@@ -30,6 +30,9 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 - Run the relevant tests (or describe what would be run and why you couldn’t).
 - Self-review using `agentic/quality/review_checklist.md`.
 - Update `STATUS.md` and any relevant docs.
+- For the affected feature(s), update `spec/FEATURES.md`:
+  - mark implementation/test status truthfully
+  - set `Accepted: yes` only when the change meets acceptance criteria and you verified it works in practice
 
 ## Token efficiency
 - Start sessions by reading `CONTEXT_PACK.md` then `STATUS.md`.

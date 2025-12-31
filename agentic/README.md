@@ -37,6 +37,13 @@ From repo root:
 bash agentic/tools/report.sh
 ```
 
+## System docs scaffolding (no LLM required)
+From repo root:
+
+```bash
+bash agentic/tools/sync_docs.sh
+```
+
 ## Where to read / edit “project truth”
 - Vision + current state + architecture pointers: `spec/OVERVIEW.md`
 - Current execution state: `STATUS.md`

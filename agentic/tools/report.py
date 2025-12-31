@@ -5,7 +5,8 @@ from pathlib import Path
 
 
 FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):\s*(.+?)\s*$")
-KEY_RE = re.compile(r"^- (\w[\w\s/.-]*?):\s*(.*?)\s*$")
+# Match both top-level and nested list items (e.g. "  - Accepted: yes")
+KEY_RE = re.compile(r"^\s*-\s+([\w][\w\s/.-]*?):\s*(.*?)\s*$")
 
 
 def parse_features(md: str):
@@ -23,6 +24,7 @@ def parse_features(md: str):
                 "status": None,
                 "acceptance": None,
                 "implementation_state": None,
+                "accepted": None,
                 "tests_unit": None,
                 "tests_acceptance": None,
                 "tests_integration": None,
@@ -45,6 +47,8 @@ def parse_features(md: str):
             current["acceptance"] = val
         elif key == "state":
             current["implementation_state"] = val
+        elif key == "accepted":
+            current["accepted"] = val
 
     return features
 
@@ -67,6 +71,7 @@ def main() -> int:
     counts = {}
     missing_acceptance = []
     missing_status = []
+    pending_acceptance = []
 
     for f in features:
         status = (f["status"] or "").strip().lower()
@@ -78,6 +83,13 @@ def main() -> int:
         acc = (f["acceptance"] or "").strip()
         if not acc or acc.lower() in {"todo", "tbd"}:
             missing_acceptance.append(f["id"])
+
+        acc_flag = (f["accepted"] or "").strip().lower()
+        impl_state = (f["implementation_state"] or "").strip().lower()
+
+        # If something is implemented/shipped but not marked accepted, flag it.
+        if (status in {"in_progress", "shipped"} or impl_state in {"partial", "complete"}) and acc_flag not in {"yes"}:
+            pending_acceptance.append(f["id"])
 
     print("=== Feature status summary ===")
     for k in sorted(counts.keys()):
@@ -92,6 +104,11 @@ def main() -> int:
         print("\nMissing Acceptance link:")
         for fid in missing_acceptance:
             print(f"- {fid} (expected: spec/acceptance/{fid}.md)")
+
+    if pending_acceptance:
+        print("\nNeeds acceptance (verify feature works + update spec/FEATURES.md -> Accepted: yes/no):")
+        for fid in pending_acceptance:
+            print(f"- {fid}")
 
     print("\nTip: Keep STATUS.md items referencing feature IDs (F-####) for easy tracking.")
     return 0
