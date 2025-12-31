@@ -1,6 +1,17 @@
 # STATUS.md (Template)
 
-Purpose: the living “truth” of where the project is today.
+Purpose: the living "truth" of where the project is today.
+
+## Current session state (optional, for mid-session tracking)
+- Session: <!-- YYYY-MM-DD-HHMM or leave empty if not mid-session -->
+- Feature: <!-- F-#### or task being worked on -->
+- Phase: <!-- e.g., "implementing", "testing", "debugging", "documenting" -->
+- Completed this session:
+  - <!-- bullets: what's done -->
+- Next immediate step:
+  - <!-- single most important next action -->
+- Blockers:
+  - <!-- issues needing attention/decision -->
 
 ## Current focus
 - <!-- what we are doing right now -->

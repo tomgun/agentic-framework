@@ -9,12 +9,15 @@ Context is expensive. Maintain **durable artifacts** so agents don’t repeatedl
 - `STACK.md`: how to build/test and key constraints
 - `/spec/*` and `spec/adr/*`: what and why
 
-## “Start of session” protocol
+## "Start of session" protocol
 Read in this order:
 1. `CONTEXT_PACK.md`
 2. `STATUS.md`
-3. The relevant spec section(s) in `/spec/`
-4. Only then: open code files
+3. `JOURNAL.md` (recent entries for session-level context)
+4. The relevant spec section(s) in `/spec/`
+5. Only then: open code files
+
+Detailed token budgeting: see `agentic/token_efficiency/reading_protocols.md`
 
 ## “Before coding” protocol (avoid token waste)
 - Restate the change in 1–3 bullets.

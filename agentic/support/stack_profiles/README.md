@@ -12,5 +12,9 @@ These are short guidance documents used during init to speed up filling `STACK.m
 - `webapp_fullstack.md`: typical webapp + backend
 - `juce_vstplugin.md`: JUCE-based VST/AU plugin considerations
 - `mobile_ios.md`: native iOS app considerations
+- `backend_go_service.md`: Go backend service
+- `ml_python_project.md`: Python machine learning project
+- `systems_rust.md`: Rust systems programming
+- `mobile_react_native.md`: React Native cross-platform mobile app
 
 
