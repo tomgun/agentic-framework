@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(pwd)"
+
+if [[ ! -d "${ROOT_DIR}/agentic/init" ]]; then
+  echo "ERROR: expected 'agentic/init' to exist in repo root."
+  echo "Run this script from your repo root (the directory that contains 'agentic/')."
+  exit 1
+fi
+
+copy_if_missing() {
+  local src="$1"
+  local dst="$2"
+
+  if [[ -f "${dst}" ]]; then
+    echo "OK  : ${dst} exists"
+    return 0
+  fi
+
+  if [[ -f "${src}" ]]; then
+    mkdir -p "$(dirname "${dst}")"
+    cp "${src}" "${dst}"
+    echo "NEW : ${dst} (from ${src})"
+    return 0
+  fi
+
+  mkdir -p "$(dirname "${dst}")"
+  cat > "${dst}" <<'EOF'
+# TODO
+EOF
+  echo "NEW : ${dst} (placeholder; missing template ${src})"
+}
+
+mkdir -p "${ROOT_DIR}/spec" "${ROOT_DIR}/adr"
+echo "OK  : ensured directories spec/ and adr/"
+
+mkdir -p "${ROOT_DIR}/spec/tasks" "${ROOT_DIR}/spec/acceptance"
+echo "OK  : ensured directories spec/tasks and spec/acceptance"
+
+copy_if_missing "${ROOT_DIR}/agentic/init/STACK.template.md" "${ROOT_DIR}/STACK.md"
+copy_if_missing "${ROOT_DIR}/agentic/init/CONTEXT_PACK.template.md" "${ROOT_DIR}/CONTEXT_PACK.md"
+copy_if_missing "${ROOT_DIR}/agentic/init/STATUS.template.md" "${ROOT_DIR}/STATUS.md"
+
+# Shared agent rules at repo root (recommended).
+# Keep agentic framework content in agentic/, but place a small entrypoint at repo root for tools that only read root files.
+if [[ ! -f "${ROOT_DIR}/AGENTS.md" ]]; then
+  cat > "${ROOT_DIR}/AGENTS.md" <<'EOF'
+# AGENTS.md
+
+This repo uses the agentic framework located at `agentic/`.
+
+## Non-negotiables
+- Add/update tests for new or changed logic.
+- Keep `STATUS.md` current.
+- Keep `/spec/*` truthful; write ADRs for real tradeoffs.
+
+Full rules: `agentic/agents/shared/agent_operating_guidelines.md`
+EOF
+  echo "NEW : ${ROOT_DIR}/AGENTS.md (entrypoint)"
+else
+  echo "OK  : ${ROOT_DIR}/AGENTS.md exists"
+fi
+
+# Seed specs (use framework templates if present; otherwise placeholders).
+if [[ ! -f "${ROOT_DIR}/spec/PRD.md" ]]; then
+  if [[ -f "${ROOT_DIR}/agentic/spec/PRD.template.md" ]]; then
+    cp "${ROOT_DIR}/agentic/spec/PRD.template.md" "${ROOT_DIR}/spec/PRD.md"
+    echo "NEW : spec/PRD.md (from agentic/spec/PRD.template.md)"
+  else
+    cat > "${ROOT_DIR}/spec/PRD.md" <<'EOF'
+# PRD (Draft)
+
+## Problem
+
+## Goals
+
+## Non-goals
+
+## Users & primary workflow
+
+## Success criteria
+
+EOF
+    echo "NEW : spec/PRD.md (placeholder)"
+  fi
+else
+  echo "OK  : spec/PRD.md exists"
+fi
+
+if [[ ! -f "${ROOT_DIR}/spec/TECH_SPEC.md" ]]; then
+  if [[ -f "${ROOT_DIR}/agentic/spec/TECH_SPEC.template.md" ]]; then
+    cp "${ROOT_DIR}/agentic/spec/TECH_SPEC.template.md" "${ROOT_DIR}/spec/TECH_SPEC.md"
+    echo "NEW : spec/TECH_SPEC.md (from agentic/spec/TECH_SPEC.template.md)"
+  else
+    cat > "${ROOT_DIR}/spec/TECH_SPEC.md" <<'EOF'
+# TECH_SPEC (Draft)
+
+## Architecture overview
+
+## Components
+
+## Data flow
+
+## Testing strategy
+
+## Risks
+
+EOF
+    echo "NEW : spec/TECH_SPEC.md (placeholder)"
+  fi
+else
+  echo "OK  : spec/TECH_SPEC.md exists"
+fi
+
+copy_if_missing "${ROOT_DIR}/agentic/spec/OVERVIEW.template.md" "${ROOT_DIR}/spec/OVERVIEW.md"
+copy_if_missing "${ROOT_DIR}/agentic/spec/FEATURES.template.md" "${ROOT_DIR}/spec/FEATURES.md"
+copy_if_missing "${ROOT_DIR}/agentic/spec/LESSONS.template.md" "${ROOT_DIR}/spec/LESSONS.md"
+copy_if_missing "${ROOT_DIR}/agentic/spec/NFR.template.md" "${ROOT_DIR}/spec/NFR.md"
+copy_if_missing "${ROOT_DIR}/agentic/spec/acceptance/README.template.md" "${ROOT_DIR}/spec/acceptance/README.md"
+
+echo "Done. Next: run the agent-guided init in agentic/init/init_playbook.md"
+
+
