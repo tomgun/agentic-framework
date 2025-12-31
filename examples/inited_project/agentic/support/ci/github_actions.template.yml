@@ -1,0 +1,49 @@
+name: agentic-spec-lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  spec-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate required durable-context artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          require_file() {
+            local f="$1"
+            if [[ ! -f "$f" ]]; then
+              echo "Missing required file: $f"
+              exit 1
+            fi
+            if [[ ! -s "$f" ]]; then
+              echo "Required file is empty: $f"
+              exit 1
+            fi
+          }
+
+          require_dir() {
+            local d="$1"
+            if [[ ! -d "$d" ]]; then
+              echo "Missing required directory: $d"
+              exit 1
+            fi
+          }
+
+          require_file "STACK.md"
+          require_file "CONTEXT_PACK.md"
+          require_file "STATUS.md"
+          require_dir "spec"
+          require_file "spec/PRD.md"
+          require_file "spec/TECH_SPEC.md"
+          require_dir "spec/adr"
+
+          echo "OK: agentic durable context artifacts present"
+
+

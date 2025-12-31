@@ -11,6 +11,10 @@ Copy the `agentic/` folder into your project repo root (i.e., into the top-level
 
 The framework also expects a small set of **repo-root bootstrap artifacts** (e.g. `STACK.md`, `STATUS.md`, `CONTEXT_PACK.md`, `AGENTS.md`, and `spec/*`) — these are created by the scaffold step below, so you don’t manually copy them.
 
+## Examples
+- `examples/example_structure/`: what a freshly scaffolded project looks like (bootstrap artifacts + `spec/` + `docs/`).
+- `examples/inited_project/`: a more complete example project (runnable Next.js Todo app) showing features/backlog/acceptance.
+
 ## Init (agent-driven)
 Developer goal: only talk to the agent. The agent can run scripts for efficiency.
 

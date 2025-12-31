@@ -1,0 +1,55 @@
+.row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.toggle {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.box {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid color-mix(in oklab, var(--accent), white 10%);
+  background: transparent;
+}
+
+.row[data-done="true"] .box {
+  background: var(--ok);
+  border-color: color-mix(in oklab, var(--ok), black 15%);
+}
+
+.text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row[data-done="true"] .text {
+  text-decoration: line-through;
+  color: color-mix(in oklab, var(--muted), var(--text) 20%);
+}
+
+.state {
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+
+
