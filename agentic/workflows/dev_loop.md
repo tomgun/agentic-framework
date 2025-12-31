@@ -23,12 +23,20 @@ Goal: ship in **small, test-backed increments** while keeping `STATUS.md` and sp
 7. **Update docs**
    - Update `STATUS.md` (always).
    - Update specs/ADRs if behavior/architecture changed.
+   - Append session summary to `JOURNAL.md` (what was done, what's next, blockers).
 
 ## Token efficiency rules
 - Prefer updating `CONTEXT_PACK.md` over re-reading the whole repo repeatedly.
 - When starting a new session after a break, read:
   1) `CONTEXT_PACK.md`
   2) `STATUS.md`
-  3) the relevant spec section(s)
+  3) `JOURNAL.md` (recent entries for session-level context)
+  4) the relevant spec section(s)
+
+## Resuming after context reset
+- If context window resets mid-implementation:
+  - Check `STATUS.md` "Current session state" section for immediate context
+  - Check recent `JOURNAL.md` entries for detailed progress trail
+  - Continue from "Next immediate step" rather than re-planning from scratch
 
 

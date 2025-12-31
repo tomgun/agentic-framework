@@ -1,6 +1,6 @@
 # ADR (Template)
 
-Purpose: record a **decision** that has meaningful tradeoffs so we don’t re-litigate it later.
+Purpose: record a **decision** that has meaningful tradeoffs so we don't re-litigate it later.
 
 ## Title
 - <!-- short, specific -->
@@ -12,6 +12,12 @@ Purpose: record a **decision** that has meaningful tradeoffs so we don’t re-li
 - What problem are we solving?
 - Constraints (from `STACK.md` / product requirements):
 
+## Research trail (optional)
+- Research conducted: <!-- link to docs/research/... if applicable -->
+- External references: <!-- REF-#### IDs from spec/REFERENCES.md -->
+- Key findings that informed this decision:
+  - <!-- bullet points from research -->
+
 ## Decision
 - We will:
 
@@ -20,10 +26,21 @@ Purpose: record a **decision** that has meaningful tradeoffs so we don’t re-li
   - Pros:
   - Cons:
 - Option B:
+  - Pros:
+  - Cons:
+
+## Alternatives attempted (optional)
+- What we tried before this decision:
+  - Approach:
+  - Why it didn't work:
+  - Lessons learned:
 
 ## Consequences
 - Positive:
 - Negative / risks:
+
+## External references
+- <!-- Links to papers, docs, examples that informed this (also add to spec/REFERENCES.md) -->
 
 ## Follow-ups
 - Tasks:

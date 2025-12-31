@@ -25,6 +25,8 @@ Purpose: a **human + machine** readable registry of features with stable IDs, st
 
 ## F-0001: ExampleFeatureName
 - Parent: none  <!-- or F-0000 for hierarchy -->
+- Dependencies: none  <!-- Features that must be complete/partial first: F-0002 (complete), F-0003 (partial OK) -->
+- Complexity: M  <!-- S | M | L | XL (optional, for prioritization) -->
 - Status: planned
 - PRD: spec/PRD.md#requirements
 - Requirements: R-0001
@@ -37,10 +39,13 @@ Purpose: a **human + machine** readable registry of features with stable IDs, st
   - State: none  <!-- none | partial | complete -->
   - Code: <!-- paths/modules -->
 - Tests:
+  - Test strategy: unit  <!-- unit | integration | e2e | manual | hybrid -->
   - Unit: todo  <!-- todo | partial | complete -->
   - Integration: n/a
   - Acceptance: todo
   - Perf/realtime: n/a
+- Technical debt:
+  - <!-- links to spec/LESSONS.md anchors or specific debt items -->
 - Lessons/caveats:
   - <!-- link to spec/LESSONS.md anchors or adr -->
 - Notes:
