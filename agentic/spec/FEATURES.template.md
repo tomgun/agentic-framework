@@ -30,6 +30,9 @@ Purpose: a **human + machine** readable registry of features with stable IDs, st
 - Requirements: R-0001
 - NFRs: none  <!-- optional; list NFR-#### only if the feature has specific constraints -->
 - Acceptance: spec/acceptance/F-0001.md
+- Verification:
+  - Accepted: no       <!-- no | yes -->
+  - Accepted at:       <!-- YYYY-MM-DD (optional) -->
 - Implementation:
   - State: none  <!-- none | partial | complete -->
   - Code: <!-- paths/modules -->
