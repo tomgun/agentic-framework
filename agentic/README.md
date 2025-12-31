@@ -12,9 +12,9 @@ This folder is a **portable framework** you can copy into any repository to boot
 
 ## Quick start (new repo)
 1. Copy the **folder** `agentic/` into your repo root (don’t copy its contents into the root; keep the folder so links stay consistent).
-2. Init is two-phase: **scripted scaffold** (create everything) + **agent-guided planning** (fill it in).
+2. Init is two-phase: **agent-runs scaffold** (create everything) + **agent-guided planning** (fill it in). The developer should only need to talk to the agent.
 
-### Step 0: scaffold (script)
+### Step 0: scaffold (agent runs script)
 
 ```bash
 bash agentic/init/scaffold.sh

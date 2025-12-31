@@ -17,3 +17,6 @@ You are working in a repo that uses the `agentic/` agentic development framework
 - Add/update tests for new/changed logic.
 - Update `STATUS.md` after progress and keep specs truthful.
 
+## Developer UX
+- Always end with: what changed, what’s next, and what you need from the user.
+

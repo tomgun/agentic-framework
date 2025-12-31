@@ -2,6 +2,19 @@
 
 These rules are intended to be used by **any** assistant (Cursor, Copilot, Claude, etc.) working in this repo.
 
+## Developer UX contract (keep the user “by the hand”)
+- Always make the next step obvious. End each work session with:
+  - what changed (1–5 bullets)
+  - what to do next (1–5 bullets)
+  - what you need from the user (questions/decisions)
+- Don’t rely on user memory. When appropriate, suggest running:
+  - `bash agentic/tools/brief.sh` (quick context)
+  - `bash agentic/tools/report.sh` (what’s missing / what needs acceptance)
+  - `bash agentic/tools/sync_docs.sh` (system docs scaffolding)
+- When the user asks to start/init the project, prefer to run the scripts yourself (with the user’s consent) rather than asking them to run commands.
+- If the user returns after a break, proactively propose a resume protocol:
+  - read `CONTEXT_PACK.md`, then `STATUS.md`, then relevant feature acceptance docs.
+
 ## Non-negotiables
 - **Follow the spec workflow**: treat `/spec/*`, `spec/adr/*`, `STATUS.md`, `STACK.md`, `CONTEXT_PACK.md` as authoritative.
 - **Keep feature truth current**: if you change a feature’s behavior/status/tests, update `spec/FEATURES.md` and the relevant acceptance file(s).
