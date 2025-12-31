@@ -3,7 +3,7 @@
 These rules are intended to be used by **any** assistant (Cursor, Copilot, Claude, etc.) working in this repo.
 
 ## Non-negotiables
-- **Follow the spec workflow**: treat `/spec/*`, `/adr/*`, `STATUS.md`, `STACK.md`, `CONTEXT_PACK.md` as authoritative.
+- **Follow the spec workflow**: treat `/spec/*`, `spec/adr/*`, `STATUS.md`, `STACK.md`, `CONTEXT_PACK.md` as authoritative.
 - **Keep feature truth current**: if you change a feature’s behavior/status/tests, update `spec/FEATURES.md` and the relevant acceptance file(s).
 - **Keep NFR truth current**: if your change affects cross-cutting constraints (perf/security/realtime/reliability), update `spec/NFR.md` and link relevant NFR IDs from the feature(s).
 - **Tests are required** for new/changed logic.

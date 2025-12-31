@@ -8,7 +8,7 @@ Create/update these at repo root:
 - `CONTEXT_PACK.md` (from `agentic/init/CONTEXT_PACK.template.md`)
 - `STATUS.md` (from `agentic/init/STATUS.template.md`)
 - `/spec/` (seed with at least `PRD.md` and `TECH_SPEC.md`)
-- `/adr/` (directory exists; can be empty at start)
+- `spec/adr/` (directory exists; can be empty at start)
 
 ## Step 0: scaffold files/folders (recommended)
 Run (from repo root):
@@ -27,7 +27,7 @@ Open a fresh agent session and paste:
 3. “Start by planning at the product/system level: choose the app type (webapp/game/vstplugin/mobileapp/app+backend) and write the initial PRD/Tech Spec outline.”
 4. “Then finalize the stack details and fill `STACK.md`.”
 5. “Use a stack profile if present (default: `agentic/support/stack_profiles/generic_default.md`).”
-6. “Your job is to write/update: `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, and seed `/spec/` + `/adr/`.”
+6. “Your job is to write/update: `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, and seed `/spec/` + `spec/adr/`.”
 7. “Keep everything short; prefer bullet points; avoid deep implementation detail.”
 
 ## Process rules (important)

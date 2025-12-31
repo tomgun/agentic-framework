@@ -15,7 +15,7 @@ Purpose: a compact, durable starting point for any agent/human so they don’t n
 - Overview: `spec/OVERVIEW.md`
 - Non-functional requirements: `spec/NFR.md`
 - Lessons: `spec/LESSONS.md`
-- Decisions: `/adr/`
+- Decisions: `spec/adr/`
 - Status: `STATUS.md`
 
 ## How to run

@@ -22,10 +22,6 @@ Purpose: define *why* we’re building this and *what* success means.
   - If you prefer minimal ceremony, skip requirements and express needs directly as feature acceptance criteria in `spec/acceptance/F-####.md`.
 - If you do use requirements, keep an explicit mapping (one requirement can map to multiple features and vice versa).
 
-## Non-functional requirements (optional but recommended)
-- Non-functional requirements (performance/security/reliability/realtime safety/etc.) live in `spec/NFR.md` as `NFR-####`.
-- Features can reference relevant NFR IDs in `spec/FEATURES.md`.
-
 ## Requirements (user-facing)
 - R-0001:
 - R-0002:

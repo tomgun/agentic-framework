@@ -47,7 +47,7 @@ The agent should ask only what’s necessary to produce durable context artifact
 
 ## Repo conventions
 - Where specs live: `/spec/`?
-- Where ADRs live: `/adr/`?
+- Where ADRs live: `spec/adr/`?
 - Where status lives: `STATUS.md`?
 - Any naming conventions that matter?
 

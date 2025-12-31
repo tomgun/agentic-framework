@@ -37,6 +37,6 @@ Purpose: one place to understand the **vision**, **current state**, and **where 
   - test coverage notes
 
 ## Lessons & caveats
-- Read: `spec/LESSONS.md` and `/adr/*`
+- Read: `spec/LESSONS.md` and `spec/adr/*`
 
 

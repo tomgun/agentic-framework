@@ -32,8 +32,8 @@ EOF
   echo "NEW : ${dst} (placeholder; missing template ${src})"
 }
 
-mkdir -p "${ROOT_DIR}/spec" "${ROOT_DIR}/adr"
-echo "OK  : ensured directories spec/ and adr/"
+mkdir -p "${ROOT_DIR}/spec" "${ROOT_DIR}/spec/adr"
+echo "OK  : ensured directories spec/ and spec/adr"
 
 mkdir -p "${ROOT_DIR}/spec/tasks" "${ROOT_DIR}/spec/acceptance"
 echo "OK  : ensured directories spec/tasks and spec/acceptance"

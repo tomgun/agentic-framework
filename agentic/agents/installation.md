@@ -8,7 +8,7 @@ These files should exist at repo root (created by `bash agentic/init/scaffold.sh
 - `CONTEXT_PACK.md`
 - `STATUS.md`
 - `/spec/`
-- `/adr/`
+- `spec/adr/`
 
 ## Shared agent rules
 Recommended: ensure `AGENTS.md` exists at repo root (created by scaffold). If you need to recreate it:

@@ -12,6 +12,11 @@ Purpose: define *how* we will build it with enough clarity to implement incremen
   - F-0001
   - F-0002
 
+## NFRs in scope (IDs) (optional but recommended)
+- NFR registry: `spec/NFR.md`
+- Addressed by this spec:
+  - NFR-0001
+
 ## Architecture overview
 - Style: <!-- monolith/modular monolith/services/plugin/etc -->
 - Key constraints from `STACK.md`:

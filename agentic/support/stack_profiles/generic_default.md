@@ -6,7 +6,7 @@ Use this when you don’t yet know the full stack, or when the project is standa
 - Language/runtime versions are explicit
 - One build/test command per test layer exists (even if `TODO` at first)
 - Dependencies manager is chosen
-- Repo conventions are stated (`/spec`, `/adr`, `STATUS.md`)
+- Repo conventions are stated (`/spec`, `spec/adr`, `STATUS.md`)
 
 ## Testing defaults
 - Unit tests: required for all new/changed logic

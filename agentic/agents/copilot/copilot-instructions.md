@@ -10,7 +10,7 @@ This repo uses the `agentic/` agentic development framework.
 - `spec/FEATURES.md`
 - `spec/NFR.md` (if constraints apply)
 - `spec/acceptance/F-####.md` for the feature you are changing
-- `/spec/*` and `/adr/*`
+- `/spec/*` and `spec/adr/*`
 - `STACK.md` for how to run/test
 
 ## Behavior contract
