@@ -7,7 +7,7 @@ Context is expensive. Maintain **durable artifacts** so agents don’t repeatedl
 - `CONTEXT_PACK.md`: where to look, how to run, architecture snapshot
 - `STATUS.md`: what’s happening now and what’s next
 - `STACK.md`: how to build/test and key constraints
-- `/spec/*` and `/adr/*`: what and why
+- `/spec/*` and `spec/adr/*`: what and why
 
 ## “Start of session” protocol
 Read in this order:

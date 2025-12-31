@@ -4,7 +4,7 @@ Always consult:
 - AGENTS.md (if present)
 - CONTEXT_PACK.md
 - STATUS.md
-- /spec/* and /adr/* as the source of truth
+- /spec/* and spec/adr/* as the source of truth
 
 Rules:
 - Add/update tests for new/changed logic.

@@ -42,7 +42,7 @@ jobs:
           require_dir "spec"
           require_file "spec/PRD.md"
           require_file "spec/TECH_SPEC.md"
-          require_dir "adr"
+          require_dir "spec/adr"
 
           echo "OK: agentic durable context artifacts present"
 

@@ -11,7 +11,7 @@ This is intentionally technology-agnostic. It validates that the repo maintains 
 
 ## Required directories (must exist)
 - `spec/`
-- `adr/`
+- `spec/adr/`
 
 ## Guidance
 - This is not meant to police writing style.
