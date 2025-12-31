@@ -1,0 +1,44 @@
+# STACK.md (Template)
+
+Purpose: a single source of truth for “how we build and run software here”.
+
+## Summary
+- What are we building: <!-- 1–2 sentences -->
+- Primary platform: <!-- web/service/mobile/desktop/cli -->
+
+## Languages & runtimes
+- Language(s): <!-- e.g., TypeScript, Python, Go -->
+- Runtime(s): <!-- e.g., Node 22, Python 3.12 -->
+
+## Frameworks & libraries
+- App framework: <!-- e.g., Next.js, FastAPI, Gin -->
+- UI framework (if any): <!-- e.g., React, Svelte -->
+
+## Tooling
+- Package manager: <!-- npm/pnpm/yarn/uv/pip/poetry/go -->
+- Formatting/linting: <!-- black/ruff/eslint/prettier/gofmt/etc -->
+
+## Testing (required)
+- Unit test framework: <!-- e.g., pytest, vitest, go test -->
+- Integration/E2E (optional): <!-- e.g., playwright, cypress -->
+- Test commands:
+  - Unit: `<!-- fill -->`
+  - Integration: `<!-- fill or N/A -->`
+  - E2E: `<!-- fill or N/A -->`
+
+## Data & integrations
+- Primary datastore: <!-- postgres/sqlite/mongo/redis/etc -->
+- Messaging/queues (if any): <!-- kafka/sqs/rabbitmq/etc -->
+- External integrations: <!-- bullet list -->
+
+## Deployment
+- Target environment: <!-- local/cloud/on-prem -->
+- CI: <!-- GitHub Actions by default -->
+- Release strategy: <!-- manual/semver/tags/etc -->
+
+## Constraints & non-negotiables
+- Security/compliance: <!-- PII, GDPR, etc -->
+- Performance: <!-- latency, throughput -->
+- Reliability: <!-- SLOs if known -->
+
+
