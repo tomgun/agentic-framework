@@ -10,8 +10,8 @@ Create/update these at repo root:
 - `/spec/` (seed with at least `PRD.md` and `TECH_SPEC.md`)
 - `spec/adr/` (directory exists; can be empty at start)
 
-## Step 0: scaffold files/folders (recommended)
-Run (from repo root):
+## Step 0: scaffold files/folders (agent should run this)
+The developer should only need to talk to the agent. The agent should run (from repo root):
 
 ```bash
 bash agentic/init/scaffold.sh

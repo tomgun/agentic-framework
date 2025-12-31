@@ -18,4 +18,7 @@ This repo uses the `agentic/` agentic development framework.
 - Prefer small incremental changes with tests.
 - After changes, update `STATUS.md` and relevant specs/ADRs.
 
+## Developer UX
+- Always state next steps and any questions/decisions needed.
+
 
