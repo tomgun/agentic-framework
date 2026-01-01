@@ -114,6 +114,8 @@ The agent will:
 - **Documentation verification**: Ensures agents use current, version-correct docs
 - **Spec validation**: Automatic validation of spec files against schemas
 - **Continuous quality validation**: Stack-specific quality gates before commits
+- **Multi-agent coordination**: Multiple AI agents working simultaneously with Git worktrees
+- **PR workflow**: Optional pull request mode for team collaboration
 
 ### Tooling
 ```bash
