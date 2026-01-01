@@ -425,49 +425,23 @@ jobs:
         run: python3 agentic/tools/validate_specs.py
 ```
 
-## Migration Strategy
+## Adoption for New Projects
 
-### Phase 1: Add Schemas (Week 1)
+**This validation system is designed for new projects initialized with the agentic framework.**
 
-1. Create `agentic/schemas/` directory
-2. Define JSON schemas for:
-   - `feature.schema.json`
-   - `nfr.schema.json`
-   - `requirement.schema.json`
-   - `adr.schema.json`
-3. Document schema in `SPEC_SCHEMA.md`
+When you initialize a new project:
+1. Agent runs scaffold script
+2. Creates spec templates with YAML frontmatter already included
+3. `validate_specs.py` is ready to use
+4. Validation can be enabled in pre-commit hooks or CI
 
-### Phase 2: Add Frontmatter (Week 1-2)
+**For existing projects:**
+- There is currently no framework upgrade/migration path
+- You can continue using plain Markdown specs (works fine)
+- If you want validation, you'd need to manually add YAML frontmatter
+- We may add migration tools in a future framework version
 
-1. Start with `FEATURES.md`:
-   ```yaml
-   ---
-   features:
-     - id: F-0001
-       # ... (existing data converted to YAML)
-   ---
-   
-   # Features (Documentation)
-   
-   Existing Markdown content stays here.
-   ```
-2. Validate with schema
-3. Update tools to parse frontmatter
-
-### Phase 3: Enable Validation (Week 2)
-
-1. Add `validate_specs.py` tool
-2. Integrate into `verify.sh`
-3. Add pre-commit hook (optional)
-4. Add CI validation
-5. Configure IDE (VS Code)
-
-### Phase 4: Migrate Other Specs (Week 3+)
-
-1. `NFR.md` → Add frontmatter + schema
-2. `PRD.md` → Add frontmatter (requirements)
-3. ADRs → Add frontmatter (metadata)
-4. Update templates
+**Recommendation:** Use this for new projects. Don't try to retrofit existing projects unless you're willing to do manual conversion.
 
 ## Alternative: Keep Markdown, Add Linter
 
@@ -518,9 +492,24 @@ def lint_features(file_path: Path) -> list[str]:
 - ⚠️ Custom code to maintain
 - ⚠️ No IDE integration
 
-## Recommendation: Incremental Adoption
+## Recommendation: Start Simple
 
-**Start simple, add complexity as needed:**
+**For most projects, the current plain Markdown approach is sufficient.**
+
+Use YAML frontmatter validation when:
+- ✅ Starting a new project with complex feature dependencies
+- ✅ Team project with multiple developers/agents
+- ✅ Need programmatic queries of spec data
+- ✅ Want IDE autocomplete and inline validation
+- ✅ Building tooling on top of specs
+
+**Don't bother with validation if:**
+- ❌ Simple solo project with <20 features
+- ❌ Existing project (no migration path yet)
+- ❌ Prototyping/exploration phase
+- ❌ Markdown-only workflow is working fine
+
+The framework works great with plain Markdown specs. Validation is an **optional enhancement**, not a requirement.
 
 1. **Now**: Use current Markdown + `SPEC_SCHEMA.md` documentation
 2. **Soon**: Add lightweight linter (`lint_specs.py`) to catch errors
