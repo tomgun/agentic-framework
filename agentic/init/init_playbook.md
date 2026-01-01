@@ -26,9 +26,10 @@ Open a fresh agent session and paste:
 2. “Follow `agentic/init/init_questions.md`.”
 3. “Start by planning at the product/system level: choose the app type (webapp/game/vstplugin/mobileapp/app+backend) and write the initial PRD/Tech Spec outline.”
 4. “Then finalize the stack details and fill `STACK.md`.”
-5. “Use a stack profile if present (default: `agentic/support/stack_profiles/generic_default.md`).”
-6. “Your job is to write/update: `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, and seed `/spec/` + `spec/adr/`.”
-7. “Keep everything short; prefer bullet points; avoid deep implementation detail.”
+5. "Use a stack profile if present (default: `agentic/support/stack_profiles/generic_default.md`)."
+6. "After finalizing STACK.md, create stack-specific quality validation by copying the appropriate profile from `agentic/quality_profiles/` to `quality_checks.sh` in the project root. Customize thresholds and ask if I want a pre-commit hook."
+7. "Your job is to write/update: `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, seed `/spec/` + `spec/adr/`, and set up `quality_checks.sh`."
+8. "Keep everything short; prefer bullet points; avoid deep implementation detail."
 
 ## Process rules (important)
 - **Ask before assuming**: if a stack choice is unclear, ask.

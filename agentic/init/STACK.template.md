@@ -87,4 +87,30 @@ Purpose: a single source of truth for “how we build and run software here”.
 <!-- - research_depth: standard  # quick (30min) | standard (60min) | deep (90min) -->
 <!-- - research_budget: 60  # default minutes per research session -->
 
+## Quality validation (recommended)
+<!-- Automated, stack-specific quality gates. See agentic/workflows/continuous_quality_validation.md -->
+<!-- Agents create this during init based on tech stack -->
+<!-- - quality_checks: enabled -->
+<!-- - profile: juce_audio_plugin  # or webapp_fullstack, ios_app, etc -->
+<!-- - pre_commit_hook: yes -->
+<!-- - run_command: bash quality_checks.sh --pre-commit -->
+<!-- - full_suite_command: bash quality_checks.sh --full -->
+
+## Quality thresholds (stack-specific, optional)
+<!-- Example for JUCE plugins: -->
+<!-- - max_cpu_percent: 50 -->
+<!-- - allow_nan_inf: no -->
+<!-- - max_glitches: 0 -->
+<!-- - max_latency_ms: 10 -->
+
+<!-- Example for web apps: -->
+<!-- - max_bundle_size_kb: 500 -->
+<!-- - min_lighthouse_performance: 90 -->
+<!-- - min_lighthouse_accessibility: 95 -->
+
+<!-- Example for mobile apps: -->
+<!-- - max_memory_mb: 150 -->
+<!-- - max_battery_per_hour_percent: 5 -->
+<!-- - max_fps_drops: 5 -->
+
 
