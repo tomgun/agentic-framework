@@ -5,13 +5,13 @@
 ## Philosophy
 
 **Every technology stack has specific failure modes.** Generic tests aren't enough:
-- Audio plugins: NaN/Inf values, glitches, runaway feedback, zipper noise
 - Web apps: Memory leaks, slow render, broken accessibility
 - Mobile apps: Battery drain, UI jank, background crashes
-- Games: Frame drops, physics glitches, asset loading issues
+- Backend services: Connection leaks, slow queries, cascade failures
 - Desktop apps: Memory leaks, UI responsiveness, cross-platform issues
 - CLI/Server tools: Memory leaks, signal handling, long-running stability
-- Backend services: Connection leaks, slow queries, cascade failures
+- Games: Frame drops, physics glitches, asset loading issues
+- Audio plugins: NaN/Inf values, glitches, runaway feedback, zipper noise
 - Real-time software: Missed deadlines, priority inversions
 - Security software: Timing attacks, side channels, buffer overflows
 
@@ -63,13 +63,13 @@ Each technology has unique failure modes. Quality profiles target these specific
 
 | Stack Type | Key Quality Checks | Example Failure Modes |
 |------------|-------------------|----------------------|
-| **Audio Plugin** | pluginval, DSP validation, CPU/glitch detection | NaN/Inf, glitches, zipper noise, feedback |
-| **Desktop App** | UI responsiveness, memory, cross-platform | UI freezes, memory leaks, platform bugs |
-| **CLI/Server Tool** | Memory, signal handling, long-running | Memory leaks, zombie processes, crashes |
 | **Web App** | Bundle size, Lighthouse, accessibility | Memory leaks, slow render, poor a11y |
 | **Mobile App** | Battery, memory, UI performance | Battery drain, jank, crashes |
 | **Backend Service** | Load testing, connection pools, queries | Connection leaks, slow queries, deadlocks |
+| **Desktop App** | UI responsiveness, memory, cross-platform | UI freezes, memory leaks, platform bugs |
+| **CLI/Server Tool** | Memory, signal handling, long-running | Memory leaks, zombie processes, crashes |
 | **Game (2D/3D)** | FPS, physics, asset loading | Frame drops, physics bugs, long loads |
+| **Audio Plugin** | pluginval, DSP validation, CPU/glitch detection | NaN/Inf, glitches, zipper noise, feedback |
 | **Real-time System** | Deadline analysis, jitter | Missed deadlines, priority inversions |
 | **Security Software** | Static analysis, fuzzing, timing | Buffer overflows, timing attacks |
 | **Network Software** | Connection handling, throughput | Connection leaks, packet loss |
@@ -77,13 +77,13 @@ Each technology has unique failure modes. Quality profiles target these specific
 ### Detailed Examples
 
 For complete implementations, see `agentic/quality_profiles/`:
-- Audio plugins (JUCE): `juce_audio_plugin.sh` - includes pluginval, offline DSP validation with numpy, realtime CPU & glitch detection
+- Web applications: `webapp_fullstack.sh`
+- Backend services: `backend_service.sh`
+- Mobile apps: `ios_app.sh`, `android_app.sh`
 - Desktop applications: `desktop_app.sh`
 - CLI/Server tools: `cli_server_tool.sh`
-- Web applications: `webapp_fullstack.sh`
-- Mobile apps: `ios_app.sh`, `android_app.sh`
-- Backend services: `backend_service.sh`
 - Games: `game_engine.sh`
+- Audio plugins: `juce_audio_plugin.sh` - includes pluginval, offline DSP validation with numpy, realtime CPU & glitch detection
 - More examples in the profiles directory
 
 Below are conceptual examples showing the approach for different stacks.
@@ -96,7 +96,7 @@ Below are conceptual examples showing the approach for different stacks.
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "=== JUCE Plugin Quality Validation ==="
+echo "=== Web Application Quality Validation ==="
 echo
 
 # 1. Build check
@@ -681,16 +681,16 @@ echo "✅ All quality checks passed!"
 
 **See `agentic/quality_profiles/` for complete implementations:**
 
-- **Audio plugins**: JUCE VST/AU/AUv3 with pluginval, DSP validation (numpy), realtime metrics
-- **Desktop apps**: Cross-platform (Linux/Mac/Windows), UI responsiveness, memory
-- **CLI/Server tools**: Long-running stability, signal handling, resource cleanup
 - **Web apps**: Bundle size, performance, accessibility, memory
 - **Mobile apps**: iOS/Android, battery, memory, UI performance
-- **Games**: 2D, Unity, Unreal - FPS, physics, assets
 - **Backend services**: Load testing, connections, queries
+- **Desktop apps**: Cross-platform (Linux/Mac/Windows), UI responsiveness, memory
+- **CLI/Server tools**: Long-running stability, signal handling, resource cleanup
+- **Games**: 2D, Unity, Unreal - FPS, physics, assets
+- **Audio plugins**: JUCE VST/AU/AUv3 with pluginval, DSP validation (numpy), realtime metrics
 - **Real-time demos**: Frame timing, shaders, audio sync
-- **Security software**: Static analysis, fuzzing, timing
 - **Image/video processing**: Quality, performance, color accuracy
+- **Security software**: Static analysis, fuzzing, timing
 - **Network software**: Connection handling, throughput, reliability
 - **Embedded/IoT**: Memory footprint, power, real-time constraints
 

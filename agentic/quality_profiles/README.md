@@ -12,9 +12,20 @@ Agents copy and customize these during project initialization to create `quality
 
 ## Available Profiles
 
-### Audio/DSP
-- **juce_audio_plugin.sh** - JUCE VST/AU/AUv3 plugin validation (complete)
-- **ios_audio_plugin.sh** (todo) - iOS AUv3 audio plugin validation
+### Web Applications
+- **webapp_fullstack.sh** (todo) - Full-stack web app validation
+- **webapp_frontend.sh** (todo) - Frontend-only validation
+
+### Mobile
+- **ios_app.sh** (todo) - iOS app validation
+- **android_app.sh** (todo) - Android app validation
+- **mobile_game.sh** (todo) - Mobile game validation
+
+### Backend/Services
+- **backend_rest_api.sh** (todo) - REST API service validation
+- **backend_go.sh** (todo) - Go service validation
+- **backend_python.sh** (todo) - Python service validation
+- **backend_rust.sh** (todo) - Rust service validation
 
 ### Desktop Applications
 - **desktop_app_qt.sh** (todo) - Qt desktop app validation
@@ -26,26 +37,15 @@ Agents copy and customize these during project initialization to create `quality
 - **server_daemon.sh** (todo) - Background service/daemon validation
 - **batch_processor.sh** (todo) - Batch processing tool validation
 
-### Web Applications
-- **webapp_fullstack.sh** (todo) - Full-stack web app validation
-- **webapp_frontend.sh** (todo) - Frontend-only validation
-
-### Mobile
-- **ios_app.sh** (todo) - iOS app validation
-- **android_app.sh** (todo) - Android app validation
-- **mobile_game.sh** (todo) - Mobile game validation
-
 ### Games
 - **game_2d.sh** (todo) - 2D game validation (SDL, SFML, etc.)
 - **unity_game.sh** (todo) - Unity game validation
 - **unreal_game.sh** (todo) - Unreal Engine game validation
 - **realtime_demo.sh** (todo) - Demo engine/demoscene validation
 
-### Backend/Services
-- **backend_rest_api.sh** (todo) - REST API service validation
-- **backend_go.sh** (todo) - Go service validation
-- **backend_python.sh** (todo) - Python service validation
-- **backend_rust.sh** (todo) - Rust service validation
+### Audio/DSP
+- **juce_audio_plugin.sh** - JUCE VST/AU/AUv3 plugin validation (complete)
+- **ios_audio_plugin.sh** (todo) - iOS AUv3 audio plugin validation
 
 ### Image/Video Processing
 - **image_processing.sh** (todo) - Image filter/processing validation
