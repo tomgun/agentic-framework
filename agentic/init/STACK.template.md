@@ -9,10 +9,28 @@ Purpose: a single source of truth for “how we build and run software here”.
 ## Languages & runtimes
 - Language(s): <!-- e.g., TypeScript, Python, Go -->
 - Runtime(s): <!-- e.g., Node 22, Python 3.12 -->
+- Specific versions: <!-- e.g., TypeScript 5.3.3, Python 3.12.1 -->
+  <!-- IMPORTANT: Agents use these exact versions to verify documentation -->
 
 ## Frameworks & libraries
 - App framework: <!-- e.g., Next.js, FastAPI, Gin -->
 - UI framework (if any): <!-- e.g., React, Svelte -->
+- Specific versions: <!-- e.g., Next.js 15.1.0, React 19.0.0 -->
+  <!-- IMPORTANT: List exact versions so agents can verify API docs -->
+
+## Documentation verification (recommended)
+<!-- Ensures agents use current, version-correct documentation -->
+<!-- See: agentic/workflows/documentation_verification.md -->
+<!-- - doc_verification: context7  # context7 | manual | none -->
+<!-- - context7_enabled: yes -->
+<!-- - context7_config: .context7.yml -->
+<!-- - strict_version_matching: yes -->
+
+## Documentation sources (for manual verification)
+<!-- If not using Context7, agents must check these sources match STACK versions -->
+<!-- Example: -->
+<!-- - Next.js: https://nextjs.org/docs (version selector: v15.1) -->
+<!-- - React: https://react.dev (v19) -->
 
 ## Tooling
 - Package manager: <!-- npm/pnpm/yarn/uv/pip/poetry/go -->

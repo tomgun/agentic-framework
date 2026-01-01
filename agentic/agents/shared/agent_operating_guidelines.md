@@ -36,6 +36,12 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
   - If `development_mode: tdd` (RECOMMENDED) → Follow `agentic/workflows/tdd_mode.md` (write tests FIRST)
   - If `development_mode: standard` → Follow `agentic/workflows/dev_loop.md` (tests required but not necessarily first)
   - If unset → Default to `tdd` mode
+- **Verify documentation versions** (CRITICAL):
+  - Read exact versions from `STACK.md` (e.g., "Next.js 15.1.0", "React 19.0.0")
+  - If `context7_enabled: yes` → Use Context7 for version-specific docs
+  - If manual verification → Go to official docs, ensure version selector matches
+  - **NEVER assume an API exists without checking current docs**
+  - See `agentic/workflows/documentation_verification.md` for full protocol
 - If the change touches a specific feature: read its acceptance file `spec/acceptance/F-####.md`.
 - If constraints matter: read `spec/NFR.md`.
 - Identify the relevant spec section(s) and acceptance criteria.
@@ -46,6 +52,12 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 - Keep diffs small and incremental.
 - Prefer seams and boundaries that enable unit tests.
 - Avoid speculative changes outside the task scope.
+- **Before using any library/framework API**:
+  1. Verify version in `STACK.md`
+  2. Check documentation for that specific version (Context7 or official docs)
+  3. Look for deprecation warnings
+  4. Add version comment in code (e.g., `// Next.js 15.1 API`)
+  5. If docs seem outdated → STOP and add to `HUMAN_NEEDED.md`
 - Annotate key code with feature IDs (see `agentic/workflows/code_annotations.md`):
   - Add `@feature F-####` comments to functions/classes implementing features
   - Add `@nfr NFR-####` comments for code with non-functional constraints

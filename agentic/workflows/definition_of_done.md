@@ -15,6 +15,13 @@ Every change should satisfy:
   - VST/JUCE: audio I/O golden tests, host automation tests, realtime/perf budget checks
   - Games: determinism/replay tests, perf budgets
 
+## Documentation verification (required)
+- [ ] All APIs used match versions declared in STACK.md
+- [ ] No deprecated APIs used (or explicitly approved in HUMAN_NEEDED.md)
+- [ ] Version comments added to code referencing external APIs
+- [ ] If Context7 enabled, Context7 docs were consulted
+- [ ] If manual verification, docs version was checked and matched
+
 ## Maintainability
 - Code is readable; complexity is justified.
 - Public interfaces are documented where needed.
