@@ -130,6 +130,9 @@ bash agentic/tools/arch_diff.sh   # Architecture changes
 
 # Documentation
 bash agentic/tools/sync_docs.sh   # Generate doc scaffolding
+
+# Retrospective
+bash agentic/tools/retro_check.sh  # Check if retrospective is due
 ```
 
 ## Troubleshooting
