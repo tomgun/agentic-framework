@@ -13,8 +13,18 @@ Agents copy and customize these during project initialization to create `quality
 ## Available Profiles
 
 ### Audio/DSP
-- **juce_audio_plugin.sh** - JUCE VST/AU/AUv3 plugin validation
+- **juce_audio_plugin.sh** - JUCE VST/AU/AUv3 plugin validation (complete)
 - **ios_audio_plugin.sh** (todo) - iOS AUv3 audio plugin validation
+
+### Desktop Applications
+- **desktop_app_qt.sh** (todo) - Qt desktop app validation
+- **desktop_app_electron.sh** (todo) - Electron app validation
+- **desktop_app_native.sh** (todo) - Native C++/C# desktop app validation
+
+### CLI & Server Tools
+- **cli_tool.sh** (todo) - Command-line tool validation
+- **server_daemon.sh** (todo) - Background service/daemon validation
+- **batch_processor.sh** (todo) - Batch processing tool validation
 
 ### Web Applications
 - **webapp_fullstack.sh** (todo) - Full-stack web app validation
