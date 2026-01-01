@@ -11,7 +11,7 @@ echo ""
 echo "▶ CURRENT FOCUS"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if [[ -f STATUS.md ]]; then
-  sed -n '/## Current focus/,/##/p' STATUS.md | head -n -1 | tail -n +2
+  sed -n '/## Current focus/,/##/p' STATUS.md | sed '$d' | tail -n +2
 else
   echo "STATUS.md not found"
 fi
@@ -21,8 +21,10 @@ echo ""
 echo "▶ LAST SESSION"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if [[ -f JOURNAL.md ]]; then
-  # Find the last session entry
-  grep -A 12 "^### Session:" JOURNAL.md | tail -13 || echo "No sessions logged yet"
+  # Find the last session entry (supports both "### Session:" and "## YYYY-MM-DD" formats)
+  grep -A 12 "^## [0-9]" JOURNAL.md | head -14 | tail -13 2>/dev/null || \
+  grep -A 12 "^### Session:" JOURNAL.md | tail -13 2>/dev/null || \
+  echo "No sessions logged yet"
 else
   echo "JOURNAL.md not found"
 fi
@@ -78,7 +80,7 @@ echo ""
 echo "▶ NEXT UP"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if [[ -f STATUS.md ]]; then
-  sed -n '/## Next up/,/##/p' STATUS.md | head -n -1 | tail -n +2 | head -5
+  sed -n '/## Next up/,/##/p' STATUS.md | sed '$d' | tail -n +2 | head -5
 else
   echo "STATUS.md not found"
 fi

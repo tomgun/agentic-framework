@@ -150,7 +150,7 @@
   - Perf/realtime: n/a
 - Test strategy: TDD
 - Lessons/caveats:
-  - Considered undo functionality, deferred to future (F-0014)
+  - Considered undo functionality, deferred to future
 - Notes:
   - Confirmation dialog prevents accidents
   - Accessible (keyboard + screen reader)

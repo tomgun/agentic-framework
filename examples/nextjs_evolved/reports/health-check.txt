@@ -2,32 +2,7 @@
 
 Looks like template content (consider filling/renaming):
 - spec/OVERVIEW.md (vision + current state + pointers)
-- spec/NFR.md (non-functional constraints)
 - spec/LESSONS.md (lessons/caveats)
-
-Validation issues:
-- F-0001: acceptance file spec/acceptance/F-0001.md not found
-- F-0002: acceptance file spec/acceptance/F-0002.md not found
-- F-0003: acceptance file spec/acceptance/F-0003.md not found
-- F-0004: acceptance file spec/acceptance/F-0004.md not found
-- F-0005: acceptance file spec/acceptance/F-0005.md not found
-- F-0006: acceptance file spec/acceptance/F-0006.md not found
-- F-0007: acceptance file spec/acceptance/F-0007.md not found
-- F-0008: acceptance file spec/acceptance/F-0008.md not found
-- F-0009: acceptance file spec/acceptance/F-0009.md not found
-- F-0010: acceptance file spec/acceptance/F-0010.md not found
-- F-0011: acceptance file spec/acceptance/F-0011.md not found
-- STATUS.md references F-0012 but it doesn't exist in spec/FEATURES.md
-- STATUS.md references F-0013 but it doesn't exist in spec/FEATURES.md
-- F-0001 references NFR-0003 but it doesn't exist in spec/NFR.md
-- F-0002 references NFR-0003 but it doesn't exist in spec/NFR.md
-- F-0003 references NFR-0003 but it doesn't exist in spec/NFR.md
-- F-0005 references NFR-0002 but it doesn't exist in spec/NFR.md
-- F-0006 references NFR-0004 but it doesn't exist in spec/NFR.md
-- F-0007 references NFR-0005 but it doesn't exist in spec/NFR.md
-- F-0008 references NFR-0006 but it doesn't exist in spec/NFR.md
-- F-0010 references NFR-0002 but it doesn't exist in spec/NFR.md
-- F-0011 references NFR-0003 but it doesn't exist in spec/NFR.md
 
 Next commands:
 - bash agentic/tools/brief.sh

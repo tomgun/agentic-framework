@@ -25,8 +25,8 @@
 
 ### v2.0.0 (future)
 - F-0011: Dark mode
-- F-0012: Keyboard shortcuts
-- F-0013: Task categories/tags
+- Future: Keyboard shortcuts
+- Future: Task categories/tags
 
 ## Known issues / risks
 - **Performance degradation >100 tasks**: Needs virtualization (F-0009)
