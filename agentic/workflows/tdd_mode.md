@@ -130,7 +130,8 @@ Run: ✅ **PASS**
 ### 5. Repeat for next behavior
 Add next test for next acceptance criterion, repeat cycle.
 
-### 6. Update docs
+### 6. Quality validation & docs
+- Run `bash quality_checks.sh --pre-commit` (if configured)
 - Update `STATUS.md` (always)
 - Update `spec/FEATURES.md` test status as tests accumulate
 - Update specs/ADRs if behavior/architecture changed

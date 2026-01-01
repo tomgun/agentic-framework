@@ -16,6 +16,7 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 - If the user returns after a break, proactively propose a resume protocol:
   - read `CONTEXT_PACK.md`, then `STATUS.md`, then `JOURNAL.md` (recent entries), then relevant feature acceptance docs.
 - **At session start, check for retrospective trigger**: If `STACK.md` has `retrospective_enabled: yes`, check if it's time for a project retrospective (see `agentic/workflows/retrospective.md`). Suggest running one if threshold is met, but wait for human approval.
+- **Check quality validation setup**: If `STACK.md` has `quality_validation_enabled: yes`, ensure `quality_checks.sh` exists at repo root. If missing, offer to create it based on the tech stack (see `agentic/workflows/continuous_quality_validation.md`).
 
 ## Non-negotiables
 - **Follow the spec workflow**: treat `/spec/*`, `spec/adr/*`, `STATUS.md`, `STACK.md`, `CONTEXT_PACK.md` as authoritative.
@@ -64,6 +65,7 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 
 ## After implementing
 - Run the relevant tests (or describe what would be run and why you couldn't).
+- **Run quality checks** (if configured): `bash quality_checks.sh --pre-commit` (see `agentic/workflows/continuous_quality_validation.md`)
 - Self-review using `agentic/quality/review_checklist.md`.
 - **MANDATORY: Sync documentation** (see Documentation Sync Rule below).
 - Append a session summary to `JOURNAL.md` (especially for long sessions or before context might reset).

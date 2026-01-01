@@ -15,6 +15,11 @@ Every change should satisfy:
   - VST/JUCE: audio I/O golden tests, host automation tests, realtime/perf budget checks
   - Games: determinism/replay tests, perf budgets
 
+## Quality validation (if configured)
+- [ ] `bash quality_checks.sh --pre-commit` passes (if `quality_validation_enabled: yes` in STACK.md)
+- [ ] Stack-specific quality gates pass (e.g., pluginval for audio, Lighthouse for web)
+- [ ] No regressions in automated quality checks
+
 ## Documentation verification (required)
 - [ ] All APIs used match versions declared in STACK.md
 - [ ] No deprecated APIs used (or explicitly approved in HUMAN_NEEDED.md)
