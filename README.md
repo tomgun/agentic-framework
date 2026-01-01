@@ -113,6 +113,7 @@ The agent will:
 - **Research mode**: Deep investigation into technologies and best practices
 - **Documentation verification**: Ensures agents use current, version-correct docs
 - **Spec validation**: Automatic validation of spec files against schemas
+- **Continuous quality validation**: Stack-specific quality gates before commits
 
 ### Tooling
 ```bash
