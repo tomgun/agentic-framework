@@ -1,38 +1,28 @@
-# JOURNAL
+# JOURNAL.md
 
-Purpose: capture session-by-session progress so both humans and agents can resume work effortlessly.
+## 2026-01-02 14:00 - Initial implementation (Session 1)
 
-## Session Log (most recent first)
+**Feature**: F-0001, F-0002, F-0003 (all core features)
 
-### Session: 2025-12-15 16:30
-**Feature**: F-0001, F-0002, F-0003 (Initial implementation)
-**Accomplished**:
-- Created basic todo app with add, toggle, display functionality
-- Implemented domain logic in `lib/todo.ts` with unit tests
-- Created TodoItemRow component for display
-- Initial app structure and styling complete
+**What was done:**
+- Implemented TaskManager class with add/list/complete
+- Created CLI interface with argparse
+- Added unit tests (TDD approach)
+- All tests passing
 
-**Next steps**:
-- Implement F-0004: localStorage persistence
-- Add F-0005: filters (All/Active/Done)
-- Add F-0006: delete todo functionality
+**Tests added:**
+- `test_add_task`: Verify task addition
+- `test_list_tasks`: Verify task listing
+- `test_complete_task`: Verify task completion
+- `test_task_persistence`: Verify JSON save/load
 
-**Blockers**:
-- None currently
+**What's next:**
+- Demo complete! (This is an example project)
 
----
-
-### Session: 2025-12-10 14:00
-**Feature**: Project initialization
-**Accomplished**:
-- Set up Next.js project structure
-- Configured testing with vitest
-- Created initial spec files (PRD, TECH_SPEC, FEATURES)
-- Wrote acceptance criteria for core features
-
-**Next steps**:
-- Begin implementation of F-0001 (view todos)
-
-**Blockers**:
+**Blockers:**
 - None
 
+**Lessons:**
+- TDD workflow worked smoothly
+- Simple JSON persistence sufficient for demo
+- Type hints improved code clarity

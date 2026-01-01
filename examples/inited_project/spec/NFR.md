@@ -1,26 +1,25 @@
-# NFR (Non-Functional Requirements) (Template)
+# Non-Functional Requirements
 
-Purpose: capture cross-cutting constraints that apply across many features (performance, security, realtime safety, reliability, etc.) in a stable, referenceable way.
+## NFR-0001: Performance
+- **Requirement**: Fast response for small task lists
+- **Metric**: <100ms for operations on <1000 tasks
+- **Affected features**: F-0001, F-0002, F-0003
+- **Verification**: Manual testing (simple JSON file is fast enough)
+- **Status**: met
 
-## Vocabulary
-- NFRs are constraints/qualities, not features.
-- Each NFR gets a stable ID: `NFR-0001`, `NFR-0002`, …
-- Features can link to NFR IDs in `spec/FEATURES.md` **when relevant**, but most features will omit NFR links.
-- Prefer one of these patterns:
-  - **Global NFR**: set “Applies to: all (unless stated otherwise)”
-  - **Scoped NFR**: list the components/features it applies to
+## NFR-0002: Data persistence
+- **Requirement**: Tasks must not be lost
+- **Metric**: 100% persistence reliability for successful operations
+- **Affected features**: F-0001, F-0003
+- **Verification**: `test_task_persistence`
+- **Status**: met
 
----
-
-## NFR-0001: Example performance budget
-- Category: performance
-- Statement: p95 request latency < 200ms for critical endpoints
-- Applies to: <!-- components/features -->
-- How to measure: <!-- benchmark/test/tool -->
-- Where enforced:
-  - Tests: <!-- perf tests -->
-  - CI: <!-- checks -->
-- Current status: unknown  <!-- unknown | partial | met | violated -->
-- Notes:
-
-
+## NFR-0003: Code quality
+- **Requirement**: Clean, typed, tested code
+- **Metric**: 
+  - Type hints on all functions
+  - >90% test coverage
+  - All tests passing
+- **Affected features**: All
+- **Verification**: pytest, type checking
+- **Status**: met

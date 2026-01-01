@@ -1,49 +1,82 @@
-# FEATURES (Template)
+# Features
 
-Purpose: a **human + machine** readable registry of features with stable IDs, status, acceptance criteria, and test coverage notes.
-
-## Terminology (requirement vs feature)
-- **Feature (F-####)** is canonical here: a ship-able capability we implement and validate. Each feature links to concrete acceptance criteria and has explicit test coverage notes.
-- **Requirements are optional**:
-  - If you use requirements, treat them as outcome/contract statements (often in `spec/PRD.md`) and link them from features.
-  - If you don’t, leave the “Requirements” field empty and rely on the feature acceptance criteria file instead.
-
-## Status vocabulary
-- `planned` | `in_progress` | `shipped` | `deprecated`
-
-## How to reference
-- Feature IDs: `F-0001`, `F-0002`, …
-- Requirement IDs (optional, from PRD): `R-0001`, …
-- NFR IDs (optional): `NFR-0001`, …
-- Task IDs (optional): `T-0001`, …
-
-## Feature index (optional)
-- F-0001:
-- F-0002:
-
----
-
-## F-0001: ExampleFeatureName
-- Parent: none  <!-- or F-0000 for hierarchy -->
-- Status: planned
-- PRD: spec/PRD.md#requirements
+## F-0001: Add tasks
+- Parent: none
+- Dependencies: none
+- Complexity: S
+- Technical debt: none
+- Status: shipped
+- PRD: spec/PRD.md#R-0001
 - Requirements: R-0001
-- NFRs: none  <!-- optional; list NFR-#### only if the feature has specific constraints -->
+- NFRs: NFR-0001 (performance)
 - Acceptance: spec/acceptance/F-0001.md
 - Verification:
-  - Accepted: no       <!-- no | yes -->
-  - Accepted at:       <!-- YYYY-MM-DD (optional) -->
+  - Accepted: yes
+  - Accepted at: 2026-01-02
 - Implementation:
-  - State: none  <!-- none | partial | complete -->
-  - Code: <!-- paths/modules -->
+  - State: complete
+  - Code: task_manager.py (TaskManager.add_task)
 - Tests:
-  - Unit: todo  <!-- todo | partial | complete -->
+  - Unit: complete
   - Integration: n/a
-  - Acceptance: todo
+  - Acceptance: complete
   - Perf/realtime: n/a
+- Test strategy: unit
 - Lessons/caveats:
-  - <!-- link to spec/LESSONS.md anchors or adr -->
+  - None
 - Notes:
-  - <!-- anything agents should remember -->
+  - Simple integer IDs (auto-increment)
 
+## F-0002: List tasks
+- Parent: none
+- Dependencies: none
+- Complexity: S
+- Technical debt: none
+- Status: shipped
+- PRD: spec/PRD.md#R-0002
+- Requirements: R-0002
+- NFRs: NFR-0001 (performance)
+- Acceptance: spec/acceptance/F-0002.md
+- Verification:
+  - Accepted: yes
+  - Accepted at: 2026-01-02
+- Implementation:
+  - State: complete
+  - Code: task_manager.py (TaskManager.list_tasks)
+- Tests:
+  - Unit: complete
+  - Integration: n/a
+  - Acceptance: complete
+  - Perf/realtime: n/a
+- Test strategy: unit
+- Lessons/caveats:
+  - None
+- Notes:
+  - Returns all tasks (no filtering yet)
 
+## F-0003: Complete tasks
+- Parent: none
+- Dependencies: F-0001 (tasks must exist to complete them)
+- Complexity: S
+- Technical debt: none
+- Status: shipped
+- PRD: spec/PRD.md#R-0003
+- Requirements: R-0003
+- NFRs: NFR-0001 (performance)
+- Acceptance: spec/acceptance/F-0003.md
+- Verification:
+  - Accepted: yes
+  - Accepted at: 2026-01-02
+- Implementation:
+  - State: complete
+  - Code: task_manager.py (TaskManager.complete_task)
+- Tests:
+  - Unit: complete
+  - Integration: n/a
+  - Acceptance: complete
+  - Perf/realtime: n/a
+- Test strategy: unit
+- Lessons/caveats:
+  - None
+- Notes:
+  - Returns false if task ID doesn't exist

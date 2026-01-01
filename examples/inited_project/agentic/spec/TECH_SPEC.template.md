@@ -20,6 +20,16 @@ Purpose: define *how* we will build it with enough clarity to implement incremen
 ## Architecture overview
 - Style: <!-- monolith/modular monolith/services/plugin/etc -->
 - Key constraints from `STACK.md`:
+- Diagrams: <!-- link to docs/architecture/diagrams/ -->
+
+## Architecture changelog
+Track major architectural changes over time:
+
+### YYYY-MM-DD: [Change description]
+- Reason: <!-- why the change was made, link to ADR if applicable -->
+- Affected features: <!-- F-#### IDs -->
+- Migration status: <!-- planned | in-progress | complete -->
+- Breaking changes: <!-- yes/no, describe if yes -->
 
 ## Components (responsibilities + boundaries)
 - ComponentA:

@@ -1,47 +1,36 @@
-# PRD (Template)
+# Product Requirements Document (PRD)
 
-Purpose: define *why* we’re building this and *what* success means.
+## Vision
+A simple, example CLI task manager demonstrating the agentic framework.
 
-## Summary
-- Problem (1–2 sentences):
-- Target user:
-- Primary workflow:
+## Goals
+- Show framework usage in a real project
+- Demonstrate TDD workflow
+- Illustrate feature tracking with F-#### IDs
+- Keep it simple (< 200 lines of code)
 
-## Goals (measurable)
-- G1:
-- G2:
+## Target users
+- Developers learning the agentic framework
+- Solo developer needing local task tracking
 
-## Non-goals (explicit)
-- NG1:
-- NG2:
+## Requirements
 
-## Terminology (requirement vs feature)
-- In this framework, **Features (F-####)** are the canonical unit we plan/ship/test (`spec/FEATURES.md`).
-- “Requirements” are **optional**:
-  - Use them when you want explicit outcome/contract statements, especially for cross-cutting constraints (security/latency/compliance).
-  - If you prefer minimal ceremony, skip requirements and express needs directly as feature acceptance criteria in `spec/acceptance/F-####.md`.
-- If you do use requirements, keep an explicit mapping (one requirement can map to multiple features and vice versa).
+### R-0001: Add tasks
+**Priority**: Must have
+**User story**: As a user, I want to add tasks so I can track what I need to do.
 
-## Requirements (user-facing)
-- R-0001:
-- R-0002:
+### R-0002: List tasks
+**Priority**: Must have  
+**User story**: As a user, I want to see all my tasks so I know what's pending.
 
-## Acceptance criteria (high-level)
-- AC1:
-- AC2:
+### R-0003: Complete tasks
+**Priority**: Must have
+**User story**: As a user, I want to mark tasks as complete so I can track progress.
 
-## Feature mapping (IDs)
-- Feature registry: `spec/FEATURES.md`
-- Map requirements to features:
-  - R-0001 -> F-0001
-  - R-0002 -> F-0002
-
-## Risks & open questions
-- Risk:
-- Question:
-
-## Release plan (thin)
-- Milestone 1:
-- Milestone 2:
-
-
+## Out of scope (v1.0)
+- Task editing
+- Task deletion
+- Due dates
+- Priorities
+- Multi-user support
+- Web interface

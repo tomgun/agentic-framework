@@ -1,32 +1,23 @@
 # STATUS.md
 
-Quick intent: the **project dashboard** (agent + human). Keep this current so resuming is effortless.
-
 ## Current focus
-- Add persistence (localStorage) and simple filters (All/Active/Done).
+- Example project is complete (all features shipped)
 
 ## In progress
-- F-0004 Persistence: store todos locally (planned next)
+- None (demo complete)
 
 ## Next up
-- F-0005 Filters: All / Active / Done
-- F-0006 Delete todo
+- None (this is a demo project)
 
 ## Roadmap (lightweight)
-- Near-term:
-  - F-0004 local persistence
-  - F-0005 filters
-  - F-0006 delete
-- Later:
-  - F-0007 E2E smoke test (Playwright)
+- Near-term: None (demo complete)
+- Later: Could add: delete tasks, edit tasks, due dates
 
 ## Known issues / risks
-- No persistence yet (refresh loses state).
+- None
 
 ## Decisions needed
-- Should we keep todos purely local, or add a backend?
+- None
 
 ## Release notes (optional)
-- Initial demo supports: view/add/toggle todos.
-
-
+- v1.0.0 (2026-01-02): Initial release with add/list/complete
