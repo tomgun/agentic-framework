@@ -109,6 +109,10 @@ The agent will:
 - **Architecture evolution**: Track changes with arch_diff.sh
 - **Research trails**: Structured documentation of research findings
 - **Scaling guidance**: Suggestions when complexity crosses thresholds
+- **Project retrospectives**: Periodic agent-led health checks
+- **Research mode**: Deep investigation into technologies and best practices
+- **Documentation verification**: Ensures agents use current, version-correct docs
+- **Spec validation**: Automatic validation of spec files against schemas
 
 ### Tooling
 ```bash
@@ -116,12 +120,27 @@ The agent will:
 bash agentic/tools/doctor.sh      # Check structure
 bash agentic/tools/report.sh      # Feature status summary
 bash agentic/tools/verify.sh      # Comprehensive validation
+python3 agentic/tools/validate_specs.py  # Validate spec frontmatter
+
+# Retrospectives & version checking
+bash agentic/tools/retro_check.sh    # Check if retrospective is due
+bash agentic/tools/version_check.sh  # Check dependency versions
 
 # Context & analysis
 bash agentic/tools/brief.sh       # Quick project brief
+bash agentic/tools/dashboard.sh   # Comprehensive dashboard
 bash agentic/tools/coverage.sh    # Code annotation coverage
 bash agentic/tools/feature_graph.sh   # Dependency visualization
 bash agentic/tools/arch_diff.sh   # Architecture changes over time
+
+# Manual operations (token-free)
+bash agentic/tools/search.sh      # Search specs and code
+bash agentic/tools/whatchanged.sh # Recent changes
+bash agentic/tools/deps.sh        # Feature dependencies
+bash agentic/tools/accept.sh      # Run acceptance tests
+bash agentic/tools/consistency.sh # Check doc drift
+bash agentic/tools/stale.sh       # Find stale docs
+bash agentic/tools/task.sh        # Create task files
 ```
 
 ### Stack Profiles

@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentic-framework.dev/schemas/nfr.schema.json",
+  "title": "Non-Functional Requirement",
+  "description": "A non-functional requirement specification",
+  "type": "object",
+  "required": ["id", "name", "category", "constraint", "rationale", "verification", "affected_features"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^NFR-[0-9]{4}$",
+      "description": "Unique NFR identifier in format NFR-####"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 150,
+      "description": "Human-readable NFR name"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "performance",
+        "security",
+        "scalability",
+        "usability",
+        "reliability",
+        "maintainability",
+        "compliance"
+      ],
+      "description": "Type of non-functional constraint"
+    },
+    "constraint": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Specific measurable constraint"
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Why this constraint matters"
+    },
+    "verification": {
+      "type": "string",
+      "minLength": 10,
+      "description": "How to test/measure compliance"
+    },
+    "affected_features": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": ["all"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^F-[0-9]{4}$"
+          },
+          "minItems": 1
+        }
+      ],
+      "description": "Which features must comply (or 'all')"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"],
+      "description": "Importance of this NFR"
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Additional context"
+    }
+  }
+}
+
