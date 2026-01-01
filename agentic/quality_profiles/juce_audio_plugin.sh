@@ -71,9 +71,10 @@ else
 fi
 echo
 
-# 3. Offline audio render test (if Python script exists)
+# 3. Offline audio render test (DSP validation with Python/numpy)
 if [ -f "scripts/test_dsp_validation.py" ]; then
   echo "3. Running offline audio DSP validation..."
+  echo "   (Python/numpy validation: NaN/Inf, DC offset, expected output)"
   
   mkdir -p test_output
   
@@ -81,6 +82,8 @@ if [ -f "scripts/test_dsp_validation.py" ]; then
     --plugin "${PLUGIN_PATH}" \
     --input test_audio/sine_440hz.wav \
     --output test_output/result.wav \
+    --expected test_audio/expected_output.wav \
+    --tolerance 0.001 \
     --check-nan-inf \
     --check-dc-offset \
     --max-dc-offset 0.01
@@ -91,14 +94,20 @@ if [ -f "scripts/test_dsp_validation.py" ]; then
   fi
   echo "✅ DSP validation passed"
 else
-  echo "3. ⚠️  scripts/test_dsp_validation.py not found. Skipping DSP validation."
-  echo "   Create this script to validate audio output."
+  echo "3. ⚠️  scripts/test_dsp_validation.py not found."
+  echo "   Create this script to:"
+  echo "   - Render audio offline with known input wav file"
+  echo "   - Compare to expected output with Python/numpy"
+  echo "   - Check for NaN/Inf values"
+  echo "   - Validate DC offset, RMS levels, etc."
+  echo "   See: agentic/workflows/continuous_quality_validation.md"
 fi
 echo
 
-# 4. Realtime performance benchmark (if Python script exists)
+# 4. Realtime CPU & glitch benchmark (measure processBlock)
 if [ -f "scripts/test_realtime_performance.py" ]; then
   echo "4. Running realtime CPU & glitch detection..."
+  echo "   (Measures processBlock: CPU, discontinuities, zipper, runaway feedback)"
   
   python3 scripts/test_realtime_performance.py \
     --plugin "${PLUGIN_PATH}" \
@@ -109,7 +118,8 @@ if [ -f "scripts/test_realtime_performance.py" ]; then
     --detect-glitches \
     --detect-nan-inf \
     --detect-discontinuities \
-    --detect-runaway
+    --detect-zipper-noise \
+    --detect-runaway-feedback
   
   if [ $? -ne 0 ]; then
     echo "❌ Performance validation failed"
@@ -118,7 +128,13 @@ if [ -f "scripts/test_realtime_performance.py" ]; then
   echo "✅ Performance validation passed"
 else
   echo "4. ⚠️  scripts/test_realtime_performance.py not found."
-  echo "   Create this script to validate realtime performance."
+  echo "   Create this script to:"
+  echo "   - Measure processBlock() CPU usage in realtime"
+  echo "   - Detect glitches (processing taking >100% of buffer time)"
+  echo "   - Detect discontinuities (clicks between buffers)"
+  echo "   - Detect zipper noise (parameter smoothing issues)"
+  echo "   - Detect runaway feedback (exponentially growing output)"
+  echo "   See: agentic/workflows/continuous_quality_validation.md"
 fi
 echo
 
@@ -134,9 +150,15 @@ fi
 
 echo "✅ All quality checks passed!"
 echo
-echo "Next steps:"
+echo "Quality checks completed:"
+echo "  ✓ Build validation"
+echo "  ✓ pluginval (smoke/stress tests)"
+echo "  ✓ Offline DSP validation (Python/numpy: NaN/Inf, expected output)"
+echo "  ✓ Realtime benchmark (CPU, glitches, discontinuities, zipper, feedback)"
+echo
+echo "Next steps if scripts missing:"
 echo "  - Create test_audio/ directory with test signals"
-echo "  - Create scripts/test_dsp_validation.py for DSP validation"
-echo "  - Create scripts/test_realtime_performance.py for performance tests"
+echo "  - Create scripts/test_dsp_validation.py for offline audio validation"
+echo "  - Create scripts/test_realtime_performance.py for processBlock() benchmarking"
 echo "  - See: agentic/workflows/continuous_quality_validation.md"
 

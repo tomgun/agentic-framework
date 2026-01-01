@@ -5,11 +5,13 @@
 ## Philosophy
 
 **Every technology stack has specific failure modes.** Generic tests aren't enough:
-- Audio plugins: NaN/Inf values, glitches, runaway feedback
+- Audio plugins: NaN/Inf values, glitches, runaway feedback, zipper noise
 - Web apps: Memory leaks, slow render, broken accessibility
 - Mobile apps: Battery drain, UI jank, background crashes
 - Games: Frame drops, physics glitches, asset loading issues
-- Backend services: Memory leaks, connection leaks, slow queries
+- Desktop apps: Memory leaks, UI responsiveness, cross-platform issues
+- CLI/Server tools: Memory leaks, signal handling, long-running stability
+- Backend services: Connection leaks, slow queries, cascade failures
 - Real-time software: Missed deadlines, priority inversions
 - Security software: Timing attacks, side channels, buffer overflows
 
@@ -61,10 +63,12 @@ Each technology has unique failure modes. Quality profiles target these specific
 
 | Stack Type | Key Quality Checks | Example Failure Modes |
 |------------|-------------------|----------------------|
-| **Audio Plugin** | pluginval, DSP validation, CPU usage | NaN/Inf, glitches, feedback loops |
+| **Audio Plugin** | pluginval, DSP validation, CPU/glitch detection | NaN/Inf, glitches, zipper noise, feedback |
+| **Desktop App** | UI responsiveness, memory, cross-platform | UI freezes, memory leaks, platform bugs |
+| **CLI/Server Tool** | Memory, signal handling, long-running | Memory leaks, zombie processes, crashes |
 | **Web App** | Bundle size, Lighthouse, accessibility | Memory leaks, slow render, poor a11y |
 | **Mobile App** | Battery, memory, UI performance | Battery drain, jank, crashes |
-| **Backend Service** | Load testing, connection pools | Memory leaks, slow queries, deadlocks |
+| **Backend Service** | Load testing, connection pools, queries | Connection leaks, slow queries, deadlocks |
 | **Game (2D/3D)** | FPS, physics, asset loading | Frame drops, physics bugs, long loads |
 | **Real-time System** | Deadline analysis, jitter | Missed deadlines, priority inversions |
 | **Security Software** | Static analysis, fuzzing, timing | Buffer overflows, timing attacks |
@@ -73,9 +77,11 @@ Each technology has unique failure modes. Quality profiles target these specific
 ### Detailed Examples
 
 For complete implementations, see `agentic/quality_profiles/`:
-- Audio plugins (JUCE): `juce_audio_plugin.sh`
+- Audio plugins (JUCE): `juce_audio_plugin.sh` - includes pluginval, offline DSP validation with numpy, realtime CPU & glitch detection
+- Desktop applications: `desktop_app.sh`
+- CLI/Server tools: `cli_server_tool.sh`
 - Web applications: `webapp_fullstack.sh`
-- Mobile iOS: `ios_app.sh`
+- Mobile apps: `ios_app.sh`, `android_app.sh`
 - Backend services: `backend_service.sh`
 - Games: `game_engine.sh`
 - More examples in the profiles directory
@@ -376,6 +382,116 @@ echo "✅ All quality checks passed!"
 echo "✅ All quality checks passed!"
 ```
 
+echo "✅ All quality checks passed!"
+```
+
+### Example: Desktop Application
+
+**Focus**: UI responsiveness, memory usage, cross-platform compatibility
+
+**File**: `quality_checks.sh`
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "=== Desktop Application Quality Validation ==="
+echo
+
+# 1. Build for all platforms
+echo "1. Build validation..."
+# Linux
+cmake --build build-linux --config Release
+# macOS (if on macOS)
+cmake --build build-macos --config Release
+# Windows (if cross-compiling or on Windows)
+# cmake --build build-windows --config Release
+
+# 2. UI responsiveness test
+echo "2. Testing UI responsiveness..."
+python3 scripts/test_ui_responsiveness.py \
+  --max-event-latency-ms 16 \
+  --max-paint-time-ms 8 \
+  --check-main-thread-blocking
+
+# 3. Memory leak detection
+echo "3. Checking for memory leaks..."
+valgrind --leak-check=full \
+  --error-exitcode=1 \
+  --suppressions=valgrind.supp \
+  ./build-linux/MyApp --run-tests
+
+# 4. Cross-platform compatibility
+echo "4. Testing cross-platform consistency..."
+python3 scripts/test_platform_compatibility.py \
+  --check-file-paths \
+  --check-line-endings \
+  --check-font-rendering
+
+# 5. Resource usage
+echo "5. Checking resource usage..."
+python3 scripts/test_resource_usage.py \
+  --max-memory-mb 200 \
+  --max-cpu-idle-percent 5 \
+  --check-file-handles
+
+echo "✅ All quality checks passed!"
+```
+
+### Example: CLI/Server Tool
+
+**Focus**: Long-running stability, memory leaks, signal handling, correctness
+
+**File**: `quality_checks.sh`
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "=== CLI/Server Tool Quality Validation ==="
+echo
+
+# 1. Build validation
+echo "1. Build validation..."
+go build -o bin/mytool ./cmd/mytool
+
+# 2. Unit/integration tests
+echo "2. Running tests..."
+go test ./... -v -race
+
+# 3. Long-running stability test
+echo "3. Testing long-running stability..."
+python3 scripts/test_long_running.py \
+  --duration 300 \
+  --check-memory-growth \
+  --check-goroutine-leaks \
+  --check-file-descriptor-leaks
+
+# 4. Signal handling
+echo "4. Testing signal handling..."
+python3 scripts/test_signal_handling.py \
+  --signals SIGTERM,SIGINT,SIGHUP \
+  --check-graceful-shutdown \
+  --max-shutdown-time-s 10
+
+# 5. Correctness under load
+echo "5. Testing correctness under load..."
+python3 scripts/test_correctness.py \
+  --concurrent-requests 100 \
+  --duration 60 \
+  --verify-output \
+  --check-data-races
+
+# 6. Resource cleanup
+echo "6. Checking resource cleanup..."
+python3 scripts/test_resource_cleanup.py \
+  --check-temp-files \
+  --check-connections \
+  --check-child-processes
+
+echo "✅ All quality checks passed!"
+```
+
 ### Example: Mobile Game
 
 **Focus**: Frame rate, physics stability, asset loading, memory
@@ -565,12 +681,18 @@ echo "✅ All quality checks passed!"
 
 **See `agentic/quality_profiles/` for complete implementations:**
 
-- **Instagram Filter / Image Processing**: Render quality, performance, color accuracy
-- **iOS Audio Plugin (AUv3)**: Audio validation, CPU usage, background behavior
-- **Unity/Unreal Game**: Build validation, scene loading, physics, shaders
-- **Desktop 2D Game**: Frame timing, input latency, asset loading
-- **Network Software**: Packet handling, connection stability, throughput
-- **Embedded/IoT**: Memory footprint, power consumption, real-time constraints
+- **Audio plugins**: JUCE VST/AU/AUv3 with pluginval, DSP validation (numpy), realtime metrics
+- **Desktop apps**: Cross-platform (Linux/Mac/Windows), UI responsiveness, memory
+- **CLI/Server tools**: Long-running stability, signal handling, resource cleanup
+- **Web apps**: Bundle size, performance, accessibility, memory
+- **Mobile apps**: iOS/Android, battery, memory, UI performance
+- **Games**: 2D, Unity, Unreal - FPS, physics, assets
+- **Backend services**: Load testing, connections, queries
+- **Real-time demos**: Frame timing, shaders, audio sync
+- **Security software**: Static analysis, fuzzing, timing
+- **Image/video processing**: Quality, performance, color accuracy
+- **Network software**: Connection handling, throughput, reliability
+- **Embedded/IoT**: Memory footprint, power, real-time constraints
 
 ## Integration with Framework
 
