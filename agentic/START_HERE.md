@@ -110,12 +110,27 @@ Instead of agents re-reading the entire codebase every session, maintain:
 
 ### Development workflow
 
-**Small increments loop:**
-1. Pick work from `STATUS.md`
-2. Check acceptance criteria (spec/acceptance/F-####.md)
-3. Implement + test
-4. Update `STATUS.md`, `JOURNAL.md`, `spec/FEATURES.md`
+**Two modes available (TDD recommended):**
 
+**TDD mode** (✅ RECOMMENDED):
+1. Pick work from `STATUS.md`
+2. Write failing test FIRST
+3. Implement minimal code to pass
+4. Refactor if needed
+5. Update docs
+
+**Why TDD?** Better token economics (smaller increments, clearer progress, less rework) + forces testable code.
+
+Enable: Set `development_mode: tdd` in `STACK.md` (default in template)  
+Details: [`agentic/workflows/tdd_mode.md`](workflows/tdd_mode.md)
+
+**Standard mode** (for exploration/prototyping):
+1. Pick work from `STATUS.md`
+2. Check acceptance criteria
+3. Implement + test (tests required but can come during/after)
+4. Update docs
+
+Enable: Set `development_mode: standard` in `STACK.md`  
 Details: [`agentic/workflows/dev_loop.md`](workflows/dev_loop.md)
 
 ---
@@ -181,6 +196,7 @@ You shouldn't need to edit these - they're the framework:
 - Test strategy: `agentic/quality/test_strategy.md`
 - Integration testing: `agentic/quality/integration_testing.md`
 - Design for testability: `agentic/quality/design_for_testability.md`
+- TDD mode (optional): `agentic/workflows/tdd_mode.md`
 
 **Understand specifications:**
 - Spec templates: `agentic/spec/*.template.md`

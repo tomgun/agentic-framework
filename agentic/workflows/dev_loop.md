@@ -2,6 +2,10 @@
 
 Goal: ship in **small, test-backed increments** while keeping `STATUS.md` and specs trustworthy.
 
+**Note**: This is the **standard mode** (tests required, but not necessarily written first).
+
+**For Test-Driven Development (TDD)**, see [`tdd_mode.md`](tdd_mode.md). Enable TDD by setting `development_mode: tdd` in `STACK.md`.
+
 ## Loop
 1. **Pick work**
    - Start from `STATUS.md` (current focus / next up).
