@@ -33,8 +33,30 @@ This framework now includes advanced features for long-term, complex software:
 
 See [`START_HERE.md`](START_HERE.md) for complete guide.
 
+## Development Modes
+
+This framework supports two development workflows:
+
+### TDD Mode (✅ RECOMMENDED)
+- Tests are written **first** (red-green-refactor cycle)
+- Implementation follows tests
+- **Token economics**: Smaller increments, less context, clearer progress
+- **Quality**: Forces testability, cleaner code, less rework
+- Workflow: `agentic/workflows/tdd_mode.md`
+- **Enable by**: Set `development_mode: tdd` in `STACK.md` (default in template)
+
+### Standard Mode (for exploration)
+- Tests are **required** but can come during/after implementation
+- Suitable for prototyping, UI exploration, unclear requirements
+- Workflow: `agentic/workflows/dev_loop.md`
+- **Enable by**: Set `development_mode: standard` in `STACK.md`
+
+**Recommendation**: Start with TDD mode. Switch to standard mode only for exploratory/prototyping work.
+
+See [`agentic/workflows/tdd_mode.md`](workflows/tdd_mode.md) for complete TDD guide and benefits.
+
 ## Quick start (new repo)
-1. Copy the **folder** `agentic/` into your repo root (don’t copy its contents into the root; keep the folder so links stay consistent).
+1. Copy the **folder** `agentic/` into your repo root (don't copy its contents into the root; keep the folder so links stay consistent).
 2. Init is two-phase: **agent-runs scaffold** (create everything) + **agent-guided planning** (fill it in). The developer should only need to talk to the agent.
 
 ### Step 0: scaffold (agent runs script)

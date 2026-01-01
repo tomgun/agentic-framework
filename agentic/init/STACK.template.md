@@ -26,6 +26,17 @@ Purpose: a single source of truth for “how we build and run software here”.
   - Integration: `<!-- fill or N/A -->`
   - E2E: `<!-- fill or N/A -->`
 
+## Development approach (optional)
+<!-- Choose development workflow mode -->
+<!-- TDD mode (RECOMMENDED): Tests written FIRST (red-green-refactor) -->
+<!--   - Better token economics (smaller increments, less rework) -->
+<!--   - Forces unit testability by design -->
+<!--   - See agentic/workflows/tdd_mode.md -->
+<!-- Standard mode: Tests required but can come during/after implementation -->
+<!--   - Use for exploration, prototyping, unclear requirements -->
+- development_mode: tdd  <!-- RECOMMENDED for most projects -->
+<!-- - development_mode: standard -->
+
 ## Data & integrations
 - Primary datastore: <!-- postgres/sqlite/mongo/redis/etc -->
 - Messaging/queues (if any): <!-- kafka/sqs/rabbitmq/etc -->

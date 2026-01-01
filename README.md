@@ -27,6 +27,7 @@ This repository is a **template**. Copy the `agentic/` folder into your project 
 
 ### 3. Quality by Design
 **Tests and incremental changes reduce risk.**
+- **TDD recommended**: Write tests first for better token economics and testable code
 - Tests are mandatory for all new/changed logic
 - Small, reviewable increments over large changes
 - Design for testability (seams, boundaries, pure functions)
