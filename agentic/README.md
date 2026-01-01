@@ -63,20 +63,31 @@ This framework supports two development workflows:
 See [`agentic/workflows/tdd_mode.md`](workflows/tdd_mode.md) for complete TDD guide and benefits.
 
 ## Quick start (new repo)
+
 1. Copy the **folder** `agentic/` into your repo root (don't copy its contents into the root; keep the folder so links stay consistent).
-2. Init is two-phase: **agent-runs scaffold** (create everything) + **agent-guided planning** (fill it in). The developer should only need to talk to the agent.
+2. Tell your agent:
 
-### Step 0: scaffold (agent runs script)
+   > "Initialize this project using the agentic framework."
 
-```bash
-bash agentic/init/scaffold.sh
-```
+**That's it!** The agent will:
+- Run the scaffold script to create all files and folders
+- Ask you questions about your project (what are you building, tech stack, etc.)
+- Fill in `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, and specs
+- Set you up to start development
 
-### Step 1: init planning (agent)
-3. Start your agent and point it to `agentic/init/init_playbook.md`.
-4. If the topic is non-trivial, do a short research pass first, then write/upgrade `/spec/PRD.md` and `/spec/TECH_SPEC.md`.
-5. Start development using `agentic/workflows/dev_loop.md` (small tasks, tests, updates to `STATUS.md`).
-6. If you’re using multiple assistants (Cursor + Copilot + Claude), install entrypoints from `agentic/agents/installation.md`.
+The agent follows `agentic/init/init_playbook.md` which guides it through the entire initialization process.
+
+### What the agent does (you don't need to do this):
+
+The agent will automatically:
+1. **Run scaffold**: `bash agentic/init/scaffold.sh` (creates all files/folders)
+2. **Ask questions**: What are you building? What tech stack? etc.
+3. **Fill in docs**: `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, specs
+4. **Set up quality checks**: If applicable, create `quality_checks.sh` for your stack
+5. **Configure Git workflow**: Ask if you want PR mode or direct commits
+6. **Ready to develop**: You're ready to start building
+
+If you're using multiple assistants (Cursor + Copilot + Claude), the agent can also set up entry points from `agentic/agents/installation.md`.
 
 ## Quick resume (after a break)
 From repo root:
