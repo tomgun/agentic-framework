@@ -130,7 +130,31 @@ bash agentic/tools/arch_diff.sh  # Architecture changes
 - Better commit practices
 - Documentation habits
 
-### 6. Innovation & Improvements (10 min)
+### 7. Quality Validation Review (5 min)
+
+**Check quality_checks.sh effectiveness:**
+- Is `quality_checks.sh` set up? If not, suggest creating it.
+- Have any quality checks failed recently? What patterns?
+- Were bugs caught by checks or slipped through?
+- Are checks too slow? (>2 min for pre-commit)
+- Are checks too strict or too lenient?
+- New failure modes discovered since last retro?
+
+**Suggest improvements:**
+- Add new checks for recent bug types (e.g., "We had a NaN bug, add NaN detection")
+- Remove/relax checks causing false positives
+- Optimize slow checks (run subset in pre-commit, full in CI)
+- Update thresholds based on actual measurements
+- Add missing stack-specific checks
+
+**Update quality_checks.sh if needed.**
+
+**Trigger research mode if:**
+- New testing tools/approaches available
+- Performance benchmarks need updating
+- Quality standards need revision
+
+### 8. Innovation & Improvements (10 min)
 
 **Explore:**
 - Are there new tools that would help? (linters, formatters, CI tools)
