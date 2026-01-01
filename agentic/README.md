@@ -30,6 +30,11 @@ This framework now includes advanced features for long-term, complex software:
 - **Architecture evolution**: Track changes over time with arch_diff.sh
 - **Research trails**: Structured research documentation
 - **Scaling guidance**: Suggestions when project complexity crosses thresholds
+- **Automated retrospectives**: Periodic project health checks and improvement suggestions
+- **Research mode**: Deep investigation into technologies and field updates
+- **Documentation verification**: Ensure agents use up-to-date, version-correct documentation
+- **Spec validation**: Enforce structure and valid values in spec files
+- **Continuous quality validation**: Stack-specific automated quality gates before commits
 
 See [`START_HERE.md`](START_HERE.md) for complete guide.
 
