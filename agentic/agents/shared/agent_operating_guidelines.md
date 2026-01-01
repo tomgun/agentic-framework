@@ -11,9 +11,11 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
   - `bash agentic/tools/brief.sh` (quick context)
   - `bash agentic/tools/report.sh` (what's missing / what needs acceptance)
   - `bash agentic/tools/sync_docs.sh` (system docs scaffolding)
+  - `bash agentic/tools/retro_check.sh` (check if retrospective is due)
 - When the user asks to start/init the project, prefer to run the scripts yourself (with the user's consent) rather than asking them to run commands.
 - If the user returns after a break, proactively propose a resume protocol:
   - read `CONTEXT_PACK.md`, then `STATUS.md`, then `JOURNAL.md` (recent entries), then relevant feature acceptance docs.
+- **At session start, check for retrospective trigger**: If `STACK.md` has `retrospective_enabled: yes`, check if it's time for a project retrospective (see `agentic/workflows/retrospective.md`). Suggest running one if threshold is met, but wait for human approval.
 
 ## Non-negotiables
 - **Follow the spec workflow**: treat `/spec/*`, `spec/adr/*`, `STATUS.md`, `STACK.md`, `CONTEXT_PACK.md` as authoritative.

@@ -52,4 +52,21 @@ Purpose: a single source of truth for “how we build and run software here”.
 - Performance: <!-- latency, throughput -->
 - Reliability: <!-- SLOs if known -->
 
+## Retrospectives (optional)
+<!-- Agent-led periodic project health checks. See agentic/workflows/retrospective.md -->
+<!-- Uncomment to enable: -->
+<!-- - retrospective_enabled: yes -->
+<!-- - retrospective_trigger: both  # time | features | both -->
+<!-- - retrospective_interval_days: 14 -->
+<!-- - retrospective_interval_features: 10 -->
+<!-- - retrospective_depth: full  # full (with research) | quick (no research) -->
+
+## Research mode (optional)
+<!-- Deep investigation into specific topics. See agentic/workflows/research_mode.md -->
+<!-- Uncomment to enable proactive research suggestions: -->
+<!-- - research_enabled: yes -->
+<!-- - research_cadence: 90  # days between field update research -->
+<!-- - research_depth: standard  # quick (30min) | standard (60min) | deep (90min) -->
+<!-- - research_budget: 60  # default minutes per research session -->
+
 
