@@ -22,9 +22,11 @@ Goal: ship in **small, test-backed increments** while keeping `STATUS.md` and sp
 5. **Test**
    - Add/update unit tests (required).
    - Add domain/acceptance tests where relevant.
-6. **Review yourself**
+6. **Quality validation**
+   - Run `bash quality_checks.sh --pre-commit` (if configured).
+7. **Review yourself**
    - Use `agentic/quality/review_checklist.md`.
-7. **Update docs**
+8. **Update docs**
    - Update `STATUS.md` (always).
    - Update specs/ADRs if behavior/architecture changed.
    - Append session summary to `JOURNAL.md` (what was done, what's next, blockers).
