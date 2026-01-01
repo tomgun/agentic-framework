@@ -1,0 +1,5 @@
+=== Feature status summary ===
+- shipped: 3
+
+Tip: Keep STATUS.md items referencing feature IDs (F-####) for easy tracking.
+Tip: Run 'bash agentic/tools/feature_graph.sh' to visualize feature dependencies.

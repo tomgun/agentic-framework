@@ -1,0 +1,11 @@
+=== Retrospective Check ===
+
+Configuration:
+  Trigger: both  # time | features | both
+  Interval (days): 14
+  Interval (features): 5
+
+⚠️  No retrospective recorded in STATUS.md yet.
+   Consider running your first retrospective!
+
+   See: agentic/workflows/retrospective.md

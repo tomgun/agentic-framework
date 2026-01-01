@@ -81,6 +81,18 @@ A Next.js task management web app showing an **evolved, production-ready project
 
 ---
 
+## 📊 Auto-Generated Reports
+
+Each example includes a `reports/` directory with auto-generated tool outputs:
+- **Dashboard**: Quick project status
+- **Feature report**: Status summary (shipped/in_progress/planned)
+- **Feature graph**: Mermaid dependency diagram
+- **Health check**: Project validation
+- **Spec verification**: Cross-reference validation
+- **Test coverage**: Feature → code annotation mapping
+
+These demonstrate the framework's **visibility tools** that help both humans and AI agents quickly understand project state. See each example's `reports/README.md` for details.
+
 ## Using These Examples
 
 **Don't copy these into your project!**

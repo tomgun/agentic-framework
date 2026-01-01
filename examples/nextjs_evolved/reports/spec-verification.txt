@@ -1,0 +1,36 @@
+=== agentic verify ===
+
+Checking cross-references...
+Found 13 broken reference(s)
+  - spec/FEATURES.md: references F-0014 which doesn't exist
+  - spec/FEATURES.md: references NFR-0003 which doesn't exist
+  - spec/FEATURES.md: references NFR-0003 which doesn't exist
+  - spec/FEATURES.md: references NFR-0003 which doesn't exist
+  - spec/FEATURES.md: references NFR-0002 which doesn't exist
+  - spec/FEATURES.md: references NFR-0004 which doesn't exist
+  - spec/FEATURES.md: references NFR-0005 which doesn't exist
+  - spec/FEATURES.md: references NFR-0006 which doesn't exist
+  - spec/FEATURES.md: references NFR-0002 which doesn't exist
+  - spec/FEATURES.md: references NFR-0003 which doesn't exist
+  - spec/NFR.md: references NFR-0002 which doesn't exist
+  - STATUS.md: references F-0012 which doesn't exist
+  - STATUS.md: references F-0013 which doesn't exist
+
+Checking acceptance files...
+Found 11 missing acceptance file(s)
+  - F-0001: no acceptance file at spec/acceptance/F-0001.md
+  - F-0002: no acceptance file at spec/acceptance/F-0002.md
+  - F-0003: no acceptance file at spec/acceptance/F-0003.md
+  - F-0004: no acceptance file at spec/acceptance/F-0004.md
+  - F-0005: no acceptance file at spec/acceptance/F-0005.md
+  - F-0006: no acceptance file at spec/acceptance/F-0006.md
+  - F-0007: no acceptance file at spec/acceptance/F-0007.md
+  - F-0008: no acceptance file at spec/acceptance/F-0008.md
+  - F-0009: no acceptance file at spec/acceptance/F-0009.md
+  - F-0010: no acceptance file at spec/acceptance/F-0010.md
+  - F-0011: no acceptance file at spec/acceptance/F-0011.md
+
+Test command from STACK.md: commands:
+  (run verify.sh to execute tests)
+
+Total issues: 24

@@ -1,0 +1,23 @@
+=== Code annotation coverage ===
+
+Scanning codebase for @feature annotations...
+Found 3 unique feature IDs in code
+
+✓ Features with code annotations (3):
+  F-0001: 3 file(s)
+    - test_task_manager.py
+    - task_manager.py
+    - task_cli.py
+  F-0002: 3 file(s)
+    - test_task_manager.py
+    - task_manager.py
+    - task_cli.py
+  F-0003: 3 file(s)
+    - test_task_manager.py
+    - task_manager.py
+    - task_cli.py
+
+Summary:
+  Implemented features: 3
+  Features with annotations: 3
+  Coverage: 100%

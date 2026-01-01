@@ -28,6 +28,19 @@ python task_cli.py complete 1
 python task_cli.py list
 ```
 
+## 📊 Generated Reports
+
+The [`reports/`](reports/) directory contains auto-generated snapshots demonstrating the framework's visibility tools:
+
+- **[dashboard.txt](reports/dashboard.txt)**: Quick project status overview
+- **[feature-report.txt](reports/feature-report.txt)**: Feature status summary (3 shipped)
+- **[feature-graph.md](reports/feature-graph.md)**: Mermaid diagram of feature dependencies
+- **[health-check.txt](reports/health-check.txt)**: Project health validation
+- **[spec-verification.txt](reports/spec-verification.txt)**: Cross-reference validation
+- **[test-coverage.txt](reports/test-coverage.txt)**: Feature → code annotation coverage (100%)
+
+See [`reports/README.md`](reports/README.md) for how to regenerate and when to use each tool.
+
 ## Project structure
 
 ```
