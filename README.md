@@ -76,13 +76,16 @@ cp -r /path/to/agentic-framework/agentic ./
 **Step 2:** Tell your agent to initialize
 Open your AI agent (Cursor/Copilot/Claude) and say:
 
-> "Initialize this project using the agentic framework. Run the scaffold script first, then follow the init playbook."
+> "Initialize this project using the agentic framework."
 
 The agent will:
-1. Run `bash agentic/init/scaffold.sh` to create all files
-2. Ask you questions about your project
+1. Run the scaffold script to create all files/folders
+2. Ask you questions about your project (what, why, tech stack)
 3. Fill in `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, and `spec/`
-4. You're ready to develop!
+4. Set up quality checks and Git workflow
+5. You're ready to develop!
+
+**You don't need to run any scripts manually** - the agent does everything.
 
 **New to the framework?** → Read [`agentic/START_HERE.md`](agentic/START_HERE.md)
 
