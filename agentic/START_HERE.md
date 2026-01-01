@@ -26,22 +26,31 @@
 cp -r /path/to/agentic-framework/agentic ./
 ```
 
-### Step 2: Run scaffold script
-```bash
-# Creates all required files and folders
-bash agentic/init/scaffold.sh
-```
-
-### Step 3: Agent-guided initialization
+### Step 2: Tell your agent to initialize
 Open your AI agent (Cursor/Copilot/Claude) and say:
 
-> "Initialize this project using the agentic framework. Follow `agentic/init/init_playbook.md`."
+> "Initialize this project using the agentic framework."
 
-The agent will ask you questions and fill in:
-- `STACK.md` (how to build/test)
-- `CONTEXT_PACK.md` (where things are)
-- `STATUS.md` (what's happening)
-- `spec/PRD.md` and `spec/TECH_SPEC.md` (what/how to build)
+**That's it!** The agent will:
+1. Run the scaffold script (creates all files and folders)
+2. Ask you questions (what are you building, tech stack, etc.)
+3. Fill in `STACK.md`, `CONTEXT_PACK.MD`, `STATUS.md`, and specs
+4. Set up quality checks (if applicable)
+5. Configure Git workflow
+6. Get you ready to develop
+
+**You don't need to run any scripts manually.** The agent follows `agentic/init/init_playbook.md` automatically.
+
+### What gets created (by the agent)
+
+Files at your repo root:
+- `AGENTS.md` - Entry point for AI agents
+- `STACK.md` - Tech stack, how to build/test
+- `STATUS.md` - Current state and roadmap
+- `CONTEXT_PACK.md` - Architecture snapshot
+- `JOURNAL.md` - Progress log
+- `HUMAN_NEEDED.md` - Items needing human input
+- `spec/` directory with templates (PRD, TECH_SPEC, FEATURES, etc.)
 
 **Done!** You're ready to develop. See [Development Workflow](#development-workflow).
 
