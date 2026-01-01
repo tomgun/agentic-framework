@@ -2,7 +2,12 @@
 
 Quick intent (agent-first): **how to build/run/test** this repo and what constraints matter.
 
-Purpose: a single source of truth for “how we build and run software here”.
+Purpose: a single source of truth for "how we build and run software here".
+
+## Agentic framework
+- Version: 0.1.0
+- Installed: 2026-01-02
+- Source: https://github.com/tomgun/agentic-framework
 
 ## Summary
 - What are we building: a small Todo web app used as an example of the agentic framework.
