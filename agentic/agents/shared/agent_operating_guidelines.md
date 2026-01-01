@@ -28,6 +28,8 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 
 ## Before you edit code
 - Read (minimum): `CONTEXT_PACK.md`, `STATUS.md`, `spec/OVERVIEW.md`, `spec/FEATURES.md`.
+- **Check for human edits**: Human may have added features, updated priorities, or changed specs directly. Honor those changes.
+- **Follow the spec schema**: All spec edits must conform to `agentic/spec/SPEC_SCHEMA.md` (valid status values, field formats, cross-reference conventions).
 - If the change touches a specific feature: read its acceptance file `spec/acceptance/F-####.md`.
 - If constraints matter: read `spec/NFR.md`.
 - Identify the relevant spec section(s) and acceptance criteria.

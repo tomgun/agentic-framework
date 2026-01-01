@@ -203,17 +203,63 @@ grep -A 20 "^## F-0005:" spec/FEATURES.md | grep -A 5 "^- Tests:"
 
 ## Quick Edits (Humans Can Do These)
 
-### Mark a decision resolved
-Edit `HUMAN_NEEDED.md` - move item from "Active" to "Resolved" section.
+You can **edit spec files directly** without talking to the agent. The agent will pick up your changes on next session.
+
+### Add a new feature
+Edit `spec/FEATURES.md` directly:
+
+```markdown
+## F-0010: New feature name
+- Parent: none
+- Dependencies: none
+- Complexity: M
+- Status: planned
+- PRD: spec/PRD.md#section
+- Requirements: R-0005
+- NFRs: none
+- Acceptance: spec/acceptance/F-0010.md
+- Verification:
+  - Accepted: no
+- Implementation:
+  - State: none
+  - Code:
+- Tests:
+  - Test strategy: unit
+  - Unit: todo
+  - Integration: n/a
+  - Acceptance: todo
+- Technical debt:
+- Lessons/caveats:
+- Notes:
+```
+
+Then tell the agent: "Implement F-0010"
 
 ### Update priorities
-Edit `STATUS.md` - change "Next up" section with new priorities.
+Edit `STATUS.md` - change "Next up" section with new order or new features.
+
+### Mark a decision resolved
+Edit `HUMAN_NEEDED.md` - move item from "Active" to "Resolved" section.
 
 ### Note a new issue
 Add to `STATUS.md` under "Known issues / risks".
 
+### Add acceptance criteria
+Create or edit `spec/acceptance/F-####.md` with specific criteria.
+
+### Record a decision
+Create `spec/adr/ADR-####-short-title.md` from template.
+
 ### Add a reference
 Add entry to `spec/REFERENCES.md` for papers/docs you found useful.
+
+### Update architecture notes
+Edit `spec/TECH_SPEC.md` to add architectural details.
+
+### Create a task
+Run `bash agentic/tools/task.sh "Task title"` or create manually in `spec/tasks/`.
+
+**The agent will see your changes** when it reads these files at session start.
 
 ## Time-Saving Patterns
 

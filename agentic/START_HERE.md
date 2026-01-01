@@ -63,6 +63,8 @@ tail -50 JOURNAL.md
 
 **💡 Pro tip**: You can check project state yourself without asking the agent. See [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) for a complete guide to token-free information retrieval.
 
+**✏️ Direct editing**: You can also edit spec files directly (add features, update priorities, write acceptance criteria) without talking to the agent. The agent will pick up your changes. See [`DIRECT_EDITING.md`](DIRECT_EDITING.md) for the workflow.
+
 ### Starting a session (agent)
 Agents should read in this order:
 1. `CONTEXT_PACK.md` (where things are, how to run)
@@ -179,6 +181,10 @@ You shouldn't need to edit these - they're the framework:
 - Test strategy: `agentic/quality/test_strategy.md`
 - Integration testing: `agentic/quality/integration_testing.md`
 - Design for testability: `agentic/quality/design_for_testability.md`
+
+**Understand specifications:**
+- Spec templates: `agentic/spec/*.template.md`
+- Spec schema (field definitions, valid values): `agentic/spec/SPEC_SCHEMA.md`
 
 **Make an architectural decision:**
 - ADR template: `agentic/spec/ADR.template.md`

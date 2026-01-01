@@ -14,6 +14,13 @@ This folder is a **portable framework** you can copy into any repository to boot
 - **Multi-agent compatibility**: a shared "agent operating contract" + thin entrypoints for Cursor/Copilot/Claude.
 - **Optional lightweight enforcement**: PR checklist + a minimal GitHub Actions template to validate docs/spec conventions.
 
+## Schema and Structure
+
+**The spec system has a defined schema**: [`agentic/spec/SPEC_SCHEMA.md`](spec/SPEC_SCHEMA.md)
+- Defines valid field values, status vocabularies, cross-reference formats
+- Ensures consistency across human and agent edits
+- Tools validate against this schema
+
 ## For complex projects
 
 This framework now includes advanced features for long-term, complex software:
