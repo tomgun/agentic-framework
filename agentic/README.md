@@ -64,6 +64,14 @@ See [`agentic/workflows/tdd_mode.md`](workflows/tdd_mode.md) for complete TDD gu
 
 ## Quick start (new repo)
 
+**Download latest release:**
+```bash
+curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
+cp -r agentic-framework-0.1.0/agentic ./
+```
+
+**Initialize:**
+
 1. Copy the **folder** `agentic/` into your repo root (don't copy its contents into the root; keep the folder so links stay consistent).
 2. Tell your agent:
 

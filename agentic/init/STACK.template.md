@@ -1,6 +1,11 @@
 # STACK.md (Template)
 
-Purpose: a single source of truth for “how we build and run software here”.
+Purpose: a single source of truth for "how we build and run software here".
+
+## Agentic framework
+- Version: 0.1.0  <!-- Update when upgrading framework -->
+- Installed: <!-- YYYY-MM-DD -->
+- Source: https://github.com/YOUR_USERNAME/agentic-framework
 
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
