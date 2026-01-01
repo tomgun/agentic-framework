@@ -1,5 +1,7 @@
 # STATUS.md (Template)
 
+<!-- format: status-v0.1.0 -->
+
 Purpose: the living "truth" of where the project is today.
 
 ## Current session state (optional, for mid-session tracking)

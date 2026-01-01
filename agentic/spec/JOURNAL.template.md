@@ -1,5 +1,7 @@
 # JOURNAL (Template)
 
+<!-- format: journal-v0.1.0 -->
+
 Purpose: capture session-by-session progress so both humans and agents can resume work effortlessly, especially after context window resets or breaks.
 
 ## How to use
@@ -9,12 +11,46 @@ Purpose: capture session-by-session progress so both humans and agents can resum
 - This complements `STATUS.md` (high-level roadmap) with granular session-level detail.
 
 ## Format
-Each entry should include:
-- **Session ID/timestamp**: `YYYY-MM-DD HH:MM` or `YYYY-MM-DD-HHMM`
-- **Feature/task**: which feature(s) or task(s) were worked on
-- **Accomplished**: what was completed this session
-- **Next steps**: immediate next actions
-- **Blockers/issues**: anything that needs attention or decision
+
+**Two formats supported (choose one and be consistent):**
+
+### Format A: Simple (template default)
+```markdown
+### Session: YYYY-MM-DD HH:MM
+**Feature**: F-####
+**Accomplished**:
+- Items completed
+**Next steps**:
+- Immediate actions
+**Blockers**:
+- Issues or decisions needed
+```
+
+### Format B: Detailed (used in examples)
+```markdown
+## YYYY-MM-DD HH:MM - Description (Session N)
+
+**Feature**: F-####
+
+**What was done:**
+- Items completed
+
+**Tests added:**
+- Tests implemented
+
+**What's next:**
+- Immediate actions
+
+**Blockers:**
+- Issues or decisions needed
+
+**Lessons:**
+- Learnings from this session
+```
+
+**Both formats work with framework tools.** Choose based on preference:
+- Format A: Simpler, less structure
+- Format B: More detailed, better for complex sessions
 
 ---
 
@@ -22,6 +58,7 @@ Each entry should include:
 
 ### Session: 2025-12-31 14:30
 **Feature**: F-0004 (Persistence)
+
 **Accomplished**:
 - Implemented localStorage adapter with quota handling
 - Added unit tests for happy path and quota exceeded
