@@ -18,11 +18,12 @@ This repository is a **template**. Copy the `agentic/` folder into your project 
 - Summarize instead of repeatedly reading
 
 ### 2. Developer-Friendly UX
-**Humans should only talk to the agent. The agent handles the mechanics.**
-- Agent runs scaffold scripts, not the developer
-- Agent maintains documentation automatically
+**Humans focus on decisions and direction. Agents handle implementation mechanics.**
+- Humans define what to build, agents handle how
+- Humans can read/edit specs directly (markdown files)
+- Agents run scaffold scripts, update docs, maintain consistency
 - Clear status at all times (`STATUS.md` + `JOURNAL.md`)
-- Tools provide immediate project health checks
+- Tools provide immediate project health checks (no agent needed)
 
 ### 3. Quality by Design
 **Tests and incremental changes reduce risk.**
@@ -32,11 +33,12 @@ This repository is a **template**. Copy the `agentic/` folder into your project 
 - Definition of Done includes quality gates
 
 ### 4. Living Documentation
-**Documentation stays current through enforced synchronization.**
-- Specs are updated with code changes (same commit)
+**Documentation stays current through collaboration and automation.**
+- Humans add requirements, features, priorities to specs
+- Agents update specs when implementing (same commit as code)
 - No stale placeholders (`(Not yet created)` gets replaced)
 - `FEATURES.md` status matches implementation reality
-- Architecture decisions are recorded (ADRs)
+- Architecture decisions are recorded (ADRs) by whoever makes them
 
 ### 5. Traceability
 **Clear path from requirements to code to tests.**
@@ -52,12 +54,13 @@ This repository is a **template**. Copy the `agentic/` folder into your project 
 - Verify acceptance criteria
 - Update docs and move to next task
 
-### 7. Agent Partnership (Not Automation)
-**Agents as collaborative partners, not just code generators.**
-- Agents understand project context and priorities
+### 7. Human-Agent Collaboration
+**Both humans and agents work together on project truth.**
+- **Humans**: Read specs, add features/tasks, make decisions, set priorities
+- **Agents**: Implement features, update docs with code changes, maintain sync
+- Specs are readable and editable by both (markdown files, not complex formats)
 - Agents know when to escalate to humans (`HUMAN_NEEDED.md`)
-- Agents maintain project truth (docs, specs, status)
-- Agents suggest improvements at complexity thresholds
+- Tools enable humans to check status without asking agents (token-free queries)
 
 ## Quick Start
 
