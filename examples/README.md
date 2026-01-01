@@ -14,20 +14,72 @@ This is what you get after running the scaffold script but before filling in any
 
 **When to reference:** To understand what files the framework creates and where they live.
 
-### 2. inited_project/ (Next.js Todo App)
-**What it shows:** Fully initialized project using the framework
+---
 
-A working Next.js + TypeScript todo application that demonstrates:
-- Complete STACK.md (how to build/test)
-- Filled-in specs (PRD, Tech Spec, Features with F-#### IDs)
-- Test-driven development (unit tests with vitest)
-- Feature tracking (F-0001: Add todos, F-0002: Complete todos)
-- Agent-friendly documentation
-- Real code with `@feature` annotations
+### 2. inited_project/ (Python CLI - Simple)
+**What it shows:** Newly initialized project using TDD
 
-**When to reference:** To see what a real project looks like after framework adoption.
+A simple Python task manager CLI demonstrating:
+- **TDD workflow**: Tests written first (red-green-refactor)
+- **Complete specs**: PRD, Tech Spec, Features (F-0001, F-0002, F-0003)
+- **Code annotations**: `@feature F-####` in code
+- **Acceptance criteria**: Per-feature files
+- **Framework v0.1.0**: Version tracking in STACK.md
 
-**Tech stack:** Next.js 14, React, TypeScript, Vitest
+**Complexity level:** ⭐ Beginner/Simple
+- 3 features (all shipped)
+- ~200 lines of code
+- Pure unit tests
+- Single-user CLI tool
+
+**Tech stack:** Python 3.12, pytest
+
+**When to reference:** Learning the framework basics, understanding TDD workflow.
+
+---
+
+### 3. nextjs_evolved/ (Next.js - Evolved)
+**What it shows:** Mature project with retrospectives, research, and quality validation
+
+A Next.js task management web app showing an **evolved, production-ready project**:
+- **Retrospectives**: 2 completed retrospectives in `docs/retrospectives/`
+- **Research**: Field research on React 19 and Next.js 15 in `docs/research/`
+- **Quality validation**: Lighthouse scores, bundle size monitoring, a11y checks
+- **PR workflow**: Feature branches, pull requests, CI checks
+- **Documentation verification**: Context7 enabled, version-specific API validation
+- **Advanced features**: 8 features across 3 releases
+- **Architecture evolution**: Tracked ADRs showing design decisions over time
+
+**Complexity level:** ⭐⭐⭐ Advanced/Mature
+- 8 features (5 shipped, 2 in progress, 1 planned)
+- 3 releases documented
+- Integration tests, E2E tests (Playwright)
+- Multiple retrospectives with action items
+- Research trails informing decisions
+- Quality gates enforced
+
+**Tech stack:** Next.js 15.1, React 19, TypeScript, Vitest, Playwright
+
+**When to reference:** Understanding long-term framework usage, seeing how projects evolve over time, learning advanced features.
+
+---
+
+## Comparison
+
+| Aspect | inited_project (Python) | nextjs_evolved (Next.js) |
+|--------|------------------------|--------------------------|
+| **Maturity** | Just initialized | Evolved over 2 months |
+| **Features** | 3 (all shipped) | 8 (5 shipped, ongoing) |
+| **Releases** | v1.0.0 | v1.0.0, v1.1.0, v1.2.0 |
+| **Tests** | Unit only | Unit + Integration + E2E |
+| **Quality** | Basic | Full automation (Lighthouse, bundle, a11y) |
+| **Retrospectives** | None yet | 2 completed |
+| **Research** | None yet | React 19, Next.js 15, Testing strategies |
+| **ADRs** | None yet | 3 (state management, styling, testing) |
+| **Git workflow** | Direct commits | Pull requests + CI |
+| **Docs verification** | Manual | Context7 enabled |
+
+---
 
 ## Using These Examples
 
@@ -51,3 +103,10 @@ These examples are compatible with:
 
 If you're using a different version, some files/features may differ.
 
+## Learning Path
+
+1. **Start with `example_structure/`**: Understand the framework structure
+2. **Study `inited_project/`**: Learn TDD workflow and basic usage
+3. **Explore `nextjs_evolved/`**: See how projects mature and use advanced features
+
+Each example builds on the previous concepts!

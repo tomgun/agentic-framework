@@ -1,0 +1,35 @@
+# Context7 Configuration
+# See: agentic/workflows/documentation_verification.md
+
+# Enable version-specific documentation validation
+enabled: true
+
+# Project dependencies to validate
+packages:
+  - name: next
+    version: 15.1.0
+    docs:
+      - https://nextjs.org/docs
+    strict_version: true
+
+  - name: react
+    version: 19.0.0
+    docs:
+      - https://react.dev
+    strict_version: true
+
+  - name: zustand
+    version: 5.0.1
+    docs:
+      - https://docs.pmnd.rs/zustand
+    strict_version: false  # Minor version differences OK
+
+# Validation rules
+rules:
+  - Warn if API not found in specified version docs
+  - Error if using deprecated API
+  - Suggest alternative if API changed in version
+
+# Update frequency (days)
+update_check_interval: 30
+
