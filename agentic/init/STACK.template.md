@@ -55,6 +55,36 @@ Purpose: a single source of truth for “how we build and run software here”.
 - development_mode: tdd  <!-- RECOMMENDED for most projects -->
 <!-- - development_mode: standard -->
 
+## Git workflow (required)
+<!-- How agents interact with Git. See agentic/workflows/git_workflow.md -->
+- git_workflow: direct  <!-- direct | pull_request -->
+
+<!-- Direct mode: Commit directly to branch (solo developer, simple projects) -->
+<!--   - Agent commits after human approval -->
+<!--   - No PR creation -->
+<!--   - Fast iteration -->
+
+<!-- Pull Request mode: Create PRs for review (teams, collaborative projects) -->
+<!--   - Agent creates feature branches -->
+<!--   - Agent creates PRs after human approval -->
+<!--   - Human or CI reviews before merge -->
+<!-- PR settings (if git_workflow: pull_request): -->
+<!-- - pr_draft_by_default: true  # Create draft PRs until complete -->
+<!-- - pr_auto_request_review: true  # Auto-assign reviewers -->
+<!-- - pr_require_ci_pass: true  # Wait for CI before suggesting merge -->
+<!-- - pr_reviewers: ["github_username"]  # Reviewers to auto-assign -->
+
+## Multi-agent coordination (optional)
+<!-- Multiple AI agents working simultaneously. See agentic/workflows/multi_agent_coordination.md -->
+<!-- - multi_agent_enabled: no  # yes | no -->
+<!-- - multi_agent_orchestrator: cursor-main  # ID of orchestrator agent (optional) -->
+<!-- - multi_agent_workers: -->
+<!--     - id: cursor-agent-1 -->
+<!--       worktree: /path/to/worktree-1 -->
+<!--     - id: cursor-agent-2 -->
+<!--       worktree: /path/to/worktree-2 -->
+<!-- When enabled, agents use Git worktrees and coordinate via AGENTS_ACTIVE.md -->
+
 ## Data & integrations
 - Primary datastore: <!-- postgres/sqlite/mongo/redis/etc -->
 - Messaging/queues (if any): <!-- kafka/sqs/rabbitmq/etc -->

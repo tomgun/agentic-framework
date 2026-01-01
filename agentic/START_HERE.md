@@ -190,7 +190,15 @@ You shouldn't need to edit these - they're the framework:
 - Feature list: `spec/FEATURES.md`
 - Acceptance criteria: `spec/acceptance/F-####.md`
 - Dev workflow: `agentic/workflows/dev_loop.md`
+- TDD mode (recommended): `agentic/workflows/tdd_mode.md`
+- Git workflow: `agentic/workflows/git_workflow.md`
 - Code annotations: `agentic/workflows/code_annotations.md`
+
+**Work with a team / multiple agents:**
+- Multi-agent coordination: `agentic/workflows/multi_agent_coordination.md`
+- Git worktrees: `agentic/workflows/multi_agent_coordination.md#git-worktrees`
+- Agent coordination file: `AGENTS_ACTIVE.md`
+- PR workflow: `agentic/workflows/git_workflow.md#pull-request-workflow`
 
 **Write tests:**
 - Test strategy: `agentic/quality/test_strategy.md`
@@ -220,6 +228,7 @@ You shouldn't need to edit these - they're the framework:
 **Check quality:**
 - Review checklist: `agentic/quality/review_checklist.md`
 - Definition of done: `agentic/workflows/definition_of_done.md`
+- Continuous quality validation: `agentic/workflows/continuous_quality_validation.md`
 - Run verification: `bash agentic/tools/verify.sh`
 
 **Get project health:**

@@ -35,6 +35,8 @@ This framework now includes advanced features for long-term, complex software:
 - **Documentation verification**: Ensure agents use up-to-date, version-correct documentation
 - **Spec validation**: Enforce structure and valid values in spec files
 - **Continuous quality validation**: Stack-specific automated quality gates before commits
+- **Multi-agent coordination**: Multiple AI agents working simultaneously with Git worktrees
+- **PR workflow**: Optional pull request mode for team collaboration
 
 See [`START_HERE.md`](START_HERE.md) for complete guide.
 

@@ -19,8 +19,14 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 - **Check quality validation setup**: If `STACK.md` has `quality_validation_enabled: yes`, ensure `quality_checks.sh` exists at repo root. If missing, offer to create it based on the tech stack (see `agentic/workflows/continuous_quality_validation.md`).
 
 ## Non-negotiables
+- **No auto-commits without explicit human approval**: 
+  - **NEVER commit changes without showing them to the user first and getting explicit approval**
+  - **ONLY commit when the user explicitly says "commit" or "commit and push"**
+  - Always present a summary of changes and ask for review before committing
+  - Exception: If the user says "commit everything" or "auto-commit", you may proceed
+  - See `agentic/workflows/git_workflow.md` for commit protocols
 - **Follow the spec workflow**: treat `/spec/*`, `spec/adr/*`, `STATUS.md`, `STACK.md`, `CONTEXT_PACK.md` as authoritative.
-- **Keep feature truth current**: if you change a feature’s behavior/status/tests, update `spec/FEATURES.md` and the relevant acceptance file(s).
+- **Keep feature truth current**: if you change a feature's behavior/status/tests, update `spec/FEATURES.md` and the relevant acceptance file(s).
 - **Keep NFR truth current**: if your change affects cross-cutting constraints (perf/security/realtime/reliability), update `spec/NFR.md` and link relevant NFR IDs from the feature(s).
 - **Tests are required** for new/changed logic.
   - If a feature needs acceptance/integration/perf tests (domain-specific), add them or record a concrete follow-up task.
