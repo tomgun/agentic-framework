@@ -1,5 +1,7 @@
 # Spec naming & lifecycle
 
+**⚠️ For the canonical schema defining valid values, field types, and validation rules, see [`SPEC_SCHEMA.md`](SPEC_SCHEMA.md).**
+
 ## Where things live (recommended)
 - `/spec/PRD.md`: the “why/what”
 - `/spec/TECH_SPEC.md`: the “how”
