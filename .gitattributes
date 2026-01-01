@@ -1,0 +1,10 @@
+# .gitattributes for agentic-framework releases
+
+# Exclude framework maintenance docs from release archives
+/CHANGELOG.md export-ignore
+/RELEASING.md export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+
+# Include everything else (especially agentic/ folder)
+
