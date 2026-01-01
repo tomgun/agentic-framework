@@ -1,10 +1,15 @@
 # .gitattributes for agentic-framework releases
 
-# Exclude framework maintenance docs from release archives
+# Exclude framework maintenance and repo-specific docs from release archives
 /CHANGELOG.md export-ignore
 /RELEASING.md export-ignore
+/README.md export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
 
-# Include everything else (especially agentic/ folder)
+# Exclude examples (for GitHub repo browsing only, not needed in releases)
+/examples export-ignore
+
+# Include only: agentic/ folder and VERSION file
+# Users get: agentic/ (with agentic/README.md inside for usage docs)
 
