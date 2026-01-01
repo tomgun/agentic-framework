@@ -1,37 +1,176 @@
-# Agentic Framework (Template Repo)
+# Agentic Framework
 
-This repository contains a portable agentic development framework under `agentic/`.
+A portable framework for building complex, maintainable software with AI agents as development partners.
 
-## For GitHub visitors
-- If you’re evaluating the framework: start at `agentic/README.md`.
-- If you copied this into a real project repo: this `README.md` is expected to be **replaced** by your project’s README.
+## What is this?
 
-## What to copy into a new project
-Copy the `agentic/` folder into your project repo root (i.e., into the top-level directory of your project repository).
+The Agentic Framework enables **sustainable long-term software development with AI agents**. It provides structure, conventions, and tooling that keep both humans and AI agents aligned as projects evolve from prototypes to production systems.
 
-The framework also expects a small set of **repo-root bootstrap artifacts** (e.g. `STACK.md`, `STATUS.md`, `CONTEXT_PACK.md`, `AGENTS.md`, and `spec/*`) — these are created by the scaffold step below, so you don’t manually copy them.
+This repository is a **template**. Copy the `agentic/` folder into your project to adopt the framework.
+
+## Design Principles
+
+### 1. Token Economics (Efficiency)
+**Durable artifacts prevent repeated context waste.**
+- Maintain `CONTEXT_PACK.md` so agents don't re-read entire codebases
+- Use `JOURNAL.md` to preserve progress across context resets
+- Follow structured reading protocols with explicit token budgets
+- Summarize instead of repeatedly reading
+
+### 2. Developer-Friendly UX
+**Humans should only talk to the agent. The agent handles the mechanics.**
+- Agent runs scaffold scripts, not the developer
+- Agent maintains documentation automatically
+- Clear status at all times (`STATUS.md` + `JOURNAL.md`)
+- Tools provide immediate project health checks
+
+### 3. Quality by Design
+**Tests and incremental changes reduce risk.**
+- Tests are mandatory for all new/changed logic
+- Small, reviewable increments over large changes
+- Design for testability (seams, boundaries, pure functions)
+- Definition of Done includes quality gates
+
+### 4. Living Documentation
+**Documentation stays current through enforced synchronization.**
+- Specs are updated with code changes (same commit)
+- No stale placeholders (`(Not yet created)` gets replaced)
+- `FEATURES.md` status matches implementation reality
+- Architecture decisions are recorded (ADRs)
+
+### 5. Traceability
+**Clear path from requirements to code to tests.**
+- Features have stable IDs (`F-0001`) with acceptance criteria
+- Code annotated with `@feature F-####` for bidirectional linking
+- Test coverage explicitly tracked per feature
+- Dependency visualization shows relationships
+
+### 6. Iterative & Incremental
+**Ship in small, validated steps.**
+- Pick one small task from `STATUS.md`
+- Implement with tests
+- Verify acceptance criteria
+- Update docs and move to next task
+
+### 7. Agent Partnership (Not Automation)
+**Agents as collaborative partners, not just code generators.**
+- Agents understand project context and priorities
+- Agents know when to escalate to humans (`HUMAN_NEEDED.md`)
+- Agents maintain project truth (docs, specs, status)
+- Agents suggest improvements at complexity thresholds
+
+## Quick Start
+
+### For new projects
+
+**Step 1:** Copy framework into your repo
+```bash
+# From your project root
+cp -r /path/to/agentic-framework/agentic ./
+```
+
+**Step 2:** Tell your agent to initialize
+Open your AI agent (Cursor/Copilot/Claude) and say:
+
+> "Initialize this project using the agentic framework. Run the scaffold script first, then follow the init playbook."
+
+The agent will:
+1. Run `bash agentic/init/scaffold.sh` to create all files
+2. Ask you questions about your project
+3. Fill in `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, and `spec/`
+4. You're ready to develop!
+
+**New to the framework?** → Read [`agentic/START_HERE.md`](agentic/START_HERE.md)
+
+### For evaluating the framework
+
+- **Full documentation**: [`agentic/README.md`](agentic/README.md)
+- **Quick tour**: [`agentic/START_HERE.md`](agentic/START_HERE.md)
+- **Visual guide**: [`agentic/FRAMEWORK_MAP.md`](agentic/FRAMEWORK_MAP.md)
+- **Working example**: [`examples/inited_project/`](examples/inited_project/) (Next.js Todo app)
+
+## What You Get
+
+### Core Framework
+- **Agent operating guidelines**: Consistent behavior across AI tools
+- **Specification templates**: PRD, Tech Spec, Features, NFR, ADR, Tasks
+- **Quality playbooks**: Test strategy, review checklist, definition of done
+- **Token efficiency guides**: Reading protocols, context budgeting
+- **Development workflows**: Dev loop, debugging, code annotations
+
+### For Complex Projects
+- **Session continuity**: JOURNAL.md tracks progress across context resets
+- **Dependency tracking**: Feature dependencies with visualization
+- **Human escalation**: HUMAN_NEEDED.md for decisions requiring judgment
+- **Architecture evolution**: Track changes with arch_diff.sh
+- **Research trails**: Structured documentation of research findings
+- **Scaling guidance**: Suggestions when complexity crosses thresholds
+
+### Tooling
+```bash
+# Project health & verification
+bash agentic/tools/doctor.sh      # Check structure
+bash agentic/tools/report.sh      # Feature status summary
+bash agentic/tools/verify.sh      # Comprehensive validation
+
+# Context & analysis
+bash agentic/tools/brief.sh       # Quick project brief
+bash agentic/tools/coverage.sh    # Code annotation coverage
+bash agentic/tools/feature_graph.sh   # Dependency visualization
+bash agentic/tools/arch_diff.sh   # Architecture changes over time
+```
+
+### Stack Profiles
+Quick-start guidance for common technology stacks:
+- Generic/default, Full-stack webapp, Native iOS
+- Go backend services, Python ML projects
+- Rust systems programming, React Native mobile
+
+## Key Artifacts
+
+The framework creates and maintains these "source of truth" files:
+
+**Project State:**
+- `STACK.md` - How to build, test, run, and deploy
+- `STATUS.md` - Current focus, roadmap, known issues
+- `CONTEXT_PACK.md` - Durable context (where things are, how it works)
+- `JOURNAL.md` - Session-by-session progress log
+
+**Specifications:**
+- `spec/PRD.md` - Requirements (why, what)
+- `spec/TECH_SPEC.md` - Architecture (how)
+- `spec/FEATURES.md` - Feature registry with IDs, status, tests
+- `spec/NFR.md` - Non-functional requirements
+- `spec/acceptance/F-####.md` - Acceptance criteria per feature
+- `spec/adr/` - Architecture Decision Records
+
+**Escalation:**
+- `HUMAN_NEEDED.md` - Items requiring human decision/intervention
 
 ## Examples
-- `examples/example_structure/`: what a freshly scaffolded project looks like (bootstrap artifacts + `spec/` + `docs/`).
-- `examples/inited_project/`: a more complete example project (runnable Next.js Todo app) showing features/backlog/acceptance.
 
-## Init (agent-driven)
-Developer goal: only talk to the agent. The agent can run scripts for efficiency.
+- **Scaffold output**: [`examples/example_structure/`](examples/example_structure/) - Freshly scaffolded project structure
+- **Working project**: [`examples/inited_project/`](examples/inited_project/) - Complete Next.js Todo app with full specs, tests, and documentation
 
-Step 0: agent scaffolds all required files/folders (so everything exists immediately):
+## For Existing Projects
 
-```bash
-bash agentic/init/scaffold.sh
-```
+Already have a project? The framework integrates non-invasively:
 
-Step 1: run the agent-guided init planning session:
-- Open your agent and point it to `agentic/init/init_playbook.md`
+1. Copy `agentic/` folder into your repo
+2. Run scaffold to create documentation structure
+3. Agent fills in specs based on existing code
+4. Adopt practices incrementally (tests first, then specs, then workflows)
 
-## Quick resume
+## License & Contributing
 
-```bash
-bash agentic/tools/brief.sh
-bash agentic/tools/report.sh
-```
+[Add your license and contribution guidelines]
 
+## Getting Help
 
+- **Documentation**: Start at [`agentic/START_HERE.md`](agentic/START_HERE.md)
+- **Examples**: See [`examples/`](examples/) directory
+- **Issues**: [Your issue tracker]
+
+---
+
+**Note for adopted projects**: After copying `agentic/` into your project, replace this root `README.md` with your project's actual README. Keep `agentic/README.md` as-is for framework documentation.
