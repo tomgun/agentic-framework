@@ -1,53 +1,74 @@
 # CONTEXT_PACK.md
 
-Quick intent: a compact starting point for **agents + humans**. Read this first to avoid re-scanning the repo.
-
-Purpose: a compact, durable starting point so you don’t need to reread the whole repo.
-
-## One-minute overview
-- What this repo is: an example initialized project demonstrating the `agentic/` framework with a Next.js Todo app.
-- Main user workflow:
-  - add a todo
-  - toggle it done/undone
-  - (next) filter + persistence
-- Current top priorities:
-  - implement F-0004 persistence (localStorage)
-  - implement F-0005 filters
+**Quick intent**: This is a simple CLI task manager demo using the agentic framework v0.1.0.
 
 ## Where to look first (map)
-- Entry points:
-  - `app/page.tsx` (UI)
-  - `lib/todo.ts` (domain logic)
-- Core modules:
-  - `lib/todo.ts` for pure logic (unit-tested)
-- Specs: `/spec/`
-- Features: `spec/FEATURES.md`
-- Overview: `spec/OVERVIEW.md`
-- Non-functional requirements: `spec/NFR.md`
-- Lessons: `spec/LESSONS.md`
-- Decisions: `spec/adr/`
-- Status: `STATUS.md`
 
-## How to run
-- Setup: `npm install`
-- Run: `npm run dev`
-- Test: `npm test`
+**Entry points:**
+- CLI: `task_cli.py` (main entry point)
+- Core logic: `task_manager.py` (business logic)
+- Tests: `test_task_manager.py` (unit tests)
+
+**Project structure:**
+```
+inited_project/
+├── task_cli.py           # CLI interface (@feature F-0001, F-0002)
+├── task_manager.py       # Core logic (@feature F-0001, F-0002, F-0003)
+├── test_task_manager.py  # Unit tests
+├── tasks.json            # Data storage
+├── spec/                 # Requirements & features
+└── agentic/              # Framework
+```
+
+## How to run / test
+
+**Run the app:**
+```bash
+python task_cli.py add "Buy milk"
+python task_cli.py list
+python task_cli.py complete 1
+```
+
+**Run tests:**
+```bash
+pytest
+```
+
+## Current top priorities
+
+1. F-0001: Add tasks ✅ (shipped)
+2. F-0002: List tasks ✅ (shipped)
+3. F-0003: Complete tasks ✅ (shipped)
 
 ## Architecture snapshot
-- Components:
-  - Next.js app (UI)
-  - Domain logic (`lib/todo.ts`)
-- Data flow:
-  - UI holds state in React for now
-  - actions call pure domain functions
-- External dependencies: none (local-only)
 
-## Quality gates (current)
-- Unit tests required: yes
-- Definition of Done: see `agentic/workflows/definition_of_done.md`
-- Review checklist: see `agentic/quality/review_checklist.md`
+**Style:** Simple CLI application with JSON persistence
+
+**Key modules:**
+- `task_manager.py`: Core business logic (add, list, complete tasks)
+- `task_cli.py`: Command-line interface using argparse
+- `tasks.json`: JSON file storage
+
+**Data flow:**
+```
+CLI → TaskManager → JSON file
+```
+
+## Technology choices
+
+- **Python 3.12**: Modern Python with type hints
+- **pytest**: Unit testing framework (TDD)
+- **JSON**: Simple file-based persistence
+- **No external dependencies**: Keep it simple for demo
 
 ## Known risks / sharp edges
-- `addTodo` uses `Date.now()` for ids; good enough for demo, but not stable across devices.
 
+- JSON file must be writable
+- No concurrent access handling (single-user tool)
+- Task IDs are simple integers (not UUIDs)
 
+## Onboarding cost
+
+**Time to understand:** 10 minutes
+- Read: STACK.md, spec/FEATURES.md
+- Run: `pytest` then `python task_cli.py --help`

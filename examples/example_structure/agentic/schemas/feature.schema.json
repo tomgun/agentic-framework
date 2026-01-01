@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentic-framework.dev/schemas/feature.schema.json",
+  "title": "Feature",
+  "description": "A feature specification with metadata and tracking",
+  "type": "object",
+  "required": ["id", "name", "status", "verification", "implementation", "tests"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^F-[0-9]{4}$",
+      "description": "Unique feature identifier in format F-####"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 150,
+      "description": "Human-readable feature name"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planned", "in_progress", "shipped", "deprecated"],
+      "description": "Current development status"
+    },
+    "parent": {
+      "type": ["string", "null"],
+      "pattern": "^F-[0-9]{4}$",
+      "description": "Parent feature ID for hierarchy"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^F-[0-9]{4}$"
+      },
+      "description": "Features that must be complete first"
+    },
+    "complexity": {
+      "type": "string",
+      "enum": ["S", "M", "L", "XL"],
+      "description": "Size estimate (S=hours, M=days, L=weeks, XL=months)"
+    },
+    "prd": {
+      "type": ["string", "null"],
+      "description": "Link to PRD section"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^R-[0-9]{4}$"
+      },
+      "description": "Requirements this feature satisfies"
+    },
+    "nfrs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^NFR-[0-9]{4}$"
+      },
+      "description": "Non-functional requirements this feature must satisfy"
+    },
+    "acceptance": {
+      "type": "string",
+      "description": "Link to acceptance criteria file"
+    },
+    "verification": {
+      "type": "object",
+      "required": ["accepted"],
+      "properties": {
+        "accepted": {
+          "type": "boolean",
+          "description": "Whether acceptance criteria are met"
+        },
+        "accepted_at": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "Date acceptance was verified (YYYY-MM-DD)"
+        }
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "required": ["state", "code"],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["none", "partial", "complete"],
+          "description": "How much is implemented"
+        },
+        "code": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "File paths where code lives"
+        }
+      }
+    },
+    "tests": {
+      "type": "object",
+      "required": ["strategy", "unit", "integration", "acceptance"],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": ["unit", "integration", "e2e", "manual", "mixed"],
+          "description": "Primary test approach"
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["todo", "partial", "complete", "n/a"],
+          "description": "Unit test coverage"
+        },
+        "integration": {
+          "type": "string",
+          "enum": ["todo", "partial", "complete", "n/a"],
+          "description": "Integration test coverage"
+        },
+        "acceptance": {
+          "type": "string",
+          "enum": ["todo", "partial", "complete", "n/a"],
+          "description": "Acceptance test coverage"
+        },
+        "perf": {
+          "type": "string",
+          "enum": ["todo", "partial", "complete", "n/a"],
+          "description": "Performance test coverage"
+        }
+      }
+    },
+    "technical_debt": {
+      "type": ["string", "null"],
+      "description": "Known shortcuts or issues"
+    },
+    "lessons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Links to LESSONS.md entries or notes"
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Additional context for agents/developers"
+    }
+  }
+}
+

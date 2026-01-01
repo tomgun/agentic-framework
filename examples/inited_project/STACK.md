@@ -1,7 +1,5 @@
 # STACK.md
 
-Quick intent (agent-first): **how to build/run/test** this repo and what constraints matter.
-
 Purpose: a single source of truth for "how we build and run software here".
 
 ## Agentic framework
@@ -10,42 +8,61 @@ Purpose: a single source of truth for "how we build and run software here".
 - Source: https://github.com/tomgun/agentic-framework
 
 ## Summary
-- What are we building: a small Todo web app used as an example of the agentic framework.
-- Primary platform: webapp
+- What are we building: A simple task management CLI tool (example project)
+- Primary platform: cli
 
 ## Languages & runtimes
-- Language(s): TypeScript
-- Runtime(s): Node.js (>= 18 recommended)
+- Language(s): Python
+- Runtime(s): Python 3.12
+- Specific versions: Python 3.12.1
 
 ## Frameworks & libraries
-- App framework: Next.js (App Router)
-- UI framework (if any): React
+- App framework: None (pure Python CLI)
+- UI framework (if any): N/A
+
+## Documentation verification (recommended)
+- doc_verification: manual
+- strict_version_matching: yes
 
 ## Tooling
-- Package manager: npm (or pnpm)
-- Formatting/linting: Next.js lint (optional)
+- Package manager: pip
+- Formatting/linting: ruff
 
 ## Testing (required)
-- Unit test framework: Vitest
-- Integration/E2E (optional): N/A (future)
+- Unit test framework: pytest
+- Integration/E2E (optional): N/A
 - Test commands:
-  - Unit: `npm test`
+  - Unit: `pytest`
   - Integration: `N/A`
   - E2E: `N/A`
 
+## Development approach (optional)
+- development_mode: tdd  <!-- RECOMMENDED for most projects -->
+
+## Git workflow (required)
+- git_workflow: direct  <!-- direct | pull_request -->
+
+## Multi-agent coordination (optional)
+- multi_agent_enabled: no
+
 ## Data & integrations
-- Primary datastore: <!-- postgres/sqlite/mongo/redis/etc -->
-- Messaging/queues (if any): <!-- kafka/sqs/rabbitmq/etc -->
-- External integrations: <!-- bullet list -->
+- Primary datastore: JSON file (tasks.json)
+- Messaging/queues (if any): N/A
+- External integrations: None
 
 ## Deployment
-- Target environment: local demo
-- CI: optional (see `agentic/support/ci/`)
-- Release strategy: N/A
+- Target environment: local
+- CI: GitHub Actions (optional)
+- Release strategy: manual
 
 ## Constraints & non-negotiables
-- Security/compliance: no PII
-- Performance: simple local state app
-- Reliability: N/A
+- Security/compliance: None (local tool)
+- Performance: Fast for small task lists (<1000 tasks)
+- Reliability: Data persisted to disk
 
-
+## Quality validation (recommended)
+- quality_checks: enabled
+- profile: generic_default
+- pre_commit_hook: no
+- run_command: bash quality_checks.sh --pre-commit
+- full_suite_command: bash quality_checks.sh --full
