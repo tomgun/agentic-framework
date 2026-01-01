@@ -23,4 +23,23 @@ Every change should satisfy:
 - `STATUS.md` updated to reflect reality.
 - Specs updated if they changed, or an ADR created if a real decision was made.
 
+## Documentation sync (required)
+Check these files are accurate and current:
+- [ ] **CONTEXT_PACK.md** accurately reflects current codebase state
+  - "Where to look first" includes all created entry points
+  - No "(Not yet created)" or "(To be created)" placeholders remain for completed work
+  - "Current top priorities" matches actual next steps from STATUS.md
+  - "Architecture snapshot" reflects current structure
+- [ ] **STATUS.md** shows current phase and completed work
+  - "Current focus" is accurate
+  - "In progress" lists only active work (completed items removed or moved)
+  - "Next up" reflects actual priorities
+  - "Current session state" updated if mid-implementation
+- [ ] **FEATURES.md** (spec/FEATURES.md) status matches implementation reality
+  - Feature `Status` changed appropriately (planned → in_progress → shipped)
+  - `Implementation: State` matches actual progress (none → partial → complete)
+  - `Implementation: Code` field lists actual file paths
+  - `Tests` fields reflect test coverage reality (todo → partial → complete)
+  - `Verification: Accepted` is 'yes' only if tested and working
+
 
