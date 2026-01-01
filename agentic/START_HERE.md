@@ -61,6 +61,8 @@ cat STATUS.md
 tail -50 JOURNAL.md
 ```
 
+**💡 Pro tip**: You can check project state yourself without asking the agent. See [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) for a complete guide to token-free information retrieval.
+
 ### Starting a session (agent)
 Agents should read in this order:
 1. `CONTEXT_PACK.md` (where things are, how to run)
