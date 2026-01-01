@@ -41,6 +41,19 @@ bash quality_checks.sh --pre-commit  # Fast quality checks
 bash quality_checks.sh --full        # Full suite (Lighthouse, etc.)
 ```
 
+## 📊 Generated Reports
+
+The [`reports/`](reports/) directory contains auto-generated snapshots demonstrating the framework's visibility tools for a mature project:
+
+- **[dashboard.txt](reports/dashboard.txt)**: Project status overview
+- **[feature-report.txt](reports/feature-report.txt)**: Feature summary (6 shipped, 2 in progress, 3 planned)
+- **[feature-graph.md](reports/feature-graph.md)**: Mermaid diagram showing 11 features + dependencies
+- **[health-check.txt](reports/health-check.txt)**: Project health check
+- **[spec-verification.txt](reports/spec-verification.txt)**: Validates ADRs, retrospectives, research links
+- **[retro-check.txt](reports/retro-check.txt)**: Checks if retrospective is due
+
+See [`reports/README.md`](reports/README.md) for how to regenerate these and explore additional tools (`whatchanged.sh`, `deps.py`, `search.sh`, etc.).
+
 ## Project Structure
 
 ```

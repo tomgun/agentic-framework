@@ -1,0 +1,11 @@
+=== Feature status summary ===
+- in_progress: 2
+- planned: 3
+- shipped: 6
+
+Needs acceptance (verify feature works + update spec/FEATURES.md -> Accepted: yes/no):
+- F-0007
+- F-0008
+
+Tip: Keep STATUS.md items referencing feature IDs (F-####) for easy tracking.
+Tip: Run 'bash agentic/tools/feature_graph.sh' to visualize feature dependencies.

@@ -1,0 +1,10 @@
+=== agentic doctor ===
+
+Looks like template content (consider filling/renaming):
+- spec/OVERVIEW.md (vision + current state + pointers)
+- spec/LESSONS.md (lessons/caveats)
+
+Next commands:
+- bash agentic/tools/brief.sh
+- bash agentic/tools/report.sh
+- bash agentic/tools/verify.sh

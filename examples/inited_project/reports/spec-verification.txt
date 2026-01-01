@@ -1,0 +1,12 @@
+=== agentic verify ===
+
+Checking cross-references...
+  ✓ No broken references
+
+Checking acceptance files...
+  ✓ All features have acceptance files
+
+Test command from STACK.md: commands:
+  (run verify.sh to execute tests)
+
+✓ All checks passed
