@@ -1,12 +1,14 @@
 # Agentic Framework
 
-A portable framework for building complex, maintainable software with AI agents as development partners.
+**Portable, token-efficient, test-driven framework for AI-assisted software development.**
+
+**Current version:** [v0.1.0](https://github.com/YOUR_USERNAME/agentic-framework/releases/tag/v0.1.0)
 
 ## What is this?
 
 The Agentic Framework enables **sustainable long-term software development with AI agents**. It provides structure, conventions, and tooling that keep both humans and AI agents aligned as projects evolve from prototypes to production systems.
 
-This repository is a **template**. Copy the `agentic/` folder into your project to adopt the framework.
+Download the latest release and extract the `agentic/` folder into your project to adopt the framework.
 
 ## Design Principles
 
@@ -206,9 +208,9 @@ The framework creates and maintains these "source of truth" files:
 
 Already have a project? The framework integrates non-invasively:
 
-1. Copy `agentic/` folder into your repo
-2. Run scaffold to create documentation structure
-3. Agent fills in specs based on existing code
+1. Download release and extract `agentic/` folder into your repo
+2. Tell your agent: "Initialize the agentic framework for this existing project"
+3. Agent analyzes existing code and fills in specs
 4. Adopt practices incrementally (tests first, then specs, then workflows)
 
 ## License & Contributing
