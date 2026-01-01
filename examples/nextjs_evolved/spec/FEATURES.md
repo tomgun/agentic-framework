@@ -1,0 +1,349 @@
+# Features
+
+## F-0001: Add tasks
+- Parent: none
+- Dependencies: none
+- Complexity: S
+- Technical debt: none
+- Status: shipped
+- PRD: spec/PRD.md#R-0001
+- Requirements: R-0001
+- NFRs: NFR-0001 (performance), NFR-0003 (accessibility)
+- Acceptance: spec/acceptance/F-0001.md
+- Verification:
+  - Accepted: yes
+  - Accepted at: 2025-12-20
+- Implementation:
+  - State: complete
+  - Code: components/TaskForm.tsx, lib/store.ts
+  - Release: v1.0.0
+- Tests:
+  - Unit: complete (__tests__/TaskForm.test.tsx)
+  - Integration: complete
+  - Acceptance: complete
+  - E2E: complete (e2e/add-task.spec.ts)
+  - Perf/realtime: n/a
+- Test strategy: TDD (tests written first)
+- Lessons/caveats:
+  - Initial implementation used direct localStorage (tech debt → ADR-0001)
+  - Refactored to Zustand in v1.1.0
+- Notes:
+  - Form submits on Enter key (bug found via E2E test)
+  - Auto-focus on input after submit (UX improvement)
+
+## F-0002: List tasks
+- Parent: none
+- Dependencies: none
+- Complexity: S
+- Technical debt: none
+- Status: shipped
+- PRD: spec/PRD.md#R-0002
+- Requirements: R-0002
+- NFRs: NFR-0001 (performance), NFR-0003 (accessibility)
+- Acceptance: spec/acceptance/F-0002.md
+- Verification:
+  - Accepted: yes
+  - Accepted at: 2025-12-20
+- Implementation:
+  - State: complete
+  - Code: components/TaskList.tsx, components/TaskRow.tsx
+  - Release: v1.0.0
+- Tests:
+  - Unit: complete
+  - Integration: complete
+  - Acceptance: complete
+  - E2E: complete
+  - Perf/realtime: ⚠️ degrades at >100 tasks (F-0009 to fix)
+- Test strategy: TDD
+- Lessons/caveats:
+  - Should be Server Component for better performance (F-0007)
+  - Need virtualization for large lists (F-0009)
+- Notes:
+  - Empty state message shown when no tasks
+  - Accessibility improvements in v1.1.0 (RETRO-2025-12-30)
+
+## F-0003: Complete tasks
+- Parent: none
+- Dependencies: F-0001 (tasks must exist)
+- Complexity: S
+- Technical debt: none
+- Status: shipped
+- PRD: spec/PRD.md#R-0003
+- Requirements: R-0003
+- NFRs: NFR-0001 (performance), NFR-0003 (accessibility)
+- Acceptance: spec/acceptance/F-0003.md
+- Verification:
+  - Accepted: yes
+  - Accepted at: 2025-12-20
+- Implementation:
+  - State: complete
+  - Code: components/TaskRow.tsx, lib/store.ts
+  - Release: v1.0.0
+- Tests:
+  - Unit: complete
+  - Integration: complete
+  - Acceptance: complete
+  - E2E: complete (e2e/complete-task.spec.ts)
+  - Perf/realtime: n/a
+- Test strategy: TDD
+- Lessons/caveats:
+  - Checkbox accessibility improved in v1.1.0 (ARIA labels)
+  - Toggle animation added for better UX
+- Notes:
+  - Supports keyboard interaction (Space/Enter)
+  - Visual feedback (strikethrough, opacity)
+
+## F-0004: Filter tasks
+- Parent: none
+- Dependencies: F-0002 (must have tasks to filter)
+- Complexity: S
+- Technical debt: none
+- Status: shipped
+- PRD: spec/PRD.md#R-0004
+- Requirements: R-0004
+- NFRs: NFR-0001 (performance)
+- Acceptance: spec/acceptance/F-0004.md
+- Verification:
+  - Accepted: yes
+  - Accepted at: 2026-01-07
+- Implementation:
+  - State: complete
+  - Code: components/TaskFilter.tsx, lib/store.ts
+  - Release: v1.1.0
+  - Related ADRs: ADR-0001 (Zustand made filtering simple)
+- Tests:
+  - Unit: complete
+  - Integration: complete
+  - Acceptance: complete
+  - E2E: complete (e2e/filter-tasks.spec.ts)
+  - Perf/realtime: n/a
+- Test strategy: TDD
+- Lessons/caveats:
+  - URL state (search params) considered but deferred to keep simple
+- Notes:
+  - Three filters: All, Active, Completed
+  - Persists filter choice to localStorage
+  - Shows count for each filter
+
+## F-0005: Delete tasks
+- Parent: none
+- Dependencies: F-0001 (tasks must exist), F-0002 (must see tasks)
+- Complexity: S
+- Technical debt: none
+- Status: shipped
+- PRD: spec/PRD.md#R-0005
+- Requirements: R-0005
+- NFRs: NFR-0001 (performance), NFR-0002 (data integrity)
+- Acceptance: spec/acceptance/F-0005.md
+- Verification:
+  - Accepted: yes
+  - Accepted at: 2026-01-09
+- Implementation:
+  - State: complete
+  - Code: components/TaskRow.tsx, lib/store.ts
+  - Release: v1.1.0
+- Tests:
+  - Unit: complete
+  - Integration: complete
+  - Acceptance: complete
+  - E2E: complete (e2e/delete-task.spec.ts)
+  - Perf/realtime: n/a
+- Test strategy: TDD
+- Lessons/caveats:
+  - Considered undo functionality, deferred to future (F-0014)
+- Notes:
+  - Confirmation dialog prevents accidents
+  - Accessible (keyboard + screen reader)
+  - Fade-out animation on delete
+
+## F-0006: E2E test infrastructure
+- Parent: none
+- Dependencies: none
+- Complexity: M
+- Technical debt: none
+- Status: shipped
+- PRD: spec/PRD.md#R-0006
+- Requirements: R-0006 (testing)
+- NFRs: NFR-0004 (quality automation)
+- Acceptance: spec/acceptance/F-0006.md
+- Verification:
+  - Accepted: yes
+  - Accepted at: 2026-01-11
+- Implementation:
+  - State: complete
+  - Code: playwright.config.ts, e2e/*.spec.ts
+  - Release: v1.2.0
+  - Related ADRs: ADR-0003 (Playwright choice)
+  - Research: docs/research/testing-strategies.md
+- Tests:
+  - Unit: n/a (infrastructure)
+  - Integration: n/a
+  - Acceptance: yes (Playwright tests run in CI)
+  - E2E: yes (dogfooding - Playwright tests Playwright setup)
+  - Perf/realtime: CI time +1 min
+- Test strategy: Research-driven decision
+- Lessons/caveats:
+  - Playwright codegen tool saved ~2 hours writing tests
+  - Trace viewer invaluable for debugging flaky tests
+- Notes:
+  - Action item A-002 from RETRO-2025-12-30
+  - Caught 1 bug immediately (Enter key submission)
+  - Integrated into quality_checks.sh
+
+## F-0007: Server Component optimization
+- Parent: none
+- Dependencies: F-0002 (affects TaskList)
+- Complexity: M
+- Technical debt: none
+- Status: in_progress
+- PRD: spec/PRD.md#R-0007
+- Requirements: R-0007 (performance)
+- NFRs: NFR-0001 (performance), NFR-0005 (bundle size)
+- Acceptance: spec/acceptance/F-0007.md
+- Verification:
+  - Accepted: no
+  - Accepted at: pending
+- Implementation:
+  - State: in_progress
+  - Code: components/TaskList.tsx (refactoring)
+  - Release: v1.3.0 (planned)
+  - Research: docs/research/react-19-patterns.md
+- Tests:
+  - Unit: in_progress
+  - Integration: in_progress
+  - Acceptance: pending
+  - E2E: existing tests cover
+  - Perf/realtime: pending (bundle size check)
+- Test strategy: TDD (new tests for Server Component behavior)
+- Lessons/caveats:
+  - None yet (in progress)
+- Notes:
+  - Expected bundle reduction: ~50kb
+  - Action item A-005 from RETRO-2026-01-13
+  - Client/Server boundary must be carefully placed
+
+## F-0008: Per-page metadata
+- Parent: none
+- Dependencies: none
+- Complexity: S
+- Technical debt: none
+- Status: in_progress
+- PRD: spec/PRD.md#R-0008
+- Requirements: R-0008 (SEO)
+- NFRs: NFR-0006 (SEO)
+- Acceptance: spec/acceptance/F-0008.md
+- Verification:
+  - Accepted: no
+  - Accepted at: pending
+- Implementation:
+  - State: in_progress
+  - Code: app/*/metadata.ts
+  - Release: v1.3.0 (planned)
+  - Research: docs/research/react-19-patterns.md
+- Tests:
+  - Unit: complete (metadata generation)
+  - Integration: n/a
+  - Acceptance: pending
+  - E2E: pending (Lighthouse SEO check)
+  - Perf/realtime: n/a
+- Test strategy: TDD
+- Lessons/caveats:
+  - None yet (in progress)
+- Notes:
+  - Expected Lighthouse SEO: 88 → 95+
+  - Next.js 15 metadata API simplifies implementation
+
+## F-0009: Virtualization for large lists
+- Parent: F-0002 (enhances list performance)
+- Dependencies: F-0002 (list), F-0004 (filter)
+- Complexity: M
+- Technical debt: none
+- Status: planned
+- PRD: spec/PRD.md#R-0009
+- Requirements: R-0009 (performance)
+- NFRs: NFR-0001 (performance)
+- Acceptance: spec/acceptance/F-0009.md
+- Verification:
+  - Accepted: no
+  - Accepted at: pending
+- Implementation:
+  - State: not_started
+  - Code: pending
+  - Release: v1.4.0 (planned)
+- Tests:
+  - Unit: pending
+  - Integration: pending
+  - Acceptance: pending
+  - E2E: pending
+  - Perf/realtime: pending (must test with 1000+ tasks)
+- Test strategy: TDD + performance benchmarks
+- Lessons/caveats:
+  - Need research on react-window vs react-virtual (A-006)
+- Notes:
+  - Current performance: OK for <100 tasks, degrades >100
+  - Target: Smooth performance with 10,000+ tasks
+  - Action item A-006 from RETRO-2026-01-13
+
+## F-0010: Multi-tab synchronization
+- Parent: F-0004 (state management)
+- Dependencies: F-0004 (Zustand store)
+- Complexity: M
+- Technical debt: none
+- Status: planned
+- PRD: spec/PRD.md#R-0010
+- Requirements: R-0010 (reliability)
+- NFRs: NFR-0002 (data integrity)
+- Acceptance: spec/acceptance/F-0010.md
+- Verification:
+  - Accepted: no
+  - Accepted at: pending
+- Implementation:
+  - State: not_started
+  - Code: pending
+  - Release: v1.4.0 (planned)
+  - Related ADRs: ADR-0001 (Zustand enables this)
+- Tests:
+  - Unit: pending
+  - Integration: pending (multi-tab test)
+  - Acceptance: pending
+  - E2E: pending (Playwright multi-context)
+  - Perf/realtime: n/a
+- Test strategy: TDD
+- Lessons/caveats:
+  - Zustand already has storage event listener, but need explicit sync
+  - Consider BroadcastChannel API vs storage events
+- Notes:
+  - User story: User opens app in 2 tabs, edits in one, sees update in other
+  - Enabled by ADR-0001 (Zustand architecture)
+
+## F-0011: Dark mode
+- Parent: none
+- Dependencies: ADR-0002 (Tailwind CSS enables this)
+- Complexity: M
+- Technical debt: none
+- Status: planned
+- PRD: spec/PRD.md#R-0011
+- Requirements: R-0011 (UX)
+- NFRs: NFR-0003 (accessibility)
+- Acceptance: spec/acceptance/F-0011.md
+- Verification:
+  - Accepted: no
+  - Accepted at: pending
+- Implementation:
+  - State: not_started
+  - Code: pending
+  - Release: v2.0.0 (planned)
+  - Related ADRs: ADR-0002 (Tailwind dark: classes)
+- Tests:
+  - Unit: pending
+  - Integration: pending
+  - Acceptance: pending
+  - E2E: pending (test theme toggle)
+  - Perf/realtime: n/a
+- Test strategy: TDD
+- Lessons/caveats:
+  - Tailwind makes this easy (dark: utility classes)
+  - Must test color contrast in both themes
+- Notes:
+  - User preference: Respect system preference + manual override
+  - Persist choice to localStorage
