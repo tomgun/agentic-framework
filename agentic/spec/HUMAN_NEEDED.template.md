@@ -1,5 +1,7 @@
 # HUMAN_NEEDED (Template)
 
+<!-- format: human-needed-v0.1.0 -->
+
 Purpose: track items that require human input, decisions, or intervention that agents cannot reasonably handle.
 
 ## How to use

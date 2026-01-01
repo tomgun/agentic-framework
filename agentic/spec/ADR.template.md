@@ -1,5 +1,7 @@
 # ADR (Template)
 
+<!-- format: adr-v0.1.0 -->
+
 Purpose: record a **decision** that has meaningful tradeoffs so we don't re-litigate it later.
 
 ## Title

@@ -1,5 +1,7 @@
 # STACK.md (Template)
 
+<!-- format: stack-v0.1.0 -->
+
 Purpose: a single source of truth for "how we build and run software here".
 
 ## Agentic framework
