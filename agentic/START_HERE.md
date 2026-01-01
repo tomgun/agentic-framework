@@ -201,6 +201,12 @@ You shouldn't need to edit these - they're the framework:
 **Understand specifications:**
 - Spec templates: `agentic/spec/*.template.md`
 - Spec schema (field definitions, valid values): `agentic/spec/SPEC_SCHEMA.md`
+- Spec validation: `agentic/workflows/spec_format_validation.md`
+
+**Do research & retrospectives:**
+- Project retrospectives: `agentic/workflows/retrospective.md`
+- Research mode: `agentic/workflows/research_mode.md`
+- Documentation verification: `agentic/workflows/documentation_verification.md`
 
 **Make an architectural decision:**
 - ADR template: `agentic/spec/ADR.template.md`
@@ -221,6 +227,8 @@ You shouldn't need to edit these - they're the framework:
 - `bash agentic/tools/report.sh` - Feature status
 - `bash agentic/tools/verify.sh` - Comprehensive checks
 - `bash agentic/tools/coverage.sh` - Code annotation coverage
+- `bash agentic/tools/retro_check.sh` - Check if retrospective is due
+- `python3 agentic/tools/validate_specs.py` - Validate spec frontmatter
 
 ---
 
@@ -270,9 +278,17 @@ See [`FRAMEWORK_MAP.md`](FRAMEWORK_MAP.md) for a visual diagram of how everythin
 bash agentic/tools/doctor.sh       # Check structure
 bash agentic/tools/report.sh       # Feature status summary
 bash agentic/tools/verify.sh       # Comprehensive verification
+python3 agentic/tools/validate_specs.py  # Validate spec frontmatter
+
+# Retrospectives & Research
+bash agentic/tools/retro_check.sh  # Check if retrospective is due
+
+# Version verification
+bash agentic/tools/version_check.sh  # Check dependency versions
 
 # Context and briefing
 bash agentic/tools/brief.sh        # Quick project brief
+bash agentic/tools/dashboard.sh    # Comprehensive dashboard
 
 # Analysis
 bash agentic/tools/feature_graph.sh    # Feature dependency graph

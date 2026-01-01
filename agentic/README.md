@@ -136,6 +136,9 @@ bash agentic/tools/retro_check.sh  # Check if retrospective is due
 
 # Version verification
 bash agentic/tools/version_check.sh # Check dependency versions match STACK.md
+
+# Spec validation
+python3 agentic/tools/validate_specs.py  # Validate spec frontmatter
 ```
 
 ## Troubleshooting
