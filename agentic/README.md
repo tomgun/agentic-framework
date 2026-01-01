@@ -49,6 +49,8 @@ From repo root:
 bash agentic/tools/brief.sh
 ```
 
+**Want to check status without using AI tokens?** See [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) for commands you can run yourself to check project state, feature status, and health.
+
 ## Reports (no LLM required)
 From repo root:
 
