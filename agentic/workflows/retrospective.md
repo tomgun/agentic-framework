@@ -29,6 +29,7 @@ When running a retrospective, the agent should:
 bash agentic/tools/verify.sh      # Comprehensive checks
 bash agentic/tools/consistency.sh # Documentation drift
 bash agentic/tools/stale.sh       # Stale documentation
+bash agentic/tools/version_check.sh # Version mismatches
 ```
 
 **Review outputs and note issues.**

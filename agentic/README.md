@@ -133,6 +133,9 @@ bash agentic/tools/sync_docs.sh   # Generate doc scaffolding
 
 # Retrospective
 bash agentic/tools/retro_check.sh  # Check if retrospective is due
+
+# Version verification
+bash agentic/tools/version_check.sh # Check dependency versions match STACK.md
 ```
 
 ## Troubleshooting
