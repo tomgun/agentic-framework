@@ -20,10 +20,17 @@
 
 ## New Project Setup
 
-### Step 1: Copy framework into your repo
+### Step 1: Download the framework
+
 ```bash
-# Copy the agentic/ folder into your project root
-cp -r /path/to/agentic-framework/agentic ./
+# Download latest release
+curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
+
+# Extract just the agentic folder
+cp -r agentic-framework-0.1.0/agentic ./
+
+# Clean up
+rm -rf agentic-framework-0.1.0
 ```
 
 ### Step 2: Tell your agent to initialize

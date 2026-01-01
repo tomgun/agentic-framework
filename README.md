@@ -67,13 +67,28 @@ This repository is a **template**. Copy the `agentic/` folder into your project 
 
 ### For new projects
 
-**Step 1:** Copy framework into your repo
+**Step 1:** Download the latest release
+
 ```bash
-# From your project root
-cp -r /path/to/agentic-framework/agentic ./
+# Download and extract latest release
+curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
+
+# Or download specific version
+curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/vX.Y.Z.tar.gz | tar xz
 ```
 
-**Step 2:** Tell your agent to initialize
+**Step 2:** Copy framework into your repo
+
+```bash
+# From your project root
+cp -r agentic-framework-0.1.0/agentic ./
+
+# Clean up
+rm -rf agentic-framework-0.1.0
+```
+
+**Step 3:** Tell your agent to initialize
+
 Open your AI agent (Cursor/Copilot/Claude) and say:
 
 > "Initialize this project using the agentic framework."
@@ -88,6 +103,12 @@ The agent will:
 **You don't need to run any scripts manually** - the agent does everything.
 
 **New to the framework?** → Read [`agentic/START_HERE.md`](agentic/START_HERE.md)
+
+### Latest version
+
+**Current release:** [v0.1.0](https://github.com/YOUR_USERNAME/agentic-framework/releases/tag/v0.1.0) (2026-01-02)
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and [RELEASING.md](RELEASING.md) for how to create releases.
 
 ### For evaluating the framework
 
