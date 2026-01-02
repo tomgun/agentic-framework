@@ -62,6 +62,23 @@ Purpose: a single source of truth for "how we build and run software here".
 - development_mode: tdd  <!-- RECOMMENDED for most projects -->
 <!-- - development_mode: standard -->
 
+## Sequential agent pipeline (optional but RECOMMENDED)
+<!-- Enables specialized agents to work sequentially on features for optimal context efficiency -->
+<!-- See: agentic/workflows/sequential_agent_specialization.md -->
+<!-- See: agentic/workflows/automatic_sequential_pipeline.md -->
+- pipeline_enabled: no  <!-- yes | no (default: no) - Start with 'no', enable after reviewing workflow -->
+- pipeline_mode: manual  <!-- manual | auto (default: manual) -->
+  <!-- manual: Human explicitly invokes each agent ("Research Agent: investigate X") -->
+  <!-- auto: Agents hand off automatically after completing their work -->
+- pipeline_agents: standard  <!-- minimal | standard | full -->
+  <!-- minimal: Planning → Implementation → Review → Git (skip research, tests, docs) -->
+  <!-- standard: Research → Planning → Test → Impl → Review → Spec Update → Docs → Git -->
+  <!-- full: + Debugging, Refactoring, Security, Performance agents as needed -->
+- pipeline_handoff_approval: yes  <!-- yes | no (require human approval between agents) -->
+  <!-- yes: Agent asks "Ready for [Next Agent]? (yes/no)" -->
+  <!-- no: Agent automatically hands off (still requires approval for commits) -->
+- pipeline_coordination_file: .agentic/pipeline  <!-- Directory for pipeline state files -->
+
 ## Git workflow (required)
 <!-- How agents interact with Git. See agentic/workflows/git_workflow.md -->
 - git_workflow: direct  <!-- direct | pull_request -->

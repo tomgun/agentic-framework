@@ -17,6 +17,7 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
   - read `CONTEXT_PACK.md`, then `STATUS.md`, then `JOURNAL.md` (recent entries), then relevant feature acceptance docs.
 - **At session start, check for retrospective trigger**: If `STACK.md` has `retrospective_enabled: yes`, check if it's time for a project retrospective (see `agentic/workflows/retrospective.md`). Suggest running one if threshold is met, but wait for human approval.
 - **Check quality validation setup**: If `STACK.md` has `quality_validation_enabled: yes`, ensure `quality_checks.sh` exists at repo root. If missing, offer to create it based on the tech stack (see `agentic/workflows/continuous_quality_validation.md`).
+- **Check for active pipeline**: If `STACK.md` has `pipeline_enabled: yes`, check for active pipeline in `.agentic/pipeline/` (see `agentic/workflows/automatic_sequential_pipeline.md`).
 
 ## Non-negotiables
 - **No auto-commits without explicit human approval**: 
@@ -35,8 +36,48 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
   - update specs when behavior changes
   - write ADRs for real tradeoffs
 
+## Sequential Pipeline Mode (if enabled)
+
+**At session start, if `pipeline_enabled: yes` in STACK.md**:
+
+1. **Check for active pipeline**: Look for `.agentic/pipeline/F-####-pipeline.md`
+2. **If pipeline exists**:
+   - Read pipeline file to determine your role (Current agent: [Role])
+   - Read handoff notes from previous agent
+   - Load ONLY role-specific context (see token budgets in `sequential_agent_specialization.md`)
+   - Follow role-specific responsibilities (Research/Planning/Test/Implementation/Review/Spec Update/Documentation/Git)
+3. **If no pipeline exists but feature assigned**:
+   - Check if you should start pipeline (usually Planning Agent, or Research if unclear)
+   - Create `.agentic/pipeline/F-####-pipeline.md` from template (see `automatic_sequential_pipeline.md`)
+4. **Context optimization** (CRITICAL):
+   - Load ONLY what your role needs (Research: ~30K, Planning: ~40K, Test: ~35K, etc.)
+   - Do NOT load entire codebase
+   - Trust handoff notes from previous agent
+   - See `agentic/workflows/sequential_agent_specialization.md` for role-specific context budgets
+
+**During work**:
+- Update pipeline file with progress periodically
+- Create handoff note for next agent when complete
+- Mark your role as complete in pipeline file
+
+**At completion**:
+- Update pipeline file: mark role complete, set next agent, add handoff notes
+- If `pipeline_mode: auto` AND `pipeline_handoff_approval: no`:
+  - Save all work, signal for next agent
+- If `pipeline_handoff_approval: yes` OR `pipeline_mode: manual`:
+  - Present summary to human
+  - Ask "Ready for [Next Agent]? (yes/no/show changes)"
+  - Wait for approval
+
+**If blocked**:
+- Update pipeline status to "blocked"
+- Add blocker description to pipeline file
+- Escalate to `HUMAN_NEEDED.md` or ask human directly
+- Do NOT proceed to next agent until resolved
+
 ## Before you edit code
-- Read (minimum): `CONTEXT_PACK.md`, `STATUS.md`, `spec/OVERVIEW.md`, `spec/FEATURES.md`.
+- **If pipeline mode enabled**: You've already loaded role-specific context. Proceed with your role's work.
+- **If pipeline mode disabled or not in pipeline**: Read (minimum): `CONTEXT_PACK.md`, `STATUS.md`, `spec/OVERVIEW.md`, `spec/FEATURES.md`.
 - **Check for human edits**: Human may have added features, updated priorities, or changed specs directly. Honor those changes.
 - **Follow the spec schema**: All spec edits must conform to `agentic/spec/SPEC_SCHEMA.md` (valid status values, field formats, cross-reference conventions).
 - **Check development mode**: Read `STACK.md` for `development_mode` field:

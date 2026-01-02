@@ -76,6 +76,39 @@ else
 fi
 echo ""
 
+# Active Pipeline (if enabled)
+echo "▶ ACTIVE PIPELINE"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+if [[ -f STACK.md ]]; then
+  PIPELINE_ENABLED=$(grep -E "^- pipeline_enabled:" STACK.md | sed 's/.*: //' || echo "no")
+  if [[ "$PIPELINE_ENABLED" == "yes" ]]; then
+    PIPELINE_DIR=$(grep -E "^- pipeline_coordination_file:" STACK.md | sed 's/.*: //' || echo ".agentic/pipeline")
+    if [[ -d "$PIPELINE_DIR" ]]; then
+      ACTIVE=$(find "$PIPELINE_DIR" -name "*-pipeline.md" -type f | head -1)
+      if [[ -n "$ACTIVE" ]]; then
+        FEATURE=$(basename "$ACTIVE" | sed 's/-pipeline.md//')
+        CURRENT_AGENT=$(grep -E "^- Current agent:" "$ACTIVE" | sed 's/.*: //' | head -1 || echo "Unknown")
+        PHASE=$(grep -E "^- Phase:" "$ACTIVE" | sed 's/.*: //' | head -1 || echo "Unknown")
+        COMPLETED_COUNT=$(grep -c "^- ✅" "$ACTIVE" || echo "0")
+        echo "Feature: $FEATURE"
+        echo "Current: $CURRENT_AGENT ($PHASE)"
+        echo "Completed: $COMPLETED_COUNT agents"
+        echo "Details: bash agentic/tools/pipeline_status.sh $FEATURE"
+      else
+        echo "No active pipeline"
+      fi
+    else
+      echo "No pipelines created yet"
+    fi
+  else
+    echo "Pipeline mode disabled"
+    echo "To enable: Edit STACK.md, set pipeline_enabled: yes"
+  fi
+else
+  echo "STACK.md not found"
+fi
+echo ""
+
 # Next up
 echo "▶ NEXT UP"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

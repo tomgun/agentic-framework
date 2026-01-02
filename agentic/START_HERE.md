@@ -126,7 +126,33 @@ Instead of agents re-reading the entire codebase every session, maintain:
 
 ### Development workflow
 
-**Two modes available (TDD recommended):**
+**Sequential Agent Pipeline** (✅ RECOMMENDED for complex features):
+
+Specialized agents work sequentially for optimal context efficiency:
+
+**Pipeline**: Research → Planning → Test → Implementation → Review → Spec Update → Documentation → Git
+
+**Why?** Each agent loads only ~30-50K tokens (vs 150-200K for general agent), focusing on their expertise.
+
+**Enable in STACK.md**:
+```yaml
+- pipeline_enabled: yes
+- pipeline_mode: manual  # Start with manual, graduate to auto
+- pipeline_agents: standard  # Research → Planning → Test → Impl → Review → Spec → Docs → Git
+```
+
+**Usage**:
+- **Manual mode**: `Human: "Research Agent: investigate auth options for F-0042"`
+- **Auto mode**: Agents hand off automatically (you approve at key points)
+
+**Details**:
+- Agent roles & responsibilities: [`workflows/sequential_agent_specialization.md`](workflows/sequential_agent_specialization.md)
+- Automatic coordination: [`workflows/automatic_sequential_pipeline.md`](workflows/automatic_sequential_pipeline.md)
+- Monitor: `bash agentic/tools/pipeline_status.sh F-####`
+
+---
+
+**Single Agent Mode** (for simple features or when learning):
 
 **TDD mode** (✅ RECOMMENDED):
 1. Pick work from `STATUS.md`
