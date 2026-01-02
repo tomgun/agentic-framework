@@ -41,9 +41,9 @@ echo ""
 echo "What I'll create:"
 echo "  ✓ spec/ directory with templates (PRD, TECH_SPEC, FEATURES, NFR)"
 echo "  ✓ STATUS.md (project status and roadmap)"
-echo "  ✓ CONTEXT_PACK.md (architecture overview)"
-echo "  ✓ HUMAN_NEEDED.md (escalation protocol)"
 echo "  ✓ Update STACK.md profile to 'core+product'"
+echo ""
+echo "Note: CONTEXT_PACK.md and HUMAN_NEEDED.md are already part of Core."
 echo ""
 
 read -p "Proceed? [y/N]: " -n 1 -r
@@ -84,7 +84,7 @@ for template in "${TEMPLATES[@]}"; do
   fi
 done
 
-# Create STATUS.md
+# Create STATUS.md (PM-specific: project roadmap and status)
 if [[ ! -f "STATUS.md" && -f ".agentic/init/STATUS.template.md" ]]; then
   cp ".agentic/init/STATUS.template.md" "STATUS.md"
   echo -e "${GREEN}✓ Created STATUS.md${NC}"
@@ -92,21 +92,7 @@ elif [[ -f "STATUS.md" ]]; then
   echo -e "${YELLOW}⚠ STATUS.md already exists, skipping${NC}"
 fi
 
-# Create CONTEXT_PACK.md
-if [[ ! -f "CONTEXT_PACK.md" && -f ".agentic/init/CONTEXT_PACK.template.md" ]]; then
-  cp ".agentic/init/CONTEXT_PACK.template.md" "CONTEXT_PACK.md"
-  echo -e "${GREEN}✓ Created CONTEXT_PACK.md${NC}"
-elif [[ -f "CONTEXT_PACK.md" ]]; then
-  echo -e "${YELLOW}⚠ CONTEXT_PACK.md already exists, skipping${NC}"
-fi
-
-# Create HUMAN_NEEDED.md
-if [[ ! -f "HUMAN_NEEDED.md" && -f ".agentic/spec/HUMAN_NEEDED.template.md" ]]; then
-  cp ".agentic/spec/HUMAN_NEEDED.template.md" "HUMAN_NEEDED.md"
-  echo -e "${GREEN}✓ Created HUMAN_NEEDED.md${NC}"
-elif [[ -f "HUMAN_NEEDED.md" ]]; then
-  echo -e "${YELLOW}⚠ HUMAN_NEEDED.md already exists, skipping${NC}"
-fi
+# Note: CONTEXT_PACK.md and HUMAN_NEEDED.md should already exist from Core profile
 
 # Update STACK.md profile
 if grep -qE "^\s*-?\s*Profile:\s*core\s*$" STACK.md; then
@@ -139,7 +125,10 @@ echo "  - spec/TECH_SPEC.md    (Technical specification)"
 echo "  - spec/FEATURES.md     (Feature tracking with IDs)"
 echo "  - spec/NFR.md          (Non-functional requirements)"
 echo "  - STATUS.md            (Project status & roadmap)"
+echo ""
+echo "Already part of Core (no changes):"
 echo "  - CONTEXT_PACK.md      (Architecture overview)"
 echo "  - HUMAN_NEEDED.md      (Escalation protocol)"
+echo "  - JOURNAL.md           (Session continuity)"
 echo ""
 
