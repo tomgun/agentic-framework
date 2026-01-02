@@ -89,15 +89,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AGENTS_ACTIVE.md for coordination
 - File lock protocol to prevent conflicts
 
+## [0.2.0] - 2026-01-02
+
+### Added
+
+**Modular Framework Profiles:**
+- Two profiles: "Core" (minimal) and "Core + Product Management" (full specs)
+- Core includes: quality standards, workflows, multi-agent, research, PRODUCT.md
+- Core+PM adds: formal specs, feature tracking (F-####), STATUS.md, project metrics
+- Profile-aware agents adapt behavior based on STACK.md profile field
+- Easy upgrade path: `enable-product-management.sh` converts Core → Core+PM
+
+**Hidden Framework Internals:**
+- Moved `agentic/` → `.agentic/` for cleaner project root
+- Framework files hidden, product files (STACK.md, STATUS.md, spec/, docs/) visible
+- Optimized for agent efficiency and developer clarity
+
+**PRODUCT.md (New Core File):**
+- Lightweight planning document for Core mode
+- Captures: what we're building, capabilities (checkboxes), technical approach, scope
+- Serves as basis for formal specs when upgrading to Core+PM
+- Agents update it as work progresses
+
+**Programming & Testing Standards:**
+- Comprehensive programming guidelines (naming, functions, error handling, security, performance, green coding)
+- Detailed testing standards (happy path, edge cases, invalid input, time-based, concurrency, resource exhaustion, network failures)
+- TDD remains recommended default approach
+- Standards linked prominently in README files
+
+**Mutation Testing (Optional):**
+- Added mutation testing as advanced quality check
+- Documentation in `test_strategy.md`
+- Helper script: `mutation_test.sh` (auto-detects stack)
+- Guidance on when to use (critical logic, suspicious coverage, post-bug-fix)
+- Integration with quality profiles
+
+**Framework Upgrade Mechanism:**
+- `UPGRADING.md` guide with step-by-step instructions
+- `upgrade.sh` tool runs from new framework download (ensures latest logic)
+- Safe upgrade path: backup → update internals → preserve customizations
+- Validates before/after with doctor.py
+
+**Examples (Complete Rewrite):**
+- `core_todo_cli/` - Python CLI demonstrating Core profile
+- `core_pm_taskboard/` - Next.js app demonstrating Core+PM profile
+- Realistic mid-development state (not empty templates)
+- Full validation: all tools pass (doctor, verify, report)
+- Comprehensive README with profile comparison table
+
+**Documentation Improvements:**
+- Updated all READMEs to reflect Core vs Core+PM modes
+- Added programming/testing standards to prominent locations
+- Clear upgrade instructions
+- Examples show both profiles in action
+
+### Changed
+- `agentic/` directory renamed to `.agentic/` (breaking change, but simple rename)
+- Agents now profile-aware (check `Profile:` in STACK.md)
+- `scaffold.sh` accepts `--profile` argument
+- `doctor.py` and `verify.py` are profile-aware (skip PM checks in Core mode)
+- `report.py` and `accept.py` degrade gracefully if PM features disabled
+
+### Fixed
+- PM templates no longer contain concrete example IDs (F-0001, NFR-0001) that caused verify failures
+- Core mode agents now work efficiently (don't try to read non-existent STATUS.md/spec/)
+- `enable-product-management.sh` detects PRODUCT.md and provides conversion guidance
+
 ## [Unreleased]
 
 ### Planned
-- Framework upgrade/migration tools
 - npm package (optional install method)
 - Homebrew formula (optional install method)
 - More stack-specific quality profiles
 - Enhanced dependency analysis
 - Automated architecture documentation
+- Framework version compatibility checks
 
 ---
 
