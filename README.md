@@ -213,6 +213,19 @@ Already have a project? The framework integrates non-invasively:
 3. Agent analyzes existing code and fills in specs
 4. Adopt practices incrementally (tests first, then specs, then workflows)
 
+## Upgrading
+
+**Already using the framework?** Upgrade to the latest version:
+
+```bash
+# Quick upgrade (recommended)
+bash agentic/tools/upgrade.sh path/to/new-framework
+
+# Or follow manual steps in UPGRADING.md
+```
+
+See **[`UPGRADING.md`](UPGRADING.md)** for complete upgrade guide, version compatibility, and troubleshooting.
+
 ## License & Contributing
 
 [Add your license and contribution guidelines]

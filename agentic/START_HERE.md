@@ -7,7 +7,8 @@
 ### 1. Are you setting up a new project?
 
 **Yes** → Go to [New Project Setup](#new-project-setup)  
-**No, working on existing project** → Go to [Resume Work](#resume-work)
+**No, working on existing project** → Go to [Resume Work](#resume-work)  
+**Upgrading framework version** → See [`UPGRADING.md`](../UPGRADING.md)
 
 ### 2. What do you need?
 
