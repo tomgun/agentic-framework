@@ -89,6 +89,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AGENTS_ACTIVE.md for coordination
 - File lock protocol to prevent conflicts
 
+## [0.2.2] - 2026-01-02
+
+### Changed
+- **Branding update**: Framework now officially named "Agentic AI Framework" (shortname: Agentic AF)
+- **Documentation overhaul**: All references updated to reflect current version (v0.2.2) and GitHub org (tomgun)
+- Replaced all `YOUR_USERNAME` placeholders with `tomgun`
+- Updated all installation and upgrade instructions
+- Fixed `.agentic/` folder references throughout documentation
+
+### Fixed
+- README.md installation section now uses `install.sh`
+- `.agentic/README.md` now has accurate v0.2.2 installation instructions
+- UPGRADING.md completely updated with correct paths and version
+- RELEASING.md examples now reference v0.2.2
+- Example projects updated with correct framework version
+
 ## [0.2.1] - 2026-01-02
 
 ### Added
