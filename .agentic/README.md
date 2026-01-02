@@ -4,6 +4,39 @@ This folder is a **portable framework** you can copy into any repository to boot
 
 **New to this framework?** → Start at [`START_HERE.md`](START_HERE.md)
 
+## Two Profiles: Choose What Fits Your Project
+
+### Core Profile (Default - Recommended for Most)
+**Purpose**: Make agents work better on ANY project - quality, workflows, multi-agent
+
+**What you get**:
+- Agent quality standards (security, performance, testing)
+- Development workflows (TDD, dev loop, debugging)
+- Multi-agent coordination (multiple agents working in parallel)
+- Research mode (deep investigation)
+- Git workflow (PR mode or direct commits)
+- Architecture docs (CONTEXT_PACK.md)
+- Escalation protocol (HUMAN_NEEDED.md)
+- Session continuity (JOURNAL.md)
+- Basic tools (doctor, verify, dashboard)
+
+**Good for**: Solo devs, small-medium projects, anyone wanting better AI coding
+
+### Core + Product Management (Optional Add-On)
+**Purpose**: Add formal project tracking for long-term development
+
+**Adds to Core**:
+- Specs & feature tracking (FEATURES.md with F-#### IDs)
+- Requirements & acceptance criteria
+- Project status & roadmap (STATUS.md)
+- Sequential agent pipeline (specialized agents per feature)
+- Advanced tools (feature graphs, consistency checks)
+- Quality automation & retrospectives
+
+**Good for**: Long-term projects (6+ months), human-machine teams, complex products
+
+**Enable later**: `bash .agentic/tools/enable-product-management.sh`
+
 ## What you get
 - **A repo init protocol** (agent-guided) that creates stable context artifacts: `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, `JOURNAL.md`, `spec/`, `spec/adr/`.
 - **Technology-agnostic spec templates**: PRD, Tech Spec, Task, ADR, Features, NFR, Status.

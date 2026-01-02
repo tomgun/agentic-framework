@@ -121,12 +121,25 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and [RELEASING.md](RELEASIN
 
 ## What You Get
 
-### Core Framework
+### Core Framework (Always Included)
 - **Agent operating guidelines**: Consistent behavior across AI tools
-- **Specification templates**: PRD, Tech Spec, Features, NFR, ADR, Tasks
-- **Quality playbooks**: Test strategy, review checklist, definition of done
+- **Quality standards**: Programming, testing, review, design-for-testability
+- **Development workflows**: TDD mode, dev loop, debugging, git workflow
+- **Multi-agent coordination**: Multiple agents working in parallel
+- **Research mode**: Deep investigation workflows
 - **Token efficiency guides**: Reading protocols, context budgeting
-- **Development workflows**: Dev loop, debugging, code annotations
+- **Basic tools**: doctor, verify, dashboard, sync_docs
+
+### Optional: Product Management Add-On
+- **Specification templates**: PRD, Tech Spec, Features, NFR, ADR, Tasks
+- **Feature tracking**: Stable IDs, dependencies, status tracking
+- **Sequential pipeline**: Specialized agents per feature (Research → Plan → Test → Implement → Review)
+- **Project status**: STATUS.md for roadmap and current focus
+- **Advanced tools**: Feature graphs, consistency checks, staleness detection
+- **Quality automation**: Stack-specific pre-commit validation
+- **Retrospectives**: Periodic project health checks
+
+Enable later: `bash .agentic/tools/enable-product-management.sh`
 
 ### For Complex Projects
 - **Session continuity**: JOURNAL.md tracks progress across context resets
@@ -180,24 +193,22 @@ Quick-start guidance for common technology stacks:
 
 ## Key Artifacts
 
-The framework creates and maintains these "source of truth" files:
-
+### Core Profile Files
 **Project State:**
-- `STACK.md` - How to build, test, run, and deploy
-- `STATUS.md` - Current focus, roadmap, known issues
-- `CONTEXT_PACK.md` - Durable context (where things are, how it works)
+- `STACK.md` - How to build, test, run, and deploy (with profile setting)
 - `JOURNAL.md` - Session-by-session progress log
+- `CONTEXT_PACK.md` - Durable context (architecture, where things are)
+- `HUMAN_NEEDED.md` - Items requiring human decision/intervention
 
+### Product Management Profile Adds
 **Specifications:**
+- `STATUS.md` - Current focus, roadmap, known issues
 - `spec/PRD.md` - Requirements (why, what)
 - `spec/TECH_SPEC.md` - Architecture (how)
 - `spec/FEATURES.md` - Feature registry with IDs, status, tests
 - `spec/NFR.md` - Non-functional requirements
 - `spec/acceptance/F-####.md` - Acceptance criteria per feature
 - `spec/adr/` - Architecture Decision Records
-
-**Escalation:**
-- `HUMAN_NEEDED.md` - Items requiring human decision/intervention
 
 ## Examples
 
