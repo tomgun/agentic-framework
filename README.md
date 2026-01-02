@@ -14,34 +14,34 @@ The Agentic Framework enables **sustainable long-term software development with 
 
 ## Installation
 
-### Option 1: Automated install (Recommended)
+### Automated install (Recommended)
 
 ```bash
 # Download latest release
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 cd agentic-framework-0.2.0
 
-# Install into your project (interactive)
+# Install into your project
 bash install.sh /path/to/your-project
-
-# Or specify profile for non-interactive install
-bash install.sh /path/to/your-project core
-bash install.sh /path/to/your-project core+product
 ```
 
 The install script will:
 1. Copy `.agentic/` folder with correct version number
 2. Run scaffold script (creates template files)
 3. Update `STACK.md` with framework version and install date
-4. Prompt you for initial project details
 
 **After installation**, tell your agent:
 
-> "Read `.agentic/init/init_playbook.md` and help me complete the initialization by filling in STACK.md, PRODUCT.md, and CONTEXT_PACK.md based on this project."
+> "Read `.agentic/init/init_playbook.md` and help me initialize this project by filling in STACK.md, PRODUCT.md, and CONTEXT_PACK.md based on what we're building."
 
-The agent will interview you about what you're building and fill in the project-specific details.
+The agent will:
+- Ask what you're building
+- **Ask which profile to use** (Core or Core+PM)
+- Interview you about tech stack, constraints, etc.
+- Fill in all project-specific details
+- Set up quality checks
 
-### Option 2: Manual copy
+### Manual install
 
 ```bash
 # Download and extract
@@ -49,13 +49,9 @@ curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar
 
 # Copy .agentic/ into your project
 cp -r agentic-framework-0.2.0/.agentic /path/to/your-project/
-
-# Initialize (agent will run this)
-cd /path/to/your-project
-bash .agentic/init/scaffold.sh
 ```
 
-**Note**: With manual copy, you need to update the version in `STACK.md` manually.
+Then follow the same agent initialization process above. The agent will run `scaffold.sh` for you.
 
 ## Design Principles
 
@@ -116,20 +112,16 @@ bash .agentic/init/scaffold.sh
 
 ### Agent-driven initialization
 
-**If you used `install.sh`**: Tell your agent:
+**After installation**, tell your agent:
 
-> "Read `.agentic/init/init_playbook.md` and help me complete the initialization by filling in STACK.md, PRODUCT.md, and CONTEXT_PACK.md based on this project."
-
-**If you copied `.agentic/` manually**: First run scaffold, then initialize:
-
-> "Read `.agentic/AGENTS.md` and initialize this project by running `.agentic/init/scaffold.sh`, then read `.agentic/init/init_playbook.md` to fill in the project details."
+> "Read `.agentic/init/init_playbook.md` and help me initialize this project."
 
 The agent will:
-1. Run `.agentic/init/scaffold.sh` to create template files (if needed)
-2. Read `init_playbook.md` to understand the initialization process
-3. Interview you about your project (what, why, tech stack, profile)
-4. Fill in `STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md` with real project info
-5. Set up your chosen profile (Core or Core+PM)
+1. Ask what you're building
+2. **Ask which profile you want** (Core or Core+PM) and explain the differences
+3. Interview you about your tech stack and requirements
+4. Fill in `STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
+5. Set up quality validation for your stack
 
 **Now you're ready!** The agent understands your project and can start building.
 
