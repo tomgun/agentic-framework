@@ -34,20 +34,20 @@ This guide explains how to create a new version release of the Agentic Framework
 ### Option 1: GitHub UI (Recommended)
 
 1. **Go to GitHub repository**
-   - Navigate to: https://github.com/YOUR_USERNAME/agentic-framework
+   - Navigate to: https://github.com/tomgun/agentic-framework
 
 2. **Create new release**
    - Click "Releases" → "Draft a new release"
-   - **Tag**: `v0.2.0` (must match VERSION file with `v` prefix)
+   - **Tag**: `v0.2.1` (must match VERSION file with `v` prefix)
    - **Target**: `main` branch
-   - **Title**: `v0.2.0`
+   - **Title**: `v0.2.1`
    - **Description**: Copy from CHANGELOG.md for this version
    - Check "Set as the latest release"
    - Click "Publish release"
 
 3. **GitHub automatically creates:**
-   - `agentic-framework-0.2.0.tar.gz` (source archive)
-   - `agentic-framework-0.2.0.zip` (source archive)
+   - `agentic-framework-0.2.1.tar.gz` (source archive)
+   - `agentic-framework-0.2.1.zip` (source archive)
 
 ### Option 2: GitHub CLI
 

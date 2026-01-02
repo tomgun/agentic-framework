@@ -13,13 +13,13 @@ cat STACK.md | grep "Version:"  # e.g., "Version: 0.1.0"
 
 # 2. Download and extract new framework (in a temp location)
 cd /tmp
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
 
 # 3. Run the NEW upgrade tool, pointing it to your project
-bash agentic-framework-0.2.0/.agentic/tools/upgrade.sh /path/to/your-project
+bash agentic-framework-0.2.1/.agentic/tools/upgrade.sh /path/to/your-project
 
 # 4. Clean up
-rm -rf agentic-framework-0.2.0
+rm -rf agentic-framework-0.2.1
 ```
 
 **Why run the script from the NEW framework?**
@@ -43,8 +43,8 @@ If you prefer manual control or the upgrade tool isn't available:
 ### Step 1: Backup
 
 ```bash
-# Backup your entire agentic folder
-cp -r agentic agentic-backup-$(date +%Y%m%d)
+# Backup your entire .agentic folder
+cp -r .agentic .agentic-backup-$(date +%Y%m%d)
 
 # Backup your project specs and docs (if modified)
 cp -r spec spec-backup-$(date +%Y%m%d)
@@ -56,7 +56,7 @@ cp -r docs docs-backup-$(date +%Y%m%d)
 ```bash
 # Download latest release (to a temporary location, not your project)
 cd /tmp  # Or any temp directory
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
 ```
 
 ### Step 3: Identify What to Replace
@@ -97,21 +97,21 @@ cd /path/to/your-project
 rm -rf .agentic/workflows .agentic/quality .agentic/agents .agentic/tools .agentic/init .agentic/spec .agentic/support
 
 # Copy new framework internals (assuming framework extracted to /tmp)
-cp -r /tmp/agentic-framework-0.2.0/.agentic/workflows .agentic/
-cp -r /tmp/agentic-framework-0.2.0/.agentic/quality .agentic/
-cp -r /tmp/agentic-framework-0.2.0/.agentic/agents .agentic/
-cp -r /tmp/agentic-framework-0.2.0/.agentic/tools .agentic/
-cp -r /tmp/agentic-framework-0.2.0/.agentic/init .agentic/
-cp -r /tmp/agentic-framework-0.2.0/.agentic/spec .agentic/
-cp -r /tmp/agentic-framework-0.2.0/.agentic/support .agentic/
+cp -r /tmp/agentic-framework-0.2.1/.agentic/workflows .agentic/
+cp -r /tmp/agentic-framework-0.2.1/.agentic/quality .agentic/
+cp -r /tmp/agentic-framework-0.2.1/.agentic/agents .agentic/
+cp -r /tmp/agentic-framework-0.2.1/.agentic/tools .agentic/
+cp -r /tmp/agentic-framework-0.2.1/.agentic/init .agentic/
+cp -r /tmp/agentic-framework-0.2.1/.agentic/spec .agentic/
+cp -r /tmp/agentic-framework-0.2.1/.agentic/support .agentic/
 
 # Update framework docs
-cp /tmp/agentic-framework-0.2.0/.agentic/README.md .agentic/
-cp /tmp/agentic-framework-0.2.0/.agentic/START_HERE.md .agentic/
-cp /tmp/agentic-framework-0.2.0/.agentic/FRAMEWORK_MAP.md .agentic/
+cp /tmp/agentic-framework-0.2.1/.agentic/README.md .agentic/
+cp /tmp/agentic-framework-0.2.1/.agentic/START_HERE.md .agentic/
+cp /tmp/agentic-framework-0.2.1/.agentic/FRAMEWORK_MAP.md .agentic/
 
 # Clean up
-rm -rf /tmp/agentic-framework-0.2.0
+rm -rf /tmp/agentic-framework-0.2.1
 ```
 
 ### Step 5: Update Version in STACK.md
