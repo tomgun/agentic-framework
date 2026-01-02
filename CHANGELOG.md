@@ -89,6 +89,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AGENTS_ACTIVE.md for coordination
 - File lock protocol to prevent conflicts
 
+## [0.2.1] - 2026-01-02
+
+### Added
+- **Installation script** (`install.sh`) for automated framework setup
+  - Reads VERSION from framework repo
+  - Copies `.agentic/` to target project
+  - Updates `STACK.md` with framework version and install date
+  - Shows clear next steps for agent initialization
+
+### Changed
+- **Profile selection moved to agent interview** (UX improvement)
+  - Profile choice now part of `init_playbook.md` workflow
+  - Agent explains Core vs Core+PM differences
+  - Users make informed choice during initialization
+  - Removed `--profile` argument from `install.sh` (simpler)
+- **Upgrade script improvements**
+  - Now reads VERSION from new framework and updates `STACK.md`
+  - Fixed references from `agentic/` to `.agentic/`
+- **Documentation improvements**
+  - README.md updated with clearer installation instructions
+  - Explicit reference to `init_playbook.md` for agent guidance
+  - Removed confusion about when initialization is complete
+
+### Fixed
+- `STACK.template.md` version updated to 0.2.0 (was 0.1.0)
+- Framework version now properly tracked in production projects
+
 ## [0.2.0] - 2026-01-02
 
 ### Added
