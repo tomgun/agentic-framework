@@ -10,11 +10,12 @@ This folder is a **portable framework** you can copy into any repository to boot
 **Purpose**: Make agents work better on ANY project - quality, workflows, multi-agent
 
 **What you get**:
-- Agent quality standards (security, performance, testing)
+- Agent quality standards (security, performance, testing, mutation testing)
 - Development workflows (TDD, dev loop, debugging)
 - Multi-agent coordination (multiple agents working in parallel)
 - Research mode (deep investigation)
 - Git workflow (PR mode or direct commits)
+- Lightweight planning (PRODUCT.md - what you're building, what's done)
 - Architecture docs (CONTEXT_PACK.md)
 - Escalation protocol (HUMAN_NEEDED.md)
 - Session continuity (JOURNAL.md)

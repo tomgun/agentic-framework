@@ -183,6 +183,9 @@ bash .agentic/tools/accept.sh      # Run acceptance tests
 bash .agentic/tools/consistency.sh # Check doc drift
 bash .agentic/tools/stale.sh       # Find stale docs
 bash .agentic/tools/task.sh        # Create task files
+
+# Advanced quality (optional)
+bash .agentic/tools/mutation_test.sh [path]  # Mutation testing for critical code
 ```
 
 ### Stack Profiles
