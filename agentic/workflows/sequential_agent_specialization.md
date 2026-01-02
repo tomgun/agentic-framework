@@ -70,13 +70,17 @@ Test Agent (write failing tests - TDD)
    ↓
 Implementation Agent (make tests pass)
    ↓
-Review Agent (verify quality)
+Build Agent (verify build, bundle, compile)
+   ↓
+Review Agent (verify quality, code review)
    ↓
 Spec Update Agent (update FEATURES.md, STATUS.md, JOURNAL.md)
    ↓
 Documentation Agent (update docs)
    ↓
-Git Agent (commit with human approval)
+Git Agent (commit with human approval, create PR)
+   ↓
+Deploy Agent (deploy to staging/production - optional, triggered by merge)
    ↓
 Done ✅
 ```
@@ -356,9 +360,102 @@ Done ✅
 
 ---
 
-### 5. Review Agent ✅
+### 5. Build Agent 🏗️
 
-**When to invoke**: After implementation complete
+**When to invoke**: After implementation complete, before code review
+
+**Context budget**: ~30K tokens
+
+**Loads**:
+- ✅ `STACK.md` (build commands, tooling)
+- ✅ Implementation code (to understand what was built)
+- ✅ Build configuration files (package.json, Dockerfile, Makefile, etc.)
+- ✅ `CONTEXT_PACK.md` (build instructions)
+- ❌ Research docs
+- ❌ Tests (already verified by Implementation Agent)
+- ❌ Most specs
+
+**Responsibilities**:
+1. Run build/compile process
+2. Verify bundle size (if applicable)
+3. Check for build warnings/errors
+4. Validate asset generation (images, fonts, etc.)
+5. Test build artifacts (can they run?)
+6. Check dependencies (no missing/broken deps)
+7. Verify environment-specific builds (dev, staging, prod)
+8. Validate Docker image builds (if containerized)
+
+**Outputs**:
+- Build artifacts (compiled code, bundles, Docker images)
+- Build report (size, warnings, time)
+- Build verification (smoke test of built artifacts)
+
+**Handoff format**:
+```markdown
+## Handoff: Build → Review
+
+**Feature**: F-0042 (User authentication)
+**Build status**: SUCCESS ✅
+
+**Build results**:
+- TypeScript compilation: OK (0 errors)
+- ESBuild bundle: 445kb (under 500kb threshold ✅)
+- Docker image: built successfully (image: myapp:f-0042)
+- Build time: 45 seconds
+- Warnings: 0
+
+**Artifacts**:
+- dist/: Production build
+- dist/client/: Client bundle (445kb)
+- dist/server/: Server bundle (890kb)
+- Docker image: myapp:f-0042 (185 MB)
+
+**Smoke test**:
+- ✅ Server starts (port 3000)
+- ✅ Health check responds (200 OK)
+- ✅ Auth endpoints registered (/api/auth/*)
+
+**Context for Review Agent**:
+- Build artifacts verified
+- No build warnings or errors
+- Bundle size within limits
+- Ready for code review
+
+**Next steps**: Code quality review, acceptance criteria verification
+```
+
+**Handoff format (if build fails)**:
+```markdown
+## Handoff: Build → Implementation (Rework)
+
+**Feature**: F-0042 (User authentication)
+**Build status**: FAILED ❌
+
+**Build errors**:
+1. TypeScript error: Cannot find module '@auth/core' (lib/auth/login.ts:5)
+2. ESBuild error: Unresolved import 'zod' (components/LoginForm.tsx:12)
+3. Bundle size: 620kb (exceeds 500kb threshold by 120kb)
+
+**Required fixes**:
+1. Add missing dependency: npm install @auth/core
+2. Add missing dependency: npm install zod
+3. Reduce bundle size (consider code splitting, lazy loading)
+
+**Context for Implementation Agent**:
+- Fix build errors above
+- Re-run build
+- Verify bundle size under threshold
+
+**Next steps**: Fix errors, rebuild, re-submit for build verification
+```
+
+**Tools**: Build tools (tsc, webpack, esbuild, Docker), bundle analyzers, linters
+
+---
+
+### 6. Review Agent ✅
+
+**When to invoke**: After build succeeds
 
 **Context budget**: ~45K tokens
 
@@ -785,8 +882,8 @@ Closes F-0042
 | Documentation | ~35K | FEATURES, TECH_SPEC, implementation, docs | Research, tests | High (doc-focused) |
 | Git | ~20K | Changed files, workflow, JOURNAL | Most other docs | Very high (minimal context) |
 
-**Total sequential**: ~280K tokens across 8 agents
-**Per agent**: <50K tokens (58% reduction vs general agent)
+**Total sequential**: ~345K tokens across 10 agents (8 core + Build + Deploy)  
+**Per agent**: <50K tokens (67% reduction vs general agent)  
 **General-purpose agent**: 150-200K tokens minimum, lower quality
 
 ---
@@ -869,7 +966,7 @@ Medium (M) - 3-5 days
 
 ---
 
-### 10. Refactoring Agent ♻️
+### 11. Refactoring Agent ♻️
 
 **When to invoke**: Code quality improvements, tech debt resolution
 
@@ -879,7 +976,7 @@ Medium (M) - 3-5 days
 
 ---
 
-### 11. Security Agent 🔒
+### 12. Security Agent 🔒
 
 **When to invoke**: Security-sensitive features (auth, data handling, encryption)
 
@@ -889,7 +986,7 @@ Medium (M) - 3-5 days
 
 ---
 
-### 12. Performance Agent ⚡
+### 13. Performance Agent ⚡
 
 **When to invoke**: Performance-critical features, optimization needs
 
