@@ -43,7 +43,7 @@ def checks_for_profile(profile: str) -> list[Check]:
     core = [
         Check("AGENTS.md", "file", "agent entrypoint (rules + read-first)"),
         Check("CONTEXT_PACK.md", "file", "durable starting context"),
-        Check("PLAN.md", "file", "what we're building (lightweight)"),
+        Check("PRODUCT.md", "file", "what we're building + current state"),
         Check("STACK.md", "file", "how to run/test + constraints"),
         Check("JOURNAL.md", "file", "session-by-session progress log"),
         Check("HUMAN_NEEDED.md", "file", "escalation protocol"),
