@@ -53,12 +53,12 @@ This guide explains how to create a new version release of the Agentic Framework
 
 ```bash
 # Create and push tag
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.2.1
+git push origin v0.2.1
 
 # Create release with gh CLI
-gh release create v0.2.0 \
-  --title "v0.2.0" \
+gh release create v0.2.1 \
+  --title "v0.2.1" \
   --notes-file RELEASE_NOTES.md \
   --latest
 ```
@@ -67,10 +67,10 @@ gh release create v0.2.0 \
 
 ```bash
 # Create annotated tag
-git tag -a v0.2.0 -m "Release v0.2.0"
+git tag -a v0.2.1 -m "Release v0.2.1"
 
 # Push tag to GitHub
-git push origin v0.2.0
+git push origin v0.2.1
 
 # Then manually create release on GitHub using this tag
 ```
