@@ -102,15 +102,18 @@ If you're using multiple assistants (Cursor + Copilot + Claude), the agent can a
 **To upgrade to a newer version of the framework:**
 
 ```bash
-# Download new version
+# Download new version (to temp location)
+cd /tmp
 curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 
-# Run upgrade tool
-bash agentic/tools/upgrade.sh agentic-framework-0.2.0
+# Run upgrade tool FROM the new framework, pointing to your project
+bash /tmp/agentic-framework-0.2.0/agentic/tools/upgrade.sh /path/to/your-project
 
 # Clean up
-rm -rf agentic-framework-0.2.0
+rm -rf /tmp/agentic-framework-0.2.0
 ```
+
+**Important**: Always run the upgrade script **from the NEW framework** (not your old one), as it contains the latest upgrade logic and bug fixes.
 
 The upgrade tool preserves your project files (specs, docs, STACK.md, STATUS.md) while updating framework internals.
 

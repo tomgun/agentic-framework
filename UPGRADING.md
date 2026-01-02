@@ -7,22 +7,30 @@
 **For most upgrades (patch & minor versions):**
 
 ```bash
-# 1. Check your current version
+# 1. Check your current version (from your project directory)
+cd /path/to/your-project
 cat STACK.md | grep "Version:"  # e.g., "Version: 0.1.0"
 
-# 2. Download latest release
+# 2. Download and extract new framework (in a temp location)
+cd /tmp
 curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 
-# 3. Run upgrade tool (this will backup and update)
-bash agentic-framework-0.2.0/agentic/tools/upgrade.sh
+# 3. Run the NEW upgrade tool, pointing it to your project
+bash agentic-framework-0.2.0/agentic/tools/upgrade.sh /path/to/your-project
 
 # 4. Clean up
 rm -rf agentic-framework-0.2.0
 ```
 
+**Why run the script from the NEW framework?**
+- ✅ Uses the latest upgrade logic (bug fixes, improvements)
+- ✅ Knows about any new files or structure changes
+- ✅ Can handle breaking changes intelligently
+- ✅ Your old upgrade script might have bugs that are already fixed
+
 **The upgrade tool will:**
 - Check your current version
-- Backup your existing `agentic/` folder
+- Backup your existing `agentic/` folder (timestamped)
 - Replace framework files (preserving your project files)
 - Update version in `STACK.md`
 - Run compatibility checks
@@ -46,7 +54,8 @@ cp -r docs docs-backup-$(date +%Y%m%d)
 ### Step 2: Download New Version
 
 ```bash
-# Download latest release
+# Download latest release (to a temporary location, not your project)
+cd /tmp  # Or any temp directory
 curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 ```
 
@@ -81,25 +90,28 @@ curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.
 ### Step 4: Replace Framework Files
 
 ```bash
+# From your project directory
+cd /path/to/your-project
+
 # Remove old framework internals
 rm -rf agentic/workflows agentic/quality agentic/agents agentic/tools agentic/init agentic/spec agentic/support
 
-# Copy new framework internals
-cp -r agentic-framework-0.2.0/agentic/workflows agentic/
-cp -r agentic-framework-0.2.0/agentic/quality agentic/
-cp -r agentic-framework-0.2.0/agentic/agents agentic/
-cp -r agentic-framework-0.2.0/agentic/tools agentic/
-cp -r agentic-framework-0.2.0/agentic/init agentic/
-cp -r agentic-framework-0.2.0/agentic/spec agentic/
-cp -r agentic-framework-0.2.0/agentic/support agentic/
+# Copy new framework internals (assuming framework extracted to /tmp)
+cp -r /tmp/agentic-framework-0.2.0/agentic/workflows agentic/
+cp -r /tmp/agentic-framework-0.2.0/agentic/quality agentic/
+cp -r /tmp/agentic-framework-0.2.0/agentic/agents agentic/
+cp -r /tmp/agentic-framework-0.2.0/agentic/tools agentic/
+cp -r /tmp/agentic-framework-0.2.0/agentic/init agentic/
+cp -r /tmp/agentic-framework-0.2.0/agentic/spec agentic/
+cp -r /tmp/agentic-framework-0.2.0/agentic/support agentic/
 
 # Update framework docs
-cp agentic-framework-0.2.0/agentic/README.md agentic/
-cp agentic-framework-0.2.0/agentic/START_HERE.md agentic/
-cp agentic-framework-0.2.0/agentic/FRAMEWORK_MAP.md agentic/
+cp /tmp/agentic-framework-0.2.0/agentic/README.md agentic/
+cp /tmp/agentic-framework-0.2.0/agentic/START_HERE.md agentic/
+cp /tmp/agentic-framework-0.2.0/agentic/FRAMEWORK_MAP.md agentic/
 
 # Clean up
-rm -rf agentic-framework-0.2.0
+rm -rf /tmp/agentic-framework-0.2.0
 ```
 
 ### Step 5: Update Version in STACK.md
@@ -174,14 +186,23 @@ curl -s https://raw.githubusercontent.com/YOUR_USERNAME/agentic-framework/v0.2.0
 1. **Read migration guide** (e.g., `docs/migrations/v1-to-v2.md`)
 2. **Test in a branch first**:
    ```bash
+   cd /path/to/your-project
    git checkout -b upgrade-framework-v2
    ```
-3. **Run upgrade tool** (or manual upgrade)
-4. **Follow migration steps** from the guide
-5. **Update custom workflows** (if any)
-6. **Run full test suite**
-7. **Verify agents work correctly**
-8. **Merge when confident**
+3. **Download new framework**:
+   ```bash
+   cd /tmp
+   curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v2.0.0.tar.gz | tar xz
+   ```
+4. **Run the NEW upgrade tool**:
+   ```bash
+   bash /tmp/agentic-framework-2.0.0/agentic/tools/upgrade.sh /path/to/your-project
+   ```
+5. **Follow migration steps** from the guide (may require manual fixes)
+6. **Update custom workflows** (if any)
+7. **Run full test suite**
+8. **Verify agents work correctly**
+9. **Merge when confident**
 
 **Time**: 1-4 hours (depending on customizations)
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # upgrade.sh: Upgrades the Agentic Framework in an existing project
+# Usage: bash path/to/new-framework/agentic/tools/upgrade.sh /path/to/your-project
 set -euo pipefail
 
 # Colors
@@ -10,7 +11,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-NEW_FRAMEWORK_DIR="${1:-agentic-framework}"
+TARGET_PROJECT_DIR="${1:-.}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NEW_FRAMEWORK_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 BACKUP_DIR="agentic-backup-$(date +%Y%m%d-%H%M%S)"
 DRY_RUN="${DRY_RUN:-no}"
 
@@ -23,9 +26,23 @@ echo ""
 echo -e "${BLUE}[1/7] Pre-flight checks${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
+# Verify target project directory
+if [[ ! -d "$TARGET_PROJECT_DIR" ]]; then
+  echo -e "${RED}✗ Error: Target directory not found: $TARGET_PROJECT_DIR${NC}"
+  exit 1
+fi
+
+cd "$TARGET_PROJECT_DIR"
+TARGET_PROJECT_DIR="$(pwd)"  # Get absolute path
+
+echo "  Target project: $TARGET_PROJECT_DIR"
+echo "  New framework: $NEW_FRAMEWORK_DIR"
+echo ""
+
 if [[ ! -d "agentic" ]]; then
-  echo -e "${RED}✗ Error: No 'agentic/' folder found in current directory${NC}"
-  echo "  Are you in your project root?"
+  echo -e "${RED}✗ Error: No 'agentic/' folder found in target project${NC}"
+  echo "  Target: $TARGET_PROJECT_DIR/agentic"
+  echo "  Is this an initialized agentic project?"
   exit 1
 fi
 
@@ -39,9 +56,10 @@ if [[ ! -f "STACK.md" ]]; then
 fi
 
 if [[ ! -d "$NEW_FRAMEWORK_DIR/agentic" ]]; then
-  echo -e "${RED}✗ Error: New framework not found at '$NEW_FRAMEWORK_DIR/agentic'${NC}"
-  echo "  Usage: bash upgrade.sh [path-to-extracted-framework]"
-  echo "  Example: bash upgrade.sh agentic-framework-0.2.0"
+  echo -e "${RED}✗ Error: New framework structure invalid${NC}"
+  echo "  Expected: $NEW_FRAMEWORK_DIR/agentic/"
+  echo "  This script must be run FROM the new framework directory"
+  echo "  Usage: bash /path/to/new-framework/agentic/tools/upgrade.sh /path/to/your-project"
   exit 1
 fi
 
@@ -52,13 +70,13 @@ echo ""
 echo -e "${BLUE}[2/7] Detecting versions${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Current version
+# Current version (from target project)
 CURRENT_VERSION=""
-if [[ -f "STACK.md" ]]; then
-  CURRENT_VERSION=$(grep -E "^\s*-?\s*Version:" STACK.md | head -1 | sed -E 's/.*Version:\s*([0-9.]+).*/\1/' || echo "unknown")
+if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+  CURRENT_VERSION=$(grep -E "^\s*-?\s*Version:" "$TARGET_PROJECT_DIR/STACK.md" | head -1 | sed -E 's/.*Version:\s*([0-9.]+).*/\1/' || echo "unknown")
 fi
 
-# New version
+# New version (from this framework)
 NEW_VERSION=""
 if [[ -f "$NEW_FRAMEWORK_DIR/VERSION" ]]; then
   NEW_VERSION=$(cat "$NEW_FRAMEWORK_DIR/VERSION" | tr -d '[:space:]')
@@ -81,9 +99,9 @@ echo -e "${BLUE}[3/7] Creating backup${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 if [[ "$DRY_RUN" == "yes" ]]; then
-  echo "  [DRY RUN] Would create backup: $BACKUP_DIR"
+  echo "  [DRY RUN] Would create backup: $TARGET_PROJECT_DIR/$BACKUP_DIR"
 else
-  cp -r agentic "$BACKUP_DIR"
+  cp -r "$TARGET_PROJECT_DIR/agentic" "$TARGET_PROJECT_DIR/$BACKUP_DIR"
   echo -e "${GREEN}✓ Backup created: $BACKUP_DIR${NC}"
 fi
 
@@ -134,8 +152,8 @@ if [[ "$DRY_RUN" == "yes" ]]; then
 else
   # Remove old directories
   for dir in "${DIRS_TO_REPLACE[@]}"; do
-    if [[ -d "agentic/$dir" ]]; then
-      rm -rf "agentic/$dir"
+    if [[ -d "$TARGET_PROJECT_DIR/agentic/$dir" ]]; then
+      rm -rf "$TARGET_PROJECT_DIR/agentic/$dir"
       echo "  Removed: agentic/$dir/"
     fi
   done
@@ -143,7 +161,7 @@ else
   # Copy new directories
   for dir in "${DIRS_TO_REPLACE[@]}"; do
     if [[ -d "$NEW_FRAMEWORK_DIR/agentic/$dir" ]]; then
-      cp -r "$NEW_FRAMEWORK_DIR/agentic/$dir" "agentic/"
+      cp -r "$NEW_FRAMEWORK_DIR/agentic/$dir" "$TARGET_PROJECT_DIR/agentic/"
       echo -e "${GREEN}  ✓ Updated: agentic/$dir/${NC}"
     fi
   done
@@ -151,7 +169,7 @@ else
   # Replace files
   for file in "${FILES_TO_REPLACE[@]}"; do
     if [[ -f "$NEW_FRAMEWORK_DIR/agentic/$file" ]]; then
-      cp "$NEW_FRAMEWORK_DIR/agentic/$file" "agentic/"
+      cp "$NEW_FRAMEWORK_DIR/agentic/$file" "$TARGET_PROJECT_DIR/agentic/"
       echo -e "${GREEN}  ✓ Updated: agentic/$file${NC}"
     fi
   done
@@ -163,14 +181,14 @@ echo ""
 echo -e "${BLUE}[6/7] Updating STACK.md${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-if [[ -f "STACK.md" && "$NEW_VERSION" != "unknown" ]]; then
+if [[ -f "$TARGET_PROJECT_DIR/STACK.md" && "$NEW_VERSION" != "unknown" ]]; then
   if [[ "$DRY_RUN" == "yes" ]]; then
     echo "  [DRY RUN] Would update version in STACK.md to $NEW_VERSION"
   else
     # Update version field (handles both "- Version:" and "Version:" formats)
-    if grep -qE "^\s*-?\s*Version:" STACK.md; then
-      sed -i.bak -E "s/(^\s*-?\s*Version:\s*)[0-9.]+.*/\1$NEW_VERSION  <!-- Updated: $(date +%Y-%m-%d) -->/" STACK.md
-      rm STACK.md.bak
+    if grep -qE "^\s*-?\s*Version:" "$TARGET_PROJECT_DIR/STACK.md"; then
+      sed -i.bak -E "s/(^\s*-?\s*Version:\s*)[0-9.]+.*/\1$NEW_VERSION  <!-- Updated: $(date +%Y-%m-%d) -->/" "$TARGET_PROJECT_DIR/STACK.md"
+      rm "$TARGET_PROJECT_DIR/STACK.md.bak" 2>/dev/null || true
       echo -e "${GREEN}✓ Updated version in STACK.md to $NEW_VERSION${NC}"
     else
       echo -e "${YELLOW}⚠ Warning: Could not find 'Version:' field in STACK.md${NC}"
@@ -191,20 +209,20 @@ if [[ "$DRY_RUN" == "yes" ]]; then
   echo "  [DRY RUN] Would run verification checks"
 else
   # Run doctor.sh if available
-  if [[ -x "agentic/tools/doctor.sh" ]]; then
+  if [[ -x "$TARGET_PROJECT_DIR/agentic/tools/doctor.sh" ]]; then
     echo "  Running doctor.sh..."
-    if bash agentic/tools/doctor.sh > /dev/null 2>&1; then
+    if bash "$TARGET_PROJECT_DIR/agentic/tools/doctor.sh" > /dev/null 2>&1; then
       echo -e "${GREEN}  ✓ Structure verification passed${NC}"
     else
       echo -e "${YELLOW}  ⚠ Some checks failed (see below)${NC}"
-      bash agentic/tools/doctor.sh 2>&1 | grep -E "^(Missing|NEW)"
+      bash "$TARGET_PROJECT_DIR/agentic/tools/doctor.sh" 2>&1 | grep -E "^(Missing|NEW)" || true
     fi
   fi
 
   # Check for spec validation
-  if [[ -f "agentic/tools/validate_specs.py" ]] && command -v python3 >/dev/null 2>&1; then
+  if [[ -f "$TARGET_PROJECT_DIR/agentic/tools/validate_specs.py" ]] && command -v python3 >/dev/null 2>&1; then
     echo "  Running spec validation..."
-    if python3 agentic/tools/validate_specs.py > /dev/null 2>&1; then
+    if python3 "$TARGET_PROJECT_DIR/agentic/tools/validate_specs.py" > /dev/null 2>&1; then
       echo -e "${GREEN}  ✓ Spec validation passed${NC}"
     else
       echo -e "${YELLOW}  ⚠ Spec validation failed (may need manual fixes)${NC}"
@@ -226,6 +244,8 @@ if [[ "$DRY_RUN" == "yes" ]]; then
 else
   echo -e "${GREEN}✓ Framework upgraded from $CURRENT_VERSION to $NEW_VERSION${NC}"
   echo ""
+  echo "Project: $TARGET_PROJECT_DIR"
+  echo ""
   echo "Next steps:"
   echo "  1. Review CHANGELOG: https://github.com/YOUR_USERNAME/agentic-framework/blob/v$NEW_VERSION/CHANGELOG.md"
   echo "  2. Test your workflow: bash agentic/tools/dashboard.sh"
@@ -236,8 +256,7 @@ else
   echo "  Rollback: rm -rf agentic && mv $BACKUP_DIR agentic"
   echo "  Docs: See UPGRADING.md for troubleshooting"
   echo ""
-  echo "Backup location: $BACKUP_DIR"
+  echo "Backup location: $TARGET_PROJECT_DIR/$BACKUP_DIR"
 fi
 
 echo ""
-
