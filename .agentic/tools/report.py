@@ -140,8 +140,9 @@ def main() -> int:
     features_path = repo_root / "spec" / "FEATURES.md"
 
     if not features_path.exists():
-        print("Missing spec/FEATURES.md (run: bash .agentic/init/scaffold.sh)")
-        return 1
+        print("Product Management not enabled (spec/FEATURES.md missing).")
+        print("Enable it with: bash .agentic/tools/enable-product-management.sh")
+        return 0
 
     md = features_path.read_text(encoding="utf-8")
     features = parse_features(md)

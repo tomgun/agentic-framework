@@ -9,13 +9,13 @@ Purpose: define *how* we will build it with enough clarity to implement incremen
 ## Features in scope (IDs)
 - Feature registry: `spec/FEATURES.md`
 - Implemented by this spec:
-  - F-0001
-  - F-0002
+  - F-####
+  - F-####
 
 ## NFRs in scope (IDs) (optional but recommended)
 - NFR registry: `spec/NFR.md`
 - Addressed by this spec:
-  - NFR-0001
+  - NFR-####
 
 ## Architecture overview
 - Style: <!-- monolith/modular monolith/services/plugin/etc -->

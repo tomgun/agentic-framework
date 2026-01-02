@@ -4,7 +4,7 @@ Purpose: capture cross-cutting constraints that apply across many features (perf
 
 ## Vocabulary
 - NFRs are constraints/qualities, not features.
-- Each NFR gets a stable ID: `NFR-0001`, `NFR-0002`, …
+- Each NFR gets a stable ID: `NFR-####`, …
 - Features can link to NFR IDs in `spec/FEATURES.md` **when relevant**, but most features will omit NFR links.
 - Prefer one of these patterns:
   - **Global NFR**: set “Applies to: all (unless stated otherwise)”
@@ -12,7 +12,7 @@ Purpose: capture cross-cutting constraints that apply across many features (perf
 
 ---
 
-## NFR-0001: Example performance budget
+## NFR-####: Example performance budget
 - Category: performance
 - Statement: p95 request latency < 200ms for critical endpoints
 - Applies to: <!-- components/features -->

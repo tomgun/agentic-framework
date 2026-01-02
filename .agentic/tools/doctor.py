@@ -13,21 +13,55 @@ class Check:
     purpose: str
 
 
-CHECKS: list[Check] = [
-    Check("AGENTS.md", "file", "agent entrypoint (rules + read-first)"),
-    Check("CONTEXT_PACK.md", "file", "durable starting context"),
-    Check("STATUS.md", "file", "current focus + next steps"),
-    Check("STACK.md", "file", "how to run/test + constraints"),
-    Check("JOURNAL.md", "file", "session-by-session progress log"),
-    Check("spec", "dir", "project truth folder"),
-    Check("spec/OVERVIEW.md", "file", "vision + current state + pointers"),
-    Check("spec/FEATURES.md", "file", "feature registry + acceptance + tests"),
-    Check("spec/NFR.md", "file", "non-functional constraints"),
-    Check("spec/acceptance", "dir", "per-feature acceptance criteria"),
-    Check("spec/LESSONS.md", "file", "lessons/caveats"),
-    Check("spec/adr", "dir", "architecture decisions"),
-    Check("docs", "dir", "system docs (long-lived)"),
-]
+def read_profile(root: Path) -> str:
+    """
+    Determine profile.
+
+    - Prefer explicit `Profile:` in STACK.md.
+    - If not present, infer:
+      - If spec/ exists OR STATUS.md exists -> core+product (legacy default)
+      - else -> core
+    """
+    stack = root / "STACK.md"
+    if stack.exists():
+        try:
+            md = stack.read_text(encoding="utf-8")
+            m = re.search(r"(?m)^\s*-\s*Profile:\s*([a-z+_-]+)\s*$", md)
+            if m:
+                val = m.group(1).strip()
+                if val in {"core", "core+product"}:
+                    return val
+        except Exception:
+            pass
+
+    if (root / "spec").is_dir() or (root / "STATUS.md").is_file():
+        return "core+product"
+    return "core"
+
+
+def checks_for_profile(profile: str) -> list[Check]:
+    core = [
+        Check("AGENTS.md", "file", "agent entrypoint (rules + read-first)"),
+        Check("CONTEXT_PACK.md", "file", "durable starting context"),
+        Check("STACK.md", "file", "how to run/test + constraints"),
+        Check("JOURNAL.md", "file", "session-by-session progress log"),
+        Check("HUMAN_NEEDED.md", "file", "escalation protocol"),
+        Check("docs", "dir", "system docs (long-lived)"),
+    ]
+    if profile == "core":
+        return core
+
+    # core+product
+    return core + [
+        Check("STATUS.md", "file", "current focus + next steps"),
+        Check("spec", "dir", "project truth folder"),
+        Check("spec/OVERVIEW.md", "file", "vision + current state + pointers"),
+        Check("spec/FEATURES.md", "file", "feature registry + acceptance + tests"),
+        Check("spec/NFR.md", "file", "non-functional constraints"),
+        Check("spec/acceptance", "dir", "per-feature acceptance criteria"),
+        Check("spec/LESSONS.md", "file", "lessons/caveats"),
+        Check("spec/adr", "dir", "architecture decisions"),
+    ]
 
 FEATURE_ID_RE = re.compile(r"\b(F-\d{4})\b")
 NFR_ID_RE = re.compile(r"\b(NFR-\d{4})\b")
@@ -201,11 +235,13 @@ def validate_nfr_refs(root: Path) -> list[str]:
 
 def main() -> int:
     root = Path.cwd()
+    profile = read_profile(root)
     missing: list[Check] = []
     empty_files: list[Check] = []
     template_like: list[Check] = []
 
-    for c in CHECKS:
+    checks = checks_for_profile(profile)
+    for c in checks:
         p = root / c.path
         if c.kind == "dir":
             if not p.is_dir():
@@ -244,27 +280,31 @@ def main() -> int:
         for c in template_like:
             print(f"- {c.path} ({c.purpose})")
 
-    # Enhanced validations
+    print(f"\nProfile: {profile}")
+
+    # Enhanced validations (core+product only)
     validation_issues = []
-    
-    features_issues = validate_features(root)
-    validation_issues.extend(features_issues)
-    
-    # Get feature IDs for cross-reference checks
-    features_path = root / "spec" / "FEATURES.md"
-    if features_path.exists():
-        try:
-            features_md = features_path.read_text(encoding="utf-8")
-            features = parse_features(features_md)
-            feature_ids = set(features.keys())
-            
-            status_issues = validate_status_refs(root, feature_ids)
-            validation_issues.extend(status_issues)
-        except Exception:
-            pass
-    
-    nfr_issues = validate_nfr_refs(root)
-    validation_issues.extend(nfr_issues)
+    if profile == "core+product":
+        features_issues = validate_features(root)
+        validation_issues.extend(features_issues)
+
+        # Get feature IDs for cross-reference checks
+        features_path = root / "spec" / "FEATURES.md"
+        if features_path.exists():
+            try:
+                features_md = features_path.read_text(encoding="utf-8")
+                features = parse_features(features_md)
+                feature_ids = set(features.keys())
+
+                status_issues = validate_status_refs(root, feature_ids)
+                validation_issues.extend(status_issues)
+            except Exception:
+                pass
+
+        nfr_issues = validate_nfr_refs(root)
+        validation_issues.extend(nfr_issues)
+    else:
+        print("\nNote: Core profile detected — skipping Product Management validations (spec/ + STATUS.md).")
     
     if validation_issues:
         print("\nValidation issues:")
@@ -276,7 +316,8 @@ def main() -> int:
 
     print("\nNext commands:")
     print("- bash .agentic/tools/brief.sh")
-    print("- bash .agentic/tools/report.sh")
+    if profile == "core+product":
+        print("- bash .agentic/tools/report.sh")
     print("- bash .agentic/tools/verify.sh")
     return 0
 
