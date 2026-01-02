@@ -1,4 +1,6 @@
-# START HERE: Agentic Framework Quick Guide
+# START HERE: Agentic AI Framework Quick Guide
+
+*Shortname: Agentic AF*
 
 **New to this framework?** This guide helps you find what you need based on your situation.
 
