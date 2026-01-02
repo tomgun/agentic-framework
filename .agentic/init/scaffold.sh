@@ -12,20 +12,29 @@ fi
 usage() {
   cat <<'EOF'
 Usage:
-  bash .agentic/init/scaffold.sh [--profile core|core+product]
+  bash .agentic/init/scaffold.sh [--profile core|core+product] [--non-interactive]
+
+Options:
+  --profile core|core+product  Set the profile (default: core)
+  --non-interactive            Skip profile prompt, use default or specified profile
 
 Notes:
-  - Default profile: core
   - You can also set: AGENTIC_PROFILE=core|core+product
+  - In non-interactive mode, agent will set profile during init_playbook
 EOF
 }
 
 PROFILE="${AGENTIC_PROFILE:-}"
+NON_INTERACTIVE=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --profile)
       PROFILE="${2:-}"
       shift 2
+      ;;
+    --non-interactive)
+      NON_INTERACTIVE="yes"
+      shift
       ;;
     -h|--help)
       usage

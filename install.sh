@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # install.sh: Install the Agentic Framework into a new or existing project
-# Usage: bash install.sh /path/to/your-project [--profile core|core+product]
+# Usage: bash install.sh /path/to/your-project
 set -euo pipefail
 
 # Colors
@@ -12,7 +12,6 @@ NC='\033[0m' # No Color
 
 # Configuration
 TARGET_PROJECT_DIR="${1:-.}"
-PROFILE="${2:-}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_VERSION=""
 
@@ -80,20 +79,12 @@ echo ""
 echo -e "${BLUE}[4/5] Running scaffold script${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
+echo "  Creating template files..."
 SCAFFOLD_CMD=".agentic/init/scaffold.sh"
 
-# Add profile flag if provided
-if [[ -n "$PROFILE" ]]; then
-  if [[ "$PROFILE" == "core" || "$PROFILE" == "core+product" ]]; then
-    SCAFFOLD_CMD="$SCAFFOLD_CMD --profile $PROFILE"
-    echo "  Using profile: $PROFILE"
-  else
-    echo -e "${YELLOW}⚠ Warning: Invalid profile '$PROFILE'. Scaffold will prompt.${NC}"
-  fi
-fi
-
 if [[ -x "$SCAFFOLD_CMD" ]]; then
-  bash $SCAFFOLD_CMD
+  # Run scaffold in non-interactive mode (agent will fill in details later)
+  bash $SCAFFOLD_CMD --non-interactive
 else
   echo -e "${RED}✗ Error: scaffold.sh not found or not executable${NC}"
   exit 1
@@ -143,17 +134,18 @@ echo ""
 echo -e "${GREEN}Framework installed successfully!${NC}"
 echo ""
 echo "What's next:"
-echo "  1. Review STACK.md and fill in your project details"
-echo "  2. Review PRODUCT.md (Core) or spec/ (Core+PM) for planning"
-echo "  3. Tell your AI agent to start working:"
-echo "     \"Read AGENTS.md and help me build this project\""
+echo "  1. Open your AI agent (Cursor/Claude/Copilot) and say:"
 echo ""
-echo "Useful commands:"
-echo "  python3 .agentic/tools/doctor.py     # Check project health"
-if [[ -n "$PROFILE" && "$PROFILE" == "core+product" ]] || grep -q "Profile: core+product" STACK.md 2>/dev/null; then
-  echo "  python3 .agentic/tools/report.py     # View feature status"
-  echo "  python3 .agentic/tools/verify.py     # Validate cross-references"
-fi
+echo "     \"Read .agentic/init/init_playbook.md and help me initialize"
+echo "     this project by filling in STACK.md, PRODUCT.md, and"
+echo "     CONTEXT_PACK.md based on what we're building.\""
+echo ""
+echo "  2. The agent will:"
+echo "     - Ask what you're building and which profile to use (Core or Core+PM)"
+echo "     - Fill in project-specific details"
+echo "     - Set up quality checks"
+echo ""
+echo "  3. Then you're ready to start building!"
 echo ""
 echo "Framework version: $FRAMEWORK_VERSION"
 echo "Installation date: $(date +%Y-%m-%d)"
