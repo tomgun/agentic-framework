@@ -1,4 +1,6 @@
-# `.agentic/`: Agentic Development Framework (Portable)
+# `.agentic/`: Agentic AI Framework (Portable)
+
+*Shortname: Agentic AF*
 
 This folder is a **portable framework** you can copy into any repository to bootstrap **high-quality, test-driven, token-efficient** agentic development in **Cursor 2.2+** (and optionally alongside GitHub Copilot / Claude).
 
