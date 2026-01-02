@@ -97,6 +97,25 @@ The agent will automatically:
 
 If you're using multiple assistants (Cursor + Copilot + Claude), the agent can also set up entry points from `agentic/agents/installation.md`.
 
+## Upgrading the Framework
+
+**To upgrade to a newer version of the framework:**
+
+```bash
+# Download new version
+curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+
+# Run upgrade tool
+bash agentic/tools/upgrade.sh agentic-framework-0.2.0
+
+# Clean up
+rm -rf agentic-framework-0.2.0
+```
+
+The upgrade tool preserves your project files (specs, docs, STACK.md, STATUS.md) while updating framework internals.
+
+See **[`UPGRADING.md`](../UPGRADING.md)** in the repo root for detailed guide.
+
 ## Quick resume (after a break)
 From repo root:
 

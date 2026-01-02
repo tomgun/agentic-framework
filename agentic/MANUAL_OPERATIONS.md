@@ -8,6 +8,24 @@ The agent maintains documentation. You can **read that documentation directly** 
 
 ## Quick Information Retrieval
 
+### Framework Version
+
+**Check your framework version:**
+```bash
+cat STACK.md | grep "Version:"
+```
+
+**Check for framework updates:**
+```bash
+curl -s https://api.github.com/repos/YOUR_USERNAME/agentic-framework/releases/latest | grep '"tag_name"'
+```
+
+**Upgrade framework:**
+```bash
+# See ../UPGRADING.md for full guide
+bash agentic/tools/upgrade.sh path/to/new-framework
+```
+
 ### What's the current status?
 ```bash
 cat STATUS.md

@@ -121,8 +121,14 @@ MAJOR.MINOR.PATCH
    # Tell agent to initialize
    ```
 
-3. **Update example project** (if applicable)
+3. **Update example projects** (if applicable)
    - Update `examples/inited_project/STACK.md` with new version
+   - Update `examples/nextjs_evolved/STACK.md` with new version
+
+4. **Announce upgrade path**
+   - Ensure `UPGRADING.md` is up to date
+   - Test `agentic/tools/upgrade.sh` works correctly
+   - Document any breaking changes in CHANGELOG
 
 ## Release Cadence
 
@@ -138,10 +144,12 @@ MAJOR.MINOR.PATCH
 **If releasing a breaking change (major version bump):**
 
 1. **Document migration path** in CHANGELOG
-2. **Create migration guide** in `docs/migrations/`
-3. **Update all examples** to new format
-4. **Add deprecation warnings** in previous version (if possible)
-5. **Consider upgrade tool** (`agentic/tools/upgrade.sh`)
+2. **Create migration guide** in `docs/migrations/` (e.g., `docs/migrations/v1-to-v2.md`)
+3. **Update UPGRADING.md** with version-specific notes
+4. **Update all examples** to new format
+5. **Test upgrade tool** with breaking changes (`agentic/tools/upgrade.sh`)
+6. **Add deprecation warnings** in previous version (if possible)
+7. **Create upgrade automation** if needed (e.g., `agentic/tools/migrate_v1_to_v2.sh`)
 
 Example migration guide structure:
 ```markdown
