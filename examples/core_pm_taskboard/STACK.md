@@ -5,10 +5,10 @@
 Purpose: a single source of truth for "how we build and run software here".
 
 ## Agentic framework
-- Version: 0.1.0  <!-- Update when upgrading framework -->
+- Version: 0.2.1
 - Profile: core+product  # core | core+product
-- Installed: <!-- YYYY-MM-DD -->
-- Source: https://github.com/YOUR_USERNAME/agentic-framework
+- Installed: 2026-01-02
+- Source: https://github.com/tomgun/agentic-framework
 
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
