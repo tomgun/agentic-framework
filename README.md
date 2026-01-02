@@ -218,11 +218,18 @@ Already have a project? The framework integrates non-invasively:
 **Already using the framework?** Upgrade to the latest version:
 
 ```bash
-# Quick upgrade (recommended)
-bash agentic/tools/upgrade.sh path/to/new-framework
+# Download new version (to temp location)
+cd /tmp
+curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 
-# Or follow manual steps in UPGRADING.md
+# Run upgrade tool from NEW framework, pointing to your project
+bash /tmp/agentic-framework-0.2.0/agentic/tools/upgrade.sh /path/to/your-project
+
+# Clean up
+rm -rf /tmp/agentic-framework-0.2.0
 ```
+
+**Why from the new framework?** The new upgrade script has the latest bug fixes and knows about new structure changes.
 
 See **[`UPGRADING.md`](UPGRADING.md)** for complete upgrade guide, version compatibility, and troubleshooting.
 
