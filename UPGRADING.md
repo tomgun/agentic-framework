@@ -144,7 +144,7 @@ Check `CHANGELOG.md` in the new version for breaking changes:
 ```bash
 # Read CHANGELOG for your upgrade path
 # Example: 0.1.0 → 0.2.0
-curl -s https://raw.githubusercontent.com/YOUR_USERNAME/agentic-framework/v0.2.0/CHANGELOG.md | less
+curl -s https://raw.githubusercontent.com/tomgun/agentic-framework/v0.2.0/CHANGELOG.md | less
 ```
 
 ## Upgrade Strategies by Version Type
@@ -192,7 +192,7 @@ curl -s https://raw.githubusercontent.com/YOUR_USERNAME/agentic-framework/v0.2.0
 3. **Download new framework**:
    ```bash
    cd /tmp
-   curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v2.0.0.tar.gz | tar xz
+   curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v2.0.0.tar.gz | tar xz
    ```
 4. **Run the NEW upgrade tool**:
    ```bash
@@ -276,7 +276,7 @@ curl -s https://raw.githubusercontent.com/YOUR_USERNAME/agentic-framework/v0.2.0
 
 ```bash
 # Check latest release
-curl -s https://api.github.com/repos/YOUR_USERNAME/agentic-framework/releases/latest | grep '"tag_name"'
+curl -s https://api.github.com/repos/tomgun/agentic-framework/releases/latest | grep '"tag_name"'
 
 # Compare to your version
 cat STACK.md | grep "Version:"

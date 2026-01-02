@@ -273,7 +273,7 @@ Already have a project? The framework integrates non-invasively:
 ```bash
 # Download new version (to temp location)
 cd /tmp
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 
 # Run upgrade tool from NEW framework, pointing to your project
 bash /tmp/agentic-framework-0.2.0/.agentic/tools/upgrade.sh /path/to/your-project

@@ -17,7 +17,7 @@ cat STACK.md | grep "Version:"
 
 **Check for framework updates:**
 ```bash
-curl -s https://api.github.com/repos/YOUR_USERNAME/agentic-framework/releases/latest | grep '"tag_name"'
+curl -s https://api.github.com/repos/tomgun/agentic-framework/releases/latest | grep '"tag_name"'
 ```
 
 **Upgrade framework:**
@@ -26,7 +26,7 @@ curl -s https://api.github.com/repos/YOUR_USERNAME/agentic-framework/releases/la
 
 # Download new framework to temp location
 cd /tmp
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 
 # Run upgrade tool FROM the new framework
 bash /tmp/agentic-framework-0.2.0/.agentic/tools/upgrade.sh /path/to/your-project
