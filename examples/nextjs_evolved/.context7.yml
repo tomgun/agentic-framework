@@ -1,5 +1,5 @@
 # Context7 Configuration
-# See: agentic/workflows/documentation_verification.md
+# See: .agentic/workflows/documentation_verification.md
 
 # Enable version-specific documentation validation
 enabled: true

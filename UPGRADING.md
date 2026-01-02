@@ -16,7 +16,7 @@ cd /tmp
 curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 
 # 3. Run the NEW upgrade tool, pointing it to your project
-bash agentic-framework-0.2.0/agentic/tools/upgrade.sh /path/to/your-project
+bash agentic-framework-0.2.0/.agentic/tools/upgrade.sh /path/to/your-project
 
 # 4. Clean up
 rm -rf agentic-framework-0.2.0
@@ -30,7 +30,7 @@ rm -rf agentic-framework-0.2.0
 
 **The upgrade tool will:**
 - Check your current version
-- Backup your existing `agentic/` folder (timestamped)
+- Backup your existing `.agentic/` folder (timestamped)
 - Replace framework files (preserving your project files)
 - Update version in `STACK.md`
 - Run compatibility checks
@@ -62,16 +62,16 @@ curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.
 ### Step 3: Identify What to Replace
 
 **Always replace** (framework internals):
-- `agentic/workflows/`
-- `agentic/quality/`
-- `agentic/agents/`
-- `agentic/tools/` (scripts only, not their output)
-- `agentic/init/` (templates only)
-- `agentic/spec/` (templates only)
-- `agentic/support/`
-- `agentic/README.md`
-- `agentic/START_HERE.md`
-- `agentic/FRAMEWORK_MAP.md`
+- `.agentic/workflows/`
+- `.agentic/quality/`
+- `.agentic/agents/`
+- `.agentic/tools/` (scripts only, not their output)
+- `.agentic/init/` (templates only)
+- `.agentic/spec/` (templates only)
+- `.agentic/support/`
+- `.agentic/README.md`
+- `.agentic/START_HERE.md`
+- `.agentic/FRAMEWORK_MAP.md`
 
 **Never replace** (your project data):
 - `STACK.md` (update version field only)
@@ -94,21 +94,21 @@ curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.
 cd /path/to/your-project
 
 # Remove old framework internals
-rm -rf agentic/workflows agentic/quality agentic/agents agentic/tools agentic/init agentic/spec agentic/support
+rm -rf .agentic/workflows .agentic/quality .agentic/agents .agentic/tools .agentic/init .agentic/spec .agentic/support
 
 # Copy new framework internals (assuming framework extracted to /tmp)
-cp -r /tmp/agentic-framework-0.2.0/agentic/workflows agentic/
-cp -r /tmp/agentic-framework-0.2.0/agentic/quality agentic/
-cp -r /tmp/agentic-framework-0.2.0/agentic/agents agentic/
-cp -r /tmp/agentic-framework-0.2.0/agentic/tools agentic/
-cp -r /tmp/agentic-framework-0.2.0/agentic/init agentic/
-cp -r /tmp/agentic-framework-0.2.0/agentic/spec agentic/
-cp -r /tmp/agentic-framework-0.2.0/agentic/support agentic/
+cp -r /tmp/agentic-framework-0.2.0/.agentic/workflows .agentic/
+cp -r /tmp/agentic-framework-0.2.0/.agentic/quality .agentic/
+cp -r /tmp/agentic-framework-0.2.0/.agentic/agents .agentic/
+cp -r /tmp/agentic-framework-0.2.0/.agentic/tools .agentic/
+cp -r /tmp/agentic-framework-0.2.0/.agentic/init .agentic/
+cp -r /tmp/agentic-framework-0.2.0/.agentic/spec .agentic/
+cp -r /tmp/agentic-framework-0.2.0/.agentic/support .agentic/
 
 # Update framework docs
-cp /tmp/agentic-framework-0.2.0/agentic/README.md agentic/
-cp /tmp/agentic-framework-0.2.0/agentic/START_HERE.md agentic/
-cp /tmp/agentic-framework-0.2.0/agentic/FRAMEWORK_MAP.md agentic/
+cp /tmp/agentic-framework-0.2.0/.agentic/README.md .agentic/
+cp /tmp/agentic-framework-0.2.0/.agentic/START_HERE.md .agentic/
+cp /tmp/agentic-framework-0.2.0/.agentic/FRAMEWORK_MAP.md .agentic/
 
 # Clean up
 rm -rf /tmp/agentic-framework-0.2.0
@@ -128,10 +128,10 @@ rm -rf /tmp/agentic-framework-0.2.0
 
 ```bash
 # Verify structure
-bash agentic/tools/doctor.sh
+bash .agentic/tools/doctor.sh
 
 # Check spec format (if spec validation is enabled)
-python3 agentic/tools/validate_specs.py
+python3 .agentic/tools/validate_specs.py
 
 # Verify quality checks (if configured)
 bash quality_checks.sh --pre-commit
@@ -196,7 +196,7 @@ curl -s https://raw.githubusercontent.com/YOUR_USERNAME/agentic-framework/v0.2.0
    ```
 4. **Run the NEW upgrade tool**:
    ```bash
-   bash /tmp/agentic-framework-2.0.0/agentic/tools/upgrade.sh /path/to/your-project
+   bash /tmp/agentic-framework-2.0.0/.agentic/tools/upgrade.sh /path/to/your-project
    ```
 5. **Follow migration steps** from the guide (may require manual fixes)
 6. **Update custom workflows** (if any)
@@ -227,11 +227,11 @@ curl -s https://raw.githubusercontent.com/YOUR_USERNAME/agentic-framework/v0.2.0
 - Your codebase (obviously!)
 
 ❌ **Never preserved (replaced by framework):**
-- Framework workflows (`agentic/workflows/`)
-- Framework quality guides (`agentic/quality/`)
-- Framework tools (`agentic/tools/`)
-- Framework templates (`agentic/init/`, `agentic/spec/`)
-- Framework agent guidelines (`agentic/agents/`)
+- Framework workflows (`.agentic/workflows/`)
+- Framework quality guides (`.agentic/quality/`)
+- Framework tools (`.agentic/tools/`)
+- Framework templates (`.agentic/init/`, `.agentic/spec/`)
+- Framework agent guidelines (`.agentic/agents/`)
 
 ## Troubleshooting
 
@@ -243,22 +243,22 @@ curl -s https://raw.githubusercontent.com/YOUR_USERNAME/agentic-framework/v0.2.0
 
 **Possible causes**:
 1. **New required files**: Check CHANGELOG for new required files, run scaffold to add them
-2. **Spec format changes**: Run `python3 agentic/tools/validate_specs.py` and fix issues
+2. **Spec format changes**: Run `python3 .agentic/tools/validate_specs.py` and fix issues
 3. **Custom modifications**: Restore from backup, merge changes carefully
 
 ### Issue: Agents behave differently after upgrade
 
 **Possible causes**:
-1. **Agent guidelines changed**: Review `agentic/agents/shared/agent_operating_guidelines.md` for changes
+1. **Agent guidelines changed**: Review `.agentic/agents/shared/agent_operating_guidelines.md` for changes
 2. **Workflow changes**: Check if your workflow (TDD, dev loop) was updated
-3. **Quality standards updated**: Review `agentic/quality/programming_standards.md` and `agentic/quality/test_strategy.md`
+3. **Quality standards updated**: Review `.agentic/quality/programming_standards.md` and `.agentic/quality/test_strategy.md`
 
 **Solution**: Read CHANGELOG, review new documentation, update your understanding
 
 ### Issue: Quality checks fail after upgrade
 
 **Possible causes**:
-1. **New checks added**: Review `agentic/workflows/continuous_quality_validation.md`
+1. **New checks added**: Review `.agentic/workflows/continuous_quality_validation.md`
 2. **Custom profile outdated**: Update your `quality_checks.sh` based on new template
 
 **Solution**: Regenerate quality profile or merge changes manually
@@ -318,7 +318,7 @@ mv agentic-backup-YYYYMMDD agentic
 git checkout HEAD -- STACK.md
 
 # 3. Test that everything works
-bash agentic/tools/doctor.sh
+bash .agentic/tools/doctor.sh
 
 # 4. Report issue to framework maintainers
 ```
@@ -326,9 +326,9 @@ bash agentic/tools/doctor.sh
 ## Future: Automated Upgrades
 
 **Planned features** (not yet implemented):
-- `agentic/tools/check_updates.sh` - Check for new versions
-- `agentic/tools/upgrade.sh --dry-run` - Preview changes
-- `agentic/tools/upgrade.sh --auto` - Fully automated upgrade
+- `.agentic/tools/check_updates.sh` - Check for new versions
+- `.agentic/tools/upgrade.sh --dry-run` - Preview changes
+- `.agentic/tools/upgrade.sh --auto` - Fully automated upgrade
 - GitHub Actions integration for upgrade notifications
 - Automatic backup and rollback on failure
 
@@ -348,7 +348,7 @@ These guides will contain:
 
 ## Questions?
 
-- **Framework docs**: `agentic/START_HERE.md`
+- **Framework docs**: `.agentic/START_HERE.md`
 - **CHANGELOG**: See release notes on GitHub
 - **Issue tracker**: Report problems or ask questions
 

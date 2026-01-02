@@ -5,6 +5,6 @@ Looks like template content (consider filling/renaming):
 - spec/LESSONS.md (lessons/caveats)
 
 Next commands:
-- bash agentic/tools/brief.sh
-- bash agentic/tools/report.sh
-- bash agentic/tools/verify.sh
+- bash .agentic/tools/brief.sh
+- bash .agentic/tools/report.sh
+- bash .agentic/tools/verify.sh

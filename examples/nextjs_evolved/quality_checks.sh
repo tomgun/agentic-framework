@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Quality Checks for Next.js Task App
-# See: agentic/workflows/continuous_quality_validation.md
+# See: .agentic/workflows/continuous_quality_validation.md
 
 echo "=== Next.js Task App Quality Validation ==="
 echo

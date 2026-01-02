@@ -61,7 +61,7 @@ inited_project/
 ├── STATUS.md             # All features shipped
 ├── CONTEXT_PACK.md       # Quick reference
 ├── JOURNAL.md            # Session log
-└── agentic/              # Framework (v0.1.0)
+└── .agentic/              # Framework (v0.1.0)
 ```
 
 ## Framework version
