@@ -31,11 +31,15 @@ bash install.sh /path/to/your-project core+product
 
 The install script will:
 1. Copy `.agentic/` folder with correct version number
-2. Run scaffold script (prompts for project details)
+2. Run scaffold script (creates template files)
 3. Update `STACK.md` with framework version and install date
-4. Show next steps
+4. Prompt you for initial project details
 
-**✅ After this, your project is fully initialized. Just start working with your agent!**
+**After installation**, tell your agent:
+
+> "Read `.agentic/init/init_playbook.md` and help me complete the initialization by filling in STACK.md, PRODUCT.md, and CONTEXT_PACK.md based on this project."
+
+The agent will interview you about what you're building and fill in the project-specific details.
 
 ### Option 2: Manual copy
 
@@ -112,23 +116,24 @@ bash .agentic/init/scaffold.sh
 
 ### Agent-driven initialization
 
-After installing (see Installation section above):
+**If you used `install.sh`**: Tell your agent:
 
-**If you used `install.sh`**: Framework is already initialized. Skip to "Quick Start" below.
+> "Read `.agentic/init/init_playbook.md` and help me complete the initialization by filling in STACK.md, PRODUCT.md, and CONTEXT_PACK.md based on this project."
 
-**If you copied `.agentic/` manually**: Open your AI agent and say:
+**If you copied `.agentic/` manually**: First run scaffold, then initialize:
 
-> "Read `.agentic/AGENTS.md` and initialize this project by running `.agentic/init/scaffold.sh`"
+> "Read `.agentic/AGENTS.md` and initialize this project by running `.agentic/init/scaffold.sh`, then read `.agentic/init/init_playbook.md` to fill in the project details."
 
 The agent will:
-1. Run `.agentic/init/scaffold.sh` to create project files
-2. Ask you questions about your project (what, why, tech stack, profile)
-3. Create all necessary files (`STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md`, etc.)
-4. Set up your chosen profile (Core or Core+PM)
+1. Run `.agentic/init/scaffold.sh` to create template files (if needed)
+2. Read `init_playbook.md` to understand the initialization process
+3. Interview you about your project (what, why, tech stack, profile)
+4. Fill in `STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md` with real project info
+5. Set up your chosen profile (Core or Core+PM)
 
-**You're ready!** The agent can now help you build.
+**Now you're ready!** The agent understands your project and can start building.
 
-**New to the framework?** → Read [`.agentic/START_HERE.md`](.agentic/START_HERE.md) or tell your agent: *"Read `.agentic/START_HERE.md` and explain how to use this framework"*
+**New to the framework?** → Tell your agent: *"Read `.agentic/START_HERE.md` and explain how to use this framework"*
 
 ### Upgrading existing projects
 
