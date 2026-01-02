@@ -88,6 +88,7 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 **What exists**:
 - ✅ `STACK.md` - How to build/run
 - ✅ `CONTEXT_PACK.md` - Architecture overview
+- ✅ `PLAN.md` - What we're building (lightweight, informal)
 - ✅ `JOURNAL.md` - Session history
 - ✅ `HUMAN_NEEDED.md` - Escalation protocol
 
@@ -97,13 +98,17 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 - ❌ Feature IDs (F-####) - No feature tracking system
 
 **How to work in Core mode**:
-1. **Ask user for direction**: "What should I work on?" (no STATUS.md to tell you)
-2. **Read context**: `CONTEXT_PACK.md` (understand architecture), `JOURNAL.md` (recent work)
-3. **Document as you go**: Update `CONTEXT_PACK.md` when architecture changes
-4. **Escalate when stuck**: Add to `HUMAN_NEEDED.md` with clear description
-5. **Session continuity**: Always update `JOURNAL.md` with progress summary
-6. **No feature tracking**: Work on what user asks, no F-#### IDs
-7. **Definition of done**: User approval (no formal acceptance criteria)
+1. **Read the plan**: `PLAN.md` tells you what's being built and what's in scope
+2. **Ask user for direction**: "Which capability from PLAN.md should I work on?" or "What's the priority?"
+3. **Read context**: `CONTEXT_PACK.md` (understand architecture), `JOURNAL.md` (recent work)
+4. **Document as you go**: 
+   - Update `CONTEXT_PACK.md` when architecture changes
+   - Update `PLAN.md` when you complete capabilities or make technical decisions
+   - Check off items in `PLAN.md` "Core capabilities" when done
+5. **Escalate when stuck**: Add to `HUMAN_NEEDED.md` with clear description
+6. **Session continuity**: Always update `JOURNAL.md` with progress summary
+7. **No feature tracking**: Work on what user asks, no F-#### IDs
+8. **Definition of done**: User approval (no formal acceptance criteria)
 
 **Core mode is good for**:
 - Small projects

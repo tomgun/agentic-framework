@@ -45,9 +45,16 @@ echo -e "${BLUE}Current profile: $CURRENT_PROFILE${NC}"
 echo ""
 
 # Ensure Core artifacts exist (some projects may have been initialized before Core profile was defined)
+PLAN_EXISTS="no"
+
 if [[ ! -f "CONTEXT_PACK.md" && -f ".agentic/init/CONTEXT_PACK.template.md" ]]; then
   cp ".agentic/init/CONTEXT_PACK.template.md" "CONTEXT_PACK.md"
   echo -e "${GREEN}✓ Created CONTEXT_PACK.md (Core)${NC}"
+fi
+
+if [[ ! -f "PLAN.md" && -f ".agentic/init/PLAN.template.md" ]]; then
+  cp ".agentic/init/PLAN.template.md" "PLAN.md"
+  echo -e "${GREEN}✓ Created PLAN.md (Core)${NC}"
 fi
 
 if [[ ! -f "JOURNAL.md" && -f ".agentic/spec/JOURNAL.template.md" ]]; then
@@ -59,13 +66,27 @@ if [[ ! -f "HUMAN_NEEDED.md" && -f ".agentic/spec/HUMAN_NEEDED.template.md" ]]; 
   cp ".agentic/spec/HUMAN_NEEDED.template.md" "HUMAN_NEEDED.md"
   echo -e "${GREEN}✓ Created HUMAN_NEEDED.md (Core)${NC}"
 fi
+
 echo "What I'll create:"
 echo "  ✓ spec/ directory with templates (PRD, TECH_SPEC, FEATURES, NFR)"
 echo "  ✓ STATUS.md (project status and roadmap)"
 echo "  ✓ Update STACK.md profile to 'core+product'"
 echo ""
-echo "Note: CONTEXT_PACK.md and HUMAN_NEEDED.md are already part of Core."
+echo "Note: CONTEXT_PACK.md, PLAN.md, and HUMAN_NEEDED.md are already part of Core."
 echo ""
+
+# Check if PLAN.md exists and has content
+if [[ -f "PLAN.md" ]]; then
+  PLAN_LINE_COUNT=$(wc -l < PLAN.md | tr -d ' ')
+  if [[ "$PLAN_LINE_COUNT" -gt 10 ]]; then
+    PLAN_EXISTS="yes"
+    echo -e "${BLUE}📝 Detected PLAN.md with content.${NC}"
+    echo "After enabling PM features, you can ask your agent to:"
+    echo "  - Seed spec/FEATURES.md from PLAN.md capabilities"
+    echo "  - Seed spec/PRD.md from PLAN.md vision"
+    echo ""
+  fi
+fi
 
 read -p "Proceed? [y/N]: " -n 1 -r
 echo
@@ -137,9 +158,16 @@ echo "Next steps:"
 echo "  1. Review the new spec templates in spec/"
 echo "  2. Fill in STATUS.md with your current project state"
 echo "  3. Update CONTEXT_PACK.md with your architecture"
-echo "  4. Tell your agent:"
-echo "     \"I've enabled Product Management features. Please review"
-echo "      spec/FEATURES.md and help me document our existing features.\""
+if [[ "$PLAN_EXISTS" == "yes" ]]; then
+  echo "  4. Tell your agent:"
+  echo "     \"I've enabled PM features. Please convert PLAN.md into formal specs:"
+  echo "      - Seed spec/FEATURES.md from PLAN.md capabilities (with F-#### IDs)"
+  echo "      - Seed spec/PRD.md from PLAN.md vision and scope\""
+else
+  echo "  4. Tell your agent:"
+  echo "     \"I've enabled Product Management features. Please review"
+  echo "      spec/FEATURES.md and help me document our existing features.\""
+fi
 echo ""
 echo "New files:"
 echo "  - spec/PRD.md          (Product requirements)"
