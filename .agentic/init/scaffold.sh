@@ -81,6 +81,7 @@ echo "OK  : ensured directories docs/, docs/research/, docs/architecture/diagram
 
 copy_if_missing "${ROOT_DIR}/.agentic/init/STACK.template.md" "${ROOT_DIR}/STACK.md"
 copy_if_missing "${ROOT_DIR}/.agentic/init/CONTEXT_PACK.template.md" "${ROOT_DIR}/CONTEXT_PACK.md"
+copy_if_missing "${ROOT_DIR}/.agentic/init/PLAN.template.md" "${ROOT_DIR}/PLAN.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/JOURNAL.template.md" "${ROOT_DIR}/JOURNAL.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/HUMAN_NEEDED.template.md" "${ROOT_DIR}/HUMAN_NEEDED.md"
 
@@ -109,6 +110,7 @@ This repo uses the agentic framework located at `.agentic/`.
 ## Non-negotiables
 - Add/update tests for new or changed logic.
 - Keep `CONTEXT_PACK.md` current when architecture changes.
+- Keep `PLAN.md` up to date with decisions and completed capabilities.
 - Add to `HUMAN_NEEDED.md` when you are blocked.
 - Keep `JOURNAL.md` current (session summaries).
 - If this repo uses the Core+Product profile: keep `STATUS.md` and `/spec/*` truthful.
