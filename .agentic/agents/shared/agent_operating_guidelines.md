@@ -13,8 +13,10 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
   - `bash .agentic/tools/sync_docs.sh` (system docs scaffolding)
   - `bash .agentic/tools/retro_check.sh` (check if retrospective is due)
 - When the user asks to start/init the project, prefer to run the scripts yourself (with the user's consent) rather than asking them to run commands.
+- **Profile selection**: If initializing a new project, ask user to choose profile (Core or Core+Product). See `.agentic/init/scaffold.sh` for details.
 - If the user returns after a break, proactively propose a resume protocol:
-  - read `CONTEXT_PACK.md`, then `STATUS.md`, then `JOURNAL.md` (recent entries), then relevant feature acceptance docs.
+  - **If core profile**: Read `CONTEXT_PACK.md`, then `JOURNAL.md` (recent entries)
+  - **If core+product profile**: Read `CONTEXT_PACK.md`, then `STATUS.md`, then `JOURNAL.md` (recent entries), then relevant feature acceptance docs
 - **At session start, check for retrospective trigger**: If `STACK.md` has `retrospective_enabled: yes`, check if it's time for a project retrospective (see `.agentic/workflows/retrospective.md`). Suggest running one if threshold is met, but wait for human approval.
 - **Check quality validation setup**: If `STACK.md` has `quality_validation_enabled: yes`, ensure `quality_checks.sh` exists at repo root. If missing, offer to create it based on the tech stack (see `.agentic/workflows/continuous_quality_validation.md`).
 - **Check for active pipeline**: If `STACK.md` has `pipeline_enabled: yes`, check for active pipeline in `..agentic/pipeline/` (see `.agentic/workflows/automatic_sequential_pipeline.md`).
@@ -26,15 +28,15 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
   - Always present a summary of changes and ask for review before committing
   - Exception: If the user says "commit everything" or "auto-commit", you may proceed
   - See `.agentic/workflows/git_workflow.md` for commit protocols
-- **Follow the spec workflow**: treat `/spec/*`, `spec/adr/*`, `STATUS.md`, `STACK.md`, `CONTEXT_PACK.md` as authoritative.
-- **Keep feature truth current**: if you change a feature's behavior/status/tests, update `spec/FEATURES.md` and the relevant acceptance file(s).
-- **Keep NFR truth current**: if your change affects cross-cutting constraints (perf/security/realtime/reliability), update `spec/NFR.md` and link relevant NFR IDs from the feature(s).
 - **Tests are required** for new/changed logic.
   - If a feature needs acceptance/integration/perf tests (domain-specific), add them or record a concrete follow-up task.
 - **Keep the repo truthful**:
-  - update `STATUS.md` after meaningful progress
-  - update specs when behavior changes
-  - write ADRs for real tradeoffs
+  - Update `CONTEXT_PACK.md` when architecture changes (Core and Core+Product)
+  - Add to `HUMAN_NEEDED.md` when stuck (Core and Core+Product)
+  - Update `JOURNAL.md` with session summary (Core and Core+Product)
+  - **If core+product profile**: Also update `STATUS.md` after progress, update specs when behavior changes, write ADRs for tradeoffs
+  - **If core+product profile**: Keep `spec/FEATURES.md` current if you change a feature's behavior/status/tests
+  - **If core+product profile**: Keep `spec/NFR.md` current if change affects constraints
 
 ## Sequential Pipeline Mode (if enabled)
 
@@ -76,10 +78,60 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 - Do NOT proceed to next agent until resolved
 
 ## Before you edit code
-- **If pipeline mode enabled**: You've already loaded role-specific context. Proceed with your role's work.
-- **If pipeline mode disabled or not in pipeline**: Read (minimum): `CONTEXT_PACK.md`, `STATUS.md`, `spec/OVERVIEW.md`, `spec/FEATURES.md`.
+
+**First, check the profile** (from `STACK.md`):
+- Look for `Profile: core` or `Profile: core+product`
+- This determines what files exist and how you work
+
+### If Profile: core (minimal project tracking)
+
+**What exists**:
+- ✅ `STACK.md` - How to build/run
+- ✅ `CONTEXT_PACK.md` - Architecture overview
+- ✅ `JOURNAL.md` - Session history
+- ✅ `HUMAN_NEEDED.md` - Escalation protocol
+
+**What does NOT exist**:
+- ❌ `STATUS.md` - No project status/roadmap
+- ❌ `spec/` - No formal specs or feature tracking
+- ❌ Feature IDs (F-####) - No feature tracking system
+
+**How to work in Core mode**:
+1. **Ask user for direction**: "What should I work on?" (no STATUS.md to tell you)
+2. **Read context**: `CONTEXT_PACK.md` (understand architecture), `JOURNAL.md` (recent work)
+3. **Document as you go**: Update `CONTEXT_PACK.md` when architecture changes
+4. **Escalate when stuck**: Add to `HUMAN_NEEDED.md` with clear description
+5. **Session continuity**: Always update `JOURNAL.md` with progress summary
+6. **No feature tracking**: Work on what user asks, no F-#### IDs
+7. **Definition of done**: User approval (no formal acceptance criteria)
+
+**Core mode is good for**:
+- Small projects
+- Solo developers with clear vision
+- Exploratory work
+- Prototyping
+
+### If Profile: core+product (formal project tracking)
+
+**What exists** (everything from Core, plus):
+- ✅ `STATUS.md` - Project status, roadmap, "next up"
+- ✅ `spec/FEATURES.md` - Feature registry with IDs (F-####)
+- ✅ `spec/PRD.md`, `spec/TECH_SPEC.md`, `spec/NFR.md`
+- ✅ `spec/acceptance/F-####.md` - Acceptance criteria per feature
+
+**How to work in Core+Product mode**:
+1. **Read STATUS.md first**: Know what to work on, current focus
+2. **Load minimum context**: `CONTEXT_PACK.md`, `STATUS.md`, `spec/OVERVIEW.md`, `spec/FEATURES.md`
+3. **Feature-based work**: Pick feature from STATUS.md, read acceptance criteria
+4. **Track everything**: Update `spec/FEATURES.md` status, link code to features
+5. **Formal definition of done**: Acceptance criteria in `spec/acceptance/F-####.md`
+6. **Keep docs synced**: Update specs when behavior changes
+
+---
+
+- **If pipeline mode enabled and in pipeline**: Read `..agentic/pipeline/F-####-pipeline.md`, follow role-specific work (requires core+product profile)
 - **Check for human edits**: Human may have added features, updated priorities, or changed specs directly. Honor those changes.
-- **Follow the spec schema**: All spec edits must conform to `.agentic/spec/SPEC_SCHEMA.md` (valid status values, field formats, cross-reference conventions).
+- **Follow the spec schema** (if core+product): All spec edits must conform to `.agentic/spec/SPEC_SCHEMA.md`
 - **Check development mode**: Read `STACK.md` for `development_mode` field:
   - If `development_mode: tdd` (RECOMMENDED) → Follow `.agentic/workflows/tdd_mode.md` (write tests FIRST)
   - If `development_mode: standard` → Follow `.agentic/workflows/dev_loop.md` (tests required but not necessarily first)
