@@ -99,6 +99,13 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 ## While implementing
 - Keep diffs small and incremental.
 - Prefer seams and boundaries that enable unit tests.
+- **Follow programming standards** (`agentic/quality/programming_standards.md`):
+  - Clear, descriptive names (no cryptic abbreviations)
+  - Small, focused functions (<50 lines ideal)
+  - Explicit error handling (fail fast, specific error types)
+  - Avoid magic numbers (use named constants)
+  - Avoid deep nesting (<4 levels)
+  - Organize imports properly
 - Avoid speculative changes outside the task scope.
 - **Before using any library/framework API**:
   1. Verify version in `STACK.md`
@@ -112,8 +119,11 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 
 ## After implementing
 - Run the relevant tests (or describe what would be run and why you couldn't).
+- **Run formatter/linter** (if configured in STACK.md): ESLint, Prettier, black, ruff, gofmt, etc.
 - **Run quality checks** (if configured): `bash quality_checks.sh --pre-commit` (see `agentic/workflows/continuous_quality_validation.md`)
-- Self-review using `agentic/quality/review_checklist.md`.
+- **Self-review using**:
+  - `agentic/quality/review_checklist.md` (general review)
+  - `agentic/quality/programming_standards.md` checklist (code quality)
 - **MANDATORY: Sync documentation** (see Documentation Sync Rule below).
 - Append a session summary to `JOURNAL.md` (especially for long sessions or before context might reset).
 - If mid-session and context is about to reset, update `STATUS.md` "Current session state" section with precise next steps.

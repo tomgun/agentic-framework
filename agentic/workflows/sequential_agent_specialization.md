@@ -234,10 +234,15 @@ Done ✅
 **Responsibilities**:
 1. Write **failing tests** for EACH acceptance criterion (AC1 → test1, AC2 → test2, etc.)
 2. Ensure tests cover all ACs comprehensively
-3. Add `@feature F-####` annotations to test files
-4. Add `@acceptance AC#` annotations to specific tests
-5. Run tests - verify they FAIL (red phase)
-6. Document test coverage in `FEATURES.md`
+3. Follow test quality standards:
+   - Descriptive test names (`should reject passwords shorter than 8 characters`)
+   - Clear assertions (one behavior per test)
+   - Deterministic (no flaky tests)
+   - Use test data factories/fixtures (see `test_strategy.md`)
+4. Add `@feature F-####` annotations to test files
+5. Add `@acceptance AC#` annotations to specific tests
+6. Run tests - verify they FAIL (red phase)
+7. Document test coverage in `FEATURES.md`
 
 **Outputs**:
 - Test files (unit, integration, E2E)
@@ -303,12 +308,21 @@ Done ✅
 
 **Responsibilities**:
 1. Implement feature to make tests pass (TDD) OR meet acceptance criteria (non-TDD)
-2. Add `@feature F-####` annotations to code
-3. Add `@acceptance AC#` annotations linking to specific criteria
-4. Add `@nfr NFR-####` if implementing NFR requirements
-5. Keep changes focused (no scope creep)
-6. Run tests **frequently** (TDD: red → green cycle)
-7. Refactor if needed (while keeping tests green)
+2. Follow programming standards (see `agentic/quality/programming_standards.md`):
+   - Clear, descriptive names (no cryptic abbreviations)
+   - Small, focused functions (<50 lines ideal)
+   - Handle errors explicitly (fail fast, specific error types)
+   - No magic numbers (use named constants)
+   - Avoid deep nesting (<4 levels)
+   - Organize imports properly
+3. Add `@feature F-####` annotations to code
+4. Add `@acceptance AC#` annotations linking to specific criteria
+5. Add `@nfr NFR-####` if implementing NFR requirements
+6. Keep changes focused (no scope creep)
+7. Run tests **frequently** (TDD: red → green cycle)
+8. Refactor if needed (while keeping tests green)
+9. Format code using project linter/formatter
+10. Review own code against `programming_standards.md` checklist before handoff
 
 **Outputs**:
 - Implementation code
@@ -471,15 +485,28 @@ Done ✅
 
 **Responsibilities**:
 1. Verify **ALL** acceptance criteria met (AC1, AC2, ..., ACN)
-2. Check code quality:
-   - Clean (readable, well-named)
-   - Testable (pure functions, dependency injection)
-   - Maintainable (no duplication, clear structure)
-3. Verify test coverage (`coverage.py`)
+2. Check code quality against `programming_standards.md`:
+   - **Naming**: Clear, descriptive (not cryptic)
+   - **Functions**: Small (<50 lines), focused, single purpose
+   - **Error handling**: Explicit, specific error types
+   - **No magic numbers**: Constants are named
+   - **No deep nesting**: <4 levels
+   - **No duplication**: DRY principle followed
+   - **Type safety**: TypeScript types, Python hints present
+   - **Organization**: Imports organized, no unused imports
+3. Verify test coverage (`coverage.py`):
+   - Unit tests: >80% ideal
+   - Integration tests: Key boundaries covered
+   - E2E tests: Critical flows covered
 4. Check code annotations (`@feature`, `@acceptance`, `@nfr`)
 5. Run quality checks (`quality_checks.sh --pre-commit`)
-6. Security review (if applicable)
-7. Performance check (if NFRs specify)
+6. Security review (if applicable):
+   - Input validation present
+   - No secrets in code
+   - Sensitive data handled properly
+7. Performance check (if NFRs specify):
+   - No obvious hot paths
+   - Resource usage reasonable
 8. Identify tech debt or refactoring opportunities
 9. **Approve** OR **request changes**
 
