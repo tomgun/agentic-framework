@@ -27,7 +27,7 @@
 
 ```bash
 # Download latest release
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
 
 # Extract just the agentic folder
 cp -r agentic-framework-0.1.0/agentic ./

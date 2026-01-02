@@ -100,7 +100,7 @@ See [`.agentic/workflows/tdd_mode.md`](workflows/tdd_mode.md) for complete TDD g
 
 **Download latest release:**
 ```bash
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
 cp -r agentic-framework-0.1.0/agentic ./
 ```
 
@@ -138,7 +138,7 @@ If you're using multiple assistants (Cursor + Copilot + Claude), the agent can a
 ```bash
 # Download new version (to temp location)
 cd /tmp
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 
 # Run upgrade tool FROM the new framework, pointing to your project
 bash /tmp/agentic-framework-0.2.0/.agentic/tools/upgrade.sh /path/to/your-project

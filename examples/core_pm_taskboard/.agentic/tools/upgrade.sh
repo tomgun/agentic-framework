@@ -247,7 +247,7 @@ else
   echo "Project: $TARGET_PROJECT_DIR"
   echo ""
   echo "Next steps:"
-  echo "  1. Review CHANGELOG: https://github.com/YOUR_USERNAME/agentic-framework/blob/v$NEW_VERSION/CHANGELOG.md"
+  echo "  1. Review CHANGELOG: https://github.com/tomgun/agentic-framework/blob/v$NEW_VERSION/CHANGELOG.md"
   echo "  2. Test your workflow: bash .agentic/tools/dashboard.sh"
   echo "  3. Run quality checks: bash quality_checks.sh --pre-commit (if configured)"
   echo "  4. Tell your agent: 'The framework was upgraded to v$NEW_VERSION. Review any new features or changes.'"

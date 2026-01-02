@@ -110,7 +110,7 @@ MAJOR.MINOR.PATCH
 2. **Test installation**
    ```bash
    # Download latest release
-   curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+   curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
    
    # Verify structure
    ls agentic-framework-0.2.0/agentic
