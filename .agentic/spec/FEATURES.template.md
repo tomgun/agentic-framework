@@ -12,26 +12,25 @@ Purpose: a **human + machine** readable registry of features with stable IDs, st
 - `planned` | `in_progress` | `shipped` | `deprecated`
 
 ## How to reference
-- Feature IDs: `F-0001`, `F-0002`, …
+- Feature IDs: `F-####`, …
 - Requirement IDs (optional, from PRD): `R-0001`, …
-- NFR IDs (optional): `NFR-0001`, …
+- NFR IDs (optional): `NFR-####`, …
 - Task IDs (optional): `T-0001`, …
 
 ## Feature index (optional)
-- F-0001:
-- F-0002:
+- F-####:
 
 ---
 
-## F-0001: ExampleFeatureName
-- Parent: none  <!-- or F-0000 for hierarchy -->
-- Dependencies: none  <!-- Features that must be complete/partial first: F-0002 (complete), F-0003 (partial OK) -->
+## F-####: ExampleFeatureName
+- Parent: none  <!-- or another feature ID -->
+- Dependencies: none  <!-- Features that must be complete/partial first -->
 - Complexity: M  <!-- S | M | L | XL (optional, for prioritization) -->
 - Status: planned
 - PRD: spec/PRD.md#requirements
 - Requirements: R-0001
 - NFRs: none  <!-- optional; list NFR-#### only if the feature has specific constraints -->
-- Acceptance: spec/acceptance/F-0001.md
+- Acceptance: spec/acceptance/F-####.md
 - Verification:
   - Accepted: no       <!-- no | yes -->
   - Accepted at:       <!-- YYYY-MM-DD (optional) -->

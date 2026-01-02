@@ -33,8 +33,8 @@ Purpose: define *why* we’re building this and *what* success means.
 ## Feature mapping (IDs)
 - Feature registry: `spec/FEATURES.md`
 - Map requirements to features:
-  - R-0001 -> F-0001
-  - R-0002 -> F-0002
+  - R-0001 -> F-####
+  - R-0002 -> F-####
 
 ## Risks & open questions
 - Risk:

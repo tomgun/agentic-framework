@@ -26,8 +26,13 @@ if [[ ! -d ".agentic" ]]; then
   exit 1
 fi
 
-# Check current profile
-CURRENT_PROFILE=$(grep -E "^\s*-?\s*Profile:" STACK.md | head -1 | sed -E 's/.*Profile:\s*([a-z+]+).*/\1/' || echo "unknown")
+# Check current profile (no PCRE, portable)
+CURRENT_PROFILE=$(
+  grep -E '^[[:space:]]*-[[:space:]]*Profile:' STACK.md 2>/dev/null \
+    | head -1 \
+    | sed -E 's/.*Profile:[[:space:]]*([^[:space:]]+).*/\1/' \
+    || echo "unknown"
+)
 
 if [[ "$CURRENT_PROFILE" == "core+product" ]]; then
   echo -e "${YELLOW}⚠ Product Management features are already enabled!${NC}"
@@ -38,6 +43,22 @@ fi
 
 echo -e "${BLUE}Current profile: $CURRENT_PROFILE${NC}"
 echo ""
+
+# Ensure Core artifacts exist (some projects may have been initialized before Core profile was defined)
+if [[ ! -f "CONTEXT_PACK.md" && -f ".agentic/init/CONTEXT_PACK.template.md" ]]; then
+  cp ".agentic/init/CONTEXT_PACK.template.md" "CONTEXT_PACK.md"
+  echo -e "${GREEN}✓ Created CONTEXT_PACK.md (Core)${NC}"
+fi
+
+if [[ ! -f "JOURNAL.md" && -f ".agentic/spec/JOURNAL.template.md" ]]; then
+  cp ".agentic/spec/JOURNAL.template.md" "JOURNAL.md"
+  echo -e "${GREEN}✓ Created JOURNAL.md (Core)${NC}"
+fi
+
+if [[ ! -f "HUMAN_NEEDED.md" && -f ".agentic/spec/HUMAN_NEEDED.template.md" ]]; then
+  cp ".agentic/spec/HUMAN_NEEDED.template.md" "HUMAN_NEEDED.md"
+  echo -e "${GREEN}✓ Created HUMAN_NEEDED.md (Core)${NC}"
+fi
 echo "What I'll create:"
 echo "  ✓ spec/ directory with templates (PRD, TECH_SPEC, FEATURES, NFR)"
 echo "  ✓ STATUS.md (project status and roadmap)"
@@ -94,14 +115,15 @@ fi
 
 # Note: CONTEXT_PACK.md and HUMAN_NEEDED.md should already exist from Core profile
 
-# Update STACK.md profile
-if grep -qE "^\s*-?\s*Profile:\s*core\s*$" STACK.md; then
-  sed -i.bak -E "s/(^\s*-?\s*Profile:\s*)core\s*$/\1core+product  # Updated: $(date +%Y-%m-%d)/" STACK.md
+# Update STACK.md profile (portable; tolerate comments)
+if grep -qE '^[[:space:]]*-[[:space:]]*Profile:' STACK.md; then
+  sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*Profile:[[:space:]]*).*/\\1core+product  # Updated: $(date +%Y-%m-%d)/" STACK.md
   rm STACK.md.bak 2>/dev/null || true
-  echo -e "${GREEN}✓ Updated STACK.md (profile: core → core+product)${NC}"
+  echo -e "${GREEN}✓ Updated STACK.md (Profile: core+product)${NC}"
 else
-  echo -e "${YELLOW}⚠ Could not update STACK.md automatically${NC}"
-  echo "  Please manually change 'Profile: core' to 'Profile: core+product'"
+  # Insert Profile line after Version line in "## Agentic framework"
+  perl -0777 -i -pe "s/(## Agentic framework\\n- Version:[^\\n]*\\n)/\\1- Profile: core+product  \\# Updated: $(date +%Y-%m-%d)\\n/" STACK.md || true
+  echo -e "${GREEN}✓ Updated STACK.md (added Profile: core+product)${NC}"
 fi
 
 echo ""

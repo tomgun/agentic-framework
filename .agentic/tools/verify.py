@@ -14,6 +14,41 @@ NFR_ID_RE = re.compile(r"\b(NFR-\d{4})\b")
 ADR_ID_RE = re.compile(r"\b(ADR-\d{4})\b")
 
 
+def read_profile(root: Path) -> str:
+    """
+    Determine profile.
+
+    - Prefer explicit `Profile:` in STACK.md.
+    - If not present, infer:
+      - If spec/ exists OR STATUS.md exists -> core+product (legacy default)
+      - else -> core
+    """
+    stack = root / "STACK.md"
+    if stack.exists():
+        try:
+            md = stack.read_text(encoding="utf-8")
+            m = re.search(r"(?m)^\s*-\s*Profile:\s*([a-z+_-]+)\s*$", md)
+            if m:
+                val = m.group(1).strip()
+                if val in {"core", "core+product"}:
+                    return val
+        except Exception:
+            pass
+
+    if (root / "spec").is_dir() or (root / "STATUS.md").is_file():
+        return "core+product"
+    return "core"
+
+
+def core_checks(root: Path) -> list[str]:
+    required = ["STACK.md", "CONTEXT_PACK.md", "JOURNAL.md", "HUMAN_NEEDED.md", "AGENTS.md"]
+    issues: list[str] = []
+    for p in required:
+        if not (root / p).exists():
+            issues.append(f"Missing {p} (run: bash .agentic/init/scaffold.sh --profile core)")
+    return issues
+
+
 def find_broken_links(root: Path) -> list[str]:
     """Find broken cross-references in spec files."""
     issues = []
@@ -157,9 +192,22 @@ def read_test_command(root: Path) -> str | None:
 
 def main() -> int:
     root = Path.cwd()
+    profile = read_profile(root)
     all_issues = []
     
     print("=== agentic verify ===\n")
+    print(f"Profile: {profile}\n")
+
+    if profile == "core":
+        print("Core profile: skipping Product Management validations (spec/ + STATUS.md).\n")
+        core_issues = core_checks(root)
+        if core_issues:
+            print(f"Found {len(core_issues)} issue(s):")
+            for issue in core_issues:
+                print(f"  - {issue}")
+            return 1
+        print("✓ Core checks passed")
+        return 0
     
     # Check for broken cross-references
     print("Checking cross-references...")

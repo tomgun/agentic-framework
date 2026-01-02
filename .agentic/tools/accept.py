@@ -106,8 +106,9 @@ def main() -> int:
     stack_path = repo_root / "STACK.md"
     
     if not features_path.exists():
-        print("Error: spec/FEATURES.md not found")
-        return 1
+        print("Product Management not enabled (spec/FEATURES.md missing).")
+        print("Enable it with: bash .agentic/tools/enable-product-management.sh")
+        return 0
     
     features_md = features_path.read_text(encoding="utf-8")
     

@@ -31,7 +31,7 @@ Purpose: one place to understand the **vision**, **current state**, and **where 
 ## Feature registry (source of truth)
 - Read: `spec/FEATURES.md`
 - Each feature has:
-  - a stable ID (e.g. `F-0001`)
+  - a stable ID (e.g. `F-####`)
   - status (planned/in_progress/shipped/deprecated)
   - acceptance criteria location
   - test coverage notes
