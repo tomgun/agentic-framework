@@ -21,10 +21,10 @@ The Agentic Framework enables **sustainable long-term software development with 
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 cd agentic-framework-0.2.0
 
-# Install into your project
+# Install into your project (interactive)
 bash install.sh /path/to/your-project
 
-# Or specify profile directly
+# Or specify profile for non-interactive install
 bash install.sh /path/to/your-project core
 bash install.sh /path/to/your-project core+product
 ```
@@ -34,6 +34,8 @@ The install script will:
 2. Run scaffold script (prompts for project details)
 3. Update `STACK.md` with framework version and install date
 4. Show next steps
+
+**✅ After this, your project is fully initialized. Just start working with your agent!**
 
 ### Option 2: Manual copy
 
@@ -110,19 +112,23 @@ bash .agentic/init/scaffold.sh
 
 ### Agent-driven initialization
 
-After installing (see Installation section above), open your AI agent and say:
+After installing (see Installation section above):
 
-> "Initialize this project using the agentic framework."
+**If you used `install.sh`**: Framework is already initialized. Skip to "Quick Start" below.
+
+**If you copied `.agentic/` manually**: Open your AI agent and say:
+
+> "Read `.agentic/AGENTS.md` and initialize this project by running `.agentic/init/scaffold.sh`"
 
 The agent will:
-1. Run `.agentic/init/scaffold.sh` (if not already done by install script)
-2. Ask you questions about your project (what, why, tech stack)
+1. Run `.agentic/init/scaffold.sh` to create project files
+2. Ask you questions about your project (what, why, tech stack, profile)
 3. Create all necessary files (`STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md`, etc.)
 4. Set up your chosen profile (Core or Core+PM)
 
 **You're ready!** The agent can now help you build.
 
-**New to the framework?** → Read [`.agentic/START_HERE.md`](.agentic/START_HERE.md)
+**New to the framework?** → Read [`.agentic/START_HERE.md`](.agentic/START_HERE.md) or tell your agent: *"Read `.agentic/START_HERE.md` and explain how to use this framework"*
 
 ### Upgrading existing projects
 
