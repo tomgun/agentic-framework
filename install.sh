@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh: Install the Agentic Framework into a new or existing project
+# install.sh: Install the Agentic AI Framework into a new or existing project
 # Usage: bash install.sh /path/to/your-project
 set -euo pipefail
 
@@ -16,7 +16,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_VERSION=""
 
 echo "╔════════════════════════════════════════════════════════════════╗"
-echo "║         AGENTIC FRAMEWORK INSTALLATION TOOL                    ║"
+echo "║       AGENTIC AI FRAMEWORK INSTALLATION TOOL                   ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 echo ""
 

@@ -1,12 +1,14 @@
-# Agentic Framework
+# Agentic AI Framework
 
 **Portable, token-efficient, test-driven framework for AI-assisted software development.**
+
+*Shortname: Agentic AF*
 
 **Current version:** [v0.2.1](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.1)
 
 ## What is this?
 
-The Agentic Framework enables **sustainable long-term software development with AI agents**. It provides structure, conventions, and tooling that keep both humans and AI agents aligned as projects evolve from prototypes to production systems.
+The Agentic AI Framework enables **sustainable long-term software development with AI agents**. It provides structure, conventions, and tooling that keep both humans and AI agents aligned as projects evolve from prototypes to production systems.
 
 **Two profiles available:**
 - **Core**: Quality standards, workflows, multi-agent coordination (minimal ceremony)

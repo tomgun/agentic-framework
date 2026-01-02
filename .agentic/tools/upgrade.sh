@@ -18,7 +18,7 @@ BACKUP_DIR="agentic-backup-$(date +%Y%m%d-%H%M%S)"
 DRY_RUN="${DRY_RUN:-no}"
 
 echo "╔════════════════════════════════════════════════════════════════╗"
-echo "║            AGENTIC FRAMEWORK UPGRADE TOOL                      ║"
+echo "║          AGENTIC AI FRAMEWORK UPGRADE TOOL                     ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 echo ""
 
