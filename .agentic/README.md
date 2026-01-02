@@ -100,54 +100,75 @@ See [`.agentic/workflows/tdd_mode.md`](workflows/tdd_mode.md) for complete TDD g
 
 ## Quick start (new repo)
 
-**Download latest release:**
+**Install using automated script (recommended):**
+
 ```bash
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
-cp -r agentic-framework-0.1.0/agentic ./
+# Download latest release
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
+cd agentic-framework-0.2.1
+
+# Install into your project
+bash install.sh /path/to/your-project
+```
+
+**Or manual installation:**
+
+```bash
+# Download and extract
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
+
+# Copy .agentic/ into your project
+cp -r agentic-framework-0.2.1/.agentic /path/to/your-project/
 ```
 
 **Initialize:**
 
-1. Copy the **folder** `.agentic/` into your repo root (don't copy its contents into the root; keep the folder so links stay consistent).
-2. Tell your agent:
+Tell your agent:
 
-   > "Initialize this project using the agentic framework."
+> "Read `.agentic/init/init_playbook.md` and help me initialize this project."
 
 **That's it!** The agent will:
-- Run the scaffold script to create all files and folders
-- Ask you questions about your project (what are you building, tech stack, etc.)
-- Fill in `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, and specs
-- Set you up to start development
+- Ask what you're building
+- Ask which profile you want (Core or Core+PM) and explain the differences
+- Interview you about your tech stack and requirements
+- Fill in `STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
+- Set up quality validation for your stack
 
 The agent follows `.agentic/init/init_playbook.md` which guides it through the entire initialization process.
 
 ### What the agent does (you don't need to do this):
 
-The agent will automatically:
-1. **Run scaffold**: `bash .agentic/init/scaffold.sh` (creates all files/folders)
-2. **Ask questions**: What are you building? What tech stack? etc.
-3. **Fill in docs**: `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, specs
-4. **Set up quality checks**: If applicable, create `quality_checks.sh` for your stack
-5. **Configure Git workflow**: Ask if you want PR mode or direct commits
+If you used `install.sh`, templates are already created. Otherwise, the agent will:
+1. **Run scaffold**: `bash .agentic/init/scaffold.sh` (creates all template files)
+2. **Ask about profile**: Explain Core vs Core+PM and help you choose
+3. **Ask questions**: What are you building? What tech stack? Performance constraints? etc.
+4. **Fill in docs**: `STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
+5. **Set up quality checks**: Create stack-specific `quality_checks.sh` if applicable
 6. **Ready to develop**: You're ready to start building
 
-If you're using multiple assistants (Cursor + Copilot + Claude), the agent can also set up entry points from `.agentic/agents/installation.md`.
+If you're using multiple assistants (Cursor + Copilot + Claude), refer to `.agentic/AGENTS.md` for the agent entry point.
 
 ## Upgrading the Framework
 
-**To upgrade to a newer version of the framework:**
+**To upgrade to a newer version:**
 
 ```bash
-# Download new version (to temp location)
-cd /tmp
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+# Download new version
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
+cd agentic-framework-0.2.1
 
 # Run upgrade tool FROM the new framework, pointing to your project
-bash /tmp/agentic-framework-0.2.0/.agentic/tools/upgrade.sh /path/to/your-project
-
-# Clean up
-rm -rf /tmp/agentic-framework-0.2.0
+bash .agentic/tools/upgrade.sh /path/to/your-project
 ```
+
+The upgrade script will:
+- Backup your existing `.agentic/` folder
+- Copy new framework files
+- Preserve your customizations
+- Update version in `STACK.md`
+- Run validation
+
+See [`UPGRADING.md`](../UPGRADING.md) for detailed instructions.
 
 **Important**: Always run the upgrade script **from the NEW framework** (not your old one), as it contains the latest upgrade logic and bug fixes.
 
