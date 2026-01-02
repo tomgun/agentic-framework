@@ -22,6 +22,14 @@ echo "║            AGENTIC FRAMEWORK UPGRADE TOOL                      ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 echo ""
 
+# Read new framework version
+FRAMEWORK_VERSION=""
+if [[ -f "$NEW_FRAMEWORK_DIR/VERSION" ]]; then
+  FRAMEWORK_VERSION=$(cat "$NEW_FRAMEWORK_DIR/VERSION" | tr -d '[:space:]')
+  echo "New framework version: $FRAMEWORK_VERSION"
+  echo ""
+fi
+
 # Step 1: Pre-flight checks
 echo -e "${BLUE}[1/7] Pre-flight checks${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -232,6 +240,28 @@ fi
 
 echo ""
 
+# Step 7: Update STACK.md with new version
+echo -e "${BLUE}[7/7] Updating STACK.md with new framework version${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+if [[ -n "$FRAMEWORK_VERSION" && -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+  if grep -q "^- Version:" "$TARGET_PROJECT_DIR/STACK.md"; then
+    # macOS and Linux compatible sed
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      sed -i '' "s/^- Version: .*$/- Version: $FRAMEWORK_VERSION/" "$TARGET_PROJECT_DIR/STACK.md"
+    else
+      sed -i "s/^- Version: .*$/- Version: $FRAMEWORK_VERSION/" "$TARGET_PROJECT_DIR/STACK.md"
+    fi
+    echo -e "  ${GREEN}✓${NC} Updated STACK.md version to $FRAMEWORK_VERSION"
+  else
+    echo -e "  ${YELLOW}⚠ Version field not found in STACK.md${NC}"
+  fi
+else
+  echo -e "  ${YELLOW}⚠ Could not update version (STACK.md not found or version unknown)${NC}"
+fi
+
+echo ""
+
 # Summary
 echo "╔════════════════════════════════════════════════════════════════╗"
 echo "║                    UPGRADE COMPLETE                            ║"
@@ -242,18 +272,22 @@ if [[ "$DRY_RUN" == "yes" ]]; then
   echo -e "${YELLOW}This was a DRY RUN. No changes were made.${NC}"
   echo "To perform the actual upgrade, run without DRY_RUN=yes"
 else
-  echo -e "${GREEN}✓ Framework upgraded from $CURRENT_VERSION to $NEW_VERSION${NC}"
+  if [[ -n "$FRAMEWORK_VERSION" ]]; then
+    echo -e "${GREEN}✓ Framework upgraded to version $FRAMEWORK_VERSION${NC}"
+  else
+    echo -e "${GREEN}✓ Framework upgraded${NC}"
+  fi
   echo ""
   echo "Project: $TARGET_PROJECT_DIR"
   echo ""
   echo "Next steps:"
-  echo "  1. Review CHANGELOG: https://github.com/YOUR_USERNAME/agentic-framework/blob/v$NEW_VERSION/CHANGELOG.md"
+  echo "  1. Review CHANGELOG: https://github.com/tomgun/agentic-framework/blob/v$FRAMEWORK_VERSION/CHANGELOG.md"
   echo "  2. Test your workflow: bash .agentic/tools/dashboard.sh"
   echo "  3. Run quality checks: bash quality_checks.sh --pre-commit (if configured)"
-  echo "  4. Tell your agent: 'The framework was upgraded to v$NEW_VERSION. Review any new features or changes.'"
+  echo "  4. Tell your agent: 'The framework was upgraded to v$FRAMEWORK_VERSION. Review any new features or changes.'"
   echo ""
   echo "If issues occur:"
-  echo "  Rollback: rm -rf agentic && mv $BACKUP_DIR agentic"
+  echo "  Rollback: rm -rf .agentic && mv $BACKUP_DIR .agentic"
   echo "  Docs: See UPGRADING.md for troubleshooting"
   echo ""
   echo "Backup location: $TARGET_PROJECT_DIR/$BACKUP_DIR"

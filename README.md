@@ -2,13 +2,54 @@
 
 **Portable, token-efficient, test-driven framework for AI-assisted software development.**
 
-**Current version:** [v0.1.0](https://github.com/YOUR_USERNAME/agentic-framework/releases/tag/v0.1.0)
+**Current version:** [v0.2.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.0)
 
 ## What is this?
 
 The Agentic Framework enables **sustainable long-term software development with AI agents**. It provides structure, conventions, and tooling that keep both humans and AI agents aligned as projects evolve from prototypes to production systems.
 
-Download the latest release and extract the `.agentic/` folder into your project to adopt the framework.
+**Two profiles available:**
+- **Core**: Quality standards, workflows, multi-agent coordination (minimal ceremony)
+- **Core + Product Management**: Adds formal specs, feature tracking, project metrics (for complex projects)
+
+## Installation
+
+### Option 1: Automated install (Recommended)
+
+```bash
+# Download latest release
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+cd agentic-framework-0.2.0
+
+# Install into your project
+bash install.sh /path/to/your-project
+
+# Or specify profile directly
+bash install.sh /path/to/your-project core
+bash install.sh /path/to/your-project core+product
+```
+
+The install script will:
+1. Copy `.agentic/` folder with correct version number
+2. Run scaffold script (prompts for project details)
+3. Update `STACK.md` with framework version and install date
+4. Show next steps
+
+### Option 2: Manual copy
+
+```bash
+# Download and extract
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+
+# Copy .agentic/ into your project
+cp -r agentic-framework-0.2.0/.agentic /path/to/your-project/
+
+# Initialize (agent will run this)
+cd /path/to/your-project
+bash .agentic/init/scaffold.sh
+```
+
+**Note**: With manual copy, you need to update the version in `STACK.md` manually.
 
 ## Design Principles
 
@@ -67,57 +108,50 @@ Download the latest release and extract the `.agentic/` folder into your project
 
 ## Quick Start
 
-### For new projects
+### Agent-driven initialization
 
-**Step 1:** Download the latest release
-
-```bash
-# Download and extract latest release
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
-
-# Or download specific version
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/vX.Y.Z.tar.gz | tar xz
-```
-
-**Step 2:** Copy framework into your repo
-
-```bash
-# From your project root
-cp -r agentic-framework-0.1.0/agentic ./
-
-# Clean up
-rm -rf agentic-framework-0.1.0
-```
-
-**Step 3:** Tell your agent to initialize
-
-Open your AI agent (Cursor/Copilot/Claude) and say:
+After installing (see Installation section above), open your AI agent and say:
 
 > "Initialize this project using the agentic framework."
 
 The agent will:
-1. Run the scaffold script to create all files/folders
+1. Run `.agentic/init/scaffold.sh` (if not already done by install script)
 2. Ask you questions about your project (what, why, tech stack)
-3. Fill in `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, and `spec/`
-4. Set up quality checks and Git workflow
-5. You're ready to develop!
+3. Create all necessary files (`STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md`, etc.)
+4. Set up your chosen profile (Core or Core+PM)
 
-**You don't need to run any scripts manually** - the agent does everything.
+**You're ready!** The agent can now help you build.
 
 **New to the framework?** → Read [`.agentic/START_HERE.md`](.agentic/START_HERE.md)
 
-### Latest version
+### Upgrading existing projects
 
-**Current release:** [v0.1.0](https://github.com/YOUR_USERNAME/agentic-framework/releases/tag/v0.1.0) (2026-01-02)
+```bash
+# Download new version
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+cd agentic-framework-0.2.0
 
-See [CHANGELOG.md](CHANGELOG.md) for version history and [RELEASING.md](RELEASING.md) for how to create releases.
+# Run upgrade script with your project path
+bash .agentic/tools/upgrade.sh /path/to/your-project
+```
+
+The upgrade script will:
+- Backup your existing `.agentic/` folder
+- Copy new framework files
+- Preserve your customizations
+- Update version in `STACK.md`
+- Run validation
+
+See `UPGRADING.md` for detailed instructions.
 
 ### For evaluating the framework
 
 - **Full documentation**: [`.agentic/README.md`](.agentic/README.md)
 - **Quick tour**: [`.agentic/START_HERE.md`](.agentic/START_HERE.md)
 - **Visual guide**: [`.agentic/FRAMEWORK_MAP.md`](.agentic/FRAMEWORK_MAP.md)
-- **Working example**: [`examples/inited_project/`](examples/inited_project/) (Next.js Todo app)
+- **Example projects**: [`examples/`](examples/) (Core and Core+PM modes)
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## What You Get
 
