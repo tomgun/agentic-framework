@@ -1,6 +1,6 @@
-# PLAN.md
+# PRODUCT.md
 
-Purpose: lightweight plan for what we're building. No ceremony, no IDs, just shared context for humans + agents.
+Purpose: what we're building, what's done, and what's next. No ceremony, no IDs, just shared context for humans + agents.
 
 ## What we're building
 <!-- 1-3 paragraphs: concrete description of the product/project -->
