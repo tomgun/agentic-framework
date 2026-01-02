@@ -26,7 +26,26 @@ const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 if (user && user.loginAttempts > MAX_LOGIN_ATTEMPTS && !user.isDeleted) { ... }
 ```
 
-### 2. Small & Focused
+### 2. Security First
+- **Validate all external input** (user input, API calls, file reads)
+- **Never trust data** from untrusted sources
+- **Sanitize output** (prevent XSS, injection attacks)
+- **Protect secrets** (no hardcoded credentials, use environment variables)
+- **Follow principle of least privilege** (minimal permissions)
+
+See [Security Best Practices](#security-best-practices) section for details.
+
+### 3. Efficiency When Measured
+- **Make it work, make it right, then make it fast** (in that order)
+- **Profile before optimizing** (don't guess)
+- **Optimize hot paths** (where data shows bottlenecks)
+- **Green coding**: Energy efficiency matters, but clarity comes first
+  - Caching reduces compute, but adds complexity
+  - Choose simple solutions first, optimize when needed
+
+See [Performance & Efficiency](#performance--efficiency) section for details.
+
+### 4. Small & Focused
 - **Functions**: One clear purpose, ~5-20 lines ideal
 - **Classes**: Single responsibility, ~100-300 lines ideal
 - **Files**: Related functionality, ~200-500 lines ideal
@@ -46,13 +65,13 @@ function sendWelcomeEmail(user): Promise<void> { ... }
 function saveUserToDatabase(user): Promise<void> { ... }
 ```
 
-### 3. Testability First
+### 5. Testability First
 - **Design code to be testable** (see `design_for_testability.md`)
 - Inject dependencies (don't use globals/singletons)
 - Separate pure logic from side effects
 - Small functions are easier to test
 
-### 4. Self-Documenting Code
+### 6. Self-Documenting Code
 - Good names eliminate need for comments
 - Comments explain **why**, not **what**
 - Code structure reveals intent
@@ -72,6 +91,503 @@ function getUserById(userId: string): Promise<User> {
   return db.query('SELECT * FROM users WHERE id = ?', [userId]);
 }
 ```
+
+---
+
+## Security Best Practices
+
+### Input Validation (CRITICAL)
+
+**Validate all external input immediately**:
+
+```typescript
+// Web API endpoint
+function createUser(req: Request): Response {
+  // Validate FIRST
+  if (!req.body.email || !isValidEmail(req.body.email)) {
+    throw new ValidationError('Invalid email');
+  }
+  if (!req.body.password || req.body.password.length < 8) {
+    throw new ValidationError('Password must be at least 8 characters');
+  }
+  
+  // Sanitize
+  const email = sanitizeEmail(req.body.email);
+  const name = sanitizeHtml(req.body.name); // Remove potential XSS
+  
+  // Then proceed
+  return userService.createUser({ email, name, password: req.body.password });
+}
+```
+
+**Validation rules**:
+- **Whitelist over blacklist**: Define what's allowed, not what's forbidden
+- **Type checking**: Ensure data types are correct
+- **Range checking**: Verify numbers are in valid ranges
+- **Format validation**: Use regex for emails, phone numbers, etc. (but carefully - avoid ReDoS)
+- **Length limits**: Prevent buffer overflows, DoS attacks
+
+### SQL Injection Prevention
+
+**ALWAYS use parameterized queries** (never string concatenation):
+
+```typescript
+// ❌ BAD - SQL Injection vulnerable
+function getUserByEmail(email: string) {
+  return db.query(`SELECT * FROM users WHERE email = '${email}'`);
+  // Attacker can send: ' OR '1'='1' --
+}
+
+// ✅ GOOD - Parameterized query
+function getUserByEmail(email: string) {
+  return db.query('SELECT * FROM users WHERE email = ?', [email]);
+  // Driver escapes the parameter safely
+}
+```
+
+### XSS (Cross-Site Scripting) Prevention
+
+**Sanitize all user-generated content before displaying**:
+
+```typescript
+import DOMPurify from 'dompurify';
+
+// ❌ BAD - XSS vulnerable
+function displayUserComment(comment: string) {
+  document.getElementById('comment').innerHTML = comment;
+  // Attacker can send: <script>stealCookies()</script>
+}
+
+// ✅ GOOD - Sanitized
+function displayUserComment(comment: string) {
+  const sanitized = DOMPurify.sanitize(comment);
+  document.getElementById('comment').innerHTML = sanitized;
+}
+
+// Even better: Use textContent for plain text
+function displayUserComment(comment: string) {
+  document.getElementById('comment').textContent = comment; // No HTML parsing
+}
+```
+
+### Authentication & Authorization
+
+**Check permissions before actions**:
+
+```typescript
+// ✅ GOOD - Check authentication and authorization
+async function deleteUser(requesterId: string, targetUserId: string): Promise<void> {
+  // 1. Authenticate: Who is making the request?
+  const requester = await getUserById(requesterId);
+  if (!requester) {
+    throw new UnauthenticatedError('User not logged in');
+  }
+  
+  // 2. Authorize: Can they perform this action?
+  if (!requester.isAdmin && requester.id !== targetUserId) {
+    throw new UnauthorizedError('Cannot delete other users');
+  }
+  
+  // 3. Perform action
+  await db.deleteUser(targetUserId);
+}
+```
+
+### Secrets Management
+
+**NEVER hardcode secrets**:
+
+```typescript
+// ❌ BAD - Hardcoded secrets
+const API_KEY = 'sk_live_abc123...';
+const DB_PASSWORD = 'mypassword123';
+
+// ✅ GOOD - Environment variables
+const API_KEY = process.env.API_KEY;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+
+if (!API_KEY || !DB_PASSWORD) {
+  throw new Error('Required environment variables not set');
+}
+```
+
+**Security checklist for secrets**:
+- Use environment variables (`.env` file, never commit to git)
+- Use secret management services (AWS Secrets Manager, HashiCorp Vault)
+- Rotate secrets regularly
+- Use different secrets for dev/staging/production
+- Never log secrets (even in error messages)
+
+### Cryptography
+
+**Use proven libraries, don't roll your own**:
+
+```typescript
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+
+// ✅ Password hashing (bcrypt, argon2, scrypt)
+async function hashPassword(password: string): Promise<string> {
+  const saltRounds = 10;
+  return bcrypt.hash(password, saltRounds);
+}
+
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
+}
+
+// ✅ Generating secure random tokens
+function generateSecureToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+// ❌ BAD - Weak hashing
+function weakHash(password: string): string {
+  return crypto.createHash('md5').update(password).digest('hex'); // MD5 is broken!
+}
+```
+
+### HTTPS & Transport Security
+
+**Always use HTTPS in production**:
+
+```typescript
+// ✅ Enforce HTTPS
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'production' && !req.secure) {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
+
+// ✅ Set security headers
+app.use((req, res, next) => {
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
+```
+
+### Rate Limiting & DoS Prevention
+
+**Protect against abuse**:
+
+```typescript
+import rateLimit from 'express-rate-limit';
+
+// Limit login attempts
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts
+  message: 'Too many login attempts, please try again later'
+});
+
+app.post('/api/login', loginLimiter, async (req, res) => {
+  // Login logic
+});
+
+// Limit API requests per user
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 100, // 100 requests per minute per user
+  keyGenerator: (req) => req.user?.id || req.ip
+});
+
+app.use('/api/', apiLimiter);
+```
+
+### Security Logging & Monitoring
+
+**Log security events** (but not sensitive data):
+
+```typescript
+// ✅ GOOD - Log security events
+function handleLoginAttempt(email: string, success: boolean, ip: string) {
+  logger.info('Login attempt', {
+    email: email, // OK to log
+    success: success,
+    ip: ip,
+    timestamp: new Date().toISOString()
+  });
+}
+
+// ❌ BAD - Logging sensitive data
+function handleLoginAttempt(email: string, password: string, success: boolean) {
+  logger.info('Login attempt', {
+    email: email,
+    password: password, // NEVER log passwords!
+    success: success
+  });
+}
+```
+
+**What to log**:
+- ✅ Authentication events (login, logout, failed attempts)
+- ✅ Authorization failures (access denied)
+- ✅ Suspicious activity (unusual patterns, rate limit hits)
+- ❌ Passwords, API keys, tokens, credit card numbers, PII
+
+---
+
+## Performance & Efficiency
+
+### Principles
+
+1. **Make it work, make it right, make it fast** (in that order)
+2. **Profile before optimizing** (measure, don't guess)
+3. **Optimize hot paths** (where profiler shows bottlenecks)
+4. **Premature optimization is the root of all evil** (Donald Knuth)
+
+### When to Optimize
+
+**✅ Optimize when**:
+- Profiler shows bottleneck
+- NFR specifies performance requirement
+- User-visible slowness (>100ms for UI interaction)
+- Resource usage unsustainable (memory leaks, CPU spikes)
+
+**❌ Don't optimize when**:
+- "This might be slow" (without evidence)
+- Code is already fast enough
+- Optimization makes code harder to understand (unless critical)
+
+### Efficient Data Structures
+
+**Choose right data structure for the job**:
+
+```typescript
+// ❌ Slow - O(n) lookup
+const users = []; // Array
+function findUserById(id: string) {
+  return users.find(u => u.id === id); // Linear search
+}
+
+// ✅ Fast - O(1) lookup
+const users = new Map<string, User>(); // Map/HashMap
+function findUserById(id: string) {
+  return users.get(id); // Constant time
+}
+```
+
+**Common patterns**:
+- **Frequent lookups**: Use Map/HashMap/Dict (O(1) vs Array O(n))
+- **Ordered data**: Use sorted arrays + binary search (O(log n))
+- **Unique items**: Use Set (O(1) membership test vs Array O(n))
+- **FIFO queue**: Use Queue (O(1) enqueue/dequeue vs Array O(n) shift)
+
+### Database Query Optimization
+
+**Minimize database roundtrips**:
+
+```typescript
+// ❌ BAD - N+1 query problem
+async function getUsersWithOrders(userIds: string[]) {
+  const users = await db.getUsers(userIds);
+  for (const user of users) {
+    user.orders = await db.getOrdersByUserId(user.id); // N queries!
+  }
+  return users;
+}
+
+// ✅ GOOD - Single query with JOIN
+async function getUsersWithOrders(userIds: string[]) {
+  return db.query(`
+    SELECT users.*, orders.*
+    FROM users
+    LEFT JOIN orders ON users.id = orders.user_id
+    WHERE users.id IN (?)
+  `, [userIds]);
+}
+```
+
+**Database performance checklist**:
+- Add indexes on frequently queried columns
+- Use `EXPLAIN` to analyze query plans
+- Avoid `SELECT *` (select only needed columns)
+- Use pagination for large result sets
+- Cache frequently accessed data (with invalidation strategy)
+
+### Caching (Green Coding)
+
+**Cache expensive operations** (but add complexity mindfully):
+
+```typescript
+// Simple in-memory cache
+const cache = new Map<string, CacheEntry>();
+
+async function getUser(userId: string): Promise<User> {
+  // Check cache first
+  const cached = cache.get(userId);
+  if (cached && Date.now() - cached.timestamp < 60000) { // 1 minute TTL
+    return cached.value;
+  }
+  
+  // Cache miss - fetch from database
+  const user = await db.getUserById(userId);
+  cache.set(userId, { value: user, timestamp: Date.now() });
+  return user;
+}
+
+// Invalidate cache on update
+async function updateUser(userId: string, updates: Partial<User>) {
+  await db.updateUser(userId, updates);
+  cache.delete(userId); // Invalidate cache
+}
+```
+
+**Caching considerations**:
+- ✅ Reduces compute/energy (green coding)
+- ✅ Improves response time
+- ⚠️ Adds complexity (cache invalidation is hard)
+- ⚠️ Stale data risk (need expiration/invalidation strategy)
+- 💡 Use for: Read-heavy data, expensive computations, external API calls
+
+### Lazy Loading & Pagination
+
+**Don't load everything at once**:
+
+```typescript
+// ❌ BAD - Load all users (could be millions)
+async function getAllUsers() {
+  return db.query('SELECT * FROM users');
+}
+
+// ✅ GOOD - Paginate
+async function getUsers(page: number, pageSize: number = 20) {
+  const offset = page * pageSize;
+  return db.query('SELECT * FROM users LIMIT ? OFFSET ?', [pageSize, offset]);
+}
+
+// ✅ GOOD - Lazy load related data
+interface User {
+  id: string;
+  name: string;
+  getOrders(): Promise<Order[]>; // Lazy load orders only when needed
+}
+```
+
+### Async & Parallel Processing
+
+**Don't block unnecessarily**:
+
+```typescript
+// ❌ BAD - Sequential (slow)
+async function fetchAllData() {
+  const users = await fetchUsers();      // Wait 500ms
+  const products = await fetchProducts(); // Wait 500ms
+  const orders = await fetchOrders();    // Wait 500ms
+  return { users, products, orders };    // Total: 1500ms
+}
+
+// ✅ GOOD - Parallel (fast)
+async function fetchAllData() {
+  const [users, products, orders] = await Promise.all([
+    fetchUsers(),      // All run in parallel
+    fetchProducts(),   //
+    fetchOrders()      //
+  ]);
+  return { users, products, orders }; // Total: 500ms (slowest)
+}
+```
+
+### Resource Management
+
+**Clean up resources**:
+
+```typescript
+// ✅ Always close connections/files
+async function processFile(filePath: string) {
+  const file = await fs.open(filePath, 'r');
+  try {
+    const data = await file.readFile();
+    return processData(data);
+  } finally {
+    await file.close(); // Always close, even on error
+  }
+}
+
+// ✅ Use connection pools (not one connection per request)
+const pool = new pg.Pool({
+  max: 20, // Maximum 20 connections
+  idleTimeoutMillis: 30000
+});
+```
+
+### Memory Efficiency
+
+**Avoid memory leaks**:
+
+```typescript
+// ❌ BAD - Memory leak (listeners never removed)
+class EventEmitter {
+  private listeners = [];
+  
+  on(event: string, callback: Function) {
+    this.listeners.push(callback); // Accumulates forever!
+  }
+}
+
+// ✅ GOOD - Provide cleanup
+class EventEmitter {
+  private listeners = new Map<string, Set<Function>>();
+  
+  on(event: string, callback: Function): () => void {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, new Set());
+    }
+    this.listeners.get(event)!.add(callback);
+    
+    // Return cleanup function
+    return () => this.off(event, callback);
+  }
+  
+  off(event: string, callback: Function) {
+    this.listeners.get(event)?.delete(callback);
+  }
+}
+```
+
+### Green Coding (Environmental Efficiency)
+
+**Principles**:
+- Energy-efficient code reduces carbon footprint
+- But: **Clarity comes first**, optimize when justified
+- Caching/memoization saves energy (fewer computations)
+- Efficient algorithms reduce compute time (greener)
+- Lazy loading reduces unnecessary work
+
+**Balance**:
+```typescript
+// Simple & clear (good default)
+function calculateDiscount(price: number, percent: number): number {
+  return price * (1 - percent / 100);
+}
+
+// Cached (if called frequently with same inputs)
+const discountCache = new Map<string, number>();
+
+function calculateDiscount(price: number, percent: number): number {
+  const key = `${price}-${percent}`;
+  if (discountCache.has(key)) {
+    return discountCache.get(key)!; // Saves computation (green)
+  }
+  
+  const result = price * (1 - percent / 100);
+  discountCache.set(key, result);
+  return result;
+}
+// Trade-off: More complex, but saves energy if called often
+```
+
+**Green coding checklist**:
+- ✅ Use efficient algorithms (O(n log n) vs O(n²))
+- ✅ Cache when read-heavy
+- ✅ Lazy load (don't process what's not needed)
+- ✅ Optimize hot paths (measured with profiler)
+- ✅ Clean up resources (prevent leaks)
+- ❌ Don't sacrifice clarity for minor gains
 
 ---
 
@@ -570,19 +1086,51 @@ if (!document.isPublished) return;
 
 Before marking code complete, verify:
 
-- [ ] **Names** are clear and descriptive
-- [ ] **Functions** are small (<50 lines) and focused
+**Correctness & Functionality**:
+- [ ] **Meets acceptance criteria** (all ACs verified)
+- [ ] **Edge cases handled** (empty input, null, boundary values)
+- [ ] **Error handling present** and specific
+
+**Code Quality**:
+- [ ] **Names** are clear and descriptive (no cryptic abbreviations)
+- [ ] **Functions** are small (<50 lines) and focused (single purpose)
 - [ ] **No magic numbers** (constants are named)
-- [ ] **Error handling** is present and specific
-- [ ] **Type safety** (TypeScript types, Python hints)
+- [ ] **Type safety** (TypeScript types, Python hints present)
 - [ ] **No deep nesting** (< 4 levels ideal)
 - [ ] **No duplication** (DRY - Don't Repeat Yourself)
 - [ ] **Comments** explain why, not what
-- [ ] **Feature annotations** present (`@feature`, `@acceptance`)
-- [ ] **Tests** exist and pass
 - [ ] **Imports** are organized and unused ones removed
 - [ ] **Console logs / debug code** removed
+
+**Security** (CRITICAL):
+- [ ] **Input validation** present for all external input
+- [ ] **SQL queries** use parameterized queries (no string concatenation)
+- [ ] **XSS prevention**: User content sanitized before display
+- [ ] **Authentication/Authorization** checked before sensitive operations
+- [ ] **No hardcoded secrets** (use environment variables)
+- [ ] **No sensitive data in logs** (passwords, tokens, API keys)
+- [ ] **HTTPS enforced** in production code
+- [ ] **Rate limiting** present for abuse-prone endpoints (login, API)
+
+**Performance & Efficiency**:
+- [ ] **No obvious performance issues** (e.g., N+1 queries)
+- [ ] **Efficient data structures** used (Map for lookups, Set for unique items)
+- [ ] **Database queries optimized** (indexes, no SELECT *, pagination)
+- [ ] **Async operations parallelized** where appropriate (Promise.all)
+- [ ] **Resources cleaned up** (connections closed, listeners removed)
+- [ ] **Caching considered** for expensive/frequent operations (if justified)
+- [ ] **Optimization justified** (profiled, not premature)
+
+**Testing & Documentation**:
+- [ ] **Feature annotations** present (`@feature`, `@acceptance`, `@nfr`)
+- [ ] **Tests** exist and pass (unit, integration, E2E as needed)
+- [ ] **Test coverage adequate** (>80% for business logic)
 - [ ] **TODOs** have context (not just "TODO: fix this")
+
+**Project Integration**:
+- [ ] **Formatted** using project linter/formatter
+- [ ] **Quality checks** pass (`quality_checks.sh`)
+- [ ] **Specs updated** (FEATURES.md, STATUS.md if needed)
 
 ---
 
