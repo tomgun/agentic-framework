@@ -2,7 +2,7 @@
 
 **Portable, token-efficient, test-driven framework for AI-assisted software development.**
 
-**Current version:** [v0.2.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.0)
+**Current version:** [v0.2.1](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.1)
 
 ## What is this?
 
@@ -18,8 +18,8 @@ The Agentic Framework enables **sustainable long-term software development with 
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
-cd agentic-framework-0.2.0
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
+cd agentic-framework-0.2.1
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -45,10 +45,10 @@ The agent will:
 
 ```bash
 # Download and extract
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
 
 # Copy .agentic/ into your project
-cp -r agentic-framework-0.2.0/.agentic /path/to/your-project/
+cp -r agentic-framework-0.2.1/.agentic /path/to/your-project/
 ```
 
 Then follow the same agent initialization process above. The agent will run `scaffold.sh` for you.
@@ -131,8 +131,8 @@ The agent will:
 
 ```bash
 # Download new version
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
-cd agentic-framework-0.2.0
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
+cd agentic-framework-0.2.1
 
 # Run upgrade script with your project path
 bash .agentic/tools/upgrade.sh /path/to/your-project
