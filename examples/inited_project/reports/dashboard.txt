@@ -46,6 +46,6 @@ All checks passed
 
 
 ╔════════════════════════════════════════════════════════════════╗
-║  Run 'bash agentic/tools/verify.sh' for detailed checks       ║
-║  See 'agentic/MANUAL_OPERATIONS.md' for more commands         ║
+║  Run 'bash .agentic/tools/verify.sh' for detailed checks       ║
+║  See '.agentic/MANUAL_OPERATIONS.md' for more commands         ║
 ╚════════════════════════════════════════════════════════════════╝

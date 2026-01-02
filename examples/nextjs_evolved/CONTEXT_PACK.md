@@ -33,7 +33,7 @@ nextjs_evolved/
 │   └── retrospectives/       # Project retrospectives
 │       ├── RETRO-2025-12-30.md
 │       └── RETRO-2026-01-13.md
-└── agentic/                  # Framework (v0.1.0)
+└── .agentic/                  # Framework (v0.1.0)
 ```
 
 ## How to run / test

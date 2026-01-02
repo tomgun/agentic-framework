@@ -3,7 +3,7 @@
 ## ✅ Current State: Standards ARE Referenced
 
 ### 1. Agent Operating Guidelines
-**File**: `agentic/agents/shared/agent_operating_guidelines.md`
+**File**: `.agentic/agents/shared/agent_operating_guidelines.md`
 
 **"While implementing" section**:
 - ✅ References `programming_standards.md` explicitly
@@ -16,14 +16,14 @@
 - ✅ Instructs to self-review using `review_checklist.md`
 
 ### 2. Sequential Agent Specialization
-**File**: `agentic/workflows/sequential_agent_specialization.md`
+**File**: `.agentic/workflows/sequential_agent_specialization.md`
 
 **Test Agent (#3)**:
 - ✅ References `test_strategy.md` for test data factories/fixtures
 - ✅ Lists test quality standards (descriptive names, clear assertions, deterministic)
 
 **Implementation Agent (#4)**:
-- ✅ Point #2: "Follow programming standards (see `agentic/quality/programming_standards.md`)"
+- ✅ Point #2: "Follow programming standards (see `.agentic/quality/programming_standards.md`)"
 - ✅ Lists all key standards: clear names, small functions, error handling, no magic numbers
 - ✅ Point #10: "Review own code against `programming_standards.md` checklist before handoff"
 
@@ -32,7 +32,7 @@
 - ✅ Detailed checklist: naming, functions, errors, no magic numbers, etc.
 
 ### 3. Cursor Rules (Agent Entry Point)
-**File**: `agentic/agents/cursor/agentic-framework.mdc`
+**File**: `.agentic/agents/cursor/agentic-framework.mdc`
 
 **UPDATED** (just now):
 - ✅ Explicitly mentions `programming_standards.md` in "Must-follow behavior"
@@ -41,7 +41,7 @@
 - ✅ Highlights test requirements: edge cases, invalid input, time-based, descriptive names
 
 ### 4. Claude Instructions (Agent Entry Point)
-**File**: `agentic/agents/claude/CLAUDE.md`
+**File**: `.agentic/agents/claude/CLAUDE.md`
 
 **UPDATED** (just now):
 - ✅ Section 2: "Follow programming standards" with key highlights
@@ -50,13 +50,13 @@
 - ✅ "Quality Standards" section lists all standard documents
 
 ### 5. TDD Mode Workflow
-**File**: `agentic/workflows/tdd_mode.md`
+**File**: `.agentic/workflows/tdd_mode.md`
 
 **References**:
 - ✅ Links to `test_strategy.md` at end ("See Also" section)
 
 ### 6. START_HERE Documentation
-**File**: `agentic/START_HERE.md`
+**File**: `.agentic/START_HERE.md`
 
 **References**:
 - ✅ Links to `test_strategy.md` in "Key artifacts" section

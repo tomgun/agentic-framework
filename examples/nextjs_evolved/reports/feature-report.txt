@@ -8,4 +8,4 @@ Needs acceptance (verify feature works + update spec/FEATURES.md -> Accepted: ye
 - F-0008
 
 Tip: Keep STATUS.md items referencing feature IDs (F-####) for easy tracking.
-Tip: Run 'bash agentic/tools/feature_graph.sh' to visualize feature dependencies.
+Tip: Run 'bash .agentic/tools/feature_graph.sh' to visualize feature dependencies.

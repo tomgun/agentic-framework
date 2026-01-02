@@ -24,7 +24,7 @@ This guide explains how to create a new version release of the Agentic Framework
 
 5. **Commit version bump**
    ```bash
-   git add VERSION CHANGELOG.md agentic/init/STACK.template.md
+   git add VERSION CHANGELOG.md .agentic/init/STACK.template.md
    git commit -m "chore: bump version to 0.2.0"
    git push origin main
    ```
@@ -127,7 +127,7 @@ MAJOR.MINOR.PATCH
 
 4. **Announce upgrade path**
    - Ensure `UPGRADING.md` is up to date
-   - Test `agentic/tools/upgrade.sh` works correctly
+   - Test `.agentic/tools/upgrade.sh` works correctly
    - Document any breaking changes in CHANGELOG
 
 ## Release Cadence
@@ -147,9 +147,9 @@ MAJOR.MINOR.PATCH
 2. **Create migration guide** in `docs/migrations/` (e.g., `docs/migrations/v1-to-v2.md`)
 3. **Update UPGRADING.md** with version-specific notes
 4. **Update all examples** to new format
-5. **Test upgrade tool** with breaking changes (`agentic/tools/upgrade.sh`)
+5. **Test upgrade tool** with breaking changes (`.agentic/tools/upgrade.sh`)
 6. **Add deprecation warnings** in previous version (if possible)
-7. **Create upgrade automation** if needed (e.g., `agentic/tools/migrate_v1_to_v2.sh`)
+7. **Create upgrade automation** if needed (e.g., `.agentic/tools/migrate_v1_to_v2.sh`)
 
 Example migration guide structure:
 ```markdown
@@ -161,7 +161,7 @@ Example migration guide structure:
 
 ## Migration Steps
 1. Backup your project
-2. Run upgrade tool: `bash agentic/tools/upgrade.sh`
+2. Run upgrade tool: `bash .agentic/tools/upgrade.sh`
 3. Manually update custom workflows
 4. Test thoroughly
 ```

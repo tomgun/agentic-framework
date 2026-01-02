@@ -17,7 +17,7 @@ inited_project/
 ├── test_task_manager.py  # Unit tests
 ├── tasks.json            # Data storage
 ├── spec/                 # Requirements & features
-└── agentic/              # Framework
+└── .agentic/              # Framework
 ```
 
 ## How to run / test

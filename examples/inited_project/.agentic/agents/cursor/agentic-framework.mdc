@@ -1,0 +1,22 @@
+# Agentic framework (Cursor rules)
+
+You are working in a repo that uses the `.agentic/` agentic development framework.
+
+## Always read first
+- `AGENTS.md` (if present)
+- `CONTEXT_PACK.md`
+- `STATUS.md`
+- `spec/OVERVIEW.md`
+- `spec/FEATURES.md`
+- `spec/NFR.md` (if constraints apply)
+- Relevant `/spec/*` sections, including `spec/acceptance/F-####.md` for the feature you are changing
+
+## Must-follow behavior
+- Follow `.agentic/agents/shared/agent_operating_guidelines.md`.
+- Keep changes small; prefer incremental diffs.
+- Add/update tests for new/changed logic.
+- Update `STATUS.md` after progress and keep specs truthful.
+
+## Developer UX
+- Always end with: what changed, what’s next, and what you need from the user.
+

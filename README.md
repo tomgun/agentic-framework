@@ -8,7 +8,7 @@
 
 The Agentic Framework enables **sustainable long-term software development with AI agents**. It provides structure, conventions, and tooling that keep both humans and AI agents aligned as projects evolve from prototypes to production systems.
 
-Download the latest release and extract the `agentic/` folder into your project to adopt the framework.
+Download the latest release and extract the `.agentic/` folder into your project to adopt the framework.
 
 ## Design Principles
 
@@ -104,7 +104,7 @@ The agent will:
 
 **You don't need to run any scripts manually** - the agent does everything.
 
-**New to the framework?** → Read [`agentic/START_HERE.md`](agentic/START_HERE.md)
+**New to the framework?** → Read [`.agentic/START_HERE.md`](.agentic/START_HERE.md)
 
 ### Latest version
 
@@ -114,9 +114,9 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and [RELEASING.md](RELEASIN
 
 ### For evaluating the framework
 
-- **Full documentation**: [`agentic/README.md`](agentic/README.md)
-- **Quick tour**: [`agentic/START_HERE.md`](agentic/START_HERE.md)
-- **Visual guide**: [`agentic/FRAMEWORK_MAP.md`](agentic/FRAMEWORK_MAP.md)
+- **Full documentation**: [`.agentic/README.md`](.agentic/README.md)
+- **Quick tour**: [`.agentic/START_HERE.md`](.agentic/START_HERE.md)
+- **Visual guide**: [`.agentic/FRAMEWORK_MAP.md`](.agentic/FRAMEWORK_MAP.md)
 - **Working example**: [`examples/inited_project/`](examples/inited_project/) (Next.js Todo app)
 
 ## What You Get
@@ -146,30 +146,30 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and [RELEASING.md](RELEASIN
 ### Tooling
 ```bash
 # Project health & verification
-bash agentic/tools/doctor.sh      # Check structure
-bash agentic/tools/report.sh      # Feature status summary
-bash agentic/tools/verify.sh      # Comprehensive validation
-python3 agentic/tools/validate_specs.py  # Validate spec frontmatter
+bash .agentic/tools/doctor.sh      # Check structure
+bash .agentic/tools/report.sh      # Feature status summary
+bash .agentic/tools/verify.sh      # Comprehensive validation
+python3 .agentic/tools/validate_specs.py  # Validate spec frontmatter
 
 # Retrospectives & version checking
-bash agentic/tools/retro_check.sh    # Check if retrospective is due
-bash agentic/tools/version_check.sh  # Check dependency versions
+bash .agentic/tools/retro_check.sh    # Check if retrospective is due
+bash .agentic/tools/version_check.sh  # Check dependency versions
 
 # Context & analysis
-bash agentic/tools/brief.sh       # Quick project brief
-bash agentic/tools/dashboard.sh   # Comprehensive dashboard
-bash agentic/tools/coverage.sh    # Code annotation coverage
-bash agentic/tools/feature_graph.sh   # Dependency visualization
-bash agentic/tools/arch_diff.sh   # Architecture changes over time
+bash .agentic/tools/brief.sh       # Quick project brief
+bash .agentic/tools/dashboard.sh   # Comprehensive dashboard
+bash .agentic/tools/coverage.sh    # Code annotation coverage
+bash .agentic/tools/feature_graph.sh   # Dependency visualization
+bash .agentic/tools/arch_diff.sh   # Architecture changes over time
 
 # Manual operations (token-free)
-bash agentic/tools/search.sh      # Search specs and code
-bash agentic/tools/whatchanged.sh # Recent changes
-bash agentic/tools/deps.sh        # Feature dependencies
-bash agentic/tools/accept.sh      # Run acceptance tests
-bash agentic/tools/consistency.sh # Check doc drift
-bash agentic/tools/stale.sh       # Find stale docs
-bash agentic/tools/task.sh        # Create task files
+bash .agentic/tools/search.sh      # Search specs and code
+bash .agentic/tools/whatchanged.sh # Recent changes
+bash .agentic/tools/deps.sh        # Feature dependencies
+bash .agentic/tools/accept.sh      # Run acceptance tests
+bash .agentic/tools/consistency.sh # Check doc drift
+bash .agentic/tools/stale.sh       # Find stale docs
+bash .agentic/tools/task.sh        # Create task files
 ```
 
 ### Stack Profiles
@@ -208,7 +208,7 @@ The framework creates and maintains these "source of truth" files:
 
 Already have a project? The framework integrates non-invasively:
 
-1. Download release and extract `agentic/` folder into your repo
+1. Download release and extract `.agentic/` folder into your repo
 2. Tell your agent: "Initialize the agentic framework for this existing project"
 3. Agent analyzes existing code and fills in specs
 4. Adopt practices incrementally (tests first, then specs, then workflows)
@@ -223,7 +223,7 @@ cd /tmp
 curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
 
 # Run upgrade tool from NEW framework, pointing to your project
-bash /tmp/agentic-framework-0.2.0/agentic/tools/upgrade.sh /path/to/your-project
+bash /tmp/agentic-framework-0.2.0/.agentic/tools/upgrade.sh /path/to/your-project
 
 # Clean up
 rm -rf /tmp/agentic-framework-0.2.0
@@ -239,10 +239,10 @@ See **[`UPGRADING.md`](UPGRADING.md)** for complete upgrade guide, version compa
 
 ## Getting Help
 
-- **Documentation**: Start at [`agentic/START_HERE.md`](agentic/START_HERE.md)
+- **Documentation**: Start at [`.agentic/START_HERE.md`](.agentic/START_HERE.md)
 - **Examples**: See [`examples/`](examples/) directory
 - **Issues**: [Your issue tracker]
 
 ---
 
-**Note for adopted projects**: After copying `agentic/` into your project, replace this root `README.md` with your project's actual README. Keep `agentic/README.md` as-is for framework documentation.
+**Note for adopted projects**: After copying `.agentic/` into your project, replace this root `README.md` with your project's actual README. Keep `.agentic/README.md` as-is for framework documentation.

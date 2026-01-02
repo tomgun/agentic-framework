@@ -72,7 +72,7 @@ nextjs_evolved/
 │   └── research/             # 2 research sessions
 ├── quality_checks.sh         # Automated quality gates
 ├── playwright.config.ts      # E2E test config
-└── agentic/                  # Framework (v0.1.0)
+└── .agentic/                  # Framework (v0.1.0)
 ```
 
 ## Features

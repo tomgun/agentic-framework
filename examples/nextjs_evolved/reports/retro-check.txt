@@ -8,4 +8,4 @@ Configuration:
 ⚠️  No retrospective recorded in STATUS.md yet.
    Consider running your first retrospective!
 
-   See: agentic/workflows/retrospective.md
+   See: .agentic/workflows/retrospective.md
