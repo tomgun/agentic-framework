@@ -23,7 +23,16 @@ curl -s https://api.github.com/repos/YOUR_USERNAME/agentic-framework/releases/la
 **Upgrade framework:**
 ```bash
 # See ../UPGRADING.md for full guide
-bash agentic/tools/upgrade.sh path/to/new-framework
+
+# Download new framework to temp location
+cd /tmp
+curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+
+# Run upgrade tool FROM the new framework
+bash /tmp/agentic-framework-0.2.0/agentic/tools/upgrade.sh /path/to/your-project
+
+# Clean up
+rm -rf /tmp/agentic-framework-0.2.0
 ```
 
 ### What's the current status?
