@@ -203,13 +203,17 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Download
 
-Get the latest release: https://github.com/YOUR_USERNAME/agentic-framework/releases
+Get the latest release: https://github.com/tomgun/agentic-framework/releases
 
 ```bash
 # Download and extract
-curl -L https://github.com/YOUR_USERNAME/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
 
-# Copy into your project
-cp -r agentic-framework-0.1.0/agentic ./
+# Install (recommended)
+cd agentic-framework-0.2.1
+bash install.sh /path/to/your-project
+
+# Or copy manually
+cp -r agentic-framework-0.2.1/.agentic /path/to/your-project/
 ```
 
