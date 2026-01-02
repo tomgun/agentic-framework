@@ -5,7 +5,7 @@
 Purpose: a single source of truth for "how we build and run software here".
 
 ## Agentic framework
-- Version: 0.2.1
+- Version: 0.2.2
 - Profile: core  # core | core+product
 - Installed: 2026-01-02
 - Framework location: .agentic/
