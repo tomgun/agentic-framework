@@ -99,12 +99,19 @@ See [`.agentic/token_efficiency/reading_protocols.md`](token_efficiency/reading_
 
 **For humans starting out**:
 1. This file (you're reading it!)
-2. **[`workflows/USER_WORKFLOWS.md`](workflows/USER_WORKFLOWS.md) - Complete user guide** ⭐
+2. **[`DEVELOPER_GUIDE.md`](DEVELOPER_GUIDE.md) - Complete developer guide** ⭐⭐⭐
+   - How to use the framework daily
+   - Manual operations vs. agent operations
+   - All automation scripts explained
+   - Customization options
+   - Best practices
+   - **START HERE if you're new!**
+3. **[`workflows/USER_WORKFLOWS.md`](workflows/USER_WORKFLOWS.md) - Working with agents** ⭐
    - How to add features, update specs, work with agents
    - Step-by-step workflows and examples
    - Common questions answered
-3. [`README.md`](README.md) - Full framework documentation
-4. [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) - Scripts you can run yourself
+4. [`README.md`](README.md) - Full framework documentation
+5. [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) - Token-free information retrieval
 
 **For AI agents** (humans can read too):
 1. [`agents/shared/agent_operating_guidelines.md`](agents/shared/agent_operating_guidelines.md) - Core rules
