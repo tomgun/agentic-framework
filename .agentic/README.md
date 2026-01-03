@@ -283,11 +283,18 @@ python3 .agentic/tools/validate_specs.py  # Validate spec frontmatter
 - Run `bash .agentic/tools/feature_graph.sh` to visualize dependencies  
 
 ## Design principles (first principles)
-See `.agentic/principles/first_principles.md` for the “why”. The short version:
+
+**📖 For comprehensive principles guide, see [`PRINCIPLES.md`](PRINCIPLES.md)** ⭐
+
+The short version:
 - **Feedback loops** beat cleverness: tests and small diffs reduce risk.
 - **Entropy is real**: decisions must be recorded, status must be current.
 - **Context is expensive**: durable artifacts reduce repeated token spend.
 - **Agents need a contract**: consistent behavior across tools avoids thrash.
+- **Human-agent partnership**: Collaboration, not replacement.
+- **Quality by design**: TDD, stack-specific checks, acceptance validation.
+
+See PRINCIPLES.md for the "why" behind every framework decision.
 
 ## Adoption notes
 - This framework is intentionally **tech-agnostic**. Where stack specifics matter, use:

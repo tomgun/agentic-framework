@@ -106,12 +106,17 @@ See [`.agentic/token_efficiency/reading_protocols.md`](token_efficiency/reading_
    - Customization options
    - Best practices
    - **START HERE if you're new!**
-3. **[`workflows/USER_WORKFLOWS.md`](workflows/USER_WORKFLOWS.md) - Working with agents** ⭐
+3. **[`PRINCIPLES.md`](PRINCIPLES.md) - Framework principles & values** ⭐
+   - Why we do what we do
+   - Core philosophy
+   - Anti-patterns to avoid
+   - **Read this to understand the "why"**
+4. **[`workflows/USER_WORKFLOWS.md`](workflows/USER_WORKFLOWS.md) - Working with agents** ⭐
    - How to add features, update specs, work with agents
    - Step-by-step workflows and examples
    - Common questions answered
-4. [`README.md`](README.md) - Full framework documentation
-5. [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) - Token-free information retrieval
+5. [`README.md`](README.md) - Full framework documentation
+6. [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) - Token-free information retrieval
 
 **For AI agents** (humans can read too):
 1. [`agents/shared/agent_operating_guidelines.md`](agents/shared/agent_operating_guidelines.md) - Core rules
