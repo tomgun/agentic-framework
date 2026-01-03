@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.2.2](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.2)
+**Current version:** [v0.2.3](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.3)
 
 ## What is this?
 
@@ -20,8 +20,8 @@ The Agentic AI Framework enables **sustainable long-term software development wi
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.2.tar.gz | tar xz
-cd agentic-framework-0.2.2
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.3.tar.gz | tar xz
+cd agentic-framework-0.2.3
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -47,10 +47,10 @@ The agent will:
 
 ```bash
 # Download and extract
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.2.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.3.tar.gz | tar xz
 
 # Copy .agentic/ into your project
-cp -r agentic-framework-0.2.2/.agentic /path/to/your-project/
+cp -r agentic-framework-0.2.3/.agentic /path/to/your-project/
 ```
 
 Then follow the same agent initialization process above. The agent will run `scaffold.sh` for you.
@@ -133,8 +133,8 @@ The agent will:
 
 ```bash
 # Download new version
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.2.tar.gz | tar xz
-cd agentic-framework-0.2.2
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.3.tar.gz | tar xz
+cd agentic-framework-0.2.3
 
 # Run upgrade script with your project path
 bash .agentic/tools/upgrade.sh /path/to/your-project

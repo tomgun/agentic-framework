@@ -89,6 +89,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AGENTS_ACTIVE.md for coordination
 - File lock protocol to prevent conflicts
 
+## [0.2.3] - 2026-01-02
+
+### Fixed
+- **install.sh now makes scripts executable**: After copying `.agentic/` folder, the install script now runs `chmod +x` on all scripts to ensure they work immediately
+- Fixed `scaffold.sh not found or not executable` error during installation
+
 ## [0.2.2] - 2026-01-02
 
 ### Changed

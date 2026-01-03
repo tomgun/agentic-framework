@@ -5,7 +5,7 @@
 Purpose: a single source of truth for "how we build and run software here".
 
 ## Agentic framework
-- Version: 0.2.2
+- Version: 0.2.3
 - Profile: core+product  # core | core+product
 - Installed: 2026-01-02
 - Source: https://github.com/tomgun/agentic-framework
