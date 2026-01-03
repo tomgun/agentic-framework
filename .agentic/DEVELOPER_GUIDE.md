@@ -260,6 +260,13 @@ This is:
 - ✅ Costs zero tokens
 - ✅ Gives you full context
 
+**📖 For focused token-saving quick reference, see [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md)**
+
+That guide provides:
+- Quick grep/cat patterns for instant information
+- Token-free dashboard script
+- When to look vs. when to ask agent
+
 ### Quick Information Retrieval
 
 ```bash
@@ -367,6 +374,8 @@ Then tell agent:
 ```
 
 ### Finding Information
+
+**📖 Also see [`MANUAL_OPERATIONS.md#finding-specific-information`](MANUAL_OPERATIONS.md#finding-specific-information) for more grep patterns**
 
 ```bash
 # Find where feature is implemented

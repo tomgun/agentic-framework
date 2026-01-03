@@ -350,33 +350,29 @@ See [`FRAMEWORK_MAP.md`](FRAMEWORK_MAP.md) for a visual diagram of how everythin
 
 ---
 
-## Quick command reference
+## Quick Command Reference
 
+**📖 For comprehensive commands and examples, see:**
+- [`DEVELOPER_GUIDE.md#quick-reference`](DEVELOPER_GUIDE.md#quick-reference) - Full command table with explanations
+- [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) - Token-free quick operations
+
+**Essential commands:**
 ```bash
 # Project health
 bash .agentic/tools/doctor.sh       # Check structure
-bash .agentic/tools/report.sh       # Feature status summary
 bash .agentic/tools/verify.sh       # Comprehensive verification
-python3 .agentic/tools/validate_specs.py  # Validate spec frontmatter
 
-# Retrospectives & Research
-bash .agentic/tools/retro_check.sh  # Check if retrospective is due
+# Project status
+cat STATUS.md                        # Current focus
+tail -30 JOURNAL.md                  # Recent work
+cat HUMAN_NEEDED.md                  # Blockers
 
-# Version verification
-bash .agentic/tools/version_check.sh  # Check dependency versions
-
-# Context and briefing
-bash .agentic/tools/brief.sh        # Quick project brief
-bash .agentic/tools/dashboard.sh    # Comprehensive dashboard
-
-# Analysis
-bash .agentic/tools/feature_graph.sh    # Feature dependency graph
-bash .agentic/tools/coverage.sh         # Code annotation coverage
-bash .agentic/tools/arch_diff.sh        # Architecture changes over time
-
-# Documentation
-bash .agentic/tools/sync_docs.sh    # Generate doc scaffolding
+# Feature info
+bash .agentic/tools/report.sh       # Feature summary
+bash .agentic/tools/feature_graph.sh # Dependencies
 ```
+
+See the guides above for 30+ available commands with detailed explanations.
 
 ---
 
