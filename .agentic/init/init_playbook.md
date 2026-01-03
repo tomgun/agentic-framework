@@ -24,7 +24,23 @@ This creates all expected files/folders with templates/placeholders so you can s
 
 **Ask the user which profile they want:**
 
-### Core Profile (Simple Setup)
+> "Which profile would you like to use?
+> 
+> **a) Core (Simple Setup)**
+> - Quality standards, multi-agent, research mode
+> - Lightweight planning (PRODUCT.md with checkboxes)
+> - Minimal ceremony, fast iteration
+> - Good for: Small projects, prototypes, external PM tools (Jira/Linear), quick experiments
+> 
+> **b) Core + Product Management**
+> - Everything in Core, plus formal specs & feature tracking
+> - STATUS.md, spec/PRD.md, spec/FEATURES.md with F-#### IDs
+> - Acceptance criteria, sequential pipeline, advanced tools
+> - Good for: Long-term projects (3+ months), complex products, audit trails
+> 
+> Type 'a' for Core or 'b' for Core+PM"
+
+### Core Profile (a)
 - ✅ Quality standards (programming, testing, TDD)
 - ✅ Multi-agent coordination
 - ✅ Research mode
@@ -36,7 +52,7 @@ This creates all expected files/folders with templates/placeholders so you can s
   - Solo developers who don't need formal tracking
   - Quick experiments and MVPs
 
-### Core + Product Management Profile
+### Core + Product Management Profile (b)
 - ✅ Everything in Core, plus:
 - ✅ Formal specifications (`spec/PRD.md`, `TECH_SPEC.md`)
 - ✅ Feature tracking with F-#### IDs
@@ -51,7 +67,8 @@ This creates all expected files/folders with templates/placeholders so you can s
 
 **Update `STACK.md`** with the chosen profile:
 ```markdown
-- Profile: core  <!-- or core+product -->
+- Profile: core  <!-- if user chose 'a' -->
+- Profile: core+product  <!-- if user chose 'b' -->
 ```
 
 ## Step 2: run init as an agent-guided planning session
