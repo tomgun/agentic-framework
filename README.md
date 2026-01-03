@@ -6,6 +6,13 @@
 
 **Current version:** [v0.2.3](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.3)
 
+**📖 Quick Links:**
+- [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
+- [START_HERE.md](.agentic/START_HERE.md) - Quick start in 5 minutes
+- [MANUAL_OPERATIONS.md](.agentic/MANUAL_OPERATIONS.md) - Token-free information retrieval
+- [USER_WORKFLOWS.md](.agentic/workflows/USER_WORKFLOWS.md) - Working with agents
+- [Example Projects](examples/) - See it in action
+
 ## What is this?
 
 The Agentic AI Framework enables **sustainable long-term software development with AI agents**. It provides structure, conventions, and tooling that keep both humans and AI agents aligned as projects evolve from prototypes to production systems.
