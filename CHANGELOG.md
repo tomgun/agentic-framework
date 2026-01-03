@@ -89,6 +89,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AGENTS_ACTIVE.md for coordination
 - File lock protocol to prevent conflicts
 
+## [0.2.4] - 2026-01-03
+
+### Added
+- **DEVELOPER_GUIDE.md**: Comprehensive 1,500+ line guide for developers
+  - Daily workflows (morning, during, evening routines)
+  - Manual operations vs. agent operations
+  - All 30+ automation scripts explained with examples and "when to run"
+  - Customization guide (profiles, STACK.md, quality checks, custom scripts)
+  - Troubleshooting section with 10 common problems and fixes
+  - Best practices for sustainable development
+  - Advanced topics (sequential pipeline, multi-agent, mutation testing)
+  - Quick reference tables and commands
+
+### Improved
+- **agent_operating_guidelines.md**: Critical improvements to prevent documentation gaps
+  - Added CRITICAL rule: Acceptance file mandatory when creating features
+  - Added CRITICAL workflow: Clear "shipped" vs "accepted" status distinction
+  - Added CRITICAL rule: Never leave `Implementation: State: none` if code exists
+  - Improved FEATURES.md sync instructions with explicit checks
+  - Better guidance on when to mark features as shipped/accepted
+
+### Changed
+- **Documentation structure**: DEVELOPER_GUIDE now primary entry point for new users
+  - Updated START_HERE.md to link DEVELOPER_GUIDE first (⭐⭐⭐)
+  - Updated .agentic/README.md to prominently link DEVELOPER_GUIDE
+  - Updated main README.md with quick links section
+- **Profile selection UX**: Added a/b choice format in init_playbook.md for easier selection
+
+### Context
+This release addresses issues found in real-world usage:
+- Missing acceptance criteria files (now mandatory via agent guidelines)
+- Features marked "shipped" but never formally accepted (now clear workflow)
+- Implementation state "none" despite code existing (now explicitly checked)
+- Documentation completeness (comprehensive DEVELOPER_GUIDE created)
+
 ## [0.2.3] - 2026-01-02
 
 ### Fixed

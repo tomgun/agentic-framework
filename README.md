@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.2.3](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.3)
+**Current version:** [v0.2.4](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.4)
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
@@ -27,8 +27,8 @@ The Agentic AI Framework enables **sustainable long-term software development wi
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.3.tar.gz | tar xz
-cd agentic-framework-0.2.3
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.4.tar.gz | tar xz
+cd agentic-framework-0.2.4
 
 # Install into your project
 bash install.sh /path/to/your-project
