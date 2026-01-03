@@ -8,7 +8,7 @@ This folder is a **portable framework** you can copy into any repository to boot
 
 ## Two Profiles: Choose What Fits Your Project
 
-### Core Profile (Default - Recommended for Most)
+### Core Profile (Default - Simple Setup)
 **Purpose**: Make agents work better on ANY project - quality, workflows, multi-agent
 
 **What you get**:
@@ -23,9 +23,13 @@ This folder is a **portable framework** you can copy into any repository to boot
 - Session continuity (JOURNAL.md)
 - Basic tools (doctor, verify, dashboard)
 
-**Good for**: Solo devs, small-medium projects, anyone wanting better AI coding
+**Good for**: 
+- Small/simple projects or prototypes
+- Projects with external PM tools (Jira, Linear, etc.)
+- Solo developers who don't need formal tracking
+- Quick experiments and MVPs
 
-### Core + Product Management (Optional Add-On)
+### Core + Product Management (For Complex Projects)
 **Purpose**: Add formal project tracking for long-term development
 
 **Adds to Core**:
@@ -36,7 +40,11 @@ This folder is a **portable framework** you can copy into any repository to boot
 - Advanced tools (feature graphs, consistency checks)
 - Quality automation & retrospectives
 
-**Good for**: Long-term projects (6+ months), human-machine teams, complex products
+**Good for**: 
+- Long-term projects (3+ months of development)
+- Human-machine teams collaborating on product
+- Complex products requiring traceability
+- Projects needing audit trails and formal specs
 
 **Enable later**: `bash .agentic/tools/enable-product-management.sh`
 

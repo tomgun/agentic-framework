@@ -24,13 +24,17 @@ This creates all expected files/folders with templates/placeholders so you can s
 
 **Ask the user which profile they want:**
 
-### Core Profile (Recommended for most projects)
+### Core Profile (Simple Setup)
 - ✅ Quality standards (programming, testing, TDD)
 - ✅ Multi-agent coordination
 - ✅ Research mode
 - ✅ `PRODUCT.md` for lightweight planning (checkboxes)
 - ✅ Minimal ceremony, fast iteration
-- **Good for**: Small/medium projects, prototypes, solo developers, fast-moving teams
+- **Good for**: 
+  - Small/simple projects or prototypes
+  - Projects with external PM tools (Jira, Linear, etc.)
+  - Solo developers who don't need formal tracking
+  - Quick experiments and MVPs
 
 ### Core + Product Management Profile
 - ✅ Everything in Core, plus:
@@ -39,7 +43,11 @@ This creates all expected files/folders with templates/placeholders so you can s
 - ✅ `STATUS.md` for roadmap and metrics
 - ✅ Acceptance criteria per feature
 - ✅ Sequential pipeline (specialized agents)
-- **Good for**: Complex projects, long-term development, teams, products requiring traceability
+- **Good for**: 
+  - Long-term projects (3+ months of development)
+  - Human-machine teams collaborating on product
+  - Complex products requiring traceability
+  - Projects needing audit trails and formal specs
 
 **Update `STACK.md`** with the chosen profile:
 ```markdown
