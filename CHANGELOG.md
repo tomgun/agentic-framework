@@ -5,6 +5,52 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2026-01-03
+
+### Added
+
+**Documentation:**
+- **PRINCIPLES.md** - Comprehensive framework constitution documenting all 60+ principles
+  - Core philosophy (sustainable development, human-agent partnership, context efficiency)
+  - Token economics principles (4 detailed principles)
+  - Quality & testing principles (6 principles including "Shipped ≠ Accepted")
+  - Human-agent collaboration principles (4 principles)
+  - Documentation & maintenance principles (5 principles)
+  - Modularity & flexibility principles (4 principles)
+  - 10 anti-patterns with explanations
+  - Each principle has: What, Why, How Enforced, Example, Anti-pattern
+  - Linked from README, START_HERE, agent_operating_guidelines
+
+- **FRAMEWORK_DEVELOPMENT.md** - Complete guide for contributors working on the framework itself
+  - 12 comprehensive sections covering framework-specific responsibilities
+  - Maintain internal consistency (templates, examples, docs)
+  - Example projects as first-class citizens
+  - Documentation single source of truth enforcement
+  - Test framework changes in scratch projects
+  - Version management (SemVer, CHANGELOG, releases)
+  - Template changes and backward compatibility
+  - Quality standards apply to framework itself
+  - Git workflow and commit conventions
+  - Complete release checklist
+  - Common development patterns and quick reference
+  - 8 framework development anti-patterns
+  - Comparison table: project dev vs. framework dev
+
+### Changed
+
+**Clarifications:**
+- `agent_operating_guidelines.md` now explicitly states it's for "projects using framework"
+- Clear distinction between project guidelines vs. framework development guidelines
+- Added cross-references between the two guideline documents
+- Removed ambiguity about "working in this repo"
+
+### Impact
+
+- Framework values and principles are now explicitly documented and won't be lost
+- Contributors have clear guidelines for framework development
+- Agents know which rules apply in which context (project vs. framework work)
+- All implicit principles from development discussions are now captured
+
 ## [0.1.0] - 2026-01-02
 
 ### Added (Initial Release)

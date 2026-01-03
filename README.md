@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.2.4](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.4)
+**Current version:** [v0.2.5](https://github.com/tomgun/agentic-framework/releases/tag/v0.2.5)
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
@@ -29,8 +29,8 @@ The Agentic AI Framework enables **sustainable long-term software development wi
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.4.tar.gz | tar xz
-cd agentic-framework-0.2.4
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.5.tar.gz | tar xz
+cd agentic-framework-0.2.5
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -56,10 +56,10 @@ The agent will:
 
 ```bash
 # Download and extract
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.3.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.5.tar.gz | tar xz
 
 # Copy .agentic/ into your project
-cp -r agentic-framework-0.2.3/.agentic /path/to/your-project/
+cp -r agentic-framework-0.2.5/.agentic /path/to/your-project/
 ```
 
 Then follow the same agent initialization process above. The agent will run `scaffold.sh` for you.
