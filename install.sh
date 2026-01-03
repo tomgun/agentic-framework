@@ -48,8 +48,11 @@ TARGET_PROJECT_DIR="$(pwd)"  # Get absolute path
 echo "  Target project: $TARGET_PROJECT_DIR"
 
 if [[ -d ".agentic" ]]; then
-  echo -e "${YELLOW}⚠ Warning: .agentic/ folder already exists${NC}"
-  echo "  If you want to upgrade, use upgrade.sh instead"
+  echo -e "${YELLOW}⚠ Warning: .agentic/ folder already exists in target project${NC}"
+  echo "  Target: $TARGET_PROJECT_DIR"
+  echo ""
+  echo "  If this is a new installation, you may have a previous failed attempt."
+  echo "  If you want to upgrade an existing installation, use upgrade.sh instead."
   echo ""
   read -p "  Continue and overwrite? [y/N] " -n 1 -r
   echo
