@@ -122,6 +122,7 @@ See [`.agentic/token_efficiency/reading_protocols.md`](token_efficiency/reading_
 1. [`agents/shared/agent_operating_guidelines.md`](agents/shared/agent_operating_guidelines.md) - Core rules
 2. [`workflows/tdd_mode.md`](workflows/tdd_mode.md) or [`workflows/dev_loop.md`](workflows/dev_loop.md) - Development workflow
 3. [`token_efficiency/reading_protocols.md`](token_efficiency/reading_protocols.md) - How to read efficiently
+4. **🚨 Working ON the framework itself?** [`FRAMEWORK_DEVELOPMENT.md`](FRAMEWORK_DEVELOPMENT.md) - Additional guidelines for framework development
 
 ---
 
