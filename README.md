@@ -8,6 +8,7 @@
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
+- [**PRINCIPLES.md**](.agentic/PRINCIPLES.md) ⭐ - Framework values & why we do what we do
 - [START_HERE.md](.agentic/START_HERE.md) - Quick start in 5 minutes
 - [MANUAL_OPERATIONS.md](.agentic/MANUAL_OPERATIONS.md) - Token-free information retrieval
 - [USER_WORKFLOWS.md](.agentic/workflows/USER_WORKFLOWS.md) - Working with agents

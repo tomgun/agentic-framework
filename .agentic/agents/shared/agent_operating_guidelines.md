@@ -1,5 +1,7 @@
 # Agent operating guidelines (shared)
 
+**📖 For framework principles and values, see [../../PRINCIPLES.md](../../PRINCIPLES.md)**
+
 These rules are intended to be used by **any** assistant (Cursor, Copilot, Claude, etc.) working in this repo.
 
 ## Developer UX contract (keep the user "by the hand")
