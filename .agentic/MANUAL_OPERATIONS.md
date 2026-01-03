@@ -78,82 +78,37 @@ Shows: decisions, blockers, or issues that need human judgment.
 
 ## Automated Health Checks
 
-These scripts analyze the project and report issues:
+**📖 For detailed script documentation, see [`DEVELOPER_GUIDE.md#automation--scripts`](DEVELOPER_GUIDE.md#automation--scripts)**
 
-### Check project structure
+These scripts analyze the project and report issues. Here are the most common ones:
+
+### Essential Scripts
+
 ```bash
+# Check project structure and required files
 bash .agentic/tools/doctor.sh
-```
-**What it checks**:
-- All required files exist (STATUS.md, FEATURES.md, etc.)
-- Files aren't empty or still template content
-- Feature IDs referenced in STATUS.md actually exist
-- NFR cross-references are valid
 
-**When to run**: After setup, before starting work, when something feels off.
-
-### Feature status summary
-```bash
+# Get feature status summary
 bash .agentic/tools/report.sh
-```
-**What it shows**:
-- Count of features by status (planned/in_progress/shipped)
-- Features missing acceptance criteria
-- Features needing acceptance validation
-- Features with dependency issues
 
-**When to run**: To understand what's done vs. what's left.
-
-### Comprehensive verification
-```bash
+# Comprehensive verification (doctor + cross-references + tests)
 bash .agentic/tools/verify.sh
-```
-**What it checks**:
-- Everything doctor.sh checks
-- Cross-references between all spec files
-- Broken links to features/NFRs/ADRs
-- Missing acceptance files
-- Optionally runs test suite
 
-**When to run**: Before committing, before deployments, weekly health check.
-
-### Code annotation coverage
-```bash
+# Check code traceability
 bash .agentic/tools/coverage.sh
-```
-**What it shows**:
-- Which features have code annotations (`@feature F-####`)
-- Which implemented features lack annotations
-- Orphaned annotations (code references non-existent features)
-- Coverage percentage
 
-**When to run**: To verify code traceability, before major reviews.
-
-### Feature dependencies
-```bash
+# Visualize feature dependencies
 bash .agentic/tools/feature_graph.sh
-# Or save to file:
-bash .agentic/tools/feature_graph.sh --save
-```
-**What it shows**:
-- Mermaid diagram of feature dependencies
-- Which features depend on which
-- Status visualization (✓ shipped, ⚙ in progress)
 
-**When to run**: Planning next features, understanding blockers.
-
-### Architecture changes
-```bash
+# See architecture evolution
 bash .agentic/tools/arch_diff.sh
-# Or compare specific commits:
-bash .agentic/tools/arch_diff.sh HEAD~5
 ```
-**What it shows**:
-- Changes to TECH_SPEC.md since last tag
-- Changes to architecture diagrams
-- What evolved and when
 
-**When to run**: Reviewing architectural drift, preparing documentation.
+**See DEVELOPER_GUIDE.md for**:
+- What each script checks
+- When to run each script
+- Example outputs
+- Full list of 30+ available scripts
 
 ## Context Gathering (Before Agent Session)
 
@@ -332,18 +287,19 @@ Now you can review code with context.
 
 ## Common Questions → Commands
 
+**📖 For comprehensive command reference, see [`DEVELOPER_GUIDE.md#quick-reference`](DEVELOPER_GUIDE.md#quick-reference)**
+
 | Question | Command |
 |----------|---------|
-| What's the current focus? | `cat STATUS.md \| head -20` |
+| What's the current focus? | `cat STATUS.md` |
 | What happened in last session? | `tail -30 JOURNAL.md` |
 | How do I run tests? | `grep -i "test" STACK.md` |
 | What features are done? | `grep "Status: shipped" spec/FEATURES.md` |
 | What's blocking progress? | `cat HUMAN_NEEDED.md` |
 | Is documentation current? | `bash .agentic/tools/verify.sh` |
 | Where is feature X implemented? | `grep -r "@feature F-000X" .` |
-| What needs acceptance testing? | `bash .agentic/tools/report.sh` |
-| Are there broken references? | `bash .agentic/tools/verify.sh` |
-| What are the dependencies? | `bash .agentic/tools/feature_graph.sh` |
+
+See DEVELOPER_GUIDE.md for the full table with 20+ commands.
 
 ## When to Ask the Agent vs. Look Yourself
 
