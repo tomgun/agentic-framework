@@ -73,6 +73,11 @@ fi
 echo "  Copying .agentic/ from framework..."
 cp -r "$SCRIPT_DIR/.agentic" .
 echo -e "  ${GREEN}✓${NC} Framework files copied"
+
+# Make scripts executable
+chmod +x .agentic/init/scaffold.sh
+chmod +x .agentic/tools/*.sh .agentic/tools/*.py 2>/dev/null || true
+echo -e "  ${GREEN}✓${NC} Scripts made executable"
 echo ""
 
 # Step 4: Run scaffold.sh
