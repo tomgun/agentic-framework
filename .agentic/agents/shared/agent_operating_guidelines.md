@@ -132,6 +132,24 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 5. **Formal definition of done**: Acceptance criteria in `spec/acceptance/F-####.md`
 6. **Keep docs synced**: Update specs when behavior changes
 
+**🚨 CRITICAL: Feature Creation Rule**:
+- **When adding a new feature to `spec/FEATURES.md`, you MUST immediately create `spec/acceptance/F-####.md`**
+- Never leave a feature without acceptance criteria - agents and humans need it to know what "done" means
+- If acceptance criteria are unclear, add to `HUMAN_NEEDED.md` and wait for clarification
+- Template: Use `.agentic/spec/FEATURES.template.md` as reference for acceptance file structure
+
+**🚨 CRITICAL: Feature Status Workflow**:
+- `planned` → Feature defined, acceptance criteria exist, not started
+- `in_progress` → Actively being worked on (tests + implementation)
+- `shipped` → Code complete, tests pass, deployed/merged
+- `shipped` + `Accepted: no` → Waiting for human validation
+- `shipped` + `Accepted: yes` → Human tested and approved
+- **NEVER mark as `shipped` until**:
+  1. All tests pass
+  2. Code is committed
+  3. Acceptance criteria file exists and is complete
+- **After marking `shipped`**, tell human: "F-#### is complete. Please test and mark as accepted if it meets criteria"
+
 ---
 
 - **If pipeline mode enabled and in pipeline**: Read `..agentic/pipeline/F-####-pipeline.md`, follow role-specific work (requires core+product profile)
@@ -231,10 +249,20 @@ Update when:
 
 **What to update:**
 - `Status`: Change from 'planned' → 'in_progress' → 'shipped'
-- `Implementation: State`: Update from 'none' → 'partial' → 'complete'
+- `Implementation: State`: Update from 'none' → 'partial' → 'complete' (ALWAYS update when you add code!)
 - `Implementation: Code`: Add actual file paths as you create them
 - `Tests: Unit/Integration/Acceptance`: Update from 'todo' → 'partial' → 'complete'
-- `Verification: Accepted`: Set to 'yes' only when fully tested and working
+- `Verification: Accepted`: Leave as 'no' until human validates, then set to 'yes' with date
+
+**🚨 CRITICAL: Keep Implementation State Accurate**:
+- **If you write ANY code for a feature, change `State: none` to `State: partial` or `State: complete`**
+- **NEVER leave `State: none` if code files exist**
+- Check this EVERY time you update FEATURES.md
+- If marking feature as `shipped`, verify:
+  1. `Implementation: State: complete`
+  2. `Implementation: Code:` field lists all relevant files
+  3. `Tests: Unit:` is `complete` (not `todo`)
+  4. Acceptance criteria file exists at `spec/acceptance/F-####.md`
 
 ### Enforcement Protocol
 

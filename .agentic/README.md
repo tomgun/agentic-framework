@@ -4,7 +4,7 @@
 
 This folder is a **portable framework** you can copy into any repository to bootstrap **high-quality, test-driven, token-efficient** agentic development in **Cursor 2.2+** (and optionally alongside GitHub Copilot / Claude).
 
-**New to this framework?** → Start at [`START_HERE.md`](START_HERE.md)
+**New to this framework?** → Start at [`DEVELOPER_GUIDE.md`](DEVELOPER_GUIDE.md) ⭐⭐⭐ or [`START_HERE.md`](START_HERE.md)
 
 ## Two Profiles: Choose What Fits Your Project
 
