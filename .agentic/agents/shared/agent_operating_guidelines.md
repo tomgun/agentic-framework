@@ -2,7 +2,9 @@
 
 **📖 For framework principles and values, see [../../PRINCIPLES.md](../../PRINCIPLES.md)**
 
-These rules are intended to be used by **any** assistant (Cursor, Copilot, Claude, etc.) working in this repo.
+**🎯 Scope**: These rules are for **any** assistant (Cursor, Copilot, Claude, etc.) working in **a project that uses this framework**.
+
+**🚨 Working ON the framework itself?** Also read [`../../FRAMEWORK_DEVELOPMENT.md`](../../FRAMEWORK_DEVELOPMENT.md) for additional guidelines specific to framework development.
 
 ## Developer UX contract (keep the user "by the hand")
 - Always make the next step obvious. End each work session with:
