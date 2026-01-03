@@ -207,7 +207,19 @@ From repo root:
 bash .agentic/tools/sync_docs.sh
 ```
 
-## Where to read / edit “project truth”
+## User Workflows: How to Work with Agents
+
+**⭐ New user? Start here**: [`workflows/USER_WORKFLOWS.md`](workflows/USER_WORKFLOWS.md)
+
+Complete guide covering:
+- How to add new features (edit specs yourself or ask agent)
+- How to update specs and acceptance criteria
+- How agents pick up your changes (YES, they do!)
+- TDD workflow
+- Sequential agent pipeline
+- Common questions and troubleshooting
+
+## Where to read / edit "project truth"
 - Vision + current state + architecture pointers: `spec/OVERVIEW.md`
 - Current execution state: `STATUS.md`
 - Requirements: `spec/PRD.md`
