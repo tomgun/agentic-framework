@@ -83,6 +83,9 @@ Then follow the same agent initialization process above. The agent will run `sca
 - Agents run scaffold scripts, update docs, maintain consistency
 - Clear status at all times (`STATUS.md` + `JOURNAL.md`)
 - Tools provide immediate project health checks (no agent needed)
+- **Ready-to-use prompts**: Copy-paste workflows from `.agentic/prompts/` (Cursor/Claude)
+- **Session continuity**: Generate `.continue-here.md` for instant context recovery
+- **Pre-project planning**: Use `VISION.template.md` for ideation phase
 
 ### 3. Quality by Design
 **Tests and incremental changes reduce risk.**
@@ -152,9 +155,11 @@ Then follow the same agent initialization process above. The agent will run `sca
 
 > "Read `.agentic/init/init_playbook.md` and help me initialize this project."
 
+**Or use a ready-made prompt**: Copy from `.agentic/prompts/cursor/session_start.md` or `.agentic/prompts/claude/session_start.md`
+
 The agent will:
 1. Ask what you're building
-2. **Ask which profile you want** (Core or Core+PM) and explain the differences
+2. **Ask which profile you want** (a=Core or b=Core+PM) and explain the differences
 3. Interview you about your tech stack and requirements
 4. Fill in `STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
 5. Set up quality validation for your stack
@@ -162,6 +167,8 @@ The agent will:
 **Now you're ready!** The agent understands your project and can start building.
 
 **New to the framework?** → Tell your agent: *"Read `.agentic/START_HERE.md` and explain how to use this framework"*
+
+**Pre-project planning?** → See `.agentic/init/VISION.template.md` for ideation-phase template.
 
 ### Upgrading existing projects
 
