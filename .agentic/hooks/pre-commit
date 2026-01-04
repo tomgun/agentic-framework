@@ -1,0 +1,25 @@
+#!/bin/bash
+# Pre-commit hook for validating spec files
+# This ensures spec integrity before commits
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}Running spec validation...${NC}"
+
+# Run validation
+if python .agentic/tools/validate_specs.py; then
+    echo -e "${GREEN}✅ Spec validation passed${NC}"
+    exit 0
+else
+    echo -e "${RED}❌ Spec validation failed${NC}"
+    echo -e "${YELLOW}Fix errors in spec files before committing.${NC}"
+    echo -e "${YELLOW}To bypass (not recommended): git commit --no-verify${NC}"
+    exit 1
+fi
+

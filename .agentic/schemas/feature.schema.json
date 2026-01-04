@@ -40,6 +40,32 @@
       "enum": ["S", "M", "L", "XL"],
       "description": "Size estimate (S=hours, M=days, L=weeks, XL=months)"
     },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      },
+      "description": "Tags for categorization and search (lowercase, hyphen-separated)"
+    },
+    "layer": {
+      "type": "string",
+      "enum": ["presentation", "business-logic", "data", "infrastructure", "other"],
+      "description": "Architectural layer this feature belongs to"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Business domain (auth, payments, content, etc.)"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"],
+      "description": "Business priority level"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Owner email or username responsible for this feature"
+    },
     "prd": {
       "type": ["string", "null"],
       "description": "Link to PRD section"
