@@ -12,7 +12,7 @@ Tomi Tuhkanen, Aki Väliaho, Miika Henttonen, Antti Rintala, Aleksi Sutela, Arto
 
 **Technical Chiefhood**: Jari Huilla  
 **AI Visionaire**: Olli Laine  
-**Sparring Partners** (lots of discussion, lots of <3): Erkka Korpi, Tony Repo, Simo-Pekka Leppänen
+**Sparring Partners**: Erkka Korpi, Tony Repo, Simo-Pekka Leppänen
 
 **And the whole Kipinä Software partners community** - plus anyone not mentioned here who has contributed ideas, feedback, and inspiration.
 
