@@ -22,17 +22,17 @@ The agent should ask only what’s necessary to produce durable context artifact
 ## Tech stack
 - Primary language(s)?
 - Primary framework(s) / runtime(s)?
-  - If 2D game (web): Phaser 3, PixiJS, or custom?
+  - If 2D game (web): Phaser 3, PixiJS, Godot (HTML5 export), or custom?
   - If 2D game (mobile): SpriteKit (iOS), libGDX (Android), Unity, or Godot?
-  - If 2D game (desktop): SFML, SDL2, Raylib, Bevy (Rust), or Macroquad (Rust)?
-  - If 3D game: Unity, Unreal Engine, or OpenGL/custom engine?
+  - If 2D game (desktop): Godot, SFML, SDL2, Raylib, Bevy (Rust), or Macroquad (Rust)?
+  - If 3D game: Unity, Unreal Engine, Godot, or OpenGL/custom engine?
   - If 3D demo: OpenGL, WebGL, or Three.js?
 - Package/dependency manager choice?
 - Data storage: DB type + hosting?
 - Authn/authz approach (if needed)?
 - External integrations (APIs, queues, payments, etc.)?
-- For games: Physics library (if needed)? Matter.js, Box2D, Bullet, etc.?
-- For games: Visual effects library (if needed)? Particle systems, shader effects?
+- For games: Physics library (if needed)? Matter.js, Box2D, Bullet, Godot built-in, etc.?
+- For games: Visual effects library (if needed)? Particle systems, shader effects, Godot VFX?
 
 ## Architecture + boundaries
 - High-level architecture style (monolith, modular monolith, services)?
