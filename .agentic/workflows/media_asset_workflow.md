@@ -210,23 +210,27 @@ The framework currently has NO specific guidance for:
 
 ### AI Image Generation
 
-1. **Stable Diffusion (Free, Open Source)**
+1. **Stable Diffusion** (Free, Open Source)
    - Run locally or via free services (Hugging Face Spaces)
    - License: Generated images are yours
    - Use case: Custom illustrations, concept art
    - Quality: Excellent
    - Note: Requires GPU for local, or use online for free
 
-2. **DALL-E 3 (via ChatGPT Plus / Bing Image Creator)**
+2. **DALL-E 3** (Free tier available)
    - Bing Image Creator: FREE (with limits)
    - ChatGPT Plus: $20/mo (includes DALL-E 3)
    - License: Generated images are yours
    - Use case: High-quality custom images
 
-3. **Midjourney** (Paid, but trial available)
-   - $10/mo basic plan
-   - License: Commercial use allowed (check terms)
-   - Quality: Excellent
+3. **Midjourney** ⭐ COMMERCIAL (Subscription)
+   - **Basic**: $10/mo (200 images/month)
+   - **Standard**: $30/mo (unlimited relaxed mode)
+   - **Pro**: $60/mo (stealth mode + more)
+   - License: Commercial use allowed (owns images on paid plans)
+   - Quality: **Excellent** (best artistic quality)
+   - Use case: Professional illustrations, concept art, game assets
+   - Website: https://midjourney.com
 
 ### AI Sprite & Pixel Art Generation
 
@@ -256,6 +260,185 @@ The framework currently has NO specific guidance for:
    - Generate royalty-free music
    - License: Check per plan
    - Use case: Background music
+
+4. **ElevenLabs** ⭐ COMMERCIAL (Subscription)
+   - **Free**: 10,000 characters/month
+   - **Starter**: $5/mo (30,000 chars)
+   - **Creator**: $22/mo (100,000 chars)
+   - **Pro**: $99/mo (500,000 chars)
+   - License: Commercial use allowed
+   - Quality: **Excellent** (best voice synthesis)
+   - Use case: Voiceovers, narration, character voices
+   - Website: https://elevenlabs.io
+
+---
+
+## Commercial Media Services (Subscription-Based)
+
+**If the developer has subscriptions to commercial services, agents should offer these as options.**
+
+### Stock Photos & Videos
+
+1. **Adobe Stock** ⭐ COMMERCIAL
+   - **Subscription**: From $29.99/mo (10 images)
+   - License: Extended commercial license included
+   - Quality: Professional
+   - Use case: High-quality photos, vectors, videos
+   - Website: https://stock.adobe.com
+
+2. **Shutterstock** ⭐ COMMERCIAL
+   - **Subscription**: From $29/mo (10 images)
+   - License: Standard commercial license
+   - Quality: Professional
+   - Use case: Photos, vectors, videos, music
+   - Website: https://shutterstock.com
+
+3. **Envato Elements** ⭐ COMMERCIAL (BEST VALUE)
+   - **Subscription**: $16.50/mo (UNLIMITED downloads!)
+   - License: Commercial use allowed
+   - Assets: Photos, videos, graphics, templates, fonts, music, SFX
+   - Quality: Excellent
+   - Use case: **Best value for unlimited assets**
+   - Website: https://elements.envato.com
+
+### Music & Sound Effects
+
+1. **Artlist** ⭐ COMMERCIAL
+   - **Music**: $9.99/mo
+   - **Music + SFX**: $14.99/mo
+   - License: Perpetual (even after subscription ends!)
+   - Quality: **Excellent** (professional music)
+   - Use case: High-quality music for videos, games, apps
+   - Website: https://artlist.io
+
+2. **Epidemic Sound** ⭐ COMMERCIAL
+   - **Personal**: $15/mo
+   - **Commercial**: $29/mo
+   - License: Commercial use allowed
+   - Quality: Excellent
+   - Use case: Music for videos, podcasts, games
+   - Website: https://epidemicsound.com
+
+3. **AudioJungle (Envato Market)** COMMERCIAL
+   - **Pay-per-track**: $1-50 per item
+   - License: Commercial use
+   - Quality: Good
+   - Use case: One-off music/SFX purchases
+   - Website: https://audiojungle.net
+
+### Fonts
+
+1. **Adobe Fonts** (Included with Adobe CC)
+   - **Subscription**: Included with Creative Cloud ($54.99/mo)
+   - License: Desktop + web use
+   - Quality: Professional
+   - Use case: High-quality typography
+
+2. **MyFonts** COMMERCIAL
+   - **Pay-per-font**: Varies
+   - License: Desktop + web (usually)
+   - Quality: Excellent
+   - Use case: Premium fonts
+
+### 3D Assets & Models
+
+1. **TurboSquid** COMMERCIAL
+   - **Pay-per-model**: Varies widely
+   - License: Check per model
+   - Quality: Professional
+   - Use case: High-quality 3D models
+
+2. **Sketchfab Pro** COMMERCIAL
+   - **Subscription**: $9/mo (store credits)
+   - License: Varies per model
+   - Quality: Good to excellent
+
+### Video Assets & Effects
+
+1. **Artgrid** (by Artlist) ⭐ COMMERCIAL
+   - **Subscription**: $29/mo
+   - License: Perpetual
+   - Quality: Professional stock footage
+   - Use case: B-roll, stock video clips
+
+2. **RunwayML** ⭐ COMMERCIAL (AI Video)
+   - **Basic**: $12/mo (125 credits)
+   - **Standard**: $28/mo (625 credits)
+   - **Pro**: $76/mo (2250 credits)
+   - License: Commercial use allowed
+   - Quality: Excellent (AI video generation)
+   - Use case: AI-generated video, effects, motion graphics
+   - Website: https://runwayml.com
+
+---
+
+## Agent Workflow for Commercial Services
+
+### When Agent Needs an Asset
+
+**Updated workflow** to include commercial services:
+
+1. **Check if asset already exists**:
+   - Look in `assets/images/`, `assets/audio/`, etc.
+   - Check `assets/ATTRIBUTION.md` for existing assets
+
+2. **If asset doesn't exist, ask human**:
+   ```
+   "I need [description] for [feature].
+   
+   Options:
+   a) Source from FREE library (Unsplash/Kenney/Freesound)
+   b) Generate with FREE AI (Stable Diffusion/AudioCraft)
+   c) Use COMMERCIAL service (if you have subscription)
+   d) Use placeholder for now
+   e) You'll provide it
+   
+   Which would you prefer?"
+   ```
+
+3. **If human chooses (c) - Commercial Service**:
+   ```
+   Agent: "Which commercial services do you have access to?
+   
+   Images:
+   - Adobe Stock subscription?
+   - Shutterstock subscription?
+   - Envato Elements subscription? (BEST VALUE - unlimited!)
+   - Midjourney subscription? (AI generation)
+   
+   Music/SFX:
+   - Artlist subscription?
+   - Epidemic Sound subscription?
+   - Envato Elements? (includes music + SFX)
+   
+   3D/Video:
+   - TurboSquid credits?
+   - RunwayML subscription?
+   
+   Let me know which you have, and I'll guide you to find the right asset."
+   ```
+
+4. **Agent provides specific search guidance**:
+   ```
+   Agent: "Great! You have Envato Elements.
+   
+   For [fantasy game background music]:
+   1. Go to: https://elements.envato.com/audio
+   2. Search: 'fantasy adventure orchestral game'
+   3. Filter: Music > Game Music > Fantasy
+   4. Recommended tracks:
+      - 'Epic Fantasy Quest' by MusicAuthor
+      - 'Medieval Adventure' by SoundArtist
+   5. Download and save to: assets/audio/music/background-fantasy.mp3
+   6. I'll add to ATTRIBUTION.md
+   
+   Envato Elements license:
+   - ✅ Commercial use allowed
+   - ✅ Attribution NOT required (but I'll note source)
+   - ✅ Perpetual license"
+   ```
+
+5. **If human chooses (a), (b), (d), or (e)**: Follow existing workflow
 
 ---
 
@@ -512,15 +695,26 @@ To fully implement media asset workflow support:
 6. ✅ Use placeholder if asset not immediately available
 
 **Recommended defaults by asset type**:
-- **Images**: Unsplash (no attribution), Pexels (no attribution)
-- **Game Sprites**: Kenney.nl (CC0), OpenGameArt.org (check license)
-- **Icons**: Heroicons (MIT), Lucide (ISC)
-- **Sound Effects**: Freesound.org (check license), Mixkit (no attribution)
-- **Music**: Incompetech (CC-BY), Free Music Archive (check license)
-- **3D Models**: Poly Haven (CC0), Sketchfab (check license)
-- **Fonts**: Google Fonts (OFL)
+- **Images (Free)**: Unsplash, Pexels (no attribution)
+- **Images (Paid)**: Envato Elements (best value), Adobe Stock, Midjourney (AI)
+- **Game Sprites (Free)**: Kenney.nl (CC0), OpenGameArt.org
+- **Game Sprites (Paid)**: Commission custom, Envato Elements
+- **Icons (Free)**: Heroicons (MIT), Lucide (ISC)
+- **Sound Effects (Free)**: Freesound.org, Mixkit
+- **Sound Effects (Paid)**: Artlist, Envato Elements, ElevenLabs (AI voice)
+- **Music (Free)**: Incompetech (CC-BY), Free Music Archive
+- **Music (Paid)**: Artlist (best quality), Epidemic Sound, Envato Elements
+- **3D Models (Free)**: Poly Haven (CC0), Sketchfab
+- **3D Models (Paid)**: TurboSquid
+- **Fonts (Free)**: Google Fonts (OFL)
+- **Fonts (Paid)**: Adobe Fonts (with CC), MyFonts
 
 **When generating with AI**:
-- Images: Stable Diffusion (free), DALL-E 3 via Bing (free with limits)
-- Sound: AudioCraft (open source), Riffusion (experimental)
+- **Images (Free)**: Stable Diffusion
+- **Images (Paid)**: Midjourney ($10-60/mo), DALL-E 3 ($20/mo)
+- **Sound (Free)**: AudioCraft (open source), Riffusion
+- **Sound (Paid)**: ElevenLabs ($5-99/mo for voice)
+- **Video (Paid)**: RunwayML ($12-76/mo)
+
+**Best value commercial service**: Envato Elements ($16.50/mo unlimited downloads - photos, music, SFX, graphics, templates, fonts!)
 
