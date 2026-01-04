@@ -383,5 +383,3 @@ To purchase white-label license: **tomas@kipina.fi**
 - **Issues**: [Your issue tracker]
 
 ---
-
-**Note for adopted projects**: After copying `.agentic/` into your project, replace this root `README.md` with your project's actual README. Keep `.agentic/README.md` as-is for framework documentation.
