@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added - Enhanced Workflows, Design Systems, Validation Cache, Claude Commands
 
-**Comprehensive framework enhancements inspired by plugin-freedom-system analysis.**
+**Comprehensive framework enhancements for improved agent autonomy and developer experience.**
 
 #### 1. Enhanced Workflows with Error Recovery
 
@@ -111,11 +111,6 @@ Optional slash commands for Claude Desktop users:
 - Updated workflow files with error recovery sections
 - Added design systems README and usage guide
 - Documented validation cache in tool comments
-
-### Credits
-
-**Concept Inspiration**: plugin-freedom-system (audio plugin development framework)  
-**Adapted for**: General-purpose software development in Agentic AF
 
 ---
 
@@ -224,11 +219,6 @@ For capturing project vision before initialization:
 - `DEVELOPER_GUIDE.md`: Document `continue_here.py`, prompt library, Claude hooks
 - `.agentic/README.md`: Add continue_here.py and migration.sh to tools list
 - `prompts/claude/README.md`: Add hooks documentation and setup guide
-
-### Credits
-
-**Session Continuity Concept**: Inspired by plugin-freedom-system's context resume architecture  
-**Claude Hooks**: Adapted from plugin-freedom-system's lifecycle hooks for general-purpose development
 
 ---
 
