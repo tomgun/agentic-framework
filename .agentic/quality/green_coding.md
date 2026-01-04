@@ -54,13 +54,27 @@ function updateUser(id, data) {
 }
 ```
 
+**⚠️ Cache invalidation is notoriously difficult:**
+
+> "There are only two hard things in Computer Science: cache invalidation and naming things." - Phil Karlton
+
+**Why cache invalidation is hard:**
+- **Distributed systems**: Multiple caches across servers need coordination
+- **Cascading dependencies**: User changes → invalidate their orders → invalidate order summaries
+- **Partial updates**: What if only one field changes? Invalidate entire object?
+- **Race conditions**: Update and cache refresh happening simultaneously
+- **Cache stampede**: All caches expire at once, overwhelming database
+- **Multi-layered caches**: Browser cache, CDN cache, server cache, DB query cache
+
 **Common bugs from green optimizations:**
-- **Stale cache data**: Cache not invalidated on updates
+- **Stale cache data**: Cache not invalidated on updates (most common!)
 - **Race conditions**: Concurrent requests with lazy loading
 - **Memory leaks**: Cache grows unbounded without eviction
 - **Incorrect batching**: Batched operations applied in wrong order
 - **Event loss**: Event-driven system drops events under load
 - **Debounce issues**: User action lost due to aggressive debouncing
+- **Cache stampede**: Thundering herd when cache expires
+- **Inconsistent state**: Different caches have different versions
 
 ### The Safe Approach
 
@@ -359,6 +373,142 @@ async function getWeather(city: string) {
 - No cache: 1000 API calls
 - With cache: ~1 API call (+ 999 cache hits)
 - **99.9% reduction in API calls**
+
+**⚠️ Cache Invalidation Strategies (The Hard Part)**
+
+> "There are only two hard things in Computer Science: cache invalidation and naming things." - Phil Karlton
+
+**Why it's hard**: When do you invalidate? Too early = cache misses. Too late = stale data.
+
+**Strategy 1: Time-Based (TTL - Time To Live)**
+```typescript
+// Simplest: Cache expires after fixed time
+cache.set(key, { data, expires: Date.now() + TTL });
+
+// ✅ Good for: Read-heavy, data changes slowly, staleness acceptable
+// ❌ Bad for: Data must be real-time, user sees own updates
+// Example: Weather (5 min stale OK), stock prices (1 sec max)
+```
+
+**Strategy 2: Write-Through (Invalidate on Update)**
+```typescript
+function updateUser(id, data) {
+  db.updateUser(id, data);      // Write to DB
+  cache.delete(id);              // Invalidate cache
+}
+
+// ✅ Good for: User must see their own updates immediately
+// ❌ Bad for: High write volume, distributed systems (hard to coordinate)
+// Example: User profile, shopping cart
+```
+
+**Strategy 3: Write-Behind (Async Invalidation)**
+```typescript
+function updateUser(id, data) {
+  db.updateUser(id, data);
+  
+  // Invalidate after write completes
+  setTimeout(() => cache.delete(id), 100);
+}
+
+// ✅ Good for: Performance critical, slight staleness OK
+// ❌ Bad for: Must be immediately consistent
+// Example: View counts, analytics
+```
+
+**Strategy 4: Event-Based (Pub/Sub)**
+```typescript
+// When data changes, publish event
+eventBus.on('user:updated', (userId) => {
+  cache.delete(userId);
+});
+
+// ✅ Good for: Microservices, distributed caches
+// ❌ Bad for: Event loss risk, added complexity
+// Example: Multi-server deployments
+```
+
+**Strategy 5: Cache Versioning**
+```typescript
+// Include version in cache key
+function getUser(id) {
+  const version = getUserVersion(id); // From DB or separate store
+  const key = `user:${id}:v${version}`;
+  
+  if (cache.has(key)) return cache.get(key);
+  
+  const user = db.getUser(id);
+  cache.set(key, user);
+  return user;
+}
+
+// On update: increment version (old cache keys automatically stale)
+function updateUser(id, data) {
+  db.updateUser(id, data);
+  incrementUserVersion(id); // Old cache keys now useless
+}
+
+// ✅ Good for: Distributed systems, no invalidation needed
+// ❌ Bad for: Version management overhead
+// Example: CDNs, immutable data
+```
+
+**Strategy 6: Combination (Layered Defense)**
+```typescript
+// Most robust: TTL + explicit invalidation
+const cache = new LRUCache({
+  max: 500,                    // Max size (prevents memory leak)
+  ttl: 5 * 60 * 1000,         // 5 min TTL (safety net)
+  updateAgeOnGet: false        // Don't extend TTL on read
+});
+
+function getUser(id) {
+  return cache.fetch(id, async () => {
+    return await db.getUser(id);
+  });
+}
+
+function updateUser(id, data) {
+  db.updateUser(id, data);
+  cache.delete(id);           // Explicit invalidation
+  // If delete fails, TTL still expires eventually
+}
+
+// ✅ Good for: Production systems, belt-and-suspenders
+// ❌ Bad for: Overkill for simple cases
+// Example: Most real-world caching
+```
+
+**Common Pitfalls:**
+1. **Cascading invalidation**: User update should invalidate user's orders? Order summaries?
+   - Solution: Keep cache scopes simple, or use versioning
+2. **Cache stampede**: All caches expire at once, overwhelming DB
+   - Solution: Staggered TTLs, request coalescing
+3. **Distributed inconsistency**: Server A's cache differs from Server B's
+   - Solution: Centralized cache (Redis), pub/sub invalidation
+4. **Race conditions**: Update and cache refresh happen simultaneously
+   - Solution: Locking, optimistic concurrency, idempotent operations
+
+**When to use which strategy:**
+
+| Data Type | Update Frequency | Staleness Tolerance | Strategy |
+|-----------|------------------|---------------------|----------|
+| Weather | Low | High (5-30 min OK) | TTL only |
+| User profile | Medium | Low (must see own updates) | TTL + Write-Through |
+| Stock prices | High | Very Low (seconds) | Short TTL (1-5s) |
+| Analytics | High | Medium | TTL + Write-Behind |
+| Static assets | Never | Infinite | Cache forever + versioning |
+| Distributed | Any | Varies | Event-Based + TTL |
+
+**The Safe Default:**
+```typescript
+// Start with: TTL + LRU + Explicit invalidation
+// Only add complexity if profiling shows need
+const cache = new LRUCache({ max: 1000, ttl: 60000 });
+// Simple, catches most issues, bounded memory
+```
+
+**Rule of Thumb**: If you can't reason about cache invalidation clearly, don't cache. Simple code > buggy caching.
 
 ### Compression
 
