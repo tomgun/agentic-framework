@@ -12,7 +12,7 @@ Tomi Tuhkanen, Aki Väliaho, Miika Henttonen, Antti Rintala, Aleksi Sutela, Arto
 
 **Technical Chiefhood**: Jari Huilla  
 **AI Visionaire**: Olli Laine  
-**Sparring Partners** (for giving the challenge of proving them wrong by making things reality): Erkka Korpi, Tony Repo, Simo-Pekka Leppänen
+**Sparring Partners** (we people LOVE to prove someone wrong, don't we? lots of discussion, lots of <3): Erkka Korpi, Tony Repo, Simo-Pekka Leppänen
 
 ---
 
