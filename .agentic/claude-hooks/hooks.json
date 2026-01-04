@@ -1,0 +1,70 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/claude-hooks/SessionStart.sh",
+            "timeout": 5000,
+            "description": "Validate environment and load session context"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/claude-hooks/UserPromptSubmit.sh",
+            "timeout": 3000,
+            "description": "Auto-inject .continue-here.md if available"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/claude-hooks/PostToolUse.sh",
+            "timeout": 2000,
+            "description": "Run quick quality checks after code edits"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/claude-hooks/PreCompact.sh",
+            "timeout": 10000,
+            "description": "Preserve critical state before context compaction"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/claude-hooks/Stop.sh",
+            "timeout": 5000,
+            "description": "Workflow integrity check before ending session"
+          }
+        ]
+      }
+    ]
+  }
+}
+

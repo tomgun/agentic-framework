@@ -95,6 +95,28 @@ For complex problems, ask Claude to use "extended thinking":
 
 Example: "Using extended thinking, help me debug this race condition..."
 
+### Hooks (Advanced)
+
+**Claude Desktop with hooks enabled** can run automated scripts at key lifecycle points:
+
+| Hook | When | Purpose |
+|------|------|---------|
+| `SessionStart` | Session begins | Show project status, check for `.continue-here.md` |
+| `UserPromptSubmit` | First prompt | Auto-inject `.continue-here.md` (no manual "read" needed!) |
+| `PostToolUse` | After file edits | Run quick linter checks |
+| `PreCompact` | Before context compaction | Save state to `.continue-here.md` |
+| `Stop` | Session ends | Remind about uncommitted changes |
+
+**Setup**: See [`.agentic/claude-hooks/README.md`](../../claude-hooks/README.md) for full documentation.
+
+**Benefits**:
+- **Zero-touch context recovery**: `.continue-here.md` is auto-injected
+- **Real-time quality gates**: Linter runs after code edits
+- **Never lose progress**: State saved before context compaction
+- **Better workflow discipline**: Reminders about commits and docs
+
+**If hooks aren't available in your Claude Desktop version**: Use the prompts in this directory instead!
+
 ## Tips for Claude
 
 - Claude works well with conversational, detailed prompts
