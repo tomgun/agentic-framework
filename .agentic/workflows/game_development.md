@@ -376,8 +376,12 @@ def test_stable_stacking():
 
 #### **Desktop Games**
 
+**Cross-Platform Engines**:
+- **Godot** ⭐ RECOMMENDED for 2D/3D (GDScript, C#, C++)
+- **Unity** (for 3D or complex 2D)
+
 **C++**:
-- **SFML** ⭐ RECOMMENDED for 2D
+- **SFML** ⭐ RECOMMENDED for pure 2D
 - **SDL2** - Lower level, more control
 - **Raylib** - Simple, modern
 
