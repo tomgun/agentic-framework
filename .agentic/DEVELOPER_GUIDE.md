@@ -64,8 +64,21 @@ The agent will:
 ### Morning: Start Your Work Session
 
 ```bash
+# 1. Quick context recovery (recommended)
+python3 .agentic/tools/continue_here.py  # Generates .continue-here.md
+
+# 2. Read the summary
+cat .continue-here.md
+
+# 3. Check blockers
+cat HUMAN_NEEDED.md
+```
+
+**Or manually:**
+
+```bash
 # 1. Check what's happening (30 seconds)
-cat STATUS.md | head -30
+cat STATUS.md | head -30  # or cat PRODUCT.md in Core mode
 
 # 2. See recent progress (30 seconds)
 tail -30 JOURNAL.md
@@ -82,6 +95,8 @@ cat HUMAN_NEEDED.md
 - What happened yesterday
 - What's broken (if anything)
 - What needs your decision
+
+**💡 Using AI prompts**: Copy a prompt from [`.agentic/prompts/cursor/`](prompts/cursor/) or [`.agentic/prompts/claude/`](prompts/claude/) to quickly start your session with the agent. Example: use `session_start.md` to get oriented automatically.
 
 ### During: Development Work
 
@@ -147,6 +162,30 @@ git push
 ---
 
 ## Working with Agents
+
+### Ready-to-Use AI Prompts
+
+**Don't want to write prompts from scratch?** Use our pre-made workflow prompts:
+
+**For Cursor**: [`.agentic/prompts/cursor/`](prompts/cursor/)
+**For Claude**: [`.agentic/prompts/claude/`](prompts/claude/)
+
+#### Available Prompts:
+- **`session_start.md`** - Start session, load context, get oriented
+- **`session_end.md`** - Document work, update specs, commit
+- **`feature_start.md`** - Begin implementing a feature (TDD workflow)
+- **`feature_test.md`** - Create comprehensive tests
+- **`feature_complete.md`** - Mark feature done, verify quality
+- **`migration_create.md`** - Create spec migration (Core+PM)
+- **`product_update.md`** - Update PRODUCT.md (Core mode)
+- **`quick_feature.md`** - Implement simple feature (Core mode)
+- **`research.md`** - Deep research session
+- **`plan_feature.md`** - Plan complex feature
+- **`run_quality.md`** - Run quality checks
+- **`fix_issues.md`** - Fix linter/test errors
+- **`retrospective.md`** - Project health check
+
+**How to use**: Open the prompt file, copy the text, paste into your AI chat. The agent will follow the workflow automatically.
 
 ### How Agents Use This Framework (Proactive Operating Loop)
 
@@ -494,6 +533,34 @@ grep -i "authentication" JOURNAL.md
 ## Automation & Scripts
 
 The framework includes 30+ automation scripts in `.agentic/tools/`.
+
+### Session Continuity
+
+#### `continue_here.py` - Generate Quick Context Recovery
+
+**What it does:**
+- Synthesizes `JOURNAL.md`, `STATUS.md`/`PRODUCT.md`, `HUMAN_NEEDED.md`, `FEATURES.md`, and pipeline files
+- Creates a single `.continue-here.md` file with:
+  - Quick summary of current state
+  - Active features and pipelines
+  - Blockers requiring human attention
+  - Recent work summary
+  - Recommended next steps
+  - Key files to review
+
+**When to run:**
+- At the end of each work session
+- Before taking a break
+- When context window is about to reset
+- Before switching to a different project
+
+```bash
+python3 .agentic/tools/continue_here.py
+```
+
+**Output:** `.continue-here.md` in your project root.
+
+**Next session:** Just read `.continue-here.md` for instant context recovery, or ask your AI agent to read it.
 
 ### Health Check Scripts
 

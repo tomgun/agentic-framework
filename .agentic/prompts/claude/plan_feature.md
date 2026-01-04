@@ -1,0 +1,1 @@
+../cursor/plan_feature.md

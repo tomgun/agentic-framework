@@ -219,6 +219,23 @@ Complete guide covering:
 - Sequential agent pipeline
 - Common questions and troubleshooting
 
+### Ready-to-Use AI Prompts
+
+**Cursor Users**: See [`prompts/cursor/`](prompts/cursor/) for copy-paste workflow prompts:
+- `session_start.md` / `session_end.md` - Session management
+- `feature_start.md` / `feature_test.md` / `feature_complete.md` - Feature development (TDD)
+- `migration_create.md` - Spec migrations (Core+PM mode)
+- `product_update.md` / `quick_feature.md` - Core mode workflows
+- `research.md` / `plan_feature.md` - Deep research and planning
+- `run_quality.md` / `fix_issues.md` / `retrospective.md` - Quality & maintenance
+
+**Claude Users**: See [`prompts/claude/`](prompts/claude/) for:
+- Same workflow prompts as Cursor
+- Claude-specific tips (Artifacts, Projects, Extended Thinking)
+- Project setup instructions
+
+**GitHub Copilot Users**: Use Cursor prompts - they work in any tool!
+
 ## Where to read / edit "project truth"
 - Vision + current state + architecture pointers: `spec/OVERVIEW.md`
 - Current execution state: `STATUS.md`
@@ -249,6 +266,7 @@ bash .agentic/tools/verify.sh      # Comprehensive checks
 
 # Context and analysis
 bash .agentic/tools/brief.sh       # Quick project brief
+python3 .agentic/tools/continue_here.py  # Generate .continue-here.md for next session
 bash .agentic/tools/coverage.sh    # Code annotation coverage
 bash .agentic/tools/feature_graph.sh   # Feature dependency graph
 bash .agentic/tools/arch_diff.sh   # Architecture changes
@@ -264,6 +282,12 @@ bash .agentic/tools/version_check.sh # Check dependency versions match STACK.md
 
 # Spec validation
 python3 .agentic/tools/validate_specs.py  # Validate spec frontmatter
+
+# Spec migrations (Core+PM mode, optional)
+bash .agentic/tools/migration.sh create "Add Feature X"  # Create new migration
+bash .agentic/tools/migration.sh list                    # List all migrations
+bash .agentic/tools/migration.sh show 001                # Show specific migration
+bash .agentic/tools/migration.sh search "keyword"        # Search migrations
 ```
 
 ## Troubleshooting
