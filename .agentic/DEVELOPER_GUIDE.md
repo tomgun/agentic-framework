@@ -148,6 +148,52 @@ git push
 
 ## Working with Agents
 
+### How Agents Use This Framework (Proactive Operating Loop)
+
+**Agents follow a proactive operating loop** to make collaboration fluent. See [`.agentic/workflows/proactive_agent_loop.md`](workflows/proactive_agent_loop.md) for full details.
+
+**At Session Start**:
+1. Load context efficiently (~2-3K tokens)
+2. Check for blockers (HUMAN_NEEDED.md)
+3. Check for incomplete work from last session
+4. Present structured summary with prioritized options
+5. Suggest next work based on STATUS.md/PRODUCT.md
+
+**During Work**:
+- Update you on progress periodically
+- Escalate blockers immediately (don't wait)
+- Ask clarifying questions early
+- Follow TDD or standard development mode
+
+**At Session End**:
+- Summarize what changed
+- Suggest next steps (based on project plan)
+- Update docs automatically
+- Ask about committing
+
+**Key behaviors that make collaboration fluent**:
+- ✅ **Proactively surface blockers**: HUMAN_NEEDED.md items presented at session start
+- ✅ **Context-aware suggestions**: Work suggestions from STATUS.md/PRODUCT.md, not random
+- ✅ **Resume incomplete work**: Checks JOURNAL.md for stale/unfinished tasks
+- ✅ **Provide recaps**: When you return after a break, agent summarizes current state
+- ✅ **Make "what's next" obvious**: Always provides 2-3 prioritized options
+
+**Example Session Start**:
+```
+📊 **Session Context**
+**Current Focus**: Login system (F-0010)
+**Recent Progress**: Form component complete, API integration 50% done
+
+⚠️ **Blocker**: H-0042 (API auth method unclear) blocks F-0010
+
+**Planned Next** (from STATUS.md):
+1. Resolve H-0042 (unblocks current work)
+2. Complete F-0010 (Login UI) - 30 min remaining
+3. Start F-0012 (Password reset) - next planned feature
+
+**What would you like to tackle?**
+```
+
 ### Agent Checklists (How Agents Work Systematically)
 
 Agents use **mandatory checklists** to ensure systematic, thorough work:
