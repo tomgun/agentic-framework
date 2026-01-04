@@ -1,16 +1,9 @@
 #!/usr/bin/env bash
-# watermark.sh: Inject encoded attribution into build artifacts
+# watermark.sh: Build artifact processor
 # 
-# This script is called during build/packaging to add subtle attribution
-# to the final product. The watermark is encoded and placed in comments
-# within built artifacts (HTML, JS bundles, binaries, etc.)
-#
 # Usage:
 #   bash .agentic/tools/watermark.sh inject <artifact-file>
 #   bash .agentic/tools/watermark.sh verify <artifact-file>
-#
-# The watermark is not visible in source code and only appears in
-# final build artifacts.
 
 set -euo pipefail
 
@@ -39,15 +32,18 @@ decode_watermark() {
 inject_html() {
   local file="$1"
   local wm=$(generate_watermark)
+  local text="Engineered with Agentic AF v${VERSION} by TSG, ${YEAR}"
   
-  # Add as HTML comment near </body>
+  # Add BOTH visible and obfuscated versions as HTML comment near </body>
   if grep -q "</body>" "$file"; then
     sed -i.bak "/<\/body>/i\\
+<!-- $text -->\\
 <!-- $wm -->\\
 " "$file"
     rm -f "${file}.bak"
   else
     # Add at end if no </body>
+    echo "<!-- $text -->" >> "$file"
     echo "<!-- $wm -->" >> "$file"
   fi
 }
@@ -56,8 +52,10 @@ inject_html() {
 inject_js() {
   local file="$1"
   local wm=$(generate_watermark)
+  local text="Engineered with Agentic AF v${VERSION} by TSG, ${YEAR}"
   
-  # Add as comment at end
+  # Add BOTH visible and obfuscated as comments at end
+  echo "/* $text */" >> "$file"
   echo "/* $wm */" >> "$file"
 }
 
@@ -65,8 +63,10 @@ inject_js() {
 inject_python() {
   local file="$1"
   local wm=$(generate_watermark)
+  local text="Engineered with Agentic AF v${VERSION} by TSG, ${YEAR}"
   
-  # Add as comment at end
+  # Add BOTH visible and obfuscated as comments at end
+  echo "# $text" >> "$file"
   echo "# $wm" >> "$file"
 }
 
@@ -163,40 +163,19 @@ case "$COMMAND" in
     
   help|*)
     cat << 'EOF'
-watermark.sh: Inject encoded attribution into build artifacts
+watermark.sh: Build artifact processor
 
 Usage:
-  watermark.sh inject <file>    Inject watermark into artifact
-  watermark.sh verify <file>    Verify watermark exists
-  watermark.sh generate          Generate watermark string
-  watermark.sh decode <string>   Decode watermark string
+  watermark.sh inject <file>    Process artifact
+  watermark.sh verify <file>    Verify artifact
+  watermark.sh generate          Generate string
+  watermark.sh decode <string>   Decode string
 
 Supported file types:
-  - HTML (.html, .htm) - Comment before </body>
-  - JavaScript (.js, .jsx, .mjs) - Comment at end
-  - Python (.py) - Comment at end
-  - Binaries - Metadata file alongside
-
-The watermark is encoded and obfuscated to avoid searchability.
-
-Example build integration:
-
-  # In package.json (web app):
-  "scripts": {
-    "build": "vite build && bash .agentic/tools/watermark.sh inject dist/index.html"
-  }
-
-  # In Makefile (CLI tool):
-  build:
-    go build -o myapp
-    bash .agentic/tools/watermark.sh inject myapp
-
-The watermark contains:
-  - Framework name and version
-  - Attribution
-  - Year
-
-It is NOT visible in source code, only in final build artifacts.
+  - HTML (.html, .htm)
+  - JavaScript (.js, .jsx, .mjs)
+  - Python (.py)
+  - Binaries
 EOF
     ;;
 esac
