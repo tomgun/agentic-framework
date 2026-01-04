@@ -5,6 +5,120 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-01-05
+
+### Added - Enhanced Workflows, Design Systems, Validation Cache, Claude Commands
+
+**Comprehensive framework enhancements inspired by plugin-freedom-system analysis.**
+
+#### 1. Enhanced Workflows with Error Recovery
+
+**TDD Mode (tdd_mode.md)**:
+- 7 detailed error recovery scenarios
+- Tests won't run, tests pass immediately, stuck in RED phase
+- Refactoring breaks tests, too many tests failing, tests are slow
+- Unclear requirements handling
+
+**Proactive Agent Loop (proactive_agent_loop.md)**:
+- Added preconditions, progress tracking, state contracts
+- 9 error recovery scenarios for agent collaboration
+- Can't find planned work, stale HUMAN_NEEDED items
+- Unclear feature states, interrupted sessions
+- Decision escalation guidelines, context window management
+- Lost track handling, non-responsive human handling
+
+**Feature Implementation Checklist (feature_implementation.md)**:
+- 7 practical error recovery scenarios
+- Tests failing, scope too large, unclear acceptance criteria
+- Dependencies not ready, code getting messy
+- Forgot to update tracking, quality checks failing
+
+**Benefits**:
+- More systematic agent behavior
+- Self-checking prevents skipped steps
+- Error recovery reduces escalations to humans
+- Clear guidance for common problems
+
+#### 2. Design System Templates
+
+**New Directory**: `.agentic/support/design_systems/`
+
+Three comprehensive design systems:
+- **Modern Minimal**: Clean, Tailwind-inspired (web apps, dashboards, SaaS)
+- **Material Design**: Google's Material Design 3 (Android apps, Google-style web)
+- **iOS Human Interface**: Apple's HIG (iOS/macOS apps, elegant consumer products)
+
+**Each includes**:
+- Color palettes (with dark mode)
+- Typography scales
+- Spacing systems
+- Component patterns
+- Motion & animation guidelines
+- Accessibility guidelines
+- Code examples (React, SwiftUI, React Native)
+
+**Benefits**:
+- Consistent UI implementation
+- Faster development (less design decisions)
+- Professional, polished results
+- Platform-appropriate designs
+
+#### 3. Validation Cache
+
+**New Tool**: `.agentic/tools/validation-cache.sh`
+
+Cache validation results to avoid redundant checks:
+- Time-based expiry (5 minutes)
+- File-based invalidation (via hash)
+- Speeds up `doctor.sh`, `verify.sh`, `validate_specs.py`
+- Simple JSON-based storage
+
+**Usage**:
+```bash
+# Check cache
+bash .agentic/tools/validation-cache.sh check doctor
+
+# Get cached results
+bash .agentic/tools/validation-cache.sh get doctor
+
+# Store results
+bash .agentic/tools/validation-cache.sh set doctor "OK"
+```
+
+**Benefits**:
+- Faster feedback loops
+- Reduces redundant work
+- Still catches real issues (smart invalidation)
+
+#### 4. Claude Custom Commands (Optional)
+
+**New Directory**: `.agentic/prompts/claude-commands/`
+
+Optional slash commands for Claude Desktop users:
+- `/start` - Start session with context loading
+- `/continue` - Resume from .continue-here.md
+- `/implement` - Implement feature with TDD
+- `/end` - End session with documentation
+
+**Benefits**:
+- Better UX for Claude Desktop users
+- User-friendly alternative to copy-paste prompts
+- Falls back to regular prompts if not supported
+- Easy to customize
+
+### Changed - Documentation Updates
+
+- Updated workflow files with error recovery sections
+- Added design systems README and usage guide
+- Documented validation cache in tool comments
+
+### Credits
+
+**Concept Inspiration**: plugin-freedom-system (audio plugin development framework)  
+**Adapted for**: General-purpose software development in Agentic AF
+
+---
+
 ## [0.4.0] - 2025-01-05
 
 ### Added - Session Continuity & Claude Hooks
