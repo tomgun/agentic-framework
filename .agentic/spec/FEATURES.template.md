@@ -26,6 +26,11 @@ Purpose: a **human + machine** readable registry of features with stable IDs, st
 - Parent: none  <!-- or another feature ID -->
 - Dependencies: none  <!-- Features that must be complete/partial first -->
 - Complexity: M  <!-- S | M | L | XL (optional, for prioritization) -->
+- Tags: [feature-type, domain-area]  <!-- Optional: lowercase, hyphen-separated for search/filtering -->
+- Layer: business-logic  <!-- Optional: presentation | business-logic | data | infrastructure | other -->
+- Domain: example  <!-- Optional: business domain (auth, payments, content, etc.) -->
+- Priority: medium  <!-- Optional: critical | high | medium | low -->
+- Owner:  <!-- Optional: email or username -->
 - Status: planned
 - PRD: spec/PRD.md#requirements
 - Requirements: R-0001

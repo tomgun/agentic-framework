@@ -54,6 +54,11 @@ spec/acceptance/F-0001.md
 - Parent: [none | F-####]
 - Dependencies: [none | F-#### (status), ...]
 - Complexity: [S | M | L | XL]
+- Tags: [[tag1, tag2, ...] | empty]  <!-- NEW in v0.3.0 -->
+- Layer: [presentation | business-logic | data | infrastructure | other | none]  <!-- NEW in v0.3.0 -->
+- Domain: [domain-name | none]  <!-- NEW in v0.3.0 -->
+- Priority: [critical | high | medium | low | none]  <!-- NEW in v0.3.0 -->
+- Owner: [email | username | none]  <!-- NEW in v0.3.0 -->
 - Status: [planned | in_progress | shipped | deprecated]
 - PRD: [spec/PRD.md#anchor | none]
 - Requirements: [R-####, ... | none]
@@ -85,6 +90,11 @@ spec/acceptance/F-0001.md
 | **Parent** | ID | `none` or `F-####` | ✅ | Parent feature for hierarchy |
 | **Dependencies** | ID list | `none` or `F-#### (status), ...` | ✅ | Features that must be complete first |
 | **Complexity** | enum | `S`, `M`, `L`, `XL` | ⚠️ Optional | Size estimate |
+| **Tags** | list | `[tag1, tag2, ...]` | ⚠️ Optional | Lowercase, hyphen-separated tags for search/filtering (v0.3.0+) |
+| **Layer** | enum | `presentation`, `business-logic`, `data`, `infrastructure`, `other` | ⚠️ Optional | Architectural layer (v0.3.0+) |
+| **Domain** | string | domain name | ⚠️ Optional | Business domain (auth, payments, content, etc.) (v0.3.0+) |
+| **Priority** | enum | `critical`, `high`, `medium`, `low` | ⚠️ Optional | Business priority level (v0.3.0+) |
+| **Owner** | string | email or username | ⚠️ Optional | Person responsible for this feature (v0.3.0+) |
 | **Status** | enum | `planned`, `in_progress`, `shipped`, `deprecated` | ✅ | Current development status |
 | **PRD** | reference | `spec/PRD.md#anchor` or `none` | ✅ | Link to product requirement |
 | **Requirements** | ID list | `R-####, ...` or `none` | ✅ | Requirements this feature satisfies |

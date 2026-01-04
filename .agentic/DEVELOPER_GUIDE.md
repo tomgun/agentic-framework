@@ -577,6 +577,120 @@ bash .agentic/tools/deps.sh
 bash .agentic/tools/stale.sh --days 90
 ```
 
+#### `query_features.py` - Feature Query & Search (NEW - v0.3.0)
+
+**What it does:**
+- Fast filtering of features by any attribute
+- Count features by status, layer, domain, tags
+- Essential for large projects (200+ features)
+
+```bash
+# Find all in-progress features
+python .agentic/tools/query_features.py --status=in_progress
+
+# Find auth-related features
+python .agentic/tools/query_features.py --tags=auth
+
+# Find critical UI features currently in progress
+python .agentic/tools/query_features.py --tags=ui --priority=critical --status=in_progress
+
+# Show counts by category
+python .agentic/tools/query_features.py --count
+
+# Filter by owner
+python .agentic/tools/query_features.py --owner=alice@example.com
+
+# Combine multiple filters
+python .agentic/tools/query_features.py --layer=presentation --domain=auth --tags=ui
+```
+
+**Example output:**
+```
+F-0002: Login UI [in_progress] (tags:auth,ui, layer:presentation, priority:high)
+F-0010: Login Button [in_progress] (tags:auth,ui, layer:presentation)
+F-0015: Auth Header Component [in_progress] (tags:auth,ui, layer:presentation)
+
+Total: 3 features
+```
+
+**When to use:**
+- Finding specific features in large projects
+- Planning sprints by layer/domain
+- Tracking team member assignments
+- Generating custom reports
+
+#### Enhanced `feature_graph.py` - Filtered Dependency Graphs (NEW - v0.3.0)
+
+**What's new:**
+- Filter graphs by status, layer, tags
+- Focus mode: show single feature + neighbors
+- Hierarchy-only mode
+- Essential for visualizing large projects
+
+```bash
+# All features (default)
+python .agentic/tools/feature_graph.py
+
+# Only in-progress features
+python .agentic/tools/feature_graph.py --status=in_progress --save
+
+# Only presentation layer
+python .agentic/tools/feature_graph.py --layer=presentation
+
+# Features with specific tags
+python .agentic/tools/feature_graph.py --tags=auth --tags=ui
+
+# Focus on one feature and its immediate neighbors
+python .agentic/tools/feature_graph.py --focus=F-0042 --depth=1
+
+# Show parent-child hierarchy only (no dependencies)
+python .agentic/tools/feature_graph.py --hierarchy-only
+
+# Combine filters
+python .agentic/tools/feature_graph.py --layer=business-logic --status=planned --save
+```
+
+**When to use:**
+- Visualizing dependencies in large projects (200+ features)
+- Understanding feature relationships
+- Planning feature implementation order
+- Documenting architecture decisions
+
+#### `validate_specs.py` - Spec Validation (Enhanced - v0.3.0)
+
+**What's new:**
+- Circular dependency detection
+- Cross-reference validation
+- Pre-commit hook integration
+
+```bash
+# Validate all specs
+python .agentic/tools/validate_specs.py
+
+# Runs automatically before commits (if pre-commit hook installed)
+```
+
+**What it checks:**
+- Circular dependencies (F-0001 → F-0002 → F-0001)
+- Invalid feature references (parent/dependencies don't exist)
+- Schema validation (if using YAML frontmatter)
+
+**Example output:**
+```
+=== Spec Validation ===
+
+Validating spec/FEATURES.md...
+  Checking for circular dependencies...
+  ✅ No circular dependencies
+  Checking cross-references...
+  ❌ 2 cross-reference error(s):
+     - F-0005: Parent F-0099 does not exist
+     - F-0007: Dependency F-0088 does not exist
+
+❌ Total errors: 2
+Fix errors in spec files and run again.
+```
+
 ### Acceptance & Quality Scripts
 
 #### `accept.sh` - Mark Feature Accepted

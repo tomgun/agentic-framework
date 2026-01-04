@@ -202,6 +202,20 @@ copy_if_missing "${ROOT_DIR}/.agentic/spec/NFR.template.md" "${ROOT_DIR}/spec/NF
 copy_if_missing "${ROOT_DIR}/.agentic/spec/REFERENCES.template.md" "${ROOT_DIR}/spec/REFERENCES.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/acceptance/README.template.md" "${ROOT_DIR}/spec/acceptance/README.md"
 
+# Install pre-commit hook for spec validation (Core+PM only)
+if [[ -f "${ROOT_DIR}/.git/hooks/pre-commit" ]]; then
+  echo "OK  : .git/hooks/pre-commit exists (not overwriting)"
+else
+  if [[ -f "${ROOT_DIR}/.agentic/hooks/pre-commit" ]]; then
+    mkdir -p "${ROOT_DIR}/.git/hooks"
+    cp "${ROOT_DIR}/.agentic/hooks/pre-commit" "${ROOT_DIR}/.git/hooks/pre-commit"
+    chmod +x "${ROOT_DIR}/.git/hooks/pre-commit"
+    echo "NEW : .git/hooks/pre-commit (spec validation before commits)"
+  else
+    echo "WARN: .agentic/hooks/pre-commit template not found"
+  fi
+fi
+
 echo "Done. Next: run the agent-guided init in .agentic/init/init_playbook.md"
 
 
