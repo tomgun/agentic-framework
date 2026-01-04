@@ -321,6 +321,95 @@ Update when:
 - FEATURES.md "Code:" field is empty for implemented feature
 - FEATURES.md "Tests: complete" but test files don't exist
 
+## Efficient Tool Usage (Core+Product Mode)
+
+**For projects with many features (50+), use these tools instead of manually editing specs:**
+
+### Finding Features Quickly
+
+**DON'T** grep or read entire FEATURES.md when you need specific features.
+
+**DO** use `query_features.py`:
+```bash
+# Find features by status
+python .agentic/tools/query_features.py --status=in_progress
+
+# Find features by tags
+python .agentic/tools/query_features.py --tags=auth --tags=ui
+
+# Find by owner
+python .agentic/tools/query_features.py --owner=alice@example.com
+
+# Find by layer
+python .agentic/tools/query_features.py --layer=presentation
+
+# Get counts
+python .agentic/tools/query_features.py --count
+```
+
+**When to use**: Anytime you need to find features (50+ total features), understand what's in progress, or filter by criteria.
+
+### Updating Multiple Features
+
+**DON'T** manually edit FEATURES.md for bulk changes.
+
+**DO** use `bulk_update.py`:
+```bash
+# Assign owner to all in-progress features
+python .agentic/tools/bulk_update.py --status=in_progress --set owner=myname
+
+# Mark all auth features as high priority
+python .agentic/tools/bulk_update.py --tags=auth --set priority=high
+
+# Add tag to all presentation layer features
+python .agentic/tools/bulk_update.py --layer=presentation --add-tag=needs-review
+```
+
+**When to use**: Setting owner on multiple features, adding tags to a category, updating priority across a domain.
+
+### Understanding Dependencies
+
+**DON'T** try to visualize dependencies in your head with 50+ features.
+
+**DO** use `feature_graph.py`:
+```bash
+# Focus on one feature and its neighbors
+python .agentic/tools/feature_graph.py --focus=F-0042 --depth=1 --save
+
+# See all UI features and their dependencies
+python .agentic/tools/feature_graph.py --layer=presentation --save
+
+# Hierarchy only (parent-child)
+python .agentic/tools/feature_graph.py --hierarchy-only --save
+```
+
+**When to use**: Planning feature implementation order, understanding blockers, documenting architecture decisions.
+
+### Project Health Metrics
+
+**DO** check project stats periodically:
+```bash
+# Comprehensive dashboard
+python .agentic/tools/feature_stats.py
+
+# Last 30 days
+python .agentic/tools/feature_stats.py --period=30
+```
+
+**When to use**: Before retrospectives, when summarizing progress, checking velocity.
+
+### Validation Before Commits
+
+**ALWAYS** validate specs before committing (pre-commit hook does this automatically):
+```bash
+python .agentic/tools/validate_specs.py
+```
+
+**Catches**:
+- Circular dependencies (F-0001 → F-0002 → F-0001)
+- Invalid feature references (parent/dependency doesn't exist)
+- Format errors
+
 ## Token efficiency
 - Start sessions by reading `CONTEXT_PACK.md` then `STATUS.md` then recent `JOURNAL.md` entries.
 - When you learn something important, capture it in `CONTEXT_PACK.md` so the next session is cheaper.
@@ -336,6 +425,36 @@ Add entries to `HUMAN_NEEDED.md` for:
 - **Production risk**: changes with unclear impact on live systems
 
 **Don't escalate routine implementation, bug fixes with clear solutions, or small refactors.**
+
+## When to suggest hierarchical feature organization
+
+For Core+Product projects with large feature sets:
+
+**Check feature count**:
+```bash
+python .agentic/tools/query_features.py --count
+```
+
+**Suggest migration when**:
+- 200-500 features: "Consider organizing features into folders for easier navigation"
+- 500+ features: "Strongly recommend migrating to hierarchical layout"
+
+**How to suggest**:
+```bash
+# Show preview
+python .agentic/tools/organize_features.py --by domain --dry-run
+
+# If user approves, migrate
+python .agentic/tools/organize_features.py --by domain
+```
+
+**Benefits to mention**:
+- Smaller files (easier to edit, faster to load)
+- Natural categorization by domain/layer
+- Git merge conflicts localized to specific domains
+- All tools continue to work (auto-detect layout)
+
+**Migration is opt-in**: Flat layout still works perfectly. Only suggest when it would genuinely help.
 
 ## When to suggest reorganization
 Periodically check complexity thresholds (see `.agentic/workflows/scaling_guidance.md`):
