@@ -1,0 +1,155 @@
+# FEATURES (Test Fixture)
+<!-- spec-format: features-v0.3.2 -->
+
+This is a test fixture with sample features for testing framework tools.
+
+## F-0001: User Authentication
+- Parent: none
+- Dependencies: none
+- Complexity: M
+- Tags: [auth, backend, security]
+- Layer: business-logic
+- Domain: authentication
+- Priority: critical
+- Owner: alice@example.com
+- Status: shipped
+- PRD: none
+- Requirements: none
+- NFRs: none
+- Acceptance: spec/acceptance/F-0001.md
+- Verification:
+  - Accepted: yes
+  - Accepted at: 2026-01-01
+- Implementation:
+  - State: complete
+  - Code: src/auth/authentication.py
+- Tests:
+  - Test strategy: unit
+  - Unit: complete
+  - Integration: complete
+  - Acceptance: complete
+  - Perf/realtime: n/a
+- Technical debt: none
+- Lessons/caveats: none
+- Notes: Core authentication system
+
+## F-0002: Login UI
+- Parent: F-0001
+- Dependencies: F-0001 (complete)
+- Complexity: S
+- Tags: [auth, ui, frontend]
+- Layer: presentation
+- Domain: authentication
+- Priority: high
+- Owner: bob@example.com
+- Status: in_progress
+- PRD: none
+- Requirements: none
+- NFRs: none
+- Acceptance: spec/acceptance/F-0002.md
+- Verification:
+  - Accepted: no
+  - Accepted at:
+- Implementation:
+  - State: partial
+  - Code: src/ui/login.tsx
+- Tests:
+  - Test strategy: e2e
+  - Unit: partial
+  - Integration: todo
+  - Acceptance: todo
+  - Perf/realtime: n/a
+- Technical debt: none
+- Lessons/caveats: none
+- Notes: none
+
+## F-0003: Password Reset
+- Parent: F-0001
+- Dependencies: F-0001 (complete)
+- Complexity: M
+- Tags: [auth, backend]
+- Layer: business-logic
+- Domain: authentication
+- Priority: medium
+- Owner: alice@example.com
+- Status: planned
+- PRD: none
+- Requirements: none
+- NFRs: none
+- Acceptance: spec/acceptance/F-0003.md
+- Verification:
+  - Accepted: no
+  - Accepted at:
+- Implementation:
+  - State: none
+  - Code: none
+- Tests:
+  - Test strategy: unit
+  - Unit: todo
+  - Integration: todo
+  - Acceptance: todo
+  - Perf/realtime: n/a
+- Technical debt: none
+- Lessons/caveats: none
+- Notes: none
+
+## F-0004: API Rate Limiting
+- Parent: none
+- Dependencies: none
+- Complexity: L
+- Tags: [api, security, infrastructure]
+- Layer: infrastructure
+- Domain: api
+- Priority: high
+- Owner: charlie@example.com
+- Status: in_progress
+- PRD: none
+- Requirements: none
+- NFRs: none
+- Acceptance: spec/acceptance/F-0004.md
+- Verification:
+  - Accepted: no
+  - Accepted at:
+- Implementation:
+  - State: partial
+  - Code: src/middleware/rate_limit.py
+- Tests:
+  - Test strategy: integration
+  - Unit: complete
+  - Integration: partial
+  - Acceptance: todo
+  - Perf/realtime: n/a
+- Technical debt: none
+- Lessons/caveats: none
+- Notes: none
+
+## F-0005: Dashboard UI
+- Parent: none
+- Dependencies: none
+- Complexity: L
+- Tags: [ui, frontend, dashboard]
+- Layer: presentation
+- Domain: ui
+- Priority: medium
+- Owner: bob@example.com
+- Status: planned
+- PRD: none
+- Requirements: none
+- NFRs: none
+- Acceptance: spec/acceptance/F-0005.md
+- Verification:
+  - Accepted: no
+  - Accepted at:
+- Implementation:
+  - State: none
+  - Code: none
+- Tests:
+  - Test strategy: e2e
+  - Unit: todo
+  - Integration: todo
+  - Acceptance: todo
+  - Perf/realtime: n/a
+- Technical debt: none
+- Lessons/caveats: none
+- Notes: none
+
