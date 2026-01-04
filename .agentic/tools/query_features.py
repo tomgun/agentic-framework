@@ -86,6 +86,25 @@ def parse_features(md: str) -> List[Dict]:
     return features
 
 
+def load_features_flat(features_file: Path) -> List[Dict]:
+    """Load features from flat FEATURES.md."""
+    with open(features_file, 'r') as f:
+        md = f.read()
+    return parse_features(md)
+
+
+def load_features_hierarchical(features_dir: Path) -> List[Dict]:
+    """Load features from hierarchical features/*/*.md."""
+    features = []
+    for md_file in features_dir.glob("*/*.md"):
+        if md_file.name == "_index.md":
+            continue
+        with open(md_file, 'r') as f:
+            md = f.read()
+        features.extend(parse_features(md))
+    return features
+
+
 def filter_features(features: List[Dict], args) -> List[Dict]:
     """Filter features based on query criteria."""
     filtered = features
@@ -232,18 +251,28 @@ Examples:
     
     args = parser.parse_args()
     
-    # Find FEATURES.md
-    features_file = Path(args.file)
-    if not features_file.exists():
-        print(f"ERROR: {features_file} not found", file=sys.stderr)
-        print(f"Run from project root or specify --file path", file=sys.stderr)
-        sys.exit(1)
-    
-    # Parse features
-    with open(features_file, 'r') as f:
-        md = f.read()
-    
-    features = parse_features(md)
+    # Detect layout: flat or hierarchical
+    if args.file != "spec/FEATURES.md":
+        # Explicit file specified
+        features_file = Path(args.file)
+        if not features_file.exists():
+            print(f"ERROR: {features_file} not found", file=sys.stderr)
+            sys.exit(1)
+        features = load_features_flat(features_file)
+    else:
+        # Auto-detect
+        features_file = Path("spec/FEATURES.md")
+        features_dir = Path("spec/features")
+        
+        if features_dir.exists() and list(features_dir.glob("*/*.md")):
+            # Hierarchical layout
+            features = load_features_hierarchical(features_dir)
+        elif features_file.exists():
+            # Flat layout
+            features = load_features_flat(features_file)
+        else:
+            print(f"ERROR: No features found (no spec/FEATURES.md or spec/features/)", file=sys.stderr)
+            sys.exit(1)
     
     if not features:
         print(f"No features found in {features_file}", file=sys.stderr)

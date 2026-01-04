@@ -2,6 +2,7 @@
 """
 Validate spec files with YAML frontmatter against JSON schemas.
 Also validates circular dependencies and cross-references.
+Supports both flat (FEATURES.md) and hierarchical (features/*.md) layouts.
 
 Single source of truth: All data in one .md file with frontmatter.
 Automatic validation: Catches typos, wrong values, missing fields.
@@ -27,6 +28,37 @@ except ImportError:
 FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):\s*(.+?)\s*$")
 FEATURE_ID_RE = re.compile(r"\b(F-\d{4})\b")
 KEY_RE = re.compile(r"^\s*-\s+([\w][\w\s/.-]*?):\s*(.*?)\s*$")
+FORMAT_VERSION_RE = re.compile(r'<!--\s*spec-format:\s*([a-z0-9-]+)-v([\d.]+)\s*-->')
+
+
+def detect_layout(spec_dir: Path) -> str:
+    """Detect if using flat or hierarchical layout."""
+    features_dir = spec_dir / "features"
+    features_file = spec_dir / "FEATURES.md"
+    
+    if features_dir.exists() and list(features_dir.glob("*/*.md")):
+        return "hierarchical"
+    elif features_file.exists():
+        return "flat"
+    else:
+        return "none"
+
+
+def load_features_flat(features_file: Path) -> List[Dict]:
+    """Load features from flat FEATURES.md file."""
+    if not features_file.exists():
+        return []
+    return parse_markdown_features(features_file)
+
+
+def load_features_hierarchical(features_dir: Path) -> List[Dict]:
+    """Load features from hierarchical features/*/*.md files."""
+    features = []
+    for md_file in features_dir.glob("*/*.md"):
+        if md_file.name == "_index.md":
+            continue
+        features.extend(parse_markdown_features(md_file))
+    return features
 
 
 def parse_markdown_features(features_file: Path) -> List[Dict]:
@@ -228,40 +260,57 @@ def main() -> int:
     
     all_errors = []
     
-    # Validate FEATURES.md
-    features_file = spec_dir / "FEATURES.md"
-    feature_schema_file = schema_dir / "feature.schema.json"
+    # Detect layout
+    layout = detect_layout(spec_dir)
     
-    if features_file.exists():
+    if layout == "none":
+        print("⚠️  No features found (no spec/FEATURES.md or spec/features/)")
+        print("   Run scaffold.sh if you're using Core+PM mode")
+        return 0
+    
+    print(f"Layout: {layout}")
+    print()
+    
+    # Load features based on layout
+    if layout == "flat":
+        features_file = spec_dir / "FEATURES.md"
         print("Validating spec/FEATURES.md...")
+        features = load_features_flat(features_file)
+    else:  # hierarchical
+        features_dir = spec_dir / "features"
+        print("Validating spec/features/*/*.md...")
+        features = load_features_hierarchical(features_dir)
+    
+    if features:
+        print(f"  Found {len(features)} features")
         
-        # Parse features from markdown
-        features = parse_markdown_features(features_file)
+        # Check for circular dependencies
+        print("  Checking for circular dependencies...")
+        cycle_errors = detect_circular_dependencies(features)
+        if cycle_errors:
+            print(f"  ❌ {len(cycle_errors)} circular dependency error(s):")
+            for error in cycle_errors:
+                print(f"     - {error}")
+                all_errors.append(error)
+        else:
+            print("  ✅ No circular dependencies")
         
-        if features:
-            # Check for circular dependencies
-            print("  Checking for circular dependencies...")
-            cycle_errors = detect_circular_dependencies(features)
-            if cycle_errors:
-                print(f"  ❌ {len(cycle_errors)} circular dependency error(s):")
-                for error in cycle_errors:
-                    print(f"     - {error}")
-                    all_errors.append(error)
-            else:
-                print("  ✅ No circular dependencies")
-            
-            # Check cross-references
-            print("  Checking cross-references...")
-            ref_errors = validate_cross_references(features)
-            if ref_errors:
-                print(f"  ❌ {len(ref_errors)} cross-reference error(s):")
-                for error in ref_errors:
-                    print(f"     - {error}")
-                    all_errors.append(error)
-            else:
-                print("  ✅ All references valid")
+        # Check cross-references
+        print("  Checking cross-references...")
+        ref_errors = validate_cross_references(features)
+        if ref_errors:
+            print(f"  ❌ {len(ref_errors)} cross-reference error(s):")
+            for error in ref_errors:
+                print(f"     - {error}")
+                all_errors.append(error)
+        else:
+            print("  ✅ All references valid")
+    
+    # Schema validation (if using frontmatter) - only for flat layout
+    if layout == "flat":
+        features_file = spec_dir / "FEATURES.md"
+        feature_schema_file = schema_dir / "feature.schema.json"
         
-        # Schema validation (if using frontmatter)
         if not feature_schema_file.exists():
             print("  ⚠️  No schema found (.agentic/schemas/feature.schema.json)")
             print("     Skipping schema validation.")

@@ -1,4 +1,5 @@
 # FEATURES (Template)
+<!-- spec-format: features-v0.3.1 -->
 
 Purpose: a **human + machine** readable registry of features with stable IDs, status, acceptance criteria, and test coverage notes.
 

@@ -77,6 +77,30 @@ def parse_features(md: str) -> list[dict]:
     return features
 
 
+def load_features_flat(features_file: Path) -> list[dict]:
+    """Load features from flat FEATURES.md."""
+    try:
+        md = features_file.read_text(encoding="utf-8")
+    except Exception as e:
+        print(f"Error reading {features_file}: {e}", file=sys.stderr)
+        sys.exit(1)
+    return parse_features(md)
+
+
+def load_features_hierarchical(features_dir: Path) -> list[dict]:
+    """Load features from hierarchical features/*/*.md."""
+    features = []
+    for md_file in features_dir.glob("*/*.md"):
+        if md_file.name == "_index.md":
+            continue
+        try:
+            md = md_file.read_text(encoding="utf-8")
+            features.extend(parse_features(md))
+        except Exception as e:
+            print(f"Warning: Error reading {md_file}: {e}", file=sys.stderr)
+    return features
+
+
 def filter_features(features: list[dict], args) -> list[dict]:
     """Filter features based on command-line arguments."""
     filtered = features
@@ -232,19 +256,29 @@ Examples:
     args = parser.parse_args()
     
     repo_root = Path.cwd()
-    features_path = repo_root / args.file
     
-    if not features_path.exists():
-        print(f"Error: {args.file} not found", file=sys.stderr)
-        return 1
-    
-    try:
-        md = features_path.read_text(encoding="utf-8")
-    except Exception as e:
-        print(f"Error reading {args.file}: {e}", file=sys.stderr)
-        return 1
-    
-    features = parse_features(md)
+    # Detect layout: flat or hierarchical
+    if args.file != "spec/FEATURES.md":
+        # Explicit file specified
+        features_path = repo_root / args.file
+        if not features_path.exists():
+            print(f"Error: {args.file} not found", file=sys.stderr)
+            return 1
+        features = load_features_flat(features_path)
+    else:
+        # Auto-detect
+        features_file = repo_root / "spec" / "FEATURES.md"
+        features_dir = repo_root / "spec" / "features"
+        
+        if features_dir.exists() and list(features_dir.glob("*/*.md")):
+            # Hierarchical layout
+            features = load_features_hierarchical(features_dir)
+        elif features_file.exists():
+            # Flat layout
+            features = load_features_flat(features_file)
+        else:
+            print("Error: No features found (no spec/FEATURES.md or spec/features/)", file=sys.stderr)
+            return 1
     
     if not features:
         print(f"No features found in {args.file}", file=sys.stderr)

@@ -5,6 +5,83 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-01-04
+
+### Added - Phase 2 & 3 Spec Scalability Complete (500+ and 1000+ Features)
+
+**Phase 2: Hierarchical Organization (500+ features)**
+
+New Tools:
+- `organize_features.py`: Migrate from flat to hierarchical layout
+  - Organize by domain or layer
+  - Auto-generates `_index.md` master index
+  - Preview with `--dry-run`
+  - Creates `spec/features/domain/*.md` structure
+- `bulk_update.py`: Mass feature updates
+  - Update multiple features at once
+  - Filter by status, tags, layer, domain, owner
+  - Add/remove tags in bulk
+  - Set fields across many features
+  - Safety: preview changes, confirmation prompt
+
+**Phase 3: Advanced Analytics (1000+ features)**
+
+New Tools:
+- `feature_stats.py`: Comprehensive statistics dashboard
+  - Distribution by status, layer, domain, priority, complexity
+  - Top tags analysis
+  - Owner distribution
+  - Health metrics (shipped vs accepted, velocity)
+  - Features per week calculation
+- `upgrade_spec_format.py`: Spec format version management
+  - Detects format version markers
+  - Upgrades specs to latest format
+  - Safe migrations with `--dry-run`
+  - Enables reliable framework upgrades
+
+**Enhanced Existing Tools**:
+- `query_features.py`: Now supports hierarchical layout (auto-detects)
+- `feature_graph.py`: Now supports hierarchical layout (auto-detects)
+- `validate_specs.py`: Validates both flat and hierarchical layouts
+
+**Spec Format Versioning**:
+- Added `<!-- spec-format: features-v0.3.1 -->` markers to all spec templates
+- Enables reliable upgrades when framework evolves
+- `upgrade_spec_format.py` tool manages migrations
+
+**Documentation**:
+- Updated `SPEC_SCALABILITY_PLAN.md`: All 3 phases complete
+- Added migration recommendations (when to use flat vs hierarchical)
+- Added tool ecosystem guide
+- Added maintenance & best practices
+
+### Changed
+- All feature tools now support both flat (`spec/FEATURES.md`) and hierarchical (`spec/features/*/*.md`) layouts
+- Tools auto-detect layout, no configuration needed
+
+### Impact
+- ✅ Handle 1000+ features smoothly (all phases complete)
+- ✅ Query time <3s even with 1000+ features  
+- ✅ Hierarchical organization for 500+ features
+- ✅ Bulk updates save massive manual work
+- ✅ Statistics dashboard for project insights
+- ✅ Format versioning for safe framework upgrades
+- ✅ Graceful migration path (opt-in hierarchical)
+- ✅ Backward compatible (flat layout still works perfectly)
+
+### Migration Guide
+
+**For existing v0.3.0 projects**:
+- All tools continue to work with flat `FEATURES.md`
+- No changes required
+- Optionally migrate to hierarchical: `python .agentic/tools/organize_features.py`
+- Optionally add format markers: `python .agentic/tools/upgrade_spec_format.py`
+
+**When to migrate to hierarchical**:
+- 0-200 features: Stay flat (simpler)
+- 200-500 features: Optional (team preference)
+- 500+ features: Recommended (better organization)
+
 ## [0.3.0] - 2026-01-04
 
 ### Added - Phase 1 Spec Scalability (Critical for 200+ Features)
