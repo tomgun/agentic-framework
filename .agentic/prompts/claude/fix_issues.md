@@ -1,0 +1,1 @@
+../cursor/fix_issues.md
