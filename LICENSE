@@ -1,0 +1,164 @@
+# Agentic AI Framework License
+
+**Copyright (c) 2025-present Tomas Günther / Kipinä Software Oy**  
+**All rights reserved.**
+
+---
+
+## 1. Free License (with Attribution)
+
+### You MAY:
+- ✅ Use this framework in personal, open source, and **commercial projects**
+- ✅ Modify it for your own use
+- ✅ Create and distribute software using it
+
+### You MUST:
+- ✅ **Include visible attribution** in your product:
+  - **Desktop/Mobile Apps**: In "About" or "Credits" section
+  - **Web Applications**: In footer, settings page, or credits page
+  - **CLI Tools**: In `--version` or `--about` output
+  - **Games**: In credits screen
+  - **Example text**: 
+    ```
+    "Built with Agentic AI Framework"
+    https://github.com/tomgun/agentic-framework
+    ```
+- ✅ Keep this license file when redistributing the framework itself
+- ✅ Do not remove or modify copyright notices in framework files
+
+### Attribution Examples:
+
+**Web app footer:**
+```html
+<footer>
+  Built with <a href="https://github.com/tomgun/agentic-framework">Agentic AI Framework</a>
+</footer>
+```
+
+**Desktop app "About" dialog:**
+```
+MyApp v1.0
+Built with Agentic AI Framework
+```
+
+**CLI tool:**
+```bash
+$ myapp --version
+MyApp v1.0.0
+Built with Agentic AI Framework (https://github.com/tomgun/agentic-framework)
+```
+
+### You MAY NOT:
+- ❌ Remove or hide the required attribution
+- ❌ Repackage and sell this framework as your own product
+- ❌ Claim you created the framework
+- ❌ Use the name "Agentic AI Framework" or "Agentic AF" for competing products
+
+---
+
+## 2. Commercial License (White-Label, No Attribution)
+
+### For:
+- Companies that want to remove attribution from their product
+- White-label products
+- Products where attribution is not desired
+
+### Cost:
+- **€499 per product** (one-time payment)
+  - OR **€99/year per product** (subscription)
+- Includes: No attribution requirement, email support, commercial use rights
+
+### To Purchase:
+Contact: tomas@kipina.fi  
+Website: https://github.com/tomgun/agentic-framework
+
+### What You Get:
+- ✅ Remove all attribution requirements from your product
+- ✅ White-label rights
+- ✅ Priority email support
+- ✅ Commercial use guarantee
+- ✅ Legal indemnification (within reason)
+
+---
+
+## 3. Kipinä Software Oy & Employees License
+
+### Special Exception:
+**Kipinä Software Oy** and its **current and former employees** may use this framework **without attribution requirements** in:
+- ✅ Any personal projects
+- ✅ Any open source projects
+- ✅ Any commercial projects
+- ✅ Client projects (freelance or through other companies)
+- ✅ Internal company projects
+- ✅ Customer projects
+
+**This is a perpetual, royalty-free, unrestricted license** for Kipinä Software Oy employees (current and former).
+
+No attribution required. Use freely.
+
+---
+
+## Enforcement & Compliance
+
+### Compliance Check:
+We may request proof of:
+- Attribution placement (screenshot, URL, etc.) for free tier users
+- OR commercial license purchase for white-label users
+
+### Violations:
+Failure to comply with attribution or licensing terms may result in:
+1. Request to add attribution or purchase license
+2. Takedown notices (DMCA for hosted code)
+3. Legal action (in extreme cases)
+
+**Most people comply - we just ask nicely if missed!**
+
+---
+
+## Distribution & Modification
+
+### Redistributing the Framework:
+If you distribute the **framework itself** (not just products built with it):
+- ✅ Keep all copyright notices intact
+- ✅ Include this LICENSE file
+- ✅ Do not misrepresent origin or authorship
+
+### Forking:
+- ⚠️ You may fork for personal modifications
+- ❌ You may NOT create competing public distributions
+- ❌ You may NOT rebrand as your own framework
+
+---
+
+## No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+## Rights Reserved
+
+All rights not expressly granted in this license are reserved by Tomas Günther / Kipinä Software Oy.
+
+---
+
+## Questions?
+
+For licensing questions, commercial licenses, or clarifications:
+- Email: tomas@kipina.fi
+- GitHub: https://github.com/tomgun/agentic-framework/issues
+- Website: https://github.com/tomgun/agentic-framework
+
+---
+
+## Summary Table
+
+| Use Case | Attribution Required? | Cost | License Tier |
+|----------|----------------------|------|--------------|
+| Personal project | ✅ Yes (in product) | Free | Free Tier |
+| Open source project | ✅ Yes (in product) | Free | Free Tier |
+| Commercial product | ✅ Yes (in product) | Free | Free Tier |
+| Commercial (white-label) | ❌ No | €499 or €99/yr | Commercial Tier |
+| Kipinä Software Oy | ❌ No | Free | Company License |
+| Kipinä employees (any project) | ❌ No | Free | Employee License |
+
