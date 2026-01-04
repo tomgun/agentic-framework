@@ -5,14 +5,72 @@
 
 ---
 
-## 1. Free License (with Attribution)
+## License Philosophy
 
-### You MAY:
-- ✅ Use this framework in personal, open source, and **commercial projects**
-- ✅ Modify it for your own use
-- ✅ Create and distribute software using it
+This framework uses a **dual license structure** to balance two important goals:
 
-### You MUST:
+1. **Community improvement** - Framework code improvements are shared with everyone (GPL-3.0)
+2. **Commercial viability** - Products built with the framework can be proprietary
+
+**Credit**: The viral/copyleft requirement for framework modifications was suggested by **Arto Jalkanen**, ensuring that all improvements to the framework benefit the community.
+
+---
+
+## Part A: Framework Source Code (GPL-3.0)
+
+**Applies to**: All code in the `.agentic/` directory
+
+### License
+
+THE FRAMEWORK CODE ITSELF is licensed under **GNU General Public License v3.0 (GPL-3.0)**.
+
+Full license text: https://www.gnu.org/licenses/gpl-3.0.html
+
+### What This Means
+
+If you **modify the framework code** (anything in `.agentic/`):
+- ✅ You MUST distribute your modifications under GPL-3.0
+- ✅ You MUST make the modified source code available
+- ✅ Modifications must preserve this license
+- ✅ **Recommended**: Submit pull request to https://github.com/tomgun/agentic-framework
+
+**Why**: This ensures the community benefits from all improvements to the framework itself.
+
+### What is "Framework Code"?
+
+Framework code = Everything in `.agentic/` directory:
+- `.agentic/tools/` - Helper scripts
+- `.agentic/workflows/` - Workflow documentation
+- `.agentic/agents/` - Agent guidelines
+- `.agentic/quality/` - Quality standards
+- `.agentic/init/` - Initialization scripts
+- All other files in `.agentic/`
+
+**If you modify these files, GPL-3.0 applies.**
+
+---
+
+## Part B: Products Built With Framework (Proprietary)
+
+**Applies to**: Your application/product code that USES the framework
+
+### Key Principle
+
+**Your product code is NOT "derivative work" of the framework** - you are using the framework as a tool.
+
+Your product code (outside `.agentic/`) can be under ANY license you choose.
+
+### Three Options for Products
+
+### 1. Free Tier (with Attribution) ⭐
+
+**You MAY:**
+- ✅ Use this framework in personal, open source, or commercial projects
+- ✅ Keep your product code proprietary (or open source - your choice)
+- ✅ Modify your own code however you want
+- ✅ Distribute your product commercially
+
+**You MUST:**
 - ✅ **Include visible attribution** in your product:
   - **Desktop/Mobile Apps**: In "About" or "Credits" section
   - **Web Applications**: In footer, settings page, or credits page
@@ -23,110 +81,171 @@
     "Built with Agentic AI Framework"
     https://github.com/tomgun/agentic-framework
     ```
-- ✅ Keep this license file when redistributing the framework itself
+- ✅ Keep this LICENSE file when redistributing the framework itself
 - ✅ Do not remove or modify copyright notices in framework files
 
-### Attribution Examples:
+**You MAY NOT:**
+- ❌ Remove or hide the required attribution
+- ❌ Claim you created the framework
+- ❌ Use the name "Agentic AI Framework" or "Agentic AF" for competing products
 
-**Web app footer:**
+### 2. Commercial License (White-Label, No Attribution)
+
+**For:**
+- Companies that want to remove attribution from their product
+- White-label products
+- Products where attribution is not desired
+
+**Cost:**
+- **€499 per product** (one-time payment)
+  - OR **€99/year per product** (subscription)
+
+**Includes:**
+- ✅ Remove all attribution requirements from your product
+- ✅ White-label rights
+- ✅ Priority email support
+- ✅ Commercial use guarantee
+
+**To Purchase:**
+- Email: tomas@kipina.fi
+- Website: https://github.com/tomgun/agentic-framework
+
+### 3. Kipinä Software Oy & Employees License
+
+**Special Exception:**
+
+**Kipinä Software Oy** and its **current and former employees** may use this framework **without attribution requirements** in:
+- ✅ Any personal projects
+- ✅ Any open source projects
+- ✅ Any commercial projects
+- ✅ Client projects (freelance or through other companies)
+
+**This is a perpetual, royalty-free, unrestricted license** for Kipinä Software Oy employees.
+
+No attribution required. Use freely.
+
+---
+
+## Clarification: Framework vs Product
+
+This is the KEY distinction:
+
+### Framework Modifications (GPL-3.0)
+
+**If you change files in `.agentic/`**:
+- This is modifying the framework itself
+- GPL-3.0 applies
+- You MUST share your modifications
+- Submit pull request OR publish your fork
+
+**Examples**:
+- Fix bug in `.agentic/tools/validate_specs.py` → MUST share
+- Improve `.agentic/workflows/tdd_mode.md` → MUST share
+- Add feature to `.agentic/agents/shared/agent_operating_guidelines.md` → MUST share
+
+### Your Product Code (Your License)
+
+**If you write your own application code**:
+- This is using the framework as a tool
+- Your code can be proprietary
+- No obligation to open source YOUR code
+- Only attribution required (free tier) OR pay for white-label
+
+**Examples**:
+```
+my-game/
+├── .agentic/              ← Framework code (GPL-3.0)
+│   ├── tools/             ← Modify these → MUST share
+│   ├── workflows/         ← Modify these → MUST share
+│   └── agents/            ← Modify these → MUST share
+├── src/                   ← YOUR game code
+│   ├── player.ts          ← Can be proprietary ✅
+│   ├── levels.ts          ← Can be proprietary ✅
+│   └── enemies.ts         ← Can be proprietary ✅
+├── assets/                ← Your assets
+│   ├── sprites/           ← Your license
+│   └── sounds/            ← Your license
+└── README.md              ← Must include attribution (free tier)
+```
+
+**Your game code** (`src/`) = Proprietary OK (just add attribution OR pay)  
+**Framework code** (`.agentic/`) = If you modify, MUST share (GPL-3.0)
+
+---
+
+## Attribution Examples (Free Tier)
+
+### Web App Footer:
 ```html
 <footer>
   Built with <a href="https://github.com/tomgun/agentic-framework">Agentic AI Framework</a>
 </footer>
 ```
 
-**Desktop app "About" dialog:**
+### Desktop/Mobile App "About":
 ```
 MyApp v1.0
 Built with Agentic AI Framework
 ```
 
-**CLI tool:**
+### CLI Tool:
 ```bash
 $ myapp --version
 MyApp v1.0.0
 Built with Agentic AI Framework (https://github.com/tomgun/agentic-framework)
 ```
 
-### You MAY NOT:
-- ❌ Remove or hide the required attribution
-- ❌ Repackage and sell this framework as your own product
-- ❌ Claim you created the framework
-- ❌ Use the name "Agentic AI Framework" or "Agentic AF" for competing products
+### Game Credits Screen:
+```
+CREDITS
+-------
+Built with Agentic AI Framework
+https://github.com/tomgun/agentic-framework
+```
 
 ---
 
-## 2. Commercial License (White-Label, No Attribution)
+## Distribution & Forking
 
-### For:
-- Companies that want to remove attribution from their product
-- White-label products
-- Products where attribution is not desired
+### Redistributing the Framework:
 
-### Cost:
-- **€499 per product** (one-time payment)
-  - OR **€99/year per product** (subscription)
-- Includes: No attribution requirement, email support, commercial use rights
+If you distribute the **framework itself**:
+- ✅ Keep all copyright notices intact
+- ✅ Include this LICENSE file
+- ✅ Include GPL-3.0 license text
+- ✅ Do not misrepresent origin or authorship
 
-### To Purchase:
-Contact: tomas@kipina.fi  
-Website: https://github.com/tomgun/agentic-framework
+### Forking:
 
-### What You Get:
-- ✅ Remove all attribution requirements from your product
-- ✅ White-label rights
-- ✅ Priority email support
-- ✅ Commercial use guarantee
-- ✅ Legal indemnification (within reason)
+**If you fork to contribute**:
+- ✅ Fork on GitHub
+- ✅ Make improvements
+- ✅ Submit pull request
+- ✅ Your contributions: GPL-3.0
 
----
-
-## 3. Kipinä Software Oy & Employees License
-
-### Special Exception:
-**Kipinä Software Oy** and its **current and former employees** may use this framework **without attribution requirements** in:
-- ✅ Any personal projects
-- ✅ Any open source projects
-- ✅ Any commercial projects
-- ✅ Client projects (freelance or through other companies)
-- ✅ Internal company projects
-- ✅ Customer projects
-
-**This is a perpetual, royalty-free, unrestricted license** for Kipinä Software Oy employees (current and former).
-
-No attribution required. Use freely.
+**If you fork to create competing framework**:
+- ⚠️ Allowed under GPL-3.0
+- ✅ Your fork must also be GPL-3.0
+- ✅ Must credit original (Agentic AI Framework)
+- ❌ Cannot use same name "Agentic AI Framework" or "Agentic AF"
 
 ---
 
 ## Enforcement & Compliance
 
-### Compliance Check:
-We may request proof of:
-- Attribution placement (screenshot, URL, etc.) for free tier users
-- OR commercial license purchase for white-label users
+### Framework Modifications:
 
-### Violations:
-Failure to comply with attribution or licensing terms may result in:
-1. Request to add attribution or purchase license
-2. Takedown notices (DMCA for hosted code)
-3. Legal action (in extreme cases)
+If you modify framework code and distribute it:
+- We may request source code of your modifications (GPL requirement)
+- Failure to provide = GPL violation
+- Submit pull request to avoid compliance issues
 
-**Most people comply - we just ask nicely if missed!**
+### Product Attribution:
 
----
-
-## Distribution & Modification
-
-### Redistributing the Framework:
-If you distribute the **framework itself** (not just products built with it):
-- ✅ Keep all copyright notices intact
-- ✅ Include this LICENSE file
-- ✅ Do not misrepresent origin or authorship
-
-### Forking:
-- ⚠️ You may fork for personal modifications
-- ❌ You may NOT create competing public distributions
-- ❌ You may NOT rebrand as your own framework
+For products using free tier:
+- We may request proof of attribution (screenshot, URL)
+- Failure to include attribution = license violation
+- Options: Add attribution OR purchase commercial license
 
 ---
 
@@ -142,23 +261,38 @@ All rights not expressly granted in this license are reserved by Tomas Günther 
 
 ---
 
-## Questions?
+## Summary Table
 
-For licensing questions, commercial licenses, or clarifications:
-- Email: tomas@kipina.fi
-- GitHub: https://github.com/tomgun/agentic-framework/issues
-- Website: https://github.com/tomgun/agentic-framework
+| Scenario | License | Must Share Code? | Attribution Required? | Cost |
+|----------|---------|------------------|----------------------|------|
+| **Use framework as-is** | Free tier | ❌ No | ✅ Yes (in product) | Free |
+| **Modify framework code** | GPL-3.0 | ✅ Yes (framework only) | ✅ Yes (in product) | Free |
+| **Build proprietary product** | Free tier | ❌ No | ✅ Yes (in product) | Free |
+| **Build product (white-label)** | Commercial | ❌ No | ❌ No | €499 or €99/yr |
+| **Kipinä projects** | Company license | ❌ No | ❌ No | Free |
 
 ---
 
-## Summary Table
+## Credits
 
-| Use Case | Attribution Required? | Cost | License Tier |
-|----------|----------------------|------|--------------|
-| Personal project | ✅ Yes (in product) | Free | Free Tier |
-| Open source project | ✅ Yes (in product) | Free | Free Tier |
-| Commercial product | ✅ Yes (in product) | Free | Free Tier |
-| Commercial (white-label) | ❌ No | €499 or €99/yr | Commercial Tier |
-| Kipinä Software Oy | ❌ No | Free | Company License |
-| Kipinä employees (any project) | ❌ No | Free | Employee License |
+**Framework created by**: Tomas Günther / Kipinä Software Oy
 
+**GPL/Copyleft suggestion by**: Arto Jalkanen - Ensuring framework improvements benefit the community
+
+---
+
+## Questions?
+
+For licensing questions, commercial licenses, or clarifications:
+- **Email**: tomas@kipina.fi
+- **GitHub**: https://github.com/tomgun/agentic-framework/issues
+- **Website**: https://github.com/tomgun/agentic-framework
+
+---
+
+## GNU GPL-3.0 License Text
+
+For the full text of the GNU General Public License v3.0, see:
+https://www.gnu.org/licenses/gpl-3.0.html
+
+A copy of the GPL-3.0 license is included with this framework in the file `LICENSE-GPL-3.0`.
