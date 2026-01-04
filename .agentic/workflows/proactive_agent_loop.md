@@ -4,6 +4,67 @@
 
 ---
 
+## Preconditions
+
+Before starting a proactive agent session, verify:
+
+- [ ] **Project has essential context files**: CONTEXT_PACK.md, STATUS.md or PRODUCT.md exist
+- [ ] **Recent activity visible**: JOURNAL.md has entries (or this is first session)
+- [ ] **Git is clean or understood**: No mysterious uncommitted changes (or you know why they exist)
+- [ ] **Can access project state**: Tools like `doctor.sh`, `brief.sh` are accessible
+
+**If any precondition fails:**
+- Missing context files → Run `doctor.sh` to identify issues, or initialize project if not yet set up
+- No JOURNAL.md entries → This might be first session (OK), or agent should create initial entry
+- Mysterious git changes → Ask human about uncommitted work before proceeding
+- Tools not accessible → Check `.agentic/` folder exists and is not corrupted
+
+---
+
+## Progress Tracking
+
+Copy this checklist to track your session progress:
+
+```
+Proactive Agent Session Progress:
+- [ ] Step 1: Loaded essential context (CONTEXT_PACK, STATUS/PRODUCT, JOURNAL, HUMAN_NEEDED)
+- [ ] Step 2: Assessed project state (blockers, stale work, planned work)
+- [ ] Step 3: Presented context & options to human
+- [ ] Step 4: Worked on chosen task(s)
+- [ ] Step 5: Provided mid-session updates (if session >30 min)
+- [ ] Step 6: Updated documentation (JOURNAL, STATUS/PRODUCT, specs)
+- [ ] Step 7: Prepared session summary with clear next steps
+- [ ] Step 8: Committed changes (or prepared for commit)
+```
+
+**Self-check**: Before ending session, verify all 8 steps completed. Don't skip documentation updates.
+
+---
+
+## State Contracts
+
+**This workflow READS**:
+- `CONTEXT_PACK.md` - Architecture & constraints
+- `STATUS.md` or `PRODUCT.md` - Current focus & planned work
+- `JOURNAL.md` - Recent progress and decisions
+- `HUMAN_NEEDED.md` - Active blockers
+- `spec/FEATURES.md` - Feature status (if Core+PM mode)
+- Git status - Uncommitted changes
+
+**This workflow WRITES**:
+- `JOURNAL.md` - Session summaries and decisions
+- `STATUS.md` or `PRODUCT.md` - Updated progress and next steps
+- `HUMAN_NEEDED.md` - New blockers or decisions needed
+- `spec/FEATURES.md` - Updated feature status (if Core+PM mode)
+- Source code, tests, other implementation files
+
+**Side effects**:
+- Git commits (with human approval)
+- May trigger retrospectives (if configured)
+- May invoke other workflows (TDD, research, etc.)
+
+---
+
 ## Core Principle: Agent as Collaborative Partner
 
 **The agent should:**
@@ -350,6 +411,207 @@ This saves agent tokens for actual development!
 - ❌ Discovering blocker at end of session (too late)
 - ❌ "Continue with current task?" (what task? what's the state?)
 - ❌ Ignoring planned work in STATUS.md/PRODUCT.md
+
+---
+
+## Error Recovery
+
+**Common problems in proactive agent workflow and solutions:**
+
+### Problem: Can't find planned work
+
+**Symptoms**: STATUS.md or PRODUCT.md is vague, no clear next steps
+
+**Solutions**:
+1. Check JOURNAL.md for what was discussed last session
+2. Check HUMAN_NEEDED.md - maybe blockers exist that should be resolved first
+3. Check spec/FEATURES.md (if Core+PM) for 'planned' features
+4. If still unclear: Ask human directly what they'd like to focus on
+5. Document the answer in STATUS.md so it's clear for next session
+
+**Prevention**: Always update STATUS.md with clear "Next Up" section before ending session
+
+---
+
+### Problem: HUMAN_NEEDED items are stale or unclear
+
+**Symptoms**: Blocker items exist but no longer relevant, or too vague to act on
+
+**Solutions**:
+1. Ask human: "Is H-0042 still relevant? Can we close it?"
+2. If vague, ask for clarification: "H-0043 says 'need decision' - what specifically?"
+3. Clean up HUMAN_NEEDED.md with human approval (move resolved items to JOURNAL.md)
+4. Add context to new items: what's blocked, why it's needed, what info is required
+
+**Prevention**: When adding to HUMAN_NEEDED.md, always include:
+- Clear ID (H-####)
+- What decision/input is needed
+- What it blocks
+- Urgency level
+- Options/context to help human decide
+
+---
+
+### Problem: Unclear what state features are in
+
+**Symptoms**: FEATURES.md says "in_progress" but no code exists, or "shipped" but not actually working
+
+**Solutions**:
+1. Run `doctor.sh` to check for inconsistencies
+2. Check git history for recent changes to those features
+3. Ask human: "F-0010 shows 'in_progress' - is this accurate?"
+4. Update FEATURES.md to match reality
+5. Add JOURNAL.md entry explaining the correction
+
+**Prevention**: Update FEATURES.md in the SAME COMMIT as code changes
+
+---
+
+### Problem: Session ended abruptly last time (incomplete work)
+
+**Symptoms**: JOURNAL.md shows work started but not finished, git has uncommitted changes
+
+**Solutions**:
+1. Present state clearly: "Last session was interrupted. Work on F-0010 was partial."
+2. Ask human: "Should we continue F-0010, commit as-is, or start fresh?"
+3. If continuing: Resume from last known good state
+4. If starting fresh: Create backup branch first, then reset or commit incomplete work
+
+**Template**:
+```
+🔄 **Interrupted Session Detected**
+
+Last session (3 days ago) ended mid-work on F-0010:
+- Form component: Complete
+- Validation logic: Incomplete (has failing tests)
+- Git: 5 uncommitted files
+
+**Options**:
+a) Continue F-0010 (fix failing tests, complete validation)
+b) Commit incomplete work with note, start something else
+c) Discard changes, start fresh
+d) Review the code first
+
+**What would you prefer?**
+```
+
+---
+
+### Problem: Agent is unsure if change requires human decision
+
+**Symptoms**: Hesitating between implementing or escalating
+
+**Guidelines for when to escalate**:
+
+**ESCALATE (add to HUMAN_NEEDED.md)** when:
+- ✅ Business logic decision (what should happen?)
+- ✅ Product direction (which feature is more important?)
+- ✅ Breaking changes (affects existing users?)
+- ✅ Security/privacy decisions
+- ✅ External dependencies (which library/service?)
+- ✅ Cost implications (cloud resources, paid APIs)
+- ✅ Multiple valid approaches with tradeoffs
+- ✅ Unclear requirements (what does "user-friendly" mean specifically?)
+
+**DON'T ESCALATE (just implement)** when:
+- ❌ Implementation details (how to structure code)
+- ❌ Naming variables/functions (use conventions)
+- ❌ Technical patterns (follow established patterns in codebase)
+- ❌ Testing approach (follow test_strategy.md)
+- ❌ Formatting/style (follow linter)
+- ❌ Refactoring (if behavior stays same and tests pass)
+
+**When in doubt**: Escalate with context, but also suggest your recommended approach
+
+**Example**:
+```
+⚠️ **Decision Needed** (H-0046)
+
+I need to implement error messages for the login form.
+
+**Question**: What tone should error messages have?
+
+**Options**:
+a) Formal: "Authentication credentials are invalid"
+b) Friendly: "Hmm, that password doesn't look right"
+c) Technical: "401 Unauthorized: Invalid password"
+
+**My recommendation**: (b) Friendly - matches the casual tone in other UI text
+
+**Impact**: Low urgency, can continue with other parts of login feature
+
+**Should I proceed with (b) or do you prefer a different tone?**
+```
+
+---
+
+### Problem: Context window approaching limit
+
+**Symptoms**: Long conversation, many file reads, approaching token limit
+
+**Solutions**:
+1. **Generate .continue-here.md immediately**:
+   ```bash
+   python3 .agentic/tools/continue_here.py
+   ```
+2. **Summarize key decisions** in JOURNAL.md before compaction
+3. **Commit current work** (even if incomplete) to preserve state in git
+4. **Tell human**: "Context window getting full. Should we wrap up this session and continue in a new one?"
+5. **Claude Desktop users**: If hooks enabled, PreCompact hook will handle this automatically
+
+**Prevention**: For long features, commit incrementally. Don't try to implement everything in one giant session.
+
+---
+
+### Problem: Lost track of what the human asked for
+
+**Symptoms**: Mid-session, forgot the original request or changed direction
+
+**Solutions**:
+1. Scroll back in conversation to re-read original request
+2. Check JOURNAL.md for what was agreed
+3. Check STATUS.md for documented current focus
+4. Ask human: "Just to confirm - we're working on F-0010 (Login UI), correct?"
+
+**Prevention**: At start of work, explicitly restate what you're doing:
+```
+✅ **Starting Work**
+
+Task: Implement F-0010 (Login UI)
+Acceptance criteria: spec/acceptance/F-0010.md
+Approach: TDD mode (tests first)
+Est. time: 1-2 hours
+
+Beginning now...
+```
+
+---
+
+### Problem: Human is non-responsive mid-session
+
+**Symptoms**: Asked question, waiting for answer, session is idle
+
+**Solutions**:
+1. **Don't block**: Find something else to work on that doesn't need the answer
+2. **Document the question**: Add to HUMAN_NEEDED.md with context
+3. **Suggest alternatives**: "While waiting for answer to H-0046, I can work on F-0012. Sound good?"
+4. **Set a note**: Add JOURNAL.md entry explaining why you pivoted
+
+**Template**:
+```
+⚠️ **Awaiting Input**
+
+I asked about error message tone (H-0046) 20 minutes ago.
+
+While waiting, I can:
+a) Work on F-0012 (Password Reset - independent of H-0046)
+b) Refactor existing code (doesn't need decisions)
+c) Write more tests for existing features
+d) Continue waiting
+
+**I'll proceed with (a) unless you object.**
+(Will resume login form once H-0046 is resolved)
+```
 
 ---
 
