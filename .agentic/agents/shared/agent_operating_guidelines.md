@@ -35,6 +35,193 @@
 
 ---
 
+## 🚨 CRITICAL: Anti-Hallucination Rules (NON-NEGOTIABLE)
+
+**Core Problem**: LLM hallucination undermines ALL quality principles. If the foundation is fabricated, tests and validation are meaningless.
+
+### Rule 1: NEVER Make Things Up
+
+**If you don't know something with certainty, you MUST**:
+1. ✅ **State that you don't know**: "I'm not certain about X"
+2. ✅ **Look it up**: Use Context7, read official docs, search web
+3. ✅ **Ask the human**: Add to HUMAN_NEEDED.md if you can't verify
+4. ❌ **NEVER guess or fabricate**: No "I think...", no plausible-sounding inventions
+
+**Examples of FORBIDDEN behavior**:
+- ❌ "React 18 has a useServerComponent hook" (NO IT DOESN'T - hallucinated)
+- ❌ "The API endpoint is probably /api/users/update" (don't guess)
+- ❌ "This library likely uses JWT for auth" (verify, don't assume)
+- ❌ "The function signature is probably func(x, y, z)" (look it up)
+
+**Examples of CORRECT behavior**:
+- ✅ "I need to check the React 18 documentation for the correct hook"
+- ✅ "Let me read the API documentation to confirm the endpoint"
+- ✅ "I'll search for this library's authentication method"
+- ✅ "Adding to HUMAN_NEEDED.md: Need to clarify the function signature"
+
+### Rule 2: Verify Technical Claims
+
+**BEFORE writing code using a library/API/framework feature, you MUST verify**:
+
+1. **Check version-specific documentation**:
+   - If `context7_enabled: yes` in STACK.md → Use Context7 for exact version docs
+   - Otherwise → Read official docs for the EXACT version in package.json/requirements.txt
+   - NEVER rely on training data for APIs/libraries (training data is outdated)
+
+2. **Verify these ALWAYS**:
+   - ✅ Function/method signatures (arguments, return types)
+   - ✅ API endpoints and HTTP methods
+   - ✅ Configuration options and their valid values
+   - ✅ Import paths and module names
+   - ✅ Breaking changes between versions
+   - ✅ Deprecated features
+
+3. **Sources of truth** (in order of preference):
+   1. **Context7** (if enabled) - version-locked, reliable
+   2. **Official documentation** for the EXACT version
+   3. **Source code** in node_modules/ or site-packages/
+   4. **Human confirmation** (HUMAN_NEEDED.md)
+   5. ❌ **NEVER**: Your training data, guesses, assumptions
+
+### Rule 3: Version-Specific Documentation Strategy
+
+**For documentation sources** (in order of token efficiency and reliability):
+
+1. **Context7** (if enabled):
+   - ✅ Version-locked, most reliable
+   - ✅ No guessing which version docs apply to
+   - ✅ Integrated with IDE, fast
+   - ✅ **PREFERRED**: Use this when available
+
+2. **Official docs (cached locally)**:
+   - ✅ Fast access (no network)
+   - ⚠️  Must verify version match
+   - ⚠️  May be outdated if not refreshed
+
+3. **Official docs (web)**:
+   - ✅ Most up-to-date
+   - ⚠️  Slower (network)
+   - ⚠️  May not match your exact version
+   - ⚠️  Requires explicit version verification
+
+4. **Source code**:
+   - ✅ Absolute truth for installed version
+   - ⚠️  Time-consuming to read
+   - ⚠️  May lack context/examples
+   - ✅ Use for ambiguous documentation
+
+**Efficiency ranking** (tokens + time + reliability):
+1. Context7 (fast + reliable + version-correct) **← BEST**
+2. Local cached docs (fast + reliable if version-matched)
+3. Official web docs (medium + reliable but version-ambiguous)
+4. Source code reading (slow + reliable + version-correct)
+
+**Recommendation**: 
+- Enable Context7 for all projects (best ROI)
+- Cache official docs locally if Context7 unavailable
+- Always verify version match before trusting docs
+
+### Rule 4: Document Uncertainty
+
+**When you encounter uncertainty, document it**:
+
+```markdown
+# HUMAN_NEEDED.md
+
+## H-0042: Verify Authentication Method
+
+**Type**: Technical Verification
+**Blocker**: Yes
+
+**Issue**: 
+I need to implement authentication for the API client, but I'm uncertain
+about which method this API actually uses.
+
+**What I Know**:
+- API requires authentication
+- Documentation mentions "Bearer tokens"
+
+**What I Don't Know**:
+- Token format (JWT? Opaque?)
+- Token endpoint
+- Refresh mechanism
+- Expiry handling
+
+**Requested**:
+Please provide:
+- Authentication documentation link
+- Example token request
+- Token refresh workflow
+```
+
+### Rule 5: Prefer "I Don't Know" Over Plausible Fiction
+
+**It is BETTER to**:
+- ✅ Admit you don't know and pause for verification
+- ✅ Add to HUMAN_NEEDED.md and wait
+- ✅ Take 5 minutes to research properly
+- ✅ Say "I need to verify this before implementing"
+
+**Than to**:
+- ❌ Write plausible-sounding but wrong code
+- ❌ Make up API signatures that "seem right"
+- ❌ Guess configuration that "should work"
+- ❌ Implement based on "probably" or "typically"
+
+**Why**: Wrong code that looks right is WORSE than no code. It wastes time, breaks tests, and undermines trust.
+
+### Rule 6: When Training Data Conflicts with Docs
+
+**If your training data contradicts current documentation**:
+- ✅ **Trust the docs** (version-specific, more recent)
+- ✅ **Discard training data** (likely outdated)
+- ✅ **Verify with source code** if ambiguous
+- ❌ **NEVER assume** training data is correct
+
+**Example**:
+- Training: "React.render() is the way to render"
+- Docs: "ReactDOM.createRoot().render() in React 18+"
+- **Action**: Use ReactDOM.createRoot().render() (docs are correct)
+
+### Rule 7: Code Review Red Flags for Hallucination
+
+**Before committing, check for these hallucination symptoms**:
+
+🚩 **Red Flags**:
+- Function/method you've never seen in docs
+- API endpoint you "think" exists
+- Configuration option that "should work"
+- Library feature you "remember" reading about
+- Pattern that "typically" works
+- Syntax that "looks right"
+
+✅ **Green Flags**:
+- Function from docs you just read
+- API endpoint from official spec
+- Configuration from version-specific docs
+- Feature confirmed in CHANGELOG
+- Pattern from official examples
+- Syntax from language spec
+
+### Success Criteria
+
+**You're following anti-hallucination rules when**:
+- ✅ You cite sources for technical claims
+- ✅ You verify before implementing
+- ✅ You use "I don't know" freely
+- ✅ HUMAN_NEEDED.md grows when appropriate
+- ✅ You prefer research over guessing
+- ✅ Tests pass on first run (no "fix made-up code" cycles)
+
+**You're hallucinating when**:
+- ❌ "This probably works" appears in commits
+- ❌ Tests fail because of wrong API signatures
+- ❌ Multiple attempts to "fix" invented code
+- ❌ Human says "that API doesn't exist"
+- ❌ Bugs traced to fabricated assumptions
+
+---
+
 ## Developer UX contract (keep the user "by the hand")
 - Always make the next step obvious. End each work session with:
   - what changed (1–5 bullets)

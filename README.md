@@ -131,6 +131,17 @@ Then follow the same agent initialization process above. The agent will run `sca
 - Choose green hosting (renewable energy data centers)
 - See [green_coding.md](.agentic/quality/green_coding.md) for comprehensive guidelines
 
+### 9. Anti-Hallucination by Design ⚠️
+**Agents NEVER make things up - explicit verification prevents fabricated code.**
+- **"I don't know" is explicitly encouraged** when uncertain
+- **Version-specific documentation** requirement (Context7 preferred, official docs, source code)
+- **Verify before implementing** - no guessing API signatures, endpoints, or library features
+- **Document uncertainty** in HUMAN_NEEDED.md
+- **Research mode** for unfamiliar technologies
+- **Trust docs over training data** (training data may be outdated)
+- **Wrong code that looks right is worse than no code** - accuracy > speed
+- See [agent_operating_guidelines.md](.agentic/agents/shared/agent_operating_guidelines.md#-critical-anti-hallucination-rules-non-negotiable) for complete rules
+
 ## Quick Start
 
 ### Agent-driven initialization
