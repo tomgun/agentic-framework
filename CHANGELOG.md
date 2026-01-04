@@ -5,6 +5,47 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2026-01-04
+
+### Added - Agent Tool Awareness
+
+**Critical Update**: Agents now know HOW and WHEN to use scalability tools efficiently.
+
+Added comprehensive guidance to `agent_operating_guidelines.md`:
+
+**Efficient Tool Usage (Core+Product Mode)**:
+1. **Finding Features Quickly**: Use `query_features.py` instead of grep (50+ features)
+   - Filter by status, tags, owner, layer
+   - Get counts and distributions
+2. **Updating Multiple Features**: Use `bulk_update.py` for mass operations
+   - Assign owners across features
+   - Set priorities by domain/layer
+   - Add/remove tags in bulk
+3. **Understanding Dependencies**: Use `feature_graph.py` with filters
+   - Focus mode for single feature + neighbors
+   - Filtered views by layer/status
+   - Hierarchy-only mode
+4. **Project Health Metrics**: Use `feature_stats.py` periodically
+   - Before retrospectives
+   - When summarizing progress
+5. **Validation**: Always run `validate_specs.py` before commits
+   - Pre-commit hook does this automatically
+6. **Hierarchical Migration**: Suggest when beneficial
+   - 200-500 features: Consider
+   - 500+ features: Recommend
+   - Show preview with `--dry-run` first
+
+**Agent Behavioral Changes**:
+- ✅ Use tools, not grep for feature searches
+- ✅ Bulk operations instead of manual edits
+- ✅ Generate focused dependency graphs
+- ✅ Monitor health metrics periodically
+- ✅ Suggest hierarchical layout when project grows
+- ✅ Validate before every commit
+
+### Impact
+Agents now work **efficiently** with 200-1000+ feature projects instead of inefficiently reading/editing large files manually.
+
 ## [0.3.1] - 2026-01-04
 
 ### Added - Phase 2 & 3 Spec Scalability Complete (500+ and 1000+ Features)
