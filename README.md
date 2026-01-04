@@ -320,7 +320,52 @@ See **[`UPGRADING.md`](UPGRADING.md)** for complete upgrade guide, version compa
 
 ## License & Contributing
 
-[Add your license and contribution guidelines]
+**Agentic AI Framework** is proprietary software by **Tomas Günther / Kipinä Software Oy**.
+
+### Three Licensing Options:
+
+1. **Free Tier (with Attribution)** ⭐
+   - Use in any personal, open source, or commercial project
+   - Must include visible attribution in your product
+   - Example: "Built with Agentic AI Framework"
+
+2. **Commercial Tier (White-Label)**
+   - €499 one-time OR €99/year per product
+   - Remove all attribution requirements
+   - Priority support included
+
+3. **Kipinä Software Oy & Employees**
+   - Free use without attribution
+   - Any projects (personal, commercial, client work)
+
+**See [LICENSE](LICENSE) for complete terms.**
+
+### Attribution Examples (Free Tier)
+
+**Web app footer:**
+```html
+Built with <a href="https://github.com/tomgun/agentic-framework">Agentic AI Framework</a>
+```
+
+**Desktop/Mobile app "About":**
+```
+Built with Agentic AI Framework
+```
+
+**CLI tool `--version`:**
+```
+Built with Agentic AI Framework (https://github.com/tomgun/agentic-framework)
+```
+
+### Commercial License
+
+To purchase white-label license: **tomas@kipina.fi**
+
+---
+
+### Contributing
+
+[Add your contribution guidelines]
 
 ## Getting Help
 
