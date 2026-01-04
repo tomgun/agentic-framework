@@ -484,6 +484,21 @@ Update when:
   3. `Tests: Unit:` is `complete` (not `todo`)
   4. Acceptance criteria file exists at `spec/acceptance/F-####.md`
 
+**Optional: Spec Migrations (Advanced)** 🆕
+If `spec/migrations/` exists, you can optionally create a migration to document the change:
+```bash
+bash .agentic/tools/migration.sh create "Add feature F-0042"
+```
+This creates an atomic record of HOW the specs evolved (credit: Arto Jalkanen).
+See: `.agentic/workflows/spec_migrations.md` for details.
+
+Benefits of migrations:
+- Smaller context windows (read 3-5 migrations vs entire FEATURES.md)
+- Natural audit trail of decisions
+- Better for parallel agent work
+
+You can maintain FEATURES.md manually AND use migrations as complementary history.
+
 ### Enforcement Protocol
 
 **After creating any file:**
