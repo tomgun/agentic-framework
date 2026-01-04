@@ -444,7 +444,7 @@ bash .agentic/tools/migration.sh create "Add CSV Export feature"
 **Note**: Migrations are optional and complementary to FEATURES.md.
 
 See: `.agentic/workflows/spec_migrations.md` for details.
-**Credit**: Concept by Arto Jalkanen
+**Credits**: Migration concept by Arto Jalkanen, hybrid approach by Tomas Günther & Arto Jalkanen
 
 #### Update Priorities
 

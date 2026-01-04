@@ -489,7 +489,7 @@ If `spec/migrations/` exists, you can optionally create a migration to document 
 ```bash
 bash .agentic/tools/migration.sh create "Add feature F-0042"
 ```
-This creates an atomic record of HOW the specs evolved (credit: Arto Jalkanen).
+This creates an atomic record of HOW the specs evolved (credit: Arto Jalkanen + Tomas Günther).
 See: `.agentic/workflows/spec_migrations.md` for details.
 
 Benefits of migrations:
