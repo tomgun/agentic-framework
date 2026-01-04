@@ -352,6 +352,9 @@ cat CONTEXT_PACK.md
 # Feature list
 grep "^## F-" spec/FEATURES.md
 
+# Optional: Check spec migrations (if using)
+bash .agentic/tools/migration.sh list
+
 # What needs your attention
 cat HUMAN_NEEDED.md
 
@@ -364,6 +367,8 @@ grep "Version:" STACK.md
 **You can edit ANY spec file**. Agents pick up your changes.
 
 #### Add a Feature
+
+**Option 1: Direct Edit (Simple)**
 
 **Edit `spec/FEATURES.md`:**
 ```markdown
@@ -418,6 +423,28 @@ grep "Version:" STACK.md
 ```
 "I've added F-0010 to FEATURES.md. Please implement it using TDD."
 ```
+
+**Option 2: Migration-Based (Advanced)** 🆕
+
+If your project uses spec migrations (for projects with 50+ features), you can create atomic change records:
+
+```bash
+# Create migration
+bash .agentic/tools/migration.sh create "Add CSV Export feature"
+
+# Edit the generated migration file
+# spec/migrations/042_add_csv_export_feature.md
+```
+
+**Benefits**:
+- Smaller context windows for AI (read 3-5 migrations vs entire FEATURES.md)
+- Natural audit trail of WHY changes were made
+- Better for parallel agent work
+
+**Note**: Migrations are optional and complementary to FEATURES.md.
+
+See: `.agentic/workflows/spec_migrations.md` for details.
+**Credit**: Concept by Arto Jalkanen
 
 #### Update Priorities
 
