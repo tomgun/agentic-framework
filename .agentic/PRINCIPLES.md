@@ -74,6 +74,48 @@
 
 ---
 
+### Green Coding & Environmental Responsibility
+
+**What**: Software should minimize energy consumption and environmental impact through efficient design and implementation.
+
+**Why**:
+- Energy-efficient code reduces operational costs
+- Sustainable software aligns with global environmental goals
+- Efficient code is usually faster, more maintainable code
+- Developer responsibility extends to environmental impact
+- Green principles often align with performance optimization
+
+**How**:
+- Optimize algorithms for computational efficiency (lower complexity)
+- Minimize resource usage (memory, CPU cycles, network calls)
+- Lazy loading and on-demand resource allocation
+- Intelligent scheduling of background tasks (event-driven > polling)
+- Profile and optimize energy hotspots
+- Design for longevity (reduce need for frequent rewrites)
+- Choose energy-efficient hosting and infrastructure
+
+**Example**: 
+- Use O(n log n) sort instead of O(n²) for large datasets (less CPU)
+- Lazy load images only when visible (less bandwidth, memory)
+- Cache API responses to reduce redundant network calls
+- Debounce UI updates to reduce unnecessary redraws
+- Use WebP instead of PNG (smaller files, less transfer energy)
+
+**Anti-pattern**: 
+- ❌ Polling every second when webhooks/events would work
+- ❌ Loading entire datasets when pagination would suffice
+- ❌ Unoptimized algorithms causing excessive CPU usage
+- ❌ Memory leaks forcing server restarts
+- ❌ Inefficient database queries causing repeated full table scans
+
+**Connection to Other Principles**:
+- **Token Economics**: Efficient code = less compute = lower energy
+- **Quality by Design**: Green code is often cleaner, more maintainable
+- **Performance**: Energy efficiency and speed usually go hand-in-hand
+- **Longevity**: Sustainable design extends software lifecycle
+
+---
+
 ## Token Economics Principles
 
 ### Durable Artifacts Prevent Repeated Re-Reading

@@ -66,6 +66,8 @@ Then follow the same agent initialization process above. The agent will run `sca
 
 ## Design Principles
 
+**📖 For comprehensive principles guide, see [`PRINCIPLES.md`](.agentic/PRINCIPLES.md)** ⭐
+
 ### 1. Token Economics (Efficiency)
 **Durable artifacts prevent repeated context waste.**
 - Maintain `CONTEXT_PACK.md` so agents don't re-read entire codebases
@@ -118,6 +120,16 @@ Then follow the same agent initialization process above. The agent will run `sca
 - Specs are readable and editable by both (markdown files, not complex formats)
 - Agents know when to escalate to humans (`HUMAN_NEEDED.md`)
 - Tools enable humans to check status without asking agents (token-free queries)
+
+### 8. Green Coding & Environmental Responsibility
+**Efficient software reduces energy consumption and environmental impact.**
+- Optimize algorithms for computational efficiency (lower complexity)
+- Minimize resource usage (memory, CPU cycles, network calls)
+- Lazy loading and on-demand resource allocation
+- Event-driven instead of polling (webhooks > setInterval)
+- Caching reduces redundant compute
+- Choose green hosting (renewable energy data centers)
+- See [green_coding.md](.agentic/quality/green_coding.md) for comprehensive guidelines
 
 ## Quick Start
 
