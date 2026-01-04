@@ -38,10 +38,11 @@ Agents copy and customize these during project initialization to create `quality
 - **batch_processor.sh** (todo) - Batch processing tool validation
 
 ### Games
-- **game_2d.sh** (todo) - 2D game validation (SDL, SFML, etc.)
-- **unity_game.sh** (todo) - Unity game validation
+- **game_2d_web.sh** ✅ - 2D web game validation (Phaser, PixiJS)
+- **game_2d_mobile.sh** ✅ - 2D mobile game validation (React Native, SpriteKit, libGDX)
+- **game_unity.sh** ✅ - Unity game validation (2D and 3D)
 - **unreal_game.sh** (todo) - Unreal Engine game validation
-- **realtime_demo.sh** (todo) - Demo engine/demoscene validation
+- **opengl_demo.sh** (todo) - OpenGL/WebGL demo validation
 
 ### Audio/DSP
 - **juce_audio_plugin.sh** - JUCE VST/AU/AUv3 plugin validation (complete)

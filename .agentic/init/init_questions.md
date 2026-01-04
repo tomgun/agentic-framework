@@ -4,12 +4,14 @@ The agent should ask only what’s necessary to produce durable context artifact
 
 ## Product + scope
 - What type of product is this: webapp / game / vstplugin / mobileapp / app+backend?
+  - If game: 2D or 3D? What genre (puzzle, platformer, shooter, strategy, etc.)?
+  - If game: Target platform (web, mobile, desktop)?
 - What are we building (1–2 sentences)?
 - Who is the user and what is the primary workflow?
 - Success criteria (measurable if possible)?
-- Non-goals (what we explicitly won’t do now)?
+- Non-goals (what we explicitly won't do now)?
 - Is this trivial/standard, or do we need a research phase first?
-  - If research is needed: list what to research and what “good” sources look like (papers, official docs, reference implementations).
+  - If research is needed: list what to research and what "good" sources look like (papers, official docs, reference implementations).
 
 ## Constraints
 - Platforms: web/mobile/desktop/CLI/service?
@@ -20,10 +22,17 @@ The agent should ask only what’s necessary to produce durable context artifact
 ## Tech stack
 - Primary language(s)?
 - Primary framework(s) / runtime(s)?
+  - If 2D game (web): Phaser 3, PixiJS, or custom?
+  - If 2D game (mobile): SpriteKit (iOS), libGDX (Android), Unity, or Godot?
+  - If 2D game (desktop): SFML, SDL2, Raylib, Bevy (Rust), or Macroquad (Rust)?
+  - If 3D game: Unity, Unreal Engine, or OpenGL/custom engine?
+  - If 3D demo: OpenGL, WebGL, or Three.js?
 - Package/dependency manager choice?
 - Data storage: DB type + hosting?
 - Authn/authz approach (if needed)?
 - External integrations (APIs, queues, payments, etc.)?
+- For games: Physics library (if needed)? Matter.js, Box2D, Bullet, etc.?
+- For games: Visual effects library (if needed)? Particle systems, shader effects?
 
 ## Architecture + boundaries
 - High-level architecture style (monolith, modular monolith, services)?
@@ -37,7 +46,7 @@ The agent should ask only what’s necessary to produce durable context artifact
 - Test data strategy (fixtures, factories, containers)?
 - Domain-specific testing/perf (if relevant):
   - VST/JUCE: audio I/O golden tests, host automation tests, realtime/perf budget tests
-  - Games: determinism/replay tests, perf budgets, input recording
+  - Games: determinism/replay tests, frame rate independence tests, perf budgets (60fps target?), input recording/replay
   - Mobile: device/simulator strategy, UI tests, crash/perf checks
 
 ## Developer experience
