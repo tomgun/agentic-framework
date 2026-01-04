@@ -6,6 +6,160 @@
 
 **Philosophy**: Efficient code is usually faster, cheaper, and greener. Green coding aligns with performance optimization and maintainability.
 
+**⚠️ CRITICAL**: Green optimizations must NOT introduce bugs. Correctness > Clarity > Efficiency. Profile before optimizing, test thoroughly, start simple.
+
+---
+
+## ⚠️ WARNING: Don't Break Things to Be Green
+
+### Complexity = Bug Risk
+
+**Green optimizations can introduce bugs if not careful:**
+
+```typescript
+// ❌ DANGEROUS - Cache without invalidation (stale data bug!)
+const cache = new Map();
+
+function getUser(id) {
+  if (cache.has(id)) return cache.get(id);
+  const user = db.getUser(id);
+  cache.set(id, user);
+  return user;
+}
+
+function updateUser(id, data) {
+  db.updateUser(id, data);
+  // BUG: Cache not invalidated! Returns stale data forever
+}
+
+// ✅ SAFE - Cache with proper invalidation
+const cache = new Map();
+
+function getUser(id) {
+  const cached = cache.get(id);
+  if (cached && Date.now() < cached.expires) {
+    return cached.data;
+  }
+  const user = db.getUser(id);
+  cache.set(id, {
+    data: user,
+    expires: Date.now() + 60000 // 1 min TTL - auto-expires
+  });
+  return user;
+}
+
+function updateUser(id, data) {
+  db.updateUser(id, data);
+  cache.delete(id); // Explicit invalidation
+}
+```
+
+**Common bugs from green optimizations:**
+- **Stale cache data**: Cache not invalidated on updates
+- **Race conditions**: Concurrent requests with lazy loading
+- **Memory leaks**: Cache grows unbounded without eviction
+- **Incorrect batching**: Batched operations applied in wrong order
+- **Event loss**: Event-driven system drops events under load
+- **Debounce issues**: User action lost due to aggressive debouncing
+
+### The Safe Approach
+
+**Priority order (NEVER compromise):**
+1. **Correctness**: Code works correctly
+2. **Clarity**: Code is maintainable
+3. **Efficiency**: Code is fast + green
+
+**Green optimization workflow:**
+1. ✅ **Make it work** (correctness)
+2. ✅ **Make it clear** (maintainability)
+3. ✅ **Profile to find hotspots** (measure, don't guess)
+4. ✅ **Optimize hot paths** (where data shows impact)
+5. ✅ **Test thoroughly** (ensure no bugs introduced)
+
+**When NOT to optimize:**
+- ❌ No profiling data (premature optimization)
+- ❌ Already fast enough (no user impact)
+- ❌ Would make code fragile/complex (maintainability > green)
+- ❌ Can't test edge cases thoroughly
+
+### Test Green Optimizations Rigorously
+
+**Caching example - what to test:**
+```typescript
+describe('User cache', () => {
+  it('caches user data', () => {
+    // Happy path
+  });
+  
+  it('returns fresh data after TTL expires', () => {
+    // Test expiration
+  });
+  
+  it('invalidates cache on update', () => {
+    const user = getUser('123');
+    updateUser('123', { name: 'New Name' });
+    const updated = getUser('123');
+    expect(updated.name).toBe('New Name'); // Not stale!
+  });
+  
+  it('handles concurrent requests', async () => {
+    // Test race conditions
+    const [u1, u2] = await Promise.all([
+      getUser('123'),
+      getUser('123')
+    ]);
+    // Should not cause double DB call or corrupt cache
+  });
+  
+  it('evicts old entries when cache full', () => {
+    // Test cache bounds (no memory leak)
+  });
+});
+```
+
+### Simple > Complex
+
+**Start simple, optimize when needed:**
+
+```typescript
+// ✅ START HERE - Simple, no bugs
+function getWeather(city) {
+  return api.fetch(`/weather/${city}`);
+}
+
+// ⚠️ ADD ONLY IF PROFILING SHOWS PROBLEM
+// And only after testing thoroughly
+const cache = new LRU({ max: 100, ttl: 300000 }); // Use proven library!
+
+function getWeather(city) {
+  return cache.fetch(city, () => 
+    api.fetch(`/weather/${city}`)
+  );
+}
+```
+
+**Use battle-tested libraries for complex patterns:**
+- Caching: `lru-cache`, `node-cache`, Redis
+- Debouncing: Lodash `debounce`, `throttle`
+- Connection pooling: Built-in to DB libraries
+- Don't roll your own unless you have expertise
+
+### Document Trade-offs
+
+**If you add complexity for green, document it:**
+
+```typescript
+/**
+ * User cache with 60s TTL
+ * 
+ * WHY: getUser() called 1000x/sec, DB was bottleneck (99% cache hit rate)
+ * TRADE-OFF: Adds complexity, possible stale data for up to 60s
+ * INVALIDATION: Explicit on update/delete, auto-expires after 60s
+ * TESTED: tests/cache.test.ts covers expiration, invalidation, concurrency
+ */
+const userCache = new LRUCache({ max: 10000, ttl: 60000 });
+```
+
 ---
 
 ## Core Principles
@@ -617,32 +771,80 @@ Example:
 
 **Green coding is a factor, not the only factor**:
 
-1. **Correctness First**: Buggy code that's energy-efficient is still useless
+1. **Correctness First**: Buggy code that's energy-efficient is still useless (and dangerous!)
 2. **Clarity Second**: Maintainability enables long-term efficiency
 3. **Green Third**: Optimize for energy when correctness and clarity are solid
 
-**When to prioritize green coding**:
-- ✅ High-scale systems (1M+ users)
-- ✅ Long-running processes (background jobs, servers)
-- ✅ Resource-constrained environments (mobile, embedded)
-- ✅ High API call volumes
-- ✅ When it aligns with performance/cost optimization
+**⚠️ NEVER sacrifice correctness or introduce bugs for green optimization.**
 
-**When NOT to sacrifice clarity for green**:
-- ❌ Micro-optimizations that add complexity
-- ❌ Premature optimization (profile first!)
-- ❌ Code becomes unmaintainable
+### When to prioritize green coding:
+- ✅ High-scale systems (1M+ users) - where small improvements have big impact
+- ✅ Long-running processes (background jobs, servers) - cumulative energy savings
+- ✅ Resource-constrained environments (mobile, embedded) - battery life matters
+- ✅ High API call volumes - caching has proven 99%+ hit rate
+- ✅ When it aligns with performance/cost optimization - win-win
+- ✅ **When you can test edge cases thoroughly** - no hidden bugs
 
-**Example of good balance**:
+### When NOT to sacrifice clarity for green:
+- ❌ Micro-optimizations that add complexity (hard to maintain)
+- ❌ Premature optimization (profile first! measure don't guess)
+- ❌ Code becomes unmaintainable (future you will hate it)
+- ❌ **Can't test edge cases** (race conditions, cache invalidation, etc.)
+- ❌ **Introducing bug risk** (correctness > green, always)
+
+### Common Bug-Prone Patterns
+
+**Be especially careful with:**
+1. **Caching**: Stale data, invalidation complexity, race conditions, memory leaks
+2. **Debouncing/Throttling**: Lost user actions, timing bugs
+3. **Batching**: Order dependencies, partial failures
+4. **Lazy loading**: Race conditions, loading indicators, error states
+5. **Connection pooling**: Connection state, transaction boundaries
+6. **Event-driven**: Lost events, ordering guarantees, back-pressure
+
+**For these patterns:**
+- Use battle-tested libraries (don't roll your own)
+- Write extensive tests (happy path + edge cases)
+- Document assumptions and trade-offs
+- Monitor in production (detect stale cache, lost events, etc.)
+
+### Example of good balance:
+
 ```python
-# Clear and green (win-win)
+# ✅ Clear and green (win-win, no bug risk)
 def find_duplicates(items):
     seen = set()
-    return [x for x in items if x in seen or seen.add(x) is False]
+    duplicates = set()
+    for item in items:
+        if item in seen:
+            duplicates.add(item)
+        seen.add(item)
+    return list(duplicates)
 
-# Over-optimized (sacrifices clarity)
+# ❌ Over-optimized (confusing, potential bugs)
 def find_duplicates(items):
-    return list({x for x in items if items.count(x) > 1})  # Confusing
+    return list({x for x in items if items.count(x) > 1})  
+    # Confusing AND O(n²) due to count()! Worse on both fronts.
+
+# ⚠️ Complex green (only if measured need + thorough testing)
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
+def find_duplicates_cached(items_tuple):
+    # Can only cache if items are immutable (tuple)
+    # Adds complexity, only worth it if called repeatedly with same input
+    # MUST TEST: cache hit/miss, memory bounds, immutability requirement
+    seen = set()
+    duplicates = set()
+    for item in items_tuple:
+        if item in seen:
+            duplicates.add(item)
+        seen.add(item)
+    return tuple(duplicates)
+
+# Wrapper to handle list->tuple conversion
+def find_duplicates(items):
+    return list(find_duplicates_cached(tuple(items)))
 ```
 
 ---
