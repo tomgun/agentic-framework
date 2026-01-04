@@ -5,6 +5,53 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-01-04
+
+### Added - Phase 1 Spec Scalability (Critical for 200+ Features)
+
+**New Tools:**
+- `query_features.py`: Fast feature filtering by status, tags, layer, domain, priority, owner
+  - Essential for finding features in large projects
+  - Count features by category
+  - Sub-second performance even with 500+ features
+- Enhanced `feature_graph.py`: Filterable dependency graphs
+  - `--focus` mode: show single feature + neighbors
+  - `--layer`, `--tags`, `--status` filters
+  - `--hierarchy-only` mode for parent-child relationships
+  - Prevents massive unreadable diagrams
+- Enhanced `validate_specs.py`: Circular dependency detection
+  - DFS-based cycle detection (catches F-0001 → F-0002 → F-0001)
+  - Cross-reference validation (parent/dependencies exist)
+- `hooks/pre-commit`: Pre-commit hook for spec validation
+  - Auto-installed by `scaffold.sh` (Core+PM mode)
+  - Catches errors before commit
+
+**New Feature Metadata Fields (v0.3.0+):**
+- `Tags`: `[auth, ui, critical]` for categorization/search
+- `Layer`: `presentation | business-logic | data | infrastructure | other`
+- `Domain`: `auth`, `payments`, `content`, etc.
+- `Priority`: `critical | high | medium | low`
+- `Owner`: email or username
+- All fields optional, backward compatible
+
+**Documentation:**
+- `docs/SPEC_SCALABILITY_PLAN.md`: Comprehensive 3-phase plan (200/500/1000+ features)
+- Updated `DEVELOPER_GUIDE.md`: New tools with examples
+- Updated `SPEC_SCHEMA.md`: Documented new fields
+- Updated `FEATURES.template.md`: Added new optional fields
+
+### Fixed
+- `scaffold.sh`: Now installs pre-commit hook for Core+PM mode
+
+### Impact
+- ✅ Handle 200+ features smoothly (Phase 1 complete)
+- ✅ Fast queries (<1 second with 500 features)
+- ✅ Focused graphs (no unreadable massive diagrams)
+- ✅ Catch circular dependencies automatically
+- ✅ Better organization (tags, layers, domains)
+- 📋 Phase 2 planned: Hierarchical file organization for 500+ features
+- 📋 Phase 3 planned: Statistics dashboard for 1000+ features
+
 ## [0.2.5] - 2026-01-03
 
 ### Added
