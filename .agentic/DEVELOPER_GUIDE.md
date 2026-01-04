@@ -148,6 +148,27 @@ git push
 
 ## Working with Agents
 
+### Agent Checklists (How Agents Work Systematically)
+
+Agents use **mandatory checklists** to ensure systematic, thorough work:
+
+**📋 Core Checklists:**
+- [`checklists/session_start.md`](checklists/session_start.md) - Starting every work session
+- [`checklists/feature_implementation.md`](checklists/feature_implementation.md) - Implementing features  
+- [`checklists/before_commit.md`](checklists/before_commit.md) - Before every commit (no exceptions!)
+- [`checklists/feature_complete.md`](checklists/feature_complete.md) - Marking features "shipped"
+- [`checklists/session_end.md`](checklists/session_end.md) - Ending work sessions
+- [`checklists/retrospective.md`](checklists/retrospective.md) - Running retrospectives
+
+**Why checklists help you:**
+- ✅ Nothing falls through cracks (agents are systematic)
+- ✅ Consistent quality across sessions
+- ✅ Clear audit trail (you see what was checked)
+- ✅ Prevents redundant work (visible checkmarks)
+- ✅ You can point agents to checklists if they miss something
+
+**You can read these** to understand what agents should be doing. If something's missing, reference the relevant checklist.
+
 ### Understanding Agent Behavior
 
 Agents are trained to:
