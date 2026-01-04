@@ -44,6 +44,19 @@ Purpose: a single source of truth for "how we build and run software here".
 - Package manager: <!-- npm/pnpm/yarn/uv/pip/poetry/go -->
 - Formatting/linting: <!-- black/ruff/eslint/prettier/gofmt/etc -->
 
+## License
+
+- **Project License**: [MIT / Apache 2.0 / GPL-3.0 / AGPL-3.0 / Proprietary]
+- **License File**: `LICENSE`
+- **Copyright**: [Year] [Your Name / Organization]
+- **Compatible Dependencies**: [e.g., MIT, Apache 2.0, BSD, LGPL (dynamic linking)]
+- **Incompatible Dependencies**: [e.g., GPL, AGPL - agent must avoid these!]
+- **Asset Licensing**: See `assets/ATTRIBUTION.md` for all external assets and their licenses
+
+**Note**: Agents MUST check dependency and asset licenses for compatibility before using!
+
+---
+
 ## Testing (required)
 - Unit test framework: <!-- e.g., pytest, vitest, go test -->
 - Integration/E2E (optional): <!-- e.g., playwright, cypress -->

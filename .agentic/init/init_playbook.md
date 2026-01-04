@@ -80,6 +80,77 @@ Interview the user to understand:
 3. **Tech stack?** (languages, frameworks, runtimes)
 4. **Key constraints?** (performance, security, compliance, offline-first, etc.)
 5. **Testing approach?** (TDD recommended, what test frameworks?)
+6. **Project license?** (See Step 2a below - IMPORTANT!)
+
+### Step 2a: Ask about project licensing ⭐
+
+**This is CRITICAL - affects what dependencies and assets you can use!**
+
+Ask the user:
+
+```
+"What license do you want for this project?
+
+**For Open Source:**
+a) MIT - Maximum freedom (most popular, 65% of projects)
+b) Apache 2.0 - Like MIT + patent protection (company-friendly)
+c) GPL-3.0 - Free Software, copyleft (improvements must be shared)
+d) AGPL-3.0 - Like GPL + applies to SaaS/cloud use
+e) Other (LGPL, MPL, BSD, Unlicense)
+
+**For Closed Source:**
+f) Proprietary/Closed Source
+
+**Not sure?** → Type 'help' for decision guide
+
+Your choice (a/b/c/d/e/f/help):"
+```
+
+**If user types 'help'**, provide quick guide:
+
+```
+**Quick Guide:**
+
+Choose **MIT (a)** if:
+- You want maximum adoption and freedom
+- OK with others making closed-source forks
+- Building libraries, tools, frameworks
+- Most business-friendly
+
+Choose **Apache 2.0 (b)** if:
+- Like MIT but want patent protection
+- Company-backed project
+
+Choose **GPL-3.0 (c)** if:
+- You believe in Free Software philosophy
+- Want to prevent proprietary forks
+- Building desktop apps, tools
+
+Choose **AGPL-3.0 (d)** if:
+- Building web app / SaaS
+- Want to prevent "SaaS loophole" (cloud hosting without sharing)
+
+Choose **Proprietary (f)** if:
+- Commercial software, no open source
+- Want full control
+
+**Most common**: MIT (65%), Apache (13%), GPL (8%)
+```
+
+**After user chooses**, create LICENSE file:
+
+1. Download appropriate license text from https://choosealicense.com/
+2. Save to `LICENSE` at repo root
+3. Update with year and copyright holder (ask user for name/org)
+4. Update `STACK.md` with license info (see Step 3)
+5. Update `README.md` with license section
+
+**IMPORTANT**: Record license choice for dependency validation:
+- **MIT/Apache/BSD**: Can use MIT, Apache, BSD, LGPL deps. CANNOT use GPL!
+- **GPL/AGPL**: Can use MIT, Apache, BSD, GPL, LGPL deps. CANNOT use proprietary!
+- **Proprietary**: Can use MIT, Apache, BSD deps. CANNOT use GPL/AGPL!
+
+**See**: `.agentic/workflows/project_licensing.md` for comprehensive licensing guide.
 
 ## Step 3: Fill in the core documents
 
