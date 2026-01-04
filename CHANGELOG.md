@@ -5,6 +5,119 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-01-05
+
+### Added - Session Continuity & Claude Hooks
+
+**Major UX improvements for session management and Claude Desktop integration.**
+
+#### 1. Session Continuity Tool (`continue_here.py`)
+
+**New Tool**: `.agentic/tools/continue_here.py`
+
+Generates `.continue-here.md` - a single-file snapshot for instant context recovery:
+- Synthesizes: JOURNAL.md, STATUS.md/PRODUCT.md, HUMAN_NEEDED.md, FEATURES.md, pipeline files
+- Output: Quick summary, active work, blockers, recent progress, next steps
+- Works in both Core and Core+PM modes
+- Auto-detects project profile
+
+**Benefits**:
+- Instant context recovery after breaks or context resets
+- Read 1 file instead of 5+ files
+- Lower cognitive load for humans and AI agents
+- Perfect handoff between sessions
+
+**Usage**:
+```bash
+python3 .agentic/tools/continue_here.py
+# Then read .continue-here.md at start of next session
+```
+
+#### 2. Ready-to-Use AI Prompts
+
+**New Directories**: `.agentic/prompts/cursor/` and `.agentic/prompts/claude/`
+
+13 copy-paste workflow prompts for common tasks:
+- **Session Management**: `session_start.md`, `session_end.md`
+- **Feature Development**: `feature_start.md`, `feature_test.md`, `feature_complete.md` (TDD workflow)
+- **Spec Management**: `migration_create.md`, `spec_update.md` (Core+PM mode)
+- **Core Mode**: `product_update.md`, `quick_feature.md`
+- **Quality & Maintenance**: `run_quality.md`, `fix_issues.md`, `retrospective.md`
+- **Research & Planning**: `research.md`, `plan_feature.md`
+
+**Claude-Specific Features Documented**:
+- Artifacts (interactive previews)
+- Projects (persistent context)
+- Extended Thinking mode
+- Hooks integration
+
+**Benefits**:
+- Eliminate prompt engineering - just copy and paste
+- Consistent agent behavior across sessions
+- Lower barrier to entry for new users
+- Claude users get platform-specific guidance
+
+#### 3. Claude Desktop Lifecycle Hooks
+
+**New Directory**: `.agentic/claude-hooks/`
+
+Automated scripts that run at key lifecycle points in Claude Desktop:
+
+**Hooks**:
+1. **`SessionStart.sh`**: Environment validation, project status, detect `.continue-here.md`
+2. **`UserPromptSubmit.sh`**: Auto-inject `.continue-here.md` (ZERO-TOUCH context recovery!)
+3. **`PostToolUse.sh`**: Real-time linter checks after code edits
+4. **`PreCompact.sh`**: State preservation before context window compaction
+5. **`Stop.sh`**: Session end reminders (commits, docs, context generation)
+
+**Configuration**: `hooks.json` for Claude Desktop
+
+**Benefits**:
+- **Automatic context injection**: No manual "read .continue-here.md" needed
+- **Real-time quality gates**: Catch syntax errors immediately after writing code
+- **Never lose progress**: State automatically saved before context compaction
+- **Better workflow discipline**: Reminders about commits and documentation
+- **Seamless session continuity**: Perfect pairing with `continue_here.py`
+
+**Requirements**: Claude Desktop with hooks enabled (check version compatibility)
+
+**Documentation**: Complete setup, usage, and troubleshooting guide in `.agentic/claude-hooks/README.md`
+
+#### 4. Pre-Project Ideation Template
+
+**New Template**: `.agentic/init/VISION.template.md`
+
+For capturing project vision before initialization:
+- Problem & opportunity
+- Vision & success criteria
+- User scenarios
+- Core principles
+- Constraints & non-goals
+- Technical direction
+- Open questions
+
+**Benefits**:
+- Better alignment before implementation
+- Clear "why" documented upfront
+- Informs PRD and feature specs
+- Reduces scope creep
+
+### Changed - Documentation Updates
+
+**Updated Files**:
+- `README.md`: Reference new prompts and tools
+- `START_HERE.md`: Mention `.continue-here.md` and prompts in session start
+- `DEVELOPER_GUIDE.md`: Document `continue_here.py`, prompt library, Claude hooks
+- `.agentic/README.md`: Add continue_here.py and migration.sh to tools list
+- `prompts/claude/README.md`: Add hooks documentation and setup guide
+
+### Credits
+
+**Session Continuity Concept**: Inspired by plugin-freedom-system's context resume architecture  
+**Claude Hooks**: Adapted from plugin-freedom-system's lifecycle hooks for general-purpose development
+
+---
+
 ## [0.3.4] - 2026-01-04
 
 ### Fixed - Upgrade Script Path Bug
