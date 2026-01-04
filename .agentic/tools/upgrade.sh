@@ -230,10 +230,18 @@ else
   # Check for spec validation
   if [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/validate_specs.py" ]] && command -v python3 >/dev/null 2>&1; then
     echo "  Running spec validation..."
-    if python3 "$TARGET_PROJECT_DIR/.agentic/tools/validate_specs.py" > /dev/null 2>&1; then
+    VALIDATION_OUTPUT=$(python3 "$TARGET_PROJECT_DIR/.agentic/tools/validate_specs.py" 2>&1)
+    VALIDATION_EXIT=$?
+    
+    if [[ $VALIDATION_EXIT -eq 0 ]]; then
       echo -e "${GREEN}  ✓ Spec validation passed${NC}"
+    elif echo "$VALIDATION_OUTPUT" | grep -q "ModuleNotFoundError\|No module named"; then
+      echo -e "${BLUE}  ℹ Spec validation skipped (Python dependencies not installed)${NC}"
+      echo "    Optional: pip install pyyaml python-frontmatter jsonschema"
     else
-      echo -e "${YELLOW}  ⚠ Spec validation failed (may need manual fixes)${NC}"
+      echo -e "${YELLOW}  ⚠ Spec validation found issues:${NC}"
+      echo "$VALIDATION_OUTPUT" | head -10
+      echo "    Run manually: python3 .agentic/tools/validate_specs.py"
     fi
   fi
 fi
