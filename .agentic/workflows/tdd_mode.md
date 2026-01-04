@@ -2,6 +2,46 @@
 
 **✅ RECOMMENDED for most projects.** Set `development_mode: tdd` in your `STACK.md`.
 
+---
+
+## Preconditions
+
+Before starting TDD workflow, verify:
+
+- [ ] **Feature has acceptance criteria**: Check `spec/acceptance/F-####.md` exists (Core+PM) or informal criteria in `PRODUCT.md` (Core)
+- [ ] **Test framework is set up**: Verify test command in `STACK.md` works (`npm test`, `cargo test`, `pytest`, etc.)
+- [ ] **No failing tests**: Run full test suite - must be GREEN before adding new tests
+- [ ] **Clear what to build**: Understand the behavior you're testing (from acceptance criteria or discussion)
+- [ ] **Development environment ready**: Can run tests locally, code editor configured
+
+**If any precondition fails:**
+- Missing acceptance criteria → Add to `HUMAN_NEEDED.md`, create criteria with human
+- Test framework not set up → Follow `STACK.md` setup instructions or research testing framework
+- Failing tests → Fix existing issues before adding new tests (or mark as known failures)
+- Unclear requirements → Discuss with human, update `HUMAN_NEEDED.md`
+
+---
+
+## Progress Tracking
+
+Copy this checklist to track your TDD progress:
+
+```
+TDD Cycle Progress:
+- [ ] Step 1: Picked specific behavior to test
+- [ ] Step 2: Written failing test (RED phase)
+- [ ] Step 3: Verified test fails for right reason
+- [ ] Step 4: Written minimal implementation (GREEN phase)
+- [ ] Step 5: All tests pass (including new one)
+- [ ] Step 6: Refactored for clarity (if needed)
+- [ ] Step 7: Updated documentation (FEATURES.md, JOURNAL.md)
+- [ ] Step 8: Committed with descriptive message
+```
+
+**Self-check**: After each cycle, verify you completed all 8 steps. Don't skip steps.
+
+---
+
 ## Why TDD is Recommended
 
 ### Token Economics Benefits
@@ -305,6 +345,176 @@ Then instruct agent case-by-case:
 
 > "Implement F-0042 using TDD" (agent uses tdd_mode.md)  
 > "Prototype the dashboard UI" (agent uses dev_loop.md)
+
+---
+
+## Error Recovery
+
+**Common TDD problems and solutions:**
+
+### Problem: Tests won't run at all
+
+**Symptoms**: Test runner not found, import errors, configuration errors
+
+**Solutions**:
+1. Check `STACK.md` for correct test command
+2. Verify dependencies installed (`npm install`, `pip install -r requirements.txt`, etc.)
+3. Check test framework is in project dependencies
+4. Verify test files are in correct location (check framework conventions)
+5. Add to `HUMAN_NEEDED.md` if test setup is unclear
+
+**Prevention**: Run `doctor.sh --quick` before starting TDD cycle
+
+---
+
+### Problem: Tests pass immediately (false positive)
+
+**Symptoms**: New test passes without implementation, always green
+
+**Root cause**: Test is too weak or not actually testing the behavior
+
+**Solutions**:
+1. Verify test actually calls the function/method being tested
+2. Check assertions are meaningful (not always true)
+3. Run test in isolation to confirm it can fail
+4. Add more specific assertions
+5. Test the negative case first (should fail, then invert)
+
+**Example of weak test**:
+```python
+def test_validate_password():
+    result = validate_password("test")
+    assert result is not None  # Too weak! Always passes
+```
+
+**Better**:
+```python
+def test_validate_password_rejects_short():
+    result = validate_password("short")  
+    assert result == False  # Specific expectation
+```
+
+---
+
+### Problem: Stuck in RED phase (tests won't pass)
+
+**Symptoms**: Can't make tests pass, implementation seems correct but fails
+
+**Solutions**:
+1. **Simplify test**: Make it test less behavior, split into smaller tests
+2. **Check test logic**: Is the test correct? Read it carefully
+3. **Debug**: Add print statements or use debugger to see actual vs. expected
+4. **Verify assumptions**: Are you testing what you think you're testing?
+5. **Ask for help**: Add specific question to `HUMAN_NEEDED.md` with:
+   - Test code
+   - Implementation code  
+   - Expected vs. actual behavior
+   - What you've tried
+
+**Break the cycle**: If stuck >15 minutes, write simpler test that you CAN pass, build up from there
+
+---
+
+### Problem: Refactoring breaks tests
+
+**Symptoms**: Tests were passing, now failing after refactor
+
+**Root cause**: Tests were coupled to implementation details, not behavior
+
+**Solutions**:
+1. **Revert refactor**: Go back to passing state
+2. **Identify coupling**: What implementation detail changed that broke test?
+3. **Rewrite test**: Test behavior/output, not internal implementation
+4. **Re-attempt refactor**: With better tests, try again
+
+**Prevention**: Write tests that test "what" not "how"
+
+**Bad (tests implementation)**:
+```python
+def test_sorts_using_quicksort():
+    assert uses_quicksort(sort([3,1,2]))  # Coupled to algorithm
+```
+
+**Good (tests behavior)**:
+```python
+def test_sorts_numbers_ascending():
+    assert sort([3,1,2]) == [1,2,3]  # Tests outcome
+```
+
+---
+
+### Problem: Too many tests failing at once
+
+**Symptoms**: After adding new code, many unrelated tests fail
+
+**Root cause**: Changed shared code or broke a core assumption
+
+**Solutions**:
+1. **Revert immediately**: Go back to last known good state
+2. **Smaller steps**: Make incremental changes, run tests after each
+3. **Isolate change**: Refactor first (tests passing), then add feature
+4. **Check dependencies**: Did you break a shared utility or core function?
+
+**Prevention**: Commit after each GREEN phase. If something breaks, you can revert easily.
+
+---
+
+### Problem: Tests are slow
+
+**Symptoms**: Test suite takes too long to run, slows down TDD cycle
+
+**Solutions**:
+1. **Run subset**: Test only the file you're working on during TDD
+2. **Mock external deps**: Database, API calls, file I/O should be mocked for unit tests
+3. **Parallel execution**: Most test runners support parallel tests
+4. **Mark slow tests**: Tag integration/slow tests separately, skip during TDD
+5. **Profile tests**: Find the slowest tests and optimize or move to integration suite
+
+**TDD cycle should be <10 seconds**: If longer, you're doing integration testing not unit testing
+
+**Example** (Jest):
+```bash
+# Fast: Test only current file during TDD
+npm test -- auth.test.ts --watch
+
+# Slow: Full suite (run before commit)
+npm test
+```
+
+---
+
+### Problem: Don't know what to test next
+
+**Symptoms**: Feature is partially done, unclear what behavior to add next
+
+**Solutions**:
+1. **Check acceptance criteria**: `spec/acceptance/F-####.md` lists all required behavior
+2. **List edge cases**: Write down all the "what if" scenarios
+3. **Start with happy path**: Test normal, expected usage first
+4. **Then error cases**: Invalid input, boundary conditions, failures
+5. **Check test coverage**: Gaps in coverage suggest untested behavior
+
+**Systematic approach**:
+1. Happy path (normal usage)
+2. Edge cases (boundary values, empty, null, zero)
+3. Error handling (invalid input, exceptions)
+4. Integration (does it work with other components?)
+
+---
+
+### Problem: Unclear requirements
+
+**Symptoms**: Don't know what the correct behavior should be
+
+**Solutions**:
+1. **Don't guess**: Add question to `HUMAN_NEEDED.md` immediately
+2. **Document assumption**: If you must proceed, write assumption in test comment and `JOURNAL.md`
+3. **Ask human**: Blocker = stop and escalate, don't waste tokens guessing
+4. **Check similar features**: How do existing features handle this?
+
+**Never write tests for guessed behavior** - you'll have to rewrite them later
+
+---
 
 ## Tools Support
 

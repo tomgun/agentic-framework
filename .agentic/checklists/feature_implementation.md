@@ -170,6 +170,140 @@
 
 ---
 
+## Error Recovery
+
+**When things go wrong during feature implementation:**
+
+### Problem: Tests keep failing after implementation
+
+**Quick fixes**:
+1. Re-read acceptance criteria - are you testing the right behavior?
+2. Check test setup/teardown - is test environment clean?
+3. Run test in isolation - does it pass alone but fail in suite?
+4. Check for timing issues - add delays if testing async code
+5. Verify test framework is configured correctly
+
+**If still stuck after 15 min**: Add to HUMAN_NEEDED.md with test code, implementation code, and error message
+
+---
+
+### Problem: Feature scope is too large (can't complete in session)
+
+**Solutions**:
+1. **Split it**: Break into smaller sub-features, implement incrementally
+2. **MVP first**: Implement minimal working version, enhance later
+3. **Commit partial work**: Mark feature `State: partial`, commit what works
+4. **Add task**: Create follow-up task in STATUS.md for remaining work
+
+**Example split**:
+- Original: F-0010 "User authentication"
+- Split into:
+  - F-0010a: Login form UI (1 hour)
+  - F-0010b: API integration (1 hour)
+  - F-0010c: Error handling (30 min)
+  - F-0010d: "Remember me" feature (30 min)
+
+---
+
+### Problem: Unclear acceptance criteria or conflicting requirements
+
+**Immediate actions**:
+1. **Don't guess**: Stop coding immediately
+2. **Document confusion**: What specifically is unclear?
+3. **Add to HUMAN_NEEDED.md**: With specific questions and options
+4. **Work on something else**: Switch to feature with clear requirements
+
+**Example escalation**:
+```
+H-0047: F-0010 Acceptance Unclear
+
+Acceptance criterion says "secure password storage" but doesn't specify:
+- Hash algorithm (bcrypt? argon2? scrypt?)
+- Salt rounds/iterations?
+- Pepper key needed?
+
+Options:
+a) bcrypt with 12 rounds (industry standard)
+b) argon2id (newer, more secure)
+c) Other?
+
+Blocking: F-0010 implementation
+```
+
+---
+
+### Problem: Dependencies not ready
+
+**Check**:
+1. In FEATURES.md, what does `Dependencies:` say?
+2. Are those features actually `Status: shipped`?
+3. Can you work on non-dependent parts first?
+
+**Solutions**:
+- Implement dependencies first (if small)
+- Use mocks/stubs for now, integrate later
+- Switch to feature without dependencies
+- Add to HUMAN_NEEDED.md if dependency priority unclear
+
+---
+
+### Problem: Code getting messy/complex
+
+**Signs**:
+- Functions >100 lines
+- Deep nesting (>4 levels)
+- Lots of duplication
+- Hard to write tests
+
+**Solutions**:
+1. **Stop adding features**: Don't make it worse
+2. **Refactor first**: Clean up while tests are passing
+3. **Extract functions**: Break large functions into smaller ones
+4. **Add tests**: Makes refactoring safe
+5. **Commit clean code**: Then add new feature on clean foundation
+
+**Don't**: Continue adding features to messy code (compound problem)
+**Do**: Clean up first, then extend
+
+---
+
+### Problem: Forgot to update FEATURES.md/PRODUCT.md
+
+**Discovered later (before commit)**:
+1. Update it now before committing
+2. Check `Implementation: State` matches reality
+3. Check `Implementation: Code` lists actual files
+4. Check `Tests:` fields are accurate
+
+**Discovered after commit**:
+1. Create immediate follow-up commit: `docs: update FEATURES.md for F-0010`
+2. No big deal, just fix it
+3. Add JOURNAL.md note about forgetting (learn from it)
+
+**Prevention**: Use this checklist every time!
+
+---
+
+### Problem: Quality checks failing
+
+**Linter errors**:
+- Fix immediately (don't commit broken code)
+- If unsure how to fix, check programming_standards.md
+- Most linters can auto-fix (`eslint --fix`, `black .`, `cargo fmt`)
+
+**Test failures** (unrelated to your code):
+- **Don't ignore**: These are regressions
+- **Revert your changes**: Verify tests pass without your code
+- **Find what broke**: Bisect your changes to find culprit
+- **Fix it**: Don't proceed until green
+
+**Test coverage too low**:
+- Add more tests (missed edge cases?)
+- Check testing_standards.md for what to test
+- Don't skip tests to pass coverage threshold
+
+---
+
 ## Anti-Patterns
 
 ❌ **Don't** mark `Status: shipped` without acceptance file  
