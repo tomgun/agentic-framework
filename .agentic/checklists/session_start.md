@@ -56,7 +56,8 @@
 - [ ] **Read `HUMAN_NEEDED.md`** (if exists and not empty)
   - Are there unresolved blockers?
   - Do you need to address them before starting new work?
-  - Should you ask human about status?
+  - **IMPORTANT**: Proactively surface blockers to user at session start
+  - Ask: "There are N items in HUMAN_NEEDED.md. Should we address these first?"
 
 ## Development Mode Check
 
@@ -65,13 +66,40 @@
   - `standard` → Tests alongside or after implementation
   - Affects your workflow significantly
 
-## Summary to User
+## Proactive Context Setting (Make Collaboration Fluent)
 
-After completing checklist, tell user:
-- What the current focus is (from STATUS.md)
-- Any blockers found (from HUMAN_NEEDED.md)
-- What you're ready to work on
-- Ask: "Should I continue with [current focus], or is there something else?"
+- [ ] **Check for planned work** (Core profile: `PRODUCT.md`, Core+PM: `STATUS.md`)
+  - Read "What's next" or "Next up" section
+  - Identify 2-3 highest priority items
+  - **Present options to user**: "I see we have [A], [B], [C] planned. Which should we tackle first?"
+
+- [ ] **Surface blockers proactively**
+  - If `HUMAN_NEEDED.md` has items, mention them BEFORE asking what to work on
+  - Example: "Before we start, there are 2 items in HUMAN_NEEDED.md that need your input: [H-0001: API auth method unclear], [H-0002: UI color scheme decision]. Should we resolve these first?"
+
+- [ ] **Check for stale work**
+  - If `JOURNAL.md` shows work was in-progress but stopped mid-task, mention it
+  - Example: "I notice we were implementing feature F-0042 but it's not complete. Should we finish that, or switch to something else?"
+
+- [ ] **Check for acceptance validation**
+  - If Core+PM and features are "shipped" but not "accepted", mention them
+  - Example: "F-0005 and F-0007 are shipped but not accepted yet. Should we validate those?"
+
+## Summary to User (Make Next Step Obvious)
+
+After completing checklist, provide structured summary:
+
+**Context Summary:**
+- Current focus: [from STATUS.md or PRODUCT.md]
+- Recent progress: [1-2 sentences from JOURNAL.md]
+- Active blockers: [list from HUMAN_NEEDED.md or "None"]
+
+**Options for this session:**
+1. [Highest priority planned work]
+2. [Second priority or blocker resolution]
+3. [Alternative based on project state]
+
+**Question**: "Which would you like to tackle? Or is there something else on your mind?"
 
 ---
 
