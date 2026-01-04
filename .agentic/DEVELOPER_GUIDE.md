@@ -26,8 +26,8 @@
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.4.0.tar.gz | tar xz
-cd agentic-framework-0.4.0
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.4.1.tar.gz | tar xz
+cd agentic-framework-0.4.1
 
 # Install into your project
 bash install.sh /path/to/your-project
