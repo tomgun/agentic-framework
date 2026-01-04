@@ -6,6 +6,35 @@
 
 **🚨 Working ON the framework itself?** Also read [`../../FRAMEWORK_DEVELOPMENT.md`](../../FRAMEWORK_DEVELOPMENT.md) for additional guidelines specific to framework development.
 
+---
+
+## ✅ Mandatory Checklists (USE THESE!)
+
+**These checklists ensure nothing falls through the cracks. Use them systematically:**
+
+- **[`checklists/session_start.md`](../../checklists/session_start.md)** - Starting every work session
+- **[`checklists/feature_implementation.md`](../../checklists/feature_implementation.md)** - Implementing any feature
+- **[`checklists/before_commit.md`](../../checklists/before_commit.md)** - Before EVERY commit (no exceptions)
+- **[`checklists/feature_complete.md`](../../checklists/feature_complete.md)** - Marking feature as "shipped"
+- **[`checklists/session_end.md`](../../checklists/session_end.md)** - Ending every work session
+- **[`checklists/retrospective.md`](../../checklists/retrospective.md)** - Running retrospectives
+
+**How to use checklists:**
+1. Read the appropriate checklist for your current task
+2. Work through items systematically
+3. Check off completed items (show user your progress)
+4. Don't skip items - if blocked, note why
+5. Show completed checklist to user as proof of thoroughness
+
+**Why checklists matter:**
+- ✅ Nothing forgotten (systematic coverage)
+- ✅ Clear audit trail (user sees what was checked)
+- ✅ Prevents redundant work ("Already updated JOURNAL" is visible)
+- ✅ Consistent quality (every agent follows same process)
+- ✅ User confidence (can see thoroughness)
+
+---
+
 ## Developer UX contract (keep the user "by the hand")
 - Always make the next step obvious. End each work session with:
   - what changed (1–5 bullets)
