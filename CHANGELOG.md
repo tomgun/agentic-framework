@@ -5,6 +5,38 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4] - 2026-01-04
+
+### Fixed - Upgrade Script Path Bug
+
+**Problem**: `upgrade.sh` checked for old `agentic/` folder instead of new `.agentic/` folder (hidden directory with dot prefix)
+
+**Impact**: Upgrade tool failed on all projects with error:
+```
+✗ Error: No '.agentic/' folder found in target project
+  Target: /path/to/project/agentic
+```
+
+**Root Cause**: Three hardcoded references to old `agentic` path:
+- Line 50: Check for target project `.agentic/` folder
+- Line 66: Check for new framework `.agentic/` folder  
+- Line 112: Backup command
+
+**Fixed**:
+- Changed all `agentic` references to `.agentic` (with dot)
+- Upgrade tool now correctly detects hidden `.agentic/` directory
+- Backup, rollback, and all operations now work correctly
+
+**Credit**: Discovered by Tomas during upgrade of `passive-income-solution1` project
+
+**Testing**:
+```bash
+# Should now work
+./upgrade.sh /Users/tomas/code/passive-income-solution1
+```
+
+---
+
 ## [0.3.3] - 2026-01-04
 
 ### Added - Minimal Test Suite (Cobbler's Children Now Have Shoes!)

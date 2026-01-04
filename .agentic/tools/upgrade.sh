@@ -47,9 +47,9 @@ echo "  Target project: $TARGET_PROJECT_DIR"
 echo "  New framework: $NEW_FRAMEWORK_DIR"
 echo ""
 
-if [[ ! -d "agentic" ]]; then
+if [[ ! -d ".agentic" ]]; then
   echo -e "${RED}✗ Error: No '.agentic/' folder found in target project${NC}"
-  echo "  Target: $TARGET_PROJECT_DIR/agentic"
+  echo "  Target: $TARGET_PROJECT_DIR/.agentic"
   echo "  Is this an initialized agentic project?"
   exit 1
 fi
@@ -63,7 +63,7 @@ if [[ ! -f "STACK.md" ]]; then
   fi
 fi
 
-if [[ ! -d "$NEW_FRAMEWORK_DIR/agentic" ]]; then
+if [[ ! -d "$NEW_FRAMEWORK_DIR/.agentic" ]]; then
   echo -e "${RED}✗ Error: New framework structure invalid${NC}"
   echo "  Expected: $NEW_FRAMEWORK_DIR/.agentic/"
   echo "  This script must be run FROM the new framework directory"
@@ -109,7 +109,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 if [[ "$DRY_RUN" == "yes" ]]; then
   echo "  [DRY RUN] Would create backup: $TARGET_PROJECT_DIR/$BACKUP_DIR"
 else
-  cp -r "$TARGET_PROJECT_DIR/agentic" "$TARGET_PROJECT_DIR/$BACKUP_DIR"
+  cp -r "$TARGET_PROJECT_DIR/.agentic" "$TARGET_PROJECT_DIR/$BACKUP_DIR"
   echo -e "${GREEN}✓ Backup created: $BACKUP_DIR${NC}"
 fi
 
