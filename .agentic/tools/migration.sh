@@ -36,6 +36,7 @@ Examples:
   bash .agentic/tools/migration.sh search "payment"
 
 Credit: Migration-based specs concept by Arto Jalkanen
+        Hybrid approach by Tomas Günther & Arto Jalkanen
 EOF
   exit 1
 }

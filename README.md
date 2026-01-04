@@ -98,7 +98,7 @@ Then follow the same agent initialization process above. The agent will run `sca
 - No stale placeholders (`(Not yet created)` gets replaced)
 - `FEATURES.md` status matches implementation reality
 - Architecture decisions are recorded (ADRs) by whoever makes them
-- **Optional: Spec Migrations** - Track evolution as atomic changes for better context management (Arto Jalkanen)
+- **Optional: Spec Migrations** - Track evolution as atomic changes for better context management (Tomas Günther & Arto Jalkanen)
 
 ### 5. Traceability
 **Clear path from requirements to code to tests.**

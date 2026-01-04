@@ -2,7 +2,9 @@
 
 **Purpose**: Track the evolution of specs as atomic changes, complementing the current-state specs with a historical truth that helps AI agents work with smaller context windows.
 
-**Credit**: This approach was proposed by **Arto Jalkanen**, inspired by database migration patterns applied to software specifications.
+**Credits**: 
+- **Migration concept**: Arto Jalkanen - Event sourcing for specs, atomic operations for better AI context windows
+- **Hybrid approach**: Tomas Günther & Arto Jalkanen - Maintaining both current-state (FEATURES.md) and historical truth (migrations) as complementary systems
 
 ---
 
@@ -381,7 +383,12 @@ Auto-generated registry of all migrations:
 
 ## Credits
 
-**Concept by**: Arto Jalkanen
+**Migration concept**: Arto Jalkanen  
 **Insight**: "Context window. Migrations are by default smaller, atomic operations where AI doesn't get tangled up as easily."
+
+**Hybrid approach**: Tomas Günther & Arto Jalkanen  
+- Maintaining both current-state specs (FEATURES.md) and migration history as complementary truths
+- "Why not both?" - combining the benefits of snapshots (human-readable) and event logs (AI-efficient)
+
 **Implementation**: Agentic AI Framework v0.4.0+
 
