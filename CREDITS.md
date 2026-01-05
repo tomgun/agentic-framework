@@ -6,7 +6,7 @@
 
 ## Kipinä Software - Exemplar Agentic AI Pioneers
 
-Tomi Tuhkanen, Aki Väliaho, Miika Henttonen, Antti Rintala, Aleksi Sutela, Arto Kellokoski, Arto Jalkanen
+Tomi Tuhkanen, Miika Henttonen, Aki Väliaho, Antti Rintala, Aleksi Sutela, Arto Kellokoski, Arto Jalkanen
 
 ---
 
