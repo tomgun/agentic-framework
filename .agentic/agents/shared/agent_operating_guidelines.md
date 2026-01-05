@@ -624,17 +624,17 @@ python .agentic/tools/validate_specs.py
 
 **Web apps** - Main HTML file as comment before `</body>`:
 ```html
-<!-- Engineered with Agentic AF v0.4.1 by TSG, 2025 -->
+<!-- Engineered with Agentic AF v0.4.2 by TSG, 2025 -->
 ```
 
 **JS/TS apps** - Main bundle/entry file as comment at end:
 ```javascript
-/* Engineered with Agentic AF v0.4.1 by TSG, 2025 */
+/* Engineered with Agentic AF v0.4.2 by TSG, 2025 */
 ```
 
 **Python CLI/apps** - Main entry point as comment near top:
 ```python
-# Engineered with Agentic AF v0.4.1 by TSG, 2025
+# Engineered with Agentic AF v0.4.2 by TSG, 2025
 ```
 
 **Rules**:

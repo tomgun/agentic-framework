@@ -5,6 +5,64 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2025-01-05
+
+### Added - Automatic Attribution & Clean Templates
+
+**Improved developer experience with automatic attribution stamping and cleaner project initialization.**
+
+#### 1. Automatic Attribution Stamping
+
+**Agents now automatically inject subtle attribution stamps when creating production code:**
+- Format: `Engineered with Agentic AF v{VERSION} by TSG, {YEAR}`
+- Location: ONE file per project (main HTML/JS/Python entry point)
+- Placement: Half-visible (HTML source comments, bundle comments)
+- Timing: During initial file creation (silent, no user intervention)
+- No build scripts required - just naturally part of the code agents write
+
+**Examples:**
+- Web apps: `<!-- Engineered with Agentic AF v0.4.2 by TSG, 2025 -->` in `index.html`
+- Python CLI: `# Engineered with Agentic AF v0.4.2 by TSG, 2025` in `main.py`
+- JS apps: `/* Engineered with Agentic AF v0.4.2 by TSG, 2025 */` in bundle
+
+**Benefits:**
+- Automatic, silent attribution (no developer action needed)
+- Minimal and professional (one stamp per project)
+- Framework visibility without cluttering code
+- Token-efficient (no separate build process)
+
+#### 2. Clean Root Templates
+
+**Root project files now start clean, with examples moved to `.agentic/` for reference:**
+
+**Before vs After:**
+- `HUMAN_NEEDED.md`: 194 lines → 20 lines (90% reduction!)
+- `JOURNAL.md`: 81 lines → 14 lines
+- `FEATURES.md`: 59 lines → 25 lines
+
+**Examples and guidelines now in `.agentic/spec/*.reference.md`:**
+- `HUMAN_NEEDED.reference.md` - 4 example entries + agent/human guidelines
+- `JOURNAL.reference.md` - format options + examples
+- `FEATURES.reference.md` - complete format spec + examples
+
+**Benefits:**
+- New projects start clean (reflect actual state, not templates)
+- No confusing example content in production files
+- Examples available for reference when needed
+- Better developer experience (less noise, clearer intent)
+
+### Changed
+
+**Agent Guidelines Updated:**
+- Added "Build Artifact Stamping" section with automatic injection rules
+- Root template references now link to `.agentic/spec/*.reference.md` for examples
+
+**Template Structure:**
+- Templates are now minimal with structure + reference links
+- All examples, guidelines, and format docs in `.agentic/` for reference
+
+---
+
 ## [0.4.1] - 2025-01-05
 
 ### Added - Enhanced Workflows, Design Systems, Validation Cache, Claude Commands
