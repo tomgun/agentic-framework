@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# watermark.sh: Build artifact processor
+# build-stamper.sh: Build artifact processor
 # 
 # Usage:
-#   bash .agentic/tools/watermark.sh inject <artifact-file>
-#   bash .agentic/tools/watermark.sh verify <artifact-file>
+#   bash .agentic/tools/build-stamper.sh inject <artifact-file>
+#   bash .agentic/tools/build-stamper.sh verify <artifact-file>
 
 set -euo pipefail
 
@@ -11,8 +11,8 @@ set -euo pipefail
 VERSION=$(cat .agentic/../VERSION 2>/dev/null || echo "unknown")
 YEAR=$(date +%Y)
 
-# Generate watermark string
-generate_watermark() {
+# Generate stamp string
+generate_stamp() {
   local text="Engineered with Agentic AF v${VERSION} by TSG, ${YEAR}"
   # Encode: base64 + reverse + add noise
   local encoded=$(echo -n "$text" | base64 | rev)
@@ -20,8 +20,8 @@ generate_watermark() {
   echo "$noisy"
 }
 
-# Decode watermark
-decode_watermark() {
+# Decode stamp
+decode_stamp() {
   local encoded="$1"
   # Remove noise, reverse, decode
   local clean=$(echo "$encoded" | sed 's/__X//;s/Y__//')
@@ -31,73 +31,73 @@ decode_watermark() {
 # Inject into HTML file
 inject_html() {
   local file="$1"
-  local wm=$(generate_watermark)
+  local stamp=$(generate_stamp)
   local text="Engineered with Agentic AF v${VERSION} by TSG, ${YEAR}"
   
   # Add BOTH visible and obfuscated versions as HTML comment near </body>
   if grep -q "</body>" "$file"; then
     sed -i.bak "/<\/body>/i\\
 <!-- $text -->\\
-<!-- $wm -->\\
+<!-- $stamp -->\\
 " "$file"
     rm -f "${file}.bak"
   else
     # Add at end if no </body>
     echo "<!-- $text -->" >> "$file"
-    echo "<!-- $wm -->" >> "$file"
+    echo "<!-- $stamp -->" >> "$file"
   fi
 }
 
 # Inject into JS/TS bundle
 inject_js() {
   local file="$1"
-  local wm=$(generate_watermark)
+  local stamp=$(generate_stamp)
   local text="Engineered with Agentic AF v${VERSION} by TSG, ${YEAR}"
   
   # Add BOTH visible and obfuscated as comments at end
   echo "/* $text */" >> "$file"
-  echo "/* $wm */" >> "$file"
+  echo "/* $stamp */" >> "$file"
 }
 
 # Inject into Python
 inject_python() {
   local file="$1"
-  local wm=$(generate_watermark)
+  local stamp=$(generate_stamp)
   local text="Engineered with Agentic AF v${VERSION} by TSG, ${YEAR}"
   
   # Add BOTH visible and obfuscated as comments at end
   echo "# $text" >> "$file"
-  echo "# $wm" >> "$file"
+  echo "# $stamp" >> "$file"
 }
 
 # Inject into binary (as metadata)
 inject_binary() {
   local file="$1"
-  local wm=$(generate_watermark)
+  local stamp=$(generate_stamp)
   
   # Create metadata file alongside binary
-  echo "$wm" > "${file}.meta"
+  echo "$stamp" > "${file}.meta"
 }
 
-# Verify watermark exists
+# Verify stamp exists
 verify_artifact() {
   local file="$1"
   
   if [[ -f "$file" ]]; then
     if grep -q "__X.*Y__" "$file" 2>/dev/null; then
       local encoded=$(grep -o "__X[^Y]*Y__" "$file" | head -1)
-      local decoded=$(decode_watermark "$encoded")
-      echo "✓ Watermark found: $decoded"
+      local decoded=$(decode_stamp "$encoded")
+      echo "✓ Stamp found: $decoded"
       return 0
     elif [[ -f "${file}.meta" ]]; then
       local encoded=$(cat "${file}.meta")
-      local decoded=$(decode_watermark "$encoded")
-      echo "✓ Watermark found: $decoded"
+      local decoded=$(decode_stamp "$encoded")
+      echo "✓ Stamp found: $decoded"
       return 0
     fi
   fi
   
-  echo "✗ No watermark found"
+  echo "✗ No stamp found"
   return 1
 }
 
@@ -107,7 +107,7 @@ COMMAND="${1:-help}"
 case "$COMMAND" in
   inject)
     if [[ $# -lt 2 ]]; then
-      echo "Usage: watermark.sh inject <file>"
+      echo "Usage: build-stamper.sh inject <file>"
       exit 1
     fi
     
@@ -122,26 +122,26 @@ case "$COMMAND" in
     case "$FILE" in
       *.html|*.htm)
         inject_html "$FILE"
-        echo "✓ Watermark injected into HTML: $FILE"
+        echo "✓ Stamp injected into HTML: $FILE"
         ;;
       *.js|*.mjs|*.jsx)
         inject_js "$FILE"
-        echo "✓ Watermark injected into JS: $FILE"
+        echo "✓ Stamp injected into JS: $FILE"
         ;;
       *.py)
         inject_python "$FILE"
-        echo "✓ Watermark injected into Python: $FILE"
+        echo "✓ Stamp injected into Python: $FILE"
         ;;
       *)
         inject_binary "$FILE"
-        echo "✓ Watermark injected as metadata: ${FILE}.meta"
+        echo "✓ Stamp injected as metadata: ${FILE}.meta"
         ;;
     esac
     ;;
     
   verify)
     if [[ $# -lt 2 ]]; then
-      echo "Usage: watermark.sh verify <file>"
+      echo "Usage: build-stamper.sh verify <file>"
       exit 1
     fi
     
@@ -149,27 +149,27 @@ case "$COMMAND" in
     ;;
     
   generate)
-    # Just output the watermark for manual use
-    generate_watermark
+    # Just output the stamp for manual use
+    generate_stamp
     ;;
     
   decode)
     if [[ $# -lt 2 ]]; then
-      echo "Usage: watermark.sh decode <encoded-string>"
+      echo "Usage: build-stamper.sh decode <encoded-string>"
       exit 1
     fi
-    decode_watermark "$2"
+    decode_stamp "$2"
     ;;
     
   help|*)
     cat << 'EOF'
-watermark.sh: Build artifact processor
+build-stamper.sh: Build artifact processor
 
 Usage:
-  watermark.sh inject <file>    Process artifact
-  watermark.sh verify <file>    Verify artifact
-  watermark.sh generate          Generate string
-  watermark.sh decode <string>   Decode string
+  build-stamper.sh inject <file>    Process artifact
+  build-stamper.sh verify <file>    Verify artifact
+  build-stamper.sh generate          Generate string
+  build-stamper.sh decode <string>   Decode string
 
 Supported file types:
   - HTML (.html, .htm)
