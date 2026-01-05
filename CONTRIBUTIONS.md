@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework  
-**Period**: Initial Development (v0.1.0 → v0.2.5)  
-**Date**: 2026-01-03  
+**Period**: Initial Development (v0.1.0 → v0.4.3)  
+**Date**: 2026-01-05  
 
 ---
 
@@ -234,8 +234,111 @@ Result: Production-ready framework with 60+ documented principles, proven workfl
 
 ---
 
+## Real-World Usage & Critical Feedback (v0.4.0+)
+
+### Chess/Tetris Hybrid Game Project
+
+**Testing the framework in practice with a custom game development project revealed critical gaps:**
+
+### 1. Smoke Testing Gap (v0.4.3)
+
+**Problem Discovered**:
+- Agents claimed code was "working" without actually running it
+- Browser errors not caught before user saw them
+- Moving pieces didn't work (logic bugs)
+- Turn logic (black/white) broken
+- Multiple blunders reached user attention
+
+**Root Cause**: Agents trusted "it should work" without verification
+
+**Solution Requested**:
+- a) Mandatory smoke testing: agents MUST run application and verify it works
+- b) Testable architecture: separate business logic from UI for unit testing
+
+**Implementation**:
+- Created `smoke_testing.md` checklist - comprehensive verification requirements
+- Integrated smoke tests into `before_commit.md` and `feature_complete.md`
+- Added testable architecture patterns with real-world examples
+- Enhanced `programming_standards.md` with Model-View separation patterns
+- Emphasized pure business logic functions (no UI dependencies)
+
+**Impact**: Agents now required to RUN and VERIFY before claiming "it's done"
+
+### 2. Library Selection Gap (v0.4.3)
+
+**Problem Discovered**:
+- Agent chose `chess.js` library for chess/Tetris hybrid game
+- chess.js enforces standard FIDE chess rules
+- Game has custom rules: Tetris-like mechanics, pieces added one at a time, hybrid moves
+- Wrong library choice locked project into incompatible constraints
+- Had to rip out library and rebuild with custom logic
+
+**Root Cause**: AI didn't recognize "chess variant ≠ standard chess"
+
+**Solution Requested**:
+- Prevent agents from using standard libraries for custom implementations
+- Force architectural discussion before library selection
+- Clear decision framework for library vs custom code
+
+**Implementation**:
+- Created `library_selection.md` - comprehensive library vs custom decision framework
+- Added decision tree: 0% custom = library, 50%+ custom = custom code
+- Required user consultation when unclear ("Does this follow standard X rules exactly?")
+- Enhanced `research_mode.md` with library constraint research
+- Added to `agent_operating_guidelines.md` as critical guideline
+- Real-world failure example documented for future reference
+
+**Impact**: Agents must now analyze customization level and ask user before choosing libraries that enforce standards
+
+### 3. Template Noise (v0.4.2)
+
+**Problem Discovered**:
+- Root files (HUMAN_NEEDED.md, JOURNAL.md, FEATURES.md) filled with example content
+- HUMAN_NEEDED.md: 194 lines with 4 examples even when no human help needed
+- Confusing for developers: "Is this real or template?"
+
+**Solution Requested**:
+- Clean root templates with minimal structure
+- Move examples to .agentic/ for reference only
+
+**Implementation**:
+- Reduced HUMAN_NEEDED.md: 194 → 20 lines (90% reduction)
+- Reduced JOURNAL.md: 81 → 14 lines
+- Reduced FEATURES.md: 59 → 25 lines
+- Created `.reference.md` files in `.agentic/spec/` with all examples/guidelines
+- Root files now reflect actual project state, not template noise
+
+**Impact**: New projects start clean, examples available for reference when needed
+
+### 4. Attribution Mechanism (v0.4.2)
+
+**Requirement**:
+- Framework attribution in end products
+- Visible but subtle (HTML source comments, not rendered UI)
+- Automatic, no developer intervention
+
+**Implementation**:
+- Agents auto-inject stamps during code creation: `<!-- Engineered with Agentic AF v{VERSION} by TSG, {YEAR} -->`
+- ONE stamp per project (main entry point)
+- No build scripts required
+- Silent operation (not mentioned to user)
+
+---
+
+## Key Lessons from Real-World Usage
+
+1. **"Works on my machine" ≠ Works**: Agents must RUN and VERIFY, not just "it should work"
+2. **Testability is architecture**: Separate business logic from UI for easy testing
+3. **Standard library ≠ Custom variant**: chess.js for chess/Tetris hybrid = WRONG
+4. **Ask when unclear**: Architectural decisions need human confirmation
+5. **Clean templates matter**: Examples pollute root files, reduce by 90%
+
+These real-world learnings directly shaped v0.4.x releases, making the framework practical and battle-tested.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework  
-**Current Version**: v0.2.5  
-**License**: [To be determined]  
-**Status**: Production-ready, actively maintained
+**Current Version**: v0.4.3  
+**License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)  
+**Status**: Production-ready, battle-tested, actively maintained
 
