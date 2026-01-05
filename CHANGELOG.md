@@ -5,6 +5,93 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.3] - 2025-01-05
+
+### Added - Library Selection Guidelines & Architectural Decision Framework
+
+**Prevents costly wrong library choices based on real-world failure (chess.js for chess variant).**
+
+#### 1. Library Selection Decision Framework
+
+**NEW: `quality/library_selection.md` - Comprehensive guide for choosing libraries vs. custom code**
+
+**Critical lesson from real project:**
+- Project: Chess/Tetris hybrid game
+- AI chose: chess.js (enforces standard FIDE chess rules)
+- Problem: Game has custom rules, Tetris mechanics, pieces added one at a time
+- Result: FAILED - had to rip out library and rebuild
+- Should have: Implemented custom engine from the start
+
+**Decision framework includes:**
+- **Standard vs. Custom identification**
+  - Standard implementation → Use library
+  - Custom/variant → Custom code or low-level library
+  - Decision tree: 0% custom = library, 20-50% = low-level, 50%+ = custom
+
+- **Required user consultation**
+  - Template: "Does this follow standard [X] rules exactly, or does it have custom mechanics?"
+  - Add to HUMAN_NEEDED.md and WAIT for response
+  - Document choice in ADR
+
+- **Red flags (wrong library)**
+  - Library enforces rules you don't need
+  - Bypassing/disabling library features
+  - User says "like X but with custom Y"
+  - Documentation says "enforces standard X"
+
+- **Examples by domain**
+  - Games: Standard chess (use chess.js) vs. Chess variant (custom engine)
+  - Card games: Standard poker (use library) vs. Custom game (custom code)
+  - Protocols: Standard HTTP (use fetch) vs. Custom protocol (custom client)
+
+**Benefits:**
+- Prevents wasted time on wrong library choices
+- Forces architectural discussion early
+- Documents decision rationale in ADR
+- Real-world failure example for learning
+
+#### 2. Enhanced Research Mode
+
+**Updated `workflows/research_mode.md` with library research requirements:**
+
+- Added CRITICAL section on library selection research
+- Must identify if library enforces standards/rules
+- Must determine if project needs standard or custom implementation
+- Required user consultation when unclear
+- Document constraints and alternatives in ADR
+
+**Prevents:**
+- Choosing chess.js for chess variants
+- Using poker libraries for custom card games
+- Selecting protocol libraries for custom protocols
+- Any standard library for non-standard implementations
+
+#### 3. Agent Guidelines Updated
+
+**Added to `agent_operating_guidelines.md`:**
+- Link to `library_selection.md` as critical guideline
+- Placed alongside smoke testing checklist
+- Mandatory review before selecting libraries
+
+### Changed
+
+**CONTRIBUTIONS.md Updated:**
+- Added "Real-World Usage & Critical Feedback" section
+- Documented chess/Tetris hybrid game learnings
+- Library selection gap analysis
+- Smoke testing gap (from v0.4.2-v0.4.3)
+- Template noise issues
+- Updated version to v0.4.3
+
+**Key Lessons Documented:**
+1. "Works on my machine" ≠ Works (smoke testing)
+2. Testability is architecture (Model-View separation)
+3. Standard library ≠ Custom variant (chess.js failure)
+4. Ask when unclear (user consultation required)
+5. Clean templates matter (90% reduction in noise)
+
+---
+
 ## [0.4.2] - 2025-01-05
 
 ### Added - Automatic Attribution & Clean Templates

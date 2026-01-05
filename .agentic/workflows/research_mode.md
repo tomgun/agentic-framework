@@ -77,13 +77,47 @@ Agent suggests research when:
 
 ### Phase 2: Information Gathering (15-45 min)
 
-**Sources to investigate:**
+**🚨 CRITICAL: Library Selection Research**
+
+**Before choosing ANY library that enforces rules/standards (chess, poker, protocols, etc.), research:**
+
+1. **Does the library enforce standard rules?**
+   - Read documentation for phrases like "enforces standard X", "FIDE-compliant", "RFC-compliant"
+   - Check if library validates/restricts behavior
+
+2. **Do we need standard or custom implementation?**
+   - Standard: Use library (faster, well-tested)
+   - Custom/variant: DON'T use library (will fight constraints)
+   - **See `.agentic/quality/library_selection.md` for decision framework**
+
+3. **If unclear, ASK THE USER:**
+   ```
+   "Does this follow standard [chess/poker/HTTP] rules exactly,
+    or does it have custom mechanics?"
+   ```
+   - Add to HUMAN_NEEDED.md and WAIT for response
+
+4. **Document decision in ADR:**
+   - Why library was chosen/rejected
+   - What constraints it adds
+   - Alternatives considered
+
+**Real failure example:**
+- Project: Chess/Tetris hybrid
+- Chose: chess.js (enforces standard chess rules)
+- Result: FAILED (game has custom rules, pieces, starting position)
+- Should have: Implemented custom engine
+
+---
+
+**General research sources:**
 
 1. **Official documentation**
    - Latest release notes
    - Migration guides
    - Best practices
    - Changelog highlights
+   - **Constraints and rule enforcement** ⬅️ CRITICAL
 
 2. **Community discussions**
    - GitHub issues/discussions
@@ -95,6 +129,7 @@ Agent suggests research when:
    - Alternative technologies
    - Benchmark comparisons
    - Feature matrices
+   - **Customization/extensibility** ⬅️ CRITICAL
 
 4. **Academic/Industry**
    - Research papers (if relevant)

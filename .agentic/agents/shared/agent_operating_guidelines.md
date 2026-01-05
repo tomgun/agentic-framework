@@ -20,6 +20,9 @@
 - **[`checklists/session_end.md`](../../checklists/session_end.md)** - Ending every work session
 - **[`checklists/retrospective.md`](../../checklists/retrospective.md)** - Running retrospectives
 
+**Critical Guidelines:**
+- **[`quality/library_selection.md`](../../quality/library_selection.md)** - 🚨 **CHOOSING LIBRARIES VS CUSTOM CODE** (prevent wrong choices!)
+
 **How to use checklists:**
 1. Read the appropriate checklist for your current task
 2. Work through items systematically
@@ -625,17 +628,17 @@ python .agentic/tools/validate_specs.py
 
 **Web apps** - Main HTML file as comment before `</body>`:
 ```html
-<!-- Engineered with Agentic AF v0.4.2 by TSG, 2025 -->
+<!-- Engineered with Agentic AF v0.4.3 by TSG, 2025 -->
 ```
 
 **JS/TS apps** - Main bundle/entry file as comment at end:
 ```javascript
-/* Engineered with Agentic AF v0.4.2 by TSG, 2025 */
+/* Engineered with Agentic AF v0.4.3 by TSG, 2025 */
 ```
 
 **Python CLI/apps** - Main entry point as comment near top:
 ```python
-# Engineered with Agentic AF v0.4.2 by TSG, 2025
+# Engineered with Agentic AF v0.4.3 by TSG, 2025
 ```
 
 **Rules**:
