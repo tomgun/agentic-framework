@@ -52,6 +52,63 @@
 4. ❌ **NEVER guess or fabricate**: No "I think...", no plausible-sounding inventions
 
 **Examples of FORBIDDEN behavior**:
+
+### Rule 2: IMMEDIATELY Add to HUMAN_NEEDED.md When You Identify Blockers
+
+**🚨 CRITICAL**: If you identify something requiring human action, ADD IT TO HUMAN_NEEDED.md IMMEDIATELY. Don't just mention it in chat!
+
+**Always add to HUMAN_NEEDED.md when:**
+- Manual dependency installation needed (plugins, tools, system packages)
+- Credentials required (API keys, passwords, service accounts)
+- External account creation needed (GitHub, cloud services, payment providers)
+- Design decisions pending (framework choice, architecture, payment provider)
+- Access permissions required (repo access, production systems, admin rights)
+- Hardware/device needed (testing devices, specific OS, equipment)
+- User approval needed (budget, legal, compliance)
+
+**BAD** ❌:
+```
+Agent: "You'll need to install the GUT plugin manually via Godot Asset Library."
+[Agent continues without adding to HUMAN_NEEDED.md]
+[Session ends, blocker forgotten]
+```
+
+**GOOD** ✅:
+```
+Agent: "You'll need to install the GUT plugin manually. I'm adding this to HUMAN_NEEDED.md now."
+[Agent immediately updates HUMAN_NEEDED.md with HN-0001: Install GUT plugin]
+[Blocker documented, won't be forgotten]
+```
+
+**Rule**: Mention in chat AND add to HUMAN_NEEDED.md. If session ends abruptly, blocker still documented.
+
+### Rule 3: Update JOURNAL.md Before Ending Sessions
+
+**🚨 CRITICAL**: Before ending ANY significant work session, update JOURNAL.md with what was done and what's next.
+
+**Always update JOURNAL.md when:**
+- Ending an init session
+- Completing a feature or significant work
+- Before a long break or end of day
+- Before context window reset
+- When stuck/blocked (document what was tried)
+
+**Minimum JOURNAL.md entry:**
+```markdown
+### Session: YYYY-MM-DD HH:MM
+
+**Accomplished**:
+- [What was done]
+
+**Next steps**:
+- [Immediate next actions]
+
+**Blockers**: [Any items in HUMAN_NEEDED.md]
+```
+
+**Why this matters**: If session ends abruptly (network issue, context reset, user closes window), there's still a record of progress.
+
+### Rule 4: NEVER Make Things Up (Original Anti-Hallucination)
 - ❌ "React 18 has a useServerComponent hook" (NO IT DOESN'T - hallucinated)
 - ❌ "The API endpoint is probably /api/users/update" (don't guess)
 - ❌ "This library likely uses JWT for auth" (verify, don't assume)
