@@ -43,9 +43,29 @@
 - Extended Markdown (custom syntax)
 - Custom payment logic (split payments, custom flows)
 
-### Step 2: Ask the User (If Unclear)
+### Step 2: Determine if Custom (Usually Obvious!)
 
-**Before choosing libraries, ask:**
+**IMPORTANT**: In most cases, it's OBVIOUS if rules are custom. Don't waste time asking.
+
+**Obvious custom implementations (DON'T ask, just use custom code):**
+- "Chess/Tetris hybrid" → OBVIOUSLY custom
+- "Chess variant" → Custom
+- "Like chess but with X" → Custom
+- "Custom game based on Y" → Custom
+- "Poker with wild cards" → Custom
+- "HTTP-like protocol" → Custom
+
+**Obvious standard implementations (DON'T ask, use library):**
+- "Chess game" (no mention of variants) → Standard (but confirm no custom rules planned)
+- "Standard poker" → Standard
+- "REST API" → Standard
+
+**Ambiguous cases (ASK the user):**
+- User just says "chess game" with no other context
+- User says "card game" without specifying rules
+- Requirements doc doesn't mention custom mechanics
+
+**If you need to ask:**
 
 ```
 "I'm planning to implement [feature]. I can:
@@ -65,7 +85,7 @@ c) Use low-level library [e.g., board representation] - no rule enforcement
 Does this game follow standard [chess] rules exactly, or does it have custom mechanics?"
 ```
 
-**Wait for user response before proceeding.**
+**Only ask if genuinely unclear. Don't waste time on obvious cases.**
 
 ### Step 3: Choose Based on Customization Level
 
@@ -150,6 +170,24 @@ class CustomProtocolClient {
 ```
 
 ---
+
+## Keywords That Signal Custom Implementation (Don't Ask, Just Do Custom)
+
+**If you see these words, it's CUSTOM - use custom code immediately:**
+
+🔴 **"Hybrid"** - Chess/Tetris hybrid, poker/blackjack hybrid  
+🔴 **"Variant"** - Chess variant, poker variant  
+🔴 **"Custom"** - Custom rules, custom mechanics, custom game  
+🔴 **"Like X but Y"** - "Like chess but pieces move like Tetris"  
+🔴 **"Modified"** - Modified chess, modified poker  
+🔴 **"Based on X with Y"** - "Based on chess with custom pieces"  
+🔴 **"Non-standard"** - Non-standard protocol, non-standard rules  
+
+**Example from real project:**
+- User: "Chess/Tetris hybrid game"
+- Keywords: "hybrid" (OBVIOUS custom)
+- Correct action: Implement custom engine (NO asking needed)
+- Wrong action: Ask "is this standard chess?" (obvious it's not!)
 
 ## Red Flags: When Standard Library is Wrong
 
@@ -339,15 +377,27 @@ If custom, what's different from the standard?
 **Key Principle**: **Standard library for standard implementations, custom code for custom implementations.**
 
 **Before choosing a library:**
-1. Identify: Standard or custom/variant?
-2. Ask user: "Does this follow standard X rules exactly?"
-3. Choose: Library (standard) or custom code (variant)
-4. Document: Add ADR explaining choice
+1. **Check for obvious keywords**: hybrid, variant, custom, "like X but Y" → CUSTOM CODE (don't ask)
+2. **If obvious**: Just proceed with custom implementation
+3. **If ambiguous**: Ask user ("Does this follow standard X rules exactly?")
+4. **Document**: Add ADR explaining choice
+
+**Keywords that mean CUSTOM (don't ask, just use custom code):**
+- Hybrid (Chess/Tetris hybrid)
+- Variant (Chess variant)
+- Custom (custom rules)
+- "Like X but Y" (like chess but different moves)
+- Modified, based on, non-standard
 
 **Red flags:**
 - Library enforces rules you don't need
 - You're bypassing/disabling library features
 - User says "like X but custom Y"
 
-**When in doubt**: Ask the user first, add to HUMAN_NEEDED.md, wait for response.
+**When to ask**:
+- Only if genuinely unclear
+- User just says "chess game" with no context
+- No mention of custom vs standard in requirements
+
+**Don't waste time asking obvious cases!**
 
