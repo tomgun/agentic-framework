@@ -117,12 +117,21 @@ if [[ ! -f "${ROOT_DIR}/AGENTS.md" ]]; then
 This repo uses the agentic framework located at `.agentic/`.
 
 ## Non-negotiables
-- Add/update tests for new or changed logic.
-- Keep `CONTEXT_PACK.md` current when architecture changes.
-- Keep `PRODUCT.md` up to date with decisions and completed capabilities.
-- Add to `HUMAN_NEEDED.md` when you are blocked.
-- Keep `JOURNAL.md` current (session summaries).
-- If this repo uses the Core+Product profile: keep `STATUS.md` and `/spec/*` truthful.
+
+**Document blockers immediately:**
+- When you identify something requiring human action (install dependency, make decision, access credentials), ADD IT TO `HUMAN_NEEDED.md` IMMEDIATELY
+- Don't just mention it in chat - document it so it's not forgotten
+
+**Keep documentation current:**
+- Update `JOURNAL.md` before ending ANY session (if session ends abruptly, JOURNAL is the only record)
+- Keep `PRODUCT.md` up to date with decisions and completed capabilities
+- Keep `CONTEXT_PACK.md` current when architecture changes
+- If this repo uses the Core+Product profile: keep `STATUS.md` and `/spec/*` truthful
+
+**Code quality:**
+- Add/update tests for new or changed logic
+- Run smoke tests before claiming features work
+- Separate business logic from UI for testability
 
 Full rules: `.agentic/agents/shared/agent_operating_guidelines.md`
 EOF

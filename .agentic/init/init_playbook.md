@@ -180,6 +180,79 @@ Choose **Proprietary (f)** if:
 3. **Copy to project root** as `quality_checks.sh` and customize thresholds
 4. **Ask if user wants a pre-commit hook** (recommended)
 
+## Step 4: Update HUMAN_NEEDED.md with discovered blockers
+
+**🚨 CRITICAL: Before ending init, check for blockers**
+
+**Review what was set up and identify anything requiring human action:**
+
+Common blockers discovered during init:
+- [ ] **Manual dependency installation** (plugins, tools not installed via package manager)
+- [ ] **Credentials needed** (API keys, database passwords, service accounts)
+- [ ] **External accounts** (GitHub, cloud services, third-party APIs)
+- [ ] **Design decisions pending** (UI framework, payment provider, database choice)
+- [ ] **Hardware requirements** (specific devices, testing equipment)
+- [ ] **Access permissions** (repo access, production systems, admin rights)
+
+**For each blocker, add to `HUMAN_NEEDED.md`:**
+
+```markdown
+### HN-0001: [Short description of what's needed]
+- **Type**: dependency | credential | decision | access
+- **Added**: YYYY-MM-DD
+- **Context**: [What this is for, why it's needed]
+- **Why human needed**: [Specific reason - manual install, requires payment, needs approval, etc.]
+- **Impact**: Blocking: [what features/work this blocks]
+- **Next steps**: [Specific actions human should take]
+```
+
+**Example from Godot game init:**
+```markdown
+### HN-0001: Install GUT testing plugin
+- **Type**: dependency
+- **Added**: 2025-01-05
+- **Context**: Godot game project using GUT for unit testing
+- **Why human needed**: GUT plugin must be installed manually via Godot Asset Library
+- **Impact**: Blocking: Cannot run tests until installed
+- **Next steps**:
+  1. Open Godot editor
+  2. Go to AssetLib tab
+  3. Search for "GUT"
+  4. Install and enable plugin
+```
+
+**Rule**: If you mention something to the user in chat that requires their action, ADD IT TO HUMAN_NEEDED.md immediately!
+
+## Step 5: Update JOURNAL.md with init session summary
+
+**Before ending the init session, document what was done:**
+
+```markdown
+### Session: YYYY-MM-DD HH:MM - Project Initialization
+
+**Accomplished**:
+- Initialized [Project Name] with [Stack]
+- Profile: [Core | Core+PM]
+- Created STACK.md, PRODUCT.md/STATUS.md, CONTEXT_PACK.md
+- Set up quality validation: [profile used]
+- Documented [X] human-needed items
+
+**Stack configured**:
+- Platform: [web/mobile/desktop/game/etc.]
+- Framework: [Framework name + version]
+- Language: [Language + version]
+- Testing: [Test framework + approach]
+
+**Next steps**:
+- Human: Review HUMAN_NEEDED.md and resolve blockers
+- Human: [Any other immediate actions]
+- Agent: [What can be done next after blockers resolved]
+
+**Blockers**: [Reference to HUMAN_NEEDED.md items if any]
+```
+
+**Rule**: Always update JOURNAL.md before ending any significant session!
+
 ## Process rules (important)
 - **Ask before assuming**: if a stack choice is unclear, ask.
 - **Prefer constraints over opinions**: versions, platforms, hosting, data, security needs.
