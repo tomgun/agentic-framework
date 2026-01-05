@@ -16,11 +16,14 @@
   - No partial completion
   - No "mostly works" items
 
-- [ ] **Manual validation performed**
-  - Actually tested the feature end-to-end
-  - Tried different inputs
-  - Verified output matches expectations
-  - Not just "tests pass"
+- [ ] **Smoke test passed** (CRITICAL - RUN THE APPLICATION!)
+  - **See `.agentic/checklists/smoke_testing.md` for full checklist**
+  - [ ] Run application in target environment (browser, simulator, etc.)
+  - [ ] Application starts without errors (no console errors, no crashes)
+  - [ ] Feature works end-to-end (perform the user action)
+  - [ ] Verified output matches expectations (visual, functional, data)
+  - [ ] Tried different inputs/scenarios
+  - **NOT just "tests pass" - ACTUALLY RUN IT and VERIFY IT WORKS**
 
 ---
 

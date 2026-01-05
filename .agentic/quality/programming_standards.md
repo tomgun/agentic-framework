@@ -65,11 +65,60 @@ function sendWelcomeEmail(user): Promise<void> { ... }
 function saveUserToDatabase(user): Promise<void> { ... }
 ```
 
-### 5. Testability First
-- **Design code to be testable** (see `design_for_testability.md`)
+### 5. Testability First (CRITICAL)
+- **Design code to be testable WITHOUT running the UI** (see `design_for_testability.md`)
+- **Separate business logic from presentation** (Model-View separation)
+- **Business logic should be pure functions** (no UI dependencies, no global state)
 - Inject dependencies (don't use globals/singletons)
 - Separate pure logic from side effects
 - Small functions are easier to test
+- **See `.agentic/checklists/smoke_testing.md` for testable architecture patterns**
+
+**Critical lesson from real projects:**
+```typescript
+// ❌ BAD: Game logic mixed with UI (CANNOT test without UI)
+const GameBoard = () => {
+  const handleClick = (square) => {
+    // Logic tightly coupled to React state and DOM
+    if (selectedPiece && isValidMove(selectedPiece, square)) {
+      // Direct state mutation, no way to test this logic!
+      board[square.x][square.y] = selectedPiece;
+      setCurrentPlayer(currentPlayer === 'white' ? 'black' : 'white');
+    }
+  };
+};
+
+// ✅ GOOD: Game logic separated (CAN test without UI)
+// src/engine/gameEngine.ts
+class GameEngine {
+  applyMove(state: GameState, move: Move): GameState {
+    // Pure function: state + move → new state
+    // Easy to unit test!
+    if (!this.isValidMove(state, move)) {
+      throw new Error("Invalid move");
+    }
+    const newState = { ...state };
+    newState.board[move.to.x][move.to.y] = state.board[move.from.x][move.from.y];
+    newState.currentPlayer = state.currentPlayer === 'white' ? 'black' : 'white';
+    return newState;
+  }
+}
+
+// src/ui/GameBoard.tsx (thin UI layer)
+const GameBoard = () => {
+  const [gameState, setGameState] = useState(initialState);
+  const engine = new GameEngine();
+  
+  const handleClick = (square) => {
+    try {
+      const newState = engine.applyMove(gameState, { from: selected, to: square });
+      setGameState(newState); // UI just renders the new state
+    } catch (error) {
+      showError(error.message);
+    }
+  };
+};
+```
 
 ### 6. Self-Documenting Code
 - Good names eliminate need for comments

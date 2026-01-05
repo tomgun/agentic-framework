@@ -14,6 +14,7 @@
 
 - **[`checklists/session_start.md`](../../checklists/session_start.md)** - Starting every work session
 - **[`checklists/feature_implementation.md`](../../checklists/feature_implementation.md)** - Implementing any feature
+- **[`checklists/smoke_testing.md`](../../checklists/smoke_testing.md)** - 🚨 **VERIFYING CODE ACTUALLY WORKS** (critical!)
 - **[`checklists/before_commit.md`](../../checklists/before_commit.md)** - Before EVERY commit (no exceptions)
 - **[`checklists/feature_complete.md`](../../checklists/feature_complete.md)** - Marking feature as "shipped"
 - **[`checklists/session_end.md`](../../checklists/session_end.md)** - Ending every work session
