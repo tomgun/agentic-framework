@@ -29,6 +29,7 @@ Each file follows the pattern `F-####.md` and contains:
 | F-0031 - F-0040 | Multi-Agent | Worktrees, coordination, pipelines |
 | F-0041 - F-0050 | Tooling | Scripts, automation, token efficiency |
 | F-0051 - F-0060 | Recovery | WIP tracking, error recovery, resilience |
+| F-0061 - F-0070 | Developer Experience | Documentation, onboarding, usability |
 
 ## Current Coverage
 
@@ -44,6 +45,10 @@ Each file follows the pattern `F-####.md` and contains:
 | F-0041.md | Token-Efficient Scripts | Complete |
 | F-0051.md | WIP Tracking | Complete |
 | F-0055.md | Anti-Hallucination Rules | Complete |
+| F-0061.md | DEVELOPER_GUIDE.md | Complete |
+| F-0064.md | Script Help Messages | Complete |
+| F-0066.md | Template Quality | Complete |
+| F-0069.md | Checklist-Driven Workflows | Complete |
 
 ## Running Validation
 

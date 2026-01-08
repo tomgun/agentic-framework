@@ -293,6 +293,65 @@ else
 fi
 
 # ============================================================
+# F-0061: DEVELOPER_GUIDE.md
+# ============================================================
+echo ""
+echo "--- F-0061: DEVELOPER_GUIDE.md ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/DEVELOPER_GUIDE.md" ]]; then
+  pass "DEVELOPER_GUIDE.md exists"
+  LINES=$(wc -l < "${FRAMEWORK_ROOT}/.agentic/DEVELOPER_GUIDE.md" | tr -d ' ')
+  if [[ $LINES -gt 500 ]]; then
+    pass "DEVELOPER_GUIDE.md is comprehensive (${LINES} lines)"
+  else
+    warn "DEVELOPER_GUIDE.md may be too short (${LINES} lines)"
+  fi
+else
+  fail "DEVELOPER_GUIDE.md missing"
+fi
+
+# ============================================================
+# F-0062: START_HERE.md
+# ============================================================
+echo ""
+echo "--- F-0062: START_HERE.md ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/START_HERE.md" ]]; then
+  pass "START_HERE.md exists"
+else
+  fail "START_HERE.md missing"
+fi
+
+# ============================================================
+# F-0066: Template Quality
+# ============================================================
+echo ""
+echo "--- F-0066: Template Quality ---"
+
+for template in STACK.template.md PRODUCT.template.md; do
+  if [[ -f "${FRAMEWORK_ROOT}/.agentic/init/${template}" ]]; then
+    pass "${template} exists"
+  else
+    fail "${template} missing"
+  fi
+done
+
+# ============================================================
+# F-0069: Checklist-Driven Workflows
+# ============================================================
+echo ""
+echo "--- F-0069: Checklist-Driven Workflows ---"
+
+CHECKLISTS=(session_start.md session_end.md feature_implementation.md before_commit.md feature_complete.md smoke_testing.md)
+for checklist in "${CHECKLISTS[@]}"; do
+  if [[ -f "${FRAMEWORK_ROOT}/.agentic/checklists/${checklist}" ]]; then
+    pass "${checklist} checklist exists"
+  else
+    fail "${checklist} checklist missing"
+  fi
+done
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

@@ -18,6 +18,7 @@
 | **Multi-Agent** | F-0031 to F-0040 | Multi-agent coordination |
 | **Tooling** | F-0041 to F-0050 | Scripts and automation |
 | **Recovery** | F-0051 to F-0060 | Error recovery and resilience |
+| **Developer Experience** | F-0061 to F-0070 | Documentation, onboarding, usability |
 
 ---
 
@@ -801,6 +802,206 @@
 
 ---
 
+## F-0061: DEVELOPER_GUIDE.md
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: high  
+**Since**: v0.2.4
+
+**Description**: Comprehensive user guide covering installation, usage, customization, troubleshooting.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/DEVELOPER_GUIDE.md`
+- Tests: manual review
+
+**Acceptance**: See `spec/acceptance/F-0061.md`
+
+---
+
+## F-0062: START_HERE.md First-Time Guidance
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: low  
+**Since**: v0.2.0
+
+**Description**: Clear entry point for new users with profile selection and next steps.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/START_HERE.md`
+- Tests: manual review
+
+**Acceptance**: See `spec/acceptance/F-0062.md`
+
+---
+
+## F-0063: README Documentation Quality
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: medium  
+**Since**: v0.1.0
+
+**Description**: Clear, accurate README with quick start, installation, feature overview.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `README.md`, `.agentic/README.md`
+- Tests: manual review
+
+**Acceptance**: See `spec/acceptance/F-0063.md`
+
+---
+
+## F-0064: Script Help Messages
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: low  
+**Since**: v0.3.0
+
+**Description**: All scripts have clear --help / usage messages with examples.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: All scripts in `.agentic/tools/`, `.agentic/hooks/`
+- Tests: script validation
+
+**Acceptance**: See `spec/acceptance/F-0064.md`
+
+---
+
+## F-0065: Error Message Quality
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: low  
+**Since**: v0.3.0
+
+**Description**: Scripts provide clear, actionable error messages when things go wrong.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: All scripts
+- Tests: error scenario testing
+
+**Acceptance**: See `spec/acceptance/F-0065.md`
+
+---
+
+## F-0066: Template Quality
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: medium  
+**Since**: v0.1.0
+
+**Description**: All templates are well-documented with examples and clear placeholders.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/init/*.template.md`, `.agentic/spec/*.template.md`
+- Tests: manual review
+
+**Acceptance**: See `spec/acceptance/F-0066.md`
+
+---
+
+## F-0067: MANUAL_OPERATIONS.md
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: low  
+**Since**: v0.2.0
+
+**Description**: Human-readable guide for querying project state without AI agents.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/MANUAL_OPERATIONS.md`
+- Tests: manual review
+
+**Acceptance**: See `spec/acceptance/F-0067.md`
+
+---
+
+## F-0068: Upgrade Experience
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: medium  
+**Since**: v0.2.4
+
+**Description**: Clear upgrade path with UPGRADING.md guide and upgrade.sh script.
+
+**Dependencies**: F-0001
+
+**Implementation**:
+- State: complete
+- Code: `UPGRADING.md`, `upgrade.sh`
+- Tests: manual testing
+
+**Acceptance**: See `spec/acceptance/F-0068.md`
+
+---
+
+## F-0069: Checklist-Driven Workflows
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: medium  
+**Since**: v0.4.0
+
+**Description**: All major workflows have clear checklists that agents can follow systematically.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/checklists/` (7 checklists)
+- Tests: checklist validation
+
+**Acceptance**: See `spec/acceptance/F-0069.md`
+
+---
+
+## F-0070: Workflow Document Organization
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: low  
+**Since**: v0.7.0
+
+**Description**: Clear README in workflows/ explaining which documents to use when.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/workflows/README.md`
+- Tests: manual review
+
+**Acceptance**: See `spec/acceptance/F-0070.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -811,5 +1012,6 @@
 | Multi-Agent (F-0031-0040) | 4 | 0 | 0 | 4 |
 | Tooling (F-0041-0050) | 4 | 0 | 0 | 4 |
 | Recovery (F-0051-0060) | 6 | 0 | 0 | 6 |
-| **Total** | **39** | **0** | **0** | **39** |
+| Developer Experience (F-0061-0070) | 10 | 0 | 0 | 10 |
+| **Total** | **49** | **0** | **0** | **49** |
 
