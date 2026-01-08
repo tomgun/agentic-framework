@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework  
-**Period**: Initial Development (v0.1.0 → v0.4.3)  
-**Date**: 2026-01-05  
+**Period**: Initial Development (v0.1.0 → v0.8.0)  
+**Date**: 2025-01-08  
 
 ---
 
@@ -234,6 +234,72 @@ Result: Production-ready framework with 60+ documented principles, proven workfl
 
 ---
 
+## Framework Methodology Refinement (v0.7.0-0.8.0)
+
+### Acceptance-Driven Development Shift (v0.7.0)
+
+**Critical Insight**:
+> "I'm not really sure if TDD is the recommended and best way of working with AI agents... AI can create large chunks of code so fast that microlevel tests beforehand might be too slow. But I think it is crucial to have the specs and acceptance criteria (thus tests) controlling any unwanted changes to the code."
+
+**Result**:
+- Changed primary methodology from TDD to **Acceptance-Driven Development**
+- Rough acceptance criteria before coding (can evolve)
+- AI implements feature (can be large chunk)
+- Tests verify acceptance criteria
+- Specs updated with discoveries
+- TDD remains optional for those who prefer it
+
+**Impact**: Faster development with AI while maintaining quality through acceptance tests.
+
+### Small Batch Development Principle (v0.7.0)
+
+**Emphasis**:
+> "It is really important that the agents work on small batches and the software is modular, and only parts of it are changed in one batch. Having detailed specs and good acceptance test and working in small batches are essential for quality in the long run."
+
+**Added as NON-NEGOTIABLE**:
+- ONE feature at a time per agent
+- MAX 5-10 files per commit
+- Acceptance criteria mandatory before coding
+- Easy rollback via frequent commits
+
+**Why Critical**: Keeps AI agents focused, prevents context drift, enables safe rollback.
+
+### Iterative & Incremental Restored (v0.8.0)
+
+**Clarification**:
+> "I liked this principles ideas, they are core in developing together with the ai agents (small batch development is crucial for keeping the agents in tact though)"
+
+**Result**:
+- Restored as separate principle (#7) alongside Small Batch (#6)
+- Small Batch = HOW (mechanics: one feature, small commits)
+- Iterative = PHILOSOPHY (ship, learn, adapt)
+- Both principles complement each other
+
+### Framework Self-Specification (v0.8.0)
+
+**Request**:
+> "Can you form the specs and acceptance criteria (maybe tests as well) for this framework? It will soon be very important to know more reliable what a certain version of this framework is capable of reliably."
+
+**Result - "Dogfooding"**:
+- **55 features** formally specified across 8 categories
+- **18 acceptance criteria files** with validation scenarios
+- **49 automated validation checks** (all passing)
+- Framework now uses its own spec-driven methodology
+
+**Categories**:
+1. Core (10 features)
+2. Quality (7 features)
+3. Session (8 features)
+4. Multi-Agent (4 features)
+5. Tooling (4 features)
+6. Recovery (6 features)
+7. Developer Experience (10 features)
+8. Design Principles (6 features)
+
+**Benefit**: Version verification - know exactly what v0.8.0 can reliably do.
+
+---
+
 ## Real-World Usage & Critical Feedback (v0.4.0+)
 
 ### Chess/Tetris Hybrid Game Project
@@ -338,7 +404,7 @@ These real-world learnings directly shaped v0.4.x releases, making the framework
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework  
-**Current Version**: v0.4.3  
+**Current Version**: v0.8.0  
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)  
-**Status**: Production-ready, battle-tested, actively maintained
+**Status**: Production-ready, battle-tested, actively maintained, formally specified
 
