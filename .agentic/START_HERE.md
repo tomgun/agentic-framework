@@ -17,7 +17,8 @@
 **a) Understand how the framework works** → See [Framework Overview](#framework-overview)  
 **b) Find a specific document** → See [Document Index](#document-index)  
 **c) Understand project structure** → See [What Files Mean](#what-files-mean)  
-**d) Troubleshoot an issue** → See [Common Issues](#common-issues)
+**d) Troubleshoot an issue** → See [Common Issues](#common-issues)  
+**e) 🚨 Tokens running out / Need to work without agent** → See [`EMERGENCY.md`](EMERGENCY.md)
 
 ---
 
@@ -27,13 +28,13 @@
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.1.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.8.1.tar.gz | tar xz
 
-# Extract just the agentic folder
-cp -r agentic-framework-0.1.0/agentic ./
+# Run the installer
+bash agentic-framework-0.8.1/install.sh
 
 # Clean up
-rm -rf agentic-framework-0.1.0
+rm -rf agentic-framework-0.8.1
 ```
 
 ### Step 2: Tell your agent to initialize
