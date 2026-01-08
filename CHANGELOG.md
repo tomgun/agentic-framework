@@ -5,6 +5,272 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-01-08
+
+### Added - Work-In-Progress (WIP) Tracking: Never Lose Work Again
+
+**Critical new feature: Automatic detection and recovery of interrupted work.**
+
+#### The Problem
+
+Work was being lost when:
+- ❌ Token limits reached mid-edit (agent stops abruptly)
+- ❌ Tools crashed or closed unexpectedly
+- ❌ Context compaction happened (Claude)
+- ❌ Environment switched mid-task (forgot to log)
+- ❌ Computer crashed or froze
+
+**User request**: *"Lock file system that tracks 'starting to work on X, if not updated = interrupted, check diff against git'"*
+
+#### The Solution: WIP.md Lock File + Recovery Protocol
+
+**NEW: `.agentic/tools/wip.sh` - Work-in-progress tracking**
+
+**Commands:**
+```bash
+bash .agentic/tools/wip.sh start F-#### "description" "files"    # Start tracking
+bash .agentic/tools/wip.sh checkpoint "progress note"             # Update (~15 min)
+bash .agentic/tools/wip.sh complete                               # Finish & remove
+bash .agentic/tools/wip.sh check                                  # Detect interrupted work
+```
+
+**Creates `WIP.md` lock file containing:**
+- Feature being worked on
+- Agent/environment (claude-desktop, cursor, copilot)
+- Started timestamp
+- Last checkpoint timestamp
+- Files being edited
+- Progress checklist
+- Recovery instructions
+
+**Staleness detection:**
+- <5 min: Recent (active handoff or recent interruption)
+- 5-60 min: Normal working (no concern)
+- >60 min: STALE (agent likely crashed, needs review)
+
+**Exit codes:**
+- 0: No interrupted work (clean state)
+- 1: Interrupted work detected (triggers recovery protocol)
+
+#### Session Start: Automatic Interruption Detection
+
+**UPDATED: `.agentic/checklists/session_start.md`**
+
+**NEW FIRST STEP (before anything else):**
+```bash
+bash .agentic/tools/wip.sh check
+```
+
+**If interrupted work detected:**
+- ⚠️ Shows what was in progress (feature, agent, time ago)
+- Shows git diff (what changed since WIP started)
+- Shows last checkpoint from SESSION_LOG.md
+- **Offers recovery options:**
+  1. **Continue** - Resume from checkpoint (if progress looks good)
+  2. **Review** - `git diff` to see changes, then decide
+  3. **Rollback** - `git reset --hard` if changes incomplete/broken
+
+**Example user message:**
+> "⚠️ Previous work on F-0005: User Authentication was interrupted 45 minutes ago.
+> I can see 3 uncommitted changes (src/auth/login.ts, src/auth/types.ts, tests/auth/login.test.ts).
+> Last checkpoint: 'Login endpoint done, starting JWT validation'
+> 
+> Would you like to:
+> 1. Continue from where we left off
+> 2. Review changes first (git diff)
+> 3. Roll back to last commit"
+
+**Why first?** Prevents building on top of incomplete/broken changes.
+
+#### Claude Hooks: Automatic WIP Protection
+
+**UPDATED: `.agentic/claude-hooks/PreCompact.sh`**
+
+**NEW Step 0 (before context compaction):**
+- If WIP.md exists: `bash .agentic/tools/wip.sh checkpoint "Context compaction triggered"`
+- Preserves WIP state automatically before context reset
+- User doesn't need to do anything!
+
+**Result:** After compaction, WIP.md still tracks work → SessionStart can resume seamlessly.
+
+**UPDATED: `.agentic/claude-hooks/Stop.sh`**
+
+**NEW Step 0 (session ending check):**
+- If WIP.md exists: "🚨 WIP.md exists - work may be incomplete!"
+- Shows options: complete work, leave for next session, review
+- Prevents forgetting in-progress work
+
+#### Commit Safety: Never Commit Incomplete Work
+
+**UPDATED: `.agentic/checklists/before_commit.md`**
+
+**NEW FIRST CHECK:**
+- Check if WIP.md exists
+- If exists: `bash .agentic/tools/wip.sh complete` FIRST (removes lock)
+- Then commit
+- **Why**: WIP.md presence = work incomplete → never commit incomplete work
+
+#### Agent Workflow Integration
+
+**UPDATED: `.agentic/agents/shared/agent_operating_guidelines.md`**
+
+**NEW Section: Work-In-Progress (WIP) Tracking**
+- When to start WIP (beginning significant work)
+- How to checkpoint frequently (~15 min, not just at end)
+- Session start WIP check (ALWAYS first, mandatory)
+- Context compaction handling (automatic via hooks)
+- Environment switching protocol (WIP as handoff mechanism)
+- Multi-agent coordination (WIP as lock file)
+- Never commit with WIP present (enforcement)
+- Benefits and token cost (~50 tokens/operation)
+
+#### Complete Documentation
+
+**NEW: `.agentic/workflows/work_in_progress.md`**
+
+**Comprehensive guide covering:**
+- Problem statement (work loss scenarios)
+- Solution overview (WIP.md lock file)
+- Usage guide (start, checkpoint, complete, check)
+- Integration points (session start, hooks, commit)
+- Recovery scenarios with examples:
+  - Token limit reached mid-edit
+  - Tool crash
+  - Context compaction
+  - Environment switching
+  - Computer crash
+- Git integration (diff, status, rollback)
+- Best practices (checkpoint frequency, never commit with WIP)
+- Multi-agent coordination (WIP as lock)
+- State machine diagram
+
+### Benefits
+
+**Prevents work loss from:**
+- ✅ Token limit reached mid-edit (checkpoint preserved in WIP.md)
+- ✅ Tool crashes or abrupt close (WIP + git diff show exact state)
+- ✅ Context compaction (PreCompact hook auto-updates WIP)
+- ✅ Computer crashes (WIP.md survives reboot)
+- ✅ Environment switching mid-task (WIP tracks handoff)
+- ✅ Forgot to log progress (WIP is automatic reminder)
+
+**Provides recovery via:**
+- ✅ Shows what was in progress (feature, files being edited, progress checklist)
+- ✅ Shows git diff (what actually changed since WIP started)
+- ✅ Shows last checkpoint (what was last accomplished)
+- ✅ Calculates time ago (staleness detection, >60 min = crashed)
+- ✅ Offers clear options (continue seamlessly, review first, or rollback)
+
+**Multi-environment support:**
+- ✅ WIP tracks which agent/environment has context (claude-desktop, cursor, copilot)
+- ✅ Seamless handoff between tools (Claude → Cursor → Copilot)
+- ✅ Each tool checks WIP at session start (shared state)
+- ✅ No work lost when switching tools mid-task
+
+**Multi-agent coordination:**
+- ✅ WIP.md acts as lock file (prevents concurrent work)
+- ✅ Fresh WIP (<5 min): Another agent working, coordinate
+- ✅ Stale WIP (>60 min): Agent crashed, safe to take over
+- ✅ Prevents conflicts in parallel agent scenarios
+
+**Token efficiency:**
+- Create WIP: ~50 tokens
+- Checkpoint WIP: ~50 tokens  
+- Check WIP: ~200 tokens (includes git diff, recovery options)
+- **Total cost: Minimal vs. losing hours of work!**
+
+### Example Scenarios
+
+**1. Token Limit Reached (Most Common)**
+```
+11:00 AM - Agent working on F-0005: User Authentication
+11:30 AM - bash wip.sh checkpoint "Login endpoint done, starting JWT validation"
+11:45 AM - Token limit reached, agent stops abruptly
+           (WIP.md preserved with checkpoint at 11:30)
+
+12:00 PM - User opens Cursor (switching environments)
+           bash wip.sh check
+           "⚠️ Interrupted work detected (15 minutes ago)"
+           git diff shows 3 uncommitted files
+           User: "Continue"
+           Cursor resumes from exact checkpoint, continues work
+```
+
+**2. Tool Crash**
+```
+2:00 PM - Agent editing src/auth/login.ts
+2:15 PM - bash wip.sh checkpoint "Implementing token validation logic"
+2:20 PM - Computer freezes, force restart required
+          (WIP.md survives reboot)
+
+2:30 PM - User reopens project in Claude
+          bash wip.sh check
+          "⚠️ WIP detected from 15 minutes ago (STALE)"
+          git diff shows partial implementation in login.ts
+          User: "Review changes first"
+          git diff src/auth/login.ts  # Shows partial validation code
+          User: "Looks incomplete, rollback"
+          git reset --hard
+          bash wip.sh complete  # Clean WIP lock
+```
+
+**3. Context Compaction (Claude, Automatic)**
+```
+10:00 AM - Agent working on F-0005
+10:30 AM - PreCompact hook triggers (context 90% full)
+           bash wip.sh checkpoint "Context compaction triggered" (AUTOMATIC!)
+           Context window resets
+10:31 AM - Agent resumes with fresh context
+           SessionStart automatically reads WIP.md
+           Continues seamlessly from checkpoint
+           User never notices interruption!
+```
+
+**4. Environment Switch (Multi-tool workflow)**
+```
+Morning  - Claude working on F-0005: User Authentication
+11:00 AM - Claude tokens at 80%
+           bash wip.sh checkpoint "Login endpoint complete, switching to Cursor"
+11:05 AM - User opens project in Cursor
+           bash wip.sh check
+           "✓ Recent checkpoint (5 minutes ago) - active handoff"
+           Cursor continues from exact checkpoint
+           No context loss, perfect continuity!
+```
+
+### Files Changed
+
+**New files:**
+- `.agentic/tools/wip.sh` - WIP tracking script (executable)
+- `.agentic/workflows/work_in_progress.md` - Complete documentation
+
+**Updated files:**
+- `.agentic/checklists/session_start.md` - WIP check as FIRST step
+- `.agentic/claude-hooks/PreCompact.sh` - Auto-checkpoint WIP before compaction
+- `.agentic/claude-hooks/Stop.sh` - Warn about uncommitted WIP
+- `.agentic/checklists/before_commit.md` - Never commit with WIP present
+- `.agentic/agents/shared/agent_operating_guidelines.md` - WIP workflow integrated
+
+### Impact
+
+**This feature fundamentally changes the reliability of AI-assisted development.**
+
+**Before v0.5.0:**
+- Work lost when tokens ran out mid-edit
+- No detection of incomplete work at session start
+- Risky to switch environments mid-task
+- Tool crashes = lost work
+- Building on top of incomplete changes = bugs
+
+**After v0.5.0:**
+- ✅ Work automatically tracked and recoverable
+- ✅ Interrupted work detected immediately at session start
+- ✅ Safe environment switching with WIP handoff
+- ✅ Tool crashes recoverable via WIP + git diff
+- ✅ Never build on incomplete work (WIP check first!)
+
+**Users can now work confidently**, knowing their progress is protected and recoverable even when tools fail or tokens run out.
+
 ## [0.4.4] - 2025-01-08
 
 ### Added - Multi-Environment Support & Environment Optimization
