@@ -67,14 +67,16 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ## Development approach (optional)
 <!-- Choose development workflow mode -->
-<!-- TDD mode (RECOMMENDED): Tests written FIRST (red-green-refactor) -->
-<!--   - Better token economics (smaller increments, less rework) -->
-<!--   - Forces unit testability by design -->
+<!-- Standard mode (Acceptance-Driven, DEFAULT): -->
+<!--   - AI implements feature, then tests verify acceptance criteria -->
+<!--   - Specs evolve during implementation (discoveries are documented) -->
+<!--   - Best for AI-generated code where large chunks work quickly -->
+<!--   - See .agentic/workflows/spec_evolution.md -->
+<!-- TDD mode (OPTIONAL): Tests written FIRST (red-green-refactor) -->
+<!--   - Better for critical logic, refactoring, or if you prefer tests-first -->
 <!--   - See .agentic/workflows/tdd_mode.md -->
-<!-- Standard mode: Tests required but can come during/after implementation -->
-<!--   - Use for exploration, prototyping, unclear requirements -->
-- development_mode: tdd  <!-- RECOMMENDED for most projects -->
-<!-- - development_mode: standard -->
+- development_mode: standard  <!-- DEFAULT: Acceptance-Driven -->
+<!-- - development_mode: tdd  # OPTIONAL: Tests-first approach -->
 
 ## Sequential agent pipeline (optional but RECOMMENDED)
 <!-- Enables specialized agents to work sequentially on features for optimal context efficiency -->

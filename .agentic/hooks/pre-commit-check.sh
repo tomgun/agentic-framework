@@ -12,6 +12,7 @@
 #   2. Shipped features must have acceptance criteria
 #   3. In-progress features must have recent JOURNAL entry (<24h)
 #   4. STACK.md version matches reality (where detectable)
+#   5. Batch size warning (>10 files = too large, should re-plan)
 #
 # Exit codes:
 #   0 - All checks pass, commit allowed
@@ -31,7 +32,7 @@ echo ""
 FAILURES=0
 
 # Check 1: WIP.md must not exist
-echo "[1/4] Checking for incomplete work (WIP.md)..."
+echo "[1/5] Checking for incomplete work (WIP.md)..."
 if [[ -f "WIP.md" ]]; then
   echo "❌ BLOCKED: WIP.md exists - work is incomplete!"
   echo ""
@@ -50,7 +51,7 @@ fi
 # Check 2: Shipped features must have acceptance criteria
 if [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[2/4] Checking shipped features have acceptance criteria..."
+  echo "[2/5] Checking shipped features have acceptance criteria..."
   
   # Extract feature IDs marked as shipped
   SHIPPED_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: shipped" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
@@ -83,13 +84,13 @@ if [[ -f "spec/FEATURES.md" ]]; then
   fi
 else
   echo ""
-  echo "[2/4] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
+  echo "[2/5] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
 fi
 
 # Check 3: In-progress features must have recent JOURNAL entry
 if [[ -f "spec/FEATURES.md" ]] && [[ -f "JOURNAL.md" ]]; then
   echo ""
-  echo "[3/4] Checking in-progress features have recent activity..."
+  echo "[3/5] Checking in-progress features have recent activity..."
   
   IN_PROGRESS_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: in_progress" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
   
@@ -126,13 +127,13 @@ if [[ -f "spec/FEATURES.md" ]] && [[ -f "JOURNAL.md" ]]; then
   fi
 else
   echo ""
-  echo "[3/4] Skipping in-progress features check (no spec/FEATURES.md or JOURNAL.md)"
+  echo "[3/5] Skipping in-progress features check (no spec/FEATURES.md or JOURNAL.md)"
 fi
 
 # Check 4: STACK.md version sanity (where detectable)
 if [[ -f "STACK.md" ]]; then
   echo ""
-  echo "[4/4] Checking STACK.md version consistency..."
+  echo "[4/5] Checking STACK.md version consistency..."
   
   # Example: Check Node.js version if package.json exists
   if [[ -f "package.json" ]] && command -v node >/dev/null 2>&1; then
@@ -162,7 +163,39 @@ if [[ -f "STACK.md" ]]; then
   fi
 else
   echo ""
-  echo "[4/4] Skipping STACK.md check (file not found)"
+  echo "[4/5] Skipping STACK.md check (file not found)"
+fi
+
+# Check 5: Batch size warning (small batches = quality)
+echo ""
+echo "[5/5] Checking batch size (small batches = quality)..."
+
+if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  # Count staged files
+  CHANGED_FILES=$(git diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
+  
+  if [[ $CHANGED_FILES -gt 15 ]]; then
+    echo "⚠️  WARNING: ${CHANGED_FILES} files changed in this commit"
+    echo ""
+    echo "   This is a LARGE commit. Consider:"
+    echo "   - Is this really ONE feature? Should it be split?"
+    echo "   - Can you extract some changes into a separate commit?"
+    echo "   - Small batches = easier review, safer rollback"
+    echo ""
+    echo "   Guideline: <10 files per feature is ideal"
+    echo ""
+    echo "   (This is a warning, not blocking commit)"
+    echo ""
+  elif [[ $CHANGED_FILES -gt 10 ]]; then
+    echo "⚠️  Note: ${CHANGED_FILES} files changed (moderate batch size)"
+    echo "   Consider if this could be smaller"
+  elif [[ $CHANGED_FILES -gt 0 ]]; then
+    echo "✓ ${CHANGED_FILES} files changed (good batch size)"
+  else
+    echo "✓ No staged files (nothing to commit)"
+  fi
+else
+  echo "✓ Git not available (skipping batch size check)"
 fi
 
 # Summary

@@ -40,6 +40,52 @@
 
 ---
 
+## 🚨 CRITICAL: Small Batch Development (NON-NEGOTIABLE)
+
+**The single most important quality principle: WORK IN SMALL, ISOLATED BATCHES.**
+
+### Why This Is Critical
+
+- **Small changes = easy to verify = easy to rollback**
+- **If something goes wrong, most of the software still works**
+- **Known-good checkpoints after each feature**
+- **One feature at a time = clear ownership**
+
+### Rules
+
+1. **ONE feature at a time** - Never work on multiple features simultaneously
+2. **Acceptance criteria MUST exist** before implementation (even if rough)
+3. **Implement → verify with tests → commit** - Small batch rhythm
+4. **MAX 5-10 files per commit** - Stop and re-plan if more
+5. **Update specs with discoveries** - New edge cases, ideas, issues found
+
+### Spec Evolution Is Expected
+
+- Initial acceptance criteria may be rough
+- During implementation, you'll discover edge cases, issues
+- **UPDATE specs with these discoveries** - See [`workflows/spec_evolution.md`](../../workflows/spec_evolution.md)
+- This is normal, not a failure of planning
+
+### STOP and Re-Plan If
+
+- You need to touch **>10 files** for "one feature"
+- You can't define **any** acceptance criteria
+- You've been working **>1 hour without a commit**
+- Multiple features are **"in progress"**
+
+### One Feature At A Time (MANDATORY)
+
+**RULE**: Never have more than ONE feature "in_progress" per agent.
+
+**Before starting new feature:**
+1. Check spec/FEATURES.md (or PRODUCT.md in Core mode) for any "in_progress" features
+2. If found: **Complete that feature FIRST** or mark as "blocked"
+3. Only then start new feature
+
+**Why:** Multiple in-progress features = unclear state, harder rollback, context confusion
+
+---
+
 ## 🚨 CRITICAL: Anti-Hallucination Rules (NON-NEGOTIABLE)
 
 **Core Problem**: LLM hallucination undermines ALL quality principles. If the foundation is fabricated, tests and validation are meaningless.

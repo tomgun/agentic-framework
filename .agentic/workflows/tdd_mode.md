@@ -1,6 +1,27 @@
 # TDD Mode (Test-Driven Development)
 
-**✅ RECOMMENDED for most projects.** Set `development_mode: tdd` in your `STACK.md`.
+**📌 OPTIONAL alternative to the default Acceptance-Driven approach.**
+
+Set `development_mode: tdd` in your `STACK.md` to enable.
+
+---
+
+## When to Use TDD
+
+**TDD is a good fit when:**
+- You prefer the discipline of tests-first development
+- Working on critical/complex logic (authentication, payments, algorithms)
+- Refactoring existing code (tests ensure behavior is preserved)
+- When you need very high confidence in correctness
+- Smaller, incremental changes are preferred
+
+**When Acceptance-Driven (standard) is better:**
+- Rapid prototyping or exploration
+- AI-generated implementations where AI can work on larger chunks
+- Discovery-phase work where specs are evolving
+- When acceptance criteria need to be discovered during implementation
+
+**To enable TDD**: Set `development_mode: tdd` in `STACK.md`
 
 ---
 
@@ -42,7 +63,7 @@ TDD Cycle Progress:
 
 ---
 
-## Why TDD is Recommended
+## Benefits of TDD (When You Choose It)
 
 ### Token Economics Benefits
 

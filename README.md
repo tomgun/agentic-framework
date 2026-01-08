@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.5.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.5.0)
+**Current version:** [v0.7.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.7.0)
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
@@ -33,7 +33,7 @@ Work seamlessly across Claude Desktop, Cursor, and GitHub Copilot in the same pr
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.5.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.7.0.tar.gz | tar xz
 cd agentic-framework-0.5.0
 
 # Install into your project

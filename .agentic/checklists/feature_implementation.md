@@ -6,14 +6,29 @@
 
 ---
 
+## GATE 1: Acceptance Criteria Exist (MANDATORY)
+
+**🚨 Cannot proceed without acceptance criteria. Rough is OK - will evolve during implementation.**
+
+- [ ] **Acceptance criteria MUST exist before ANY code is written**
+  - Core+PM: `spec/acceptance/F-####.md` file exists with testable criteria
+  - Core: Clear criteria in `PRODUCT.md` or written user request
+  - Rough is OK: "User can log in" is valid to start
+  - **If missing: Create acceptance criteria FIRST or escalate to HUMAN_NEEDED.md**
+  - **DO NOT write code without acceptance criteria**
+
+- [ ] **Understood success condition**
+  - What does "done" look like?
+  - How will we verify it works?
+  - Edge cases can be discovered during implementation
+
+**Note**: Specs WILL evolve during implementation. This is expected. Document discoveries as you go. See [`workflows/spec_evolution.md`](../workflows/spec_evolution.md).
+
+---
+
 ## Before Starting Implementation
 
 ### 1. Verify Feature Definition
-
-- [ ] **Feature has acceptance criteria**
-  - Core+Product: `spec/acceptance/F-####.md` exists
-  - Core: Acceptance criteria in `PRODUCT.md` or clear user request
-  - If missing: Create it first or escalate to `HUMAN_NEEDED.md`
 
 - [ ] **Read and understand acceptance criteria**
   - What defines "done"?
@@ -25,11 +40,11 @@
   - Are dependent features complete?
   - If not, implement dependencies first
 
-### 2. Check Development Mode
+### 2. Check Development Mode (Both Are Valid)
 
-- [ ] **Confirm TDD or standard mode** (`STACK.md` → `development_mode:`)
-  - TDD → Write failing test first
-  - Standard → Can write code first, but tests are still mandatory
+- [ ] **Confirm mode** (`STACK.md` → `development_mode:`)
+  - **Standard (Acceptance-Driven)**: Implement first, tests verify acceptance criteria
+  - **TDD (Optional)**: Write failing tests first, then implement
 
 ### 3. Understand Scope
 
@@ -47,7 +62,7 @@
 
 ## During Implementation
 
-### If TDD Mode (Recommended)
+### If TDD Mode (Optional)
 
 - [ ] **Write failing test first** (RED)
   - Test expresses desired behavior
@@ -68,12 +83,23 @@
   - Small increments (one test at a time)
   - Clear progress checkpoints
 
-### If Standard Mode
+### If Standard Mode (Default - Acceptance-Driven)
 
-- [ ] **Implement code and tests together**
-  - Write code for one unit of behavior
-  - Write tests for that behavior
+- [ ] **Implement feature** (AI can generate large working chunks)
+  - Implement the full feature or significant portion
+  - AI can work quickly - no need for micro-steps
+  - Focus on meeting acceptance criteria
+
+- [ ] **Write acceptance tests to verify**
+  - Tests verify the acceptance criteria are met
   - Run tests → verify they pass
+  - If tests reveal edge cases, document them
+
+- [ ] **Update specs with discoveries**
+  - New edge cases found during implementation
+  - Issues to avoid in future work
+  - Ideas for enhancement
+  - Use [`workflows/spec_evolution.md`](../workflows/spec_evolution.md)
 
 ### Code Quality Checks (Both Modes)
 
