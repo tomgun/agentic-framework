@@ -6,7 +6,7 @@ This directory contains acceptance criteria for the Agentic AI Framework's own f
 
 Define what the framework can reliably do at each version. These specs allow:
 
-1. **Version Verification**: Know exactly what v0.7.0 can do
+1. **Version Verification**: Know exactly what each version can do
 2. **Regression Testing**: Ensure upgrades don't break existing features
 3. **Clear Communication**: Unambiguous feature definitions
 4. **Self-Dogfooding**: Apply the framework's spec-driven approach to itself
