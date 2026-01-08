@@ -254,6 +254,24 @@ else
       echo "    Run manually: python3 .agentic/tools/validate_specs.py"
     fi
   fi
+
+  # Run spec format upgrade if available
+  if [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/upgrade_spec_format.py" ]] && command -v python3 >/dev/null 2>&1; then
+    echo "  Running spec format upgrade..."
+    UPGRADE_OUTPUT=$(python3 "$TARGET_PROJECT_DIR/.agentic/tools/upgrade_spec_format.py" 2>&1)
+    UPGRADE_EXIT=$?
+    
+    if [[ $UPGRADE_EXIT -eq 0 ]]; then
+      if echo "$UPGRADE_OUTPUT" | grep -q "upgraded\|Updated\|Added"; then
+        echo -e "${GREEN}  ✓ Spec formats upgraded${NC}"
+        echo "$UPGRADE_OUTPUT" | grep -E "✅|upgraded|Updated" | head -5
+      else
+        echo -e "${GREEN}  ✓ Spec formats already current${NC}"
+      fi
+    else
+      echo -e "${YELLOW}  ⚠ Spec format upgrade had issues (may need manual review)${NC}"
+    fi
+  fi
 fi
 
 echo ""
@@ -308,7 +326,16 @@ else
   echo "  1. Review CHANGELOG: https://github.com/tomgun/agentic-framework/blob/v$FRAMEWORK_VERSION/CHANGELOG.md"
   echo "  2. Test your workflow: bash .agentic/tools/dashboard.sh"
   echo "  3. Run quality checks: bash quality_checks.sh --pre-commit (if configured)"
-  echo "  4. Tell your agent: 'The framework was upgraded to v$FRAMEWORK_VERSION. Review any new features or changes.'"
+  echo ""
+  echo "Tell your agent (copy this prompt):"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "  The framework was upgraded from [OLD_VERSION] to v$FRAMEWORK_VERSION."
+  echo "  Please:"
+  echo "  1. Read .agentic/START_HERE.md to understand any new workflows"
+  echo "  2. Check if spec/FEATURES.md needs format updates (compare to .agentic/spec/FEATURES.reference.md)"
+  echo "  3. Review CHANGELOG for breaking changes or new features"
+  echo "  4. Update STACK.md if any new configuration options are available"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
   echo "If issues occur:"
   echo "  Rollback: rm -rf .agentic && mv $BACKUP_DIR .agentic"

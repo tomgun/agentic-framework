@@ -40,6 +40,48 @@
 
 ---
 
+## 🔄 After Framework Upgrade
+
+**When user tells you the framework was upgraded (e.g., from v0.3 → v0.8):**
+
+### Immediate Actions
+
+1. **Read START_HERE.md** - Understand any new workflows or changed processes
+   ```
+   Read .agentic/START_HERE.md
+   ```
+
+2. **Check CHANGELOG** - Review breaking changes and new features
+   - Ask user for the old version if not provided
+   - Focus on changes between old → new version
+
+3. **Validate Project Specs** - Ensure specs match new format
+   ```bash
+   python3 .agentic/tools/validate_specs.py
+   ```
+   - If validation fails, compare your `spec/FEATURES.md` to `.agentic/spec/FEATURES.reference.md`
+   - Update format if needed (add missing fields, fix structure)
+
+4. **Update STACK.md** - Check for new configuration options
+   - Compare to `.agentic/init/STACK.template.md` for new fields
+
+### What NOT to Do
+
+- ❌ Don't assume old workflows still apply exactly
+- ❌ Don't skip the spec validation
+- ❌ Don't blindly continue previous work without reading new guidelines
+
+### Common Post-Upgrade Tasks
+
+| Old Version | Typical Updates Needed |
+|-------------|------------------------|
+| < 0.5.0 | Add acceptance criteria, check for new checklists |
+| < 0.6.0 | Update feature format, add WIP tracking |
+| < 0.7.0 | Review Acceptance-Driven vs TDD approach |
+| < 0.8.0 | Check new design principles, DX features |
+
+---
+
 ## 🚨 CRITICAL: Small Batch Development (NON-NEGOTIABLE)
 
 **The single most important quality principle: WORK IN SMALL, ISOLATED BATCHES.**
