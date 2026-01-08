@@ -91,12 +91,13 @@ Then follow the same agent initialization process above. The agent will run `sca
 - **Pre-project planning**: Use `VISION.template.md` for ideation phase
 
 ### 3. Quality by Design
-**Tests and incremental changes reduce risk.**
-- **TDD recommended**: Write tests first for better token economics and testable code
+**Acceptance criteria and tests control unwanted changes.**
+- **Acceptance-Driven Development**: Define acceptance criteria (rough OK), implement, then verify with tests
+- **Specs evolve during implementation**: Discovery is expected - update specs as you learn
 - Tests are mandatory for all new/changed logic
-- Small, reviewable increments over large changes
 - Design for testability (seams, boundaries, pure functions)
 - Definition of Done includes quality gates
+- **TDD available**: Optional for those who prefer tests-first (set `development_mode: tdd`)
 
 ### 4. Living Documentation
 **Documentation stays current through collaboration and automation.**
@@ -114,12 +115,14 @@ Then follow the same agent initialization process above. The agent will run `sca
 - Test coverage explicitly tracked per feature
 - Dependency visualization shows relationships
 
-### 6. Iterative & Incremental
-**Ship in small, validated steps.**
-- Pick one small task from `STATUS.md`
-- Implement with tests
-- Verify acceptance criteria
-- Update docs and move to next task
+### 6. Small Batch Development (Critical!)
+**Work in small, isolated batches - one feature at a time.**
+- **ONE feature at a time per agent** (multi-agent uses worktrees)
+- **MAX 5-10 files per commit** (stop and re-plan if more)
+- Acceptance criteria MUST exist before implementation (rough OK)
+- Commit when feature's acceptance tests pass
+- Update specs with discoveries (edge cases, issues, ideas)
+- **Why**: Small changes = easy rollback, known-good checkpoints, clear ownership
 
 ### 7. Human-Agent Collaboration
 **Both humans and agents work together on project truth.**

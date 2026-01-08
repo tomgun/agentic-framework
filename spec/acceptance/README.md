@@ -30,6 +30,7 @@ Each file follows the pattern `F-####.md` and contains:
 | F-0041 - F-0050 | Tooling | Scripts, automation, token efficiency |
 | F-0051 - F-0060 | Recovery | WIP tracking, error recovery, resilience |
 | F-0061 - F-0070 | Developer Experience | Documentation, onboarding, usability |
+| F-0071 - F-0080 | Design Principles | Core framework principles as specs |
 
 ## Current Coverage
 
@@ -49,6 +50,9 @@ Each file follows the pattern `F-####.md` and contains:
 | F-0064.md | Script Help Messages | Complete |
 | F-0066.md | Template Quality | Complete |
 | F-0069.md | Checklist-Driven Workflows | Complete |
+| F-0071.md | Token Economics | Complete |
+| F-0073.md | Human-Agent Collaboration | Complete |
+| F-0074.md | Green Coding Principles | Complete |
 
 ## Running Validation
 
