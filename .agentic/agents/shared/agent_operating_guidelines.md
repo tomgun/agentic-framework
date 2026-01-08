@@ -336,6 +336,127 @@ Please provide:
   - **If core+product profile**: Keep `spec/FEATURES.md` current if you change a feature's behavior/status/tests
   - **If core+product profile**: Keep `spec/NFR.md` current if change affects constraints
 
+## Work-In-Progress (WIP) Tracking - Prevent Work Loss
+
+**Purpose**: Never lose work when tokens run out, tools crash, or context gets compacted.
+
+### When to Use WIP Tracking
+
+**Start WIP when beginning significant work:**
+```bash
+# Starting a feature
+bash .agentic/tools/wip.sh start F-0005 "User authentication" "src/auth/*.ts,tests/auth/*.test.ts"
+
+# Or for Core profile (no feature IDs)
+bash .agentic/tools/wip.sh start "auth-implementation" "User login and JWT tokens" "src/auth/*.ts"
+```
+
+**Update WIP frequently** (~every 15 minutes or after significant step):
+```bash
+bash .agentic/tools/wip.sh checkpoint "Login endpoint complete, starting JWT validation"
+bash .agentic/tools/wip.sh checkpoint "Unit tests passing, working on integration tests"
+```
+
+**Complete WIP when work is done:**
+```bash
+bash .agentic/tools/wip.sh complete
+# Then commit your changes
+git add -A && git commit -m "feat: user authentication"
+```
+
+### Critical: Session Start WIP Check
+
+**ALWAYS check for interrupted work at session start** (first item in `session_start.md`):
+```bash
+bash .agentic/tools/wip.sh check
+```
+
+**If interrupted work detected:**
+- ⚠️ Previous agent stopped mid-task
+- WIP.md shows what was in progress
+- Git diff shows uncommitted changes
+- **STOP and tell user** about interrupted work
+- Offer: Continue | Review | Rollback
+
+**Example user message:**
+> "⚠️ Previous work on F-0005: User Authentication was interrupted 45 minutes ago.
+> I can see 3 uncommitted changes (src/auth/login.ts, src/auth/types.ts, tests/auth/login.test.ts).
+> Last checkpoint: 'Login endpoint done, starting JWT validation'
+> 
+> Would you like to:
+> 1. Continue from where we left off
+> 2. Review changes first (git diff)
+> 3. Roll back to last commit (git reset --hard)"
+
+### WIP and Context Compaction (Claude)
+
+**Claude PreCompact hook automatically updates WIP:**
+- Before context compaction, `PreCompact.sh` runs
+- Updates WIP checkpoint automatically
+- Logs to SESSION_LOG.md
+- After compaction, WIP preserves state
+
+**You don't need to do anything** - hooks handle it!
+
+### WIP and Environment Switching
+
+**When switching environments (Claude → Cursor → Copilot):**
+
+**Before switching:**
+```bash
+bash .agentic/tools/wip.sh checkpoint "Switching from Claude to Cursor"
+```
+
+**In new environment (session start):**
+```bash
+bash .agentic/tools/wip.sh check
+# Output: "✓ Recent checkpoint (3 minutes ago) - This may be an active handoff"
+# Continue seamlessly!
+```
+
+### WIP and Multi-Agent Coordination
+
+**WIP.md acts as a lock file for multi-agent scenarios:**
+- If WIP.md exists and is recent (<5 min): Another agent is working, wait or coordinate
+- If WIP.md exists and is stale (>60 min): Previous agent crashed, review and decide
+- Never start new work while another agent's WIP.md is fresh
+
+### Never Commit with WIP.md Present
+
+**Before commit checklist includes WIP check:**
+```bash
+# Check if WIP exists
+ls WIP.md 2>/dev/null
+
+# If exists:
+bash .agentic/tools/wip.sh complete  # Remove lock
+# Then commit
+```
+
+**Why**: WIP.md presence = work incomplete. Never commit incomplete work.
+
+### WIP Benefits
+
+**Prevents work loss from:**
+- ✅ Token limit reached mid-edit
+- ✅ Tool crashes or abrupt close
+- ✅ Context compaction (Claude)
+- ✅ Computer crashes
+- ✅ Environment switching mid-task
+- ✅ Forgot to log progress
+
+**Provides recovery:**
+- ✅ Shows what was in progress (feature, files, progress)
+- ✅ Shows git diff (what changed)
+- ✅ Shows last checkpoint (what was last done)
+- ✅ Offers options (continue, review, rollback)
+
+**Token cost**: Minimal (~50 tokens to create/update, ~200 tokens to check)
+
+**See full workflow**: `.agentic/workflows/work_in_progress.md`
+
+---
+
 ## Sequential Pipeline Mode (if enabled)
 
 **At session start, if `pipeline_enabled: yes` in STACK.md**:

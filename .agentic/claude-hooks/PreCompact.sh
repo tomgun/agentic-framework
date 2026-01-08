@@ -21,7 +21,13 @@ echo ""
 echo "💾 Context compaction detected - preserving state..."
 echo ""
 
-# 0. Auto-log to SESSION_LOG.md (append-only, token-efficient)
+# 0. Update WIP checkpoint if exists (prevent loss of in-progress work)
+if [[ -f "WIP.md" ]] && [[ -x ".agentic/tools/wip.sh" ]]; then
+  bash .agentic/tools/wip.sh checkpoint "Context compaction triggered" 2>/dev/null || true
+  echo "✓ Updated WIP checkpoint"
+fi
+
+# 1. Auto-log to SESSION_LOG.md (append-only, token-efficient)
 if [[ -x ".agentic/tools/session_log.sh" ]]; then
   CURRENT_TASK="Unknown"
   if [[ -f "STATUS.md" ]]; then
@@ -38,7 +44,7 @@ if [[ -x ".agentic/tools/session_log.sh" ]]; then
   echo "✓ Auto-logged to SESSION_LOG.md"
 fi
 
-# 1. Generate fresh .continue-here.md
+# 2. Generate fresh .continue-here.md
 if [[ -x ".agentic/tools/continue_here.py" ]] && command -v python3 >/dev/null 2>&1; then
   echo "Generating .continue-here.md..."
   if python3 .agentic/tools/continue_here.py 2>/dev/null; then
@@ -50,7 +56,7 @@ else
   echo "⚠ continue_here.py not available"
 fi
 
-# 2. Add JOURNAL.md entry (if we have significant uncommitted work)
+# 3. Add JOURNAL.md entry (if we have significant uncommitted work)
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   UNCOMMITTED=$(git status --porcelain | wc -l | tr -d ' ')
   if [[ "$UNCOMMITTED" -gt 0 ]] && [[ -f "JOURNAL.md" ]]; then
@@ -67,7 +73,7 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   fi
 fi
 
-# 3. Save current feature status (if Core+PM mode)
+# 4. Save current feature status (if Core+PM mode)
 if [[ -f "spec/FEATURES.md" ]]; then
   IN_PROGRESS=$(grep -c "status: in_progress" spec/FEATURES.md 2>/dev/null || echo "0")
   if [[ "$IN_PROGRESS" -gt 0 ]]; then
@@ -75,7 +81,7 @@ if [[ -f "spec/FEATURES.md" ]]; then
   fi
 fi
 
-# 4. Remind about HUMAN_NEEDED.md
+# 5. Remind about HUMAN_NEEDED.md
 if [[ -f "HUMAN_NEEDED.md" ]]; then
   BLOCKER_COUNT=$(grep -c "^## H-" HUMAN_NEEDED.md 2>/dev/null || echo "0")
   if [[ "$BLOCKER_COUNT" -gt 0 ]]; then
