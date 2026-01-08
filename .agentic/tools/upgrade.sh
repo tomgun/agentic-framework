@@ -302,6 +302,26 @@ if [[ -n "$FRAMEWORK_VERSION" ]]; then
   echo -e "  ${GREEN}✓${NC} Updated .agentic/VERSION to $FRAMEWORK_VERSION"
 fi
 
+# Create upgrade marker for agent to pick up at next session
+UPGRADE_MARKER="$TARGET_PROJECT_DIR/.agentic/.upgrade_pending"
+cat > "$UPGRADE_MARKER" << EOF
+# Framework Upgrade Pending
+# This file is auto-created by upgrade.sh and should be deleted after agent handles it.
+
+from_version: ${CURRENT_VERSION:-unknown}
+to_version: $FRAMEWORK_VERSION
+upgrade_date: $(date -Iseconds)
+changelog_url: https://github.com/tomgun/agentic-framework/blob/v$FRAMEWORK_VERSION/CHANGELOG.md
+
+## Agent TODO (delete this file after completing):
+1. Read .agentic/START_HERE.md for new workflows
+2. Validate specs: python3 .agentic/tools/validate_specs.py
+3. Update STACK.md version if not already updated
+4. Review breaking changes in CHANGELOG
+5. Delete this file: rm .agentic/.upgrade_pending
+EOF
+echo -e "  ${GREEN}✓${NC} Created .upgrade_pending marker for agent"
+
 echo ""
 
 # Summary
