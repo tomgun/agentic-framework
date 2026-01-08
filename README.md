@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.4.3](https://github.com/tomgun/agentic-framework/releases/tag/v0.4.3)
+**Current version:** [v0.4.4](https://github.com/tomgun/agentic-framework/releases/tag/v0.4.4)
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
@@ -24,14 +24,17 @@ The Agentic AI Framework enables **sustainable long-term software development wi
 - **Core**: Quality standards, workflows, multi-agent coordination (minimal ceremony)
 - **Core + Product Management**: Adds formal specs, feature tracking, project metrics (for complex projects)
 
+**🔄 Multi-Environment Support:**
+Work seamlessly across Claude Desktop, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out or use the best tool for each task. All environments share the same project state for perfect continuity. [Learn more](.agentic/workflows/environment_switching.md)
+
 ## Installation
 
 ### Automated install (Recommended)
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.4.3.tar.gz | tar xz
-cd agentic-framework-0.4.3
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.4.4.tar.gz | tar xz
+cd agentic-framework-0.4.4
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -198,6 +201,66 @@ See `UPGRADING.md` for detailed instructions.
 - **Example projects**: [`examples/`](examples/) (Core and Core+PM modes)
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.
+
+## Multi-Environment Support 🔄
+
+**Work seamlessly across Claude Desktop, Cursor, and GitHub Copilot in the same project.**
+
+### Why Multi-Environment?
+
+**Token limits exist:** Claude Desktop (200K) → Cursor (50K) → GitHub Copilot (8K)
+
+Instead of stopping when tokens run out, **switch to another tool and keep working**. The framework makes handoff seamless because all tools share the same project state.
+
+### How It Works
+
+**All environments read/write the same files:**
+- `JOURNAL.md` - Session history and decisions
+- `FEATURES.md` - Feature status and acceptance criteria
+- `STATUS.md` / `PRODUCT.md` - Current project state
+- `HUMAN_NEEDED.md` - Blockers requiring human action
+- Token-efficient scripts - Work in all environments (40x cheaper than file reads!)
+
+**Example workflow:**
+1. **Morning (Claude Desktop)**: Complex feature with full codebase context
+2. **Afternoon (Claude tokens low)**: Switch to Cursor, continue implementation
+3. **Quick fix needed**: Use Copilot for inline suggestions
+4. **Next morning**: Back to Claude, seamless continuation
+
+### Setting Up Multi-Environment
+
+During `init_playbook.md`, choose **"a) Multiple (RECOMMENDED)"** and the framework will:
+- Install Claude instructions (`CLAUDE.md` + hooks)
+- Install Cursor rules (`.cursor/rules/*.mdc`)
+- Install Copilot instructions (`.github/copilot-instructions.md`)
+- Configure shared state files
+- Set up token-efficient scripts
+
+**Learn more:**
+- [Environment Switching Workflow](.agentic/workflows/environment_switching.md) - Complete handoff guide
+- [Environment Research](.agentic/support/environment_research.md) - Capabilities & optimizations
+
+### Best Tool for Each Task
+
+**Claude Desktop** (200K context):
+- ✅ Complex features requiring full codebase understanding
+- ✅ Architectural decisions and planning
+- ✅ Research and documentation (artifacts)
+- ✅ Initial project setup
+
+**Cursor** (50K context):
+- ✅ Multi-file refactors
+- ✅ Feature implementation across modules
+- ✅ IDE-integrated work with @ mentions
+- ✅ Composer mode for batch edits
+
+**GitHub Copilot** (8K context):
+- ✅ Quick inline suggestions
+- ✅ Single-file edits
+- ✅ Small bug fixes
+- ✅ When other tools unavailable
+
+**Switching between tools?** Each tool automatically picks up where the previous left off via shared markdown files!
 
 ## What You Get
 

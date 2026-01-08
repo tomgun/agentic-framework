@@ -5,6 +5,243 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.4] - 2025-01-08
+
+### Added - Multi-Environment Support & Environment Optimization
+
+**Work seamlessly across Claude Desktop, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out.**
+
+#### 1. Multi-Environment as Default Setup
+
+**NEW: Multi-environment is now RECOMMENDED during initialization**
+
+**Problem it solves:**
+- Token limits force work stoppage (Claude 200K → Cursor 50K → Copilot 8K)
+- User wants: Claude tokens run out → switch to Cursor → continue work → switch to Copilot → keep going
+- Each tool should pick up EXACTLY where previous left off
+- Need seamless handoff without losing context
+
+**Solution:**
+- Init playbook now asks: "a) Multiple (RECOMMENDED)" as first option
+- All adapter files installed by default (CLAUDE.md, .cursor/rules/, .github/)
+- Shared state files ensure continuity (JOURNAL.md, FEATURES.md, STATUS.md)
+- Token-efficient scripts work in ALL environments (40x cheaper than file reads)
+
+**Example chain:**
+1. Morning: Claude Desktop (complex feature, full codebase context)
+2. Claude tokens 80%: Switch to Cursor (@ mentions, composer mode)
+3. Need quick fix: Copilot inline suggestion
+4. Next morning: Back to Claude (SessionStart hook loads full context)
+
+Each tool reads same files → Perfect continuity!
+
+#### 2. Environment-Specific Optimizations
+
+**NEW: `.agentic/support/environment_research.md` - Capabilities matrix & best practices**
+
+**Documented differences:**
+- **Context windows**: Claude (200K) >> Cursor (~50K) >> Copilot (8K)
+- **File operations**: Claude/Cursor (direct edits) vs. Copilot (suggestions only)
+- **Hooks**: Claude ONLY (SessionStart, PreCompact, PostToolUse, Stop)
+- **Multi-file**: Claude/Cursor (yes) vs. Copilot (no, one file at a time)
+- **Terminal**: Claude/Cursor (yes) vs. Copilot (no)
+
+**Environment-specific instructions:**
+- **Claude**: Leverage hooks for auto-logging, use artifacts, read all specs at once
+- **Cursor**: Use @ mentions (@FEATURES.md), composer mode, token-efficient scripts
+- **Copilot**: ULTRA-CONCISE instructions (8K limit!), scripts CRITICAL, work file-by-file
+
+**Benefits:**
+- Claude users get hooks (automatic checkpoint logging before context reset!)
+- Cursor users get @ mention tips (precise context without reading whole files)
+- Copilot users get minimal instructions (fits in 8K limit)
+- Each tool optimized for its strengths
+
+#### 3. Seamless Environment Switching Workflow
+
+**NEW: `.agentic/workflows/environment_switching.md` - Complete handoff protocol**
+
+**Switching protocols:**
+
+**Claude → Cursor:**
+```bash
+# In Claude (before tokens run out)
+bash .agentic/tools/journal.sh "Checkpoint" "What done" "What next" "Blockers"
+# PreCompact hook does this automatically!
+
+# In Cursor
+@JOURNAL.md  # Reads recent entries
+@FEATURES.md # Current feature state
+# Continues seamlessly
+```
+
+**Cursor → Copilot:**
+```bash
+# In Cursor
+bash .agentic/tools/session_log.sh "Checkpoint" "Details" "feature=F-####"
+
+# In Copilot (TINY context!)
+# Give minimal context, use scripts only
+bash .agentic/tools/feature.sh F-#### status shipped
+```
+
+**Copilot → Claude:**
+```
+# Next session in Claude
+# SessionStart hook automatically loads .continue-here.md
+# Full context restored!
+```
+
+**Best practices:**
+- Log before switching (journal.sh, session_log.sh)
+- Match tool to task (complex→Claude, multi-file→Cursor, quick→Copilot)
+- Checkpoint frequently (every ~30 min, not just at session end)
+- Use shared state files (all tools read/write same markdown)
+
+**Token management:**
+- Claude: 200K tokens/session (~2-4 hours complex work)
+- Cursor: 50K tokens/conversation (~30-60 min complex work)
+- Copilot: 8K tokens (~quick edits only)
+- Scripts: 40x more efficient than reading files!
+
+#### 4. Framework Staleness Detection
+
+**NEW: `.agentic/tools/framework_age.sh` - Check if framework is outdated**
+
+**Problem:** AI tools evolve rapidly (new hooks, larger context, new features). Framework instructions may become outdated.
+
+**Solution:** Automatic staleness detection during init:
+```bash
+bash .agentic/tools/framework_age.sh
+# Outputs:
+# - Framework version and age
+# - Status: Current (<30 days) / Aging (30-90 days) / Outdated (>90 days)
+# - Research recommendations if old
+# - Links to official docs (Claude, Cursor, Copilot)
+```
+
+**Exit codes:**
+- 0: Current (<30 days) - No action needed
+- 1: Aging (30-90 days) - Consider research
+- 2: Outdated (>90 days) - Strongly recommend research
+
+**If framework old (>30 days), agent offers:**
+> "Framework is 120 days old. Would you like to research latest [Claude/Cursor/Copilot] features?
+> I'll check official docs and update environment_research.md with new capabilities."
+
+**Benefits:**
+- Framework stays current with tool updates
+- Users get latest optimizations
+- Clear prompts for agents to research and update
+- Prevents obsolescence
+
+#### 5. Updated Init Playbook
+
+**UPDATED: `.agentic/init/init_playbook.md`**
+
+**New steps:**
+- **Step 1a: Detect AI environment**
+  - Ask: Multiple (a) | Claude (b) | Cursor (c) | Copilot (d)
+  - Install appropriate adapters
+  - Provide environment-specific tips
+  - Update STACK.md with "AI Environments: multi"
+
+- **Step 1b: Check framework age**
+  - Calculate days since last update
+  - Warn if >30 days old
+  - Offer research prompt if >90 days
+  - Link to official docs for each environment
+
+**Why this matters:**
+- Users explicitly choose multi-environment (or know they can)
+- Framework adapts to tool capabilities
+- Staleness detected before it's a problem
+- Research workflow prevents obsolete instructions
+
+### Benefits
+
+**Token resilience:**
+- Never blocked by token limits
+- Work continuously throughout day (Claude → Cursor → Copilot chain)
+- Each tool picks up where previous left off
+
+**Tool flexibility:**
+- Use best tool for each task
+- Claude: Complex features, architecture, research
+- Cursor: Multi-file refactors, IDE work, @ mentions
+- Copilot: Quick edits, inline suggestions, when others unavailable
+
+**Seamless handoff:**
+- All tools share state (JOURNAL, FEATURES, STATUS)
+- Token-efficient scripts work everywhere
+- Common checklists and standards
+- AGENTS.md as unified behavioral contract
+
+**Cost optimization:**
+- Start with Claude (large context, can read all specs)
+- Switch to Cursor before tokens run out
+- Use Copilot for quick fixes
+- Extend work session across tools
+- Minimize token waste
+
+**Future-proof:**
+- Framework age check prevents obsolescence
+- Research workflow keeps optimizations current
+- Environment-specific instructions evolve with tools
+- Maintenance reminders every 3-6 months
+
+### Example: Full Day Multi-Environment Workflow
+
+```
+8:00 AM - Claude Desktop (tokens fresh)
+├─ Read all specs, understand architecture
+├─ Plan F-0005 implementation
+├─ Write tests (TDD)
+├─ Implement core logic
+└─ Hooks auto-log checkpoints
+
+11:00 AM - Claude tokens at 80%
+├─ bash .agentic/tools/journal.sh "F-0005 progress" "..." "..." "..."
+└─ Switch to Cursor
+
+11:15 AM - Cursor
+├─ @JOURNAL.md (loads recent context)
+├─ @src/feature.ts (current code)
+├─ Composer mode (multi-file error handling)
+├─ bash .agentic/tools/feature.sh F-0005 impl-state complete
+└─ Integration tests
+
+12:30 PM - Quick README typo
+├─ Open in VS Code
+├─ Copilot inline suggestion
+└─ Fixed in 30 seconds
+
+2:00 PM - Back to Cursor
+├─ Complete F-0005
+├─ bash .agentic/tools/feature.sh F-0005 status shipped
+└─ bash .agentic/tools/journal.sh "F-0005 complete" "..." "Start F-0006" "..."
+
+Next day 8:00 AM - Claude Desktop
+├─ SessionStart hook loads .continue-here.md
+├─ Sees full progress from all tools
+├─ ✓ F-0005 shipped yesterday
+└─ Continues with F-0006 seamlessly
+```
+
+**Total work**: ~6 hours uninterrupted across 3 tools!
+
+### Files Changed
+
+**New files:**
+- `.agentic/support/environment_research.md` - Capabilities matrix & optimizations
+- `.agentic/workflows/environment_switching.md` - Complete handoff guide
+- `.agentic/tools/framework_age.sh` - Staleness detection script
+
+**Updated files:**
+- `.agentic/init/init_playbook.md` - Multi-environment setup, staleness check
+- `README.md` - Multi-environment section, token resilience benefits
+- `CHANGELOG.md` - This entry
+
 ## [0.4.3] - 2025-01-05
 
 ### Added - Library Selection Guidelines & Architectural Decision Framework
