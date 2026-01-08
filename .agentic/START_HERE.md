@@ -28,13 +28,13 @@
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.8.1.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.0.tar.gz | tar xz
 
 # Run the installer
-bash agentic-framework-0.8.1/install.sh
+bash agentic-framework-0.9.0/install.sh
 
 # Clean up
-rm -rf agentic-framework-0.8.1
+rm -rf agentic-framework-0.9.0
 ```
 
 ### Step 2: Tell your agent to initialize

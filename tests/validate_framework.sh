@@ -408,6 +408,90 @@ else
 fi
 
 # ============================================================
+# F-0077: Emergency Quick Reference
+# ============================================================
+echo ""
+echo "--- F-0077: Emergency Quick Reference ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/EMERGENCY.md" ]]; then
+  pass "EMERGENCY.md exists"
+else
+  fail "EMERGENCY.md missing"
+fi
+
+if grep -qi "Tokens Running Out" "${FRAMEWORK_ROOT}/.agentic/EMERGENCY.md" 2>/dev/null; then
+  pass "EMERGENCY.md has tokens section"
+else
+  fail "EMERGENCY.md missing tokens section"
+fi
+
+if grep -q "EMERGENCY.md" "${FRAMEWORK_ROOT}/.agentic/START_HERE.md" 2>/dev/null; then
+  pass "EMERGENCY.md linked from START_HERE"
+else
+  fail "EMERGENCY.md not linked from START_HERE"
+fi
+
+# ============================================================
+# F-0078: Quick Feature & Issue Scripts
+# ============================================================
+echo ""
+echo "--- F-0078: Quick Feature & Issue Scripts ---"
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/quick_feature.sh" ]]; then
+  pass "quick_feature.sh exists and executable"
+else
+  fail "quick_feature.sh missing or not executable"
+fi
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/quick_issue.sh" ]]; then
+  pass "quick_issue.sh exists and executable"
+else
+  fail "quick_issue.sh missing or not executable"
+fi
+
+# ============================================================
+# F-0079: Issue/Bug Tracking
+# ============================================================
+echo ""
+echo "--- F-0079: Issue/Bug Tracking ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/ISSUES.template.md" ]]; then
+  pass "ISSUES.template.md exists"
+else
+  fail "ISSUES.template.md missing"
+fi
+
+if grep -q "ISSUES.template.md" "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null; then
+  pass "Scaffold includes ISSUES.md"
+else
+  fail "Scaffold missing ISSUES.md"
+fi
+
+# ============================================================
+# F-0080: Upgrade Marker System
+# ============================================================
+echo ""
+echo "--- F-0080: Upgrade Marker System ---"
+
+if grep -q "upgrade_pending" "${FRAMEWORK_ROOT}/.agentic/tools/upgrade.sh" 2>/dev/null; then
+  pass "upgrade.sh creates .upgrade_pending marker"
+else
+  fail "upgrade.sh missing marker creation"
+fi
+
+if grep -q "upgrade_pending" "${FRAMEWORK_ROOT}/.agentic/checklists/session_start.md" 2>/dev/null; then
+  pass "session_start.md checks for upgrade marker"
+else
+  fail "session_start.md missing upgrade check"
+fi
+
+if grep -qi "After Framework Upgrade" "${FRAMEWORK_ROOT}/.agentic/agents/shared/agent_operating_guidelines.md" 2>/dev/null; then
+  pass "Guidelines have post-upgrade section"
+else
+  fail "Guidelines missing post-upgrade section"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework  
-**Period**: Initial Development (v0.1.0 → v0.8.0)  
+**Period**: Initial Development (v0.1.0 → v0.9.0)  
 **Date**: 2025-01-08  
 
 ---
@@ -298,6 +298,51 @@ Result: Production-ready framework with 60+ documented principles, proven workfl
 
 **Benefit**: Version verification - know exactly what v0.8.0 can reliably do.
 
+### Developer Hand-Holding & Emergency Reference (v0.8.1-0.9.0)
+
+**Request**:
+> "Can you review is the framework 'holding the developers hand' in every situation, in order for the developer to not have to remember what he was doing, how to work smartly, and also knowing how to do things efficiently - for example when running out of tokens, reminding how he can still write new specs somewhere for next session."
+
+**Result - EMERGENCY.md**:
+- Created `.agentic/EMERGENCY.md` - printable quick reference
+- "Tokens Running Out NOW?" - immediate actions
+- "Add a New Feature Without Agent" - `quick_feature.sh`
+- "Log a Bug/Issue" - `quick_issue.sh`
+- "Check What Agent Was Doing" - commands for STATUS, JOURNAL, WIP
+- Key files cheat sheet
+
+**Scripts Created**:
+- `quick_feature.sh` - One-liner to add feature (auto-generates F-#### ID)
+- `quick_issue.sh` - One-liner to log bug (auto-generates I-#### ID)
+
+### Issue/Bug Tracking (v0.9.0)
+
+**Question**:
+> "We are tracking new features - what about issues we have found and not yet fixed?"
+
+**Result - Formal Issue Tracking**:
+- Created `spec/ISSUES.template.md` - parallel to FEATURES.md
+- Issue format: I-0001, I-0002 (like F-0001, F-0002 for features)
+- Status: open, in_progress, fixed, wont_fix
+- Priority + Severity fields
+- Scaffold now creates spec/ISSUES.md for Core+PM projects
+
+### Framework Self-Dogfooding Enforcement (v0.9.0)
+
+**Critical Question**:
+> "Are the issues included in the framework specs and acceptance criteria/tests - and if not, what should be documented about the 'framework development' so that those are UP TO DATE?"
+
+**Result - Dogfooding Enforcement**:
+- Added F-0077 to F-0080 to framework's own `spec/FEATURES.md`
+- Created 4 new acceptance criteria files
+- Updated `tests/validate_framework.sh` (now 59 checks, all passing)
+- Updated `FRAMEWORK_DEVELOPMENT.md` release checklist:
+  - MUST update spec/FEATURES.md with new features
+  - MUST create acceptance criteria files
+  - MUST update validation script
+
+**Principle Established**: "The framework uses its own spec-driven methodology. New framework features MUST be specced just like product features!"
+
 ### Upgrade Efficiency: Marker File Approach (v0.8.0)
 
 **Insight**:
@@ -428,7 +473,7 @@ These real-world learnings directly shaped v0.4.x releases, making the framework
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework  
-**Current Version**: v0.8.0  
+**Current Version**: v0.9.0  
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)  
-**Status**: Production-ready, battle-tested, actively maintained, formally specified
+**Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 
