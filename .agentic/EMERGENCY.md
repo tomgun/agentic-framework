@@ -79,6 +79,18 @@ bash .agentic/tools/doctor.sh
 
 ---
 
+## Log a Bug/Issue
+
+```bash
+# Quick log an issue
+bash .agentic/tools/quick_issue.sh "Button not working"
+
+# With priority and severity
+bash .agentic/tools/quick_issue.sh "Memory leak" high major
+```
+
+---
+
 ## Record a Decision/Blocker
 
 ```bash
@@ -113,6 +125,7 @@ Or shorter:
 | `WIP.md` | Interrupted work | If exists = work interrupted |
 | `HUMAN_NEEDED.md` | Decisions needed | Before starting |
 | `spec/FEATURES.md` | All features | To add/check features |
+| `spec/ISSUES.md` | Bugs & issues | To log/check bugs |
 | `STACK.md` | How to run/test | When building |
 
 ---
