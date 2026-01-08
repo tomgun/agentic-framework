@@ -53,7 +53,7 @@
 
 ### Rules
 
-1. **ONE feature at a time** - Never work on multiple features simultaneously
+1. **ONE feature at a time per agent** - Never work on multiple features simultaneously (multi-agent with worktrees is different - see below)
 2. **Acceptance criteria MUST exist** before implementation (even if rough)
 3. **Implement → verify with tests → commit** - Small batch rhythm
 4. **MAX 5-10 files per commit** - Stop and re-plan if more
@@ -73,16 +73,18 @@
 - You've been working **>1 hour without a commit**
 - Multiple features are **"in progress"**
 
-### One Feature At A Time (MANDATORY)
+### One Feature At A Time (Per Agent)
 
-**RULE**: Never have more than ONE feature "in_progress" per agent.
+**RULE**: Each agent works on ONE feature at a time. Never have multiple features "in_progress" for the same agent.
 
 **Before starting new feature:**
-1. Check spec/FEATURES.md (or PRODUCT.md in Core mode) for any "in_progress" features
+1. Check spec/FEATURES.md (or PRODUCT.md in Core mode) for any "in_progress" features *assigned to you*
 2. If found: **Complete that feature FIRST** or mark as "blocked"
 3. Only then start new feature
 
-**Why:** Multiple in-progress features = unclear state, harder rollback, context confusion
+**Why:** Multiple in-progress features per agent = unclear state, harder rollback, context confusion
+
+**Multi-Agent Note**: Multiple agents CAN work on different features simultaneously using Git worktrees. Each agent follows "one feature at a time" in their own worktree. See [`workflows/multi_agent_coordination.md`](../../workflows/multi_agent_coordination.md).
 
 ---
 
