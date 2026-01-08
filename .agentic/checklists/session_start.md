@@ -46,30 +46,36 @@
 
 ## 🔄 SECOND: Check for Framework Upgrade
 
-**Detect if framework was recently upgraded:**
+**Check if upgrade marker exists (left by upgrade.sh):**
 
-- [ ] **Run version check**:
+- [ ] **Check for upgrade marker**:
   ```bash
-  bash .agentic/tools/version_check.sh
+  if [[ -f .agentic/.upgrade_pending ]]; then
+    cat .agentic/.upgrade_pending
+  fi
   ```
 
-**If upgrade detected (exit code 1):**
-- ⚠️ Framework has been updated since last session
+**If `.agentic/.upgrade_pending` exists:**
+- ⚠️ Framework was recently upgraded!
+- Read the file - it contains from/to versions and TODO list
 - Tell user: "I notice the framework was upgraded from [OLD] to [NEW]. Let me review what's changed."
-- **Follow post-upgrade checklist** (see `.agentic/agents/shared/agent_operating_guidelines.md` → "After Framework Upgrade"):
+- **Complete the TODO items in the file:**
   1. Read `.agentic/START_HERE.md` for new workflows
-  2. Check if `spec/FEATURES.md` needs format updates
-  3. Review CHANGELOG for breaking changes
-  4. Update `STACK.md` if new config options available
+  2. Validate specs: `python3 .agentic/tools/validate_specs.py`
+  3. Update `STACK.md` version if needed
+  4. Review CHANGELOG for breaking changes
+- **When done, delete the marker:**
+  ```bash
+  rm .agentic/.upgrade_pending
+  ```
 
-**If versions match (exit code 0):**
-- ✅ No upgrade, proceed normally
+**If no marker exists:**
+- ✅ No recent upgrade, proceed normally
 
-**Why check this:**
-- New framework = new templates, workflows, checklists
-- Old spec formats may need migration
-- Prevents confusion from outdated patterns
-- Shows user you're aware of changes
+**Why this is efficient:**
+- Only check once per upgrade (not every session)
+- Marker contains all needed info (versions, changelog URL)
+- Agent handles it → deletes marker → future sessions skip this
 
 ---
 
