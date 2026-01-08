@@ -23,6 +23,17 @@ echo ""
 
 WARNINGS=0
 
+# 0. Check for WIP.md (work in progress lock)
+if [[ -f "WIP.md" ]]; then
+  echo "🚨 WIP.md exists - work may be incomplete!"
+  echo "   Feature in progress (check WIP.md for details)"
+  echo "   Options:"
+  echo "   - Complete work: bash .agentic/tools/wip.sh complete"
+  echo "   - Leave for next session: OK if intentional handoff"
+  echo "   - Review: git status && git diff"
+  WARNINGS=$((WARNINGS + 1))
+fi
+
 # 1. Check for uncommitted changes
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   UNCOMMITTED=$(git status --porcelain | wc -l | tr -d ' ')

@@ -6,6 +6,44 @@
 
 ---
 
+## 🚨 FIRST: Check for Interrupted Work (CRITICAL!)
+
+**BEFORE doing anything else, check if previous work was interrupted:**
+
+- [ ] **Run WIP check**:
+  ```bash
+  bash .agentic/tools/wip.sh check
+  ```
+
+**If interrupted work detected (exit code 1):**
+- ⚠️ Previous session stopped mid-task (tokens out, crash, or abrupt close)
+- WIP.md shows what was in progress
+- Git diff shows uncommitted changes
+- **STOP and review before continuing!**
+
+**Recovery options:**
+1. **Continue work** - Resume from checkpoint (if progress looks good)
+2. **Review changes** - `git diff` to see what changed, then decide
+3. **Rollback** - `git reset --hard` if changes incomplete/broken
+
+**Tell user about interrupted work:**
+> "⚠️ Previous work on [Feature] was interrupted [X] minutes ago.
+> I can see [Y] uncommitted changes. Would you like to:
+> 1. Continue from where we left off
+> 2. Review changes first (git diff)
+> 3. Roll back to last commit"
+
+**If no interrupted work (exit code 0):**
+- ✅ Clean state, proceed with session start
+
+**Why this is FIRST:**
+- Prevents building on top of incomplete/broken changes
+- Git diff shows true state vs. what docs claim
+- Uncommitted changes may conflict with new work
+- Lost work can be recovered instead of overwritten
+
+---
+
 ## Essential Reads (Always)
 
 - [ ] **Read `CONTEXT_PACK.md`** (≈500-1000 tokens)
