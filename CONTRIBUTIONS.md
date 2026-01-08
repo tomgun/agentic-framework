@@ -298,6 +298,30 @@ Result: Production-ready framework with 60+ documented principles, proven workfl
 
 **Benefit**: Version verification - know exactly what v0.8.0 can reliably do.
 
+### Upgrade Efficiency: Marker File Approach (v0.8.0)
+
+**Insight**:
+> "The agent should pick this situation up from a file it is reading at session start... the script could update some file, so that the agent doesn't have to do that work every time - only when the framework (rarely) has been updated"
+
+**Problem with Initial Approach**:
+- Agent compared versions (`.agentic/VERSION` vs `STACK.md`) every session
+- Unnecessary work when no upgrade happened (99% of sessions)
+
+**Solution Implemented**:
+- `upgrade.sh` now creates `.agentic/.upgrade_pending` marker file
+- Marker contains: from_version, to_version, changelog URL, TODO list
+- Agent at session start: just checks if file exists (instant)
+- If exists: handle upgrade tasks, then delete marker
+- If not exists: skip entirely (no version comparison)
+
+**Efficiency Gain**:
+| Approach | Every Session | After Upgrade |
+|----------|--------------|---------------|
+| Version compare | Parse 2 files | N/A |
+| Marker file | Check file exists | Read & handle once |
+
+**Principle**: Minimize agent work for rare events by using one-time markers.
+
 ---
 
 ## Real-World Usage & Critical Feedback (v0.4.0+)
