@@ -63,5 +63,26 @@ if [[ "$HAS_ISSUES" == "true" ]]; then
   echo ""
 fi
 
+# Auto-log checkpoint (every ~10 tool uses to avoid spam)
+COUNTER_FILE=".agentic/.cache/tool_use_counter"
+mkdir -p ".agentic/.cache" 2>/dev/null || true
+
+if [[ -f "$COUNTER_FILE" ]]; then
+  COUNT=$(cat "$COUNTER_FILE")
+  COUNT=$((COUNT + 1))
+else
+  COUNT=1
+fi
+
+echo "$COUNT" > "$COUNTER_FILE"
+
+# Log every 10th tool use as a checkpoint
+if [[ $((COUNT % 10)) -eq 0 ]] && [[ -x ".agentic/tools/session_log.sh" ]]; then
+  bash .agentic/tools/session_log.sh \
+    "Checkpoint (${COUNT} actions)" \
+    "Automatic checkpoint after ${COUNT} tool uses." \
+    "checkpoint=auto,actions=${COUNT}" 2>/dev/null || true
+fi
+
 exit 0  # Always exit 0 (advisory only, don't block Claude)
 
