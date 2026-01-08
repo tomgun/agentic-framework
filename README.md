@@ -34,7 +34,7 @@ Work seamlessly across Claude Desktop, Cursor, and GitHub Copilot in the same pr
 ```bash
 # Download latest release
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.8.1.tar.gz | tar xz
-cd agentic-framework-0.5.0
+cd agentic-framework-0.8.1
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -60,10 +60,10 @@ The agent will:
 
 ```bash
 # Download and extract
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.5.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.8.1.tar.gz | tar xz
 
 # Copy .agentic/ into your project
-cp -r agentic-framework-0.2.5/.agentic /path/to/your-project/
+cp -r agentic-framework-0.8.1/.agentic /path/to/your-project/
 ```
 
 Then follow the same agent initialization process above. The agent will run `scaffold.sh` for you.
@@ -191,8 +191,8 @@ The agent will:
 
 ```bash
 # Download new version
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.3.tar.gz | tar xz
-cd agentic-framework-0.2.3
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.8.1.tar.gz | tar xz
+cd agentic-framework-0.8.1
 
 # Run upgrade script with your project path
 bash .agentic/tools/upgrade.sh /path/to/your-project
@@ -391,13 +391,13 @@ Already have a project? The framework integrates non-invasively:
 ```bash
 # Download new version (to temp location)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.8.1.tar.gz | tar xz
 
 # Run upgrade tool from NEW framework, pointing to your project
-bash /tmp/agentic-framework-0.2.0/.agentic/tools/upgrade.sh /path/to/your-project
+bash /tmp/agentic-framework-0.8.1/.agentic/tools/upgrade.sh /path/to/your-project
 
 # Clean up
-rm -rf /tmp/agentic-framework-0.2.0
+rm -rf /tmp/agentic-framework-0.8.1
 ```
 
 **Why from the new framework?** The new upgrade script has the latest bug fixes and knows about new structure changes.
