@@ -46,36 +46,36 @@
 
 ## 🔄 SECOND: Check for Framework Upgrade
 
-**Check if upgrade marker exists (left by upgrade.sh):**
+**🚨 IMPORTANT: The marker file IS the upgrade notification. Don't search elsewhere!**
 
 - [ ] **Check for upgrade marker**:
   ```bash
-  if [[ -f .agentic/.upgrade_pending ]]; then
-    cat .agentic/.upgrade_pending
-  fi
+  cat .agentic/.upgrade_pending 2>/dev/null || echo "No upgrade pending"
   ```
 
 **If `.agentic/.upgrade_pending` exists:**
-- ⚠️ Framework was recently upgraded!
-- Read the file - it contains from/to versions and TODO list
-- Tell user: "I notice the framework was upgraded from [OLD] to [NEW]. Let me review what's changed."
-- **Complete the TODO items in the file:**
-  1. Read `.agentic/START_HERE.md` for new workflows
-  2. Validate specs: `python3 .agentic/tools/validate_specs.py`
-  3. Update `STACK.md` version if needed
-  4. Review CHANGELOG for breaking changes
-- **When done, delete the marker:**
-  ```bash
-  rm .agentic/.upgrade_pending
-  ```
+- ⚠️ **STOP AND READ THE FILE** - it contains everything you need
+- The file tells you:
+  - From/to versions
+  - Whether STACK.md was auto-updated
+  - Complete TODO checklist
+  - Changelog link
+- **Follow the TODO list in the file (it's 5-6 items)**
+- **Delete the file when done**: `rm .agentic/.upgrade_pending`
+
+**CRITICAL - DON'T WASTE TOKENS:**
+- ❌ Don't search through `.agentic/` randomly for upgrade info
+- ❌ Don't read multiple files looking for version info
+- ✅ Just read `.upgrade_pending` - it has everything
+- ✅ The file tells you exactly what to do
 
 **If no marker exists:**
-- ✅ No recent upgrade, proceed normally
+- ✅ No recent upgrade, proceed to next check
 
-**Why this is efficient:**
-- Only check once per upgrade (not every session)
-- Marker contains all needed info (versions, changelog URL)
-- Agent handles it → deletes marker → future sessions skip this
+**Why this design:**
+- ONE file = complete upgrade context
+- No version comparison needed every session
+- Agent handles it once → deletes → done
 
 ---
 
