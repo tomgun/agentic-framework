@@ -5,6 +5,54 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2025-01-08
+
+### Fixed: Upgrade Script & Agent Upgrade Detection
+
+**Problem Reported**: After upgrade, agent didn't know WHERE to look for upgrade info and was "reading all over .agentic", wasting tokens. STACK.md version wasn't updated.
+
+#### Fixed: STACK.md Version Update
+
+- **More robust pattern matching** - Now handles all STACK.md formats:
+  - `- Version: X.Y.Z` (standard)
+  - `Version: X.Y.Z` (no dash)
+  - `  - Version: X.Y.Z` (indented)
+- **Verification step** - Checks that version was actually updated
+- **Reports if manual update needed**
+
+#### Fixed: Agent Upgrade Detection
+
+**New `.upgrade_pending` marker format**:
+```markdown
+🚨 FRAMEWORK UPGRADE PENDING - READ THIS FIRST!
+
+**DO NOT search through .agentic/ randomly. This file tells you everything.**
+
+## Upgrade Summary
+- From: 0.4.3
+- To: 0.9.1
+- STACK.md updated: yes/no
+
+## Your TODO List (complete all, then delete this file):
+1. ✅ Read this file (you're doing it now)
+2. [ ] If STACK.md not updated → update manually
+3. [ ] Read START_HERE.md
+4. [ ] Validate specs
+5. [ ] Review CHANGELOG
+6. [ ] Delete this file
+```
+
+**Updated session_start.md**:
+- Emphasizes: "The marker file IS the upgrade notification"
+- Explicitly says: "Don't search through .agentic/ randomly"
+- Clear instructions to read the ONE file
+
+**Updated agent_operating_guidelines.md**:
+- Same emphasis on single-file detection
+- Token waste prevention instructions
+
+---
+
 ## [0.9.0] - 2025-01-08
 
 ### Major: Developer Hand-Holding & Issue Tracking

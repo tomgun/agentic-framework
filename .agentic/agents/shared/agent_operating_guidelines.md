@@ -42,34 +42,43 @@
 
 ## 🔄 After Framework Upgrade
 
-**When user tells you the framework was upgraded (e.g., from v0.3 → v0.8):**
+**🚨 CRITICAL: The `.agentic/.upgrade_pending` file IS the upgrade notification. It contains EVERYTHING.**
 
-### Immediate Actions
+### How to Detect Upgrade
 
-1. **Read START_HERE.md** - Understand any new workflows or changed processes
-   ```
-   Read .agentic/START_HERE.md
-   ```
+At session start, check:
+```bash
+cat .agentic/.upgrade_pending 2>/dev/null || echo "No upgrade"
+```
 
-2. **Check CHANGELOG** - Review breaking changes and new features
-   - Ask user for the old version if not provided
-   - Focus on changes between old → new version
+### If Marker Exists
 
-3. **Validate Project Specs** - Ensure specs match new format
-   ```bash
-   python3 .agentic/tools/validate_specs.py
-   ```
-   - If validation fails, compare your `spec/FEATURES.md` to `.agentic/spec/FEATURES.reference.md`
-   - Update format if needed (add missing fields, fix structure)
+**READ THE FILE. It tells you:**
+- From/to versions
+- Whether STACK.md was auto-updated (if "no", update manually)
+- Complete TODO checklist
+- Changelog link
 
-4. **Update STACK.md** - Check for new configuration options
-   - Compare to `.agentic/init/STACK.template.md` for new fields
+**DON'T waste tokens:**
+- ❌ Don't search through `.agentic/` randomly
+- ❌ Don't read multiple files looking for version info
+- ❌ Don't compare versions manually
+- ✅ Just read `.upgrade_pending` and follow its TODO list
 
-### What NOT to Do
+### The TODO List (in the marker file)
 
-- ❌ Don't assume old workflows still apply exactly
-- ❌ Don't skip the spec validation
-- ❌ Don't blindly continue previous work without reading new guidelines
+1. Read this file (the marker)
+2. If STACK.md not updated → update manually
+3. Read START_HERE.md for new workflows
+4. Validate specs
+5. Review CHANGELOG
+6. Delete the marker file
+
+### After Completing TODO
+
+```bash
+rm .agentic/.upgrade_pending
+```
 
 ### Common Post-Upgrade Tasks
 
@@ -79,6 +88,7 @@
 | < 0.6.0 | Update feature format, add WIP tracking |
 | < 0.7.0 | Review Acceptance-Driven vs TDD approach |
 | < 0.8.0 | Check new design principles, DX features |
+| < 0.9.0 | Check issue tracking (I-####), EMERGENCY.md |
 
 ---
 

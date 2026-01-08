@@ -276,21 +276,40 @@ fi
 
 echo ""
 
-# Step 7: Update STACK.md with new version
+# Step 7: Update STACK.md with new version (robust pattern matching)
 echo -e "${BLUE}[7/7] Updating STACK.md with new framework version${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
+STACK_UPDATED="no"
 if [[ -n "$FRAMEWORK_VERSION" && -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
-  if grep -q "^- Version:" "$TARGET_PROJECT_DIR/STACK.md"; then
-    # macOS and Linux compatible sed
+  # Try multiple patterns to catch all STACK.md formats
+  # Pattern 1: "- Version: X.Y.Z" (standard format)
+  # Pattern 2: "Version: X.Y.Z" (no dash)
+  # Pattern 3: "  - Version: X.Y.Z" (indented)
+  
+  if grep -qE "^[[:space:]]*-?[[:space:]]*Version:" "$TARGET_PROJECT_DIR/STACK.md"; then
     if [[ "$OSTYPE" == "darwin"* ]]; then
-      sed -i '' "s/^- Version: .*$/- Version: $FRAMEWORK_VERSION/" "$TARGET_PROJECT_DIR/STACK.md"
+      # macOS sed
+      sed -i '' -E "s/^([[:space:]]*-?[[:space:]]*Version:[[:space:]]*)[0-9]+\.[0-9]+\.[0-9]+.*/\1$FRAMEWORK_VERSION/" "$TARGET_PROJECT_DIR/STACK.md"
     else
-      sed -i "s/^- Version: .*$/- Version: $FRAMEWORK_VERSION/" "$TARGET_PROJECT_DIR/STACK.md"
+      # Linux sed
+      sed -i -E "s/^([[:space:]]*-?[[:space:]]*Version:[[:space:]]*)[0-9]+\.[0-9]+\.[0-9]+.*/\1$FRAMEWORK_VERSION/" "$TARGET_PROJECT_DIR/STACK.md"
     fi
+    STACK_UPDATED="yes"
     echo -e "  ${GREEN}✓${NC} Updated STACK.md version to $FRAMEWORK_VERSION"
   else
     echo -e "  ${YELLOW}⚠ Version field not found in STACK.md${NC}"
+    echo "  Add manually: - Version: $FRAMEWORK_VERSION"
+  fi
+  
+  # Verify the update worked
+  if [[ "$STACK_UPDATED" == "yes" ]]; then
+    UPDATED_VERSION=$(grep -oE "Version:[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+" "$TARGET_PROJECT_DIR/STACK.md" | head -1 | grep -oE "[0-9]+\.[0-9]+\.[0-9]+")
+    if [[ "$UPDATED_VERSION" != "$FRAMEWORK_VERSION" ]]; then
+      echo -e "  ${RED}✗ STACK.md version mismatch: expected $FRAMEWORK_VERSION, got $UPDATED_VERSION${NC}"
+      echo "  Please update manually!"
+      STACK_UPDATED="no"
+    fi
   fi
 else
   echo -e "  ${YELLOW}⚠ Could not update version (STACK.md not found or version unknown)${NC}"
@@ -305,20 +324,35 @@ fi
 # Create upgrade marker for agent to pick up at next session
 UPGRADE_MARKER="$TARGET_PROJECT_DIR/.agentic/.upgrade_pending"
 cat > "$UPGRADE_MARKER" << EOF
-# Framework Upgrade Pending
-# This file is auto-created by upgrade.sh and should be deleted after agent handles it.
+# 🚨 FRAMEWORK UPGRADE PENDING - READ THIS FIRST!
 
-from_version: ${CURRENT_VERSION:-unknown}
-to_version: $FRAMEWORK_VERSION
-upgrade_date: $(date -Iseconds)
-changelog_url: https://github.com/tomgun/agentic-framework/blob/v$FRAMEWORK_VERSION/CHANGELOG.md
+**DO NOT search through .agentic/ randomly. This file tells you everything.**
 
-## Agent TODO (delete this file after completing):
-1. Read .agentic/START_HERE.md for new workflows
-2. Validate specs: python3 .agentic/tools/validate_specs.py
-3. Update STACK.md version if not already updated
-4. Review breaking changes in CHANGELOG
-5. Delete this file: rm .agentic/.upgrade_pending
+## Upgrade Summary
+
+- **From**: ${CURRENT_VERSION:-unknown}
+- **To**: $FRAMEWORK_VERSION
+- **Date**: $(date +%Y-%m-%d)
+- **STACK.md updated**: ${STACK_UPDATED}
+
+## Your TODO List (complete all, then delete this file):
+
+1. ✅ Read this file (you're doing it now)
+2. [ ] If "STACK.md updated: no" above → manually update: \`- Version: $FRAMEWORK_VERSION\`
+3. [ ] Read .agentic/START_HERE.md (5 min) for new workflows
+4. [ ] Validate specs: \`python3 .agentic/tools/validate_specs.py\`
+5. [ ] Review CHANGELOG: $FRAMEWORK_VERSION changes
+6. [ ] Delete this file: \`rm .agentic/.upgrade_pending\`
+
+## Changelog
+
+See: https://github.com/tomgun/agentic-framework/blob/v$FRAMEWORK_VERSION/CHANGELOG.md
+
+## Don't Waste Tokens!
+
+- This file IS the upgrade notification
+- Don't search .agentic/ for upgrade info - it's all here
+- After completing TODO, delete this file
 EOF
 echo -e "  ${GREEN}✓${NC} Created .upgrade_pending marker for agent"
 
