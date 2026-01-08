@@ -5,6 +5,81 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2025-01-08
+
+### Added - Framework Self-Specification ("Dogfooding")
+
+**Major milestone: The framework now has formal specs and acceptance criteria for itself.**
+
+#### What This Means
+
+At each version, you can now know exactly what the framework reliably does:
+- **55 features** defined with clear acceptance criteria
+- **49 automated validation checks** (all passing)
+- **8 feature categories**: Core, Quality, Session, Multi-Agent, Tooling, Recovery, Developer Experience, Design Principles
+
+#### New: spec/ Directory
+
+**`spec/FEATURES.md`** - Complete feature catalog:
+- F-0001 to F-0010: Core (initialization, profiles, spec-driven dev)
+- F-0011 to F-0020: Quality (standards, gates, smoke testing)
+- F-0021 to F-0030: Session (session management, journaling, context)
+- F-0031 to F-0040: Multi-Agent (worktrees, coordination)
+- F-0041 to F-0050: Tooling (scripts, automation, token efficiency)
+- F-0051 to F-0060: Recovery (WIP tracking, error recovery)
+- F-0061 to F-0070: Developer Experience (docs, onboarding, usability)
+- F-0071 to F-0080: Design Principles (token economics, green coding, etc.)
+
+**`spec/acceptance/`** - Acceptance criteria for 17 features:
+- F-0001: Project Initialization
+- F-0006: Acceptance-Driven Development
+- F-0007: Small Batch Development
+- F-0013: Smoke Testing
+- F-0016: Pre-Commit Quality Gates
+- F-0021: Session Start Protocol
+- F-0031: Multi-Agent Coordination
+- F-0041: Token-Efficient Scripts
+- F-0051: WIP Tracking
+- F-0055: Anti-Hallucination Rules
+- F-0061: DEVELOPER_GUIDE.md
+- F-0064: Script Help Messages
+- F-0066: Template Quality
+- F-0069: Checklist-Driven Workflows
+- F-0071: Token Economics
+- F-0073: Human-Agent Collaboration
+- F-0074: Green Coding
+
+**`tests/validate_framework.sh`** - Automated validation:
+```bash
+bash tests/validate_framework.sh
+# ✅ ALL ACCEPTANCE CRITERIA VALIDATED
+# Passed: 49, Failed: 0, Warnings: 0
+```
+
+#### Updated Design Principles in README
+
+**Quality by Design:**
+- Changed from "TDD recommended" to "Acceptance-Driven Development" primary
+- TDD remains available as optional alternative
+
+**Small Batch Development (Critical for Agents!):**
+- Added as separate principle (#6) - critical for keeping agents focused
+- One feature at a time per agent (multi-agent uses worktrees)
+- MAX 5-10 files per commit
+
+**Iterative & Incremental Development:**
+- Restored as separate principle (#7) - complements Small Batch
+- Small Batch = HOW to work (mechanics)
+- Iterative = PHILOSOPHY (ship, learn, adapt)
+- Both principles work together
+
+#### Benefits
+
+1. **Version Verification**: Know exactly what v0.8.0 can do
+2. **Regression Testing**: Ensure upgrades don't break features
+3. **Clear Communication**: Unambiguous feature definitions
+4. **Self-Dogfooding**: Framework uses its own methodology
+
 ## [0.7.0] - 2025-01-08
 
 ### Changed - Acceptance-Driven Development (Primary Methodology)

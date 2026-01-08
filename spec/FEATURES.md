@@ -1103,6 +1103,26 @@
 
 ---
 
+## F-0076: Iterative & Incremental Development
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: low  
+**Since**: v0.1.0
+
+**Description**: Ship in small, validated steps - learn and adapt through building.
+
+**Dependencies**: F-0006, F-0007
+
+**Implementation**:
+- State: complete
+- Code: Workflows, STATUS.md, feature tracking
+- Tests: workflow validation
+
+**Acceptance**: See `spec/acceptance/F-0076.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1114,6 +1134,6 @@
 | Tooling (F-0041-0050) | 4 | 0 | 0 | 4 |
 | Recovery (F-0051-0060) | 6 | 0 | 0 | 6 |
 | Developer Experience (F-0061-0070) | 10 | 0 | 0 | 10 |
-| Design Principles (F-0071-0080) | 5 | 0 | 0 | 5 |
-| **Total** | **54** | **0** | **0** | **54** |
+| Design Principles (F-0071-0080) | 6 | 0 | 0 | 6 |
+| **Total** | **55** | **0** | **0** | **55** |
 

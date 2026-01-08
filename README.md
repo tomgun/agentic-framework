@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.7.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.7.0)
+**Current version:** [v0.8.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.8.0)
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
@@ -33,7 +33,7 @@ Work seamlessly across Claude Desktop, Cursor, and GitHub Copilot in the same pr
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.7.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.8.0.tar.gz | tar xz
 cd agentic-framework-0.5.0
 
 # Install into your project
@@ -115,7 +115,7 @@ Then follow the same agent initialization process above. The agent will run `sca
 - Test coverage explicitly tracked per feature
 - Dependency visualization shows relationships
 
-### 6. Small Batch Development (Critical!)
+### 6. Small Batch Development (Critical for Agents!)
 **Work in small, isolated batches - one feature at a time.**
 - **ONE feature at a time per agent** (multi-agent uses worktrees)
 - **MAX 5-10 files per commit** (stop and re-plan if more)
@@ -123,8 +123,19 @@ Then follow the same agent initialization process above. The agent will run `sca
 - Commit when feature's acceptance tests pass
 - Update specs with discoveries (edge cases, issues, ideas)
 - **Why**: Small changes = easy rollback, known-good checkpoints, clear ownership
+- **Critical**: Keeps AI agents focused and prevents context drift
 
-### 7. Human-Agent Collaboration
+### 7. Iterative & Incremental Development
+**Ship in small, validated steps - learn and adapt.**
+- Pick one small task from `STATUS.md` or planned features
+- Implement with acceptance tests
+- Verify criteria are met
+- Update docs and specs based on discoveries
+- Ship to production (or mark complete) and move to next task
+- **Adapt based on learnings**: Requirements evolve through building
+- **Validated progress**: Each iteration produces working software
+
+### 8. Human-Agent Collaboration
 **Both humans and agents work together on project truth.**
 - **Humans**: Read specs, add features/tasks, make decisions, set priorities
 - **Agents**: Implement features, update docs with code changes, maintain sync
@@ -132,7 +143,7 @@ Then follow the same agent initialization process above. The agent will run `sca
 - Agents know when to escalate to humans (`HUMAN_NEEDED.md`)
 - Tools enable humans to check status without asking agents (token-free queries)
 
-### 8. Green Coding & Environmental Responsibility
+### 9. Green Coding & Environmental Responsibility
 **Efficient software reduces energy consumption and environmental impact.**
 - Optimize algorithms for computational efficiency (lower complexity)
 - Minimize resource usage (memory, CPU cycles, network calls)
@@ -142,7 +153,7 @@ Then follow the same agent initialization process above. The agent will run `sca
 - Choose green hosting (renewable energy data centers)
 - See [green_coding.md](.agentic/quality/green_coding.md) for comprehensive guidelines
 
-### 9. Anti-Hallucination by Design ⚠️
+### 10. Anti-Hallucination by Design ⚠️
 **Agents NEVER make things up - explicit verification prevents fabricated code.**
 - **"I don't know" is explicitly encouraged** when uncertain
 - **Version-specific documentation** requirement (Context7 preferred, official docs, source code)
