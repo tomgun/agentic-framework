@@ -268,6 +268,12 @@ else
   echo -e "  ${YELLOW}⚠ Could not update version (STACK.md not found or version unknown)${NC}"
 fi
 
+# Also update .agentic/VERSION file
+if [[ -n "$FRAMEWORK_VERSION" ]]; then
+  echo "$FRAMEWORK_VERSION" > "$TARGET_PROJECT_DIR/.agentic/VERSION"
+  echo -e "  ${GREEN}✓${NC} Updated .agentic/VERSION to $FRAMEWORK_VERSION"
+fi
+
 echo ""
 
 # Summary
