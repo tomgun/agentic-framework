@@ -302,25 +302,74 @@ bash .agentic/hooks/pre-commit-check.sh
 
 ## Quality & Testing Principles
 
-### Test-Driven Development as Default
+### Small Batch Development (NON-NEGOTIABLE)
 
-**What**: TDD (write tests first) is the RECOMMENDED mode, not just an option.
+**What**: Work in small, isolated batches at the FEATURE level. One feature at a time, commit frequently.
 
-**Why**:
-- **Token economics**: Smaller increments, clearer progress, less rework
-- **Forces testability**: Testable code by design, no later refactoring
-- **Better for context resets**: "Last test passed" is clear resumption point
-- **Quality**: Tests catch bugs before they ship
+**Why (Critical for Long-Term Quality)**:
+- **Easy rollback**: Small changes = easy to verify = easy to rollback
+- **Known-good checkpoints**: If something goes wrong, most of the software still works
+- **Clear ownership**: One feature at a time = unambiguous responsibility
+- **Quality assurance**: Frequent commits = smaller, more reviewable changes
 
 **How Enforced**:
-- STACK.template.md defaults to `development_mode: tdd`
-- tdd_mode.md documents the workflow
-- agent_operating_guidelines.md checks development_mode
-- Red-green-refactor cycle
+- ONE feature at a time (never work on multiple features simultaneously)
+- MAX 5-10 files per commit (stop and re-plan if more)
+- COMMIT when feature's acceptance tests pass
+- pre-commit-check.sh warns when batch size exceeds threshold
+- Agents check for "in_progress" features before starting new work
 
-**Example**: Agent writes failing test for CSV export (RED), implements minimal code (GREEN), refactors for clarity (REFACTOR), commits. Next test.
+**Rules**:
+1. Acceptance criteria MUST exist before implementation (even rough)
+2. Implement feature → verify with tests → commit
+3. Update specs with discoveries (new edge cases, ideas, issues)
+4. If >10 files touched for "one feature", stop and re-plan
 
-**Anti-pattern**: ❌ Implementing feature completely, then "adding tests". ❌ Tests that just assert implementation details.
+**STOP and re-plan if**:
+- You need to touch >10 files for "one task"
+- You can't define any acceptance criteria
+- You've been working >1 hour without a commit
+- Multiple features are "in progress"
+
+**Example**: Agent implements "user login" feature. It touches 5 files (route, controller, service, test, spec). Tests pass. Commit. Move to next feature.
+
+**Anti-pattern**: ❌ Working on authentication, session management, and password reset all at once. ❌ Commits with 30 files changed. ❌ "I'll commit everything at the end of the day."
+
+---
+
+### Acceptance-Driven Development
+
+**What**: Features are defined by acceptance criteria. AI implements, then tests verify. Specs evolve with discoveries.
+
+**Why**:
+- **AI speed**: AI can generate large working chunks quickly - micro-TDD may be slower than needed
+- **Discovery process**: Specs are discovered during implementation, not fully known upfront
+- **Acceptance tests**: The critical gate that catches regressions and unwanted changes
+- **Realistic workflow**: Accommodates the iterative nature of software development
+
+**How Enforced**:
+- Acceptance criteria MUST exist before implementation (even if rough)
+- AI implements feature (can be large chunk)
+- Acceptance tests verify feature works as expected
+- Specs updated with discoveries (new edge cases, issues found)
+- TDD remains an OPTION for those who prefer it
+
+**The Flow**:
+1. Define feature + acceptance criteria (can be rough initially)
+2. AI implements feature
+3. Write/update tests to verify acceptance criteria
+4. Update specs with discoveries (new requirements, edge cases)
+5. Commit when acceptance tests pass
+6. Move to next feature
+
+**Example**: 
+- Acceptance: "User can log in with email/password"
+- AI implements login flow (may be 200 lines)
+- Write acceptance test: login with valid credentials succeeds
+- Discovery: "Need rate limiting for failed attempts" → add to specs
+- Tests pass → commit → next feature
+
+**Anti-pattern**: ❌ Starting implementation with no acceptance criteria at all. ❌ Never updating specs when discoveries are made. ❌ Treating TDD as the only valid approach.
 
 ---
 

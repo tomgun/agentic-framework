@@ -5,6 +5,106 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2025-01-08
+
+### Changed - Acceptance-Driven Development (Primary Methodology)
+
+**Major shift: From TDD-recommended to Acceptance-Driven Development as default.**
+
+#### Philosophy Change
+
+**Before (TDD-first):**
+- Write test → Implement 5 lines → Repeat (micro-level)
+- Good discipline, but can be slower with AI
+
+**After (Acceptance-Driven):**
+1. Define feature + acceptance criteria (rough is OK)
+2. AI implements feature (can be large chunk - AI is fast!)
+3. Write acceptance tests to verify criteria
+4. Update specs with discoveries (edge cases, issues, ideas)
+5. Commit when tests pass
+6. Move to next feature
+
+**Why this change:**
+- AI can generate large working chunks quickly
+- Micro-TDD may be slower than needed with AI
+- Specs are discovered during implementation, not fully known upfront
+- Acceptance tests are the critical gate, not unit test coverage
+- Discovery is expected and encouraged - update specs as you learn
+
+**TDD remains available:** Set `development_mode: tdd` in STACK.md for those who prefer tests-first.
+
+### Added - Small Batch Development (NON-NEGOTIABLE Principle)
+
+**New top-level principle in PRINCIPLES.md and agent_operating_guidelines.md.**
+
+**Rules:**
+- ONE feature at a time (never work on multiple simultaneously)
+- Acceptance criteria MUST exist before implementation (rough is OK)
+- MAX 5-10 files per commit (stop and re-plan if more)
+- Commit when feature's acceptance tests pass
+- Update specs with discoveries
+
+**STOP and re-plan if:**
+- >10 files touched for "one feature"
+- Can't define any acceptance criteria
+- >1 hour without a commit
+- Multiple features "in progress"
+
+### Added - Spec Evolution Workflow
+
+**New: `spec_evolution.md` - How specs evolve during implementation**
+
+Specs are discovered, not fully designed upfront. This is expected!
+
+**During implementation, update specs when you discover:**
+- New edge cases
+- Security requirements
+- Performance constraints
+- Future enhancement ideas
+- Dependencies on other features
+
+**Mark discoveries:** `[Discovered] Rate limit: Max 5 failed attempts per 10 min`
+
+### Added - Workflows README
+
+**New: `workflows/README.md` - Guide to workflow documents**
+
+Clarifies which documents to use when:
+- Primary checklists for day-to-day work
+- Development modes (Standard vs TDD)
+- Quality documents
+- Recovery documents
+- Optional/advanced documents
+
+### Changed - Batch Size Enforcement
+
+**Updated: `pre-commit-check.sh` now warns about large commits**
+
+- >10 files: Note (moderate batch size)
+- >15 files: Warning (too large, should re-plan)
+
+### Changed - Feature Implementation Checklist
+
+**Updated: `feature_implementation.md` now has Gate 1: Acceptance Criteria**
+
+- Cannot proceed without acceptance criteria (rough is OK)
+- Specs evolve during implementation (expected)
+- Links to `spec_evolution.md`
+
+### Changed - STACK.template.md Default
+
+**Updated: `development_mode: standard` is now default (was `tdd`)**
+
+- Standard (Acceptance-Driven): AI implements, tests verify
+- TDD (Optional): Tests first, for those who prefer it
+
+## [0.6.0] - 2025-01-08
+
+### Added - Enforcement Layer: From Guidelines to Gates
+
+(Previous release notes...)
+
 ## [0.5.0] - 2025-01-08
 
 ### Added - Work-In-Progress (WIP) Tracking: Never Lose Work Again

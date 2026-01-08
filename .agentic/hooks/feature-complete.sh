@@ -54,15 +54,25 @@ if ! grep -q "^## ${FEATURE_ID}:" spec/FEATURES.md; then
 fi
 echo "✓ Feature found"
 
-# Check 2: Acceptance criteria exists
+# Check 2: Acceptance criteria exists (CRITICAL GATE)
 echo ""
-echo "[2/6] Checking acceptance criteria file exists..."
+echo "[2/6] Checking acceptance criteria file exists (CRITICAL)..."
 if [[ ! -f "spec/acceptance/${FEATURE_ID}.md" ]]; then
-  echo "❌ spec/acceptance/${FEATURE_ID}.md not found"
+  echo "❌ BLOCKED: spec/acceptance/${FEATURE_ID}.md not found"
+  echo "   Acceptance criteria are MANDATORY for feature completion."
   echo "   Create acceptance criteria before marking feature complete"
   FAILURES=$((FAILURES + 1))
 else
   echo "✓ Acceptance criteria file exists"
+  
+  # Check that acceptance criteria has testable items
+  CRITERIA_COUNT=$(grep -c "^- \[" "spec/acceptance/${FEATURE_ID}.md" 2>/dev/null || echo "0")
+  if [[ "$CRITERIA_COUNT" == "0" ]]; then
+    echo "⚠️  WARNING: Acceptance criteria has no testable items (- [ ] ...)"
+    echo "   Add testable criteria: - [ ] User can do X"
+  else
+    echo "✓ ${CRITERIA_COUNT} testable criteria found"
+  fi
 fi
 
 # Check 3: Tests exist (check for @feature annotation in test files)
