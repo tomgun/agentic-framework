@@ -1,24 +1,154 @@
-# GitHub Copilot instructions
+# GitHub Copilot Instructions
 
-This repo uses the `.agentic/` agentic development framework.
+This repo uses the `.agentic/` **Agentic Framework** for AI-assisted development.
 
-## Source of truth (read first)
+---
+
+## 🚨 MANDATORY Protocols (READ THESE!)
+
+### 1. Session Start (Every Time)
+**Read `.agentic/checklists/session_start.md`** before doing ANY work.
+
+Use token-efficient scripts (not file edits):
+```bash
+# Log to JOURNAL.md (append-only, cheap)
+bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"
+
+# Update STATUS.md section (field update, no rewrite)
+bash .agentic/tools/status.sh focus "Current task"
+```
+
+### 2. Documentation Updates = Part of Done
+**When code changes, docs MUST update** (not optional!):
+
+- **Project docs** (e.g., `docs/GAME_RULES.md`) → Update immediately when behavior changes
+- **spec/FEATURES.md** → Update after completing ANY feature:
+  ```bash
+  bash .agentic/tools/feature.sh F-0003 status shipped
+  bash .agentic/tools/feature.sh F-0003 impl-state complete
+  ```
+- **CONTEXT_PACK.md** → Update when architecture changes
+
+**Anti-pattern ❌**: "Code works, I'll update docs later"  
+**Correct ✅**: "Code works AND docs updated = done"
+
+### 3. Feature Complete Check
+**Before claiming "done", run `.agentic/checklists/feature_complete.md`**
+
+Definition of done:
+- ✅ All acceptance criteria met
+- ✅ Tests written and passing
+- ✅ spec/FEATURES.md updated (use `feature.sh`)
+- ✅ Docs updated
+- ✅ Smoke tested (actually RUN it)
+- ✅ JOURNAL.md updated (use `journal.sh`)
+
+### 4. Session End
+**Run `.agentic/checklists/session_end.md`** before ending.
+
+Use token-efficient logging:
+```bash
+bash .agentic/tools/journal.sh \
+  "Session summary" \
+  "What done" \
+  "What next" \
+  "Blockers"
+```
+
+---
+
+## Token-Efficient Scripts (USE THESE!)
+
+**Located in `.agentic/tools/`** - save tokens by avoiding full file reads:
+
+```bash
+# JOURNAL.md - Append entry
+bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"
+
+# SESSION_LOG.md - Quick checkpoint (40x cheaper!)
+bash .agentic/tools/session_log.sh "Description" "Details" "key=value"
+
+# STATUS.md - Update section
+bash .agentic/tools/status.sh focus "Task"
+bash .agentic/tools/status.sh progress "60%"
+bash .agentic/tools/status.sh next "Next step"
+
+# FEATURES.md - Update feature field
+bash .agentic/tools/feature.sh F-0003 status shipped
+bash .agentic/tools/feature.sh F-0003 impl-state complete
+bash .agentic/tools/feature.sh F-0003 tests complete
+
+# HUMAN_NEEDED.md - Add/resolve blockers
+bash .agentic/tools/blocker.sh add "Description" "Type" "Details"
+bash .agentic/tools/blocker.sh resolve HN-0001 "Resolution"
+```
+
+**Use scripts, not direct file edits!**
+
+---
+
+## Source of Truth (Read First)
 - `AGENTS.md` (if present)
-- `CONTEXT_PACK.md`
-- `STATUS.md`
-- `spec/OVERVIEW.md`
-- `spec/FEATURES.md`
-- `spec/NFR.md` (if constraints apply)
-- `spec/acceptance/F-####.md` for the feature you are changing
-- `/spec/*` and `spec/adr/*`
-- `STACK.md` for how to run/test
+- `.agentic/agents/shared/agent_operating_guidelines.md` (mandatory)
+- `CONTEXT_PACK.md` (where things are, how to run)
+- `STATUS.md` (current focus, next steps)
+- `spec/FEATURES.md` (feature tracking)
+- `spec/acceptance/F-####.md` (acceptance criteria)
 
-## Behavior contract
-- Follow `.agentic/agents/shared/agent_operating_guidelines.md`.
-- Prefer small incremental changes with tests.
-- After changes, update `STATUS.md` and relevant specs/ADRs.
+---
 
-## Developer UX
-- Always state next steps and any questions/decisions needed.
+## Standards
 
+**Programming** (`.agentic/quality/programming_standards.md`):
+- Security first, clear naming, small functions, explicit errors
 
+**Testing** (`.agentic/quality/test_strategy.md`):
+- Happy path + edge cases + invalid input + time-based behavior
+
+**Development** (`STACK.md`):
+- Check `development_mode` (tdd recommended)
+- TDD: Write tests FIRST (`.agentic/workflows/tdd_mode.md`)
+
+---
+
+## Automatic Journaling
+
+**See `.agentic/workflows/automatic_journaling.md`**
+
+Log at natural checkpoints (don't wait for session end!):
+- After completing feature → `session_log.sh`
+- After fixing bug → `session_log.sh`
+- Every ~30 min work → `session_log.sh`
+- At milestones → `journal.sh`
+
+---
+
+## Checklists (Your Friend!)
+
+- **[`checklists/session_start.md`]** - START every session
+- **[`checklists/session_end.md`]** - END every session
+- **[`checklists/feature_complete.md`]** - BEFORE claiming "done"
+- **[`checklists/before_commit.md`]** - BEFORE every commit
+- **[`checklists/smoke_testing.md`]** - RUN the app, verify it works
+
+---
+
+## Key Workflows
+
+- **Session management**: `.agentic/workflows/automatic_journaling.md`
+- **TDD mode**: `.agentic/workflows/tdd_mode.md`
+- **Definition of done**: `.agentic/workflows/definition_of_done.md`
+- **Git workflow**: `.agentic/workflows/git_workflow.md`
+
+---
+
+## Summary
+
+**Three mandatory protocols:**
+1. **Session START**: Read `session_start.md`, load context
+2. **During work**: Update docs alongside code, use scripts
+3. **Session END**: Run `session_end.md`, update JOURNAL.md
+
+**Use scripts** - 40x cheaper than reading/rewriting files.
+
+**Follow checklists** - systematic, nothing forgotten.
