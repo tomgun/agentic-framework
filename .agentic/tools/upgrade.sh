@@ -339,10 +339,14 @@ cat > "$UPGRADE_MARKER" << EOF
 
 1. ✅ Read this file (you're doing it now)
 2. [ ] If "STACK.md updated: no" above → manually update: \`- Version: $FRAMEWORK_VERSION\`
-3. [ ] Read .agentic/START_HERE.md (5 min) for new workflows
-4. [ ] Validate specs: \`python3 .agentic/tools/validate_specs.py\`
-5. [ ] Review CHANGELOG: $FRAMEWORK_VERSION changes
-6. [ ] Delete this file: \`rm .agentic/.upgrade_pending\`
+3. [ ] Check spec files for format markers (add if missing):
+       - spec/FEATURES.md → \`<!-- format: features-v0.2.0 -->\`
+       - spec/NFR.md → \`<!-- format: nfr-v0.1.0 -->\`
+       - spec/ISSUES.md → \`<!-- format: issues-v0.1.0 -->\`
+4. [ ] Read .agentic/START_HERE.md (5 min) for new workflows
+5. [ ] Validate specs: \`python3 .agentic/tools/validate_specs.py\`
+6. [ ] Review CHANGELOG: $FRAMEWORK_VERSION changes
+7. [ ] Delete this file: \`rm .agentic/.upgrade_pending\`
 
 ## Changelog
 
@@ -381,15 +385,20 @@ else
   echo "  2. Test your workflow: bash .agentic/tools/dashboard.sh"
   echo "  3. Run quality checks: bash quality_checks.sh --pre-commit (if configured)"
   echo ""
-  echo "Tell your agent (copy this prompt):"
+  echo -e "${YELLOW}If agent is already running and doesn't notice the upgrade:${NC}"
+  echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "  The framework was upgraded from [OLD_VERSION] to v$FRAMEWORK_VERSION."
-  echo "  Please:"
-  echo "  1. Read .agentic/START_HERE.md to understand any new workflows"
-  echo "  2. Check if spec/FEATURES.md needs format updates (compare to .agentic/spec/FEATURES.reference.md)"
-  echo "  3. Review CHANGELOG for breaking changes or new features"
-  echo "  4. Update STACK.md if any new configuration options are available"
+  echo -e "${GREEN}COPY THIS PROMPT TO YOUR AGENT:${NC}"
+  echo ""
+  echo "  Read .agentic/.upgrade_pending and follow the TODO list in it."
+  echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  echo "The file .agentic/.upgrade_pending contains everything the agent needs:"
+  echo "  - From/to versions"
+  echo "  - Whether STACK.md was updated"
+  echo "  - Complete TODO checklist"
+  echo "  - Changelog link"
   echo ""
   echo "If issues occur:"
   echo "  Rollback: rm -rf .agentic && mv $BACKUP_DIR .agentic"
