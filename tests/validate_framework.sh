@@ -352,6 +352,62 @@ for checklist in "${CHECKLISTS[@]}"; do
 done
 
 # ============================================================
+# F-0071: Token Economics
+# ============================================================
+echo ""
+echo "--- F-0071: Token Economics ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/init/CONTEXT_PACK.template.md" ]]; then
+  pass "CONTEXT_PACK template exists"
+else
+  fail "CONTEXT_PACK template missing"
+fi
+
+for script in journal.sh status.sh; do
+  if [[ -f "${FRAMEWORK_ROOT}/.agentic/tools/${script}" ]]; then
+    pass "Token-efficient ${script} exists"
+  else
+    fail "Token-efficient ${script} missing"
+  fi
+done
+
+# ============================================================
+# F-0073: Human-Agent Collaboration
+# ============================================================
+echo ""
+echo "--- F-0073: Human-Agent Collaboration ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/MANUAL_OPERATIONS.md" ]]; then
+  pass "MANUAL_OPERATIONS.md exists"
+else
+  fail "MANUAL_OPERATIONS.md missing"
+fi
+
+if grep -qi "human" "${FRAMEWORK_ROOT}/.agentic/agents/shared/agent_operating_guidelines.md" 2>/dev/null; then
+  pass "Human collaboration documented in guidelines"
+else
+  fail "Human collaboration not documented"
+fi
+
+# ============================================================
+# F-0074: Green Coding
+# ============================================================
+echo ""
+echo "--- F-0074: Green Coding ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/quality/green_coding.md" ]]; then
+  pass "green_coding.md exists"
+else
+  fail "green_coding.md missing"
+fi
+
+if grep -qi "green" "${FRAMEWORK_ROOT}/README.md" 2>/dev/null; then
+  pass "Green coding in README design principles"
+else
+  fail "Green coding not in README"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

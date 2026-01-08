@@ -19,6 +19,7 @@
 | **Tooling** | F-0041 to F-0050 | Scripts and automation |
 | **Recovery** | F-0051 to F-0060 | Error recovery and resilience |
 | **Developer Experience** | F-0061 to F-0070 | Documentation, onboarding, usability |
+| **Design Principles** | F-0071 to F-0080 | Core framework principles as specs |
 
 ---
 
@@ -1002,6 +1003,106 @@
 
 ---
 
+## F-0071: Token Economics
+
+**Status**: shipped  
+**Priority**: critical  
+**Complexity**: high  
+**Since**: v0.1.0
+
+**Description**: Durable artifacts prevent repeated context waste - CONTEXT_PACK, JOURNAL, structured reading protocols.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: Templates, reading_protocols.md, token-efficient scripts
+- Tests: manual validation
+
+**Acceptance**: See `spec/acceptance/F-0071.md`
+
+---
+
+## F-0072: Living Documentation
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: medium  
+**Since**: v0.1.0
+
+**Description**: Documentation stays current - specs updated with code, no stale placeholders, automatic sync.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: agent_operating_guidelines.md, checklists
+- Tests: manual validation
+
+**Acceptance**: See `spec/acceptance/F-0072.md`
+
+---
+
+## F-0073: Human-Agent Collaboration
+
+**Status**: shipped  
+**Priority**: critical  
+**Complexity**: medium  
+**Since**: v0.1.0
+
+**Description**: Both humans and agents work on project truth - readable specs, clear escalation, dual editing.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: All spec templates, HUMAN_NEEDED.md, MANUAL_OPERATIONS.md
+- Tests: workflow validation
+
+**Acceptance**: See `spec/acceptance/F-0073.md`
+
+---
+
+## F-0074: Green Coding Principles
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: medium  
+**Since**: v0.3.5
+
+**Description**: Efficient software reduces environmental impact - algorithm optimization, resource minimization, caching.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/quality/green_coding.md`, programming_standards.md
+- Tests: agent compliance
+
+**Acceptance**: See `spec/acceptance/F-0074.md`
+
+---
+
+## F-0075: Traceability
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: medium  
+**Since**: v0.1.0
+
+**Description**: Clear path from requirements to code to tests - stable IDs, @feature annotations, dependency visualization.
+
+**Dependencies**: F-0003
+
+**Implementation**:
+- State: complete
+- Code: Feature IDs, code annotations, feature_graph tools
+- Tests: validation scripts
+
+**Acceptance**: See `spec/acceptance/F-0075.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1013,5 +1114,6 @@
 | Tooling (F-0041-0050) | 4 | 0 | 0 | 4 |
 | Recovery (F-0051-0060) | 6 | 0 | 0 | 6 |
 | Developer Experience (F-0061-0070) | 10 | 0 | 0 | 10 |
-| **Total** | **49** | **0** | **0** | **49** |
+| Design Principles (F-0071-0080) | 5 | 0 | 0 | 5 |
+| **Total** | **54** | **0** | **0** | **54** |
 
