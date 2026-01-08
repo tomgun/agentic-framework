@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.8.1
+**Version**: 0.9.0
 
 ---
 
@@ -1123,6 +1123,86 @@
 
 ---
 
+## F-0077: Emergency Quick Reference
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: low  
+**Since**: v0.8.1
+
+**Description**: EMERGENCY.md provides instant guidance when tokens run out or developer needs to work without agent.
+
+**Dependencies**: none
+
+**Implementation**:
+- State: complete
+- Code: .agentic/EMERGENCY.md
+- Tests: file existence, content validation
+
+**Acceptance**: See `spec/acceptance/F-0077.md`
+
+---
+
+## F-0078: Quick Feature & Issue Scripts
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: low  
+**Since**: v0.8.1
+
+**Description**: One-liner scripts to add features and issues without agent assistance.
+
+**Dependencies**: F-0003
+
+**Implementation**:
+- State: complete
+- Code: quick_feature.sh, quick_issue.sh
+- Tests: script execution, file creation
+
+**Acceptance**: See `spec/acceptance/F-0078.md`
+
+---
+
+## F-0079: Issue/Bug Tracking
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: medium  
+**Since**: v0.9.0
+
+**Description**: Formal issue tracking (I-####) parallel to feature tracking (F-####).
+
+**Dependencies**: F-0003
+
+**Implementation**:
+- State: complete
+- Code: spec/ISSUES.template.md, quick_issue.sh
+- Tests: template validation, script execution
+
+**Acceptance**: See `spec/acceptance/F-0079.md`
+
+---
+
+## F-0080: Upgrade Marker System
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: medium  
+**Since**: v0.8.1
+
+**Description**: Efficient upgrade detection via .upgrade_pending marker file instead of version comparison every session.
+
+**Dependencies**: F-0001
+
+**Implementation**:
+- State: complete
+- Code: upgrade.sh creates marker, session_start.md checks it
+- Tests: upgrade flow validation
+
+**Acceptance**: See `spec/acceptance/F-0080.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1134,6 +1214,6 @@
 | Tooling (F-0041-0050) | 4 | 0 | 0 | 4 |
 | Recovery (F-0051-0060) | 6 | 0 | 0 | 6 |
 | Developer Experience (F-0061-0070) | 10 | 0 | 0 | 10 |
-| Design Principles (F-0071-0080) | 6 | 0 | 0 | 6 |
-| **Total** | **55** | **0** | **0** | **55** |
+| Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
+| **Total** | **59** | **0** | **0** | **59** |
 

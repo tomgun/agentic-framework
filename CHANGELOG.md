@@ -5,6 +5,78 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2025-01-08
+
+### Major: Developer Hand-Holding & Issue Tracking
+
+**Philosophy**: Developers should never need to remember processes. The framework guides them.
+
+#### New: Emergency Quick Reference (EMERGENCY.md)
+
+**Problem Solved**: When tokens run out, developers need immediate guidance.
+
+**New file**: `.agentic/EMERGENCY.md` - Printable quick reference card
+
+**Sections**:
+- 🚨 "Tokens Running Out NOW?" - Save work in 3 commands
+- "Add a New Feature Without Agent" - `quick_feature.sh` one-liner
+- "Log a Bug/Issue" - `quick_issue.sh` one-liner  
+- "Check What Agent Was Doing" - STATUS, JOURNAL, WIP commands
+- "Resume Next Session" - Exact prompt to use
+- Key files cheat sheet
+
+**Linked from**: START_HERE.md for easy discovery.
+
+#### New: Quick Scripts for Manual Work
+
+**`quick_feature.sh`**:
+```bash
+bash .agentic/tools/quick_feature.sh "Dark mode support"
+# Creates F-0001: Dark mode support in spec/FEATURES.md
+```
+
+**`quick_issue.sh`**:
+```bash
+bash .agentic/tools/quick_issue.sh "Login button broken" high major
+# Creates I-0001: Login button broken in spec/ISSUES.md
+```
+
+Both scripts:
+- Auto-generate next ID (F-#### or I-####)
+- Create proper markdown format
+- Show help when called without arguments
+
+#### New: Issue/Bug Tracking (I-#### IDs)
+
+**Problem Solved**: Features tracked (F-####), but bugs weren't formally tracked.
+
+**New template**: `spec/ISSUES.template.md`
+
+**Issue format**:
+- ID: I-0001, I-0002, ...
+- Status: open, in_progress, fixed, wont_fix
+- Priority: critical, high, medium, low
+- Severity: blocker, major, minor, cosmetic
+- Found/Fixed dates
+- Steps to reproduce
+- Related features
+
+**Scaffold updated**: Creates `spec/ISSUES.md` for Core+PM projects.
+
+#### Framework Self-Dogfooding Enforced
+
+**Critical insight**: Framework wasn't using its own methodology for new features!
+
+**Fixed**:
+- Added F-0077 to F-0080 to `spec/FEATURES.md` (now 59 features)
+- Created acceptance criteria files for all new features
+- Updated `tests/validate_framework.sh` (59 checks, all passing)
+- Updated `FRAMEWORK_DEVELOPMENT.md` release checklist
+
+**New rule**: "New framework features MUST be specced just like product features!"
+
+---
+
 ## [0.8.1] - 2025-01-08
 
 ### Improved - Upgrade Experience
