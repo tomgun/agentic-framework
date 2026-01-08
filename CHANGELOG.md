@@ -5,6 +5,33 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2025-01-08
+
+### Improved - Upgrade Experience
+
+#### Upgrade Script Enhancements
+- **All directories replaced**: Now replaces 14 directories (was 7), including `checklists/`, `claude-hooks/`, `hooks/`, `prompts/`, `quality_profiles/`, `schemas/`, `token_efficiency/`
+- **All files replaced**: Now replaces 8 root files (was 5), including `DEVELOPER_GUIDE.md`, `FRAMEWORK_DEVELOPMENT.md`, `PRINCIPLES.md`
+- **Auto-migrates spec formats**: Runs `upgrade_spec_format.py` automatically
+- **Updates .agentic/VERSION**: Both `STACK.md` and `.agentic/VERSION` are updated
+
+#### Efficient Upgrade Detection (Marker File)
+- **New**: `upgrade.sh` creates `.agentic/.upgrade_pending` marker file
+- Agent checks for marker at session start (instant file existence check)
+- No more version comparison every session
+- Marker contains: from_version, to_version, changelog URL, TODO list
+- Agent handles upgrade tasks → deletes marker → done
+
+#### Post-Upgrade Agent Guidance
+- **New section** in `agent_operating_guidelines.md`: "After Framework Upgrade"
+- **New check** in `session_start.md`: Check for `.upgrade_pending` marker
+- Clear instructions for agents on what to review after upgrade
+
+#### New Tool
+- `version_check.sh`: Manual version comparison (backup method)
+
+---
+
 ## [0.8.0] - 2025-01-08
 
 ### Added - Framework Self-Specification ("Dogfooding")
