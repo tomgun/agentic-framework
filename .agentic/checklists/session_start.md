@@ -44,6 +44,35 @@
 
 ---
 
+## 🔄 SECOND: Check for Framework Upgrade
+
+**Detect if framework was recently upgraded:**
+
+- [ ] **Run version check**:
+  ```bash
+  bash .agentic/tools/version_check.sh
+  ```
+
+**If upgrade detected (exit code 1):**
+- ⚠️ Framework has been updated since last session
+- Tell user: "I notice the framework was upgraded from [OLD] to [NEW]. Let me review what's changed."
+- **Follow post-upgrade checklist** (see `.agentic/agents/shared/agent_operating_guidelines.md` → "After Framework Upgrade"):
+  1. Read `.agentic/START_HERE.md` for new workflows
+  2. Check if `spec/FEATURES.md` needs format updates
+  3. Review CHANGELOG for breaking changes
+  4. Update `STACK.md` if new config options available
+
+**If versions match (exit code 0):**
+- ✅ No upgrade, proceed normally
+
+**Why check this:**
+- New framework = new templates, workflows, checklists
+- Old spec formats may need migration
+- Prevents confusion from outdated patterns
+- Shows user you're aware of changes
+
+---
+
 ## Essential Reads (Always)
 
 - [ ] **Read `CONTEXT_PACK.md`** (≈500-1000 tokens)
