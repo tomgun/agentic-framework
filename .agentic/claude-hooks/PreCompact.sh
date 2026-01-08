@@ -21,6 +21,23 @@ echo ""
 echo "💾 Context compaction detected - preserving state..."
 echo ""
 
+# 0. Auto-log to SESSION_LOG.md (append-only, token-efficient)
+if [[ -x ".agentic/tools/session_log.sh" ]]; then
+  CURRENT_TASK="Unknown"
+  if [[ -f "STATUS.md" ]]; then
+    CURRENT_TASK=$(grep -A2 "## Current session state" STATUS.md | tail -1 | sed 's/^[[:space:]]*//' || echo "Working")
+  elif [[ -f "PRODUCT.md" ]]; then
+    CURRENT_TASK=$(grep -m1 "^- \[ \]" PRODUCT.md | sed 's/^- \[ \] //' || echo "Working")
+  fi
+  
+  bash .agentic/tools/session_log.sh \
+    "Context compaction checkpoint" \
+    "Saving state before context reset. Last task: ${CURRENT_TASK}" \
+    "checkpoint=pre-compact" 2>/dev/null || true
+  
+  echo "✓ Auto-logged to SESSION_LOG.md"
+fi
+
 # 1. Generate fresh .continue-here.md
 if [[ -x ".agentic/tools/continue_here.py" ]] && command -v python3 >/dev/null 2>&1; then
   echo "Generating .continue-here.md..."

@@ -22,6 +22,7 @@
 
 **Critical Guidelines:**
 - **[`quality/library_selection.md`](../../quality/library_selection.md)** - 🚨 **CHOOSING LIBRARIES VS CUSTOM CODE** (prevent wrong choices!)
+- **[`workflows/automatic_journaling.md`](../../workflows/automatic_journaling.md)** - 🚨 **AUTO-JOURNAL AT CHECKPOINTS** (don't wait for session end!)
 
 **How to use checklists:**
 1. Read the appropriate checklist for your current task
@@ -82,31 +83,47 @@ Agent: "You'll need to install the GUT plugin manually. I'm adding this to HUMAN
 
 **Rule**: Mention in chat AND add to HUMAN_NEEDED.md. If session ends abruptly, blocker still documented.
 
-### Rule 3: Update JOURNAL.md Before Ending Sessions
+### Rule 3: Auto-Journal at Natural Checkpoints (Don't Wait!)
 
-**🚨 CRITICAL**: Before ending ANY significant work session, update JOURNAL.md with what was done and what's next.
+**🚨 CRITICAL**: Log progress automatically at natural checkpoints. Don't wait for session end or user reminders!
 
-**Always update JOURNAL.md when:**
-- Ending an init session
-- Completing a feature or significant work
-- Before a long break or end of day
-- Before context window reset
-- When stuck/blocked (document what was tried)
+**Natural checkpoints (log immediately):**
+- ✅ After completing a feature
+- ✅ After fixing a bug
+- ✅ After making an architectural decision
+- ✅ After discovering a blocker
+- ✅ After significant refactoring
+- ✅ Every ~30 minutes of focused work
+- ✅ Before context window compaction
+- ✅ Before ending session
 
-**Minimum JOURNAL.md entry:**
+**Two logging levels:**
+
+1. **Quick log (SESSION_LOG.md)** - Append-only, token-efficient:
+```bash
+bash .agentic/tools/session_log.sh \
+  "Feature F-0003 complete" \
+  "Implemented user login with JWT. Tests passing." \
+  "files=auth.ts,tests=8"
+```
+
+2. **Milestone log (JOURNAL.md)** - Structured, comprehensive:
 ```markdown
 ### Session: YYYY-MM-DD HH:MM
-
-**Accomplished**:
-- [What was done]
-
-**Next steps**:
-- [Immediate next actions]
-
+**Feature**: F-####
+**Accomplished**: [What was done]
+**Next steps**: [Immediate actions]
 **Blockers**: [Any items in HUMAN_NEEDED.md]
 ```
 
-**Why this matters**: If session ends abruptly (network issue, context reset, user closes window), there's still a record of progress.
+**When to use which:**
+- Quick checkpoint → SESSION_LOG.md (append-only, cheap)
+- Major milestone → JOURNAL.md (feature complete, session end)
+- Session end → Consolidate both
+
+**Why this matters**: If session crashes, logs preserve progress. Don't wait - log as you go!
+
+**See**: `.agentic/workflows/automatic_journaling.md` for detailed triggers and examples.
 
 ### Rule 4: NEVER Make Things Up (Original Anti-Hallucination)
 - ❌ "React 18 has a useServerComponent hook" (NO IT DOESN'T - hallucinated)
