@@ -122,11 +122,18 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 DIRS_TO_REPLACE=(
   "workflows"
   "quality"
+  "quality_profiles"
   "agents"
   "tools"
   "init"
   "spec"
   "support"
+  "checklists"
+  "claude-hooks"
+  "hooks"
+  "prompts"
+  "schemas"
+  "token_efficiency"
 )
 
 FILES_TO_REPLACE=(
@@ -135,6 +142,9 @@ FILES_TO_REPLACE=(
   "FRAMEWORK_MAP.md"
   "MANUAL_OPERATIONS.md"
   "DIRECT_EDITING.md"
+  "DEVELOPER_GUIDE.md"
+  "FRAMEWORK_DEVELOPMENT.md"
+  "PRINCIPLES.md"
 )
 
 echo "  Directories to replace:"
