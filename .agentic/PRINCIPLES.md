@@ -116,6 +116,109 @@
 
 ---
 
+### Deterministic Behavior & Enforcement
+
+**What**: Agents should produce consistent, predictable results through verification and gates, not just documentation conventions.
+
+**Why**:
+- Documentation can be ignored (agents may skip reading)
+- Guidelines can be misunderstood or forgotten
+- Compliance varies across agent models and versions
+- Critical workflows must be reliable, not "usually" reliable
+- Failure should be detected early, not after shipping
+
+**How**:
+- **Verification scripts > Documentation**: `wip.sh check` is mandatory, not optional
+- **Gates that block > Guidelines that advise**: Pre-commit hooks enforce, checklists advise
+- **Explicit protocols > Implicit expectations**: `session_start.md` specifies exact steps
+- **Automated checks > Human vigilance**: Hooks validate before commits
+- **Structured data > Free text**: YAML frontmatter enables machine validation
+
+**Enforcement Mechanisms**:
+
+1. **Session Start Protocol** (Mandatory):
+   - `.agentic/checklists/session_start.md` - FIRST step is `wip.sh check`
+   - Detects interrupted work, prevents building on incomplete changes
+   - Non-negotiable: WIP check returns exit code 1 if interrupted work found
+
+2. **Commit Gates** (Blocking):
+   - `.agentic/hooks/pre-commit-check.sh` - Validates before commit allowed
+   - Checks: WIP.md doesn't exist, shipped features have acceptance criteria
+   - Exit code 1 blocks commit if validation fails
+
+3. **Feature Completion Protocol** (Validated):
+   - `.agentic/workflows/definition_of_done.md` - Explicit checklist
+   - `feature.sh` enforces valid status transitions (planned → in_progress → shipped)
+   - Never mark "shipped" without tests + acceptance criteria
+
+4. **Token-Efficient Operations** (Append-only):
+   - `journal.sh`, `status.sh`, `feature.sh`, `blocker.sh` - Surgical edits
+   - Avoid full-file rewrites that waste tokens
+   - 40x more efficient than read-modify-write pattern
+
+5. **Recovery Protocol** (Structured):
+   - WIP tracking + git diff integration
+   - Clear options: Continue | Review | Rollback
+   - No guessing about interrupted work state
+
+**Example (Before - Unreliable)**:
+```markdown
+# agent_operating_guidelines.md
+"Agents should update FEATURES.md when completing features."
+
+Result: Some agents do, some forget, some partially update.
+Token waste: Full file read (1200 tokens) for status change.
+```
+
+**Example (After - Enforced)**:
+```bash
+# Token-efficient script enforces valid states
+bash .agentic/tools/feature.sh F-0005 status shipped
+# Validates: status is valid, file format correct
+# Updates: Single line, no full read
+# Cost: 50 tokens vs. 1200 tokens
+# Outcome: Deterministic, always correct
+
+# Pre-commit hook blocks if incomplete
+bash .agentic/hooks/pre-commit-check.sh
+# Exit 1 if WIP.md exists (work incomplete)
+# Exit 1 if shipped features lack acceptance criteria
+# Exit 0 only if all gates pass
+```
+
+**Why This Matters**:
+
+**Reliability over Convenience**:
+- Convenient: "Agents should read session_start.md"
+- Reliable: `wip.sh check` returns exit code, blocks if interrupted
+
+**Early Detection**:
+- Problem: Agent commits incomplete work, builds on it, compounds errors
+- Solution: Pre-commit hook detects WIP.md, blocks commit until complete
+
+**Cross-Agent Consistency**:
+- Problem: Different AI models interpret guidelines differently
+- Solution: Scripts enforce same behavior regardless of agent
+
+**Token Economics**:
+- Problem: Reading JOURNAL.md (2000 tokens) to append entry
+- Solution: `journal.sh` appends without read (50 tokens), 40x savings
+
+**Connection to Other Principles**:
+- **Context Efficiency**: Token-efficient scripts reduce waste
+- **Quality by Design**: Gates prevent shipping incomplete features
+- **Human-Agent Partnership**: Scripts enforce contracts reliably
+- **Sustainable Long-Term**: Determinism enables scaling to large projects
+
+**Anti-patterns**:
+- ❌ "Agents should..." without enforcement (hope-based development)
+- ❌ Full file rewrites for single field updates (token waste)
+- ❌ Advisory checklists without validation (ignored under pressure)
+- ❌ No detection of interrupted work (build on broken foundations)
+- ❌ Commit first, validate later (too late to prevent problems)
+
+---
+
 ## Token Economics Principles
 
 ### Durable Artifacts Prevent Repeated Re-Reading
