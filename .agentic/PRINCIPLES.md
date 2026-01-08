@@ -313,7 +313,7 @@ bash .agentic/hooks/pre-commit-check.sh
 - **Quality assurance**: Frequent commits = smaller, more reviewable changes
 
 **How Enforced**:
-- ONE feature at a time (never work on multiple features simultaneously)
+- ONE feature at a time per agent (multi-agent teams use worktrees for parallel work)
 - MAX 5-10 files per commit (stop and re-plan if more)
 - COMMIT when feature's acceptance tests pass
 - pre-commit-check.sh warns when batch size exceeds threshold
