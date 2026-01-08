@@ -13,13 +13,13 @@ cat STACK.md | grep "Version:"  # e.g., "Version: 0.1.0"
 
 # 2. Download and extract new framework (in a temp location)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.1.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.2.tar.gz | tar xz
 
 # 3. Run the NEW upgrade tool, pointing it to your project
-bash agentic-framework-0.9.1/.agentic/tools/upgrade.sh /path/to/your-project
+bash agentic-framework-0.9.2/.agentic/tools/upgrade.sh /path/to/your-project
 
 # 4. Clean up
-rm -rf agentic-framework-0.9.1
+rm -rf agentic-framework-0.9.2
 ```
 
 **Why run the script from the NEW framework?**
@@ -64,7 +64,7 @@ cp -r docs docs-backup-$(date +%Y%m%d)
 ```bash
 # Download latest release (to a temporary location, not your project)
 cd /tmp  # Or any temp directory
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.1.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.2.tar.gz | tar xz
 ```
 
 ### Step 3: Identify What to Replace
@@ -114,7 +114,7 @@ curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.1.tar
 ```bash
 # From your project directory
 cd /path/to/your-project
-NEW_FW="/tmp/agentic-framework-0.9.1"
+NEW_FW="/tmp/agentic-framework-0.9.2"
 
 # Remove old framework internals (all 14 directories)
 rm -rf .agentic/workflows .agentic/quality .agentic/quality_profiles \

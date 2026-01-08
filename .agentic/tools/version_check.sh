@@ -16,8 +16,23 @@ FRAMEWORK_VERSION=""
 if [[ -f ".agentic/VERSION" ]]; then
     FRAMEWORK_VERSION=$(cat .agentic/VERSION | tr -d '[:space:]')
 else
-    echo -e "${RED}Error: .agentic/VERSION not found${NC}"
-    exit 2
+    # Fallback: check STACK.md for framework version (older projects)
+    if [[ -f "STACK.md" ]]; then
+        FRAMEWORK_VERSION=$(grep -E "^\s*-?\s*Version:" STACK.md | head -1 | sed -E 's/.*Version:\s*([0-9.]+).*/\1/' | tr -d '[:space:]')
+        if [[ -n "$FRAMEWORK_VERSION" ]]; then
+            echo -e "${YELLOW}Note: .agentic/VERSION not found, using STACK.md version${NC}"
+        fi
+    fi
+    
+    if [[ -z "$FRAMEWORK_VERSION" ]]; then
+        echo -e "${RED}Error: Cannot determine framework version${NC}"
+        echo "Missing: .agentic/VERSION file"
+        echo "Missing: Version field in STACK.md"
+        echo ""
+        echo "If recently upgraded, add version manually:"
+        echo "  echo '0.9.1' > .agentic/VERSION"
+        exit 2
+    fi
 fi
 
 # Get recorded version from STACK.md

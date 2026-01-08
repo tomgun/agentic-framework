@@ -5,6 +5,38 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.2] - 2025-01-08
+
+### Fixed: Additional Upgrade Issues
+
+**Reported issues fixed:**
+
+#### 1. version_check.sh expects missing VERSION file
+
+- Now falls back to STACK.md if `.agentic/VERSION` doesn't exist
+- Clear error message with fix instructions
+- Works with older projects that lack the VERSION file
+
+#### 2. NFR.md missing format marker
+
+- Added `<!-- format: nfr-v0.1.0 -->` to NFR.template.md
+- Updated example project NFR.md
+- Upgrade TODO now reminds to check format markers on all spec files
+
+#### 3. Upgrade script now shows agent prompt
+
+When upgrade completes, shows:
+```
+If agent is already running and doesn't notice the upgrade:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COPY THIS PROMPT TO YOUR AGENT:
+
+  Read .agentic/.upgrade_pending and follow the TODO list in it.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
 ## [0.9.1] - 2025-01-08
 
 ### Fixed: Upgrade Script & Agent Upgrade Detection
