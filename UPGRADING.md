@@ -13,13 +13,13 @@ cat STACK.md | grep "Version:"  # e.g., "Version: 0.1.0"
 
 # 2. Download and extract new framework (in a temp location)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.8.1.tar.gz | tar xz
 
 # 3. Run the NEW upgrade tool, pointing it to your project
-bash agentic-framework-0.2.1/.agentic/tools/upgrade.sh /path/to/your-project
+bash agentic-framework-0.8.1/.agentic/tools/upgrade.sh /path/to/your-project
 
 # 4. Clean up
-rm -rf agentic-framework-0.2.1
+rm -rf agentic-framework-0.8.1
 ```
 
 **Why run the script from the NEW framework?**
@@ -31,10 +31,18 @@ rm -rf agentic-framework-0.2.1
 **The upgrade tool will:**
 - Check your current version
 - Backup your existing `.agentic/` folder (timestamped)
-- Replace framework files (preserving your project files)
-- Update version in `STACK.md`
+- Replace all 14 framework directories and 8 root files
+- Auto-migrate spec formats (`upgrade_spec_format.py`)
+- Update version in `STACK.md` and `.agentic/VERSION`
 - Run compatibility checks
+- **Create `.agentic/.upgrade_pending` marker** for your AI agent
 - Report any manual steps needed
+
+**After upgrade, your AI agent will:**
+- Detect the `.upgrade_pending` marker at session start
+- Review new workflows and breaking changes
+- Validate your specs against new format
+- Delete the marker when done
 
 ## Manual Upgrade (Advanced)
 
@@ -56,22 +64,36 @@ cp -r docs docs-backup-$(date +%Y%m%d)
 ```bash
 # Download latest release (to a temporary location, not your project)
 cd /tmp  # Or any temp directory
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.8.1.tar.gz | tar xz
 ```
 
 ### Step 3: Identify What to Replace
 
-**Always replace** (framework internals):
+**Always replace** (framework internals - 14 directories):
 - `.agentic/workflows/`
 - `.agentic/quality/`
+- `.agentic/quality_profiles/`
 - `.agentic/agents/`
-- `.agentic/tools/` (scripts only, not their output)
-- `.agentic/init/` (templates only)
-- `.agentic/spec/` (templates only)
+- `.agentic/tools/`
+- `.agentic/init/`
+- `.agentic/spec/` (templates only, not your project's `spec/`)
 - `.agentic/support/`
+- `.agentic/checklists/`
+- `.agentic/claude-hooks/`
+- `.agentic/hooks/`
+- `.agentic/prompts/`
+- `.agentic/schemas/`
+- `.agentic/token_efficiency/`
+
+**Always replace** (8 root files):
 - `.agentic/README.md`
 - `.agentic/START_HERE.md`
 - `.agentic/FRAMEWORK_MAP.md`
+- `.agentic/MANUAL_OPERATIONS.md`
+- `.agentic/DIRECT_EDITING.md`
+- `.agentic/DEVELOPER_GUIDE.md`
+- `.agentic/FRAMEWORK_DEVELOPMENT.md`
+- `.agentic/PRINCIPLES.md`
 
 **Never replace** (your project data):
 - `STACK.md` (update version field only)
@@ -92,26 +114,31 @@ curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar
 ```bash
 # From your project directory
 cd /path/to/your-project
+NEW_FW="/tmp/agentic-framework-0.8.1"
 
-# Remove old framework internals
-rm -rf .agentic/workflows .agentic/quality .agentic/agents .agentic/tools .agentic/init .agentic/spec .agentic/support
+# Remove old framework internals (all 14 directories)
+rm -rf .agentic/workflows .agentic/quality .agentic/quality_profiles \
+       .agentic/agents .agentic/tools .agentic/init .agentic/spec \
+       .agentic/support .agentic/checklists .agentic/claude-hooks \
+       .agentic/hooks .agentic/prompts .agentic/schemas .agentic/token_efficiency
 
-# Copy new framework internals (assuming framework extracted to /tmp)
-cp -r /tmp/agentic-framework-0.2.1/.agentic/workflows .agentic/
-cp -r /tmp/agentic-framework-0.2.1/.agentic/quality .agentic/
-cp -r /tmp/agentic-framework-0.2.1/.agentic/agents .agentic/
-cp -r /tmp/agentic-framework-0.2.1/.agentic/tools .agentic/
-cp -r /tmp/agentic-framework-0.2.1/.agentic/init .agentic/
-cp -r /tmp/agentic-framework-0.2.1/.agentic/spec .agentic/
-cp -r /tmp/agentic-framework-0.2.1/.agentic/support .agentic/
+# Copy new framework internals
+for dir in workflows quality quality_profiles agents tools init spec support \
+           checklists claude-hooks hooks prompts schemas token_efficiency; do
+  cp -r "$NEW_FW/.agentic/$dir" .agentic/
+done
 
-# Update framework docs
-cp /tmp/agentic-framework-0.2.1/.agentic/README.md .agentic/
-cp /tmp/agentic-framework-0.2.1/.agentic/START_HERE.md .agentic/
-cp /tmp/agentic-framework-0.2.1/.agentic/FRAMEWORK_MAP.md .agentic/
+# Update framework docs (all 8 files)
+for file in README.md START_HERE.md FRAMEWORK_MAP.md MANUAL_OPERATIONS.md \
+            DIRECT_EDITING.md DEVELOPER_GUIDE.md FRAMEWORK_DEVELOPMENT.md PRINCIPLES.md; do
+  cp "$NEW_FW/.agentic/$file" .agentic/
+done
+
+# Update VERSION
+cp "$NEW_FW/VERSION" .agentic/VERSION
 
 # Clean up
-rm -rf /tmp/agentic-framework-0.2.1
+rm -rf "$NEW_FW"
 ```
 
 ### Step 5: Update Version in STACK.md
@@ -192,11 +219,11 @@ curl -s https://raw.githubusercontent.com/tomgun/agentic-framework/v0.2.0/CHANGE
 3. **Download new framework**:
    ```bash
    cd /tmp
-   curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v2.0.0.tar.gz | tar xz
+   curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/vX.0.0.tar.gz | tar xz
    ```
 4. **Run the NEW upgrade tool**:
    ```bash
-   bash /tmp/agentic-framework-2.0.0/.agentic/tools/upgrade.sh /path/to/your-project
+   bash /tmp/agentic-framework-X.0.0/.agentic/tools/upgrade.sh /path/to/your-project
    ```
 5. **Follow migration steps** from the guide (may require manual fixes)
 6. **Update custom workflows** (if any)
@@ -310,9 +337,9 @@ The agent will:
 If upgrade causes issues:
 
 ```bash
-# 1. Restore from backup
-rm -rf agentic
-mv agentic-backup-YYYYMMDD agentic
+# 1. Restore from backup (backup created by upgrade.sh)
+rm -rf .agentic
+mv agentic-backup-YYYYMMDD-HHMMSS .agentic
 
 # 2. Revert STACK.md version field (if changed)
 git checkout HEAD -- STACK.md
@@ -323,14 +350,19 @@ bash .agentic/tools/doctor.sh
 # 4. Report issue to framework maintainers
 ```
 
-## Future: Automated Upgrades
+## Available Upgrade Features
 
-**Planned features** (not yet implemented):
-- `.agentic/tools/check_updates.sh` - Check for new versions
-- `.agentic/tools/upgrade.sh --dry-run` - Preview changes
-- `.agentic/tools/upgrade.sh --auto` - Fully automated upgrade
+**Implemented:**
+- ✅ `.agentic/tools/upgrade.sh` - Full upgrade with backup
+- ✅ `DRY_RUN=yes upgrade.sh` - Preview changes without applying
+- ✅ `.agentic/tools/version_check.sh` - Check version mismatch
+- ✅ Automatic backup (timestamped folder)
+- ✅ Auto-migrate spec formats
+- ✅ `.upgrade_pending` marker for agent awareness
+
+**Planned** (not yet implemented):
 - GitHub Actions integration for upgrade notifications
-- Automatic backup and rollback on failure
+- Automatic rollback on failure
 
 ## Migration Guides (for Major Versions)
 
