@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 # upgrade.sh: Upgrades the Agentic Framework in an existing project
 # Usage: bash path/to/new-framework/.agentic/tools/upgrade.sh /path/to/your-project
+# Debug: DEBUG=yes bash upgrade.sh /path/to/project
 set -euo pipefail
+
+# Debug mode
+DEBUG="${DEBUG:-no}"
+debug() {
+  if [[ "$DEBUG" == "yes" ]]; then
+    echo -e "\033[0;35m[DEBUG] $1\033[0m"
+  fi
+}
 
 # Colors
 RED='\033[0;31m'
@@ -24,11 +33,17 @@ echo ""
 
 # Read new framework version
 FRAMEWORK_VERSION=""
+debug "Looking for VERSION at: $NEW_FRAMEWORK_DIR/VERSION"
 if [[ -f "$NEW_FRAMEWORK_DIR/VERSION" ]]; then
   FRAMEWORK_VERSION=$(cat "$NEW_FRAMEWORK_DIR/VERSION" | tr -d '[:space:]')
   echo "New framework version: $FRAMEWORK_VERSION"
   echo ""
+else
+  echo -e "${YELLOW}⚠ Warning: VERSION file not found at $NEW_FRAMEWORK_DIR/VERSION${NC}"
+  echo "  The upgrade will continue but version tracking may not work correctly."
+  echo ""
 fi
+debug "FRAMEWORK_VERSION=$FRAMEWORK_VERSION"
 
 # Step 1: Pre-flight checks
 echo -e "${BLUE}[1/7] Pre-flight checks${NC}"
@@ -195,27 +210,8 @@ fi
 
 echo ""
 
-# Step 6: Update version in STACK.md
-echo -e "${BLUE}[6/7] Updating STACK.md${NC}"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-if [[ -f "$TARGET_PROJECT_DIR/STACK.md" && "$NEW_VERSION" != "unknown" ]]; then
-  if [[ "$DRY_RUN" == "yes" ]]; then
-    echo "  [DRY RUN] Would update version in STACK.md to $NEW_VERSION"
-  else
-    # Update version field (handles both "- Version:" and "Version:" formats)
-    if grep -qE "^\s*-?\s*Version:" "$TARGET_PROJECT_DIR/STACK.md"; then
-      sed -i.bak -E "s/(^\s*-?\s*Version:\s*)[0-9.]+.*/\1$NEW_VERSION  <!-- Updated: $(date +%Y-%m-%d) -->/" "$TARGET_PROJECT_DIR/STACK.md"
-      rm "$TARGET_PROJECT_DIR/STACK.md.bak" 2>/dev/null || true
-      echo -e "${GREEN}✓ Updated version in STACK.md to $NEW_VERSION${NC}"
-    else
-      echo -e "${YELLOW}⚠ Warning: Could not find 'Version:' field in STACK.md${NC}"
-      echo "  Please update manually to: Version: $NEW_VERSION"
-    fi
-  fi
-else
-  echo -e "${YELLOW}⚠ Skipping STACK.md update${NC}"
-fi
+# Step 6: REMOVED - consolidated into Step 7
+# (Previous versions had duplicate STACK.md update logic here and in Step 7)
 
 echo ""
 
@@ -276,54 +272,84 @@ fi
 
 echo ""
 
-# Step 7: Update STACK.md with new version (robust pattern matching)
-echo -e "${BLUE}[7/7] Updating STACK.md with new framework version${NC}"
+# Step 6: Update STACK.md with new version (consolidated, robust pattern matching)
+echo -e "${BLUE}[6/7] Updating STACK.md with new framework version${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
+# Use whichever version variable is set (FRAMEWORK_VERSION or NEW_VERSION as fallback)
+VERSION_TO_USE="${FRAMEWORK_VERSION:-$NEW_VERSION}"
+debug "VERSION_TO_USE='$VERSION_TO_USE' (FRAMEWORK_VERSION='$FRAMEWORK_VERSION', NEW_VERSION='$NEW_VERSION')"
+
 STACK_UPDATED="no"
-if [[ -n "$FRAMEWORK_VERSION" && -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+debug "Checking STACK.md update conditions:"
+debug "  VERSION_TO_USE='$VERSION_TO_USE'"
+debug "  STACK.md exists at $TARGET_PROJECT_DIR/STACK.md? $(test -f "$TARGET_PROJECT_DIR/STACK.md" && echo yes || echo no)"
+
+if [[ -z "$VERSION_TO_USE" || "$VERSION_TO_USE" == "unknown" ]]; then
+  echo -e "${RED}✗ Cannot update STACK.md: version not determined${NC}"
+  echo "  Check that VERSION file exists in the framework being used for upgrade"
+elif [[ ! -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+  echo -e "${YELLOW}⚠ STACK.md not found - skipping version update${NC}"
+else
   # Try multiple patterns to catch all STACK.md formats
   # Pattern 1: "- Version: X.Y.Z" (standard format)
   # Pattern 2: "Version: X.Y.Z" (no dash)
   # Pattern 3: "  - Version: X.Y.Z" (indented)
   
+  debug "Looking for Version: pattern in STACK.md"
   if grep -qE "^[[:space:]]*-?[[:space:]]*Version:" "$TARGET_PROJECT_DIR/STACK.md"; then
+    debug "Found Version: pattern, updating..."
     if [[ "$OSTYPE" == "darwin"* ]]; then
       # macOS sed
-      sed -i '' -E "s/^([[:space:]]*-?[[:space:]]*Version:[[:space:]]*)[0-9]+\.[0-9]+\.[0-9]+.*/\1$FRAMEWORK_VERSION/" "$TARGET_PROJECT_DIR/STACK.md"
+      sed -i '' -E "s/^([[:space:]]*-?[[:space:]]*Version:[[:space:]]*)[0-9]+\.[0-9]+\.[0-9]+.*/\1$VERSION_TO_USE/" "$TARGET_PROJECT_DIR/STACK.md"
     else
       # Linux sed
-      sed -i -E "s/^([[:space:]]*-?[[:space:]]*Version:[[:space:]]*)[0-9]+\.[0-9]+\.[0-9]+.*/\1$FRAMEWORK_VERSION/" "$TARGET_PROJECT_DIR/STACK.md"
+      sed -i -E "s/^([[:space:]]*-?[[:space:]]*Version:[[:space:]]*)[0-9]+\.[0-9]+\.[0-9]+.*/\1$VERSION_TO_USE/" "$TARGET_PROJECT_DIR/STACK.md"
     fi
     STACK_UPDATED="yes"
-    echo -e "  ${GREEN}✓${NC} Updated STACK.md version to $FRAMEWORK_VERSION"
+    echo -e "  ${GREEN}✓${NC} Updated STACK.md version to $VERSION_TO_USE"
   else
     echo -e "  ${YELLOW}⚠ Version field not found in STACK.md${NC}"
-    echo "  Add manually: - Version: $FRAMEWORK_VERSION"
+    echo "  Add manually: - Version: $VERSION_TO_USE"
+    debug "STACK.md content (first 20 lines):"
+    debug "$(head -20 "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null || echo 'Could not read')"
   fi
   
   # Verify the update worked
   if [[ "$STACK_UPDATED" == "yes" ]]; then
-    UPDATED_VERSION=$(grep -oE "Version:[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+" "$TARGET_PROJECT_DIR/STACK.md" | head -1 | grep -oE "[0-9]+\.[0-9]+\.[0-9]+")
-    if [[ "$UPDATED_VERSION" != "$FRAMEWORK_VERSION" ]]; then
-      echo -e "  ${RED}✗ STACK.md version mismatch: expected $FRAMEWORK_VERSION, got $UPDATED_VERSION${NC}"
+    UPDATED_VERSION=$(grep -oE "Version:[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+" "$TARGET_PROJECT_DIR/STACK.md" | head -1 | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" || echo "")
+    debug "Verification: UPDATED_VERSION='$UPDATED_VERSION', expected='$VERSION_TO_USE'"
+    if [[ "$UPDATED_VERSION" != "$VERSION_TO_USE" ]]; then
+      echo -e "  ${RED}✗ STACK.md version mismatch: expected $VERSION_TO_USE, got ${UPDATED_VERSION:-nothing}${NC}"
       echo "  Please update manually!"
       STACK_UPDATED="no"
+    else
+      debug "Verification passed!"
     fi
   fi
-else
-  echo -e "  ${YELLOW}⚠ Could not update version (STACK.md not found or version unknown)${NC}"
 fi
 
 # Also update .agentic/VERSION file
-if [[ -n "$FRAMEWORK_VERSION" ]]; then
-  echo "$FRAMEWORK_VERSION" > "$TARGET_PROJECT_DIR/.agentic/VERSION"
-  echo -e "  ${GREEN}✓${NC} Updated .agentic/VERSION to $FRAMEWORK_VERSION"
+if [[ -n "$VERSION_TO_USE" && "$VERSION_TO_USE" != "unknown" ]]; then
+  echo "$VERSION_TO_USE" > "$TARGET_PROJECT_DIR/.agentic/VERSION"
+  echo -e "  ${GREEN}✓${NC} Updated .agentic/VERSION to $VERSION_TO_USE"
+else
+  echo -e "  ${YELLOW}⚠${NC} Could not update .agentic/VERSION (version unknown)"
 fi
 
-# Create upgrade marker for agent to pick up at next session
-UPGRADE_MARKER="$TARGET_PROJECT_DIR/.agentic/.upgrade_pending"
-cat > "$UPGRADE_MARKER" << EOF
+# Step 7: Create upgrade marker for agent to pick up at next session
+echo -e "${BLUE}[7/7] Creating upgrade marker${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+debug "Creating upgrade marker at: $TARGET_PROJECT_DIR/.agentic/.upgrade_pending"
+debug "  .agentic dir exists? $(test -d "$TARGET_PROJECT_DIR/.agentic" && echo yes || echo no)"
+
+if [[ ! -d "$TARGET_PROJECT_DIR/.agentic" ]]; then
+  echo -e "${RED}✗ Cannot create marker: .agentic/ directory not found${NC}"
+  echo "  This is unexpected after upgrade. Check the upgrade output above."
+else
+  UPGRADE_MARKER="$TARGET_PROJECT_DIR/.agentic/.upgrade_pending"
+  cat > "$UPGRADE_MARKER" << EOF
 # 🚨 FRAMEWORK UPGRADE PENDING - READ THIS FIRST!
 
 **DO NOT search through .agentic/ randomly. This file tells you everything.**
@@ -331,26 +357,26 @@ cat > "$UPGRADE_MARKER" << EOF
 ## Upgrade Summary
 
 - **From**: ${CURRENT_VERSION:-unknown}
-- **To**: $FRAMEWORK_VERSION
+- **To**: ${VERSION_TO_USE:-unknown}
 - **Date**: $(date +%Y-%m-%d)
 - **STACK.md updated**: ${STACK_UPDATED}
 
 ## Your TODO List (complete all, then delete this file):
 
 1. ✅ Read this file (you're doing it now)
-2. [ ] If "STACK.md updated: no" above → manually update: \`- Version: $FRAMEWORK_VERSION\`
+2. [ ] If "STACK.md updated: no" above → manually update: \`- Version: ${VERSION_TO_USE:-unknown}\`
 3. [ ] Check spec files for format markers (add if missing):
        - spec/FEATURES.md → \`<!-- format: features-v0.2.0 -->\`
        - spec/NFR.md → \`<!-- format: nfr-v0.1.0 -->\`
        - spec/ISSUES.md → \`<!-- format: issues-v0.1.0 -->\`
 4. [ ] Read .agentic/START_HERE.md (5 min) for new workflows
 5. [ ] Validate specs: \`python3 .agentic/tools/validate_specs.py\`
-6. [ ] Review CHANGELOG: $FRAMEWORK_VERSION changes
+6. [ ] Review CHANGELOG: ${VERSION_TO_USE:-unknown} changes
 7. [ ] Delete this file: \`rm .agentic/.upgrade_pending\`
 
 ## Changelog
 
-See: https://github.com/tomgun/agentic-framework/blob/v$FRAMEWORK_VERSION/CHANGELOG.md
+See: https://github.com/tomgun/agentic-framework/blob/v${VERSION_TO_USE:-unknown}/CHANGELOG.md
 
 ## Don't Waste Tokens!
 
@@ -358,7 +384,13 @@ See: https://github.com/tomgun/agentic-framework/blob/v$FRAMEWORK_VERSION/CHANGE
 - Don't search .agentic/ for upgrade info - it's all here
 - After completing TODO, delete this file
 EOF
-echo -e "  ${GREEN}✓${NC} Created .upgrade_pending marker for agent"
+
+  if [[ -f "$UPGRADE_MARKER" ]]; then
+    echo -e "  ${GREEN}✓${NC} Created .upgrade_pending marker for agent"
+  else
+    echo -e "  ${RED}✗${NC} Failed to create .upgrade_pending marker"
+  fi
+fi
 
 echo ""
 
@@ -372,8 +404,8 @@ if [[ "$DRY_RUN" == "yes" ]]; then
   echo -e "${YELLOW}This was a DRY RUN. No changes were made.${NC}"
   echo "To perform the actual upgrade, run without DRY_RUN=yes"
 else
-  if [[ -n "$FRAMEWORK_VERSION" ]]; then
-    echo -e "${GREEN}✓ Framework upgraded to version $FRAMEWORK_VERSION${NC}"
+  if [[ -n "$VERSION_TO_USE" && "$VERSION_TO_USE" != "unknown" ]]; then
+    echo -e "${GREEN}✓ Framework upgraded to version $VERSION_TO_USE${NC}"
   else
     echo -e "${GREEN}✓ Framework upgraded${NC}"
   fi
@@ -381,7 +413,7 @@ else
   echo "Project: $TARGET_PROJECT_DIR"
   echo ""
   echo "Next steps:"
-  echo "  1. Review CHANGELOG: https://github.com/tomgun/agentic-framework/blob/v$FRAMEWORK_VERSION/CHANGELOG.md"
+  echo "  1. Review CHANGELOG: https://github.com/tomgun/agentic-framework/blob/v${VERSION_TO_USE:-latest}/CHANGELOG.md"
   echo "  2. Test your workflow: bash .agentic/tools/dashboard.sh"
   echo "  3. Run quality checks: bash quality_checks.sh --pre-commit (if configured)"
   echo ""
