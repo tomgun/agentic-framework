@@ -5,6 +5,70 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.3] - 2025-01-08
+
+### FIXED: Upgrade Script Bug (STACK.md & .upgrade_pending not created)
+
+**Root Cause Found**: The upgrade script had **duplicate STACK.md update logic** in Step 6 and Step 7, using different variables (`NEW_VERSION` vs `FRAMEWORK_VERSION`). This caused confusion and silent failures.
+
+#### Bug Fix
+
+1. **Removed duplicate Step 6** - Consolidated into Step 7
+2. **Unified version variable** - Now uses `VERSION_TO_USE` consistently
+3. **Added explicit error messages** - Script now tells you exactly what failed
+4. **Added debug mode** - Run `DEBUG=yes bash upgrade.sh ...` to diagnose issues
+5. **Verification after update** - Confirms STACK.md was actually updated
+6. **Better .upgrade_pending creation** - Checks .agentic/ exists before writing
+
+#### How to Use Debug Mode
+
+```bash
+DEBUG=yes bash /path/to/upgrade.sh /your/project
+```
+
+Shows:
+- VERSION file location being checked
+- Whether STACK.md exists and its content
+- Pattern matching results
+- Verification results
+
+### Added: Integration Test Plan
+
+**Problem**: Framework features not validated end-to-end. Upgrade script may silently fail.
+
+#### New: Integration Test Plan
+
+Created `tests/INTEGRATION_TEST_PLAN.md` documenting:
+- **Installation tests** (INST-01 to INST-03)
+- **Upgrade tests** (UPG-01 to UPG-05) - covers the bugs reported
+- **Tool tests** (TOOL-01 to TOOL-07)
+- **Agent simulation tests** (AGT-01 to AGT-03)
+- **Cross-environment tests** (ENV-01 to ENV-03)
+- Manual test scenarios for agent behavior
+- Future CI/CD integration plan
+
+#### New: Upgrade Script Debug Mode
+
+Run with `DEBUG=yes` to diagnose issues:
+```bash
+DEBUG=yes bash upgrade.sh /path/to/project
+```
+
+Shows:
+- Where VERSION file is being read from
+- Whether STACK.md exists and its path
+- Whether .agentic/ directory exists before creating marker
+- All conditions being checked
+
+#### Quality Assurance Philosophy
+
+- Static checks (`validate_framework.sh`) ≠ working software
+- Integration tests validate actual behavior
+- Manual scenarios test agent interaction
+- Debug mode helps diagnose real-world issues
+
+---
+
 ## [0.9.2] - 2025-01-08
 
 ### Fixed: Additional Upgrade Issues
