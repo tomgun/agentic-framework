@@ -95,8 +95,8 @@ This creates all expected files/folders with templates/placeholders so you can s
 
 ### If Claude Desktop (a):
 ```bash
-# Copy Claude instructions to project root
-cp .agentic/agents/claude/CLAUDE.md CLAUDE.md
+# Set up Claude (creates CLAUDE.md automatically)
+bash .agentic/tools/setup-agent.sh claude
 
 # Enable Claude hooks (automatic checkpoints!)
 mkdir -p .claude
@@ -139,12 +139,11 @@ echo "  - User must apply suggestions (Copilot can't edit directly)"
 
 ### If Multiple (a) - RECOMMENDED:
 ```bash
-# Install all adapters for seamless environment switching
-cp .agentic/agents/claude/CLAUDE.md CLAUDE.md
+# Install all tool adapters for seamless environment switching
+bash .agentic/tools/setup-agent.sh all
+
+# Enable Claude hooks for automatic checkpoints (optional but recommended)
 mkdir -p .claude && cp .agentic/claude-hooks/hooks.json .claude/
-mkdir -p .cursor/rules && cp .agentic/agents/cursor/agentic-framework.mdc .cursor/rules/
-cp .agentic/agents/cursor/cursorrules.txt .cursorrules
-mkdir -p .github && cp .agentic/agents/copilot/copilot-instructions.md .github/
 
 echo "✓ Multi-environment setup complete:"
 echo ""

@@ -114,7 +114,10 @@ if [[ ! -f "${ROOT_DIR}/AGENTS.md" ]]; then
   cat > "${ROOT_DIR}/AGENTS.md" <<'EOF'
 # AGENTS.md
 
-This repo uses the agentic framework located at `.agentic/`.
+> **Note**: This file is a REFERENCE document. It is NOT auto-loaded by AI tools.
+> The auto-loaded files (CLAUDE.md, .cursorrules, etc.) point to this file.
+
+This repo uses the **Agentic Framework** located at `.agentic/`.
 
 ## Non-negotiables
 
@@ -133,7 +136,18 @@ This repo uses the agentic framework located at `.agentic/`.
 - Run smoke tests before claiming features work
 - Separate business logic from UI for testability
 
-Full rules: `.agentic/agents/shared/agent_operating_guidelines.md`
+## Full Guidelines
+
+See `.agentic/agents/shared/agent_operating_guidelines.md`
+
+## Tool-Specific Files
+
+These are auto-loaded by your AI tool:
+- **Claude Code**: `CLAUDE.md`
+- **Cursor**: `.cursorrules`
+- **GitHub Copilot**: `.github/copilot-instructions.md`
+
+To regenerate: `bash .agentic/tools/setup-agent.sh all`
 EOF
   echo "NEW : ${ROOT_DIR}/AGENTS.md (entrypoint)"
 else
@@ -141,6 +155,12 @@ else
 fi
 
 if [[ "${PROFILE}" == "core" ]]; then
+  echo ""
+  # Set up tool-specific auto-loaded files
+  echo "Setting up AI tool integration..."
+  if [[ -f "${ROOT_DIR}/.agentic/tools/setup-agent.sh" ]]; then
+    bash "${ROOT_DIR}/.agentic/tools/setup-agent.sh" all 2>/dev/null || true
+  fi
   echo ""
   echo "Done (Core). Next: tell your agent to initialize using .agentic/init/init_playbook.md"
   echo "To enable Product Management later: bash .agentic/tools/enable-product-management.sh"
@@ -226,6 +246,14 @@ else
   fi
 fi
 
-echo "Done. Next: run the agent-guided init in .agentic/init/init_playbook.md"
+# Set up tool-specific auto-loaded files
+echo ""
+echo "Setting up AI tool integration..."
+if [[ -f "${ROOT_DIR}/.agentic/tools/setup-agent.sh" ]]; then
+  bash "${ROOT_DIR}/.agentic/tools/setup-agent.sh" all 2>/dev/null || true
+fi
+
+echo ""
+echo "Done (Core+PM). Next: run the agent-guided init in .agentic/init/init_playbook.md"
 
 
