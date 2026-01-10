@@ -26,13 +26,13 @@ curl -s https://api.github.com/repos/tomgun/agentic-framework/releases/latest | 
 
 # Download new framework to temp location
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.3.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.4.tar.gz | tar xz
 
 # Run upgrade tool FROM the new framework
-bash /tmp/agentic-framework-0.9.3/.agentic/tools/upgrade.sh /path/to/your-project
+bash /tmp/agentic-framework-0.9.4/.agentic/tools/upgrade.sh /path/to/your-project
 
 # Clean up
-rm -rf /tmp/agentic-framework-0.9.3
+rm -rf /tmp/agentic-framework-0.9.4
 ```
 
 ### What's the current status?

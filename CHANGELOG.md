@@ -5,6 +5,53 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.4] - 2025-01-08
+
+### NEW: Tool-Specific Initialization (Critical Fix!)
+
+**Problem**: `AGENTS.md` is NOT auto-loaded by any AI tool!
+- Claude Code auto-loads `CLAUDE.md`
+- Cursor auto-loads `.cursorrules`
+- Copilot auto-loads `.github/copilot-instructions.md`
+
+Agents weren't seeing framework instructions unless manually told to read AGENTS.md.
+
+#### New: setup-agent.sh
+
+```bash
+# Set up for your specific tool
+bash .agentic/tools/setup-agent.sh claude   # Creates CLAUDE.md
+bash .agentic/tools/setup-agent.sh cursor   # Creates .cursorrules
+bash .agentic/tools/setup-agent.sh copilot  # Creates copilot-instructions.md
+bash .agentic/tools/setup-agent.sh all      # All of the above
+```
+
+#### Updated: scaffold.sh
+
+Now automatically runs `setup-agent.sh all` during initialization, so all tool-specific files are created.
+
+#### Updated: AGENTS.md
+
+Now clarifies it's a REFERENCE file (not auto-loaded) and lists the tool-specific files.
+
+#### Updated: Documentation
+
+- `START_HERE.md`: Explains AGENTS.md vs auto-loaded files
+- `init_playbook.md`: Uses setup-agent.sh instead of manual cp
+- `.agentic/agents/installation.md`: Comprehensive tool setup guide
+
+#### Supported Tools
+
+| Tool | Auto-Loaded File |
+|------|------------------|
+| Claude Code | CLAUDE.md |
+| Cursor | .cursorrules |
+| GitHub Copilot | .github/copilot-instructions.md |
+| Codex (OpenAI) | .codex/instructions.md (documented) |
+| Gemini CLI | .gemini/instructions.md (documented) |
+
+---
+
 ## [0.9.3] - 2025-01-08
 
 ### FIXED: Upgrade Script Bug (STACK.md & .upgrade_pending not created)

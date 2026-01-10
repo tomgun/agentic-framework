@@ -1,51 +1,125 @@
-# Agent adapter installation
+# Agent Tool Installation Guide
 
-Goal: make **all agents** (Cursor / Copilot / Claude) follow the same operating rules.
+**Critical**: `AGENTS.md` is a **reference file** that is NOT auto-loaded by any AI coding tool!
 
-## Canonical truth (works for all agents)
-These files should exist at repo root (created by `bash .agentic/init/scaffold.sh`):
-- `STACK.md`
-- `CONTEXT_PACK.md`
-- `STATUS.md`
-- `/spec/`
-- `spec/adr/`
+Each tool has its own auto-loaded file:
 
-## Shared agent rules
-Recommended: ensure `AGENTS.md` exists at repo root (created by scaffold). If you need to recreate it:
+| Tool | Auto-Loaded File | How to Create |
+|------|------------------|---------------|
+| Claude Code | `CLAUDE.md` | `bash .agentic/tools/setup-agent.sh claude` |
+| Cursor | `.cursorrules` | `bash .agentic/tools/setup-agent.sh cursor` |
+| GitHub Copilot | `.github/copilot-instructions.md` | `bash .agentic/tools/setup-agent.sh copilot` |
+| **All tools** | All of the above | `bash .agentic/tools/setup-agent.sh all` |
 
-```bash
-bash .agentic/init/scaffold.sh
-```
+---
 
-## Cursor (2.2+)
-Preferred (modern) rule location:
+## Quick Setup
 
 ```bash
-mkdir -p .cursor/rules
-cp .agentic/agents/cursor/agentic-framework.mdc .cursor/rules/agentic-framework.mdc
+# Set up for your specific tool:
+bash .agentic/tools/setup-agent.sh claude   # Claude Code
+bash .agentic/tools/setup-agent.sh cursor   # Cursor
+bash .agentic/tools/setup-agent.sh copilot  # GitHub Copilot
+
+# Or set up all tools at once:
+bash .agentic/tools/setup-agent.sh all
 ```
 
-Compatibility (older):
+---
+
+## What Each File Does
+
+### CLAUDE.md (Claude Code)
+
+- Auto-loaded by Claude Code at session start
+- Contains mandatory session protocol
+- Points to `.agentic/agents/shared/agent_operating_guidelines.md`
+- Includes Claude-specific optimizations
+
+### .cursorrules (Cursor)
+
+- Auto-loaded by Cursor when opening project
+- Minimal file pointing to framework guidelines
+- Also creates `.cursor/rules/agentic-framework.mdc` if `.cursor/` exists
+
+### .github/copilot-instructions.md (GitHub Copilot)
+
+- Auto-loaded by GitHub Copilot
+- Contains mandatory protocols
+- Points to full guidelines
+
+---
+
+## What About AGENTS.md?
+
+`AGENTS.md` is:
+- ✅ A human-readable reference of non-negotiables
+- ✅ Included by the auto-loaded files
+- ❌ NOT auto-loaded by any tool
+
+Keep `AGENTS.md` as the source of truth for non-negotiables, but ensure agents actually see them by setting up the tool-specific files.
+
+---
+
+## Research: Other Tools
+
+### Codex (OpenAI CLI)
+
+As of 2025, Codex CLI uses:
+- `.codex/instructions.md` (if exists)
+- Falls back to reading README.md
+
+To support Codex, create `.codex/instructions.md`:
+```bash
+mkdir -p .codex
+cp .agentic/agents/shared/agent_operating_guidelines.md .codex/instructions.md
+```
+
+### Gemini CLI
+
+As of 2025, Gemini CLI uses:
+- `.gemini/instructions.md` (if exists)
+- Or specify via `--system-prompt` flag
+
+To support Gemini, create `.gemini/instructions.md`:
+```bash
+mkdir -p .gemini
+cp .agentic/agents/shared/agent_operating_guidelines.md .gemini/instructions.md
+```
+
+### Amazon Q Developer
+
+Uses `.amazonq/instructions.md`.
+
+### Other Tools
+
+If your tool isn't listed:
+1. Check your tool's documentation for auto-loaded file locations
+2. Copy the content from `.agentic/agents/shared/agent_operating_guidelines.md`
+3. Consider contributing the setup to this framework!
+
+---
+
+## Verifying Setup
+
+After running setup, verify the files were created:
 
 ```bash
-cp .agentic/agents/cursor/cursorrules.txt .cursorrules
+# Check what files exist
+ls -la CLAUDE.md .cursorrules .github/copilot-instructions.md 2>/dev/null
+
+# Verify content
+head -20 CLAUDE.md
 ```
 
-## GitHub Copilot
+---
+
+## Updating Tool Files
+
+If you update `.agentic/agents/*/` content, re-run setup:
 
 ```bash
-mkdir -p .github
-cp .agentic/agents/copilot/copilot-instructions.md .github/copilot-instructions.md
+bash .agentic/tools/setup-agent.sh all
 ```
 
-## Claude
-
-```bash
-cp .agentic/agents/claude/CLAUDE.md CLAUDE.md
-```
-
-## Avoiding conflicts (multi-agent repos)
-- Treat `AGENTS.md` (if present) as the **single behavioral contract**.
-- Keep tool-specific instruction files thin and pointing back to `AGENTS.md`, `CONTEXT_PACK.md`, `STATUS.md`.
-
-
+The script will backup existing files before overwriting.

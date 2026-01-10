@@ -28,13 +28,13 @@
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.3.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.4.tar.gz | tar xz
 
 # Run the installer
-bash agentic-framework-0.9.3/install.sh
+bash agentic-framework-0.9.4/install.sh
 
 # Clean up
-rm -rf agentic-framework-0.9.3
+rm -rf agentic-framework-0.9.4
 ```
 
 ### Step 2: Tell your agent to initialize
@@ -55,7 +55,10 @@ Open your AI agent (Cursor/Copilot/Claude) and say:
 ### What gets created (by the agent)
 
 Files at your repo root:
-- `AGENTS.md` - Entry point for AI agents
+- `AGENTS.md` - Reference for AI agent rules (NOT auto-loaded, see below)
+- `CLAUDE.md` - Auto-loaded by Claude Code
+- `.cursorrules` - Auto-loaded by Cursor
+- `.github/copilot-instructions.md` - Auto-loaded by GitHub Copilot
 - `STACK.md` - Tech stack, how to build/test
 - `STATUS.md` - Current state and roadmap
 - `CONTEXT_PACK.md` - Architecture snapshot
@@ -221,8 +224,15 @@ Details: [`.agentic/workflows/dev_loop.md`](workflows/dev_loop.md)
 ## What Files Mean
 
 ### At repo root (created by scaffold)
-- **AGENTS.md**: Entry point for AI agents (points to framework rules)
+- **AGENTS.md**: Reference document with non-negotiable rules (NOT auto-loaded)
+- **CLAUDE.md**: Auto-loaded by Claude Code → points to framework rules
+- **.cursorrules**: Auto-loaded by Cursor → points to framework rules  
+- **.github/copilot-instructions.md**: Auto-loaded by GitHub Copilot
 - **STACK.md**: Tech stack, how to build/test, constraints
+
+> **Important**: `AGENTS.md` is a human-readable reference. AI tools auto-load their specific files (CLAUDE.md, .cursorrules, etc.) which point to AGENTS.md.
+> 
+> To regenerate tool files: `bash .agentic/tools/setup-agent.sh all`
 - **STATUS.md**: Current state, what's in progress, roadmap
 - **CONTEXT_PACK.md**: Durable context (architecture snapshot, where to look)
 - **JOURNAL.md**: Session-by-session progress (what was done, what's next, blockers)
