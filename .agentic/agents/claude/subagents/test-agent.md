@@ -2,7 +2,9 @@
 
 **Purpose**: Write and run tests for implemented features.
 
-**Recommended Model**: `sonnet` (needs reasoning for good test design)
+**Recommended Model Tier**: Mid-tier (e.g., `sonnet`, `gpt-4o`)
+
+**Model selection principle**: Test design needs reasoning for edge cases. Don't use cheap models for test quality.
 
 ## When to Use
 

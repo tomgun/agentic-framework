@@ -843,38 +843,42 @@ You can maintain FEATURES.md manually AND use migrations as complementary histor
 See `.agentic/token_efficiency/agent_delegation_savings.md` for quantified savings (60-83% reduction typical).
 
 Available agents in `.agentic/agents/claude/subagents/`:
-- `explore-agent` - Quick codebase exploration (use haiku model)
-- `implementation-agent` - Write production code (use sonnet/opus)
-- `test-agent` - Write and run tests (use sonnet)
-- `review-agent` - Code review and refactoring (use sonnet)
-- `research-agent` - Web search, documentation lookup (use haiku/sonnet)
+- `explore-agent` - Quick codebase exploration (cheap/fast model)
+- `implementation-agent` - Write production code (mid-tier/powerful model)
+- `test-agent` - Write and run tests (mid-tier model)
+- `review-agent` - Code review and refactoring (mid-tier model)
+- `research-agent` - Web search, documentation lookup (cheap for lookups, mid-tier for analysis)
 
 ### When to Delegate
 
-| Task Type | Delegate To | Model |
-|-----------|-------------|-------|
-| "Where is X defined?" | explore-agent | haiku |
-| "Find all uses of Y" | explore-agent | haiku |
-| Implement feature (>20 lines) | implementation-agent | sonnet |
-| Complex implementation | implementation-agent | opus |
-| Write tests for code | test-agent | sonnet |
-| Review before commit | review-agent | sonnet |
-| Look up documentation | research-agent | haiku |
-| Compare tech options | research-agent | sonnet |
+| Task Type | Delegate To | Model Tier |
+|-----------|-------------|------------|
+| "Where is X defined?" | explore-agent | Cheap/Fast |
+| "Find all uses of Y" | explore-agent | Cheap/Fast |
+| Implement feature (>20 lines) | implementation-agent | Mid-tier |
+| Complex implementation | implementation-agent | Powerful |
+| Write tests for code | test-agent | Mid-tier |
+| Review before commit | review-agent | Mid-tier |
+| Look up documentation | research-agent | Cheap/Fast |
+| Compare tech options | research-agent | Mid-tier |
 
 ### Delegation Rules
 
-1. **For exploration/search tasks**: Spawn explore-agent with haiku model
+1. **For exploration/search tasks**: Spawn explore-agent with cheap/fast model
 2. **For implementation >50 lines**: Spawn implementation-agent
 3. **For test writing**: Spawn test-agent after implementation
 4. **For multi-file changes**: Consider parallel agents
-5. **Always specify model**: Use haiku for quick lookups to save tokens
+5. **Match model to task complexity**: Simple = cheap, Complex = powerful
 
-### Model Selection
+### Model Selection (Tier-Based)
 
-- **haiku**: Fast, cheap. Use for exploration, simple lookups, quick searches
-- **sonnet**: Balanced. Use for implementation, testing, reviews
-- **opus**: Powerful, slow. Use for complex architecture, difficult bugs
+**Note**: Model names change frequently. Focus on the tier, not specific names.
+
+- **Cheap/Fast**: Exploration, lookups, simple searches (e.g., haiku, gpt-4o-mini, gemini-flash)
+- **Mid-tier**: Implementation, testing, reviews (e.g., sonnet, gpt-4o)
+- **Powerful**: Complex architecture, difficult bugs (e.g., opus, o1)
+
+Check your tool's current model offerings and map to these tiers.
 
 ### Creating Project-Specific Agents
 
