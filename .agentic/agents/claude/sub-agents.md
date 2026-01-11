@@ -12,6 +12,20 @@ Claude Code supports **sub-agents** - independent agent instances that:
 - Don't interfere with each other
 - Report back to the main agent
 
+## Quick Start: Use the Orchestrator
+
+The fastest way to use sub-agents:
+
+```
+Read .agentic/agents/claude/subagents/orchestrator-agent.md and coordinate feature F-0042
+```
+
+The orchestrator will:
+1. Delegate to specialized agents
+2. Verify quality gates at each step
+3. Ensure specs, tests, and docs are updated
+4. Block if quality criteria not met
+
 ## Setting Up Sub-Agents
 
 ### 1. Reference Role Definitions
@@ -19,17 +33,20 @@ Claude Code supports **sub-agents** - independent agent instances that:
 Tell Claude about the available roles:
 
 ```
-The project has specialized agent roles defined in .agentic/agents/roles/
-Available roles:
-- research_agent.md
-- planning_agent.md
-- test_agent.md
-- implementation_agent.md
-- review_agent.md
-- spec_update_agent.md
-- documentation_agent.md
-- git_agent.md
+The project has specialized agent roles defined in .agentic/agents/claude/subagents/
+Available agents (9 total):
+- orchestrator-agent.md  ← Start here! Coordinates all others
+- research-agent.md
+- planning-agent.md
+- test-agent.md
+- implementation-agent.md
+- review-agent.md
+- spec-update-agent.md
+- documentation-agent.md
+- git-agent.md
 ```
+
+**Tip**: Use the **orchestrator-agent** to manage features. It delegates to others and ensures compliance.
 
 ### 2. Start a Feature Pipeline
 
