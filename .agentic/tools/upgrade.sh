@@ -372,7 +372,11 @@ else
 4. [ ] Read .agentic/START_HERE.md (5 min) for new workflows
 5. [ ] Validate specs: \`python3 .agentic/tools/validate_specs.py\`
 6. [ ] Review CHANGELOG: ${VERSION_TO_USE:-unknown} changes
-7. [ ] Delete this file: \`rm .agentic/.upgrade_pending\`
+7. [ ] **NEW FEATURES CHECK**: Ask user about new features added since their last version:
+       - Sub-agent setup: \`bash .agentic/tools/setup-agent.sh cursor-agents\` (for specialized agents)
+       - Multi-agent pipeline: \`bash .agentic/tools/setup-agent.sh pipeline\` (for parallel work)
+       - Tool setup: \`bash .agentic/tools/setup-agent.sh all\` (auto-loaded instructions)
+8. [ ] Delete this file: \`rm .agentic/.upgrade_pending\`
 
 ## Changelog
 
