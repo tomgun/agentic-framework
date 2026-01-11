@@ -834,6 +834,14 @@ You can maintain FEATURES.md manually AND use migrations as complementary histor
 
 **Use specialized agents to save tokens and improve quality.**
 
+### Why Delegation Saves Tokens
+
+1. **Model cost**: haiku is ~10x cheaper than opus. Use haiku for exploration/search.
+2. **Fresh context**: Subagents start with focused context, not your entire conversation.
+3. **Parallel execution**: Multiple subagents can work simultaneously.
+
+See `.agentic/token_efficiency/agent_delegation_savings.md` for quantified savings (60-83% reduction typical).
+
 Available agents in `.agentic/agents/claude/subagents/`:
 - `explore-agent` - Quick codebase exploration (use haiku model)
 - `implementation-agent` - Write production code (use sonnet/opus)
