@@ -2,7 +2,9 @@
 
 **Purpose**: Web search, documentation lookup, technology research.
 
-**Recommended Model**: `haiku` (for quick lookups) or `sonnet` (for deep research)
+**Recommended Model Tier**: Cheap/Fast for lookups, Mid-tier for deep research
+
+**Model selection principle**: Simple lookups = cheap model. Comparing options or deep analysis = mid-tier.
 
 ## When to Use
 

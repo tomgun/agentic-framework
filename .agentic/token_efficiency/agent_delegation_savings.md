@@ -8,12 +8,17 @@
 
 | Task Type | Without Delegation | With Delegation | Savings |
 |-----------|-------------------|-----------------|---------|
-| Find file location | opus (expensive) | haiku explore-agent | ~90% |
-| Search for pattern | sonnet (moderate) | haiku explore-agent | ~70% |
-| Documentation lookup | opus (expensive) | haiku research-agent | ~90% |
-| Implementation | opus (full context) | sonnet impl-agent (focused) | ~50% |
+| Find file location | expensive model | cheap/fast model | ~90% |
+| Search for pattern | mid-tier model | cheap/fast model | ~70% |
+| Documentation lookup | expensive model | cheap/fast model | ~90% |
+| Implementation | expensive (full context) | mid-tier (focused) | ~50% |
 
-**Why it works**: Haiku is ~10x cheaper than Opus. Simple tasks don't need expensive reasoning.
+**Why it works**: Cheap/fast models cost ~10x less than expensive ones. Simple tasks don't need expensive reasoning.
+
+**Model tiers** (examples, check current offerings):
+- **Cheap/Fast**: Claude Haiku, GPT-4o-mini, Gemini Flash
+- **Mid-tier**: Claude Sonnet, GPT-4o
+- **Expensive/Powerful**: Claude Opus, GPT-4, o1
 
 ### 2. Context Isolation Savings
 

@@ -2,7 +2,9 @@
 
 **Purpose**: Quick codebase exploration, finding files, understanding structure.
 
-**Recommended Model**: `haiku` (fast, cheap, sufficient for exploration)
+**Recommended Model Tier**: Cheap/Fast (e.g., `haiku`, `gpt-4o-mini`, `gemini-flash`)
+
+**Model selection principle**: This task doesn't need complex reasoning - use the cheapest available.
 
 ## When to Use
 

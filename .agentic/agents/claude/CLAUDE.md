@@ -236,27 +236,29 @@ bash .agentic/tools/blocker.sh resolve HN-0001 \
 
 Check `.agentic/agents/claude/subagents/` for agent definitions:
 
-| Agent | Use For | Model |
-|-------|---------|-------|
-| `explore-agent` | Finding code, searching patterns | haiku |
-| `implementation-agent` | Writing production code (>20 lines) | sonnet |
-| `test-agent` | Writing and running tests | sonnet |
-| `review-agent` | Code review before commit | sonnet |
-| `research-agent` | Documentation lookup, web search | haiku |
+| Agent | Use For | Model Tier |
+|-------|---------|------------|
+| `explore-agent` | Finding code, searching patterns | Cheap/Fast |
+| `implementation-agent` | Writing production code (>20 lines) | Mid-tier |
+| `test-agent` | Writing and running tests | Mid-tier |
+| `review-agent` | Code review before commit | Mid-tier |
+| `research-agent` | Documentation lookup, web search | Cheap/Fast |
 
 ### When to Delegate
 
-- **Exploration/search tasks**: Use explore-agent with haiku (cheap, fast)
-- **Implementation >50 lines**: Use implementation-agent with sonnet
+- **Exploration/search tasks**: Use explore-agent with cheap/fast model
+- **Implementation >50 lines**: Use implementation-agent with mid-tier model
 - **Test writing**: Use test-agent after implementation
 - **Multi-file changes**: Consider parallel agents
-- **Documentation lookup**: Use research-agent with haiku
+- **Documentation lookup**: Use research-agent with cheap/fast model
 
-### Model Selection
+### Model Selection (Tier-Based)
 
-- **haiku**: Fast, cheap → exploration, lookups, simple searches
-- **sonnet**: Balanced → implementation, testing, reviews
-- **opus**: Powerful → complex architecture, difficult bugs
+**Note**: Model names evolve. Focus on the tier, not specific names.
+
+- **Cheap/Fast**: Exploration, lookups (e.g., haiku, gpt-4o-mini)
+- **Mid-tier**: Implementation, testing, reviews (e.g., sonnet, gpt-4o)
+- **Powerful**: Complex architecture, difficult bugs (e.g., opus, o1)
 
 ### Example Delegation
 

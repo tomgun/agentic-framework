@@ -2,7 +2,9 @@
 
 **Purpose**: Write production code, implement features, fix bugs.
 
-**Recommended Model**: `sonnet` (balanced speed/quality) or `opus` (complex implementations)
+**Recommended Model Tier**: Mid-tier (e.g., `sonnet`, `gpt-4o`) or Powerful (e.g., `opus`, `o1`) for complex work
+
+**Model selection principle**: Balance cost vs quality. Use mid-tier for normal features, powerful for complex architecture.
 
 ## When to Use
 

@@ -2,7 +2,9 @@
 
 **Purpose**: Code review, quality checks, refactoring suggestions.
 
-**Recommended Model**: `sonnet` (needs nuanced judgment)
+**Recommended Model Tier**: Mid-tier (e.g., `sonnet`, `gpt-4o`)
+
+**Model selection principle**: Reviews need nuanced judgment about code quality. Worth the mid-tier cost.
 
 ## When to Use
 
