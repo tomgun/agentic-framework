@@ -223,6 +223,67 @@ bash .agentic/tools/blocker.sh resolve HN-0001 \
 
 ---
 
+## Agent Delegation (Use Task Tool!)
+
+**Spawn specialized agents to save tokens and improve quality.**
+
+### Available Agents
+
+Check `.agentic/agents/claude/subagents/` for agent definitions:
+
+| Agent | Use For | Model |
+|-------|---------|-------|
+| `explore-agent` | Finding code, searching patterns | haiku |
+| `implementation-agent` | Writing production code (>20 lines) | sonnet |
+| `test-agent` | Writing and running tests | sonnet |
+| `review-agent` | Code review before commit | sonnet |
+| `research-agent` | Documentation lookup, web search | haiku |
+
+### When to Delegate
+
+- **Exploration/search tasks**: Use explore-agent with haiku (cheap, fast)
+- **Implementation >50 lines**: Use implementation-agent with sonnet
+- **Test writing**: Use test-agent after implementation
+- **Multi-file changes**: Consider parallel agents
+- **Documentation lookup**: Use research-agent with haiku
+
+### Model Selection
+
+- **haiku**: Fast, cheap → exploration, lookups, simple searches
+- **sonnet**: Balanced → implementation, testing, reviews
+- **opus**: Powerful → complex architecture, difficult bugs
+
+### Example Delegation
+
+```
+# For quick codebase exploration
+Task tool:
+  subagent_type: explore
+  model: haiku
+  prompt: "Find where user authentication is implemented"
+
+# For implementation
+Task tool:
+  subagent_type: implementation
+  model: sonnet
+  prompt: "Implement password reset per spec/acceptance/F-0005.md"
+```
+
+### Project-Specific Agents
+
+Review available custom agents at session start:
+```bash
+ls .agentic/agents/claude/subagents/
+```
+
+Create custom agents for domain-specific work:
+```bash
+bash .agentic/tools/suggest-agents.sh  # See suggestions
+bash .agentic/tools/create-agent.sh game-rules  # Create one
+```
+
+---
+
 ## Multi-Agent Scenarios
 
 If multiple agents are working simultaneously:

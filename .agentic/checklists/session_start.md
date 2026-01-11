@@ -124,6 +124,17 @@
   - Check if `quality_checks.sh` exists at repo root
   - If missing, offer to create based on tech stack
 
+## Agent Delegation Check
+
+- [ ] **Review available agents** (for delegation opportunities)
+  ```bash
+  ls .agentic/agents/claude/subagents/ 2>/dev/null || echo "No subagents defined"
+  ```
+  - Consider if subtasks can be delegated to specialized agents
+  - Use `explore-agent` (haiku) for codebase searches
+  - Use `research-agent` (haiku) for documentation lookups
+  - See Agent Delegation Guidelines in operating guidelines
+
 ## Blockers Check
 
 - [ ] **Read `HUMAN_NEEDED.md`** (if exists and not empty)

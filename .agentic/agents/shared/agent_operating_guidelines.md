@@ -830,6 +830,59 @@ You can maintain FEATURES.md manually AND use migrations as complementary histor
 - FEATURES.md "Code:" field is empty for implemented feature
 - FEATURES.md "Tests: complete" but test files don't exist
 
+## Agent Delegation Guidelines
+
+**Use specialized agents to save tokens and improve quality.**
+
+Available agents in `.agentic/agents/claude/subagents/`:
+- `explore-agent` - Quick codebase exploration (use haiku model)
+- `implementation-agent` - Write production code (use sonnet/opus)
+- `test-agent` - Write and run tests (use sonnet)
+- `review-agent` - Code review and refactoring (use sonnet)
+- `research-agent` - Web search, documentation lookup (use haiku/sonnet)
+
+### When to Delegate
+
+| Task Type | Delegate To | Model |
+|-----------|-------------|-------|
+| "Where is X defined?" | explore-agent | haiku |
+| "Find all uses of Y" | explore-agent | haiku |
+| Implement feature (>20 lines) | implementation-agent | sonnet |
+| Complex implementation | implementation-agent | opus |
+| Write tests for code | test-agent | sonnet |
+| Review before commit | review-agent | sonnet |
+| Look up documentation | research-agent | haiku |
+| Compare tech options | research-agent | sonnet |
+
+### Delegation Rules
+
+1. **For exploration/search tasks**: Spawn explore-agent with haiku model
+2. **For implementation >50 lines**: Spawn implementation-agent
+3. **For test writing**: Spawn test-agent after implementation
+4. **For multi-file changes**: Consider parallel agents
+5. **Always specify model**: Use haiku for quick lookups to save tokens
+
+### Model Selection
+
+- **haiku**: Fast, cheap. Use for exploration, simple lookups, quick searches
+- **sonnet**: Balanced. Use for implementation, testing, reviews
+- **opus**: Powerful, slow. Use for complex architecture, difficult bugs
+
+### Creating Project-Specific Agents
+
+For domain-specific tasks, create custom agents:
+
+```bash
+# See suggestions based on your project
+bash .agentic/tools/suggest-agents.sh
+
+# Create a custom agent
+bash .agentic/tools/create-agent.sh chess-rules
+bash .agentic/tools/create-agent.sh godot-ui
+```
+
+Custom agents live in `.agentic/agents/claude/subagents/` and can be invoked the same way.
+
 ## Efficient Tool Usage (Core+Product Mode)
 
 **For projects with many features (50+), use these tools instead of manually editing specs:**
