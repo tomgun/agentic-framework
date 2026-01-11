@@ -5,6 +5,76 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.5] - 2025-01-11
+
+### NEW: Native Sub-Agent Integration
+
+Claude Code and Cursor support **specialized sub-agents** for task-specific work. This release adds full support for leveraging these native capabilities.
+
+#### 8 Agent Role Definitions
+
+Created `.agentic/agents/roles/` with specialized roles:
+
+| Role | Purpose | Output |
+|------|---------|--------|
+| Research Agent | Investigate tech choices | docs/research/*.md |
+| Planning Agent | Define features, acceptance criteria | spec/acceptance/*.md |
+| Test Agent | Write failing tests (TDD red) | tests/*.test.ts |
+| Implementation Agent | Make tests pass (TDD green) | src/*.ts |
+| Review Agent | Code review, quality checks | Approval/feedback |
+| Spec Update Agent | Update FEATURES.md status | spec/FEATURES.md |
+| Documentation Agent | Update docs | docs/, README |
+| Git Agent | Commits, PRs | Git operations |
+
+#### Tool-Specific Integration
+
+- **Claude Code**: `.agentic/agents/claude/sub-agents.md` - How to spawn sub-agents
+- **Cursor**: `.agentic/agents/cursor/agents-setup.md` - Custom agent setup
+
+#### Pipeline Coordination
+
+All agents update `.agentic/pipeline/F-####-pipeline.md` with:
+- Current phase and agent
+- Completed steps with timestamps
+- Handoff notes for next agent
+
+#### New: setup-agent.sh Options
+
+```bash
+# Multi-agent setup
+bash .agentic/tools/setup-agent.sh cursor-agents  # Copy roles to .cursor/agents/
+bash .agentic/tools/setup-agent.sh pipeline       # Create pipeline infrastructure
+```
+
+#### New: project-health.sh
+
+Manager oversight script for monitoring:
+- Pipeline status and stalled agents
+- Feature completion tracking
+- Documentation currency
+- HUMAN_NEEDED items
+- Active agent registry
+
+```bash
+bash .agentic/tools/project-health.sh --verbose
+```
+
+#### Updated: init_questions.md
+
+New question for development style:
+- (a) Single agent (default)
+- (b) Specialized agents (sequential pipeline)
+- (c) Parallel features (git worktrees)
+- (d) Not sure (start simple)
+
+#### Updated: multi_agent_coordination.md
+
+Clarified two approaches:
+1. **Native Sub-Agents**: Sequential pipeline for complex features
+2. **Git Worktrees**: Parallel work on independent features
+
+---
+
 ## [0.9.4] - 2025-01-08
 
 ### NEW: Tool-Specific Initialization (Critical Fix!)

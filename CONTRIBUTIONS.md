@@ -472,8 +472,32 @@ These real-world learnings directly shaped v0.4.x releases, making the framework
 
 ---
 
+## Multi-Agent Clarification (v0.9.5)
+
+### Critical Correction on Multi-Agent Definition
+
+**User feedback**:
+> "multiagent does not mean using many tools like claude+cursor"
+> "Both in claude and cursor you can create agents for specific tasks like a 'typescript engineer', 'reviewer', 'version control expert'"
+
+**Key insight**: Multi-agent refers to **specialized sub-agents within a single tool**, not just parallel use of different AI tools.
+
+**Result - Native Sub-Agent Integration**:
+- 8 specialized agent role definitions (Research, Planning, Test, Implementation, Review, Spec Update, Documentation, Git)
+- Claude Code sub-agent integration guide
+- Cursor custom agent setup guide
+- Pipeline coordination protocol (`.agentic/pipeline/F-####-pipeline.md`)
+- `project-health.sh` for manager oversight
+- Updated `init_questions.md` with agent style selection
+
+**Impact**: Framework now properly supports both:
+1. **Native sub-agents**: Specialized agents for sequential feature development
+2. **Git worktrees**: Parallel work on independent features
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework  
-**Current Version**: v0.9.0  
+**Current Version**: v0.9.5  
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)  
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 

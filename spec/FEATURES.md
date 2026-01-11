@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.9.0
+**Version**: 0.9.5
 
 ---
 
@@ -600,6 +600,66 @@
 - Tests: documented workflow
 
 **Acceptance**: See `spec/acceptance/F-0034.md`
+
+---
+
+## F-0035: Agent Role Definitions
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: medium  
+**Since**: v0.9.5
+
+**Description**: 8 specialized agent roles (Research, Planning, Test, Implementation, Review, Spec Update, Documentation, Git) with clear responsibilities, context requirements, and handoff protocols.
+
+**Dependencies**: F-0034
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/agents/roles/*.md` (8 role files)
+- Tests: role file existence validation
+
+**Acceptance**: See `spec/acceptance/F-0035.md`
+
+---
+
+## F-0036: Native Sub-Agent Integration
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: medium  
+**Since**: v0.9.5
+
+**Description**: Integration guides for Claude Code and Cursor native sub-agent capabilities.
+
+**Dependencies**: F-0035
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/agents/claude/sub-agents.md`, `.agentic/agents/cursor/agents-setup.md`
+- Tests: documentation validation
+
+**Acceptance**: See `spec/acceptance/F-0036.md`
+
+---
+
+## F-0037: Project Health Monitoring
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: medium  
+**Since**: v0.9.5
+
+**Description**: Manager oversight script for monitoring pipeline status, stalled agents, feature completion, documentation currency.
+
+**Dependencies**: F-0035, F-0031
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/project-health.sh`
+- Tests: script execution validation
+
+**Acceptance**: See `spec/acceptance/F-0037.md`
 
 ---
 

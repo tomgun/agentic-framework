@@ -2,6 +2,61 @@
 
 **Purpose**: Enable multiple AI agents to work simultaneously on different features without conflicts, using Git worktrees and coordination files.
 
+---
+
+## Two Approaches to Multi-Agent Development
+
+This framework supports **two complementary approaches**:
+
+### 1. Native Sub-Agents (Sequential Pipeline)
+
+Use the tool's built-in sub-agent capabilities for **specialized sequential work**:
+
+```
+Feature F-0042: User Authentication
+  ├── Research Agent → docs/research/auth.md
+  ├── Planning Agent → spec/acceptance/F-0042.md
+  ├── Test Agent → tests/auth.test.ts (all RED)
+  ├── Implementation Agent → src/auth.ts (all GREEN)
+  ├── Review Agent → APPROVED
+  ├── Spec Update Agent → FEATURES.md updated
+  ├── Documentation Agent → docs/auth.md
+  └── Git Agent → committed
+```
+
+**Best for**: Complex features with clear phases, context efficiency, quality gates.
+
+**Setup**:
+- Claude Code: See `.agentic/agents/claude/sub-agents.md`
+- Cursor: See `.agentic/agents/cursor/agents-setup.md`
+- Role definitions: `.agentic/agents/roles/`
+
+### 2. Git Worktrees (Parallel Features)
+
+Use Git worktrees for **parallel work on different features**:
+
+```
+/project/           (main) ← coordination hub
+/project-F0042/     (feature/F-0042) ← Agent 1
+/project-F0043/     (feature/F-0043) ← Agent 2
+```
+
+**Best for**: Independent features, team development, urgent parallel work.
+
+**Setup**: Run `bash .agentic/tools/setup-agent.sh pipeline`
+
+### Choosing the Right Approach
+
+| Scenario | Approach |
+|----------|----------|
+| Complex feature with research, testing, review phases | Native Sub-Agents |
+| Multiple independent features simultaneously | Git Worktrees |
+| Single developer, one feature at a time | Single Agent (default) |
+| Team with multiple human-agent pairs | Git Worktrees |
+| Quality-critical with code review requirements | Native Sub-Agents |
+
+---
+
 ## When to Use Multi-Agent Development
 
 **✅ Good for:**
@@ -579,8 +634,20 @@ All features complete!
 
 ## References
 
+### Native Sub-Agents (Sequential Pipeline)
+- `.agentic/agents/roles/` - Specialized agent role definitions (8 roles)
+- `.agentic/agents/claude/sub-agents.md` - Claude Code sub-agent integration
+- `.agentic/agents/cursor/agents-setup.md` - Cursor agent setup
+- `.agentic/pipeline/` - Pipeline state files for feature tracking
+
+### Parallel Features (Git Worktrees)
 - `.agentic/workflows/git_workflow.md` - Git protocols (PR, direct commits)
 - `.agentic/agents/shared/agent_operating_guidelines.md` - Core agent rules
 - `.agentic/init/STACK.template.md` - Multi-agent configuration
 - Git worktrees docs: https://git-scm.com/docs/git-worktree
+
+### Tools
+- `bash .agentic/tools/setup-agent.sh pipeline` - Set up pipeline infrastructure
+- `bash .agentic/tools/setup-agent.sh cursor-agents` - Copy roles to .cursor/agents/
+- `bash .agentic/tools/project-health.sh` - Manager oversight and pipeline monitoring
 

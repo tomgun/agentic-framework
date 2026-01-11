@@ -237,6 +237,74 @@ else
 fi
 
 # ============================================================
+# F-0035: Agent Role Definitions
+# ============================================================
+echo ""
+echo "--- F-0035: Agent Role Definitions ---"
+
+ROLES_DIR="${FRAMEWORK_ROOT}/.agentic/agents/roles"
+if [[ -d "$ROLES_DIR" ]]; then
+  pass "roles directory exists"
+else
+  fail "roles directory missing"
+fi
+
+for role in research_agent planning_agent test_agent implementation_agent review_agent spec_update_agent documentation_agent git_agent; do
+  if [[ -f "${ROLES_DIR}/${role}.md" ]]; then
+    pass "${role}.md exists"
+  else
+    fail "${role}.md missing"
+  fi
+done
+
+# ============================================================
+# F-0036: Native Sub-Agent Integration
+# ============================================================
+echo ""
+echo "--- F-0036: Native Sub-Agent Integration ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/agents/claude/sub-agents.md" ]]; then
+  pass "Claude sub-agents.md exists"
+else
+  fail "Claude sub-agents.md missing"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/agents/cursor/agents-setup.md" ]]; then
+  pass "Cursor agents-setup.md exists"
+else
+  fail "Cursor agents-setup.md missing"
+fi
+
+if grep -q "cursor-agents" "${FRAMEWORK_ROOT}/.agentic/tools/setup-agent.sh" 2>/dev/null; then
+  pass "setup-agent.sh supports cursor-agents"
+else
+  fail "setup-agent.sh missing cursor-agents support"
+fi
+
+if grep -q "pipeline" "${FRAMEWORK_ROOT}/.agentic/tools/setup-agent.sh" 2>/dev/null; then
+  pass "setup-agent.sh supports pipeline"
+else
+  fail "setup-agent.sh missing pipeline support"
+fi
+
+# ============================================================
+# F-0037: Project Health Monitoring
+# ============================================================
+echo ""
+echo "--- F-0037: Project Health Monitoring ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/tools/project-health.sh" ]]; then
+  pass "project-health.sh exists"
+  if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/project-health.sh" ]]; then
+    pass "project-health.sh is executable"
+  else
+    warn "project-health.sh not executable"
+  fi
+else
+  fail "project-health.sh missing"
+fi
+
+# ============================================================
 # F-0041: Token-Efficient Scripts
 # ============================================================
 echo ""
