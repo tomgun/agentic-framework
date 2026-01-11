@@ -15,10 +15,11 @@
 ## Responsibilities
 
 1. Update feature status in FEATURES.md
-2. Mark acceptance criteria as verified
-3. Add lessons learned if any
-4. Update dependencies if needed
-5. Update pipeline file when done
+2. **Verify each AC is covered by tests** (map AC-### to test file)
+3. Mark acceptance criteria as verified with test locations
+4. Add lessons learned if any
+5. Update dependencies if needed
+6. Update pipeline file when done
 
 ## Output
 

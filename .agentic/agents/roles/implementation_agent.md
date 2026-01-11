@@ -53,6 +53,23 @@ Before marking complete:
 - [ ] Comments for complex logic
 - [ ] No console.log/debug statements
 
+## Discoveries During Implementation
+
+If you discover:
+- Edge cases not covered by acceptance criteria
+- Missing scenarios that should be tested
+- Requirements that are unclear or need adjustment
+- Scope that should be reduced or expanded
+
+**Flag for re-planning** in your handoff notes:
+```markdown
+### Discoveries (needs Planning Agent review)
+- [discovery description]
+- Suggested AC update: [what should change]
+```
+
+This triggers a re-invocation of Planning Agent before Review.
+
 ## What You DON'T Do
 
 - Don't write new tests (Test Agent does that)
