@@ -182,6 +182,17 @@ docs(readme): update installation instructions
 
 ## Final Checks
 
+- [ ] **Check for untracked files** (CRITICAL - prevents deployment issues!)
+  ```bash
+  git status --short | grep '??'
+  # Or: bash .agentic/tools/check-untracked.sh
+  ```
+  - Check: assets/, src/, tests/, spec/, docs/ for untracked files
+  - **If you created new files, they MUST be git added!**
+  - Either: `git add <file>` to track
+  - Or: Add to `.gitignore` if intentionally untracked
+  - **WARNING**: Untracked files = missing from deployment!
+
 - [ ] **Git status clean** (no unexpected files)
   - `git status` shows only intended changes
   - No untracked files that should be ignored
