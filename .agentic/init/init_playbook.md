@@ -73,32 +73,38 @@ This creates all expected files/folders with templates/placeholders so you can s
 
 ## Step 1a: Set up your AI tool(s)
 
-**Ask the user which AI tool they're using NOW:**
+**Ask the user which AI tool(s) they use:**
 
-> "Which AI coding tool are you using right now?
+> "Which AI coding tool(s) will you use? (can pick multiple)
 > 
-> **a) Claude Code** - This conversation (creates CLAUDE.md)
-> **b) Cursor** - IDE-integrated (creates .cursorrules)  
-> **c) GitHub Copilot** - VS Code (creates .github/copilot-instructions.md)
-> **d) Codex CLI** - Terminal-based (uses AGENTS.md)
-> **e) Gemini** - Google AI (creates GEMINI.md)
+> **a) Claude Code** - creates CLAUDE.md
+> **b) Cursor** - creates .cursorrules
+> **c) GitHub Copilot** - creates .github/copilot-instructions.md
+> **d) Codex CLI** - uses AGENTS.md
+> **e) Gemini** - creates GEMINI.md
 > 
-> Type the letter for your current tool"
+> Type the letters for tools you use (e.g., 'ab' for Claude + Cursor, or just 'b' for Cursor only)"
 
-**Based on answer, create ONLY that tool's file:**
+**Create files for ALL selected tools:**
 
 ```bash
-# Run the appropriate command:
-bash .agentic/tools/setup-agent.sh claude   # for (a)
-bash .agentic/tools/setup-agent.sh cursor   # for (b)
-bash .agentic/tools/setup-agent.sh copilot  # for (c)
-bash .agentic/tools/setup-agent.sh codex    # for (d)
-bash .agentic/tools/setup-agent.sh gemini   # for (e)
+# Examples based on user response:
+# User typed 'a' → 
+bash .agentic/tools/setup-agent.sh claude
+
+# User typed 'ab' → 
+bash .agentic/tools/setup-agent.sh claude
+bash .agentic/tools/setup-agent.sh cursor
+
+# User typed 'abc' → 
+bash .agentic/tools/setup-agent.sh claude
+bash .agentic/tools/setup-agent.sh cursor
+bash .agentic/tools/setup-agent.sh copilot
 ```
 
-**IMPORTANT**: Only create the file for the tool being used NOW. If the user later switches to a different tool, they can run:
+**To add more tools later:**
 ```bash
-bash .agentic/tools/setup-agent.sh <new-tool>
+bash .agentic/tools/setup-agent.sh <tool>
 ```
 
 All tool files reference the same common rules (`.agentic/agents/shared/`), so switching is seamless.
