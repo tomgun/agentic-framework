@@ -4,6 +4,28 @@ This repo uses the `.agentic/` **Agentic Framework** for AI-assisted development
 
 ---
 
+## 🤖 AUTO-ORCHESTRATION (MOST IMPORTANT!)
+
+**Automatically follow systematic processes based on user requests:**
+
+| User Says | You Do |
+|-----------|--------|
+| "implement F-####" / "build feature" | → Feature Pipeline (acceptance criteria → implement → test → update specs) |
+| "fix I-####" / "fix bug" | → Issue Pipeline (understand → failing test → fix → update ISSUES.md) |
+| "commit" | → Before Commit checklist |
+| "done" / "feature complete" | → Feature Complete checklist |
+
+### Non-Negotiable Gates
+
+- **Acceptance Criteria**: Must exist BEFORE implementing
+- **Smoke Test**: Must RUN the application before shipping
+- **Specs Updated**: FEATURES.md/PRODUCT.md current before commit
+- **Tests Pass**: Cannot ship with failing tests
+
+**Full rules: `.agentic/agents/shared/auto_orchestration.md`**
+
+---
+
 ## 🚨 MANDATORY Protocols (READ THESE!)
 
 ### 1. Session Start (Every Time)
