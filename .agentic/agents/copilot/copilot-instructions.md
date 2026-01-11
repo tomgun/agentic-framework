@@ -38,17 +38,26 @@ FEATURE REQUEST?
 
 ## 🚨 MANDATORY Protocols
 
-### 1. Session Start (Every Time)
-**Read `.agentic/checklists/session_start.md`** before doing ANY work.
+### 1. Session Start (BE PROACTIVE!)
 
-Use token-efficient scripts (not file edits):
+**At session start, automatically greet user with context:**
+
+```
+👋 Welcome back! Here's where we are:
+**Current focus**: [From STATUS.md/PRODUCT.md]
+**Next steps**: 
+1. [Planned task]
+2. [Another option]
+What would you like to work on?
+```
+
+**Token-efficient updates:**
 ```bash
-# Log to JOURNAL.md (append-only, cheap)
 bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"
-
-# Update STATUS.md section (field update, no rewrite)
 bash .agentic/tools/status.sh focus "Current task"
 ```
+
+**Full checklist**: `.agentic/checklists/session_start.md`
 
 ### 2. Documentation Updates = Part of Done
 **When code changes, docs MUST update** (not optional!):
