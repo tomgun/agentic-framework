@@ -6,29 +6,52 @@ This directory contains predefined agent roles for specialized task execution.
 
 ## Available Roles
 
+### 🎯 Orchestrator (Start Here!)
+
 | Role | File | Purpose |
 |------|------|---------|
-| Research Agent | `research_agent.md` | Investigate tech choices, best practices |
-| Planning Agent | `planning_agent.md` | Define features, write acceptance criteria |
-| Test Agent | `test_agent.md` | Write failing tests (TDD red phase) |
-| Implementation Agent | `implementation_agent.md` | Write code to pass tests (TDD green phase) |
-| Review Agent | `review_agent.md` | Code review, quality checks |
-| Spec Update Agent | `spec_update_agent.md` | Update FEATURES.md and specs |
-| Documentation Agent | `documentation_agent.md` | Update docs and README |
-| Git Agent | `git_agent.md` | Commits, branches, PRs |
+| **Orchestrator Agent** | `orchestrator-agent.md` | **Coordinates all agents, ensures compliance** |
+
+Use `@orchestrator-agent` to manage features. It delegates to specialized agents and verifies quality gates.
+
+### Specialized Agents
+
+| Role | File | Purpose |
+|------|------|---------|
+| Research Agent | `research-agent.md` | Investigate tech choices, best practices |
+| Planning Agent | `planning-agent.md` | Define features, write acceptance criteria |
+| Test Agent | `test-agent.md` | Write tests |
+| Implementation Agent | `implementation-agent.md` | Write code |
+| Review Agent | `review-agent.md` | Code review, quality checks |
+| Spec Update Agent | `spec-update-agent.md` | Update FEATURES.md and specs |
+| Documentation Agent | `documentation-agent.md` | Update docs and README |
+| Git Agent | `git-agent.md` | Commits, branches, PRs |
+
+## Usage
+
+```
+@orchestrator-agent Implement feature F-0042
+
+@research-agent What's the best JWT library for our stack?
+
+@implementation-agent Make the F-0042 tests pass
+```
 
 ## Typical Feature Pipeline
 
 ```mermaid
-graph LR
-    R[Research] --> P[Planning]
-    P --> T[Test]
-    T --> I[Implementation]
-    I --> Rev[Review]
-    Rev --> S[Spec Update]
-    S --> D[Documentation]
-    D --> G[Git]
+graph TB
+    O[🎯 Orchestrator] --> R[Research]
+    O --> P[Planning]
+    O --> T[Test]
+    O --> I[Implementation]
+    O --> Rev[Review]
+    O --> S[Spec Update]
+    O --> D[Documentation]
+    O --> G[Git]
 ```
+
+The **Orchestrator** coordinates the pipeline, delegating to specialized agents and verifying quality gates at each step.
 
 ## How to Use These Roles
 
