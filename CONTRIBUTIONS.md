@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework  
-**Period**: Initial Development (v0.1.0 → v0.9.8)  
+**Period**: Initial Development (v0.1.0 → v0.10.0)  
 **Date**: 2025-01-11  
 
 ---
@@ -568,8 +568,80 @@ These real-world learnings directly shaped v0.4.x releases, making the framework
 
 ---
 
+## Deterministic Behavior & Proactive UX (v0.10.0)
+
+### Determinism Problem Identified
+
+**User shared real conversation where Claude skipped workflows:**
+> "so why would you not follow that flow if it is in claude.md? how can we instruct claude deterministically???"
+
+**Claude's honest answer** (from the conversation):
+- Long instructions - attention drifts
+- Immediate task focus - jumped to "how" vs "what's the process"
+- No hard stop - nothing forced pause
+
+**User-generated improvement prompt**:
+Detailed prompt for restructuring docs with:
+- Primacy/recency (critical rules at TOP and BOTTOM)
+- Explicit triggers ("WHEN user says X → STOP → do Y first")
+- Shorter focused files
+- STOP/BLOCK language
+- Pattern matching for trigger phrases
+- Redundancy across files
+
+**Result - v0.9.9/v0.10.0**:
+- New `feature_start.md` with BLOCKING gates
+- All instruction files restructured with trigger tables at TOP
+- "🛑 STOP" language for non-negotiable gates
+- Same rules at top AND bottom (primacy + recency effect)
+
+### Proactive Session Start
+
+**User request**:
+> "at session start / when starting the tools / when getting back to work after tokens reset, i would like the tool to HELP me as a developer without asking it particularly something. Is that possible? Like a short recap where were we and asking what next (present options if planned)"
+
+**Result - Proactive Greeting**:
+```
+👋 Welcome back! Here's where we are:
+
+**Last session**: [Summary]
+**Current focus**: [Task]
+
+**Next steps**:
+1. [Option 1]
+2. [Option 2]
+
+What would you like to work on?
+```
+
+Added to all shared (tool-agnostic) files:
+- `agent_operating_guidelines.md`
+- `auto_orchestration.md`
+- `session_start.md`
+
+**Impact**: User doesn't have to remember context - agent helps immediately.
+
+### Tool-Agnostic Reminder
+
+**User feedback**:
+> "why are you updating only CLAUDE.md?? i even reminded you we are tool agnostic.."
+
+**Result**: Ensured all improvements go to SHARED files first:
+- `agent_operating_guidelines.md` (all tools read this)
+- `auto_orchestration.md` (orchestration for all tools)
+- Tool-specific files reference shared files
+
+### Claude Desktop → Claude Code
+
+**User clarification**:
+> "i don't know claude desktop, claude code (terminal) is what people seems to use."
+
+**Result**: Renamed all 16+ references from "Claude Desktop" to "Claude Code" throughout the codebase.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework  
-**Current Version**: v0.9.8  
+**Current Version**: v0.10.0  
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)  
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 
