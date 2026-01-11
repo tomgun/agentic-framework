@@ -6,7 +6,74 @@
 
 ---
 
-## 🚨 FIRST: Check for Interrupted Work (CRITICAL!)
+# 🤖 PROACTIVE START (Do This Automatically!)
+
+**When a new session starts (first message, tokens reset, or user returns), automatically:**
+
+## Step 1: Quick Context Scan (Silent)
+
+```bash
+# Read these silently (don't dump to user)
+cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
+cat HUMAN_NEEDED.md 2>/dev/null | head -20
+ls WIP.md 2>/dev/null
+```
+
+## Step 2: Greet User with Recap
+
+**Always start with a proactive greeting like this:**
+
+```
+👋 Welcome back! Here's where we are:
+
+**Last session**: [Summary from JOURNAL.md or STATUS.md]
+**Current focus**: [From STATUS.md "Current focus" or PRODUCT.md]
+**Progress**: [What's done, what's in progress]
+
+**Next steps** (pick one or tell me something else):
+1. [Next planned task from STATUS.md]
+2. [Second option if exists]
+3. [Review blockers in HUMAN_NEEDED.md - if any exist]
+
+What would you like to work on?
+```
+
+## Step 3: Handle Special Cases
+
+**If WIP.md exists** (interrupted work):
+```
+⚠️ Previous work was interrupted!
+Feature: [from WIP.md]
+Files changed: [from WIP.md or git diff]
+
+Options:
+1. Continue from checkpoint
+2. Review changes first (git diff)
+3. Roll back to last commit
+```
+
+**If HUMAN_NEEDED.md has unresolved items**:
+```
+📋 There are [N] items waiting for your input:
+- [H-0001]: [Brief description]
+
+Want to address these first, or continue with planned work?
+```
+
+**If upgrade pending**:
+```
+🔄 Framework was upgraded to v[X.Y.Z]!
+I'll quickly apply the updates, then we'll continue.
+[Handle upgrade, then return to normal greeting]
+```
+
+---
+
+**Why proactive**: User shouldn't have to ask "where were we?" - you should tell them automatically.
+
+---
+
+## 🚨 THEN: Check for Interrupted Work (CRITICAL!)
 
 **BEFORE doing anything else, check if previous work was interrupted:**
 

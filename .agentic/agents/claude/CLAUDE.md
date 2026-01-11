@@ -57,28 +57,48 @@ FEATURE REQUEST?
 
 ## 🚨 MANDATORY: Session Start Protocol
 
-**BEFORE doing ANY work, run this protocol:**
+**At session start (first message, tokens reset, user returns), BE PROACTIVE:**
 
-1. **Read `.agentic/checklists/session_start.md`** (2-minute checklist)
-   - Loads project context efficiently
-   - Identifies current task/blockers
-   - Sets up session correctly
+### 1. Silently Read Context
 
-2. **Use token-efficient scripts** (not file edits):
-   ```bash
-   # Append to JOURNAL.md (don't read/rewrite whole file!)
-   bash .agentic/tools/journal.sh "Topic" "What done" "What next" "Blockers"
-   
-   # Update STATUS.md sections (don't rewrite whole file!)
-   bash .agentic/tools/status.sh focus "Current task description"
-   ```
+```bash
+cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
+cat HUMAN_NEEDED.md 2>/dev/null | head -20
+ls WIP.md 2>/dev/null
+```
 
-3. **Check for blockers in `HUMAN_NEEDED.md`**
-   - If blockers exist, address them FIRST or escalate
+### 2. Greet User with Recap (DO THIS AUTOMATICALLY!)
 
-**Why mandatory**: Without this, you'll waste tokens re-reading context and miss critical blockers.
+**Don't wait for user to ask "where were we?" - TELL THEM:**
 
-**Checkpoint**: After reading session_start.md, tell user: "✓ Session started. Working on: [task]. Blockers: [none/list]"
+```
+👋 Welcome back! Here's where we are:
+
+**Last session**: [Summary from JOURNAL.md/STATUS.md]
+**Current focus**: [From STATUS.md or PRODUCT.md]
+
+**Next steps** (pick one or tell me something else):
+1. [Next planned task]
+2. [Another option if exists]
+3. [Address blockers - if any in HUMAN_NEEDED.md]
+
+What would you like to work on?
+```
+
+### 3. Handle Special Cases
+
+- **WIP.md exists?** → "⚠️ Previous work interrupted! [options]"
+- **HUMAN_NEEDED.md has items?** → "📋 [N] items need your input"
+- **Upgrade pending?** → Handle it, then greet
+
+### 4. Token-Efficient Updates (Later in Session)
+
+```bash
+bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"
+bash .agentic/tools/status.sh focus "Current task"
+```
+
+**Why proactive**: User shouldn't have to remember context. You help them immediately.
 
 ---
 
