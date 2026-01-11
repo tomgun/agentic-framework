@@ -6,6 +6,16 @@ This directory contains predefined agent roles for specialized task execution.
 
 ## Available Roles
 
+### 🎯 Orchestrator (Manager/Puppeteer)
+
+| Role | File | Purpose |
+|------|------|---------|
+| **Orchestrator Agent** | `orchestrator-agent.md` | **Coordinates all agents, ensures compliance** |
+
+The orchestrator **delegates** to specialized agents and **verifies** quality gates. It never implements code itself.
+
+### Specialized Agents
+
 | Role | File | Purpose |
 |------|------|---------|
 | Research Agent | `research_agent.md` | Investigate tech choices, best practices |
@@ -20,15 +30,26 @@ This directory contains predefined agent roles for specialized task execution.
 ## Typical Feature Pipeline
 
 ```mermaid
-graph LR
-    R[Research] --> P[Planning]
-    P --> T[Test]
-    T --> I[Implementation]
-    I --> Rev[Review]
-    Rev --> S[Spec Update]
-    S --> D[Documentation]
-    D --> G[Git]
+graph TB
+    O[🎯 Orchestrator] --> R[Research]
+    O --> P[Planning]
+    O --> T[Test]
+    O --> I[Implementation]
+    O --> Rev[Review]
+    O --> S[Spec Update]
+    O --> D[Documentation]
+    O --> G[Git]
+    
+    R --> P
+    P --> T
+    T --> I
+    I --> Rev
+    Rev --> S
+    S --> D
+    D --> G
 ```
+
+The **Orchestrator** coordinates the pipeline, delegating to specialized agents and verifying quality gates at each step.
 
 ## How to Use These Roles
 
