@@ -42,6 +42,7 @@ rm -rf agentic-framework-0.9.4
 - Detect the `.upgrade_pending` marker at session start
 - Review new workflows and breaking changes
 - Validate your specs against new format
+- **Ask about new features** (e.g., sub-agent setup, multi-agent pipeline)
 - Delete the marker when done
 
 ## Manual Upgrade (Advanced)
