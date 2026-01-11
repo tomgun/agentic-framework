@@ -13,7 +13,7 @@ cat STACK.md | grep "Version:"  # e.g., "Version: 0.1.0"
 
 # 2. Download and extract new framework (in a temp location)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.6.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
 
 # 3. Run the NEW upgrade tool, pointing it to your project
 bash agentic-framework-0.9.4/.agentic/tools/upgrade.sh /path/to/your-project
@@ -65,7 +65,7 @@ cp -r docs docs-backup-$(date +%Y%m%d)
 ```bash
 # Download latest release (to a temporary location, not your project)
 cd /tmp  # Or any temp directory
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.6.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
 ```
 
 ### Step 3: Identify What to Replace
