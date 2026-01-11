@@ -700,7 +700,7 @@ bash .agentic/tools/wip.sh check                                  # Detect inter
 
 **Creates `WIP.md` lock file containing:**
 - Feature being worked on
-- Agent/environment (claude-desktop, cursor, copilot)
+- Agent/environment (claude-code, cursor, copilot)
 - Started timestamp
 - Last checkpoint timestamp
 - Files being edited
@@ -826,7 +826,7 @@ bash .agentic/tools/wip.sh check
 - ✅ Offers clear options (continue seamlessly, review first, or rollback)
 
 **Multi-environment support:**
-- ✅ WIP tracks which agent/environment has context (claude-desktop, cursor, copilot)
+- ✅ WIP tracks which agent/environment has context (claude-code, cursor, copilot)
 - ✅ Seamless handoff between tools (Claude → Cursor → Copilot)
 - ✅ Each tool checks WIP at session start (shared state)
 - ✅ No work lost when switching tools mid-task
@@ -939,7 +939,7 @@ Morning  - Claude working on F-0005: User Authentication
 
 ### Added - Multi-Environment Support & Environment Optimization
 
-**Work seamlessly across Claude Desktop, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out.**
+**Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out.**
 
 #### 1. Multi-Environment as Default Setup
 
@@ -958,7 +958,7 @@ Morning  - Claude working on F-0005: User Authentication
 - Token-efficient scripts work in ALL environments (40x cheaper than file reads)
 
 **Example chain:**
-1. Morning: Claude Desktop (complex feature, full codebase context)
+1. Morning: Claude Code (complex feature, full codebase context)
 2. Claude tokens 80%: Switch to Cursor (@ mentions, composer mode)
 3. Need quick fix: Copilot inline suggestion
 4. Next morning: Back to Claude (SessionStart hook loads full context)
@@ -1123,7 +1123,7 @@ bash .agentic/tools/framework_age.sh
 ### Example: Full Day Multi-Environment Workflow
 
 ```
-8:00 AM - Claude Desktop (tokens fresh)
+8:00 AM - Claude Code (tokens fresh)
 ├─ Read all specs, understand architecture
 ├─ Plan F-0005 implementation
 ├─ Write tests (TDD)
@@ -1151,7 +1151,7 @@ bash .agentic/tools/framework_age.sh
 ├─ bash .agentic/tools/feature.sh F-0005 status shipped
 └─ bash .agentic/tools/journal.sh "F-0005 complete" "..." "Start F-0006" "..."
 
-Next day 8:00 AM - Claude Desktop
+Next day 8:00 AM - Claude Code
 ├─ SessionStart hook loads .continue-here.md
 ├─ Sees full progress from all tools
 ├─ ✓ F-0005 shipped yesterday
@@ -1406,14 +1406,14 @@ bash .agentic/tools/validation-cache.sh set doctor "OK"
 
 **New Directory**: `.agentic/prompts/claude-commands/`
 
-Optional slash commands for Claude Desktop users:
+Optional slash commands for Claude Code users:
 - `/start` - Start session with context loading
 - `/continue` - Resume from .continue-here.md
 - `/implement` - Implement feature with TDD
 - `/end` - End session with documentation
 
 **Benefits**:
-- Better UX for Claude Desktop users
+- Better UX for Claude Code users
 - User-friendly alternative to copy-paste prompts
 - Falls back to regular prompts if not supported
 - Easy to customize
@@ -1430,7 +1430,7 @@ Optional slash commands for Claude Desktop users:
 
 ### Added - Session Continuity & Claude Hooks
 
-**Major UX improvements for session management and Claude Desktop integration.**
+**Major UX improvements for session management and Claude Code integration.**
 
 #### 1. Session Continuity Tool (`continue_here.py`)
 
@@ -1478,11 +1478,11 @@ python3 .agentic/tools/continue_here.py
 - Lower barrier to entry for new users
 - Claude users get platform-specific guidance
 
-#### 3. Claude Desktop Lifecycle Hooks
+#### 3. Claude Code Lifecycle Hooks
 
 **New Directory**: `.agentic/claude-hooks/`
 
-Automated scripts that run at key lifecycle points in Claude Desktop:
+Automated scripts that run at key lifecycle points in Claude Code:
 
 **Hooks**:
 1. **`SessionStart.sh`**: Environment validation, project status, detect `.continue-here.md`
@@ -1491,7 +1491,7 @@ Automated scripts that run at key lifecycle points in Claude Desktop:
 4. **`PreCompact.sh`**: State preservation before context window compaction
 5. **`Stop.sh`**: Session end reminders (commits, docs, context generation)
 
-**Configuration**: `hooks.json` for Claude Desktop
+**Configuration**: `hooks.json` for Claude Code
 
 **Benefits**:
 - **Automatic context injection**: No manual "read .continue-here.md" needed
@@ -1500,7 +1500,7 @@ Automated scripts that run at key lifecycle points in Claude Desktop:
 - **Better workflow discipline**: Reminders about commits and documentation
 - **Seamless session continuity**: Perfect pairing with `continue_here.py`
 
-**Requirements**: Claude Desktop with hooks enabled (check version compatibility)
+**Requirements**: Claude Code with hooks enabled (check version compatibility)
 
 **Documentation**: Complete setup, usage, and troubleshooting guide in `.agentic/claude-hooks/README.md`
 

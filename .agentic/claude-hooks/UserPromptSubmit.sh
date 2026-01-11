@@ -5,7 +5,7 @@
 # It automatically adds .continue-here.md to context if the file exists
 # and hasn't been injected yet in this session.
 #
-# Triggered by: Claude Desktop UserPromptSubmit hook
+# Triggered by: Claude Code UserPromptSubmit hook
 # Timeout: 3 seconds
 
 set -euo pipefail

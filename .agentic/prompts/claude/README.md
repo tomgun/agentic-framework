@@ -97,7 +97,7 @@ Example: "Using extended thinking, help me debug this race condition..."
 
 ### Hooks (Advanced)
 
-**Claude Desktop with hooks enabled** can run automated scripts at key lifecycle points:
+**Claude Code with hooks enabled** can run automated scripts at key lifecycle points:
 
 | Hook | When | Purpose |
 |------|------|---------|
@@ -115,7 +115,7 @@ Example: "Using extended thinking, help me debug this race condition..."
 - **Never lose progress**: State saved before context compaction
 - **Better workflow discipline**: Reminders about commits and docs
 
-**If hooks aren't available in your Claude Desktop version**: Use the prompts in this directory instead!
+**If hooks aren't available in your Claude Code version**: Use the prompts in this directory instead!
 
 ## Tips for Claude
 

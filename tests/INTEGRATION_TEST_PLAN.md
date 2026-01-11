@@ -73,7 +73,7 @@ But it does NOT verify:
 
 | Test ID | Description | Environment | Expected |
 |---------|-------------|-------------|----------|
-| ENV-01 | Claude Desktop hooks | Claude Desktop | Hooks fire, logs created |
+| ENV-01 | Claude Code hooks | Claude Code | Hooks fire, logs created |
 | ENV-02 | Cursor integration | Cursor | CLAUDE.md instructions followed |
 | ENV-03 | Copilot integration | GitHub Copilot | copilot-instructions.md applied |
 

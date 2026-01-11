@@ -4,7 +4,7 @@
 # This hook runs automatically when a Claude session starts.
 # It performs quick health checks and provides context for the session.
 #
-# Triggered by: Claude Desktop SessionStart hook
+# Triggered by: Claude Code SessionStart hook
 # Timeout: 5 seconds
 #
 # Exit codes:

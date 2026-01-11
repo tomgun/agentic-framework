@@ -96,7 +96,7 @@ if [[ $DAYS_OLD -gt 90 ]]; then
   echo ""
   case "${AI_ENV}" in
     claude)
-      echo "Claude Desktop research areas:"
+      echo "Claude Code research areas:"
       echo "- Hooks (SessionStart, PostToolUse, PreCompact, Stop)"
       echo "- Context window improvements"
       echo "- New APIs or capabilities"
@@ -121,7 +121,7 @@ if [[ $DAYS_OLD -gt 90 ]]; then
       ;;
     multi|unknown)
       echo "Research all environments you use:"
-      echo "- Claude Desktop: https://docs.anthropic.com/claude/desktop"
+      echo "- Claude Code: https://docs.anthropic.com/claude/desktop"
       echo "- Cursor: https://cursor.sh/docs"
       echo "- Copilot: https://docs.github.com/copilot"
       ;;

@@ -4,7 +4,7 @@
 # This hook runs after Claude uses any tool (file edits, terminal commands, etc.)
 # It performs fast, non-blocking quality checks to catch issues early.
 #
-# Triggered by: Claude Desktop PostToolUse hook
+# Triggered by: Claude Code PostToolUse hook
 # Timeout: 2 seconds
 
 set -euo pipefail

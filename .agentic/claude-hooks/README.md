@@ -1,14 +1,14 @@
-# Claude Desktop Hooks for Agentic AF
+# Claude Code Hooks for Agentic AF
 
-**Purpose**: Automated lifecycle hooks that enhance Claude Desktop with real-time validation, automatic context injection, and state preservation.
+**Purpose**: Automated lifecycle hooks that enhance Claude Code with real-time validation, automatic context injection, and state preservation.
 
-**Requirements**: Claude Desktop with hooks enabled (available in Claude Desktop settings)
+**Requirements**: Claude Code with hooks enabled (available in Claude Code settings)
 
 ---
 
 ## What Are Hooks?
 
-Hooks are scripts that run automatically at specific points in the Claude Desktop lifecycle:
+Hooks are scripts that run automatically at specific points in the Claude Code lifecycle:
 
 | Hook | When It Runs | Purpose |
 |------|--------------|---------|
@@ -22,14 +22,14 @@ Hooks are scripts that run automatically at specific points in the Claude Deskto
 
 ## Setup
 
-### 1. Enable Hooks in Claude Desktop
+### 1. Enable Hooks in Claude Code
 
-1. Open Claude Desktop settings
+1. Open Claude Code settings
 2. Go to **Advanced** or **Developer** section
 3. Enable **Custom Hooks** or **Project Hooks**
 4. Specify hooks configuration file: `.agentic/claude-hooks/hooks.json`
 
-**Note**: Hook support varies by Claude Desktop version. Check official Claude documentation for your version.
+**Note**: Hook support varies by Claude Code version. Check official Claude documentation for your version.
 
 ### 2. Copy Hooks to Your Project
 
@@ -43,7 +43,7 @@ chmod +x .agentic/claude-hooks/*.sh
 
 ### 3. Configure Claude Project
 
-In Claude Desktop, when creating or configuring a project:
+In Claude Code, when creating or configuring a project:
 
 1. Set **Project Directory**: `/path/to/your-project`
 2. Enable **Custom Hooks**: Yes
@@ -244,14 +244,14 @@ Or modify `hooks.json` to remove the hook entry.
 ### Hooks Not Running
 
 **Check**:
-1. Hooks enabled in Claude Desktop settings?
+1. Hooks enabled in Claude Code settings?
 2. `.agentic/claude-hooks/hooks.json` exists and is valid JSON?
 3. Hook scripts are executable? (`ls -la .agentic/claude-hooks/*.sh`)
 4. Claude has permission to run scripts? (macOS: check Security & Privacy)
 
 **Debug**:
 - Run hooks manually to see output: `bash .agentic/claude-hooks/SessionStart.sh`
-- Check Claude Desktop logs (location varies by OS)
+- Check Claude Code logs (location varies by OS)
 
 ### Hook Timeout Errors
 
@@ -279,12 +279,12 @@ All hooks are designed to **never block Claude** (they exit with code 0 even on 
 
 | Feature | Required Version | Notes |
 |---------|-----------------|-------|
-| Hooks API | Claude Desktop 1.x+ | Check official docs for your version |
+| Hooks API | Claude Code 1.x+ | Check official docs for your version |
 | `SessionStart` | All versions | Basic hook support |
-| `UserPromptSubmit` | Newer versions | May not be available in older Claude Desktop |
+| `UserPromptSubmit` | Newer versions | May not be available in older Claude Code |
 | `PreCompact` | Newer versions | Context compaction is a recent feature |
 
-**If hooks don't work in your Claude Desktop version**:
+**If hooks don't work in your Claude Code version**:
 - You can still use the scripts manually
 - Example: Run `bash .agentic/tools/continue_here.py` before starting a session
 - Example: Run `.agentic/claude-hooks/Stop.sh` manually before ending a session
@@ -299,5 +299,5 @@ All hooks are designed to **never block Claude** (they exit with code 0 even on 
 
 ---
 
-**Note**: Hooks are a Claude Desktop feature. For Cursor or GitHub Copilot, use manual workflows or ready-to-use prompts instead.
+**Note**: Hooks are a Claude Code feature. For Cursor or GitHub Copilot, use manual workflows or ready-to-use prompts instead.
 
