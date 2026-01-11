@@ -398,7 +398,17 @@ fi
 
 echo ""
 
+# Environment check - detect and suggest tool-specific files
+echo ""
+echo "[8/8] Environment check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+if [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/check-environment.sh" ]]; then
+  cd "$TARGET_PROJECT_DIR"
+  bash .agentic/tools/check-environment.sh --fix 2>/dev/null || true
+  cd - > /dev/null
+fi
+
 # Summary
+echo ""
 echo "╔════════════════════════════════════════════════════════════════╗"
 echo "║                    UPGRADE COMPLETE                            ║"
 echo "╚════════════════════════════════════════════════════════════════╝"

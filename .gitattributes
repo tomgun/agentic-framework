@@ -10,6 +10,18 @@
 # Exclude examples (for GitHub repo browsing only, not needed in releases)
 /examples export-ignore
 
-# Include only: agentic/ folder and VERSION file
-# Users get: agentic/ (with agentic/README.md inside for usage docs)
+# Exclude tool-specific files (framework dogfooding - each project generates its own)
+/CLAUDE.md export-ignore
+/.cursorrules export-ignore
+/.github export-ignore
+
+# Exclude framework development files
+/spec export-ignore
+/tests export-ignore
+/CONTRIBUTIONS.md export-ignore
+/CREDITS.md export-ignore
+/PRINCIPLES.md export-ignore
+
+# Include only: .agentic/ folder, VERSION, and install.sh
+# Users get: .agentic/ (with .agentic/README.md inside for usage docs)
 
