@@ -5,6 +5,33 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.6] - 2025-01-11
+
+### Improved: Tool-Specific Setup
+
+#### Selective Tool File Creation
+- Init now asks which AI tool(s) user will use (can select multiple)
+- Only creates files for selected tools (no clutter)
+- User types 'ab' for Claude + Cursor, 'b' for Cursor only, etc.
+
+#### Technology-Agnostic Agent Roles
+- Role definitions now work with any language/framework
+- Replaced `.ts` extensions with `.*` placeholders
+- Agents read `STACK.md` for project-specific conventions
+
+#### Environment Detection
+- New: `check-environment.sh` detects which tools might be in use
+- New: `check-environment.sh --list` shows existing tool files
+- Upgrade process (step 8/8) now shows tool file status
+
+#### Upgrade Asks About New Features
+- `.upgrade_pending` now includes TODO for new features (sub-agents, pipeline)
+- Helps users discover features added since their last version
+
+#### Framework Dogfooding
+- Framework repo now uses its own tool files (CLAUDE.md, .cursorrules)
+- These are excluded from release packages via .gitattributes
+
 ## [0.9.5] - 2025-01-11
 
 ### NEW: Native Sub-Agent Integration
