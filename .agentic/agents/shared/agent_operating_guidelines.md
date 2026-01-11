@@ -801,9 +801,17 @@ You can maintain FEATURES.md manually AND use migrations as complementary histor
 ### Enforcement Protocol
 
 **After creating any file:**
-1. Check if that file type is mentioned in CONTEXT_PACK.md
-2. If yes, update CONTEXT_PACK.md to replace placeholder with actual path
-3. If creating entry point, add it to "Where to look first"
+1. **ALWAYS `git add` the new file** (or explicitly note why it shouldn't be tracked)
+   - Untracked files = missing from deployment!
+   - Run `git status --short | grep '??'` to check for untracked files
+2. Check if that file type is mentioned in CONTEXT_PACK.md
+3. If yes, update CONTEXT_PACK.md to replace placeholder with actual path
+4. If creating entry point, add it to "Where to look first"
+
+**Before committing:**
+1. Run `git status` and review any untracked files (??) in project directories
+2. `git add` all new files in assets/, src/, tests/, spec/, docs/
+3. Or add to `.gitignore` if intentionally untracked
 
 **Before marking work complete:**
 1. Check STATUS.md reflects what you actually did

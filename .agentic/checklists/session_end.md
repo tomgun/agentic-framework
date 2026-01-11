@@ -88,6 +88,13 @@
   - Or: Clear explanation to user why not committed
   - If mid-work: Explain state and what's next
 
+- [ ] **No untracked files in project directories**
+  - Run: `git status --short | grep '??'`
+  - Check: assets/, src/, tests/, spec/, docs/ for untracked files
+  - Either: `git add` new files you created
+  - Or: Add to `.gitignore` if intentionally untracked
+  - **WARNING**: Untracked files = missing from deployment!
+
 - [ ] **No work-in-progress files**
   - No temp files left around
   - No test.js, debug.py, scratch files
