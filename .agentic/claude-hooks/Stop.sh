@@ -4,7 +4,7 @@
 # This hook runs when a Claude session is ending (user closes chat, etc.)
 # It reminds about uncommitted work and documentation updates.
 #
-# Triggered by: Claude Desktop Stop hook
+# Triggered by: Claude Code Stop hook
 # Timeout: 5 seconds
 
 set -euo pipefail

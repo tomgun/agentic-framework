@@ -25,7 +25,7 @@ The Agentic AI Framework enables **sustainable long-term software development wi
 - **Core + Product Management**: Adds formal specs, feature tracking, project metrics (for complex projects)
 
 **🔄 Multi-Environment Support:**
-Work seamlessly across Claude Desktop, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out or use the best tool for each task. All environments share the same project state for perfect continuity. [Learn more](.agentic/workflows/environment_switching.md)
+Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out or use the best tool for each task. All environments share the same project state for perfect continuity. [Learn more](.agentic/workflows/environment_switching.md)
 
 ## Installation
 
@@ -223,11 +223,11 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## Multi-Environment Support 🔄
 
-**Work seamlessly across Claude Desktop, Cursor, and GitHub Copilot in the same project.**
+**Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same project.**
 
 ### Why Multi-Environment?
 
-**Token limits exist:** Claude Desktop (200K) → Cursor (50K) → GitHub Copilot (8K)
+**Token limits exist:** Claude Code (200K) → Cursor (50K) → GitHub Copilot (8K)
 
 Instead of stopping when tokens run out, **switch to another tool and keep working**. The framework makes handoff seamless because all tools share the same project state.
 
@@ -241,7 +241,7 @@ Instead of stopping when tokens run out, **switch to another tool and keep worki
 - Token-efficient scripts - Work in all environments (40x cheaper than file reads!)
 
 **Example workflow:**
-1. **Morning (Claude Desktop)**: Complex feature with full codebase context
+1. **Morning (Claude Code)**: Complex feature with full codebase context
 2. **Afternoon (Claude tokens low)**: Switch to Cursor, continue implementation
 3. **Quick fix needed**: Use Copilot for inline suggestions
 4. **Next morning**: Back to Claude, seamless continuation
@@ -261,7 +261,7 @@ During `init_playbook.md`, choose **"a) Multiple (RECOMMENDED)"** and the framew
 
 ### Best Tool for Each Task
 
-**Claude Desktop** (200K context):
+**Claude Code** (200K context):
 - ✅ Complex features requiring full codebase understanding
 - ✅ Architectural decisions and planning
 - ✅ Research and documentation (artifacts)

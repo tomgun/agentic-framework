@@ -109,7 +109,7 @@ bash .agentic/tools/setup-agent.sh <tool>
 
 All tool files reference the same common rules (`.agentic/agents/shared/`), so switching is seamless.
 
-### If Claude Desktop (a):
+### If Claude Code (a):
 ```bash
 # Set up Claude (creates CLAUDE.md automatically)
 bash .agentic/tools/setup-agent.sh claude
@@ -118,7 +118,7 @@ bash .agentic/tools/setup-agent.sh claude
 mkdir -p .claude
 cp .agentic/claude-hooks/hooks.json .claude/hooks.json
 
-echo "✓ Claude Desktop optimized:"
+echo "✓ Claude Code optimized:"
 echo "  - CLAUDE.md installed (instructions)"
 echo "  - Hooks enabled (automatic logging at checkpoints)"
 echo "  - Large context leveraged (can read all specs at once)"
@@ -164,7 +164,7 @@ mkdir -p .claude && cp .agentic/claude-hooks/hooks.json .claude/
 echo "✓ Multi-environment setup complete:"
 echo ""
 echo "  You can now switch seamlessly between:"
-echo "  - Claude Desktop (CLAUDE.md + hooks) → Large context, hooks"
+echo "  - Claude Code (CLAUDE.md + hooks) → Large context, hooks"
 echo "  - Cursor (.cursor/rules/) → @ mentions, composer"
 echo "  - Copilot (.github/) → Quick edits, inline suggestions"
 echo ""
@@ -190,7 +190,7 @@ When switching between tools, the handoff is seamless because:
 
 **Example: Claude → Cursor → Copilot chain:**
 
-1. **Morning (Claude Desktop - tokens fresh)**:
+1. **Morning (Claude Code - tokens fresh)**:
    ```
    # Claude reads all specs, starts complex feature
    # Hooks auto-log checkpoints
@@ -231,12 +231,12 @@ When switching between tools, the handoff is seamless because:
 **Note**: "multi" means all environment adapters are installed. You can switch freely:
 - Out of Claude tokens? → Open project in Cursor
 - Out of Cursor tokens? → Use Copilot in VS Code
-- Back home? → Continue with Claude Desktop
+- Back home? → Continue with Claude Code
 - All tools see same project state (JOURNAL, FEATURES, etc.)
 
 **Environment-specific tips:**
 
-**Claude Desktop users:**
+**Claude Code users:**
 - Hooks run automatically (SessionStart, PostToolUse, PreCompact)
 - Large context = can read all specs simultaneously
 - Use artifacts for diagrams/documentation drafts
@@ -273,7 +273,7 @@ if [[ "$FRAMEWORK_DATE" != "unknown" ]]; then
     echo "   AI tool capabilities evolve rapidly. Framework may be outdated."
     echo ""
     echo "   STRONGLY RECOMMEND: Research current best practices"
-    echo "   - Claude Desktop latest features (hooks, context, APIs)"
+    echo "   - Claude Code latest features (hooks, context, APIs)"
     echo "   - Cursor latest features (agentic mode, composer, @ mentions)"
     echo "   - Copilot latest features (context window, workspaces)"
     echo ""
@@ -315,7 +315,7 @@ fi
 
 Please research current best practices for [environment]:
 
-### Claude Desktop
+### Claude Code
 - Official docs: https://docs.anthropic.com/claude/desktop
 - Check: Hooks, context window, new APIs, Claude 4 features
 - Focus: Anything that impacts how agents should work

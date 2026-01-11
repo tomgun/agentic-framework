@@ -1,6 +1,6 @@
 # Environment Switching Workflow
 
-**Purpose**: Seamlessly switch between Claude Desktop, Cursor, and Copilot as tokens run out or tool availability changes.
+**Purpose**: Seamlessly switch between Claude Code, Cursor, and Copilot as tokens run out or tool availability changes.
 
 **Why this works**: All tools share the same project state via markdown files (JOURNAL.md, FEATURES.md, STATUS.md, etc.).
 
@@ -9,7 +9,7 @@
 ## Quick Reference
 
 **Token limits** (approximate):
-- Claude Desktop: ~200K tokens/session → ~2-4 hours complex work
+- Claude Code: ~200K tokens/session → ~2-4 hours complex work
 - Cursor: ~50K tokens/conversation → ~30-60 min complex work
 - Copilot: ~8K tokens/context → Quick edits only
 
@@ -19,7 +19,7 @@
 
 ## Switching Protocol
 
-### From Claude Desktop → Cursor
+### From Claude Code → Cursor
 
 **1. In Claude (before running out of tokens):**
 ```bash
@@ -95,7 +95,7 @@ bash .agentic/tools/journal.sh \
 
 ---
 
-### From Copilot → Claude Desktop (Next Session)
+### From Copilot → Claude Code (Next Session)
 
 **1. In Copilot (before ending):**
 ```bash
@@ -136,7 +136,7 @@ bash .agentic/tools/session_log.sh "Checkpoint" "Details" "key=value"
 
 ### 2. Match Tool to Task
 
-**Claude Desktop**:
+**Claude Code**:
 - ✅ Complex features requiring full codebase understanding
 - ✅ Architectural decisions
 - ✅ Initial feature research and planning
@@ -191,7 +191,7 @@ bash .agentic/tools/session_log.sh \
 
 ### Monitor Token Usage
 
-**Claude Desktop**:
+**Claude Code**:
 - Check token counter in UI
 - ~200K limit per session
 - PreCompact hook logs state before reset
@@ -231,7 +231,7 @@ bash .agentic/tools/journal.sh "..." "..." "..." "..."  # 50 tokens!
 
 ## Example: Full Day Workflow
 
-**8:00 AM - Claude Desktop**
+**8:00 AM - Claude Code**
 ```
 # Fresh tokens, complex work
 Agent: ✓ Session started (SessionStart hook)
@@ -283,7 +283,7 @@ Cursor: bash .agentic/tools/feature.sh F-0005 status shipped
 Cursor: bash .agentic/tools/journal.sh "F-0005 complete" "..." "Start F-0006" "None"
 ```
 
-**Next day 8:00 AM - Claude Desktop**
+**Next day 8:00 AM - Claude Code**
 ```
 Claude: SessionStart hook loads .continue-here.md
 Claude: ✓ F-0005 shipped yesterday

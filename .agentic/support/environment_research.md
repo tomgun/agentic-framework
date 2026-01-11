@@ -9,7 +9,7 @@
 
 ## Environment Capabilities Matrix
 
-| Feature | Claude Desktop | Cursor | GitHub Copilot |
+| Feature | Claude Code | Cursor | GitHub Copilot |
 |---------|----------------|--------|----------------|
 | **Instruction File** | `CLAUDE.md` (root) | `.cursor/rules/*.mdc` or `.cursorrules` | `.github/copilot-instructions.md` |
 | **Context Window** | 200K tokens | Varies by model | ~8K tokens (limited) |
@@ -26,7 +26,7 @@
 
 ## Environment-Specific Optimizations
 
-### Claude Desktop
+### Claude Code
 
 **Strengths:**
 - Lifecycle hooks (automatic checkpoint logging!)
@@ -242,7 +242,7 @@ The Agentic Framework was last updated ${DAYS_OLD} days ago.
 AI coding tools evolve rapidly. Would you like to research current best practices?
 
 **Research topics:**
-1. **Claude Desktop updates** (hooks, context window, new features)
+1. **Claude Code updates** (hooks, context window, new features)
 2. **Cursor updates** (agentic mode, composer improvements, @ mentions)
 3. **Copilot updates** (context window, new capabilities, workspaces)
 
@@ -277,7 +277,7 @@ and update `.agentic/support/environment_research.md`
 ### YYYY-MM-DD Update
 
 **Tool updates**:
-- Claude Desktop 1.X: Added [feature], improved [capability]
+- Claude Code 1.X: Added [feature], improved [capability]
 - Cursor 0.X: New [feature], changed [behavior]
 - Copilot: Increased context to XK tokens, added [feature]
 

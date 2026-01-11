@@ -4,7 +4,7 @@
 # This hook runs before Claude compacts the context window (when it gets full).
 # It saves critical information so you don't lose progress.
 #
-# Triggered by: Claude Desktop PreCompact hook
+# Triggered by: Claude Code PreCompact hook
 # Timeout: 10 seconds
 
 set -euo pipefail

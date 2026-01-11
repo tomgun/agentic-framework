@@ -1,8 +1,8 @@
 # Claude Custom Commands (Optional)
 
-**For Claude Desktop users only** - Set up slash commands for common workflows.
+**For Claude Code users only** - Set up slash commands for common workflows.
 
-**Requirements**: Claude Desktop with custom commands enabled (check Claude settings)
+**Requirements**: Claude Code with custom commands enabled (check Claude settings)
 
 ---
 
@@ -16,9 +16,9 @@ Custom commands let you type `/command` in Claude to quickly invoke predefined w
 
 ## Setup
 
-### Method 1: Claude Desktop Settings (if supported)
+### Method 1: Claude Code Settings (if supported)
 
-1. Open Claude Desktop settings
+1. Open Claude Code settings
 2. Go to "Custom Commands" or "Slash Commands"
 3. Add commands from this directory
 4. Save and restart Claude
@@ -98,7 +98,7 @@ You can modify these commands or add your own:
 1. Copy a command file
 2. Modify the prompt text
 3. Change the command name
-4. Add to Claude Desktop settings
+4. Add to Claude Code settings
 
 **Example custom command**:
 ```markdown

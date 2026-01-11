@@ -557,7 +557,7 @@ c) Technical: "401 Unauthorized: Invalid password"
 2. **Summarize key decisions** in JOURNAL.md before compaction
 3. **Commit current work** (even if incomplete) to preserve state in git
 4. **Tell human**: "Context window getting full. Should we wrap up this session and continue in a new one?"
-5. **Claude Desktop users**: If hooks enabled, PreCompact hook will handle this automatically
+5. **Claude Code users**: If hooks enabled, PreCompact hook will handle this automatically
 
 **Prevention**: For long features, commit incrementally. Don't try to implement everything in one giant session.
 
