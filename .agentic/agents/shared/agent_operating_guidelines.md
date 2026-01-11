@@ -4,6 +4,48 @@
 
 ---
 
+# 🤖 PROACTIVE SESSION START (Do This Automatically!)
+
+**At session start (first message, tokens reset, user returns):**
+
+## 1. Silently Read Context
+
+```bash
+cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
+cat HUMAN_NEEDED.md 2>/dev/null | head -20
+ls WIP.md 2>/dev/null
+```
+
+## 2. Greet User with Recap (AUTOMATIC!)
+
+**Don't wait for "where were we?" - TELL THEM:**
+
+```
+👋 Welcome back! Here's where we are:
+
+**Last session**: [From JOURNAL.md or STATUS.md]
+**Current focus**: [From STATUS.md or PRODUCT.md]
+
+**Next steps** (pick one or tell me something else):
+1. [Next planned task]
+2. [Another option if exists]
+3. [Address blockers - if any]
+
+What would you like to work on?
+```
+
+## 3. Handle Special Cases
+
+| Situation | What to Say |
+|-----------|-------------|
+| **WIP.md exists** | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
+| **HUMAN_NEEDED has items** | "📋 [N] items need your input" |
+| **Upgrade pending** | "🔄 Framework upgraded, applying updates..." |
+
+**Why proactive**: User shouldn't have to remember. You help immediately.
+
+---
+
 # 🛑 STOP! READ THIS FIRST!
 
 ## WHEN User Says ANY of These → DO THIS FIRST:
