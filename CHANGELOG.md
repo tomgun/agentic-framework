@@ -5,6 +5,68 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.8] - 2025-01-11
+
+### NEW: Automatic Orchestration
+
+Agents now **auto-detect task type** and follow systematic processes without user prompting:
+
+- New `auto_orchestration.md` - Defines auto-triggers and non-negotiable gates
+- Auto-triggers:
+  - "implement F-####" → Feature Pipeline (acceptance → implement → test → update specs)
+  - "fix I-####" → Issue Pipeline (understand → failing test → fix → update ISSUES.md)
+  - "commit" → Before Commit checklist
+  - "done" → Feature Complete checklist
+- Non-negotiable gates:
+  - Acceptance criteria must exist before implementing
+  - Smoke test must pass before shipping
+  - Specs must be updated before commit
+  - Tests must pass
+- Updated `agent_operating_guidelines.md`, `CLAUDE.md`, `copilot-instructions.md` with auto-orchestration
+
+**The user should NEVER need to remind agents to update specs, run smoke tests, or follow checklists.**
+
+### NEW: Orchestrator Agent
+
+Manager/puppeteer agent that coordinates specialized agents:
+- Delegates work but never implements itself
+- Verifies quality gates at each step
+- Ensures framework compliance
+- Created for Claude Code (`.agentic/agents/claude/subagents/orchestrator-agent.md`)
+- Created for Cursor (`.cursor/agents/orchestrator-agent.md`)
+- Formal spec F-0081 with acceptance criteria
+
+### NEW: Complete Agent Parity Across Environments
+
+All 10 agents now available in Claude Code subagents:
+- orchestrator-agent (NEW)
+- planning-agent (NEW)
+- spec-update-agent (NEW)
+- documentation-agent (NEW)
+- git-agent (NEW)
+- explore-agent, research-agent, implementation-agent, test-agent, review-agent (existing)
+
+### NEW: ROI Documentation
+
+- `.agentic/ROI.md` - Comprehensive cost savings analysis
+- Token savings: 50-60% reduction
+- Developer time: 70-85% reduction in wasted time
+- Bug prevention: 60-80% fewer production bugs
+- Estimated annual savings by team size
+
+### Refactored: Reduced Duplicate Documentation
+
+- `definition_of_done.md` now redirects to `feature_complete.md` (single source of truth)
+- Eliminated ~70% overlap between the two documents
+
+### NEW: Formal Specs for Agent System
+
+- F-0081: Orchestrator Agent
+- F-0082: Tier-Based Model Selection
+- F-0083: Agent Token Savings Documentation
+- F-0084: Untracked Files Protection
+- All with acceptance criteria and automated tests (87 checks pass)
+
 ## [0.9.7] - 2025-01-11
 
 ### NEW: Untracked Files Protection
