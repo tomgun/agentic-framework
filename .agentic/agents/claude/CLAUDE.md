@@ -1,28 +1,57 @@
-# Claude (Anthropic) Instructions
+# Claude Instructions
 
-You are working in a repository that uses the **Agentic Framework** for AI-assisted development.
+You are working in a repository that uses the **Agentic Framework**.
 
 ---
 
-## 🤖 AUTO-ORCHESTRATION (MOST IMPORTANT!)
+# 🛑 STOP! READ THIS FIRST!
 
-**You automatically follow systematic processes based on what the user asks. No manual prompting needed.**
+## WHEN User Says ANY of These:
 
-| User Request | You Automatically Do |
-|--------------|---------------------|
-| "implement F-####" / "build [feature]" | Feature Pipeline (acceptance criteria → implement → test → update specs) |
-| "fix I-####" / "fix [bug]" | Issue Pipeline (understand → failing test → fix → update ISSUES.md) |
-| "commit" | Before Commit checklist (all gates must pass) |
-| "done" / "feature complete" | Feature Complete checklist |
+| Trigger Words | YOUR FIRST ACTION |
+|---------------|-------------------|
+| "build", "implement", "add", "create", "let's do" | **🛑 STOP → Read `feature_start.md` → Check acceptance criteria EXIST** |
+| "fix", "bug", "issue" | **🛑 STOP → Check spec/ISSUES.md → Write failing test FIRST** |
+| "commit", "push" | **🛑 STOP → Read `before_commit.md` → All gates must pass** |
+| "done", "complete", "finished" | **🛑 STOP → Read `feature_complete.md` → Verify ALL items** |
 
-### Non-Negotiable Gates (BLOCK IF NOT MET)
+## 🚫 DO NOT PROCEED UNTIL:
 
-- **Acceptance Criteria**: Must exist BEFORE implementing
-- **Smoke Test**: Must actually RUN the application before shipping
-- **Specs Updated**: FEATURES.md/PRODUCT.md current before commit
-- **Tests Pass**: Cannot ship with failing tests
+```
+FEATURE REQUEST?
+├─ Does spec/acceptance/F-####.md exist?
+│   ├─ YES → OK to implement
+│   └─ NO  → 🛑 BLOCK. Create criteria FIRST. NO CODE until criteria exist.
+```
 
-**Full auto-orchestration rules: `.agentic/agents/shared/auto_orchestration.md`**
+**This is NON-NEGOTIABLE. Criteria before code. Every time. No exceptions.**
+
+---
+
+## Token Efficiency: DELEGATE, Don't Do Everything
+
+| Task Type | Spawn This Agent | Model Tier | Why |
+|-----------|------------------|------------|-----|
+| Codebase search | `explore-agent` | Cheap/fast | 83% cheaper |
+| Research/docs | `research-agent` | Cheap/fast | Fresh small context |
+| Implementation | `implementation-agent` | Mid-tier | Focused context |
+| Writing tests | `test-agent` | Mid-tier | Isolated work |
+| Code review | `review-agent` | Mid-tier | Fresh perspective |
+
+**Pass to subagent ONLY**: Feature ID, acceptance criteria, 3-5 relevant files, STACK.md info.
+**DO NOT pass**: Full history, unrelated code, previous sessions.
+
+**Subagent definitions**: `.agentic/agents/claude/subagents/`
+
+---
+
+## Quick Checklist References
+
+- **Starting feature?** → `.agentic/checklists/feature_start.md`
+- **Before commit?** → `.agentic/checklists/before_commit.md`
+- **Feature done?** → `.agentic/checklists/feature_complete.md`
+- **Session start?** → `.agentic/checklists/session_start.md`
+- **Session end?** → `.agentic/checklists/session_end.md`
 
 ---
 
@@ -377,4 +406,26 @@ If multiple agents are working simultaneously:
 
 **Checklists prevent mistakes** - systematic coverage, nothing forgotten.
 
-**Follow these, and you'll be a reliable, efficient agent.** ✅
+---
+
+# 🛑 REMINDER (Read This Too!)
+
+**Before implementing ANY feature:**
+
+```
+1. Do acceptance criteria exist?
+   └─ NO? → 🛑 STOP. Create them FIRST. DO NOT write code.
+   
+2. Can I delegate?
+   └─ YES? → Spawn subagent. Save tokens. Fresh context.
+   
+3. Is this small batch?
+   └─ NO? → Split it. Max 5-10 files per commit.
+```
+
+**Trigger phrases that REQUIRE criteria check:**
+- "build", "implement", "add", "create", "let's do", "make", "develop"
+
+**You WILL forget this.** That's why it's at the TOP and BOTTOM of this file.
+
+**Read `.agentic/checklists/feature_start.md` for every feature. No exceptions.**

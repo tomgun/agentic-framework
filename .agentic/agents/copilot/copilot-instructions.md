@@ -1,32 +1,42 @@
-# GitHub Copilot Instructions
+# Copilot Instructions
 
-This repo uses the `.agentic/` **Agentic Framework** for AI-assisted development.
-
----
-
-## 🤖 AUTO-ORCHESTRATION (MOST IMPORTANT!)
-
-**Automatically follow systematic processes based on user requests:**
-
-| User Says | You Do |
-|-----------|--------|
-| "implement F-####" / "build feature" | → Feature Pipeline (acceptance criteria → implement → test → update specs) |
-| "fix I-####" / "fix bug" | → Issue Pipeline (understand → failing test → fix → update ISSUES.md) |
-| "commit" | → Before Commit checklist |
-| "done" / "feature complete" | → Feature Complete checklist |
-
-### Non-Negotiable Gates
-
-- **Acceptance Criteria**: Must exist BEFORE implementing
-- **Smoke Test**: Must RUN the application before shipping
-- **Specs Updated**: FEATURES.md/PRODUCT.md current before commit
-- **Tests Pass**: Cannot ship with failing tests
-
-**Full rules: `.agentic/agents/shared/auto_orchestration.md`**
+This repo uses the **Agentic Framework**.
 
 ---
 
-## 🚨 MANDATORY Protocols (READ THESE!)
+# 🛑 STOP! READ THIS FIRST!
+
+## WHEN User Says ANY of These:
+
+| Trigger Words | YOUR FIRST ACTION |
+|---------------|-------------------|
+| "build", "implement", "add", "create", "let's do" | **🛑 STOP → Check acceptance criteria EXIST first** |
+| "fix", "bug", "issue" | **🛑 STOP → Write failing test FIRST** |
+| "commit", "push" | **🛑 STOP → All gates must pass (tests, specs updated)** |
+| "done", "complete" | **🛑 STOP → Verify smoke test passed, specs updated** |
+
+## 🚫 DO NOT PROCEED UNTIL:
+
+```
+FEATURE REQUEST?
+├─ Does spec/acceptance/F-####.md exist?
+│   ├─ YES → OK to implement
+│   └─ NO  → 🛑 BLOCK. Create criteria FIRST.
+```
+
+**Criteria before code. Every time. No exceptions.**
+
+---
+
+## Quick Checklists
+
+- **Starting feature?** → `.agentic/checklists/feature_start.md`
+- **Before commit?** → `.agentic/checklists/before_commit.md`
+- **Feature done?** → `.agentic/checklists/feature_complete.md`
+
+---
+
+## 🚨 MANDATORY Protocols
 
 ### 1. Session Start (Every Time)
 **Read `.agentic/checklists/session_start.md`** before doing ANY work.

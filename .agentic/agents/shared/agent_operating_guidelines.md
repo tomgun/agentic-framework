@@ -1,50 +1,66 @@
-# Agent operating guidelines (shared)
+# Agent Operating Guidelines (All Tools)
 
-**📖 For framework principles and values, see [../../PRINCIPLES.md](../../PRINCIPLES.md)**
-
-**🎯 Scope**: These rules are for **any** assistant (Cursor, Copilot, Claude, etc.) working in **a project that uses this framework**.
-
-**🚨 Working ON the framework itself?** Also read [`../../FRAMEWORK_DEVELOPMENT.md`](../../FRAMEWORK_DEVELOPMENT.md) for additional guidelines specific to framework development.
+**For**: Cursor, Copilot, Claude, Gemini, Codex, or ANY AI assistant.
 
 ---
 
-## 🤖 AUTO-ORCHESTRATION (READ THIS FIRST!)
+# 🛑 STOP! READ THIS FIRST!
 
-**🚨 CRITICAL: Agents AUTOMATICALLY detect task type and follow systematic process. No user prompting needed.**
+## WHEN User Says ANY of These → DO THIS FIRST:
 
-**See full rules: [`auto_orchestration.md`](./auto_orchestration.md)**
+| Trigger Words | YOUR FIRST ACTION |
+|---------------|-------------------|
+| "build", "implement", "add", "create", "let's do", "make" | **🛑 STOP → Read `feature_start.md` → Check acceptance criteria EXIST** |
+| "fix", "bug", "issue" | **🛑 STOP → Check spec/ISSUES.md → Write failing test FIRST** |
+| "commit", "push" | **🛑 STOP → Read `before_commit.md` → All gates must pass** |
+| "done", "complete", "finished" | **🛑 STOP → Read `feature_complete.md` → Verify ALL items** |
 
-### Quick Reference: Auto-Triggers
-
-| User Says | You Automatically Do |
-|-----------|---------------------|
-| "implement F-####" / "build [feature]" | → Feature Pipeline (acceptance criteria → implement → test → update specs) |
-| "fix I-####" / "fix [bug]" | → Issue Pipeline (understand → failing test → fix → update ISSUES.md) |
-| First message / "start session" | → Session Start checklist |
-| "commit" / "ready to commit" | → Before Commit checklist |
-| "done" / "feature complete" | → Feature Complete checklist |
-| "end session" | → Session End checklist |
-
-### Non-Negotiable Gates (BLOCK IF NOT MET)
-
-| Gate | Requirement |
-|------|-------------|
-| **Acceptance Criteria** | Must exist BEFORE any implementation |
-| **Tests Pass** | Cannot ship with failing tests |
-| **Smoke Test** | Must actually RUN the application |
-| **Specs Updated** | FEATURES.md/PRODUCT.md current before commit |
-| **No Untracked Files** | All new files git-added |
-
-### Framework Promises YOU Must Enforce
+## 🚫 BLOCKING GATE (Non-Negotiable)
 
 ```
-✅ Specs drive development (cannot implement without acceptance criteria)
-✅ Tests verify correctness (cannot ship without passing tests)
-✅ Documentation stays current (cannot commit without updating docs)
-✅ Quality gates block bad code (pre-commit-check.sh must pass)
+FEATURE REQUEST DETECTED?
+├─ Does spec/acceptance/F-####.md exist?
+│   ├─ YES → OK to proceed with implementation
+│   └─ NO  → 🛑 BLOCK. Create acceptance criteria FIRST.
+│            DO NOT write any code until criteria exist.
+│            Ask user to define criteria, or draft for approval.
 ```
 
-**The user should NEVER need to remind you to update specs, run smoke tests, or follow checklists.**
+**This gate is NON-NEGOTIABLE. Criteria before code. Every time.**
+
+---
+
+## Token Efficiency: DELEGATE Tasks
+
+| Task | Spawn Agent | Model Tier | Savings |
+|------|-------------|------------|---------|
+| Codebase exploration | `explore-agent` | Cheap/fast | 83% |
+| Documentation lookup | `research-agent` | Cheap/fast | 60% |
+| Implementation | `implementation-agent` | Mid-tier | Focus |
+| Test writing | `test-agent` | Mid-tier | Isolation |
+| Code review | `review-agent` | Mid-tier | Fresh eyes |
+
+**Context handoff**: Pass ONLY feature ID, criteria, 3-5 files, STACK.md.
+**DO NOT pass**: Full history, unrelated code, previous sessions.
+
+---
+
+## Quick Checklist References
+
+| Task | Read This First |
+|------|-----------------|
+| Starting a feature | `checklists/feature_start.md` |
+| Before any commit | `checklists/before_commit.md` |
+| Marking done | `checklists/feature_complete.md` |
+| Session start | `checklists/session_start.md` |
+| Session end | `checklists/session_end.md` |
+
+**Full auto-orchestration rules**: [`auto_orchestration.md`](./auto_orchestration.md)
+
+---
+
+**📖 Principles**: [../../PRINCIPLES.md](../../PRINCIPLES.md)
+**🚨 Framework development?** [../../FRAMEWORK_DEVELOPMENT.md](../../FRAMEWORK_DEVELOPMENT.md)
 
 ---
 
@@ -52,6 +68,7 @@
 
 **These checklists ensure nothing falls through the cracks. Use them systematically:**
 
+- **[`checklists/feature_start.md`](../../checklists/feature_start.md)** - 🛑 **BEFORE ANY FEATURE WORK** (gates!)
 - **[`checklists/session_start.md`](../../checklists/session_start.md)** - Starting every work session
 - **[`checklists/feature_implementation.md`](../../checklists/feature_implementation.md)** - Implementing any feature
 - **[`checklists/smoke_testing.md`](../../checklists/smoke_testing.md)** - 🚨 **VERIFYING CODE ACTUALLY WORKS** (critical!)

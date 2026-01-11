@@ -5,6 +5,51 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.9] - 2025-01-11
+
+### IMPROVED: Deterministic Agent Behavior
+
+Based on real-world usage feedback where agents skipped documented workflows:
+
+**Problem**: Agents would jump straight to implementation when asked to "build a feature", skipping the acceptance criteria check.
+
+**Solution**: Restructured all agent instruction files for deterministic behavior:
+
+1. **New checklist**: `feature_start.md` - BLOCKING gates before any feature work
+   - Gate 1: Acceptance criteria exist?
+   - Gate 2: Small batch? (max 5-10 files)
+   - Gate 3: Delegate or do?
+   - Gate 4: Context handoff (if delegating)
+
+2. **Trigger pattern matching**: Explicit triggers at TOP of all instruction files
+   - "build", "implement", "add", "create", "let's do" → Check criteria FIRST
+   - "fix", "bug", "issue" → Write failing test FIRST
+   - "commit" → All gates must pass
+
+3. **Primacy + Recency**: Critical rules at BOTH top AND bottom of docs
+
+4. **STOP language**: "🛑 STOP", "BLOCK", "DO NOT PROCEED UNTIL"
+
+5. **Redundancy**: Same rules in multiple places (CLAUDE.md, copilot-instructions.md, agent_operating_guidelines.md)
+
+Updated files:
+- `.agentic/checklists/feature_start.md` (NEW)
+- `.agentic/agents/claude/CLAUDE.md` (restructured)
+- `.agentic/agents/copilot/copilot-instructions.md` (restructured)
+- `.agentic/agents/shared/agent_operating_guidelines.md` (restructured)
+
+### IMPROVED: Token Efficiency Delegation Guidelines
+
+Clear rules for when to spawn subagents:
+
+| Task | Spawn Agent | Model Tier | Savings |
+|------|-------------|------------|---------|
+| Codebase exploration | explore-agent | Cheap/fast | 83% |
+| Documentation lookup | research-agent | Cheap/fast | 60% |
+| Implementation | implementation-agent | Mid-tier | Focus |
+
+Context handoff rules: Pass ONLY feature ID, criteria, 3-5 files, STACK.md.
+
 ## [0.9.8] - 2025-01-11
 
 ### NEW: Automatic Orchestration
