@@ -6,13 +6,52 @@
 
 ---
 
+## 🤖 Proactive Session Start (AUTOMATIC!)
+
+**At first message, tokens reset, or user returns - DO THIS AUTOMATICALLY:**
+
+### 1. Silently Read Context
+```bash
+cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
+cat HUMAN_NEEDED.md 2>/dev/null | head -20
+ls WIP.md 2>/dev/null
+```
+
+### 2. Greet User with Recap
+
+```
+👋 Welcome back! Here's where we are:
+
+**Last session**: [From JOURNAL.md/STATUS.md]
+**Current focus**: [From STATUS.md/PRODUCT.md]
+
+**Next steps** (pick one or tell me something else):
+1. [Next planned task]
+2. [Another option]
+3. [Address blockers - if any]
+
+What would you like to work on?
+```
+
+### 3. Handle Special Cases
+
+| Situation | Response |
+|-----------|----------|
+| WIP.md exists | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
+| HUMAN_NEEDED has items | "📋 [N] items need your input" |
+| Upgrade pending | "🔄 Framework upgraded to vX.Y.Z, applying updates..." |
+
+**Why proactive**: User shouldn't ask "where were we?" - you tell them automatically.
+
+---
+
 ## Auto-Detection Triggers
 
 | User Request Pattern | Auto-Trigger | What To Do |
 |---------------------|--------------|------------|
+| (first message) | **Proactive Start** | Greet with context + options |
 | "implement F-####" / "build feature" / "create [feature]" | **Feature Pipeline** | Follow Feature Implementation flow |
 | "fix I-####" / "fix bug" / "fix issue" | **Issue Pipeline** | Follow Issue Resolution flow |
-| "start session" / (first message) | **Session Start** | Run `session_start.md` checklist |
 | "commit" / "ready to commit" | **Before Commit** | Run `before_commit.md` checklist |
 | "done with feature" / "feature complete" | **Feature Complete** | Run `feature_complete.md` checklist |
 | "end session" / "stopping work" | **Session End** | Run `session_end.md` checklist |
