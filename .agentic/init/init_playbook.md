@@ -71,27 +71,37 @@ This creates all expected files/folders with templates/placeholders so you can s
 - Profile: core+product  <!-- if user chose 'b' -->
 ```
 
-## Step 1a: Detect AI environment and optimize (NEW!)
+## Step 1a: Set up your AI tool(s)
 
-**Ask the user which AI environment(s) they'll use:**
+**Ask the user which AI tool they're using NOW:**
 
-> "Which AI coding environment(s) will you use?
+> "Which AI coding tool are you using right now?
 > 
-> **a) Multiple (RECOMMENDED)** - Switch between tools as needed (e.g., Claude → Cursor → Copilot as tokens run out)
-> **b) Claude Desktop only** - Large context, hooks, autonomous
-> **c) Cursor only** - IDE-integrated, composer, @ mentions  
-> **d) GitHub Copilot only** - VS Code integrated, inline suggestions
+> **a) Claude Code** - This conversation (creates CLAUDE.md)
+> **b) Cursor** - IDE-integrated (creates .cursorrules)  
+> **c) GitHub Copilot** - VS Code (creates .github/copilot-instructions.md)
+> **d) Codex CLI** - Terminal-based (uses AGENTS.md)
+> **e) Gemini** - Google AI (creates GEMINI.md)
 > 
-> Type 'a' (recommended for flexibility), 'b', 'c', or 'd'"
+> Type the letter for your current tool"
 
-**Why "Multiple" is recommended:**
-- Token limits exist (Claude → Cursor → Copilot chain)
-- Different tools for different tasks (Claude for complex, Copilot for quick edits)
-- Tool availability varies (desktop vs mobile, work vs home)
-- Redundancy if one tool is down
-- All tools share same project state (JOURNAL.md, FEATURES.md, etc.)
+**Based on answer, create ONLY that tool's file:**
 
-**Install appropriate adapter files:**
+```bash
+# Run the appropriate command:
+bash .agentic/tools/setup-agent.sh claude   # for (a)
+bash .agentic/tools/setup-agent.sh cursor   # for (b)
+bash .agentic/tools/setup-agent.sh copilot  # for (c)
+bash .agentic/tools/setup-agent.sh codex    # for (d)
+bash .agentic/tools/setup-agent.sh gemini   # for (e)
+```
+
+**IMPORTANT**: Only create the file for the tool being used NOW. If the user later switches to a different tool, they can run:
+```bash
+bash .agentic/tools/setup-agent.sh <new-tool>
+```
+
+All tool files reference the same common rules (`.agentic/agents/shared/`), so switching is seamless.
 
 ### If Claude Desktop (a):
 ```bash
