@@ -13,6 +13,7 @@
 # Exclude tool-specific files (framework dogfooding - each project generates its own)
 /CLAUDE.md export-ignore
 /.cursorrules export-ignore
+/.cursor export-ignore
 /.github export-ignore
 
 # Exclude framework development files
