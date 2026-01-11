@@ -39,9 +39,9 @@ Add verification section:
 ```markdown
 ## Verification
 
-- [x] AC-001: Verified in test_feature.test.ts
-- [x] AC-002: Verified in test_feature.test.ts
-- [x] AC-003: Verified in e2e/feature.spec.ts
+- [x] AC-001: Verified in tests/unit/feature.test.*
+- [x] AC-002: Verified in tests/unit/feature.test.*
+- [x] AC-003: Verified in tests/e2e/feature.spec.*
 
 Verified by: Review Agent
 Date: YYYY-MM-DD

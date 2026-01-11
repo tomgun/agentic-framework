@@ -23,24 +23,25 @@
 ## Output
 
 ### Test Files
-Create tests in appropriate location:
-- Unit: `tests/unit/[feature].test.ts`
-- Integration: `tests/integration/[feature].test.ts`
-- E2E: `tests/e2e/[feature].spec.ts`
+Create tests in appropriate location (paths depend on project language/framework):
+- Unit: `tests/unit/[feature].test.*`
+- Integration: `tests/integration/[feature].test.*`
+- E2E: `tests/e2e/[feature].spec.*`
+
+Check `STACK.md` for project-specific test locations and naming conventions.
 
 ### Test Format
-```typescript
-describe('F-####: [Feature Name]', () => {
-  describe('AC-001: [Scenario]', () => {
-    it('should [expected behavior]', () => {
-      // Given
-      // When
-      // Then
-      expect(result).toBe(expected);
-    });
-  });
-});
+Use the project's testing framework. Example structure:
 ```
+describe('F-####: [Feature Name]')
+  describe('AC-001: [Scenario]')
+    it('should [expected behavior]')
+      // Given - setup
+      // When - action
+      // Then - assertion
+```
+
+Always include the F-#### and AC-### identifiers for traceability.
 
 ### Verification
 Run tests to confirm they fail:
@@ -59,7 +60,7 @@ npm test -- --grep "F-####"
 
 When done, update `.agentic/pipeline/F-{id}-pipeline.md`:
 ```markdown
-- [x] Test Agent (HH:MM) → tests/[feature].test.ts (N tests, all RED)
+- [x] Test Agent (HH:MM) → tests/[feature].test.* (N tests, all RED)
 ```
 
 Add handoff notes for Implementation Agent:
