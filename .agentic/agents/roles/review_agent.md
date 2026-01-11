@@ -38,11 +38,13 @@
 - [ ] Auth checks where needed
 - [ ] Sensitive data handled properly
 
-### Tests
-- [ ] Tests cover acceptance criteria
+### Tests & Acceptance Criteria
+- [ ] **Each AC has corresponding test(s)** - map AC-001, AC-002 to test files
+- [ ] Tests cover acceptance criteria completely
 - [ ] Edge cases tested
 - [ ] Tests are deterministic
 - [ ] No flaky tests
+- [ ] If discoveries were made, verify Planning Agent was re-invoked
 
 ### Performance
 - [ ] No obvious N+1 queries
