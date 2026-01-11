@@ -163,6 +163,10 @@ if [[ "${PROFILE}" == "core" ]]; then
   fi
   echo ""
   echo "Done (Core). Next: tell your agent to initialize using .agentic/init/init_playbook.md"
+  echo ""
+  echo "Optional: For multi-agent development, run:"
+  echo "  bash .agentic/tools/setup-agent.sh pipeline       # Pipeline infrastructure"
+  echo "  bash .agentic/tools/setup-agent.sh cursor-agents  # Cursor-specific agents"
   echo "To enable Product Management later: bash .agentic/tools/enable-product-management.sh"
   exit 0
 fi
@@ -251,9 +255,19 @@ echo ""
 echo "Setting up AI tool integration..."
 if [[ -f "${ROOT_DIR}/.agentic/tools/setup-agent.sh" ]]; then
   bash "${ROOT_DIR}/.agentic/tools/setup-agent.sh" all 2>/dev/null || true
+  
+  # For Core+PM: also set up pipeline infrastructure for multi-agent work
+  echo ""
+  echo "Setting up multi-agent pipeline infrastructure..."
+  bash "${ROOT_DIR}/.agentic/tools/setup-agent.sh" pipeline 2>/dev/null || true
 fi
 
 echo ""
 echo "Done (Core+PM). Next: run the agent-guided init in .agentic/init/init_playbook.md"
+echo ""
+echo "Multi-agent setup:"
+echo "  - Pipeline infrastructure: ✓ Created (AGENTS_ACTIVE.md, .agentic/pipeline/)"
+echo "  - Agent roles: Available in .agentic/agents/roles/"
+echo "  - To copy roles to Cursor: bash .agentic/tools/setup-agent.sh cursor-agents"
 
 

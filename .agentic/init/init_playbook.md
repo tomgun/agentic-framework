@@ -403,6 +403,52 @@ Choose **Proprietary (f)** if:
 
 **See**: `.agentic/workflows/project_licensing.md` for comprehensive licensing guide.
 
+### Step 2b: Ask about development style (multi-agent)
+
+Ask the user:
+
+```
+"How do you want to work with AI agents?
+
+a) Single agent (default) - One agent handles everything
+   Simple, no coordination overhead
+   Good for: Most projects, getting started
+
+b) Specialized agents - Different agents for research, testing, coding, review
+   More context-efficient, better quality gates
+   Requires: Pipeline tracking, handoff protocols
+   Good for: Complex features with clear phases
+
+c) Parallel features - Multiple agents on different features simultaneously
+   Uses git worktrees for isolation
+   Requires: AGENTS_ACTIVE.md coordination
+   Good for: Large projects, team development
+
+d) Not sure - Start simple, enable later
+   You can always add multi-agent support with:
+   bash .agentic/tools/setup-agent.sh pipeline
+
+Type a/b/c/d:"
+```
+
+**If (b) Specialized agents chosen:**
+1. Pipeline infrastructure already created by scaffold (Core+PM)
+2. For Cursor, run: `bash .agentic/tools/setup-agent.sh cursor-agents`
+3. Tell user about role definitions: `.agentic/agents/roles/`
+4. Explain pipeline workflow: Research → Planning → Test → Implementation → Review → Spec Update → Docs → Git
+
+**If (c) Parallel features chosen:**
+1. Pipeline infrastructure already created by scaffold (Core+PM)
+2. Explain git worktree workflow (see `.agentic/workflows/multi_agent_coordination.md`)
+3. Show how to create worktrees:
+   ```bash
+   git worktree add ../project-F0042 -b feature/F-0042
+   ```
+
+**If (a) or (d) chosen:**
+- No additional setup needed
+- Multi-agent can be enabled later
+
 ## Step 3: Fill in the core documents
 
 ### For all profiles:
