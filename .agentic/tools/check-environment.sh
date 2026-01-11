@@ -1,6 +1,11 @@
 #!/bin/bash
 # Environment Detection & Tool Setup Check
 # Detects which AI coding tools might be in use and suggests setup
+#
+# Usage:
+#   check-environment.sh         # Check and suggest
+#   check-environment.sh --fix   # Auto-create for detected environments
+#   check-environment.sh --list  # Just list what files exist
 
 set -e
 
@@ -13,6 +18,28 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 RED='\033[0;31m'
 NC='\033[0m'
+
+# Parse args
+FIX_MODE=false
+LIST_MODE=false
+if [[ "$1" == "--fix" ]]; then
+  FIX_MODE=true
+elif [[ "$1" == "--list" ]]; then
+  LIST_MODE=true
+fi
+
+if [[ "$LIST_MODE" == true ]]; then
+  echo "Tool files in project:"
+  [[ -f "$PROJECT_ROOT/CLAUDE.md" ]] && echo "  ✓ CLAUDE.md (Claude Code)"
+  [[ -f "$PROJECT_ROOT/.cursorrules" ]] && echo "  ✓ .cursorrules (Cursor)"
+  [[ -f "$PROJECT_ROOT/.github/copilot-instructions.md" ]] && echo "  ✓ .github/copilot-instructions.md (Copilot)"
+  [[ -f "$PROJECT_ROOT/GEMINI.md" ]] && echo "  ✓ GEMINI.md (Gemini)"
+  [[ -f "$PROJECT_ROOT/AGENTS.md" ]] && echo "  ✓ AGENTS.md (Codex/general)"
+  echo ""
+  echo "To add another tool: bash .agentic/tools/setup-agent.sh <tool>"
+  echo "Available: claude, cursor, copilot, codex, gemini"
+  exit 0
+fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo -e "${BLUE}Environment Detection & Tool Setup${NC}"

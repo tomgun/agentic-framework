@@ -169,12 +169,12 @@ if [[ "${PROFILE}" == "core" ]]; then
   echo "  bash .agentic/tools/setup-agent.sh cursor-agents  # Cursor-specific agents"
   echo "To enable Product Management later: bash .agentic/tools/enable-product-management.sh"
   
-  # Final environment check
+  # Note about tool setup (don't auto-create - let init_playbook ask)
   echo ""
-  echo "Verifying tool-specific files..."
-  if [[ -f "${ROOT_DIR}/.agentic/tools/check-environment.sh" ]]; then
-    bash "${ROOT_DIR}/.agentic/tools/check-environment.sh" --fix 2>/dev/null || true
-  fi
+  echo "Tool-specific setup:"
+  echo "  The agent will ask which AI tool(s) you use during initialization."
+  echo "  Or run manually: bash .agentic/tools/setup-agent.sh <tool>"
+  echo "  Available: claude, cursor, copilot, codex, gemini"
   exit 0
 fi
 
@@ -277,11 +277,11 @@ echo "  - Pipeline infrastructure: ✓ Created (AGENTS_ACTIVE.md, .agentic/pipel
 echo "  - Agent roles: Available in .agentic/agents/roles/"
 echo "  - To copy roles to Cursor: bash .agentic/tools/setup-agent.sh cursor-agents"
 
-# Final environment check
+# Note about tool setup (don't auto-create - let init_playbook ask)
 echo ""
-echo "Verifying tool-specific files..."
-if [[ -f "${ROOT_DIR}/.agentic/tools/check-environment.sh" ]]; then
-  bash "${ROOT_DIR}/.agentic/tools/check-environment.sh" --fix 2>/dev/null || true
-fi
+echo "Tool-specific setup:"
+echo "  The agent will ask which AI tool(s) you use during initialization."
+echo "  Or run manually: bash .agentic/tools/setup-agent.sh <tool>"
+echo "  Available: claude, cursor, copilot, codex, gemini"
 
 
