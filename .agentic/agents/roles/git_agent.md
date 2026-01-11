@@ -31,7 +31,7 @@ git diff
 ### 2. Stage Changes
 ```bash
 # Stage related changes together
-git add src/feature.ts tests/feature.test.ts
+git add src/feature.* tests/feature.test.*
 ```
 
 ### 3. Commit with Conventional Format

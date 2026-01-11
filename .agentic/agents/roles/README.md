@@ -2,6 +2,8 @@
 
 This directory contains predefined agent roles for specialized task execution.
 
+**Technology-agnostic**: These roles work with any language, framework, or stack. They reference `STACK.md` for project-specific details (test frameworks, file conventions, build commands).
+
 ## Available Roles
 
 | Role | File | Purpose |

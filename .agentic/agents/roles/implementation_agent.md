@@ -82,7 +82,7 @@ This triggers a re-invocation of Planning Agent before Review.
 
 When done, update `.agentic/pipeline/F-{id}-pipeline.md`:
 ```markdown
-- [x] Implementation Agent (HH:MM) → src/[files].ts (N tests passing)
+- [x] Implementation Agent (HH:MM) → src/[files].* (N tests passing)
 ```
 
 Add handoff notes for Review Agent:
