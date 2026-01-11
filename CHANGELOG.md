@@ -5,6 +5,60 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2025-01-11
+
+### NEW: Proactive Session Start
+
+Agents now **automatically greet users with context** at session start:
+
+```
+👋 Welcome back! Here's where we are:
+
+**Last session**: Implemented game board rendering
+**Current focus**: Touch controls for mobile
+
+**Next steps**:
+1. Add touch event handlers (F-0019)
+2. Test on mobile emulator
+
+What would you like to work on?
+```
+
+Features:
+- Silently reads STATUS.md, PRODUCT.md, HUMAN_NEEDED.md, WIP.md
+- Presents options for next steps
+- Handles special cases:
+  - "⚠️ Previous work interrupted!" (if WIP.md exists)
+  - "📋 3 items need your input" (if HUMAN_NEEDED has items)
+  - "🔄 Framework upgraded" (if upgrade pending)
+
+**User shouldn't ask "where were we?" - agent tells them automatically.**
+
+Added to shared (tool-agnostic) files:
+- `agent_operating_guidelines.md`
+- `auto_orchestration.md`
+- `checklists/session_start.md`
+
+### NEW: Feature Start Checklist
+
+New `checklists/feature_start.md` with BLOCKING gates:
+- Gate 1: Acceptance criteria exist?
+- Gate 2: Small batch? (max 5-10 files)
+- Gate 3: Delegate or do?
+- Gate 4: Context handoff rules
+
+### IMPROVED: Deterministic Agent Behavior
+
+Restructured all agent instruction files:
+- Trigger pattern matching at TOP
+- STOP/BLOCK language for non-negotiable gates
+- Primacy + recency (rules at top AND bottom)
+- Redundancy across all tool-specific files
+
+### FIXED: Claude Desktop → Claude Code
+
+Renamed all references from "Claude Desktop" to "Claude Code" (terminal).
+
 ## [0.9.9] - 2025-01-11
 
 ### IMPROVED: Deterministic Agent Behavior
