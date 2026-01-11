@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.9.5
+**Version**: 0.9.7
 
 ---
 
@@ -20,6 +20,7 @@
 | **Recovery** | F-0051 to F-0060 | Error recovery and resilience |
 | **Developer Experience** | F-0061 to F-0070 | Documentation, onboarding, usability |
 | **Design Principles** | F-0071 to F-0080 | Core framework principles as specs |
+| **Agent System** | F-0081 to F-0090 | Specialized agents, orchestration, token efficiency |
 
 ---
 
@@ -610,13 +611,13 @@
 **Complexity**: medium  
 **Since**: v0.9.5
 
-**Description**: 8 specialized agent roles (Research, Planning, Test, Implementation, Review, Spec Update, Documentation, Git) with clear responsibilities, context requirements, and handoff protocols.
+**Description**: 9 specialized agent roles (Orchestrator, Research, Planning, Test, Implementation, Review, Spec Update, Documentation, Git) with clear responsibilities, context requirements, and handoff protocols.
 
 **Dependencies**: F-0034
 
 **Implementation**:
 - State: complete
-- Code: `.agentic/agents/roles/*.md` (8 role files)
+- Code: `.agentic/agents/roles/*.md` (9 role files including orchestrator-agent.md)
 - Tests: role file existence validation
 
 **Acceptance**: See `spec/acceptance/F-0035.md`
@@ -1263,6 +1264,86 @@
 
 ---
 
+## F-0081: Orchestrator Agent
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: medium  
+**Since**: v0.9.7
+
+**Description**: Manager/puppeteer agent that coordinates specialized agents, ensures framework compliance, and manages feature pipeline. Delegates work but never implements itself.
+
+**Dependencies**: F-0035, F-0036
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/agents/roles/orchestrator-agent.md`, `.cursor/agents/orchestrator-agent.md`
+- Tests: role structure validation
+
+**Acceptance**: See `spec/acceptance/F-0081.md`
+
+---
+
+## F-0082: Tier-Based Model Selection
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: low  
+**Since**: v0.9.7
+
+**Description**: Model recommendations use tiers (Cheap/Fast, Mid-tier, Powerful) instead of specific model names. Future-proof as model names change frequently.
+
+**Dependencies**: F-0071
+
+**Implementation**:
+- State: complete
+- Code: All subagent definitions, agent_operating_guidelines.md, CLAUDE.md
+- Tests: documentation review
+
+**Acceptance**: See `spec/acceptance/F-0082.md`
+
+---
+
+## F-0083: Agent Token Savings Documentation
+
+**Status**: shipped  
+**Priority**: medium  
+**Complexity**: low  
+**Since**: v0.9.7
+
+**Description**: Quantified documentation of token savings from agent delegation (60-83% typical), based on Claude best practices.
+
+**Dependencies**: F-0071, F-0081
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/token_efficiency/agent_delegation_savings.md`, `.agentic/token_efficiency/claude_best_practices.md`
+- Tests: documentation existence
+
+**Acceptance**: See `spec/acceptance/F-0083.md`
+
+---
+
+## F-0084: Untracked Files Protection
+
+**Status**: shipped  
+**Priority**: high  
+**Complexity**: low  
+**Since**: v0.9.7
+
+**Description**: Prevent deployment failures from files created but not git-tracked. Pre-commit warning, session/commit checklists, and tool for verification.
+
+**Dependencies**: F-0013
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/check-untracked.sh`, `.agentic/hooks/pre-commit-check.sh` (check 6/6)
+- Tests: script execution, hook validation
+
+**Acceptance**: See `spec/acceptance/F-0084.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1275,5 +1356,6 @@
 | Recovery (F-0051-0060) | 6 | 0 | 0 | 6 |
 | Developer Experience (F-0061-0070) | 10 | 0 | 0 | 10 |
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
-| **Total** | **59** | **0** | **0** | **59** |
+| Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
+| **Total** | **63** | **0** | **0** | **63** |
 

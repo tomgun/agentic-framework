@@ -249,7 +249,7 @@ else
   fail "roles directory missing"
 fi
 
-for role in research_agent planning_agent test_agent implementation_agent review_agent spec_update_agent documentation_agent git_agent; do
+for role in orchestrator-agent research_agent planning_agent test_agent implementation_agent review_agent spec_update_agent documentation_agent git_agent; do
   if [[ -f "${ROLES_DIR}/${role}.md" ]]; then
     pass "${role}.md exists"
   else
@@ -557,6 +557,98 @@ if grep -qi "After Framework Upgrade" "${FRAMEWORK_ROOT}/.agentic/agents/shared/
   pass "Guidelines have post-upgrade section"
 else
   fail "Guidelines missing post-upgrade section"
+fi
+
+# F-0081: Orchestrator Agent
+# ============================================================
+echo ""
+echo "--- F-0081: Orchestrator Agent ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/agents/roles/orchestrator-agent.md" ]]; then
+  pass "orchestrator-agent.md exists"
+else
+  fail "orchestrator-agent.md missing"
+fi
+
+if grep -qi "Delegate.*specialized agents" "${FRAMEWORK_ROOT}/.agentic/agents/roles/orchestrator-agent.md" 2>/dev/null; then
+  pass "Orchestrator describes delegation"
+else
+  fail "Orchestrator missing delegation description"
+fi
+
+if grep -qi "Compliance Checks" "${FRAMEWORK_ROOT}/.agentic/agents/roles/orchestrator-agent.md" 2>/dev/null; then
+  pass "Orchestrator has compliance checks"
+else
+  fail "Orchestrator missing compliance checks"
+fi
+
+# F-0082: Tier-Based Model Selection
+# ============================================================
+echo ""
+echo "--- F-0082: Tier-Based Model Selection ---"
+
+if grep -qi "Cheap/Fast\|Mid-tier\|Powerful" "${FRAMEWORK_ROOT}/.agentic/agents/claude/subagents/explore-agent.md" 2>/dev/null; then
+  pass "explore-agent uses tier terminology"
+else
+  fail "explore-agent missing tier terminology"
+fi
+
+if grep -qi "Model selection principle" "${FRAMEWORK_ROOT}/.agentic/agents/claude/subagents/implementation-agent.md" 2>/dev/null; then
+  pass "implementation-agent has model selection principle"
+else
+  fail "implementation-agent missing model selection principle"
+fi
+
+# F-0083: Agent Token Savings Documentation
+# ============================================================
+echo ""
+echo "--- F-0083: Agent Token Savings Documentation ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/token_efficiency/agent_delegation_savings.md" ]]; then
+  pass "agent_delegation_savings.md exists"
+else
+  fail "agent_delegation_savings.md missing"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/token_efficiency/claude_best_practices.md" ]]; then
+  pass "claude_best_practices.md exists"
+else
+  fail "claude_best_practices.md missing"
+fi
+
+if grep -qi "60.*83\|savings" "${FRAMEWORK_ROOT}/.agentic/token_efficiency/agent_delegation_savings.md" 2>/dev/null; then
+  pass "Token savings quantified"
+else
+  fail "Token savings not quantified"
+fi
+
+# F-0084: Untracked Files Protection
+# ============================================================
+echo ""
+echo "--- F-0084: Untracked Files Protection ---"
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/check-untracked.sh" ]]; then
+  pass "check-untracked.sh exists and is executable"
+else
+  fail "check-untracked.sh missing or not executable"
+fi
+
+if grep -qi "untracked" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "pre-commit-check.sh includes untracked check"
+else
+  fail "pre-commit-check.sh missing untracked check"
+fi
+
+if grep -qi "untracked" "${FRAMEWORK_ROOT}/.agentic/checklists/session_end.md" 2>/dev/null; then
+  pass "session_end.md has untracked files check"
+else
+  fail "session_end.md missing untracked files check"
+fi
+
+if grep -qi "git add" "${FRAMEWORK_ROOT}/.agentic/agents/shared/agent_operating_guidelines.md" 2>/dev/null; then
+  pass "Guidelines have git add rule"
+else
+  fail "Guidelines missing git add rule"
 fi
 
 # ============================================================
