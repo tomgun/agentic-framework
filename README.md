@@ -34,7 +34,7 @@ Work seamlessly across Claude Desktop, Cursor, and GitHub Copilot in the same pr
 ```bash
 # Download latest release
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
-cd agentic-framework-0.9.4
+cd agentic-framework-0.9.7
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -63,7 +63,7 @@ The agent will:
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
 
 # Copy .agentic/ into your project
-cp -r agentic-framework-0.9.4/.agentic /path/to/your-project/
+cp -r agentic-framework-0.9.7/.agentic /path/to/your-project/
 ```
 
 Then follow the same agent initialization process above. The agent will run `scaffold.sh` for you.
@@ -73,11 +73,14 @@ Then follow the same agent initialization process above. The agent will run `sca
 **📖 For comprehensive principles guide, see [`PRINCIPLES.md`](.agentic/PRINCIPLES.md)** ⭐
 
 ### 1. Token Economics (Efficiency)
-**Durable artifacts prevent repeated context waste.**
+**Durable artifacts and smart delegation prevent token waste.**
 - Maintain `CONTEXT_PACK.md` so agents don't re-read entire codebases
 - Use `JOURNAL.md` to preserve progress across context resets
 - Follow structured reading protocols with explicit token budgets
-- Summarize instead of repeatedly reading
+- **Agent delegation**: Use cheap/fast models for exploration, mid-tier for implementation
+- **Tier-based selection**: Don't hardcode model names (they change); use tiers
+- **Claude Projects**: Add key docs to project knowledge for automatic caching
+- See `.agentic/token_efficiency/` for quantified savings (60-83% typical)
 
 ### 2. Developer-Friendly UX
 **Humans focus on decisions and direction. Agents handle implementation mechanics.**
@@ -89,6 +92,8 @@ Then follow the same agent initialization process above. The agent will run `sca
 - **Ready-to-use prompts**: Copy-paste workflows from `.agentic/prompts/` (Cursor/Claude)
 - **Session continuity**: Generate `.continue-here.md` for instant context recovery
 - **Pre-project planning**: Use `VISION.template.md` for ideation phase
+- **Specialized agents**: 5 pre-defined subagents (explore, implement, test, review, research)
+- **Project-specific agents**: Create domain experts with `create-agent.sh`
 
 ### 3. Quality by Design
 **Acceptance criteria and tests control unwanted changes.**
@@ -192,7 +197,7 @@ The agent will:
 ```bash
 # Download new version
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
-cd agentic-framework-0.9.4
+cd agentic-framework-0.9.7
 
 # Run upgrade script with your project path
 bash .agentic/tools/upgrade.sh /path/to/your-project
@@ -394,10 +399,10 @@ cd /tmp
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
 
 # Run upgrade tool from NEW framework, pointing to your project
-bash /tmp/agentic-framework-0.9.4/.agentic/tools/upgrade.sh /path/to/your-project
+bash /tmp/agentic-framework-0.9.7/.agentic/tools/upgrade.sh /path/to/your-project
 
 # Clean up
-rm -rf /tmp/agentic-framework-0.9.4
+rm -rf /tmp/agentic-framework-0.9.7
 ```
 
 **Why from the new framework?** The new upgrade script has the latest bug fixes and knows about new structure changes.

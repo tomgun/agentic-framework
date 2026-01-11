@@ -278,6 +278,33 @@ bash .agentic/hooks/pre-commit-check.sh
 
 ---
 
+### Agent Delegation Saves Tokens
+
+**What**: Specialized agents with cheaper models handle specific tasks more efficiently than one powerful agent doing everything.
+
+**Why**:
+- Cheap/fast models are ~10x less expensive than powerful ones
+- Simple tasks (exploration, lookups) don't need expensive reasoning
+- Subagents get fresh, focused context (not full conversation history)
+- Parallel execution for independent tasks
+
+**How**:
+- Use **tier-based model selection** (not specific model names):
+  - Cheap/Fast tier: Exploration, lookups, simple searches
+  - Mid-tier: Implementation, testing, reviews
+  - Powerful tier: Complex architecture, difficult bugs
+- Delegate exploration to explore-agent (cheap/fast)
+- Delegate implementation to implementation-agent (mid-tier)
+- Create project-specific agents for domain expertise
+
+**Example**: Instead of opus analyzing "where is auth implemented?" → spawn explore-agent with haiku. Saves ~90% tokens.
+
+**Anti-pattern**: ❌ Using the most powerful model for every task. ❌ Hardcoding specific model names (they change frequently).
+
+**Reference**: `.agentic/token_efficiency/agent_delegation_savings.md`
+
+---
+
 ### Sequential Agents Optimize Context
 
 **What**: Specialized agents work sequentially, each loading only role-specific context.
@@ -462,6 +489,30 @@ F-0005: CSV Export
 - `State: complete` → All code written, tests pass
 
 **Anti-pattern**: ❌ `State: none` but `Code: src/export.py` field is filled. ❌ Never updating State field as code is written.
+
+---
+
+### No Untracked Files in Project Directories
+
+**What**: New files must be git tracked or explicitly ignored. Untracked files in project directories cause deployment failures.
+
+**Why**:
+- Agents create files but sometimes forget to `git add`
+- Untracked files don't get committed → missing from deployment
+- Silent failures are worse than loud failures
+- Prevention is cheaper than debugging production
+
+**How**:
+- Pre-commit hook (check 6/6) warns about untracked files
+- Session end checklist includes untracked file review
+- Agent guidelines: "After creating any file, always `git add` it"
+- `check-untracked.sh` tool for manual verification
+
+**Example**: Agent creates `assets/sounds/click.wav` but forgets to track. Pre-commit warns: "⚠ Untracked files in assets/". Developer adds it before deployment breaks.
+
+**Anti-pattern**: ❌ Assuming all files get tracked automatically. ❌ Ignoring pre-commit warnings about untracked files.
+
+**Reference**: `.agentic/tools/check-untracked.sh`, `.agentic/hooks/pre-commit-check.sh`
 
 ---
 
@@ -930,8 +981,8 @@ Type 'a' or 'b':
 
 ---
 
-**Last Updated**: 2026-01-03  
-**Framework Version**: 0.2.4  
+**Last Updated**: 2025-01-11  
+**Framework Version**: 0.9.7  
 
 **Note**: Principles evolve, but slowly. Major changes to core philosophy require strong justification and community discussion.
 
