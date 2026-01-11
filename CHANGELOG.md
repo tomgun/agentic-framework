@@ -5,6 +5,46 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.7] - 2025-01-11
+
+### NEW: Untracked Files Protection
+
+Prevents "files created but not tracked in git" deployment issues:
+- `check-untracked.sh` - Detect untracked files in project directories
+- Pre-commit hook (check 6/6) warns about untracked files
+- Updated `session_end.md` and `before_commit.md` checklists
+- Updated `agent_operating_guidelines.md` with "always git add new files" rule
+
+### NEW: Specialized Agent Usage
+
+Claude Code can now actively use specialized subagents:
+- Created 5 subagent definitions in `.agentic/agents/claude/subagents/`:
+  - `explore-agent` - Quick codebase exploration (cheap/fast tier)
+  - `implementation-agent` - Code writing (mid-tier)
+  - `test-agent` - Test writing (mid-tier)
+  - `review-agent` - Code review (mid-tier)
+  - `research-agent` - Documentation lookup (cheap/fast tier)
+- `create-agent.sh` - Create project-specific agents interactively
+- `suggest-agents.sh` - Analyze project, suggest useful agents
+- Updated `CLAUDE.md` with Agent Delegation section
+- Updated `session_start.md` with Agent Delegation Check
+
+### NEW: Token Savings Documentation
+
+- `agent_delegation_savings.md` - Quantified savings (60-83% typical)
+- `claude_best_practices.md` - Based on official Claude guide
+- Documented why delegation saves tokens (model cost, context isolation)
+- Added Claude Projects caching tips
+
+### Improved: Tier-Based Model Recommendations
+
+Model names change frequently. Documentation now uses tiers:
+- **Cheap/Fast**: Exploration, lookups (haiku, gpt-4o-mini, gemini-flash)
+- **Mid-tier**: Implementation, testing, reviews (sonnet, gpt-4o)
+- **Powerful**: Complex architecture (opus, o1)
+
+Future-proof: guidance remains valid as new models release.
+
 ## [0.9.6] - 2025-01-11
 
 ### Improved: Tool-Specific Setup
