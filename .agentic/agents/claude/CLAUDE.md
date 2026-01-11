@@ -227,6 +227,11 @@ bash .agentic/tools/blocker.sh resolve HN-0001 \
 
 **Spawn specialized agents to save tokens and improve quality.**
 
+**Why this saves tokens** (see `.agentic/token_efficiency/agent_delegation_savings.md`):
+- **haiku is ~10x cheaper** than opus - use it for exploration/search
+- **Fresh context** - subagents don't carry your entire conversation history
+- **Parallel execution** - multiple subagents work simultaneously
+
 ### Available Agents
 
 Check `.agentic/agents/claude/subagents/` for agent definitions:
@@ -281,6 +286,25 @@ Create custom agents for domain-specific work:
 bash .agentic/tools/suggest-agents.sh  # See suggestions
 bash .agentic/tools/create-agent.sh game-rules  # Create one
 ```
+
+---
+
+## Claude Projects (Caching for Free!)
+
+**Tip**: If using Claude Projects, add key files for automatic caching:
+
+Upload to project knowledge base:
+- `CONTEXT_PACK.md` - Architecture, entry points
+- `STACK.md` - Tech stack, conventions
+- `spec/PRD.md` - Requirements (if Core+PM)
+- Key reference docs
+
+**Benefits** (per [Claude usage guide](https://support.claude.com/en/articles/9797557-usage-limit-best-practices)):
+- Cached content doesn't count against limits when reused
+- Questions about these docs use fewer tokens
+- More messages available for actual work
+
+See `.agentic/token_efficiency/claude_best_practices.md` for details.
 
 ---
 
