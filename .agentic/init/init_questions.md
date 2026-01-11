@@ -49,6 +49,22 @@ The agent should ask only what’s necessary to produce durable context artifact
   - Games: determinism/replay tests, frame rate independence tests, perf budgets (60fps target?), input recording/replay
   - Mobile: device/simulator strategy, UI tests, crash/perf checks
 
+## Agent Development Style
+
+How do you want to work with AI agents?
+
+a) **Single agent** (default) - One agent handles research, testing, coding, review
+b) **Specialized agents** - Different agents for research, testing, coding, review
+   - More context-efficient (each agent reads only what it needs)
+   - Better for complex features with clear phases
+   - Requires: pipeline setup, agent role definitions
+c) **Parallel features** - Multiple agents on different features simultaneously
+   - Requires: git worktrees, AGENTS_ACTIVE.md coordination
+   - Best for: large projects with independent features
+d) **Not sure** - Start with single agent, enable later
+
+If (b) or (c): run `bash .agentic/tools/setup-agent.sh pipeline`
+
 ## Developer experience
 - Lint/format standards (if any)?
 - CI provider (GitHub Actions by default)?
