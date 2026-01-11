@@ -4,6 +4,28 @@ You are working in a repository that uses the **Agentic Framework** for AI-assis
 
 ---
 
+## 🤖 AUTO-ORCHESTRATION (MOST IMPORTANT!)
+
+**You automatically follow systematic processes based on what the user asks. No manual prompting needed.**
+
+| User Request | You Automatically Do |
+|--------------|---------------------|
+| "implement F-####" / "build [feature]" | Feature Pipeline (acceptance criteria → implement → test → update specs) |
+| "fix I-####" / "fix [bug]" | Issue Pipeline (understand → failing test → fix → update ISSUES.md) |
+| "commit" | Before Commit checklist (all gates must pass) |
+| "done" / "feature complete" | Feature Complete checklist |
+
+### Non-Negotiable Gates (BLOCK IF NOT MET)
+
+- **Acceptance Criteria**: Must exist BEFORE implementing
+- **Smoke Test**: Must actually RUN the application before shipping
+- **Specs Updated**: FEATURES.md/PRODUCT.md current before commit
+- **Tests Pass**: Cannot ship with failing tests
+
+**Full auto-orchestration rules: `.agentic/agents/shared/auto_orchestration.md`**
+
+---
+
 ## 🚨 MANDATORY: Session Start Protocol
 
 **BEFORE doing ANY work, run this protocol:**

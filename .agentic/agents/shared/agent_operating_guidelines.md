@@ -8,6 +8,46 @@
 
 ---
 
+## 🤖 AUTO-ORCHESTRATION (READ THIS FIRST!)
+
+**🚨 CRITICAL: Agents AUTOMATICALLY detect task type and follow systematic process. No user prompting needed.**
+
+**See full rules: [`auto_orchestration.md`](./auto_orchestration.md)**
+
+### Quick Reference: Auto-Triggers
+
+| User Says | You Automatically Do |
+|-----------|---------------------|
+| "implement F-####" / "build [feature]" | → Feature Pipeline (acceptance criteria → implement → test → update specs) |
+| "fix I-####" / "fix [bug]" | → Issue Pipeline (understand → failing test → fix → update ISSUES.md) |
+| First message / "start session" | → Session Start checklist |
+| "commit" / "ready to commit" | → Before Commit checklist |
+| "done" / "feature complete" | → Feature Complete checklist |
+| "end session" | → Session End checklist |
+
+### Non-Negotiable Gates (BLOCK IF NOT MET)
+
+| Gate | Requirement |
+|------|-------------|
+| **Acceptance Criteria** | Must exist BEFORE any implementation |
+| **Tests Pass** | Cannot ship with failing tests |
+| **Smoke Test** | Must actually RUN the application |
+| **Specs Updated** | FEATURES.md/PRODUCT.md current before commit |
+| **No Untracked Files** | All new files git-added |
+
+### Framework Promises YOU Must Enforce
+
+```
+✅ Specs drive development (cannot implement without acceptance criteria)
+✅ Tests verify correctness (cannot ship without passing tests)
+✅ Documentation stays current (cannot commit without updating docs)
+✅ Quality gates block bad code (pre-commit-check.sh must pass)
+```
+
+**The user should NEVER need to remind you to update specs, run smoke tests, or follow checklists.**
+
+---
+
 ## ✅ Mandatory Checklists (USE THESE!)
 
 **These checklists ensure nothing falls through the cracks. Use them systematically:**
