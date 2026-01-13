@@ -640,8 +640,87 @@ Added to all shared (tool-agnostic) files:
 
 ---
 
-**Framework Repository**: https://github.com/tomgun/agentic-framework  
-**Current Version**: v0.10.0  
-**License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)  
+---
+
+## Critical Framework Review & Consolidation Plan (v0.10.0)
+
+### Framework Meta-Review Requested
+
+**User request**:
+> "Make a critical review about the framework implementation. How could it be better? Should instructions in 'production' be organized to be more concise? How can we make it more deterministic: There has been problems still that agent's don't remember to do everything."
+
+### Key Problems Identified
+
+**1. Tool Sprawl**:
+- 60+ shell/python scripts, many overlapping
+- 10+ verification tools doing related tasks (doctor, verify, consistency, validate_specs, validate_formats, check-untracked, project-health, report, coverage, pre-commit-check)
+- No single entry point - agents confused about which to run
+
+**2. Documentation Sprawl**:
+- 42K+ lines of documentation
+- `agent_operating_guidelines.md`: 1186 lines
+- Same concepts repeated in 3-4 places
+- 20-30% estimated content duplication
+
+**3. Orchestrator Exists But Isn't Used**:
+- Orchestrator agent already defines compliance checks, pipeline coordination, quality gates
+- But main docs push manual checklists instead
+- Agents don't know to use orchestrator
+
+**4. Accretion Without Cleanup**:
+- Each problem solved by adding new doc/tool
+- Existing ones never cleaned up or deprecated
+- Framework suffers from same issues it tries to prevent
+
+### Critical Insight
+
+> "The framework already has all the pieces. They just need to be unified and surfaced, not duplicated or added to."
+
+Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out:
+> "So we already have tools like that and even an orchestrator agent. Did you take those into account? It seems every time we develop this framework new stuff gets added, which leads to this bloat, but cleaning is not done as well."
+
+### Solution: Consolidation, Not Addition
+
+**Phase 1: Tool Consolidation**
+- Make `doctor.sh` THE single verification command
+- Add `--full` mode that orchestrates all existing checks
+- Deprecate redundant tools (verify.sh, consistency.sh, etc.)
+
+**Phase 2: Documentation Consolidation**
+- Create `QUICK_REFERENCE.md` (~100 lines for daily use)
+- Reduce CLAUDE.md from 271 to ~100 lines
+- Make checklists reference guidelines instead of duplicate
+
+**Phase 3: Elevate Orchestrator**
+- Make orchestrator THE default for feature work
+- Update main instruction files to prominently reference it
+
+### Documents Created
+
+| Document | Purpose |
+|----------|---------|
+| `docs/reviews/2025-01-13-v0.10.0-critical-review.md` | Full analysis of current state |
+| `docs/reviews/2025-01-13-v0.10.0-improvement-plan.md` | Detailed remediation plan |
+
+### Target Metrics
+
+| Metric | Before | Target |
+|--------|--------|--------|
+| Agent reading burden | 15-30K tokens | <5K tokens |
+| Verification commands | 10+ | 1 (doctor.sh --full) |
+| Duplicated content | 20-30% | <5% |
+
+### Status
+
+- [x] Critical review completed
+- [x] Improvement plan drafted
+- [ ] Another agent to review plan
+- [ ] Implementation (target: v0.11.0)
+
+---
+
+**Framework Repository**: https://github.com/tomgun/agentic-framework
+**Current Version**: v0.10.0
+**License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 
