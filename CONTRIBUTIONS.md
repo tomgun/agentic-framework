@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework  
-**Period**: Initial Development (v0.1.0 → v0.11.0)
+**Period**: Initial Development (v0.1.0 → v0.11.1)
 **Date**: 2025-01-14  
 
 ---
@@ -213,6 +213,15 @@
 
 ---
 
+## v0.11.1 Contributions (2025-01-15)
+
+### Bug Fixes & Issue Tracking
+- Reported `status.sh` failing on macOS - led to awk-based cross-platform fix
+- Requested issue tracking be added to agent instructions (minimal addition)
+- Noted: "when I report an issue, it should be logged as a known issue"
+
+---
+
 ## v0.11.0 Contributions (2025-01-14)
 
 ### Gate-Based Architecture Initiative
@@ -239,7 +248,7 @@
 
 ## Summary Statement
 
-Led development of Agentic AI Framework from v0.1.0 to v0.11.0, defining vision, architecture, and quality standards. Key contributions include:
+Led development of Agentic AI Framework from v0.1.0 to v0.11.1, defining vision, architecture, and quality standards. Key contributions include:
 
 - **Modular architecture design** (Core vs Core+PM profiles)
 - **Systematic quality checklists** (6 workflow checklists, 1400+ lines)
@@ -739,12 +748,12 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 - [x] Critical review completed
 - [x] Improvement plan drafted
 - [ ] Another agent to review plan
-- [ ] Implementation (target: v0.11.0)
+- [ ] Implementation (target: v0.11.1)
 
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.11.0
+**Current Version**: v0.11.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 

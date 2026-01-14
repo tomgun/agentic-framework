@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.11.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.11.0)
+**Current version:** [v0.11.1](https://github.com/tomgun/agentic-framework/releases/tag/v0.11.1)
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
@@ -49,7 +49,7 @@ Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same proje
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.1.tar.gz | tar xz
 cd agentic-framework-0.9.7
 
 # Install into your project
@@ -76,7 +76,7 @@ The agent will:
 
 ```bash
 # Download and extract
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.1.tar.gz | tar xz
 
 # Copy .agentic/ into your project
 cp -r agentic-framework-0.9.7/.agentic /path/to/your-project/
@@ -212,7 +212,7 @@ The agent will:
 
 ```bash
 # Download new version
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.1.tar.gz | tar xz
 cd agentic-framework-0.9.7
 
 # Run upgrade script with your project path
@@ -336,7 +336,7 @@ Enable later: `bash .agentic/tools/enable-product-management.sh`
 
 ### Tooling
 ```bash
-# Project health & verification (v0.11.0: doctor.sh is THE verification command)
+# Project health & verification (v0.11.1: doctor.sh is THE verification command)
 bash .agentic/tools/doctor.sh              # Quick health check
 bash .agentic/tools/doctor.sh --full       # Comprehensive verification
 bash .agentic/tools/doctor.sh --phase X    # Phase-specific (start/planning/implement/complete/commit)
@@ -414,7 +414,7 @@ Already have a project? The framework integrates non-invasively:
 ```bash
 # Download new version (to temp location)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.1.tar.gz | tar xz
 
 # Run upgrade tool from NEW framework, pointing to your project
 bash /tmp/agentic-framework-0.9.7/.agentic/tools/upgrade.sh /path/to/your-project

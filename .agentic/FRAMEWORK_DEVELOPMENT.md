@@ -131,7 +131,8 @@ Example projects demonstrate best practices and verify workflows actually work.
    - Date the release
 
 3. **Update version references**:
-   - `README.md` (installation instructions)
+   - `README.md` (current version)
+   - `CONTRIBUTIONS.md` (current version at bottom)
    - Any docs referencing specific versions
 
 4. **Update example projects**:
