@@ -5,6 +5,16 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.1] - 2025-01-15
+
+### Fixed
+- `status.sh` macOS compatibility - replaced sed with awk for cross-platform support
+
+### Added
+- Issue tracking to `AGENT_QUICK_START.md` - agents now log bugs to ISSUES.md before fixing
+
+---
+
 ## [0.11.0] - 2025-01-14
 
 ### NEW: Gate-Based Verification
