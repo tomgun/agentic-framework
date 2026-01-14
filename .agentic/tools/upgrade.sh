@@ -344,6 +344,44 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 debug "Creating upgrade marker at: $TARGET_PROJECT_DIR/.agentic/.upgrade_pending"
 debug "  .agentic dir exists? $(test -d "$TARGET_PROJECT_DIR/.agentic" && echo yes || echo no)"
 
+# Helper function: check if version A < version B
+version_lt() {
+  # Returns 0 (true) if $1 < $2
+  [[ "$1" != "$2" ]] && [[ "$(printf '%s\n%s' "$1" "$2" | sort -V | head -n1)" == "$1" ]]
+}
+
+# Build NEW FEATURES section based on version upgrade path
+# Features registry: "version_introduced:feature_name:command:description"
+# Only features introduced AFTER from_version and AT OR BEFORE to_version are shown
+NEW_FEATURES_SECTION=""
+FROM_VER="${CURRENT_VERSION:-0.0.0}"
+TO_VER="${VERSION_TO_USE:-999.0.0}"
+
+# Feature registry - add new features here with the version they were introduced
+declare -a FEATURE_REGISTRY=(
+  "0.5.0:Sub-agent setup:bash .agentic/tools/setup-agent.sh cursor-agents:Specialized agents for different tasks"
+  "0.5.0:Multi-agent pipeline:bash .agentic/tools/setup-agent.sh pipeline:Parallel work coordination"
+  "0.5.0:Tool setup:bash .agentic/tools/setup-agent.sh all:Auto-loaded instructions"
+)
+
+# Filter features based on version range
+NEW_FEATURES=""
+for feature_entry in "${FEATURE_REGISTRY[@]}"; do
+  IFS=':' read -r feat_version feat_name feat_cmd feat_desc <<< "$feature_entry"
+  # Include if: from_version < feature_version <= to_version
+  if version_lt "$FROM_VER" "$feat_version" && ! version_lt "$TO_VER" "$feat_version"; then
+    NEW_FEATURES="${NEW_FEATURES}       - ${feat_name}: \`${feat_cmd}\` (${feat_desc})\n"
+  fi
+done
+
+# Only add NEW FEATURES section if there are actually new features
+if [[ -n "$NEW_FEATURES" ]]; then
+  NEW_FEATURES_SECTION="7. [ ] **NEW FEATURES CHECK**: Ask user about new features added since ${FROM_VER}:
+${NEW_FEATURES}8. [ ] Delete this file: \\\`rm .agentic/.upgrade_pending\\\`"
+else
+  NEW_FEATURES_SECTION="7. [ ] Delete this file: \\\`rm .agentic/.upgrade_pending\\\`"
+fi
+
 if [[ ! -d "$TARGET_PROJECT_DIR/.agentic" ]]; then
   echo -e "${RED}✗ Cannot create marker: .agentic/ directory not found${NC}"
   echo "  This is unexpected after upgrade. Check the upgrade output above."
@@ -372,11 +410,7 @@ else
 4. [ ] Read .agentic/START_HERE.md (5 min) for new workflows
 5. [ ] Validate specs: \`python3 .agentic/tools/validate_specs.py\`
 6. [ ] Review CHANGELOG: ${VERSION_TO_USE:-unknown} changes
-7. [ ] **NEW FEATURES CHECK**: Ask user about new features added since their last version:
-       - Sub-agent setup: \`bash .agentic/tools/setup-agent.sh cursor-agents\` (for specialized agents)
-       - Multi-agent pipeline: \`bash .agentic/tools/setup-agent.sh pipeline\` (for parallel work)
-       - Tool setup: \`bash .agentic/tools/setup-agent.sh all\` (auto-loaded instructions)
-8. [ ] Delete this file: \`rm .agentic/.upgrade_pending\`
+$(echo -e "$NEW_FEATURES_SECTION")
 
 ## Changelog
 
