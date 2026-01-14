@@ -53,70 +53,77 @@ TIMESTAMP=$(date +"%Y-%m-%d %H:%M")
 case "${FIELD}" in
   focus)
     # Update "## Current session state" section
-    sed -i.bak "/^## Current session state/,/^## / {
-      /^## Current session state/!{
-        /^## /!{
-          /^- / c\\
-- ${VALUE} (Updated: ${TIMESTAMP})
-        }
-      }
-    }" "${STATUS_FILE}"
-    rm -f "${STATUS_FILE}.bak"
+    # Use awk for macOS compatibility (BSD sed doesn't handle c\ well)
+    awk -v value="${VALUE}" -v ts="${TIMESTAMP}" '
+      /^## Current session state/ { in_section=1; print; next }
+      /^## / && in_section { in_section=0; printed=1; print "- " value " (Updated: " ts ")"; print ""; print }
+      in_section && /^- / { if (!printed) { print "- " value " (Updated: " ts ")"; printed=1 }; next }
+      in_section && /^$/ && printed { next }
+      { print }
+      END { if (in_section && !printed) print "- " value " (Updated: " ts ")" }
+    ' "${STATUS_FILE}" > "${STATUS_FILE}.tmp" && mv "${STATUS_FILE}.tmp" "${STATUS_FILE}"
     echo "✓ Updated focus in STATUS.md"
     ;;
     
   progress)
     # Look for "Progress:" or "Status:" line and update it
+    # Use awk for macOS compatibility
     if grep -q "^- Progress:" "${STATUS_FILE}"; then
-      sed -i.bak "s/^- Progress:.*$/- Progress: ${VALUE} (${TIMESTAMP})/" "${STATUS_FILE}"
+      awk -v value="${VALUE}" -v ts="${TIMESTAMP}" '
+        /^- Progress:/ { print "- Progress: " value " (" ts ")"; next }
+        { print }
+      ' "${STATUS_FILE}" > "${STATUS_FILE}.tmp" && mv "${STATUS_FILE}.tmp" "${STATUS_FILE}"
     elif grep -q "^- Status:" "${STATUS_FILE}"; then
-      sed -i.bak "s/^- Status:.*$/- Status: ${VALUE} (${TIMESTAMP})/" "${STATUS_FILE}"
+      awk -v value="${VALUE}" -v ts="${TIMESTAMP}" '
+        /^- Status:/ { print "- Status: " value " (" ts ")"; next }
+        { print }
+      ' "${STATUS_FILE}" > "${STATUS_FILE}.tmp" && mv "${STATUS_FILE}.tmp" "${STATUS_FILE}"
     else
-      # Add after Current session state section
-      sed -i.bak "/^## Current session state/a\\
-- Progress: ${VALUE} (${TIMESTAMP})
-" "${STATUS_FILE}"
+      # Add after Current session state header
+      awk -v value="${VALUE}" -v ts="${TIMESTAMP}" '
+        { print }
+        /^## Current session state/ { print "- Progress: " value " (" ts ")" }
+      ' "${STATUS_FILE}" > "${STATUS_FILE}.tmp" && mv "${STATUS_FILE}.tmp" "${STATUS_FILE}"
     fi
-    rm -f "${STATUS_FILE}.bak"
     echo "✓ Updated progress in STATUS.md"
     ;;
     
   next)
     # Update "## Next immediate step" section
-    sed -i.bak "/^## Next immediate step/,/^## / {
-      /^## Next immediate step/!{
-        /^## /!{
-          /^- / c\\
-- ${VALUE}
-        }
-      }
-    }" "${STATUS_FILE}"
-    rm -f "${STATUS_FILE}.bak"
+    # Use awk for macOS compatibility (BSD sed doesn't handle c\ well)
+    awk -v value="${VALUE}" '
+      /^## Next immediate step/ { in_section=1; print; next }
+      /^## / && in_section { in_section=0; printed=1; print "- " value; print ""; print }
+      in_section && /^- / { if (!printed) { print "- " value; printed=1 }; next }
+      in_section && /^$/ && printed { next }
+      { print }
+      END { if (in_section && !printed) print "- " value }
+    ' "${STATUS_FILE}" > "${STATUS_FILE}.tmp" && mv "${STATUS_FILE}.tmp" "${STATUS_FILE}"
     echo "✓ Updated next step in STATUS.md"
     ;;
     
   blocker)
     # Update blockers section
+    # Use awk for macOS compatibility (BSD sed doesn't handle c\ well)
     if [[ "${VALUE}" == "None" ]]; then
-      sed -i.bak "/^## Blockers/,/^## / {
-        /^## Blockers/!{
-          /^## /!{
-            /^- / c\\
-- None
-          }
-        }
-      }" "${STATUS_FILE}"
+      awk '
+        /^## Blockers/ { in_section=1; print; next }
+        /^## / && in_section { in_section=0; printed=1; print "- None"; print ""; print }
+        in_section && /^- / { if (!printed) { print "- None"; printed=1 }; next }
+        in_section && /^$/ && printed { next }
+        { print }
+        END { if (in_section && !printed) print "- None" }
+      ' "${STATUS_FILE}" > "${STATUS_FILE}.tmp" && mv "${STATUS_FILE}.tmp" "${STATUS_FILE}"
     else
-      sed -i.bak "/^## Blockers/,/^## / {
-        /^## Blockers/!{
-          /^## /!{
-            /^- / c\\
-- ${VALUE} (Added: ${TIMESTAMP})
-          }
-        }
-      }" "${STATUS_FILE}"
+      awk -v value="${VALUE}" -v ts="${TIMESTAMP}" '
+        /^## Blockers/ { in_section=1; print; next }
+        /^## / && in_section { in_section=0; printed=1; print "- " value " (Added: " ts ")"; print ""; print }
+        in_section && /^- / { if (!printed) { print "- " value " (Added: " ts ")"; printed=1 }; next }
+        in_section && /^$/ && printed { next }
+        { print }
+        END { if (in_section && !printed) print "- " value " (Added: " ts ")" }
+      ' "${STATUS_FILE}" > "${STATUS_FILE}.tmp" && mv "${STATUS_FILE}.tmp" "${STATUS_FILE}"
     fi
-    rm -f "${STATUS_FILE}.bak"
     echo "✓ Updated blocker in STATUS.md"
     ;;
     
