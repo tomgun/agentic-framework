@@ -1,7 +1,7 @@
 # Project Contributions Report
 
-**Project**: Agentic AI Framework  
-**Period**: Initial Development (v0.1.0 → v0.11.1)
+**Project**: Agentic AI Framework
+**Period**: Initial Development (v0.1.0 → v0.11.2)
 **Date**: 2025-01-14  
 
 ---
@@ -210,6 +210,14 @@
 > "Can you now review if the agents still can work efficiently in the CORE mode?"
 
 > "Agent operating guidelines - is this for the agents working ON this framework or USING this framework and do we need to distinguish / clarify this for the agents?"
+
+---
+
+## v0.11.2 Contributions (2025-01-15)
+
+### Upgrade Process Fix
+- Reported recurring "new features" prompt on every upgrade (same features shown repeatedly)
+- Led to version-aware feature registry in upgrade.sh
 
 ---
 
