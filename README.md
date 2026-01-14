@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.9.7](https://github.com/tomgun/agentic-framework/releases/tag/v0.9.7)
+**Current version:** [v0.11.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.11.0)
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
@@ -21,8 +21,24 @@
 The Agentic AI Framework enables **sustainable long-term software development with AI agents**. It provides structure, conventions, and tooling that keep both humans and AI agents aligned as projects evolve from prototypes to production systems.
 
 **Two profiles available:**
-- **Core**: Quality standards, workflows, multi-agent coordination (minimal ceremony)
-- **Core + Product Management**: Adds formal specs, feature tracking, project metrics (for complex projects)
+
+- **Core**: Full framework capabilities with lightweight planning
+  - Context optimization (CONTEXT_PACK.md)
+  - Session continuity (JOURNAL.md)
+  - Multi-agent coordination
+  - Test-driven development support
+  - Token efficiency guidelines
+  - Green coding principles
+  - Quality gates (doctor.sh)
+  - Human escalation (HUMAN_NEEDED.md)
+  - Lightweight planning (PRODUCT.md)
+
+- **Core + Product Management**: Everything in Core, plus formal specs
+  - Feature tracking with F-#### IDs
+  - Acceptance criteria per feature
+  - STATUS.md for current focus
+  - spec/FEATURES.md, NFR.md, ADRs
+  - Cross-reference validation
 
 **🔄 Multi-Environment Support:**
 Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out or use the best tool for each task. All environments share the same project state for perfect continuity. [Learn more](.agentic/workflows/environment_switching.md)
@@ -33,7 +49,7 @@ Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same proje
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.0.tar.gz | tar xz
 cd agentic-framework-0.9.7
 
 # Install into your project
@@ -60,7 +76,7 @@ The agent will:
 
 ```bash
 # Download and extract
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.0.tar.gz | tar xz
 
 # Copy .agentic/ into your project
 cp -r agentic-framework-0.9.7/.agentic /path/to/your-project/
@@ -196,7 +212,7 @@ The agent will:
 
 ```bash
 # Download new version
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.0.tar.gz | tar xz
 cd agentic-framework-0.9.7
 
 # Run upgrade script with your project path
@@ -290,7 +306,7 @@ During `init_playbook.md`, choose **"a) Multiple (RECOMMENDED)"** and the framew
 - **Multi-agent coordination**: Multiple agents working in parallel
 - **Research mode**: Deep investigation workflows
 - **Token efficiency guides**: Reading protocols, context budgeting
-- **Basic tools**: doctor, verify, dashboard, sync_docs
+- **Basic tools**: doctor.sh (with --full, --phase, --pre-commit modes), dashboard, phase_detect
 
 ### Optional: Product Management Add-On
 - **Specification templates**: PRD, Tech Spec, Features, NFR, ADR, Tasks
@@ -320,11 +336,13 @@ Enable later: `bash .agentic/tools/enable-product-management.sh`
 
 ### Tooling
 ```bash
-# Project health & verification
-bash .agentic/tools/doctor.sh      # Check structure
-bash .agentic/tools/report.sh      # Feature status summary
-bash .agentic/tools/verify.sh      # Comprehensive validation
-python3 .agentic/tools/validate_specs.py  # Validate spec frontmatter
+# Project health & verification (v0.11.0: doctor.sh is THE verification command)
+bash .agentic/tools/doctor.sh              # Quick health check
+bash .agentic/tools/doctor.sh --full       # Comprehensive verification
+bash .agentic/tools/doctor.sh --phase X    # Phase-specific (start/planning/implement/complete/commit)
+bash .agentic/tools/doctor.sh --pre-commit # Pre-commit gate checks
+bash .agentic/tools/report.sh              # Feature status summary
+python3 .agentic/tools/phase_detect.py     # Detect current development phase
 
 # Retrospectives & version checking
 bash .agentic/tools/retro_check.sh    # Check if retrospective is due
@@ -396,7 +414,7 @@ Already have a project? The framework integrates non-invasively:
 ```bash
 # Download new version (to temp location)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.0.tar.gz | tar xz
 
 # Run upgrade tool from NEW framework, pointing to your project
 bash /tmp/agentic-framework-0.9.7/.agentic/tools/upgrade.sh /path/to/your-project

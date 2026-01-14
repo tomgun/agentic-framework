@@ -278,28 +278,30 @@ bash .agentic/hooks/pre-commit-check.sh
 
 ---
 
-### Agent Delegation Saves Tokens
+### Agent Delegation: Fresh Context is the Key Benefit
 
-**What**: Specialized agents with cheaper models handle specific tasks more efficiently than one powerful agent doing everything.
+**What**: Specialized subagents start with fresh, focused context instead of inheriting 100K+ tokens of accumulated conversation.
 
-**Why**:
-- Cheap/fast models are ~10x less expensive than powerful ones
-- Simple tasks (exploration, lookups) don't need expensive reasoning
-- Subagents get fresh, focused context (not full conversation history)
-- Parallel execution for independent tasks
+**Why (in order of importance)**:
+1. **Fresh context** - Subagent gets 5-10K focused tokens, not 100K+ of drift
+2. **Better focus** - Agent sees only what's relevant to its task
+3. **Less drift** - No accumulated confusion from long conversations
+4. **Token savings** - Smaller input = fewer tokens billed (indirect benefit)
+
+**Model Choice is Optional**:
+- **Same model** (e.g., Opus 4.5): Best quality, benefit is context isolation
+- **Cheaper model** (e.g., Haiku): Cost savings for simple/mechanical tasks
+- **Your choice**: Use best model for quality-critical work
 
 **How**:
-- Use **tier-based model selection** (not specific model names):
-  - Cheap/Fast tier: Exploration, lookups, simple searches
-  - Mid-tier: Implementation, testing, reviews
-  - Powerful tier: Complex architecture, difficult bugs
-- Delegate exploration to explore-agent (cheap/fast)
-- Delegate implementation to implementation-agent (mid-tier)
+- Delegate exploration to explore-agent (fresh context for search)
+- Delegate implementation to implementation-agent (focused on code)
 - Create project-specific agents for domain expertise
+- Choose model based on task complexity, not as default optimization
 
-**Example**: Instead of opus analyzing "where is auth implemented?" → spawn explore-agent with haiku. Saves ~90% tokens.
+**Example**: Long session (100K context) → spawn subagent for focused task (5K context). Result: clearer output, regardless of model.
 
-**Anti-pattern**: ❌ Using the most powerful model for every task. ❌ Hardcoding specific model names (they change frequently).
+**Anti-pattern**: ❌ Assuming cheaper models are always better. ❌ Keeping everything in one long session until context overflows.
 
 **Reference**: `.agentic/token_efficiency/agent_delegation_savings.md`
 

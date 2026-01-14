@@ -25,28 +25,39 @@ This creates all expected files/folders with templates/placeholders so you can s
 **Ask the user which profile they want:**
 
 > "Which profile would you like to use?
-> 
-> **a) Core (Simple Setup)**
-> - Quality standards, multi-agent, research mode
+>
+> **a) Core (Full Framework, Lightweight Planning)**
+> - All framework capabilities: context optimization, multi-agent, TDD, quality gates
+> - Session continuity, token efficiency, green coding, /verify command
 > - Lightweight planning (PRODUCT.md with checkboxes)
-> - Minimal ceremony, fast iteration
-> - Good for: Small projects, prototypes, external PM tools (Jira/Linear), quick experiments
-> 
-> **b) Core + Product Management**
-> - Everything in Core, plus formal specs & feature tracking
-> - STATUS.md, spec/PRD.md, spec/FEATURES.md with F-#### IDs
-> - Acceptance criteria, sequential pipeline, advanced tools
+> - Optional STATUS.md for current focus
+> - Good for: Small projects, prototypes, external PM tools (Jira/Linear)
+>
+> **b) Core + Product Management (Formal Specs)**
+> - Everything in Core, PLUS formal specifications
+> - Feature tracking with F-#### IDs (spec/FEATURES.md)
+> - Acceptance criteria per feature (spec/acceptance/)
+> - STATUS.md, NFR.md, ADRs, cross-reference validation
 > - Good for: Long-term projects (3+ months), complex products, audit trails
-> 
+>
 > Type 'a' for Core or 'b' for Core+PM"
 
 ### Core Profile (a)
+**Full framework capabilities with lightweight planning:**
+- ✅ Context optimization (CONTEXT_PACK.md)
+- ✅ Session continuity (JOURNAL.md)
 - ✅ Quality standards (programming, testing, TDD)
 - ✅ Multi-agent coordination
+- ✅ Token efficiency guidelines
+- ✅ Green coding principles
+- ✅ Quality gates (doctor.sh with --full, --phase, --pre-commit)
+- ✅ Human escalation (HUMAN_NEEDED.md)
 - ✅ Research mode
+- ✅ `/verify` command for human-assisted quality
 - ✅ `PRODUCT.md` for lightweight planning (checkboxes)
+- ✅ Optional `STATUS.md` for current focus
 - ✅ Minimal ceremony, fast iteration
-- **Good for**: 
+- **Good for**:
   - Small/simple projects or prototypes
   - Projects with external PM tools (Jira, Linear, etc.)
   - Solo developers who don't need formal tracking

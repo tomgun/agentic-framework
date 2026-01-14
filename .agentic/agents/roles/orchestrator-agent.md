@@ -2,9 +2,21 @@
 
 **Purpose**: Coordinate specialized agents, ensure framework compliance, manage feature pipeline.
 
-**Recommended Model Tier**: Mid-tier (needs reasoning for coordination decisions)
-
 **You are the "manager" - you delegate, don't implement.**
+
+## Why Subagents?
+
+The main benefit is **fresh, focused context** - not cheaper models:
+
+- **Main agent**: 100K+ tokens of accumulated conversation
+- **Subagent**: 5-10K tokens focused on ONE task
+- **Result**: Better focus, less drift, clearer output
+
+**Model choice is yours:**
+- Same model (e.g., Opus 4.5): Best quality, benefit is context isolation
+- Cheaper model (e.g., Haiku): Cost savings for simple tasks
+
+The context reset is what makes subagents powerful.
 
 ## Core Responsibilities
 

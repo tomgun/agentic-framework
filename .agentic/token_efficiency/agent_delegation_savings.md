@@ -1,26 +1,34 @@
-# Token Savings Through Agent Delegation
+# Agent Delegation: Fresh Context is the Primary Benefit
 
-**Core Principle**: Use the right model for the right task to maximize token efficiency.
+**Core Principle**: Subagents work better because they start with fresh, focused context - not because they use cheaper models.
 
-## How Specialized Agents Save Tokens
+## The Main Benefit: Context Isolation
 
-### 1. Model Selection Savings
+### Why Fresh Context Matters Most
 
-| Task Type | Without Delegation | With Delegation | Savings |
-|-----------|-------------------|-----------------|---------|
-| Find file location | expensive model | cheap/fast model | ~90% |
-| Search for pattern | mid-tier model | cheap/fast model | ~70% |
-| Documentation lookup | expensive model | cheap/fast model | ~90% |
-| Implementation | expensive (full context) | mid-tier (focused) | ~50% |
+| Agent Type | Context Size | Quality Impact |
+|------------|--------------|----------------|
+| Main agent (long session) | 100K+ tokens | Context drift, forgotten details, accumulated confusion |
+| Subagent (fresh start) | 5-10K tokens | Focused, clear, precise output |
 
-**Why it works**: Cheap/fast models cost ~10x less than expensive ones. Simple tasks don't need expensive reasoning.
+**The context reset is what makes subagents powerful.**
 
-**Model tiers** (examples, check current offerings):
-- **Cheap/Fast**: Claude Haiku, GPT-4o-mini, Gemini Flash
-- **Mid-tier**: Claude Sonnet, GPT-4o
-- **Expensive/Powerful**: Claude Opus, GPT-4, o1
+A subagent with Opus 4.5 and 5K focused context will often outperform a main agent with Opus 4.5 and 100K accumulated context.
 
-### 2. Context Isolation Savings
+### Model Choice is Secondary (And Optional)
+
+You can choose models based on task needs:
+
+| Task Type | Recommended Model | Why |
+|-----------|-------------------|-----|
+| Quality-critical implementation | Same as main (e.g., Opus) | Best reasoning, context isolation is the benefit |
+| Exploration, file search | Cheaper is fine (Haiku) | Simple task, cost savings make sense |
+| Research, complex analysis | Same as main (e.g., Opus) | Needs full reasoning capability |
+| Mechanical updates | Cheaper is fine (Haiku) | Straightforward, structured task |
+
+**Don't default to cheaper models** - use them when the task is simple, not as a general optimization.
+
+## Context Isolation Savings
 
 When you spawn a subagent, it gets a **fresh, focused context** rather than carrying your entire conversation history.
 

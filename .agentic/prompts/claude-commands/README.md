@@ -38,6 +38,7 @@ If your Claude version doesn't support custom commands:
 |---------|-------------|-------------|
 | `/start` | Start session with context loading | `start.md` |
 | `/continue` | Resume from .continue-here.md | `continue.md` |
+| `/verify` | **Run verification gates** (quality check) | `verify.md` |
 | `/implement` | Implement a feature (TDD mode) | `implement.md` |
 | `/test` | Write tests for a feature | `test.md` |
 | `/fix` | Fix linter/test errors | `fix.md` |
@@ -45,6 +46,39 @@ If your Claude version doesn't support custom commands:
 | `/retro` | Run project retrospective | `retro.md` |
 | `/research` | Deep research on topic | `research.md` |
 | `/end` | End session with documentation | `end.md` |
+
+---
+
+## How You Help the Framework
+
+**The framework works best when you actively participate.** Here's how:
+
+### Run `/verify` at Key Moments
+
+The agent should run doctor.sh automatically, but you can ensure quality by asking:
+
+| When | Say |
+|------|-----|
+| Before starting work | `/verify` or "run doctor" |
+| After completing a feature | `/verify` |
+| Before committing | `/verify` or "check before commit" |
+| Something feels off | `/verify` |
+
+### Prompt the Agent
+
+If the agent seems to be skipping steps, you can say:
+- "Did you check the acceptance criteria?"
+- "Run doctor.sh before we continue"
+- "What does verification say?"
+- "Are we following the framework guidelines?"
+
+### The Partnership
+
+You and the agent work together:
+- **Agent**: Follows guidelines, runs tools, updates docs
+- **You**: Verify quality, make decisions, catch drift
+
+**This is human-agent collaboration** - neither works perfectly alone, but together you maintain quality.
 
 ---
 

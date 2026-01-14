@@ -1,5 +1,13 @@
 # Agent Operating Guidelines (All Tools)
 
+> **📚 REFERENCE MATERIAL (v0.11.0)**
+>
+> This document contains detailed rationale and edge cases. For daily use, read:
+> - **Quick Start**: `.agentic/agents/shared/AGENT_QUICK_START.md` (~70 lines)
+> - **Verification**: Run `doctor.sh` - gates enforce quality automatically
+>
+> Only consult this document when you need detailed context or are troubleshooting.
+
 **For**: Cursor, Copilot, Claude, Gemini, Codex, or ANY AI assistant.
 
 ---
