@@ -20,7 +20,7 @@ START → PLANNING → IMPLEMENT → COMPLETE → COMMIT
 |-------|------|---------|
 | START | Session begins | `bash .agentic/tools/doctor.sh` |
 | PLANNING | User says "implement F-####" | Check `spec/acceptance/F-####.md` exists |
-| BUG FIX | User says "fix", "bug", "issue" | Log to `spec/ISSUES.md` (use `quick_issue.sh`) |
+| BUG FIX | User reports or says "fix", "bug", "issue" | Log to `spec/ISSUES.md` first, then fix |
 | IMPLEMENT | Acceptance exists | Write code + tests |
 | COMPLETE | User says "done" | `bash .agentic/tools/doctor.sh --full` |
 | COMMIT | Ready to commit | `bash .agentic/tools/doctor.sh --pre-commit` |
