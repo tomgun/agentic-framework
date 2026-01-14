@@ -20,6 +20,7 @@ START → PLANNING → IMPLEMENT → COMPLETE → COMMIT
 |-------|------|---------|
 | START | Session begins | `bash .agentic/tools/doctor.sh` |
 | PLANNING | User says "implement F-####" | Check `spec/acceptance/F-####.md` exists |
+| BUG FIX | User says "fix", "bug", "issue" | Log to `spec/ISSUES.md` (use `quick_issue.sh`) |
 | IMPLEMENT | Acceptance exists | Write code + tests |
 | COMPLETE | User says "done" | `bash .agentic/tools/doctor.sh --full` |
 | COMMIT | Ready to commit | `bash .agentic/tools/doctor.sh --pre-commit` |
@@ -59,6 +60,7 @@ The user is helping enforce quality. Run `doctor.sh --full` immediately and repo
 | `doctor.sh --pre-commit` | Before committing |
 | `journal.sh` | Append to JOURNAL.md |
 | `feature.sh` | Update FEATURES.md |
+| `quick_issue.sh` | Log bugs to ISSUES.md |
 | `wip.sh` | Track work-in-progress |
 
 ## Feature Work
