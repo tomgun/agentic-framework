@@ -6,6 +6,8 @@ This folder is a **portable framework** you can copy into any repository to boot
 
 **New to this framework?** → Start at [`DEVELOPER_GUIDE.md`](DEVELOPER_GUIDE.md) ⭐⭐⭐ or [`START_HERE.md`](START_HERE.md)
 
+**For AI Agents** → Read [`agents/shared/AGENT_QUICK_START.md`](agents/shared/AGENT_QUICK_START.md) (~70 lines) - gates enforce quality automatically
+
 ## Two Profiles: Choose What Fits Your Project
 
 ### Core Profile (Default - Simple Setup)
@@ -21,7 +23,7 @@ This folder is a **portable framework** you can copy into any repository to boot
 - Architecture docs (CONTEXT_PACK.md)
 - Escalation protocol (HUMAN_NEEDED.md)
 - Session continuity (JOURNAL.md)
-- Basic tools (doctor, verify, dashboard)
+- Basic tools (doctor.sh with --full/--phase/--pre-commit modes, phase_detect)
 
 **Good for**: 
 - Small/simple projects or prototypes
@@ -54,7 +56,7 @@ This folder is a **portable framework** you can copy into any repository to boot
 - **Quality playbooks**: Definition of Done, test strategy, design-for-testability, integration testing, review checklist.
 - **Token-efficiency playbooks**: context budgeting, reading protocols, change slicing, durable context packs.
 - **Code-spec traceability**: `@feature` annotations and coverage tooling.
-- **Verification tooling**: doctor.sh, verify.sh, report.sh, coverage.sh, feature_graph.sh.
+- **Verification tooling**: doctor.sh (--full, --phase, --pre-commit modes), phase_detect.py, report.sh, coverage.sh, feature_graph.sh.
 - **Multi-agent compatibility**: a shared "agent operating contract" + thin entrypoints for Cursor/Copilot/Claude.
 - **Optional lightweight enforcement**: PR checklist + a minimal GitHub Actions template to validate docs/spec conventions.
 

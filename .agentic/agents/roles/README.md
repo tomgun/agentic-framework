@@ -14,7 +14,7 @@ This directory contains predefined agent roles for specialized task execution.
 
 The orchestrator **delegates** to specialized agents and **verifies** quality gates. It never implements code itself.
 
-### Specialized Agents
+### Core Pipeline Agents
 
 | Role | File | Purpose |
 |------|------|---------|
@@ -26,6 +26,56 @@ The orchestrator **delegates** to specialized agents and **verifies** quality ga
 | Spec Update Agent | `spec_update_agent.md` | Update FEATURES.md and specs |
 | Documentation Agent | `documentation_agent.md` | Update docs and README |
 | Git Agent | `git_agent.md` | Commits, branches, PRs |
+
+### Domain Expert Agents (Examples)
+
+These are **examples** for reference. The right agents depend on YOUR project.
+
+| Role | File | Purpose |
+|------|------|---------|
+| Scientific Research | `scientific_research_agent.md` | Peer-reviewed papers, benchmarks |
+| Architecture | `architecture_agent.md` | System design, patterns, scalability |
+| Cloud Expert | `cloud_expert_agent.md` | AWS/GCP/Azure best practices |
+| Monetization | `monetization_agent.md` | Pricing, revenue models, conversion |
+
+**These are templates** - create agents specific to your project's needs.
+
+## Discovering the Right Agents for Your Project
+
+Don't use a fixed list. Analyze your project and create relevant experts:
+
+```
+Tell agent: "Analyze this project and suggest specialized subagents"
+```
+
+The agent will consider:
+- **Technical domain**: ML research? Architecture decisions? Cloud expertise?
+- **Product type**: UI-heavy? Data pipeline? Game? Audio?
+- **Business context**: Commercial? Need marketing? Monetization?
+- **Compliance**: User data? Healthcare? Finance?
+
+See: `.agentic/prompts/analyze-agents.md` for the full analysis workflow.
+
+### Creating Project-Specific Agents
+
+```bash
+# Create a new agent from template
+bash .agentic/tools/create-agent.sh my-domain-expert
+
+# Example: create a game design agent
+bash .agentic/tools/create-agent.sh game-design
+```
+
+### Example Agents by Context
+
+| Context | Possible Agents |
+|---------|-----------------|
+| Commercial SaaS | monetization, marketing, analytics, growth |
+| ML/Research | scientific-research, data, experiment-tracking |
+| Game | game-design, playtest, monetization (F2P) |
+| Enterprise | security, compliance, architecture |
+| Consumer App | ux-research, accessibility, localization |
+| Audio/Music | dsp-expert, audio-quality, plugin-compat |
 
 ## Typical Feature Pipeline
 
@@ -96,9 +146,27 @@ Copy any role file and modify:
 
 ## Why Specialized Agents?
 
-1. **Context efficiency** - Each agent reads only what it needs
-2. **Clear boundaries** - No confusion about responsibilities  
-3. **Quality** - Focused agents do their job better
-4. **Parallelization** - Independent tasks can run concurrently
-5. **Audit trail** - Pipeline shows who did what
+### The Main Benefit: Fresh, Focused Context
+
+| Agent Type | Context Size | Result |
+|------------|--------------|--------|
+| Main agent (long session) | 100K+ tokens | Context drift, forgotten details |
+| Subagent (fresh start) | 5-10K tokens | Focused, clear, precise output |
+
+**The context reset is what makes subagents powerful** - not cheaper models.
+
+### Model Choice is Optional
+
+- **Same model** (e.g., Opus 4.5): Best quality, benefit is context isolation
+- **Cheaper model** (e.g., Haiku): Cost savings for simple/mechanical tasks
+
+Use the best model for quality-critical work. Use cheaper models for routine tasks.
+
+### Other Benefits
+
+1. **Clear boundaries** - No confusion about responsibilities
+2. **Quality** - Focused agents do their job better
+3. **Parallelization** - Independent tasks can run concurrently
+4. **Audit trail** - Pipeline shows who did what
+5. **Token savings** - Smaller context = fewer input tokens
 

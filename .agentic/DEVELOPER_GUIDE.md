@@ -6,15 +6,71 @@
 
 ## Table of Contents
 
-1. [Getting Started](#getting-started)
-2. [Daily Workflows](#daily-workflows)
-3. [Working with Agents](#working-with-agents)
-4. [Manual Operations](#manual-operations)
-5. [Automation & Scripts](#automation--scripts)
-6. [Customization](#customization)
-7. [Troubleshooting](#troubleshooting)
-8. [Best Practices](#best-practices)
-9. [Advanced Topics](#advanced-topics)
+1. [How You Help the Framework](#how-you-help-the-framework) **← Start here!**
+2. [Getting Started](#getting-started)
+3. [Daily Workflows](#daily-workflows)
+4. [Working with Agents](#working-with-agents)
+5. [Manual Operations](#manual-operations)
+6. [Automation & Scripts](#automation--scripts)
+7. [Customization](#customization)
+8. [Troubleshooting](#troubleshooting)
+9. [Best Practices](#best-practices)
+10. [Advanced Topics](#advanced-topics)
+
+---
+
+## How You Help the Framework
+
+**The framework works best when you actively participate.** Agents follow guidelines, but you're the quality gate.
+
+### The `/verify` Command
+
+At any point, you can say `/verify` (or "run doctor") and the agent will check everything:
+
+```
+You: /verify
+Agent: [runs doctor.sh --full, reports status, fixes issues]
+```
+
+### When to Verify
+
+| Moment | Why |
+|--------|-----|
+| **Starting work** | Ensure clean state, no interrupted work |
+| **After completing a feature** | Verify everything is updated |
+| **Before committing** | Catch issues before they're permanent |
+| **Something feels off** | Quick health check |
+
+### Prompts That Help
+
+If the agent seems to be skipping steps:
+
+```
+"Did you check the acceptance criteria first?"
+"Run doctor.sh before we continue"
+"What phase are we in? Run verification."
+"Are we following TDD?"
+```
+
+### The Partnership
+
+| You | Agent |
+|-----|-------|
+| Run `/verify` at key moments | Follow guidelines, run tools |
+| Make decisions, set priorities | Implement, update docs |
+| Catch drift, ask questions | Report status, suggest fixes |
+| Approve commits | Never auto-commit |
+
+**Neither works perfectly alone.** Together you maintain quality.
+
+### Quick Commands
+
+```bash
+# You can also run these directly:
+bash .agentic/tools/doctor.sh           # Quick health check
+bash .agentic/tools/doctor.sh --full    # Comprehensive verification
+bash .agentic/tools/doctor.sh --phase X # Phase-specific check
+```
 
 ---
 
@@ -145,7 +201,7 @@ vim spec/FEATURES.md   # Update implementation status
 
 ```bash
 # 1. Verify everything is correct
-bash .agentic/tools/verify.sh
+bash .agentic/tools/doctor.sh --full
 
 # 2. Check test coverage
 bash .agentic/tools/coverage.sh
@@ -601,17 +657,24 @@ Validation issues:
 - F-0005: acceptance file not found
 ```
 
-#### `verify.sh` - Comprehensive Verification
+#### `doctor.sh --full` - Comprehensive Verification (v0.11.0)
+
+> **Note:** `verify.sh` is deprecated. Use `doctor.sh --full` instead.
 
 **What it checks:**
-- Everything from doctor.sh
+- Everything from `doctor.sh` (quick mode)
 - Cross-references between all spec files
 - Broken links to features/NFRs/ADRs
 - Missing acceptance files
-- Optionally runs test suite
 
 ```bash
-bash .agentic/tools/verify.sh
+bash .agentic/tools/doctor.sh --full
+```
+
+**Other modes:**
+```bash
+doctor.sh --phase planning F-0001  # Phase-specific checks
+doctor.sh --pre-commit             # Pre-commit gate checks
 ```
 
 **When to run:**
@@ -1183,7 +1246,7 @@ Full rules: `.agentic/agents/shared/agent_operating_guidelines.md`
 # scripts/deploy-staging.sh
 
 echo "Deploying to staging..."
-bash .agentic/tools/verify.sh || exit 1
+bash .agentic/tools/doctor.sh --full || exit 1
 npm run build
 aws s3 sync dist/ s3://staging-bucket/
 echo "✅ Deployed to https://staging.example.com"
@@ -1274,7 +1337,7 @@ cat spec/FEATURES.md
 bash .agentic/tools/report.sh
 
 # Run comprehensive verification
-bash .agentic/tools/verify.sh
+bash .agentic/tools/doctor.sh --full
 
 # Review test strategy
 cat .agentic/quality/test_strategy.md
@@ -1331,7 +1394,7 @@ tail -50 JOURNAL.md
 **Fix:**
 ```bash
 # Run verification
-bash .agentic/tools/verify.sh
+bash .agentic/tools/doctor.sh --full
 
 # Check staleness
 bash .agentic/tools/stale.sh --days 90
@@ -1400,10 +1463,10 @@ Then agents write tests FIRST (red-green-refactor).
 
 ```bash
 # Before commits
-bash .agentic/tools/verify.sh
+bash .agentic/tools/doctor.sh --full
 
 # Weekly
-bash .agentic/tools/verify.sh > weekly-health-check.txt
+bash .agentic/tools/doctor.sh --full > weekly-health-check.txt
 ```
 
 ### 4. Use Feature IDs Consistently
@@ -1496,7 +1559,7 @@ git commit -m "feat(F-0005): implement CSV export with tests and spec updates"
 
 **Checklist before merge:**
 - [ ] All tests pass
-- [ ] `bash .agentic/tools/verify.sh` passes
+- [ ] `bash .agentic/tools/doctor.sh --full` passes
 - [ ] FEATURES.md updated (implementation state, code paths, test status)
 - [ ] JOURNAL.md updated
 - [ ] Acceptance criteria met (check spec/acceptance/F-####.md)
@@ -1729,10 +1792,10 @@ bash .agentic/tools/doctor.sh
 
 # During
 bash quality_checks.sh --pre-commit
-bash .agentic/tools/verify.sh
+bash .agentic/tools/doctor.sh --full
 
 # Evening
-bash .agentic/tools/verify.sh
+bash .agentic/tools/doctor.sh --full
 bash .agentic/tools/coverage.sh
 ```
 
@@ -1741,7 +1804,7 @@ bash .agentic/tools/coverage.sh
 | Situation | Command |
 |-----------|---------|
 | Start work session | `cat STATUS.md`, `tail -30 JOURNAL.md` |
-| Before commit | `bash .agentic/tools/verify.sh` |
+| Before commit | `bash .agentic/tools/doctor.sh --full` |
 | Check feature status | `bash .agentic/tools/report.sh` |
 | Find blockers | `cat HUMAN_NEEDED.md` |
 | Check test coverage | `bash .agentic/tools/coverage.sh` |

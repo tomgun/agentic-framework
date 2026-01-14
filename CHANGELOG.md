@@ -5,6 +5,68 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2025-01-14
+
+### NEW: Gate-Based Verification
+
+Shift from instruction-based to **gate-based architecture**. Agents don't need to memorize 1000+ lines of guidelines - gates enforce quality automatically.
+
+**`doctor.sh` is now THE verification command:**
+
+```bash
+doctor.sh              # Quick health check
+doctor.sh --full       # Comprehensive verification (replaces verify.sh)
+doctor.sh --phase X    # Phase-specific checks (start/planning/implement/complete/commit)
+doctor.sh --pre-commit # Fast checks for git pre-commit hook
+```
+
+### NEW: Phase Detection
+
+New `phase_detect.py` detects current development phase:
+- `start` - No active work
+- `planning` - Feature started, needs acceptance criteria
+- `implement` - Has acceptance, coding in progress
+- `complete` - Ready for final verification
+- `blocked` - Has unresolved blockers
+
+### NEW: Simplified Instructions
+
+**AGENT_QUICK_START.md** (~70 lines) replaces reading 1000+ lines of guidelines.
+
+**CLAUDE.md reduced 71%** (271 → 78 lines) - points to quick start, gates handle enforcement.
+
+**agent_operating_guidelines.md** now marked as **reference material** - detailed rationale for troubleshooting, not required reading.
+
+### NEW: Enforcement Hooks
+
+`UserPromptSubmit.sh` now warns when user says "implement F-####" but acceptance criteria are missing:
+
+```
+⚠️  GATE WARNING: No acceptance criteria for F-0042
+   Create spec/acceptance/F-0042.md before implementing
+```
+
+### DEPRECATED
+
+- `verify.sh` - Use `doctor.sh --full` instead (will be removed in v0.12.0)
+
+### Files Added
+- `.agentic/tools/phase_detect.py`
+- `.agentic/agents/shared/AGENT_QUICK_START.md`
+- `tests/test_phase_detect.py`
+- `docs/reviews/2025-01-14-framework-critical-review.md`
+- `docs/reviews/2025-01-14-comparison-analysis.md`
+
+### Files Modified
+- `.agentic/tools/doctor.py` - Added argparse, --full, --phase, --pre-commit modes
+- `.agentic/tools/doctor.sh` - Passes all args to Python
+- `.agentic/tools/verify.sh` - Added deprecation warning
+- `.agentic/claude-hooks/UserPromptSubmit.sh` - Added gate warnings
+- `CLAUDE.md` - Reduced to 78 lines
+- `.agentic/agents/shared/agent_operating_guidelines.md` - Marked as reference
+
+---
+
 ## [0.10.0] - 2025-01-11
 
 ### NEW: Proactive Session Start
