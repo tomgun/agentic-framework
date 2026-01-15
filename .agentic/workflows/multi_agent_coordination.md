@@ -83,7 +83,7 @@ Use Git worktrees for **parallel work on different features**:
 ```bash
 # Main worktree (coordination hub)
 /Users/dev/project/           # main branch
-├── AGENTS_ACTIVE.md          # Shared coordination file
+├── .agentic/AGENTS_ACTIVE.md          # Shared coordination file
 ├── STACK.md                  # Shared (read-only for workers)
 ├── CONTEXT_PACK.md           # Shared (read-only for workers)
 ├── spec/                     # Shared specs
@@ -129,7 +129,7 @@ git worktree list
 
 **Each agent now works in their own directory.**
 
-## Coordination File: `AGENTS_ACTIVE.md`
+## Coordination File: `.agentic/AGENTS_ACTIVE.md`
 
 **Location**: Repo root (main worktree)
 
@@ -208,9 +208,9 @@ Last sync: 2026-01-02 16:00
 **Every agent must:**
 
 1. **Open their worktree** (not main repo)
-2. **Read `AGENTS_ACTIVE.md`** from main worktree:
+2. **Read `.agentic/AGENTS_ACTIVE.md`** from main worktree:
    ```bash
-   cat /Users/dev/project/AGENTS_ACTIVE.md
+   cat /Users/dev/project/.agentic/AGENTS_ACTIVE.md
    ```
 3. **Update their entry**:
    - Last update timestamp
@@ -230,23 +230,23 @@ Last sync: 2026-01-02 16:00
 Agent 1: "Starting session in worktree /Users/dev/project-F0042
           Feature: F-0042 (password validation)
           
-          Checking AGENTS_ACTIVE.md...
+          Checking .agentic/AGENTS_ACTIVE.md...
           - Agent 2 is working on F-0043 (profile page), blocked by my work
           - Agent 3 is working on F-0044 (emails), independent
           - No file conflicts detected
           
-          Proceeding with implementation. Will update AGENTS_ACTIVE.md every 15 min."
+          Proceeding with implementation. Will update .agentic/AGENTS_ACTIVE.md every 15 min."
 ```
 
 ### Phase 2: During Work
 
-**Every 15-30 minutes, agent updates `AGENTS_ACTIVE.md`:**
+**Every 15-30 minutes, agent updates `.agentic/AGENTS_ACTIVE.md`:**
 
 ```bash
 # From agent's worktree, access main worktree file
 cd /Users/dev/project  # Main worktree
-# Edit AGENTS_ACTIVE.md: update "Last update", "Phase", "Notes"
-git add AGENTS_ACTIVE.md
+# Edit .agentic/AGENTS_ACTIVE.md: update "Last update", "Phase", "Notes"
+git add .agentic/AGENTS_ACTIVE.md
 git commit -m "docs: Agent 1 progress update (F-0042 60% done)"
 git push origin main
 ```
@@ -263,7 +263,7 @@ git push origin main
 
 **If file conflict detected:**
 - Check if another agent is editing the same file
-- Coordinate in `AGENTS_ACTIVE.md` notes: "Coordinating with Agent 2 on FEATURES.md edits"
+- Coordinate in `.agentic/AGENTS_ACTIVE.md` notes: "Coordinating with Agent 2 on FEATURES.md edits"
 
 ### Phase 3: Before Committing
 
@@ -278,7 +278,7 @@ git push origin main
    - If trivial (docs): Resolve automatically
    - If non-trivial (code): Present to human for review
 3. **Re-run tests** after merge
-4. **Update `AGENTS_ACTIVE.md`** (mark ready for review):
+4. **Update `.agentic/AGENTS_ACTIVE.md`** (mark ready for review):
    ```markdown
    - **Status**: ready_for_review
    - **Phase**: complete
@@ -298,7 +298,7 @@ gh pr create \
   --label "agent-generated"
 ```
 
-**Update `AGENTS_ACTIVE.md`:**
+**Update `.agentic/AGENTS_ACTIVE.md`:**
 
 ```markdown
 - **Status**: pr_created
@@ -310,7 +310,7 @@ gh pr create \
 
 **Agent or orchestrator:**
 
-1. **Update `AGENTS_ACTIVE.md`**:
+1. **Update `.agentic/AGENTS_ACTIVE.md`**:
    - Move entry to "Recent Merges" section
    - Remove from active list (or mark status: complete)
 2. **Notify dependent agents**:
@@ -333,7 +333,7 @@ gh pr create \
 | `spec/TECH_SPEC.md` | Main worktree | Read-only | Tech decisions, don't edit |
 | `spec/NFR.md` | Main worktree | Read-only | Constraints, don't edit |
 | **Coordination (Shared Write)** ||||
-| `AGENTS_ACTIVE.md` | Main worktree | ⚠️ Update your entry only | Central coordination |
+| `.agentic/AGENTS_ACTIVE.md` | Main worktree | ⚠️ Update your entry only | Central coordination |
 | `spec/FEATURES.md` | Main worktree | ⚠️ Update your feature only | Lock before editing |
 | **Per-Agent (Private)** ||||
 | `STATUS.md` | Agent worktree | Read/write freely | Your local status |
@@ -346,7 +346,7 @@ gh pr create \
 
 **Before editing shared files:**
 
-1. **Check `AGENTS_ACTIVE.md` → "Shared File Locks"**
+1. **Check `.agentic/AGENTS_ACTIVE.md` → "Shared File Locks"**
 2. **If file is locked**: Wait or coordinate
 3. **If file is free**: Add lock entry
    ```markdown
@@ -370,7 +370,7 @@ gh pr create \
 
 **Option A: Wait (if tightly coupled)**
 ```markdown
-# Agent 2 in AGENTS_ACTIVE.md
+# Agent 2 in .agentic/AGENTS_ACTIVE.md
 - **Status**: blocked
 - **Blocked by**: F-0042 (needs validatePassword function)
 - **Notes**: Waiting for F-0042 to merge. Will start UI design in meantime.
@@ -398,7 +398,7 @@ function validatePassword(password: string): boolean {
 
 **Strategy:**
 
-1. **Coordinate in `AGENTS_ACTIVE.md`**:
+1. **Coordinate in `.agentic/AGENTS_ACTIVE.md`**:
    ```markdown
    ## Coordination Notes
    - Agent 1 & Agent 2: Both need User type changes
@@ -421,19 +421,19 @@ function validatePassword(password: string): boolean {
 **Responsibilities:**
 
 1. **Assign features** to worker agents
-2. **Maintain `AGENTS_ACTIVE.md`** (update statuses, merge queue)
+2. **Maintain `.agentic/AGENTS_ACTIVE.md`** (update statuses, merge queue)
 3. **Resolve conflicts** (prioritize work, reorder merge queue)
 4. **Merge PRs** in dependency order
 5. **Update shared docs** after merges (FEATURES.md, CONTEXT_PACK.md)
 6. **Monitor progress** (check if agents are blocked)
 
-**Not needed for**: 2-3 agents with independent features (self-coordination via AGENTS_ACTIVE.md)
+**Not needed for**: 2-3 agents with independent features (self-coordination via .agentic/AGENTS_ACTIVE.md)
 
 **Orchestrator workflow:**
 
 ```markdown
 # Orchestrator session (every 30-60 min)
-1. Read all agent entries in AGENTS_ACTIVE.md
+1. Read all agent entries in .agentic/AGENTS_ACTIVE.md
 2. Check for blockers:
    - Is Agent 2 blocked by Agent 1? → Prioritize Agent 1's PR review
    - Are agents editing same files? → Coordinate sequencing
@@ -442,7 +442,7 @@ function validatePassword(password: string): boolean {
    - Wait for Agent 2 to rebase and update PR
    - Merge F-0043
 4. Update shared docs (FEATURES.md, CONTEXT_PACK.md) after merges
-5. Notify agents of changes via AGENTS_ACTIVE.md notes
+5. Notify agents of changes via .agentic/AGENTS_ACTIVE.md notes
 ```
 
 ## Conflict Resolution
@@ -467,7 +467,7 @@ git merge origin/main
 4. **Agents continue**
 
 **Prevention:**
-- Coordinate in `AGENTS_ACTIVE.md` before editing shared files
+- Coordinate in `.agentic/AGENTS_ACTIVE.md` before editing shared files
 - Use feature branches (not shared branches)
 - Keep features small and independent
 
@@ -476,7 +476,7 @@ git merge origin/main
 **Scenario**: Agent 1 and Agent 2 both need resource X
 
 **Resolution:**
-1. **Check `AGENTS_ACTIVE.md` → Merge Queue`**: Who's ahead?
+1. **Check `.agentic/AGENTS_ACTIVE.md` → Merge Queue`**: Who's ahead?
 2. **Follow queue order**: First come, first served
 3. **Or human decides**: "Agent 1 is higher priority, Agent 2 waits"
 
@@ -497,7 +497,7 @@ git merge origin/main
 #!/usr/bin/env bash
 # Show active agents and their status
 
-cat AGENTS_ACTIVE.md | grep -A 10 "^## Agent"
+cat .agentic/AGENTS_ACTIVE.md | grep -A 10 "^## Agent"
 ```
 
 ### `.agentic/tools/check_agent_conflicts.sh`
@@ -509,7 +509,7 @@ cat AGENTS_ACTIVE.md | grep -A 10 "^## Agent"
 AGENT_ID=$1
 FILES_EDITING=$2  # Comma-separated
 
-# Parse AGENTS_ACTIVE.md
+# Parse .agentic/AGENTS_ACTIVE.md
 # Check if FILES_EDITING overlap with other agents' "Files editing"
 # Output: conflicts or "No conflicts detected"
 ```
@@ -532,7 +532,7 @@ done
 
 ### For Agents:
 
-1. **Update `AGENTS_ACTIVE.md` frequently** (every 15-30 min)
+1. **Update `.agentic/AGENTS_ACTIVE.md` frequently** (every 15-30 min)
 2. **Check for blockers** before starting work
 3. **Coordinate on shared files** (use locks)
 4. **Pull main frequently** (every hour or before committing)
@@ -543,13 +543,13 @@ done
 1. **Assign independent features** to different agents
 2. **Review PRs quickly** (don't let agents block each other)
 3. **Resolve conflicts promptly** (agents can't do this well)
-4. **Monitor `AGENTS_ACTIVE.md`** (check for stuck agents)
+4. **Monitor `.agentic/AGENTS_ACTIVE.md`** (check for stuck agents)
 5. **Start with 2 agents**, scale up only if working well
 
 ### For Teams:
 
 1. **Use orchestrator agent** for 4+ agents
-2. **Daily sync meetings** (or async updates via AGENTS_ACTIVE.md)
+2. **Daily sync meetings** (or async updates via .agentic/AGENTS_ACTIVE.md)
 3. **Clear feature ownership** (one feature = one agent)
 4. **Define integration points** upfront (APIs, interfaces)
 5. **Automate testing** (catch integration bugs early)
@@ -599,7 +599,7 @@ Agent 2: Still blocked, working on docs
 **Day 2 (10:00):**
 ```
 Human: Reviews PR #123 (Agent 1), merges
-Agent 1: Updates AGENTS_ACTIVE.md: "F-0042 merged"
+Agent 1: Updates .agentic/AGENTS_ACTIVE.md: "F-0042 merged"
 Agent 2: Pulls main, integrates auth, completes F-0043, PR created (#125)
 Human: Merges PR #124 (Agent 3) - independent, no conflicts
 ```
@@ -613,7 +613,7 @@ All features complete!
 ## Troubleshooting
 
 ### "Agent is stuck/blocked"
-- Check `AGENTS_ACTIVE.md` → "Blocked by"
+- Check `.agentic/AGENTS_ACTIVE.md` → "Blocked by"
 - Prioritize unblocking PR review/merge
 - Consider reassigning feature if blocker is long-term
 
@@ -622,7 +622,7 @@ All features complete!
 - Agents editing same files → Use file locks or sequential work
 - Merge more frequently → Don't let branches diverge
 
-### "AGENTS_ACTIVE.md not being updated"
+### ".agentic/AGENTS_ACTIVE.md not being updated"
 - Remind agents to update every 15-30 min
 - Add to agent guidelines as non-negotiable
 - Use orchestrator to monitor and prompt updates

@@ -59,6 +59,19 @@ FEATURE REQUEST?
 
 **At session start (first message, tokens reset, user returns), BE PROACTIVE:**
 
+### 0. FIRST: Check for Other Active Agents (Multi-Window Conflict Prevention)
+
+**IMMEDIATELY read `.agentic/AGENTS_ACTIVE.md`** before doing anything else:
+
+```bash
+cat .agentic/AGENTS_ACTIVE.md 2>/dev/null
+```
+
+**If file exists and shows other agents:**
+- ⚠️ **TELL USER IMMEDIATELY**: "👥 Another agent is already working on [X]. I'll avoid those files."
+- **Add yourself** to `.agentic/AGENTS_ACTIVE.md`
+- **Work on different files/features** to prevent merge conflicts
+
 ### 1. Silently Read Context
 
 ```bash
@@ -87,6 +100,9 @@ What would you like to work on?
 
 ### 3. Handle Special Cases
 
+- **.agentic/AGENTS_ACTIVE.md shows other agents?** → "👥 Another agent is working on [X]. I'll work on different files."
+  - **Register yourself** in .agentic/AGENTS_ACTIVE.md
+  - **Avoid their files** to prevent conflicts
 - **WIP.md exists?** → "⚠️ Previous work interrupted! [options]"
 - **HUMAN_NEEDED.md has items?** → "📋 [N] items need your input"
 - **Upgrade pending?** → Handle it, then greet
@@ -274,9 +290,12 @@ bash .agentic/tools/blocker.sh resolve HN-0001 \
    - Check `STACK.md` for `development_mode` (tdd recommended)
    - TDD: Write tests FIRST (see `.agentic/workflows/tdd_mode.md`)
 
-5. **Never auto-commit**:
-   - ALWAYS show changes to human first
-   - ONLY commit when human explicitly approves
+5. **Git workflow** (see `.agentic/workflows/git_workflow.md`):
+   - **PR by default**: Create feature branches and PRs (not direct commits to main)
+   - Check `git_workflow` in STACK.md: `pull_request` (default) or `direct`
+   - Feature branch naming: `feature/F-####-description`
+   - **Never auto-commit**: ALWAYS show changes to human first
+   - ONLY commit/create PR when human explicitly approves
 
 ---
 
@@ -385,9 +404,9 @@ See `.agentic/token_efficiency/claude_best_practices.md` for details.
 
 If multiple agents are working simultaneously:
 
-1. **Check `.agentic/spec/AGENTS_ACTIVE.md`** for coordination
+1. **Check `.agentic/spec/.agentic/AGENTS_ACTIVE.md`** for coordination
 2. **Use file locking** (scripts handle this automatically)
-3. **Communicate via AGENTS_ACTIVE.md** (don't step on each other's toes)
+3. **Communicate via .agentic/AGENTS_ACTIVE.md** (don't step on each other's toes)
 4. **Append-only operations** (SESSION_LOG.md, JOURNAL.md) are safe for concurrent use
 
 ---

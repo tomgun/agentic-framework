@@ -35,9 +35,10 @@ START → PLANNING → IMPLEMENT → COMPLETE → COMMIT
 
 ## Session Start Protocol
 
-1. Check `WIP.md` - interrupted work?
-2. Read: `CONTEXT_PACK.md` → `STATUS.md` → `JOURNAL.md` (last 3 entries)
-3. Greet user with context summary and options
+1. Check `.agentic/AGENTS_ACTIVE.md` - other agents working? Register yourself, avoid their files
+2. Check `WIP.md` - interrupted work?
+3. Read: `CONTEXT_PACK.md` → `STATUS.md` → `JOURNAL.md` (last 3 entries)
+4. Greet user with context summary and options
 
 ## If Gate Fails
 

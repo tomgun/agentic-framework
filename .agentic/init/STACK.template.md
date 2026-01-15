@@ -5,8 +5,8 @@
 Purpose: a single source of truth for "how we build and run software here".
 
 ## Agentic framework
-- Version: 0.2.4  <!-- Update when upgrading framework -->
-- Profile: core  <!-- core | core+product -->
+- Version: 0.11.2  <!-- Update when upgrading framework -->
+- Profile: core  <!-- core | core+pm -->
 - Installed: <!-- YYYY-MM-DD -->
 - Source: https://github.com/tomgun/agentic-framework
 
@@ -97,22 +97,25 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ## Git workflow (required)
 <!-- How agents interact with Git. See .agentic/workflows/git_workflow.md -->
-- git_workflow: direct  <!-- direct | pull_request -->
+<!-- Profile-aware defaults: Core+PM → pull_request, Core → direct -->
+<!-- Override explicitly if needed -->
+- git_workflow: pull_request  <!-- pull_request (recommended) | direct -->
 
-<!-- Direct mode: Commit directly to branch (solo developer, simple projects) -->
-<!--   - Agent commits after human approval -->
-<!--   - No PR creation -->
-<!--   - Fast iteration -->
-
-<!-- Pull Request mode: Create PRs for review (teams, collaborative projects) -->
-<!--   - Agent creates feature branches -->
+<!-- Pull Request mode (DEFAULT for Core+PM, recommended): -->
+<!--   - Agent creates feature branches for each feature -->
 <!--   - Agent creates PRs after human approval -->
-<!--   - Human or CI reviews before merge -->
-<!-- PR settings (if git_workflow: pull_request): -->
+<!--   - Human reviews PR before merge -->
+<!--   - Aligns with acceptance-driven workflow -->
+<!-- PR settings: -->
 <!-- - pr_draft_by_default: true  # Create draft PRs until complete -->
 <!-- - pr_auto_request_review: true  # Auto-assign reviewers -->
 <!-- - pr_require_ci_pass: true  # Wait for CI before suggesting merge -->
 <!-- - pr_reviewers: ["github_username"]  # Reviewers to auto-assign -->
+
+<!-- Direct mode (opt-in, better for solo prototyping): -->
+<!--   - Agent commits directly to branch after human approval -->
+<!--   - No PR creation, fast iteration -->
+<!--   - Use: git_workflow: direct -->
 
 ## Multi-agent coordination (optional)
 <!-- Multiple AI agents working simultaneously. See .agentic/workflows/multi_agent_coordination.md -->
@@ -123,7 +126,7 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--       worktree: /path/to/worktree-1 -->
 <!--     - id: cursor-agent-2 -->
 <!--       worktree: /path/to/worktree-2 -->
-<!-- When enabled, agents use Git worktrees and coordinate via AGENTS_ACTIVE.md -->
+<!-- When enabled, agents use Git worktrees and coordinate via .agentic/AGENTS_ACTIVE.md -->
 
 ## Data & integrations
 - Primary datastore: <!-- postgres/sqlite/mongo/redis/etc -->

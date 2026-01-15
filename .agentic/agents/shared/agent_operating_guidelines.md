@@ -22,6 +22,7 @@
 cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
 ls WIP.md 2>/dev/null
+cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
 ```
 
 ## 2. Greet User with Recap (AUTOMATIC!)
@@ -46,9 +47,12 @@ What would you like to work on?
 
 | Situation | What to Say |
 |-----------|-------------|
+| **.agentic/AGENTS_ACTIVE.md has entries** | "👥 Another agent is working on [X]. I'll register myself and work on different files." |
 | **WIP.md exists** | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
 | **HUMAN_NEEDED has items** | "📋 [N] items need your input" |
 | **Upgrade pending** | "🔄 Framework upgraded, applying updates..." |
+
+**Multi-agent coordination**: If other agents are active, register yourself in .agentic/AGENTS_ACTIVE.md and avoid their files.
 
 **Why proactive**: User shouldn't have to remember. You help immediately.
 
@@ -527,7 +531,13 @@ Please provide:
 - **Check for active pipeline**: If `STACK.md` has `pipeline_enabled: yes`, check for active pipeline in `..agentic/pipeline/` (see `.agentic/workflows/automatic_sequential_pipeline.md`).
 
 ## Non-negotiables
-- **No auto-commits without explicit human approval**: 
+- **PR-based workflow by default** (especially Core+PM profile):
+  - **Create feature branches** for each feature: `git checkout -b feature/F-####-description`
+  - **Create PRs** instead of committing directly to main
+  - **Direct commits to main** only if `git_workflow: direct` in STACK.md (or user explicitly requests)
+  - Profile defaults: Core+PM → `pull_request`, Core → `direct`
+  - See `.agentic/workflows/git_workflow.md` for details
+- **No auto-commits without explicit human approval**:
   - **NEVER commit changes without showing them to the user first and getting explicit approval**
   - **ONLY commit when the user explicitly says "commit" or "commit and push"**
   - Always present a summary of changes and ask for review before committing
