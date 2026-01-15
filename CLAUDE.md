@@ -4,6 +4,22 @@ You are working in a repository that uses the **Agentic Framework** for AI-assis
 
 ---
 
+## 🚨 FRAMEWORK DEVELOPMENT MODE
+
+**If this repo IS the `agentic-framework` itself** (check: `VERSION` file at root, `spec/FEATURES.md` has F-0001 to F-00XX):
+
+→ **Read `.agentic/FRAMEWORK_QUICK_START.md` instead** — different rules apply!
+
+Key differences:
+- You must spec framework features in `spec/FEATURES.md`
+- You must create acceptance criteria in `spec/acceptance/F-####.md`
+- You must add tests to `tests/validate_framework.sh`
+- Changes affect ALL users — higher bar for quality
+
+**If this is a project USING the framework** → continue below.
+
+---
+
 ## Quick Start (READ THIS)
 
 **Read `.agentic/agents/shared/AGENT_QUICK_START.md`** (~70 lines) - it has everything you need.
