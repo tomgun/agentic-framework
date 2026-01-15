@@ -393,19 +393,30 @@ You: "Git Agent: commit this"
 
 ### Multi-Agent Coordination (Parallel Work)
 
-**Enable in `STACK.md`:**
-```yaml
-- multi_agent_enabled: yes
-```
+**Use the worktree tool for parallel agent development:**
 
-**Use Git worktrees:**
 ```bash
-# Agent 1 works on F-0005 in main worktree
-# Agent 2 works on F-0006 in separate worktree
-git worktree add ../project-feature-6 feature-6
+# Create worktree for second agent
+bash .agentic/tools/worktree.sh create F-0006 "Dashboard feature"
+# → Creates ../project-f-0006/ on branch feature/F-0006
+# → Auto-registers in .agentic/AGENTS_ACTIVE.md
 
-# Agents coordinate via AGENTS_ACTIVE.md
+# Open new Claude/Cursor in that directory
+cd ../project-f-0006/
+
+# List all active worktrees
+bash .agentic/tools/worktree.sh list
+
+# When done, cleanup
+bash .agentic/tools/worktree.sh remove F-0006
 ```
+
+**Workflow:**
+1. Agent 1 works in main directory on F-0005
+2. `worktree.sh create F-0006` for Agent 2
+3. Both work in parallel - no conflicts (different branches)
+4. Each creates PR when done
+5. Merge PRs, cleanup worktrees
 
 See `.agentic/workflows/multi_agent_coordination.md` for full guide.
 
@@ -744,6 +755,33 @@ bash .agentic/tools/feature_graph.sh --save
 **When to run:**
 - Planning next features
 - Understanding blockers
+
+#### `worktree.sh` - Parallel Agent Management (NEW - v0.11.3)
+
+**What it does:**
+- Creates git worktrees for parallel agent development
+- Auto-registers agents in `.agentic/AGENTS_ACTIVE.md`
+- Enables multiple Claude/Cursor windows without conflicts
+
+```bash
+# Create worktree for parallel work
+bash .agentic/tools/worktree.sh create F-0001 "User auth"
+# → ../project-f-0001/ on branch feature/F-0001
+
+# List active worktrees and agents
+bash .agentic/tools/worktree.sh list
+
+# Show current status
+bash .agentic/tools/worktree.sh status
+
+# Cleanup when done
+bash .agentic/tools/worktree.sh remove F-0001
+```
+
+**When to run:**
+- Starting parallel agent work
+- Opening second Claude/Cursor window
+- Cleaning up after feature completion
 
 #### `arch_diff.sh` - Architecture Changes
 
@@ -1116,20 +1154,21 @@ This creates:
 #### Git Workflow
 
 ```yaml
-# Direct commits (solo developer)
-- git_workflow: direct
-
-# Or Pull Request mode (teams)
-# - git_workflow: pull_request
+# PR mode (default for Core+PM, recommended)
+- git_workflow: pull_request
 # - pr_draft_by_default: true
 # - pr_reviewers: ["github_username"]
+
+# Or direct commits (solo developer, prototyping)
+# - git_workflow: direct
 ```
 
 #### Multi-Agent Coordination
 
 ```yaml
-# Enable multiple agents working in parallel
-# - multi_agent_enabled: yes
+# Use worktree.sh tool for parallel agents:
+# bash .agentic/tools/worktree.sh create F-0001 "Feature name"
+# See: .agentic/workflows/multi_agent_coordination.md
 ```
 
 #### Retrospectives
@@ -1631,19 +1670,21 @@ You: "Implementation Agent: make tests pass"
 
 **Full guide:** `.agentic/workflows/multi_agent_coordination.md`
 
-**Use Git worktrees for isolation:**
+**Use worktree.sh for parallel agents:**
 ```bash
-# Main worktree: Agent 1 works on F-0005
-git worktree add ../project-feat-6 feat-6
-# Worktree: Agent 2 works on F-0006
+# Create worktree for Agent 2
+bash .agentic/tools/worktree.sh create F-0006 "Dashboard"
+# → Creates ../project-f-0006/ on branch feature/F-0006
+# → Registers in .agentic/AGENTS_ACTIVE.md
 
-# Agents coordinate via AGENTS_ACTIVE.md
-```
+# Open new Claude/Cursor in ../project-f-0006/
+# Agent 2 works there, Agent 1 continues here
 
-**Enable:**
-```yaml
-# STACK.md
-- multi_agent_enabled: yes
+# List active agents
+bash .agentic/tools/worktree.sh list
+
+# Cleanup when done
+bash .agentic/tools/worktree.sh remove F-0006
 ```
 
 ### Pull Request Workflow
