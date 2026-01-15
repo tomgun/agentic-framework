@@ -5,6 +5,27 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.3] - 2026-01-15
+
+### Added
+- **F-0096: PR-Based Workflow Default** - PR workflow is now default for Core+PM profile
+  - Profile-aware defaults: Core+PM → `pull_request`, Core → `direct`
+  - Updated agent guidelines, CLAUDE.md, STACK.template.md
+- **F-0097: Worktree Management Tool** - `worktree.sh` for parallel agent development
+  - Commands: `create`, `list`, `remove`, `status`
+  - Auto-registers agents in `.agentic/AGENTS_ACTIVE.md`
+  - Enables multiple Claude/Cursor windows without conflicts
+- Multi-agent coordination via `.agentic/AGENTS_ACTIVE.md`
+- Session start protocol now checks for other active agents
+- Framework development itself now uses PR workflow (dogfooding)
+
+### Changed
+- `STACK.template.md` default `git_workflow` changed from `direct` to `pull_request`
+- Agent guidelines updated to prioritize PR-based workflow
+- DEVELOPER_GUIDE.md updated with `worktree.sh` documentation
+
+---
+
 ## [0.11.2] - 2025-01-15
 
 ### Fixed
