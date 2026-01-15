@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.11.2
+**Version**: 0.11.3
 
 ---
 
@@ -1410,7 +1410,7 @@
 **Status**: shipped
 **Priority**: medium
 **Complexity**: medium
-**Since**: v0.11.2
+**Since**: v0.11.3
 
 **Description**: Upgrade script tracks which version each feature was introduced. Only shows features that are actually NEW relative to user's previous version, preventing repeated "new features" prompts.
 
