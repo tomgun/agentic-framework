@@ -17,6 +17,7 @@
 cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
 ls WIP.md 2>/dev/null
+cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
 ```
 
 ## Step 2: Greet User with Recap
@@ -66,6 +67,24 @@ Want to address these first, or continue with planned work?
 I'll quickly apply the updates, then we'll continue.
 [Handle upgrade, then return to normal greeting]
 ```
+
+**If .agentic/AGENTS_ACTIVE.md shows other agents working**:
+```
+👥 Another agent is currently active!
+
+Agent 1 (Claude - Main Window):
+- Working on: [their task]
+- Files: [their files]
+
+To avoid conflicts, I should work on different files/features.
+What would you like me to work on? (I'll register myself in .agentic/AGENTS_ACTIVE.md)
+```
+
+**CRITICAL - Multi-agent coordination:**
+1. **Read .agentic/AGENTS_ACTIVE.md** to see who else is working
+2. **Register yourself** by adding your entry
+3. **Avoid their files** - pick different features/files
+4. **Update when done** - remove your entry or mark complete
 
 ---
 

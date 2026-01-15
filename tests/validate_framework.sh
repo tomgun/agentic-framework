@@ -786,6 +786,88 @@ else
 fi
 
 # ============================================================
+# F-0096: PR-Based Workflow Default
+# ============================================================
+echo ""
+echo "--- F-0096: PR-Based Workflow Default ---"
+
+# AC-001: STACK.template.md has pull_request as default
+if grep -q "git_workflow: pull_request" "${FRAMEWORK_ROOT}/.agentic/init/STACK.template.md" 2>/dev/null; then
+  pass "STACK.template.md has pull_request as default git workflow"
+else
+  fail "STACK.template.md missing pull_request default"
+fi
+
+# AC-002: git_workflow.md documents profile-aware defaults
+if grep -q "Core+PM.*pull_request" "${FRAMEWORK_ROOT}/.agentic/workflows/git_workflow.md" 2>/dev/null; then
+  pass "git_workflow.md documents profile-aware defaults"
+else
+  fail "git_workflow.md missing profile-aware defaults"
+fi
+
+# AC-003: Agent guidelines include PR-based workflow
+if grep -q "PR-based workflow by default" "${FRAMEWORK_ROOT}/.agentic/agents/shared/agent_operating_guidelines.md" 2>/dev/null; then
+  pass "Agent guidelines include PR-based workflow as non-negotiable"
+else
+  fail "Agent guidelines missing PR-based workflow"
+fi
+
+# AC-004: Claude CLAUDE.md includes git workflow guidance
+if grep -q "PR by default" "${FRAMEWORK_ROOT}/.agentic/agents/claude/CLAUDE.md" 2>/dev/null; then
+  pass "Claude CLAUDE.md includes PR-first guidance"
+else
+  fail "Claude CLAUDE.md missing PR-first guidance"
+fi
+
+# AC-005: Feature branch naming convention documented
+if grep -q "feature/F-" "${FRAMEWORK_ROOT}/.agentic/workflows/git_workflow.md" 2>/dev/null; then
+  pass "Feature branch naming convention documented"
+else
+  fail "Feature branch naming convention not documented"
+fi
+
+# ============================================================
+# F-0097: Worktree Management Tool
+# ============================================================
+echo ""
+echo "--- F-0097: Worktree Management Tool ---"
+
+# AC-001: worktree.sh exists and is executable
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/worktree.sh" ]]; then
+  pass "worktree.sh exists and is executable"
+else
+  fail "worktree.sh missing or not executable"
+fi
+
+# AC-002: Create command creates worktree
+if grep -q "git worktree add" "${FRAMEWORK_ROOT}/.agentic/tools/worktree.sh" 2>/dev/null; then
+  pass "worktree.sh has create functionality"
+else
+  fail "worktree.sh missing worktree add"
+fi
+
+# AC-003: List command shows worktrees
+if grep -q "git worktree list" "${FRAMEWORK_ROOT}/.agentic/tools/worktree.sh" 2>/dev/null; then
+  pass "worktree.sh has list functionality"
+else
+  fail "worktree.sh missing worktree list"
+fi
+
+# AC-004: Remove command cleans up
+if grep -q "git worktree remove" "${FRAMEWORK_ROOT}/.agentic/tools/worktree.sh" 2>/dev/null; then
+  pass "worktree.sh has remove functionality"
+else
+  fail "worktree.sh missing worktree remove"
+fi
+
+# AC-005: Help command shows usage
+if bash "${FRAMEWORK_ROOT}/.agentic/tools/worktree.sh" help 2>/dev/null | grep -q "USAGE"; then
+  pass "worktree.sh help shows usage"
+else
+  fail "worktree.sh help not working"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

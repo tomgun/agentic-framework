@@ -1445,6 +1445,46 @@
 
 ---
 
+## F-0096: PR-Based Workflow Default
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: low
+**Since**: v0.11.3
+
+**Description**: PR-based git workflow is the default for Core+PM profile. Agents create feature branches and PRs instead of committing directly to main. Profile-aware defaults: Core+PM → `pull_request`, Core → `direct`. Users can override in STACK.md.
+
+**Dependencies**: F-0002 (Profile Selection)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/workflows/git_workflow.md`, `.agentic/init/STACK.template.md`, agent guidelines
+- Tests: validation script checks
+
+**Acceptance**: See `spec/acceptance/F-0096.md`
+
+---
+
+## F-0097: Worktree Management Tool
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.11.3
+
+**Description**: Tool to manage git worktrees for parallel agent development. Creates worktrees with proper branch naming, registers agents in AGENTS_ACTIVE.md, and provides cleanup commands. Enables multiple Claude/Cursor windows to work on different features simultaneously without conflicts.
+
+**Dependencies**: F-0031 (Multi-Agent Coordination)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/worktree.sh`
+- Tests: validation script checks
+
+**Acceptance**: See `spec/acceptance/F-0097.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1458,6 +1498,6 @@
 | Developer Experience (F-0061-0070) | 10 | 0 | 0 | 10 |
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
-| Verification & Enforcement (F-0091-0100) | 5 | 0 | 0 | 5 |
-| **Total** | **68** | **0** | **0** | **68** |
+| Verification & Enforcement (F-0091-0100) | 7 | 0 | 0 | 7 |
+| **Total** | **70** | **0** | **0** | **70** |
 
