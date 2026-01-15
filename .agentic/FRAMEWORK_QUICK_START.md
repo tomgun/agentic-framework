@@ -77,6 +77,28 @@ Ask yourself:
 
 ---
 
+## 🔀 GIT WORKFLOW (PR-Based)
+
+Framework development uses PR workflow (dogfooding):
+
+```bash
+# 1. Create feature branch
+git checkout -b feature/F-0098-description
+
+# 2. Work, commit to branch
+git commit -m "feat(scope): description"
+
+# 3. Push and create PR
+git push -u origin feature/F-0098-description
+gh pr create --title "feat: Description (F-0098)"
+
+# 4. Merge after review
+```
+
+**Never commit directly to main** - always use feature branches + PRs.
+
+---
+
 ## 🔄 RELEASE CHECKLIST (Abbreviated)
 
 ```

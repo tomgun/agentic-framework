@@ -265,10 +265,26 @@ The framework must follow its own quality standards:
 
 ### 10. **Git Workflow for Framework**
 
-**Branch strategy**:
-- `main` - Stable, released versions
-- Feature branches for significant changes (optional)
+**Branch strategy** (PR-based, dogfooding our own recommendation):
+- `main` - Stable, released versions (protected)
+- Feature branches for ALL changes: `feature/F-####-description`
+- Create PR for review before merging to main
 - Tag releases: `vX.Y.Z`
+
+**Workflow**:
+```bash
+# Create feature branch
+git checkout -b feature/F-0098-new-feature
+
+# Work, commit to branch
+git add . && git commit -m "feat: description"
+
+# Push and create PR
+git push -u origin feature/F-0098-new-feature
+gh pr create --title "feat: New feature (F-0098)" --body "..."
+
+# After review, merge PR
+```
 
 **Commit messages**:
 Follow conventional commits:
