@@ -12,9 +12,12 @@ Every decision must align with these. If conflict, re-read `PRINCIPLES.md`.
 
 | Principle | What It Means for Framework Dev |
 |-----------|--------------------------------|
-| **Traceability** | Spec ↔ Acceptance Criteria ↔ Acceptance Tests ↔ Unit Tests ↔ Code — ALL must match |
+| **Traceability** | Spec ↔ Acceptance Criteria ↔ Tests ↔ Code — ALL must match current committed version |
+| **Acceptance-Driven** | Write acceptance criteria BEFORE implementation, not after |
 | **Living Documentation** | Update docs WITH code in same commit, never "later" |
+| **Documentation = Reality** | Test that workflows actually work; don't assume |
 | **Single Source of Truth** | Information lives in ONE place; others reference it |
+| **Internal Consistency** | Templates + examples + docs + agent guidelines must align |
 | **Dogfooding** | Framework follows its own spec-driven methodology |
 | **Developer UX** | Easy to use, clear errors, helpful messages |
 | **Small Batch** | One feature at a time, max 5-10 files per commit |
@@ -30,9 +33,10 @@ Ask yourself:
 
 1. **Does it align with principles above?** → If not, reconsider
 2. **Will it affect templates?** → Test in scratch project first
-3. **Will it affect examples?** → Update `examples/` too
+3. **Will it affect examples?** → Consider updating `examples/` (not blocking, but recommended)
 4. **Is it a new feature?** → Must be specced (see below)
-5. **Does it break existing projects?** → Provide upgrade path
+5. **Does it break existing projects?** → Provide upgrade path in `upgrade.sh`
+6. **Did you test it actually works?** → Run in scratch project, don't assume
 
 ---
 
@@ -41,27 +45,31 @@ Ask yourself:
 | # | File | Action | Why |
 |---|------|--------|-----|
 | 1 | `spec/FEATURES.md` | Add F-#### entry | Dogfooding: we spec our own features |
-| 2 | `spec/acceptance/F-####.md` | Create acceptance criteria | Traceability: criteria before code |
-| 3 | `tests/validate_framework.sh` | Add validation tests | Gates > Guidelines: enforce, don't advise |
-| 4 | Code | Implement the feature | Now code matches spec |
-| 5 | `CHANGELOG.md` | Document the change | Living docs |
-| 6 | `CONTRIBUTIONS.md` | Add version section | Attribution |
-| 7 | `upgrade.sh` FEATURE_REGISTRY | If user-visible during upgrade | Developer UX |
+| 2 | `spec/acceptance/F-####.md` | Create acceptance criteria FIRST | Acceptance-Driven: criteria before code |
+| 3 | Code | Implement the feature | Now you know what "done" means |
+| 4 | `tests/validate_framework.sh` | Add validation tests | Gates > Guidelines: enforce, don't advise |
+| 5 | Scratch project | Test the feature works | Documentation = Reality |
+| 6 | `CHANGELOG.md` | Document the change | Living docs |
+| 7 | `CONTRIBUTIONS.md` | Add version section | Attribution |
+| 8 | `upgrade.sh` FEATURE_REGISTRY | If user-visible during upgrade | Developer UX |
 
-**Verification**: `bash tests/validate_framework.sh` must pass.
+**Feature is "accepted" when**: Tests pass in `validate_framework.sh` AND developer has reviewed tests and results.
+
+**Note**: Further development may break features. Re-run `validate_framework.sh` regularly.
 
 ---
 
 ## 🔄 RELEASE CHECKLIST (Abbreviated)
 
 ```
-[ ] spec/FEATURES.md has new features
-[ ] spec/acceptance/F-####.md exists for each
-[ ] tests/validate_framework.sh passes (all tests)
-[ ] Examples in examples/ updated and working
+[ ] spec/FEATURES.md has new features (F-####)
+[ ] spec/acceptance/F-####.md exists for each new feature
+[ ] tests/validate_framework.sh passes (ALL tests)
+[ ] Tested in scratch project (install.sh, init, upgrade)
 [ ] CHANGELOG.md updated
 [ ] CONTRIBUTIONS.md updated
 [ ] VERSION file updated
+[ ] Version references updated (README, DEVELOPER_GUIDE, etc.)
 [ ] Git tag: git tag -a vX.Y.Z -m "Release vX.Y.Z"
 [ ] Push: git push origin main vX.Y.Z
 ```
@@ -90,12 +98,40 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 | Mistake | Consequence | Prevention |
 |---------|-------------|------------|
 | Code without spec | Untraceable, undocumented | Always F-#### first |
-| Spec without acceptance | No verification criteria | Always create F-####.md |
+| Spec without acceptance criteria | No definition of "done" | Always create F-####.md BEFORE coding |
 | Acceptance without test | Gate doesn't enforce | Always update validate_framework.sh |
 | Change templates without testing | Breaks all future projects | Test in scratch project |
-| Forget examples | Examples become stale | Update examples/ with changes |
-| Docs "later" | Docs become stale | Same commit as code |
+| Assume it works | Broken workflows shipped | Actually run it, verify output |
+| Docs "later" | Docs become stale/wrong | Same commit as code |
+| Scattered version refs | Users install wrong version | Update ALL version references on release |
 
 ---
 
-**Remember**: Framework changes affect ALL users. Spec → Acceptance → Test → Code → Docs — in sync, always.
+## 🧪 TESTING FRAMEWORK CHANGES
+
+**Before committing**:
+
+```bash
+# 1. Create scratch project
+mkdir /tmp/test-framework && cd /tmp/test-framework && git init
+
+# 2. Install framework
+bash /path/to/agentic-framework/install.sh .
+
+# 3. Test init works
+# (run through init_playbook.md with agent)
+
+# 4. Test tools work
+python3 .agentic/tools/doctor.py
+bash .agentic/tools/wip.sh check
+
+# 5. If changing upgrade.sh, test upgrade path
+cd /tmp/old-project  # existing project on older version
+bash /path/to/new-framework/.agentic/tools/upgrade.sh .
+```
+
+---
+
+**Remember**: Framework changes affect ALL users.
+
+**The chain**: Spec → Acceptance Criteria → Code → Tests → Docs — all in sync, all matching committed version.
