@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.9.7
+**Version**: 0.11.2
 
 ---
 
@@ -21,6 +21,7 @@
 | **Developer Experience** | F-0061 to F-0070 | Documentation, onboarding, usability |
 | **Design Principles** | F-0071 to F-0080 | Core framework principles as specs |
 | **Agent System** | F-0081 to F-0090 | Specialized agents, orchestration, token efficiency |
+| **Verification & Enforcement** | F-0091 to F-0100 | Gate-based verification, phase detection, enforcement |
 
 ---
 
@@ -1344,6 +1345,106 @@
 
 ---
 
+## F-0091: Gate-Based Verification
+
+**Status**: shipped
+**Priority**: critical
+**Complexity**: high
+**Since**: v0.11.0
+
+**Description**: Shift from instruction-based to gate-based architecture. Instead of agents memorizing 1000+ lines of guidelines, gates enforce quality automatically. `doctor.sh` becomes THE single verification command with multiple modes.
+
+**Dependencies**: F-0016, F-0043
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/doctor.sh` (--full, --phase, --pre-commit modes), `.agentic/tools/doctor.py`
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0091.md`
+
+---
+
+## F-0092: Phase Detection
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.11.0
+
+**Description**: Automatic detection of current development phase (start, planning, implement, complete, blocked) to run appropriate verification gates.
+
+**Dependencies**: F-0091
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/phase_detect.py`
+- Tests: `tests/test_phase_detect.py`
+
+**Acceptance**: See `spec/acceptance/F-0092.md`
+
+---
+
+## F-0093: AGENT_QUICK_START.md
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: low
+**Since**: v0.11.0
+
+**Description**: Concise (~70 lines) quick reference replacing 1000+ lines of agent guidelines for daily use. Full guidelines become reference material for troubleshooting.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/agents/shared/AGENT_QUICK_START.md`
+- Tests: file existence, content validation
+
+**Acceptance**: See `spec/acceptance/F-0093.md`
+
+---
+
+## F-0094: Version-Aware Upgrade Features
+
+**Status**: shipped
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.11.2
+
+**Description**: Upgrade script tracks which version each feature was introduced. Only shows features that are actually NEW relative to user's previous version, preventing repeated "new features" prompts.
+
+**Dependencies**: F-0056, F-0080
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/upgrade.sh` (FEATURE_REGISTRY array)
+- Tests: version comparison validation
+
+**Acceptance**: See `spec/acceptance/F-0094.md`
+
+---
+
+## F-0095: Cross-Platform Tool Compatibility
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.11.1
+
+**Description**: All shell scripts work on both macOS (BSD) and Linux (GNU). Uses awk instead of sed for complex text processing to avoid platform-specific syntax issues.
+
+**Dependencies**: F-0041
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/status.sh` (awk-based), all tools tested on macOS
+- Tests: manual cross-platform testing
+
+**Acceptance**: See `spec/acceptance/F-0095.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1351,11 +1452,12 @@
 | Core (F-0001-0010) | 10 | 0 | 0 | 10 |
 | Quality (F-0011-0020) | 7 | 0 | 0 | 7 |
 | Session (F-0021-0030) | 8 | 0 | 0 | 8 |
-| Multi-Agent (F-0031-0040) | 4 | 0 | 0 | 4 |
+| Multi-Agent (F-0031-0040) | 7 | 0 | 0 | 7 |
 | Tooling (F-0041-0050) | 4 | 0 | 0 | 4 |
 | Recovery (F-0051-0060) | 6 | 0 | 0 | 6 |
 | Developer Experience (F-0061-0070) | 10 | 0 | 0 | 10 |
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
-| **Total** | **63** | **0** | **0** | **63** |
+| Verification & Enforcement (F-0091-0100) | 5 | 0 | 0 | 5 |
+| **Total** | **68** | **0** | **0** | **68** |
 

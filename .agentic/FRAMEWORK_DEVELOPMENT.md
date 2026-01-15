@@ -313,8 +313,10 @@ refactor(docs): eliminate documentation duplication
 - [ ] **`spec/FEATURES.md` updated with new features (F-####)**
 - [ ] **`spec/acceptance/F-####.md` created for new features**
 - [ ] **`tests/validate_framework.sh` updated if new acceptance criteria**
+- [ ] **`FEATURE_REGISTRY` in upgrade.sh updated if user-visible feature**
 - [ ] `VERSION` file updated
 - [ ] `CHANGELOG.md` updated with all changes
+- [ ] `CONTRIBUTIONS.md` updated with version section
 - [ ] Installation instructions reference correct version (README, DEVELOPER_GUIDE, UPGRADING, START_HERE, MANUAL_OPERATIONS)
 - [ ] All commits pushed to main
 - [ ] Git tag created: `git tag -a vX.Y.Z -m "Release vX.Y.Z"`
@@ -367,6 +369,36 @@ refactor(docs): eliminate documentation duplication
 5. Test scaffold.sh creates correct files
 6. Test upgrade from old → new
 7. Document in CHANGELOG (if breaking: major/minor version bump)
+
+**Adding a new framework feature**:
+1. Add feature spec to `spec/FEATURES.md` (F-#### format)
+2. Create acceptance criteria in `spec/acceptance/F-####.md`
+3. Add tests to `tests/validate_framework.sh`
+4. If user-visible during upgrade, add to FEATURE_REGISTRY (see below)
+5. Update CHANGELOG.md
+6. Update CONTRIBUTIONS.md
+
+**Adding to FEATURE_REGISTRY (upgrade notifications)**:
+When adding a user-visible feature that should be offered during upgrades:
+
+1. Edit `.agentic/tools/upgrade.sh`
+2. Find the `FEATURE_REGISTRY` array (~line 360)
+3. Add entry: `"X.Y.Z:Feature Name:setup command:Description"`
+   - X.Y.Z = version where feature is introduced
+   - Feature Name = short name shown to user
+   - setup command = command to enable/setup the feature
+   - Description = brief explanation
+
+Example:
+```bash
+declare -a FEATURE_REGISTRY=(
+  "0.5.0:Sub-agent setup:bash .agentic/tools/setup-agent.sh cursor-agents:Specialized agents"
+  "0.12.0:New Feature:bash .agentic/tools/setup-new.sh:Description here"
+)
+```
+
+Users upgrading FROM a version BEFORE X.Y.Z will see the feature offer.
+Users already past X.Y.Z will NOT see it (prevents repeated prompts).
 
 ---
 
@@ -500,8 +532,8 @@ refactor(docs): eliminate documentation duplication
 
 ---
 
-**Last Updated**: 2026-01-03  
-**Framework Version**: 0.2.4  
+**Last Updated**: 2025-01-15
+**Framework Version**: 0.11.2
 
 **Note**: These guidelines evolve with the framework. When they change, notify framework contributors and update this document.
 
