@@ -93,10 +93,13 @@ echo ""
 echo -e "${BLUE}[2/7] Detecting versions${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Current version (from target project)
+# Current version (from target project - prefer .agentic/VERSION, fallback to STACK.md)
 CURRENT_VERSION=""
-if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
-  CURRENT_VERSION=$(grep -E "^\s*-?\s*Version:" "$TARGET_PROJECT_DIR/STACK.md" | head -1 | sed -E 's/.*Version:\s*([0-9.]+).*/\1/' || echo "unknown")
+if [[ -f "$TARGET_PROJECT_DIR/.agentic/VERSION" ]]; then
+  CURRENT_VERSION=$(cat "$TARGET_PROJECT_DIR/.agentic/VERSION" | tr -d '[:space:]')
+elif [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+  # Extract version number from line like "- Version: 0.11.2  <!-- comment -->"
+  CURRENT_VERSION=$(grep -E "^\s*-?\s*Version:" "$TARGET_PROJECT_DIR/STACK.md" | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
 fi
 
 # New version (from this framework)
@@ -403,18 +406,14 @@ else
 
 1. ✅ Read this file (you're doing it now)
 2. [ ] If "STACK.md updated: no" above → manually update: \`- Version: ${VERSION_TO_USE:-unknown}\`
-3. [ ] Check spec files for format markers (add if missing):
-       - spec/FEATURES.md → \`<!-- format: features-v0.2.0 -->\`
-       - spec/NFR.md → \`<!-- format: nfr-v0.1.0 -->\`
-       - spec/ISSUES.md → \`<!-- format: issues-v0.1.0 -->\`
-4. [ ] Read .agentic/START_HERE.md (5 min) for new workflows
-5. [ ] Validate specs: \`python3 .agentic/tools/validate_specs.py\`
-6. [ ] Review CHANGELOG: ${VERSION_TO_USE:-unknown} changes
+3. [ ] Read .agentic/START_HERE.md (5 min) for new workflows
+4. [ ] Validate specs: \`python3 .agentic/tools/validate_specs.py\`
+5. [ ] Review CHANGELOG for ${VERSION_TO_USE:-unknown} changes (see link below)
 $(echo -e "$NEW_FEATURES_SECTION")
 
 ## Changelog
 
-See: https://github.com/tomgun/agentic-framework/blob/v${VERSION_TO_USE:-unknown}/CHANGELOG.md
+https://github.com/tomgun/agentic-framework/blob/main/CHANGELOG.md
 
 ## Don't Waste Tokens!
 
@@ -461,7 +460,7 @@ else
   echo "Project: $TARGET_PROJECT_DIR"
   echo ""
   echo "Next steps:"
-  echo "  1. Review CHANGELOG: https://github.com/tomgun/agentic-framework/blob/v${VERSION_TO_USE:-latest}/CHANGELOG.md"
+  echo "  1. Review CHANGELOG: https://github.com/tomgun/agentic-framework/blob/main/CHANGELOG.md"
   echo "  2. Test your workflow: bash .agentic/tools/dashboard.sh"
   echo "  3. Run quality checks: bash quality_checks.sh --pre-commit (if configured)"
   echo ""
