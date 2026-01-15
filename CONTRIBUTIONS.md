@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.11.2)
-**Date**: 2025-01-14  
+**Period**: Initial Development (v0.1.0 → v0.11.3)
+**Date**: 2026-01-15  
 
 ---
 
@@ -760,8 +760,27 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 
 ---
 
+## v0.11.3 Contributions
+
+### PR-Based Workflow Default (F-0096)
+- Requested PR workflow as default instead of direct commits to main
+- Profile-aware defaults: Core+PM → `pull_request`, Core → `direct`
+- Dogfooding: Framework development itself now uses PRs
+
+### Parallel Agent Tooling (F-0097)
+- Identified need for `worktree.sh` tool for parallel agent development
+- Automated worktree creation, agent registration, cleanup
+- Tested multi-agent coordination with second Claude window
+
+### Multi-Agent Coordination
+- Discovered agents weren't reading AGENTS_ACTIVE.md at session start
+- Fixed by making it "Step 0" in session start protocol
+- Verified fix works with actual parallel Claude sessions
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.11.1
+**Current Version**: v0.11.3
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 

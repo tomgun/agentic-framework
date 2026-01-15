@@ -549,7 +549,7 @@ Users already past X.Y.Z will NOT see it (prevents repeated prompts).
 ---
 
 **Last Updated**: 2025-01-15
-**Framework Version**: 0.11.2
+**Framework Version**: 0.11.3
 
 **Note**: These guidelines evolve with the framework. When they change, notify framework contributors and update this document.
 
