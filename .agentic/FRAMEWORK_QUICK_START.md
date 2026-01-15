@@ -19,7 +19,7 @@ Every decision must align with these. If conflict, re-read `PRINCIPLES.md`.
 | **Single Source of Truth** | Information lives in ONE place; others reference it |
 | **Internal Consistency** | Templates + examples + docs + agent guidelines must align |
 | **Dogfooding** | Framework follows its own spec-driven methodology |
-| **Developer UX** | Easy to use, clear errors, helpful messages |
+| **Developer UX** | User remembers nothing; specs/WIP/STATUS carry state; agent guides proactively |
 | **Small Batch** | One feature at a time, max 5-10 files per commit |
 | **Gates > Guidelines** | Enforcement (hooks, scripts) over advice (docs) |
 | **Backward Compatibility** | Existing projects must upgrade cleanly |
