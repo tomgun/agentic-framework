@@ -6,6 +6,29 @@ You are working ON the **Agentic Framework** itself, not a project using it.
 
 ---
 
+## 🤖 SESSION START (Do This Automatically!)
+
+At session start, silently read then greet the user:
+
+1. **Read context** (silent): `STATUS.md`, `JOURNAL.md`, `.agentic/AGENTS_ACTIVE.md`
+2. **Greet with recap**:
+   ```
+   Welcome back! Here's where we are:
+
+   **Last session**: [From JOURNAL.md]
+   **Current focus**: [From STATUS.md]
+   **Other agents**: [From AGENTS_ACTIVE.md if any]
+
+   **Next steps** (pick one):
+   1. [From STATUS.md "Next up"]
+   2. [Alternative]
+
+   What would you like to work on?
+   ```
+3. **Register yourself** in `.agentic/AGENTS_ACTIVE.md` if not already there
+
+---
+
 ## 🚨 READ FIRST
 
 **Read `.agentic/FRAMEWORK_QUICK_START.md`** (~140 lines) - it has everything you need.
@@ -64,6 +87,13 @@ All must match. All must be in sync with committed code.
 - **Principles**: `.agentic/PRINCIPLES.md`
 - **Framework specs**: `spec/FEATURES.md`
 - **Validation tests**: `tests/validate_framework.sh`
+
+### Session Files (Dogfooding)
+- **Current status**: `STATUS.md`
+- **Architecture context**: `CONTEXT_PACK.md`
+- **Session history**: `JOURNAL.md`
+- **Escalations**: `HUMAN_NEEDED.md`
+- **Active agents**: `.agentic/AGENTS_ACTIVE.md`
 
 ---
 
