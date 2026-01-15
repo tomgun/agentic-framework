@@ -98,7 +98,8 @@ CURRENT_VERSION=""
 if [[ -f "$TARGET_PROJECT_DIR/.agentic/VERSION" ]]; then
   CURRENT_VERSION=$(cat "$TARGET_PROJECT_DIR/.agentic/VERSION" | tr -d '[:space:]')
 elif [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
-  CURRENT_VERSION=$(grep -E "^\s*-?\s*Version:" "$TARGET_PROJECT_DIR/STACK.md" | head -1 | sed -E 's/.*Version:\s*([0-9.]+).*/\1/' || echo "unknown")
+  # Extract version number from line like "- Version: 0.11.2  <!-- comment -->"
+  CURRENT_VERSION=$(grep -E "^\s*-?\s*Version:" "$TARGET_PROJECT_DIR/STACK.md" | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
 fi
 
 # New version (from this framework)
