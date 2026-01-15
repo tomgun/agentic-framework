@@ -652,6 +652,140 @@ else
 fi
 
 # ============================================================
+# F-0091: Gate-Based Verification
+# ============================================================
+echo ""
+echo "--- F-0091: Gate-Based Verification ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/tools/doctor.sh" ]]; then
+  pass "doctor.sh exists"
+else
+  fail "doctor.sh missing"
+fi
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/doctor.sh" ]]; then
+  pass "doctor.sh is executable"
+else
+  fail "doctor.sh is not executable"
+fi
+
+# doctor.sh is a wrapper that passes args to doctor.py, so check doctor.py for modes
+if grep -q "\-\-full" "${FRAMEWORK_ROOT}/.agentic/tools/doctor.py" 2>/dev/null; then
+  pass "doctor.py has --full mode"
+else
+  fail "doctor.py missing --full mode"
+fi
+
+if grep -q "\-\-phase" "${FRAMEWORK_ROOT}/.agentic/tools/doctor.py" 2>/dev/null; then
+  pass "doctor.py has --phase mode"
+else
+  fail "doctor.py missing --phase mode"
+fi
+
+if grep -q "\-\-pre-commit" "${FRAMEWORK_ROOT}/.agentic/tools/doctor.py" 2>/dev/null; then
+  pass "doctor.py has --pre-commit mode"
+else
+  fail "doctor.py missing --pre-commit mode"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/tools/doctor.py" ]]; then
+  pass "doctor.py exists"
+else
+  fail "doctor.py missing"
+fi
+
+# ============================================================
+# F-0092: Phase Detection
+# ============================================================
+echo ""
+echo "--- F-0092: Phase Detection ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/tools/phase_detect.py" ]]; then
+  pass "phase_detect.py exists"
+else
+  fail "phase_detect.py missing"
+fi
+
+if grep -q "start\|planning\|implement\|complete\|blocked" "${FRAMEWORK_ROOT}/.agentic/tools/phase_detect.py" 2>/dev/null; then
+  pass "phase_detect.py defines all 5 phases"
+else
+  fail "phase_detect.py missing phase definitions"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/tests/test_phase_detect.py" ]]; then
+  pass "test_phase_detect.py exists"
+else
+  fail "test_phase_detect.py missing"
+fi
+
+# ============================================================
+# F-0093: AGENT_QUICK_START.md
+# ============================================================
+echo ""
+echo "--- F-0093: AGENT_QUICK_START.md ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/agents/shared/AGENT_QUICK_START.md" ]]; then
+  pass "AGENT_QUICK_START.md exists"
+  LINES=$(wc -l < "${FRAMEWORK_ROOT}/.agentic/agents/shared/AGENT_QUICK_START.md" | tr -d ' ')
+  if [[ $LINES -lt 150 ]]; then
+    pass "AGENT_QUICK_START.md is concise (${LINES} lines)"
+  else
+    warn "AGENT_QUICK_START.md may be too long (${LINES} lines, target <100)"
+  fi
+else
+  fail "AGENT_QUICK_START.md missing"
+fi
+
+if grep -qi "doctor.sh" "${FRAMEWORK_ROOT}/.agentic/agents/shared/AGENT_QUICK_START.md" 2>/dev/null; then
+  pass "AGENT_QUICK_START references doctor.sh"
+else
+  fail "AGENT_QUICK_START missing doctor.sh reference"
+fi
+
+# ============================================================
+# F-0094: Version-Aware Upgrade Features
+# ============================================================
+echo ""
+echo "--- F-0094: Version-Aware Upgrade Features ---"
+
+if grep -q "FEATURE_REGISTRY" "${FRAMEWORK_ROOT}/.agentic/tools/upgrade.sh" 2>/dev/null; then
+  pass "upgrade.sh has FEATURE_REGISTRY"
+else
+  fail "upgrade.sh missing FEATURE_REGISTRY"
+fi
+
+if grep -q "version_lt" "${FRAMEWORK_ROOT}/.agentic/tools/upgrade.sh" 2>/dev/null; then
+  pass "upgrade.sh has version comparison function"
+else
+  fail "upgrade.sh missing version comparison"
+fi
+
+if grep -q "sort -V" "${FRAMEWORK_ROOT}/.agentic/tools/upgrade.sh" 2>/dev/null; then
+  pass "upgrade.sh uses sort -V for version comparison"
+else
+  fail "upgrade.sh missing sort -V"
+fi
+
+# ============================================================
+# F-0095: Cross-Platform Tool Compatibility
+# ============================================================
+echo ""
+echo "--- F-0095: Cross-Platform Tool Compatibility ---"
+
+if grep -q "awk" "${FRAMEWORK_ROOT}/.agentic/tools/status.sh" 2>/dev/null; then
+  pass "status.sh uses awk for cross-platform compatibility"
+else
+  fail "status.sh missing awk (may have sed compatibility issues)"
+fi
+
+# Check that status.sh doesn't use problematic sed patterns
+if grep -q "sed -i.bak.*c\\\\" "${FRAMEWORK_ROOT}/.agentic/tools/status.sh" 2>/dev/null; then
+  fail "status.sh uses BSD-incompatible sed pattern"
+else
+  pass "status.sh avoids problematic sed patterns"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""
