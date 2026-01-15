@@ -1,112 +1,72 @@
-# Claude (Anthropic) Instructions
+# Claude Instructions - Framework Development
 
-You are working in a repository that uses the **Agentic Framework** for AI-assisted development.
+You are working ON the **Agentic Framework** itself, not a project using it.
 
----
-
-## 🚨 FRAMEWORK DEVELOPMENT MODE
-
-**If this repo IS the `agentic-framework` itself** (check: `VERSION` file at root, `spec/FEATURES.md` has F-0001 to F-00XX):
-
-→ **Read `.agentic/FRAMEWORK_QUICK_START.md` instead** — different rules apply!
-
-Key differences:
-- You must spec framework features in `spec/FEATURES.md`
-- You must create acceptance criteria in `spec/acceptance/F-####.md`
-- You must add tests to `tests/validate_framework.sh`
-- Changes affect ALL users — higher bar for quality
-
-**If this is a project USING the framework** → continue below.
+**Different rules apply here** — framework changes affect ALL users.
 
 ---
 
-## Quick Start (READ THIS)
+## 🚨 READ FIRST
 
-**Read `.agentic/agents/shared/AGENT_QUICK_START.md`** (~70 lines) - it has everything you need.
-
----
-
-## The One Rule
-
-Run `doctor.sh` at phase transitions. Gates enforce quality - you don't need to memorize checklists.
-
-```bash
-doctor.sh              # Quick health check
-doctor.sh --full       # Comprehensive verification
-doctor.sh --phase X    # Phase-specific check (start/planning/implement/complete/commit)
-doctor.sh --pre-commit # Before committing
-```
+**Read `.agentic/FRAMEWORK_QUICK_START.md`** (~140 lines) - it has everything you need.
 
 ---
 
-## Session Start Protocol
+## The Core Chain (Never Break This)
 
-1. Check `WIP.md` (interrupted work?)
-2. Read: `CONTEXT_PACK.md` → `STATUS.md` → `JOURNAL.md` (last 3 entries)
-3. Greet user: "✓ Session started. Working on: [task]. Blockers: [none/list]"
+**Spec → Acceptance Criteria → Code → Tests → Docs**
 
----
-
-## Feature Work
-
-For "implement F-####":
-1. Check acceptance exists: `spec/acceptance/F-####.md`
-2. If missing, create it first (planning phase)
-3. Use orchestrator for complex features: `.agentic/agents/roles/orchestrator-agent.md`
+All must match. All must be in sync with committed code.
 
 ---
 
-## Token-Efficient Tools (Use These!)
+## Before ANY Change
 
-```bash
-# Append to JOURNAL.md (don't read/rewrite!)
-bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"
-
-# Update STATUS.md sections
-bash .agentic/tools/status.sh focus "Current task"
-
-# Update FEATURES.md
-bash .agentic/tools/feature.sh F-0003 status shipped
-```
+1. Does it align with principles in `PRINCIPLES.md`?
+2. Will it affect templates? → Test in scratch project
+3. Is it a new feature? → Spec it in `spec/FEATURES.md` first
+4. Does it break existing projects? → Provide upgrade path
 
 ---
 
-## Session End
+## Adding Framework Features (Mandatory)
 
-Run `.agentic/checklists/session_end.md` checklist.
-Tell user: "✓ Session ending. Summary: [done]. Next: [next]. Blockers: [list]"
+| Step | Action |
+|------|--------|
+| 1 | Add F-#### to `spec/FEATURES.md` |
+| 2 | Create `spec/acceptance/F-####.md` BEFORE coding |
+| 3 | Implement the feature |
+| 4 | Add tests to `tests/validate_framework.sh` |
+| 5 | Update `CHANGELOG.md` |
+| 6 | If user-visible during upgrade: add to `FEATURE_REGISTRY` in `upgrade.sh` |
+
+**Verify**: `bash tests/validate_framework.sh` must pass (all 104+ tests)
+
+---
+
+## Key Principles (From PRINCIPLES.md)
+
+| Principle | Meaning |
+|-----------|---------|
+| **Traceability** | Spec ↔ Acceptance ↔ Tests ↔ Code must match |
+| **Acceptance-Driven** | Criteria BEFORE implementation |
+| **Living Docs** | Update docs WITH code, same commit |
+| **Documentation = Reality** | Test that workflows work, don't assume |
+| **Gates > Guidelines** | Enforce with scripts, not just docs |
+| **Backward Compatibility** | Existing projects must upgrade cleanly |
+
+---
+
+## Reference Material
+
+- **Quick start**: `.agentic/FRAMEWORK_QUICK_START.md`
+- **Full guide**: `.agentic/FRAMEWORK_DEVELOPMENT.md`
+- **Principles**: `.agentic/PRINCIPLES.md`
+- **Framework specs**: `spec/FEATURES.md`
+- **Validation tests**: `tests/validate_framework.sh`
 
 ---
 
 ## Never Auto-Commit
 
 ALWAYS show changes to human first. ONLY commit when human explicitly approves.
-
----
-
-## When User Says "/verify"
-
-The user is helping enforce quality. Immediately run:
-
-```bash
-bash .agentic/tools/doctor.sh --full
-```
-
-Then:
-1. Report results clearly (passes, issues, suggestions)
-2. Offer to fix issues automatically where possible
-3. For decisions needed, add to HUMAN_NEEDED.md
-4. Summarize: phase, what's working, what needs attention
-
-**This is human-agent partnership** - acknowledge the user is actively helping maintain quality.
-
----
-
-## Reference Material (Read When Needed)
-
-- **Full guidelines**: `.agentic/agents/shared/agent_operating_guidelines.md` (detailed rationale)
-- **Principles**: `.agentic/PRINCIPLES.md` (philosophy)
-- **Checklists**: `.agentic/checklists/` (step-by-step when stuck)
-- **Quality standards**: `.agentic/quality/` (testing, code review)
-
-These are **reference** - gates handle enforcement, you don't need to memorize them.

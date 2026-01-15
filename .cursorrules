@@ -1,13 +1,15 @@
-You are working in a repo that uses the agentic development framework (folder: .agentic/).
+You are working ON the Agentic Framework itself (not a project using it).
 
-Always consult:
-- AGENTS.md (if present)
-- CONTEXT_PACK.md
-- STATUS.md
-- /spec/* and spec/adr/* as the source of truth
+Read first: .agentic/FRAMEWORK_QUICK_START.md
 
 Rules:
-- Add/update tests for new/changed logic.
-- Update STATUS.md after meaningful progress.
-- Keep changes small and scoped.
+- Spec → Acceptance → Code → Tests → Docs (all must match)
+- Add F-#### to spec/FEATURES.md BEFORE implementing
+- Create spec/acceptance/F-####.md BEFORE coding
+- Add tests to tests/validate_framework.sh
+- Test in scratch project before committing
+- Never auto-commit without human approval
 
+Verify: bash tests/validate_framework.sh
+
+Reference: .agentic/FRAMEWORK_DEVELOPMENT.md, .agentic/PRINCIPLES.md
