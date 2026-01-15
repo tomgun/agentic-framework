@@ -12,6 +12,8 @@ Every decision must align with these. If conflict, re-read `PRINCIPLES.md`.
 
 | Principle | What It Means for Framework Dev |
 |-----------|--------------------------------|
+| **Token Economics** | Durable artifacts, efficient scripts, context isolation (Core) |
+| **Developer UX** | User remembers nothing; specs/WIP/STATUS carry state; agent guides proactively (Core) |
 | **Traceability** | Spec ↔ Acceptance Criteria ↔ Tests ↔ Code — ALL must match current committed version |
 | **Acceptance-Driven** | Write acceptance criteria BEFORE implementation, not after |
 | **Living Documentation** | Update docs WITH code in same commit, never "later" |
@@ -19,11 +21,9 @@ Every decision must align with these. If conflict, re-read `PRINCIPLES.md`.
 | **Single Source of Truth** | Information lives in ONE place; others reference it |
 | **Internal Consistency** | Templates + examples + docs + agent guidelines must align |
 | **Dogfooding** | Framework follows its own spec-driven methodology |
-| **Developer UX** | User remembers nothing; specs/WIP/STATUS carry state; agent guides proactively |
 | **Small Batch** | One feature at a time, max 5-10 files per commit |
 | **Gates > Guidelines** | Enforcement (hooks, scripts) over advice (docs) |
 | **Backward Compatibility** | Existing projects must upgrade cleanly |
-| **Token Economics** | Durable artifacts, efficient scripts, context isolation |
 
 ---
 
