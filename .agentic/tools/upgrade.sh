@@ -459,7 +459,7 @@ else
   echo "Project: $TARGET_PROJECT_DIR"
   echo ""
   echo "Next steps:"
-  echo "  1. Review CHANGELOG: https://github.com/tomgun/agentic-framework/blob/v${VERSION_TO_USE:-latest}/CHANGELOG.md"
+  echo "  1. Review CHANGELOG: https://github.com/tomgun/agentic-framework/blob/main/CHANGELOG.md"
   echo "  2. Test your workflow: bash .agentic/tools/dashboard.sh"
   echo "  3. Run quality checks: bash quality_checks.sh --pre-commit (if configured)"
   echo ""
