@@ -38,27 +38,27 @@ This guide explains how to create a new version release of the Agentic Framework
 
 2. **Create new release**
    - Click "Releases" → "Draft a new release"
-   - **Tag**: `v0.2.1` (must match VERSION file with `v` prefix)
+   - **Tag**: `vX.Y.Z` (must match VERSION file with `v` prefix)
    - **Target**: `main` branch
-   - **Title**: `v0.2.1`
+   - **Title**: `vX.Y.Z`
    - **Description**: Copy from CHANGELOG.md for this version
    - Check "Set as the latest release"
    - Click "Publish release"
 
 3. **GitHub automatically creates:**
-   - `agentic-framework-0.2.1.tar.gz` (source archive)
-   - `agentic-framework-0.2.1.zip` (source archive)
+   - `agentic-framework-X.Y.Z.tar.gz` (source archive)
+   - `agentic-framework-X.Y.Z.zip` (source archive)
 
 ### Option 2: GitHub CLI
 
 ```bash
 # Create and push tag
-git tag v0.2.1
-git push origin v0.2.1
+git tag vX.Y.Z
+git push origin vX.Y.Z
 
 # Create release with gh CLI
-gh release create v0.2.1 \
-  --title "v0.2.1" \
+gh release create vX.Y.Z \
+  --title "vX.Y.Z" \
   --notes-file RELEASE_NOTES.md \
   --latest
 ```
@@ -67,10 +67,10 @@ gh release create v0.2.1 \
 
 ```bash
 # Create annotated tag
-git tag -a v0.2.1 -m "Release v0.2.1"
+git tag -a vX.Y.Z -m "Release vX.Y.Z"
 
 # Push tag to GitHub
-git push origin v0.2.1
+git push origin vX.Y.Z
 
 # Then manually create release on GitHub using this tag
 ```
@@ -110,13 +110,13 @@ MAJOR.MINOR.PATCH
 2. **Test installation**
    ```bash
    # Download latest release
-   curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.0.tar.gz | tar xz
+   curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/vX.Y.Z.tar.gz | tar xz
    
    # Verify structure
-   ls agentic-framework-0.2.0/agentic
+   ls agentic-framework-X.Y.Z/agentic
    
    # Test init
-   cp -r agentic-framework-0.2.0/agentic test-project/
+   cp -r agentic-framework-X.Y.Z/agentic test-project/
    cd test-project
    # Tell agent to initialize
    ```
@@ -173,14 +173,14 @@ If a release has critical issues:
 ```bash
 # Delete release on GitHub UI
 # Or via CLI:
-gh release delete v0.2.0
+gh release delete vX.Y.Z
 
 # Delete tag locally and remotely
-git tag -d v0.2.0
-git push origin :refs/tags/v0.2.0
+git tag -d vX.Y.Z
+git push origin :refs/tags/vX.Y.Z
 ```
 
-Then fix issues and re-release with patch version (v0.2.1).
+Then fix issues and re-release with patch version (vX.Y.Z).
 
 ## Notes
 

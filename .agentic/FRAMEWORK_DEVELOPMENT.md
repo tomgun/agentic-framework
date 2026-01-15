@@ -106,7 +106,7 @@ Example projects demonstrate best practices and verify workflows actually work.
 
 5. **Test upgrade path** (if changing templates/structure):
    ```bash
-   cd /tmp/old-project  # Project on v0.2.3
+   cd /tmp/old-project  # Project on vX.Y.Z
    bash /path/to/new-framework/upgrade.sh
    # Verify upgrade worked
    ```
@@ -121,7 +121,7 @@ Example projects demonstrate best practices and verify workflows actually work.
 
 1. **Update `VERSION` file**:
    ```bash
-   echo "0.2.5" > VERSION
+   echo "X.Y.Z" > VERSION
    ```
 
 2. **Update `CHANGELOG.md`**:
@@ -136,13 +136,13 @@ Example projects demonstrate best practices and verify workflows actually work.
    - Any docs referencing specific versions
 
 4. **Update example projects**:
-   - Update `STACK.md` in each example: `Version: 0.2.5`
+   - Update `STACK.md` in each example: `Version: X.Y.Z`
    - Test examples still work
 
 5. **Git tag**:
    ```bash
-   git tag -a v0.2.5 -m "Release v0.2.5: [brief description]"
-   git push origin v0.2.5
+   git tag -a vX.Y.Z -m "Release vX.Y.Z: [brief description]"
+   git push origin vX.Y.Z
    ```
 
 6. **Create GitHub release** (manual in GitHub UI):
@@ -268,7 +268,7 @@ The framework must follow its own quality standards:
 **Branch strategy**:
 - `main` - Stable, released versions
 - Feature branches for significant changes (optional)
-- Tag releases: `v0.2.5`
+- Tag releases: `vX.Y.Z`
 
 **Commit messages**:
 Follow conventional commits:

@@ -82,8 +82,8 @@ bash .agentic/tools/doctor.sh --phase X # Phase-specific check
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.4.tar.gz | tar xz
-cd agentic-framework-0.5.0
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
+cd agentic-framework-0.11.2
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -1009,10 +1009,10 @@ Checks if versions in `package.json` / `requirements.txt` match `STACK.md`.
 ```bash
 # Download new framework version
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.4.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
 
 # Run upgrade FROM new framework
-bash /tmp/agentic-framework-0.2.4/.agentic/tools/upgrade.sh /path/to/your-project
+bash /tmp/agentic-framework-0.11.2/.agentic/tools/upgrade.sh /path/to/your-project
 ```
 
 ### Consistency Scripts
@@ -1432,8 +1432,8 @@ curl -s https://api.github.com/repos/tomgun/agentic-framework/releases/latest | 
 
 # Upgrade (see UPGRADING.md)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.4.tar.gz | tar xz
-bash /tmp/agentic-framework-0.2.4/.agentic/tools/upgrade.sh /path/to/your-project
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
+bash /tmp/agentic-framework-0.11.2/.agentic/tools/upgrade.sh /path/to/your-project
 ```
 
 ---
@@ -1874,6 +1874,6 @@ bash .agentic/tools/coverage.sh
 
 ---
 
-**Version:** 0.2.4  
+**Version:** 0.11.2  
 **Last updated:** 2026-01-03
 
