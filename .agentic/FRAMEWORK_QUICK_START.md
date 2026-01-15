@@ -27,6 +27,24 @@ Every decision must align with these. If conflict, re-read `PRINCIPLES.md`.
 
 ---
 
+## 📦 TWO PROFILES: Core vs Core+PM
+
+Framework features apply to different profiles:
+
+| Profile | What Users Get | Key Files |
+|---------|---------------|-----------|
+| **Core** | Token efficiency, developer UX, workflows, quality gates | CONTEXT_PACK.md, JOURNAL.md, PRODUCT.md, WIP.md |
+| **Core+PM** | Core + formal specs, feature tracking, acceptance criteria | + spec/FEATURES.md, spec/acceptance/, STATUS.md |
+
+**When adding framework features, know which profile it affects:**
+- Core features → affect ALL users
+- Core+PM features → only users who enable formal specs
+- Both → document clearly in spec/FEATURES.md
+
+**Core is the foundation** - Token Economics and Developer UX must work without any specs.
+
+---
+
 ## 🔴 BEFORE ANY FRAMEWORK CHANGE
 
 Ask yourself:
