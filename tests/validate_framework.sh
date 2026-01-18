@@ -868,6 +868,169 @@ else
 fi
 
 # ============================================================
+# PROFILE-AWARE INSTALLATION TESTS
+# ============================================================
+echo ""
+echo "--- Profile-Aware Installation Tests ---"
+
+# Create unique temp directories
+TEST_CORE="/tmp/test-framework-core-$$"
+TEST_PM="/tmp/test-framework-pm-$$"
+
+# Cleanup function
+cleanup_test_dirs() {
+  rm -rf "$TEST_CORE" "$TEST_PM" 2>/dev/null || true
+}
+trap cleanup_test_dirs EXIT
+
+# --- CORE PROFILE TESTS ---
+echo ""
+echo "Testing Core profile installation..."
+
+mkdir -p "$TEST_CORE"
+cd "$TEST_CORE"
+git init -q
+
+# Run install
+if bash "${FRAMEWORK_ROOT}/install.sh" . >/dev/null 2>&1; then
+  pass "Core: install.sh succeeds"
+else
+  fail "Core: install.sh failed"
+fi
+
+# Run scaffold with core profile
+if AGENTIC_PROFILE=core bash .agentic/init/scaffold.sh --non-interactive >/dev/null 2>&1; then
+  pass "Core: scaffold.sh succeeds"
+else
+  fail "Core: scaffold.sh failed"
+fi
+
+# Verify Core-specific structure
+if [[ ! -d "spec" ]]; then
+  pass "Core: No spec/ directory (correct)"
+else
+  fail "Core: spec/ should not exist in Core profile"
+fi
+
+if [[ -f "PRODUCT.md" ]]; then
+  pass "Core: PRODUCT.md exists"
+else
+  fail "Core: PRODUCT.md missing"
+fi
+
+if [[ -f "STACK.md" ]]; then
+  pass "Core: STACK.md exists"
+else
+  fail "Core: STACK.md missing"
+fi
+
+if [[ -f "CONTEXT_PACK.md" ]]; then
+  pass "Core: CONTEXT_PACK.md exists"
+else
+  fail "Core: CONTEXT_PACK.md missing"
+fi
+
+# --- CORE+PM PROFILE TESTS ---
+echo ""
+echo "Testing Core+PM profile installation..."
+
+mkdir -p "$TEST_PM"
+cd "$TEST_PM"
+git init -q
+
+# Run install
+if bash "${FRAMEWORK_ROOT}/install.sh" . >/dev/null 2>&1; then
+  pass "PM: install.sh succeeds"
+else
+  fail "PM: install.sh failed"
+fi
+
+# Run scaffold with core+product profile
+if AGENTIC_PROFILE=core+product bash .agentic/init/scaffold.sh --non-interactive >/dev/null 2>&1; then
+  pass "PM: scaffold.sh succeeds"
+else
+  fail "PM: scaffold.sh failed"
+fi
+
+# Verify Core+PM-specific structure
+if [[ -d "spec" ]]; then
+  pass "PM: spec/ directory exists"
+else
+  fail "PM: spec/ directory missing"
+fi
+
+if [[ -f "spec/FEATURES.md" ]]; then
+  pass "PM: spec/FEATURES.md exists"
+else
+  fail "PM: spec/FEATURES.md missing"
+fi
+
+if [[ -f "spec/PRD.md" ]]; then
+  pass "PM: spec/PRD.md exists"
+else
+  fail "PM: spec/PRD.md missing"
+fi
+
+if [[ -d "spec/acceptance" ]]; then
+  pass "PM: spec/acceptance/ directory exists"
+else
+  fail "PM: spec/acceptance/ directory missing"
+fi
+
+# ============================================================
+# FUNCTIONAL TESTS (Key Tools)
+# ============================================================
+echo ""
+echo "--- Functional Tests ---"
+
+# Test in PM directory (has FEATURES.md)
+cd "$TEST_PM"
+
+# Test wip.sh check (should work without WIP)
+if bash .agentic/tools/wip.sh check >/dev/null 2>&1; then
+  pass "wip.sh check runs successfully"
+else
+  fail "wip.sh check failed"
+fi
+
+# Test wip.sh start (requires: feature_id, description, files)
+# WIP.md is created in .agentic/ (framework internal state)
+if bash .agentic/tools/wip.sh start "TEST-001" "Testing WIP functionality" "test.md" >/dev/null 2>&1; then
+  if [[ -f ".agentic/WIP.md" ]]; then
+    pass "wip.sh start creates .agentic/WIP.md"
+  else
+    fail "wip.sh start did not create .agentic/WIP.md"
+  fi
+else
+  fail "wip.sh start failed"
+fi
+
+# Clean up WIP
+bash .agentic/tools/wip.sh done >/dev/null 2>&1 || true
+
+# Test journal.sh
+if bash .agentic/tools/journal.sh "Test Entry" "Did testing" "More tests" "None" >/dev/null 2>&1; then
+  if grep -q "Test Entry" JOURNAL.md 2>/dev/null; then
+    pass "journal.sh appends to JOURNAL.md"
+  else
+    fail "journal.sh did not append to JOURNAL.md"
+  fi
+else
+  fail "journal.sh failed"
+fi
+
+# Test doctor.sh (basic run)
+if bash .agentic/tools/doctor.sh >/dev/null 2>&1; then
+  pass "doctor.sh runs successfully"
+else
+  # doctor.sh may fail on incomplete project, that's ok for now
+  warn "doctor.sh returned non-zero (may be expected for test project)"
+fi
+
+# Return to framework root
+cd "${FRAMEWORK_ROOT}"
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

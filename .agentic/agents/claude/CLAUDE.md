@@ -77,7 +77,7 @@ cat .agentic/AGENTS_ACTIVE.md 2>/dev/null
 ```bash
 cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
-ls WIP.md 2>/dev/null
+ls .agentic/WIP.md 2>/dev/null
 ```
 
 ### 2. Greet User with Recap (DO THIS AUTOMATICALLY!)
@@ -103,7 +103,7 @@ What would you like to work on?
 - **.agentic/AGENTS_ACTIVE.md shows other agents?** → "👥 Another agent is working on [X]. I'll work on different files."
   - **Register yourself** in .agentic/AGENTS_ACTIVE.md
   - **Avoid their files** to prevent conflicts
-- **WIP.md exists?** → "⚠️ Previous work interrupted! [options]"
+- **.agentic/WIP.md exists?** → "⚠️ Previous work interrupted! [options]"
 - **HUMAN_NEEDED.md has items?** → "📋 [N] items need your input"
 - **Upgrade pending?** → Handle it, then greet
 

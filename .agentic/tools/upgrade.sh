@@ -209,6 +209,21 @@ else
       echo -e "${GREEN}  ✓ Updated: .agentic/$file${NC}"
     fi
   done
+
+  # Restore state files from backup (these are project-specific, not framework)
+  echo ""
+  echo "  Restoring project state files from backup..."
+  STATE_FILES=(
+    "WIP.md"              # Work in progress tracking
+    "AGENTS_ACTIVE.md"    # Multi-agent coordination
+    ".verification-state" # Verification state
+  )
+  for state_file in "${STATE_FILES[@]}"; do
+    if [[ -f "$TARGET_PROJECT_DIR/$BACKUP_DIR/$state_file" ]]; then
+      cp "$TARGET_PROJECT_DIR/$BACKUP_DIR/$state_file" "$TARGET_PROJECT_DIR/.agentic/"
+      echo -e "${GREEN}  ✓ Restored: .agentic/$state_file${NC}"
+    fi
+  done
 fi
 
 echo ""

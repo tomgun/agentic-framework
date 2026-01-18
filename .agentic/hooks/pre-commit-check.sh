@@ -8,7 +8,7 @@
 #   bash .agentic/hooks/pre-commit-check.sh
 #
 # Checks:
-#   1. WIP.md must not exist (work must be complete)
+#   1. .agentic/WIP.md must not exist (work must be complete)
 #   2. Shipped features must have acceptance criteria
 #   3. In-progress features must have recent JOURNAL entry (<24h)
 #   4. STACK.md version matches reality (where detectable)
@@ -32,10 +32,10 @@ echo ""
 
 FAILURES=0
 
-# Check 1: WIP.md must not exist
-echo "[1/6] Checking for incomplete work (WIP.md)..."
-if [[ -f "WIP.md" ]]; then
-  echo "❌ BLOCKED: WIP.md exists - work is incomplete!"
+# Check 1: .agentic/WIP.md must not exist
+echo "[1/6] Checking for incomplete work (.agentic/WIP.md)..."
+if [[ -f ".agentic/WIP.md" ]]; then
+  echo "❌ BLOCKED: .agentic/WIP.md exists - work is incomplete!"
   echo ""
   echo "   Work-in-progress must be completed before committing."
   echo "   Options:"
@@ -46,7 +46,7 @@ if [[ -f "WIP.md" ]]; then
   echo ""
   FAILURES=$((FAILURES + 1))
 else
-  echo "✓ No WIP.md found (work complete)"
+  echo "✓ No .agentic/WIP.md found (work complete)"
 fi
 
 # Check 2: Shipped features must have acceptance criteria

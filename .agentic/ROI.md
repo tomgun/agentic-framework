@@ -49,7 +49,7 @@ The Agentic Framework delivers **50-80% cost reduction** in AI-assisted developm
 |----------|-------------|----------------|------------|
 | "Where was I?" | 15-30 min searching | Read `STATUS.md` (2 min) | **85%** |
 | Understanding codebase | 1-2 hours | Read `CONTEXT_PACK.md` (10 min) | **90%** |
-| Session handoff | Verbal explanation | `WIP.md` auto-tracked | **100%** |
+| Session handoff | Verbal explanation | `.agentic/WIP.md` auto-tracked | **100%** |
 | Finding decisions | Search git history | Read `JOURNAL.md`, ADRs | **80%** |
 
 ### Automated Processes
