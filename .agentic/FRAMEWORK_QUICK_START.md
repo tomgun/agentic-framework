@@ -105,6 +105,7 @@ gh pr create --title "feat: Description (F-0098)"
 [ ] spec/FEATURES.md has new features (F-####)
 [ ] spec/acceptance/F-####.md exists for each new feature
 [ ] tests/validate_framework.sh passes (ALL tests)
+[ ] LLM behavioral tests current (bash .agentic/tools/llm-test-status.sh)
 [ ] Tested in scratch project (install.sh, init, upgrade)
 [ ] CHANGELOG.md updated
 [ ] CONTRIBUTIONS.md updated
@@ -125,6 +126,9 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 | Framework specs | `spec/FEATURES.md` |
 | Acceptance criteria | `spec/acceptance/F-####.md` |
 | Validation tests | `tests/validate_framework.sh` |
+| LLM test plan | `tests/LLM_TEST_PLAN.md` |
+| LLM test results | `tests/LLM_TEST_RESULTS.md` |
+| How to run LLM tests | `tests/RUN_LLM_TESTS.md` |
 | Upgrade notifications | `.agentic/tools/upgrade.sh` → FEATURE_REGISTRY |
 | Templates | `.agentic/init/*.template.md` |
 | Agent guidelines | `.agentic/agents/shared/` |

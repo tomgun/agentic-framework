@@ -1,95 +1,125 @@
 # LLM Agent Behavioral Test Results
 
-**Test Plan**: See `LLM_TEST_PLAN.md` for test definitions.
+**Test Plan**: `LLM_TEST_PLAN.md`
+**How to Run**: `RUN_LLM_TESTS.md`
 
 ---
 
-## Test Runs
+## Latest Test Status
 
-### Run 1: [DATE] - [Environment]
+| Environment | Last Tested | Version | Result | Tester |
+|-------------|-------------|---------|--------|--------|
+| Claude Code | _not yet_ | - | - | - |
+| Cursor | _not yet_ | - | - | - |
+| GitHub Copilot | _not yet_ | - | - | - |
 
-**Environment**: Claude Code / Cursor / Copilot
-**Framework Version**:
+**Last full verification**: _not yet_
+
+---
+
+## Test History by Version
+
+### v0.11.3
+
+_No tests run yet for this version._
+
+<!-- Template for recording:
+#### Claude Code - [DATE]
+- Critical: X/4 passed
+- Important: X/5 passed
+- Full: X/22 passed
+- Notes: [any issues]
+-->
+
+---
+
+## Detailed Test Runs
+
+### Template (Copy for Each Run)
+
+```
+## [DATE] - [Environment] - v[VERSION]
+
 **Tester**:
-**Project Profile**: Core / Core+PM
+**Profile**: Core / Core+PM
+**Duration**: ~X minutes
 
-#### Summary
+### Summary
+- Critical Tests: X/4
+- Important Tests: X/5
+- Total: X/22
 
-| Metric | Count |
-|--------|-------|
-| Tests Run | |
-| Passed | |
-| Failed | |
-| Skipped | |
+### Critical Tests
 
-#### Results
+| Test | Result | Notes |
+|------|--------|-------|
+| LLM-001 Session Start | ☐ | |
+| LLM-010 Acceptance First | ☐ | |
+| LLM-030 Pre-Commit Gate | ☐ | |
+| LLM-091 No Auto-Commit | ☐ | |
 
-| Test ID | Name | Result | Notes |
-|---------|------|--------|-------|
-| **Session Management** | | | |
-| LLM-001 | Session Start - Proactive Greeting | ☐ | |
-| LLM-002 | Session Start - WIP Recovery | ☐ | |
-| LLM-003 | Session End - Summary | ☐ | |
-| **Feature Development** | | | |
-| LLM-010 | Feature Request - Acceptance First | ☐ | |
-| LLM-011 | Feature Implementation - Small Batch | ☐ | |
-| LLM-012 | Feature Complete - Definition of Done | ☐ | |
-| LLM-013 | Smoke Testing Required | ☐ | |
-| **Documentation Sync** | | | |
-| LLM-020 | Living Documentation | ☐ | |
-| LLM-021 | JOURNAL.md Updates | ☐ | |
-| **Quality Gates** | | | |
-| LLM-030 | Pre-Commit Gates | ☐ | |
-| LLM-031 | Untracked Files Check | ☐ | |
-| **Bug Fixing** | | | |
-| LLM-040 | Bug Report - Issue First | ☐ | |
-| **Multi-Agent** | | | |
-| LLM-050 | Multi-Agent Awareness | ☐ | |
-| LLM-051 | Worktree Setup | ☐ | |
-| **Recovery** | | | |
-| LLM-060 | Token Limit Recovery | ☐ | |
-| LLM-061 | Crash Recovery | ☐ | |
-| **Tool Usage** | | | |
-| LLM-070 | Token-Efficient Scripts | ☐ | |
-| LLM-071 | Doctor Command | ☐ | |
-| **Git Workflow** | | | |
-| LLM-080 | PR-Based Workflow (Core+PM) | ☐ | |
-| LLM-081 | Direct Workflow (Core) | ☐ | |
-| **Anti-Patterns** | | | |
-| LLM-090 | Anti-Hallucination | ☐ | |
-| LLM-091 | No Auto-Commit | ☐ | |
+### Important Tests
 
-#### Failure Details
+| Test | Result | Notes |
+|------|--------|-------|
+| LLM-002 WIP Recovery | ☐ | |
+| LLM-020 Living Docs | ☐ | |
+| LLM-011 Small Batch | ☐ | |
+| LLM-070 Token-Efficient | ☐ | |
+| LLM-080 PR Workflow | ☐ | |
 
-<!-- Document any failures here -->
+### Other Tests
 
-#### Observations
+| Test | Result | Notes |
+|------|--------|-------|
+| LLM-003 Session End | ☐ | |
+| LLM-012 Feature Complete | ☐ | |
+| LLM-013 Smoke Testing | ☐ | |
+| LLM-021 JOURNAL Updates | ☐ | |
+| LLM-031 Untracked Files | ☐ | |
+| LLM-040 Bug Report | ☐ | |
+| LLM-050 Multi-Agent | ☐ | |
+| LLM-051 Worktree Setup | ☐ | |
+| LLM-060 Token Limit | ☐ | |
+| LLM-061 Crash Recovery | ☐ | |
+| LLM-071 Doctor Command | ☐ | |
+| LLM-081 Direct Workflow | ☐ | |
+| LLM-090 Anti-Hallucination | ☐ | |
 
-<!-- Any patterns, insights, or suggestions -->
+### Failures Detail
 
----
+[Document any failures with expected vs actual behavior]
 
-## Cross-Environment Comparison
+### Issues Filed
 
-| Test ID | Claude Code | Cursor | Copilot | Notes |
-|---------|-------------|--------|---------|-------|
-| LLM-001 | | | | |
-| LLM-002 | | | | |
-| LLM-010 | | | | |
-| ... | | | | |
-
----
-
-## Issues Filed
-
-| Test ID | Issue | Status |
-|---------|-------|--------|
+| Test | Issue # | Status |
+|------|---------|--------|
 | | | |
+```
 
 ---
 
-## Framework Updates Made
+## Cross-Version Comparison
 
-| Date | Change | Based on Test |
-|------|--------|---------------|
-| | | |
+| Test | v0.11.3 Claude | v0.11.3 Cursor | v0.11.3 Copilot |
+|------|----------------|----------------|-----------------|
+| LLM-001 | - | - | - |
+| LLM-010 | - | - | - |
+| LLM-030 | - | - | - |
+| ... | | | |
+
+---
+
+## Known Issues
+
+| Test | Issue | Workaround | Status |
+|------|-------|------------|--------|
+| _none yet_ | | | |
+
+---
+
+## Notes
+
+- Results may vary between runs due to LLM non-determinism
+- Record model version if known (e.g., Claude Opus 4, GPT-4, etc.)
+- Critical test failures should block releases
