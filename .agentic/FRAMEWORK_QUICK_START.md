@@ -33,7 +33,7 @@ Framework features apply to different profiles:
 
 | Profile | What Users Get | Key Files |
 |---------|---------------|-----------|
-| **Core** | Token efficiency, developer UX, workflows, quality gates | CONTEXT_PACK.md, JOURNAL.md, PRODUCT.md, WIP.md |
+| **Core** | Token efficiency, developer UX, workflows, quality gates | CONTEXT_PACK.md, JOURNAL.md, PRODUCT.md, .agentic/WIP.md |
 | **Core+PM** | Core + formal specs, feature tracking, acceptance criteria | + spec/FEATURES.md, spec/acceptance/, STATUS.md |
 
 **When adding framework features, know which profile it affects:**

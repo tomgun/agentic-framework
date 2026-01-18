@@ -10,20 +10,20 @@
 
 ## Work-In-Progress Check (FIRST!)
 
-- [ ] **WIP.md must be completed**
+- [ ] **.agentic/WIP.md must be completed**
   ```bash
   # Check if WIP lock exists
-  ls WIP.md 2>/dev/null
+  ls .agentic/WIP.md 2>/dev/null
   ```
   
-  - **If WIP.md exists**: Work is not yet complete!
+  - **If .agentic/WIP.md exists**: Work is not yet complete!
     - Complete work first: `bash .agentic/tools/wip.sh complete`
     - This removes the WIP lock file
-    - **NEVER commit while WIP.md exists** (indicates incomplete work)
+    - **NEVER commit while .agentic/WIP.md exists** (indicates incomplete work)
   
-  - **If WIP.md does not exist**: ✓ OK to proceed with commit checks
+  - **If .agentic/WIP.md does not exist**: ✓ OK to proceed with commit checks
 
-**Why**: WIP.md is a lock file that tracks in-progress work. If it exists, the work is not ready for commit.
+**Why**: .agentic/WIP.md is a lock file that tracks in-progress work. If it exists, the work is not ready for commit.
 
 ---
 

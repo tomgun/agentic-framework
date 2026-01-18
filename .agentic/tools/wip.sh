@@ -25,7 +25,7 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${PROJECT_ROOT}"
 
-WIP_FILE="WIP.md"
+WIP_FILE=".agentic/WIP.md"
 SESSION_LOG="SESSION_LOG.md"
 
 COMMAND="${1:-}"

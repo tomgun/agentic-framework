@@ -62,7 +62,7 @@ head -30 STATUS.md
 tail -30 JOURNAL.md
 
 # Any unfinished work?
-cat WIP.md 2>/dev/null || echo "No WIP"
+cat .agentic/WIP.md 2>/dev/null || echo "No WIP"
 
 # Uncommitted changes?
 git status
@@ -122,7 +122,7 @@ Or shorter:
 |------|---------|--------------|
 | `STATUS.md` | Current focus, priorities | Always |
 | `JOURNAL.md` | Session history | To remember context |
-| `WIP.md` | Interrupted work | If exists = work interrupted |
+| `.agentic/WIP.md` | Interrupted work | If exists = work interrupted |
 | `HUMAN_NEEDED.md` | Decisions needed | Before starting |
 | `spec/FEATURES.md` | All features | To add/check features |
 | `spec/ISSUES.md` | Bugs & issues | To log/check bugs |
