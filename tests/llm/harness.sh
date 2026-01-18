@@ -18,15 +18,30 @@
 #   - Returns 0 for pass, 1 for fail
 #
 # Environment:
+#   TOOL - AI tool to use: claude (default), cursor, copilot
+#   CLAUDE_MODEL - Model for Claude: opus (default), sonnet, or full model name
 #   CLAUDE_CMD - Path to claude CLI (default: claude)
 #   KEEP_PROJECTS - Set to "1" to keep temp projects for debugging
+#
+# Examples:
+#   bash tests/llm/harness.sh                              # Claude + Opus
+#   CLAUDE_MODEL=sonnet bash tests/llm/harness.sh          # Claude + Sonnet
+#   TOOL=cursor bash tests/llm/harness.sh                  # Cursor (semi-automated)
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+TOOL="${TOOL:-claude}"
+CLAUDE_MODEL="${CLAUDE_MODEL:-opus}"
 CLAUDE_CMD="${CLAUDE_CMD:-claude}"
 KEEP_PROJECTS="${KEEP_PROJECTS:-0}"
+
+# Validate tool
+if [[ "$TOOL" != "claude" && "$TOOL" != "cursor" && "$TOOL" != "copilot" ]]; then
+    echo "Error: TOOL must be 'claude', 'cursor', or 'copilot'"
+    exit 1
+fi
 
 # Colors
 RED='\033[0;31m'
@@ -76,7 +91,7 @@ setup_test_project() {
     export TEST_PROJECT
 }
 
-# Send a prompt to Claude and capture output
+# Send a prompt to the AI tool and capture output
 send_prompt() {
     local prompt="$1"
     local max_turns="${2:-5}"  # Limit turns to keep tests fast
@@ -85,14 +100,54 @@ send_prompt() {
 
     cd "$TEST_PROJECT"
 
-    # Run claude with the prompt, capture output
-    # Using --print flag for non-interactive single response
-    # Fallback to echo + pipe if --print not available
-    if $CLAUDE_CMD --help 2>&1 | grep -q "\-\-print"; then
-        LAST_OUTPUT=$($CLAUDE_CMD --print "$prompt" 2>&1) || true
+    if [[ "$TOOL" == "claude" ]]; then
+        # Fully automated: Claude Code CLI
+        # Use --model to specify model, --print for non-interactive
+        local model_arg=""
+        if [[ -n "$CLAUDE_MODEL" ]]; then
+            model_arg="--model $CLAUDE_MODEL"
+        fi
+
+        if $CLAUDE_CMD --help 2>&1 | grep -q "\-\-print"; then
+            LAST_OUTPUT=$($CLAUDE_CMD $model_arg --print "$prompt" 2>&1) || true
+        else
+            # Fallback to echo + pipe if --print not available
+            LAST_OUTPUT=$(echo "$prompt" | timeout 120 $CLAUDE_CMD $model_arg 2>&1) || true
+        fi
     else
-        # Use heredoc to send prompt and exit
-        LAST_OUTPUT=$(echo "$prompt" | timeout 120 $CLAUDE_CMD 2>&1) || true
+        # Semi-automated: Cursor or Copilot (IDE-based)
+        echo ""
+        echo -e "${YELLOW}════════════════════════════════════════════════════════════${NC}"
+        echo -e "${YELLOW}MANUAL STEP REQUIRED (${TOOL})${NC}"
+        echo -e "${YELLOW}════════════════════════════════════════════════════════════${NC}"
+        echo ""
+        echo -e "1. Open this folder in ${TOOL^}:"
+        echo -e "   ${GREEN}$TEST_PROJECT${NC}"
+        echo ""
+        echo -e "2. Enter this prompt:"
+        echo -e "   ${GREEN}$prompt${NC}"
+        echo ""
+        echo -e "3. Wait for the agent to complete its response"
+        echo ""
+        echo -e "4. Copy the agent's full response and paste below"
+        echo -e "   (or type 'skip' to mark as manual verification needed)"
+        echo ""
+        echo -e "${YELLOW}════════════════════════════════════════════════════════════${NC}"
+        echo ""
+        echo -n "Paste response (end with Ctrl+D) or type 'skip': "
+
+        LAST_OUTPUT=""
+        while IFS= read -r line; do
+            if [[ "$line" == "skip" ]]; then
+                LAST_OUTPUT="[MANUAL_VERIFICATION_NEEDED]"
+                break
+            fi
+            LAST_OUTPUT="${LAST_OUTPUT}${line}\n"
+        done
+
+        if [[ "$LAST_OUTPUT" == "[MANUAL_VERIFICATION_NEEDED]" ]]; then
+            echo -e "${YELLOW}Skipped - manual verification needed${NC}"
+        fi
     fi
 
     echo "$LAST_OUTPUT" > "$LAST_OUTPUT_FILE"
@@ -189,10 +244,10 @@ cleanup_test_project() {
     fi
 }
 
-# Export functions for test scripts
+# Export functions and variables for test scripts
 export -f setup_test_project send_prompt check_output_contains check_output_not_contains
 export -f check_file_exists check_file_not_exists check_file_contains cleanup_test_project
-export FRAMEWORK_ROOT CLAUDE_CMD
+export FRAMEWORK_ROOT CLAUDE_CMD TOOL CLAUDE_MODEL
 
 #=============================================================================
 # Test Runner
@@ -245,7 +300,13 @@ main() {
     echo "╚═══════════════════════════════════════════════════════════════╝"
     echo ""
     echo "Framework: $FRAMEWORK_ROOT"
-    echo "Claude CLI: $CLAUDE_CMD"
+    echo "Tool: $TOOL"
+    if [[ "$TOOL" == "claude" ]]; then
+        echo "Model: $CLAUDE_MODEL"
+        echo "CLI: $CLAUDE_CMD"
+    else
+        echo "Mode: Semi-automated (manual prompt entry required)"
+    fi
     echo ""
 
     local tests_to_run=()
