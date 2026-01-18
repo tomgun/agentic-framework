@@ -779,6 +779,78 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 
 ---
 
+## v0.11.4 Contributions (2026-01-18)
+
+### Framework Verification & LLM Testing Infrastructure
+
+**User request**:
+> "can you run a full verification of the framework claimed/designed features (note: two different modes - Core vs Core+PM)? plan first how to do it."
+
+**Result - Complete Verification**:
+- 73 features formally documented in spec/FEATURES.md
+- 100% acceptance criteria coverage (created 37 missing files)
+- 129 automated tests passing
+- Verification report: `tests/VERIFICATION_REPORT.md`
+
+### LLM Behavioral Test Plan
+
+**User insight**:
+> "also plan how to test the LLM work, which really is the whole point of this framework"
+
+**Result - 22 Test Scenarios** (`tests/LLM_TEST_PLAN.md`):
+- 4 critical tests (session start, acceptance first, pre-commit gate, no auto-commit)
+- 5 important tests (WIP recovery, living docs, small batch, token efficiency, PR workflow)
+- 13 additional tests covering all agent behaviors
+- Test environments: Claude Code, Cursor, GitHub Copilot
+
+### LLM Test Execution Infrastructure
+
+**User question**:
+> "Do we have now clear instructions how to run the tests? We could do it manually, log the results for each version... It could be a precommit/prepush/pr reminder to run those tests"
+
+**Result**:
+- `tests/RUN_LLM_TESTS.md` - Quick start guide for manual testing
+- `tests/LLM_TEST_RESULTS.md` - Version tracking template
+- `.agentic/tools/llm-test-status.sh` - Check test staleness (>30 days = stale)
+- Advisory check in pre-commit hook (check 7/7)
+
+### Automated LLM Test Harness
+
+**User insight**:
+> "Should there be a lot more tests? And can't claude run them with some subagents / fresh contexts?"
+> "Brilliant. We don't need to run the tests constantly, but those could really help us fine tune the framework to work as intended if the feedback loop is short!"
+
+**Result - TDD for Agent Behavior**:
+- `tests/llm/harness.sh` - Test runner with helper functions
+- `tests/llm/tests/` - 5 automated behavioral tests:
+  - 001_session_start: Agent greets with context
+  - 002_wip_blocks_commit: WIP.md blocks commits
+  - 003_acceptance_first: Requirements before coding
+  - 004_uses_journal_script: Token-efficient script usage
+  - 005_no_auto_commit: No commit without approval
+
+**Feedback Loop Enabled**:
+1. Write test for desired behavior
+2. Run automated test → observe failure
+3. Update CLAUDE.md or agent guidelines
+4. Re-run → verify fix
+5. Iterate until consistent
+
+**Impact**: Framework guidelines can now be iteratively refined with short feedback loops instead of relying on manual testing.
+
+### WIP.md Location Consistency
+
+**User feedback**:
+> "WIP.md is framework internal state and should be inside .agentic/ not at the root"
+
+**Result**:
+- All scripts updated: wip.sh, doctor.py, phase_detect.py, pre-commit-check.sh
+- All documentation updated to reference `.agentic/WIP.md`
+- upgrade.sh now preserves state files during framework upgrade
+- Tests updated to create WIP in correct location
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.11.3
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
