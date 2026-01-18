@@ -14,6 +14,7 @@
 #   4. STACK.md version matches reality (where detectable)
 #   5. Batch size warning (>10 files = too large, should re-plan)
 #   6. Untracked files warning (new files not git added)
+#   7. LLM behavioral test status (advisory, framework dev only)
 #
 # Exit codes:
 #   0 - All checks pass, commit allowed
@@ -242,6 +243,19 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   fi
 else
   echo "✓ Git not available (skipping untracked check)"
+fi
+
+# Check 7: LLM behavioral test status (advisory, framework development only)
+if [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/LLM_TEST_RESULTS.md" ]]; then
+  echo ""
+  echo "[7/7] Checking LLM behavioral test status..."
+  if bash .agentic/tools/llm-test-status.sh --quiet 2>/dev/null; then
+    echo "✓ LLM behavioral tests are current"
+  else
+    echo "💡 Tip: LLM behavioral tests may need updating"
+    echo "   Run: bash .agentic/tools/llm-test-status.sh"
+    echo "   (This is advisory, not blocking commit)"
+  fi
 fi
 
 # Summary
