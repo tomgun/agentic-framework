@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Agent should ask about/create acceptance criteria before coding
+# Section: trigger
 # Category: Critical
 # Tests: LLM-010
 

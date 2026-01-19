@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Agent should reference checklists for systematic work
+# Section: context
 # Category: Important
 # Tests: Framework checklist usage
 

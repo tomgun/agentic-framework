@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Agent should warn about interrupted work when WIP.md exists at session start
+# Section: session
 # Category: Important
 # Tests: LLM-002
 

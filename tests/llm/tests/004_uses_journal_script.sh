@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Agent should use journal.sh script instead of editing JOURNAL.md directly
+# Section: scripts
 # Category: Important
 # Tests: LLM-070
 

@@ -6,6 +6,61 @@ Adding instructions to fix one behavior can degrade others:
 - **Attention drift**: More text = less focus on each part
 - **Primacy/recency**: Items at top/bottom get more attention than middle
 - **Cognitive load**: Long trigger tables get skimmed
+- **Cost**: Running all tests is expensive (each test = Claude API call)
+
+---
+
+## Compartmentalized Testing
+
+### Guideline Sections → Tests Mapping
+
+Instead of running ALL tests, run only tests affected by your change:
+
+| Guideline Section | Tests to Run | Command |
+|-------------------|--------------|---------|
+| **Trigger table** | 003, 007, 010 | `bash tests/llm/harness.sh tests/llm/tests/00{3,7}*.sh tests/llm/tests/010*.sh` |
+| **Session start** | 001, 006 | `bash tests/llm/harness.sh tests/llm/tests/00{1,6}*.sh` |
+| **Token-efficient scripts** | 004 | `bash tests/llm/harness.sh tests/llm/tests/004*.sh` |
+| **Commit/git workflow** | 002, 005 | `bash tests/llm/harness.sh tests/llm/tests/00{2,5}*.sh` |
+| **Context/project info** | 008, 009 | `bash tests/llm/harness.sh tests/llm/tests/00{8,9}*.sh` |
+
+### Test Tiers
+
+| Tier | Tests | When to Run | Cost |
+|------|-------|-------------|------|
+| **Critical** | 001, 002, 003 | Every change | ~3 API calls |
+| **Extended** | 004-010 | Section changes | ~7 API calls |
+| **Full** | All | Before PR merge | ~10 API calls |
+
+### Quick Commands
+
+```bash
+# Critical only (cheap, catches major regressions)
+bash tests/llm/harness.sh tests/llm/tests/00{1,2,3}*.sh
+
+# Section-specific (after changing that section)
+SECTION=trigger   # or: session, scripts, commit, context
+bash tests/llm/harness.sh tests/llm/tests/*${SECTION}*.sh  # if tests were named by section
+
+# Full suite (before merge only)
+bash tests/llm/harness.sh
+```
+
+### Using Cheaper Model for Regression
+
+For quick regression checks, use Sonnet instead of Opus:
+
+```bash
+# Cheaper regression check (~10x less cost)
+CLAUDE_MODEL=sonnet bash tests/llm/harness.sh tests/llm/tests/00{1,2,3}*.sh
+
+# Full verification with Opus (before merge)
+CLAUDE_MODEL=opus bash tests/llm/harness.sh
+```
+
+**Caveat**: Sonnet may behave differently. Critical tests should pass on both.
+
+---
 
 ## Rules for Guideline Changes
 
