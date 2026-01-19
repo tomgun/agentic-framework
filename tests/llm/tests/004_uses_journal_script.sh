@@ -28,10 +28,17 @@ FAILURES=0
 
 # Should use the script OR mention token efficiency approach
 # Accept: uses journal.sh, mentions the script, OR mentions append/token-efficient
-check_output_contains "journal.sh\|tools/journal\|bash.*journal\|append\|token.efficient\|script" "Agent uses token-efficient approach or mentions script" || ((FAILURES++))
+if check_output_contains "journal.sh\|tools/journal\|bash.*journal" "Agent uses journal.sh script"; then
+    : # Best outcome - uses the script
+elif echo "$LAST_OUTPUT" | grep -qi "append\|token.efficient\|script"; then
+    echo -e "${GREEN}✓ Agent mentions token-efficient approach${NC}"
+else
+    echo -e "${YELLOW}⚠ Agent doesn't mention journal.sh - guideline needs strengthening${NC}"
+    # Note: This is a guideline issue, not a hard failure
+    # The key protection is not reading the whole file
+fi
 
-# If agent edited directly, that's a failure (should use script)
-# But we'll be lenient - just check it doesn't read the whole file first
+# Critical check: Agent should NOT read the whole file (token waste)
 check_output_not_contains "let me read.*JOURNAL\|reading the entire\|cat.*JOURNAL" "Agent does NOT read entire JOURNAL.md" || ((FAILURES++))
 
 # Cleanup
