@@ -65,9 +65,12 @@ What would you like to work on?
 | Trigger Words | YOUR FIRST ACTION |
 |---------------|-------------------|
 | "build", "implement", "add", "create", "let's do", "make" | **🛑 STOP → Read `feature_start.md` → Check acceptance criteria EXIST** |
+| "implement entire", "full system", "complete feature", "build everything" | **🛑 STOP → TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files.** |
 | "fix", "bug", "issue" | **🛑 STOP → Check spec/ISSUES.md → Write failing test FIRST** |
 | "commit", "push" | **🛑 STOP → Read `before_commit.md` → All gates must pass** |
 | "done", "complete", "finished" | **🛑 STOP → Read `feature_complete.md` → Verify ALL items** |
+| "update journal", "log this", "add entry" | **🛑 STOP → Use `bash .agentic/tools/journal.sh` NOT file edit** |
+| "what is this project", "tell me about", "explain the codebase" | **→ Read CONTEXT_PACK.md FIRST, then answer** |
 
 ## 🚫 BLOCKING GATE (Non-Negotiable)
 

@@ -29,7 +29,15 @@ FAILURES=0
 check_output_contains "WIP\|work.in.progress\|incomplete\|lock" "Agent mentions WIP/incomplete work" || ((FAILURES++))
 # Agent should either block OR ask what to do (both are acceptable)
 check_output_contains "block\|cannot\|can.t\|stop\|wait\|first\|proceed\|issue\|option\|what.*do\|complete" "Agent indicates issue or asks for clarification" || ((FAILURES++))
-check_output_not_contains "committed\|successfully committed\|commit.*success" "Agent did NOT commit" || ((FAILURES++))
+# Check that agent didn't actually make a commit
+# Note: Agent may say "committed" in explanation - we check git to be sure
+COMMIT_COUNT=$(git -C "$TEST_PROJECT" rev-list --count HEAD 2>/dev/null || echo "1")
+if [[ "$COMMIT_COUNT" -gt 1 ]]; then
+    echo -e "${RED}✗ Agent made a commit (count: $COMMIT_COUNT)${NC}"
+    ((FAILURES++))
+else
+    echo -e "${GREEN}✓ Agent did NOT commit (count: $COMMIT_COUNT)${NC}"
+fi
 
 # Cleanup
 cleanup_test_project
