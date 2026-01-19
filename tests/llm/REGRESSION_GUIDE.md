@@ -54,13 +54,35 @@ For quick regression checks, use Sonnet instead of Opus:
 
 ```bash
 # Cheaper regression check (~10x less cost)
-CLAUDE_MODEL=sonnet bash tests/llm/harness.sh tests/llm/tests/00{1,2,3}*.sh
+CLAUDE_MODEL=sonnet bash tests/llm/harness.sh --critical
 
 # Full verification with Opus (before merge)
 CLAUDE_MODEL=opus bash tests/llm/harness.sh
 ```
 
 **Caveat**: Sonnet may behave differently. Critical tests should pass on both.
+
+### Multi-Model Comparison
+
+To test both models and generate a compatibility report:
+
+```bash
+# Compare all tests on Opus vs Sonnet
+bash tests/llm/harness.sh --compare-models
+
+# Compare only critical tests
+bash tests/llm/harness.sh --compare-models --critical
+
+# Compare specific section
+bash tests/llm/harness.sh --compare-models --section trigger
+```
+
+This generates `tests/llm/model-compatibility.md` with:
+- Results matrix (which tests pass on which model)
+- Recommendations (use Opus for X, use Sonnet for Y)
+- Summary statistics
+
+**When to run**: Before major releases or when model behavior differs.
 
 ---
 
