@@ -1,0 +1,5 @@
+# LLM Test History
+# date | version | change | result
+
+2026-01-19 | v0.11.3 | Initial baseline with 10 tests | 10/10
+2026-01-19 | v0.11.3 | Added 3 triggers (journal, large task, context_pack) | 10/10
