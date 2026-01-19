@@ -13,8 +13,8 @@ send_prompt "hi"
 # Verify agent behavior
 FAILURES=0
 
-check_output_contains "session\|project\|welcome\|status\|context\|here" "Agent mentions session/project context" || ((FAILURES++))
-check_output_contains "CONTEXT_PACK\|context\|project" "Agent references project context" || ((FAILURES++))
+check_output_contains "session\|welcome\|status\|here\|working on\|focus" "Agent mentions session context" || ((FAILURES++))
+check_output_contains "CONTEXT_PACK\|framework\|agentic\|checklists" "Agent references framework/project info" || ((FAILURES++))
 check_file_not_exists ".agentic/WIP.md" "No WIP created for simple greeting" || ((FAILURES++))
 
 # Cleanup
