@@ -282,16 +282,68 @@ list_tests() {
         if [[ -f "$test_file" ]]; then
             local name=$(basename "$test_file" .sh)
             local desc=$(grep "^# Description:" "$test_file" | sed 's/^# Description: //' || echo "No description")
-            echo "  $name"
+            local section=$(grep "^# Section:" "$test_file" | sed 's/^# Section: //' || echo "unknown")
+            echo "  $name [$section]"
             echo "    $desc"
         fi
     done
+}
+
+# Get tests by section
+get_tests_by_section() {
+    local section="$1"
+    for test_file in "$SCRIPT_DIR/tests"/*.sh; do
+        if [[ -f "$test_file" ]]; then
+            local file_section=$(grep "^# Section:" "$test_file" | sed 's/^# Section: //')
+            if [[ "$file_section" == "$section" ]]; then
+                echo "$test_file"
+            fi
+        fi
+    done
+}
+
+# List available sections
+list_sections() {
+    echo "Available sections:"
+    echo ""
+    for section in session trigger scripts commit context; do
+        local count=$(get_tests_by_section "$section" | wc -l | tr -d ' ')
+        echo "  $section ($count tests)"
+    done
+    echo ""
+    echo "Usage: bash tests/llm/harness.sh --section <section>"
 }
 
 main() {
     if [[ "${1:-}" == "--list" ]]; then
         list_tests
         exit 0
+    fi
+
+    if [[ "${1:-}" == "--sections" ]]; then
+        list_sections
+        exit 0
+    fi
+
+    if [[ "${1:-}" == "--section" ]]; then
+        local section="${2:-}"
+        if [[ -z "$section" ]]; then
+            echo "Error: --section requires a section name"
+            list_sections
+            exit 1
+        fi
+        local section_tests=$(get_tests_by_section "$section")
+        if [[ -z "$section_tests" ]]; then
+            echo "Error: No tests found for section '$section'"
+            list_sections
+            exit 1
+        fi
+        set -- $section_tests
+    fi
+
+    if [[ "${1:-}" == "--critical" ]]; then
+        # Run only critical tests (001, 002, 003)
+        set -- "$SCRIPT_DIR/tests/001"*.sh "$SCRIPT_DIR/tests/002"*.sh "$SCRIPT_DIR/tests/003"*.sh
     fi
 
     echo ""

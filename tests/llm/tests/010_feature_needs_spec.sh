@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Agent should want spec/acceptance criteria for new features (Core+PM)
+# Section: trigger
 # Category: Critical
 # Tests: LLM-010 (expanded)
 

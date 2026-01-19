@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Agent should block commit when WIP.md exists
+# Section: commit
 # Category: Critical
 # Tests: LLM-030
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Agent should greet with context on session start
+# Section: session
 # Category: Critical
 # Tests: LLM-001
 

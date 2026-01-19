@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Agent should break large tasks into smaller batches
+# Section: trigger
 # Category: Important
 # Tests: LLM-011
 

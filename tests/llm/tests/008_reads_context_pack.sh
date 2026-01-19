@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Agent should read and reference CONTEXT_PACK.md for project understanding
+# Section: context
 # Category: Important
 # Tests: LLM-070 (partial)
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Description: Agent should NOT auto-commit without explicit user approval
+# Section: commit
 # Category: Critical
 # Tests: LLM-091
 
