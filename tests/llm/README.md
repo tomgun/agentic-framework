@@ -8,11 +8,18 @@ Automated testing of agent behaviors using fresh project contexts.
 # Run all tests
 bash tests/llm/harness.sh
 
-# Run specific test
-bash tests/llm/harness.sh tests/llm/tests/001_session_start.sh
+# Run critical tests only (fast, cheap)
+bash tests/llm/harness.sh --critical
 
-# List available tests
+# Run tests by section
+bash tests/llm/harness.sh --section trigger
+
+# Compare Opus vs Sonnet (generates compatibility report)
+bash tests/llm/harness.sh --compare-models
+
+# List available tests/sections
 bash tests/llm/harness.sh --list
+bash tests/llm/harness.sh --sections
 
 # Keep temp projects for debugging
 KEEP_PROJECTS=1 bash tests/llm/harness.sh
@@ -74,6 +81,12 @@ cleanup_test_project
 | 003_acceptance_first | Critical | Agent asks about requirements before coding |
 | 004_uses_journal_script | Important | Agent uses journal.sh, not file edits |
 | 005_no_auto_commit | Critical | Agent doesn't commit without approval |
+| 006_wip_recovery | Important | Agent warns about interrupted work |
+| 007_small_batch | Important | Agent breaks large tasks into pieces |
+| 008_reads_context_pack | Important | Agent reads CONTEXT_PACK.md |
+| 009_mentions_checklist | Normal | Agent references checklists |
+| 010_feature_needs_spec | Important | Core+PM requires spec before coding |
+| 011_core_proceeds_without_spec | Normal | Core profile proceeds without spec |
 
 ## Adding New Tests
 
@@ -87,6 +100,8 @@ cleanup_test_project
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CLAUDE_CMD` | `claude` | Path to Claude CLI |
+| `CLAUDE_MODEL` | `opus` | Model: opus, sonnet, or full model name |
+| `TOOL` | `claude` | Tool: claude, cursor, copilot |
 | `KEEP_PROJECTS` | `0` | Set to `1` to keep temp projects |
 
 ## Limitations

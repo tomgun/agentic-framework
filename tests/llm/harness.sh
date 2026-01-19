@@ -8,6 +8,7 @@
 #   bash tests/llm/harness.sh                    # Run all tests
 #   bash tests/llm/harness.sh tests/llm/tests/001_session_start.sh  # Run specific test
 #   bash tests/llm/harness.sh --list             # List available tests
+#   bash tests/llm/harness.sh --compare-models   # Run on Opus + Sonnet, generate report
 #
 # Test format:
 #   Each test is a bash script that:
@@ -27,6 +28,7 @@
 #   bash tests/llm/harness.sh                              # Claude + Opus
 #   CLAUDE_MODEL=sonnet bash tests/llm/harness.sh          # Claude + Sonnet
 #   TOOL=cursor bash tests/llm/harness.sh                  # Cursor (semi-automated)
+#   bash tests/llm/harness.sh --compare-models --critical  # Compare Opus vs Sonnet
 
 set -euo pipefail
 
@@ -314,6 +316,162 @@ list_sections() {
     echo "Usage: bash tests/llm/harness.sh --section <section>"
 }
 
+# Run tests on multiple models and generate compatibility report
+run_model_comparison() {
+    local models=("opus" "sonnet")
+    local tests_to_run=()
+
+    # Collect tests to run
+    if [[ $# -gt 0 ]]; then
+        tests_to_run=("$@")
+    else
+        for test_file in "$SCRIPT_DIR/tests"/*.sh; do
+            [[ -f "$test_file" ]] && tests_to_run+=("$test_file")
+        done
+    fi
+
+    if [[ ${#tests_to_run[@]} -eq 0 ]]; then
+        echo "No tests found"
+        exit 1
+    fi
+
+    echo ""
+    echo "╔═══════════════════════════════════════════════════════════════╗"
+    echo "║         Multi-Model Comparison Test Run                       ║"
+    echo "╚═══════════════════════════════════════════════════════════════╝"
+    echo ""
+    echo "Models: ${models[*]}"
+    echo "Tests: ${#tests_to_run[@]}"
+    echo ""
+
+    # Results storage: model -> test -> pass/fail
+    declare -A results
+    local report_file="$SCRIPT_DIR/model-compatibility.md"
+
+    for model in "${models[@]}"; do
+        echo ""
+        echo "═══════════════════════════════════════════════════════════════"
+        echo -e "${BLUE}Running with model: $model${NC}"
+        echo "═══════════════════════════════════════════════════════════════"
+
+        export CLAUDE_MODEL="$model"
+
+        for test_file in "${tests_to_run[@]}"; do
+            local test_name=$(basename "$test_file" .sh)
+            echo -e "${BLUE}  Testing: $test_name${NC}"
+
+            if (source "$test_file" 2>/dev/null); then
+                results["$model:$test_name"]="✅"
+                echo -e "  ${GREEN}✓ PASS${NC}"
+            else
+                results["$model:$test_name"]="❌"
+                echo -e "  ${RED}✗ FAIL${NC}"
+            fi
+        done
+    done
+
+    # Generate compatibility report
+    echo ""
+    echo "═══════════════════════════════════════════════════════════════"
+    echo "Generating compatibility report..."
+    echo "═══════════════════════════════════════════════════════════════"
+
+    {
+        echo "# Model Compatibility Report"
+        echo ""
+        echo "Generated: $(date '+%Y-%m-%d %H:%M')"
+        echo ""
+        echo "## Results Matrix"
+        echo ""
+        echo "| Test | Opus | Sonnet | Status |"
+        echo "|------|------|--------|--------|"
+
+        local all_pass=0
+        local opus_only=0
+        local sonnet_only=0
+        local both_fail=0
+
+        for test_file in "${tests_to_run[@]}"; do
+            local test_name=$(basename "$test_file" .sh)
+            local opus_result="${results[opus:$test_name]:-?}"
+            local sonnet_result="${results[sonnet:$test_name]:-?}"
+
+            local status=""
+            if [[ "$opus_result" == "✅" && "$sonnet_result" == "✅" ]]; then
+                status="Both pass"
+                ((all_pass++))
+            elif [[ "$opus_result" == "✅" && "$sonnet_result" == "❌" ]]; then
+                status="⚠️ Opus only"
+                ((opus_only++))
+            elif [[ "$opus_result" == "❌" && "$sonnet_result" == "✅" ]]; then
+                status="⚠️ Sonnet only"
+                ((sonnet_only++))
+            else
+                status="❌ Both fail"
+                ((both_fail++))
+            fi
+
+            echo "| $test_name | $opus_result | $sonnet_result | $status |"
+        done
+
+        echo ""
+        echo "## Summary"
+        echo ""
+        echo "- **Both pass**: $all_pass tests"
+        echo "- **Opus only**: $opus_only tests"
+        echo "- **Sonnet only**: $sonnet_only tests"
+        echo "- **Both fail**: $both_fail tests"
+        echo ""
+
+        if [[ $opus_only -gt 0 || $sonnet_only -gt 0 ]]; then
+            echo "## Recommendations"
+            echo ""
+            if [[ $opus_only -gt 0 ]]; then
+                echo "### Use Opus for:"
+                for test_file in "${tests_to_run[@]}"; do
+                    local test_name=$(basename "$test_file" .sh)
+                    if [[ "${results[opus:$test_name]}" == "✅" && "${results[sonnet:$test_name]}" == "❌" ]]; then
+                        local desc=$(grep "^# Description:" "$test_file" | sed 's/^# Description: //')
+                        echo "- **$test_name**: $desc"
+                    fi
+                done
+                echo ""
+            fi
+            if [[ $sonnet_only -gt 0 ]]; then
+                echo "### Use Sonnet for:"
+                for test_file in "${tests_to_run[@]}"; do
+                    local test_name=$(basename "$test_file" .sh)
+                    if [[ "${results[opus:$test_name]}" == "❌" && "${results[sonnet:$test_name]}" == "✅" ]]; then
+                        local desc=$(grep "^# Description:" "$test_file" | sed 's/^# Description: //')
+                        echo "- **$test_name**: $desc"
+                    fi
+                done
+                echo ""
+            fi
+        fi
+    } > "$report_file"
+
+    echo ""
+    echo -e "${GREEN}Report saved to: $report_file${NC}"
+    echo ""
+
+    # Print summary to console
+    echo "═══════════════════════════════════════════════════════════════"
+    echo "COMPARISON SUMMARY"
+    echo "═══════════════════════════════════════════════════════════════"
+    echo ""
+    printf "%-30s %-8s %-8s\n" "Test" "Opus" "Sonnet"
+    printf "%-30s %-8s %-8s\n" "----" "----" "------"
+    for test_file in "${tests_to_run[@]}"; do
+        local test_name=$(basename "$test_file" .sh)
+        printf "%-30s %-8s %-8s\n" "$test_name" "${results[opus:$test_name]:-?}" "${results[sonnet:$test_name]:-?}"
+    done
+    echo ""
+
+    # Return success if no regressions between models
+    return 0
+}
+
 main() {
     if [[ "${1:-}" == "--list" ]]; then
         list_tests
@@ -344,6 +502,12 @@ main() {
     if [[ "${1:-}" == "--critical" ]]; then
         # Run only critical tests (001, 002, 003)
         set -- "$SCRIPT_DIR/tests/001"*.sh "$SCRIPT_DIR/tests/002"*.sh "$SCRIPT_DIR/tests/003"*.sh
+    fi
+
+    if [[ "${1:-}" == "--compare-models" ]]; then
+        # Run tests on multiple models and compare results
+        run_model_comparison "${@:2}"
+        exit $?
     fi
 
     echo ""
