@@ -16,31 +16,33 @@ Adding instructions to fix one behavior can degrade others:
 
 Instead of running ALL tests, run only tests affected by your change:
 
-| Guideline Section | Tests to Run | Command |
-|-------------------|--------------|---------|
-| **Trigger table** | 003, 007, 010 | `bash tests/llm/harness.sh tests/llm/tests/00{3,7}*.sh tests/llm/tests/010*.sh` |
-| **Session start** | 001, 006 | `bash tests/llm/harness.sh tests/llm/tests/00{1,6}*.sh` |
-| **Token-efficient scripts** | 004 | `bash tests/llm/harness.sh tests/llm/tests/004*.sh` |
-| **Commit/git workflow** | 002, 005 | `bash tests/llm/harness.sh tests/llm/tests/00{2,5}*.sh` |
-| **Context/project info** | 008, 009 | `bash tests/llm/harness.sh tests/llm/tests/00{8,9}*.sh` |
+| Guideline Section | Section Tag | Tests | Command |
+|-------------------|-------------|-------|---------|
+| **Trigger table** | `trigger` | 003, 007, 010, 011 | `bash tests/llm/harness.sh --section trigger` |
+| **Session start** | `session` | 001, 006 | `bash tests/llm/harness.sh --section session` |
+| **Token-efficient scripts** | `scripts` | 004 | `bash tests/llm/harness.sh --section scripts` |
+| **Commit/git workflow** | `commit` | 002, 005 | `bash tests/llm/harness.sh --section commit` |
+| **Context/project info** | `context` | 008, 009 | `bash tests/llm/harness.sh --section context` |
 
 ### Test Tiers
 
 | Tier | Tests | When to Run | Cost |
 |------|-------|-------------|------|
 | **Critical** | 001, 002, 003 | Every change | ~3 API calls |
-| **Extended** | 004-010 | Section changes | ~7 API calls |
-| **Full** | All | Before PR merge | ~10 API calls |
+| **Extended** | 004-011 | Section changes | ~8 API calls |
+| **Full** | All | Before PR merge | ~11 API calls |
 
 ### Quick Commands
 
 ```bash
 # Critical only (cheap, catches major regressions)
-bash tests/llm/harness.sh tests/llm/tests/00{1,2,3}*.sh
+bash tests/llm/harness.sh --critical
 
 # Section-specific (after changing that section)
-SECTION=trigger   # or: session, scripts, commit, context
-bash tests/llm/harness.sh tests/llm/tests/*${SECTION}*.sh  # if tests were named by section
+bash tests/llm/harness.sh --section trigger   # or: session, scripts, commit, context
+
+# List available sections
+bash tests/llm/harness.sh --sections
 
 # Full suite (before merge only)
 bash tests/llm/harness.sh
@@ -98,6 +100,7 @@ bash tests/llm/harness.sh
 | 008_reads_context_pack | Project question trigger | Core Guidelines |
 | 009_mentions_checklist | Checklist references | Feature Complete |
 | 010_feature_needs_spec | Feature trigger row | BLOCKING GATE |
+| 011_core_proceeds_without_spec | Feature trigger row | Core vs Core+PM |
 
 ### 4. Before Making Guideline Changes
 

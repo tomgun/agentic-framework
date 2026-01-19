@@ -103,16 +103,16 @@ send_prompt() {
     if [[ "$TOOL" == "claude" ]]; then
         # Fully automated: Claude Code CLI
         # Use --model to specify model, --print for non-interactive
-        local model_arg=""
+        local -a model_args=()
         if [[ -n "$CLAUDE_MODEL" ]]; then
-            model_arg="--model $CLAUDE_MODEL"
+            model_args=(--model "$CLAUDE_MODEL")
         fi
 
         if $CLAUDE_CMD --help 2>&1 | grep -q "\-\-print"; then
-            LAST_OUTPUT=$($CLAUDE_CMD $model_arg --print "$prompt" 2>&1) || true
+            LAST_OUTPUT=$($CLAUDE_CMD "${model_args[@]}" --print "$prompt" 2>&1) || true
         else
             # Fallback to echo + pipe if --print not available
-            LAST_OUTPUT=$(echo "$prompt" | timeout 120 $CLAUDE_CMD $model_arg 2>&1) || true
+            LAST_OUTPUT=$(echo "$prompt" | timeout 120 $CLAUDE_CMD "${model_args[@]}" 2>&1) || true
         fi
     else
         # Semi-automated: Cursor or Copilot (IDE-based)
