@@ -228,6 +228,40 @@ fi
 
 echo ""
 
+# Step 5b: Regenerate Claude Skills
+echo -e "${BLUE}[5b/8] Regenerating Claude Skills${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+if [[ "$DRY_RUN" == "yes" ]]; then
+  echo "  [DRY RUN] Would regenerate Claude Skills"
+elif [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/generate-skills.sh" ]]; then
+  # Remove old generated skills (keep custom skills)
+  if [[ -d "$TARGET_PROJECT_DIR/.claude/skills" ]]; then
+    # Only remove skills that have the "Generated from:" marker
+    for skill_dir in "$TARGET_PROJECT_DIR/.claude/skills"/*; do
+      if [[ -d "$skill_dir" ]] && [[ -f "$skill_dir/SKILL.md" ]]; then
+        if grep -q "Generated from: .agentic/agents/claude/subagents" "$skill_dir/SKILL.md" 2>/dev/null; then
+          rm -rf "$skill_dir"
+        fi
+      fi
+    done
+  fi
+
+  # Generate fresh skills
+  bash "$TARGET_PROJECT_DIR/.agentic/tools/generate-skills.sh" 2>/dev/null || true
+
+  if [[ -d "$TARGET_PROJECT_DIR/.claude/skills" ]]; then
+    SKILL_COUNT=$(ls -1 "$TARGET_PROJECT_DIR/.claude/skills/" 2>/dev/null | wc -l | tr -d ' ')
+    echo -e "  ${GREEN}✓${NC} Regenerated $SKILL_COUNT Claude Skills"
+  else
+    echo -e "  ${YELLOW}⚠${NC} No skills generated"
+  fi
+else
+  echo -e "  ${YELLOW}⚠${NC} generate-skills.sh not found, skipping"
+fi
+
+echo ""
+
 # Step 6: REMOVED - consolidated into Step 7
 # (Previous versions had duplicate STACK.md update logic here and in Step 7)
 
