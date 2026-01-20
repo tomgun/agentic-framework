@@ -79,7 +79,7 @@ cat .agentic/AGENTS_ACTIVE.md 2>/dev/null
 ### 1. Silently Read Context
 
 ```bash
-cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
+cat STATUS.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
 ls .agentic/WIP.md 2>/dev/null
 ```
@@ -92,7 +92,7 @@ ls .agentic/WIP.md 2>/dev/null
 👋 Welcome back! Here's where we are:
 
 **Last session**: [Summary from JOURNAL.md/STATUS.md]
-**Current focus**: [From STATUS.md or PRODUCT.md]
+**Current focus**: [From STATUS.md]
 
 **Next steps** (pick one or tell me something else):
 1. [Next planned task]

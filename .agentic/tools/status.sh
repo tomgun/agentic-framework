@@ -17,8 +17,8 @@ STATUS_FILE="${PROJECT_ROOT}/STATUS.md"
 
 # Check if STATUS.md exists
 if [[ ! -f "${STATUS_FILE}" ]]; then
-  echo "Error: STATUS.md not found. This project may not use Core+PM mode."
-  echo "For Core mode, use PRODUCT.md instead."
+  echo "Error: STATUS.md not found."
+  echo "Run: bash .agentic/init/scaffold.sh"
   exit 1
 fi
 

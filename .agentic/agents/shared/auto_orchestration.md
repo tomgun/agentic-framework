@@ -12,7 +12,7 @@
 
 ### 1. Silently Read Context
 ```bash
-cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
+cat STATUS.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
 ls .agentic/WIP.md 2>/dev/null
 ```
@@ -23,7 +23,7 @@ ls .agentic/WIP.md 2>/dev/null
 👋 Welcome back! Here's where we are:
 
 **Last session**: [From JOURNAL.md/STATUS.md]
-**Current focus**: [From STATUS.md/PRODUCT.md]
+**Current focus**: [From STATUS.md]
 
 **Next steps** (pick one or tell me something else):
 1. [Next planned task]
@@ -105,7 +105,7 @@ What would you like to work on?
 | Acceptance Criteria | `spec/acceptance/F-####.md` exists | Missing = cannot proceed |
 | Tests Pass | Run test suite | Any failure = cannot ship |
 | Smoke Test | Actually run the app | Doesn't work = cannot ship |
-| Specs Updated | FEATURES.md or PRODUCT.md current | Stale = cannot commit |
+| Specs Updated | FEATURES.md and STATUS.md current | Stale = cannot commit |
 | No Untracked Files | `check-untracked.sh` clean | Untracked = warn before commit |
 
 ---

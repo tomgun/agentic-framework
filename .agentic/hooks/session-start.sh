@@ -86,7 +86,7 @@ elif [[ "$PROFILE" == "core+product" ]]; then
   echo "   - Known blockers"
   echo ""
 else
-  echo "2. STATUS.md or PRODUCT.md (if exists)"
+  echo "2. STATUS.md (if exists)"
   echo ""
 fi
 
@@ -137,18 +137,9 @@ echo "PROACTIVE CONTEXT SETTING"
 echo "═══════════════════════════════════════════════════════"
 echo ""
 
-# Check for planned work
+# Check for planned work (STATUS.md is now used by both profiles)
 echo "📋 Checking for planned work..."
-if [[ "$PROFILE" == "core" ]] && [[ -f "PRODUCT.md" ]]; then
-  PLANNED_WORK=$(grep "^## What's next" PRODUCT.md -A10 | grep "^- \[ \]" | head -3 || echo "")
-  if [[ -n "$PLANNED_WORK" ]]; then
-    echo ""
-    echo "Planned work found in PRODUCT.md:"
-    echo "$PLANNED_WORK"
-    echo ""
-    echo "Ask user: 'Which should we tackle first?'"
-  fi
-elif [[ "$PROFILE" == "core+product" ]] && [[ -f "STATUS.md" ]]; then
+if [[ -f "STATUS.md" ]]; then
   NEXT_UP=$(grep "^## Next up" STATUS.md -A5 | tail -4 || echo "")
   if [[ -n "$NEXT_UP" ]]; then
     echo ""
@@ -157,6 +148,8 @@ elif [[ "$PROFILE" == "core+product" ]] && [[ -f "STATUS.md" ]]; then
     echo ""
     echo "Ask user: 'Should we start with these, or something else?'"
   fi
+else
+  echo "⚠️  No STATUS.md found - run: bash .agentic/init/scaffold.sh"
 fi
 
 # Check for stale work

@@ -10,7 +10,7 @@
 
 **🚨 CRITICAL**: If session ends abruptly, these documents are the ONLY record of progress. Update them BEFORE ending!
 
-### Core Profile
+### Both Profiles (Core and Core+PM)
 
 - [ ] **`JOURNAL.md` updated with full session summary** (NON-NEGOTIABLE!)
   - Session date/time
@@ -22,7 +22,13 @@
   - Any context the next session needs
   - **RULE**: Never end session without updating JOURNAL.md!
 
-- [ ] **`PRODUCT.md` reflects current state**
+- [ ] **`STATUS.md` updated**
+  - Current session state: Summarize this session
+  - Completed this session: List concrete accomplishments
+  - Next immediate step: Clear, actionable next step
+  - Blockers: Document any blockers encountered
+
+- [ ] **`PRODUCT.md` reflects current state** (if exists)
   - Completed capabilities marked [x]
   - "What works now" is accurate
   - "Known limitations" is current
@@ -34,13 +40,7 @@
   - Architecture snapshot current
   - Known risks updated
 
-### Core+Product Profile (All Core items plus:)
-
-- [ ] **`STATUS.md` updated**
-  - Current session state: Summarize this session
-  - Completed this session: List concrete accomplishments
-  - Next immediate step: Clear, actionable next step
-  - Blockers: Document any blockers encountered
+### Core+Product Profile (Additional items:)
 
 - [ ] **`spec/FEATURES.md` updated** (if working on features)
   - Status accurate (planned/in_progress/shipped)

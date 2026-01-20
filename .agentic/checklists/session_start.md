@@ -14,7 +14,7 @@
 
 ```bash
 # Read these silently (don't dump to user)
-cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
+cat STATUS.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
 ls .agentic/WIP.md 2>/dev/null
 cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
@@ -28,7 +28,7 @@ cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
 👋 Welcome back! Here's where we are:
 
 **Last session**: [Summary from JOURNAL.md or STATUS.md]
-**Current focus**: [From STATUS.md "Current focus" or PRODUCT.md]
+**Current focus**: [From STATUS.md "Current focus"]
 **Progress**: [What's done, what's in progress]
 
 **Next steps** (pick one or tell me something else):
@@ -238,8 +238,8 @@ What would you like me to work on? (I'll register myself in .agentic/AGENTS_ACTI
 
 ## Proactive Context Setting (Make Collaboration Fluent)
 
-- [ ] **Check for planned work** (Core profile: `PRODUCT.md`, Core+PM: `STATUS.md`)
-  - Read "What's next" or "Next up" section
+- [ ] **Check for planned work** (from `STATUS.md`)
+  - Read "Next up" or "Next immediate step" section
   - Identify 2-3 highest priority items
   - **Present options to user**: "I see we have [A], [B], [C] planned. Which should we tackle first?"
 
@@ -260,7 +260,7 @@ What would you like me to work on? (I'll register myself in .agentic/AGENTS_ACTI
 After completing checklist, provide structured summary:
 
 **Context Summary:**
-- Current focus: [from STATUS.md or PRODUCT.md]
+- Current focus: [from STATUS.md]
 - Recent progress: [1-2 sentences from JOURNAL.md]
 - Active blockers: [list from HUMAN_NEEDED.md or "None"]
 
