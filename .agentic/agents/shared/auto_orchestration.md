@@ -14,7 +14,7 @@
 ```bash
 cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
-ls WIP.md 2>/dev/null
+ls .agentic/WIP.md 2>/dev/null
 ```
 
 ### 2. Greet User with Recap
@@ -37,7 +37,7 @@ What would you like to work on?
 
 | Situation | Response |
 |-----------|----------|
-| WIP.md exists | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
+| .agentic/WIP.md exists | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
 | HUMAN_NEEDED has items | "📋 [N] items need your input" |
 | Upgrade pending | "🔄 Framework upgraded to vX.Y.Z, applying updates..." |
 
@@ -154,7 +154,7 @@ What would you like to work on?
    └─ cat .agentic/.upgrade_pending (follow if exists)
    
 2. CHECK FOR WIP
-   └─ ls WIP.md (resume if exists)
+   └─ ls .agentic/WIP.md (resume if exists)
    
 3. READ CONTEXT
    ├─ STATUS.md (what's current focus)
@@ -195,7 +195,7 @@ What would you like to work on?
 ### Automatic Checks (ALL MUST PASS)
 
 ```
-□ No WIP.md exists (work is complete)
+□ No .agentic/WIP.md exists (work is complete)
 □ All tests pass
 □ Smoke test passed (for user-facing changes)
 □ Quality checks pass (if enabled)

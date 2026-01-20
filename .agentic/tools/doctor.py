@@ -601,8 +601,8 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
 
     if phase == "start":
         # Check WIP exists (interrupted work?)
-        if (root / "WIP.md").exists():
-            issues.append("WIP.md exists - previous work was interrupted. Review or complete it.")
+        if (root / ".agentic" / "WIP.md").exists():
+            issues.append(".agentic/WIP.md exists - previous work was interrupted. Review or complete it.")
         # Context files checked by main doctor flow
 
     elif phase == "planning":
@@ -620,8 +620,8 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
             acc_file = root / "spec" / "acceptance" / f"{feature_id}.md"
             if not acc_file.exists():
                 issues.append(f"Missing acceptance criteria for {feature_id}")
-            if not (root / "WIP.md").exists():
-                issues.append("No WIP.md - start tracking with: wip.sh start " + (feature_id or "FEATURE"))
+            if not (root / ".agentic" / "WIP.md").exists():
+                issues.append("No .agentic/WIP.md - start tracking with: wip.sh start " + (feature_id or "FEATURE"))
 
     elif phase == "complete":
         # Tests should pass, FEATURES.md updated
@@ -645,9 +645,9 @@ def run_pre_commit_checks(root: Path, profile: str) -> list[str]:
     """Fast checks for pre-commit hook."""
     issues = []
 
-    # 1. WIP.md must not exist (work should be complete before commit)
-    if (root / "WIP.md").exists():
-        issues.append("WIP.md exists - complete or remove work-in-progress before committing")
+    # 1. .agentic/WIP.md must not exist (work should be complete before commit)
+    if (root / ".agentic" / "WIP.md").exists():
+        issues.append(".agentic/WIP.md exists - complete or remove work-in-progress before committing")
 
     # 2. Check for untracked files in key directories
     import subprocess

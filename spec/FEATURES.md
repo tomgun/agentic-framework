@@ -767,12 +767,12 @@
 
 ## F-0052: WIP.md Lock File
 
-**Status**: shipped  
-**Priority**: critical  
-**Complexity**: low  
+**Status**: shipped
+**Priority**: critical
+**Complexity**: low
 **Since**: v0.5.0
 
-**Description**: Lock file created when work starts, contains feature, files, progress, recovery instructions.
+**Description**: Lock file at `.agentic/WIP.md` created when work starts, contains feature, files, progress, recovery instructions.
 
 **Dependencies**: F-0051
 

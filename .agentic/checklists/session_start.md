@@ -16,7 +16,7 @@
 # Read these silently (don't dump to user)
 cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
-ls WIP.md 2>/dev/null
+ls .agentic/WIP.md 2>/dev/null
 cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
 ```
 
@@ -41,11 +41,11 @@ What would you like to work on?
 
 ## Step 3: Handle Special Cases
 
-**If WIP.md exists** (interrupted work):
+**If .agentic/WIP.md exists** (interrupted work):
 ```
 ⚠️ Previous work was interrupted!
-Feature: [from WIP.md]
-Files changed: [from WIP.md or git diff]
+Feature: [from .agentic/WIP.md]
+Files changed: [from .agentic/WIP.md or git diff]
 
 Options:
 1. Continue from checkpoint
@@ -103,7 +103,7 @@ What would you like me to work on? (I'll register myself in .agentic/AGENTS_ACTI
 
 **If interrupted work detected (exit code 1):**
 - ⚠️ Previous session stopped mid-task (tokens out, crash, or abrupt close)
-- WIP.md shows what was in progress
+- .agentic/WIP.md shows what was in progress
 - Git diff shows uncommitted changes
 - **STOP and review before continuing!**
 

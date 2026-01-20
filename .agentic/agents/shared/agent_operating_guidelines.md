@@ -21,7 +21,7 @@
 ```bash
 cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
-ls WIP.md 2>/dev/null
+ls .agentic/WIP.md 2>/dev/null
 cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
 ```
 
@@ -48,7 +48,7 @@ What would you like to work on?
 | Situation | What to Say |
 |-----------|-------------|
 | **.agentic/AGENTS_ACTIVE.md has entries** | "👥 Another agent is working on [X]. I'll register myself and work on different files." |
-| **WIP.md exists** | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
+| **.agentic/WIP.md exists** | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
 | **HUMAN_NEEDED has items** | "📋 [N] items need your input" |
 | **Upgrade pending** | "🔄 Framework upgraded, applying updates..." |
 
@@ -65,9 +65,12 @@ What would you like to work on?
 | Trigger Words | YOUR FIRST ACTION |
 |---------------|-------------------|
 | "build", "implement", "add", "create", "let's do", "make" | **🛑 STOP → Read `feature_start.md` → Check acceptance criteria EXIST** |
+| "implement entire", "full system", "complete feature", "build everything" | **🛑 STOP → TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files.** |
 | "fix", "bug", "issue" | **🛑 STOP → Check spec/ISSUES.md → Write failing test FIRST** |
 | "commit", "push" | **🛑 STOP → Read `before_commit.md` → All gates must pass** |
 | "done", "complete", "finished" | **🛑 STOP → Read `feature_complete.md` → Verify ALL items** |
+| "update journal", "log this", "add entry" | **🛑 STOP → Use `bash .agentic/tools/journal.sh` NOT file edit** |
+| "what is this project", "tell me about", "explain the codebase" | **→ Read CONTEXT_PACK.md FIRST, then answer** |
 
 ## 🚫 BLOCKING GATE (Non-Negotiable)
 
@@ -590,7 +593,7 @@ bash .agentic/tools/wip.sh check
 
 **If interrupted work detected:**
 - ⚠️ Previous agent stopped mid-task
-- WIP.md shows what was in progress
+- .agentic/WIP.md shows what was in progress
 - Git diff shows uncommitted changes
 - **STOP and tell user** about interrupted work
 - Offer: Continue | Review | Rollback
@@ -633,24 +636,24 @@ bash .agentic/tools/wip.sh check
 
 ### WIP and Multi-Agent Coordination
 
-**WIP.md acts as a lock file for multi-agent scenarios:**
-- If WIP.md exists and is recent (<5 min): Another agent is working, wait or coordinate
-- If WIP.md exists and is stale (>60 min): Previous agent crashed, review and decide
-- Never start new work while another agent's WIP.md is fresh
+**.agentic/WIP.md acts as a lock file for multi-agent scenarios:**
+- If .agentic/WIP.md exists and is recent (<5 min): Another agent is working, wait or coordinate
+- If .agentic/WIP.md exists and is stale (>60 min): Previous agent crashed, review and decide
+- Never start new work while another agent's .agentic/WIP.md is fresh
 
-### Never Commit with WIP.md Present
+### Never Commit with .agentic/WIP.md Present
 
 **Before commit checklist includes WIP check:**
 ```bash
 # Check if WIP exists
-ls WIP.md 2>/dev/null
+ls .agentic/WIP.md 2>/dev/null
 
 # If exists:
 bash .agentic/tools/wip.sh complete  # Remove lock
 # Then commit
 ```
 
-**Why**: WIP.md presence = work incomplete. Never commit incomplete work.
+**Why**: .agentic/WIP.md presence = work incomplete. Never commit incomplete work.
 
 ### WIP Benefits
 

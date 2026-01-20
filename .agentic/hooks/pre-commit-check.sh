@@ -8,12 +8,14 @@
 #   bash .agentic/hooks/pre-commit-check.sh
 #
 # Checks:
-#   1. WIP.md must not exist (work must be complete)
+#   1. .agentic/WIP.md must not exist (work must be complete)
 #   2. Shipped features must have acceptance criteria
 #   3. In-progress features must have recent JOURNAL entry (<24h)
 #   4. STACK.md version matches reality (where detectable)
 #   5. Batch size warning (>10 files = too large, should re-plan)
 #   6. Untracked files warning (new files not git added)
+#   7. LLM behavioral test status (advisory, framework dev only)
+#   8. Agent instruction file size limits (prevents context bloat)
 #
 # Exit codes:
 #   0 - All checks pass, commit allowed
@@ -32,10 +34,10 @@ echo ""
 
 FAILURES=0
 
-# Check 1: WIP.md must not exist
-echo "[1/6] Checking for incomplete work (WIP.md)..."
-if [[ -f "WIP.md" ]]; then
-  echo "❌ BLOCKED: WIP.md exists - work is incomplete!"
+# Check 1: .agentic/WIP.md must not exist
+echo "[1/8] Checking for incomplete work (.agentic/WIP.md)..."
+if [[ -f ".agentic/WIP.md" ]]; then
+  echo "❌ BLOCKED: .agentic/WIP.md exists - work is incomplete!"
   echo ""
   echo "   Work-in-progress must be completed before committing."
   echo "   Options:"
@@ -46,13 +48,13 @@ if [[ -f "WIP.md" ]]; then
   echo ""
   FAILURES=$((FAILURES + 1))
 else
-  echo "✓ No WIP.md found (work complete)"
+  echo "✓ No .agentic/WIP.md found (work complete)"
 fi
 
 # Check 2: Shipped features must have acceptance criteria
 if [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[2/6] Checking shipped features have acceptance criteria..."
+  echo "[2/8] Checking shipped features have acceptance criteria..."
   
   # Extract feature IDs marked as shipped
   SHIPPED_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: shipped" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
@@ -85,13 +87,13 @@ if [[ -f "spec/FEATURES.md" ]]; then
   fi
 else
   echo ""
-  echo "[2/6] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
+  echo "[2/8] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
 fi
 
 # Check 3: In-progress features must have recent JOURNAL entry
 if [[ -f "spec/FEATURES.md" ]] && [[ -f "JOURNAL.md" ]]; then
   echo ""
-  echo "[3/6] Checking in-progress features have recent activity..."
+  echo "[3/8] Checking in-progress features have recent activity..."
   
   IN_PROGRESS_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: in_progress" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
   
@@ -128,13 +130,13 @@ if [[ -f "spec/FEATURES.md" ]] && [[ -f "JOURNAL.md" ]]; then
   fi
 else
   echo ""
-  echo "[3/6] Skipping in-progress features check (no spec/FEATURES.md or JOURNAL.md)"
+  echo "[3/8] Skipping in-progress features check (no spec/FEATURES.md or JOURNAL.md)"
 fi
 
 # Check 4: STACK.md version sanity (where detectable)
 if [[ -f "STACK.md" ]]; then
   echo ""
-  echo "[4/6] Checking STACK.md version consistency..."
+  echo "[4/8] Checking STACK.md version consistency..."
   
   # Example: Check Node.js version if package.json exists
   if [[ -f "package.json" ]] && command -v node >/dev/null 2>&1; then
@@ -164,12 +166,12 @@ if [[ -f "STACK.md" ]]; then
   fi
 else
   echo ""
-  echo "[4/6] Skipping STACK.md check (file not found)"
+  echo "[4/8] Skipping STACK.md check (file not found)"
 fi
 
 # Check 5: Batch size warning (small batches = quality)
 echo ""
-echo "[5/6] Checking batch size (small batches = quality)..."
+echo "[5/8] Checking batch size (small batches = quality)..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   # Count staged files
@@ -201,7 +203,7 @@ fi
 
 # Check 6: Untracked files in project directories
 echo ""
-echo "[6/6] Checking for untracked files in project directories..."
+echo "[6/8] Checking for untracked files in project directories..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   # Directories that should typically have files tracked
@@ -242,6 +244,55 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   fi
 else
   echo "✓ Git not available (skipping untracked check)"
+fi
+
+# Check 7: LLM behavioral test status (advisory, framework development only)
+if [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/LLM_TEST_RESULTS.md" ]]; then
+  echo ""
+  echo "[7/8] Checking LLM behavioral test status..."
+  if bash .agentic/tools/llm-test-status.sh --quiet 2>/dev/null; then
+    echo "✓ LLM behavioral tests are current"
+  else
+    echo "💡 Tip: LLM behavioral tests may need updating"
+    echo "   Run: bash .agentic/tools/llm-test-status.sh"
+    echo "   (This is advisory, not blocking commit)"
+  fi
+fi
+
+# Check 8: Agent instruction file size limits (prevents context bloat)
+echo ""
+echo "[8/8] Checking agent instruction file sizes..."
+
+SIZE_WARNINGS=0
+
+# CLAUDE.md limit: 500 lines
+if [[ -f ".agentic/agents/claude/CLAUDE.md" ]]; then
+  CLAUDE_LINES=$(wc -l < ".agentic/agents/claude/CLAUDE.md" | tr -d ' ')
+  if [[ $CLAUDE_LINES -gt 500 ]]; then
+    echo "⚠️  WARNING: CLAUDE.md has $CLAUDE_LINES lines (limit: 500)"
+    echo "   Large instruction files cause attention drift."
+    echo "   Consider consolidating or moving content to referenced docs."
+    SIZE_WARNINGS=$((SIZE_WARNINGS + 1))
+  else
+    echo "✓ CLAUDE.md: $CLAUDE_LINES/500 lines"
+  fi
+fi
+
+# agent_operating_guidelines.md limit: 1200 lines
+if [[ -f ".agentic/agents/shared/agent_operating_guidelines.md" ]]; then
+  GUIDELINES_LINES=$(wc -l < ".agentic/agents/shared/agent_operating_guidelines.md" | tr -d ' ')
+  if [[ $GUIDELINES_LINES -gt 1200 ]]; then
+    echo "⚠️  WARNING: agent_operating_guidelines.md has $GUIDELINES_LINES lines (limit: 1200)"
+    echo "   Consider consolidating or splitting into tool-specific files."
+    SIZE_WARNINGS=$((SIZE_WARNINGS + 1))
+  else
+    echo "✓ agent_operating_guidelines.md: $GUIDELINES_LINES/1200 lines"
+  fi
+fi
+
+if [[ $SIZE_WARNINGS -gt 0 ]]; then
+  echo ""
+  echo "   (File size warnings are advisory, not blocking commit)"
 fi
 
 # Summary

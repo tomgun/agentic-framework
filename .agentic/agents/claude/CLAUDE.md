@@ -11,9 +11,12 @@ You are working in a repository that uses the **Agentic Framework**.
 | Trigger Words | YOUR FIRST ACTION |
 |---------------|-------------------|
 | "build", "implement", "add", "create", "let's do" | **🛑 STOP → Read `feature_start.md` → Check acceptance criteria EXIST** |
+| "implement entire", "full system", "complete feature" | **🛑 STOP → TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files.** |
 | "fix", "bug", "issue" | **🛑 STOP → Check spec/ISSUES.md → Write failing test FIRST** |
 | "commit", "push" | **🛑 STOP → Read `before_commit.md` → All gates must pass** |
 | "done", "complete", "finished" | **🛑 STOP → Read `feature_complete.md` → Verify ALL items** |
+| "update journal", "log this", "add to journal" | **🛑 STOP → Use `bash .agentic/tools/journal.sh` NOT file edit** |
+| "what is this project", "what am I working on" | **→ Read CONTEXT_PACK.md FIRST, then answer** |
 
 ## 🚫 DO NOT PROCEED UNTIL:
 
@@ -77,7 +80,7 @@ cat .agentic/AGENTS_ACTIVE.md 2>/dev/null
 ```bash
 cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
-ls WIP.md 2>/dev/null
+ls .agentic/WIP.md 2>/dev/null
 ```
 
 ### 2. Greet User with Recap (DO THIS AUTOMATICALLY!)
@@ -103,7 +106,7 @@ What would you like to work on?
 - **.agentic/AGENTS_ACTIVE.md shows other agents?** → "👥 Another agent is working on [X]. I'll work on different files."
   - **Register yourself** in .agentic/AGENTS_ACTIVE.md
   - **Avoid their files** to prevent conflicts
-- **WIP.md exists?** → "⚠️ Previous work interrupted! [options]"
+- **.agentic/WIP.md exists?** → "⚠️ Previous work interrupted! [options]"
 - **HUMAN_NEEDED.md has items?** → "📋 [N] items need your input"
 - **Upgrade pending?** → Handle it, then greet
 
@@ -210,9 +213,11 @@ bash .agentic/tools/journal.sh \
 
 ## Token-Efficient Scripts (USE THESE, Don't Edit Files Directly!)
 
+**🛑 MANDATORY**: For JOURNAL.md, FEATURES.md, STATUS.md, HUMAN_NEEDED.md - **ALWAYS use scripts, NEVER edit directly**.
+
 **Located in `.agentic/tools/`** - these save massive tokens by avoiding full file reads:
 
-### 1. `journal.sh` - Append to JOURNAL.md
+### 1. `journal.sh` - Append to JOURNAL.md (🛑 ALWAYS USE THIS)
 ```bash
 bash .agentic/tools/journal.sh \
   "Session topic" \
@@ -272,12 +277,37 @@ bash .agentic/tools/blocker.sh resolve HN-0001 \
 
 ---
 
+## 🛑 MANDATORY: Small Batch Development
+
+**WHEN user asks for something large** (e.g., "implement entire auth system", "build full API"):
+
+```
+🛑 STOP - This is TOO BIG for one task.
+
+I'll break this into smaller, manageable pieces:
+1. [First small piece - 3-5 files max]
+2. [Second piece]
+3. [Third piece]
+...
+
+Let's start with #1. Which would you like to tackle first?
+```
+
+**Why this matters**:
+- Max 5-10 files per commit = easy review, safe rollback
+- One feature at a time = focused context, fewer bugs
+- Small batches = you can verify each piece works before moving on
+
+**Signs it's too big**: User asks for "entire", "full", "complete system", or lists 4+ features.
+
+---
+
 ## Core Guidelines (Unchanged)
 
 1. **Read at session start**:
    - `AGENTS.md` (if present)
    - `.agentic/agents/shared/agent_operating_guidelines.md` (mandatory)
-   - `CONTEXT_PACK.md` (where things are, how to run)
+   - `CONTEXT_PACK.md` (where things are, how to run) - **READ THIS to understand project**
    - `STATUS.md` (current focus, next steps)
 
 2. **Follow programming standards** (`.agentic/quality/programming_standards.md`):
