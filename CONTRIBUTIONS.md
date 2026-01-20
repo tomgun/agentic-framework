@@ -997,6 +997,48 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 - Requirements exploration
 - Initial design work
 
+### PR Tracking via HUMAN_NEEDED.md
+
+**User insight**:
+> "the framework could notify the user if there are PRs waiting (in human_needed.md for example) to avoid troubles later"
+> "not every project uses github"
+> "would human_needed be more token saving?"
+
+**Problem identified**:
+- Open PRs can cause merge conflicts if forgotten
+- GitHub CLI check (gh) is GitHub-specific
+- Need universal solution that works with any git host
+
+**Result - Hybrid PR Notification**:
+
+**Primary: HUMAN_NEEDED.md** (universal, token-efficient)
+- PRs tracked as blockers with "review" category
+- Already read at session start (no extra tokens)
+- Works with any git host (GitHub, GitLab, Bitbucket, etc.)
+
+**Backup: gh CLI check** (GitHub convenience)
+- session-start.sh checks for missed PRs on GitHub
+- Suggests adding to HUMAN_NEEDED.md if found
+
+**Changes**:
+- blocker.sh: Added "review" type for PR tracking
+- git_workflow.md: Added step 7 (track PR in HUMAN_NEEDED.md)
+- session_start.md: Documented hybrid approach
+- session-start.sh: Clarified gh CLI is backup mechanism
+- HUMAN_NEEDED.reference.md: Added PR example entry
+
+**Usage**:
+```bash
+# When creating PR
+bash .agentic/tools/blocker.sh add \
+  "Review/merge PR #123: feature name" \
+  "review" \
+  "PR waiting: https://github.com/user/repo/pull/123"
+
+# When PR merged
+bash .agentic/tools/blocker.sh resolve HN-XXXX "PR merged"
+```
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
