@@ -87,6 +87,39 @@ FEATURE REQUEST DETECTED?
 
 ---
 
+## 🔄 Iterative Requirements Gathering
+
+**NEVER assume you have enough information.** When gathering requirements, creating acceptance criteria, or envisioning a project:
+
+### After Each Round of Questions, Offer Options:
+
+```
+I've gathered some initial context. What would you like to do?
+
+a) ✅ **Finalize** - This is enough, let's proceed with what we have
+b) 🔍 **4 more questions** - Dive deeper into specific areas
+c) 📝 **Give more context** - You have more to share
+d) 💬 **Free input** - Tell me anything else relevant
+```
+
+### Guidelines for Follow-up Questions:
+
+- **Go deeper**: If user mentioned "authentication", ask about OAuth vs JWT, session handling, refresh tokens
+- **Go broader**: If focused on one area, ask about adjacent concerns (security, performance, UX)
+- **Challenge assumptions**: "You mentioned X - have you considered Y as an alternative?"
+- **Uncover edge cases**: "What happens when Z fails?" or "How should this behave for new users?"
+
+### Why This Matters:
+
+- Users often don't know what they don't know
+- Early clarification prevents expensive rework
+- Better acceptance criteria = better implementation
+- Shows thoroughness and builds trust
+
+**Default behavior**: Always offer to continue gathering context until user explicitly says "finalize" or equivalent.
+
+---
+
 ## Token Efficiency: DELEGATE Tasks
 
 | Task | Spawn Agent | Model Tier | Savings |
