@@ -44,7 +44,7 @@ FEATURE REQUEST?
 
 ```
 👋 Welcome back! Here's where we are:
-**Current focus**: [From STATUS.md/PRODUCT.md]
+**Current focus**: [From STATUS.md]
 **Next steps**: 
 1. [Planned task]
 2. [Another option]

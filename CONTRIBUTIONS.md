@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.11.3)
-**Date**: 2026-01-15  
+**Period**: Initial Development (v0.1.0 → v0.12.0)
+**Date**: 2026-01-20  
 
 ---
 
@@ -923,8 +923,84 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 
 ---
 
+## v0.12.0 Contributions (2026-01-20)
+
+### Branch Policy Safeguard (F-0099)
+
+**Problem identified**:
+- Risk of pushing directly to main/master branch
+- Especially problematic in PR-based workflows
+
+**Result - Branch Policy Safeguard**:
+- Pre-push hook that blocks direct pushes to main/master
+- Added `--i-know-what-im-doing` flag for intentional direct pushes
+- Integrated into before_commit.md checklist
+- Agent guidelines updated with branch policy awareness
+
+### STATUS.md Consolidation
+
+**User insight during Project Phase discussion**:
+> "would it make sense to use the same STATUS.md in both modes?"
+> "does this simplify developing the framework / make it more reliable?"
+
+**Key decision**: User confirmed consolidation would simplify framework development.
+
+**Problem identified**:
+- 30+ places with `STATUS.md || PRODUCT.md` conditional logic
+- Different files for tracking state in Core vs Core+PM profiles
+- More code paths = more bugs, more testing, confusing docs
+
+**Result - Unified STATUS.md**:
+| File | Purpose | Required? |
+|------|---------|-----------|
+| **STATUS.md** | WHERE we are (Project Phase, current focus, next steps) | Yes (both profiles) |
+| **PRODUCT.md** | WHAT we're building (vision, capabilities, scope) | Optional |
+| **CONTEXT_PACK.md** | HOW to work (technical context) | Yes (both profiles) |
+
+**Changes (33 files)**:
+- Templates updated: STATUS.md required, PRODUCT.md optional
+- scaffold.sh: Creates STATUS.md for BOTH profiles
+- All hooks, checklists, agent guidelines updated
+- Removed all conditional patterns (`STATUS.md || PRODUCT.md`)
+- Python tools updated (doctor.py, verify.py)
+- upgrade.sh: Auto-creates STATUS.md for existing Core projects
+- Tests added for STATUS.md requirement
+
+**Impact**:
+- Simpler framework code (fewer code paths)
+- Easier maintenance
+- Consistent experience across profiles
+- Migration handled automatically by upgrade.sh
+
+### Project Phase Concept
+
+**User insight**:
+> "discovery seems good. it also includes research, references, example gathering etc probably"
+> "dev loop is never ending - testing is part of the dev loop, not separate"
+
+**Result - Two-Phase Model**:
+- **Discovery**: Research, references, examples, requirements gathering, initial designs
+- **Building**: Iterative loop where specs, designs, code, tests all evolve together
+- Phase tracked in STATUS.md (not separate file)
+- Deprecates continue_here.py (redundant with STATUS.md)
+
+### Terminology Refinement
+
+**User question**:
+> "is envisioning the best term for creating a product/project idea?"
+
+**Discussion**: Considered "envisioning" vs "discovery"
+
+**Result**: Chose "discovery" as it better captures:
+- Research and reference gathering
+- Example collection
+- Requirements exploration
+- Initial design work
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.11.5
+**Current Version**: v0.12.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 

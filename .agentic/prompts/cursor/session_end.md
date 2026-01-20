@@ -9,7 +9,7 @@ I'm wrapping up this coding session. Please help me document what was done:
    - Problems encountered and solutions
    - Next steps or open questions
 
-2. Update `STATUS.md` or `PRODUCT.md`:
+2. Update `STATUS.md`:
    - Current focus/next steps
    - Overall progress state
    - Any new insights or changes
@@ -25,16 +25,11 @@ I'm wrapping up this coding session. Please help me document what was done:
    - Unclear requirements
    - Trade-offs needing human judgment
 
-5. Generate `.continue-here.md` for next session:
-   ```bash
-   python3 .agentic/tools/continue_here.py
-   ```
-
-6. Verify git status is clean:
+5. Verify git status is clean:
    - All changes committed with descriptive messages
    - No untracked files (or explain why they exist)
 
-7. Provide a brief summary of:
+6. Provide a brief summary of:
    - What was accomplished
    - What's ready for the next session
    - Any important notes or warnings

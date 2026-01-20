@@ -262,13 +262,48 @@ fi
 
 echo ""
 
-# Step 6: REMOVED - consolidated into Step 7
-# (Previous versions had duplicate STACK.md update logic here and in Step 7)
+# Step 6: Migrate STATUS.md for Core profile
+echo -e "${BLUE}[6/7] Checking STATUS.md migration${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# Detect profile
+PROFILE="core"
+if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+  PROFILE_LINE=$(grep -E "^\s*-\s*Profile:" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null || echo "")
+  if [[ "$PROFILE_LINE" == *"core+product"* ]]; then
+    PROFILE="core+product"
+  fi
+fi
+
+# Check if STATUS.md exists
+if [[ ! -f "$TARGET_PROJECT_DIR/STATUS.md" ]]; then
+  echo "  STATUS.md not found - creating (now required for all profiles)"
+
+  if [[ -f "$NEW_FRAMEWORK_DIR/.agentic/init/STATUS.template.md" ]]; then
+    cp "$NEW_FRAMEWORK_DIR/.agentic/init/STATUS.template.md" "$TARGET_PROJECT_DIR/STATUS.md"
+    echo -e "  ${GREEN}✓${NC} Created STATUS.md from template"
+
+    # Add to upgrade marker TODO
+    STATUS_MD_MIGRATION="yes"
+  else
+    echo -e "  ${YELLOW}⚠${NC} Template not found - run: bash .agentic/init/scaffold.sh"
+  fi
+else
+  echo -e "  ${GREEN}✓${NC} STATUS.md already exists"
+fi
+
+# Check if STATUS.md has Project Phase section (new requirement)
+if [[ -f "$TARGET_PROJECT_DIR/STATUS.md" ]]; then
+  if ! grep -q "## Project Phase" "$TARGET_PROJECT_DIR/STATUS.md" 2>/dev/null; then
+    echo -e "  ${YELLOW}⚠${NC} STATUS.md missing Project Phase section (see template for format)"
+    STATUS_MD_NEEDS_UPDATE="yes"
+  fi
+fi
 
 echo ""
 
-# Step 7: Verification
-echo -e "${BLUE}[7/7] Running verification${NC}"
+# Step 7: Verification (now 7/9)
+echo -e "${BLUE}[7/9] Running verification${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 if [[ "$DRY_RUN" == "yes" ]]; then
@@ -324,8 +359,8 @@ fi
 
 echo ""
 
-# Step 6: Update STACK.md with new version (consolidated, robust pattern matching)
-echo -e "${BLUE}[6/7] Updating STACK.md with new framework version${NC}"
+# Step 8: Update STACK.md with new version (consolidated, robust pattern matching)
+echo -e "${BLUE}[8/9] Updating STACK.md with new framework version${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Use whichever version variable is set (FRAMEWORK_VERSION or NEW_VERSION as fallback)
@@ -389,8 +424,8 @@ else
   echo -e "  ${YELLOW}⚠${NC} Could not update .agentic/VERSION (version unknown)"
 fi
 
-# Step 7: Create upgrade marker for agent to pick up at next session
-echo -e "${BLUE}[7/7] Creating upgrade marker${NC}"
+# Step 9: Create upgrade marker for agent to pick up at next session
+echo -e "${BLUE}[9/9] Creating upgrade marker${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 debug "Creating upgrade marker at: $TARGET_PROJECT_DIR/.agentic/.upgrade_pending"
@@ -414,6 +449,7 @@ declare -a FEATURE_REGISTRY=(
   "0.5.0:Sub-agent setup:bash .agentic/tools/setup-agent.sh cursor-agents:Specialized agents for different tasks"
   "0.5.0:Multi-agent pipeline:bash .agentic/tools/setup-agent.sh pipeline:Parallel work coordination"
   "0.5.0:Tool setup:bash .agentic/tools/setup-agent.sh all:Auto-loaded instructions"
+  "0.12.0:STATUS.md consolidation:See STATUS.md:STATUS.md now required for both Core and Core+PM profiles"
 )
 
 # Filter features based on version range

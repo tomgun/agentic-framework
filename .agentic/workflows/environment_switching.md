@@ -163,7 +163,7 @@ bash .agentic/tools/session_log.sh "Checkpoint" "Details" "key=value"
 - `JOURNAL.md` - Session history
 - `SESSION_LOG.md` - Quick checkpoints
 - `FEATURES.md` - Feature status
-- `STATUS.md` / `PRODUCT.md` - Current state
+- `STATUS.md` - Current state
 - `HUMAN_NEEDED.md` - Blockers
 
 **All tools use**:

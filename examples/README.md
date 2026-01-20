@@ -85,7 +85,7 @@ core_pm_taskboard/
 
 | Aspect | Core (`core_todo_cli/`) | Core+PM (`core_pm_taskboard/`) |
 |--------|-------------------------|--------------------------------|
-| **Planning doc** | `PRODUCT.md` (lightweight) | `PRODUCT.md` + `STATUS.md` + `spec/` |
+| **Planning doc** | `STATUS.md` + `PRODUCT.md` (optional) | `STATUS.md` + `PRODUCT.md` + `spec/` |
 | **Feature tracking** | Checkboxes in `PRODUCT.md` | F-#### IDs in `spec/FEATURES.md` |
 | **Acceptance criteria** | Informal (user approval) | Formal (`spec/acceptance/F-####.md`) |
 | **Agent direction** | Asks user what to work on | Reads `STATUS.md` for focus |

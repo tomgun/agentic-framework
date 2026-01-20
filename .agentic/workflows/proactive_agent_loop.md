@@ -8,7 +8,7 @@
 
 Before starting a proactive agent session, verify:
 
-- [ ] **Project has essential context files**: CONTEXT_PACK.md, STATUS.md or PRODUCT.md exist
+- [ ] **Project has essential context files**: CONTEXT_PACK.md, STATUS.md exist
 - [ ] **Recent activity visible**: JOURNAL.md has entries (or this is first session)
 - [ ] **Git is clean or understood**: No mysterious uncommitted changes (or you know why they exist)
 - [ ] **Can access project state**: Tools like `doctor.sh`, `brief.sh` are accessible
@@ -45,7 +45,7 @@ Proactive Agent Session Progress:
 
 **This workflow READS**:
 - `CONTEXT_PACK.md` - Architecture & constraints
-- `STATUS.md` or `PRODUCT.md` - Current focus & planned work
+- `STATUS.md` - Current focus & planned work
 - `JOURNAL.md` - Recent progress and decisions
 - `HUMAN_NEEDED.md` - Active blockers
 - `spec/FEATURES.md` - Feature status (if Core+PM mode)
@@ -53,7 +53,7 @@ Proactive Agent Session Progress:
 
 **This workflow WRITES**:
 - `JOURNAL.md` - Session summaries and decisions
-- `STATUS.md` or `PRODUCT.md` - Updated progress and next steps
+- `STATUS.md` - Updated progress and next steps
 - `HUMAN_NEEDED.md` - New blockers or decisions needed
 - `spec/FEATURES.md` - Updated feature status (if Core+PM mode)
 - Source code, tests, other implementation files
@@ -90,7 +90,7 @@ Proactive Agent Session Progress:
 
 **Read in order** (~2-3K tokens):
 1. `CONTEXT_PACK.md` - Architecture & constraints
-2. `STATUS.md` or `PRODUCT.md` - Current focus & planned work
+2. `STATUS.md` - Current focus & planned work
 3. `JOURNAL.md` (last 2-3 entries) - Recent progress
 4. `HUMAN_NEEDED.md` - Active blockers
 
@@ -101,7 +101,7 @@ Proactive Agent Session Progress:
 - 🚩 **Stale work**: In-progress tasks from last session that weren't completed
 - 🚩 **Awaiting acceptance**: Features marked "shipped" but not "accepted"
 - 🚩 **Retrospective due**: If enabled and threshold met
-- ✅ **Planned work**: Next items from STATUS.md or PRODUCT.md
+- ✅ **Planned work**: Next items from STATUS.md
 
 ### 3. Present Context & Options to Human
 
@@ -110,7 +110,7 @@ Proactive Agent Session Progress:
 ```
 📊 **Session Context**
 
-**Current Focus**: [from STATUS.md/PRODUCT.md]
+**Current Focus**: [from STATUS.md]
 **Recent Progress**: [1-2 sentences from JOURNAL.md]
 
 [If blockers exist:]
@@ -264,7 +264,7 @@ c) You have the error format info now?
 - ❌ Pick random task without context
 
 **DO**:
-- ✅ Check STATUS.md or PRODUCT.md for planned work
+- ✅ Check STATUS.md for planned work
 - ✅ Prioritize by: blockers > incomplete work > planned > new ideas
 - ✅ Provide 3-4 concrete options with context
 
@@ -410,7 +410,7 @@ This saves agent tokens for actual development!
 - ❌ Starting work without checking HUMAN_NEEDED.md
 - ❌ Discovering blocker at end of session (too late)
 - ❌ "Continue with current task?" (what task? what's the state?)
-- ❌ Ignoring planned work in STATUS.md/PRODUCT.md
+- ❌ Ignoring planned work in STATUS.md
 
 ---
 
@@ -420,7 +420,7 @@ This saves agent tokens for actual development!
 
 ### Problem: Can't find planned work
 
-**Symptoms**: STATUS.md or PRODUCT.md is vague, no clear next steps
+**Symptoms**: STATUS.md is vague, no clear next steps
 
 **Solutions**:
 1. Check JOURNAL.md for what was discussed last session
@@ -621,6 +621,6 @@ This operating loop is enforced by:
 1. **session_start.md checklist** - What to check at start
 2. **agent_operating_guidelines.md** - Rules for proactive behavior
 3. **JOURNAL.md** - Provides continuity across sessions
-4. **STATUS.md / PRODUCT.md** - Provides planned work context
+4. **STATUS.md** - Provides planned work context
 5. **HUMAN_NEEDED.md** - Makes blockers explicit and actionable
 
