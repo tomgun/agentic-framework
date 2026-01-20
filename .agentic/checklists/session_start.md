@@ -27,6 +27,7 @@ cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
 ```
 👋 Welcome back! Here's where we are:
 
+**Project phase**: [discovery | building] - [brief focus]
 **Last session**: [Summary from JOURNAL.md or STATUS.md]
 **Current focus**: [From STATUS.md "Current focus" or PRODUCT.md]
 **Progress**: [What's done, what's in progress]
@@ -38,6 +39,10 @@ cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
 
 What would you like to work on?
 ```
+
+**Project phases:**
+- **Discovery**: Figuring out what to build (research, requirements, examples, initial designs)
+- **Building**: Iteratively building it (specs, designs, code, tests evolve together)
 
 ## Step 3: Handle Special Cases
 
@@ -260,6 +265,7 @@ What would you like me to work on? (I'll register myself in .agentic/AGENTS_ACTI
 After completing checklist, provide structured summary:
 
 **Context Summary:**
+- Project phase: [discovery | building] - [brief focus]
 - Current focus: [from STATUS.md or PRODUCT.md]
 - Recent progress: [1-2 sentences from JOURNAL.md]
 - Active blockers: [list from HUMAN_NEEDED.md or "None"]

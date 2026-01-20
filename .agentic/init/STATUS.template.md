@@ -1,8 +1,31 @@
 # STATUS.md (Template)
 
-<!-- format: status-v0.1.0 -->
+<!-- format: status-v0.2.0 -->
 
 Purpose: the living "truth" of where the project is today.
+
+## Project Phase
+
+<!-- Two phases: discovery (figuring out what to build) or building (iteratively building it) -->
+
+- **Phase**: discovery  <!-- discovery | building -->
+- **Focus**: <!-- What's the current focus within this phase? -->
+
+### Discovery includes:
+<!-- Remove this section once in building phase -->
+- [ ] Research (problem space, technical options)
+- [ ] References & examples (similar products, patterns)
+- [ ] Requirements gathering (iterative questioning)
+- [ ] Initial designs (wireframes, mockups)
+- [ ] Feasibility exploration
+
+### Building is iterative:
+<!-- Uncomment when in building phase -->
+<!-- Specs, designs, code, and tests all evolve together -->
+<!-- - Current iteration focus: -->
+<!-- - Acceptance criteria progress: X/Y done -->
+
+---
 
 ## Current session state (optional, for mid-session tracking)
 - Session: <!-- YYYY-MM-DD-HHMM or leave empty if not mid-session -->

@@ -44,16 +44,13 @@ if [[ -x ".agentic/tools/session_log.sh" ]]; then
   echo "✓ Auto-logged to SESSION_LOG.md"
 fi
 
-# 2. Generate fresh .continue-here.md
-if [[ -x ".agentic/tools/continue_here.py" ]] && command -v python3 >/dev/null 2>&1; then
-  echo "Generating .continue-here.md..."
-  if python3 .agentic/tools/continue_here.py 2>/dev/null; then
-    echo "✓ Session context preserved in .continue-here.md"
-  else
-    echo "⚠ Could not generate .continue-here.md (check Python setup)"
-  fi
+# 2. Verify STATUS.md/PRODUCT.md has current state
+if [[ -f "STATUS.md" ]]; then
+  echo "✓ STATUS.md exists - agent will read at resume"
+elif [[ -f "PRODUCT.md" ]]; then
+  echo "✓ PRODUCT.md exists - agent will read at resume"
 else
-  echo "⚠ continue_here.py not available"
+  echo "⚠ No STATUS.md or PRODUCT.md found"
 fi
 
 # 3. Add JOURNAL.md entry (if we have significant uncommitted work)
@@ -62,9 +59,9 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   if [[ "$UNCOMMITTED" -gt 0 ]] && [[ -f "JOURNAL.md" ]]; then
     TIMESTAMP=$(date "+%Y-%m-%d %H:%M")
     echo "" >> JOURNAL.md
-    echo "## $TIMESTAMP - Context Compaction" >> JOURNAL.MD
+    echo "## $TIMESTAMP - Context Compaction" >> JOURNAL.md
     echo "" >> JOURNAL.md
-    echo "Context window reached capacity. State preserved in .continue-here.md." >> JOURNAL.md
+    echo "Context window reached capacity. State preserved in STATUS.md/PRODUCT.md." >> JOURNAL.md
     echo "" >> JOURNAL.md
     echo "Uncommitted changes:" >> JOURNAL.md
     git status --short | head -10 >> JOURNAL.md
@@ -92,7 +89,8 @@ fi
 echo ""
 echo "✓ State preservation complete"
 echo ""
-echo "After compaction, I'll resume with full context from .continue-here.md"
+echo "After compaction, agent will resume by reading STATUS.md/PRODUCT.md"
+echo "(following session_start.md checklist)"
 echo ""
 
 exit 0

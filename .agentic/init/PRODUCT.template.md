@@ -2,6 +2,25 @@
 
 Purpose: what we're building, what's done, and what's next. No ceremony, no IDs, just shared context for humans + agents.
 
+## Project Phase
+
+- **Phase**: discovery  <!-- discovery | building -->
+- **Focus**: <!-- Current focus within this phase -->
+
+<!--
+Discovery: figuring out what to build
+  - Research, references, examples
+  - Requirements gathering
+  - Initial designs/mockups
+  - Feasibility exploration
+
+Building: iteratively building it
+  - Specs, designs, code, tests evolve together
+  - No separate "testing phase" - testing is continuous
+-->
+
+---
+
 ## What we're building
 <!-- 1-3 paragraphs: concrete description of the product/project -->
 

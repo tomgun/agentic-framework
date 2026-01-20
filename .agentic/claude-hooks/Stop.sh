@@ -62,21 +62,16 @@ if [[ -f "JOURNAL.md" ]]; then
   fi
 fi
 
-# 3. Check if .continue-here.md is fresh
-if [[ ! -f ".continue-here.md" ]]; then
-  echo "💡 Tip: Generate .continue-here.md for next session"
-  echo "   Run: python3 .agentic/tools/continue_here.py"
-elif command -v stat >/dev/null 2>&1; then
-  if [[ "$(uname)" == "Darwin" ]]; then
-    CONTINUE_AGE_SECONDS=$(( $(date +%s) - $(stat -f %m .continue-here.md) ))
-  else
-    CONTINUE_AGE_SECONDS=$(( $(date +%s) - $(stat -c %Y .continue-here.md) ))
+# 3. Check if STATUS.md/PRODUCT.md has project phase
+if [[ -f "STATUS.md" ]]; then
+  if ! grep -q "## Project Phase" STATUS.md 2>/dev/null; then
+    echo "💡 Tip: Add Project Phase section to STATUS.md"
+    echo "   Phase: discovery | building"
   fi
-  
-  ONE_HOUR=$((60 * 60))
-  if [[ $CONTINUE_AGE_SECONDS -gt $ONE_HOUR ]]; then
-    echo "💡 Tip: Refresh .continue-here.md for next session"
-    echo "   Run: python3 .agentic/tools/continue_here.py"
+elif [[ -f "PRODUCT.md" ]]; then
+  if ! grep -q "## Project Phase" PRODUCT.md 2>/dev/null; then
+    echo "💡 Tip: Add Project Phase section to PRODUCT.md"
+    echo "   Phase: discovery | building"
   fi
 fi
 
@@ -99,8 +94,7 @@ else
   echo "Session end checklist:"
   echo "- [ ] Commit changes (git add + git commit)"
   echo "- [ ] Update JOURNAL.md with session summary"
-  echo "- [ ] Update STATUS.md or PRODUCT.md if needed"
-  echo "- [ ] Generate .continue-here.md for next session"
+  echo "- [ ] Update STATUS.md or PRODUCT.md (including Project Phase)"
 fi
 echo ""
 
