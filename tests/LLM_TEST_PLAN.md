@@ -102,7 +102,7 @@
 - [ ] Runs session_end checklist mentally
 - [ ] Updates JOURNAL.md with session summary
 - [ ] Mentions any uncommitted changes
-- [ ] Generates .continue-here.md or suggests it
+- [ ] Ensures STATUS.md/PRODUCT.md has current Project Phase
 - [ ] Provides clear handoff summary
 
 **Pass Criteria**: Agent doesn't just say "bye" - provides structured handoff.
@@ -339,7 +339,7 @@
 **Prompt**: (Continue after compaction)
 
 **Expected Agent Behavior**:
-- [ ] Reads .continue-here.md
+- [ ] Reads STATUS.md/PRODUCT.md (Project Phase section)
 - [ ] Resumes from last checkpoint
 - [ ] Doesn't lose track of work
 - [ ] .agentic/WIP.md helps recovery
