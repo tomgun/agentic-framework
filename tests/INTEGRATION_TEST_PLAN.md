@@ -66,7 +66,7 @@ But it does NOT verify:
 | Test ID | Description | Steps | Expected |
 |---------|-------------|-------|----------|
 | AGT-01 | Session start detection | Create .upgrade_pending, check session_start.md flow | Agent reads file, follows TODO |
-| AGT-02 | WIP tracking | Create WIP.md, simulate crash | Recovery info preserved |
+| AGT-02 | WIP tracking | Create .agentic/WIP.md, simulate crash | Recovery info preserved |
 | AGT-03 | Feature complete flow | Mark feature done | FEATURES.md updated |
 
 ### 6. Cross-Environment Tests
