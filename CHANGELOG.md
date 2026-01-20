@@ -5,6 +5,39 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-01-20
+
+### Changed
+- **STATUS.md now required for both Core and Core+PM profiles**
+  - Simplifies framework - one file for project state tracking
+  - PRODUCT.md becomes optional "vision document"
+  - Removes 30+ conditional code paths (`STATUS.md || PRODUCT.md`)
+  - Migration: `upgrade.sh` auto-creates STATUS.md for existing Core projects
+- **Project Phase concept** - STATUS.md tracks phase: `discovery` or `building`
+  - Discovery: Research, references, requirements gathering, initial designs
+  - Building: Iterative loop (specs, code, tests evolve together)
+- **F-0028 (continue_here.py) deprecated** - Superseded by Project Phase in STATUS.md
+
+### Added
+- **PR Tracking via HUMAN_NEEDED.md** - Universal PR notification at session start
+  - Primary: PRs tracked in HUMAN_NEEDED.md with "review" category (any git host)
+  - Backup: `gh pr list` check for GitHub users
+  - `blocker.sh` now supports "review" type for PR tracking
+  - `git_workflow.md` step 7: Track PR in HUMAN_NEEDED.md when creating
+- **F-0099: Branch Policy Safeguard** - Pre-push hook blocks direct pushes to main/master
+  - `--i-know-what-im-doing` flag for intentional direct pushes
+  - Integrated into `before_commit.md` checklist
+
+### Updated
+- 33 files updated for STATUS.md consolidation
+- Templates: STATUS.md required, PRODUCT.md optional with clear header
+- `scaffold.sh`: Creates STATUS.md for both profiles
+- `doctor.py`, `verify.py`: Profile detection and required files updated
+- `upgrade.sh`: Step 6 migrates Core projects to use STATUS.md
+- All hooks, checklists, agent guidelines simplified
+
+---
+
 ## [0.11.5] - 2026-01-20
 
 ### Added
