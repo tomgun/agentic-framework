@@ -21,7 +21,7 @@ echo "╚═══════════════════════�
 echo ""
 
 # Step 1: Read framework version
-echo -e "${BLUE}[1/5] Reading framework version${NC}"
+echo -e "${BLUE}[1/7] Reading framework version${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 if [[ -f "$SCRIPT_DIR/VERSION" ]]; then
@@ -35,7 +35,7 @@ fi
 echo ""
 
 # Step 2: Verify target directory
-echo -e "${BLUE}[2/5] Verifying target project${NC}"
+echo -e "${BLUE}[2/7] Verifying target project${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 if [[ ! -d "$TARGET_PROJECT_DIR" ]]; then
@@ -64,7 +64,7 @@ fi
 echo ""
 
 # Step 3: Copy .agentic/ folder
-echo -e "${BLUE}[3/5] Copying framework files${NC}"
+echo -e "${BLUE}[3/7] Copying framework files${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 if [[ -d ".agentic" ]]; then
@@ -84,7 +84,7 @@ echo -e "  ${GREEN}✓${NC} Scripts made executable"
 echo ""
 
 # Step 4: Run scaffold.sh
-echo -e "${BLUE}[4/5] Running scaffold script${NC}"
+echo -e "${BLUE}[4/7] Running scaffold script${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 echo "  Creating template files..."
@@ -100,7 +100,7 @@ fi
 echo ""
 
 # Step 5: Update STACK.md with framework version
-echo -e "${BLUE}[5/5] Setting framework version in STACK.md${NC}"
+echo -e "${BLUE}[5/7] Setting framework version in STACK.md${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 if [[ -f "STACK.md" ]]; then
@@ -131,6 +131,42 @@ if [[ -f "STACK.md" ]]; then
 else
   echo -e "  ${YELLOW}⚠ Warning: STACK.md not found${NC}"
   echo "    Scaffold may have failed"
+fi
+echo ""
+
+# Step 6: Generate Claude Skills (if subagents exist)
+echo -e "${BLUE}[6/7] Generating Claude Skills${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+if [[ -f ".agentic/tools/generate-skills.sh" ]] && [[ -d ".agentic/agents/claude/subagents" ]]; then
+  bash .agentic/tools/generate-skills.sh 2>/dev/null || true
+  if [[ -d ".claude/skills" ]]; then
+    SKILL_COUNT=$(ls -1 .claude/skills/ 2>/dev/null | wc -l | tr -d ' ')
+    echo -e "  ${GREEN}✓${NC} Generated $SKILL_COUNT Claude Skills in .claude/skills/"
+    echo "    Skills are auto-discovered by Claude Code based on task description."
+  fi
+else
+  echo -e "  ${YELLOW}⚠${NC} Skipping (no subagents found)"
+fi
+echo ""
+
+# Step 7: Offer to suggest project-specific agents
+echo -e "${BLUE}[7/7] Project-specific agents${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+if [[ -f ".agentic/tools/suggest-agents.sh" ]]; then
+  echo "  The framework can suggest specialized agents based on your tech stack."
+  echo ""
+  read -p "  Run agent suggestions now? [y/N] " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo ""
+    bash .agentic/tools/suggest-agents.sh
+  else
+    echo -e "  ${YELLOW}⚠${NC} Skipped. Run later with: bash .agentic/tools/suggest-agents.sh"
+  fi
+else
+  echo -e "  ${YELLOW}⚠${NC} suggest-agents.sh not found"
 fi
 echo ""
 
