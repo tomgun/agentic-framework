@@ -5,7 +5,7 @@ I want to run a retrospective on this project.
 Please conduct a comprehensive review:
 
 1. **Project health check:**
-   - Review `STATUS.md` or `PRODUCT.md` - is it accurate and up-to-date?
+   - Review `STATUS.md` - is it accurate and up-to-date?
    - Check `JOURNAL.md` - are entries recent and meaningful?
    - For Core+PM: Review `spec/FEATURES.md` - do statuses match reality?
    - Check `HUMAN_NEEDED.md` - any stale items?
@@ -58,7 +58,7 @@ Please conduct a comprehensive review:
    - Add high-priority items to `HUMAN_NEEDED.md` if human decision needed
 
 9. **Update project docs:**
-   - Update `STATUS.md`/`PRODUCT.md` with insights
+   - Update `STATUS.md` with insights
    - Add JOURNAL.md entry summarizing retro
    - Update `.agentic/STACK.md` if process changes needed
 

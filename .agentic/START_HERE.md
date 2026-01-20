@@ -77,11 +77,8 @@ Files at your repo root:
 # Get quick context
 bash .agentic/tools/brief.sh
 
-# Or generate a comprehensive continue-here document
-python3 .agentic/tools/continue_here.py
-
 # Check status
-cat STATUS.md  # or cat PRODUCT.md (in Core mode)
+cat STATUS.md
 
 # See recent progress
 tail -50 JOURNAL.md
@@ -95,10 +92,10 @@ tail -50 JOURNAL.md
 
 ### Starting a session (agent)
 Agents should read in this order:
-1. `.continue-here.md` (if exists - quick recovery document)
+1. `STATUS.md` (current focus, next steps)
 2. `CONTEXT_PACK.md` (where things are, how to run)
-3. `STATUS.md` or `PRODUCT.md` (current focus, next steps)
-4. `JOURNAL.md` last 2-3 entries (recent progress)
+3. `JOURNAL.md` last 2-3 entries (recent progress)
+4. `HUMAN_NEEDED.md` (blockers requiring attention)
 5. Relevant feature acceptance criteria (if Core+PM mode)
 
 See [`.agentic/token_efficiency/reading_protocols.md`](token_efficiency/reading_protocols.md) for details.

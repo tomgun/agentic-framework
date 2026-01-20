@@ -195,8 +195,7 @@ After compaction, I'll resume with full context from .continue-here.md
 Session end checklist:
 - [ ] Commit changes (git add + git commit)
 - [ ] Update JOURNAL.md with session summary
-- [ ] Update STATUS.md or PRODUCT.md if needed
-- [ ] Generate .continue-here.md for next session
+- [ ] Update STATUS.md if needed
 ```
 
 ---

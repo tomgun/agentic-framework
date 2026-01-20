@@ -1,10 +1,24 @@
 #!/usr/bin/env python3
 """
+⚠️ DEPRECATED: This tool is deprecated as of v0.12.0
+
+The functionality is now covered by:
+- STATUS.md: Contains "Project Phase" section (discovery | building)
+- session_start.md checklist: Guides agents to read project state
+- WIP.md: Handles interrupted work detection
+
+The separate .continue-here.md file was redundant with existing mechanisms.
+Agents should read STATUS.md directly at session start.
+
+This file is kept for backwards compatibility but may be removed in a future version.
+
+---
+
 continue_here.py: Generate .continue-here.md for quick context recovery
 
 This tool synthesizes information from:
 - JOURNAL.md (recent work)
-- STATUS.md/PRODUCT.md (current state)
+- STATUS.md (current state)
 - HUMAN_NEEDED.md (blockers)
 - spec/FEATURES.md (active features, if PM mode)
 - .agentic/pipeline/ (active pipelines, if PM mode)

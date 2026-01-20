@@ -90,6 +90,7 @@ echo "OK  : ensured directories docs/, docs/research/, docs/architecture/diagram
 
 copy_if_missing "${ROOT_DIR}/.agentic/init/STACK.template.md" "${ROOT_DIR}/STACK.md"
 copy_if_missing "${ROOT_DIR}/.agentic/init/CONTEXT_PACK.template.md" "${ROOT_DIR}/CONTEXT_PACK.md"
+copy_if_missing "${ROOT_DIR}/.agentic/init/STATUS.template.md" "${ROOT_DIR}/STATUS.md"
 copy_if_missing "${ROOT_DIR}/.agentic/init/PRODUCT.template.md" "${ROOT_DIR}/PRODUCT.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/JOURNAL.template.md" "${ROOT_DIR}/JOURNAL.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/HUMAN_NEEDED.template.md" "${ROOT_DIR}/HUMAN_NEEDED.md"
@@ -182,7 +183,7 @@ fi
 mkdir -p "${ROOT_DIR}/spec" "${ROOT_DIR}/spec/adr" "${ROOT_DIR}/spec/tasks" "${ROOT_DIR}/spec/acceptance"
 echo "OK  : ensured directories spec/, spec/adr, spec/tasks, spec/acceptance"
 
-copy_if_missing "${ROOT_DIR}/.agentic/init/STATUS.template.md" "${ROOT_DIR}/STATUS.md"
+# Note: STATUS.md already created above (shared by both profiles)
 
 # Seed specs (use framework templates if present; otherwise placeholders).
 if [[ ! -f "${ROOT_DIR}/spec/PRD.md" ]]; then

@@ -507,18 +507,21 @@
 
 ## F-0028: Continue-Here Generator
 
-**Status**: shipped  
-**Priority**: medium  
-**Complexity**: medium  
+**Status**: deprecated
+**Priority**: low
+**Complexity**: medium
 **Since**: v0.3.5
+**Deprecated**: v0.12.0
 
-**Description**: Generate `.continue-here.md` for quick context recovery.
+**Description**: ~~Generate `.continue-here.md` for quick context recovery.~~
+
+**Superseded by**: Project Phase tracking in STATUS.md (see F-0071)
 
 **Dependencies**: F-0023, F-0024
 
 **Implementation**:
-- State: complete
-- Code: `.agentic/tools/continue_here.py`
+- State: deprecated (backwards compatible)
+- Code: `.agentic/tools/continue_here.py` (deprecated)
 - Tests: script validation
 
 **Acceptance**: See `spec/acceptance/F-0028.md`

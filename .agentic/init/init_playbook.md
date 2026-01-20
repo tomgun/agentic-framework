@@ -557,7 +557,7 @@ Common blockers discovered during init:
 **Accomplished**:
 - Initialized [Project Name] with [Stack]
 - Profile: [Core | Core+PM]
-- Created STACK.md, PRODUCT.md/STATUS.md, CONTEXT_PACK.md
+- Created STACK.md, STATUS.md, PRODUCT.md (optional), CONTEXT_PACK.md
 - Set up quality validation: [profile used]
 - Documented [X] human-needed items
 
@@ -590,5 +590,5 @@ Common blockers discovered during init:
 Init is not "one and done".
 - When stack changes: update `STACK.md` and record an ADR if it's a real decision.
 - When architecture changes: update `TECH_SPEC.md` (if Core+PM) or `CONTEXT_PACK.md` (if Core), and/or write an ADR.
-- When progress changes: update `STATUS.md` (Core+PM) or `PRODUCT.md` (Core).
+- When progress changes: update `STATUS.md`.
 - When onboarding cost rises: improve `CONTEXT_PACK.md`.

@@ -134,7 +134,7 @@ cat HUMAN_NEEDED.md
 
 ```bash
 # 1. Check what's happening (30 seconds)
-cat STATUS.md | head -30  # or cat PRODUCT.md in Core mode
+cat STATUS.md | head -30
 
 # 2. See recent progress (30 seconds)
 tail -30 JOURNAL.md
@@ -252,7 +252,7 @@ git push
 2. Check for blockers (HUMAN_NEEDED.md)
 3. Check for incomplete work from last session
 4. Present structured summary with prioritized options
-5. Suggest next work based on STATUS.md/PRODUCT.md
+5. Suggest next work based on STATUS.md
 
 **During Work**:
 - Update you on progress periodically
@@ -268,7 +268,7 @@ git push
 
 **Key behaviors that make collaboration fluent**:
 - ✅ **Proactively surface blockers**: HUMAN_NEEDED.md items presented at session start
-- ✅ **Context-aware suggestions**: Work suggestions from STATUS.md/PRODUCT.md, not random
+- ✅ **Context-aware suggestions**: Work suggestions from STATUS.md, not random
 - ✅ **Resume incomplete work**: Checks JOURNAL.md for stale/unfinished tasks
 - ✅ **Provide recaps**: When you return after a break, agent summarizes current state
 - ✅ **Make "what's next" obvious**: Always provides 2-3 prioritized options
@@ -606,7 +606,7 @@ The framework includes 30+ automation scripts in `.agentic/tools/`.
 #### `continue_here.py` - Generate Quick Context Recovery
 
 **What it does:**
-- Synthesizes `JOURNAL.md`, `STATUS.md`/`PRODUCT.md`, `HUMAN_NEEDED.md`, `FEATURES.md`, and pipeline files
+- Synthesizes `JOURNAL.md`, `STATUS.md`, `HUMAN_NEEDED.md`, `FEATURES.md`, and pipeline files
 - Creates a single `.continue-here.md` file with:
   - Quick summary of current state
   - Active features and pipelines

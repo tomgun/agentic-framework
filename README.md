@@ -252,7 +252,7 @@ Instead of stopping when tokens run out, **switch to another tool and keep worki
 **All environments read/write the same files:**
 - `JOURNAL.md` - Session history and decisions
 - `FEATURES.md` - Feature status and acceptance criteria
-- `STATUS.md` / `PRODUCT.md` - Current project state
+- `STATUS.md` - Current project state
 - `HUMAN_NEEDED.md` - Blockers requiring human action
 - Token-efficient scripts - Work in all environments (40x cheaper than file reads!)
 

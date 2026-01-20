@@ -20,7 +20,7 @@ def read_profile(root: Path) -> str:
 
     - Prefer explicit `Profile:` in STACK.md.
     - If not present, infer:
-      - If spec/ exists OR STATUS.md exists -> core+product (legacy default)
+      - If spec/ exists -> core+product
       - else -> core
     """
     stack = root / "STACK.md"
@@ -35,13 +35,13 @@ def read_profile(root: Path) -> str:
         except Exception:
             pass
 
-    if (root / "spec").is_dir() or (root / "STATUS.md").is_file():
+    if (root / "spec").is_dir():
         return "core+product"
     return "core"
 
 
 def core_checks(root: Path) -> list[str]:
-    required = ["STACK.md", "CONTEXT_PACK.md", "JOURNAL.md", "HUMAN_NEEDED.md", "AGENTS.md"]
+    required = ["STACK.md", "CONTEXT_PACK.md", "STATUS.md", "JOURNAL.md", "HUMAN_NEEDED.md", "AGENTS.md"]
     issues: list[str] = []
     for p in required:
         if not (root / p).exists():
