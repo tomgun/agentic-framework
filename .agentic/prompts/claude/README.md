@@ -82,7 +82,7 @@ Projects in Claude Pro provide:
    Keep documentation updated in the same commit as code.
    ```
 3. Add key files as project context:
-   - `PRODUCT.md` or `STATUS.md`
+   - `STATUS.md`
    - `spec/FEATURES.md` (if Core+PM mode)
    - `STACK.md`
    - `.agentic/START_HERE.md`

@@ -19,7 +19,7 @@
 ## 1. Silently Read Context
 
 ```bash
-cat STATUS.md 2>/dev/null || cat PRODUCT.md 2>/dev/null
+cat STATUS.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
 ls .agentic/WIP.md 2>/dev/null
 cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
@@ -33,7 +33,7 @@ cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
 👋 Welcome back! Here's where we are:
 
 **Last session**: [From JOURNAL.md or STATUS.md]
-**Current focus**: [From STATUS.md or PRODUCT.md]
+**Current focus**: [From STATUS.md]
 
 **Next steps** (pick one or tell me something else):
 1. [Next planned task]
@@ -277,7 +277,7 @@ rm .agentic/.upgrade_pending
 **RULE**: Each agent works on ONE feature at a time. Never have multiple features "in_progress" for the same agent.
 
 **Before starting new feature:**
-1. Check spec/FEATURES.md (or PRODUCT.md in Core mode) for any "in_progress" features *assigned to you*
+1. Check spec/FEATURES.md for any "in_progress" features *assigned to you*
 2. If found: **Complete that feature FIRST** or mark as "blocked"
 3. Only then start new feature
 

@@ -32,7 +32,7 @@ Please verify and update:
 
 5. **Update documentation:**
    - `JOURNAL.md`: Log completion and any final notes
-   - `STATUS.md` or `PRODUCT.md`: Update current focus/next steps
+   - `STATUS.md`: Update current focus/next steps
    - User-facing docs (if needed): Update README, guides, etc.
 
 6. **Final verification:**

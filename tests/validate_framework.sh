@@ -912,10 +912,16 @@ else
   fail "Core: spec/ should not exist in Core profile"
 fi
 
+if [[ -f "STATUS.md" ]]; then
+  pass "Core: STATUS.md exists"
+else
+  fail "Core: STATUS.md missing (now required for both profiles)"
+fi
+
 if [[ -f "PRODUCT.md" ]]; then
   pass "Core: PRODUCT.md exists"
 else
-  fail "Core: PRODUCT.md missing"
+  warn "Core: PRODUCT.md missing (optional but created by default)"
 fi
 
 if [[ -f "STACK.md" ]]; then
@@ -1029,6 +1035,21 @@ fi
 
 # Return to framework root
 cd "${FRAMEWORK_ROOT}"
+
+# ============================================================
+# CODE QUALITY CHECKS
+# ============================================================
+echo ""
+echo "--- Code Quality Checks ---"
+
+# Check for no remaining STATUS.md || PRODUCT.md conditional patterns in core files
+# (These should have been consolidated in v0.12.0)
+CONDITIONAL_COUNT=$(grep -r "STATUS.md.*||.*PRODUCT.md\|cat STATUS.md.*cat PRODUCT.md" .agentic/ --include="*.md" --include="*.sh" 2>/dev/null | wc -l | tr -d ' ')
+if [[ "$CONDITIONAL_COUNT" -eq 0 ]]; then
+  pass "No STATUS.md||PRODUCT.md conditional patterns found"
+else
+  warn "Found $CONDITIONAL_COUNT files with STATUS.md||PRODUCT.md conditionals (review for consolidation)"
+fi
 
 # ============================================================
 # Summary

@@ -309,7 +309,7 @@ def read_profile(root: Path) -> str:
 
     - Prefer explicit `Profile:` in STACK.md.
     - If not present, infer:
-      - If spec/ exists OR STATUS.md exists -> core+product (legacy default)
+      - If spec/ exists -> core+product
       - else -> core
     """
     stack = root / "STACK.md"
@@ -324,7 +324,7 @@ def read_profile(root: Path) -> str:
         except Exception:
             pass
 
-    if (root / "spec").is_dir() or (root / "STATUS.md").is_file():
+    if (root / "spec").is_dir():
         return "core+product"
     return "core"
 
@@ -333,7 +333,7 @@ def checks_for_profile(profile: str) -> list[Check]:
     core = [
         Check("AGENTS.md", "file", "agent entrypoint (rules + read-first)"),
         Check("CONTEXT_PACK.md", "file", "durable starting context"),
-        Check("PRODUCT.md", "file", "what we're building + current state"),
+        Check("STATUS.md", "file", "current focus + next steps"),
         Check("STACK.md", "file", "how to run/test + constraints"),
         Check("JOURNAL.md", "file", "session-by-session progress log"),
         Check("HUMAN_NEEDED.md", "file", "escalation protocol"),
@@ -344,7 +344,6 @@ def checks_for_profile(profile: str) -> list[Check]:
 
     # core+product
     return core + [
-        Check("STATUS.md", "file", "current focus + next steps"),
         Check("spec", "dir", "project truth folder"),
         Check("spec/OVERVIEW.md", "file", "vision + current state + pointers"),
         Check("spec/FEATURES.md", "file", "feature registry + acceptance + tests"),
