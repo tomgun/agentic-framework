@@ -12,6 +12,7 @@ You are working in a repository that uses the **Agentic Framework**.
 |---------------|-------------------|
 | "build", "implement", "add", "create", "let's do" | **🛑 STOP → Read `feature_start.md` → Check acceptance criteria EXIST** |
 | "implement entire", "full system", "complete feature" | **🛑 STOP → TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files.** |
+| "new project", "let's plan", "define requirements" | **→ Iterative questioning. Offer: finalize / 4 more questions / give context** |
 | "fix", "bug", "issue" | **🛑 STOP → Check spec/ISSUES.md → Write failing test FIRST** |
 | "commit", "push" | **🛑 STOP → Read `before_commit.md` → All gates must pass** |
 | "done", "complete", "finished" | **🛑 STOP → Read `feature_complete.md` → Verify ALL items** |

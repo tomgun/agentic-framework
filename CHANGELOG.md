@@ -5,6 +5,30 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.5] - 2026-01-20
+
+### Added
+- **F-0098: Generate Claude Skills from Subagents** - Auto-discovered capabilities
+  - `generate-skills.sh` creates `.claude/skills/` from subagent definitions
+  - 10 skills: research, review, test, implementation, explore, planning, etc.
+  - Skills auto-discovered by Claude Code based on task description
+  - Single source of truth: `.agentic/agents/claude/subagents/*.md`
+- **LLM Behavioral Tests Expanded** - From 5 to 11 tests, all passing
+  - Section-based organization: session, trigger, scripts, commit, context
+  - Compartmentalized testing: `--section`, `--critical` options
+  - Multi-model comparison: `--compare-models` (Opus vs Sonnet)
+  - Cost controls: `REGRESSION_GUIDE.md` with budget limits
+- **Iterative Requirements Gathering** - New guideline
+  - Agents offer options: finalize, ask more questions, get more context
+  - Prevents premature assumption that enough info was gathered
+
+### Changed
+- `install.sh` now generates Claude Skills (Step 6) and offers agent suggestions (Step 7)
+- `upgrade.sh` regenerates Skills (Step 5b), preserves custom skills
+- Pre-commit hook now checks agent instruction file sizes (advisory)
+
+---
+
 ## [0.11.3] - 2026-01-15
 
 ### Added

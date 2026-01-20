@@ -851,8 +851,80 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 
 ---
 
+## v0.11.5 Contributions (2026-01-20)
+
+### Automated LLM Test Suite Expansion
+
+**User feedback on initial test results**:
+> After running tests: 7/10 passing, 3 failing
+
+**Result - Full Test Suite**:
+- Expanded from 5 to 11 behavioral tests
+- All tests passing after guideline improvements
+- Tests organized by section: session, trigger, scripts, commit, context
+
+### Compartmentalized Testing
+
+**User concern**:
+> "one thing i'm worried about... adding new info might bloat the context and the agents might not consider the instructions like before the changes"
+> "running ALL tests after a change will be really costly tokenwise"
+
+**Result - Cost-Effective Testing**:
+- `--section <name>` option to run tests by category
+- `--critical` option for quick 3-test check
+- `--sections` to list available sections
+- `REGRESSION_GUIDE.md` with budget limits (CLAUDE.md ≤ 500 lines)
+- Test → Guideline mapping for targeted regression testing
+
+### Multi-Model Comparison
+
+**User request**:
+> "If Sonnet and Opus behave differently, should critical tests be run on both models in CI?"
+
+**Result**:
+- `--compare-models` option runs tests on both Opus and Sonnet
+- Generates `model-compatibility.md` report
+- Shows which tests pass on which model
+- Recommendations for model-specific behaviors
+
+### Claude Skills Generation (F-0098)
+
+**User question**:
+> "In Claude Code, do we use 'ask user mode' (with tabs?) or skills?"
+> "could we use skills for specific tasks like research, creating mockups/design systems, reviewing code etc?"
+
+**Discussion about architecture**:
+> "What's best in the long run for the framework to work as intended?"
+
+**Result - Generate Skills from Subagents**:
+- `generate-skills.sh` creates `.claude/skills/` from `.agentic/agents/claude/subagents/`
+- Skills are auto-discovered by Claude Code based on task description
+- Single source of truth maintained (subagent markdown files)
+- 10 skills generated: research, review, test, implementation, explore, etc.
+- `install.sh` Step 6: Generates skills automatically
+- `install.sh` Step 7: Offers to suggest project-specific agents
+- `upgrade.sh` Step 5b: Regenerates skills (preserves custom)
+
+**Key Architecture Decision**:
+- Subagents remain source of truth (tool-agnostic)
+- Skills are generated output (Claude-specific)
+- Custom skills preserved during regeneration
+- Cursor/Copilot users still have subagent definitions
+
+### Iterative Requirements Gathering Guideline
+
+**User insight**:
+> "Don't let the AI assume it has asked enough questions and got enough information, when envisioning the project, creating acceptance criteria etc. offer for example to a) finalize the brief/whatever b) ask 4 more questions c) let me give more context d) free text input"
+
+**Result**:
+- Added explicit guideline to agent operating guidelines
+- Agents now offer options to continue gathering context
+- Further questions dive deeper/broader into the topic
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.11.3
+**Current Version**: v0.11.5
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 
