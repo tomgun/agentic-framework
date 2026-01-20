@@ -19,6 +19,35 @@
 - Learn from the agent's changes
 - Maintain control over their repository
 
+## Branch Policy: Never Push Directly to Main
+
+**🚨 CRITICAL RULE FOR AGENTS:**
+
+**NEVER push directly to `main` or `master` branch.**
+
+**Before committing, always check:**
+```bash
+git branch --show-current
+```
+
+**If on `main`/`master`:**
+1. **STOP** - Do not commit
+2. **Ask user**: "I'm on main. Should I create a feature branch and PR, or push directly to main?"
+3. **Only push to main if user explicitly says** "push to main directly" or "yes, commit to main"
+
+**Default behavior:**
+- Create feature branch: `git checkout -b feature/short-description`
+- Make commits on feature branch
+- Create PR for review
+
+**Why?**
+- Direct commits to main skip code review
+- PRs provide review opportunity, CI checks, and audit trail
+- Easier to revert a PR than untangle commits on main
+- Team workflows expect PRs
+
+**Exception**: User explicitly grants permission for direct main commits.
+
 ## Workflow Modes
 
 Projects configure their Git workflow in `STACK.md`:
