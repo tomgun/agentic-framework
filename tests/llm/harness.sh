@@ -500,8 +500,14 @@ main() {
     fi
 
     if [[ "${1:-}" == "--critical" ]]; then
-        # Run only critical tests (001, 002, 003)
-        set -- "$SCRIPT_DIR/tests/001"*.sh "$SCRIPT_DIR/tests/002"*.sh "$SCRIPT_DIR/tests/003"*.sh
+        # Run only tests marked as "Category: Critical"
+        local critical_tests=()
+        for test_file in "$SCRIPT_DIR/tests"/*.sh; do
+            if grep -q "^# Category: Critical" "$test_file" 2>/dev/null; then
+                critical_tests+=("$test_file")
+            fi
+        done
+        set -- "${critical_tests[@]}"
     fi
 
     if [[ "${1:-}" == "--compare-models" ]]; then
