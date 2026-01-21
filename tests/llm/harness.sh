@@ -75,8 +75,8 @@ setup_test_project() {
     git config user.email "test@example.com"
     git config user.name "Test User"
 
-    # Install framework
-    bash "$FRAMEWORK_ROOT/install.sh" . --quiet 2>/dev/null || bash "$FRAMEWORK_ROOT/install.sh" .
+    # Install framework (echo 'n' to skip agent suggestions prompt)
+    echo "n" | bash "$FRAMEWORK_ROOT/install.sh" .
 
     # Create minimal project structure based on profile
     if [[ "$profile" == "core-pm" ]]; then
