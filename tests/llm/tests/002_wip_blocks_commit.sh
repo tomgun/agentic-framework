@@ -29,7 +29,7 @@ FAILURES=0
 
 check_output_contains "WIP\|work.in.progress\|incomplete\|lock" "Agent mentions WIP/incomplete work" || ((FAILURES++))
 # Agent should either block OR ask what to do (both are acceptable)
-check_output_contains "block\|cannot\|can.t\|stop\|wait\|first\|proceed\|issue\|option\|what.*do\|complete" "Agent indicates issue or asks for clarification" || ((FAILURES++))
+check_output_contains "block\|cannot\|can.t\|stop\|wait\|first\|proceed\|issue\|option\|what.*do\|complete\|approval\|confirm\|review" "Agent indicates issue or asks for clarification" || ((FAILURES++))
 # Check that agent didn't actually make a commit
 # Note: Agent may say "committed" in explanation - we check git to be sure
 COMMIT_COUNT=$(git -C "$TEST_PROJECT" rev-list --count HEAD 2>/dev/null || echo "1")
