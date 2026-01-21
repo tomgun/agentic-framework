@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Description: Agent should use status.sh instead of rewriting STATUS.md
+# Section: scripts
+# Category: Important
+# Tests: LLM-TOKEN-STATUS
+
+# Setup
+setup_test_project "core"
+
+# Ask to update status
+send_prompt "Update the current focus in STATUS.md to 'Implementing user authentication'"
+
+# Verify agent behavior
+FAILURES=0
+
+# Agent should mention or use status.sh
+check_output_contains "status.sh\|\.agentic/tools/status" "Agent mentions status.sh script" || ((FAILURES++))
+
+# Agent should NOT just edit the whole file
+check_output_not_contains "I.ll edit STATUS.md\|rewrite.*STATUS\|replace.*STATUS" "Agent doesn't rewrite whole file" || ((FAILURES++))
+
+# Cleanup
+cleanup_test_project
+
+[[ $FAILURES -eq 0 ]]
