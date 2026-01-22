@@ -28,11 +28,10 @@
   - Next immediate step: Clear, actionable next step
   - Blockers: Document any blockers encountered
 
-- [ ] **`PRODUCT.md` reflects current state** (if exists)
+- [ ] **`PRODUCT.md` updated** (optional - only if project has one)
   - Completed capabilities marked [x]
   - "What works now" is accurate
-  - "Known limitations" is current
-  - No stale information
+  - Skip if project uses STATUS.md only
 
 - [ ] **`CONTEXT_PACK.md` updated** (if anything changed)
   - New modules/components documented

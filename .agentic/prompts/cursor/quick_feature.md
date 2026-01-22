@@ -42,7 +42,8 @@ Please follow this streamlined workflow for Core mode:
 **Core Mode Philosophy:**
 - Lighter process than Core+PM
 - No formal specs, but still maintain quality
-- `PRODUCT.md` is your single source of truth
+- `STATUS.md` tracks current focus and progress
+- `PRODUCT.md` (optional) captures detailed vision
 - TDD ensures quality without heavy process
 - Documentation stays current
 

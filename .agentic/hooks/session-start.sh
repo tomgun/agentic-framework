@@ -72,21 +72,16 @@ echo "   - Architecture snapshot"
 echo "   - Known constraints"
 echo ""
 
-if [[ "$PROFILE" == "core" ]]; then
-  echo "2. PRODUCT.md (~300-800 tokens)"
-  echo "   - What we're building"
-  echo "   - What's done"
-  echo "   - What's next"
-  echo ""
-elif [[ "$PROFILE" == "core+product" ]]; then
-  echo "2. STATUS.md (~300-800 tokens)"
-  echo "   - Current focus"
-  echo "   - What's in progress"
-  echo "   - Next steps"
-  echo "   - Known blockers"
-  echo ""
-else
-  echo "2. STATUS.md (if exists)"
+# STATUS.md is required for all profiles (v0.12.0+)
+echo "2. STATUS.md (~300-800 tokens)"
+echo "   - Project phase (discovery | building)"
+echo "   - Current focus"
+echo "   - What's in progress"
+echo "   - Next steps"
+echo "   - Known blockers"
+echo ""
+if [[ -f "PRODUCT.md" ]]; then
+  echo "   Optional: PRODUCT.md exists - read for detailed project vision"
   echo ""
 fi
 
