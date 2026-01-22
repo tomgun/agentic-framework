@@ -60,9 +60,9 @@
 | Principle | Spec | Test | Status |
 |-----------|------|------|--------|
 | Use journal.sh (append-only) | F-0071 | 004_uses_journal_script | ✅ |
-| Use status.sh (field updates) | F-0071 | 018_uses_status_script | ⚠️ Flaky |
-| Use blocker.sh (append-only) | F-0071 | 019_uses_blocker_script | ⚠️ Flaky |
-| Use feature.sh (field updates) | F-0071 | 020_uses_feature_script | ⚠️ Flaky |
+| Use status.sh (field updates) | F-0071 | 018_uses_status_script | ⚠️ Improved |
+| Use blocker.sh (append-only) | F-0071 | 019_uses_blocker_script | ⚠️ Improved |
+| Use feature.sh (field updates) | F-0071 | 020_uses_feature_script | ⚠️ Improved |
 | No full file read for append | F-0071 | 021_no_full_file_read | ✅ |
 
 ### 5. Multi-Agent Coordination
@@ -109,12 +109,12 @@
 | 015_session_end_summary | ⚠️ Flaky | Passes individually |
 | 016_pr_tracking_human_needed | ⚠️ Flaky | Agent not always mentioning tracking |
 | 017_untracked_files_check | ⚠️ Flaky | Passes individually |
-| 018_uses_status_script | ❌ Fail | Agent edits directly, not using script |
-| 019_uses_blocker_script | ❌ Fail | Agent edits directly, not using script |
-| 020_uses_feature_script | ❌ Fail | Agent edits directly, not using script |
+| 018_uses_status_script | ⚠️ Improved | Trigger table added to CLAUDE.md, test prompt naturalized |
+| 019_uses_blocker_script | ⚠️ Improved | Trigger table added to CLAUDE.md, test prompt naturalized |
+| 020_uses_feature_script | ⚠️ Improved | Trigger table added to CLAUDE.md, test prompt naturalized |
 | 021_no_full_file_read | ✅ Pass | |
 
-**Summary**: 17/21 reliable, 4 need guideline improvements
+**Summary**: 17/21 reliable, 4 improved (018-020 guidelines updated, need re-test)
 
 ---
 
