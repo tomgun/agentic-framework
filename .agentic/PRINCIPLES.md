@@ -769,8 +769,8 @@ Type 'a' or 'b':
 **How Enforced**:
 - STACK.md has `Profile:` field
 - agent_operating_guidelines.md checks profile
-- Core: minimal ceremony (PRODUCT.md)
-- Core+PM: formal tracking (spec/, STATUS.md)
+- Core: minimal ceremony (STATUS.md, optional PRODUCT.md)
+- Core+PM: formal tracking (STATUS.md + spec/)
 
 **Example**: 
 - Core: Weekend project, prototype, external PM → Use Core
