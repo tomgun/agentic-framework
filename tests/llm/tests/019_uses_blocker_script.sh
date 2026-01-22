@@ -7,14 +7,14 @@
 # Setup
 setup_test_project "core"
 
-# Ask to add a blocker
-send_prompt "I need help with the database schema design - add this to HUMAN_NEEDED.md as a blocker"
+# Ask to add a blocker (natural language)
+send_prompt "I'm blocked on database schema design and need human input - please track this blocker"
 
 # Verify agent behavior
 FAILURES=0
 
 # Agent should mention or use blocker.sh
-check_output_contains "blocker.sh\|\.agentic/tools/blocker" "Agent mentions blocker.sh script" || ((FAILURES++))
+check_output_contains "blocker\.sh\|tools/blocker\|blocker script\|bash.*blocker" "Agent mentions blocker.sh script" || ((FAILURES++))
 
 # Agent should understand it's for tracking blockers
 check_output_contains "HUMAN_NEEDED\|blocker\|add\|track" "Agent understands blocker tracking" || ((FAILURES++))

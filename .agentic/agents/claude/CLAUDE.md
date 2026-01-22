@@ -16,8 +16,18 @@ You are working in a repository that uses the **Agentic Framework**.
 | "fix", "bug", "issue" | **🛑 STOP → Check spec/ISSUES.md → Write failing test FIRST** |
 | "commit", "push" | **🛑 STOP → Read `before_commit.md` → All gates must pass** |
 | "done", "complete", "finished" | **🛑 STOP → Read `feature_complete.md` → Verify ALL items** |
-| "update journal", "log this", "add to journal" | **🛑 STOP → Use `bash .agentic/tools/journal.sh` NOT file edit** |
 | "what is this project", "what am I working on" | **→ Read CONTEXT_PACK.md FIRST, then answer** |
+
+### 🛑 TOKEN-EFFICIENT SCRIPTS (MUST USE - Never edit these files directly!)
+
+| When updating... | USE THIS SCRIPT | NOT direct file edit |
+|------------------|-----------------|----------------------|
+| JOURNAL.md | `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"` | ❌ Read/Edit |
+| STATUS.md (focus, progress) | `bash .agentic/tools/status.sh focus "Task"` | ❌ Read/Edit |
+| HUMAN_NEEDED.md (blockers) | `bash .agentic/tools/blocker.sh add "Title" "type" "Details"` | ❌ Read/Edit |
+| spec/FEATURES.md | `bash .agentic/tools/feature.sh F-#### status shipped` | ❌ Read/Edit |
+
+**WHY**: Scripts append/update fields without reading whole file = 40x cheaper tokens.
 
 ## 🚫 DO NOT PROCEED UNTIL:
 
