@@ -135,6 +135,21 @@ d) 💬 **Free input** - Tell me anything else relevant
 
 ---
 
+## Token-Efficient Scripts (MUST USE)
+
+**🛑 NEVER edit these files directly - use scripts instead:**
+
+| File to Update | USE THIS SCRIPT | Why |
+|----------------|-----------------|-----|
+| JOURNAL.md | `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"` | Append-only, no read |
+| STATUS.md | `bash .agentic/tools/status.sh focus "Task"` | Field update, no rewrite |
+| HUMAN_NEEDED.md | `bash .agentic/tools/blocker.sh add "Title" "type" "Details"` | Append-only |
+| spec/FEATURES.md | `bash .agentic/tools/feature.sh F-#### status shipped` | Field update |
+
+**Savings**: Scripts are 40x cheaper than read-edit-write cycles.
+
+---
+
 ## Quick Checklist References
 
 | Task | Read This First |

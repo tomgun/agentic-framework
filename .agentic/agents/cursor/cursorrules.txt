@@ -11,3 +11,9 @@ Rules:
 - Update STATUS.md after meaningful progress.
 - Keep changes small and scoped.
 
+Token-efficient scripts (USE THESE, don't edit files directly):
+- JOURNAL.md: bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"
+- STATUS.md: bash .agentic/tools/status.sh focus "Task"
+- HUMAN_NEEDED.md: bash .agentic/tools/blocker.sh add "Title" "type" "Details"
+- FEATURES.md: bash .agentic/tools/feature.sh F-#### status shipped
+
