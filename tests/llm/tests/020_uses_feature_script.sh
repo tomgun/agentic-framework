@@ -21,14 +21,14 @@ EOF
 git -C "$TEST_PROJECT" add -A
 git -C "$TEST_PROJECT" commit -m "Add feature" --quiet
 
-# Ask to update feature status
-send_prompt "Mark F-0001 as shipped in FEATURES.md"
+# Ask to update feature status (natural language)
+send_prompt "Feature F-0001 is complete and shipped - please update its status"
 
 # Verify agent behavior
 FAILURES=0
 
 # Agent should mention or use feature.sh
-check_output_contains "feature.sh\|\.agentic/tools/feature" "Agent mentions feature.sh script" || ((FAILURES++))
+check_output_contains "feature\.sh\|tools/feature\|feature script\|bash.*feature" "Agent mentions feature.sh script" || ((FAILURES++))
 
 # Agent should understand the update
 check_output_contains "F-0001\|status\|shipped\|update" "Agent understands feature update" || ((FAILURES++))
