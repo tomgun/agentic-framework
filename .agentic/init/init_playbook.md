@@ -5,9 +5,9 @@ Goal: in one short planning session, produce **durable repo artifacts** so any a
 ## Outputs (authoritative context)
 Create/update these at repo root:
 - `STACK.md` (from `.agentic/init/STACK.template.md`)
-- `PRODUCT.md` (from `.agentic/init/PRODUCT.template.md`) - for Core mode
+- `STATUS.md` (from `.agentic/init/STATUS.template.md`) - required for both profiles
 - `CONTEXT_PACK.md` (from `.agentic/init/CONTEXT_PACK.template.md`)
-- `STATUS.md` (from `.agentic/init/STATUS.template.md`) - for Core+PM mode
+- `PRODUCT.md` (from `.agentic/init/PRODUCT.template.md`) - optional detailed vision
 - `/spec/` (from `.agentic/spec/*.template.md`) - for Core+PM mode
 - `spec/adr/` (directory exists; can be empty at start)
 
@@ -29,8 +29,8 @@ This creates all expected files/folders with templates/placeholders so you can s
 > **a) Core (Full Framework, Lightweight Planning)**
 > - All framework capabilities: context optimization, multi-agent, TDD, quality gates
 > - Session continuity, token efficiency, green coding, /verify command
-> - Lightweight planning (PRODUCT.md with checkboxes)
-> - Optional STATUS.md for current focus
+> - STATUS.md for project phase and current focus
+> - Optional PRODUCT.md for detailed vision
 > - Good for: Small projects, prototypes, external PM tools (Jira/Linear)
 >
 > **b) Core + Product Management (Formal Specs)**
@@ -54,8 +54,8 @@ This creates all expected files/folders with templates/placeholders so you can s
 - ✅ Human escalation (HUMAN_NEEDED.md)
 - ✅ Research mode
 - ✅ `/verify` command for human-assisted quality
-- ✅ `PRODUCT.md` for lightweight planning (checkboxes)
-- ✅ Optional `STATUS.md` for current focus
+- ✅ `STATUS.md` for project phase and current focus
+- ✅ Optional `PRODUCT.md` for detailed vision (checkboxes)
 - ✅ Minimal ceremony, fast iteration
 - **Good for**:
   - Small/simple projects or prototypes
@@ -480,11 +480,11 @@ Type a/b/c/d:"
 
 ### For all profiles:
 - **`STACK.md`**: Fill in tech stack, versions, how to run/test
-- **`PRODUCT.md`**: What we're building, core capabilities (as checkboxes), technical approach, scope
+- **`STATUS.md`**: Project phase, current focus, what's next
 - **`CONTEXT_PACK.md`**: Architecture overview, key decisions, how it works
+- **`PRODUCT.md`** (optional): Detailed vision, core capabilities, scope
 
 ### For Core+PM profile additionally:
-- **`STATUS.md`**: Current focus, roadmap phases, known issues
 - **`spec/PRD.md`**: Why we're building this, goals, requirements
 - **`spec/TECH_SPEC.md`**: How we're building it, architecture, data models
 - **`spec/FEATURES.md`**: Seed with 2-3 initial features (F-0001, F-0002, etc.)
