@@ -141,8 +141,17 @@
 ## Running Tests
 
 ```bash
-# All tests
+# All tests (stops on rate limit, saves progress)
 bash tests/llm/harness.sh
+
+# Resume after rate limit (skips already-passed tests)
+bash tests/llm/harness.sh --resume
+
+# Check current progress
+bash tests/llm/harness.sh --status
+
+# Start fresh (clear saved state)
+bash tests/llm/harness.sh --reset
 
 # Critical only
 bash tests/llm/harness.sh --critical
@@ -156,3 +165,9 @@ bash tests/llm/harness.sh tests/llm/tests/001_session_start.sh
 # Compare models
 bash tests/llm/harness.sh --compare-models
 ```
+
+**Rate Limit Workflow:**
+1. Run tests: `bash tests/llm/harness.sh`
+2. When rate limited, progress is saved automatically
+3. Check status: `bash tests/llm/harness.sh --status`
+4. Resume later: `bash tests/llm/harness.sh --resume`
