@@ -6,6 +6,9 @@
 #
 # Usage:
 #   bash tests/llm/harness.sh                    # Run all tests
+#   bash tests/llm/harness.sh --resume           # Resume from last run (skip passed tests)
+#   bash tests/llm/harness.sh --status           # Show current run status
+#   bash tests/llm/harness.sh --reset            # Clear saved state, start fresh
 #   bash tests/llm/harness.sh tests/llm/tests/001_session_start.sh  # Run specific test
 #   bash tests/llm/harness.sh --list             # List available tests
 #   bash tests/llm/harness.sh --compare-models   # Run on Opus + Sonnet, generate report
@@ -56,6 +59,121 @@ NC='\033[0m'
 TEST_PROJECT=""
 LAST_OUTPUT=""
 LAST_OUTPUT_FILE=""
+
+# State persistence for incremental runs
+STATE_FILE="$SCRIPT_DIR/.test-state"
+RESUME_MODE="${RESUME_MODE:-0}"
+
+#=============================================================================
+# State Management Functions
+#=============================================================================
+
+# Initialize or load state file
+init_state() {
+    if [[ ! -f "$STATE_FILE" ]]; then
+        echo "# LLM Test State - $(date '+%Y-%m-%d %H:%M')" > "$STATE_FILE"
+        echo "# Format: test_name:result (pass|fail|skip|pending)" >> "$STATE_FILE"
+        echo "RUN_DATE=$(date '+%Y-%m-%d %H:%M')" >> "$STATE_FILE"
+        echo "MODEL=$CLAUDE_MODEL" >> "$STATE_FILE"
+    fi
+}
+
+# Save test result to state
+save_result() {
+    local test_name="$1"
+    local result="$2"  # pass, fail, rate_limit
+
+    # Remove any existing entry for this test
+    if [[ -f "$STATE_FILE" ]]; then
+        grep -v "^$test_name:" "$STATE_FILE" > "$STATE_FILE.tmp" || true
+        mv "$STATE_FILE.tmp" "$STATE_FILE"
+    fi
+
+    # Add new result
+    echo "$test_name:$result" >> "$STATE_FILE"
+}
+
+# Get test result from state
+get_result() {
+    local test_name="$1"
+    if [[ -f "$STATE_FILE" ]]; then
+        grep "^$test_name:" "$STATE_FILE" 2>/dev/null | cut -d: -f2 || echo ""
+    fi
+}
+
+# Check if test should be skipped (already passed in this run)
+should_skip_test() {
+    local test_name="$1"
+    if [[ "$RESUME_MODE" == "1" ]]; then
+        local result=$(get_result "$test_name")
+        if [[ "$result" == "pass" ]]; then
+            return 0  # Skip - already passed
+        fi
+    fi
+    return 1  # Don't skip
+}
+
+# Show current state status
+show_status() {
+    if [[ ! -f "$STATE_FILE" ]]; then
+        echo "No test run in progress. Start with: bash tests/llm/harness.sh"
+        return
+    fi
+
+    echo ""
+    echo "╔═══════════════════════════════════════════════════════════════╗"
+    echo "║         LLM Test Run Status                                   ║"
+    echo "╚═══════════════════════════════════════════════════════════════╝"
+    echo ""
+
+    local run_date=$(grep "^RUN_DATE=" "$STATE_FILE" | cut -d= -f2)
+    local model=$(grep "^MODEL=" "$STATE_FILE" | cut -d= -f2)
+    echo "Run started: $run_date"
+    echo "Model: $model"
+    echo ""
+
+    local passed=$(grep ":pass$" "$STATE_FILE" | wc -l | tr -d ' ')
+    local failed=$(grep ":fail$" "$STATE_FILE" | wc -l | tr -d ' ')
+    local rate_limited=$(grep ":rate_limit$" "$STATE_FILE" | wc -l | tr -d ' ')
+    local total_tests=$(ls "$SCRIPT_DIR/tests"/*.sh 2>/dev/null | wc -l | tr -d ' ')
+    local completed=$((passed + failed))
+    local remaining=$((total_tests - completed))
+
+    echo "Progress: $completed/$total_tests completed"
+    echo "  ✓ Passed: $passed"
+    echo "  ✗ Failed: $failed"
+    if [[ $rate_limited -gt 0 ]]; then
+        echo "  ⚠ Rate limited: $rate_limited (will retry on resume)"
+    fi
+    echo "  ○ Remaining: $remaining"
+    echo ""
+
+    if [[ $remaining -gt 0 || $rate_limited -gt 0 ]]; then
+        echo "Resume with: bash tests/llm/harness.sh --resume"
+    else
+        echo "Run complete! Reset with: bash tests/llm/harness.sh --reset"
+    fi
+    echo ""
+}
+
+# Reset state for fresh run
+reset_state() {
+    if [[ -f "$STATE_FILE" ]]; then
+        rm "$STATE_FILE"
+        echo "State cleared. Ready for fresh test run."
+    else
+        echo "No state to clear."
+    fi
+}
+
+# Detect rate limit in output
+detect_rate_limit() {
+    local output="$1"
+    if echo "$output" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded"; then
+        return 0  # Rate limited
+    fi
+    return 1  # Not rate limited
+}
 
 #=============================================================================
 # Test Helper Functions (available to test scripts)
@@ -115,6 +233,15 @@ send_prompt() {
         else
             # Fallback to echo + pipe if --print not available
             LAST_OUTPUT=$(echo "$prompt" | timeout 120 $CLAUDE_CMD "${model_args[@]}" 2>&1) || true
+        fi
+
+        # Write output to shared file for rate limit detection across subshells
+        echo "$LAST_OUTPUT" > "$SCRIPT_DIR/.last-output"
+
+        # Check for rate limit and exit with special code
+        if echo "$LAST_OUTPUT" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded"; then
+            echo -e "${YELLOW}⚠ Rate limit detected in response${NC}"
+            exit 2  # Special exit code for rate limit
         fi
     else
         # Semi-automated: Cursor or Copilot (IDE-based)
@@ -249,7 +376,7 @@ cleanup_test_project() {
 # Export functions and variables for test scripts
 export -f setup_test_project send_prompt check_output_contains check_output_not_contains
 export -f check_file_exists check_file_not_exists check_file_contains cleanup_test_project
-export FRAMEWORK_ROOT CLAUDE_CMD TOOL CLAUDE_MODEL
+export FRAMEWORK_ROOT CLAUDE_CMD TOOL CLAUDE_MODEL SCRIPT_DIR
 
 #=============================================================================
 # Test Runner
@@ -259,6 +386,12 @@ run_test() {
     local test_file="$1"
     local test_name=$(basename "$test_file" .sh)
 
+    # Check if we should skip (resume mode + already passed)
+    if should_skip_test "$test_name"; then
+        echo -e "${BLUE}Skipping: $test_name${NC} (already passed)"
+        return 0
+    fi
+
     echo ""
     echo "═══════════════════════════════════════════════════════════════"
     echo -e "${BLUE}Running: $test_name${NC}"
@@ -266,13 +399,31 @@ run_test() {
     echo ""
 
     # Run test in subshell to isolate state
-    if (source "$test_file"); then
+    local test_result=0
+    (source "$test_file") || test_result=$?
+
+    if [[ $test_result -eq 0 ]]; then
         echo ""
         echo -e "${GREEN}══ PASSED: $test_name ══${NC}"
+        save_result "$test_name" "pass"
         return 0
+    elif [[ $test_result -eq 2 ]]; then
+        # Rate limit detected (exit code 2 from send_prompt)
+        echo ""
+        echo -e "${YELLOW}══ RATE LIMITED: $test_name ══${NC}"
+        save_result "$test_name" "rate_limit"
+        return 2
     else
+        # Check shared output file for rate limit (backup detection)
+        if [[ -f "$SCRIPT_DIR/.last-output" ]] && detect_rate_limit "$(cat "$SCRIPT_DIR/.last-output")"; then
+            echo ""
+            echo -e "${YELLOW}══ RATE LIMITED: $test_name ══${NC}"
+            save_result "$test_name" "rate_limit"
+            return 2
+        fi
         echo ""
         echo -e "${RED}══ FAILED: $test_name ══${NC}"
+        save_result "$test_name" "fail"
         return 1
     fi
 }
@@ -478,6 +629,26 @@ main() {
         exit 0
     fi
 
+    if [[ "${1:-}" == "--status" ]]; then
+        show_status
+        exit 0
+    fi
+
+    if [[ "${1:-}" == "--reset" ]]; then
+        reset_state
+        exit 0
+    fi
+
+    if [[ "${1:-}" == "--resume" ]]; then
+        RESUME_MODE=1
+        shift
+        if [[ ! -f "$STATE_FILE" ]]; then
+            echo "No previous run to resume. Starting fresh."
+        else
+            echo -e "${BLUE}Resuming from previous run (skipping passed tests)${NC}"
+        fi
+    fi
+
     if [[ "${1:-}" == "--sections" ]]; then
         list_sections
         exit 0
@@ -551,9 +722,39 @@ main() {
 
     echo "Running ${#tests_to_run[@]} test(s)..."
 
+    # Initialize state tracking
+    if [[ "$RESUME_MODE" != "1" ]]; then
+        # Fresh run - reset state
+        rm -f "$STATE_FILE"
+    fi
+    init_state
+
+    local skipped=0
+    local rate_limited=0
+
     for test_file in "${tests_to_run[@]}"; do
-        if run_test "$test_file"; then
+        local test_name=$(basename "$test_file" .sh)
+
+        # Count already-passed tests as skipped
+        if should_skip_test "$test_name"; then
+            ((skipped++))
             ((passed++))
+            echo -e "${BLUE}Skipping: $test_name${NC} (already passed)"
+            continue
+        fi
+
+        local result=0
+        run_test "$test_file" || result=$?
+
+        if [[ $result -eq 0 ]]; then
+            ((passed++))
+        elif [[ $result -eq 2 ]]; then
+            # Rate limited - stop running more tests
+            ((rate_limited++))
+            echo ""
+            echo -e "${YELLOW}Stopping due to rate limit. Progress saved.${NC}"
+            echo -e "${YELLOW}Resume later with: bash tests/llm/harness.sh --resume${NC}"
+            break
         else
             ((failed++))
         fi
@@ -562,9 +763,16 @@ main() {
     echo ""
     echo "═══════════════════════════════════════════════════════════════"
     echo "RESULTS: $passed passed, $failed failed ($(( passed + failed )) total)"
+    if [[ $skipped -gt 0 ]]; then
+        echo "  (including $skipped skipped from previous run)"
+    fi
+    if [[ $rate_limited -gt 0 ]]; then
+        echo ""
+        echo -e "${YELLOW}Rate limit hit. Resume with: bash tests/llm/harness.sh --resume${NC}"
+    fi
     echo "═══════════════════════════════════════════════════════════════"
 
-    [[ $failed -eq 0 ]]
+    [[ $failed -eq 0 && $rate_limited -eq 0 ]]
 }
 
 # Only run main if not being sourced
