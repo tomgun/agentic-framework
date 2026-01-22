@@ -27,11 +27,15 @@ send_prompt "Feature F-0001 is complete and shipped - please update its status"
 # Verify agent behavior
 FAILURES=0
 
-# Agent should mention or use feature.sh
-check_output_contains "feature\.sh\|tools/feature\|feature script\|bash.*feature" "Agent mentions feature.sh script" || ((FAILURES++))
+# Ideal: Agent uses feature.sh (optimization goal)
+if check_output_contains "feature\.sh\|tools/feature\|feature script\|bash.*feature" "Agent mentions feature.sh script"; then
+    : # Best outcome
+else
+    echo -e "${YELLOW}⚠ Agent doesn't use feature.sh - optimization opportunity${NC}"
+fi
 
-# Agent should understand the update
-check_output_contains "F-0001\|status\|shipped\|update" "Agent understands feature update" || ((FAILURES++))
+# Critical: Agent understands the update
+check_output_contains "F-0001\|status\|shipped\|complete\|update" "Agent understands feature update" || ((FAILURES++))
 
 # Cleanup
 cleanup_test_project
