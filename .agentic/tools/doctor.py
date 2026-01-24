@@ -419,18 +419,17 @@ def validate_optional_enhancements(root: Path, profile: str) -> list[str]:
     """
     suggestions = []
 
-    # STATUS.md is optional in core but useful
-    if profile == "core":
-        status_path = root / "STATUS.md"
-        if status_path.exists():
-            try:
-                content = status_path.read_text(encoding="utf-8")
-                if len(content.strip()) == 0:
-                    suggestions.append("STATUS.md exists but is empty. Fill it in or remove it")
-            except Exception:
-                pass
-        else:
-            suggestions.append("Consider adding STATUS.md for tracking current focus (optional in core profile)")
+    # STATUS.md is required for both profiles (v0.12.0+)
+    status_path = root / "STATUS.md"
+    if status_path.exists():
+        try:
+            content = status_path.read_text(encoding="utf-8")
+            if len(content.strip()) == 0:
+                suggestions.append("STATUS.md exists but is empty. Fill in current focus and project phase")
+        except Exception:
+            pass
+    else:
+        suggestions.append("STATUS.md is missing. Run: cp .agentic/init/STATUS.template.md STATUS.md")
 
     return suggestions
 
