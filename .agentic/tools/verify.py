@@ -199,7 +199,7 @@ def main() -> int:
     print(f"Profile: {profile}\n")
 
     if profile == "core":
-        print("Core profile: skipping Product Management validations (spec/ + STATUS.md).\n")
+        print("Core profile: skipping Product Management validations (spec/).\n")
         core_issues = core_checks(root)
         if core_issues:
             print(f"Found {len(core_issues)} issue(s):")
