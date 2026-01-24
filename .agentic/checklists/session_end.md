@@ -270,3 +270,20 @@ Your final message should include:
 
 **Quality bar**: Could a fresh agent with NO context read JOURNAL.md and STATUS.md and know exactly what to do next? If not, add more detail.
 
+---
+
+## Periodic: Spec ↔ Code Alignment (Weekly/Major Milestones)
+
+Run occasionally to catch drift between specs and code:
+
+```bash
+bash .agentic/tools/drift.sh
+```
+
+This checks:
+- Specs have matching code (and vice versa)
+- Non-coders can understand system by reading specs
+- No undocumented functionality
+
+Not required every session, but useful after major work.
+
