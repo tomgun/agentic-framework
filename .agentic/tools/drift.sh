@@ -9,7 +9,8 @@
 #   bash .agentic/tools/drift.sh --check   # Check only, no prompts (CI mode)
 #   bash .agentic/tools/drift.sh --report  # Generate drift report
 #
-set -euo pipefail
+# Note: Not using set -e because grep returns 1 when no matches (expected behavior)
+set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -327,6 +328,181 @@ check_tests_drift() {
 }
 
 #=============================================================================
+# Drift Detection: Code → Specs (undocumented code)
+#=============================================================================
+
+check_undocumented_code() {
+    log_check "Code → Specs (undocumented functionality)"
+
+    local spec_content=""
+    local context_content=""
+
+    # Gather all spec content for searching
+    if [[ -d "$ROOT_DIR/spec" ]]; then
+        spec_content=$(cat "$ROOT_DIR/spec"/*.md 2>/dev/null || true)
+    fi
+    if [[ -f "$ROOT_DIR/CONTEXT_PACK.md" ]]; then
+        context_content=$(cat "$ROOT_DIR/CONTEXT_PACK.md")
+    fi
+    if [[ -f "$ROOT_DIR/PRODUCT.md" ]]; then
+        context_content="$context_content $(cat "$ROOT_DIR/PRODUCT.md")"
+    fi
+
+    local all_docs="$spec_content $context_content"
+    local undocumented=()
+
+    # Check for common code patterns not mentioned in specs
+    # This is language-agnostic, looking for common export patterns
+
+    # Find source directories (including .agentic/tools for framework projects)
+    local src_dirs=""
+    for dir in src lib app pkg cmd internal .agentic/tools; do
+        [[ -d "$ROOT_DIR/$dir" ]] && src_dirs="$src_dirs $ROOT_DIR/$dir"
+    done
+
+    if [[ -z "$src_dirs" ]]; then
+        log_ok "No standard source directories found"
+        return 0
+    fi
+
+    # TypeScript/JavaScript: exported functions, classes, components
+    local ts_exports=$(grep -rh "^export \(const\|function\|class\|default\)" $src_dirs --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" 2>/dev/null | \
+        grep -oE "(function|class|const) [A-Z][a-zA-Z0-9]+" | \
+        awk '{print $2}' | sort -u || true)
+
+    # Python: class and function definitions
+    local py_exports=$(grep -rh "^class \|^def \|^async def " $src_dirs --include="*.py" 2>/dev/null | \
+        grep -oE "(class|def) [A-Za-z_][A-Za-z0-9_]+" | \
+        awk '{print $2}' | grep -v "^_" | sort -u || true)
+
+    # Go: exported functions (capitalized)
+    local go_exports=$(grep -rh "^func [A-Z]" $src_dirs --include="*.go" 2>/dev/null | \
+        grep -oE "func [A-Z][a-zA-Z0-9]+" | \
+        awk '{print $2}' | sort -u || true)
+
+    # Combine all exports
+    local all_exports=$(echo -e "$ts_exports\n$py_exports\n$go_exports" | grep -v "^$" | sort -u)
+
+    if [[ -z "$all_exports" ]]; then
+        log_ok "No exported code found to check"
+        return 0
+    fi
+
+    local undoc_count=0
+    local checked_count=0
+
+    for export in $all_exports; do
+        ((checked_count++))
+        # Skip common/generic names
+        if [[ "$export" =~ ^(Test|Mock|Stub|Helper|Utils?|Config|Setup|Init|Main|App|Index)$ ]]; then
+            continue
+        fi
+
+        # Check if mentioned in any documentation
+        if ! echo "$all_docs" | grep -qi "$export"; then
+            if [[ $undoc_count -eq 0 ]]; then
+                log_drift "Code exports not mentioned in specs/CONTEXT_PACK:"
+            fi
+            echo "      - $export"
+            ((undoc_count++))
+            if [[ $undoc_count -ge 10 ]]; then
+                echo "      ... and more (showing first 10)"
+                break
+            fi
+        fi
+    done
+
+    if [[ $undoc_count -gt 0 ]]; then
+        echo ""
+        echo -e "  ${CYAN}Tip:${NC} Non-coders can't discover undocumented code."
+        echo "       Add to CONTEXT_PACK.md or create specs for these."
+
+        if [[ "$MODE" == "interactive" ]]; then
+            local choice=$(prompt_fix \
+                "Found $undoc_count undocumented export(s). What to do?" \
+                "  1. Open CONTEXT_PACK.md to document them
+  2. Skip (document later)
+  3. These are internal, don't need docs")
+
+            case "$choice" in
+                1)
+                    ${EDITOR:-vim} "$ROOT_DIR/CONTEXT_PACK.md"
+                    ((FIXED_COUNT++))
+                    ;;
+                3)
+                    log_ok "Marked as internal (no docs needed)"
+                    ;;
+            esac
+        fi
+    else
+        log_ok "All $checked_count exports are documented"
+    fi
+}
+
+#=============================================================================
+# Drift Detection: API Endpoints → Specs
+#=============================================================================
+
+check_undocumented_endpoints() {
+    log_check "API Endpoints → Specs"
+
+    local spec_content=""
+    if [[ -d "$ROOT_DIR/spec" ]]; then
+        spec_content=$(cat "$ROOT_DIR/spec"/*.md 2>/dev/null || true)
+    fi
+    if [[ -f "$ROOT_DIR/CONTEXT_PACK.md" ]]; then
+        spec_content="$spec_content $(cat "$ROOT_DIR/CONTEXT_PACK.md")"
+    fi
+
+    # Find API route definitions (common patterns)
+    local routes=""
+
+    # Express.js / Node
+    routes=$(grep -rh "app\.\(get\|post\|put\|delete\|patch\)\|router\.\(get\|post\|put\|delete\|patch\)" "$ROOT_DIR" \
+        --include="*.ts" --include="*.js" 2>/dev/null | \
+        grep -oE "(get|post|put|delete|patch)\(['\"][^'\"]+['\"]" | \
+        sed "s/['\"]//g" | sed 's/(/ /' || true)
+
+    # Python Flask/FastAPI
+    routes="$routes $(grep -rh "@app\.\(get\|post\|put\|delete\|route\)\|@router\." "$ROOT_DIR" \
+        --include="*.py" 2>/dev/null | \
+        grep -oE "(get|post|put|delete|route)\(['\"][^'\"]+['\"]" | \
+        sed "s/['\"]//g" | sed 's/(/ /' || true)"
+
+    # Go net/http or common frameworks
+    routes="$routes $(grep -rh "HandleFunc\|Handle\|GET\|POST\|PUT\|DELETE" "$ROOT_DIR" \
+        --include="*.go" 2>/dev/null | \
+        grep -oE "['\"][/][^'\"]+['\"]" | tr -d "'\""  || true)"
+
+    routes=$(echo "$routes" | grep -v "^$" | sort -u)
+
+    if [[ -z "$routes" ]]; then
+        log_ok "No API routes detected"
+        return 0
+    fi
+
+    local undoc_count=0
+    for route in $routes; do
+        # Extract just the path part
+        local path=$(echo "$route" | grep -oE "/[a-zA-Z0-9/_:-]+" | head -1)
+        if [[ -n "$path" ]] && ! echo "$spec_content" | grep -q "$path"; then
+            if [[ $undoc_count -eq 0 ]]; then
+                log_drift "API endpoints not documented in specs:"
+            fi
+            echo "      - $path"
+            ((undoc_count++))
+        fi
+    done
+
+    if [[ $undoc_count -eq 0 ]]; then
+        log_ok "All API endpoints documented"
+    else
+        echo ""
+        echo -e "  ${CYAN}Tip:${NC} API endpoints should be in CONTEXT_PACK.md or spec/API.md"
+    fi
+}
+
+#=============================================================================
 # Main
 #=============================================================================
 
@@ -347,6 +523,10 @@ main() {
     check_status_drift
     echo ""
     check_tests_drift
+    echo ""
+    check_undocumented_code
+    echo ""
+    check_undocumented_endpoints
 
     echo ""
     echo "═══════════════════════════════════════════════════════════════"
