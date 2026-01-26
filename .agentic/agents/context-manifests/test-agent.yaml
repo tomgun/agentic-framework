@@ -1,0 +1,30 @@
+# Context Manifest: Test Agent
+# Token budget: ~4000 tokens
+# Purpose: Write tests from acceptance criteria (before implementation)
+
+role: test-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - spec/acceptance/{feature_id}.md   # Acceptance criteria to test
+  - STACK.md[test_commands]             # How to run tests
+  - tests/                              # Existing test patterns (scan structure)
+
+# Files to load if available and budget permits
+optional:
+  - .agentic/quality/testing_standards.md
+  - CONTEXT_PACK.md[entry_points]       # Where to find testable code
+
+# Files to explicitly skip (save tokens)
+exclude:
+  - src/                                # Don't read implementation (TDD!)
+  - spec/PRD.md                         # High-level, not needed
+  - docs/                               # Documentation not needed
+  - JOURNAL.md                          # History not needed
+
+# Section markers for partial file reads
+sections:
+  STACK.md:
+    test_commands: "## Test"
+    build_commands: "## Build"

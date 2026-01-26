@@ -1,0 +1,27 @@
+# Context Manifest: Orchestrator Agent
+# Token budget: ~2000 tokens
+# Purpose: Coordinate specialized agents, delegate tasks, verify completion
+
+role: orchestrator-agent
+token_budget: 2000
+
+# Files to always load
+required:
+  - STATUS.md                           # Current project state
+  - HUMAN_NEEDED.md                     # Blockers to address
+  - spec/FEATURES.md[current_feature]   # Current feature status only
+
+# Files to load if available and budget permits
+optional:
+  - .agentic/WIP.md                     # Interrupted work
+  - .agentic/AGENTS_ACTIVE.md           # Other active agents
+
+# Files to explicitly skip (orchestrator delegates, doesn't implement)
+exclude:
+  - src/                                # Implementation details
+  - tests/                              # Test details
+  - docs/                               # Documentation details
+  - .agentic/quality/                   # Standards (agents handle)
+  - spec/PRD.md                         # Detail work delegated
+
+# Orchestrator loads minimal context, delegates with context-for-role.sh
