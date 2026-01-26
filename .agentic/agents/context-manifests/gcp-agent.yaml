@@ -1,0 +1,51 @@
+# Context Manifest: GCP Expert Agent
+# Token budget: ~4000 tokens
+# Purpose: Google Cloud services, architecture, deployment, best practices
+
+role: gcp-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - STACK.md                            # Current infrastructure
+  - CONTEXT_PACK.md                     # Architecture overview
+
+# Files to load if available and budget permits
+optional:
+  - docs/GCP.md                         # GCP-specific docs
+  - docs/INFRASTRUCTURE.md              # Infrastructure docs
+  - terraform/                          # Terraform GCP resources (listing)
+  - deployment/                         # GCP deployment configs (listing)
+  - cloudbuild.yaml                     # Cloud Build config
+  - app.yaml                            # App Engine config
+
+# Files to explicitly skip
+exclude:
+  - src/                                # Application code
+  - tests/                              # Test code
+  - docs/research/                      # Research not relevant
+
+# Trigger patterns for auto-detection
+triggers:
+  - "GCP"
+  - "Google Cloud"
+  - "Cloud Run"
+  - "Cloud Functions"
+  - "GKE"
+  - "BigQuery"
+  - "Cloud SQL"
+  - "Firestore"
+  - "Cloud Storage"
+  - "Pub/Sub"
+  - "App Engine"
+  - "Cloud Build"
+  - "Firebase"
+  - "Vertex AI"
+
+# GCP expertise areas
+focus:
+  - cloud_architecture_framework
+  - cost_optimization
+  - security_best_practices
+  - serverless_patterns
+  - data_analytics

@@ -1,0 +1,49 @@
+# Context Manifest: Security Agent
+# Token budget: ~4000 tokens
+# Purpose: Security audit, vulnerability scanning, security review
+
+role: security-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - STACK.md                            # Tech stack, dependencies
+  - CONTEXT_PACK.md                     # Architecture overview
+  - spec/NFR.md                         # Security requirements
+
+# Files to load if available and budget permits
+optional:
+  - docs/SECURITY.md                    # Security documentation
+  - docs/THREAT_MODEL.md                # Threat analysis
+  - .agentic/quality/programming_standards.md
+  - package.json                        # Dependencies to audit
+  - requirements.txt                    # Python dependencies
+
+# Files to explicitly skip
+exclude:
+  - docs/research/                      # Research not relevant
+  - JOURNAL.md                          # History not needed
+  - docs/mockups/                       # Design not relevant
+
+# Trigger patterns for auto-detection
+triggers:
+  - "security"
+  - "vulnerability"
+  - "audit"
+  - "OWASP"
+  - "CVE"
+  - "penetration"
+  - "injection"
+  - "XSS"
+  - "CSRF"
+  - "authentication"
+  - "authorization"
+
+# Security focus areas
+focus:
+  - input_validation
+  - authentication
+  - authorization
+  - data_encryption
+  - dependency_vulnerabilities
+  - secrets_management

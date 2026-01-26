@@ -47,6 +47,8 @@ What would you like to work on?
 
 ## Auto-Detection Triggers
 
+### Core Workflow Triggers
+
 | User Request Pattern | Auto-Trigger | What To Do |
 |---------------------|--------------|------------|
 | (first message) | **Proactive Start** | Greet with context + options |
@@ -56,6 +58,55 @@ What would you like to work on?
 | "done with feature" / "feature complete" | **Feature Complete** | Run `feature_complete.md` checklist |
 | "end session" / "stopping work" | **Session End** | Run `session_end.md` checklist |
 | "review code" / "check this" | **Review** | Run `review_checklist.md` |
+
+### Domain & Design Triggers
+
+| User Request Pattern | Auto-Trigger | Agent | What To Do |
+|---------------------|--------------|-------|------------|
+| "game rules" / "business logic" / "domain model" / "state machine" | **Domain Logic** | domain-agent | Define rules BEFORE coding |
+| "design" / "mockup" / "wireframe" / "UI for" / "layout" | **Design** | design-agent | Create visual designs |
+| "usability" / "UX" / "user flow" / "accessibility" / "a11y" | **UX Review** | ux-agent | Evaluate user experience |
+
+### Technical Triggers
+
+| User Request Pattern | Auto-Trigger | Agent | What To Do |
+|---------------------|--------------|-------|------------|
+| "refactor" / "clean up" / "restructure" / "technical debt" | **Refactoring** | refactor-agent | Improve code without changing behavior |
+| "performance" / "optimize" / "slow" / "profile" / "benchmark" | **Performance** | perf-agent | Profile and optimize |
+| "security" / "vulnerability" / "audit" / "OWASP" | **Security Audit** | security-agent | Security review |
+| "API" / "endpoint" / "schema" / "REST" / "GraphQL" | **API Design** | api-design-agent | Design API contracts |
+| "database" / "schema" / "migration" / "ERD" / "SQL" | **Database** | db-agent | Database design/migration |
+| "upgrade" / "migrate" / "update to" / "breaking change" | **Migration** | migration-agent | Handle upgrades safely |
+
+### Deployment Triggers
+
+| User Request Pattern | Auto-Trigger | Agent | What To Do |
+|---------------------|--------------|-------|------------|
+| "CI/CD" / "pipeline" / "deploy" / "Docker" / "Kubernetes" | **DevOps** | devops-agent | CI/CD and infrastructure |
+| "App Store" / "Play Store" / "iOS submission" / "TestFlight" | **App Store** | appstore-agent | Store submissions |
+| "AWS" / "Lambda" / "S3" / "EC2" / "CloudFormation" | **AWS** | aws-agent | AWS architecture |
+| "Azure" / "Azure Functions" / "AKS" / "ARM template" | **Azure** | azure-agent | Azure architecture |
+| "GCP" / "Cloud Run" / "BigQuery" / "Firebase" | **GCP** | gcp-agent | GCP architecture |
+
+### Quality & Compliance Triggers
+
+| User Request Pattern | Auto-Trigger | Agent | What To Do |
+|---------------------|--------------|-------|------------|
+| "check compliance" / "did I follow" / "verify process" | **Compliance** | compliance-agent | Verify framework adherence |
+
+### Using Context Manifests
+
+When triggering a specialized agent, use `context-for-role.sh` for minimal context:
+
+```bash
+# Get focused context for the agent
+bash .agentic/tools/context-for-role.sh domain-agent F-0042 --dry-run
+# Shows: Token budget: 4000, Files to load, Tokens used
+
+# Pass assembled context to subagent (saves 60-80% tokens)
+```
+
+See `.agentic/agents/context-manifests/` for all role definitions
 
 ---
 

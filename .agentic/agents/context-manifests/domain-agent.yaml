@@ -1,0 +1,37 @@
+# Context Manifest: Domain/Business Logic Agent
+# Token budget: ~4000 tokens
+# Purpose: Define rules, state machines, game mechanics BEFORE coding
+
+role: domain-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - spec/PRD.md                         # What we're building
+  - spec/acceptance/{feature_id}.md     # Feature requirements
+
+# Files to load if available and budget permits
+optional:
+  - docs/DOMAIN.md                      # Domain model
+  - docs/RULES.md                       # Business/game rules
+  - docs/GAME_RULES.md                  # Game-specific rules
+  - docs/STATE_MACHINES.md              # State diagrams
+  - docs/DECISION_TABLES.md             # Rule tables
+  - spec/GLOSSARY.md                    # Domain terminology
+
+# Files to explicitly skip (not about code)
+exclude:
+  - src/                                # Implementation details
+  - tests/                              # Test details
+  - .agentic/                           # Framework internals
+
+# Trigger patterns for auto-detection
+triggers:
+  - "game rules"
+  - "business logic"
+  - "domain model"
+  - "state machine"
+  - "how should .* work"
+  - "rules for"
+  - "define the logic"
+  - "what happens when"

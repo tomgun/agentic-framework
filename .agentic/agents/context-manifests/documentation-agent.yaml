@@ -1,0 +1,24 @@
+# Context Manifest: Documentation Agent
+# Token budget: ~4000 tokens
+# Purpose: Update documentation after implementation
+
+role: documentation-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - spec/acceptance/{feature_id}.md   # What was implemented
+  - CONTEXT_PACK.md                     # Architecture to document
+  - README.md                           # May need updates
+
+# Files to load if available and budget permits
+optional:
+  - docs/                               # Existing documentation
+  - CHANGELOG.md                        # Version history
+
+# Files to explicitly skip (save tokens)
+exclude:
+  - src/                                # Code details (summary provided)
+  - tests/                              # Test details not needed
+  - .agentic/quality/                   # Standards not relevant
+  - JOURNAL.md                          # History not needed

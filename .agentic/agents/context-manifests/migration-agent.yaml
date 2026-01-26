@@ -1,0 +1,42 @@
+# Context Manifest: Migration Agent
+# Token budget: ~4000 tokens
+# Purpose: Framework/library upgrades, data migrations, version upgrades
+
+role: migration-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - STACK.md                            # Current versions
+  - CONTEXT_PACK.md                     # Architecture overview
+  - package.json                        # Current dependencies (if JS/TS)
+  - requirements.txt                    # Current dependencies (if Python)
+
+# Files to load if available and budget permits
+optional:
+  - CHANGELOG.md                        # Version history
+  - docs/MIGRATION.md                   # Migration docs
+  - docs/BREAKING_CHANGES.md            # Known breaking changes
+
+# Files to explicitly skip
+exclude:
+  - spec/PRD.md                         # Requirements don't change
+  - docs/research/                      # Research not relevant
+  - JOURNAL.md                          # History not needed
+
+# Trigger patterns for auto-detection
+triggers:
+  - "upgrade"
+  - "migrate"
+  - "update .* to"
+  - "breaking change"
+  - "deprecat"
+  - "version bump"
+  - "major version"
+
+# Migration checklist
+constraints:
+  - backup_before: true
+  - run_tests_after: true
+  - document_changes: true
+  - check_breaking_changes: true

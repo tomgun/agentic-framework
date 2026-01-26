@@ -1,0 +1,43 @@
+# Context Manifest: Performance Agent
+# Token budget: ~4000 tokens
+# Purpose: Performance analysis, profiling, optimization
+
+role: perf-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - STACK.md                            # Tech stack, build commands
+  - CONTEXT_PACK.md[entry_points]       # Where performance matters
+  - spec/NFR.md                         # Non-functional requirements
+
+# Files to load if available and budget permits
+optional:
+  - docs/PERFORMANCE.md                 # Performance docs
+  - docs/BENCHMARKS.md                  # Existing benchmarks
+  - .agentic/quality/programming_standards.md
+
+# Files to explicitly skip
+exclude:
+  - spec/PRD.md                         # Functional requirements
+  - docs/research/                      # Research not relevant
+  - JOURNAL.md                          # History not needed
+
+# Trigger patterns for auto-detection
+triggers:
+  - "performance"
+  - "optimize"
+  - "slow"
+  - "profile"
+  - "benchmark"
+  - "memory"
+  - "CPU"
+  - "latency"
+  - "throughput"
+  - "bottleneck"
+
+# Special rule: Measure before and after
+constraints:
+  - profile_before: true
+  - profile_after: true
+  - document_improvement: true
