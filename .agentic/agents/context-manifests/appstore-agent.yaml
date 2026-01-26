@@ -1,0 +1,49 @@
+# Context Manifest: App Store Deployment Agent
+# Token budget: ~3000 tokens
+# Purpose: iOS App Store, Google Play Store submissions and compliance
+
+role: appstore-agent
+token_budget: 3000
+
+# Files to always load
+required:
+  - STACK.md                            # App tech stack
+  - spec/PRD.md                         # App description, features
+
+# Files to load if available and budget permits
+optional:
+  - docs/APP_STORE.md                   # Store listing info
+  - docs/PRIVACY_POLICY.md              # Required for stores
+  - docs/RELEASE_NOTES.md               # Version release notes
+  - ios/                                # iOS project (listing)
+  - android/                            # Android project (listing)
+  - fastlane/                           # Fastlane configs
+  - docs/SCREENSHOTS.md                 # Screenshot requirements
+
+# Files to explicitly skip
+exclude:
+  - src/                                # Core code not needed
+  - tests/                              # Tests not relevant
+  - docs/research/                      # Research not relevant
+
+# Trigger patterns for auto-detection
+triggers:
+  - "App Store"
+  - "Play Store"
+  - "Google Play"
+  - "iOS submission"
+  - "Android release"
+  - "app review"
+  - "store listing"
+  - "TestFlight"
+  - "beta release"
+  - "app bundle"
+
+# Store compliance focus
+focus:
+  - privacy_policy
+  - app_permissions
+  - content_rating
+  - screenshot_guidelines
+  - metadata_requirements
+  - review_guidelines

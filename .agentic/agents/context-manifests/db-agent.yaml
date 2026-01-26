@@ -1,0 +1,49 @@
+# Context Manifest: Database Agent
+# Token budget: ~4000 tokens
+# Purpose: Database schema design, migrations, query optimization
+
+role: db-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - STACK.md                            # Database tech
+  - spec/PRD.md                         # Data requirements
+  - CONTEXT_PACK.md                     # Architecture overview
+
+# Files to load if available and budget permits
+optional:
+  - docs/DATABASE.md                    # Database documentation
+  - docs/ERD.md                         # Entity relationship diagram
+  - docs/SCHEMA.md                      # Schema documentation
+  - migrations/                         # Existing migrations (listing)
+  - prisma/schema.prisma                # Prisma schema
+  - db/schema.rb                        # Rails schema
+
+# Files to explicitly skip
+exclude:
+  - src/                                # Application code
+  - tests/                              # Test code
+  - docs/research/                      # Research not relevant
+
+# Trigger patterns for auto-detection
+triggers:
+  - "database"
+  - "schema"
+  - "migration"
+  - "table"
+  - "column"
+  - "index"
+  - "query"
+  - "SQL"
+  - "ERD"
+  - "relationship"
+  - "foreign key"
+
+# Database design principles
+focus:
+  - normalization
+  - indexing_strategy
+  - migration_safety
+  - data_integrity
+  - performance

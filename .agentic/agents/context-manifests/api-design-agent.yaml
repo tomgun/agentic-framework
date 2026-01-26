@@ -1,0 +1,46 @@
+# Context Manifest: API Design Agent
+# Token budget: ~4000 tokens
+# Purpose: API endpoint design, schema design, contract-first development
+
+role: api-design-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - spec/PRD.md                         # Requirements
+  - spec/acceptance/{feature_id}.md     # Feature requirements
+  - STACK.md                            # Tech stack
+
+# Files to load if available and budget permits
+optional:
+  - docs/API.md                         # Existing API docs
+  - docs/openapi.yaml                   # OpenAPI spec
+  - docs/swagger.yaml                   # Swagger spec
+  - docs/SCHEMAS.md                     # Data schemas
+  - docs/ENDPOINTS.md                   # Endpoint documentation
+
+# Files to explicitly skip
+exclude:
+  - src/                                # Implementation (design first)
+  - tests/                              # Tests come after design
+  - JOURNAL.md                          # History not needed
+
+# Trigger patterns for auto-detection
+triggers:
+  - "API"
+  - "endpoint"
+  - "schema"
+  - "REST"
+  - "GraphQL"
+  - "contract"
+  - "request/response"
+  - "payload"
+
+# API design principles
+focus:
+  - restful_conventions
+  - versioning_strategy
+  - error_handling
+  - pagination
+  - authentication
+  - rate_limiting

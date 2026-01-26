@@ -1,0 +1,34 @@
+# Context Manifest: Framework Compliance Agent
+# Token budget: ~3000 tokens
+# Purpose: Verify agents follow Agentic Framework correctly
+
+role: compliance-agent
+token_budget: 3000
+
+# Files to always load
+required:
+  - .agentic/checklists/before_commit.md
+  - .agentic/checklists/feature_complete.md
+  - .agentic/PRINCIPLES.md
+  - STATUS.md
+
+# Files to load if available and budget permits
+optional:
+  - .agentic/checklists/session_end.md
+  - .agentic/workflows/definition_of_done.md
+  - JOURNAL.md                          # Recent entries to verify logging
+  - spec/FEATURES.md                    # Verify spec updates
+
+# Files to explicitly skip
+exclude:
+  - src/                                # Code details not needed
+  - tests/                              # Test details not needed
+  - docs/research/                      # Research not relevant
+
+# Trigger patterns for auto-detection
+triggers:
+  - "check compliance"
+  - "did I follow"
+  - "verify process"
+  - "framework check"
+  - "audit workflow"
