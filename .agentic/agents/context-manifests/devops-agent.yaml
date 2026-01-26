@@ -1,0 +1,43 @@
+# Context Manifest: DevOps Agent
+# Token budget: ~4000 tokens
+# Purpose: CI/CD, pipelines, infrastructure, deployment automation
+
+role: devops-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - STACK.md                            # Tech stack, deployment info
+  - CONTEXT_PACK.md                     # Architecture overview
+
+# Files to load if available and budget permits
+optional:
+  - .github/workflows/                  # GitHub Actions (listing)
+  - .gitlab-ci.yml                      # GitLab CI
+  - Jenkinsfile                         # Jenkins
+  - docker-compose.yml                  # Docker setup
+  - Dockerfile                          # Container definition
+  - docs/DEPLOYMENT.md                  # Deployment docs
+  - docs/INFRASTRUCTURE.md              # Infrastructure docs
+  - terraform/                          # Terraform configs (listing)
+  - k8s/                                # Kubernetes manifests (listing)
+
+# Files to explicitly skip
+exclude:
+  - src/                                # Application code
+  - tests/                              # Test code (unless CI-related)
+  - docs/research/                      # Research not relevant
+
+# Trigger patterns for auto-detection
+triggers:
+  - "CI/CD"
+  - "pipeline"
+  - "deploy"
+  - "infrastructure"
+  - "Docker"
+  - "Kubernetes"
+  - "k8s"
+  - "GitHub Actions"
+  - "Jenkins"
+  - "Terraform"
+  - "automation"

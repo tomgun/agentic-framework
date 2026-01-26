@@ -1,0 +1,37 @@
+# Context Manifest: Design/Mockup Agent
+# Token budget: ~4000 tokens
+# Purpose: UI/UX design, wireframes, component design, visual design
+
+role: design-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - spec/PRD.md                         # What we're building
+  - spec/acceptance/{feature_id}.md     # Feature requirements
+
+# Files to load if available and budget permits
+optional:
+  - docs/STYLE_GUIDE.md                 # Design system
+  - docs/DESIGN_SYSTEM.md               # Component library
+  - docs/BRAND.md                       # Brand guidelines
+  - docs/mockups/                       # Existing designs
+  - docs/PERSONAS.md                    # Target users
+  - docs/USER_FLOWS.md                  # User journeys
+
+# Files to explicitly skip
+exclude:
+  - src/                                # Code not needed for design
+  - tests/                              # Test code
+  - .agentic/                           # Framework internals
+
+# Trigger patterns for auto-detection
+triggers:
+  - "design"
+  - "mockup"
+  - "wireframe"
+  - "UI for"
+  - "layout"
+  - "visual"
+  - "component design"
+  - "screen design"
