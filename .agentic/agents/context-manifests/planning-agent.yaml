@@ -1,0 +1,25 @@
+# Context Manifest: Planning Agent
+# Token budget: ~5000 tokens
+# Purpose: Design implementation approach, break down features
+
+role: planning-agent
+token_budget: 5000
+
+# Files to always load
+required:
+  - spec/PRD.md                         # Product requirements
+  - spec/FEATURES.md                    # Feature registry
+  - CONTEXT_PACK.md                     # Architecture context
+  - STACK.md                            # Tech constraints
+
+# Files to load if available and budget permits
+optional:
+  - spec/TECH_SPEC.md                   # Technical specifications
+  - spec/NFR.md                         # Non-functional requirements
+  - docs/research/                      # Research findings
+
+# Files to explicitly skip (planning doesn't need implementation details)
+exclude:
+  - src/                                # Code (not implementing yet)
+  - tests/                              # Tests (not writing yet)
+  - JOURNAL.md                          # History not needed

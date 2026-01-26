@@ -1,0 +1,51 @@
+# Context Manifest: Azure Expert Agent
+# Token budget: ~4000 tokens
+# Purpose: Azure services, architecture, deployment, best practices
+
+role: azure-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - STACK.md                            # Current infrastructure
+  - CONTEXT_PACK.md                     # Architecture overview
+
+# Files to load if available and budget permits
+optional:
+  - docs/AZURE.md                       # Azure-specific docs
+  - docs/INFRASTRUCTURE.md              # Infrastructure docs
+  - arm/                                # ARM templates (listing)
+  - bicep/                              # Bicep templates (listing)
+  - terraform/                          # Terraform Azure resources (listing)
+  - azure-pipelines.yml                 # Azure DevOps pipelines
+
+# Files to explicitly skip
+exclude:
+  - src/                                # Application code
+  - tests/                              # Test code
+  - docs/research/                      # Research not relevant
+
+# Trigger patterns for auto-detection
+triggers:
+  - "Azure"
+  - "Microsoft Cloud"
+  - "Azure Functions"
+  - "App Service"
+  - "AKS"
+  - "Cosmos DB"
+  - "Azure SQL"
+  - "Blob Storage"
+  - "Azure AD"
+  - "ARM template"
+  - "Bicep"
+  - "Azure DevOps"
+  - "Key Vault"
+  - "Service Bus"
+
+# Azure expertise areas
+focus:
+  - well_architected_framework
+  - cost_management
+  - security_center
+  - hybrid_cloud
+  - identity_management

@@ -1,0 +1,41 @@
+# Context Manifest: Refactoring Agent
+# Token budget: ~5000 tokens
+# Purpose: Code cleanup, restructuring without changing behavior
+
+role: refactor-agent
+token_budget: 5000
+
+# Files to always load
+required:
+  - CONTEXT_PACK.md                     # Architecture context
+  - STACK.md[test_commands]             # Must verify tests still pass
+
+# Files to load if available and budget permits
+optional:
+  - .agentic/quality/programming_standards.md
+  - tests/                              # Existing tests (must still pass!)
+  - docs/ARCHITECTURE.md                # Current architecture
+
+# Files to explicitly skip
+exclude:
+  - spec/PRD.md                         # Requirements don't change
+  - docs/research/                      # Research not relevant
+  - JOURNAL.md                          # History not needed
+
+# Trigger patterns for auto-detection
+triggers:
+  - "refactor"
+  - "clean up"
+  - "restructure"
+  - "reorganize"
+  - "simplify"
+  - "extract"
+  - "rename"
+  - "move to"
+  - "technical debt"
+
+# Special rule: Tests MUST pass before and after
+constraints:
+  - run_tests_before: true
+  - run_tests_after: true
+  - no_behavior_change: true

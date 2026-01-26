@@ -1,0 +1,28 @@
+# Context Manifest: Git Agent
+# Token budget: ~2000 tokens
+# Purpose: Handle commits, branches, PRs
+
+role: git-agent
+token_budget: 2000
+
+# Files to always load
+required:
+  - STACK.md[git_workflow]              # Git workflow rules
+  - .agentic/checklists/before_commit.md
+
+# Files to load if available and budget permits
+optional:
+  - CHANGELOG.md                        # For version commits
+  - .agentic/WIP.md                     # Check for incomplete work
+
+# Files to explicitly skip (git agent doesn't need implementation context)
+exclude:
+  - src/                                # Code content (git status shows changes)
+  - tests/                              # Test content
+  - spec/                               # Specs
+  - docs/                               # Documentation content
+
+# Section markers for partial file reads
+sections:
+  STACK.md:
+    git_workflow: "## Git"

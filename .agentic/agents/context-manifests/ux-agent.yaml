@@ -1,0 +1,39 @@
+# Context Manifest: UX/Usability Agent
+# Token budget: ~4000 tokens
+# Purpose: Evaluate user experience, accessibility, user flows
+
+role: ux-agent
+token_budget: 4000
+
+# Files to always load
+required:
+  - spec/PRD.md                         # User needs
+  - spec/acceptance/{feature_id}.md     # Feature requirements
+
+# Files to load if available and budget permits
+optional:
+  - docs/PERSONAS.md                    # Who uses this
+  - docs/USER_FLOWS.md                  # Current flows
+  - docs/USER_STORIES.md                # User scenarios
+  - docs/STYLE_GUIDE.md                 # Design system
+  - docs/ACCESSIBILITY.md               # A11y guidelines
+  - docs/mockups/                       # Designs to review
+
+# Files to explicitly skip
+exclude:
+  - src/                                # Implementation details
+  - tests/                              # Test code
+  - .agentic/                           # Framework internals
+
+# Trigger patterns for auto-detection
+triggers:
+  - "usability"
+  - "UX"
+  - "user experience"
+  - "accessibility"
+  - "a11y"
+  - "user flow"
+  - "how does user"
+  - "user journey"
+  - "friction"
+  - "WCAG"

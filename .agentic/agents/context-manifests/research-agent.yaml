@@ -1,0 +1,31 @@
+# Context Manifest: Research Agent
+# Token budget: ~3000 tokens
+# Purpose: Research options, gather references, explore solutions
+
+role: research-agent
+token_budget: 3000
+
+# Files to always load
+required:
+  - STACK.md                             # Current tech stack constraints
+  - spec/PRD.md[requirements]            # User needs (section only)
+  - spec/REFERENCES.md                   # Existing research
+
+# Files to load if available and budget permits
+optional:
+  - docs/research/                       # Past research sessions
+  - spec/NFR.md                          # Non-functional requirements
+
+# Files to explicitly skip (save tokens)
+exclude:
+  - src/                                 # Implementation code not needed
+  - tests/                               # Tests not relevant for research
+  - JOURNAL.md                           # History not needed
+  - spec/FEATURES.md                     # Feature details not needed
+  - .agentic/                            # Framework internals
+
+# Section markers for partial file reads
+sections:
+  spec/PRD.md:
+    requirements: "## Requirements"
+    constraints: "## Constraints"

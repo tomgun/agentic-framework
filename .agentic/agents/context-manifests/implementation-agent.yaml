@@ -1,0 +1,34 @@
+# Context Manifest: Implementation Agent
+# Token budget: ~5000 tokens
+# Purpose: Implement features to make tests pass
+
+role: implementation-agent
+token_budget: 5000
+
+# Files to always load
+required:
+  - spec/acceptance/{feature_id}.md     # Acceptance criteria for this feature
+  - STACK.md                             # Tech stack, build commands
+  - CONTEXT_PACK.md[entry_points]        # Where code lives (section only)
+
+# Files to load if available and budget permits
+optional:
+  - .agentic/quality/programming_standards.md
+  - tests/                               # Existing test patterns (scan, don't read all)
+
+# Files to explicitly skip (save tokens)
+exclude:
+  - spec/PRD.md                          # Not needed for implementation
+  - spec/OVERVIEW.md                     # High-level, not actionable
+  - docs/research/                       # Research phase is done
+  - JOURNAL.md                           # History not needed
+  - .agentic/workflows/                  # Guidelines, not implementation context
+
+# Section markers for partial file reads
+sections:
+  CONTEXT_PACK.md:
+    entry_points: "## Entry Points"
+    architecture: "## Architecture"
+  STACK.md:
+    build_commands: "## Build"
+    test_commands: "## Test"
