@@ -40,3 +40,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-01-26 17:17 - Expanded Task-Type Detection
+
+**Accomplished**:
+- - Added 15 new specialized agent manifests\n- Domain: compliance, domain, design, ux\n- Technical: refactor, perf, security, api-design, db, migration\n- Deployment: devops, appstore, aws, azure, gcp\n- Updated auto_orchestration.md with trigger patterns\n- Total: 24 agent types now supported
+
+**Next steps**:
+- - Test agents in real scenarios\n- Add more deployment targets if needed
+
+**Blockers**: None
+
