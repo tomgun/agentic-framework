@@ -31,6 +31,38 @@ Task: Implement feature F-0042 to make tests pass
 Model: mid-tier (sonnet, gpt-4o)
 ```
 
+## Minimal Context Loading (Token Optimization)
+
+**IMPORTANT**: Don't pass your entire context to subagents. Use `context-for-role.sh`:
+
+```bash
+# Get focused context for implementation agent
+bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
+
+# Output shows:
+# Token budget: 5000
+# Tokens used: 3200 (64%)
+# Files loaded: spec/acceptance/F-0042.md, STACK.md, CONTEXT_PACK.md[entry_points]
+```
+
+**When delegating, pass ONLY the assembled context:**
+
+```
+Task: Implement F-0042
+
+CONTEXT (from context-for-role.sh):
+[paste relevant context here - acceptance criteria, stack info, entry points]
+
+Make the tests pass. Don't read additional files unless necessary.
+```
+
+**Context manifests**: `.agentic/agents/context-manifests/` define what each role needs.
+
+**Benefits**:
+- 60-80% token savings vs full context handoff
+- Subagent stays focused on relevant files
+- Prevents context pollution from unrelated code
+
 ## Feature Pipeline
 
 For each feature F-####:
