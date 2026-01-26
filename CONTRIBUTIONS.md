@@ -1140,6 +1140,34 @@ bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
 - Extract remaining guideline modules
 - Consolidate CLAUDE.md duplications
 
+### Expanded Task-Type Detection (24 Agent Types)
+
+**User suggestions**:
+> "should one agent be 'framework compliance expert'?"
+> "what about something that helps develop business logic/game rules or usability/ux?"
+> "one agent could be expert in the deployment environments like app/play store, azure/aws/gcp"
+
+**Result - 15 New Specialized Agents**:
+
+| Category | Agents Added |
+|----------|--------------|
+| **Domain & Design** | compliance-agent, domain-agent, design-agent, ux-agent |
+| **Technical** | refactor-agent, perf-agent, security-agent, api-design-agent, db-agent, migration-agent |
+| **Deployment** | devops-agent, appstore-agent, aws-agent, azure-agent, gcp-agent |
+
+**Auto-detection triggers added to auto_orchestration.md**:
+- "game rules" / "business logic" → domain-agent
+- "usability" / "UX" / "accessibility" → ux-agent
+- "design" / "mockup" / "wireframe" → design-agent
+- "security" / "vulnerability" / "audit" → security-agent
+- "AWS" / "Lambda" / "S3" → aws-agent
+- "Azure" / "App Service" → azure-agent
+- "GCP" / "Cloud Run" → gcp-agent
+- "App Store" / "Play Store" → appstore-agent
+- etc.
+
+**Total**: 24 agent manifests for role-based context loading.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
