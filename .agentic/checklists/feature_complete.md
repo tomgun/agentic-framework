@@ -150,6 +150,12 @@
 
 ## Quality Checks
 
+- [ ] **Spec ↔ Code alignment verified**
+  - Run `bash .agentic/tools/drift.sh --check`
+  - No undocumented code (non-coders can read specs)
+  - Acceptance criteria match implementation
+  - Fix any drift before marking complete
+
 - [ ] **Quality checks pass** (if enabled)
   - `bash quality_checks.sh` succeeds
   - All stack-specific validations pass
