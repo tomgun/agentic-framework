@@ -1093,6 +1093,53 @@ bash .agentic/tools/blocker.sh add \
 bash .agentic/tools/blocker.sh resolve HN-XXXX "PR merged"
 ```
 
+### Role-Based Context Loading (Context Optimization)
+
+**User request**:
+> "evaluate the framework actual working from context optimization perspective"
+> "if the framework/agent understand what kind of work is being done and can load the relevant context for it"
+
+**Problem identified**:
+- Agents load full 51KB `agent_operating_guidelines.md` for ALL tasks
+- No automated context selection based on role/task type
+- Token-efficient scripts (status.sh, feature.sh) read full files via awk, not true append-only
+- Orchestrator delegates without specifying minimal context
+
+**Result - Role-Based Context Assembly**:
+
+**1. Context Manifests** (`.agentic/agents/context-manifests/`):
+- 9 YAML files defining token budgets per role
+- Each manifest specifies required/optional/exclude files
+- Supports section extraction (e.g., `CONTEXT_PACK.md[entry_points]`)
+
+**2. Context Assembly Tool** (`context-for-role.sh`):
+```bash
+# Get minimal context for implementation agent
+bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
+# Output: Token budget: 5000, Tokens used: 3200 (64%)
+```
+
+**3. Orchestrator Integration**:
+- Updated orchestrator-agent.md with context loading instructions
+- Agents pass ONLY assembled context to subagents
+
+**4. Guidelines Modularization** (partial):
+- Created `.agentic/agents/shared/guidelines/` directory
+- Extracted `anti-hallucination.md` as standalone module
+- Enables lazy loading: load only needed guidelines
+
+**Projected Token Savings**:
+| Role | Before | After | Savings |
+|------|--------|-------|---------|
+| Implementation agent | ~18K tokens | ~5K tokens | 72% |
+| Research agent | ~15K tokens | ~3K tokens | 80% |
+| Session start | ~12K tokens | ~5K tokens | 60% |
+
+**Deferred (documented for future)**:
+- JSON backend for status.sh (true append-only)
+- Extract remaining guideline modules
+- Consolidate CLAUDE.md duplications
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
