@@ -15,17 +15,26 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 
 ## Where to look first (map)
 - Entry points: `install.sh` (installation), `.agentic/init/scaffold.sh` (initialization)
-- Core agent guidelines: `.agentic/agents/shared/agent_operating_guidelines.md`
-- Quick start for agents: `.agentic/agents/shared/AGENT_QUICK_START.md`
-- Framework specs: `spec/FEATURES.md`
+- Agent guidelines:
+  - Quick start: `.agentic/agents/shared/AGENT_QUICK_START.md` (~70 lines)
+  - Full reference: `.agentic/agents/shared/agent_operating_guidelines.md`
+  - **Modular guidelines** (lazy-loaded): `.agentic/agents/shared/guidelines/`
+    - `anti-hallucination.md` - Core rule, always relevant
+    - `token-efficiency.md` - When updating docs
+    - `small-batch.md` - Implementation tasks
+    - `multi-agent.md` - Parallel agent work
+    - `wip-tracking.md` - Interrupted sessions
+- Claude-specific: `.agentic/agents/claude/CLAUDE.md` (consolidated quick reference)
+- Framework specs: `spec/FEATURES.md` (70 features)
 - Acceptance criteria: `spec/acceptance/F-####.md`
-- Validation tests: `tests/validate_framework.sh`
+- Validation tests: `tests/validate_framework.sh` (104+ tests)
 - Templates: `.agentic/init/*.template.md`, `.agentic/spec/*.template.md`
 - Workflows: `.agentic/workflows/`
 - Quality guides: `.agentic/quality/`
 - Checklists: `.agentic/checklists/`
 - Principles: `.agentic/PRINCIPLES.md`
 - Full dev guide: `.agentic/FRAMEWORK_DEVELOPMENT.md`
+- **Framework ADRs**: `docs/adr/` - why framework decisions were made (read before changing!)
 
 ## How to run
 - Setup: Clone repo, no dependencies required (bash/Python 3)
@@ -40,11 +49,17 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 - Components:
   - Installation system (`install.sh`, `upgrade.sh`)
   - Init scaffolding (profile selection, file generation)
-  - Agent guidelines (tool-specific instructions)
+  - Agent guidelines (tool-specific + shared)
+  - Modular guidelines (lazy-loaded for token efficiency)
   - Workflows (TDD, git, session management)
-  - Quality gates (checklists, validation scripts)
+  - Quality gates (checklists, validation scripts, doctor.sh)
   - Templates (specs, docs, features)
-  - Tools (doctor.py, wip.sh, session_log.sh, etc.)
+  - Token-efficient tools:
+    - `journal.sh` - Append-only JOURNAL.md updates
+    - `status.sh` - JSON backend (`.agentic/state/status.json`) → STATUS.md sync
+    - `feature.sh` - Field updates to FEATURES.md
+    - `blocker.sh` - Append-only HUMAN_NEEDED.md updates
+    - `wip.sh` - Work-in-progress tracking
 - Data flow: Framework installed → Project initialized → Agents follow guidelines → Quality gates enforced
 - External dependencies: None (pure bash/Python, no npm/pip packages)
 
@@ -52,6 +67,11 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 - Validation tests required: `tests/validate_framework.sh` must pass (104+ tests)
 - Acceptance criteria: Every feature needs `spec/acceptance/F-####.md`
 - Definition of Done: See `.agentic/workflows/definition_of_done.md`
+
+## State files
+- `.agentic/state/status.json` - Fast status updates (JSON backend)
+- `.agentic/WIP.md` - Work-in-progress tracking (recovery)
+- `.agentic/AGENTS_ACTIVE.md` - Multi-agent coordination
 
 ## Known risks / sharp edges
 - Multiple agents can work simultaneously - must coordinate via `.agentic/AGENTS_ACTIVE.md`

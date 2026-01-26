@@ -232,6 +232,22 @@
 
 ## v0.11.0 Contributions (2025-01-14)
 
+### Context Optimization (2026-01-26)
+
+**Token efficiency improvements**:
+- Extracted guideline modules for lazy loading:
+  - `anti-hallucination.md` - Core rule always loaded
+  - `token-efficiency.md` - When updating docs
+  - `small-batch.md` - Implementation tasks
+  - `multi-agent.md` - Parallel agent work (NEW)
+  - `wip-tracking.md` - Interrupted sessions
+- Consolidated CLAUDE.md template (512 → 113 lines, 78% reduction)
+- Added JSON backend for status.sh (true append-only updates)
+
+**Token savings projection**:
+- Guidelines: 12,800 tokens → ~2,000 tokens per agent (84% reduction)
+- CLAUDE.md: Reduced duplication, now references modular guidelines
+
 ### Gate-Based Architecture Initiative
 - Requested critical review of framework's determinism issues
 - Identified core problem: "agents don't remember to do everything"
