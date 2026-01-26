@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.12.0] - 2026-01-20
 
+### Added
+- **F-0099: Framework Architecture Decision Records (ADRs)** - Document WHY decisions were made
+  - `docs/adr/` directory for framework-level decision documentation
+  - ADR-001: CLAUDE.md must be self-contained (bootstrap reliability)
+  - Prevents future contributors from undoing intentional decisions
+- **F-0100: Modular Guidelines for Token Efficiency** - Lazy-loaded guideline modules
+  - `.agentic/agents/shared/guidelines/` with 5 modules
+  - anti-hallucination, token-efficiency, small-batch, wip-tracking, multi-agent
+  - ~84% token reduction (12,800 → 2,000 tokens) for typical tasks
+- **.gitignore** for framework repository
+- **JSON backend for status.sh** - True append-only updates via `.agentic/state/status.json`
+
 ### Changed
 - **STATUS.md now required for both Core and Core+PM profiles**
   - Simplifies framework - one file for project state tracking
