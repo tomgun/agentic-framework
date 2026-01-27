@@ -30,8 +30,8 @@
 
 - [ ] **.agentic/WIP.md must be completed**
   ```bash
-  # Check if WIP lock exists
-  ls .agentic/WIP.md 2>/dev/null
+  # Check if WIP lock exists (no output = doesn't exist = OK)
+  ls .agentic/WIP.md 2>/dev/null || true
   ```
   
   - **If .agentic/WIP.md exists**: Work is not yet complete!
