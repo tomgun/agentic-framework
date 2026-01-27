@@ -983,8 +983,8 @@ Type 'a' or 'b':
 
 ---
 
-**Last Updated**: 2025-01-11  
-**Framework Version**: 0.11.2  
+**Last Updated**: 2026-01-27
+**Framework Version**: 0.12.0  
 
 **Note**: Principles evolve, but slowly. Major changes to core philosophy require strong justification and community discussion.
 

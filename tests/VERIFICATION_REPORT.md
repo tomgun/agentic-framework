@@ -1,7 +1,7 @@
 # Framework Verification Report
 
 **Generated**: 2025-01-18
-**Framework Version**: 0.11.3
+**Framework Version**: 0.12.0
 **Test Results**: 129 passed, 0 failed
 
 ---

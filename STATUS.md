@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Context Optimization complete (Updated: 2026-01-27 13:02)
+- Releasing v0.12.0 - updating version numbers and CONTRIBUTIONS.md (Updated: 2026-01-27 18:20)
 - Progress: All phases done. Manifests + tool + JSON backend working.
   - Identified missing session files (STATUS, CONTEXT_PACK, JOURNAL, HUMAN_NEEDED)
   - Creating dogfooding infrastructure
@@ -28,7 +28,7 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - Near-term:
   - Complete dogfooding setup
   - Merge pending git workflow changes
-  - Release v0.11.3 with improvements
+  - Release v0.12.0
 - Later:
   - Enhanced multi-agent coordination
   - Better token efficiency tooling
@@ -42,5 +42,5 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - None currently
 
 ## Release notes (optional)
-- v0.11.2 current
+- v0.12.0 releasing
 - See CHANGELOG.md for full history

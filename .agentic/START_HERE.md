@@ -31,10 +31,10 @@
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
 
 # Run the installer
-bash agentic-framework-0.11.2/install.sh
+bash agentic-framework-0.12.0/install.sh
 
 # Clean up
-rm -rf agentic-framework-0.11.2
+rm -rf agentic-framework-0.12.0
 ```
 
 ### Step 2: Tell your agent to initialize
