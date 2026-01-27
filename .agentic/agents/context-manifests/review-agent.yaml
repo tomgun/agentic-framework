@@ -1,27 +1,27 @@
 # Context Manifest: Review Agent
-# Token budget: ~6000 tokens
-# Purpose: Review implementation quality, security, standards compliance
+# Reviews code quality, security, and adherence to standards
 
 role: review-agent
 token_budget: 6000
+description: Review code quality, security, and standards compliance
 
-# Files to always load
 required:
-  - spec/acceptance/{feature_id}.md   # What should be implemented
-  - .agentic/quality/programming_standards.md
-  - STACK.md                            # Tech stack context
+  - spec/acceptance/{feature_id}.md         # Original requirements
+  - .agentic/quality/programming_standards.md # Code standards
+  - .agentic/agents/shared/guidelines/anti-hallucination.md
+  # Changed files passed dynamically from pipeline
 
-# Files to load if available and budget permits
 optional:
-  - .agentic/quality/testing_standards.md
-  - .agentic/checklists/before_commit.md
-  - spec/NFR.md                         # Non-functional requirements
+  - .agentic/quality/testing_standards.md     # Test quality review
+  - .agentic/checklists/before_commit.md      # Pre-commit checklist
 
-# Files to explicitly skip (save tokens)
 exclude:
-  - docs/research/                      # Research not relevant
-  - JOURNAL.md                          # History not needed
-  - spec/PRD.md                         # High-level context not needed
+  - JOURNAL.md
+  - STATUS.md
+  - docs/research/
+  - spec/PRD.md
+  - .agentic/workflows/
 
-# Review focuses on changed files (passed by orchestrator)
-# Not listed here as they're dynamic
+variables:
+  - feature_id
+  - changed_files   # List of files to review (passed at invocation)

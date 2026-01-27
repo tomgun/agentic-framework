@@ -1,30 +1,33 @@
 # Context Manifest: Test Agent
-# Token budget: ~4000 tokens
-# Purpose: Write tests from acceptance criteria (before implementation)
+# Writes tests based on acceptance criteria BEFORE implementation (TDD)
 
 role: test-agent
 token_budget: 4000
+description: Write failing tests for acceptance criteria (TDD red phase)
 
-# Files to always load
 required:
-  - spec/acceptance/{feature_id}.md   # Acceptance criteria to test
-  - STACK.md[test_commands]             # How to run tests
-  - tests/                              # Existing test patterns (scan structure)
+  - spec/acceptance/{feature_id}.md       # What to test
+  - STACK.md[test_framework,test_commands]  # How to test
+  - .agentic/quality/testing_standards.md   # Testing guidelines
+  - .agentic/agents/shared/guidelines/anti-hallucination.md
 
-# Files to load if available and budget permits
 optional:
-  - .agentic/quality/testing_standards.md
-  - CONTEXT_PACK.md[entry_points]       # Where to find testable code
+  - tests/                                  # Existing test patterns (sampled)
+  - CONTEXT_PACK.md[modules]                # Where code will live
 
-# Files to explicitly skip (save tokens)
 exclude:
-  - src/                                # Don't read implementation (TDD!)
-  - spec/PRD.md                         # High-level, not needed
-  - docs/                               # Documentation not needed
-  - JOURNAL.md                          # History not needed
+  - JOURNAL.md
+  - STATUS.md
+  - docs/research/
+  - spec/PRD.md
+  - .agentic/workflows/
 
-# Section markers for partial file reads
-sections:
+variables:
+  - feature_id
+
+section_markers:
   STACK.md:
+    test_framework: "## Test"
     test_commands: "## Test"
-    build_commands: "## Build"
+  CONTEXT_PACK.md:
+    modules: "## Modules"

@@ -1,25 +1,26 @@
 # Context Manifest: Planning Agent
-# Token budget: ~5000 tokens
-# Purpose: Design implementation approach, break down features
+# Creates implementation plans and acceptance criteria
 
 role: planning-agent
-token_budget: 5000
+token_budget: 4000
+description: Create implementation plans and acceptance criteria
 
-# Files to always load
 required:
-  - spec/PRD.md                         # Product requirements
-  - spec/FEATURES.md                    # Feature registry
-  - CONTEXT_PACK.md                     # Architecture context
-  - STACK.md                            # Tech constraints
+  - CONTEXT_PACK.md                         # Project architecture
+  - STACK.md                                # Tech stack constraints
+  - .agentic/agents/shared/guidelines/anti-hallucination.md
 
-# Files to load if available and budget permits
 optional:
-  - spec/TECH_SPEC.md                   # Technical specifications
-  - spec/NFR.md                         # Non-functional requirements
-  - docs/research/                      # Research findings
+  - docs/research/{topic}.md                # Research findings (if available)
+  - spec/PRD.md                             # Product requirements
+  - spec/FEATURES.md[related_features]      # Related features
 
-# Files to explicitly skip (planning doesn't need implementation details)
 exclude:
-  - src/                                # Code (not implementing yet)
-  - tests/                              # Tests (not writing yet)
-  - JOURNAL.md                          # History not needed
+  - JOURNAL.md
+  - STATUS.md
+  - src/                                    # Not implementing
+  - tests/                                  # Not writing tests
+
+variables:
+  - feature_id
+  - topic

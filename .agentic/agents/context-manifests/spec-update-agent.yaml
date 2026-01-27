@@ -1,24 +1,29 @@
 # Context Manifest: Spec Update Agent
-# Token budget: ~3000 tokens
-# Purpose: Update specs after implementation (FEATURES.md, acceptance criteria)
+# Updates FEATURES.md and acceptance criteria after implementation
 
 role: spec-update-agent
 token_budget: 3000
+description: Update specs after feature completion
 
-# Files to always load
 required:
-  - spec/FEATURES.md                    # Feature registry to update
-  - spec/acceptance/{feature_id}.md   # Acceptance criteria to verify/update
+  - spec/acceptance/{feature_id}.md       # Current acceptance criteria
+  - spec/FEATURES.md[{feature_id}]        # Feature entry to update
+  - .agentic/agents/shared/guidelines/anti-hallucination.md
 
-# Files to load if available and budget permits
 optional:
-  - CONTEXT_PACK.md                     # May need to update architecture notes
-  - STATUS.md                           # Update current focus
+  - CHANGELOG.md[unreleased]                # If updating changelog
 
-# Files to explicitly skip (save tokens)
 exclude:
-  - src/                                # Code details not needed
-  - tests/                              # Test details not needed
-  - docs/research/                      # Research not relevant
-  - JOURNAL.md                          # History not needed
-  - .agentic/quality/                   # Standards not relevant
+  - JOURNAL.md
+  - STATUS.md
+  - src/
+  - tests/
+  - docs/research/
+  - .agentic/workflows/
+
+variables:
+  - feature_id
+
+section_markers:
+  CHANGELOG.md:
+    unreleased: "## [Unreleased]"
