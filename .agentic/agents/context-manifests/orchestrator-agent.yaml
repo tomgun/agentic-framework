@@ -1,27 +1,35 @@
 # Context Manifest: Orchestrator Agent
-# Token budget: ~2000 tokens
-# Purpose: Coordinate specialized agents, delegate tasks, verify completion
+# Coordinates specialized agents, ensures framework compliance
 
 role: orchestrator-agent
 token_budget: 2000
+description: Coordinate agents and ensure framework compliance
 
-# Files to always load
 required:
-  - STATUS.md                           # Current project state
-  - HUMAN_NEEDED.md                     # Blockers to address
-  - spec/FEATURES.md[current_feature]   # Current feature status only
+  - STATUS.md                               # Current project state
+  - CONTEXT_PACK.md[entry_points]           # Project structure overview
+  - .agentic/agents/shared/guidelines/anti-hallucination.md
 
-# Files to load if available and budget permits
 optional:
-  - .agentic/WIP.md                     # Interrupted work
-  - .agentic/AGENTS_ACTIVE.md           # Other active agents
+  - HUMAN_NEEDED.md                         # Blockers to address
+  - .agentic/AGENTS_ACTIVE.md               # Multi-agent coordination
+  - spec/FEATURES.md[summary]               # Feature overview (section only)
 
-# Files to explicitly skip (orchestrator delegates, doesn't implement)
 exclude:
-  - src/                                # Implementation details
-  - tests/                              # Test details
-  - docs/                               # Documentation details
-  - .agentic/quality/                   # Standards (agents handle)
-  - spec/PRD.md                         # Detail work delegated
+  - JOURNAL.md                              # Historical
+  - src/                                    # Don't implement code
+  - tests/                                  # Don't write tests
+  - docs/research/
+  - .agentic/quality/                       # Delegates handle quality
 
-# Orchestrator loads minimal context, delegates with context-for-role.sh
+variables:
+  - feature_id
+
+section_markers:
+  CONTEXT_PACK.md:
+    entry_points: "## Entry Points"
+  spec/FEATURES.md:
+    summary: "## Summary"
+
+# Note: Orchestrator loads minimal context, then uses context-for-role.sh
+# to assemble context for each subagent it spawns

@@ -1,31 +1,29 @@
 # Context Manifest: Research Agent
-# Token budget: ~3000 tokens
-# Purpose: Research options, gather references, explore solutions
+# Investigates technology choices, best practices, external dependencies
 
 role: research-agent
 token_budget: 3000
+description: Research technology options and best practices
 
-# Files to always load
 required:
-  - STACK.md                             # Current tech stack constraints
-  - spec/PRD.md[requirements]            # User needs (section only)
-  - spec/REFERENCES.md                   # Existing research
+  - CONTEXT_PACK.md[architecture]           # Understand project structure
+  - STACK.md                                # Current tech stack
+  - .agentic/agents/shared/guidelines/anti-hallucination.md
 
-# Files to load if available and budget permits
 optional:
-  - docs/research/                       # Past research sessions
-  - spec/NFR.md                          # Non-functional requirements
+  - spec/PRD.md                             # Product goals (if Core+PM)
+  - spec/acceptance/{feature_id}.md       # If assigned to specific feature
 
-# Files to explicitly skip (save tokens)
 exclude:
-  - src/                                 # Implementation code not needed
-  - tests/                               # Tests not relevant for research
-  - JOURNAL.md                           # History not needed
-  - spec/FEATURES.md                     # Feature details not needed
-  - .agentic/                            # Framework internals
+  - JOURNAL.md
+  - STATUS.md
+  - src/                                    # Not implementing code
+  - tests/                                  # Not writing tests
+  - .agentic/workflows/
 
-# Section markers for partial file reads
-sections:
-  spec/PRD.md:
-    requirements: "## Requirements"
-    constraints: "## Constraints"
+variables:
+  - feature_id
+
+section_markers:
+  CONTEXT_PACK.md:
+    architecture: "## Architecture"

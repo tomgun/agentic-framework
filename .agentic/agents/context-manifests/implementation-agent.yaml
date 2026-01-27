@@ -1,34 +1,41 @@
 # Context Manifest: Implementation Agent
-# Token budget: ~5000 tokens
-# Purpose: Implement features to make tests pass
+# Token budget defines max context to load for this role
 
 role: implementation-agent
 token_budget: 5000
+description: Write code to make tests pass (TDD green phase)
 
-# Files to always load
+# Required context - always loaded
 required:
-  - spec/acceptance/{feature_id}.md     # Acceptance criteria for this feature
-  - STACK.md                             # Tech stack, build commands
-  - CONTEXT_PACK.md[entry_points]        # Where code lives (section only)
+  - spec/acceptance/{feature_id}.md        # Acceptance criteria for the feature
+  - STACK.md[build_commands,test_commands] # How to build and test
+  - CONTEXT_PACK.md[entry_points,modules]  # Where code lives
+  - .agentic/agents/shared/guidelines/anti-hallucination.md  # Core rule
 
-# Files to load if available and budget permits
+# Optional context - loaded if token budget allows
 optional:
-  - .agentic/quality/programming_standards.md
-  - tests/                               # Existing test patterns (scan, don't read all)
+  - .agentic/quality/programming_standards.md  # Code standards
+  - .agentic/agents/shared/guidelines/small-batch.md  # Small batch principle
+  - src/                                       # Existing code patterns (sampled)
 
-# Files to explicitly skip (save tokens)
+# Excluded - never load (saves tokens)
 exclude:
-  - spec/PRD.md                          # Not needed for implementation
-  - spec/OVERVIEW.md                     # High-level, not actionable
-  - docs/research/                       # Research phase is done
-  - JOURNAL.md                           # History not needed
-  - .agentic/workflows/                  # Guidelines, not implementation context
+  - JOURNAL.md           # Historical, not needed for implementation
+  - docs/research/       # Research phase output
+  - spec/PRD.md          # Product requirements (planning phase)
+  - .agentic/workflows/  # Meta-documentation
+  - docs/adr/            # Decision records (reference only)
 
-# Section markers for partial file reads
-sections:
-  CONTEXT_PACK.md:
-    entry_points: "## Entry Points"
-    architecture: "## Architecture"
+# Variables that can be substituted
+variables:
+  - feature_id   # e.g., F-0042
+
+# Section extraction patterns (for partial file loading)
+# Format: file.md[section1,section2] extracts only those sections
+section_markers:
   STACK.md:
     build_commands: "## Build"
     test_commands: "## Test"
+  CONTEXT_PACK.md:
+    entry_points: "## Entry Points"
+    modules: "## Modules"
