@@ -70,6 +70,7 @@ Ask yourself:
 | 6 | `CHANGELOG.md` | Document the change | Living docs |
 | 7 | `CONTRIBUTIONS.md` | Add version section | Attribution |
 | 8 | `upgrade.sh` FEATURE_REGISTRY | If user-visible during upgrade | Developer UX |
+| 9 | `.agentic/agents/claude/CLAUDE.md` | Sync if guidelines/principles changed | Bootstrap must be self-contained (see ADR-001) |
 
 **Feature is "accepted" when**: Tests pass in `validate_framework.sh` AND developer has reviewed tests and results.
 

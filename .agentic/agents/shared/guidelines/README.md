@@ -29,11 +29,12 @@ exclude:
 
 - [x] Directory structure created
 - [x] anti-hallucination.md extracted
-- [ ] token-efficiency.md (TODO)
-- [ ] multi-agent.md (TODO)
-- [ ] wip-tracking.md (TODO)
-- [ ] small-batch.md (TODO)
+- [x] token-efficiency.md extracted
+- [x] multi-agent.md extracted
+- [x] wip-tracking.md extracted
+- [x] small-batch.md extracted
 - [ ] Update agent_operating_guidelines.md to reference modules
+- [x] Consolidate CLAUDE.md duplications (512 → 113 lines, 78% reduction)
 
 ## Token Savings
 
