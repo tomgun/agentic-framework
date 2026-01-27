@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.11.2](https://github.com/tomgun/agentic-framework/releases/tag/v0.11.2)
+**Current version:** [v0.12.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.12.0)
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
