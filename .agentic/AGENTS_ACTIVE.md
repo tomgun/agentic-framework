@@ -5,17 +5,16 @@
 
 ## Currently Active
 
-### Agent 1 (Claude - Main Window)
-- **Working on**: Framework development, PR workflow implementation
-- **Branch**: main
-- **Files touched**: git_workflow.md, STACK.template.md, agent guidelines
-- **Started**: 2026-01-15 (this session)
-- **Status**: Active
+<!-- No agents currently active -->
 
-### Agent 2 (Claude - Second Window)
-- **Working on**: Awaiting assignment
-- **Branch**: main
-- **Files touched**: None yet
-- **Started**: 2026-01-15
-- **Status**: Active - ready for work
+---
 
+**When to use**: Multiple AI agents working simultaneously on different features.
+
+**Protocol**:
+1. Add your entry when starting a session
+2. Update every 15-30 minutes
+3. Remove your entry when done
+4. Check for other agents before editing shared files
+
+**Full guide**: `.agentic/workflows/multi_agent_coordination.md`

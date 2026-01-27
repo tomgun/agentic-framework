@@ -95,3 +95,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-01-27 20:28 - v0.12.0 Release
+
+**Accomplished**:
+- - Updated all version references (14 files)\n- Updated CONTRIBUTIONS.md with subagents + dogfooding sections\n- Added periodic CONTRIBUTIONS.md update reminder to dev guide\n- Tested install.sh and upgrade.sh - both working\n- Created tag v0.12.0 and pushed
+
+**Next steps**:
+- - Create GitHub release with CHANGELOG excerpt
+
+**Blockers**: None
+

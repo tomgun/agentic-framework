@@ -16,8 +16,8 @@
 # Read these silently (don't dump to user)
 cat STATUS.md 2>/dev/null
 cat HUMAN_NEEDED.md 2>/dev/null | head -20
-ls .agentic/WIP.md 2>/dev/null
-cat .agentic/AGENTS_ACTIVE.md 2>/dev/null  # Check for other active agents!
+ls .agentic/WIP.md 2>/dev/null || true
+cat .agentic/AGENTS_ACTIVE.md 2>/dev/null || true
 ```
 
 ## Step 2: Greet User with Recap
