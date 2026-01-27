@@ -94,7 +94,7 @@ Copy the template section in `LLM_TEST_RESULTS.md` and fill in:
 ```markdown
 ## Test Run: 2025-01-18 - Claude Code
 
-**Framework Version**: 0.11.3
+**Framework Version**: 0.12.0
 **Profile**: Core+PM
 **Tester**: [name]
 

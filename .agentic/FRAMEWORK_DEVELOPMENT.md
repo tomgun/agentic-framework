@@ -348,6 +348,10 @@ refactor(docs): eliminate documentation duplication
 - [ ] Start next version in CHANGELOG (## [Unreleased])
 - [ ] Update README version if showing "latest"
 
+**Ongoing documentation (don't wait for release)**:
+- **CONTRIBUTIONS.md**: Update periodically as features are implemented (not just at release time)
+- **CHANGELOG.md**: Add entries as changes are made (## [Unreleased] section)
+
 ---
 
 ### 12. **Common Framework Development Patterns**
@@ -548,8 +552,8 @@ Users already past X.Y.Z will NOT see it (prevents repeated prompts).
 
 ---
 
-**Last Updated**: 2025-01-15
-**Framework Version**: 0.11.3
+**Last Updated**: 2026-01-27
+**Framework Version**: 0.12.0
 
 **Note**: These guidelines evolve with the framework. When they change, notify framework contributors and update this document.
 

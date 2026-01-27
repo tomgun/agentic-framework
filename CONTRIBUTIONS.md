@@ -927,7 +927,7 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 
 ---
 
-## v0.12.0 Contributions (2026-01-20)
+## v0.12.0 Contributions (2026-01-27)
 
 ### Branch Policy Safeguard (F-0099)
 
@@ -1199,6 +1199,46 @@ bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
 
 **Token savings projection**:
 - Guidelines: 12,800 tokens → ~2,000 tokens per agent (84% reduction)
+
+### 25 Subagent Definition Files
+
+**User request**:
+> "we have context manifests but they're not matched by subagent definitions"
+
+**Result - Complete Subagent Coverage**:
+- Created 15 new specialized agent definitions (`.agentic/agents/claude/subagents/`)
+- Total: 25 subagent definitions matching 24 context manifests
+- Each agent has: Purpose, When to Use, Core Rules, Output Format, What You DON'T Do
+
+**New agents created**:
+| Category | Agents |
+|----------|--------|
+| Domain | compliance-agent, domain-agent, design-agent, ux-agent |
+| Technical | refactor-agent, perf-agent, security-agent, api-design-agent, db-agent, migration-agent |
+| Deployment | devops-agent, appstore-agent, aws-agent, azure-agent, gcp-agent |
+
+### Dogfooding CLAUDE.md Fix
+
+**User insight**:
+> "are we dogfooding properly as the claude.md in the root of this is significantly smaller than claude.md in .agentic/agents/claude"
+
+**Problem identified**:
+- Root CLAUDE.md was only 102 lines
+- Framework template CLAUDE.md (what users get) is 511 lines
+- Agents working ON the framework got less guidance than users USING the framework
+
+**Key decision - HOW vs WHAT separation**:
+> "should we use similar logic for framework-development specific things? I kind of like that it is here clearly named FRAMEWORK_QUICK_START.md, separating the 'framework working things' and 'what we are working on things'"
+
+**Result**:
+- **CLAUDE.md** (541 lines): Full framework instructions (HOW to work)
+- **FRAMEWORK_QUICK_START.md**: Framework-specific context (WHAT we're building)
+- Pattern applies to all projects: CLAUDE.md = methodology, PRD/product docs = domain
+
+**Changes**:
+- Merged full framework CLAUDE.md with framework-specific header/footer
+- Added framework reminders pointing to FRAMEWORK_QUICK_START.md
+- Only ~30 lines larger than what users get (~1KB, easily fits in context)
 
 ---
 

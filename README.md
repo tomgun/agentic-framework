@@ -50,7 +50,7 @@ Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same proje
 ```bash
 # Download latest release
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
-cd agentic-framework-0.11.2
+cd agentic-framework-0.12.0
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -79,7 +79,7 @@ The agent will:
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
 
 # Copy .agentic/ into your project
-cp -r agentic-framework-0.11.2/.agentic /path/to/your-project/
+cp -r agentic-framework-0.12.0/.agentic /path/to/your-project/
 ```
 
 Then follow the same agent initialization process above. The agent will run `scaffold.sh` for you.
@@ -213,7 +213,7 @@ The agent will:
 ```bash
 # Download new version
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
-cd agentic-framework-0.11.2
+cd agentic-framework-0.12.0
 
 # Run upgrade script with your project path
 bash .agentic/tools/upgrade.sh /path/to/your-project
@@ -417,10 +417,10 @@ cd /tmp
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
 
 # Run upgrade tool from NEW framework, pointing to your project
-bash /tmp/agentic-framework-0.11.2/.agentic/tools/upgrade.sh /path/to/your-project
+bash /tmp/agentic-framework-0.12.0/.agentic/tools/upgrade.sh /path/to/your-project
 
 # Clean up
-rm -rf /tmp/agentic-framework-0.11.2
+rm -rf /tmp/agentic-framework-0.12.0
 ```
 
 **Why from the new framework?** The new upgrade script has the latest bug fixes and knows about new structure changes.
