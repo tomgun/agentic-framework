@@ -4,9 +4,9 @@
   "migrations": [
     {
       "id": 1,
-      "file": "001_add_f0099_framework_adrs_and_f0100_modular_guidelines.md",
+      "file": "001_add_f0101_framework_adrs_and_f0102_modular_guidelines.md",
       "date": "2026-01-27",
-      "description": "Add F-0099 Framework ADRs and F-0100 Modular Guidelines"
+      "description": "Add F-0101 Framework ADRs and F-0102 Modular Guidelines"
     }
   ]
 }

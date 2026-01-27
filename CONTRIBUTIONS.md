@@ -232,34 +232,6 @@
 
 ## v0.11.0 Contributions (2025-01-14)
 
-### Context Optimization (2026-01-26/27)
-
-**Token efficiency improvements**:
-- Extracted guideline modules for lazy loading (F-0100):
-  - `anti-hallucination.md` - Core rule always loaded
-  - `token-efficiency.md` - When updating docs
-  - `small-batch.md` - Implementation tasks
-  - `multi-agent.md` - Parallel agent work
-  - `wip-tracking.md` - Interrupted sessions
-- Added JSON backend for status.sh (true append-only updates)
-
-**Token savings projection**:
-- Guidelines: 12,800 tokens → ~2,000 tokens per agent (84% reduction)
-
-### Framework ADRs Initiative (2026-01-27)
-
-**Critical insight**: Agent attempted to "consolidate" CLAUDE.md (512 → 113 lines) thinking content was duplicated. This broke the bootstrap mechanism - the duplication was intentional.
-
-**Key question asked**: "Why do I have to ask these [about updating docs] always?"
-
-**Result - F-0099: Framework ADRs**:
-- Created `docs/adr/` for documenting WHY decisions were made
-- ADR-001: CLAUDE.md Must Be Self-Contained (bootstrap reliability)
-- Added step 9 to FRAMEWORK_QUICK_START.md: sync CLAUDE.md when guidelines change
-- Reverted CLAUDE.md consolidation (mistake acknowledged)
-
-**Principle established**: "Duplication" between CLAUDE.md and agent_operating_guidelines.md is intentional redundancy for reliability, not a DRY violation to fix.
-
 ### Commit Preferences
 
 **Preference stated**: No self-credit (Co-Authored-By) in commits
@@ -1199,6 +1171,34 @@ bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
 - etc.
 
 **Total**: 24 agent manifests for role-based context loading.
+
+### Framework ADRs Initiative (F-0101)
+
+**Critical insight**: Agent attempted to "consolidate" CLAUDE.md (512 → 113 lines) thinking content was duplicated. This broke the bootstrap mechanism - the duplication was intentional.
+
+**Key question asked**: "Why do I have to ask these [about updating docs] always?"
+
+**Result - F-0101: Framework ADRs**:
+- Created `docs/adr/` for documenting WHY decisions were made
+- ADR-001: CLAUDE.md Must Be Self-Contained (bootstrap reliability)
+- Added step 9 to FRAMEWORK_QUICK_START.md: sync CLAUDE.md when guidelines change
+- Reverted CLAUDE.md consolidation (mistake acknowledged)
+
+**Principle established**: "Duplication" between CLAUDE.md and agent_operating_guidelines.md is intentional redundancy for reliability, not a DRY violation to fix.
+
+### Modular Guidelines for Token Efficiency (F-0102)
+
+**Token efficiency improvements**:
+- Extracted guideline modules for lazy loading:
+  - `anti-hallucination.md` - Core rule always loaded
+  - `token-efficiency.md` - When updating docs
+  - `small-batch.md` - Implementation tasks
+  - `multi-agent.md` - Parallel agent work
+  - `wip-tracking.md` - Interrupted sessions
+- Added JSON backend for status.sh (true append-only updates)
+
+**Token savings projection**:
+- Guidelines: 12,800 tokens → ~2,000 tokens per agent (84% reduction)
 
 ---
 

@@ -1508,7 +1508,7 @@
 
 ---
 
-## F-0099: Framework Architecture Decision Records (ADRs)
+## F-0101: Framework Architecture Decision Records (ADRs)
 
 **Status**: shipped
 **Priority**: high
@@ -1524,11 +1524,11 @@
 - Code: `docs/adr/`, `docs/adr/001-claude-md-self-contained.md`
 - Tests: directory and ADR existence
 
-**Acceptance**: See `spec/acceptance/F-0099.md`
+**Acceptance**: See `spec/acceptance/F-0101.md`
 
 ---
 
-## F-0100: Modular Guidelines for Token Efficiency
+## F-0102: Modular Guidelines for Token Efficiency
 
 **Status**: shipped
 **Priority**: high
@@ -1544,7 +1544,7 @@
 - Code: `.agentic/agents/shared/guidelines/` (anti-hallucination.md, token-efficiency.md, small-batch.md, wip-tracking.md, multi-agent.md)
 - Tests: module existence validation
 
-**Acceptance**: See `spec/acceptance/F-0100.md`
+**Acceptance**: See `spec/acceptance/F-0102.md`
 
 ---
 
@@ -1561,6 +1561,7 @@
 | Developer Experience (F-0061-0070) | 10 | 0 | 0 | 10 |
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
-| Verification & Enforcement (F-0091-0100) | 9 | 1 | 0 | 10 |
-| **Total** | **72** | **1** | **0** | **73** |
+| Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
+| Framework Infrastructure (F-0101+) | 2 | 0 | 0 | 2 |
+| **Total** | **75** | **1** | **0** | **76** |
 

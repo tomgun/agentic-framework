@@ -3,7 +3,7 @@
 <!-- author: Claude (Opus) -->
 <!-- type: feature -->
 
-# Migration 001: Add F-0099 Framework ADRs and F-0100 Modular Guidelines
+# Migration 001: Add F-0101 Framework ADRs and F-0102 Modular Guidelines
 
 ## Context & Why
 
@@ -18,13 +18,13 @@ Example: CLAUDE.md had content that appeared duplicated with agent_operating_gui
 
 ### Features Added
 
-- F-0099: Framework Architecture Decision Records (ADRs)
+- F-0101: Framework Architecture Decision Records (ADRs)
   - Created `docs/adr/` directory
   - Created ADR-001: CLAUDE.md Must Be Self-Contained
   - Updated CONTEXT_PACK.md to reference ADRs
   - Updated FRAMEWORK_QUICK_START.md with step 9 (sync CLAUDE.md)
 
-- F-0100: Modular Guidelines for Token Efficiency
+- F-0102: Modular Guidelines for Token Efficiency
   - Created `.agentic/agents/shared/guidelines/` directory
   - Extracted 5 modules: anti-hallucination, token-efficiency, small-batch, wip-tracking, multi-agent
   - ~84% token reduction for typical tasks
@@ -66,13 +66,13 @@ None
 2. Remove `.agentic/agents/shared/guidelines/` directory (keep README.md)
 3. Remove step 9 from FRAMEWORK_QUICK_START.md
 4. Update CONTEXT_PACK.md to remove ADR reference
-5. Revert spec/FEATURES.md (remove F-0099, F-0100)
+5. Revert spec/FEATURES.md (remove F-0101, F-0102)
 
 ## Related Files
 
-- `spec/FEATURES.md` - Added F-0099, F-0100
-- `spec/acceptance/F-0099.md` - Created
-- `spec/acceptance/F-0100.md` - Created
+- `spec/FEATURES.md` - Added F-0101, F-0102
+- `spec/acceptance/F-0101.md` - Created
+- `spec/acceptance/F-0102.md` - Created
 - `docs/adr/README.md` - Created
 - `docs/adr/001-claude-md-self-contained.md` - Created
 - `.agentic/agents/shared/guidelines/*.md` - Created (5 modules)
