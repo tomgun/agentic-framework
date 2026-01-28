@@ -61,18 +61,21 @@ Keep `AGENTS.md` as the source of truth for non-negotiables, but ensure agents a
 
 ---
 
-## Research: Other Tools
+## Supported Tools
 
 ### Codex (OpenAI CLI)
 
-As of 2025, Codex CLI uses:
-- `.codex/instructions.md` (if exists)
-- Falls back to reading README.md
+Codex CLI auto-loads `.codex/instructions.md`.
 
-To support Codex, create `.codex/instructions.md`:
+**Automatic setup:**
+```bash
+bash .agentic/tools/setup-agent.sh codex
+```
+
+**Manual setup:**
 ```bash
 mkdir -p .codex
-cp .agentic/agents/shared/agent_operating_guidelines.md .codex/instructions.md
+cp .agentic/agents/codex/codex-instructions.md .codex/instructions.md
 ```
 
 ### Gemini CLI

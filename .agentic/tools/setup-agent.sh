@@ -9,6 +9,7 @@
 #   claude       - Creates CLAUDE.md (auto-loaded by Claude Code)
 #   cursor       - Creates .cursorrules (auto-loaded by Cursor)
 #   copilot      - Creates .github/copilot-instructions.md (auto-loaded by GitHub Copilot)
+#   codex        - Creates .codex/instructions.md (auto-loaded by OpenAI Codex CLI)
 #   all          - Creates files for all tools
 #   
 # Multi-agent setup:
@@ -20,6 +21,7 @@
 #   - Claude Code: CLAUDE.md
 #   - Cursor: .cursorrules or .cursor/rules/*.mdc
 #   - Copilot: .github/copilot-instructions.md
+#   - Codex: .codex/instructions.md
 #
 set -euo pipefail
 
@@ -41,6 +43,7 @@ show_help() {
   echo "  claude         Create CLAUDE.md for Claude Code"
   echo "  cursor         Create .cursorrules for Cursor"
   echo "  copilot        Create .github/copilot-instructions.md for GitHub Copilot"
+  echo "  codex          Create .codex/instructions.md for OpenAI Codex CLI"
   echo "  all            Create files for all tools"
   echo ""
   echo "Multi-Agent Setup:"
@@ -127,6 +130,54 @@ EOF
       cp "$AGENTIC_DIR/agents/cursor/agentic-framework.mdc" "$PROJECT_ROOT/.cursor/rules/"
       echo -e "${GREEN}✓ Also created .cursor/rules/agentic-framework.mdc${NC}"
     fi
+  fi
+}
+
+setup_codex() {
+  echo -e "${BLUE}Setting up OpenAI Codex CLI...${NC}"
+
+  mkdir -p "$PROJECT_ROOT/.codex"
+  TARGET="$PROJECT_ROOT/.codex/instructions.md"
+  SOURCE="$AGENTIC_DIR/agents/codex/codex-instructions.md"
+
+  if [[ -f "$TARGET" ]]; then
+    echo -e "${YELLOW}⚠ .codex/instructions.md already exists. Backing up to instructions.md.bak${NC}"
+    cp "$TARGET" "$TARGET.bak"
+  fi
+
+  if [[ -f "$SOURCE" ]]; then
+    cp "$SOURCE" "$TARGET"
+    echo -e "${GREEN}✓ Created .codex/instructions.md${NC}"
+    echo "  OpenAI Codex CLI will now auto-load framework instructions."
+  else
+    # Create minimal instructions
+    cat > "$TARGET" << 'EOF'
+# Codex Instructions - Agentic Framework
+
+This project uses the Agentic Framework for AI-assisted development.
+
+## MANDATORY: Before doing any work
+
+1. Read `.agentic/checklists/session_start.md`
+2. Follow the session start protocol
+3. Check `HUMAN_NEEDED.md` for blockers
+
+## Full Guidelines
+
+See `.agentic/agents/shared/agent_operating_guidelines.md` for complete instructions.
+
+## Non-Negotiables
+
+- Acceptance criteria before code
+- Add/update tests for new or changed logic
+- Keep documentation current
+- Add blockers to HUMAN_NEEDED.md
+- Update JOURNAL.md at session end
+
+See `AGENTS.md` for full list.
+EOF
+    echo -e "${GREEN}✓ Created .codex/instructions.md (minimal)${NC}"
+    echo "  OpenAI Codex CLI will now auto-load framework instructions."
   fi
 }
 
@@ -329,6 +380,8 @@ setup_all() {
   setup_cursor
   echo ""
   setup_copilot
+  echo ""
+  setup_codex
 }
 
 # Main
@@ -348,6 +401,9 @@ case "$TOOL" in
     ;;
   copilot)
     setup_copilot
+    ;;
+  codex)
+    setup_codex
     ;;
   cursor-agents)
     setup_cursor_agents
