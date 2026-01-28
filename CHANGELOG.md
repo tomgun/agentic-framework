@@ -9,15 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **F-0103: Agent Mode Selection (Quality vs Cost)** - Configurable model selection for agent tasks
-  - Four modes: `full_steam`, `premium`, `balanced` (default), `economy`
-  - `full_steam`: Uses opus for EVERYTHING (maximum quality)
-  - Planning/specs always use best model for mode (opus or sonnet)
-  - Implementation uses mid-tier (sonnet or haiku)
-  - Search/exploration uses haiku (except full_steam which uses opus)
+  - Three modes: `premium`, `balanced` (default), `economy`
+  - Four task types: planning, implementation, review, search
+  - Premium: opus for planning/impl/review, sonnet for search
+  - Balanced: opus for planning, sonnet for impl/review, haiku for search
+  - Economy: sonnet for planning, haiku for everything else
   - `agent_mode` setting in STACK.md controls selection
-  - **Model customization**: `models:` section allows per-task model overrides
-  - **Documentation**: `.agentic/workflows/agent_mode.md` explains everything
-  - **LLM Tests**: `022_agent_mode_selection.sh`, `023_full_steam_mode.sh`
+  - **Model customization**: `models:` section allows per-task overrides
+  - **Documentation**: `.agentic/workflows/agent_mode.md`
+  - **Init questions**: Agent asks about preferred mode during setup
 - **Codex CLI Support** - OpenAI Codex CLI now supported
   - Created `.agentic/agents/codex/codex-instructions.md` template
   - Added `setup_codex()` function to setup-agent.sh

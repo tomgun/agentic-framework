@@ -1261,12 +1261,11 @@ bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
 
 **Result - Agent Mode Selection**:
 
-| Mode | Planning/Specs | Implementation | Search |
-|------|----------------|----------------|--------|
-| `full_steam` | opus | opus | opus |
-| `premium` | opus | sonnet | haiku |
-| `balanced` (default) | opus | sonnet | haiku |
-| `economy` | sonnet | haiku | haiku |
+| Mode | planning | implementation | review | search |
+|------|----------|----------------|--------|--------|
+| `premium` | opus | opus | opus | sonnet |
+| `balanced` (default) | opus | sonnet | sonnet | haiku |
+| `economy` | sonnet | haiku | haiku | haiku |
 
 **Model Customization** (per user request):
 ```yaml
@@ -1284,8 +1283,7 @@ bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
 - Documents all modes, customization, cost comparison, best practices
 
 **LLM Tests** (per user request):
-- `022_agent_mode_selection.sh` - Verifies agent reads mode and selects model
-- `023_full_steam_mode.sh` - Verifies full_steam uses opus everywhere
+- `022_agent_mode_selection.sh` - Verifies agent reads mode and selects correct model
 
 **Changes**:
 - Added `agent_mode` to STACK.template.md with mode descriptions

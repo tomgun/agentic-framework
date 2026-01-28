@@ -13,9 +13,9 @@ Rules:
 - Criteria before code (check spec/acceptance/F-####.md exists)
 
 Agent Mode (check STACK.md):
-- full_steam: best model for everything
-- balanced (default): best for planning, mid-tier for implementation
-- economy: mid-tier for planning, cheap for implementation
+- premium: best for planning/implementation/review, mid-tier for search
+- balanced (default): best for planning, mid-tier for implementation/review
+- economy: mid-tier for planning, cheap for everything else
 - Custom: check `models:` section for overrides
 - Full docs: .agentic/workflows/agent_mode.md
 
