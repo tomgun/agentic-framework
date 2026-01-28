@@ -138,6 +138,23 @@ bash .agentic/tools/blocker.sh resolve HN-0001 "Resolution"
 
 ---
 
+## Agent Mode (Model Selection)
+
+Check `agent_mode` in STACK.md for model selection:
+
+| Mode | Planning | Implementation | Search |
+|------|----------|----------------|--------|
+| `full_steam` | best | best | best |
+| `premium` | best | mid-tier | cheap |
+| `balanced` (default) | best | mid-tier | cheap |
+| `economy` | mid-tier | cheap | cheap |
+
+**Custom models**: Check `models:` section in STACK.md for overrides.
+
+**Full docs**: `.agentic/workflows/agent_mode.md`
+
+---
+
 ## Standards
 
 **Programming** (`.agentic/quality/programming_standards.md`):

@@ -10,6 +10,14 @@ Rules:
 - Add/update tests for new/changed logic.
 - Update STATUS.md after meaningful progress.
 - Keep changes small and scoped.
+- Criteria before code (check spec/acceptance/F-####.md exists)
+
+Agent Mode (check STACK.md):
+- full_steam: best model for everything
+- balanced (default): best for planning, mid-tier for implementation
+- economy: mid-tier for planning, cheap for implementation
+- Custom: check `models:` section for overrides
+- Full docs: .agentic/workflows/agent_mode.md
 
 Token-efficient scripts (USE THESE, don't edit files directly):
 - JOURNAL.md: bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"

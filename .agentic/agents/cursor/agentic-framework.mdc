@@ -11,6 +11,10 @@ You are working in a repo that uses the `.agentic/` agentic development framewor
 - `spec/NFR.md` (if constraints apply)
 - Relevant `/spec/*` sections, including `spec/acceptance/F-####.md` for the feature you are changing
 
+## Agent Mode (model selection)
+Check `agent_mode` in STACK.md: `full_steam` | `premium` | `balanced` (default) | `economy`
+Custom models: check `models:` section. Full docs: `.agentic/workflows/agent_mode.md`
+
 ## Must-follow behavior
 - Follow `.agentic/agents/shared/agent_operating_guidelines.md`.
 - **Follow programming standards**: `.agentic/quality/programming_standards.md`
