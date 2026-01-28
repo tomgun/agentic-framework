@@ -61,18 +61,20 @@ FEATURE REQUEST?
 
 ## Token Efficiency: DELEGATE, Don't Do Everything
 
-| Task Type | Spawn This Agent | Model Tier | Why |
-|-----------|------------------|------------|-----|
-| Codebase search | `explore-agent` | Cheap/fast | 83% cheaper |
-| Research/docs | `research-agent` | Cheap/fast | Fresh small context |
-| Implementation | `implementation-agent` | Mid-tier | Focused context |
-| Writing tests | `test-agent` | Mid-tier | Isolated work |
-| Code review | `review-agent` | Mid-tier | Fresh perspective |
+Use the **Task tool** to spawn agents. Use `Explore` for search, `general-purpose` for everything else:
+
+| Task Type | Task Tool `subagent_type` | `model` | Why |
+|-----------|--------------------------|---------|-----|
+| Codebase search | `Explore` | haiku | 83% cheaper |
+| Research/docs | `general-purpose` | haiku | Fresh small context |
+| Implementation | `general-purpose` | sonnet | Focused context |
+| Writing tests | `general-purpose` | sonnet | Isolated work |
+| Code review | `general-purpose` | sonnet | Fresh perspective |
 
 **Pass to subagent ONLY**: Feature ID, acceptance criteria, 3-5 relevant files, STACK.md info.
 **DO NOT pass**: Full history, unrelated code, previous sessions.
 
-**Subagent definitions**: `.agentic/agents/claude/subagents/`
+**Role definitions** (use as prompt context): `.agentic/agents/claude/subagents/`
 
 ---
 
@@ -380,49 +382,59 @@ Let's start with #1. Which would you like to tackle first?
 - **Fresh context** - subagents don't carry your entire conversation history
 - **Parallel execution** - multiple subagents work simultaneously
 
-### Available Agents
+### Claude Code Task Tool Agent Types
 
-Check `.agentic/agents/claude/subagents/` for agent definitions:
+Claude Code's Task tool has these **built-in agent types**:
 
-| Agent | Use For | Model Tier |
-|-------|---------|------------|
-| `explore-agent` | Finding code, searching patterns | Cheap/Fast |
-| `implementation-agent` | Writing production code (>20 lines) | Mid-tier |
-| `test-agent` | Writing and running tests | Mid-tier |
-| `review-agent` | Code review before commit | Mid-tier |
-| `research-agent` | Documentation lookup, web search | Cheap/Fast |
+| Agent Type | Use For | Model |
+|------------|---------|-------|
+| `Explore` | Finding files, searching code patterns | haiku |
+| `general-purpose` | Research, implementation, testing, review | sonnet or haiku |
+| `Plan` | Architecture design, implementation planning | sonnet |
+| `Bash` | Running commands, builds, tests | haiku |
 
-### When to Delegate
+### Framework Role → Task Tool Mapping
 
-- **Exploration/search tasks**: Use explore-agent with cheap/fast model
-- **Implementation >50 lines**: Use implementation-agent with mid-tier model
-- **Test writing**: Use test-agent after implementation
-- **Multi-file changes**: Consider parallel agents
-- **Documentation lookup**: Use research-agent with cheap/fast model
+The framework defines specialized roles in `.agentic/agents/claude/subagents/`. Use them as **prompt context** with the `general-purpose` agent type:
 
-### Model Selection (Tier-Based)
-
-**Note**: Model names evolve. Focus on the tier, not specific names.
-
-- **Cheap/Fast**: Exploration, lookups (e.g., haiku, gpt-4o-mini)
-- **Mid-tier**: Implementation, testing, reviews (e.g., sonnet, gpt-4o)
-- **Powerful**: Complex architecture, difficult bugs (e.g., opus, o1)
+| Framework Role | Task Tool Agent Type | Model |
+|----------------|---------------------|-------|
+| `explore-agent` | `Explore` | haiku |
+| `research-agent` | `general-purpose` | haiku |
+| `implementation-agent` | `general-purpose` | sonnet |
+| `test-agent` | `general-purpose` | sonnet |
+| `review-agent` | `general-purpose` | sonnet |
+| `planning-agent` | `Plan` | sonnet |
 
 ### Example Delegation
 
 ```
-# For quick codebase exploration
+# Codebase exploration (use Explore agent type directly)
 Task tool:
-  subagent_type: explore
+  subagent_type: Explore
   model: haiku
   prompt: "Find where user authentication is implemented"
 
-# For implementation
+# Research (use general-purpose with research role context)
 Task tool:
-  subagent_type: implementation
+  subagent_type: general-purpose
+  model: haiku
+  prompt: "Research iPlug2 CMake support. Check current state and VST3 SDK availability."
+
+# Implementation (use general-purpose with implementation context)
+Task tool:
+  subagent_type: general-purpose
   model: sonnet
-  prompt: "Implement password reset per spec/acceptance/F-0005.md"
+  prompt: "Implement password reset per spec/acceptance/F-0005.md. Read .agentic/agents/claude/subagents/implementation-agent.md for your role guidelines."
 ```
+
+### When to Delegate
+
+- **Codebase search**: `Explore` agent with haiku
+- **Research/docs/web**: `general-purpose` agent with haiku
+- **Implementation >50 lines**: `general-purpose` agent with sonnet
+- **Test writing**: `general-purpose` agent with sonnet
+- **Architecture planning**: `Plan` agent with sonnet
 
 ### Project-Specific Agents
 
