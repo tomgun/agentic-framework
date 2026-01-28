@@ -1242,8 +1242,82 @@ bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
 
 ---
 
+## v0.12.2 Contributions (2026-01-28)
+
+### Agent Mode Selection (F-0103)
+
+**User insight**:
+> "i think we agreed to use the best model for most tasks? what do you think? i think it would be crucial for planning/speccing tasks at least. Maybe there could be agent-level modes: 'top performance'..., 'balanced' and 'really token saving'"
+
+**Follow-up request**:
+> "maybe we could have a 'FULL STEAM' mode, that uses the best model for everything? Also make it so that the user can easily edit the used models in these modes"
+> "also our documentation should know about this and tell the developer what it is, why and how to customize"
+> "Also is there a test for testing if the models are actually used for tasks?"
+
+**Philosophy established**:
+- Planning/speccing sets direction for everything
+- Bad specs = wasted implementation tokens
+- Worth spending on quality for direction-setting tasks
+
+**Result - Agent Mode Selection**:
+
+| Mode | Planning/Specs | Implementation | Search |
+|------|----------------|----------------|--------|
+| `full_steam` | opus | opus | opus |
+| `premium` | opus | sonnet | haiku |
+| `balanced` (default) | opus | sonnet | haiku |
+| `economy` | sonnet | haiku | haiku |
+
+**Model Customization** (per user request):
+```yaml
+- models:
+    planning: opus
+    implementation: sonnet
+    testing: sonnet
+    review: sonnet
+    search: haiku
+    research: haiku
+```
+
+**Documentation** (per user request):
+- Created `.agentic/workflows/agent_mode.md` - Full explanation of what, why, how
+- Documents all modes, customization, cost comparison, best practices
+
+**LLM Tests** (per user request):
+- `022_agent_mode_selection.sh` - Verifies agent reads mode and selects model
+- `023_full_steam_mode.sh` - Verifies full_steam uses opus everywhere
+
+**Changes**:
+- Added `agent_mode` to STACK.template.md with mode descriptions
+- Added `models:` section for customization (commented template)
+- Updated CLAUDE.md delegation tables with mode-aware recommendations
+- Updated agent_operating_guidelines.md delegation tables
+- Created acceptance criteria: spec/acceptance/F-0103.md (10 ACs)
+
+**Impact**: Users can now choose quality vs cost tradeoff. Planning always gets best available model for the mode. Full customization available.
+
+### Codex CLI Support
+
+**User request**:
+> "add support for Codex"
+
+**Result**:
+- Created `.agentic/agents/codex/codex-instructions.md` template
+- Added `setup_codex()` function to setup-agent.sh
+- Codex CLI now auto-loads framework instructions from `.codex/instructions.md`
+
+### Session Start Bug Fix (v0.12.1)
+
+**User report**: "Exit code 1" error on fresh projects at session start
+
+**Root cause**: `ls .agentic/WIP.md 2>/dev/null` returns exit code 1 when file doesn't exist
+
+**Fix**: Added `|| true` to all such commands in session start files
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.12.0
+**Current Version**: v0.12.2
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 

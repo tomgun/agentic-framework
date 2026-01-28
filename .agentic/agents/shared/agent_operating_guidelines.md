@@ -122,13 +122,33 @@ d) 💬 **Free input** - Tell me anything else relevant
 
 ## Token Efficiency: DELEGATE Tasks
 
-| Task | Spawn Agent | Model Tier | Savings |
-|------|-------------|------------|---------|
-| Codebase exploration | `explore-agent` | Cheap/fast | 83% |
-| Documentation lookup | `research-agent` | Cheap/fast | 60% |
-| Implementation | `implementation-agent` | Mid-tier | Focus |
-| Test writing | `test-agent` | Mid-tier | Isolation |
-| Code review | `review-agent` | Mid-tier | Fresh eyes |
+### Agent Mode (from STACK.md)
+
+Check `agent_mode` in STACK.md to determine model selection:
+
+| Mode | Planning/Specs | Implementation | Search |
+|------|----------------|----------------|--------|
+| `full_steam` | Best (opus) | Best (opus) | Best (opus) |
+| `premium` | Best (opus) | Mid-tier (sonnet) | Cheap (haiku) |
+| `balanced` (default) | Best (opus) | Mid-tier (sonnet) | Cheap (haiku) |
+| `economy` | Mid-tier (sonnet) | Cheap (haiku) | Cheap (haiku) |
+
+**Philosophy**: Planning sets direction → worth quality there. Search is mechanical → usually cheap.
+
+**Custom models**: Check `models:` section in STACK.md for per-task overrides. See `.agentic/workflows/agent_mode.md`.
+
+### Delegation Table (Mode-Aware)
+
+| Task | Spawn Agent | full_steam | Balanced | Economy |
+|------|-------------|------------|----------|---------|
+| Codebase exploration | `explore-agent` | opus | haiku | haiku |
+| Documentation lookup | `research-agent` | opus | haiku | haiku |
+| **Planning/architecture** | `planning-agent` | **opus** | **opus** | sonnet |
+| Implementation | `implementation-agent` | opus | sonnet | haiku |
+| Test writing | `test-agent` | opus | sonnet | haiku |
+| Code review | `review-agent` | opus | sonnet | haiku |
+
+**Custom models**: If `models:` section exists in STACK.md, those values override the table above.
 
 **Context handoff**: Pass ONLY feature ID, criteria, 3-5 files, STACK.md.
 **DO NOT pass**: Full history, unrelated code, previous sessions.
@@ -1010,43 +1030,71 @@ You can maintain FEATURES.md manually AND use migrations as complementary histor
 
 See `.agentic/token_efficiency/agent_delegation_savings.md` for quantified savings (60-83% reduction typical).
 
+### Agent Mode Selection (from STACK.md)
+
+Check `agent_mode` in STACK.md (default: `balanced`):
+
+| Mode | Best For | Planning | Implementation |
+|------|----------|----------|----------------|
+| `full_steam` | Maximum quality, complex tasks | opus | opus |
+| `premium` | Production, quality-critical | opus | sonnet |
+| `balanced` | General development (default) | opus | sonnet |
+| `economy` | Prototyping, exploration | sonnet | haiku |
+
+**Customization**: Users can override models per task type in `models:` section of STACK.md.
+
 Available agents in `.agentic/agents/claude/subagents/`:
-- `explore-agent` - Quick codebase exploration (cheap/fast model)
-- `implementation-agent` - Write production code (mid-tier/powerful model)
-- `test-agent` - Write and run tests (mid-tier model)
-- `review-agent` - Code review and refactoring (mid-tier model)
-- `research-agent` - Web search, documentation lookup (cheap for lookups, mid-tier for analysis)
+- `explore-agent` - Quick codebase exploration (always cheap/fast model)
+- `planning-agent` - Architecture and specs (opus in balanced, sonnet in economy)
+- `implementation-agent` - Write production code (sonnet in balanced, haiku in economy)
+- `test-agent` - Write and run tests (sonnet in balanced, haiku in economy)
+- `review-agent` - Code review and refactoring (sonnet in balanced, haiku in economy)
+- `research-agent` - Web search, documentation lookup (always cheap/fast)
 
-### When to Delegate
+### When to Delegate (Mode-Aware)
 
-| Task Type | Delegate To | Model Tier |
-|-----------|-------------|------------|
-| "Where is X defined?" | explore-agent | Cheap/Fast |
-| "Find all uses of Y" | explore-agent | Cheap/Fast |
-| Implement feature (>20 lines) | implementation-agent | Mid-tier |
-| Complex implementation | implementation-agent | Powerful |
-| Write tests for code | test-agent | Mid-tier |
-| Review before commit | review-agent | Mid-tier |
-| Look up documentation | research-agent | Cheap/Fast |
-| Compare tech options | research-agent | Mid-tier |
+| Task Type | Delegate To | full_steam | Balanced | Economy |
+|-----------|-------------|------------|----------|---------|
+| "Where is X defined?" | explore-agent | opus | haiku | haiku |
+| "Find all uses of Y" | explore-agent | opus | haiku | haiku |
+| **Plan architecture** | planning-agent | **opus** | **opus** | sonnet |
+| **Write spec/acceptance criteria** | planning-agent | **opus** | **opus** | sonnet |
+| Implement feature (>20 lines) | implementation-agent | opus | sonnet | haiku |
+| Complex implementation | implementation-agent | opus | sonnet | haiku |
+| Write tests for code | test-agent | opus | sonnet | haiku |
+| Review before commit | review-agent | opus | sonnet | haiku |
+| Look up documentation | research-agent | opus | haiku | haiku |
+| Compare tech options | research-agent | opus | haiku | haiku |
 
 ### Delegation Rules
 
-1. **For exploration/search tasks**: Spawn explore-agent with cheap/fast model
-2. **For implementation >50 lines**: Spawn implementation-agent
-3. **For test writing**: Spawn test-agent after implementation
-4. **For multi-file changes**: Consider parallel agents
-5. **Match model to task complexity**: Simple = cheap, Complex = powerful
+1. **Check `agent_mode` in STACK.md** first (default: `balanced`)
+2. **For exploration/search tasks**: Always use cheap/fast model (haiku)
+3. **For planning/architecture**: Use opus (balanced) or sonnet (economy)
+4. **For implementation >50 lines**: Use sonnet (balanced) or haiku (economy)
+5. **For test writing**: Spawn test-agent after implementation
+6. **For multi-file changes**: Consider parallel agents
 
-### Model Selection (Tier-Based)
+### Model Selection (Mode-Aware)
 
-**Note**: Model names change frequently. Focus on the tier, not specific names.
+**Note**: Model names change frequently. The `agent_mode` setting in STACK.md controls selection.
 
-- **Cheap/Fast**: Exploration, lookups, simple searches (e.g., haiku, gpt-4o-mini, gemini-flash)
-- **Mid-tier**: Implementation, testing, reviews (e.g., sonnet, gpt-4o)
-- **Powerful**: Complex architecture, difficult bugs (e.g., opus, o1)
+| Task Category | full_steam | Balanced/Premium | Economy |
+|---------------|------------|------------------|---------|
+| Search/exploration | opus | haiku | haiku |
+| Research/docs | opus | haiku | haiku |
+| **Planning/specs** | **opus** | **opus** | sonnet |
+| Implementation | opus | sonnet | haiku |
+| Testing/review | opus | sonnet | haiku |
 
-Check your tool's current model offerings and map to these tiers.
+**Custom models**: Override any task type in `models:` section of STACK.md.
+
+**Tier mapping** (for non-Claude tools):
+- **Cheap/Fast**: haiku, gpt-4o-mini, gemini-flash
+- **Mid-tier**: sonnet, gpt-4o
+- **Best**: opus, o1
+
+**Full documentation**: See `.agentic/workflows/agent_mode.md`
 
 ### Creating Project-Specific Agents
 

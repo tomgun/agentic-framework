@@ -1548,6 +1548,39 @@
 
 ---
 
+## F-0103: Agent Mode Selection (Quality vs Cost)
+
+**Status**: in_progress
+**Since**: v0.12.2
+**Category**: Framework Infrastructure
+
+**Description**: Allow users to choose an agent quality/cost tradeoff mode that affects model selection across all agent tasks. Critical tasks like planning and speccing use best models in all modes.
+
+**Modes**:
+| Mode | Description | Planning/Specs | Implementation | Search |
+|------|-------------|----------------|----------------|--------|
+| `premium` | Best quality, higher cost | opus | sonnet | haiku |
+| `balanced` | Good balance (default) | opus | sonnet | haiku |
+| `economy` | Cost saving, prototyping | sonnet | haiku | haiku |
+
+**Philosophy**: Planning and speccing set direction - bad specs lead to wasted implementation tokens. Worth spending on quality there.
+
+**Configuration**: `STACK.md`:
+```yaml
+agent_mode: balanced  # premium | balanced | economy
+```
+
+**Dependencies**: None
+
+**Implementation**:
+- State: in_progress
+- Code: STACK.template.md, CLAUDE.md, agent_operating_guidelines.md
+- Tests: validation of agent_mode values
+
+**Acceptance**: See `spec/acceptance/F-0103.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1562,6 +1595,6 @@
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 2 | 0 | 0 | 2 |
-| **Total** | **75** | **1** | **0** | **76** |
+| Framework Infrastructure (F-0101+) | 2 | 1 | 0 | 3 |
+| **Total** | **75** | **2** | **0** | **77** |
 

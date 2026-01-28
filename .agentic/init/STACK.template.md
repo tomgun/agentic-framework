@@ -5,7 +5,7 @@
 Purpose: a single source of truth for "how we build and run software here".
 
 ## Agentic framework
-- Version: 0.12.0  <!-- Update when upgrading framework -->
+- Version: 0.12.2  <!-- Update when upgrading framework -->
 - Profile: core  <!-- core | core+pm -->
 - Installed: <!-- YYYY-MM-DD -->
 - Source: https://github.com/tomgun/agentic-framework
@@ -77,6 +77,27 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--   - See .agentic/workflows/tdd_mode.md -->
 - development_mode: standard  <!-- DEFAULT: Acceptance-Driven -->
 <!-- - development_mode: tdd  # OPTIONAL: Tests-first approach -->
+
+## Agent mode (quality vs cost tradeoff)
+<!-- Controls model selection across all agent tasks -->
+<!-- See: .agentic/workflows/agent_mode.md for full documentation -->
+- agent_mode: balanced  <!-- full_steam | premium | balanced | economy -->
+  <!-- full_steam: Best model for EVERYTHING (opus across the board) - maximum quality -->
+  <!-- premium: Best quality, higher cost. opus for planning, sonnet for implementation -->
+  <!-- balanced: Good balance (DEFAULT). opus for planning, sonnet for implementation -->
+  <!-- economy: Cost saving. sonnet for planning, haiku for implementation -->
+
+## Model customization (optional)
+<!-- Override default models for any task type. Uncomment and edit to customize. -->
+<!-- Useful when: new models released, fine-tuning for your workflow, cost optimization -->
+<!-- Task types: planning, implementation, testing, review, search, research -->
+<!-- - models: -->
+<!--     planning: opus        # Architecture, specs, acceptance criteria -->
+<!--     implementation: sonnet # Writing production code -->
+<!--     testing: sonnet       # Writing and running tests -->
+<!--     review: sonnet        # Code review, refactoring suggestions -->
+<!--     search: haiku         # Codebase exploration, file finding -->
+<!--     research: haiku       # Documentation lookup, web search -->
 
 ## Sequential agent pipeline (optional but RECOMMENDED)
 <!-- Enables specialized agents to work sequentially on features for optimal context efficiency -->

@@ -44,15 +44,33 @@ FEATURE REQUEST?
 
 ## Token Efficiency: DELEGATE, Don't Do Everything
 
-Use the **Task tool** to spawn agents. Use `Explore` for search, `general-purpose` for everything else:
+Use the **Task tool** to spawn agents. Model selection depends on `agent_mode` in STACK.md:
 
-| Task Type | Task Tool `subagent_type` | `model` | Why |
-|-----------|--------------------------|---------|-----|
-| Codebase search | `Explore` | haiku | 83% cheaper |
-| Research/docs | `general-purpose` | haiku | Fresh small context |
-| Implementation | `general-purpose` | sonnet | Focused context |
-| Writing tests | `general-purpose` | sonnet | Isolated work |
-| Code review | `general-purpose` | sonnet | Fresh perspective |
+### Agent Mode (from STACK.md)
+
+| Mode | Planning/Specs | Implementation | Search |
+|------|----------------|----------------|--------|
+| `full_steam` | opus | opus | opus |
+| `premium` | opus | sonnet | haiku |
+| `balanced` (default) | opus | sonnet | haiku |
+| `economy` | sonnet | haiku | haiku |
+
+**Philosophy**: Planning sets direction → worth quality there. Search is mechanical → usually cheap.
+
+**Custom models**: Check `models:` section in STACK.md for per-task overrides. See `.agentic/workflows/agent_mode.md`.
+
+### Quick Delegation Table
+
+| Task Type | Task Tool `subagent_type` | full_steam | balanced | economy |
+|-----------|--------------------------|------------|----------|---------|
+| Codebase search | `Explore` | opus | haiku | haiku |
+| Research/docs | `general-purpose` | opus | haiku | haiku |
+| **Planning/architecture** | `Plan` | **opus** | **opus** | sonnet |
+| Implementation | `general-purpose` | opus | sonnet | haiku |
+| Writing tests | `general-purpose` | opus | sonnet | haiku |
+| Code review | `general-purpose` | opus | sonnet | haiku |
+
+**Note**: If `models:` section exists in STACK.md, those override the defaults above.
 
 **Pass to subagent ONLY**: Feature ID, acceptance criteria, 3-5 relevant files, STACK.md info.
 **DO NOT pass**: Full history, unrelated code, previous sessions.
@@ -369,25 +387,29 @@ Let's start with #1. Which would you like to tackle first?
 
 Claude Code's Task tool has these **built-in agent types**:
 
-| Agent Type | Use For | Model |
-|------------|---------|-------|
-| `Explore` | Finding files, searching code patterns | haiku |
-| `general-purpose` | Research, implementation, testing, review | sonnet or haiku |
-| `Plan` | Architecture design, implementation planning | sonnet |
+| Agent Type | Use For | Model (see agent_mode) |
+|------------|---------|------------------------|
+| `Explore` | Finding files, searching code patterns | Always haiku |
+| `general-purpose` | Research, implementation, testing, review | See mode table |
+| `Plan` | Architecture design, implementation planning | opus (balanced) / sonnet (economy) |
 | `Bash` | Running commands, builds, tests | haiku |
 
-### Framework Role → Task Tool Mapping
+### Framework Role → Task Tool Mapping (Mode-Aware)
 
-The framework defines specialized roles in `.agentic/agents/claude/subagents/`. Use them as **prompt context** with the `general-purpose` agent type:
+The framework defines specialized roles in `.agentic/agents/claude/subagents/`. Use them as **prompt context** with the `general-purpose` agent type.
 
-| Framework Role | Task Tool Agent Type | Model |
-|----------------|---------------------|-------|
-| `explore-agent` | `Explore` | haiku |
-| `research-agent` | `general-purpose` | haiku |
-| `implementation-agent` | `general-purpose` | sonnet |
-| `test-agent` | `general-purpose` | sonnet |
-| `review-agent` | `general-purpose` | sonnet |
-| `planning-agent` | `Plan` | sonnet |
+**Check `agent_mode` in STACK.md** (default: `balanced`):
+
+| Framework Role | Task Tool Agent Type | Balanced Mode | Economy Mode |
+|----------------|---------------------|---------------|--------------|
+| `explore-agent` | `Explore` | haiku | haiku |
+| `research-agent` | `general-purpose` | haiku | haiku |
+| `planning-agent` | `Plan` | **opus** | sonnet |
+| `implementation-agent` | `general-purpose` | sonnet | haiku |
+| `test-agent` | `general-purpose` | sonnet | haiku |
+| `review-agent` | `general-purpose` | sonnet | haiku |
+
+**Note**: Premium mode uses same models as balanced. Economy mode saves cost for prototyping.
 
 ### Example Delegation
 
@@ -411,13 +433,15 @@ Task tool:
   prompt: "Implement password reset per spec/acceptance/F-0005.md. Read .agentic/agents/claude/subagents/implementation-agent.md for your role guidelines."
 ```
 
-### When to Delegate
+### When to Delegate (Mode-Aware)
 
-- **Codebase search**: `Explore` agent with haiku
-- **Research/docs/web**: `general-purpose` agent with haiku
-- **Implementation >50 lines**: `general-purpose` agent with sonnet
-- **Test writing**: `general-purpose` agent with sonnet
-- **Architecture planning**: `Plan` agent with sonnet
+Check `agent_mode` in STACK.md (default: `balanced`):
+
+- **Codebase search**: `Explore` agent with haiku (all modes)
+- **Research/docs/web**: `general-purpose` agent with haiku (all modes)
+- **Architecture/planning**: `Plan` agent with **opus** (balanced) or sonnet (economy)
+- **Implementation >50 lines**: `general-purpose` agent with sonnet (balanced) or haiku (economy)
+- **Test writing**: `general-purpose` agent with sonnet (balanced) or haiku (economy)
 
 ### Project-Specific Agents
 
