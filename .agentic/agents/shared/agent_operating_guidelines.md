@@ -126,27 +126,24 @@ d) 💬 **Free input** - Tell me anything else relevant
 
 Check `agent_mode` in STACK.md to determine model selection:
 
-| Mode | Planning/Specs | Implementation | Search |
-|------|----------------|----------------|--------|
-| `full_steam` | Best (opus) | Best (opus) | Best (opus) |
-| `premium` | Best (opus) | Best (opus) | Cheap (haiku) |
-| `balanced` (default) | Best (opus) | Mid-tier (sonnet) | Cheap (haiku) |
-| `economy` | Mid-tier (sonnet) | Cheap (haiku) | Cheap (haiku) |
+| Mode | planning | implementation | review | search |
+|------|----------|----------------|--------|--------|
+| `premium` | opus | opus | opus | sonnet |
+| `balanced` (default) | opus | sonnet | sonnet | haiku |
+| `economy` | sonnet | haiku | haiku | haiku |
 
-**Philosophy**: Planning sets direction → worth quality there. Search is mechanical → usually cheap.
-
-**Custom models**: Check `models:` section in STACK.md for per-task overrides. See `.agentic/workflows/agent_mode.md`.
+**Custom models**: Override in `models:` section of STACK.md. See `.agentic/workflows/agent_mode.md`.
 
 ### Delegation Table (Mode-Aware)
 
-| Task | Spawn Agent | full_steam | premium | balanced | economy |
-|------|-------------|------------|---------|----------|---------|
-| Codebase exploration | `explore-agent` | opus | haiku | haiku | haiku |
-| Documentation lookup | `research-agent` | opus | haiku | haiku | haiku |
-| **Planning/architecture** | `planning-agent` | **opus** | **opus** | **opus** | sonnet |
-| Implementation | `implementation-agent` | opus | opus | sonnet | haiku |
-| Test writing | `test-agent` | opus | opus | sonnet | haiku |
-| Code review | `review-agent` | opus | opus | sonnet | haiku |
+| Task | Spawn Agent | premium | balanced | economy |
+|------|-------------|---------|----------|---------|
+| Codebase exploration | `explore-agent` | sonnet | haiku | haiku |
+| Documentation lookup | `research-agent` | sonnet | haiku | haiku |
+| **Planning/architecture** | `planning-agent` | **opus** | **opus** | sonnet |
+| Implementation | `implementation-agent` | opus | sonnet | haiku |
+| Test writing | `test-agent` | opus | sonnet | haiku |
+| Code review | `review-agent` | opus | sonnet | haiku |
 
 **Custom models**: If `models:` section exists in STACK.md, those values override the table above.
 
@@ -1034,12 +1031,11 @@ See `.agentic/token_efficiency/agent_delegation_savings.md` for quantified savin
 
 Check `agent_mode` in STACK.md (default: `balanced`):
 
-| Mode | Best For | Planning | Implementation |
-|------|----------|----------|----------------|
-| `full_steam` | Maximum quality, complex tasks | opus | opus |
-| `premium` | Production, quality-critical | opus | opus |
-| `balanced` | General development (default) | opus | sonnet |
-| `economy` | Prototyping, exploration | sonnet | haiku |
+| Mode | Best For | Planning | Implementation | Review | Search |
+|------|----------|----------|----------------|--------|--------|
+| `premium` | Production, quality-critical | opus | opus | opus | sonnet |
+| `balanced` | General development (default) | opus | sonnet | sonnet | haiku |
+| `economy` | Prototyping, exploration | sonnet | haiku | haiku | haiku |
 
 **Customization**: Users can override models per task type in `models:` section of STACK.md.
 
@@ -1053,18 +1049,18 @@ Available agents in `.agentic/agents/claude/subagents/`:
 
 ### When to Delegate (Mode-Aware)
 
-| Task Type | Delegate To | full_steam | premium | balanced | economy |
-|-----------|-------------|------------|---------|----------|---------|
-| "Where is X defined?" | explore-agent | opus | haiku | haiku | haiku |
-| "Find all uses of Y" | explore-agent | opus | haiku | haiku | haiku |
-| **Plan architecture** | planning-agent | **opus** | **opus** | **opus** | sonnet |
-| **Write spec/acceptance criteria** | planning-agent | **opus** | **opus** | **opus** | sonnet |
-| Implement feature (>20 lines) | implementation-agent | opus | opus | sonnet | haiku |
-| Complex implementation | implementation-agent | opus | opus | sonnet | haiku |
-| Write tests for code | test-agent | opus | opus | sonnet | haiku |
-| Review before commit | review-agent | opus | opus | sonnet | haiku |
-| Look up documentation | research-agent | opus | haiku | haiku | haiku |
-| Compare tech options | research-agent | opus | haiku | haiku | haiku |
+| Task Type | Delegate To | premium | balanced | economy |
+|-----------|-------------|---------|----------|---------|
+| "Where is X defined?" | explore-agent | sonnet | haiku | haiku |
+| "Find all uses of Y" | explore-agent | sonnet | haiku | haiku |
+| **Plan architecture** | planning-agent | **opus** | **opus** | sonnet |
+| **Write spec/acceptance criteria** | planning-agent | **opus** | **opus** | sonnet |
+| Implement feature (>20 lines) | implementation-agent | opus | sonnet | haiku |
+| Complex implementation | implementation-agent | opus | sonnet | haiku |
+| Write tests for code | test-agent | opus | sonnet | haiku |
+| Review before commit | review-agent | opus | sonnet | haiku |
+| Look up documentation | research-agent | sonnet | haiku | haiku |
+| Compare tech options | research-agent | sonnet | haiku | haiku |
 
 ### Delegation Rules
 
@@ -1079,13 +1075,12 @@ Available agents in `.agentic/agents/claude/subagents/`:
 
 **Note**: Model names change frequently. The `agent_mode` setting in STACK.md controls selection.
 
-| Task Category | full_steam | premium | balanced | economy |
-|---------------|------------|---------|----------|---------|
-| Search/exploration | opus | haiku | haiku | haiku |
-| Research/docs | opus | haiku | haiku | haiku |
-| **Planning/specs** | **opus** | **opus** | **opus** | sonnet |
-| Implementation | opus | opus | sonnet | haiku |
-| Testing/review | opus | opus | sonnet | haiku |
+| Task Category | premium | balanced | economy |
+|---------------|---------|----------|---------|
+| Search/exploration | sonnet | haiku | haiku |
+| **Planning/specs** | **opus** | **opus** | sonnet |
+| Implementation | opus | sonnet | haiku |
+| Review/testing | opus | sonnet | haiku |
 
 **Custom models**: Override any task type in `models:` section of STACK.md.
 

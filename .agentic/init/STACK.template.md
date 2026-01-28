@@ -81,23 +81,19 @@ Purpose: a single source of truth for "how we build and run software here".
 ## Agent mode (quality vs cost tradeoff)
 <!-- Controls model selection across all agent tasks -->
 <!-- See: .agentic/workflows/agent_mode.md for full documentation -->
-- agent_mode: balanced  <!-- full_steam | premium | balanced | economy -->
-  <!-- full_steam: Best model for EVERYTHING (opus across the board) - maximum quality -->
-  <!-- premium: High quality. opus for planning AND implementation, haiku for search -->
-  <!-- balanced: Good balance (DEFAULT). opus for planning, sonnet for implementation -->
-  <!-- economy: Cost saving. sonnet for planning, haiku for implementation -->
+- agent_mode: balanced  <!-- premium | balanced | economy -->
+  <!-- premium: Best quality. opus for planning/implementation/review, sonnet for search -->
+  <!-- balanced: Good balance (DEFAULT). opus for planning, sonnet for implementation/review -->
+  <!-- economy: Cost saving. sonnet for planning, haiku for everything else -->
 
 ## Model customization (optional)
 <!-- Override default models for any task type. Uncomment and edit to customize. -->
 <!-- Useful when: new models released, fine-tuning for your workflow, cost optimization -->
-<!-- Task types: planning, implementation, testing, review, search, research -->
 <!-- - models: -->
-<!--     planning: opus        # Architecture, specs, acceptance criteria -->
+<!--     planning: opus        # Architecture, specs, critical decisions -->
 <!--     implementation: sonnet # Writing production code -->
-<!--     testing: sonnet       # Writing and running tests -->
-<!--     review: sonnet        # Code review, refactoring suggestions -->
-<!--     search: haiku         # Codebase exploration, file finding -->
-<!--     research: haiku       # Documentation lookup, web search -->
+<!--     review: sonnet        # Code review, testing, refactoring -->
+<!--     search: haiku         # Codebase exploration, finding files -->
 
 ## Sequential agent pipeline (optional but RECOMMENDED)
 <!-- Enables specialized agents to work sequentially on features for optimal context efficiency -->

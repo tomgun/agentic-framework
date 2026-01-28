@@ -65,6 +65,19 @@ d) **Not sure** - Start with single agent, enable later
 
 If (b) or (c): run `bash .agentic/tools/setup-agent.sh pipeline`
 
+## Agent Mode (Quality vs Cost)
+
+What quality/cost tradeoff do you want for AI model selection?
+
+a) **Premium** - Best models for planning, implementation, and review. Higher cost, best quality.
+   - Use for: Production code, quality-critical work
+b) **Balanced** (default) - Best model for planning, mid-tier for implementation/review.
+   - Use for: General development, good quality at reasonable cost
+c) **Economy** - Mid-tier for planning, cheap for everything else.
+   - Use for: Prototyping, learning, tight budget
+
+See `.agentic/workflows/agent_mode.md` for details and customization options.
+
 ## Developer experience
 - Lint/format standards (if any)?
 - CI provider (GitHub Actions by default)?

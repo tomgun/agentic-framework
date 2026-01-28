@@ -48,27 +48,24 @@ Use the **Task tool** to spawn agents. Model selection depends on `agent_mode` i
 
 ### Agent Mode (from STACK.md)
 
-| Mode | Planning/Specs | Implementation | Search |
-|------|----------------|----------------|--------|
-| `full_steam` | opus | opus | opus |
-| `premium` | opus | opus | haiku |
-| `balanced` (default) | opus | sonnet | haiku |
-| `economy` | sonnet | haiku | haiku |
+| Mode | planning | implementation | review | search |
+|------|----------|----------------|--------|--------|
+| `premium` | opus | opus | opus | sonnet |
+| `balanced` (default) | opus | sonnet | sonnet | haiku |
+| `economy` | sonnet | haiku | haiku | haiku |
 
-**Philosophy**: Planning sets direction → worth quality there. Search is mechanical → usually cheap.
-
-**Custom models**: Check `models:` section in STACK.md for per-task overrides. See `.agentic/workflows/agent_mode.md`.
+**Custom models**: Override in `models:` section of STACK.md. See `.agentic/workflows/agent_mode.md`.
 
 ### Quick Delegation Table
 
-| Task Type | Task Tool `subagent_type` | full_steam | premium | balanced | economy |
-|-----------|--------------------------|------------|---------|----------|---------|
-| Codebase search | `Explore` | opus | haiku | haiku | haiku |
-| Research/docs | `general-purpose` | opus | haiku | haiku | haiku |
-| **Planning/architecture** | `Plan` | **opus** | **opus** | **opus** | sonnet |
-| Implementation | `general-purpose` | opus | opus | sonnet | haiku |
-| Writing tests | `general-purpose` | opus | opus | sonnet | haiku |
-| Code review | `general-purpose` | opus | opus | sonnet | haiku |
+| Task Type | Task Tool `subagent_type` | premium | balanced | economy |
+|-----------|--------------------------|---------|----------|---------|
+| Codebase search | `Explore` | sonnet | haiku | haiku |
+| Research/docs | `general-purpose` | sonnet | haiku | haiku |
+| **Planning/architecture** | `Plan` | **opus** | **opus** | sonnet |
+| Implementation | `general-purpose` | opus | sonnet | haiku |
+| Writing tests | `general-purpose` | opus | sonnet | haiku |
+| Code review | `general-purpose` | opus | sonnet | haiku |
 
 **Note**: If `models:` section exists in STACK.md, those override the defaults above.
 
@@ -400,16 +397,14 @@ The framework defines specialized roles in `.agentic/agents/claude/subagents/`. 
 
 **Check `agent_mode` in STACK.md** (default: `balanced`):
 
-| Framework Role | Task Tool Agent Type | full_steam | premium | balanced | economy |
-|----------------|---------------------|------------|---------|----------|---------|
-| `explore-agent` | `Explore` | opus | haiku | haiku | haiku |
-| `research-agent` | `general-purpose` | opus | haiku | haiku | haiku |
-| `planning-agent` | `Plan` | **opus** | **opus** | **opus** | sonnet |
-| `implementation-agent` | `general-purpose` | opus | opus | sonnet | haiku |
-| `test-agent` | `general-purpose` | opus | opus | sonnet | haiku |
-| `review-agent` | `general-purpose` | opus | opus | sonnet | haiku |
-
-**Note**: Premium uses opus for implementation too. Economy mode saves cost for prototyping.
+| Framework Role | Task Tool Agent Type | premium | balanced | economy |
+|----------------|---------------------|---------|----------|---------|
+| `explore-agent` | `Explore` | sonnet | haiku | haiku |
+| `research-agent` | `general-purpose` | sonnet | haiku | haiku |
+| `planning-agent` | `Plan` | **opus** | **opus** | sonnet |
+| `implementation-agent` | `general-purpose` | opus | sonnet | haiku |
+| `test-agent` | `general-purpose` | opus | sonnet | haiku |
+| `review-agent` | `general-purpose` | opus | sonnet | haiku |
 
 ### Example Delegation
 
@@ -437,11 +432,10 @@ Task tool:
 
 Check `agent_mode` in STACK.md (default: `balanced`):
 
-- **Codebase search**: `Explore` agent with haiku (except full_steam → opus)
-- **Research/docs/web**: `general-purpose` agent with haiku (except full_steam → opus)
-- **Architecture/planning**: `Plan` agent with **opus** (all except economy → sonnet)
-- **Implementation >50 lines**: opus (full_steam/premium), sonnet (balanced), haiku (economy)
-- **Test writing**: opus (full_steam/premium), sonnet (balanced), haiku (economy)
+- **Codebase search**: `Explore` - sonnet (premium), haiku (balanced/economy)
+- **Architecture/planning**: `Plan` - opus (premium/balanced), sonnet (economy)
+- **Implementation**: opus (premium), sonnet (balanced), haiku (economy)
+- **Review/testing**: opus (premium), sonnet (balanced), haiku (economy)
 
 ### Project-Specific Agents
 
