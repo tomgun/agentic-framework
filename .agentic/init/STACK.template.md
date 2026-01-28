@@ -83,7 +83,7 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- See: .agentic/workflows/agent_mode.md for full documentation -->
 - agent_mode: balanced  <!-- full_steam | premium | balanced | economy -->
   <!-- full_steam: Best model for EVERYTHING (opus across the board) - maximum quality -->
-  <!-- premium: Best quality, higher cost. opus for planning, sonnet for implementation -->
+  <!-- premium: High quality. opus for planning AND implementation, haiku for search -->
   <!-- balanced: Good balance (DEFAULT). opus for planning, sonnet for implementation -->
   <!-- economy: Cost saving. sonnet for planning, haiku for implementation -->
 

@@ -22,7 +22,7 @@ Different tasks have different quality requirements:
 |------|----------|------|---------|
 | `full_steam` | Complex projects, maximum quality | Highest | Best |
 | `premium` | Production code, quality-critical work | High | Excellent |
-| `balanced` | General development (DEFAULT) | Medium | Good |
+| `balanced` | General development (DEFAULT) | Medium | Very Good |
 | `economy` | Prototyping, exploration, learning | Low | Adequate |
 
 ### Mode Details
@@ -42,21 +42,21 @@ Uses the best model (opus) for ALL tasks.
 **Use when**: Complex architecture, critical systems, maximum accuracy needed, cost is not a concern.
 
 #### `premium` - High Quality
-Best model for planning, mid-tier for implementation, cheap for search.
+Best model for planning AND implementation, cheap for search.
 
 | Task | Model |
 |------|-------|
 | Planning/specs | opus |
-| Implementation | sonnet |
-| Testing | sonnet |
-| Review | sonnet |
+| Implementation | opus |
+| Testing | opus |
+| Review | opus |
 | Search | haiku |
 | Research | haiku |
 
-**Use when**: Production code, quality matters, reasonable budget.
+**Use when**: Production code, quality-critical work, budget allows for best implementation quality.
 
 #### `balanced` (DEFAULT) - Good Balance
-Same as premium. This is the recommended starting point.
+Best model for planning, mid-tier for implementation, cheap for search.
 
 | Task | Model |
 |------|-------|

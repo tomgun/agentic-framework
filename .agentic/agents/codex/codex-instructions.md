@@ -148,7 +148,7 @@ Check `agent_mode` in STACK.md for model selection:
 | Mode | Planning | Implementation | Search |
 |------|----------|----------------|--------|
 | `full_steam` | best | best | best |
-| `premium` | best | mid-tier | cheap |
+| `premium` | best | best | cheap |
 | `balanced` (default) | best | mid-tier | cheap |
 | `economy` | mid-tier | cheap | cheap |
 
