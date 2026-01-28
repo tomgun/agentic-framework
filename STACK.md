@@ -32,6 +32,9 @@ Purpose: Configuration for developing the Agentic Framework itself.
 ## Development approach
 - development_mode: standard
 
+## Agent mode
+- agent_mode: premium  # Framework development = quality-critical
+
 ## Git workflow
 - git_workflow: pull_request
 - pr_draft_by_default: false
