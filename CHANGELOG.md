@@ -5,6 +5,31 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.2] - 2026-01-28
+
+### Added
+- **F-0103: Agent Mode Selection (Quality vs Cost)** - Configurable model selection for agent tasks
+  - Three modes: `premium`, `balanced` (default), `economy`
+  - Four task types: planning, implementation, review, search
+  - Premium: opus for planning/impl/review, sonnet for search
+  - Balanced: opus for planning, sonnet for impl/review, haiku for search
+  - Economy: sonnet for planning, haiku for everything else
+  - `agent_mode` setting in STACK.md controls selection
+  - **Model customization**: `models:` section allows per-task overrides
+  - **Documentation**: `.agentic/workflows/agent_mode.md`
+  - **Init questions**: Agent asks about preferred mode during setup
+- **Codex CLI Support** - OpenAI Codex CLI now supported
+  - Created `.agentic/agents/codex/codex-instructions.md` template
+  - Added `setup_codex()` function to setup-agent.sh
+  - `bash .agentic/tools/setup-agent.sh codex` generates `.codex/instructions.md`
+
+### Changed
+- CLAUDE.md delegation tables now mode-aware (show different models per agent_mode)
+- agent_operating_guidelines.md delegation tables updated with mode-based recommendations
+- STACK.template.md includes agent_mode setting and commented models section for customization
+
+---
+
 ## [0.12.1] - 2026-01-27
 
 ### Fixed

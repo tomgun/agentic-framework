@@ -5,7 +5,7 @@
 Purpose: a single source of truth for "how we build and run software here".
 
 ## Agentic framework
-- Version: 0.12.0  <!-- Update when upgrading framework -->
+- Version: 0.12.2  <!-- Update when upgrading framework -->
 - Profile: core  <!-- core | core+pm -->
 - Installed: <!-- YYYY-MM-DD -->
 - Source: https://github.com/tomgun/agentic-framework
@@ -77,6 +77,23 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--   - See .agentic/workflows/tdd_mode.md -->
 - development_mode: standard  <!-- DEFAULT: Acceptance-Driven -->
 <!-- - development_mode: tdd  # OPTIONAL: Tests-first approach -->
+
+## Agent mode (quality vs cost tradeoff)
+<!-- Controls model selection across all agent tasks -->
+<!-- See: .agentic/workflows/agent_mode.md for full documentation -->
+- agent_mode: balanced  <!-- premium | balanced | economy -->
+  <!-- premium: Best quality. opus for planning/implementation/review, sonnet for search -->
+  <!-- balanced: Good balance (DEFAULT). opus for planning, sonnet for implementation/review -->
+  <!-- economy: Cost saving. sonnet for planning, haiku for everything else -->
+
+## Model customization (optional)
+<!-- Override default models for any task type. Uncomment and edit to customize. -->
+<!-- Useful when: new models released, fine-tuning for your workflow, cost optimization -->
+<!-- - models: -->
+<!--     planning: opus        # Architecture, specs, critical decisions -->
+<!--     implementation: sonnet # Writing production code -->
+<!--     review: sonnet        # Code review, testing, refactoring -->
+<!--     search: haiku         # Codebase exploration, finding files -->
 
 ## Sequential agent pipeline (optional but RECOMMENDED)
 <!-- Enables specialized agents to work sequentially on features for optimal context efficiency -->
