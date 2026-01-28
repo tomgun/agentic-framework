@@ -15,21 +15,11 @@ _No active items_
 
 ---
 
-### HN-0001: Review/merge PR #12: F-0103 Agent mode selection
-- **Type**: review
-- **Added**: 2026-01-28
-- **Context**: PR waiting: https://github.com/tomgun/agentic-framework/pull/12
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
 ## Resolved
 
 <!-- Archive resolved items here with date and outcome -->
 
 ### HN-0001: Review/merge PR #12: F-0103 Agent mode selection
 - **Type**: review
-- **Added**: 2026-01-28
-- **Context**: PR waiting: https://github.com/tomgun/agentic-framework/pull/12
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
+- **Resolved**: 2026-01-28
+- **Outcome**: PR merged
