@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- v0.12.0 released and tagged (Updated: 2026-01-30 18:43)
+- v0.13.0 release prep - PR ready for merge and tag (Updated: 2026-01-30 19:56)
 - Progress: v0.12.1 released and tagged
 
 ## Current focus

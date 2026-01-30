@@ -5,6 +5,32 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-01-30
+
+### Added
+- **ag.sh Gateway Command** - Unified entry point for all framework commands
+  - `ag start` - Session initialization (checks WIP, upgrades, shows status)
+  - `ag implement F-XXXX` - Start feature implementation (Core+PM with acceptance criteria check)
+  - `ag work "description"` - Start work session (Core profile, lighter workflow)
+  - `ag commit` - Pre-commit validation and guided commit
+  - `ag done F-XXXX` - Feature completion checklist
+  - `ag verify` - Run doctor.sh with appropriate flags
+  - `ag status` - Show current project status
+  - `ag tools` - List available tools
+- **list-tools.sh** - New tool to list and describe all framework tools
+
+### Changed
+- **CLAUDE.md reduced from ~570 to ~285 lines** - Trimmed redundancy, delegated to ag commands
+- **agent_operating_guidelines.md reduced from ~1300 to ~340 lines** - Major token efficiency improvement
+- **Docs cleanup** - Updated version references to v0.13.0 across 14+ documentation files
+
+### Fixed
+- **install.sh non-interactive mode** - Script now properly exits with code 0 when run without tty
+  - Added `[[ -t 0 ]]` checks for interactive prompts
+  - Fixes test failures in `validate_framework.sh`
+
+---
+
 ## [0.12.2] - 2026-01-28
 
 ### Added

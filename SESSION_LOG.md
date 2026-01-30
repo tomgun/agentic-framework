@@ -19,3 +19,11 @@ Implemented ag.sh gateway (start/implement/work/commit/done/verify/status/tools)
 - **tests_failed**: 2
 ---
 
+
+## 2026-01-30 21:56 - v0.13.0 Release Prep
+
+Fixed install.sh non-interactive mode (all 130 tests pass). Updated CHANGELOG with v0.13.0 changes (ag gateway, docs cleanup, token reduction). Branch ready for PR/merge/tag.
+
+- **0.13.0**: 0.13.0
+---
+

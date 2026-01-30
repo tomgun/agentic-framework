@@ -54,11 +54,18 @@ if [[ -d ".agentic" ]]; then
   echo "  If this is a new installation, you may have a previous failed attempt."
   echo "  If you want to upgrade an existing installation, use upgrade.sh instead."
   echo ""
-  read -p "  Continue and overwrite? [y/N] " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo -e "${YELLOW}Installation cancelled${NC}"
-    exit 0
+  # In non-interactive mode, abort (safer default)
+  if [[ -t 0 ]]; then
+    read -p "  Continue and overwrite? [y/N] " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      echo -e "${YELLOW}Installation cancelled${NC}"
+      exit 0
+    fi
+  else
+    echo -e "${RED}Non-interactive mode: refusing to overwrite existing .agentic/${NC}"
+    echo "  Use upgrade.sh for upgrades, or remove .agentic/ first"
+    exit 1
   fi
 fi
 echo ""
@@ -157,13 +164,18 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 if [[ -f ".agentic/tools/suggest-agents.sh" ]]; then
   echo "  The framework can suggest specialized agents based on your tech stack."
   echo ""
-  read -p "  Run agent suggestions now? [y/N] " -n 1 -r
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo ""
-    bash .agentic/tools/suggest-agents.sh
+  # Skip prompt if not running interactively (e.g., in tests)
+  if [[ -t 0 ]]; then
+    read -p "  Run agent suggestions now? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      echo ""
+      bash .agentic/tools/suggest-agents.sh
+    else
+      echo -e "  ${YELLOW}⚠${NC} Skipped. Run later with: bash .agentic/tools/suggest-agents.sh"
+    fi
   else
-    echo -e "  ${YELLOW}⚠${NC} Skipped. Run later with: bash .agentic/tools/suggest-agents.sh"
+    echo -e "  ${YELLOW}⚠${NC} Non-interactive mode. Run later: bash .agentic/tools/suggest-agents.sh"
   fi
 else
   echo -e "  ${YELLOW}⚠${NC} suggest-agents.sh not found"
