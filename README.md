@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.12.1](https://github.com/tomgun/agentic-framework/releases/tag/v0.12.1)
+**Current version:** [v0.13.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.13.0)
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
@@ -49,8 +49,8 @@ Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same proje
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
-cd agentic-framework-0.12.0
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
+cd agentic-framework-0.13.0
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -76,10 +76,10 @@ The agent will:
 
 ```bash
 # Download and extract
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
 
 # Copy .agentic/ into your project
-cp -r agentic-framework-0.12.0/.agentic /path/to/your-project/
+cp -r agentic-framework-0.13.0/.agentic /path/to/your-project/
 ```
 
 Then follow the same agent initialization process above. The agent will run `scaffold.sh` for you.
@@ -106,7 +106,7 @@ Then follow the same agent initialization process above. The agent will run `sca
 - Clear status at all times (`STATUS.md` + `JOURNAL.md`)
 - Tools provide immediate project health checks (no agent needed)
 - **Ready-to-use prompts**: Copy-paste workflows from `.agentic/prompts/` (Cursor/Claude)
-- **Session continuity**: Generate `.continue-here.md` for instant context recovery
+- **Session continuity**: `STATUS.md` and `WIP.md` for seamless context recovery
 - **Pre-project planning**: Use `VISION.template.md` for ideation phase
 - **Specialized agents**: 5 pre-defined subagents (explore, implement, test, review, research)
 - **Project-specific agents**: Create domain experts with `create-agent.sh`
@@ -212,8 +212,8 @@ The agent will:
 
 ```bash
 # Download new version
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
-cd agentic-framework-0.12.0
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
+cd agentic-framework-0.13.0
 
 # Run upgrade script with your project path
 bash .agentic/tools/upgrade.sh /path/to/your-project
@@ -414,13 +414,13 @@ Already have a project? The framework integrates non-invasively:
 ```bash
 # Download new version (to temp location)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
 
 # Run upgrade tool from NEW framework, pointing to your project
-bash /tmp/agentic-framework-0.12.0/.agentic/tools/upgrade.sh /path/to/your-project
+bash /tmp/agentic-framework-0.13.0/.agentic/tools/upgrade.sh /path/to/your-project
 
 # Clean up
-rm -rf /tmp/agentic-framework-0.12.0
+rm -rf /tmp/agentic-framework-0.13.0
 ```
 
 **Why from the new framework?** The new upgrade script has the latest bug fixes and knows about new structure changes.

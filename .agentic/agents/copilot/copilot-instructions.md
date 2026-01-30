@@ -4,16 +4,30 @@ This repo uses the **Agentic Framework**.
 
 ---
 
+## ENFORCED GATES (Profile-Aware)
+
+| Gate | Core+PM (formal) | Core (discovery) |
+|------|------------------|------------------|
+| Acceptance criteria | **BLOCKS** - `ag implement` requires acceptance | N/A - use `ag work` |
+| WIP before commit | **BLOCKS** - must complete WIP first | WARNING only |
+| Pre-commit checks | **BLOCKS** - full validation | Light check, no block |
+
+**Core+PM**: Formal tracking with enforced gates. **Core**: Discovery with lighter guidance.
+
+**Quick Commands**: `ag start` | `ag implement F-XXXX` (Core+PM) | `ag work "desc"` (Core) | `ag commit` | `ag done` | `ag tools`
+
+---
+
 # 🛑 STOP! READ THIS FIRST!
 
 ## WHEN User Says ANY of These:
 
 | Trigger Words | YOUR FIRST ACTION |
 |---------------|-------------------|
-| "build", "implement", "add", "create", "let's do" | **🛑 STOP → Check acceptance criteria EXIST first** |
+| "build", "implement", "add", "create", "let's do" | **🛑 STOP → Run `ag implement F-XXXX` (verifies acceptance criteria)** |
 | "fix", "bug", "issue" | **🛑 STOP → Write failing test FIRST** |
-| "commit", "push" | **🛑 STOP → All gates must pass (tests, specs updated)** |
-| "done", "complete" | **🛑 STOP → Verify smoke test passed, specs updated** |
+| "commit", "push" | **🛑 STOP → Run `ag commit` (all gates must pass)** |
+| "done", "complete" | **🛑 STOP → Run `ag done F-XXXX` (verifies completion)** |
 
 ## 🚫 DO NOT PROCEED UNTIL:
 

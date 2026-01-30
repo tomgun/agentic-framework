@@ -491,7 +491,12 @@ git merge origin/main
 
 ## Tools for Multi-Agent Coordination
 
-### `.agentic/tools/agents_active.sh`
+> **TODO (F-0108)**: The scripts below are planned but not yet implemented. For now use:
+> - `worktree.sh` for Git worktree management
+> - `.agentic/AGENTS_ACTIVE.md` for manual coordination
+> - `wip.sh` for work-in-progress tracking
+
+### `.agentic/tools/agents_active.sh` (TODO)
 
 ```bash
 #!/usr/bin/env bash
@@ -500,7 +505,7 @@ git merge origin/main
 cat .agentic/AGENTS_ACTIVE.md | grep -A 10 "^## Agent"
 ```
 
-### `.agentic/tools/check_agent_conflicts.sh`
+### `.agentic/tools/check_agent_conflicts.sh` (TODO)
 
 ```bash
 #!/usr/bin/env bash
@@ -514,7 +519,7 @@ FILES_EDITING=$2  # Comma-separated
 # Output: conflicts or "No conflicts detected"
 ```
 
-### `.agentic/tools/sync_worktrees.sh`
+### `.agentic/tools/sync_worktrees.sh` (TODO)
 
 ```bash
 #!/usr/bin/env bash

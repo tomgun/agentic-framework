@@ -268,7 +268,7 @@ bash .agentic/tools/verify.sh      # Comprehensive checks
 
 # Context and analysis
 bash .agentic/tools/brief.sh       # Quick project brief
-python3 .agentic/tools/continue_here.py  # Generate .continue-here.md for next session
+# Note: continue_here.py is deprecated - use STATUS.md directly
 bash .agentic/tools/coverage.sh    # Code annotation coverage
 bash .agentic/tools/feature_graph.sh   # Feature dependency graph
 bash .agentic/tools/arch_diff.sh   # Architecture changes

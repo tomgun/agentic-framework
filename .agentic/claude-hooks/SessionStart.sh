@@ -39,14 +39,19 @@ if [[ -f ".agentic/STACK.md" ]]; then
   echo -e "📦 Framework version: ${GREEN}${FRAMEWORK_VERSION}${NC}"
 fi
 
-# 3. Check for .continue-here.md
-if [[ -f ".continue-here.md" ]]; then
-  CONTINUE_AGE=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" .continue-here.md 2>/dev/null || stat -c "%y" .continue-here.md 2>/dev/null | cut -d' ' -f1,2)
-  echo -e "${GREEN}✓ Session context available${NC} (.continue-here.md from $CONTINUE_AGE)"
-  echo "  💡 I'll auto-inject this file when you send your first prompt"
+# 3. Check for STATUS.md (primary session context)
+if [[ -f "STATUS.md" ]]; then
+  # Extract current focus if present
+  CURRENT_FOCUS=$(grep -A 1 "## Current Focus" STATUS.md 2>/dev/null | tail -1 | head -c 60 || echo "")
+  if [[ -n "$CURRENT_FOCUS" && "$CURRENT_FOCUS" != "## Current Focus" ]]; then
+    echo -e "${GREEN}✓ Session context available${NC}"
+    echo "  📍 Focus: $CURRENT_FOCUS"
+  else
+    echo -e "${BLUE}ℹ STATUS.md exists but no focus set${NC}"
+  fi
 else
-  echo -e "${BLUE}ℹ No .continue-here.md found${NC}"
-  echo "  Tip: Generate one with: python3 .agentic/tools/continue_here.py"
+  echo -e "${YELLOW}⚠ No STATUS.md found${NC}"
+  echo "  Run: ag init (to initialize project)"
 fi
 
 # 4. Check for blockers

@@ -23,53 +23,73 @@
 
 **The framework works best when you actively participate.** Agents follow guidelines, but you're the quality gate.
 
-### The `/verify` Command
+### The `ag` Gateway Commands
 
-At any point, you can say `/verify` (or "run doctor") and the agent will check everything:
+The `ag` command is the single entry point for all framework operations:
 
+```bash
+ag start              # Session start - check status, WIP, blockers
+ag implement F-XXXX   # Start feature (Core+PM) - verifies acceptance criteria
+ag work "description" # Start task (Core) - simpler tracking
+ag commit             # Pre-commit gates - blocks if issues
+ag done [F-XXXX]      # Completion check - verifies everything updated
+ag verify [--full]    # Health check
+ag tools              # Discover all available tools
+ag status             # Show profile, WIP, current focus
 ```
-You: /verify
-Agent: [runs doctor.sh --full, reports status, fixes issues]
-```
 
-### When to Verify
+### When to Use `ag` Commands
 
-| Moment | Why |
-|--------|-----|
-| **Starting work** | Ensure clean state, no interrupted work |
-| **After completing a feature** | Verify everything is updated |
-| **Before committing** | Catch issues before they're permanent |
-| **Something feels off** | Quick health check |
+| Moment | Command | Why |
+|--------|---------|-----|
+| **Starting work** | `ag start` | Check WIP, blockers, multi-agent status |
+| **Before implementing** | `ag implement F-XXXX` | Verify acceptance criteria exist |
+| **Before committing** | `ag commit` | All gates must pass |
+| **Marking done** | `ag done F-XXXX` | Verify completion checklist |
+| **Something feels off** | `ag verify` | Quick health check |
 
 ### Prompts That Help
 
 If the agent seems to be skipping steps:
 
 ```
-"Did you check the acceptance criteria first?"
-"Run doctor.sh before we continue"
-"What phase are we in? Run verification."
-"Are we following TDD?"
+"Run ag implement F-XXXX before starting"
+"Did ag commit pass?"
+"What does ag status show?"
+"Run ag verify before we continue"
 ```
 
 ### The Partnership
 
 | You | Agent |
 |-----|-------|
-| Run `/verify` at key moments | Follow guidelines, run tools |
+| Ask for `ag` commands at key moments | Run `ag` commands, follow gates |
 | Make decisions, set priorities | Implement, update docs |
 | Catch drift, ask questions | Report status, suggest fixes |
 | Approve commits | Never auto-commit |
 
 **Neither works perfectly alone.** Together you maintain quality.
 
-### Quick Commands
+### Profile-Aware Commands
+
+The framework detects your profile (Core or Core+PM) automatically:
 
 ```bash
-# You can also run these directly:
-bash .agentic/tools/doctor.sh           # Quick health check
+# Core+PM profile (formal feature tracking)
+ag implement F-0042   # Requires spec/acceptance/F-0042.md
+
+# Core profile (simpler task tracking)
+ag work "Add login"   # No feature IDs needed
+```
+
+### Direct Tool Access
+
+You can also run tools directly:
+
+```bash
 bash .agentic/tools/doctor.sh --full    # Comprehensive verification
-bash .agentic/tools/doctor.sh --phase X # Phase-specific check
+bash .agentic/tools/wip.sh check        # Check interrupted work
+bash .agentic/tools/journal.sh ...      # Log to JOURNAL.md
 ```
 
 ---
@@ -82,7 +102,7 @@ bash .agentic/tools/doctor.sh --phase X # Phase-specific check
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
 cd agentic-framework-0.12.0
 
 # Install into your project
@@ -119,31 +139,21 @@ The agent will:
 
 ### Morning: Start Your Work Session
 
+**Recommended (one command):**
+
 ```bash
-# 1. Quick context recovery (recommended)
-python3 .agentic/tools/continue_here.py  # Generates .continue-here.md
-
-# 2. Read the summary
-cat .continue-here.md
-
-# 3. Check blockers
-cat HUMAN_NEEDED.md
+ag start
 ```
+
+This shows: profile, verification status, WIP, blockers, current focus.
 
 **Or manually:**
 
 ```bash
-# 1. Check what's happening (30 seconds)
-cat STATUS.md | head -30
-
-# 2. See recent progress (30 seconds)
-tail -30 JOURNAL.md
-
-# 3. Health check (1 minute)
-bash .agentic/tools/doctor.sh
-
-# 4. Check blockers
-cat HUMAN_NEEDED.md
+cat STATUS.md | head -30          # Current focus
+tail -30 JOURNAL.md               # Recent progress
+ag verify                         # Health check
+cat HUMAN_NEEDED.md               # Blockers
 ```
 
 **Now you know**:
@@ -158,26 +168,25 @@ cat HUMAN_NEEDED.md
 
 #### Working with Agent
 
-**Option 1: Continue existing work**
+**Option 1: Start a feature (Core+PM profile)**
+```bash
+ag implement F-0005    # Verifies acceptance criteria exist, starts WIP
 ```
-Agent: "Continue working on F-0005"
-```
+Then tell agent: "Implement F-0005"
 
-**Option 2: Start new feature**
+**Option 2: Start a task (Core profile)**
+```bash
+ag work "Add CSV export"    # Starts WIP tracking
 ```
-Agent: "Add new feature: user can export data to CSV.
-Create F-#### entry in FEATURES.md with acceptance criteria."
-```
+Then tell agent: "Implement CSV export"
 
 **Option 3: Direct spec editing (faster!)**
 ```bash
 # Edit spec/FEATURES.md yourself - add F-0010
 # Create spec/acceptance/F-0010.md with criteria
+ag implement F-0010    # Verify and start
 ```
-Then tell agent:
-```
-Agent: "I've added F-0010. Please implement it using TDD."
-```
+Then tell agent: "I've added F-0010. Please implement it using TDD."
 
 #### Working Manually (Without Agent)
 
@@ -603,31 +612,14 @@ The framework includes 30+ automation scripts in `.agentic/tools/`.
 
 ### Session Continuity
 
-#### `continue_here.py` - Generate Quick Context Recovery
+**Status:** Session continuity is now handled by standard framework files:
+- `STATUS.md` - Current focus, phase, next steps
+- `.agentic/WIP.md` - Interrupted work detection
+- `JOURNAL.md` - Work history
 
-**What it does:**
-- Synthesizes `JOURNAL.md`, `STATUS.md`, `HUMAN_NEEDED.md`, `FEATURES.md`, and pipeline files
-- Creates a single `.continue-here.md` file with:
-  - Quick summary of current state
-  - Active features and pipelines
-  - Blockers requiring human attention
-  - Recent work summary
-  - Recommended next steps
-  - Key files to review
+Agents read these files at session start (via `ag start` or session_start.md checklist).
 
-**When to run:**
-- At the end of each work session
-- Before taking a break
-- When context window is about to reset
-- Before switching to a different project
-
-```bash
-python3 .agentic/tools/continue_here.py
-```
-
-**Output:** `.continue-here.md` in your project root.
-
-**Next session:** Just read `.continue-here.md` for instant context recovery, or ask your AI agent to read it.
+> **Deprecated:** `continue_here.py` and `.continue-here.md` are deprecated as of v0.12.0. The separate file was redundant with STATUS.md. Agents should read STATUS.md directly.
 
 ### Health Check Scripts
 
@@ -1047,7 +1039,7 @@ Checks if versions in `package.json` / `requirements.txt` match `STACK.md`.
 ```bash
 # Download new framework version
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
 
 # Run upgrade FROM new framework
 bash /tmp/agentic-framework-0.12.0/.agentic/tools/upgrade.sh /path/to/your-project
@@ -1471,7 +1463,7 @@ curl -s https://api.github.com/repos/tomgun/agentic-framework/releases/latest | 
 
 # Upgrade (see UPGRADING.md)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.11.2.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
 bash /tmp/agentic-framework-0.12.0/.agentic/tools/upgrade.sh /path/to/your-project
 ```
 

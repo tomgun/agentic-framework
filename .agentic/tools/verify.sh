@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "⚠️  DEPRECATED: Use 'doctor.sh --full' instead"
-echo "   This tool will be removed in v0.12.0"
+echo "⚠️  DEPRECATED: Use 'doctor.sh --full' or 'ag verify' instead"
+echo "   This tool is kept for backwards compatibility only"
 echo ""
 
 echo "=== agentic verify (comprehensive) ==="
