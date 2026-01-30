@@ -45,7 +45,23 @@ Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same proje
 
 ## Installation
 
-### Automated install (Recommended)
+### One-liner install (Recommended)
+
+```bash
+# Run from your project directory
+curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
+```
+
+Options:
+```bash
+# Install specific version
+VERSION=v0.13.0 curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
+
+# Install to different directory
+TARGET=/path/to/project curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
+```
+
+### Manual install
 
 ```bash
 # Download latest release
@@ -211,12 +227,14 @@ The agent will:
 ### Upgrading existing projects
 
 ```bash
-# Download new version
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
-cd agentic-framework-0.13.0
+# Run from your project directory
+curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-upgrade.sh | bash
+```
 
-# Run upgrade script with your project path
-bash .agentic/tools/upgrade.sh /path/to/your-project
+Or manually:
+```bash
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
+bash agentic-framework-0.13.0/.agentic/tools/upgrade.sh /path/to/your-project
 ```
 
 The upgrade script will:
@@ -412,14 +430,15 @@ Already have a project? The framework integrates non-invasively:
 **Already using the framework?** Upgrade to the latest version:
 
 ```bash
-# Download new version (to temp location)
+# One-liner (run from your project directory)
+curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-upgrade.sh | bash
+```
+
+Or manually:
+```bash
 cd /tmp
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
-
-# Run upgrade tool from NEW framework, pointing to your project
 bash /tmp/agentic-framework-0.13.0/.agentic/tools/upgrade.sh /path/to/your-project
-
-# Clean up
 rm -rf /tmp/agentic-framework-0.13.0
 ```
 
