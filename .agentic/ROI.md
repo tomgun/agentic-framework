@@ -379,6 +379,6 @@ With Agentic Framework + AI:
 
 ---
 
-*Last Updated: 2025-01-11*
-*Framework Version: 0.9.8*
+*Last Updated: 2026-01-30*
+*Framework Version: 0.13.0*
 

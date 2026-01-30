@@ -101,16 +101,16 @@ Example: "Using extended thinking, help me debug this race condition..."
 
 | Hook | When | Purpose |
 |------|------|---------|
-| `SessionStart` | Session begins | Show project status, check for `.continue-here.md` |
-| `UserPromptSubmit` | First prompt | Auto-inject `.continue-here.md` (no manual "read" needed!) |
+| `SessionStart` | Session begins | Show project status from STATUS.md |
+| `UserPromptSubmit` | First prompt | Phase-aware verification (acceptance check) |
 | `PostToolUse` | After file edits | Run quick linter checks |
-| `PreCompact` | Before context compaction | Save state to `.continue-here.md` |
+| `PreCompact` | Before context compaction | Save state to STATUS.md and JOURNAL.md |
 | `Stop` | Session ends | Remind about uncommitted changes |
 
 **Setup**: See [`.agentic/claude-hooks/README.md`](../../claude-hooks/README.md) for full documentation.
 
 **Benefits**:
-- **Zero-touch context recovery**: `.continue-here.md` is auto-injected
+- **Phase-aware gates**: Catches missing acceptance criteria
 - **Real-time quality gates**: Linter runs after code edits
 - **Never lose progress**: State saved before context compaction
 - **Better workflow discipline**: Reminders about commits and docs

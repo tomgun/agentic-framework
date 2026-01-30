@@ -226,8 +226,8 @@ When switching between tools, the handoff is seamless because:
 
 4. **Next morning (back to Claude)**:
    ```
-   # Claude SessionStart hook loads .continue-here.md
-   # Sees full progress from all tools
+   # Claude SessionStart hook checks STATUS.md
+   # Sees current focus and progress
    # Continues seamlessly
    ```
 

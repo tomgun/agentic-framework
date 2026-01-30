@@ -21,7 +21,7 @@
             "type": "command",
             "command": "${CLAUDE_PROJECT_DIR}/.agentic/claude-hooks/UserPromptSubmit.sh",
             "timeout": 3000,
-            "description": "Auto-inject .continue-here.md if available"
+            "description": "Phase-aware verification (acceptance criteria check)"
           }
         ]
       }

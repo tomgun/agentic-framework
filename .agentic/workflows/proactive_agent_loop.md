@@ -550,9 +550,10 @@ c) Technical: "401 Unauthorized: Invalid password"
 **Symptoms**: Long conversation, many file reads, approaching token limit
 
 **Solutions**:
-1. **Generate .continue-here.md immediately**:
+1. **Update STATUS.md** with current state:
    ```bash
-   python3 .agentic/tools/continue_here.py
+   bash .agentic/tools/status.sh focus "Current task"
+   bash .agentic/tools/status.sh next "What to continue"
    ```
 2. **Summarize key decisions** in JOURNAL.md before compaction
 3. **Commit current work** (even if incomplete) to preserve state in git

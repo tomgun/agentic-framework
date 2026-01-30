@@ -44,6 +44,8 @@ Please help me update:
 
 **Tip:** If the project is growing complex and you find yourself wishing for more structure, consider upgrading to Core+PM mode:
 ```bash
-bash .agentic/tools/upgrade_profile.sh
+# TODO: upgrade_profile.sh not yet implemented
+# For now: manually run scaffold.sh with core+product profile
+bash .agentic/init/scaffold.sh
 ```
 
