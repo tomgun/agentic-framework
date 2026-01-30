@@ -38,11 +38,11 @@ bash .agentic/tools/journal.sh \
 ```
 # First thing in Cursor composer:
 "Read .agentic/checklists/session_start.md and load context.
- Check .continue-here.md if present, otherwise read recent JOURNAL.md.
+ Check STATUS.md for current focus and .agentic/WIP.md for interrupted work.
  Continue work from where Claude left off."
 
 # Cursor reads:
-@.continue-here.md   # If Claude hooks created it
+@STATUS.md           # Current focus
 @JOURNAL.md          # Recent entries
 @SESSION_LOG.md      # Quick checkpoints
 @FEATURES.md         # Current feature state
@@ -110,7 +110,7 @@ bash .agentic/tools/journal.sh \
 **2. Next morning in Claude:**
 ```
 # Claude SessionStart hook automatically:
-- Loads .continue-here.md (if exists)
+- Shows STATUS.md current focus
 - Shows recent JOURNAL.md entries
 - Identifies current task from STATUS.md
 - Lists any HUMAN_NEEDED items
@@ -285,7 +285,7 @@ Cursor: bash .agentic/tools/journal.sh "F-0005 complete" "..." "Start F-0006" "N
 
 **Next day 8:00 AM - Claude Code**
 ```
-Claude: SessionStart hook loads .continue-here.md
+Claude: SessionStart hook checks STATUS.md
 Claude: ✓ F-0005 shipped yesterday
 Claude: ✓ Next: F-0006
 Claude: Seamless continuation

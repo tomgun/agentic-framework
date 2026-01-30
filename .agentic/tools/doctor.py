@@ -601,14 +601,46 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
         # Check WIP exists (interrupted work?)
         if (root / ".agentic" / "WIP.md").exists():
             issues.append(".agentic/WIP.md exists - previous work was interrupted. Review or complete it.")
-        # Context files checked by main doctor flow
+
+        # Check for stale verification
+        state = read_verification_state(root)
+        if state:
+            try:
+                last_run = datetime.fromisoformat(state["last_run"])
+                hours_ago = (datetime.now() - last_run).total_seconds() / 3600
+                if hours_ago > 24:
+                    issues.append(f"Last verification was {hours_ago:.0f}h ago. Consider running: ag verify")
+            except Exception:
+                pass
+
+        # Check for unresolved blockers
+        blockers_file = root / "HUMAN_NEEDED.md"
+        if blockers_file.exists():
+            try:
+                content = blockers_file.read_text()
+                unresolved = len(re.findall(r"^## HN-\d+:.*(?!\[RESOLVED\])", content, re.MULTILINE))
+                if unresolved > 0:
+                    issues.append(f"{unresolved} unresolved blocker(s) in HUMAN_NEEDED.md")
+            except Exception:
+                pass
 
     elif phase == "planning":
         # Must have acceptance criteria before implementing
         if feature_id:
             acc_file = root / "spec" / "acceptance" / f"{feature_id}.md"
             if not acc_file.exists():
-                issues.append(f"No acceptance criteria: spec/acceptance/{feature_id}.md required before implementing")
+                issues.append(f"BLOCKED: No acceptance criteria at spec/acceptance/{feature_id}.md")
+                issues.append("  Create acceptance criteria FIRST, then implement.")
+
+            # Check if feature exists in FEATURES.md
+            features_path = root / "spec" / "FEATURES.md"
+            if features_path.exists():
+                try:
+                    content = features_path.read_text()
+                    if f"## {feature_id}:" not in content:
+                        issues.append(f"Feature {feature_id} not found in spec/FEATURES.md")
+                except Exception:
+                    pass
         else:
             issues.append("No feature ID provided. Use: doctor.sh --phase planning F-0001")
 
@@ -617,20 +649,57 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
         if feature_id:
             acc_file = root / "spec" / "acceptance" / f"{feature_id}.md"
             if not acc_file.exists():
-                issues.append(f"Missing acceptance criteria for {feature_id}")
+                issues.append(f"BLOCKED: Missing acceptance criteria for {feature_id}")
             if not (root / ".agentic" / "WIP.md").exists():
-                issues.append("No .agentic/WIP.md - start tracking with: wip.sh start " + (feature_id or "FEATURE"))
+                issues.append("No WIP tracking. Start with: bash .agentic/tools/wip.sh start " + feature_id)
+
+            # Check feature status
+            features_path = root / "spec" / "FEATURES.md"
+            if features_path.exists():
+                try:
+                    content = features_path.read_text()
+                    if f"## {feature_id}:" in content:
+                        feature_section = content[content.find(f"## {feature_id}:"):]
+                        if "- Status: shipped" in feature_section[:500]:
+                            issues.append(f"{feature_id} already marked 'shipped' - is this intentional?")
+                except Exception:
+                    pass
 
     elif phase == "complete":
         # Tests should pass, FEATURES.md updated
         if feature_id and profile == "core+product":
             features_path = root / "spec" / "FEATURES.md"
             if features_path.exists():
-                content = features_path.read_text()
-                if f"## {feature_id}:" in content:
-                    # Check status is shipped or being shipped
-                    if f"- Status: planned" in content[content.find(f"## {feature_id}:"):]:
-                        issues.append(f"{feature_id} still marked 'planned' - update to 'shipped'")
+                try:
+                    content = features_path.read_text()
+                    if f"## {feature_id}:" in content:
+                        feature_section = content[content.find(f"## {feature_id}:"):]
+                        section_end = feature_section.find("\n## ", 10)
+                        if section_end > 0:
+                            feature_section = feature_section[:section_end]
+
+                        # Check status
+                        if "- Status: planned" in feature_section:
+                            issues.append(f"{feature_id}: Status still 'planned' - update to 'shipped'")
+
+                        # Check implementation state
+                        if "State: none" in feature_section or "State: partial" in feature_section:
+                            issues.append(f"{feature_id}: Implementation state not 'complete'")
+
+                        # Check tests
+                        if "Unit: todo" in feature_section.lower():
+                            issues.append(f"{feature_id}: Unit tests still marked 'todo'")
+
+                        # Check acceptance file
+                        acc_file = root / "spec" / "acceptance" / f"{feature_id}.md"
+                        if not acc_file.exists():
+                            issues.append(f"{feature_id}: Missing acceptance criteria file")
+                except Exception:
+                    pass
+
+        # Check WIP is complete
+        if (root / ".agentic" / "WIP.md").exists():
+            issues.append("WIP still active. Complete with: bash .agentic/tools/wip.sh complete")
 
     elif phase == "commit":
         # Delegate to pre-commit checks
@@ -681,6 +750,71 @@ def run_pre_commit_checks(root: Path, profile: str) -> list[str]:
     return issues
 
 
+def get_verification_summary(root: Path) -> str:
+    """Get a one-line verification status summary for session greeting."""
+    state = read_verification_state(root)
+    if state is None:
+        return "No verification record. Run: ag verify"
+
+    try:
+        last_run = datetime.fromisoformat(state["last_run"])
+        hours_ago = (datetime.now() - last_run).total_seconds() / 3600
+        issues = state.get("issues_count", 0)
+        result = state.get("result", "unknown")
+
+        time_str = f"{hours_ago:.1f}h ago" if hours_ago < 24 else f"{hours_ago/24:.1f}d ago"
+
+        if result == "pass":
+            return f"Last verified: {time_str}, 0 issues"
+        else:
+            return f"Last verified: {time_str}, {issues} issue(s)"
+    except Exception:
+        return "Verification state unreadable"
+
+
+def run_summary_check(root: Path) -> dict:
+    """Run a quick summary check for session start context."""
+    summary = {
+        "verification": get_verification_summary(root),
+        "wip_active": (root / ".agentic" / "WIP.md").exists(),
+        "agents_active": 0,
+        "blockers": 0,
+        "current_focus": None,
+    }
+
+    # Check for active agents
+    agents_file = root / ".agentic" / "AGENTS_ACTIVE.md"
+    if agents_file.exists():
+        try:
+            content = agents_file.read_text()
+            summary["agents_active"] = content.count("## ")
+        except Exception:
+            pass
+
+    # Check for blockers
+    blockers_file = root / "HUMAN_NEEDED.md"
+    if blockers_file.exists():
+        try:
+            content = blockers_file.read_text()
+            summary["blockers"] = len(re.findall(r"^## HN-", content, re.MULTILINE))
+        except Exception:
+            pass
+
+    # Get current focus from STATUS.md
+    status_file = root / "STATUS.md"
+    if status_file.exists():
+        try:
+            content = status_file.read_text()
+            # Try to find current focus
+            focus_match = re.search(r"(?:Current [Ff]ocus|## Current Focus)[:\s]*(.+?)(?:\n|$)", content)
+            if focus_match:
+                summary["current_focus"] = focus_match.group(1).strip()[:100]
+        except Exception:
+            pass
+
+    return summary
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Agentic Framework health check")
     parser.add_argument('--full', action='store_true', help='Run full verification (includes verify.py checks)')
@@ -688,12 +822,27 @@ def main() -> int:
                         help='Run phase-specific checks')
     parser.add_argument('--pre-commit', action='store_true', help='Run pre-commit checks')
     parser.add_argument('--quick', action='store_true', help='Quick health check (default)')
+    parser.add_argument('--summary', action='store_true', help='One-line summary for session greeting')
     parser.add_argument('feature_id', nargs='?', help='Feature ID (e.g., F-0001) for phase checks')
     args = parser.parse_args()
 
     root = Path.cwd()
     profile = read_profile(root)
     detected_stack = None  # Will be set if stack detection runs
+
+    # Handle --summary mode (for session greeting)
+    if args.summary:
+        summary = run_summary_check(root)
+        print(summary["verification"])
+        if summary["wip_active"]:
+            print("WIP: Active (previous work interrupted)")
+        if summary["agents_active"] > 0:
+            print(f"Multi-agent: {summary['agents_active']} agent(s) active")
+        if summary["blockers"] > 0:
+            print(f"Blockers: {summary['blockers']} item(s) need human input")
+        if summary["current_focus"]:
+            print(f"Focus: {summary['current_focus']}")
+        return 0
 
     # Handle --phase mode (context-aware checks)
     if args.phase:

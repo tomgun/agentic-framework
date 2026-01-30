@@ -1581,6 +1581,30 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0108: Multi-Agent Helper Scripts
+
+**Status**: planned
+**Priority**: medium
+**Profile**: Both
+
+**Description**: Utility scripts for multi-agent coordination that are documented but not yet implemented:
+- `agents_active.sh` - Parse and display AGENTS_ACTIVE.md status
+- `check_agent_conflicts.sh` - Check if files overlap between agents
+- `sync_worktrees.sh` - Pull main into all worktrees
+- `git_mode.sh` - Show git workflow mode from STACK.md
+- `upgrade_profile.sh` - Upgrade Core → Core+PM profile
+
+**Dependencies**: F-0031 (Multi-Agent Coordination)
+
+**Implementation**:
+- State: none
+- Code: `.agentic/tools/` (to be created)
+- Tests: unit tests for each script
+
+**Acceptance**: See `spec/acceptance/F-0108.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |

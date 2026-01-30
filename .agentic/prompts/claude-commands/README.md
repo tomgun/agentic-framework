@@ -10,7 +10,7 @@
 
 Custom commands let you type `/command` in Claude to quickly invoke predefined workflows. They're like shortcuts for our ready-to-use prompts.
 
-**Example**: Type `/continue` to resume work from `.continue-here.md`
+**Example**: Type `/start` to load context from STATUS.md and begin working
 
 ---
 
@@ -36,8 +36,8 @@ If your Claude version doesn't support custom commands:
 
 | Command | Description | Prompt File |
 |---------|-------------|-------------|
-| `/start` | Start session with context loading | `start.md` |
-| `/continue` | Resume from .continue-here.md | `continue.md` |
+| `/start` | Start session with context loading from STATUS.md | `start.md` |
+| `/continue` | Resume from STATUS.md and WIP.md (deprecated, use /start) | `continue.md` |
 | `/verify` | **Run verification gates** (quality check) | `verify.md` |
 | `/implement` | Implement a feature (TDD mode) | `implement.md` |
 | `/test` | Write tests for a feature | `test.md` |
@@ -107,9 +107,9 @@ Claude will load context and present session options.
 
 **Resume work**:
 ```
-/continue
+/start
 ```
-Claude will read `.continue-here.md` and resume.
+Claude will read STATUS.md and WIP.md to resume.
 
 **Implement feature**:
 ```

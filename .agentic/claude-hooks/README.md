@@ -12,10 +12,10 @@ Hooks are scripts that run automatically at specific points in the Claude Code l
 
 | Hook | When It Runs | Purpose |
 |------|--------------|---------|
-| `SessionStart.sh` | When you start a new Claude chat | Validate environment, show project status |
-| `UserPromptSubmit.sh` | Before Claude processes your first prompt | Auto-inject `.continue-here.md` for instant context recovery |
+| `SessionStart.sh` | When you start a new Claude chat | Validate environment, show project status from STATUS.md |
+| `UserPromptSubmit.sh` | Before Claude processes your first prompt | Phase-aware verification (acceptance criteria check) |
 | `PostToolUse.sh` | After Claude uses any tool (file edit, terminal, etc.) | Run quick linter checks |
-| `PreCompact.sh` | Before context window gets compacted | Save state to `.continue-here.md` and `JOURNAL.md` |
+| `PreCompact.sh` | Before context window gets compacted | Save state to `JOURNAL.md`, preserve WIP |
 | `Stop.sh` | When session ends | Remind about uncommitted changes and documentation |
 
 ---
@@ -60,7 +60,7 @@ In Claude Code, when creating or configuring a project:
 **Actions**:
 - ✓ Check if this is an Agentic AF project
 - ✓ Show framework version
-- ✓ Detect if `.continue-here.md` exists (for context recovery)
+- ✓ Show current focus from `STATUS.md`
 - ✓ Check for blockers in `HUMAN_NEEDED.md`
 - ✓ Run quick health check (`doctor.sh --quick`)
 - ✓ Show git status (uncommitted changes, last commit)
@@ -69,9 +69,9 @@ In Claude Code, when creating or configuring a project:
 ```
 🚀 Agentic AF Session Start
 
-📦 Framework version: 0.3.5
-✓ Session context available (.continue-here.md from 2025-01-04 22:30)
-  💡 I'll auto-inject this file when you send your first prompt
+📦 Framework version: 0.13.0
+✓ Session context available
+  📍 Focus: Implementing user authentication
 ⚠ 2 blocker(s) in HUMAN_NEEDED.md
   Review these before continuing development
 📝 3 uncommitted change(s)
@@ -84,27 +84,23 @@ In Claude Code, when creating or configuring a project:
 
 ### `UserPromptSubmit.sh`
 
-**Runs**: Before Claude processes your first prompt in a session
+**Runs**: Before Claude processes prompts that contain implementation triggers
 
 **Actions**:
-- Check if `.continue-here.md` exists
-- If yes, and if not injected yet this session:
-  - Auto-inject file contents into context
-  - Mark as injected (won't inject again until next session)
-- If file is >7 days old, warn about staleness
+- Detect implementation triggers (e.g., "implement F-0005")
+- Check if acceptance criteria file exists for the feature
+- Warn if no acceptance criteria found (gate enforcement)
 
 **Benefits**:
-- **Zero manual work**: You don't have to say "read .continue-here.md"
-- **Instant context**: Claude knows where you left off immediately
-- **One-time injection**: Won't spam context with repeated injections
+- **Phase-aware validation**: Catches missing acceptance criteria before implementation
+- **Early warning**: Prompts developer to define criteria first
+- **Non-blocking**: Advisory warning, lets you proceed if needed
 
-**Output Example**:
+**Output Example** (when implementing without criteria):
 ```
-📄 Auto-injecting session context from .continue-here.md:
-
-[... contents of .continue-here.md ...]
-
----
+⚠️  GATE WARNING: No acceptance criteria for F-0005
+   Create spec/acceptance/F-0005.md before implementing
+   Run: doctor.sh --phase planning F-0005
 ```
 
 ---
@@ -138,29 +134,26 @@ In Claude Code, when creating or configuring a project:
 **Runs**: Before Claude compacts the context window (when it gets full)
 
 **Actions**:
-- Generate fresh `.continue-here.md` (preserves current state)
+- Update `STATUS.md` with compaction note
 - Add `JOURNAL.md` entry with compaction timestamp
 - Note uncommitted changes
 - Remind about in-progress features and blockers
 
 **Benefits**:
 - **Never lose progress**: State is saved before compaction
-- **Seamless resume**: After compaction, Claude can continue with full context
+- **Seamless resume**: After compaction, Claude reads STATUS.md and JOURNAL.md
 - **Audit trail**: `JOURNAL.md` tracks compaction events
 
 **Output Example**:
 ```
 💾 Context compaction detected - preserving state...
 
-Generating .continue-here.md...
-✓ Session context preserved in .continue-here.md
+✓ Updated STATUS.md with current state
 ✓ Added JOURNAL.md entry
 Note: 1 feature(s) in progress (check FEATURES.md after resuming)
 ⚠ Reminder: 2 blocker(s) in HUMAN_NEEDED.md
 
 ✓ State preservation complete
-
-After compaction, I'll resume with full context from .continue-here.md
 ```
 
 ---
@@ -172,8 +165,8 @@ After compaction, I'll resume with full context from .continue-here.md
 **Actions**:
 - Check for uncommitted git changes
 - Check if `JOURNAL.md` was updated this session
-- Check if `.continue-here.md` is fresh
 - Note in-progress features
+- Check WIP.md for interrupted work
 - Show session end checklist
 
 **Benefits**:
@@ -285,7 +278,7 @@ All hooks are designed to **never block Claude** (they exit with code 0 even on 
 
 **If hooks don't work in your Claude Code version**:
 - You can still use the scripts manually
-- Example: Run `bash .agentic/tools/continue_here.py` before starting a session
+- Example: Run `ag start` before starting a session
 - Example: Run `.agentic/claude-hooks/Stop.sh` manually before ending a session
 
 ---
@@ -294,7 +287,7 @@ All hooks are designed to **never block Claude** (they exit with code 0 even on 
 
 - [`.agentic/prompts/claude/README.md`](../prompts/claude/README.md) - Ready-to-use Claude prompts
 - [`.agentic/DEVELOPER_GUIDE.md`](../DEVELOPER_GUIDE.md) - Complete framework guide
-- [`.agentic/tools/continue_here.py`](../tools/continue_here.py) - Generate `.continue-here.md` manually
+- [`.agentic/tools/ag.sh`](../tools/ag.sh) - Gateway script for common commands
 
 ---
 

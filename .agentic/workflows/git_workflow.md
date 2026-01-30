@@ -341,14 +341,15 @@ multi_agent:
 ### Tool integration:
 
 ```bash
-# Check git workflow mode
-bash .agentic/tools/git_mode.sh
+# Manage Git worktrees for parallel development
+bash .agentic/tools/worktree.sh list
+bash .agentic/tools/worktree.sh create F-0042
 
-# List active agents
-bash .agentic/tools/agents_active.sh
+# Check for active agents (manual coordination)
+cat .agentic/AGENTS_ACTIVE.md
 
-# Check for conflicts with other agents
-bash .agentic/tools/check_agent_conflicts.sh
+# Track work in progress
+bash .agentic/tools/wip.sh check
 ```
 
 ## Troubleshooting

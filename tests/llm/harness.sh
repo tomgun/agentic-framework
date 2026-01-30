@@ -22,14 +22,17 @@
 #   - Returns 0 for pass, 1 for fail
 #
 # Environment:
-#   TOOL - AI tool to use: claude (default), cursor, copilot
+#   TOOL - AI tool to use: claude (default), codex, cursor, copilot
 #   CLAUDE_MODEL - Model for Claude: opus (default), sonnet, or full model name
 #   CLAUDE_CMD - Path to claude CLI (default: claude)
+#   CODEX_MODEL - Model for Codex: gpt-5-codex (default), gpt-5-codex-mini
+#   CODEX_CMD - Path to codex CLI (default: codex)
 #   KEEP_PROJECTS - Set to "1" to keep temp projects for debugging
 #
 # Examples:
 #   bash tests/llm/harness.sh                              # Claude + Opus
 #   CLAUDE_MODEL=sonnet bash tests/llm/harness.sh          # Claude + Sonnet
+#   TOOL=codex bash tests/llm/harness.sh                   # Codex (automated)
 #   TOOL=cursor bash tests/llm/harness.sh                  # Cursor (semi-automated)
 #   bash tests/llm/harness.sh --compare-models --critical  # Compare Opus vs Sonnet
 
@@ -40,11 +43,13 @@ FRAMEWORK_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 TOOL="${TOOL:-claude}"
 CLAUDE_MODEL="${CLAUDE_MODEL:-opus}"
 CLAUDE_CMD="${CLAUDE_CMD:-claude}"
+CODEX_MODEL="${CODEX_MODEL:-gpt-5-codex}"
+CODEX_CMD="${CODEX_CMD:-codex}"
 KEEP_PROJECTS="${KEEP_PROJECTS:-0}"
 
 # Validate tool
-if [[ "$TOOL" != "claude" && "$TOOL" != "cursor" && "$TOOL" != "copilot" ]]; then
-    echo "Error: TOOL must be 'claude', 'cursor', or 'copilot'"
+if [[ "$TOOL" != "claude" && "$TOOL" != "codex" && "$TOOL" != "cursor" && "$TOOL" != "copilot" ]]; then
+    echo "Error: TOOL must be 'claude', 'codex', 'cursor', or 'copilot'"
     exit 1
 fi
 
@@ -243,6 +248,25 @@ send_prompt() {
             echo -e "${YELLOW}⚠ Rate limit detected in response${NC}"
             exit 2  # Special exit code for rate limit
         fi
+    elif [[ "$TOOL" == "codex" ]]; then
+        # Fully automated: OpenAI Codex CLI
+        # Use codex exec for non-interactive execution
+        local -a model_args=()
+        if [[ -n "$CODEX_MODEL" ]]; then
+            model_args=(-c "model=$CODEX_MODEL")
+        fi
+
+        # codex exec runs non-interactively
+        LAST_OUTPUT=$(timeout 120 $CODEX_CMD exec "${model_args[@]}" "$prompt" 2>&1) || true
+
+        # Write output to shared file for rate limit detection across subshells
+        echo "$LAST_OUTPUT" > "$SCRIPT_DIR/.last-output"
+
+        # Check for rate limit and exit with special code
+        if echo "$LAST_OUTPUT" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded"; then
+            echo -e "${YELLOW}⚠ Rate limit detected in response${NC}"
+            exit 2  # Special exit code for rate limit
+        fi
     else
         # Semi-automated: Cursor or Copilot (IDE-based)
         echo ""
@@ -376,7 +400,7 @@ cleanup_test_project() {
 # Export functions and variables for test scripts
 export -f setup_test_project send_prompt check_output_contains check_output_not_contains
 export -f check_file_exists check_file_not_exists check_file_contains cleanup_test_project
-export FRAMEWORK_ROOT CLAUDE_CMD TOOL CLAUDE_MODEL SCRIPT_DIR
+export FRAMEWORK_ROOT CLAUDE_CMD CODEX_CMD TOOL CLAUDE_MODEL CODEX_MODEL SCRIPT_DIR
 
 #=============================================================================
 # Test Runner
@@ -697,6 +721,9 @@ main() {
     if [[ "$TOOL" == "claude" ]]; then
         echo "Model: $CLAUDE_MODEL"
         echo "CLI: $CLAUDE_CMD"
+    elif [[ "$TOOL" == "codex" ]]; then
+        echo "Model: $CODEX_MODEL"
+        echo "CLI: $CODEX_CMD"
     else
         echo "Mode: Semi-automated (manual prompt entry required)"
     fi
