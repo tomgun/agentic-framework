@@ -83,7 +83,8 @@ For complete implementations, see `.agentic/quality_profiles/`:
 - Desktop applications: `desktop_app.sh`
 - CLI/Server tools: `cli_server_tool.sh`
 - Games: `game_engine.sh`
-- Audio plugins: `juce_audio_plugin.sh` - includes pluginval, offline DSP validation with numpy, realtime CPU & glitch detection
+- Audio plugins (JUCE): `juce_audio_plugin.sh` - includes pluginval, offline DSP validation with numpy, realtime CPU & glitch detection
+- Audio plugins (raw VST3 SDK): `raw_vst3_plugin.sh` - for projects using Steinberg VST3 SDK directly without JUCE/iPlug2
 - More examples in the profiles directory
 
 Below are conceptual examples showing the approach for different stacks.
@@ -312,6 +313,66 @@ def test_realtime_performance(
 
 # ... (helper functions)
 ```
+
+### Raw VST3 SDK Plugin (non-JUCE)
+
+For projects using the Steinberg VST3 SDK directly without JUCE or iPlug2.
+
+**Profile**: `.agentic/quality_profiles/raw_vst3_plugin.sh`
+
+**Key differences from JUCE:**
+- CMake-based build system (not Projucer)
+- Different artifact paths: `build/VST3/Release/*.vst3`
+- pluginval detection handles Homebrew Cask installs on macOS
+- No JUCE-specific test infrastructure
+
+**Why use raw VST3 SDK?**
+- Avoid JUCE commercial license costs
+- Minimal dependencies
+- Full control over plugin architecture
+- Custom OpenGL/Metal rendering without JUCE abstractions
+
+**Typical project structure:**
+```
+project/
+├── CMakeLists.txt
+├── external/vst3sdk/          # VST3 SDK as submodule
+├── src/
+│   ├── processor.cpp          # Audio processing
+│   ├── controller.cpp         # Parameter handling
+│   └── view_mac.mm            # Platform-specific UI
+├── build/
+│   └── VST3/Release/*.vst3    # Build output
+└── quality_checks.sh          # Generated from profile
+```
+
+**Example `quality_checks.sh` creation:**
+```bash
+cp .agentic/quality_profiles/raw_vst3_plugin.sh quality_checks.sh
+chmod +x quality_checks.sh
+# Customize thresholds as needed
+```
+
+**Stack detection patterns** (for auto-suggesting this profile):
+- `external/vst3sdk/` or `libs/vst3sdk/` directory exists
+- CMakeLists.txt contains `smtg_add_vst3plugin` or references VST3 SDK
+- No JUCE or iPlug2 dependencies detected
+- `.mm` files for macOS platform code (manual UI, not framework)
+
+**STACK.md configuration:**
+```markdown
+## Quality validation (recommended)
+- quality_checks: enabled
+- profile: raw_vst3_plugin
+- pre_commit_hook: no  # Enable when tests comprehensive
+- run_command: bash quality_checks.sh --pre-commit
+- full_suite_command: bash quality_checks.sh --full
+- validation_tool: pluginval  # brew install --cask pluginval
+```
+
+**Reference implementation**: https://github.com/tomgun/vst-musializer
+
+---
 
 ### Web Application (React/Next.js)
 
@@ -854,6 +915,7 @@ jobs:
 **Location**: `.agentic/quality_profiles/`
 
 - `juce_audio_plugin.sh` - JUCE plugin validation
+- `raw_vst3_plugin.sh` - Raw VST3 SDK plugin validation (non-JUCE)
 - `webapp_fullstack.sh` - Web app validation
 - `ios_app.sh` - iOS app validation
 - `android_app.sh` - Android app validation
