@@ -14,10 +14,11 @@
 
 ```bash
 # Read these silently (don't dump to user)
-cat STATUS.md 2>/dev/null
-cat HUMAN_NEEDED.md 2>/dev/null | head -20
-ls .agentic/WIP.md 2>/dev/null || true
+# IMPORTANT: Every command must have "|| true" to prevent exit code errors
+cat STATUS.md 2>/dev/null || true
+cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
 cat .agentic/AGENTS_ACTIVE.md 2>/dev/null || true
+ls .agentic/WIP.md 2>/dev/null || true
 ```
 
 ## Step 2: Greet User with Recap
