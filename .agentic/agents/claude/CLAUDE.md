@@ -106,8 +106,10 @@ cat .agentic/AGENTS_ACTIVE.md 2>/dev/null
 ### 1. Silently Read Context
 
 ```bash
-cat STATUS.md 2>/dev/null
-cat HUMAN_NEEDED.md 2>/dev/null | head -20
+# Every command needs || true to prevent exit code errors
+cat STATUS.md 2>/dev/null || true
+cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
+cat .agentic/AGENTS_ACTIVE.md 2>/dev/null || true
 ls .agentic/WIP.md 2>/dev/null || true
 ```
 
