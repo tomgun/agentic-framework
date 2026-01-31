@@ -145,10 +145,14 @@ Example projects demonstrate best practices and verify workflows actually work.
    git push origin vX.Y.Z
    ```
 
-6. **Create GitHub release** (manual in GitHub UI):
+6. **Create GitHub release** (manual in GitHub UI) - **REQUIRED**:
    - Copy CHANGELOG entry
    - Attach release notes
    - GitHub auto-creates release packages
+
+   ⚠️ **IMPORTANT**: Tag alone is NOT enough! `remote-upgrade.sh` downloads from
+   `/archive/refs/tags/vX.Y.Z.tar.gz` which only works after a GitHub Release is
+   created. Without the release, the tarball URL returns stale content.
 
 **Semantic Versioning**:
 - **Major (1.0.0)**: Breaking changes, incompatible with old projects
