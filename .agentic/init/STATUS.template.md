@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the project is today.
 
 ## Quick Context
-<!-- 1-2 sentences: What is this project? (See PRODUCT.md for details if it exists) -->
+<!-- 1-2 sentences: What is this project? (See OVERVIEW.md for details if it exists) -->
 
 
 ## Project Phase

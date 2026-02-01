@@ -12,7 +12,7 @@
 
 - [ ] **Acceptance criteria MUST exist before ANY code is written**
   - Core+PM: `spec/acceptance/F-####.md` file exists with testable criteria
-  - Core: Clear criteria in `PRODUCT.md` or written user request
+  - Core: Clear criteria in `OVERVIEW.md` or written user request
   - Rough is OK: "User can log in" is valid to start
   - **If missing: Create acceptance criteria FIRST or escalate to HUMAN_NEEDED.md**
   - **DO NOT write code without acceptance criteria**
@@ -145,7 +145,7 @@
 
 ### Update Tracking (Core)
 
-- [ ] **Update `PRODUCT.md`**
+- [ ] **Update `OVERVIEW.md`**
   - Mark implemented capabilities with [x]
   - Update "What works now" section
   - Keep "Known limitations" current
@@ -293,7 +293,7 @@ Blocking: F-0010 implementation
 
 ---
 
-### Problem: Forgot to update FEATURES.md/PRODUCT.md
+### Problem: Forgot to update FEATURES.md/OVERVIEW.md
 
 **Discovered later (before commit)**:
 1. Update it now before committing
@@ -341,6 +341,6 @@ Blocking: F-0010 implementation
 ✅ **Do** small increments (easier to review)  
 ✅ **Do** update tracking in same commit as code  
 ✅ **Do** write tests (TDD: first; Standard: alongside)  
-✅ **Do** keep FEATURES.md/PRODUCT.md accurate  
+✅ **Do** keep FEATURES.md/OVERVIEW.md accurate  
 ✅ **Do** add code annotations
 

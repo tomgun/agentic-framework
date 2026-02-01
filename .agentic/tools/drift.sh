@@ -391,8 +391,8 @@ check_undocumented_code() {
     if [[ -f "$ROOT_DIR/CONTEXT_PACK.md" ]]; then
         context_content=$(cat "$ROOT_DIR/CONTEXT_PACK.md")
     fi
-    if [[ -f "$ROOT_DIR/PRODUCT.md" ]]; then
-        context_content="$context_content $(cat "$ROOT_DIR/PRODUCT.md")"
+    if [[ -f "$ROOT_DIR/OVERVIEW.md" ]]; then
+        context_content="$context_content $(cat "$ROOT_DIR/OVERVIEW.md")"
     fi
 
     local all_docs="$spec_content $context_content"
@@ -628,7 +628,7 @@ check_template_markers() {
         "STACK.md"
         "CONTEXT_PACK.md"
         "STATUS.md"
-        "PRODUCT.md"
+        "OVERVIEW.md"
         "spec/FEATURES.md"
         "spec/PRD.md"
         "spec/TECH_SPEC.md"

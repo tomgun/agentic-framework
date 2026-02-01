@@ -37,7 +37,7 @@ Please help me create a thorough plan:
    - Create acceptance criteria files: `spec/acceptance/F-####.md`
    - Update `spec/PRD.md` or `spec/TECH_SPEC.md` if needed
 
-6. **For Core mode - Document in PRODUCT.md:**
+6. **For Core mode - Document in OVERVIEW.md:**
    - Add planned features with acceptance criteria
    - Note technical approach and key decisions
    - List dependencies and risks

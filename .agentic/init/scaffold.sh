@@ -97,7 +97,7 @@ echo "OK  : ensured directories docs/, docs/research/, docs/architecture/diagram
 copy_if_missing "${ROOT_DIR}/.agentic/init/STACK.template.md" "${ROOT_DIR}/STACK.md"
 copy_if_missing "${ROOT_DIR}/.agentic/init/CONTEXT_PACK.template.md" "${ROOT_DIR}/CONTEXT_PACK.md"
 copy_if_missing "${ROOT_DIR}/.agentic/init/STATUS.template.md" "${ROOT_DIR}/STATUS.md"
-copy_if_missing "${ROOT_DIR}/.agentic/init/PRODUCT.template.md" "${ROOT_DIR}/PRODUCT.md"
+copy_if_missing "${ROOT_DIR}/.agentic/init/OVERVIEW.template.md" "${ROOT_DIR}/OVERVIEW.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/JOURNAL.template.md" "${ROOT_DIR}/JOURNAL.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/HUMAN_NEEDED.template.md" "${ROOT_DIR}/HUMAN_NEEDED.md"
 
@@ -134,7 +134,7 @@ This repo uses the **Agentic Framework** located at `.agentic/`.
 
 **Keep documentation current:**
 - Update `JOURNAL.md` before ending ANY session (if session ends abruptly, JOURNAL is the only record)
-- Keep `PRODUCT.md` up to date with decisions and completed capabilities
+- Keep `OVERVIEW.md` up to date with vision and completed capabilities
 - Keep `CONTEXT_PACK.md` current when architecture changes
 - If this repo uses the Core+Product profile: keep `STATUS.md` and `/spec/*` truthful
 
@@ -191,31 +191,8 @@ echo "OK  : ensured directories spec/, spec/adr, spec/tasks, spec/acceptance"
 
 # Note: STATUS.md already created above (shared by both profiles)
 
-# Seed specs (use framework templates if present; otherwise placeholders).
-if [[ ! -f "${ROOT_DIR}/spec/PRD.md" ]]; then
-  if [[ -f "${ROOT_DIR}/.agentic/spec/PRD.template.md" ]]; then
-    cp "${ROOT_DIR}/.agentic/spec/PRD.template.md" "${ROOT_DIR}/spec/PRD.md"
-    echo "NEW : spec/PRD.md (from .agentic/spec/PRD.template.md)"
-  else
-    cat > "${ROOT_DIR}/spec/PRD.md" <<'EOF'
-# PRD (Draft)
-
-## Problem
-
-## Goals
-
-## Non-goals
-
-## Users & primary workflow
-
-## Success criteria
-
-EOF
-    echo "NEW : spec/PRD.md (placeholder)"
-  fi
-else
-  echo "OK  : spec/PRD.md exists"
-fi
+# Note: PRD.md is deprecated in favor of OVERVIEW.md at root level
+# OVERVIEW.md is created above for both profiles
 
 if [[ ! -f "${ROOT_DIR}/spec/TECH_SPEC.md" ]]; then
   if [[ -f "${ROOT_DIR}/.agentic/spec/TECH_SPEC.template.md" ]]; then
@@ -242,7 +219,6 @@ else
   echo "OK  : spec/TECH_SPEC.md exists"
 fi
 
-copy_if_missing "${ROOT_DIR}/.agentic/spec/OVERVIEW.template.md" "${ROOT_DIR}/spec/OVERVIEW.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/FEATURES.template.md" "${ROOT_DIR}/spec/FEATURES.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/ISSUES.template.md" "${ROOT_DIR}/spec/ISSUES.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/LESSONS.template.md" "${ROOT_DIR}/spec/LESSONS.md"

@@ -19,7 +19,7 @@ This folder is a **portable framework** you can copy into any repository to boot
 - Multi-agent coordination (multiple agents working in parallel)
 - Research mode (deep investigation)
 - Git workflow (PR mode or direct commits)
-- Lightweight planning (PRODUCT.md - what you're building, what's done)
+- Lightweight planning (OVERVIEW.md - what you're building, what's done)
 - Architecture docs (CONTEXT_PACK.md)
 - Escalation protocol (HUMAN_NEEDED.md)
 - Session continuity (JOURNAL.md)
@@ -141,7 +141,7 @@ Tell your agent:
 - Ask what you're building
 - Ask which profile you want (Core or Core+PM) and explain the differences
 - Interview you about your tech stack and requirements
-- Fill in `STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
+- Fill in `STACK.md`, `OVERVIEW.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
 - Set up quality validation for your stack
 
 The agent follows `.agentic/init/init_playbook.md` which guides it through the entire initialization process.
@@ -152,7 +152,7 @@ If you used `install.sh`, templates are already created. Otherwise, the agent wi
 1. **Run scaffold**: `bash .agentic/init/scaffold.sh` (creates all template files)
 2. **Ask about profile**: Explain Core vs Core+PM and help you choose
 3. **Ask questions**: What are you building? What tech stack? Performance constraints? etc.
-4. **Fill in docs**: `STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
+4. **Fill in docs**: `STACK.md`, `OVERVIEW.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
 5. **Set up quality checks**: Create stack-specific `quality_checks.sh` if applicable
 6. **Ready to develop**: You're ready to start building
 

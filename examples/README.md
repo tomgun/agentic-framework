@@ -8,7 +8,7 @@ This directory contains example projects demonstrating the Agentic Framework in 
 **Project**: Simple Python CLI todo manager
 
 **Demonstrates**:
-- ✅ `PRODUCT.md` for lightweight planning (checkboxes track progress)
+- ✅ `OVERVIEW.md` for lightweight planning (checkboxes track progress)
 - ✅ Working with agents without formal specs
 - ✅ Minimal ceremony, fast iteration
 - ✅ Code annotations (`@feature`) for context
@@ -20,7 +20,7 @@ core_todo_cli/
 ├── .agentic/           # Framework (same in both profiles)
 ├── AGENTS.md           # Agent entry point
 ├── STACK.md            # Profile: core
-├── PRODUCT.md          # ← What we're building (lightweight)
+├── OVERVIEW.md          # ← What we're building (lightweight)
 ├── CONTEXT_PACK.md     # Architecture
 ├── JOURNAL.md          # Session history
 ├── HUMAN_NEEDED.md     # Escalations
@@ -29,9 +29,9 @@ core_todo_cli/
 ```
 
 **How agents work in Core mode**:
-1. Read `PRODUCT.md` to understand what's being built
+1. Read `OVERVIEW.md` to understand what's being built
 2. Ask user: "Which capability should I work on?"
-3. Implement, test, update `PRODUCT.md` (check off items)
+3. Implement, test, update `OVERVIEW.md` (check off items)
 4. Log progress in `JOURNAL.md`
 
 ---
@@ -56,7 +56,7 @@ core_pm_taskboard/
 ├── .agentic/           # Framework
 ├── AGENTS.md           # Agent entry point
 ├── STACK.md            # Profile: core+product
-├── PRODUCT.md          # High-level overview
+├── OVERVIEW.md          # High-level overview
 ├── STATUS.md           # ← Current focus, roadmap
 ├── CONTEXT_PACK.md     # Architecture
 ├── JOURNAL.md          # Session history
@@ -85,8 +85,8 @@ core_pm_taskboard/
 
 | Aspect | Core (`core_todo_cli/`) | Core+PM (`core_pm_taskboard/`) |
 |--------|-------------------------|--------------------------------|
-| **Planning doc** | `STATUS.md` + `PRODUCT.md` (optional) | `STATUS.md` + `PRODUCT.md` + `spec/` |
-| **Feature tracking** | Checkboxes in `PRODUCT.md` | F-#### IDs in `spec/FEATURES.md` |
+| **Planning doc** | `STATUS.md` + `OVERVIEW.md` (optional) | `STATUS.md` + `OVERVIEW.md` + `spec/` |
+| **Feature tracking** | Checkboxes in `OVERVIEW.md` | F-#### IDs in `spec/FEATURES.md` |
 | **Acceptance criteria** | Informal (user approval) | Formal (`spec/acceptance/F-####.md`) |
 | **Agent direction** | Asks user what to work on | Reads `STATUS.md` for focus |
 | **Tools** | `doctor`, `verify` | `doctor`, `report`, `verify`, `feature_graph` |
@@ -106,7 +106,7 @@ Previous examples (before Core/Core+PM split) are in `old/` for reference.
 # Core mode
 cd core_todo_cli/
 python3 .agentic/tools/doctor.py
-cat PRODUCT.md
+cat OVERVIEW.md
 
 # Core+PM mode
 cd core_pm_taskboard/

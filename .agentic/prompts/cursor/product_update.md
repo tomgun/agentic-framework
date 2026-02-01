@@ -1,6 +1,6 @@
-# Update PRODUCT.md Prompt (Core Mode)
+# Update OVERVIEW.md Prompt (Core Mode)
 
-I've made changes to the project and need to update `PRODUCT.md`.
+I've made changes to the project and need to update `OVERVIEW.md`.
 
 Please help me update:
 
@@ -29,12 +29,12 @@ Please help me update:
    - Note any important decisions or insights
 
 6. **Commit together:**
-   - Commit code changes + `PRODUCT.md` + `JOURNAL.md` together
+   - Commit code changes + `OVERVIEW.md` + `JOURNAL.md` together
    - Use descriptive commit message
 
 ---
 
-**PRODUCT.md is your lightweight spec:**
+**OVERVIEW.md is your lightweight spec:**
 - In Core mode, it replaces the formal `spec/FEATURES.md`
 - Keep it up-to-date with every significant change
 - It's the first place anyone (human or AI) should look to understand the project

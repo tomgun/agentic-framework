@@ -15,7 +15,7 @@ This folder is a **portable framework** you can copy into any repository to boot
 - Multi-agent coordination (multiple agents working in parallel)
 - Research mode (deep investigation)
 - Git workflow (PR mode or direct commits)
-- Lightweight planning (PRODUCT.md - what you're building, what's done)
+- Lightweight planning (OVERVIEW.md - what you're building, what's done)
 - Architecture docs (CONTEXT_PACK.md)
 - Escalation protocol (HUMAN_NEEDED.md)
 - Session continuity (JOURNAL.md)

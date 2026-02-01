@@ -7,7 +7,7 @@ Create/update these at repo root:
 - `STACK.md` (from `.agentic/init/STACK.template.md`)
 - `STATUS.md` (from `.agentic/init/STATUS.template.md`) - required for both profiles
 - `CONTEXT_PACK.md` (from `.agentic/init/CONTEXT_PACK.template.md`)
-- `PRODUCT.md` (from `.agentic/init/PRODUCT.template.md`) - optional detailed vision
+- `OVERVIEW.md` (from `.agentic/init/OVERVIEW.template.md`) - product vision and goals
 - `/spec/` (from `.agentic/spec/*.template.md`) - for Core+PM mode
 - `spec/adr/` (directory exists; can be empty at start)
 
@@ -30,7 +30,7 @@ This creates all expected files/folders with templates/placeholders so you can s
 > - All framework capabilities: context optimization, multi-agent, TDD, quality gates
 > - Session continuity, token efficiency, green coding, /verify command
 > - STATUS.md for project phase and current focus
-> - Optional PRODUCT.md for detailed vision
+> - Optional OVERVIEW.md for detailed vision
 > - Good for: Small projects, prototypes, external PM tools (Jira/Linear)
 >
 > **b) Core + Product Management (Formal Specs)**
@@ -55,7 +55,7 @@ This creates all expected files/folders with templates/placeholders so you can s
 - ✅ Research mode
 - ✅ `/verify` command for human-assisted quality
 - ✅ `STATUS.md` for project phase and current focus
-- ✅ Optional `PRODUCT.md` for detailed vision (checkboxes)
+- ✅ `OVERVIEW.md` for product vision and goals
 - ✅ Minimal ceremony, fast iteration
 - **Good for**:
   - Small/simple projects or prototypes
@@ -482,10 +482,9 @@ Type a/b/c/d:"
 - **`STACK.md`**: Fill in tech stack, versions, how to run/test
 - **`STATUS.md`**: Project phase, current focus, what's next
 - **`CONTEXT_PACK.md`**: Architecture overview, key decisions, how it works
-- **`PRODUCT.md`** (optional): Detailed vision, core capabilities, scope
+- **`OVERVIEW.md`**: Product vision, why it matters, core capabilities, success criteria
 
 ### For Core+PM profile additionally:
-- **`spec/PRD.md`**: Why we're building this, goals, requirements
 - **`spec/TECH_SPEC.md`**: How we're building it, architecture, data models
 - **`spec/FEATURES.md`**: Seed with 2-3 initial features (F-0001, F-0002, etc.)
 
@@ -557,7 +556,7 @@ Common blockers discovered during init:
 **Accomplished**:
 - Initialized [Project Name] with [Stack]
 - Profile: [Core | Core+PM]
-- Created STACK.md, STATUS.md, PRODUCT.md (optional), CONTEXT_PACK.md
+- Created STACK.md, STATUS.md, OVERVIEW.md (optional), CONTEXT_PACK.md
 - Set up quality validation: [profile used]
 - Documented [X] human-needed items
 

@@ -137,7 +137,7 @@
     - "Enable after reviewing workflow"
 
 19. **Product Management Features Are Separate**
-    - PRODUCT.md for Core (lightweight)
+    - OVERVIEW.md for Core (lightweight)
     - spec/ and STATUS.md for Core+PM (formal)
     - Different workflows for different needs
     - enable-product-management.sh for upgrade
@@ -288,7 +288,7 @@
     - Quality standards: always
     - Multi-agent: always
     - Research mode: always
-    - PRODUCT.md: always in Core
+    - OVERVIEW.md: always in Core
 
 39. **Product Management Features Optional**
     - Specs (F-####): only in Core+PM
@@ -298,7 +298,7 @@
 
 40. **Easy to Upgrade**
     - enable-product-management.sh
-    - Detects PRODUCT.md, converts to specs
+    - Detects OVERVIEW.md, converts to specs
     - All framework files always present
     - Agent helps with migration
 

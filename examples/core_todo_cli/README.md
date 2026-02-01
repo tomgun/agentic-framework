@@ -34,5 +34,5 @@ See `CONTEXT_PACK.md` for architecture overview.
 - ✅ MVP complete: add, list, done commands
 - ⬜ Next: filter, delete, edit commands
 
-See `PRODUCT.md` for full roadmap and `JOURNAL.md` for session history.
+See `OVERVIEW.md` for full roadmap and `JOURNAL.md` for session history.
 

@@ -31,7 +31,7 @@ cat spec/acceptance/F-0001.md  # Specific acceptance criteria
 ## Key Files
 
 **Core files** (same as Core mode):
-- `PRODUCT.md` - What we're building (lightweight overview)
+- `OVERVIEW.md` - What we're building (lightweight overview)
 - `STACK.md` - Tech stack (Next.js 15, React 19, Tailwind)
 - `CONTEXT_PACK.md` - Architecture overview
 - `JOURNAL.md` - Session history

@@ -88,7 +88,7 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 **What exists**:
 - ✅ `STACK.md` - How to build/run
 - ✅ `CONTEXT_PACK.md` - Architecture overview
-- ✅ `PRODUCT.md` - What we're building, what's done, what's next
+- ✅ `OVERVIEW.md` - What we're building, what's done, what's next
 - ✅ `JOURNAL.md` - Session history
 - ✅ `HUMAN_NEEDED.md` - Escalation protocol
 
@@ -98,13 +98,13 @@ These rules are intended to be used by **any** assistant (Cursor, Copilot, Claud
 - ❌ Feature IDs (F-####) - No feature tracking system
 
 **How to work in Core mode**:
-1. **Read the product**: `PRODUCT.md` tells you what's being built, what's done, and what's in scope
-2. **Ask user for direction**: "Which capability from PRODUCT.md should I work on?" or "What's the priority?"
+1. **Read the product**: `OVERVIEW.md` tells you what's being built, what's done, and what's in scope
+2. **Ask user for direction**: "Which capability from OVERVIEW.md should I work on?" or "What's the priority?"
 3. **Read context**: `CONTEXT_PACK.md` (understand architecture), `JOURNAL.md` (recent work)
 4. **Document as you go**: 
    - Update `CONTEXT_PACK.md` when architecture changes
-   - Update `PRODUCT.md` when you complete capabilities or make technical decisions
-   - Check off items in `PRODUCT.md` "Core capabilities" when done
+   - Update `OVERVIEW.md` when you complete capabilities or make technical decisions
+   - Check off items in `OVERVIEW.md` "Core capabilities" when done
 5. **Escalate when stuck**: Add to `HUMAN_NEEDED.md` with clear description
 6. **Session continuity**: Always update `JOURNAL.md` with progress summary
 7. **No feature tracking**: Work on what user asks, no F-#### IDs

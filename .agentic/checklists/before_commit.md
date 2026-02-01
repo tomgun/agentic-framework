@@ -84,7 +84,7 @@
 
 ### Core Profile
 
-- [ ] **`PRODUCT.md` reflects reality**
+- [ ] **`OVERVIEW.md` reflects reality**
   - Implemented capabilities marked with [x]
   - "What works now" is accurate
   - "Known limitations" is current
@@ -246,7 +246,7 @@ docs(readme): update installation instructions
 ❌ **Don't** commit without human approval
 ❌ **Don't** commit with failing tests
 ❌ **Don't** commit without updating JOURNAL.md
-❌ **Don't** commit with stale FEATURES.md/PRODUCT.md
+❌ **Don't** commit with stale FEATURES.md/OVERVIEW.md
 ❌ **Don't** commit with "(Not yet created)" placeholders
 ❌ **Don't** commit debug code (console.log, etc.)
 
