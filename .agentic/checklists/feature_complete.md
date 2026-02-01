@@ -148,6 +148,17 @@
 
 ---
 
+## Drift Check (Recommended)
+
+Before marking feature as complete:
+
+- [ ] **Run `bash .agentic/tools/drift.sh`** to verify:
+  - No untracked implementation files related to this feature
+  - Feature status in FEATURES.md matches acceptance criteria completion
+  - No template markers left in project files (e.g., "(Template)" in title)
+
+---
+
 ## Quality Checks
 
 - [ ] **Spec ↔ Code alignment verified**

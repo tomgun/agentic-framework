@@ -465,6 +465,50 @@ cmd_done() {
 
         # Run complete phase check
         bash "$SCRIPT_DIR/doctor.sh" --phase complete "$feature_id" 2>/dev/null || true
+
+        # Check for untracked feature files
+        echo ""
+        echo -e "${BOLD}Drift Checks:${NC}"
+        local untracked_feature_files=$(git status --porcelain 2>/dev/null | grep '^??' | grep -i "$feature_id\|$(echo $feature_id | tr '[:upper:]' '[:lower:]')" || true)
+        if [ -n "$untracked_feature_files" ]; then
+            echo -e "${YELLOW}⚠ Untracked files related to $feature_id:${NC}"
+            echo "$untracked_feature_files" | sed 's/^??/   /'
+            echo "  Consider: git add <files>"
+        else
+            echo -e "${GREEN}✓${NC} No untracked feature files"
+        fi
+
+        # Check if acceptance criteria file exists and has untracked state
+        local acc_file="$ROOT_DIR/spec/acceptance/${feature_id}.md"
+        if [ -f "$acc_file" ]; then
+            if git status --porcelain "$acc_file" 2>/dev/null | grep -q '^??'; then
+                echo -e "${YELLOW}⚠ Acceptance criteria file is untracked:${NC}"
+                echo "   spec/acceptance/${feature_id}.md"
+                echo "   Consider: git add spec/acceptance/${feature_id}.md"
+            fi
+        fi
+
+        # Auto-update FEATURES.md status to shipped if using table format
+        local features_file="$ROOT_DIR/spec/FEATURES.md"
+        if [ -f "$features_file" ]; then
+            if grep -qE "^\|[[:space:]]*${feature_id}[[:space:]]*\|" "$features_file"; then
+                # Table format detected - check if not already shipped
+                if ! grep -E "^\|[[:space:]]*${feature_id}[[:space:]]*\|" "$features_file" | grep -qi "shipped"; then
+                    echo ""
+                    echo -e "${YELLOW}Note: $feature_id not marked as 'shipped' in FEATURES.md (table format)${NC}"
+                    echo "  To update: bash .agentic/tools/feature.sh $feature_id status shipped"
+                fi
+            fi
+        fi
+
+        # Remind about STATUS.md
+        echo ""
+        if [ -f "$ROOT_DIR/STATUS.md" ]; then
+            if ! grep -q "$feature_id" "$ROOT_DIR/STATUS.md" 2>/dev/null; then
+                echo -e "${YELLOW}Note: $feature_id not mentioned in STATUS.md${NC}"
+                echo "  Consider updating STATUS.md to reflect completion"
+            fi
+        fi
     fi
 
     # Show definition of done checklist
@@ -486,6 +530,12 @@ cmd_done() {
         echo -e "${YELLOW}Note: WIP tracking still active. Complete it with:${NC}"
         echo "  bash .agentic/tools/wip.sh complete"
     fi
+
+    # Suggest drift detection
+    echo ""
+    echo -e "${BLUE}Recommended: Run drift detection${NC}"
+    echo "  bash .agentic/tools/drift.sh"
+    echo "  (Checks: untracked files, feature status, template markers)"
 }
 
 # Tools command - list all tools

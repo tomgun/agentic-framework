@@ -78,15 +78,62 @@ check_features_drift() {
 
     log_check "FEATURES.md ↔ Code alignment"
 
-    # Parse shipped features
-    local shipped_features=$(grep -E "^## F-[0-9]+" "$features_file" | while read line; do
-        local fid=$(echo "$line" | grep -oE "F-[0-9]+")
-        # Check if status is shipped
-        local section=$(sed -n "/^## $fid/,/^## F-/p" "$features_file" | head -20)
-        if echo "$section" | grep -qi "status:.*shipped"; then
-            echo "$fid"
+    # Detect format: table or heading-based
+    local format="heading"
+    if grep -qE "^\|[[:space:]]*F-[0-9]+" "$features_file"; then
+        format="table"
+    fi
+
+    # Parse shipped features (support both formats)
+    local shipped_features=""
+    if [[ "$format" == "table" ]]; then
+        # Table format: | F-0003 | Name | shipped | ... |
+        shipped_features=$(grep -E "^\|[[:space:]]*F-[0-9]+" "$features_file" | \
+            grep -i "shipped" | \
+            grep -oE "F-[0-9]+" || true)
+    else
+        # Heading format: ## F-0003: Name with - Status: shipped
+        shipped_features=$(grep -E "^## F-[0-9]+" "$features_file" | while read line; do
+            local fid=$(echo "$line" | grep -oE "F-[0-9]+")
+            # Check if status is shipped
+            local section=$(sed -n "/^## $fid/,/^## F-/p" "$features_file" | head -20)
+            if echo "$section" | grep -qi "status:.*shipped"; then
+                echo "$fid"
+            fi
+        done)
+    fi
+
+    # Also check for pending features with high acceptance completion (status drift)
+    local pending_features=""
+    if [[ "$format" == "table" ]]; then
+        pending_features=$(grep -E "^\|[[:space:]]*F-[0-9]+" "$features_file" | \
+            grep -iE "(pending|planned)" | \
+            grep -oE "F-[0-9]+" || true)
+    else
+        pending_features=$(grep -E "^## F-[0-9]+" "$features_file" | while read line; do
+            local fid=$(echo "$line" | grep -oE "F-[0-9]+")
+            local section=$(sed -n "/^## $fid/,/^## F-/p" "$features_file" | head -20)
+            if echo "$section" | grep -qiE "status:.*(pending|planned)"; then
+                echo "$fid"
+            fi
+        done)
+    fi
+
+    # Check pending features for acceptance criteria completion
+    for fid in $pending_features; do
+        local criteria_file="$ROOT_DIR/spec/acceptance/${fid}.md"
+        if [[ -f "$criteria_file" ]]; then
+            local total=$(grep -cE "^- \[.\]" "$criteria_file" 2>/dev/null || echo "0")
+            local complete=$(grep -cE "^- \[x\]" "$criteria_file" 2>/dev/null || echo "0")
+            if [[ "$total" -gt 0 ]]; then
+                local pct=$((complete * 100 / total))
+                if [[ "$pct" -ge 50 ]]; then
+                    log_drift "$fid: marked 'pending' but acceptance criteria ${pct}% complete ($complete/$total)"
+                    echo "      → Consider updating status to 'in_progress' or 'shipped'"
+                fi
+            fi
         fi
-    done)
+    done
 
     for fid in $shipped_features; do
         # Check if acceptance criteria file exists
@@ -503,6 +550,144 @@ check_undocumented_endpoints() {
 }
 
 #=============================================================================
+# Drift Detection: Untracked Implementation Files
+#=============================================================================
+
+check_untracked_files() {
+    log_check "Untracked implementation files"
+
+    # Skip if not a git repo
+    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        log_ok "Not a git repository, skipping"
+        return 0
+    fi
+
+    # Find untracked files in implementation directories
+    local untracked=""
+    for dir in src lib app pkg cmd internal tests test spec; do
+        if [[ -d "$ROOT_DIR/$dir" ]]; then
+            local dir_untracked=$(git status --porcelain "$ROOT_DIR/$dir" 2>/dev/null | grep '^??' | sed 's/^?? //' || true)
+            if [[ -n "$dir_untracked" ]]; then
+                untracked="$untracked$dir_untracked"$'\n'
+            fi
+        fi
+    done
+
+    untracked=$(echo "$untracked" | grep -v '^$' | head -10)
+
+    if [[ -n "$untracked" ]]; then
+        log_drift "Untracked implementation files found:"
+        echo "$untracked" | while read -r file; do
+            if [[ -n "$file" ]]; then
+                # Get file size/line count for context
+                local info=""
+                if [[ -f "$ROOT_DIR/$file" ]]; then
+                    local lines=$(wc -l < "$ROOT_DIR/$file" 2>/dev/null | tr -d ' ')
+                    info=" ($lines lines)"
+                fi
+                echo "      - $file$info"
+            fi
+        done
+        echo ""
+        echo -e "  ${CYAN}Tip:${NC} Consider: git add + commit, or add to .gitignore"
+
+        if [[ "$MODE" == "interactive" ]]; then
+            local choice=$(prompt_fix \
+                "Untracked files found. What to do?" \
+                "  1. Stage all for commit (git add)
+  2. Skip (handle manually later)
+  3. Show git status")
+
+            case "$choice" in
+                1)
+                    echo "$untracked" | while read -r file; do
+                        [[ -n "$file" ]] && git add "$ROOT_DIR/$file" 2>/dev/null
+                    done
+                    log_ok "Staged untracked files"
+                    ((FIXED_COUNT++))
+                    ;;
+                3)
+                    git status --short
+                    ;;
+            esac
+        fi
+    else
+        log_ok "No untracked implementation files"
+    fi
+}
+
+#=============================================================================
+# Drift Detection: Template Markers
+#=============================================================================
+
+check_template_markers() {
+    log_check "Template markers in project files"
+
+    local markers_found=0
+    local files_to_check=(
+        "STACK.md"
+        "CONTEXT_PACK.md"
+        "STATUS.md"
+        "PRODUCT.md"
+        "spec/FEATURES.md"
+        "spec/PRD.md"
+        "spec/TECH_SPEC.md"
+    )
+
+    for file in "${files_to_check[@]}"; do
+        local filepath="$ROOT_DIR/$file"
+        if [[ -f "$filepath" ]]; then
+            # Check for "(Template)" in title (first line)
+            if head -1 "$filepath" | grep -qi "(Template)"; then
+                if [[ $markers_found -eq 0 ]]; then
+                    log_drift "Template markers found in project files:"
+                fi
+                echo "      - $file:1 - \"(Template)\" in title"
+                ((markers_found++))
+            fi
+
+            # Check for common template placeholders
+            local placeholders=$(grep -nE "^.*TBD[^a-zA-Z]|TODO:.*fill|<!-- .*-->$|\[Your |<describe " "$filepath" 2>/dev/null | head -3 || true)
+            if [[ -n "$placeholders" ]]; then
+                if [[ $markers_found -eq 0 ]]; then
+                    log_drift "Template markers found in project files:"
+                fi
+                echo "$placeholders" | while read -r line; do
+                    local linenum=$(echo "$line" | cut -d: -f1)
+                    echo "      - $file:$linenum - template placeholder"
+                done
+                ((markers_found++))
+            fi
+        fi
+    done
+
+    if [[ $markers_found -eq 0 ]]; then
+        log_ok "No template markers found"
+    else
+        echo ""
+        echo -e "  ${CYAN}Tip:${NC} Remove template markers after filling in content"
+
+        if [[ "$MODE" == "interactive" ]]; then
+            local choice=$(prompt_fix \
+                "Template markers found. What to do?" \
+                "  1. Fix STACK.md title (remove Template suffix)
+  2. Skip (handle manually later)")
+
+            case "$choice" in
+                1)
+                    if [[ -f "$ROOT_DIR/STACK.md" ]]; then
+                        sed -i.bak 's/ (Template)//g; s/(Template)//g' "$ROOT_DIR/STACK.md"
+                        rm -f "$ROOT_DIR/STACK.md.bak"
+                        log_ok "Removed (Template) from STACK.md"
+                        ((FIXED_COUNT++))
+                    fi
+                    ;;
+            esac
+        fi
+    fi
+}
+
+#=============================================================================
 # Main
 #=============================================================================
 
@@ -516,6 +701,10 @@ main() {
     echo "Root: $ROOT_DIR"
     echo ""
 
+    check_untracked_files
+    echo ""
+    check_template_markers
+    echo ""
     check_features_drift
     echo ""
     check_context_pack_drift
