@@ -28,7 +28,7 @@
   - Next immediate step: Clear, actionable next step
   - Blockers: Document any blockers encountered
 
-- [ ] **`PRODUCT.md` updated** (optional - only if project has one)
+- [ ] **`OVERVIEW.md` updated** (optional - only if project has one)
   - Completed capabilities marked [x]
   - "What works now" is accurate
   - Skip if project uses STATUS.md only

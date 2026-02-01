@@ -29,7 +29,7 @@ When working in **Core+Product** profile, you have:
 ### Key Documents
 | Document | Purpose | Who Updates |
 |----------|---------|-------------|
-| `PRODUCT.md` | Vision, capabilities, rough plan | Human + Agent |
+| `OVERVIEW.md` | Vision, capabilities, rough plan | Human + Agent |
 | `STATUS.md` | Current focus, next up, roadmap | Mostly Agent |
 | `JOURNAL.md` | Session-by-session log | Agent |
 | `spec/FEATURES.md` | Feature registry with F-#### IDs | Human + Agent |
@@ -494,8 +494,8 @@ Run `bash .agentic/tools/verify.sh` weekly to catch:
 - Out-of-sync specs
 - Test gaps
 
-### 5. Use PRODUCT.md for Vision
-`PRODUCT.md` is your "why we're building this" doc.
+### 5. Use OVERVIEW.md for Vision
+`OVERVIEW.md` is your "why we're building this" doc.
 `spec/FEATURES.md` is your "what exactly we're building" doc.
 
 Keep both in sync but distinct in purpose.

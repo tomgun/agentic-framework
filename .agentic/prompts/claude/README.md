@@ -19,7 +19,7 @@ This directory contains ready-to-use prompts (called "Projects" in Claude) for c
 
 ### Method 3: Quick Conversation
 1. Start a new conversation
-2. Upload relevant files (PRODUCT.md, FEATURES.md, etc.)
+2. Upload relevant files (OVERVIEW.md, FEATURES.md, etc.)
 3. Paste the prompt from this directory
 
 ## Available Prompts
@@ -38,7 +38,7 @@ This directory contains ready-to-use prompts (called "Projects" in Claude) for c
 - **`spec_update.md`** - Update specs after implementation
 
 ### Core Mode
-- **`product_update.md`** - Update PRODUCT.md
+- **`product_update.md`** - Update OVERVIEW.md
 - **`quick_feature.md`** - Implement simple feature
 
 ### Quality & Maintenance

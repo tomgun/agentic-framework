@@ -52,9 +52,9 @@ if [[ ! -f "CONTEXT_PACK.md" && -f ".agentic/init/CONTEXT_PACK.template.md" ]]; 
   echo -e "${GREEN}✓ Created CONTEXT_PACK.md (Core)${NC}"
 fi
 
-if [[ ! -f "PRODUCT.md" && -f ".agentic/init/PRODUCT.template.md" ]]; then
-  cp ".agentic/init/PRODUCT.template.md" "PRODUCT.md"
-  echo -e "${GREEN}✓ Created PRODUCT.md (Core)${NC}"
+if [[ ! -f "OVERVIEW.md" && -f ".agentic/init/PRODUCT.template.md" ]]; then
+  cp ".agentic/init/PRODUCT.template.md" "OVERVIEW.md"
+  echo -e "${GREEN}✓ Created OVERVIEW.md (Core)${NC}"
 fi
 
 if [[ ! -f "JOURNAL.md" && -f ".agentic/spec/JOURNAL.template.md" ]]; then
@@ -72,18 +72,18 @@ echo "  ✓ spec/ directory with templates (PRD, TECH_SPEC, FEATURES, NFR)"
 echo "  ✓ STATUS.md (project status and roadmap)"
 echo "  ✓ Update STACK.md profile to 'core+product'"
 echo ""
-echo "Note: CONTEXT_PACK.md, PRODUCT.md, and HUMAN_NEEDED.md are already part of Core."
+echo "Note: CONTEXT_PACK.md, OVERVIEW.md, and HUMAN_NEEDED.md are already part of Core."
 echo ""
 
-# Check if PRODUCT.md exists and has content
-if [[ -f "PRODUCT.md" ]]; then
-  PRODUCT_LINE_COUNT=$(wc -l < PRODUCT.md | tr -d ' ')
+# Check if OVERVIEW.md exists and has content
+if [[ -f "OVERVIEW.md" ]]; then
+  PRODUCT_LINE_COUNT=$(wc -l < OVERVIEW.md | tr -d ' ')
   if [[ "$PRODUCT_LINE_COUNT" -gt 10 ]]; then
     PRODUCT_EXISTS="yes"
-    echo -e "${BLUE}📝 Detected PRODUCT.md with content.${NC}"
+    echo -e "${BLUE}📝 Detected OVERVIEW.md with content.${NC}"
     echo "After enabling PM features, you can ask your agent to:"
-    echo "  - Seed spec/FEATURES.md from PRODUCT.md capabilities"
-    echo "  - Seed spec/PRD.md from PRODUCT.md vision"
+    echo "  - Seed spec/FEATURES.md from OVERVIEW.md capabilities"
+    echo "  - Seed spec/PRD.md from OVERVIEW.md vision"
     echo ""
   fi
 fi
@@ -160,9 +160,9 @@ echo "  2. Fill in STATUS.md with your current project state"
 echo "  3. Update CONTEXT_PACK.md with your architecture"
 if [[ "$PRODUCT_EXISTS" == "yes" ]]; then
   echo "  4. Tell your agent:"
-  echo "     \"I've enabled PM features. Please convert PRODUCT.md into formal specs:"
-  echo "      - Seed spec/FEATURES.md from PRODUCT.md capabilities (with F-#### IDs)"
-  echo "      - Seed spec/PRD.md from PRODUCT.md vision and scope\""
+  echo "     \"I've enabled PM features. Please convert OVERVIEW.md into formal specs:"
+  echo "      - Seed spec/FEATURES.md from OVERVIEW.md capabilities (with F-#### IDs)"
+  echo "      - Seed spec/PRD.md from OVERVIEW.md vision and scope\""
 else
   echo "  4. Tell your agent:"
   echo "     \"I've enabled Product Management features. Please review"

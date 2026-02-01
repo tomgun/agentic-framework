@@ -22,7 +22,7 @@ Fresh, focused context for research tasks. The main agent's 100K+ token context 
 
 ## What You Read
 
-- Project's PRODUCT.md or CONTEXT_PACK.md (understand domain)
+- Project's OVERVIEW.md or CONTEXT_PACK.md (understand domain)
 - Specific research question from orchestrator
 - Previous research notes if any (docs/research/)
 

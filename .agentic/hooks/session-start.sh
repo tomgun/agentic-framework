@@ -80,8 +80,8 @@ echo "   - What's in progress"
 echo "   - Next steps"
 echo "   - Known blockers"
 echo ""
-if [[ -f "PRODUCT.md" ]]; then
-  echo "   Optional: PRODUCT.md exists - read for detailed project vision"
+if [[ -f "OVERVIEW.md" ]]; then
+  echo "   Optional: OVERVIEW.md exists - read for detailed project vision"
   echo ""
 fi
 

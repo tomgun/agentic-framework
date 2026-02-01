@@ -60,7 +60,7 @@
 **Prompt**: (Start fresh session, say nothing or just "hi")
 
 **Expected Agent Behavior**:
-- [ ] Reads context files silently (STATUS.md, PRODUCT.md, HUMAN_NEEDED.md)
+- [ ] Reads context files silently (STATUS.md, OVERVIEW.md, HUMAN_NEEDED.md)
 - [ ] Checks for .agentic/WIP.md (interrupted work)
 - [ ] Greets user with context summary
 - [ ] Presents "what's next" options

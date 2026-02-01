@@ -151,7 +151,7 @@ def generate_continue_here(project_root, output_path=None):
     # Read source files
     journal_path = os.path.join(project_root, 'JOURNAL.md')
     status_path = os.path.join(project_root, 'STATUS.md')
-    product_path = os.path.join(project_root, 'PRODUCT.md')
+    product_path = os.path.join(project_root, 'OVERVIEW.md')
     human_needed_path = os.path.join(project_root, 'HUMAN_NEEDED.md')
     features_path = os.path.join(project_root, 'spec', 'FEATURES.md')
     pipeline_dir = os.path.join(project_root, '.agentic', 'pipeline')
@@ -196,7 +196,7 @@ def generate_continue_here(project_root, output_path=None):
     if current_focus:
         output.append(current_focus)
     else:
-        output.append("*No explicit 'Current Focus' found in STATUS.md or PRODUCT.md.*")
+        output.append("*No explicit 'Current Focus' found in STATUS.md or OVERVIEW.md.*")
     output.append("")
     
     # Section 2: Active Work
@@ -243,7 +243,7 @@ def generate_continue_here(project_root, output_path=None):
         output.append("2. **Continue active pipelines** (see above)")
     if active_features:
         output.append("3. **Advance active features** (see above)")
-    output.append("- Review `STATUS.md` or `PRODUCT.md` for overall project state")
+    output.append("- Review `STATUS.md` or `OVERVIEW.md` for overall project state")
     if mode == 'Core+PM':
         output.append("- Check `spec/FEATURES.md` for planned work")
     output.append("- Run `bash .agentic/tools/version_check.sh` to ensure framework is up-to-date")
@@ -254,7 +254,7 @@ def generate_continue_here(project_root, output_path=None):
     output.append("")
     if mode == 'Core+PM':
         output.append("- `spec/FEATURES.md` - Feature registry")
-    output.append("- `STATUS.md` or `PRODUCT.md` - Current project state")
+    output.append("- `STATUS.md` or `OVERVIEW.md` - Current project state")
     output.append("- `JOURNAL.md` - Work history")
     output.append("- `HUMAN_NEEDED.md` - Blockers & decisions")
     if mode == 'Core+PM':

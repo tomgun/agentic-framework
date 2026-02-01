@@ -12,7 +12,7 @@
 
 - [ ] **All acceptance criteria satisfied**
   - Core+Product: Every item in `spec/acceptance/F-####.md`
-  - Core: Every item in `PRODUCT.md` or user requirements
+  - Core: Every item in `OVERVIEW.md` or user requirements
   - No partial completion
   - No "mostly works" items
 
@@ -105,7 +105,7 @@
 
 ### Core Profile
 
-- [ ] **`PRODUCT.md` updated**
+- [ ] **`OVERVIEW.md` updated**
   - Feature marked as implemented [x]
   - "What works now" includes this feature
   - Usage examples if complex
@@ -245,7 +245,7 @@ If ANY answer is "No" or "Not sure" → Feature is NOT ready to be marked shippe
 
 ### Core Profile
 
-- [ ] **Update `PRODUCT.md`**
+- [ ] **Update `OVERVIEW.md`**
   - Mark capability as [x] implemented
   - Update "What works now"
 

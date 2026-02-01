@@ -32,7 +32,7 @@
 | F-0006 | Acceptance-Driven Development | shipped | ⚠️ Manual: Agent behavioral test required |
 | F-0007 | Small Batch Development | shipped | ⚠️ Manual: Agent behavioral test required |
 | F-0008 | TDD Mode (Optional) | shipped | ⚠️ Manual: Agent behavioral test required |
-| F-0009 | PRODUCT.md (Core Profile) | shipped | ✅ Automated: Core profile tests |
+| F-0009 | OVERVIEW.md (Core Profile) | shipped | ✅ Automated: Core profile tests |
 | F-0010 | Spec Evolution Workflow | shipped | ⚠️ Manual: Agent behavioral test required |
 
 ### Quality Features (F-0011 to F-0020)
@@ -160,7 +160,7 @@
 
 ### Core Profile
 - ✅ Installation creates correct structure (no spec/)
-- ✅ PRODUCT.md exists
+- ✅ OVERVIEW.md exists
 - ✅ STACK.md exists
 - ✅ CONTEXT_PACK.md exists
 - ✅ Tools work (wip.sh, journal.sh, status.sh)

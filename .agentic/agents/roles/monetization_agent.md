@@ -23,7 +23,7 @@ Monetization decisions require focused analysis of business context, competitive
 
 ## What You Read
 
-- PRODUCT.md (what we're building, target users)
+- OVERVIEW.md (what we're building, target users)
 - Market research (if available)
 - Current pricing/revenue data (if exists)
 - Competitor analysis (if available)

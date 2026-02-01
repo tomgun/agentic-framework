@@ -636,7 +636,7 @@ Type 'a' or 'b':
 - Humans make decisions, agents implement
 - No "AI will do everything" messaging
 
-**Example**: Human defines what to build (PRODUCT.md, acceptance criteria). Agent implements (TDD, code, tests, updates docs). Human validates (acceptance).
+**Example**: Human defines what to build (OVERVIEW.md, acceptance criteria). Agent implements (TDD, code, tests, updates docs). Human validates (acceptance).
 
 **Anti-pattern**: ❌ "Let AI build your project while you sleep". ❌ Hiding all details from humans. ❌ Agent makes all architectural decisions.
 
@@ -769,7 +769,7 @@ Type 'a' or 'b':
 **How Enforced**:
 - STACK.md has `Profile:` field
 - agent_operating_guidelines.md checks profile
-- Core: minimal ceremony (STATUS.md, optional PRODUCT.md)
+- Core: minimal ceremony (STATUS.md, optional OVERVIEW.md)
 - Core+PM: formal tracking (STATUS.md + spec/)
 
 **Example**: 
@@ -819,7 +819,7 @@ Type 'a' or 'b':
 - Both scripts handle migration safely
 - UPGRADING.md documents process
 
-**Example**: Start with Core profile for MVP. After 3 months, project grows: run `enable-product-management.sh`. Agent converts PRODUCT.md into formal specs.
+**Example**: Start with Core profile for MVP. After 3 months, project grows: run `enable-product-management.sh`. Agent converts OVERVIEW.md into formal specs.
 
 **Anti-pattern**: ❌ No upgrade path (stuck forever). ❌ Manual, error-prone migration. ❌ "Just start over with new profile".
 
