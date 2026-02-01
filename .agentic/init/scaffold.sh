@@ -69,6 +69,12 @@ copy_if_missing() {
   if [[ -f "${src}" ]]; then
     mkdir -p "$(dirname "${dst}")"
     cp "${src}" "${dst}"
+    # Remove "(Template)" from title line in generated file
+    # Template files keep the marker, but output should not have it
+    if head -1 "${dst}" | grep -qi "(Template)"; then
+      sed -i.bak '1s/ (Template)//g; 1s/(Template)//g' "${dst}"
+      rm -f "${dst}.bak" 2>/dev/null || true
+    fi
     echo "NEW : ${dst} (from ${src})"
     return 0
   fi
