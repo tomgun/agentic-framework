@@ -396,7 +396,7 @@ fi
 echo ""
 echo "--- F-0066: Template Quality ---"
 
-for template in STACK.template.md PRODUCT.template.md; do
+for template in STACK.template.md OVERVIEW.template.md; do
   if [[ -f "${FRAMEWORK_ROOT}/.agentic/init/${template}" ]]; then
     pass "${template} exists"
   else
@@ -918,10 +918,10 @@ else
   fail "Core: STATUS.md missing (now required for both profiles)"
 fi
 
-if [[ -f "PRODUCT.md" ]]; then
-  pass "Core: PRODUCT.md exists"
+if [[ -f "OVERVIEW.md" ]]; then
+  pass "Core: OVERVIEW.md exists"
 else
-  warn "Core: PRODUCT.md missing (optional but created by default)"
+  warn "Core: OVERVIEW.md missing (optional but created by default)"
 fi
 
 if [[ -f "STACK.md" ]]; then
@@ -971,10 +971,11 @@ else
   fail "PM: spec/FEATURES.md missing"
 fi
 
-if [[ -f "spec/PRD.md" ]]; then
-  pass "PM: spec/PRD.md exists"
+# Note: spec/PRD.md deprecated in favor of OVERVIEW.md at root
+if [[ -f "spec/TECH_SPEC.md" ]]; then
+  pass "PM: spec/TECH_SPEC.md exists"
 else
-  fail "PM: spec/PRD.md missing"
+  fail "PM: spec/TECH_SPEC.md missing"
 fi
 
 if [[ -d "spec/acceptance" ]]; then
@@ -1042,13 +1043,13 @@ cd "${FRAMEWORK_ROOT}"
 echo ""
 echo "--- Code Quality Checks ---"
 
-# Check for no remaining STATUS.md || PRODUCT.md conditional patterns in core files
+# Check for no remaining STATUS.md || OVERVIEW.md conditional patterns in core files
 # (These should have been consolidated in v0.12.0)
-CONDITIONAL_COUNT=$(grep -r "STATUS.md.*||.*PRODUCT.md\|cat STATUS.md.*cat PRODUCT.md" .agentic/ --include="*.md" --include="*.sh" 2>/dev/null | wc -l | tr -d ' ')
+CONDITIONAL_COUNT=$(grep -r "STATUS.md.*||.*OVERVIEW.md\|cat STATUS.md.*cat OVERVIEW.md" .agentic/ --include="*.md" --include="*.sh" 2>/dev/null | wc -l | tr -d ' ')
 if [[ "$CONDITIONAL_COUNT" -eq 0 ]]; then
-  pass "No STATUS.md||PRODUCT.md conditional patterns found"
+  pass "No STATUS.md||OVERVIEW.md conditional patterns found"
 else
-  warn "Found $CONDITIONAL_COUNT files with STATUS.md||PRODUCT.md conditionals (review for consolidation)"
+  warn "Found $CONDITIONAL_COUNT files with STATUS.md||OVERVIEW.md conditionals (review for consolidation)"
 fi
 
 # ============================================================

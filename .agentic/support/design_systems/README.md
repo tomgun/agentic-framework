@@ -27,7 +27,7 @@ When asked about design preferences in `init_playbook.md`:
 ### For UI Implementation
 
 When implementing UI features, agents should:
-1. Check if design system is specified in `STACK.md` or `PRODUCT.md`
+1. Check if design system is specified in `STACK.md` or `OVERVIEW.md`
 2. Follow color palette, typography, spacing rules from the design system
 3. Use component patterns from the design system
 4. Deviate only when explicitly requested by human

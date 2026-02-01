@@ -121,7 +121,7 @@ See `.agentic/agents/context-manifests/` for all role definitions
 ```
 1. VERIFY ACCEPTANCE CRITERIA EXIST
    ├─ Core+PM: Check spec/acceptance/F-####.md exists
-   ├─ Core: Check PRODUCT.md has criteria
+   ├─ Core: Check OVERVIEW.md has criteria
    └─ If missing: CREATE THEM FIRST (rough is OK)
    
 2. CHECK DEVELOPMENT MODE
@@ -139,7 +139,7 @@ See `.agentic/agents/context-manifests/` for all role definitions
    
 5. UPDATE SPECS (MANDATORY - NOT OPTIONAL)
    ├─ Core+PM: Update spec/FEATURES.md status
-   ├─ Core: Update PRODUCT.md
+   ├─ Core: Update OVERVIEW.md
    └─ This is part of "done", not afterthought
    
 6. UPDATE DOCS
@@ -230,7 +230,7 @@ See `.agentic/agents/context-manifests/` for all role definitions
 □ All acceptance criteria met
 □ Smoke test passed (actually ran the app)
 □ All tests pass
-□ FEATURES.md/PRODUCT.md updated with status: shipped
+□ FEATURES.md/OVERVIEW.md updated with status: shipped
 □ Code annotations added (@feature, @acceptance)
 □ JOURNAL.md updated
 □ No untracked files
@@ -252,7 +252,7 @@ See `.agentic/agents/context-manifests/` for all role definitions
 □ All tests pass
 □ Smoke test passed (for user-facing changes)
 □ Quality checks pass (if enabled)
-□ FEATURES.md/PRODUCT.md updated
+□ FEATURES.md/OVERVIEW.md updated
 □ JOURNAL.md updated
 □ No untracked files in project directories
 □ Human approval obtained
@@ -308,7 +308,7 @@ The framework promises these things. Agents MUST enforce them:
 
 ❌ **Implementing without acceptance criteria first**
 ❌ **Marking shipped without running the application**
-❌ **Committing without updating FEATURES.md/PRODUCT.md**
+❌ **Committing without updating FEATURES.md/OVERVIEW.md**
 ❌ **Skipping smoke tests ("tests pass" is not enough)**
 ❌ **Treating checklists as optional**
 ❌ **Waiting for user to remind you about specs**

@@ -217,7 +217,7 @@ See `.agentic/agents/shared/agent_operating_guidelines.md` for complete instruct
 ## Non-Negotiables
 
 - Add/update tests for new or changed logic
-- Keep documentation current (CONTEXT_PACK.md, PRODUCT.md)
+- Keep documentation current (CONTEXT_PACK.md, OVERVIEW.md)
 - Add blockers to HUMAN_NEEDED.md
 - Update JOURNAL.md at session end
 

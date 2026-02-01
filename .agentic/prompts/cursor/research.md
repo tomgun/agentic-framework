@@ -34,7 +34,7 @@ Please conduct a deep research session:
 5. **Share insights:**
    - Update `JOURNAL.md` with key findings
    - If research impacts architecture, update `spec/ADR.md` (or create new ADR)
-   - If research changes tech direction, update `STACK.md` or `PRODUCT.md`
+   - If research changes tech direction, update `STACK.md` or `OVERVIEW.md`
 
 6. **Next steps:**
    - Recommend action based on findings

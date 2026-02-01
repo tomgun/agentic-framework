@@ -4,11 +4,17 @@
 
 ---
 
+## Before Planning
+
+1. **Read `OVERVIEW.md`** - understand the product vision and goals
+2. **Read `STATUS.md`** - understand current state
+3. **Read relevant acceptance criteria** - existing feature specs
+
 ## Context to Read
 
 - Research Agent's output (if any)
+- `OVERVIEW.md` - Product vision and goals
 - `CONTEXT_PACK.md` - Architecture overview
-- `spec/PRD.md` - Product requirements
 - `spec/FEATURES.md` - Existing features
 - `spec/NFR.md` - Non-functional requirements
 - Implementation Agent handoff notes (if re-planning after discoveries)

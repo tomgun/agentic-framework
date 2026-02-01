@@ -185,7 +185,7 @@
 
 ---
 
-## F-0009: PRODUCT.md (Core Profile)
+## F-0009: OVERVIEW.md (Core Profile)
 
 **Status**: shipped  
 **Priority**: high  

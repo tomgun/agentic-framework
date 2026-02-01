@@ -127,7 +127,7 @@ The agent will:
 
 **Profile Selection:**
 
-- **a) Core (Simple Setup)**: Quality standards, multi-agent, research, lightweight planning (`PRODUCT.md`)
+- **a) Core (Simple Setup)**: Quality standards, multi-agent, research, lightweight planning (`OVERVIEW.md`)
   - Good for: Small projects, prototypes, external PM tools, quick experiments
   
 - **b) Core + Product Management**: Everything in Core plus formal specs, feature tracking (`F-####` IDs), roadmap
@@ -242,7 +242,7 @@ git push
 - **`feature_test.md`** - Create comprehensive tests
 - **`feature_complete.md`** - Mark feature done, verify quality
 - **`migration_create.md`** - Create spec migration (Core+PM)
-- **`product_update.md`** - Update PRODUCT.md (Core mode)
+- **`product_update.md`** - Update OVERVIEW.md (Core mode)
 - **`quick_feature.md`** - Implement simple feature (Core mode)
 - **`research.md`** - Deep research session
 - **`plan_feature.md`** - Plan complex feature
@@ -1098,7 +1098,7 @@ Shows all file changes in last N days with context.
 **Two profiles available:**
 
 1. **Core (Simple Setup)**
-   - Lightweight planning (`PRODUCT.md`)
+   - Lightweight planning (`OVERVIEW.md`)
    - No formal feature tracking
    - Fast iteration
    
@@ -1117,7 +1117,7 @@ This creates:
 - `STATUS.md`
 - Updates `STACK.md` profile
 
-**The agent will then help you migrate `PRODUCT.md` content into formal specs.**
+**The agent will then help you migrate `OVERVIEW.md` content into formal specs.**
 
 ### Customizing STACK.md
 
@@ -1254,7 +1254,7 @@ This repo uses the agentic framework located at `.agentic/`.
 ## Non-negotiables
 - Add/update tests for new or changed logic.
 - Keep `CONTEXT_PACK.md` current when architecture changes.
-- Update `PRODUCT.md` with decisions and completed capabilities.
+- Update `OVERVIEW.md` with decisions and completed capabilities.
 - Add to `HUMAN_NEEDED.md` when blocked.
 - Keep `JOURNAL.md` current (session summaries).
 - If Core+Product: keep `STATUS.md` and `/spec/*` truthful.
@@ -1349,7 +1349,7 @@ our quality_checks.sh to include those iOS-specific validations."
 **Fix:**
 ```bash
 # Read vision
-cat PRODUCT.md  # or spec/OVERVIEW.md if Core+PM
+cat OVERVIEW.md  # or spec/OVERVIEW.md if Core+PM
 
 # Check current status
 cat STATUS.md
@@ -1855,7 +1855,7 @@ bash .agentic/tools/coverage.sh
 - `STACK.md` - How to build/test/run
 - `CONTEXT_PACK.md` - Architecture overview
 - `spec/FEATURES.md` - Feature list and status (Core+PM)
-- `PRODUCT.md` - Vision and capabilities (Core)
+- `OVERVIEW.md` - Vision and capabilities (Core)
 
 ### Essential Agent Prompts
 

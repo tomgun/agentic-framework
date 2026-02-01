@@ -337,6 +337,7 @@ Let's start with #1. Which would you like to tackle first?
 1. **Read at session start**:
    - `AGENTS.md` (if present)
    - `.agentic/agents/shared/agent_operating_guidelines.md` (mandatory)
+   - `OVERVIEW.md` (if exists) - product vision and goals
    - `CONTEXT_PACK.md` (where things are, how to run) - **READ THIS to understand project**
    - `STATUS.md` (current focus, next steps)
 

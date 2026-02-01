@@ -5,6 +5,36 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-02-01
+
+### Added
+- **OVERVIEW.md as High-Level Context Document** - New unified vision document for projects
+  - Clean structure: What We're Building, Why It Matters, Core Capabilities, In/Out of Scope, Success Looks Like, Guiding Principles
+  - Agents read during planning to keep project vision front and center
+  - Created at project root for both Core and Core+PM profiles
+
+### Changed
+- **Document separation clarified**:
+  - `OVERVIEW.md` - What & why we're building (stable, read during planning)
+  - `CONTEXT_PACK.md` - How to work here (operational, read at session start)
+  - `STATUS.md` - What's happening now (dynamic, read at session start)
+- **Planning agent** now reads OVERVIEW.md first before planning
+- **Session start checklist** includes OVERVIEW.md in essential reads
+- **scaffold.sh** creates OVERVIEW.md instead of PRODUCT.md
+
+### Removed
+- **PRODUCT.template.md** - Replaced by OVERVIEW.template.md
+- **VISION.template.md** - Merged into OVERVIEW.md
+- **PRD.template.md** - Corporate jargon, redundant with OVERVIEW.md
+- **spec/OVERVIEW.template.md** - Consolidated to init/OVERVIEW.template.md
+
+### Migration
+- Existing PRODUCT.md files should be renamed to OVERVIEW.md
+- Update content to match new structure (add "Why It Matters", "Success Looks Like", "Guiding Principles")
+- All PRODUCT.md references in your project should be updated to OVERVIEW.md
+
+---
+
 ## [0.13.0] - 2026-01-30
 
 ### Added
@@ -81,8 +111,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **STATUS.md now required for both Core and Core+PM profiles**
   - Simplifies framework - one file for project state tracking
-  - PRODUCT.md becomes optional "vision document"
-  - Removes 30+ conditional code paths (`STATUS.md || PRODUCT.md`)
+  - OVERVIEW.md becomes optional "vision document"
+  - Removes 30+ conditional code paths (`STATUS.md || OVERVIEW.md`)
   - Migration: `upgrade.sh` auto-creates STATUS.md for existing Core projects
 - **Project Phase concept** - STATUS.md tracks phase: `discovery` or `building`
   - Discovery: Research, references, requirements gathering, initial designs
@@ -101,7 +131,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - 33 files updated for STATUS.md consolidation
-- Templates: STATUS.md required, PRODUCT.md optional with clear header
+- Templates: STATUS.md required, OVERVIEW.md optional with clear header
 - `scaffold.sh`: Creates STATUS.md for both profiles
 - `doctor.py`, `verify.py`: Profile detection and required files updated
 - `upgrade.sh`: Step 6 migrates Core projects to use STATUS.md
@@ -254,7 +284,7 @@ What would you like to work on?
 ```
 
 Features:
-- Silently reads STATUS.md, PRODUCT.md, HUMAN_NEEDED.md, WIP.md
+- Silently reads STATUS.md, OVERVIEW.md, HUMAN_NEEDED.md, WIP.md
 - Presents options for next steps
 - Handles special cases:
   - "⚠️ Previous work interrupted!" (if WIP.md exists)
@@ -1765,7 +1795,7 @@ Optional slash commands for Claude Code users:
 **New Tool**: `.agentic/tools/continue_here.py`
 
 Generates `.continue-here.md` - a single-file snapshot for instant context recovery:
-- Synthesizes: JOURNAL.md, STATUS.md/PRODUCT.md, HUMAN_NEEDED.md, FEATURES.md, pipeline files
+- Synthesizes: JOURNAL.md, STATUS.md/OVERVIEW.md, HUMAN_NEEDED.md, FEATURES.md, pipeline files
 - Output: Quick summary, active work, blockers, recent progress, next steps
 - Works in both Core and Core+PM modes
 - Auto-detects project profile
@@ -2334,7 +2364,7 @@ This release addresses issues found in real-world usage:
 
 **Modular Framework Profiles:**
 - Two profiles: "Core" (minimal) and "Core + Product Management" (full specs)
-- Core includes: quality standards, workflows, multi-agent, research, PRODUCT.md
+- Core includes: quality standards, workflows, multi-agent, research, OVERVIEW.md
 - Core+PM adds: formal specs, feature tracking (F-####), STATUS.md, project metrics
 - Profile-aware agents adapt behavior based on STACK.md profile field
 - Easy upgrade path: `enable-product-management.sh` converts Core → Core+PM
@@ -2344,7 +2374,7 @@ This release addresses issues found in real-world usage:
 - Framework files hidden, product files (STACK.md, STATUS.md, spec/, docs/) visible
 - Optimized for agent efficiency and developer clarity
 
-**PRODUCT.md (New Core File):**
+**OVERVIEW.md (New Core File):**
 - Lightweight planning document for Core mode
 - Captures: what we're building, capabilities (checkboxes), technical approach, scope
 - Serves as basis for formal specs when upgrading to Core+PM
@@ -2392,7 +2422,7 @@ This release addresses issues found in real-world usage:
 ### Fixed
 - PM templates no longer contain concrete example IDs (F-0001, NFR-0001) that caused verify failures
 - Core mode agents now work efficiently (don't try to read non-existent STATUS.md/spec/)
-- `enable-product-management.sh` detects PRODUCT.md and provides conversion guidance
+- `enable-product-management.sh` detects OVERVIEW.md and provides conversion guidance
 
 ## [Unreleased]
 

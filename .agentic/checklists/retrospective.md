@@ -114,7 +114,7 @@
 
 - [ ] **Check documentation accuracy**
   - Is CONTEXT_PACK.md still accurate?
-  - Is PRODUCT.md / spec/ current?
+  - Is OVERVIEW.md / spec/ current?
   - Are there stale placeholders?
   - Are READMEs up to date?
 

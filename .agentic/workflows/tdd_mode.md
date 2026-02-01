@@ -29,7 +29,7 @@ Set `development_mode: tdd` in your `STACK.md` to enable.
 
 Before starting TDD workflow, verify:
 
-- [ ] **Feature has acceptance criteria**: Check `spec/acceptance/F-####.md` exists (Core+PM) or informal criteria in `PRODUCT.md` (Core)
+- [ ] **Feature has acceptance criteria**: Check `spec/acceptance/F-####.md` exists (Core+PM) or informal criteria in `OVERVIEW.md` (Core)
 - [ ] **Test framework is set up**: Verify test command in `STACK.md` works (`npm test`, `cargo test`, `pytest`, etc.)
 - [ ] **No failing tests**: Run full test suite - must be GREEN before adding new tests
 - [ ] **Clear what to build**: Understand the behavior you're testing (from acceptance criteria or discussion)

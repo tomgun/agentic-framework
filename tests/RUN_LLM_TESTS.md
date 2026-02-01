@@ -20,7 +20,7 @@ bash ~/code/agentic-framework/install.sh .
 
 # Run scaffold (choose Core or Core+PM when prompted)
 # For Core+PM: creates spec/, STATUS.md, full feature tracking
-# For Core: simpler setup with PRODUCT.md
+# For Core: simpler setup with OVERVIEW.md
 ```
 
 ### Step 2: Open in Target Environment

@@ -24,7 +24,7 @@ Please follow this streamlined workflow for Core mode:
    - Run linter/formatter
    - Quick manual test if applicable
 
-5. **Update `PRODUCT.md`:**
+5. **Update `OVERVIEW.md`:**
    - Add new feature to list
    - Update current focus/status
    - Note any technical decisions
@@ -43,7 +43,7 @@ Please follow this streamlined workflow for Core mode:
 - Lighter process than Core+PM
 - No formal specs, but still maintain quality
 - `STATUS.md` tracks current focus and progress
-- `PRODUCT.md` (optional) captures detailed vision
+- `OVERVIEW.md` (optional) captures detailed vision
 - TDD ensures quality without heavy process
 - Documentation stays current
 

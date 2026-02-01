@@ -950,7 +950,7 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 **Key decision**: User confirmed consolidation would simplify framework development.
 
 **Problem identified**:
-- 30+ places with `STATUS.md || PRODUCT.md` conditional logic
+- 30+ places with `STATUS.md || OVERVIEW.md` conditional logic
 - Different files for tracking state in Core vs Core+PM profiles
 - More code paths = more bugs, more testing, confusing docs
 
@@ -958,14 +958,14 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 | File | Purpose | Required? |
 |------|---------|-----------|
 | **STATUS.md** | WHERE we are (Project Phase, current focus, next steps) | Yes (both profiles) |
-| **PRODUCT.md** | WHAT we're building (vision, capabilities, scope) | Optional |
+| **OVERVIEW.md** | WHAT we're building (vision, capabilities, scope) | Optional |
 | **CONTEXT_PACK.md** | HOW to work (technical context) | Yes (both profiles) |
 
 **Changes (33 files)**:
-- Templates updated: STATUS.md required, PRODUCT.md optional
+- Templates updated: STATUS.md required, OVERVIEW.md optional
 - scaffold.sh: Creates STATUS.md for BOTH profiles
 - All hooks, checklists, agent guidelines updated
-- Removed all conditional patterns (`STATUS.md || PRODUCT.md`)
+- Removed all conditional patterns (`STATUS.md || OVERVIEW.md`)
 - Python tools updated (doctor.py, verify.py)
 - upgrade.sh: Auto-creates STATUS.md for existing Core projects
 - Tests added for STATUS.md requirement

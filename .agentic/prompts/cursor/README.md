@@ -24,7 +24,7 @@ This directory contains ready-to-use prompts for common workflows in Cursor when
 - **`spec_update.md`** - Update specs after implementation
 
 ### Core Mode
-- **`product_update.md`** - Update PRODUCT.md after changes
+- **`product_update.md`** - Update OVERVIEW.md after changes
 - **`quick_feature.md`** - Implement a simple feature in Core mode
 
 ### Quality & Maintenance

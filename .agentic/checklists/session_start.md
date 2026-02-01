@@ -168,6 +168,12 @@ What would you like me to work on? (I'll register myself in .agentic/AGENTS_ACTI
 
 ## Essential Reads (Always)
 
+- [ ] **Read `OVERVIEW.md`** (if exists, ≈300-500 tokens)
+  - Product vision and goals
+  - Why we're building this
+  - Core capabilities and scope
+  - Guiding principles
+
 - [ ] **Read `CONTEXT_PACK.md`** (≈500-1000 tokens)
   - Where to look for code
   - How to run/test

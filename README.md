@@ -31,7 +31,7 @@ The Agentic AI Framework enables **sustainable long-term software development wi
   - Green coding principles
   - Quality gates (doctor.sh)
   - Human escalation (HUMAN_NEEDED.md)
-  - Lightweight planning (PRODUCT.md)
+  - Lightweight planning (OVERVIEW.md)
 
 - **Core + Product Management**: Everything in Core, plus formal specs
   - Feature tracking with F-#### IDs
@@ -79,7 +79,7 @@ The install script will:
 
 **After installation**, tell your agent:
 
-> "Read `.agentic/init/init_playbook.md` and help me initialize this project by filling in STACK.md, PRODUCT.md, and CONTEXT_PACK.md based on what we're building."
+> "Read `.agentic/init/init_playbook.md` and help me initialize this project by filling in STACK.md, OVERVIEW.md, and CONTEXT_PACK.md based on what we're building."
 
 The agent will:
 - Ask what you're building
@@ -215,7 +215,7 @@ The agent will:
 1. Ask what you're building
 2. **Ask which profile you want** (a=Core or b=Core+PM) and explain the differences
 3. Interview you about your tech stack and requirements
-4. Fill in `STACK.md`, `PRODUCT.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
+4. Fill in `STACK.md`, `OVERVIEW.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
 5. Set up quality validation for your stack
 
 **Now you're ready!** The agent understands your project and can start building.

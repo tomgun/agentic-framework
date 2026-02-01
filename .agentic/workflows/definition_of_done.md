@@ -25,7 +25,7 @@ Every feature marked "shipped" must have:
 - Code annotations added (@feature, @acceptance)
 
 ### ✅ Documentation Updated
-- `FEATURES.md` or `PRODUCT.md` status = shipped
+- `FEATURES.md` or `OVERVIEW.md` status = shipped
 - `JOURNAL.md` updated
 - `CONTEXT_PACK.md` updated (if architecture changed)
 - Code comments explain "why"
