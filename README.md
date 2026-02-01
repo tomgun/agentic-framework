@@ -4,7 +4,7 @@
 
 *Shortname: Agentic AF*
 
-**Current version:** [v0.13.0](https://github.com/tomgun/agentic-framework/releases/tag/v0.13.0)
+[![Latest Release](https://img.shields.io/github/v/release/tomgun/agentic-framework?label=version)](https://github.com/tomgun/agentic-framework/releases/latest)
 
 **📖 Quick Links:**
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
@@ -54,8 +54,8 @@ curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remot
 
 Options:
 ```bash
-# Install specific version
-VERSION=v0.13.0 curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
+# Install specific version (e.g., v0.14.0)
+VERSION=v0.14.0 curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
 
 # Install to different directory
 TARGET=/path/to/project curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
@@ -64,9 +64,10 @@ TARGET=/path/to/project curl -fsSL https://raw.githubusercontent.com/tomgun/agen
 ### Manual install
 
 ```bash
-# Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
-cd agentic-framework-0.13.0
+# Download latest release (auto-redirects to newest version)
+curl -sL https://api.github.com/repos/tomgun/agentic-framework/releases/latest | \
+  grep tarball_url | cut -d '"' -f 4 | xargs curl -L | tar xz
+cd tomgun-agentic-framework-*
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -88,14 +89,15 @@ The agent will:
 - Fill in all project-specific details
 - Set up quality checks
 
-### Manual install
+### Alternative: Copy .agentic/ directly
 
 ```bash
-# Download and extract
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
+# Download and extract latest
+curl -sL https://api.github.com/repos/tomgun/agentic-framework/releases/latest | \
+  grep tarball_url | cut -d '"' -f 4 | xargs curl -L | tar xz
 
 # Copy .agentic/ into your project
-cp -r agentic-framework-0.13.0/.agentic /path/to/your-project/
+cp -r tomgun-agentic-framework-*/.agentic /path/to/your-project/
 ```
 
 Then follow the same agent initialization process above. The agent will run `scaffold.sh` for you.
@@ -437,9 +439,10 @@ curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remot
 Or manually:
 ```bash
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
-bash /tmp/agentic-framework-0.13.0/.agentic/tools/upgrade.sh /path/to/your-project
-rm -rf /tmp/agentic-framework-0.13.0
+curl -sL https://api.github.com/repos/tomgun/agentic-framework/releases/latest | \
+  grep tarball_url | cut -d '"' -f 4 | xargs curl -L | tar xz
+bash /tmp/tomgun-agentic-framework-*/.agentic/tools/upgrade.sh /path/to/your-project
+rm -rf /tmp/tomgun-agentic-framework-*
 ```
 
 **Why from the new framework?** The new upgrade script has the latest bug fixes and knows about new structure changes.
