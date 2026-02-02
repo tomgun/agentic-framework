@@ -8,6 +8,7 @@
 #   bash .agentic/tools/drift.sh           # Interactive mode
 #   bash .agentic/tools/drift.sh --check   # Check only, no prompts (CI mode)
 #   bash .agentic/tools/drift.sh --report  # Generate drift report
+#   bash .agentic/tools/drift.sh --json    # JSON output (machine-readable)
 #
 # Note: Not using set -e because grep returns 1 when no matches (expected behavior)
 set -uo pipefail
@@ -15,7 +16,7 @@ set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-# Colors
+# Colors (disabled for JSON mode)
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -28,33 +29,69 @@ MODE="${1:-interactive}"
 DRIFT_COUNT=0
 FIXED_COUNT=0
 
+# JSON output collection
+JSON_ISSUES=()
+JSON_MODE=false
+if [[ "$MODE" == "--json" ]]; then
+    JSON_MODE=true
+    # Disable colors for JSON mode
+    RED='' GREEN='' YELLOW='' BLUE='' CYAN='' NC=''
+fi
+
 #=============================================================================
 # Utility Functions
 #=============================================================================
 
+# Add an issue to the JSON collection
+# Usage: add_json_issue "type" "description" ["file"] ["feature"] ["extra_key" "extra_value"]
+add_json_issue() {
+    local type="$1"
+    local description="$2"
+    local file="${3:-}"
+    local feature="${4:-}"
+    local extra_key="${5:-}"
+    local extra_value="${6:-}"
+
+    local json="{\"type\":\"$type\",\"description\":\"$description\""
+    [[ -n "$file" ]] && json="$json,\"file\":\"$file\""
+    [[ -n "$feature" ]] && json="$json,\"feature\":\"$feature\""
+    [[ -n "$extra_key" ]] && json="$json,\"$extra_key\":\"$extra_value\""
+    json="$json}"
+
+    JSON_ISSUES+=("$json")
+}
+
 log_check() {
-    echo -e "${BLUE}Checking:${NC} $1"
+    if [[ "$JSON_MODE" != "true" ]]; then
+        echo -e "${BLUE}Checking:${NC} $1"
+    fi
 }
 
 log_ok() {
-    echo -e "  ${GREEN}✓${NC} $1"
+    if [[ "$JSON_MODE" != "true" ]]; then
+        echo -e "  ${GREEN}✓${NC} $1"
+    fi
 }
 
 log_drift() {
-    echo -e "  ${YELLOW}⚠${NC} $1"
+    if [[ "$JSON_MODE" != "true" ]]; then
+        echo -e "  ${YELLOW}⚠${NC} $1"
+    fi
     ((DRIFT_COUNT++))
 }
 
 log_error() {
-    echo -e "  ${RED}✗${NC} $1"
+    if [[ "$JSON_MODE" != "true" ]]; then
+        echo -e "  ${RED}✗${NC} $1"
+    fi
 }
 
 prompt_fix() {
     local message="$1"
     local options="$2"
 
-    if [[ "$MODE" == "--check" ]]; then
-        return 1  # In check mode, don't prompt
+    if [[ "$MODE" == "--check" || "$JSON_MODE" == "true" ]]; then
+        return 1  # In check/JSON mode, don't prompt
     fi
 
     echo ""
@@ -129,7 +166,8 @@ check_features_drift() {
                 local pct=$((complete * 100 / total))
                 if [[ "$pct" -ge 50 ]]; then
                     log_drift "$fid: marked 'pending' but acceptance criteria ${pct}% complete ($complete/$total)"
-                    echo "      → Consider updating status to 'in_progress' or 'shipped'"
+                    add_json_issue "status_drift" "$fid marked pending but ${pct}% complete" "$criteria_file" "$fid" "completion" "$pct"
+                    [[ "$JSON_MODE" != "true" ]] && echo "      → Consider updating status to 'in_progress' or 'shipped'"
                 fi
             fi
         fi
@@ -143,7 +181,8 @@ check_features_drift() {
             local incomplete=$(grep -E "^- \[ \]" "$criteria_file" 2>/dev/null || true)
             if [[ -n "$incomplete" ]]; then
                 log_drift "$fid marked 'shipped' but has incomplete criteria:"
-                echo "$incomplete" | head -3 | sed 's/^/      /'
+                add_json_issue "incomplete_shipped" "$fid marked shipped but has incomplete acceptance criteria" "$criteria_file" "$fid"
+                [[ "$JSON_MODE" != "true" ]] && echo "$incomplete" | head -3 | sed 's/^/      /'
 
                 if [[ "$MODE" == "interactive" ]]; then
                     local choice=$(prompt_fix \
@@ -194,6 +233,7 @@ check_features_drift() {
             # Check STATUS.md for mention
             if ! grep -q "$fid" "$ROOT_DIR/STATUS.md" 2>/dev/null; then
                 log_drift "$fid is 'in_progress' but no recent activity (7 days)"
+                add_json_issue "stale_in_progress" "$fid in_progress but no recent activity" "" "$fid"
 
                 if [[ "$MODE" == "interactive" ]]; then
                     local choice=$(prompt_fix \
@@ -248,7 +288,8 @@ check_context_pack_drift() {
             if [[ $missing_count -eq 0 ]]; then
                 log_drift "CONTEXT_PACK.md references files that don't exist:"
             fi
-            echo "      - $file"
+            [[ "$JSON_MODE" != "true" ]] && echo "      - $file"
+            add_json_issue "stale_reference" "CONTEXT_PACK.md references non-existent file" "$file" "" "referenced_in" "CONTEXT_PACK.md"
             ((missing_count++))
         fi
     done
@@ -299,6 +340,7 @@ check_status_drift() {
 
             if [[ "$recent_related" -eq 0 ]]; then
                 log_drift "Current focus '$current_focus' has no recent commits (3 days)"
+                add_json_issue "stale_focus" "STATUS.md focus has no recent commits" "STATUS.md" "" "focus" "$current_focus"
 
                 if [[ "$MODE" == "interactive" ]]; then
                     local choice=$(prompt_fix \
@@ -330,6 +372,7 @@ check_status_drift() {
         if [[ -n "$wip_feature" ]]; then
             if ! grep -q "$wip_feature" "$status_file" 2>/dev/null; then
                 log_drift "WIP.md has '$wip_feature' but STATUS.md doesn't mention it"
+                add_json_issue "wip_status_mismatch" "WIP.md feature not mentioned in STATUS.md" "STATUS.md" "$wip_feature"
             fi
         fi
     fi
@@ -368,6 +411,7 @@ check_tests_drift() {
 
         if [[ "$test_coverage" -eq 0 && "$criteria_count" -gt 0 ]]; then
             log_drift "$fid has $criteria_count criteria but no test files reference it"
+            add_json_issue "missing_tests" "$fid has acceptance criteria but no tests reference it" "$criteria_file" "$fid" "criteria_count" "$criteria_count"
         else
             log_ok "$fid: $criteria_count criteria, $test_coverage test file(s)"
         fi
@@ -450,19 +494,20 @@ check_undocumented_code() {
             if [[ $undoc_count -eq 0 ]]; then
                 log_drift "Code exports not mentioned in specs/CONTEXT_PACK:"
             fi
-            echo "      - $export"
+            [[ "$JSON_MODE" != "true" ]] && echo "      - $export"
+            add_json_issue "undocumented_code" "Code export not mentioned in documentation" "" "" "export" "$export"
             ((undoc_count++))
             if [[ $undoc_count -ge 10 ]]; then
-                echo "      ... and more (showing first 10)"
+                [[ "$JSON_MODE" != "true" ]] && echo "      ... and more (showing first 10)"
                 break
             fi
         fi
     done
 
     if [[ $undoc_count -gt 0 ]]; then
-        echo ""
-        echo -e "  ${CYAN}Tip:${NC} Non-coders can't discover undocumented code."
-        echo "       Add to CONTEXT_PACK.md or create specs for these."
+        [[ "$JSON_MODE" != "true" ]] && echo ""
+        [[ "$JSON_MODE" != "true" ]] && echo -e "  ${CYAN}Tip:${NC} Non-coders can't discover undocumented code."
+        [[ "$JSON_MODE" != "true" ]] && echo "       Add to CONTEXT_PACK.md or create specs for these."
 
         if [[ "$MODE" == "interactive" ]]; then
             local choice=$(prompt_fix \
@@ -536,7 +581,8 @@ check_undocumented_endpoints() {
             if [[ $undoc_count -eq 0 ]]; then
                 log_drift "API endpoints not documented in specs:"
             fi
-            echo "      - $path"
+            [[ "$JSON_MODE" != "true" ]] && echo "      - $path"
+            add_json_issue "undocumented_endpoint" "API endpoint not documented in specs" "" "" "endpoint" "$path"
             ((undoc_count++))
         fi
     done
@@ -544,8 +590,8 @@ check_undocumented_endpoints() {
     if [[ $undoc_count -eq 0 ]]; then
         log_ok "All API endpoints documented"
     else
-        echo ""
-        echo -e "  ${CYAN}Tip:${NC} API endpoints should be in CONTEXT_PACK.md or spec/API.md"
+        [[ "$JSON_MODE" != "true" ]] && echo ""
+        [[ "$JSON_MODE" != "true" ]] && echo -e "  ${CYAN}Tip:${NC} API endpoints should be in CONTEXT_PACK.md or spec/API.md"
     fi
 }
 
@@ -581,15 +627,17 @@ check_untracked_files() {
             if [[ -n "$file" ]]; then
                 # Get file size/line count for context
                 local info=""
+                local lines=""
                 if [[ -f "$ROOT_DIR/$file" ]]; then
-                    local lines=$(wc -l < "$ROOT_DIR/$file" 2>/dev/null | tr -d ' ')
+                    lines=$(wc -l < "$ROOT_DIR/$file" 2>/dev/null | tr -d ' ')
                     info=" ($lines lines)"
                 fi
-                echo "      - $file$info"
+                [[ "$JSON_MODE" != "true" ]] && echo "      - $file$info"
+                add_json_issue "untracked_file" "Implementation file not tracked by git" "$file" "" "lines" "${lines:-0}"
             fi
         done
-        echo ""
-        echo -e "  ${CYAN}Tip:${NC} Consider: git add + commit, or add to .gitignore"
+        [[ "$JSON_MODE" != "true" ]] && echo ""
+        [[ "$JSON_MODE" != "true" ]] && echo -e "  ${CYAN}Tip:${NC} Consider: git add + commit, or add to .gitignore"
 
         if [[ "$MODE" == "interactive" ]]; then
             local choice=$(prompt_fix \
@@ -642,7 +690,8 @@ check_template_markers() {
                 if [[ $markers_found -eq 0 ]]; then
                     log_drift "Template markers found in project files:"
                 fi
-                echo "      - $file:1 - \"(Template)\" in title"
+                [[ "$JSON_MODE" != "true" ]] && echo "      - $file:1 - \"(Template)\" in title"
+                add_json_issue "template_marker" "File has (Template) marker in title" "$file" "" "line" "1"
                 ((markers_found++))
             fi
 
@@ -654,7 +703,8 @@ check_template_markers() {
                 fi
                 echo "$placeholders" | while read -r line; do
                     local linenum=$(echo "$line" | cut -d: -f1)
-                    echo "      - $file:$linenum - template placeholder"
+                    [[ "$JSON_MODE" != "true" ]] && echo "      - $file:$linenum - template placeholder"
+                    add_json_issue "template_placeholder" "File has unfilled template placeholder" "$file" "" "line" "$linenum"
                 done
                 ((markers_found++))
             fi
@@ -664,8 +714,8 @@ check_template_markers() {
     if [[ $markers_found -eq 0 ]]; then
         log_ok "No template markers found"
     else
-        echo ""
-        echo -e "  ${CYAN}Tip:${NC} Remove template markers after filling in content"
+        [[ "$JSON_MODE" != "true" ]] && echo ""
+        [[ "$JSON_MODE" != "true" ]] && echo -e "  ${CYAN}Tip:${NC} Remove template markers after filling in content"
 
         if [[ "$MODE" == "interactive" ]]; then
             local choice=$(prompt_fix \
@@ -688,49 +738,100 @@ check_template_markers() {
 }
 
 #=============================================================================
+# JSON Output
+#=============================================================================
+
+output_json() {
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    # Count issues by type
+    local type_counts="{}"
+    for issue in "${JSON_ISSUES[@]}"; do
+        local issue_type
+        issue_type=$(echo "$issue" | grep -oE '"type":"[^"]+"' | cut -d'"' -f4)
+        # Simple counting - for more complex needs, use jq
+    done
+
+    # Build issues array
+    local issues_json="["
+    local first=true
+    for issue in "${JSON_ISSUES[@]}"; do
+        if [[ "$first" == "true" ]]; then
+            first=false
+        else
+            issues_json="$issues_json,"
+        fi
+        issues_json="$issues_json$issue"
+    done
+    issues_json="$issues_json]"
+
+    # Output final JSON
+    cat <<EOF
+{
+  "tool": "drift",
+  "timestamp": "$timestamp",
+  "root": "$ROOT_DIR",
+  "issues": $issues_json,
+  "summary": {
+    "total_issues": $DRIFT_COUNT,
+    "fixed_issues": $FIXED_COUNT
+  }
+}
+EOF
+}
+
+#=============================================================================
 # Main
 #=============================================================================
 
 main() {
-    echo ""
-    echo "╔═══════════════════════════════════════════════════════════════╗"
-    echo "║         Spec ↔ Code Drift Detection                          ║"
-    echo "╚═══════════════════════════════════════════════════════════════╝"
-    echo ""
-    echo "Mode: $MODE"
-    echo "Root: $ROOT_DIR"
-    echo ""
+    if [[ "$JSON_MODE" != "true" ]]; then
+        echo ""
+        echo "╔═══════════════════════════════════════════════════════════════╗"
+        echo "║         Spec ↔ Code Drift Detection                          ║"
+        echo "╚═══════════════════════════════════════════════════════════════╝"
+        echo ""
+        echo "Mode: $MODE"
+        echo "Root: $ROOT_DIR"
+        echo ""
+    fi
 
     check_untracked_files
-    echo ""
+    [[ "$JSON_MODE" != "true" ]] && echo ""
     check_template_markers
-    echo ""
+    [[ "$JSON_MODE" != "true" ]] && echo ""
     check_features_drift
-    echo ""
+    [[ "$JSON_MODE" != "true" ]] && echo ""
     check_context_pack_drift
-    echo ""
+    [[ "$JSON_MODE" != "true" ]] && echo ""
     check_status_drift
-    echo ""
+    [[ "$JSON_MODE" != "true" ]] && echo ""
     check_tests_drift
-    echo ""
+    [[ "$JSON_MODE" != "true" ]] && echo ""
     check_undocumented_code
-    echo ""
+    [[ "$JSON_MODE" != "true" ]] && echo ""
     check_undocumented_endpoints
 
-    echo ""
-    echo "═══════════════════════════════════════════════════════════════"
-    if [[ $DRIFT_COUNT -eq 0 ]]; then
-        echo -e "${GREEN}No drift detected. Specs and code are aligned.${NC}"
+    # Output JSON or human-readable summary
+    if [[ "$JSON_MODE" == "true" ]]; then
+        output_json
     else
-        echo -e "${YELLOW}Found $DRIFT_COUNT drift issue(s).${NC}"
-        if [[ $FIXED_COUNT -gt 0 ]]; then
-            echo -e "${GREEN}Fixed $FIXED_COUNT issue(s).${NC}"
+        echo ""
+        echo "═══════════════════════════════════════════════════════════════"
+        if [[ $DRIFT_COUNT -eq 0 ]]; then
+            echo -e "${GREEN}No drift detected. Specs and code are aligned.${NC}"
+        else
+            echo -e "${YELLOW}Found $DRIFT_COUNT drift issue(s).${NC}"
+            if [[ $FIXED_COUNT -gt 0 ]]; then
+                echo -e "${GREEN}Fixed $FIXED_COUNT issue(s).${NC}"
+            fi
+            if [[ "$MODE" == "--check" ]]; then
+                exit 1
+            fi
         fi
-        if [[ "$MODE" == "--check" ]]; then
-            exit 1
-        fi
+        echo "═══════════════════════════════════════════════════════════════"
     fi
-    echo "═══════════════════════════════════════════════════════════════"
 }
 
 main "$@"

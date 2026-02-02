@@ -326,6 +326,7 @@ You shouldn't need to edit these - they're the framework:
 - `bash .agentic/tools/report.sh` - Feature status
 - `bash .agentic/tools/verify.sh` - Comprehensive checks
 - `bash .agentic/tools/coverage.sh` - Code annotation coverage
+- `bash .agentic/tools/ag.sh trace` - Spec-code traceability (drift + coverage)
 - `bash .agentic/tools/retro_check.sh` - Check if retrospective is due
 - `python3 .agentic/tools/validate_specs.py` - Validate spec frontmatter
 

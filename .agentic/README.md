@@ -270,8 +270,17 @@ bash .agentic/tools/verify.sh      # Comprehensive checks
 bash .agentic/tools/brief.sh       # Quick project brief
 # Note: continue_here.py is deprecated - use STATUS.md directly
 bash .agentic/tools/coverage.sh    # Code annotation coverage
+bash .agentic/tools/coverage.sh --json           # JSON output
+bash .agentic/tools/coverage.sh --reverse FILE   # What features does FILE implement?
+bash .agentic/tools/coverage.sh --test-mapping   # Infer test→feature mapping
 bash .agentic/tools/feature_graph.sh   # Feature dependency graph
 bash .agentic/tools/arch_diff.sh   # Architecture changes
+
+# Traceability (unified CLI)
+bash .agentic/tools/ag.sh trace              # Combined drift + coverage
+bash .agentic/tools/ag.sh trace F-XXXX       # Files implementing feature
+bash .agentic/tools/ag.sh trace --gaps       # Missing implementations
+bash .agentic/tools/ag.sh trace --json       # Machine-readable output
 
 # Documentation
 bash .agentic/tools/sync_docs.sh   # Generate doc scaffolding

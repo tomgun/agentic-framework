@@ -5,6 +5,47 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] - 2026-02-01
+
+### Added
+- **Spec-Code Traceability Enhancements (F-0109)** - Answer key questions about code-spec alignment
+  - `drift.sh --json` - Machine-readable drift detection output
+  - `coverage.py --json` - Machine-readable annotation coverage
+  - `coverage.py --reverse FILE` - Find what features a file implements
+  - `coverage.py --test-mapping` - Infer test→feature relationships via conventions
+  - `ag trace` - Unified CLI combining drift + coverage
+    - `ag trace` - Full traceability report
+    - `ag trace F-XXXX` - Files implementing a feature
+    - `ag trace FILE` - Features implemented by a file
+    - `ag trace --gaps` - Missing implementations only
+    - `ag trace --orphans` - Orphaned code/annotations
+    - `ag trace --json` - Combined JSON output for CI/tooling
+
+- **Test→Feature Inference Conventions** - No annotations required
+  - Explicit naming: `test_F0001_*.py` → F-0001 (high confidence)
+  - Import tracing: test imports file with `@feature` → inferred (medium confidence)
+  - Documented in `.agentic/workflows/code_annotations.md`
+
+- **New Example Project: traced_notes_app** - Demonstrates traceability features
+  - Source code with `@feature` annotations
+  - Tests using naming conventions
+  - Spec files with acceptance criteria
+
+- **New Tests** - 18 tests for traceability tools
+  - `tests/test_coverage.py` - Tests for coverage.py enhancements
+  - `tests/test_drift.py` - Tests for drift.sh JSON output
+
+### Changed
+- Archived old examples to `examples/archived/`
+- Updated documentation to include new traceability commands:
+  - `.agentic/README.md`
+  - `.agentic/DEVELOPER_GUIDE.md`
+  - `.agentic/MANUAL_OPERATIONS.md`
+  - `.agentic/START_HERE.md`
+  - `.agentic/checklists/feature_complete.md`
+
+---
+
 ## [0.14.0] - 2026-02-01
 
 ### Added

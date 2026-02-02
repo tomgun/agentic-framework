@@ -97,6 +97,11 @@ bash .agentic/tools/verify.sh
 # Check code traceability
 bash .agentic/tools/coverage.sh
 
+# Unified traceability (drift + coverage combined)
+bash .agentic/tools/ag.sh trace          # Full report
+bash .agentic/tools/ag.sh trace --gaps   # Missing implementations
+bash .agentic/tools/ag.sh trace F-0001   # Files implementing a feature
+
 # Visualize feature dependencies
 bash .agentic/tools/feature_graph.sh
 

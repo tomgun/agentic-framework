@@ -722,14 +722,38 @@ Needs acceptance validation:
 - Implemented features lacking annotations
 - Orphaned annotations (non-existent features)
 - Coverage percentage
+- Test→feature mapping (with `--test-mapping`)
 
 ```bash
-bash .agentic/tools/coverage.sh
+bash .agentic/tools/coverage.sh              # Human-readable report
+bash .agentic/tools/coverage.sh --json       # Machine-readable output
+bash .agentic/tools/coverage.sh --reverse src/auth.py  # Features in this file
+bash .agentic/tools/coverage.sh --test-mapping  # Infer test→feature mapping
 ```
 
 **When to run:**
 - Before major reviews
 - To verify code traceability
+
+#### `ag trace` - Unified Traceability CLI (NEW - v0.15.0)
+
+**What it does:**
+- Combines drift detection and coverage analysis
+- Answers: "What specs lack code?", "What code lacks specs?", "What tests cover what?"
+
+```bash
+bash .agentic/tools/ag.sh trace              # Full report
+bash .agentic/tools/ag.sh trace F-0001       # Files implementing F-0001
+bash .agentic/tools/ag.sh trace src/auth.py  # Features in this file
+bash .agentic/tools/ag.sh trace --gaps       # Missing implementations only
+bash .agentic/tools/ag.sh trace --orphans    # Orphaned code/annotations
+bash .agentic/tools/ag.sh trace --json       # Combined JSON output
+```
+
+**When to run:**
+- Before completing a feature
+- To find what needs documentation
+- CI/CD integration (with `--json`)
 
 #### `feature_graph.sh` - Feature Dependencies
 
@@ -969,6 +993,225 @@ Threshold: 14 days or 10 features
 
 ⚠ Retrospective overdue!
 ```
+
+### Session & Environment Scripts
+
+#### `start.sh` - Project Initialization
+
+**What it does:**
+- Runs scaffold.sh to ensure project structure
+- Shows instructions for init playbook
+- Points to optional follow-up steps
+
+```bash
+bash .agentic/tools/start.sh
+```
+
+**When to run:**
+- First time setting up a project
+- After cloning framework into new project
+
+#### `check-environment.sh` - Environment Detection
+
+**What it does:**
+- Detects which AI coding tools are installed (Claude, Cursor, Copilot)
+- Suggests optimal setup for detected tools
+- Checks for required dependencies
+
+```bash
+bash .agentic/tools/check-environment.sh
+```
+
+**When to run:**
+- During project setup
+- When switching development environments
+- Troubleshooting tool integration
+
+#### `framework_age.sh` - Framework Version Check
+
+**What it does:**
+- Checks if framework is outdated
+- Compares local version to latest release
+- Suggests upgrade if newer version available
+
+```bash
+bash .agentic/tools/framework_age.sh
+```
+
+**When to run:**
+- Periodically (monthly)
+- Before starting major features
+- When experiencing issues
+
+### Feature Management Scripts
+
+#### `accept.py` - Feature Acceptance Runner
+
+**What it does:**
+- Runs tests specific to a feature
+- Parses FEATURES.md to find related test files
+- Reports acceptance status
+
+```bash
+python3 .agentic/tools/accept.py F-0005
+```
+
+**When to run:**
+- Before marking feature as shipped
+- During acceptance validation
+
+#### `feature_stats.py` - Feature Statistics Dashboard
+
+**What it does:**
+- Shows feature distribution by status
+- Calculates velocity metrics
+- Reports health indicators
+
+```bash
+python3 .agentic/tools/feature_stats.py
+python3 .agentic/tools/feature_stats.py --period=30  # Last 30 days
+```
+
+**When to run:**
+- Sprint planning
+- Retrospectives
+- Progress reporting
+
+#### `bulk_update.py` - Bulk Feature Updates
+
+**What it does:**
+- Updates multiple features matching criteria
+- Safely modifies FEATURES.md
+
+```bash
+python3 .agentic/tools/bulk_update.py --status=planned --set priority=high
+python3 .agentic/tools/bulk_update.py --tags=auth --add-tag=urgent
+```
+
+**When to run:**
+- Reorganizing feature priorities
+- Bulk tagging or ownership changes
+
+#### `organize_features.py` - Feature Organization
+
+**What it does:**
+- Migrates FEATURES.md from flat to hierarchical format
+- Organizes features by domain or layer
+
+```bash
+python3 .agentic/tools/organize_features.py --by domain --dry-run
+python3 .agentic/tools/organize_features.py --by layer
+```
+
+**When to run:**
+- When project grows beyond 50+ features
+- Reorganizing project structure
+
+#### `upgrade_spec_format.py` - Spec Format Upgrade
+
+**What it does:**
+- Detects spec format version
+- Applies migrations to newer format versions
+
+```bash
+python3 .agentic/tools/upgrade_spec_format.py --dry-run
+python3 .agentic/tools/upgrade_spec_format.py
+```
+
+**When to run:**
+- After framework upgrade
+- When format version warnings appear
+
+### Agent Support Scripts
+
+#### `context-for-role.sh` - Role-Based Context Assembly
+
+**What it does:**
+- Assembles minimal context for a specific agent role
+- Loads only relevant files for the role
+
+```bash
+bash .agentic/tools/context-for-role.sh planning F-0005
+bash .agentic/tools/context-for-role.sh implementation F-0005 --dry-run
+```
+
+**When to run:**
+- Starting specialized agent work
+- Optimizing context size
+
+#### `suggest-agents.sh` - Agent Suggestions
+
+**What it does:**
+- Analyzes project structure
+- Suggests useful custom agents based on tech stack
+
+```bash
+bash .agentic/tools/suggest-agents.sh
+```
+
+**When to run:**
+- Initial project setup
+- Adding new technologies
+
+#### `generate-skills.sh` - Claude Skills Generator
+
+**What it does:**
+- Generates Claude Skills from subagent definitions
+- Creates skill files for Claude Code integration
+
+```bash
+bash .agentic/tools/generate-skills.sh           # Generate all skills
+bash .agentic/tools/generate-skills.sh planning  # Generate specific skill
+```
+
+**When to run:**
+- After modifying subagent definitions
+- Setting up Claude Code integration
+
+#### `list-tools.sh` - Tool Discovery Menu
+
+**What it does:**
+- Lists all framework tools by category
+- Shows brief descriptions and usage
+
+```bash
+bash .agentic/tools/list-tools.sh
+```
+
+**When to run:**
+- Learning available tools
+- Finding the right tool for a task
+
+### Build & Performance Scripts
+
+#### `build-stamper.sh` - Build Artifact Processor
+
+**What it does:**
+- Injects version/build info into artifacts
+- Stamps build metadata
+
+```bash
+bash .agentic/tools/build-stamper.sh inject dist/bundle.js
+```
+
+**When to run:**
+- During build process
+- Before deployment
+
+#### `validation-cache.sh` - Validation Caching
+
+**What it does:**
+- Caches validation results to avoid redundant checks
+- Speeds up doctor.sh, verify.sh, validate_specs.py
+
+```bash
+bash .agentic/tools/validation-cache.sh check
+bash .agentic/tools/validation-cache.sh clear
+```
+
+**When to run:**
+- Automatically used by other tools
+- Clear when validation seems stale
 
 ### Utility Scripts
 

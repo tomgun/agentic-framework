@@ -134,6 +134,7 @@ COMMANDS:
     work "description"  Start WIP tracking for a task
     commit              Run all pre-commit gates
     done                Task complete validation
+    trace [options]     Spec-code traceability (drift + coverage)
     tools               List all available tools by category
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -145,6 +146,8 @@ EXAMPLES:
     ag work "Add login form"    # Start working on a task
     ag commit                   # Verify ready to commit
     ag done                     # Check task completion
+    ag trace                    # Full drift + coverage report
+    ag trace --gaps             # Show only gaps
     ag tools                    # Discover available tools
 
 Core profile: No formal feature tracking. Use STATUS.md for focus.
@@ -162,6 +165,7 @@ COMMANDS:
     implement F-XXXX    Verify acceptance exists, start WIP tracking
     commit              Run all pre-commit gates
     done [F-XXXX]       Feature complete validation
+    trace [options]     Spec-code traceability (drift + coverage)
     tools               List all available tools by category
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -173,6 +177,11 @@ EXAMPLES:
     ag implement F-0042         # Start working on feature F-0042
     ag commit                   # Verify ready to commit
     ag done F-0042              # Check feature completion
+    ag trace                    # Full drift + coverage report
+    ag trace F-0042             # What files implement F-0042?
+    ag trace src/auth.py        # What features does auth.py implement?
+    ag trace --gaps             # Show only gaps (missing implementations)
+    ag trace --json             # Machine-readable combined output
     ag tools                    # Discover available tools
     ag verify --full            # Full verification
 
@@ -637,6 +646,233 @@ cmd_status() {
     fi
 }
 
+# Trace command - spec-code traceability
+cmd_trace() {
+    local arg="${1:-}"
+    local json_mode=false
+    local gaps_mode=false
+    local tests_mode=false
+    local orphans_mode=false
+
+    # Parse options
+    while [[ -n "$arg" ]]; do
+        case "$arg" in
+            --json)
+                json_mode=true
+                shift 2>/dev/null || true
+                arg="${1:-}"
+                ;;
+            --gaps)
+                gaps_mode=true
+                shift 2>/dev/null || true
+                arg="${1:-}"
+                ;;
+            --tests)
+                tests_mode=true
+                shift 2>/dev/null || true
+                arg="${1:-}"
+                ;;
+            --orphans)
+                orphans_mode=true
+                shift 2>/dev/null || true
+                arg="${1:-}"
+                ;;
+            F-[0-9][0-9][0-9][0-9])
+                # Feature lookup: what files implement this feature?
+                cmd_trace_feature "$arg"
+                return
+                ;;
+            *)
+                # Check if it's a file path
+                if [ -f "$arg" ] || [ -f "$ROOT_DIR/$arg" ]; then
+                    cmd_trace_file "$arg"
+                    return
+                fi
+                echo -e "${RED}Unknown option or target: $arg${NC}"
+                return 1
+                ;;
+        esac
+    done
+
+    # Full trace (combined drift + coverage)
+    if [ "$json_mode" = true ]; then
+        cmd_trace_json
+    elif [ "$gaps_mode" = true ]; then
+        cmd_trace_gaps
+    elif [ "$tests_mode" = true ]; then
+        python3 "$SCRIPT_DIR/coverage.py" --test-mapping 2>/dev/null
+    elif [ "$orphans_mode" = true ]; then
+        cmd_trace_orphans
+    else
+        cmd_trace_full
+    fi
+}
+
+cmd_trace_full() {
+    echo -e "${BOLD}=== Spec ↔ Code Traceability ===${NC}"
+    echo ""
+
+    # Run drift detection
+    echo -e "${BLUE}--- Drift Detection ---${NC}"
+    bash "$SCRIPT_DIR/drift.sh" --check 2>/dev/null || true
+    echo ""
+
+    # Run coverage check
+    echo -e "${BLUE}--- Coverage Analysis ---${NC}"
+    python3 "$SCRIPT_DIR/coverage.py" 2>/dev/null || true
+}
+
+cmd_trace_json() {
+    # Combine JSON outputs from drift.sh and coverage.py
+    local drift_file coverage_file
+    drift_file=$(mktemp)
+    coverage_file=$(mktemp)
+
+    # Use || true to ignore exit codes (both tools return 1 if issues found)
+    bash "$SCRIPT_DIR/drift.sh" --json 2>/dev/null > "$drift_file" || true
+    python3 "$SCRIPT_DIR/coverage.py" --json 2>/dev/null > "$coverage_file" || true
+
+    # Merge the two JSON outputs
+    python3 - "$drift_file" "$coverage_file" << 'PYEOF'
+import json
+import sys
+from datetime import datetime, timezone
+
+drift_file = sys.argv[1]
+coverage_file = sys.argv[2]
+
+with open(drift_file) as f:
+    drift = json.load(f)
+with open(coverage_file) as f:
+    coverage = json.load(f)
+
+combined = {
+    "tool": "trace",
+    "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+    "drift": drift,
+    "coverage": coverage,
+    "summary": {
+        "total_drift_issues": drift.get("summary", {}).get("total_issues", 0),
+        "total_coverage_issues": len(coverage.get("issues", [])),
+        "annotated_features": coverage.get("summary", {}).get("annotated_features", 0),
+        "implemented_features": coverage.get("summary", {}).get("implemented_features", 0),
+    }
+}
+print(json.dumps(combined, indent=2))
+PYEOF
+
+    rm -f "$drift_file" "$coverage_file"
+}
+
+cmd_trace_gaps() {
+    echo -e "${BOLD}=== Implementation Gaps ===${NC}"
+    echo ""
+
+    # Features with missing annotations
+    echo -e "${YELLOW}Features without code annotations:${NC}"
+    python3 "$SCRIPT_DIR/coverage.py" --json 2>/dev/null | \
+        python3 -c "
+import json
+import sys
+data = json.load(sys.stdin)
+for issue in data.get('issues', []):
+    if issue.get('type') == 'missing_annotation':
+        print(f\"  {issue['feature']}: {issue.get('status', '')} - no @feature annotations\")
+"
+    echo ""
+
+    # Features with incomplete acceptance criteria
+    echo -e "${YELLOW}Shipped features with incomplete acceptance:${NC}"
+    bash "$SCRIPT_DIR/drift.sh" --json 2>/dev/null | \
+        python3 -c "
+import json
+import sys
+data = json.load(sys.stdin)
+for issue in data.get('issues', []):
+    if issue.get('type') in ('incomplete_shipped', 'status_drift'):
+        print(f\"  {issue.get('feature', 'unknown')}: {issue.get('description', '')}\")
+"
+}
+
+cmd_trace_orphans() {
+    echo -e "${BOLD}=== Orphaned Code & Annotations ===${NC}"
+    echo ""
+
+    # Orphaned annotations
+    echo -e "${YELLOW}Orphaned @feature annotations (feature doesn't exist):${NC}"
+    python3 "$SCRIPT_DIR/coverage.py" --json 2>/dev/null | \
+        python3 -c "
+import json
+import sys
+data = json.load(sys.stdin)
+found = False
+for issue in data.get('issues', []):
+    if issue.get('type') == 'orphaned_annotation':
+        found = True
+        print(f\"  {issue['feature']} in {issue.get('file', 'unknown')}\")
+if not found:
+    print('  None found')
+"
+    echo ""
+
+    # Undocumented code
+    echo -e "${YELLOW}Undocumented exports:${NC}"
+    bash "$SCRIPT_DIR/drift.sh" --json 2>/dev/null | \
+        python3 -c "
+import json
+import sys
+data = json.load(sys.stdin)
+found = False
+for issue in data.get('issues', []):
+    if issue.get('type') == 'undocumented_code':
+        found = True
+        print(f\"  {issue.get('export', 'unknown')}\")
+if not found:
+    print('  None found')
+" | head -15
+}
+
+cmd_trace_feature() {
+    local feature_id="$1"
+    echo -e "${BOLD}=== Files implementing $feature_id ===${NC}"
+    echo ""
+
+    python3 "$SCRIPT_DIR/coverage.py" --json 2>/dev/null | \
+        python3 -c "
+import json
+import sys
+
+data = json.load(sys.stdin)
+fid = '$feature_id'
+
+# Find in full scan (we need annotations data which isn't in JSON output)
+# Fall back to direct scan
+" 2>/dev/null || true
+
+    # Direct grep for @feature annotations
+    echo "Files with @feature $feature_id annotation:"
+    grep -rl "@feature $feature_id" "$ROOT_DIR" --include="*.py" --include="*.ts" --include="*.js" --include="*.go" --include="*.rs" --include="*.java" --include="*.sh" 2>/dev/null | \
+        while read -r f; do
+            echo "  - ${f#$ROOT_DIR/}"
+        done || echo "  (none found)"
+    echo ""
+
+    # Check acceptance criteria
+    local acc_file="$ROOT_DIR/spec/acceptance/${feature_id}.md"
+    if [ -f "$acc_file" ]; then
+        echo "Acceptance criteria: $acc_file"
+        local total complete
+        total=$(grep -cE "^- \[.\]" "$acc_file" 2>/dev/null || echo "0")
+        complete=$(grep -cE "^- \[x\]" "$acc_file" 2>/dev/null || echo "0")
+        echo "  Progress: $complete/$total complete"
+    fi
+}
+
+cmd_trace_file() {
+    local target_file="$1"
+    python3 "$SCRIPT_DIR/coverage.py" --reverse "$target_file" 2>/dev/null
+}
+
 # Main command dispatch
 case "${1:-help}" in
     start)
@@ -656,6 +892,10 @@ case "${1:-help}" in
         ;;
     done)
         cmd_done "${2:-}"
+        ;;
+    trace)
+        shift
+        cmd_trace "$@"
         ;;
     tools)
         cmd_tools

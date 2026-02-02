@@ -54,8 +54,8 @@ curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remot
 
 Options:
 ```bash
-# Install specific version (e.g., v0.14.0)
-VERSION=v0.14.0 curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
+# Install specific version (e.g., v0.15.0)
+VERSION=v0.15.0 curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
 
 # Install to different directory
 TARGET=/path/to/project curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
