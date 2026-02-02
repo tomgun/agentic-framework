@@ -1,118 +1,93 @@
-# Examples Index
+# Agentic Framework Examples
 
 This directory contains example projects demonstrating the Agentic Framework in action.
 
-## 📁 Core Mode Example: `core_todo_cli/`
+## Active Examples
 
-**Profile**: Core (no formal product management)  
-**Project**: Simple Python CLI todo manager
+### 📁 `traced_notes_app/` - Traceability Demo
+
+**Focus**: Spec-Code Traceability (F-0109)
+**Project**: Simple Python notes manager
 
 **Demonstrates**:
-- ✅ `OVERVIEW.md` for lightweight planning (checkboxes track progress)
-- ✅ Working with agents without formal specs
-- ✅ Minimal ceremony, fast iteration
-- ✅ Code annotations (`@feature`) for context
-- ✅ Unit tests with pytest
+- ✅ `@feature F-####` annotations in source code
+- ✅ Test naming conventions (`test_F0001_*.py`)
+- ✅ Import tracing for test→feature mapping
+- ✅ Acceptance criteria files
+- ✅ `coverage.py` with `--json`, `--reverse`, `--test-mapping`
+- ✅ `ag trace` unified CLI
 
 **File Structure**:
 ```
-core_todo_cli/
-├── .agentic/           # Framework (same in both profiles)
-├── AGENTS.md           # Agent entry point
-├── STACK.md            # Profile: core
-├── OVERVIEW.md          # ← What we're building (lightweight)
-├── CONTEXT_PACK.md     # Architecture
-├── JOURNAL.md          # Session history
-├── HUMAN_NEEDED.md     # Escalations
-├── todo_cli/           # Implementation
-└── tests/              # Unit tests
-```
-
-**How agents work in Core mode**:
-1. Read `OVERVIEW.md` to understand what's being built
-2. Ask user: "Which capability should I work on?"
-3. Implement, test, update `OVERVIEW.md` (check off items)
-4. Log progress in `JOURNAL.md`
-
----
-
-## 📁 Core+PM Example: `core_pm_taskboard/`
-
-**Profile**: Core + Product Management  
-**Project**: Next.js task board web app
-
-**Demonstrates**:
-- ✅ Full `spec/` directory with formal requirements
-- ✅ `STATUS.md` for project roadmap
-- ✅ Feature tracking with stable IDs (F-0001, F-0002, etc.)
-- ✅ Acceptance criteria per feature
-- ✅ Cross-reference validation
-- ✅ NFRs (performance, accessibility, reliability)
-- ✅ Tools: `doctor.py`, `report.py`, `verify.py`
-
-**File Structure**:
-```
-core_pm_taskboard/
-├── .agentic/           # Framework
-├── AGENTS.md           # Agent entry point
-├── STACK.md            # Profile: core+product
-├── OVERVIEW.md          # High-level overview
-├── STATUS.md           # ← Current focus, roadmap
-├── CONTEXT_PACK.md     # Architecture
-├── JOURNAL.md          # Session history
-├── HUMAN_NEEDED.md     # Escalations
+traced_notes_app/
+├── README.md              # How to run traceability checks
+├── src/
+│   └── notes.py           # Code with @feature annotations
+├── tests/
+│   ├── test_F0001_*.py    # Explicit naming → F-0001 (high confidence)
+│   ├── test_F0002_*.py    # Explicit naming → F-0002 (high confidence)
+│   └── test_delete.py     # Import tracing → F-0003 (medium confidence)
 └── spec/
-    ├── PRD.md          # Why (requirements)
-    ├── TECH_SPEC.md    # How (architecture)
-    ├── FEATURES.md     # ← Feature registry with F-#### IDs
-    ├── NFR.md          # Non-functional requirements
-    └── acceptance/
-        ├── F-0001.md   # ← Acceptance criteria per feature
-        ├── F-0002.md
-        └── ...
+    ├── FEATURES.md        # Feature definitions
+    └── acceptance/        # Acceptance criteria
 ```
 
-**How agents work in Core+PM mode**:
-1. Read `STATUS.md` to know current focus
-2. Read `spec/FEATURES.md` to understand feature status
-3. Read `spec/acceptance/F-####.md` for the specific feature
-4. Implement, test, update `spec/FEATURES.md` with progress
-5. Update `STATUS.md` when completing/starting features
+**Running traceability checks**:
+```bash
+cd traced_notes_app/
+
+# Check annotation coverage
+python3 ../../.agentic/tools/coverage.py
+
+# See test→feature mapping
+python3 ../../.agentic/tools/coverage.py --test-mapping
+
+# What features does notes.py implement?
+python3 ../../.agentic/tools/coverage.py --reverse src/notes.py
+```
 
 ---
 
-## Comparing the Profiles
+## Archived Examples
 
-| Aspect | Core (`core_todo_cli/`) | Core+PM (`core_pm_taskboard/`) |
-|--------|-------------------------|--------------------------------|
-| **Planning doc** | `STATUS.md` + `OVERVIEW.md` (optional) | `STATUS.md` + `OVERVIEW.md` + `spec/` |
-| **Feature tracking** | Checkboxes in `OVERVIEW.md` | F-#### IDs in `spec/FEATURES.md` |
-| **Acceptance criteria** | Informal (user approval) | Formal (`spec/acceptance/F-####.md`) |
-| **Agent direction** | Asks user what to work on | Reads `STATUS.md` for focus |
-| **Tools** | `doctor`, `verify` | `doctor`, `report`, `verify`, `feature_graph` |
+Previous examples have been archived to `archived/` for reference:
+
+### `archived/core_todo_cli/`
+**Profile**: Core (no formal product management)
+**Project**: Python CLI todo manager
+**Demonstrates**: `OVERVIEW.md` for lightweight planning, minimal ceremony
+
+### `archived/core_pm_taskboard/`
+**Profile**: Core + Product Management
+**Project**: Next.js task board web app
+**Demonstrates**: Full `spec/` directory, formal feature tracking with F-#### IDs
+
+### `archived/old/`
+Original example projects before the Core/Core+PM profile split.
+
+---
+
+## Profile Comparison
+
+| Aspect | Core | Core+PM |
+|--------|------|---------|
+| **Planning doc** | `OVERVIEW.md` | `spec/FEATURES.md` + `spec/acceptance/` |
+| **Feature tracking** | Checkboxes | F-#### IDs with status |
+| **Acceptance criteria** | Informal | Formal (`spec/acceptance/F-####.md`) |
+| **Tools** | `doctor`, `verify` | + `coverage`, `drift`, `trace` |
 | **Good for** | Small projects, prototypes | Long-term projects, teams |
 
 ---
 
-## Old Examples
+## Creating New Examples
 
-Previous examples (before Core/Core+PM split) are in `old/` for reference.
+When creating new examples, demonstrate at least one of:
 
----
+1. **Core Profile**: `OVERVIEW.md` checkboxes, minimal ceremony
+2. **Core+PM Profile**: Full `spec/` directory, F-#### feature tracking
+3. **Traceability**: `@feature` annotations, test naming conventions
 
-## Running the Examples
-
-```bash
-# Core mode
-cd core_todo_cli/
-python3 .agentic/tools/doctor.py
-cat OVERVIEW.md
-
-# Core+PM mode
-cd core_pm_taskboard/
-python3 .agentic/tools/doctor.py
-python3 .agentic/tools/report.py
-cat STATUS.md
-```
-
-Both examples show realistic project states mid-development (not empty templates).
+Ensure examples are:
+- Self-contained (can run independently)
+- Mid-development state (not empty templates)
+- Well-documented (README explaining what's demonstrated)

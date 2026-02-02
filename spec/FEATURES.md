@@ -1605,6 +1605,26 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0109: Spec-Code Traceability Enhancements
+
+**Status**: shipped
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.15.0
+
+**Description**: Enhance existing drift and coverage tools to answer key traceability questions: "What specs are not implemented?", "What code has no spec?", "What's changed since last sync?", "Which tests validate which features?". Adds unified `ag trace` CLI.
+
+**Dependencies**: F-0041 (Token-Efficient Update Scripts)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/drift.sh` (--json), `.agentic/tools/coverage.py` (--json, --reverse, --test-mapping), `.agentic/tools/ag.sh` (trace command)
+- Tests: manual validation
+
+**Acceptance**: See `spec/acceptance/F-0109.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1619,6 +1639,6 @@ agent_mode: balanced  # premium | balanced | economy
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 2 | 1 | 0 | 3 |
-| **Total** | **75** | **2** | **0** | **77** |
+| Framework Infrastructure (F-0101+) | 3 | 1 | 1 | 5 |
+| **Total** | **76** | **2** | **1** | **79** |
 

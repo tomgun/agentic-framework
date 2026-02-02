@@ -117,3 +117,33 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-01 12:44 - v0.14.0 shipped + Next planning task
+
+**Accomplished**:
+- - Shipped OVERVIEW.md as high-level context document (PR #15 merged)
+- - Dynamic version badge in README
+- - Rebased on main after drift detection merge
+
+**Next steps**:
+- ULTRATHINK: Spec-code traceability system
+- - Problem: How to guarantee specs and implementation stay in sync?
+- - Full chain: vision → features/NFRs → acceptance criteria → tests → code
+- - Need: Know what's outdated/unimplemented at any time
+- - Also: Detect obsolete instructions that bloat context
+- - Research: What options exist for reliable mapping?
+- - Question: Is this even practical?
+
+**Blockers**: None - needs deep research/planning first
+
+
+### Session: 2026-02-02 23:03 - F-0109 Spec-Code Traceability
+
+**Accomplished**:
+- Implemented drift.sh --json, coverage.py enhancements, ag trace CLI, doc-check.sh enforcement, traced_notes_app example, 18 new tests
+
+**Next steps**:
+- Push changes, bump version to 0.15.0
+
+**Blockers**: None
+

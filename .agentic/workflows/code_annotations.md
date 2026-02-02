@@ -119,12 +119,68 @@ export class TodoStorage {
 
 ## Tools
 
-- **Check coverage**: `bash .agentic/tools/coverage.sh`
+- **Check coverage**: `python3 .agentic/tools/coverage.py`
   - Shows which features have/lack code annotations
   - Reports orphaned annotations (referencing non-existent features)
-  
+  - Options:
+    - `--json` - Machine-readable JSON output
+    - `--reverse FILE` - What features does FILE implement?
+    - `--test-mapping` - Infer test→feature mapping
+
+- **Trace**: `bash .agentic/tools/ag.sh trace`
+  - Combined drift + coverage analysis
+  - Options:
+    - `ag trace` - Full report
+    - `ag trace F-XXXX` - What files implement feature?
+    - `ag trace FILE` - What features does file implement?
+    - `ag trace --gaps` - Only show gaps
+    - `ag trace --json` - Machine-readable output
+
 - **Verify consistency**: `bash .agentic/tools/verify.sh`
   - Includes cross-reference checks for feature IDs
+
+## Test-to-Feature Inference
+
+The `coverage.py --test-mapping` command infers which tests validate which features using conventions (no annotations required).
+
+### Inference Methods (Priority Order)
+
+1. **Explicit Naming (High Confidence)**
+   Test files named with feature ID are automatically mapped:
+   ```
+   tests/test_F0003_login.py → F-0003
+   tests/test_F-0003_*.py → F-0003
+   spec/F0003_spec.ts → F-0003
+   ```
+
+2. **Import Tracing (Medium Confidence)**
+   If a test imports a file that has `@feature` annotations, the test is mapped to those features:
+   ```python
+   # test_auth.py
+   from src.auth import login  # auth.py has @feature F-0003
+   # → test_auth.py is mapped to F-0003
+   ```
+
+3. **Name Heuristics (Low Confidence)**
+   _Reserved for future use._ Would match test names to feature descriptions.
+
+### Example Output
+
+```
+Test→Feature Mapping (3 features with tests):
+  F-0003:
+    - tests/test_F0003_login.py (explicit_naming) [high]
+    - tests/test_auth.py (import_tracing) [medium]
+  F-0004:
+    - tests/test_storage.py (import_tracing) [medium]
+```
+
+### Best Practices for Test Naming
+
+For reliable test→feature mapping:
+1. **Preferred**: Name test files with feature ID: `test_F0003_*.py`
+2. **Alternative**: Import files that have `@feature` annotations
+3. **Avoid**: Generic test names that require heuristic matching
 
 ## Migration strategy (for existing codebases)
 
