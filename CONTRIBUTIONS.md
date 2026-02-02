@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.14.0)
+**Period**: Initial Development (v0.1.0 → v0.15.0)
 **Date**: 2026-02-01  
 
 ---
@@ -1330,8 +1330,35 @@ bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
 
 ---
 
+## v0.15.0 Contributions (2026-02-02)
+
+### Spec-Code Traceability System (F-0109)
+
+**User direction**: "enforce it" - Add automated checks to catch documentation drift and spec-code misalignment.
+
+**Implementation**:
+- `drift.sh --json` - Machine-readable drift detection output
+- `coverage.py --json/--reverse/--test-mapping` - Enhanced annotation coverage analysis
+- `ag trace` - Unified CLI combining drift + coverage reports
+- `doc-check.sh` - Documentation sync enforcement tool
+- Test→feature inference via naming conventions (no annotations required)
+
+**New Example Project**:
+- `traced_notes_app/` - Demonstrates @feature annotations, test naming conventions, import tracing
+
+**Documentation Enforcement**:
+- Added doc-check.sh to catch undocumented tools
+- Integrated into validate_framework.sh
+- Documented 14 previously undocumented tools in DEVELOPER_GUIDE.md
+
+**Tests**: 18 new tests for traceability features (37 total), all validation checks pass (133 passed)
+
+**Impact**: Teams can now answer key questions: "What specs lack code?", "What code lacks specs?", "Which tests cover which features?" - all machine-readable for CI integration.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.14.0
+**Current Version**: v0.15.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 

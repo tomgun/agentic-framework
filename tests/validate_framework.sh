@@ -1038,6 +1038,50 @@ fi
 cd "${FRAMEWORK_ROOT}"
 
 # ============================================================
+# DOCUMENTATION SYNC CHECKS
+# ============================================================
+echo ""
+echo "--- Documentation Sync Checks ---"
+
+# Check for undocumented tools (warning, not blocking)
+UNDOC_TOOLS=$(for tool in .agentic/tools/*.sh .agentic/tools/*.py; do
+  [[ -f "$tool" ]] || continue
+  name=$(basename "$tool")
+  [[ "$name" == "doc-check.sh" ]] && continue
+  if ! grep -rq "$name" .agentic/*.md .agentic/**/*.md 2>/dev/null; then
+    echo "$name"
+  fi
+done | wc -l | tr -d ' ')
+
+if [[ "$UNDOC_TOOLS" -eq 0 ]]; then
+  pass "All tools are documented"
+else
+  warn "$UNDOC_TOOLS tool(s) not documented (run: bash .agentic/tools/doc-check.sh)"
+fi
+
+# Check for missing tools referenced in docs (warning, not blocking)
+# Exclude known planned/example tools (documented as TODO or examples in docs)
+PLANNED_TOOLS="agents_active.sh check_agent_conflicts.sh sync_worktrees.sh lint_specs.py setup_ci.sh migrate_formats.sh new_tool.sh new_tool.py setup-new.sh"
+MISSING_TOOLS=0
+for tool in $(grep -roh '\.agentic/tools/[a-z_-]*\.\(sh\|py\)' .agentic/*.md .agentic/**/*.md 2>/dev/null | sort -u); do
+  tool_name=$(basename "$tool")
+  if [[ ! -f "$tool" ]]; then
+    # Check if it's a known planned/example tool
+    is_planned=false
+    for planned in $PLANNED_TOOLS; do
+      [[ "$tool_name" == "$planned" ]] && is_planned=true && break
+    done
+    [[ "$is_planned" == "false" ]] && ((MISSING_TOOLS++)) || true
+  fi
+done
+
+if [[ "$MISSING_TOOLS" -eq 0 ]]; then
+  pass "All referenced tools exist"
+else
+  warn "$MISSING_TOOLS tool(s) referenced but missing (run: bash .agentic/tools/doc-check.sh)"
+fi
+
+# ============================================================
 # CODE QUALITY CHECKS
 # ============================================================
 echo ""
@@ -1045,7 +1089,8 @@ echo "--- Code Quality Checks ---"
 
 # Check for no remaining STATUS.md || OVERVIEW.md conditional patterns in core files
 # (These should have been consolidated in v0.12.0)
-CONDITIONAL_COUNT=$(grep -r "STATUS.md.*||.*OVERVIEW.md\|cat STATUS.md.*cat OVERVIEW.md" .agentic/ --include="*.md" --include="*.sh" 2>/dev/null | wc -l | tr -d ' ')
+# Note: grep returns exit code 1 when no matches, use || true to handle with pipefail
+CONDITIONAL_COUNT=$(grep -r "STATUS.md.*||.*OVERVIEW.md\|cat STATUS.md.*cat OVERVIEW.md" .agentic/ --include="*.md" --include="*.sh" 2>/dev/null || true | wc -l | tr -d ' ')
 if [[ "$CONDITIONAL_COUNT" -eq 0 ]]; then
   pass "No STATUS.md||OVERVIEW.md conditional patterns found"
 else
