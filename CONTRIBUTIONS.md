@@ -1355,6 +1355,34 @@ bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
 
 **Impact**: Teams can now answer key questions: "What specs lack code?", "What code lacks specs?", "Which tests cover which features?" - all machine-readable for CI integration.
 
+### Feature Hierarchy Query (--children flag)
+
+**User request**: Add ability to query feature hierarchy - "show all children of F-XXXX"
+
+**Implementation**:
+- `query_features.py --children=F-XXXX` - List direct children of a feature
+- `--recursive` flag - Show all descendants with indented tree format
+- Status summary output (X shipped, Y in_progress, Z planned)
+- Combined with `--status` filter for targeted queries
+- Graceful handling: non-existent parent errors, no children messages
+- Cycle detection for recursive mode (handles circular refs)
+
+**Usage**:
+```bash
+# Direct children only
+python3 .agentic/tools/query_features.py --children=F-0100
+
+# All descendants with tree format
+python3 .agentic/tools/query_features.py --children=F-0100 --recursive
+
+# Filter children by status
+python3 .agentic/tools/query_features.py --children=F-0100 --status=shipped
+```
+
+**Tests**: 8 new tests for --children functionality (14 total in test_query_features.py)
+
+**Impact**: Teams can now easily visualize feature hierarchy and track sub-feature completion status.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework

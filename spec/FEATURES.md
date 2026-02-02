@@ -1625,6 +1625,26 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0110: Feature Hierarchy Query
+
+**Status**: shipped
+**Priority**: low
+**Complexity**: small
+**Since**: v0.15.0
+
+**Description**: Add `--children` flag to `query_features.py` to list children/descendants of a feature. Supports direct children query, recursive descendants with tree format, status filtering, and summary output.
+
+**Dependencies**: F-0109 (Spec-Code Traceability)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/query_features.py` (--children, --recursive flags)
+- Tests: `tests/test_query_features.py` (8 tests)
+
+**Acceptance**: See `spec/acceptance/F-0110.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |

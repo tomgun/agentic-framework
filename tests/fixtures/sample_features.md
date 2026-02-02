@@ -153,3 +153,63 @@ This is a test fixture with sample features for testing framework tools.
 - Lessons/caveats: none
 - Notes: none
 
+## F-0006: Login Form Component
+- Parent: F-0002
+- Dependencies: F-0002
+- Complexity: S
+- Tags: [auth, ui, frontend]
+- Layer: presentation
+- Domain: authentication
+- Priority: high
+- Owner: bob@example.com
+- Status: shipped
+- PRD: none
+- Requirements: none
+- NFRs: none
+- Acceptance: spec/acceptance/F-0006.md
+- Verification:
+  - Accepted: yes
+  - Accepted at: 2026-01-05
+- Implementation:
+  - State: complete
+  - Code: src/ui/login_form.tsx
+- Tests:
+  - Test strategy: unit
+  - Unit: complete
+  - Integration: complete
+  - Acceptance: complete
+  - Perf/realtime: n/a
+- Technical debt: none
+- Lessons/caveats: none
+- Notes: Child of Login UI for testing hierarchy
+
+## F-0007: Login Button
+- Parent: F-0002
+- Dependencies: F-0006
+- Complexity: S
+- Tags: [auth, ui, frontend]
+- Layer: presentation
+- Domain: authentication
+- Priority: medium
+- Owner: bob@example.com
+- Status: planned
+- PRD: none
+- Requirements: none
+- NFRs: none
+- Acceptance: spec/acceptance/F-0007.md
+- Verification:
+  - Accepted: no
+  - Accepted at:
+- Implementation:
+  - State: none
+  - Code: none
+- Tests:
+  - Test strategy: unit
+  - Unit: todo
+  - Integration: todo
+  - Acceptance: todo
+  - Perf/realtime: n/a
+- Technical debt: none
+- Lessons/caveats: none
+- Notes: Child of Login UI for testing hierarchy
+
