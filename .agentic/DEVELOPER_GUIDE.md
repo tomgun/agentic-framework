@@ -839,6 +839,7 @@ bash .agentic/tools/stale.sh --days 90
 **What it does:**
 - Fast filtering of features by any attribute
 - Count features by status, layer, domain, tags
+- Query feature hierarchy (children, descendants)
 - Essential for large projects (200+ features)
 
 ```bash
@@ -859,6 +860,15 @@ python .agentic/tools/query_features.py --owner=alice@example.com
 
 # Combine multiple filters
 python .agentic/tools/query_features.py --layer=presentation --domain=auth --tags=ui
+
+# List direct children of a feature
+python .agentic/tools/query_features.py --children=F-0001
+
+# List all descendants (recursive) with tree format
+python .agentic/tools/query_features.py --children=F-0001 --recursive
+
+# Filter children by status
+python .agentic/tools/query_features.py --children=F-0001 --status=shipped
 ```
 
 **Example output:**
@@ -870,10 +880,21 @@ F-0015: Auth Header Component [in_progress] (tags:auth,ui, layer:presentation)
 Total: 3 features
 ```
 
+**Example --children output:**
+```
+F-0101: Login UI [shipped]
+  F-0110: Login Form [shipped]
+  F-0111: Login Button [shipped]
+F-0102: OAuth Integration [planned]
+
+Summary: 4 descendants (2 shipped, 2 planned)
+```
+
 **When to use:**
 - Finding specific features in large projects
 - Planning sprints by layer/domain
 - Tracking team member assignments
+- Understanding feature hierarchy and relationships
 - Generating custom reports
 
 #### Enhanced `feature_graph.py` - Filtered Dependency Graphs (NEW - v0.3.0)
