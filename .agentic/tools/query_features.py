@@ -9,6 +9,8 @@ Usage:
     python query_features.py --layer=presentation --priority=critical
     python query_features.py --owner=alice@example.com
     python query_features.py --count  # Show counts by category
+    python query_features.py --children=F-0001  # List direct children
+    python query_features.py --children=F-0001 --recursive  # All descendants
 """
 
 import re
@@ -111,31 +113,127 @@ def filter_features(features: List[Dict], args) -> List[Dict]:
 
     if args.status:
         filtered = [f for f in filtered if f.get("status") == args.status.lower()]
-    
+
     if args.tags:
         # Must have ALL specified tags
         tags_lower = [t.lower() for t in args.tags]
         filtered = [f for f in filtered if all(tag in f.get("tags", []) for tag in tags_lower)]
-    
+
     if args.layer:
         filtered = [f for f in filtered if f.get("layer") == args.layer.lower()]
-    
+
     if args.domain:
         filtered = [f for f in filtered if f.get("domain") == args.domain.lower()]
-    
+
     if args.priority:
         filtered = [f for f in filtered if f.get("priority") == args.priority.lower()]
-    
+
     if args.owner:
         filtered = [f for f in filtered if f.get("owner") == args.owner]
-    
+
     if args.complexity:
         filtered = [f for f in filtered if f.get("complexity") == args.complexity.upper()]
-    
+
     if args.parent:
         filtered = [f for f in filtered if f.get("parent") == args.parent]
 
     return filtered
+
+
+def get_children(features: List[Dict], parent_id: str, recursive: bool = False,
+                 status_filter: Optional[str] = None) -> List[Dict]:
+    """
+    Get children of a feature.
+
+    Args:
+        features: List of all features
+        parent_id: The parent feature ID (e.g., "F-0001")
+        recursive: If True, get all descendants; if False, only direct children
+        status_filter: Optional status to filter by
+
+    Returns:
+        List of child features (with 'depth' key for recursive mode)
+    """
+    def find_children_recursive(pid: str, depth: int, visited: set) -> List[Dict]:
+        """Recursively find children, tracking depth and avoiding cycles."""
+        if pid in visited:
+            return []  # Avoid infinite loops on circular refs
+        visited.add(pid)
+
+        children = []
+        for f in features:
+            if f.get("parent") == pid:
+                child = f.copy()
+                child["depth"] = depth
+
+                # Apply status filter if specified
+                if status_filter and f.get("status") != status_filter.lower():
+                    # Skip this child but still process its descendants
+                    if recursive:
+                        children.extend(find_children_recursive(f["id"], depth + 1, visited))
+                    continue
+
+                children.append(child)
+
+                if recursive:
+                    children.extend(find_children_recursive(f["id"], depth + 1, visited))
+
+        return children
+
+    if recursive:
+        return find_children_recursive(parent_id, 0, set())
+    else:
+        # Direct children only
+        children = []
+        for f in features:
+            if f.get("parent") == parent_id:
+                if status_filter and f.get("status") != status_filter.lower():
+                    continue
+                child = f.copy()
+                child["depth"] = 0
+                children.append(child)
+        return children
+
+
+def print_children(children: List[Dict], parent_id: str, recursive: bool = False):
+    """Print children with optional tree formatting and status summary."""
+    if not children:
+        print(f"No children found for {parent_id}")
+        return
+
+    # Count statuses
+    status_counts = {}
+    for c in children:
+        status = c.get("status", "unknown")
+        status_counts[status] = status_counts.get(status, 0) + 1
+
+    # Print children
+    for c in children:
+        fid = c["id"]
+        name = c["name"]
+        status = c.get("status", "unknown")
+        depth = c.get("depth", 0)
+
+        indent = "  " * depth
+        print(f"{indent}{fid}: {name} [{status}]")
+
+    # Print summary
+    count_word = "descendants" if recursive else "children"
+    total = len(children)
+
+    summary_parts = []
+    # Order: shipped, in_progress, planned, then others
+    status_order = ["shipped", "in_progress", "planned"]
+    for status in status_order:
+        if status in status_counts:
+            summary_parts.append(f"{status_counts[status]} {status}")
+    # Add any other statuses
+    for status, count in sorted(status_counts.items()):
+        if status not in status_order:
+            summary_parts.append(f"{count} {status}")
+
+    summary_str = ", ".join(summary_parts) if summary_parts else "0"
+    print(f"\nSummary: {total} {count_word} ({summary_str})")
 
 
 def print_features(features: List[Dict], show_details: bool = True):
@@ -234,9 +332,12 @@ Examples:
   %(prog)s --owner=alice@example.com
   %(prog)s --count  # Show counts by category
   %(prog)s --tags=auth --count
+  %(prog)s --children=F-0001  # List direct children of F-0001
+  %(prog)s --children=F-0001 --recursive  # All descendants with tree format
+  %(prog)s --children=F-0001 --status=shipped  # Only shipped children
 """
     )
-    
+
     parser.add_argument("--status", help="Filter by status (planned|in_progress|shipped|deprecated)")
     parser.add_argument("--tags", action="append", help="Filter by tags (can specify multiple)")
     parser.add_argument("--layer", help="Filter by layer (presentation|business-logic|data|infrastructure|other)")
@@ -245,6 +346,8 @@ Examples:
     parser.add_argument("--owner", help="Filter by owner (email or username)")
     parser.add_argument("--complexity", help="Filter by complexity (S|M|L|XL)")
     parser.add_argument("--parent", help="Filter by parent feature ID")
+    parser.add_argument("--children", metavar="F-ID", help="List children of a feature (e.g., --children=F-0001)")
+    parser.add_argument("--recursive", action="store_true", help="With --children: show all descendants in tree format")
     parser.add_argument("--count", action="store_true", help="Show counts by category instead of listing features")
     parser.add_argument("--simple", action="store_true", help="Simple output (no details)")
     parser.add_argument("--file", default="spec/FEATURES.md", help="Path to FEATURES.md (default: spec/FEATURES.md)")
@@ -277,10 +380,35 @@ Examples:
     if not features:
         print(f"No features found in {features_file}", file=sys.stderr)
         sys.exit(1)
-    
+
+    # Handle --children query
+    if args.children:
+        # Validate feature ID format
+        if not re.match(r'^F-\d{4}$', args.children):
+            print(f"Error: Invalid feature ID format: {args.children}", file=sys.stderr)
+            print("Expected format: F-XXXX (e.g., F-0001)", file=sys.stderr)
+            sys.exit(1)
+
+        # Check if parent exists
+        parent_exists = any(f["id"] == args.children for f in features)
+        if not parent_exists:
+            print(f"Error: Feature {args.children} not found", file=sys.stderr)
+            sys.exit(1)
+
+        # Get children (with optional status filter)
+        children = get_children(
+            features,
+            args.children,
+            recursive=args.recursive,
+            status_filter=args.status
+        )
+
+        print_children(children, args.children, recursive=args.recursive)
+        sys.exit(0)
+
     # Filter
     filtered = filter_features(features, args)
-    
+
     # Output
     if args.count:
         print_counts(filtered)
