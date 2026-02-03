@@ -228,6 +228,15 @@ git push
 
 ## Working with Agents
 
+### When to Delegate vs. Do It Yourself
+
+Not sure when to use the agent? See **[`.agentic/workflows/delegation_heuristics.md`](workflows/delegation_heuristics.md)** for practical guidance.
+
+**Quick rules**:
+- ✅ **Delegate**: Repetitive tasks, clear specs, verifiable output
+- ❌ **Do yourself**: Explaining takes >2 min, agent failed twice, quick one-liner
+- ⚠️ **Watch closely**: Unfamiliar domain, architectural decisions
+
 ### Ready-to-Use AI Prompts
 
 **Don't want to write prompts from scratch?** Use our pre-made workflow prompts:

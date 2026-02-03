@@ -1665,6 +1665,46 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0112: Code Style Examples in CONTEXT_PACK
+
+**Status**: shipped
+**Priority**: low
+**Complexity**: small
+**Since**: v0.15.0
+
+**Description**: Add Code Style Examples section to CONTEXT_PACK template. Agents mimic patterns from examples. Includes maintenance guidance and alternative to reference real files.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/init/CONTEXT_PACK.template.md`
+- Tests: Manual validation
+
+**Acceptance**: See `spec/acceptance/F-0112.md`
+
+---
+
+## F-0113: Delegation Heuristics Guide
+
+**Status**: shipped
+**Priority**: low
+**Complexity**: small
+**Since**: v0.15.0
+
+**Description**: Practical guide for when to delegate to AI agents vs. do tasks yourself. Includes decision flowchart, task-type examples, and anti-patterns.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/workflows/delegation_heuristics.md`
+- Tests: Manual validation
+
+**Acceptance**: See `spec/acceptance/F-0113.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
