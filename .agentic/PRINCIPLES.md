@@ -1030,7 +1030,7 @@ Type 'a' or 'b':
 ---
 
 **Last Updated**: 2026-02-03
-**Framework Version**: 0.15.0  
+**Framework Version**: 0.15.1  
 
 **Note**: Principles evolve, but slowly. Major changes to core philosophy require strong justification and community discussion.
 

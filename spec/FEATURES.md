@@ -1730,7 +1730,7 @@ agent_mode: balanced  # premium | balanced | economy
 **Status**: shipped
 **Priority**: medium
 **Complexity**: small
-**Since**: v0.15.0
+**Since**: v0.15.1
 
 **Description**: Enforce git workflow policy from STACK.md. When `git_workflow: pull_request`, block commits to main/master with clear guidance (create feature branch, use --no-verify for hotfixes, or switch to direct workflow). Profile-aware defaults: Core → direct, Core+PM → pull_request.
 

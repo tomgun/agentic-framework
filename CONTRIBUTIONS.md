@@ -1467,7 +1467,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.15.0
+**Current Version**: v0.15.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 
