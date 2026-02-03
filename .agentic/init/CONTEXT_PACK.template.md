@@ -28,6 +28,60 @@ Purpose: a compact, durable starting point for any agent/human so they don’t n
 - Data flow: <!-- short bullets -->
 - External dependencies: <!-- APIs, DBs -->
 
+## Code style examples
+
+<!--
+PURPOSE: Agents mimic these patterns. One snippet > many words of description.
+MAINTENANCE: Update when code style changes. Review quarterly.
+ALTERNATIVE: Reference actual files: "See src/utils/helpers.py for our style"
+-->
+
+### Function style
+```
+<!-- Replace with your language. Show: naming, typing, early returns, comments -->
+function calculateTotal(items):
+    // Early return for edge cases
+    if items.isEmpty():
+        return 0
+
+    // Clear variable names, no abbreviations
+    subtotal = sum(item.price for item in items)
+    return subtotal
+```
+
+### Error handling
+```
+<!-- Show your preferred error pattern -->
+if not user:
+    raise NotFoundError("User {userId} not found")
+
+// Don't swallow errors silently
+```
+
+### Test structure
+```
+<!-- Show how you organize tests -->
+test "calculates total correctly":
+    items = [Item(price=100), Item(price=50)]
+    result = calculateTotal(items)
+    expect(result).toBe(150)
+```
+
+<!--
+WHEN TO UPDATE EXAMPLES:
+- When you change coding standards
+- When examples no longer match codebase
+- During quarterly retrospectives
+
+SIGNS EXAMPLES ARE STALE:
+- Agent produces code that looks different from recent commits
+- You keep correcting the same style issues
+
+TIP: You can reference real files instead of inline examples:
+- Function style: see src/services/billing.py:calculate_total()
+- Tests: see tests/unit/test_billing.py
+-->
+
 ## Quality gates (current)
 - Unit tests required: yes
 - Definition of Done: see `.agentic/workflows/definition_of_done.md`
