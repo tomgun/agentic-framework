@@ -1645,6 +1645,26 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0111: Three-Tier Agent Boundaries
+
+**Status**: shipped
+**Priority**: medium
+**Complexity**: small
+**Since**: v0.15.0
+
+**Description**: Restructure agent boundaries with ✅/⚠️/🚫 visual hierarchy. Single authoritative location in agent_operating_guidelines.md. CLAUDE.md references (not duplicates) the section.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/agents/shared/agent_operating_guidelines.md`, `.agentic/agents/claude/CLAUDE.md`
+- Tests: Manual validation
+
+**Acceptance**: See `spec/acceptance/F-0111.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |

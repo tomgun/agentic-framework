@@ -26,6 +26,40 @@
 
 ---
 
+## Agent Boundaries & Authority
+
+### ✅ ALWAYS (Autonomous - No approval needed)
+- Run tests before claiming "done"
+- Update specs when behavior changes
+- Use token-efficient scripts for file updates
+- Check WIP.md at session start
+- Follow existing code patterns in the file
+- Add comments for non-obvious logic
+- `git add` new files after creating them
+- PR-based workflow by default (Core+PM profile)
+
+### ⚠️ ASK FIRST (Requires human approval)
+- Adding new external dependencies
+- Changing architectural patterns
+- Deleting files or removing functionality
+- Modifying public APIs or interfaces
+- Creating new top-level directories
+- Deviating from acceptance criteria
+- Large refactors (>20 files)
+- Security decisions (auth, encryption)
+
+### 🚫 NEVER (Forbidden - No exceptions)
+- Commit without human approval
+- Push to main/master directly
+- Modify .env, credentials, or secrets
+- Skip acceptance criteria
+- Guess at unclear requirements (ask instead)
+- Force push or rewrite git history
+- Auto-merge pull requests
+- Make up API signatures or endpoints
+
+---
+
 ## Session Start Protocol
 
 Run `ag start` or manually:
@@ -250,13 +284,13 @@ If `pipeline_enabled: yes` in STACK.md:
 
 ## When to Escalate
 
-Add to HUMAN_NEEDED.md for:
+See **⚠️ ASK FIRST** items in Agent Boundaries section above.
+
+**Additionally, add to HUMAN_NEEDED.md for**:
 - Business decisions (pricing, partnerships)
-- Security decisions (encryption, auth)
-- Complex debugging (after 3-5 failed attempts)
-- Large refactors (>50 files)
 - Compliance/legal requirements
 - Production risk
+- Complex debugging (after 3-5 failed attempts)
 
 **Don't escalate**: Routine implementation, clear bug fixes, small refactors.
 
@@ -276,10 +310,9 @@ Add to HUMAN_NEEDED.md for:
 
 ## Non-Negotiables
 
-- **PR-based workflow by default** (Core+PM profile)
-- **No auto-commits** without explicit human approval
-- **Tests required** for new/changed logic
-- **Keep repo truthful**: Update docs alongside code
+See **Agent Boundaries & Authority** section above for full list.
+
+Quick reference: ✅ Autonomous (tests, specs, patterns) | ⚠️ Ask (deps, architecture, APIs) | 🚫 Never (commits, secrets, force push)
 
 ---
 
