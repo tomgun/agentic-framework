@@ -847,7 +847,53 @@ Type 'a' or 'b':
 
 ---
 
-## Anti-Patterns (What NOT to Do)
+## Agent Behavior & Delegation Principles
+
+### Make Human Review Efficient, Not Unnecessary
+
+**What**: Agent oversight is a feature, not a bug. "Watch like a hawk" is the answer. Framework effort should make human review efficient, not eliminate it.
+
+**Why**:
+- Agents make mistakes that only humans catch
+- Domain knowledge lives in humans
+- More rules don't make agents need less supervision
+- Information helps humans decide; automation can't replace judgment
+
+**How**:
+- Show humans useful information (diff stats, scope drift warnings)
+- Human decides; framework informs
+- Don't try to make agents "need less supervision"
+- Accept that human review is the quality gate
+
+**Example**: Pre-commit hook shows diff stats and scope drift. Human sees the information and decides whether to proceed. No automated judgment on "too big" or "too many side effects."
+
+**Anti-pattern**: ❌ Trying to make agents "need less supervision" through more rules. ❌ Automating approval decisions that require judgment.
+
+---
+
+### Warnings Beat Blocks for Soft Signals
+
+**What**: For judgment calls (scope drift, change size), warnings are better than blocks. Hard gates for hard rules; soft warnings for soft signals.
+
+**Why**:
+- Hard rules have clear pass/fail (acceptance criteria exist: yes/no)
+- Soft signals require context (is this change size appropriate for this task?)
+- Blocking on soft signals causes frustration when the task legitimately needs it
+- Warnings inform; humans judge
+
+**How**:
+- Acceptance criteria missing → BLOCK (hard rule)
+- Scope drift detected → WARN (soft signal, human judges)
+- Large diff size → SHOW STATS (information, not judgment)
+- WIP.md exists → BLOCK (hard rule, work incomplete)
+
+**Example**:
+- Hard rule: `pre-commit-check.sh` blocks if WIP.md exists
+- Soft signal: `scope_check.sh` warns about files outside declared scope but doesn't block
+
+**Anti-pattern**: ❌ Blocking commit because diff is "too big" when task legitimately needed it. ❌ Auto-rejecting based on heuristics without context.
+
+---
 
 ### ❌ Don't Duplicate Documentation
 
@@ -983,8 +1029,8 @@ Type 'a' or 'b':
 
 ---
 
-**Last Updated**: 2026-01-27
-**Framework Version**: 0.12.0  
+**Last Updated**: 2026-02-03
+**Framework Version**: 0.15.0  
 
 **Note**: Principles evolve, but slowly. Major changes to core philosophy require strong justification and community discussion.
 

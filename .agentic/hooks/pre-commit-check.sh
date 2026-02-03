@@ -16,6 +16,7 @@
 #   6. Untracked files warning (new files not git added)
 #   7. LLM behavioral test status (advisory, framework dev only)
 #   8. Agent instruction file size limits (prevents context bloat)
+#   9. Branch policy for PR workflow (blocks commit to main if pull_request mode)
 #
 # Exit codes:
 #   0 - All checks pass, commit allowed
@@ -32,10 +33,36 @@ echo "Pre-Commit Quality Gates"
 echo "═══════════════════════════════════════════════════════"
 echo ""
 
+# Show diff stats prominently (helps human review proportionality)
+if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  STAGED_COUNT=$(git diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
+  if [[ $STAGED_COUNT -gt 0 ]]; then
+    echo "Change Summary:"
+    git diff --cached --stat 2>/dev/null | tail -10
+    TOTAL_LINES=$(git diff --cached --numstat 2>/dev/null | awk '{sum+=$1+$2} END {print sum+0}')
+    echo ""
+    echo "Total: ${TOTAL_LINES} lines changed across ${STAGED_COUNT} files"
+    echo "Does this seem proportional to the task?"
+    echo ""
+    echo "───────────────────────────────────────────────────────"
+    echo ""
+  fi
+fi
+
+# Check for scope drift (warning only)
+if [[ -f ".agentic/tools/scope_check.sh" ]]; then
+  SCOPE_OUTPUT=$(bash .agentic/tools/scope_check.sh 2>/dev/null || true)
+  if [[ -n "$SCOPE_OUTPUT" ]]; then
+    echo "$SCOPE_OUTPUT"
+    echo "───────────────────────────────────────────────────────"
+    echo ""
+  fi
+fi
+
 FAILURES=0
 
 # Check 1: .agentic/WIP.md must not exist
-echo "[1/8] Checking for incomplete work (.agentic/WIP.md)..."
+echo "[1/9] Checking for incomplete work (.agentic/WIP.md)..."
 if [[ -f ".agentic/WIP.md" ]]; then
   echo "❌ BLOCKED: .agentic/WIP.md exists - work is incomplete!"
   echo ""
@@ -54,7 +81,7 @@ fi
 # Check 2: Shipped features must have acceptance criteria
 if [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[2/8] Checking shipped features have acceptance criteria..."
+  echo "[2/9] Checking shipped features have acceptance criteria..."
   
   # Extract feature IDs marked as shipped
   SHIPPED_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: shipped" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
@@ -87,13 +114,13 @@ if [[ -f "spec/FEATURES.md" ]]; then
   fi
 else
   echo ""
-  echo "[2/8] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
+  echo "[2/9] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
 fi
 
 # Check 3: In-progress features must have recent JOURNAL entry
 if [[ -f "spec/FEATURES.md" ]] && [[ -f "JOURNAL.md" ]]; then
   echo ""
-  echo "[3/8] Checking in-progress features have recent activity..."
+  echo "[3/9] Checking in-progress features have recent activity..."
   
   IN_PROGRESS_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: in_progress" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
   
@@ -130,13 +157,13 @@ if [[ -f "spec/FEATURES.md" ]] && [[ -f "JOURNAL.md" ]]; then
   fi
 else
   echo ""
-  echo "[3/8] Skipping in-progress features check (no spec/FEATURES.md or JOURNAL.md)"
+  echo "[3/9] Skipping in-progress features check (no spec/FEATURES.md or JOURNAL.md)"
 fi
 
 # Check 4: STACK.md version sanity (where detectable)
 if [[ -f "STACK.md" ]]; then
   echo ""
-  echo "[4/8] Checking STACK.md version consistency..."
+  echo "[4/9] Checking STACK.md version consistency..."
   
   # Example: Check Node.js version if package.json exists
   if [[ -f "package.json" ]] && command -v node >/dev/null 2>&1; then
@@ -166,12 +193,12 @@ if [[ -f "STACK.md" ]]; then
   fi
 else
   echo ""
-  echo "[4/8] Skipping STACK.md check (file not found)"
+  echo "[4/9] Skipping STACK.md check (file not found)"
 fi
 
 # Check 5: Batch size warning (small batches = quality)
 echo ""
-echo "[5/8] Checking batch size (small batches = quality)..."
+echo "[5/9] Checking batch size (small batches = quality)..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   # Count staged files
@@ -203,7 +230,7 @@ fi
 
 # Check 6: Untracked files in project directories
 echo ""
-echo "[6/8] Checking for untracked files in project directories..."
+echo "[6/9] Checking for untracked files in project directories..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   # Directories that should typically have files tracked
@@ -249,7 +276,7 @@ fi
 # Check 7: LLM behavioral test status (advisory, framework development only)
 if [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/LLM_TEST_RESULTS.md" ]]; then
   echo ""
-  echo "[7/8] Checking LLM behavioral test status..."
+  echo "[7/9] Checking LLM behavioral test status..."
   if bash .agentic/tools/llm-test-status.sh --quiet 2>/dev/null; then
     echo "✓ LLM behavioral tests are current"
   else
@@ -261,7 +288,7 @@ fi
 
 # Check 8: Agent instruction file size limits (prevents context bloat)
 echo ""
-echo "[8/8] Checking agent instruction file sizes..."
+echo "[8/9] Checking agent instruction file sizes..."
 
 SIZE_WARNINGS=0
 
@@ -293,6 +320,37 @@ fi
 if [[ $SIZE_WARNINGS -gt 0 ]]; then
   echo ""
   echo "   (File size warnings are advisory, not blocking commit)"
+fi
+
+# Check 9: Branch policy for PR workflow (BLOCKS commit to main/master)
+echo ""
+echo "[9/9] Checking branch policy..."
+
+if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+  GIT_WORKFLOW=$(grep "git_workflow:" STACK.md 2>/dev/null | grep -oE "pull_request|direct" | head -1)
+
+  if [[ "$GIT_WORKFLOW" == "pull_request" ]] && [[ "$CURRENT_BRANCH" =~ ^(main|master)$ ]]; then
+    echo "❌ BLOCKED: Direct commit to $CURRENT_BRANCH with PR workflow"
+    echo ""
+    echo "   Your STACK.md has git_workflow: pull_request"
+    echo "   This means you want changes reviewed before merging to main."
+    echo ""
+    echo "   Options:"
+    echo "   1. Create a feature branch: git checkout -b feature/description"
+    echo "   2. Hotfix bypass: git commit --no-verify (use sparingly)"
+    echo "   3. Change workflow: Set git_workflow: direct in STACK.md"
+    echo ""
+    FAILURES=$((FAILURES + 1))
+  elif [[ "$GIT_WORKFLOW" == "pull_request" ]]; then
+    echo "✓ On branch '$CURRENT_BRANCH' (PR workflow allows feature branches)"
+  elif [[ "$GIT_WORKFLOW" == "direct" ]]; then
+    echo "✓ Direct workflow - commits to any branch allowed"
+  else
+    echo "✓ No git_workflow setting found (defaulting to allow)"
+  fi
+else
+  echo "✓ Git not available (skipping branch policy check)"
 fi
 
 # Summary

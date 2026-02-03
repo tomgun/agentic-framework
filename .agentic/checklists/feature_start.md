@@ -27,6 +27,11 @@
 □ Is this a SMALL batch? (max 5-10 files)
   ├─ YES → Proceed
   └─ NO  → 🛑 STOP. Split into smaller features first.
+
+□ Declare scope when starting work:
+  - When running `wip.sh start`, files are captured
+  - Pre-commit will warn if you change files outside declared scope
+  - This helps catch unintended side effects
 ```
 
 ---

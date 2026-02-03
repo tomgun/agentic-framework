@@ -349,6 +349,39 @@ Please research current best practices for [environment]:
 5. Note any breaking changes in HUMAN_NEEDED.md
 ```
 
+## Step 1c: Git Workflow Preference (Core profile only)
+
+**SKIP this step for Core+PM profile** - Core+PM defaults to `pull_request` (formal tracking implies formal review).
+
+**For Core profile, ask the user:**
+
+> "How do you prefer to work with Git?
+>
+> **a) Direct commits** (default for Core - fast iteration)
+> - Commit directly to main/master
+> - No PR overhead
+> - Good for: solo projects, prototypes, speed
+>
+> **b) Pull Request workflow** (adds review step)
+> - Create feature branches
+> - Review changes before merging
+> - Good for: safety net, audit trail, collaboration
+>
+> Type 'a' for direct or 'b' for pull_request"
+
+**After user chooses, update STACK.md:**
+
+```markdown
+## Git workflow
+- git_workflow: direct    <!-- if user chose 'a' -->
+- git_workflow: pull_request  <!-- if user chose 'b' -->
+```
+
+**Important notes:**
+- The pre-commit hook will **BLOCK** commits to main/master when `git_workflow: pull_request` is set
+- Users can always bypass with `git commit --no-verify` for hotfixes
+- This is about **user choice**, not enforcement - both workflows are valid
+
 ## Step 2: run init as an agent-guided planning session
 
 Interview the user to understand:

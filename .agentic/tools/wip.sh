@@ -114,6 +114,11 @@ ${DESCRIPTION}
 **Files being edited**:
 $(echo "$FILES" | tr ',' '\n' | sed 's/^/- /')
 
+## Declared Scope (for scope drift detection)
+
+IN_SCOPE: ${FILES}
+OUT_OF_SCOPE: everything else
+
 **Progress**:
 - [ ] Task started
 
