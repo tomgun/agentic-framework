@@ -18,6 +18,19 @@ This guide explains how to use Cursor's agent capabilities with the Agentic Fram
 
 ---
 
+## Agent Boundaries (Quick Reference)
+
+**Full details**: `.agentic/agents/shared/agent_operating_guidelines.md#agent-boundaries--authority`
+
+| ✅ ALWAYS (Autonomous) | ⚠️ ASK FIRST | 🚫 NEVER |
+|------------------------|--------------|----------|
+| Run tests before "done" | Add dependencies | Commit without approval |
+| Update specs with code | Change architecture | Push to main directly |
+| Follow existing patterns | Delete files/functionality | Modify secrets/.env |
+| Use token-efficient scripts | Modify public APIs | Guess at requirements |
+
+---
+
 ## Overview
 
 Cursor supports custom agents through:
