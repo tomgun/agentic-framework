@@ -113,6 +113,22 @@ if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
     perl -0777 -i -pe "s/(## Agentic framework\\n- Version:[^\\n]*\\n)/\\1- Profile: ${PROFILE}  \\# core | core+product\\n/" "${ROOT_DIR}/STACK.md" || true
     echo "NEW : STACK.md Profile: ${PROFILE}"
   fi
+
+  # Set profile-aware git_workflow default
+  # Core profile → direct (fast iteration, user can override during init)
+  # Core+PM profile → pull_request (formal tracking = formal review)
+  if [[ "${PROFILE}" == "core" ]]; then
+    GIT_WORKFLOW_DEFAULT="direct"
+  else
+    GIT_WORKFLOW_DEFAULT="pull_request"
+  fi
+
+  if grep -qE '^[[:space:]]*-[[:space:]]*git_workflow:' "${ROOT_DIR}/STACK.md"; then
+    # Update existing git_workflow line to profile default
+    sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*git_workflow:[[:space:]]*).*/\\1${GIT_WORKFLOW_DEFAULT}/" "${ROOT_DIR}/STACK.md"
+    rm -f "${ROOT_DIR}/STACK.md.bak" 2>/dev/null || true
+    echo "OK  : STACK.md git_workflow set to ${GIT_WORKFLOW_DEFAULT} (${PROFILE} default)"
+  fi
 fi
 
 # Shared agent rules at repo root (recommended).

@@ -123,3 +123,33 @@ If the agent produces unusable output:
 | Quick one-liner | ❌ Do yourself |
 
 **Remember**: The goal is shipping quality software, not maximizing AI usage.
+
+---
+
+## Meta-Insights About Agent Behavior
+
+### Instructions Don't Change Agent Behavior
+
+Behavioral instructions ("answer honestly", "consider alternatives") rarely change agent behavior. Structural constraints and automated verification do.
+
+- Agents that over-engineer won't stop because you asked
+- Self-reflection prompts get gamed or ignored
+- "Should you do X?" becomes "yes" regardless of actual behavior
+
+**What works instead**:
+- Build verification scripts instead of guidelines
+- Show information (diff stats) instead of asking questions
+- Structural constraints (gates, hooks) beat behavioral instructions
+
+### One Example Beats Three Paragraphs
+
+Agents learn patterns from examples better than from prose descriptions.
+
+- Examples are concrete; prose is abstract
+- Agents pattern-match; lengthy explanations may be skimmed
+- "Functions should be small" is vague; a 15-line function is concrete
+
+**What works**:
+- Code style examples beat style guidelines
+- Reference real files: "See src/utils/example.py"
+- Show before/after for transformations

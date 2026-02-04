@@ -9,6 +9,13 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+# Optional YAML support (graceful fallback if not installed)
+try:
+    import yaml
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
+
 
 # === Verification State Tracking ===
 
@@ -432,6 +439,91 @@ def validate_optional_enhancements(root: Path, profile: str) -> list[str]:
         suggestions.append("STATUS.md is missing. Run: cp .agentic/init/STATUS.template.md STATUS.md")
 
     return suggestions
+
+
+# === Acceptance File Frontmatter Parsing ===
+
+def parse_acceptance_frontmatter(acceptance_path: Path) -> dict:
+    """
+    Extract structured frontmatter from acceptance file.
+
+    Expected format:
+    ---
+    feature: F-0120
+    status: shipped
+    validation:
+      - command: "pytest tests/test_feature.py -v"
+        description: "Unit tests pass"
+    ---
+    """
+    try:
+        content = acceptance_path.read_text(encoding="utf-8")
+    except Exception:
+        return {}
+
+    # Check for YAML frontmatter
+    if not content.startswith('---'):
+        return {}
+
+    try:
+        # Find end of frontmatter
+        end = content.index('---', 3)
+        frontmatter = content[3:end]
+
+        if HAS_YAML:
+            return yaml.safe_load(frontmatter) or {}
+        else:
+            # Fallback: regex-based parsing for critical fields
+            result = {}
+            feature_match = re.search(r'feature:\s*(\S+)', frontmatter)
+            if feature_match:
+                result['feature'] = feature_match.group(1)
+            status_match = re.search(r'status:\s*(\S+)', frontmatter)
+            if status_match:
+                result['status'] = status_match.group(1)
+            # Extract validation commands (simplified)
+            if 'validation:' in frontmatter:
+                commands = re.findall(r'command:\s*["\'](.+?)["\']', frontmatter)
+                result['validation'] = [{'command': c} for c in commands]
+            return result
+    except (ValueError, Exception):
+        return {}
+
+
+def validate_acceptance_tests(root: Path, feature_id: str) -> list[str]:
+    """Verify acceptance file has runnable validation commands."""
+    issues = []
+    acc_path = root / "spec" / "acceptance" / f"{feature_id}.md"
+
+    if not acc_path.exists():
+        return [f"No acceptance file for {feature_id}"]
+
+    meta = parse_acceptance_frontmatter(acc_path)
+    validations = meta.get('validation', [])
+
+    if not validations:
+        # Fallback: check for legacy ## Validation Commands section
+        try:
+            content = acc_path.read_text(encoding="utf-8")
+            if '## Validation' not in content and '## Test' not in content:
+                # Just a suggestion, not an error
+                pass
+        except Exception:
+            pass
+    else:
+        for v in validations:
+            cmd = v.get('command', '')
+            # Check referenced files exist
+            if 'tests/' in cmd:
+                # Extract test file path from command
+                test_match = re.search(r'tests/[\w/.-]+', cmd)
+                if test_match:
+                    test_file = test_match.group(0)
+                    # Handle glob patterns gracefully
+                    if '*' not in test_file and not (root / test_file).exists():
+                        issues.append(f"{feature_id}: Test file not found: {test_file}")
+
+    return issues
 
 
 def parse_features(md: str) -> dict[str, dict]:

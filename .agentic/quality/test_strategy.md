@@ -325,6 +325,38 @@ For each function/method, ensure tests cover:
 
 ---
 
+## Test Result Logging (Framework Development)
+
+When running tests for a release:
+
+**CRITICAL ORDER**: Update version BEFORE running tests.
+
+1. **Update VERSION first**: `echo "X.Y.Z" > VERSION`
+2. **Update STACK.md version** to match
+3. **Update spec/FEATURES.md version** to match
+4. **THEN run tests**: `bash tests/validate_framework.sh`
+5. **Update result files** with new version:
+   - `tests/VERIFICATION_REPORT.md` - Test counts, feature list
+   - `tests/LLM_TEST_RESULTS.md` - Manual test tracking
+
+**Why order matters**: Test results are logged with the version number. Running tests first, then bumping version = results logged against wrong version.
+
+**Anti-pattern**:
+```bash
+# ❌ WRONG - tests logged as v0.15.0
+bash tests/validate_framework.sh  # Shows v0.15.0
+echo "0.16.0" > VERSION           # Now v0.16.0 but tests said v0.15.0
+```
+
+**Correct pattern**:
+```bash
+# ✅ RIGHT - tests logged as v0.16.0
+echo "0.16.0" > VERSION           # Set version first
+bash tests/validate_framework.sh  # Shows v0.16.0
+```
+
+---
+
 ## See Also
 
 - TDD workflow: `.agentic/workflows/tdd_mode.md`

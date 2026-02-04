@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.12.0
+**Version**: 0.16.0
 
 ---
 
@@ -1705,6 +1705,66 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0114: Scope & Diff Verification
+
+**Status**: shipped
+**Priority**: medium
+**Complexity**: small
+**Since**: v0.15.0
+
+**Description**: Structural verification tools that help humans review agent changes efficiently. Shows diff stats at pre-commit, warns on scope drift (files changed outside declared scope), and adds principles documenting meta-insights about agent behavior (structural > behavioral instructions).
+
+**Dependencies**: F-0016 (Pre-Commit Quality Gates), F-0051 (WIP Tracking)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/scope_check.sh`, `.agentic/hooks/pre-commit-check.sh`, `.agentic/PRINCIPLES.md`
+- Tests: validate_framework.sh
+
+**Acceptance**: See `spec/acceptance/F-0114.md`
+
+---
+
+## F-0115: Git Workflow Branch Check
+
+**Status**: shipped
+**Priority**: medium
+**Complexity**: small
+**Since**: v0.15.1
+
+**Description**: Enforce git workflow policy from STACK.md. When `git_workflow: pull_request`, block commits to main/master with clear guidance (create feature branch, use --no-verify for hotfixes, or switch to direct workflow). Profile-aware defaults: Core → direct, Core+PM → pull_request.
+
+**Dependencies**: F-0002 (Profile Selection), F-0016 (Pre-Commit Quality Gates), F-0096 (PR-Based Workflow Default)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/hooks/pre-commit-check.sh`, `.agentic/init/scaffold.sh`, `.agentic/init/init_playbook.md`, `.agentic/init/STACK.template.md`
+- Tests: `tests/validate_framework.sh` (9 checks)
+
+**Acceptance**: See `spec/acceptance/F-0115.md`
+
+---
+
+## F-0116: Maintainability Enforcement Gates
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.16.0
+
+**Description**: Enforce maintainability through automated gates: test execution (BLOCKING), complexity limits (BLOCKING: max files, max added lines, max file length), and escape hatches for legitimate bypasses (blocked on main/master). Both Core and Core+PM profiles enforce tests and complexity limits.
+
+**Dependencies**: F-0016 (Pre-Commit Quality Gates), F-0115 (Git Workflow Branch Check)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/hooks/pre-commit-check.sh` (checks 6-7), `.agentic/tools/wip.sh` (--auto flag), `.agentic/tools/doctor.py` (frontmatter parsing), `.agentic/tools/upgrade.sh` (migration)
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0116.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1719,6 +1779,6 @@ agent_mode: balanced  # premium | balanced | economy
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 3 | 1 | 1 | 5 |
-| **Total** | **76** | **2** | **1** | **79** |
+| Framework Infrastructure (F-0101+) | 5 | 1 | 1 | 7 |
+| **Total** | **78** | **2** | **1** | **81** |
 

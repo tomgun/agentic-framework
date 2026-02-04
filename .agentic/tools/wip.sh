@@ -10,12 +10,14 @@
 #
 # Usage:
 #   bash .agentic/tools/wip.sh start <feature_id> "<description>" "<files>"
+#   bash .agentic/tools/wip.sh start <feature_id> --auto             # Auto-create minimal WIP
 #   bash .agentic/tools/wip.sh checkpoint "<progress_note>"
 #   bash .agentic/tools/wip.sh complete
 #   bash .agentic/tools/wip.sh check
 #
 # Examples:
 #   bash .agentic/tools/wip.sh start F-0005 "User authentication" "src/auth/*.ts,tests/auth/*.test.ts"
+#   bash .agentic/tools/wip.sh start exploration --auto              # Auto-created on first edit
 #   bash .agentic/tools/wip.sh checkpoint "Login endpoint done, starting JWT"
 #   bash .agentic/tools/wip.sh complete
 #   bash .agentic/tools/wip.sh check
@@ -72,26 +74,74 @@ time_ago() {
 
 case "$COMMAND" in
   start)
-    if [[ $# -lt 4 ]]; then
+    FEATURE_ID="${2:-}"
+    AUTO_MODE="no"
+    DESCRIPTION=""
+    FILES=""
+
+    # Check for --auto flag
+    if [[ "${3:-}" == "--auto" ]] || [[ "${2:-}" == "--auto" ]]; then
+      AUTO_MODE="yes"
+      if [[ "${2:-}" == "--auto" ]]; then
+        FEATURE_ID="exploration"
+      fi
+    elif [[ $# -lt 4 ]]; then
       echo "Usage: wip.sh start <feature_id> \"<description>\" \"<files>\""
+      echo "       wip.sh start <feature_id> --auto  # Minimal auto-created WIP"
       exit 1
+    else
+      DESCRIPTION="$3"
+      FILES="$4"
     fi
-    
-    FEATURE_ID="$2"
-    DESCRIPTION="$3"
-    FILES="$4"
+
     AGENT=$(detect_agent)
     TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
-    
+
     # Check if WIP already exists
     if [[ -f "$WIP_FILE" ]]; then
+      if [[ "$AUTO_MODE" == "yes" ]]; then
+        # Silent exit for auto-mode - WIP already exists
+        exit 0
+      fi
       echo "⚠️  WIP.md already exists!"
       echo "   Another task may be in progress."
       echo "   Complete it first: bash .agentic/tools/wip.sh complete"
       exit 1
     fi
-    
-    # Create WIP.md
+
+    # Create minimal WIP.md for auto mode
+    if [[ "$AUTO_MODE" == "yes" ]]; then
+      cat > "$WIP_FILE" <<EOF
+# Work In Progress (Auto-created)
+
+**⚠️ This file tracks active work. If it exists when you return, work was interrupted.**
+
+---
+
+## Current Task
+
+- **Feature**: ${FEATURE_ID}
+- **Agent**: ${AGENT}
+- **Started**: ${TIMESTAMP}
+- **Last checkpoint**: ${TIMESTAMP}
+
+## Status
+
+Auto-created on first edit. Update with:
+\`\`\`bash
+bash .agentic/tools/wip.sh checkpoint "Current progress"
+\`\`\`
+
+---
+
+**Auto-generated**: \`.agentic/tools/wip.sh start --auto\`
+**Remove when**: Task complete (\`wip.sh complete\`)
+EOF
+      echo "📝 WIP tracking auto-started for ${FEATURE_ID}"
+      exit 0
+    fi
+
+    # Create full WIP.md for manual mode
     cat > "$WIP_FILE" <<EOF
 # Work In Progress (DO NOT EDIT MANUALLY)
 
@@ -113,6 +163,11 @@ ${DESCRIPTION}
 
 **Files being edited**:
 $(echo "$FILES" | tr ',' '\n' | sed 's/^/- /')
+
+## Declared Scope (for scope drift detection)
+
+IN_SCOPE: ${FILES}
+OUT_OF_SCOPE: everything else
 
 **Progress**:
 - [ ] Task started

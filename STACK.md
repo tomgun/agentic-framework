@@ -5,7 +5,7 @@
 Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Agentic framework
-- Version: 0.12.2
+- Version: 0.16.0
 - Profile: core+pm
 - This IS the framework (dogfooding)
 - Source: https://github.com/tomgun/agentic-framework
@@ -24,6 +24,8 @@ Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Testing
 - Unit test framework: bash tests/validate_framework.sh
+- test: bash tests/validate_framework.sh
+- test_fast: bash tests/validate_framework.sh
 - Test commands:
   - Unit: `bash tests/validate_framework.sh`
   - Integration: N/A
@@ -39,6 +41,11 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - git_workflow: pull_request
 - pr_draft_by_default: false
 - pr_auto_request_review: false
+
+## Complexity limits
+- max_files_per_commit: 15
+- max_added_lines: 1000
+- max_code_file_length: 1200
 
 ## Constraints
 - Backward compatibility: Must support existing projects upgrading

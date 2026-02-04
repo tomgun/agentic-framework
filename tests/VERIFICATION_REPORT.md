@@ -1,8 +1,8 @@
 # Framework Verification Report
 
-**Generated**: 2025-01-18
-**Framework Version**: 0.12.0
-**Test Results**: 129 passed, 0 failed
+**Generated**: 2026-02-04
+**Framework Version**: 0.16.0
+**Test Results**: 149 passed, 0 failed
 
 ---
 
@@ -10,9 +10,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Features | 73 |
-| Acceptance Files | 73/73 (100%) |
-| Automated Tests | 129 |
+| Total Features | 74 |
+| Acceptance Files | 74/74 (100%) |
+| Automated Tests | 149 |
 | Test Pass Rate | 100% |
 | Profile Coverage | Core ✅, Core+PM ✅ |
 
@@ -142,6 +142,7 @@
 | F-0095 | Cross-Platform Tool Compatibility | shipped | ✅ Automated: awk usage tests |
 | F-0096 | PR-Based Workflow Default | shipped | ✅ Automated: Template + docs tests |
 | F-0097 | Worktree Management Tool | shipped | ✅ Automated: worktree.sh tests |
+| F-0116 | Maintainability Enforcement Gates | shipped | ✅ Automated: pre-commit test/complexity gates |
 
 ---
 
@@ -149,10 +150,10 @@
 
 | Verification Type | Count | Percentage |
 |-------------------|-------|------------|
-| ✅ Automated (structural) | 45 | 62% |
-| ✅ Automated (functional) | 8 | 11% |
+| ✅ Automated (structural) | 45 | 61% |
+| ✅ Automated (functional) | 9 | 12% |
 | ⚠️ Manual (agent behavioral) | 20 | 27% |
-| **Total** | **73** | **100%** |
+| **Total** | **74** | **100%** |
 
 ---
 
@@ -205,10 +206,11 @@ These 20 features require agent behavioral testing (see `LLM_TEST_PLAN.md`):
 Run: `bash tests/validate_framework.sh`
 
 ```
-Tests: 129 passed, 0 failed, 1 warning
+Tests: 149 passed, 0 failed, 1 warning
 - Structural tests: File/directory existence
 - Functional tests: Script execution, output validation
 - Profile tests: Core and Core+PM installation
+- Enforcement tests: Pre-commit gates, complexity limits
 ```
 
 ---

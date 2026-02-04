@@ -147,3 +147,25 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-03 18:35 - F-0114 Scope & Diff Verification
+
+**Accomplished**:
+- Implemented scope_check.sh, added diff stats to pre-commit, added 6 agent behavior principles to PRINCIPLES.md, updated WIP template with IN_SCOPE field
+
+**Next steps**:
+- Run tests, verify with validation script, commit changes
+
+**Blockers**: None
+
+
+### Session: 2026-02-04 13:05 - F-0116 Maintainability Enforcement
+
+**Accomplished**:
+- Implemented test execution gate, complexity limits, escape hatches, WIP auto-creation, frontmatter parsing, migration support
+
+**Next steps**:
+- Create PR, merge to main
+
+**Blockers**: None
+
