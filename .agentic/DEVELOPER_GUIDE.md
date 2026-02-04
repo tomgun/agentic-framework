@@ -417,7 +417,7 @@ You: "Git Agent: commit this"
 # Create worktree for second agent
 bash .agentic/tools/worktree.sh create F-0006 "Dashboard feature"
 # → Creates ../project-f-0006/ on branch feature/F-0006
-# → Auto-registers in .agentic/AGENTS_ACTIVE.md
+# → Auto-registers in .agentic-state/AGENTS_ACTIVE.md
 
 # Open new Claude/Cursor in that directory
 cd ../project-f-0006/
@@ -623,7 +623,7 @@ The framework includes 30+ automation scripts in `.agentic/tools/`.
 
 **Status:** Session continuity is now handled by standard framework files:
 - `STATUS.md` - Current focus, phase, next steps
-- `.agentic/WIP.md` - Interrupted work detection
+- `.agentic-state/WIP.md` - Interrupted work detection
 - `JOURNAL.md` - Work history
 
 Agents read these files at session start (via `ag start` or session_start.md checklist).
@@ -785,7 +785,7 @@ bash .agentic/tools/feature_graph.sh --save
 
 **What it does:**
 - Creates git worktrees for parallel agent development
-- Auto-registers agents in `.agentic/AGENTS_ACTIVE.md`
+- Auto-registers agents in `.agentic-state/AGENTS_ACTIVE.md`
 - Enables multiple Claude/Cursor windows without conflicts
 
 ```bash
@@ -1940,7 +1940,7 @@ You: "Implementation Agent: make tests pass"
 # Create worktree for Agent 2
 bash .agentic/tools/worktree.sh create F-0006 "Dashboard"
 # → Creates ../project-f-0006/ on branch feature/F-0006
-# → Registers in .agentic/AGENTS_ACTIVE.md
+# → Registers in .agentic-state/AGENTS_ACTIVE.md
 
 # Open new Claude/Cursor in ../project-f-0006/
 # Agent 2 works there, Agent 1 continues here

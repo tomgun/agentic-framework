@@ -1,0 +1,22 @@
+# Agentic Framework - Runtime State Directory
+#
+# This directory contains runtime/generated data that persists across
+# .agentic/ framework upgrades. NOT part of the framework library.
+#
+# Contents:
+#   manifests/        - Change manifests (what changed per feature) - COMMITTED
+#   WIP.md            - Work in progress tracking - NOT committed (.gitignore)
+#   AGENTS_ACTIVE.md  - Multi-agent coordination - NOT committed (.gitignore)
+#   .verification-state - Doctor verification results - NOT committed (.gitignore)
+#
+# Git tracking:
+#   - manifests/ are committed (audit trail for documentation patching)
+#   - Transient files (WIP, AGENTS_ACTIVE, .verification-state) are gitignored
+#
+# Location: Project root (outside .agentic/) to survive upgrades.
+#
+# Tools that use this:
+#   manifest.sh  - Generate manifests
+#   wip.sh       - WIP tracking
+#   doctor.py    - Verification state
+#   ag.sh        - Gateway commands

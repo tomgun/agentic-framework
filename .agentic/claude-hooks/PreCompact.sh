@@ -22,7 +22,7 @@ echo "💾 Context compaction detected - preserving state..."
 echo ""
 
 # 0. Update WIP checkpoint if exists (prevent loss of in-progress work)
-if [[ -f ".agentic/WIP.md" ]] && [[ -x ".agentic/tools/wip.sh" ]]; then
+if [[ -f ".agentic-state/WIP.md" ]] && [[ -x ".agentic/tools/wip.sh" ]]; then
   bash .agentic/tools/wip.sh checkpoint "Context compaction triggered" 2>/dev/null || true
   echo "✓ Updated WIP checkpoint"
 fi

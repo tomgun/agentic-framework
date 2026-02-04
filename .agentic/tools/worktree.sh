@@ -29,7 +29,7 @@ if [[ -z "$REPO_ROOT" ]]; then
     exit 1
 fi
 
-AGENTS_FILE="$REPO_ROOT/.agentic/AGENTS_ACTIVE.md"
+AGENTS_FILE="$REPO_ROOT/.agentic-state/AGENTS_ACTIVE.md"
 REPO_NAME=$(basename "$REPO_ROOT")
 PARENT_DIR=$(dirname "$REPO_ROOT")
 
@@ -47,7 +47,7 @@ ensure_agents_file() {
 
 <!-- No agents currently active -->
 EOF
-        echo -e "${GREEN}Created .agentic/AGENTS_ACTIVE.md${NC}"
+        echo -e "${GREEN}Created .agentic-state/AGENTS_ACTIVE.md${NC}"
     fi
 }
 
@@ -127,7 +127,7 @@ register_agent() {
 - **Status**: active
 EOF
 
-    echo -e "${GREEN}✓ Registered in .agentic/AGENTS_ACTIVE.md${NC}"
+    echo -e "${GREEN}✓ Registered in .agentic-state/AGENTS_ACTIVE.md${NC}"
 }
 
 # List active worktrees
@@ -138,11 +138,11 @@ cmd_list() {
     echo ""
 
     if [[ -f "$AGENTS_FILE" ]]; then
-        echo -e "${BLUE}Registered Agents (.agentic/AGENTS_ACTIVE.md):${NC}"
+        echo -e "${BLUE}Registered Agents (.agentic-state/AGENTS_ACTIVE.md):${NC}"
         echo ""
         grep -A5 "^### " "$AGENTS_FILE" 2>/dev/null || echo "No agents registered"
     else
-        echo -e "${YELLOW}No .agentic/AGENTS_ACTIVE.md file${NC}"
+        echo -e "${YELLOW}No .agentic-state/AGENTS_ACTIVE.md file${NC}"
     fi
 }
 
@@ -195,7 +195,7 @@ cmd_remove() {
             !skip { print }
         ' "$AGENTS_FILE" > "$AGENTS_FILE.tmp" && mv "$AGENTS_FILE.tmp" "$AGENTS_FILE"
 
-        echo -e "${GREEN}✓ Unregistered from .agentic/AGENTS_ACTIVE.md${NC}"
+        echo -e "${GREEN}✓ Unregistered from .agentic-state/AGENTS_ACTIVE.md${NC}"
     fi
 
     # Optionally delete branch
@@ -257,7 +257,7 @@ EXAMPLES:
     worktree.sh create F-0001 "User authentication"
 
     # Creates: ../project-f-0001/ on branch feature/F-0001
-    # Registers in .agentic/AGENTS_ACTIVE.md
+    # Registers in .agentic-state/AGENTS_ACTIVE.md
 
     # List all worktrees
     worktree.sh list

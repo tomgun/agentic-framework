@@ -9,7 +9,7 @@ setup_test_project "core"
 
 # Create AGENTS_ACTIVE.md showing another agent working
 mkdir -p "$TEST_PROJECT/.agentic"
-cat > "$TEST_PROJECT/.agentic/AGENTS_ACTIVE.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic-state/AGENTS_ACTIVE.md" << 'EOF'
 # Active Agents
 
 ## Agent 1 (Cursor - Window 1)

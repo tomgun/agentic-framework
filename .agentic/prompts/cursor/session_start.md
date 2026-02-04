@@ -7,7 +7,7 @@ Please help me get oriented by:
 1. Reading `STATUS.md` for current project state and focus
 2. Checking `HUMAN_NEEDED.md` for any blockers requiring my attention
 3. Reviewing recent work in `JOURNAL.md` (last 2-3 entries)
-4. Checking `.agentic/WIP.md` for any interrupted work
+4. Checking `.agentic-state/WIP.md` for any interrupted work
 5. For Core+PM mode: Check for active features in `spec/FEATURES.md` (status: in_progress)
 
 Then provide a brief summary of:

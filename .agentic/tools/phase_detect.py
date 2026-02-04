@@ -33,7 +33,7 @@ def detect_phase(root: Path) -> str:
     Returns one of:
     - "core-mode": Core profile (no feature tracking)
     - "blocked": Has unresolved blockers in HUMAN_NEEDED.md
-    - "start": No active work (no .agentic/WIP.md)
+    - "start": No active work (no .agentic-state/WIP.md)
     - "planning": Feature started but no acceptance criteria
     - "implement": Has acceptance, implementing
     - "complete": Feature shipped, awaiting validation
@@ -54,8 +54,8 @@ def detect_phase(root: Path) -> str:
         except Exception:
             pass
 
-    # Check .agentic/WIP.md for active feature (format: **Feature**: F-0001: description)
-    wip = root / ".agentic" / "WIP.md"
+    # Check .agentic-state/WIP.md for active feature (format: **Feature**: F-0001: description)
+    wip = root / ".agentic-state" / "WIP.md"
     if not wip.exists():
         return "start"
 
@@ -64,7 +64,7 @@ def detect_phase(root: Path) -> str:
     except Exception:
         return "start"
 
-    # Match .agentic/WIP.md format: **Feature**: F-0001
+    # Match .agentic-state/WIP.md format: **Feature**: F-0001
     feature_match = re.search(r"\*\*Feature\*\*:\s*(F-\d{4})", wip_content)
     if not feature_match:
         # Also try simpler format: Feature: F-0001

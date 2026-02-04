@@ -1765,6 +1765,66 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0117: Spec Migration System
+
+**Status**: shipped
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.16.0
+
+**Description**: Complete migration management for spec evolution. Migrations track HOW we arrived at current specs (not just WHAT they are). Supports create, list, show, search, and apply commands. Auto-updates `_index.json` registry and can regenerate FEATURES.md from migration history.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/migration.sh`, `spec/migrations/`
+- Tests: manual
+
+**Acceptance**: See `spec/acceptance/F-0117.md`
+
+---
+
+## F-0118: Documentation Drift Detection
+
+**Status**: shipped
+**Priority**: low
+**Complexity**: medium
+**Since**: v0.16.0
+
+**Description**: Manifest-based documentation staleness detection. Compares recently changed code files against documentation that references them, flagging docs that may be out of sync. Advisory only (never blocks). Supports manifest-specific checking and configurable tracking via STACK.md.
+
+**Dependencies**: F-0109 (Spec-Code Traceability)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/drift.sh` (--docs flag)
+- Tests: manual
+
+**Acceptance**: See `spec/acceptance/F-0118.md`
+
+---
+
+## F-0119: Feature Change Manifest Generation
+
+**Status**: shipped
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.16.0
+
+**Description**: Generate comprehensive change manifests from git history for features, branches, or date ranges. Manifests track all commits, files changed (grouped by type), and line statistics. Supports embedding into migration files. Enables documentation patching and audit trails.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/manifest.sh`, `.agentic-state/manifests/`
+- Tests: manual
+
+**Acceptance**: See `spec/acceptance/F-0119.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1779,6 +1839,6 @@ agent_mode: balanced  # premium | balanced | economy
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 5 | 1 | 1 | 7 |
-| **Total** | **78** | **2** | **1** | **81** |
+| Framework Infrastructure (F-0101+) | 8 | 1 | 1 | 10 |
+| **Total** | **81** | **2** | **1** | **84** |
 

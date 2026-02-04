@@ -15,8 +15,8 @@
 # Every command needs || true to prevent exit code errors
 cat STATUS.md 2>/dev/null || true
 cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
-cat .agentic/AGENTS_ACTIVE.md 2>/dev/null || true
-ls .agentic/WIP.md 2>/dev/null || true
+cat .agentic-state/AGENTS_ACTIVE.md 2>/dev/null || true
+ls .agentic-state/WIP.md 2>/dev/null || true
 ```
 
 ### 2. Greet User with Recap
@@ -39,7 +39,7 @@ What would you like to work on?
 
 | Situation | Response |
 |-----------|----------|
-| .agentic/WIP.md exists | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
+| .agentic-state/WIP.md exists | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
 | HUMAN_NEEDED has items | "📋 [N] items need your input" |
 | Upgrade pending | "🔄 Framework upgraded to vX.Y.Z, applying updates..." |
 
@@ -207,7 +207,7 @@ See `.agentic/agents/context-manifests/` for all role definitions
    └─ cat .agentic/.upgrade_pending (follow if exists)
    
 2. CHECK FOR WIP
-   └─ ls .agentic/WIP.md (resume if exists)
+   └─ ls .agentic-state/WIP.md (resume if exists)
    
 3. READ CONTEXT
    ├─ STATUS.md (what's current focus)
@@ -248,7 +248,7 @@ See `.agentic/agents/context-manifests/` for all role definitions
 ### Automatic Checks (ALL MUST PASS)
 
 ```
-□ No .agentic/WIP.md exists (work is complete)
+□ No .agentic-state/WIP.md exists (work is complete)
 □ All tests pass
 □ Smoke test passed (for user-facing changes)
 □ Quality checks pass (if enabled)

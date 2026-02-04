@@ -38,7 +38,7 @@ bash .agentic/tools/journal.sh \
 ```
 # First thing in Cursor composer:
 "Read .agentic/checklists/session_start.md and load context.
- Check STATUS.md for current focus and .agentic/WIP.md for interrupted work.
+ Check STATUS.md for current focus and .agentic-state/WIP.md for interrupted work.
  Continue work from where Claude left off."
 
 # Cursor reads:

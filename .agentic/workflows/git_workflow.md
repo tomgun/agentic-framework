@@ -172,12 +172,12 @@ git worktree add ../project-agent3-F0044 -b feature/F-0044
 | `spec/NFR.md` | ✅ Read-only | ❌ Don't edit |
 | `STATUS.md` | ❌ Don't use | ✅ Per-agent (your status only) |
 | `JOURNAL.md` | ❌ Don't use | ✅ Per-agent (your progress) |
-| `.agentic/AGENTS_ACTIVE.md` | ✅ Shared coordination | ⚠️ Update your entry |
+| `.agentic-state/AGENTS_ACTIVE.md` | ✅ Shared coordination | ⚠️ Update your entry |
 | Code files | ⚠️ Depends on feature | ✅ Edit freely in your feature |
 
 ### Coordination Protocol
 
-**File: `.agentic/AGENTS_ACTIVE.md` (at repo root)**
+**File: `.agentic-state/AGENTS_ACTIVE.md` (at repo root)**
 
 ```markdown
 # Active Agents
@@ -221,25 +221,25 @@ git worktree add ../project-agent3-F0044 -b feature/F-0044
 ### Agent Protocol in Multi-Agent Mode
 
 **At session start:**
-1. **Check `.agentic/AGENTS_ACTIVE.md`**: See what other agents are working on
+1. **Check `.agentic-state/AGENTS_ACTIVE.md`**: See what other agents are working on
 2. **Update your entry**: Status, last update timestamp
 3. **Check dependencies**: Is your feature blocked by another agent's work?
 4. **Check for conflicts**: Will you edit files another agent is editing?
 
 **While working:**
 1. **Stay in your worktree/branch**: Don't touch main branch
-2. **Update `.agentic/AGENTS_ACTIVE.md` every 15-30 min**: Keep others informed
+2. **Update `.agentic-state/AGENTS_ACTIVE.md` every 15-30 min**: Keep others informed
 3. **Coordinate on shared files**: If you must edit `FEATURES.md`, sync carefully
 4. **Use feature toggles**: If your code depends on incomplete features
 
 **Before committing:**
-1. **Check `.agentic/AGENTS_ACTIVE.md` again**: Any conflicts emerged?
+1. **Check `.agentic-state/AGENTS_ACTIVE.md` again**: Any conflicts emerged?
 2. **Pull latest from main**: `git fetch origin main`
 3. **Check for merge conflicts**: `git merge origin/main` (in your branch)
 4. **Resolve conflicts** (if any): Ask human for help with non-trivial conflicts
 
 **After PR merged:**
-1. **Update `.agentic/AGENTS_ACTIVE.md`**: Mark feature complete, remove entry or mark "done"
+1. **Update `.agentic-state/AGENTS_ACTIVE.md`**: Mark feature complete, remove entry or mark "done"
 2. **Notify dependent agents**: Add notes to their entries if they were waiting on you
 3. **Sync main worktree**: Main agent pulls latest into shared worktree
 
@@ -248,7 +248,7 @@ git worktree add ../project-agent3-F0044 -b feature/F-0044
 **Role**: Coordinates multiple worker agents, resolves conflicts, manages merge order
 
 **Responsibilities:**
-- Maintains `.agentic/AGENTS_ACTIVE.md`
+- Maintains `.agentic-state/AGENTS_ACTIVE.md`
 - Assigns features to worker agents
 - Monitors progress and dependencies
 - Resolves merge conflicts
@@ -335,7 +335,7 @@ multi_agent:
 ### In agent guidelines:
 
 - Read `git_workflow` from `STACK.md` before committing
-- If `multi_agent.enabled: true`, check `.agentic/AGENTS_ACTIVE.md` at session start
+- If `multi_agent.enabled: true`, check `.agentic-state/AGENTS_ACTIVE.md` at session start
 - Always get human approval before committing (unless explicitly told to auto-commit)
 
 ### Tool integration:
@@ -346,7 +346,7 @@ bash .agentic/tools/worktree.sh list
 bash .agentic/tools/worktree.sh create F-0042
 
 # Check for active agents (manual coordination)
-cat .agentic/AGENTS_ACTIVE.md
+cat .agentic-state/AGENTS_ACTIVE.md
 
 # Track work in progress
 bash .agentic/tools/wip.sh check
@@ -367,7 +367,7 @@ bash .agentic/tools/wip.sh check
 
 ### "I need to update shared docs (FEATURES.md, CONTEXT_PACK.md)"
 1. In PR mode: Do it in your PR, will be reviewed
-2. In multi-agent mode: Coordinate in `.agentic/AGENTS_ACTIVE.md` first
+2. In multi-agent mode: Coordinate in `.agentic-state/AGENTS_ACTIVE.md` first
 3. Keep changes minimal and scoped to your feature
 
 ## Escape Hatches
@@ -404,7 +404,7 @@ SKIP_TESTS=1 git commit -m "WIP: partial implementation, tests broken"
 **ALWAYS:**
 - Get human review before committing
 - Respect branch protection rules
-- Check `.agentic/AGENTS_ACTIVE.md` before force operations
+- Check `.agentic-state/AGENTS_ACTIVE.md` before force operations
 - Ask before deleting any branch
 
 ## Examples
@@ -467,24 +467,24 @@ multi_agent:
 
 **Agent 1 session:**
 ```
-Agent1: [reads .agentic/AGENTS_ACTIVE.md]
+Agent1: [reads .agentic-state/AGENTS_ACTIVE.md]
 Agent1: "I see Agent 2 is working on F-0043 (profile page).
          I'm assigned F-0042 (auth). No conflicts expected.
          Starting implementation in worktree ../project-agent1-F0042..."
 [... works on F-0042 ...]
-Agent1: [updates .agentic/AGENTS_ACTIVE.md with progress]
+Agent1: [updates .agentic-state/AGENTS_ACTIVE.md with progress]
 Agent1: "F-0042 complete. Creating PR..."
 ```
 
 **Agent 2 session (blocked by Agent 1):**
 ```
-Agent2: [reads .agentic/AGENTS_ACTIVE.md]
+Agent2: [reads .agentic-state/AGENTS_ACTIVE.md]
 Agent2: "I'm working on F-0043 (profile page).
          This depends on F-0042 (auth) which Agent 1 is finishing.
          I'll start with the UI/routing parts that don't need auth yet.
          Will integrate auth after Agent 1's PR merges."
 [... works on independent parts ...]
-Agent2: [updates .agentic/AGENTS_ACTIVE.md: "Blocked by F-0042, proceeding with UI"]
+Agent2: [updates .agentic-state/AGENTS_ACTIVE.md: "Blocked by F-0042, proceeding with UI"]
 ```
 
 ## References

@@ -143,7 +143,7 @@ Profile: core
 EOF
 mkdir -p "$TEST_DIR/.agentic"
 bash "$TEST_DIR/.agentic/tools/ag.sh" work "Test task" >/dev/null 2>&1 || true
-if [[ -f "$TEST_DIR/.agentic/WIP.md" ]]; then
+if [[ -f "$TEST_DIR/.agentic-state/WIP.md" ]]; then
     pass
 else
     fail "WIP.md not created"
@@ -160,7 +160,7 @@ cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: core
 EOF
 mkdir -p "$TEST_DIR/.agentic"
-echo "test" > "$TEST_DIR/.agentic/WIP.md"
+echo "test" > "$TEST_DIR/.agentic-state/WIP.md"
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" commit 2>&1) || true
 if echo "$output" | grep -q "WARNING"; then
     pass
@@ -173,7 +173,7 @@ test_case "ag commit: Core+PM profile shows BLOCKED for WIP"
 setup_test_env
 mkdir -p "$TEST_DIR/spec"
 mkdir -p "$TEST_DIR/.agentic"
-echo "test" > "$TEST_DIR/.agentic/WIP.md"
+echo "test" > "$TEST_DIR/.agentic-state/WIP.md"
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" commit 2>&1) || true
 if echo "$output" | grep -q "BLOCKED"; then
     pass
@@ -186,7 +186,7 @@ test_case "ag commit: Core+PM exits non-zero when blocked"
 setup_test_env
 mkdir -p "$TEST_DIR/spec"
 mkdir -p "$TEST_DIR/.agentic"
-echo "test" > "$TEST_DIR/.agentic/WIP.md"
+echo "test" > "$TEST_DIR/.agentic-state/WIP.md"
 result=0
 bash "$TEST_DIR/.agentic/tools/ag.sh" commit >/dev/null 2>&1 || result=$?
 if [[ $result -ne 0 ]]; then
