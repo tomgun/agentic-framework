@@ -8,6 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.16.0] - 2026-02-04
 
 ### Added
+- **Spec Migration System (F-0117)** - Complete migration management for spec evolution
+  - `migration.sh create "title"` - Creates numbered migration files with template
+  - `migration.sh list` - Lists all migrations with dates
+  - `migration.sh show N` - Displays specific migration
+  - `migration.sh search "term"` - Searches migrations by keyword
+  - `migration.sh apply` - Regenerates FEATURES.md from migrations
+  - Auto-updates `_index.json` registry
+  - Parses Features Added/Modified/Deprecated sections
+  - Detects shipped status from acceptance criteria
+
+- **Documentation Drift Detection (F-0118)** - Manifest-based doc staleness detection
+  - `drift.sh --docs` - Detects when docs may be out of sync with code changes
+  - `drift.sh --docs --manifest F-XXXX` - Checks against specific feature manifest
+  - Advisory only (never blocks)
+  - Shows "potentially stale" vs "updated" documentation
+  - Configurable via `doc_tracking:` in STACK.md
+
 - **Maintainability Enforcement Gates (F-0116)** - Automated quality enforcement
   - **Test Execution Gate** (BLOCKING) - Pre-commit runs tests from STACK.md
     - Reads `test_fast:` (preferred) or `test:` commands

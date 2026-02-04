@@ -9,6 +9,8 @@
 #   bash .agentic/tools/drift.sh --check   # Check only, no prompts (CI mode)
 #   bash .agentic/tools/drift.sh --report  # Generate drift report
 #   bash .agentic/tools/drift.sh --json    # JSON output (machine-readable)
+#   bash .agentic/tools/drift.sh --docs    # Check documentation drift
+#   bash .agentic/tools/drift.sh --docs --manifest F-XXXX  # Check against specific manifest
 #
 # Note: Not using set -e because grep returns 1 when no matches (expected behavior)
 set -uo pipefail
@@ -28,6 +30,31 @@ NC='\033[0m'
 MODE="${1:-interactive}"
 DRIFT_COUNT=0
 FIXED_COUNT=0
+DOCS_MODE=false
+MANIFEST_FEATURE=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --docs)
+            DOCS_MODE=true
+            MODE="--docs"
+            shift
+            ;;
+        --manifest)
+            shift
+            MANIFEST_FEATURE="${1:-}"
+            shift
+            ;;
+        --check|--report|--json|interactive)
+            MODE="$1"
+            shift
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
 
 # JSON output collection
 JSON_ISSUES=()
@@ -367,8 +394,8 @@ check_status_drift() {
     fi
 
     # Check for WIP.md without STATUS.md mention
-    if [[ -f "$ROOT_DIR/.agentic/WIP.md" ]]; then
-        local wip_feature=$(grep -E "^Feature:" "$ROOT_DIR/.agentic/WIP.md" 2>/dev/null | head -1 | sed 's/Feature: //')
+    if [[ -f "$ROOT_DIR/.agentic-state/WIP.md" ]]; then
+        local wip_feature=$(grep -E "^Feature:" "$ROOT_DIR/.agentic-state/WIP.md" 2>/dev/null | head -1 | sed 's/Feature: //')
         if [[ -n "$wip_feature" ]]; then
             if ! grep -q "$wip_feature" "$status_file" 2>/dev/null; then
                 log_drift "WIP.md has '$wip_feature' but STATUS.md doesn't mention it"
@@ -738,6 +765,186 @@ check_template_markers() {
 }
 
 #=============================================================================
+# Drift Detection: Documentation ↔ Code (--docs mode)
+#=============================================================================
+
+check_documentation_drift() {
+    echo ""
+    echo "╔═══════════════════════════════════════════════════════════════╗"
+    echo "║         Documentation Drift Detection                          ║"
+    echo "╚═══════════════════════════════════════════════════════════════╝"
+    echo ""
+
+    local changed_files=()
+    local manifest_dir="$ROOT_DIR/.agentic-state/manifests"
+
+    # Get changed files from manifest or git
+    if [[ -n "$MANIFEST_FEATURE" && -d "$manifest_dir" ]]; then
+        echo -e "${BLUE}Using manifest:${NC} $MANIFEST_FEATURE"
+        local manifest_file="$manifest_dir/${MANIFEST_FEATURE}.json"
+        if [[ -f "$manifest_file" ]]; then
+            # Extract changed files from manifest JSON
+            while IFS= read -r file; do
+                [[ -n "$file" ]] && changed_files+=("$file")
+            done < <(grep -oE '"file":\s*"[^"]+"' "$manifest_file" | sed 's/"file":\s*"//' | sed 's/"$//' || true)
+        else
+            echo -e "${YELLOW}Warning:${NC} Manifest $manifest_file not found"
+            echo "  Falling back to recent git changes..."
+        fi
+    fi
+
+    # Fallback: get recently changed files from git
+    if [[ ${#changed_files[@]} -eq 0 ]]; then
+        echo -e "${BLUE}Checking:${NC} Recent code changes (last 7 days)"
+        while IFS= read -r file; do
+            [[ -n "$file" ]] && changed_files+=("$file")
+        done < <(git log --name-only --since="7 days ago" --pretty=format: 2>/dev/null | grep -E '\.(ts|tsx|js|jsx|py|go|rs|java|rb|sh)$' | sort -u | head -50 || true)
+    fi
+
+    if [[ ${#changed_files[@]} -eq 0 ]]; then
+        echo -e "${GREEN}✓${NC} No recent code changes to check"
+        return 0
+    fi
+
+    echo ""
+    echo -e "${BLUE}Files changed (${#changed_files[@]}):${NC}"
+    for f in "${changed_files[@]:0:10}"; do
+        echo "  - $f"
+    done
+    if [[ ${#changed_files[@]} -gt 10 ]]; then
+        echo "  ... and $((${#changed_files[@]} - 10)) more"
+    fi
+    echo ""
+
+    # Find documentation files
+    local doc_files=()
+    for pattern in "*.md" "docs/**/*.md" "README.md" "CONTEXT_PACK.md"; do
+        while IFS= read -r f; do
+            [[ -f "$ROOT_DIR/$f" ]] && doc_files+=("$f")
+        done < <(cd "$ROOT_DIR" && find . -name "*.md" -type f 2>/dev/null | grep -vE '(node_modules|\.git|vendor|spec/migrations)' | sed 's|^\./||' | head -100 || true)
+    done
+
+    # Remove duplicates
+    doc_files=($(printf '%s\n' "${doc_files[@]}" | sort -u))
+
+    echo -e "${BLUE}Checking against ${#doc_files[@]} documentation files${NC}"
+    echo ""
+
+    # Extract keywords from changed code files
+    local code_keywords=()
+    for code_file in "${changed_files[@]}"; do
+        [[ ! -f "$ROOT_DIR/$code_file" ]] && continue
+
+        # Extract meaningful identifiers from filename
+        local basename
+        basename=$(basename "$code_file" | sed 's/\.[^.]*$//')
+        [[ -n "$basename" && ${#basename} -gt 2 ]] && code_keywords+=("$basename")
+
+        # Extract function/class names (simplified)
+        while IFS= read -r name; do
+            [[ -n "$name" && ${#name} -gt 3 ]] && code_keywords+=("$name")
+        done < <(grep -ohE '(function|class|def|const|export)\s+[A-Za-z_][A-Za-z0-9_]*' "$ROOT_DIR/$code_file" 2>/dev/null | awk '{print $2}' | head -20 || true)
+    done
+
+    # Remove duplicates and common words
+    code_keywords=($(printf '%s\n' "${code_keywords[@]}" | sort -u | grep -vE '^(test|spec|index|main|app|config|utils|helper|const|function|class|export|default)$' | head -30))
+
+    if [[ ${#code_keywords[@]} -eq 0 ]]; then
+        echo -e "${GREEN}✓${NC} No significant code identifiers to check"
+        return 0
+    fi
+
+    # Check documentation for mentions of changed code
+    local stale_docs=()
+    local updated_docs=()
+    local doc_drift_count=0
+
+    for doc_file in "${doc_files[@]}"; do
+        [[ ! -f "$ROOT_DIR/$doc_file" ]] && continue
+
+        local doc_content
+        doc_content=$(cat "$ROOT_DIR/$doc_file" 2>/dev/null || true)
+        local doc_mentions=false
+
+        # Check if doc mentions any of our code keywords
+        for keyword in "${code_keywords[@]}"; do
+            if echo "$doc_content" | grep -qi "$keyword"; then
+                doc_mentions=true
+                break
+            fi
+        done
+
+        if [[ "$doc_mentions" == true ]]; then
+            # Doc mentions changed code - check if it was updated recently
+            local doc_modified=false
+            if [[ -n "$MANIFEST_FEATURE" ]]; then
+                # Check if doc was in the same manifest
+                if echo "${changed_files[*]}" | grep -q "$doc_file"; then
+                    doc_modified=true
+                fi
+            else
+                # Check git log
+                local doc_changes
+                doc_changes=$(git log --since="7 days ago" --oneline -- "$ROOT_DIR/$doc_file" 2>/dev/null | wc -l | tr -d ' ')
+                [[ "$doc_changes" -gt 0 ]] && doc_modified=true
+            fi
+
+            if [[ "$doc_modified" == true ]]; then
+                updated_docs+=("$doc_file")
+            else
+                stale_docs+=("$doc_file")
+                ((doc_drift_count++))
+            fi
+        fi
+    done
+
+    # Report results
+    echo "═══════════════════════════════════════════════════════════════"
+    echo -e "${BLUE}📄 Documentation Drift Report${NC}"
+    echo "═══════════════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ ${#updated_docs[@]} -gt 0 ]]; then
+        echo -e "${GREEN}✓ Updated docs (likely in sync):${NC}"
+        for doc in "${updated_docs[@]}"; do
+            echo "    ✓ $doc"
+        done
+        echo ""
+    fi
+
+    if [[ ${#stale_docs[@]} -gt 0 ]]; then
+        echo -e "${YELLOW}⚠ Potentially stale docs (mention changed code but weren't updated):${NC}"
+        for doc in "${stale_docs[@]}"; do
+            echo "    ⚠ $doc"
+            add_json_issue "doc_drift" "Documentation may be stale - mentions changed code" "$doc" "" "reason" "not_updated"
+            ((DRIFT_COUNT++))
+        done
+        echo ""
+        echo -e "${CYAN}Recommendation:${NC} Review flagged docs for accuracy."
+        echo "  These docs reference code that changed but weren't updated themselves."
+        echo ""
+    else
+        echo -e "${GREEN}✓ No documentation drift detected${NC}"
+        echo "  All docs that mention changed code were also updated."
+    fi
+
+    echo "═══════════════════════════════════════════════════════════════"
+    echo ""
+
+    # STACK.md tracking hint
+    if [[ ${#stale_docs[@]} -gt 3 ]]; then
+        echo -e "${CYAN}Tip:${NC} Configure doc tracking in STACK.md to reduce false positives:"
+        echo ""
+        echo "  doc_tracking:"
+        echo "    - docs: docs/api.md"
+        echo "      tracks: src/api/**"
+        echo "    - docs: README.md"
+        echo "      tracks: src/index.ts, package.json"
+        echo ""
+    fi
+}
+
+#=============================================================================
 # JSON Output
 #=============================================================================
 
@@ -786,6 +993,16 @@ EOF
 #=============================================================================
 
 main() {
+    # Handle --docs mode separately
+    if [[ "$DOCS_MODE" == "true" ]]; then
+        check_documentation_drift
+        if [[ $DRIFT_COUNT -gt 0 ]]; then
+            echo -e "${YELLOW}Found $DRIFT_COUNT potential documentation drift issue(s).${NC}"
+            echo "  (Advisory only - review recommended)"
+        fi
+        return 0
+    fi
+
     if [[ "$JSON_MODE" != "true" ]]; then
         echo ""
         echo "╔═══════════════════════════════════════════════════════════════╗"

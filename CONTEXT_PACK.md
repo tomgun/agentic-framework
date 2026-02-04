@@ -60,6 +60,8 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
     - `feature.sh` - Field updates to FEATURES.md
     - `blocker.sh` - Append-only HUMAN_NEEDED.md updates
     - `wip.sh` - Work-in-progress tracking
+    - `migration.sh` - Spec migration management (create/list/show/search/apply)
+    - `drift.sh --docs` - Documentation drift detection
 - Data flow: Framework installed → Project initialized → Agents follow guidelines → Quality gates enforced
 - External dependencies: None (pure bash/Python, no npm/pip packages)
 
@@ -70,11 +72,11 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 
 ## State files
 - `.agentic/state/status.json` - Fast status updates (JSON backend)
-- `.agentic/WIP.md` - Work-in-progress tracking (recovery)
-- `.agentic/AGENTS_ACTIVE.md` - Multi-agent coordination
+- `.agentic-state/WIP.md` - Work-in-progress tracking (recovery)
+- `.agentic-state/AGENTS_ACTIVE.md` - Multi-agent coordination
 
 ## Known risks / sharp edges
-- Multiple agents can work simultaneously - must coordinate via `.agentic/AGENTS_ACTIVE.md`
+- Multiple agents can work simultaneously - must coordinate via `.agentic-state/AGENTS_ACTIVE.md`
 - Template changes affect ALL future projects - test in scratch first
 - Version references scattered across files - update ALL on release
 - Upgrade path must preserve user customizations
