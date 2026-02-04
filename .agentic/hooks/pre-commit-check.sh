@@ -8,15 +8,21 @@
 #   bash .agentic/hooks/pre-commit-check.sh
 #
 # Checks:
-#   1. .agentic/WIP.md must not exist (work must be complete)
-#   2. Shipped features must have acceptance criteria
-#   3. In-progress features must have recent JOURNAL entry (<24h)
-#   4. STACK.md version matches reality (where detectable)
-#   5. Batch size warning (>10 files = too large, should re-plan)
-#   6. Untracked files warning (new files not git added)
-#   7. LLM behavioral test status (advisory, framework dev only)
-#   8. Agent instruction file size limits (prevents context bloat)
-#   9. Branch policy for PR workflow (blocks commit to main if pull_request mode)
+#   1.  .agentic/WIP.md must not exist (work must be complete)
+#   2.  Shipped features must have acceptance criteria
+#   3.  In-progress features must have recent JOURNAL entry (<24h)
+#   4.  STACK.md version matches reality (where detectable)
+#   5.  Batch size warning (>10 files = too large, should re-plan)
+#   6.  Test execution (BLOCKING - tests must pass)
+#   7.  Complexity limits (BLOCKING - max files, lines, file length)
+#   8.  Untracked files warning (new files not git added)
+#   9.  LLM behavioral test status (advisory, framework dev only)
+#   10. Agent instruction file size limits (prevents context bloat)
+#   11. Branch policy for PR workflow (blocks commit to main if pull_request mode)
+#
+# Escape hatches (use sparingly, blocked on main/master):
+#   SKIP_TESTS=1      Skip test execution
+#   SKIP_COMPLEXITY=1 Skip complexity limits
 #
 # Exit codes:
 #   0 - All checks pass, commit allowed
@@ -26,6 +32,37 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${PROJECT_ROOT}"
+
+# === Escape Hatches ===
+# For legitimate bypasses (WIP branches, urgent hotfixes)
+# NEVER use on main/master - blocked below
+
+CURRENT_BRANCH=""
+if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+fi
+
+# Block escape hatches on main/master
+if [[ "$CURRENT_BRANCH" == "main" || "$CURRENT_BRANCH" == "master" ]]; then
+  if [[ -n "${SKIP_TESTS:-}" || -n "${SKIP_COMPLEXITY:-}" ]]; then
+    echo "❌ BLOCKED: Cannot use SKIP_* environment variables on $CURRENT_BRANCH"
+    echo "   Escape hatches are only allowed on feature branches."
+    exit 1
+  fi
+fi
+
+# Show escape hatch warnings
+if [[ -n "${SKIP_TESTS:-}" ]]; then
+  echo "⚠️  SKIP_TESTS set - skipping test execution"
+  echo "   Only use for WIP commits on feature branches!"
+  echo ""
+fi
+
+if [[ -n "${SKIP_COMPLEXITY:-}" ]]; then
+  echo "⚠️  SKIP_COMPLEXITY set - skipping complexity limits"
+  echo "   Only use for large refactors with review!"
+  echo ""
+fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
@@ -62,7 +99,7 @@ fi
 FAILURES=0
 
 # Check 1: .agentic/WIP.md must not exist
-echo "[1/9] Checking for incomplete work (.agentic/WIP.md)..."
+echo "[1/11] Checking for incomplete work (.agentic/WIP.md)..."
 if [[ -f ".agentic/WIP.md" ]]; then
   echo "❌ BLOCKED: .agentic/WIP.md exists - work is incomplete!"
   echo ""
@@ -81,7 +118,7 @@ fi
 # Check 2: Shipped features must have acceptance criteria
 if [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[2/9] Checking shipped features have acceptance criteria..."
+  echo "[2/11] Checking shipped features have acceptance criteria..."
   
   # Extract feature IDs marked as shipped
   SHIPPED_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: shipped" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
@@ -114,13 +151,13 @@ if [[ -f "spec/FEATURES.md" ]]; then
   fi
 else
   echo ""
-  echo "[2/9] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
+  echo "[2/11] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
 fi
 
 # Check 3: In-progress features must have recent JOURNAL entry
 if [[ -f "spec/FEATURES.md" ]] && [[ -f "JOURNAL.md" ]]; then
   echo ""
-  echo "[3/9] Checking in-progress features have recent activity..."
+  echo "[3/11] Checking in-progress features have recent activity..."
   
   IN_PROGRESS_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: in_progress" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
   
@@ -157,13 +194,13 @@ if [[ -f "spec/FEATURES.md" ]] && [[ -f "JOURNAL.md" ]]; then
   fi
 else
   echo ""
-  echo "[3/9] Skipping in-progress features check (no spec/FEATURES.md or JOURNAL.md)"
+  echo "[3/11] Skipping in-progress features check (no spec/FEATURES.md or JOURNAL.md)"
 fi
 
 # Check 4: STACK.md version sanity (where detectable)
 if [[ -f "STACK.md" ]]; then
   echo ""
-  echo "[4/9] Checking STACK.md version consistency..."
+  echo "[4/11] Checking STACK.md version consistency..."
   
   # Example: Check Node.js version if package.json exists
   if [[ -f "package.json" ]] && command -v node >/dev/null 2>&1; then
@@ -193,12 +230,12 @@ if [[ -f "STACK.md" ]]; then
   fi
 else
   echo ""
-  echo "[4/9] Skipping STACK.md check (file not found)"
+  echo "[4/11] Skipping STACK.md check (file not found)"
 fi
 
 # Check 5: Batch size warning (small batches = quality)
 echo ""
-echo "[5/9] Checking batch size (small batches = quality)..."
+echo "[5/11] Checking batch size (small batches = quality)..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   # Count staged files
@@ -228,15 +265,184 @@ else
   echo "✓ Git not available (skipping batch size check)"
 fi
 
-# Check 6: Untracked files in project directories
+# Check 6: Test execution (BLOCKING)
 echo ""
-echo "[6/9] Checking for untracked files in project directories..."
+echo "═══════════════════════════════════════════════════════════════════════"
+echo "[6/11] Running tests..."
+
+if [[ -n "${SKIP_TESTS:-}" ]]; then
+  echo "  ⚠ Skipped (SKIP_TESTS set)"
+else
+  # Prefer fast tests for pre-commit, fall back to full test command
+  TEST_CMD=""
+  if [[ -f "STACK.md" ]]; then
+    TEST_CMD=$(grep -iE "^[- ]*test_fast:" "STACK.md" 2>/dev/null | head -1 | sed 's/.*: *//' || true)
+    if [[ -z "$TEST_CMD" ]]; then
+      TEST_CMD=$(grep -iE "^[- ]*test:" "STACK.md" 2>/dev/null | head -1 | sed 's/.*: *//' || true)
+    fi
+  fi
+
+  if [[ -n "$TEST_CMD" ]]; then
+    # Security: Only allow known test runners (whitelist)
+    case "$TEST_CMD" in
+      pytest*|python\ -m\ pytest*|python3\ -m\ pytest*|\
+      npm\ test*|npm\ run\ test*|yarn\ test*|pnpm\ test*|\
+      cargo\ test*|go\ test*|\
+      bash\ tests/*|bash\ validate*|./tests/*|\
+      ruby\ -r*|rspec*|bundle\ exec\ rspec*|\
+      jest*|npx\ jest*|\
+      make\ test*|\
+      swift\ test*|dotnet\ test*|\
+      gradle\ test*|./gradlew\ test*|\
+      mvn\ test*|./mvnw\ test*)
+        # Portable timeout (macOS uses gtimeout from coreutils)
+        TEST_TIMEOUT=${TEST_TIMEOUT:-300}
+        run_with_timeout() {
+          local timeout_val="$1"
+          local cmd="$2"
+          if command -v timeout &>/dev/null; then
+            timeout "$timeout_val" bash -c "$cmd"
+          elif command -v gtimeout &>/dev/null; then
+            gtimeout "$timeout_val" bash -c "$cmd"
+          else
+            # No timeout available, run without
+            bash -c "$cmd"
+          fi
+        }
+
+        echo "  Running: $TEST_CMD"
+        if TEST_OUTPUT=$(run_with_timeout "$TEST_TIMEOUT" "$TEST_CMD" 2>&1); then
+          echo "  ✓ Tests passed"
+        else
+          TEST_EXIT_CODE=$?
+          echo "  ❌ BLOCKED: Tests failed"
+          if [[ $TEST_EXIT_CODE -eq 124 ]]; then
+            echo "     (Timed out after ${TEST_TIMEOUT}s)"
+          fi
+          echo "  Last 15 lines of output:"
+          echo "$TEST_OUTPUT" | tail -15 | sed 's/^/    /'
+          FAILURES=$((FAILURES + 1))
+        fi
+        ;;
+      *)
+        echo "  ⚠ Unknown test command format: $TEST_CMD"
+        echo "    Allowed: pytest, npm test, cargo test, go test, bash tests/*, jest, etc."
+        echo "    Add to whitelist in pre-commit-check.sh if this is a legitimate test runner"
+        ;;
+    esac
+  else
+    echo "  ⚠ No test command found in STACK.md"
+    echo "    Add 'test_fast: <quick tests>' for pre-commit checks"
+    echo "    Add 'test: <full suite>' for CI"
+  fi
+fi
+
+# Check 7: Complexity limits (BLOCKING)
+echo ""
+echo "═══════════════════════════════════════════════════════════════════════"
+echo "[7/11] Checking complexity limits..."
+
+if [[ -n "${SKIP_COMPLEXITY:-}" ]]; then
+  echo "  ⚠ Skipped (SKIP_COMPLEXITY set)"
+else
+  COMPLEXITY_FAILURES=0
+
+  # Read limits from STACK.md (with sensible defaults)
+  MAX_FILES=10
+  MAX_ADDED_LINES=500
+  MAX_CODE_FILE_LEN=500
+
+  if [[ -f "STACK.md" ]]; then
+    STACK_MAX_FILES=$(grep -iE "max_files_per_commit" "STACK.md" 2>/dev/null | grep -oE '[0-9]+' | head -1 || true)
+    [[ -n "$STACK_MAX_FILES" ]] && MAX_FILES=$STACK_MAX_FILES
+
+    STACK_MAX_LINES=$(grep -iE "max_added_lines" "STACK.md" 2>/dev/null | grep -oE '[0-9]+' | head -1 || true)
+    [[ -n "$STACK_MAX_LINES" ]] && MAX_ADDED_LINES=$STACK_MAX_LINES
+
+    STACK_MAX_FILE_LEN=$(grep -iE "max_code_file_length" "STACK.md" 2>/dev/null | grep -oE '[0-9]+' | head -1 || true)
+    [[ -n "$STACK_MAX_FILE_LEN" ]] && MAX_CODE_FILE_LEN=$STACK_MAX_FILE_LEN
+  fi
+
+  if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+    # Count staged files (excluding deletions)
+    STAGED_COUNT=$(git diff --cached --name-only --diff-filter=d 2>/dev/null | wc -l | tr -d ' ')
+    if [[ $STAGED_COUNT -gt $MAX_FILES ]]; then
+      echo "  ❌ BLOCKED: $STAGED_COUNT files staged (max: $MAX_FILES)"
+      echo "     Split into smaller commits for easier review and safer rollback"
+      COMPLEXITY_FAILURES=$((COMPLEXITY_FAILURES + 1))
+    else
+      echo "  ✓ File count: $STAGED_COUNT/$MAX_FILES"
+    fi
+
+    # Count ADDED lines only (not total file size, not deletions)
+    ADDED_LINES=$(git diff --cached --numstat 2>/dev/null | awk '{sum += $1} END {print sum+0}')
+    if [[ $ADDED_LINES -gt $MAX_ADDED_LINES ]]; then
+      echo "  ❌ BLOCKED: $ADDED_LINES lines added (max: $MAX_ADDED_LINES)"
+      echo "     Split into smaller commits"
+      COMPLEXITY_FAILURES=$((COMPLEXITY_FAILURES + 1))
+    else
+      echo "  ✓ Added lines: $ADDED_LINES/$MAX_ADDED_LINES"
+    fi
+
+    # File-type aware length limits (configurable code extensions)
+    CODE_EXTENSIONS="py|js|ts|tsx|jsx|go|rs|rb|java|c|cpp|h|sh|swift|kt|scala|cs|php|vue|svelte"
+    if [[ -f "STACK.md" ]]; then
+      STACK_CODE_EXT=$(grep -iE "code_extensions:" "STACK.md" 2>/dev/null | sed 's/.*: *//' | tr ',' '|' || true)
+      [[ -n "$STACK_CODE_EXT" ]] && CODE_EXTENSIONS="$STACK_CODE_EXT"
+    fi
+
+    LONG_FILES=0
+    while IFS= read -r file; do
+      if [[ -f "$file" ]] && [[ "$file" =~ \.($CODE_EXTENSIONS)$ ]]; then
+        LINES=$(wc -l < "$file" 2>/dev/null | tr -d ' ')
+        if [[ $LINES -gt $MAX_CODE_FILE_LEN ]]; then
+          echo "  ❌ BLOCKED: $file has $LINES lines (max for code: $MAX_CODE_FILE_LEN)"
+          LONG_FILES=$((LONG_FILES + 1))
+        fi
+      fi
+    done < <(git diff --cached --name-only --diff-filter=d 2>/dev/null)
+
+    if [[ $LONG_FILES -gt 0 ]]; then
+      COMPLEXITY_FAILURES=$((COMPLEXITY_FAILURES + 1))
+    else
+      echo "  ✓ File lengths within limits"
+    fi
+
+    # Optional: Run complexity tool if configured (whitelist only)
+    if [[ -f "STACK.md" ]]; then
+      COMPLEXITY_CMD=$(grep -iE "complexity_check:" "STACK.md" 2>/dev/null | sed 's/.*: *//' || true)
+      if [[ -n "$COMPLEXITY_CMD" ]]; then
+        case "$COMPLEXITY_CMD" in
+          radon*|complexity-report*|gocyclo*|eslint*|lizard*|sonar*)
+            echo "  Running complexity analysis: $COMPLEXITY_CMD"
+            if ! bash -c "$COMPLEXITY_CMD" 2>/dev/null; then
+              echo "  ⚠ Complexity warning (non-blocking)"
+            fi
+            ;;
+          *)
+            echo "  ⚠ Unknown complexity tool: $COMPLEXITY_CMD (skipped)"
+            ;;
+        esac
+      fi
+    fi
+  else
+    echo "  ✓ Git not available (skipping complexity check)"
+  fi
+
+  if [[ $COMPLEXITY_FAILURES -gt 0 ]]; then
+    FAILURES=$((FAILURES + COMPLEXITY_FAILURES))
+  fi
+fi
+
+# Check 8: Untracked files in project directories
+echo ""
+echo "[8/11] Checking for untracked files in project directories..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   # Directories that should typically have files tracked
   CHECK_DIRS=("src" "lib" "app" "assets" "public" "tests" "test" "spec" "docs" "scripts")
   
-  UNTRACKED=$(git status --porcelain 2>/dev/null | grep '^??' | cut -c4-)
+  UNTRACKED=$(git status --porcelain 2>/dev/null | grep '^??' | cut -c4- || true)
   
   if [[ -n "$UNTRACKED" ]]; then
     RELEVANT=""
@@ -273,10 +479,10 @@ else
   echo "✓ Git not available (skipping untracked check)"
 fi
 
-# Check 7: LLM behavioral test status (advisory, framework development only)
+# Check 9: LLM behavioral test status (advisory, framework development only)
 if [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/LLM_TEST_RESULTS.md" ]]; then
   echo ""
-  echo "[7/9] Checking LLM behavioral test status..."
+  echo "[9/11] Checking LLM behavioral test status..."
   if bash .agentic/tools/llm-test-status.sh --quiet 2>/dev/null; then
     echo "✓ LLM behavioral tests are current"
   else
@@ -286,9 +492,9 @@ if [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/LLM_TEST_RESULTS
   fi
 fi
 
-# Check 8: Agent instruction file size limits (prevents context bloat)
+# Check 10: Agent instruction file size limits (prevents context bloat)
 echo ""
-echo "[8/9] Checking agent instruction file sizes..."
+echo "[10/11] Checking agent instruction file sizes..."
 
 SIZE_WARNINGS=0
 
@@ -322,9 +528,9 @@ if [[ $SIZE_WARNINGS -gt 0 ]]; then
   echo "   (File size warnings are advisory, not blocking commit)"
 fi
 
-# Check 9: Branch policy for PR workflow (BLOCKS commit to main/master)
+# Check 11: Branch policy for PR workflow (BLOCKS commit to main/master)
 echo ""
-echo "[9/9] Checking branch policy..."
+echo "[11/11] Checking branch policy..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)

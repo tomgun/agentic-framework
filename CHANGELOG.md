@@ -5,6 +5,44 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] - 2026-02-04
+
+### Added
+- **Maintainability Enforcement Gates (F-0116)** - Automated quality enforcement
+  - **Test Execution Gate** (BLOCKING) - Pre-commit runs tests from STACK.md
+    - Reads `test_fast:` (preferred) or `test:` commands
+    - Whitelist-based execution for security (pytest, npm test, cargo test, etc.)
+    - Timeout protection with macOS/Linux compatibility
+  - **Complexity Limits Gate** (BLOCKING) - Enforces small batch development
+    - `max_files_per_commit` (default: 10)
+    - `max_added_lines` (default: 500) - counts additions only, not deletions
+    - `max_code_file_length` (default: 500)
+    - File-type aware (only checks code extensions)
+  - **Escape Hatches** for legitimate bypasses
+    - `SKIP_TESTS=1` and `SKIP_COMPLEXITY=1` environment variables
+    - BLOCKED on main/master branches (only allowed on feature branches)
+
+- **WIP Auto-Creation** - `wip.sh start F-XXXX --auto` creates minimal WIP tracking
+
+- **Acceptance Frontmatter Parsing** - doctor.py parses YAML frontmatter from acceptance files
+  - Graceful fallback to regex if PyYAML not installed
+  - `validate_acceptance_tests()` function for validation commands
+
+- **Migration Support** - upgrade.sh now adds:
+  - Complexity limits section to STACK.md
+  - Frontmatter to acceptance files missing it
+
+### Changed
+- Pre-commit check now has 11 checks (was 9)
+- Core profile now enforces tests and complexity (previously lighter)
+- Updated CLAUDE.md enforcement table with new gates
+- Updated agent_operating_guidelines.md with Core profile clarification
+
+### Fixed
+- `grep '^??'` failing with pipefail when no untracked files (added `|| true`)
+
+---
+
 ## [0.15.0] - 2026-02-01
 
 ### Added

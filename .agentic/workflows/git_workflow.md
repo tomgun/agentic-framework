@@ -370,6 +370,27 @@ bash .agentic/tools/wip.sh check
 2. In multi-agent mode: Coordinate in `.agentic/AGENTS_ACTIVE.md` first
 3. Keep changes minimal and scoped to your feature
 
+## Escape Hatches
+
+For legitimate bypasses (WIP branches, urgent hotfixes):
+
+| Variable | Effect | When to Use |
+|----------|--------|-------------|
+| `SKIP_TESTS=1` | Skip test execution | WIP commits, broken test suite |
+| `SKIP_COMPLEXITY=1` | Skip file/line limits | Large refactors |
+
+**Rules:**
+- NEVER use on main/master (blocked by hook)
+- ALWAYS document why in commit message
+- ALWAYS clean up before PR merge
+
+**Example:**
+```bash
+SKIP_TESTS=1 git commit -m "WIP: partial implementation, tests broken"
+```
+
+---
+
 ## Security & Safety
 
 **NEVER:**
@@ -378,6 +399,7 @@ bash .agentic/tools/wip.sh check
 - Delete branches other agents are using
 - Rewrite history (`git rebase`, `git reset --hard`) in shared branches
 - Skip hooks (`--no-verify`) without explicit permission
+- Use escape hatches (SKIP_*) on main/master
 
 **ALWAYS:**
 - Get human review before committing

@@ -201,9 +201,21 @@ If interrupted work detected:
 
 ## Profile-Specific Workflows
 
-### Core Profile (minimal tracking)
+### Core Profile (Discovery Mode)
 
 **Files exist**: STACK.md, CONTEXT_PACK.md, STATUS.md, JOURNAL.md, HUMAN_NEEDED.md
+
+**No formal feature tracking** (no F-#### IDs required, no acceptance criteria files)
+
+**STILL ENFORCED**:
+- **Tests for changed code**: If you modify `src/foo.py`, tests in `tests/test_foo.py` must pass
+- **Complexity limits**: max files per commit, max added lines, max file length
+- **WIP tracking**: Auto-created on first edit for multi-session work
+
+**What "tests must pass" means in Core**:
+- If test files exist for modified code → they must pass
+- If no test files exist → no blocking (true discovery mode)
+- This is NOT a free pass: CI will run full suite
 
 **How to work**:
 1. Read STATUS.md for current focus

@@ -244,6 +244,20 @@ If ANY answer is "No" or "Not sure" → Feature is NOT ready to be marked shippe
 
 **Only after ALL items above are checked:**
 
+### Version Update (Framework Development)
+
+**CRITICAL ORDER**: Update version BEFORE running final tests, so test results are logged with correct version.
+
+- [ ] **Update VERSION file first** (`echo "X.Y.Z" > VERSION`)
+- [ ] **Update STACK.md version** to match
+- [ ] **Update spec/FEATURES.md version** to match
+- [ ] **THEN run tests** (`bash tests/validate_framework.sh`)
+- [ ] **Update test result files** with new version:
+  - `tests/VERIFICATION_REPORT.md`
+  - `tests/LLM_TEST_RESULTS.md`
+
+**Anti-pattern**: Running tests first, then updating version = test results logged against wrong version.
+
 ### Core Profile
 
 - [ ] **Update `OVERVIEW.md`**

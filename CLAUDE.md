@@ -10,11 +10,15 @@ You are working in a repository that uses the **Agentic Framework**.
 |------|------------------|------------------|
 | Acceptance criteria | **BLOCKS** - `ag implement` requires `spec/acceptance/F-XXXX.md` | N/A - use `ag work` |
 | WIP before commit | **BLOCKS** - must complete WIP first | WARNING only |
-| Pre-commit checks | **BLOCKS** - `doctor.sh --pre-commit` | Light check, no block |
+| **Test execution** | **BLOCKS** - tests must pass | **BLOCKS** - tests for changed files |
+| **Complexity limits** | **BLOCKS** - max files/lines/length | **BLOCKS** - same limits apply |
+| Pre-commit checks | **BLOCKS** - full validation | Light check, no block |
 | Feature status | **BLOCKS** - shipped needs acceptance | N/A |
 
+**Escape hatches** (feature branches only): `SKIP_TESTS=1` or `SKIP_COMPLEXITY=1`
+
 **Core+PM**: Formal tracking with enforced gates.
-**Core**: Discovery/exploration with lighter guidance.
+**Core**: Discovery/exploration with lighter guidance (tests + complexity still enforced).
 
 **Quick Commands**: `ag start` | `ag implement F-XXXX` (Core+PM) | `ag work "desc"` (Core) | `ag commit` | `ag done` | `ag tools`
 

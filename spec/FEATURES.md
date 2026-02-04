@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.12.0
+**Version**: 0.16.0
 
 ---
 
@@ -1742,6 +1742,26 @@ agent_mode: balanced  # premium | balanced | economy
 - Tests: `tests/validate_framework.sh` (9 checks)
 
 **Acceptance**: See `spec/acceptance/F-0115.md`
+
+---
+
+## F-0116: Maintainability Enforcement Gates
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.16.0
+
+**Description**: Enforce maintainability through automated gates: test execution (BLOCKING), complexity limits (BLOCKING: max files, max added lines, max file length), and escape hatches for legitimate bypasses (blocked on main/master). Both Core and Core+PM profiles enforce tests and complexity limits.
+
+**Dependencies**: F-0016 (Pre-Commit Quality Gates), F-0115 (Git Workflow Branch Check)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/hooks/pre-commit-check.sh` (checks 6-7), `.agentic/tools/wip.sh` (--auto flag), `.agentic/tools/doctor.py` (frontmatter parsing), `.agentic/tools/upgrade.sh` (migration)
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0116.md`
 
 ---
 
