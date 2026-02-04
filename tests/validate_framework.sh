@@ -1124,10 +1124,10 @@ fi
 # Test wip.sh start (requires: feature_id, description, files)
 # WIP.md is created in .agentic/ (framework internal state)
 if bash .agentic/tools/wip.sh start "TEST-001" "Testing WIP functionality" "test.md" >/dev/null 2>&1; then
-  if [[ -f ".agentic/WIP.md" ]]; then
-    pass "wip.sh start creates .agentic/WIP.md"
+  if [[ -f ".agentic-state/WIP.md" ]]; then
+    pass "wip.sh start creates .agentic-state/WIP.md"
   else
-    fail "wip.sh start did not create .agentic/WIP.md"
+    fail "wip.sh start did not create .agentic-state/WIP.md"
   fi
 else
   fail "wip.sh start failed"

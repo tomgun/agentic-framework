@@ -329,11 +329,13 @@ refactor(docs): eliminate documentation duplication
 
 - [ ] All changes tested in scratch project
 - [ ] Example projects updated and working
+- [ ] **`bash .agentic/tools/drift.sh --docs` passes** (no stale docs)
 - [ ] Documentation accurate and up-to-date
 - [ ] **`spec/FEATURES.md` updated with new features (F-####)**
 - [ ] **`spec/acceptance/F-####.md` created for new features**
 - [ ] **`tests/validate_framework.sh` updated if new acceptance criteria**
 - [ ] **`FEATURE_REGISTRY` in upgrade.sh updated if user-visible feature**
+- [ ] **Manifests generated**: `bash .agentic/tools/manifest.sh F-####` for each feature
 - [ ] `VERSION` file updated
 - [ ] `CHANGELOG.md` updated with all changes
 - [ ] `CONTRIBUTIONS.md` updated with version section
@@ -399,8 +401,15 @@ refactor(docs): eliminate documentation duplication
 2. Create acceptance criteria in `spec/acceptance/F-####.md`
 3. Add tests to `tests/validate_framework.sh`
 4. If user-visible during upgrade, add to FEATURE_REGISTRY (see below)
-5. Update CHANGELOG.md
-6. Update CONTRIBUTIONS.md
+5. Run `bash .agentic/tools/drift.sh --docs` to check for stale docs
+6. Update CHANGELOG.md
+7. Update CONTRIBUTIONS.md
+8. Generate manifest: `bash .agentic/tools/manifest.sh F-####`
+
+**For spec changes (adding/modifying features in FEATURES.md)**:
+- Use `bash .agentic/tools/migration.sh create "description"` to create a migration
+- Migrations provide auditable history of spec evolution
+- Run `bash .agentic/tools/migration.sh list` to see all migrations
 
 **Adding to FEATURE_REGISTRY (upgrade notifications)**:
 When adding a user-visible feature that should be offered during upgrades:

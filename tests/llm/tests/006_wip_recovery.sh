@@ -9,7 +9,7 @@ setup_test_project "core"
 
 # Create stale WIP file (simulating interrupted previous session)
 mkdir -p "$TEST_PROJECT/.agentic"
-cat > "$TEST_PROJECT/.agentic/WIP.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic-state/WIP.md" << 'EOF'
 **Feature**: F-0042: User authentication
 **Started**: 2026-01-15
 **Status**: In progress
@@ -30,7 +30,7 @@ Implementing login form validation
 None
 EOF
 
-git -C "$TEST_PROJECT" add .agentic/WIP.md
+git -C "$TEST_PROJECT" add .agentic-state/WIP.md
 git -C "$TEST_PROJECT" commit -m "Add WIP" --quiet
 
 # Start session with greeting (agent should notice WIP)

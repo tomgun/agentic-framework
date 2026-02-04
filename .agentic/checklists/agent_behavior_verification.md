@@ -23,7 +23,7 @@ These tests require a real LLM agent interacting with the framework.
 - [ ] Agent reads CONTEXT_PACK.md before coding
 - [ ] Agent reads STATUS.md for current focus
 - [ ] Agent checks for .upgrade_pending marker
-- [ ] Agent checks for .agentic/WIP.md (interrupted work)
+- [ ] Agent checks for .agentic-state/WIP.md (interrupted work)
 
 ### Session End
 - [ ] Agent updates JOURNAL.md with session summary
@@ -98,7 +98,7 @@ These tests require a real LLM agent interacting with the framework.
 ## 6. Recovery Tests
 
 ### Interrupted Session
-- [ ] Agent reads .agentic/WIP.md if present
+- [ ] Agent reads .agentic-state/WIP.md if present
 - [ ] Agent can resume work from where it left off
 - [ ] Agent uses JOURNAL.md for context recovery
 

@@ -1,0 +1,20 @@
+{
+  "feature": "F-0117",
+  "mode": "feature",
+  "generated": "2026-02-04T21:15:38Z",
+  "commits": [
+    {"hash": "cc42c11", "date": "2026-02-04", "message": "feat: Add migration system and doc drift detection (F-0117, F-0118)", "additions": 714, "deletions": 110}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/tools/drift.sh"}, {"file": ".agentic/tools/migration.sh"}],
+    "tests": [{"file": "spec/FEATURES.md"}, {"file": "spec/acceptance/F-0117.md"}, {"file": "spec/acceptance/F-0118.md"}],
+    "docs": [{"file": "CHANGELOG.md"}, {"file": "CONTEXT_PACK.md"}, {"file": "spec/FEATURES.md"}, {"file": "spec/acceptance/F-0117.md"}, {"file": "spec/acceptance/F-0118.md"}],
+    "config": []
+  },
+  "stats": {
+    "total_commits": 1,
+    "total_files": 7,
+    "additions": 714,
+    "deletions": 110
+  }
+}

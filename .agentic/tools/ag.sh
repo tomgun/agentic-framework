@@ -192,7 +192,7 @@ EOF
 
 # Get verification state summary
 get_verification_summary() {
-    local state_file="$ROOT_DIR/.agentic/.verification-state"
+    local state_file="$ROOT_DIR/.agentic-state/.verification-state"
     if [ -f "$state_file" ]; then
         local last_run issues result
         last_run=$(grep '"last_run"' "$state_file" 2>/dev/null | sed 's/.*: "\([^"]*\)".*/\1/' | cut -dT -f1,2 | tr T ' ' | cut -c1-16)
@@ -224,18 +224,18 @@ cmd_start() {
     echo ""
 
     # 1. Check for other active agents
-    if [ -f "$ROOT_DIR/.agentic/AGENTS_ACTIVE.md" ]; then
+    if [ -f "$ROOT_DIR/.agentic-state/AGENTS_ACTIVE.md" ]; then
         local active_count
-        active_count=$(grep -c "^##" "$ROOT_DIR/.agentic/AGENTS_ACTIVE.md" 2>/dev/null || echo "0")
+        active_count=$(grep -c "^##" "$ROOT_DIR/.agentic-state/AGENTS_ACTIVE.md" 2>/dev/null || echo "0")
         if [ "$active_count" -gt 0 ]; then
             echo -e "${YELLOW}Multi-agent: $active_count agent(s) active${NC}"
-            head -20 "$ROOT_DIR/.agentic/AGENTS_ACTIVE.md" 2>/dev/null | grep "^##" || true
+            head -20 "$ROOT_DIR/.agentic-state/AGENTS_ACTIVE.md" 2>/dev/null | grep "^##" || true
             echo ""
         fi
     fi
 
     # 2. Check for WIP (interrupted work)
-    if [ -f "$ROOT_DIR/.agentic/WIP.md" ]; then
+    if [ -f "$ROOT_DIR/.agentic-state/WIP.md" ]; then
         echo -e "${YELLOW}WIP detected - previous work was interrupted${NC}"
         bash "$SCRIPT_DIR/wip.sh" check 2>/dev/null || true
         echo ""
@@ -381,15 +381,15 @@ cmd_commit() {
     echo ""
 
     # 1. Check WIP exists
-    if [ -f "$ROOT_DIR/.agentic/WIP.md" ]; then
+    if [ -f "$ROOT_DIR/.agentic-state/WIP.md" ]; then
         if [ "$PROFILE" = "core" ]; then
             # Core mode: WIP is a warning, not a blocker (exploratory work)
-            echo -e "${YELLOW}WARNING: .agentic/WIP.md exists${NC}"
+            echo -e "${YELLOW}WARNING: .agentic-state/WIP.md exists${NC}"
             echo "  Consider completing WIP: bash .agentic/tools/wip.sh complete"
             echo ""
         else
             # Core+PM mode: WIP is a blocker (formal tracking)
-            echo -e "${RED}BLOCKED: .agentic/WIP.md exists${NC}"
+            echo -e "${RED}BLOCKED: .agentic-state/WIP.md exists${NC}"
             echo "  Work-in-progress must be completed before committing."
             echo "  Run: bash .agentic/tools/wip.sh complete"
             echo ""
@@ -452,11 +452,31 @@ cmd_done() {
         echo "  [ ] JOURNAL.md updated"
         echo ""
         # Check if WIP is complete
-        if [ -f "$ROOT_DIR/.agentic/WIP.md" ]; then
+        if [ -f "$ROOT_DIR/.agentic-state/WIP.md" ]; then
             echo -e "${YELLOW}Note: WIP tracking still active. Complete it with:${NC}"
             echo "  bash .agentic/tools/wip.sh complete"
         fi
         return
+    fi
+
+    # Generate manifest for feature (Core+PM profile)
+    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        echo -e "${BOLD}=== Generating Change Manifest ===${NC}"
+        if bash "$SCRIPT_DIR/manifest.sh" "$feature_id" 2>/dev/null; then
+            local manifest_file="$ROOT_DIR/.agentic-state/manifests/${feature_id}.manifest.md"
+            if [ -f "$manifest_file" ]; then
+                # Extract stats for journal metadata
+                local commit_count file_count
+                commit_count=$(grep -c "^|" "$manifest_file" 2>/dev/null | head -1 || echo "0")
+                commit_count=$((commit_count - 2))  # Subtract header rows
+                file_count=$(grep -c "^\- \`" "$manifest_file" 2>/dev/null || echo "0")
+                echo -e "${GREEN}Manifest generated: .agentic-state/manifests/${feature_id}.manifest.md${NC}"
+                echo "  Commits: $commit_count, Files: $file_count"
+            fi
+        else
+            echo -e "${YELLOW}Could not generate manifest (no matching commits?)${NC}"
+        fi
+        echo ""
     fi
 
     echo -e "${BOLD}=== Feature Complete Check ===${NC}"
@@ -534,7 +554,7 @@ cmd_done() {
     echo "Full checklist: .agentic/checklists/feature_complete.md"
 
     # Check if WIP is complete
-    if [ -f "$ROOT_DIR/.agentic/WIP.md" ]; then
+    if [ -f "$ROOT_DIR/.agentic-state/WIP.md" ]; then
         echo ""
         echo -e "${YELLOW}Note: WIP tracking still active. Complete it with:${NC}"
         echo "  bash .agentic/tools/wip.sh complete"
@@ -631,9 +651,9 @@ cmd_status() {
     echo ""
 
     # WIP status
-    if [ -f "$ROOT_DIR/.agentic/WIP.md" ]; then
+    if [ -f "$ROOT_DIR/.agentic-state/WIP.md" ]; then
         echo -e "${YELLOW}Active WIP:${NC}"
-        head -10 "$ROOT_DIR/.agentic/WIP.md" 2>/dev/null | grep -E "^(Feature|Task|Started|Last):" || true
+        head -10 "$ROOT_DIR/.agentic-state/WIP.md" 2>/dev/null | grep -E "^(Feature|Task|Started|Last):" || true
     else
         echo "No active WIP"
     fi

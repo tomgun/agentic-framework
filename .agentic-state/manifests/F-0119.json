@@ -1,0 +1,20 @@
+{
+  "feature": "F-0119",
+  "mode": "feature",
+  "generated": "2026-02-04T21:30:59Z",
+  "commits": [
+    {"hash": "dccf7af", "date": "2026-02-04", "message": "feat: Add manifest.sh and migrate state to .agentic-state/ (F-0119)", "additions": 668, "deletions": 202}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/claude-hooks/PreCompact.sh"}, {"file": ".agentic/claude-hooks/Stop.sh"}, {"file": ".agentic/hooks/pre-commit-check.sh"}, {"file": ".agentic/tools/ag.sh"}, {"file": ".agentic/tools/doctor.py"}, {"file": ".agentic/tools/journal.sh"}, {"file": ".agentic/tools/manifest.sh"}, {"file": ".agentic/tools/phase_detect.py"}, {"file": ".agentic/tools/scope_check.sh"}, {"file": ".agentic/tools/wip.sh"}, {"file": ".agentic/tools/worktree.sh"}],
+    "tests": [{"file": "spec/FEATURES.md"}, {"file": "spec/acceptance/F-0119.md"}, {"file": "tests/llm/tests/001_session_start.sh"}, {"file": "tests/llm/tests/002_wip_blocks_commit.sh"}, {"file": "tests/llm/tests/006_wip_recovery.sh"}, {"file": "tests/llm/tests/014_multi_agent_awareness.sh"}, {"file": "tests/test_ag_gateway.sh"}, {"file": "tests/test_phase_detect.py"}, {"file": "tests/validate_framework.sh"}],
+    "docs": [{"file": ".agentic/DEVELOPER_GUIDE.md"}, {"file": ".agentic/EMERGENCY.md"}, {"file": ".agentic/FRAMEWORK_QUICK_START.md"}, {"file": ".agentic/PRINCIPLES.md"}, {"file": ".agentic/ROI.md"}, {"file": ".agentic/agents/claude/CLAUDE.md"}, {"file": ".agentic/agents/codex/codex-instructions.md"}, {"file": ".agentic/agents/shared/AGENT_QUICK_START.md"}, {"file": ".agentic/agents/shared/agent_operating_guidelines.md"}, {"file": ".agentic/agents/shared/auto_orchestration.md"}, {"file": ".agentic/agents/shared/guidelines/multi-agent.md"}, {"file": ".agentic/agents/shared/guidelines/small-batch.md"}, {"file": ".agentic/agents/shared/guidelines/wip-tracking.md"}, {"file": ".agentic/checklists/agent_behavior_verification.md"}, {"file": ".agentic/checklists/before_commit.md"}, {"file": ".agentic/checklists/feature_complete.md"}, {"file": ".agentic/checklists/session_start.md"}, {"file": ".agentic/init/STACK.template.md"}, {"file": ".agentic/prompts/claude-commands/continue.md"}, {"file": ".agentic/prompts/cursor/session_start.md"}, {"file": ".agentic/workflows/environment_switching.md"}, {"file": ".agentic/workflows/git_workflow.md"}, {"file": ".agentic/workflows/multi_agent_coordination.md"}, {"file": ".agentic/workflows/recovery.md"}, {"file": ".agentic/workflows/work_in_progress.md"}, {"file": "CHANGELOG.md"}, {"file": "CLAUDE.md"}, {"file": "CONTEXT_PACK.md"}, {"file": "JOURNAL.md"}, {"file": "spec/FEATURES.md"}, {"file": "spec/acceptance/F-0119.md"}],
+    "config": [{"file": ".agentic/agents/context-manifests/git-agent.yaml"}, {"file": ".agentic/agents/context-manifests/orchestrator-agent.yaml"}, {"file": ".agentic/state/status.json"}]
+  },
+  "stats": {
+    "total_commits": 1,
+    "total_files": 55,
+    "additions": 668,
+    "deletions": 202
+  }
+}

@@ -127,8 +127,8 @@ Use the **Task tool** to spawn agents. Model selection depends on `agent_mode` i
 
 **At session start, run `ag start` or manually:**
 
-1. **Check multi-agent**: Read `.agentic/AGENTS_ACTIVE.md` - if other agents active, avoid their files
-2. **Check WIP**: If `.agentic/WIP.md` exists → "⚠️ Previous work interrupted! Continue/Review/Rollback?"
+1. **Check multi-agent**: Read `.agentic-state/AGENTS_ACTIVE.md` - if other agents active, avoid their files
+2. **Check WIP**: If `.agentic-state/WIP.md` exists → "⚠️ Previous work interrupted! Continue/Review/Rollback?"
 3. **Read context**: `STATUS.md`, `HUMAN_NEEDED.md` (first 20 lines)
 4. **Greet user proactively**: Show current focus, next steps, and any blockers
 
@@ -260,7 +260,7 @@ Check `agent_mode` in STACK.md (default: `balanced`). Model selection:
 
 ## Multi-Agent Scenarios
 
-If multiple agents working: check `.agentic/AGENTS_ACTIVE.md`, register yourself, avoid other agents' files.
+If multiple agents working: check `.agentic-state/AGENTS_ACTIVE.md`, register yourself, avoid other agents' files.
 
 ---
 

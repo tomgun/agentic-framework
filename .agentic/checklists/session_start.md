@@ -17,8 +17,8 @@
 # IMPORTANT: Every command must have "|| true" to prevent exit code errors
 cat STATUS.md 2>/dev/null || true
 cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
-cat .agentic/AGENTS_ACTIVE.md 2>/dev/null || true
-ls .agentic/WIP.md 2>/dev/null || true
+cat .agentic-state/AGENTS_ACTIVE.md 2>/dev/null || true
+ls .agentic-state/WIP.md 2>/dev/null || true
 ```
 
 ## Step 2: Greet User with Recap
@@ -42,11 +42,11 @@ What would you like to work on?
 
 ## Step 3: Handle Special Cases
 
-**If .agentic/WIP.md exists** (interrupted work):
+**If .agentic-state/WIP.md exists** (interrupted work):
 ```
 ⚠️ Previous work was interrupted!
-Feature: [from .agentic/WIP.md]
-Files changed: [from .agentic/WIP.md or git diff]
+Feature: [from .agentic-state/WIP.md]
+Files changed: [from .agentic-state/WIP.md or git diff]
 
 Options:
 1. Continue from checkpoint
@@ -69,7 +69,7 @@ I'll quickly apply the updates, then we'll continue.
 [Handle upgrade, then return to normal greeting]
 ```
 
-**If .agentic/AGENTS_ACTIVE.md shows other agents working**:
+**If .agentic-state/AGENTS_ACTIVE.md shows other agents working**:
 ```
 👥 Another agent is currently active!
 
@@ -78,11 +78,11 @@ Agent 1 (Claude - Main Window):
 - Files: [their files]
 
 To avoid conflicts, I should work on different files/features.
-What would you like me to work on? (I'll register myself in .agentic/AGENTS_ACTIVE.md)
+What would you like me to work on? (I'll register myself in .agentic-state/AGENTS_ACTIVE.md)
 ```
 
 **CRITICAL - Multi-agent coordination:**
-1. **Read .agentic/AGENTS_ACTIVE.md** to see who else is working
+1. **Read .agentic-state/AGENTS_ACTIVE.md** to see who else is working
 2. **Register yourself** by adding your entry
 3. **Avoid their files** - pick different features/files
 4. **Update when done** - remove your entry or mark complete
@@ -104,7 +104,7 @@ What would you like me to work on? (I'll register myself in .agentic/AGENTS_ACTI
 
 **If interrupted work detected (exit code 1):**
 - ⚠️ Previous session stopped mid-task (tokens out, crash, or abrupt close)
-- .agentic/WIP.md shows what was in progress
+- .agentic-state/WIP.md shows what was in progress
 - Git diff shows uncommitted changes
 - **STOP and review before continuing!**
 

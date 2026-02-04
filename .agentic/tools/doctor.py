@@ -19,7 +19,8 @@ except ImportError:
 
 # === Verification State Tracking ===
 
-VERIFICATION_STATE_FILE = ".agentic/.verification-state"
+# State lives at project root, NOT inside .agentic (survives framework upgrades)
+VERIFICATION_STATE_FILE = ".agentic-state/.verification-state"
 
 
 def get_git_state(root: Path) -> dict:
@@ -691,8 +692,8 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
 
     if phase == "start":
         # Check WIP exists (interrupted work?)
-        if (root / ".agentic" / "WIP.md").exists():
-            issues.append(".agentic/WIP.md exists - previous work was interrupted. Review or complete it.")
+        if (root / ".agentic-state" / "WIP.md").exists():
+            issues.append(".agentic-state/WIP.md exists - previous work was interrupted. Review or complete it.")
 
         # Check for stale verification
         state = read_verification_state(root)
@@ -804,9 +805,9 @@ def run_pre_commit_checks(root: Path, profile: str) -> list[str]:
     """Fast checks for pre-commit hook."""
     issues = []
 
-    # 1. .agentic/WIP.md must not exist (work should be complete before commit)
-    if (root / ".agentic" / "WIP.md").exists():
-        issues.append(".agentic/WIP.md exists - complete or remove work-in-progress before committing")
+    # 1. .agentic-state/WIP.md must not exist (work should be complete before commit)
+    if (root / ".agentic-state" / "WIP.md").exists():
+        issues.append(".agentic-state/WIP.md exists - complete or remove work-in-progress before committing")
 
     # 2. Check for untracked files in key directories
     import subprocess

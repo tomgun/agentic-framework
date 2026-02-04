@@ -33,7 +33,7 @@ Framework features apply to different profiles:
 
 | Profile | What Users Get | Key Files |
 |---------|---------------|-----------|
-| **Core** | Token efficiency, developer UX, workflows, quality gates | STATUS.md, CONTEXT_PACK.md, JOURNAL.md, .agentic/WIP.md |
+| **Core** | Token efficiency, developer UX, workflows, quality gates | STATUS.md, CONTEXT_PACK.md, JOURNAL.md, .agentic-state/WIP.md |
 | **Core+PM** | Core + formal specs, feature tracking, acceptance criteria | + spec/FEATURES.md, spec/acceptance/ |
 
 **When adding framework features, know which profile it affects:**
@@ -67,10 +67,12 @@ Ask yourself:
 | 3 | Code | Implement the feature | Now you know what "done" means |
 | 4 | `tests/validate_framework.sh` | Add validation tests | Gates > Guidelines: enforce, don't advise |
 | 5 | Scratch project | Test the feature works | Documentation = Reality |
-| 6 | `CHANGELOG.md` | Document the change | Living docs |
-| 7 | `CONTRIBUTIONS.md` | Add version section | Attribution |
-| 8 | `upgrade.sh` FEATURE_REGISTRY | If user-visible during upgrade | Developer UX |
-| 9 | `.agentic/agents/claude/CLAUDE.md` | Sync if guidelines/principles changed | Bootstrap must be self-contained (see ADR-001) |
+| 6 | `bash .agentic/tools/drift.sh --docs` | Check for stale documentation | Living docs: catch drift early |
+| 7 | `CHANGELOG.md` | Document the change | Living docs |
+| 8 | `CONTRIBUTIONS.md` | Add version section | Attribution |
+| 9 | `upgrade.sh` FEATURE_REGISTRY | If user-visible during upgrade | Developer UX |
+| 10 | `.agentic/agents/claude/CLAUDE.md` | Sync if guidelines/principles changed | Bootstrap must be self-contained (see ADR-001) |
+| 11 | `bash .agentic/tools/manifest.sh F-####` | Generate change manifest | Audit trail of what changed |
 
 **Feature is "accepted" when**: Tests pass in `validate_framework.sh` AND developer has reviewed tests and results.
 
@@ -126,6 +128,7 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 |---------|------|
 | Framework specs | `spec/FEATURES.md` |
 | Acceptance criteria | `spec/acceptance/F-####.md` |
+| Spec migrations | `spec/migrations/` (use `migration.sh create "title"`) |
 | Validation tests | `tests/validate_framework.sh` |
 | LLM test plan | `tests/LLM_TEST_PLAN.md` |
 | LLM test results | `tests/LLM_TEST_RESULTS.md` |
@@ -135,6 +138,8 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 | Agent guidelines | `.agentic/agents/shared/` |
 | Full dev guide | `.agentic/FRAMEWORK_DEVELOPMENT.md` |
 | Principles | `.agentic/PRINCIPLES.md` |
+| Change manifests | `.agentic-state/manifests/` (use `manifest.sh F-####`) |
+| Doc drift check | `drift.sh --docs` or `drift.sh --docs --manifest F-####` |
 
 ---
 

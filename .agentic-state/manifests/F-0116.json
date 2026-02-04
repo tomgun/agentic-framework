@@ -1,0 +1,21 @@
+{
+  "feature": "F-0116",
+  "mode": "feature",
+  "generated": "2026-02-04T21:21:11Z",
+  "commits": [
+    {"hash": "e7fd59e", "date": "2026-02-04", "message": "feat: Add maintainability enforcement gates (F-0116) (#20)", "additions": 1424, "deletions": 65},
+    {"hash": "b62f5a0", "date": "2026-02-04", "message": "feat: Add maintainability enforcement gates (F-0116)", "additions": 738, "deletions": 58}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/hooks/pre-commit-check.sh"}, {"file": ".agentic/init/scaffold.sh"}, {"file": ".agentic/tools/doctor.py"}, {"file": ".agentic/tools/scope_check.sh"}, {"file": ".agentic/tools/upgrade.sh"}, {"file": ".agentic/tools/wip.sh"}],
+    "tests": [{"file": "spec/FEATURES.md"}, {"file": "spec/acceptance/F-0114.md"}, {"file": "spec/acceptance/F-0115.md"}, {"file": "spec/acceptance/F-0116.md"}, {"file": "tests/LLM_TEST_RESULTS.md"}, {"file": "tests/VERIFICATION_REPORT.md"}, {"file": "tests/validate_framework.sh"}],
+    "docs": [{"file": ".agentic/PRINCIPLES.md"}, {"file": ".agentic/agents/shared/agent_operating_guidelines.md"}, {"file": ".agentic/checklists/feature_complete.md"}, {"file": ".agentic/checklists/feature_start.md"}, {"file": ".agentic/init/STACK.template.md"}, {"file": ".agentic/init/init_playbook.md"}, {"file": ".agentic/workflows/delegation_heuristics.md"}, {"file": ".agentic/workflows/git_workflow.md"}, {"file": "CHANGELOG.md"}, {"file": "CLAUDE.md"}, {"file": "CONTRIBUTIONS.md"}, {"file": "JOURNAL.md"}, {"file": "STACK.md"}, {"file": "spec/FEATURES.md"}, {"file": "spec/acceptance/F-0114.md"}, {"file": "spec/acceptance/F-0115.md"}, {"file": "spec/acceptance/F-0116.md"}],
+    "config": []
+  },
+  "stats": {
+    "total_commits": 2,
+    "total_files": 28,
+    "additions": 2162,
+    "deletions": 123
+  }
+}

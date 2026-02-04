@@ -99,14 +99,14 @@ When multiple agents work in parallel:
 
 1. Each agent maintains their own WIP in their worktree
 2. WIP files are NOT shared between worktrees
-3. Use `.agentic/AGENTS_ACTIVE.md` to coordinate
+3. Use `.agentic-state/AGENTS_ACTIVE.md` to coordinate
 4. Check for conflicting file modifications
 
 ---
 
 ## WIP File Location
 
-- Location: `.agentic/WIP.md`
+- Location: `.agentic-state/WIP.md`
 - Contains:
   - Feature/task being worked on
   - Files being modified

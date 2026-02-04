@@ -143,7 +143,7 @@
 
 2. **Commit Gates** (Blocking):
    - `.agentic/hooks/pre-commit-check.sh` - Validates before commit allowed
-   - Checks: .agentic/WIP.md doesn't exist, shipped features have acceptance criteria
+   - Checks: .agentic-state/WIP.md doesn't exist, shipped features have acceptance criteria
    - Exit code 1 blocks commit if validation fails
 
 3. **Feature Completion Protocol** (Validated):
@@ -181,7 +181,7 @@ bash .agentic/tools/feature.sh F-0005 status shipped
 
 # Pre-commit hook blocks if incomplete
 bash .agentic/hooks/pre-commit-check.sh
-# Exit 1 if .agentic/WIP.md exists (work incomplete)
+# Exit 1 if .agentic-state/WIP.md exists (work incomplete)
 # Exit 1 if shipped features lack acceptance criteria
 # Exit 0 only if all gates pass
 ```
@@ -194,7 +194,7 @@ bash .agentic/hooks/pre-commit-check.sh
 
 **Early Detection**:
 - Problem: Agent commits incomplete work, builds on it, compounds errors
-- Solution: Pre-commit hook detects .agentic/WIP.md, blocks commit until complete
+- Solution: Pre-commit hook detects .agentic-state/WIP.md, blocks commit until complete
 
 **Cross-Agent Consistency**:
 - Problem: Different AI models interpret guidelines differently

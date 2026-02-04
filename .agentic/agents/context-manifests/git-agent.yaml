@@ -13,7 +13,7 @@ required:
 # Files to load if available and budget permits
 optional:
   - CHANGELOG.md                        # For version commits
-  - .agentic/WIP.md                     # Check for incomplete work
+  - .agentic-state/WIP.md                     # Check for incomplete work
 
 # Files to explicitly skip (git agent doesn't need implementation context)
 exclude:
