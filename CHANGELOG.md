@@ -5,6 +5,23 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.1] - 2026-02-04
+
+### Fixed
+- **CLAUDE.md Dogfooding (I-0001)** - Template is now canonical source
+  - `.agentic/agents/claude/CLAUDE.md` is the canonical template (what users get)
+  - Root `/CLAUDE.md` extends template with framework-dev-specific notes only
+  - Template now includes: ENFORCED GATES, `ag` CLI commands, escape hatches
+  - **50% token reduction** for users (558 → 277 lines)
+  - Added dogfooding rule to `FRAMEWORK_DEVELOPMENT.md`
+
+### Added
+- **Issue Tracking** - `spec/ISSUES.md` for bug/issue tracking (I-#### format)
+  - Created via `quick_issue.sh` script
+  - Parallel to feature tracking (F-####)
+
+---
+
 ## [0.17.0] - 2026-02-04
 
 ### Added

@@ -38,6 +38,7 @@ Framework changes affect ALL users. Extra care required:
 - New features → Add to `spec/FEATURES.md` FIRST
 - Changes → Test in scratch project before committing
 - Breaking changes → Provide upgrade path in `upgrade.sh`
+- **Dogfooding**: Develop in `.agentic/` first, then use here
 
 ---
 
@@ -79,6 +80,19 @@ FEATURE REQUEST?
 
 ---
 
+## Agent Boundaries (Quick Reference)
+
+| ✅ ALWAYS (Autonomous) | ⚠️ ASK FIRST | 🚫 NEVER |
+|------------------------|--------------|----------|
+| Run tests before "done" | Add dependencies | Commit without approval |
+| Update specs with code | Change architecture | Push to main directly |
+| Follow existing patterns | Delete files/functionality | Modify secrets/.env |
+| Use token-efficient scripts | Modify public APIs | Guess at requirements |
+
+**Full details**: `.agentic/agents/shared/agent_operating_guidelines.md`
+
+---
+
 ## Token Efficiency: DELEGATE, Don't Do Everything
 
 Use the **Task tool** to spawn agents. Model selection depends on `agent_mode` in STACK.md:
@@ -104,12 +118,10 @@ Use the **Task tool** to spawn agents. Model selection depends on `agent_mode` i
 | Writing tests | `general-purpose` | opus | sonnet | haiku |
 | Code review | `general-purpose` | opus | sonnet | haiku |
 
-**Note**: If `models:` section exists in STACK.md, those override the defaults above.
-
 **Pass to subagent ONLY**: Feature ID, acceptance criteria, 3-5 relevant files, STACK.md info.
 **DO NOT pass**: Full history, unrelated code, previous sessions.
 
-**Role definitions** (use as prompt context): `.agentic/agents/claude/subagents/`
+**Role definitions**: `.agentic/agents/claude/subagents/`
 
 ---
 
@@ -202,7 +214,7 @@ Let's start with #1. Which would you like to tackle first?
 
 ---
 
-## Core Guidelines (Unchanged)
+## Core Guidelines
 
 1. **Read at session start**:
    - `AGENTS.md` (if present)
@@ -288,3 +300,4 @@ If multiple agents working: check `.agentic-state/AGENTS_ACTIVE.md`, register yo
 
 This is the Agentic Framework repo. **Validation**: `bash tests/validate_framework.sh` must pass.
 **Never auto-commit.** Show changes to human first.
+**Dogfooding**: `.agentic/` is the source of truth - develop there first.
