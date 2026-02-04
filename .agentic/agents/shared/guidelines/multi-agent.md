@@ -14,11 +14,11 @@
 
 ## Coordination File: AGENTS_ACTIVE.md
 
-**Location**: `.agentic/AGENTS_ACTIVE.md`
+**Location**: `.agentic-state/AGENTS_ACTIVE.md`
 
 **At session start, check for other agents:**
 ```bash
-cat .agentic/AGENTS_ACTIVE.md 2>/dev/null
+cat .agentic-state/AGENTS_ACTIVE.md 2>/dev/null
 ```
 
 **If other agents are active:**
@@ -53,7 +53,7 @@ cat .agentic/AGENTS_ACTIVE.md 2>/dev/null
 
 ## WIP Files as Locks
 
-**.agentic/WIP.md acts as a lock file:**
+**.agentic-state/WIP.md acts as a lock file:**
 
 | WIP Age | Meaning | Action |
 |---------|---------|--------|
@@ -133,7 +133,7 @@ I'll register myself and work on different files.
 
 | Check | When | Tool |
 |-------|------|------|
-| Other agents active? | Session start | `cat .agentic/AGENTS_ACTIVE.md` |
+| Other agents active? | Session start | `cat .agentic-state/AGENTS_ACTIVE.md` |
 | WIP exists? | Session start | `bash .agentic/tools/wip.sh check` |
 | Register yourself | Starting work | Edit AGENTS_ACTIVE.md |
 | Deregister | Work complete | Edit AGENTS_ACTIVE.md |

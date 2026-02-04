@@ -12,7 +12,7 @@ required:
 
 optional:
   - HUMAN_NEEDED.md                         # Blockers to address
-  - .agentic/AGENTS_ACTIVE.md               # Multi-agent coordination
+  - .agentic-state/AGENTS_ACTIVE.md               # Multi-agent coordination
   - spec/FEATURES.md[summary]               # Feature overview (section only)
 
 exclude:

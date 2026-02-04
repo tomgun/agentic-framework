@@ -188,10 +188,20 @@ Before marking feature as complete:
 
 ## Context & Tracking Updated
 
+- [ ] **Change manifest generated** (for documentation patching)
+  - Run: `bash .agentic/tools/manifest.sh F-####`
+  - Or: `ag done F-####` (auto-generates manifest)
+  - Creates `.agentic-state/manifests/F-####.manifest.md` with:
+    - All commits related to feature
+    - Files changed (code, tests, docs, config)
+    - Lines added/removed
+  - Use for: Auditing what actually changed, patching docs later
+
 - [ ] **`JOURNAL.md` updated**
   - Feature completion documented
   - Important decisions recorded
   - Any challenges/learnings noted
+  - Consider: `--feature F-#### --files N` flags for metadata
 
 - [ ] **`STATUS.md` updated** (Core+Product)
   - Moved feature from "Current focus" to "Recently completed"

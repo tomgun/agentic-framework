@@ -28,20 +28,20 @@
 
 ## Work-In-Progress Check (FIRST!)
 
-- [ ] **.agentic/WIP.md must be completed**
+- [ ] **.agentic-state/WIP.md must be completed**
   ```bash
   # Check if WIP lock exists (no output = doesn't exist = OK)
-  ls .agentic/WIP.md 2>/dev/null || true
+  ls .agentic-state/WIP.md 2>/dev/null || true
   ```
   
-  - **If .agentic/WIP.md exists**: Work is not yet complete!
+  - **If .agentic-state/WIP.md exists**: Work is not yet complete!
     - Complete work first: `bash .agentic/tools/wip.sh complete`
     - This removes the WIP lock file
-    - **NEVER commit while .agentic/WIP.md exists** (indicates incomplete work)
+    - **NEVER commit while .agentic-state/WIP.md exists** (indicates incomplete work)
   
-  - **If .agentic/WIP.md does not exist**: ✓ OK to proceed with commit checks
+  - **If .agentic-state/WIP.md does not exist**: ✓ OK to proceed with commit checks
 
-**Why**: .agentic/WIP.md is a lock file that tracks in-progress work. If it exists, the work is not ready for commit.
+**Why**: .agentic-state/WIP.md is a lock file that tracks in-progress work. If it exists, the work is not ready for commit.
 
 ---
 

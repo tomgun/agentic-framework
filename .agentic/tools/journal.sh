@@ -3,6 +3,8 @@
 #
 # Usage:
 #   bash .agentic/tools/journal.sh "Topic" "Accomplished" "Next steps" "Blockers"
+#   bash .agentic/tools/journal.sh "Topic" "Accomplished" "Next steps" "Blockers" \
+#       --feature F-0116 --files 12 --commits abc123
 #
 # Token efficiency: APPENDS to file, never reads whole file
 #
@@ -11,11 +13,26 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 JOURNAL_FILE="${PROJECT_ROOT}/JOURNAL.md"
 
-# Arguments
+# Required positional arguments
 TOPIC="${1:-Untitled}"
 ACCOMPLISHED="${2:-No details provided}"
 NEXT_STEPS="${3:-TBD}"
 BLOCKERS="${4:-None}"
+shift 4 2>/dev/null || true
+
+# Optional metadata via flags
+FEATURE=""
+FILES_COUNT=""
+COMMITS=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --feature) FEATURE="$2"; shift 2 ;;
+        --files) FILES_COUNT="$2"; shift 2 ;;
+        --commits) COMMITS="$2"; shift 2 ;;
+        *) shift ;;  # Ignore unknown flags
+    esac
+done
 
 # Generate timestamp
 TIMESTAMP=$(date +"%Y-%m-%d %H:%M")
@@ -48,6 +65,15 @@ fi
   echo "${NEXT_STEPS}" | sed 's/^/- /'
   echo ""
   echo "**Blockers**: ${BLOCKERS}"
+
+  # Add structured metadata if provided (for documentation patching)
+  if [[ -n "$FEATURE" || -n "$FILES_COUNT" || -n "$COMMITS" ]]; then
+      echo ""
+      echo "**Metadata**:"
+      [[ -n "$FEATURE" ]] && echo "- Feature: $FEATURE"
+      [[ -n "$FILES_COUNT" ]] && echo "- Files changed: $FILES_COUNT"
+      [[ -n "$COMMITS" ]] && echo "- Commits: $COMMITS"
+  fi
   echo ""
 } >> "${JOURNAL_FILE}"
 

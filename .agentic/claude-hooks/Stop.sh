@@ -23,10 +23,10 @@ echo ""
 
 WARNINGS=0
 
-# 0. Check for .agentic/WIP.md (work in progress lock)
-if [[ -f ".agentic/WIP.md" ]]; then
-  echo "🚨 .agentic/WIP.md exists - work may be incomplete!"
-  echo "   Feature in progress (check .agentic/WIP.md for details)"
+# 0. Check for .agentic-state/WIP.md (work in progress lock)
+if [[ -f ".agentic-state/WIP.md" ]]; then
+  echo "🚨 .agentic-state/WIP.md exists - work may be incomplete!"
+  echo "   Feature in progress (check .agentic-state/WIP.md for details)"
   echo "   Options:"
   echo "   - Complete work: bash .agentic/tools/wip.sh complete"
   echo "   - Leave for next session: OK if intentional handoff"

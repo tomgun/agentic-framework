@@ -27,8 +27,13 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${PROJECT_ROOT}"
 
-WIP_FILE=".agentic/WIP.md"
+# State lives at project root, NOT inside .agentic (survives framework upgrades)
+STATE_DIR=".agentic-state"
+WIP_FILE="${STATE_DIR}/WIP.md"
 SESSION_LOG="SESSION_LOG.md"
+
+# Ensure state directory exists
+mkdir -p "$STATE_DIR"
 
 COMMAND="${1:-}"
 

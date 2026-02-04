@@ -154,7 +154,7 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--       worktree: /path/to/worktree-1 -->
 <!--     - id: cursor-agent-2 -->
 <!--       worktree: /path/to/worktree-2 -->
-<!-- When enabled, agents use Git worktrees and coordinate via .agentic/AGENTS_ACTIVE.md -->
+<!-- When enabled, agents use Git worktrees and coordinate via .agentic-state/AGENTS_ACTIVE.md -->
 
 ## Data & integrations
 - Primary datastore: <!-- postgres/sqlite/mongo/redis/etc -->

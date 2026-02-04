@@ -32,7 +32,7 @@
 
 ### Location
 
-`.agentic/WIP.md` in project root (visible, easy to find)
+`.agentic-state/WIP.md` in project root (visible, easy to find)
 
 ### Content Format
 
@@ -186,7 +186,7 @@ git add -A && git commit -m "feat: F-0005 user authentication"
 
 ```bash
 # Before context compaction, update WIP checkpoint
-if [[ -f ".agentic/WIP.md" ]]; then
+if [[ -f ".agentic-state/WIP.md" ]]; then
   bash .agentic/tools/wip.sh checkpoint "Context compaction triggered"
 fi
 ```
@@ -195,8 +195,8 @@ fi
 
 ```bash
 # Warn user about uncommitted WIP
-if [[ -f ".agentic/WIP.md" ]]; then
-  echo "⚠️  .agentic/WIP.md exists - work may be incomplete!"
+if [[ -f ".agentic-state/WIP.md" ]]; then
+  echo "⚠️  .agentic-state/WIP.md exists - work may be incomplete!"
   echo "   Check git status before closing."
 fi
 ```
@@ -213,7 +213,7 @@ bash .agentic/tools/wip.sh checkpoint "Switching from Claude to Cursor"
 
 ### 5. Multi-Agent Coordination
 
-**.agentic/WIP.md acts as a lock for multi-agent scenarios:**
+**.agentic-state/WIP.md acts as a lock for multi-agent scenarios:**
 
 ```bash
 # Check if another agent is working
@@ -237,7 +237,7 @@ bash .agentic/tools/wip.sh check
 **What happens:**
 1. Agent editing `src/auth/login.ts`
 2. Token limit reached → Tool stops abruptly
-3. .agentic/WIP.md exists with last checkpoint: "Implementing JWT validation"
+3. .agentic-state/WIP.md exists with last checkpoint: "Implementing JWT validation"
 4. Changes uncommitted in git
 
 **Recovery (next session):**
@@ -257,7 +257,7 @@ git diff src/auth/login.ts
 **What happens:**
 1. Agent working on feature F-0005
 2. Computer crashes or tool freezes
-3. .agentic/WIP.md exists, SESSION_LOG.md has last checkpoint
+3. .agentic-state/WIP.md exists, SESSION_LOG.md has last checkpoint
 4. Uncommitted changes in git
 
 **Recovery (reboot, new session):**
@@ -304,7 +304,7 @@ bash .agentic/tools/wip.sh check
 
 **Recovery (after compaction):**
 ```bash
-# Claude SessionStart reads .agentic/WIP.md
+# Claude SessionStart reads .agentic-state/WIP.md
 # "✓ Context was compacted 5 minutes ago"
 # "Feature F-0005 in progress"
 # Loads from WIP.md + SESSION_LOG.md
@@ -331,12 +331,12 @@ git checkout -- <file>  # Rollback specific file
 
 ### Commit Safeguards
 
-**Never commit while .agentic/WIP.md exists:**
+**Never commit while .agentic-state/WIP.md exists:**
 
 Check in `before_commit.md`:
 ```bash
-if [[ -f ".agentic/WIP.md" ]]; then
-  echo "⚠️  .agentic/WIP.md still exists!"
+if [[ -f ".agentic-state/WIP.md" ]]; then
+  echo "⚠️  .agentic-state/WIP.md still exists!"
   echo "   Complete work first: bash .agentic/tools/wip.sh complete"
   exit 1
 fi
@@ -347,15 +347,15 @@ fi
 ## WIP.md State Machine
 
 ```
-[No .agentic/WIP.md] → bash wip.sh start → [.agentic/WIP.md: IN_PROGRESS]
+[No .agentic-state/WIP.md] → bash wip.sh start → [.agentic-state/WIP.md: IN_PROGRESS]
                                          ↓
                                    (work + checkpoints)
                                          ↓
-[.agentic/WIP.md: IN_PROGRESS] → bash wip.sh complete → [No .agentic/WIP.md] → git commit
+[.agentic-state/WIP.md: IN_PROGRESS] → bash wip.sh complete → [No .agentic-state/WIP.md] → git commit
                                          ↓
                               (if interrupted)
                                          ↓
-[.agentic/WIP.md: STALE] → bash wip.sh check → Recovery prompt
+[.agentic-state/WIP.md: STALE] → bash wip.sh check → Recovery prompt
                       ↓
             Continue | Review | Rollback
 ```
@@ -395,7 +395,7 @@ git add -A && git commit -m "feat: F-0005"
 ```bash
 # Work done, but forgot to complete
 git add -A && git commit -m "feat: F-0005"
-# .agentic/WIP.md still exists! (confusing for next session)
+# .agentic-state/WIP.md still exists! (confusing for next session)
 ```
 
 ### 3. Review Before Continuing Interrupted Work
@@ -436,7 +436,7 @@ bash .agentic/tools/wip.sh complete  # Remove WIP lock
 - Environment switching (handoff tracking)
 - Multi-agent coordination (prevent conflicts)
 
-**Token cost:** Minimal (~50 tokens to create/update .agentic/WIP.md)
+**Token cost:** Minimal (~50 tokens to create/update .agentic-state/WIP.md)
 
 **Benefit:** Never lose significant work again! 🎉
 

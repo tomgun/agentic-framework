@@ -28,8 +28,11 @@ tests/llm/.test-state
 *.bak
 *.backup
 
-# State files that shouldn't be committed
-.agentic/state/
+# Agentic state files - transient, don't commit
+.agentic-state/WIP.md
+.agentic-state/AGENTS_ACTIVE.md
+.agentic-state/.verification-state
+# Note: .agentic-state/manifests/ IS committed (audit trail)
 
 # Local notes (not part of framework)
 *.local.md

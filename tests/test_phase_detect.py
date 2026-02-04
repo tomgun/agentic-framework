@@ -34,14 +34,14 @@ def test_no_wip_returns_start():
 
 
 def test_wip_without_acceptance_returns_planning():
-    """.agentic/WIP.md with feature but no acceptance file should return 'planning'."""
+    """.agentic-state/WIP.md with feature but no acceptance file should return 'planning'."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         # Setup core+product
         (root / "spec").mkdir()
         (root / "spec" / "acceptance").mkdir()
         (root / "STATUS.md").write_text("# Status\n")
-        # Create .agentic/WIP.md with feature
+        # Create .agentic-state/WIP.md with feature
         (root / ".agentic").mkdir()
         (root / ".agentic" / "WIP.md").write_text("**Feature**: F-0001: Test feature\n")
 
@@ -49,14 +49,14 @@ def test_wip_without_acceptance_returns_planning():
 
 
 def test_wip_with_acceptance_returns_implement():
-    """.agentic/WIP.md with feature and acceptance file should return 'implement'."""
+    """.agentic-state/WIP.md with feature and acceptance file should return 'implement'."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         # Setup core+product
         (root / "spec").mkdir()
         (root / "spec" / "acceptance").mkdir()
         (root / "STATUS.md").write_text("# Status\n")
-        # Create .agentic/WIP.md with feature
+        # Create .agentic-state/WIP.md with feature
         (root / ".agentic").mkdir()
         (root / ".agentic" / "WIP.md").write_text("**Feature**: F-0001: Test feature\n")
         # Create acceptance file

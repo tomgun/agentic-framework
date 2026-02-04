@@ -12,7 +12,8 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${PROJECT_ROOT}"
 
-WIP_FILE=".agentic/WIP.md"
+# State lives at project root, NOT inside .agentic (survives framework upgrades)
+WIP_FILE=".agentic-state/WIP.md"
 
 # If no WIP.md, skip check silently
 if [[ ! -f "$WIP_FILE" ]]; then

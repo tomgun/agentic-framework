@@ -25,6 +25,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Shows "potentially stale" vs "updated" documentation
   - Configurable via `doc_tracking:` in STACK.md
 
+- **Feature Change Manifest Generation (F-0119)** - Git-based change tracking
+  - `manifest.sh F-XXXX` - Generate manifest from feature ID
+  - `manifest.sh --branch feature/foo` - Generate from branch
+  - `manifest.sh --since 2026-02-01` - Generate from date range
+  - `manifest.sh F-XXXX --migration N` - Embed into migration file
+  - Outputs JSON with commits, files grouped by type, line stats
+
+- **State Directory Migration** - Moved state files to `.agentic-state/`
+  - `WIP.md`, `AGENTS_ACTIVE.md`, manifests now in `.agentic-state/`
+  - Survives framework upgrades (not inside `.agentic/`)
+  - Updated all tools and tests for new paths
+
 - **Maintainability Enforcement Gates (F-0116)** - Automated quality enforcement
   - **Test Execution Gate** (BLOCKING) - Pre-commit runs tests from STACK.md
     - Reads `test_fast:` (preferred) or `test:` commands

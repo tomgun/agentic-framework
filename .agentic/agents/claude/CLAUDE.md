@@ -105,15 +105,15 @@ Use the **Task tool** to spawn agents. Model selection depends on `agent_mode` i
 
 ### 0. FIRST: Check for Other Active Agents (Multi-Window Conflict Prevention)
 
-**IMMEDIATELY read `.agentic/AGENTS_ACTIVE.md`** before doing anything else:
+**IMMEDIATELY read `.agentic-state/AGENTS_ACTIVE.md`** before doing anything else:
 
 ```bash
-cat .agentic/AGENTS_ACTIVE.md 2>/dev/null
+cat .agentic-state/AGENTS_ACTIVE.md 2>/dev/null
 ```
 
 **If file exists and shows other agents:**
 - ⚠️ **TELL USER IMMEDIATELY**: "👥 Another agent is already working on [X]. I'll avoid those files."
-- **Add yourself** to `.agentic/AGENTS_ACTIVE.md`
+- **Add yourself** to `.agentic-state/AGENTS_ACTIVE.md`
 - **Work on different files/features** to prevent merge conflicts
 
 ### 1. Silently Read Context
@@ -122,8 +122,8 @@ cat .agentic/AGENTS_ACTIVE.md 2>/dev/null
 # Every command needs || true to prevent exit code errors
 cat STATUS.md 2>/dev/null || true
 cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
-cat .agentic/AGENTS_ACTIVE.md 2>/dev/null || true
-ls .agentic/WIP.md 2>/dev/null || true
+cat .agentic-state/AGENTS_ACTIVE.md 2>/dev/null || true
+ls .agentic-state/WIP.md 2>/dev/null || true
 ```
 
 ### 2. Greet User with Recap (DO THIS AUTOMATICALLY!)
@@ -146,10 +146,10 @@ What would you like to work on?
 
 ### 3. Handle Special Cases
 
-- **.agentic/AGENTS_ACTIVE.md shows other agents?** → "👥 Another agent is working on [X]. I'll work on different files."
-  - **Register yourself** in .agentic/AGENTS_ACTIVE.md
+- **.agentic-state/AGENTS_ACTIVE.md shows other agents?** → "👥 Another agent is working on [X]. I'll work on different files."
+  - **Register yourself** in .agentic-state/AGENTS_ACTIVE.md
   - **Avoid their files** to prevent conflicts
-- **.agentic/WIP.md exists?** → "⚠️ Previous work interrupted! [options]"
+- **.agentic-state/WIP.md exists?** → "⚠️ Previous work interrupted! [options]"
 - **HUMAN_NEEDED.md has items?** → "📋 [N] items need your input"
 - **Upgrade pending?** → Handle it, then greet
 
@@ -491,9 +491,9 @@ See `.agentic/token_efficiency/claude_best_practices.md` for details.
 
 If multiple agents are working simultaneously:
 
-1. **Check `.agentic/spec/.agentic/AGENTS_ACTIVE.md`** for coordination
+1. **Check `.agentic/spec/.agentic-state/AGENTS_ACTIVE.md`** for coordination
 2. **Use file locking** (scripts handle this automatically)
-3. **Communicate via .agentic/AGENTS_ACTIVE.md** (don't step on each other's toes)
+3. **Communicate via .agentic-state/AGENTS_ACTIVE.md** (don't step on each other's toes)
 4. **Append-only operations** (SESSION_LOG.md, JOURNAL.md) are safe for concurrent use
 
 ---

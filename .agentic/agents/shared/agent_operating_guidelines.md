@@ -63,8 +63,8 @@
 ## Session Start Protocol
 
 Run `ag start` or manually:
-1. Check `.agentic/AGENTS_ACTIVE.md` for multi-agent coordination
-2. Check `.agentic/WIP.md` for interrupted work
+1. Check `.agentic-state/AGENTS_ACTIVE.md` for multi-agent coordination
+2. Check `.agentic-state/WIP.md` for interrupted work
 3. Read `STATUS.md`, `HUMAN_NEEDED.md`
 4. Greet user proactively with context
 
@@ -191,7 +191,7 @@ If interrupted work detected:
 - Offer: Continue | Review | Rollback
 
 ### WIP Rules
-- Never commit with .agentic/WIP.md present
+- Never commit with .agentic-state/WIP.md present
 - If WIP exists and is recent (<5 min): Another agent working
 - If WIP is stale (>60 min): Previous agent crashed
 

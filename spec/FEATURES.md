@@ -1805,6 +1805,26 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0119: Feature Change Manifest Generation
+
+**Status**: shipped
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.16.0
+
+**Description**: Generate comprehensive change manifests from git history for features, branches, or date ranges. Manifests track all commits, files changed (grouped by type), and line statistics. Supports embedding into migration files. Enables documentation patching and audit trails.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/manifest.sh`, `.agentic-state/manifests/`
+- Tests: manual
+
+**Acceptance**: See `spec/acceptance/F-0119.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1819,6 +1839,6 @@ agent_mode: balanced  # premium | balanced | economy
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 7 | 1 | 1 | 9 |
-| **Total** | **80** | **2** | **1** | **83** |
+| Framework Infrastructure (F-0101+) | 8 | 1 | 1 | 10 |
+| **Total** | **81** | **2** | **1** | **84** |
 
