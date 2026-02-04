@@ -19,6 +19,10 @@
 
 ## Test History by Version
 
+### v0.16.0
+
+_No tests run yet for this version._
+
 ### v0.11.3
 
 _No tests run yet for this version._
@@ -101,7 +105,7 @@ _No tests run yet for this version._
 
 ## Cross-Version Comparison
 
-| Test | v0.11.3 Claude | v0.11.3 Cursor | v0.11.3 Copilot |
+| Test | v0.16.0 Claude | v0.16.0 Cursor | v0.16.0 Copilot |
 |------|----------------|----------------|-----------------|
 | LLM-001 | - | - | - |
 | LLM-010 | - | - | - |

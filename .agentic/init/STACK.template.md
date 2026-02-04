@@ -113,10 +113,21 @@ Purpose: a single source of truth for "how we build and run software here".
 - pipeline_coordination_file: ..agentic/pipeline  <!-- Directory for pipeline state files -->
 
 ## Git workflow (required)
-<!-- How agents interact with Git. See .agentic/workflows/git_workflow.md -->
-<!-- Profile-aware defaults: Core+PM → pull_request, Core → direct -->
-<!-- Override explicitly if needed -->
-- git_workflow: pull_request  <!-- pull_request (recommended) | direct -->
+<!-- How changes get into main branch. See .agentic/workflows/git_workflow.md -->
+<!--                                                                           -->
+<!-- pull_request: Feature branches + PRs (review before merge)                -->
+<!--   - Agent creates feature branches (feature/F-####-description)           -->
+<!--   - Agent creates PRs for human review                                    -->
+<!--   - Pre-commit BLOCKS commits to main/master (use --no-verify for hotfix) -->
+<!--   - Best for: teams, long-term projects, audit trails                     -->
+<!--                                                                           -->
+<!-- direct: Commit straight to main (faster, less ceremony)                   -->
+<!--   - Agent commits directly to main branch                                 -->
+<!--   - No PR overhead                                                        -->
+<!--   - Best for: solo prototypes, fast iteration                             -->
+<!--                                                                           -->
+<!-- Profile defaults: Core → direct, Core+PM → pull_request                   -->
+- git_workflow: pull_request  <!-- pull_request | direct -->
 
 <!-- Pull Request mode (DEFAULT for Core+PM, recommended): -->
 <!--   - Agent creates feature branches for each feature -->

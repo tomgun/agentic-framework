@@ -868,6 +868,127 @@ else
 fi
 
 # ============================================================
+# F-0114: Scope & Diff Verification
+# ============================================================
+echo ""
+echo "--- F-0114: Scope & Diff Verification ---"
+
+# AC-001: scope_check.sh exists and is executable
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/scope_check.sh" ]]; then
+  pass "scope_check.sh exists and is executable"
+else
+  fail "scope_check.sh missing or not executable"
+fi
+
+# AC-002: pre-commit shows diff stats
+if grep -q "Change Summary" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "pre-commit-check.sh shows diff stats"
+else
+  fail "pre-commit-check.sh missing diff stats display"
+fi
+
+# AC-003: pre-commit calls scope_check
+if grep -q "scope_check.sh" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "pre-commit-check.sh calls scope_check.sh"
+else
+  fail "pre-commit-check.sh missing scope_check.sh integration"
+fi
+
+# AC-004: WIP template has scope fields
+if grep -q "IN_SCOPE:" "${FRAMEWORK_ROOT}/.agentic/tools/wip.sh" 2>/dev/null; then
+  pass "wip.sh template includes IN_SCOPE field"
+else
+  fail "wip.sh missing IN_SCOPE field"
+fi
+
+# AC-005: New principles added
+if grep -q "Make Human Review Efficient" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
+  pass "PRINCIPLES.md has 'Make Human Review Efficient'"
+else
+  fail "PRINCIPLES.md missing human review principle"
+fi
+
+if grep -q "Warnings Beat Blocks" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
+  pass "PRINCIPLES.md has 'Warnings Beat Blocks for Soft Signals'"
+else
+  fail "PRINCIPLES.md missing soft signal principle"
+fi
+
+if grep -q "Don't Delegate Ambiguity\|Delegating ambiguity" "${FRAMEWORK_ROOT}/.agentic/workflows/delegation_heuristics.md" 2>/dev/null; then
+  pass "delegation_heuristics.md covers ambiguity principle"
+else
+  fail "delegation_heuristics.md missing ambiguity guidance"
+fi
+
+# ============================================================
+# F-0115: Git Workflow Branch Check
+# ============================================================
+echo ""
+echo "--- F-0115: Git Workflow Branch Check ---"
+
+# AC-001: Branch policy check exists in pre-commit
+if grep -q "Branch policy" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "pre-commit-check.sh has branch policy check"
+else
+  fail "pre-commit-check.sh missing branch policy check"
+fi
+
+# AC-001: Check blocks (not warns) on main with pull_request
+if grep -q "BLOCKED.*Direct commit.*PR workflow" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "Branch check BLOCKS commits to main with PR workflow"
+else
+  fail "Branch check missing BLOCK behavior"
+fi
+
+# AC-001: Escape hatch documented (--no-verify)
+if grep -q "\-\-no-verify" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "Escape hatch (--no-verify) documented in pre-commit"
+else
+  fail "Escape hatch not documented in pre-commit"
+fi
+
+# AC-004: Profile-aware defaults in scaffold.sh
+if grep -q 'GIT_WORKFLOW_DEFAULT="direct"' "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null; then
+  pass "scaffold.sh sets direct for Core profile"
+else
+  fail "scaffold.sh missing Core profile git_workflow default"
+fi
+
+if grep -q 'GIT_WORKFLOW_DEFAULT="pull_request"' "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null; then
+  pass "scaffold.sh sets pull_request for Core+PM profile"
+else
+  fail "scaffold.sh missing Core+PM profile git_workflow default"
+fi
+
+# AC-005: Core profile git workflow question in init_playbook
+if grep -q "Git Workflow Preference.*Core profile" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
+  pass "init_playbook.md has Core profile git workflow question"
+else
+  fail "init_playbook.md missing Core profile git workflow question"
+fi
+
+# AC-006: Core+PM skip noted
+if grep -q "SKIP.*Core.PM\|Core.PM.*pull_request" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
+  pass "init_playbook.md notes Core+PM defaults to pull_request"
+else
+  fail "init_playbook.md missing Core+PM default note"
+fi
+
+# AC-007: STACK.template has prominent git_workflow documentation
+if grep -q "Pre-commit BLOCKS\|BLOCKS commits to main" "${FRAMEWORK_ROOT}/.agentic/init/STACK.template.md" 2>/dev/null; then
+  pass "STACK.template.md documents that pre-commit BLOCKS"
+else
+  fail "STACK.template.md missing BLOCK documentation"
+fi
+
+# Acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0115.md" ]]; then
+  pass "F-0115 acceptance criteria file exists"
+else
+  fail "F-0115 acceptance criteria file missing"
+fi
+
+# ============================================================
 # PROFILE-AWARE INSTALLATION TESTS
 # ============================================================
 echo ""

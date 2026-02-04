@@ -1385,8 +1385,89 @@ python3 .agentic/tools/query_features.py --children=F-0100 --status=shipped
 
 ---
 
+## v0.15.0 Contributions (2026-02-03)
+
+### Scope & Diff Verification (F-0114)
+
+**Origin**: Analysis of Andrej Karpathy's January 2025 insights about agent weaknesses, combined with learnings from Osmani/Mollick analysis.
+
+**Core Insight**:
+> "Instructions don't change agent behavior. Structural constraints and automated verification do."
+
+Initial proposal included 8 behavioral protocols ("answer honestly - could this be simpler?"). After critical review, realized these are instructions that agents would ignore.
+
+**Solution - Structural Over Behavioral**:
+
+1. **Diff Stats Display** (pre-commit-check.sh):
+   - Shows lines changed, files affected at start of output
+   - Human sees "847 lines changed across 12 files" and decides if proportional
+   - No automated judgment - information only
+
+2. **Scope Drift Warnings** (scope_check.sh):
+   - WIP.md now includes `IN_SCOPE:` field
+   - Pre-commit compares staged files to declared scope
+   - WARNS on unexpected files (doesn't block)
+   - Human decides if side effects intentional
+
+3. **Six New Principles** (PRINCIPLES.md):
+   - Instructions Don't Change Agent Behavior
+   - Make Human Review Efficient, Not Unnecessary
+   - Warnings Beat Blocks for Soft Signals
+   - One Example Beats Three Paragraphs
+   - If Explaining Takes Longer Than Doing, Just Do It
+   - Don't Delegate Ambiguity
+
+**Key Insight Preserved**:
+> "'Watch like a hawk' may BE the answer. These changes make human review more efficient, not unnecessary."
+
+**Files Created/Modified**:
+- `.agentic/tools/scope_check.sh` (new - ~60 lines)
+- `.agentic/hooks/pre-commit-check.sh` (modified - ~25 lines added)
+- `.agentic/tools/wip.sh` (modified - scope fields in template)
+- `.agentic/checklists/feature_start.md` (modified - scope declaration)
+- `.agentic/PRINCIPLES.md` (modified - 6 new principles, ~100 lines)
+
+**Impact**: Human review becomes more efficient. Agents don't need behavioral instructions that would be ignored anyway. Structural verification makes drift visible.
+
+### Git Workflow Branch Check (F-0115)
+
+**User insight**:
+> "Some people might prefer working fast without PRs... i like that there is an option to use version control just with simple commits/pushes."
+
+**Key decision**: User choice matters - both direct commits and PRs are valid workflows.
+
+**Implementation**:
+1. **Branch Policy Check** (pre-commit-check.sh check 9/9):
+   - BLOCKS commits to main/master when `git_workflow: pull_request`
+   - Clear error with 3 options: feature branch, --no-verify bypass, or change to direct
+   - Respects user's workflow choice from STACK.md
+
+2. **Profile-Aware Defaults** (scaffold.sh):
+   - Core profile → `git_workflow: direct` (fast iteration default)
+   - Core+PM profile → `git_workflow: pull_request` (formal tracking = formal review)
+
+3. **Init Playbook Git Workflow Question** (Core profile only):
+   - Step 1c asks Core users their preference
+   - Core+PM defaults to pull_request without asking
+
+4. **STACK.template.md Documentation**:
+   - Prominent comments explaining both workflows
+   - Documents that pre-commit BLOCKS (not warns)
+   - Mentions --no-verify escape hatch
+
+**Why BLOCK not WARN?**
+- User explicitly chose `pull_request` = they want enforcement
+- Agents ignore warnings
+- Built-in escape hatch (`--no-verify`) for intentional hotfixes
+
+**Tests**: 9 validation checks added to validate_framework.sh
+
+**Impact**: Framework respects user's workflow choice while enforcing it when requested.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.15.0
+**Current Version**: v0.15.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 

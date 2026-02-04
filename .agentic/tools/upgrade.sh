@@ -302,8 +302,85 @@ fi
 
 echo ""
 
-# Step 7: Verification (now 7/9)
-echo -e "${BLUE}[7/9] Running verification${NC}"
+# Step 7: Add new configuration sections (v0.16.0+)
+echo -e "${BLUE}[7/10] Adding new configuration sections${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+if [[ "$DRY_RUN" == "yes" ]]; then
+  echo "  [DRY RUN] Would add new configuration sections"
+else
+  # Add complexity_limits section to STACK.md if missing
+  if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+    if ! grep -q "## Complexity limits" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null; then
+      echo "  Adding complexity limits section to STACK.md..."
+      cat >> "$TARGET_PROJECT_DIR/STACK.md" <<'COMPLEXITY_EOF'
+
+## Complexity limits
+- max_files_per_commit: 10
+- max_added_lines: 500
+- max_code_file_length: 500
+COMPLEXITY_EOF
+      echo -e "${GREEN}  ✓ Added complexity limits section${NC}"
+    else
+      echo -e "  ${GREEN}✓${NC} Complexity limits section already exists"
+    fi
+
+    # Check for test commands
+    HAS_TEST=$(grep -iE "^[- ]*test:" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null || true)
+    HAS_TEST_FAST=$(grep -iE "test_fast:" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null || true)
+
+    if [[ -z "$HAS_TEST" ]] && [[ -z "$HAS_TEST_FAST" ]]; then
+      echo -e "  ${YELLOW}⚠${NC} No test commands in STACK.md"
+      echo "    Consider adding:"
+      echo "      - test: <your full test suite command>"
+      echo "      - test_fast: <quick tests for pre-commit>"
+    elif [[ -n "$HAS_TEST" ]] && [[ -z "$HAS_TEST_FAST" ]]; then
+      echo -e "  ${YELLOW}⚠${NC} Found 'test:' but no 'test_fast:'"
+      echo "    Consider adding a faster test for pre-commit checks"
+    else
+      echo -e "  ${GREEN}✓${NC} Test commands configured"
+    fi
+  fi
+
+  # Add frontmatter to acceptance files missing it
+  if [[ -d "$TARGET_PROJECT_DIR/spec/acceptance" ]]; then
+    UPDATED_ACC=0
+    for acc_file in "$TARGET_PROJECT_DIR"/spec/acceptance/F-*.md; do
+      if [[ -f "$acc_file" ]]; then
+        # Check if file already has frontmatter
+        if ! head -1 "$acc_file" | grep -q "^---"; then
+          FEATURE_ID=$(basename "$acc_file" .md)
+          echo "  Adding frontmatter to $FEATURE_ID..."
+
+          # Create temp file with frontmatter prepended
+          {
+            echo "---"
+            echo "feature: $FEATURE_ID"
+            echo "status: shipped"
+            echo "validation: []  # TODO: Add validation commands"
+            echo "---"
+            echo ""
+            cat "$acc_file"
+          } > "${acc_file}.tmp"
+          mv "${acc_file}.tmp" "$acc_file"
+
+          UPDATED_ACC=$((UPDATED_ACC + 1))
+        fi
+      fi
+    done
+
+    if [[ $UPDATED_ACC -gt 0 ]]; then
+      echo -e "  ${GREEN}✓${NC} Updated $UPDATED_ACC acceptance file(s) with frontmatter"
+    else
+      echo -e "  ${GREEN}✓${NC} All acceptance files have frontmatter"
+    fi
+  fi
+fi
+
+echo ""
+
+# Step 8: Verification (was 7/9)
+echo -e "${BLUE}[8/10] Running verification${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 if [[ "$DRY_RUN" == "yes" ]]; then
@@ -359,8 +436,8 @@ fi
 
 echo ""
 
-# Step 8: Update STACK.md with new version (consolidated, robust pattern matching)
-echo -e "${BLUE}[8/9] Updating STACK.md with new framework version${NC}"
+# Step 9: Update STACK.md with new version (consolidated, robust pattern matching)
+echo -e "${BLUE}[9/10] Updating STACK.md with new framework version${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Use whichever version variable is set (FRAMEWORK_VERSION or NEW_VERSION as fallback)
@@ -424,8 +501,8 @@ else
   echo -e "  ${YELLOW}⚠${NC} Could not update .agentic/VERSION (version unknown)"
 fi
 
-# Step 9: Create upgrade marker for agent to pick up at next session
-echo -e "${BLUE}[9/9] Creating upgrade marker${NC}"
+# Step 10: Create upgrade marker for agent to pick up at next session
+echo -e "${BLUE}[10/10] Creating upgrade marker${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 debug "Creating upgrade marker at: $TARGET_PROJECT_DIR/.agentic/.upgrade_pending"
@@ -518,7 +595,7 @@ echo ""
 
 # Environment check - show what tool files exist, suggest if missing
 echo ""
-echo "[8/8] Environment check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "[11/11] Environment check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/check-environment.sh" ]]; then
   cd "$TARGET_PROJECT_DIR"
   bash .agentic/tools/check-environment.sh --list 2>/dev/null || true
