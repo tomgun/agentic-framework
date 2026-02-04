@@ -1,7 +1,7 @@
 {
   "focus": "v0.13.0 released and tagged",
   "progress": "v0.12.1 released and tagged",
-  "next": "F-0109 complete - commit pending",
+  "next": "F-0120: Move JOURNAL.md + manifests to .agentic-journal/",
   "blocker": "None",
-  "updated": "2026-02-02T21:02:09Z"
+  "updated": "2026-02-04T21:43:02Z"
 }

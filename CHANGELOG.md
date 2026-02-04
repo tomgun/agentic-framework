@@ -5,7 +5,7 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.16.0] - 2026-02-04
+## [0.17.0] - 2026-02-04
 
 ### Added
 - **Spec Migration System (F-0117)** - Complete migration management for spec evolution
@@ -26,17 +26,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Configurable via `doc_tracking:` in STACK.md
 
 - **Feature Change Manifest Generation (F-0119)** - Git-based change tracking
-  - `manifest.sh F-XXXX` - Generate manifest from feature ID
+  - `manifest.sh F-XXXX` - Generate manifest from feature ID (JSON output)
   - `manifest.sh --branch feature/foo` - Generate from branch
   - `manifest.sh --since 2026-02-01` - Generate from date range
-  - `manifest.sh F-XXXX --migration N` - Embed into migration file
-  - Outputs JSON with commits, files grouped by type, line stats
+  - `manifest.sh --markdown` - Human-readable Markdown output
+  - Integrates with `drift.sh --manifest` for targeted doc drift detection
 
 - **State Directory Migration** - Moved state files to `.agentic-state/`
   - `WIP.md`, `AGENTS_ACTIVE.md`, manifests now in `.agentic-state/`
   - Survives framework upgrades (not inside `.agentic/`)
   - Updated all tools and tests for new paths
 
+---
+
+## [0.16.0] - 2026-02-04
+
+### Added
 - **Maintainability Enforcement Gates (F-0116)** - Automated quality enforcement
   - **Test Execution Gate** (BLOCKING) - Pre-commit runs tests from STACK.md
     - Reads `test_fast:` (preferred) or `test:` commands

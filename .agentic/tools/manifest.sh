@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# manifest.sh - Generate feature change manifest from git history
+# manifest.sh - Generate feature change manifest from git history (JSON format)
 #
 # Usage:
 #   manifest.sh F-XXXX                    # Generate from feature ID (searches commits)
 #   manifest.sh --branch feature/foo      # Generate from branch
 #   manifest.sh --since 2026-02-01        # Generate from date range
 #   manifest.sh --commits abc123,def456   # Generate from explicit commits
-#   manifest.sh F-XXXX --migration 116    # Generate and embed into migration file
+#   manifest.sh F-XXXX --markdown         # Output Markdown instead of JSON
 #
-# Output: .manifests/ directory at project root (persists across .agentic upgrades)
+# Output: .agentic-state/manifests/<name>.json (JSON format for drift.sh integration)
 #
 set -euo pipefail
 
@@ -28,8 +28,8 @@ git rev-parse --git-dir >/dev/null 2>&1 || error "Not a git repository"
 # Parse arguments
 MODE=""
 VALUE=""
-MIGRATION_ID=""
 OUTPUT_FILE=""
+FORMAT="json"  # Default to JSON for drift.sh compatibility
 
 show_help() {
     cat << 'EOF'
@@ -40,21 +40,21 @@ USAGE:
     manifest.sh --branch NAME             Generate from branch (vs main)
     manifest.sh --since DATE              Generate from date range
     manifest.sh --commits HASH,HASH       Generate from explicit commits
-    manifest.sh F-XXXX --migration 116    Embed manifest into migration file
 
 OPTIONS:
     --output FILE     Override output file path
-    --migration ID    Append manifest to spec/migrations/ID_*.md
+    --markdown        Output Markdown format instead of JSON
     -h, --help        Show this help
 
 EXAMPLES:
-    manifest.sh F-0116                    # Feature commits
+    manifest.sh F-0116                    # Feature commits (JSON)
     manifest.sh --branch feature/auth     # All commits on branch
     manifest.sh --since "2026-02-01"      # Recent commits
-    manifest.sh F-0116 --migration 116    # Embed in migration
+    manifest.sh F-0116 --markdown         # Human-readable Markdown
 
 OUTPUT:
-    Creates .agentic-state/manifests/<name>.manifest.md at project root.
+    Creates .agentic-state/manifests/<name>.json at project root.
+    Use --markdown for .manifest.md human-readable format.
     This location persists across .agentic framework upgrades.
 EOF
 }
@@ -76,9 +76,9 @@ while [[ $# -gt 0 ]]; do
             VALUE="$2"
             shift 2
             ;;
-        --migration)
-            MIGRATION_ID="$2"
-            shift 2
+        --markdown)
+            FORMAT="markdown"
+            shift
             ;;
         --output)
             OUTPUT_FILE="$2"
@@ -140,150 +140,252 @@ fi
 
 mkdir -p "$MANIFEST_DIR"
 
+# Determine output file extension based on format
+if [[ "$FORMAT" == "json" ]]; then
+    EXT="json"
+else
+    EXT="manifest.md"
+fi
+
 # Determine output file
 if [[ -z "$OUTPUT_FILE" ]]; then
     case "$MODE" in
         feature)
-            OUTPUT_FILE="$MANIFEST_DIR/${VALUE}.manifest.md"
+            OUTPUT_FILE="$MANIFEST_DIR/${VALUE}.${EXT}"
             ;;
         branch)
-            OUTPUT_FILE="$MANIFEST_DIR/branch-$(echo "$VALUE" | tr '/' '-').manifest.md"
+            OUTPUT_FILE="$MANIFEST_DIR/branch-$(echo "$VALUE" | tr '/' '-').${EXT}"
             ;;
         since)
-            OUTPUT_FILE="$MANIFEST_DIR/since-$(echo "$VALUE" | tr ' :' '-').manifest.md"
+            OUTPUT_FILE="$MANIFEST_DIR/since-$(echo "$VALUE" | tr ' :' '-').${EXT}"
             ;;
         commits)
-            OUTPUT_FILE="$MANIFEST_DIR/commits-$(date +%Y%m%d-%H%M%S).manifest.md"
+            OUTPUT_FILE="$MANIFEST_DIR/commits-$(date +%Y%m%d-%H%M%S).${EXT}"
             ;;
     esac
 fi
 
-# Generate manifest
-{
-    echo "# Change Manifest: $VALUE"
-    echo ""
-    echo "Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-    echo "Mode: $MODE"
-    echo ""
+# Helper: escape JSON string
+json_escape() {
+    local str="$1"
+    str="${str//\\/\\\\}"
+    str="${str//\"/\\\"}"
+    str="${str//$'\n'/\\n}"
+    str="${str//$'\t'/\\t}"
+    printf '%s' "$str"
+}
 
-    echo "## Commits"
-    echo ""
-    echo "| Hash | Date | Message | Files | +/- |"
-    echo "|------|------|---------|-------|-----|"
+# Collect all data first
+TOTAL_ADDED=0
+TOTAL_REMOVED=0
+ALL_FILES=""
+COMMITS_DATA=""
 
-    TOTAL_ADDED=0
-    TOTAL_REMOVED=0
-    ALL_FILES=""
+while IFS= read -r commit; do
+    [[ -z "$commit" ]] && continue
 
-    while IFS= read -r commit; do
-        [[ -z "$commit" ]] && continue
+    # Use git log for consistent output (handles merge commits)
+    SHORT=$(git log -1 --format="%h" "$commit" 2>/dev/null) || continue
+    DATE=$(git log -1 --format="%cs" "$commit")
+    MSG=$(git log -1 --format="%s" "$commit")
 
-        # Use git log for consistent output (handles merge commits)
-        SHORT=$(git log -1 --format="%h" "$commit" 2>/dev/null) || continue
-        DATE=$(git log -1 --format="%cs" "$commit")
-        MSG=$(git log -1 --format="%s" "$commit" | head -c 50)
+    # Get file stats
+    STATS=$(git log -1 --numstat --format="" "$commit")
+    ADDED=$(echo "$STATS" | awk '{sum += $1} END {print sum+0}')
+    REMOVED=$(echo "$STATS" | awk '{sum += $2} END {print sum+0}')
 
-        # Get file stats
-        STATS=$(git log -1 --numstat --format="" "$commit")
-        FILE_COUNT=$(echo "$STATS" | grep -c '.' 2>/dev/null || echo "0")
-        ADDED=$(echo "$STATS" | awk '{sum += $1} END {print sum+0}')
-        REMOVED=$(echo "$STATS" | awk '{sum += $2} END {print sum+0}')
+    TOTAL_ADDED=$((TOTAL_ADDED + ADDED))
+    TOTAL_REMOVED=$((TOTAL_REMOVED + REMOVED))
 
-        echo "| $SHORT | $DATE | $MSG | $FILE_COUNT | +$ADDED/-$REMOVED |"
+    # Collect files
+    FILES=$(git log -1 --name-only --format="" "$commit")
+    ALL_FILES="$ALL_FILES"$'\n'"$FILES"
 
-        TOTAL_ADDED=$((TOTAL_ADDED + ADDED))
-        TOTAL_REMOVED=$((TOTAL_REMOVED + REMOVED))
+    # Store commit data for later
+    COMMITS_DATA="$COMMITS_DATA$SHORT|$DATE|$MSG|$ADDED|$REMOVED"$'\n'
 
-        # Collect files
-        FILES=$(git log -1 --name-only --format="" "$commit")
-        ALL_FILES="$ALL_FILES"$'\n'"$FILES"
+done <<< "$COMMITS"
 
-    done <<< "$COMMITS"
+# Deduplicate and categorize files
+UNIQUE_FILES=$(echo "$ALL_FILES" | grep -v '^$' | sort -u)
 
-    echo ""
-    echo "## Summary"
-    echo ""
-    COMMIT_COUNT=$(echo "$COMMITS" | grep -c '.' 2>/dev/null || echo "0")
-    echo "- **Total commits**: $COMMIT_COUNT"
-    echo "- **Lines added**: $TOTAL_ADDED"
-    echo "- **Lines removed**: $TOTAL_REMOVED"
-    echo ""
+CODE_FILES=$(echo "$UNIQUE_FILES" | grep -E '\.(py|js|ts|tsx|jsx|go|rs|rb|sh|java|swift|kt|scala)$' | grep -v -iE '(test|spec)' || true)
+TEST_FILES=$(echo "$UNIQUE_FILES" | grep -iE '(test|spec)\.(py|js|ts|tsx|jsx|go|rs|rb|java)$|tests?/|spec/' || true)
+DOC_FILES=$(echo "$UNIQUE_FILES" | grep -E '\.(md|txt|rst)$' | grep -v -iE 'test' || true)
+CONFIG_FILES=$(echo "$UNIQUE_FILES" | grep -E '\.(json|yaml|yml|toml|ini|cfg)$' || true)
 
-    # Deduplicate and categorize files
-    UNIQUE_FILES=$(echo "$ALL_FILES" | grep -v '^$' | sort -u)
+COMMIT_COUNT=$(echo "$COMMITS" | grep -c '.' 2>/dev/null || echo "0")
+TOTAL_FILES=$(echo "$UNIQUE_FILES" | grep -c '.' 2>/dev/null || echo "0")
 
-    echo "## Files Changed"
-    echo ""
+# Generate output based on format
+if [[ "$FORMAT" == "json" ]]; then
+    # JSON format for drift.sh integration
+    {
+        echo "{"
+        echo "  \"feature\": \"$VALUE\","
+        echo "  \"mode\": \"$MODE\","
+        echo "  \"generated\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\","
+        echo "  \"commits\": ["
 
-    # Code files
-    echo "### Code"
-    CODE_FILES=$(echo "$UNIQUE_FILES" | grep -E '\.(py|js|ts|tsx|jsx|go|rs|rb|sh|java|swift|kt|scala)$' | grep -v -iE '(test|spec)' || true)
-    if [[ -n "$CODE_FILES" ]]; then
-        echo "$CODE_FILES" | while read -r f; do
-            [[ -n "$f" ]] && echo "- \`$f\`"
-        done
-    else
-        echo "_None_"
-    fi
+        # Output commits
+        FIRST=true
+        while IFS='|' read -r hash date msg added removed; do
+            [[ -z "$hash" ]] && continue
+            if [[ "$FIRST" == "true" ]]; then
+                FIRST=false
+            else
+                echo ","
+            fi
+            printf '    {"hash": "%s", "date": "%s", "message": "%s", "additions": %s, "deletions": %s}' \
+                "$hash" "$date" "$(json_escape "$msg")" "$added" "$removed"
+        done <<< "$COMMITS_DATA"
+        echo ""
+        echo "  ],"
 
-    echo ""
-    echo "### Tests"
-    TEST_FILES=$(echo "$UNIQUE_FILES" | grep -iE '(test|spec)\.(py|js|ts|tsx|jsx|go|rs|rb|java)$|tests?/|spec/' || true)
-    if [[ -n "$TEST_FILES" ]]; then
-        echo "$TEST_FILES" | while read -r f; do
-            [[ -n "$f" ]] && echo "- \`$f\`"
-        done
-    else
-        echo "_None_"
-    fi
+        # Output files
+        echo "  \"files\": {"
 
-    echo ""
-    echo "### Documentation"
-    DOC_FILES=$(echo "$UNIQUE_FILES" | grep -E '\.(md|txt|rst)$' | grep -v -iE 'test' || true)
-    if [[ -n "$DOC_FILES" ]]; then
-        echo "$DOC_FILES" | while read -r f; do
-            [[ -n "$f" ]] && echo "- \`$f\`"
-        done
-    else
-        echo "_None_"
-    fi
+        # Code files
+        echo -n "    \"code\": ["
+        FIRST=true
+        while IFS= read -r f; do
+            [[ -z "$f" ]] && continue
+            if [[ "$FIRST" == "true" ]]; then
+                FIRST=false
+            else
+                echo -n ", "
+            fi
+            printf '{"file": "%s"}' "$f"
+        done <<< "$CODE_FILES"
+        echo "],"
 
-    echo ""
-    echo "### Configuration"
-    CONFIG_FILES=$(echo "$UNIQUE_FILES" | grep -E '\.(json|yaml|yml|toml|ini|cfg)$' || true)
-    if [[ -n "$CONFIG_FILES" ]]; then
-        echo "$CONFIG_FILES" | while read -r f; do
-            [[ -n "$f" ]] && echo "- \`$f\`"
-        done
-    else
-        echo "_None_"
-    fi
+        # Test files
+        echo -n "    \"tests\": ["
+        FIRST=true
+        while IFS= read -r f; do
+            [[ -z "$f" ]] && continue
+            if [[ "$FIRST" == "true" ]]; then
+                FIRST=false
+            else
+                echo -n ", "
+            fi
+            printf '{"file": "%s"}' "$f"
+        done <<< "$TEST_FILES"
+        echo "],"
 
-} > "$OUTPUT_FILE"
+        # Doc files
+        echo -n "    \"docs\": ["
+        FIRST=true
+        while IFS= read -r f; do
+            [[ -z "$f" ]] && continue
+            if [[ "$FIRST" == "true" ]]; then
+                FIRST=false
+            else
+                echo -n ", "
+            fi
+            printf '{"file": "%s"}' "$f"
+        done <<< "$DOC_FILES"
+        echo "],"
+
+        # Config files
+        echo -n "    \"config\": ["
+        FIRST=true
+        while IFS= read -r f; do
+            [[ -z "$f" ]] && continue
+            if [[ "$FIRST" == "true" ]]; then
+                FIRST=false
+            else
+                echo -n ", "
+            fi
+            printf '{"file": "%s"}' "$f"
+        done <<< "$CONFIG_FILES"
+        echo "]"
+
+        echo "  },"
+
+        # Stats
+        echo "  \"stats\": {"
+        echo "    \"total_commits\": $COMMIT_COUNT,"
+        echo "    \"total_files\": $TOTAL_FILES,"
+        echo "    \"additions\": $TOTAL_ADDED,"
+        echo "    \"deletions\": $TOTAL_REMOVED"
+        echo "  }"
+        echo "}"
+
+    } > "$OUTPUT_FILE"
+
+else
+    # Markdown format for human readability
+    {
+        echo "# Change Manifest: $VALUE"
+        echo ""
+        echo "Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+        echo "Mode: $MODE"
+        echo ""
+
+        echo "## Commits"
+        echo ""
+        echo "| Hash | Date | Message | +/- |"
+        echo "|------|------|---------|-----|"
+
+        while IFS='|' read -r hash date msg added removed; do
+            [[ -z "$hash" ]] && continue
+            # Truncate message for table display
+            short_msg="${msg:0:50}"
+            echo "| $hash | $date | $short_msg | +$added/-$removed |"
+        done <<< "$COMMITS_DATA"
+
+        echo ""
+        echo "## Summary"
+        echo ""
+        echo "- **Total commits**: $COMMIT_COUNT"
+        echo "- **Lines added**: $TOTAL_ADDED"
+        echo "- **Lines removed**: $TOTAL_REMOVED"
+        echo ""
+
+        echo "## Files Changed"
+        echo ""
+
+        echo "### Code"
+        if [[ -n "$CODE_FILES" ]]; then
+            echo "$CODE_FILES" | while read -r f; do
+                [[ -n "$f" ]] && echo "- \`$f\`"
+            done
+        else
+            echo "_None_"
+        fi
+
+        echo ""
+        echo "### Tests"
+        if [[ -n "$TEST_FILES" ]]; then
+            echo "$TEST_FILES" | while read -r f; do
+                [[ -n "$f" ]] && echo "- \`$f\`"
+            done
+        else
+            echo "_None_"
+        fi
+
+        echo ""
+        echo "### Documentation"
+        if [[ -n "$DOC_FILES" ]]; then
+            echo "$DOC_FILES" | while read -r f; do
+                [[ -n "$f" ]] && echo "- \`$f\`"
+            done
+        else
+            echo "_None_"
+        fi
+
+        echo ""
+        echo "### Configuration"
+        if [[ -n "$CONFIG_FILES" ]]; then
+            echo "$CONFIG_FILES" | while read -r f; do
+                [[ -n "$f" ]] && echo "- \`$f\`"
+            done
+        else
+            echo "_None_"
+        fi
+
+    } > "$OUTPUT_FILE"
+fi
 
 echo "✅ Generated $OUTPUT_FILE"
-
-# If --migration specified, append to migration file
-if [[ -n "$MIGRATION_ID" ]]; then
-    MIGRATION_PATTERN="$PROJECT_ROOT/spec/migrations/${MIGRATION_ID}_*.md"
-    MIGRATION_FILE=$(ls $MIGRATION_PATTERN 2>/dev/null | head -1)
-
-    if [[ -f "$MIGRATION_FILE" ]]; then
-        # Check if manifest section already exists
-        if ! grep -q "## Generated Manifest" "$MIGRATION_FILE"; then
-            {
-                echo ""
-                echo "---"
-                echo ""
-                echo "## Generated Manifest"
-                echo ""
-                cat "$OUTPUT_FILE"
-            } >> "$MIGRATION_FILE"
-            echo "✅ Appended manifest to $MIGRATION_FILE"
-        else
-            echo "⚠️ Migration already has manifest section (skipped)"
-        fi
-    else
-        warn "Migration file not found for ID $MIGRATION_ID"
-    fi
-fi

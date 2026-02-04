@@ -783,10 +783,10 @@ check_documentation_drift() {
         echo -e "${BLUE}Using manifest:${NC} $MANIFEST_FEATURE"
         local manifest_file="$manifest_dir/${MANIFEST_FEATURE}.json"
         if [[ -f "$manifest_file" ]]; then
-            # Extract changed files from manifest JSON
+            # Extract changed files from manifest JSON (portable for macOS/Linux)
             while IFS= read -r file; do
                 [[ -n "$file" ]] && changed_files+=("$file")
-            done < <(grep -oE '"file":\s*"[^"]+"' "$manifest_file" | sed 's/"file":\s*"//' | sed 's/"$//' || true)
+            done < <(grep -o '"file": "[^"]*"' "$manifest_file" | sed 's/"file": "//;s/"$//' || true)
         else
             echo -e "${YELLOW}Warning:${NC} Manifest $manifest_file not found"
             echo "  Falling back to recent git changes..."

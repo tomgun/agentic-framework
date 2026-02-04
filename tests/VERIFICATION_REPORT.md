@@ -1,7 +1,7 @@
 # Framework Verification Report
 
 **Generated**: 2026-02-04
-**Framework Version**: 0.16.0
+**Framework Version**: 0.17.0
 **Test Results**: 149 passed, 0 failed
 
 ---

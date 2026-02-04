@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.15.0)
-**Date**: 2026-02-01  
+**Period**: Initial Development (v0.1.0 → v0.17.0)
+**Date**: 2026-02-04  
 
 ---
 
@@ -1466,8 +1466,89 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+---
+
+## v0.16.0 Contributions (2026-02-04)
+
+### Maintainability Enforcement Gates (F-0116)
+
+**User direction**: After Karpathy/Osmani analysis, moved from behavioral instructions to structural enforcement.
+
+**Implementation - Three Enforcement Gates**:
+
+1. **Test Execution Gate** (BLOCKING):
+   - Pre-commit runs tests from `test_fast:` or `test:` in STACK.md
+   - Whitelist-based execution (pytest, npm test, cargo test, etc.)
+   - Timeout protection with macOS/Linux compatibility
+
+2. **Complexity Limits Gate** (BLOCKING):
+   - `max_files_per_commit` (default: 10)
+   - `max_added_lines` (default: 500) - additions only, not deletions
+   - `max_code_file_length` (default: 500 lines)
+   - File-type aware (only checks code extensions)
+
+3. **Escape Hatches** (feature branches only):
+   - `SKIP_TESTS=1` and `SKIP_COMPLEXITY=1` environment variables
+   - BLOCKED on main/master branches
+
+**Impact**: Enforces small batch development structurally, not via instructions.
+
+---
+
+## v0.17.0 Contributions (2026-02-04)
+
+### Spec Migration System (F-0117)
+
+**User direction**: Need versioned spec evolution to track feature changes over time.
+
+**Implementation**:
+- `migration.sh create "title"` - Creates numbered migration files
+- `migration.sh list` / `show N` / `search "term"` - Query migrations
+- `migration.sh apply` - Regenerates FEATURES.md from migrations
+- Auto-updates `_index.json` registry
+- Parses Features Added/Modified/Deprecated sections
+
+**Impact**: Spec changes tracked like database migrations - auditable history.
+
+### Documentation Drift Detection (F-0118)
+
+**User insight**: Code changes without doc updates lead to stale documentation.
+
+**Implementation**:
+- `drift.sh --docs` - Detects when docs may be out of sync with code
+- `drift.sh --docs --manifest F-XXXX` - Targeted check against feature manifest
+- Advisory only (never blocks)
+- Shows "potentially stale" vs "updated" documentation
+
+**Impact**: Proactive doc freshness detection without blocking workflow.
+
+### Feature Change Manifest Generation (F-0119)
+
+**User direction**: Track what files changed for each feature.
+
+**Implementation**:
+- `manifest.sh F-XXXX` - Generate JSON manifest from feature commits
+- `manifest.sh --branch feature/foo` - Generate from branch
+- `manifest.sh --markdown` - Human-readable format option
+- JSON output integrates with drift.sh `--manifest` flag
+
+**Impact**: Change visibility for targeted drift detection.
+
+### State Directory Migration
+
+**User insight**: State files inside `.agentic/` get lost during framework upgrades.
+
+**Implementation**:
+- Created `.agentic-state/` at project root (survives upgrades)
+- Moved: `WIP.md`, `AGENTS_ACTIVE.md`, manifests
+- Updated all tools and tests for new paths
+
+**Impact**: State persistence across framework version upgrades.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.15.1
+**Current Version**: v0.17.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 
