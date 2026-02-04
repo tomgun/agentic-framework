@@ -72,6 +72,28 @@ Example projects demonstrate best practices and verify workflows actually work.
 
 **Anti-pattern**: ❌ Copying script explanation to 3 files instead of putting in DEVELOPER_GUIDE and referencing it.
 
+#### Agent Instruction Files (CLAUDE.md, Cursor Rules, etc.)
+
+**Canonical source**: `.agentic/agents/<tool>/` contains what users receive.
+
+```
+.agentic/agents/claude/CLAUDE.md     ← CANONICAL (develop features here)
+         ↓
+/CLAUDE.md (root)                    ← Framework-specific wrapper only
+```
+
+**The dogfooding rule**:
+1. **Develop features in `.agentic/`** - the template users receive
+2. **Root files extend, not replace** - add only project-specific notes
+3. **Never let root diverge** - if root has features template doesn't, backport immediately
+
+**When adding new features to CLAUDE.md**:
+1. Add to `.agentic/agents/claude/CLAUDE.md` FIRST
+2. Test that users would benefit from it
+3. Only then update root `/CLAUDE.md` if framework-dev needs something extra
+
+**Anti-pattern**: ❌ Adding `ag` CLI commands to root CLAUDE.md but not the template users get.
+
 ---
 
 ### 4. **Test Framework Changes**
