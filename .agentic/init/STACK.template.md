@@ -95,6 +95,17 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--     review: sonnet        # Code review, testing, refactoring -->
 <!--     search: haiku         # Codebase exploration, finding files -->
 
+## Plan-Review Loop (recommended)
+<!-- Iterative planning with critical review before implementation -->
+<!-- See: .agentic/workflows/plan_review_loop.md -->
+- plan_review_enabled: yes  <!-- yes | no (default: yes for Core+PM, no for Core) -->
+- plan_review_max_iterations: 3  <!-- Max revisions before human escalation -->
+- plan_review_auto_for: [planning]  <!-- planning | implement | both -->
+  <!-- planning: Runs for ag plan commands -->
+  <!-- implement: Also runs before ag implement if no approved plan exists -->
+  <!-- both: Always runs for both commands -->
+<!-- - plan_review_reviewer_model: same  # same | opus | sonnet (use same model as planner) -->
+
 ## Sequential agent pipeline (optional but RECOMMENDED)
 <!-- Enables specialized agents to work sequentially on features for optimal context efficiency -->
 <!-- See: .agentic/workflows/sequential_agent_specialization.md -->
