@@ -1051,6 +1051,80 @@ else
 fi
 
 # ============================================================
+# F-0122: Multi-Tool LLM Testing Infrastructure
+# ============================================================
+echo ""
+echo "--- F-0122: Multi-Tool LLM Testing Infrastructure ---"
+
+# Test definitions JSON exists
+if [[ -f "${FRAMEWORK_ROOT}/tests/llm/test_definitions.json" ]]; then
+  pass "test_definitions.json exists"
+else
+  fail "test_definitions.json missing"
+fi
+
+# Test definitions has critical tests
+if grep -q '"category": "Critical"' "${FRAMEWORK_ROOT}/tests/llm/test_definitions.json" 2>/dev/null; then
+  pass "test_definitions.json has Critical tests"
+else
+  fail "test_definitions.json missing Critical category tests"
+fi
+
+# Interactive runner exists and is executable
+if [[ -f "${FRAMEWORK_ROOT}/tests/llm/interactive_runner.py" ]]; then
+  pass "interactive_runner.py exists"
+else
+  fail "interactive_runner.py missing"
+fi
+
+# Interactive runner has key functions
+if grep -q "def setup_test_project" "${FRAMEWORK_ROOT}/tests/llm/interactive_runner.py" 2>/dev/null; then
+  pass "interactive_runner.py has setup_test_project function"
+else
+  fail "interactive_runner.py missing setup_test_project"
+fi
+
+if grep -q "def verify_test" "${FRAMEWORK_ROOT}/tests/llm/interactive_runner.py" 2>/dev/null; then
+  pass "interactive_runner.py has verify_test function"
+else
+  fail "interactive_runner.py missing verify_test"
+fi
+
+# ag.sh has test llm command
+if grep -q 'cmd_test_llm' "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "ag.sh has cmd_test_llm function"
+else
+  fail "ag.sh missing cmd_test_llm function"
+fi
+
+if grep -q 'ag test llm' "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "ag.sh documents 'ag test llm' command"
+else
+  fail "ag.sh missing 'ag test llm' documentation"
+fi
+
+# harness.sh supports cursor-cli
+if grep -q 'cursor-cli' "${FRAMEWORK_ROOT}/tests/llm/harness.sh" 2>/dev/null; then
+  pass "harness.sh supports cursor-cli"
+else
+  fail "harness.sh missing cursor-cli support"
+fi
+
+# harness.sh exports CURSOR_CMD
+if grep -q 'export.*CURSOR_CMD' "${FRAMEWORK_ROOT}/tests/llm/harness.sh" 2>/dev/null; then
+  pass "harness.sh exports CURSOR_CMD"
+else
+  fail "harness.sh missing CURSOR_CMD export"
+fi
+
+# Acceptance criteria exists
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0122.md" ]]; then
+  pass "F-0122 acceptance criteria exists"
+else
+  fail "F-0122 acceptance criteria missing"
+fi
+
+# ============================================================
 # PROFILE-AWARE INSTALLATION TESTS
 # ============================================================
 echo ""

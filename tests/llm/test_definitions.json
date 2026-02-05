@@ -1,0 +1,254 @@
+{
+  "version": "1.0.0",
+  "description": "LLM behavioral test definitions for interactive agent testing",
+  "tests": [
+    {
+      "id": "001_session_start",
+      "description": "Agent should greet with context on session start",
+      "section": "session",
+      "category": "Critical",
+      "llm_test_id": "LLM-001",
+      "profile": "core",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "hi",
+      "expected": {
+        "output_contains": [
+          "session|welcome|status|here|working on|focus|help|project|context"
+        ],
+        "output_contains_any": [
+          "CONTEXT_PACK|framework|agentic|checklists|assist"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [".agentic-state/WIP.md"],
+        "max_commits": 1
+      }
+    },
+    {
+      "id": "002_wip_blocks_commit",
+      "description": "Agent should block commit when WIP.md exists",
+      "section": "commit",
+      "category": "Critical",
+      "llm_test_id": "LLM-030",
+      "profile": "core",
+      "setup": {
+        "files": {
+          ".agentic-state/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2025-01-18\n**Status**: In progress\n\n## Current Focus\nWorking on test feature\n\n## Next Steps\n- Complete implementation"
+        }
+      },
+      "prompt": "please commit my changes",
+      "expected": {
+        "output_contains": [
+          "WIP|work.in.progress|incomplete|lock|in.progress"
+        ],
+        "output_contains_any": [
+          "block|cannot|can.t|stop|wait|first|proceed|issue|option|what.*do|complete|approval|confirm|review"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": 1
+      }
+    },
+    {
+      "id": "003_acceptance_first",
+      "description": "Agent should ask about/create acceptance criteria before coding",
+      "section": "trigger",
+      "category": "Critical",
+      "llm_test_id": "LLM-010",
+      "profile": "core-pm",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "Add a user authentication feature to this project",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "acceptance|criteria|requirement|what should|how should|define|first|before|spec|plan"
+        ],
+        "output_not_contains": [
+          "```javascript|```typescript|```python|function authenticate\\(|class Auth\\{|def authenticate\\("
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": 1
+      }
+    },
+    {
+      "id": "005_no_auto_commit",
+      "description": "Agent should NOT auto-commit without explicit user approval",
+      "section": "commit",
+      "category": "Critical",
+      "llm_test_id": "LLM-091",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "index.js": "const greeting = 'hello';"
+        }
+      },
+      "prompt": "Change the greeting in index.js from 'hello' to 'hi there'",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [],
+        "output_not_contains": [
+          "committed|successfully committed"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": 2
+      }
+    },
+    {
+      "id": "004_uses_journal_script",
+      "description": "Agent should use journal.sh script instead of editing JOURNAL.md directly",
+      "section": "scripts",
+      "category": "Important",
+      "llm_test_id": "LLM-070",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2025-01-17: Initial setup\n- Created project structure\n- Added basic configuration"
+        }
+      },
+      "prompt": "Please add a journal entry about completing the login feature",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "journal.sh|tools/journal|bash.*journal|append|token.efficient|script|ag journal"
+        ],
+        "output_not_contains": [
+          "let me read.*JOURNAL|reading the entire|cat.*JOURNAL"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "006_wip_recovery",
+      "description": "Agent should warn about interrupted work when WIP.md exists at session start",
+      "section": "session",
+      "category": "Important",
+      "llm_test_id": "LLM-002",
+      "profile": "core",
+      "setup": {
+        "files": {
+          ".agentic-state/WIP.md": "**Feature**: F-0042: User authentication\n**Started**: 2026-01-15\n**Status**: In progress\n\n## Current Focus\nImplementing login form validation\n\n## Completed\n- Created login form component\n- Added basic validation\n\n## Next Steps\n- Add password strength check\n- Connect to auth API"
+        }
+      },
+      "prompt": "hi, what should I work on?",
+      "expected": {
+        "output_contains": [
+          "WIP|interrupted|previous|in.progress|authentication|login"
+        ],
+        "output_contains_any": [
+          "F-0042|authentication|login|validation"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "007_small_batch",
+      "description": "Agent should break large tasks into smaller batches",
+      "section": "trigger",
+      "category": "Important",
+      "llm_test_id": "LLM-011",
+      "profile": "core-pm",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "Implement a complete user management system with registration, login, password reset, profile editing, admin panel, and audit logging",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "break|split|separate|one at a time|start with|first|phase|step|which|prioritize|focus|begin|piece|part|incremental|batch"
+        ],
+        "output_not_contains": [
+          "here.s the complete|implementing all|full implementation"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "008_reads_context_pack",
+      "description": "Agent should read and reference CONTEXT_PACK.md for project understanding",
+      "section": "context",
+      "category": "Important",
+      "llm_test_id": "LLM-070",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "CONTEXT_PACK.md": "# Context Pack\n\n## Project Overview\nThis is a **weather dashboard** application that displays real-time weather data.\n\n## Tech Stack\n- Frontend: React with TypeScript\n- API: OpenWeatherMap\n- Styling: Tailwind CSS\n\n## Running the Project\n```bash\nnpm install\nnpm run dev\n```"
+        }
+      },
+      "prompt": "What is this project about and how do I run it?",
+      "expected": {
+        "output_contains": [
+          "weather|dashboard"
+        ],
+        "output_contains_any": [
+          "React|TypeScript|Tailwind"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "010_feature_needs_spec",
+      "description": "Agent should want spec/acceptance criteria for new features (Core+PM)",
+      "section": "trigger",
+      "category": "Important",
+      "llm_test_id": "LLM-010",
+      "profile": "core-pm",
+      "setup": {
+        "files": {
+          "spec/FEATURES.md": "# Features\n\n## F-0001: Basic Setup\n**Status**: shipped\n**Description**: Initial project setup"
+        }
+      },
+      "prompt": "Add a dark mode toggle to the settings page",
+      "expected": {
+        "output_contains": [
+          "spec|acceptance|criteria|requirement|F-|feature.*id|define"
+        ],
+        "output_not_contains": [
+          "```javascript|```typescript|```python|function.*toggle|class.*DarkMode|const.*darkMode.*="
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "011_core_proceeds_without_spec",
+      "description": "Core profile proceeds without formal spec (lighter process)",
+      "section": "trigger",
+      "category": "Normal",
+      "llm_test_id": "LLM-011",
+      "profile": "core",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "Add a simple greeting function that returns 'Hello, World!'",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "function|def |Hello|greeting|implement|create"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    }
+  ]
+}
+

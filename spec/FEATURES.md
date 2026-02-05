@@ -1865,6 +1865,26 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0122: Multi-Tool LLM Testing Infrastructure
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.18.0
+
+**Description**: Enable running LLM behavioral tests across different AI tools (Claude CLI, Codex CLI, Cursor CLI, Cursor IDE, Copilot IDE). Adds environment detection, interactive test mode for IDE-based agents, machine-readable test definitions, and `ag test llm` command. Critical for validating framework compliance across all supported tools.
+
+**Dependencies**: F-0121 (Tool-Specific Instructions Parity)
+
+**Implementation**:
+- State: complete
+- Code: `tests/llm/test_definitions.json`, `tests/llm/interactive_runner.py`, `.agentic/tools/ag.sh` (test command), `tests/llm/harness.sh`
+- Tests: `tests/validate_framework.sh` (F-0122 section), `tests/LLM_TEST_RESULTS.md`
+
+**Acceptance**: See `spec/acceptance/F-0122.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1879,6 +1899,6 @@ agent_mode: balanced  # premium | balanced | economy
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 9 | 1 | 1 | 11 |
-| **Total** | **82** | **2** | **1** | **85** |
+| Framework Infrastructure (F-0101+) | 10 | 1 | 1 | 12 |
+| **Total** | **83** | **2** | **1** | **86** |
 
