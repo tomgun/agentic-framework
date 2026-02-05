@@ -329,7 +329,329 @@ bash .agentic/hooks/pre-commit-check.sh
 
 ---
 
+### Multi-Agent Coordination
+
+**What**: Multiple agents can work in parallel on different features with proper isolation and coordination.
+
+**Why**:
+- Parallel work speeds up development
+- Different features can be worked independently
+- Large projects benefit from parallelization
+- Each agent maintains focused context
+
+**How Enforced**:
+- Git worktrees provide isolated working directories
+- AGENTS_ACTIVE.md tracks which agents are working on what
+- File lock protocol prevents conflicts
+- Clear scope per agent (one feature each)
+- Merge coordination through HUMAN_NEEDED.md when conflicts arise
+
+**Coordination Protocol**:
+1. Before starting: Check AGENTS_ACTIVE.md for conflicts
+2. Claim scope: Add entry with feature ID and working directory
+3. Work in worktree: Isolated branch, isolated files
+4. Complete: Remove from AGENTS_ACTIVE.md, create PR
+5. Human merges: Resolves any conflicts
+
+**Example**:
+```markdown
+# AGENTS_ACTIVE.md
+| Agent | Feature | Worktree | Started |
+|-------|---------|----------|---------|
+| Agent-1 | F-0010 | worktrees/f0010 | 2026-02-05 |
+| Agent-2 | F-0012 | worktrees/f0012 | 2026-02-05 |
+```
+
+**Anti-pattern**: ❌ Multiple agents editing same files. ❌ No tracking of who's working on what. ❌ Race conditions on commits.
+
+---
+
+### PR Mode for Team Collaboration
+
+**What**: Optional pull request workflow for team environments.
+
+**Why**:
+- Teams need code review
+- CI checks before merge
+- Documentation of changes
+- Audit trail of decisions
+- Solo developers may not need this overhead
+
+**How Enforced**:
+- STACK.md has `pr_workflow: enabled/disabled`
+- When enabled, agents create PRs instead of direct commits
+- Human review required (no auto-merge)
+- CI checks must pass before suggesting merge
+- Optional: disabled by default for solo developers
+
+**Example**:
+```
+Agent: "I've implemented F-0010 on branch feature/f0010. 
+       Ready to create PR targeting main?"
+Human: "Yes, create the PR"
+Agent: [Creates PR with description, links to spec]
+Human: [Reviews, requests changes or approves]
+Agent: [Makes changes if needed]
+Human: [Merges PR]
+```
+
+**Anti-pattern**: ❌ Auto-merging PRs. ❌ Skipping CI checks. ❌ Forcing PR workflow on solo developer prototypes.
+
+---
+
+### Build/Deploy Agent Specialization
+
+**What**: Specialized agents for build verification and deployment automation.
+
+**Why**:
+- Build issues should be caught before commit
+- Platform-specific build checks need expertise
+- Deployment is a specialized skill
+- Separation of concerns improves reliability
+- Different agents can have different permissions
+
+**Build Agent**:
+- Verifies build/bundle/compile after implementation
+- Catches platform-specific build issues
+- Part of sequential pipeline (after implementation, before commit)
+- Runs: `npm run build`, `cargo build --release`, etc.
+
+**Deploy Agent**:
+- Deploys to staging/production environments
+- Triggered by PR merge or manual request
+- Has deployment credentials (other agents don't)
+- Automated but with guardrails
+- Optional (not all projects need deployment)
+
+**Example**:
+```
+1. Implementation Agent: Writes code, tests pass
+2. Build Agent: Runs production build, checks for warnings
+3. Human: Reviews and approves
+4. Deploy Agent: Deploys to staging, runs smoke tests
+5. Human: Validates staging, approves production
+6. Deploy Agent: Deploys to production
+```
+
+**Anti-pattern**: ❌ Implementation agent doing deployment. ❌ Skipping build verification. ❌ No separation of deployment credentials.
+
+---
+
 ## Quality & Testing Principles
+
+### TDD as Recommended Default
+
+**What**: Test-Driven Development is the RECOMMENDED (not just optional) development mode for this framework.
+
+**Why**:
+- Better token economics (smaller increments, clearer stopping points)
+- Forces testability by design (cleaner code architecture)
+- Clear progress indicators (each passing test = verifiable progress)
+- Catches issues early (cheaper than debugging later)
+- Reduces rework (design issues surface immediately)
+
+**How Enforced**:
+- STACK.template.md has `development_mode: tdd` as default
+- agent_operating_guidelines.md documents TDD workflow
+- Agents follow red-green-refactor cycle
+- Acceptance-Driven Development is the alternative (not "no testing")
+
+**Example**:
+1. Write failing test for "user login returns token"
+2. Implement minimal code to pass
+3. Refactor for clarity
+4. Commit
+5. Next test
+
+**Anti-pattern**: ❌ Writing all code first, then "adding tests later" (which often means never). ❌ Treating TDD as "too slow" without trying it.
+
+---
+
+### Explicit Over Implicit
+
+**What**: All behavior must be documented explicitly. No "magic" or implicit understanding required.
+
+**Why**:
+- Agents interpret guidelines differently
+- Implicit behavior is forgotten or misunderstood
+- Debugging implicit behavior is costly
+- New team members (human or agent) need clear documentation
+- Magic creates technical debt
+
+**How Enforced**:
+- All scripts have clear documentation in DEVELOPER_GUIDE.md
+- Environment variables documented where used
+- No hidden state or side effects
+- Explicit protocols (session_start.md, definition_of_done.md)
+- YAML/frontmatter for machine-parseable metadata
+
+**Example**:
+- ✅ `session_start.md` explicitly lists: "Step 1: Run wip.sh check"
+- ✅ FEATURES.md uses explicit Status values: planned, in_progress, shipped
+- ❌ "Agents should know to check for WIP" (implicit assumption)
+- ❌ Magic file that changes behavior when present (undocumented)
+
+**Anti-pattern**: ❌ Relying on conventions not documented. ❌ "Smart" defaults that require knowing the codebase. ❌ Hidden configuration files with undocumented effects.
+
+---
+
+### Automated Validation Before Commits
+
+**What**: Quality checks run automatically before code can be committed.
+
+**Why**:
+- Catch issues before they propagate
+- Fail fast philosophy
+- Consistent enforcement regardless of developer
+- Reduces manual review burden
+- Prevents regressions
+
+**How Enforced**:
+- `pre-commit-check.sh` runs validation hooks
+- `quality_checks.sh` runs stack-specific tests
+- Hooks block commit if validation fails
+- CI/CD runs same checks (no "works locally" issues)
+
+**Example**:
+```bash
+# Pre-commit hook automatically runs:
+1. WIP check (is there unfinished work?)
+2. Acceptance criteria exist for shipped features
+3. No untracked files in project directories
+4. Stack-specific quality checks
+# All must pass before commit allowed
+```
+
+**Anti-pattern**: ❌ "Run tests manually before committing" (forgotten). ❌ Different checks in CI vs. local (surprises). ❌ No pre-commit hooks (quality varies).
+
+---
+
+### Retrospectives for Continuous Improvement
+
+**What**: Periodic health checks identify improvement opportunities.
+
+**Why**:
+- Projects drift from best practices over time
+- Bugs reveal gaps in quality checks
+- Framework evolves, projects should too
+- Learning from mistakes prevents repetition
+- Continuous improvement > periodic audits
+
+**How Enforced**:
+- STACK.md has `retrospective_frequency` setting
+- Agent-led but human-approved retrospectives
+- Update quality_checks.sh based on bugs found
+- Document learnings in JOURNAL.md
+- Optional but recommended for long-term projects
+
+**Example**:
+- After 5 features: "Review last 5 features. Any patterns in bugs? Update quality checks."
+- After production bug: "Why didn't tests catch this? Add check to prevent recurrence."
+
+**Anti-pattern**: ❌ Never reviewing past work. ❌ Repeating same mistakes. ❌ Quality checks never evolve with project.
+
+---
+
+### Research Mode for Complex Decisions
+
+**What**: Deep investigation before implementation for complex or unfamiliar work.
+
+**Why**:
+- Complex decisions need exploration
+- Unfamiliar territory benefits from research
+- Document findings for future reference
+- Compare options before committing
+- Prevents expensive wrong turns
+
+**How Enforced**:
+- STACK.md has `research_mode: enabled/disabled`
+- research-agent.md defines research workflow
+- Research findings documented in docs/research/
+- Recommendation or escalation to human before implementing
+- Used for architecture decisions, library choices, complex features
+
+**Example**:
+- "Before implementing auth, research: JWT vs. session, OAuth providers, security best practices"
+- Document: "Researched 3 auth approaches. Recommended: NextAuth.js because..."
+- Then implement based on research findings
+
+**Anti-pattern**: ❌ Jumping into implementation without understanding domain. ❌ Assuming library works without checking docs. ❌ No documentation of why decisions were made.
+
+---
+
+### Programming Standards
+
+**What**: Clear, consistent standards for code quality.
+
+**Why**:
+- Maintainability requires readable code
+- Debugging is harder than writing
+- New agents/developers need to understand existing code
+- Consistency reduces cognitive load
+- Standards prevent common mistakes
+
+**Standards**:
+1. **Descriptive Names**: No cryptic abbreviations (`getUserByEmail` not `getUsrByEml`)
+2. **Small Functions**: <50 lines ideal, single responsibility
+3. **Explicit Error Handling**: Fail fast, clear error messages
+4. **Avoid Magic Numbers**: Named constants (`MAX_RETRIES = 3`)
+5. **Shallow Nesting**: <4 levels deep (extract functions if needed)
+6. **Comments for Why**: Comment non-obvious decisions, not what code does
+
+**Example**:
+```python
+# ✅ Good
+def validate_user_age(age: int) -> bool:
+    """Validate age is within acceptable range."""
+    MINIMUM_AGE = 13
+    MAXIMUM_AGE = 120
+    return MINIMUM_AGE <= age <= MAXIMUM_AGE
+
+# ❌ Bad
+def v(a):
+    return a >= 13 and a <= 120
+```
+
+**Anti-pattern**: ❌ Single-letter variable names. ❌ 200-line functions. ❌ Silent failures. ❌ Deep nesting (if in if in if...).
+
+---
+
+### Comprehensive Testing Standards
+
+**What**: Tests must go beyond happy path to catch real-world failures.
+
+**Why**:
+- Happy path tests miss edge cases
+- Production bugs often come from unexpected inputs
+- Security vulnerabilities hide in edge cases
+- Comprehensive testing catches more bugs
+- Tests document expected behavior
+
+**What to Test**:
+1. **Happy path**: Normal expected inputs
+2. **Edge cases**: Empty strings, zeros, max values
+3. **Invalid input**: Wrong types, malformed data
+4. **Time-based errors**: Timeouts, race conditions
+5. **Concurrency**: Parallel access, deadlocks
+6. **Resource exhaustion**: Memory, disk, connections
+7. **Network failures**: Timeouts, disconnections
+8. **Security**: Injection, unauthorized access
+
+**Example**:
+```python
+# User login tests should cover:
+- Valid credentials → success
+- Invalid password → failure with message
+- Non-existent user → same message (prevent enumeration)
+- Empty password → validation error
+- SQL injection attempt → handled safely
+- Rate limiting → blocked after 5 failures
+- Session timeout → re-authentication required
+```
+
+**Anti-pattern**: ❌ Only testing "it works with good input". ❌ No negative tests. ❌ Ignoring security scenarios.
+
+---
 
 ### Small Batch Development (NON-NEGOTIABLE)
 
@@ -751,6 +1073,114 @@ Type 'a' or 'b':
 **Example**: Agent implements F-0005, updates FEATURES.md (State: complete), updates JOURNAL.md (session summary), commits all together.
 
 **Anti-pattern**: ❌ Code committed, docs updated "later" (never). ❌ README says "not yet implemented" but feature exists. ❌ Stale placeholders.
+
+---
+
+### Spec Schema Enforces Consistency
+
+**What**: Specification files follow a strict schema with valid values and required fields.
+
+**Why**:
+- Consistent format enables automation
+- Valid values prevent errors
+- Required fields ensure completeness
+- Machine-parseable enables validation
+- Humans and agents follow same rules
+
+**Schema Elements**:
+- **Status values**: planned, in_progress, shipped (no variations)
+- **Required fields**: Feature ID, Title, Status, Acceptance file path
+- **Cross-reference format**: F-#### for features, A-#### for ADRs
+- **YAML frontmatter**: Machine-parseable metadata
+- **Format version**: <!-- format: features-v1.0 --> for evolution
+
+**How Enforced**:
+- validate_specs.py checks structure
+- Templates include format version indicators
+- agent_operating_guidelines.md specifies valid values
+- Pre-commit can validate spec format
+
+**Example**:
+```markdown
+<!-- format: features-v1.0 -->
+## F-0010: User Authentication
+
+- **Status**: in_progress
+- **Priority**: P1
+- **Acceptance**: [spec/acceptance/F-0010.md](spec/acceptance/F-0010.md)
+```
+
+**Anti-pattern**: ❌ Free-form status ("kinda done", "mostly working"). ❌ No acceptance file link. ❌ Different formats in different files.
+
+---
+
+### Examples Are First-Class Citizens
+
+**What**: Example projects are maintained, working code that demonstrates best practices.
+
+**Why**:
+- Examples are documentation that runs
+- Prove workflows actually work
+- Onboarding is faster with real examples
+- Catch breaking changes early
+- Show, don't just tell
+
+**How Enforced**:
+- examples/ directory contains real projects
+- Example projects run and produce output
+- Scripts tested in examples before release
+- Output stored for demo purposes
+- README links to working examples
+
+**What Examples Must Have**:
+1. **Working code**: Actually runs, not just stubs
+2. **Documentation**: README explaining what it demonstrates
+3. **Output**: Generated reports, test results stored
+4. **Both profiles**: Core and Core+PM examples
+5. **Maintenance**: Updated when framework changes
+
+**Example**:
+- `examples/core_todo_cli/` - Simple CLI app demonstrating Core profile
+- `examples/core_pm_taskboard/` - Larger app demonstrating Core+PM profile
+- Both have working tests, generated outputs, complete documentation
+
+**Anti-pattern**: ❌ Examples with placeholder code. ❌ "Example" that doesn't run. ❌ Stale examples from old framework versions.
+
+---
+
+### Framework Self-Documentation
+
+**What**: Each documentation file has a clear, distinct purpose with no overlap.
+
+**Why**:
+- Clear navigation for users
+- No confusion about where to look
+- Reduces duplication
+- Easier maintenance
+- Progressive disclosure of complexity
+
+**Document Hierarchy**:
+| Document | Purpose | Audience |
+|----------|---------|----------|
+| START_HERE.md | 5-minute quick start | New users |
+| DEVELOPER_GUIDE.md | Comprehensive reference | Daily use |
+| MANUAL_OPERATIONS.md | Token-free commands | Quick lookups |
+| PRINCIPLES.md | Why we do what we do | Contributors |
+| agent_operating_guidelines.md | Agent behavior rules | AI agents |
+
+**Rules**:
+1. Each doc has ONE primary purpose
+2. Cross-reference, don't duplicate
+3. Link to authoritative source
+4. Remove outdated docs
+5. README points to appropriate doc per topic
+
+**Example**:
+- "How do I use doctor.sh?" → DEVELOPER_GUIDE.md (authoritative)
+- MANUAL_OPERATIONS.md says: "See DEVELOPER_GUIDE.md for details"
+- No duplicated explanation in 3 places
+
+**Anti-pattern**: ❌ Same table in multiple docs. ❌ "I'll add it here too for convenience" (creates maintenance burden). ❌ No clear document for a topic.
 
 ---
 
