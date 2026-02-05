@@ -30,7 +30,7 @@ def test_parse_features():
     fixtures_dir = Path(__file__).parent / "fixtures"
     features = parse_markdown_features(fixtures_dir / "sample_features.md")
     
-    assert len(features) == 5
+    assert len(features) == 7  # F-0001 through F-0007
     assert features[0]["id"] == "F-0001"
     assert features[1]["parent"] == "F-0001"
 

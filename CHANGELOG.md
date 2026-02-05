@@ -17,6 +17,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - New agents: `plan-creator-agent.md`, `plan-reviewer-agent.md`
   - Catches issues before code is written (better quality first time)
 
+- **Multi-Tool LLM Testing Infrastructure (F-0122)** - Cross-tool behavioral testing
+  - `ag test llm` - Environment-aware test command
+  - `ag test llm --list` - List available tests
+  - `ag test llm --critical` - Run/show critical tests only
+  - `ag test llm --setup 001` - Set up test project for a specific test
+  - `ag test llm --verify 001` - Verify test outcomes
+  - `ag test llm --detect` - Show detected environment
+  - **Interactive mode** for IDE-based tools (Cursor, Copilot)
+  - Machine-readable test definitions in `tests/llm/test_definitions.json`
+  - Python interactive runner `tests/llm/interactive_runner.py`
+  - Cursor CLI (`cursor-cli`) support added to harness.sh
+  - Environment detection: Claude CLI, Codex CLI, Cursor IDE, Copilot IDE
+  - All 4 critical behavioral tests validated in Cursor
+
 ---
 
 ## [0.17.1] - 2026-02-04

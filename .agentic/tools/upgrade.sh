@@ -527,6 +527,8 @@ declare -a FEATURE_REGISTRY=(
   "0.5.0:Multi-agent pipeline:bash .agentic/tools/setup-agent.sh pipeline:Parallel work coordination"
   "0.5.0:Tool setup:bash .agentic/tools/setup-agent.sh all:Auto-loaded instructions"
   "0.12.0:STATUS.md consolidation:See STATUS.md:STATUS.md now required for both Core and Core+PM profiles"
+  "0.18.0:LLM behavioral tests:ag test llm --help:Run behavioral tests in any AI tool (Claude, Cursor, Codex, Copilot)"
+  "0.18.0:Plan-review loop:ag plan F-XXXX:Iterative planning with critical review before implementation"
 )
 
 # Filter features based on version range
