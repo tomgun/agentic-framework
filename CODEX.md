@@ -8,9 +8,23 @@ You are working ON the **Agentic Framework** itself, not a project using it.
 
 ---
 
+## Session Start
+
+On first message of a conversation, give a briefing:
+- Read STATUS.md, HUMAN_NEEDED.md, JOURNAL.md, VERSION, and git status
+- Greet the user and summarize: current state, focus, blockers, next steps, recent work
+- Do NOT wait to be asked
+
+## Git Workflow
+
+- Always create a separate git worktree on a feature branch before making changes (another agent may be working on main)
+- Never auto-commit without human approval
+
+---
+
 ## READ FIRST
 
-**Read `.agentic/FRAMEWORK_QUICK_START.md`** (~140 lines) - it has everything you need.
+**Read `FRAMEWORK_QUICK_START.md`** (~140 lines) - it has everything you need.
 
 ---
 
@@ -82,8 +96,8 @@ bash tests/validate_framework.sh
 
 ## Reference Material
 
-- **Quick start**: `.agentic/FRAMEWORK_QUICK_START.md`
-- **Full guide**: `.agentic/FRAMEWORK_DEVELOPMENT.md`
+- **Quick start**: `FRAMEWORK_QUICK_START.md`
+- **Full guide**: `FRAMEWORK_DEVELOPMENT.md`
 - **Principles**: `.agentic/PRINCIPLES.md`
 - **Framework specs**: `spec/FEATURES.md`
 - **Validation tests**: `tests/validate_framework.sh`

@@ -29,8 +29,8 @@ You are working in a repository that uses the **Agentic Framework**.
 **You are working ON the framework itself, not a project using it.**
 
 Framework changes affect ALL users. Extra care required:
-- **What we're building**: Read `.agentic/FRAMEWORK_QUICK_START.md`
-- **Full guide**: `.agentic/FRAMEWORK_DEVELOPMENT.md`
+- **What we're building**: Read `FRAMEWORK_QUICK_START.md`
+- **Full guide**: `FRAMEWORK_DEVELOPMENT.md`
 - **Principles**: `.agentic/PRINCIPLES.md`
 - **Validation**: `bash tests/validate_framework.sh` must pass
 

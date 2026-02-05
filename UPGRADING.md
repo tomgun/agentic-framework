@@ -93,7 +93,7 @@ curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar
 - `.agentic/MANUAL_OPERATIONS.md`
 - `.agentic/DIRECT_EDITING.md`
 - `.agentic/DEVELOPER_GUIDE.md`
-- `.agentic/FRAMEWORK_DEVELOPMENT.md`
+- `FRAMEWORK_DEVELOPMENT.md`
 - `.agentic/PRINCIPLES.md`
 
 **Never replace** (your project data):
@@ -131,7 +131,7 @@ done
 
 # Update framework docs (all 8 files)
 for file in README.md START_HERE.md FRAMEWORK_MAP.md MANUAL_OPERATIONS.md \
-            DIRECT_EDITING.md DEVELOPER_GUIDE.md FRAMEWORK_DEVELOPMENT.md PRINCIPLES.md; do
+            DIRECT_EDITING.md DEVELOPER_GUIDE.md PRINCIPLES.md; do
   cp "$NEW_FW/.agentic/$file" .agentic/
 done
 

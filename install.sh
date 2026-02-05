@@ -82,16 +82,7 @@ fi
 
 echo "  Copying .agentic/ from framework..."
 cp -r "$SCRIPT_DIR/.agentic" .
-
-# Remove framework-development-only files (not needed in production projects)
-FRAMEWORK_DEV_ONLY_FILES=(
-  "FRAMEWORK_DEVELOPMENT.md"
-  "FRAMEWORK_QUICK_START.md"
-)
-for dev_file in "${FRAMEWORK_DEV_ONLY_FILES[@]}"; do
-  rm -f ".agentic/$dev_file"
-done
-echo -e "  ${GREEN}✓${NC} Framework files copied (dev-only files excluded)"
+echo -e "  ${GREEN}✓${NC} Framework files copied"
 
 # Make scripts executable
 chmod +x .agentic/init/scaffold.sh
