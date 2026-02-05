@@ -1,6 +1,6 @@
 # Agent Operating Guidelines (All Tools)
 
-> **📚 REFERENCE MATERIAL (v0.13.0)**
+> **📚 REFERENCE MATERIAL (v0.18.0)**
 >
 > This document contains detailed rationale and edge cases. For daily use:
 > - **Quick Start**: `.agentic/agents/shared/AGENT_QUICK_START.md` (~70 lines)
@@ -95,6 +95,18 @@ Run `ag start` or manually:
 - **MAX 5-10 files** per commit
 - **Acceptance criteria MUST exist** before implementation
 - **STOP and re-plan** if touching >10 files for "one feature"
+
+---
+
+## Green Coding (Efficiency Mindset)
+
+Prefer energy-efficient patterns:
+- **Event-driven > polling** (webhooks over intervals)
+- **Lazy loading** (load resources on demand)
+- **Efficient algorithms** (O(n log n) over O(n²) for large datasets)
+- **Cache wisely** (reduce redundant API/DB calls)
+
+See `.agentic/quality/green_coding.md` for full guidance.
 
 ---
 
