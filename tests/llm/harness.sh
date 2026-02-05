@@ -22,18 +22,21 @@
 #   - Returns 0 for pass, 1 for fail
 #
 # Environment:
-#   TOOL - AI tool to use: claude (default), codex, cursor, copilot
+#   TOOL - AI tool to use: claude (default), codex, cursor, cursor-cli, copilot
 #   CLAUDE_MODEL - Model for Claude: opus (default), sonnet, or full model name
 #   CLAUDE_CMD - Path to claude CLI (default: claude)
 #   CODEX_MODEL - Model for Codex: gpt-5-codex (default), gpt-5-codex-mini
 #   CODEX_CMD - Path to codex CLI (default: codex)
+#   CURSOR_CMD - Path to cursor agent CLI (default: cursor-agent or agent)
 #   KEEP_PROJECTS - Set to "1" to keep temp projects for debugging
 #
 # Examples:
 #   bash tests/llm/harness.sh                              # Claude + Opus
 #   CLAUDE_MODEL=sonnet bash tests/llm/harness.sh          # Claude + Sonnet
 #   TOOL=codex bash tests/llm/harness.sh                   # Codex (automated)
-#   TOOL=cursor bash tests/llm/harness.sh                  # Cursor (semi-automated)
+#   TOOL=cursor-cli bash tests/llm/harness.sh              # Cursor CLI (automated)
+#   TOOL=cursor bash tests/llm/harness.sh                  # Cursor IDE (semi-automated)
+#   TOOL=copilot bash tests/llm/harness.sh                 # Copilot (semi-automated)
 #   bash tests/llm/harness.sh --compare-models --critical  # Compare Opus vs Sonnet
 
 set -euo pipefail
@@ -45,11 +48,22 @@ CLAUDE_MODEL="${CLAUDE_MODEL:-opus}"
 CLAUDE_CMD="${CLAUDE_CMD:-claude}"
 CODEX_MODEL="${CODEX_MODEL:-gpt-5-codex}"
 CODEX_CMD="${CODEX_CMD:-codex}"
+# Cursor CLI - try cursor-agent first, fall back to agent
+CURSOR_CMD="${CURSOR_CMD:-}"
+if [[ -z "$CURSOR_CMD" ]]; then
+    if command -v cursor-agent &>/dev/null; then
+        CURSOR_CMD="cursor-agent"
+    elif command -v agent &>/dev/null; then
+        CURSOR_CMD="agent"
+    else
+        CURSOR_CMD="cursor-agent"  # Default, will fail gracefully if not installed
+    fi
+fi
 KEEP_PROJECTS="${KEEP_PROJECTS:-0}"
 
 # Validate tool
-if [[ "$TOOL" != "claude" && "$TOOL" != "codex" && "$TOOL" != "cursor" && "$TOOL" != "copilot" ]]; then
-    echo "Error: TOOL must be 'claude', 'codex', 'cursor', or 'copilot'"
+if [[ "$TOOL" != "claude" && "$TOOL" != "codex" && "$TOOL" != "cursor" && "$TOOL" != "cursor-cli" && "$TOOL" != "copilot" ]]; then
+    echo "Error: TOOL must be 'claude', 'codex', 'cursor', 'cursor-cli', or 'copilot'"
     exit 1
 fi
 
@@ -267,6 +281,27 @@ send_prompt() {
             echo -e "${YELLOW}⚠ Rate limit detected in response${NC}"
             exit 2  # Special exit code for rate limit
         fi
+    elif [[ "$TOOL" == "cursor-cli" ]]; then
+        # Fully automated: Cursor Agent CLI
+        # Uses cursor-agent or agent command for headless execution
+        if ! command -v "$CURSOR_CMD" &>/dev/null; then
+            echo -e "${RED}Error: Cursor Agent CLI not found ($CURSOR_CMD)${NC}"
+            echo "Install from: https://cursor.com/en/blog/cli"
+            echo "Or use TOOL=cursor for semi-automated mode"
+            exit 1
+        fi
+
+        # Run cursor agent in headless mode
+        LAST_OUTPUT=$(timeout 120 $CURSOR_CMD --headless "$prompt" 2>&1) || true
+
+        # Write output to shared file for rate limit detection across subshells
+        echo "$LAST_OUTPUT" > "$SCRIPT_DIR/.last-output"
+
+        # Check for rate limit and exit with special code
+        if echo "$LAST_OUTPUT" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded"; then
+            echo -e "${YELLOW}⚠ Rate limit detected in response${NC}"
+            exit 2  # Special exit code for rate limit
+        fi
     else
         # Semi-automated: Cursor or Copilot (IDE-based)
         echo ""
@@ -400,7 +435,7 @@ cleanup_test_project() {
 # Export functions and variables for test scripts
 export -f setup_test_project send_prompt check_output_contains check_output_not_contains
 export -f check_file_exists check_file_not_exists check_file_contains cleanup_test_project
-export FRAMEWORK_ROOT CLAUDE_CMD CODEX_CMD TOOL CLAUDE_MODEL CODEX_MODEL SCRIPT_DIR
+export FRAMEWORK_ROOT CLAUDE_CMD CODEX_CMD CURSOR_CMD TOOL CLAUDE_MODEL CODEX_MODEL SCRIPT_DIR
 
 #=============================================================================
 # Test Runner
@@ -724,8 +759,11 @@ main() {
     elif [[ "$TOOL" == "codex" ]]; then
         echo "Model: $CODEX_MODEL"
         echo "CLI: $CODEX_CMD"
+    elif [[ "$TOOL" == "cursor-cli" ]]; then
+        echo "CLI: $CURSOR_CMD"
     else
         echo "Mode: Semi-automated (manual prompt entry required)"
+        echo "Tip: For automated mode, use: TOOL=claude, TOOL=codex, or TOOL=cursor-cli"
     fi
     echo ""
 

@@ -135,6 +135,7 @@ COMMANDS:
     commit              Run all pre-commit gates
     done                Task complete validation
     trace [options]     Spec-code traceability (drift + coverage)
+    test llm [options]  Run LLM behavioral tests
     tools               List all available tools by category
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -148,6 +149,8 @@ EXAMPLES:
     ag done                     # Check task completion
     ag trace                    # Full drift + coverage report
     ag trace --gaps             # Show only gaps
+    ag test llm                 # Run all LLM behavioral tests
+    ag test llm --critical      # Run critical tests only
     ag tools                    # Discover available tools
 
 Core profile: No formal feature tracking. Use STATUS.md for focus.
@@ -167,6 +170,7 @@ COMMANDS:
     commit              Run all pre-commit gates
     done [F-XXXX]       Feature complete validation
     trace [options]     Spec-code traceability (drift + coverage)
+    test llm [options]  Run LLM behavioral tests
     tools               List all available tools by category
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -185,6 +189,8 @@ EXAMPLES:
     ag trace src/auth.py        # What features does auth.py implement?
     ag trace --gaps             # Show only gaps (missing implementations)
     ag trace --json             # Machine-readable combined output
+    ag test llm                 # Run all LLM behavioral tests
+    ag test llm --critical      # Run critical tests only
     ag tools                    # Discover available tools
     ag verify --full            # Full verification
 
@@ -1057,6 +1063,168 @@ cmd_trace_file() {
     python3 "$SCRIPT_DIR/coverage.py" --reverse "$target_file" 2>/dev/null
 }
 
+# Test command - run LLM behavioral tests
+cmd_test() {
+    local test_type="${1:-}"
+    shift 2>/dev/null || true
+    
+    case "$test_type" in
+        llm)
+            cmd_test_llm "$@"
+            ;;
+        unit|framework)
+            echo -e "${BOLD}=== Framework Unit Tests ===${NC}"
+            bash "$ROOT_DIR/tests/validate_framework.sh"
+            ;;
+        "")
+            echo -e "${RED}Error: Test type required${NC}"
+            echo "Usage: ag test llm [--critical|--list|--setup TEST_ID]"
+            echo "       ag test unit"
+            exit 1
+            ;;
+        *)
+            echo -e "${RED}Unknown test type: $test_type${NC}"
+            echo "Available: llm, unit"
+            exit 1
+            ;;
+    esac
+}
+
+# LLM behavioral tests
+cmd_test_llm() {
+    local arg="${1:-}"
+    local runner="$ROOT_DIR/tests/llm/interactive_runner.py"
+    local harness="$ROOT_DIR/tests/llm/harness.sh"
+    
+    # Detect environment
+    local env="unknown"
+    if command -v claude &>/dev/null; then
+        env="claude"
+    elif command -v codex &>/dev/null; then
+        env="codex"
+    elif [[ -n "${CURSOR_SESSION:-}" ]] || pgrep -f "Cursor" &>/dev/null; then
+        env="cursor-ide"
+    elif [[ -n "${VSCODE_PID:-}" ]]; then
+        env="copilot-ide"
+    fi
+    
+    echo -e "${BOLD}=== LLM Behavioral Tests ===${NC}"
+    echo "Environment: $env"
+    echo ""
+    
+    case "$arg" in
+        --list)
+            python3 "$runner" --list
+            ;;
+        --critical)
+            if [[ "$env" == "claude" ]]; then
+                echo "Using Claude CLI (automated)..."
+                TOOL=claude bash "$harness" --critical
+            elif [[ "$env" == "codex" ]]; then
+                echo "Using Codex CLI (automated)..."
+                TOOL=codex bash "$harness" --critical
+            else
+                echo "Using interactive mode (agent-driven)..."
+                echo ""
+                python3 "$runner" --list --critical
+                echo ""
+                echo -e "${YELLOW}To run these tests interactively:${NC}"
+                echo "  python3 tests/llm/interactive_runner.py --interactive --critical"
+                echo ""
+                echo -e "${YELLOW}Or run individually:${NC}"
+                echo "  python3 tests/llm/interactive_runner.py --setup 001"
+                echo "  (Agent responds to prompt)"
+                echo "  python3 tests/llm/interactive_runner.py --verify 001"
+            fi
+            ;;
+        --setup)
+            local test_id="${2:-}"
+            if [[ -z "$test_id" ]]; then
+                echo -e "${RED}Error: Test ID required${NC}"
+                echo "Usage: ag test llm --setup 001"
+                exit 1
+            fi
+            python3 "$runner" --setup "$test_id"
+            ;;
+        --verify)
+            local test_id="${2:-}"
+            if [[ -z "$test_id" ]]; then
+                echo -e "${RED}Error: Test ID required${NC}"
+                echo "Usage: ag test llm --verify 001"
+                exit 1
+            fi
+            shift  # Remove --verify
+            python3 "$runner" --verify "$@"
+            ;;
+        --interactive)
+            if [[ "$env" == "cursor-ide" ]] || [[ "$env" == "copilot-ide" ]]; then
+                echo "Running in interactive mode..."
+                python3 "$runner" --interactive "${@:2}"
+            else
+                echo -e "${YELLOW}Interactive mode is for IDE-based tools (Cursor, Copilot).${NC}"
+                echo "Your environment ($env) supports automated tests:"
+                echo "  TOOL=$env bash tests/llm/harness.sh"
+            fi
+            ;;
+        --detect)
+            echo "Detected environment: $env"
+            case "$env" in
+                claude)
+                    echo "  Claude CLI available - fully automated tests"
+                    echo "  Run: bash tests/llm/harness.sh"
+                    ;;
+                codex)
+                    echo "  Codex CLI available - fully automated tests"
+                    echo "  Run: TOOL=codex bash tests/llm/harness.sh"
+                    ;;
+                cursor-ide)
+                    echo "  Running inside Cursor IDE - use interactive mode"
+                    echo "  Run: ag test llm --interactive --critical"
+                    ;;
+                copilot-ide)
+                    echo "  Running inside VS Code (Copilot) - use interactive mode"
+                    echo "  Run: ag test llm --interactive --critical"
+                    ;;
+                *)
+                    echo "  Unknown environment"
+                    echo "  Install: claude CLI, codex CLI, or run from Cursor/Copilot"
+                    ;;
+            esac
+            ;;
+        ""|--help)
+            echo "LLM behavioral tests verify agent compliance with framework rules."
+            echo ""
+            echo "Usage: ag test llm [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  --list              List all available tests"
+            echo "  --critical          Run/list critical tests only"
+            echo "  --setup TEST_ID     Set up project for a specific test"
+            echo "  --verify TEST_ID    Verify outcomes of a test"
+            echo "  --interactive       Run tests interactively (for Cursor/Copilot)"
+            echo "  --detect            Show detected environment"
+            echo ""
+            echo "Environments:"
+            echo "  Claude CLI (claude):    Fully automated via 'bash tests/llm/harness.sh'"
+            echo "  Codex CLI (codex):      Fully automated via 'TOOL=codex bash tests/llm/harness.sh'"
+            echo "  Cursor IDE:             Interactive mode - agent responds to prompts"
+            echo "  Copilot IDE:            Interactive mode - agent responds to prompts"
+            echo ""
+            echo "Current environment: $env"
+            ;;
+        *)
+            # Check if it's a test ID
+            if echo "$arg" | grep -qE '^[0-9]+'; then
+                python3 "$runner" --setup "$arg"
+            else
+                echo -e "${RED}Unknown option: $arg${NC}"
+                cmd_test_llm --help
+                exit 1
+            fi
+            ;;
+    esac
+}
+
 # Main command dispatch
 case "${1:-help}" in
     start)
@@ -1083,6 +1251,10 @@ case "${1:-help}" in
     trace)
         shift
         cmd_trace "$@"
+        ;;
+    test)
+        shift
+        cmd_test "$@"
         ;;
     tools)
         cmd_tools

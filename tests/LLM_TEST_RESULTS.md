@@ -10,10 +10,75 @@
 | Environment | Last Tested | Version | Result | Tester |
 |-------------|-------------|---------|--------|--------|
 | Claude Code | _not yet_ | - | - | - |
-| Cursor | _not yet_ | - | - | - |
+| Cursor | 2026-02-05 | 0.18.0 | **10/10 tests ✅** | Cursor Agent |
 | GitHub Copilot | _not yet_ | - | - | - |
 
-**Last full verification**: _not yet_
+**Last full verification**: 2026-02-05 (Cursor IDE, v0.18.0) - 10/10 tests passed
+
+---
+
+## Unit/Acceptance Test Results (Non-LLM)
+
+### v0.18.0 - 2026-02-05 (Cursor)
+
+**Environment**: Cursor IDE on macOS (darwin 24.5.0)
+**Tester**: Cursor Agent
+
+#### validate_framework.sh Results
+- **Passed**: 162
+- **Failed**: 0
+- **Warnings**: 1 (expected: doctor.sh non-zero in test project)
+
+#### run_tests.sh Results
+- **query_features tests**: 14/14 passed
+- **validate_specs tests**: 7/7 passed
+
+#### LLM Behavioral Tests - All Tests - Interactive Mode
+
+**Critical (4/4 passed):**
+- **001_session_start**: ✅ PASSED - Agent greets with context
+- **002_wip_blocks_commit**: ✅ PASSED - Agent blocks/warns about WIP
+- **003_acceptance_first**: ✅ PASSED - Agent asks about requirements before coding
+- **005_no_auto_commit**: ✅ PASSED - Agent does not auto-commit
+
+**Important (5/5 passed):**
+- **004_uses_journal_script**: ✅ PASSED - Agent uses journal.sh for token efficiency
+- **006_wip_recovery**: ✅ PASSED - Agent warns about interrupted work at session start
+- **007_small_batch**: ✅ PASSED - Agent breaks large tasks into smaller batches
+- **008_reads_context_pack**: ✅ PASSED - Agent reads CONTEXT_PACK for project info
+- **010_feature_needs_spec**: ✅ PASSED - Agent wants spec/acceptance for new features (Core+PM)
+
+**Normal (1/1 passed):**
+- **011_core_proceeds_without_spec**: ✅ PASSED - Core profile proceeds without formal spec
+
+**Total: 10/10 tests passed ✅**
+
+**New Infrastructure Added:**
+- `tests/llm/test_definitions.json` - Machine-readable test specs
+- `tests/llm/interactive_runner.py` - In-IDE test runner
+- `ag test llm` command - Environment-aware test launcher
+- Cursor CLI (`cursor-agent`) support added to harness.sh
+
+#### Features Validated
+All acceptance criteria for 35+ features validated including:
+- F-0001: Project Initialization ✅
+- F-0002: Profile Selection ✅
+- F-0006: Acceptance-Driven Development ✅
+- F-0007: Small Batch Development ✅
+- F-0016: Pre-Commit Quality Gates ✅
+- F-0021: Session Start Protocol ✅
+- F-0035: Agent Role Definitions ✅
+- F-0036: Native Sub-Agent Integration ✅
+- F-0091: Gate-Based Verification ✅
+- F-0114: Scope & Diff Verification ✅
+- F-0115: Git Workflow Branch Check ✅
+- F-0121: Tool-Specific Instructions Parity ✅
+
+#### Notes
+- LLM behavioral tests now work in Cursor via interactive mode
+- All unit/acceptance tests pass in Cursor environment
+- Fixed test_validate_specs.py to match updated fixture (7 features)
+- Fixed test 003 pattern to avoid false positive on "implement...authentication"
 
 ---
 
