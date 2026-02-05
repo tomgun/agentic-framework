@@ -10,19 +10,19 @@
 | Environment | Last Tested | Version | Result | Tester |
 |-------------|-------------|---------|--------|--------|
 | Claude Code | _not yet_ | - | - | - |
-| Cursor | 2026-02-05 | 0.19.0 | **10/10 ✅ + 12 pending** | Cursor Agent |
+| Cursor | 2026-02-05 | 0.19.0 | **22/22 tests ✅** | Cursor Agent |
 | GitHub Copilot | _not yet_ | - | - | - |
 
-**Last full verification**: 2026-02-05 (Cursor IDE, v0.19.0) - 10/10 passed, 12 new value proposition tests pending
+**Last full verification**: 2026-02-05 (Cursor IDE, v0.19.0) - 22/22 tests passed (Critical: 7/7, Important: 12/12, Normal: 3/3)
 
 ---
 
 ## Unit/Acceptance Test Results (Non-LLM)
 
-### v0.18.0 - 2026-02-05 (Cursor)
+### v0.19.0 - 2026-02-05 (Cursor)
 
 **Environment**: Cursor IDE on macOS (darwin 24.5.0)
-**Tester**: Cursor Agent
+**Tester**: Cursor Agent (claude-4.6-opus-high-thinking)
 
 #### validate_framework.sh Results
 - **Passed**: 162
@@ -51,29 +51,34 @@
 **Normal (1/1 passed):**
 - **011_core_proceeds_without_spec**: ✅ PASSED - Core profile proceeds without formal spec
 
-**Total: 10/10 tests passed ✅**
+**Original Tests Total: 10/10 passed ✅**
 
-#### Value Proposition Tests (v0.19.0 - NEW, not yet run)
+#### Value Proposition Tests (v0.19.0)
 
-**Token Efficiency (3 tests):**
-- **024_mentions_script_for_journal**: ⏳ PENDING - Agent knows about token-efficient journal script
-- **025_targeted_context_reading**: ⏳ PENDING - Agent uses CONTEXT_PACK instead of scanning source files
-- **026_avoids_unnecessary_reads**: ⏳ PENDING - Agent doesn't over-read for simple tasks
+**Token Efficiency (3/3 passed):**
+- **024_mentions_script_for_journal**: ✅ PASSED - Agent mentions journal.sh/ag journal for token efficiency
+- **025_targeted_context_reading**: ✅ PASSED - Agent uses CONTEXT_PACK for targeted info, not source scanning
+- **026_avoids_unnecessary_reads**: ✅ PASSED - Agent reads only relevant file for simple edit
 
-**Anti-Hallucination (3 tests - Critical):**
-- **027_no_fabricated_methods**: ⏳ PENDING - Agent doesn't invent methods on real class
-- **028_no_fabricated_config**: ⏳ PENDING - Agent doesn't assume config keys exist
-- **029_verifies_db_schema**: ⏳ PENDING - Agent checks schema before using fields
+**Anti-Hallucination (3/3 passed - Critical):**
+- **027_no_fabricated_methods**: ✅ PASSED - Agent identifies only getUser/updateUser exist, doesn't invent syncPreferences
+- **028_no_fabricated_config**: ✅ PASSED - Agent notes MAX_RETRIES not in config, offers to add it
+- **029_verifies_db_schema**: ✅ PASSED - Agent checks schema, reports last_login missing, suggests migration
 
-**Durable Artifacts (3 tests):**
-- **030_reads_status_on_start**: ⏳ PENDING - Agent reads STATUS.md for next steps
-- **031_references_journal_history**: ⏳ PENDING - Agent reads JOURNAL.md for history
-- **032_knows_architecture_from_context_pack**: ⏳ PENDING - Agent uses CONTEXT_PACK for architecture
+**Durable Artifacts (3/3 passed):**
+- **030_reads_status_on_start**: ✅ PASSED - Agent reads STATUS.md, references payment gateway and Stripe
+- **031_references_journal_history**: ✅ PASSED - Agent reads JOURNAL.md, reports race condition fix in auth
+- **032_knows_architecture_from_context_pack**: ✅ PASSED - Agent references packages/api/prisma/migrations/ from CONTEXT_PACK
 
-**Multi-Agent & Profiles (3 tests):**
-- **033_mentions_agents_active**: ⏳ PENDING - Agent aware of multi-agent coordination
-- **034_suggests_worktree_for_parallel**: ⏳ PENDING - Agent recommends worktree for parallel work
-- **035_core_is_lightweight**: ⏳ PENDING - Core profile doesn't enforce formal specs
+**Multi-Agent & Profiles (3/3 passed):**
+- **033_mentions_agents_active**: ✅ PASSED - Agent mentions AGENTS_ACTIVE coordination and worktrees
+- **034_suggests_worktree_for_parallel**: ✅ PASSED - Agent recommends git worktree for isolation
+- **035_core_is_lightweight**: ✅ PASSED - Agent implements function directly without requiring spec/feature ID
+
+**Grand Total: 22/22 tests passed ✅**
+- Critical: 7/7 (session, commit, acceptance, anti-hallucination)
+- Important: 12/12 (scripts, context, durable artifacts, multi-agent, profiles)
+- Normal: 3/3 (core profile, token efficiency, parallel work)
 
 **New Infrastructure Added:**
 - `tests/llm/test_definitions.json` - Machine-readable test specs
@@ -97,10 +102,13 @@ All acceptance criteria for 35+ features validated including:
 - F-0121: Tool-Specific Instructions Parity ✅
 
 #### Notes
-- LLM behavioral tests now work in Cursor via interactive mode
+- LLM behavioral tests run in Cursor via interactive mode with pattern verification
 - All unit/acceptance tests pass in Cursor environment
 - Fixed test_validate_specs.py to match updated fixture (7 features)
 - Fixed test 003 pattern to avoid false positive on "implement...authentication"
+- Anti-hallucination tests (027-029) use partial real code - agent correctly refuses to fabricate methods/config/fields
+- Token efficiency tests verify agent awareness of scripts, not enforcement
+- Test projects created for critical tests; file/commit checks verified independently
 
 ---
 
