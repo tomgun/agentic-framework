@@ -33,19 +33,18 @@
 
 ## Configuration (STACK.md)
 
-```yaml
-## Planning
-plan_review:
-  enabled: true              # Enable plan-review loop
-  max_iterations: 3          # Max revisions before human escalation
-  auto_for: [planning, implement]  # Which commands trigger it
-  reviewer_model: same       # same | opus | sonnet (default: same as planner)
+```markdown
+## Plan-Review Loop (recommended)
+- plan_review_enabled: yes        <!-- yes | no (default: yes for Core+PM, no for Core) -->
+- plan_review_max_iterations: 3   <!-- Max revisions before human escalation -->
+- plan_review_auto_for: [planning]  <!-- planning | implement | both -->
+<!-- - plan_review_reviewer_model: same  # same | opus | sonnet -->
 ```
 
 **Defaults** (if not specified):
-- `enabled: true` for Core+PM profile, `false` for Core
-- `max_iterations: 3`
-- `auto_for: [planning]`
+- `plan_review_enabled: yes` for Core+PM profile, `no` for Core
+- `plan_review_max_iterations: 3`
+- `plan_review_auto_for: [planning]`
 
 ---
 
@@ -180,7 +179,6 @@ When reviewing a plan:
 ```bash
 ag plan F-XXXX              # Create plan with review loop
 ag plan F-XXXX --no-review  # Skip review (simple cases)
-ag plan F-XXXX --review 1   # Single review iteration
 ```
 
 ### ag implement F-XXXX
