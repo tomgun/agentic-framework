@@ -1693,5 +1693,5 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 **Current Version**: v0.19.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
-**LLM Tests**: 10/10 passing in Cursor IDE (v0.18.0)
+**LLM Tests**: 22/22 passing in Cursor IDE (v0.19.0)
 
