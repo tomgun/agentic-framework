@@ -174,6 +174,44 @@ If training data contradicts docs → **Trust the docs**. Training data is outda
 
 ---
 
+## 🚨 Check Before Creating (NON-NEGOTIABLE)
+
+**Before creating ANY new file, test, or component, you MUST search for existing equivalents.**
+
+### What to Check
+
+| Creating | Search First |
+|----------|--------------|
+| New test | `grep` for similar test names, check test_definitions.json |
+| New document | `grep` for topic in docs/, check existing .md files |
+| New component | Search codebase for similar names/functionality |
+| New utility | Check utils/, helpers/, common/ for similar functions |
+| New principle | Check PRINCIPLES.md for existing coverage |
+
+### How to Check
+
+```bash
+# Before creating a test
+grep -r "similar_behavior" tests/
+
+# Before creating a doc
+ls docs/ && grep -r "topic_name" .agentic/
+
+# Before creating a component
+grep -r "ComponentName\|similar_name" src/
+```
+
+### Examples
+
+✅ "Let me check if there's an existing test for feature script usage..." → finds test 020
+✅ "I see PRINCIPLES.md already covers anti-hallucination"
+❌ Creating test 025 when test 020 already covers the same behavior
+❌ Creating AUTH_GUIDE.md when auth section exists in DEVELOPER_GUIDE.md
+
+**Why This Matters**: Duplicates waste effort, cause inconsistency, and increase maintenance burden. A 30-second search prevents hours of duplicate work and future confusion.
+
+---
+
 ## Work-In-Progress (WIP) Tracking
 
 **Purpose**: Never lose work when tokens run out or context resets.

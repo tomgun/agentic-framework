@@ -1325,6 +1325,45 @@ Type 'a' or 'b':
 
 ---
 
+### Check Before Creating (NON-NEGOTIABLE)
+
+**What**: Before creating any file, test, document, or component, agents MUST check if equivalent functionality already exists.
+
+**Why**:
+- Duplication wastes effort and creates maintenance burden
+- Existing implementations may have edge cases already handled
+- Inconsistent duplicates cause confusion
+- Testing infrastructure, docs, and code can all be duplicated accidentally
+- "I didn't know that existed" is not an excuse - checking is mandatory
+
+**How Enforced**:
+- agent_operating_guidelines.md: Check before creating
+- Before new test: `grep` for similar tests, check test_definitions.json
+- Before new doc: Search for existing docs on topic
+- Before new component: Check if similar component exists
+- Use `list_dir`, `grep`, `codebase_search` to verify
+
+**Examples**:
+- ✅ "Let me check if there's an existing test for this..." → finds test 020
+- ✅ "I see PRINCIPLES.md already covers this topic"
+- ✅ "There's already a UserService - I'll extend it instead of creating UserHelper"
+- ❌ Creating auth.js when AuthService.ts exists
+- ❌ Adding test 025 when test 020 covers the same behavior
+- ❌ Creating TESTING_GUIDE.md when test_strategy.md exists
+
+**What to Check**:
+| Creating | Check First |
+|----------|-------------|
+| New test | Existing tests in same area (`grep`, test_definitions.json) |
+| New doc | Existing docs on topic (`grep`, list docs/) |
+| New component | Similar components in codebase |
+| New utility | Existing utilities with similar names/functions |
+| New principle | PRINCIPLES.md for existing coverage |
+
+**Anti-pattern**: ❌ Creating without searching. ❌ "I'll just add a new one, it's faster." ❌ Assuming nothing exists because you haven't seen it.
+
+---
+
 ### Anti-Hallucination (NON-NEGOTIABLE)
 
 **What**: Agents must never fabricate information - APIs, function signatures, endpoints, library behavior, or technical claims.
@@ -1350,6 +1389,16 @@ Type 'a' or 'b':
 - ❌ "The endpoint is probably /api/users/update" (guessing)
 
 **Anti-pattern**: ❌ Guessing API signatures. ❌ Assuming library behavior. ❌ "It probably works like..." ❌ Fabricating function names or parameters.
+
+---
+
+### ❌ Don't Create Without Checking
+
+**Why Wrong**: Duplicates waste effort, cause inconsistency, and increase maintenance burden. Tests, docs, and components can all be accidentally duplicated.
+
+**Correct Approach**: ALWAYS search for existing implementations before creating new ones. Use grep, list_dir, codebase_search.
+
+**How to Fix**: Make checking a habit. Ask "Does this already exist?" before every creation.
 
 ---
 
