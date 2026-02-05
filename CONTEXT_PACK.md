@@ -33,7 +33,7 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 - Quality guides: `.agentic/quality/`
 - Checklists: `.agentic/checklists/`
 - Principles: `.agentic/PRINCIPLES.md`
-- Full dev guide: `.agentic/FRAMEWORK_DEVELOPMENT.md`
+- Full dev guide: `FRAMEWORK_DEVELOPMENT.md`
 - **Framework ADRs**: `docs/adr/` - why framework decisions were made (read before changing!)
 
 ## How to run

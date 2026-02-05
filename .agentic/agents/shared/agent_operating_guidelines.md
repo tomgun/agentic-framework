@@ -431,4 +431,4 @@ git status --short | grep '??'
 - **Test strategy**: `.agentic/quality/test_strategy.md`
 - **TDD mode**: `.agentic/workflows/tdd_mode.md`
 - **Git workflow**: `.agentic/workflows/git_workflow.md`
-- **Framework development**: `.agentic/FRAMEWORK_DEVELOPMENT.md`
+- **Framework development**: `FRAMEWORK_DEVELOPMENT.md`

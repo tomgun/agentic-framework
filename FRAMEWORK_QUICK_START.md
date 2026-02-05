@@ -2,7 +2,7 @@
 
 **Scope**: Agents working ON the Agentic Framework itself (not projects using it).
 
-**Full reference**: `FRAMEWORK_DEVELOPMENT.md` | **Principles rationale**: `PRINCIPLES.md`
+**Full reference**: `FRAMEWORK_DEVELOPMENT.md` | **Principles rationale**: `.agentic/PRINCIPLES.md`
 
 ---
 
@@ -136,7 +136,7 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 | Upgrade notifications | `.agentic/tools/upgrade.sh` → FEATURE_REGISTRY |
 | Templates | `.agentic/init/*.template.md` |
 | Agent guidelines | `.agentic/agents/shared/` |
-| Full dev guide | `.agentic/FRAMEWORK_DEVELOPMENT.md` |
+| Full dev guide | `FRAMEWORK_DEVELOPMENT.md` |
 | Principles | `.agentic/PRINCIPLES.md` |
 | Change manifests | `.agentic-journal/manifests/` (use `manifest.sh F-####`) |
 | Doc drift check | `drift.sh --docs` or `drift.sh --docs --manifest F-####` |

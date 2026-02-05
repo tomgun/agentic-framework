@@ -14,7 +14,7 @@
 - [MANUAL_OPERATIONS.md](.agentic/MANUAL_OPERATIONS.md) - Token-free information retrieval
 - [USER_WORKFLOWS.md](.agentic/workflows/USER_WORKFLOWS.md) - Working with agents
 - [Example Projects](examples/) - See it in action
-- 🚨 [**FRAMEWORK_DEVELOPMENT.md**](.agentic/FRAMEWORK_DEVELOPMENT.md) - For contributors working on the framework itself
+- 🚨 [**FRAMEWORK_DEVELOPMENT.md**](FRAMEWORK_DEVELOPMENT.md) - For contributors working on the framework itself
 
 ## What is this?
 

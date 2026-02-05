@@ -1,15 +1,27 @@
 You are working ON the Agentic Framework itself (not a project using it).
 
-Read first: .agentic/FRAMEWORK_QUICK_START.md
+Read first: FRAMEWORK_QUICK_START.md
 
-Rules:
+## Session Start
+
+On first message of a conversation, give a briefing:
+- Read STATUS.md, HUMAN_NEEDED.md, JOURNAL.md, VERSION, and git status
+- Greet the user and summarize: current state, focus, blockers, next steps, recent work
+- Do NOT wait to be asked
+
+## Git Workflow
+
+- Always create a separate git worktree on a feature branch before making changes (another agent may be working on main)
+- Never auto-commit without human approval
+
+## Development Process
+
 - Spec → Acceptance → Code → Tests → Docs (all must match)
 - Add F-#### to spec/FEATURES.md BEFORE implementing
 - Create spec/acceptance/F-####.md BEFORE coding
 - Add tests to tests/validate_framework.sh
 - Test in scratch project before committing
-- Never auto-commit without human approval
 
 Verify: bash tests/validate_framework.sh
 
-Reference: .agentic/FRAMEWORK_DEVELOPMENT.md, .agentic/PRINCIPLES.md
+Reference: FRAMEWORK_DEVELOPMENT.md, .agentic/PRINCIPLES.md
