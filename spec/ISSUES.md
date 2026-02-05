@@ -12,7 +12,7 @@
 
 | Status | Count |
 |--------|-------|
-| Open | 0 |
+| Open | 1 |
 | In Progress | 0 |
 | Fixed | 1 |
 | Won't Fix | 0 |
