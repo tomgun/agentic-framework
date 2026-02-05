@@ -5,6 +5,20 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.0] - 2026-02-05
+
+### Added
+- **Plan-Review Loop (F-0120)** - Iterative planning with critical review
+  - `ag plan F-XXXX` - Create plan with iterative review loop
+  - `ag plan F-XXXX --no-review` - Skip review for simple cases
+  - Planner creates plan, reviewer critiques, loop until approved
+  - Configurable via STACK.md: `plan_review_enabled`, `plan_review_max_iterations`
+  - Plan artifacts stored in `.agentic-state/plans/`
+  - New agents: `plan-creator-agent.md`, `plan-reviewer-agent.md`
+  - Catches issues before code is written (better quality first time)
+
+---
+
 ## [0.17.1] - 2026-02-04
 
 ### Fixed
