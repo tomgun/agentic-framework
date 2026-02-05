@@ -1018,8 +1018,8 @@ def find_duplicates(items):
 
 ---
 
-**Last Updated**: 2026-01-03  
-**Framework Version**: 0.2.5  
+**Last Updated**: 2026-02-05  
+**Framework Version**: 0.18.0  
 
 **See Also**:
 - `programming_standards.md` - General code quality standards
