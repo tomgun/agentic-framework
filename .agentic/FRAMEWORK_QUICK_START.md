@@ -138,7 +138,7 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 | Agent guidelines | `.agentic/agents/shared/` |
 | Full dev guide | `.agentic/FRAMEWORK_DEVELOPMENT.md` |
 | Principles | `.agentic/PRINCIPLES.md` |
-| Change manifests | `.agentic-state/manifests/` (use `manifest.sh F-####`) |
+| Change manifests | `.agentic-journal/manifests/` (use `manifest.sh F-####`) |
 | Doc drift check | `drift.sh --docs` or `drift.sh --docs --manifest F-####` |
 
 ---

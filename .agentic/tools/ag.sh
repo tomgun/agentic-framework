@@ -627,14 +627,14 @@ cmd_done() {
     if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
         echo -e "${BOLD}=== Generating Change Manifest ===${NC}"
         if bash "$SCRIPT_DIR/manifest.sh" "$feature_id" 2>/dev/null; then
-            local manifest_file="$ROOT_DIR/.agentic-state/manifests/${feature_id}.manifest.md"
+            local manifest_file="$ROOT_DIR/.agentic-journal/manifests/${feature_id}.manifest.md"
             if [ -f "$manifest_file" ]; then
                 # Extract stats for journal metadata
                 local commit_count file_count
                 commit_count=$(grep -c "^|" "$manifest_file" 2>/dev/null | head -1 || echo "0")
                 commit_count=$((commit_count - 2))  # Subtract header rows
                 file_count=$(grep -c "^\- \`" "$manifest_file" 2>/dev/null || echo "0")
-                echo -e "${GREEN}Manifest generated: .agentic-state/manifests/${feature_id}.manifest.md${NC}"
+                echo -e "${GREEN}Manifest generated: .agentic-journal/manifests/${feature_id}.manifest.md${NC}"
                 echo "  Commits: $commit_count, Files: $file_count"
             fi
         else

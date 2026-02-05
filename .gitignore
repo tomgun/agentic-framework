@@ -32,7 +32,8 @@ tests/llm/.test-state
 .agentic-state/WIP.md
 .agentic-state/AGENTS_ACTIVE.md
 .agentic-state/.verification-state
-# Note: .agentic-state/manifests/ IS committed (audit trail)
+.agentic-state/plans/
+# Note: .agentic-journal/ IS committed (persistent history: manifests, lessons)
 
 # Local notes (not part of framework)
 *.local.md
