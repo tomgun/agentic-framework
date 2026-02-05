@@ -260,7 +260,7 @@
 
 ## Summary Statement
 
-Led development of Agentic AI Framework from v0.1.0 to v0.11.1, defining vision, architecture, and quality standards. Key contributions include:
+Led development of Agentic AI Framework from v0.1.0 to v0.18.0, defining vision, architecture, and quality standards. Key contributions include:
 
 - **Modular architecture design** (Core vs Core+PM profiles)
 - **Systematic quality checklists** (6 workflow checklists, 1400+ lines)
@@ -1571,10 +1571,52 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Catches issues during planning rather than implementation - cheaper to fix.
 
+### Persistent Journal & Tool Parity (F-0121)
+
+**User insight**: State files in `.agentic-state/` are transient, but lessons and manifests should persist across sessions. Also, all AI tools should have consistent enforcement gates.
+
+**Implementation - Persistent History**:
+- Created `.agentic-journal/` directory for persistent artifacts
+- Separates transient (WIP, plans) from historical (lessons, manifests)
+- `lessons/` subdirectory with L-#### format for project learnings
+- Moved manifests from `.agentic-state/` to `.agentic-journal/`
+- Survives framework upgrades and context resets
+
+**Implementation - Tool Parity**:
+- All 4 tool templates (Claude, Codex, Copilot, Cursor) now have consistent gates
+- 6-gate enforcement table in all templates
+- Escape hatches documented in all templates
+- Validation tests ensure parity across tools
+- `/CODEX.md` now properly extends template (was a stub)
+
+**Impact**: Cross-session learning captured; all AI tools enforce same quality gates.
+
+### Multi-Tool LLM Testing Infrastructure (F-0122)
+
+**User request**:
+> "So the behavioral LLM tests are ESSENTIAL. And they should be run using Cursor when in cursor."
+
+**Implementation**:
+- Machine-readable test definitions in `tests/llm/test_definitions.json`
+- Python interactive runner `tests/llm/interactive_runner.py`
+- `ag test llm` command with environment detection
+- Cursor CLI (`cursor-agent`) support added to harness.sh
+- Interactive mode for IDE-based tools (Cursor, Copilot)
+- 10 behavioral tests all passing in Cursor IDE environment
+
+**Test Results (v0.18.0 Cursor)**:
+- Critical: 4/4 passed
+- Important: 5/5 passed
+- Normal: 1/1 passed
+- Total: **10/10 tests passed**
+
+**Impact**: LLM behavioral tests now work across Claude CLI, Codex CLI, Cursor CLI, Cursor IDE, and Copilot IDE.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.18.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
+**LLM Tests**: 10/10 passing in Cursor IDE (v0.18.0)
 
