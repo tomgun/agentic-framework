@@ -8,15 +8,16 @@
 #   manifest.sh --commits abc123,def456   # Generate from explicit commits
 #   manifest.sh F-XXXX --markdown         # Output Markdown instead of JSON
 #
-# Output: .agentic-state/manifests/<name>.json (JSON format for drift.sh integration)
+# Output: .agentic-journal/manifests/<name>.json (JSON format for drift.sh integration)
 #
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-# State lives at project root, NOT inside .agentic (survives framework upgrades)
-STATE_DIR="$PROJECT_ROOT/.agentic-state"
-MANIFEST_DIR="$STATE_DIR/manifests"
+# Manifests live in .agentic-journal/ (persistent history, always committed)
+# Separate from .agentic-state/ (transient state, mostly gitignored)
+JOURNAL_DIR="$PROJECT_ROOT/.agentic-journal"
+MANIFEST_DIR="$JOURNAL_DIR/manifests"
 
 # Error handling
 error() { echo "❌ Error: $1" >&2; exit 1; }
@@ -53,9 +54,9 @@ EXAMPLES:
     manifest.sh F-0116 --markdown         # Human-readable Markdown
 
 OUTPUT:
-    Creates .agentic-state/manifests/<name>.json at project root.
+    Creates .agentic-journal/manifests/<name>.json at project root.
     Use --markdown for .manifest.md human-readable format.
-    This location persists across .agentic framework upgrades.
+    Part of persistent history (always committed).
 EOF
 }
 

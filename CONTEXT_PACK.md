@@ -75,7 +75,8 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 - `.agentic/state/status.json` - Fast status updates (JSON backend)
 - `.agentic-state/WIP.md` - Work-in-progress tracking (recovery)
 - `.agentic-state/AGENTS_ACTIVE.md` - Multi-agent coordination
-- `.agentic-state/manifests/` - Feature change manifests (git history snapshots)
+- `.agentic-journal/manifests/` - Feature change manifests (git history snapshots)
+- `.agentic-journal/lessons/` - Operational learnings (L-#### files)
 
 ## Known risks / sharp edges
 - Multiple agents can work simultaneously - must coordinate via `.agentic-state/AGENTS_ACTIVE.md`
