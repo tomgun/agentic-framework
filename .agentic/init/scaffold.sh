@@ -197,7 +197,7 @@ if [[ "${PROFILE}" == "core" ]]; then
   echo "Tool-specific setup:"
   echo "  The agent will ask which AI tool(s) you use during initialization."
   echo "  Or run manually: bash .agentic/tools/setup-agent.sh <tool>"
-  echo "  Available: claude, cursor, copilot, codex, gemini"
+  echo "  Available: claude, cursor, copilot, codex"
   exit 0
 fi
 
@@ -281,6 +281,6 @@ echo ""
 echo "Tool-specific setup:"
 echo "  The agent will ask which AI tool(s) you use during initialization."
 echo "  Or run manually: bash .agentic/tools/setup-agent.sh <tool>"
-echo "  Available: claude, cursor, copilot, codex, gemini"
+echo "  Available: claude, cursor, copilot, codex"
 
 

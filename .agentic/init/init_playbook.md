@@ -91,8 +91,7 @@ This creates all expected files/folders with templates/placeholders so you can s
 > **a) Claude Code** - creates CLAUDE.md
 > **b) Cursor** - creates .cursorrules
 > **c) GitHub Copilot** - creates .github/copilot-instructions.md
-> **d) Codex CLI** - uses AGENTS.md
-> **e) Gemini** - creates GEMINI.md
+> **d) Codex CLI** - creates .codex/instructions.md
 > 
 > Type the letters for tools you use (e.g., 'ab' for Claude + Cursor, or just 'b' for Cursor only)"
 
