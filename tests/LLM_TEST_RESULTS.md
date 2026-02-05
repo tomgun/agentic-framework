@@ -10,10 +10,10 @@
 | Environment | Last Tested | Version | Result | Tester |
 |-------------|-------------|---------|--------|--------|
 | Claude Code | _not yet_ | - | - | - |
-| Cursor | 2026-02-05 | 0.18.0 | **10/10 tests ✅** | Cursor Agent |
+| Cursor | 2026-02-05 | 0.19.0 | **10/10 ✅ + 12 pending** | Cursor Agent |
 | GitHub Copilot | _not yet_ | - | - | - |
 
-**Last full verification**: 2026-02-05 (Cursor IDE, v0.18.0) - 10/10 tests passed
+**Last full verification**: 2026-02-05 (Cursor IDE, v0.19.0) - 10/10 passed, 12 new value proposition tests pending
 
 ---
 
@@ -52,6 +52,28 @@
 - **011_core_proceeds_without_spec**: ✅ PASSED - Core profile proceeds without formal spec
 
 **Total: 10/10 tests passed ✅**
+
+#### Value Proposition Tests (v0.19.0 - NEW, not yet run)
+
+**Token Efficiency (3 tests):**
+- **024_mentions_script_for_journal**: ⏳ PENDING - Agent knows about token-efficient journal script
+- **025_targeted_context_reading**: ⏳ PENDING - Agent uses CONTEXT_PACK instead of scanning source files
+- **026_avoids_unnecessary_reads**: ⏳ PENDING - Agent doesn't over-read for simple tasks
+
+**Anti-Hallucination (3 tests - Critical):**
+- **027_no_fabricated_methods**: ⏳ PENDING - Agent doesn't invent methods on real class
+- **028_no_fabricated_config**: ⏳ PENDING - Agent doesn't assume config keys exist
+- **029_verifies_db_schema**: ⏳ PENDING - Agent checks schema before using fields
+
+**Durable Artifacts (3 tests):**
+- **030_reads_status_on_start**: ⏳ PENDING - Agent reads STATUS.md for next steps
+- **031_references_journal_history**: ⏳ PENDING - Agent reads JOURNAL.md for history
+- **032_knows_architecture_from_context_pack**: ⏳ PENDING - Agent uses CONTEXT_PACK for architecture
+
+**Multi-Agent & Profiles (3 tests):**
+- **033_mentions_agents_active**: ⏳ PENDING - Agent aware of multi-agent coordination
+- **034_suggests_worktree_for_parallel**: ⏳ PENDING - Agent recommends worktree for parallel work
+- **035_core_is_lightweight**: ⏳ PENDING - Core profile doesn't enforce formal specs
 
 **New Infrastructure Added:**
 - `tests/llm/test_definitions.json` - Machine-readable test specs
@@ -94,8 +116,8 @@ _No tests run yet for this version._
 
 <!-- Template for recording:
 #### Claude Code - [DATE]
-- Critical: X/4 passed
-- Important: X/5 passed
+- Critical: X/7 passed
+- Important: X/11 passed
 - Full: X/22 passed
 - Notes: [any issues]
 -->

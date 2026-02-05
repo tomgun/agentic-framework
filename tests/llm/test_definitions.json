@@ -248,6 +248,317 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "024_mentions_script_for_journal",
+      "description": "Agent should know about token-efficient journal script instead of reading JOURNAL.md directly",
+      "section": "token-efficiency",
+      "category": "Important",
+      "llm_test_id": "LLM-024",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-01-15: Authentication Module\n- Implemented JWT token generation\n- Added refresh token rotation\n- Fixed CORS issues with auth endpoints\n- Performance: 2ms avg response time\n\n### 2026-01-14: Database Migration\n- Migrated from SQLite to PostgreSQL\n- Added connection pooling\n- Schema: users, sessions, tokens tables\n- Benchmark: 500 concurrent connections stable\n\n### 2026-01-13: Initial Setup\n- Created project structure\n- Added CI/CD pipeline\n- Configured linting and formatting\n- Set up Docker development environment\n\n### 2026-01-12: Planning Session\n- Defined architecture: microservices with API gateway\n- Tech stack: Node.js, TypeScript, PostgreSQL\n- Testing strategy: unit + integration + e2e\n- Deployment: Kubernetes with Helm charts"
+        }
+      },
+      "prompt": "Add a journal entry about completing the authentication feature",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "journal.sh|tools/journal|ag journal|append|token.efficient|script"
+        ],
+        "output_not_contains": [
+          "let me read.*JOURNAL|reading the entire.*JOURNAL|cat.*JOURNAL"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "025_targeted_context_reading",
+      "description": "Agent should use durable artifacts (CONTEXT_PACK) for targeted info instead of scanning source files",
+      "section": "token-efficiency",
+      "category": "Important",
+      "llm_test_id": "LLM-025",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "CONTEXT_PACK.md": "# Context Pack\n\n## Project Overview\nE-commerce platform with microservices architecture.\n\n## Frontend Layer\n- React 18 with TypeScript\n- Next.js for SSR\n- Tailwind CSS for styling\n- State: Zustand\n\n## API Gateway\n- Express.js reverse proxy\n- Rate limiting: 100 req/min per user\n- JWT validation middleware\n\n## Database Layer\n- PostgreSQL 15 for primary data\n- Redis for caching and sessions\n- Prisma ORM for type-safe queries\n- Migrations in db/migrations/\n- Connection pooling via PgBouncer\n\n## Authentication\n- JWT with RS256 signing\n- Refresh token rotation\n- OAuth2 providers: Google, GitHub\n\n## Deployment\n- Kubernetes on AWS EKS\n- Helm charts in deploy/\n- CI/CD via GitHub Actions",
+          "src/index.ts": "import express from 'express';\nconst app = express();\napp.listen(3000);",
+          "src/db/connection.ts": "import { PrismaClient } from '@prisma/client';\nexport const prisma = new PrismaClient();"
+        }
+      },
+      "prompt": "I need to understand the database layer for my next task",
+      "expected": {
+        "output_contains": [
+          "PostgreSQL|Prisma|Redis|PgBouncer|db/migrations"
+        ],
+        "output_contains_any": [
+          "CONTEXT_PACK|context pack|architecture|database layer"
+        ],
+        "output_not_contains": [
+          "scanning all.*src|reading all source|let me search every"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "026_avoids_unnecessary_reads",
+      "description": "Agent should not over-read files for simple tasks",
+      "section": "token-efficiency",
+      "category": "Normal",
+      "llm_test_id": "LLM-026",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "index.js": "const app = require('express')();\n\napp.get('/', (req, res) => {\n  res.send('Hello World');\n});\n\napp.listen(3000, () => {\n  console.log('Server running on port 3000');\n});",
+          "JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-01-20: Major refactor\n- Rewrote authentication module\n- Added rate limiting\n- Updated all API endpoints\n- Fixed 15 bugs\n\n### 2026-01-19: Database optimization\n- Added indexes on frequently queried columns\n- Implemented connection pooling\n- Query performance improved 3x"
+        }
+      },
+      "prompt": "Add a console.log statement to index.js that logs 'Request received' when the root endpoint is hit",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "console.log|index.js|Request received|endpoint"
+        ],
+        "output_not_contains": [
+          "reading.*JOURNAL|reading.*FEATURES|let me check.*JOURNAL"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "027_no_fabricated_methods",
+      "description": "Agent must not invent methods that don't exist on a real class",
+      "section": "anti-hallucination",
+      "category": "Critical",
+      "llm_test_id": "LLM-027",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "services/user.ts": "export class UserService {\n  private db: Database;\n\n  constructor(db: Database) {\n    this.db = db;\n  }\n\n  async getUser(id: string): Promise<User | null> {\n    return this.db.query('SELECT * FROM users WHERE id = $1', [id]);\n  }\n\n  async updateUser(id: string, data: Partial<User>): Promise<User> {\n    const fields = Object.entries(data).map(([k, v]) => `${k} = '${v}'`).join(', ');\n    return this.db.query(`UPDATE users SET ${fields} WHERE id = $1 RETURNING *`, [id]);\n  }\n}"
+        }
+      },
+      "prompt": "Use the UserService to sync user preferences to the cloud",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "don.t see|doesn.t have|not.*exist|only.*getUser|only.*updateUser|need to.*add|implement|create.*method|no.*syncPreferences|no.*sync.*method"
+        ],
+        "output_not_contains": [
+          "userService\\.syncPreferences\\(|UserService\\.sync\\(|this\\.syncPreferences\\(|await.*\\.syncPreferences\\("
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "028_no_fabricated_config",
+      "description": "Agent must not assume config keys exist when they don't",
+      "section": "anti-hallucination",
+      "category": "Critical",
+      "llm_test_id": "LLM-028",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "config.ts": "export interface AppConfig {\n  apiUrl: string;\n  timeout: number;\n  debug: boolean;\n}\n\nexport const config: AppConfig = {\n  apiUrl: 'https://api.example.com',\n  timeout: 3000,\n  debug: false\n};"
+        }
+      },
+      "prompt": "Set the MAX_RETRIES config to 5 for the API client",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "don.t see.*MAX_RETRIES|not.*in.*config|doesn.t.*exist|doesn.t have|add.*MAX_RETRIES|need to.*add|no.*MAX_RETRIES|interface.*doesn.t|not.*defined"
+        ],
+        "output_not_contains": [
+          "config\\.MAX_RETRIES\\s*=\\s*5|config\\[.MAX_RETRIES.\\]\\s*=\\s*5"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "029_verifies_db_schema",
+      "description": "Agent must check schema before using fields that may not exist",
+      "section": "anti-hallucination",
+      "category": "Critical",
+      "llm_test_id": "LLM-029",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "prisma/schema.prisma": "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id        Int      @id @default(autoincrement())\n  email     String   @unique\n  name      String\n  createdAt DateTime @default(now())\n  posts     Post[]\n}\n\nmodel Post {\n  id        Int      @id @default(autoincrement())\n  title     String\n  content   String?\n  authorId  Int\n  author    User     @relation(fields: [authorId], references: [id])\n}"
+        }
+      },
+      "prompt": "Query the users table for the last_login field to find inactive users",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "don.t see.*last_login|no.*last_login|doesn.t have.*last_login|not in.*schema|not.*in.*model|need to add|field.*doesn.t exist|schema.*doesn.t|add.*field|migration"
+        ],
+        "output_not_contains": [
+          "user\\.last_login|SELECT.*last_login.*FROM|where:.*\\{.*last_login|findMany.*last_login"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "030_reads_status_on_start",
+      "description": "Agent should read STATUS.md and reference its content when asked about next steps",
+      "section": "durable-artifacts",
+      "category": "Important",
+      "llm_test_id": "LLM-030",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "STATUS.md": "# Project Status\n\n## Current Sprint: Sprint 7\n**Goal**: Complete payment gateway integration\n\n## Completed\n- User authentication (Sprint 5)\n- Product catalog (Sprint 6)\n- Shopping cart (Sprint 6)\n\n## In Progress\n- Payment gateway - Stripe integration (70% done)\n- Order confirmation emails\n\n## Next Steps\n- Implement the payment gateway webhook handlers\n- Add invoice PDF generation\n- Set up monitoring dashboards\n\n## Blockers\n- Waiting for Stripe API keys from finance team"
+        }
+      },
+      "prompt": "What should I work on next?",
+      "expected": {
+        "output_contains": [
+          "payment|gateway|webhook|Stripe|invoice|monitoring"
+        ],
+        "output_contains_any": [
+          "STATUS|status|next step|priority|sprint"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "031_references_journal_history",
+      "description": "Agent should read JOURNAL.md to answer questions about past sessions",
+      "section": "durable-artifacts",
+      "category": "Important",
+      "llm_test_id": "LLM-031",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-02-04: Critical bug fix session\n- Fixed critical race condition in auth module\n- Root cause: concurrent token refresh requests\n- Solution: Added mutex lock on refresh endpoint\n- Also updated error logging to capture stack traces\n- Tests: Added 3 concurrency tests, all passing\n\n### 2026-02-03: Performance optimization\n- Identified N+1 query in product listing\n- Added DataLoader for batch fetching\n- Response time: 800ms → 120ms\n- Memory usage reduced by 40%\n\n### 2026-02-02: Feature development\n- Started shopping cart implementation\n- Added cart model and API endpoints\n- Frontend: CartDrawer component with animations"
+        }
+      },
+      "prompt": "What did we accomplish in the last session?",
+      "expected": {
+        "output_contains": [
+          "race condition|auth|mutex|token refresh|concurrent|bug fix"
+        ],
+        "output_contains_any": [
+          "JOURNAL|journal|last session|previous session|February 4|2026-02-04"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "032_knows_architecture_from_context_pack",
+      "description": "Agent should use CONTEXT_PACK for architecture knowledge instead of guessing",
+      "section": "durable-artifacts",
+      "category": "Important",
+      "llm_test_id": "LLM-032",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "CONTEXT_PACK.md": "# Context Pack\n\n## Project Overview\nMonorepo with 3 packages: api, web, shared\n\n## Directory Structure\n- packages/api/ - Express.js REST API\n- packages/web/ - Next.js frontend\n- packages/shared/ - Shared types and utilities\n\n## Database\n- PostgreSQL with Prisma ORM\n- Migrations live in packages/api/prisma/migrations/\n- Seeds in packages/api/prisma/seed.ts\n\n## Testing\n- Jest for unit tests\n- Playwright for e2e tests in packages/web/e2e/\n\n## Deployment\n- Docker Compose for local dev\n- Kubernetes for production\n- Helm charts in deploy/charts/"
+        }
+      },
+      "prompt": "Where should I add the new database migration?",
+      "expected": {
+        "output_contains": [
+          "packages/api/prisma/migrations|api/prisma/migrations"
+        ],
+        "output_contains_any": [
+          "CONTEXT_PACK|context|Prisma|migration"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "033_mentions_agents_active",
+      "description": "Agent should be aware of multi-agent coordination when parallel work is discussed",
+      "section": "multi-agent",
+      "category": "Important",
+      "llm_test_id": "LLM-033",
+      "profile": "core",
+      "setup": {
+        "files": {
+          ".agentic-state/AGENTS_ACTIVE.md": ""
+        }
+      },
+      "prompt": "I want to start working on the payment feature while my colleague works on auth in parallel",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "AGENTS_ACTIVE|coordination|parallel|worktree|conflict|branch|isolat|concurrent|separate"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "034_suggests_worktree_for_parallel",
+      "description": "Agent should recommend git worktree or branch isolation for parallel agent work",
+      "section": "multi-agent",
+      "category": "Normal",
+      "llm_test_id": "LLM-034",
+      "profile": "core-pm",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "How can two AI agents work on different features at the same time without conflicts?",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "worktree|git worktree|parallel|isolation|separate.*branch|different.*branch|concurrent"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "035_core_is_lightweight",
+      "description": "Core profile should not enforce formal specs - lightweight process for simple tasks",
+      "section": "profiles",
+      "category": "Important",
+      "llm_test_id": "LLM-035",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "utils.js": "// Utility functions\n\nfunction capitalize(str) {\n  return str.charAt(0).toUpperCase() + str.slice(1);\n}\n\nmodule.exports = { capitalize };"
+        }
+      },
+      "prompt": "Add a utility function to format dates as YYYY-MM-DD",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "function|formatDate|format.*date|YYYY|toISOString|Date"
+        ],
+        "output_not_contains": [
+          "need a feature ID|create.*spec|F-\\d{4}|FEATURES\\.md|acceptance criteria"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }
