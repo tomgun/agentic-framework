@@ -895,6 +895,34 @@ Type 'a' or 'b':
 
 ---
 
+### Anti-Hallucination (NON-NEGOTIABLE)
+
+**What**: Agents must never fabricate information - APIs, function signatures, endpoints, library behavior, or technical claims.
+
+**Why**:
+- Hallucinated code causes runtime errors and security vulnerabilities
+- Guessed API signatures waste hours of debugging
+- Fabricated technical claims undermine trust
+- One hallucination can cascade into systemic problems
+- This undermines ALL other quality principles
+
+**How Enforced**:
+- agent_operating_guidelines.md: "🚨 Anti-Hallucination Rules"
+- Rule 1: NEVER make things up - state uncertainty, look it up, or ask
+- Rule 2: Verify technical claims against version-specific documentation
+- Rule 3: Use HUMAN_NEEDED.md when uncertain
+- Documentation verification via Context7 or manual checking
+
+**Example**:
+- ✅ "I'm not certain about the exact API. Let me check the docs."
+- ✅ "According to Next.js 15 docs, the function signature is..."
+- ❌ "React 18 has a useServerComponent hook" (hallucinated)
+- ❌ "The endpoint is probably /api/users/update" (guessing)
+
+**Anti-pattern**: ❌ Guessing API signatures. ❌ Assuming library behavior. ❌ "It probably works like..." ❌ Fabricating function names or parameters.
+
+---
+
 ### ❌ Don't Duplicate Documentation
 
 **Why Wrong**: Update in 3 places = errors, maintenance burden, inconsistency over time.
