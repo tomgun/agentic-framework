@@ -191,7 +191,7 @@ Before marking feature as complete:
 - [ ] **Change manifest generated** (for documentation patching)
   - Run: `bash .agentic/tools/manifest.sh F-####`
   - Or: `ag done F-####` (auto-generates manifest)
-  - Creates `.agentic-state/manifests/F-####.manifest.md` with:
+  - Creates `.agentic-journal/manifests/F-####.manifest.md` with:
     - All commits related to feature
     - Files changed (code, tests, docs, config)
     - Lines added/removed

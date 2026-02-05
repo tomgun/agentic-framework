@@ -8,11 +8,17 @@ This repo uses the **Agentic Framework**.
 
 | Gate | Core+PM (formal) | Core (discovery) |
 |------|------------------|------------------|
-| Acceptance criteria | **BLOCKS** - `ag implement` requires acceptance | N/A - use `ag work` |
+| Acceptance criteria | **BLOCKS** - `ag implement` requires `spec/acceptance/F-XXXX.md` | N/A - use `ag work` |
 | WIP before commit | **BLOCKS** - must complete WIP first | WARNING only |
+| **Test execution** | **BLOCKS** - tests must pass | **BLOCKS** - tests for changed files |
+| **Complexity limits** | **BLOCKS** - max files/lines/length | **BLOCKS** - same limits apply |
 | Pre-commit checks | **BLOCKS** - full validation | Light check, no block |
+| Feature status | **BLOCKS** - shipped needs acceptance | N/A |
 
-**Core+PM**: Formal tracking with enforced gates. **Core**: Discovery with lighter guidance.
+**Escape hatches** (feature branches only): `SKIP_TESTS=1` or `SKIP_COMPLEXITY=1`
+
+**Core+PM**: Formal tracking with enforced gates.
+**Core**: Discovery/exploration with lighter guidance (tests + complexity still enforced).
 
 **Quick Commands**: `ag start` | `ag implement F-XXXX` (Core+PM) | `ag work "desc"` (Core) | `ag commit` | `ag done` | `ag tools`
 
@@ -25,6 +31,7 @@ This repo uses the **Agentic Framework**.
 | Trigger Words | YOUR FIRST ACTION |
 |---------------|-------------------|
 | "build", "implement", "add", "create", "let's do" | **STOP -> Run `ag implement F-XXXX` (verifies acceptance criteria)** |
+| "implement entire", "full system", "complete feature" | **STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files.** |
 | "fix", "bug", "issue" | **STOP -> Write failing test FIRST** |
 | "commit", "push" | **STOP -> Run `ag commit` (all gates must pass)** |
 | "done", "complete" | **STOP -> Run `ag done F-XXXX` (verifies completion)** |
@@ -47,6 +54,31 @@ FEATURE REQUEST?
 - **Starting feature?** -> `.agentic/checklists/feature_start.md`
 - **Before commit?** -> `.agentic/checklists/before_commit.md`
 - **Feature done?** -> `.agentic/checklists/feature_complete.md`
+
+---
+
+## MANDATORY: Small Batch Development
+
+**WHEN user asks for something large** (e.g., "implement entire auth system", "build full API"):
+
+```
+STOP - This is TOO BIG for one task.
+
+I'll break this into smaller, manageable pieces:
+1. [First small piece - 3-5 files max]
+2. [Second piece]
+3. [Third piece]
+...
+
+Let's start with #1. Which would you like to tackle first?
+```
+
+**Why this matters**:
+- Max 5-10 files per commit = easy review, safe rollback
+- One feature at a time = focused context, fewer bugs
+- Small batches = you can verify each piece works before moving on
+
+**Signs it's too big**: User asks for "entire", "full", "complete system", or lists 4+ features.
 
 ---
 

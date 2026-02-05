@@ -1818,7 +1818,7 @@ agent_mode: balanced  # premium | balanced | economy
 
 **Implementation**:
 - State: complete
-- Code: `.agentic/tools/manifest.sh`, `.agentic-state/manifests/`
+- Code: `.agentic/tools/manifest.sh`, `.agentic-journal/manifests/`
 - Tests: manual
 
 **Acceptance**: See `spec/acceptance/F-0119.md`
@@ -1842,6 +1842,26 @@ agent_mode: balanced  # premium | balanced | economy
 - Tests: manual
 
 **Acceptance**: See `spec/acceptance/F-0120.md`
+
+---
+
+## F-0121: Tool-Specific Instructions Parity
+
+**Status**: in_progress
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.18.0
+
+**Description**: Ensure Cursor, Codex, and Copilot templates in `.agentic/agents/` have feature parity with Claude template for enforced gates. All templates have 6-gate table, escape hatches, small batch development rules, and "implement entire" trigger word.
+
+**Dependencies**: F-0116 (Maintainability Enforcement Gates)
+
+**Implementation**:
+- State: in_progress
+- Code: `.agentic/agents/cursor/cursorrules.txt`, `.agentic/agents/codex/codex-instructions.md`, `.agentic/agents/copilot/copilot-instructions.md`, `/CODEX.md`
+- Tests: `tests/validate_framework.sh` (F-0121 section)
+
+**Acceptance**: See `spec/acceptance/F-0121.md`
 
 ---
 

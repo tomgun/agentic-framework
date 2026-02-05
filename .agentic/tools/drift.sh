@@ -776,7 +776,7 @@ check_documentation_drift() {
     echo ""
 
     local changed_files=()
-    local manifest_dir="$ROOT_DIR/.agentic-state/manifests"
+    local manifest_dir="$ROOT_DIR/.agentic-journal/manifests"
 
     # Get changed files from manifest or git
     if [[ -n "$MANIFEST_FEATURE" && -d "$manifest_dir" ]]; then

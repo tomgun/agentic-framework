@@ -989,6 +989,68 @@ else
 fi
 
 # ============================================================
+# F-0121: Tool-Specific Instructions Parity
+# ============================================================
+echo ""
+echo "--- F-0121: Tool-Specific Instructions Parity ---"
+
+# Required gates that all templates must have
+REQUIRED_GATES=("Acceptance criteria" "WIP" "Test execution" "Complexity limits" "Pre-commit" "Feature status")
+
+# Templates to check
+TEMPLATES=(
+  ".agentic/agents/claude/CLAUDE.md"
+  ".agentic/agents/codex/codex-instructions.md"
+  ".agentic/agents/copilot/copilot-instructions.md"
+  ".agentic/agents/cursor/cursorrules.txt"
+)
+
+for template in "${TEMPLATES[@]}"; do
+  template_path="${FRAMEWORK_ROOT}/${template}"
+  template_name=$(basename "$template")
+
+  if [[ ! -f "$template_path" ]]; then
+    fail "${template_name}: file missing"
+    continue
+  fi
+
+  # Check for all 6 gates
+  gate_count=0
+  for gate in "${REQUIRED_GATES[@]}"; do
+    if grep -qi "$gate" "$template_path" 2>/dev/null; then
+      ((gate_count++))
+    fi
+  done
+
+  if [[ $gate_count -eq 6 ]]; then
+    pass "${template_name}: has all 6 gates"
+  else
+    fail "${template_name}: only ${gate_count}/6 gates found"
+  fi
+
+  # Check for escape hatches
+  if grep -q "SKIP_TESTS\|SKIP_COMPLEXITY" "$template_path" 2>/dev/null; then
+    pass "${template_name}: has escape hatches"
+  else
+    fail "${template_name}: missing escape hatches"
+  fi
+
+  # Check for small batch development
+  if grep -qi "small batch\|TOO BIG\|5-10 files" "$template_path" 2>/dev/null; then
+    pass "${template_name}: has small batch rules"
+  else
+    fail "${template_name}: missing small batch rules"
+  fi
+done
+
+# Check /CODEX.md extends template (not a stub)
+if grep -q "Full template.*codex-instructions" "${FRAMEWORK_ROOT}/CODEX.md" 2>/dev/null; then
+  pass "CODEX.md extends template (not stub)"
+else
+  fail "CODEX.md should extend template"
+fi
+
+# ============================================================
 # PROFILE-AWARE INSTALLATION TESTS
 # ============================================================
 echo ""
