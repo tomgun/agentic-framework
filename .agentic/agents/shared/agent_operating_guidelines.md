@@ -1,6 +1,6 @@
 # Agent Operating Guidelines (All Tools)
 
-> **📚 REFERENCE MATERIAL (v0.18.0)**
+> **📚 REFERENCE MATERIAL (v0.19.0)**
 >
 > This document contains detailed rationale and edge cases. For daily use:
 > - **Quick Start**: `.agentic/agents/shared/AGENT_QUICK_START.md` (~70 lines)

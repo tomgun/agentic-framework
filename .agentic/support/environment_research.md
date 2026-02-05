@@ -3,7 +3,7 @@
 **Purpose**: Track capabilities and optimal practices for each AI coding environment.
 
 **Last updated**: 2026-02-05  
-**Framework version**: 0.18.0
+**Framework version**: 0.19.0
 
 ---
 

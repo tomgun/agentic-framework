@@ -69,7 +69,7 @@ In Claude Code, when creating or configuring a project:
 ```
 🚀 Agentic AF Session Start
 
-📦 Framework version: 0.18.0
+📦 Framework version: 0.19.0
 ✓ Session context available
   📍 Focus: Implementing user authentication
 ⚠ 2 blocker(s) in HUMAN_NEEDED.md

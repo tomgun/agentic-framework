@@ -5,6 +5,46 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.0] - 2026-02-05
+
+### Added
+- **Principles Consolidation** - Expanded PRINCIPLES.md from 34 to 48 principles
+  - Development & Quality: TDD as Default, Explicit Over Implicit, Automated Validation, Retrospectives, Research Mode, Programming Standards, Comprehensive Testing
+  - Collaboration: Multi-Agent Coordination, PR Mode, Build/Deploy Specialization
+  - Documentation: Spec Schema Enforces Consistency, Examples First-Class, Framework Self-Documentation
+  - Archived historical analysis files to `docs/reviews/`
+
+- **Framework Value Proposition** - New documentation of framework value
+  - `docs/FRAMEWORK_VALUE_PROPOSITION.md` - Problems solved & key features
+  - 6 problem areas documented with specific solutions
+  - Features organized by use case (Solo, Teams, Quality-Critical, Long-Term)
+
+- **Value Proposition Audit** - Verification that claims match reality
+  - `docs/reviews/2026-02-value-proposition-audit.md`
+  - Systematic audit of all 30 value claims
+  - Results: 29/30 IMPLEMENTED, 1/30 PARTIAL (progressive disclosure)
+
+- **"Check Before Creating" Principle (NON-NEGOTIABLE)** - Prevent duplicates
+  - Agents must search for existing implementations before creating new ones
+  - Applies to tests, docs, components, utilities
+  - Discovered via plan-review loop catching duplicate test
+  - Enforcement added to `agent_operating_guidelines.md`
+
+- **Anti-Hallucination Formalized** - Elevated to formal principle
+  - Added to PRINCIPLES.md as NON-NEGOTIABLE
+  - Comprehensive examples and enforcement mechanisms
+  - Previously scattered, now first-class principle
+
+### Fixed
+- **Stale Version Numbers** - Updated 8 files from 0.12.0-0.15.1 to 0.18.0
+  - PRINCIPLES.md, DEVELOPER_GUIDE.md, FRAMEWORK_DEVELOPMENT.md
+  - ROI.md, claude-hooks/README.md, MANUAL_OPERATIONS.md
+  - environment_research.md, green_coding.md
+
+- **Green Coding Reference** - Added to agent_operating_guidelines.md
+
+---
+
 ## [0.18.0] - 2026-02-05
 
 ### Added
