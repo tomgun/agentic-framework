@@ -124,5 +124,5 @@ Use these tests to iterate on framework guidelines:
 ## See Also
 
 - `tests/LLM_TEST_PLAN.md` - Full test scenarios (22 tests)
-- `tests/LLM_TEST_RESULTS.md` - Manual test results tracking
+- `tests/VERIFICATION_REPORT.md` - All test results (single source of truth)
 - `tests/RUN_LLM_TESTS.md` - Manual test guide

@@ -121,7 +121,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - llm_tests_enabled: yes
 - llm_test_command: ag test llm
 - llm_test_critical_only: ag test llm --critical
-- llm_test_results: tests/LLM_TEST_RESULTS.md
+- llm_test_results: tests/VERIFICATION_REPORT.md
 
 ## Constraints & non-negotiables
 - Backward compatibility: Must support existing projects upgrading

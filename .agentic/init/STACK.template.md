@@ -29,13 +29,14 @@ Purpose: a single source of truth for "how we build and run software here".
 ## Documentation verification (recommended)
 <!-- Ensures agents use current, version-correct documentation -->
 <!-- See: .agentic/workflows/documentation_verification.md -->
-<!-- - doc_verification: context7  # context7 | manual | none -->
-<!-- - context7_enabled: yes -->
-<!-- - context7_config: .context7.yml -->
+<!-- - doc_verification: context7-mcp  # context7-mcp | web-search | manual | none -->
+<!-- - context7_mcp: enabled          # Requires MCP server config in IDE -->
 <!-- - strict_version_matching: yes -->
+<!-- MCP setup: Add to .cursor/mcp.json or claude_desktop_config.json: -->
+<!-- { "mcpServers": { "context7": { "command": "npx", "args": ["-y", "@upstash/context7-mcp@latest"] } } } -->
 
-## Documentation sources (for manual verification)
-<!-- If not using Context7, agents must check these sources match STACK versions -->
+## Documentation sources (for verification)
+<!-- Agents verify these sources match STACK versions -->
 <!-- Example: -->
 <!-- - Next.js: https://nextjs.org/docs (version selector: v15.1) -->
 <!-- - React: https://react.dev (v19) -->

@@ -38,11 +38,13 @@
 6. **Deprecated features**
 
 **Sources of truth** (in order of preference):
-1. **Context7** (if enabled) - version-locked, reliable
-2. **Official documentation** for the EXACT version
+1. **Context7 MCP server** (if configured) - version-locked, live docs
+2. **Official documentation** for the EXACT version (web search or direct)
 3. **Source code** in node_modules/ or site-packages/
 4. **Human confirmation** (HUMAN_NEEDED.md)
 5. **NEVER**: Your training data, guesses, assumptions
+
+See `.agentic/workflows/documentation_verification.md` for setup and details.
 
 ---
 

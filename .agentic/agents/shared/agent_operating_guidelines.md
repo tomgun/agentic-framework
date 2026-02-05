@@ -130,13 +130,13 @@ If you don't know something with certainty:
 ### Rule 2: Verify Technical Claims
 
 **BEFORE writing code using any API**:
-1. Check version-specific documentation (Context7 if enabled, or official docs)
+1. Check version-specific documentation (Context7 MCP server if configured, web search, or official docs)
 2. Verify: function signatures, API endpoints, config options, import paths
 3. If uncertain → Add to HUMAN_NEEDED.md
 
 **Sources of truth** (in order):
-1. Context7 (if enabled) - version-locked, reliable
-2. Official documentation for EXACT version
+1. Context7 MCP server (if configured) - version-locked, live docs
+2. Official documentation for EXACT version (web search or direct)
 3. Source code in node_modules/
 4. Human confirmation
 5. ❌ NEVER: Training data, guesses

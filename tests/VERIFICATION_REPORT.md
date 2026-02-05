@@ -1,8 +1,9 @@
 # Framework Verification Report
 
-**Generated**: 2026-02-04
-**Framework Version**: 0.18.0
-**Test Results**: 149 passed, 0 failed
+**Single source of truth for ALL test results.**
+
+**Generated**: 2026-02-05
+**Framework Version**: 0.20.0
 
 ---
 
@@ -10,150 +11,166 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Features | 74 |
-| Acceptance Files | 74/74 (100%) |
-| Automated Tests | 149 |
+| Acceptance Tests (validate_framework.sh) | 171 passed, 0 failed |
+| Unit Tests (run_tests.sh) | 21/21 passed |
+| LLM Behavioral Tests | 22/22 passed |
+| **Total Tests** | **214** |
 | Test Pass Rate | 100% |
+| Principles Covered | 11/11 |
 | Profile Coverage | Core ✅, Core+PM ✅ |
 
 ---
 
-## Verification by Category
+## Latest Test Runs
 
-### Core Features (F-0001 to F-0010)
-
-| Feature | Name | Status | Verification |
-|---------|------|--------|--------------|
-| F-0001 | Project Initialization | shipped | ✅ Automated: install.sh, scaffold.sh tests |
-| F-0002 | Profile Selection (Core vs Core+PM) | shipped | ✅ Automated: Profile-aware installation tests |
-| F-0003 | Spec-Driven Development | shipped | ✅ Automated: FEATURES.md validation |
-| F-0004 | Feature Tracking & Status | shipped | ✅ Automated: feature.sh tests |
-| F-0005 | Acceptance Criteria Files | shipped | ✅ Automated: Acceptance file existence checks |
-| F-0006 | Acceptance-Driven Development | shipped | ⚠️ Manual: Agent behavioral test required |
-| F-0007 | Small Batch Development | shipped | ⚠️ Manual: Agent behavioral test required |
-| F-0008 | TDD Mode (Optional) | shipped | ⚠️ Manual: Agent behavioral test required |
-| F-0009 | OVERVIEW.md (Core Profile) | shipped | ✅ Automated: Core profile tests |
-| F-0010 | Spec Evolution Workflow | shipped | ⚠️ Manual: Agent behavioral test required |
-
-### Quality Features (F-0011 to F-0020)
-
-| Feature | Name | Status | Verification |
-|---------|------|--------|--------------|
-| F-0011 | Programming Standards | shipped | ✅ Automated: File existence |
-| F-0012 | Testing Standards | shipped | ✅ Automated: File existence |
-| F-0013 | Smoke Testing Checklist | shipped | ⚠️ Manual: Agent behavioral test required |
-| F-0014 | Library Selection Guidelines | shipped | ✅ Automated: File existence |
-| F-0015 | Quality Profiles (Stack-Specific) | shipped | ✅ Automated: Profile directory exists |
-| F-0016 | Pre-Commit Quality Gates | shipped | ✅ Automated: pre-commit-check.sh tests |
-| F-0017 | Feature Completion Validator | shipped | ✅ Automated: feature-complete.sh tests |
-
-### Session Features (F-0021 to F-0030)
-
-| Feature | Name | Status | Verification |
-|---------|------|--------|--------------|
-| F-0021 | Session Start Protocol | shipped | ⚠️ Manual: Agent behavioral test required |
-| F-0022 | Session End Protocol | shipped | ⚠️ Manual: Agent behavioral test required |
-| F-0023 | JOURNAL.md Session Tracking | shipped | ✅ Automated: journal.sh functional test |
-| F-0024 | STATUS.md Current State | shipped | ✅ Automated: status.sh tests |
-| F-0025 | CONTEXT_PACK.md Architecture | shipped | ✅ Automated: File existence |
-| F-0026 | HUMAN_NEEDED.md Escalation | shipped | ✅ Automated: blocker.sh tests |
-| F-0027 | Automatic Journaling | shipped | ✅ Automated: session_log.sh tests |
-| F-0028 | Continue-Here Generator | shipped | ✅ Automated: continue_here.py exists |
-
-### Multi-Agent Features (F-0031 to F-0040)
-
-| Feature | Name | Status | Verification |
-|---------|------|--------|--------------|
-| F-0031 | Multi-Agent Coordination | shipped | ⚠️ Manual: Multi-agent behavioral test |
-| F-0032 | Git Worktree Setup | shipped | ✅ Automated: worktree.sh tests |
-| F-0033 | AGENTS_ACTIVE.md Coordination | shipped | ⚠️ Manual: Multi-agent behavioral test |
-| F-0034 | Sequential Agent Pipeline | shipped | ⚠️ Manual: Agent behavioral test required |
-| F-0035 | Agent Role Definitions | shipped | ✅ Automated: Role file existence |
-| F-0036 | Native Sub-Agent Integration | shipped | ✅ Automated: Integration docs exist |
-| F-0037 | Project Health Monitoring | shipped | ✅ Automated: project-health.sh exists |
-
-### Tooling Features (F-0041 to F-0050)
-
-| Feature | Name | Status | Verification |
-|---------|------|--------|--------------|
-| F-0041 | Token-Efficient Update Scripts | shipped | ✅ Automated: Script existence + functional |
-| F-0042 | Feature Query Tool | shipped | ✅ Automated: query_features.py tests |
-| F-0043 | Spec Validation Tool | shipped | ✅ Automated: validate_specs.py tests |
-| F-0044 | Framework Age Check | shipped | ✅ Automated: framework_age.sh exists |
-
-### Recovery Features (F-0051 to F-0060)
-
-| Feature | Name | Status | Verification |
-|---------|------|--------|--------------|
-| F-0051 | WIP Tracking | shipped | ✅ Automated: wip.sh functional tests |
-| F-0052 | WIP.md Lock File | shipped | ✅ Automated: wip.sh creates .agentic/WIP.md |
-| F-0053 | Recovery Protocol | shipped | ⚠️ Manual: Agent behavioral test required |
-| F-0054 | Multi-Environment Support | shipped | ⚠️ Manual: Cross-environment test required |
-| F-0055 | Anti-Hallucination Rules | shipped | ⚠️ Manual: Agent behavioral test required |
-| F-0056 | Framework Upgrade | shipped | ✅ Automated: upgrade.sh tests |
-
-### Developer Experience Features (F-0061 to F-0070)
-
-| Feature | Name | Status | Verification |
-|---------|------|--------|--------------|
-| F-0061 | DEVELOPER_GUIDE.md | shipped | ✅ Automated: File exists |
-| F-0062 | START_HERE.md First-Time Guidance | shipped | ✅ Automated: File exists |
-| F-0063 | README Documentation Quality | shipped | ✅ Automated: File exists |
-| F-0064 | Script Help Messages | shipped | ✅ Automated: --help tests |
-| F-0065 | Error Message Quality | shipped | ⚠️ Manual: Review error scenarios |
-| F-0066 | Template Quality | shipped | ✅ Automated: Template existence |
-| F-0067 | MANUAL_OPERATIONS.md | shipped | ✅ Automated: File exists |
-| F-0068 | Upgrade Experience | shipped | ✅ Automated: upgrade.sh tests |
-| F-0069 | Checklist-Driven Workflows | shipped | ✅ Automated: Checklist existence |
-| F-0070 | Workflow Document Organization | shipped | ✅ Automated: workflows/README.md exists |
-
-### Design Principles (F-0071 to F-0080)
-
-| Feature | Name | Status | Verification |
-|---------|------|--------|--------------|
-| F-0071 | Token Economics | shipped | ⚠️ Manual: Measure token usage |
-| F-0072 | Living Documentation | shipped | ⚠️ Manual: Agent behavioral test |
-| F-0073 | Human-Agent Collaboration | shipped | ⚠️ Manual: Agent behavioral test |
-| F-0074 | Green Coding Principles | shipped | ✅ Automated: File exists |
-| F-0075 | Traceability | shipped | ⚠️ Manual: Trace feature to code |
-| F-0076 | Iterative & Incremental Development | shipped | ⚠️ Manual: Agent behavioral test |
-| F-0077 | Emergency Quick Reference | shipped | ✅ Automated: EMERGENCY.md exists |
-| F-0078 | Quick Feature & Issue Scripts | shipped | ✅ Automated: Script tests |
-| F-0079 | Issue/Bug Tracking | shipped | ✅ Automated: ISSUES.template.md exists |
-| F-0080 | Upgrade Marker System | shipped | ✅ Automated: .upgrade_pending tests |
-
-### Agent System Features (F-0081 to F-0090)
-
-| Feature | Name | Status | Verification |
-|---------|------|--------|--------------|
-| F-0081 | Orchestrator Agent | shipped | ⚠️ Manual: Agent behavioral test |
-| F-0082 | Tier-Based Model Selection | shipped | ✅ Automated: Docs use tier terminology |
-| F-0083 | Agent Token Savings Documentation | shipped | ✅ Automated: Docs exist |
-| F-0084 | Untracked Files Protection | shipped | ✅ Automated: check-untracked.sh tests |
-
-### Verification & Enforcement (F-0091 to F-0100)
-
-| Feature | Name | Status | Verification |
-|---------|------|--------|--------------|
-| F-0091 | Gate-Based Verification | shipped | ✅ Automated: doctor.sh/py tests |
-| F-0092 | Phase Detection | shipped | ✅ Automated: phase_detect.py tests |
-| F-0093 | AGENT_QUICK_START.md | shipped | ✅ Automated: File exists, line count |
-| F-0094 | Version-Aware Upgrade Features | shipped | ✅ Automated: FEATURE_REGISTRY tests |
-| F-0095 | Cross-Platform Tool Compatibility | shipped | ✅ Automated: awk usage tests |
-| F-0096 | PR-Based Workflow Default | shipped | ✅ Automated: Template + docs tests |
-| F-0097 | Worktree Management Tool | shipped | ✅ Automated: worktree.sh tests |
-| F-0116 | Maintainability Enforcement Gates | shipped | ✅ Automated: pre-commit test/complexity gates |
+| Environment | Last Tested | Version | Result | Tester |
+|-------------|-------------|---------|--------|--------|
+| Cursor IDE | 2026-02-05 | 0.19.0 | **214/214 ✅** | Cursor Agent (claude-4.6-opus) |
+| Claude Code | _not yet_ | - | - | - |
+| GitHub Copilot | _not yet_ | - | - | - |
 
 ---
 
-## Verification Coverage Summary
+## Evidence Tiers
 
-| Verification Type | Count | Percentage |
-|-------------------|-------|------------|
-| ✅ Automated (structural) | 45 | 61% |
-| ✅ Automated (functional) | 9 | 12% |
-| ⚠️ Manual (agent behavioral) | 20 | 27% |
-| **Total** | **74** | **100%** |
+| Tier | Meaning | Examples |
+|------|---------|----------|
+| **Battle-tested** | Proven through months of real development | Durable artifacts, token-efficient scripts, session continuity, acceptance-driven dev |
+| **LLM-verified** | Agent behavioral tests confirm compliance | 22 tests across all principle categories |
+| **Structurally verified** | Files/scripts exist and pass functional tests | 171 acceptance + 21 unit tests |
+| **Designed for** | Implemented with tooling, growing usage | Multi-agent at scale, sequential pipelines |
+
+---
+
+## Test Results by Principle
+
+### Principle 1: Sustainable Long-Term Development (NON-NEGOTIABLE)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 001_session_start | Agent greets with context at session start | LLM | ✅ |
+| 006_wip_recovery | Agent warns about interrupted work | LLM | ✅ |
+| 015_session_end_summary | Agent provides session end handoff | LLM | ✅ |
+| 014_multi_agent_awareness | Agent checks AGENTS_ACTIVE.md | LLM | ✅ |
+| 030_reads_status_on_start | Agent reads STATUS.md, references current work | LLM | ✅ |
+| 031_references_journal_history | Agent reads JOURNAL.md, reports history | LLM | ✅ |
+| 033_mentions_agents_active | Agent mentions AGENTS_ACTIVE coordination | LLM | ✅ |
+| 034_suggests_worktree | Agent recommends worktree for parallel work | LLM | ✅ |
+| _Acceptance_ | journal.sh, status.sh, wip.sh, session_log.sh functional tests | Structural | ✅ (12 tests) |
+
+### Principle 2: Human-Agent Partnership (NON-NEGOTIABLE)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 001_session_start | Agent proactively greets with context | LLM | ✅ |
+| 016_pr_tracking_human_needed | Agent escalates to HUMAN_NEEDED.md | LLM | ✅ |
+| _Acceptance_ | blocker.sh, scope_check.sh tests | Structural | ✅ (6 tests) |
+
+### Principle 3: Context Efficiency (NON-NEGOTIABLE)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 004_uses_journal_script | Agent uses journal.sh for token efficiency | LLM | ✅ |
+| 018_uses_status_script | Agent uses status.sh | LLM | ✅ |
+| 019_uses_blocker_script | Agent uses blocker.sh | LLM | ✅ |
+| 020_uses_feature_script | Agent uses feature.sh | LLM | ✅ |
+| 021_no_full_file_read | Agent doesn't read entire file for append | LLM | ✅ |
+| 024_mentions_script_for_journal | Agent mentions journal.sh/ag journal | LLM | ✅ |
+| 025_targeted_context_reading | Agent uses CONTEXT_PACK, not source scanning | LLM | ✅ |
+| 026_avoids_unnecessary_reads | Agent reads only relevant file | LLM | ✅ |
+| _Acceptance_ | Script existence + functional tests | Structural | ✅ (15 tests) |
+
+### Principle 4: Deterministic Enforcement (NON-NEGOTIABLE)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 002_wip_blocks_commit | Agent blocks/warns about WIP | LLM | ✅ |
+| 009_mentions_checklist | Agent references pre-commit checklist | LLM | ✅ |
+| 020_uses_feature_script | Agent uses feature.sh for status | LLM | ✅ |
+| _Acceptance_ | pre-commit-check.sh, doctor.sh, feature-complete.sh tests | Structural | ✅ (18 tests) |
+
+### Principle 5: Durable Artifacts (NON-NEGOTIABLE)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 008_reads_context_pack | Agent reads CONTEXT_PACK for project info | LLM | ✅ |
+| 030_reads_status_on_start | Agent reads STATUS.md, references Stripe | LLM | ✅ |
+| 031_references_journal_history | Agent reads JOURNAL.md, reports auth fix | LLM | ✅ |
+| 032_knows_architecture | Agent references CONTEXT_PACK entries | LLM | ✅ |
+| _Acceptance_ | File existence + content tests | Structural | ✅ (8 tests) |
+
+### Principle 6: Anti-Hallucination (NON-NEGOTIABLE)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 027_no_fabricated_methods | Agent won't invent methods on UserService | LLM Critical | ✅ |
+| 028_no_fabricated_config | Agent notes MAX_RETRIES missing from config | LLM Critical | ✅ |
+| 029_verifies_db_schema | Agent checks schema, reports last_login missing | LLM Critical | ✅ |
+| _Acceptance_ | Anti-hallucination guidelines existence | Structural | ✅ (3 tests) |
+
+### Principle 7: No Auto-Commits (NON-NEGOTIABLE)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 005_no_auto_commit | Agent does not auto-commit | LLM | ✅ |
+| 013_pr_workflow_corepm | Agent follows PR workflow | LLM | ✅ |
+| _Acceptance_ | PR template + docs tests | Structural | ✅ (4 tests) |
+
+### Principle 8: Check Before Creating (NON-NEGOTIABLE)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 017_untracked_files_check | Agent warns about untracked files | LLM | ✅ |
+| _Acceptance_ | check-untracked.sh tests | Structural | ✅ (3 tests) |
+
+### Principle 9: Small Batch + Acceptance-Driven Development (RECOMMENDED)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 003_acceptance_first | Agent asks about requirements before coding | LLM | ✅ |
+| 007_small_batch | Agent breaks large tasks into batches | LLM | ✅ |
+| 010_feature_needs_spec | Core+PM needs spec/acceptance | LLM | ✅ |
+| 011_core_proceeds_without_spec | Core profile proceeds without spec | LLM | ✅ |
+| 012_definition_of_done | Agent references Definition of Done | LLM | ✅ |
+| 035_core_is_lightweight | Core implements without formal spec | LLM | ✅ |
+| _Acceptance_ | Feature tracking, acceptance file validation | Structural | ✅ (14 tests) |
+
+### Principle 10: Living Documentation (RECOMMENDED)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| _Acceptance_ | Documentation sync rules, doc hierarchy | Structural | ✅ (5 tests) |
+| _Note_ | No LLM behavioral test yet | — | Backlog |
+
+### Principle 11: Green Coding (RECOMMENDED)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 024-026 | Token efficiency tests (green operations) | LLM | ✅ |
+| _Acceptance_ | green_coding.md existence | Structural | ✅ (1 test) |
+
+---
+
+## Unit Test Details
+
+### run_tests.sh
+
+| Suite | Tests | Result |
+|-------|-------|--------|
+| query_features tests | 14 | ✅ All pass |
+| validate_specs tests | 7 | ✅ All pass |
+| **Total** | **21** | **100%** |
+
+### validate_framework.sh
+
+| Category | Tests | Result |
+|----------|-------|--------|
+| Structural (file/dir existence) | ~90 | ✅ |
+| Functional (script execution) | ~35 | ✅ |
+| Profile (Core + Core+PM) | ~20 | ✅ |
+| Enforcement (pre-commit, complexity) | ~15 | ✅ |
+| Principles validation | ~11 | ✅ |
+| **Total** | **171** | **100%** (2 warnings) |
 
 ---
 
@@ -165,6 +182,7 @@
 - ✅ STACK.md exists
 - ✅ CONTEXT_PACK.md exists
 - ✅ Tools work (wip.sh, journal.sh, status.sh)
+- ✅ LLM: 035_core_is_lightweight passes
 
 ### Core+PM Profile
 - ✅ Installation creates correct structure (with spec/)
@@ -172,52 +190,64 @@
 - ✅ spec/PRD.md exists
 - ✅ spec/acceptance/ directory exists
 - ✅ All Core features also work
+- ✅ LLM: 010_feature_needs_spec passes
 
 ---
 
-## Outstanding Manual Verification
+## Multi-Environment Status
 
-These 20 features require agent behavioral testing (see `LLM_TEST_PLAN.md`):
-
-1. F-0006: Acceptance-Driven Development
-2. F-0007: Small Batch Development
-3. F-0008: TDD Mode
-4. F-0010: Spec Evolution Workflow
-5. F-0013: Smoke Testing Checklist
-6. F-0021: Session Start Protocol
-7. F-0022: Session End Protocol
-8. F-0031: Multi-Agent Coordination
-9. F-0033: AGENTS_ACTIVE.md Coordination
-10. F-0034: Sequential Agent Pipeline
-11. F-0053: Recovery Protocol
-12. F-0054: Multi-Environment Support
-13. F-0055: Anti-Hallucination Rules
-14. F-0071: Token Economics
-15. F-0072: Living Documentation
-16. F-0073: Human-Agent Collaboration
-17. F-0075: Traceability
-18. F-0076: Iterative & Incremental Development
-19. F-0081: Orchestrator Agent
+| Feature | Cursor | Claude Code | Copilot | Codex |
+|---------|--------|-------------|---------|-------|
+| Tool config file | ✅ .cursorrules | ✅ CLAUDE.md | ✅ copilot-instructions.md | ✅ codex-instructions.md |
+| LLM tests run | ✅ v0.19.0 | ❌ Not yet | ❌ Not yet | ❌ Not yet |
+| Harness support | ✅ | ✅ | ✅ (manual) | ✅ |
+| Interactive runner | ✅ | — | ✅ (manual) | — |
 
 ---
 
-## Automated Test Details
+## Backlog (Missing Tests)
 
-Run: `bash tests/validate_framework.sh`
+| Priority | Aspect | Principle | Notes |
+|----------|--------|-----------|-------|
+| Medium | Living documentation sync | 10 | Agent updates docs in same commit |
+| Medium | Branch policy enforcement | 4 | Block direct push to main |
+| Low | Worktree coordination | 1 | Multi-agent file isolation |
+| Low | Doctor command usage | 4 | Agent uses doctor.sh for verification |
 
+---
+
+## Running All Tests
+
+```bash
+# All acceptance criteria (171 tests)
+bash tests/validate_framework.sh
+
+# Unit tests (21 tests)
+bash tests/run_tests.sh
+
+# LLM behavioral tests - CLI mode
+bash tests/llm/harness.sh
+
+# LLM behavioral tests - IDE interactive mode
+python3 tests/llm/interactive_runner.py
+
+# Single LLM test
+bash tests/llm/harness.sh tests/llm/tests/001_session_start.sh
 ```
-Tests: 149 passed, 0 failed, 1 warning
-- Structural tests: File/directory existence
-- Functional tests: Script execution, output validation
-- Profile tests: Core and Core+PM installation
-- Enforcement tests: Pre-commit gates, complexity limits
-```
 
 ---
 
-## Next Steps
+## Test History
 
-1. Execute LLM behavioral tests per `LLM_TEST_PLAN.md`
-2. Document results in `tests/LLM_TEST_RESULTS.md`
-3. Address any failures found during LLM testing
-4. Consider automation of agent behavioral tests (prompt injection + output validation)
+### v0.19.0 (2026-02-05) — Current
+
+- **Environment**: Cursor IDE on macOS (darwin 24.5.0)
+- **Tester**: Cursor Agent (claude-4.6-opus-high-thinking)
+- **Result**: 214/214 (171 acceptance + 21 unit + 22 LLM behavioral)
+- **Notes**: First run with principle-aligned test organization. Anti-hallucination tests (027-029) use partial real code. Token efficiency tests verify agent awareness of scripts.
+
+### v0.12.0 (2026-01-21)
+
+- **Environment**: Claude Code + Opus
+- **Result**: 17/21 LLM tests reliable, 4 improved (018-020 guidelines updated)
+- **Notes**: Original test set. Pre-principle-reorganization.

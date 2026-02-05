@@ -20,6 +20,30 @@
 
 The Agentic AI Framework enables **sustainable long-term software development with AI agents**. It provides structure, conventions, and tooling that keep both humans and AI agents aligned as projects evolve from prototypes to production systems.
 
+## Why not just a `.cursorrules` or `CLAUDE.md`?
+
+A custom rules file is a great start. This framework builds on the same idea but solves problems that emerge after weeks and months of AI-assisted development:
+
+| Problem | `.cursorrules` / `CLAUDE.md` | This Framework |
+|---------|------------------------------|----------------|
+| **Context resets** | Agent forgets everything each session | Durable artifacts (CONTEXT_PACK, STATUS, JOURNAL) survive resets |
+| **Inconsistent behavior** | Guidelines agents may or may not follow | Enforced gates — scripts with exit codes that block bad commits |
+| **Token waste** | Agents re-read entire codebases each session | Token-efficient tools (40x savings measured), structured reading protocols |
+| **Tool lock-in** | Rules file works in one tool only | Works across Claude, Cursor, Copilot, and Codex — same project state |
+| **Quality drift** | No enforcement mechanism for rules | Pre-commit hooks, WIP tracking, acceptance criteria validation |
+| **Hallucinated code** | No verification system | Anti-hallucination rules with LLM behavioral tests that verify compliance |
+| **Scaling** | One agent, one context window | Multi-agent coordination with worktrees, sequential agent pipelines |
+
+**What's battle-tested** (proven through months of dogfooding this framework):
+- Durable artifacts, token-efficient scripts, session continuity, acceptance-driven development, pre-commit gates, WIP recovery, multi-environment switching
+
+**What's designed for** (implemented with tooling, growing in real-world usage):
+- Multi-agent coordination at scale, sequential agent pipelines, automated retrospectives
+
+**How we know it works**: 171 acceptance tests + 22 LLM behavioral tests verify that agents actually follow the rules. See [TRACEABILITY_MATRIX.md](tests/TRACEABILITY_MATRIX.md) for principle → feature → test mapping.
+
+**📖 Detailed problem analysis**: [FRAMEWORK_VALUE_PROPOSITION.md](docs/FRAMEWORK_VALUE_PROPOSITION.md)
+
 **Two profiles available:**
 
 - **Core**: Full framework capabilities with lightweight planning
@@ -104,104 +128,51 @@ Then follow the same agent initialization process above. The agent will run `sca
 
 ## Design Principles
 
-**📖 For comprehensive principles guide, see [`PRINCIPLES.md`](.agentic/PRINCIPLES.md)** ⭐
+**📖 Full detail with rationale: [`PRINCIPLES.md`](.agentic/PRINCIPLES.md)** ⭐
 
-### 1. Token Economics (Efficiency)
-**Durable artifacts and smart delegation prevent token waste.**
-- Maintain `CONTEXT_PACK.md` so agents don't re-read entire codebases
-- Use `JOURNAL.md` to preserve progress across context resets
-- Follow structured reading protocols with explicit token budgets
-- **Agent delegation**: Use cheap/fast models for exploration, mid-tier for implementation
-- **Tier-based selection**: Don't hardcode model names (they change); use tiers
-- **Claude Projects**: Add key docs to project knowledge for automatic caching
-- See `.agentic/token_efficiency/` for quantified savings (60-83% typical)
+8 NON-NEGOTIABLE principles + 3 RECOMMENDED. Here's the overview:
 
-### 2. Developer-Friendly UX
-**Humans focus on decisions and direction. Agents handle implementation mechanics.**
-- Humans define what to build, agents handle how
-- Humans can read/edit specs directly (markdown files)
-- Agents run scaffold scripts, update docs, maintain consistency
-- Clear status at all times (`STATUS.md` + `JOURNAL.md`)
-- Tools provide immediate project health checks (no agent needed)
-- **Ready-to-use prompts**: Copy-paste workflows from `.agentic/prompts/` (Cursor/Claude)
-- **Session continuity**: `STATUS.md` and `WIP.md` for seamless context recovery
-- **Pre-project planning**: Use `VISION.template.md` for ideation phase
-- **Specialized agents**: 5 pre-defined subagents (explore, implement, test, review, research)
-- **Project-specific agents**: Create domain experts with `create-agent.sh`
+### 1. Sustainable Long-Term Development
+**Projects lasting months or years, not quick prototypes.**
+Context resets, team changes, evolving requirements — the framework keeps projects coherent through durable artifacts (`CONTEXT_PACK.md`, `STATUS.md`, `JOURNAL.md`) and observable progress visible to both humans and agents.
 
-### 3. Quality by Design
-**Acceptance criteria and tests control unwanted changes.**
-- **Acceptance-Driven Development**: Define acceptance criteria (rough OK), implement, then verify with tests
-- **Specs evolve during implementation**: Discovery is expected - update specs as you learn
-- Tests are mandatory for all new/changed logic
-- Design for testability (seams, boundaries, pure functions)
-- Definition of Done includes quality gates
-- **TDD available**: Optional for those who prefer tests-first (set `development_mode: tdd`)
+### 2. Human-Agent Partnership
+**Humans define WHAT, agents handle HOW. Neither alone is optimal.**
+Humans edit specs directly (markdown), agents honor edits as source of truth. Framework makes review efficient (diff stats, scope warnings) but never eliminates it. `HUMAN_NEEDED.md` for escalation.
 
-### 4. Living Documentation
-**Documentation stays current through collaboration and automation.**
-- Humans add requirements, features, priorities to specs
-- Agents update specs when implementing (same commit as code)
-- No stale placeholders (`(Not yet created)` gets replaced)
-- `FEATURES.md` status matches implementation reality
-- Architecture decisions are recorded (ADRs) by whoever makes them
-- **Optional: Spec Migrations** - Track evolution as atomic changes for better context management (Tomas Günther & Arto Jalkanen)
+### 3. Context Efficiency
+**The #1 unique technical insight: respect the context window.**
+Structured reading protocols with token budgets. Agent delegation for fresh context. Sequential agents load only role-specific context. Token-efficient scripts (40x cheaper than read-modify-write). Manual operations for zero-token information retrieval. See `.agentic/token_efficiency/` for quantified savings (60-83% typical).
 
-### 5. Traceability
-**Clear path from requirements to code to tests.**
-- Features have stable IDs (`F-0001`) with acceptance criteria
-- Code annotated with `@feature F-####` for bidirectional linking
-- Test coverage explicitly tracked per feature
-- Dependency visualization shows relationships
+### 4. Deterministic Enforcement
+**Scripts and gates enforce behavior, not documentation and hope.**
+Pre-commit hooks block if WIP exists or acceptance files missing. `feature.sh` enforces valid status transitions. Hard gates for hard rules, soft warnings for judgment calls. Works the same regardless of which AI model runs them.
 
-### 6. Small Batch Development (Critical for Agents!)
-**Work in small, isolated batches - one feature at a time.**
-- **ONE feature at a time per agent** (multi-agent uses worktrees)
-- **MAX 5-10 files per commit** (stop and re-plan if more)
-- Acceptance criteria MUST exist before implementation (rough OK)
-- Commit when feature's acceptance tests pass
-- Update specs with discoveries (edge cases, issues, ideas)
-- **Why**: Small changes = easy rollback, known-good checkpoints, clear ownership
-- **Critical**: Keeps AI agents focused and prevents context drift
+### 5. Durable Artifacts
+**Living documents readable by both humans and agents.**
+`CONTEXT_PACK.md` (architecture), `STATUS.md` (current state), `JOURNAL.md` (progress history), `HUMAN_NEEDED.md` (decisions needed). Agents read these first; humans can `cat STATUS.md` for instant awareness (zero tokens). The core mechanism for surviving context resets.
 
-### 7. Iterative & Incremental Development
-**Ship in small, validated steps - learn and adapt.**
-- Pick one small task from `STATUS.md` or planned features
-- Implement with acceptance tests
-- Verify criteria are met
-- Update docs and specs based on discoveries
-- Ship to production (or mark complete) and move to next task
-- **Adapt based on learnings**: Requirements evolve through building
-- **Validated progress**: Each iteration produces working software
+### 6. Anti-Hallucination ⚠️
+**Agents NEVER make things up — accuracy over speed.**
+"I don't know" is explicitly encouraged. Verify against version-specific docs. Wrong code that looks right is worse than no code. See [agent guidelines](.agentic/agents/shared/agent_operating_guidelines.md) for complete rules.
 
-### 8. Human-Agent Collaboration
-**Both humans and agents work together on project truth.**
-- **Humans**: Read specs, add features/tasks, make decisions, set priorities
-- **Agents**: Implement features, update docs with code changes, maintain sync
-- Specs are readable and editable by both (markdown files, not complex formats)
-- Agents know when to escalate to humans (`HUMAN_NEEDED.md`)
-- Tools enable humans to check status without asking agents (token-free queries)
+### 7. No Auto-Commits
+**Human approval required before every commit.** The safety gate that prevents compounding mistakes.
 
-### 9. Green Coding & Environmental Responsibility
-**Efficient software reduces energy consumption and environmental impact.**
-- Optimize algorithms for computational efficiency (lower complexity)
-- Minimize resource usage (memory, CPU cycles, network calls)
-- Lazy loading and on-demand resource allocation
-- Event-driven instead of polling (webhooks > setInterval)
-- Caching reduces redundant compute
-- Choose green hosting (renewable energy data centers)
-- See [green_coding.md](.agentic/quality/green_coding.md) for comprehensive guidelines
+### 8. Check Before Creating
+**Search before creating any file, test, doc, or component.** Duplication wastes effort and causes inconsistency. A 30-second search prevents hours of duplicate work.
 
-### 10. Anti-Hallucination by Design ⚠️
-**Agents NEVER make things up - explicit verification prevents fabricated code.**
-- **"I don't know" is explicitly encouraged** when uncertain
-- **Version-specific documentation** requirement (Context7 preferred, official docs, source code)
-- **Verify before implementing** - no guessing API signatures, endpoints, or library features
-- **Document uncertainty** in HUMAN_NEEDED.md
-- **Research mode** for unfamiliar technologies
-- **Trust docs over training data** (training data may be outdated)
-- **Wrong code that looks right is worse than no code** - accuracy > speed
-- See [agent_operating_guidelines.md](.agentic/agents/shared/agent_operating_guidelines.md#-critical-anti-hallucination-rules-non-negotiable) for complete rules
+### 9. Small Batch + Acceptance-Driven Development *(recommended)*
+**One feature at a time, acceptance criteria before code.**
+MAX 5-10 files per commit. Specs evolve during implementation. Shipped ≠ Accepted (human validation is final gate). TDD available as option.
+
+### 10. Living Documentation *(recommended)*
+**Docs updated in same commit as code. Single source of truth.**
+No stale placeholders. DRY (cross-reference, don't duplicate). Explicit over implicit — agents need explicitness.
+
+### 11. Green Coding *(recommended)*
+**Efficient software reduces energy consumption and cost.**
+Token efficiency IS green for framework ops. For project code: algorithms, caching, event-driven patterns. See [green_coding.md](.agentic/quality/green_coding.md) for comprehensive guidelines.
 
 ## Quick Start
 

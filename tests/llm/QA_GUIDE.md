@@ -124,7 +124,7 @@ Each test has a prompt and expected outcomes. Example for `001_session_start`:
 
 ### Step 4: Record Results
 
-Check the outcomes and record in `tests/LLM_TEST_RESULTS.md`:
+Check the outcomes and record in `tests/VERIFICATION_REPORT.md`:
 
 ```markdown
 ## Test Run: 2026-01-18 - Claude Code (Opus 4.5)
@@ -258,5 +258,5 @@ This is **TDD for agent behavior**. Short feedback loops = rapid framework impro
 - `tests/llm/README.md` - Harness documentation
 - `tests/llm/harness.sh` - Test runner source
 - `tests/LLM_TEST_PLAN.md` - Full test scenarios (22 tests)
-- `tests/LLM_TEST_RESULTS.md` - Results tracking
+- `tests/VERIFICATION_REPORT.md` - All test results (single source of truth)
 - `tests/RUN_LLM_TESTS.md` - Manual test quick start
