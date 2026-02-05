@@ -1879,7 +1879,7 @@ agent_mode: balanced  # premium | balanced | economy
 **Implementation**:
 - State: complete
 - Code: `tests/llm/test_definitions.json`, `tests/llm/interactive_runner.py`, `.agentic/tools/ag.sh` (test command), `tests/llm/harness.sh`
-- Tests: `tests/validate_framework.sh` (F-0122 section), `tests/LLM_TEST_RESULTS.md`
+- Tests: `tests/validate_framework.sh` (F-0122 section), `tests/VERIFICATION_REPORT.md`
 
 **Acceptance**: See `spec/acceptance/F-0122.md`
 

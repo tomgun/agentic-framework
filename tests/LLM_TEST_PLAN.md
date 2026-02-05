@@ -43,7 +43,7 @@
 
 ### After Testing
 
-- Document results in `tests/LLM_TEST_RESULTS.md`
+- Document results in `tests/VERIFICATION_REPORT.md`
 - File issues for failures
 - Update framework if behavior unclear
 
@@ -482,7 +482,7 @@
 
 - [ ] Set up test project
 - [ ] Run all LLM-0XX tests
-- [ ] Record results in LLM_TEST_RESULTS.md
+- [ ] Record results in VERIFICATION_REPORT.md
 - [ ] File issues for failures
 
 ### Phase 2: Cursor
@@ -510,7 +510,7 @@
 
 ## Results Template
 
-Copy to `tests/LLM_TEST_RESULTS.md`:
+Copy to `tests/VERIFICATION_REPORT.md`:
 
 ```markdown
 # LLM Test Results

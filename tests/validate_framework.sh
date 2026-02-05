@@ -134,7 +134,7 @@ fi
 echo ""
 echo "--- F-0007: Small Batch Development ---"
 
-if grep -q "Small Batch Development" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
+if grep -q "Small Batch" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
   pass "Small Batch Development in PRINCIPLES.md"
 else
   fail "Small Batch Development not in PRINCIPLES.md"
@@ -901,17 +901,17 @@ else
   fail "wip.sh missing IN_SCOPE field"
 fi
 
-# AC-005: New principles added
-if grep -q "Make Human Review Efficient" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
-  pass "PRINCIPLES.md has 'Make Human Review Efficient'"
+# AC-005: Principles cover human review and soft signals (merged into core principles)
+if grep -q "human review efficient\|review efficient" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
+  pass "PRINCIPLES.md covers human review efficiency"
 else
-  fail "PRINCIPLES.md missing human review principle"
+  fail "PRINCIPLES.md missing human review concept"
 fi
 
-if grep -q "Warnings Beat Blocks" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
-  pass "PRINCIPLES.md has 'Warnings Beat Blocks for Soft Signals'"
+if grep -q "Soft warnings for\|warnings for soft signals\|WARN.*don't block" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
+  pass "PRINCIPLES.md covers soft signals (warnings beat blocks)"
 else
-  fail "PRINCIPLES.md missing soft signal principle"
+  fail "PRINCIPLES.md missing soft signal concept"
 fi
 
 if grep -q "Don't Delegate Ambiguity\|Delegating ambiguity" "${FRAMEWORK_ROOT}/.agentic/workflows/delegation_heuristics.md" 2>/dev/null; then

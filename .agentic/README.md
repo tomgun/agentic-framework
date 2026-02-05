@@ -114,8 +114,8 @@ See [`.agentic/workflows/tdd_mode.md`](workflows/tdd_mode.md) for complete TDD g
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
-cd agentic-framework-0.2.1
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.19.0.tar.gz | tar xz
+cd agentic-framework-0.19.0
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -125,10 +125,10 @@ bash install.sh /path/to/your-project
 
 ```bash
 # Download and extract
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.19.0.tar.gz | tar xz
 
 # Copy .agentic/ into your project
-cp -r agentic-framework-0.2.1/.agentic /path/to/your-project/
+cp -r agentic-framework-0.19.0/.agentic /path/to/your-project/
 ```
 
 **Initialize:**
@@ -164,8 +164,8 @@ If you're using multiple assistants (Cursor + Copilot + Claude), refer to `.agen
 
 ```bash
 # Download new version
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.2.1.tar.gz | tar xz
-cd agentic-framework-0.2.1
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.19.0.tar.gz | tar xz
+cd agentic-framework-0.19.0
 
 # Run upgrade tool FROM the new framework, pointing to your project
 bash .agentic/tools/upgrade.sh /path/to/your-project
@@ -317,19 +317,25 @@ bash .agentic/tools/migration.sh search "keyword"        # Search migrations
 - See `.agentic/workflows/scaling_guidance.md` for reorganization suggestions
 - Run `bash .agentic/tools/feature_graph.sh` to visualize dependencies  
 
-## Design principles (first principles)
+## Design Principles
 
-**📖 For comprehensive principles guide, see [`PRINCIPLES.md`](PRINCIPLES.md)** ⭐
+**📖 Full guide: [`PRINCIPLES.md`](PRINCIPLES.md)** ⭐
 
-The short version:
-- **Feedback loops** beat cleverness: tests and small diffs reduce risk.
-- **Entropy is real**: decisions must be recorded, status must be current.
-- **Context is expensive**: durable artifacts reduce repeated token spend.
-- **Agents need a contract**: consistent behavior across tools avoids thrash.
-- **Human-agent partnership**: Collaboration, not replacement.
-- **Quality by design**: TDD, stack-specific checks, acceptance validation.
+11 core principles (8 NON-NEGOTIABLE, 3 RECOMMENDED):
 
-See PRINCIPLES.md for the "why" behind every framework decision.
+1. **Sustainable Long-Term Development** — Durable artifacts survive context resets
+2. **Human-Agent Partnership** — Collaboration, not AI autonomy
+3. **Context Efficiency** — Token-efficient scripts and reading protocols
+4. **Deterministic Enforcement** — Scripts with exit codes, not suggestions
+5. **Durable Artifacts** — CONTEXT_PACK, STATUS, JOURNAL always current
+6. **Anti-Hallucination** — Verify before using, never fabricate
+7. **No Auto-Commits** — Human approval required
+8. **Check Before Creating** — Search for existing before adding new
+9. **Small Batch + Acceptance-Driven** — One feature at a time, criteria first
+10. **Living Documentation** — Docs updated in same commit as code
+11. **Green Coding** — Minimize environmental impact
+
+See PRINCIPLES.md for the reasoning behind every framework decision.
 
 ## Adoption notes
 - This framework is intentionally **tech-agnostic**. Where stack specifics matter, use:

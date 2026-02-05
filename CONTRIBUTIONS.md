@@ -814,7 +814,7 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 
 **Result**:
 - `tests/RUN_LLM_TESTS.md` - Quick start guide for manual testing
-- `tests/LLM_TEST_RESULTS.md` - Version tracking template
+- `tests/VERIFICATION_REPORT.md` - All test results (single source of truth)
 - `.agentic/tools/llm-test-status.sh` - Check test staleness (>30 days = stale)
 - Advisory check in pre-commit hook (check 7/7)
 
@@ -1687,11 +1687,82 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Version consistency across documentation.
 
+### Principles Simplification
+
+**User prompt**:
+> "Go through all the principles and think is this really beneficial... if there are doubts should we remove something for simplifying the framework"
+
+**Before**: 48 positive principles + 11 anti-patterns across 7 sections (1,542 lines)
+**After**: 11 core principles (8 NON-NEGOTIABLE + 3 RECOMMENDED) (~240 lines, 84% reduction)
+
+**Key decisions**:
+- Sub-principles absorbed into parent principles (e.g., 5 token-related principles → "Context Efficiency")
+- Anti-patterns section removed entirely (each principle now has inline anti-patterns)
+- "Durable Artifacts" kept standalone (user: "they're human-readable too")
+- "Green Coding" kept as visible principle (user: "important for project output")
+- "Small Batch" + "Acceptance-Driven Development" merged (one methodology, two phases)
+- Programming/Testing Standards demoted to reference files (already existed in `.agentic/quality/`)
+- PR Mode, Build/Deploy Agent, Retrospectives, Mutation Testing → features, not principles
+
+**Process**: Plan-review loop with 3 iterations of planner/reviewer analysis.
+
+**Impact**: PRINCIPLES.md now fits in a single context window read. Clearer hierarchy.
+
+---
+
+## v0.20.0 Contributions (2026-02-05)
+
+### Traceability & Documentation Overhaul
+
+**User request**:
+> "do we have somewhere a mapping of the design principles to features (to acceptance criteria to tests)? that should be updated. both the readme.mds as well."
+
+**Implementation - Traceability Matrix Rewrite**:
+- `tests/TRACEABILITY_MATRIX.md` completely rewritten for 11 simplified principles
+- Maps every principle → features → specific tests → results
+- 100% principle coverage: 32 LLM behavioral + 13 structural tests
+- v0.19.0 test results: 33/33 tests mapped to principles
+
+**Implementation - Test Results Consolidation**:
+- Deleted `tests/LLM_TEST_RESULTS.md` (duplicate source of truth)
+- `tests/VERIFICATION_REPORT.md` is now single source for ALL test results
+- Organized by principle (11 sections matching core principles)
+- Updated 9 files referencing old location
+- Evidence tiers: battle-tested, LLM-verified, structurally verified, designed for
+
+**Implementation - "Why This Framework?" README Section**:
+- Added honest comparison table: `.cursorrules`/`CLAUDE.md` vs this framework
+- 7 problem areas with concrete solutions
+- Explicit "battle-tested" vs "designed for" evidence tiers
+- Links to traceability matrix for verification
+
+**Implementation - `.agentic/README.md` Updates**:
+- Fixed stale version refs (v0.2.1 → v0.19.0 in all curl examples)
+- Updated Design Principles section to list all 11 principles
+
+### Context7 → MCP Server Documentation Update
+
+**User question**:
+> "are the impl agents actually using context7 for example?"
+
+**Discovery**: Framework docs referenced Context7 as a CLI tool (`npm install -D @context7/cli`), but it's now primarily an MCP server.
+
+**Implementation**:
+- `.agentic/workflows/documentation_verification.md` rewritten (~430 → ~130 lines)
+  - MCP server setup for Cursor (`.cursor/mcp.json`) and Claude Desktop
+  - `@upstash/context7-mcp@latest` package reference
+  - Simplified from 4-layer system to clear priority table
+- `anti-hallucination.md` - Updated sources of truth (#1: Context7 MCP server)
+- `agent_operating_guidelines.md` - Same update in verification protocol
+- `STACK.template.md` - Updated config: `context7-mcp` option with setup comment
+
+**Impact**: Agents now have accurate instructions for using Context7 as MCP server rather than deprecated CLI.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.19.0
+**Current Version**: v0.20.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
-**LLM Tests**: 22/22 passing in Cursor IDE (v0.19.0)
+**LLM Tests**: 22/22 passing in Cursor IDE (v0.19.0), test infrastructure updated for v0.20.0
 

@@ -5,6 +5,39 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.0] - 2026-02-05
+
+### Added
+- **"Why This Framework?" section in README.md** - Honest comparison vs custom rules files
+  - Comparison table: `.cursorrules`/`CLAUDE.md` vs this framework
+  - Evidence tiers: battle-tested, LLM-verified, structurally verified, designed for
+  - Links to traceability matrix for proof
+
+- **Principle-organized test reporting** - All test results in single file
+  - VERIFICATION_REPORT.md is now the single source of truth for ALL tests
+  - Results organized by the 11 core principles
+  - Deleted `LLM_TEST_RESULTS.md` (consolidated)
+  - Updated all 9 files referencing old location
+
+- **TRACEABILITY_MATRIX.md rewritten** - Maps principles → features → tests
+  - Aligned with 11 simplified principles
+  - Shows principle coverage at 100% (32 LLM + 13 structural)
+  - v0.19.0 results: 33/33 tests mapped
+
+- **Context7 MCP server documentation** - Updated from legacy CLI to MCP approach
+  - `documentation_verification.md` rewritten for MCP server setup
+  - Cursor and Claude Desktop MCP config examples
+  - `anti-hallucination.md` sources of truth updated
+  - `agent_operating_guidelines.md` verification protocol updated
+  - `STACK.template.md` config updated to `context7-mcp` option
+
+### Changed
+- `.agentic/README.md` - Fixed stale version refs (v0.2.1 → v0.19.0), updated principles list
+- `STACK.md` - Test results path updated to VERIFICATION_REPORT.md
+
+### Removed
+- `tests/LLM_TEST_RESULTS.md` - Consolidated into VERIFICATION_REPORT.md
+
 ## [0.19.0] - 2026-02-05
 
 ### Added

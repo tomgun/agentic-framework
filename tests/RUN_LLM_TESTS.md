@@ -41,7 +41,7 @@ Use the **Test Checklist** below. For each test:
 
 ### Step 4: Record Results
 
-Update `tests/LLM_TEST_RESULTS.md` with:
+Update `tests/VERIFICATION_REPORT.md` with:
 - Date and framework version
 - Environment tested
 - Pass/fail for each test
@@ -89,7 +89,7 @@ echo "$(date +%Y-%m-%d) | v$(cat .agentic/VERSION) | Claude | LLM-001: PASS" >> 
 
 ### Full Results (After Testing)
 
-Copy the template section in `LLM_TEST_RESULTS.md` and fill in:
+Copy the template section in `VERIFICATION_REPORT.md` and fill in:
 
 ```markdown
 ## Test Run: 2025-01-18 - Claude Code
