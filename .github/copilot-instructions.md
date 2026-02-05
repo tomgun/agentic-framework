@@ -88,6 +88,31 @@ bash tests/validate_framework.sh
 
 ---
 
+## Plan-Review Loop (Complex Features)
+
+For complex features, use iterative planning with critical review:
+
+```
+ag plan F-XXXX    # Creates plan, triggers review loop
+```
+
+**In Plan Mode:**
+1. Create plan at `.agentic-state/plans/F-XXXX-plan.md`
+2. Switch to Agent Mode to spawn reviewer
+3. Reviewer critiques → Planner revises → Loop until APPROVED
+
+**Agents:**
+- `plan-creator-agent.md` - Creates implementation plans
+- `plan-reviewer-agent.md` - Critical review (adversarial mindset)
+
+**Config** (STACK.md):
+- `plan_review_enabled: yes`
+- `plan_review_max_iterations: 3`
+
+See: `.agentic/workflows/plan_review_loop.md`
+
+---
+
 ## Never Auto-Commit
 
 ALWAYS show changes to human first. ONLY commit when human explicitly approves.
