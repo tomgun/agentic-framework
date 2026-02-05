@@ -8,6 +8,14 @@
 
 ---
 
+## Guiding Meta-Principle: KISS (Keep It Simple)
+
+Every decision — feature design, documentation, tooling, agent instructions — should favor the simplest approach that works. Complexity is the enemy of reliability, especially with AI agents. If a solution requires lengthy explanation, it's probably too complex. Simpler frameworks get followed; complex ones get ignored.
+
+**Apply everywhere**: When adding a principle, feature, or tool — ask "is this the simplest way?" When reviewing — ask "can this be simpler?" When choosing between two approaches — pick the one easier to understand and maintain.
+
+---
+
 ## NON-NEGOTIABLE Principles
 
 ### 1. Sustainable Long-Term Development
