@@ -5,38 +5,40 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- v0.13.0 released and tagged (Updated: 2026-02-04 21:43)
-- Progress: v0.12.1 released and tagged
+- v0.20.0 released and pushed (Updated: 2026-02-06)
+- All 22 LLM behavioral tests passing (Cursor IDE, v0.19.0 run)
+- 171 acceptance + 21 unit tests passing
 
 ## Current focus
-- Setting up framework to dogfood itself (use its own session protocols)
+- Framework quality, documentation consolidation, and principles simplification
 
 ## In progress
-- Framework dogfooding setup (Agent 2)
-- Framework development, PR workflow implementation (Agent 1 - see AGENTS_ACTIVE.md)
+- Nothing currently in progress
 
 ## Next up
-- Validate session start checklist works with new files
-- Review uncommitted changes from Agent 1
-- Continue framework feature development
+- Run validation tests (`bash tests/validate_framework.sh`) to confirm v0.20.0 integrity
+- Re-run LLM behavioral tests against v0.20.0 and update VERIFICATION_REPORT.md
+- Consider progressive disclosure implementation (only partial claim from audit)
+- Context7 MCP integration: test in real project scenario
 
 ## Roadmap (lightweight)
 - Near-term:
-  - Complete dogfooding setup
-  - Merge pending git workflow changes
-  - Release v0.12.0
+  - Validate simplified principles work well in practice (agent behavior)
+  - Test Context7 MCP server setup end-to-end
+  - Address any issues from LLM test re-runs
 - Later:
-  - Enhanced multi-agent coordination
-  - Better token efficiency tooling
-  - More specialized agent roles
+  - Progressive disclosure of complexity (partial implementation)
+  - More LLM tests for edge cases
+  - Real-world project validation (non-framework)
 
 ## Known issues / risks
-- Multiple agents working on main branch - coordinate via AGENTS_ACTIVE.md
-- Some uncommitted changes from Agent 1 session
+- STATUS.md and JOURNAL.md were not kept up to date during v0.13→v0.20 development — fixed now
+- Some CHANGELOG.md historical references point to old file locations (acceptable — historical records)
 
 ## Decisions needed
 - None currently
 
 ## Release notes (optional)
-- v0.12.0 releasing
+- v0.20.0: Traceability overhaul, test consolidation, Context7 MCP update, KISS meta-principle
+- v0.19.0: Principles simplification (48→11), value proposition audit, 12 new LLM tests
 - See CHANGELOG.md for full history
