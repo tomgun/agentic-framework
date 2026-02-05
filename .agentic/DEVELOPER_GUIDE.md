@@ -2180,6 +2180,6 @@ bash .agentic/tools/coverage.sh
 
 ---
 
-**Version:** 0.18.0
+**Version:** 0.19.0
 **Last updated:** 2026-02-05
 

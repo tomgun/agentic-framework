@@ -588,7 +588,7 @@ Users already past X.Y.Z will NOT see it (prevents repeated prompts).
 ---
 
 **Last Updated**: 2026-02-05
-**Framework Version**: 0.18.0
+**Framework Version**: 0.19.0
 
 **Note**: These guidelines evolve with the framework. When they change, notify framework contributors and update this document.
 
