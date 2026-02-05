@@ -197,6 +197,36 @@ else
   echo "[3/11] Skipping in-progress features check (no spec/FEATURES.md or JOURNAL.md)"
 fi
 
+# Check 3b: STATUS.md staleness advisory (48h)
+if [[ -f "STATUS.md" ]]; then
+  echo ""
+  echo "[3b/11] Checking STATUS.md freshness..."
+  if command -v stat >/dev/null 2>&1; then
+    if [[ "$(uname)" == "Darwin" ]]; then
+      STATUS_AGE_SECONDS=$(( $(date +%s) - $(stat -f %m STATUS.md) ))
+    else
+      STATUS_AGE_SECONDS=$(( $(date +%s) - $(stat -c %Y STATUS.md) ))
+    fi
+
+    TWO_DAYS=$((48 * 60 * 60))
+    if [[ $STATUS_AGE_SECONDS -gt $TWO_DAYS ]]; then
+      STATUS_AGE_DAYS=$(( STATUS_AGE_SECONDS / 86400 ))
+      echo "⚠️  WARNING: STATUS.md not updated in ${STATUS_AGE_DAYS} days"
+      echo ""
+      echo "   Recommendation:"
+      echo "   - Run: bash .agentic/tools/status.sh infer --apply"
+      echo "   - Or update STATUS.md manually"
+      echo ""
+      echo "   (This is a warning, not blocking commit)"
+      echo ""
+    else
+      echo "✓ STATUS.md is current"
+    fi
+  else
+    echo "✓ Cannot check STATUS.md age (stat command unavailable)"
+  fi
+fi
+
 # Check 4: STACK.md version sanity (where detectable)
 if [[ -f "STACK.md" ]]; then
   echo ""
@@ -480,7 +510,7 @@ else
 fi
 
 # Check 9: LLM behavioral test status (advisory, framework development only)
-if [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/LLM_TEST_RESULTS.md" ]]; then
+if [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/VERIFICATION_REPORT.md" ]]; then
   echo ""
   echo "[9/11] Checking LLM behavioral test status..."
   if bash .agentic/tools/llm-test-status.sh --quiet 2>/dev/null; then

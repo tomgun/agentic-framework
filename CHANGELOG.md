@@ -5,6 +5,35 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.21.0] - 2026-02-06
+
+### Added
+- **`status.sh infer` command** - Auto-infer project state from history data
+  - Reconstructs STATUS.md from git log, JOURNAL.md, FEATURES.md, VERSION, CHANGELOG.md
+  - `--apply` flag to auto-update STATUS.md
+  - Catches staleness AND recovers in one step
+
+- **Session-start auto-inference** - Active recovery instead of passive warnings
+  - When STATUS.md is stale (>7 days), auto-runs `status.sh infer`
+  - Displays inferred state for agent to review or apply
+  - Replaces "it's stale" warning with actionable recovery
+
+- **Pre-commit STATUS.md staleness check** - Safety net during work
+  - Advisory warning if STATUS.md not updated in >48h
+  - Suggests `status.sh infer --apply` for quick recovery
+  - Alongside existing JOURNAL.md staleness check
+
+- **6 artifact-maintenance LLM tests (036-041)** - Verify agents maintain durable artifacts
+  - 036: Session end actually updates JOURNAL + STATUS (not just verbal summary)
+  - 037: Detects stale STATUS.md (version mismatch)
+  - 038: Mentions WIP tracking when starting significant work
+  - 039: Updates full chain on feature complete (FEATURES → CHANGELOG → JOURNAL)
+  - 040: Documents blockers in HUMAN_NEEDED.md
+  - 041: Notices stale JOURNAL.md (date gap vs active development)
+
+### Fixed
+- Stale `tests/LLM_TEST_RESULTS.md` reference in pre-commit-check.sh (file was deleted in v0.20.0)
+
 ## [0.20.0] - 2026-02-05
 
 ### Added

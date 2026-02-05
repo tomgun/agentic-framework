@@ -2,8 +2,8 @@
 
 **Single source of truth for ALL test results.**
 
-**Generated**: 2026-02-05
-**Framework Version**: 0.20.0
+**Generated**: 2026-02-06
+**Framework Version**: 0.21.0
 
 ---
 
@@ -13,8 +13,8 @@
 |--------|-------|
 | Acceptance Tests (validate_framework.sh) | 171 passed, 0 failed |
 | Unit Tests (run_tests.sh) | 21/21 passed |
-| LLM Behavioral Tests | 22/22 passed |
-| **Total Tests** | **214** |
+| LLM Behavioral Tests | 28/28 passed |
+| **Total Tests** | **220** |
 | Test Pass Rate | 100% |
 | Principles Covered | 11/11 |
 | Profile Coverage | Core ✅, Core+PM ✅ |
@@ -25,7 +25,7 @@
 
 | Environment | Last Tested | Version | Result | Tester |
 |-------------|-------------|---------|--------|--------|
-| Cursor IDE | 2026-02-05 | 0.19.0 | **214/214 ✅** | Cursor Agent (claude-4.6-opus) |
+| Cursor IDE | 2026-02-06 | 0.21.0 | **220/220 ✅** | Cursor Agent (claude-4.6-opus) |
 | Claude Code | _not yet_ | - | - | - |
 | GitHub Copilot | _not yet_ | - | - | - |
 
@@ -36,7 +36,7 @@
 | Tier | Meaning | Examples |
 |------|---------|----------|
 | **Battle-tested** | Proven through months of real development | Durable artifacts, token-efficient scripts, session continuity, acceptance-driven dev |
-| **LLM-verified** | Agent behavioral tests confirm compliance | 22 tests across all principle categories |
+| **LLM-verified** | Agent behavioral tests confirm compliance | 28 tests across all principle categories |
 | **Structurally verified** | Files/scripts exist and pass functional tests | 171 acceptance + 21 unit tests |
 | **Designed for** | Implemented with tooling, growing usage | Multi-agent at scale, sequential pipelines |
 
@@ -97,6 +97,12 @@
 | 030_reads_status_on_start | Agent reads STATUS.md, references Stripe | LLM | ✅ |
 | 031_references_journal_history | Agent reads JOURNAL.md, reports auth fix | LLM | ✅ |
 | 032_knows_architecture | Agent references CONTEXT_PACK entries | LLM | ✅ |
+| 036_session_end_updates_artifacts | Agent updates JOURNAL + STATUS at session end | LLM Critical | ✅ |
+| 037_detects_stale_status | Agent detects stale STATUS.md (version mismatch) | LLM Critical | ✅ |
+| 038_mentions_wip_on_work_start | Agent mentions WIP tracking on work start | LLM | ✅ |
+| 039_feature_complete_updates_chain | Agent updates FEATURES→CHANGELOG→JOURNAL chain | LLM | ✅ |
+| 040_blocker_creates_human_needed | Agent documents blockers in HUMAN_NEEDED.md | LLM | ✅ |
+| 041_notices_stale_journal | Agent notices stale JOURNAL.md (date gap) | LLM | ✅ |
 | _Acceptance_ | File existence + content tests | Structural | ✅ (8 tests) |
 
 ### Principle 6: Anti-Hallucination (NON-NEGOTIABLE)
@@ -239,7 +245,14 @@ bash tests/llm/harness.sh tests/llm/tests/001_session_start.sh
 
 ## Test History
 
-### v0.19.0 (2026-02-05) — Current
+### v0.21.0 (2026-02-06) — Current
+
+- **Environment**: Cursor IDE on macOS (darwin 24.5.0)
+- **Tester**: Cursor Agent (claude-4.6-opus-high-thinking)
+- **Result**: 220/220 (171 acceptance + 21 unit + 28 LLM behavioral)
+- **Notes**: Added 6 artifact-maintenance tests (036-041) verifying agents proactively maintain durable artifacts. Tests cover session-end updates, stale detection, WIP tracking, feature-complete chain, blocker documentation, and journal gap detection.
+
+### v0.19.0 (2026-02-05)
 
 - **Environment**: Cursor IDE on macOS (darwin 24.5.0)
 - **Tester**: Cursor Agent (claude-4.6-opus-high-thinking)
