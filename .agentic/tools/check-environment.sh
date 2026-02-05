@@ -33,11 +33,11 @@ if [[ "$LIST_MODE" == true ]]; then
   [[ -f "$PROJECT_ROOT/CLAUDE.md" ]] && echo "  ✓ CLAUDE.md (Claude Code)"
   [[ -f "$PROJECT_ROOT/.cursorrules" ]] && echo "  ✓ .cursorrules (Cursor)"
   [[ -f "$PROJECT_ROOT/.github/copilot-instructions.md" ]] && echo "  ✓ .github/copilot-instructions.md (Copilot)"
-  [[ -f "$PROJECT_ROOT/GEMINI.md" ]] && echo "  ✓ GEMINI.md (Gemini)"
-  [[ -f "$PROJECT_ROOT/AGENTS.md" ]] && echo "  ✓ AGENTS.md (Codex/general)"
+  [[ -f "$PROJECT_ROOT/.codex/instructions.md" ]] && echo "  ✓ .codex/instructions.md (Codex CLI)"
+  [[ -f "$PROJECT_ROOT/AGENTS.md" ]] && echo "  ✓ AGENTS.md (general)"
   echo ""
   echo "To add another tool: bash .agentic/tools/setup-agent.sh <tool>"
-  echo "Available: claude, cursor, copilot, codex, gemini"
+  echo "Available: claude, cursor, copilot, codex"
   exit 0
 fi
 
