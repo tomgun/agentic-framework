@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.19.0)
-**Date**: 2026-02-05  
+**Period**: Initial Development (v0.1.0 → v0.21.0)
+**Date**: 2026-02-06  
 
 ---
 
@@ -1760,9 +1760,55 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## v0.21.0 Contributions (2026-02-06)
+
+### Structural Enforcement of Durable Artifacts
+
+**User insight**:
+> "Yeah so what is the solution to have those files always updated?"
+> "also, we have LLM tests - how come they don't catch these essential files not being updated regularly?"
+
+**Root cause identified**: STATUS.md drifted from v0.13 to v0.20 because the only enforcement was behavioral (checklists say "update it"). Agents forget. Per Principle #4: scripts > documentation.
+
+**Implementation - `status.sh infer` command**:
+- New subcommand reconstructs project state from 5 data sources:
+  - Git log (commits since STATUS.md last modified)
+  - Last JOURNAL.md entry (Next Steps, Blockers)
+  - VERSION file
+  - spec/FEATURES.md in-progress features
+  - CHANGELOG.md latest version entry
+- `--apply` flag auto-updates STATUS.md
+- Labels each inference source for transparency
+
+**Implementation - Session-start auto-inference**:
+- session-start.sh: when STATUS.md stale >7 days, auto-runs `status.sh infer`
+- Replaces passive "it's stale" warning with active recovery
+- Agent can review and apply or update manually
+
+**Implementation - Pre-commit STATUS.md advisory**:
+- pre-commit-check.sh: new check 3b warns if STATUS.md not updated in >48h
+- Advisory only (Principle #4: Warnings Beat Blocks)
+- Suggests `status.sh infer --apply`
+
+**Implementation - 6 artifact-maintenance LLM tests (036-041)**:
+- Identified gap: existing LLM tests check **awareness** (agent knows about tools) but not **behavior** (agent actually uses tools when workflow triggers happen)
+- New tests verify proactive maintenance:
+  - 036: Session end → agent updates JOURNAL + STATUS (not just verbal summary)
+  - 037: Agent detects stale STATUS.md (version mismatch: v0.5 vs v0.20)
+  - 038: Agent mentions WIP tracking on work start
+  - 039: Feature complete → agent updates FEATURES + CHANGELOG + JOURNAL chain
+  - 040: Agent documents blockers in HUMAN_NEEDED.md
+  - 041: Agent notices stale JOURNAL.md (3-week gap vs active development)
+
+**Bug fix**: Stale `tests/LLM_TEST_RESULTS.md` reference in pre-commit-check.sh (file deleted in v0.20.0)
+
+**Impact**: Durable artifacts now have structural enforcement at three levels: session-start (catch before work), pre-commit (catch during work), and LLM tests (verify agent behavior). Total LLM tests: 28.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.20.0
+**Current Version**: v0.21.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
-**LLM Tests**: 22/22 passing in Cursor IDE (v0.19.0), test infrastructure updated for v0.20.0
+**LLM Tests**: 28 defined (22 previously passing + 6 new artifact-maintenance tests)
 

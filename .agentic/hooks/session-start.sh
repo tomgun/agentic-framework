@@ -85,6 +85,31 @@ if [[ -f "OVERVIEW.md" ]]; then
   echo ""
 fi
 
+# Check STATUS.md freshness — auto-infer state if stale
+if [[ -f "STATUS.md" ]]; then
+  if [[ "$(uname)" == "Darwin" ]]; then
+    STATUS_AGE=$(( ($(date +%s) - $(stat -f %m STATUS.md)) / 86400 ))
+  else
+    STATUS_AGE=$(( ($(date +%s) - $(stat -c %Y STATUS.md)) / 86400 ))
+  fi
+  if [[ $STATUS_AGE -gt 7 ]]; then
+    echo "   ⚠️  WARNING: STATUS.md last updated ${STATUS_AGE} days ago!"
+    echo "      Auto-inferring current state from history..."
+    echo ""
+    if [[ -x ".agentic/tools/status.sh" ]]; then
+      bash .agentic/tools/status.sh infer 2>/dev/null || true
+      echo ""
+      echo "   → Review the inferred state above."
+      echo "   → To apply: bash .agentic/tools/status.sh infer --apply"
+      echo "   → Or update STATUS.md manually with better context."
+      echo ""
+    else
+      echo "      Update it early this session."
+      echo ""
+    fi
+  fi
+fi
+
 echo "3. JOURNAL.md - Last 2-3 entries (~500-1000 tokens)"
 echo "   - Recent progress"
 echo "   - What worked/didn't work"

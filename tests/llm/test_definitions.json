@@ -559,6 +559,176 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "036_session_end_updates_artifacts",
+      "description": "Agent should proactively update JOURNAL and STATUS when ending a session, not just give a verbal summary",
+      "section": "artifact-maintenance",
+      "category": "Critical",
+      "llm_test_id": "LLM-036",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "STATUS.md": "# Project Status\n\n## Current Focus\nImplementing payment gateway\n\n## In Progress\n- Stripe integration (70%)\n- Webhook handlers\n\n## Next Steps\n- Complete webhook handlers\n- Add invoice generation\n\n## Blockers\n- None",
+          "JOURNAL.md": "# Development Journal\n\n### Session: 2026-01-28\n- Started Stripe integration\n- Added payment intent API\n- Next: webhook handlers",
+          "src/payments.ts": "export class PaymentService {\n  async createIntent(amount: number) {\n    // Stripe payment intent creation\n    return { id: 'pi_test', status: 'created' };\n  }\n}"
+        }
+      },
+      "prompt": "I need to stop for today. We finished the webhook handlers and started on invoice generation. Please wrap up the session.",
+      "expected": {
+        "output_contains": [
+          "journal|JOURNAL"
+        ],
+        "output_contains_any": [
+          "status.sh|STATUS.md|update.*status|journal.sh|ag journal|append.*journal|update.*journal"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "037_detects_stale_status",
+      "description": "Agent should notice when STATUS.md is clearly outdated (version/content mismatch) and offer to update it",
+      "section": "artifact-maintenance",
+      "category": "Critical",
+      "llm_test_id": "LLM-037",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "STATUS.md": "# Project Status\n\n## Version: 0.5.0\n\n## Current Focus\nImplementing user login form\n\n## In Progress\n- Login form component\n- Basic password validation\n\n## Next Steps\n- Add email verification\n- Connect to auth API\n\n## Blockers\n- None",
+          "VERSION": "0.20.0",
+          "CHANGELOG.md": "# Changelog\n\n## [0.20.0] - 2026-02-05\n- Payment gateway fully integrated\n- Order management system complete\n- Admin dashboard shipped\n\n## [0.15.0] - 2026-01-20\n- User authentication complete\n- Product catalog launched\n\n## [0.5.0] - 2025-12-01\n- Initial user login form",
+          "JOURNAL.md": "# Development Journal\n\n### Session: 2026-02-04\n- Completed admin dashboard\n- All payment tests passing\n- Next: monitoring and analytics"
+        }
+      },
+      "prompt": "Hi, let's start a new session. What should we work on?",
+      "expected": {
+        "output_contains": [
+          "outdated|stale|out.of.date|mismatch|update.*STATUS|STATUS.*old|doesn't match|inconsistent|v?0\\.5|0\\.20"
+        ],
+        "output_contains_any": [
+          "STATUS|status|update|refresh|current"
+        ],
+        "output_not_contains": [
+          "login form|password validation|email verification"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "038_mentions_wip_on_work_start",
+      "description": "Agent should mention WIP tracking when starting significant work to prevent loss from interruptions",
+      "section": "artifact-maintenance",
+      "category": "Important",
+      "llm_test_id": "LLM-038",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "STATUS.md": "# Project Status\n\n## Current Focus\nReady for next feature\n\n## Next Steps\n- Implement notification system\n\n## Blockers\n- None",
+          "CONTEXT_PACK.md": "# Context Pack\n\n## Project: E-commerce Platform\n- packages/api/ - Express.js backend\n- packages/web/ - Next.js frontend\n\n## Testing\n- Jest for unit tests\n- Run: npm test",
+          "src/index.ts": "import express from 'express';\nconst app = express();\napp.listen(3000);"
+        }
+      },
+      "prompt": "Let's implement the user notifications feature - push notifications, email digests, and in-app alerts",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "WIP|wip.sh|track|work.in.progress|checkpoint|save.*progress|interrupted|recovery"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "039_feature_complete_updates_chain",
+      "description": "When a feature is complete, agent should update FEATURES.md, mention CHANGELOG, and update JOURNAL",
+      "section": "artifact-maintenance",
+      "category": "Important",
+      "llm_test_id": "LLM-039",
+      "profile": "core-pm",
+      "setup": {
+        "files": {
+          "spec/FEATURES.md": "# Features\n\n## F-0001: User Authentication\n- Status: in_progress\n- Priority: high\n- Acceptance: spec/acceptance/F-0001.md\n\n## F-0002: Product Catalog\n- Status: shipped\n- Priority: high",
+          "spec/acceptance/F-0001.md": "# F-0001: User Authentication\n\n## Acceptance Criteria\n- [x] Users can register with email/password\n- [x] Users can login and receive JWT\n- [x] Password reset via email\n- [x] Session management with refresh tokens\n\n## Tests\n- All 12 auth tests passing",
+          "JOURNAL.md": "# Development Journal\n\n### Session: 2026-02-04\n- Finished password reset flow\n- All acceptance criteria met\n- 12/12 tests passing",
+          "CHANGELOG.md": "# Changelog\n\n## [Unreleased]\n\n## [0.19.0] - 2026-02-01\n- Product catalog shipped"
+        }
+      },
+      "prompt": "F-0001 User Authentication is complete - all acceptance criteria pass and all tests are green. Please mark it as shipped.",
+      "expected": {
+        "output_contains": [
+          "F-0001|feature|status|shipped"
+        ],
+        "output_contains_any": [
+          "FEATURES|feature.sh|CHANGELOG|changelog|journal|JOURNAL"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "040_blocker_creates_human_needed",
+      "description": "When agent discovers a blocker, it should document it in HUMAN_NEEDED.md",
+      "section": "artifact-maintenance",
+      "category": "Important",
+      "llm_test_id": "LLM-040",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "STATUS.md": "# Project Status\n\n## Current Focus\nIntegrating Stripe payment gateway\n\n## Next Steps\n- Configure Stripe webhook endpoint\n- Add payment confirmation flow\n\n## Blockers\n- None",
+          "HUMAN_NEEDED.md": "# Human Needed\n\nItems requiring human decision or action.\n\n(No items currently)",
+          "src/payments.ts": "export class PaymentService {\n  // TODO: Need real Stripe API keys\n  private apiKey = 'sk_test_placeholder';\n}"
+        }
+      },
+      "prompt": "We can't proceed with the Stripe integration. The finance team hasn't provided the production API keys yet, and we've been waiting for a week. Please document this blocker.",
+      "expected": {
+        "output_contains": [
+          "HUMAN_NEEDED|blocker|human.needed|block"
+        ],
+        "output_contains_any": [
+          "Stripe|API key|finance|document|recorded|added|tracked"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "041_notices_stale_journal",
+      "description": "Agent should notice when JOURNAL.md has not been updated for weeks despite active development",
+      "section": "artifact-maintenance",
+      "category": "Important",
+      "llm_test_id": "LLM-041",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "JOURNAL.md": "# Development Journal\n\n### Session: 2026-01-10\n- Set up project structure\n- Added initial configuration\n- Next: start building auth module",
+          "STATUS.md": "# Project Status\n\n## Current Focus\nBuilding admin dashboard (Sprint 7)\n\n## In Progress\n- Admin user management\n- Analytics dashboard\n\n## Completed Recently\n- Payment gateway (Sprint 5-6)\n- Order management (Sprint 6)\n- User auth (Sprint 3-4)\n\n## Next Steps\n- Deploy admin dashboard\n- Set up monitoring\n\n## Blockers\n- None",
+          "CHANGELOG.md": "# Changelog\n\n## [0.18.0] - 2026-02-04\n- Admin dashboard MVP\n- Analytics charts\n\n## [0.15.0] - 2026-01-25\n- Payment gateway complete\n- Order management\n\n## [0.10.0] - 2026-01-15\n- User authentication\n- Product catalog"
+        }
+      },
+      "prompt": "Let's continue working on the admin dashboard. Where did we leave off?",
+      "expected": {
+        "output_contains": [
+          "admin|dashboard"
+        ],
+        "output_contains_any": [
+          "JOURNAL|journal|stale|outdated|hasn't been updated|last entry|January 10|gap|catch.up|update.*journal|no recent"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }
