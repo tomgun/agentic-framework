@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.17.0)
-**Date**: 2026-02-04  
+**Period**: Initial Development (v0.1.0 → v0.18.0)
+**Date**: 2026-02-05  
 
 ---
 
@@ -1547,8 +1547,34 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## v0.18.0 Contributions (2026-02-05)
+
+### Plan-Review Loop (F-0120)
+
+**User insight**: Plans created by a single agent miss issues that a critical reviewer would catch. Two perspectives are better than one.
+
+**Implementation**:
+- Two-agent loop: Planner creates plan, Reviewer critiques, iterate until APPROVED
+- Plan artifacts stored in `.agentic-state/plans/F-XXXX-plan.md`
+- Configurable: `plan_review_enabled`, `plan_review_max_iterations`, `plan_review_auto_for`
+- Issue categorization: CRITICAL, IMPORTANT, SUGGESTION
+- Verdict system: APPROVED, REVISION_NEEDED, ESCALATE
+- Agent definitions for both Claude Code and Cursor
+
+**Agents**:
+- `plan-creator-agent.md` - Creates comprehensive plans following template
+- `plan-reviewer-agent.md` - Critical review with adversarial mindset
+
+**Testing**:
+- LLM test `023_plan_review_loop.sh` verifies agent behavior
+- Framework validation passes (149/149)
+
+**Impact**: Catches issues during planning rather than implementation - cheaper to fix.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.17.0
+**Current Version**: v0.18.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 
