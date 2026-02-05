@@ -162,6 +162,7 @@ USAGE:
 COMMANDS:
     start               Session start checks + context summary
     init                Run project initialization interview
+    plan F-XXXX         Create plan with review loop (before implementing)
     implement F-XXXX    Verify acceptance exists, start WIP tracking
     commit              Run all pre-commit gates
     done [F-XXXX]       Feature complete validation
@@ -174,6 +175,8 @@ COMMANDS:
 EXAMPLES:
     ag start                    # Begin a new session
     ag init                     # Initialize project (if not done)
+    ag plan F-0042              # Create plan with iterative review
+    ag plan F-0042 --no-review  # Create plan without review loop
     ag implement F-0042         # Start working on feature F-0042
     ag commit                   # Verify ready to commit
     ag done F-0042              # Check feature completion
@@ -300,6 +303,144 @@ cmd_work() {
     echo "Update STATUS.md with your progress."
 }
 
+# Get plan-review config from STACK.md
+get_plan_review_config() {
+    local stack_file="$ROOT_DIR/STACK.md"
+    local key="$1"
+    local default="$2"
+
+    if [ -f "$stack_file" ]; then
+        local value
+        value=$(grep -E "^-?\s*${key}:" "$stack_file" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | tr -d ' ')
+        if [ -n "$value" ]; then
+            echo "$value"
+            return
+        fi
+    fi
+    echo "$default"
+}
+
+# Plan command - create plan with iterative review
+cmd_plan() {
+    local feature_id="${1:-}"
+    local no_review=false
+
+    # Parse options
+    if [ "$2" = "--no-review" ]; then
+        no_review=true
+    fi
+
+    # Check profile
+    if [ "$PROFILE" = "core" ]; then
+        echo -e "${YELLOW}Core profile detected - no feature IDs.${NC}"
+        echo "Planning works best with Core+PM profile for formal specs."
+        echo "You can still create informal plans in STATUS.md."
+        exit 1
+    fi
+
+    if [ -z "$feature_id" ]; then
+        echo -e "${RED}Error: Feature ID required${NC}"
+        echo "Usage: ag plan F-XXXX [--no-review]"
+        exit 1
+    fi
+
+    # Validate feature ID format
+    if ! echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        echo -e "${RED}Error: Invalid feature ID format. Expected: F-XXXX (e.g., F-0042)${NC}"
+        exit 1
+    fi
+
+    echo -e "${BOLD}=== Plan: $feature_id ===${NC}"
+    echo ""
+
+    # 1. Check acceptance criteria exist
+    local acc_file="$ROOT_DIR/spec/acceptance/${feature_id}.md"
+    if [ ! -f "$acc_file" ]; then
+        echo -e "${RED}BLOCKED: No acceptance criteria${NC}"
+        echo "  Missing: spec/acceptance/${feature_id}.md"
+        echo "  Create acceptance criteria FIRST, then plan."
+        exit 1
+    fi
+    echo -e "${GREEN}Acceptance criteria: EXISTS${NC}"
+
+    # 2. Check for existing plan
+    local plan_file="$ROOT_DIR/.agentic-state/plans/${feature_id}-plan.md"
+    mkdir -p "$ROOT_DIR/.agentic-state/plans"
+
+    if [ -f "$plan_file" ]; then
+        local status
+        status=$(grep -E "^\*\*Status\*\*:" "$plan_file" 2>/dev/null | head -1 | sed 's/.*Status\*\*:[[:space:]]*//' || echo "UNKNOWN")
+        echo -e "${YELLOW}Existing plan found: $status${NC}"
+        if [ "$status" = "APPROVED" ]; then
+            echo "Plan already approved. Ready for implementation."
+            echo "  Plan: $plan_file"
+            return 0
+        fi
+        echo "  Previous plan at: $plan_file"
+        echo ""
+    fi
+
+    # 3. Get config
+    local enabled max_iterations
+    enabled=$(get_plan_review_config "plan_review_enabled" "yes")
+    max_iterations=$(get_plan_review_config "plan_review_max_iterations" "3")
+
+    if [ "$no_review" = true ] || [ "$enabled" = "no" ]; then
+        echo -e "${YELLOW}Review loop: SKIPPED${NC}"
+        echo ""
+        echo "Creating plan without review..."
+        echo ""
+        echo -e "${BOLD}AGENT INSTRUCTION:${NC}"
+        echo "Create implementation plan for $feature_id."
+        echo ""
+        echo "Read:"
+        echo "  - spec/acceptance/${feature_id}.md"
+        echo "  - CONTEXT_PACK.md"
+        echo ""
+        echo "Write plan to: .agentic-state/plans/${feature_id}-plan.md"
+        echo "Follow format in: .agentic/workflows/plan_review_loop.md"
+        echo "Set status to: APPROVED (no review)"
+        return 0
+    fi
+
+    # 4. Show plan-review loop instructions
+    echo -e "${GREEN}Review loop: ENABLED (max $max_iterations iterations)${NC}"
+    echo ""
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}PLAN-REVIEW LOOP INSTRUCTIONS${NC}"
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo "This feature uses iterative planning with critical review."
+    echo "Spawn two agents: PLANNER and REVIEWER."
+    echo ""
+    echo -e "${BLUE}STEP 1: PLANNER creates initial plan${NC}"
+    echo "  Task tool:"
+    echo "    subagent_type: Plan"
+    echo "    prompt: \"Create implementation plan for $feature_id."
+    echo "            Read: spec/acceptance/${feature_id}.md, CONTEXT_PACK.md"
+    echo "            Write to: .agentic-state/plans/${feature_id}-plan.md"
+    echo "            Follow: .agentic/workflows/plan_review_loop.md\""
+    echo ""
+    echo -e "${BLUE}STEP 2: REVIEWER critiques the plan${NC}"
+    echo "  Task tool:"
+    echo "    subagent_type: general-purpose"
+    echo "    model: opus  # Critical review needs quality"
+    echo "    prompt: \"Critically review plan at .agentic-state/plans/${feature_id}-plan.md"
+    echo "            Follow reviewer instructions in .agentic/workflows/plan_review_loop.md"
+    echo "            Add review to Review History section."
+    echo "            Set verdict: APPROVED, REVISION_NEEDED, or ESCALATE\""
+    echo ""
+    echo -e "${BLUE}STEP 3: Loop until APPROVED or max iterations${NC}"
+    echo "  - If REVISION_NEEDED: Planner revises, Reviewer re-reviews"
+    echo "  - If ESCALATE or max reached: Human intervention needed"
+    echo "  - If APPROVED: Ready for 'ag implement $feature_id'"
+    echo ""
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo "Plan artifact: .agentic-state/plans/${feature_id}-plan.md"
+    echo "Workflow docs: .agentic/workflows/plan_review_loop.md"
+}
+
 # Implement command - verify acceptance exists, start WIP (Core+PM only)
 cmd_implement() {
     local feature_id="${1:-}"
@@ -326,6 +467,29 @@ cmd_implement() {
 
     echo -e "${BOLD}=== Implement: $feature_id ===${NC}"
     echo ""
+
+    # 0. Check if plan-review is required for implement
+    local auto_for
+    auto_for=$(get_plan_review_config "plan_review_auto_for" "[planning]")
+    if echo "$auto_for" | grep -qE "(implement|both)"; then
+        local plan_file="$ROOT_DIR/.agentic-state/plans/${feature_id}-plan.md"
+        if [ -f "$plan_file" ]; then
+            local plan_status
+            plan_status=$(grep -E "^\*\*Status\*\*:" "$plan_file" 2>/dev/null | head -1 | sed 's/.*Status\*\*:[[:space:]]*//' || echo "UNKNOWN")
+            if [ "$plan_status" != "APPROVED" ]; then
+                echo -e "${YELLOW}Plan exists but not approved (status: $plan_status)${NC}"
+                echo "  Run: ag plan $feature_id"
+                echo "  Or set plan status to APPROVED manually"
+                echo ""
+            else
+                echo -e "${GREEN}Approved plan: EXISTS${NC}"
+            fi
+        else
+            echo -e "${YELLOW}No plan found - consider running: ag plan $feature_id${NC}"
+            echo "  (plan_review_auto_for includes 'implement')"
+            echo ""
+        fi
+    fi
 
     # 1. Check acceptance criteria exist
     local acc_file="$ROOT_DIR/spec/acceptance/${feature_id}.md"
@@ -903,6 +1067,9 @@ case "${1:-help}" in
         ;;
     work)
         cmd_work "${2:-}"
+        ;;
+    plan)
+        cmd_plan "${2:-}" "${3:-}"
         ;;
     implement)
         cmd_implement "${2:-}"

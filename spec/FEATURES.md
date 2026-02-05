@@ -1825,6 +1825,26 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0120: Plan-Review Loop
+
+**Status**: shipped
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.18.0
+
+**Description**: Iterative planning with critical review before implementation. Planner creates plan, reviewer critiques, planner revises - loop until approved or max iterations reached. Improves plan quality by catching issues before code is written. Configurable via STACK.md.
+
+**Dependencies**: F-0081 (Orchestrator Agent), F-0035 (Agent Role Definitions)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/workflows/plan_review_loop.md`, `.agentic/tools/ag.sh`, STACK.template.md, plan-creator-agent.md, plan-reviewer-agent.md
+- Tests: manual
+
+**Acceptance**: See `spec/acceptance/F-0120.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1839,6 +1859,6 @@ agent_mode: balanced  # premium | balanced | economy
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 8 | 1 | 1 | 10 |
-| **Total** | **81** | **2** | **1** | **84** |
+| Framework Infrastructure (F-0101+) | 9 | 1 | 1 | 11 |
+| **Total** | **82** | **2** | **1** | **85** |
 
