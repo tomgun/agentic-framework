@@ -1827,7 +1827,7 @@ agent_mode: balanced  # premium | balanced | economy
 
 ## F-0120: Plan-Review Loop
 
-**Status**: in_progress
+**Status**: shipped
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.18.0
@@ -1837,8 +1837,8 @@ agent_mode: balanced  # premium | balanced | economy
 **Dependencies**: F-0081 (Orchestrator Agent), F-0035 (Agent Role Definitions)
 
 **Implementation**:
-- State: partial
-- Code: `.agentic/workflows/plan_review_loop.md`, STACK.template.md config
+- State: complete
+- Code: `.agentic/workflows/plan_review_loop.md`, `.agentic/tools/ag.sh`, STACK.template.md, plan-creator-agent.md, plan-reviewer-agent.md
 - Tests: manual
 
 **Acceptance**: See `spec/acceptance/F-0120.md`
@@ -1859,6 +1859,6 @@ agent_mode: balanced  # premium | balanced | economy
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 8 | 2 | 1 | 11 |
-| **Total** | **81** | **3** | **1** | **85** |
+| Framework Infrastructure (F-0101+) | 9 | 1 | 1 | 11 |
+| **Total** | **82** | **2** | **1** | **85** |
 
