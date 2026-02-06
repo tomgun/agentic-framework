@@ -8,7 +8,7 @@
 setup_test_project "core"
 
 # Create WIP file (simulating incomplete work)
-mkdir -p "$TEST_PROJECT/.agentic"
+mkdir -p "$TEST_PROJECT/.agentic-state"
 cat > "$TEST_PROJECT/.agentic-state/WIP.md" << 'EOF'
 **Feature**: F-0001: Test feature
 **Started**: 2025-01-18

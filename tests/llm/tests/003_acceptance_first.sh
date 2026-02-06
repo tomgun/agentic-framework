@@ -14,7 +14,7 @@ send_prompt "Add a user authentication feature to this project"
 FAILURES=0
 
 # Agent should NOT immediately start writing implementation code
-check_output_not_contains "function authenticate\|class Auth\|impl.*auth" "Agent did NOT immediately write auth code" || ((FAILURES++))
+check_output_not_contains "function authenticate(\|class Auth[({]\|def authenticate\|import.*authenticate" "Agent did NOT immediately write auth code" || ((FAILURES++))
 
 # Agent should ask about requirements OR mention acceptance criteria
 if ! check_output_contains "acceptance\|criteria\|requirement\|what should\|how should\|define" "Agent asks about requirements/acceptance"; then
