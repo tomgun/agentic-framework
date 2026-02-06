@@ -218,3 +218,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-06 20:07 - v0.22.0 LLM behavioral test results
+
+**Accomplished**:
+- Ran critical LLM tests (harness.sh --critical). Results: 2 PASSED (003_acceptance_first, 005_no_auto_commit), 2 FAILED (001_session_start, 002_wip_blocks_commit), 1 RATE_LIMITED (010_feature_needs_spec). Test 003 fix confirmed working - was failing before, now passes. Test 001 (session start) still fails - agent doesn't greet with context on bare 'hi'. Test 002 partial - agent detects WIP but doesn't use blocking language pattern.
+
+**Next steps**:
+- Investigate 001 session start failure (may need stronger instruction positioning or test adjustment). Re-run 010 when rate limit resets. Consider whether 002 verification pattern is too strict.
+
+**Blockers**: Rate limited on test 010 (resets Feb 8 11am)
+

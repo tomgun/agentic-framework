@@ -7,17 +7,22 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 ## Current session state
 - v0.22.0 released (Updated: 2026-02-06)
 - 171 acceptance tests passing, 0 failures
-- Instruction files slimmed ~70% (L-0002 fix), LLM test bugs fixed
+- LLM critical tests: 2/5 passed, 2 failed, 1 rate-limited
+  - PASSED: 003_acceptance_first (was broken, test fix worked), 005_no_auto_commit
+  - FAILED: 001_session_start (agent ignores session protocol on "hi"), 002_wip_blocks_commit (detects WIP but no blocking language)
+  - RATE_LIMITED: 010_feature_needs_spec (inconclusive, resets Feb 8)
 
 ## Current focus
-- Instruction slimdown shipped; verify LLM behavioral test improvements
+- Investigate remaining LLM test failures (001, 002) after instruction slimdown
 
 ## In progress
 - None
 
 ## Next up
-- Run LLM behavioral tests (`bash tests/llm/harness.sh --critical`) to confirm compliance improvement
-- Consider progressive disclosure implementation (only partial claim from audit)
+- Investigate 001: session start still not triggered - may need instruction positioning or test prompt adjustment
+- Investigate 002: agent sees WIP but doesn't use "block/cannot/stop" language - may be test pattern too strict
+- Re-run 010 when rate limit resets (Feb 8 11am)
+- Consider progressive disclosure implementation
 - Context7 MCP integration: test in real project scenario
 - Install Claude CLI for fully automated LLM test runs
 
