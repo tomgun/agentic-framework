@@ -61,6 +61,34 @@ if [[ -z "$CURSOR_CMD" ]]; then
 fi
 KEEP_PROJECTS="${KEEP_PROJECTS:-0}"
 
+# Portable timeout: prefer GNU timeout, fall back to gtimeout (macOS + coreutils), then perl
+if command -v timeout &>/dev/null; then
+    TIMEOUT_CMD="timeout"
+elif command -v gtimeout &>/dev/null; then
+    TIMEOUT_CMD="gtimeout"
+else
+    # Pure-bash fallback using background process
+    TIMEOUT_CMD=""
+fi
+
+run_with_timeout() {
+    local secs="$1"; shift
+    if [[ -n "$TIMEOUT_CMD" ]]; then
+        "$TIMEOUT_CMD" "$secs" "$@"
+    else
+        # Bash fallback: run in background, kill after timeout
+        "$@" &
+        local pid=$!
+        ( sleep "$secs"; kill "$pid" 2>/dev/null ) &
+        local watchdog=$!
+        wait "$pid" 2>/dev/null
+        local rc=$?
+        kill "$watchdog" 2>/dev/null
+        wait "$watchdog" 2>/dev/null
+        return $rc
+    fi
+}
+
 # Validate tool
 if [[ "$TOOL" != "claude" && "$TOOL" != "codex" && "$TOOL" != "cursor" && "$TOOL" != "cursor-cli" && "$TOOL" != "copilot" ]]; then
     echo "Error: TOOL must be 'claude', 'codex', 'cursor', 'cursor-cli', or 'copilot'"
@@ -251,7 +279,7 @@ send_prompt() {
             LAST_OUTPUT=$($CLAUDE_CMD "${model_args[@]}" --print "$prompt" 2>&1) || true
         else
             # Fallback to echo + pipe if --print not available
-            LAST_OUTPUT=$(echo "$prompt" | timeout 120 $CLAUDE_CMD "${model_args[@]}" 2>&1) || true
+            LAST_OUTPUT=$(echo "$prompt" | run_with_timeout 120 $CLAUDE_CMD "${model_args[@]}" 2>&1) || true
         fi
 
         # Write output to shared file for rate limit detection across subshells
@@ -271,7 +299,7 @@ send_prompt() {
         fi
 
         # codex exec runs non-interactively
-        LAST_OUTPUT=$(timeout 120 $CODEX_CMD exec "${model_args[@]}" "$prompt" 2>&1) || true
+        LAST_OUTPUT=$(run_with_timeout 120 $CODEX_CMD exec "${model_args[@]}" "$prompt" 2>&1) || true
 
         # Write output to shared file for rate limit detection across subshells
         echo "$LAST_OUTPUT" > "$SCRIPT_DIR/.last-output"
@@ -291,8 +319,8 @@ send_prompt() {
             exit 1
         fi
 
-        # Run cursor agent in headless mode
-        LAST_OUTPUT=$(timeout 120 $CURSOR_CMD --headless "$prompt" 2>&1) || true
+        # Run cursor agent in non-interactive print mode with --force to auto-approve
+        LAST_OUTPUT=$(run_with_timeout 120 $CURSOR_CMD --print --force --workspace "$TEST_PROJECT" "$prompt" 2>&1) || true
 
         # Write output to shared file for rate limit detection across subshells
         echo "$LAST_OUTPUT" > "$SCRIPT_DIR/.last-output"
