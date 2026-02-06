@@ -91,6 +91,7 @@ Example projects demonstrate best practices and verify workflows actually work.
 1. Add to `.agentic/agents/claude/CLAUDE.md` FIRST
 2. Test that users would benefit from it
 3. Only then update root `/CLAUDE.md` if framework-dev needs something extra
+4. CLAUDE.md is auto-loaded for ALL agents including subagents - every line added is multiplied across every Task tool invocation. Keep templates under 100 lines. Run LLM behavioral tests (`bash tests/llm/harness.sh --critical`) after changes.
 
 **Anti-pattern**: ❌ Adding `ag` CLI commands to root CLAUDE.md but not the template users get.
 
