@@ -28,9 +28,10 @@ KEEP_PROJECTS=1 bash tests/llm/harness.sh
 ## How It Works
 
 1. **Fresh context per test**: Each test creates a new temp project with the framework installed
-2. **Real agent interaction**: Sends prompts to Claude CLI, captures output
+2. **Real agent interaction**: Sends prompts to the AI CLI tool, captures output
 3. **Outcome verification**: Checks output patterns, file existence, git state
 4. **Pass/fail reporting**: Clear results for each test
+5. **Results saved**: Durable report written to `tests/llm/results/` (git-tracked)
 
 ## Test Structure
 
@@ -95,13 +96,35 @@ cleanup_test_project
 3. Use helper functions (setup, send_prompt, check_*)
 4. Return 0 for pass, 1 for fail
 
+## Results & History
+
+After each complete run, the harness writes a markdown report to `tests/llm/results/`:
+
+```
+tests/llm/results/
+  2026-02-06_cursor-cli.md    # Cursor CLI run
+  2026-02-07_claude.md        # Claude Code run
+```
+
+Each file records: date, version, tool, model, pass/fail per test, and failure notes.
+
+**Commit these files** to maintain a history of what works and what needs fixing:
+
+```bash
+git add tests/llm/results/ && git commit -m "test: LLM results $(date +%Y-%m-%d)"
+```
+
+The canonical summary is in `tests/VERIFICATION_REPORT.md`.
+
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CLAUDE_CMD` | `claude` | Path to Claude CLI |
 | `CLAUDE_MODEL` | `opus` | Model: opus, sonnet, or full model name |
-| `TOOL` | `claude` | Tool: claude, cursor, copilot |
+| `CODEX_CMD` | `codex` | Path to Codex CLI |
+| `CURSOR_CMD` | `agent` | Path to Cursor Agent CLI |
+| `TOOL` | `claude` | Tool: claude, codex, cursor-cli, cursor, copilot |
 | `KEEP_PROJECTS` | `0` | Set to `1` to keep temp projects |
 
 ## Limitations

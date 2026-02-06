@@ -124,15 +124,23 @@ Each test has a prompt and expected outcomes. Example for `001_session_start`:
 
 ### Step 4: Record Results
 
-Check the outcomes and record in `tests/VERIFICATION_REPORT.md`:
+The harness **automatically saves** results to `tests/llm/results/YYYY-MM-DD_tool.md`.
+
+Commit the results file so the history is tracked:
+
+```bash
+git add tests/llm/results/ && git commit -m "test: LLM results $(date +%Y-%m-%d)"
+```
+
+For manual runs, record in `tests/VERIFICATION_REPORT.md`:
 
 ```markdown
-## Test Run: 2026-01-18 - Claude Code (Opus 4.5)
+## Test Run: 2026-02-06 - Cursor CLI (agent v2026.01.28)
 
 | Test | Result | Notes |
 |------|--------|-------|
 | 001_session_start | ✅ | Agent greeted with context, mentioned CONTEXT_PACK |
-| 002_wip_blocks_commit | ✅ | Correctly blocked, explained WIP |
+| 002_wip_blocks_commit | ❌ | Agent didn't block commit |
 ...
 ```
 
