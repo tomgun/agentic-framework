@@ -5,19 +5,18 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- v0.21.0 releasing (Updated: 2026-02-06)
-- All 28 LLM behavioral tests passing (Cursor IDE, v0.21.0 run)
-- 171 acceptance + 21 unit tests passing
-- Total: 220 tests
+- v0.22.0 released (Updated: 2026-02-06)
+- 171 acceptance tests passing, 0 failures
+- Instruction files slimmed ~70% (L-0002 fix), LLM test bugs fixed
 
 ## Current focus
-- Structural enforcement of durable artifacts + artifact-maintenance LLM tests
+- Instruction slimdown shipped; verify LLM behavioral test improvements
 
 ## In progress
-- Committing v0.21.0 release
+- None
 
 ## Next up
-- Run validation tests (`bash tests/validate_framework.sh`) to confirm v0.21.0 integrity
+- Run LLM behavioral tests (`bash tests/llm/harness.sh --critical`) to confirm compliance improvement
 - Consider progressive disclosure implementation (only partial claim from audit)
 - Context7 MCP integration: test in real project scenario
 - Install Claude CLI for fully automated LLM test runs
@@ -39,6 +38,7 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - None currently
 
 ## Release notes (optional)
+- v0.22.0: Instruction file slimdown ~70% (L-0002 fix), LLM test bug fixes, subagent context waste documented
 - v0.21.0: Structural enforcement for durable artifacts, `status.sh infer`, 6 new artifact-maintenance LLM tests
 - v0.20.0: Traceability overhaul, test consolidation, Context7 MCP update, KISS meta-principle
 - v0.19.0: Principles simplification (48→11), value proposition audit, 12 new LLM tests

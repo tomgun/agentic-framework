@@ -207,3 +207,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-06 12:35 - v0.22.0: Instruction slimdown
+
+**Accomplished**:
+- Rewrote all instruction templates ~70% smaller (277→79, 268→69/71). Fixed LLM test bugs (002 mkdir path, 003 pattern matching). Updated L-0002 lesson with subagent context multiplier insight. All 171 validation tests passing.
+
+**Next steps**:
+- Run LLM behavioral tests to confirm compliance improvement. Consider progressive disclosure implementation.
+
+**Blockers**: None
+
