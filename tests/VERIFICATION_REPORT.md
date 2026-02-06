@@ -3,7 +3,7 @@
 **Single source of truth for ALL test results.**
 
 **Generated**: 2026-02-06
-**Framework Version**: 0.21.0
+**Framework Version**: 0.22.0
 
 ---
 
@@ -13,9 +13,9 @@
 |--------|-------|
 | Acceptance Tests (validate_framework.sh) | 171 passed, 0 failed |
 | Unit Tests (run_tests.sh) | 21/21 passed |
-| LLM Behavioral Tests | 28/28 passed |
-| **Total Tests** | **220** |
-| Test Pass Rate | 100% |
+| LLM Behavioral Tests (Cursor CLI) | 17/23 passed (74%) |
+| **Total Tests** | **209 passing / 215 total** |
+| Test Pass Rate | 97.2% |
 | Principles Covered | 11/11 |
 | Profile Coverage | Core ✅, Core+PM ✅ |
 
@@ -25,7 +25,7 @@
 
 | Environment | Last Tested | Version | Result | Tester |
 |-------------|-------------|---------|--------|--------|
-| Cursor IDE | 2026-02-06 | 0.21.0 | **220/220 ✅** | Cursor Agent (claude-4.6-opus) |
+| Cursor CLI (agent) | 2026-02-06 | 0.22.0 | **17/23 (74%)** | Cursor Agent CLI v2026.01.28 |
 | Claude Code | _not yet_ | - | - | - |
 | GitHub Copilot | _not yet_ | - | - | - |
 
@@ -49,9 +49,9 @@
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
 | 001_session_start | Agent greets with context at session start | LLM | ✅ |
-| 006_wip_recovery | Agent warns about interrupted work | LLM | ✅ |
+| 006_wip_recovery | Agent warns about interrupted work | LLM | ❌ Cursor CLI |
 | 015_session_end_summary | Agent provides session end handoff | LLM | ✅ |
-| 014_multi_agent_awareness | Agent checks AGENTS_ACTIVE.md | LLM | ✅ |
+| 014_multi_agent_awareness | Agent checks AGENTS_ACTIVE.md | LLM | ❌ Cursor CLI |
 | 030_reads_status_on_start | Agent reads STATUS.md, references current work | LLM | ✅ |
 | 031_references_journal_history | Agent reads JOURNAL.md, reports history | LLM | ✅ |
 | 033_mentions_agents_active | Agent mentions AGENTS_ACTIVE coordination | LLM | ✅ |
@@ -63,7 +63,7 @@
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
 | 001_session_start | Agent proactively greets with context | LLM | ✅ |
-| 016_pr_tracking_human_needed | Agent escalates to HUMAN_NEEDED.md | LLM | ✅ |
+| 016_pr_tracking_human_needed | Agent escalates to HUMAN_NEEDED.md | LLM | ❌ Cursor CLI |
 | _Acceptance_ | blocker.sh, scope_check.sh tests | Structural | ✅ (6 tests) |
 
 ### Principle 3: Context Efficiency (NON-NEGOTIABLE)
@@ -74,7 +74,7 @@
 | 018_uses_status_script | Agent uses status.sh | LLM | ✅ |
 | 019_uses_blocker_script | Agent uses blocker.sh | LLM | ✅ |
 | 020_uses_feature_script | Agent uses feature.sh | LLM | ✅ |
-| 021_no_full_file_read | Agent doesn't read entire file for append | LLM | ✅ |
+| 021_no_full_file_read | Agent doesn't read entire file for append | LLM | ❌ Cursor CLI |
 | 024_mentions_script_for_journal | Agent mentions journal.sh/ag journal | LLM | ✅ |
 | 025_targeted_context_reading | Agent uses CONTEXT_PACK, not source scanning | LLM | ✅ |
 | 026_avoids_unnecessary_reads | Agent reads only relevant file | LLM | ✅ |
@@ -84,7 +84,7 @@
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
-| 002_wip_blocks_commit | Agent blocks/warns about WIP | LLM | ✅ |
+| 002_wip_blocks_commit | Agent blocks/warns about WIP | LLM | ❌ Cursor CLI |
 | 009_mentions_checklist | Agent references pre-commit checklist | LLM | ✅ |
 | 020_uses_feature_script | Agent uses feature.sh for status | LLM | ✅ |
 | _Acceptance_ | pre-commit-check.sh, doctor.sh, feature-complete.sh tests | Structural | ✅ (18 tests) |
@@ -202,11 +202,11 @@
 
 ## Multi-Environment Status
 
-| Feature | Cursor | Claude Code | Copilot | Codex |
-|---------|--------|-------------|---------|-------|
+| Feature | Cursor CLI | Claude Code | Copilot | Codex |
+|---------|------------|-------------|---------|-------|
 | Tool config file | ✅ .cursorrules | ✅ CLAUDE.md | ✅ copilot-instructions.md | ✅ codex-instructions.md |
-| LLM tests run | ✅ v0.19.0 | ❌ Not yet | ❌ Not yet | ❌ Not yet |
-| Harness support | ✅ | ✅ | ✅ (manual) | ✅ |
+| LLM tests run | ✅ v0.22.0 (17/23) | ❌ Not yet | ❌ Not yet | ❌ Not yet |
+| Harness support | ✅ `--print --force` | ✅ `--print` | ✅ (manual) | ✅ `exec` |
 | Interactive runner | ✅ | — | ✅ (manual) | — |
 
 ---
@@ -245,12 +245,19 @@ bash tests/llm/harness.sh tests/llm/tests/001_session_start.sh
 
 ## Test History
 
-### v0.21.0 (2026-02-06) — Current
+### v0.22.0 (2026-02-06) — Current
+
+- **Environment**: Cursor CLI (`agent` v2026.01.28) on macOS (darwin 24.5.0)
+- **Tester**: Cursor Agent CLI (automated, `--print --force`)
+- **Result**: 209/215 (171 acceptance + 21 unit + 17/23 LLM behavioral)
+- **Notes**: First real automated LLM test run via Cursor CLI. Fixed harness: portable `timeout` for macOS, corrected `--headless` → `--print --force --workspace`. 6 LLM failures: 002 (WIP block), 006 (WIP recovery), 014 (multi-agent awareness), 016 (PR tracking), 021 (journal append), 022 (agent mode selection).
+
+### v0.21.0 (2026-02-06)
 
 - **Environment**: Cursor IDE on macOS (darwin 24.5.0)
-- **Tester**: Cursor Agent (claude-4.6-opus-high-thinking)
-- **Result**: 220/220 (171 acceptance + 21 unit + 28 LLM behavioral)
-- **Notes**: Added 6 artifact-maintenance tests (036-041) verifying agents proactively maintain durable artifacts. Tests cover session-end updates, stale detection, WIP tracking, feature-complete chain, blocker documentation, and journal gap detection.
+- **Tester**: Cursor Agent (claude-4.6-opus-high-thinking, simulated)
+- **Result**: 220/220 (171 acceptance + 21 unit + 28 LLM behavioral — simulated)
+- **Notes**: Added 6 artifact-maintenance tests (036-041). Results were simulated in-IDE, not via CLI automation.
 
 ### v0.19.0 (2026-02-05)
 
