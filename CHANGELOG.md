@@ -5,6 +5,24 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.0] - 2026-02-06
+
+### Changed
+- **Instruction file slimdown** - All templates reduced ~70% to fix LLM compliance failures (L-0002)
+  - Claude template: 277 → 79 lines
+  - Copilot template: 268 → 69 lines
+  - Codex template: 268 → 71 lines
+  - Modeled after cursorrules.txt (69 lines) which already achieved full compliance
+  - Root CLAUDE.md: 303 → 92 lines, copilot: 118 → 77 lines, CODEX.md: 134 → 76 lines
+
+### Fixed
+- **LLM test 002** (`wip_blocks_commit`) - Wrong mkdir path (`.agentic` → `.agentic-state`)
+- **LLM test 003** (`acceptance_first`) - Overly broad pattern `impl.*auth` matched natural language; tightened to code-only patterns
+
+### Added
+- **L-0002 lesson update** - Documented subagent context multiplier effect
+- **FRAMEWORK_DEVELOPMENT.md** - Added 100-line budget guidance for CLAUDE.md edits
+
 ## [0.21.0] - 2026-02-06
 
 ### Added
