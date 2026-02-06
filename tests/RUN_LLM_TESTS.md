@@ -41,7 +41,11 @@ Use the **Test Checklist** below. For each test:
 
 ### Step 4: Record Results
 
-Update `tests/VERIFICATION_REPORT.md` with:
+The harness **automatically saves** per-run results to `tests/llm/results/YYYY-MM-DD_tool.md`.
+
+Commit them: `git add tests/llm/results/ && git commit -m "test: LLM results"`
+
+Also update `tests/VERIFICATION_REPORT.md` summary with:
 - Date and framework version
 - Environment tested
 - Pass/fail for each test
