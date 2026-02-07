@@ -21,10 +21,10 @@ Quick Commands: `ag start` | `ag implement F-XXXX` | `ag work "desc"` | `ag comm
 STOP! Trigger Words:
 | Trigger | Action |
 |---------|--------|
-| "build", "implement", "add", "create" | STOP -> Run `ag implement F-XXXX` |
+| "build", "implement", "add", "create" | STOP -> Run `ag plan F-XXXX` first, then `ag implement` |
 | "implement entire", "full system" | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
 | "fix", "bug", "issue" | STOP -> Write failing test FIRST |
-| "commit", "push" | STOP -> Run `ag commit` |
+| "commit", "push" | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
 | "done", "complete" | STOP -> Run `ag done F-XXXX` |
 
 DO NOT PROCEED without acceptance criteria: spec/acceptance/F-####.md must exist. Criteria before code. No exceptions.
@@ -32,13 +32,13 @@ DO NOT PROCEED without acceptance criteria: spec/acceptance/F-####.md must exist
 Small batch development: When user asks for something large ("entire", "full", "complete system"), STOP - TOO BIG for one task. Break into smaller pieces (3-5 files max each). Max 5-10 files per commit.
 
 Rules:
-- **PR by default**: Create feature branches and PRs (check `git_workflow` in STACK.md)
+- **PR by default**: Create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to HUMAN_NEEDED.md for review tracking.
 - Never auto-commit. Show changes to human first.
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later).
 - Keep changes small and scoped.
 - Log at natural checkpoints, not just session end.
-- Multi-agent: check `.agentic-state/AGENTS_ACTIVE.md`, avoid other agents' files.
+- Multi-agent: read `.agentic-state/AGENTS_ACTIVE.md` before starting work. If another agent is active on same feature, warn about conflict and suggest a different task or coordination.
 
 Agent Boundaries:
 | ALWAYS | ASK FIRST | NEVER |
@@ -47,20 +47,20 @@ Agent Boundaries:
 | Update specs with code | Change architecture | Push to main directly |
 | Follow existing patterns | Delete files | Modify secrets/.env |
 
-Agent Mode (check `agent_mode` in STACK.md):
+Agent Mode (MUST read `agent_mode` in STACK.md before any delegation):
 - premium: opus for planning/impl/review, sonnet for search
 - balanced (default): opus for planning, sonnet for impl/review, haiku for search
 - economy: sonnet for planning, haiku for everything else
 - Custom: check `models:` section. Docs: `.agentic/workflows/agent_mode.md`
 
-Token-efficient scripts (USE THESE, don't edit files directly):
+Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):
 - STATUS.md: `bash .agentic/tools/status.sh focus "Task"`
-- JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
+- JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"` (appends directly, never reads full file — saves tokens)
 - HUMAN_NEEDED.md: `bash .agentic/tools/blocker.sh add "Title" "type" "Details"`
 - FEATURES.md: `bash .agentic/tools/feature.sh F-#### status shipped`
 
 Session Protocols:
-- START: Run `ag start`. Read STATUS.md, HUMAN_NEEDED.md, check for WIP.md. Greet user proactively with current focus, next steps, blockers.
+- START: Run `ag start`. Read STATUS.md, HUMAN_NEEDED.md, check .agentic-state/WIP.md. If WIP.md exists: read its content, warn about the interrupted work (mention specific feature/task), and suggest resuming before starting anything new. Greet user proactively with current focus, next steps, blockers.
 - END: Run `.agentic/checklists/session_end.md`, update JOURNAL.md.
 - DONE: Run `.agentic/checklists/feature_complete.md` before claiming done.
 
