@@ -1824,10 +1824,16 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: L-0002 corrected, L-0003 created documenting architectural tensions, implement trigger updated across all tool instruction files.
 
+### Cross-Tool Subagent Context Research (2026-02-07)
+
+6. **Drove cross-tool research confirming context isolation is industry-wide**: Investigation across Claude Code, Cursor 2.4, GitHub Copilot, and OpenAI Codex confirmed that subagent context isolation is a universal pattern — instruction files serve only the orchestrating/principal agent. This validates the framework's existing context manifest architecture and removes the false "subagent context multiplier" concern.
+
+**Impact**: L-0003 updated with cross-tool evidence table, subagent definitions made self-contained (removed "Full documentation: see file X" footers), CLAUDE.md now tells orchestrator to use `context-for-role.sh` for subagent context assembly.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.22.0
+**Current Version**: v0.22.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 28 defined (22 previously passing + 6 new artifact-maintenance tests)

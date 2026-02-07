@@ -35,7 +35,4 @@
 
 → Pass to **git-agent** with: "Commit F-#### changes"
 
-## Reference
-
-Full documentation: `.agentic/agents/roles/documentation_agent.md`
 

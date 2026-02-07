@@ -39,7 +39,4 @@ For complex updates, edit the file directly.
 
 → Pass to **documentation-agent** with: "Update docs for F-####"
 
-## Reference
-
-Full documentation: `.agentic/agents/roles/spec_update_agent.md`
 

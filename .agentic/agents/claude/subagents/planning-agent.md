@@ -51,7 +51,4 @@ Create `spec/acceptance/F-####.md`:
 
 → Pass to **test-agent** with: "Write tests for F-#### covering all acceptance criteria"
 
-## Reference
-
-Full documentation: `.agentic/agents/roles/planning_agent.md`
 
