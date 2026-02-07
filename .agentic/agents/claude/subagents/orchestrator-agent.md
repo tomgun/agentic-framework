@@ -102,7 +102,4 @@ bash .agentic/hooks/pre-commit-check.sh
 ❌ Marking complete without running checklists
 ❌ Assuming previous stages were done correctly
 
-## Reference
-
-Full documentation: `.agentic/agents/roles/orchestrator-agent.md`
 

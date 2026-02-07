@@ -1,7 +1,7 @@
 # L-0003: Instruction file architecture — orchestrator vs subagents
 
 **Date**: 2026-02-06
-**Status**: Hypothesis (needs empirical validation)
+**Status**: Confirmed for Claude Code and Cursor; strongly suggested for Codex; unclear for Copilot
 **Related**: L-0002, ADR-001, F-0120
 
 ---
@@ -27,6 +27,24 @@ Official Claude Code documentation states:
 - CLAUDE.md can be optimized purely for the orchestrator without worrying about subagent bloat
 - Subagent efficiency depends on what the orchestrator passes in the Task prompt, not CLAUDE.md size
 - L-0002's 100-line budget recommendation still holds — but for orchestrator attention quality, not subagent cost
+
+## Cross-tool confirmation (2026-02-07 research)
+
+Context isolation is an industry-wide pattern, not Claude-specific:
+
+| Tool | Instruction File | Subagent Inherits It? | Evidence |
+|------|-----------------|----------------------|----------|
+| Claude Code | CLAUDE.md | **NO** | Official docs: "Subagents receive only this system prompt" |
+| Cursor 2.4+ | .cursorrules | **NO** | Docs: subagents "use their own context", tools inherited but not instructions |
+| GitHub Copilot | copilot-instructions.md | **Unclear** | "Attached to every session" but subagents are "context-isolated" — contradictory |
+| OpenAI Codex | AGENTS.md | **N/A** | Subagent support experimental (issue #2604); instructions loaded once per main session |
+
+**Sources**:
+- Cursor: https://cursor.com/docs/context/subagents, https://cursor.com/changelog/2-4
+- Copilot: https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent
+- Codex: https://developers.openai.com/codex/guides/agents-md/, https://github.com/openai/codex/issues/2604
+
+**Implication**: Instruction files are read ONLY by the orchestrating/principal agent across all major tools. Subagent quality depends on what the orchestrator passes in the task/subagent prompt, not instruction file content.
 
 ## Official size guidance vs framework observation
 

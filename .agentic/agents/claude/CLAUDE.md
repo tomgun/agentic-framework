@@ -74,6 +74,6 @@ Task Tool Delegation (spawn subagents to save tokens):
 | Implementation | `general-purpose` | opus | sonnet | haiku |
 | Testing/review | `general-purpose` | opus | sonnet | haiku |
 
-Pass to subagent ONLY: Feature ID, acceptance criteria, 3-5 relevant files, STACK.md info.
+Subagent context: Run `bash .agentic/tools/context-for-role.sh <role> <feature-id>` to assemble minimal context per subagent. Subagents do NOT inherit CLAUDE.md.
 
 Standards: programming (`.agentic/quality/programming_standards.md`), testing (`.agentic/quality/test_strategy.md`), dev mode in STACK.md (tdd recommended, `.agentic/workflows/tdd_mode.md`).

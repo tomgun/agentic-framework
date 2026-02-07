@@ -57,7 +57,4 @@ git commit -m "feat(auth): add password reset (F-0042)
 git push origin feature/F-0042
 ```
 
-## Reference
-
-Full documentation: `.agentic/agents/roles/git_agent.md`
 
