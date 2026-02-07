@@ -71,7 +71,7 @@ Ask yourself:
 | 7 | `CHANGELOG.md` | Document the change | Living docs |
 | 8 | `CONTRIBUTIONS.md` | Add version section | Attribution |
 | 9 | `upgrade.sh` FEATURE_REGISTRY | If user-visible during upgrade | Developer UX |
-| 10 | `.agentic/agents/claude/CLAUDE.md` | Sync if guidelines/principles changed | Bootstrap must be self-contained (see ADR-001) |
+| 10 | `.agentic/agents/claude/CLAUDE.md` | Sync if guidelines/principles changed | Bootstrap must be self-contained (see ADR-001). Design: `docs/research/INSTRUCTION_ARCHITECTURE.md` — instruction files serve the orchestrator only; subagents get context via `context-for-role.sh`. |
 | 11 | `bash .agentic/tools/manifest.sh F-####` | Generate change manifest | Audit trail of what changed |
 
 **Feature is "accepted" when**: Tests pass in `validate_framework.sh` AND developer has reviewed tests and results.

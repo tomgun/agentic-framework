@@ -1832,6 +1832,31 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## Instruction Architecture Design Document (2026-02-07)
+
+### Definitive Design Basis
+
+**User direction**: Two independent research efforts (ChatGPT 5.2 and Claude Opus 4.6) converged on a clear architecture, but findings were scattered across research docs and lessons. Directed creation of a single authoritative design document to end the back-and-forth.
+
+**Result - `docs/research/INSTRUCTION_ARCHITECTURE.md`**:
+- Unified design document synthesizing both research efforts
+- Three-layer architecture mapped to framework: Constitution (instruction files) → Playbooks (ag commands + docs) → Project State (STACK.md + status.json)
+- 4 specific gaps identified with actionable fixes
+- 10 testable assumptions tracked with validation status
+- "Do not change" list protecting 11+ working mechanisms
+- Evidence quality distinguished: verified tool docs vs architectural reasoning
+- Distributed enforcement model documented as conscious design divergence from centralized orchestrator recommendation
+
+**Key corrections made**:
+- FRAMEWORK_DEVELOPMENT.md line 94: Fixed false claim "CLAUDE.md is auto-loaded for ALL agents including subagents" → tool-specific correction noting subagents do NOT inherit it
+- Added research references to FRAMEWORK_QUICK_START.md and PRINCIPLES.md
+- L-0003 updated with resolution pointing to design document
+- L-0004 created preserving the 3-round plan-review process
+
+**Impact**: Single authoritative reference for instruction architecture decisions. Future changes reference this document, not ad-hoc lessons or research.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.22.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

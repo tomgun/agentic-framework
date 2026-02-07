@@ -5,6 +5,21 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.1] - 2026-02-07
+
+### Added
+- **Instruction Architecture Design Document** (`docs/research/INSTRUCTION_ARCHITECTURE.md`) — Single authoritative design basis synthesizing ChatGPT 5.2 and Claude Opus 4.6 research into unified three-layer architecture (Constitution → Playbooks → State), with 4 gaps, 10 testable assumptions, and maintenance model
+- **L-0004 lesson** — Plan-review process preserved (3 rounds, 15 issues narrowed to acceptance)
+- **ChatGPT 5.2 research** committed (`docs/research/context_and_subagents_research_2026_02_06.md`)
+
+### Fixed
+- **FRAMEWORK_DEVELOPMENT.md line 94** — False claim "CLAUDE.md is auto-loaded for ALL agents including subagents" corrected to tool-specific facts (subagents do NOT inherit it)
+
+### Changed
+- **FRAMEWORK_QUICK_START.md** — Step 10 now references instruction architecture design
+- **PRINCIPLES.md** — Principle #4 (Deterministic Enforcement) now cites cross-tool research basis
+- **L-0003** — Added resolution section pointing to design document
+
 ## [0.22.0] - 2026-02-06
 
 ### Changed

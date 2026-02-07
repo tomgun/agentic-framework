@@ -91,7 +91,9 @@ Example projects demonstrate best practices and verify workflows actually work.
 1. Add to `.agentic/agents/claude/CLAUDE.md` FIRST
 2. Test that users would benefit from it
 3. Only then update root `/CLAUDE.md` if framework-dev needs something extra
-4. CLAUDE.md is auto-loaded for ALL agents including subagents - every line added is multiplied across every Task tool invocation. Keep templates under 100 lines. Run LLM behavioral tests (`bash tests/llm/harness.sh --critical`) after changes.
+4. CLAUDE.md is loaded for the orchestrating agent only. Subagents do NOT inherit it — confirmed for Claude Code (Task tool) and Cursor; Copilot behavior unverified; Codex subagents experimental. Keep templates under 100 lines for orchestrator attention quality (L-0002). Run LLM behavioral tests (`bash tests/llm/harness.sh --critical`) after changes.
+
+**Design basis**: `docs/research/INSTRUCTION_ARCHITECTURE.md` — the definitive instruction architecture design. Source research: `docs/research/context_and_subagents_research_2026_02_06.md` (ChatGPT 5.2), `docs/research/2026-02-07-subagent-context-inheritance.md` (Claude Opus 4.6).
 
 **Anti-pattern**: ❌ Adding `ag` CLI commands to root CLAUDE.md but not the template users get.
 

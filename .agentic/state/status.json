@@ -1,7 +1,7 @@
 {
-  "focus": "v0.13.0 released and tagged",
+  "focus": "v0.22.0 released: Instruction file slimdown (L-0002 fix)",
   "progress": "v0.12.1 released and tagged",
   "next": "F-0120: Move JOURNAL.md + manifests to .agentic-journal/",
   "blocker": "None",
-  "updated": "2026-02-04T21:43:02Z"
+  "updated": "2026-02-06T10:35:38Z"
 }

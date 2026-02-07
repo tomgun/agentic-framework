@@ -92,6 +92,8 @@ Every decision — feature design, documentation, tooling, agent instructions �
 3. `feature.sh` — enforces valid status transitions (planned → in_progress → shipped)
 4. Token-efficient tools — surgical edits, no full-file rewrites
 
+**Design basis**: Two independent research efforts confirmed this principle across Claude Code, Cursor, Copilot, and Codex. See `docs/research/INSTRUCTION_ARCHITECTURE.md`.
+
 **Anti-pattern**: ❌ "Agents should..." without enforcement (hope-based development). ❌ Commit first, validate later. ❌ Blocking on soft signals that require human judgment.
 
 ---

@@ -90,9 +90,15 @@ The `ag` commands (`ag plan`, `ag implement`, `ag commit`, `ag done`) print deta
 
 ---
 
+## Resolution
+
+See `docs/research/INSTRUCTION_ARCHITECTURE.md` for the definitive design that synthesizes this lesson's findings with the cross-tool research. This lesson (L-0003) is retained as historical context for how the architecture was discovered.
+
 ## Links
 
+- **Design document**: `docs/research/INSTRUCTION_ARCHITECTURE.md` (authoritative)
 - L-0002: Instruction bloat breaks LLM compliance (attention budget finding)
+- L-0004: Plan-review process for the design document
 - ADR-001: CLAUDE.md Must Be Self-Contained
 - F-0120: Plan-review loop (the workflow that prompted this analysis)
 - Claude Code docs: Task tool subagent context (source of inheritance finding)
