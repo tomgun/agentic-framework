@@ -39,9 +39,20 @@ This is a recurring pattern: instructions accumulate organically, each addition 
 
 LLM instruction files have an effective attention budget. Doubling the length doesn't halve compliance - it can destroy it entirely, because the model satisfices across competing priorities rather than following any single instruction reliably. Shorter instructions with clear hierarchy beat comprehensive instructions every time.
 
-## Subagent context multiplier
+## ~~Subagent context multiplier~~ [CORRECTED — see addendum]
 
-CLAUDE.md is auto-loaded for EVERY subagent spawned via Task tool, not just the top-level agent. A 277-line CLAUDE.md means every implementation agent, test agent, and explore agent burns context on 200+ lines of irrelevant instructions (delegation tables, session start protocol). At balanced mode with haiku subagents, this context waste is proportionally even more expensive since haiku has a smaller effective context budget. The slimdown to ~80 lines benefits both top-level agents (critical instructions not buried) and subagents (less irrelevant context waste).
+~~CLAUDE.md is auto-loaded for EVERY subagent spawned via Task tool, not just the top-level agent. A 277-line CLAUDE.md means every implementation agent, test agent, and explore agent burns context on 200+ lines of irrelevant instructions (delegation tables, session start protocol). At balanced mode with haiku subagents, this context waste is proportionally even more expensive since haiku has a smaller effective context budget. The slimdown to ~80 lines benefits both top-level agents (critical instructions not buried) and subagents (less irrelevant context waste).~~
+
+### CORRECTION (2026-02-06)
+
+**The above section is WRONG.** Official Claude Code documentation explicitly states:
+> "Subagents receive only this system prompt (plus basic environment details like working directory), not the full Claude Code system prompt."
+
+Subagents spawned via the Task tool do NOT inherit CLAUDE.md. They receive only the task prompt passed by the orchestrator. The "subagent context multiplier" justification was based on an incorrect assumption about how Claude Code works internally.
+
+**What remains valid**: The core lesson of L-0002 — that instruction bloat degrades compliance — is correct and empirically verified. The ~100-line attention budget recommendation stands on its own merits (orchestrator attention quality). It just doesn't have the additional subagent-cost justification originally claimed.
+
+See also: L-0003 for updated architectural analysis.
 
 ---
 

@@ -1806,8 +1806,28 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## v0.22.0 Contributions (2026-02-06)
+
+### Instruction File Architecture Analysis
+
+**Key insights that shaped L-0003 and corrected L-0002**:
+
+1. **Orchestrator vs subagent instruction needs**: Identified that the user-facing orchestrator and subagents have fundamentally different instruction needs — the orchestrator needs workflow knowledge (triggers, gates, protocols), subagents need only role-specific focus. Drove investigation that revealed subagents don't inherit CLAUDE.md at all (per official docs), confirming the distinction is already the reality.
+
+2. **ag commands as context delivery hypothesis**: Proposed that shell command output (`ag plan`, `ag implement`) could serve as just-in-time context delivery — keeping CLAUDE.md minimal while delivering rich task-specific instructions when triggered. Documented as untested hypothesis requiring validation.
+
+3. **CLAUDE.md as router concept**: Identified that CLAUDE.md's optimal role may be dispatch/routing (trigger words → actions) rather than comprehensive manual. The trigger table format already works this way — tests 003/010 confirm agents follow it.
+
+4. **Subagent context questioning**: Drove investigation that surfaced contradiction between L-0002's "subagent context multiplier" claim and official Claude Code documentation. Result: L-0002 section corrected with addendum.
+
+5. **Plan-review loop adoption gap**: Identified that the plan-review loop (F-0120) exists but is never triggered because the implement trigger in CLAUDE.md goes straight to code, skipping planning. Led to updating all instruction files to mention `ag plan` before `ag implement`.
+
+**Impact**: L-0002 corrected, L-0003 created documenting architectural tensions, implement trigger updated across all tool instruction files.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.21.0
+**Current Version**: v0.22.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 28 defined (22 previously passing + 6 new artifact-maintenance tests)
