@@ -47,7 +47,7 @@ send_prompt "Create a plan for implementing F-0042 (user authentication)"
 FAILURES=0
 
 # Agent should mention plan-review or planning workflow
-check_output_contains "plan\|review\|.agentic-state/plans\|plan_review\|Plan.*Creator\|Plan.*Reviewer" \
+check_output_contains "plan\|review\|.agentic-journal/plans\|.agentic-state/plans\|plan_review\|Plan.*Creator\|Plan.*Reviewer" \
     "Agent mentions planning/plan-review workflow" || ((FAILURES++))
 
 # Agent should reference or read the acceptance criteria

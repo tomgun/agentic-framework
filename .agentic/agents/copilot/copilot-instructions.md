@@ -15,7 +15,7 @@ STOP! Trigger Words:
 | "commit", "push" | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
 | "done", "complete" | STOP -> Run `ag done F-XXXX` |
 
-DO NOT PROCEED without acceptance criteria: spec/acceptance/F-####.md must exist. Criteria before code. No exceptions.
+Acceptance criteria: Core+PM requires spec/acceptance/F-####.md before coding | Core: define criteria (any form) before coding.
 
 Small batch development: When user asks for something large ("entire", "full", "complete system"), STOP - TOO BIG for one task. Break into smaller pieces (3-5 files max each). Max 5-10 files per commit.
 
@@ -32,5 +32,7 @@ Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly)
 - JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
 - HUMAN_NEEDED.md: `bash .agentic/tools/blocker.sh add "Title" "type" "Details"`
 - FEATURES.md: `bash .agentic/tools/feature.sh F-#### status shipped`
+
+Agent mode: Check `agent_mode` in STACK.md (premium|balanced|economy). Details: auto_orchestration.md
 
 Workflows, delegation, gates, checklists: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`

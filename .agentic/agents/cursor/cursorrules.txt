@@ -1,71 +1,38 @@
 You are working in a repo that uses the agentic development framework (folder: .agentic/).
 
-Always consult:
-- AGENTS.md (if present)
-- CONTEXT_PACK.md
-- STATUS.md
-- /spec/* and spec/adr/* as the source of truth
+Always consult: AGENTS.md (if present), `.agentic/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, STATUS.md, spec/* and spec/adr/* as the source of truth.
 
-ENFORCED GATES (Profile-Aware):
-| Gate | Core+PM (formal) | Core (discovery) |
-| Acceptance criteria | BLOCKS - ag implement requires spec/acceptance/F-XXXX.md | N/A - use ag work |
-| WIP before commit | BLOCKS - must complete WIP first | WARNING only |
-| Test execution | BLOCKS - tests must pass | BLOCKS - tests for changed files |
-| Complexity limits | BLOCKS - max files/lines/length | BLOCKS - same limits apply |
-| Pre-commit checks | BLOCKS - full validation | Light check, no block |
-| Feature status | BLOCKS - shipped needs acceptance | N/A |
-
-Escape hatches (feature branches only): SKIP_TESTS=1 or SKIP_COMPLEXITY=1
-
-Quick Commands: ag start | ag implement F-XXXX | ag work "desc" | ag commit | ag done
+Quick Commands: `ag start` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done`
 
 STOP! Trigger Words:
 | Trigger | Action |
-| "build", "implement", "add", "create" | STOP -> Run ag plan F-XXXX first, then ag implement |
+|---------|--------|
+| "build", "implement", "add", "create" | STOP -> Run `ag plan F-XXXX` first, then `ag implement` |
 | "implement entire", "full system" | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
 | "fix", "bug", "issue" | STOP -> Write failing test FIRST |
-| "commit", "push" | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run ag commit |
-| "done", "complete" | STOP -> Run ag done F-XXXX |
+| "commit", "push" | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
+| "done", "complete" | STOP -> Run `ag done F-XXXX` |
 
-DO NOT PROCEED without acceptance criteria: spec/acceptance/F-####.md must exist.
+Acceptance criteria: Core+PM requires spec/acceptance/F-####.md before coding | Core: define criteria (any form) before coding.
 
-SMALL BATCH DEVELOPMENT:
-When user asks for something large ("entire", "full", "complete system"):
-STOP - TOO BIG for one task.
-Break into smaller pieces (3-5 files max each).
-Let user pick which piece to start with.
+Small batch development: When user asks for something large ("entire", "full", "complete system"), STOP - TOO BIG for one task. Break into smaller pieces (3-5 files max each). Max 5-10 files per commit.
 
 Rules:
-- Add/update tests for new/changed logic.
-- Update STATUS.md after meaningful progress.
-- Keep changes small and scoped (max 5-10 files per commit).
-- Criteria before code (check spec/acceptance/F-####.md exists)
+- **PR by default**: Create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to HUMAN_NEEDED.md for review tracking.
 - Never auto-commit. Show changes to human first.
-- Multi-agent: read .agentic-state/AGENTS_ACTIVE.md before starting work. If another agent is active on same feature, warn about conflict and suggest a different task or coordination.
-- PR workflow: create feature branches and PRs (check git_workflow in STACK.md). After creating a PR, add entry to HUMAN_NEEDED.md for review tracking.
+- Add/update tests for new/changed logic.
+- Code + docs = done (update docs with code, not later).
+- Keep changes small and scoped.
+- Multi-agent: read `.agentic-state/AGENTS_ACTIVE.md` before starting work.
 
-Agent Boundaries:
-| ALWAYS | ASK FIRST | NEVER |
-| Run tests before "done" | Add dependencies | Commit without approval |
-| Update specs with code | Change architecture | Push to main directly |
-| Follow existing patterns | Delete files | Modify secrets/.env |
-
-Agent Mode (MUST read agent_mode in STACK.md before any delegation):
-- premium: opus for planning/impl/review, sonnet for search
-- balanced (default): opus for planning, sonnet for impl/review, haiku for search
-- economy: sonnet for planning, haiku for everything else
-- Custom: check models: section for overrides
-- Full docs: .agentic/workflows/agent_mode.md
+Agent mode: Check `agent_mode` in STACK.md (premium|balanced|economy). Details: auto_orchestration.md
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):
-- JOURNAL.md: bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers" (appends directly, never reads full file — saves tokens)
-- STATUS.md: bash .agentic/tools/status.sh focus "Task"
-- HUMAN_NEEDED.md: bash .agentic/tools/blocker.sh add "Title" "type" "Details"
-- FEATURES.md: bash .agentic/tools/feature.sh F-#### status shipped
+- STATUS.md: `bash .agentic/tools/status.sh focus "Task"`
+- JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
+- HUMAN_NEEDED.md: `bash .agentic/tools/blocker.sh add "Title" "type" "Details"`
+- FEATURES.md: `bash .agentic/tools/feature.sh F-#### status shipped`
 
-Session Protocols:
-- START: Read STATUS.md, HUMAN_NEEDED.md, check .agentic-state/WIP.md. If WIP.md exists: read its content, warn about the interrupted work (mention specific feature/task), and suggest resuming before starting anything new.
-- END: Run session_end.md checklist, update JOURNAL.md
-- DONE: Run feature_complete.md checklist before claiming done
+Subagent context: Run `bash .agentic/tools/context-for-role.sh <role> <feature-id>` to assemble minimal context per subagent. Subagents do NOT inherit instruction files.
 
-Checklists: .agentic/checklists/ (session_start, session_end, feature_complete, before_commit)
+Workflows, delegation, gates, checklists: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`
