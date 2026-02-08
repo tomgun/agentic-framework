@@ -200,10 +200,17 @@ infer_status() {
     # --- Source 3: Last JOURNAL.md entry ---
     echo ""
     echo "📓 Last JOURNAL.md entry:"
-    if [[ -f "${PROJECT_ROOT}/JOURNAL.md" ]]; then
+    local journal_file=""
+    if [[ -f "${PROJECT_ROOT}/.agentic-journal/JOURNAL.md" ]]; then
+        journal_file="${PROJECT_ROOT}/.agentic-journal/JOURNAL.md"
+    elif [[ -f "${PROJECT_ROOT}/JOURNAL.md" ]]; then
+        journal_file="${PROJECT_ROOT}/JOURNAL.md"
+    fi
+
+    if [[ -n "$journal_file" ]]; then
         # Extract the last session entry (everything after the last "### Session:")
         local last_entry
-        last_entry=$(awk '/^### Session:/{buf=""; capturing=1} capturing{buf=buf"\n"$0} END{print buf}' "${PROJECT_ROOT}/JOURNAL.md" 2>/dev/null || echo "")
+        last_entry=$(awk '/^### Session:/{buf=""; capturing=1} capturing{buf=buf"\n"$0} END{print buf}' "$journal_file" 2>/dev/null || echo "")
 
         if [[ -n "$last_entry" ]]; then
             echo "$last_entry" | head -20 | sed 's/^/   /'

@@ -114,6 +114,7 @@ echo "3. JOURNAL.md - Last 2-3 entries (~500-1000 tokens)"
 echo "   - Recent progress"
 echo "   - What worked/didn't work"
 echo "   - Avoid repeating mistakes"
+echo "   (Location: .agentic-journal/JOURNAL.md or JOURNAL.md)"
 echo ""
 
 # Check for blockers
@@ -173,8 +174,15 @@ else
 fi
 
 # Check for stale work
-if [[ -f "JOURNAL.md" ]]; then
-  LAST_WORK=$(tail -20 JOURNAL.md | grep "in progress\|working on" -i || echo "")
+JOURNAL_PATH=""
+if [[ -f ".agentic-journal/JOURNAL.md" ]]; then
+  JOURNAL_PATH=".agentic-journal/JOURNAL.md"
+elif [[ -f "JOURNAL.md" ]]; then
+  JOURNAL_PATH="JOURNAL.md"
+fi
+
+if [[ -n "$JOURNAL_PATH" ]]; then
+  LAST_WORK=$(tail -20 "$JOURNAL_PATH" | grep "in progress\|working on" -i || echo "")
   if [[ -n "$LAST_WORK" ]]; then
     echo ""
     echo "⚠️  Possible stale work detected in JOURNAL.md"

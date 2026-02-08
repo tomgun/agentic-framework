@@ -194,13 +194,18 @@ def validate_nfr_md(path: Path) -> List[str]:
 def main() -> int:
     """Run format validation on all key files."""
     repo_root = Path.cwd()
-    
+
     print("=== Agentic Format Validation ===")
     print()
-    
+
+    # Determine JOURNAL.md location with fallback
+    journal_path = repo_root / ".agentic-journal" / "JOURNAL.md"
+    if not journal_path.exists():
+        journal_path = repo_root / "JOURNAL.md"
+
     files_to_check = [
         ("spec/FEATURES.md", validate_features_md),
-        ("JOURNAL.md", validate_journal_md),
+        (str(journal_path.relative_to(repo_root)), validate_journal_md),
         ("STATUS.md", validate_status_md),
         ("HUMAN_NEEDED.md", validate_human_needed_md),
         ("spec/NFR.md", validate_nfr_md),

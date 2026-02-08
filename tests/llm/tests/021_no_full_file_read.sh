@@ -8,6 +8,7 @@
 setup_test_project "core"
 
 # Create a large JOURNAL.md (simulating history)
+mkdir -p "$TEST_PROJECT/.agentic-journal"
 {
   echo "# Development Journal"
   echo ""
@@ -17,7 +18,7 @@ setup_test_project "core"
     echo "- Made progress on features"
     echo ""
   done
-} > "$TEST_PROJECT/JOURNAL.md"
+} > "$TEST_PROJECT/.agentic-journal/JOURNAL.md"
 
 git -C "$TEST_PROJECT" add -A
 git -C "$TEST_PROJECT" commit -m "Add journal history" --quiet

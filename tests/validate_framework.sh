@@ -994,15 +994,15 @@ fi
 echo ""
 echo "--- F-0121: Tool-Specific Instructions Parity ---"
 
-# Required gates that all templates must have
-REQUIRED_GATES=("Acceptance criteria" "WIP" "Test execution" "Complexity limits" "Pre-commit" "Feature status")
+# Constitutional content templates must have (trigger table, token scripts, small batch)
+# Gates/escape hatches moved to auto_orchestration.md (playbook layer) per INSTRUCTION_ARCHITECTURE.md
 
 # Templates to check
 TEMPLATES=(
   ".agentic/agents/claude/CLAUDE.md"
   ".agentic/agents/codex/codex-instructions.md"
   ".agentic/agents/copilot/copilot-instructions.md"
-  ".agentic/agents/cursor/cursorrules.txt"
+  ".agentic/agents/cursor/agentic-framework.mdc"
 )
 
 for template in "${TEMPLATES[@]}"; do
@@ -1014,34 +1014,54 @@ for template in "${TEMPLATES[@]}"; do
     continue
   fi
 
-  # Check for all 6 gates
-  gate_count=0
-  for gate in "${REQUIRED_GATES[@]}"; do
-    if grep -qi "$gate" "$template_path" 2>/dev/null; then
-      ((gate_count++))
+  # Check for trigger words (constitutional — must be in template)
+  if grep -qi "trigger\|STOP.*Run\|TOO BIG\|implement entire" "$template_path" 2>/dev/null; then
+    pass "${template_name}: has trigger words"
+  else
+    # Cursor .mdc delegates to guidelines instead of inlining triggers
+    if [[ "$template_name" == "agentic-framework.mdc" ]]; then
+      warn "${template_name}: no inline triggers (delegates to guidelines)"
+    else
+      fail "${template_name}: missing trigger words"
     fi
-  done
-
-  if [[ $gate_count -eq 6 ]]; then
-    pass "${template_name}: has all 6 gates"
-  else
-    fail "${template_name}: only ${gate_count}/6 gates found"
-  fi
-
-  # Check for escape hatches
-  if grep -q "SKIP_TESTS\|SKIP_COMPLEXITY" "$template_path" 2>/dev/null; then
-    pass "${template_name}: has escape hatches"
-  else
-    fail "${template_name}: missing escape hatches"
   fi
 
   # Check for small batch development
-  if grep -qi "small batch\|TOO BIG\|5-10 files" "$template_path" 2>/dev/null; then
+  if grep -qi "small batch\|TOO BIG\|5-10 files\|small.*scoped\|incremental" "$template_path" 2>/dev/null; then
     pass "${template_name}: has small batch rules"
   else
     fail "${template_name}: missing small batch rules"
   fi
+
+  # Check for playbook pointer (references ag commands or auto_orchestration.md)
+  if grep -qi "auto_orchestration\|ag.*commands\|ag start\|ag implement" "$template_path" 2>/dev/null; then
+    pass "${template_name}: has playbook pointer"
+  else
+    fail "${template_name}: missing playbook pointer"
+  fi
 done
+
+# Check gates/escape hatches exist in auto_orchestration.md (playbook layer)
+AUTO_ORCH="${FRAMEWORK_ROOT}/.agentic/agents/shared/auto_orchestration.md"
+if [[ -f "$AUTO_ORCH" ]]; then
+  REQUIRED_GATES=("Acceptance criteria" "WIP" "Test execution" "Complexity limits" "Pre-commit" "Feature status")
+  gate_count=0
+  for gate in "${REQUIRED_GATES[@]}"; do
+    if grep -qi "$gate" "$AUTO_ORCH" 2>/dev/null; then
+      ((gate_count++))
+    fi
+  done
+  if [[ $gate_count -eq 6 ]]; then
+    pass "auto_orchestration.md: has all 6 gates"
+  else
+    fail "auto_orchestration.md: only ${gate_count}/6 gates found"
+  fi
+  if grep -q "SKIP_TESTS\|SKIP_COMPLEXITY" "$AUTO_ORCH" 2>/dev/null; then
+    pass "auto_orchestration.md: has escape hatches"
+  else
+    fail "auto_orchestration.md: missing escape hatches"
+  fi
+fi
 
 # Check /CODEX.md extends template (not a stub)
 if grep -q "Full template.*codex-instructions" "${FRAMEWORK_ROOT}/CODEX.md" 2>/dev/null; then
@@ -1274,10 +1294,10 @@ bash .agentic/tools/wip.sh done >/dev/null 2>&1 || true
 
 # Test journal.sh
 if bash .agentic/tools/journal.sh "Test Entry" "Did testing" "More tests" "None" >/dev/null 2>&1; then
-  if grep -q "Test Entry" JOURNAL.md 2>/dev/null; then
-    pass "journal.sh appends to JOURNAL.md"
+  if grep -q "Test Entry" .agentic-journal/JOURNAL.md 2>/dev/null; then
+    pass "journal.sh appends to .agentic-journal/JOURNAL.md"
   else
-    fail "journal.sh did not append to JOURNAL.md"
+    fail "journal.sh did not append to .agentic-journal/JOURNAL.md"
   fi
 else
   fail "journal.sh failed"

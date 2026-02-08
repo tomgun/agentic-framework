@@ -6,18 +6,6 @@ Always consult: AGENTS.md (if present), `.agentic/agents/shared/agent_operating_
 
 Note: Codex runs commands in a sandbox. Append `|| true` to commands that may fail to prevent non-zero exit codes from halting execution.
 
-ENFORCED GATES (Profile-Aware):
-| Gate | Core+PM (formal) | Core (discovery) |
-|------|------------------|------------------|
-| Acceptance criteria | BLOCKS - `ag implement` requires spec/acceptance/F-XXXX.md | N/A - use `ag work` |
-| WIP before commit | BLOCKS - must complete WIP first | WARNING only |
-| Test execution | BLOCKS - tests must pass | BLOCKS - tests for changed files |
-| Complexity limits | BLOCKS - max files/lines/length | BLOCKS - same limits apply |
-| Pre-commit checks | BLOCKS - full validation | Light check, no block |
-| Feature status | BLOCKS - shipped needs acceptance | N/A |
-
-Escape hatches (feature branches only): SKIP_TESTS=1 or SKIP_COMPLEXITY=1
-
 Quick Commands: `ag start` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done`
 
 STOP! Trigger Words:
@@ -39,33 +27,12 @@ Rules:
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later).
 - Keep changes small and scoped.
-- Log at natural checkpoints, not just session end.
-- Multi-agent: read `.agentic-state/AGENTS_ACTIVE.md` before starting work. If another agent is active on same feature, warn about conflict and suggest a different task or coordination.
-
-Agent Boundaries:
-| ALWAYS | ASK FIRST | NEVER |
-|--------|-----------|-------|
-| Run tests before "done" | Add dependencies | Commit without approval |
-| Update specs with code | Change architecture | Push to main directly |
-| Follow existing patterns | Delete files | Modify secrets/.env |
-
-Agent Mode (MUST read `agent_mode` in STACK.md before any delegation):
-- premium: best for planning/impl/review, mid-tier for search
-- balanced (default): best for planning, mid-tier for impl/review, cheap for search
-- economy: mid-tier for planning, cheap for everything else
-- Custom: check `models:` section. Docs: `.agentic/workflows/agent_mode.md`
+- Multi-agent: read `.agentic-state/AGENTS_ACTIVE.md` before starting work.
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):
 - STATUS.md: `bash .agentic/tools/status.sh focus "Task"`
-- JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"` (appends directly, never reads full file — saves tokens)
+- JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
 - HUMAN_NEEDED.md: `bash .agentic/tools/blocker.sh add "Title" "type" "Details"`
 - FEATURES.md: `bash .agentic/tools/feature.sh F-#### status shipped`
 
-Session Protocols:
-- START: Run `ag start`. Read STATUS.md, HUMAN_NEEDED.md, check .agentic-state/WIP.md. If WIP.md exists: read its content, warn about the interrupted work (mention specific feature/task), and suggest resuming before starting anything new. Greet user proactively with current focus, next steps, blockers.
-- END: Run `.agentic/checklists/session_end.md`, update JOURNAL.md.
-- DONE: Run `.agentic/checklists/feature_complete.md` before claiming done.
-
-Checklists: `.agentic/checklists/` (session_start, session_end, feature_complete, before_commit)
-
-Standards: programming (`.agentic/quality/programming_standards.md`), testing (`.agentic/quality/test_strategy.md`), dev mode in STACK.md (tdd recommended, `.agentic/workflows/tdd_mode.md`).
+Workflows, delegation, gates, checklists: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`

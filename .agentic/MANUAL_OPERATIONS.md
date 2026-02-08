@@ -105,8 +105,8 @@ bash .agentic/tools/ag.sh trace F-0001   # Files implementing a feature
 # Visualize feature dependencies
 bash .agentic/tools/feature_graph.sh
 
-# See architecture evolution
-bash .agentic/tools/arch_diff.sh
+# Check spec/code drift
+bash .agentic/tools/drift.sh
 ```
 
 **See DEVELOPER_GUIDE.md for**:

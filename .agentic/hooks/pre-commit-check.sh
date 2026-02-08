@@ -155,21 +155,28 @@ else
 fi
 
 # Check 3: In-progress features must have recent JOURNAL entry
-if [[ -f "spec/FEATURES.md" ]] && [[ -f "JOURNAL.md" ]]; then
+JOURNAL_PATH=""
+if [[ -f ".agentic-journal/JOURNAL.md" ]]; then
+  JOURNAL_PATH=".agentic-journal/JOURNAL.md"
+elif [[ -f "JOURNAL.md" ]]; then
+  JOURNAL_PATH="JOURNAL.md"
+fi
+
+if [[ -f "spec/FEATURES.md" ]] && [[ -n "$JOURNAL_PATH" ]]; then
   echo ""
   echo "[3/11] Checking in-progress features have recent activity..."
-  
+
   IN_PROGRESS_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: in_progress" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
-  
+
   if [[ -n "$IN_PROGRESS_FEATURES" ]]; then
     # Check if JOURNAL.md was updated in last 24 hours
     if command -v stat >/dev/null 2>&1; then
       if [[ "$(uname)" == "Darwin" ]]; then
-        JOURNAL_AGE_SECONDS=$(( $(date +%s) - $(stat -f %m JOURNAL.md) ))
+        JOURNAL_AGE_SECONDS=$(( $(date +%s) - $(stat -f %m "$JOURNAL_PATH") ))
       else
-        JOURNAL_AGE_SECONDS=$(( $(date +%s) - $(stat -c %Y JOURNAL.md) ))
+        JOURNAL_AGE_SECONDS=$(( $(date +%s) - $(stat -c %Y "$JOURNAL_PATH") ))
       fi
-      
+
       ONE_DAY=$((24 * 60 * 60))
       if [[ $JOURNAL_AGE_SECONDS -gt $ONE_DAY ]]; then
         echo "⚠️  WARNING: In-progress features exist but JOURNAL.md not updated in 24h"

@@ -6,72 +6,42 @@ Read first: `FRAMEWORK_QUICK_START.md`, `FRAMEWORK_DEVELOPMENT.md`, `.agentic/PR
 
 Full template: `.agentic/agents/copilot/copilot-instructions.md`
 
----
+Always consult: AGENTS.md (if present), `.agentic/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, STATUS.md, spec/* and spec/adr/* as the source of truth.
 
-## The Core Chain (Never Break This)
+Quick Commands: `ag start` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done`
 
-**Spec -> Acceptance Criteria -> Code -> Tests -> Docs**
+STOP! Trigger Words:
+| Trigger | Action |
+|---------|--------|
+| "build", "implement", "add", "create" | STOP -> Run `ag plan F-XXXX` first, then `ag implement` |
+| "implement entire", "full system" | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
+| "fix", "bug", "issue" | STOP -> Write failing test FIRST |
+| "commit", "push" | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
+| "done", "complete" | STOP -> Run `ag done F-XXXX` |
 
-All must match. All must be in sync with committed code.
+DO NOT PROCEED without acceptance criteria: spec/acceptance/F-####.md must exist. Criteria before code. No exceptions.
 
----
+Small batch development: When user asks for something large ("entire", "full", "complete system"), STOP - TOO BIG for one task. Break into smaller pieces (3-5 files max each). Max 5-10 files per commit.
 
-## Adding Framework Features (Mandatory)
+Rules:
+- Never auto-commit. Show changes to human first.
+- Add/update tests for new/changed logic.
+- Code + docs = done (update docs with code, not later).
+- Keep changes small and scoped.
 
-| Step | Action |
-|------|--------|
-| 1 | Add F-#### to `spec/FEATURES.md` |
-| 2 | Create `spec/acceptance/F-####.md` BEFORE coding |
-| 3 | Implement the feature |
-| 4 | Add tests to `tests/validate_framework.sh` |
-| 5 | Update `CHANGELOG.md` |
-| 6 | Update `CONTRIBUTIONS.md` |
-| 7 | If user-visible during upgrade: add to `FEATURE_REGISTRY` in `upgrade.sh` |
+Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):
+- STATUS.md: `bash .agentic/tools/status.sh focus "Task"`
+- JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
+- HUMAN_NEEDED.md: `bash .agentic/tools/blocker.sh add "Title" "type" "Details"`
+- FEATURES.md: `bash .agentic/tools/feature.sh F-#### status shipped`
 
-Verify: `bash tests/validate_framework.sh` must pass
-
----
-
-## Before ANY Change
-
-1. Does it align with principles in `PRINCIPLES.md`?
-2. Will it affect templates? -> Test in scratch project first
-3. Is it a new feature? -> Spec it FIRST
-4. Does it break existing projects? -> Provide upgrade path
+Workflows, delegation, gates, checklists: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`
 
 ---
 
-## Session Start
+## Framework Development
 
-On first message, give a briefing:
-- Read STATUS.md, HUMAN_NEEDED.md, JOURNAL.md, VERSION, and git status
-- Greet user with: current state, focus, blockers, next steps, recent work
-- Do NOT wait to be asked
-
-## Git Workflow
-
-- Always create a separate feature branch before making changes
-- Never auto-commit without human approval
-- Worktree: Use `git worktree` when another agent may be working on main
-
----
-
-## Key Principles
-
-| Principle | Meaning |
-|-----------|---------|
-| **Traceability** | Spec <-> Acceptance <-> Tests <-> Code must match |
-| **Acceptance-Driven** | Criteria BEFORE implementation |
-| **Living Docs** | Update docs WITH code, same commit |
-| **Gates > Guidelines** | Enforce with scripts, not just docs |
-| **Backward Compatibility** | Existing projects must upgrade cleanly |
-
----
-
-## Reference
-
-- Quick start: `FRAMEWORK_QUICK_START.md`
-- Full guide: `FRAMEWORK_DEVELOPMENT.md`
-- Principles: `.agentic/PRINCIPLES.md`
-- Specs: `spec/FEATURES.md`
-- Validation: `tests/validate_framework.sh`
+Validation: `bash tests/validate_framework.sh` must pass before committing.
+New features: Add to `spec/FEATURES.md` FIRST, create acceptance criteria before coding.
+Breaking changes: Provide upgrade path in `upgrade.sh`.
+Test in scratch project before committing framework changes.

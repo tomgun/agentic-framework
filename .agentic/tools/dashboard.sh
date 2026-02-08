@@ -20,10 +20,17 @@ echo ""
 # Last session
 echo "▶ LAST SESSION"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [[ -f JOURNAL.md ]]; then
+JOURNAL_PATH=""
+if [[ -f ".agentic-journal/JOURNAL.md" ]]; then
+  JOURNAL_PATH=".agentic-journal/JOURNAL.md"
+elif [[ -f "JOURNAL.md" ]]; then
+  JOURNAL_PATH="JOURNAL.md"
+fi
+
+if [[ -n "$JOURNAL_PATH" ]]; then
   # Find the last session entry (supports both "### Session:" and "## YYYY-MM-DD" formats)
-  grep -A 12 "^## [0-9]" JOURNAL.md | head -14 | tail -13 2>/dev/null || \
-  grep -A 12 "^### Session:" JOURNAL.md | tail -13 2>/dev/null || \
+  grep -A 12 "^## [0-9]" "$JOURNAL_PATH" | head -14 | tail -13 2>/dev/null || \
+  grep -A 12 "^### Session:" "$JOURNAL_PATH" | tail -13 2>/dev/null || \
   echo "No sessions logged yet"
 else
   echo "JOURNAL.md not found"

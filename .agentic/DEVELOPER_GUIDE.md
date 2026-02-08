@@ -808,19 +808,6 @@ bash .agentic/tools/worktree.sh remove F-0001
 - Opening second Claude/Cursor window
 - Cleaning up after feature completion
 
-#### `arch_diff.sh` - Architecture Changes
-
-**What it shows:**
-- Changes to TECH_SPEC.md since last tag
-- Changes to architecture diagrams
-- What evolved and when
-
-```bash
-bash .agentic/tools/arch_diff.sh
-# Or compare specific commits:
-bash .agentic/tools/arch_diff.sh HEAD~5
-```
-
 #### `deps.sh` - Dependency Analysis
 
 **What it shows:**
@@ -1107,21 +1094,6 @@ python3 .agentic/tools/feature_stats.py --period=30  # Last 30 days
 - Retrospectives
 - Progress reporting
 
-#### `bulk_update.py` - Bulk Feature Updates
-
-**What it does:**
-- Updates multiple features matching criteria
-- Safely modifies FEATURES.md
-
-```bash
-python3 .agentic/tools/bulk_update.py --status=planned --set priority=high
-python3 .agentic/tools/bulk_update.py --tags=auth --add-tag=urgent
-```
-
-**When to run:**
-- Reorganizing feature priorities
-- Bulk tagging or ownership changes
-
 #### `organize_features.py` - Feature Organization
 
 **What it does:**
@@ -1214,20 +1186,6 @@ bash .agentic/tools/list-tools.sh
 
 ### Build & Performance Scripts
 
-#### `build-stamper.sh` - Build Artifact Processor
-
-**What it does:**
-- Injects version/build info into artifacts
-- Stamps build metadata
-
-```bash
-bash .agentic/tools/build-stamper.sh inject dist/bundle.js
-```
-
-**When to run:**
-- During build process
-- Before deployment
-
 #### `validation-cache.sh` - Validation Caching
 
 **What it does:**
@@ -1291,12 +1249,6 @@ bash .agentic/tools/pipeline_status.sh F-0005
 - Next agent
 - Handoff notes
 
-#### `pipeline_list.sh` - List All Active Pipelines
-
-```bash
-bash .agentic/tools/pipeline_list.sh
-```
-
 ### Version & Upgrade Scripts
 
 #### `version_check.sh` - Verify Dependency Versions
@@ -1320,18 +1272,6 @@ bash /tmp/agentic-framework-0.12.0/.agentic/tools/upgrade.sh /path/to/your-proje
 
 ### Consistency Scripts
 
-#### `consistency.sh` - Check Spec Consistency
-
-```bash
-bash .agentic/tools/consistency.sh
-```
-
-**Checks:**
-- Feature IDs referenced in STATUS.md exist
-- NFR IDs referenced in FEATURES.md exist
-- ADR IDs referenced exist
-- No duplicate IDs
-
 #### `validate_specs.py` - Validate Spec Format
 
 ```bash
@@ -1345,14 +1285,6 @@ python3 .agentic/tools/validate_specs.py
 - Cross-references follow format
 
 ### Search & Navigation
-
-#### `search.sh` - Smart Search Across Specs
-
-```bash
-bash .agentic/tools/search.sh "authentication"
-```
-
-Searches across all spec files, ADRs, JOURNAL, CONTEXT_PACK.
 
 #### `whatchanged.sh` - What Changed Recently
 

@@ -57,9 +57,10 @@ if [[ ! -f "OVERVIEW.md" && -f ".agentic/init/PRODUCT.template.md" ]]; then
   echo -e "${GREEN}✓ Created OVERVIEW.md (Core)${NC}"
 fi
 
-if [[ ! -f "JOURNAL.md" && -f ".agentic/spec/JOURNAL.template.md" ]]; then
-  cp ".agentic/spec/JOURNAL.template.md" "JOURNAL.md"
-  echo -e "${GREEN}✓ Created JOURNAL.md (Core)${NC}"
+if [[ ! -f ".agentic-journal/JOURNAL.md" ]] && [[ ! -f "JOURNAL.md" ]] && [[ -f ".agentic/spec/JOURNAL.template.md" ]]; then
+  mkdir -p ".agentic-journal"
+  cp ".agentic/spec/JOURNAL.template.md" ".agentic-journal/JOURNAL.md"
+  echo -e "${GREEN}✓ Created .agentic-journal/JOURNAL.md (Core)${NC}"
 fi
 
 if [[ ! -f "HUMAN_NEEDED.md" && -f ".agentic/spec/HUMAN_NEEDED.template.md" ]]; then
@@ -177,8 +178,8 @@ echo "  - spec/NFR.md          (Non-functional requirements)"
 echo "  - STATUS.md            (Project status & roadmap)"
 echo ""
 echo "Already part of Core (no changes):"
-echo "  - CONTEXT_PACK.md      (Architecture overview)"
-echo "  - HUMAN_NEEDED.md      (Escalation protocol)"
-echo "  - JOURNAL.md           (Session continuity)"
+echo "  - CONTEXT_PACK.md                (Architecture overview)"
+echo "  - HUMAN_NEEDED.md                (Escalation protocol)"
+echo "  - .agentic-journal/JOURNAL.md    (Session continuity)"
 echo ""
 

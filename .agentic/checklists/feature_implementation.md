@@ -6,23 +6,9 @@
 
 ---
 
-## GATE 1: Acceptance Criteria Exist (MANDATORY)
+## Prerequisite: Feature Start Checklist
 
-**🚨 Cannot proceed without acceptance criteria. Rough is OK - will evolve during implementation.**
-
-- [ ] **Acceptance criteria MUST exist before ANY code is written**
-  - Core+PM: `spec/acceptance/F-####.md` file exists with testable criteria
-  - Core: Clear criteria in `OVERVIEW.md` or written user request
-  - Rough is OK: "User can log in" is valid to start
-  - **If missing: Create acceptance criteria FIRST or escalate to HUMAN_NEEDED.md**
-  - **DO NOT write code without acceptance criteria**
-
-- [ ] **Understood success condition**
-  - What does "done" look like?
-  - How will we verify it works?
-  - Edge cases can be discovered during implementation
-
-**Note**: Specs WILL evolve during implementation. This is expected. Document discoveries as you go. See [`workflows/spec_evolution.md`](../workflows/spec_evolution.md).
+**🚨 Complete `.agentic/checklists/feature_start.md` FIRST** — it covers acceptance criteria, scope check, delegation decisions, and context handoff. Do not start implementation without passing those gates.
 
 ---
 
@@ -190,9 +176,7 @@
 
 ## Before Committing
 
-- [ ] **Use Before Commit Checklist** (`.agentic/checklists/before_commit.md`)
-  - Don't commit without running that checklist
-  - Every commit must pass all checks
+- [ ] **Follow `.agentic/checklists/before_commit.md`** — covers branch check, WIP lock, tests, docs sync, human approval
 
 ---
 

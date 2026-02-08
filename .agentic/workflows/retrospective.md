@@ -27,7 +27,7 @@ When running a retrospective, the agent should:
 **Run automated tools:**
 ```bash
 bash .agentic/tools/verify.sh      # Comprehensive checks
-bash .agentic/tools/consistency.sh # Documentation drift
+bash .agentic/tools/drift.sh      # Spec/code drift
 bash .agentic/tools/stale.sh       # Stale documentation
 bash .agentic/tools/version_check.sh # Version mismatches
 ```
@@ -90,7 +90,7 @@ bash .agentic/tools/version_check.sh # Version mismatches
 
 **Run:**
 ```bash
-bash .agentic/tools/arch_diff.sh  # Architecture changes
+bash .agentic/tools/drift.sh --check  # Spec/code drift
 ```
 
 **Trigger research mode if:**
@@ -198,7 +198,7 @@ bash .agentic/tools/arch_diff.sh  # Architecture changes
 
 ### Automated Tools
 - verify.sh: [PASS/FAIL - summary]
-- consistency.sh: [X issues found]
+- drift.sh: [X issues found]
 - stale.sh: [X stale docs]
 
 ### Key Metrics

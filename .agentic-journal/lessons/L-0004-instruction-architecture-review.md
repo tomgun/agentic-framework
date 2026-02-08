@@ -8,7 +8,7 @@
 
 ## Summary
 
-Two independent research efforts (ChatGPT 5.2 and Claude Opus 4.6) investigated how AI coding tools handle instruction files, context, and subagents. Their findings converged, but the framework lacked a single authoritative design basis. This lesson documents the plan-review process that produced `docs/research/INSTRUCTION_ARCHITECTURE.md`.
+Two independent research efforts (ChatGPT 5.2 and Claude Opus 4.6) investigated how AI coding tools handle instruction files, context, and subagents. Their findings converged, but the framework lacked a single authoritative design basis. This lesson documents the plan-review process that produced `docs/INSTRUCTION_ARCHITECTURE.md`.
 
 ## What the design document is
 
@@ -60,7 +60,7 @@ The plan-review loop itself demonstrated the value of structured critique:
 
 ## Links
 
-- Design document: `docs/research/INSTRUCTION_ARCHITECTURE.md`
+- Design document: `docs/INSTRUCTION_ARCHITECTURE.md`
 - ChatGPT research: `docs/research/context_and_subagents_research_2026_02_06.md`
 - Claude research: `docs/research/2026-02-07-subagent-context-inheritance.md`
 - L-0002: Instruction bloat breaks compliance

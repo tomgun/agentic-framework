@@ -186,7 +186,14 @@ check_doc_age() {
   fi
 }
 
-check_doc_age "JOURNAL.md" "JOURNAL.md" 3
+# Check JOURNAL.md (resolve location first)
+if [[ -f ".agentic-journal/JOURNAL.md" ]]; then
+  check_doc_age ".agentic-journal/JOURNAL.md" "JOURNAL.md" 3
+elif [[ -f "JOURNAL.md" ]]; then
+  check_doc_age "JOURNAL.md" "JOURNAL.md" 3
+else
+  info "JOURNAL.md not found"
+fi
 check_doc_age "STATUS.md" "STATUS.md" 7
 check_doc_age "CONTEXT_PACK.md" "CONTEXT_PACK.md" 14
 

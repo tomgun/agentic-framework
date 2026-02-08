@@ -338,12 +338,20 @@ def read_profile(root: Path) -> str:
 
 
 def checks_for_profile(profile: str) -> list[Check]:
+    # Determine JOURNAL.md location with fallback
+    from pathlib import Path
+    repo_root = Path.cwd()
+    journal_path = repo_root / ".agentic-journal" / "JOURNAL.md"
+    if not journal_path.exists():
+        journal_path = repo_root / "JOURNAL.md"
+    journal_relative = str(journal_path.relative_to(repo_root))
+
     core = [
         Check("AGENTS.md", "file", "agent entrypoint (rules + read-first)"),
         Check("CONTEXT_PACK.md", "file", "durable starting context"),
         Check("STATUS.md", "file", "current focus + next steps"),
         Check("STACK.md", "file", "how to run/test + constraints"),
-        Check("JOURNAL.md", "file", "session-by-session progress log"),
+        Check(journal_relative, "file", "session-by-session progress log"),
         Check("HUMAN_NEEDED.md", "file", "escalation protocol"),
         Check("docs", "dir", "system docs (long-lived)"),
     ]

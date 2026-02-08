@@ -113,33 +113,42 @@ These mechanisms are proven and stable. Changes require strong justification:
 
 ## 4. Gaps to Close
 
-### Gap 1: Instruction files mix constitution with playbook content
+### Gap 1: Instruction files mix constitution with playbook content — RESOLVED
 
-**Current baselines**: Template CLAUDE.md 79 lines, root 92 lines, others 69-71 lines.
-**Target**: ~40-50 lines.
-**Principle**: Keep what cannot be structurally enforced (trigger table, token scripts, core behavioral rules). Move what IS structurally enforced (gates table, delegation table, session protocol details) to playbooks. The gates table is informational — pre-commit-check.sh enforces it regardless.
+**Final line counts** (all under L-0002 ceiling of 100):
 
-### Gap 2: Subagents don't consistently receive critical constitutional rules
+| File | Before | After | Reduction |
+|------|--------|-------|-----------|
+| Template CLAUDE.md | 79 | 40 | 49% |
+| Template copilot | 69 | 38 | 45% |
+| Template codex | 71 | 40 | 44% |
+| Template cursor .mdc | 35 | 37 | +2 (added playbook pointer) |
+| Root CLAUDE.md | 92 | 53 | 42% |
+| Root .codex/instructions.md | 286 | 52 | 82% |
+| Root .github/copilot-instructions.md | 77 | 49 | 36% |
+| Root .cursorrules | 27 | 27 | unchanged (already lean) |
 
-Currently, 7 of 24 context manifests (orchestrator, planning, research, review, test, implementation, spec-update) declare anti-hallucination.md as a required file. The remaining 17 manifests do not include it. `context-for-role.sh` has no hardcoded always-inject list — injection is entirely manifest-declared.
+Moved content (gates table, delegation/agent mode, session protocols, agent boundaries) to `auto_orchestration.md` (334 → 384 lines). All templates now contain only constitutional content: trigger table, token-efficient scripts, core behavioral rules, and a playbook pointer.
 
-A broader set of critical rules (~300 tokens — no fabrication, no auto-commit, use token-efficient scripts) should apply to ALL agents. Two possible mechanisms:
-- **(a)** Add the rules file to all 24 manifests
-- **(b)** Add a script-level always-inject feature to context-for-role.sh
+**Note**: Original design doc baseline for `.cursorrules` was incorrectly listed as 71 lines (that was the codex template). Actual root `.cursorrules` is 27 lines.
 
-Choice deferred to implementation plan.
+### Gap 2: Subagents don't consistently receive critical constitutional rules — RESOLVED
 
-### Gap 3: `ag` commands don't print playbook references
+**Status**: RESOLVED — Option (b) implemented.
 
-`ag` commands should tell the agent which playbook file to read for deeper details. Example: `ag implement` could reference auto_orchestration.md; `ag commit` could reference before_commit.md.
+`context-for-role.sh` now has an `ALWAYS_INJECT` array that loads `core-rules.md` (~300 tokens) BEFORE manifest-declared files, counted against the token budget. All 24 agent roles receive the constitutional minimum (no fabrication, no auto-commit, token-efficient scripts, ask when uncertain). The existing manifest-based injection mechanism remains completely intact — always-inject is an additive layer on top.
 
-**Caveat**: This assumes agents follow stdout references — L-0003 notes this is untested. Implementation plan should include a simple validation test. See assumption A7.
+### Gap 3: `ag` commands don't print playbook references — RESOLVED
 
-### Gap 4: `ag done` doesn't block on validation failures
+`ag implement` now prints references to `auto_orchestration.md` and `feature_implementation.md`. `ag commit` prints reference to `before_commit.md`. `ag done` already had `feature_complete.md` reference.
 
-`ag done` (Core+PM) runs `doctor.sh --phase complete` (in `cmd_done()` function of ag.sh) but `|| true` suppresses the exit code. The structural check exists but isn't blocking.
+**Note**: Assumption A7 (agents follow stdout references) remains untested. References are harmless regardless — they add information without removing anything.
 
-**Fix**: Remove `|| true` to make it blocking. For Core profile, add a basic check instead of the current no-op.
+### Gap 4: `ag done` doesn't block on validation failures — RESOLVED
+
+`cmd_done()` (Core+PM) now runs `doctor.sh --phase complete` with proper error handling — failure prints a RED warning instead of being silently suppressed by `|| true`. Core profile now runs `doctor.sh --quick` as a non-blocking warning (Core is discovery mode).
+
+`cmd_implement()` line 528 retains `|| true` for `doctor.sh --phase planning` — this is intentional. Planning is early-stage; blocking would be overly strict.
 
 ---
 

@@ -148,8 +148,10 @@ def generate_continue_here(project_root, output_path=None):
     # Detect mode
     mode = detect_mode(project_root)
     
-    # Read source files
-    journal_path = os.path.join(project_root, 'JOURNAL.md')
+    # Read source files - JOURNAL.md with fallback
+    journal_path = os.path.join(project_root, '.agentic-journal', 'JOURNAL.md')
+    if not os.path.exists(journal_path):
+        journal_path = os.path.join(project_root, 'JOURNAL.md')
     status_path = os.path.join(project_root, 'STATUS.md')
     product_path = os.path.join(project_root, 'OVERVIEW.md')
     human_needed_path = os.path.join(project_root, 'HUMAN_NEEDED.md')

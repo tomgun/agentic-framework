@@ -98,7 +98,11 @@ copy_if_missing "${ROOT_DIR}/.agentic/init/STACK.template.md" "${ROOT_DIR}/STACK
 copy_if_missing "${ROOT_DIR}/.agentic/init/CONTEXT_PACK.template.md" "${ROOT_DIR}/CONTEXT_PACK.md"
 copy_if_missing "${ROOT_DIR}/.agentic/init/STATUS.template.md" "${ROOT_DIR}/STATUS.md"
 copy_if_missing "${ROOT_DIR}/.agentic/init/OVERVIEW.template.md" "${ROOT_DIR}/OVERVIEW.md"
-copy_if_missing "${ROOT_DIR}/.agentic/spec/JOURNAL.template.md" "${ROOT_DIR}/JOURNAL.md"
+
+# JOURNAL.md moved to .agentic-journal/ directory (v0.23.0+)
+mkdir -p "${ROOT_DIR}/.agentic-journal"
+copy_if_missing "${ROOT_DIR}/.agentic/spec/JOURNAL.template.md" "${ROOT_DIR}/.agentic-journal/JOURNAL.md"
+
 copy_if_missing "${ROOT_DIR}/.agentic/spec/HUMAN_NEEDED.template.md" "${ROOT_DIR}/HUMAN_NEEDED.md"
 
 # Ensure STACK.md has Profile field (newer versions)
@@ -149,7 +153,7 @@ This repo uses the **Agentic Framework** located at `.agentic/`.
 - Don't just mention it in chat - document it so it's not forgotten
 
 **Keep documentation current:**
-- Update `JOURNAL.md` before ending ANY session (if session ends abruptly, JOURNAL is the only record)
+- Update `.agentic-journal/JOURNAL.md` before ending ANY session (if session ends abruptly, JOURNAL is the only record)
 - Keep `OVERVIEW.md` up to date with vision and completed capabilities
 - Keep `CONTEXT_PACK.md` current when architecture changes
 - If this repo uses the Core+Product profile: keep `STATUS.md` and `/spec/*` truthful

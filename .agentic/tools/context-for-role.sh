@@ -159,7 +159,41 @@ main() {
     local total_tokens=0
     local assembled_content=""
     local files_loaded=()
-    
+
+    # Always-inject: constitutional rules for ALL agent roles
+    local ALWAYS_INJECT=(
+        ".agentic/agents/shared/guidelines/core-rules.md"
+    )
+
+    if $dry_run; then
+        echo -e "${GREEN}Always-inject files:${NC}"
+    fi
+
+    for inject_path in "${ALWAYS_INJECT[@]}"; do
+        local full_inject_path="$PROJECT_ROOT/$inject_path"
+        if [[ -f "$full_inject_path" ]]; then
+            local content=$(cat "$full_inject_path")
+            local file_tokens=$(count_tokens "$content")
+            total_tokens=$((total_tokens + file_tokens))
+            files_loaded+=("$inject_path")
+
+            if $dry_run; then
+                echo -e "  ${GREEN}✓${NC} $inject_path (~${file_tokens} tokens) [always-inject]"
+            else
+                assembled_content+="# === $inject_path ==="#$'\n'
+                assembled_content+="$content"$'\n\n'
+            fi
+        else
+            if $dry_run; then
+                echo -e "  ${YELLOW}⚠${NC} $inject_path (not found) [always-inject]"
+            fi
+        fi
+    done
+
+    if $dry_run; then
+        echo ""
+    fi
+
     # Process required files
     if $dry_run; then
         echo -e "${GREEN}Required files:${NC}"
