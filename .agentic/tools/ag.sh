@@ -370,8 +370,8 @@ cmd_plan() {
     echo -e "${GREEN}Acceptance criteria: EXISTS${NC}"
 
     # 2. Check for existing plan
-    local plan_file="$ROOT_DIR/.agentic-state/plans/${feature_id}-plan.md"
-    mkdir -p "$ROOT_DIR/.agentic-state/plans"
+    local plan_file="$ROOT_DIR/.agentic-journal/plans/${feature_id}-plan.md"
+    mkdir -p "$ROOT_DIR/.agentic-journal/plans"
 
     if [ -f "$plan_file" ]; then
         local status
@@ -403,7 +403,7 @@ cmd_plan() {
         echo "  - spec/acceptance/${feature_id}.md"
         echo "  - CONTEXT_PACK.md"
         echo ""
-        echo "Write plan to: .agentic-state/plans/${feature_id}-plan.md"
+        echo "Write plan to: .agentic-journal/plans/${feature_id}-plan.md"
         echo "Follow format in: .agentic/workflows/plan_review_loop.md"
         echo "Set status to: APPROVED (no review)"
         return 0
@@ -424,14 +424,14 @@ cmd_plan() {
     echo "    subagent_type: Plan"
     echo "    prompt: \"Create implementation plan for $feature_id."
     echo "            Read: spec/acceptance/${feature_id}.md, CONTEXT_PACK.md"
-    echo "            Write to: .agentic-state/plans/${feature_id}-plan.md"
+    echo "            Write to: .agentic-journal/plans/${feature_id}-plan.md"
     echo "            Follow: .agentic/workflows/plan_review_loop.md\""
     echo ""
     echo -e "${BLUE}STEP 2: REVIEWER critiques the plan${NC}"
     echo "  Task tool:"
     echo "    subagent_type: general-purpose"
     echo "    model: opus  # Critical review needs quality"
-    echo "    prompt: \"Critically review plan at .agentic-state/plans/${feature_id}-plan.md"
+    echo "    prompt: \"Critically review plan at .agentic-journal/plans/${feature_id}-plan.md"
     echo "            Follow reviewer instructions in .agentic/workflows/plan_review_loop.md"
     echo "            Add review to Review History section."
     echo "            Set verdict: APPROVED, REVISION_NEEDED, or ESCALATE\""
@@ -443,7 +443,7 @@ cmd_plan() {
     echo ""
     echo -e "${BOLD}═══════════════════════════════════════════════════════════════${NC}"
     echo ""
-    echo "Plan artifact: .agentic-state/plans/${feature_id}-plan.md"
+    echo "Plan artifact: .agentic-journal/plans/${feature_id}-plan.md"
     echo "Workflow docs: .agentic/workflows/plan_review_loop.md"
 }
 
@@ -478,7 +478,7 @@ cmd_implement() {
     local auto_for
     auto_for=$(get_plan_review_config "plan_review_auto_for" "[planning]")
     if echo "$auto_for" | grep -qE "(implement|both)"; then
-        local plan_file="$ROOT_DIR/.agentic-state/plans/${feature_id}-plan.md"
+        local plan_file="$ROOT_DIR/.agentic-journal/plans/${feature_id}-plan.md"
         if [ -f "$plan_file" ]; then
             local plan_status
             plan_status=$(grep -E "^\*\*Status\*\*:" "$plan_file" 2>/dev/null | head -1 | sed 's/.*Status\*\*:[[:space:]]*//' || echo "UNKNOWN")
@@ -543,6 +543,10 @@ cmd_implement() {
     echo ""
     echo -e "${GREEN}Ready to implement ${feature_id}${NC}"
     echo "Remember: Update FEATURES.md status to 'in_progress'"
+    echo ""
+    echo -e "${BOLD}References:${NC}"
+    echo "  Playbook: .agentic/agents/shared/auto_orchestration.md"
+    echo "  Checklist: .agentic/checklists/feature_implementation.md"
 }
 
 # Commit command - pre-commit gates (profile-aware)
@@ -600,6 +604,8 @@ cmd_commit() {
             echo "Ready to commit. Suggested workflow:"
             echo "  git add <files>"
             echo "  git commit -m \"feat(F-XXXX): description\""
+            echo ""
+            echo -e "${BOLD}Checklist:${NC} .agentic/checklists/before_commit.md"
         else
             echo ""
             echo -e "${RED}Pre-commit gates FAILED - fix issues above${NC}"
@@ -620,6 +626,13 @@ cmd_done() {
         echo "  [ ] Tests written and passing (if applicable)"
         echo "  [ ] STATUS.md updated"
         echo "  [ ] JOURNAL.md updated"
+        echo ""
+        # Quick health check (warning only — Core is discovery mode)
+        if bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null; then
+            echo -e "${GREEN}✓${NC} Quick health check passed"
+        else
+            echo -e "${YELLOW}⚠ Quick health check found issues (non-blocking for Core profile)${NC}"
+        fi
         echo ""
         # Check if WIP is complete
         if [ -f "$ROOT_DIR/.agentic-state/WIP.md" ]; then
@@ -663,7 +676,9 @@ cmd_done() {
         echo ""
 
         # Run complete phase check
-        bash "$SCRIPT_DIR/doctor.sh" --phase complete "$feature_id" 2>/dev/null || true
+        if ! bash "$SCRIPT_DIR/doctor.sh" --phase complete "$feature_id" 2>/dev/null; then
+            echo -e "${RED}Structural checks FAILED - fix issues above before marking complete${NC}"
+        fi
 
         # Check for untracked feature files
         echo ""

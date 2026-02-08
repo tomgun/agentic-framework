@@ -60,8 +60,10 @@ def parse_journal_entries(journal_path: Path) -> list[dict]:
 
 def main() -> int:
     repo_root = Path.cwd()
-    journal_path = repo_root / "JOURNAL.md"
-    
+    journal_path = repo_root / ".agentic-journal" / "JOURNAL.md"
+    if not journal_path.exists():
+        journal_path = repo_root / "JOURNAL.md"
+
     if not journal_path.exists():
         print("JOURNAL.md not found")
         return 1

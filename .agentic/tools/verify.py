@@ -41,11 +41,19 @@ def read_profile(root: Path) -> str:
 
 
 def core_checks(root: Path) -> list[str]:
-    required = ["STACK.md", "CONTEXT_PACK.md", "STATUS.md", "JOURNAL.md", "HUMAN_NEEDED.md", "AGENTS.md"]
+    required = ["STACK.md", "CONTEXT_PACK.md", "STATUS.md", "HUMAN_NEEDED.md", "AGENTS.md"]
     issues: list[str] = []
     for p in required:
         if not (root / p).exists():
             issues.append(f"Missing {p} (run: bash .agentic/init/scaffold.sh --profile core)")
+
+    # Check JOURNAL.md with fallback
+    journal_path = root / ".agentic-journal" / "JOURNAL.md"
+    if not journal_path.exists():
+        journal_path = root / "JOURNAL.md"
+    if not journal_path.exists():
+        issues.append(f"Missing JOURNAL.md (run: bash .agentic/init/scaffold.sh --profile core)")
+
     return issues
 
 

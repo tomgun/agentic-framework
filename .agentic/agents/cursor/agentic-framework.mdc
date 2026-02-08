@@ -33,3 +33,5 @@ Custom models: check `models:` section. Full docs: `.agentic/workflows/agent_mod
 ## Developer UX
 - Always end with: what changed, what's next, and what you need from the user.
 
+Workflows, gates, delegation: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`
+

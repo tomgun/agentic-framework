@@ -80,7 +80,7 @@ Two articles on AI-assisted development provide insights for the Agentic Framewo
 **CLAUDE.md approach**: Reference only, not duplicate:
 ```markdown
 ## Boundaries
-See `.agentic/agents/shared/agent_operating_guidelines.md#agent-boundaries--authority` for full list.
+See `.agentic/agents/shared/agent_operating_guidelines.md#agent-boundaries` for full list.
 
 Quick reference: ✅ Autonomous (tests, specs, patterns) | ⚠️ Ask (deps, architecture, APIs) | 🚫 Never (commits, secrets, force push)
 ```

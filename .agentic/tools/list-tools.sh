@@ -26,7 +26,7 @@ ${BOLD}GATEWAY (Start Here)${NC}
 ${BOLD}VERIFICATION${NC}
   doctor.sh           Health check (--full, --phase, --pre-commit)
   verify.sh           Run all validation checks
-  consistency.sh      Check cross-file consistency
+  pre-commit-check.sh Pre-commit structural checks (11 gates)
 
 ${BOLD}SESSION MANAGEMENT${NC}
   wip.sh              Track work-in-progress (start, checkpoint, complete)
@@ -69,7 +69,6 @@ ${BOLD}ADVANCED${NC}
   feature_graph.sh    Visualize feature dependencies
   migration.sh        Spec migration management
   mutation_test.sh    Run mutation tests
-  arch_diff.sh        Architecture diff analysis
   context-for-role.sh Get context for specific agent role
 
 ${BOLD}USAGE${NC}

@@ -45,14 +45,21 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
 fi
 
 # 2. Check if JOURNAL.md was updated recently
-if [[ -f "JOURNAL.md" ]]; then
+JOURNAL_PATH=""
+if [[ -f ".agentic-journal/JOURNAL.md" ]]; then
+  JOURNAL_PATH=".agentic-journal/JOURNAL.md"
+elif [[ -f "JOURNAL.md" ]]; then
+  JOURNAL_PATH="JOURNAL.md"
+fi
+
+if [[ -n "$JOURNAL_PATH" ]]; then
   if command -v stat >/dev/null 2>&1; then
     if [[ "$(uname)" == "Darwin" ]]; then
-      JOURNAL_AGE_SECONDS=$(( $(date +%s) - $(stat -f %m JOURNAL.md) ))
+      JOURNAL_AGE_SECONDS=$(( $(date +%s) - $(stat -f %m "$JOURNAL_PATH") ))
     else
-      JOURNAL_AGE_SECONDS=$(( $(date +%s) - $(stat -c %Y JOURNAL.md) ))
+      JOURNAL_AGE_SECONDS=$(( $(date +%s) - $(stat -c %Y "$JOURNAL_PATH") ))
     fi
-    
+
     ONE_HOUR=$((60 * 60))
     if [[ $JOURNAL_AGE_SECONDS -gt $ONE_HOUR ]]; then
       echo "⚠️  JOURNAL.md not updated in this session"

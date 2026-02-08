@@ -8,11 +8,12 @@ This directory separates **persistent history** from **transient state** (`.agen
 
 ## Contents
 
-| Directory | What | Committed? |
-|-----------|------|------------|
+| Directory/File | What | Committed? |
+|----------------|------|------------|
+| `JOURNAL.md` | Session-by-session progress log | Yes |
 | `manifests/` | Change manifests (what changed per feature/branch/date) | Yes |
 | `lessons/` | Operational learnings (L-####) | Yes |
-| `JOURNAL.md` | Session log (future: move from project root) | Yes |
+| `plans/` | Reviewed & approved implementation plans | Yes |
 
 ---
 
@@ -49,6 +50,19 @@ Use cases:
 - Don't repeat mistakes
 - Share learnings across sessions
 - Build institutional knowledge
+
+---
+
+## plans/
+
+Reviewed and approved implementation plans, promoted from working drafts.
+
+**Lifecycle**: `ag plan F-XXXX` creates a working draft in `.agentic-journal/plans/`. After plan-review approval, it stays as a permanent record.
+
+Use cases:
+- Audit trail: What was the plan for a feature?
+- Learning: What approaches were considered?
+- Reference: Reuse patterns from past plans
 
 ---
 

@@ -20,7 +20,7 @@ This guide explains how to use Cursor's agent capabilities with the Agentic Fram
 
 ## Agent Boundaries (Quick Reference)
 
-**Full details**: `.agentic/agents/shared/agent_operating_guidelines.md#agent-boundaries--authority`
+**Full details**: `.agentic/agents/shared/agent_operating_guidelines.md#agent-boundaries`
 
 | ✅ ALWAYS (Autonomous) | ⚠️ ASK FIRST | 🚫 NEVER |
 |------------------------|--------------|----------|

@@ -107,3 +107,18 @@ bash .agentic/tools/blocker.sh add \
 | Session ending | Ensure all blockers documented |
 
 **The cost of hallucination > The cost of asking.**
+
+---
+
+## Check Before Creating (NON-NEGOTIABLE)
+
+**Before creating ANY new file, test, or component, search for existing equivalents.**
+
+| Creating | Search First |
+|----------|--------------|
+| New test | `grep` for similar test names, check test_definitions.json |
+| New document | `grep` for topic in docs/, check existing .md files |
+| New component | Search codebase for similar names/functionality |
+| New utility | Check utils/, helpers/, common/ for similar functions |
+
+**Why**: Duplicates waste effort, cause inconsistency, and increase maintenance burden. A 30-second search prevents hours of duplicate work.

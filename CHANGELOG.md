@@ -5,10 +5,34 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.23.0] - 2026-02-08
+
+### Added
+- **"How It Works" section in README.md** — Three-layer architecture (Constitution → Playbooks → State) explained for prospective users
+- **Architecture table in FRAMEWORK_QUICK_START.md** — Quick reference for framework-dev agents
+- **Template vs Root table in FRAMEWORK_DEVELOPMENT.md** — Explicit dogfooding comparison with sync rules
+- **Architecture cross-references** — Pointers added to PRINCIPLES.md, auto_orchestration.md, and root CLAUDE.md
+- **`core-rules.md`** — Constitutional minimum (~300 tokens) auto-injected for ALL subagent roles via `context-for-role.sh` ALWAYS_INJECT
+- **Plans directory** (`.agentic-journal/plans/`) — Reviewed & approved plans now git-tracked alongside manifests and lessons
+- **Archived tools README** (`.agentic/tools/archived/README.md`) — Documents why 6 tools were archived
+
+### Changed
+- **JOURNAL.md moved** to `.agentic-journal/JOURNAL.md` — all scripts use fallback to root for backward compat
+- **Plans consolidated** — from `docs/plans/` and `.agentic-state/plans/` (gitignored) to `.agentic-journal/plans/` (git-tracked)
+- **Instruction architecture doc promoted** — `docs/research/INSTRUCTION_ARCHITECTURE.md` → `docs/INSTRUCTION_ARCHITECTURE.md`
+- **Instruction files slimmed** — Template CLAUDE.md 79→40 lines, root 92→52 lines, codex 286→50 lines. Gates, delegation, session protocols moved to `auto_orchestration.md`
+- **agent_operating_guidelines.md** — 434→~120 lines. Detailed rules extracted to `guidelines/` modules
+- **`ag.sh`** — `implement`, `commit`, `done` commands now print playbook references. `done` (Core) runs `doctor.sh --quick`
+- **4 design gaps from INSTRUCTION_ARCHITECTURE.md** — all resolved (instruction slimming, always-inject, playbook refs, done blocking)
+
+### Removed
+- 6 legacy tools archived: `arch_diff.sh`, `build-stamper.sh`, `bulk_update.py`, `consistency.sh`, `pipeline_list.sh`, `search.sh`
+- `docs/plans/` directory (plans consolidated to `.agentic-journal/plans/`)
+
 ## [0.22.1] - 2026-02-07
 
 ### Added
-- **Instruction Architecture Design Document** (`docs/research/INSTRUCTION_ARCHITECTURE.md`) — Single authoritative design basis synthesizing ChatGPT 5.2 and Claude Opus 4.6 research into unified three-layer architecture (Constitution → Playbooks → State), with 4 gaps, 10 testable assumptions, and maintenance model
+- **Instruction Architecture Design Document** (`docs/INSTRUCTION_ARCHITECTURE.md`) — Single authoritative design basis synthesizing ChatGPT 5.2 and Claude Opus 4.6 research into unified three-layer architecture (Constitution → Playbooks → State), with 4 gaps, 10 testable assumptions, and maintenance model
 - **L-0004 lesson** — Plan-review process preserved (3 rounds, 15 issues narrowed to acceptance)
 - **ChatGPT 5.2 research** committed (`docs/research/context_and_subagents_research_2026_02_06.md`)
 
@@ -148,7 +172,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ag plan F-XXXX --no-review` - Skip review for simple cases
   - Planner creates plan, reviewer critiques, loop until approved
   - Configurable via STACK.md: `plan_review_enabled`, `plan_review_max_iterations`
-  - Plan artifacts stored in `.agentic-state/plans/`
+  - Plan artifacts stored in `.agentic-journal/plans/`
   - New agents: `plan-creator-agent.md`, `plan-reviewer-agent.md`
   - Catches issues before code is written (better quality first time)
 

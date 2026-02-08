@@ -93,7 +93,27 @@ Example projects demonstrate best practices and verify workflows actually work.
 3. Only then update root `/CLAUDE.md` if framework-dev needs something extra
 4. CLAUDE.md is loaded for the orchestrating agent only. Subagents do NOT inherit it — confirmed for Claude Code (Task tool) and Cursor; Copilot behavior unverified; Codex subagents experimental. Keep templates under 100 lines for orchestrator attention quality (L-0002). Run LLM behavioral tests (`bash tests/llm/harness.sh --critical`) after changes.
 
-**Design basis**: `docs/research/INSTRUCTION_ARCHITECTURE.md` — the definitive instruction architecture design. Source research: `docs/research/context_and_subagents_research_2026_02_06.md` (ChatGPT 5.2), `docs/research/2026-02-07-subagent-context-inheritance.md` (Claude Opus 4.6).
+**Design basis**: `docs/INSTRUCTION_ARCHITECTURE.md` — the definitive instruction architecture design. Source research: `docs/research/context_and_subagents_research_2026_02_06.md` (ChatGPT 5.2), `docs/research/2026-02-07-subagent-context-inheritance.md` (Claude Opus 4.6).
+
+**Template vs Root — what differs and why**:
+
+| Content | Template (`.agentic/agents/`) | Root (`CLAUDE.md`, etc.) |
+|---------|-------------------------------|--------------------------|
+| Context opener | "You are working in a repo that uses..." | "THIS IS FRAMEWORK DEVELOPMENT. You are working ON the framework..." |
+| "Read first" directive | NO | YES — `FRAMEWORK_QUICK_START.md`, `FRAMEWORK_DEVELOPMENT.md`, `PRINCIPLES.md` |
+| Architecture pointer | NO | YES — `docs/INSTRUCTION_ARCHITECTURE.md` |
+| Trigger table | YES | YES (identical) |
+| Token-efficient scripts | YES | YES (identical) |
+| Small batch rules | YES | YES (identical) |
+| Playbook pointer | YES | YES (identical) |
+| Framework validation | NO | YES — `bash tests/validate_framework.sh` |
+| Framework-dev footer | NO | YES — dogfooding, worktree, spec-first |
+
+**Sync rules**:
+- If root has content template doesn't, and it's NOT framework-specific → backport immediately
+- Templates must never exceed root for shared concerns
+
+**Cursor note**: Root `.cursorrules` (27 lines) is a lean framework-dev file. Template `cursorrules.txt` (71 lines) is the full user-project version (pre-slimming — not yet aligned with three-layer architecture). The `.mdc` file (37 lines) is the slimmed Cursor format. Follow-up: slim `cursorrules.txt` to match.
 
 **Anti-pattern**: ❌ Adding `ag` CLI commands to root CLAUDE.md but not the template users get.
 

@@ -1555,7 +1555,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Implementation**:
 - Two-agent loop: Planner creates plan, Reviewer critiques, iterate until APPROVED
-- Plan artifacts stored in `.agentic-state/plans/F-XXXX-plan.md`
+- Plan artifacts stored in `.agentic-journal/plans/F-XXXX-plan.md`
 - Configurable: `plan_review_enabled`, `plan_review_max_iterations`, `plan_review_auto_for`
 - Issue categorization: CRITICAL, IMPORTANT, SUGGESTION
 - Verdict system: APPROVED, REVISION_NEEDED, ESCALATE
@@ -1838,7 +1838,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **User direction**: Two independent research efforts (ChatGPT 5.2 and Claude Opus 4.6) converged on a clear architecture, but findings were scattered across research docs and lessons. Directed creation of a single authoritative design document to end the back-and-forth.
 
-**Result - `docs/research/INSTRUCTION_ARCHITECTURE.md`**:
+**Result - `docs/INSTRUCTION_ARCHITECTURE.md`**:
 - Unified design document synthesizing both research efforts
 - Three-layer architecture mapped to framework: Constitution (instruction files) → Playbooks (ag commands + docs) → Project State (STACK.md + status.json)
 - 4 specific gaps identified with actionable fixes
@@ -1857,8 +1857,44 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## Architecture Visibility & Framework Cleanup (v0.23.0, 2026-02-08)
+
+### Three-Layer Architecture Implementation
+
+**User direction**: Implement the instruction architecture design document — slim instruction files, surface the architecture for all audiences, consolidate persistent artifacts.
+
+**Cleanup results** (7 batches):
+- Instruction files slimmed to <100 lines (template CLAUDE.md 79→40, root 92→52, codex 286→50)
+- Gates, delegation, session protocols moved from instruction files to `auto_orchestration.md` (playbook layer)
+- `agent_operating_guidelines.md` refactored 434→~120 lines with modular `guidelines/` directory
+- `core-rules.md` (constitutional minimum) auto-injected for all 24 agent roles via `context-for-role.sh`
+- `ag.sh` commands now print playbook references; `done` blocks on validation failures
+- 6 legacy tools archived with documentation
+
+### Architecture Visibility
+
+**User direction**: The framework's "magic sauce" (three-layer architecture) was buried in a research folder. Surface it for all audiences.
+
+**Results**:
+- `docs/INSTRUCTION_ARCHITECTURE.md` promoted from `docs/research/`
+- "How It Works" section added to README.md (three-layer architecture explained)
+- Architecture table added to FRAMEWORK_QUICK_START.md
+- Template vs Root table added to FRAMEWORK_DEVELOPMENT.md
+- Cross-references added to PRINCIPLES.md, auto_orchestration.md, root CLAUDE.md
+
+### Persistent Artifacts Consolidation
+
+**User direction**: JOURNAL.md should live in `.agentic-journal/`. Approved plans should be git-tracked in one place.
+
+**Results**:
+- `JOURNAL.md` moved to `.agentic-journal/JOURNAL.md` (all scripts use fallback for backward compat)
+- Plans consolidated from `docs/plans/` + `.agentic-state/plans/` (gitignored) to `.agentic-journal/plans/` (git-tracked)
+- `.agentic-journal/` now holds: JOURNAL.md, manifests/, lessons/, plans/
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.22.1
+**Current Version**: v0.23.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 28 defined (22 previously passing + 6 new artifact-maintenance tests)

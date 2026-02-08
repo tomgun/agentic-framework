@@ -73,7 +73,7 @@ This framework now includes advanced features for long-term, complex software:
 - **Session continuity**: JOURNAL.md tracks progress across context resets
 - **Dependency tracking**: Feature dependencies with visualization
 - **Human escalation**: HUMAN_NEEDED.md for decisions requiring human input
-- **Architecture evolution**: Track changes over time with arch_diff.sh
+- **Architecture evolution**: Track changes with CONTEXT_PACK.md snapshots
 - **Research trails**: Structured research documentation
 - **Scaling guidance**: Suggestions when project complexity crosses thresholds
 - **Automated retrospectives**: Periodic project health checks and improvement suggestions
@@ -274,7 +274,7 @@ bash .agentic/tools/coverage.sh --json           # JSON output
 bash .agentic/tools/coverage.sh --reverse FILE   # What features does FILE implement?
 bash .agentic/tools/coverage.sh --test-mapping   # Infer test→feature mapping
 bash .agentic/tools/feature_graph.sh   # Feature dependency graph
-bash .agentic/tools/arch_diff.sh   # Architecture changes
+bash .agentic/tools/drift.sh       # Spec/code drift check
 
 # Traceability (unified CLI)
 bash .agentic/tools/ag.sh trace              # Combined drift + coverage

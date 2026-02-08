@@ -762,7 +762,7 @@ Closes F-0042
 5. Push to remote
 ```
 
-**Tools**: `sync_docs.py`, `arch_diff.sh`
+**Tools**: `sync_docs.py`, `drift.sh`
 
 ---
 

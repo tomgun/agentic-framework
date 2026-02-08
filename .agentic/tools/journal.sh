@@ -11,7 +11,14 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-JOURNAL_FILE="${PROJECT_ROOT}/JOURNAL.md"
+# New location: .agentic-journal/JOURNAL.md; fallback to root for older projects
+if [[ -f "${PROJECT_ROOT}/.agentic-journal/JOURNAL.md" ]]; then
+  JOURNAL_FILE="${PROJECT_ROOT}/.agentic-journal/JOURNAL.md"
+elif [[ -f "${PROJECT_ROOT}/JOURNAL.md" ]]; then
+  JOURNAL_FILE="${PROJECT_ROOT}/JOURNAL.md"
+else
+  JOURNAL_FILE="${PROJECT_ROOT}/.agentic-journal/JOURNAL.md"
+fi
 
 # Required positional arguments
 TOPIC="${1:-Untitled}"
@@ -39,6 +46,7 @@ TIMESTAMP=$(date +"%Y-%m-%d %H:%M")
 
 # Create journal if doesn't exist
 if [[ ! -f "${JOURNAL_FILE}" ]]; then
+  mkdir -p "$(dirname "${JOURNAL_FILE}")"
   cat > "${JOURNAL_FILE}" <<'HEADER'
 # JOURNAL
 
@@ -48,7 +56,7 @@ if [[ ! -f "${JOURNAL_FILE}" ]]; then
 
 ---
 
-## Session Log (most recent first)
+## Session Log
 
 HEADER
 fi
@@ -77,5 +85,5 @@ fi
   echo ""
 } >> "${JOURNAL_FILE}"
 
-echo "✓ Added entry to JOURNAL.md (appended, no full file read)"
+echo "✓ Added entry to ${JOURNAL_FILE#$PROJECT_ROOT/} (appended, no full file read)"
 

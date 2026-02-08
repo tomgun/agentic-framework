@@ -13,15 +13,22 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 fi
 
 # Key documentation files to check
+# Note: JOURNAL.md location is resolved below
 FILES=(
   "CONTEXT_PACK.md"
   "STATUS.md"
-  "JOURNAL.md"
   "spec/FEATURES.md"
   "spec/TECH_SPEC.md"
   "spec/NFR.md"
   "spec/OVERVIEW.md"
 )
+
+# Resolve JOURNAL.md path
+if [[ -f ".agentic-journal/JOURNAL.md" ]]; then
+  FILES+=(".agentic-journal/JOURNAL.md")
+elif [[ -f "JOURNAL.md" ]]; then
+  FILES+=("JOURNAL.md")
+fi
 
 stale_count=0
 

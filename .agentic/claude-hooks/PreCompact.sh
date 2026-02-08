@@ -54,16 +54,23 @@ fi
 # 3. Add JOURNAL.md entry (if we have significant uncommitted work)
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   UNCOMMITTED=$(git status --porcelain | wc -l | tr -d ' ')
-  if [[ "$UNCOMMITTED" -gt 0 ]] && [[ -f "JOURNAL.md" ]]; then
+  JOURNAL_PATH=""
+  if [[ -f ".agentic-journal/JOURNAL.md" ]]; then
+    JOURNAL_PATH=".agentic-journal/JOURNAL.md"
+  elif [[ -f "JOURNAL.md" ]]; then
+    JOURNAL_PATH="JOURNAL.md"
+  fi
+
+  if [[ "$UNCOMMITTED" -gt 0 ]] && [[ -n "$JOURNAL_PATH" ]]; then
     TIMESTAMP=$(date "+%Y-%m-%d %H:%M")
-    echo "" >> JOURNAL.md
-    echo "## $TIMESTAMP - Context Compaction" >> JOURNAL.md
-    echo "" >> JOURNAL.md
-    echo "Context window reached capacity. State preserved in STATUS.md." >> JOURNAL.md
-    echo "" >> JOURNAL.md
-    echo "Uncommitted changes:" >> JOURNAL.md
-    git status --short | head -10 >> JOURNAL.md
-    echo "" >> JOURNAL.md
+    echo "" >> "$JOURNAL_PATH"
+    echo "## $TIMESTAMP - Context Compaction" >> "$JOURNAL_PATH"
+    echo "" >> "$JOURNAL_PATH"
+    echo "Context window reached capacity. State preserved in STATUS.md." >> "$JOURNAL_PATH"
+    echo "" >> "$JOURNAL_PATH"
+    echo "Uncommitted changes:" >> "$JOURNAL_PATH"
+    git status --short | head -10 >> "$JOURNAL_PATH"
+    echo "" >> "$JOURNAL_PATH"
     echo "✓ Added JOURNAL.md entry"
   fi
 fi

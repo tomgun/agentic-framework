@@ -92,7 +92,7 @@ Every decision — feature design, documentation, tooling, agent instructions �
 3. `feature.sh` — enforces valid status transitions (planned → in_progress → shipped)
 4. Token-efficient tools — surgical edits, no full-file rewrites
 
-**Design basis**: Two independent research efforts confirmed this principle across Claude Code, Cursor, Copilot, and Codex. See `docs/research/INSTRUCTION_ARCHITECTURE.md`.
+**Design basis**: Two independent research efforts confirmed this principle across Claude Code, Cursor, Copilot, and Codex. See `docs/INSTRUCTION_ARCHITECTURE.md`.
 
 **Anti-pattern**: ❌ "Agents should..." without enforcement (hope-based development). ❌ Commit first, validate later. ❌ Blocking on soft signals that require human judgment.
 
@@ -114,7 +114,7 @@ Every decision — feature design, documentation, tooling, agent instructions �
 - Agents read these FIRST at session start (reading protocols)
 - Updated in same commit as code changes (Living Documentation)
 - Token-efficient tools prevent full-file rewrites when updating
-- Humans can `cat STATUS.md && tail -30 JOURNAL.md` for instant project state (zero tokens)
+- Humans can `cat STATUS.md && tail -30 .agentic-journal/JOURNAL.md` for instant project state (zero tokens)
 
 **Anti-pattern**: ❌ Starting every session with "let me read all files in src/". ❌ Empty or stale CONTEXT_PACK.md. ❌ "What are we working on?" when STATUS.md has the answer.
 
@@ -259,6 +259,8 @@ Every decision — feature design, documentation, tooling, agent instructions �
 **For Contributors**: Propose changes consistent with principles. Challenge principles if context has changed (with strong rationale).
 
 **For Agents**: These principles guide all work. When uncertain, return to principles. NON-NEGOTIABLE means NON-NEGOTIABLE.
+
+**Architecture**: These principles are implemented through a three-layer instruction architecture (Constitution → Playbooks → State). See `docs/INSTRUCTION_ARCHITECTURE.md` for the design basis.
 
 ---
 

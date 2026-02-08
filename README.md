@@ -174,6 +174,31 @@ No stale placeholders. DRY (cross-reference, don't duplicate). Explicit over imp
 **Efficient software reduces energy consumption and cost.**
 Token efficiency IS green for framework ops. For project code: algorithms, caching, event-driven patterns. See [green_coding.md](.agentic/quality/green_coding.md) for comprehensive guidelines.
 
+## How It Works: Three-Layer Architecture
+
+AI coding tools have limited context windows. Stuffing everything into a `.cursorrules` or `CLAUDE.md` file doesn't scale — agents lose focus as instruction files grow, and structurally-enforced content (like pre-commit hooks) doesn't need to be in the context window at all.
+
+The framework uses a **three-layer architecture** that respects context limits while ensuring consistent behavior:
+
+### Layer 1: Constitution (Always Loaded)
+Instruction files (`CLAUDE.md`, `.cursorrules`, `copilot-instructions.md`) — kept under **100 lines**. Only behavioral rules that *cannot* be enforced structurally. These are the only files that compete for the agent's attention budget.
+
+### Layer 2: Playbooks (Just-in-Time)
+Workflows, checklists, and orchestration rules (`auto_orchestration.md`, `checklists/`, `workflows/`) — loaded by `ag` commands when needed, never pinned in the instruction file. This keeps the constitution small while providing deep guidance for specific tasks.
+
+### Layer 3: State (Durable Artifacts)
+Project truth that survives context resets (`STACK.md`, `STATUS.md`, `CONTEXT_PACK.md`, `JOURNAL.md`). Git-tracked files work cross-machine; gitignored files (`.agentic-state/`) are session-local. Agents read these first; humans can `cat STATUS.md` for instant awareness at zero token cost.
+
+### Distributed Enforcement
+Three scripts enforce behavior regardless of which AI tool runs them:
+- **`ag.sh`** — CLI that loads the right playbook for each task
+- **`pre-commit-check.sh`** — gates that block bad commits (exit codes, not advice)
+- **`context-for-role.sh`** — assembles minimal context per subagent (60-80% token savings)
+
+This works across Claude Code, Cursor, Copilot, and Codex — no single orchestrator process required.
+
+**Deep dive**: [`docs/INSTRUCTION_ARCHITECTURE.md`](docs/INSTRUCTION_ARCHITECTURE.md) — the authoritative design document.
+
 ## Quick Start
 
 ### Agent-driven initialization
@@ -314,7 +339,7 @@ Enable later: `bash .agentic/tools/enable-product-management.sh`
 - **Session continuity**: JOURNAL.md tracks progress across context resets
 - **Dependency tracking**: Feature dependencies with visualization
 - **Human escalation**: HUMAN_NEEDED.md for decisions requiring judgment
-- **Architecture evolution**: Track changes with arch_diff.sh
+- **Architecture evolution**: Track changes with CONTEXT_PACK.md snapshots
 - **Research trails**: Structured documentation of research findings
 - **Scaling guidance**: Suggestions when complexity crosses thresholds
 - **Project retrospectives**: Periodic agent-led health checks
@@ -344,14 +369,11 @@ bash .agentic/tools/brief.sh       # Quick project brief
 bash .agentic/tools/dashboard.sh   # Comprehensive dashboard
 bash .agentic/tools/coverage.sh    # Code annotation coverage
 bash .agentic/tools/feature_graph.sh   # Dependency visualization
-bash .agentic/tools/arch_diff.sh   # Architecture changes over time
 
 # Manual operations (token-free)
-bash .agentic/tools/search.sh      # Search specs and code
 bash .agentic/tools/whatchanged.sh # Recent changes
 bash .agentic/tools/deps.sh        # Feature dependencies
 bash .agentic/tools/accept.sh      # Run acceptance tests
-bash .agentic/tools/consistency.sh # Check doc drift
 bash .agentic/tools/stale.sh       # Find stale docs
 bash .agentic/tools/task.sh        # Create task files
 
@@ -370,7 +392,7 @@ Quick-start guidance for common technology stacks:
 ### Core Profile Files
 **Project State:**
 - `STACK.md` - How to build, test, run, and deploy (with profile setting)
-- `JOURNAL.md` - Session-by-session progress log
+- `.agentic-journal/JOURNAL.md` - Session-by-session progress log
 - `CONTEXT_PACK.md` - Durable context (architecture, where things are)
 - `HUMAN_NEEDED.md` - Items requiring human decision/intervention
 

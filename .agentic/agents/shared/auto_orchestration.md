@@ -2,6 +2,8 @@
 
 **Purpose**: Agents automatically detect task type and follow the correct systematic process.
 
+**Design basis**: Implements Principles #3 (Context Efficiency), #4 (Deterministic Enforcement), and #5 (Durable Artifacts). Architecture: `docs/INSTRUCTION_ARCHITECTURE.md`.
+
 **🚨 CRITICAL**: These rules are NON-NEGOTIABLE. Follow them without user prompting.
 
 ---
@@ -331,4 +333,54 @@ The framework promises these things. Agents MUST enforce them:
 - Follow the definition of done
 
 These are YOUR responsibility as an agent following this framework.
+
+---
+
+## Reference: Gates, Delegation, and Session Protocols
+
+*(Moved from instruction files — these are structurally enforced, not constitutional rules)*
+
+### Enforced Gates (Profile-Aware)
+
+| Gate | Core+PM (formal) | Core (discovery) |
+|------|------------------|------------------|
+| Acceptance criteria | BLOCKS - `ag implement` requires spec/acceptance/F-XXXX.md | N/A - use `ag work` |
+| WIP before commit | BLOCKS - must complete WIP first | WARNING only |
+| Test execution | BLOCKS - tests must pass | BLOCKS - tests for changed files |
+| Complexity limits | BLOCKS - max files/lines/length | BLOCKS - same limits apply |
+| Pre-commit checks | BLOCKS - full validation | Light check, no block |
+| Feature status | BLOCKS - shipped needs acceptance | N/A |
+
+Escape hatches (feature branches only): SKIP_TESTS=1 or SKIP_COMPLEXITY=1
+
+### Agent Boundaries
+
+| ALWAYS | ASK FIRST | NEVER |
+|--------|-----------|-------|
+| Run tests before "done" | Add dependencies | Commit without approval |
+| Update specs with code | Change architecture | Push to main directly |
+| Follow existing patterns | Delete files | Modify secrets/.env |
+
+### Agent Mode (model selection for delegation)
+
+Check `agent_mode` in STACK.md: `premium` | `balanced` (default) | `economy`
+- premium: opus for planning/impl/review, sonnet for search
+- balanced (default): opus for planning, sonnet for impl/review, haiku for search
+- economy: sonnet for planning, haiku for everything else
+- Custom: check `models:` section. Docs: `.agentic/workflows/agent_mode.md`
+
+### Task Tool Delegation (Claude Code)
+
+| Task Type | subagent_type | premium | balanced | economy |
+|-----------|---------------|---------|----------|---------|
+| Codebase search | `Explore` | sonnet | haiku | haiku |
+| Planning/architecture | `Plan` | opus | opus | sonnet |
+| Implementation | `general-purpose` | opus | sonnet | haiku |
+| Testing/review | `general-purpose` | opus | sonnet | haiku |
+
+### Session Protocols
+
+- **START**: Run `ag start`. Read STATUS.md, HUMAN_NEEDED.md, check .agentic-state/WIP.md. If WIP.md exists: warn about interrupted work and suggest resuming.
+- **END**: Run `.agentic/checklists/session_end.md`, update JOURNAL.md.
+- **DONE**: Run `.agentic/checklists/feature_complete.md` before claiming done.
 

@@ -53,13 +53,8 @@
   - No test failures or errors
 
 - [ ] **Smoke test passed** (CRITICAL for user-facing changes)
-  - **If this commit adds/changes user-facing functionality, you MUST run the application and verify it works**
   - See `.agentic/checklists/smoke_testing.md` for full checklist
-  - Quick check:
-    - [ ] Application starts without errors
-    - [ ] Primary user action works (click button, move piece, submit form, etc.)
-    - [ ] No console/log errors
-    - [ ] Expected behavior happens
+  - Quick: app starts, primary action works, no errors
   - **If smoke test fails, DO NOT commit - fix it first**
 
 - [ ] **Quality checks pass** (if enabled)

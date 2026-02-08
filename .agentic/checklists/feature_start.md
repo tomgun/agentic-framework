@@ -82,6 +82,8 @@ DO NOT pass:
 □ Will update specs when done
 ```
 
+**Next**: Follow `.agentic/checklists/feature_implementation.md` for the implementation phase.
+
 ---
 
 ## Quick Reference

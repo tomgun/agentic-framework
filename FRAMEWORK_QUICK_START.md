@@ -27,6 +27,20 @@ Every decision must align with these. If conflict, re-read `PRINCIPLES.md`.
 
 ---
 
+## 🏗️ ARCHITECTURE: Three Layers
+
+| Layer | What | Files | Rule |
+|-------|------|-------|------|
+| **Constitution** | Behavioral rules always loaded | CLAUDE.md, .cursorrules, etc. | <100 lines. Only what can't be structurally enforced. |
+| **Playbooks** | How to execute tasks | auto_orchestration.md, checklists/ | Loaded just-in-time by `ag` commands. Never in instruction files. |
+| **State** | Project truth | STACK.md, STATUS.md, CONTEXT_PACK.md | Git-tracked = cross-machine. Gitignored = session-local. |
+
+Enforcement is **distributed** — `ag.sh`, `pre-commit-check.sh`, and `context-for-role.sh` enforce behavior across all AI tools. No single orchestrator required.
+
+**Design basis**: [`docs/INSTRUCTION_ARCHITECTURE.md`](docs/INSTRUCTION_ARCHITECTURE.md)
+
+---
+
 ## 📦 TWO PROFILES: Core vs Core+PM
 
 Framework features apply to different profiles:
@@ -71,7 +85,7 @@ Ask yourself:
 | 7 | `CHANGELOG.md` | Document the change | Living docs |
 | 8 | `CONTRIBUTIONS.md` | Add version section | Attribution |
 | 9 | `upgrade.sh` FEATURE_REGISTRY | If user-visible during upgrade | Developer UX |
-| 10 | `.agentic/agents/claude/CLAUDE.md` | Sync if guidelines/principles changed | Bootstrap must be self-contained (see ADR-001). Design: `docs/research/INSTRUCTION_ARCHITECTURE.md` — instruction files serve the orchestrator only; subagents get context via `context-for-role.sh`. |
+| 10 | `.agentic/agents/claude/CLAUDE.md` | Sync if guidelines/principles changed | Bootstrap must be self-contained (see ADR-001). Design: `docs/INSTRUCTION_ARCHITECTURE.md` — instruction files serve the orchestrator only; subagents get context via `context-for-role.sh`. |
 | 11 | `bash .agentic/tools/manifest.sh F-####` | Generate change manifest | Audit trail of what changed |
 
 **Feature is "accepted" when**: Tests pass in `validate_framework.sh` AND developer has reviewed tests and results.

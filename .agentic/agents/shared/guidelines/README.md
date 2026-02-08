@@ -6,7 +6,8 @@ This directory contains focused guideline modules extracted from `agent_operatin
 
 | Module | Purpose | When to Load |
 |--------|---------|--------------|
-| `anti-hallucination.md` | Rules for verifying claims, no fabrication | Always (core rule) |
+| `core-rules.md` | Constitutional minimum: no fabrication, no auto-commit, token scripts, ask when uncertain | **Always** (auto-injected by `context-for-role.sh` for ALL roles) |
+| `anti-hallucination.md` | Comprehensive verification rules, check-before-creating | Always (core rule) |
 | `token-efficiency.md` | Scripts, delegation, context optimization | When updating docs |
 | `multi-agent.md` | Coordination, AGENTS_ACTIVE.md, worktrees | Parallel agent work |
 | `wip-tracking.md` | Work-in-progress, recovery | Interrupted sessions |
@@ -33,7 +34,7 @@ exclude:
 - [x] multi-agent.md extracted
 - [x] wip-tracking.md extracted
 - [x] small-batch.md extracted
-- [ ] Update agent_operating_guidelines.md to reference modules
+- [x] Update agent_operating_guidelines.md to reference modules (434 → 110 lines)
 - [x] Consolidate CLAUDE.md duplications (512 → 113 lines, 78% reduction)
 
 ## Token Savings

@@ -87,17 +87,8 @@
 
 ### Test Quality
 
-- [ ] **Tests follow testing standards**
-  - Test edge cases
-  - Test invalid input
-  - Test time-based behavior (if applicable)
-  - Test concurrency (if applicable)
-  - Test resource exhaustion (if applicable)
-
-- [ ] **Mutation testing considered** (for critical code)
-  - If feature is critical (auth, payments, data integrity)
-  - Consider running mutation tests
-  - If run, score should be >80%
+- [ ] **Tests follow testing standards** — see `.agentic/quality/testing_standards.md`
+- [ ] **Mutation testing considered** (for critical code — auth, payments, data integrity)
 
 ---
 
