@@ -125,31 +125,37 @@ See `.agentic/agents/context-manifests/` for all role definitions
    ├─ Core+PM: Check spec/acceptance/F-####.md exists
    ├─ Core: Check OVERVIEW.md has criteria
    └─ If missing: CREATE THEM FIRST (rough is OK)
-   
-2. CHECK DEVELOPMENT MODE
+
+2. CHECK PLAN-REVIEW SETTING
+   └─ Read STACK.md → plan_review_enabled (default: yes for Core+PM)
+   ├─ If yes: Run `ag plan F-####` first — tell user review loop is active
+   │          and mention max iterations from plan_review_max_iterations
+   └─ If no: Proceed directly (or run ag plan --no-review for simple plan)
+
+3. CHECK DEVELOPMENT MODE
    └─ Read STACK.md → development_mode (default: standard)
-   
-3. IMPLEMENT
+
+4. IMPLEMENT
    ├─ Write code meeting acceptance criteria
    ├─ Add @feature annotations
    └─ Keep small, focused changes
-   
-4. TEST
+
+5. TEST
    ├─ Write/run tests verifying acceptance criteria
    ├─ All tests must pass
    └─ Smoke test: RUN THE APPLICATION
-   
-5. UPDATE SPECS (MANDATORY - NOT OPTIONAL)
+
+6. UPDATE SPECS (MANDATORY - NOT OPTIONAL)
    ├─ Core+PM: Update spec/FEATURES.md status
    ├─ Core: Update OVERVIEW.md
    └─ This is part of "done", not afterthought
-   
-6. UPDATE DOCS
+
+7. UPDATE DOCS
    ├─ JOURNAL.md (what was accomplished)
    ├─ CONTEXT_PACK.md (if architecture changed)
    └─ STATUS.md (next steps)
-   
-7. BEFORE COMMIT
+
+8. BEFORE COMMIT
    └─ Run before_commit.md checklist
 ```
 
@@ -157,7 +163,7 @@ See `.agentic/agents/context-manifests/` for all role definitions
 
 | Gate | Check | Block If |
 |------|-------|----------|
-| Acceptance Criteria | `spec/acceptance/F-####.md` exists | Missing = cannot proceed |
+| Acceptance Criteria | `spec/acceptance/F-####.md` (Core+PM) or criteria in any form (Core) | Core+PM: Missing = cannot proceed |
 | Tests Pass | Run test suite | Any failure = cannot ship |
 | Smoke Test | Actually run the app | Doesn't work = cannot ship |
 | Specs Updated | FEATURES.md and STATUS.md current | Stale = cannot commit |

@@ -1893,9 +1893,56 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## LLM Test Suite Completion & Settings Testing (v0.23.0, 2026-02-08)
+
+### Complete LLM Test Coverage (13 Missing Scripts Implemented)
+
+**Context**: After v0.23.0 shipped 28 test definitions in `test_definitions.json`, 13 lacked shell script implementations. All 13 were implemented in a single batch following the established harness pattern.
+
+**Implementation**:
+- 13 shell scripts created covering token-efficiency, durable-artifacts, multi-agent, profiles, and artifact-maintenance sections
+- 2 JSON definition fixes: test 033 (empty AGENTS_ACTIVE → populated with active agent, plus `git add -f` for gitignored file) and test 037 (improved `output_not_contains` patterns to avoid false-fails on quoted stale content)
+- Soft-check pattern (warnings, not hard failures) used for proactive/aspirational behavior tests (024-026, 036, 038, 040, 041)
+- Hard-check pattern used for tests where behavior is explicitly instructed (031-034, 037, 039)
+
+**Result**: All 29 test definitions now have matching shell scripts. Zero gaps between JSON definitions and harness tests.
+
+### Settings Abstraction Insight
+
+**User insight**: STACK.md settings like `plan_review_enabled`, `agent_mode`, and `git_workflow` are abstracted behind `ag` commands — agents don't read these settings directly, they run `ag plan` / `ag commit` and the scripts read the settings. Therefore:
+
+1. **LLM tests for settings awareness are the wrong layer** — an initial LLM test (042) that checked whether agents could quote STACK.md values was reverted after recognizing the architecture mismatch.
+2. **Functional tests for `ag.sh` are the right layer** — settings should be tested where they're consumed (the scripts), not where they're stored (STACK.md).
+
+**Result - 7 Functional Settings Tests** (added to `test_ag_gateway.sh`):
+- `plan_review_enabled=yes` → shows "Review loop: ENABLED"
+- `plan_review_enabled=no` → shows "Review loop: SKIPPED"
+- `--no-review` flag overrides the enabled setting
+- `plan_review_max_iterations=5` → shows "max 5 iterations"
+- Default (setting absent) → ENABLED
+- Core profile rejects `ag plan` (feature IDs require Core+PM)
+- `plan_review_auto_for=[implement]` warns when no approved plan exists
+
+**Bug fix**: 3 pre-existing test failures in `test_ag_gateway.sh` caused by missing `mkdir -p .agentic-state/` before writing WIP.md.
+
+**All 21 gateway tests now pass.**
+
+### Plan-Review Awareness in Feature Pipeline
+
+**User insight**: When an agent starts planning a feature, it should surface the plan-review configuration so the user knows whether review is active and how many iterations are allowed. This was a gap in the playbook layer — the Feature Pipeline in `auto_orchestration.md` went straight from acceptance criteria to implementation without checking plan-review settings.
+
+**Implementation**:
+- Added step 2 "CHECK PLAN-REVIEW SETTING" to Feature Pipeline in `auto_orchestration.md`
+- Tells agents to read `plan_review_enabled` from STACK.md and mention the review loop status and max iterations to the user
+- New LLM test `043_plan_review_awareness.sh` verifies the agent mentions plan-review when starting to implement a feature
+
+**Design principle reinforced**: Keep CLAUDE.md minimal (constitution layer). Add workflow guidance to `auto_orchestration.md` (playbook layer) where it's loaded just-in-time when needed.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.23.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
-**LLM Tests**: 28 defined (22 previously passing + 6 new artifact-maintenance tests)
+**LLM Tests**: 29 defined with matching shell scripts + 1 plan-review awareness test (30 total)
 

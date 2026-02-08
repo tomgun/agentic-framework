@@ -159,7 +159,7 @@ setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: core
 EOF
-mkdir -p "$TEST_DIR/.agentic"
+mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
 echo "test" > "$TEST_DIR/.agentic-state/WIP.md"
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" commit 2>&1) || true
 if echo "$output" | grep -q "WARNING"; then
@@ -172,7 +172,7 @@ cleanup_test_env
 test_case "ag commit: Core+PM profile shows BLOCKED for WIP"
 setup_test_env
 mkdir -p "$TEST_DIR/spec"
-mkdir -p "$TEST_DIR/.agentic"
+mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
 echo "test" > "$TEST_DIR/.agentic-state/WIP.md"
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" commit 2>&1) || true
 if echo "$output" | grep -q "BLOCKED"; then
@@ -185,7 +185,7 @@ cleanup_test_env
 test_case "ag commit: Core+PM exits non-zero when blocked"
 setup_test_env
 mkdir -p "$TEST_DIR/spec"
-mkdir -p "$TEST_DIR/.agentic"
+mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
 echo "test" > "$TEST_DIR/.agentic-state/WIP.md"
 result=0
 bash "$TEST_DIR/.agentic/tools/ag.sh" commit >/dev/null 2>&1 || result=$?
@@ -291,6 +291,129 @@ if echo "$output" | grep -q "needs initialization"; then
     pass
 else
     fail "Should show initialization guidance"
+fi
+cleanup_test_env
+
+#=============================================================================
+# Plan-Review Settings Tests
+#=============================================================================
+
+# Helper: set up Core+PM with acceptance criteria for ag plan
+setup_plan_env() {
+    setup_test_env
+    mkdir -p "$TEST_DIR/spec/acceptance"
+    cat > "$TEST_DIR/spec/acceptance/F-0042.md" << 'EOF'
+# F-0042: Test Feature
+## Acceptance Criteria
+- [ ] Basic functionality works
+EOF
+}
+
+test_case "ag plan: plan_review_enabled=yes shows ENABLED"
+setup_plan_env
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+Profile: core+product
+- plan_review_enabled: yes
+- plan_review_max_iterations: 3
+EOF
+output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 2>&1)
+if echo "$output" | grep -q "Review loop: ENABLED"; then
+    pass
+else
+    fail "Expected 'Review loop: ENABLED' when plan_review_enabled=yes"
+fi
+cleanup_test_env
+
+test_case "ag plan: plan_review_enabled=no shows SKIPPED"
+setup_plan_env
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+Profile: core+product
+- plan_review_enabled: no
+EOF
+output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 2>&1)
+if echo "$output" | grep -q "Review loop: SKIPPED"; then
+    pass
+else
+    fail "Expected 'Review loop: SKIPPED' when plan_review_enabled=no"
+fi
+cleanup_test_env
+
+test_case "ag plan: --no-review overrides enabled setting"
+setup_plan_env
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+Profile: core+product
+- plan_review_enabled: yes
+EOF
+output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 --no-review 2>&1)
+if echo "$output" | grep -q "Review loop: SKIPPED"; then
+    pass
+else
+    fail "Expected --no-review to override plan_review_enabled=yes"
+fi
+cleanup_test_env
+
+test_case "ag plan: max_iterations=5 shows in output"
+setup_plan_env
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+Profile: core+product
+- plan_review_enabled: yes
+- plan_review_max_iterations: 5
+EOF
+output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 2>&1)
+if echo "$output" | grep -q "max 5 iterations"; then
+    pass
+else
+    fail "Expected 'max 5 iterations' in output"
+fi
+cleanup_test_env
+
+test_case "ag plan: defaults to enabled when setting absent"
+setup_plan_env
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+Profile: core+product
+EOF
+output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 2>&1)
+if echo "$output" | grep -q "Review loop: ENABLED"; then
+    pass
+else
+    fail "Expected default to ENABLED when plan_review_enabled not set"
+fi
+cleanup_test_env
+
+test_case "ag plan: Core profile rejects plan command"
+setup_test_env
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+Profile: core
+EOF
+result=0
+bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 >/dev/null 2>&1 || result=$?
+if [[ $result -ne 0 ]]; then
+    pass
+else
+    fail "Core profile should reject ag plan"
+fi
+cleanup_test_env
+
+#=============================================================================
+# Implement Command Settings Tests
+#=============================================================================
+
+test_case "ag implement: plan_review_auto_for=implement warns when no plan"
+setup_plan_env
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+Profile: core+product
+- plan_review_auto_for: [implement]
+EOF
+# Add feature to FEATURES.md
+cat > "$TEST_DIR/spec/FEATURES.md" << 'EOF'
+## F-0042: Test Feature
+- Status: in_progress
+EOF
+output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" implement F-0042 2>&1) || true
+if echo "$output" | grep -q "No plan found\|consider running.*ag plan"; then
+    pass
+else
+    fail "Expected warning about missing plan when auto_for includes implement"
 fi
 cleanup_test_env
 
