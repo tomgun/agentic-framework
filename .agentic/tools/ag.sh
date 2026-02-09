@@ -592,6 +592,11 @@ cmd_commit() {
         # Core mode: just check for basic issues, don't block on spec stuff
         bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null || true
         echo ""
+        echo ""
+        echo -e "${BOLD}Pre-commit artifacts check:${NC}"
+        echo "   Have you updated JOURNAL.md?  (bash .agentic/tools/journal.sh ...)"
+        echo "   Have you updated STATUS.md?   (bash .agentic/tools/status.sh ...)"
+        echo ""
         echo -e "${GREEN}Core mode: Ready to commit${NC}"
         echo "  git add <files>"
         echo "  git commit -m \"description\""
@@ -600,6 +605,10 @@ cmd_commit() {
         if bash "$SCRIPT_DIR/doctor.sh" --pre-commit 2>/dev/null; then
             echo ""
             echo -e "${GREEN}All pre-commit gates PASSED${NC}"
+            echo ""
+            echo -e "${BOLD}Pre-commit artifacts check:${NC}"
+            echo "   Have you updated JOURNAL.md?  (bash .agentic/tools/journal.sh ...)"
+            echo "   Have you updated STATUS.md?   (bash .agentic/tools/status.sh ...)"
             echo ""
             echo "Ready to commit. Suggested workflow:"
             echo "  git add <files>"

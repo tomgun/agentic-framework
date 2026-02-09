@@ -251,3 +251,25 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-09 19:33 - LLM Test Suite v0.23.0
+
+**Accomplished**:
+- Fixed 3 test bugs (006/014 mkdir, 022 regex), fixed harness rate-limit detection, ran full suite 42/42 pass (100% Sonnet), registered F-0123 + approved plan, tagged v0.23.0
+
+**Next steps**:
+- Push v0.23.0 release, implement F-0123
+
+**Blockers**: None
+
+
+### Session: 2026-02-10 00:08 - Structural Enforcement: JOURNAL/STATUS Staleness
+
+**Accomplished**:
+- Implemented commit-relative staleness checks in pre-commit-check.sh (BLOCKING) and UserPromptSubmit.sh (proactive reminder). Added SKIP_STALENESS escape hatch. Added contribution logging rule to CLAUDE.md and .cursorrules. Updated CONTRIBUTIONS.md.
+
+**Next steps**:
+- Review with user, commit changes
+
+**Blockers**: None
+
