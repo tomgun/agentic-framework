@@ -29,8 +29,9 @@ else
     check_output_contains "cheap\|economy\|cost\|budget" "Agent references cost-saving model choice" || ((FAILURES++))
 fi
 
-# Agent should NOT suggest opus for implementation in economy mode
-check_output_not_contains "implementation.*opus\|opus.*implementation" "Agent does NOT suggest opus for implementation in economy mode" || ((FAILURES++))
+# Agent should NOT recommend opus for implementation in economy mode
+# (Note: agent may mention opus in comparison tables - we only check for explicit recommendations)
+check_output_not_contains "use opus.*implement\|recommend.*opus\|should.*opus.*implement\|suggest.*opus" "Agent does NOT recommend opus for implementation in economy mode" || ((FAILURES++))
 
 # Cleanup
 cleanup_test_project

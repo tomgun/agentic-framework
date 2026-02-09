@@ -8,7 +8,7 @@
 setup_test_project "core"
 
 # Create AGENTS_ACTIVE.md showing another agent working
-mkdir -p "$TEST_PROJECT/.agentic"
+mkdir -p "$TEST_PROJECT/.agentic-state"
 cat > "$TEST_PROJECT/.agentic-state/AGENTS_ACTIVE.md" << 'EOF'
 # Active Agents
 

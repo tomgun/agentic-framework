@@ -279,7 +279,7 @@ reset_state() {
 # Detect rate limit in output
 detect_rate_limit() {
     local output="$1"
-    if echo "$output" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded"; then
+    if echo "$output" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded\|out of extra usage\|out of.*usage"; then
         return 0  # Rate limited
     fi
     return 1  # Not rate limited
@@ -349,7 +349,7 @@ send_prompt() {
         echo "$LAST_OUTPUT" > "$SCRIPT_DIR/.last-output"
 
         # Check for rate limit and exit with special code
-        if echo "$LAST_OUTPUT" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded"; then
+        if echo "$LAST_OUTPUT" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded\|out of extra usage\|out of.*usage"; then
             echo -e "${YELLOW}⚠ Rate limit detected in response${NC}"
             exit 2  # Special exit code for rate limit
         fi
@@ -368,7 +368,7 @@ send_prompt() {
         echo "$LAST_OUTPUT" > "$SCRIPT_DIR/.last-output"
 
         # Check for rate limit and exit with special code
-        if echo "$LAST_OUTPUT" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded"; then
+        if echo "$LAST_OUTPUT" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded\|out of extra usage\|out of.*usage"; then
             echo -e "${YELLOW}⚠ Rate limit detected in response${NC}"
             exit 2  # Special exit code for rate limit
         fi
@@ -389,7 +389,7 @@ send_prompt() {
         echo "$LAST_OUTPUT" > "$SCRIPT_DIR/.last-output"
 
         # Check for rate limit and exit with special code
-        if echo "$LAST_OUTPUT" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded"; then
+        if echo "$LAST_OUTPUT" | grep -qi "rate.limit\|hit your limit\|too many requests\|quota exceeded\|out of extra usage\|out of.*usage"; then
             echo -e "${YELLOW}⚠ Rate limit detected in response${NC}"
             exit 2  # Special exit code for rate limit
         fi
