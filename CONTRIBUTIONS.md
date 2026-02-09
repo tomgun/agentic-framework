@@ -1940,6 +1940,45 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## Structural Enforcement: JOURNAL & STATUS Staleness (2026-02-09)
+
+### From Behavioral Rules to Structural Enforcement
+
+**User frustration** (driving the entire feature):
+- Agents bypass `ag commit` and JOURNAL/STATUS update rules even when the trigger word table is right there in CLAUDE.md
+- Text rules don't change agent behavior under cognitive load — the agent that skipped the workflow had the instructions loaded
+- Core insight: **structural enforcement** (mechanisms that physically prevent the wrong action) > behavioral rules (text telling agents what to do)
+
+**User direction — Two-Layer Enforcement**:
+1. **Git pre-commit hook** (cross-agent): Blocks commits when JOURNAL/STATUS are stale — works for Claude, Cursor, Copilot, Codex, anything using git
+2. **Claude Code UserPromptSubmit hook** (Claude-specific): Proactive reminder injected before each response when artifacts are stale
+3. Checks must be **BLOCKING**, not advisory warnings (agents ignore warnings)
+
+### Commit-Relative Staleness (Refinement)
+
+**User insight** (after initial fixed-time implementation):
+> "Could the staleness be checked from something more concrete, like the previous git commit time instead of a fixed time? There could be multiple commits within an hour or two... but it could be that within the fixed time multiple different things were accomplished."
+> Also flagged worktree compatibility as a requirement.
+
+**Problem with fixed-time thresholds**: A 2h/4h threshold is simultaneously too lenient (multiple commits within window, only the first gets journaled) and too strict (a single long session with one commit gets blocked even though everything's fine).
+
+**Result - Commit-Relative Staleness**:
+- Pre-commit hook checks if JOURNAL.md/STATUS.md were modified **after the last commit**, not within a fixed time window
+- Three-tier pass logic: (1) artifact is staged in current commit → PASS, (2) artifact mtime > last commit time → PASS, (3) otherwise → BLOCK
+- Works correctly in git worktrees (`git log -1` resolves per-worktree HEAD)
+- `SKIP_STALENESS=1` escape hatch (blocked on main/master, like existing SKIP_TESTS/SKIP_COMPLEXITY)
+- Claude Code `UserPromptSubmit.sh` hook: proactive reminder when uncommitted changes exist but artifacts haven't been updated since last commit
+
+### Contribution Logging Gap
+
+**User observation**: Agents weren't logging user contributions — the root CLAUDE.md and .cursorrules had no instruction to update CONTRIBUTIONS.md.
+
+**Result**: Added contribution logging rule to both framework-dev instruction files.
+
+**Impact**: Structural enforcement replaces behavioral rules for artifact freshness. Commit-relative detection is tied to actual activity, not wall-clock time.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.23.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

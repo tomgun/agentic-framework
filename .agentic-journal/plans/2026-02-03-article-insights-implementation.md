@@ -1,7 +1,7 @@
 # Plan: Implement Article Insights for Framework Enhancement
 
 **Date**: 2026-02-03
-**Status**: Revised after review
+**Status**: Superseded — items 2 & 3 implemented during v0.20–v0.23 work; item 1 (three-tier boundaries) superseded by instruction architecture cleanup (guidelines 434→115 lines, gates in CLAUDE.md + core-rules.md)
 **Version**: 2.0
 **Sources**:
 - [Management as AI Superpower](https://www.oneusefulthing.org/p/management-as-ai-superpower) by Ethan Mollick

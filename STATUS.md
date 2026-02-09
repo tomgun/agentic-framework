@@ -5,10 +5,8 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- v0.23.0 released (Updated: 2026-02-08)
-- 172 acceptance tests passing, 0 failures
-- LLM test suite: 30 tests total (up from 23)
-- Uncommitted: CLAUDE.md changes (both template and root)
+- Structural enforcement: commit-relative JOURNAL/STATUS staleness checks (Updated: 2026-02-09 22:08)
+- Progress: v0.12.1 released and tagged
 
 ## Current focus
 - LLM test suite complete, instruction architecture cleanup done

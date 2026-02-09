@@ -23,6 +23,7 @@ Rules:
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later).
 - Keep changes small and scoped.
+- Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
 - Multi-agent: read `.agentic-state/AGENTS_ACTIVE.md` before starting work.
 
 Agent mode: Check `agent_mode` in STACK.md (premium|balanced|economy). Details: auto_orchestration.md

@@ -13,6 +13,8 @@ On first message of a conversation, give a briefing:
 
 - Always create a separate git worktree on a feature branch before making changes (another agent may be working on main)
 - Never auto-commit without human approval
+- Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts)
+- Log user's design insights and direction to CONTRIBUTIONS.md (their ideas, not agent's implementation work)
 
 ## Development Process
 

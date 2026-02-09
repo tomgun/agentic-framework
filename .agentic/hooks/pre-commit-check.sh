@@ -10,7 +10,7 @@
 # Checks:
 #   1.  .agentic-state/WIP.md must not exist (work must be complete)
 #   2.  Shipped features must have acceptance criteria
-#   3.  In-progress features must have recent JOURNAL entry (<24h)
+#   3.  JOURNAL.md updated since last commit (BLOCKING)
 #   4.  STACK.md version matches reality (where detectable)
 #   5.  Batch size warning (>10 files = too large, should re-plan)
 #   6.  Test execution (BLOCKING - tests must pass)
@@ -22,7 +22,8 @@
 #
 # Escape hatches (use sparingly, blocked on main/master):
 #   SKIP_TESTS=1      Skip test execution
-#   SKIP_COMPLEXITY=1 Skip complexity limits
+#   SKIP_COMPLEXITY=1  Skip complexity limits
+#   SKIP_STALENESS=1   Skip JOURNAL/STATUS staleness checks
 #
 # Exit codes:
 #   0 - All checks pass, commit allowed
@@ -44,7 +45,7 @@ fi
 
 # Block escape hatches on main/master
 if [[ "$CURRENT_BRANCH" == "main" || "$CURRENT_BRANCH" == "master" ]]; then
-  if [[ -n "${SKIP_TESTS:-}" || -n "${SKIP_COMPLEXITY:-}" ]]; then
+  if [[ -n "${SKIP_TESTS:-}" || -n "${SKIP_COMPLEXITY:-}" || -n "${SKIP_STALENESS:-}" ]]; then
     echo "❌ BLOCKED: Cannot use SKIP_* environment variables on $CURRENT_BRANCH"
     echo "   Escape hatches are only allowed on feature branches."
     exit 1
@@ -61,6 +62,12 @@ fi
 if [[ -n "${SKIP_COMPLEXITY:-}" ]]; then
   echo "⚠️  SKIP_COMPLEXITY set - skipping complexity limits"
   echo "   Only use for large refactors with review!"
+  echo ""
+fi
+
+if [[ -n "${SKIP_STALENESS:-}" ]]; then
+  echo "⚠️  SKIP_STALENESS set - skipping JOURNAL/STATUS staleness checks"
+  echo "   Only use for quick fixes on feature branches!"
   echo ""
 fi
 
@@ -154,7 +161,10 @@ else
   echo "[2/11] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
 fi
 
-# Check 3: In-progress features must have recent JOURNAL entry
+# Check 3: JOURNAL.md updated since last commit (BLOCKING)
+# Uses commit-relative staleness: was JOURNAL.md modified after the last commit?
+# This catches multiple commits in quick succession where only the first gets journaled.
+# Works correctly in git worktrees (git log resolves per-worktree HEAD).
 JOURNAL_PATH=""
 if [[ -f ".agentic-journal/JOURNAL.md" ]]; then
   JOURNAL_PATH=".agentic-journal/JOURNAL.md"
@@ -162,75 +172,83 @@ elif [[ -f "JOURNAL.md" ]]; then
   JOURNAL_PATH="JOURNAL.md"
 fi
 
-if [[ -f "spec/FEATURES.md" ]] && [[ -n "$JOURNAL_PATH" ]]; then
+if [[ -n "$JOURNAL_PATH" ]]; then
   echo ""
-  echo "[3/11] Checking in-progress features have recent activity..."
+  echo "[3/11] Checking JOURNAL.md freshness..."
 
-  IN_PROGRESS_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: in_progress" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
+  if [[ -n "${SKIP_STALENESS:-}" ]]; then
+    echo "  ⚠ Skipped (SKIP_STALENESS set)"
+  else
+    LAST_COMMIT_TIME=$(git log -1 --format=%ct 2>/dev/null || echo "")
 
-  if [[ -n "$IN_PROGRESS_FEATURES" ]]; then
-    # Check if JOURNAL.md was updated in last 24 hours
-    if command -v stat >/dev/null 2>&1; then
+    if [[ -z "$LAST_COMMIT_TIME" ]]; then
+      echo "✓ First commit - JOURNAL.md check skipped"
+    elif git diff --cached --name-only 2>/dev/null | grep -q "JOURNAL.md"; then
+      echo "✓ JOURNAL.md is being updated in this commit"
+    elif command -v stat >/dev/null 2>&1; then
       if [[ "$(uname)" == "Darwin" ]]; then
-        JOURNAL_AGE_SECONDS=$(( $(date +%s) - $(stat -f %m "$JOURNAL_PATH") ))
+        JOURNAL_MTIME=$(stat -f %m "$JOURNAL_PATH")
       else
-        JOURNAL_AGE_SECONDS=$(( $(date +%s) - $(stat -c %Y "$JOURNAL_PATH") ))
+        JOURNAL_MTIME=$(stat -c %Y "$JOURNAL_PATH")
       fi
 
-      ONE_DAY=$((24 * 60 * 60))
-      if [[ $JOURNAL_AGE_SECONDS -gt $ONE_DAY ]]; then
-        echo "⚠️  WARNING: In-progress features exist but JOURNAL.md not updated in 24h"
-        echo ""
-        echo "   Features in progress:"
-        echo "$IN_PROGRESS_FEATURES" | sed 's/^/   - /'
-        echo ""
-        echo "   Recommendation:"
-        echo "   - Update JOURNAL.md with progress summary"
-        echo "   - Or change status if features are stale"
-        echo ""
-        echo "   (This is a warning, not blocking commit)"
-        echo ""
+      if [[ $JOURNAL_MTIME -gt $LAST_COMMIT_TIME ]]; then
+        echo "✓ JOURNAL.md updated since last commit"
       else
-        echo "✓ In-progress features have recent JOURNAL entry"
+        echo "❌ BLOCKED: JOURNAL.md not updated since last commit"
+        echo ""
+        echo "   Update before committing:"
+        echo "   bash .agentic/tools/journal.sh \"Topic\" \"Done\" \"Next\" \"Blockers\""
+        echo ""
+        echo "   To skip (feature branches only): SKIP_STALENESS=1 git commit ..."
+        echo ""
+        FAILURES=$((FAILURES + 1))
       fi
     else
       echo "✓ Cannot check JOURNAL age (stat command unavailable)"
     fi
-  else
-    echo "✓ No in-progress features to check"
   fi
 else
   echo ""
-  echo "[3/11] Skipping in-progress features check (no spec/FEATURES.md or JOURNAL.md)"
+  echo "[3/11] Skipping JOURNAL.md check (file not found)"
 fi
 
-# Check 3b: STATUS.md staleness advisory (48h)
+# Check 3b: STATUS.md updated since last commit (BLOCKING)
 if [[ -f "STATUS.md" ]]; then
   echo ""
   echo "[3b/11] Checking STATUS.md freshness..."
-  if command -v stat >/dev/null 2>&1; then
-    if [[ "$(uname)" == "Darwin" ]]; then
-      STATUS_AGE_SECONDS=$(( $(date +%s) - $(stat -f %m STATUS.md) ))
-    else
-      STATUS_AGE_SECONDS=$(( $(date +%s) - $(stat -c %Y STATUS.md) ))
-    fi
 
-    TWO_DAYS=$((48 * 60 * 60))
-    if [[ $STATUS_AGE_SECONDS -gt $TWO_DAYS ]]; then
-      STATUS_AGE_DAYS=$(( STATUS_AGE_SECONDS / 86400 ))
-      echo "⚠️  WARNING: STATUS.md not updated in ${STATUS_AGE_DAYS} days"
-      echo ""
-      echo "   Recommendation:"
-      echo "   - Run: bash .agentic/tools/status.sh infer --apply"
-      echo "   - Or update STATUS.md manually"
-      echo ""
-      echo "   (This is a warning, not blocking commit)"
-      echo ""
-    else
-      echo "✓ STATUS.md is current"
-    fi
+  if [[ -n "${SKIP_STALENESS:-}" ]]; then
+    echo "  ⚠ Skipped (SKIP_STALENESS set)"
   else
-    echo "✓ Cannot check STATUS.md age (stat command unavailable)"
+    LAST_COMMIT_TIME=${LAST_COMMIT_TIME:-$(git log -1 --format=%ct 2>/dev/null || echo "")}
+
+    if [[ -z "$LAST_COMMIT_TIME" ]]; then
+      echo "✓ First commit - STATUS.md check skipped"
+    elif git diff --cached --name-only 2>/dev/null | grep -q "STATUS.md"; then
+      echo "✓ STATUS.md is being updated in this commit"
+    elif command -v stat >/dev/null 2>&1; then
+      if [[ "$(uname)" == "Darwin" ]]; then
+        STATUS_MTIME=$(stat -f %m STATUS.md)
+      else
+        STATUS_MTIME=$(stat -c %Y STATUS.md)
+      fi
+
+      if [[ $STATUS_MTIME -gt $LAST_COMMIT_TIME ]]; then
+        echo "✓ STATUS.md updated since last commit"
+      else
+        echo "❌ BLOCKED: STATUS.md not updated since last commit"
+        echo ""
+        echo "   Update before committing:"
+        echo "   bash .agentic/tools/status.sh focus \"Current task\""
+        echo ""
+        echo "   To skip (feature branches only): SKIP_STALENESS=1 git commit ..."
+        echo ""
+        FAILURES=$((FAILURES + 1))
+      fi
+    else
+      echo "✓ Cannot check STATUS.md age (stat command unavailable)"
+    fi
   fi
 fi
 
