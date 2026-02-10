@@ -1375,6 +1375,75 @@ else
 fi
 
 # ============================================================
+# F-0123: Intelligent Onboarding
+# ============================================================
+
+# discover.sh exists and is executable
+if [[ -f "$FRAMEWORK_ROOT/.agentic/tools/discover.sh" ]] && [[ -x "$FRAMEWORK_ROOT/.agentic/tools/discover.sh" ]]; then
+  pass "F-0123: discover.sh exists and is executable"
+else
+  fail "F-0123: discover.sh missing or not executable"
+fi
+
+# discover.py exists
+if [[ -f "$FRAMEWORK_ROOT/.agentic/tools/discover.py" ]]; then
+  pass "F-0123: discover.py exists"
+else
+  fail "F-0123: discover.py missing"
+fi
+
+# render_proposals.py exists
+if [[ -f "$FRAMEWORK_ROOT/.agentic/tools/render_proposals.py" ]]; then
+  pass "F-0123: render_proposals.py exists"
+else
+  fail "F-0123: render_proposals.py missing"
+fi
+
+# ag approve-onboarding command recognized
+if bash "$FRAMEWORK_ROOT/.agentic/tools/ag.sh" help 2>&1 | grep -q "approve-onboarding"; then
+  pass "F-0123: ag approve-onboarding in help output"
+else
+  fail "F-0123: ag approve-onboarding not in help output"
+fi
+
+# init_playbook.md mentions discovery/brownfield
+if grep -qi "discovery\|brownfield\|existing.*codebase\|auto-discover" "$FRAMEWORK_ROOT/.agentic/init/init_playbook.md" 2>/dev/null; then
+  pass "F-0123: init_playbook.md documents brownfield flow"
+else
+  fail "F-0123: init_playbook.md does not document brownfield flow"
+fi
+
+# discover.py imports without error
+if python3 -c "import sys; sys.path.insert(0,'$FRAMEWORK_ROOT/.agentic/tools'); import discover" 2>/dev/null; then
+  pass "F-0123: discover.py imports without error"
+else
+  fail "F-0123: discover.py fails to import"
+fi
+
+# render_proposals.py imports without error
+if python3 -c "import sys; sys.path.insert(0,'$FRAMEWORK_ROOT/.agentic/tools'); import render_proposals" 2>/dev/null; then
+  pass "F-0123: render_proposals.py imports without error"
+else
+  fail "F-0123: render_proposals.py fails to import"
+fi
+
+# scaffold.sh has brownfield detection function
+if grep -q "detect_existing_codebase" "$FRAMEWORK_ROOT/.agentic/init/scaffold.sh" 2>/dev/null; then
+  pass "F-0123: scaffold.sh has detect_existing_codebase"
+else
+  fail "F-0123: scaffold.sh missing detect_existing_codebase"
+fi
+
+# Template files still exist (regression check)
+for tmpl in STACK.template.md CONTEXT_PACK.template.md STATUS.template.md OVERVIEW.template.md; do
+  if [[ -f "$FRAMEWORK_ROOT/.agentic/init/$tmpl" ]]; then
+    pass "F-0123: template $tmpl exists (regression)"
+  else
+    fail "F-0123: template $tmpl missing (regression!)"
+  fi
+done
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

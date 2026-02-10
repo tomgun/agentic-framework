@@ -273,3 +273,36 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-10 00:29 - F-0123 Intelligent Onboarding Implementation
+
+**Accomplished**:
+- Implemented all 10 steps: brownfield detection in scaffold.sh, discover.sh orchestrator, discover.py analysis engine (stack/feature/architecture detection), render_proposals.py, init_playbook Step 0.5, ag approve-onboarding command, doctor.py proposal awareness, 31 pytest tests (all pass), 12 validation checks (184/184 pass), .gitignore + feature status
+
+**Next steps**:
+- Review changes, commit, update F-0123 status to shipped, test in scratch project
+
+**Blockers**: None
+
+
+### Session: 2026-02-10 10:50 - Memory Seed for Init
+
+**Accomplished**:
+- Created memory-seed.md (52 lines), updated init_playbook.md (Claude/Codex/Windsurf sections), added memory seed pointer to CLAUDE.md template. 184/184 validation checks pass.
+
+**Next steps**:
+- Commit and PR. Follow-up: add windsurf to setup-agent.sh, Codex AGENTS.md as primary.
+
+**Blockers**: None
+
+
+### Session: 2026-02-10 11:14 - v0.24.0 Release
+
+**Accomplished**:
+- Tagged v0.24.0: F-0123 intelligent onboarding for existing projects, agent memory seeding during init (Claude/Codex/Windsurf), Windsurf support in init playbook.
+
+**Next steps**:
+- PR for feature branch, merge to main, tag v0.24.0.
+
+**Blockers**: None
+

@@ -134,6 +134,7 @@ COMMANDS:
     work "description"  Start WIP tracking for a task
     commit              Run all pre-commit gates
     done                Task complete validation
+    approve-onboarding  Review/approve auto-discovered proposals
     trace [options]     Spec-code traceability (drift + coverage)
     test llm [options]  Run LLM behavioral tests
     tools               List all available tools by category
@@ -147,6 +148,8 @@ EXAMPLES:
     ag work "Add login form"    # Start working on a task
     ag commit                   # Verify ready to commit
     ag done                     # Check task completion
+    ag approve-onboarding       # List unapproved proposals
+    ag approve-onboarding --all # Approve all proposals
     ag trace                    # Full drift + coverage report
     ag trace --gaps             # Show only gaps
     ag test llm                 # Run all LLM behavioral tests
@@ -169,6 +172,7 @@ COMMANDS:
     implement F-XXXX    Verify acceptance exists, start WIP tracking
     commit              Run all pre-commit gates
     done [F-XXXX]       Feature complete validation
+    approve-onboarding  Review/approve auto-discovered proposals
     trace [options]     Spec-code traceability (drift + coverage)
     test llm [options]  Run LLM behavioral tests
     tools               List all available tools by category
@@ -184,6 +188,8 @@ EXAMPLES:
     ag implement F-0042         # Start working on feature F-0042
     ag commit                   # Verify ready to commit
     ag done F-0042              # Check feature completion
+    ag approve-onboarding       # List unapproved proposals
+    ag approve-onboarding --all # Approve all proposals
     ag trace                    # Full drift + coverage report
     ag trace F-0042             # What files implement F-0042?
     ag trace src/auth.py        # What features does auth.py implement?
@@ -787,6 +793,109 @@ cmd_verify() {
     fi
 }
 
+# Approve onboarding proposals
+cmd_approve_onboarding() {
+    local target="${1:-}"
+
+    # Find files with PROPOSAL markers
+    local proposal_files=()
+    for f in STACK.md CONTEXT_PACK.md OVERVIEW.md; do
+        if [ -f "$ROOT_DIR/$f" ] && grep -q '<!-- PROPOSAL' "$ROOT_DIR/$f" 2>/dev/null; then
+            proposal_files+=("$f")
+        fi
+    done
+    # Core+PM files
+    if [ -f "$ROOT_DIR/spec/FEATURES.md" ] && grep -q '<!-- PROPOSAL' "$ROOT_DIR/spec/FEATURES.md" 2>/dev/null; then
+        proposal_files+=("spec/FEATURES.md")
+    fi
+    # Acceptance criteria
+    if [ -d "$ROOT_DIR/spec/acceptance" ]; then
+        while IFS= read -r -d '' f; do
+            if grep -q '<!-- PROPOSAL' "$f" 2>/dev/null; then
+                local rel="${f#$ROOT_DIR/}"
+                proposal_files+=("$rel")
+            fi
+        done < <(find "$ROOT_DIR/spec/acceptance" -name "F-*.md" -print0 2>/dev/null)
+    fi
+
+    if [ ${#proposal_files[@]} -eq 0 ]; then
+        echo -e "${GREEN}No unapproved proposals found.${NC}"
+        return 0
+    fi
+
+    # No args: list status
+    if [ -z "$target" ]; then
+        echo -e "${BOLD}=== Onboarding Proposals ===${NC}"
+        echo ""
+        echo "Files with unapproved proposals:"
+        for f in "${proposal_files[@]}"; do
+            echo "  - $f"
+        done
+        echo ""
+        echo "Commands:"
+        echo "  ag approve-onboarding <file>  # Approve single file"
+        echo "  ag approve-onboarding --all   # Approve all files"
+        return 0
+    fi
+
+    # --all: approve all
+    if [ "$target" = "--all" ]; then
+        echo -e "${BOLD}Approving all proposals...${NC}"
+        for f in "${proposal_files[@]}"; do
+            _strip_proposal_markers "$ROOT_DIR/$f"
+            echo -e "  ${GREEN}✓${NC} $f"
+        done
+        _cleanup_proposals
+        echo ""
+        echo -e "${GREEN}All proposals approved.${NC}"
+        return 0
+    fi
+
+    # Single file approval
+    local full_path="$ROOT_DIR/$target"
+    if [ ! -f "$full_path" ]; then
+        echo -e "${RED}File not found: $target${NC}"
+        return 1
+    fi
+    if ! grep -q '<!-- PROPOSAL' "$full_path" 2>/dev/null; then
+        echo -e "${YELLOW}$target has no proposal markers.${NC}"
+        return 0
+    fi
+
+    _strip_proposal_markers "$full_path"
+    echo -e "${GREEN}✓ Approved: $target${NC}"
+
+    # Check if all proposals are now approved
+    local remaining=0
+    for f in "${proposal_files[@]}"; do
+        if [ "$f" != "$target" ] && grep -q '<!-- PROPOSAL' "$ROOT_DIR/$f" 2>/dev/null; then
+            remaining=$((remaining + 1))
+        fi
+    done
+    if [ "$remaining" -eq 0 ]; then
+        _cleanup_proposals
+        echo -e "${GREEN}All proposals approved.${NC}"
+    else
+        echo "$remaining file(s) still have proposals. Run: ag approve-onboarding"
+    fi
+}
+
+# Strip PROPOSAL and confidence markers from a file
+_strip_proposal_markers() {
+    local file="$1"
+    # Remove PROPOSAL header line
+    sed -i.bak '/<!-- PROPOSAL: Auto-discovered by ag init/d' "$file"
+    # Remove confidence markers
+    sed -i.bak 's/ <!-- confidence: [a-z]* -->//g' "$file"
+    rm -f "${file}.bak" 2>/dev/null || true
+}
+
+# Clean up discovery artifacts after all proposals approved
+_cleanup_proposals() {
+    rm -f "$ROOT_DIR/.agentic-state/discovery_report.json" 2>/dev/null || true
+    rm -rf "$ROOT_DIR/.agentic-state/proposals" 2>/dev/null || true
+}
+
 # Status command - show project status
 # Init command - guide through project initialization
 cmd_init() {
@@ -811,11 +920,12 @@ cmd_init() {
     echo "This project needs initialization."
     echo ""
     echo -e "${BOLD}What initialization does:${NC}"
-    echo "  1. Choose profile: Core (lightweight) or Core+PM (formal specs)"
-    echo "  2. Set up AI tools: Claude, Cursor, Copilot, Codex"
-    echo "  3. Define project: Tech stack, languages, frameworks"
-    echo "  4. Configure quality: Testing approach, quality gates"
-    echo "  5. Document architecture: Entry points, data flow"
+    echo "  1. Auto-discover existing code (if brownfield project)"
+    echo "  2. Choose profile: Core (lightweight) or Core+PM (formal specs)"
+    echo "  3. Set up AI tools: Claude, Cursor, Copilot, Codex"
+    echo "  4. Define project: Tech stack, languages, frameworks"
+    echo "  5. Configure quality: Testing approach, quality gates"
+    echo "  6. Document architecture: Entry points, data flow"
     echo ""
     echo -e "${BOLD}To initialize, ask your AI agent:${NC}"
     echo ""
@@ -1285,6 +1395,9 @@ case "${1:-help}" in
         ;;
     verify)
         cmd_verify "${2:-}"
+        ;;
+    approve-onboarding)
+        cmd_approve_onboarding "${2:-}"
         ;;
     status)
         cmd_status

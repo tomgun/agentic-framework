@@ -1887,7 +1887,7 @@ agent_mode: balanced  # premium | balanced | economy
 
 ## F-0123: Intelligent Onboarding for Existing Projects
 
-**Status**: planned
+**Status**: in_progress
 **Priority**: high
 **Complexity**: high
 
@@ -1896,9 +1896,9 @@ agent_mode: balanced  # premium | balanced | economy
 **Dependencies**: F-0001 (Project Initialization), F-0003 (Spec-Driven Development)
 
 **Implementation**:
-- State: none
-- Code: TBD
-- Tests: TBD
+- State: complete
+- Code: `.agentic/tools/discover.sh`, `.agentic/tools/discover.py`, `.agentic/tools/render_proposals.py`
+- Tests: `tests/test_discover.py` (31 tests), `tests/validate_framework.sh` (12 checks)
 
 **Acceptance**: See `spec/acceptance/F-0123.md`
 

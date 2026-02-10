@@ -19,6 +19,28 @@ bash .agentic/init/scaffold.sh
 ```
 
 This creates all expected files/folders with templates/placeholders so you can start development immediately.
+If the project has existing code, scaffold will automatically run discovery and generate proposals.
+
+## Step 0.5: Review Discovery Results (brownfield projects only)
+
+**If `.agentic-state/discovery_report.json` exists**, this is an existing project with auto-discovered data:
+
+1. Read `.agentic-state/discovery_report.json`
+2. Present a human-readable summary to the user:
+   - **Detected stack**: language, framework, package manager, test framework
+   - **Architecture**: entry points, components, monorepo status
+   - **Project description**: extracted from README
+   - **Discovered features** (Core+PM only): modules, routes, packages
+3. For each section, ask: "Does this look right? Want to edit anything?"
+4. For confirmed sections: the proposal file from `.agentic-state/proposals/` is already copied to the project root
+5. For rejected sections: user fills in manually during Step 2 interview
+6. For "I don't know" answers: keep the discovery data as-is (it's still a proposal with `<!-- PROPOSAL -->` markers)
+7. Skip interview questions in Step 2 for sections the user already confirmed
+
+**Important**: All proposals have `<!-- PROPOSAL -->` markers and `<!-- confidence: high|medium|low -->` annotations.
+After review, run `ag approve-onboarding` to strip markers from confirmed files.
+
+**If no discovery report exists**, skip to Step 1 (standard init for new projects).
 
 ## Step 1: Choose profile (Core vs Core+PM)
 
@@ -87,12 +109,13 @@ This creates all expected files/folders with templates/placeholders so you can s
 **Ask the user which AI tool(s) they use:**
 
 > "Which AI coding tool(s) will you use? (can pick multiple)
-> 
+>
 > **a) Claude Code** - creates CLAUDE.md
 > **b) Cursor** - creates .cursorrules
 > **c) GitHub Copilot** - creates .github/copilot-instructions.md
 > **d) Codex CLI** - creates .codex/instructions.md
-> 
+> **e) Windsurf** - creates .windsurfrules
+>
 > Type the letters for tools you use (e.g., 'ab' for Claude + Cursor, or just 'b' for Cursor only)"
 
 **Create files for ALL selected tools:**
@@ -134,6 +157,8 @@ echo "  - Hooks enabled (automatic logging at checkpoints)"
 echo "  - Large context leveraged (can read all specs at once)"
 ```
 
+**Seed persistent memory**: Read `.agentic/init/memory-seed.md` and write its key patterns to Claude's persistent memory (`~/.claude/projects/*/memory/MEMORY.md`). This ensures workflow patterns survive across sessions even when CLAUDE.md gets compressed.
+
 ### If Cursor (b):
 ```bash
 # Modern Cursor (0.42+)
@@ -162,6 +187,30 @@ echo "  - Token-efficient scripts CRITICAL (context very limited)"
 echo "  - Work file-by-file (no multi-file operations)"
 echo "  - User must apply suggestions (Copilot can't edit directly)"
 ```
+
+### If Codex CLI (d):
+```bash
+# Codex instructions
+bash .agentic/tools/setup-agent.sh codex
+
+echo "✓ Codex CLI optimized:"
+echo "  - .codex/instructions.md installed"
+echo "  - Auto-loaded by Codex CLI on every run"
+```
+
+**Optional — seed user-level memory**: Codex supports `~/.codex/AGENTS.md` for cross-project behavioral patterns. Ask the user before writing to user-level files (they affect all projects). If they agree, append the key patterns from `.agentic/init/memory-seed.md`.
+
+### If Windsurf (e):
+```bash
+# Windsurf rules
+bash .agentic/tools/setup-agent.sh windsurf  # if supported, else:
+cp .agentic/agents/shared/agent_operating_guidelines.md .windsurfrules
+
+echo "✓ Windsurf optimized:"
+echo "  - .windsurfrules installed (project-level instructions)"
+```
+
+**Optional — seed global memory**: Windsurf supports `~/.codeium/windsurf/memories/global_rules.md` for cross-project patterns. Ask the user before writing to user-level files. If they agree, append the key patterns from `.agentic/init/memory-seed.md`.
 
 ### If Multiple (a) - RECOMMENDED:
 ```bash
