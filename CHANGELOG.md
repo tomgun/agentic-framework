@@ -5,6 +5,20 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.24.0] - 2026-02-10
+
+### Added
+- **Intelligent Onboarding for Existing Projects (F-0123)** — `discover.py` analyzes brownfield codebases (package files, entry points, architecture), `render_proposals.py` generates STACK/CONTEXT_PACK/OVERVIEW proposals with confidence annotations and `<!-- PROPOSAL -->` markers. `scaffold.sh` auto-runs discovery for existing projects. `ag approve-onboarding` strips proposal markers from confirmed files.
+- **Agent Memory Seeding** — `.agentic/init/memory-seed.md` with tool-agnostic behavioral patterns (pre-commit sequence, session start, feature workflow, common pitfalls). Seeded to persistent memory during init for Claude Code, Codex CLI, and Windsurf.
+- **Windsurf support in init** — Added as option (e) in tool selection, with `.windsurfrules` setup and optional global memory seeding
+- **Codex CLI section in init** — Dedicated setup section with optional `~/.codex/AGENTS.md` seeding (asks user first)
+- **Memory seed pointer in CLAUDE.md template** — Existing projects auto-seed memory on next session start
+
+### Changed
+- **init_playbook.md** — Step 0.5 for brownfield discovery review, Windsurf/Codex sections, Claude memory seeding instruction
+- **doctor.py** — Validates discovery artifacts (discover.sh, discover.py, render_proposals.py)
+- **ag.sh** — `approve-onboarding` command for stripping proposal markers
+
 ## [0.23.0] - 2026-02-08
 
 ### Added

@@ -1,7 +1,7 @@
 {
-  "focus": "Structural enforcement: commit-relative JOURNAL/STATUS staleness checks",
+  "focus": "Memory seed implementation complete, ready to commit",
   "progress": "v0.12.1 released and tagged",
   "next": "F-0120: Move JOURNAL.md + manifests to .agentic-journal/",
   "blocker": "None",
-  "updated": "2026-02-09T22:08:49Z"
+  "updated": "2026-02-10T08:50:22Z"
 }
