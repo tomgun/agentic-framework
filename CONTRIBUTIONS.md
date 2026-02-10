@@ -1979,6 +1979,31 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## Agent Memory Seeding During Init (2026-02-10)
+
+### Persistent Memory as Behavioral Reinforcement
+
+**User insight**: CLAUDE.md rules like "Update JOURNAL.md and STATUS.md before every commit" get buried in long sessions. Tools with persistent memory hold behavioral patterns more reliably than instruction files that get compressed.
+
+**User research** (Feb 2026): Mapped which AI tools support persistent memory and whether it's seedable:
+- Claude Code: `~/.claude/projects/*/memory/MEMORY.md` (agent writes during init)
+- Codex CLI: `~/.codex/AGENTS.md` (direct file write)
+- Windsurf: `~/.codeium/windsurf/memories/global_rules.md` (direct file write)
+- Copilot (JetBrains): `~/.config/github-copilot/global-copilot-instructions.md` (direct file write)
+- Cursor: SQLite DB (UI-only, not seedable)
+
+**Key distinction**: Memory seed contains *workflow patterns* (what to do and when), not rules (rules stay in CLAUDE.md). This prevents duplication while reinforcing the patterns agents forget most.
+
+**Design decisions**:
+- Memory seeding stays inline in init_playbook.md (1-3 lines per tool section) — no separate playbook needed
+- User-level files (Codex AGENTS.md, Windsurf global_rules.md) require explicit user consent before writing
+- Existing project migration handled via CLAUDE.md template pointer (no separate migration path)
+- Version marker in memory-seed.md so agents can detect staleness
+
+**Impact**: Agents get framework workflows written to persistent memory during init, surviving session resets and context compression.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.23.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

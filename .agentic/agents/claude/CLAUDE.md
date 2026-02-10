@@ -42,4 +42,6 @@ Subagent context: Run `bash .agentic/tools/context-for-role.sh <role> <feature-i
 
 Agent mode: Check `agent_mode` in STACK.md (premium|balanced|economy). Details: auto_orchestration.md
 
+Memory seed: If your persistent memory doesn't have framework workflow patterns, read `.agentic/init/memory-seed.md` and write key patterns to your memory.
+
 Workflows, delegation, gates, checklists: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`
