@@ -1021,6 +1021,29 @@ def main() -> int:
         for c in template_like:
             print(f"- {c.path} ({c.purpose})")
 
+    # === Check for unapproved onboarding proposals ===
+    proposal_files = []
+    for fname in ["STACK.md", "CONTEXT_PACK.md", "OVERVIEW.md"]:
+        fpath = root / fname
+        if fpath.exists():
+            try:
+                if "<!-- PROPOSAL" in fpath.read_text(encoding="utf-8")[:200]:
+                    proposal_files.append(fname)
+            except Exception:
+                pass
+    if (root / "spec" / "FEATURES.md").exists():
+        try:
+            if "<!-- PROPOSAL" in (root / "spec" / "FEATURES.md").read_text(encoding="utf-8")[:200]:
+                proposal_files.append("spec/FEATURES.md")
+        except Exception:
+            pass
+
+    if proposal_files:
+        print(f"\nOnboarding proposals ({len(proposal_files)} file(s) pending review):")
+        for pf in proposal_files:
+            print(f"  - {pf}")
+        print("  Run: ag approve-onboarding")
+
     # === Validations for BOTH profiles ===
     validation_issues = []
     suggestions = []
