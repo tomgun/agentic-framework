@@ -295,3 +295,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-10 11:14 - v0.24.0 Release
+
+**Accomplished**:
+- Tagged v0.24.0: F-0123 intelligent onboarding for existing projects, agent memory seeding during init (Claude/Codex/Windsurf), Windsurf support in init playbook.
+
+**Next steps**:
+- PR for feature branch, merge to main, tag v0.24.0.
+
+**Blockers**: None
+

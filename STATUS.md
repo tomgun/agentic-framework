@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Memory seed implementation complete, ready to commit (Updated: 2026-02-10 08:50)
+- v0.24.0 released: F-0123 intelligent onboarding + agent memory seeding (Updated: 2026-02-10 09:14)
 - Progress: v0.12.1 released and tagged
 
 ## Current focus
