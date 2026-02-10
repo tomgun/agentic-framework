@@ -56,7 +56,7 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
   - Templates (specs, docs, features)
   - Token-efficient tools:
     - `journal.sh` - Append-only JOURNAL.md updates
-    - `status.sh` - JSON backend (`.agentic/state/status.json`) → STATUS.md sync
+    - `status.sh` - Direct STATUS.md section updates (focus, progress, next, blocker)
     - `feature.sh` - Field updates to FEATURES.md
     - `blocker.sh` - Append-only HUMAN_NEEDED.md updates
     - `wip.sh` - Work-in-progress tracking
@@ -72,7 +72,6 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 - Definition of Done: See `.agentic/workflows/definition_of_done.md`
 
 ## State files
-- `.agentic/state/status.json` - Fast status updates (JSON backend)
 - `.agentic-state/WIP.md` - Work-in-progress tracking (recovery)
 - `.agentic-state/AGENTS_ACTIVE.md` - Multi-agent coordination
 - `.agentic-journal/manifests/` - Feature change manifests (git history snapshots)

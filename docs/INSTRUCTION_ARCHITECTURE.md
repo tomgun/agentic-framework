@@ -71,7 +71,7 @@ This design synthesizes two independent research efforts:
 
 **Git-tracked state** (survives across machines):
 - STACK.md — git-tracked, parseable config file read by ag.sh with grep/sed
-- `.agentic/state/status.json` — holds runtime state (focus, progress, next, blocker). Git-tracked by design so work can continue on another computer.
+- STATUS.md — holds all runtime state (focus, progress, next, blocker) plus roadmap, risks, decisions. Updated directly by status.sh.
 
 **Session-local state** (gitignored):
 - `.agentic-state/WIP.md` — work-in-progress lock
@@ -107,7 +107,7 @@ These mechanisms are proven and stable. Changes require strong justification:
 - **AGENT_QUICK_START.md** — "one rule: run doctor.sh" pattern
 - **Manifest-based guideline injection** in context-for-role.sh — 7 of 24 manifests currently include anti-hallucination.md
 - **STACK.md parsing** via ag.sh (grep/sed) — works today, no need to replace
-- **Git-tracked vs gitignored state split** — status.json in git for cross-machine; WIP.md/AGENTS_ACTIVE.md gitignored for session-local
+- **Git-tracked vs gitignored state split** — STATUS.md in git for cross-machine; WIP.md/AGENTS_ACTIVE.md gitignored for session-local
 
 ---
 
@@ -159,7 +159,7 @@ These principles govern future framework changes to instruction architecture:
 1. **Never rely on memory** — if a rule must always apply, enforce it structurally (script/gate), not behaviorally (instruction text)
 2. **Constitution = what cannot be structurally enforced** — anti-hallucination, "ask when uncertain", trigger word responses
 3. **Playbooks = how to follow rules** — loaded by `ag` commands at the right moment, not pinned in context
-4. **State = machine-readable** — STACK.md parsed by ag.sh; status.json for runtime state
+4. **State = machine-readable** — STACK.md parsed by ag.sh; STATUS.md sections parsed by status.sh
 5. **Distributed enforcement** — ag.sh + pre-commit-check.sh + context-for-role.sh each own their phase. Framework design choice diverging from ChatGPT's centralized recommendation; rationale: cross-tool compatibility
 6. **Test behavioral rules empirically** — LLM tests prove which instruction file content agents actually follow. No behavioral rule should be added without a corresponding test
 
@@ -202,7 +202,7 @@ The design makes assumptions that should be validated over time. Each has a stat
 | A7 | `ag` command stdout has high salience to agents | UNTESTED — proposed in Gap 3 | Create LLM test: does agent follow instruction printed by `ag` command? |
 | A8 | ~40-50 lines is achievable while keeping trigger table + token scripts + core rules | UNTESTED — proposed in Gap 1 | Attempt the slimdown and run LLM tests |
 | A9 | Copilot loads copilot-instructions.md into subagent sessions | UNKNOWN — contradictory docs | Empirical test with distinctive instruction |
-| A10 | Git-tracked status.json survives cross-machine workflow | ASSUMED — git fundamentals, untested in practice | Work on feature from machine A, continue from machine B |
+| A10 | Git-tracked STATUS.md survives cross-machine workflow | RESOLVED — status.json eliminated; STATUS.md is the sole cross-machine state file | N/A — STATUS.md is already git-tracked and used directly |
 
 **Update this table** when assumptions are validated or invalidated. Failed assumptions trigger design document amendments.
 

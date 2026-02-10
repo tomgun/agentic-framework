@@ -7,94 +7,44 @@
 #   bash .agentic/tools/status.sh next "Deploy to staging"
 #   bash .agentic/tools/status.sh blocker "Waiting for API key"
 #   bash .agentic/tools/status.sh blocker "None"  # Clear blocker
-#   bash .agentic/tools/status.sh sync            # Regenerate STATUS.md from JSON
 #   bash .agentic/tools/status.sh infer           # Infer current state from history
 #   bash .agentic/tools/status.sh infer --apply   # Infer and auto-update STATUS.md
-#
-# Token efficiency: Updates JSON state file (fast), syncs to MD on demand
 #
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 STATUS_FILE="${PROJECT_ROOT}/STATUS.md"
-STATE_DIR="${PROJECT_ROOT}/.agentic/state"
-STATE_FILE="${STATE_DIR}/status.json"
 
-# Ensure state directory exists
-mkdir -p "${STATE_DIR}"
+# Read current values from STATUS.md sections
+_read_current() {
+    local focus="" progress="" next_step="" blocker=""
 
-# Initialize JSON state from STATUS.md if it doesn't exist
-init_state() {
-    if [[ ! -f "${STATE_FILE}" ]]; then
-        # Extract current values from STATUS.md if it exists
-        local focus="" progress="" next_step="" blocker=""
-
-        if [[ -f "${STATUS_FILE}" ]]; then
-            # Try to extract existing values (best effort)
-            focus=$(awk '/^## Current session state/,/^## /{if(/^- /) {gsub(/^- /,""); gsub(/ \(Updated:.*\)/,""); print; exit}}' "${STATUS_FILE}" 2>/dev/null || echo "")
-            next_step=$(awk '/^## Next immediate step/,/^## /{if(/^- /) {gsub(/^- /,""); print; exit}}' "${STATUS_FILE}" 2>/dev/null || echo "")
-            blocker=$(awk '/^## Blockers/,/^## /{if(/^- /) {gsub(/^- /,""); gsub(/ \(Added:.*\)/,""); print; exit}}' "${STATUS_FILE}" 2>/dev/null || echo "None")
-        fi
-
-        # Create initial state
-        cat > "${STATE_FILE}" <<EOF
-{
-  "focus": "${focus:-Not set}",
-  "progress": "${progress:-}",
-  "next": "${next_step:-Not set}",
-  "blocker": "${blocker:-None}",
-  "updated": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-}
-EOF
+    if [[ -f "${STATUS_FILE}" ]]; then
+        focus=$(awk '/^## Current session state/,/^## /{if(/^- /) {gsub(/^- /,""); gsub(/ \(Updated:.*\)/,""); print; exit}}' "${STATUS_FILE}" 2>/dev/null || echo "")
+        progress=$(awk '/^## Current session state/,/^## /{if(/^- Progress: /) {gsub(/^- Progress: /,""); print; exit}}' "${STATUS_FILE}" 2>/dev/null || echo "")
+        next_step=$(awk '/^## Next immediate step/,/^## /{if(/^- /) {gsub(/^- /,""); print; exit}}' "${STATUS_FILE}" 2>/dev/null || echo "")
+        blocker=$(awk '/^## Blockers/,/^## /{if(/^- /) {gsub(/^- /,""); gsub(/ \(Added:.*\)/,""); print; exit}}' "${STATUS_FILE}" 2>/dev/null || echo "None")
     fi
+
+    # Export to caller via global variables
+    _CURRENT_FOCUS="${focus:-Not set}"
+    _CURRENT_PROGRESS="${progress:-}"
+    _CURRENT_NEXT="${next_step:-Not set}"
+    _CURRENT_BLOCKER="${blocker:-None}"
 }
 
-# Read a field from JSON state
-read_state() {
-    local field="$1"
-    if command -v jq &>/dev/null; then
-        jq -r ".${field} // \"\"" "${STATE_FILE}" 2>/dev/null || echo ""
-    else
-        # Fallback without jq - simple grep
-        grep "\"${field}\"" "${STATE_FILE}" | sed 's/.*: *"\([^"]*\)".*/\1/' | head -1
-    fi
-}
-
-# Update a field in JSON state (without jq dependency)
-update_state() {
-    local field="$1"
-    local value="$2"
+# Apply values to STATUS.md using awk section replacement (proven, well-tested)
+_apply_to_md() {
+    local focus="$1"
+    local progress="$2"
+    local next_step="$3"
+    local blocker="$4"
     local timestamp
     timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-    if command -v jq &>/dev/null; then
-        # Use jq if available (cleaner)
-        jq --arg val "$value" --arg ts "$timestamp" \
-            ".${field} = \$val | .updated = \$ts" \
-            "${STATE_FILE}" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "${STATE_FILE}"
-    else
-        # Fallback: sed-based update (works without jq)
-        local escaped_value
-        escaped_value=$(echo "$value" | sed 's/[&/\]/\\&/g; s/"/\\"/g')
-        sed -i.bak "s|\"${field}\": \"[^\"]*\"|\"${field}\": \"${escaped_value}\"|" "${STATE_FILE}"
-        sed -i.bak "s|\"updated\": \"[^\"]*\"|\"updated\": \"${timestamp}\"|" "${STATE_FILE}"
-        rm -f "${STATE_FILE}.bak"
-    fi
-}
-
-# Regenerate STATUS.md from JSON state
-sync_to_md() {
-    local focus progress next_step blocker updated
-
-    focus=$(read_state "focus")
-    progress=$(read_state "progress")
-    next_step=$(read_state "next")
-    blocker=$(read_state "blocker")
-    updated=$(read_state "updated")
-
     # Convert ISO timestamp to readable format
     local readable_date
-    readable_date=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$updated" "+%Y-%m-%d %H:%M" 2>/dev/null || echo "$updated")
+    readable_date=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$timestamp" "+%Y-%m-%d %H:%M" 2>/dev/null || echo "$timestamp")
 
     # Update STATUS.md sections using awk (preserves other content)
     awk -v focus="$focus" -v progress="$progress" -v next_step="$next_step" -v blocker="$blocker" -v ts="$readable_date" '
@@ -140,6 +90,28 @@ sync_to_md() {
 
         { print }
     ' "${STATUS_FILE}" > "${STATUS_FILE}.tmp" && mv "${STATUS_FILE}.tmp" "${STATUS_FILE}"
+}
+
+# Read current values, override one field, write back to STATUS.md
+update_md() {
+    local field="$1"
+    local value="$2"
+
+    _read_current
+
+    local focus="${_CURRENT_FOCUS}"
+    local progress="${_CURRENT_PROGRESS}"
+    local next_step="${_CURRENT_NEXT}"
+    local blocker="${_CURRENT_BLOCKER}"
+
+    case "${field}" in
+        focus) focus="$value" ;;
+        progress) progress="$value" ;;
+        next) next_step="$value" ;;
+        blocker) blocker="$value" ;;
+    esac
+
+    _apply_to_md "$focus" "$progress" "$next_step" "$blocker"
 }
 
 # Infer current project state from history data
@@ -275,12 +247,13 @@ infer_status() {
     echo ""
 
     if [[ "$apply" == "--apply" ]]; then
-        # Auto-update STATUS.md via existing state mechanism
-        init_state
-        [[ -n "$focus" ]] && update_state "focus" "$focus"
-        [[ -n "$next_step" ]] && update_state "next" "$next_step"
-        update_state "blocker" "$blocker"
-        sync_to_md
+        # Read current values as baseline, then override with inferred
+        _read_current
+        local progress="${_CURRENT_PROGRESS}"
+        [[ -n "$focus" ]] && true || focus="${_CURRENT_FOCUS}"
+        [[ -n "$next_step" ]] && true || next_step="${_CURRENT_NEXT}"
+
+        _apply_to_md "${focus:-${_CURRENT_FOCUS}}" "$progress" "${next_step:-${_CURRENT_NEXT}}" "$blocker"
         echo "✓ Applied inferred state to STATUS.md"
     else
         echo "To apply: bash .agentic/tools/status.sh infer --apply"
@@ -299,26 +272,9 @@ fi
 FIELD="${1:-}"
 VALUE="${2:-}"
 
-# Handle infer command (before init_state, since it may create state)
+# Handle infer command
 if [[ "${FIELD}" == "infer" ]]; then
     infer_status "${VALUE}"
-    exit 0
-fi
-
-# Initialize state if needed
-init_state
-
-# Handle sync command
-if [[ "${FIELD}" == "sync" ]]; then
-    sync_to_md
-    echo "✓ Synchronized STATUS.md from state"
-    exit 0
-fi
-
-# Handle show command (display current state)
-if [[ "${FIELD}" == "show" ]]; then
-    echo "Current status state:"
-    cat "${STATE_FILE}"
     exit 0
 fi
 
@@ -333,8 +289,6 @@ Fields:
   blocker   - Current blocker (use "None" to clear)
 
 Commands:
-  sync      - Regenerate STATUS.md from JSON state
-  show      - Display current JSON state
   infer     - Infer current state from git/journal/features
               Add --apply to auto-update STATUS.md
 
@@ -344,7 +298,6 @@ Examples:
   bash status.sh next "Add email verification"
   bash status.sh blocker "Waiting for design mockups"
   bash status.sh blocker "None"
-  bash status.sh sync
   bash status.sh infer
   bash status.sh infer --apply
 USAGE
@@ -354,8 +307,7 @@ fi
 # Update the appropriate field
 case "${FIELD}" in
     focus|progress|next|blocker)
-        update_state "${FIELD}" "${VALUE}"
-        sync_to_md
+        update_md "${FIELD}" "${VALUE}"
         echo "✓ Updated ${FIELD} in STATUS.md"
         ;;
     *)
