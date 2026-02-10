@@ -299,6 +299,10 @@ if [[ -f "$TARGET_PROJECT_DIR/STATUS.md" ]]; then
   fi
 fi
 
+# Cleanup: Remove deprecated status.json backend (removed in v0.25.0)
+rm -f "$TARGET_PROJECT_DIR/.agentic/state/status.json" 2>/dev/null
+rmdir "$TARGET_PROJECT_DIR/.agentic/state" 2>/dev/null || true
+
 echo ""
 
 # Step 7: Add new configuration sections (v0.16.0+)
