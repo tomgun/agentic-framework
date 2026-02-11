@@ -1925,6 +1925,64 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0125: Unified Drift Detection (`ag sync`)
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.25.4
+
+**Description**: Unified drift detection across 5 phases: memory seed integrity, state freshness (JOURNAL.md/STATUS.md staleness), feature reconciliation (FEATURES.md vs code), spec/doc drift, and tool file parity. Three modes: full sync (detect + auto-fix safe errors), dry run (`--check`), and quiet probe (`--quiet`) for `ag start` integration. User-initiated to control token cost.
+
+**Dependencies**: F-0024 (Session Context), F-0098 (Structural Enforcement)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/sync.sh`, `.agentic/tools/ag.sh` (sync command)
+- Tests: Manual validation (3 modes work), `tests/validate_framework.sh` (184/184 pass)
+
+**Acceptance**: See `spec/acceptance/F-0125.md`
+
+---
+
+## F-0126: Discoverability Reminders
+
+**Status**: shipped
+**Priority**: medium
+**Complexity**: low
+**Since**: v0.25.4
+
+**Description**: Agents forget about `ag plan` and `ag sync` even though they're in trigger tables — instructions get compressed away in long sessions. Fix: put reminders where agents actually look — the `ag start` dashboard output. Dim "Remind user" line shows `ag plan` and `ag sync`. Yellow sync probe appears only when issues exist. Greeting template in `session_start.md` includes "Available workflows" line. Both CLAUDE.md files include `ag sync` in Quick Commands.
+
+**Dependencies**: F-0125 (ag sync), F-0024 (Session Context)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/ag.sh` (cmd_start reminder line), `.agentic/checklists/session_start.md` (greeting template), `CLAUDE.md` + `.agentic/agents/claude/CLAUDE.md` (Quick Commands)
+
+**Acceptance**: See `spec/acceptance/F-0126.md`
+
+---
+
+## F-0127: Tip of the Day
+
+**Status**: shipped
+**Priority**: low
+**Complexity**: low
+**Since**: v0.25.4
+
+**Description**: Random tip displayed each session in `ag start` output to passively surface framework capabilities. 10 tips covering the full `ag` command set. Zero token cost (static strings, `$RANDOM` selection). Dim formatting to avoid dominating the dashboard.
+
+**Dependencies**: F-0024 (Session Context)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/ag.sh` (tips array in cmd_start), `.agentic/checklists/session_start.md` (tip placeholder in greeting template)
+
+**Acceptance**: See `spec/acceptance/F-0127.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1939,6 +1997,6 @@ agent_mode: balanced  # premium | balanced | economy
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 12 | 1 | 1 | 14 |
-| **Total** | **85** | **2** | **1** | **88** |
+| Framework Infrastructure (F-0101+) | 15 | 1 | 1 | 17 |
+| **Total** | **88** | **2** | **1** | **91** |
 
