@@ -14,18 +14,15 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - None
 
 ## Next up
-- Re-run LLM tests with full 45-test suite to get updated pass rates
+- Re-run LLM tests with full 48-test suite to get updated pass rates
 - Real-world project validation (non-framework)
 - Consider progressive disclosure implementation
 - Context7 MCP integration: test in real project scenario
 
-## Roadmap (lightweight)
-- Near-term:
-  - Updated LLM test pass rates with 30-test suite
-  - Real-world project validation (non-framework)
-- Later:
-  - Progressive disclosure of complexity
-  - Automated CI for LLM tests via Claude CLI
+## Backlog
+- Apply mutation tests to framework LLM tests (validate tests catch real failures)
+- Progressive disclosure of complexity
+- Automated CI for LLM tests via Claude CLI
 
 ## Known issues / risks
 - LLM tests run interactively (simulated) — need Claude CLI for fully automated runs
