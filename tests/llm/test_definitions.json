@@ -753,6 +753,86 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "044_ag_specs_awareness",
+      "description": "Agent should suggest ag specs for large brownfield projects with multiple domains",
+      "section": "brownfield",
+      "category": "Important",
+      "llm_test_id": "LLM-044",
+      "profile": "core-pm",
+      "setup": {
+        "files": {
+          ".agentic-state/discovery_report.json": "{\"version\":\"2.0.0\",\"profile\":\"core+product\",\"stack\":{\"language\":\"TypeScript\"},\"sub_projects\":[{\"name\":\"web\",\"framework\":\"Next.js\"},{\"name\":\"api\",\"framework\":\"Express\"},{\"name\":\"admin\",\"framework\":\"React\"}],\"domains\":[{\"name\":\"web\",\"type\":\"frontend\",\"estimated_features\":10},{\"name\":\"api\",\"type\":\"backend\",\"estimated_features\":8},{\"name\":\"admin\",\"type\":\"frontend\",\"estimated_features\":5}],\"feature_clusters\":[{\"name\":\"checkout\"},{\"name\":\"catalog\"},{\"name\":\"orders\"},{\"name\":\"users\"},{\"name\":\"reports\"}],\"infra_patterns\":[],\"features\":[]}"
+        }
+      },
+      "prompt": "This is an existing codebase with web frontend, API backend, and admin panel. I need to generate specs for all of it. How should we approach this?",
+      "expected": {
+        "output_contains": [
+          "ag specs|domain|systematic|brownfield|per.domain"
+        ],
+        "output_contains_any": [
+          "web|api|admin|sub.project|multiple.*domain|3.*domain"
+        ],
+        "output_not_contains": [
+          "here are all.*features|generating all.*specs"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "045_domain_tagged_features",
+      "description": "Agent should include Domain metadata when creating features in multi-domain projects",
+      "section": "brownfield",
+      "category": "Important",
+      "llm_test_id": "LLM-045",
+      "profile": "core-pm",
+      "setup": {
+        "files": {
+          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Dashboard\n- Status: shipped\n- Domain: frontend\n- Acceptance: spec/acceptance/F-0001.md\n\n## F-0002: Products API\n- Status: shipped\n- Domain: backend\n- Acceptance: spec/acceptance/F-0002.md"
+        }
+      },
+      "prompt": "Add a new feature F-0003 for a mobile shopping cart screen to FEATURES.md. This is a mobile feature.",
+      "expected": {
+        "output_contains": [
+          "Domain.*mobile|domain.*mobile|- Domain:"
+        ],
+        "output_contains_any": [
+          "F-0003|F.0003"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "046_brownfield_plan_resume",
+      "description": "Agent should detect and suggest resuming an active brownfield spec plan on session start",
+      "section": "brownfield",
+      "category": "Important",
+      "llm_test_id": "LLM-046",
+      "profile": "core-pm",
+      "setup": {
+        "files": {
+          ".agentic-journal/plans/brownfield-specs-plan.md": "# Brownfield Spec Generation Plan\n\n**Status**: APPROVED\n**Created**: 2026-02-08\n\n## Domains\n\n- [x] Frontend Web App (type: frontend, ~12 features)\n- [ ] Backend API (type: backend, ~10 features)\n- [ ] Mobile App (type: mobile, ~5 features)\n\n## Approach\n- Work domains in priority order"
+        }
+      },
+      "prompt": "Hi, starting a new session. What should we work on?",
+      "expected": {
+        "output_contains": [
+          "spec.*plan|brownfield|domain.*completed|1.*3|backend|ag specs|resume"
+        ],
+        "output_contains_any": [
+          "frontend.*done|frontend.*completed|mobile|remaining|next.*domain|uncompleted|2.*domain"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }

@@ -587,7 +587,8 @@ def detect_test_patterns(root: Path) -> dict:
     return patterns
 
 
-def discover_features(root: Path, stack: dict, architecture: dict) -> list[dict]:
+def discover_features(root: Path, stack: dict, architecture: dict,
+                      sub_projects: list[dict] | None = None) -> list[dict]:
     """Discover existing features/modules from code structure (Core+PM only)."""
     features: list[dict] = []
     seen_names: set[str] = set()
@@ -629,7 +630,7 @@ def discover_features(root: Path, stack: dict, architecture: dict) -> list[dict]
     lang = (stack.get("language") or "").lower()
 
     # Route-based feature discovery (web apps)
-    _discover_route_features(root, features, seen_names)
+    _discover_route_features(root, features, seen_names, sub_projects)
 
     # Module-based feature discovery
     _discover_module_features(root, lang, features, seen_names)
@@ -637,7 +638,8 @@ def discover_features(root: Path, stack: dict, architecture: dict) -> list[dict]
     return features[:MAX_FEATURES]
 
 
-def _discover_route_features(root: Path, features: list[dict], seen_names: set[str]):
+def _discover_route_features(root: Path, features: list[dict], seen_names: set[str],
+                             sub_projects: list[dict] | None = None):
     """Discover features from route/page files."""
     route_dirs = [
         root / "src" / "pages",
@@ -645,6 +647,12 @@ def _discover_route_features(root: Path, features: list[dict], seen_names: set[s
         root / "app",      # Next.js app router
         root / "pages",    # Next.js pages router
     ]
+
+    # Also scan sub-project route dirs
+    for sp in (sub_projects or []):
+        sp_root = root / sp["name"]
+        for d in ["src/pages", "src/routes"]:
+            route_dirs.append(sp_root / Path(d))
 
     for route_dir in route_dirs:
         if not route_dir.is_dir():
@@ -708,6 +716,551 @@ def _discover_module_features(root: Path, lang: str, features: list[dict], seen_
             })
 
 
+# --- Sub-project detection ---
+
+_PROJECT_MARKERS = [
+    ("package.json", "TypeScript"),  # refined below if no tsconfig
+    ("pyproject.toml", "Python"),
+    ("go.mod", "Go"),
+    ("Cargo.toml", "Rust"),
+    ("requirements.txt", "Python"),
+]
+
+
+def detect_sub_projects(root: Path) -> list[dict]:
+    """Detect sub-projects in immediate subdirectories."""
+    sub_projects = []
+    for child in sorted(root.iterdir()):
+        if not child.is_dir() or child.name.startswith(".") or child.name in EXCLUDE_DIRS:
+            continue
+        for marker_file, lang in _PROJECT_MARKERS:
+            if (child / marker_file).exists():
+                # Refine language: JS vs TS
+                if marker_file == "package.json" and not (child / "tsconfig.json").exists():
+                    lang = "JavaScript"
+                # Detect framework
+                framework = _detect_sub_project_framework(child, marker_file)
+                # Azure Functions host.json overrides framework
+                if (child / "host.json").exists():
+                    framework = "Azure Functions"
+                has_tests = _sub_project_has_tests(child)
+                sub_projects.append({
+                    "name": child.name,
+                    "path": f"{child.name}/",
+                    "language": lang,
+                    "framework": framework,
+                    "has_tests": has_tests,
+                })
+                break  # first marker wins per directory
+    return sub_projects
+
+
+def _detect_sub_project_framework(sp_root: Path, marker: str) -> str | None:
+    """Detect framework for a sub-project from its config."""
+    if marker == "package.json":
+        try:
+            pkg = json.loads((sp_root / "package.json").read_text())
+            deps = {}
+            deps.update(pkg.get("dependencies", {}))
+            deps.update(pkg.get("devDependencies", {}))
+            js_frameworks = [
+                ("next", "Next.js"), ("nuxt", "Nuxt"), ("@angular/core", "Angular"),
+                ("svelte", "SvelteKit"), ("vue", "Vue"), ("react-native", "React Native"),
+                ("react", "React"), ("express", "Express"), ("fastify", "Fastify"),
+            ]
+            for pkg_name, fw_name in js_frameworks:
+                if pkg_name in deps:
+                    return fw_name
+        except Exception:
+            pass
+    elif marker in ("pyproject.toml", "requirements.txt"):
+        try:
+            content = (sp_root / marker).read_text().lower()
+            for pkg_name, fw_name in [
+                ("fastapi", "FastAPI"), ("django", "Django"), ("flask", "Flask"),
+            ]:
+                if pkg_name in content:
+                    return fw_name
+        except Exception:
+            pass
+    return None
+
+
+def _sub_project_has_tests(sp_root: Path) -> bool:
+    """Check if a sub-project has test files."""
+    for d in ["tests", "test", "__tests__", "spec"]:
+        if (sp_root / d).is_dir():
+            return True
+    # Check for *.test.* or *.spec.* files in src/
+    src = sp_root / "src"
+    if src.is_dir():
+        for f in src.rglob("*"):
+            if f.is_file() and (".test." in f.name or ".spec." in f.name):
+                return True
+    return False
+
+
+# --- Serverless function detection ---
+
+def _serverless_type_hint(name: str) -> str:
+    """Infer type hint from function name prefix."""
+    lower = name.lower()
+    if lower.startswith("admin"):
+        return "admin"
+    if lower.startswith("mobile"):
+        return "mobile"
+    if lower.startswith(("internal", "system", "cron", "scheduled")):
+        return "infrastructure"
+    return "user-facing"
+
+
+def detect_serverless_functions(root: Path) -> list[dict]:
+    """Detect serverless functions (Azure Functions, AWS Lambda, Vercel)."""
+    functions = []
+
+    # Azure Functions: */function.json
+    for fj in root.rglob("function.json"):
+        rel = fj.relative_to(root)
+        if should_exclude(rel):
+            continue
+        try:
+            config = json.loads(fj.read_text())
+            bindings = config.get("bindings", [])
+            trigger = None
+            route = None
+            methods = []
+            for b in bindings:
+                btype = b.get("type", "")
+                if b.get("direction") == "in" and btype.endswith("Trigger"):
+                    trigger = btype.replace("Trigger", "").lower()
+                    route = b.get("route")
+                    methods = b.get("methods", [])
+            name = fj.parent.name
+            functions.append({
+                "name": name,
+                "trigger": trigger or "unknown",
+                "route": route,
+                "methods": [m.upper() for m in methods] if methods else [],
+                "type_hint": _serverless_type_hint(name),
+                "path": str(fj.parent.relative_to(root)),
+            })
+        except Exception:
+            continue
+
+    # AWS Lambda: serverless.yml / template.yaml (SAM)
+    for cfg in ["serverless.yml", "serverless.yaml", "template.yaml", "template.yml"]:
+        if (root / cfg).exists():
+            functions.append({
+                "name": "_aws_lambda_config",
+                "trigger": "config_file",
+                "route": None,
+                "methods": [],
+                "type_hint": "infrastructure",
+                "path": cfg,
+            })
+            break
+
+    # Vercel: api/ directory with source files
+    api_dir = root / "api"
+    if api_dir.is_dir():
+        for f in sorted(api_dir.rglob("*")):
+            if f.is_file() and f.suffix in SOURCE_EXTENSIONS and not should_exclude(f.relative_to(root)):
+                name = f.stem
+                functions.append({
+                    "name": name,
+                    "trigger": "http",
+                    "route": str(f.relative_to(api_dir)).rsplit(".", 1)[0],
+                    "methods": [],
+                    "type_hint": _serverless_type_hint(name),
+                    "path": str(f.relative_to(root)),
+                })
+
+    return functions
+
+
+# --- UI component grouping ---
+
+def detect_ui_components(root: Path, sub_projects: list[dict]) -> list[dict]:
+    """Detect UI component groupings from standard directories."""
+    components = []
+    scan_dirs = []
+
+    # Standard root-level dirs
+    for pattern in ["src/components", "src/pages", "src/screens"]:
+        d = root / pattern
+        if d.is_dir():
+            scan_dirs.append(d)
+
+    # Sub-project dirs
+    for sp in sub_projects:
+        sp_root = root / sp["name"]
+        for pattern in ["src/components", "src/pages", "src/screens"]:
+            d = sp_root / pattern
+            if d.is_dir():
+                scan_dirs.append(d)
+
+    for scan_dir in scan_dirs:
+        for child in sorted(scan_dir.iterdir()):
+            if not child.is_dir() or child.name.startswith(("_", ".")):
+                continue
+            if child.name.lower() in NON_FEATURE_DIRS:
+                continue
+            file_count = sum(1 for f in child.rglob("*")
+                             if f.is_file() and f.suffix in SOURCE_EXTENSIONS)
+            if file_count >= 2:
+                components.append({
+                    "name": child.name,
+                    "path": str(child.relative_to(root)),
+                    "file_count": file_count,
+                })
+
+    return components
+
+
+# --- Feature clustering ---
+
+def _camel_case_split(name: str) -> list[str]:
+    """Split camelCase/PascalCase into lowercase tokens."""
+    s = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", name)
+    s = re.sub(r"[^a-zA-Z0-9]", " ", s)
+    return [t.lower() for t in s.split() if t]
+
+
+def _normalize_name(name: str) -> str:
+    """Normalize a name to joined lowercase tokens for prefix matching."""
+    return "".join(_camel_case_split(name))
+
+
+def _common_prefix_len(a: str, b: str) -> int:
+    """Return the length of the common prefix of two strings."""
+    n = min(len(a), len(b))
+    for i in range(n):
+        if a[i] != b[i]:
+            return i
+    return n
+
+
+def cluster_features(ui_components: list[dict], serverless_functions: list[dict],
+                     features: list[dict]) -> list[dict]:
+    """Group related frontend/backend/mobile items into feature clusters."""
+    # Collect (normalized_name, tier, path, type_hint)
+    items: list[tuple[str, str, str, str]] = []
+
+    for comp in ui_components:
+        norm = _normalize_name(comp["name"])
+        path = comp.get("path", "")
+        tier = "mobile" if "/screens/" in path else "frontend"
+        items.append((norm, tier, path + "/", "user-facing"))
+
+    for func in serverless_functions:
+        if func["name"].startswith("_"):
+            continue
+        norm = _normalize_name(func["name"])
+        items.append((norm, "backend", func.get("path", ""),
+                      func.get("type_hint", "user-facing")))
+
+    if not items:
+        return []
+
+    # Sort for prefix grouping
+    items.sort(key=lambda x: x[0])
+
+    # Greedy prefix grouping: merge items sharing >= 4 char prefix
+    clusters_map: dict[str, dict] = {}
+
+    for norm, tier, path, type_hint in items:
+        best_key = None
+        best_plen = 0
+        for key in list(clusters_map.keys()):
+            plen = _common_prefix_len(norm, key)
+            if plen >= 4 and plen > best_plen:
+                best_key = key
+                best_plen = plen
+
+        if best_key is not None:
+            common = norm[:best_plen]
+            if common != best_key:
+                clusters_map[common] = clusters_map.pop(best_key)
+            clusters_map[common].setdefault(tier, []).append(path)
+            if type_hint not in ("user-facing",):
+                clusters_map[common]["type_hint"] = type_hint
+        else:
+            clusters_map[norm] = {tier: [path], "type_hint": type_hint}
+
+    # Build output list
+    clusters = []
+    for key, data in sorted(clusters_map.items()):
+        frontend = data.get("frontend", [])
+        backend = data.get("backend", [])
+        mobile = data.get("mobile", [])
+        tier_count = sum(1 for t in [frontend, backend, mobile] if t)
+        confidence = "high" if tier_count >= 3 else ("medium" if tier_count >= 2 else "low")
+        clusters.append({
+            "name": key,
+            "frontend": frontend,
+            "backend": backend,
+            "mobile": mobile,
+            "has_tests": False,
+            "type_hint": data.get("type_hint", "user-facing"),
+            "confidence": confidence,
+        })
+    return clusters
+
+
+# --- Infrastructure pattern detection ---
+
+def detect_infra_patterns(root: Path) -> list[dict]:
+    """Detect infrastructure patterns (CI/CD, IaC, containers, deployment)."""
+    patterns = []
+
+    # CI/CD
+    ci_cd_checks = [
+        (".github/workflows", "GitHub Actions"),
+        (".gitlab-ci.yml", "GitLab CI"),
+        ("azure-pipelines.yml", "Azure Pipelines"),
+        ("Jenkinsfile", "Jenkins"),
+        (".circleci", "CircleCI"),
+        ("bitbucket-pipelines.yml", "Bitbucket Pipelines"),
+        (".travis.yml", "Travis CI"),
+    ]
+    for path_str, detail in ci_cd_checks:
+        p = root / path_str
+        if p.exists():
+            # For directories, count files inside
+            if p.is_dir():
+                files = [f for f in p.rglob("*") if f.is_file()]
+                if files:
+                    patterns.append({"type": "ci_cd", "path": path_str, "detail": f"{detail} ({len(files)} files)"})
+            else:
+                patterns.append({"type": "ci_cd", "path": path_str, "detail": detail})
+
+    # IaC
+    iac_checks = [
+        ("terraform", "Terraform"),
+        ("pulumi", "Pulumi"),
+        ("cloudformation", "CloudFormation"),
+        ("bicep", "Bicep"),
+        ("cdk", "AWS CDK"),
+    ]
+    for path_str, detail in iac_checks:
+        p = root / path_str
+        if p.is_dir():
+            tf_files = list(p.rglob("*.tf")) if detail == "Terraform" else list(p.rglob("*"))
+            if tf_files or detail != "Terraform":
+                patterns.append({"type": "iac", "path": path_str, "detail": detail})
+
+    # Containers
+    dockerfiles = list(root.glob("Dockerfile*"))
+    if dockerfiles:
+        patterns.append({"type": "container", "path": "Dockerfile", "detail": f"Docker ({len(dockerfiles)} Dockerfile(s))"})
+    if (root / "docker-compose.yml").exists() or (root / "docker-compose.yaml").exists():
+        compose_name = "docker-compose.yml" if (root / "docker-compose.yml").exists() else "docker-compose.yaml"
+        patterns.append({"type": "container", "path": compose_name, "detail": "Docker Compose"})
+    for k8s_dir in ["k8s", "kubernetes", "helm"]:
+        if (root / k8s_dir).is_dir():
+            patterns.append({"type": "container", "path": k8s_dir, "detail": f"Kubernetes ({k8s_dir}/)"})
+            break
+
+    # Deployment
+    deploy_checks = [
+        ("deploy", "Deploy scripts"),
+        ("scripts/deploy", "Deploy scripts"),
+        ("infrastructure", "Infrastructure"),
+    ]
+    for path_str, detail in deploy_checks:
+        if (root / path_str).is_dir():
+            patterns.append({"type": "deployment", "path": path_str, "detail": detail})
+
+    # Makefile with deploy target
+    makefile = root / "Makefile"
+    if makefile.exists():
+        try:
+            content = makefile.read_text()
+            if re.search(r"^deploy:", content, re.MULTILINE):
+                patterns.append({"type": "deployment", "path": "Makefile", "detail": "Makefile deploy target"})
+        except Exception:
+            pass
+
+    return patterns
+
+
+# --- Domain detection ---
+
+# Framework-to-domain-type mapping
+_FRAMEWORK_DOMAIN_TYPE = {
+    "React": "frontend", "Vue": "frontend", "Angular": "frontend",
+    "Next.js": "frontend", "Nuxt": "frontend", "SvelteKit": "frontend",
+    "Svelte": "frontend", "Astro": "frontend", "Gatsby": "frontend",
+    "Remix": "frontend", "Electron": "frontend",
+    "React Native": "mobile", "Flutter": "mobile",
+    "Express": "backend", "FastAPI": "backend", "Django": "backend",
+    "Flask": "backend", "Fastify": "backend", "Koa": "backend",
+    "Hono": "backend", "Gin": "backend", "Echo": "backend",
+    "Fiber": "backend", "Chi": "backend", "Gorilla Mux": "backend",
+    "Actix Web": "backend", "Axum": "backend", "Rocket": "backend",
+    "Warp": "backend", "Azure Functions": "backend",
+    "Bevy": "frontend", "Tauri": "frontend",
+}
+
+
+def detect_domains(root: Path, sub_projects: list[dict],
+                   feature_clusters: list[dict],
+                   architecture: dict,
+                   infra_patterns: list[dict]) -> list[dict]:
+    """Group sub-projects, clusters, and infra into domains."""
+    domains: list[dict] = []
+    cluster_assigned: set[str] = set()
+
+    # 1. Each sub-project with a recognized framework → a domain
+    for sp in sub_projects:
+        fw = sp.get("framework") or ""
+        domain_type = _FRAMEWORK_DOMAIN_TYPE.get(fw, "shared")
+        domain_name = sp["name"]
+
+        # Find clusters matching this sub-project by path prefix
+        matched_clusters = []
+        for cluster in feature_clusters:
+            cluster_paths = (cluster.get("frontend", []) +
+                             cluster.get("backend", []) +
+                             cluster.get("mobile", []))
+            for p in cluster_paths:
+                if p.startswith(sp["name"] + "/") or p.startswith(sp.get("path", "")):
+                    if cluster["name"] not in cluster_assigned:
+                        matched_clusters.append(cluster["name"])
+                        cluster_assigned.add(cluster["name"])
+                    break
+
+        # Estimate features from clusters or a default
+        estimated = len(matched_clusters) if matched_clusters else max(1, sp.get("file_count", 3) // 3)
+
+        domains.append({
+            "name": domain_name,
+            "type": domain_type,
+            "sub_projects": [sp["name"]],
+            "clusters": matched_clusters,
+            "infra_paths": [],
+            "estimated_features": estimated,
+        })
+
+    # 2. Infrastructure domain (≥3 infra patterns or dedicated IaC directory)
+    iac_dirs = [p for p in infra_patterns if p["type"] == "iac"]
+    if len(infra_patterns) >= 3 or iac_dirs:
+        domains.append({
+            "name": "infrastructure",
+            "type": "infrastructure",
+            "sub_projects": [],
+            "clusters": [],
+            "infra_paths": [p["path"] for p in infra_patterns],
+            "estimated_features": max(1, len(infra_patterns)),
+        })
+
+    # 3. Assign orphan clusters to existing domains or create uncategorized
+    orphan_clusters = [c for c in feature_clusters if c["name"] not in cluster_assigned]
+    if orphan_clusters and domains:
+        # Try to assign by tier (frontend/backend/mobile)
+        for cluster in orphan_clusters:
+            assigned = False
+            if cluster.get("frontend"):
+                for d in domains:
+                    if d["type"] == "frontend":
+                        d["clusters"].append(cluster["name"])
+                        d["estimated_features"] += 1
+                        assigned = True
+                        break
+            if not assigned and cluster.get("backend"):
+                for d in domains:
+                    if d["type"] == "backend":
+                        d["clusters"].append(cluster["name"])
+                        d["estimated_features"] += 1
+                        assigned = True
+                        break
+            if not assigned and cluster.get("mobile"):
+                for d in domains:
+                    if d["type"] == "mobile":
+                        d["clusters"].append(cluster["name"])
+                        d["estimated_features"] += 1
+                        assigned = True
+                        break
+            if not assigned:
+                cluster_assigned.add(cluster["name"])
+                # Collect for uncategorized domain
+
+    # Remaining truly orphan clusters → uncategorized
+    still_orphan = [c["name"] for c in feature_clusters
+                    if c["name"] not in cluster_assigned
+                    and not any(c["name"] in d["clusters"] for d in domains)]
+    if still_orphan:
+        domains.append({
+            "name": "uncategorized",
+            "type": "uncategorized",
+            "sub_projects": [],
+            "clusters": still_orphan,
+            "infra_paths": [],
+            "estimated_features": len(still_orphan),
+        })
+
+    # 4. Single-project repos (no sub-projects): 1 domain from root
+    if not sub_projects and not domains:
+        # Derive name from root directory or package name
+        domain_name = root.name
+        pkg_json = root / "package.json"
+        if pkg_json.exists():
+            try:
+                pkg = json.loads(pkg_json.read_text())
+                if pkg.get("name"):
+                    domain_name = pkg["name"].split("/")[-1]  # strip @scope/
+            except Exception:
+                pass
+
+        # Detect type from root framework
+        fw = None
+        for sp_marker, _ in _PROJECT_MARKERS:
+            if (root / sp_marker).exists():
+                fw = _detect_sub_project_framework(root, sp_marker)
+                if (root / "host.json").exists():
+                    fw = "Azure Functions"
+                break
+        if not fw:
+            # Try the main stack detect
+            stack = detect_stack(root)
+            fw = stack.get("framework")
+
+        domain_type = _FRAMEWORK_DOMAIN_TYPE.get(fw or "", "shared")
+
+        all_cluster_names = [c["name"] for c in feature_clusters]
+        domains.append({
+            "name": domain_name,
+            "type": domain_type,
+            "sub_projects": [],
+            "clusters": all_cluster_names,
+            "infra_paths": [p["path"] for p in infra_patterns] if infra_patterns else [],
+            "estimated_features": max(len(all_cluster_names), len(feature_clusters)),
+        })
+
+    return domains
+
+
+# --- API spec detection ---
+
+def detect_api_specs(root: Path, sub_projects: list[dict]) -> str | None:
+    """Check for OpenAPI/Swagger spec files."""
+    search_dirs = [root] + [root / sp["name"] for sp in sub_projects]
+
+    for d in search_dirs:
+        if not d.is_dir():
+            continue
+        for child in d.rglob("*"):
+            if not child.is_file():
+                continue
+            if should_exclude(child.relative_to(root)):
+                continue
+            name_lower = child.name.lower()
+            if ("openapi" in name_lower or "swagger" in name_lower) and \
+               child.suffix in (".json", ".yaml", ".yml"):
+                return str(child.relative_to(root))
+    return None
+
+
 def generate_report(root: Path, profile: str) -> dict:
     """Orchestrate all discovery and generate the JSON report."""
     root = root.resolve()
@@ -718,12 +1271,67 @@ def generate_report(root: Path, profile: str) -> dict:
     readme_desc = read_readme(root)
     test_patterns = detect_test_patterns(root)
 
+    # Always detect sub-projects
+    sub_projects = detect_sub_projects(root)
+
+    # Backfill root stack from sub-projects when root has no config
+    if not stack["language"] and sub_projects:
+        langs = list({sp["language"] for sp in sub_projects if sp["language"]})
+        if len(langs) == 1:
+            stack["language"] = langs[0]
+            stack["confidence"]["language"] = "medium"
+        elif langs:
+            stack["language"] = langs[0]
+            stack["confidence"]["language"] = "low"
+
+    if not stack["framework"] and sub_projects:
+        frameworks = [sp["framework"] for sp in sub_projects if sp["framework"]]
+        if len(frameworks) == 1:
+            stack["framework"] = frameworks[0]
+            stack["confidence"]["framework"] = "medium"
+        elif len(frameworks) > 1:
+            stack["framework"] = f"Multi ({', '.join(frameworks)})"
+            stack["confidence"]["framework"] = "medium"
+
+    if not stack["package_manager"] and sub_projects:
+        for sp in sub_projects:
+            sp_root = root / sp["name"]
+            for lockfile, pm in [
+                ("pnpm-lock.yaml", "pnpm"), ("yarn.lock", "yarn"),
+                ("package-lock.json", "npm"), ("bun.lockb", "bun"),
+            ]:
+                if (sp_root / lockfile).exists():
+                    stack["package_manager"] = pm
+                    stack["confidence"]["package_manager"] = "medium"
+                    break
+            if stack["package_manager"]:
+                break
+
+    # Always detect infra patterns (useful for CONTEXT_PACK.md even in core)
+    infra_patterns = detect_infra_patterns(root)
+
     features = []
+    serverless_functions = []
+    ui_components = []
+    feature_clusters = []
+    api_spec_path = None
+    domains = []
+
     if profile == "core+product":
-        features = discover_features(root, stack, architecture)
+        features = discover_features(root, stack, architecture, sub_projects)
+        serverless_functions = detect_serverless_functions(root)
+        ui_components = detect_ui_components(root, sub_projects)
+        feature_clusters = cluster_features(ui_components, serverless_functions, features)
+        api_spec_path = detect_api_specs(root, sub_projects)
+        domains = detect_domains(root, sub_projects, feature_clusters,
+                                 architecture, infra_patterns)
+    else:
+        # Even core profile gets domains for context
+        domains = detect_domains(root, sub_projects, [],
+                                 architecture, infra_patterns)
 
     report = {
-        "version": "1.0.0",
+        "version": "2.0.0",
         "generated": datetime.now(timezone.utc).isoformat(),
         "profile": profile,
         "project_root": str(root),
@@ -733,7 +1341,16 @@ def generate_report(root: Path, profile: str) -> dict:
         "readme_description": readme_desc,
         "test_patterns": test_patterns,
         "features": features,
+        "sub_projects": sub_projects,
+        "infra_patterns": infra_patterns,
+        "domains": domains,
     }
+
+    if profile == "core+product":
+        report["serverless_functions"] = serverless_functions
+        report["ui_components"] = ui_components
+        report["feature_clusters"] = feature_clusters
+        report["api_spec_path"] = api_spec_path
 
     return report
 
@@ -768,8 +1385,23 @@ def main():
         print(f"Test framework: {stack['test_framework']}")
     print(f"Entry points: {len(report['entry_points'])}")
     print(f"Components: {len(report['architecture'].get('components', []))}")
+    if report.get("sub_projects"):
+        print(f"Sub-projects: {len(report['sub_projects'])}")
     if report["features"]:
         print(f"Features discovered: {len(report['features'])}")
+    if report.get("serverless_functions"):
+        print(f"Serverless functions: {len(report['serverless_functions'])}")
+    if report.get("ui_components"):
+        print(f"UI components: {len(report['ui_components'])}")
+    if report.get("feature_clusters"):
+        print(f"Feature clusters: {len(report['feature_clusters'])}")
+    if report.get("api_spec_path"):
+        print(f"API spec: {report['api_spec_path']}")
+    if report.get("infra_patterns"):
+        print(f"Infrastructure patterns: {len(report['infra_patterns'])}")
+    if report.get("domains"):
+        domain_summary = ", ".join(f"{d['name']}({d['type']})" for d in report["domains"])
+        print(f"Domains: {len(report['domains'])} [{domain_summary}]")
 
 
 if __name__ == "__main__":

@@ -131,6 +131,23 @@ What would you like me to work on? (I'll register myself in .agentic-state/AGENT
 
 ---
 
+## 📋 Check for Active Brownfield Spec Plan
+
+- [ ] **Check for brownfield spec plan in progress**:
+  ```bash
+  ls .agentic-journal/plans/*-specs-plan.md 2>/dev/null || echo "No specs plan"
+  ```
+
+**If a specs plan exists with uncompleted domains:**
+```
+📋 Brownfield spec generation is in progress (X/Y domains completed).
+Resume with: ag specs
+```
+
+This is a **suggestion**, not a block. The user may choose to work on something else.
+
+---
+
 ## 🔄 SECOND: Check for Framework Upgrade
 
 **🚨 IMPORTANT: The marker file IS the upgrade notification. Don't search elsewhere!**

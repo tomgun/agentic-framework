@@ -5,6 +5,23 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.0] - 2026-02-10
+
+### Added
+- **Domain categories for features** — `detect_domains()` groups sub-projects by framework type (frontend, backend, mobile, infrastructure, shared). `detect_infra_patterns()` scans for CI/CD, IaC, containers, and deployment configs. Both always run during discovery.
+- **Domain-tagged FEATURES.md output** — `render_proposals.py` adds `- Domain:` metadata to each feature, with cluster-to-domain mapping from discovery report.
+- **`ag specs` command** — Systematic brownfield spec generation with plan-review loop, per-domain progress tracking via checkbox plan artifacts, multi-session resume support.
+- **Size-aware routing in init** — Small projects (1 domain, ≤8 clusters) get inline spec generation; larger projects are routed to `ag specs`.
+- **Greenfield domain question** — Init interview asks Core+PM projects about distinct domains from day 1.
+- **Brownfield Spec Pipeline** — Documented in `auto_orchestration.md`: 7-step process from discovery through cross-domain review.
+- **Session start brownfield plan detection** — Detects active `*-specs-plan.md` and suggests resuming.
+- **3 new LLM behavioral tests** (044-046) — `ag specs` awareness, domain-tagged features, brownfield plan resume.
+- **16 new pytest tests** — Infrastructure pattern detection (7), domain detection (8), integration test update (1). Total: 75 discover tests.
+
+### Changed
+- **discover.py** — Report now always includes `infra_patterns` and `domains` fields (additive, no version bump needed).
+- **init_playbook.md** — Step 0.5c for size-aware routing, greenfield domain question in Step 1.
+
 ## [0.24.0] - 2026-02-10
 
 ### Added

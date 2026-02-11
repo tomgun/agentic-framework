@@ -21,6 +21,15 @@ from discover import (
     discover_features,
     generate_report,
     count_source_files,
+    detect_sub_projects,
+    detect_serverless_functions,
+    detect_ui_components,
+    cluster_features,
+    detect_api_specs,
+    detect_infra_patterns,
+    detect_domains,
+    _normalize_name,
+    _camel_case_split,
 )
 
 
@@ -312,7 +321,7 @@ class TestDiscoverFeatures:
     def test_monorepo_features(self, tmp_path):
         """Discover features from monorepo packages."""
         (tmp_path / "packages").mkdir()
-        for pkg in ["auth", "billing", "notifications"]:
+        for pkg in ["auth", "orders", "notifications"]:
             pkg_dir = tmp_path / "packages" / pkg
             pkg_dir.mkdir()
             (pkg_dir / "index.ts").write_text(f"// {pkg}")
@@ -321,7 +330,7 @@ class TestDiscoverFeatures:
         features = discover_features(tmp_path, {"language": "TypeScript"}, arch)
         names = [f["name"].lower() for f in features]
         assert "auth" in names
-        assert "billing" in names
+        assert "orders" in names
 
     def test_route_features(self, tmp_path):
         """Discover features from page/route files."""
@@ -402,13 +411,14 @@ class TestGenerateReport:
         (tmp_path / "README.md").write_text("# Test\n\nA test project.\n")
 
         report = generate_report(tmp_path, "core")
-        assert "version" in report
+        assert report["version"] == "2.0.0"
         assert "generated" in report
         assert "stack" in report
         assert "entry_points" in report
         assert "architecture" in report
         assert "readme_description" in report
         assert "test_patterns" in report
+        assert "sub_projects" in report
         assert report["features"] == []  # Core profile: no features
 
     def test_core_pm_includes_features(self, tmp_path):
@@ -423,6 +433,10 @@ class TestGenerateReport:
 
         report = generate_report(tmp_path, "core+product")
         assert len(report["features"]) > 0
+        assert "serverless_functions" in report
+        assert "ui_components" in report
+        assert "feature_clusters" in report
+        assert "api_spec_path" in report
 
 
 # === Source File Counting ===
@@ -446,3 +460,673 @@ class TestCountSourceFiles:
 
         counts = count_source_files(tmp_path)
         assert counts.get(".js", 0) == 1
+
+
+# === Sub-project Detection Tests ===
+
+class TestDetectSubProjects:
+    def test_nested_package_json(self, tmp_path):
+        """Detect sub-projects with package.json."""
+        frontend = tmp_path / "frontend"
+        frontend.mkdir()
+        (frontend / "package.json").write_text(json.dumps({
+            "dependencies": {"react": "^18.0.0"},
+        }))
+        (frontend / "tsconfig.json").write_text("{}")
+
+        backend = tmp_path / "backend"
+        backend.mkdir()
+        (backend / "package.json").write_text(json.dumps({
+            "dependencies": {"express": "^4.0.0"},
+        }))
+
+        sps = detect_sub_projects(tmp_path)
+        assert len(sps) == 2
+        names = {sp["name"] for sp in sps}
+        assert names == {"backend", "frontend"}
+
+        # Frontend has tsconfig → TypeScript
+        fe = next(sp for sp in sps if sp["name"] == "frontend")
+        assert fe["language"] == "TypeScript"
+        assert fe["framework"] == "React"
+
+        # Backend has no tsconfig → JavaScript
+        be = next(sp for sp in sps if sp["name"] == "backend")
+        assert be["language"] == "JavaScript"
+        assert be["framework"] == "Express"
+
+    def test_no_false_positives_node_modules(self, tmp_path):
+        """node_modules should not be detected as a sub-project."""
+        nm = tmp_path / "node_modules"
+        nm.mkdir()
+        (nm / "package.json").write_text("{}")
+        (tmp_path / "src").mkdir()
+        (tmp_path / "src" / "app.ts").write_text("// app")
+
+        sps = detect_sub_projects(tmp_path)
+        assert len(sps) == 0
+
+    def test_azure_functions_host_json(self, tmp_path):
+        """Sub-project with host.json detected as Azure Functions."""
+        funcs = tmp_path / "functions"
+        funcs.mkdir()
+        (funcs / "package.json").write_text(json.dumps({"name": "functions"}))
+        (funcs / "host.json").write_text("{}")
+
+        sps = detect_sub_projects(tmp_path)
+        assert len(sps) == 1
+        assert sps[0]["framework"] == "Azure Functions"
+
+    def test_python_sub_project(self, tmp_path):
+        """Detect Python sub-project."""
+        api = tmp_path / "api"
+        api.mkdir()
+        (api / "pyproject.toml").write_text('[project]\nname="api"\ndependencies=["fastapi"]\n')
+
+        sps = detect_sub_projects(tmp_path)
+        assert len(sps) == 1
+        assert sps[0]["language"] == "Python"
+        assert sps[0]["framework"] == "FastAPI"
+
+    def test_sub_project_with_tests(self, tmp_path):
+        """Detect has_tests for sub-projects."""
+        fe = tmp_path / "frontend"
+        fe.mkdir()
+        (fe / "package.json").write_text("{}")
+        (fe / "__tests__").mkdir()
+
+        be = tmp_path / "backend"
+        be.mkdir()
+        (be / "package.json").write_text("{}")
+
+        sps = detect_sub_projects(tmp_path)
+        fe_sp = next(sp for sp in sps if sp["name"] == "frontend")
+        be_sp = next(sp for sp in sps if sp["name"] == "backend")
+        assert fe_sp["has_tests"] is True
+        assert be_sp["has_tests"] is False
+
+
+# === Serverless Function Detection Tests ===
+
+class TestDetectServerlessFunctions:
+    def test_azure_functions(self, tmp_path):
+        """Parse Azure Functions function.json."""
+        func_dir = tmp_path / "inventory"
+        func_dir.mkdir()
+        (func_dir / "function.json").write_text(json.dumps({
+            "bindings": [
+                {
+                    "type": "httpTrigger",
+                    "direction": "in",
+                    "route": "inventory",
+                    "methods": ["get"],
+                    "authLevel": "anonymous",
+                },
+                {"type": "http", "direction": "out"},
+            ]
+        }))
+        (func_dir / "index.ts").write_text("// handler")
+
+        funcs = detect_serverless_functions(tmp_path)
+        assert len(funcs) == 1
+        assert funcs[0]["name"] == "inventory"
+        assert funcs[0]["trigger"] == "http"
+        assert funcs[0]["route"] == "inventory"
+        assert funcs[0]["methods"] == ["GET"]
+        assert funcs[0]["type_hint"] == "user-facing"
+
+    def test_azure_admin_functions(self, tmp_path):
+        """Admin prefix gets correct type hint."""
+        func_dir = tmp_path / "adminUsers"
+        func_dir.mkdir()
+        (func_dir / "function.json").write_text(json.dumps({
+            "bindings": [
+                {"type": "httpTrigger", "direction": "in", "route": "admin/users", "methods": ["get", "post"]},
+            ]
+        }))
+
+        funcs = detect_serverless_functions(tmp_path)
+        assert len(funcs) == 1
+        assert funcs[0]["type_hint"] == "admin"
+
+    def test_aws_lambda_config(self, tmp_path):
+        """Detect AWS Lambda serverless.yml."""
+        (tmp_path / "serverless.yml").write_text("service: my-service\n")
+
+        funcs = detect_serverless_functions(tmp_path)
+        assert len(funcs) == 1
+        assert funcs[0]["name"] == "_aws_lambda_config"
+        assert funcs[0]["trigger"] == "config_file"
+
+    def test_vercel_api(self, tmp_path):
+        """Detect Vercel api/ functions."""
+        api = tmp_path / "api"
+        api.mkdir()
+        (api / "hello.ts").write_text("// handler")
+        (api / "users.ts").write_text("// handler")
+
+        funcs = detect_serverless_functions(tmp_path)
+        assert len(funcs) == 2
+        names = {f["name"] for f in funcs}
+        assert names == {"hello", "users"}
+        assert all(f["trigger"] == "http" for f in funcs)
+
+    def test_no_serverless(self, tmp_path):
+        """Non-serverless project returns empty list."""
+        (tmp_path / "src").mkdir()
+        (tmp_path / "src" / "app.ts").write_text("// app")
+
+        funcs = detect_serverless_functions(tmp_path)
+        assert funcs == []
+
+    def test_timer_trigger(self, tmp_path):
+        """Detect timer trigger Azure Function."""
+        func_dir = tmp_path / "cronCleanup"
+        func_dir.mkdir()
+        (func_dir / "function.json").write_text(json.dumps({
+            "bindings": [
+                {"type": "timerTrigger", "direction": "in", "schedule": "0 0 * * *"},
+            ]
+        }))
+
+        funcs = detect_serverless_functions(tmp_path)
+        assert len(funcs) == 1
+        assert funcs[0]["trigger"] == "timer"
+
+
+# === UI Component Detection Tests ===
+
+class TestDetectUIComponents:
+    def test_component_directory_grouping(self, tmp_path):
+        """Detect component directories with 2+ source files."""
+        comp_dir = tmp_path / "src" / "components" / "Orders"
+        comp_dir.mkdir(parents=True)
+        (comp_dir / "Orders.tsx").write_text("// orders")
+        (comp_dir / "OrdersList.tsx").write_text("// list")
+        (comp_dir / "OrdersDetail.tsx").write_text("// detail")
+
+        small_dir = tmp_path / "src" / "components" / "Tiny"
+        small_dir.mkdir()
+        (small_dir / "Tiny.tsx").write_text("// only one file")
+
+        comps = detect_ui_components(tmp_path, [])
+        assert len(comps) == 1
+        assert comps[0]["name"] == "Orders"
+        assert comps[0]["file_count"] == 3
+
+    def test_sub_project_components(self, tmp_path):
+        """Detect components inside sub-projects."""
+        fe = tmp_path / "frontend" / "src" / "components" / "Dashboard"
+        fe.mkdir(parents=True)
+        (fe / "Dashboard.tsx").write_text("// dash")
+        (fe / "DashboardChart.tsx").write_text("// chart")
+
+        sub_projects = [{"name": "frontend", "path": "frontend/", "language": "TypeScript",
+                         "framework": "React", "has_tests": False}]
+        comps = detect_ui_components(tmp_path, sub_projects)
+        assert len(comps) == 1
+        assert comps[0]["name"] == "Dashboard"
+        assert comps[0]["path"] == "frontend/src/components/Dashboard"
+
+    def test_excludes_utility_dirs(self, tmp_path):
+        """Exclude utility directories from component detection."""
+        for name in ["utils", "helpers", "Dashboard"]:
+            d = tmp_path / "src" / "components" / name
+            d.mkdir(parents=True)
+            (d / "index.tsx").write_text("// code")
+            (d / "helpers.tsx").write_text("// more code")
+
+        comps = detect_ui_components(tmp_path, [])
+        names = [c["name"] for c in comps]
+        assert "Dashboard" in names
+        assert "utils" not in names
+        assert "helpers" not in names
+
+    def test_screens_detected_as_mobile(self, tmp_path):
+        """screens/ directories are detected."""
+        screen_dir = tmp_path / "src" / "screens" / "Home"
+        screen_dir.mkdir(parents=True)
+        (screen_dir / "Home.tsx").write_text("// home")
+        (screen_dir / "HomeStyles.ts").write_text("// styles")
+
+        comps = detect_ui_components(tmp_path, [])
+        assert len(comps) == 1
+        assert comps[0]["name"] == "Home"
+
+
+# === Feature Clustering Tests ===
+
+class TestClusterFeatures:
+    def test_prefix_matching(self, tmp_path):
+        """Items with common prefix >= 4 chars are clustered."""
+        ui = [
+            {"name": "Inventory", "path": "frontend/src/components/Inventory", "file_count": 5},
+        ]
+        funcs = [
+            {"name": "inventory", "trigger": "http", "route": "inventory",
+             "methods": ["GET"], "type_hint": "user-facing", "path": "functions/inventory"},
+            {"name": "inventoryDetail", "trigger": "http", "route": "inventory/average",
+             "methods": ["GET"], "type_hint": "user-facing", "path": "functions/inventoryDetail"},
+        ]
+
+        clusters = cluster_features(ui, funcs, [])
+        # All should be in one cluster (common prefix "inventory")
+        assert len(clusters) == 1
+        assert clusters[0]["name"] == "inventory"
+        assert len(clusters[0]["frontend"]) == 1
+        assert len(clusters[0]["backend"]) == 2
+        assert clusters[0]["confidence"] == "medium"  # frontend + backend
+
+    def test_confidence_levels(self, tmp_path):
+        """Verify confidence based on tier count."""
+        ui = [
+            {"name": "Orders", "path": "frontend/src/components/Orders", "file_count": 3},
+            {"name": "Orders", "path": "mobile/src/screens/Orders", "file_count": 2},
+        ]
+        funcs = [
+            {"name": "orders", "trigger": "http", "route": "orders",
+             "methods": ["GET"], "type_hint": "user-facing", "path": "functions/orders"},
+        ]
+
+        clusters = cluster_features(ui, funcs, [])
+        orders = next(c for c in clusters if c["name"] == "orders")
+        assert orders["confidence"] == "high"  # all 3 tiers
+
+    def test_type_hint_tagging(self, tmp_path):
+        """Admin functions get admin type hint on cluster."""
+        funcs = [
+            {"name": "adminUsers", "trigger": "http", "route": "admin/users",
+             "methods": ["GET"], "type_hint": "admin", "path": "functions/adminUsers"},
+            {"name": "adminRoles", "trigger": "http", "route": "admin/roles",
+             "methods": ["GET"], "type_hint": "admin", "path": "functions/adminRoles"},
+        ]
+
+        clusters = cluster_features([], funcs, [])
+        assert len(clusters) == 1
+        assert clusters[0]["type_hint"] == "admin"
+
+    def test_no_merge_short_prefix(self, tmp_path):
+        """Items with < 4 char common prefix stay separate."""
+        ui = [
+            {"name": "Auth", "path": "src/components/Auth", "file_count": 3},
+            {"name": "API", "path": "src/components/API", "file_count": 3},
+        ]
+
+        clusters = cluster_features(ui, [], [])
+        assert len(clusters) == 2
+
+    def test_empty_input(self):
+        """Empty inputs produce no clusters."""
+        clusters = cluster_features([], [], [])
+        assert clusters == []
+
+    def test_separate_unrelated(self):
+        """Unrelated items stay in separate clusters."""
+        ui = [
+            {"name": "Orders", "path": "fe/src/components/Orders", "file_count": 3},
+            {"name": "Inventory", "path": "fe/src/components/Inventory", "file_count": 5},
+        ]
+
+        clusters = cluster_features(ui, [], [])
+        assert len(clusters) == 2
+        names = {c["name"] for c in clusters}
+        assert "orders" in names
+        assert "inventory" in names
+
+
+# === Name Normalization Tests ===
+
+class TestNameNormalization:
+    def test_camel_case_split(self):
+        """camelCase splitting works correctly."""
+        assert _camel_case_split("userProfileEdit") == ["user", "profile", "edit"]
+        assert _camel_case_split("InventoryDetail") == ["inventory", "detail"]
+        assert _camel_case_split("adminUsers") == ["admin", "users"]
+        assert _camel_case_split("simple") == ["simple"]
+
+    def test_normalize_name(self):
+        """Normalize produces joined lowercase tokens."""
+        assert _normalize_name("userProfileEdit") == "userprofileedit"
+        assert _normalize_name("Inventory") == "inventory"
+        assert _normalize_name("admin-users") == "adminusers"
+        assert _normalize_name("my_component") == "mycomponent"
+
+
+# === Stack Backfill from Sub-projects ===
+
+class TestSubProjectStackBackfill:
+    def test_language_from_sub_projects(self, tmp_path):
+        """Root with no config gets language from unanimous sub-projects."""
+        for name in ["frontend", "mobile"]:
+            d = tmp_path / name
+            d.mkdir()
+            (d / "package.json").write_text("{}")
+            (d / "tsconfig.json").write_text("{}")
+
+        report = generate_report(tmp_path, "core")
+        assert report["stack"]["language"] == "TypeScript"
+        assert report["stack"]["confidence"]["language"] == "medium"
+
+    def test_framework_multi(self, tmp_path):
+        """Multiple sub-project frameworks produce Multi(...) framework."""
+        fe = tmp_path / "frontend"
+        fe.mkdir()
+        (fe / "package.json").write_text(json.dumps({"dependencies": {"react": "^18"}}))
+        (fe / "tsconfig.json").write_text("{}")
+
+        funcs = tmp_path / "functions"
+        funcs.mkdir()
+        (funcs / "package.json").write_text("{}")
+        (funcs / "host.json").write_text("{}")
+
+        report = generate_report(tmp_path, "core")
+        assert "Multi" in report["stack"]["framework"]
+        assert "React" in report["stack"]["framework"]
+        assert "Azure Functions" in report["stack"]["framework"]
+
+    def test_package_manager_from_sub_project(self, tmp_path):
+        """Root with no lockfile gets package manager from sub-project."""
+        fe = tmp_path / "frontend"
+        fe.mkdir()
+        (fe / "package.json").write_text("{}")
+        (fe / "yarn.lock").write_text("")
+
+        report = generate_report(tmp_path, "core")
+        assert report["stack"]["package_manager"] == "yarn"
+
+    def test_no_backfill_when_root_has_config(self, tmp_path):
+        """Root config takes priority over sub-projects."""
+        (tmp_path / "package.json").write_text(json.dumps({
+            "dependencies": {"next": "^14.0.0"},
+        }))
+        (tmp_path / "tsconfig.json").write_text("{}")
+        (tmp_path / "package-lock.json").write_text("{}")
+
+        fe = tmp_path / "frontend"
+        fe.mkdir()
+        (fe / "package.json").write_text(json.dumps({"dependencies": {"vue": "^3"}}))
+        (fe / "yarn.lock").write_text("")
+
+        report = generate_report(tmp_path, "core")
+        # Root config wins
+        assert report["stack"]["framework"] == "Next.js"
+        assert report["stack"]["package_manager"] == "npm"
+
+
+# === Integration: Multi-Sub-Project Structure ===
+
+class TestMultiSubProjectIntegration:
+    def test_multi_sub_project_repo(self, tmp_path):
+        """Full integration test: multi-sub-project with serverless functions."""
+        # web sub-project (React frontend)
+        web = tmp_path / "web"
+        (web / "src" / "components" / "Checkout").mkdir(parents=True)
+        (web / "src" / "components" / "Checkout" / "Checkout.tsx").write_text("// checkout")
+        (web / "src" / "components" / "Checkout" / "CheckoutForm.tsx").write_text("// form")
+        (web / "src" / "components" / "Catalog").mkdir(parents=True)
+        (web / "src" / "components" / "Catalog" / "Catalog.tsx").write_text("// catalog")
+        (web / "src" / "components" / "Catalog" / "CatalogGrid.tsx").write_text("// grid")
+        (web / "package.json").write_text(json.dumps({"dependencies": {"react": "^18"}}))
+        (web / "tsconfig.json").write_text("{}")
+        (web / "yarn.lock").write_text("")
+
+        # api sub-project (Azure Functions)
+        api = tmp_path / "api"
+        api.mkdir()
+        (api / "package.json").write_text("{}")
+        (api / "host.json").write_text("{}")
+        for fn_name in ["checkout", "checkoutConfirm", "catalog"]:
+            fn_dir = api / fn_name
+            fn_dir.mkdir()
+            (fn_dir / "function.json").write_text(json.dumps({
+                "bindings": [
+                    {"type": "httpTrigger", "direction": "in",
+                     "route": fn_name, "methods": ["get"]},
+                ]
+            }))
+            (fn_dir / "index.ts").write_text(f"// {fn_name}")
+
+        # mobile sub-project
+        mobile = tmp_path / "mobile"
+        (mobile / "src" / "screens" / "Checkout").mkdir(parents=True)
+        (mobile / "src" / "screens" / "Checkout" / "CheckoutScreen.tsx").write_text("// screen")
+        (mobile / "src" / "screens" / "Checkout" / "CheckoutStyles.ts").write_text("// styles")
+        (mobile / "package.json").write_text(json.dumps({"dependencies": {"react-native": "^0.72"}}))
+        (mobile / "tsconfig.json").write_text("{}")
+
+        report = generate_report(tmp_path, "core+product")
+
+        # Sub-projects detected
+        sp_names = {sp["name"] for sp in report["sub_projects"]}
+        assert sp_names == {"web", "api", "mobile"}
+
+        # Stack backfilled
+        assert report["stack"]["language"] == "TypeScript"
+        assert "Multi" in report["stack"]["framework"]
+        assert report["stack"]["package_manager"] == "yarn"
+
+        # Serverless functions detected
+        sf_names = {f["name"] for f in report["serverless_functions"]}
+        assert "checkout" in sf_names
+        assert "checkoutConfirm" in sf_names
+        assert "catalog" in sf_names
+
+        # UI components detected
+        comp_names = {c["name"] for c in report["ui_components"]}
+        assert "Checkout" in comp_names
+        assert "Catalog" in comp_names
+
+        # Feature clusters created
+        assert len(report["feature_clusters"]) > 0
+        cluster_names = {c["name"] for c in report["feature_clusters"]}
+        assert "checkout" in cluster_names
+        assert "catalog" in cluster_names
+
+        # Checkout cluster has frontend + backend + mobile = high confidence
+        checkout = next(c for c in report["feature_clusters"] if c["name"] == "checkout")
+        assert len(checkout["frontend"]) >= 1
+        assert len(checkout["backend"]) >= 1
+        assert len(checkout["mobile"]) >= 1
+        assert checkout["confidence"] == "high"
+
+        # Domains detected (3+ domains: web, api, mobile)
+        assert "domains" in report
+        assert len(report["domains"]) >= 3
+        domain_names = {d["name"] for d in report["domains"]}
+        assert "web" in domain_names
+        assert "api" in domain_names
+        assert "mobile" in domain_names
+
+        # Domain types correct
+        web_domain = next(d for d in report["domains"] if d["name"] == "web")
+        assert web_domain["type"] == "frontend"
+        mobile_domain = next(d for d in report["domains"] if d["name"] == "mobile")
+        assert mobile_domain["type"] == "mobile"
+        api_domain = next(d for d in report["domains"] if d["name"] == "api")
+        assert api_domain["type"] == "backend"
+
+        # Infra patterns always present (may be empty for this test)
+        assert "infra_patterns" in report
+
+
+# === Infrastructure Pattern Detection Tests ===
+
+class TestDetectInfraPatterns:
+    def test_github_actions(self, tmp_path):
+        """Detect GitHub Actions workflows."""
+        wf = tmp_path / ".github" / "workflows"
+        wf.mkdir(parents=True)
+        (wf / "ci.yml").write_text("name: CI\n")
+        (wf / "deploy.yml").write_text("name: Deploy\n")
+
+        patterns = detect_infra_patterns(tmp_path)
+        assert len(patterns) >= 1
+        ci_cd = [p for p in patterns if p["type"] == "ci_cd"]
+        assert len(ci_cd) == 1
+        assert "GitHub Actions" in ci_cd[0]["detail"]
+
+    def test_terraform(self, tmp_path):
+        """Detect Terraform IaC."""
+        tf = tmp_path / "terraform"
+        tf.mkdir()
+        (tf / "main.tf").write_text('resource "aws_s3_bucket" "b" {}\n')
+
+        patterns = detect_infra_patterns(tmp_path)
+        iac = [p for p in patterns if p["type"] == "iac"]
+        assert len(iac) == 1
+        assert "Terraform" in iac[0]["detail"]
+
+    def test_docker(self, tmp_path):
+        """Detect Docker containers."""
+        (tmp_path / "Dockerfile").write_text("FROM node:18\n")
+        (tmp_path / "docker-compose.yml").write_text("version: '3'\n")
+
+        patterns = detect_infra_patterns(tmp_path)
+        containers = [p for p in patterns if p["type"] == "container"]
+        assert len(containers) == 2  # Dockerfile + docker-compose
+
+    def test_kubernetes(self, tmp_path):
+        """Detect Kubernetes config."""
+        (tmp_path / "k8s").mkdir()
+        (tmp_path / "k8s" / "deployment.yaml").write_text("kind: Deployment\n")
+
+        patterns = detect_infra_patterns(tmp_path)
+        k8s = [p for p in patterns if p["type"] == "container" and "Kubernetes" in p["detail"]]
+        assert len(k8s) == 1
+
+    def test_empty_repo(self, tmp_path):
+        """Non-infra repo returns empty list."""
+        (tmp_path / "src").mkdir()
+        (tmp_path / "src" / "app.py").write_text("# app")
+
+        patterns = detect_infra_patterns(tmp_path)
+        assert patterns == []
+
+    def test_deploy_makefile(self, tmp_path):
+        """Detect Makefile with deploy target."""
+        (tmp_path / "Makefile").write_text("build:\n\tgo build\n\ndeploy:\n\tkubectl apply\n")
+
+        patterns = detect_infra_patterns(tmp_path)
+        deploy = [p for p in patterns if p["type"] == "deployment"]
+        assert len(deploy) == 1
+        assert "Makefile" in deploy[0]["detail"]
+
+    def test_multiple_ci_cd(self, tmp_path):
+        """Detect multiple CI/CD systems."""
+        wf = tmp_path / ".github" / "workflows"
+        wf.mkdir(parents=True)
+        (wf / "ci.yml").write_text("name: CI\n")
+        (tmp_path / "Jenkinsfile").write_text("pipeline {}\n")
+
+        patterns = detect_infra_patterns(tmp_path)
+        ci_cd = [p for p in patterns if p["type"] == "ci_cd"]
+        assert len(ci_cd) == 2
+
+
+# === Domain Detection Tests ===
+
+class TestDetectDomains:
+    def test_sub_projects_grouped_by_framework(self, tmp_path):
+        """Sub-projects with recognized frameworks produce typed domains."""
+        sub_projects = [
+            {"name": "frontend", "path": "frontend/", "language": "TypeScript",
+             "framework": "React", "has_tests": True},
+            {"name": "api", "path": "api/", "language": "Python",
+             "framework": "FastAPI", "has_tests": True},
+        ]
+
+        domains = detect_domains(tmp_path, sub_projects, [], {}, [])
+        assert len(domains) == 2
+        fe = next(d for d in domains if d["name"] == "frontend")
+        assert fe["type"] == "frontend"
+        api = next(d for d in domains if d["name"] == "api")
+        assert api["type"] == "backend"
+
+    def test_infra_domain_threshold(self, tmp_path):
+        """Infrastructure domain created when >= 3 infra patterns."""
+        infra = [
+            {"type": "ci_cd", "path": ".github/workflows", "detail": "GitHub Actions"},
+            {"type": "container", "path": "Dockerfile", "detail": "Docker"},
+            {"type": "container", "path": "docker-compose.yml", "detail": "Docker Compose"},
+        ]
+
+        domains = detect_domains(tmp_path, [], [], {}, infra)
+        infra_domains = [d for d in domains if d["type"] == "infrastructure"]
+        assert len(infra_domains) == 1
+        assert infra_domains[0]["name"] == "infrastructure"
+
+    def test_infra_domain_from_iac_dir(self, tmp_path):
+        """Infrastructure domain created when IaC directory exists (even < 3 total)."""
+        infra = [
+            {"type": "iac", "path": "terraform", "detail": "Terraform"},
+        ]
+
+        domains = detect_domains(tmp_path, [], [], {}, infra)
+        infra_domains = [d for d in domains if d["type"] == "infrastructure"]
+        assert len(infra_domains) == 1
+
+    def test_no_infra_domain_below_threshold(self, tmp_path):
+        """No infrastructure domain when < 3 patterns and no IaC dir."""
+        infra = [
+            {"type": "ci_cd", "path": ".github/workflows", "detail": "GitHub Actions"},
+            {"type": "container", "path": "Dockerfile", "detail": "Docker"},
+        ]
+
+        domains = detect_domains(tmp_path, [], [], {}, infra)
+        infra_domains = [d for d in domains if d["type"] == "infrastructure"]
+        assert len(infra_domains) == 0
+
+    def test_clusters_assigned_to_domains(self, tmp_path):
+        """Clusters are assigned to domains by path prefix."""
+        sub_projects = [
+            {"name": "frontend", "path": "frontend/", "language": "TypeScript",
+             "framework": "React", "has_tests": False},
+        ]
+        clusters = [
+            {"name": "orders", "frontend": ["frontend/src/components/Orders/"],
+             "backend": [], "mobile": [], "confidence": "low"},
+        ]
+
+        domains = detect_domains(tmp_path, sub_projects, clusters, {}, [])
+        fe = next(d for d in domains if d["name"] == "frontend")
+        assert "orders" in fe["clusters"]
+
+    def test_single_project_fallback(self, tmp_path):
+        """Single-project repo produces 1 domain named from root directory."""
+        (tmp_path / "package.json").write_text(json.dumps({
+            "name": "my-app",
+            "dependencies": {"react": "^18"},
+        }))
+
+        domains = detect_domains(tmp_path, [], [], {}, [])
+        assert len(domains) == 1
+        assert domains[0]["name"] == "my-app"
+        assert domains[0]["type"] == "frontend"
+
+    def test_single_project_no_package(self, tmp_path):
+        """Single-project without package.json uses directory name."""
+        domains = detect_domains(tmp_path, [], [], {}, [])
+        assert len(domains) == 1
+        assert domains[0]["name"] == tmp_path.name
+
+    def test_mobile_domain_type(self, tmp_path):
+        """React Native sub-project gets mobile type."""
+        sub_projects = [
+            {"name": "mobile", "path": "mobile/", "language": "TypeScript",
+             "framework": "React Native", "has_tests": False},
+        ]
+
+        domains = detect_domains(tmp_path, sub_projects, [], {}, [])
+        assert len(domains) == 1
+        assert domains[0]["type"] == "mobile"
+
+    def test_azure_functions_domain(self, tmp_path):
+        """Azure Functions sub-project gets backend type."""
+        sub_projects = [
+            {"name": "functions", "path": "functions/", "language": "TypeScript",
+             "framework": "Azure Functions", "has_tests": False},
+        ]
+
+        domains = detect_domains(tmp_path, sub_projects, [], {}, [])
+        assert len(domains) == 1
+        assert domains[0]["type"] == "backend"

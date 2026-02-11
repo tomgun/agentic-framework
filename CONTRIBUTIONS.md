@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.21.0)
-**Date**: 2026-02-06  
+**Period**: Initial Development (v0.1.0 → v0.25.0)
+**Date**: 2026-02-10  
 
 ---
 
@@ -2004,9 +2004,61 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## Deep Feature Discovery for Brownfield Onboarding (2026-02-10)
+
+### Real-World Pain Point
+
+**User discovery**: Running `discover.py` against a real multi-sub-project repo (React frontend + serverless backend + React Native mobile) produced nearly useless output — zero features, null framework/package-manager, serverless functions and frontend components completely invisible.
+
+**Root cause identified**: Discovery was gated behind `core+product` check and only looked at root-level config files. Multi-sub-project repos (frontend/ + api/ + mobile/) with no root package.json were invisible.
+
+### Design Principle: Python Collects, LLM Synthesizes
+
+**Key architectural decision**: Discovery script collects rich structural evidence (sub-projects, serverless functions, UI components, feature clusters). The LLM synthesizes meaningful features during `init_playbook` user interview. Don't over-engineer fuzzy matching in Python — let the LLM/user merge "User Settings" and "Preferences" during review.
+
+### User-Facing Terminology Fix
+
+**User observation**: Init playbook asked users to "Type 'a' for Core or 'b' for Core+PM" — users don't know what "PM" means. Fixed to spell out "Core + Product Management".
+
+**Impact**: Discovery now handles multi-sub-project repos, serverless backends, and component-based frontends. Feature clustering cross-matches frontend/backend/mobile tiers for richer onboarding.
+
+---
+
+## Domain Categories + Systematic Brownfield Spec Generation (2026-02-10)
+
+### Design Direction: Domains as Metadata, Not Structure
+
+**User insight**: Different "wholes" in a repo (frontend app, backend API, CI/CD) should have their own feature categories. But features should keep the flat `## F-XXXX:` heading format — 15+ tools depend on it.
+
+**Key decision**: Domains are metadata (`- Domain: frontend`), not heading-level structure. This preserves all existing tooling while enabling domain-filtered queries and hierarchical splitting for large projects.
+
+### Systematic Multi-Session Spec Generation
+
+**User requirement**: Brownfield repos with multiple domains need systematic, domain-by-domain spec generation — potentially spanning multiple sessions. Not everything can be done in one pass.
+
+**Design decisions**:
+- `ag specs` creates a plan artifact with checkbox-based progress tracking (`- [x]` / `- [ ]` per domain)
+- Session start detects active brownfield plans and suggests resuming
+- Plan-review loop validates domain boundaries before execution begins
+- Per-domain user confirmation before moving to next domain
+
+### Size-Aware Routing
+
+**User insight**: Small single-domain projects shouldn't be forced through the full `ag specs` pipeline. Two independent thresholds:
+1. **Spec approach**: 1 domain AND ≤8 clusters → quick inline; otherwise → `ag specs`
+2. **Token cost**: >50 features → suggest `organize_features.py --by domain` for file splitting
+
+### Greenfield Support
+
+**Requirement**: Domain categories must work for both greenfield and brownfield projects. Init interview now asks Core+PM projects about distinct domains from day 1.
+
+**Impact**: Agents can now systematically generate specs for large brownfield repos, track progress across sessions, and organize features by domain for both new and existing projects.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.23.0
+**Current Version**: v0.25.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
-**LLM Tests**: 29 defined with matching shell scripts + 1 plan-review awareness test (30 total)
+**LLM Tests**: 45 behavioral test scripts
 
