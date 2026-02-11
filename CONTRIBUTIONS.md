@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.25.2)
-**Date**: 2026-02-11
+**Period**: Initial Development (v0.1.0 → v0.25.4)
+**Date**: 2026-02-12
 
 ---
 
@@ -2104,10 +2104,28 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Behavioral reinforcement now uses the same proven imperative format as structural enforcement. Intent matching broadens trigger coverage beyond exact keyword matches.
 
+### Unified Sync + Discoverability Reminders + Tip of the Day (v0.25.4)
+
+**User insight**: Agents forget about `ag plan` (plan-review loop) even though it's in the trigger table. Same risk for `ag sync`. The fix is putting reminders where the agent actually looks — the `ag start` output — not just in instructions that may get compressed away.
+
+**User direction**: Build `ag sync` as unified drift detection across 5 phases (memory, state freshness, feature reconciliation, spec/doc drift, tool parity). Make it user-initiated (not auto-run) to control token cost, but have `ag start` remind the human it exists.
+
+**User design choice**: `ag sync` does NOT auto-run every session — token cost is too high. It's user-initiated, but the agent should remind the human it exists via a dim "Available workflows" line and a yellow sync probe when issues are detected.
+
+**User idea**: Add a "tip of the day" to the session start dashboard — a random tip surfacing framework capabilities the user might not know about. Examples: "synchronize framework memory and specs by running `ag sync`", "start planning with plan-review loop to automatically let agents discuss a brilliant plan". Low-cost discoverability boost.
+
+**Changes**:
+- `sync.sh` (new) — unified drift detection + auto-fix across 5 phases, with `--check` (dry run) and `--quiet` (probe) modes
+- `ag.sh` — thin wrapper for `ag sync`, discoverability reminder line in `cmd_start`, tip of the day (10 tips, random per session)
+- `session_start.md` — greeting template updated with "Available workflows" line and tip slot
+- Both `CLAUDE.md` files updated for sync documentation
+
+**Impact**: Framework capabilities are now surfaced where agents and users actually look (dashboard output), not buried in instruction files. Tip of the day provides passive discoverability for the full `ag` command set.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.25.3
+**Current Version**: v0.25.4
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 48 behavioral test scripts

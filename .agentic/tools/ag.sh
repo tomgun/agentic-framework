@@ -15,9 +15,10 @@ if [ -t 1 ]; then
     YELLOW='\033[0;33m'
     BLUE='\033[0;34m'
     BOLD='\033[1m'
+    DIM='\033[2m'
     NC='\033[0m'
 else
-    RED='' GREEN='' YELLOW='' BLUE='' BOLD='' NC=''
+    RED='' GREEN='' YELLOW='' BLUE='' BOLD='' DIM='' NC=''
 fi
 
 # Detect profile from STACK.md or directory structure
@@ -138,6 +139,7 @@ COMMANDS:
     trace [options]     Spec-code traceability (drift + coverage)
     test llm [options]  Run LLM behavioral tests
     tools               List all available tools by category
+    sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     status              Show current project status
     help                Show this help
@@ -146,6 +148,8 @@ EXAMPLES:
     ag start                    # Begin a new session
     ag init                     # Initialize project (if not done)
     ag work "Add login form"    # Start working on a task
+    ag sync                     # Full sync: detect + auto-fix
+    ag sync --check             # Dry run: detect only
     ag commit                   # Verify ready to commit
     ag done                     # Check task completion
     ag approve-onboarding       # List unapproved proposals
@@ -177,6 +181,7 @@ COMMANDS:
     trace [options]     Spec-code traceability (drift + coverage)
     test llm [options]  Run LLM behavioral tests
     tools               List all available tools by category
+    sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     status              Show current project status
     help                Show this help
@@ -201,6 +206,8 @@ EXAMPLES:
     ag test llm                 # Run all LLM behavioral tests
     ag test llm --critical      # Run critical tests only
     ag tools                    # Discover available tools
+    ag sync                     # Full sync: detect + auto-fix
+    ag sync --check             # Dry run: detect only
     ag verify --full            # Full verification
 
 Core+PM profile: Formal feature tracking with acceptance criteria.
@@ -289,12 +296,39 @@ cmd_start() {
     echo -e "${BOLD}Quick Health Check:${NC}"
     bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null | head -20 || echo "  (doctor.sh not available)"
 
+    # 7. Quick sync probe
+    local sync_summary
+    sync_summary=$(bash "$SCRIPT_DIR/sync.sh" --quiet 2>/dev/null || true)
+    if [ -n "$sync_summary" ]; then
+        echo ""
+        echo -e "${YELLOW}${sync_summary}${NC}"
+        echo -e "  Run ${BOLD}ag sync${NC} to auto-fix and see details"
+    fi
+
+    # Tip of the day
+    local tips=(
+        "Run \`ag sync\` to detect and auto-fix drift across memory, specs, docs, and tools."
+        "Use \`ag plan F-XXXX\` to start a plan-review loop — two agents debate until the plan is solid."
+        "Run \`ag trace\` to see which code implements which features (and find gaps)."
+        "Use \`ag test llm\` to verify agents actually follow framework rules."
+        "Run \`ag sync --check\` for a dry run — see what's drifted without changing anything."
+        "Use \`ag trace --gaps\` to find shipped features with no code annotations."
+        "Run \`ag verify --full\` for a comprehensive health check of all framework files."
+        "Use \`ag specs\` to systematically generate specs for existing code, domain by domain."
+        "Run \`ag tools\` to discover all available framework tools and scripts."
+        "Use \`ag approve-onboarding\` to review auto-discovered project proposals after init."
+    )
+    local tip_index=$((RANDOM % ${#tips[@]}))
+    echo ""
+    echo -e "${DIM}Tip: ${tips[$tip_index]}${NC}"
+
     echo ""
     if [ "$PROFILE" = "core" ]; then
         echo -e "${BOLD}Ready to work. Run 'ag work \"description\"' to start a task.${NC}"
     else
         echo -e "${BOLD}Ready to work. Run 'ag implement F-XXXX' to start a feature.${NC}"
     fi
+    echo -e "${DIM}Remind user: ag plan (plan-review before building) | ag sync (detect & fix drift)${NC}"
 }
 
 # Work command (Core profile) - start WIP tracking without feature ID
@@ -860,6 +894,12 @@ cmd_tools() {
         echo ""
         echo "Run tool with: bash .agentic/tools/<tool>.sh"
     }
+}
+
+# Sync command - unified drift detection + auto-fix
+cmd_sync() {
+    local flag="${1:-}"
+    bash "$SCRIPT_DIR/sync.sh" $flag
 }
 
 # Verify command - doctor checks
@@ -1647,6 +1687,9 @@ case "${1:-help}" in
         ;;
     tools)
         cmd_tools
+        ;;
+    sync)
+        cmd_sync "${2:-}"
         ;;
     verify)
         cmd_verify "${2:-}"

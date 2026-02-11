@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Memory-seed infrastructure complete (v0.25.3). Imperative format + intent-based triggers shipped. Next: dogfood re-seed, LLM test for memory-driven command execution (Updated: 2026-02-11 20:18)
+- ag sync, discoverability reminders, tip of the day (v0.25.4) (Updated: 2026-02-11 22:17)
 
 ## Current focus
 - Domain categories + systematic brownfield spec generation (v0.25.0)

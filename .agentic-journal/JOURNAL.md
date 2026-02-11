@@ -372,3 +372,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-12 00:17 - ag sync + discoverability + tip of the day
+
+**Accomplished**:
+- Implemented ag sync (5-phase drift detection), discoverability reminders in ag start (dim workflow line + yellow sync probe), tip of the day (10 random tips per session), updated CONTRIBUTIONS.md
+
+**Next steps**:
+- Dogfood re-seed, LLM test for sync, real-world project validation
+
+**Blockers**: None
+
