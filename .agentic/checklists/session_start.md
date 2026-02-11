@@ -131,6 +131,25 @@ What would you like me to work on? (I'll register myself in .agentic-state/AGENT
 
 ---
 
+## 🧠 Memory Integrity Check
+
+After the WIP check, verify that Claude Code's auto-memory still contains framework behavioral patterns from `memory-seed.md`. This runs automatically via `ag start`.
+
+```bash
+bash .agentic/tools/memory-check.sh
+```
+
+**What it checks** (Claude Code only; skips other tools):
+- Memory has been seeded (MEMORY.md exists)
+- Version marker matches current `memory-seed.md`
+- Core sentinel patterns haven't been overwritten
+
+**If stale or missing**: Re-read `.agentic/init/memory-seed.md` and write the patterns to your persistent memory. Preserve any other project-specific content already in memory.
+
+**Why**: Memory-seed is a defense-in-depth layer. Scripts enforce workflow structurally; memory reinforces it behaviorally. If memory gets overwritten during development, this check catches it at session start.
+
+---
+
 ## 📋 Check for Active Brownfield Spec Plan
 
 - [ ] **Check for brownfield spec plan in progress**:

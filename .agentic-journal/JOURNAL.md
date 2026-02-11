@@ -350,3 +350,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-11 22:10 - Memory-seed infrastructure
+
+**Accomplished**:
+- Created memory-check.sh (advisory integrity check), wired into ag start, documented defense-in-depth layer in INSTRUCTION_ARCHITECTURE.md, added memory seed maintenance to FRAMEWORK_DEVELOPMENT.md, updated CONTEXT_PACK.md with instruction architecture section, fixed stale counters
+
+**Next steps**:
+- Rewrite memory-seed.md in imperative format (trigger→action style), explore intent-based trigger matching beyond exact keywords
+
+**Blockers**: None
+

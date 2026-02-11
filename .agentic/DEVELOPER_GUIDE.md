@@ -89,6 +89,7 @@ You can also run tools directly:
 ```bash
 bash .agentic/tools/doctor.sh --full    # Comprehensive verification
 bash .agentic/tools/wip.sh check        # Check interrupted work
+bash .agentic/tools/memory-check.sh     # Check memory-seed integrity (Claude Code)
 bash .agentic/tools/journal.sh ...      # Log to JOURNAL.md
 ```
 

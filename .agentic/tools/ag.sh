@@ -259,6 +259,9 @@ cmd_start() {
         echo ""
     fi
 
+    # 2.5. Check memory integrity (advisory)
+    bash "$SCRIPT_DIR/memory-check.sh" --quiet 2>&1 || true
+
     # 3. Verification status
     get_verification_summary
     echo ""

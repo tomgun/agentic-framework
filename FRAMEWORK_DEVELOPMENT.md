@@ -117,6 +117,24 @@ Example projects demonstrate best practices and verify workflows actually work.
 
 **Anti-pattern**: ❌ Adding `ag` CLI commands to root CLAUDE.md but not the template users get.
 
+#### Memory Seed Maintenance
+
+`.agentic/init/memory-seed.md` seeds behavioral patterns into tool persistent memory during init. It is a **subset** of instruction files/playbooks — redundant for resilience, not a place for new rules.
+
+**When to update memory-seed.md**:
+- Workflow changes (new pre-commit steps, new `ag` commands)
+- New behavioral rules added to instruction files that benefit from memory reinforcement
+- Version bumps (always bump `<!-- memory-seed vX.Y.Z -->` when content changes)
+
+**Update process**:
+1. Edit `.agentic/init/memory-seed.md`
+2. Bump the version marker: `<!-- memory-seed vX.Y.Z -->`
+3. Verify sentinel strings still present: `pre-commit sequence`, `token-efficient scripts`, `ag commit`, `ag done`
+4. Run `bash .agentic/tools/memory-check.sh` to verify alignment
+5. If sentinels change, update the `SENTINELS` array in `memory-check.sh` and the `<!-- sentinels: ... -->` comment in memory-seed.md
+
+**Key rule**: Memory-seed must never contain rules that aren't already in instruction files or playbooks. It reinforces; it doesn't originate.
+
 ---
 
 ### 4. **Test Framework Changes**

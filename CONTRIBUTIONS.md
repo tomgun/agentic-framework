@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.25.0)
-**Date**: 2026-02-10  
+**Period**: Initial Development (v0.1.0 → v0.25.2)
+**Date**: 2026-02-11
 
 ---
 
@@ -2068,10 +2068,27 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Framework now practices what it preaches — Principle #4 (Deterministic Enforcement) is honestly documented and structurally enforced where possible.
 
+## Memory Seed Infrastructure + Integrity (2026-02-11)
+
+### Memory-Seed Effectiveness and Intent-Based Triggers
+
+**User insight**: Memory-seed content is written in documentation style ("Plan first: `ag plan`") but agents treat it as knowledge, not as action triggers. The trigger table in CLAUDE.md works because it uses imperative trigger→action format. Memory-seed should use the same proven format to actually drive command execution, not just awareness.
+
+**User direction**: Rewrite memory-seed.md in imperative format matching the trigger table style. Also: trigger words should match on user *intent* and synonyms, not just exact keywords — "build", "implement", "create" are too narrow; users say things like "let's make", "set up", "develop", "work on" which carry the same intent.
+
+**User insight**: CONTEXT_PACK.md was missing the instruction architecture — the core intellectual framework of the project. Added architecture section so agents get the three-layer model, enforcement hierarchy, and defense-in-depth concepts at session start without reading the full design doc.
+
+**Changes**:
+- `memory-check.sh` — advisory integrity check for Claude Code auto-memory at session start
+- Defense-in-depth documentation across INSTRUCTION_ARCHITECTURE.md, FRAMEWORK_DEVELOPMENT.md, CONTEXT_PACK.md, session_start.md
+- Tool memory landscape documented (5 tools)
+
+**Impact**: Memory-seed layer now has integrity checking, architectural documentation, and maintenance guidance. Next: rewrite seed content for effectiveness.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.25.1
+**Current Version**: v0.25.2
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 48 behavioral test scripts

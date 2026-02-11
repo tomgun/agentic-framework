@@ -25,9 +25,9 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
     - `multi-agent.md` - Parallel agent work
     - `wip-tracking.md` - Interrupted sessions
 - Claude-specific: `.agentic/agents/claude/CLAUDE.md` (consolidated quick reference)
-- Framework specs: `spec/FEATURES.md` (70 features)
+- Framework specs: `spec/FEATURES.md` (100+ features)
 - Acceptance criteria: `spec/acceptance/F-####.md`
-- Validation tests: `tests/validate_framework.sh` (104+ tests)
+- Validation tests: `tests/validate_framework.sh` (180+ tests)
 - Templates: `.agentic/init/*.template.md`, `.agentic/spec/*.template.md`
 - Workflows: `.agentic/workflows/`
 - Quality guides: `.agentic/quality/`
@@ -63,11 +63,23 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
     - `migration.sh` - Spec migration management (create/list/show/search/apply)
     - `drift.sh --docs` - Documentation drift detection
     - `manifest.sh` - Feature change manifest generation from git history
+    - `memory-check.sh` - Advisory memory-seed integrity check (session start)
 - Data flow: Framework installed → Project initialized → Agents follow guidelines → Quality gates enforced
 - External dependencies: None (pure bash/Python, no npm/pip packages)
 
+## Instruction architecture (core design)
+- **Design doc**: `docs/INSTRUCTION_ARCHITECTURE.md` — authoritative, read before changing instruction files
+- **Three-layer model**:
+  - **Layer 1 — Constitution** (instruction files: CLAUDE.md, .cursorrules, etc.): Only rules that cannot be structurally enforced. Keep under 100 lines (L-0002 empirical ceiling).
+  - **Layer 2 — Playbooks** (auto_orchestration.md, checklists, workflows): Loaded just-in-time by `ag` commands, not pinned in context.
+  - **Layer 3 — Project State** (STACK.md, STATUS.md): Machine-readable config parsed by scripts. Git-tracked state vs gitignored session-local state.
+- **Enforcement model**: Distributed — `ag implement` (planning gates), `pre-commit-check.sh` (11 structural checks), `ag done` (completion validation). No single orchestrator process; each script enforces its phase.
+- **Defense-in-depth**: `memory-seed.md` seeds behavioral patterns into tool persistent memory. Memory reinforces; scripts enforce. Memory fades during long sessions (context compression); structural gates are the only reliable late-session enforcement.
+- **Multi-tool support**: Claude Code, Cursor, Windsurf, Copilot, Codex — each has different instruction file formats and memory mechanisms. Templates in `.agentic/agents/<tool>/`.
+- **Key principle**: Structural enforcement > behavioral instruction > memory reinforcement. If a rule can be checked by a script, don't rely on the agent remembering it.
+
 ## Quality gates (current)
-- Validation tests required: `tests/validate_framework.sh` must pass (104+ tests)
+- Validation tests required: `tests/validate_framework.sh` must pass (180+ tests)
 - Acceptance criteria: Every feature needs `spec/acceptance/F-####.md`
 - Definition of Done: See `.agentic/workflows/definition_of_done.md`
 
