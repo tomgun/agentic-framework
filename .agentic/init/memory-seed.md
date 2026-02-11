@@ -1,6 +1,7 @@
 # Memory Seed — Agentic Framework Behavioral Patterns
 
 <!-- memory-seed v0.25.0 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done -->
 
 These are workflow patterns for agents working in an agentic framework project. Write them to your persistent memory so they survive across sessions.
 

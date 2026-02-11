@@ -81,6 +81,28 @@ This design synthesizes two independent research efforts:
 
 **Future consideration**: A compact config.json (aggregating STACK.md keys + runtime state) could help subagent context injection. Lower priority than Gaps 1-4 — STACK.md parsing works today.
 
+### Defense-in-Depth: Memory Seed Layer
+
+The framework includes a **memory-seed** mechanism (`.agentic/init/memory-seed.md`) that seeds key workflow patterns into each tool's persistent memory during init. This coexists with Design Principle 1 ("Never rely on memory") because memory-seed is **redundant reinforcement, not primary enforcement**.
+
+**The relationship**: Scripts enforce; memory reinforces. `pre-commit-check.sh` structurally blocks bad commits regardless of what the agent remembers. Memory-seed makes the agent *less likely* to attempt the bad commit in the first place. If memory fails, structural gates still catch the violation.
+
+**The compression problem**: All instruction mechanisms — CLAUDE.md, `.claude/rules/*.md`, auto-memory MEMORY.md — are loaded at session start but get compressed as context grows during long sessions. Behavioral instructions fade over time within a session. Only structural enforcement (scripts with exit codes) survives the entire session reliably. Memory-seed helps most in the early-to-mid session window; structural gates are the only reliable late-session enforcement.
+
+**Integrity checking**: `memory-check.sh` runs at session start (via `ag start`) and performs a coarse heuristic validation — checking version markers and sentinel strings. It is advisory only (never blocking) and catches gross overwrites, not subtle drift.
+
+**Memory is NOT a fourth layer** — it is defense-in-depth reinforcement of the existing three layers. The hierarchy remains: structural enforcement > instruction files > memory reinforcement.
+
+**Tool memory landscape**:
+
+| Tool | Memory Location | Auto-Memory? | Seedable? |
+|------|----------------|-------------|-----------|
+| Claude Code | `~/.claude/projects/<hash>/memory/MEMORY.md` (~200 lines loaded at start) | Yes | Agent writes during init |
+| Cursor | `.cursor/rules/*.mdc` + `learned-memories.mdc` | Yes | File-based (`.mdc` w/ YAML frontmatter) |
+| Windsurf | `.windsurf/rules/*.md`, `~/.codeium/windsurf/memories/global_rules.md` | Yes | File-based (12K char/file limit) |
+| Copilot | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md` | No | File-based |
+| Codex CLI | `AGENTS.md` (repo root + subdirs), `~/.codex/AGENTS.md` | Emerging | File-based (can read CLAUDE.md via `project_doc_fallback_filenames`) |
+
 ### Orchestrator Enforcement (distributed model)
 
 The framework uses a **distributed enforcement model** — this is a conscious design choice that diverges from the ChatGPT research's centralized orchestrator recommendation. Rationale: the framework operates across Claude Code, Cursor, Copilot, and Codex — no single orchestrator process is possible. The distributed model (each script enforces its phase) achieves the same guarantees.
@@ -100,7 +122,7 @@ These mechanisms are proven and stable. Changes require strong justification:
 - **pre-commit-check.sh** — 11 structural gates
 - **context-for-role.sh** + 24 context manifests — subagent context injection
 - **Token-efficient scripts** — journal.sh, status.sh, feature.sh, blocker.sh
-- **LLM behavioral test suite** — 23 tests validating instruction compliance
+- **LLM behavioral test suite** — 48+ tests validating instruction compliance
 - **auto_orchestration.md** — primary playbook for agent workflows
 - **`ag` gateway** — structural enforcement entry point
 - **Trigger table format** in instruction files — tested (003/010 pass), proven

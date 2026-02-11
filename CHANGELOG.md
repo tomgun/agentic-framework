@@ -5,6 +5,21 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.2] - 2026-02-11
+
+### Added
+- **Memory integrity check** — `memory-check.sh` validates Claude Code auto-memory contains expected framework patterns at session start. Advisory only (never blocking). Checks: never seeded, stale version, partially overwritten (sentinel-based heuristic).
+- **Defense-in-Depth section in INSTRUCTION_ARCHITECTURE.md** — Documents the memory-seed layer, compression problem, tool memory landscape table (Claude Code, Cursor, Windsurf, Copilot, Codex), and why memory is reinforcement not enforcement.
+- **Instruction architecture section in CONTEXT_PACK.md** — Three-layer model, distributed enforcement, defense-in-depth summary for session-start context.
+- **Memory Seed Maintenance section in FRAMEWORK_DEVELOPMENT.md** — When/how to update memory-seed.md, sentinel alignment, version bump discipline.
+- **Memory integrity step in session_start.md** — Checklist step with manual remediation instructions.
+- **Sentinels documentation comment in memory-seed.md** — `<!-- sentinels: ... -->` for maintainer reference.
+
+### Changed
+- **ag.sh** — `cmd_start()` now runs `memory-check.sh --quiet` after WIP check.
+- **CONTEXT_PACK.md** — Fixed stale counters (features 70→100+, tests 104+→180+).
+- **INSTRUCTION_ARCHITECTURE.md** — Fixed stale LLM test count (23→48+).
+
 ## [0.25.0] - 2026-02-10
 
 ### Added
