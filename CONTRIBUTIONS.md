@@ -2083,12 +2083,31 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 - Defense-in-depth documentation across INSTRUCTION_ARCHITECTURE.md, FRAMEWORK_DEVELOPMENT.md, CONTEXT_PACK.md, session_start.md
 - Tool memory landscape documented (5 tools)
 
-**Impact**: Memory-seed layer now has integrity checking, architectural documentation, and maintenance guidance. Next: rewrite seed content for effectiveness.
+**Impact**: Memory-seed layer now has integrity checking, architectural documentation, and maintenance guidance.
+
+### Intent-Based Triggers + Imperative Memory Seed (v0.25.3)
+
+**User insight**: Memory-seed was written in documentation style ("Plan first: `ag plan`") — agents treat this as knowledge, not action triggers. The proven trigger table in CLAUDE.md works because it's imperative: trigger→action with STOP. Memory-seed should use the same format.
+
+**User direction**: Rewrite memory-seed.md as imperative action rules, not reference documentation. "Write these rules to memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions."
+
+**User insight**: Trigger words should match on user *intent* and synonyms, not just exact keywords. Users say "let's make", "set up", "develop", "work on" — all carrying "build" intent but none matching the old exact-keyword triggers.
+
+**User direction**: Update all 7 instruction files to use "User intent" column with broader phrasing. Add "(match on intent, not just exact words)" to the header.
+
+**User catch**: The memory-seed integrity check at session start wasn't instructed in CLAUDE.md itself — only wired into `ag start`. Agents that don't run `ag start` would never know to check. Added explicit instruction to both template and root CLAUDE.md.
+
+**Changes**:
+- memory-seed.md rewritten: documentation style → imperative trigger→action format
+- All 7 trigger tables: exact keywords → intent-based matching with synonyms
+- CLAUDE.md (template + root): added explicit "check your memory at session start" instruction
+
+**Impact**: Behavioral reinforcement now uses the same proven imperative format as structural enforcement. Intent matching broadens trigger coverage beyond exact keyword matches.
 
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.25.2
+**Current Version**: v0.25.3
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 48 behavioral test scripts
