@@ -37,6 +37,10 @@ ls .agentic-state/WIP.md 2>/dev/null || true
 2. [Second option if exists]
 3. [Review blockers in HUMAN_NEEDED.md - if any exist]
 
+**Available workflows**: `ag plan` (plan-review before building) | `ag sync` (detect & fix drift)
+
+💡 **Tip**: [Random framework tip — shown automatically by `ag start`]
+
 What would you like to work on?
 ```
 
@@ -147,6 +151,24 @@ bash .agentic/tools/memory-check.sh
 **If stale or missing**: Re-read `.agentic/init/memory-seed.md` and write the patterns to your persistent memory. Preserve any other project-specific content already in memory.
 
 **Why**: Memory-seed is a defense-in-depth layer. Scripts enforce workflow structurally; memory reinforces it behaviorally. If memory gets overwritten during development, this check catches it at session start.
+
+---
+
+## 🔄 Sync Check (Advertise if Issues)
+
+`ag start` automatically runs a quick sync probe. If it reports issues:
+
+```
+Sync: 2 issue(s) (journal stale, STATUS.md stale)
+  Run ag sync to auto-fix and see details
+```
+
+Suggest running `ag sync` to the user. It checks memory, journal/STATUS freshness, feature status drift, spec/doc drift, and tool file parity. Safe fixes (like STATUS.md inference) are applied automatically; everything else is report-only with suggested commands.
+
+```bash
+ag sync          # Full sync: detect + auto-fix safe things
+ag sync --check  # Dry run: detect only
+```
 
 ---
 
