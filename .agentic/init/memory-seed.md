@@ -1,6 +1,6 @@
 # Memory Seed — Agentic Framework Behavioral Patterns
 
-<!-- memory-seed v0.24.0 -->
+<!-- memory-seed v0.25.0 -->
 
 These are workflow patterns for agents working in an agentic framework project. Write them to your persistent memory so they survive across sessions.
 
@@ -8,6 +8,7 @@ These are workflow patterns for agents working in an agentic framework project. 
 
 1. Update JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
 2. Update STATUS.md: `bash .agentic/tools/status.sh focus "Current task"`
+2b. If shipping a feature (Core+PM): `bash .agentic/tools/feature.sh F-#### status shipped`
 3. Run `ag commit` (runs quality gates, shows diff, waits for human approval)
 4. THEN announce ready — never announce "done" before artifacts are updated
 
@@ -43,6 +44,9 @@ Never read or edit state files directly. Always use scripts:
 - **Don't skip the plan**: Even small features benefit from `ag plan` first.
 - **Don't commit without showing changes**: Never auto-commit. Human reviews first.
 - **"Too big" check**: If touching >10 files, break it into smaller batches.
+- **Don't start a second feature**: Complete current WIP first. One feature at a time.
+- **Bug fix = test first**: Write a failing test that reproduces the bug BEFORE writing the fix.
+- **Smoke test before "done"**: Actually run the app/feature. "Tests pass" ≠ "it works."
 
 ## Trigger Word Awareness
 
