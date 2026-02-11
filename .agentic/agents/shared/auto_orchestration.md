@@ -171,6 +171,47 @@ See `.agentic/agents/context-manifests/` for all role definitions
 
 ---
 
+## Brownfield Spec Pipeline (triggered by `ag specs`)
+
+**Trigger**: User runs `ag specs` or asks to generate specs for an existing codebase
+
+### Automatic Steps
+
+```
+1. CHECK: Discovery report exists → if not, run discover.py
+2. CHECK: Domains detected → if only 1 small domain, use quick inline path
+   - Small: 1 domain AND ≤8 clusters → quick inline spec generation
+   - Large: >1 domain OR >8 clusters → systematic domain-by-domain approach
+3. CREATE PLAN: Brownfield spec plan via plan-review loop
+   - Domain map with boundaries, priorities, approach per domain
+   - Reviewer checks: boundaries correct? anything missed? priorities sensible?
+   - Plan artifact: .agentic-journal/plans/brownfield-specs-plan.md
+   - Uses checkbox format: - [ ] Domain (type, ~N features)
+4. PER DOMAIN (in priority order):
+   a. Read key source files (1-2 per cluster, max ~10 per domain)
+   b. Generate features with `- Domain:` metadata tag
+   c. Generate Given/When/Then acceptance criteria
+   d. Write FEATURES.md entries + spec/acceptance/F-####.md files
+   e. Ask user: "Does this look right for [Domain]? Merge/split/adjust?"
+   f. Mark domain as COMPLETED in plan artifact (change - [ ] to - [x])
+5. CROSS-DOMAIN REVIEW:
+   - Check for duplicate features across domains
+   - Check for gaps (code areas not covered)
+   - Final user confirmation
+6. TOKEN COST CHECK:
+   - If feature count > 50: suggest `organize_features.py --by domain`
+7. UPDATE: FEATURES.md, STATUS.md, JOURNAL.md
+```
+
+### Multi-Session Support
+
+Brownfield spec generation can span multiple sessions:
+- Progress tracked via checkboxes in plan artifact
+- Session start detects active plan → suggests resuming with `ag specs`
+- `ag specs --status` shows domain completion progress
+
+---
+
 ## Issue Pipeline (AUTO-INVOKED)
 
 **Trigger**: User mentions fixing an issue (I-#### or general bug)

@@ -236,10 +236,25 @@ def render_overview_md(report: dict) -> str:
     return "\n".join(lines)
 
 
+def _build_cluster_domain_map(report: dict) -> dict[str, str]:
+    """Build a mapping from cluster name to domain type."""
+    domain_map: dict[str, str] = {}
+    for domain in report.get("domains", []):
+        for cluster_name in domain.get("clusters", []):
+            domain_map[cluster_name] = domain.get("type", "shared")
+    return domain_map
+
+
 def render_features_md(report: dict) -> str:
     """Render FEATURES.md with discovered features (Core+PM only)."""
     date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    feature_clusters = report.get("feature_clusters", [])
     features = report.get("features", [])
+    domains = report.get("domains", [])
+    cluster_domain_map = _build_cluster_domain_map(report)
+
+    # For flat features, derive domain from the first domain's type
+    default_domain = domains[0]["type"] if domains else None
 
     lines = [
         PROPOSAL_HEADER.format(date=date),
@@ -254,24 +269,54 @@ def render_features_md(report: dict) -> str:
         "",
     ]
 
-    if not features:
+    if feature_clusters:
+        # Use clusters for richer output with file evidence
+        for i, cluster in enumerate(feature_clusters, start=1):
+            fid = f"F-{i:04d}"
+            name = cluster["name"].replace("_", " ").title()
+            domain_type = cluster_domain_map.get(cluster["name"])
+            lines.extend([
+                f"## {fid}: {name}",
+                f"- Status: shipped {confidence_marker(cluster.get('confidence', 'medium'))}",
+            ])
+            if domain_type:
+                lines.append(f"- Domain: {domain_type}")
+            lines.extend([
+                f"- Acceptance: spec/acceptance/{fid}.md",
+                f"- State: complete",
+                f"- Accepted: no  <!-- Needs human verification -->",
+                f"- Type: {cluster.get('type_hint', 'user-facing')}",
+            ])
+            if cluster.get("frontend"):
+                lines.append(f"- Frontend: {', '.join(cluster['frontend'])}")
+            if cluster.get("backend"):
+                lines.append(f"- Backend: {', '.join(cluster['backend'])}")
+            if cluster.get("mobile"):
+                lines.append(f"- Mobile: {', '.join(cluster['mobile'])}")
+            lines.append(f"- Tests: {'yes' if cluster.get('has_tests') else 'none detected'}")
+            lines.append("")
+    elif features:
+        # Fallback to flat features list
+        for i, feat in enumerate(features, start=1):
+            fid = f"F-{i:04d}"
+            lines.extend([
+                f"## {fid}: {feat['name']}",
+                f"- Status: shipped {confidence_marker(feat.get('confidence', 'medium'))}",
+            ])
+            if default_domain:
+                lines.append(f"- Domain: {default_domain}")
+            lines.extend([
+                f"- Acceptance: spec/acceptance/{fid}.md",
+                f"- State: complete",
+                f"- Accepted: no  <!-- Needs human verification -->",
+                f"- Evidence: {feat.get('evidence', feat.get('description', ''))}",
+                "",
+            ])
+    else:
         lines.extend([
             "## F-0001: <!-- First Feature -->",
             "- Status: planned",
             "- Acceptance: spec/acceptance/F-0001.md",
-            "",
-        ])
-        return "\n".join(lines)
-
-    for i, feat in enumerate(features, start=1):
-        fid = f"F-{i:04d}"
-        lines.extend([
-            f"## {fid}: {feat['name']}",
-            f"- Status: shipped {confidence_marker(feat.get('confidence', 'medium'))}",
-            f"- Acceptance: spec/acceptance/{fid}.md",
-            f"- State: complete",
-            f"- Accepted: no  <!-- Needs human verification -->",
-            f"- Evidence: {feat.get('evidence', feat.get('description', ''))}",
             "",
         ])
 
@@ -280,38 +325,68 @@ def render_features_md(report: dict) -> str:
 
 def render_acceptance_criteria(report: dict, output_dir: Path):
     """Render individual acceptance criteria files (Core+PM only)."""
+    feature_clusters = report.get("feature_clusters", [])
     features = report.get("features", [])
     acc_dir = output_dir / "acceptance"
     acc_dir.mkdir(parents=True, exist_ok=True)
     date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-    for i, feat in enumerate(features, start=1):
-        fid = f"F-{i:04d}"
-        content = "\n".join([
-            PROPOSAL_HEADER.format(date=date),
-            "",
-            f"# {fid}: {feat['name']} - Acceptance Criteria",
-            "",
-            f"**Feature**: {feat.get('description', feat['name'])}",
-            f"**Status**: shipped (auto-discovered)",
-            f"**Confidence**: {feat.get('confidence', 'medium')}",
-            f"**Evidence**: {feat.get('evidence', 'code analysis')}",
-            "",
-            "---",
-            "",
-            "## Acceptance Criteria",
-            "",
-            "<!-- Review and fill in based on actual feature behavior -->",
-            f"- [ ] {feat['name']} is functional",
-            "- [ ] <!-- Add specific criteria -->",
-            "",
-            "## Notes",
-            "",
-            "This feature was auto-discovered during onboarding. Review and update",
-            "the acceptance criteria to match actual behavior.",
-            "",
-        ])
-        (acc_dir / f"{fid}.md").write_text(content)
+    if feature_clusters:
+        for i, cluster in enumerate(feature_clusters, start=1):
+            fid = f"F-{i:04d}"
+            name = cluster["name"].replace("_", " ").title()
+            lines = [
+                PROPOSAL_HEADER.format(date=date),
+                "",
+                f"# {fid}: {name} - Acceptance Criteria",
+                "",
+            ]
+            if cluster.get("frontend"):
+                lines.append(f"**Frontend**: {', '.join(cluster['frontend'])}")
+            if cluster.get("backend"):
+                lines.append(f"**Backend**: {', '.join(cluster['backend'])}")
+            if cluster.get("mobile"):
+                lines.append(f"**Mobile**: {', '.join(cluster['mobile'])}")
+            lines.append(f"**Tests**: {'detected' if cluster.get('has_tests') else 'none detected'}")
+            lines.append(f"**Type**: {cluster.get('type_hint', 'user-facing')}")
+            lines.extend([
+                "",
+                "## Acceptance Criteria",
+                "",
+                "> **TODO (agent)**: Read the source files listed above and generate 3-5 Given/When/Then",
+                "> criteria based on what the UI shows, what API calls it makes, and what states exist",
+                "> (loading, error, empty, data).",
+                "",
+                "- [ ] ...",
+                "",
+            ])
+            (acc_dir / f"{fid}.md").write_text("\n".join(lines))
+    else:
+        for i, feat in enumerate(features, start=1):
+            fid = f"F-{i:04d}"
+            content = "\n".join([
+                PROPOSAL_HEADER.format(date=date),
+                "",
+                f"# {fid}: {feat['name']} - Acceptance Criteria",
+                "",
+                f"**Feature**: {feat.get('description', feat['name'])}",
+                f"**Status**: shipped (auto-discovered)",
+                f"**Confidence**: {feat.get('confidence', 'medium')}",
+                f"**Evidence**: {feat.get('evidence', 'code analysis')}",
+                "",
+                "---",
+                "",
+                "## Acceptance Criteria",
+                "",
+                "> **TODO (agent)**: Read the source files listed above and generate 3-5 Given/When/Then",
+                "> criteria based on what the UI shows, what API calls it makes, and what states exist",
+                "> (loading, error, empty, data).",
+                "",
+                f"- [ ] {feat['name']} is functional",
+                "- [ ] ...",
+                "",
+            ])
+            (acc_dir / f"{fid}.md").write_text(content)
 
 
 def main():
@@ -328,6 +403,13 @@ def main():
         raise SystemExit(1)
 
     report = json.loads(report_path.read_text())
+
+    # Version check
+    report_version = report.get("version", "1.0.0")
+    if report_version != "2.0.0":
+        print(f"  WARNING: Report version {report_version} doesn't match expected 2.0.0")
+        print(f"  Some features may not render correctly. Re-run discover.py to update.")
+
     template_dir = Path(args.templates)
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -349,11 +431,14 @@ def main():
     if args.profile == "core+product":
         features_content = render_features_md(report)
         (output_dir / "FEATURES.md").write_text(features_content)
-        print(f"  Rendered: FEATURES.md ({len(report.get('features', []))} features)")
+        cluster_count = len(report.get("feature_clusters", []))
+        feature_count = len(report.get("features", []))
+        count = cluster_count or feature_count
+        print(f"  Rendered: FEATURES.md ({count} features)")
 
-        if report.get("features"):
+        if report.get("feature_clusters") or report.get("features"):
             render_acceptance_criteria(report, output_dir)
-            print(f"  Rendered: {len(report['features'])} acceptance criteria files")
+            print(f"  Rendered: {count} acceptance criteria files")
 
 
 if __name__ == "__main__":

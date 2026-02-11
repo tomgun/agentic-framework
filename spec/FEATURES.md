@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.16.0
+**Version**: 0.25.0
 
 ---
 
@@ -1887,9 +1887,10 @@ agent_mode: balanced  # premium | balanced | economy
 
 ## F-0123: Intelligent Onboarding for Existing Projects
 
-**Status**: in_progress
+**Status**: shipped
 **Priority**: high
 **Complexity**: high
+**Since**: v0.24.0
 
 **Description**: When `ag init` detects an existing codebase, offer auto-discover mode that analyzes code structure, README, tests, and generates populated FEATURES.md (shipped features), acceptance criteria, STACK.md, CONTEXT_PACK.md, and OVERVIEW.md. Two modes: interactive (guided questions) or auto-discover (analyze + propose). All generated specs are proposals requiring human approval.
 
@@ -1898,9 +1899,29 @@ agent_mode: balanced  # premium | balanced | economy
 **Implementation**:
 - State: complete
 - Code: `.agentic/tools/discover.sh`, `.agentic/tools/discover.py`, `.agentic/tools/render_proposals.py`
-- Tests: `tests/test_discover.py` (31 tests), `tests/validate_framework.sh` (12 checks)
+- Tests: `tests/test_discover.py` (75 tests), `tests/validate_framework.sh` (12 checks)
 
 **Acceptance**: See `spec/acceptance/F-0123.md`
+
+---
+
+## F-0124: Domain Categories & Systematic Brownfield Spec Generation
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: high
+**Since**: v0.25.0
+
+**Description**: Features get a `- Domain:` metadata field (frontend, backend, mobile, infrastructure, shared, uncategorized). Discovery detects infrastructure patterns (CI/CD, IaC, containers, deployment) and groups sub-projects into typed domains by framework. `ag specs` command enables systematic domain-by-domain spec generation with plan-review loop, per-domain user confirmation, and multi-session resume via checkbox plan artifacts. Size-aware routing: small projects (1 domain, ≤8 clusters) use inline generation; larger projects use `ag specs`. Greenfield projects get domain question during init.
+
+**Dependencies**: F-0123 (Intelligent Onboarding), F-0120 (Plan-Review Loop)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/discover.py` (detect_infra_patterns, detect_domains), `.agentic/tools/render_proposals.py` (domain-tagged output), `.agentic/tools/ag.sh` (specs command), `.agentic/agents/shared/auto_orchestration.md` (Brownfield Spec Pipeline), `.agentic/init/init_playbook.md` (size-aware routing, greenfield domains), `.agentic/checklists/session_start.md` (brownfield plan detection)
+- Tests: `tests/test_discover.py` (16 new tests), `tests/llm/tests/044-046` (3 LLM behavioral tests)
+
+**Acceptance**: See `spec/acceptance/F-0124.md`
 
 ---
 
@@ -1918,6 +1939,6 @@ agent_mode: balanced  # premium | balanced | economy
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 10 | 1 | 2 | 13 |
-| **Total** | **83** | **2** | **2** | **87** |
+| Framework Infrastructure (F-0101+) | 12 | 1 | 1 | 14 |
+| **Total** | **85** | **2** | **1** | **88** |
 

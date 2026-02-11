@@ -317,3 +317,25 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-10 19:30 - Deep Feature Discovery
+
+**Accomplished**:
+- Implemented sub-project detection, serverless function detection, UI component grouping, feature clustering, API spec detection in discover.py. Updated render_proposals.py for richer output with clusters. Enhanced init_playbook.md Step 0.5b for feature synthesis. 59 tests all passing. Fixed user-facing 'Core+PM' jargon.
+
+**Next steps**:
+- Verify against real multi-sub-project repo. Consider follow-up for Django/Rails/Spring patterns.
+
+**Blockers**: None
+
+
+### Session: 2026-02-11 00:26 - Domain Categories + ag specs (v0.25.0)
+
+**Accomplished**:
+- Implemented detect_infra_patterns() and detect_domains() in discover.py, domain-tagged FEATURES.md in render_proposals.py, ag specs command with plan-resume support, size-aware routing and greenfield domains in init_playbook, brownfield plan detection in session_start, brownfield spec pipeline in auto_orchestration. 75 pytest tests pass, 184 validation checks pass. 3 new LLM tests (044-046). Bumped to v0.25.0.
+
+**Next steps**:
+- Next task from backlog
+
+**Blockers**: None
+
