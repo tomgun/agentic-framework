@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Domain categories + ag specs shipped (v0.25.0) (Updated: 2026-02-10 22:26)
+- Enforcement gaps implemented (v0.25.1) (Updated: 2026-02-11 10:24)
 
 ## Current focus
 - Domain categories + systematic brownfield spec generation (v0.25.0)

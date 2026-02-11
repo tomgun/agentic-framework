@@ -2054,11 +2054,25 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Agents can now systematically generate specs for large brownfield repos, track progress across sessions, and organize features by domain for both new and existing projects.
 
+### Enforcement Gap Audit & Closure
+
+**User insight**: Framework shipped F-0124 (v0.25.0) without updating FEATURES.md status, and F-0123 sat as "in_progress" despite being shipped. No gate caught it. Requested systematic audit of all enforcement gaps — "plan-review loop until no critique."
+
+**Key decisions**:
+- 20 gaps identified, each assigned the right enforcement tool (structural gate, doc honesty, memory seed, LLM test, or accept-as-advisory)
+- FEATURES.md staleness now structurally gated (conditional: only when spec/ files staged)
+- `ag done` blocks if acceptance file missing or feature not registered in FEATURES.md
+- `ag implement` blocks if a different feature is already in WIP
+- Doc honesty: smoke testing downgraded from "gate" to "strongly recommended"; PRINCIPLES.md now lists enforcement tiers explicitly; ROI.md qualified from "100% auto-enforced" to "80% staleness-gated"
+- Three new LLM behavioral tests (047-049) for defense-in-depth
+
+**Impact**: Framework now practices what it preaches — Principle #4 (Deterministic Enforcement) is honestly documented and structurally enforced where possible.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.25.0
+**Current Version**: v0.25.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
-**LLM Tests**: 45 behavioral test scripts
+**LLM Tests**: 48 behavioral test scripts
 

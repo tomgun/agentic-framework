@@ -316,6 +316,8 @@ cmd_work() {
     echo ""
     echo -e "${GREEN}Ready to work on: $description${NC}"
     echo "Update STATUS.md with your progress."
+    echo ""
+    echo -e "${BLUE}Reminder: Define acceptance criteria (in any form) before implementing.${NC}"
 }
 
 # Get plan-review config from STACK.md
@@ -483,7 +485,20 @@ cmd_implement() {
     echo -e "${BOLD}=== Implement: $feature_id ===${NC}"
     echo ""
 
-    # 0. Check if plan-review is required for implement
+    # 0a. Check: one feature at a time (WIP conflict detection)
+    if [ -f "$ROOT_DIR/.agentic-state/WIP.md" ]; then
+        # WIP.md format: "- **Feature**: F-XXXX: description" (from wip.sh line 159)
+        local current_wip
+        current_wip=$(grep -oE 'F-[0-9]{4}' "$ROOT_DIR/.agentic-state/WIP.md" | head -1)
+        if [ -n "$current_wip" ] && [ "$current_wip" != "$feature_id" ]; then
+            echo -e "${RED}BLOCKED: $current_wip is already in progress${NC}"
+            echo "  Complete it first: ag done $current_wip"
+            echo "  Or clear WIP: bash .agentic/tools/wip.sh complete"
+            exit 1
+        fi
+    fi
+
+    # 0b. Check if plan-review is required for implement
     local auto_for
     auto_for=$(get_plan_review_config "plan_review_auto_for" "[planning]")
     if echo "$auto_for" | grep -qE "(implement|both)"; then
@@ -614,6 +629,21 @@ cmd_commit() {
         if bash "$SCRIPT_DIR/doctor.sh" --pre-commit 2>/dev/null; then
             echo ""
             echo -e "${GREEN}All pre-commit gates PASSED${NC}"
+
+            # Additional check: FEATURES.md staleness (Core+PM only)
+            if [ -f "$ROOT_DIR/spec/FEATURES.md" ]; then
+                local spec_staged
+                spec_staged=$(git diff --cached --name-only 2>/dev/null | grep "^spec/" || true)
+                if [ -n "$spec_staged" ]; then
+                    if ! git diff --cached --name-only 2>/dev/null | grep -q "FEATURES.md"; then
+                        echo ""
+                        echo -e "${YELLOW}WARNING: Spec files staged but FEATURES.md not updated${NC}"
+                        echo "  Staged spec files: $(echo $spec_staged | tr '\n' ' ')"
+                        echo "  Update with: bash .agentic/tools/feature.sh F-#### status <status>"
+                    fi
+                fi
+            fi
+
             echo ""
             echo -e "${BOLD}Pre-commit artifacts check:${NC}"
             echo "   Have you updated JOURNAL.md?  (bash .agentic/tools/journal.sh ...)"
@@ -698,6 +728,34 @@ cmd_done() {
             echo -e "${RED}Structural checks FAILED - fix issues above before marking complete${NC}"
         fi
 
+        # Blocking gates (Core+PM)
+        local done_failures=0
+
+        # Gate 1: Acceptance file must exist
+        local acc_file="$ROOT_DIR/spec/acceptance/${feature_id}.md"
+        if [ ! -f "$acc_file" ]; then
+            echo -e "${RED}BLOCKED: Missing acceptance criteria${NC}"
+            echo "  Expected: spec/acceptance/${feature_id}.md"
+            done_failures=$((done_failures + 1))
+        fi
+
+        # Gate 2: Feature must be registered in FEATURES.md (heading OR table format)
+        local features_file="$ROOT_DIR/spec/FEATURES.md"
+        if [ -f "$features_file" ]; then
+            if ! grep -qE "^## ${feature_id}:" "$features_file" && \
+               ! grep -qE "^\|[[:space:]]*${feature_id}[[:space:]]*\|" "$features_file"; then
+                echo -e "${RED}BLOCKED: $feature_id not found in FEATURES.md${NC}"
+                echo "  Register it first, or use: bash .agentic/tools/feature.sh $feature_id status shipped"
+                done_failures=$((done_failures + 1))
+            fi
+        fi
+
+        if [ "$done_failures" -gt 0 ]; then
+            echo ""
+            echo -e "${RED}$done_failures blocking issue(s). Fix before marking complete.${NC}"
+            exit 1
+        fi
+
         # Check for untracked feature files
         echo ""
         echo -e "${BOLD}Drift Checks:${NC}"
@@ -720,16 +778,32 @@ cmd_done() {
             fi
         fi
 
-        # Auto-update FEATURES.md status to shipped if using table format
+        # Check FEATURES.md shipped status (heading AND table format)
         local features_file="$ROOT_DIR/spec/FEATURES.md"
         if [ -f "$features_file" ]; then
-            if grep -qE "^\|[[:space:]]*${feature_id}[[:space:]]*\|" "$features_file"; then
-                # Table format detected - check if not already shipped
-                if ! grep -E "^\|[[:space:]]*${feature_id}[[:space:]]*\|" "$features_file" | grep -qi "shipped"; then
-                    echo ""
-                    echo -e "${YELLOW}Note: $feature_id not marked as 'shipped' in FEATURES.md (table format)${NC}"
-                    echo "  To update: bash .agentic/tools/feature.sh $feature_id status shipped"
+            local feature_found=false
+            local is_shipped=false
+
+            # Check heading format: ## F-XXXX: Title
+            if grep -qE "^## ${feature_id}:" "$features_file"; then
+                feature_found=true
+                if grep -A5 "^## ${feature_id}:" "$features_file" | grep -qi "shipped"; then
+                    is_shipped=true
                 fi
+            fi
+
+            # Check table format: | F-XXXX | ... |
+            if grep -qE "^\|[[:space:]]*${feature_id}[[:space:]]*\|" "$features_file"; then
+                feature_found=true
+                if grep -E "^\|[[:space:]]*${feature_id}[[:space:]]*\|" "$features_file" | grep -qi "shipped"; then
+                    is_shipped=true
+                fi
+            fi
+
+            if [ "$feature_found" = true ] && [ "$is_shipped" = false ]; then
+                echo ""
+                echo -e "${YELLOW}Note: $feature_id not marked as 'shipped' in FEATURES.md${NC}"
+                echo "  To update: bash .agentic/tools/feature.sh $feature_id status shipped"
             fi
         fi
 

@@ -833,6 +833,84 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "047_features_updated_before_commit",
+      "description": "Agent should remind to update FEATURES.md when feature work is done",
+      "section": "artifact-maintenance",
+      "category": "Important",
+      "llm_test_id": "LLM-047",
+      "profile": "core-pm",
+      "setup": {
+        "files": {
+          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: in_progress\n- Acceptance: spec/acceptance/F-0001.md",
+          "spec/acceptance/F-0001.md": "# F-0001: User Authentication\n\n## Acceptance Criteria\n- [x] Login form validates email and password\n- [x] JWT tokens issued on successful login\n- [x] Session expires after 30 minutes"
+        }
+      },
+      "prompt": "F-0001 is complete and all tests pass. I want to commit the changes. What needs updating first?",
+      "expected": {
+        "output_contains": [
+          "FEATURES.md|feature.sh|status.*shipped|mark.*shipped|update.*feature.*status"
+        ],
+        "output_contains_any": [
+          "JOURNAL|STATUS|journal.sh|status.sh"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "048_bug_fix_test_first",
+      "description": "Agent should suggest writing a failing test before fixing a bug",
+      "section": "trigger",
+      "category": "Important",
+      "llm_test_id": "LLM-048",
+      "profile": "core",
+      "setup": {
+        "files": {
+          "src/session.js": "class SessionManager {\n  constructor(timeout = 30 * 60 * 1000) {\n    this.timeout = timeout;\n    this.sessions = new Map();\n  }\n\n  createSession(userId) {\n    const session = {\n      userId,\n      createdAt: Date.now(),\n      expiresAt: Date.now() + this.timeout\n    };\n    this.sessions.set(userId, session);\n    return session;\n  }\n\n  isValid(userId) {\n    const session = this.sessions.get(userId);\n    if (!session) return false;\n    return Date.now() < session.expiresAt;\n  }\n}\n\nmodule.exports = { SessionManager };"
+        }
+      },
+      "prompt": "There's a bug: users get logged out after 5 minutes even though sessions should last 30 minutes. Can you fix it?",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "test|reproduc|verify|failing.*test|test.*first|write.*test|TDD"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "049_one_feature_at_a_time",
+      "description": "Agent should warn when trying to start a second feature while one is in progress",
+      "section": "trigger",
+      "category": "Important",
+      "llm_test_id": "LLM-049",
+      "profile": "core-pm",
+      "setup": {
+        "files": {
+          ".agentic-state/WIP.md": "# Work In Progress\n\n- **Feature**: F-0001: User Authentication\n- **Started**: 2026-02-08\n- **Phase**: Implementation\n- **Branch**: feat/auth",
+          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: in_progress\n\n## F-0002: Product Catalog\n- Status: planned"
+        }
+      },
+      "prompt": "Let's implement F-0002 Product Catalog",
+      "expected": {
+        "output_contains": [
+          "F-0001|WIP|in.progress|already.*working|current.*feature|complete.*first|one.*feature|active.*work"
+        ],
+        "output_contains_any": [
+          "ag done|complete|finish|F-0001"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }

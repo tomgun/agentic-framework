@@ -18,12 +18,13 @@
 #   8.  Untracked files warning (new files not git added)
 #   9.  LLM behavioral test status (advisory, framework dev only)
 #   10. Agent instruction file size limits (prevents context bloat)
+#   3c. FEATURES.md updated when spec files changed (BLOCKING, Core+PM only)
 #   11. Branch policy for PR workflow (blocks commit to main if pull_request mode)
 #
 # Escape hatches (use sparingly, blocked on main/master):
 #   SKIP_TESTS=1      Skip test execution
 #   SKIP_COMPLEXITY=1  Skip complexity limits
-#   SKIP_STALENESS=1   Skip JOURNAL/STATUS staleness checks
+#   SKIP_STALENESS=1   Skip JOURNAL/STATUS/FEATURES staleness checks
 #
 # Exit codes:
 #   0 - All checks pass, commit allowed
@@ -106,7 +107,7 @@ fi
 FAILURES=0
 
 # Check 1: .agentic-state/WIP.md must not exist
-echo "[1/11] Checking for incomplete work (.agentic-state/WIP.md)..."
+echo "[1/12] Checking for incomplete work (.agentic-state/WIP.md)..."
 if [[ -f ".agentic-state/WIP.md" ]]; then
   echo "❌ BLOCKED: .agentic-state/WIP.md exists - work is incomplete!"
   echo ""
@@ -125,7 +126,7 @@ fi
 # Check 2: Shipped features must have acceptance criteria
 if [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[2/11] Checking shipped features have acceptance criteria..."
+  echo "[2/12] Checking shipped features have acceptance criteria..."
   
   # Extract feature IDs marked as shipped
   SHIPPED_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: shipped" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
@@ -158,7 +159,7 @@ if [[ -f "spec/FEATURES.md" ]]; then
   fi
 else
   echo ""
-  echo "[2/11] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
+  echo "[2/12] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
 fi
 
 # Check 3: JOURNAL.md updated since last commit (BLOCKING)
@@ -174,7 +175,7 @@ fi
 
 if [[ -n "$JOURNAL_PATH" ]]; then
   echo ""
-  echo "[3/11] Checking JOURNAL.md freshness..."
+  echo "[3/12] Checking JOURNAL.md freshness..."
 
   if [[ -n "${SKIP_STALENESS:-}" ]]; then
     echo "  ⚠ Skipped (SKIP_STALENESS set)"
@@ -210,7 +211,7 @@ if [[ -n "$JOURNAL_PATH" ]]; then
   fi
 else
   echo ""
-  echo "[3/11] Skipping JOURNAL.md check (file not found)"
+  echo "[3/12] Skipping JOURNAL.md check (file not found)"
 fi
 
 # Check 3b: STATUS.md updated since last commit (BLOCKING)
@@ -252,10 +253,53 @@ if [[ -f "STATUS.md" ]]; then
   fi
 fi
 
+# Check 3c: FEATURES.md updated when spec files changed (Core+PM, BLOCKING)
+if [[ -f "spec/FEATURES.md" ]]; then
+  SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep "^spec/" || true)
+  if [[ -n "$SPEC_STAGED" ]]; then
+    echo ""
+    echo "[3c/12] Checking FEATURES.md freshness (spec files staged)..."
+
+    if [[ -n "${SKIP_STALENESS:-}" ]]; then
+      echo "  ⚠ Skipped (SKIP_STALENESS set)"
+    else
+      # Check if FEATURES.md is also staged (being updated)
+      if git diff --cached --name-only 2>/dev/null | grep -q "FEATURES.md"; then
+        echo "✓ FEATURES.md is staged alongside spec changes"
+      else
+        # Check mtime like JOURNAL/STATUS pattern
+        LAST_COMMIT_TIME=${LAST_COMMIT_TIME:-$(git log -1 --format=%ct 2>/dev/null || echo "")}
+        if [[ -n "$LAST_COMMIT_TIME" ]]; then
+          if command -v stat >/dev/null 2>&1; then
+            if [[ "$(uname)" == "Darwin" ]]; then
+              FEATURES_MTIME=$(stat -f %m "spec/FEATURES.md" 2>/dev/null || echo "0")
+            else
+              FEATURES_MTIME=$(stat -c %Y "spec/FEATURES.md" 2>/dev/null || echo "0")
+            fi
+
+            if [[ "$FEATURES_MTIME" -lt "$LAST_COMMIT_TIME" ]]; then
+              echo "❌ BLOCKED: FEATURES.md not updated but spec files are staged"
+              echo "   Staged spec files: $(echo $SPEC_STAGED | tr '\n' ' ')"
+              echo ""
+              echo "   Update with: bash .agentic/tools/feature.sh F-#### status <status>"
+              echo ""
+              echo "   To skip (feature branches only): SKIP_STALENESS=1 git commit ..."
+              echo ""
+              FAILURES=$((FAILURES + 1))
+            else
+              echo "✓ FEATURES.md updated since last commit"
+            fi
+          fi
+        fi
+      fi
+    fi
+  fi
+fi
+
 # Check 4: STACK.md version sanity (where detectable)
 if [[ -f "STACK.md" ]]; then
   echo ""
-  echo "[4/11] Checking STACK.md version consistency..."
+  echo "[4/12] Checking STACK.md version consistency..."
   
   # Example: Check Node.js version if package.json exists
   if [[ -f "package.json" ]] && command -v node >/dev/null 2>&1; then
@@ -285,12 +329,12 @@ if [[ -f "STACK.md" ]]; then
   fi
 else
   echo ""
-  echo "[4/11] Skipping STACK.md check (file not found)"
+  echo "[4/12] Skipping STACK.md check (file not found)"
 fi
 
 # Check 5: Batch size warning (small batches = quality)
 echo ""
-echo "[5/11] Checking batch size (small batches = quality)..."
+echo "[5/12] Checking batch size (small batches = quality)..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   # Count staged files
@@ -323,7 +367,7 @@ fi
 # Check 6: Test execution (BLOCKING)
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════"
-echo "[6/11] Running tests..."
+echo "[6/12] Running tests..."
 
 if [[ -n "${SKIP_TESTS:-}" ]]; then
   echo "  ⚠ Skipped (SKIP_TESTS set)"
@@ -395,7 +439,7 @@ fi
 # Check 7: Complexity limits (BLOCKING)
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════"
-echo "[7/11] Checking complexity limits..."
+echo "[7/12] Checking complexity limits..."
 
 if [[ -n "${SKIP_COMPLEXITY:-}" ]]; then
   echo "  ⚠ Skipped (SKIP_COMPLEXITY set)"
@@ -491,7 +535,7 @@ fi
 
 # Check 8: Untracked files in project directories
 echo ""
-echo "[8/11] Checking for untracked files in project directories..."
+echo "[8/12] Checking for untracked files in project directories..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   # Directories that should typically have files tracked
@@ -537,7 +581,7 @@ fi
 # Check 9: LLM behavioral test status (advisory, framework development only)
 if [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/VERIFICATION_REPORT.md" ]]; then
   echo ""
-  echo "[9/11] Checking LLM behavioral test status..."
+  echo "[9/12] Checking LLM behavioral test status..."
   if bash .agentic/tools/llm-test-status.sh --quiet 2>/dev/null; then
     echo "✓ LLM behavioral tests are current"
   else
@@ -549,7 +593,7 @@ fi
 
 # Check 10: Agent instruction file size limits (prevents context bloat)
 echo ""
-echo "[10/11] Checking agent instruction file sizes..."
+echo "[10/12] Checking agent instruction file sizes..."
 
 SIZE_WARNINGS=0
 
@@ -585,7 +629,7 @@ fi
 
 # Check 11: Branch policy for PR workflow (BLOCKS commit to main/master)
 echo ""
-echo "[11/11] Checking branch policy..."
+echo "[11/12] Checking branch policy..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)

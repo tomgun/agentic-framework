@@ -94,6 +94,13 @@ Every decision — feature design, documentation, tooling, agent instructions �
 
 **Design basis**: Two independent research efforts confirmed this principle across Claude Code, Cursor, Copilot, and Codex. See `docs/INSTRUCTION_ARCHITECTURE.md`.
 
+**Enforcement Tiers**:
+- **Structural gates** (script exit 1): WIP blocking, acceptance file existence, JOURNAL/STATUS/FEATURES staleness, test execution, complexity limits, branch policy, one-feature-at-a-time
+- **Behavioral + LLM tests**: Anti-hallucination (LLM-027/028/029), no-auto-commit (LLM-005), bug-fix-test-first (LLM-048)
+- **Behavioral only**: Smoke testing, session protocols, check-before-creating, code annotations
+
+Some principles are inherently behavioral — they cannot be enforced by scripts. The framework reinforces them through memory seeding (all tools), LLM behavioral tests, and agent guidelines.
+
 **Anti-pattern**: ❌ "Agents should..." without enforcement (hope-based development). ❌ Commit first, validate later. ❌ Blocking on soft signals that require human judgment.
 
 ---
@@ -135,6 +142,8 @@ Every decision — feature design, documentation, tooling, agent instructions �
 
 **Anti-pattern**: ❌ Guessing API signatures. ❌ "It probably works like..." ❌ Assuming library behavior from training data. ❌ Fabricating function names or parameters.
 
+**Enforcement**: Behavioral — reinforced by LLM tests (LLM-027, 028, 029), memory seed, and agent guidelines. Cannot be structurally gated.
+
 **Reference**: `agent_operating_guidelines.md` Anti-Hallucination Rules
 
 ---
@@ -144,6 +153,8 @@ Every decision — feature design, documentation, tooling, agent instructions �
 **What**: Agents NEVER commit changes without explicit human approval.
 
 **Why**: Humans need to review what changed and why. This is the safety gate that prevents compounding mistakes. Agents present changes, wait for approval, then commit.
+
+**Enforcement**: Behavioral — LLM test (LLM-005) verifies compliance. Cannot be structurally gated since git commit always succeeds.
 
 **Exception**: User may grant blanket approval for a session.
 

@@ -10,7 +10,7 @@ The Agentic Framework delivers **50-80% cost reduction** in AI-assisted developm
 - Token efficiency (agent delegation, context optimization)
 - Developer time savings (automated checklists, instant context recovery)
 - Bug prevention (quality gates, smoke testing, acceptance-driven development)
-- Reduced rework (auto-enforced spec updates, documentation sync)
+- Reduced rework (staleness-gated spec updates, documentation sync)
 
 ---
 
@@ -57,7 +57,7 @@ The Agentic Framework delivers **50-80% cost reduction** in AI-assisted developm
 | Task | Manual Approach | Framework Approach | Savings |
 |------|-----------------|-------------------|---------|
 | Pre-commit checks | Remember checklist | `pre-commit-check.sh` auto | **100%** |
-| Spec updates | Remember to update | Auto-enforced gates | **100%** |
+| Spec updates | Remember to update | Staleness-gated (JOURNAL, STATUS, FEATURES) | **80%** |
 | Documentation sync | Often forgotten | Part of "done" definition | **100%** |
 | Quality validation | Manual testing | Automated quality gates | **70%** |
 

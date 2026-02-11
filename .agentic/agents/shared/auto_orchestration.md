@@ -165,9 +165,11 @@ See `.agentic/agents/context-manifests/` for all role definitions
 |------|-------|----------|
 | Acceptance Criteria | `spec/acceptance/F-####.md` (Core+PM) or criteria in any form (Core) | Core+PM: Missing = cannot proceed |
 | Tests Pass | Run test suite | Any failure = cannot ship |
-| Smoke Test | Actually run the app | Doesn't work = cannot ship |
-| Specs Updated | FEATURES.md and STATUS.md current | Stale = cannot commit |
+| Smoke Test | Actually run the app | Strongly recommended — verify manually before shipping |
+| Specs Updated | FEATURES.md and STATUS.md current | Stale = cannot commit (enforced by pre-commit-check.sh for Core+PM) |
 | No Untracked Files | `check-untracked.sh` clean | Untracked = warn before commit |
+
+†Smoke testing and anti-hallucination are behavioral principles reinforced by memory seed and LLM tests. They cannot be verified by scripts.
 
 ---
 
