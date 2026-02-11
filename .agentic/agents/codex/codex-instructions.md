@@ -8,14 +8,14 @@ Note: Codex runs commands in a sandbox. Append `|| true` to commands that may fa
 
 Quick Commands: `ag start` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done`
 
-STOP! Trigger Words:
-| Trigger | Action |
-|---------|--------|
-| "build", "implement", "add", "create" | STOP -> Run `ag plan F-XXXX` first, then `ag implement` |
-| "implement entire", "full system" | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
-| "fix", "bug", "issue" | STOP -> Write failing test FIRST |
-| "commit", "push" | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
-| "done", "complete" | STOP -> Run `ag done F-XXXX` |
+STOP! Trigger Words (match on intent, not just exact words):
+| User intent | Action |
+|-------------|--------|
+| Build / implement / add / create / set up / develop / make something | STOP -> Run `ag plan F-XXXX` first, then `ag implement` |
+| Build something large (>10 files, "entire", "full system") | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
+| Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
+| Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
+| Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX` |
 
 Acceptance criteria: Core+PM requires spec/acceptance/F-####.md before coding | Core: define criteria (any form) before coding.
 

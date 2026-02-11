@@ -361,3 +361,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-11 22:18 - Intent-based triggers + imperative memory-seed
+
+**Accomplished**:
+- Rewrote memory-seed.md as imperative action rules, updated all 7 trigger tables to intent-based matching with synonyms, added memory-check instruction to CLAUDE.md template+root
+
+**Next steps**:
+- Dogfood by re-seeding memory with new content, consider LLM test for memory-seeded command execution
+
+**Blockers**: None
+

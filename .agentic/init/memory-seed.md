@@ -1,57 +1,69 @@
-# Memory Seed — Agentic Framework Behavioral Patterns
+# Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.25.0 -->
+<!-- memory-seed v0.25.3 -->
 <!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done -->
 
-These are workflow patterns for agents working in an agentic framework project. Write them to your persistent memory so they survive across sessions.
+Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
-## Pre-Commit Sequence (never skip steps)
+## When the user wants to build something
 
-1. Update JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
-2. Update STATUS.md: `bash .agentic/tools/status.sh focus "Current task"`
-2b. If shipping a feature (Core+PM): `bash .agentic/tools/feature.sh F-#### status shipped`
-3. Run `ag commit` (runs quality gates, shows diff, waits for human approval)
-4. THEN announce ready — never announce "done" before artifacts are updated
+If the user's intent is to build, implement, add, create, set up, develop, make, or work on a feature — in any phrasing:
 
-## Session Start
+**STOP.** Do not write code yet. Run `ag plan F-XXXX` first, then `ag implement F-XXXX` after the plan is approved.
+
+If they say "implement entire", "full system", "complete", or describe something that would touch >10 files: **STOP — TOO BIG.** Break into 3-5 smaller tasks first.
+
+## When the user reports a bug or wants a fix
+
+If the user's intent is to fix, debug, repair, resolve, investigate, troubleshoot, or address a bug/issue/error:
+
+**STOP.** Write a failing test that reproduces the bug FIRST. Then fix it. Then verify the test passes.
+
+## When committing or pushing
+
+If the user wants to commit, push, save, ship, or finalize changes:
+
+**STOP.** Check `.agentic-state/WIP.md` first — if it exists, BLOCK and warn. Otherwise, follow the pre-commit sequence below, then run `ag commit`.
+
+## When work is done
+
+If the user says done, complete, finished, wrapped up, or indicates a feature is ready:
+
+**STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command.
+
+## Pre-commit sequence (never skip steps)
+
+Every time before committing, execute these commands in order:
+
+1. `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"` — update JOURNAL.md
+2. `bash .agentic/tools/status.sh focus "Current task"` — update STATUS.md
+3. If shipping a feature (Core+PM): `bash .agentic/tools/feature.sh F-#### status shipped`
+4. `ag commit` — runs quality gates, shows diff, waits for human approval
+5. Only THEN announce ready — never say "done" before artifacts are updated
+
+## Token-efficient scripts (always use these)
+
+Never read or edit these files directly. Always use the scripts:
+
+| File | Command |
+|------|---------|
+| STATUS.md | `bash .agentic/tools/status.sh focus "Task"` |
+| JOURNAL.md | `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"` |
+| HUMAN_NEEDED.md | `bash .agentic/tools/blocker.sh add "Title" "type" "Details"` |
+| FEATURES.md | `bash .agentic/tools/feature.sh F-#### status shipped` |
+
+## Session start
+
+When a session begins, immediately:
 
 1. Read STATUS.md, HUMAN_NEEDED.md, last 2-3 JOURNAL.md entries
-2. Check `bash .agentic/tools/wip.sh check` for interrupted work
+2. Run `bash .agentic/tools/wip.sh check` for interrupted work
 3. Greet user with dashboard: current focus, recent progress, blockers, suggested next steps
-4. Full protocol: `.agentic/checklists/session_start.md`
 
-## Feature Work Flow
+## Rules that always apply
 
-1. **Plan first**: `ag plan F-XXXX` — never start coding without a plan
-2. **Acceptance criteria before code**: Core+PM needs `spec/acceptance/F-####.md`; Core needs criteria in any form
-3. **Implement**: `ag implement F-XXXX` — small batches, max 5-10 files per commit
-4. **Test**: Add/update tests for all new/changed logic
-5. **Update state**: Journal + Status before committing
-6. **Done**: `ag done F-XXXX` — updates features, status, journal
-
-## Token-Efficient Scripts (always use these)
-
-Never read or edit state files directly. Always use scripts:
-- `bash .agentic/tools/status.sh focus "Task"` → STATUS.md
-- `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"` → JOURNAL.md
-- `bash .agentic/tools/blocker.sh add "Title" "type" "Details"` → HUMAN_NEEDED.md
-- `bash .agentic/tools/feature.sh F-#### status shipped` → FEATURES.md
-
-## Common Pitfalls
-
-- **Don't bypass gates**: Quality checks exist for a reason. Don't use `--no-verify`.
-- **Don't announce before updating artifacts**: Update JOURNAL.md and STATUS.md first, then tell the user you're ready.
-- **Don't edit state files directly**: Use the token-efficient scripts above.
-- **Don't skip the plan**: Even small features benefit from `ag plan` first.
-- **Don't commit without showing changes**: Never auto-commit. Human reviews first.
-- **"Too big" check**: If touching >10 files, break it into smaller batches.
-- **Don't start a second feature**: Complete current WIP first. One feature at a time.
-- **Bug fix = test first**: Write a failing test that reproduces the bug BEFORE writing the fix.
-- **Smoke test before "done"**: Actually run the app/feature. "Tests pass" ≠ "it works."
-
-## Trigger Word Awareness
-
-When the user says "build/implement/add/create" → plan first.
-When the user says "fix/bug" → write failing test first.
-When the user says "commit/push" → check WIP.md first.
-When the user says "done/complete" → run `ag done`.
+- **Never auto-commit.** Human reviews every change first.
+- **Never bypass gates.** Do not use `--no-verify` or skip quality checks.
+- **One feature at a time.** Complete current WIP before starting another.
+- **Small batches.** Max 5-10 files per commit. If bigger, break it up.
+- **Smoke test before "done".** Actually run the feature. "Tests pass" does not mean "it works."

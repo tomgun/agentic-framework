@@ -5,6 +5,13 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.3] - 2026-02-11
+
+### Changed
+- **memory-seed.md** — Rewritten from documentation style to imperative trigger→action format. Rules framed as "when condition → execute command", not reference material.
+- **All 7 trigger tables** (CLAUDE.md, copilot, codex, cursor × template + root) — "Trigger" column → "User intent" with broader synonym matching. Header: "match on intent, not just exact words."
+- **CLAUDE.md** (template + root) — Added explicit "check your memory at session start" instruction with re-read directive if stale.
+
 ## [0.25.2] - 2026-02-11
 
 ### Added
