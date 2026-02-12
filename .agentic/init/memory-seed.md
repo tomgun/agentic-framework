@@ -42,7 +42,7 @@ If the user says done, complete, finished, wrapped up, or indicates a feature is
 
 Every time before committing, execute these commands in order:
 
-1. `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"` — update JOURNAL.md
+1. `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Problem being solved"` — update JOURNAL.md (always include --why)
 2. `bash .agentic/tools/status.sh focus "Current task"` — update STATUS.md
 3. If shipping a feature (Core+PM): `bash .agentic/tools/feature.sh F-#### status shipped`
 4. `ag commit` — runs quality gates, shows diff, waits for human approval
@@ -55,7 +55,7 @@ Never read or edit these files directly. Always use the scripts:
 | File | Command |
 |------|---------|
 | STATUS.md | `bash .agentic/tools/status.sh focus "Task"` |
-| JOURNAL.md | `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"` |
+| JOURNAL.md | `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"` |
 | HUMAN_NEEDED.md | `bash .agentic/tools/blocker.sh add "Title" "type" "Details"` |
 | FEATURES.md | `bash .agentic/tools/feature.sh F-#### status shipped` |
 

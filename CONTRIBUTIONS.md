@@ -34,6 +34,7 @@
 - Asked for continuous quality validation standard
 - Requested technology-agnostic quality validation (not JUCE-focused)
 - Asked for mutation testing integration
+- **Infrastructure validation via mutation tests** — designed test strategy proving git hooks, CLAUDE.md triggers, and defense-in-depth layering actually work. Key insight: mutation tests that remove infrastructure (core.hooksPath, hook files, config) prove enforcement is real, not theatrical. Control group (no-framework baseline) proves framework causes behavioral change.
 - **Green coding principles** - initiative to add environmental responsibility
 
 ### 3. Multi-Agent & Workflows

@@ -663,7 +663,11 @@ Type a/b/c/d:"
    - Generic: `.agentic/quality_profiles/generic.sh`
 
 3. **Copy to project root** as `quality_checks.sh` and customize thresholds
-4. **Ask if user wants a pre-commit hook** (recommended)
+4. **Pre-commit hook** (already installed via `core.hooksPath`):
+   - Default mode is `fast` (structural checks only, skips slow tests)
+   - Ask user if they want `full` mode (runs tests on every commit) or `no` (disable)
+   - Update `pre_commit_hook:` in STACK.md accordingly
+   - Check with `ag hooks status`, manage with `ag hooks install|disable`
 
 ## Step 4: Update HUMAN_NEEDED.md with discovered blockers
 
