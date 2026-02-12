@@ -383,3 +383,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-12 09:35 - F-0128 Specs-Before-Code Enforcement
+
+**Accomplished**:
+- Root cause analysis (7 findings), 7 fixes: ag work hard block in Core+PM, ag implement plan-review gate, doctor check blocking, pre-commit workflow bypass, trigger table one-liner, memory-seed imperative, auto_orchestration pre-condition. Plan-review loop: 3 iterations (2 REVISION_NEEDED, 1 APPROVED). LLM test 050 added.
+
+**Next steps**:
+- Dogfood: test the enforcement in next feature implementation
+
+**Blockers**: None
+

@@ -627,6 +627,42 @@ if [[ $SIZE_WARNINGS -gt 0 ]]; then
   echo "   (File size warnings are advisory, not blocking commit)"
 fi
 
+# Check 12: Workflow bypass detection (Core+PM only)
+# Did the agent use ag implement (which creates WIP with a feature ID)?
+if [[ -f "spec/FEATURES.md" ]]; then
+  echo ""
+  echo "[12/13] Checking workflow compliance (Core+PM)..."
+
+  # Only check when new files are being added in implementation directories
+  NEW_IMPL_FILES=$(git diff --cached --name-only --diff-filter=A 2>/dev/null | grep -E '^(src/|lib/|app/|\.agentic/tools/|\.agentic/hooks/)' || true)
+
+  if [[ -n "$NEW_IMPL_FILES" ]]; then
+    # Check if WIP tracking is active with a feature ID
+    HAS_FEATURE_WIP=false
+    if [[ -f ".agentic-state/WIP.md" ]]; then
+      if grep -qE 'F-[0-9]{4}' ".agentic-state/WIP.md" 2>/dev/null; then
+        HAS_FEATURE_WIP=true
+      fi
+    fi
+
+    if [[ "$HAS_FEATURE_WIP" = false ]]; then
+      echo "⚠️  WARNING: New implementation files without feature tracking"
+      echo "   New files: $(echo "$NEW_IMPL_FILES" | wc -l | tr -d ' ')"
+      echo ""
+      echo "   Core+PM requires: ag implement F-XXXX before coding."
+      echo "   This creates WIP tracking with a feature ID."
+      echo ""
+      echo "   If this is intentional (refactor, config), ignore this warning."
+      echo ""
+      echo "   (This is a warning, not blocking commit)"
+    else
+      echo "✓ Feature WIP tracking active"
+    fi
+  else
+    echo "✓ No new implementation files (workflow check skipped)"
+  fi
+fi
+
 # Check 11: Branch policy for PR workflow (BLOCKS commit to main/master)
 echo ""
 echo "[11/12] Checking branch policy..."

@@ -118,6 +118,13 @@ See `.agentic/agents/context-manifests/` for all role definitions
 
 **Trigger**: User mentions implementing a feature (F-#### or general)
 
+**CRITICAL PRE-CONDITION (Core+PM)**: If the user describes a feature without a feature ID:
+1. Assign the next available F-XXXX ID in spec/FEATURES.md
+2. Create spec/acceptance/F-XXXX.md with acceptance criteria
+3. THEN proceed with the pipeline below
+
+Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANCE CRITERIA EXIST).
+
 ### Automatic Steps (DO ALL OF THESE)
 
 ```

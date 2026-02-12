@@ -13,7 +13,7 @@ Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |
 |-------------|--------|
-| Build / implement / add / create / set up / develop / make something | STOP -> Run `ag plan F-XXXX` first, then `ag implement` |
+| Build / implement / add / create / set up / develop / make something | STOP -> If no F-XXXX: create spec/acceptance/F-XXXX.md FIRST, then `ag plan` + `ag implement`. Never code before specs. |
 | Build something large (>10 files, "entire", "full system") | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
 | Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
 | Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
