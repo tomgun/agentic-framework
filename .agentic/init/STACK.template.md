@@ -205,7 +205,7 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- Agents create this during init based on tech stack -->
 <!-- - quality_checks: enabled -->
 <!-- - profile: juce_audio_plugin  # or webapp_fullstack, ios_app, etc -->
-<!-- - pre_commit_hook: yes -->
+- pre_commit_hook: fast  # fast | full | no (backward compat: yes → fast)
 <!-- - run_command: bash quality_checks.sh --pre-commit -->
 <!-- - full_suite_command: bash quality_checks.sh --full -->
 

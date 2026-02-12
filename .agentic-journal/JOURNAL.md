@@ -394,3 +394,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-12 13:28 - F-0129 Git Hook Enforcement
+
+**Accomplished**:
+- Implemented all 7 fixes: pre-commit dispatcher, --mode flag, core.hooksPath wiring, ag hooks command, sync phase 6, start warning, STACK template + upgrade.sh. All 184 framework tests pass.
+
+**Next steps**:
+- Create acceptance criteria, update FEATURES.md, commit
+
+**Blockers**: None
+

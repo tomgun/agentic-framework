@@ -135,6 +135,7 @@ COMMANDS:
     work "description"  Start WIP tracking for a task
     commit              Run all pre-commit gates
     done                Task complete validation
+    hooks <sub>         Manage git hooks (install|status|disable)
     approve-onboarding  Review/approve auto-discovered proposals
     trace [options]     Spec-code traceability (drift + coverage)
     test llm [options]  Run LLM behavioral tests
@@ -177,6 +178,7 @@ COMMANDS:
     specs               Systematic brownfield spec generation by domain
     commit              Run all pre-commit gates
     done [F-XXXX]       Feature complete validation
+    hooks <sub>         Manage git hooks (install|status|disable)
     approve-onboarding  Review/approve auto-discovered proposals
     trace [options]     Spec-code traceability (drift + coverage)
     test llm [options]  Run LLM behavioral tests
@@ -296,7 +298,18 @@ cmd_start() {
     echo -e "${BOLD}Quick Health Check:${NC}"
     bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null | head -20 || echo "  (doctor.sh not available)"
 
-    # 7. Quick sync probe
+    # 7. Hook configuration check
+    if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+        local hooks_path
+        hooks_path=$(git config core.hooksPath 2>/dev/null || echo "")
+        if [ "$hooks_path" != ".agentic/hooks" ]; then
+            echo -e "${YELLOW}Git hooks not configured — pre-commit quality gates inactive${NC}"
+            echo -e "  Fix: ${BOLD}ag hooks install${NC}"
+            echo ""
+        fi
+    fi
+
+    # 8. Quick sync probe
     local sync_summary
     sync_summary=$(bash "$SCRIPT_DIR/sync.sh" --quiet 2>/dev/null || true)
     if [ -n "$sync_summary" ]; then
@@ -420,15 +433,16 @@ cmd_plan() {
     echo -e "${BOLD}=== Plan: $feature_id ===${NC}"
     echo ""
 
-    # 1. Check acceptance criteria exist
+    # 1. Check acceptance criteria (advisory for plan, blocking for implement)
     local acc_file="$ROOT_DIR/spec/acceptance/${feature_id}.md"
     if [ ! -f "$acc_file" ]; then
-        echo -e "${RED}BLOCKED: No acceptance criteria${NC}"
-        echo "  Missing: spec/acceptance/${feature_id}.md"
-        echo "  Create acceptance criteria FIRST, then plan."
-        exit 1
+        echo -e "${YELLOW}Note: No acceptance criteria yet (spec/acceptance/${feature_id}.md)${NC}"
+        echo "  The plan-review loop can help define what to build."
+        echo "  Acceptance criteria will be required before 'ag implement'."
+        echo ""
+    else
+        echo -e "${GREEN}Acceptance criteria: EXISTS${NC}"
     fi
-    echo -e "${GREEN}Acceptance criteria: EXISTS${NC}"
 
     # 2. Check for existing plan
     local plan_file="$ROOT_DIR/.agentic-journal/plans/${feature_id}-plan.md"
@@ -910,6 +924,77 @@ cmd_tools() {
         echo ""
         echo "Run tool with: bash .agentic/tools/<tool>.sh"
     }
+}
+
+# Hooks command - manage git hook configuration
+cmd_hooks() {
+    local subcmd="${1:-}"
+    local flag="${2:-}"
+
+    case "$subcmd" in
+        install)
+            if ! command -v git >/dev/null 2>&1 || ! git rev-parse --git-dir >/dev/null 2>&1; then
+                echo -e "${RED}Error: Not a git repository${NC}"
+                exit 1
+            fi
+            git config core.hooksPath .agentic/hooks
+            echo -e "${GREEN}Hooks installed: core.hooksPath set to .agentic/hooks${NC}"
+            ;;
+        status)
+            if ! command -v git >/dev/null 2>&1 || ! git rev-parse --git-dir >/dev/null 2>&1; then
+                echo -e "${RED}Error: Not a git repository${NC}"
+                exit 1
+            fi
+            local hooks_path
+            hooks_path=$(git config core.hooksPath 2>/dev/null || echo "")
+            if [ "$hooks_path" = ".agentic/hooks" ]; then
+                echo -e "${GREEN}INSTALLED${NC}: core.hooksPath = .agentic/hooks"
+                # Show current mode
+                local mode="fast"
+                if [ -f "$ROOT_DIR/STACK.md" ]; then
+                    local raw
+                    raw=$(grep -iE "^[- ]*pre_commit_hook:" "$ROOT_DIR/STACK.md" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | tr -d ' ')
+                    case "$raw" in
+                        yes) mode="fast" ;;
+                        no|fast|full) mode="$raw" ;;
+                    esac
+                fi
+                echo "  Mode: $mode (set pre_commit_hook in STACK.md)"
+            elif [ -n "$hooks_path" ]; then
+                echo -e "${YELLOW}CUSTOM${NC}: core.hooksPath = $hooks_path (not .agentic/hooks)"
+            else
+                echo -e "${RED}NOT INSTALLED${NC}: core.hooksPath not configured"
+                echo "  Run: ag hooks install"
+            fi
+            ;;
+        disable)
+            if [ "$flag" != "--confirm" ]; then
+                echo -e "${RED}WARNING: This disables all pre-commit quality gates.${NC}"
+                echo ""
+                echo "Commits will no longer be checked for:"
+                echo "  - WIP lock, journal/status freshness, complexity limits"
+                echo "  - Branch policy, spec validation, test execution"
+                echo ""
+                echo "To proceed: ag hooks disable --confirm"
+                exit 1
+            fi
+            if ! command -v git >/dev/null 2>&1 || ! git rev-parse --git-dir >/dev/null 2>&1; then
+                echo -e "${RED}Error: Not a git repository${NC}"
+                exit 1
+            fi
+            git config --unset core.hooksPath 2>/dev/null || true
+            echo -e "${YELLOW}Hooks disabled: core.hooksPath unset${NC}"
+            echo "  Re-enable with: ag hooks install"
+            ;;
+        *)
+            echo "Usage: ag hooks <install|status|disable>"
+            echo ""
+            echo "Commands:"
+            echo "  install             Set core.hooksPath to .agentic/hooks"
+            echo "  status              Show current hook configuration"
+            echo "  disable --confirm   Remove core.hooksPath (disables all quality gates)"
+            ;;
+    esac
 }
 
 # Sync command - unified drift detection + auto-fix
@@ -1692,6 +1777,9 @@ case "${1:-help}" in
         ;;
     done)
         cmd_done "${2:-}"
+        ;;
+    hooks)
+        cmd_hooks "${2:-}" "${3:-}"
         ;;
     trace)
         shift

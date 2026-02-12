@@ -289,6 +289,22 @@ else
 fi
 
 if [[ "${PROFILE}" == "core" ]]; then
+  # Configure git hooks for Core profile too
+  if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+    CURRENT_HOOKS_PATH=$(git config core.hooksPath 2>/dev/null || echo "")
+    if [[ "$CURRENT_HOOKS_PATH" != ".agentic/hooks" ]]; then
+      GIT_VERSION=$(git --version | grep -oE '[0-9]+\.[0-9]+' | head -1)
+      GIT_MAJOR=$(echo "$GIT_VERSION" | cut -d. -f1)
+      GIT_MINOR=$(echo "$GIT_VERSION" | cut -d. -f2)
+      if [[ "$GIT_MAJOR" -gt 2 ]] || [[ "$GIT_MAJOR" -eq 2 && "$GIT_MINOR" -ge 9 ]]; then
+        git config core.hooksPath .agentic/hooks
+        echo "NEW : git core.hooksPath set to .agentic/hooks"
+      fi
+    else
+      echo "OK  : git hooks already configured"
+    fi
+  fi
+
   echo ""
   # Set up tool-specific auto-loaded files
   echo "Setting up AI tool integration..."
@@ -363,17 +379,28 @@ copy_if_missing "${ROOT_DIR}/.agentic/spec/NFR.template.md" "${ROOT_DIR}/spec/NF
 copy_if_missing "${ROOT_DIR}/.agentic/spec/REFERENCES.template.md" "${ROOT_DIR}/spec/REFERENCES.md"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/acceptance/README.template.md" "${ROOT_DIR}/spec/acceptance/README.md"
 
-# Install pre-commit hook for spec validation (Core+PM only)
-if [[ -f "${ROOT_DIR}/.git/hooks/pre-commit" ]]; then
-  echo "OK  : .git/hooks/pre-commit exists (not overwriting)"
-else
-  if [[ -f "${ROOT_DIR}/.agentic/hooks/pre-commit" ]]; then
-    mkdir -p "${ROOT_DIR}/.git/hooks"
-    cp "${ROOT_DIR}/.agentic/hooks/pre-commit" "${ROOT_DIR}/.git/hooks/pre-commit"
-    chmod +x "${ROOT_DIR}/.git/hooks/pre-commit"
-    echo "NEW : .git/hooks/pre-commit (spec validation before commits)"
+# Configure git hooks via core.hooksPath (both profiles)
+if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  CURRENT_HOOKS_PATH=$(git config core.hooksPath 2>/dev/null || echo "")
+  if [[ "$CURRENT_HOOKS_PATH" == ".agentic/hooks" ]]; then
+    echo "OK  : git hooks already configured (core.hooksPath = .agentic/hooks)"
   else
-    echo "WARN: .agentic/hooks/pre-commit template not found"
+    # Check git version supports core.hooksPath (git >= 2.9)
+    GIT_VERSION=$(git --version | grep -oE '[0-9]+\.[0-9]+' | head -1)
+    GIT_MAJOR=$(echo "$GIT_VERSION" | cut -d. -f1)
+    GIT_MINOR=$(echo "$GIT_VERSION" | cut -d. -f2)
+    if [[ "$GIT_MAJOR" -gt 2 ]] || [[ "$GIT_MAJOR" -eq 2 && "$GIT_MINOR" -ge 9 ]]; then
+      git config core.hooksPath .agentic/hooks
+      echo "NEW : git core.hooksPath set to .agentic/hooks"
+    else
+      # Fallback: file copy for git < 2.9
+      if [[ -f "${ROOT_DIR}/.agentic/hooks/pre-commit" ]]; then
+        mkdir -p "${ROOT_DIR}/.git/hooks"
+        cp "${ROOT_DIR}/.agentic/hooks/pre-commit" "${ROOT_DIR}/.git/hooks/pre-commit"
+        chmod +x "${ROOT_DIR}/.git/hooks/pre-commit"
+        echo "NEW : .git/hooks/pre-commit (fallback for git < 2.9)"
+      fi
+    fi
   fi
 fi
 

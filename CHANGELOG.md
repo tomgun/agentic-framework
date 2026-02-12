@@ -5,6 +5,34 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.6] - 2026-02-12
+
+### Added
+- **Git hook enforcement (F-0129)** — Pre-commit dispatcher with CI detection, STACK.md config routing (`pre_commit_hook: fast|full|no`), and `core.hooksPath` wiring. Hooks now fire on every `git commit`.
+- **`ag hooks` command** — `install`, `status`, `disable --confirm` for manual hook management.
+- **sync.sh Phase 6** — Git hook configuration check with auto-fix in full mode.
+- **`ag start` hook warning** — Dashboard warns when hooks are not configured.
+
+### Changed
+- **`ag plan` gate** — Loosened from hard block to advisory when acceptance criteria missing. `ag implement` retains independent hard block.
+- **pre-commit-check.sh** — Added `--mode fast|full` flag. Fast mode keeps structural blocking checks (1,2,3,3b,3c,7,11), skips slow/advisory checks (4,5,6,8,9,10,12).
+- **scaffold.sh** — Uses `git config core.hooksPath .agentic/hooks` instead of file-copy installation. Both profiles get hooks.
+- **STACK.template.md** — Uncommented `pre_commit_hook: fast` (was `<!-- yes -->`).
+- **upgrade.sh** — Configures `core.hooksPath`, cleans stale `.git/hooks/pre-commit`, migrates `yes` → `fast`.
+- **status.sh** — Timestamps now include timezone (e.g., `2026-02-12 13:30 EET`).
+
+## [0.25.5] - 2026-02-12
+
+### Added
+- **Specs-before-code structural enforcement (F-0128)** — `ag implement` and `ag plan` block if acceptance criteria don't exist. Enforcement gap audit identified 20 gaps.
+
+## [0.25.4] - 2026-02-11
+
+### Added
+- **`ag sync` command** — Unified drift detection across 5 phases (memory, state freshness, features, spec/doc drift, tool parity) with `--check` (dry run) and `--quiet` (probe) modes.
+- **Discoverability reminders** — `ag start` shows "Available workflows" line and sync probe when issues detected.
+- **Tip of the day** — Random framework tip in session dashboard (10 tips).
+
 ## [0.25.3] - 2026-02-11
 
 ### Changed
