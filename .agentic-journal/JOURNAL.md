@@ -397,11 +397,35 @@
 
 ### Session: 2026-02-12 13:28 - F-0129 Git Hook Enforcement
 
+**Why**: Pre-commit hooks existed since v0.20 but git never actually called them — `scaffold.sh` copied hook files into `.git/hooks/` which got overwritten or ignored. Every quality gate (WIP locks, staleness checks, branch policy) was theatre. The fix: use `git config core.hooksPath .agentic/hooks` so git reads hooks from our tracked directory.
+
 **Accomplished**:
-- Implemented all 7 fixes: pre-commit dispatcher, --mode flag, core.hooksPath wiring, ag hooks command, sync phase 6, start warning, STACK template + upgrade.sh. All 184 framework tests pass.
+- Pre-commit dispatcher with CI detection and STACK.md config routing (`pre_commit_hook: fast|full|no`)
+- `core.hooksPath` wiring in scaffold.sh and upgrade.sh
+- `ag hooks` command (install/status/disable), sync phase 6, start warning
+- All 184 framework tests pass
 
 **Next steps**:
-- Create acceptance criteria, update FEATURES.md, commit
+- Prove the hooks actually work with mutation tests
+
+**Blockers**: None
+
+
+### Session: 2026-02-12 15:21 - Infrastructure validation mutation tests
+
+**Why**: We shipped three enforcement layers (git hooks, CLAUDE.md triggers, memory seed) but had no proof they actually work — or that things break without them. Mutation testing answers: "if I remove this, does enforcement disappear?" This is especially important for git hooks where silent bypass means zero quality gates.
+
+**Accomplished**:
+- 8 structural positive tests (S01-S08): hooks configured, WIP blocks, staleness blocks, branch policy, defense-in-depth
+- 3 mutation tests (M01-M03): removing core.hooksPath / hook file / setting `no` all silently bypass enforcement
+- S06 "killer test": simulates LLM ignoring CLAUDE.md → hook still catches it (proves layered architecture)
+- 6 LLM behavioral tests, 2 interactive memory tests, 2 LLM mutation tests (ready to run)
+- 52 assertions all passing in 32s, $0 cost
+- Date-prefixed all plan files, updated init_playbook for F-0129
+
+**Next steps**:
+- Run LLM tests (`--with-llm`) to prove framework changes agent behavior vs bare baseline
+- Real-world project validation (non-framework)
 
 **Blockers**: None
 

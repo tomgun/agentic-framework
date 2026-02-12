@@ -4,7 +4,10 @@
 # Usage:
 #   bash .agentic/tools/journal.sh "Topic" "Accomplished" "Next steps" "Blockers"
 #   bash .agentic/tools/journal.sh "Topic" "Accomplished" "Next steps" "Blockers" \
-#       --feature F-0116 --files 12 --commits abc123
+#       --why "Reason this work was needed" --feature F-0116 --files 12 --commits abc123
+#
+# The --why flag adds a "Why" section explaining the motivation/problem being solved.
+# Always include --why when possible — "what" without "why" loses context for future readers.
 #
 # Token efficiency: APPENDS to file, never reads whole file
 #
@@ -31,9 +34,11 @@ shift 4 2>/dev/null || true
 FEATURE=""
 FILES_COUNT=""
 COMMITS=""
+WHY=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --why) WHY="$2"; shift 2 ;;
         --feature) FEATURE="$2"; shift 2 ;;
         --files) FILES_COUNT="$2"; shift 2 ;;
         --commits) COMMITS="$2"; shift 2 ;;
@@ -66,6 +71,10 @@ fi
   echo ""
   echo "### Session: ${TIMESTAMP} - ${TOPIC}"
   echo ""
+  if [[ -n "$WHY" ]]; then
+    echo "**Why**: ${WHY}"
+    echo ""
+  fi
   echo "**Accomplished**:"
   echo "${ACCOMPLISHED}" | sed 's/^/- /'
   echo ""
