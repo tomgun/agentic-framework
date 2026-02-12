@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- ag sync, discoverability reminders, tip of the day (v0.25.4) (Updated: 2026-02-11 22:17)
+- F-0128 specs-before-code enforcement shipped (v0.25.5) (Updated: 2026-02-12 07:35)
 
 ## Current focus
 - Domain categories + systematic brownfield spec generation (v0.25.0)

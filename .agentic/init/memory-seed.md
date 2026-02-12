@@ -9,7 +9,14 @@ Write these rules to your persistent memory. They are action triggers — when a
 
 If the user's intent is to build, implement, add, create, set up, develop, make, or work on a feature — in any phrasing:
 
-**STOP.** Do not write code yet. Run `ag plan F-XXXX` first, then `ag implement F-XXXX` after the plan is approved.
+**STOP.** Do not write code yet.
+
+1. If no feature ID exists: assign the next available F-XXXX in spec/FEATURES.md
+2. Create spec/acceptance/F-XXXX.md with acceptance criteria FIRST
+3. Run `ag plan F-XXXX` (starts the plan-review loop)
+4. Run `ag implement F-XXXX` after the plan is approved
+
+Never write implementation code before acceptance criteria exist. This is a structural rule, not a suggestion.
 
 If they say "implement entire", "full system", "complete", or describe something that would touch >10 files: **STOP — TOO BIG.** Break into 3-5 smaller tasks first.
 

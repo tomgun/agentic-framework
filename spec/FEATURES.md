@@ -1983,6 +1983,26 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0128: Specs-Before-Code Structural Enforcement
+
+**Status**: shipped
+**Priority**: critical
+**Complexity**: medium
+**Since**: v0.25.5
+
+**Description**: Agents skip the specs-first workflow even when CLAUDE.md trigger tables say to plan first. Root cause analysis of why instructions fail to enforce the Core+PM contract (acceptance criteria before coding), and structural fixes across all enforcement points (ag commands, memory-seed, trigger tables, gate scripts) to make skipping specs structurally difficult rather than relying on behavioral compliance.
+
+**Dependencies**: F-0098 (Structural Enforcement), F-0003 (Spec-Driven Development)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/ag.sh` (cmd_work block, cmd_implement plan-review gate, doctor check blocking), `.agentic/hooks/pre-commit-check.sh` (workflow bypass check), `.agentic/init/memory-seed.md`, `.agentic/agents/shared/auto_orchestration.md`
+- Tests: `tests/llm/tests/050_specs_before_code_no_fid.sh` (LLM-050), `tests/validate_framework.sh` (184/184)
+
+**Acceptance**: See `spec/acceptance/F-0128.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -1997,6 +2017,6 @@ agent_mode: balanced  # premium | balanced | economy
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 15 | 1 | 1 | 17 |
-| **Total** | **88** | **2** | **1** | **91** |
+| Framework Infrastructure (F-0101+) | 16 | 1 | 0 | 17 |
+| **Total** | **89** | **2** | **0** | **91** |
 

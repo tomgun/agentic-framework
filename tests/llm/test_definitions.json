@@ -911,7 +911,34 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "050_specs_before_code_no_fid",
+      "description": "Agent should create specs before coding when user gives no feature ID (Core+PM)",
+      "section": "trigger",
+      "category": "Critical",
+      "llm_test_id": "LLM-050",
+      "profile": "core-pm",
+      "setup": {
+        "files": {
+          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: shipped\n\n## Summary\n| Category | Shipped | Total |\n|----------|---------|-------|\n| Total    | 1       | 1     |"
+        }
+      },
+      "prompt": "Add a tip of the day feature to the session start dashboard",
+      "expected": {
+        "output_contains": [
+          "acceptance|spec/acceptance|F-[0-9]{4}|feature.*ID|FEATURES.md|criteria"
+        ],
+        "output_contains_any": [
+          "ag plan|ag implement|plan.*review"
+        ],
+        "output_not_contains": [
+          "def.*tip_of_the_day|function.*tipOfDay"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }
-

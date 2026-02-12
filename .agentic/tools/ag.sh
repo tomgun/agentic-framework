@@ -341,6 +341,19 @@ cmd_work() {
         exit 1
     fi
 
+    # Core+PM: hard block — require feature ID with acceptance criteria
+    if [ "$PROFILE" = "core+product" ]; then
+        echo -e "${RED}BLOCKED: Core+PM profile requires a feature ID with acceptance criteria.${NC}"
+        echo ""
+        echo "To start:"
+        echo "  1. Add feature to spec/FEATURES.md (next available F-XXXX)"
+        echo "  2. Create spec/acceptance/F-XXXX.md with acceptance criteria"
+        echo "  3. Run: ag implement F-XXXX"
+        echo ""
+        echo "Core profile users: ag work is available without feature IDs."
+        exit 1
+    fi
+
     echo -e "${BOLD}=== Starting Task ===${NC}"
     echo "Task: $description"
     echo ""
@@ -535,26 +548,26 @@ cmd_implement() {
         fi
     fi
 
-    # 0b. Check if plan-review is required for implement
-    local auto_for
-    auto_for=$(get_plan_review_config "plan_review_auto_for" "[planning]")
-    if echo "$auto_for" | grep -qE "(implement|both)"; then
+    # 0b. Check plan-review (BLOCKING when enabled)
+    local plan_review_enabled
+    plan_review_enabled=$(get_plan_review_config "plan_review_enabled" "no")
+    if [ "$plan_review_enabled" = "yes" ]; then
         local plan_file="$ROOT_DIR/.agentic-journal/plans/${feature_id}-plan.md"
         if [ -f "$plan_file" ]; then
             local plan_status
             plan_status=$(grep -E "^\*\*Status\*\*:" "$plan_file" 2>/dev/null | head -1 | sed 's/.*Status\*\*:[[:space:]]*//' || echo "UNKNOWN")
             if [ "$plan_status" != "APPROVED" ]; then
-                echo -e "${YELLOW}Plan exists but not approved (status: $plan_status)${NC}"
-                echo "  Run: ag plan $feature_id"
-                echo "  Or set plan status to APPROVED manually"
-                echo ""
+                echo -e "${RED}BLOCKED: Plan exists but not approved (status: $plan_status)${NC}"
+                echo "  Complete the review loop: ag plan $feature_id"
+                exit 1
             else
                 echo -e "${GREEN}Approved plan: EXISTS${NC}"
             fi
         else
-            echo -e "${YELLOW}No plan found - consider running: ag plan $feature_id${NC}"
-            echo "  (plan_review_auto_for includes 'implement')"
-            echo ""
+            echo -e "${RED}BLOCKED: No approved plan found (plan_review_enabled: yes)${NC}"
+            echo "  Run: ag plan $feature_id"
+            echo "  This starts the plan-review loop before implementation."
+            exit 1
         fi
     fi
 
@@ -583,10 +596,13 @@ cmd_implement() {
         fi
     fi
 
-    # 3. Run planning phase check
+    # 3. Run planning phase check (BLOCKING)
     echo ""
     echo "Running phase check..."
-    bash "$SCRIPT_DIR/doctor.sh" --phase planning "$feature_id" 2>/dev/null || true
+    if ! bash "$SCRIPT_DIR/doctor.sh" --phase planning "$feature_id" 2>/dev/null; then
+        echo -e "${RED}BLOCKED: Planning phase checks failed. Fix issues above.${NC}"
+        exit 1
+    fi
 
     # 4. Start WIP tracking
     echo ""
