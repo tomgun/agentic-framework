@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.25.4)
+**Period**: Initial Development (v0.1.0 → v0.25.6)
 **Date**: 2026-02-12
 
 ---
@@ -2122,10 +2122,28 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Framework capabilities are now surfaced where agents and users actually look (dashboard output), not buried in instruction files. Tip of the day provides passive discoverability for the full `ag` command set.
 
+## Git Hook Enforcement (2026-02-12)
+
+### Enforcement Gap Discovery & Closure (F-0129)
+
+**User discovery**: Committed 3 times in one session using `git add && git commit` directly, bypassing every quality gate. The pre-commit-check.sh (716 lines, 13 checks) existed but was never wired as an actual git hook — `.git/hooks/` had only `.sample` files. Also identified that `ag plan` requiring acceptance criteria before planning was backwards — specs should gate implementation, not planning.
+
+**User direction**: Two-fix approach: (1) Wire hooks via `core.hooksPath` so they actually fire, with a dispatcher that reads config from STACK.md. (2) Loosen `ag plan` gate to advisory — planning helps you figure out *what* to build, acceptance criteria should gate `ag implement` not `ag plan`.
+
+**User design decisions**:
+- `pre_commit_hook: fast|full|no` in STACK.md — fast skips tests and advisories, full runs everything, no disables hooks
+- CI detection in dispatcher — hooks should never run in CI environments
+- `ag hooks install|status|disable` for manual management
+- `disable` requires `--confirm` flag (destructive action pattern)
+- Backward compat: `yes` maps to `fast`
+- Both profiles get hooks (Core profile users: Core+PM-specific checks self-skip)
+
+**Impact**: The 13-check pre-commit quality gate is now structurally enforced via git's `core.hooksPath` mechanism. No more bypassing quality gates by using raw `git commit`.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.25.4
+**Current Version**: v0.25.6
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 48 behavioral test scripts

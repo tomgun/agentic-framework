@@ -5,7 +5,7 @@
 # BLOCKS commit if validation fails (exit code 1).
 #
 # Usage:
-#   bash .agentic/hooks/pre-commit-check.sh
+#   bash .agentic/hooks/pre-commit-check.sh [--mode fast|full]
 #
 # Checks:
 #   1.  .agentic-state/WIP.md must not exist (work must be complete)
@@ -34,6 +34,24 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${PROJECT_ROOT}"
+
+# === Mode flag ===
+# --mode fast: skip slow/advisory checks (4,5,6,8,9,10,12)
+# --mode full: run all checks (default when called directly)
+_FAST_MODE=0
+for _arg in "$@"; do
+    case "$_arg" in
+        --mode)
+            :  # next arg is the value
+            ;;
+        fast)
+            _FAST_MODE=1
+            ;;
+        full)
+            _FAST_MODE=0
+            ;;
+    esac
+done
 
 # === Escape Hatches ===
 # For legitimate bypasses (WIP branches, urgent hotfixes)
@@ -297,7 +315,9 @@ if [[ -f "spec/FEATURES.md" ]]; then
 fi
 
 # Check 4: STACK.md version sanity (where detectable)
-if [[ -f "STACK.md" ]]; then
+if [[ $_FAST_MODE -eq 1 ]]; then
+  : # skip in fast mode
+elif [[ -f "STACK.md" ]]; then
   echo ""
   echo "[4/12] Checking STACK.md version consistency..."
   
@@ -333,10 +353,12 @@ else
 fi
 
 # Check 5: Batch size warning (small batches = quality)
-echo ""
-echo "[5/12] Checking batch size (small batches = quality)..."
+if [[ $_FAST_MODE -eq 1 ]]; then
+  : # skip in fast mode
+elif command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  echo ""
+  echo "[5/12] Checking batch size (small batches = quality)..."
 
-if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   # Count staged files
   CHANGED_FILES=$(git diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
   
@@ -365,13 +387,17 @@ else
 fi
 
 # Check 6: Test execution (BLOCKING)
-echo ""
-echo "═══════════════════════════════════════════════════════════════════════"
-echo "[6/12] Running tests..."
-
-if [[ -n "${SKIP_TESTS:-}" ]]; then
+if [[ $_FAST_MODE -eq 1 ]]; then
+  : # skip tests in fast mode (too slow for pre-commit)
+elif [[ -n "${SKIP_TESTS:-}" ]]; then
+  echo ""
+  echo "═══════════════════════════════════════════════════════════════════════"
+  echo "[6/12] Running tests..."
   echo "  ⚠ Skipped (SKIP_TESTS set)"
 else
+  echo ""
+  echo "═══════════════════════════════════════════════════════════════════════"
+  echo "[6/12] Running tests..."
   # Prefer fast tests for pre-commit, fall back to full test command
   TEST_CMD=""
   if [[ -f "STACK.md" ]]; then
@@ -534,10 +560,11 @@ else
 fi
 
 # Check 8: Untracked files in project directories
-echo ""
-echo "[8/12] Checking for untracked files in project directories..."
-
-if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+if [[ $_FAST_MODE -eq 1 ]]; then
+  : # skip in fast mode
+elif command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  echo ""
+  echo "[8/12] Checking for untracked files in project directories..."
   # Directories that should typically have files tracked
   CHECK_DIRS=("src" "lib" "app" "assets" "public" "tests" "test" "spec" "docs" "scripts")
   
@@ -579,7 +606,9 @@ else
 fi
 
 # Check 9: LLM behavioral test status (advisory, framework development only)
-if [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/VERIFICATION_REPORT.md" ]]; then
+if [[ $_FAST_MODE -eq 1 ]]; then
+  : # skip in fast mode
+elif [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/VERIFICATION_REPORT.md" ]]; then
   echo ""
   echo "[9/12] Checking LLM behavioral test status..."
   if bash .agentic/tools/llm-test-status.sh --quiet 2>/dev/null; then
@@ -592,6 +621,9 @@ if [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/VERIFICATION_REP
 fi
 
 # Check 10: Agent instruction file size limits (prevents context bloat)
+if [[ $_FAST_MODE -eq 1 ]]; then
+  : # skip in fast mode
+else
 echo ""
 echo "[10/12] Checking agent instruction file sizes..."
 
@@ -626,10 +658,13 @@ if [[ $SIZE_WARNINGS -gt 0 ]]; then
   echo ""
   echo "   (File size warnings are advisory, not blocking commit)"
 fi
+fi  # end fast mode skip for check 10
 
 # Check 12: Workflow bypass detection (Core+PM only)
 # Did the agent use ag implement (which creates WIP with a feature ID)?
-if [[ -f "spec/FEATURES.md" ]]; then
+if [[ $_FAST_MODE -eq 1 ]]; then
+  : # skip in fast mode
+elif [[ -f "spec/FEATURES.md" ]]; then
   echo ""
   echo "[12/13] Checking workflow compliance (Core+PM)..."
 

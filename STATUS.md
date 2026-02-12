@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0128 specs-before-code enforcement shipped (v0.25.5) (Updated: 2026-02-12 07:35)
+- F-0129: Git hook enforcement shipped (v0.25.6) (Updated: 2026-02-12 13:30 EET)
 
 ## Current focus
 - Domain categories + systematic brownfield spec generation (v0.25.0)
