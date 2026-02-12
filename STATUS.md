@@ -5,27 +5,26 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Infrastructure validation tests implemented, 52/52 passing (Updated: 2026-02-12 15:21 EET)
+- Infrastructure validation shipped (PR #27). Next: run LLM tests, real-world validation. (Updated: 2026-02-12 22:23 EET)
 
 ## Current focus
-- Domain categories + systematic brownfield spec generation (v0.25.0)
+- Infrastructure validation tests shipped (v0.25.6, PR #27)
+- Three-layer enforcement proven: git hooks + CLAUDE.md triggers + memory seed
 
 ## In progress
-- None
+- PR #27 awaiting review (infrastructure validation tests)
 
 ## Next up
-- Re-run LLM tests with full 48-test suite to get updated pass rates
-- Real-world project validation (non-framework)
-- Consider progressive disclosure implementation
-- Context7 MCP integration: test in real project scenario
+- Run infrastructure LLM tests (`bash tests/infrastructure/run.sh --with-llm`)
+- Run interactive memory tests (`bash tests/infrastructure/run.sh --interactive`)
+- Real-world project validation (non-framework project)
 
 ## Backlog
-- Apply mutation tests to framework LLM tests (validate tests catch real failures)
 - Progressive disclosure of complexity
+- Context7 MCP integration: test in real project scenario
 - Automated CI for LLM tests via Claude CLI
 
 ## Known issues / risks
-- LLM tests run interactively (simulated) — need Claude CLI for fully automated runs
 - Some CHANGELOG.md historical references point to old file locations (acceptable — historical records)
 
 ## Decisions needed
