@@ -6,12 +6,13 @@
 #   bash .agentic/tools/sync.sh --check      # Dry run: detect only, no auto-fixes
 #   bash .agentic/tools/sync.sh --quiet      # One-line summary (for ag start probe)
 #
-# Five check phases:
+# Six check phases:
 #   1. Memory seed integrity
 #   2. State freshness (journal, STATUS, CHANGELOG)
 #   3. Feature reconciliation (Core+PM only)
 #   4. Spec/doc drift (skipped in --quiet)
 #   5. Tool parity (instruction files + trigger tables)
+#   6. Git hook configuration
 #
 # Exit code: always 0 (advisory tool).
 
@@ -447,6 +448,35 @@ phase_tool_parity() {
 }
 
 # ============================================================================
+# Phase 6: Git hook configuration
+# ============================================================================
+phase_hooks() {
+    if ! command -v git >/dev/null 2>&1 || ! git rev-parse --git-dir >/dev/null 2>&1; then
+        return 0
+    fi
+
+    local hooks_path
+    hooks_path=$(git config core.hooksPath 2>/dev/null || echo "")
+
+    if [ "$hooks_path" = ".agentic/hooks" ]; then
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "Git hooks:  ${GREEN}OK (core.hooksPath = .agentic/hooks)${NC}"
+        fi
+    elif [ "$MODE" = "full" ]; then
+        git config core.hooksPath .agentic/hooks
+        record_fixed
+        echo -e "Git hooks:  ${GREEN}FIXED (set core.hooksPath to .agentic/hooks)${NC}"
+    else
+        record_issue "git hooks not configured"
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "Git hooks:  ${YELLOW}NOT CONFIGURED${NC}"
+            echo -e "            Fix: ag hooks install"
+        fi
+    fi
+}
+
+# ============================================================================
 # Main
 # ============================================================================
 main() {
@@ -457,6 +487,7 @@ main() {
         phase_features
         # Skip phase 4 (slow)
         phase_tool_parity
+        phase_hooks
 
         # Output one-line summary only if issues exist
         if [ "$ISSUE_COUNT" -gt 0 ]; then
@@ -483,6 +514,7 @@ main() {
     phase_features
     phase_spec_drift
     phase_tool_parity
+    phase_hooks
 
     # Summary
     echo ""

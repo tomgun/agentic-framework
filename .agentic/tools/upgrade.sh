@@ -382,6 +382,47 @@ fi
 
 echo ""
 
+# Step 7b: Git hook configuration
+echo -e "${BLUE}[7b/10] Configuring git hooks${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+if [[ "$DRY_RUN" == "yes" ]]; then
+  echo "  [DRY RUN] Would configure git hooks"
+else
+  # Configure core.hooksPath
+  if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+    CURRENT_HOOKS_PATH=$(git config core.hooksPath 2>/dev/null || echo "")
+    if [[ "$CURRENT_HOOKS_PATH" != ".agentic/hooks" ]]; then
+      git config core.hooksPath .agentic/hooks
+      echo -e "  ${GREEN}✓${NC} Set core.hooksPath to .agentic/hooks"
+    else
+      echo -e "  ${GREEN}✓${NC} core.hooksPath already configured"
+    fi
+
+    # Clean up stale file-copied hook from old scaffold.sh
+    if [[ -f "$TARGET_PROJECT_DIR/.git/hooks/pre-commit" ]]; then
+      if grep -q "validate_specs" "$TARGET_PROJECT_DIR/.git/hooks/pre-commit" 2>/dev/null; then
+        rm -f "$TARGET_PROJECT_DIR/.git/hooks/pre-commit"
+        echo -e "  ${GREEN}✓${NC} Removed stale .git/hooks/pre-commit (replaced by core.hooksPath)"
+      fi
+    fi
+  fi
+
+  # Migrate pre_commit_hook: yes → fast in STACK.md
+  if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+    if grep -qE "^[- ]*pre_commit_hook:[[:space:]]*yes" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null; then
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' -E 's/^([- ]*pre_commit_hook:[[:space:]]*)yes/\1fast  # fast | full | no/' "$TARGET_PROJECT_DIR/STACK.md"
+      else
+        sed -i -E 's/^([- ]*pre_commit_hook:[[:space:]]*)yes/\1fast  # fast | full | no/' "$TARGET_PROJECT_DIR/STACK.md"
+      fi
+      echo -e "  ${GREEN}✓${NC} Migrated pre_commit_hook: yes → fast"
+    fi
+  fi
+fi
+
+echo ""
+
 # Step 8: Verification (was 7/9)
 echo -e "${BLUE}[8/10] Running verification${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

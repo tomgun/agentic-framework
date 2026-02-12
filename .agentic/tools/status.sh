@@ -40,11 +40,11 @@ _apply_to_md() {
     local next_step="$3"
     local blocker="$4"
     local timestamp
-    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    timestamp=$(date +"%Y-%m-%dT%H:%M:%S%z")
 
-    # Convert ISO timestamp to readable format
+    # Convert ISO timestamp to readable format with timezone
     local readable_date
-    readable_date=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$timestamp" "+%Y-%m-%d %H:%M" 2>/dev/null || echo "$timestamp")
+    readable_date=$(date "+%Y-%m-%d %H:%M %Z" 2>/dev/null || echo "$timestamp")
 
     # Update STATUS.md sections using awk (preserves other content)
     awk -v focus="$focus" -v progress="$progress" -v next_step="$next_step" -v blocker="$blocker" -v ts="$readable_date" '
