@@ -15,6 +15,13 @@ _No active items_
 
 ---
 
+### HN-0002: PR #27: Infrastructure validation tests
+- **Type**: review
+- **Added**: 2026-02-12
+- **Context**: https://github.com/tomgun/agentic-framework/pull/27
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 <!-- Archive resolved items here with date and outcome -->
@@ -23,3 +30,11 @@ _No active items_
 - **Type**: review
 - **Resolved**: 2026-01-28
 - **Outcome**: PR merged
+
+### HN-0002: PR #27: Infrastructure validation tests
+- **Type**: review
+- **Added**: 2026-02-12
+- **Context**: https://github.com/tomgun/agentic-framework/pull/27
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
