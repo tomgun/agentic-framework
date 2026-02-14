@@ -2003,6 +2003,27 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0130: Rough Specs & Structural Nudging
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: low
+**Since**: v0.25.8
+
+**Description**: Core profile gets zero spec nudging — agents skip criteria entirely. This adds structural reminders (D2: scripts > docs) for thinking about success criteria before coding. Core gets non-blocking nudges; Core+PM gets spec evolution surfacing. Also removes dead-code `## Project Phase` section from STATUS.template.md (Profile handles spec rigor).
+
+**Dependencies**: F-0128 (Specs-Before-Code), F-0006 (Acceptance-Driven Development)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/ag.sh` (cmd_work nudge, cmd_done spec review), `.agentic/tools/wip.sh` (Success Criteria section), `.agentic/hooks/pre-commit-check.sh` (Core checklist), `.agentic/tools/sync.sh` (acceptance file check), `.agentic/workflows/spec_evolution.md` (Starting Rough section), `.agentic/PRINCIPLES.md` (D4 guidance)
+- Removed: `## Project Phase` from STATUS.template.md, Phase refs from Stop.sh, upgrade.sh, session-start.sh, ag.sh
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0130.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |

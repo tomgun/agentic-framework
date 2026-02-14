@@ -4,6 +4,21 @@
 
 ---
 
+## Starting Rough Is OK
+
+2-3 bullet points answering "What would success look like?" is a valid starting spec.
+
+**The flow**: rough spec → implement → discover → `[Discovered]` markers → human reviews evolved spec
+
+| Profile | Where criteria live | When to formalize |
+|---------|-------------------|-------------------|
+| **Core** | WIP.md, JOURNAL.md, or inline | Upgrade to Core+PM when persistence needed |
+| **Core+PM** | `spec/acceptance/F-####.md` | Can start rough, evolve during implementation |
+
+Rough specs lower the barrier to thinking about success criteria — the alternative (no criteria at all) is worse than imperfect criteria.
+
+---
+
 ## Why Specs Evolve
 
 During implementation, you will discover:

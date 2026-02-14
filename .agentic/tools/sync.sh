@@ -305,6 +305,18 @@ phase_features() {
         fi
     done
 
+    # Check in_progress features have acceptance criteria
+    for fid in $in_progress_features; do
+        if [ ! -f "$ROOT_DIR/spec/acceptance/${fid}.md" ]; then
+            record_issue "$fid no-acceptance"
+            ((feature_issues++))
+            if [ "$MODE" != "quiet" ]; then
+                echo -e "            $fid: in_progress but no acceptance criteria"
+                echo -e "            Create: spec/acceptance/${fid}.md (even rough 2-3 bullet points)"
+            fi
+        fi
+    done
+
     # Check planned features that have commits (should be in_progress)
     local planned_features
     planned_features=$(grep -B1 -iE "status:.*(planned|pending)" "$features_file" 2>/dev/null | grep -oE "F-[0-9]+" || true)
