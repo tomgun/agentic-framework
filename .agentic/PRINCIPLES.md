@@ -4,7 +4,7 @@
 
 **For New Contributors**: Understand these before proposing changes. **For Agents**: These are non-negotiable guidance.
 
-**Structure**: 3 FOUNDATION principles (WHY the framework exists) + 6 NON-NEGOTIABLE principles (enforced rules & guardrails) + 3 RECOMMENDED principles (highly valuable, adaptable to context). All 9 FOUNDATION + NON-NEGOTIABLE are mandatory; the tier distinction is importance/abstraction level.
+**Structure**: 3 FOUNDATION + 7 DESIGN PRINCIPLES + 3 OPERATIONAL RULES (13 total). All are mandatory. The tier distinction is abstraction level (WHY → HOW → WHAT), not enforcement level. When principles conflict, specificity wins: Rules override Design Principles for concrete situations.
 
 ---
 
@@ -16,9 +16,61 @@ Every decision — feature design, documentation, tooling, agent instructions �
 
 ---
 
-## FOUNDATION Principles (WHY — the reasons this framework exists)
+## Derivation Hierarchy
 
-### 1. Developer-Friendly Experience
+Every non-foundation principle traces back to one or more parent principles, forming a directed acyclic graph (DAG). This makes the reasoning visible: you can trace any rule back to the foundational WHY it exists.
+
+```mermaid
+graph TB
+    subgraph FOUNDATION["FOUNDATION (WHY)"]
+        F1["F1: Developer-Friendly<br/>Experience"]
+        F2["F2: Sustainable Quality"]
+        F3["F3: Token & Context<br/>Optimization"]
+    end
+    subgraph DESIGN["DESIGN PRINCIPLES (HOW)"]
+        D1["D1: Human-Agent<br/>Partnership"]
+        D2["D2: Deterministic<br/>Enforcement"]
+        D3["D3: Durable Artifacts"]
+        D4["D4: Small Batch +<br/>Acceptance-Driven"]
+        D5["D5: Living<br/>Documentation"]
+        D6["D6: Green Coding"]
+        D7["D7: Multi-Env<br/>Portability"]
+    end
+    subgraph RULES["OPERATIONAL RULES (WHAT)"]
+        R1["R1: Anti-<br/>Hallucination"]
+        R2["R2: No Auto-<br/>Commits"]
+        R3["R3: Check Before<br/>Creating"]
+    end
+
+    F1 --> D1
+    F1 --> D2
+    F1 --> D3
+    F1 --> D7
+    F2 --> D1
+    F2 --> D2
+    F2 --> D3
+    F2 --> D4
+    F2 --> D5
+    F2 --> D6
+    F2 --> D7
+    F3 --> D2
+    F3 --> D3
+    F3 --> D4
+    F2 --> R1
+    F2 --> R3
+    F3 --> R3
+    D1 --> R1
+    D1 --> R2
+    D2 --> R2
+    D3 --> R1
+    D3 --> D5
+```
+
+---
+
+## FOUNDATION (WHY — the reasons this framework exists)
+
+### F1. Developer-Friendly Experience
 
 **What**: The framework makes the developer's life easier. It adds on top of using Claude (or any AI tool) directly: context reconstruction, automatic documentation, guided workflows, state recovery, decision surfacing, and passive learning.
 
@@ -36,7 +88,7 @@ Every decision — feature design, documentation, tooling, agent instructions �
 
 ---
 
-### 2. Sustainable Long-Term Development & Quality Software
+### F2. Sustainable Long-Term Development & Quality Software
 
 **What**: AI-assisted projects produce properly designed, tested, and documented software that stays reliable over time. When specs, criteria, and tests exist, agents can't silently regress working features — even if the developer doesn't review every line.
 
@@ -56,9 +108,9 @@ Every decision — feature design, documentation, tooling, agent instructions �
 
 ---
 
-### 3. Context Efficiency
+### F3. Token & Context Optimization
 
-**What**: Limited context windows are the fundamental constraint of AI-assisted development. Every framework decision respects this constraint.
+**What**: Tokens cost money, context windows are limited, and compute has environmental impact. Every framework decision respects these constraints — from choosing appropriate models per task to loading minimal context to using scripts that are 40x cheaper than read-modify-write.
 
 **Why**: Reading entire codebases repeatedly is prohibitive. Context resets would kill projects without strategy. Token costs compound over months. This is the #1 unique technical insight of this framework.
 
@@ -77,13 +129,15 @@ Every decision — feature design, documentation, tooling, agent instructions �
 
 ---
 
-## NON-NEGOTIABLE Principles (HOW — enforced rules & guardrails)
+## DESIGN PRINCIPLES (HOW — strategies that serve the foundations)
 
-### 4. Human-Agent Partnership
+### D1. Human-Agent Partnership
 
 **What**: Humans and AI agents collaborate as partners. Humans define WHAT, agents handle HOW. Neither alone is optimal.
 
 **Why**: Humans have domain knowledge and judgment. AI has execution speed and consistency. Specs (markdown files) are the collaboration interface — readable and editable by both. Human oversight is a feature, not a bug.
+
+**Derives from**: F1 (UX requires human control), F2 (quality needs human judgment)
 
 **Key Practices**:
 - Humans can directly edit specs (FEATURES.md, acceptance criteria, STATUS.md)
@@ -96,11 +150,13 @@ Every decision — feature design, documentation, tooling, agent instructions �
 
 ---
 
-### 5. Deterministic Enforcement
+### D2. Deterministic Enforcement
 
 **What**: Critical behavior is enforced by scripts and gates, not by documentation and hope. This is what makes the framework actually work.
 
 **Why**: Documentation can be ignored. Guidelines can be misunderstood. Different AI models interpret rules differently. Critical workflows must be reliable, not "usually" reliable. Scripts enforce the same behavior regardless of which agent runs them.
+
+**Derives from**: F1 (predictable UX requires enforcement), F2 (quality needs enforcement), F3 (scripts more token-efficient than behavioral rules)
 
 **Key Practices**:
 - **Scripts > Documentation**: `wip.sh check` returns exit code, doesn't just advise
@@ -129,11 +185,13 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 ---
 
-### 6. Durable Artifacts
+### D3. Durable Artifacts
 
 **What**: Living documents that capture project truth, readable by both humans and agents. The core mechanism for surviving context resets.
 
 **Why**: Without persistent state, every new session starts from scratch. Re-reading the same code every session wastes tokens and time. These artifacts serve dual purpose: agents read them for context; humans read them for project awareness (zero tokens).
+
+**Derives from**: F1 (humans read artifacts without agent), F2 (state must survive for quality), F3 (artifacts replace re-scanning code)
 
 **The Artifacts**:
 - **CONTEXT_PACK.md**: Architecture snapshot — where things are, how they connect. Read this first.
@@ -151,69 +209,13 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 ---
 
-### 7. Anti-Hallucination (NON-NEGOTIABLE)
-
-**What**: Agents must NEVER fabricate information — APIs, function signatures, endpoints, library behavior, or technical claims.
-
-**Why**: Hallucinated code causes runtime errors and security vulnerabilities. Guessed API signatures waste hours of debugging. One hallucination can cascade into systemic problems. This undermines ALL other quality principles.
-
-**Key Practices**:
-- NEVER make things up — state uncertainty, look it up, or ask
-- Verify technical claims against version-specific documentation
-- Use HUMAN_NEEDED.md when uncertain
-- "I don't know" is explicitly encouraged
-- Wrong code that looks right is worse than no code — accuracy > speed
-
-**Anti-pattern**: Guessing API signatures. "It probably works like..." Assuming library behavior from training data. Fabricating function names or parameters.
-
-**Enforcement**: Behavioral — reinforced by LLM tests (LLM-027, 028, 029), memory seed, and agent guidelines. Cannot be structurally gated.
-
-**Reference**: `agent_operating_guidelines.md` Anti-Hallucination Rules
-
----
-
-### 8. No Auto-Commits Without Approval (NON-NEGOTIABLE)
-
-**What**: Agents NEVER commit changes without explicit human approval.
-
-**Why**: Humans need to review what changed and why. This is the safety gate that prevents compounding mistakes. Agents present changes, wait for approval, then commit.
-
-**Enforcement**: Behavioral — LLM test (LLM-005) verifies compliance. Cannot be structurally gated since git commit always succeeds.
-
-**Exception**: User may grant blanket approval for a session.
-
-**Anti-pattern**: "I've committed your changes" (past tense, no approval). Blanket auto-commit by default.
-
-**Reference**: `git_workflow.md`
-
----
-
-### 9. Check Before Creating (NON-NEGOTIABLE)
-
-**What**: Before creating any file, test, document, or component, agents MUST check if equivalent functionality already exists.
-
-**Why**: Duplication wastes effort and creates maintenance burden. Existing implementations may have edge cases already handled. "I didn't know that existed" is not an excuse — checking is mandatory. Proven by real-world discovery (duplicate test 020/025).
-
-**What to Check**:
-| Creating | Check First |
-|----------|-------------|
-| New test | Existing tests in same area (`grep`, test_definitions.json) |
-| New doc | Existing docs on topic (`grep`, list docs/) |
-| New component | Similar components in codebase |
-| New utility | Existing utilities with similar names/functions |
-| New principle | PRINCIPLES.md for existing coverage |
-
-**Anti-pattern**: Creating without searching. "I'll just add a new one, it's faster." Creating auth.js when AuthService.ts exists.
-
----
-
-## RECOMMENDED Principles
-
-### 10. Small Batch + Acceptance-Driven Development
+### D4. Small Batch + Acceptance-Driven Development
 
 **What**: Work in small, isolated batches at the feature level. Define acceptance criteria before implementation. Specs evolve with discoveries.
 
 **Why**: AI agents lose focus in large batches — context drift is real. Small changes are easy to verify and rollback. Acceptance criteria define "done" before code is written. But specs aren't perfect upfront — they evolve during implementation.
+
+**Derives from**: F2 (quality through criteria + small batches), F3 (smaller batches = less context needed)
 
 **Small Batch Rules**:
 - ONE feature at a time per agent (multi-agent teams use worktrees for parallel work)
@@ -237,11 +239,13 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 ---
 
-### 11. Living Documentation
+### D5. Living Documentation
 
 **What**: Documentation stays current, has one authoritative location per topic, and is explicit enough for any agent to follow.
 
 **Why**: Stale docs are worse than no docs. Duplicated information drifts apart. Agents interpret ambiguity differently. Clear, current, single-source documentation is the foundation of sustainable AI-assisted development.
+
+**Derives from**: F2 (stale docs = quality problem), D3 (docs ARE artifacts)
 
 **Key Practices**:
 - **Same commit rule**: Documentation updated in same commit as code changes (MANDATORY)
@@ -263,19 +267,105 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 ---
 
-### 12. Green Coding
+### D6. Green Coding
 
 **What**: The framework helps projects produce environmentally efficient software through practical guidance and awareness.
 
 **Why**: Energy-efficient code is usually faster, cheaper, and more maintainable. Green principles align with performance optimization. Developer responsibility extends to environmental impact.
 
+**Derives from**: F2 (environmental quality of output code)
+
 **Two Aspects**:
-1. **Framework operations**: Token efficiency (Principle #3) inherently reduces compute energy
+1. **Framework operations**: Token efficiency (F3) inherently reduces compute energy
 2. **Project output**: Practical guidance for writing efficient code — algorithms, caching, event-driven patterns, resource optimization
 
 **Reference**: See `.agentic/quality/green_coding.md` for comprehensive guidelines covering algorithms, caching, lazy loading, event-driven patterns, resource optimization, and infrastructure choices.
 
 **Anti-pattern**: Polling every second when webhooks would work. Loading entire datasets when pagination would suffice. Unoptimized algorithms causing excessive CPU usage.
+
+---
+
+### D7. Multi-Environment Portability
+
+**What**: Developers can continue work seamlessly across different machines and AI tools (Claude Code, Cursor, Copilot, Codex). Same project state, same conventions, same enforcement — regardless of which tool runs the session.
+
+**Why**: AI tool subscriptions have limits. Different tools excel at different tasks. Teams use multiple tools. Long-term projects can't be locked to one vendor. This is why we maintain instruction parity (4 instruction file templates), distributed enforcement (scripts work in any tool), and tool-agnostic state files.
+
+**Derives from**: F1 (seamless switching is developer-friendly UX), F2 (long-term projects need tool flexibility)
+
+**Key Practices**:
+- Instruction parity across tools (CLAUDE.md, .cursorrules, copilot-instructions.md, codex-instructions.md)
+- Distributed enforcement via scripts — `ag.sh`, `pre-commit-check.sh`, `context-for-role.sh` work in any tool
+- Durable artifacts in tool-agnostic formats (plain markdown, YAML frontmatter)
+- `context-for-role.sh` assembles context for any tool's subagent model
+
+**Existing features**: F-0054 (multi-environment support), distributed enforcement model (`docs/INSTRUCTION_ARCHITECTURE.md` §6), 4 instruction file templates, `context-for-role.sh`.
+
+**Anti-pattern**: Tool-specific config that only works in one IDE. State stored in tool-proprietary formats. Features that depend on a single tool's API.
+
+---
+
+## OPERATIONAL RULES (WHAT — concrete, testable constraints)
+
+### R1. Anti-Hallucination
+
+**What**: Agents must NEVER fabricate information — APIs, function signatures, endpoints, library behavior, or technical claims.
+
+**Why**: Hallucinated code causes runtime errors and security vulnerabilities. Guessed API signatures waste hours of debugging. One hallucination can cascade into systemic problems. This undermines ALL other quality principles.
+
+**Derives from**: D1 (trust requires accuracy), D3 (artifacts must contain truth), F2 (quality baseline: no fabrication)
+
+**Key Practices**:
+- NEVER make things up — state uncertainty, look it up, or ask
+- Verify technical claims against version-specific documentation
+- Use HUMAN_NEEDED.md when uncertain
+- "I don't know" is explicitly encouraged
+- Wrong code that looks right is worse than no code — accuracy > speed
+
+**Anti-pattern**: Guessing API signatures. "It probably works like..." Assuming library behavior from training data. Fabricating function names or parameters.
+
+**Enforcement**: Behavioral — reinforced by LLM tests (LLM-027, 028, 029), memory seed, and agent guidelines. Cannot be structurally gated.
+
+**Reference**: `agent_operating_guidelines.md` Anti-Hallucination Rules
+
+---
+
+### R2. No Auto-Commits Without Approval
+
+**What**: Agents NEVER commit changes without explicit human approval.
+
+**Why**: Humans need to review what changed and why. This is the safety gate that prevents compounding mistakes. Agents present changes, wait for approval, then commit.
+
+**Derives from**: D1 (humans must approve), D2 (enforcement gate)
+
+**Enforcement**: Behavioral — LLM test (LLM-005) verifies compliance. Cannot be structurally gated since git commit always succeeds.
+
+**Exception**: User may grant blanket approval for a session.
+
+**Anti-pattern**: "I've committed your changes" (past tense, no approval). Blanket auto-commit by default.
+
+**Reference**: `git_workflow.md`
+
+---
+
+### R3. Check Before Creating
+
+**What**: Before creating any file, test, document, or component, agents MUST check if equivalent functionality already exists.
+
+**Why**: Duplication wastes effort and creates maintenance burden. Existing implementations may have edge cases already handled. "I didn't know that existed" is not an excuse — checking is mandatory. Proven by real-world discovery (duplicate test 020/025).
+
+**Derives from**: F2 (duplicates are quality problems), F3 (don't waste tokens creating duplicates)
+
+**What to Check**:
+| Creating | Check First |
+|----------|-------------|
+| New test | Existing tests in same area (`grep`, test_definitions.json) |
+| New doc | Existing docs on topic (`grep`, list docs/) |
+| New component | Similar components in codebase |
+| New utility | Existing utilities with similar names/functions |
+| New principle | PRINCIPLES.md for existing coverage |
+
+**Anti-pattern**: Creating without searching. "I'll just add a new one, it's faster." Creating auth.js when AuthService.ts exists.
 
 ---
 
@@ -293,14 +383,16 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 **For Contributors**: Propose changes consistent with principles. Challenge principles if context has changed (with strong rationale).
 
-**For Agents**: These principles guide all work. When uncertain, return to principles. NON-NEGOTIABLE means NON-NEGOTIABLE. FOUNDATION principles are the highest tier — they are the reasons the framework exists.
+**For Agents**: These principles guide all work. When uncertain, return to principles. Operational Rules are concrete constraints — follow them exactly. Design Principles are strategies — apply judgment within them. Foundations are axiomatic — they are the reasons the framework exists.
+
+**Precedence**: When principles conflict, specificity wins. R-level rules override D-level principles for concrete situations. D-level principles override F-level foundations for strategic decisions. Trace the derivation DAG to understand why a rule exists.
 
 **Architecture**: These principles are implemented through a three-layer instruction architecture (Constitution → Playbooks → State). See `docs/INSTRUCTION_ARCHITECTURE.md` for the design basis.
 
 ---
 
-**Last Updated**: 2026-02-13
-**Framework Version**: 0.25.6
+**Last Updated**: 2026-02-14
+**Framework Version**: 0.25.7
 
 **Note**: Principles evolve, but slowly. Major changes require strong justification.
 

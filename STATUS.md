@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Principle restructuring complete — 3 FOUNDATION + 6 NON-NEGOTIABLE + 3 RECOMMENDED. Ready for PR. (Updated: 2026-02-14 09:46 EET)
+- Principles DAG hierarchy — ready to commit (Updated: 2026-02-14 14:19 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

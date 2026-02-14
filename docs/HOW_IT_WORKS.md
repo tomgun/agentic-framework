@@ -11,23 +11,24 @@
 ```mermaid
 graph TB
     subgraph PRINCIPLES["PRINCIPLES (Why)"]
-        subgraph FOUNDATION["FOUNDATION (Why it exists)"]
-            P1[1. Developer-Friendly Experience]
-            P2[2. Sustainable Quality]
-            P3[3. Context Efficiency]
+        subgraph FOUNDATION["FOUNDATION (WHY)"]
+            F1[F1: Developer-Friendly Experience]
+            F2[F2: Sustainable Quality]
+            F3[F3: Token & Context<br/>Optimization]
         end
-        subgraph NONNEG["NON-NEGOTIABLE (Enforced rules)"]
-            P4[4. Human-Agent Partnership]
-            P5[5. Deterministic Enforcement]
-            P6[6. Durable Artifacts]
-            P7[7. Anti-Hallucination]
-            P8[8. No Auto-Commits]
-            P9[9. Check Before Creating]
+        subgraph DESIGN["DESIGN PRINCIPLES (HOW)"]
+            D1[D1: Human-Agent Partnership]
+            D2[D2: Deterministic Enforcement]
+            D3[D3: Durable Artifacts]
+            D4[D4: Small Batch + Acceptance-Driven]
+            D5[D5: Living Documentation]
+            D6[D6: Green Coding]
+            D7[D7: Multi-Env Portability]
         end
-        subgraph RECOMMENDED["RECOMMENDED (Best practices)"]
-            P10[10. Small Batch + Acceptance-Driven]
-            P11[11. Living Documentation]
-            P12[12. Green Coding]
+        subgraph RULES["OPERATIONAL RULES (WHAT)"]
+            R1[R1: Anti-Hallucination]
+            R2[R2: No Auto-Commits]
+            R3[R3: Check Before Creating]
         end
         KISS[META: KISS]
     end
@@ -51,7 +52,7 @@ graph TB
         F_HUMAN_NEEDED[Human Escalation<br/>F-0026]
         F_PR_WORKFLOW[PR Workflow<br/>F-0096]
 
-        %% Context Efficiency
+        %% Token & Context Optimization
         F_TOKEN_SCRIPTS[Token-Efficient Scripts<br/>F-0041]
         F_AGENT_ROLES[Agent Roles + Manifests<br/>F-0035, F-0036]
         F_ORCHESTRATOR[Orchestrator Agent<br/>F-0081]
@@ -105,7 +106,7 @@ graph TB
         %% Structural
         M_HOOKS_PATH[git core.hooksPath<br/>.agentic/hooks/]
         M_CLAUDE_MD[CLAUDE.md template<br/>~40 lines constitution]
-        M_AUTO_ORCH[auto_orchestration.md<br/>playbook, 384 lines]
+        M_AUTO_ORCH[auto_orchestration.md<br/>playbook, 442 lines]
         M_MEMORY[memory-seed.md<br/>persistent memory]
         M_STACK[STACK.md<br/>machine-readable config]
 
@@ -121,72 +122,75 @@ graph TB
 
     %% Principle → Feature connections
 
-    %% P1: Developer-Friendly Experience
-    P1 --> F_SESSION
-    P1 --> F_STATUS
-    P1 --> F_MANUAL_OPS
-    P1 --> F_HUMAN_NEEDED
-    P1 --> F_DISCOVERY
-    P1 --> F_TIP
-    P1 --> F_REMIND
+    %% F1: Developer-Friendly Experience
+    F1 --> F_SESSION
+    F1 --> F_STATUS
+    F1 --> F_MANUAL_OPS
+    F1 --> F_HUMAN_NEEDED
+    F1 --> F_DISCOVERY
+    F1 --> F_TIP
+    F1 --> F_REMIND
 
-    %% P2: Sustainable Quality (merged old P1 + Quality)
-    P2 --> F_SESSION
-    P2 --> F_WIP
-    P2 --> F_MULTI_ENV
-    P2 --> F_STATUS
-    P2 --> F_JOURNAL
-    P2 --> F_QUALITY
-    P2 --> F_SPECS
+    %% F2: Sustainable Quality
+    F2 --> F_SESSION
+    F2 --> F_WIP
+    F2 --> F_MULTI_ENV
+    F2 --> F_STATUS
+    F2 --> F_JOURNAL
+    F2 --> F_QUALITY
+    F2 --> F_SPECS
 
-    %% P3: Context Efficiency
-    P3 --> F_TOKEN_SCRIPTS
-    P3 --> F_AGENT_ROLES
-    P3 --> F_ORCHESTRATOR
-    P3 --> F_CONTEXT_MANIFESTS
-    P3 --> F_AGENT_MODE
+    %% F3: Token & Context Optimization
+    F3 --> F_TOKEN_SCRIPTS
+    F3 --> F_AGENT_ROLES
+    F3 --> F_ORCHESTRATOR
+    F3 --> F_CONTEXT_MANIFESTS
+    F3 --> F_AGENT_MODE
 
-    %% P4: Human-Agent Partnership
-    P4 --> F_HUMAN_NEEDED
-    P4 --> F_MANUAL_OPS
-    P4 --> F_PR_WORKFLOW
-    P4 --> F_PLAN_REVIEW
+    %% D1: Human-Agent Partnership
+    D1 --> F_HUMAN_NEEDED
+    D1 --> F_MANUAL_OPS
+    D1 --> F_PR_WORKFLOW
+    D1 --> F_PLAN_REVIEW
 
-    %% P5: Deterministic Enforcement
-    P5 --> F_PRE_COMMIT
-    P5 --> F_GIT_HOOKS
-    P5 --> F_DOCTOR
-    P5 --> F_MEMORY_SEED
-    P5 --> F_THREE_LAYER
-    P5 --> F_QUALITY
+    %% D2: Deterministic Enforcement
+    D2 --> F_PRE_COMMIT
+    D2 --> F_GIT_HOOKS
+    D2 --> F_DOCTOR
+    D2 --> F_MEMORY_SEED
+    D2 --> F_THREE_LAYER
+    D2 --> F_QUALITY
 
-    %% P6: Durable Artifacts
-    P6 --> F_STATUS
-    P6 --> F_JOURNAL
-    P6 --> F_CONTEXT_PACK
-    P6 --> F_FEATURES_MD
+    %% D3: Durable Artifacts
+    D3 --> F_STATUS
+    D3 --> F_JOURNAL
+    D3 --> F_CONTEXT_PACK
+    D3 --> F_FEATURES_MD
 
-    %% P7: Anti-Hallucination
-    P7 --> F_LLM_TESTS
+    %% R1: Anti-Hallucination
+    R1 --> F_LLM_TESTS
 
-    %% P8: No Auto-Commits
-    P8 --> F_PR_WORKFLOW
-    P8 --> F_PRE_COMMIT
+    %% R2: No Auto-Commits
+    R2 --> F_PR_WORKFLOW
+    R2 --> F_PRE_COMMIT
 
-    %% P9: Check Before Creating
-    P9 --> F_LLM_TESTS
+    %% R3: Check Before Creating
+    R3 --> F_LLM_TESTS
 
-    %% P10: Small Batch + Acceptance-Driven
-    P10 --> F_SPECS
-    P10 --> F_SMALL_BATCH
-    P10 --> F_PLAN_REVIEW
-    P10 --> F_QUALITY
+    %% D4: Small Batch + Acceptance-Driven
+    D4 --> F_SPECS
+    D4 --> F_SMALL_BATCH
+    D4 --> F_PLAN_REVIEW
+    D4 --> F_QUALITY
 
-    %% P11: Living Documentation
-    P11 --> F_DISCOVERY
+    %% D5: Living Documentation
+    D5 --> F_DISCOVERY
 
-    %% P12: Green Coding
-    P12 --> F_TOKEN_SCRIPTS
+    %% D6: Green Coding
+    D6 --> F_TOKEN_SCRIPTS
+
+    %% D7: Multi-Env Portability
+    D7 --> F_MULTI_ENV
 
     %% Feature → Mechanism connections
     F_SESSION --> M_AG
@@ -218,8 +222,8 @@ graph TB
     classDef mechanism fill:#e8a838,color:#fff,stroke:#b8821c
     classDef dormant fill:#999,color:#fff,stroke:#666
 
-    class P1,P2,P3 foundation
-    class P4,P5,P6,P7,P8,P9,P10,P11,P12,KISS principle
+    class F1,F2,F3 foundation
+    class D1,D2,D3,D4,D5,D6,D7,R1,R2,R3,KISS principle
     class F_SESSION,F_WIP,F_MULTI_ENV,F_HUMAN_NEEDED,F_MANUAL_OPS,F_PR_WORKFLOW,F_TOKEN_SCRIPTS,F_AGENT_ROLES,F_ORCHESTRATOR,F_CONTEXT_MANIFESTS,F_PRE_COMMIT,F_GIT_HOOKS,F_DOCTOR,F_PHASE,F_MEMORY_SEED,F_THREE_LAYER,F_STATUS,F_JOURNAL,F_CONTEXT_PACK,F_FEATURES_MD,F_SPECS,F_PLAN_REVIEW,F_SMALL_BATCH,F_MULTI_AGENT,F_WORKTREE,F_SEQ_PIPELINE,F_INIT,F_DISCOVERY,F_BROWNFIELD,F_LLM_TESTS,F_MUTATION,F_FRAMEWORK_TESTS,F_QUALITY,F_TIP,F_REMIND feature
     class M_AG,M_PRECOMMIT,M_WIP_SH,M_STATUS_SH,M_FEATURE_SH,M_DOCTOR_PY,M_CONTEXT_ROLE,M_SYNC,M_DISCOVER,M_HOOKS_PATH,M_CLAUDE_MD,M_AUTO_ORCH,M_MEMORY,M_STACK,M_HARNESS,M_MUTATION_SH,M_VALIDATE,M_QUALITY_DOCS,M_QUALITY_WIRING mechanism
     class F_AGENT_MODE dormant
@@ -229,7 +233,7 @@ graph TB
 
 ## Principle-by-Principle Breakdown
 
-### Principle 1: Developer-Friendly Experience (FOUNDATION)
+### F1: Developer-Friendly Experience (FOUNDATION)
 
 > "The framework makes the developer's life easier — context reconstruction, automatic documentation, guided workflows."
 
@@ -247,7 +251,7 @@ graph TB
 
 ---
 
-### Principle 2: Sustainable Long-Term Development & Quality Software (FOUNDATION)
+### F2: Sustainable Long-Term Development & Quality Software (FOUNDATION)
 
 > "AI-assisted projects produce properly designed, tested, and documented software that stays reliable over time."
 
@@ -269,9 +273,9 @@ graph TB
 
 ---
 
-### Principle 3: Context Efficiency (FOUNDATION)
+### F3: Token & Context Optimization (FOUNDATION)
 
-> "Limited context windows are the fundamental constraint. Every decision respects this."
+> "Tokens cost money, context windows are limited, and compute has environmental impact. Every decision respects these constraints."
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
@@ -285,13 +289,13 @@ graph TB
 | **Reading Protocols** | `reading_protocols.md` defines token budgets per task type (3-5K for focused feature, not 50K). | DOCUMENTED - behavioral |
 | **Tier-Based Model Selection** (F-0082) | Model recommendations use tiers (Cheap/Fast, Mid-tier, Powerful) instead of specific names. Future-proof. | ACTIVE - documented in orchestration tables |
 
-**Hidden mechanism**: The `ag` command gateway is itself a context-efficiency mechanism. By printing just-in-time instructions (playbook references) when agents run commands, it avoids front-loading auto_orchestration.md (384 lines) into every session. Zero tokens until the agent actually needs the guidance.
+**Hidden mechanism**: The `ag` command gateway is itself a context-efficiency mechanism. By printing just-in-time instructions (playbook references) when agents run commands, it avoids front-loading auto_orchestration.md (442 lines) into every session. Zero tokens until the agent actually needs the guidance.
 
 **Hidden mechanism**: `context-for-role.sh` supports variable substitution in manifests (e.g., `${FEATURE_ID}` → `F-0042`), enabling manifests to dynamically reference the right acceptance criteria file without hardcoding.
 
 ---
 
-### Principle 4: Human-Agent Partnership (NON-NEGOTIABLE)
+### D1: Human-Agent Partnership (DESIGN PRINCIPLE)
 
 > "Humans define WHAT, agents handle HOW. Neither alone is optimal."
 
@@ -301,7 +305,7 @@ graph TB
 | **Manual Operations** (F-0067) | `MANUAL_OPERATIONS.md` documents all queries humans can run without agent (zero tokens). `cat STATUS.md`, `grep` patterns for feature status. | ACTIVE - documentation |
 | **PR Workflow** (F-0096) | Default for Core+PM. `pre-commit-check.sh` Check 11 blocks commits to main when `git_workflow: pull_request`. Forces feature branches + human review via PRs. | ACTIVE - structural gate |
 | **Plan-Review Loop** (F-0120) | Planner agent creates plan → Reviewer agent critiques → iterate until APPROVED or max iterations → ESCALATE to human. Configurable in STACK.md. | ACTIVE but UNDERUTILIZED - exists but not always triggered |
-| **No Auto-Commits** (P8) | Behavioral rule in CLAUDE.md + memory seed. LLM test 005 validates compliance. Git agent role shows changes and waits for approval. | ACTIVE - behavioral + tested |
+| **No Auto-Commits** (R2) | Behavioral rule in CLAUDE.md + memory seed. LLM test 005 validates compliance. Git agent role shows changes and waits for approval. | ACTIVE - behavioral + tested |
 | **Scope Drift Warning** (F-0114) | `scope_check.sh` compares changed files against WIP declared scope. Pre-commit warns on drift. Human judges whether drift is acceptable. | ACTIVE - advisory warning |
 | **CONTRIBUTIONS.md** | Logs human design insights and direction. Agent tracks human ideas vs agent implementation work. | ACTIVE - behavioral |
 
@@ -309,7 +313,7 @@ graph TB
 
 ---
 
-### Principle 5: Deterministic Enforcement (NON-NEGOTIABLE)
+### D2: Deterministic Enforcement (DESIGN PRINCIPLE)
 
 > "Critical behavior is enforced by scripts and gates, not by documentation and hope."
 
@@ -332,7 +336,7 @@ graph TB
 
 ---
 
-### Principle 6: Durable Artifacts (NON-NEGOTIABLE)
+### D3: Durable Artifacts (DESIGN PRINCIPLE)
 
 > "Living documents that capture project truth, readable by both humans and agents."
 
@@ -350,7 +354,7 @@ graph TB
 
 ---
 
-### Principle 10: Small Batch + Acceptance-Driven Development (RECOMMENDED)
+### D4: Small Batch + Acceptance-Driven Development (DESIGN PRINCIPLE)
 
 > "Work in small, isolated batches. Define acceptance criteria before implementation."
 
@@ -370,28 +374,28 @@ Some features serve multiple principles. Key cross-cutting features:
 
 | Feature | Principles Served |
 |---------|-------------------|
-| **Session Start Protocol** (F-0021) | P1 (Developer UX), P2 (Sustainability) |
-| **STATUS.md** (F-0024) | P1 (Developer UX), P2 (Sustainability), P6 (Durable Artifacts) |
-| **HUMAN_NEEDED.md** (F-0026) | P1 (Developer UX), P4 (Partnership) |
-| **Quality Standards** (F-0015) | P2 (Quality), P5 (Enforcement), P10 (Acceptance-Driven) |
-| **Token-Efficient Scripts** (F-0041) | P3 (Context Efficiency), P12 (Green Coding) |
+| **Session Start Protocol** (F-0021) | F1 (Developer UX), F2 (Sustainability) |
+| **STATUS.md** (F-0024) | F1 (Developer UX), F2 (Sustainability), D3 (Durable Artifacts) |
+| **HUMAN_NEEDED.md** (F-0026) | F1 (Developer UX), D1 (Partnership) |
+| **Quality Standards** (F-0015) | F2 (Quality), D2 (Enforcement), D4 (Acceptance-Driven) |
+| **Token-Efficient Scripts** (F-0041) | F3 (Token & Context Optimization), D6 (Green Coding) |
 
 ---
 
 ## Features NOT Mapped to Principles (Orphans)
 
-These features exist but don't clearly derive from the 12 principles:
+These features exist but don't clearly derive from the 13 principles:
 
 | Feature | What It Does | Possible Principle |
 |---------|-------------|-------------------|
-| **Framework Age Check** (F-0044) | Warns if framework >1 month old | P2 (Sustainability) + P1 (Developer UX) |
-| **Emergency Quick Reference** (F-0077) | EMERGENCY.md for when tokens run out | P3 (Context Efficiency) + P4 (Partnership) |
-| **Issue/Bug Tracking** (F-0079) | Formal I-#### tracking parallel to F-#### | P10 (Small Batch) |
-| **ADRs** (F-0101) | Architecture Decision Records | P11 (Living Docs) |
-| **Spec Migration System** (F-0117) | Track how specs evolved over time | P11 (Living Docs) |
-| **Documentation Drift Detection** (F-0118) | Detect stale docs | P11 (Living Docs) |
-| **Feature Change Manifests** (F-0119) | Git history per feature | P6 (Durable Artifacts) |
-| **Claude Skills Generation** (F-0098) | Generate `.claude/skills/` from subagent definitions | P3 (Context Efficiency) |
+| **Framework Age Check** (F-0044) | Warns if framework >1 month old | F2 (Sustainability) + F1 (Developer UX) |
+| **Emergency Quick Reference** (F-0077) | EMERGENCY.md for when tokens run out | F3 (Token & Context Optimization) + D1 (Partnership) |
+| **Issue/Bug Tracking** (F-0079) | Formal I-#### tracking parallel to F-#### | D4 (Small Batch) |
+| **ADRs** (F-0101) | Architecture Decision Records | D5 (Living Docs) |
+| **Spec Migration System** (F-0117) | Track how specs evolved over time | D5 (Living Docs) |
+| **Documentation Drift Detection** (F-0118) | Detect stale docs | D5 (Living Docs) |
+| **Feature Change Manifests** (F-0119) | Git history per feature | D3 (Durable Artifacts) |
+| **Claude Skills Generation** (F-0098) | Generate `.claude/skills/` from subagent definitions | F3 (Token & Context Optimization) |
 
 ---
 
@@ -505,7 +509,7 @@ These features exist but don't clearly derive from the 12 principles:
 
 ## Task-Specific Quality Standards
 
-The framework ships 7 quality documents in `.agentic/quality/` that define how code should be written, tested, and reviewed. These aren't generic guidelines — they're wired into specific agent roles via context manifests. This is a concrete implementation of Principle 2 (Sustainable Quality): quality by default, not quality by hope.
+The framework ships 7 quality documents in `.agentic/quality/` that define how code should be written, tested, and reviewed. These aren't generic guidelines — they're wired into specific agent roles via context manifests. This is a concrete implementation of F2 (Sustainable Quality): quality by default, not quality by hope.
 
 ### The 7 Quality Documents
 
@@ -571,9 +575,9 @@ This would allow projects to declare their stack (e.g., `stack_type: web-react` 
 ### Intentionally Behavioral (Cannot Be Structurally Enforced)
 
 These will always rely on behavioral reinforcement:
-- Anti-hallucination (P7)
-- No auto-commits (P8)
-- Check before creating (P9)
+- Anti-hallucination (R1)
+- No auto-commits (R2)
+- Check before creating (R3)
 - Smoke testing before "done"
 - Code quality standards (see Task-Specific Quality Standards section above)
 

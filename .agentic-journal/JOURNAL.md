@@ -442,3 +442,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-14 14:19 - Principles DAG Hierarchy
+
+**Accomplished**:
+- Restructured 12→13 principles into derivation DAG (F1-F3/D1-D7/R1-R3) with 22 edges, added D7 Multi-Env Portability. Fixed doc drift: stale versions (0.19.0→0.25.7), broken example links, stale line counts across 5 docs.
+
+**Next steps**:
+- Commit and PR for review
+
+**Blockers**: None
+

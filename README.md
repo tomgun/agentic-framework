@@ -130,59 +130,63 @@ Then follow the same agent initialization process above. The agent will run `sca
 
 **📖 Full detail with rationale: [`PRINCIPLES.md`](.agentic/PRINCIPLES.md)** ⭐
 
-3 FOUNDATION + 6 NON-NEGOTIABLE + 3 RECOMMENDED. Here's the overview:
+3 FOUNDATION + 7 DESIGN PRINCIPLES + 3 OPERATIONAL RULES (13 total, all mandatory). Each non-foundation principle traces back to parent foundations via a derivation DAG.
 
 #### FOUNDATION (WHY — the reasons this framework exists)
 
-### 1. Developer-Friendly Experience
+### F1. Developer-Friendly Experience
 **The framework makes the developer's life easier.**
 Session dashboard reconstructs context, documentation is automatic, state carries across sessions. The developer doesn't have to remember what happened — the framework remembers for them.
 
-### 2. Sustainable Long-Term Development & Quality Software
+### F2. Sustainable Long-Term Development & Quality Software
 **Properly designed, tested, documented software that stays reliable over time.**
 When specs, criteria, and tests exist, agents can't silently regress working features. Programming standards loaded by default, durable artifacts survive context resets, observable progress visible to both humans and agents.
 
-### 3. Context Efficiency
-**The #1 unique technical insight: respect the context window.**
+### F3. Token & Context Optimization
+**The #1 unique technical insight: tokens cost money, context is limited.**
 Structured reading protocols with token budgets. Agent delegation for fresh context. Sequential agents load only role-specific context. Token-efficient scripts (40x cheaper than read-modify-write). Manual operations for zero-token information retrieval. See `.agentic/token_efficiency/` for quantified savings (60-83% typical).
 
-#### NON-NEGOTIABLE (HOW — enforced rules & guardrails)
+#### DESIGN PRINCIPLES (HOW — strategies that serve the foundations)
 
-### 4. Human-Agent Partnership
+### D1. Human-Agent Partnership
 **Humans define WHAT, agents handle HOW. Neither alone is optimal.**
 Humans edit specs directly (markdown), agents honor edits as source of truth. Framework makes review efficient (diff stats, scope warnings) but never eliminates it. `HUMAN_NEEDED.md` for escalation.
 
-### 5. Deterministic Enforcement
+### D2. Deterministic Enforcement
 **Scripts and gates enforce behavior, not documentation and hope.**
 Pre-commit hooks block if WIP exists or acceptance files missing. `feature.sh` enforces valid status transitions. Hard gates for hard rules, soft warnings for judgment calls. Works the same regardless of which AI model runs them.
 
-### 6. Durable Artifacts
+### D3. Durable Artifacts
 **Living documents readable by both humans and agents.**
 `CONTEXT_PACK.md` (architecture), `STATUS.md` (current state), `JOURNAL.md` (progress history), `HUMAN_NEEDED.md` (decisions needed). Agents read these first; humans can `cat STATUS.md` for instant awareness (zero tokens). The core mechanism for surviving context resets.
 
-### 7. Anti-Hallucination
-**Agents NEVER make things up — accuracy over speed.**
-"I don't know" is explicitly encouraged. Verify against version-specific docs. Wrong code that looks right is worse than no code. See [agent guidelines](.agentic/agents/shared/agent_operating_guidelines.md) for complete rules.
-
-### 8. No Auto-Commits
-**Human approval required before every commit.** The safety gate that prevents compounding mistakes.
-
-### 9. Check Before Creating
-**Search before creating any file, test, doc, or component.** Duplication wastes effort and causes inconsistency. A 30-second search prevents hours of duplicate work.
-
-#### RECOMMENDED (HOW — best practices)
-
-### 10. Small Batch + Acceptance-Driven Development *(recommended)*
+### D4. Small Batch + Acceptance-Driven Development
 **One feature at a time, acceptance criteria before code.**
 MAX 5-10 files per commit. Specs evolve during implementation. Shipped ≠ Accepted (human validation is final gate). TDD available as option.
 
-### 11. Living Documentation *(recommended)*
+### D5. Living Documentation
 **Docs updated in same commit as code. Single source of truth.**
 No stale placeholders. DRY (cross-reference, don't duplicate). Explicit over implicit — agents need explicitness.
 
-### 12. Green Coding *(recommended)*
+### D6. Green Coding
 **Efficient software reduces energy consumption and cost.**
 Token efficiency IS green for framework ops. For project code: algorithms, caching, event-driven patterns. See [green_coding.md](.agentic/quality/green_coding.md) for comprehensive guidelines.
+
+### D7. Multi-Environment Portability
+**Work seamlessly across Claude Code, Cursor, Copilot, and Codex.**
+Same project state, same conventions, same enforcement — regardless of which tool runs the session. Instruction parity, distributed enforcement via scripts, tool-agnostic state files.
+
+#### OPERATIONAL RULES (WHAT — concrete, testable constraints)
+
+### R1. Anti-Hallucination
+**Agents NEVER make things up — accuracy over speed.**
+"I don't know" is explicitly encouraged. Verify against version-specific docs. Wrong code that looks right is worse than no code. See [agent guidelines](.agentic/agents/shared/agent_operating_guidelines.md) for complete rules.
+
+### R2. No Auto-Commits
+**Human approval required before every commit.** The safety gate that prevents compounding mistakes.
+
+### R3. Check Before Creating
+**Search before creating any file, test, doc, or component.** Duplication wastes effort and causes inconsistency. A 30-second search prevents hours of duplicate work.
 
 ## How It Works: Three-Layer Architecture
 
@@ -418,8 +422,8 @@ Quick-start guidance for common technology stacks:
 
 ## Examples
 
-- **Scaffold output**: [`examples/example_structure/`](examples/example_structure/) - Freshly scaffolded project structure
-- **Working project**: [`examples/inited_project/`](examples/inited_project/) - Complete Next.js Todo app with full specs, tests, and documentation
+- **Traced Notes App**: [`examples/traced_notes_app/`](examples/traced_notes_app/) - Example project with full framework integration
+- **Archived examples**: [`examples/archived/`](examples/archived/) - Core Todo CLI and Core+PM Taskboard examples (historical)
 
 ## For Existing Projects
 
