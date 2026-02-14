@@ -2,7 +2,7 @@
 
 **Purpose**: Comprehensive map of how every principle is implemented, what mechanisms exist, which are actively working, and which are dormant or underutilized.
 
-**Generated**: 2026-02-13 | **Framework Version**: 0.25.6
+**Generated**: 2026-02-14 | **Framework Version**: 0.25.8
 
 ---
 

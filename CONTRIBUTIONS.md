@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.25.6)
+**Period**: Initial Development (v0.1.0 → v0.25.8)
 **Date**: 2026-02-12
 
 ---
