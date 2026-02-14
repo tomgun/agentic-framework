@@ -71,7 +71,7 @@ check_initialization() {
 
     # Check STATUS.md for placeholder content
     if [ -f "$ROOT_DIR/STATUS.md" ]; then
-        if grep -q "Describe the current project phase" "$ROOT_DIR/STATUS.md" 2>/dev/null; then
+        if grep -q "what we are doing right now" "$ROOT_DIR/STATUS.md" 2>/dev/null; then
             issues+=("STATUS.md has template content")
         fi
     fi
@@ -102,8 +102,8 @@ show_init_warning() {
     if grep -q "What this repo is:.*<!--" "$ROOT_DIR/CONTEXT_PACK.md" 2>/dev/null; then
         echo "  • CONTEXT_PACK.md: Architecture overview, entry points"
     fi
-    if grep -q "Describe the current project phase" "$ROOT_DIR/STATUS.md" 2>/dev/null; then
-        echo "  • STATUS.md: Current focus and project phase"
+    if grep -q "what we are doing right now" "$ROOT_DIR/STATUS.md" 2>/dev/null; then
+        echo "  • STATUS.md: Current focus and project status"
     fi
 
     echo ""
@@ -380,7 +380,8 @@ cmd_work() {
     echo -e "${GREEN}Ready to work on: $description${NC}"
     echo "Update STATUS.md with your progress."
     echo ""
-    echo -e "${BLUE}Reminder: Define acceptance criteria (in any form) before implementing.${NC}"
+    echo -e "${BLUE}💡 Tip: Even rough acceptance criteria help — 2-3 bullet points:${NC}"
+    echo -e "${BLUE}   What would success look like? What should the user be able to do?${NC}"
 }
 
 # Get plan-review config from STACK.md
@@ -843,6 +844,17 @@ cmd_done() {
                 echo "   spec/acceptance/${feature_id}.md"
                 echo "   Consider: git add spec/acceptance/${feature_id}.md"
             fi
+
+            # Surface [Discovered] markers
+            local discovered_count
+            discovered_count=$(grep -c '\[Discovered\]' "$acc_file" 2>/dev/null || echo "0")
+            if [ "$discovered_count" -gt 0 ]; then
+                echo ""
+                echo -e "${YELLOW}📋 Spec evolved: $discovered_count requirements discovered during implementation${NC}"
+            fi
+            echo ""
+            echo -e "${BOLD}📝 Review acceptance criteria before marking accepted:${NC}"
+            echo "   cat spec/acceptance/${feature_id}.md"
         fi
 
         # Check FEATURES.md shipped status (heading AND table format)

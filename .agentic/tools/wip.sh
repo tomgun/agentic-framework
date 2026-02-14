@@ -130,6 +130,10 @@ case "$COMMAND" in
 - **Started**: ${TIMESTAMP}
 - **Last checkpoint**: ${TIMESTAMP}
 
+## Success Criteria
+<!-- What does "done" look like? Even 2-3 rough bullet points help. -->
+-
+
 ## Status
 
 Auto-created on first edit. Update with:
@@ -160,6 +164,10 @@ EOF
 - **Agent**: ${AGENT}
 - **Started**: ${TIMESTAMP}
 - **Last checkpoint**: ${TIMESTAMP}
+
+## Success Criteria
+<!-- What does "done" look like? Even 2-3 rough bullet points help. -->
+-
 
 ## Task Details
 

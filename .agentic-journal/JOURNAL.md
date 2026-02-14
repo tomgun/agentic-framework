@@ -464,3 +464,25 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-14 14:28 - Quick Start cleanup
+
+**Accomplished**:
+- Updated FRAMEWORK_QUICK_START.md heading and table to use F/D/R principle IDs, removed old Non-Negotiable tier label
+
+**Next steps**:
+- All 11 review items now resolved
+
+**Blockers**: None
+
+
+### Session: 2026-02-15 00:13 - F-0130 Rough Specs & Structural Nudging
+
+**Accomplished**:
+- Removed Phase from STATUS.template.md and all refs. Added Core nudges (pre-commit checklist, ag work tip, WIP Success Criteria). Added Core+PM surfacing (ag done [Discovered] count, sync.sh acceptance check). Updated PRINCIPLES.md, spec_evolution.md, FRAMEWORK_QUICK_START.md. Created F-0130 spec + acceptance + 10 validation tests (194/194 pass).
+
+**Next steps**:
+- Commit and PR
+
+**Blockers**: None
+

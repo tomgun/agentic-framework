@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- PR ready for review (Updated: 2026-02-14 14:20 EET)
+- F-0130 shipped, ready for PR (Updated: 2026-02-15 00:13 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

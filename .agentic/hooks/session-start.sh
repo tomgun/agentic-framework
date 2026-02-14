@@ -74,7 +74,6 @@ echo ""
 
 # STATUS.md is required for all profiles (v0.12.0+)
 echo "2. STATUS.md (~300-800 tokens)"
-echo "   - Project phase (discovery | building)"
 echo "   - Current focus"
 echo "   - What's in progress"
 echo "   - Next steps"
