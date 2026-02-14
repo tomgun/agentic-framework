@@ -113,7 +113,7 @@ Example projects demonstrate best practices and verify workflows actually work.
 - If root has content template doesn't, and it's NOT framework-specific → backport immediately
 - Templates must never exceed root for shared concerns
 
-**Cursor note**: Root `.cursorrules` (27 lines) is a lean framework-dev file. Template `cursorrules.txt` (71 lines) is the full user-project version (pre-slimming — not yet aligned with three-layer architecture). The `.mdc` file (37 lines) is the slimmed Cursor format. Follow-up: slim `cursorrules.txt` to match.
+**Cursor note**: Root `.cursorrules` (29 lines) is a lean framework-dev file. Template `cursorrules.txt` (39 lines) is the user-project version (slimmed to align with three-layer architecture). The `.mdc` file (37 lines) is the slimmed Cursor format.
 
 **Anti-pattern**: ❌ Adding `ag` CLI commands to root CLAUDE.md but not the template users get.
 
@@ -628,8 +628,8 @@ Users already past X.Y.Z will NOT see it (prevents repeated prompts).
 
 ---
 
-**Last Updated**: 2026-02-05
-**Framework Version**: 0.19.0
+**Last Updated**: 2026-02-14
+**Framework Version**: 0.25.7
 
 **Note**: These guidelines evolve with the framework. When they change, notify framework contributors and update this document.
 
