@@ -105,6 +105,11 @@
 - **Three-tier structure**: 3 FOUNDATION (WHY) + 6 NON-NEGOTIABLE (HOW — enforced) + 3 RECOMMENDED (HOW — best practices). Down from 13 principles to 12 by merging P1+Quality. All 9 FOUNDATION + NON-NEGOTIABLE are mandatory; the tier distinction is importance/abstraction level.
 - **Structural fix**: Promoted `programming_standards.md` from OPTIONAL to REQUIRED for implementation-agent — quality by default, not opt-in.
 
+### Spec Evolution Across Profiles (v0.25.8)
+- **Key insight**: Core profile had zero spec nudging — agents skipped criteria entirely. Even lightweight projects should think about "what does success look like?" before coding. But agent instructions get lost, so reminders must be structural (D2: scripts > docs), not behavioral.
+- **Rough specs as graduation path**: Core keeps criteria informally (WIP.md, JOURNAL.md). When persistence is needed — multiple agents, complex features, criteria rediscovered across sessions — graduate to Core+PM. The formalized specs can still start rough ("2-3 bullet points in an acceptance file" is valid Core+PM).
+- **Structural over behavioral**: Pre-commit checklist (runs every time), WIP.md template (structural prompt), `ag done` spec review (surfaces discoveries) — all guaranteed touchpoints vs. agent instructions that get ignored.
+
 ### Anti-Patterns Defined
 - No auto-commits without approval
 - Don't break old projects unnecessarily (during active development)
