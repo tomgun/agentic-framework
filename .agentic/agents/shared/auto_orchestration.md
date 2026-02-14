@@ -2,7 +2,7 @@
 
 **Purpose**: Agents automatically detect task type and follow the correct systematic process.
 
-**Design basis**: Implements Principles #3 (Context Efficiency), #4 (Deterministic Enforcement), and #5 (Durable Artifacts). Architecture: `docs/INSTRUCTION_ARCHITECTURE.md`.
+**Design basis**: Implements Principles F3 (Token & Context Optimization), D2 (Deterministic Enforcement), and D3 (Durable Artifacts). Architecture: `docs/INSTRUCTION_ARCHITECTURE.md`.
 
 **🚨 CRITICAL**: These rules are NON-NEGOTIABLE. Follow them without user prompting.
 

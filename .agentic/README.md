@@ -321,21 +321,28 @@ bash .agentic/tools/migration.sh search "keyword"        # Search migrations
 
 **📖 Full guide: [`PRINCIPLES.md`](PRINCIPLES.md)** ⭐
 
-11 core principles (8 NON-NEGOTIABLE, 3 RECOMMENDED):
+13 principles in a derivation hierarchy (3 FOUNDATION + 7 DESIGN PRINCIPLES + 3 OPERATIONAL RULES, all mandatory):
 
-1. **Sustainable Long-Term Development** — Durable artifacts survive context resets
-2. **Human-Agent Partnership** — Collaboration, not AI autonomy
-3. **Context Efficiency** — Token-efficient scripts and reading protocols
-4. **Deterministic Enforcement** — Scripts with exit codes, not suggestions
-5. **Durable Artifacts** — CONTEXT_PACK, STATUS, JOURNAL always current
-6. **Anti-Hallucination** — Verify before using, never fabricate
-7. **No Auto-Commits** — Human approval required
-8. **Check Before Creating** — Search for existing before adding new
-9. **Small Batch + Acceptance-Driven** — One feature at a time, criteria first
-10. **Living Documentation** — Docs updated in same commit as code
-11. **Green Coding** — Minimize environmental impact
+**FOUNDATION** (WHY — the reasons this framework exists):
+- **F1: Developer-Friendly Experience** — Framework remembers so developers don't have to
+- **F2: Sustainable Long-Term Development & Quality Software** — Tested, documented, reliable over time
+- **F3: Token & Context Optimization** — Token-efficient scripts and reading protocols
 
-See PRINCIPLES.md for the reasoning behind every framework decision.
+**DESIGN PRINCIPLES** (HOW — strategies that serve the foundations):
+- **D1: Human-Agent Partnership** — Collaboration, not AI autonomy
+- **D2: Deterministic Enforcement** — Scripts with exit codes, not suggestions
+- **D3: Durable Artifacts** — CONTEXT_PACK, STATUS, JOURNAL always current
+- **D4: Small Batch + Acceptance-Driven** — One feature at a time, criteria first
+- **D5: Living Documentation** — Docs updated in same commit as code
+- **D6: Green Coding** — Minimize environmental impact
+- **D7: Multi-Environment Portability** — Same state and enforcement across all AI tools
+
+**OPERATIONAL RULES** (WHAT — concrete, testable constraints):
+- **R1: Anti-Hallucination** — Verify before using, never fabricate
+- **R2: No Auto-Commits** — Human approval required
+- **R3: Check Before Creating** — Search for existing before adding new
+
+See PRINCIPLES.md for the derivation DAG and reasoning behind every framework decision.
 
 ## Adoption notes
 - This framework is intentionally **tech-agnostic**. Where stack specifics matter, use:

@@ -11,10 +11,10 @@ required:
   - STACK.md[build_commands,test_commands] # How to build and test
   - CONTEXT_PACK.md[entry_points,modules]  # Where code lives
   - .agentic/agents/shared/guidelines/anti-hallucination.md  # Core rule
+  - .agentic/quality/programming_standards.md  # Code standards (F2: quality by default)
 
 # Optional context - loaded if token budget allows
 optional:
-  - .agentic/quality/programming_standards.md  # Code standards
   - .agentic/agents/shared/guidelines/small-batch.md  # Small batch principle
   - src/                                       # Existing code patterns (sampled)
 

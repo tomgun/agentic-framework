@@ -22,6 +22,13 @@ _No active items_
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
+### HN-0003: Plan: Map FEATURES.md to Principles (F/D/R)
+- **Type**: planning
+- **Added**: 2026-02-14
+- **Context**: Add a Principle: field to FEATURES.md feature schema (98 features). Natural extension of the DAG hierarchy. Scope: (1) Add Principle: to spec schema (required for new, optional backfill). (2) Backfill ~30 already mapped in HOW_IT_WORKS.md first. (3) Backfill rest incrementally. (4) Add validate_framework.sh warning for missing Principle:. Infrastructure features use 'Principle: infrastructure'. Makes orphan detection scriptable, closes traceability gap Principle→Feature→Test. HOW_IT_WORKS.md and TRACEABILITY_MATRIX.md should derive from FEATURES.md as single source.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 <!-- Archive resolved items here with date and outcome -->
@@ -35,6 +42,14 @@ _No active items_
 - **Type**: review
 - **Added**: 2026-02-12
 - **Context**: https://github.com/tomgun/agentic-framework/pull/27
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
+### HN-0003: Plan: Map FEATURES.md to Principles (F/D/R)
+- **Type**: planning
+- **Added**: 2026-02-14
+- **Context**: Add a Principle: field to FEATURES.md feature schema (98 features). Natural extension of the DAG hierarchy. Scope: (1) Add Principle: to spec schema (required for new, optional backfill). (2) Backfill ~30 already mapped in HOW_IT_WORKS.md first. (3) Backfill rest incrementally. (4) Add validate_framework.sh warning for missing Principle:. Infrastructure features use 'Principle: infrastructure'. Makes orphan detection scriptable, closes traceability gap Principle→Feature→Test. HOW_IT_WORKS.md and TRACEABILITY_MATRIX.md should derive from FEATURES.md as single source.
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 

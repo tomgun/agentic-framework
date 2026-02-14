@@ -97,6 +97,14 @@
 - DRY principle for docs (not just code)
 - Long-term reliability: "everything should work as reliably as possible in the LONG RUN"
 
+### Three-Tier Principle Architecture (v0.25.6)
+- **Key insight**: The 11 principles described HOW to work but none stated WHY. Two foundational motivations — the reasons features exist — were never given principle status.
+- **Developer-Friendly Experience (P1)**: Framework adds on top of using Claude directly — session dashboard reconstructs context, documentation tasks are automatic, developer doesn't have to remember things. Originally Principle #2 ("Developer-Friendly UX" in early commits) but got lost during consolidation.
+- **Quality as a design principle (P2)**: Properly designed code + unit tests + acceptance tests + clearly written specs = long-term reliability. When specs and criteria-based tests exist, agents can't accidentally change or remove working features. Merged with old P1 (Sustainable Long-Term Development) because both serve the same goal: software that stays reliable over time.
+- **Context Efficiency promoted to FOUNDATION (P3)**: Token economics is the unique technical constraint that shapes every framework decision — always was a FOUNDATION-level insight hiding in the NON-NEGOTIABLE tier.
+- **Three-tier structure**: 3 FOUNDATION (WHY) + 6 NON-NEGOTIABLE (HOW — enforced) + 3 RECOMMENDED (HOW — best practices). Down from 13 principles to 12 by merging P1+Quality. All 9 FOUNDATION + NON-NEGOTIABLE are mandatory; the tier distinction is importance/abstraction level.
+- **Structural fix**: Promoted `programming_standards.md` from OPTIONAL to REQUIRED for implementation-agent — quality by default, not opt-in.
+
 ### Anti-Patterns Defined
 - No auto-commits without approval
 - Don't break old projects unnecessarily (during active development)
@@ -2141,10 +2149,42 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: The 13-check pre-commit quality gate is now structurally enforced via git's `core.hooksPath` mechanism. No more bypassing quality gates by using raw `git commit`.
 
+### Journal "Why" — Capture Motivation at Write Time, Not After the Fact (2026-02-12)
+
+**User insight**: Journal entries were mechanical "what was done" lists — useful for tracking but missing the *why* behind each session's work. Without motivation context, future readers (human or agent) can't distinguish important architectural decisions from routine chores.
+
+**User direction**: Add a `--why` flag to `journal.sh` so motivation is captured at write time as part of the workflow. Don't fabricate "why" retroactively by reversing "what was done" — that adds no real information. If you don't have genuine context for why something was done, leave it blank rather than inventing a plausible-sounding reason.
+
+**Key principle**: Metadata quality comes from capturing context *when it exists* (at write time), not from reconstructing it later. Retroactive inference is worse than honest gaps.
+
+**Changes**:
+- `journal.sh` — added `--why "Reason"` optional flag, renders as `**Why**:` section before Accomplished
+- `memory-seed.md`, `CLAUDE.md` (template + root) — updated command pattern to include `--why`
+
+**Impact**: Journal entries going forward capture motivation alongside accomplishments, improving context for session resumption and historical review.
+
+## Derivation Hierarchy with F/D/R IDs (2026-02-14)
+
+### Principle Restructuring: From Flat List to Derivation DAG
+
+**User insight**: The previous 3-tier restructuring (FOUNDATION / NON-NEGOTIABLE / RECOMMENDED from commit d10f072) was "a flat list pretending to be hierarchical." The tier labels described enforcement level, but there was no derivation — you couldn't trace WHY each principle exists by following edges back to a parent. Flat P-numbering made all principles look equal and didn't scale.
+
+**User direction**: A genuine hierarchy where 3 foundations (WHY) lead to derived strategies (HOW), which lead to specific rules (WHAT). Tier-prefixed IDs (F/D/R) so the tier is immediately visible and each tier can grow independently — adding R4 never affects F or D numbering.
+
+**User design decisions**:
+- Green Coding is NOT derived from Context Efficiency — it's broader, about energy-efficient production code. Promoted to Design Principle (D6)
+- Multi-Environment Portability IS a core design principle (D7), not just a feature — derived from F1 (UX) + F2 (long-term flexibility)
+- Tool agnosticity reframed as Multi-Environment Portability
+- All 13 principles are mandatory — the tier distinction is abstraction level, not enforcement level
+- When principles conflict, specificity wins: Rules override Design Principles, Design Principles override Foundations
+- Anti-Hallucination traces to D1 (trust) + D3 (artifact truth) + F2 (quality), not forced to every foundation
+
+**Impact**: 12 → 13 principles (added D7). 22 explicit derivation edges form a DAG. Every non-foundation principle has a "Derives from" line tracing it to parent principles. Mermaid diagram shows the full hierarchy visually.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.25.6
+**Current Version**: v0.25.7
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 48 behavioral test scripts

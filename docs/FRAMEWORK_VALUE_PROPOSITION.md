@@ -197,6 +197,6 @@
 
 ---
 
-**Last Updated**: 2026-02-05
-**Framework Version**: 0.19.0
+**Last Updated**: 2026-02-14
+**Framework Version**: 0.25.7
 

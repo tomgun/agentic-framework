@@ -429,3 +429,38 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-14 09:46 - Principle restructuring
+
+**Why**: Two foundational motivations (developer UX, code quality) were never given principle status despite being the reasons the framework exists
+
+**Accomplished**:
+- Restructured 12 principles into 3 tiers: 3 FOUNDATION (P1 Developer-Friendly Experience NEW, P2 Sustainable+Quality MERGED, P3 Context Efficiency PROMOTED) + 6 NON-NEGOTIABLE (P4-P9) + 3 RECOMMENDED (P10-P12). Updated 9 files: PRINCIPLES.md, HOW_IT_WORKS.md, README.md, .agentic/README.md, FRAMEWORK_QUICK_START.md, INSTRUCTION_ARCHITECTURE.md, TRACEABILITY_MATRIX.md, VERIFICATION_REPORT.md, implementation-agent.yaml. Promoted programming_standards.md to REQUIRED. All 184 validation tests pass.
+
+**Next steps**:
+- Create feature branch and PR for review
+
+**Blockers**: None
+
+
+### Session: 2026-02-14 14:19 - Principles DAG Hierarchy
+
+**Accomplished**:
+- Restructured 12→13 principles into derivation DAG (F1-F3/D1-D7/R1-R3) with 22 edges, added D7 Multi-Env Portability. Fixed doc drift: stale versions (0.19.0→0.25.7), broken example links, stale line counts across 5 docs.
+
+**Next steps**:
+- Commit and PR for review
+
+**Blockers**: None
+
+
+### Session: 2026-02-14 14:20 - Doc Drift Fixes
+
+**Accomplished**:
+- Fixed stale versions (0.19.0→0.25.7), line counts, broken example links, stale P2 reference across 5 docs
+
+**Next steps**:
+- PR ready for review
+
+**Blockers**: None
+
