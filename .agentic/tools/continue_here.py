@@ -3,7 +3,7 @@
 ⚠️ DEPRECATED: This tool is deprecated as of v0.12.0
 
 The functionality is now covered by:
-- STATUS.md: Contains "Project Phase" section (discovery | building)
+- STATUS.md: Contains current focus and project state
 - session_start.md checklist: Guides agents to read project state
 - WIP.md: Handles interrupted work detection
 

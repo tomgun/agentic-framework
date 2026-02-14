@@ -230,6 +230,8 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 4. Update specs with discoveries (new requirements, edge cases)
 5. Commit when acceptance tests pass → next feature
 
+**Starting rough is OK**: 2-3 bullet points ("What would success look like?") are a valid starting spec. Specs evolve during implementation — mark discoveries with `[Discovered]` per `spec_evolution.md`. Human verifies the evolved specs as part of acceptance (Shipped ≠ Accepted).
+
 **Quality Gates**:
 - Acceptance files mandatory for shipped features (spec/acceptance/F-####.md)
 - Shipped ≠ Accepted: agents mark shipped, humans mark accepted (human validation is final gate)

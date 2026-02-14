@@ -5,6 +5,16 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.8] - 2026-02-14
+
+### Added
+- **Rough specs & structural nudging (F-0130)** — Core profile gets non-blocking reminders for success criteria: pre-commit checklist, improved `ag work` tip, Success Criteria section in WIP.md templates.
+- **Spec evolution surfacing (F-0130)** — `ag done` shows `[Discovered]` marker count and prompts spec review. `ag sync` nudges when in_progress features lack acceptance files.
+- **"Starting rough is OK" guidance** — Added to PRINCIPLES.md D4 and spec_evolution.md.
+
+### Removed
+- **`## Project Phase` from STATUS.template.md** — Dead code; Profile (Core vs Core+PM) handles spec rigor. All references cleaned from Stop.sh, upgrade.sh, session-start.sh, ag.sh.
+
 ## [0.25.6] - 2026-02-12
 
 ### Added

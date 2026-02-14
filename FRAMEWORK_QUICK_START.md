@@ -6,23 +6,21 @@
 
 ---
 
-## 🚨 CORE PRINCIPLES (Non-Negotiable)
+## 🚨 CORE PRINCIPLES
 
-Every decision must align with these. If conflict, re-read `PRINCIPLES.md`.
+Every decision must align with these. If conflict, re-read `PRINCIPLES.md` (13 principles: F1-F3 → D1-D7 → R1-R3).
 
 | Principle | What It Means for Framework Dev |
 |-----------|--------------------------------|
-| **Token & Context Optimization** (F3) | Durable artifacts, efficient scripts, context isolation (Core) |
-| **Developer UX** (F1) | User remembers nothing; specs/WIP/STATUS carry state; agent guides proactively (Core) |
-| **Traceability** | Spec ↔ Acceptance Criteria ↔ Tests ↔ Code — ALL must match current committed version |
-| **Acceptance-Driven** | Write acceptance criteria BEFORE implementation, not after |
-| **Living Documentation** | Update docs WITH code in same commit, never "later" |
-| **Documentation = Reality** | Test that workflows actually work; don't assume |
+| **Developer UX** (F1) | User remembers nothing; specs/WIP/STATUS carry state; agent guides proactively |
+| **Sustainable Quality** (F2) | Spec ↔ Acceptance Criteria ↔ Tests ↔ Code — ALL must match current committed version |
+| **Token & Context Optimization** (F3) | Durable artifacts, efficient scripts, context isolation |
+| **Gates > Guidelines** (D2) | Enforcement (hooks, scripts) over advice (docs) |
+| **Small Batch + Acceptance-Driven** (D4) | One feature at a time, max 5-10 files per commit. Write acceptance criteria (even rough bullet points) BEFORE implementation, not after |
+| **Living Documentation** (D5) | Update docs WITH code in same commit, never "later". Test that workflows actually work; don't assume |
 | **Single Source of Truth** | Information lives in ONE place; others reference it |
 | **Internal Consistency** | Templates + examples + docs + agent guidelines must align |
 | **Dogfooding** | Framework follows its own spec-driven methodology |
-| **Small Batch** | One feature at a time, max 5-10 files per commit |
-| **Gates > Guidelines** (D2) | Enforcement (hooks, scripts) over advice (docs) |
 | **Backward Compatibility** | Existing projects must upgrade cleanly |
 
 ---

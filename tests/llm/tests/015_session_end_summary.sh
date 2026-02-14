@@ -11,9 +11,6 @@ setup_test_project "core"
 cat > "$TEST_PROJECT/STATUS.md" << 'EOF'
 # Project Status
 
-## Project Phase
-building
-
 ## Current Focus
 Implementing user login feature
 

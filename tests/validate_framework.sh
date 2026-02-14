@@ -1444,6 +1444,83 @@ for tmpl in STACK.template.md CONTEXT_PACK.template.md STATUS.template.md OVERVI
 done
 
 # ============================================================
+# F-0130: Rough Specs & Structural Nudging
+# ============================================================
+echo ""
+echo "--- F-0130: Rough Specs & Structural Nudging ---"
+
+# Phase removed from STATUS template
+if ! grep -q "Project Phase" "${FRAMEWORK_ROOT}/.agentic/init/STATUS.template.md" 2>/dev/null; then
+  pass "F-0130: Phase section removed from STATUS.template.md"
+else
+  fail "F-0130: STATUS.template.md still has Project Phase"
+fi
+
+# No stale Phase refs in active scripts/hooks
+STALE_PHASE=$(grep -rl "Project Phase" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" "${FRAMEWORK_ROOT}/.agentic/hooks/" "${FRAMEWORK_ROOT}/.agentic/claude-hooks/" 2>/dev/null || true)
+if [[ -z "$STALE_PHASE" ]]; then
+  pass "F-0130: No stale Phase references in tools/hooks"
+else
+  fail "F-0130: Stale Phase references found: $STALE_PHASE"
+fi
+
+# ag work shows improved nudge
+if grep -q "rough acceptance criteria" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0130: ag work has improved criteria nudge"
+else
+  fail "F-0130: ag work missing improved nudge"
+fi
+
+# WIP.md templates have Success Criteria
+if grep -q "Success Criteria" "${FRAMEWORK_ROOT}/.agentic/tools/wip.sh" 2>/dev/null; then
+  pass "F-0130: WIP template has Success Criteria section"
+else
+  fail "F-0130: WIP template missing Success Criteria"
+fi
+
+# Pre-commit Core checklist
+if grep -q "Core checklist" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "F-0130: Pre-commit has Core checklist reminder"
+else
+  fail "F-0130: Pre-commit missing Core checklist"
+fi
+
+# ag done surfaces [Discovered] markers
+if grep -q '\[Discovered\]' "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0130: ag done surfaces discovered markers"
+else
+  fail "F-0130: ag done missing discovered marker surfacing"
+fi
+
+# sync.sh checks acceptance file existence
+if grep -q "no-acceptance" "${FRAMEWORK_ROOT}/.agentic/tools/sync.sh" 2>/dev/null; then
+  pass "F-0130: sync.sh checks for missing acceptance files"
+else
+  fail "F-0130: sync.sh missing acceptance file check"
+fi
+
+# PRINCIPLES.md has rough specs guidance
+if grep -q "Starting rough is OK" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
+  pass "F-0130: PRINCIPLES.md has rough specs guidance"
+else
+  fail "F-0130: PRINCIPLES.md missing rough specs guidance"
+fi
+
+# spec_evolution.md has Starting Rough section
+if grep -q "Starting Rough Is OK" "${FRAMEWORK_ROOT}/.agentic/workflows/spec_evolution.md" 2>/dev/null; then
+  pass "F-0130: spec_evolution.md has Starting Rough section"
+else
+  fail "F-0130: spec_evolution.md missing Starting Rough section"
+fi
+
+# Acceptance criteria exists
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0130.md" ]]; then
+  pass "F-0130: acceptance criteria file exists"
+else
+  fail "F-0130: acceptance criteria file missing"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

@@ -178,6 +178,10 @@ if [[ -f "spec/FEATURES.md" ]]; then
 else
   echo ""
   echo "[2/12] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
+  echo ""
+  echo "  📋 Core checklist (review, not blocking):"
+  echo "     □ Defined what success looks like (even 2-3 bullet points)"
+  echo "     □ Tested it actually works"
 fi
 
 # Check 3: JOURNAL.md updated since last commit (BLOCKING)
