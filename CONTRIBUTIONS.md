@@ -97,6 +97,14 @@
 - DRY principle for docs (not just code)
 - Long-term reliability: "everything should work as reliably as possible in the LONG RUN"
 
+### Three-Tier Principle Architecture (v0.25.6)
+- **Key insight**: The 11 principles described HOW to work but none stated WHY. Two foundational motivations — the reasons features exist — were never given principle status.
+- **Developer-Friendly Experience (P1)**: Framework adds on top of using Claude directly — session dashboard reconstructs context, documentation tasks are automatic, developer doesn't have to remember things. Originally Principle #2 ("Developer-Friendly UX" in early commits) but got lost during consolidation.
+- **Quality as a design principle (P2)**: Properly designed code + unit tests + acceptance tests + clearly written specs = long-term reliability. When specs and criteria-based tests exist, agents can't accidentally change or remove working features. Merged with old P1 (Sustainable Long-Term Development) because both serve the same goal: software that stays reliable over time.
+- **Context Efficiency promoted to FOUNDATION (P3)**: Token economics is the unique technical constraint that shapes every framework decision — always was a FOUNDATION-level insight hiding in the NON-NEGOTIABLE tier.
+- **Three-tier structure**: 3 FOUNDATION (WHY) + 6 NON-NEGOTIABLE (HOW — enforced) + 3 RECOMMENDED (HOW — best practices). Down from 13 principles to 12 by merging P1+Quality. All 9 FOUNDATION + NON-NEGOTIABLE are mandatory; the tier distinction is importance/abstraction level.
+- **Structural fix**: Promoted `programming_standards.md` from OPTIONAL to REQUIRED for implementation-agent — quality by default, not opt-in.
+
 ### Anti-Patterns Defined
 - No auto-commits without approval
 - Don't break old projects unnecessarily (during active development)
@@ -2140,6 +2148,20 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 - Both profiles get hooks (Core profile users: Core+PM-specific checks self-skip)
 
 **Impact**: The 13-check pre-commit quality gate is now structurally enforced via git's `core.hooksPath` mechanism. No more bypassing quality gates by using raw `git commit`.
+
+### Journal "Why" — Capture Motivation at Write Time, Not After the Fact (2026-02-12)
+
+**User insight**: Journal entries were mechanical "what was done" lists — useful for tracking but missing the *why* behind each session's work. Without motivation context, future readers (human or agent) can't distinguish important architectural decisions from routine chores.
+
+**User direction**: Add a `--why` flag to `journal.sh` so motivation is captured at write time as part of the workflow. Don't fabricate "why" retroactively by reversing "what was done" — that adds no real information. If you don't have genuine context for why something was done, leave it blank rather than inventing a plausible-sounding reason.
+
+**Key principle**: Metadata quality comes from capturing context *when it exists* (at write time), not from reconstructing it later. Retroactive inference is worse than honest gaps.
+
+**Changes**:
+- `journal.sh` — added `--why "Reason"` optional flag, renders as `**Why**:` section before Accomplished
+- `memory-seed.md`, `CLAUDE.md` (template + root) — updated command pattern to include `--why`
+
+**Impact**: Journal entries going forward capture motivation alongside accomplishments, improving context for session resumption and historical review.
 
 ---
 

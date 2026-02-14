@@ -4,7 +4,7 @@
 
 **For New Contributors**: Understand these before proposing changes. **For Agents**: These are non-negotiable guidance.
 
-**Structure**: 8 NON-NEGOTIABLE principles (the framework breaks without them) + 3 RECOMMENDED principles (highly valuable, adaptable to context).
+**Structure**: 3 FOUNDATION principles (WHY the framework exists) + 6 NON-NEGOTIABLE principles (enforced rules & guardrails) + 3 RECOMMENDED principles (highly valuable, adaptable to context). All 9 FOUNDATION + NON-NEGOTIABLE are mandatory; the tier distinction is importance/abstraction level.
 
 ---
 
@@ -16,38 +16,43 @@ Every decision — feature design, documentation, tooling, agent instructions �
 
 ---
 
-## NON-NEGOTIABLE Principles
+## FOUNDATION Principles (WHY — the reasons this framework exists)
 
-### 1. Sustainable Long-Term Development
+### 1. Developer-Friendly Experience
 
-**What**: This framework optimizes for projects lasting months or years, not quick prototypes.
+**What**: The framework makes the developer's life easier. It adds on top of using Claude (or any AI tool) directly: context reconstruction, automatic documentation, guided workflows, state recovery, decision surfacing, and passive learning.
 
-**Why**: Complex software takes time. Context windows reset. Teams evolve. AI alone cannot sustain long-term projects. Without deliberate structure, AI-assisted projects collapse after a few sessions.
+**Why**: AI coding tools are already useful. This framework exists to solve the problems they don't: what happened last session? What needs my attention? What did the agent change? The developer shouldn't have to remember — the framework remembers for them.
 
 **Key Practices**:
-- Durable artifacts survive context resets (CONTEXT_PACK, STATUS, JOURNAL)
-- Documentation evolves with code (same commit)
-- Clear project state is always visible to both humans and agents
-- **Observable Progress**: STATUS.md, JOURNAL.md, and feature tracking provide unambiguous progress signals. Humans can check project state without starting an agent session (zero tokens). Agents can resume work without human explanation.
+- **Session dashboard**: `ag start` reconstructs context — current focus, recent progress, blockers, suggested next steps
+- **State carries over**: STATUS.md, JOURNAL.md, and WIP.md carry state across sessions so the developer doesn't have to explain what happened
+- **Decision surfacing**: HUMAN_NEEDED.md surfaces items requiring human judgment, `ag sync` detects drift
+- **Discoverability**: Tips of the day, `ag sync` reminders, guided workflows help developers discover framework capabilities over time
+- **Zero-token access**: MANUAL_OPERATIONS.md lets humans check project state without starting an agent session
+- **Readable artifacts**: All specs, status, and journals are plain markdown — readable by humans without tooling
 
-**Anti-pattern**: ❌ Optimizing for quick demos that break after context is lost. ❌ No persistent documentation, re-learning every session.
+**Anti-pattern**: Developer must remember what happened last session. Framework is opaque to humans. Information only accessible through agent queries.
 
 ---
 
-### 2. Human-Agent Partnership
+### 2. Sustainable Long-Term Development & Quality Software
 
-**What**: Humans and AI agents collaborate as partners. Humans define WHAT, agents handle HOW. Neither alone is optimal.
+**What**: AI-assisted projects produce properly designed, tested, and documented software that stays reliable over time. When specs, criteria, and tests exist, agents can't silently regress working features — even if the developer doesn't review every line.
 
-**Why**: Humans have domain knowledge and judgment. AI has execution speed and consistency. Specs (markdown files) are the collaboration interface — readable and editable by both. Human oversight is a feature, not a bug.
+**Why**: Complex software takes months or years. Context windows reset. Teams evolve. Without deliberate structure, AI-assisted projects collapse after a few sessions. Without quality standards, agents produce code that works today but breaks tomorrow. Specs + acceptance criteria + tests = long-term reliability.
 
 **Key Practices**:
-- Humans can directly edit specs (FEATURES.md, acceptance criteria, STATUS.md)
-- Agents honor human edits as source of truth
-- Framework makes human review efficient (diff stats, scope drift warnings) — but never tries to eliminate review
-- Agent presents useful information; human makes judgment calls
-- Agents escalate uncertainty to humans (HUMAN_NEEDED.md)
+- **Programming standards by default**: Quality docs wired to agents as REQUIRED, not optional
+- **Specs and criteria before code**: Clearly written specs and acceptance criteria define what "correct" means
+- **Tests based on criteria**: Unit tests + acceptance tests verify criteria, so agents can't silently regress features
+- **Durable artifacts survive context resets**: CONTEXT_PACK, STATUS, JOURNAL carry project state across sessions
+- **Observable progress**: STATUS.md, JOURNAL.md, and feature tracking provide unambiguous progress signals visible to both humans and agents
+- **Testable design**: Architecture supports testing (pure core + imperative shell, dependency injection)
 
-**Anti-pattern**: ❌ "Agent-driven development" where humans just watch. ❌ Hiding specs in formats only agents can edit. ❌ Trying to make agents "need less supervision" through more rules.
+**Anti-pattern**: Optimizing for quick demos that break after context is lost. No persistent documentation, re-learning every session. Code without tests. Standards loaded as optional.
+
+**Reference**: `.agentic/quality/` (7 quality documents), context manifests for agent wiring
 
 ---
 
@@ -66,13 +71,32 @@ Every decision — feature design, documentation, tooling, agent instructions �
 - **Token-efficient scripts**: `journal.sh`, `status.sh`, `feature.sh` — 40x more efficient than read-modify-write
 - Token efficiency IS green coding for framework operations — every token saved reduces compute energy
 
-**Anti-pattern**: ❌ Reading all files in src/ at session start. ❌ "Load all spec files to understand the project." ❌ Keeping everything in one long session until context overflows.
+**Anti-pattern**: Reading all files in src/ at session start. "Load all spec files to understand the project." Keeping everything in one long session until context overflows.
 
 **Reference**: `.agentic/token_efficiency/`, `reading_protocols.md`, `MANUAL_OPERATIONS.md`
 
 ---
 
-### 4. Deterministic Enforcement
+## NON-NEGOTIABLE Principles (HOW — enforced rules & guardrails)
+
+### 4. Human-Agent Partnership
+
+**What**: Humans and AI agents collaborate as partners. Humans define WHAT, agents handle HOW. Neither alone is optimal.
+
+**Why**: Humans have domain knowledge and judgment. AI has execution speed and consistency. Specs (markdown files) are the collaboration interface — readable and editable by both. Human oversight is a feature, not a bug.
+
+**Key Practices**:
+- Humans can directly edit specs (FEATURES.md, acceptance criteria, STATUS.md)
+- Agents honor human edits as source of truth
+- Framework makes human review efficient (diff stats, scope drift warnings) — but never tries to eliminate review
+- Agent presents useful information; human makes judgment calls
+- Agents escalate uncertainty to humans (HUMAN_NEEDED.md)
+
+**Anti-pattern**: "Agent-driven development" where humans just watch. Hiding specs in formats only agents can edit. Trying to make agents "need less supervision" through more rules.
+
+---
+
+### 5. Deterministic Enforcement
 
 **What**: Critical behavior is enforced by scripts and gates, not by documentation and hope. This is what makes the framework actually work.
 
@@ -101,11 +125,11 @@ Every decision — feature design, documentation, tooling, agent instructions �
 
 Some principles are inherently behavioral — they cannot be enforced by scripts. The framework reinforces them through memory seeding (all tools), LLM behavioral tests, and agent guidelines.
 
-**Anti-pattern**: ❌ "Agents should..." without enforcement (hope-based development). ❌ Commit first, validate later. ❌ Blocking on soft signals that require human judgment.
+**Anti-pattern**: "Agents should..." without enforcement (hope-based development). Commit first, validate later. Blocking on soft signals that require human judgment.
 
 ---
 
-### 5. Durable Artifacts
+### 6. Durable Artifacts
 
 **What**: Living documents that capture project truth, readable by both humans and agents. The core mechanism for surviving context resets.
 
@@ -123,11 +147,11 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 - Token-efficient tools prevent full-file rewrites when updating
 - Humans can `cat STATUS.md && tail -30 .agentic-journal/JOURNAL.md` for instant project state (zero tokens)
 
-**Anti-pattern**: ❌ Starting every session with "let me read all files in src/". ❌ Empty or stale CONTEXT_PACK.md. ❌ "What are we working on?" when STATUS.md has the answer.
+**Anti-pattern**: Starting every session with "let me read all files in src/". Empty or stale CONTEXT_PACK.md. "What are we working on?" when STATUS.md has the answer.
 
 ---
 
-### 6. Anti-Hallucination (NON-NEGOTIABLE)
+### 7. Anti-Hallucination (NON-NEGOTIABLE)
 
 **What**: Agents must NEVER fabricate information — APIs, function signatures, endpoints, library behavior, or technical claims.
 
@@ -140,7 +164,7 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 - "I don't know" is explicitly encouraged
 - Wrong code that looks right is worse than no code — accuracy > speed
 
-**Anti-pattern**: ❌ Guessing API signatures. ❌ "It probably works like..." ❌ Assuming library behavior from training data. ❌ Fabricating function names or parameters.
+**Anti-pattern**: Guessing API signatures. "It probably works like..." Assuming library behavior from training data. Fabricating function names or parameters.
 
 **Enforcement**: Behavioral — reinforced by LLM tests (LLM-027, 028, 029), memory seed, and agent guidelines. Cannot be structurally gated.
 
@@ -148,7 +172,7 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 ---
 
-### 7. No Auto-Commits Without Approval (NON-NEGOTIABLE)
+### 8. No Auto-Commits Without Approval (NON-NEGOTIABLE)
 
 **What**: Agents NEVER commit changes without explicit human approval.
 
@@ -158,13 +182,13 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 **Exception**: User may grant blanket approval for a session.
 
-**Anti-pattern**: ❌ "I've committed your changes" (past tense, no approval). ❌ Blanket auto-commit by default.
+**Anti-pattern**: "I've committed your changes" (past tense, no approval). Blanket auto-commit by default.
 
 **Reference**: `git_workflow.md`
 
 ---
 
-### 8. Check Before Creating (NON-NEGOTIABLE)
+### 9. Check Before Creating (NON-NEGOTIABLE)
 
 **What**: Before creating any file, test, document, or component, agents MUST check if equivalent functionality already exists.
 
@@ -179,13 +203,13 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 | New utility | Existing utilities with similar names/functions |
 | New principle | PRINCIPLES.md for existing coverage |
 
-**Anti-pattern**: ❌ Creating without searching. ❌ "I'll just add a new one, it's faster." ❌ Creating auth.js when AuthService.ts exists.
+**Anti-pattern**: Creating without searching. "I'll just add a new one, it's faster." Creating auth.js when AuthService.ts exists.
 
 ---
 
 ## RECOMMENDED Principles
 
-### 9. Small Batch + Acceptance-Driven Development
+### 10. Small Batch + Acceptance-Driven Development
 
 **What**: Work in small, isolated batches at the feature level. Define acceptance criteria before implementation. Specs evolve with discoveries.
 
@@ -209,11 +233,11 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 - Shipped ≠ Accepted: agents mark shipped, humans mark accepted (human validation is final gate)
 - TDD available as option (set `development_mode: tdd` in STACK.md) for those who prefer tests-first
 
-**Anti-pattern**: ❌ Working on auth, sessions, and password reset all at once. ❌ Starting with no acceptance criteria. ❌ Commits with 30 files. ❌ Marking feature "done" without human validation.
+**Anti-pattern**: Working on auth, sessions, and password reset all at once. Starting with no acceptance criteria. Commits with 30 files. Marking feature "done" without human validation.
 
 ---
 
-### 10. Living Documentation
+### 11. Living Documentation
 
 **What**: Documentation stays current, has one authoritative location per topic, and is explicit enough for any agent to follow.
 
@@ -235,11 +259,11 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 | PRINCIPLES.md | Why we do what we do | Contributors |
 | agent_operating_guidelines.md | Agent behavior rules | AI agents |
 
-**Anti-pattern**: ❌ Code committed, docs updated "later" (never). ❌ Same explanation in 3 files. ❌ Relying on conventions not documented.
+**Anti-pattern**: Code committed, docs updated "later" (never). Same explanation in 3 files. Relying on conventions not documented.
 
 ---
 
-### 11. Green Coding
+### 12. Green Coding
 
 **What**: The framework helps projects produce environmentally efficient software through practical guidance and awareness.
 
@@ -251,7 +275,7 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 **Reference**: See `.agentic/quality/green_coding.md` for comprehensive guidelines covering algorithms, caching, lazy loading, event-driven patterns, resource optimization, and infrastructure choices.
 
-**Anti-pattern**: ❌ Polling every second when webhooks would work. ❌ Loading entire datasets when pagination would suffice. ❌ Unoptimized algorithms causing excessive CPU usage.
+**Anti-pattern**: Polling every second when webhooks would work. Loading entire datasets when pagination would suffice. Unoptimized algorithms causing excessive CPU usage.
 
 ---
 
@@ -269,14 +293,14 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 **For Contributors**: Propose changes consistent with principles. Challenge principles if context has changed (with strong rationale).
 
-**For Agents**: These principles guide all work. When uncertain, return to principles. NON-NEGOTIABLE means NON-NEGOTIABLE.
+**For Agents**: These principles guide all work. When uncertain, return to principles. NON-NEGOTIABLE means NON-NEGOTIABLE. FOUNDATION principles are the highest tier — they are the reasons the framework exists.
 
 **Architecture**: These principles are implemented through a three-layer instruction architecture (Constitution → Playbooks → State). See `docs/INSTRUCTION_ARCHITECTURE.md` for the design basis.
 
 ---
 
-**Last Updated**: 2026-02-05
-**Framework Version**: 0.19.0
+**Last Updated**: 2026-02-13
+**Framework Version**: 0.25.6
 
 **Note**: Principles evolve, but slowly. Major changes require strong justification.
 

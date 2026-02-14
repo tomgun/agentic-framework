@@ -130,47 +130,57 @@ Then follow the same agent initialization process above. The agent will run `sca
 
 **📖 Full detail with rationale: [`PRINCIPLES.md`](.agentic/PRINCIPLES.md)** ⭐
 
-8 NON-NEGOTIABLE principles + 3 RECOMMENDED. Here's the overview:
+3 FOUNDATION + 6 NON-NEGOTIABLE + 3 RECOMMENDED. Here's the overview:
 
-### 1. Sustainable Long-Term Development
-**Projects lasting months or years, not quick prototypes.**
-Context resets, team changes, evolving requirements — the framework keeps projects coherent through durable artifacts (`CONTEXT_PACK.md`, `STATUS.md`, `JOURNAL.md`) and observable progress visible to both humans and agents.
+#### FOUNDATION (WHY — the reasons this framework exists)
 
-### 2. Human-Agent Partnership
-**Humans define WHAT, agents handle HOW. Neither alone is optimal.**
-Humans edit specs directly (markdown), agents honor edits as source of truth. Framework makes review efficient (diff stats, scope warnings) but never eliminates it. `HUMAN_NEEDED.md` for escalation.
+### 1. Developer-Friendly Experience
+**The framework makes the developer's life easier.**
+Session dashboard reconstructs context, documentation is automatic, state carries across sessions. The developer doesn't have to remember what happened — the framework remembers for them.
+
+### 2. Sustainable Long-Term Development & Quality Software
+**Properly designed, tested, documented software that stays reliable over time.**
+When specs, criteria, and tests exist, agents can't silently regress working features. Programming standards loaded by default, durable artifacts survive context resets, observable progress visible to both humans and agents.
 
 ### 3. Context Efficiency
 **The #1 unique technical insight: respect the context window.**
 Structured reading protocols with token budgets. Agent delegation for fresh context. Sequential agents load only role-specific context. Token-efficient scripts (40x cheaper than read-modify-write). Manual operations for zero-token information retrieval. See `.agentic/token_efficiency/` for quantified savings (60-83% typical).
 
-### 4. Deterministic Enforcement
+#### NON-NEGOTIABLE (HOW — enforced rules & guardrails)
+
+### 4. Human-Agent Partnership
+**Humans define WHAT, agents handle HOW. Neither alone is optimal.**
+Humans edit specs directly (markdown), agents honor edits as source of truth. Framework makes review efficient (diff stats, scope warnings) but never eliminates it. `HUMAN_NEEDED.md` for escalation.
+
+### 5. Deterministic Enforcement
 **Scripts and gates enforce behavior, not documentation and hope.**
 Pre-commit hooks block if WIP exists or acceptance files missing. `feature.sh` enforces valid status transitions. Hard gates for hard rules, soft warnings for judgment calls. Works the same regardless of which AI model runs them.
 
-### 5. Durable Artifacts
+### 6. Durable Artifacts
 **Living documents readable by both humans and agents.**
 `CONTEXT_PACK.md` (architecture), `STATUS.md` (current state), `JOURNAL.md` (progress history), `HUMAN_NEEDED.md` (decisions needed). Agents read these first; humans can `cat STATUS.md` for instant awareness (zero tokens). The core mechanism for surviving context resets.
 
-### 6. Anti-Hallucination ⚠️
+### 7. Anti-Hallucination
 **Agents NEVER make things up — accuracy over speed.**
 "I don't know" is explicitly encouraged. Verify against version-specific docs. Wrong code that looks right is worse than no code. See [agent guidelines](.agentic/agents/shared/agent_operating_guidelines.md) for complete rules.
 
-### 7. No Auto-Commits
+### 8. No Auto-Commits
 **Human approval required before every commit.** The safety gate that prevents compounding mistakes.
 
-### 8. Check Before Creating
+### 9. Check Before Creating
 **Search before creating any file, test, doc, or component.** Duplication wastes effort and causes inconsistency. A 30-second search prevents hours of duplicate work.
 
-### 9. Small Batch + Acceptance-Driven Development *(recommended)*
+#### RECOMMENDED (HOW — best practices)
+
+### 10. Small Batch + Acceptance-Driven Development *(recommended)*
 **One feature at a time, acceptance criteria before code.**
 MAX 5-10 files per commit. Specs evolve during implementation. Shipped ≠ Accepted (human validation is final gate). TDD available as option.
 
-### 10. Living Documentation *(recommended)*
+### 11. Living Documentation *(recommended)*
 **Docs updated in same commit as code. Single source of truth.**
 No stale placeholders. DRY (cross-reference, don't duplicate). Explicit over implicit — agents need explicitness.
 
-### 11. Green Coding *(recommended)*
+### 12. Green Coding *(recommended)*
 **Efficient software reduces energy consumption and cost.**
 Token efficiency IS green for framework ops. For project code: algorithms, caching, event-driven patterns. See [green_coding.md](.agentic/quality/green_coding.md) for comprehensive guidelines.
 

@@ -321,19 +321,25 @@ bash .agentic/tools/migration.sh search "keyword"        # Search migrations
 
 **📖 Full guide: [`PRINCIPLES.md`](PRINCIPLES.md)** ⭐
 
-11 core principles (8 NON-NEGOTIABLE, 3 RECOMMENDED):
+12 core principles (3 FOUNDATION, 6 NON-NEGOTIABLE, 3 RECOMMENDED):
 
-1. **Sustainable Long-Term Development** — Durable artifacts survive context resets
-2. **Human-Agent Partnership** — Collaboration, not AI autonomy
+**FOUNDATION** (WHY — the reasons this framework exists):
+1. **Developer-Friendly Experience** — Framework remembers so developers don't have to
+2. **Sustainable Long-Term Development & Quality Software** — Tested, documented, reliable over time
 3. **Context Efficiency** — Token-efficient scripts and reading protocols
-4. **Deterministic Enforcement** — Scripts with exit codes, not suggestions
-5. **Durable Artifacts** — CONTEXT_PACK, STATUS, JOURNAL always current
-6. **Anti-Hallucination** — Verify before using, never fabricate
-7. **No Auto-Commits** — Human approval required
-8. **Check Before Creating** — Search for existing before adding new
-9. **Small Batch + Acceptance-Driven** — One feature at a time, criteria first
-10. **Living Documentation** — Docs updated in same commit as code
-11. **Green Coding** — Minimize environmental impact
+
+**NON-NEGOTIABLE** (HOW — enforced rules & guardrails):
+4. **Human-Agent Partnership** — Collaboration, not AI autonomy
+5. **Deterministic Enforcement** — Scripts with exit codes, not suggestions
+6. **Durable Artifacts** — CONTEXT_PACK, STATUS, JOURNAL always current
+7. **Anti-Hallucination** — Verify before using, never fabricate
+8. **No Auto-Commits** — Human approval required
+9. **Check Before Creating** — Search for existing before adding new
+
+**RECOMMENDED** (HOW — best practices):
+10. **Small Batch + Acceptance-Driven** — One feature at a time, criteria first
+11. **Living Documentation** — Docs updated in same commit as code
+12. **Green Coding** — Minimize environmental impact
 
 See PRINCIPLES.md for the reasoning behind every framework decision.
 

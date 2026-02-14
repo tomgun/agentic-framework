@@ -429,3 +429,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-14 09:46 - Principle restructuring
+
+**Why**: Two foundational motivations (developer UX, code quality) were never given principle status despite being the reasons the framework exists
+
+**Accomplished**:
+- Restructured 12 principles into 3 tiers: 3 FOUNDATION (P1 Developer-Friendly Experience NEW, P2 Sustainable+Quality MERGED, P3 Context Efficiency PROMOTED) + 6 NON-NEGOTIABLE (P4-P9) + 3 RECOMMENDED (P10-P12). Updated 9 files: PRINCIPLES.md, HOW_IT_WORKS.md, README.md, .agentic/README.md, FRAMEWORK_QUICK_START.md, INSTRUCTION_ARCHITECTURE.md, TRACEABILITY_MATRIX.md, VERIFICATION_REPORT.md, implementation-agent.yaml. Promoted programming_standards.md to REQUIRED. All 184 validation tests pass.
+
+**Next steps**:
+- Create feature branch and PR for review
+
+**Blockers**: None
+

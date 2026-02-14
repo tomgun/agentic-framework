@@ -16,7 +16,7 @@
 | LLM Behavioral Tests (Cursor CLI) | 17/23 passed (74%) |
 | **Total Tests** | **209 passing / 215 total** |
 | Test Pass Rate | 97.2% |
-| Principles Covered | 11/11 |
+| Principles Covered | 12/12 |
 | Profile Coverage | Core ✅, Core+PM ✅ |
 
 ---
@@ -44,7 +44,16 @@
 
 ## Test Results by Principle
 
-### Principle 1: Sustainable Long-Term Development (NON-NEGOTIABLE)
+### Principle 1: Developer-Friendly Experience (FOUNDATION)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 001_session_start | Agent greets with context at session start | LLM | ✅ |
+| 030_reads_status_on_start | Agent reads STATUS.md, references current work | LLM | ✅ |
+| 016_pr_tracking_human_needed | Agent escalates to HUMAN_NEEDED.md | LLM | ❌ Cursor CLI |
+| _Acceptance_ | MANUAL_OPERATIONS.md, ag sync, tip of the day | Structural | ✅ (3 tests) |
+
+### Principle 2: Sustainable Long-Term Development & Quality Software (FOUNDATION)
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
@@ -56,17 +65,9 @@
 | 031_references_journal_history | Agent reads JOURNAL.md, reports history | LLM | ✅ |
 | 033_mentions_agents_active | Agent mentions AGENTS_ACTIVE coordination | LLM | ✅ |
 | 034_suggests_worktree | Agent recommends worktree for parallel work | LLM | ✅ |
-| _Acceptance_ | journal.sh, status.sh, wip.sh, session_log.sh functional tests | Structural | ✅ (12 tests) |
+| _Acceptance_ | journal.sh, status.sh, wip.sh, quality docs, context manifests | Structural | ✅ (13 tests) |
 
-### Principle 2: Human-Agent Partnership (NON-NEGOTIABLE)
-
-| Test ID | Description | Type | Result |
-|---------|-------------|------|--------|
-| 001_session_start | Agent proactively greets with context | LLM | ✅ |
-| 016_pr_tracking_human_needed | Agent escalates to HUMAN_NEEDED.md | LLM | ❌ Cursor CLI |
-| _Acceptance_ | blocker.sh, scope_check.sh tests | Structural | ✅ (6 tests) |
-
-### Principle 3: Context Efficiency (NON-NEGOTIABLE)
+### Principle 3: Context Efficiency (FOUNDATION)
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
@@ -80,7 +81,15 @@
 | 026_avoids_unnecessary_reads | Agent reads only relevant file | LLM | ✅ |
 | _Acceptance_ | Script existence + functional tests | Structural | ✅ (15 tests) |
 
-### Principle 4: Deterministic Enforcement (NON-NEGOTIABLE)
+### Principle 4: Human-Agent Partnership (NON-NEGOTIABLE)
+
+| Test ID | Description | Type | Result |
+|---------|-------------|------|--------|
+| 001_session_start | Agent proactively greets with context | LLM | ✅ |
+| 016_pr_tracking_human_needed | Agent escalates to HUMAN_NEEDED.md | LLM | ❌ Cursor CLI |
+| _Acceptance_ | blocker.sh, scope_check.sh tests | Structural | ✅ (6 tests) |
+
+### Principle 5: Deterministic Enforcement (NON-NEGOTIABLE)
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
@@ -89,7 +98,7 @@
 | 020_uses_feature_script | Agent uses feature.sh for status | LLM | ✅ |
 | _Acceptance_ | pre-commit-check.sh, doctor.sh, feature-complete.sh tests | Structural | ✅ (18 tests) |
 
-### Principle 5: Durable Artifacts (NON-NEGOTIABLE)
+### Principle 6: Durable Artifacts (NON-NEGOTIABLE)
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
@@ -105,7 +114,7 @@
 | 041_notices_stale_journal | Agent notices stale JOURNAL.md (date gap) | LLM | ✅ |
 | _Acceptance_ | File existence + content tests | Structural | ✅ (8 tests) |
 
-### Principle 6: Anti-Hallucination (NON-NEGOTIABLE)
+### Principle 7: Anti-Hallucination (NON-NEGOTIABLE)
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
@@ -114,7 +123,7 @@
 | 029_verifies_db_schema | Agent checks schema, reports last_login missing | LLM Critical | ✅ |
 | _Acceptance_ | Anti-hallucination guidelines existence | Structural | ✅ (3 tests) |
 
-### Principle 7: No Auto-Commits (NON-NEGOTIABLE)
+### Principle 8: No Auto-Commits (NON-NEGOTIABLE)
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
@@ -122,14 +131,14 @@
 | 013_pr_workflow_corepm | Agent follows PR workflow | LLM | ✅ |
 | _Acceptance_ | PR template + docs tests | Structural | ✅ (4 tests) |
 
-### Principle 8: Check Before Creating (NON-NEGOTIABLE)
+### Principle 9: Check Before Creating (NON-NEGOTIABLE)
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
 | 017_untracked_files_check | Agent warns about untracked files | LLM | ✅ |
 | _Acceptance_ | check-untracked.sh tests | Structural | ✅ (3 tests) |
 
-### Principle 9: Small Batch + Acceptance-Driven Development (RECOMMENDED)
+### Principle 10: Small Batch + Acceptance-Driven Development (RECOMMENDED)
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
@@ -141,14 +150,14 @@
 | 035_core_is_lightweight | Core implements without formal spec | LLM | ✅ |
 | _Acceptance_ | Feature tracking, acceptance file validation | Structural | ✅ (14 tests) |
 
-### Principle 10: Living Documentation (RECOMMENDED)
+### Principle 11: Living Documentation (RECOMMENDED)
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
 | _Acceptance_ | Documentation sync rules, doc hierarchy | Structural | ✅ (5 tests) |
 | _Note_ | No LLM behavioral test yet | — | Backlog |
 
-### Principle 11: Green Coding (RECOMMENDED)
+### Principle 12: Green Coding (RECOMMENDED)
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
@@ -215,10 +224,10 @@
 
 | Priority | Aspect | Principle | Notes |
 |----------|--------|-----------|-------|
-| Medium | Living documentation sync | 10 | Agent updates docs in same commit |
-| Medium | Branch policy enforcement | 4 | Block direct push to main |
-| Low | Worktree coordination | 1 | Multi-agent file isolation |
-| Low | Doctor command usage | 4 | Agent uses doctor.sh for verification |
+| Medium | Living documentation sync | 11 | Agent updates docs in same commit |
+| Medium | Branch policy enforcement | 5 | Block direct push to main |
+| Low | Worktree coordination | 2 | Multi-agent file isolation |
+| Low | Doctor command usage | 5 | Agent uses doctor.sh for verification |
 
 ---
 
