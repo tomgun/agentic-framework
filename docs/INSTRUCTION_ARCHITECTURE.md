@@ -23,7 +23,7 @@ This design synthesizes two independent research efforts:
 | Instruction files serve orchestrator only | YES | YES — confirmed across tools with sources | FULL |
 | Context retention is unreliable | YES — "never rely on passive retention" | YES — L-0002: degrades past ~100 lines (empirical) | FULL |
 | Three-layer architecture needed | YES — Constitution/Playbooks/State | Partially — framework has pieces but no formal layering | ALIGNED |
-| Structural enforcement > behavioral | YES — "orchestrator is enforcement layer" | YES — Principle #5, pre-commit gates | FULL |
+| Structural enforcement > behavioral | YES — "orchestrator is enforcement layer" | YES — D2 (Deterministic Enforcement), pre-commit gates | FULL |
 | Post-task validation mandatory | YES — finalization check pattern | `ag done` runs doctor.sh but `\|\| true` suppresses failures | NARROW GAP |
 | Constitution size: 300-800 tokens | YES (no cited empirical basis) | ~100 lines / ~1500 tokens max (LLM test-validated) | DEVIATION |
 
@@ -61,7 +61,7 @@ This design synthesizes two independent research efforts:
 
 ### Layer 2: Playbooks (already exist)
 
-**Key files**: auto_orchestration.md (335 lines), agent_operating_guidelines.md (435 lines), 9 checklists, quality standards, workflow docs.
+**Key files**: auto_orchestration.md (442 lines), agent_operating_guidelines.md (127 lines), 9 checklists, quality standards, workflow docs.
 
 **Loading mechanism**: `ag` commands print relevant instructions at the right moment. auto_orchestration.md is NOT referenced in any instruction file — it is accessed indirectly when agents run `ag implement`, `ag commit`, etc., which print task-specific guidance. This is intentional: just-in-time delivery via scripts.
 
@@ -83,7 +83,7 @@ This design synthesizes two independent research efforts:
 
 ### Defense-in-Depth: Memory Seed Layer
 
-The framework includes a **memory-seed** mechanism (`.agentic/init/memory-seed.md`) that seeds key workflow patterns into each tool's persistent memory during init. This coexists with Design Principle 2 ("Never rely on memory") because memory-seed is **redundant reinforcement, not primary enforcement**.
+The framework includes a **memory-seed** mechanism (`.agentic/init/memory-seed.md`) that seeds key workflow patterns into each tool's persistent memory during init. This coexists with this document's design principle #2 in §5 ("Never rely on memory") [note: this is the doc's own design principle list, not framework principle D2] because memory-seed is **redundant reinforcement, not primary enforcement**.
 
 **The relationship**: Scripts enforce; memory reinforces. `pre-commit-check.sh` structurally blocks bad commits regardless of what the agent remembers. Memory-seed makes the agent *less likely* to attempt the bad commit in the first place. If memory fails, structural gates still catch the violation.
 
@@ -150,7 +150,7 @@ These mechanisms are proven and stable. Changes require strong justification:
 | Root .github/copilot-instructions.md | 77 | 49 | 36% |
 | Root .cursorrules | 27 | 27 | unchanged (already lean) |
 
-Moved content (gates table, delegation/agent mode, session protocols, agent boundaries) to `auto_orchestration.md` (334 → 384 lines). All templates now contain only constitutional content: trigger table, token-efficient scripts, core behavioral rules, and a playbook pointer.
+Moved content (gates table, delegation/agent mode, session protocols, agent boundaries) to `auto_orchestration.md` (334 → 442 lines). All templates now contain only constitutional content: trigger table, token-efficient scripts, core behavioral rules, and a playbook pointer.
 
 **Note**: Original design doc baseline for `.cursorrules` was incorrectly listed as 71 lines (that was the codex template). Actual root `.cursorrules` is 27 lines.
 

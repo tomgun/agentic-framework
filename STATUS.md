@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Principles DAG hierarchy — ready to commit (Updated: 2026-02-14 14:19 EET)
+- PR ready for review (Updated: 2026-02-14 14:20 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)
