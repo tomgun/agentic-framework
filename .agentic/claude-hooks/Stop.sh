@@ -69,12 +69,9 @@ if [[ -n "$JOURNAL_PATH" ]]; then
   fi
 fi
 
-# 3. Check if STATUS.md exists and has Project Phase
+# 3. Check if STATUS.md exists
 if [[ -f "STATUS.md" ]]; then
-  if ! grep -q "## Project Phase" STATUS.md 2>/dev/null; then
-    echo "💡 Tip: Add Project Phase section to STATUS.md"
-    echo "   Phase: discovery | building"
-  fi
+  : # STATUS.md exists, no further checks needed
 else
   echo "⚠️  No STATUS.md found"
   echo "   Run: bash .agentic/init/scaffold.sh"
@@ -100,7 +97,7 @@ else
   echo "Session end checklist:"
   echo "- [ ] Commit changes (git add + git commit)"
   echo "- [ ] Update JOURNAL.md with session summary"
-  echo "- [ ] Update STATUS.md (Project Phase, current focus)"
+  echo "- [ ] Update STATUS.md (current focus, progress)"
 fi
 echo ""
 

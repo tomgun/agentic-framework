@@ -291,14 +291,6 @@ else
   echo -e "  ${GREEN}✓${NC} STATUS.md already exists"
 fi
 
-# Check if STATUS.md has Project Phase section (new requirement)
-if [[ -f "$TARGET_PROJECT_DIR/STATUS.md" ]]; then
-  if ! grep -q "## Project Phase" "$TARGET_PROJECT_DIR/STATUS.md" 2>/dev/null; then
-    echo -e "  ${YELLOW}⚠${NC} STATUS.md missing Project Phase section (see template for format)"
-    STATUS_MD_NEEDS_UPDATE="yes"
-  fi
-fi
-
 # Cleanup: Remove deprecated status.json backend (removed in v0.25.0)
 rm -f "$TARGET_PROJECT_DIR/.agentic/state/status.json" 2>/dev/null
 rmdir "$TARGET_PROJECT_DIR/.agentic/state" 2>/dev/null || true
