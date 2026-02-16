@@ -7,7 +7,7 @@ source "$(dirname "$0")/../lib/helpers.sh"
 
 section_header "S05: Hook fires end-to-end"
 
-PROJECT=$(scaffold_test_project "core")
+PROJECT=$(scaffold_test_project "discovery")
 cd "$PROJECT"
 
 # Create WIP so the hook has something to catch (guarantees non-zero exit + output)

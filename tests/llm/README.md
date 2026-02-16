@@ -44,7 +44,7 @@ Each test is a bash script in `tests/llm/tests/`:
 # Tests: LLM-XXX (reference to LLM_TEST_PLAN.md)
 
 # Setup - create fresh project
-setup_test_project "core"  # or "core-pm"
+setup_test_project "discovery"  # or "formal"
 
 # Action - send prompt to agent
 send_prompt "your prompt here"
@@ -64,7 +64,7 @@ cleanup_test_project
 
 | Function | Description |
 |----------|-------------|
-| `setup_test_project "profile"` | Create temp project (core or core-pm) |
+| `setup_test_project "profile"` | Create temp project (discovery or formal) |
 | `send_prompt "text"` | Send prompt to Claude, capture output |
 | `check_output_contains "pattern" "desc"` | Verify output has pattern |
 | `check_output_not_contains "pattern" "desc"` | Verify output lacks pattern |
@@ -86,8 +86,8 @@ cleanup_test_project
 | 007_small_batch | Important | Agent breaks large tasks into pieces |
 | 008_reads_context_pack | Important | Agent reads CONTEXT_PACK.md |
 | 009_mentions_checklist | Normal | Agent references checklists |
-| 010_feature_needs_spec | Important | Core+PM requires spec before coding |
-| 011_core_proceeds_without_spec | Normal | Core profile proceeds without spec |
+| 010_feature_needs_spec | Important | Formal requires spec before coding |
+| 011_core_proceeds_without_spec | Normal | Discovery profile proceeds without spec |
 
 ## Adding New Tests
 
