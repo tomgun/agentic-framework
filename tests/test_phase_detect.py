@@ -12,21 +12,21 @@ sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "tools"))
 from phase_detect import detect_phase, read_profile
 
 
-def test_core_profile_returns_core_mode():
-    """Core profile should return 'core-mode'."""
+def test_discovery_profile_returns_discovery_mode():
+    """Discovery profile should return 'discovery-mode'."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
-        # Create minimal STACK.md with core profile
-        (root / "STACK.md").write_text("- Profile: core\n")
+        # Create minimal STACK.md with discovery profile
+        (root / "STACK.md").write_text("- Profile: discovery\n")
 
-        assert detect_phase(root) == "core-mode"
+        assert detect_phase(root) == "discovery-mode"
 
 
 def test_no_wip_returns_start():
     """No WIP.md should return 'start'."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
-        # Create core+product profile indicators
+        # Create formal profile indicators
         (root / "spec").mkdir()
         (root / "STATUS.md").write_text("# Status\n")
 
@@ -37,13 +37,13 @@ def test_wip_without_acceptance_returns_planning():
     """.agentic-state/WIP.md with feature but no acceptance file should return 'planning'."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
-        # Setup core+product
+        # Setup formal profile
         (root / "spec").mkdir()
         (root / "spec" / "acceptance").mkdir()
         (root / "STATUS.md").write_text("# Status\n")
         # Create .agentic-state/WIP.md with feature
-        (root / ".agentic").mkdir()
-        (root / ".agentic" / "WIP.md").write_text("**Feature**: F-0001: Test feature\n")
+        (root / ".agentic-state").mkdir()
+        (root / ".agentic-state" / "WIP.md").write_text("**Feature**: F-0001: Test feature\n")
 
         assert detect_phase(root) == "planning"
 
@@ -52,13 +52,13 @@ def test_wip_with_acceptance_returns_implement():
     """.agentic-state/WIP.md with feature and acceptance file should return 'implement'."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
-        # Setup core+product
+        # Setup formal profile
         (root / "spec").mkdir()
         (root / "spec" / "acceptance").mkdir()
         (root / "STATUS.md").write_text("# Status\n")
         # Create .agentic-state/WIP.md with feature
-        (root / ".agentic").mkdir()
-        (root / ".agentic" / "WIP.md").write_text("**Feature**: F-0001: Test feature\n")
+        (root / ".agentic-state").mkdir()
+        (root / ".agentic-state" / "WIP.md").write_text("**Feature**: F-0001: Test feature\n")
         # Create acceptance file
         (root / "spec" / "acceptance" / "F-0001.md").write_text("# Acceptance\n")
 
@@ -69,7 +69,7 @@ def test_blocker_returns_blocked():
     """HUMAN_NEEDED.md with blocker should return 'blocked'."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
-        # Setup core+product
+        # Setup formal profile
         (root / "spec").mkdir()
         (root / "STATUS.md").write_text("# Status\n")
         # Create blocker
@@ -82,16 +82,16 @@ def test_read_profile_defaults():
     """Test profile detection defaults."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
-        # No indicators = core
-        assert read_profile(root) == "core"
+        # No indicators = discovery
+        assert read_profile(root) == "discovery"
 
-        # spec/ dir = core+product
+        # spec/ dir = formal
         (root / "spec").mkdir()
-        assert read_profile(root) == "core+product"
+        assert read_profile(root) == "formal"
 
 
 if __name__ == "__main__":
-    test_core_profile_returns_core_mode()
+    test_discovery_profile_returns_discovery_mode()
     test_no_wip_returns_start()
     test_wip_without_acceptance_returns_planning()
     test_wip_with_acceptance_returns_implement()

@@ -54,21 +54,21 @@ fi
 
 if [[ ! -f "OVERVIEW.md" && -f ".agentic/init/PRODUCT.template.md" ]]; then
   cp ".agentic/init/PRODUCT.template.md" "OVERVIEW.md"
-  echo -e "${GREEN}✓ Created OVERVIEW.md (Core)${NC}"
+  echo -e "${GREEN}✓ Created OVERVIEW.md (Discovery)${NC}"
 fi
 
 if [[ ! -f ".agentic-journal/JOURNAL.md" ]] && [[ ! -f "JOURNAL.md" ]] && [[ -f ".agentic/spec/JOURNAL.template.md" ]]; then
   mkdir -p ".agentic-journal"
   cp ".agentic/spec/JOURNAL.template.md" ".agentic-journal/JOURNAL.md"
-  echo -e "${GREEN}✓ Created .agentic-journal/JOURNAL.md (Core)${NC}"
+  echo -e "${GREEN}✓ Created .agentic-journal/JOURNAL.md (Discovery)${NC}"
 fi
 
 if [[ ! -f "HUMAN_NEEDED.md" && -f ".agentic/spec/HUMAN_NEEDED.template.md" ]]; then
   cp ".agentic/spec/HUMAN_NEEDED.template.md" "HUMAN_NEEDED.md"
-  echo -e "${GREEN}✓ Created HUMAN_NEEDED.md (Core)${NC}"
+  echo -e "${GREEN}✓ Created HUMAN_NEEDED.md (Discovery)${NC}"
 fi
 
-echo "What What changes:"
+echo "What changes:"
 echo "  ✓ spec/ directory with templates (PRD, TECH_SPEC, FEATURES, NFR)"
 echo "  ✓ STATUS.md (project status and roadmap)"
 echo "  ✓ Update STACK.md profile to 'formal'"

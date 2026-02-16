@@ -1175,7 +1175,7 @@ else
   fail "Discovery: install.sh failed"
 fi
 
-# Run scaffold with discovery profile (also tests old 'core' value via normalization)
+# Run scaffold with discovery profile
 if AGENTIC_PROFILE=discovery bash .agentic/init/scaffold.sh --non-interactive >/dev/null 2>&1; then
   pass "Discovery: scaffold.sh succeeds"
 else
