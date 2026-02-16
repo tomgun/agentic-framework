@@ -5,7 +5,7 @@
 # Tests: LLM-091
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a simple file to modify
 echo "const greeting = 'hello';" > "$TEST_PROJECT/index.js"

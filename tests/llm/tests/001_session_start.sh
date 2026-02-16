@@ -5,7 +5,7 @@
 # Tests: LLM-001
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Send simple greeting
 send_prompt "hi"

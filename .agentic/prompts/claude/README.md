@@ -28,16 +28,16 @@ This directory contains ready-to-use prompts (called "Projects" in Claude) for c
 - **`session_start.md`** - Start a new coding session
 - **`session_end.md`** - End a session with documentation
 
-### Feature Development (Core+PM Mode)
+### Feature Development (Formal Mode)
 - **`feature_start.md`** - Begin implementing a feature
 - **`feature_test.md`** - Create tests (TDD workflow)
 - **`feature_complete.md`** - Mark feature complete
 
-### Spec Management (Core+PM Mode)
+### Spec Management (Formal Mode)
 - **`migration_create.md`** - Create spec migration
 - **`spec_update.md`** - Update specs after implementation
 
-### Core Mode
+### Discovery Mode
 - **`product_update.md`** - Update OVERVIEW.md
 - **`quick_feature.md`** - Implement simple feature
 
@@ -83,7 +83,7 @@ Projects in Claude Pro provide:
    ```
 3. Add key files as project context:
    - `STATUS.md`
-   - `spec/FEATURES.md` (if Core+PM mode)
+   - `spec/FEATURES.md` (if Formal mode)
    - `STACK.md`
    - `.agentic/START_HERE.md`
 

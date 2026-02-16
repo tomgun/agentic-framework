@@ -1,4 +1,4 @@
-# Update OVERVIEW.md Prompt (Core Mode)
+# Update OVERVIEW.md Prompt (Discovery Mode)
 
 I've made changes to the project and need to update `OVERVIEW.md`.
 
@@ -35,17 +35,17 @@ Please help me update:
 ---
 
 **OVERVIEW.md is your lightweight spec:**
-- In Core mode, it replaces the formal `spec/FEATURES.md`
+- In Discovery mode, it replaces the formal `spec/FEATURES.md`
 - Keep it up-to-date with every significant change
 - It's the first place anyone (human or AI) should look to understand the project
 - Think of it as "living documentation" that evolves with the code
 
 ---
 
-**Tip:** If the project is growing complex and you find yourself wishing for more structure, consider upgrading to Core+PM mode:
+**Tip:** If the project is growing complex and you find yourself wishing for more structure, consider upgrading to Formal mode:
 ```bash
 # TODO: upgrade_profile.sh not yet implemented
-# For now: manually run scaffold.sh with core+product profile
+# For now: manually run scaffold.sh with formal profile
 bash .agentic/init/scaffold.sh
 ```
 

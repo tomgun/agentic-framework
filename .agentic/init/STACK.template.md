@@ -6,7 +6,7 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ## Agentic framework
 - Version: 0.19.0  <!-- Update when upgrading framework -->
-- Profile: core  <!-- core | core+pm -->
+- Profile: discovery  <!-- discovery | formal -->
 - Installed: <!-- YYYY-MM-DD -->
 - Source: https://github.com/tomgun/agentic-framework
 
@@ -99,7 +99,7 @@ Purpose: a single source of truth for "how we build and run software here".
 ## Plan-Review Loop (recommended)
 <!-- Iterative planning with critical review before implementation -->
 <!-- See: .agentic/workflows/plan_review_loop.md -->
-- plan_review_enabled: yes  <!-- yes | no (default: yes for Core+PM, no for Core) -->
+- plan_review_enabled: yes  <!-- yes | no (default: yes for Formal, no for Discovery) -->
 - plan_review_max_iterations: 3  <!-- Max revisions before human escalation -->
 - plan_review_auto_for: [planning]  <!-- planning | implement | both -->
   <!-- planning: Runs for ag plan commands -->
@@ -138,10 +138,10 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--   - No PR overhead                                                        -->
 <!--   - Best for: solo prototypes, fast iteration                             -->
 <!--                                                                           -->
-<!-- Profile defaults: Core → direct, Core+PM → pull_request                   -->
+<!-- Profile defaults: Discovery → direct, Formal → pull_request                -->
 - git_workflow: pull_request  <!-- pull_request | direct -->
 
-<!-- Pull Request mode (DEFAULT for Core+PM, recommended): -->
+<!-- Pull Request mode (DEFAULT for Formal, recommended): -->
 <!--   - Agent creates feature branches for each feature -->
 <!--   - Agent creates PRs after human approval -->
 <!--   - Human reviews PR before merge -->

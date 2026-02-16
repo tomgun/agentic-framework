@@ -5,7 +5,7 @@
 # Tests: LLM-TOKEN-EFFICIENCY
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a large JOURNAL.md (simulating history)
 mkdir -p "$TEST_PROJECT/.agentic-journal"

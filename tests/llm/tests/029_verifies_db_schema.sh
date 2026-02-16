@@ -5,7 +5,7 @@
 # Tests: LLM-029 (core-rules.md rule #1)
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a Prisma schema with User (id, email, name, createdAt) - no last_login
 mkdir -p "$TEST_PROJECT/prisma"

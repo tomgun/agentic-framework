@@ -95,7 +95,7 @@
   - Entry points still accurate?
   - Architecture snapshot current?
 
-### Core+Product Profile (All Core items plus:)
+### Formal Profile (All Core items plus:)
 
 - [ ] **`spec/FEATURES.md` reflects reality**
   - Status accurate (`planned` / `in_progress` / `shipped`)
@@ -136,7 +136,7 @@
 
 ---
 
-## Code Annotations (Core+Product)
+## Code Annotations (Formal)
 
 - [ ] **@feature annotations added**
   - Functions implementing F-#### have `@feature F-####` comment

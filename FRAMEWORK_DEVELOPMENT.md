@@ -35,7 +35,7 @@ Example projects demonstrate best practices and verify workflows actually work.
 
 **How to update examples**:
 1. List all example projects: `ls examples/`
-2. For each example in relevant profile (Core or Core+PM):
+2. For each example in relevant profile (Discovery or Formal):
    - Apply changes manually or regenerate
    - Verify scripts work: `doctor.py`, `verify.py`, etc.
    - Test quality checks if applicable
@@ -43,8 +43,8 @@ Example projects demonstrate best practices and verify workflows actually work.
 3. Commit examples with framework changes
 
 **Example projects to maintain**:
-- `examples/core_todo_cli/` - Core profile example
-- `examples/core_pm_taskboard/` - Core+PM profile example
+- `examples/core_todo_cli/` - Discovery profile example
+- `examples/core_pm_taskboard/` - Formal profile example
 - Keep `examples/old/` as reference but don't update
 
 ---
@@ -151,7 +151,7 @@ Example projects demonstrate best practices and verify workflows actually work.
 
 2. **Verify initialization**:
    - Run through init_playbook.md
-   - Test both Core and Core+PM profiles
+   - Test both Discovery and Formal profiles
    - Verify scaffold.sh creates correct files
 
 3. **Test tools work**:
@@ -162,7 +162,7 @@ Example projects demonstrate best practices and verify workflows actually work.
    ```
 
 4. **Test workflows**:
-   - Add a feature (Core+PM)
+   - Add a feature (Formal)
    - Implement with TDD
    - Run quality checks
    - Verify documentation updates

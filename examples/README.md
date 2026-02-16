@@ -53,24 +53,24 @@ python3 ../../.agentic/tools/coverage.py --reverse src/notes.py
 Previous examples have been archived to `archived/` for reference:
 
 ### `archived/core_todo_cli/`
-**Profile**: Core (no formal product management)
+**Profile**: Discovery (no formal product management)
 **Project**: Python CLI todo manager
 **Demonstrates**: `OVERVIEW.md` for lightweight planning, minimal ceremony
 
 ### `archived/core_pm_taskboard/`
-**Profile**: Core + Product Management
+**Profile**: Formal
 **Project**: Next.js task board web app
 **Demonstrates**: Full `spec/` directory, formal feature tracking with F-#### IDs
 
 ### `archived/old/`
-Original example projects before the Core/Core+PM profile split.
+Original example projects before the Discovery/Formal profile split.
 
 ---
 
 ## Profile Comparison
 
-| Aspect | Core | Core+PM |
-|--------|------|---------|
+| Aspect | Discovery | Formal |
+|--------|-----------|--------|
 | **Planning doc** | `OVERVIEW.md` | `spec/FEATURES.md` + `spec/acceptance/` |
 | **Feature tracking** | Checkboxes | F-#### IDs with status |
 | **Acceptance criteria** | Informal | Formal (`spec/acceptance/F-####.md`) |
@@ -83,8 +83,8 @@ Original example projects before the Core/Core+PM profile split.
 
 When creating new examples, demonstrate at least one of:
 
-1. **Core Profile**: `OVERVIEW.md` checkboxes, minimal ceremony
-2. **Core+PM Profile**: Full `spec/` directory, F-#### feature tracking
+1. **Discovery Profile**: `OVERVIEW.md` checkboxes, minimal ceremony
+2. **Formal Profile**: Full `spec/` directory, F-#### feature tracking
 3. **Traceability**: `@feature` annotations, test naming conventions
 
 Ensure examples are:

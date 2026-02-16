@@ -140,8 +140,8 @@ def main() -> int:
     features_path = repo_root / "spec" / "FEATURES.md"
 
     if not features_path.exists():
-        print("Product Management not enabled (spec/FEATURES.md missing).")
-        print("Enable it with: bash .agentic/tools/enable-product-management.sh")
+        print("Formal profile not enabled (spec/FEATURES.md missing).")
+        print("Enable it with: bash .agentic/tools/enable-formal.sh")
         return 0
 
     md = features_path.read_text(encoding="utf-8")

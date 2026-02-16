@@ -32,7 +32,7 @@
 **Complexity**: medium  
 **Since**: v0.1.0
 
-**Description**: Initialize a new project with the Agentic framework, choosing between Core and Core+PM profiles.
+**Description**: Initialize a new project with the Agentic framework, choosing between Discovery and Formal profiles.
 
 **Dependencies**: None
 
@@ -45,14 +45,14 @@
 
 ---
 
-## F-0002: Profile Selection (Core vs Core+PM)
+## F-0002: Profile Selection (Discovery vs Formal)
 
 **Status**: shipped  
 **Priority**: critical  
 **Complexity**: low  
 **Since**: v0.2.0
 
-**Description**: Two framework profiles - Core (quality + workflows) and Core+PM (adds spec-driven development, feature tracking).
+**Description**: Two framework profiles - Discovery (quality + workflows) and Formal (adds spec-driven development, feature tracking).
 
 **Dependencies**: F-0001
 
@@ -74,7 +74,7 @@
 
 **Description**: Manage features through markdown specifications with status tracking, dependencies, and acceptance criteria.
 
-**Dependencies**: F-0002 (Core+PM profile)
+**Dependencies**: F-0002 (Formal profile)
 
 **Implementation**:
 - State: complete
@@ -1455,7 +1455,7 @@
 **Complexity**: low
 **Since**: v0.11.3
 
-**Description**: PR-based git workflow is the default for Core+PM profile. Agents create feature branches and PRs instead of committing directly to main. Profile-aware defaults: Core+PM → `pull_request`, Core → `direct`. Users can override in STACK.md.
+**Description**: PR-based git workflow is the default for Formal profile. Agents create feature branches and PRs instead of committing directly to main. Profile-aware defaults: Formal → `pull_request`, Discovery → `direct`. Users can override in STACK.md.
 
 **Dependencies**: F-0002 (Profile Selection)
 
@@ -1592,7 +1592,7 @@ agent_mode: balanced  # premium | balanced | economy
 - `check_agent_conflicts.sh` - Check if files overlap between agents
 - `sync_worktrees.sh` - Pull main into all worktrees
 - `git_mode.sh` - Show git workflow mode from STACK.md
-- `upgrade_profile.sh` - Upgrade Core → Core+PM profile
+- `upgrade_profile.sh` - Upgrade Discovery → Formal profile
 
 **Dependencies**: F-0031 (Multi-Agent Coordination)
 
@@ -1732,7 +1732,7 @@ agent_mode: balanced  # premium | balanced | economy
 **Complexity**: small
 **Since**: v0.15.1
 
-**Description**: Enforce git workflow policy from STACK.md. When `git_workflow: pull_request`, block commits to main/master with clear guidance (create feature branch, use --no-verify for hotfixes, or switch to direct workflow). Profile-aware defaults: Core → direct, Core+PM → pull_request.
+**Description**: Enforce git workflow policy from STACK.md. When `git_workflow: pull_request`, block commits to main/master with clear guidance (create feature branch, use --no-verify for hotfixes, or switch to direct workflow). Profile-aware defaults: Discovery → direct, Formal → pull_request.
 
 **Dependencies**: F-0002 (Profile Selection), F-0016 (Pre-Commit Quality Gates), F-0096 (PR-Based Workflow Default)
 
@@ -1752,7 +1752,7 @@ agent_mode: balanced  # premium | balanced | economy
 **Complexity**: medium
 **Since**: v0.16.0
 
-**Description**: Enforce maintainability through automated gates: test execution (BLOCKING), complexity limits (BLOCKING: max files, max added lines, max file length), and escape hatches for legitimate bypasses (blocked on main/master). Both Core and Core+PM profiles enforce tests and complexity limits.
+**Description**: Enforce maintainability through automated gates: test execution (BLOCKING), complexity limits (BLOCKING: max files, max added lines, max file length), and escape hatches for legitimate bypasses (blocked on main/master). Both Discovery and Formal profiles enforce tests and complexity limits.
 
 **Dependencies**: F-0016 (Pre-Commit Quality Gates), F-0115 (Git Workflow Branch Check)
 
@@ -1990,7 +1990,7 @@ agent_mode: balanced  # premium | balanced | economy
 **Complexity**: medium
 **Since**: v0.25.5
 
-**Description**: Agents skip the specs-first workflow even when CLAUDE.md trigger tables say to plan first. Root cause analysis of why instructions fail to enforce the Core+PM contract (acceptance criteria before coding), and structural fixes across all enforcement points (ag commands, memory-seed, trigger tables, gate scripts) to make skipping specs structurally difficult rather than relying on behavioral compliance.
+**Description**: Agents skip the specs-first workflow even when CLAUDE.md trigger tables say to plan first. Root cause analysis of why instructions fail to enforce the Formal contract (acceptance criteria before coding), and structural fixes across all enforcement points (ag commands, memory-seed, trigger tables, gate scripts) to make skipping specs structurally difficult rather than relying on behavioral compliance.
 
 **Dependencies**: F-0098 (Structural Enforcement), F-0003 (Spec-Driven Development)
 
@@ -2010,7 +2010,7 @@ agent_mode: balanced  # premium | balanced | economy
 **Complexity**: low
 **Since**: v0.25.8
 
-**Description**: Core profile gets zero spec nudging — agents skip criteria entirely. This adds structural reminders (D2: scripts > docs) for thinking about success criteria before coding. Core gets non-blocking nudges; Core+PM gets spec evolution surfacing. Also removes dead-code `## Project Phase` section from STATUS.template.md (Profile handles spec rigor).
+**Description**: Discovery profile gets zero spec nudging — agents skip criteria entirely. This adds structural reminders (D2: scripts > docs) for thinking about success criteria before coding. Discovery gets non-blocking nudges; Formal gets spec evolution surfacing. Also removes dead-code `## Project Phase` section from STATUS.template.md (Profile handles spec rigor).
 
 **Dependencies**: F-0128 (Specs-Before-Code), F-0006 (Acceptance-Driven Development)
 

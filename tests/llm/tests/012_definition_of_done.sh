@@ -4,8 +4,8 @@
 # Category: Important
 # Tests: LLM-012
 
-# Setup - Core+PM project with a "completed" feature
-setup_test_project "core-pm"
+# Setup - Formal project with a "completed" feature
+setup_test_project "formal"
 
 # Create a feature that's "implemented" but needs verification
 mkdir -p "$TEST_PROJECT/src"

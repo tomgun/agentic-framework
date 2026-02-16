@@ -6,7 +6,7 @@
 # Tests: LLM-025
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create CONTEXT_PACK with detailed architecture info
 cat > "$TEST_PROJECT/CONTEXT_PACK.md" << 'EOF'

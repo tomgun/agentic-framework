@@ -1,4 +1,4 @@
-# Start Feature Implementation Prompt (Core+PM Mode)
+# Start Feature Implementation Prompt (Formal Mode)
 
 I want to implement feature **F-[XXXX]** (replace with actual feature ID).
 

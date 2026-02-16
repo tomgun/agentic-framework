@@ -5,7 +5,7 @@
 # Tests: LLM-048
 
 # Setup with Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a simple app with a bug scenario
 cat > "$TEST_PROJECT/src/session.js" << 'EOF'

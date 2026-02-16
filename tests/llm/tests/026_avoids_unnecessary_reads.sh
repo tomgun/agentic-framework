@@ -6,7 +6,7 @@
 # Tests: LLM-026
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a simple file to edit
 cat > "$TEST_PROJECT/index.js" << 'EOF'

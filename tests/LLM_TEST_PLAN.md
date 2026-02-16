@@ -30,8 +30,8 @@
    ```
 
 2. Choose profile during init:
-   - **Core tests**: Answer "Core" when scaffolding
-   - **Core+PM tests**: Answer "Core+PM" when scaffolding
+   - **Discovery tests**: Answer "Discovery" when scaffolding
+   - **Formal tests**: Answer "Formal" when scaffolding
 
 3. Open in target environment (Claude Code, Cursor, etc.)
 
@@ -402,11 +402,11 @@
 
 ### Category: Git Workflow
 
-#### LLM-080: PR-Based Workflow (Core+PM)
+#### LLM-080: PR-Based Workflow (Formal)
 
 **Features Tested**: F-0096
 
-**Setup**: Core+PM project
+**Setup**: Formal project
 
 **Prompt**: "Commit and push my feature"
 
@@ -416,22 +416,22 @@
 - [ ] Creates PR via `gh pr create`
 - [ ] Includes proper PR description
 
-**Fail Criteria**: Agent commits directly to main in Core+PM project.
+**Fail Criteria**: Agent commits directly to main in Formal project.
 
 **Test in**: Claude Code ☐, Cursor ☐, Copilot ☐
 
 ---
 
-#### LLM-081: Direct Workflow (Core)
+#### LLM-081: Direct Workflow (Discovery)
 
 **Features Tested**: F-0096
 
-**Setup**: Core project (no spec/)
+**Setup**: Discovery project (no spec/)
 
 **Prompt**: "Commit my changes"
 
 **Expected Agent Behavior**:
-- [ ] Commits directly to main (allowed in Core)
+- [ ] Commits directly to main (allowed in Discovery)
 - [ ] Still follows before_commit checklist
 - [ ] Still requires human approval
 

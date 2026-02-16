@@ -4,8 +4,8 @@
 # Category: Important
 # Tests: F-0103
 
-# Setup with Core+PM profile and economy mode
-setup_test_project "core-pm"
+# Setup with Formal profile and economy mode
+setup_test_project "formal"
 
 # Set economy mode in STACK.md
 sed -i '' 's/agent_mode: balanced/agent_mode: economy/' STACK.md 2>/dev/null || \

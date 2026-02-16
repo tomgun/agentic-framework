@@ -4,8 +4,8 @@
 # Category: Important
 # Tests: LLM-047
 
-# Setup with Core+PM profile
-setup_test_project "core-pm"
+# Setup with Formal profile
+setup_test_project "formal"
 
 # Create a feature in_progress with acceptance criteria done
 mkdir -p "$TEST_PROJECT/spec/acceptance"

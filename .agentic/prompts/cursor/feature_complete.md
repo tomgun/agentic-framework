@@ -1,4 +1,4 @@
-# Mark Feature Complete Prompt (Core+PM Mode)
+# Mark Feature Complete Prompt (Formal Mode)
 
 Feature **F-[XXXX]** is ready to be marked complete.
 

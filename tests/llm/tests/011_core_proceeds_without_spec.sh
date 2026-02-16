@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Description: Core profile allows proceeding without acceptance spec
+# Description: Discovery profile allows proceeding without acceptance spec
 # Section: trigger
 # Category: Normal
-# Tests: LLM-011 (Core profile behavior)
+# Tests: LLM-011 (Discovery profile behavior)
 
-# Setup - Core profile (NOT core-pm)
-setup_test_project "core"
+# Setup - Discovery profile (NOT formal)
+setup_test_project "discovery"
 
 # Ask to implement something without a spec file existing
 send_prompt "Add a hello world function to main.js"
@@ -13,9 +13,9 @@ send_prompt "Add a hello world function to main.js"
 # Verify agent behavior
 FAILURES=0
 
-# In Core profile, agent should NOT block on missing spec
+# In Discovery profile, agent should NOT block on missing spec
 check_output_not_contains "spec.*required\|acceptance.*required\|criteria.*first\|BLOCK\|cannot proceed" \
-    "Agent does NOT require spec in Core profile" || ((FAILURES++))
+    "Agent does NOT require spec in Discovery profile" || ((FAILURES++))
 
 # Agent should proceed with the request OR ask clarifying questions (both OK)
 if check_output_contains "function\|hello\|world\|implement\|add\|create\|let me" \

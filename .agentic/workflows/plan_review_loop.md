@@ -35,14 +35,14 @@
 
 ```markdown
 ## Plan-Review Loop (recommended)
-- plan_review_enabled: yes        <!-- yes | no (default: yes for Core+PM, no for Core) -->
+- plan_review_enabled: yes        <!-- yes | no (default: yes for Formal, no for Discovery) -->
 - plan_review_max_iterations: 3   <!-- Max revisions before human escalation -->
 - plan_review_auto_for: [planning]  <!-- planning | implement | both -->
 <!-- - plan_review_reviewer_model: same  # same | opus | sonnet -->
 ```
 
 **Defaults** (if not specified):
-- `plan_review_enabled: yes` for Core+PM profile, `no` for Core
+- `plan_review_enabled: yes` for Formal profile, `no` for Discovery
 - `plan_review_max_iterations: 3`
 - `plan_review_auto_for: [planning]`
 

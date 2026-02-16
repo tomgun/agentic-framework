@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Description: Agent should use plan-review loop for complex features (Core+PM)
+# Description: Agent should use plan-review loop for complex features (Formal)
 # Section: planning
 # Category: Important
 # Tests: LLM-023 (F-0120)
 
-# Setup with Core+PM profile (plan_review_enabled by default)
-setup_test_project "core-pm"
+# Setup with Formal profile (plan_review_enabled by default)
+setup_test_project "formal"
 
-# Enable plan-review in STACK.md (should already be enabled by default for Core+PM)
+# Enable plan-review in STACK.md (should already be enabled by default for Formal)
 # Verify it's in the config
 grep -q "plan_review_enabled" "$TEST_PROJECT/STACK.md" || {
     echo "plan_review_enabled: yes" >> "$TEST_PROJECT/STACK.md"

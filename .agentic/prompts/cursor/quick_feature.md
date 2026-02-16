@@ -1,8 +1,8 @@
-# Quick Feature Implementation Prompt (Core Mode)
+# Quick Feature Implementation Prompt (Discovery Mode)
 
 I want to implement a small feature: **[brief description]**
 
-Please follow this streamlined workflow for Core mode:
+Please follow this streamlined workflow for Discovery mode:
 
 1. **Plan briefly:**
    - What needs to be built?
@@ -39,8 +39,8 @@ Please follow this streamlined workflow for Core mode:
 
 ---
 
-**Core Mode Philosophy:**
-- Lighter process than Core+PM
+**Discovery Mode Philosophy:**
+- Lighter process than Formal
 - No formal specs, but still maintain quality
 - `STATUS.md` tracks current focus and progress
 - `OVERVIEW.md` (optional) captures detailed vision
@@ -48,7 +48,7 @@ Please follow this streamlined workflow for Core mode:
 - Documentation stays current
 
 **If you need more structure:**
-- Consider upgrading to Core+PM mode
+- Consider upgrading to Formal mode
 - Adds feature tracking, acceptance criteria files, sequential pipelines
 - Run: `bash .agentic/init/scaffold.sh` (TODO: upgrade_profile.sh)
 

@@ -127,7 +127,7 @@ echo ""
 #-----------------------------------------------------------------------------
 echo -e "${YELLOW}Checking for deprecated references...${NC}"
 
-# Note: PRD.md is NOT deprecated for Core+PM profiles (spec/PRD.md is valid)
+# Note: PRD.md is NOT deprecated for Formal profiles (spec/PRD.md is valid)
 # Only flag truly deprecated patterns
 deprecated_patterns=(
     "continue_here\.py"    # Deprecated in v0.12.0 - use STATUS.md

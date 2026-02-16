@@ -122,7 +122,7 @@ bash tests/llm/harness.sh
 | 008_reads_context_pack | Project question trigger | Core Guidelines |
 | 009_mentions_checklist | Checklist references | Feature Complete |
 | 010_feature_needs_spec | Feature trigger row | BLOCKING GATE |
-| 011_core_proceeds_without_spec | Feature trigger row | Core vs Core+PM |
+| 011_core_proceeds_without_spec | Feature trigger row | Discovery vs Formal |
 
 ### 4. Before Making Guideline Changes
 

@@ -252,12 +252,12 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 ## Profile-Specific Checks
 
 - [ ] **Check profile** in `STACK.md` (`Profile:` field)
-  - Core profile → Simpler workflow
-  - Core+Product profile → Additional spec tracking
+  - Discovery profile → Simpler workflow
+  - Formal profile → Additional spec tracking
 
 ## Conditional Checks
 
-- [ ] **If Core+Product profile**: Check for active feature
+- [ ] **If Formal profile**: Check for active feature
   - Look at `STATUS.md` → "Current focus"
   - Read relevant `spec/acceptance/F-####.md` if working on feature
   - Check `spec/FEATURES.md` for that feature's status
@@ -317,7 +317,7 @@ This is a **suggestion**, not a block. The user may choose to work on something 
   - Example: "I notice we were implementing feature F-0042 but it's not complete. Should we finish that, or switch to something else?"
 
 - [ ] **Check for acceptance validation**
-  - If Core+PM and features are "shipped" but not "accepted", mention them
+  - If Formal and features are "shipped" but not "accepted", mention them
   - Example: "F-0005 and F-0007 are shipped but not accepted yet. Should we validate those?"
 
 ## Summary to User (Make Next Step Obvious)

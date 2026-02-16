@@ -5,7 +5,7 @@
 # Tests: LLM-002
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create stale WIP file (simulating interrupted previous session)
 mkdir -p "$TEST_PROJECT/.agentic-state"

@@ -81,10 +81,10 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 |--------|------|------|--------|
 | Small batch enforcement | F-0007 | 007_small_batch | ✅ |
 | Acceptance criteria before code | F-0006 | 003_acceptance_first | ✅ |
-| Core+PM requires specs | F-0006 | 010_feature_needs_spec | ✅ |
-| Core proceeds without specs | — | 011_core_proceeds_without_spec | ✅ |
+| Formal requires specs | F-0006 | 010_feature_needs_spec | ✅ |
+| Discovery proceeds without specs | — | 011_core_proceeds_without_spec | ✅ |
 | Definition of Done checklist | F-0017 | 012_definition_of_done | ✅ |
-| Core profile is lightweight | — | 035_core_is_lightweight | ✅ |
+| Discovery profile is lightweight | — | 035_core_is_lightweight | ✅ |
 
 ### D5: Living Documentation (DESIGN PRINCIPLE)
 
@@ -124,7 +124,7 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 | Aspect | Spec | Test | Status |
 |--------|------|------|--------|
 | Human approval required | AGENTS.md | 005_no_auto_commit | ✅ |
-| PR workflow for Core+PM | F-0096 | 013_pr_workflow_corepm | ✅ |
+| PR workflow for Formal | F-0096 | 013_pr_workflow_formal | ✅ |
 
 ### R3: Check Before Creating (OPERATIONAL RULE)
 
@@ -173,10 +173,10 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 | 007_small_batch | Small batch enforcement | D4 | ✅ |
 | 008_reads_context_pack | Reads CONTEXT_PACK first | D3 | ✅ |
 | 009_mentions_checklist | References checklists | D2 | ✅ |
-| 010_feature_needs_spec | Core+PM needs spec | D4 | ✅ |
-| 011_core_proceeds_without_spec | Core without spec | D4 | ✅ |
+| 010_feature_needs_spec | Formal needs spec | D4 | ✅ |
+| 011_core_proceeds_without_spec | Discovery without spec | D4 | ✅ |
 | 012_definition_of_done | Definition of Done | D4 | ✅ |
-| 013_pr_workflow_corepm | PR workflow | R2 | ✅ |
+| 013_pr_workflow_formal | PR workflow | R2 | ✅ |
 | 014_multi_agent_awareness | Multi-agent coordination | F2 | ✅ |
 | 015_session_end_summary | Session end handoff | F2 | ✅ |
 | 016_pr_tracking_human_needed | Human escalation | F1, D1 | ✅ |
@@ -196,7 +196,7 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 | 032_knows_architecture | Durable: CONTEXT_PACK.md | D3 | ✅ |
 | 033_mentions_agents_active | Multi-agent coordination | F2 | ✅ |
 | 034_suggests_worktree | Worktree for parallel work | F2 | ✅ |
-| 035_core_is_lightweight | Core profile lightweight | D4 | ✅ |
+| 035_core_is_lightweight | Discovery profile lightweight | D4 | ✅ |
 
 **Summary**: 33/33 tests pass. All 13 principles have coverage (36 LLM behavioral + 21 structural).
 

@@ -11,7 +11,7 @@ Specifically:
 
 1. Update `JOURNAL.md` with session summary
 2. Update `STATUS.md` with current state and next steps
-3. Update `spec/FEATURES.md` if in Core+PM mode
+3. Update `spec/FEATURES.md` if in Formal mode
 4. Check if anything should go in `HUMAN_NEEDED.md`
 5. Verify git status is clean (or explain uncommitted changes)
 6. Provide session summary:

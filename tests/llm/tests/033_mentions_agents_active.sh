@@ -6,7 +6,7 @@
 # Tests: LLM-033
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create AGENTS_ACTIVE with an active agent working on auth
 mkdir -p "$TEST_PROJECT/.agentic-state"

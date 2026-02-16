@@ -4,8 +4,8 @@
 # Category: Important
 # Tests: LLM-045
 
-# Setup with Core+PM profile
-setup_test_project "core-pm"
+# Setup with Formal profile
+setup_test_project "formal"
 
 # Create FEATURES.md with domain-tagged features (as brownfield discovery would produce)
 mkdir -p "$TEST_PROJECT/spec/acceptance"

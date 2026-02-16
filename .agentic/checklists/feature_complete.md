@@ -11,7 +11,7 @@
 ## Acceptance Criteria Met
 
 - [ ] **All acceptance criteria satisfied**
-  - Core+Product: Every item in `spec/acceptance/F-####.md`
+  - Formal: Every item in `spec/acceptance/F-####.md`
   - Core: Every item in `OVERVIEW.md` or user requirements
   - No partial completion
   - No "mostly works" items
@@ -102,7 +102,7 @@
   - Usage examples if complex
   - Known limitations documented
 
-### Core+Product Profile
+### Formal Profile
 
 - [ ] **`spec/FEATURES.md` updated**
   - Status: `shipped` (not `planned` or `in_progress`)
@@ -194,7 +194,7 @@ Before marking feature as complete:
   - Any challenges/learnings noted
   - Consider: `--feature F-#### --files N` flags for metadata
 
-- [ ] **`STATUS.md` updated** (Core+Product)
+- [ ] **`STATUS.md` updated** (Formal)
   - Moved feature from "Current focus" to "Recently completed"
   - Or updated "Next up" if more work queued
 
@@ -265,7 +265,7 @@ If ANY answer is "No" or "Not sure" → Feature is NOT ready to be marked shippe
   - Mark capability as [x] implemented
   - Update "What works now"
 
-### Core+Product Profile
+### Formal Profile
 
 - [ ] **Update `spec/FEATURES.md`**
   ```markdown

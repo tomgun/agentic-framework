@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Description: Agent should want spec/acceptance criteria for new features (Core+PM)
+# Description: Agent should want spec/acceptance criteria for new features (Formal)
 # Section: trigger
 # Category: Critical
 # Tests: LLM-010 (expanded)
 
-# Setup with Core+PM profile
-setup_test_project "core-pm"
+# Setup with Formal profile
+setup_test_project "formal"
 
 # Create a minimal FEATURES.md
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'

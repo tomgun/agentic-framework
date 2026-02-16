@@ -4,15 +4,15 @@
 # Category: Important
 # Tests: LLM-044
 
-# Setup with Core+PM profile
-setup_test_project "core-pm"
+# Setup with Formal profile
+setup_test_project "formal"
 
 # Create a discovery report with multiple domains (generic e-commerce example)
 mkdir -p "$TEST_PROJECT/.agentic-state"
 cat > "$TEST_PROJECT/.agentic-state/discovery_report.json" << 'EOF'
 {
   "version": "2.0.0",
-  "profile": "core+product",
+  "profile": "formal",
   "stack": {"language": "TypeScript", "framework": "Multi (Next.js, Express)"},
   "sub_projects": [
     {"name": "web", "path": "web/", "language": "TypeScript", "framework": "Next.js", "has_tests": true},

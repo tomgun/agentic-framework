@@ -5,7 +5,7 @@
 # Tests: LLM-031
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create src directory and a tracked change
 mkdir -p "$TEST_PROJECT/src"

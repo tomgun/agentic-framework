@@ -5,7 +5,7 @@
 # Tests: LLM-TOKEN-STATUS
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Ask to update status (natural language, not mentioning file directly)
 send_prompt "Update the current focus to 'Implementing user authentication'"

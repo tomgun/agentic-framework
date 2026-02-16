@@ -43,7 +43,7 @@ FAILURES=0
 
 # Check 1: Feature exists in FEATURES.md
 if [[ ! -f "spec/FEATURES.md" ]]; then
-  echo "❌ spec/FEATURES.md not found (Core+PM profile required for features)"
+  echo "❌ spec/FEATURES.md not found (Formal profile required for features)"
   exit 1
 fi
 

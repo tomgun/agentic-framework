@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Description: Agent should create specs before coding when user gives no feature ID (Core+PM)
+# Description: Agent should create specs before coding when user gives no feature ID (Formal)
 # Section: trigger
 # Category: Critical
 # Tests: LLM-050
 
-# Setup with Core+PM profile
-setup_test_project "core-pm"
+# Setup with Formal profile
+setup_test_project "formal"
 
 # Ensure spec directories exist but are empty (no pre-existing specs)
 mkdir -p "$TEST_PROJECT/spec/acceptance"

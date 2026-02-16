@@ -14,18 +14,18 @@ This directory contains ready-to-use prompts for common workflows in Cursor when
 - **`session_start.md`** - Start a new coding session with proper context loading
 - **`session_end.md`** - End a session with proper documentation updates
 
-### Feature Development (Core+PM Mode)
+### Feature Development (Formal Mode)
 - **`feature_start.md`** - Begin implementing a new feature
 - **`feature_test.md`** - Create tests for a feature (TDD workflow)
 - **`feature_complete.md`** - Mark a feature as complete with all updates
 
-### Spec Management (Core+PM Mode)
+### Spec Management (Formal Mode)
 - **`migration_create.md`** - Create a new spec migration
 - **`spec_update.md`** - Update specs after implementation
 
-### Core Mode
+### Discovery Mode
 - **`product_update.md`** - Update OVERVIEW.md after changes
-- **`quick_feature.md`** - Implement a simple feature in Core mode
+- **`quick_feature.md`** - Implement a simple feature in Discovery mode
 
 ### Quality & Maintenance
 - **`run_quality.md`** - Run quality checks before commit
@@ -38,7 +38,7 @@ This directory contains ready-to-use prompts for common workflows in Cursor when
 
 ## Tips
 
-- Always specify the feature ID (e.g., F-0010) when working on features in Core+PM mode
+- Always specify the feature ID (e.g., F-0010) when working on features in Formal mode
 - Use the session_start prompt at the beginning of each work session
 - Use the session_end prompt before taking a break
 - Run quality checks before committing

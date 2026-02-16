@@ -34,7 +34,7 @@ if [ "$HOOK_MODE" = "no" ]; then
     exit 0
 fi
 
-# Spec validation: only for Core+PM profile (detected by spec/FEATURES.md existence)
+# Spec validation: only for Formal profile (detected by spec/FEATURES.md existence)
 if [ -f "$PROJECT_ROOT/spec/FEATURES.md" ] && [ -f "$PROJECT_ROOT/.agentic/tools/validate_specs.py" ]; then
     if command -v python3 >/dev/null 2>&1; then
         if ! python3 "$PROJECT_ROOT/.agentic/tools/validate_specs.py" 2>/dev/null; then

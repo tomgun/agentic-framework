@@ -44,7 +44,7 @@ Every time before committing, execute these commands in order:
 
 1. `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Problem being solved"` — update JOURNAL.md (always include --why)
 2. `bash .agentic/tools/status.sh focus "Current task"` — update STATUS.md
-3. If shipping a feature (Core+PM): `bash .agentic/tools/feature.sh F-#### status shipped`
+3. If shipping a feature (Formal): `bash .agentic/tools/feature.sh F-#### status shipped`
 4. `ag commit` — runs quality gates, shows diff, waits for human approval
 5. Only THEN announce ready — never say "done" before artifacts are updated
 

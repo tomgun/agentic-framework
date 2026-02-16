@@ -6,7 +6,7 @@
 # Tests: LLM-038
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create STATUS.md
 cat > "$TEST_PROJECT/STATUS.md" << 'EOF'

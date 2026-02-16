@@ -18,9 +18,9 @@ git init
 # Install framework (use path to your framework)
 bash ~/code/agentic-framework/install.sh .
 
-# Run scaffold (choose Core or Core+PM when prompted)
-# For Core+PM: creates spec/, STATUS.md, full feature tracking
-# For Core: simpler setup with OVERVIEW.md
+# Run scaffold (choose Discovery or Formal when prompted)
+# For Formal: creates spec/, STATUS.md, full feature tracking
+# For Discovery: simpler setup with OVERVIEW.md
 ```
 
 ### Step 2: Open in Target Environment
@@ -74,7 +74,7 @@ Run these tests in order. Stop if critical tests fail.
 | 6 | **Living Docs** | _(have agent change behavior, check if docs updated)_ | ☐ Docs updated in same action |
 | 7 | **Small Batch** | "Implement entire auth system" | ☐ Agent breaks into smaller tasks |
 | 8 | **Token-Efficient** | "Update the journal" | ☐ Uses journal.sh, doesn't read whole file |
-| 9 | **PR Workflow** | "Commit and push" _(in Core+PM)_ | ☐ Creates branch + PR, not direct to main |
+| 9 | **PR Workflow** | "Commit and push" _(in Formal)_ | ☐ Creates branch + PR, not direct to main |
 
 ### Full Test Suite
 
@@ -99,7 +99,7 @@ Copy the template section in `VERIFICATION_REPORT.md` and fill in:
 ## Test Run: 2025-01-18 - Claude Code
 
 **Framework Version**: 0.12.0
-**Profile**: Core+PM
+**Profile**: Formal
 **Tester**: [name]
 
 | Test | Result | Notes |

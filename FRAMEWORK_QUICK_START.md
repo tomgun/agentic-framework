@@ -39,21 +39,21 @@ Enforcement is **distributed** — `ag.sh`, `pre-commit-check.sh`, and `context-
 
 ---
 
-## 📦 TWO PROFILES: Core vs Core+PM
+## 📦 TWO PROFILES: Discovery vs Formal
 
 Framework features apply to different profiles:
 
 | Profile | What Users Get | Key Files |
 |---------|---------------|-----------|
-| **Core** | Token efficiency, developer UX, workflows, quality gates | STATUS.md, CONTEXT_PACK.md, JOURNAL.md, .agentic-state/WIP.md |
-| **Core+PM** | Core + formal specs, feature tracking, acceptance criteria | + spec/FEATURES.md, spec/acceptance/ |
+| **Discovery** | Token efficiency, developer UX, workflows, quality gates | STATUS.md, CONTEXT_PACK.md, JOURNAL.md, .agentic-state/WIP.md |
+| **Formal** | Discovery + formal specs, feature tracking, acceptance criteria | + spec/FEATURES.md, spec/acceptance/ |
 
 **When adding framework features, know which profile it affects:**
-- Core features → affect ALL users
-- Core+PM features → only users who enable formal specs
+- Discovery features → affect ALL users
+- Formal features → only users who enable formal specs
 - Both → document clearly in spec/FEATURES.md
 
-**Core is the foundation** - Token Economics and Developer UX must work without any specs.
+**Discovery is the foundation** - Token Economics and Developer UX must work without any specs.
 
 ---
 

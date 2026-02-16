@@ -35,7 +35,7 @@ ${BOLD}SESSION MANAGEMENT${NC}
   status.sh           Update STATUS.md sections
   blocker.sh          Manage HUMAN_NEEDED.md blockers
 
-${BOLD}FEATURES (Core+PM Profile)${NC}
+${BOLD}FEATURES (Formal Profile)${NC}
   feature.sh          Update spec/FEATURES.md fields
   query_features.py   Search/filter features by status, tags, owner
   quick_feature.sh    Rapid feature creation

@@ -8,7 +8,7 @@ Create/update these at repo root:
 - `STATUS.md` (from `.agentic/init/STATUS.template.md`) - required for both profiles
 - `CONTEXT_PACK.md` (from `.agentic/init/CONTEXT_PACK.template.md`)
 - `OVERVIEW.md` (from `.agentic/init/OVERVIEW.template.md`) - product vision and goals
-- `/spec/` (from `.agentic/spec/*.template.md`) - for Core+PM mode
+- `/spec/` (from `.agentic/spec/*.template.md`) - for Formal mode
 - `spec/adr/` (directory exists; can be empty at start)
 
 ## Step 0: scaffold files/folders (if not already done)
@@ -31,7 +31,7 @@ If the project has existing code, scaffold will automatically run discovery and 
    - **Sub-projects**: detected sub-projects with their frameworks (e.g., frontend/React, functions/Azure Functions, mobile/React Native)
    - **Architecture**: entry points, components, monorepo status
    - **Project description**: extracted from README
-   - **Discovered features** (Core+PM only): modules, routes, packages
+   - **Discovered features** (Formal only): modules, routes, packages
 3. For each section, ask: "Does this look right? Want to edit anything?"
 4. For confirmed sections: the proposal file from `.agentic-state/proposals/` is already copied to the project root
 5. For rejected sections: user fills in manually during Step 2 interview
@@ -43,7 +43,7 @@ After review, run `ag approve-onboarding` to strip markers from confirmed files.
 
 **If no discovery report exists**, skip to Step 1 (standard init for new projects).
 
-### Step 0.5b: Feature Discovery Deep Dive (Core+PM only)
+### Step 0.5b: Feature Discovery Deep Dive (Formal only)
 
 **If the report contains `feature_clusters`**, run this enhanced feature synthesis:
 
@@ -79,7 +79,7 @@ After review, run `ag approve-onboarding` to strip markers from confirmed files.
    - Write spec/acceptance/F-####.md files with criteria
    - Features with user-confirmed criteria get `Accepted: yes`
 
-### Step 0.5c: Size-Aware Routing (Core+PM only)
+### Step 0.5c: Size-Aware Routing (Formal only)
 
 After reviewing discovery results, evaluate whether the project is small or large:
 
@@ -100,29 +100,29 @@ If large, tell the user:
 **Token cost** (evaluated after features exist):
 - > 50 features in FEATURES.md → suggest `organize_features.py --by domain` for hierarchical splitting
 
-## Step 1: Choose profile (Core vs Core+PM)
+## Step 1: Choose profile (Discovery vs Formal)
 
 **Ask the user which profile they want:**
 
 > "Which profile would you like to use?
 >
-> **a) Core (Full Framework, Lightweight Planning)**
+> **a) Discovery (Full Framework, Lightweight Planning)**
 > - All framework capabilities: context optimization, multi-agent, TDD, quality gates
 > - Session continuity, token efficiency, green coding, /verify command
 > - STATUS.md for project phase and current focus
 > - Optional OVERVIEW.md for detailed vision
 > - Good for: Small projects, prototypes, external PM tools (Jira/Linear)
 >
-> **b) Core + Product Management (Formal Specs)**
-> - Everything in Core, PLUS formal specifications
+> **b) Formal (Formal Specs)**
+> - Everything in Discovery, PLUS formal specifications
 > - Feature tracking with F-#### IDs (spec/FEATURES.md)
 > - Acceptance criteria per feature (spec/acceptance/)
 > - STATUS.md, NFR.md, ADRs, cross-reference validation
 > - Good for: Long-term projects (3+ months), complex products, audit trails
 >
-> Type 'a' for Core or 'b' for Core + Product Management"
+> Type 'a' for Discovery or 'b' for Formal"
 
-### Core Profile (a)
+### Discovery Profile (a)
 **Full framework capabilities with lightweight planning:**
 - ✅ Context optimization (CONTEXT_PACK.md)
 - ✅ Session continuity (JOURNAL.md)
@@ -143,8 +143,8 @@ If large, tell the user:
   - Solo developers who don't need formal tracking
   - Quick experiments and MVPs
 
-### Core + Product Management Profile (b)
-- ✅ Everything in Core, plus:
+### Formal Profile (b)
+- ✅ Everything in Discovery, plus:
 - ✅ Formal specifications (`spec/PRD.md`, `TECH_SPEC.md`)
 - ✅ Feature tracking with F-#### IDs
 - ✅ `STATUS.md` for roadmap and metrics
@@ -158,15 +158,15 @@ If large, tell the user:
 
 **Update `STACK.md`** with the chosen profile:
 ```markdown
-- Profile: core  <!-- if user chose 'a' -->
-- Profile: core+product  <!-- if user chose 'b' -->
+- Profile: discovery  <!-- if user chose 'a' -->
+- Profile: formal  <!-- if user chose 'b' -->
 ```
 
-### Step 1 (cont.): Greenfield Domain Question (Core+PM only, new projects)
+### Step 1 (cont.): Greenfield Domain Question (Formal only, new projects)
 
 **Skip this for brownfield projects** (discovery handles domains automatically).
 
-For **new/greenfield Core+PM projects**, ask:
+For **new/greenfield Formal projects**, ask:
 
 > "Does your project have distinct domains? Examples:
 > - Frontend web app + Backend API
@@ -364,7 +364,7 @@ When switching between tools, the handoff is seamless because:
 ```markdown
 ## Agentic framework
 - Version: [version]
-- Profile: [core | core+product]
+- Profile: [discovery | formal]
 - AI Environments: [multi | claude | cursor | copilot]  # NEW! "multi" = can use all
 ```
 
@@ -478,15 +478,15 @@ Please research current best practices for [environment]:
 5. Note any breaking changes in HUMAN_NEEDED.md
 ```
 
-## Step 1c: Git Workflow Preference (Core profile only)
+## Step 1c: Git Workflow Preference (Discovery profile only)
 
-**SKIP this step for Core+PM profile** - Core+PM defaults to `pull_request` (formal tracking implies formal review).
+**SKIP this step for Formal profile** - Formal defaults to `pull_request` (formal tracking implies formal review).
 
-**For Core profile, ask the user:**
+**For Discovery profile, ask the user:**
 
 > "How do you prefer to work with Git?
 >
-> **a) Direct commits** (default for Core - fast iteration)
+> **a) Direct commits** (default for Discovery - fast iteration)
 > - Commit directly to main/master
 > - No PR overhead
 > - Good for: solo projects, prototypes, speed
@@ -621,13 +621,13 @@ Type a/b/c/d:"
 ```
 
 **If (b) Specialized agents chosen:**
-1. Pipeline infrastructure already created by scaffold (Core+PM)
+1. Pipeline infrastructure already created by scaffold (Formal)
 2. For Cursor, run: `bash .agentic/tools/setup-agent.sh cursor-agents`
 3. Tell user about role definitions: `.agentic/agents/roles/`
 4. Explain pipeline workflow: Research → Planning → Test → Implementation → Review → Spec Update → Docs → Git
 
 **If (c) Parallel features chosen:**
-1. Pipeline infrastructure already created by scaffold (Core+PM)
+1. Pipeline infrastructure already created by scaffold (Formal)
 2. Explain git worktree workflow (see `.agentic/workflows/multi_agent_coordination.md`)
 3. Show how to create worktrees:
    ```bash
@@ -646,7 +646,7 @@ Type a/b/c/d:"
 - **`CONTEXT_PACK.md`**: Architecture overview, key decisions, how it works
 - **`OVERVIEW.md`**: Product vision, why it matters, core capabilities, success criteria
 
-### For Core+PM profile additionally:
+### For Formal profile additionally:
 - **`spec/TECH_SPEC.md`**: How we're building it, architecture, data models
 - **`spec/FEATURES.md`**: Seed with 2-3 initial features (F-0001, F-0002, etc.)
 
@@ -721,7 +721,7 @@ Common blockers discovered during init:
 
 **Accomplished**:
 - Initialized [Project Name] with [Stack]
-- Profile: [Core | Core+PM]
+- Profile: [Discovery | Formal]
 - Created STACK.md, STATUS.md, OVERVIEW.md (optional), CONTEXT_PACK.md
 - Set up quality validation: [profile used]
 - Documented [X] human-needed items
@@ -754,6 +754,6 @@ Common blockers discovered during init:
 ## Updating init outputs over time
 Init is not "one and done".
 - When stack changes: update `STACK.md` and record an ADR if it's a real decision.
-- When architecture changes: update `TECH_SPEC.md` (if Core+PM) or `CONTEXT_PACK.md` (if Core), and/or write an ADR.
+- When architecture changes: update `TECH_SPEC.md` (if Formal) or `CONTEXT_PACK.md` (if Discovery), and/or write an ADR.
 - When progress changes: update `STATUS.md`.
 - When onboarding cost rises: improve `CONTEXT_PACK.md`.

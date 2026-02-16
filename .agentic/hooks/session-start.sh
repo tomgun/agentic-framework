@@ -128,9 +128,9 @@ if [[ -f "HUMAN_NEEDED.md" ]]; then
 fi
 
 # Profile-specific reads
-if [[ "$PROFILE" == "core+product" ]]; then
+if [[ "$PROFILE" == "formal" ]]; then
   echo ""
-  echo "📖 CORE+PM PROFILE - ADDITIONAL READS:"
+  echo "📖 FORMAL PROFILE - ADDITIONAL READS:"
   echo ""
   echo "- spec/FEATURES.md - Overview of all features (scan, don't read all)"
   echo "- spec/acceptance/F-####.md - If working on specific feature"
@@ -191,7 +191,7 @@ if [[ -n "$JOURNAL_PATH" ]]; then
 fi
 
 # Check for acceptance validation
-if [[ "$PROFILE" == "core+product" ]] && [[ -f "spec/FEATURES.md" ]]; then
+if [[ "$PROFILE" == "formal" ]] && [[ -f "spec/FEATURES.md" ]]; then
   SHIPPED_NOT_ACCEPTED=$(grep -A5 "^## F-" spec/FEATURES.md | grep -B5 "Status: shipped" | grep -B5 "Accepted: no" | grep "^## F-" || echo "")
   if [[ -n "$SHIPPED_NOT_ACCEPTED" ]]; then
     echo ""

@@ -168,7 +168,7 @@ Moved content (gates table, delegation/agent mode, session protocols, agent boun
 
 ### Gap 4: `ag done` doesn't block on validation failures — RESOLVED
 
-`cmd_done()` (Core+PM) now runs `doctor.sh --phase complete` with proper error handling — failure prints a RED warning instead of being silently suppressed by `|| true`. Core profile now runs `doctor.sh --quick` as a non-blocking warning (Core is discovery mode).
+`cmd_done()` (Formal) now runs `doctor.sh --phase complete` with proper error handling — failure prints a RED warning instead of being silently suppressed by `|| true`. Discovery profile now runs `doctor.sh --quick` as a non-blocking warning.
 
 `cmd_implement()` line 528 retains `|| true` for `doctor.sh --phase planning` — this is intentional. Planning is early-stage; blocking would be overly strict.
 

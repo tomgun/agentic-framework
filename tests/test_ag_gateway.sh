@@ -55,52 +55,52 @@ cleanup_test_env() {
 # Profile Detection Tests
 #=============================================================================
 
-test_case "Profile detection: Core from STACK.md"
+test_case "Profile detection: Discovery from STACK.md"
 setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 # Stack
-Profile: core
+Profile: discovery
 EOF
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Core Profile"; then
+if echo "$output" | grep -qi "Discovery Profile"; then
     pass
 else
-    fail "Expected 'Core Profile' in output"
+    fail "Expected 'Discovery Profile' in output"
 fi
 cleanup_test_env
 
-test_case "Profile detection: Core+Product from STACK.md"
+test_case "Profile detection: Formal from STACK.md"
 setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 # Stack
-Profile: core+product
+Profile: formal
 EOF
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Core+Product Profile\|Core+PM"; then
+if echo "$output" | grep -qi "Formal Profile"; then
     pass
 else
-    fail "Expected 'Core+Product Profile' in output"
+    fail "Expected 'Formal Profile' in output"
 fi
 cleanup_test_env
 
-test_case "Profile detection: Core+Product from spec/ directory"
+test_case "Profile detection: Formal from spec/ directory"
 setup_test_env
 mkdir -p "$TEST_DIR/spec"
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Core+Product Profile\|Core+PM"; then
+if echo "$output" | grep -qi "Formal Profile"; then
     pass
 else
-    fail "Expected 'Core+Product Profile' from spec/ directory"
+    fail "Expected 'Formal Profile' from spec/ directory"
 fi
 cleanup_test_env
 
-test_case "Profile detection: Default to Core when no indicators"
+test_case "Profile detection: Default to Discovery when no indicators"
 setup_test_env
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Core Profile"; then
+if echo "$output" | grep -qi "Discovery Profile"; then
     pass
 else
-    fail "Expected default 'Core Profile'"
+    fail "Expected default 'Discovery Profile'"
 fi
 cleanup_test_env
 
@@ -108,27 +108,27 @@ cleanup_test_env
 # Help Command Tests
 #=============================================================================
 
-test_case "Help shows ag work for Core profile"
+test_case "Help shows ag work for Discovery profile"
 setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
-Profile: core
+Profile: discovery
 EOF
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
 if echo "$output" | grep -q "ag work"; then
     pass
 else
-    fail "Core help should show 'ag work'"
+    fail "Discovery help should show 'ag work'"
 fi
 cleanup_test_env
 
-test_case "Help shows ag implement for Core+PM profile"
+test_case "Help shows ag implement for Formal profile"
 setup_test_env
 mkdir -p "$TEST_DIR/spec"
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
 if echo "$output" | grep -q "ag implement"; then
     pass
 else
-    fail "Core+PM help should show 'ag implement'"
+    fail "Formal help should show 'ag implement'"
 fi
 cleanup_test_env
 
@@ -136,7 +136,7 @@ cleanup_test_env
 # Work Command Tests (Core profile)
 #=============================================================================
 
-test_case "ag work creates WIP.md in Core profile"
+test_case "ag work creates WIP.md in Discovery profile"
 setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: core
@@ -154,10 +154,10 @@ cleanup_test_env
 # Commit Command Tests (Profile-Aware)
 #=============================================================================
 
-test_case "ag commit: Core profile shows WARNING for WIP"
+test_case "ag commit: Discovery profile shows WARNING for WIP"
 setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
-Profile: core
+Profile: discovery
 EOF
 mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
 echo "test" > "$TEST_DIR/.agentic-state/WIP.md"
@@ -165,11 +165,11 @@ output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" commit 2>&1) || true
 if echo "$output" | grep -q "WARNING"; then
     pass
 else
-    fail "Core mode should show WARNING for WIP"
+    fail "Discovery mode should show WARNING for WIP"
 fi
 cleanup_test_env
 
-test_case "ag commit: Core+PM profile shows BLOCKED for WIP"
+test_case "ag commit: Formal profile shows BLOCKED for WIP"
 setup_test_env
 mkdir -p "$TEST_DIR/spec"
 mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
@@ -178,11 +178,11 @@ output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" commit 2>&1) || true
 if echo "$output" | grep -q "BLOCKED"; then
     pass
 else
-    fail "Core+PM mode should show BLOCKED for WIP"
+    fail "Formal mode should show BLOCKED for WIP"
 fi
 cleanup_test_env
 
-test_case "ag commit: Core+PM exits non-zero when blocked"
+test_case "ag commit: Formal exits non-zero when blocked"
 setup_test_env
 mkdir -p "$TEST_DIR/spec"
 mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
@@ -298,7 +298,7 @@ cleanup_test_env
 # Plan-Review Settings Tests
 #=============================================================================
 
-# Helper: set up Core+PM with acceptance criteria for ag plan
+# Helper: set up Formal with acceptance criteria for ag plan
 setup_plan_env() {
     setup_test_env
     mkdir -p "$TEST_DIR/spec/acceptance"
@@ -312,7 +312,7 @@ EOF
 test_case "ag plan: plan_review_enabled=yes shows ENABLED"
 setup_plan_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
-Profile: core+product
+Profile: formal
 - plan_review_enabled: yes
 - plan_review_max_iterations: 3
 EOF
@@ -327,7 +327,7 @@ cleanup_test_env
 test_case "ag plan: plan_review_enabled=no shows SKIPPED"
 setup_plan_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
-Profile: core+product
+Profile: formal
 - plan_review_enabled: no
 EOF
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 2>&1)
@@ -341,7 +341,7 @@ cleanup_test_env
 test_case "ag plan: --no-review overrides enabled setting"
 setup_plan_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
-Profile: core+product
+Profile: formal
 - plan_review_enabled: yes
 EOF
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 --no-review 2>&1)
@@ -355,7 +355,7 @@ cleanup_test_env
 test_case "ag plan: max_iterations=5 shows in output"
 setup_plan_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
-Profile: core+product
+Profile: formal
 - plan_review_enabled: yes
 - plan_review_max_iterations: 5
 EOF
@@ -370,7 +370,7 @@ cleanup_test_env
 test_case "ag plan: defaults to enabled when setting absent"
 setup_plan_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
-Profile: core+product
+Profile: formal
 EOF
 output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 2>&1)
 if echo "$output" | grep -q "Review loop: ENABLED"; then
@@ -380,17 +380,17 @@ else
 fi
 cleanup_test_env
 
-test_case "ag plan: Core profile rejects plan command"
+test_case "ag plan: Discovery profile rejects plan command"
 setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
-Profile: core
+Profile: discovery
 EOF
 result=0
 bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 >/dev/null 2>&1 || result=$?
 if [[ $result -ne 0 ]]; then
     pass
 else
-    fail "Core profile should reject ag plan"
+    fail "Discovery profile should reject ag plan"
 fi
 cleanup_test_env
 
@@ -401,7 +401,7 @@ cleanup_test_env
 test_case "ag implement: plan_review_auto_for=implement warns when no plan"
 setup_plan_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
-Profile: core+product
+Profile: formal
 - plan_review_auto_for: [implement]
 EOF
 # Add feature to FEATURES.md

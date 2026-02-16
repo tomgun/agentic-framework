@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Description: Core+PM should use PR workflow, not direct commits to main
+# Description: Formal should use PR workflow, not direct commits to main
 # Section: commit
 # Category: Important
 # Tests: LLM-080
 
-# Setup - Core+PM project
-setup_test_project "core-pm"
+# Setup - Formal project
+setup_test_project "formal"
 
 # Make a change
 mkdir -p "$TEST_PROJECT/src"

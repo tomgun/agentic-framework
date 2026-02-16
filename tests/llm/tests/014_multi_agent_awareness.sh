@@ -5,7 +5,7 @@
 # Tests: LLM-050
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create AGENTS_ACTIVE.md showing another agent working
 mkdir -p "$TEST_PROJECT/.agentic-state"

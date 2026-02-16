@@ -104,7 +104,7 @@
 - **Multi-agent coordination** - AGENTS_ACTIVE.md, file locks
 - **Git worktrees** - isolated working directories
 - **PR mode** - optional team workflow
-- **Two profiles** - Core (simple) vs Core+PM (complex)
+- **Two profiles** - Discovery (simple) vs Formal (complex)
 - **Progressive disclosure** - start simple, add features as needed
 
 ---
@@ -115,7 +115,7 @@
 
 | Feature | Why It Matters |
 |---------|----------------|
-| **Core profile** | Minimal ceremony, maximum productivity |
+| **Discovery profile** | Minimal ceremony, maximum productivity |
 | **Token-efficient tools** | Save money, work faster |
 | **Session continuity** | Resume where you left off |
 | **WIP tracking** | Never lose work in progress |
@@ -125,7 +125,7 @@
 
 | Feature | Why It Matters |
 |---------|----------------|
-| **Core+PM profile** | Formal tracking for complex projects |
+| **Formal profile** | Formal tracking for complex projects |
 | **PR workflow** | Code review integration |
 | **Multi-agent coordination** | Parallel work without conflicts |
 | **Spec schema** | Consistent format across team |

@@ -5,7 +5,7 @@
 # Tests: LLM-011
 
 # Setup
-setup_test_project "core-pm"
+setup_test_project "formal"
 
 # Ask for a large feature that should be broken down
 send_prompt "Implement a complete user management system with registration, login, password reset, profile editing, admin panel, and audit logging"
