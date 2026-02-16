@@ -14,14 +14,22 @@ NFR_ID_RE = re.compile(r"\b(NFR-\d{4})\b")
 ADR_ID_RE = re.compile(r"\b(ADR-\d{4})\b")
 
 
+def _normalize_profile(raw: str) -> str:
+    """Validate profile value."""
+    val = raw.strip().lower()
+    if val in ("discovery", "formal"):
+        return val
+    return ""
+
+
 def read_profile(root: Path) -> str:
     """
     Determine profile.
 
     - Prefer explicit `Profile:` in STACK.md.
     - If not present, infer:
-      - If spec/ exists -> core+product
-      - else -> core
+      - If spec/ exists -> formal
+      - else -> discovery
     """
     stack = root / "STACK.md"
     if stack.exists():
@@ -29,15 +37,15 @@ def read_profile(root: Path) -> str:
             md = stack.read_text(encoding="utf-8")
             m = re.search(r"(?m)^\s*-\s*Profile:\s*([a-z+_-]+)\s*$", md)
             if m:
-                val = m.group(1).strip()
-                if val in {"core", "core+product"}:
-                    return val
+                normalized = _normalize_profile(m.group(1).strip())
+                if normalized:
+                    return normalized
         except Exception:
             pass
 
     if (root / "spec").is_dir():
-        return "core+product"
-    return "core"
+        return "formal"
+    return "discovery"
 
 
 def core_checks(root: Path) -> list[str]:
@@ -45,14 +53,14 @@ def core_checks(root: Path) -> list[str]:
     issues: list[str] = []
     for p in required:
         if not (root / p).exists():
-            issues.append(f"Missing {p} (run: bash .agentic/init/scaffold.sh --profile core)")
+            issues.append(f"Missing {p} (run: bash .agentic/init/scaffold.sh --profile discovery)")
 
     # Check JOURNAL.md with fallback
     journal_path = root / ".agentic-journal" / "JOURNAL.md"
     if not journal_path.exists():
         journal_path = root / "JOURNAL.md"
     if not journal_path.exists():
-        issues.append(f"Missing JOURNAL.md (run: bash .agentic/init/scaffold.sh --profile core)")
+        issues.append(f"Missing JOURNAL.md (run: bash .agentic/init/scaffold.sh --profile discovery)")
 
     return issues
 
@@ -206,8 +214,8 @@ def main() -> int:
     print("=== agentic verify ===\n")
     print(f"Profile: {profile}\n")
 
-    if profile == "core":
-        print("Core profile: skipping Product Management validations (spec/).\n")
+    if profile == "discovery":
+        print("Discovery profile: skipping Formal validations (spec/).\n")
         core_issues = core_checks(root)
         if core_issues:
             print(f"Found {len(core_issues)} issue(s):")

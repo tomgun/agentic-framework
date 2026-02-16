@@ -410,7 +410,7 @@ class TestGenerateReport:
         }))
         (tmp_path / "README.md").write_text("# Test\n\nA test project.\n")
 
-        report = generate_report(tmp_path, "core")
+        report = generate_report(tmp_path, "discovery")
         assert report["version"] == "2.0.0"
         assert "generated" in report
         assert "stack" in report
@@ -419,10 +419,10 @@ class TestGenerateReport:
         assert "readme_description" in report
         assert "test_patterns" in report
         assert "sub_projects" in report
-        assert report["features"] == []  # Core profile: no features
+        assert report["features"] == []  # Discovery profile: no features
 
-    def test_core_pm_includes_features(self, tmp_path):
-        """Core+PM profile includes feature discovery."""
+    def test_formal_includes_features(self, tmp_path):
+        """Formal profile includes feature discovery."""
         (tmp_path / "package.json").write_text(json.dumps({
             "name": "test",
             "dependencies": {"next": "^14.0.0"},
@@ -431,7 +431,7 @@ class TestGenerateReport:
         pages.mkdir(parents=True)
         (pages / "home.tsx").write_text("// home")
 
-        report = generate_report(tmp_path, "core+product")
+        report = generate_report(tmp_path, "formal")
         assert len(report["features"]) > 0
         assert "serverless_functions" in report
         assert "ui_components" in report
@@ -803,7 +803,7 @@ class TestSubProjectStackBackfill:
             (d / "package.json").write_text("{}")
             (d / "tsconfig.json").write_text("{}")
 
-        report = generate_report(tmp_path, "core")
+        report = generate_report(tmp_path, "discovery")
         assert report["stack"]["language"] == "TypeScript"
         assert report["stack"]["confidence"]["language"] == "medium"
 
@@ -819,7 +819,7 @@ class TestSubProjectStackBackfill:
         (funcs / "package.json").write_text("{}")
         (funcs / "host.json").write_text("{}")
 
-        report = generate_report(tmp_path, "core")
+        report = generate_report(tmp_path, "discovery")
         assert "Multi" in report["stack"]["framework"]
         assert "React" in report["stack"]["framework"]
         assert "Azure Functions" in report["stack"]["framework"]
@@ -831,7 +831,7 @@ class TestSubProjectStackBackfill:
         (fe / "package.json").write_text("{}")
         (fe / "yarn.lock").write_text("")
 
-        report = generate_report(tmp_path, "core")
+        report = generate_report(tmp_path, "discovery")
         assert report["stack"]["package_manager"] == "yarn"
 
     def test_no_backfill_when_root_has_config(self, tmp_path):
@@ -847,7 +847,7 @@ class TestSubProjectStackBackfill:
         (fe / "package.json").write_text(json.dumps({"dependencies": {"vue": "^3"}}))
         (fe / "yarn.lock").write_text("")
 
-        report = generate_report(tmp_path, "core")
+        report = generate_report(tmp_path, "discovery")
         # Root config wins
         assert report["stack"]["framework"] == "Next.js"
         assert report["stack"]["package_manager"] == "npm"
@@ -894,7 +894,7 @@ class TestMultiSubProjectIntegration:
         (mobile / "package.json").write_text(json.dumps({"dependencies": {"react-native": "^0.72"}}))
         (mobile / "tsconfig.json").write_text("{}")
 
-        report = generate_report(tmp_path, "core+product")
+        report = generate_report(tmp_path, "formal")
 
         # Sub-projects detected
         sp_names = {sp["name"] for sp in report["sub_projects"]}

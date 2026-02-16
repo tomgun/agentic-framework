@@ -10,6 +10,14 @@ import sys
 from pathlib import Path
 
 
+def _normalize_profile(raw: str) -> str:
+    """Validate profile value."""
+    val = raw.strip().lower()
+    if val in ("discovery", "formal"):
+        return val
+    return ""
+
+
 def read_profile(root: Path) -> str:
     """Determine profile from STACK.md or infer from structure."""
     stack = root / "STACK.md"
@@ -17,13 +25,15 @@ def read_profile(root: Path) -> str:
         try:
             md = stack.read_text(encoding="utf-8")
             m = re.search(r"(?m)^\s*-\s*Profile:\s*([a-z+_-]+)\s*$", md)
-            if m and m.group(1).strip() in {"core", "core+product"}:
-                return m.group(1).strip()
+            if m:
+                normalized = _normalize_profile(m.group(1).strip())
+                if normalized:
+                    return normalized
         except Exception:
             pass
     if (root / "spec").is_dir() or (root / "STATUS.md").is_file():
-        return "core+product"
-    return "core"
+        return "formal"
+    return "discovery"
 
 
 def detect_phase(root: Path) -> str:
@@ -31,7 +41,7 @@ def detect_phase(root: Path) -> str:
     Detect current development phase.
 
     Returns one of:
-    - "core-mode": Core profile (no feature tracking)
+    - "discovery-mode": Discovery profile (no feature tracking)
     - "blocked": Has unresolved blockers in HUMAN_NEEDED.md
     - "start": No active work (no .agentic-state/WIP.md)
     - "planning": Feature started but no acceptance criteria
@@ -40,9 +50,9 @@ def detect_phase(root: Path) -> str:
     """
     profile = read_profile(root)
 
-    # Core profile has no feature-based phases
-    if profile == "core":
-        return "core-mode"
+    # Discovery profile has no feature-based phases
+    if profile == "discovery":
+        return "discovery-mode"
 
     # Check for blockers first
     human_needed = root / "HUMAN_NEEDED.md"

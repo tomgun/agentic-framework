@@ -128,7 +128,7 @@ def setup_test_project(test_id: str) -> Path:
         print(f"{Colors.YELLOW}Warning: Install script returned non-zero{Colors.NC}")
     
     # Set up profile-specific structure
-    if test["profile"] == "core-pm":
+    if test["profile"] == "formal":
         (test_dir / "spec" / "acceptance").mkdir(parents=True, exist_ok=True)
         (test_dir / "spec" / "FEATURES.md").write_text("# Features\n")
         (test_dir / "STATUS.md").write_text("# Status\n")

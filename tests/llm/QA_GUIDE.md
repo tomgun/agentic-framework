@@ -232,7 +232,7 @@ See `tests/llm/README.md` for the test format. Quick example:
 # Category: Important
 # Tests: LLM-XXX
 
-setup_test_project "core"  # or "core-pm"
+setup_test_project "discovery"  # or "formal"
 
 send_prompt "your test prompt"
 

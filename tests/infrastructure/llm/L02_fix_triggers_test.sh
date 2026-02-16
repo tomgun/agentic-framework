@@ -8,7 +8,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  L02: 'Fix bug' triggers test-first"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a file with a plausible bug
 mkdir -p src

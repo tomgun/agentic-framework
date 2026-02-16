@@ -101,7 +101,7 @@ assert_file_executable() {
 # ─── Scaffold ───
 
 scaffold_test_project() {
-    local profile="${1:-core}"
+    local profile="${1:-discovery}"  # discovery or formal
 
     local test_dir
     test_dir=$(mktemp -d "/tmp/infra-test-XXXXXX")
@@ -118,7 +118,7 @@ scaffold_test_project() {
     echo "n" | bash "$FRAMEWORK_ROOT/install.sh" . >/dev/null 2>&1
 
     # Profile-specific setup
-    if [[ "$profile" == "core-pm" ]]; then
+    if [[ "$profile" == "formal" ]]; then
         mkdir -p spec/acceptance
         echo "# Features" > spec/FEATURES.md
     fi

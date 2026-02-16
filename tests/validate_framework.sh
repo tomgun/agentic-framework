@@ -92,16 +92,16 @@ fi
 echo ""
 echo "--- F-0002: Profile Selection ---"
 
-if grep -q "core" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
-  pass "Core profile documented in init_playbook"
+if grep -qi "discovery\|core" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
+  pass "Discovery profile documented in init_playbook"
 else
-  fail "Core profile not documented"
+  fail "Discovery profile not documented"
 fi
 
-if grep -qi "core\+pm\|core+product" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
-  pass "Core+PM profile documented in init_playbook"
+if grep -qi "formal" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
+  pass "Formal profile documented in init_playbook"
 else
-  fail "Core+PM profile not documented"
+  fail "Formal profile not documented"
 fi
 
 # ============================================================
@@ -799,7 +799,7 @@ else
 fi
 
 # AC-002: git_workflow.md documents profile-aware defaults
-if grep -q "Core+PM.*pull_request" "${FRAMEWORK_ROOT}/.agentic/workflows/git_workflow.md" 2>/dev/null; then
+if grep -q "Formal.*pull_request" "${FRAMEWORK_ROOT}/.agentic/workflows/git_workflow.md" 2>/dev/null; then
   pass "git_workflow.md documents profile-aware defaults"
 else
   fail "git_workflow.md missing profile-aware defaults"
@@ -949,29 +949,29 @@ fi
 
 # AC-004: Profile-aware defaults in scaffold.sh
 if grep -q 'GIT_WORKFLOW_DEFAULT="direct"' "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null; then
-  pass "scaffold.sh sets direct for Core profile"
+  pass "scaffold.sh sets direct for Discovery profile"
 else
-  fail "scaffold.sh missing Core profile git_workflow default"
+  fail "scaffold.sh missing Discovery profile git_workflow default"
 fi
 
 if grep -q 'GIT_WORKFLOW_DEFAULT="pull_request"' "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null; then
-  pass "scaffold.sh sets pull_request for Core+PM profile"
+  pass "scaffold.sh sets pull_request for Formal profile"
 else
-  fail "scaffold.sh missing Core+PM profile git_workflow default"
+  fail "scaffold.sh missing Formal profile git_workflow default"
 fi
 
 # AC-005: Core profile git workflow question in init_playbook
-if grep -q "Git Workflow Preference.*Core profile" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
-  pass "init_playbook.md has Core profile git workflow question"
+if grep -qi "Git Workflow Preference.*\(Core\|Discovery\) profile" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
+  pass "init_playbook.md has Discovery profile git workflow question"
 else
-  fail "init_playbook.md missing Core profile git workflow question"
+  fail "init_playbook.md missing Discovery profile git workflow question"
 fi
 
-# AC-006: Core+PM skip noted
-if grep -q "SKIP.*Core.PM\|Core.PM.*pull_request" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
-  pass "init_playbook.md notes Core+PM defaults to pull_request"
+# AC-006: Formal skip noted
+if grep -qi "SKIP.*\(Core.PM\|Formal\)\|\(Core.PM\|Formal\).*pull_request" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
+  pass "init_playbook.md notes Formal defaults to pull_request"
 else
-  fail "init_playbook.md missing Core+PM default note"
+  fail "init_playbook.md missing Formal default note"
 fi
 
 # AC-007: STACK.template has prominent git_workflow documentation
@@ -1151,8 +1151,8 @@ echo ""
 echo "--- Profile-Aware Installation Tests ---"
 
 # Create unique temp directories
-TEST_CORE="/tmp/test-framework-core-$$"
-TEST_PM="/tmp/test-framework-pm-$$"
+TEST_CORE="/tmp/test-framework-discovery-$$"
+TEST_PM="/tmp/test-framework-formal-$$"
 
 # Cleanup function
 cleanup_test_dirs() {
@@ -1160,9 +1160,9 @@ cleanup_test_dirs() {
 }
 trap cleanup_test_dirs EXIT
 
-# --- CORE PROFILE TESTS ---
+# --- DISCOVERY PROFILE TESTS ---
 echo ""
-echo "Testing Core profile installation..."
+echo "Testing Discovery profile installation..."
 
 mkdir -p "$TEST_CORE"
 cd "$TEST_CORE"
@@ -1170,52 +1170,52 @@ git init -q
 
 # Run install
 if bash "${FRAMEWORK_ROOT}/install.sh" . >/dev/null 2>&1; then
-  pass "Core: install.sh succeeds"
+  pass "Discovery: install.sh succeeds"
 else
-  fail "Core: install.sh failed"
+  fail "Discovery: install.sh failed"
 fi
 
-# Run scaffold with core profile
-if AGENTIC_PROFILE=core bash .agentic/init/scaffold.sh --non-interactive >/dev/null 2>&1; then
-  pass "Core: scaffold.sh succeeds"
+# Run scaffold with discovery profile
+if AGENTIC_PROFILE=discovery bash .agentic/init/scaffold.sh --non-interactive >/dev/null 2>&1; then
+  pass "Discovery: scaffold.sh succeeds"
 else
-  fail "Core: scaffold.sh failed"
+  fail "Discovery: scaffold.sh failed"
 fi
 
-# Verify Core-specific structure
+# Verify Discovery-specific structure
 if [[ ! -d "spec" ]]; then
-  pass "Core: No spec/ directory (correct)"
+  pass "Discovery: No spec/ directory (correct)"
 else
-  fail "Core: spec/ should not exist in Core profile"
+  fail "Discovery: spec/ should not exist in Discovery profile"
 fi
 
 if [[ -f "STATUS.md" ]]; then
-  pass "Core: STATUS.md exists"
+  pass "Discovery: STATUS.md exists"
 else
-  fail "Core: STATUS.md missing (now required for both profiles)"
+  fail "Discovery: STATUS.md missing (now required for both profiles)"
 fi
 
 if [[ -f "OVERVIEW.md" ]]; then
-  pass "Core: OVERVIEW.md exists"
+  pass "Discovery: OVERVIEW.md exists"
 else
-  warn "Core: OVERVIEW.md missing (optional but created by default)"
+  warn "Discovery: OVERVIEW.md missing (optional but created by default)"
 fi
 
 if [[ -f "STACK.md" ]]; then
-  pass "Core: STACK.md exists"
+  pass "Discovery: STACK.md exists"
 else
-  fail "Core: STACK.md missing"
+  fail "Discovery: STACK.md missing"
 fi
 
 if [[ -f "CONTEXT_PACK.md" ]]; then
-  pass "Core: CONTEXT_PACK.md exists"
+  pass "Discovery: CONTEXT_PACK.md exists"
 else
-  fail "Core: CONTEXT_PACK.md missing"
+  fail "Discovery: CONTEXT_PACK.md missing"
 fi
 
-# --- CORE+PM PROFILE TESTS ---
+# --- FORMAL PROFILE TESTS ---
 echo ""
-echo "Testing Core+PM profile installation..."
+echo "Testing Formal profile installation..."
 
 mkdir -p "$TEST_PM"
 cd "$TEST_PM"
@@ -1223,42 +1223,42 @@ git init -q
 
 # Run install
 if bash "${FRAMEWORK_ROOT}/install.sh" . >/dev/null 2>&1; then
-  pass "PM: install.sh succeeds"
+  pass "Formal: install.sh succeeds"
 else
-  fail "PM: install.sh failed"
+  fail "Formal: install.sh failed"
 fi
 
-# Run scaffold with core+product profile
-if AGENTIC_PROFILE=core+product bash .agentic/init/scaffold.sh --non-interactive >/dev/null 2>&1; then
-  pass "PM: scaffold.sh succeeds"
+# Run scaffold with formal profile
+if AGENTIC_PROFILE=formal bash .agentic/init/scaffold.sh --non-interactive >/dev/null 2>&1; then
+  pass "Formal: scaffold.sh succeeds"
 else
-  fail "PM: scaffold.sh failed"
+  fail "Formal: scaffold.sh failed"
 fi
 
-# Verify Core+PM-specific structure
+# Verify Formal-specific structure
 if [[ -d "spec" ]]; then
-  pass "PM: spec/ directory exists"
+  pass "Formal: spec/ directory exists"
 else
-  fail "PM: spec/ directory missing"
+  fail "Formal: spec/ directory missing"
 fi
 
 if [[ -f "spec/FEATURES.md" ]]; then
-  pass "PM: spec/FEATURES.md exists"
+  pass "Formal: spec/FEATURES.md exists"
 else
-  fail "PM: spec/FEATURES.md missing"
+  fail "Formal: spec/FEATURES.md missing"
 fi
 
 # Note: spec/PRD.md deprecated in favor of OVERVIEW.md at root
 if [[ -f "spec/TECH_SPEC.md" ]]; then
-  pass "PM: spec/TECH_SPEC.md exists"
+  pass "Formal: spec/TECH_SPEC.md exists"
 else
-  fail "PM: spec/TECH_SPEC.md missing"
+  fail "Formal: spec/TECH_SPEC.md missing"
 fi
 
 if [[ -d "spec/acceptance" ]]; then
-  pass "PM: spec/acceptance/ directory exists"
+  pass "Formal: spec/acceptance/ directory exists"
 else
-  fail "PM: spec/acceptance/ directory missing"
+  fail "Formal: spec/acceptance/ directory missing"
 fi
 
 # ============================================================
@@ -1478,11 +1478,11 @@ else
   fail "F-0130: WIP template missing Success Criteria"
 fi
 
-# Pre-commit Core checklist
-if grep -q "Core checklist" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
-  pass "F-0130: Pre-commit has Core checklist reminder"
+# Pre-commit Discovery checklist
+if grep -q "Discovery checklist" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "F-0130: Pre-commit has Discovery checklist reminder"
 else
-  fail "F-0130: Pre-commit missing Core checklist"
+  fail "F-0130: Pre-commit missing Discovery checklist"
 fi
 
 # ag done surfaces [Discovered] markers

@@ -6,7 +6,7 @@ source "$(dirname "$0")/../lib/helpers.sh"
 
 section_header "S03: Stale JOURNAL.md blocks commit"
 
-PROJECT=$(scaffold_test_project "core")
+PROJECT=$(scaffold_test_project "discovery")
 cd "$PROJECT"
 
 # Wait to ensure mtime gap

@@ -291,7 +291,7 @@ detect_rate_limit() {
 
 # Create fresh test project with framework installed
 setup_test_project() {
-    local profile="${1:-core}"  # core or core-pm
+    local profile="${1:-discovery}"  # discovery or formal
 
     TEST_PROJECT=$(mktemp -d "/tmp/llm-test-XXXXXX")
     LAST_OUTPUT_FILE="$TEST_PROJECT/.test_output"
@@ -307,7 +307,7 @@ setup_test_project() {
     echo "n" | bash "$FRAMEWORK_ROOT/install.sh" .
 
     # Create minimal project structure based on profile
-    if [[ "$profile" == "core-pm" ]]; then
+    if [[ "$profile" == "formal" ]]; then
         mkdir -p spec/acceptance
         echo "# Features" > spec/FEATURES.md
         echo "# Status" > STATUS.md

@@ -6,7 +6,7 @@ source "$(dirname "$0")/../lib/helpers.sh"
 
 section_header "S01: core.hooksPath configured after scaffold"
 
-PROJECT=$(scaffold_test_project "core")
+PROJECT=$(scaffold_test_project "discovery")
 cd "$PROJECT"
 
 # Assert core.hooksPath is set

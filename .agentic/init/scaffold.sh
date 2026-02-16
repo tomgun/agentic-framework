@@ -12,14 +12,14 @@ fi
 usage() {
   cat <<'EOF'
 Usage:
-  bash .agentic/init/scaffold.sh [--profile core|core+product] [--non-interactive]
+  bash .agentic/init/scaffold.sh [--profile discovery|formal] [--non-interactive]
 
 Options:
-  --profile core|core+product  Set the profile (default: core)
-  --non-interactive            Skip profile prompt, use default or specified profile
+  --profile discovery|formal  Set the profile (default: discovery)
+  --non-interactive           Skip profile prompt, use default or specified profile
 
 Notes:
-  - You can also set: AGENTIC_PROFILE=core|core+product
+  - You can also set: AGENTIC_PROFILE=discovery|formal
   - In non-interactive mode, agent will set profile during init_playbook
 EOF
 }
@@ -49,13 +49,16 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "${PROFILE}" ]]; then
-  PROFILE="core"
+  PROFILE="discovery"
 fi
 
-if [[ "${PROFILE}" != "core" && "${PROFILE}" != "core+product" ]]; then
-  echo "ERROR: invalid profile '${PROFILE}' (expected: core | core+product)"
-  exit 2
-fi
+case "${PROFILE}" in
+  discovery|formal) ;; # valid
+  *)
+    echo "ERROR: invalid profile '${PROFILE}' (expected: discovery | formal)"
+    exit 2
+    ;;
+esac
 
 copy_if_missing() {
   local src="$1"
@@ -216,19 +219,19 @@ copy_if_missing "${ROOT_DIR}/.agentic/spec/HUMAN_NEEDED.template.md" "${ROOT_DIR
 if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
   if grep -qE '^[[:space:]]*-[[:space:]]*Profile:' "${ROOT_DIR}/STACK.md"; then
     # Normalize to the selected profile
-    sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*Profile:[[:space:]]*).*/\\1${PROFILE}  # core | core+product/" "${ROOT_DIR}/STACK.md"
+    sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*Profile:[[:space:]]*).*/\\1${PROFILE}  # discovery | formal/" "${ROOT_DIR}/STACK.md"
     rm -f "${ROOT_DIR}/STACK.md.bak" 2>/dev/null || true
     echo "OK  : STACK.md Profile set to ${PROFILE}"
   else
     # Insert right after the Version line inside "## Agentic framework"
-    perl -0777 -i -pe "s/(## Agentic framework\\n- Version:[^\\n]*\\n)/\\1- Profile: ${PROFILE}  \\# core | core+product\\n/" "${ROOT_DIR}/STACK.md" || true
+    perl -0777 -i -pe "s/(## Agentic framework\\n- Version:[^\\n]*\\n)/\\1- Profile: ${PROFILE}  \\# discovery | formal\\n/" "${ROOT_DIR}/STACK.md" || true
     echo "NEW : STACK.md Profile: ${PROFILE}"
   fi
 
   # Set profile-aware git_workflow default
-  # Core profile → direct (fast iteration, user can override during init)
-  # Core+PM profile → pull_request (formal tracking = formal review)
-  if [[ "${PROFILE}" == "core" ]]; then
+  # Discovery profile → direct (fast iteration, user can override during init)
+  # Formal profile → pull_request (formal tracking = formal review)
+  if [[ "${PROFILE}" == "discovery" ]]; then
     GIT_WORKFLOW_DEFAULT="direct"
   else
     GIT_WORKFLOW_DEFAULT="pull_request"
@@ -263,7 +266,7 @@ This repo uses the **Agentic Framework** located at `.agentic/`.
 - Update `.agentic-journal/JOURNAL.md` before ending ANY session (if session ends abruptly, JOURNAL is the only record)
 - Keep `OVERVIEW.md` up to date with vision and completed capabilities
 - Keep `CONTEXT_PACK.md` current when architecture changes
-- If this repo uses the Core+Product profile: keep `STATUS.md` and `/spec/*` truthful
+- If this repo uses the Formal profile: keep `STATUS.md` and `/spec/*` truthful
 
 **Code quality:**
 - Add/update tests for new or changed logic
@@ -288,8 +291,8 @@ else
   echo "OK  : ${ROOT_DIR}/AGENTS.md exists"
 fi
 
-if [[ "${PROFILE}" == "core" ]]; then
-  # Configure git hooks for Core profile too
+if [[ "${PROFILE}" == "discovery" ]]; then
+  # Configure git hooks for Discovery profile too
   if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
     CURRENT_HOOKS_PATH=$(git config core.hooksPath 2>/dev/null || echo "")
     if [[ "$CURRENT_HOOKS_PATH" != ".agentic/hooks" ]]; then
@@ -313,17 +316,17 @@ if [[ "${PROFILE}" == "core" ]]; then
   fi
   echo ""
   if [[ "$DISCOVERY_RAN" == "yes" ]]; then
-    echo "Done (Core + auto-discovery). Proposals in .agentic-state/proposals/"
+    echo "Done (Discovery + auto-discovery). Proposals in .agentic-state/proposals/"
     echo "Next: tell your agent to initialize using .agentic/init/init_playbook.md"
     echo "      The agent will review discovery results with you before finalizing."
   else
-    echo "Done (Core). Next: tell your agent to initialize using .agentic/init/init_playbook.md"
+    echo "Done (Discovery). Next: tell your agent to initialize using .agentic/init/init_playbook.md"
   fi
   echo ""
   echo "Optional: For multi-agent development, run:"
   echo "  bash .agentic/tools/setup-agent.sh pipeline       # Pipeline infrastructure"
   echo "  bash .agentic/tools/setup-agent.sh cursor-agents  # Cursor-specific agents"
-  echo "To enable Product Management later: bash .agentic/tools/enable-product-management.sh"
+  echo "To enable Formal profile later: bash .agentic/tools/enable-formal.sh"
   
   # Note about tool setup (don't auto-create - let init_playbook ask)
   echo ""
@@ -334,7 +337,7 @@ if [[ "${PROFILE}" == "core" ]]; then
   exit 0
 fi
 
-# Profile: core+product
+# Profile: formal
 mkdir -p "${ROOT_DIR}/spec" "${ROOT_DIR}/spec/adr" "${ROOT_DIR}/spec/tasks" "${ROOT_DIR}/spec/acceptance"
 echo "OK  : ensured directories spec/, spec/adr, spec/tasks, spec/acceptance"
 
@@ -410,7 +413,7 @@ echo "Setting up AI tool integration..."
 if [[ -f "${ROOT_DIR}/.agentic/tools/setup-agent.sh" ]]; then
   bash "${ROOT_DIR}/.agentic/tools/setup-agent.sh" all 2>/dev/null || true
   
-  # For Core+PM: also set up pipeline infrastructure for multi-agent work
+  # For Formal: also set up pipeline infrastructure for multi-agent work
   echo ""
   echo "Setting up multi-agent pipeline infrastructure..."
   bash "${ROOT_DIR}/.agentic/tools/setup-agent.sh" pipeline 2>/dev/null || true
@@ -418,11 +421,11 @@ fi
 
 echo ""
 if [[ "$DISCOVERY_RAN" == "yes" ]]; then
-  echo "Done (Core+PM + auto-discovery). Proposals in .agentic-state/proposals/"
+  echo "Done (Formal + auto-discovery). Proposals in .agentic-state/proposals/"
   echo "Next: run the agent-guided init in .agentic/init/init_playbook.md"
   echo "      The agent will review discovery results with you before finalizing."
 else
-  echo "Done (Core+PM). Next: run the agent-guided init in .agentic/init/init_playbook.md"
+  echo "Done (Formal). Next: run the agent-guided init in .agentic/init/init_playbook.md"
 fi
 echo ""
 echo "Multi-agent setup:"
