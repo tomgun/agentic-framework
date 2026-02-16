@@ -4,8 +4,8 @@
 # Category: Important
 # Tests: LLM-TOKEN-FEATURE
 
-# Setup - Core+PM has FEATURES.md
-setup_test_project "core-pm"
+# Setup - Formal has FEATURES.md
+setup_test_project "formal"
 
 # Create a feature entry
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'

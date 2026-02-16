@@ -18,7 +18,7 @@ FEATURES_FILE="${PROJECT_ROOT}/spec/FEATURES.md"
 
 # Check if FEATURES.md exists
 if [[ ! -f "${FEATURES_FILE}" ]]; then
-  echo "Error: spec/FEATURES.md not found. This project may not use Core+PM mode."
+  echo "Error: spec/FEATURES.md not found. This project may not use Formal mode."
   exit 1
 fi
 

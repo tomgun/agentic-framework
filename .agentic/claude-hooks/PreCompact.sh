@@ -75,7 +75,7 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   fi
 fi
 
-# 4. Save current feature status (if Core+PM mode)
+# 4. Save current feature status (if Formal mode)
 if [[ -f "spec/FEATURES.md" ]]; then
   IN_PROGRESS=$(grep -c "status: in_progress" spec/FEATURES.md 2>/dev/null || echo "0")
   if [[ "$IN_PROGRESS" -gt 0 ]]; then

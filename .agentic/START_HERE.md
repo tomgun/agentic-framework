@@ -96,7 +96,7 @@ Agents should read in this order:
 2. `CONTEXT_PACK.md` (where things are, how to run)
 3. `JOURNAL.md` last 2-3 entries (recent progress)
 4. `HUMAN_NEEDED.md` (blockers requiring attention)
-5. Relevant feature acceptance criteria (if Core+PM mode)
+5. Relevant feature acceptance criteria (if Formal mode)
 
 See [`.agentic/token_efficiency/reading_protocols.md`](token_efficiency/reading_protocols.md) for details.
 

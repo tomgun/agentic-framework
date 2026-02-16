@@ -265,7 +265,7 @@ def main() -> int:
     
     if layout == "none":
         print("⚠️  No features found (no spec/FEATURES.md or spec/features/)")
-        print("   Run scaffold.sh if you're using Core+PM mode")
+        print("   Run scaffold.sh if you're using Formal mode")
         return 0
     
     print(f"Layout: {layout}")

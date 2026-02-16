@@ -6,15 +6,15 @@ This guide explains how to use Cursor's agent capabilities with the Agentic Fram
 
 ## ENFORCED GATES (Profile-Aware)
 
-| Gate | Core+PM (formal) | Core (discovery) |
-|------|------------------|------------------|
+| Gate | Formal | Discovery |
+|------|--------|-----------|
 | Acceptance criteria | **BLOCKS** - `ag implement` requires acceptance | N/A - use `ag work` |
 | WIP before commit | **BLOCKS** - must complete WIP first | WARNING only |
 | Pre-commit checks | **BLOCKS** - full validation | Light check, no block |
 
-**Core+PM**: Formal tracking with enforced gates. **Core**: Discovery with lighter guidance.
+**Formal**: Formal tracking with enforced gates. **Discovery**: Lighter guidance.
 
-**Quick Commands**: `ag start` | `ag implement F-XXXX` (Core+PM) | `ag work "desc"` (Core) | `ag commit` | `ag done` | `ag tools`
+**Quick Commands**: `ag start` | `ag implement F-XXXX` (Formal) | `ag work "desc"` (Discovery) | `ag commit` | `ag done` | `ag tools`
 
 ---
 

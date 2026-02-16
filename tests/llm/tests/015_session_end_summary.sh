@@ -5,7 +5,7 @@
 # Tests: LLM-003
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Simulate some work was done
 cat > "$TEST_PROJECT/STATUS.md" << 'EOF'

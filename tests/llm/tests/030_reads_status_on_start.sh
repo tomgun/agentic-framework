@@ -5,7 +5,7 @@
 # Tests: LLM-030
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create STATUS.md with specific sprint/task info
 cat > "$TEST_PROJECT/STATUS.md" << 'EOF'

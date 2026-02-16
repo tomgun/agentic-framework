@@ -5,7 +5,7 @@
 # Tests: LLM-TOKEN-BLOCKER
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Ask to add a blocker (natural language)
 send_prompt "I'm blocked on database schema design and need human input - please track this blocker"

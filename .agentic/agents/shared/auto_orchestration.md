@@ -118,7 +118,7 @@ See `.agentic/agents/context-manifests/` for all role definitions
 
 **Trigger**: User mentions implementing a feature (F-#### or general)
 
-**CRITICAL PRE-CONDITION (Core+PM)**: If the user describes a feature without a feature ID:
+**CRITICAL PRE-CONDITION (Formal)**: If the user describes a feature without a feature ID:
 1. Assign the next available F-XXXX ID in spec/FEATURES.md
 2. Create spec/acceptance/F-XXXX.md with acceptance criteria
 3. THEN proceed with the pipeline below
@@ -129,12 +129,12 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
 
 ```
 1. VERIFY ACCEPTANCE CRITERIA EXIST
-   ├─ Core+PM: Check spec/acceptance/F-####.md exists
-   ├─ Core: Check OVERVIEW.md has criteria
+   ├─ Formal: Check spec/acceptance/F-####.md exists
+   ├─ Discovery: Check OVERVIEW.md has criteria
    └─ If missing: CREATE THEM FIRST (rough is OK)
 
 2. CHECK PLAN-REVIEW SETTING
-   └─ Read STACK.md → plan_review_enabled (default: yes for Core+PM)
+   └─ Read STACK.md → plan_review_enabled (default: yes for Formal)
    ├─ If yes: Run `ag plan F-####` first — tell user review loop is active
    │          and mention max iterations from plan_review_max_iterations
    └─ If no: Proceed directly (or run ag plan --no-review for simple plan)
@@ -153,8 +153,8 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
    └─ Smoke test: RUN THE APPLICATION
 
 6. UPDATE SPECS (MANDATORY - NOT OPTIONAL)
-   ├─ Core+PM: Update spec/FEATURES.md status
-   ├─ Core: Update OVERVIEW.md
+   ├─ Formal: Update spec/FEATURES.md status
+   ├─ Discovery: Update OVERVIEW.md
    └─ This is part of "done", not afterthought
 
 7. UPDATE DOCS
@@ -170,10 +170,10 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
 
 | Gate | Check | Block If |
 |------|-------|----------|
-| Acceptance Criteria | `spec/acceptance/F-####.md` (Core+PM) or criteria in any form (Core) | Core+PM: Missing = cannot proceed |
+| Acceptance Criteria | `spec/acceptance/F-####.md` (Formal) or criteria in any form (Discovery) | Formal: Missing = cannot proceed |
 | Tests Pass | Run test suite | Any failure = cannot ship |
 | Smoke Test | Actually run the app | Strongly recommended — verify manually before shipping |
-| Specs Updated | FEATURES.md and STATUS.md current | Stale = cannot commit (enforced by pre-commit-check.sh for Core+PM) |
+| Specs Updated | FEATURES.md and STATUS.md current | Stale = cannot commit (enforced by pre-commit-check.sh for Formal) |
 | No Untracked Files | `check-untracked.sh` clean | Untracked = warn before commit |
 
 †Smoke testing and anti-hallucination are behavioral principles reinforced by memory seed and LLM tests. They cannot be verified by scripts.
@@ -398,8 +398,8 @@ These are YOUR responsibility as an agent following this framework.
 
 ### Enforced Gates (Profile-Aware)
 
-| Gate | Core+PM (formal) | Core (discovery) |
-|------|------------------|------------------|
+| Gate | Formal | Discovery |
+|------|--------|-----------|
 | Acceptance criteria | BLOCKS - `ag implement` requires spec/acceptance/F-XXXX.md | N/A - use `ag work` |
 | WIP before commit | BLOCKS - must complete WIP first | WARNING only |
 | Test execution | BLOCKS - tests must pass | BLOCKS - tests for changed files |

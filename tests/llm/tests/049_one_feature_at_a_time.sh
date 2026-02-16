@@ -4,8 +4,8 @@
 # Category: Important
 # Tests: LLM-049
 
-# Setup with Core+PM profile
-setup_test_project "core-pm"
+# Setup with Formal profile
+setup_test_project "formal"
 
 # Create WIP.md with an active feature
 mkdir -p "$TEST_PROJECT/.agentic-state"

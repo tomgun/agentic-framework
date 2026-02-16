@@ -11,7 +11,7 @@ required:
   - .agentic/agents/shared/guidelines/anti-hallucination.md
 
 optional:
-  - spec/PRD.md                             # Product goals (if Core+PM)
+  - spec/PRD.md                             # Product goals (if Formal)
   - spec/acceptance/{feature_id}.md       # If assigned to specific feature
 
 exclude:

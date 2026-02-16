@@ -2,7 +2,7 @@
 
 **Purpose**: Ensure systematic, complete feature implementation with proper tracking.
 
-**Use when**: Implementing any feature (F-#### in Core+Product, or general feature in Core).
+**Use when**: Implementing any feature (F-#### in Formal, or general feature in Core).
 
 ---
 
@@ -21,7 +21,7 @@
   - What are the testable success conditions?
   - Are there edge cases explicitly mentioned?
 
-- [ ] **Check dependencies** (Core+Product only)
+- [ ] **Check dependencies** (Formal only)
   - Look at `Dependencies:` field in `spec/FEATURES.md`
   - Are dependent features complete?
   - If not, implement dependencies first
@@ -104,7 +104,7 @@
   - Test time-based behavior (if applicable)
 
 - [ ] **Add code annotations**
-  - `@feature F-####` on relevant functions (Core+Product)
+  - `@feature F-####` on relevant functions (Formal)
   - `@acceptance A-####` on acceptance test functions
   - `@nfr NFR-####` on NFR-related code
 
@@ -119,7 +119,7 @@
 
 ## After Implementation
 
-### Update Tracking (Core+Product)
+### Update Tracking (Formal)
 
 - [ ] **Update `spec/FEATURES.md`**
   - Status: `planned` → `in_progress` → `shipped`
@@ -145,7 +145,7 @@
   - Blockers encountered (if any)
   - What's next
 
-- [ ] **Update `STATUS.md`** (Core+Product)
+- [ ] **Update `STATUS.md`** (Formal)
   - Current session state
   - Completed this session
   - Next immediate step

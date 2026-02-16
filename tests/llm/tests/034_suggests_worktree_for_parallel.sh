@@ -2,11 +2,11 @@
 # Description: Agent should recommend git worktree or branch isolation for parallel agent work
 # Section: multi-agent
 # Category: Normal
-# Profile: core-pm
+# Profile: formal
 # Tests: LLM-034
 
-# Setup - Core+PM profile
-setup_test_project "core-pm"
+# Setup - Formal profile
+setup_test_project "formal"
 
 # Ask about parallel agent workflows
 send_prompt "How can two AI agents work on different features at the same time without conflicts?"

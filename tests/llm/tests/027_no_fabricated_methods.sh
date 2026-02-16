@@ -5,7 +5,7 @@
 # Tests: LLM-027 (core-rules.md rule #1)
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a UserService with only getUser() and updateUser()
 mkdir -p "$TEST_PROJECT/services"

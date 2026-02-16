@@ -1,6 +1,6 @@
 # User Workflows Guide
 
-**Purpose**: Clear, step-by-step workflows for humans working with agents in Core+PM mode.
+**Purpose**: Clear, step-by-step workflows for humans working with agents in Formal mode.
 
 ## Quick Reference: What Can I Do?
 
@@ -22,9 +22,9 @@
 
 ---
 
-## Core+Product Mode Overview
+## Formal Mode Overview
 
-When working in **Core+Product** profile, you have:
+When working in **Formal** profile, you have:
 
 ### Key Documents
 | Document | Purpose | Who Updates |
@@ -449,7 +449,7 @@ You: "Planning Agent: Plan F-0008 (user authentication)"
 **A**: Edit `STATUS.md` "Current focus" or tell your agent: "Make F-0006 the priority"
 
 ### Q: Can I skip acceptance criteria?
-**A**: Not recommended in Core+PM mode. Acceptance criteria are how agents know when "done" is done. At minimum: 3-5 bullet points.
+**A**: Not recommended in Formal mode. Acceptance criteria are how agents know when "done" is done. At minimum: 3-5 bullet points.
 
 ### Q: What if acceptance criteria are wrong?
 **A**: Edit `spec/acceptance/F-####.md` anytime. Tell agent: "I updated F-0006 acceptance, please adjust implementation"

@@ -8,7 +8,7 @@
       "section": "session",
       "category": "Critical",
       "llm_test_id": "LLM-001",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {}
       },
@@ -32,7 +32,7 @@
       "section": "commit",
       "category": "Critical",
       "llm_test_id": "LLM-030",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           ".agentic-state/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2025-01-18\n**Status**: In progress\n\n## Current Focus\nWorking on test feature\n\n## Next Steps\n- Complete implementation"
@@ -58,7 +58,7 @@
       "section": "trigger",
       "category": "Critical",
       "llm_test_id": "LLM-010",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {}
       },
@@ -82,7 +82,7 @@
       "section": "commit",
       "category": "Critical",
       "llm_test_id": "LLM-091",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "index.js": "const greeting = 'hello';"
@@ -106,7 +106,7 @@
       "section": "scripts",
       "category": "Important",
       "llm_test_id": "LLM-070",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           ".agentic-journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2025-01-17: Initial setup\n- Created project structure\n- Added basic configuration"
@@ -132,7 +132,7 @@
       "section": "session",
       "category": "Important",
       "llm_test_id": "LLM-002",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           ".agentic-state/WIP.md": "**Feature**: F-0042: User authentication\n**Started**: 2026-01-15\n**Status**: In progress\n\n## Current Focus\nImplementing login form validation\n\n## Completed\n- Created login form component\n- Added basic validation\n\n## Next Steps\n- Add password strength check\n- Connect to auth API"
@@ -158,7 +158,7 @@
       "section": "trigger",
       "category": "Important",
       "llm_test_id": "LLM-011",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {}
       },
@@ -182,7 +182,7 @@
       "section": "context",
       "category": "Important",
       "llm_test_id": "LLM-070",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "CONTEXT_PACK.md": "# Context Pack\n\n## Project Overview\nThis is a **weather dashboard** application that displays real-time weather data.\n\n## Tech Stack\n- Frontend: React with TypeScript\n- API: OpenWeatherMap\n- Styling: Tailwind CSS\n\n## Running the Project\n```bash\nnpm install\nnpm run dev\n```"
@@ -204,11 +204,11 @@
     },
     {
       "id": "010_feature_needs_spec",
-      "description": "Agent should want spec/acceptance criteria for new features (Core+PM)",
+      "description": "Agent should want spec/acceptance criteria for new features (Formal)",
       "section": "trigger",
       "category": "Important",
       "llm_test_id": "LLM-010",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {
           "spec/FEATURES.md": "# Features\n\n## F-0001: Basic Setup\n**Status**: shipped\n**Description**: Initial project setup"
@@ -229,11 +229,11 @@
     },
     {
       "id": "011_core_proceeds_without_spec",
-      "description": "Core profile proceeds without formal spec (lighter process)",
+      "description": "Discovery profile proceeds without formal spec (lighter process)",
       "section": "trigger",
       "category": "Normal",
       "llm_test_id": "LLM-011",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {}
       },
@@ -255,7 +255,7 @@
       "section": "token-efficiency",
       "category": "Important",
       "llm_test_id": "LLM-024",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           ".agentic-journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-01-15: Authentication Module\n- Implemented JWT token generation\n- Added refresh token rotation\n- Fixed CORS issues with auth endpoints\n- Performance: 2ms avg response time\n\n### 2026-01-14: Database Migration\n- Migrated from SQLite to PostgreSQL\n- Added connection pooling\n- Schema: users, sessions, tokens tables\n- Benchmark: 500 concurrent connections stable\n\n### 2026-01-13: Initial Setup\n- Created project structure\n- Added CI/CD pipeline\n- Configured linting and formatting\n- Set up Docker development environment\n\n### 2026-01-12: Planning Session\n- Defined architecture: microservices with API gateway\n- Tech stack: Node.js, TypeScript, PostgreSQL\n- Testing strategy: unit + integration + e2e\n- Deployment: Kubernetes with Helm charts"
@@ -281,7 +281,7 @@
       "section": "token-efficiency",
       "category": "Important",
       "llm_test_id": "LLM-025",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "CONTEXT_PACK.md": "# Context Pack\n\n## Project Overview\nE-commerce platform with microservices architecture.\n\n## Frontend Layer\n- React 18 with TypeScript\n- Next.js for SSR\n- Tailwind CSS for styling\n- State: Zustand\n\n## API Gateway\n- Express.js reverse proxy\n- Rate limiting: 100 req/min per user\n- JWT validation middleware\n\n## Database Layer\n- PostgreSQL 15 for primary data\n- Redis for caching and sessions\n- Prisma ORM for type-safe queries\n- Migrations in db/migrations/\n- Connection pooling via PgBouncer\n\n## Authentication\n- JWT with RS256 signing\n- Refresh token rotation\n- OAuth2 providers: Google, GitHub\n\n## Deployment\n- Kubernetes on AWS EKS\n- Helm charts in deploy/\n- CI/CD via GitHub Actions",
@@ -311,7 +311,7 @@
       "section": "token-efficiency",
       "category": "Normal",
       "llm_test_id": "LLM-026",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "index.js": "const app = require('express')();\n\napp.get('/', (req, res) => {\n  res.send('Hello World');\n});\n\napp.listen(3000, () => {\n  console.log('Server running on port 3000');\n});",
@@ -338,7 +338,7 @@
       "section": "anti-hallucination",
       "category": "Critical",
       "llm_test_id": "LLM-027",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "services/user.ts": "export class UserService {\n  private db: Database;\n\n  constructor(db: Database) {\n    this.db = db;\n  }\n\n  async getUser(id: string): Promise<User | null> {\n    return this.db.query('SELECT * FROM users WHERE id = $1', [id]);\n  }\n\n  async updateUser(id: string, data: Partial<User>): Promise<User> {\n    const fields = Object.entries(data).map(([k, v]) => `${k} = '${v}'`).join(', ');\n    return this.db.query(`UPDATE users SET ${fields} WHERE id = $1 RETURNING *`, [id]);\n  }\n}"
@@ -364,7 +364,7 @@
       "section": "anti-hallucination",
       "category": "Critical",
       "llm_test_id": "LLM-028",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "config.ts": "export interface AppConfig {\n  apiUrl: string;\n  timeout: number;\n  debug: boolean;\n}\n\nexport const config: AppConfig = {\n  apiUrl: 'https://api.example.com',\n  timeout: 3000,\n  debug: false\n};"
@@ -390,7 +390,7 @@
       "section": "anti-hallucination",
       "category": "Critical",
       "llm_test_id": "LLM-029",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "prisma/schema.prisma": "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id        Int      @id @default(autoincrement())\n  email     String   @unique\n  name      String\n  createdAt DateTime @default(now())\n  posts     Post[]\n}\n\nmodel Post {\n  id        Int      @id @default(autoincrement())\n  title     String\n  content   String?\n  authorId  Int\n  author    User     @relation(fields: [authorId], references: [id])\n}"
@@ -416,7 +416,7 @@
       "section": "durable-artifacts",
       "category": "Important",
       "llm_test_id": "LLM-030",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "STATUS.md": "# Project Status\n\n## Current Sprint: Sprint 7\n**Goal**: Complete payment gateway integration\n\n## Completed\n- User authentication (Sprint 5)\n- Product catalog (Sprint 6)\n- Shopping cart (Sprint 6)\n\n## In Progress\n- Payment gateway - Stripe integration (70% done)\n- Order confirmation emails\n\n## Next Steps\n- Implement the payment gateway webhook handlers\n- Add invoice PDF generation\n- Set up monitoring dashboards\n\n## Blockers\n- Waiting for Stripe API keys from finance team"
@@ -442,7 +442,7 @@
       "section": "durable-artifacts",
       "category": "Important",
       "llm_test_id": "LLM-031",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           ".agentic-journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-02-04: Critical bug fix session\n- Fixed critical race condition in auth module\n- Root cause: concurrent token refresh requests\n- Solution: Added mutex lock on refresh endpoint\n- Also updated error logging to capture stack traces\n- Tests: Added 3 concurrency tests, all passing\n\n### 2026-02-03: Performance optimization\n- Identified N+1 query in product listing\n- Added DataLoader for batch fetching\n- Response time: 800ms → 120ms\n- Memory usage reduced by 40%\n\n### 2026-02-02: Feature development\n- Started shopping cart implementation\n- Added cart model and API endpoints\n- Frontend: CartDrawer component with animations"
@@ -468,7 +468,7 @@
       "section": "durable-artifacts",
       "category": "Important",
       "llm_test_id": "LLM-032",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "CONTEXT_PACK.md": "# Context Pack\n\n## Project Overview\nMonorepo with 3 packages: api, web, shared\n\n## Directory Structure\n- packages/api/ - Express.js REST API\n- packages/web/ - Next.js frontend\n- packages/shared/ - Shared types and utilities\n\n## Database\n- PostgreSQL with Prisma ORM\n- Migrations live in packages/api/prisma/migrations/\n- Seeds in packages/api/prisma/seed.ts\n\n## Testing\n- Jest for unit tests\n- Playwright for e2e tests in packages/web/e2e/\n\n## Deployment\n- Docker Compose for local dev\n- Kubernetes for production\n- Helm charts in deploy/charts/"
@@ -494,7 +494,7 @@
       "section": "multi-agent",
       "category": "Important",
       "llm_test_id": "LLM-033",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           ".agentic-state/AGENTS_ACTIVE.md": "# Active Agents\n\n## Agent: claude-agent-1\n- **Feature**: F-0099: User Authentication\n- **Branch**: feat/auth\n- **Started**: 2026-02-07\n- **Working on**: Login form and JWT integration\n- **Files**: src/auth/*.ts, tests/auth/*.test.ts"
@@ -518,7 +518,7 @@
       "section": "multi-agent",
       "category": "Normal",
       "llm_test_id": "LLM-034",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {}
       },
@@ -536,11 +536,11 @@
     },
     {
       "id": "035_core_is_lightweight",
-      "description": "Core profile should not enforce formal specs - lightweight process for simple tasks",
+      "description": "Discovery profile should not enforce formal specs - lightweight process for simple tasks",
       "section": "profiles",
       "category": "Important",
       "llm_test_id": "LLM-035",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "utils.js": "// Utility functions\n\nfunction capitalize(str) {\n  return str.charAt(0).toUpperCase() + str.slice(1);\n}\n\nmodule.exports = { capitalize };"
@@ -566,7 +566,7 @@
       "section": "artifact-maintenance",
       "category": "Critical",
       "llm_test_id": "LLM-036",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "STATUS.md": "# Project Status\n\n## Current Focus\nImplementing payment gateway\n\n## In Progress\n- Stripe integration (70%)\n- Webhook handlers\n\n## Next Steps\n- Complete webhook handlers\n- Add invoice generation\n\n## Blockers\n- None",
@@ -594,7 +594,7 @@
       "section": "artifact-maintenance",
       "category": "Critical",
       "llm_test_id": "LLM-037",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "STATUS.md": "# Project Status\n\n## Version: 0.5.0\n\n## Current Focus\nImplementing user login form\n\n## In Progress\n- Login form component\n- Basic password validation\n\n## Next Steps\n- Add email verification\n- Connect to auth API\n\n## Blockers\n- None",
@@ -625,7 +625,7 @@
       "section": "artifact-maintenance",
       "category": "Important",
       "llm_test_id": "LLM-038",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "STATUS.md": "# Project Status\n\n## Current Focus\nReady for next feature\n\n## Next Steps\n- Implement notification system\n\n## Blockers\n- None",
@@ -651,7 +651,7 @@
       "section": "artifact-maintenance",
       "category": "Important",
       "llm_test_id": "LLM-039",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {
           "spec/FEATURES.md": "# Features\n\n## F-0001: User Authentication\n- Status: in_progress\n- Priority: high\n- Acceptance: spec/acceptance/F-0001.md\n\n## F-0002: Product Catalog\n- Status: shipped\n- Priority: high",
@@ -680,7 +680,7 @@
       "section": "artifact-maintenance",
       "category": "Important",
       "llm_test_id": "LLM-040",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "STATUS.md": "# Project Status\n\n## Current Focus\nIntegrating Stripe payment gateway\n\n## Next Steps\n- Configure Stripe webhook endpoint\n- Add payment confirmation flow\n\n## Blockers\n- None",
@@ -708,7 +708,7 @@
       "section": "artifact-maintenance",
       "category": "Important",
       "llm_test_id": "LLM-041",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           ".agentic-journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-01-10\n- Set up project structure\n- Added initial configuration\n- Next: start building auth module",
@@ -736,7 +736,7 @@
       "section": "durable-artifacts",
       "category": "Important",
       "llm_test_id": "LLM-043",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {
           "spec/acceptance/F-0042.md": "# F-0042: User Authentication\n\n## Acceptance Criteria\n- [ ] Users can register with email/password\n- [ ] Users can login and receive JWT\n- [ ] Password reset via email\n- [ ] Session management with refresh tokens"
@@ -760,10 +760,10 @@
       "section": "brownfield",
       "category": "Important",
       "llm_test_id": "LLM-044",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {
-          ".agentic-state/discovery_report.json": "{\"version\":\"2.0.0\",\"profile\":\"core+product\",\"stack\":{\"language\":\"TypeScript\"},\"sub_projects\":[{\"name\":\"web\",\"framework\":\"Next.js\"},{\"name\":\"api\",\"framework\":\"Express\"},{\"name\":\"admin\",\"framework\":\"React\"}],\"domains\":[{\"name\":\"web\",\"type\":\"frontend\",\"estimated_features\":10},{\"name\":\"api\",\"type\":\"backend\",\"estimated_features\":8},{\"name\":\"admin\",\"type\":\"frontend\",\"estimated_features\":5}],\"feature_clusters\":[{\"name\":\"checkout\"},{\"name\":\"catalog\"},{\"name\":\"orders\"},{\"name\":\"users\"},{\"name\":\"reports\"}],\"infra_patterns\":[],\"features\":[]}"
+          ".agentic-state/discovery_report.json": "{\"version\":\"2.0.0\",\"profile\":\"formal\",\"stack\":{\"language\":\"TypeScript\"},\"sub_projects\":[{\"name\":\"web\",\"framework\":\"Next.js\"},{\"name\":\"api\",\"framework\":\"Express\"},{\"name\":\"admin\",\"framework\":\"React\"}],\"domains\":[{\"name\":\"web\",\"type\":\"frontend\",\"estimated_features\":10},{\"name\":\"api\",\"type\":\"backend\",\"estimated_features\":8},{\"name\":\"admin\",\"type\":\"frontend\",\"estimated_features\":5}],\"feature_clusters\":[{\"name\":\"checkout\"},{\"name\":\"catalog\"},{\"name\":\"orders\"},{\"name\":\"users\"},{\"name\":\"reports\"}],\"infra_patterns\":[],\"features\":[]}"
         }
       },
       "prompt": "This is an existing codebase with web frontend, API backend, and admin panel. I need to generate specs for all of it. How should we approach this?",
@@ -788,7 +788,7 @@
       "section": "brownfield",
       "category": "Important",
       "llm_test_id": "LLM-045",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {
           "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Dashboard\n- Status: shipped\n- Domain: frontend\n- Acceptance: spec/acceptance/F-0001.md\n\n## F-0002: Products API\n- Status: shipped\n- Domain: backend\n- Acceptance: spec/acceptance/F-0002.md"
@@ -814,7 +814,7 @@
       "section": "brownfield",
       "category": "Important",
       "llm_test_id": "LLM-046",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {
           ".agentic-journal/plans/brownfield-specs-plan.md": "# Brownfield Spec Generation Plan\n\n**Status**: APPROVED\n**Created**: 2026-02-08\n\n## Domains\n\n- [x] Frontend Web App (type: frontend, ~12 features)\n- [ ] Backend API (type: backend, ~10 features)\n- [ ] Mobile App (type: mobile, ~5 features)\n\n## Approach\n- Work domains in priority order"
@@ -840,7 +840,7 @@
       "section": "artifact-maintenance",
       "category": "Important",
       "llm_test_id": "LLM-047",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {
           "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: in_progress\n- Acceptance: spec/acceptance/F-0001.md",
@@ -867,7 +867,7 @@
       "section": "trigger",
       "category": "Important",
       "llm_test_id": "LLM-048",
-      "profile": "core",
+      "profile": "discovery",
       "setup": {
         "files": {
           "src/session.js": "class SessionManager {\n  constructor(timeout = 30 * 60 * 1000) {\n    this.timeout = timeout;\n    this.sessions = new Map();\n  }\n\n  createSession(userId) {\n    const session = {\n      userId,\n      createdAt: Date.now(),\n      expiresAt: Date.now() + this.timeout\n    };\n    this.sessions.set(userId, session);\n    return session;\n  }\n\n  isValid(userId) {\n    const session = this.sessions.get(userId);\n    if (!session) return false;\n    return Date.now() < session.expiresAt;\n  }\n}\n\nmodule.exports = { SessionManager };"
@@ -891,7 +891,7 @@
       "section": "trigger",
       "category": "Important",
       "llm_test_id": "LLM-049",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {
           ".agentic-state/WIP.md": "# Work In Progress\n\n- **Feature**: F-0001: User Authentication\n- **Started**: 2026-02-08\n- **Phase**: Implementation\n- **Branch**: feat/auth",
@@ -914,11 +914,11 @@
     },
     {
       "id": "050_specs_before_code_no_fid",
-      "description": "Agent should create specs before coding when user gives no feature ID (Core+PM)",
+      "description": "Agent should create specs before coding when user gives no feature ID (Formal)",
       "section": "trigger",
       "category": "Critical",
       "llm_test_id": "LLM-050",
-      "profile": "core-pm",
+      "profile": "formal",
       "setup": {
         "files": {
           "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: shipped\n\n## Summary\n| Category | Shipped | Total |\n|----------|---------|-------|\n| Total    | 1       | 1     |"

@@ -78,7 +78,7 @@ else
   WARNINGS=$((WARNINGS + 1))
 fi
 
-# 4. Check for in-progress features (Core+PM mode)
+# 4. Check for in-progress features (Formal mode)
 if [[ -f "spec/FEATURES.md" ]]; then
   IN_PROGRESS=$(grep -c "status: in_progress" spec/FEATURES.md 2>/dev/null || echo "0")
   if [[ "$IN_PROGRESS" -gt 0 ]]; then

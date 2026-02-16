@@ -7,7 +7,7 @@
 # Note: Token-efficiency angle of journal.sh usage (see also 004 for scripts angle)
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a realistic multi-session journal (larger than 004's simple journal)
 mkdir -p "$TEST_PROJECT/.agentic-journal"

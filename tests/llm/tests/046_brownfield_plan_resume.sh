@@ -4,8 +4,8 @@
 # Category: Important
 # Tests: LLM-046
 
-# Setup with Core+PM profile
-setup_test_project "core-pm"
+# Setup with Formal profile
+setup_test_project "formal"
 
 # Create an in-progress brownfield specs plan
 mkdir -p "$TEST_PROJECT/.agentic-journal/plans"

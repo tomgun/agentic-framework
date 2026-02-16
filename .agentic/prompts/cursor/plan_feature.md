@@ -28,7 +28,7 @@ Please help me create a thorough plan:
    - Highlight data flow
    - Save to `docs/architecture/[feature].md`
 
-5. **For Core+PM mode - Create formal specs:**
+5. **For Formal mode - Create formal specs:**
    - Create spec migration if `spec_migration_mode: enabled`
    - Add features to `spec/FEATURES.md` with:
      - Feature IDs (F-####)
@@ -37,7 +37,7 @@ Please help me create a thorough plan:
    - Create acceptance criteria files: `spec/acceptance/F-####.md`
    - Update `spec/PRD.md` or `spec/TECH_SPEC.md` if needed
 
-6. **For Core mode - Document in OVERVIEW.md:**
+6. **For Discovery mode - Document in OVERVIEW.md:**
    - Add planned features with acceptance criteria
    - Note technical approach and key decisions
    - List dependencies and risks

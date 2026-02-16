@@ -17,7 +17,7 @@
 | **Total Tests** | **209 passing / 215 total** |
 | Test Pass Rate | 97.2% |
 | Principles Covered | 13/13 |
-| Profile Coverage | Core ✅, Core+PM ✅ |
+| Profile Coverage | Discovery ✅, Formal ✅ |
 
 ---
 
@@ -128,7 +128,7 @@
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
 | 005_no_auto_commit | Agent does not auto-commit | LLM | ✅ |
-| 013_pr_workflow_corepm | Agent follows PR workflow | LLM | ✅ |
+| 013_pr_workflow_formal | Agent follows PR workflow | LLM | ✅ |
 | _Acceptance_ | PR template + docs tests | Structural | ✅ (4 tests) |
 
 ### R3: Check Before Creating (OPERATIONAL RULE)
@@ -144,10 +144,10 @@
 |---------|-------------|------|--------|
 | 003_acceptance_first | Agent asks about requirements before coding | LLM | ✅ |
 | 007_small_batch | Agent breaks large tasks into batches | LLM | ✅ |
-| 010_feature_needs_spec | Core+PM needs spec/acceptance | LLM | ✅ |
-| 011_core_proceeds_without_spec | Core profile proceeds without spec | LLM | ✅ |
+| 010_feature_needs_spec | Formal needs spec/acceptance | LLM | ✅ |
+| 011_core_proceeds_without_spec | Discovery profile proceeds without spec | LLM | ✅ |
 | 012_definition_of_done | Agent references Definition of Done | LLM | ✅ |
-| 035_core_is_lightweight | Core implements without formal spec | LLM | ✅ |
+| 035_core_is_lightweight | Discovery implements without formal spec | LLM | ✅ |
 | _Acceptance_ | Feature tracking, acceptance file validation | Structural | ✅ (14 tests) |
 
 ### D5: Living Documentation (DESIGN PRINCIPLE)
@@ -190,7 +190,7 @@
 |----------|-------|--------|
 | Structural (file/dir existence) | ~90 | ✅ |
 | Functional (script execution) | ~35 | ✅ |
-| Profile (Core + Core+PM) | ~20 | ✅ |
+| Profile (Discovery + Formal) | ~20 | ✅ |
 | Enforcement (pre-commit, complexity) | ~15 | ✅ |
 | Principles validation | ~11 | ✅ |
 | **Total** | **171** | **100%** (2 warnings) |
@@ -199,7 +199,7 @@
 
 ## Profile-Specific Verification
 
-### Core Profile
+### Discovery Profile
 - ✅ Installation creates correct structure (no spec/)
 - ✅ OVERVIEW.md exists
 - ✅ STACK.md exists
@@ -207,12 +207,12 @@
 - ✅ Tools work (wip.sh, journal.sh, status.sh)
 - ✅ LLM: 035_core_is_lightweight passes
 
-### Core+PM Profile
+### Formal Profile
 - ✅ Installation creates correct structure (with spec/)
 - ✅ spec/FEATURES.md exists
 - ✅ spec/PRD.md exists
 - ✅ spec/acceptance/ directory exists
-- ✅ All Core features also work
+- ✅ All Discovery features also work
 - ✅ LLM: 010_feature_needs_spec passes
 
 ---

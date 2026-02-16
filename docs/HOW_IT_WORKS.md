@@ -265,7 +265,7 @@ graph TB
 | **Multi-Environment Support** (F-0054) | Documented workflow for switching between Claude/Cursor/Copilot when tokens run out. Durable artifacts ensure state survives tool switches. | PASSIVE - documented workflow, no enforcement |
 | **Upgrade System** (F-0056, F-0094) | `upgrade.sh` with FEATURE_REGISTRY. Version-aware: only shows features new since user's previous version. `.upgrade_pending` marker. | ACTIVE - structural |
 | **Quality Standards** (F-0015) | 7 quality documents in `.agentic/quality/`. Programming standards, test strategy, review checklist, library selection, green coding, integration testing, design for testability. | ACTIVE - wired via context manifests |
-| **Spec-Driven Development** (F-0003-0006) | Features defined in spec, acceptance criteria before code, tests verify criteria. Agents can't silently regress features when criteria-based tests exist. | ACTIVE - structural gate (Core+PM) |
+| **Spec-Driven Development** (F-0003-0006) | Features defined in spec, acceptance criteria before code, tests verify criteria. Agents can't silently regress features when criteria-based tests exist. | ACTIVE - structural gate (Formal) |
 
 **Hidden mechanism**: The staleness check in `pre-commit-check.sh` (Check 3) compares JOURNAL.md modification time against last git commit. This forces agents to update project state before every commit, ensuring long-term projects never go stale.
 
@@ -303,7 +303,7 @@ graph TB
 |---------|-------------|--------|
 | **HUMAN_NEEDED.md Escalation** (F-0026) | `blocker.sh add "Title" "type" "Details"` creates entries. Agents read at session start. Humans can `cat HUMAN_NEEDED.md` for zero-token check. | ACTIVE |
 | **Manual Operations** (F-0067) | `MANUAL_OPERATIONS.md` documents all queries humans can run without agent (zero tokens). `cat STATUS.md`, `grep` patterns for feature status. | ACTIVE - documentation |
-| **PR Workflow** (F-0096) | Default for Core+PM. `pre-commit-check.sh` Check 11 blocks commits to main when `git_workflow: pull_request`. Forces feature branches + human review via PRs. | ACTIVE - structural gate |
+| **PR Workflow** (F-0096) | Default for Formal. `pre-commit-check.sh` Check 11 blocks commits to main when `git_workflow: pull_request`. Forces feature branches + human review via PRs. | ACTIVE - structural gate |
 | **Plan-Review Loop** (F-0120) | Planner agent creates plan → Reviewer agent critiques → iterate until APPROVED or max iterations → ESCALATE to human. Configurable in STACK.md. | ACTIVE but UNDERUTILIZED - exists but not always triggered |
 | **No Auto-Commits** (R2) | Behavioral rule in CLAUDE.md + memory seed. LLM test 005 validates compliance. Git agent role shows changes and waits for approval. | ACTIVE - behavioral + tested |
 | **Scope Drift Warning** (F-0114) | `scope_check.sh` compares changed files against WIP declared scope. Pre-commit warns on drift. Human judges whether drift is acceptable. | ACTIVE - advisory warning |
@@ -326,7 +326,7 @@ graph TB
 | **Three-Layer Architecture** | Layer 1: Instruction files (constitution, <100 lines). Layer 2: Playbooks (just-in-time via `ag` commands). Layer 3: Project state (STACK.md, STATUS.md). Each layer has different persistence and enforcement properties. | ACTIVE - design documented in INSTRUCTION_ARCHITECTURE.md |
 | **Memory Seed** | `.agentic/init/memory-seed.md` — action triggers seeded into persistent memory during init. Reinforces (not originates) structural rules. Fades in long sessions but structural gates still catch violations. `memory-check.sh` validates integrity at session start. | ACTIVE - defense-in-depth |
 | **Distributed Enforcement** | No single orchestrator — ag.sh, pre-commit-check.sh, doctor.py, context-for-role.sh each own their phase. Works across Claude/Cursor/Copilot/Codex. | ACTIVE - architectural design |
-| **Specs-Before-Code** (F-0128) | `ag work` hard-blocks in Core+PM without feature ID. `ag implement` requires approved plan. `doctor.py` checks blocking. Pre-commit detects workflow bypass. Memory seed reinforces. | ACTIVE - 7 enforcement points |
+| **Specs-Before-Code** (F-0128) | `ag work` hard-blocks in Formal without feature ID. `ag implement` requires approved plan. `doctor.py` checks blocking. Pre-commit detects workflow bypass. Memory seed reinforces. | ACTIVE - 7 enforcement points |
 | **One-Feature-At-A-Time** | WIP.md lock allows only one feature. `ag implement F-XXXX` blocks if different feature in WIP. | ACTIVE - structural |
 | **Escape Hatches** | `SKIP_TESTS=1`, `SKIP_COMPLEXITY=1`, `SKIP_STALENESS=1` — blocked on main/master branch. Feature branches only. | ACTIVE - safety valve |
 
@@ -345,7 +345,7 @@ graph TB
 | **CONTEXT_PACK.md** (F-0025) | Architecture snapshot: modules, entry points, key files, data flow. Read FIRST at session start. Template with code style examples section. | ACTIVE - manually maintained |
 | **STATUS.md** (F-0024) | Current focus, progress, next steps, blockers. Updated via `status.sh` (token-efficient). Staleness enforced by pre-commit. | ACTIVE - structurally enforced |
 | **JOURNAL.md** (F-0023) | Append-only session log via `journal.sh`. Staleness enforced. `--why` flag documents reasoning. | ACTIVE - structurally enforced |
-| **FEATURES.md** (F-0003, F-0004) | Feature tracking with lifecycle (planned → in_progress → shipped). Machine-readable YAML frontmatter. Updated via `feature.sh`. Staleness enforced when spec files change. | ACTIVE - Core+PM only |
+| **FEATURES.md** (F-0003, F-0004) | Feature tracking with lifecycle (planned → in_progress → shipped). Machine-readable YAML frontmatter. Updated via `feature.sh`. Staleness enforced when spec files change. | ACTIVE - Formal only |
 | **HUMAN_NEEDED.md** (F-0026) | Blockers requiring human action. Updated via `blocker.sh`. | ACTIVE |
 | **Acceptance Criteria** (F-0005) | `spec/acceptance/F-####.md` per feature. Pre-commit blocks if shipped feature has no acceptance file. | ACTIVE - structural gate |
 | **STACK.md** | Machine-readable project config. Parsed by ag.sh (grep/sed), doctor.py (YAML). Profile, git workflow, agent mode, plan-review settings, complexity limits. | ACTIVE - core config |
@@ -361,7 +361,7 @@ graph TB
 | Feature | How It Works | Status |
 |---------|-------------|--------|
 | **Small Batch Enforcement** (F-0007) | Pre-commit Check 7: blocks >10 files staged, >500 lines added, >500-line code files. Configurable in STACK.md. | ACTIVE - structural gate |
-| **Acceptance-Driven Flow** (F-0006) | Define criteria → implement → test → update specs → commit. `ag implement` requires `spec/acceptance/F-####.md` to exist. | ACTIVE - structural gate (Core+PM) |
+| **Acceptance-Driven Flow** (F-0006) | Define criteria → implement → test → update specs → commit. `ag implement` requires `spec/acceptance/F-####.md` to exist. | ACTIVE - structural gate (Formal) |
 | **Plan-Review Loop** (F-0120) | Planner + Reviewer agents iterate on plans before implementation. Max 3 iterations before human escalation. Configurable: `plan_review_enabled`, `plan_review_max_iterations` in STACK.md. | ACTIVE but invocation is inconsistent |
 | **Feature Completion Validator** (F-0017) | `feature-complete.sh` validates all criteria met before marking shipped. `ag done` triggers this. | ACTIVE |
 | **Spec Evolution** (F-0010) | Specs evolve during implementation. Discoveries get documented. Not rigid waterfall. | ACTIVE - workflow |
@@ -451,7 +451,7 @@ These features exist but don't clearly derive from the 13 principles:
 │  pre-commit-check.sh (11 checks)                        │
 │  git core.hooksPath → .agentic/hooks/                   │
 │  ag implement → requires acceptance criteria             │
-│  ag work → blocks without feature ID (Core+PM)          │
+│  ag work → blocks without feature ID (Formal)          │
 │  ag done → runs doctor.sh --phase complete              │
 │  wip.sh → one-feature-at-a-time lock                    │
 │  complexity limits → max files/lines/length              │
@@ -495,7 +495,7 @@ These features exist but don't clearly derive from the 13 principles:
 |---------|-------------|-------------|
 | `ag start` | Read state, check WIP, memory integrity, display dashboard | Advisory (soft start) |
 | `ag sync` | 5-phase drift detection + auto-fix | Advisory (user-initiated) |
-| `ag work "desc"` | Create WIP, start task. Core+PM: BLOCKS without feature ID. | Structural (Core+PM) |
+| `ag work "desc"` | Create WIP, start task. Formal: BLOCKS without feature ID. | Structural (Formal) |
 | `ag plan F-XXXX` | Create plan with optional review loop | Structural (must have acceptance) |
 | `ag implement F-XXXX` | Check acceptance, check approved plan, create WIP, print guidance | Structural (multiple gates) |
 | `ag commit` | Run pre-commit-check.sh, show diff, wait for approval | Structural (exit codes) |
@@ -607,7 +607,7 @@ These will always rely on behavioral reinforcement:
 `tests/llm/harness.sh`, `mutation_test.sh`, `llm-test-status.sh`
 
 ### Utilities
-`quick_feature.sh`, `quick_issue.sh`, `dashboard.sh`, `brief.sh`, `session_log.sh`, `list-tools.sh`, `report.py`/`report.sh`, `check-untracked.sh`, `check-environment.sh`, `doc-check.sh`, `version_check.sh`, `validation-cache.sh`, `organize_features.py`, `feature_stats.py`, `upgrade_spec_format.py`, `validate_formats.py`, `enable-product-management.sh`, `generate-skills.sh`, `start.sh`, `task.sh`, `continue_here.py` (deprecated), `retro_check.sh`, `verify.py`/`verify.sh`
+`quick_feature.sh`, `quick_issue.sh`, `dashboard.sh`, `brief.sh`, `session_log.sh`, `list-tools.sh`, `report.py`/`report.sh`, `check-untracked.sh`, `check-environment.sh`, `doc-check.sh`, `version_check.sh`, `validation-cache.sh`, `organize_features.py`, `feature_stats.py`, `upgrade_spec_format.py`, `validate_formats.py`, `enable-formal.sh`, `generate-skills.sh`, `start.sh`, `task.sh`, `continue_here.py` (deprecated), `retro_check.sh`, `verify.py`/`verify.sh`
 
 ### Archived (6 tools)
 `arch_diff.sh`, `build-stamper.sh`, `bulk_update.py`, `consistency.sh`, `pipeline_list.sh`, `search.sh`

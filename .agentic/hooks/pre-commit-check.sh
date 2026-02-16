@@ -18,7 +18,7 @@
 #   8.  Untracked files warning (new files not git added)
 #   9.  LLM behavioral test status (advisory, framework dev only)
 #   10. Agent instruction file size limits (prevents context bloat)
-#   3c. FEATURES.md updated when spec files changed (BLOCKING, Core+PM only)
+#   3c. FEATURES.md updated when spec files changed (BLOCKING, Formal only)
 #   11. Branch policy for PR workflow (blocks commit to main if pull_request mode)
 #
 # Escape hatches (use sparingly, blocked on main/master):
@@ -177,9 +177,9 @@ if [[ -f "spec/FEATURES.md" ]]; then
   fi
 else
   echo ""
-  echo "[2/12] Skipping shipped features check (Core profile, no spec/FEATURES.md)"
+  echo "[2/12] Skipping shipped features check (Discovery profile, no spec/FEATURES.md)"
   echo ""
-  echo "  📋 Core checklist (review, not blocking):"
+  echo "  📋 Discovery checklist (review, not blocking):"
   echo "     □ Defined what success looks like (even 2-3 bullet points)"
   echo "     □ Tested it actually works"
 fi
@@ -275,7 +275,7 @@ if [[ -f "STATUS.md" ]]; then
   fi
 fi
 
-# Check 3c: FEATURES.md updated when spec files changed (Core+PM, BLOCKING)
+# Check 3c: FEATURES.md updated when spec files changed (Formal, BLOCKING)
 if [[ -f "spec/FEATURES.md" ]]; then
   SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep "^spec/" || true)
   if [[ -n "$SPEC_STAGED" ]]; then
@@ -664,13 +664,13 @@ if [[ $SIZE_WARNINGS -gt 0 ]]; then
 fi
 fi  # end fast mode skip for check 10
 
-# Check 12: Workflow bypass detection (Core+PM only)
+# Check 12: Workflow bypass detection (Formal only)
 # Did the agent use ag implement (which creates WIP with a feature ID)?
 if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 elif [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[12/13] Checking workflow compliance (Core+PM)..."
+  echo "[12/13] Checking workflow compliance (Formal)..."
 
   # Only check when new files are being added in implementation directories
   NEW_IMPL_FILES=$(git diff --cached --name-only --diff-filter=A 2>/dev/null | grep -E '^(src/|lib/|app/|\.agentic/tools/|\.agentic/hooks/)' || true)
@@ -688,7 +688,7 @@ elif [[ -f "spec/FEATURES.md" ]]; then
       echo "⚠️  WARNING: New implementation files without feature tracking"
       echo "   New files: $(echo "$NEW_IMPL_FILES" | wc -l | tr -d ' ')"
       echo ""
-      echo "   Core+PM requires: ag implement F-XXXX before coding."
+      echo "   Formal requires: ag implement F-XXXX before coding."
       echo "   This creates WIP tracking with a feature ID."
       echo ""
       echo "   If this is intentional (refactor, config), ignore this warning."

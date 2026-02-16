@@ -10,7 +10,7 @@ This folder is a **portable framework** you can copy into any repository to boot
 
 ## Two Profiles: Choose What Fits Your Project
 
-### Core Profile (Default - Simple Setup)
+### Discovery Profile (Default - Simple Setup)
 **Purpose**: Make agents work better on ANY project - quality, workflows, multi-agent
 
 **What you get**:
@@ -31,10 +31,10 @@ This folder is a **portable framework** you can copy into any repository to boot
 - Solo developers who don't need formal tracking
 - Quick experiments and MVPs
 
-### Core + Product Management (For Complex Projects)
+### Formal Profile (For Complex Projects)
 **Purpose**: Add formal project tracking for long-term development
 
-**Adds to Core**:
+**Adds to Discovery**:
 - Specs & feature tracking (FEATURES.md with F-#### IDs)
 - Requirements & acceptance criteria
 - Project status & roadmap (STATUS.md)
@@ -48,7 +48,7 @@ This folder is a **portable framework** you can copy into any repository to boot
 - Complex products requiring traceability
 - Projects needing audit trails and formal specs
 
-**Enable later**: `bash .agentic/tools/enable-product-management.sh`
+**Enable later**: `bash .agentic/tools/enable-formal.sh`
 
 ## What you get
 - **A repo init protocol** (agent-guided) that creates stable context artifacts: `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, `JOURNAL.md`, `spec/`, `spec/adr/`.
@@ -139,9 +139,9 @@ Tell your agent:
 
 **That's it!** The agent will:
 - Ask what you're building
-- Ask which profile you want (Core or Core+PM) and explain the differences
+- Ask which profile you want (Discovery or Formal) and explain the differences
 - Interview you about your tech stack and requirements
-- Fill in `STACK.md`, `OVERVIEW.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
+- Fill in `STACK.md`, `OVERVIEW.md`, `CONTEXT_PACK.md` (and `spec/` if Formal)
 - Set up quality validation for your stack
 
 The agent follows `.agentic/init/init_playbook.md` which guides it through the entire initialization process.
@@ -150,9 +150,9 @@ The agent follows `.agentic/init/init_playbook.md` which guides it through the e
 
 If you used `install.sh`, templates are already created. Otherwise, the agent will:
 1. **Run scaffold**: `bash .agentic/init/scaffold.sh` (creates all template files)
-2. **Ask about profile**: Explain Core vs Core+PM and help you choose
+2. **Ask about profile**: Explain Discovery vs Formal and help you choose
 3. **Ask questions**: What are you building? What tech stack? Performance constraints? etc.
-4. **Fill in docs**: `STACK.md`, `OVERVIEW.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
+4. **Fill in docs**: `STACK.md`, `OVERVIEW.md`, `CONTEXT_PACK.md` (and `spec/` if Formal)
 5. **Set up quality checks**: Create stack-specific `quality_checks.sh` if applicable
 6. **Ready to develop**: You're ready to start building
 
@@ -226,8 +226,8 @@ Complete guide covering:
 **Cursor Users**: See [`prompts/cursor/`](prompts/cursor/) for copy-paste workflow prompts:
 - `session_start.md` / `session_end.md` - Session management
 - `feature_start.md` / `feature_test.md` / `feature_complete.md` - Feature development (TDD)
-- `migration_create.md` - Spec migrations (Core+PM mode)
-- `product_update.md` / `quick_feature.md` - Core mode workflows
+- `migration_create.md` - Spec migrations (Formal mode)
+- `product_update.md` / `quick_feature.md` - Discovery mode workflows
 - `research.md` / `plan_feature.md` - Deep research and planning
 - `run_quality.md` / `fix_issues.md` / `retrospective.md` - Quality & maintenance
 
@@ -294,7 +294,7 @@ bash .agentic/tools/version_check.sh # Check dependency versions match STACK.md
 # Spec validation
 python3 .agentic/tools/validate_specs.py  # Validate spec frontmatter
 
-# Spec migrations (Core+PM mode, optional)
+# Spec migrations (Formal mode, optional)
 bash .agentic/tools/migration.sh create "Add Feature X"  # Create new migration
 bash .agentic/tools/migration.sh list                    # List all migrations
 bash .agentic/tools/migration.sh show 001                # Show specific migration

@@ -2,11 +2,11 @@
 # Description: When a feature is complete, agent should update FEATURES.md, mention CHANGELOG, and update JOURNAL
 # Section: artifact-maintenance
 # Category: Important
-# Profile: core-pm
+# Profile: formal
 # Tests: LLM-039
 
-# Setup - Core+PM profile
-setup_test_project "core-pm"
+# Setup - Formal profile
+setup_test_project "formal"
 
 # Create FEATURES.md with F-0001 in_progress
 mkdir -p "$TEST_PROJECT/spec/acceptance"

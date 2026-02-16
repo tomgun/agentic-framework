@@ -5,7 +5,7 @@
 # Tests: LLM-070 (partial)
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a CONTEXT_PACK.md with specific project info
 cat > "$TEST_PROJECT/CONTEXT_PACK.md" << 'EOF'

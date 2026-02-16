@@ -5,7 +5,7 @@
 # Tests: LLM-070
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create JOURNAL.md so there's something to update
 mkdir -p "$TEST_PROJECT/.agentic-journal"

@@ -6,7 +6,7 @@
 # Tests: LLM-032
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create CONTEXT_PACK with specific directory structure info
 cat > "$TEST_PROJECT/CONTEXT_PACK.md" << 'EOF'

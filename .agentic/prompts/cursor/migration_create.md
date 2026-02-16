@@ -1,4 +1,4 @@
-# Create Spec Migration Prompt (Core+PM Mode)
+# Create Spec Migration Prompt (Formal Mode)
 
 I want to create a new spec migration for: **[brief description of change]**
 
@@ -44,7 +44,7 @@ Please follow the spec migration workflow:
 - When `spec_migration_mode: enabled` in `STACK.md`
 
 **When to skip migrations:**
-- Simple, small projects (Core mode or Core+PM with few features)
+- Simple, small projects (Discovery mode or Formal with few features)
 - Quick, minor adjustments
 - When reviewing overall feature status (read `FEATURES.md` directly)
 

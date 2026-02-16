@@ -9,7 +9,7 @@
 ### Start WIP when beginning significant work
 
 ```bash
-# Starting a feature (Core+PM)
+# Starting a feature (Formal)
 bash .agentic/tools/wip.sh start F-0005 "User authentication" "src/auth/*.ts,tests/auth/*.test.ts"
 
 # Starting work (Core profile)

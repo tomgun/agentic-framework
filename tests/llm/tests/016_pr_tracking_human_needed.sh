@@ -4,8 +4,8 @@
 # Category: Important
 # Tests: LLM-PR-TRACKING
 
-# Setup - Core+PM project
-setup_test_project "core-pm"
+# Setup - Formal project
+setup_test_project "formal"
 
 # Make a change and ask to create PR
 mkdir -p "$TEST_PROJECT/src"

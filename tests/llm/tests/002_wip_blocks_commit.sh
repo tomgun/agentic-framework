@@ -5,7 +5,7 @@
 # Tests: LLM-030
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create WIP file (simulating incomplete work)
 mkdir -p "$TEST_PROJECT/.agentic-state"

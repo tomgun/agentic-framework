@@ -6,7 +6,7 @@
 # Tests: LLM-041
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a stale JOURNAL.md (last entry Jan 10, project is now in Sprint 7)
 mkdir -p "$TEST_PROJECT/.agentic-journal"

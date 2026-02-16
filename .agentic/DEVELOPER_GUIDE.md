@@ -29,8 +29,8 @@ The `ag` command is the single entry point for all framework operations:
 
 ```bash
 ag start              # Session start - check status, WIP, blockers
-ag implement F-XXXX   # Start feature (Core+PM) - verifies acceptance criteria
-ag work "description" # Start task (Core) - simpler tracking
+ag implement F-XXXX   # Start feature (Formal) - verifies acceptance criteria
+ag work "description" # Start task (Discovery) - simpler tracking
 ag commit             # Pre-commit gates - blocks if issues
 ag done [F-XXXX]      # Completion check - verifies everything updated
 ag verify [--full]    # Health check
@@ -72,13 +72,13 @@ If the agent seems to be skipping steps:
 
 ### Profile-Aware Commands
 
-The framework detects your profile (Core or Core+PM) automatically:
+The framework detects your profile (Discovery or Formal) automatically:
 
 ```bash
-# Core+PM profile (formal feature tracking)
+# Formal profile (formal feature tracking)
 ag implement F-0042   # Requires spec/acceptance/F-0042.md
 
-# Core profile (simpler task tracking)
+# Discovery profile (simpler task tracking)
 ag work "Add login"   # No feature IDs needed
 ```
 
@@ -121,17 +121,17 @@ cd /path/to/your-project
 
 The agent will:
 1. Ask what you're building
-2. Offer profile choice (a=Core, b=Core+PM)
+2. Offer profile choice (a=Discovery, b=Formal)
 3. Interview you about tech stack
 4. Create all necessary files
 5. Set up quality checks for your stack
 
 **Profile Selection:**
 
-- **a) Core (Simple Setup)**: Quality standards, multi-agent, research, lightweight planning (`OVERVIEW.md`)
+- **a) Discovery (Simple Setup)**: Quality standards, multi-agent, research, lightweight planning (`OVERVIEW.md`)
   - Good for: Small projects, prototypes, external PM tools, quick experiments
-  
-- **b) Core + Product Management**: Everything in Core plus formal specs, feature tracking (`F-####` IDs), roadmap
+
+- **b) Formal**: Everything in Discovery plus formal specs, feature tracking (`F-####` IDs), roadmap
   - Good for: Long-term projects (3+ months), complex products, audit trails
 
 ---
@@ -169,13 +169,13 @@ cat HUMAN_NEEDED.md               # Blockers
 
 #### Working with Agent
 
-**Option 1: Start a feature (Core+PM profile)**
+**Option 1: Start a feature (Formal profile)**
 ```bash
 ag implement F-0005    # Verifies acceptance criteria exist, starts WIP
 ```
 Then tell agent: "Implement F-0005"
 
-**Option 2: Start a task (Core profile)**
+**Option 2: Start a task (Discovery profile)**
 ```bash
 ag work "Add CSV export"    # Starts WIP tracking
 ```
@@ -251,9 +251,9 @@ Not sure when to use the agent? See **[`.agentic/workflows/delegation_heuristics
 - **`feature_start.md`** - Begin implementing a feature (TDD workflow)
 - **`feature_test.md`** - Create comprehensive tests
 - **`feature_complete.md`** - Mark feature done, verify quality
-- **`migration_create.md`** - Create spec migration (Core+PM)
-- **`product_update.md`** - Update OVERVIEW.md (Core mode)
-- **`quick_feature.md`** - Implement simple feature (Core mode)
+- **`migration_create.md`** - Create spec migration (Formal)
+- **`product_update.md`** - Update OVERVIEW.md (Discovery mode)
+- **`quick_feature.md`** - Implement simple feature (Discovery mode)
 - **`research.md`** - Deep research session
 - **`plan_feature.md`** - Plan complex feature
 - **`run_quality.md`** - Run quality checks
@@ -654,7 +654,7 @@ bash .agentic/tools/doctor.sh
 ```
 === agentic doctor ===
 
-Profile: core+product
+Profile: formal
 
 ✓ AGENTS.md exists
 ✓ STACK.md exists
@@ -1303,19 +1303,19 @@ Shows all file changes in last N days with context.
 
 **Two profiles available:**
 
-1. **Core (Simple Setup)**
+1. **Discovery (Simple Setup)**
    - Lightweight planning (`OVERVIEW.md`)
    - No formal feature tracking
    - Fast iteration
-   
-2. **Core + Product Management**
+
+2. **Formal**
    - Formal specs (`spec/FEATURES.md`)
    - Feature IDs (`F-####`)
    - Roadmap and status tracking
 
-**Switch from Core to Core+PM:**
+**Switch from Discovery to Formal:**
 ```bash
-bash .agentic/tools/enable-product-management.sh
+bash .agentic/tools/enable-formal.sh
 ```
 
 This creates:
@@ -1352,7 +1352,7 @@ This creates:
 #### Git Workflow
 
 ```yaml
-# PR mode (default for Core+PM, recommended)
+# PR mode (default for Formal, recommended)
 - git_workflow: pull_request
 # - pr_draft_by_default: true
 # - pr_reviewers: ["github_username"]
@@ -1463,7 +1463,7 @@ This repo uses the agentic framework located at `.agentic/`.
 - Update `OVERVIEW.md` with decisions and completed capabilities.
 - Add to `HUMAN_NEEDED.md` when blocked.
 - Keep `JOURNAL.md` current (session summaries).
-- If Core+Product: keep `STATUS.md` and `/spec/*` truthful.
+- If Formal: keep `STATUS.md` and `/spec/*` truthful.
 
 ## Project-Specific Rules
 - NEVER expose API keys in logs or error messages
@@ -1555,7 +1555,7 @@ our quality_checks.sh to include those iOS-specific validations."
 **Fix:**
 ```bash
 # Read vision
-cat OVERVIEW.md  # or spec/OVERVIEW.md if Core+PM
+cat OVERVIEW.md  # or spec/OVERVIEW.md if Formal
 
 # Check current status
 cat STATUS.md
@@ -2060,8 +2060,8 @@ bash .agentic/tools/coverage.sh
 - `HUMAN_NEEDED.md` - Blockers and decisions
 - `STACK.md` - How to build/test/run
 - `CONTEXT_PACK.md` - Architecture overview
-- `spec/FEATURES.md` - Feature list and status (Core+PM)
-- `OVERVIEW.md` - Vision and capabilities (Core)
+- `spec/FEATURES.md` - Feature list and status (Formal)
+- `OVERVIEW.md` - Vision and capabilities (Discovery)
 
 ### Essential Agent Prompts
 

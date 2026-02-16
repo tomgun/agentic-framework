@@ -7,7 +7,7 @@ Please conduct a comprehensive review:
 1. **Project health check:**
    - Review `STATUS.md` - is it accurate and up-to-date?
    - Check `JOURNAL.md` - are entries recent and meaningful?
-   - For Core+PM: Review `spec/FEATURES.md` - do statuses match reality?
+   - For Formal: Review `spec/FEATURES.md` - do statuses match reality?
    - Check `HUMAN_NEEDED.md` - any stale items?
 
 2. **Code quality assessment:**
@@ -35,7 +35,7 @@ Please conduct a comprehensive review:
    - Is documentation staying current?
    - Are quality checks catching issues?
 
-6. **Spec consistency (Core+PM mode):**
+6. **Spec consistency (Formal mode):**
    - Run: `python3 .agentic/tools/validate_specs.py`
    - Run: `python3 .agentic/tools/consistency.py`
    - Review any inconsistencies found

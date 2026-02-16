@@ -46,7 +46,7 @@ A custom rules file is a great start. This framework builds on the same idea but
 
 **Two profiles available:**
 
-- **Core**: Full framework capabilities with lightweight planning
+- **Discovery**: Full framework capabilities with lightweight planning
   - Context optimization (CONTEXT_PACK.md)
   - Session continuity (JOURNAL.md)
   - Multi-agent coordination
@@ -57,7 +57,7 @@ A custom rules file is a great start. This framework builds on the same idea but
   - Human escalation (HUMAN_NEEDED.md)
   - Lightweight planning (OVERVIEW.md)
 
-- **Core + Product Management**: Everything in Core, plus formal specs
+- **Formal**: Everything in Discovery, plus formal specs
   - Feature tracking with F-#### IDs
   - Acceptance criteria per feature
   - STATUS.md for current focus
@@ -108,7 +108,7 @@ The install script will:
 
 The agent will:
 - Ask what you're building
-- **Ask which profile to use** (Core or Core+PM)
+- **Ask which profile to use** (Discovery or Formal)
 - Interview you about tech stack, constraints, etc.
 - Fill in all project-specific details
 - Set up quality checks
@@ -225,9 +225,9 @@ This works across Claude Code, Cursor, Copilot, and Codex — no single orchestr
 
 The agent will:
 1. Ask what you're building
-2. **Ask which profile you want** (a=Core or b=Core+PM) and explain the differences
+2. **Ask which profile you want** (a=Discovery or b=Formal) and explain the differences
 3. Interview you about your tech stack and requirements
-4. Fill in `STACK.md`, `OVERVIEW.md`, `CONTEXT_PACK.md` (and `spec/` if Core+PM)
+4. Fill in `STACK.md`, `OVERVIEW.md`, `CONTEXT_PACK.md` (and `spec/` if Formal)
 5. Set up quality validation for your stack
 
 **Now you're ready!** The agent understands your project and can start building.
@@ -263,7 +263,7 @@ See `UPGRADING.md` for detailed instructions.
 - **Full documentation**: [`.agentic/README.md`](.agentic/README.md)
 - **Quick tour**: [`.agentic/START_HERE.md`](.agentic/START_HERE.md)
 - **Visual guide**: [`.agentic/FRAMEWORK_MAP.md`](.agentic/FRAMEWORK_MAP.md)
-- **Example projects**: [`examples/`](examples/) (Core and Core+PM modes)
+- **Example projects**: [`examples/`](examples/) (Discovery and Formal modes)
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.
 
@@ -329,7 +329,7 @@ During `init_playbook.md`, choose **"a) Multiple (RECOMMENDED)"** and the framew
 
 ## What You Get
 
-### Core Framework (Always Included)
+### Discovery Framework (Always Included)
 - **Agent operating guidelines**: Consistent behavior across AI tools
 - **Quality standards**: Programming, testing, review, design-for-testability
 - **Development workflows**: TDD mode, dev loop, debugging, git workflow
@@ -338,7 +338,7 @@ During `init_playbook.md`, choose **"a) Multiple (RECOMMENDED)"** and the framew
 - **Token efficiency guides**: Reading protocols, context budgeting
 - **Basic tools**: doctor.sh (with --full, --phase, --pre-commit modes), dashboard, phase_detect
 
-### Optional: Product Management Add-On
+### Optional: Formal Profile Add-On
 - **Specification templates**: PRD, Tech Spec, Features, NFR, ADR, Tasks
 - **Feature tracking**: Stable IDs, dependencies, status tracking
 - **Sequential pipeline**: Specialized agents per feature (Research → Plan → Test → Implement → Review)
@@ -347,7 +347,7 @@ During `init_playbook.md`, choose **"a) Multiple (RECOMMENDED)"** and the framew
 - **Quality automation**: Stack-specific pre-commit validation
 - **Retrospectives**: Periodic project health checks
 
-Enable later: `bash .agentic/tools/enable-product-management.sh`
+Enable later: `bash .agentic/tools/enable-formal.sh`
 
 ### For Complex Projects
 - **Session continuity**: JOURNAL.md tracks progress across context resets
@@ -403,14 +403,14 @@ Quick-start guidance for common technology stacks:
 
 ## Key Artifacts
 
-### Core Profile Files
+### Discovery Profile Files
 **Project State:**
 - `STACK.md` - How to build, test, run, and deploy (with profile setting)
 - `.agentic-journal/JOURNAL.md` - Session-by-session progress log
 - `CONTEXT_PACK.md` - Durable context (architecture, where things are)
 - `HUMAN_NEEDED.md` - Items requiring human decision/intervention
 
-### Product Management Profile Adds
+### Formal Profile Adds
 **Specifications:**
 - `STATUS.md` - Current focus, roadmap, known issues
 - `spec/PRD.md` - Requirements (why, what)
@@ -423,7 +423,7 @@ Quick-start guidance for common technology stacks:
 ## Examples
 
 - **Traced Notes App**: [`examples/traced_notes_app/`](examples/traced_notes_app/) - Example project with full framework integration
-- **Archived examples**: [`examples/archived/`](examples/archived/) - Core Todo CLI and Core+PM Taskboard examples (historical)
+- **Archived examples**: [`examples/archived/`](examples/archived/) - Discovery Todo CLI and Formal Taskboard examples (historical)
 
 ## For Existing Projects
 

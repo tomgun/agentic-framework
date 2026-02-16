@@ -14,7 +14,7 @@ I'm wrapping up this coding session. Please help me document what was done:
    - Overall progress state
    - Any new insights or changes
 
-3. For Core+PM mode: Update `spec/FEATURES.md`:
+3. For Formal mode: Update `spec/FEATURES.md`:
    - Change feature status if appropriate (planned → in_progress → shipped)
    - Update implementation state (none → partial → complete)
    - Add new code file paths

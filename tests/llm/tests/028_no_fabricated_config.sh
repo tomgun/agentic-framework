@@ -5,7 +5,7 @@
 # Tests: LLM-028 (core-rules.md rule #1)
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a config with only apiUrl, timeout, debug
 cat > "$TEST_PROJECT/config.ts" << 'EOF'

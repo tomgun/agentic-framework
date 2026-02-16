@@ -35,8 +35,8 @@ But it does NOT verify:
 
 | Test ID | Description | Steps | Expected |
 |---------|-------------|-------|----------|
-| INIT-01 | Core profile scaffold | Run scaffold.sh with Core | OVERVIEW.md, JOURNAL.md created |
-| INIT-02 | Core+PM profile scaffold | Run scaffold.sh with Core+PM | + spec/FEATURES.md, STATUS.md |
+| INIT-01 | Discovery profile scaffold | Run scaffold.sh with Discovery | OVERVIEW.md, JOURNAL.md created |
+| INIT-02 | Formal profile scaffold | Run scaffold.sh with Formal | + spec/FEATURES.md, STATUS.md |
 | INIT-03 | Scaffold idempotency | Run scaffold.sh twice | No duplicates, no errors |
 
 ### 3. Upgrade Tests (CRITICAL - Current Bug Area)

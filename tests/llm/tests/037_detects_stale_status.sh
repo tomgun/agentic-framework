@@ -6,7 +6,7 @@
 # Tests: LLM-037
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create a STATUS.md that references v0.5.0 (very outdated)
 cat > "$TEST_PROJECT/STATUS.md" << 'EOF'

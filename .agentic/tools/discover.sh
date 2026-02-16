@@ -6,13 +6,13 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Defaults
-PROFILE="core"
+PROFILE="discovery"
 ROOT_DIR="$(pwd)"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --profile)
-      PROFILE="${2:-core}"
+      PROFILE="${2:-discovery}"
       shift 2
       ;;
     --root)
@@ -20,7 +20,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -h|--help)
-      echo "Usage: bash .agentic/tools/discover.sh --profile core|core+product [--root DIR]"
+      echo "Usage: bash .agentic/tools/discover.sh --profile discovery|formal [--root DIR]"
       echo "Analyzes existing codebase and generates onboarding proposals."
       exit 0
       ;;

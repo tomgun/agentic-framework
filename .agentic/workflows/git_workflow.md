@@ -60,14 +60,14 @@ git_workflow: pull_request  # or 'direct'
 
 | Profile | Default | Rationale |
 |---------|---------|-----------|
-| **Core+PM** | `pull_request` | Formal specs = formal review. PRs align with acceptance-driven workflow. |
-| **Core** | `direct` | Lightweight workflow for solo developers, prototypes. |
+| **Formal** | `pull_request` | Formal specs = formal review. PRs align with acceptance-driven workflow. |
+| **Discovery** | `direct` | Lightweight workflow for solo developers, prototypes. |
 
 **Override**: Users can always set explicitly in STACK.md.
 
 **Agent behavior**: If `git_workflow` not specified, check profile and use appropriate default.
 
-### Mode 1: Direct Commits (Core default, opt-in for Core+PM)
+### Mode 1: Direct Commits (Discovery default, opt-in for Formal)
 
 **When to use**: Solo developer, prototyping, simple projects, personal repos
 
@@ -98,7 +98,7 @@ Human: "Yes"
 Agent: [pushes]
 ```
 
-### Mode 2: Pull Request Workflow (Core+PM default, recommended for teams)
+### Mode 2: Pull Request Workflow (Formal default, recommended for teams)
 
 **When to use**: Team projects, open source, code review required, CI/CD pipelines
 

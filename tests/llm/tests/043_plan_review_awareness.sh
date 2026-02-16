@@ -2,11 +2,11 @@
 # Description: Agent should surface plan-review settings when starting to plan a feature
 # Section: durable-artifacts
 # Category: Important
-# Profile: core-pm
+# Profile: formal
 # Tests: LLM-043
 
-# Setup - Core+PM profile
-setup_test_project "core-pm"
+# Setup - Formal profile
+setup_test_project "formal"
 
 # Set distinctive plan-review settings in STACK.md
 cat >> "$TEST_PROJECT/STACK.md" << 'EOF'

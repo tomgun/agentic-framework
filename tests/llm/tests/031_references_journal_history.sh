@@ -6,7 +6,7 @@
 # Tests: LLM-031
 
 # Setup - Core profile
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Create JOURNAL.md with multiple sessions
 mkdir -p "$TEST_PROJECT/.agentic-journal"

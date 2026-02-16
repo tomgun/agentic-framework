@@ -88,7 +88,7 @@ The dogfooding architecture for CLAUDE.md is backwards:
 
 **Specific gaps in template:**
 1. No `ag` CLI commands (`ag start`, `ag implement`, `ag commit`, `ag done`)
-2. No ENFORCED GATES section (Core+PM vs Core profile awareness)
+2. No ENFORCED GATES section (Formal vs Discovery profile awareness)
 3. No complexity limits reference
 4. No escape hatches documentation (`SKIP_TESTS=1`, `SKIP_COMPLEXITY=1`)
 5. Template is 558 lines vs root's 291 lines (users pay 2x token cost)

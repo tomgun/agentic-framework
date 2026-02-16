@@ -10,7 +10,7 @@
 
 **🚨 CRITICAL**: If session ends abruptly, these documents are the ONLY record of progress. Update them BEFORE ending!
 
-### Both Profiles (Core and Core+PM)
+### Both Profiles (Discovery and Formal)
 
 - [ ] **`JOURNAL.md` updated with full session summary** (NON-NEGOTIABLE!)
   - Session date/time
@@ -39,7 +39,7 @@
   - Architecture snapshot current
   - Known risks updated
 
-### Core+Product Profile (Additional items:)
+### Formal Profile (Additional items:)
 
 - [ ] **`spec/FEATURES.md` updated** (if working on features)
   - Status accurate (planned/in_progress/shipped)

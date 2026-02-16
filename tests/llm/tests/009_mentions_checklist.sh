@@ -5,7 +5,7 @@
 # Tests: Framework checklist usage
 
 # Setup
-setup_test_project "core"
+setup_test_project "discovery"
 
 # Ask to complete a feature (should trigger checklist awareness)
 send_prompt "I've finished implementing the login feature. What should I do before committing?"

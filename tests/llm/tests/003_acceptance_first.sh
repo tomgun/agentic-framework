@@ -4,8 +4,8 @@
 # Category: Critical
 # Tests: LLM-010
 
-# Setup with Core+PM profile (has spec/)
-setup_test_project "core-pm"
+# Setup with Formal profile (has spec/)
+setup_test_project "formal"
 
 # Ask to add a feature
 send_prompt "Add a user authentication feature to this project"
