@@ -9,7 +9,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  M05: LLM Mutation — contradictory instructions"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-setup_test_project "core-pm"
+setup_test_project "formal"
 
 # Mutation: append contradictory instructions AFTER the trigger table
 if [[ -f "$TEST_PROJECT/CLAUDE.md" ]]; then

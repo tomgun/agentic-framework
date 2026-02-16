@@ -6,7 +6,7 @@ source "$(dirname "$0")/../lib/helpers.sh"
 
 section_header "I01: Memory Persistence (human-guided)"
 
-PROJECT=$(scaffold_test_project "core-pm")
+PROJECT=$(scaffold_test_project "formal")
 echo ""
 echo -e "${YELLOW}╔═══════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${YELLOW}║  INTERACTIVE TEST: Memory Persistence (I01)                   ║${NC}"
