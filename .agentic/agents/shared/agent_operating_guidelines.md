@@ -12,8 +12,8 @@
 
 ## ENFORCED GATES (Profile-Aware)
 
-| Gate | Core+PM (formal) | Core (discovery) |
-|------|------------------|------------------|
+| Gate | Formal | Discovery |
+|------|--------|-----------|
 | Acceptance criteria | **BLOCKS** - `ag implement` requires acceptance | N/A - use `ag work` |
 | WIP before commit | **BLOCKS** - must complete WIP first | WARNING only |
 | Pre-commit checks | **BLOCKS** - full validation | Light check, no block |
@@ -54,8 +54,11 @@ Full guidance: `.agentic/quality/green_coding.md`
 
 ## Profile-Specific Workflows
 
-- **Core**: Discovery mode. No F-#### IDs. Tests enforced for changed files only.
-- **Core+PM**: Formal tracking. Feature IDs, acceptance criteria, full gates.
+Valid profiles: **`discovery`** and **`formal`** (only these two).
+- **Discovery**: No F-#### IDs. Tests enforced for changed files only.
+- **Formal**: Feature IDs, acceptance criteria, full gates.
+
+> **Legacy fix**: If you see `Profile: core` or `Profile: core+product` / `core+pm` in STACK.md, rename them: `core` → `discovery`, `core+product` / `core+pm` → `formal`. These old names are no longer accepted.
 
 Full details: `.agentic/agents/shared/auto_orchestration.md`
 
@@ -66,7 +69,7 @@ Full details: `.agentic/agents/shared/auto_orchestration.md`
 Update docs **in the same commit** as code changes:
 - CONTEXT_PACK.md → architecture changes
 - STATUS.md → focus/progress changes
-- FEATURES.md → feature status (Core+PM)
+- FEATURES.md → feature status (Formal)
 
 ---
 

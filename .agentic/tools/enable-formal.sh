@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# enable-product-management.sh: Add Product Management features to a Core-only project
+# enable-formal.sh: Upgrade a Discovery project to Formal profile
 set -euo pipefail
 
 # Colors
@@ -10,7 +10,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo "╔════════════════════════════════════════════════════════════════╗"
-echo "║         ENABLING PRODUCT MANAGEMENT FEATURES                   ║"
+echo "║         ENABLING FORMAL PROFILE                   ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -34,10 +34,10 @@ CURRENT_PROFILE=$(
     || echo "unknown"
 )
 
-if [[ "$CURRENT_PROFILE" == "core+product" ]]; then
-  echo -e "${YELLOW}⚠ Product Management features are already enabled!${NC}"
+if [[ "$CURRENT_PROFILE" == "formal" ]]; then
+  echo -e "${YELLOW}⚠ Formal profile is already enabled!${NC}"
   echo ""
-  echo "Current profile: core+product"
+  echo "Current profile: formal"
   exit 0
 fi
 
@@ -68,10 +68,10 @@ if [[ ! -f "HUMAN_NEEDED.md" && -f ".agentic/spec/HUMAN_NEEDED.template.md" ]]; 
   echo -e "${GREEN}✓ Created HUMAN_NEEDED.md (Core)${NC}"
 fi
 
-echo "What I'll create:"
+echo "What What changes:"
 echo "  ✓ spec/ directory with templates (PRD, TECH_SPEC, FEATURES, NFR)"
 echo "  ✓ STATUS.md (project status and roadmap)"
-echo "  ✓ Update STACK.md profile to 'core+product'"
+echo "  ✓ Update STACK.md profile to 'formal'"
 echo ""
 echo "Note: CONTEXT_PACK.md, OVERVIEW.md, and HUMAN_NEEDED.md are already part of Core."
 echo ""
@@ -82,7 +82,7 @@ if [[ -f "OVERVIEW.md" ]]; then
   if [[ "$PRODUCT_LINE_COUNT" -gt 10 ]]; then
     PRODUCT_EXISTS="yes"
     echo -e "${BLUE}📝 Detected OVERVIEW.md with content.${NC}"
-    echo "After enabling PM features, you can ask your agent to:"
+    echo "After enabling Formal profile, you can ask your agent to:"
     echo "  - Seed spec/FEATURES.md from OVERVIEW.md capabilities"
     echo "  - Seed spec/PRD.md from OVERVIEW.md vision"
     echo ""
@@ -139,13 +139,13 @@ fi
 
 # Update STACK.md profile (portable; tolerate comments)
 if grep -qE '^[[:space:]]*-[[:space:]]*Profile:' STACK.md; then
-  sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*Profile:[[:space:]]*).*/\\1core+product  # Updated: $(date +%Y-%m-%d)/" STACK.md
+  sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*Profile:[[:space:]]*).*/\\1formal  # Updated: $(date +%Y-%m-%d)/" STACK.md
   rm STACK.md.bak 2>/dev/null || true
-  echo -e "${GREEN}✓ Updated STACK.md (Profile: core+product)${NC}"
+  echo -e "${GREEN}✓ Updated STACK.md (Profile: formal)${NC}"
 else
   # Insert Profile line after Version line in "## Agentic framework"
-  perl -0777 -i -pe "s/(## Agentic framework\\n- Version:[^\\n]*\\n)/\\1- Profile: core+product  \\# Updated: $(date +%Y-%m-%d)\\n/" STACK.md || true
-  echo -e "${GREEN}✓ Updated STACK.md (added Profile: core+product)${NC}"
+  perl -0777 -i -pe "s/(## Agentic framework\\n- Version:[^\\n]*\\n)/\\1- Profile: formal  \\# Updated: $(date +%Y-%m-%d)\\n/" STACK.md || true
+  echo -e "${GREEN}✓ Updated STACK.md (added Profile: formal)${NC}"
 fi
 
 echo ""
@@ -153,7 +153,7 @@ echo "╔═══════════════════════�
 echo "║                    COMPLETE                                    ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 echo ""
-echo -e "${GREEN}Product Management features enabled!${NC}"
+echo -e "${GREEN}Formal profile enabled!${NC}"
 echo ""
 echo "Next steps:"
 echo "  1. Review the new spec templates in spec/"
@@ -161,12 +161,12 @@ echo "  2. Fill in STATUS.md with your current project state"
 echo "  3. Update CONTEXT_PACK.md with your architecture"
 if [[ "$PRODUCT_EXISTS" == "yes" ]]; then
   echo "  4. Tell your agent:"
-  echo "     \"I've enabled PM features. Please convert OVERVIEW.md into formal specs:"
+  echo "     \"I've enabled the Formal profile. Please convert OVERVIEW.md into formal specs:"
   echo "      - Seed spec/FEATURES.md from OVERVIEW.md capabilities (with F-#### IDs)"
   echo "      - Seed spec/PRD.md from OVERVIEW.md vision and scope\""
 else
   echo "  4. Tell your agent:"
-  echo "     \"I've enabled Product Management features. Please review"
+  echo "     \"I've enabled the Formal profile. Please review"
   echo "      spec/FEATURES.md and help me document our existing features.\""
 fi
 echo ""
