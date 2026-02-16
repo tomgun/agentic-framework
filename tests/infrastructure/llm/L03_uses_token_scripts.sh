@@ -8,7 +8,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  L03: Agent uses token-efficient scripts"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-setup_test_project "core"
+setup_test_project "discovery"
 
 send_prompt "Update the journal to note we finished the caching layer"
 

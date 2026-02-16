@@ -24,20 +24,22 @@ fi
 # Detect profile from STACK.md or directory structure
 get_profile() {
     local stack_file="$ROOT_DIR/STACK.md"
+    local raw=""
     if [ -f "$stack_file" ]; then
-        local profile
-        profile=$(grep -i "Profile:" "$stack_file" 2>/dev/null | head -1 | sed 's/.*Profile:[[:space:]]*//' | tr -d ' ')
-        if [ "$profile" = "core" ] || [ "$profile" = "core+product" ]; then
-            echo "$profile"
-            return
-        fi
+        raw=$(grep -i "Profile:" "$stack_file" 2>/dev/null | head -1 | sed 's/.*Profile:[[:space:]]*//' | tr -d ' ')
     fi
-    # Infer from directory structure
-    if [ -d "$ROOT_DIR/spec" ]; then
-        echo "core+product"
-    else
-        echo "core"
-    fi
+    case "$raw" in
+        discovery) echo "discovery" ;;
+        formal) echo "formal" ;;
+        *)
+            # Infer from directory structure
+            if [ -d "$ROOT_DIR/spec" ]; then
+                echo "formal"
+            else
+                echo "discovery"
+            fi
+            ;;
+    esac
 }
 
 PROFILE=$(get_profile)
@@ -112,7 +114,7 @@ show_init_warning() {
     echo "  Or ask your AI agent: \"Let's initialize this project\""
     echo ""
     echo -e "${BOLD}The init interview will:${NC}"
-    echo "  1. Choose profile (Core vs Core+PM)"
+    echo "  1. Choose profile (Discovery vs Formal)"
     echo "  2. Define tech stack and project goals"
     echo "  3. Set up AI tool integrations"
     echo "  4. Configure quality gates"
@@ -122,9 +124,9 @@ show_init_warning() {
 }
 
 show_help() {
-    if [ "$PROFILE" = "core" ]; then
+    if [ "$PROFILE" = "discovery" ]; then
         cat << 'EOF'
-ag - Agentic Framework Gateway (Core Profile)
+ag - Agentic Framework Gateway (Discovery Profile)
 
 USAGE:
     ag <command> [options]
@@ -161,11 +163,11 @@ EXAMPLES:
     ag test llm --critical      # Run critical tests only
     ag tools                    # Discover available tools
 
-Core profile: No formal feature tracking. Use STATUS.md for focus.
+Discovery profile: No formal feature tracking. Use STATUS.md for focus.
 EOF
     else
         cat << 'EOF'
-ag - Agentic Framework Gateway (Core+PM Profile)
+ag - Agentic Framework Gateway (Formal Profile)
 
 USAGE:
     ag <command> [options]
@@ -212,7 +214,7 @@ EXAMPLES:
     ag sync --check             # Dry run: detect only
     ag verify --full            # Full verification
 
-Core+PM profile: Formal feature tracking with acceptance criteria.
+Formal profile: Formal feature tracking with acceptance criteria.
 EOF
     fi
 }
@@ -336,7 +338,7 @@ cmd_start() {
     echo -e "${DIM}Tip: ${tips[$tip_index]}${NC}"
 
     echo ""
-    if [ "$PROFILE" = "core" ]; then
+    if [ "$PROFILE" = "discovery" ]; then
         echo -e "${BOLD}Ready to work. Run 'ag work \"description\"' to start a task.${NC}"
     else
         echo -e "${BOLD}Ready to work. Run 'ag implement F-XXXX' to start a feature.${NC}"
@@ -344,7 +346,7 @@ cmd_start() {
     echo -e "${DIM}Remind user: ag plan (plan-review before building) | ag sync (detect & fix drift)${NC}"
 }
 
-# Work command (Core profile) - start WIP tracking without feature ID
+# Work command (Discovery profile) - start WIP tracking without feature ID
 cmd_work() {
     local description="${1:-}"
 
@@ -354,16 +356,16 @@ cmd_work() {
         exit 1
     fi
 
-    # Core+PM: hard block — require feature ID with acceptance criteria
-    if [ "$PROFILE" = "core+product" ]; then
-        echo -e "${RED}BLOCKED: Core+PM profile requires a feature ID with acceptance criteria.${NC}"
+    # Formal: hard block — require feature ID with acceptance criteria
+    if [ "$PROFILE" = "formal" ]; then
+        echo -e "${RED}BLOCKED: Formal profile requires a feature ID with acceptance criteria.${NC}"
         echo ""
         echo "To start:"
         echo "  1. Add feature to spec/FEATURES.md (next available F-XXXX)"
         echo "  2. Create spec/acceptance/F-XXXX.md with acceptance criteria"
         echo "  3. Run: ag implement F-XXXX"
         echo ""
-        echo "Core profile users: ag work is available without feature IDs."
+        echo "Discovery profile users: ag work is available without feature IDs."
         exit 1
     fi
 
@@ -412,9 +414,9 @@ cmd_plan() {
     fi
 
     # Check profile
-    if [ "$PROFILE" = "core" ]; then
-        echo -e "${YELLOW}Core profile detected - no feature IDs.${NC}"
-        echo "Planning works best with Core+PM profile for formal specs."
+    if [ "$PROFILE" = "discovery" ]; then
+        echo -e "${YELLOW}Discovery profile detected - no feature IDs.${NC}"
+        echo "Planning works best with Formal profile for formal specs."
         echo "You can still create informal plans in STATUS.md."
         exit 1
     fi
@@ -523,15 +525,15 @@ cmd_plan() {
     echo "Workflow docs: .agentic/workflows/plan_review_loop.md"
 }
 
-# Implement command - verify acceptance exists, start WIP (Core+PM only)
+# Implement command - verify acceptance exists, start WIP (Formal only)
 cmd_implement() {
     local feature_id="${1:-}"
 
     # Check profile
-    if [ "$PROFILE" = "core" ]; then
-        echo -e "${YELLOW}Core profile detected - no feature IDs.${NC}"
+    if [ "$PROFILE" = "discovery" ]; then
+        echo -e "${YELLOW}Discovery profile detected - no feature IDs.${NC}"
         echo "Use: ag work \"description\" instead"
-        echo "Or switch to Core+PM profile for formal feature tracking."
+        echo "Or switch to Formal profile for formal feature tracking."
         exit 1
     fi
 
@@ -648,13 +650,13 @@ cmd_commit() {
 
     # 1. Check WIP exists
     if [ -f "$ROOT_DIR/.agentic-state/WIP.md" ]; then
-        if [ "$PROFILE" = "core" ]; then
-            # Core mode: WIP is a warning, not a blocker (exploratory work)
+        if [ "$PROFILE" = "discovery" ]; then
+            # Discovery mode: WIP is a warning, not a blocker (exploratory work)
             echo -e "${YELLOW}WARNING: .agentic-state/WIP.md exists${NC}"
             echo "  Consider completing WIP: bash .agentic/tools/wip.sh complete"
             echo ""
         else
-            # Core+PM mode: WIP is a blocker (formal tracking)
+            # Formal mode: WIP is a blocker (formal tracking)
             echo -e "${RED}BLOCKED: .agentic-state/WIP.md exists${NC}"
             echo "  Work-in-progress must be completed before committing."
             echo "  Run: bash .agentic/tools/wip.sh complete"
@@ -677,11 +679,11 @@ cmd_commit() {
         echo -e "${GREEN}Untracked check: PASS${NC}"
     fi
 
-    # 3. Run doctor pre-commit checks (Core mode is more lenient)
+    # 3. Run doctor pre-commit checks (Discovery mode is more lenient)
     echo ""
-    if [ "$PROFILE" = "core" ]; then
-        echo "Running basic checks (Core mode - lighter gates)..."
-        # Core mode: just check for basic issues, don't block on spec stuff
+    if [ "$PROFILE" = "discovery" ]; then
+        echo "Running basic checks (Discovery mode - lighter gates)..."
+        # Discovery mode: just check for basic issues, don't block on spec stuff
         bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null || true
         echo ""
         echo ""
@@ -689,7 +691,7 @@ cmd_commit() {
         echo "   Have you updated JOURNAL.md?  (bash .agentic/tools/journal.sh ...)"
         echo "   Have you updated STATUS.md?   (bash .agentic/tools/status.sh ...)"
         echo ""
-        echo -e "${GREEN}Core mode: Ready to commit${NC}"
+        echo -e "${GREEN}Discovery mode: Ready to commit${NC}"
         echo "  git add <files>"
         echo "  git commit -m \"description\""
     else
@@ -698,7 +700,7 @@ cmd_commit() {
             echo ""
             echo -e "${GREEN}All pre-commit gates PASSED${NC}"
 
-            # Additional check: FEATURES.md staleness (Core+PM only)
+            # Additional check: FEATURES.md staleness (Formal only)
             if [ -f "$ROOT_DIR/spec/FEATURES.md" ]; then
                 local spec_staged
                 spec_staged=$(git diff --cached --name-only 2>/dev/null | grep "^spec/" || true)
@@ -734,20 +736,20 @@ cmd_commit() {
 cmd_done() {
     local feature_id="${1:-}"
 
-    if [ "$PROFILE" = "core" ]; then
+    if [ "$PROFILE" = "discovery" ]; then
         echo -e "${BOLD}=== Task Complete Check ===${NC}"
         echo ""
-        echo -e "${BOLD}Definition of Done (Core):${NC}"
+        echo -e "${BOLD}Definition of Done (Discovery):${NC}"
         echo "  [ ] Task completed as described"
         echo "  [ ] Tests written and passing (if applicable)"
         echo "  [ ] STATUS.md updated"
         echo "  [ ] JOURNAL.md updated"
         echo ""
-        # Quick health check (warning only — Core is discovery mode)
+        # Quick health check (warning only — Discovery mode)
         if bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null; then
             echo -e "${GREEN}✓${NC} Quick health check passed"
         else
-            echo -e "${YELLOW}⚠ Quick health check found issues (non-blocking for Core profile)${NC}"
+            echo -e "${YELLOW}⚠ Quick health check found issues (non-blocking for Discovery profile)${NC}"
         fi
         echo ""
         # Check if WIP is complete
@@ -758,7 +760,7 @@ cmd_done() {
         return
     fi
 
-    # Generate manifest for feature (Core+PM profile)
+    # Generate manifest for feature (Formal profile)
     if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
         echo -e "${BOLD}=== Generating Change Manifest ===${NC}"
         if bash "$SCRIPT_DIR/manifest.sh" "$feature_id" 2>/dev/null; then
@@ -796,7 +798,7 @@ cmd_done() {
             echo -e "${RED}Structural checks FAILED - fix issues above before marking complete${NC}"
         fi
 
-        # Blocking gates (Core+PM)
+        # Blocking gates (Formal)
         local done_failures=0
 
         # Gate 1: Acceptance file must exist
@@ -1037,7 +1039,7 @@ cmd_approve_onboarding() {
             proposal_files+=("$f")
         fi
     done
-    # Core+PM files
+    # Formal files
     if [ -f "$ROOT_DIR/spec/FEATURES.md" ] && grep -q '<!-- PROPOSAL' "$ROOT_DIR/spec/FEATURES.md" 2>/dev/null; then
         proposal_files+=("spec/FEATURES.md")
     fi
@@ -1154,7 +1156,7 @@ cmd_init() {
     echo ""
     echo -e "${BOLD}What initialization does:${NC}"
     echo "  1. Auto-discover existing code (if brownfield project)"
-    echo "  2. Choose profile: Core (lightweight) or Core+PM (formal specs)"
+    echo "  2. Choose profile: Discovery (lightweight) or Formal (formal specs)"
     echo "  3. Set up AI tools: Claude, Cursor, Copilot, Codex"
     echo "  4. Define project: Tech stack, languages, frameworks"
     echo "  5. Configure quality: Testing approach, quality gates"
@@ -1172,7 +1174,7 @@ cmd_init() {
     echo "  • Ask clarifying questions about your project"
     echo "  • Fill in STACK.md, STATUS.md, CONTEXT_PACK.md"
     echo "  • Set up appropriate quality gates"
-    echo "  • Create any needed spec files (Core+PM)"
+    echo "  • Create any needed spec files (Formal)"
     echo ""
     echo -e "Init playbook: ${BLUE}.agentic/init/init_playbook.md${NC}"
     echo -e "Init questions: ${BLUE}.agentic/init/init_questions.md${NC}"
@@ -1597,9 +1599,9 @@ cmd_specs() {
     local arg="${1:-}"
 
     # Check profile
-    if [ "$PROFILE" != "core+product" ]; then
-        echo -e "${RED}Error: ag specs requires Core+PM profile${NC}"
-        echo "FEATURES.md tracking needs Core+PM. Update STACK.md Profile: core+product"
+    if [ "$PROFILE" != "formal" ]; then
+        echo -e "${RED}Error: ag specs requires Formal profile${NC}"
+        echo "FEATURES.md tracking needs Formal profile. Update STACK.md Profile: formal"
         exit 1
     fi
 
@@ -1608,7 +1610,7 @@ cmd_specs() {
     if [ ! -f "$report" ]; then
         echo -e "${YELLOW}No discovery report found.${NC}"
         echo "Run discovery first:"
-        echo "  python3 .agentic/tools/discover.py --root . --output .agentic-state/discovery_report.json --profile core+product"
+        echo "  python3 .agentic/tools/discover.py --root . --output .agentic-state/discovery_report.json --profile formal"
         echo ""
         echo "Or run: ag init (for full initialization)"
         exit 1

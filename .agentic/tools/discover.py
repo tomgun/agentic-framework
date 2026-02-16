@@ -589,7 +589,7 @@ def detect_test_patterns(root: Path) -> dict:
 
 def discover_features(root: Path, stack: dict, architecture: dict,
                       sub_projects: list[dict] | None = None) -> list[dict]:
-    """Discover existing features/modules from code structure (Core+PM only)."""
+    """Discover existing features/modules from code structure (Formal profile only)."""
     features: list[dict] = []
     seen_names: set[str] = set()
 
@@ -1317,7 +1317,7 @@ def generate_report(root: Path, profile: str) -> dict:
     api_spec_path = None
     domains = []
 
-    if profile == "core+product":
+    if profile == "formal":
         features = discover_features(root, stack, architecture, sub_projects)
         serverless_functions = detect_serverless_functions(root)
         ui_components = detect_ui_components(root, sub_projects)
@@ -1346,7 +1346,7 @@ def generate_report(root: Path, profile: str) -> dict:
         "domains": domains,
     }
 
-    if profile == "core+product":
+    if profile == "formal":
         report["serverless_functions"] = serverless_functions
         report["ui_components"] = ui_components
         report["feature_clusters"] = feature_clusters
@@ -1359,7 +1359,8 @@ def main():
     parser = argparse.ArgumentParser(description="Analyze existing codebase for onboarding")
     parser.add_argument("--root", type=str, default=".", help="Project root directory")
     parser.add_argument("--output", type=str, required=True, help="Output JSON report path")
-    parser.add_argument("--profile", type=str, default="core", choices=["core", "core+product"],
+    parser.add_argument("--profile", type=str, default="discovery",
+                        choices=["discovery", "formal"],
                         help="Agentic Framework profile")
     args = parser.parse_args()
 
@@ -1368,7 +1369,9 @@ def main():
         print(f"ERROR: {root} is not a directory")
         raise SystemExit(1)
 
-    report = generate_report(root, args.profile)
+    profile = args.profile
+
+    report = generate_report(root, profile)
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)

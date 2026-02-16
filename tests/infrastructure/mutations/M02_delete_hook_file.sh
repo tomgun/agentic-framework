@@ -6,7 +6,7 @@ source "$(dirname "$0")/../lib/helpers.sh"
 
 section_header "M02: Mutation — delete pre-commit hook file"
 
-PROJECT=$(scaffold_test_project "core")
+PROJECT=$(scaffold_test_project "discovery")
 cd "$PROJECT"
 
 # Create WIP to give hook something to catch

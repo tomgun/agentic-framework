@@ -486,3 +486,29 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-15 21:50 - Profile Rename: Discovery/Formal
+
+**Why**: Profile names Core/Core+PM imply modular system that doesn't exist. Discovery/Formal better reflects the actual distinction: informal vs formal specs.
+
+**Accomplished**:
+- Completed all 5 batches of profile rename across ~70 files. Core→Discovery, Core+PM→Formal. Added backwards-compatible normalization in all profile-reading functions. Fixed pre-existing test_phase_detect.py WIP path bug (.agentic/ → .agentic-state/). All tests passing: 194/194 validate_framework, 6/6 phase_detect, 20/21 ag gateway (1 pre-existing failure).
+
+**Next steps**:
+- Commit changes on feature branch and create PR.
+
+**Blockers**: None
+
+
+### Session: 2026-02-16 15:24 - Profile Rename Final Cleanup
+
+**Why**: Old profile names were dead code — keeping normalization created false impression they were still supported
+
+**Accomplished**:
+- Removed all backward compat normalization (core/core+product/core+pm no longer accepted). Deleted enable-product-management.sh. Updated ~37 files: tools, tests, specs. Added legacy-fix note to agent_operating_guidelines.md. PR #30 created, review fixes applied.
+
+**Next steps**:
+- Merge PR #30. Follow-up: rename stale 'Core Profile' headings in checklists/wip-tracking.md
+
+**Blockers**: None
+

@@ -11,7 +11,7 @@ source "$(dirname "$0")/../lib/helpers.sh"
 
 section_header "S06: Defense-in-depth (hooks catch LLM misses)"
 
-PROJECT=$(scaffold_test_project "core")
+PROJECT=$(scaffold_test_project "discovery")
 cd "$PROJECT"
 
 # Simulate: LLM makes code changes but IGNORES the instruction

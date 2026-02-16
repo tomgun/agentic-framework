@@ -311,14 +311,22 @@ class Check:
     purpose: str
 
 
+def _normalize_profile(raw: str) -> str:
+    """Validate profile value."""
+    val = raw.strip().lower()
+    if val in ("discovery", "formal"):
+        return val
+    return ""
+
+
 def read_profile(root: Path) -> str:
     """
     Determine profile.
 
     - Prefer explicit `Profile:` in STACK.md.
     - If not present, infer:
-      - If spec/ exists -> core+product
-      - else -> core
+      - If spec/ exists -> formal
+      - else -> discovery
     """
     stack = root / "STACK.md"
     if stack.exists():
@@ -326,15 +334,15 @@ def read_profile(root: Path) -> str:
             md = stack.read_text(encoding="utf-8")
             m = re.search(r"(?m)^\s*-\s*Profile:\s*([a-z+_-]+)\s*$", md)
             if m:
-                val = m.group(1).strip()
-                if val in {"core", "core+product"}:
-                    return val
+                normalized = _normalize_profile(m.group(1).strip())
+                if normalized:
+                    return normalized
         except Exception:
             pass
 
     if (root / "spec").is_dir():
-        return "core+product"
-    return "core"
+        return "formal"
+    return "discovery"
 
 
 def checks_for_profile(profile: str) -> list[Check]:
@@ -355,10 +363,10 @@ def checks_for_profile(profile: str) -> list[Check]:
         Check("HUMAN_NEEDED.md", "file", "escalation protocol"),
         Check("docs", "dir", "system docs (long-lived)"),
     ]
-    if profile == "core":
+    if profile == "discovery":
         return core
 
-    # core+product
+    # formal
     return core + [
         Check("spec", "dir", "project truth folder"),
         Check("spec/OVERVIEW.md", "file", "vision + current state + pointers"),
@@ -768,7 +776,7 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
 
     elif phase == "complete":
         # Tests should pass, FEATURES.md updated
-        if feature_id and profile == "core+product":
+        if feature_id and profile == "formal":
             features_path = root / "spec" / "FEATURES.md"
             if features_path.exists():
                 try:
@@ -831,8 +839,8 @@ def run_pre_commit_checks(root: Path, profile: str) -> list[str]:
     except Exception:
         pass
 
-    # 3. For core+product: shipped features need acceptance
-    if profile == "core+product":
+    # 3. For formal: shipped features need acceptance
+    if profile == "formal":
         features_path = root / "spec" / "FEATURES.md"
         if features_path.exists():
             try:
@@ -1069,7 +1077,7 @@ def main() -> int:
         suggestions.extend(stack_suggestions)
 
     # === Profile-specific validations ===
-    if profile == "core+product":
+    if profile == "formal":
         features_issues = validate_features(root)
         validation_issues.extend(features_issues)
 
@@ -1089,7 +1097,7 @@ def main() -> int:
         nfr_issues = validate_nfr_refs(root)
         validation_issues.extend(nfr_issues)
     else:
-        print("\nNote: Core profile — formal PM validations (spec/FEATURES.md, acceptance files) skipped.")
+        print("\nNote: Discovery profile — formal PM validations (spec/FEATURES.md, acceptance files) skipped.")
 
     if validation_issues:
         print("\nValidation issues:")
@@ -1122,7 +1130,7 @@ def main() -> int:
     else:
         print("\nNext commands:")
         print("- bash .agentic/tools/brief.sh")
-        if profile == "core+product":
+        if profile == "formal":
             print("- bash .agentic/tools/report.sh")
         print("- bash .agentic/tools/doctor.sh --full  # comprehensive check")
 

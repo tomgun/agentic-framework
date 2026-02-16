@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.25.8)
+**Period**: Initial Development (v0.1.0 → v0.26.0)
 **Date**: 2026-02-12
 
 ---
@@ -109,6 +109,10 @@
 - **Key insight**: Core profile had zero spec nudging — agents skipped criteria entirely. Even lightweight projects should think about "what does success look like?" before coding. But agent instructions get lost, so reminders must be structural (D2: scripts > docs), not behavioral.
 - **Rough specs as graduation path**: Core keeps criteria informally (WIP.md, JOURNAL.md). When persistence is needed — multiple agents, complex features, criteria rediscovered across sessions — graduate to Core+PM. The formalized specs can still start rough ("2-3 bullet points in an acceptance file" is valid Core+PM).
 - **Structural over behavioral**: Pre-commit checklist (runs every time), WIP.md template (structural prompt), `ag done` spec review (surfaces discoveries) — all guaranteed touchpoints vs. agent instructions that get ignored.
+
+### Profile Rename: Discovery/Formal (v0.26.0)
+- **Key decision**: Renamed Core → Discovery, Core+PM → Formal. Old names implied a modular "core" system that didn't exist — the real distinction is informal vs formal specs. New names communicate intent clearly.
+- **Clean break over compat**: Directed removal of all backward-compat normalization. Old values now produce clear errors rather than silently mapping. Agents get a legacy-fix note so they know how to handle old STACK.md files.
 
 ### Anti-Patterns Defined
 - No auto-commits without approval

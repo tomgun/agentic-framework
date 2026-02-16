@@ -48,7 +48,7 @@ def render_stack_md(report: dict, template_path: Path) -> str:
         "",
         "## Agentic framework",
         "- Version: 0.23.0",
-        f"- Profile: {report.get('profile', 'core')}",
+        f"- Profile: {report.get('profile', 'discovery')}",
         f"- Installed: {date}",
         "- Source: https://github.com/tomgun/agentic-framework",
         "",
@@ -246,7 +246,7 @@ def _build_cluster_domain_map(report: dict) -> dict[str, str]:
 
 
 def render_features_md(report: dict) -> str:
-    """Render FEATURES.md with discovered features (Core+PM only)."""
+    """Render FEATURES.md with discovered features (Formal only)."""
     date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     feature_clusters = report.get("feature_clusters", [])
     features = report.get("features", [])
@@ -324,7 +324,7 @@ def render_features_md(report: dict) -> str:
 
 
 def render_acceptance_criteria(report: dict, output_dir: Path):
-    """Render individual acceptance criteria files (Core+PM only)."""
+    """Render individual acceptance criteria files (Formal only)."""
     feature_clusters = report.get("feature_clusters", [])
     features = report.get("features", [])
     acc_dir = output_dir / "acceptance"
@@ -394,7 +394,8 @@ def main():
     parser.add_argument("--report", type=str, required=True, help="Path to discovery_report.json")
     parser.add_argument("--templates", type=str, required=True, help="Path to template directory")
     parser.add_argument("--output", type=str, required=True, help="Output directory for proposals")
-    parser.add_argument("--profile", type=str, default="core", choices=["core", "core+product"])
+    parser.add_argument("--profile", type=str, default="discovery",
+                        choices=["discovery", "formal"])
     args = parser.parse_args()
 
     report_path = Path(args.report)
@@ -427,8 +428,9 @@ def main():
     (output_dir / "OVERVIEW.md").write_text(overview_content)
     print(f"  Rendered: OVERVIEW.md")
 
-    # Core+PM: render FEATURES.md and acceptance criteria
-    if args.profile == "core+product":
+    profile = args.profile
+
+    if profile == "formal":
         features_content = render_features_md(report)
         (output_dir / "FEATURES.md").write_text(features_content)
         cluster_count = len(report.get("feature_clusters", []))

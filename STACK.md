@@ -5,8 +5,8 @@
 Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Agentic framework
-- Version: 0.25.8
-- Profile: core+pm
+- Version: 0.26.0
+- Profile: formal
 - This IS the framework (dogfooding)
 - Source: https://github.com/tomgun/agentic-framework
 

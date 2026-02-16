@@ -9,7 +9,7 @@
 # Six check phases:
 #   1. Memory seed integrity
 #   2. State freshness (journal, STATUS, CHANGELOG)
-#   3. Feature reconciliation (Core+PM only)
+#   3. Feature reconciliation (Formal only)
 #   4. Spec/doc drift (skipped in --quiet)
 #   5. Tool parity (instruction files + trigger tables)
 #   6. Git hook configuration
@@ -54,19 +54,21 @@ done
 # --- Detect profile ---
 get_profile() {
     local stack_file="$ROOT_DIR/STACK.md"
+    local raw=""
     if [ -f "$stack_file" ]; then
-        local profile
-        profile=$(grep -i "Profile:" "$stack_file" 2>/dev/null | head -1 | sed 's/.*Profile:[[:space:]]*//' | tr -d ' ')
-        if [ "$profile" = "core" ] || [ "$profile" = "core+product" ]; then
-            echo "$profile"
-            return
-        fi
+        raw=$(grep -i "Profile:" "$stack_file" 2>/dev/null | head -1 | sed 's/.*Profile:[[:space:]]*//' | tr -d ' ')
     fi
-    if [ -d "$ROOT_DIR/spec" ]; then
-        echo "core+product"
-    else
-        echo "core"
-    fi
+    case "$raw" in
+        discovery) echo "discovery" ;;
+        formal) echo "formal" ;;
+        *)
+            if [ -d "$ROOT_DIR/spec" ]; then
+                echo "formal"
+            else
+                echo "discovery"
+            fi
+            ;;
+    esac
 }
 PROFILE="$(get_profile)"
 
@@ -264,10 +266,10 @@ phase_state_freshness() {
 }
 
 # ============================================================================
-# Phase 3: Feature reconciliation (Core+PM only)
+# Phase 3: Feature reconciliation (Formal only)
 # ============================================================================
 phase_features() {
-    if [ "$PROFILE" = "core" ]; then
+    if [ "$PROFILE" = "discovery" ]; then
         return 0
     fi
 

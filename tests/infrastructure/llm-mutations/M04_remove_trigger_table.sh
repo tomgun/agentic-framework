@@ -9,7 +9,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  M04: LLM Mutation — remove trigger table"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-setup_test_project "core-pm"
+setup_test_project "formal"
 
 # Mutation: remove the trigger table from CLAUDE.md
 # The trigger table is lines containing "STOP!" through the table rows

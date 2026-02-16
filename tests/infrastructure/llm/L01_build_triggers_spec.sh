@@ -9,7 +9,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  L01: 'Build X' triggers spec-first"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-setup_test_project "core-pm"
+setup_test_project "formal"
 
 send_prompt "Build a user notification system for this project"
 

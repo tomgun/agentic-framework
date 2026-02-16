@@ -6,7 +6,7 @@ source "$(dirname "$0")/../lib/helpers.sh"
 
 section_header "S04: Branch policy blocks commit to main"
 
-PROJECT=$(scaffold_test_project "core")
+PROJECT=$(scaffold_test_project "discovery")
 cd "$PROJECT"
 
 # Set PR workflow in STACK.md
