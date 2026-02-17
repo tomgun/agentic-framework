@@ -12,11 +12,11 @@
 
 | Status | Count |
 |--------|-------|
-| Open | 1 |
+| Open | 2 |
 | In Progress | 0 |
 | Fixed | 1 |
 | Won't Fix | 0 |
-| **Total** | 1 |
+| **Total** | 3 |
 
 ---
 
@@ -124,6 +124,85 @@ Features were added to root CLAUDE.md during framework development but not backp
 - `.agentic/agents/claude/CLAUDE.md` (canonical template)
 - `/CLAUDE.md` (framework-specific wrapper)
 - `.agentic/FRAMEWORK_DEVELOPMENT.md` (dogfooding rule)
+
+---
+
+## I-0002: Plan mode bypasses "create F-XXXX FIRST" trigger — feature specs skipped
+
+**Status**: open
+**Priority**: high
+**Severity**: major
+**Found**: 2026-02-17
+**Fixed**:
+
+**Description**:
+CLAUDE.md line 19 says: `Build / implement → STOP → create spec/acceptance/F-XXXX.md FIRST, then ag plan + ag implement. Never code before specs.`
+
+This trigger was completely bypassed during the settings-over-profiles implementation (F-0131). The work was planned via plan mode, approved, and implemented across multiple sessions — all without ever creating a feature entry in FEATURES.md or writing acceptance criteria. The feature + acceptance criteria were only created retroactively after the PR was already up.
+
+**How it happened**:
+1. User requested implementation of settings-over-profiles architecture
+2. Agent entered plan mode and wrote a detailed plan file (`.claude/plans/...`)
+3. Plan was approved, implementation began immediately
+4. Plan mode treated the plan file as the driving document, never checking for F-XXXX
+5. Continuation sessions inherited the gap — none caught the missing feature spec
+6. Session-start checklist didn't flag "in-progress work without a feature ID"
+
+**Root cause**:
+Plan mode and session continuation are blind spots in the trigger-word enforcement:
+- **Plan mode**: The plan itself substitutes for the feature spec in the agent's mind, but it's a session-scoped artifact (`.claude/plans/`) — not a durable framework artifact (`spec/acceptance/F-XXXX.md`). The "STOP → create specs FIRST" gate doesn't fire because plan mode feels like "we already planned it."
+- **Session continuation**: When picking up from a previous session summary, the agent continues from where it left off without re-evaluating trigger conditions. The summary says "Phase 2b in progress" and the agent resumes coding, never checking if F-XXXX exists.
+- **No programmatic enforcement**: The trigger is purely instruction-based (CLAUDE.md text). There's no `ag plan` or `ag implement` gate that checks "does F-XXXX exist in FEATURES.md?" before proceeding.
+
+**Impact**:
+- Feature shipped without formal acceptance criteria — criteria were written post-hoc
+- Acceptance criteria might not reflect what was actually intended vs what was built
+- Sets a precedent where plan mode can bypass the spec-first workflow
+
+**Proposed fixes**:
+
+1. **`ag plan` gate**: Before allowing plan mode, check if an F-XXXX is referenced. If not, prompt to create one first. (Programmatic enforcement)
+
+2. **`ag implement` gate**: Before starting implementation, verify `spec/acceptance/F-XXXX.md` exists. Block if missing. (Programmatic enforcement)
+
+3. **Session-start checklist**: Add a check — "if there's in-progress work (WIP.md or active branch), verify it has an associated F-XXXX with acceptance criteria"
+
+4. **Plan mode instructions**: Add to plan mode system prompt — "Before writing the plan, verify F-XXXX exists in FEATURES.md. If not, create it first."
+
+**Related**:
+- Feature: F-0131 (the feature that was shipped without specs)
+- Feature: F-0006 (Acceptance-Driven Development — the principle this violates)
+- Feature: F-0091 (Gate-Based Verification — where programmatic enforcement should live)
+
+**Lessons**:
+- Instruction-only enforcement is fragile — agents can bypass it unintentionally during mode transitions (plan mode, session continuation)
+- Programmatic gates (like pre-commit-check.sh) are more reliable than text-based triggers
+- Session continuations are a particularly weak point — the agent resumes "in the middle" and skips initial checks
+
+---
+
+## I-0003: Plan mode plan files are session-scoped, not durable framework artifacts
+
+**Status**: open
+**Priority**: medium
+**Severity**: minor
+**Found**: 2026-02-17
+**Fixed**:
+
+**Description**:
+Plan mode writes plans to `.claude/plans/` which is tool-specific (Claude Code) and session-scoped. These plans are not committed to the repo, not visible to other agents/tools, and can be lost when context compresses or sessions end.
+
+For F-0131, the plan was the primary design document but it lived only in `.claude/plans/shimmying-foraging-shore.md`. If a different agent or tool needed to understand the design decisions, they'd have no access to it.
+
+The framework has `.agentic-state/` for session state and `spec/` for durable specs, but plan mode doesn't use either.
+
+**Proposed fix**:
+- `ag plan` should write the approved plan to `.agentic-state/PLAN.md` or `spec/` as a durable artifact
+- Or: plan approval step should prompt to extract key decisions into the acceptance criteria file
+
+**Related**:
+- Issue: I-0002 (plan mode bypasses spec-first workflow)
+- Feature: F-0006 (Acceptance-Driven Development)
 
 ---
 
