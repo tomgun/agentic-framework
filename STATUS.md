@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0132 spec-first gate shipped, working through task list (Updated: 2026-02-18 00:19 EET)
+- Tasks #6 #7 shipped, remaining: #11 #12 (Updated: 2026-02-18 00:28 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)
