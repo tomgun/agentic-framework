@@ -2024,6 +2024,30 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
+## F-0131: Settings-Over-Profiles Architecture
+
+**Status**: shipped
+**Priority**: high
+**Added**: 2026-02-17
+
+Replace all-or-nothing profile branching with granular individual settings. Profiles become presets that set bundles of defaults; all framework logic checks individual settings via `get_setting()`. Users can override any setting independently with `ag set`.
+
+**Key components**:
+- Shared settings libraries: `.agentic/lib/settings.sh` (bash), `.agentic/lib/settings.py` (python)
+- Profile presets: `.agentic/presets/profiles.conf` (profile.setting=value format)
+- Constraint rules: `.agentic/presets/constraints.conf` (if A=X -> B=Y|Z)
+- `ag set` command: `--show`, `--validate`, `--migrate` subcommands
+- Three-level resolution: Explicit (STACK.md ## Settings) > Profile Preset > Fallback Default
+- Settings inventory: feature_tracking, acceptance_criteria, wip_before_commit, pre_commit_checks, git_workflow, plan_review_enabled, spec_directory, max_files_per_commit, max_added_lines, max_code_file_length
+- 18 files converted from profile checks to get_setting() calls
+- Enum value validation in `ag set`
+- Backward compatibility for STACK.md without ## Settings section
+- Tests: 20 framework validation tests, 12 LLM behavioral tests (051-061)
+
+**Acceptance**: See `spec/acceptance/F-0131.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |

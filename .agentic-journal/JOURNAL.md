@@ -512,3 +512,51 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-17 10:07 - Settings-Over-Profiles
+
+**Why**: Profiles are now presets that set bundles of settings. All framework logic checks individual settings via get_setting(). Users can override any setting independently.
+
+**Accomplished**:
+- Implemented full settings architecture: Phase 1 (lib/settings.sh, lib/settings.py, presets/profiles.conf, presets/constraints.conf, ag set command, STACK.template ## Settings section), Phase 2a (ag.sh 9 profile→setting conversions, sync.sh, pre-commit-check.sh, session-start.sh, enable-formal.sh), Phase 2b (phase_detect.py, doctor.py, verify.py, render_proposals.py, continue_here.py, discover.py), Phase 2c (upgrade.sh adds lib/presets to DIRS_TO_REPLACE + Settings migration, discover.sh settings-aware, scaffold.sh writes ## Settings), Phase 3 (gates tables in guidelines/auto_orchestration, CLAUDE.md template, 15 new tests in validate_framework.sh including 3 functional)
+
+**Next steps**:
+- Show changes to human for commit
+
+**Blockers**: None
+
+
+### Session: 2026-02-17 18:35 - Settings-Over-Profiles
+
+**Why**: Profiles were all-or-nothing; settings allow individual overrides
+
+**Accomplished**:
+- Implemented full settings architecture: shared libs (settings.sh/py), profiles.conf presets, constraints.conf, ag set command. Converted all 18 files from profile branching to get_setting(). Added 15 framework tests, 12 LLM behavioral tests.
+
+**Next steps**:
+- Create PR for review
+
+**Blockers**: None
+
+
+### Session: 2026-02-17 20:56 - Review fixes
+
+**Accomplished**:
+- Fixed all review findings: W1 enum validation, W2 gate enforcement docs, W3 scaffold.sh dead code, W4 STACK.md formatting, S1 whitespace trim parity, S2 Python caching, S3 phase_detect docstring, S4 additional tests, S5 render_proposals import
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+
+
+### Session: 2026-02-17 21:45 - Settings docs & version bump
+
+**Accomplished**:
+- Moved settings docs to DEVELOPER_GUIDE.md, added I-0004/I-0005, updated READMEs, version 0.27.0
+
+**Next steps**:
+- PR #31 merge review
+
+**Blockers**: None
+

@@ -10,13 +10,16 @@
 
 ---
 
-## ENFORCED GATES (Profile-Aware)
+## GATES (Settings-Driven)
 
-| Gate | Formal | Discovery |
-|------|--------|-----------|
-| Acceptance criteria | **BLOCKS** - `ag implement` requires acceptance | N/A - use `ag work` |
-| WIP before commit | **BLOCKS** - must complete WIP first | WARNING only |
-| Pre-commit checks | **BLOCKS** - full validation | Light check, no block |
+| Gate | Setting | Formal default | Discovery default | Enforcement |
+|------|---------|----------------|-------------------|-------------|
+| Acceptance criteria | `acceptance_criteria` | **blocking** | recommended | Agent-interpreted |
+| WIP before commit | `wip_before_commit` | **blocking** | warning | Script-enforced |
+| Pre-commit checks | `pre_commit_checks` | **full** | fast | Script-enforced |
+| Feature tracking | `feature_tracking` | **yes** | no | Script-enforced |
+
+Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 
 **Quick Commands**: `ag start` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done`
 
@@ -54,9 +57,11 @@ Full guidance: `.agentic/quality/green_coding.md`
 
 ## Profile-Specific Workflows
 
-Valid profiles: **`discovery`** and **`formal`** (only these two).
+Valid profiles: **`discovery`** and **`formal`** (only these two). Profiles are presets — they set bundles of settings. Individual settings can be overridden via `ag set <key> <value>`.
 - **Discovery**: No F-#### IDs. Tests enforced for changed files only.
 - **Formal**: Feature IDs, acceptance criteria, full gates.
+
+> **Settings override**: Check `ag set --show` to see which settings are active. The `## Settings` section in STACK.md holds explicit overrides.
 
 > **Legacy fix**: If you see `Profile: core` or `Profile: core+product` / `core+pm` in STACK.md, rename them: `core` → `discovery`, `core+product` / `core+pm` → `formal`. These old names are no longer accepted.
 

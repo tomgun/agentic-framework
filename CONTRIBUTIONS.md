@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.26.0)
-**Date**: 2026-02-12
+**Period**: Initial Development (v0.1.0 → v0.27.0)
+**Date**: 2026-02-16
 
 ---
 
@@ -201,7 +201,7 @@
 1. **Modular profiles**: Core vs Core+PM separation
 2. **Hidden internals**: `.agentic/` for framework, visible product docs
 3. **Upgrade mechanism**: `upgrade.sh` from new package
-4. **Profile-aware agents**: Behavior adapts to selected profile
+4. **Settings-over-profiles**: Individual settings override profile presets (v0.27.0)
 
 ### Quality Mechanisms Introduced
 1. **Mandatory checklists**: 6 systematic workflow checklists
@@ -228,6 +228,20 @@
 > "Can you now review if the agents still can work efficiently in the CORE mode?"
 
 > "Agent operating guidelines - is this for the agents working ON this framework or USING this framework and do we need to distinguish / clarify this for the agents?"
+
+---
+
+## v0.27.0 Contributions (2026-02-16)
+
+### Settings-Over-Profiles Architecture (F-0131)
+- Identified the all-or-nothing problem: users couldn't customize one behavior without switching their entire profile
+- Directed the architecture: profiles become presets that set bundles of defaults, all framework logic checks individual settings
+- Requested individual setting overrides via `ag set` command
+- Defined the resolution chain: explicit > profile preset > fallback default
+- Identified that settings documentation should live in DEVELOPER_GUIDE.md (not agent-facing workflows/)
+- Directed development ideas to be tracked in ISSUES.md rather than inline docs
+- Caught missing F-XXXX / acceptance criteria post-implementation — led to I-0002 (plan mode bypasses spec-first workflow)
+- Requested documentation of when settings take effect (script-enforced vs agent-interpreted)
 
 ---
 
@@ -278,7 +292,7 @@
 
 ## Summary Statement
 
-Led development of Agentic AI Framework from v0.1.0 to v0.18.0, defining vision, architecture, and quality standards. Key contributions include:
+Led development of Agentic AI Framework from v0.1.0 to v0.27.0, defining vision, architecture, and quality standards. Key contributions include:
 
 - **Modular architecture design** (Core vs Core+PM profiles)
 - **Systematic quality checklists** (6 workflow checklists, 1400+ lines)

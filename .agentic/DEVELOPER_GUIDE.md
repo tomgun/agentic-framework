@@ -1299,35 +1299,88 @@ Shows all file changes in last N days with context.
 
 ## Customization
 
-### Choosing a Profile
+### Settings System
 
-**Two profiles available:**
+Profiles (`discovery`, `formal`) are presets that set bundles of defaults. You can override any setting independently.
 
-1. **Discovery (Simple Setup)**
-   - Lightweight planning (`OVERVIEW.md`)
-   - No formal feature tracking
-   - Fast iteration
+```bash
+ag set --show              # View all settings with sources
+ag set --validate          # Check constraint rules
+ag set feature_tracking yes  # Override a single setting
+ag set profile formal      # Switch profile preset
+```
 
-2. **Formal**
-   - Formal specs (`spec/FEATURES.md`)
-   - Feature IDs (`F-####`)
-   - Roadmap and status tracking
+**Resolution order** (highest priority wins):
+
+1. **Explicit** — `## Settings` section in STACK.md (you set it directly)
+2. **Profile preset** — from `.agentic/presets/profiles.conf` (set by your profile)
+3. **Fallback default** — hardcoded in the calling script
+
+Example: if your profile is `discovery` (which defaults `feature_tracking=no`) but you explicitly set `- feature_tracking: yes` in STACK.md, you get `yes`.
+
+**Profile presets:**
+
+| Setting | Discovery | Formal |
+|---------|-----------|--------|
+| `feature_tracking` | no | **yes** |
+| `acceptance_criteria` | recommended | **blocking** |
+| `wip_before_commit` | warning | **blocking** |
+| `pre_commit_checks` | fast | **full** |
+| `git_workflow` | direct | **pull_request** |
+| `plan_review_enabled` | no | **yes** |
+| `spec_directory` | no | **yes** |
+| `max_files_per_commit` | 15 | 10 |
+| `max_added_lines` | 1000 | 500 |
+| `max_code_file_length` | 1000 | 500 |
 
 **Switch from Discovery to Formal:**
 ```bash
 bash .agentic/tools/enable-formal.sh
 ```
 
-This creates:
-- `spec/` directory with templates
-- `STATUS.md`
-- Updates `STACK.md` profile
+#### When Settings Take Effect
 
-**The agent will then help you migrate `OVERVIEW.md` content into formal specs.**
+**Script-enforced settings** (immediate) — read fresh on every `ag` command or commit:
+
+| Setting | Enforced by |
+|---------|-------------|
+| `wip_before_commit` | `pre-commit-check.sh` |
+| `pre_commit_checks` | `pre-commit-check.sh` |
+| `max_files_per_commit` | `pre-commit-check.sh` |
+| `max_added_lines` | `pre-commit-check.sh` |
+| `max_code_file_length` | `pre-commit-check.sh` |
+| `git_workflow` | `pre-commit-check.sh` |
+| `feature_tracking` | `ag` commands, `session-start.sh` |
+| `spec_directory` | `ag` commands |
+
+**Agent-interpreted settings** (session start only) — the agent reads STACK.md once at session start:
+
+`acceptance_criteria`, `plan_review_enabled`, `agent_mode`, `development_mode`
+
+If you change these mid-session, tell the agent: *"I changed X to Y"* or *"Please re-read STACK.md ## Settings"*.
+
+#### Constraints
+
+Some combinations are invalid. Run `ag set --validate` to check:
+
+- `acceptance_criteria=blocking` requires `feature_tracking=yes` and `spec_directory=yes`
+- `plan_review_enabled=yes` requires `feature_tracking=yes`
+- `feature_tracking=yes` requires `spec_directory=yes`
 
 ### Customizing STACK.md
 
-`STACK.md` is your project's configuration file.
+`STACK.md` is your project's configuration file. Settings live in the `## Settings` section:
+
+```markdown
+## Settings
+<!-- Profile sets defaults. Override individual settings below. -->
+- profile: formal
+- feature_tracking: yes
+- acceptance_criteria: recommended    # override: suggest, don't block
+- max_files_per_commit: 20            # temporarily raised for refactor
+```
+
+Only settings you want to override need to be listed — unset settings use profile defaults. Projects without a `## Settings` section still work (backward-compatible whole-file search).
 
 #### Development Mode
 

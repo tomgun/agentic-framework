@@ -9,8 +9,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+# Import shared settings library
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+from settings import get_setting
 
 PROPOSAL_HEADER = (
     "<!-- PROPOSAL: Auto-discovered by ag init on {date}. "
@@ -430,7 +435,10 @@ def main():
 
     profile = args.profile
 
-    if profile == "formal":
+    # Determine feature_tracking from settings (respects overrides)
+    feature_tracking = get_setting(Path.cwd(), "feature_tracking", "no") == "yes"
+
+    if feature_tracking:
         features_content = render_features_md(report)
         (output_dir / "FEATURES.md").write_text(features_content)
         cluster_count = len(report.get("feature_clusters", []))

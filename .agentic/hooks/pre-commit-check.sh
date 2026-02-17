@@ -35,6 +35,9 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${PROJECT_ROOT}"
 
+# Source shared settings
+source "${PROJECT_ROOT}/.agentic/lib/settings.sh"
+
 # === Mode flag ===
 # --mode fast: skip slow/advisory checks (4,5,6,8,9,10,12)
 # --mode full: run all checks (default when called directly)
@@ -365,21 +368,24 @@ elif command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; 
 
   # Count staged files
   CHANGED_FILES=$(git diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
-  
-  if [[ $CHANGED_FILES -gt 15 ]]; then
-    echo "⚠️  WARNING: ${CHANGED_FILES} files changed in this commit"
+
+  # Derive warning thresholds from max_files_per_commit setting
+  MAX_FILES_SETTING=$(get_setting "max_files_per_commit" "10")
+  WARN_THRESHOLD=$(( MAX_FILES_SETTING * 7 / 10 ))  # floor(max * 0.7)
+  STRONG_WARN_THRESHOLD=$MAX_FILES_SETTING
+
+  if [[ $CHANGED_FILES -gt $STRONG_WARN_THRESHOLD ]]; then
+    echo "⚠️  WARNING: ${CHANGED_FILES} files changed (max: ${MAX_FILES_SETTING})"
     echo ""
     echo "   This is a LARGE commit. Consider:"
     echo "   - Is this really ONE feature? Should it be split?"
     echo "   - Can you extract some changes into a separate commit?"
     echo "   - Small batches = easier review, safer rollback"
     echo ""
-    echo "   Guideline: <10 files per feature is ideal"
+    echo "   (This is a warning, not blocking commit — Check 7 enforces the limit)"
     echo ""
-    echo "   (This is a warning, not blocking commit)"
-    echo ""
-  elif [[ $CHANGED_FILES -gt 10 ]]; then
-    echo "⚠️  Note: ${CHANGED_FILES} files changed (moderate batch size)"
+  elif [[ $CHANGED_FILES -gt $WARN_THRESHOLD ]]; then
+    echo "⚠️  Note: ${CHANGED_FILES} files changed (approaching limit of ${MAX_FILES_SETTING})"
     echo "   Consider if this could be smaller"
   elif [[ $CHANGED_FILES -gt 0 ]]; then
     echo "✓ ${CHANGED_FILES} files changed (good batch size)"
@@ -476,21 +482,10 @@ if [[ -n "${SKIP_COMPLEXITY:-}" ]]; then
 else
   COMPLEXITY_FAILURES=0
 
-  # Read limits from STACK.md (with sensible defaults)
-  MAX_FILES=10
-  MAX_ADDED_LINES=500
-  MAX_CODE_FILE_LEN=500
-
-  if [[ -f "STACK.md" ]]; then
-    STACK_MAX_FILES=$(grep -iE "max_files_per_commit" "STACK.md" 2>/dev/null | grep -oE '[0-9]+' | head -1 || true)
-    [[ -n "$STACK_MAX_FILES" ]] && MAX_FILES=$STACK_MAX_FILES
-
-    STACK_MAX_LINES=$(grep -iE "max_added_lines" "STACK.md" 2>/dev/null | grep -oE '[0-9]+' | head -1 || true)
-    [[ -n "$STACK_MAX_LINES" ]] && MAX_ADDED_LINES=$STACK_MAX_LINES
-
-    STACK_MAX_FILE_LEN=$(grep -iE "max_code_file_length" "STACK.md" 2>/dev/null | grep -oE '[0-9]+' | head -1 || true)
-    [[ -n "$STACK_MAX_FILE_LEN" ]] && MAX_CODE_FILE_LEN=$STACK_MAX_FILE_LEN
-  fi
+  # Read limits via settings resolution (explicit > preset > default)
+  MAX_FILES=$(get_setting "max_files_per_commit" "10")
+  MAX_ADDED_LINES=$(get_setting "max_added_lines" "500")
+  MAX_CODE_FILE_LEN=$(get_setting "max_code_file_length" "500")
 
   if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
     # Count staged files (excluding deletions)
@@ -708,7 +703,7 @@ echo "[11/12] Checking branch policy..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-  GIT_WORKFLOW=$(grep "git_workflow:" STACK.md 2>/dev/null | grep -oE "pull_request|direct" | head -1)
+  GIT_WORKFLOW=$(get_setting "git_workflow" "direct")
 
   if [[ "$GIT_WORKFLOW" == "pull_request" ]] && [[ "$CURRENT_BRANCH" =~ ^(main|master)$ ]]; then
     echo "❌ BLOCKED: Direct commit to $CURRENT_BRANCH with PR workflow"

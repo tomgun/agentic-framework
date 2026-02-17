@@ -134,17 +134,18 @@ def get_active_pipelines(pipeline_dir):
 
 def detect_mode(project_root):
     """Detect if project is Discovery or Formal mode."""
-    stack_file = os.path.join(project_root, 'STACK.md')
-    stack_content = read_file(stack_file).lower()
-
-    if 'profile: formal' in stack_content:
-        return 'Formal'
-    if 'profile: discovery' in stack_content:
+    try:
+        _lib_dir = str(Path(os.path.abspath(__file__)).parent.parent / "lib")
+        if _lib_dir not in sys.path:
+            sys.path.insert(0, _lib_dir)
+        from settings import get_setting
+        profile = get_setting(Path(project_root), "profile", "discovery")
+        return "Formal" if profile == "formal" else "Discovery"
+    except Exception:
+        # Fallback
+        if os.path.isdir(os.path.join(project_root, 'spec')):
+            return 'Formal'
         return 'Discovery'
-    # Infer from directory structure
-    if os.path.isdir(os.path.join(project_root, 'spec')):
-        return 'Formal'
-    return 'Discovery'
 
 
 def generate_continue_here(project_root, output_path=None):

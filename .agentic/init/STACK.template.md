@@ -6,9 +6,30 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ## Agentic framework
 - Version: 0.19.0  <!-- Update when upgrading framework -->
-- Profile: discovery  <!-- discovery | formal -->
 - Installed: <!-- YYYY-MM-DD -->
 - Source: https://github.com/tomgun/agentic-framework
+
+## Settings
+<!-- Profile sets defaults. Override individual settings below. -->
+<!-- Use `ag set <key> <value>` to change, `ag set --show` to view all. -->
+- profile: discovery  <!-- discovery | formal -->
+
+### Workflow
+<!-- These inherit from profile preset. Uncomment to override. -->
+<!-- Discovery defaults: feature_tracking: no, git_workflow: direct, pre_commit_checks: fast -->
+<!-- Formal defaults:    feature_tracking: yes, git_workflow: pull_request, pre_commit_checks: full -->
+<!-- - feature_tracking: no          # yes | no -->
+<!-- - acceptance_criteria: recommended  # blocking | recommended | off -->
+<!-- - wip_before_commit: warning    # blocking | warning -->
+<!-- - pre_commit_checks: fast       # full | fast | off -->
+<!-- - git_workflow: direct          # pull_request | direct -->
+<!-- - plan_review_enabled: no       # yes | no -->
+<!-- - spec_directory: no            # yes | no -->
+
+### Complexity limits
+<!-- - max_files_per_commit: 15      # blocking limit in pre-commit -->
+<!-- - max_added_lines: 1000         # blocking limit for added lines -->
+<!-- - max_code_file_length: 1000    # blocking limit for single file -->
 
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
@@ -96,10 +117,10 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--     review: sonnet        # Code review, testing, refactoring -->
 <!--     search: haiku         # Codebase exploration, finding files -->
 
-## Plan-Review Loop (recommended)
+## Plan-Review Loop
 <!-- Iterative planning with critical review before implementation -->
 <!-- See: .agentic/workflows/plan_review_loop.md -->
-- plan_review_enabled: yes  <!-- yes | no (default: yes for Formal, no for Discovery) -->
+<!-- Note: plan_review_enabled is now in ## Settings (profile-aware) -->
 - plan_review_max_iterations: 3  <!-- Max revisions before human escalation -->
 - plan_review_auto_for: [planning]  <!-- planning | implement | both -->
   <!-- planning: Runs for ag plan commands -->
@@ -124,22 +145,17 @@ Purpose: a single source of truth for "how we build and run software here".
   <!-- no: Agent automatically hands off (still requires approval for commits) -->
 - pipeline_coordination_file: ..agentic/pipeline  <!-- Directory for pipeline state files -->
 
-## Git workflow (required)
+## Git workflow
 <!-- How changes get into main branch. See .agentic/workflows/git_workflow.md -->
+<!-- git_workflow setting is in ## Settings (profile-aware: Discovery→direct, Formal→pull_request) -->
+<!-- Override: `ag set git_workflow direct` or `ag set git_workflow pull_request`                  -->
 <!--                                                                           -->
 <!-- pull_request: Feature branches + PRs (review before merge)                -->
-<!--   - Agent creates feature branches (feature/F-####-description)           -->
-<!--   - Agent creates PRs for human review                                    -->
 <!--   - Pre-commit BLOCKS commits to main/master (use --no-verify for hotfix) -->
 <!--   - Best for: teams, long-term projects, audit trails                     -->
 <!--                                                                           -->
 <!-- direct: Commit straight to main (faster, less ceremony)                   -->
-<!--   - Agent commits directly to main branch                                 -->
-<!--   - No PR overhead                                                        -->
 <!--   - Best for: solo prototypes, fast iteration                             -->
-<!--                                                                           -->
-<!-- Profile defaults: Discovery → direct, Formal → pull_request                -->
-- git_workflow: pull_request  <!-- pull_request | direct -->
 
 <!-- Pull Request mode (DEFAULT for Formal, recommended): -->
 <!--   - Agent creates feature branches for each feature -->
@@ -205,7 +221,7 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- Agents create this during init based on tech stack -->
 <!-- - quality_checks: enabled -->
 <!-- - profile: juce_audio_plugin  # or webapp_fullstack, ios_app, etc -->
-- pre_commit_hook: fast  # fast | full | no (backward compat: yes → fast)
+<!-- Note: pre_commit_hook is now in ## Settings (use `ag set pre_commit_hook fast|full|no`) -->
 <!-- - run_command: bash quality_checks.sh --pre-commit -->
 <!-- - full_suite_command: bash quality_checks.sh --full -->
 

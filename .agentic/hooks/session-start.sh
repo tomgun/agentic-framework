@@ -21,17 +21,16 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${PROJECT_ROOT}"
 
+# Source shared settings
+source "${PROJECT_ROOT}/.agentic/lib/settings.sh"
+
 echo ""
 echo "═══════════════════════════════════════════════════════"
 echo "SESSION START PROTOCOL"
 echo "═══════════════════════════════════════════════════════"
 echo ""
 
-# Detect profile
-PROFILE="unknown"
-if [[ -f "STACK.md" ]]; then
-  PROFILE=$(grep "^- Profile:" STACK.md | cut -d: -f2 | tr -d ' ' || echo "unknown")
-fi
+PROFILE=$(get_setting "profile" "discovery")
 
 echo "Project Profile: ${PROFILE}"
 echo ""
@@ -127,10 +126,11 @@ if [[ -f "HUMAN_NEEDED.md" ]]; then
   fi
 fi
 
-# Profile-specific reads
-if [[ "$PROFILE" == "formal" ]]; then
+# Feature-tracking-specific reads
+FT=$(get_setting "feature_tracking" "no")
+if [[ "$FT" == "yes" ]]; then
   echo ""
-  echo "📖 FORMAL PROFILE - ADDITIONAL READS:"
+  echo "📖 FEATURE TRACKING - ADDITIONAL READS:"
   echo ""
   echo "- spec/FEATURES.md - Overview of all features (scan, don't read all)"
   echo "- spec/acceptance/F-####.md - If working on specific feature"
@@ -191,7 +191,7 @@ if [[ -n "$JOURNAL_PATH" ]]; then
 fi
 
 # Check for acceptance validation
-if [[ "$PROFILE" == "formal" ]] && [[ -f "spec/FEATURES.md" ]]; then
+if [[ "$FT" == "yes" ]] && [[ -f "spec/FEATURES.md" ]]; then
   SHIPPED_NOT_ACCEPTED=$(grep -A5 "^## F-" spec/FEATURES.md | grep -B5 "Status: shipped" | grep -B5 "Accepted: no" | grep "^## F-" || echo "")
   if [[ -n "$SHIPPED_NOT_ACCEPTED" ]]; then
     echo ""

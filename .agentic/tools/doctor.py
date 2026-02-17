@@ -5,9 +5,14 @@ import argparse
 import json
 import re
 import subprocess
+import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+
+# Import shared settings library
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+from settings import get_setting
 
 # Optional YAML support (graceful fallback if not installed)
 try:
@@ -311,44 +316,15 @@ class Check:
     purpose: str
 
 
-def _normalize_profile(raw: str) -> str:
-    """Validate profile value."""
-    val = raw.strip().lower()
-    if val in ("discovery", "formal"):
-        return val
-    return ""
-
-
 def read_profile(root: Path) -> str:
-    """
-    Determine profile.
-
-    - Prefer explicit `Profile:` in STACK.md.
-    - If not present, infer:
-      - If spec/ exists -> formal
-      - else -> discovery
-    """
-    stack = root / "STACK.md"
-    if stack.exists():
-        try:
-            md = stack.read_text(encoding="utf-8")
-            m = re.search(r"(?m)^\s*-\s*Profile:\s*([a-z+_-]+)\s*$", md)
-            if m:
-                normalized = _normalize_profile(m.group(1).strip())
-                if normalized:
-                    return normalized
-        except Exception:
-            pass
-
-    if (root / "spec").is_dir():
-        return "formal"
-    return "discovery"
+    """Determine profile via shared settings library."""
+    return get_setting(root, "profile", "discovery")
 
 
-def checks_for_profile(profile: str) -> list[Check]:
+def checks_for_profile(profile: str, root: Path | None = None) -> list[Check]:
     # Determine JOURNAL.md location with fallback
     from pathlib import Path
-    repo_root = Path.cwd()
+    repo_root = root or Path.cwd()
     journal_path = repo_root / ".agentic-journal" / "JOURNAL.md"
     if not journal_path.exists():
         journal_path = repo_root / "JOURNAL.md"
@@ -363,10 +339,11 @@ def checks_for_profile(profile: str) -> list[Check]:
         Check("HUMAN_NEEDED.md", "file", "escalation protocol"),
         Check("docs", "dir", "system docs (long-lived)"),
     ]
-    if profile == "discovery":
+    ft = get_setting(repo_root, "feature_tracking", "no")
+    if ft != "yes":
         return core
 
-    # formal
+    # feature tracking enabled: also check spec files
     return core + [
         Check("spec", "dir", "project truth folder"),
         Check("spec/OVERVIEW.md", "file", "vision + current state + pointers"),
@@ -776,7 +753,8 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
 
     elif phase == "complete":
         # Tests should pass, FEATURES.md updated
-        if feature_id and profile == "formal":
+        ft = get_setting(root, "feature_tracking", "no")
+        if feature_id and ft == "yes":
             features_path = root / "spec" / "FEATURES.md"
             if features_path.exists():
                 try:
@@ -839,8 +817,9 @@ def run_pre_commit_checks(root: Path, profile: str) -> list[str]:
     except Exception:
         pass
 
-    # 3. For formal: shipped features need acceptance
-    if profile == "formal":
+    # 3. For feature tracking: shipped features need acceptance
+    ft = get_setting(root, "feature_tracking", "no")
+    if ft == "yes":
         features_path = root / "spec" / "FEATURES.md"
         if features_path.exists():
             try:
@@ -981,7 +960,7 @@ def main() -> int:
     empty_files: list[Check] = []
     template_like: list[Check] = []
 
-    checks = checks_for_profile(profile)
+    checks = checks_for_profile(profile, root)
     for c in checks:
         p = root / c.path
         if c.kind == "dir":
@@ -1076,8 +1055,9 @@ def main() -> int:
     if stack_suggestions:
         suggestions.extend(stack_suggestions)
 
-    # === Profile-specific validations ===
-    if profile == "formal":
+    # === Feature-tracking validations ===
+    ft = get_setting(root, "feature_tracking", "no")
+    if ft == "yes":
         features_issues = validate_features(root)
         validation_issues.extend(features_issues)
 
@@ -1097,7 +1077,7 @@ def main() -> int:
         nfr_issues = validate_nfr_refs(root)
         validation_issues.extend(nfr_issues)
     else:
-        print("\nNote: Discovery profile — formal PM validations (spec/FEATURES.md, acceptance files) skipped.")
+        print("\nNote: Feature tracking off — formal validations (spec/FEATURES.md, acceptance files) skipped.")
 
     if validation_issues:
         print("\nValidation issues:")
@@ -1130,7 +1110,7 @@ def main() -> int:
     else:
         print("\nNext commands:")
         print("- bash .agentic/tools/brief.sh")
-        if profile == "formal":
+        if ft == "yes":
             print("- bash .agentic/tools/report.sh")
         print("- bash .agentic/tools/doctor.sh --full  # comprehensive check")
 
