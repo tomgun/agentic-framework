@@ -560,3 +560,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 00:19 - F-0132 Spec-First Gate
+
+**Accomplished**:
+- Added programmatic gates to ag plan (FEATURES.md check) and ag implement (FEATURES.md + acceptance file check). SKIP_SPEC_CHECK=1 escape hatch. 3 new tests. Fixed I-0002.
+
+**Next steps**:
+- Next pending tasks
+
+**Blockers**: None
+

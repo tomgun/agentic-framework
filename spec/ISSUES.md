@@ -12,9 +12,9 @@
 
 | Status | Count |
 |--------|-------|
-| Open | 4 |
+| Open | 3 |
 | In Progress | 0 |
-| Fixed | 1 |
+| Fixed | 2 |
 | Won't Fix | 0 |
 | **Total** | 5 |
 
@@ -129,11 +129,11 @@ Features were added to root CLAUDE.md during framework development but not backp
 
 ## I-0002: Plan mode bypasses "create F-XXXX FIRST" trigger — feature specs skipped
 
-**Status**: open
+**Status**: fixed
 **Priority**: high
 **Severity**: major
 **Found**: 2026-02-17
-**Fixed**:
+**Fixed**: 2026-02-16
 
 **Description**:
 CLAUDE.md line 19 says: `Build / implement → STOP → create spec/acceptance/F-XXXX.md FIRST, then ag plan + ag implement. Never code before specs.`

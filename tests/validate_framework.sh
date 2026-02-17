@@ -1797,6 +1797,79 @@ else
 fi
 
 # ============================================================
+# F-0132: Spec-First Gate Tests
+# ============================================================
+
+# Test: ag plan blocks when F-XXXX not in FEATURES.md
+(
+  GATE_TEST_DIR=$(mktemp -d)
+  mkdir -p "$GATE_TEST_DIR/spec"
+  cat > "$GATE_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: formal
+- feature_tracking: yes
+TESTEOF
+  cat > "$GATE_TEST_DIR/spec/FEATURES.md" <<'TESTEOF'
+## F-0001: Existing Feature
+**Status**: planned
+TESTEOF
+  # F-9999 is NOT in FEATURES.md — should block
+  # Override settings paths so get_setting reads from test dir
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/tools/ag.sh" plan F-9999 2>&1) || true
+  rm -rf "$GATE_TEST_DIR"
+  echo "$OUTPUT" | grep -q "BLOCKED.*not found in FEATURES.md"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Gate: ag plan blocks when F-XXXX not in FEATURES.md"
+else
+  fail "Gate: ag plan should block when F-XXXX not in FEATURES.md"
+fi
+
+# Test: ag implement blocks when no acceptance criteria file
+(
+  GATE_TEST_DIR=$(mktemp -d)
+  mkdir -p "$GATE_TEST_DIR/spec/acceptance"
+  cat > "$GATE_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: formal
+- feature_tracking: yes
+- plan_review_enabled: no
+TESTEOF
+  cat > "$GATE_TEST_DIR/spec/FEATURES.md" <<'TESTEOF'
+## F-0001: Test Feature
+**Status**: planned
+TESTEOF
+  # F-0001 IS in FEATURES.md but no acceptance file — should block
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/tools/ag.sh" implement F-0001 2>&1) || true
+  rm -rf "$GATE_TEST_DIR"
+  echo "$OUTPUT" | grep -q "BLOCKED.*No acceptance criteria"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Gate: ag implement blocks when no acceptance criteria"
+else
+  fail "Gate: ag implement should block when no acceptance criteria"
+fi
+
+# Test: gate inactive when feature_tracking=no
+(
+  GATE_TEST_DIR=$(mktemp -d)
+  cat > "$GATE_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: discovery
+- feature_tracking: no
+TESTEOF
+  # With feature_tracking=no, ag plan should not check FEATURES.md — it exits with "tracking is off"
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/tools/ag.sh" plan F-9999 2>&1) || true
+  rm -rf "$GATE_TEST_DIR"
+  echo "$OUTPUT" | grep -q "Feature tracking is off"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Gate: spec-first gate inactive when feature_tracking=no"
+else
+  fail "Gate: spec-first gate should be inactive when feature_tracking=no"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

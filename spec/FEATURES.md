@@ -2048,6 +2048,20 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ---
 
+## F-0132: Programmatic Spec-First Gate
+
+**Status**: planned
+**Priority**: high
+**Added**: 2026-02-17
+
+**Description**: Add programmatic gates to `ag plan` and `ag implement` that verify a feature ID (F-XXXX) exists in FEATURES.md and acceptance criteria exist in `spec/acceptance/F-XXXX.md` before proceeding. Prevents the bypass documented in I-0002 where plan mode skips the spec-first workflow.
+
+**Dependencies**: F-0091 (Gate-Based Verification), F-0131 (Settings)
+
+**Acceptance**: See `spec/acceptance/F-0132.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
