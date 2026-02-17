@@ -198,10 +198,14 @@
 ## Technical Contributions Summary
 
 ### Architecture Decisions Influenced
-1. **Modular profiles**: Core vs Core+PM separation
+1. **Modular profiles**: Discovery vs Formal separation (renamed from Core/Core+PM in v0.26.0)
 2. **Hidden internals**: `.agentic/` for framework, visible product docs
 3. **Upgrade mechanism**: `upgrade.sh` from new package
 4. **Settings-over-profiles**: Individual settings override profile presets (v0.27.0)
+5. **Three-layer architecture**: Constitution → Playbooks → State (v0.23.0)
+6. **Structural enforcement over behavioral rules**: Git hooks + pre-commit gates beat text instructions (v0.25.5+)
+7. **Derivation hierarchy**: Principles organized as DAG with F/D/R tier-prefixed IDs (v0.25.7)
+8. **Spec-first gates**: Programmatic blocking before code, not just behavioral rules (v0.27.0)
 
 ### Quality Mechanisms Introduced
 1. **Mandatory checklists**: 6 systematic workflow checklists
@@ -240,8 +244,18 @@
 - Defined the resolution chain: explicit > profile preset > fallback default
 - Identified that settings documentation should live in DEVELOPER_GUIDE.md (not agent-facing workflows/)
 - Directed development ideas to be tracked in ISSUES.md rather than inline docs
-- Caught missing F-XXXX / acceptance criteria post-implementation — led to I-0002 (plan mode bypasses spec-first workflow)
 - Requested documentation of when settings take effect (script-enforced vs agent-interpreted)
+
+### Spec-First Gate & Durable Plans (F-0132, F-0133)
+- Caught missing F-XXXX / acceptance criteria post-implementation — led to I-0002 (plan mode bypasses spec-first workflow)
+- Identified I-0003: plans in `.claude/plans/` are session-scoped and get lost — need durable storage
+- Directed archival of 16 historical plans from `.claude/plans/` to `.agentic-journal/plans/`
+
+### Skill Routing & Developer Experience
+- Identified agent confusion between framework skills (`/review`) and Task tool agents — led to explicit routing hints in CLAUDE.md
+- Directed auto-suggest of `/review` after PR creation
+- Identified DEVELOPER_GUIDE.md audience problem: "Telling the user to 'run ag implement F-XXXX' when starting a new feature is really dumb" — led to F-0134 rewrite planning
+- Identified scattered TODO tracking problem (HUMAN_NEEDED, STATUS, ISSUES, FEATURES with no single inbox) — Task #12
 
 ---
 
@@ -2206,8 +2220,98 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## Infrastructure Validation with Mutation Tests (v0.25.8, 2026-02-14)
+
+### Proving Enforcement Is Real
+
+**User direction**: Framework claims "deterministic enforcement" but how do you prove git hooks, CLAUDE.md triggers, and defense-in-depth layering actually work? Design test strategy proving enforcement is real, not theatrical.
+
+**Key insight**: Mutation tests that remove infrastructure (core.hooksPath, hook files, config) prove enforcement fires. Control group (no-framework baseline) proves framework causes behavioral change.
+
+**Impact**: Infrastructure validation tests shipped (PR #27), proving the enforcement layer works under mutation.
+
+---
+
+## Rough Specs & Structural Nudging (v0.25.8, 2026-02-14)
+
+### Making Discovery Profile Spec-Aware Without Blocking
+
+**User direction**: Discovery profile users shouldn't be forced through formal spec process, but should get gentle nudges toward capturing success criteria. "Starting rough is OK" — the framework should encourage any form of criteria rather than demanding formal specs.
+
+**Key design decisions**:
+- Non-blocking reminders in pre-commit checklist for discovery profile
+- Success Criteria section in WIP.md templates
+- `ag done` shows `[Discovered]` marker count and prompts spec review
+- Removed `## Project Phase` from STATUS.template.md — dead code
+
+**Impact**: Discovery profile gets spec awareness without the overhead of formal tracking.
+
+---
+
+## Profile Rename (v0.26.0, 2026-02-15)
+
+### Clean Naming: Core → Discovery, Core+PM → Formal
+
+**User direction**: The old names (`core`, `core+product`) were technical jargon that didn't communicate the actual usage difference. Renamed to `discovery` (exploratory work) and `formal` (spec-driven development). Clean break — no backward compatibility normalization.
+
+**Key decisions**:
+- `enable-pm.sh` → `enable-formal.sh`
+- 18+ files updated across scripts, templates, documentation, tests, agent instructions
+- No normalization code — old names simply stop working
+
+**Impact**: Profile names now communicate their intent clearly to new users.
+
+---
+
+## Settings-Over-Profiles Architecture (v0.27.0, 2026-02-16)
+
+### Individual Setting Overrides
+
+**User insight**: The all-or-nothing problem — users couldn't customize one behavior (e.g., "I want feature tracking but not blocking WIP") without switching their entire profile. Every `if profile == "formal"` check was a maintenance burden.
+
+**User direction**:
+- Profiles become presets that set bundles of defaults; all framework logic checks individual settings
+- `ag set` command for individual overrides without changing profile
+- Resolution chain: explicit > profile preset > fallback default
+- Settings documentation should live in DEVELOPER_GUIDE.md (not agent-facing workflows/)
+- Development ideas tracked in ISSUES.md rather than inline docs
+
+**User catch**: Missing F-XXXX / acceptance criteria post-implementation — led to I-0002 (plan mode bypasses spec-first workflow) and I-0003 (durable plan artifacts).
+
+### Programmatic Spec-First Gate (F-0132)
+
+**User direction** (from I-0002): Plan mode + session continuation are blind spots for "create F-XXXX FIRST" — the plan file feels like "we already planned it" but it's NOT a feature spec.
+
+**Result**: `ag plan F-XXXX` blocks if not in FEATURES.md. `ag implement F-XXXX` blocks if no acceptance criteria. `SKIP_SPEC_CHECK=1` escape hatch. Gates only active when `feature_tracking=yes`.
+
+### Durable Plan Artifacts (F-0133)
+
+**User direction** (from I-0003): Plans in `.claude/plans/` are tool-specific and session-scoped — they get lost. Approved plans should be git-tracked in `.agentic-journal/plans/`.
+
+**Result**: `ag plan --save <source-file> F-XXXX` command. CLAUDE.md instructs agents to save plans after approval. 16 historical plans archived from `.claude/plans/`.
+
+### Skill Routing & Review-After-PR
+
+**User direction**: Agents were confusing framework skills (`/review`, `/test`) with built-in Task tool agents. After creating PRs, agents should proactively offer code review.
+
+**Result**: CLAUDE.md template now explicitly documents: framework roles use Skill tool, NOT Task tool's subagent_type. PR rule includes: "then offer: Want me to run `/review` on this PR?"
+
+### DEVELOPER_GUIDE Rewrite Planning (F-0134)
+
+**User insight**: DEVELOPER_GUIDE tells users to "run `ag implement F-XXXX`" — but users don't know feature numbers. Scripts should work behind the scenes; user guidance should use natural workflow language. "Telling the user to 'run ag implement F-XXXX' when starting a new feature is really dumb."
+
+**Impact**: F-0134 planned for thorough rewrite with user-first framing.
+
+### Centralized TODO Tracking (Task #12)
+
+**User insight**: Ideas and tasks are scattered across HUMAN_NEEDED.md, STATUS.md, ISSUES.md, and FEATURES.md with no single inbox. Need a solid mechanism for logging ideas/tasks in a central place.
+
+**Impact**: Planned for design and implementation.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.25.7
+**Current Version**: v0.27.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 48 behavioral test scripts

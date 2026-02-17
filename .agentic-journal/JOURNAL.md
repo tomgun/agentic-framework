@@ -590,3 +590,29 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 00:44 - Session: settings-over-profiles completion + task cleanup
+
+**Why**: Consolidating session progress before plan-review loop
+
+**Accomplished**:
+- Merged PR #31 (F-0131 settings-over-profiles, v0.27.0 tagged). Fixed all review findings (W1-W4, S1-S5). Shipped F-0132 (spec-first gate, PR #32) fixing I-0002. Shipped F-0133 (durable plans + 16 archived plans, PR #33) fixing I-0003. Shipped skill routing hints + review-after-PR (PR #34). Moved settings docs to DEVELOPER_GUIDE.md, filed I-0004/I-0005. Updated CONTRIBUTIONS.md, READMEs, VERSION.
+
+**Next steps**:
+- Plan-review loop for #11 (DEVELOPER_GUIDE rewrite) and #12 (centralized TODO tracking)
+
+**Blockers**: None
+
+
+### Session: 2026-02-18 00:50 - CONTRIBUTIONS & CHANGELOG catchup
+
+**Why**: CONTRIBUTIONS was 5 versions behind — capturing all user contributions before they get lost to context compression
+
+**Accomplished**:
+- Updated CONTRIBUTIONS.md with v0.25.8-v0.27.0 entries (rough specs, profile rename, settings-over-profiles, spec-first gate, durable plans, skill routing). Updated CHANGELOG.md with v0.26.0 and v0.27.0 entries. Updated architecture decisions list. Created F-0134 feature entry and acceptance criteria for DEVELOPER_GUIDE rewrite.
+
+**Next steps**:
+- Plan-review loop for F-0134 DEVELOPER_GUIDE rewrite, then Task #12 centralized TODO tracking
+
+**Blockers**: None
+

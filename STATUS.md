@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Tasks #6 #7 #10 shipped, remaining: #11 #12 (Updated: 2026-02-18 00:28 EET)
+- F-0134 DEVELOPER_GUIDE rewrite — planning phase (Updated: 2026-02-18 00:50 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

@@ -5,6 +5,32 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.27.0] - 2026-02-16
+
+### Added
+- **Settings-over-profiles architecture (F-0131)** — Profiles become presets; all framework logic uses `get_setting()` with three-level resolution (explicit > profile preset > fallback default). New `ag set` command for individual overrides. Shared libraries: `.agentic/lib/settings.sh` + `.agentic/lib/settings.py`.
+- **Programmatic spec-first gate (F-0132)** — `ag plan F-XXXX` blocks if F-XXXX not in FEATURES.md. `ag implement F-XXXX` blocks if no FEATURES.md entry or no `spec/acceptance/F-XXXX.md`. `SKIP_SPEC_CHECK=1` escape hatch.
+- **Durable plan artifacts (F-0133)** — `ag plan --save <source-file> F-XXXX` saves plans to `.agentic-journal/plans/`. CLAUDE.md instructs agents to save plans after approval.
+- **Skill routing hints** — CLAUDE.md template documents that framework roles (`/review`, `/test`, etc.) use Skill tool, NOT Task tool's subagent_type.
+- **Review-after-PR suggestion** — PR creation rule in CLAUDE.md now includes: "then offer: Want me to run `/review` on this PR?"
+- **Profile presets file** — `.agentic/presets/profiles.conf` and `.agentic/presets/constraints.conf` define profile defaults and inter-setting constraints.
+
+### Changed
+- **All 18 files with profile logic** — Converted from `if profile == "formal"` to `get_setting` calls. 5 duplicate `get_profile()`/`read_profile()` implementations replaced by shared library imports.
+- **STACK.md** — Settings consolidated under `## Settings` section with section-scoped parsing.
+- **Pre-commit-check.sh** — Check 5/7 thresholds now derived from settings, not hardcoded.
+- **enable-formal.sh** → now calls `ag set profile formal` + creates spec directory.
+
+### Removed
+- **Duplicate `get_profile()` / `read_profile()` functions** — Removed from ag.sh, sync.sh, phase_detect.py, doctor.py, verify.py. All use shared `get_setting()`.
+
+## [0.26.0] - 2026-02-15
+
+### Changed
+- **Profile rename** — `core` → `discovery`, `core+product` → `formal` across all files. Backward compatibility normalization removed — clean break.
+- **enable-pm.sh** → **enable-formal.sh** — Script renamed to match new profile name.
+- **All profile references updated** — 18+ files: scripts, templates, documentation, tests, agent instructions.
+
 ## [0.25.8] - 2026-02-14
 
 ### Added
