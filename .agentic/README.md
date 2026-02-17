@@ -10,6 +10,8 @@ This folder is a **portable framework** you can copy into any repository to boot
 
 ## Two Profiles: Choose What Fits Your Project
 
+Profiles are **presets** that set bundles of defaults. You can override any individual setting: `ag set feature_tracking yes`. See `ag set --show` for all settings and their sources.
+
 ### Discovery Profile (Default - Simple Setup)
 **Purpose**: Make agents work better on ANY project - quality, workflows, multi-agent
 
@@ -49,6 +51,8 @@ This folder is a **portable framework** you can copy into any repository to boot
 - Projects needing audit trails and formal specs
 
 **Enable later**: `bash .agentic/tools/enable-formal.sh`
+
+**Customize settings**: See [`DEVELOPER_GUIDE.md` → Settings System](DEVELOPER_GUIDE.md#settings-system) for resolution order, profile defaults, and constraints.
 
 ## What you get
 - **A repo init protocol** (agent-guided) that creates stable context artifacts: `STACK.md`, `CONTEXT_PACK.md`, `STATUS.md`, `JOURNAL.md`, `spec/`, `spec/adr/`.

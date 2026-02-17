@@ -549,3 +549,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-17 21:45 - Settings docs & version bump
+
+**Accomplished**:
+- Moved settings docs to DEVELOPER_GUIDE.md, added I-0004/I-0005, updated READMEs, version 0.27.0
+
+**Next steps**:
+- PR #31 merge review
+
+**Blockers**: None
+

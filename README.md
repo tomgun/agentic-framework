@@ -44,7 +44,7 @@ A custom rules file is a great start. This framework builds on the same idea but
 
 **📖 Detailed problem analysis**: [FRAMEWORK_VALUE_PROPOSITION.md](docs/FRAMEWORK_VALUE_PROPOSITION.md)
 
-**Two profiles available:**
+**Two profiles available** (profiles are presets — override any setting with `ag set <key> <value>`):
 
 - **Discovery**: Full framework capabilities with lightweight planning
   - Context optimization (CONTEXT_PACK.md)
@@ -347,7 +347,7 @@ During `init_playbook.md`, choose **"a) Multiple (RECOMMENDED)"** and the framew
 - **Quality automation**: Stack-specific pre-commit validation
 - **Retrospectives**: Periodic project health checks
 
-Enable later: `bash .agentic/tools/enable-formal.sh`
+Enable later: `bash .agentic/tools/enable-formal.sh` | Customize settings: `ag set --show`
 
 ### For Complex Projects
 - **Session continuity**: JOURNAL.md tracks progress across context resets

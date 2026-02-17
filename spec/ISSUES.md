@@ -12,11 +12,11 @@
 
 | Status | Count |
 |--------|-------|
-| Open | 2 |
+| Open | 4 |
 | In Progress | 0 |
 | Fixed | 1 |
 | Won't Fix | 0 |
-| **Total** | 3 |
+| **Total** | 5 |
 
 ---
 
@@ -203,6 +203,44 @@ The framework has `.agentic-state/` for session state and `spec/` for durable sp
 **Related**:
 - Issue: I-0002 (plan mode bypasses spec-first workflow)
 - Feature: F-0006 (Acceptance-Driven Development)
+
+---
+
+## I-0004: No per-command setting overrides
+
+**Status**: open
+**Priority**: low
+**Severity**: minor
+**Found**: 2026-02-16
+
+**Description**:
+Settings can only be changed permanently in STACK.md. There's no way to override a setting for a single command (e.g., `ag commit --max-files=25` for a one-off large commit).
+
+**Proposed fix**:
+- Environment variable overrides: `MAX_FILES_PER_COMMIT=25 ag commit`
+- Command-line flags: `ag commit --override max_files_per_commit=25`
+
+**Related**:
+- Feature: F-0131 (Settings-Over-Profiles Architecture)
+
+---
+
+## I-0005: Settings list hardcoded in show_all_settings
+
+**Status**: open
+**Priority**: low
+**Severity**: minor
+**Found**: 2026-02-16
+
+**Description**:
+The `show_all_settings()` function in `settings.sh` has a hardcoded list of known settings. Adding a new setting requires updating the list manually.
+
+**Proposed fix**:
+- Read setting names from `profiles.conf` automatically
+- Or maintain a `settings.registry` file listing all valid settings with types and descriptions
+
+**Related**:
+- Feature: F-0131 (Settings-Over-Profiles Architecture)
 
 ---
 
