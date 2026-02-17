@@ -24,7 +24,7 @@ Acceptance criteria: When `feature_tracking=yes` (formal profile): spec/acceptan
 Small batch development: When user asks for something large ("entire", "full", "complete system"), STOP - TOO BIG for one task. Break into smaller pieces (3-5 files max each). Max 5-10 files per commit.
 
 Rules:
-- **PR by default**: Create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to HUMAN_NEEDED.md for review tracking.
+- **PR by default**: Create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to HUMAN_NEEDED.md for review tracking, then offer: "Want me to run `/review` on this PR?"
 - Never auto-commit. Show changes to human first.
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later).
@@ -39,6 +39,8 @@ Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly)
 - FEATURES.md: `bash .agentic/tools/feature.sh F-#### status shipped`
 
 Subagent context: Run `bash .agentic/tools/context-for-role.sh <role> <feature-id>` to assemble minimal context per subagent. Subagents do NOT inherit CLAUDE.md.
+
+Framework roles (review, test, implementation, etc.) are invoked via `/review`, `/test`, etc. — NOT via the Task tool's subagent_type. The Task tool only has built-in types (Bash, general-purpose, Explore, Plan). Use `/review` for code review, `/test` for test writing, `/implementation` for coding.
 
 Agent mode: Check `agent_mode` in STACK.md (premium|balanced|economy). Details: auto_orchestration.md
 

@@ -571,3 +571,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 00:28 - Skill routing + review-after-PR
+
+**Accomplished**:
+- Added routing hints: framework roles use /slash commands not Task tool. PR rule now offers /review after creation.
+
+**Next steps**:
+- DEVELOPER_GUIDE rewrite, centralized TODO tracking
+
+**Blockers**: None
+
