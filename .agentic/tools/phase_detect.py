@@ -19,7 +19,7 @@ def detect_phase(root: Path) -> str:
     Detect current development phase.
 
     Returns one of:
-    - "discovery-mode": Discovery profile (no feature tracking)
+    - "no-feature-tracking": Feature tracking disabled (setting or profile)
     - "blocked": Has unresolved blockers in HUMAN_NEEDED.md
     - "start": No active work (no .agentic-state/WIP.md)
     - "planning": Feature started but no acceptance criteria

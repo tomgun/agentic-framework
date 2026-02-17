@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Settings-over-profiles: ready for PR (Updated: 2026-02-17 18:35 EET)
+- Settings-over-profiles: review fixes applied, ready to merge (Updated: 2026-02-17 20:56 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

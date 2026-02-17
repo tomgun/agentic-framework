@@ -13,6 +13,10 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Import shared settings library
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+from settings import get_setting
+
 PROPOSAL_HEADER = (
     "<!-- PROPOSAL: Auto-discovered by ag init on {date}. "
     "Review and approve with: ag approve-onboarding -->"
@@ -431,18 +435,8 @@ def main():
 
     profile = args.profile
 
-    # Determine feature_tracking: formal profile implies yes
-    feature_tracking = profile == "formal"
-    if not feature_tracking:
-        # Also check settings in case user overrode
-        try:
-            _lib_dir = str(Path(__file__).resolve().parent.parent / "lib")
-            if _lib_dir not in sys.path:
-                sys.path.insert(0, _lib_dir)
-            from settings import get_setting as _gs
-            feature_tracking = _gs(Path.cwd(), "feature_tracking", "no") == "yes"
-        except Exception:
-            pass
+    # Determine feature_tracking from settings (respects overrides)
+    feature_tracking = get_setting(Path.cwd(), "feature_tracking", "no") == "yes"
 
     if feature_tracking:
         features_content = render_features_md(report)

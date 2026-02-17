@@ -1616,6 +1616,7 @@ TESTEOF
   _SETTINGS_SECTION_CACHE=""
   _SETTINGS_PROFILE_RESOLVED=0
   _SETTINGS_PROFILE_CACHE=""
+  _SETTINGS_PROFILES_CONF="${FRAMEWORK_ROOT}/.agentic/presets/profiles.conf"
 
   FT_VAL=$(get_setting "feature_tracking" "UNSET")
   rm -rf "$SETTINGS_TEST_DIR"
@@ -1683,6 +1684,116 @@ if grep -q '"lib"' "${FRAMEWORK_ROOT}/.agentic/tools/upgrade.sh" 2>/dev/null && 
   pass "Settings: upgrade.sh copies lib/ and presets/"
 else
   fail "Settings: upgrade.sh missing lib/ or presets/ in DIRS_TO_REPLACE"
+fi
+
+# Helper: reset settings cache for functional tests
+_reset_settings_cache() {
+  _SETTINGS_SECTION_EXTRACTED=0
+  _SETTINGS_SECTION_CACHE=""
+  _SETTINGS_PROFILE_RESOLVED=0
+  _SETTINGS_PROFILE_CACHE=""
+  _SETTINGS_PROFILES_CONF="${FRAMEWORK_ROOT}/.agentic/presets/profiles.conf"
+  _SETTINGS_CONSTRAINTS_CONF="${FRAMEWORK_ROOT}/.agentic/presets/constraints.conf"
+}
+
+# Test constraint validation detects violations
+(
+  source "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" 2>/dev/null || exit 1
+  SETTINGS_TEST_DIR=$(mktemp -d)
+  # acceptance_criteria=blocking requires feature_tracking=yes
+  cat > "$SETTINGS_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: discovery
+- acceptance_criteria: blocking
+- feature_tracking: no
+TESTEOF
+  _SETTINGS_STACK_FILE="$SETTINGS_TEST_DIR/STACK.md"
+  _reset_settings_cache
+
+  VIOLATIONS=$(validate_constraints 2>&1)
+  rm -rf "$SETTINGS_TEST_DIR"
+  [[ "$VIOLATIONS" == *"violation"* ]]
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Settings: constraint validation detects violations"
+else
+  fail "Settings: constraint validation should detect violations"
+fi
+
+# Test missing STACK.md uses profile preset (inferred discovery → feature_tracking=no)
+(
+  source "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" 2>/dev/null || exit 1
+  SETTINGS_TEST_DIR=$(mktemp -d)
+  _SETTINGS_STACK_FILE="$SETTINGS_TEST_DIR/nonexistent.md"
+  _SETTINGS_ROOT_DIR="$SETTINGS_TEST_DIR"
+  _reset_settings_cache
+
+  VAL=$(get_setting "feature_tracking" "fallback_val")
+  rm -rf "$SETTINGS_TEST_DIR"
+  # No STACK.md, no spec/ dir → inferred discovery → preset feature_tracking=no
+  [[ "$VAL" == "no" ]]
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Settings: missing STACK.md falls through to profile preset"
+else
+  fail "Settings: missing STACK.md should fall through to profile preset"
+fi
+
+# Test empty value is not returned (falls through to preset/default)
+(
+  source "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" 2>/dev/null || exit 1
+  SETTINGS_TEST_DIR=$(mktemp -d)
+  cat > "$SETTINGS_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: formal
+- feature_tracking:
+TESTEOF
+  _SETTINGS_STACK_FILE="$SETTINGS_TEST_DIR/STACK.md"
+  _reset_settings_cache
+
+  FT_VAL=$(get_setting "feature_tracking" "UNSET")
+  rm -rf "$SETTINGS_TEST_DIR"
+  # Empty value should fall through to profile preset (formal=yes)
+  [[ "$FT_VAL" == "yes" ]]
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Settings: empty value falls through to preset"
+else
+  fail "Settings: empty value should fall through to preset"
+fi
+
+# Test ag set validates enum values
+(
+  cd "${FRAMEWORK_ROOT}" || exit 1
+  OUTPUT=$(bash ".agentic/tools/ag.sh" set profile bogus 2>&1) && exit 1
+  [[ "$OUTPUT" == *"Error"* ]]
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Settings: ag set rejects invalid enum values"
+else
+  fail "Settings: ag set should reject invalid enum values"
+fi
+
+# Test Python settings.py resolves correctly
+(
+  SETTINGS_TEST_DIR=$(mktemp -d)
+  cat > "$SETTINGS_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: formal
+- feature_tracking: no
+TESTEOF
+  RESULT=$(python3 -c "
+import sys; sys.path.insert(0, '${FRAMEWORK_ROOT}/.agentic/lib')
+from settings import get_setting; from pathlib import Path
+print(get_setting(Path('$SETTINGS_TEST_DIR'), 'feature_tracking', 'UNSET'))
+" 2>&1)
+  rm -rf "$SETTINGS_TEST_DIR"
+  [[ "$RESULT" == "no" ]]
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Settings: Python get_setting() resolves explicit override"
+else
+  fail "Settings: Python get_setting() should resolve explicit override"
 fi
 
 # ============================================================

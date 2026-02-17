@@ -1821,6 +1821,52 @@ _settings_set_value() {
         exit 1
     fi
 
+    # Validate values for enum settings
+    case "$key" in
+        profile)
+            if [[ ! "$value" =~ ^(discovery|formal)$ ]]; then
+                echo -e "${RED}Error: profile must be 'discovery' or 'formal', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        feature_tracking|plan_review_enabled|spec_directory)
+            if [[ ! "$value" =~ ^(yes|no)$ ]]; then
+                echo -e "${RED}Error: $key must be 'yes' or 'no', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        acceptance_criteria)
+            if [[ ! "$value" =~ ^(blocking|recommended|off)$ ]]; then
+                echo -e "${RED}Error: acceptance_criteria must be 'blocking', 'recommended', or 'off', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        wip_before_commit)
+            if [[ ! "$value" =~ ^(blocking|warning)$ ]]; then
+                echo -e "${RED}Error: wip_before_commit must be 'blocking' or 'warning', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        pre_commit_checks)
+            if [[ ! "$value" =~ ^(full|fast|off)$ ]]; then
+                echo -e "${RED}Error: pre_commit_checks must be 'full', 'fast', or 'off', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        git_workflow)
+            if [[ ! "$value" =~ ^(pull_request|direct)$ ]]; then
+                echo -e "${RED}Error: git_workflow must be 'pull_request' or 'direct', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        max_files_per_commit|max_added_lines|max_code_file_length)
+            if [[ ! "$value" =~ ^[0-9]+$ ]]; then
+                echo -e "${RED}Error: $key must be a positive integer, got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+    esac
+
     if [ ! -f "$stack_file" ]; then
         echo -e "${RED}Error: STACK.md not found${NC}"
         exit 1

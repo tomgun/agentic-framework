@@ -10,14 +10,14 @@
 
 ---
 
-## ENFORCED GATES (Settings-Driven)
+## GATES (Settings-Driven)
 
-| Gate | Setting | Formal default | Discovery default |
-|------|---------|----------------|-------------------|
-| Acceptance criteria | `acceptance_criteria` | **blocking** | recommended |
-| WIP before commit | `wip_before_commit` | **blocking** | warning |
-| Pre-commit checks | `pre_commit_checks` | **full** | fast |
-| Feature tracking | `feature_tracking` | **yes** | no |
+| Gate | Setting | Formal default | Discovery default | Enforcement |
+|------|---------|----------------|-------------------|-------------|
+| Acceptance criteria | `acceptance_criteria` | **blocking** | recommended | Agent-interpreted |
+| WIP before commit | `wip_before_commit` | **blocking** | warning | Script-enforced |
+| Pre-commit checks | `pre_commit_checks` | **full** | fast | Script-enforced |
+| Feature tracking | `feature_tracking` | **yes** | no | Script-enforced |
 
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 

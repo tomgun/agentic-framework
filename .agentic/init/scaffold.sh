@@ -239,9 +239,16 @@ if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
     GIT_WORKFLOW_DEFAULT="pull_request"
   fi
 
-  if grep -qE '^[[:space:]]*-[[:space:]]*git_workflow:' "${ROOT_DIR}/STACK.md"; then
-    sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*git_workflow:[[:space:]]*).*/\\1${GIT_WORKFLOW_DEFAULT}/" "${ROOT_DIR}/STACK.md"
-    rm -f "${ROOT_DIR}/STACK.md.bak" 2>/dev/null || true
+  # Write git_workflow into ## Settings section (after profile line)
+  if grep -q "^- profile:" "${ROOT_DIR}/STACK.md" 2>/dev/null; then
+    SCAFFOLD_TMP=$(mktemp)
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      echo "$line" >> "$SCAFFOLD_TMP"
+      if [[ "$line" =~ ^-[[:space:]]*profile: ]]; then
+        echo "- git_workflow: ${GIT_WORKFLOW_DEFAULT}" >> "$SCAFFOLD_TMP"
+      fi
+    done < "${ROOT_DIR}/STACK.md"
+    mv "$SCAFFOLD_TMP" "${ROOT_DIR}/STACK.md"
     echo "OK  : STACK.md git_workflow set to ${GIT_WORKFLOW_DEFAULT} (${PROFILE} default)"
   fi
 fi

@@ -80,7 +80,7 @@ _get_from_settings_section() {
 
     # Match "- key: value" (with optional leading spaces, strip comments)
     local val
-    val=$(echo "$_SETTINGS_SECTION_CACHE" | grep -E "^[[:space:]]*-[[:space:]]*${key}:" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | sed 's/<!--.*-->//' | tr -d ' ')
+    val=$(echo "$_SETTINGS_SECTION_CACHE" | grep -E "^[[:space:]]*-[[:space:]]*${key}:" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | sed 's/<!--.*-->//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
     if [[ -n "$val" ]]; then
         echo "$val"
         return 0
@@ -98,7 +98,7 @@ _get_from_whole_file() {
     fi
 
     local val
-    val=$(grep -E "^[[:space:]]*-?[[:space:]]*${key}:" "$_SETTINGS_STACK_FILE" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | sed 's/<!--.*-->//' | tr -d ' ')
+    val=$(grep -E "^[[:space:]]*-?[[:space:]]*${key}:" "$_SETTINGS_STACK_FILE" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | sed 's/<!--.*-->//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
     if [[ -n "$val" ]]; then
         echo "$val"
         return 0

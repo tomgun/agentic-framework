@@ -17,6 +17,10 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Optional
+
+# Simple module-level cache to avoid re-parsing files within the same process
+_cache: dict[str, object] = {}
 
 # ---------------------------------------------------------------------------
 # Internal: parse the ## Settings section from STACK.md
@@ -29,6 +33,10 @@ _SETTING_LINE_RE = re.compile(
 
 def _extract_settings_section(stack_path: Path) -> dict[str, str]:
     """Extract key-value pairs from the ## Settings section of STACK.md."""
+    cache_key = f"settings:{stack_path}"
+    if cache_key in _cache:
+        return _cache[cache_key]  # type: ignore[return-value]
+
     if not stack_path.exists():
         return {}
 
@@ -60,6 +68,7 @@ def _extract_settings_section(stack_path: Path) -> dict[str, str]:
             if val:
                 settings[key] = val
 
+    _cache[cache_key] = settings
     return settings
 
 
@@ -96,6 +105,10 @@ def _load_profile_presets(presets_path: Path) -> dict[str, dict[str, str]]:
 
     Returns: {"discovery": {"feature_tracking": "no", ...}, "formal": {...}}
     """
+    cache_key = f"presets:{presets_path}"
+    if cache_key in _cache:
+        return _cache[cache_key]  # type: ignore[return-value]
+
     if not presets_path.exists():
         return {}
 
@@ -117,6 +130,7 @@ def _load_profile_presets(presets_path: Path) -> dict[str, dict[str, str]]:
     except Exception:
         pass
 
+    _cache[cache_key] = profiles
     return profiles
 
 
