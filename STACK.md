@@ -10,6 +10,14 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - This IS the framework (dogfooding)
 - Source: https://github.com/tomgun/agentic-framework
 
+## Settings
+<!-- Profile sets defaults. Override individual settings below. -->
+- profile: formal
+
+
+- max_files_per_commit: 30
+- max_added_lines: 2000
+- max_code_file_length: 2100
 ## Summary
 - What are we building: AI-assisted development framework with spec-driven methodology
 - Primary platform: CLI tools / documentation

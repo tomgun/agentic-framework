@@ -215,17 +215,19 @@ copy_if_missing "${ROOT_DIR}/.agentic/spec/JOURNAL.template.md" "${ROOT_DIR}/.ag
 
 copy_if_missing "${ROOT_DIR}/.agentic/spec/HUMAN_NEEDED.template.md" "${ROOT_DIR}/HUMAN_NEEDED.md"
 
-# Ensure STACK.md has Profile field (newer versions)
+# Configure STACK.md settings for selected profile
 if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
+  # Set profile in ## Settings section
+  if grep -qE '^- profile:' "${ROOT_DIR}/STACK.md"; then
+    sed -i.bak -E "s/^(- profile:[[:space:]]*).*/\\1${PROFILE}/" "${ROOT_DIR}/STACK.md"
+    rm -f "${ROOT_DIR}/STACK.md.bak" 2>/dev/null || true
+    echo "OK  : STACK.md profile set to ${PROFILE}"
+  fi
+
+  # Legacy: also update Profile field in ## Agentic framework if present
   if grep -qE '^[[:space:]]*-[[:space:]]*Profile:' "${ROOT_DIR}/STACK.md"; then
-    # Normalize to the selected profile
     sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*Profile:[[:space:]]*).*/\\1${PROFILE}  # discovery | formal/" "${ROOT_DIR}/STACK.md"
     rm -f "${ROOT_DIR}/STACK.md.bak" 2>/dev/null || true
-    echo "OK  : STACK.md Profile set to ${PROFILE}"
-  else
-    # Insert right after the Version line inside "## Agentic framework"
-    perl -0777 -i -pe "s/(## Agentic framework\\n- Version:[^\\n]*\\n)/\\1- Profile: ${PROFILE}  \\# discovery | formal\\n/" "${ROOT_DIR}/STACK.md" || true
-    echo "NEW : STACK.md Profile: ${PROFILE}"
   fi
 
   # Set profile-aware git_workflow default
@@ -238,7 +240,6 @@ if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
   fi
 
   if grep -qE '^[[:space:]]*-[[:space:]]*git_workflow:' "${ROOT_DIR}/STACK.md"; then
-    # Update existing git_workflow line to profile default
     sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*git_workflow:[[:space:]]*).*/\\1${GIT_WORKFLOW_DEFAULT}/" "${ROOT_DIR}/STACK.md"
     rm -f "${ROOT_DIR}/STACK.md.bak" 2>/dev/null || true
     echo "OK  : STACK.md git_workflow set to ${GIT_WORKFLOW_DEFAULT} (${PROFILE} default)"

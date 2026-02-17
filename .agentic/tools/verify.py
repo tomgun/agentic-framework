@@ -8,44 +8,18 @@ import re
 import sys
 from pathlib import Path
 
+# Import shared settings library
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+from settings import get_setting
 
 FEATURE_ID_RE = re.compile(r"\b(F-\d{4})\b")
 NFR_ID_RE = re.compile(r"\b(NFR-\d{4})\b")
 ADR_ID_RE = re.compile(r"\b(ADR-\d{4})\b")
 
 
-def _normalize_profile(raw: str) -> str:
-    """Validate profile value."""
-    val = raw.strip().lower()
-    if val in ("discovery", "formal"):
-        return val
-    return ""
-
-
 def read_profile(root: Path) -> str:
-    """
-    Determine profile.
-
-    - Prefer explicit `Profile:` in STACK.md.
-    - If not present, infer:
-      - If spec/ exists -> formal
-      - else -> discovery
-    """
-    stack = root / "STACK.md"
-    if stack.exists():
-        try:
-            md = stack.read_text(encoding="utf-8")
-            m = re.search(r"(?m)^\s*-\s*Profile:\s*([a-z+_-]+)\s*$", md)
-            if m:
-                normalized = _normalize_profile(m.group(1).strip())
-                if normalized:
-                    return normalized
-        except Exception:
-            pass
-
-    if (root / "spec").is_dir():
-        return "formal"
-    return "discovery"
+    """Determine profile via shared settings library."""
+    return get_setting(root, "profile", "discovery")
 
 
 def core_checks(root: Path) -> list[str]:
@@ -214,8 +188,9 @@ def main() -> int:
     print("=== agentic verify ===\n")
     print(f"Profile: {profile}\n")
 
-    if profile == "discovery":
-        print("Discovery profile: skipping Formal validations (spec/).\n")
+    ft = get_setting(root, "feature_tracking", "no")
+    if ft != "yes":
+        print("Feature tracking off: skipping formal validations (spec/).\n")
         core_issues = core_checks(root)
         if core_issues:
             print(f"Found {len(core_issues)} issue(s):")

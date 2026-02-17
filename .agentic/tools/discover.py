@@ -11,8 +11,13 @@ import argparse
 import json
 import os
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+# Import shared settings library
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+from settings import get_setting
 
 # Directories to always exclude from scanning
 EXCLUDE_DIRS = {
@@ -589,7 +594,7 @@ def detect_test_patterns(root: Path) -> dict:
 
 def discover_features(root: Path, stack: dict, architecture: dict,
                       sub_projects: list[dict] | None = None) -> list[dict]:
-    """Discover existing features/modules from code structure (Formal profile only)."""
+    """Discover existing features/modules from code structure (feature_tracking=yes only)."""
     features: list[dict] = []
     seen_names: set[str] = set()
 
@@ -1261,7 +1266,7 @@ def detect_api_specs(root: Path, sub_projects: list[dict]) -> str | None:
     return None
 
 
-def generate_report(root: Path, profile: str) -> dict:
+def generate_report(root: Path, profile: str, feature_tracking: bool = False) -> dict:
     """Orchestrate all discovery and generate the JSON report."""
     root = root.resolve()
 
@@ -1317,7 +1322,7 @@ def generate_report(root: Path, profile: str) -> dict:
     api_spec_path = None
     domains = []
 
-    if profile == "formal":
+    if feature_tracking:
         features = discover_features(root, stack, architecture, sub_projects)
         serverless_functions = detect_serverless_functions(root)
         ui_components = detect_ui_components(root, sub_projects)
@@ -1326,7 +1331,7 @@ def generate_report(root: Path, profile: str) -> dict:
         domains = detect_domains(root, sub_projects, feature_clusters,
                                  architecture, infra_patterns)
     else:
-        # Even core profile gets domains for context
+        # Non-feature-tracking projects still get domains for context
         domains = detect_domains(root, sub_projects, [],
                                  architecture, infra_patterns)
 
@@ -1346,7 +1351,7 @@ def generate_report(root: Path, profile: str) -> dict:
         "domains": domains,
     }
 
-    if profile == "formal":
+    if feature_tracking:
         report["serverless_functions"] = serverless_functions
         report["ui_components"] = ui_components
         report["feature_clusters"] = feature_clusters
@@ -1371,7 +1376,10 @@ def main():
 
     profile = args.profile
 
-    report = generate_report(root, profile)
+    # Resolve feature_tracking from settings (profile preset handles formal→yes)
+    feature_tracking = get_setting(root, "feature_tracking", "no") == "yes"
+
+    report = generate_report(root, profile, feature_tracking=feature_tracking)
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)

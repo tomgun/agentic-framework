@@ -51,26 +51,9 @@ for arg in "$@"; do
     esac
 done
 
-# --- Detect profile ---
-get_profile() {
-    local stack_file="$ROOT_DIR/STACK.md"
-    local raw=""
-    if [ -f "$stack_file" ]; then
-        raw=$(grep -i "Profile:" "$stack_file" 2>/dev/null | head -1 | sed 's/.*Profile:[[:space:]]*//' | tr -d ' ')
-    fi
-    case "$raw" in
-        discovery) echo "discovery" ;;
-        formal) echo "formal" ;;
-        *)
-            if [ -d "$ROOT_DIR/spec" ]; then
-                echo "formal"
-            else
-                echo "discovery"
-            fi
-            ;;
-    esac
-}
-PROFILE="$(get_profile)"
+# --- Source shared settings ---
+source "$SCRIPT_DIR/../lib/settings.sh"
+PROFILE="$(get_setting "profile" "discovery")"
 
 # --- Counters ---
 OK_COUNT=0
@@ -269,7 +252,9 @@ phase_state_freshness() {
 # Phase 3: Feature reconciliation (Formal only)
 # ============================================================================
 phase_features() {
-    if [ "$PROFILE" = "discovery" ]; then
+    local ft
+    ft="$(get_setting "feature_tracking" "no")"
+    if [ "$ft" != "yes" ]; then
         return 0
     fi
 

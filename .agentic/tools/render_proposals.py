@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -430,7 +431,20 @@ def main():
 
     profile = args.profile
 
-    if profile == "formal":
+    # Determine feature_tracking: formal profile implies yes
+    feature_tracking = profile == "formal"
+    if not feature_tracking:
+        # Also check settings in case user overrode
+        try:
+            _lib_dir = str(Path(__file__).resolve().parent.parent / "lib")
+            if _lib_dir not in sys.path:
+                sys.path.insert(0, _lib_dir)
+            from settings import get_setting as _gs
+            feature_tracking = _gs(Path.cwd(), "feature_tracking", "no") == "yes"
+        except Exception:
+            pass
+
+    if feature_tracking:
         features_content = render_features_md(report)
         (output_dir / "FEATURES.md").write_text(features_content)
         cluster_count = len(report.get("feature_clusters", []))

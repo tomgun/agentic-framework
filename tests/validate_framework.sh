@@ -1521,6 +1521,171 @@ else
 fi
 
 # ============================================================
+# Settings Infrastructure (Settings-Over-Profiles)
+# ============================================================
+echo ""
+echo "--- Settings Infrastructure ---"
+
+# settings.sh exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" ]]; then
+  pass "Settings: settings.sh exists"
+else
+  fail "Settings: settings.sh missing"
+fi
+
+# settings.py exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/settings.py" ]]; then
+  pass "Settings: settings.py exists"
+else
+  fail "Settings: settings.py missing"
+fi
+
+# profiles.conf exists with both profiles
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/presets/profiles.conf" ]]; then
+  pass "Settings: profiles.conf exists"
+  if grep -q "^discovery\." "${FRAMEWORK_ROOT}/.agentic/presets/profiles.conf"; then
+    pass "Settings: profiles.conf has discovery defaults"
+  else
+    fail "Settings: profiles.conf missing discovery defaults"
+  fi
+  if grep -q "^formal\." "${FRAMEWORK_ROOT}/.agentic/presets/profiles.conf"; then
+    pass "Settings: profiles.conf has formal defaults"
+  else
+    fail "Settings: profiles.conf missing formal defaults"
+  fi
+else
+  fail "Settings: profiles.conf missing"
+fi
+
+# constraints.conf exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/presets/constraints.conf" ]]; then
+  pass "Settings: constraints.conf exists"
+else
+  fail "Settings: constraints.conf missing"
+fi
+
+# settings.sh has get_setting function
+if grep -q "^get_setting()" "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" 2>/dev/null; then
+  pass "Settings: settings.sh has get_setting()"
+else
+  fail "Settings: settings.sh missing get_setting()"
+fi
+
+# settings.py has get_setting function
+if grep -q "^def get_setting" "${FRAMEWORK_ROOT}/.agentic/lib/settings.py" 2>/dev/null; then
+  pass "Settings: settings.py has get_setting()"
+else
+  fail "Settings: settings.py missing get_setting()"
+fi
+
+# ag.sh has ag set command
+if grep -q "cmd_set" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "Settings: ag.sh has set command"
+else
+  fail "Settings: ag.sh missing set command"
+fi
+
+# ag.sh sources settings.sh
+if grep -q 'source.*lib/settings.sh' "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "Settings: ag.sh sources settings.sh"
+else
+  fail "Settings: ag.sh doesn't source settings.sh"
+fi
+
+# STACK.template.md has ## Settings section
+if grep -q "^## Settings" "${FRAMEWORK_ROOT}/.agentic/init/STACK.template.md" 2>/dev/null; then
+  pass "Settings: STACK.template.md has ## Settings section"
+else
+  fail "Settings: STACK.template.md missing ## Settings section"
+fi
+
+# settings.sh resolves from profile presets (functional test)
+# We run each test in a subshell to get clean state, and override _SETTINGS_STACK_FILE
+(
+  source "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" 2>/dev/null || exit 1
+
+  # Create temp STACK.md with profile set
+  SETTINGS_TEST_DIR=$(mktemp -d)
+  cat > "$SETTINGS_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: formal
+TESTEOF
+  # Override the stack file path to point to our test file
+  _SETTINGS_STACK_FILE="$SETTINGS_TEST_DIR/STACK.md"
+  _SETTINGS_SECTION_EXTRACTED=0
+  _SETTINGS_SECTION_CACHE=""
+  _SETTINGS_PROFILE_RESOLVED=0
+  _SETTINGS_PROFILE_CACHE=""
+
+  FT_VAL=$(get_setting "feature_tracking" "UNSET")
+  rm -rf "$SETTINGS_TEST_DIR"
+  [[ "$FT_VAL" == "yes" ]]
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Settings: formal profile resolves feature_tracking=yes"
+else
+  fail "Settings: formal profile feature_tracking resolution failed"
+fi
+
+# Test explicit override trumps preset
+(
+  source "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" 2>/dev/null || exit 1
+  SETTINGS_TEST_DIR=$(mktemp -d)
+  cat > "$SETTINGS_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: formal
+- feature_tracking: no
+TESTEOF
+  _SETTINGS_STACK_FILE="$SETTINGS_TEST_DIR/STACK.md"
+  _SETTINGS_SECTION_EXTRACTED=0
+  _SETTINGS_SECTION_CACHE=""
+  _SETTINGS_PROFILE_RESOLVED=0
+  _SETTINGS_PROFILE_CACHE=""
+
+  FT_VAL=$(get_setting "feature_tracking" "UNSET")
+  rm -rf "$SETTINGS_TEST_DIR"
+  [[ "$FT_VAL" == "no" ]]
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Settings: explicit override trumps profile preset"
+else
+  fail "Settings: explicit override should trump profile preset"
+fi
+
+# Test backward compat: STACK.md without ## Settings section
+(
+  source "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" 2>/dev/null || exit 1
+  SETTINGS_TEST_DIR=$(mktemp -d)
+  cat > "$SETTINGS_TEST_DIR/STACK.md" <<'TESTEOF'
+# STACK.md
+- Profile: formal
+- git_workflow: direct
+TESTEOF
+  _SETTINGS_STACK_FILE="$SETTINGS_TEST_DIR/STACK.md"
+  _SETTINGS_SECTION_EXTRACTED=0
+  _SETTINGS_SECTION_CACHE=""
+  _SETTINGS_PROFILE_RESOLVED=0
+  _SETTINGS_PROFILE_CACHE=""
+
+  GW_VAL=$(get_setting "git_workflow" "UNSET")
+  rm -rf "$SETTINGS_TEST_DIR"
+  [[ "$GW_VAL" == "direct" ]]
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "Settings: backward compat reads from whole file"
+else
+  fail "Settings: backward compat should read from whole file"
+fi
+
+# upgrade.sh includes lib and presets in DIRS_TO_REPLACE
+if grep -q '"lib"' "${FRAMEWORK_ROOT}/.agentic/tools/upgrade.sh" 2>/dev/null && \
+   grep -q '"presets"' "${FRAMEWORK_ROOT}/.agentic/tools/upgrade.sh" 2>/dev/null; then
+  pass "Settings: upgrade.sh copies lib/ and presets/"
+else
+  fail "Settings: upgrade.sh missing lib/ or presets/ in DIRS_TO_REPLACE"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

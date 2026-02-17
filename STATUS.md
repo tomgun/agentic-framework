@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Profile rename complete — backward compat removed, v0.26.0 (PR #30) (Updated: 2026-02-16 15:25 EET)
+- Settings-over-profiles: ready for PR (Updated: 2026-02-17 18:35 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

@@ -939,6 +939,300 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "051_settings_feature_tracking_on_discovery",
+      "description": "Discovery profile with feature_tracking=yes should require specs (setting overrides profile)",
+      "section": "settings",
+      "category": "Important",
+      "llm_test_id": "LLM-051",
+      "profile": "discovery",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: discovery\n- feature_tracking: yes\n- acceptance_criteria: blocking\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
+          "spec/FEATURES.md": "# Features\n\n## F-0001: Basic Setup\n- Status: shipped"
+        }
+      },
+      "prompt": "Add a notification feature to the app",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "acceptance|criteria|spec|F-|feature.*id|define|before.*cod|plan"
+        ],
+        "output_not_contains": [
+          "```javascript|```typescript|function.*notify|class.*Notification|const.*notification.*="
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "052_settings_feature_tracking_off_formal",
+      "description": "Formal profile with feature_tracking=no should NOT require F-#### IDs or specs",
+      "section": "settings",
+      "category": "Important",
+      "llm_test_id": "LLM-052",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: formal\n- feature_tracking: no\n- acceptance_criteria: off\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
+          "utils.js": "// Utility functions\nfunction add(a, b) { return a + b; }\nmodule.exports = { add };"
+        }
+      },
+      "prompt": "Add a multiply function to utils.js",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "function|multiply|implement|create|add.*multiply"
+        ],
+        "output_not_contains": [
+          "need.*feature.*id|F-\\d{4}|create.*spec|FEATURES\\.md|acceptance criteria.*required"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "053_settings_acceptance_blocking_discovery",
+      "description": "Discovery profile with acceptance_criteria=blocking should require acceptance before coding",
+      "section": "settings",
+      "category": "Important",
+      "llm_test_id": "LLM-053",
+      "profile": "discovery",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: discovery\n- feature_tracking: yes\n- acceptance_criteria: blocking\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
+          "spec/FEATURES.md": "# Features\n\n## F-0001: Basic Setup\n- Status: shipped"
+        }
+      },
+      "prompt": "Implement F-0002: add a search bar to the homepage",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "acceptance|criteria|spec/acceptance|before.*implement|need.*acceptance|create.*acceptance"
+        ],
+        "output_not_contains": [
+          "```javascript|```html|```css|class.*SearchBar|function.*search"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "054_settings_acceptance_off_formal",
+      "description": "Formal profile with acceptance_criteria=off should allow coding without acceptance file",
+      "section": "settings",
+      "category": "Important",
+      "llm_test_id": "LLM-054",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: formal\n- acceptance_criteria: off\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
+          "utils.js": "// Utility functions\nfunction add(a, b) { return a + b; }\nmodule.exports = { add };"
+        }
+      },
+      "prompt": "Add a multiply function to utils.js",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "function|multiply|implement|create|add.*multiply"
+        ],
+        "output_not_contains": [
+          "need.*acceptance|must.*have.*spec|require.*criteria|cannot proceed.*acceptance"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "055_settings_wip_blocking_discovery",
+      "description": "Discovery profile with wip_before_commit=blocking should BLOCK commit when WIP exists",
+      "section": "settings",
+      "category": "Important",
+      "llm_test_id": "LLM-055",
+      "profile": "discovery",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: discovery\n- wip_before_commit: blocking\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
+          ".agentic-state/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2026-02-15\n**Status**: In progress\n\n## Current Focus\nWorking on test feature",
+          "index.js": "console.log('hello');"
+        }
+      },
+      "prompt": "Please commit my changes now",
+      "expected": {
+        "output_contains": [
+          "WIP|work.in.progress|incomplete|in.progress"
+        ],
+        "output_contains_any": [
+          "block|cannot|can.t|stop|must.*complete|first|proceed"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": 1
+      }
+    },
+    {
+      "id": "056_settings_wip_warning_formal",
+      "description": "Formal profile with wip_before_commit=warning should WARN but not block commit when WIP exists",
+      "section": "settings",
+      "category": "Important",
+      "llm_test_id": "LLM-056",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: formal\n- wip_before_commit: warning\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
+          ".agentic-state/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2026-02-15\n**Status**: In progress\n\n## Current Focus\nWorking on test feature",
+          "index.js": "console.log('hello');"
+        }
+      },
+      "prompt": "Please commit my changes now",
+      "expected": {
+        "output_contains": [
+          "WIP|work.in.progress|in.progress"
+        ],
+        "output_contains_any": [
+          "warn|note|notice|proceed|continu|option|would you|want to|anyway"
+        ],
+        "output_not_contains": [
+          "BLOCK.*commit|cannot.*commit|refusing"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "057_settings_plan_review_on_discovery",
+      "description": "Discovery profile with plan_review_enabled=yes should mention plan-review loop",
+      "section": "settings",
+      "category": "Important",
+      "llm_test_id": "LLM-057",
+      "profile": "discovery",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: discovery\n- feature_tracking: yes\n- plan_review_enabled: yes\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
+          "spec/acceptance/F-0042.md": "# F-0042: User Authentication\n\n## Acceptance Criteria\n- [ ] Users can register with email/password\n- [ ] Users can login and receive JWT"
+        }
+      },
+      "prompt": "I want to implement F-0042 (user authentication). Let's get started.",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "plan.review|review loop|ag plan|plan.*review|plan.*iteration|plan.*creator|plan.*reviewer|review.*plan"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "058_settings_plan_review_off_formal",
+      "description": "Formal profile with plan_review_enabled=no should skip plan-review loop",
+      "section": "settings",
+      "category": "Important",
+      "llm_test_id": "LLM-058",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: formal\n- plan_review_enabled: no\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
+          "spec/acceptance/F-0042.md": "# F-0042: User Authentication\n\n## Acceptance Criteria\n- [ ] Users can register with email/password\n- [ ] Users can login and receive JWT"
+        }
+      },
+      "prompt": "I want to implement F-0042 (user authentication). Let's get started.",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "implement|acceptance|F-0042|authentication|start|plan"
+        ],
+        "output_not_contains": [
+          "plan.review loop|review.*iteration|plan_review_enabled|plan.*creator.*reviewer"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "059_settings_git_workflow_pr_discovery",
+      "description": "Discovery profile with git_workflow=pull_request should use feature branches and PRs",
+      "section": "settings",
+      "category": "Important",
+      "llm_test_id": "LLM-059",
+      "profile": "discovery",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: discovery\n- git_workflow: pull_request\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
+          "index.js": "console.log('hello');"
+        }
+      },
+      "prompt": "I've finished my changes. How should I get them merged?",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "branch|PR|pull request|feature branch|merge|review"
+        ],
+        "output_not_contains": [
+          "commit directly to main|push to main|commit.*main"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "060_settings_git_workflow_direct_formal",
+      "description": "Formal profile with git_workflow=direct should allow committing to main without PR",
+      "section": "settings",
+      "category": "Important",
+      "llm_test_id": "LLM-060",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: formal\n- git_workflow: direct\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
+          "index.js": "console.log('hello');"
+        }
+      },
+      "prompt": "I've finished my changes. How should I get them merged?",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "commit|direct|main|push|ag commit"
+        ],
+        "output_not_contains": [
+          "must.*create.*PR|require.*pull request|need.*feature branch.*first"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "061_ag_set_awareness",
+      "description": "Agent should know about ag set for customizing framework settings",
+      "section": "settings",
+      "category": "Normal",
+      "llm_test_id": "LLM-061",
+      "profile": "discovery",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "I want to enable feature tracking but keep the Discovery profile. How do I customize framework settings?",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "ag set|STACK.md|Settings|feature_tracking|settings|override|customize"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }
