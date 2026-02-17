@@ -18,13 +18,13 @@
 [[ -n "${_AGENTIC_SETTINGS_LOADED:-}" ]] && return 0
 _AGENTIC_SETTINGS_LOADED=1
 
-# Resolve paths relative to the script sourcing us
+# Resolve paths relative to the script sourcing us (allow env overrides for testing)
 _SETTINGS_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 _SETTINGS_AGENTIC_DIR="$(cd "$_SETTINGS_LIB_DIR/.." && pwd)"
-_SETTINGS_ROOT_DIR="$(cd "$_SETTINGS_AGENTIC_DIR/.." && pwd)"
-_SETTINGS_PROFILES_CONF="$_SETTINGS_AGENTIC_DIR/presets/profiles.conf"
-_SETTINGS_CONSTRAINTS_CONF="$_SETTINGS_AGENTIC_DIR/presets/constraints.conf"
-_SETTINGS_STACK_FILE="$_SETTINGS_ROOT_DIR/STACK.md"
+_SETTINGS_ROOT_DIR="${_SETTINGS_ROOT_DIR:-$(cd "$_SETTINGS_AGENTIC_DIR/.." && pwd)}"
+_SETTINGS_PROFILES_CONF="${_SETTINGS_PROFILES_CONF:-$_SETTINGS_AGENTIC_DIR/presets/profiles.conf}"
+_SETTINGS_CONSTRAINTS_CONF="${_SETTINGS_CONSTRAINTS_CONF:-$_SETTINGS_AGENTIC_DIR/presets/constraints.conf}"
+_SETTINGS_STACK_FILE="${_SETTINGS_STACK_FILE:-$_SETTINGS_ROOT_DIR/STACK.md}"
 
 # Cache for the ## Settings section (extracted once per invocation)
 _SETTINGS_SECTION_CACHE=""
