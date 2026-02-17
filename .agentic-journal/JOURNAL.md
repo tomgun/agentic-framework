@@ -572,6 +572,14 @@
 **Blockers**: None
 
 
+### Session: 2026-02-18 00:25 - F-0133 Durable Plan Artifacts
+
+**Accomplished**:
+- Added ag plan --save command, plan-save rule to CLAUDE.md template and agent guidelines. Fixes I-0003.
+
+**Next steps**:
+- Next pending tasks (#6, #7, #11)
+
 ### Session: 2026-02-18 00:28 - Skill routing + review-after-PR
 
 **Accomplished**:

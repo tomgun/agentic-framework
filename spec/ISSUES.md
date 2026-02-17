@@ -12,9 +12,9 @@
 
 | Status | Count |
 |--------|-------|
-| Open | 3 |
+| Open | 2 |
 | In Progress | 0 |
-| Fixed | 2 |
+| Fixed | 3 |
 | Won't Fix | 0 |
 | **Total** | 5 |
 
@@ -183,11 +183,11 @@ Plan mode and session continuation are blind spots in the trigger-word enforceme
 
 ## I-0003: Plan mode plan files are session-scoped, not durable framework artifacts
 
-**Status**: open
+**Status**: fixed
 **Priority**: medium
 **Severity**: minor
 **Found**: 2026-02-17
-**Fixed**:
+**Fixed**: 2026-02-16
 
 **Description**:
 Plan mode writes plans to `.claude/plans/` which is tool-specific (Claude Code) and session-scoped. These plans are not committed to the repo, not visible to other agents/tools, and can be lost when context compresses or sessions end.

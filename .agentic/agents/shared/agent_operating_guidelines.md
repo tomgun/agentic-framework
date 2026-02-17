@@ -31,6 +31,8 @@ Profiles set default bundles. Override any setting: `ag set <key> <value>` | Vie
 **Ask first**: Add dependencies, change architecture, delete files, modify APIs, large refactors.
 **Never**: Commit without approval, push to main, modify secrets, skip acceptance criteria, fabricate.
 
+**Plans**: Save approved plans to `.agentic-journal/plans/F-XXXX-plan.md` (durable, git-tracked). Tool-specific plan locations (`.claude/plans/`) are session-scoped.
+
 ---
 
 ## Guidelines Modules

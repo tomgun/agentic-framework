@@ -2062,6 +2062,20 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ---
 
+## F-0133: Durable Plan Artifacts
+
+**Status**: planned
+**Priority**: medium
+**Added**: 2026-02-16
+
+**Description**: When plans are created (via `ag plan` or native tool plan mode), save them to `.agentic-journal/plans/` as durable, git-trackable artifacts. Fixes I-0003 where plans in `.claude/plans/` are tool-specific and session-scoped.
+
+**Dependencies**: F-0132 (Spec-First Gate)
+
+**Acceptance**: See `spec/acceptance/F-0133.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
