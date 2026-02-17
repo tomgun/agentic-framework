@@ -25,6 +25,7 @@ Small batch development: When user asks for something large ("entire", "full", "
 
 Rules:
 - **PR by default**: Create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to HUMAN_NEEDED.md for review tracking, then offer: "Want me to run `/review` on this PR?"
+- **Plans are durable**: After plan approval (plan mode or otherwise), save to `.agentic-journal/plans/F-XXXX-plan.md`. Use `ag plan --save <file> F-XXXX` or write directly. Plans in `.claude/plans/` are session-scoped and will be lost.
 - Never auto-commit. Show changes to human first.
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later).
