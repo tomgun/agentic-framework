@@ -8,6 +8,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
+# Source shared settings library
+source "$SCRIPT_DIR/../lib/settings.sh"
+
 # Colors (disabled if not TTY)
 if [ -t 1 ]; then
     RED='\033[0;31m'
@@ -21,28 +24,8 @@ else
     RED='' GREEN='' YELLOW='' BLUE='' BOLD='' DIM='' NC=''
 fi
 
-# Detect profile from STACK.md or directory structure
-get_profile() {
-    local stack_file="$ROOT_DIR/STACK.md"
-    local raw=""
-    if [ -f "$stack_file" ]; then
-        raw=$(grep -i "Profile:" "$stack_file" 2>/dev/null | head -1 | sed 's/.*Profile:[[:space:]]*//' | tr -d ' ')
-    fi
-    case "$raw" in
-        discovery) echo "discovery" ;;
-        formal) echo "formal" ;;
-        *)
-            # Infer from directory structure
-            if [ -d "$ROOT_DIR/spec" ]; then
-                echo "formal"
-            else
-                echo "discovery"
-            fi
-            ;;
-    esac
-}
-
-PROFILE=$(get_profile)
+# Profile resolved via settings.sh (sourced above)
+PROFILE=$(get_setting "profile" "discovery")
 
 # Check if framework is installed but not initialized
 check_initialization() {
@@ -124,9 +107,11 @@ show_init_warning() {
 }
 
 show_help() {
-    if [ "$PROFILE" = "discovery" ]; then
+    local ft
+    ft=$(get_setting "feature_tracking" "no")
+    if [ "$ft" = "no" ]; then
         cat << 'EOF'
-ag - Agentic Framework Gateway (Discovery Profile)
+ag - Agentic Framework Gateway
 
 USAGE:
     ag <command> [options]
@@ -137,6 +122,7 @@ COMMANDS:
     work "description"  Start WIP tracking for a task
     commit              Run all pre-commit gates
     done                Task complete validation
+    set [key] [value]   View/change settings (--show, --validate, --migrate)
     hooks <sub>         Manage git hooks (install|status|disable)
     approve-onboarding  Review/approve auto-discovered proposals
     trace [options]     Spec-code traceability (drift + coverage)
@@ -163,11 +149,11 @@ EXAMPLES:
     ag test llm --critical      # Run critical tests only
     ag tools                    # Discover available tools
 
-Discovery profile: No formal feature tracking. Use STATUS.md for focus.
+No formal feature tracking. Use STATUS.md for focus.
 EOF
     else
         cat << 'EOF'
-ag - Agentic Framework Gateway (Formal Profile)
+ag - Agentic Framework Gateway (Feature Tracking)
 
 USAGE:
     ag <command> [options]
@@ -180,6 +166,7 @@ COMMANDS:
     specs               Systematic brownfield spec generation by domain
     commit              Run all pre-commit gates
     done [F-XXXX]       Feature complete validation
+    set [key] [value]   View/change settings (--show, --validate, --migrate)
     hooks <sub>         Manage git hooks (install|status|disable)
     approve-onboarding  Review/approve auto-discovered proposals
     trace [options]     Spec-code traceability (drift + coverage)
@@ -214,7 +201,7 @@ EXAMPLES:
     ag sync --check             # Dry run: detect only
     ag verify --full            # Full verification
 
-Formal profile: Formal feature tracking with acceptance criteria.
+Feature tracking with acceptance criteria.
 EOF
     fi
 }
@@ -338,7 +325,9 @@ cmd_start() {
     echo -e "${DIM}Tip: ${tips[$tip_index]}${NC}"
 
     echo ""
-    if [ "$PROFILE" = "discovery" ]; then
+    local ft
+    ft=$(get_setting "feature_tracking" "no")
+    if [ "$ft" = "no" ]; then
         echo -e "${BOLD}Ready to work. Run 'ag work \"description\"' to start a task.${NC}"
     else
         echo -e "${BOLD}Ready to work. Run 'ag implement F-XXXX' to start a feature.${NC}"
@@ -356,16 +345,18 @@ cmd_work() {
         exit 1
     fi
 
-    # Formal: hard block — require feature ID with acceptance criteria
-    if [ "$PROFILE" = "formal" ]; then
-        echo -e "${RED}BLOCKED: Formal profile requires a feature ID with acceptance criteria.${NC}"
+    # Feature tracking: hard block — require feature ID with acceptance criteria
+    local ft
+    ft=$(get_setting "feature_tracking" "no")
+    if [ "$ft" = "yes" ]; then
+        echo -e "${RED}BLOCKED: Feature tracking is enabled — requires a feature ID with acceptance criteria.${NC}"
         echo ""
         echo "To start:"
         echo "  1. Add feature to spec/FEATURES.md (next available F-XXXX)"
         echo "  2. Create spec/acceptance/F-XXXX.md with acceptance criteria"
         echo "  3. Run: ag implement F-XXXX"
         echo ""
-        echo "Discovery profile users: ag work is available without feature IDs."
+        echo "Disable feature_tracking to use ag work without feature IDs."
         exit 1
     fi
 
@@ -386,21 +377,11 @@ cmd_work() {
     echo -e "${BLUE}   What would success look like? What should the user be able to do?${NC}"
 }
 
-# Get plan-review config from STACK.md
+# get_plan_review_config is now a thin wrapper around get_setting
 get_plan_review_config() {
-    local stack_file="$ROOT_DIR/STACK.md"
     local key="$1"
     local default="$2"
-
-    if [ -f "$stack_file" ]; then
-        local value
-        value=$(grep -E "^-?\s*${key}:" "$stack_file" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | tr -d ' ')
-        if [ -n "$value" ]; then
-            echo "$value"
-            return
-        fi
-    fi
-    echo "$default"
+    get_setting "$key" "$default"
 }
 
 # Plan command - create plan with iterative review
@@ -413,10 +394,12 @@ cmd_plan() {
         no_review=true
     fi
 
-    # Check profile
-    if [ "$PROFILE" = "discovery" ]; then
-        echo -e "${YELLOW}Discovery profile detected - no feature IDs.${NC}"
-        echo "Planning works best with Formal profile for formal specs."
+    # Check feature tracking
+    local ft
+    ft=$(get_setting "feature_tracking" "no")
+    if [ "$ft" = "no" ]; then
+        echo -e "${YELLOW}Feature tracking is off — no feature IDs.${NC}"
+        echo "Enable with: ag set feature_tracking yes"
         echo "You can still create informal plans in STATUS.md."
         exit 1
     fi
@@ -529,11 +512,13 @@ cmd_plan() {
 cmd_implement() {
     local feature_id="${1:-}"
 
-    # Check profile
-    if [ "$PROFILE" = "discovery" ]; then
-        echo -e "${YELLOW}Discovery profile detected - no feature IDs.${NC}"
+    # Check feature tracking
+    local ft
+    ft=$(get_setting "feature_tracking" "no")
+    if [ "$ft" = "no" ]; then
+        echo -e "${YELLOW}Feature tracking is off — no feature IDs.${NC}"
         echo "Use: ag work \"description\" instead"
-        echo "Or switch to Formal profile for formal feature tracking."
+        echo "Enable with: ag set feature_tracking yes"
         exit 1
     fi
 
@@ -645,18 +630,18 @@ cmd_implement() {
 
 # Commit command - pre-commit gates (profile-aware)
 cmd_commit() {
-    echo -e "${BOLD}=== Pre-Commit Gates ($PROFILE) ===${NC}"
+    echo -e "${BOLD}=== Pre-Commit Gates ===${NC}"
     echo ""
 
     # 1. Check WIP exists
+    local wip_mode
+    wip_mode=$(get_setting "wip_before_commit" "warning")
     if [ -f "$ROOT_DIR/.agentic-state/WIP.md" ]; then
-        if [ "$PROFILE" = "discovery" ]; then
-            # Discovery mode: WIP is a warning, not a blocker (exploratory work)
+        if [ "$wip_mode" = "warning" ]; then
             echo -e "${YELLOW}WARNING: .agentic-state/WIP.md exists${NC}"
             echo "  Consider completing WIP: bash .agentic/tools/wip.sh complete"
             echo ""
         else
-            # Formal mode: WIP is a blocker (formal tracking)
             echo -e "${RED}BLOCKED: .agentic-state/WIP.md exists${NC}"
             echo "  Work-in-progress must be completed before committing."
             echo "  Run: bash .agentic/tools/wip.sh complete"
@@ -679,11 +664,12 @@ cmd_commit() {
         echo -e "${GREEN}Untracked check: PASS${NC}"
     fi
 
-    # 3. Run doctor pre-commit checks (Discovery mode is more lenient)
+    # 3. Run doctor pre-commit checks
+    local pcc
+    pcc=$(get_setting "pre_commit_checks" "fast")
     echo ""
-    if [ "$PROFILE" = "discovery" ]; then
-        echo "Running basic checks (Discovery mode - lighter gates)..."
-        # Discovery mode: just check for basic issues, don't block on spec stuff
+    if [ "$pcc" = "fast" ] || [ "$pcc" = "off" ]; then
+        echo "Running basic checks (lightweight gates)..."
         bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null || true
         echo ""
         echo ""
@@ -691,7 +677,7 @@ cmd_commit() {
         echo "   Have you updated JOURNAL.md?  (bash .agentic/tools/journal.sh ...)"
         echo "   Have you updated STATUS.md?   (bash .agentic/tools/status.sh ...)"
         echo ""
-        echo -e "${GREEN}Discovery mode: Ready to commit${NC}"
+        echo -e "${GREEN}Ready to commit${NC}"
         echo "  git add <files>"
         echo "  git commit -m \"description\""
     else
@@ -736,10 +722,12 @@ cmd_commit() {
 cmd_done() {
     local feature_id="${1:-}"
 
-    if [ "$PROFILE" = "discovery" ]; then
+    local ft
+    ft=$(get_setting "feature_tracking" "no")
+    if [ "$ft" = "no" ]; then
         echo -e "${BOLD}=== Task Complete Check ===${NC}"
         echo ""
-        echo -e "${BOLD}Definition of Done (Discovery):${NC}"
+        echo -e "${BOLD}Definition of Done:${NC}"
         echo "  [ ] Task completed as described"
         echo "  [ ] Tests written and passing (if applicable)"
         echo "  [ ] STATUS.md updated"
@@ -749,7 +737,7 @@ cmd_done() {
         if bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null; then
             echo -e "${GREEN}✓${NC} Quick health check passed"
         else
-            echo -e "${YELLOW}⚠ Quick health check found issues (non-blocking for Discovery profile)${NC}"
+            echo -e "${YELLOW}⚠ Quick health check found issues (non-blocking)${NC}"
         fi
         echo ""
         # Check if WIP is complete
@@ -1182,7 +1170,7 @@ cmd_init() {
 
 cmd_status() {
     echo -e "${BOLD}=== Project Status ===${NC}"
-    echo "Profile: $PROFILE"
+    echo "Profile: $(get_setting profile discovery)"
     echo ""
 
     # Verification status
@@ -1598,10 +1586,13 @@ cmd_test_llm() {
 cmd_specs() {
     local arg="${1:-}"
 
-    # Check profile
-    if [ "$PROFILE" != "formal" ]; then
-        echo -e "${RED}Error: ag specs requires Formal profile${NC}"
-        echo "FEATURES.md tracking needs Formal profile. Update STACK.md Profile: formal"
+    # Check feature tracking and spec directory
+    local ft sd
+    ft=$(get_setting "feature_tracking" "no")
+    sd=$(get_setting "spec_directory" "no")
+    if [ "$ft" = "no" ] || [ "$sd" = "no" ]; then
+        echo -e "${RED}Error: ag specs requires feature_tracking and spec_directory${NC}"
+        echo "Enable with: ag set feature_tracking yes && ag set spec_directory yes"
         exit 1
     fi
 
@@ -1766,6 +1757,242 @@ _specs_status() {
     grep -E "^- \[.\]" "$plan_file" 2>/dev/null || echo "  (no domains listed)"
 }
 
+# Set command — manage settings
+cmd_set() {
+    local arg1="${1:-}"
+    local arg2="${2:-}"
+
+    case "$arg1" in
+        --show|"")
+            echo -e "${BOLD}=== Resolved Settings ===${NC}"
+            echo ""
+            show_all_settings
+            echo ""
+            # Constraint check
+            local violations
+            violations=$(validate_constraints 2>&1)
+            if [ -n "$violations" ]; then
+                echo -e "${YELLOW}Constraint warnings:${NC}"
+                echo "$violations"
+            else
+                echo -e "${GREEN}All constraint rules satisfied.${NC}"
+            fi
+            ;;
+        --validate)
+            echo -e "${BOLD}=== Constraint Validation ===${NC}"
+            local violations
+            violations=$(validate_constraints 2>&1)
+            if [ -n "$violations" ]; then
+                echo -e "${RED}Violations:${NC}"
+                echo "$violations"
+                exit 1
+            else
+                echo -e "${GREEN}All constraints satisfied.${NC}"
+            fi
+            ;;
+        --migrate)
+            echo -e "${BOLD}=== Migrate Settings ===${NC}"
+            _settings_migrate
+            ;;
+        *)
+            # ag set <key> <value>
+            if [ -z "$arg2" ]; then
+                echo -e "${RED}Error: Value required${NC}"
+                echo "Usage: ag set <key> <value>"
+                echo "       ag set --show"
+                echo "       ag set --validate"
+                echo "       ag set --migrate"
+                exit 1
+            fi
+            _settings_set_value "$arg1" "$arg2"
+            ;;
+    esac
+}
+
+# Set a single setting value in STACK.md ## Settings section
+_settings_set_value() {
+    local key="$1"
+    local value="$2"
+    local stack_file="$ROOT_DIR/STACK.md"
+
+    # Validate key format (prevent regex injection)
+    if [[ ! "$key" =~ ^[a-z_][a-z0-9_]*$ ]]; then
+        echo -e "${RED}Error: Invalid setting key '$key' (must be lowercase letters, digits, underscores)${NC}"
+        exit 1
+    fi
+
+    # Validate values for enum settings
+    case "$key" in
+        profile)
+            if [[ ! "$value" =~ ^(discovery|formal)$ ]]; then
+                echo -e "${RED}Error: profile must be 'discovery' or 'formal', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        feature_tracking|plan_review_enabled|spec_directory)
+            if [[ ! "$value" =~ ^(yes|no)$ ]]; then
+                echo -e "${RED}Error: $key must be 'yes' or 'no', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        acceptance_criteria)
+            if [[ ! "$value" =~ ^(blocking|recommended|off)$ ]]; then
+                echo -e "${RED}Error: acceptance_criteria must be 'blocking', 'recommended', or 'off', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        wip_before_commit)
+            if [[ ! "$value" =~ ^(blocking|warning)$ ]]; then
+                echo -e "${RED}Error: wip_before_commit must be 'blocking' or 'warning', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        pre_commit_checks)
+            if [[ ! "$value" =~ ^(full|fast|off)$ ]]; then
+                echo -e "${RED}Error: pre_commit_checks must be 'full', 'fast', or 'off', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        git_workflow)
+            if [[ ! "$value" =~ ^(pull_request|direct)$ ]]; then
+                echo -e "${RED}Error: git_workflow must be 'pull_request' or 'direct', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        max_files_per_commit|max_added_lines|max_code_file_length)
+            if [[ ! "$value" =~ ^[0-9]+$ ]]; then
+                echo -e "${RED}Error: $key must be a positive integer, got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+    esac
+
+    if [ ! -f "$stack_file" ]; then
+        echo -e "${RED}Error: STACK.md not found${NC}"
+        exit 1
+    fi
+
+    # Ensure ## Settings section exists
+    if ! grep -q "^## Settings" "$stack_file" 2>/dev/null; then
+        _settings_create_section
+    fi
+
+    # Check if key already exists in ## Settings section
+    # We need to be careful to only match within the section
+    local in_section=0
+    local found=0
+    local tmpfile
+    tmpfile=$(mktemp)
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ "$in_section" -eq 0 ]]; then
+            echo "$line" >> "$tmpfile"
+            if [[ "$line" =~ ^##[[:space:]]+Settings ]]; then
+                in_section=1
+            fi
+        elif [[ "$line" =~ ^##[[:space:]]+[^#] ]]; then
+            # Exiting settings section
+            if [[ "$found" -eq 0 ]]; then
+                # Key not found in section, add it before next H2
+                echo "- ${key}: ${value}" >> "$tmpfile"
+                found=1
+            fi
+            in_section=0
+            echo "$line" >> "$tmpfile"
+        else
+            # Inside settings section
+            if [[ "$line" =~ ^[[:space:]]*-[[:space:]]*${key}: ]]; then
+                echo "- ${key}: ${value}" >> "$tmpfile"
+                found=1
+            else
+                echo "$line" >> "$tmpfile"
+            fi
+        fi
+    done < "$stack_file"
+
+    # If still in section at EOF and not found, append
+    if [[ "$found" -eq 0 ]]; then
+        echo "- ${key}: ${value}" >> "$tmpfile"
+    fi
+
+    mv "$tmpfile" "$stack_file"
+
+    # Invalidate caches
+    _SETTINGS_SECTION_EXTRACTED=0
+    _SETTINGS_SECTION_CACHE=""
+    _SETTINGS_PROFILE_RESOLVED=0
+    _SETTINGS_PROFILE_CACHE=""
+
+    echo -e "${GREEN}Set ${key} = ${value}${NC}"
+
+    # Validate constraints after change
+    local violations
+    violations=$(validate_constraints 2>&1)
+    if [ -n "$violations" ]; then
+        echo ""
+        echo -e "${YELLOW}Warning — constraint issues:${NC}"
+        echo "$violations"
+    fi
+}
+
+# Create ## Settings section in STACK.md if missing
+_settings_create_section() {
+    local stack_file="$ROOT_DIR/STACK.md"
+    local profile
+    profile=$(_get_profile)
+
+    # Find a good insertion point — after ## Agentic framework section
+    local tmpfile
+    tmpfile=$(mktemp)
+    local inserted=0
+
+    while IFS= read -r line; do
+        echo "$line" >> "$tmpfile"
+        # Insert after the "- Source:" line in ## Agentic framework section
+        if [[ "$inserted" -eq 0 ]] && [[ "$line" =~ ^-[[:space:]]*Source: ]]; then
+            echo "" >> "$tmpfile"
+            echo "## Settings" >> "$tmpfile"
+            echo "<!-- Profile sets defaults. Override individual settings below. -->" >> "$tmpfile"
+            echo "- profile: ${profile}" >> "$tmpfile"
+            echo "" >> "$tmpfile"
+            inserted=1
+        fi
+    done < "$stack_file"
+
+    # Fallback: append at end
+    if [[ "$inserted" -eq 0 ]]; then
+        echo "" >> "$tmpfile"
+        echo "## Settings" >> "$tmpfile"
+        echo "<!-- Profile sets defaults. Override individual settings below. -->" >> "$tmpfile"
+        echo "- profile: ${profile}" >> "$tmpfile"
+        echo "" >> "$tmpfile"
+    fi
+
+    mv "$tmpfile" "$stack_file"
+}
+
+# Migrate: add ## Settings section with current values
+_settings_migrate() {
+    local stack_file="$ROOT_DIR/STACK.md"
+
+    if [ ! -f "$stack_file" ]; then
+        echo -e "${RED}Error: STACK.md not found${NC}"
+        exit 1
+    fi
+
+    if grep -q "^## Settings" "$stack_file" 2>/dev/null; then
+        echo -e "${YELLOW}## Settings section already exists in STACK.md${NC}"
+        echo "Run 'ag set --show' to see resolved settings."
+        return 0
+    fi
+
+    _settings_create_section
+    echo -e "${GREEN}Created ## Settings section in STACK.md${NC}"
+    echo ""
+    echo "Current resolved settings:"
+    show_all_settings
+}
+
 # Main command dispatch
 case "${1:-help}" in
     start)
@@ -1817,6 +2044,10 @@ case "${1:-help}" in
         ;;
     status)
         cmd_status
+        ;;
+    set)
+        shift
+        cmd_set "$@"
         ;;
     help|--help|-h)
         show_help

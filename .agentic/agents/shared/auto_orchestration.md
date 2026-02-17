@@ -118,7 +118,7 @@ See `.agentic/agents/context-manifests/` for all role definitions
 
 **Trigger**: User mentions implementing a feature (F-#### or general)
 
-**CRITICAL PRE-CONDITION (Formal)**: If the user describes a feature without a feature ID:
+**CRITICAL PRE-CONDITION (feature_tracking=yes)**: If the user describes a feature without a feature ID:
 1. Assign the next available F-XXXX ID in spec/FEATURES.md
 2. Create spec/acceptance/F-XXXX.md with acceptance criteria
 3. THEN proceed with the pipeline below
@@ -129,12 +129,12 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
 
 ```
 1. VERIFY ACCEPTANCE CRITERIA EXIST
-   ├─ Formal: Check spec/acceptance/F-####.md exists
-   ├─ Discovery: Check OVERVIEW.md has criteria
+   ├─ feature_tracking=yes: Check spec/acceptance/F-####.md exists
+   ├─ feature_tracking=no: Check OVERVIEW.md has criteria
    └─ If missing: CREATE THEM FIRST (rough is OK)
 
 2. CHECK PLAN-REVIEW SETTING
-   └─ Read STACK.md → plan_review_enabled (default: yes for Formal)
+   └─ Read STACK.md → plan_review_enabled (default: yes for formal profile)
    ├─ If yes: Run `ag plan F-####` first — tell user review loop is active
    │          and mention max iterations from plan_review_max_iterations
    └─ If no: Proceed directly (or run ag plan --no-review for simple plan)
@@ -153,8 +153,8 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
    └─ Smoke test: RUN THE APPLICATION
 
 6. UPDATE SPECS (MANDATORY - NOT OPTIONAL)
-   ├─ Formal: Update spec/FEATURES.md status
-   ├─ Discovery: Update OVERVIEW.md
+   ├─ feature_tracking=yes: Update spec/FEATURES.md status
+   ├─ feature_tracking=no: Update OVERVIEW.md
    └─ This is part of "done", not afterthought
 
 7. UPDATE DOCS
@@ -170,10 +170,10 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
 
 | Gate | Check | Block If |
 |------|-------|----------|
-| Acceptance Criteria | `spec/acceptance/F-####.md` (Formal) or criteria in any form (Discovery) | Formal: Missing = cannot proceed |
+| Acceptance Criteria | `spec/acceptance/F-####.md` (feature_tracking=yes) or criteria in any form (feature_tracking=no) | acceptance_criteria=blocking: Missing = cannot proceed |
 | Tests Pass | Run test suite | Any failure = cannot ship |
 | Smoke Test | Actually run the app | Strongly recommended — verify manually before shipping |
-| Specs Updated | FEATURES.md and STATUS.md current | Stale = cannot commit (enforced by pre-commit-check.sh for Formal) |
+| Specs Updated | FEATURES.md and STATUS.md current | Stale = cannot commit (enforced by pre-commit-check.sh when feature_tracking=yes) |
 | No Untracked Files | `check-untracked.sh` clean | Untracked = warn before commit |
 
 †Smoke testing and anti-hallucination are behavioral principles reinforced by memory seed and LLM tests. They cannot be verified by scripts.
@@ -396,16 +396,18 @@ These are YOUR responsibility as an agent following this framework.
 
 *(Moved from instruction files — these are structurally enforced, not constitutional rules)*
 
-### Enforced Gates (Profile-Aware)
+### Enforced Gates (Settings-Driven)
 
-| Gate | Formal | Discovery |
-|------|--------|-----------|
-| Acceptance criteria | BLOCKS - `ag implement` requires spec/acceptance/F-XXXX.md | N/A - use `ag work` |
-| WIP before commit | BLOCKS - must complete WIP first | WARNING only |
-| Test execution | BLOCKS - tests must pass | BLOCKS - tests for changed files |
-| Complexity limits | BLOCKS - max files/lines/length | BLOCKS - same limits apply |
-| Pre-commit checks | BLOCKS - full validation | Light check, no block |
-| Feature status | BLOCKS - shipped needs acceptance | N/A |
+| Gate | Setting | Formal default | Discovery default |
+|------|---------|----------------|-------------------|
+| Acceptance criteria | `acceptance_criteria` | **blocking** | recommended |
+| WIP before commit | `wip_before_commit` | **blocking** | warning |
+| Test execution | (always enforced) | tests must pass | tests for changed files |
+| Complexity limits | `max_files_per_commit` etc. | 10/500/500 | 15/1000/1000 |
+| Pre-commit checks | `pre_commit_checks` | **full** | fast |
+| Feature status | `feature_tracking` | **yes** (shipped needs acceptance) | no |
+
+Override any setting: `ag set <key> <value>` | View resolved settings: `ag set --show`
 
 Escape hatches (feature branches only): SKIP_TESTS=1 or SKIP_COMPLEXITY=1
 

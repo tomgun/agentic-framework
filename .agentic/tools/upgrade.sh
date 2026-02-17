@@ -152,6 +152,8 @@ DIRS_TO_REPLACE=(
   "prompts"
   "schemas"
   "token_efficiency"
+  "lib"
+  "presets"
 )
 
 FILES_TO_REPLACE=(
@@ -265,14 +267,20 @@ echo ""
 echo -e "${BLUE}[6/7] Checking STATUS.md migration${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Detect profile
+# Detect profile using settings library (copied in step 5)
 PROFILE="discovery"
-if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
-  PROFILE_LINE=$(grep -E "^\s*-\s*Profile:" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null || echo "")
-  case "$PROFILE_LINE" in
-    *formal*) PROFILE="formal" ;;
-    *discovery*) PROFILE="discovery" ;;
-  esac
+if [[ -f "$TARGET_PROJECT_DIR/.agentic/lib/settings.sh" ]]; then
+  source "$TARGET_PROJECT_DIR/.agentic/lib/settings.sh"
+  PROFILE="$(get_setting "profile" "discovery")"
+else
+  # Fallback for upgrading from pre-settings versions
+  if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+    PROFILE_LINE=$(grep -E "^\s*-\s*[Pp]rofile:" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null || echo "")
+    case "$PROFILE_LINE" in
+      *formal*) PROFILE="formal" ;;
+      *discovery*) PROFILE="discovery" ;;
+    esac
+  fi
 fi
 
 # Check if STATUS.md exists
@@ -369,6 +377,26 @@ COMPLEXITY_EOF
       echo -e "  ${GREEN}✓${NC} Updated $UPDATED_ACC acceptance file(s) with frontmatter"
     else
       echo -e "  ${GREEN}✓${NC} All acceptance files have frontmatter"
+    fi
+  fi
+
+  # Add ## Settings section to STACK.md if missing (v0.27.0+)
+  if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+    if ! grep -q "^## Settings" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null; then
+      echo "  Adding ## Settings section to STACK.md..."
+      # Determine current profile for preset defaults
+      SETTINGS_PROFILE="$PROFILE"
+      cat >> "$TARGET_PROJECT_DIR/STACK.md" <<SETTINGS_EOF
+
+## Settings
+<!-- Profile sets defaults. Override individual settings below. -->
+<!-- Run: ag set --show to see all resolved settings. -->
+- profile: ${SETTINGS_PROFILE}
+SETTINGS_EOF
+      echo -e "  ${GREEN}✓${NC} Added ## Settings section (profile: ${SETTINGS_PROFILE})"
+      echo "    Run 'ag set --show' to see all resolved settings"
+    else
+      echo -e "  ${GREEN}✓${NC} ## Settings section already exists"
     fi
   fi
 fi

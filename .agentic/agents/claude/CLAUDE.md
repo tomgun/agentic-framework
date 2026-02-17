@@ -19,7 +19,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
 | Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX` |
 
-Acceptance criteria: Formal requires spec/acceptance/F-####.md before coding | Discovery: define criteria (any form) before coding.
+Acceptance criteria: When `feature_tracking=yes` (formal profile): spec/acceptance/F-####.md required before coding | When `feature_tracking=no` (discovery): define criteria (any form) before coding. Override settings: `ag set <key> <value>`
 
 Small batch development: When user asks for something large ("entire", "full", "complete system"), STOP - TOO BIG for one task. Break into smaller pieces (3-5 files max each). Max 5-10 files per commit.
 

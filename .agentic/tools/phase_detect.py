@@ -9,31 +9,9 @@ import re
 import sys
 from pathlib import Path
 
-
-def _normalize_profile(raw: str) -> str:
-    """Validate profile value."""
-    val = raw.strip().lower()
-    if val in ("discovery", "formal"):
-        return val
-    return ""
-
-
-def read_profile(root: Path) -> str:
-    """Determine profile from STACK.md or infer from structure."""
-    stack = root / "STACK.md"
-    if stack.exists():
-        try:
-            md = stack.read_text(encoding="utf-8")
-            m = re.search(r"(?m)^\s*-\s*Profile:\s*([a-z+_-]+)\s*$", md)
-            if m:
-                normalized = _normalize_profile(m.group(1).strip())
-                if normalized:
-                    return normalized
-        except Exception:
-            pass
-    if (root / "spec").is_dir() or (root / "STATUS.md").is_file():
-        return "formal"
-    return "discovery"
+# Import shared settings library
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+from settings import get_setting
 
 
 def detect_phase(root: Path) -> str:
@@ -41,18 +19,18 @@ def detect_phase(root: Path) -> str:
     Detect current development phase.
 
     Returns one of:
-    - "discovery-mode": Discovery profile (no feature tracking)
+    - "no-feature-tracking": Feature tracking disabled (setting or profile)
     - "blocked": Has unresolved blockers in HUMAN_NEEDED.md
     - "start": No active work (no .agentic-state/WIP.md)
     - "planning": Feature started but no acceptance criteria
     - "implement": Has acceptance, implementing
     - "complete": Feature shipped, awaiting validation
     """
-    profile = read_profile(root)
+    ft = get_setting(root, "feature_tracking", "no")
 
-    # Discovery profile has no feature-based phases
-    if profile == "discovery":
-        return "discovery-mode"
+    # No feature tracking = no feature-based phases
+    if ft != "yes":
+        return "no-feature-tracking"
 
     # Check for blockers first
     human_needed = root / "HUMAN_NEEDED.md"

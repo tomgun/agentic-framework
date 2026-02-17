@@ -26,13 +26,21 @@ if [[ ! -d ".agentic" ]]; then
   exit 1
 fi
 
-# Check current profile (no PCRE, portable)
-CURRENT_PROFILE=$(
-  grep -E '^[[:space:]]*-[[:space:]]*Profile:' STACK.md 2>/dev/null \
-    | head -1 \
-    | sed -E 's/.*Profile:[[:space:]]*([^[:space:]]+).*/\1/' \
-    || echo "unknown"
-)
+# Check current profile via settings library
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CURRENT_PROFILE="unknown"
+if [[ -f "$SCRIPT_DIR/../lib/settings.sh" ]]; then
+  source "$SCRIPT_DIR/../lib/settings.sh"
+  CURRENT_PROFILE="$(get_setting "profile" "discovery")"
+else
+  # Fallback for pre-settings framework
+  CURRENT_PROFILE=$(
+    grep -iE '^[[:space:]]*-[[:space:]]*[Pp]rofile:' STACK.md 2>/dev/null \
+      | head -1 \
+      | sed -E 's/.*[Pp]rofile:[[:space:]]*([^[:space:]]+).*/\1/' \
+      || echo "unknown"
+  )
+fi
 
 if [[ "$CURRENT_PROFILE" == "formal" ]]; then
   echo -e "${YELLOW}⚠ Formal profile is already enabled!${NC}"
@@ -137,16 +145,15 @@ fi
 
 # Note: CONTEXT_PACK.md and HUMAN_NEEDED.md should already exist from Core profile
 
-# Update STACK.md profile (portable; tolerate comments)
-if grep -qE '^[[:space:]]*-[[:space:]]*Profile:' STACK.md; then
-  sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*Profile:[[:space:]]*).*/\\1formal  # Updated: $(date +%Y-%m-%d)/" STACK.md
-  rm STACK.md.bak 2>/dev/null || true
-  echo -e "${GREEN}✓ Updated STACK.md (Profile: formal)${NC}"
-else
-  # Insert Profile line after Version line in "## Agentic framework"
-  perl -0777 -i -pe "s/(## Agentic framework\\n- Version:[^\\n]*\\n)/\\1- Profile: formal  \\# Updated: $(date +%Y-%m-%d)\\n/" STACK.md || true
-  echo -e "${GREEN}✓ Updated STACK.md (added Profile: formal)${NC}"
-fi
+# Update profile via ag set (creates ## Settings section if needed)
+bash "$SCRIPT_DIR/ag.sh" set profile formal 2>/dev/null || {
+  # Fallback: direct STACK.md edit
+  if grep -qE '^[[:space:]]*-[[:space:]]*[Pp]rofile:' STACK.md; then
+    sed -i.bak -E "s/^([[:space:]]*-[[:space:]]*[Pp]rofile:[[:space:]]*).*/\\1formal/" STACK.md
+    rm STACK.md.bak 2>/dev/null || true
+  fi
+}
+echo -e "${GREEN}✓ Updated STACK.md (profile: formal)${NC}"
 
 echo ""
 echo "╔════════════════════════════════════════════════════════════════╗"

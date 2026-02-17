@@ -5,14 +5,19 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Source settings library if available
+if [[ -f "$SCRIPT_DIR/../lib/settings.sh" ]]; then
+  source "$SCRIPT_DIR/../lib/settings.sh"
+fi
+
 # Defaults
-PROFILE="discovery"
+PROFILE=""
 ROOT_DIR="$(pwd)"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --profile)
-      PROFILE="${2:-discovery}"
+      PROFILE="${2:-}"
       shift 2
       ;;
     --root)
@@ -20,7 +25,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -h|--help)
-      echo "Usage: bash .agentic/tools/discover.sh --profile discovery|formal [--root DIR]"
+      echo "Usage: bash .agentic/tools/discover.sh [--profile discovery|formal] [--root DIR]"
       echo "Analyzes existing codebase and generates onboarding proposals."
       exit 0
       ;;
@@ -30,6 +35,15 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+# Resolve profile from settings if not explicitly provided
+if [[ -z "$PROFILE" ]]; then
+  if type get_setting &>/dev/null; then
+    PROFILE="$(get_setting "profile" "discovery")"
+  else
+    PROFILE="discovery"
+  fi
+fi
 
 # Check Python 3 availability
 if ! command -v python3 &>/dev/null; then
