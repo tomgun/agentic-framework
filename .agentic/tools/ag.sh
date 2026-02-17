@@ -6,7 +6,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+ROOT_DIR="${ROOT_DIR:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 
 # Source shared settings library
 source "$SCRIPT_DIR/../lib/settings.sh"
@@ -419,6 +419,23 @@ cmd_plan() {
     echo -e "${BOLD}=== Plan: $feature_id ===${NC}"
     echo ""
 
+    # 0. Check feature exists in FEATURES.md (BLOCKING)
+    if [ "${SKIP_SPEC_CHECK:-}" = "1" ]; then
+        echo -e "${YELLOW}⚠ SKIP_SPEC_CHECK: Bypassing spec-first gate${NC}"
+    else
+        local features_file="$ROOT_DIR/spec/FEATURES.md"
+        if [ -f "$features_file" ]; then
+            if grep -q "^## ${feature_id}:" "$features_file"; then
+                echo -e "${GREEN}Feature registered: YES${NC}"
+            else
+                echo -e "${RED}BLOCKED: ${feature_id} not found in FEATURES.md${NC}"
+                echo "  Add it first: add an entry to spec/FEATURES.md"
+                echo "  Or bypass: SKIP_SPEC_CHECK=1 ag plan $feature_id"
+                exit 1
+            fi
+        fi
+    fi
+
     # 1. Check acceptance criteria (advisory for plan, blocking for implement)
     local acc_file="$ROOT_DIR/spec/acceptance/${feature_id}.md"
     if [ ! -f "$acc_file" ]; then
@@ -573,29 +590,35 @@ cmd_implement() {
         fi
     fi
 
-    # 1. Check acceptance criteria exist
-    local acc_file="$ROOT_DIR/spec/acceptance/${feature_id}.md"
-    if [ ! -f "$acc_file" ]; then
-        echo -e "${RED}BLOCKED: No acceptance criteria${NC}"
-        echo "  Missing: spec/acceptance/${feature_id}.md"
-        echo ""
-        echo "Create acceptance criteria FIRST, then run this command again."
-        echo "Template: .agentic/spec/acceptance.template.md"
-        exit 1
-    fi
-
-    echo -e "${GREEN}Acceptance criteria: EXISTS${NC}"
-
-    # 2. Check if feature is in FEATURES.md
-    local features_file="$ROOT_DIR/spec/FEATURES.md"
-    if [ -f "$features_file" ]; then
-        if grep -q "^## ${feature_id}:" "$features_file"; then
-            echo -e "${GREEN}Feature registered: YES${NC}"
-            # Show feature name
-            grep "^## ${feature_id}:" "$features_file" | head -1
-        else
-            echo -e "${YELLOW}Feature not in FEATURES.md - add it first${NC}"
+    # 1. Spec-first gate (BLOCKING unless SKIP_SPEC_CHECK=1)
+    if [ "${SKIP_SPEC_CHECK:-}" = "1" ]; then
+        echo -e "${YELLOW}⚠ SKIP_SPEC_CHECK: Bypassing spec-first gate${NC}"
+    else
+        # 1a. Check feature exists in FEATURES.md
+        local features_file="$ROOT_DIR/spec/FEATURES.md"
+        if [ -f "$features_file" ]; then
+            if grep -q "^## ${feature_id}:" "$features_file"; then
+                echo -e "${GREEN}Feature registered: YES${NC}"
+            else
+                echo -e "${RED}BLOCKED: ${feature_id} not found in FEATURES.md${NC}"
+                echo "  Add it first: add an entry to spec/FEATURES.md"
+                echo "  Or bypass: SKIP_SPEC_CHECK=1 ag implement $feature_id"
+                exit 1
+            fi
         fi
+
+        # 1b. Check acceptance criteria exist
+        local acc_file="$ROOT_DIR/spec/acceptance/${feature_id}.md"
+        if [ ! -f "$acc_file" ]; then
+            echo -e "${RED}BLOCKED: No acceptance criteria${NC}"
+            echo "  Missing: spec/acceptance/${feature_id}.md"
+            echo ""
+            echo "Create acceptance criteria FIRST, then run this command again."
+            echo "  Template: .agentic/spec/acceptance.template.md"
+            echo "  Or bypass: SKIP_SPEC_CHECK=1 ag implement $feature_id"
+            exit 1
+        fi
+        echo -e "${GREEN}Acceptance criteria: EXISTS${NC}"
     fi
 
     # 3. Run planning phase check (BLOCKING)

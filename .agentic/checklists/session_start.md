@@ -249,18 +249,19 @@ This is a **suggestion**, not a block. The user may choose to work on something 
   - What worked/didn't work
   - Avoid repeating failed approaches
 
-## Profile-Specific Checks
+## Settings-Aware Checks
 
-- [ ] **Check profile** in `STACK.md` (`Profile:` field)
-  - Discovery profile → Simpler workflow
-  - Formal profile → Additional spec tracking
+- [ ] **Check settings** in `STACK.md` `## Settings` section
+  - `feature_tracking=yes` → Full spec tracking (feature IDs, acceptance criteria)
+  - `feature_tracking=no` → Lightweight workflow
 
 ## Conditional Checks
 
-- [ ] **If Formal profile**: Check for active feature
+- [ ] **If `feature_tracking=yes`**: Check for active feature
   - Look at `STATUS.md` → "Current focus"
   - Read relevant `spec/acceptance/F-####.md` if working on feature
   - Check `spec/FEATURES.md` for that feature's status
+  - **If in-progress work exists** (WIP.md or active branch): verify it has an F-XXXX in FEATURES.md with acceptance criteria. If missing, create them before continuing.
 
 - [ ] **If `pipeline_enabled: yes`**: Check for active pipeline
   - Look for `.agentic/pipeline/F-####-pipeline.md`

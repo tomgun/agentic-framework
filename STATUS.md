@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Settings-over-profiles docs & version bump (v0.27.0) (Updated: 2026-02-17 21:45 EET)
+- F-0132 spec-first gate shipped, working through task list (Updated: 2026-02-18 00:19 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)
