@@ -43,6 +43,13 @@ _No active items_
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
+### HN-0006: PR #32: Spec-first gate (F-0132)
+- **Type**: review
+- **Added**: 2026-02-18
+- **Context**: Programmatic gates for ag plan/implement — needs review before merge
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 <!-- Archive resolved items here with date and outcome -->
@@ -80,6 +87,14 @@ _No active items_
 - **Type**: review
 - **Added**: 2026-02-17
 - **Context**: https://github.com/tomgun/agentic-framework/pull/31 — 27 files, settings architecture replacing profile branching
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
+### HN-0006: PR #32: Spec-first gate (F-0132)
+- **Type**: review
+- **Added**: 2026-02-18
+- **Context**: Programmatic gates for ag plan/implement — needs review before merge
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 

@@ -389,8 +389,28 @@ cmd_plan() {
     local feature_id="${1:-}"
     local no_review=false
 
+    # Handle --save subcommand: ag plan --save <source-file> F-XXXX
+    if [ "$feature_id" = "--save" ]; then
+        local source_file="${2:-}"
+        local save_fid="${3:-}"
+        if [ -z "$source_file" ] || [ -z "$save_fid" ]; then
+            echo -e "${RED}Usage: ag plan --save <source-file> F-XXXX${NC}"
+            echo "  Copies a plan to .agentic-journal/plans/F-XXXX-plan.md"
+            exit 1
+        fi
+        if [ ! -f "$source_file" ]; then
+            echo -e "${RED}Error: Source file not found: $source_file${NC}"
+            exit 1
+        fi
+        local dest_dir="$ROOT_DIR/.agentic-journal/plans"
+        mkdir -p "$dest_dir"
+        cp "$source_file" "$dest_dir/${save_fid}-plan.md"
+        echo -e "${GREEN}Plan saved: $dest_dir/${save_fid}-plan.md${NC}"
+        return 0
+    fi
+
     # Parse options
-    if [ "$2" = "--no-review" ]; then
+    if [ "${2:-}" = "--no-review" ]; then
         no_review=true
     fi
 
