@@ -15,9 +15,9 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - profile: formal
 
 
-- max_files_per_commit: 30
-- max_added_lines: 2000
-- max_code_file_length: 2100
+- max_files_per_commit: 15
+- max_added_lines: 1000
+- max_code_file_length: 1200
 ## Summary
 - What are we building: AI-assisted development framework with spec-driven methodology
 - Primary platform: CLI tools / documentation
