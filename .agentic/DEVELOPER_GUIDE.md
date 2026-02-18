@@ -84,6 +84,7 @@ The framework ships many scripts. You'll rarely run them directly — they exist
 bash .agentic/tools/doctor.sh --full    # Comprehensive verification
 bash .agentic/tools/wip.sh check        # Check interrupted work
 bash .agentic/tools/journal.sh ...      # Log to JOURNAL.md
+bash .agentic/tools/nfr.sh list         # List NFRs with status
 ag tools                                # Discover all available tools
 ```
 
@@ -643,6 +644,7 @@ Validation issues:
 - Everything from `doctor.sh` (quick mode)
 - Cross-references between all spec files
 - Broken links to features/NFRs/ADRs
+- NFR content validation (non-placeholder fields, valid status/category, test file paths)
 - Missing acceptance files
 
 ```bash

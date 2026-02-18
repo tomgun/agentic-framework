@@ -574,6 +574,11 @@ def parse_nfr_ids(md: str) -> set[str]:
     return set(nfr_header_re.findall(md))
 
 
+
+# NFR content validation (extracted to nfr_validator.py for complexity limits)
+from nfr_validator import parse_nfr_entries, validate_nfr_content, _is_placeholder, _strip_trailing_comment
+
+
 def validate_features(root: Path) -> list[str]:
     """Validate FEATURES.md structure and cross-references."""
     issues = []
@@ -1076,6 +1081,9 @@ def main() -> int:
 
         nfr_issues = validate_nfr_refs(root)
         validation_issues.extend(nfr_issues)
+
+        nfr_content_issues = validate_nfr_content(root)
+        validation_issues.extend(nfr_content_issues)
     else:
         print("\nNote: Feature tracking off — formal validations (spec/FEATURES.md, acceptance files) skipped.")
 

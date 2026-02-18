@@ -651,3 +651,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 14:03 - NFR content validation
+
+**Why**: NFR.md fields were theater - nothing validated content. Now doctor.py validates categories, status enums, test file paths, and placeholder detection.
+
+**Accomplished**:
+- Implemented validate_nfr_content() in doctor.py, nfr.sh script, framework spec/NFR.md with 2 real NFRs, 15 pytest tests, schema tech debt note, DEVELOPER_GUIDE updates
+
+**Next steps**:
+- Show changes to human, commit, create PR
+
+**Blockers**: None
+
