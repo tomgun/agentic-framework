@@ -20,6 +20,14 @@ Never write implementation code before acceptance criteria exist. This is a stru
 
 If they say "implement entire", "full system", "complete", or describe something that would touch >10 files: **STOP — TOO BIG.** Break into 3-5 smaller tasks first.
 
+## After exiting plan mode
+
+When you exit the tool's native plan mode and the plan is approved:
+
+1. Save the plan to `.agentic-journal/plans/F-XXXX-plan.md` using `ag plan --save <plan-file> F-XXXX` (tool-specific plan locations are session-scoped and will be lost)
+2. Check `plan_review_enabled` in STACK.md — if `yes`, invoke `/review` on the saved plan file
+3. Only proceed to implementation after the review completes (or if review is disabled)
+
 ## When the user reports a bug or wants a fix
 
 If the user's intent is to fix, debug, repair, resolve, investigate, troubleshoot, or address a bug/issue/error:
