@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://agentic-framework.dev/schemas/nfr.schema.json",
+  "$comment": "This schema defines a JSON/YAML structure that does not match the actual markdown format used by NFR.md (see NFR.template.md). Schema alignment is future work.",
   "title": "Non-Functional Requirement",
   "description": "A non-functional requirement specification",
   "type": "object",

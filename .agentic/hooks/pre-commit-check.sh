@@ -18,7 +18,8 @@
 #   8.  Untracked files warning (new files not git added)
 #   9.  LLM behavioral test status (advisory, framework dev only)
 #   10. Agent instruction file size limits (prevents context bloat)
-#   3c. FEATURES.md updated when spec files changed (BLOCKING, Formal only)
+#   3c. FEATURES.md updated when feature spec files changed (BLOCKING, Formal only)
+#   3d. NFR.md updated when NFR spec files changed (BLOCKING, Formal only)
 #   11. Branch policy for PR workflow (blocks commit to main if pull_request mode)
 #
 # Escape hatches (use sparingly, blocked on main/master):
@@ -278,42 +279,77 @@ if [[ -f "STATUS.md" ]]; then
   fi
 fi
 
-# Check 3c: FEATURES.md updated when spec files changed (Formal, BLOCKING)
-if [[ -f "spec/FEATURES.md" ]]; then
-  SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep "^spec/" || true)
-  if [[ -n "$SPEC_STAGED" ]]; then
-    echo ""
-    echo "[3c/12] Checking FEATURES.md freshness (spec files staged)..."
+# Check 3c: FEATURES.md updated when feature spec files changed (Formal, BLOCKING)
+FEATURE_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep "^spec/" | grep -v "^spec/NFR\.md$" | grep -v "^spec/acceptance/NFR-" | grep -v "^$" || true)
+if [[ -n "$FEATURE_SPEC_STAGED" ]] && [[ -f "spec/FEATURES.md" ]]; then
+  echo ""
+  echo "[3c/12] Checking FEATURES.md freshness (feature spec files staged)..."
 
-    if [[ -n "${SKIP_STALENESS:-}" ]]; then
-      echo "  ⚠ Skipped (SKIP_STALENESS set)"
+  if [[ -n "${SKIP_STALENESS:-}" ]]; then
+    echo "  ⚠ Skipped (SKIP_STALENESS set)"
+  else
+    # Check if FEATURES.md is also staged (being updated)
+    if git diff --cached --name-only 2>/dev/null | grep -q "FEATURES.md"; then
+      echo "✓ FEATURES.md is staged alongside spec changes"
     else
-      # Check if FEATURES.md is also staged (being updated)
-      if git diff --cached --name-only 2>/dev/null | grep -q "FEATURES.md"; then
-        echo "✓ FEATURES.md is staged alongside spec changes"
-      else
-        # Check mtime like JOURNAL/STATUS pattern
-        LAST_COMMIT_TIME=${LAST_COMMIT_TIME:-$(git log -1 --format=%ct 2>/dev/null || echo "")}
-        if [[ -n "$LAST_COMMIT_TIME" ]]; then
-          if command -v stat >/dev/null 2>&1; then
-            if [[ "$(uname)" == "Darwin" ]]; then
-              FEATURES_MTIME=$(stat -f %m "spec/FEATURES.md" 2>/dev/null || echo "0")
-            else
-              FEATURES_MTIME=$(stat -c %Y "spec/FEATURES.md" 2>/dev/null || echo "0")
-            fi
+      # Check mtime like JOURNAL/STATUS pattern
+      LAST_COMMIT_TIME=${LAST_COMMIT_TIME:-$(git log -1 --format=%ct 2>/dev/null || echo "")}
+      if [[ -n "$LAST_COMMIT_TIME" ]]; then
+        if command -v stat >/dev/null 2>&1; then
+          if [[ "$(uname)" == "Darwin" ]]; then
+            FEATURES_MTIME=$(stat -f %m "spec/FEATURES.md" 2>/dev/null || echo "0")
+          else
+            FEATURES_MTIME=$(stat -c %Y "spec/FEATURES.md" 2>/dev/null || echo "0")
+          fi
 
-            if [[ "$FEATURES_MTIME" -lt "$LAST_COMMIT_TIME" ]]; then
-              echo "❌ BLOCKED: FEATURES.md not updated but spec files are staged"
-              echo "   Staged spec files: $(echo $SPEC_STAGED | tr '\n' ' ')"
-              echo ""
-              echo "   Update with: bash .agentic/tools/feature.sh F-#### status <status>"
-              echo ""
-              echo "   To skip (feature branches only): SKIP_STALENESS=1 git commit ..."
-              echo ""
-              FAILURES=$((FAILURES + 1))
-            else
-              echo "✓ FEATURES.md updated since last commit"
-            fi
+          if [[ "$FEATURES_MTIME" -lt "$LAST_COMMIT_TIME" ]]; then
+            echo "❌ BLOCKED: FEATURES.md not updated but spec files are staged"
+            echo "   Staged spec files: $(echo $FEATURE_SPEC_STAGED | tr '\n' ' ')"
+            echo ""
+            echo "   Update with: bash .agentic/tools/feature.sh F-#### status <status>"
+            echo ""
+            echo "   To skip (feature branches only): SKIP_STALENESS=1 git commit ..."
+            echo ""
+            FAILURES=$((FAILURES + 1))
+          else
+            echo "✓ FEATURES.md updated since last commit"
+          fi
+        fi
+      fi
+    fi
+  fi
+fi
+
+# Check 3d: NFR.md updated when NFR spec files changed (Formal, BLOCKING)
+NFR_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^spec/(NFR\.md|acceptance/NFR-)" || true)
+if [[ -n "$NFR_SPEC_STAGED" ]] && [[ -f "spec/NFR.md" ]]; then
+  echo ""
+  echo "[3d/12] Checking NFR.md freshness (NFR spec files staged)..."
+
+  if [[ -n "${SKIP_STALENESS:-}" ]]; then
+    echo "  ⚠ Skipped (SKIP_STALENESS set)"
+  else
+    if git diff --cached --name-only 2>/dev/null | grep -q "^spec/NFR\.md$"; then
+      echo "✓ NFR.md is staged alongside NFR spec changes"
+    else
+      LAST_COMMIT_TIME=${LAST_COMMIT_TIME:-$(git log -1 --format=%ct 2>/dev/null || echo "")}
+      if [[ -n "$LAST_COMMIT_TIME" ]]; then
+        if command -v stat >/dev/null 2>&1; then
+          if [[ "$(uname)" == "Darwin" ]]; then
+            NFR_MTIME=$(stat -f %m "spec/NFR.md" 2>/dev/null || echo "0")
+          else
+            NFR_MTIME=$(stat -c %Y "spec/NFR.md" 2>/dev/null || echo "0")
+          fi
+
+          if [[ "$NFR_MTIME" -lt "$LAST_COMMIT_TIME" ]]; then
+            echo "❌ BLOCKED: NFR.md not updated but NFR spec files are staged"
+            echo "   Staged NFR files: $(echo $NFR_SPEC_STAGED | tr '\n' ' ')"
+            echo ""
+            echo "   To skip (feature branches only): SKIP_STALENESS=1 git commit ..."
+            echo ""
+            FAILURES=$((FAILURES + 1))
+          else
+            echo "✓ NFR.md updated since last commit"
           fi
         fi
       fi

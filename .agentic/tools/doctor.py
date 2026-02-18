@@ -14,6 +14,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from settings import get_setting
 
+# NFR content validation (extracted to nfr_validator.py for complexity limits)
+from nfr_validator import validate_nfr_content
+
 # Optional YAML support (graceful fallback if not installed)
 try:
     import yaml
@@ -574,6 +577,7 @@ def parse_nfr_ids(md: str) -> set[str]:
     return set(nfr_header_re.findall(md))
 
 
+
 def validate_features(root: Path) -> list[str]:
     """Validate FEATURES.md structure and cross-references."""
     issues = []
@@ -1076,6 +1080,9 @@ def main() -> int:
 
         nfr_issues = validate_nfr_refs(root)
         validation_issues.extend(nfr_issues)
+
+        nfr_content_issues = validate_nfr_content(root)
+        validation_issues.extend(nfr_content_issues)
     else:
         print("\nNote: Feature tracking off — formal validations (spec/FEATURES.md, acceptance files) skipped.")
 
