@@ -2080,9 +2080,10 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ## F-0134: DEVELOPER_GUIDE Rewrite — User-First Framing
 
-**Status**: planned
+**Status**: shipped
 **Priority**: high
 **Added**: 2026-02-18
+**Since**: v0.27.1
 
 **Description**: Thorough rewrite of `.agentic/DEVELOPER_GUIDE.md` to fix wrong audience framing. Currently tells users to "run `ag implement F-XXXX`" when they don't know feature numbers. Scripts should work behind the scenes (agent runs them naturally); user-facing guidance should describe workflows in human terms. Remove stale content, align with v0.27.0 settings-over-profiles architecture.
 
@@ -2104,6 +2105,6 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 25 | 2 | 2 | 29 |
-| **Total** | **97** | **3** | **2** | **103** |
+| Framework Infrastructure (F-0101+) | 26 | 2 | 1 | 29 |
+| **Total** | **98** | **3** | **1** | **103** |
 

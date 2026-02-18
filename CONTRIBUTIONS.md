@@ -235,27 +235,9 @@
 
 ---
 
-## v0.27.0 Contributions (2026-02-16)
+## v0.27.0–v0.27.1 Contributions (2026-02-16 – 2026-02-18)
 
-### Settings-Over-Profiles Architecture (F-0131)
-- Identified the all-or-nothing problem: users couldn't customize one behavior without switching their entire profile
-- Directed the architecture: profiles become presets that set bundles of defaults, all framework logic checks individual settings
-- Requested individual setting overrides via `ag set` command
-- Defined the resolution chain: explicit > profile preset > fallback default
-- Identified that settings documentation should live in DEVELOPER_GUIDE.md (not agent-facing workflows/)
-- Directed development ideas to be tracked in ISSUES.md rather than inline docs
-- Requested documentation of when settings take effect (script-enforced vs agent-interpreted)
-
-### Spec-First Gate & Durable Plans (F-0132, F-0133)
-- Caught missing F-XXXX / acceptance criteria post-implementation — led to I-0002 (plan mode bypasses spec-first workflow)
-- Identified I-0003: plans in `.claude/plans/` are session-scoped and get lost — need durable storage
-- Directed archival of 16 historical plans from `.claude/plans/` to `.agentic-journal/plans/`
-
-### Skill Routing & Developer Experience
-- Identified agent confusion between framework skills (`/review`) and Task tool agents — led to explicit routing hints in CLAUDE.md
-- Directed auto-suggest of `/review` after PR creation
-- Identified DEVELOPER_GUIDE.md audience problem: "Telling the user to 'run ag implement F-XXXX' when starting a new feature is really dumb" — led to F-0134 rewrite planning
-- Identified scattered TODO tracking problem (HUMAN_NEEDED, STATUS, ISSUES, FEATURES with no single inbox) — Task #12
+See detailed chronological entries below (Settings-Over-Profiles Architecture, DEVELOPER_GUIDE Rewrite, etc.)
 
 ---
 
