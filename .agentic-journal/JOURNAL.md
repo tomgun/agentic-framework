@@ -651,3 +651,64 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 14:03 - NFR content validation
+
+**Why**: NFR.md fields were theater - nothing validated content. Now doctor.py validates categories, status enums, test file paths, and placeholder detection.
+
+**Accomplished**:
+- Implemented validate_nfr_content() in doctor.py, nfr.sh script, framework spec/NFR.md with 2 real NFRs, 15 pytest tests, schema tech debt note, DEVELOPER_GUIDE updates
+
+**Next steps**:
+- Show changes to human, commit, create PR
+
+**Blockers**: None
+
+
+### Session: 2026-02-18 18:41 - NFR review fixes
+
+**Accomplished**:
+- Fixed import placement, nfr.sh error msg, pytest.skip, backtick test
+
+**Next steps**:
+- Push and merge PR #36
+
+**Blockers**: None
+
+
+### Session: 2026-02-18 18:50 - Version bump v0.27.2
+
+**Accomplished**:
+- CONTRIBUTIONS, CHANGELOG, VERSION, STACK.md, DEVELOPER_GUIDE footer updated
+
+**Next steps**:
+- Merge PR #36
+
+**Blockers**: None
+
+
+### Session: 2026-02-18 19:51 - NFR Acceptance Criteria
+
+**Why**: Structured acceptance criteria for NFRs matching feature pattern
+
+**Accomplished**:
+- Created NFR-0001/0002 acceptance files, added validator check for missing acceptance files, 3 new tests, updated template and NFR.md entries
+
+**Next steps**:
+- PR review, merge to main
+
+**Blockers**: None
+
+
+### Session: 2026-02-18 19:57 - Pre-commit gate fix
+
+**Why**: NFR spec changes incorrectly triggered FEATURES.md staleness gate
+
+**Accomplished**:
+- Split spec staleness gate into 3c (FEATURES.md for feature specs) and 3d (NFR.md for NFR specs) — symmetric logic
+
+**Next steps**:
+- PR review
+
+**Blockers**: None
+

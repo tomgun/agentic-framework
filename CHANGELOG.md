@@ -5,6 +5,19 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.27.2] - 2026-02-18
+
+### Added
+- **NFR content validation** — `validate_nfr_content()` in `nfr_validator.py` validates NFR.md fields: categories against schema enum, status enum values, test file path existence, placeholder detection. State-machine parser handles nested "Where enforced" structure.
+- **nfr.sh** — Token-efficient script for NFR status updates (`list`, `show`, `status` commands).
+- **Framework dogfooding NFRs** — `spec/NFR.md` with 2 real NFRs (instruction file size limit, token budget compliance).
+- **16 pytest tests** — NFR validation coverage including parser, validators, edge cases, and framework dogfooding.
+
+### Changed
+- **doctor.py** — Now calls `validate_nfr_content()` alongside existing `validate_nfr_refs()` in feature-tracking validation block.
+- **nfr.schema.json** — Added `$comment` noting markdown/schema format mismatch (tech debt).
+- **DEVELOPER_GUIDE.md** — Added nfr.sh to scripts listing, NFR content validation to doctor.sh --full description.
+
 ## [0.27.1] - 2026-02-18
 
 ### Changed

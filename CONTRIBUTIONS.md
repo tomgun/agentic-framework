@@ -2291,6 +2291,14 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: Section 1 rewritten from "How You Help the Framework" (user-serves-framework) to "How It Works" (chat-first, framework-serves-user). "Why 30+ Scripts Exist" section added. Daily Workflows reframed as conversation, with manual commands as fallback. All user-facing prompts rewritten as natural language.
 
+### NFR.md Role Strengthening (v0.27.2)
+
+**User direction**: When agent dismissed `memory-check.sh` as "niche," user corrected: "the memory-check is NOT niche, I think, but really important for the framework to work." This led to researching NFR.md's role and discovering that its enforcement fields were theater — nothing validated them.
+
+**User request**: "merged, continue with next tasks (NFR.md role with plan review loop)" — directed using the plan-review loop for NFR work.
+
+**Result**: `validate_nfr_content()` validates categories, status enums, test file paths, and placeholder detection. Framework dogfoods its own `spec/NFR.md` with 2 real NFRs. Plan went through 2-iteration plan-review loop.
+
 ### Centralized TODO Tracking (Task #12)
 
 **User insight**: Ideas and tasks are scattered across HUMAN_NEEDED.md, STATUS.md, ISSUES.md, and FEATURES.md with no single inbox. Need a solid mechanism for logging ideas/tasks in a central place.
@@ -2300,7 +2308,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.27.0
+**Current Version**: v0.27.2
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 48 behavioral test scripts
