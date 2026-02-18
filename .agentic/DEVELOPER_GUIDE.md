@@ -2129,6 +2129,6 @@ Evening:  "Let's wrap up and commit" → agent verifies + commits with approval
 
 ---
 
-**Version:** 0.27.1
+**Version:** 0.27.2
 **Last updated:** 2026-02-18
 
