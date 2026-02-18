@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.27.0)
+**Period**: Initial Development (v0.1.0 → v0.27.1)
 **Date**: 2026-02-16
 
 ---
@@ -2296,11 +2296,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: CLAUDE.md template now explicitly documents: framework roles use Skill tool, NOT Task tool's subagent_type. PR rule includes: "then offer: Want me to run `/review` on this PR?"
 
-### DEVELOPER_GUIDE Rewrite Planning (F-0134)
+### DEVELOPER_GUIDE Rewrite (F-0134, v0.27.1)
 
-**User insight**: DEVELOPER_GUIDE tells users to "run `ag implement F-XXXX`" — but users don't know feature numbers. Scripts should work behind the scenes; user guidance should use natural workflow language. "Telling the user to 'run ag implement F-XXXX' when starting a new feature is really dumb."
+**User insight**: DEVELOPER_GUIDE tells users to "run `ag implement F-XXXX`" — but users don't know feature numbers. Scripts should work behind the scenes; user guidance should use natural workflow language.
 
-**Impact**: F-0134 planned for thorough rewrite with user-first framing.
+**User direction during implementation**:
+- "The user is not the quality gate" — the framework's gates handle quality; the user makes decisions and sets direction
+- "It is still framing scripts as something the user uses on a daily basis, but that shouldn't be the case" — this is a chat-first framework, scripts exist for the agent to use behind the scenes
+- "The guide should quickly mention why scripts exist in a framework that is supposed to be an easy-to-use tool for AI development with a chat interface"
+- Insisted on plan-review loop before implementation (plan → reviewer agent → revision → re-review → approved)
+- Caught incorrect NFR.md removal — NFR.template.md is a real framework template
+
+**Result**: Section 1 rewritten from "How You Help the Framework" (user-serves-framework) to "How It Works" (chat-first, framework-serves-user). "Why 30+ Scripts Exist" section added. Daily Workflows reframed as conversation, with manual commands as fallback. All user-facing prompts rewritten as natural language.
 
 ### Centralized TODO Tracking (Task #12)
 

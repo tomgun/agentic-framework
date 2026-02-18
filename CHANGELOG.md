@@ -5,6 +5,12 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.27.1] - 2026-02-18
+
+### Changed
+- **DEVELOPER_GUIDE.md rewrite (F-0134)** — Chat-first framing: users talk to the agent, scripts work behind the scenes. Removed "you're the quality gate" framing, rewrote all user-instruction examples as natural language prompts, added "Why Scripts Exist" section explaining the 3 reasons (agent uses them, transparency, escape hatch). Stale install URLs replaced with `v<VERSION>` placeholders. Pre-commit hook docs updated to `ag hooks install`. Version footer updated.
+- **FEATURES.md** — F-0132 and F-0133 marked shipped (v0.27.0). Summary table corrected (97 shipped, 3 in-progress, 2 planned, 103 total).
+
 ## [0.27.0] - 2026-02-16
 
 ### Added

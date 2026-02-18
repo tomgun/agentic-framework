@@ -616,3 +616,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 10:18 - F-0134 DEVELOPER_GUIDE rewrite
+
+**Why**: Guide was framing users as script operators; now chat-first with scripts as agent tooling
+
+**Accomplished**:
+- Chat-first reframing of all 10 sections, stale URLs/version/NFR fixed, F-0132/F-0133 shipped in FEATURES.md, summary table corrected
+
+**Next steps**:
+- Commit and PR, then plan-review-loop CLAUDE.md trigger (task #7), NFR.md spec role (task #11)
+
+**Blockers**: None
+

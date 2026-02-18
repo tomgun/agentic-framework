@@ -2050,9 +2050,10 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ## F-0132: Programmatic Spec-First Gate
 
-**Status**: planned
+**Status**: shipped
 **Priority**: high
 **Added**: 2026-02-17
+**Since**: v0.27.0
 
 **Description**: Add programmatic gates to `ag plan` and `ag implement` that verify a feature ID (F-XXXX) exists in FEATURES.md and acceptance criteria exist in `spec/acceptance/F-XXXX.md` before proceeding. Prevents the bypass documented in I-0002 where plan mode skips the spec-first workflow.
 
@@ -2064,9 +2065,10 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ## F-0133: Durable Plan Artifacts
 
-**Status**: planned
+**Status**: shipped
 **Priority**: medium
 **Added**: 2026-02-16
+**Since**: v0.27.0
 
 **Description**: When plans are created (via `ag plan` or native tool plan mode), save them to `.agentic-journal/plans/` as durable, git-trackable artifacts. Fixes I-0003 where plans in `.claude/plans/` are tool-specific and session-scoped.
 
@@ -2094,7 +2096,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 |----------|---------|-------------|---------|-------|
 | Core (F-0001-0010) | 10 | 0 | 0 | 10 |
 | Quality (F-0011-0020) | 7 | 0 | 0 | 7 |
-| Session (F-0021-0030) | 8 | 0 | 0 | 8 |
+| Session (F-0021-0030) | 7 | 0 | 0 | 8 |
 | Multi-Agent (F-0031-0040) | 7 | 0 | 0 | 7 |
 | Tooling (F-0041-0050) | 4 | 0 | 0 | 4 |
 | Recovery (F-0051-0060) | 6 | 0 | 0 | 6 |
@@ -2102,6 +2104,6 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 16 | 1 | 0 | 17 |
-| **Total** | **89** | **2** | **0** | **91** |
+| Framework Infrastructure (F-0101+) | 25 | 2 | 2 | 29 |
+| **Total** | **97** | **3** | **2** | **103** |
 
