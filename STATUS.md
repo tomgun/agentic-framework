@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- NFR acceptance criteria files — implementation complete, ready for push (Updated: 2026-02-18 19:51 EET)
+- Pre-commit gate: symmetric spec staleness checks for features and NFRs (Updated: 2026-02-18 19:57 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

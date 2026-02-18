@@ -699,3 +699,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 19:57 - Pre-commit gate fix
+
+**Why**: NFR spec changes incorrectly triggered FEATURES.md staleness gate
+
+**Accomplished**:
+- Split spec staleness gate into 3c (FEATURES.md for feature specs) and 3d (NFR.md for NFR specs) — symmetric logic
+
+**Next steps**:
+- PR review
+
+**Blockers**: None
+
