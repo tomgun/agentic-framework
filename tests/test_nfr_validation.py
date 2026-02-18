@@ -3,6 +3,8 @@
 import sys
 from pathlib import Path
 
+import pytest
+
 # Add .agentic/tools to path
 sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "tools"))
 # Add .agentic/lib to path (for settings import)
@@ -238,6 +240,33 @@ def test_validate_accepts_test_path_with_none(tmp_path):
     assert issues == []
 
 
+def test_validate_handles_backtick_wrapped_paths(tmp_path):
+    """Backtick-wrapped test paths like `tests/foo.py` should be resolved."""
+    # Create the referenced test file
+    tests_dir = tmp_path / "tests"
+    tests_dir.mkdir()
+    (tests_dir / "real_test.py").write_text("# test")
+
+    nfr_md = """\
+# NFR
+
+## NFR-0001: Backtick paths
+- Category: performance
+- Statement: something
+- How to measure: run tests
+- Where enforced:
+  - Tests: `tests/real_test.py`
+  - CI: none
+- Current status: met
+"""
+    spec_dir = tmp_path / "spec"
+    spec_dir.mkdir()
+    (spec_dir / "NFR.md").write_text(nfr_md)
+
+    issues = validate_nfr_content(tmp_path)
+    assert issues == [], f"Backtick-wrapped path should resolve: {issues}"
+
+
 # --- Framework dogfooding test ---
 
 
@@ -246,7 +275,7 @@ def test_framework_nfr_passes_validation():
     root = Path(__file__).parent.parent
     nfr_path = root / "spec" / "NFR.md"
     if not nfr_path.exists():
-        return  # Skip if running outside framework repo
+        pytest.skip("No spec/NFR.md — not running in framework repo")
 
     issues = validate_nfr_content(root)
     assert issues == [], f"Framework NFR.md has validation issues: {issues}"

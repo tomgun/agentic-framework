@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- NFR content validation implemented - ready for review (Updated: 2026-02-18 14:03 EET)
+- PR #36 review fixes applied (Updated: 2026-02-18 18:41 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

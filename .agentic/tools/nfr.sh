@@ -132,5 +132,9 @@ if [[ "${SUBCMD}" == "status" ]]; then
   exit 0
 fi
 
-echo "Error: Unknown command '${SUBCMD}'. Use: show | status"
+if [[ -z "${SUBCMD}" ]]; then
+  echo "Error: Missing command for ${NFR_ID}. Use: show | status <value>"
+else
+  echo "Error: Unknown command '${SUBCMD}'. Use: show | status"
+fi
 exit 1

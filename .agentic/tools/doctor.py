@@ -14,6 +14,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from settings import get_setting
 
+# NFR content validation (extracted to nfr_validator.py for complexity limits)
+from nfr_validator import validate_nfr_content
+
 # Optional YAML support (graceful fallback if not installed)
 try:
     import yaml
@@ -573,10 +576,6 @@ def parse_nfr_ids(md: str) -> set[str]:
     nfr_header_re = re.compile(r"^##\s+(NFR-\d{4}):", re.MULTILINE)
     return set(nfr_header_re.findall(md))
 
-
-
-# NFR content validation (extracted to nfr_validator.py for complexity limits)
-from nfr_validator import parse_nfr_entries, validate_nfr_content, _is_placeholder, _strip_trailing_comment
 
 
 def validate_features(root: Path) -> list[str]:
