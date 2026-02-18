@@ -686,3 +686,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 19:51 - NFR Acceptance Criteria
+
+**Why**: Structured acceptance criteria for NFRs matching feature pattern
+
+**Accomplished**:
+- Created NFR-0001/0002 acceptance files, added validator check for missing acceptance files, 3 new tests, updated template and NFR.md entries
+
+**Next steps**:
+- PR review, merge to main
+
+**Blockers**: None
+

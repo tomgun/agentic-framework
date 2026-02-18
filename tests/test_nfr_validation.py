@@ -208,6 +208,9 @@ def test_validate_accepts_valid_entries(tmp_path):
     spec_dir = tmp_path / "spec"
     spec_dir.mkdir()
     (spec_dir / "NFR.md").write_text(nfr_md)
+    acc_dir = spec_dir / "acceptance"
+    acc_dir.mkdir()
+    (acc_dir / "NFR-0001.md").write_text("# acceptance")
 
     issues = validate_nfr_content(tmp_path)
     assert issues == []
@@ -262,9 +265,84 @@ def test_validate_handles_backtick_wrapped_paths(tmp_path):
     spec_dir = tmp_path / "spec"
     spec_dir.mkdir()
     (spec_dir / "NFR.md").write_text(nfr_md)
+    acc_dir = spec_dir / "acceptance"
+    acc_dir.mkdir()
+    (acc_dir / "NFR-0001.md").write_text("# acceptance")
 
     issues = validate_nfr_content(tmp_path)
     assert issues == [], f"Backtick-wrapped path should resolve: {issues}"
+
+
+# --- Acceptance file tests ---
+
+
+def test_validate_catches_missing_acceptance_file(tmp_path):
+    """NFR with status: met but no acceptance file should produce an error."""
+    nfr_md = """\
+# NFR
+
+## NFR-0001: Missing acceptance
+- Category: performance
+- Statement: something
+- How to measure: run tests
+- Where enforced:
+  - Tests: none
+  - CI: none
+- Current status: met
+"""
+    spec_dir = tmp_path / "spec"
+    spec_dir.mkdir()
+    (spec_dir / "NFR.md").write_text(nfr_md)
+
+    issues = validate_nfr_content(tmp_path)
+    assert any("acceptance file" in i and "not found" in i for i in issues)
+
+
+def test_validate_accepts_present_acceptance_file(tmp_path):
+    """NFR with status: met and acceptance file present should not error."""
+    nfr_md = """\
+# NFR
+
+## NFR-0001: Has acceptance
+- Category: performance
+- Statement: something
+- How to measure: run tests
+- Where enforced:
+  - Tests: none
+  - CI: none
+- Current status: met
+"""
+    spec_dir = tmp_path / "spec"
+    spec_dir.mkdir()
+    (spec_dir / "NFR.md").write_text(nfr_md)
+    acc_dir = spec_dir / "acceptance"
+    acc_dir.mkdir()
+    (acc_dir / "NFR-0001.md").write_text("# acceptance criteria")
+
+    issues = validate_nfr_content(tmp_path)
+    assert not any("acceptance file" in i for i in issues)
+
+
+def test_validate_skips_acceptance_check_for_unknown_status(tmp_path):
+    """NFR with status: unknown should not require an acceptance file."""
+    nfr_md = """\
+# NFR
+
+## NFR-0001: Unknown status
+- Category: performance
+- Statement: something
+- How to measure: run tests
+- Where enforced:
+  - Tests: none
+  - CI: none
+- Current status: unknown
+"""
+    spec_dir = tmp_path / "spec"
+    spec_dir.mkdir()
+    (spec_dir / "NFR.md").write_text(nfr_md)
+
+    issues = validate_nfr_content(tmp_path)
+    assert not any("acceptance file" in i for i in issues)
 
 
 # --- Framework dogfooding test ---

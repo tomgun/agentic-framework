@@ -23,6 +23,7 @@ Purpose: capture cross-cutting constraints that apply across many features (perf
   - Tests: <!-- perf tests -->
   - CI: <!-- checks -->
 - Current status: unknown  <!-- unknown | partial | met | violated -->
+- Acceptance: spec/acceptance/NFR-####.md
 - Notes:
 
 

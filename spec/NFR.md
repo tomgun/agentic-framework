@@ -23,6 +23,7 @@ Purpose: capture cross-cutting constraints that apply across many features (perf
   - Tests: `tests/infrastructure/structural/S08_claude_md_under_100_lines.sh`
   - CI: pre-commit-check.sh staleness detection
 - Current status: met
+- Acceptance: spec/acceptance/NFR-0001.md
 - Notes: See docs/INSTRUCTION_ARCHITECTURE.md for the empirical basis (L-0002)
 
 ## NFR-0002: Token budget compliance
@@ -34,4 +35,5 @@ Purpose: capture cross-cutting constraints that apply across many features (perf
   - Tests: `tests/test_nfr_validation.py`
   - CI: none
 - Current status: met
+- Acceptance: spec/acceptance/NFR-0002.md
 - Notes: context-for-role.sh counts tokens and warns when over budget at runtime

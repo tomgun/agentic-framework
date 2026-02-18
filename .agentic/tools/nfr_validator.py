@@ -152,4 +152,13 @@ def validate_nfr_content(root: Path) -> list[str]:
                         f"{nfr_id}: test path '{file_path}' does not exist"
                     )
 
+        # Check acceptance file exists for non-unknown NFRs
+        status = entry.get("current_status")
+        if status and status != "unknown":
+            acc_file = root / "spec" / "acceptance" / f"{nfr_id}.md"
+            if not acc_file.exists():
+                issues.append(
+                    f"{nfr_id}: acceptance file spec/acceptance/{nfr_id}.md not found"
+                )
+
     return issues

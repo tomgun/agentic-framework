@@ -57,6 +57,13 @@ _No active items_
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
+### HN-0008: PR #36: NFR content validation
+- **Type**: review
+- **Added**: 2026-02-18
+- **Context**: feat/nfr-spec-role - NFR content validation and dogfooding
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 <!-- Archive resolved items here with date and outcome -->
@@ -110,6 +117,14 @@ _No active items_
 - **Type**: review
 - **Added**: 2026-02-18
 - **Context**: https://github.com/tomgun/agentic-framework/pull/35
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
+### HN-0008: PR #36: NFR content validation
+- **Type**: review
+- **Added**: 2026-02-18
+- **Context**: feat/nfr-spec-role - NFR content validation and dogfooding
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
