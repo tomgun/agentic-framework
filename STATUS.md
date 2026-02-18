@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Pre-commit gate: symmetric spec staleness checks for features and NFRs (Updated: 2026-02-18 19:57 EET)
+- Plan-mode-exit trigger added to all instruction files (Updated: 2026-02-18 23:05 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

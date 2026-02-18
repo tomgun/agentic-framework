@@ -712,3 +712,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 23:05 - Plan-mode-exit trigger
+
+**Why**: Agents skipped durable save and review loop after native plan mode exit
+
+**Accomplished**:
+- Added trigger to all instruction files and memory-seed: after exiting plan mode, save plan durably and invoke review if enabled. S07 test updated to verify.
+
+**Next steps**:
+- Next tasks from backlog
+
+**Blockers**: None
+
