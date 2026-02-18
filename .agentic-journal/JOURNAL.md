@@ -640,3 +640,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 13:29 - F-0135 memory-seed feature
+
+**Accomplished**:
+- Created F-0135 feature entry and acceptance criteria for memory-seed defense-in-depth layer. Retroactive tracking — mechanism shipped in v0.25.3. 3 'should have' criteria identified: 2 LLM tests + DEVELOPER_GUIDE mention.
+
+**Next steps**:
+- Commit, push to PR #35
+
+**Blockers**: None
+

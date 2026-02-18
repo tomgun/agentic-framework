@@ -2091,6 +2091,21 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ---
 
+## F-0135: Memory-Seed Defense-in-Depth Layer
+
+**Status**: shipped
+**Priority**: high
+**Added**: 2026-02-18
+**Since**: v0.25.3
+
+**Description**: Persistent memory seeding mechanism that reinforces framework behavioral patterns (trigger words, pre-commit sequence, token-efficient scripts) into AI agent memory. Defense-in-depth: scripts enforce structurally, memory reinforces behaviorally. `memory-check.sh` validates seed integrity at session start (stale version, missing patterns, partial overwrites). Memory-seed is NOT a fourth architectural layer — it reinforces the Constitution layer (CLAUDE.md trigger tables) so agents recognize patterns before hitting structural gates.
+
+**Dependencies**: F-0128 (Specs-Before-Code Enforcement)
+
+**Acceptance**: See `spec/acceptance/F-0135.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -2105,6 +2120,6 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 26 | 2 | 1 | 29 |
-| **Total** | **98** | **3** | **1** | **103** |
+| Framework Infrastructure (F-0101+) | 27 | 2 | 1 | 30 |
+| **Total** | **99** | **3** | **1** | **104** |
 

@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0134 shipped — PR #35 review fixes (Updated: 2026-02-18 13:26 EET)
+- F-0135 memory-seed spec + F-0134 PR #35 (Updated: 2026-02-18 13:29 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)
