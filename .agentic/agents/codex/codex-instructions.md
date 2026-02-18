@@ -16,6 +16,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
 | Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
 | Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX` |
+| Plan created / planning complete | STOP -> Save plan to `.agentic-journal/plans/F-XXXX-plan.md` (use `ag plan --save <file> F-XXXX`), then if `plan_review_enabled: yes` in STACK.md invoke `/review` on the saved plan. |
 
 Acceptance criteria: Formal requires spec/acceptance/F-####.md before coding | Discovery: define criteria (any form) before coding.
 

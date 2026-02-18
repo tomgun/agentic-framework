@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # S07: Memory-seed ↔ CLAUDE.md consistency
-# Both files should contain the same 5 trigger categories and 4 script references
+# Both files should contain the same 6 trigger categories and 4 script references
 set -euo pipefail
 source "$(dirname "$0")/../lib/helpers.sh"
 
@@ -61,6 +61,16 @@ for file in "$MEMORY_SEED" "$CLAUDE_MD"; do
         pass_test "$name: too-big → break-down trigger present"
     else
         fail_test "$name: too-big → break-down trigger present"
+    fi
+done
+
+# 6. Plan mode exit → save plan + review
+for file in "$MEMORY_SEED" "$CLAUDE_MD"; do
+    name=$(basename "$file")
+    if grep -qi "plan.*mode\|planning.*complete\|plan.*approved" "$file" && grep -qi "agentic-journal/plans\|ag plan --save" "$file"; then
+        pass_test "$name: plan-mode-exit → save + review trigger present"
+    else
+        fail_test "$name: plan-mode-exit → save + review trigger present"
     fi
 done
 
