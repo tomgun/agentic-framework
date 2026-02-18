@@ -590,3 +590,64 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-18 00:44 - Session: settings-over-profiles completion + task cleanup
+
+**Why**: Consolidating session progress before plan-review loop
+
+**Accomplished**:
+- Merged PR #31 (F-0131 settings-over-profiles, v0.27.0 tagged). Fixed all review findings (W1-W4, S1-S5). Shipped F-0132 (spec-first gate, PR #32) fixing I-0002. Shipped F-0133 (durable plans + 16 archived plans, PR #33) fixing I-0003. Shipped skill routing hints + review-after-PR (PR #34). Moved settings docs to DEVELOPER_GUIDE.md, filed I-0004/I-0005. Updated CONTRIBUTIONS.md, READMEs, VERSION.
+
+**Next steps**:
+- Plan-review loop for #11 (DEVELOPER_GUIDE rewrite) and #12 (centralized TODO tracking)
+
+**Blockers**: None
+
+
+### Session: 2026-02-18 00:50 - CONTRIBUTIONS & CHANGELOG catchup
+
+**Why**: CONTRIBUTIONS was 5 versions behind — capturing all user contributions before they get lost to context compression
+
+**Accomplished**:
+- Updated CONTRIBUTIONS.md with v0.25.8-v0.27.0 entries (rough specs, profile rename, settings-over-profiles, spec-first gate, durable plans, skill routing). Updated CHANGELOG.md with v0.26.0 and v0.27.0 entries. Updated architecture decisions list. Created F-0134 feature entry and acceptance criteria for DEVELOPER_GUIDE rewrite.
+
+**Next steps**:
+- Plan-review loop for F-0134 DEVELOPER_GUIDE rewrite, then Task #12 centralized TODO tracking
+
+**Blockers**: None
+
+
+### Session: 2026-02-18 10:18 - F-0134 DEVELOPER_GUIDE rewrite
+
+**Why**: Guide was framing users as script operators; now chat-first with scripts as agent tooling
+
+**Accomplished**:
+- Chat-first reframing of all 10 sections, stale URLs/version/NFR fixed, F-0132/F-0133 shipped in FEATURES.md, summary table corrected
+
+**Next steps**:
+- Commit and PR, then plan-review-loop CLAUDE.md trigger (task #7), NFR.md spec role (task #11)
+
+**Blockers**: None
+
+
+### Session: 2026-02-18 13:26 - F-0134 review fixes
+
+**Accomplished**:
+- Fixed CONTRIBUTIONS.md duplicate, F-0134 marked shipped, summary table updated
+
+**Next steps**:
+- Force-push PR, remaining tasks #7 #11
+
+**Blockers**: None
+
+
+### Session: 2026-02-18 13:29 - F-0135 memory-seed feature
+
+**Accomplished**:
+- Created F-0135 feature entry and acceptance criteria for memory-seed defense-in-depth layer. Retroactive tracking — mechanism shipped in v0.25.3. 3 'should have' criteria identified: 2 LLM tests + DEVELOPER_GUIDE mention.
+
+**Next steps**:
+- Commit, push to PR #35
+
+**Blockers**: None
+

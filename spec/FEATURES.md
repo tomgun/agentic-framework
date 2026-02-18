@@ -2050,9 +2050,10 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ## F-0132: Programmatic Spec-First Gate
 
-**Status**: planned
+**Status**: shipped
 **Priority**: high
 **Added**: 2026-02-17
+**Since**: v0.27.0
 
 **Description**: Add programmatic gates to `ag plan` and `ag implement` that verify a feature ID (F-XXXX) exists in FEATURES.md and acceptance criteria exist in `spec/acceptance/F-XXXX.md` before proceeding. Prevents the bypass documented in I-0002 where plan mode skips the spec-first workflow.
 
@@ -2064,9 +2065,10 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ## F-0133: Durable Plan Artifacts
 
-**Status**: planned
+**Status**: shipped
 **Priority**: medium
 **Added**: 2026-02-16
+**Since**: v0.27.0
 
 **Description**: When plans are created (via `ag plan` or native tool plan mode), save them to `.agentic-journal/plans/` as durable, git-trackable artifacts. Fixes I-0003 where plans in `.claude/plans/` are tool-specific and session-scoped.
 
@@ -2076,13 +2078,41 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ---
 
+## F-0134: DEVELOPER_GUIDE Rewrite — User-First Framing
+
+**Status**: shipped
+**Priority**: high
+**Added**: 2026-02-18
+**Since**: v0.27.1
+
+**Description**: Thorough rewrite of `.agentic/DEVELOPER_GUIDE.md` to fix wrong audience framing. Currently tells users to "run `ag implement F-XXXX`" when they don't know feature numbers. Scripts should work behind the scenes (agent runs them naturally); user-facing guidance should describe workflows in human terms. Remove stale content, align with v0.27.0 settings-over-profiles architecture.
+
+**Acceptance**: See `spec/acceptance/F-0134.md`
+
+---
+
+## F-0135: Memory-Seed Defense-in-Depth Layer
+
+**Status**: shipped
+**Priority**: high
+**Added**: 2026-02-18
+**Since**: v0.25.3
+
+**Description**: Persistent memory seeding mechanism that reinforces framework behavioral patterns (trigger words, pre-commit sequence, token-efficient scripts) into AI agent memory. Defense-in-depth: scripts enforce structurally, memory reinforces behaviorally. `memory-check.sh` validates seed integrity at session start (stale version, missing patterns, partial overwrites). Memory-seed is NOT a fourth architectural layer — it reinforces the Constitution layer (CLAUDE.md trigger tables) so agents recognize patterns before hitting structural gates.
+
+**Dependencies**: F-0128 (Specs-Before-Code Enforcement)
+
+**Acceptance**: See `spec/acceptance/F-0135.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
 |----------|---------|-------------|---------|-------|
 | Core (F-0001-0010) | 10 | 0 | 0 | 10 |
 | Quality (F-0011-0020) | 7 | 0 | 0 | 7 |
-| Session (F-0021-0030) | 8 | 0 | 0 | 8 |
+| Session (F-0021-0030) | 7 | 0 | 0 | 8 |
 | Multi-Agent (F-0031-0040) | 7 | 0 | 0 | 7 |
 | Tooling (F-0041-0050) | 4 | 0 | 0 | 4 |
 | Recovery (F-0051-0060) | 6 | 0 | 0 | 6 |
@@ -2090,6 +2120,6 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 16 | 1 | 0 | 17 |
-| **Total** | **89** | **2** | **0** | **91** |
+| Framework Infrastructure (F-0101+) | 27 | 2 | 1 | 30 |
+| **Total** | **99** | **3** | **1** | **104** |
 

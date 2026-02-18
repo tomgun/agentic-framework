@@ -19,78 +19,72 @@
 
 ---
 
-## How You Help the Framework
+## How It Works
 
-**The framework works best when you actively participate.** Agents follow guidelines, but you're the quality gate.
+**You describe what you want to build. The agent and framework handle the rest.**
 
-### The `ag` Gateway Commands
+The framework provides structure, quality gates, and tracking. The agent uses these automatically when you work together through conversation. You stay focused on decisions, direction, and code review.
 
-The `ag` command is the single entry point for all framework operations:
+### Talking to the Agent
 
-```bash
-ag start              # Session start - check status, WIP, blockers
-ag implement F-XXXX   # Start feature (Formal) - verifies acceptance criteria
-ag work "description" # Start task (Discovery) - simpler tracking
-ag commit             # Pre-commit gates - blocks if issues
-ag done [F-XXXX]      # Completion check - verifies everything updated
-ag verify [--full]    # Health check
-ag tools              # Discover all available tools
-ag status             # Show profile, WIP, current focus
-```
-
-### When to Use `ag` Commands
-
-| Moment | Command | Why |
-|--------|---------|-----|
-| **Starting work** | `ag start` | Check WIP, blockers, multi-agent status |
-| **Before implementing** | `ag implement F-XXXX` | Verify acceptance criteria exist |
-| **Before committing** | `ag commit` | All gates must pass |
-| **Marking done** | `ag done F-XXXX` | Verify completion checklist |
-| **Something feels off** | `ag verify` | Quick health check |
-
-### Prompts That Help
-
-If the agent seems to be skipping steps:
+Tell the agent what you want in plain language:
 
 ```
-"Run ag implement F-XXXX before starting"
-"Did ag commit pass?"
-"What does ag status show?"
-"Run ag verify before we continue"
+"Let's work on the CSV export feature"        → agent starts implementation workflow
+"What's our current status?"                   → agent checks STATUS.md, blockers, WIP
+"Are we in good shape to commit?"              → agent runs verification + commit gates
+"Let's plan the authentication changes first"  → agent creates an implementation plan
+"We're done with this feature"                 → agent runs completion checklist
 ```
-
-### The Partnership
-
-| You | Agent |
-|-----|-------|
-| Ask for `ag` commands at key moments | Run `ag` commands, follow gates |
-| Make decisions, set priorities | Implement, update docs |
-| Catch drift, ask questions | Report status, suggest fixes |
-| Approve commits | Never auto-commit |
-
-**Neither works perfectly alone.** Together you maintain quality.
-
-### Profile-Aware Commands
 
 The framework detects your profile (Discovery or Formal) automatically:
 
-```bash
-# Formal profile (formal feature tracking)
-ag implement F-0042   # Requires spec/acceptance/F-0042.md
+```
+You say: "Let's implement the login feature"
 
-# Discovery profile (simpler task tracking)
-ag work "Add login"   # No feature IDs needed
+# Formal profile → agent verifies specs exist, tracks feature IDs internally
+# Discovery profile → agent starts simpler task tracking, no IDs needed
 ```
 
-### Direct Tool Access
+You can switch anytime: `ag set profile discovery`
 
-You can also run tools directly:
+### What the Framework Does Behind the Scenes
+
+When you work with the agent, it uses `ag` commands to enforce quality automatically:
+
+| When you say... | Agent runs | What happens |
+|-----------------|-----------|--------------|
+| "Let's build X" | `ag implement` / `ag work` | Verifies specs exist, starts WIP tracking |
+| "Plan this first" | `ag plan` | Creates reviewable plan, saves to journal |
+| "Commit this" | `ag commit` | Runs all quality gates, blocks if issues |
+| "We're done" | `ag done` | Checks docs updated, tests pass, acceptance met |
+
+You don't need to memorize these commands. The agent picks the right one.
+
+### The Few Commands You Might Use Directly
+
+Most of the time, conversation is enough. But a few commands are useful to run yourself:
 
 ```bash
+ag start              # Quick orientation at session start
+ag status             # See current focus and profile
+ag set <key> <value>  # Change a setting (e.g., ag set feature_tracking no)
+```
+
+### Why 30+ Scripts Exist in a Chat-First Framework
+
+The framework ships many scripts. You'll rarely run them directly — they exist for three reasons:
+
+1. **The agent uses them** — when you say "commit this", the agent runs `ag commit` which triggers gates, checks, and state updates behind the scenes
+2. **Transparency** — you can run any script yourself to see exactly what the agent would do
+3. **Escape hatch** — if the agent is unavailable, every workflow works standalone from the terminal
+
+```bash
+# Available if you want them:
 bash .agentic/tools/doctor.sh --full    # Comprehensive verification
 bash .agentic/tools/wip.sh check        # Check interrupted work
-bash .agentic/tools/memory-check.sh     # Check memory-seed integrity (Claude Code)
 bash .agentic/tools/journal.sh ...      # Log to JOURNAL.md
+ag tools                                # Discover all available tools
 ```
 
 ---
@@ -103,8 +97,9 @@ bash .agentic/tools/journal.sh ...      # Log to JOURNAL.md
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
-cd agentic-framework-0.12.0
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v<VERSION>.tar.gz | tar xz
+cd agentic-framework-<VERSION>
+# Replace <VERSION> with the latest from: https://github.com/tomgun/agentic-framework/releases
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -138,24 +133,13 @@ The agent will:
 
 ## Daily Workflows
 
+Most of your interaction is through conversation with the agent. The framework handles structure and quality behind the scenes.
+
 ### Morning: Start Your Work Session
 
-**Recommended (one command):**
+Open your AI tool and say hello — the agent reads STATUS.md, JOURNAL.md, and blockers automatically at session start.
 
-```bash
-ag start
-```
-
-This shows: profile, verification status, WIP, blockers, current focus.
-
-**Or manually:**
-
-```bash
-cat STATUS.md | head -30          # Current focus
-tail -30 JOURNAL.md               # Recent progress
-ag verify                         # Health check
-cat HUMAN_NEEDED.md               # Blockers
-```
+Or if you prefer a quick self-check first: `ag start`
 
 **Now you know**:
 - Current focus
@@ -163,65 +147,43 @@ cat HUMAN_NEEDED.md               # Blockers
 - What's broken (if anything)
 - What needs your decision
 
-**💡 Using AI prompts**: Copy a prompt from [`.agentic/prompts/cursor/`](prompts/cursor/) or [`.agentic/prompts/claude/`](prompts/claude/) to quickly start your session with the agent. Example: use `session_start.md` to get oriented automatically.
-
 ### During: Development Work
 
-#### Working with Agent
+Tell the agent what you want to build. It picks the right workflow based on your profile:
 
-**Option 1: Start a feature (Formal profile)**
-```bash
-ag implement F-0005    # Verifies acceptance criteria exist, starts WIP
-```
-Then tell agent: "Implement F-0005"
+**"Let's implement the CSV export feature"**
+- Formal profile → agent runs `ag implement` (verifies acceptance criteria, starts WIP)
+- Discovery profile → agent runs `ag work "Add CSV export"` (simpler tracking)
 
-**Option 2: Start a task (Discovery profile)**
-```bash
-ag work "Add CSV export"    # Starts WIP tracking
-```
-Then tell agent: "Implement CSV export"
+**"I've added a CSV export feature to the spec. Please implement it using TDD."**
+- If you edited spec files yourself, the agent picks up your changes and implements from them
 
-**Option 3: Direct spec editing (faster!)**
-```bash
-# Edit spec/FEATURES.md yourself - add F-0010
-# Create spec/acceptance/F-0010.md with criteria
-ag implement F-0010    # Verify and start
-```
-Then tell agent: "I've added F-0010. Please implement it using TDD."
+**"Let's plan the authentication changes before coding"**
+- Agent runs `ag plan` to create and review an implementation plan first
 
-#### Working Manually (Without Agent)
+### Evening: Wrap Up
+
+Tell the agent: **"Let's wrap up and commit"**
+
+The agent runs verification, updates JOURNAL.md, and prepares the commit for your approval.
+
+### Working Manually (Without Agent)
+
+If you prefer direct control or the agent isn't available:
 
 ```bash
-# Run tests
-<test command from STACK.md>
+# Morning
+ag start                          # Or: cat STATUS.md | head -30
 
-# Format code
-<formatter from STACK.md>
+# During
+<test command from STACK.md>      # Run tests
+<formatter from STACK.md>         # Format code
+bash quality_checks.sh --pre-commit  # If you've created one (see Customization)
 
-# Quality check
-bash quality_checks.sh --pre-commit
-
-# Update docs yourself
-vim STATUS.md          # Update "Current focus"
-vim JOURNAL.md         # Add session entry
-vim spec/FEATURES.md   # Update implementation status
-```
-
-### Evening: Wrap Up Session
-
-```bash
-# 1. Verify everything is correct
-bash .agentic/tools/doctor.sh --full
-
-# 2. Check test coverage
-bash .agentic/tools/coverage.sh
-
-# 3. Update JOURNAL.md if agent didn't
-# (Add session summary: what done, what's next, blockers)
-
-# 4. Commit your work
-git add .
-git commit -m "feat: implemented F-0005 CSV export"
+# Evening
+bash .agentic/tools/doctor.sh --full  # Verify
+vim JOURNAL.md                        # Add session summary
+git add . && git commit -m "feat: add CSV export for user data"
 git push
 ```
 
@@ -351,15 +313,15 @@ Agents are trained to:
 
 **✅ Good Prompts:**
 ```
-"Implement F-0005 using TDD. The acceptance criteria are in spec/acceptance/F-0005.md."
+"Implement the CSV export feature using TDD."
 
-"I've updated acceptance criteria for F-0003. Please review and update tests/implementation to match."
+"I've updated the acceptance criteria for the caching layer. Please review and update tests to match."
 
 "Research Agent: Investigate authentication options for our Next.js app. We need OAuth support for Google and GitHub."
 
-"Planning Agent: Plan F-0008 (user notifications) and create acceptance criteria."
+"Planning Agent: Plan the user notifications feature and create acceptance criteria."
 
-"Continue working on F-0005 - you left off at implementing the export function."
+"Continue working on the export feature — you left off at implementing the export function."
 ```
 
 ### Agent Modes
@@ -369,7 +331,7 @@ Agents are trained to:
 One agent does everything. Simple but uses more tokens.
 
 ```
-You: "Implement F-0005"
+You: "Implement the CSV export feature"
 Agent: [researches, plans, writes tests, implements, reviews, updates docs, commits]
 ```
 
@@ -382,16 +344,16 @@ Agent: [researches, plans, writes tests, implements, reviews, updates docs, comm
 - pipeline_handoff_approval: yes
 ```
 
-Then invoke specific agents:
+Then invoke specific agents (using feature names — the agent resolves IDs internally if you use Formal profile):
 
 ```
 You: "Research Agent: investigate CSV export libraries for Python"
 [Research Agent works, creates research doc]
 
-You: "Planning Agent: plan F-0010 CSV export using pandas"
+You: "Planning Agent: plan the CSV export feature using pandas"
 [Planning Agent creates acceptance criteria]
 
-You: "Test Agent: write tests for F-0010"
+You: "Test Agent: write tests for CSV export"
 [Test Agent writes failing tests]
 
 You: "Implementation Agent: make tests pass"
@@ -544,8 +506,9 @@ grep "Version:" STACK.md
 - [ ] CSV is properly formatted (RFC 4180)
 ```
 
-**Tell agent:**
+**Tell agent** (either works — you just created the spec, so you know the ID):
 ```
+"I've added a CSV export feature to FEATURES.md. Please implement it using TDD."
 "I've added F-0010 to FEATURES.md. Please implement it using TDD."
 ```
 
@@ -589,12 +552,14 @@ See: `.agentic/workflows/spec_migrations.md` for details.
 
 Then tell agent:
 ```
-"I updated acceptance criteria for F-0005. Please adjust implementation to match."
+"I updated the acceptance criteria for CSV export. Please adjust implementation to match."
 ```
 
 ### Finding Information
 
 **📖 Also see [`MANUAL_OPERATIONS.md#finding-specific-information`](MANUAL_OPERATIONS.md#finding-specific-information) for more grep patterns**
+
+These examples use feature IDs from your spec files (replace with your own IDs):
 
 ```bash
 # Find where feature is implemented
@@ -629,7 +594,7 @@ The framework includes 30+ automation scripts in `.agentic/tools/`.
 
 Agents read these files at session start (via `ag start` or session_start.md checklist).
 
-> **Deprecated:** `continue_here.py` and `.continue-here.md` are deprecated as of v0.12.0. The separate file was redundant with STATUS.md. Agents should read STATUS.md directly.
+> **Migration:** `continue_here.py` / `.continue-here.md` are superseded by STATUS.md — delete if found in your project.
 
 ### Health Check Scripts
 
@@ -1265,10 +1230,11 @@ Checks if versions in `package.json` / `requirements.txt` match `STACK.md`.
 ```bash
 # Download new framework version
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v<VERSION>.tar.gz | tar xz
+# Replace <VERSION> with the latest from: https://github.com/tomgun/agentic-framework/releases
 
 # Run upgrade FROM new framework
-bash /tmp/agentic-framework-0.12.0/.agentic/tools/upgrade.sh /path/to/your-project
+bash /tmp/agentic-framework-<VERSION>/.agentic/tools/upgrade.sh /path/to/your-project
 ```
 
 ### Consistency Scripts
@@ -1695,7 +1661,7 @@ bash .agentic/tools/stale.sh --days 90
 
 ### Quality Checks Failing
 
-**Problem:** `quality_checks.sh` fails on commit.
+**Problem:** Your project's `quality_checks.sh` (user-created — see Customization section) fails on commit.
 
 **Fix:**
 ```bash
@@ -1722,8 +1688,9 @@ curl -s https://api.github.com/repos/tomgun/agentic-framework/releases/latest | 
 
 # Upgrade (see UPGRADING.md)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
-bash /tmp/agentic-framework-0.12.0/.agentic/tools/upgrade.sh /path/to/your-project
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v<VERSION>.tar.gz | tar xz
+# Replace <VERSION> with the latest from: https://github.com/tomgun/agentic-framework/releases
+bash /tmp/agentic-framework-<VERSION>/.agentic/tools/upgrade.sh /path/to/your-project
 ```
 
 ---
@@ -1759,7 +1726,7 @@ bash .agentic/tools/doctor.sh --full
 bash .agentic/tools/doctor.sh --full > weekly-health-check.txt
 ```
 
-### 4. Use Feature IDs Consistently
+### 4. Use Feature IDs Consistently (Formal Profile)
 
 **In code:**
 ```python
@@ -1823,7 +1790,7 @@ cp .agentic/spec/ADR.template.md spec/adr/ADR-0005-use-postgresql.md
 
 ```
 Agent: "Read CONTEXT_PACK.md, STATUS.md, and JOURNAL.md (last 3 entries).
-Then load spec/acceptance/F-0005.md and continue implementation."
+Then load the acceptance criteria for CSV export and continue implementation."
 ```
 
 Not:
@@ -1853,7 +1820,7 @@ git commit -m "feat(F-0005): implement CSV export with tests and spec updates"
 - [ ] FEATURES.md updated (implementation state, code paths, test status)
 - [ ] JOURNAL.md updated
 - [ ] Acceptance criteria met (check spec/acceptance/F-####.md)
-- [ ] Quality checks pass (`bash quality_checks.sh --full`)
+- [ ] Quality checks pass (if you have a `quality_checks.sh` — see Customization section)
 
 ### 10. Run Retrospectives
 
@@ -2024,11 +1991,11 @@ bash .agentic/tools/mutation_test.sh src/payment
 - run_command: bash quality_checks.sh --pre-commit
 ```
 
-**Pre-commit hook:**
+**Pre-commit hook** (the framework uses `core.hooksPath` — install via `ag hooks install`):
 ```bash
-# .git/hooks/pre-commit
-#!/bin/bash
-bash quality_checks.sh --pre-commit || exit 1
+# Installed automatically by: ag hooks install
+# Runs framework checks + your quality_checks.sh (if it exists)
+ag hooks install
 ```
 
 **Full guide:** `.agentic/workflows/continuous_quality_validation.md`
@@ -2074,29 +2041,20 @@ documentation:
 
 ## Quick Reference
 
-### Daily Commands
+### Daily Flow
 
-```bash
-# Morning
-cat STATUS.md | head -30
-tail -30 JOURNAL.md
-bash .agentic/tools/doctor.sh
-
-# During
-bash quality_checks.sh --pre-commit
-bash .agentic/tools/doctor.sh --full
-
-# Evening
-bash .agentic/tools/doctor.sh --full
-bash .agentic/tools/coverage.sh
+```
+Morning:  Open your AI tool → agent orients itself from STATUS.md + JOURNAL.md
+During:   "Implement X" / "Fix Y" / "Plan Z" → agent handles workflows
+Evening:  "Let's wrap up and commit" → agent verifies + commits with approval
 ```
 
-### When to Run What
+### Manual Fallbacks (when you want direct control)
 
 | Situation | Command |
 |-----------|---------|
-| Start work session | `cat STATUS.md`, `tail -30 JOURNAL.md` |
-| Before commit | `bash .agentic/tools/doctor.sh --full` |
+| Start work session | `ag start` |
+| Before commit | `ag verify` or `bash .agentic/tools/doctor.sh --full` |
 | Check feature status | `bash .agentic/tools/report.sh` |
 | Find blockers | `cat HUMAN_NEEDED.md` |
 | Check test coverage | `bash .agentic/tools/coverage.sh` |
@@ -2120,22 +2078,25 @@ bash .agentic/tools/coverage.sh
 
 ```
 # Continue work
-"Continue working on F-0005"
+"Continue working on the CSV export feature"
 
 # New feature
-"Implement F-0010 using TDD. Acceptance criteria in spec/acceptance/F-0010.md"
+"Implement the user notifications feature using TDD"
+
+# Plan first
+"Let's plan the authentication changes before coding"
 
 # Research
 "Research Agent: investigate authentication options for Next.js (OAuth, JWT)"
 
 # Review
-"Review the implementation of F-0005 against acceptance criteria"
+"Review the CSV export implementation against acceptance criteria"
 
 # Fix
 "Fix the test failures in test_csv_export.py"
 
 # Update
-"I updated acceptance criteria for F-0005. Please adjust implementation"
+"I updated the acceptance criteria for CSV export. Please adjust implementation"
 
 # Commit
 "All tests pass. Please commit with appropriate message"
@@ -2166,6 +2127,6 @@ bash .agentic/tools/coverage.sh
 
 ---
 
-**Version:** 0.19.0
-**Last updated:** 2026-02-05
+**Version:** 0.27.1
+**Last updated:** 2026-02-18
 
