@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.28.0)
+**Period**: Initial Development (v0.1.0 → v0.28.1)
 **Date**: 2026-02-18
 
 ---
@@ -2305,10 +2305,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Shipped as F-0136 (v0.28.0). TODO.md + todo.sh + `ag todo` command. Routing rules enforced across all instruction files. STATUS.md Backlog replaced.
 
+### Documentation Deduplication
+
+**User insight**: F-0136 routing table work exposed the pattern — same content maintained in 3-5 places, drifting over time. F-0134 DEVELOPER_GUIDE rewrite made USER_WORKFLOWS.md redundant. User identified the ownership model: each piece of content lives in ONE canonical file, others cross-reference.
+
+**User direction**: Defined 5-file document ownership model (START_HERE=navigation, DEVELOPER_GUIDE=comprehensive reference, MANUAL_OPERATIONS=token-free commands, README=overview, USER_WORKFLOWS=retired). Specified which unique content to preserve before retiring USER_WORKFLOWS (Accepting a Feature, Common Questions FAQ). Rejected Document Roles markers and structural tests as over-engineering.
+
+**Impact**: ~687 lines of duplication removed. Stale version numbers (0.19.0, 0.13.0) fixed across 3 files. Clear ownership prevents future triple-maintenance.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.28.0
+**Current Version**: v0.28.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 48 behavioral test scripts

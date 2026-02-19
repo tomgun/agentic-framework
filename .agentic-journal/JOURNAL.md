@@ -764,3 +764,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-19 10:59 - F-0136 shipped
+
+**Why**: Merge complete
+
+**Accomplished**:
+- PR #38 merged, centralized TODO tracking live on main (v0.28.0)
+
+**Next steps**:
+- Pick next feature from backlog
+
+**Blockers**: None
+

@@ -26,13 +26,13 @@ curl -s https://api.github.com/repos/tomgun/agentic-framework/releases/latest | 
 
 # Download new framework to temp location
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.19.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v<VERSION>.tar.gz | tar xz
 
 # Run upgrade tool FROM the new framework
-bash /tmp/agentic-framework-0.19.0/.agentic/tools/upgrade.sh /path/to/your-project
+bash /tmp/agentic-framework-<VERSION>/.agentic/tools/upgrade.sh /path/to/your-project
 
 # Clean up
-rm -rf /tmp/agentic-framework-0.19.0
+rm -rf /tmp/agentic-framework-<VERSION>
 ```
 
 ### What's the current status?
@@ -78,42 +78,13 @@ Shows: decisions, blockers, or issues that need human judgment.
 
 ## Automated Health Checks
 
-**📖 For detailed script documentation, see [`DEVELOPER_GUIDE.md#automation--scripts`](DEVELOPER_GUIDE.md#automation--scripts)**
-
-These scripts analyze the project and report issues. Here are the most common ones:
-
-### Essential Scripts
-
 ```bash
-# Check project structure and required files
-bash .agentic/tools/doctor.sh
-
-# Get feature status summary
-bash .agentic/tools/report.sh
-
-# Comprehensive verification (doctor + cross-references + tests)
-bash .agentic/tools/verify.sh
-
-# Check code traceability
-bash .agentic/tools/coverage.sh
-
-# Unified traceability (drift + coverage combined)
-bash .agentic/tools/ag.sh trace          # Full report
-bash .agentic/tools/ag.sh trace --gaps   # Missing implementations
-bash .agentic/tools/ag.sh trace F-0001   # Files implementing a feature
-
-# Visualize feature dependencies
-bash .agentic/tools/feature_graph.sh
-
-# Check spec/code drift
-bash .agentic/tools/drift.sh
+bash .agentic/tools/doctor.sh       # Check project structure
+bash .agentic/tools/doctor.sh --full # Comprehensive verification
+bash .agentic/tools/report.sh       # Feature status summary
 ```
 
-**See DEVELOPER_GUIDE.md for**:
-- What each script checks
-- When to run each script
-- Example outputs
-- Full list of 30+ available scripts
+**📖 Full script documentation (30+ scripts)**: [`DEVELOPER_GUIDE.md#automation--scripts`](DEVELOPER_GUIDE.md#automation--scripts)
 
 ## Context Gathering (Before Agent Session)
 

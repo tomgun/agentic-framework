@@ -12,7 +12,7 @@
 - [**CREDITS.md**](CREDITS.md) - Contributors and acknowledgments
 - [START_HERE.md](.agentic/START_HERE.md) - Quick start in 5 minutes
 - [MANUAL_OPERATIONS.md](.agentic/MANUAL_OPERATIONS.md) - Token-free information retrieval
-- [USER_WORKFLOWS.md](.agentic/workflows/USER_WORKFLOWS.md) - Working with agents
+- [DEVELOPER_GUIDE.md → Working with Agents](.agentic/DEVELOPER_GUIDE.md#working-with-agents) - Agent workflows & common questions
 - [Example Projects](examples/) - See it in action
 - 🚨 [**FRAMEWORK_DEVELOPMENT.md**](FRAMEWORK_DEVELOPMENT.md) - For contributors working on the framework itself
 
