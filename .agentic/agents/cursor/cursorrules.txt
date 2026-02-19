@@ -27,6 +27,7 @@ Rules:
 - Keep changes small and scoped.
 - Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
 - Multi-agent: read `.agentic-state/AGENTS_ACTIVE.md` before starting work.
+- **Where to log**: Task/idea → `ag todo`; human blocker (PR, credential, decision) → `blocker.sh`; bug → `quick_issue.sh`; new capability → `feature.sh`. Do NOT put development tasks in HUMAN_NEEDED.md.
 
 Agent mode: Check `agent_mode` in STACK.md (premium|balanced|economy). Details: auto_orchestration.md
 

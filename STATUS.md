@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0136 Centralized TODO Tracking — PR ready for review (Updated: 2026-02-19 06:29 EET)
+- F-0136 Centralized TODO Tracking — routing rule parity complete, PR ready (Updated: 2026-02-19 10:49 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

@@ -738,3 +738,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-19 10:49 - F-0136 routing rule parity
+
+**Why**: Routing rule was only in Claude files, not other agents — agents using codex/copilot/cursor would misroute tasks
+
+**Accomplished**:
+- Added Where-to-log routing rule to codex, copilot, cursor instruction files; documented in DEVELOPER_GUIDE.md Best Practices #7; created S09 structural test for cross-agent routing consistency
+
+**Next steps**:
+- PR #38 ready for final review
+
+**Blockers**: None
+
