@@ -1786,7 +1786,20 @@ cp .agentic/spec/ADR.template.md spec/adr/ADR-0005-use-postgresql.md
 **Priority**: High
 ```
 
-### 7. Use Brief Context Loads
+### 7. Log Things in the Right Place
+
+The framework provides multiple tracking files. Use this decision table to route items correctly:
+
+| What you have | Where it goes | How |
+|--------------|---------------|-----|
+| Development idea, task, or reminder | `TODO.md` | `ag todo "description"` |
+| Human blocker (PR review, credentials, decision needed) | `HUMAN_NEEDED.md` | `bash .agentic/tools/blocker.sh add "Title" "type" "Details"` |
+| Bug or technical debt | `ISSUES.md` | `bash .agentic/tools/quick_issue.sh "Title" "Details"` |
+| New capability to spec | `FEATURES.md` | `bash .agentic/tools/feature.sh add "Title"` |
+
+**Do NOT** put development tasks in HUMAN_NEEDED.md — that file is reserved for items that genuinely require human action (approvals, credentials, external decisions). If an agent can act on it, it belongs in TODO.md.
+
+### 8. Use Brief Context Loads
 
 **Don't load entire codebase every session:**
 
@@ -1800,7 +1813,7 @@ Not:
 Agent: "Read all files in src/ and tell me what's happening"  ❌
 ```
 
-### 8. Batch Related Changes
+### 9. Batch Related Changes
 
 **One feature = one commit with all updates:**
 ```bash
@@ -1814,7 +1827,7 @@ git add src/ tests/ spec/
 git commit -m "feat(F-0005): implement CSV export with tests and spec updates"
 ```
 
-### 9. Review Before Merging
+### 10. Review Before Merging
 
 **Checklist before merge:**
 - [ ] All tests pass
@@ -1824,7 +1837,7 @@ git commit -m "feat(F-0005): implement CSV export with tests and spec updates"
 - [ ] Acceptance criteria met (check spec/acceptance/F-####.md)
 - [ ] Quality checks pass (if you have a `quality_checks.sh` — see Customization section)
 
-### 10. Run Retrospectives
+### 11. Run Retrospectives
 
 **Enable in STACK.md:**
 ```yaml
@@ -2129,6 +2142,6 @@ Evening:  "Let's wrap up and commit" → agent verifies + commits with approval
 
 ---
 
-**Version:** 0.27.2
-**Last updated:** 2026-02-18
+**Version:** 0.28.0
+**Last updated:** 2026-02-19
 

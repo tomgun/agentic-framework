@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Plan-mode-exit trigger added to all instruction files (Updated: 2026-02-18 23:05 EET)
+- F-0136 Centralized TODO Tracking — routing rule in all docs, PR ready (Updated: 2026-02-19 10:52 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)
@@ -18,11 +18,6 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - Run infrastructure LLM tests (`bash tests/infrastructure/run.sh --with-llm`)
 - Run interactive memory tests (`bash tests/infrastructure/run.sh --interactive`)
 - Real-world project validation (non-framework project)
-
-## Backlog
-- Progressive disclosure of complexity
-- Context7 MCP integration: test in real project scenario
-- Automated CI for LLM tests via Claude CLI
 
 ## Known issues / risks
 - Some CHANGELOG.md historical references point to old file locations (acceptable — historical records)

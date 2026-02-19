@@ -2106,6 +2106,20 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ---
 
+## F-0136: Centralized TODO Tracking
+
+**Status**: in_progress
+**Priority**: high
+**Added**: 2026-02-18
+
+**Description**: Durable, git-tracked inbox (TODO.md) for quick-capture of ideas, tasks, and reminders. Replaces scattered capture across STATUS.md Backlog, HUMAN_NEEDED.md, and JOURNAL.md "Next steps." `todo.sh` provides CRUD operations (add/done/drop/triage/list) following the `blocker.sh` pattern. Routing rules in all instruction files enforce: task → TODO.md, blocker → HUMAN_NEEDED.md, bug → ISSUES.md, capability → FEATURES.md.
+
+**Dependencies**: F-0041 (Token-Efficient Update Scripts), F-0026 (HUMAN_NEEDED.md Escalation)
+
+**Acceptance**: See `spec/acceptance/F-0136.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -2120,6 +2134,6 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 27 | 2 | 1 | 30 |
-| **Total** | **99** | **3** | **1** | **104** |
+| Framework Infrastructure (F-0101+) | 27 | 3 | 1 | 31 |
+| **Total** | **99** | **4** | **1** | **105** |
 

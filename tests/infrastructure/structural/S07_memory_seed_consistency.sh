@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # S07: Memory-seed ↔ CLAUDE.md consistency
-# Both files should contain the same 6 trigger categories and 4 script references
+# Both files should contain the same 7 trigger categories and 5 script references
 set -euo pipefail
 source "$(dirname "$0")/../lib/helpers.sh"
 
@@ -12,7 +12,7 @@ CLAUDE_MD="$FRAMEWORK_ROOT/.agentic/agents/claude/CLAUDE.md"
 assert_file_exists "$MEMORY_SEED" "memory-seed.md exists"
 assert_file_exists "$CLAUDE_MD" "CLAUDE.md template exists"
 
-# Check 5 trigger categories exist in BOTH files
+# Check 7 trigger categories exist in BOTH files
 
 # 1. Build/implement → spec first
 for file in "$MEMORY_SEED" "$CLAUDE_MD"; do
@@ -74,8 +74,18 @@ for file in "$MEMORY_SEED" "$CLAUDE_MD"; do
     fi
 done
 
-# Check 4 token-efficient script references in BOTH files
-for script in "journal.sh" "status.sh" "blocker.sh" "feature.sh"; do
+# 7. Todo/idea → ag todo
+for file in "$MEMORY_SEED" "$CLAUDE_MD"; do
+    name=$(basename "$file")
+    if grep -qi "todo\|idea\|remember" "$file" && grep -qi "ag todo\|todo\.sh" "$file"; then
+        pass_test "$name: todo/idea → ag todo trigger present"
+    else
+        fail_test "$name: todo/idea → ag todo trigger present"
+    fi
+done
+
+# Check 5 token-efficient script references in BOTH files
+for script in "journal.sh" "status.sh" "blocker.sh" "feature.sh" "todo.sh"; do
     for file in "$MEMORY_SEED" "$CLAUDE_MD"; do
         name=$(basename "$file")
         if grep -q "$script" "$file"; then

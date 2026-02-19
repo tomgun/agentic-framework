@@ -235,6 +235,15 @@ Details: [`.agentic/workflows/dev_loop.md`](workflows/dev_loop.md)
 - **JOURNAL.md**: Session-by-session progress (what was done, what's next, blockers)
 - **HUMAN_NEEDED.md**: Items requiring human decision/intervention
 
+### Where to log things
+
+| What you have | Where it goes | How |
+|--------------|---------------|-----|
+| Task / idea / reminder | `TODO.md` | `ag todo "description"` |
+| Needs human action (PR review, credentials, decision) | `HUMAN_NEEDED.md` | `bash .agentic/tools/blocker.sh add` |
+| Bug or technical debt | `ISSUES.md` | `bash .agentic/tools/quick_issue.sh` |
+| New capability to spec | `FEATURES.md` | `bash .agentic/tools/feature.sh add` |
+
 ### In `spec/` (specifications)
 - **PRD.md**: Product requirements (why, what)
 - **TECH_SPEC.md**: Technical spec (how, architecture)

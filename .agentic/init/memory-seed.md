@@ -1,7 +1,7 @@
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.25.3 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done -->
+<!-- memory-seed v0.28.0 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag todo -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -40,11 +40,17 @@ If the user wants to commit, push, save, ship, or finalize changes:
 
 **STOP.** Check `.agentic-state/WIP.md` first — if it exists, BLOCK and warn. Otherwise, follow the pre-commit sequence below, then run `ag commit`.
 
+## When the user mentions an idea, todo, or reminder
+
+If the user says remember, todo, idea, note for later, tasklist, or mentions something to track:
+
+**STOP.** Run `ag todo "description"` to capture it in TODO.md (git-tracked, survives context compression).
+
 ## When work is done
 
 If the user says done, complete, finished, wrapped up, or indicates a feature is ready:
 
-**STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command.
+**STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. Before ending, check your TaskList for pending items and flush them to TODO.md via `ag todo`.
 
 ## Pre-commit sequence (never skip steps)
 
@@ -66,6 +72,7 @@ Never read or edit these files directly. Always use the scripts:
 | JOURNAL.md | `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"` |
 | HUMAN_NEEDED.md | `bash .agentic/tools/blocker.sh add "Title" "type" "Details"` |
 | FEATURES.md | `bash .agentic/tools/feature.sh F-#### status shipped` |
+| TODO.md | `bash .agentic/tools/todo.sh add "Idea"` or `ag todo "Idea"` |
 
 ## Session start
 
@@ -74,6 +81,15 @@ When a session begins, immediately:
 1. Read STATUS.md, HUMAN_NEEDED.md, last 2-3 JOURNAL.md entries
 2. Run `bash .agentic/tools/wip.sh check` for interrupted work
 3. Greet user with dashboard: current focus, recent progress, blockers, suggested next steps
+
+## Where to log things
+
+- Development idea or task → `ag todo "description"` (TODO.md)
+- Needs human action (PR review, credentials, decision) → `blocker.sh` (HUMAN_NEEDED.md)
+- Bug or technical debt → ISSUES.md
+- New capability to spec → FEATURES.md
+
+Do NOT put development tasks in HUMAN_NEEDED.md.
 
 ## Rules that always apply
 

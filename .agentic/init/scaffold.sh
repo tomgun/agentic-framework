@@ -214,6 +214,7 @@ mkdir -p "${ROOT_DIR}/.agentic-journal"
 copy_if_missing "${ROOT_DIR}/.agentic/spec/JOURNAL.template.md" "${ROOT_DIR}/.agentic-journal/JOURNAL.md"
 
 copy_if_missing "${ROOT_DIR}/.agentic/spec/HUMAN_NEEDED.template.md" "${ROOT_DIR}/HUMAN_NEEDED.md"
+copy_if_missing "${ROOT_DIR}/.agentic/spec/TODO.template.md" "${ROOT_DIR}/TODO.md"
 
 # Configure STACK.md settings for selected profile
 if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
