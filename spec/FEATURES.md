@@ -2134,6 +2134,20 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ---
 
+## F-0139: Doc Lifecycle System
+
+**Status**: in_progress
+**Priority**: medium
+**Added**: 2026-02-19
+
+**Description**: Systematic doc drafting and update lifecycle wired into `ag done` and `ag docs`. Two-layer architecture: project doc registry in `STACK.md ## Docs` (survives upgrades) and framework machinery in `.agentic/tools/docs.sh` (context assembler + trigger dispatcher). Supports 8 built-in doc types (changelog, readme, lessons, architecture, adr, runbook, tech-spec, custom) with 4 triggers (feature_done, pr, session, manual). Append/prepend-only strategy — never rewrites existing content. Developer extends by adding one line to STACK.md.
+
+**Dependencies**: F-0138 (Documentation Impact Tracking)
+
+**Acceptance**: See `spec/acceptance/F-0139.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |

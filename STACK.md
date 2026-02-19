@@ -5,7 +5,7 @@
 Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Agentic framework
-- Version: 0.29.0
+- Version: 0.30.0
 - Profile: formal
 - This IS the framework (dogfooding)
 - Source: https://github.com/tomgun/agentic-framework
@@ -130,6 +130,20 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - llm_test_command: ag test llm
 - llm_test_critical_only: ag test llm --critical
 - llm_test_results: tests/VERIFICATION_REPORT.md
+
+## Docs
+<!-- Doc registry — declare what docs this project maintains.
+     This section lives in STACK.md (project root) and survives .agentic/ upgrades.
+     To add a doc: add a line here. No .agentic/ files need editing.
+     Triggers: feature_done | pr | session | manual
+     Note: pr-trigger docs only fire in formal profile (formal uses PRs).
+     To fire on multiple triggers, add two entries with the same path.
+     Types (built-in): changelog | readme | adr | lessons | architecture | runbook | tech-spec | custom -->
+- doc: CHANGELOG.md                | changelog    | pr
+- doc: README.md                   | readme       | pr
+- doc: spec/LESSONS.md             | lessons      | feature_done
+- doc: docs/INSTRUCTION_ARCHITECTURE.md | architecture | feature_done
+- doc: spec/adr/                   | adr          | manual
 
 ## Constraints & non-negotiables
 - Backward compatibility: Must support existing projects upgrading

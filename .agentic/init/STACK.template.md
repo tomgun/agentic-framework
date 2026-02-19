@@ -195,6 +195,20 @@ Purpose: a single source of truth for "how we build and run software here".
 - CI: <!-- GitHub Actions by default -->
 - Release strategy: <!-- manual/semver/tags/etc -->
 
+## Docs
+<!-- Doc registry — declare what docs this project maintains.
+     This section lives in STACK.md (project root) and survives .agentic/ upgrades.
+     To add a doc: add a line here. No .agentic/ files need editing.
+     Triggers: feature_done | pr | session | manual
+     Note: pr-trigger docs only fire in formal profile (formal uses PRs).
+     To fire on multiple triggers, add two entries with the same path.
+     Types (built-in): changelog | readme | adr | lessons | architecture | runbook | tech-spec | custom -->
+<!-- - doc: CHANGELOG.md          | changelog    | pr           -->
+<!-- - doc: README.md             | readme       | pr           -->
+<!-- - doc: docs/lessons.md       | lessons      | feature_done -->
+<!-- - doc: docs/architecture.md  | architecture | feature_done -->
+<!-- - doc: docs/adr/             | adr          | manual       -->
+
 ## Constraints & non-negotiables
 - Security/compliance: <!-- PII, GDPR, etc -->
 - Performance: <!-- latency, throughput -->

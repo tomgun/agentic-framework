@@ -10,7 +10,28 @@
 - User-facing functionality has changed
 - API or configuration has changed
 
-## Process (use this every time)
+## Two Modes
+
+### Mode 1: Structured Registry (when `docs.sh` output is provided)
+
+When invoked via `ag docs` or `ag done` with a populated `STACK.md ## Docs` registry,
+you receive structured context blocks from `docs.sh`. Follow these instructions:
+
+1. Read each `=== DOC DRAFT CONTEXT ===` block
+2. For each doc, use the type guidance and write strategy:
+   - **prepend**: Add new entry at top of content (below headers), e.g., CHANGELOG
+   - **append**: Add new entry at end of file, e.g., lessons
+   - **append-section**: Add clearly marked section at end, e.g., README, architecture
+   - **new-file**: Create a new file (e.g., ADR)
+3. Mark all drafted content with `<!-- draft: F-#### YYYY-MM-DD -->` at the start
+4. If target file doesn't exist (`Status: [new file]`), create it using the
+   "New file template" from `.agentic/agents/shared/doc_types.md`
+5. Never rewrite or restructure existing content — append/prepend only
+6. Print summary of what was drafted
+
+### Mode 2: Autonomous Discovery (standalone invocation)
+
+When invoked directly (not via docs.sh), use the original discovery process:
 
 1. **Read CONTEXT_PACK.md → `## Documentation`** — this tells you what docs exist in this project
 2. **Run**: `bash .agentic/tools/drift.sh --docs --manifest F-####` — this tells you what's stale
@@ -41,5 +62,3 @@
 ## Handoff
 
 → Pass to **git-agent** with: "Commit F-#### changes"
-
-
