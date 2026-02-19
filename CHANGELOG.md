@@ -5,6 +5,19 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.28.1] - 2026-02-19
+
+### Changed
+- **Documentation deduplication** — Established document ownership model: each piece of content lives in ONE canonical file, others cross-reference. Removed ~687 lines of duplication across 5 docs.
+- **USER_WORKFLOWS.md retired** — Replaced 547-line file with redirect stub to DEVELOPER_GUIDE.md. Unique content (Accepting a Feature, Common Questions FAQ) migrated first.
+- **DEVELOPER_GUIDE.md** — Added "Accepting a Feature" section (§Daily Workflows) and "Common Questions" FAQ (§Troubleshooting). Removed Quick Information Retrieval and Finding Information subsections (duplicated MANUAL_OPERATIONS.md).
+- **START_HERE.md** — Common Issues condensed to table + link. Quick Command Reference replaced with cross-refs only. USER_WORKFLOWS ref updated.
+- **README.md** — Tools section compressed to categories + link. Troubleshooting replaced with pointer. USER_WORKFLOWS ref updated.
+- **MANUAL_OPERATIONS.md** — Script list slimmed to top 3 + cross-ref to DEVELOPER_GUIDE.
+
+### Fixed
+- **Stale version numbers** — Replaced hardcoded `v0.19.0` (README.md, MANUAL_OPERATIONS.md) and `v0.13.0`/`v0.12.0` (START_HERE.md) with `<VERSION>` placeholder.
+
 ## [0.28.0] - 2026-02-18
 
 ### Added

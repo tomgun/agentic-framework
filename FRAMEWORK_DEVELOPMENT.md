@@ -278,7 +278,6 @@ Different docs serve different readers:
 - `START_HERE.md` - Quick orientation
 - `DEVELOPER_GUIDE.md` - Daily usage
 - `PRINCIPLES.md` - Understanding "why"
-- `USER_WORKFLOWS.md` - Working with agents
 - `MANUAL_OPERATIONS.md` - Token-free operations
 
 **For agents working in user projects**:
@@ -448,7 +447,7 @@ refactor(docs): eliminate documentation duplication
 4. Update `sequential_agent_specialization.md`
 5. Update `automatic_sequential_pipeline.md`
 6. Test with real feature in example project
-7. Document in `USER_WORKFLOWS.md`
+7. Document in `DEVELOPER_GUIDE.md`
 
 **Changing existing template**:
 1. Update `.agentic/init/*.template.md` or `.agentic/spec/*.template.md`

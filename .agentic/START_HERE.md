@@ -28,13 +28,13 @@
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v<VERSION>.tar.gz | tar xz
 
 # Run the installer
-bash agentic-framework-0.12.0/install.sh
+bash agentic-framework-<VERSION>/install.sh
 
 # Clean up
-rm -rf agentic-framework-0.12.0
+rm -rf agentic-framework-<VERSION>
 ```
 
 ### Step 2: Tell your agent to initialize
@@ -118,7 +118,7 @@ See [`.agentic/token_efficiency/reading_protocols.md`](token_efficiency/reading_
    - Core philosophy
    - Anti-patterns to avoid
    - **Read this to understand the "why"**
-4. **[`workflows/USER_WORKFLOWS.md`](workflows/USER_WORKFLOWS.md) - Working with agents** ⭐
+4. **[`DEVELOPER_GUIDE.md` → Working with Agents](DEVELOPER_GUIDE.md#working-with-agents)** ⭐
    - How to add features, update specs, work with agents
    - Step-by-step workflows and examples
    - Common questions answered
@@ -343,34 +343,16 @@ You shouldn't need to edit these - they're the framework:
 
 ## Common Issues
 
-### "Agent keeps re-reading the entire codebase"
-→ Update `CONTEXT_PACK.md` with structure summaries  
-→ Agent should follow `.agentic/token_efficiency/reading_protocols.md`  
-→ Use `@feature` annotations to help agents find code
+| Problem | Quick fix |
+|---------|-----------|
+| Agent keeps re-reading everything | Update `CONTEXT_PACK.md` with structure summaries |
+| Lost track of what we're building | Read `STATUS.md` and `spec/OVERVIEW.md` |
+| Agent context reset mid-task | Check `STATUS.md` "Current session state" |
+| Tests are missing or broken | Run `bash .agentic/tools/doctor.sh --full` |
+| Don't know what to work on next | Check `STATUS.md` "Next up" and `HUMAN_NEEDED.md` |
+| Project getting complex | See `.agentic/workflows/scaling_guidance.md` |
 
-### "Lost track of what we're building"
-→ Update `STATUS.md` with current focus  
-→ Read `spec/FEATURES.md` for feature list  
-→ Read `spec/OVERVIEW.md` for vision
-
-### "Tests are missing or broken"
-→ Check `spec/FEATURES.md` for test status  
-→ Run `bash .agentic/tools/verify.sh`  
-→ Review `.agentic/quality/test_strategy.md`
-
-### "Don't know what to work on next"
-→ Check `STATUS.md` "Next up" section  
-→ Check `spec/FEATURES.md` for planned features  
-→ Check `HUMAN_NEEDED.md` for blocked items
-
-### "Agent context reset mid-task"
-→ Check `STATUS.md` "Current session state"  
-→ Check recent `JOURNAL.md` entries for exact next step  
-→ Agents should update these before context resets
-
-### "Project is getting complex and hard to navigate"
-→ See `.agentic/workflows/scaling_guidance.md` for reorganization suggestions  
-→ Consider splitting large files (FEATURES.md, NFR.md, CONTEXT_PACK.md)
+**More issues & detailed solutions**: [`DEVELOPER_GUIDE.md#troubleshooting`](DEVELOPER_GUIDE.md#troubleshooting)
 
 ---
 
@@ -382,27 +364,8 @@ See [`FRAMEWORK_MAP.md`](FRAMEWORK_MAP.md) for a visual diagram of how everythin
 
 ## Quick Command Reference
 
-**📖 For comprehensive commands and examples, see:**
-- [`DEVELOPER_GUIDE.md#quick-reference`](DEVELOPER_GUIDE.md#quick-reference) - Full command table with explanations
-- [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) - Token-free quick operations
-
-**Essential commands:**
-```bash
-# Project health
-bash .agentic/tools/doctor.sh       # Check structure
-bash .agentic/tools/verify.sh       # Comprehensive verification
-
-# Project status
-cat STATUS.md                        # Current focus
-tail -30 JOURNAL.md                  # Recent work
-cat HUMAN_NEEDED.md                  # Blockers
-
-# Feature info
-bash .agentic/tools/report.sh       # Feature summary
-bash .agentic/tools/feature_graph.sh # Dependencies
-```
-
-See the guides above for 30+ available commands with detailed explanations.
+See [`DEVELOPER_GUIDE.md#quick-reference`](DEVELOPER_GUIDE.md#quick-reference) for the full command table.
+See [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) for token-free operations.
 
 ---
 

@@ -168,6 +168,20 @@ Tell the agent: **"Let's wrap up and commit"**
 
 The agent runs verification, updates JOURNAL.md, and prepares the commit for your approval.
 
+### Accepting a Feature
+
+When the agent says a feature is complete:
+
+1. **Test it yourself** — try the feature, check acceptance criteria from `spec/acceptance/F-####.md`
+2. **If it works**, tell the agent: *"F-#### looks good, mark it as accepted"*
+3. Agent updates `spec/FEATURES.md` (Accepted: yes, date), `STATUS.md`, and `JOURNAL.md`
+
+**Automated acceptance** (if tests exist):
+```bash
+bash .agentic/tools/accept.sh F-####
+```
+This marks the feature as accepted if all tests pass.
+
 ### Working Manually (Without Agent)
 
 If you prefer direct control or the agent isn't available:
@@ -406,49 +420,8 @@ See `.agentic/workflows/multi_agent_coordination.md` for full guide.
 
 ## Manual Operations
 
-### Philosophy: Save Tokens, Read Docs Yourself
-
-**The agent maintains documentation. You can read it directly instead of asking the agent.**
-
-This is:
-- ✅ Faster
-- ✅ Costs zero tokens
-- ✅ Gives you full context
-
-**📖 For focused token-saving quick reference, see [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md)**
-
-That guide provides:
-- Quick grep/cat patterns for instant information
-- Token-free dashboard script
-- When to look vs. when to ask agent
-
-### Quick Information Retrieval
-
-```bash
-# Current status
-cat STATUS.md
-
-# Recent work
-tail -50 JOURNAL.md
-
-# How to build/test
-cat STACK.md
-
-# Architecture overview
-cat CONTEXT_PACK.md
-
-# Feature list
-grep "^## F-" spec/FEATURES.md
-
-# Optional: Check spec migrations (if using)
-bash .agentic/tools/migration.sh list
-
-# What needs your attention
-cat HUMAN_NEEDED.md
-
-# Framework version
-grep "Version:" STACK.md
-```
+**📖 Quick commands for token-free operations**: [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md)
+— status checks, context gathering, finding information, dashboard script.
 
 ### Editing Specs Directly
 
@@ -554,30 +527,6 @@ See: `.agentic/workflows/spec_migrations.md` for details.
 Then tell agent:
 ```
 "I updated the acceptance criteria for CSV export. Please adjust implementation to match."
-```
-
-### Finding Information
-
-**📖 Also see [`MANUAL_OPERATIONS.md#finding-specific-information`](MANUAL_OPERATIONS.md#finding-specific-information) for more grep patterns**
-
-These examples use feature IDs from your spec files (replace with your own IDs):
-
-```bash
-# Find where feature is implemented
-grep -r "@feature F-0005" src/
-
-# Find acceptance criteria
-cat spec/acceptance/F-0005.md
-
-# Find decisions
-ls spec/adr/ | grep -i "auth"
-grep -i "authentication" spec/adr/*.md
-
-# Check test coverage for feature
-grep -A 20 "^## F-0005:" spec/FEATURES.md | grep -A 5 "^- Tests:"
-
-# Find why something was done
-grep -i "authentication" JOURNAL.md
 ```
 
 ---
@@ -1661,6 +1610,32 @@ bash .agentic/tools/stale.sh --days 90
 # Check agent_operating_guidelines.md "Documentation Sync Rule"
 ```
 
+### Common Questions
+
+**Q: Can I edit FEATURES.md myself?**
+A: Yes! Agents pick up your changes. Edit freely.
+
+**Q: Will agents overwrite my changes?**
+A: No. Agents treat human edits as source of truth. They might add information (like test status) but won't delete your content.
+
+**Q: How do I change feature priority?**
+A: Edit `STATUS.md` "Current focus" or tell your agent: *"Make F-#### the priority"*
+
+**Q: Can I skip acceptance criteria?**
+A: Not recommended in Formal mode. Acceptance criteria are how agents know when "done" is done. At minimum: 3-5 bullet points.
+
+**Q: What if acceptance criteria are wrong?**
+A: Edit `spec/acceptance/F-####.md` anytime. Tell agent: *"I updated F-#### acceptance, please adjust implementation"*
+
+**Q: How do I know what's implemented?**
+A: Run `bash .agentic/tools/report.sh` or check `spec/FEATURES.md` "Implementation: State" field.
+
+**Q: What if agent gets stuck?**
+A: Agent should add entry to `HUMAN_NEEDED.md`. Check there for blockers.
+
+**Q: Can I work on code without agent?**
+A: Yes! Just update `FEATURES.md` status and `JOURNAL.md` when done so agent knows what changed.
+
 ### Quality Checks Failing
 
 **Problem:** Your project's `quality_checks.sh` (user-created — see Customization section) fails on commit.
@@ -2123,7 +2098,6 @@ Evening:  "Let's wrap up and commit" → agent verifies + commits with approval
 
 **Framework Documentation:**
 - Quick start: `.agentic/START_HERE.md`
-- User workflows: `.agentic/workflows/USER_WORKFLOWS.md`
 - Manual operations: `.agentic/MANUAL_OPERATIONS.md`
 - All workflows: `.agentic/workflows/`
 - All tools: `.agentic/tools/` (each has inline help)
@@ -2142,6 +2116,6 @@ Evening:  "Let's wrap up and commit" → agent verifies + commits with approval
 
 ---
 
-**Version:** 0.28.0
+**Version:** 0.28.1
 **Last updated:** 2026-02-19
 
