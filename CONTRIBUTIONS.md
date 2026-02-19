@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.27.1)
-**Date**: 2026-02-16
+**Period**: Initial Development (v0.1.0 → v0.28.0)
+**Date**: 2026-02-18
 
 ---
 
@@ -2303,12 +2303,12 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **User insight**: Ideas and tasks are scattered across HUMAN_NEEDED.md, STATUS.md, ISSUES.md, and FEATURES.md with no single inbox. Need a solid mechanism for logging ideas/tasks in a central place.
 
-**Impact**: Planned for design and implementation.
+**Impact**: Shipped as F-0136 (v0.28.0). TODO.md + todo.sh + `ag todo` command. Routing rules enforced across all instruction files. STATUS.md Backlog replaced.
 
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.27.2
+**Current Version**: v0.28.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 48 behavioral test scripts

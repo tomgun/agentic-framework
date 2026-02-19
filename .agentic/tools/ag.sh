@@ -120,6 +120,7 @@ COMMANDS:
     start               Session start checks + context summary
     init                Run project initialization interview
     work "description"  Start WIP tracking for a task
+    todo <args>         Quick-capture ideas/tasks to TODO.md inbox
     commit              Run all pre-commit gates
     done                Task complete validation
     set [key] [value]   View/change settings (--show, --validate, --migrate)
@@ -137,6 +138,9 @@ EXAMPLES:
     ag start                    # Begin a new session
     ag init                     # Initialize project (if not done)
     ag work "Add login form"    # Start working on a task
+    ag todo "Try new library"   # Capture idea to TODO.md
+    ag todo list                # Show inbox items
+    ag todo done T-0001 "done"  # Resolve item
     ag sync                     # Full sync: detect + auto-fix
     ag sync --check             # Dry run: detect only
     ag commit                   # Verify ready to commit
@@ -164,6 +168,7 @@ COMMANDS:
     plan F-XXXX         Create plan with review loop (before implementing)
     implement F-XXXX    Verify acceptance exists, start WIP tracking
     specs               Systematic brownfield spec generation by domain
+    todo <args>         Quick-capture ideas/tasks to TODO.md inbox
     commit              Run all pre-commit gates
     done [F-XXXX]       Feature complete validation
     set [key] [value]   View/change settings (--show, --validate, --migrate)
@@ -185,6 +190,9 @@ EXAMPLES:
     ag implement F-0042         # Start working on feature F-0042
     ag specs                    # Start/resume brownfield spec generation
     ag specs --status           # Show domain progress
+    ag todo "Try new library"   # Capture idea to TODO.md
+    ag todo list                # Show inbox items
+    ag todo done T-0001 "done"  # Resolve item
     ag commit                   # Verify ready to commit
     ag done F-0042              # Check feature completion
     ag approve-onboarding       # List unapproved proposals
@@ -276,9 +284,18 @@ cmd_start() {
     # 5. Check HUMAN_NEEDED.md for blockers
     if [ -f "$ROOT_DIR/HUMAN_NEEDED.md" ]; then
         local blocker_count
-        blocker_count=$(grep -c "^## HN-" "$ROOT_DIR/HUMAN_NEEDED.md" 2>/dev/null || echo "0")
+        blocker_count=$(grep -c "^### HN-" "$ROOT_DIR/HUMAN_NEEDED.md" 2>/dev/null || echo "0")
         if [ "$blocker_count" -gt 0 ]; then
             echo -e "${YELLOW}Blockers: $blocker_count item(s) need human input${NC}"
+        fi
+    fi
+
+    # 5b. Check TODO.md inbox
+    if [ -f "$ROOT_DIR/TODO.md" ]; then
+        local todo_count
+        todo_count=$(awk '/^## Inbox/,/^## Done/' "$ROOT_DIR/TODO.md" 2>/dev/null | grep -c "^### T-" || echo "0")
+        if [ "$todo_count" -gt 0 ]; then
+            echo -e "${BLUE}TODO inbox: $todo_count item(s)${NC} (ag todo list)"
         fi
     fi
 
@@ -2036,6 +2053,33 @@ _settings_migrate() {
     show_all_settings
 }
 
+# Todo command - quick-capture ideas/tasks to TODO.md
+cmd_todo() {
+    local first_arg="${1:-}"
+
+    if [ -z "$first_arg" ]; then
+        echo -e "${RED}Error: Description or subcommand required${NC}"
+        echo "Usage: ag todo \"description\"          # add item"
+        echo "       ag todo list                    # show inbox"
+        echo "       ag todo done T-0001 \"resolved\"  # resolve item"
+        echo "       ag todo drop T-0001 \"reason\"    # drop item"
+        echo "       ag todo triage T-0001 feature   # promote to FEATURES.md"
+        exit 1
+    fi
+
+    case "$first_arg" in
+        list|done|drop|triage)
+            shift
+            bash "$SCRIPT_DIR/todo.sh" "$first_arg" "$@"
+            ;;
+        *)
+            # Default: treat as "add" with description
+            shift
+            bash "$SCRIPT_DIR/todo.sh" add "$first_arg" "$@"
+            ;;
+    esac
+}
+
 # Main command dispatch
 case "${1:-help}" in
     start)
@@ -2055,6 +2099,10 @@ case "${1:-help}" in
         ;;
     specs)
         cmd_specs "${2:-}"
+        ;;
+    todo)
+        shift
+        cmd_todo "$@"
         ;;
     commit)
         cmd_commit

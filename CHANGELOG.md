@@ -5,6 +5,20 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.28.0] - 2026-02-18
+
+### Added
+- **Centralized TODO tracking (F-0136)** — `TODO.md` as a durable, git-tracked inbox for ideas, tasks, and reminders. `todo.sh` provides CRUD operations (add/done/drop/triage/list) following the `blocker.sh` pattern with single-write insertion (no double-write bug). `ag todo` command for quick capture.
+- **Routing rules** — All instruction files and memory-seed now include a decision table: task/idea → `ag todo`, human blocker → `blocker.sh`, bug → `quick_issue.sh`, capability → `feature.sh`. Prevents agents from dumping development tasks into HUMAN_NEEDED.md.
+- **Session lifecycle integration** — `ag start` shows TODO inbox count; session-end checklist includes TaskList→TODO.md flush step.
+- **S07 structural test** — 7th trigger check (todo/idea → ag todo) and 5th script reference (todo.sh) in memory-seed ↔ CLAUDE.md consistency test.
+
+### Changed
+- **STATUS.md** — Backlog section removed (replaced by TODO.md inbox). "Next up" remains as curated session priorities.
+- **scaffold.sh** — TODO.md created for both Discovery and Formal profiles during project initialization.
+- **ag.sh** — Fixed HUMAN_NEEDED blocker count bug in `cmd_start()` (`^## HN-` → `^### HN-`).
+- **memory-seed** — Bumped to v0.28.0, added `ag todo` sentinel, routing rules section, todo.sh script reference.
+
 ## [0.27.2] - 2026-02-18
 
 ### Added

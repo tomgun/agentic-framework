@@ -725,3 +725,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-19 06:29 - F-0136 Centralized TODO Tracking
+
+**Why**: Ideas scattered across 5 files with no designated inbox — agents dump tasks into HUMAN_NEEDED.md
+
+**Accomplished**:
+- TODO.md + todo.sh + ag todo command, routing rules in all instruction files, S07 test updated (26/26), scaffold for both profiles, STATUS.md Backlog removed, HN count bug fixed
+
+**Next steps**:
+- Mark F-0136 shipped, merge PR
+
+**Blockers**: None
+
