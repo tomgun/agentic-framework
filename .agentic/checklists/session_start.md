@@ -19,6 +19,7 @@ cat STATUS.md 2>/dev/null || true
 cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
 cat .agentic-state/AGENTS_ACTIVE.md 2>/dev/null || true
 ls .agentic-state/WIP.md 2>/dev/null || true
+bash .agentic/tools/todo.sh list 2>/dev/null || true
 ```
 
 ## Step 2: Greet User with Recap

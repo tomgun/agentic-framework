@@ -64,6 +64,13 @@ _No active items_
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
+### HN-0009: PR #37: Plan-mode-exit trigger
+- **Type**: review
+- **Added**: 2026-02-18
+- **Context**: feat/plan-mode-exit-trigger — trigger for durable save + review after plan mode
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 <!-- Archive resolved items here with date and outcome -->
@@ -125,6 +132,14 @@ _No active items_
 - **Type**: review
 - **Added**: 2026-02-18
 - **Context**: feat/nfr-spec-role - NFR content validation and dogfooding
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
+### HN-0009: PR #37: Plan-mode-exit trigger
+- **Type**: review
+- **Added**: 2026-02-18
+- **Context**: feat/plan-mode-exit-trigger — trigger for durable save + review after plan mode
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 

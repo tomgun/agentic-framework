@@ -15,7 +15,8 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Build something large (>10 files, "entire", "full system") | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
 | Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
 | Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
-| Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX` |
+| Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, flush pending ideas to TODO.md via `ag todo`. |
+| Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
 | Plan created / planning complete | STOP -> Save plan to `.agentic-journal/plans/F-XXXX-plan.md` (use `ag plan --save <file> F-XXXX`), then if `plan_review_enabled: yes` in STACK.md invoke `/review` on the saved plan. |
 
 Acceptance criteria: Formal requires spec/acceptance/F-####.md before coding | Discovery: define criteria (any form) before coding.
@@ -36,6 +37,7 @@ Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly)
 - JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
 - HUMAN_NEEDED.md: `bash .agentic/tools/blocker.sh add "Title" "type" "Details"`
 - FEATURES.md: `bash .agentic/tools/feature.sh F-#### status shipped`
+- TODO.md: `bash .agentic/tools/todo.sh add "Idea"` or `ag todo "Idea"`
 
 Agent mode: Check `agent_mode` in STACK.md (premium|balanced|economy). Details: auto_orchestration.md
 
