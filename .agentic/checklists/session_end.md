@@ -80,6 +80,15 @@
 
 ---
 
+## Flush Pending Ideas to TODO.md
+
+- [ ] **Check Claude's TaskList for pending items**
+  - Any ideas, tasks, or reminders captured during the session?
+  - Flush remaining items to TODO.md via `ag todo "description"`
+  - TODO.md is git-tracked and survives context compression; TaskList does not
+
+---
+
 ## Code State Clean
 
 - [ ] **No uncommitted work** (unless intentional)

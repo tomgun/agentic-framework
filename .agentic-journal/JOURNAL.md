@@ -725,3 +725,42 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-19 06:29 - F-0136 Centralized TODO Tracking
+
+**Why**: Ideas scattered across 5 files with no designated inbox — agents dump tasks into HUMAN_NEEDED.md
+
+**Accomplished**:
+- TODO.md + todo.sh + ag todo command, routing rules in all instruction files, S07 test updated (26/26), scaffold for both profiles, STATUS.md Backlog removed, HN count bug fixed
+
+**Next steps**:
+- Mark F-0136 shipped, merge PR
+
+**Blockers**: None
+
+
+### Session: 2026-02-19 10:49 - F-0136 routing rule parity
+
+**Why**: Routing rule was only in Claude files, not other agents — agents using codex/copilot/cursor would misroute tasks
+
+**Accomplished**:
+- Added Where-to-log routing rule to codex, copilot, cursor instruction files; documented in DEVELOPER_GUIDE.md Best Practices #7; created S09 structural test for cross-agent routing consistency
+
+**Next steps**:
+- PR #38 ready for final review
+
+**Blockers**: None
+
+
+### Session: 2026-02-19 10:52 - F-0136 routing rule in docs
+
+**Why**: Routing rule needed in user-facing docs, not just agent instruction files
+
+**Accomplished**:
+- Added Where-to-log routing table to agent_operating_guidelines.md, MANUAL_OPERATIONS.md, START_HERE.md; expanded S09 test to cover all 9 files
+
+**Next steps**:
+- PR #38 ready
+
+**Blockers**: None
+

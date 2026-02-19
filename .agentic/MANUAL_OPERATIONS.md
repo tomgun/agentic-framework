@@ -188,6 +188,19 @@ grep -i "auth" spec/LESSONS.md
 grep -A 20 "^## F-0005:" spec/FEATURES.md | grep -A 5 "^- Tests:"
 ```
 
+## Where to Log Things
+
+Use the right file for the right purpose:
+
+| What you have | Where it goes | Command |
+|--------------|---------------|---------|
+| Development idea, task, or reminder | `TODO.md` | `ag todo "description"` |
+| Needs human action (PR review, credentials, decision) | `HUMAN_NEEDED.md` | `bash .agentic/tools/blocker.sh add "Title" "type" "Details"` |
+| Bug or technical debt | `ISSUES.md` | `bash .agentic/tools/quick_issue.sh "Title" "Details"` |
+| New capability to spec | `FEATURES.md` | `bash .agentic/tools/feature.sh add "Title"` |
+
+**Do NOT** put development tasks in HUMAN_NEEDED.md — reserve it for items requiring human action.
+
 ## Quick Edits (Humans Can Do These)
 
 You can **edit spec files directly** without talking to the agent. The agent will pick up your changes on next session.
