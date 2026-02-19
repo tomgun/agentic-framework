@@ -123,6 +123,7 @@ COMMANDS:
     todo <args>         Quick-capture ideas/tasks to TODO.md inbox
     commit              Run all pre-commit gates
     done                Task complete validation
+    docs [F-XXXX]       Draft docs from registry (STACK.md ## Docs)
     set [key] [value]   View/change settings (--show, --validate, --migrate)
     hooks <sub>         Manage git hooks (install|status|disable)
     approve-onboarding  Review/approve auto-discovered proposals
@@ -141,6 +142,8 @@ EXAMPLES:
     ag todo "Try new library"   # Capture idea to TODO.md
     ag todo list                # Show inbox items
     ag todo done T-0001 "done"  # Resolve item
+    ag docs                     # Draft docs for current work
+    ag docs --list              # Show doc registry
     ag sync                     # Full sync: detect + auto-fix
     ag sync --check             # Dry run: detect only
     ag commit                   # Verify ready to commit
@@ -171,6 +174,7 @@ COMMANDS:
     todo <args>         Quick-capture ideas/tasks to TODO.md inbox
     commit              Run all pre-commit gates
     done [F-XXXX]       Feature complete validation
+    docs [F-XXXX]       Draft docs from registry (STACK.md ## Docs)
     set [key] [value]   View/change settings (--show, --validate, --migrate)
     hooks <sub>         Manage git hooks (install|status|disable)
     approve-onboarding  Review/approve auto-discovered proposals
@@ -205,6 +209,10 @@ EXAMPLES:
     ag test llm                 # Run all LLM behavioral tests
     ag test llm --critical      # Run critical tests only
     ag tools                    # Discover available tools
+    ag docs F-0042              # Draft docs for feature F-0042
+    ag docs --list              # Show doc registry from STACK.md
+    ag docs --pr                # Draft PR-trigger docs only
+    ag docs --check             # Dry run: what would be drafted
     ag sync                     # Full sync: detect + auto-fix
     ag sync --check             # Dry run: detect only
     ag verify --full            # Full verification
@@ -856,6 +864,32 @@ cmd_done() {
         echo ""
     fi
 
+    # Doc lifecycle: draft docs from registry (after docs_gate, before complete check)
+    if [[ -f "$SCRIPT_DIR/docs.sh" ]]; then
+        local has_docs_registry
+        has_docs_registry=$(bash "$SCRIPT_DIR/docs.sh" --list 2>/dev/null | grep -c "^  " || true)
+        if [[ "$has_docs_registry" -gt 1 ]]; then
+            echo -e "${BOLD}=== Doc Lifecycle ===${NC}"
+            # feature_done trigger: both profiles
+            if [ -n "$feature_id" ]; then
+                bash "$SCRIPT_DIR/docs.sh" --trigger feature_done --manifest "$feature_id" 2>/dev/null || true
+            else
+                bash "$SCRIPT_DIR/docs.sh" --trigger feature_done 2>/dev/null || true
+            fi
+            # pr trigger: formal profile only
+            local profile_val
+            profile_val=$(get_setting "profile" "discovery")
+            if [[ "$profile_val" == "formal" ]]; then
+                if [ -n "$feature_id" ]; then
+                    bash "$SCRIPT_DIR/docs.sh" --trigger pr --manifest "$feature_id" 2>/dev/null || true
+                else
+                    bash "$SCRIPT_DIR/docs.sh" --trigger pr 2>/dev/null || true
+                fi
+            fi
+            echo ""
+        fi
+    fi
+
     echo -e "${BOLD}=== Feature Complete Check ===${NC}"
     echo ""
 
@@ -1016,6 +1050,60 @@ cmd_tools() {
     }
 }
 
+# Docs command - doc lifecycle system
+cmd_docs() {
+    local arg1="${1:-}"
+    local arg2="${2:-}"
+
+    # Resolve feature ID: explicit arg, or from WIP
+    local feature_id=""
+    if [[ "$arg1" =~ ^F-[0-9]{4}$ ]]; then
+        feature_id="$arg1"
+        shift 2>/dev/null || true
+        arg1="${1:-}"
+    elif [[ -f "$ROOT_DIR/.agentic-state/WIP.md" ]]; then
+        feature_id=$(grep -oE 'F-[0-9]{4}' "$ROOT_DIR/.agentic-state/WIP.md" 2>/dev/null | head -1 || true)
+    fi
+
+    case "$arg1" in
+        --list)
+            bash "$SCRIPT_DIR/docs.sh" --list
+            ;;
+        --check)
+            if [[ -n "$feature_id" ]]; then
+                bash "$SCRIPT_DIR/docs.sh" --trigger feature_done --check --manifest "$feature_id"
+                bash "$SCRIPT_DIR/docs.sh" --trigger pr --check --manifest "$feature_id"
+            else
+                echo -e "${RED}No feature ID given and no WIP active. Usage: ag docs F-####${NC}"
+                exit 1
+            fi
+            ;;
+        --pr)
+            if [[ -n "$feature_id" ]]; then
+                bash "$SCRIPT_DIR/docs.sh" --trigger pr --manifest "$feature_id"
+            else
+                echo -e "${RED}No feature ID given and no WIP active. Usage: ag docs --pr F-####${NC}"
+                exit 1
+            fi
+            ;;
+        "")
+            # Default: run both feature_done + pr triggers
+            if [[ -n "$feature_id" ]]; then
+                bash "$SCRIPT_DIR/docs.sh" --trigger feature_done --manifest "$feature_id"
+                bash "$SCRIPT_DIR/docs.sh" --trigger pr --manifest "$feature_id"
+            else
+                echo -e "${RED}No feature ID given and no WIP active. Usage: ag docs F-####${NC}"
+                exit 1
+            fi
+            ;;
+        *)
+            echo -e "${RED}Unknown docs subcommand: $arg1${NC}"
+            echo "Usage: ag docs [F-####] [--list|--check|--pr]"
+            exit 1
+            ;;
+    esac
+}
+
 # Hooks command - manage git hook configuration
 cmd_hooks() {
     local subcmd="${1:-}"
@@ -1091,6 +1179,17 @@ cmd_hooks() {
 cmd_sync() {
     local flag="${1:-}"
     bash "$SCRIPT_DIR/sync.sh" $flag
+
+    # Doc staleness check (session trigger)
+    if [[ -f "$SCRIPT_DIR/docs.sh" ]]; then
+        local has_docs
+        has_docs=$(bash "$SCRIPT_DIR/docs.sh" --list 2>/dev/null | grep -c "^  " || true)
+        if [[ "$has_docs" -gt 1 ]]; then
+            echo ""
+            echo -e "${BOLD}--- Doc Staleness ---${NC}"
+            bash "$SCRIPT_DIR/docs.sh" --trigger session 2>/dev/null || true
+        fi
+    fi
 }
 
 # Verify command - doctor checks
@@ -2143,6 +2242,10 @@ case "${1:-help}" in
         ;;
     done)
         cmd_done "${2:-}"
+        ;;
+    docs)
+        shift
+        cmd_docs "$@"
         ;;
     hooks)
         cmd_hooks "${2:-}" "${3:-}"

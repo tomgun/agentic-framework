@@ -120,6 +120,13 @@
 - Don't optimize without profiling data
 - Don't sacrifice correctness for green optimization
 
+### 14. Doc Lifecycle Design (F-0139)
+- Identified gap: F-0138 added detection but no writing — docs still rot
+- Designed two-layer separation: registry in STACK.md (developer-owned, survives upgrades) vs machinery in .agentic/ (framework-owned, replaceable)
+- Critical insight: docs.sh must be a context assembler, not an LLM caller — bash can't invoke Claude
+- Chose append/prepend-only strategy for safety: existing content never touched, human reviews via git diff
+- Registry format designed for simplicity: one line per doc, parseable with awk
+
 ---
 
 ## Framework Outcomes (Direct Result of Direction)
