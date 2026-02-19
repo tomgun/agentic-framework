@@ -87,6 +87,14 @@ TIP: You can reference real files instead of inline examples:
 - Definition of Done: see `.agentic/workflows/definition_of_done.md`
 - Review checklist: see `.agentic/quality/review_checklist.md`
 
+## Documentation
+
+<!-- List key docs in this project and what each covers. Keep short (5-8 entries).
+     This helps agents know where new feature documentation should go.
+     drift.sh --docs handles staleness detection separately. -->
+- `README.md` — <!-- e.g., User-facing overview, install, usage -->
+- `<!-- path -->` — <!-- purpose -->
+
 ## Known risks / sharp edges
 - <!-- bullets -->
 

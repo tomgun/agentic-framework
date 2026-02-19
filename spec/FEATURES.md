@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.25.0
+**Version**: 0.29.0
 
 ---
 
@@ -2120,6 +2120,20 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ---
 
+## F-0138: Documentation Impact Tracking
+
+**Status**: shipped
+**Priority**: medium
+**Added**: 2026-02-19
+
+**Description**: Systematic documentation update process wired into feature completion. Two complementary pieces: (1) `drift.sh --docs --manifest F-####` wired into `ag done` with `docs_gate` setting (off/warning/blocking) — machine-detects which existing docs reference changed code; (2) `## Documentation` section added to CONTEXT_PACK.md template — agents know what docs exist for new content placement. Documentation agent updated with concrete process: read CONTEXT_PACK.md docs list → run drift.sh → update flagged + new-content docs.
+
+**Dependencies**: F-0041 (Token-Efficient Update Scripts), F-0098 (drift.sh)
+
+**Acceptance**: See `spec/acceptance/F-0138.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -2134,6 +2148,6 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 27 | 3 | 1 | 31 |
-| **Total** | **99** | **4** | **1** | **105** |
+| Framework Infrastructure (F-0101+) | 28 | 3 | 1 | 32 |
+| **Total** | **100** | **4** | **1** | **106** |
 

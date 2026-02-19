@@ -1870,6 +1870,184 @@ else
 fi
 
 # ============================================================
+# F-0138: Documentation Impact Tracking
+# ============================================================
+echo ""
+echo "--- Acceptance Criteria Template ---"
+
+# acceptance.template.md exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance.template.md" ]]; then
+  pass "Acceptance template: acceptance.template.md exists"
+else
+  fail "Acceptance template: acceptance.template.md missing (ag implement references it)"
+fi
+
+# acceptance.template.md has a ## Tests section
+if grep -q "^## Tests" "${FRAMEWORK_ROOT}/.agentic/spec/acceptance.template.md" 2>/dev/null; then
+  pass "Acceptance template: has ## Tests section"
+else
+  fail "Acceptance template: missing ## Tests section"
+fi
+
+# feature_start.md gates the ## Tests section
+if grep -q "## Tests" "${FRAMEWORK_ROOT}/.agentic/checklists/feature_start.md" 2>/dev/null; then
+  pass "Acceptance template: feature_start.md checks for ## Tests section"
+else
+  fail "Acceptance template: feature_start.md does not check for ## Tests section"
+fi
+
+echo "--- F-0138: Documentation Impact Tracking ---"
+
+# CONTEXT_PACK.template.md has ## Documentation section
+if grep -q "^## Documentation" "${FRAMEWORK_ROOT}/.agentic/init/CONTEXT_PACK.template.md" 2>/dev/null; then
+  pass "F-0138: CONTEXT_PACK.template.md has ## Documentation section"
+else
+  fail "F-0138: CONTEXT_PACK.template.md missing ## Documentation section"
+fi
+
+# CONTEXT_PACK.md (framework instance) has populated ## Documentation section
+if grep -q "^## Documentation" "${FRAMEWORK_ROOT}/CONTEXT_PACK.md" 2>/dev/null; then
+  pass "F-0138: CONTEXT_PACK.md has ## Documentation section"
+else
+  fail "F-0138: CONTEXT_PACK.md missing ## Documentation section"
+fi
+
+# profiles.conf has docs_gate for both profiles
+if grep -q "^discovery.docs_gate=" "${FRAMEWORK_ROOT}/.agentic/presets/profiles.conf" 2>/dev/null; then
+  pass "F-0138: profiles.conf has discovery.docs_gate"
+else
+  fail "F-0138: profiles.conf missing discovery.docs_gate"
+fi
+if grep -q "^formal.docs_gate=" "${FRAMEWORK_ROOT}/.agentic/presets/profiles.conf" 2>/dev/null; then
+  pass "F-0138: profiles.conf has formal.docs_gate"
+else
+  fail "F-0138: profiles.conf missing formal.docs_gate"
+fi
+
+# STACK.template.md has docs_gate in Settings comments
+if grep -q "docs_gate" "${FRAMEWORK_ROOT}/.agentic/init/STACK.template.md" 2>/dev/null; then
+  pass "F-0138: STACK.template.md has docs_gate in Settings"
+else
+  fail "F-0138: STACK.template.md missing docs_gate"
+fi
+
+# auto_orchestration.md has docs_gate in gates table
+if grep -q "docs_gate" "${FRAMEWORK_ROOT}/.agentic/agents/shared/auto_orchestration.md" 2>/dev/null; then
+  pass "F-0138: auto_orchestration.md has docs_gate gate"
+else
+  fail "F-0138: auto_orchestration.md missing docs_gate gate"
+fi
+
+# documentation-agent.md has drift.sh process
+if grep -q "drift.sh" "${FRAMEWORK_ROOT}/.agentic/agents/claude/subagents/documentation-agent.md" 2>/dev/null; then
+  pass "F-0138: documentation-agent.md references drift.sh process"
+else
+  fail "F-0138: documentation-agent.md missing drift.sh process"
+fi
+if grep -q "CONTEXT_PACK" "${FRAMEWORK_ROOT}/.agentic/agents/claude/subagents/documentation-agent.md" 2>/dev/null; then
+  pass "F-0138: documentation-agent.md references CONTEXT_PACK.md docs list"
+else
+  fail "F-0138: documentation-agent.md missing CONTEXT_PACK.md reference"
+fi
+
+# ag.sh has docs_gate gate logic in cmd_done
+if grep -q "docs_gate" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0138: ag.sh has docs_gate logic"
+else
+  fail "F-0138: ag.sh missing docs_gate logic"
+fi
+if grep -q "drift.sh.*--docs" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0138: ag.sh calls drift.sh --docs in ag done"
+else
+  fail "F-0138: ag.sh missing drift.sh --docs call"
+fi
+
+# ag.sh validates docs_gate enum values in ag set
+if grep -q "docs_gate)" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0138: ag.sh validates docs_gate enum in ag set"
+else
+  fail "F-0138: ag.sh missing docs_gate validation in ag set"
+fi
+
+# docs_gate=off skips doc check (behavioral test via ag done mock)
+(
+  GATE_TEST_DIR=$(mktemp -d)
+  mkdir -p "$GATE_TEST_DIR/spec/acceptance"
+  mkdir -p "$GATE_TEST_DIR/.agentic-journal/manifests"
+  cat > "$GATE_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: discovery
+- feature_tracking: yes
+- docs_gate: off
+TESTEOF
+  cat > "$GATE_TEST_DIR/spec/FEATURES.md" <<'TESTEOF'
+## F-0001: Test Feature
+**Status**: in_progress
+TESTEOF
+  touch "$GATE_TEST_DIR/spec/acceptance/F-0001.md"
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/tools/ag.sh" done F-0001 2>&1) || true
+  rm -rf "$GATE_TEST_DIR"
+  # docs_gate=off means no "Documentation Drift Check" section
+  ! echo "$OUTPUT" | grep -q "Documentation Drift Check"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "F-0138: docs_gate=off skips doc drift check in ag done"
+else
+  fail "F-0138: docs_gate=off should skip doc drift check"
+fi
+
+# docs_gate=warning runs drift but doesn't prompt
+(
+  GATE_TEST_DIR=$(mktemp -d)
+  mkdir -p "$GATE_TEST_DIR/spec/acceptance"
+  mkdir -p "$GATE_TEST_DIR/.agentic-journal/manifests"
+  cat > "$GATE_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: formal
+- feature_tracking: yes
+- docs_gate: warning
+TESTEOF
+  cat > "$GATE_TEST_DIR/spec/FEATURES.md" <<'TESTEOF'
+## F-0001: Test Feature
+**Status**: in_progress
+TESTEOF
+  touch "$GATE_TEST_DIR/spec/acceptance/F-0001.md"
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/tools/ag.sh" done F-0001 2>&1) || true
+  rm -rf "$GATE_TEST_DIR"
+  # warning mode shows "Documentation Drift Check" but no blocking prompt
+  echo "$OUTPUT" | grep -q "Documentation Drift Check" && ! echo "$OUTPUT" | grep -q "confirm docs are updated"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "F-0138: docs_gate=warning runs drift check but does not block"
+else
+  fail "F-0138: docs_gate=warning should run drift check without blocking"
+fi
+
+# ag set validates docs_gate enum
+(
+  GATE_TEST_DIR=$(mktemp -d)
+  cat > "$GATE_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: formal
+TESTEOF
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/tools/ag.sh" set docs_gate invalid_value 2>&1) || true
+  rm -rf "$GATE_TEST_DIR"
+  echo "$OUTPUT" | grep -q "Error.*docs_gate"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "F-0138: ag set rejects invalid docs_gate values"
+else
+  fail "F-0138: ag set should reject invalid docs_gate value"
+fi
+
+# Acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0138.md" ]]; then
+  pass "F-0138: acceptance criteria file exists"
+else
+  fail "F-0138: acceptance criteria file missing"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

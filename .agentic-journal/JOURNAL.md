@@ -777,3 +777,42 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-19 12:32 - F-0138 Documentation Impact Tracking
+
+**Why**: Agents lacked systematic way to know which docs needed updating after feature completion
+
+**Accomplished**:
+- Implemented docs impact tracking: drift.sh --docs wired into ag done with docs_gate setting (off/warning/blocking), ## Documentation section added to CONTEXT_PACK.md template and framework instance, documentation-agent.md updated with concrete drift.sh-based process, docs_gate added to profiles.conf/STACK.md/auto_orchestration.md
+
+**Next steps**:
+- Review PR, run ag done F-0138
+
+**Blockers**: None
+
+
+### Session: 2026-02-19 13:01 - v0.29.0 release
+
+**Why**: Version bump for F-0138 Documentation Impact Tracking and test planning enforcement
+
+**Accomplished**:
+- Updated VERSION→0.29.0, STACK.md, FEATURES.md, CHANGELOG, CONTRIBUTIONS with F-0138 + test framework improvements (acceptance.template.md, ## Tests in Gate 1)
+
+**Next steps**:
+- Create PR for v0.29.0
+
+**Blockers**: None
+
+
+### Session: 2026-02-19 17:48 - F-0138 PR review fixes
+
+**Why**: Keeping PR quality high before merge
+
+**Accomplished**:
+- Fixed 3 review issues: FRAMEWORK_DEVELOPMENT.md step numbering, F-0138.md ## Tests section, ag.sh SKIP_DOCS_GATE escape hatch
+
+**Next steps**:
+- Merge PR #40
+
+**Blockers**: None
+

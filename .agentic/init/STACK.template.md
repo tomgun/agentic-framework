@@ -16,8 +16,8 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ### Workflow
 <!-- These inherit from profile preset. Uncomment to override. -->
-<!-- Discovery defaults: feature_tracking: no, git_workflow: direct, pre_commit_checks: fast -->
-<!-- Formal defaults:    feature_tracking: yes, git_workflow: pull_request, pre_commit_checks: full -->
+<!-- Discovery defaults: feature_tracking: no, git_workflow: direct, pre_commit_checks: fast, docs_gate: off -->
+<!-- Formal defaults:    feature_tracking: yes, git_workflow: pull_request, pre_commit_checks: full, docs_gate: blocking -->
 <!-- - feature_tracking: no          # yes | no -->
 <!-- - acceptance_criteria: recommended  # blocking | recommended | off -->
 <!-- - wip_before_commit: warning    # blocking | warning -->
@@ -25,6 +25,7 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- - git_workflow: direct          # pull_request | direct -->
 <!-- - plan_review_enabled: no       # yes | no -->
 <!-- - spec_directory: no            # yes | no -->
+<!-- - docs_gate: off                # off | warning | blocking -->
 
 ### Complexity limits
 <!-- - max_files_per_commit: 15      # blocking limit in pre-commit -->

@@ -828,6 +828,34 @@ cmd_done() {
         echo ""
     fi
 
+    # Doc drift gate (controlled by docs_gate setting)
+    local docs_gate_mode
+    docs_gate_mode=$(get_setting "docs_gate" "off")
+    if [ "$docs_gate_mode" != "off" ]; then
+        echo -e "${BOLD}=== Documentation Drift Check ===${NC}"
+        if [ -n "$feature_id" ]; then
+            bash "$SCRIPT_DIR/drift.sh" --docs --manifest "$feature_id" 2>/dev/null || true
+        else
+            bash "$SCRIPT_DIR/drift.sh" --docs 2>/dev/null || true
+        fi
+        if [ "$docs_gate_mode" = "blocking" ]; then
+            if [ "${SKIP_DOCS_GATE:-0}" = "1" ] || [ ! -t 0 ]; then
+                echo -e "${YELLOW}docs_gate: blocking — skipped (non-interactive or SKIP_DOCS_GATE=1)${NC}"
+            else
+                echo ""
+                echo -e "${YELLOW}docs_gate: blocking — confirm docs are updated before marking complete${NC}"
+                printf "  Continue marking feature complete? [y/N] "
+                local doc_confirm
+                read -r doc_confirm
+                if [[ ! "$doc_confirm" =~ ^[Yy]$ ]]; then
+                    echo -e "${RED}Aborted: Update documentation first, then run ag done again.${NC}"
+                    exit 1
+                fi
+            fi
+        fi
+        echo ""
+    fi
+
     echo -e "${BOLD}=== Feature Complete Check ===${NC}"
     echo ""
 
@@ -1904,6 +1932,12 @@ _settings_set_value() {
         wip_before_commit)
             if [[ ! "$value" =~ ^(blocking|warning)$ ]]; then
                 echo -e "${RED}Error: wip_before_commit must be 'blocking' or 'warning', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        docs_gate)
+            if [[ ! "$value" =~ ^(off|warning|blocking)$ ]]; then
+                echo -e "${RED}Error: docs_gate must be 'off', 'warning', or 'blocking', got '$value'${NC}"
                 exit 1
             fi
             ;;

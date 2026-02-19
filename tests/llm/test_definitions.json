@@ -1233,6 +1233,53 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "062_doc_update_uses_context_pack",
+      "description": "Agent updating docs after a feature should consult CONTEXT_PACK.md ## Documentation and run drift.sh",
+      "section": "documentation",
+      "category": "Important",
+      "llm_test_id": "LLM-062",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "CONTEXT_PACK.md": "# CONTEXT_PACK.md\n\n## Documentation\n\n- `README.md` — User-facing overview and install\n- `docs/API.md` — API reference\n- `docs/CONFIG.md` — Configuration guide\n",
+          "STACK.md": "# STACK.md\n\n## Settings\n- profile: formal\n- docs_gate: blocking\n\n## Languages & runtimes\n- Language(s): Python\n\n## Testing\n- Unit test framework: pytest\n- Test commands:\n  - Unit: `pytest`"
+        }
+      },
+      "prompt": "I just shipped F-0042 which adds a new config option. Please update the documentation.",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "CONTEXT_PACK|drift.sh|Documentation.*section|docs.*list|what docs exist|documentation.*inventory|drift.*check|stale"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "063_docs_gate_blocking_awareness",
+      "description": "Agent should know docs_gate controls doc check behaviour in ag done",
+      "section": "documentation",
+      "category": "Normal",
+      "llm_test_id": "LLM-063",
+      "profile": "formal",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "How does the framework ensure documentation gets updated when a feature is completed?",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "docs_gate|drift.sh|ag done|documentation.*check|doc.*drift|CONTEXT_PACK.*Documentation|blocking"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }

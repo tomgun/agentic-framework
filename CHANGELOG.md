@@ -5,6 +5,25 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.29.0] - 2026-02-19
+
+### Added
+- **Documentation Impact Tracking (F-0138)** — `drift.sh --docs --manifest F-####` wired into `ag done` with `docs_gate` setting (`off` | `warning` | `blocking`). Machine-detects which existing docs reference changed code. Formal profile defaults to `blocking`; Discovery defaults to `off`.
+- **`## Documentation` section in CONTEXT_PACK.md template** — agents know what docs exist in a project at session start. Framework's own CONTEXT_PACK.md populated with 8 entries.
+- **`acceptance.template.md`** — the template `ag implement` referenced but didn't exist. Has `## Tests` section as a first-class section before acceptance criteria, forcing test planning before coding.
+- **2 new LLM behavioral tests** (LLM-062, LLM-063) — doc update process and `docs_gate` awareness.
+
+### Changed
+- **Documentation agent** — replaced generic guidance with concrete process: read CONTEXT_PACK.md `## Documentation` → run `drift.sh` → update flagged docs + add new sections for user-facing changes.
+- **`auto_orchestration.md` TEST step** — now points to `## Tests` in acceptance criteria rather than giving generic advice. Applies to all projects.
+- **`feature_start.md` Gate 1** — now checks for a `## Tests` section in acceptance criteria. An acceptance file without tests is explicitly incomplete.
+- **`spec/acceptance/README.template.md`** — documents `## Tests` as a required section for all acceptance files.
+- **`docs_gate`** added to `profiles.conf` (discovery=off, formal=blocking), `STACK.template.md`, `auto_orchestration.md` gates table, and `ag set` enum validation.
+- **`FRAMEWORK_DEVELOPMENT.md`** — "Adding a new framework feature" now lists structural tests (`validate_framework.sh`) and LLM behavioral tests (`test_definitions.json`) as explicit required steps.
+
+### Fixed
+- **VERSION / STACK.md** — corrected stale `0.27.2` to `0.29.0` (two releases behind).
+
 ## [0.28.1] - 2026-02-19
 
 ### Changed

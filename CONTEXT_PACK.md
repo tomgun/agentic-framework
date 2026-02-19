@@ -89,6 +89,17 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 - `.agentic-journal/manifests/` - Feature change manifests (git history snapshots)
 - `.agentic-journal/lessons/` - Operational learnings (L-#### files)
 
+## Documentation
+
+- `README.md` — Framework overview and install guide
+- `.agentic/DEVELOPER_GUIDE.md` — Commands, scripts, daily workflows reference
+- `.agentic/MANUAL_OPERATIONS.md` — Token-free CLI reference for humans
+- `.agentic/PRINCIPLES.md` — Why the framework does what it does
+- `docs/INSTRUCTION_ARCHITECTURE.md` — Three-layer design (read before changing instruction files)
+- `docs/HOW_IT_WORKS.md` — Principle → feature → implementation map
+- `CONTEXT_PACK.md` — Architecture snapshot (update when architecture changes)
+- `spec/TECH_SPEC.md` — Technical architecture details
+
 ## Known risks / sharp edges
 - Multiple agents can work simultaneously - must coordinate via `.agentic-state/AGENTS_ACTIVE.md`
 - Template changes affect ALL future projects - test in scratch first
