@@ -2048,6 +2048,168 @@ else
 fi
 
 # ============================================================
+# F-0139: Doc Lifecycle System
+# ============================================================
+echo ""
+echo "--- F-0139: Doc Lifecycle System ---"
+
+# docs.sh exists and is executable
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/tools/docs.sh" ]]; then
+  pass "F-0139: docs.sh exists"
+else
+  fail "F-0139: docs.sh missing"
+fi
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/docs.sh" ]]; then
+  pass "F-0139: docs.sh is executable"
+else
+  fail "F-0139: docs.sh is not executable"
+fi
+
+# doc_types.md exists with all 8 built-in types
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/agents/shared/doc_types.md" ]]; then
+  pass "F-0139: doc_types.md exists"
+  for dtype in changelog readme lessons architecture adr runbook tech-spec custom; do
+    if grep -q "^## $dtype" "${FRAMEWORK_ROOT}/.agentic/agents/shared/doc_types.md" 2>/dev/null; then
+      pass "F-0139: doc_types.md has $dtype type"
+    else
+      fail "F-0139: doc_types.md missing $dtype type"
+    fi
+  done
+else
+  fail "F-0139: doc_types.md missing"
+fi
+
+# ag.sh has cmd_docs function
+if grep -q "cmd_docs" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0139: ag.sh has cmd_docs function"
+else
+  fail "F-0139: ag.sh missing cmd_docs"
+fi
+
+# ag.sh has docs) case in dispatch
+if grep -q "^    docs)" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0139: ag.sh has docs command dispatch"
+else
+  fail "F-0139: ag.sh missing docs command dispatch"
+fi
+
+# ag.sh wires docs.sh into cmd_done
+if grep -q "docs.sh.*--trigger feature_done" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0139: ag.sh wires docs.sh feature_done into ag done"
+else
+  fail "F-0139: ag.sh missing docs.sh feature_done wiring in ag done"
+fi
+if grep -q "docs.sh.*--trigger pr" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0139: ag.sh wires docs.sh pr trigger"
+else
+  fail "F-0139: ag.sh missing docs.sh pr trigger wiring"
+fi
+
+# ag.sh wires docs.sh session into ag sync
+if grep -q "docs.sh.*--trigger session" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0139: ag.sh wires docs.sh session into ag sync"
+else
+  fail "F-0139: ag.sh missing docs.sh session wiring in ag sync"
+fi
+
+# STACK.template.md has ## Docs section
+if grep -q "^## Docs" "${FRAMEWORK_ROOT}/.agentic/init/STACK.template.md" 2>/dev/null; then
+  pass "F-0139: STACK.template.md has ## Docs section"
+else
+  fail "F-0139: STACK.template.md missing ## Docs section"
+fi
+
+# auto_orchestration.md mentions doc lifecycle
+if grep -q "DOC LIFECYCLE" "${FRAMEWORK_ROOT}/.agentic/agents/shared/auto_orchestration.md" 2>/dev/null; then
+  pass "F-0139: auto_orchestration.md has doc lifecycle step"
+else
+  fail "F-0139: auto_orchestration.md missing doc lifecycle step"
+fi
+
+# documentation-agent.md has structured registry mode
+if grep -q "Structured Registry" "${FRAMEWORK_ROOT}/.agentic/agents/claude/subagents/documentation-agent.md" 2>/dev/null; then
+  pass "F-0139: documentation-agent.md has structured registry mode"
+else
+  fail "F-0139: documentation-agent.md missing structured registry mode"
+fi
+
+# STACK.md (framework instance) has populated ## Docs section
+if grep -q "^## Docs" "${FRAMEWORK_ROOT}/STACK.md" 2>/dev/null; then
+  pass "F-0139: STACK.md has ## Docs section (dogfooding)"
+else
+  fail "F-0139: STACK.md missing ## Docs section"
+fi
+if grep -q "^- doc:" "${FRAMEWORK_ROOT}/STACK.md" 2>/dev/null; then
+  pass "F-0139: STACK.md has populated doc entries"
+else
+  fail "F-0139: STACK.md has no doc entries (should be populated for dogfooding)"
+fi
+
+# docs.sh --list runs without error on framework project
+if bash "${FRAMEWORK_ROOT}/.agentic/tools/docs.sh" --list >/dev/null 2>&1; then
+  pass "F-0139: docs.sh --list runs without error"
+else
+  fail "F-0139: docs.sh --list fails"
+fi
+
+# docs.sh --list shows framework doc entries
+DOCS_LIST_OUTPUT=$(bash "${FRAMEWORK_ROOT}/.agentic/tools/docs.sh" --list 2>/dev/null)
+if echo "$DOCS_LIST_OUTPUT" | grep -q "CHANGELOG.md"; then
+  pass "F-0139: docs.sh --list shows CHANGELOG.md entry"
+else
+  fail "F-0139: docs.sh --list missing CHANGELOG.md entry"
+fi
+
+# docs.sh empty registry test
+(
+  DOCS_TEST_DIR=$(mktemp -d)
+  cat > "$DOCS_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: discovery
+TESTEOF
+  OUTPUT=$(ROOT_DIR="$DOCS_TEST_DIR" bash "${FRAMEWORK_ROOT}/.agentic/tools/docs.sh" --list 2>&1)
+  rm -rf "$DOCS_TEST_DIR"
+  echo "$OUTPUT" | grep -q "No docs registered"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "F-0139: empty registry prints 'No docs registered'"
+else
+  fail "F-0139: empty registry should print 'No docs registered'"
+fi
+
+# docs.sh --trigger filters correctly
+(
+  DOCS_TEST_DIR=$(mktemp -d)
+  cat > "$DOCS_TEST_DIR/STACK.md" <<'TESTEOF'
+## Docs
+- doc: CHANGELOG.md | changelog | pr
+- doc: docs/lessons.md | lessons | feature_done
+TESTEOF
+  OUTPUT=$(ROOT_DIR="$DOCS_TEST_DIR" bash "${FRAMEWORK_ROOT}/.agentic/tools/docs.sh" --trigger feature_done --check 2>&1)
+  rm -rf "$DOCS_TEST_DIR"
+  echo "$OUTPUT" | grep -q "lessons" && ! echo "$OUTPUT" | grep -q "CHANGELOG"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "F-0139: --trigger feature_done filters correctly (lessons yes, changelog no)"
+else
+  fail "F-0139: --trigger filtering incorrect"
+fi
+
+# ag help shows docs command
+if bash "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" help 2>&1 | grep -q "docs"; then
+  pass "F-0139: ag help includes docs command"
+else
+  fail "F-0139: ag help missing docs command"
+fi
+
+# Acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0139.md" ]]; then
+  pass "F-0139: acceptance criteria file exists"
+else
+  fail "F-0139: acceptance criteria file missing"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

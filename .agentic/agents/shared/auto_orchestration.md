@@ -162,7 +162,13 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
    ├─ CONTEXT_PACK.md (if architecture changed)
    └─ STATUS.md (next steps)
 
-8. BEFORE COMMIT
+8. DOC LIFECYCLE (if STACK.md ## Docs has entries)
+   ├─ `ag docs F-####` or `docs.sh --trigger feature_done`
+   ├─ Drafts registered docs (lessons, architecture, changelog, etc.)
+   ├─ Formal profile: also drafts pr-trigger docs (changelog, readme)
+   └─ Human reviews drafts in git diff, removes `<!-- draft: -->` markers
+
+9. BEFORE COMMIT
    └─ Run before_commit.md checklist
 ```
 

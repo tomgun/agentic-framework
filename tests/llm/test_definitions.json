@@ -1280,6 +1280,56 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "064_ag_docs_awareness",
+      "description": "Agent should know about ag docs command and doc registry in STACK.md ## Docs",
+      "section": "documentation",
+      "category": "Important",
+      "llm_test_id": "LLM-064",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Settings\n- profile: formal\n- docs_gate: blocking\n\n## Docs\n- doc: CHANGELOG.md | changelog | pr\n- doc: README.md | readme | pr\n- doc: docs/lessons.md | lessons | feature_done\n\n## Languages & runtimes\n- Language(s): Python\n\n## Testing\n- Unit test framework: pytest\n- Test commands:\n  - Unit: `pytest`"
+        }
+      },
+      "prompt": "How do I manage which docs get updated when I complete a feature?",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "STACK.md|## Docs|doc registry|ag docs|docs.sh|doc.*lifecycle"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "065_doc_lifecycle_at_feature_done",
+      "description": "Agent should run doc lifecycle (ag docs or docs.sh) as part of feature completion",
+      "section": "documentation",
+      "category": "Important",
+      "llm_test_id": "LLM-065",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Settings\n- profile: formal\n- docs_gate: blocking\n\n## Docs\n- doc: CHANGELOG.md | changelog | pr\n- doc: docs/lessons.md | lessons | feature_done\n\n## Languages & runtimes\n- Language(s): Python\n\n## Testing\n- Unit test framework: pytest\n- Test commands:\n  - Unit: `pytest`",
+          "spec/FEATURES.md": "# Features\n\n## F-0042: User Authentication\n- Status: in_progress",
+          "spec/acceptance/F-0042.md": "# F-0042: User Authentication\n\n## Acceptance Criteria\n- [x] Login form works\n- [x] JWT tokens issued"
+        }
+      },
+      "prompt": "F-0042 is complete, all tests pass. I want to mark it done and prepare the PR.",
+      "expected": {
+        "output_contains": [],
+        "output_contains_any": [
+          "ag docs|docs.sh|doc.*lifecycle|CHANGELOG|lessons|draft.*doc|update.*doc|doc.*registry"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }

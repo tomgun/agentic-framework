@@ -5,6 +5,21 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.0] - 2026-02-19
+
+### Added
+- **Doc Lifecycle System (F-0139)** — Systematic doc drafting wired into `ag done` and `ag docs`. Two-layer architecture: project doc registry in `STACK.md ## Docs` (survives `.agentic/` upgrades), framework machinery in `.agentic/tools/docs.sh` (context assembler + trigger dispatcher).
+- **8 built-in doc types** — changelog, readme, lessons, architecture, adr, runbook, tech-spec, custom. Each with write strategy (prepend/append/append-section/new-file) and type guidance in `.agentic/agents/shared/doc_types.md`.
+- **4 trigger types** — `feature_done` (fires at `ag done`), `pr` (formal profile only), `session` (staleness check in `ag sync`), `manual`.
+- **`ag docs` command** — `ag docs F-####`, `ag docs --list`, `ag docs --check`, `ag docs --pr`.
+- **Doc staleness check** — `ag sync` now checks registered docs for staleness (configurable via `docs_stale_days` in STACK.md, default: 30 days).
+- **Documentation agent dual-mode** — Structured registry mode (when `docs.sh` context provided) + existing autonomous discovery mode (standalone invocation).
+- **2 new LLM behavioral tests** (LLM-064, LLM-065) — doc registry awareness and doc lifecycle at feature completion.
+
+### Changed
+- **`auto_orchestration.md`** — Added step 8 "DOC LIFECYCLE" to feature pipeline (between UPDATE DOCS and BEFORE COMMIT).
+- **`STACK.template.md`** — Added `## Docs` section with commented-out entries for new projects.
+
 ## [0.29.0] - 2026-02-19
 
 ### Added
