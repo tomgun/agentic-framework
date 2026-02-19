@@ -751,3 +751,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-19 10:52 - F-0136 routing rule in docs
+
+**Why**: Routing rule needed in user-facing docs, not just agent instruction files
+
+**Accomplished**:
+- Added Where-to-log routing table to agent_operating_guidelines.md, MANUAL_OPERATIONS.md, START_HERE.md; expanded S09 test to cover all 9 files
+
+**Next steps**:
+- PR #38 ready
+
+**Blockers**: None
+

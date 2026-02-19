@@ -80,6 +80,17 @@ Update docs **in the same commit** as code changes:
 
 ---
 
+## Where to Log
+
+| What | Target | Command |
+|------|--------|---------|
+| Task / idea / reminder | TODO.md | `ag todo "description"` |
+| Human blocker (PR review, credentials, decision) | HUMAN_NEEDED.md | `blocker.sh add "Title" "type" "Details"` |
+| Bug / technical debt | ISSUES.md | `quick_issue.sh "Title" "Details"` |
+| New capability to spec | FEATURES.md | `feature.sh add "Title"` |
+
+Do NOT put development tasks in HUMAN_NEEDED.md.
+
 ## When to Escalate
 
 See Agent Boundaries "Ask first" items. Additionally, add to HUMAN_NEEDED.md for business decisions, compliance, production risk, or complex debugging after 3-5 failed attempts.
