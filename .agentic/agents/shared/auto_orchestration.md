@@ -148,7 +148,7 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
    └─ Keep small, focused changes
 
 5. TEST
-   ├─ Write/run tests verifying acceptance criteria
+   ├─ Write tests as specified in spec/acceptance/F-####.md → ## Tests
    ├─ All tests must pass
    └─ Smoke test: RUN THE APPLICATION
 
@@ -406,6 +406,7 @@ These are YOUR responsibility as an agent following this framework.
 | Complexity limits | `max_files_per_commit` etc. | 10/500/500 | 15/1000/1000 |
 | Pre-commit checks | `pre_commit_checks` | **full** | fast |
 | Feature status | `feature_tracking` | **yes** (shipped needs acceptance) | no |
+| Docs reviewed | `docs_gate` | **blocking** | off |
 
 Override any setting: `ag set <key> <value>` | View resolved settings: `ag set --show`
 

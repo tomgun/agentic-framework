@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.28.1)
-**Date**: 2026-02-18
+**Period**: Initial Development (v0.1.0 → v0.29.0)
+**Date**: 2026-02-19
 
 ---
 
@@ -2313,11 +2313,21 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: ~687 lines of duplication removed. Stale version numbers (0.19.0, 0.13.0) fixed across 3 files. Clear ownership prevents future triple-maintenance.
 
+### Documentation Impact Tracking (F-0138, v0.29.0)
+
+**User insight**: Agents had no systematic way to know which docs needed updating after a feature shipped. Two separate problems: what's stale (machine-detectable) vs what docs exist (agent context).
+
+**User direction**: "Both pieces exist but aren't connected to the feature completion flow." Defined the separation of concerns: `drift.sh --docs` = machine detection (what's stale), `CONTEXT_PACK.md ## Documentation` = agent context (what docs exist). Specified `docs_gate` values (off/warning/blocking) consistent with existing gate pattern. Insisted tests be wired in automatically with the feature, not as a separate follow-up.
+
+**User direction on tests**: "All these tests should be auto-implemented with the new features" — and "the same principle applies to production projects as well." Led to creating `acceptance.template.md` with `## Tests` as a required upfront section, updating `feature_start.md` Gate 1 to check for it, and making `auto_orchestration.md` TEST step point to acceptance criteria rather than giving generic advice.
+
+**Result**: `docs_gate` setting in profiles (formal=blocking, discovery=off). `ag done` runs `drift.sh --docs` with confirmation gate. `CONTEXT_PACK.md` template gets `## Documentation` section. Documentation agent updated with concrete drift.sh-based process. `acceptance.template.md` created. Test planning now enforced at Gate 1 for all projects.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.28.1
+**Current Version**: v0.29.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
-**LLM Tests**: 48 behavioral test scripts
+**LLM Tests**: 49 behavioral test definitions
 

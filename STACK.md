@@ -5,7 +5,7 @@
 Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Agentic framework
-- Version: 0.27.2
+- Version: 0.29.0
 - Profile: formal
 - This IS the framework (dogfooding)
 - Source: https://github.com/tomgun/agentic-framework
@@ -16,6 +16,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - max_files_per_commit: 15
 - max_added_lines: 1000
 - max_code_file_length: 1200
+- docs_gate: blocking  <!-- off | warning | blocking -->
 
 ## Summary
 - What are we building: AI-assisted development framework with spec-driven methodology
