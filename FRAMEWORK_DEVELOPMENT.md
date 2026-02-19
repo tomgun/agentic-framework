@@ -464,10 +464,10 @@ refactor(docs): eliminate documentation duplication
 3. Add structural tests to `tests/validate_framework.sh` (verifies files exist, settings present, script behaviour)
 4. If the feature changes how agents behave: add LLM behavioral tests to `tests/llm/test_definitions.json` and list them in `spec/acceptance/F-####.md` under `## LLM Behavioral Tests`
 5. If user-visible during upgrade, add to FEATURE_REGISTRY (see below)
-5. Run `bash .agentic/tools/drift.sh --docs` to check for stale docs
-6. Update CHANGELOG.md
-7. Update CONTRIBUTIONS.md
-8. Generate manifest: `bash .agentic/tools/manifest.sh F-####`
+6. Run `bash .agentic/tools/drift.sh --docs` to check for stale docs
+7. Update CHANGELOG.md
+8. Update CONTRIBUTIONS.md
+9. Generate manifest: `bash .agentic/tools/manifest.sh F-####`
 
 **For spec changes (adding/modifying features in FEATURES.md)**:
 - Use `bash .agentic/tools/migration.sh create "description"` to create a migration

@@ -839,14 +839,18 @@ cmd_done() {
             bash "$SCRIPT_DIR/drift.sh" --docs 2>/dev/null || true
         fi
         if [ "$docs_gate_mode" = "blocking" ]; then
-            echo ""
-            echo -e "${YELLOW}docs_gate: blocking — confirm docs are updated before marking complete${NC}"
-            printf "  Continue marking feature complete? [y/N] "
-            local doc_confirm
-            read -r doc_confirm 2>/dev/null || doc_confirm="n"
-            if [[ ! "$doc_confirm" =~ ^[Yy]$ ]]; then
-                echo -e "${RED}Aborted: Update documentation first, then run ag done again.${NC}"
-                exit 1
+            if [ "${SKIP_DOCS_GATE:-0}" = "1" ] || [ ! -t 0 ]; then
+                echo -e "${YELLOW}docs_gate: blocking — skipped (non-interactive or SKIP_DOCS_GATE=1)${NC}"
+            else
+                echo ""
+                echo -e "${YELLOW}docs_gate: blocking — confirm docs are updated before marking complete${NC}"
+                printf "  Continue marking feature complete? [y/N] "
+                local doc_confirm
+                read -r doc_confirm
+                if [[ ! "$doc_confirm" =~ ^[Yy]$ ]]; then
+                    echo -e "${RED}Aborted: Update documentation first, then run ag done again.${NC}"
+                    exit 1
+                fi
             fi
         fi
         echo ""
