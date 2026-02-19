@@ -1,0 +1,20 @@
+{
+  "feature": "F-0136",
+  "mode": "feature",
+  "generated": "2026-02-19T08:59:25Z",
+  "commits": [
+    {"hash": "ff9eef6", "date": "2026-02-19", "message": "feat: centralized TODO tracking — core (F-0136), v0.28.0", "additions": 719, "deletions": 8}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/init/scaffold.sh"}, {"file": ".agentic/tools/ag.sh"}, {"file": ".agentic/tools/todo.sh"}],
+    "tests": [{"file": ".agentic/spec/TODO.template.md"}, {"file": "spec/FEATURES.md"}, {"file": "spec/acceptance/F-0136.md"}],
+    "docs": [{"file": ".agentic-journal/JOURNAL.md"}, {"file": ".agentic-journal/plans/2026-02-18-F-0136-centralized-todo-tracking-plan.md"}, {"file": ".agentic/spec/TODO.template.md"}, {"file": "CHANGELOG.md"}, {"file": "CONTRIBUTIONS.md"}, {"file": "TODO.md"}, {"file": "spec/FEATURES.md"}, {"file": "spec/acceptance/F-0136.md"}],
+    "config": []
+  },
+  "stats": {
+    "total_commits": 1,
+    "total_files": 12,
+    "additions": 719,
+    "deletions": 8
+  }
+}

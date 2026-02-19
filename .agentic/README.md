@@ -118,8 +118,8 @@ See [`.agentic/workflows/tdd_mode.md`](workflows/tdd_mode.md) for complete TDD g
 
 ```bash
 # Download latest release
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.19.0.tar.gz | tar xz
-cd agentic-framework-0.19.0
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v<VERSION>.tar.gz | tar xz
+cd agentic-framework-<VERSION>
 
 # Install into your project
 bash install.sh /path/to/your-project
@@ -129,10 +129,10 @@ bash install.sh /path/to/your-project
 
 ```bash
 # Download and extract
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.19.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v<VERSION>.tar.gz | tar xz
 
 # Copy .agentic/ into your project
-cp -r agentic-framework-0.19.0/.agentic /path/to/your-project/
+cp -r agentic-framework-<VERSION>/.agentic /path/to/your-project/
 ```
 
 **Initialize:**
@@ -168,8 +168,8 @@ If you're using multiple assistants (Cursor + Copilot + Claude), refer to `.agen
 
 ```bash
 # Download new version
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.19.0.tar.gz | tar xz
-cd agentic-framework-0.19.0
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v<VERSION>.tar.gz | tar xz
+cd agentic-framework-<VERSION>
 
 # Run upgrade tool FROM the new framework, pointing to your project
 bash .agentic/tools/upgrade.sh /path/to/your-project
@@ -215,15 +215,7 @@ bash .agentic/tools/sync_docs.sh
 
 ## User Workflows: How to Work with Agents
 
-**⭐ New user? Start here**: [`workflows/USER_WORKFLOWS.md`](workflows/USER_WORKFLOWS.md)
-
-Complete guide covering:
-- How to add new features (edit specs yourself or ask agent)
-- How to update specs and acceptance criteria
-- How agents pick up your changes (YES, they do!)
-- TDD workflow
-- Sequential agent pipeline
-- Common questions and troubleshooting
+**⭐ Complete guide**: [`DEVELOPER_GUIDE.md`](DEVELOPER_GUIDE.md) — covers adding features, updating specs, TDD workflow, agent pipeline, troubleshooting, and common questions.
 
 ### Ready-to-Use AI Prompts
 
@@ -262,64 +254,17 @@ Complete guide covering:
 
 ## Tools and automation
 
-From repo root:
+30+ scripts in `.agentic/tools/`. Key categories:
+- **Health**: `doctor.sh`, `report.sh`, `verify.sh`
+- **Traceability**: `ag trace`, `coverage.sh`, `drift.sh`
+- **Analysis**: `feature_graph.sh`, `stale.sh`, `deps.sh`
 
-```bash
-# Project health and verification
-bash .agentic/tools/doctor.sh      # Check structure
-bash .agentic/tools/report.sh      # Feature status
-bash .agentic/tools/verify.sh      # Comprehensive checks
-
-# Context and analysis
-bash .agentic/tools/brief.sh       # Quick project brief
-# Note: continue_here.py is deprecated - use STATUS.md directly
-bash .agentic/tools/coverage.sh    # Code annotation coverage
-bash .agentic/tools/coverage.sh --json           # JSON output
-bash .agentic/tools/coverage.sh --reverse FILE   # What features does FILE implement?
-bash .agentic/tools/coverage.sh --test-mapping   # Infer test→feature mapping
-bash .agentic/tools/feature_graph.sh   # Feature dependency graph
-bash .agentic/tools/drift.sh       # Spec/code drift check
-
-# Traceability (unified CLI)
-bash .agentic/tools/ag.sh trace              # Combined drift + coverage
-bash .agentic/tools/ag.sh trace F-XXXX       # Files implementing feature
-bash .agentic/tools/ag.sh trace --gaps       # Missing implementations
-bash .agentic/tools/ag.sh trace --json       # Machine-readable output
-
-# Documentation
-bash .agentic/tools/sync_docs.sh   # Generate doc scaffolding
-
-# Retrospective
-bash .agentic/tools/retro_check.sh  # Check if retrospective is due
-
-# Version verification
-bash .agentic/tools/version_check.sh # Check dependency versions match STACK.md
-
-# Spec validation
-python3 .agentic/tools/validate_specs.py  # Validate spec frontmatter
-
-# Spec migrations (Formal mode, optional)
-bash .agentic/tools/migration.sh create "Add Feature X"  # Create new migration
-bash .agentic/tools/migration.sh list                    # List all migrations
-bash .agentic/tools/migration.sh show 001                # Show specific migration
-bash .agentic/tools/migration.sh search "keyword"        # Search migrations
-```
+Run `ag tools` or see [`DEVELOPER_GUIDE.md#automation--scripts`](DEVELOPER_GUIDE.md#automation--scripts) for full documentation.
 
 ## Troubleshooting
 
-**Can't find what you need?**
-- Read [`START_HERE.md`](START_HERE.md) for guided navigation
-- See [`FRAMEWORK_MAP.md`](FRAMEWORK_MAP.md) for visual overview
-- Check tools with `bash .agentic/tools/doctor.sh`
-
-**Agent keeps re-reading everything?**
-- Ensure `CONTEXT_PACK.md` is comprehensive
-- Use `@feature` annotations in code
-- Follow `.agentic/token_efficiency/reading_protocols.md`
-
-**Project getting complex?**
-- See `.agentic/workflows/scaling_guidance.md` for reorganization suggestions
-- Run `bash .agentic/tools/feature_graph.sh` to visualize dependencies  
+See [`DEVELOPER_GUIDE.md#troubleshooting`](DEVELOPER_GUIDE.md#troubleshooting) for common issues.
+Quick navigation: [`START_HERE.md`](START_HERE.md) | Visual overview: [`FRAMEWORK_MAP.md`](FRAMEWORK_MAP.md)
 
 ## Design Principles
 
