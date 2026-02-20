@@ -82,7 +82,7 @@ DO NOT pass:
 
 ```
 □ Gates 1-4 passed
-□ Ready to implement (or delegate)
+□ Run `ag implement F-XXXX` (creates WIP) or start WIP manually
 □ Will smoke test after
 □ Will update specs when done
 ```

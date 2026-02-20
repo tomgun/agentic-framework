@@ -829,3 +829,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-20 21:01 - F-0140: Proactive WIP Creation
+
+**Why**: Real-world token-limit crash lost 466 lines because WIP was never created — plan-mode-exit never chained to ag implement
+
+**Accomplished**:
+- Plan-mode-exit trigger chains to ag implement across all 5 instruction files, (creates WIP) annotation on Build triggers, memory-seed WIP steps, doctor.py path fix, checklists updated, S10 structural test, L07 LLM test, validate_framework.sh F-0140 section (14 checks), spec/acceptance/F-0140.md + FEATURES.md entry
+
+**Next steps**:
+- PR review, mark F-0140 shipped
+
+**Blockers**: None
+

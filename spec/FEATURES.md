@@ -2148,6 +2148,20 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ---
 
+## F-0140: Proactive WIP Creation in Agent Instructions
+
+**Status**: in_progress
+**Priority**: high
+**Added**: 2026-02-20
+
+Ensures the plan-mode-exit trigger chains to `ag implement` (which creates WIP tracking), adds `(creates WIP)` annotations to Build triggers across all instruction files, updates memory seed with WIP creation steps, and fixes doctor.py WIP path bug.
+
+**Dependencies**: F-0051 (WIP Tracking)
+
+**Acceptance**: See `spec/acceptance/F-0140.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
