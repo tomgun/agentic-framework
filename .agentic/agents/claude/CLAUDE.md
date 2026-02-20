@@ -19,7 +19,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
 | Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, check TaskList for pending items and flush to TODO.md via `ag todo`. |
 | Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
-| Exited plan mode (plan approved) | STOP -> Save plan durably, then `ag implement F-XXXX` (creates WIP). If `plan_review_enabled: yes`: invoke `/review` on plan first. |
+| Exited plan mode (plan approved) | STOP -> Save plan durably, then `ag implement F-XXXX` (creates WIP). If `plan_review_enabled: yes`: run `/review` on plan before coding. |
 
 Acceptance criteria: When `feature_tracking=yes` (formal profile): spec/acceptance/F-####.md required before coding | When `feature_tracking=no` (discovery): define criteria (any form) before coding. Override settings: `ag set <key> <value>`
 

@@ -16,7 +16,7 @@ send_prompt "My plan for F-0001 has been approved and I've exited plan mode. Wha
 FAILURES=0
 check_output_contains "ag implement\|WIP\|wip" \
     "Agent mentions ag implement or WIP tracking" || FAILURES=$((FAILURES + 1))
-check_output_not_contains "^import \|^def \|^class \|^function " \
+check_output_not_contains "import \|def \|class \|function " \
     "Agent does NOT jump straight to writing code" || FAILURES=$((FAILURES + 1))
 
 cleanup_test_project
