@@ -5,6 +5,22 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.31.0] - 2026-02-20
+
+### Added
+- **Proactive WIP Creation (F-0140)** — Plan-mode-exit trigger now chains to `ag implement` (creates WIP) across all 5 instruction files. Fixes real-world issue where agents lost work after token limit crash because WIP was never created.
+- **S10 structural test** — Verifies all instruction files reference both WIP check (session start) and WIP creation (work start). 15 checks.
+- **L07 LLM behavioral test** — Verifies agent mentions `ag implement`/WIP after plan-mode-exit, doesn't jump to code.
+- **14 acceptance checks** in `validate_framework.sh` for F-0140.
+
+### Fixed
+- **doctor.py WIP path bug** — Was checking `.agentic/WIP.md` instead of `.agentic-state/WIP.md` in implement phase.
+
+### Changed
+- **Build trigger** annotated with `(creates WIP)` in all instruction files.
+- **Memory seed** updated with WIP creation steps in both "build" and "plan-mode-exit" sections.
+- **Checklists** — `feature_start.md` and `feature_implementation.md` reference WIP tracking.
+
 ## [0.30.0] - 2026-02-19
 
 ### Added

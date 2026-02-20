@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.29.0)
+**Period**: Initial Development (v0.1.0 → v0.31.0)
 **Date**: 2026-02-19
 
 ---
@@ -2330,10 +2330,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: `docs_gate` setting in profiles (formal=blocking, discovery=off). `ag done` runs `drift.sh --docs` with confirmation gate. `CONTEXT_PACK.md` template gets `## Documentation` section. Documentation agent updated with concrete drift.sh-based process. `acceptance.template.md` created. Test planning now enforced at Gate 1 for all projects.
 
+### Proactive WIP Creation (F-0140, v0.31.0)
+
+**User insight**: Real-world Cursor session worked on 466 lines, ran out of tokens, no WIP.md existed — next session had zero context about interrupted work. The infrastructure (`wip.sh`, `ag implement` auto-creating WIP) all worked, but agents skipped it because the plan-mode-exit trigger never chained to `ag implement`.
+
+**User direction**: Identified the specific gap: "Exited plan mode" trigger saved the plan but never told the agent to run `ag implement`, so WIP was never created. Also spotted `doctor.py` checking wrong WIP path (`.agentic/WIP.md` instead of `.agentic-state/WIP.md`). Designed minimal fix: ~6 words per instruction file, not new rules or sections.
+
+**Result**: Plan-mode-exit trigger now chains to `ag implement (creates WIP)` across all 5 instruction files. Memory seed updated. doctor.py bug fixed. S10 structural test enforces WIP lifecycle presence in all instructions.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.29.0
+**Current Version**: v0.31.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 49 behavioral test definitions
