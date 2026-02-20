@@ -13,13 +13,13 @@ Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |
 |-------------|--------|
-| Build / implement / add / create / set up / develop / make something | STOP -> If no F-XXXX: create spec/acceptance/F-XXXX.md FIRST, then `ag plan` + `ag implement`. Never code before specs. |
+| Build / implement / add / create / set up / develop / make something | STOP -> If no F-XXXX: create spec/acceptance/F-XXXX.md FIRST, then `ag plan` + `ag implement` (creates WIP). Never code before specs. |
 | Build something large (>10 files, "entire", "full system") | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
 | Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
 | Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
 | Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, check TaskList for pending items and flush to TODO.md via `ag todo`. |
 | Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
-| Exited plan mode (plan approved) | STOP -> Save plan to `.agentic-journal/plans/F-XXXX-plan.md` (use `ag plan --save <file> F-XXXX`), then if `plan_review_enabled: yes` in STACK.md invoke `/review` on the saved plan. |
+| Exited plan mode (plan approved) | STOP -> Save plan durably, then `ag implement F-XXXX` (creates WIP). If `plan_review_enabled: yes`: run `/review` on plan before coding. |
 
 Acceptance criteria: When `feature_tracking=yes` (formal profile): spec/acceptance/F-####.md required before coding | When `feature_tracking=no` (discovery): define criteria (any form) before coding. Override settings: `ag set <key> <value>`
 

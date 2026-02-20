@@ -2210,6 +2210,73 @@ else
 fi
 
 # ============================================================
+# F-0140: Proactive WIP Creation in Agent Instructions
+# ============================================================
+
+echo ""
+echo "--- F-0140: Proactive WIP Creation in Agent Instructions ---"
+
+# Plan-mode-exit trigger chains to ag implement across all instruction files
+for file in \
+  "${FRAMEWORK_ROOT}/.agentic/agents/claude/CLAUDE.md" \
+  "${FRAMEWORK_ROOT}/.agentic/agents/cursor/cursorrules.txt" \
+  "${FRAMEWORK_ROOT}/.agentic/agents/copilot/copilot-instructions.md" \
+  "${FRAMEWORK_ROOT}/.agentic/agents/codex/codex-instructions.md"; do
+  name=$(basename "$file")
+  # Plan-mode-exit row must mention ag implement
+  if grep -i "plan.*mode\|plan.*approved\|planning complete" "$file" | grep -q "ag implement"; then
+    pass "F-0140: $name plan-mode-exit → ag implement"
+  else
+    fail "F-0140: $name plan-mode-exit row missing ag implement chaining"
+  fi
+  # Build row must mention (creates WIP)
+  if grep -i "Build.*implement.*create" "$file" | grep -q "creates WIP"; then
+    pass "F-0140: $name Build trigger has (creates WIP)"
+  else
+    fail "F-0140: $name Build trigger missing (creates WIP) annotation"
+  fi
+done
+
+# Memory seed has WIP creation in both sections
+if grep -q "auto-creates WIP" "${FRAMEWORK_ROOT}/.agentic/init/memory-seed.md"; then
+  pass "F-0140: memory-seed.md has WIP creation in build section"
+else
+  fail "F-0140: memory-seed.md missing WIP creation note in build section"
+fi
+if grep -q "auto-creates WIP lock" "${FRAMEWORK_ROOT}/.agentic/init/memory-seed.md"; then
+  pass "F-0140: memory-seed.md has WIP creation in plan-mode-exit section"
+else
+  fail "F-0140: memory-seed.md missing WIP creation in plan-mode-exit section"
+fi
+
+# doctor.py checks .agentic-state/WIP.md (not .agentic/WIP.md)
+if grep -q '\.agentic-state.*WIP\.md' "${FRAMEWORK_ROOT}/.agentic/tools/doctor.py"; then
+  pass "F-0140: doctor.py uses correct WIP path (.agentic-state/)"
+else
+  fail "F-0140: doctor.py still uses wrong WIP path"
+fi
+# feature_start.md references ag implement creates WIP
+if grep -q "ag implement.*creates WIP" "${FRAMEWORK_ROOT}/.agentic/checklists/feature_start.md"; then
+  pass "F-0140: feature_start.md has ag implement (creates WIP) in After Gates"
+else
+  fail "F-0140: feature_start.md missing WIP reference in After Gates Pass"
+fi
+
+# feature_implementation.md has WIP tracking checkbox
+if grep -q "WIP tracking active" "${FRAMEWORK_ROOT}/.agentic/checklists/feature_implementation.md"; then
+  pass "F-0140: feature_implementation.md has WIP tracking prerequisite"
+else
+  fail "F-0140: feature_implementation.md missing WIP tracking checkbox"
+fi
+
+# Acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0140.md" ]]; then
+  pass "F-0140: acceptance criteria file exists"
+else
+  fail "F-0140: acceptance criteria file missing"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

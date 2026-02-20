@@ -1,7 +1,7 @@
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.28.1 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag todo -->
+<!-- memory-seed v0.31.0 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -16,6 +16,8 @@ If the user's intent is to build, implement, add, create, set up, develop, make,
 3. Run `ag plan F-XXXX` (starts the plan-review loop)
 4. Run `ag implement F-XXXX` after the plan is approved
 
+`ag implement` auto-creates WIP tracking. If bypassing ag: run `bash .agentic/tools/wip.sh start F-XXXX "desc" "files"` before coding.
+
 Never write implementation code before acceptance criteria exist. This is a structural rule, not a suggestion.
 
 If they say "implement entire", "full system", "complete", or describe something that would touch >10 files: **STOP — TOO BIG.** Break into 3-5 smaller tasks first.
@@ -25,8 +27,9 @@ If they say "implement entire", "full system", "complete", or describe something
 When you exit the tool's native plan mode and the plan is approved:
 
 1. Save the plan to `.agentic-journal/plans/F-XXXX-plan.md` using `ag plan --save <plan-file> F-XXXX` (tool-specific plan locations are session-scoped and will be lost)
-2. Check `plan_review_enabled` in STACK.md — if `yes`, invoke `/review` on the saved plan file
-3. Only proceed to implementation after the review completes (or if review is disabled)
+2. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
+3. Check `plan_review_enabled` in STACK.md — if `yes`, invoke `/review` on the saved plan file first
+4. Only proceed to implementation after the review completes (or if review is disabled)
 
 ## When the user reports a bug or wants a fix
 
@@ -51,6 +54,12 @@ If the user says remember, todo, idea, note for later, tasklist, or mentions som
 If the user says done, complete, finished, wrapped up, or indicates a feature is ready:
 
 **STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. Before ending, check your TaskList for pending items and flush them to TODO.md via `ag todo`.
+
+## When work is done (doc lifecycle)
+
+After `ag done F-XXXX` completes, if STACK.md has a `## Docs` section with entries:
+the doc lifecycle fires automatically (docs.sh assembles context, you draft the docs).
+You can also run `ag docs F-XXXX` manually to draft registered docs for a feature.
 
 ## Pre-commit sequence (never skip steps)
 

@@ -740,7 +740,7 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
             acc_file = root / "spec" / "acceptance" / f"{feature_id}.md"
             if not acc_file.exists():
                 issues.append(f"BLOCKED: Missing acceptance criteria for {feature_id}")
-            if not (root / ".agentic" / "WIP.md").exists():
+            if not (root / ".agentic-state" / "WIP.md").exists():
                 issues.append("No WIP tracking. Start with: bash .agentic/tools/wip.sh start " + feature_id)
 
             # Check feature status

@@ -10,6 +10,8 @@
 
 **🚨 Complete `.agentic/checklists/feature_start.md` FIRST** — it covers acceptance criteria, scope check, delegation decisions, and context handoff. Do not start implementation without passing those gates.
 
+- [ ] **WIP tracking active** (`ag implement` creates this; manual: `wip.sh start F-#### "desc" "files"`)
+
 ---
 
 ## Before Starting Implementation
