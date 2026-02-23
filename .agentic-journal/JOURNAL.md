@@ -842,3 +842,25 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-23 18:41 - F-0141: Explicit Settings in STACK.md
+
+**Accomplished**:
+- Rewrote STACK.template.md with explicit settings + inline docs; Updated scaffold.sh profiles.conf loop; Added smart profile cascade in ag.sh; Added pre_commit_hook validation; Updated upgrade.sh for missing settings; Dogfooding root STACK.md; Added 11 F-0141 tests + 2 functional scaffold tests; Fixed 3 pre-existing tests; All 285 tests pass
+
+**Next steps**:
+- Show changes for review, then commit
+
+**Blockers**: None
+
+
+### Session: 2026-02-23 23:45 - F-0141 PR updates
+
+**Accomplished**:
+- Bumped version to 0.32.0 across all files, added F-0141 contributions entry, created L08 LLM test for settings compliance
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+

@@ -389,14 +389,50 @@ COMPLEXITY_EOF
       cat >> "$TARGET_PROJECT_DIR/STACK.md" <<SETTINGS_EOF
 
 ## Settings
-<!-- Profile sets defaults. Override individual settings below. -->
-<!-- Run: ag set --show to see all resolved settings. -->
+<!-- Use \`ag set <key> <value>\` to change, \`ag set --show\` to view all. -->
 - profile: ${SETTINGS_PROFILE}
 SETTINGS_EOF
       echo -e "  ${GREEN}✓${NC} Added ## Settings section (profile: ${SETTINGS_PROFILE})"
-      echo "    Run 'ag set --show' to see all resolved settings"
     else
       echo -e "  ${GREEN}✓${NC} ## Settings section already exists"
+    fi
+
+    # Populate missing explicit settings from profile defaults (F-0141)
+    PRESETS_FILE="$NEW_FRAMEWORK_DIR/.agentic/presets/profiles.conf"
+    if [[ -f "$PRESETS_FILE" ]]; then
+      local settings_added=0
+      # Find ## Settings section boundaries (start line to next ## heading)
+      local settings_start settings_end
+      settings_start=$(grep -n "^## Settings" "$TARGET_PROJECT_DIR/STACK.md" | head -1 | cut -d: -f1)
+      settings_end=$(awk -v start="$settings_start" 'NR > start && /^## [^#]/ { print NR; exit }' "$TARGET_PROJECT_DIR/STACK.md")
+      [[ -z "$settings_end" ]] && settings_end=$(wc -l < "$TARGET_PROJECT_DIR/STACK.md")
+
+      while IFS='=' read -r preset_key preset_value; do
+        [[ "$preset_key" =~ ^#|^$ ]] && continue
+        [[ -z "$preset_key" ]] && continue
+        if [[ "$preset_key" =~ ^${PROFILE}\.(.*) ]]; then
+          local sname="${BASH_REMATCH[1]}"
+          # Only add if setting line doesn't exist yet (don't overwrite)
+          if ! grep -q "^- ${sname}:" "$TARGET_PROJECT_DIR/STACK.md"; then
+            # Find the last setting line within ## Settings section only
+            local last_setting_line
+            last_setting_line=$(sed -n "${settings_start},${settings_end}p" "$TARGET_PROJECT_DIR/STACK.md" | grep -n "^- " | tail -1 | cut -d: -f1)
+            if [[ -n "$last_setting_line" ]]; then
+              # Convert section-relative line to absolute line number
+              local abs_line=$((settings_start + last_setting_line - 1))
+              sed -i.bak "${abs_line}a\\
+- ${sname}: ${preset_value}" "$TARGET_PROJECT_DIR/STACK.md"
+              rm -f "$TARGET_PROJECT_DIR/STACK.md.bak" 2>/dev/null || true
+              # Adjust end boundary since we inserted a line
+              settings_end=$((settings_end + 1))
+              settings_added=$((settings_added + 1))
+            fi
+          fi
+        fi
+      done < "$PRESETS_FILE"
+      if [[ $settings_added -gt 0 ]]; then
+        echo -e "  ${GREEN}✓${NC} Added $settings_added missing explicit settings for ${PROFILE} profile"
+      fi
     fi
   fi
 fi

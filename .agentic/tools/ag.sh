@@ -2046,6 +2046,12 @@ _settings_set_value() {
                 exit 1
             fi
             ;;
+        pre_commit_hook)
+            if [[ ! "$value" =~ ^(fast|full|no)$ ]]; then
+                echo -e "${RED}Error: pre_commit_hook must be 'fast', 'full', or 'no', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
         git_workflow)
             if [[ ! "$value" =~ ^(pull_request|direct)$ ]]; then
                 echo -e "${RED}Error: git_workflow must be 'pull_request' or 'direct', got '$value'${NC}"
@@ -2063,6 +2069,11 @@ _settings_set_value() {
     if [ ! -f "$stack_file" ]; then
         echo -e "${RED}Error: STACK.md not found${NC}"
         exit 1
+    fi
+
+    # Capture old profile before writing (used by profile cascade below)
+    if [[ "$key" == "profile" ]]; then
+        _PREV_PROFILE=$(get_setting "profile" "discovery")
     fi
 
     # Ensure ## Settings section exists
@@ -2117,6 +2128,50 @@ _settings_set_value() {
     _SETTINGS_PROFILE_CACHE=""
 
     echo -e "${GREEN}Set ${key} = ${value}${NC}"
+
+    # Smart profile cascade: update all settings to new profile defaults,
+    # but preserve any settings the user has customized away from the old profile
+    if [[ "$key" == "profile" ]]; then
+        local old_profile presets_file
+        old_profile="${_PREV_PROFILE:-discovery}"
+        presets_file="$ROOT_DIR/.agentic/presets/profiles.conf"
+        if [[ -f "$presets_file" ]]; then
+            local changed=0
+            while IFS='=' read -r preset_key preset_value; do
+                [[ "$preset_key" =~ ^#|^$ ]] && continue
+                [[ -z "$preset_key" ]] && continue
+                if [[ "$preset_key" =~ ^${value}\.(.*) ]]; then
+                    local setting_name="${BASH_REMATCH[1]}"
+                    local new_value="$preset_value"
+                    # Get old profile default for this setting
+                    local old_default
+                    old_default=$(grep "^${old_profile}.${setting_name}=" "$presets_file" | cut -d= -f2)
+                    # Re-read current value from file (cache was invalidated)
+                    _SETTINGS_SECTION_EXTRACTED=0; _SETTINGS_SECTION_CACHE=""
+                    local current_value
+                    current_value=$(get_setting "$setting_name" "")
+                    # Only overwrite if current value matches old profile default (user didn't customize)
+                    if [[ "$current_value" == "$old_default" || -z "$current_value" ]]; then
+                        sed -i.bak -E "s/^(- ${setting_name}:[[:space:]]*).*/\\1${new_value}/" "$stack_file"
+                        rm -f "$stack_file.bak" 2>/dev/null || true
+                        changed=$((changed + 1))
+                    fi
+                fi
+            done < "$presets_file"
+            # Clear caches and validate constraints once at end
+            _SETTINGS_SECTION_EXTRACTED=0; _SETTINGS_SECTION_CACHE=""
+            _SETTINGS_PROFILE_RESOLVED=0; _SETTINGS_PROFILE_CACHE=""
+            local violations
+            violations=$(validate_constraints 2>&1)
+            if [ -n "$violations" ]; then
+                echo ""
+                echo -e "${YELLOW}Warning — constraint issues:${NC}"
+                echo "$violations"
+            fi
+            echo "Switched to ${value} profile ($changed settings updated, customized settings preserved)"
+            return
+        fi
+    fi
 
     # Validate constraints after change
     local violations
