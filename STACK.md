@@ -11,12 +11,37 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - Source: https://github.com/tomgun/agentic-framework
 
 ## Settings
-<!-- Profile sets defaults. Override individual settings below. -->
+<!-- Use `ag set <key> <value>` to change, `ag set --show` to view all. -->
 - profile: formal
+<!-- discovery | formal -->
+
+### Workflow
+- feature_tracking: yes
+# F-XXXX tracking, acceptance criteria gates. Profile defaults — Discovery: no | Formal: yes
+- acceptance_criteria: blocking
+# Require criteria before coding. Profile defaults — Discovery: recommended | Formal: blocking
+- wip_before_commit: blocking
+# WIP.md required before commit. Profile defaults — Discovery: warning | Formal: blocking
+- pre_commit_checks: full
+# Pre-commit gate depth. Profile defaults — Discovery: fast | Formal: full
+- pre_commit_hook: fast
+# Git hook dispatch mode. Profile defaults — Discovery: fast | Formal: fast
+- git_workflow: pull_request
+# Commit policy for main branch. Profile defaults — Discovery: direct | Formal: pull_request
+- plan_review_enabled: yes
+# Review plan before implementation. Profile defaults — Discovery: no | Formal: yes
+- spec_directory: yes
+# Create spec/ directory for features. Profile defaults — Discovery: no | Formal: yes
+- docs_gate: blocking
+# Doc staleness check at ag done. Profile defaults — Discovery: off | Formal: blocking
+
+### Complexity limits
 - max_files_per_commit: 15
+# Blocking limit in pre-commit. Profile defaults — Discovery: 15 | Formal: 10
 - max_added_lines: 1000
-- max_code_file_length: 1200
-- docs_gate: blocking  <!-- off | warning | blocking -->
+# Blocking limit for added lines. Profile defaults — Discovery: 1000 | Formal: 500
+- max_code_file_length: 2500
+# Blocking limit for single file length. Profile defaults — Discovery: 1000 | Formal: 500
 
 ## Summary
 - What are we building: AI-assisted development framework with spec-driven methodology
@@ -69,7 +94,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Plan-Review Loop
 <!-- Iterative planning with critical review before implementation -->
-- plan_review_enabled: yes
+<!-- Note: plan_review_enabled is in ## Settings (profile-aware) -->
 - plan_review_max_iterations: 3
 - plan_review_auto_for: [planning]
   <!-- planning: Runs for ag plan commands -->
@@ -85,7 +110,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Git workflow
 <!-- Framework uses PR workflow (dogfooding) -->
-- git_workflow: pull_request
+<!-- Note: git_workflow is in ## Settings (profile-aware) -->
 - pr_draft_by_default: false
 - pr_auto_request_review: false
 
@@ -96,12 +121,6 @@ Purpose: Configuration for developing the Agentic Framework itself.
 <!-- - multi_agent_workers: -->
 <!--     - id: cursor-agent-1 -->
 <!--       worktree: /path/to/worktree-1 -->
-
-## Complexity limits
-<!-- Framework allows larger batches due to multi-file changes -->
-- max_files_per_commit: 15
-- max_added_lines: 1000
-- max_code_file_length: 1200
 
 ## Retrospectives
 <!-- Periodic project health checks -->
@@ -121,7 +140,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 <!-- Framework-specific quality gates -->
 - quality_checks: enabled
 - profile: framework_development
-- pre_commit_hook: yes
+<!-- Note: pre_commit_hook is in ## Settings (profile-aware) -->
 - run_command: bash tests/validate_framework.sh
 
 ## LLM behavioral tests

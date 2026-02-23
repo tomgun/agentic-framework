@@ -389,14 +389,40 @@ COMPLEXITY_EOF
       cat >> "$TARGET_PROJECT_DIR/STACK.md" <<SETTINGS_EOF
 
 ## Settings
-<!-- Profile sets defaults. Override individual settings below. -->
-<!-- Run: ag set --show to see all resolved settings. -->
+<!-- Use \`ag set <key> <value>\` to change, \`ag set --show\` to view all. -->
 - profile: ${SETTINGS_PROFILE}
 SETTINGS_EOF
       echo -e "  ${GREEN}✓${NC} Added ## Settings section (profile: ${SETTINGS_PROFILE})"
-      echo "    Run 'ag set --show' to see all resolved settings"
     else
       echo -e "  ${GREEN}✓${NC} ## Settings section already exists"
+    fi
+
+    # Populate missing explicit settings from profile defaults (F-0141)
+    PRESETS_FILE="$NEW_FRAMEWORK_DIR/.agentic/presets/profiles.conf"
+    if [[ -f "$PRESETS_FILE" ]]; then
+      local settings_added=0
+      while IFS='=' read -r preset_key preset_value; do
+        [[ "$preset_key" =~ ^#|^$ ]] && continue
+        [[ -z "$preset_key" ]] && continue
+        if [[ "$preset_key" =~ ^${PROFILE}\.(.*) ]]; then
+          local sname="${BASH_REMATCH[1]}"
+          # Only add if setting line doesn't exist yet (don't overwrite)
+          if ! grep -q "^- ${sname}:" "$TARGET_PROJECT_DIR/STACK.md"; then
+            # Find the last setting line in ## Settings section and insert after it
+            local last_setting_line
+            last_setting_line=$(grep -n "^- " "$TARGET_PROJECT_DIR/STACK.md" | grep -A999 "^.*:- profile:" | tail -1 | cut -d: -f1)
+            if [[ -n "$last_setting_line" ]]; then
+              sed -i.bak "${last_setting_line}a\\
+- ${sname}: ${preset_value}" "$TARGET_PROJECT_DIR/STACK.md"
+              rm -f "$TARGET_PROJECT_DIR/STACK.md.bak" 2>/dev/null || true
+              settings_added=$((settings_added + 1))
+            fi
+          fi
+        fi
+      done < "$PRESETS_FILE"
+      if [[ $settings_added -gt 0 ]]; then
+        echo -e "  ${GREEN}✓${NC} Added $settings_added missing explicit settings for ${PROFILE} profile"
+      fi
     fi
   fi
 fi

@@ -10,27 +10,37 @@ Purpose: a single source of truth for "how we build and run software here".
 - Source: https://github.com/tomgun/agentic-framework
 
 ## Settings
-<!-- Profile sets defaults. Override individual settings below. -->
 <!-- Use `ag set <key> <value>` to change, `ag set --show` to view all. -->
-- profile: discovery  <!-- discovery | formal -->
+- profile: discovery
+<!-- discovery | formal -->
 
 ### Workflow
-<!-- These inherit from profile preset. Uncomment to override. -->
-<!-- Discovery defaults: feature_tracking: no, git_workflow: direct, pre_commit_checks: fast, docs_gate: off -->
-<!-- Formal defaults:    feature_tracking: yes, git_workflow: pull_request, pre_commit_checks: full, docs_gate: blocking -->
-<!-- - feature_tracking: no          # yes | no -->
-<!-- - acceptance_criteria: recommended  # blocking | recommended | off -->
-<!-- - wip_before_commit: warning    # blocking | warning -->
-<!-- - pre_commit_checks: fast       # full | fast | off -->
-<!-- - git_workflow: direct          # pull_request | direct -->
-<!-- - plan_review_enabled: no       # yes | no -->
-<!-- - spec_directory: no            # yes | no -->
-<!-- - docs_gate: off                # off | warning | blocking -->
+- feature_tracking: no
+# F-XXXX tracking, acceptance criteria gates. Profile defaults — Discovery: no | Formal: yes
+- acceptance_criteria: recommended
+# Require criteria before coding. Profile defaults — Discovery: recommended | Formal: blocking
+- wip_before_commit: warning
+# WIP.md required before commit. Profile defaults — Discovery: warning | Formal: blocking
+- pre_commit_checks: fast
+# Pre-commit gate depth. Profile defaults — Discovery: fast | Formal: full
+- pre_commit_hook: fast
+# Git hook dispatch mode. Profile defaults — Discovery: fast | Formal: fast
+- git_workflow: direct
+# Commit policy for main branch. Profile defaults — Discovery: direct | Formal: pull_request
+- plan_review_enabled: no
+# Review plan before implementation. Profile defaults — Discovery: no | Formal: yes
+- spec_directory: no
+# Create spec/ directory for features. Profile defaults — Discovery: no | Formal: yes
+- docs_gate: off
+# Doc staleness check at ag done. Profile defaults — Discovery: off | Formal: blocking
 
 ### Complexity limits
-<!-- - max_files_per_commit: 15      # blocking limit in pre-commit -->
-<!-- - max_added_lines: 1000         # blocking limit for added lines -->
-<!-- - max_code_file_length: 1000    # blocking limit for single file -->
+- max_files_per_commit: 15
+# Blocking limit in pre-commit. Profile defaults — Discovery: 15 | Formal: 10
+- max_added_lines: 1000
+# Blocking limit for added lines. Profile defaults — Discovery: 1000 | Formal: 500
+- max_code_file_length: 1000
+# Blocking limit for single file length. Profile defaults — Discovery: 1000 | Formal: 500
 
 ## Summary
 - What are we building: <!-- 1–2 sentences -->

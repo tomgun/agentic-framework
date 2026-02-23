@@ -2162,6 +2162,20 @@ Ensures the plan-mode-exit trigger chains to `ag implement` (which creates WIP t
 
 ---
 
+## F-0141: Explicit Settings in STACK.md
+
+**Status**: in_progress
+**Priority**: high
+**Added**: 2026-02-23
+
+All profile-aware settings are listed explicitly with values in STACK.md (no commented-out lines). Each setting has inline docs showing both profile defaults. Scaffold populates all values from profiles.conf. Profile switching preserves user customizations.
+
+**Dependencies**: F-0009 (Settings System)
+
+**Acceptance**: See `spec/acceptance/F-0141.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |

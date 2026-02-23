@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0140: Proactive WIP Creation — implementation complete, 14 files, all tests passing (276/276) (Updated: 2026-02-20 21:01 EET)
+- F-0141: Explicit Settings in STACK.md — implementation complete, 8 files, all tests passing (285/285) (Updated: 2026-02-23 18:41 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

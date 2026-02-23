@@ -231,26 +231,19 @@ if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
     rm -f "${ROOT_DIR}/STACK.md.bak" 2>/dev/null || true
   fi
 
-  # Set profile-aware git_workflow default
-  # Discovery profile → direct (fast iteration, user can override during init)
-  # Formal profile → pull_request (formal tracking = formal review)
-  if [[ "${PROFILE}" == "discovery" ]]; then
-    GIT_WORKFLOW_DEFAULT="direct"
-  else
-    GIT_WORKFLOW_DEFAULT="pull_request"
-  fi
-
-  # Write git_workflow into ## Settings section (after profile line)
-  if grep -q "^- profile:" "${ROOT_DIR}/STACK.md" 2>/dev/null; then
-    SCAFFOLD_TMP=$(mktemp)
-    while IFS= read -r line || [[ -n "$line" ]]; do
-      echo "$line" >> "$SCAFFOLD_TMP"
-      if [[ "$line" =~ ^-[[:space:]]*profile: ]]; then
-        echo "- git_workflow: ${GIT_WORKFLOW_DEFAULT}" >> "$SCAFFOLD_TMP"
+  # Replace all settings values from profile preset
+  PRESETS_FILE="${ROOT_DIR}/.agentic/presets/profiles.conf"
+  if [[ -f "$PRESETS_FILE" ]]; then
+    while IFS='=' read -r preset_key preset_value; do
+      [[ "$preset_key" =~ ^#|^$ ]] && continue
+      [[ -z "$preset_key" ]] && continue
+      if [[ "$preset_key" =~ ^${PROFILE}\.(.*) ]]; then
+        setting_name="${BASH_REMATCH[1]}"
+        sed -i.bak -E "s/^(- ${setting_name}:[[:space:]]*).*/\\1${preset_value}/" "${ROOT_DIR}/STACK.md"
+        rm -f "${ROOT_DIR}/STACK.md.bak" 2>/dev/null || true
       fi
-    done < "${ROOT_DIR}/STACK.md"
-    mv "$SCAFFOLD_TMP" "${ROOT_DIR}/STACK.md"
-    echo "OK  : STACK.md git_workflow set to ${GIT_WORKFLOW_DEFAULT} (${PROFILE} default)"
+    done < "$PRESETS_FILE"
+    echo "OK  : STACK.md settings populated for ${PROFILE} profile"
   fi
 fi
 
