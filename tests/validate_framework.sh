@@ -791,11 +791,11 @@ fi
 echo ""
 echo "--- F-0096: PR-Based Workflow Default ---"
 
-# AC-001: STACK.template.md has pull_request as default
-if grep -q "git_workflow: pull_request" "${FRAMEWORK_ROOT}/.agentic/init/STACK.template.md" 2>/dev/null; then
-  pass "STACK.template.md has pull_request as default git workflow"
+# AC-001: STACK.template.md has git_workflow setting (explicit, discovery default = direct)
+if grep -q "^- git_workflow:" "${FRAMEWORK_ROOT}/.agentic/init/STACK.template.md" 2>/dev/null; then
+  pass "STACK.template.md has explicit git_workflow setting"
 else
-  fail "STACK.template.md missing pull_request default"
+  fail "STACK.template.md missing git_workflow setting"
 fi
 
 # AC-002: git_workflow.md documents profile-aware defaults
@@ -947,17 +947,11 @@ else
   fail "Escape hatch not documented in pre-commit"
 fi
 
-# AC-004: Profile-aware defaults in scaffold.sh
-if grep -q 'GIT_WORKFLOW_DEFAULT="direct"' "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null; then
-  pass "scaffold.sh sets direct for Discovery profile"
+# AC-004: Profile-aware defaults in scaffold.sh (reads from profiles.conf)
+if grep -q 'profiles.conf' "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null; then
+  pass "scaffold.sh reads settings from profiles.conf"
 else
-  fail "scaffold.sh missing Discovery profile git_workflow default"
-fi
-
-if grep -q 'GIT_WORKFLOW_DEFAULT="pull_request"' "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null; then
-  pass "scaffold.sh sets pull_request for Formal profile"
-else
-  fail "scaffold.sh missing Formal profile git_workflow default"
+  fail "scaffold.sh missing profiles.conf loop for profile defaults"
 fi
 
 # AC-005: Core profile git workflow question in init_playbook
@@ -2274,6 +2268,196 @@ if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0140.md" ]]; then
   pass "F-0140: acceptance criteria file exists"
 else
   fail "F-0140: acceptance criteria file missing"
+fi
+
+# ============================================================
+# F-0141: Explicit Settings in STACK.md
+# ============================================================
+echo ""
+echo "--- F-0141: Explicit Settings in STACK.md ---"
+
+# Test: STACK.template.md has all profiles.conf settings uncommented
+PROFILES_CONF="${FRAMEWORK_ROOT}/.agentic/presets/profiles.conf"
+STACK_TEMPLATE="${FRAMEWORK_ROOT}/.agentic/init/STACK.template.md"
+
+if [[ -f "$PROFILES_CONF" && -f "$STACK_TEMPLATE" ]]; then
+  # Extract all setting names from profiles.conf (discovery.xxx=yyy → xxx)
+  F0141_MISSING_IN_TEMPLATE=0
+  while IFS='=' read -r pkey pval; do
+    [[ "$pkey" =~ ^#|^$ ]] && continue
+    [[ -z "$pkey" ]] && continue
+    if [[ "$pkey" =~ ^discovery\.(.*) ]]; then
+      sname="${BASH_REMATCH[1]}"
+      if grep -q "^- ${sname}:" "$STACK_TEMPLATE"; then
+        : # found
+      else
+        fail "F-0141: profiles.conf setting '${sname}' missing from STACK.template.md"
+        F0141_MISSING_IN_TEMPLATE=1
+      fi
+    fi
+  done < "$PROFILES_CONF"
+  if [[ $F0141_MISSING_IN_TEMPLATE -eq 0 ]]; then
+    pass "F-0141: all profiles.conf settings present in STACK.template.md"
+  fi
+
+  # Reverse check: all template settings in ## Settings section have matching profiles.conf key
+  F0141_MISSING_IN_CONF=0
+  F0141_IN_SETTINGS=0
+  while IFS= read -r line; do
+    # Track when we enter/exit ## Settings section
+    if [[ "$line" =~ ^##[[:space:]]+Settings ]]; then
+      F0141_IN_SETTINGS=1
+      continue
+    fi
+    if [[ $F0141_IN_SETTINGS -eq 1 ]] && [[ "$line" =~ ^##[[:space:]] ]] && [[ ! "$line" =~ ^###[[:space:]] ]]; then
+      F0141_IN_SETTINGS=0
+      continue
+    fi
+    # Only check settings within ## Settings section
+    if [[ $F0141_IN_SETTINGS -eq 1 ]]; then
+      if [[ "$line" =~ ^-[[:space:]]+(profile):[[:space:]] ]]; then
+        continue  # profile itself is not in profiles.conf as discovery.profile
+      fi
+      if [[ "$line" =~ ^-[[:space:]]+([a-z_]+):[[:space:]] ]]; then
+        sname="${BASH_REMATCH[1]}"
+        if grep -q "^discovery\.${sname}=" "$PROFILES_CONF"; then
+          : # found
+        else
+          fail "F-0141: STACK.template.md setting '${sname}' not in profiles.conf"
+          F0141_MISSING_IN_CONF=1
+        fi
+      fi
+    fi
+  done < "$STACK_TEMPLATE"
+  if [[ $F0141_MISSING_IN_CONF -eq 0 ]]; then
+    pass "F-0141: all template Settings section entries have matching profiles.conf keys"
+  fi
+else
+  fail "F-0141: profiles.conf or STACK.template.md not found"
+fi
+
+# Test: template settings have "Profile defaults" comments
+if grep -q "Profile defaults" "$STACK_TEMPLATE"; then
+  pass "F-0141: STACK.template.md has Profile defaults comments"
+else
+  fail "F-0141: STACK.template.md missing Profile defaults comments"
+fi
+
+# Test: settings are uncommented (not HTML comments)
+F0141_COMMENTED=0
+while IFS='=' read -r pkey pval; do
+  [[ "$pkey" =~ ^#|^$ ]] && continue
+  [[ -z "$pkey" ]] && continue
+  if [[ "$pkey" =~ ^discovery\.(.*) ]]; then
+    sname="${BASH_REMATCH[1]}"
+    if grep -q "^<!--.*- ${sname}:" "$STACK_TEMPLATE"; then
+      fail "F-0141: setting '${sname}' is still commented out in template"
+      F0141_COMMENTED=1
+    fi
+  fi
+done < "$PROFILES_CONF"
+if [[ $F0141_COMMENTED -eq 0 ]]; then
+  pass "F-0141: no profile settings are commented out in template"
+fi
+
+# Test: scaffold.sh reads from profiles.conf
+if grep -q "profiles.conf" "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh"; then
+  pass "F-0141: scaffold.sh references profiles.conf"
+else
+  fail "F-0141: scaffold.sh does not reference profiles.conf"
+fi
+
+# Test: ag.sh has pre_commit_hook validation
+if grep -q "pre_commit_hook)" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh"; then
+  pass "F-0141: ag.sh has pre_commit_hook validation"
+else
+  fail "F-0141: ag.sh missing pre_commit_hook validation"
+fi
+
+# Test: ag.sh has profile cascade logic
+if grep -q "_PREV_PROFILE" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh"; then
+  pass "F-0141: ag.sh has smart profile cascade"
+else
+  fail "F-0141: ag.sh missing smart profile cascade"
+fi
+
+# Functional test: scaffold with discovery profile produces all settings
+echo ""
+echo "--- F-0141: Functional scaffold tests ---"
+F0141_SCRATCH=$(mktemp -d)
+mkdir -p "$F0141_SCRATCH/.agentic"
+cp -r "${FRAMEWORK_ROOT}/.agentic/init" "$F0141_SCRATCH/.agentic/"
+cp -r "${FRAMEWORK_ROOT}/.agentic/presets" "$F0141_SCRATCH/.agentic/"
+cp -r "${FRAMEWORK_ROOT}/.agentic/spec" "$F0141_SCRATCH/.agentic/"
+cp -r "${FRAMEWORK_ROOT}/.agentic/tools" "$F0141_SCRATCH/.agentic/"
+cp -r "${FRAMEWORK_ROOT}/.agentic/hooks" "$F0141_SCRATCH/.agentic/"
+[[ -d "${FRAMEWORK_ROOT}/.agentic/lib" ]] && cp -r "${FRAMEWORK_ROOT}/.agentic/lib" "$F0141_SCRATCH/.agentic/"
+
+# Init git repo for scaffold
+(cd "$F0141_SCRATCH" && git init -q 2>/dev/null)
+
+# Test discovery scaffold
+(cd "$F0141_SCRATCH" && bash .agentic/init/scaffold.sh --profile discovery --non-interactive >/dev/null 2>&1) || true
+F0141_DISC_MISSING=0
+while IFS='=' read -r pkey pval; do
+  [[ "$pkey" =~ ^#|^$ ]] && continue
+  [[ -z "$pkey" ]] && continue
+  if [[ "$pkey" =~ ^discovery\.(.*) ]]; then
+    sname="${BASH_REMATCH[1]}"
+    expected_val="$pval"
+    if grep -q "^- ${sname}: ${expected_val}" "$F0141_SCRATCH/STACK.md" 2>/dev/null; then
+      : # correct
+    else
+      actual=$(grep "^- ${sname}:" "$F0141_SCRATCH/STACK.md" 2>/dev/null || echo "(not found)")
+      fail "F-0141: discovery scaffold: ${sname} expected '${expected_val}', got '${actual}'"
+      F0141_DISC_MISSING=1
+    fi
+  fi
+done < "$PROFILES_CONF"
+if [[ $F0141_DISC_MISSING -eq 0 ]]; then
+  pass "F-0141: discovery scaffold has all settings with correct values"
+fi
+
+# Test formal scaffold
+F0141_SCRATCH2=$(mktemp -d)
+mkdir -p "$F0141_SCRATCH2/.agentic"
+cp -r "${FRAMEWORK_ROOT}/.agentic/init" "$F0141_SCRATCH2/.agentic/"
+cp -r "${FRAMEWORK_ROOT}/.agentic/presets" "$F0141_SCRATCH2/.agentic/"
+cp -r "${FRAMEWORK_ROOT}/.agentic/spec" "$F0141_SCRATCH2/.agentic/"
+cp -r "${FRAMEWORK_ROOT}/.agentic/tools" "$F0141_SCRATCH2/.agentic/"
+cp -r "${FRAMEWORK_ROOT}/.agentic/hooks" "$F0141_SCRATCH2/.agentic/"
+[[ -d "${FRAMEWORK_ROOT}/.agentic/lib" ]] && cp -r "${FRAMEWORK_ROOT}/.agentic/lib" "$F0141_SCRATCH2/.agentic/"
+(cd "$F0141_SCRATCH2" && git init -q 2>/dev/null)
+
+(cd "$F0141_SCRATCH2" && bash .agentic/init/scaffold.sh --profile formal --non-interactive >/dev/null 2>&1) || true
+F0141_FORM_MISSING=0
+while IFS='=' read -r pkey pval; do
+  [[ "$pkey" =~ ^#|^$ ]] && continue
+  [[ -z "$pkey" ]] && continue
+  if [[ "$pkey" =~ ^formal\.(.*) ]]; then
+    sname="${BASH_REMATCH[1]}"
+    expected_val="$pval"
+    if grep -q "^- ${sname}: ${expected_val}" "$F0141_SCRATCH2/STACK.md" 2>/dev/null; then
+      : # correct
+    else
+      actual=$(grep "^- ${sname}:" "$F0141_SCRATCH2/STACK.md" 2>/dev/null || echo "(not found)")
+      fail "F-0141: formal scaffold: ${sname} expected '${expected_val}', got '${actual}'"
+      F0141_FORM_MISSING=1
+    fi
+  fi
+done < "$PROFILES_CONF"
+if [[ $F0141_FORM_MISSING -eq 0 ]]; then
+  pass "F-0141: formal scaffold has all settings with correct values"
+fi
+
+# Cleanup scratch dirs
+rm -rf "$F0141_SCRATCH" "$F0141_SCRATCH2" 2>/dev/null || true
+
+# Acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0141.md" ]]; then
+  pass "F-0141: acceptance criteria file exists"
+else
+  fail "F-0141: acceptance criteria file missing"
 fi
 
 # ============================================================

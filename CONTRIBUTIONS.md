@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.31.0)
+**Period**: Initial Development (v0.1.0 → v0.32.0)
 **Date**: 2026-02-19
 
 ---
@@ -2338,11 +2338,19 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: Plan-mode-exit trigger now chains to `ag implement (creates WIP)` across all 5 instruction files. Memory seed updated. doctor.py bug fixed. S10 structural test enforces WIP lifecycle presence in all instructions.
 
+### Explicit Settings in STACK.md (F-0141, v0.32.0)
+
+**User insight**: Settings were scattered and half-commented-out in STACK.md. Users couldn't tell which settings existed, what values were active, or what the defaults were. Profile switching (`ag set profile formal`) was fragile because it couldn't distinguish user customizations from defaults.
+
+**User direction**: All profile-aware settings should be explicit (uncommented, with values) in STACK.md. Each setting needs inline docs showing both profile defaults. Profile switching should be smart — preserve user customizations, only change settings still at old-profile defaults. Upgrade path needed for existing projects.
+
+**Result**: STACK.template.md lists all 12 settings explicitly with inline `# Profile defaults` comments. scaffold.sh reads profiles.conf to populate all values. `ag set profile` does smart cascade preserving customizations. upgrade.sh adds missing settings from profile defaults. Sync tests catch template/profiles.conf drift.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.31.0
+**Current Version**: v0.32.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
-**LLM Tests**: 49 behavioral test definitions
+**LLM Tests**: 50 behavioral test definitions
 
