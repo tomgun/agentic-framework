@@ -864,3 +864,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-24 12:38 - Performance review fixes (F-0142)
+
+**Accomplished**:
+- Self-healing hook install in ag preamble (D2 root cause), plan auto-save from .claude/plans/ + .cursor/plans/, test co-presence advisory check in pre-commit, CONTEXT_PACK placeholder detection in sync
+
+**Next steps**:
+- Register F-0142 in FEATURES.md, write acceptance tests, PR
+
+**Blockers**: None
+

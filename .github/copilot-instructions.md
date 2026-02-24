@@ -28,6 +28,7 @@ Rules:
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later).
 - Keep changes small and scoped.
+- **Every PR**: Bump VERSION (at least patch) and update CONTRIBUTIONS.md with user's insight/direction.
 - Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):

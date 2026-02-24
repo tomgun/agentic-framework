@@ -29,6 +29,7 @@ Rules:
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later).
 - Keep changes small and scoped.
+- **Every PR**: Bump VERSION (at least patch) and update CONTRIBUTIONS.md with user's insight/direction.
 - Multi-agent: read `.agentic-state/AGENTS_ACTIVE.md` before starting work.
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):
