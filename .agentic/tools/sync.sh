@@ -246,6 +246,31 @@ phase_state_freshness() {
             echo -e "CHANGELOG:  ${DIM}skipped (no CHANGELOG.md or VERSION)${NC}"
         fi
     fi
+
+    # --- CONTEXT_PACK.md placeholder detection ---
+    local ctx_pack="$ROOT_DIR/CONTEXT_PACK.md"
+    if [ -f "$ctx_pack" ]; then
+        local placeholder_count
+        placeholder_count=$(grep -cE '<!-- (1|fill|bullets|e\.g\.|path )' "$ctx_pack" 2>/dev/null || echo "0")
+
+        if [ "$placeholder_count" -ge 3 ]; then
+            record_issue "CONTEXT_PACK.md has template placeholders"
+            if [ "$MODE" != "quiet" ]; then
+                echo -e "CONTEXT_PACK: ${YELLOW}STALE ($placeholder_count template placeholders still present)${NC}"
+                echo -e "            Fix: Replace <!-- fill ... --> placeholders with real project content"
+            fi
+        else
+            record_ok
+            if [ "$MODE" != "quiet" ]; then
+                echo -e "CONTEXT_PACK: ${GREEN}OK${NC}"
+            fi
+        fi
+    else
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "CONTEXT_PACK: ${DIM}skipped (no CONTEXT_PACK.md)${NC}"
+        fi
+    fi
 }
 
 # ============================================================================

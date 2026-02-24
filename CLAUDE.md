@@ -38,6 +38,7 @@ Rules:
 - Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
 - Multi-agent: read `.agentic-state/AGENTS_ACTIVE.md` before starting work.
 - Log user's design insights and direction to CONTRIBUTIONS.md (their ideas, not agent's implementation work).
+- **Every PR**: Bump VERSION (at least patch) and update CONTRIBUTIONS.md with user's insight/direction.
 - **Where to log**: Task/idea → `ag todo`; human blocker (PR, credential, decision) → `blocker.sh`; bug → `quick_issue.sh`; new capability → `feature.sh`. Do NOT put development tasks in HUMAN_NEEDED.md.
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):

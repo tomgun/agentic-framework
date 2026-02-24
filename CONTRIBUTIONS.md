@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.32.0)
+**Period**: Initial Development (v0.1.0 → v0.32.1)
 **Date**: 2026-02-19
 
 ---
@@ -2346,10 +2346,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: STACK.template.md lists all 12 settings explicitly with inline `# Profile defaults` comments. scaffold.sh reads profiles.conf to populate all values. `ag set profile` does smart cascade preserving customizations. upgrade.sh adds missing settings from profile defaults. Sync tests catch template/profiles.conf drift.
 
+### Performance Review & Self-Healing Enforcement (F-0142, v0.32.1)
+
+**User insight**: Conducted real-world framework performance review on a greenfield game project (4 days, 12 features shipped). Discovered the root cause of most enforcement failures: pre-commit hooks were never installed because `scaffold.sh` ran once and nothing verified the git config persisted. The framework's enforcement mechanism was itself enforced only behaviorally — violating its own core principle (D2). Also identified that plans made in Claude Code and Cursor plan modes were lost because they're session-scoped.
+
+**User direction**: Apply D2 to itself — every `ag` command should self-heal hook installation. Plans from all AI tools (`.claude/plans/`, `.cursor/plans/`) should be auto-saved to durable storage. Pre-commit should warn about missing tests (advisory). CONTEXT_PACK placeholder drift should be detected. Also established rule: every PR must bump version (at least patch) and update CONTRIBUTIONS.md.
+
+**Result**: `_ensure_hooks()` preamble in ag.sh auto-fixes `core.hooksPath` on every invocation. `cmd_implement()` auto-saves plans from `.claude/plans/` and `.cursor/plans/`. Check 13 (advisory test co-presence) added to pre-commit. CONTEXT_PACK placeholder detection added to `ag sync`. Full review artifact saved to `.agentic-journal/reviews/`.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.32.0
+**Current Version**: v0.32.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions

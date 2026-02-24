@@ -21,6 +21,7 @@
 #   3c. FEATURES.md updated when feature spec files changed (BLOCKING, Formal only)
 #   3d. NFR.md updated when NFR spec files changed (BLOCKING, Formal only)
 #   11. Branch policy for PR workflow (blocks commit to main if pull_request mode)
+#   13. Test co-presence check (advisory, full mode only — warns when source files lack tests)
 #
 # Escape hatches (use sparingly, blocked on main/master):
 #   SKIP_TESTS=1      Skip test execution
@@ -40,7 +41,7 @@ cd "${PROJECT_ROOT}"
 source "${PROJECT_ROOT}/.agentic/lib/settings.sh"
 
 # === Mode flag ===
-# --mode fast: skip slow/advisory checks (4,5,6,8,9,10,12)
+# --mode fast: skip slow/advisory checks (4,5,6,8,9,10,12,13)
 # --mode full: run all checks (default when called directly)
 _FAST_MODE=0
 for _arg in "$@"; do
@@ -129,7 +130,7 @@ fi
 FAILURES=0
 
 # Check 1: .agentic-state/WIP.md must not exist
-echo "[1/12] Checking for incomplete work (.agentic-state/WIP.md)..."
+echo "[1/13] Checking for incomplete work (.agentic-state/WIP.md)..."
 if [[ -f ".agentic-state/WIP.md" ]]; then
   echo "❌ BLOCKED: .agentic-state/WIP.md exists - work is incomplete!"
   echo ""
@@ -148,7 +149,7 @@ fi
 # Check 2: Shipped features must have acceptance criteria
 if [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[2/12] Checking shipped features have acceptance criteria..."
+  echo "[2/13] Checking shipped features have acceptance criteria..."
   
   # Extract feature IDs marked as shipped
   SHIPPED_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: shipped" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
@@ -181,7 +182,7 @@ if [[ -f "spec/FEATURES.md" ]]; then
   fi
 else
   echo ""
-  echo "[2/12] Skipping shipped features check (Discovery profile, no spec/FEATURES.md)"
+  echo "[2/13] Skipping shipped features check (Discovery profile, no spec/FEATURES.md)"
   echo ""
   echo "  📋 Discovery checklist (review, not blocking):"
   echo "     □ Defined what success looks like (even 2-3 bullet points)"
@@ -201,7 +202,7 @@ fi
 
 if [[ -n "$JOURNAL_PATH" ]]; then
   echo ""
-  echo "[3/12] Checking JOURNAL.md freshness..."
+  echo "[3/13] Checking JOURNAL.md freshness..."
 
   if [[ -n "${SKIP_STALENESS:-}" ]]; then
     echo "  ⚠ Skipped (SKIP_STALENESS set)"
@@ -237,13 +238,13 @@ if [[ -n "$JOURNAL_PATH" ]]; then
   fi
 else
   echo ""
-  echo "[3/12] Skipping JOURNAL.md check (file not found)"
+  echo "[3/13] Skipping JOURNAL.md check (file not found)"
 fi
 
 # Check 3b: STATUS.md updated since last commit (BLOCKING)
 if [[ -f "STATUS.md" ]]; then
   echo ""
-  echo "[3b/11] Checking STATUS.md freshness..."
+  echo "[3b/13] Checking STATUS.md freshness..."
 
   if [[ -n "${SKIP_STALENESS:-}" ]]; then
     echo "  ⚠ Skipped (SKIP_STALENESS set)"
@@ -283,7 +284,7 @@ fi
 FEATURE_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep "^spec/" | grep -v "^spec/NFR\.md$" | grep -v "^spec/acceptance/NFR-" | grep -v "^$" || true)
 if [[ -n "$FEATURE_SPEC_STAGED" ]] && [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[3c/12] Checking FEATURES.md freshness (feature spec files staged)..."
+  echo "[3c/13] Checking FEATURES.md freshness (feature spec files staged)..."
 
   if [[ -n "${SKIP_STALENESS:-}" ]]; then
     echo "  ⚠ Skipped (SKIP_STALENESS set)"
@@ -324,7 +325,7 @@ fi
 NFR_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^spec/(NFR\.md|acceptance/NFR-)" || true)
 if [[ -n "$NFR_SPEC_STAGED" ]] && [[ -f "spec/NFR.md" ]]; then
   echo ""
-  echo "[3d/12] Checking NFR.md freshness (NFR spec files staged)..."
+  echo "[3d/13] Checking NFR.md freshness (NFR spec files staged)..."
 
   if [[ -n "${SKIP_STALENESS:-}" ]]; then
     echo "  ⚠ Skipped (SKIP_STALENESS set)"
@@ -362,7 +363,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 elif [[ -f "STACK.md" ]]; then
   echo ""
-  echo "[4/12] Checking STACK.md version consistency..."
+  echo "[4/13] Checking STACK.md version consistency..."
   
   # Example: Check Node.js version if package.json exists
   if [[ -f "package.json" ]] && command -v node >/dev/null 2>&1; then
@@ -392,7 +393,7 @@ elif [[ -f "STACK.md" ]]; then
   fi
 else
   echo ""
-  echo "[4/12] Skipping STACK.md check (file not found)"
+  echo "[4/13] Skipping STACK.md check (file not found)"
 fi
 
 # Check 5: Batch size warning (small batches = quality)
@@ -400,7 +401,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 elif command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   echo ""
-  echo "[5/12] Checking batch size (small batches = quality)..."
+  echo "[5/13] Checking batch size (small batches = quality)..."
 
   # Count staged files
   CHANGED_FILES=$(git diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
@@ -438,12 +439,12 @@ if [[ $_FAST_MODE -eq 1 ]]; then
 elif [[ -n "${SKIP_TESTS:-}" ]]; then
   echo ""
   echo "═══════════════════════════════════════════════════════════════════════"
-  echo "[6/12] Running tests..."
+  echo "[6/13] Running tests..."
   echo "  ⚠ Skipped (SKIP_TESTS set)"
 else
   echo ""
   echo "═══════════════════════════════════════════════════════════════════════"
-  echo "[6/12] Running tests..."
+  echo "[6/13] Running tests..."
   # Prefer fast tests for pre-commit, fall back to full test command
   TEST_CMD=""
   if [[ -f "STACK.md" ]]; then
@@ -511,7 +512,7 @@ fi
 # Check 7: Complexity limits (BLOCKING)
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════"
-echo "[7/12] Checking complexity limits..."
+echo "[7/13] Checking complexity limits..."
 
 if [[ -n "${SKIP_COMPLEXITY:-}" ]]; then
   echo "  ⚠ Skipped (SKIP_COMPLEXITY set)"
@@ -599,7 +600,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 elif command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   echo ""
-  echo "[8/12] Checking for untracked files in project directories..."
+  echo "[8/13] Checking for untracked files in project directories..."
   # Directories that should typically have files tracked
   CHECK_DIRS=("src" "lib" "app" "assets" "public" "tests" "test" "spec" "docs" "scripts")
   
@@ -645,7 +646,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 elif [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/VERIFICATION_REPORT.md" ]]; then
   echo ""
-  echo "[9/12] Checking LLM behavioral test status..."
+  echo "[9/13] Checking LLM behavioral test status..."
   if bash .agentic/tools/llm-test-status.sh --quiet 2>/dev/null; then
     echo "✓ LLM behavioral tests are current"
   else
@@ -660,7 +661,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 else
 echo ""
-echo "[10/12] Checking agent instruction file sizes..."
+echo "[10/13] Checking agent instruction file sizes..."
 
 SIZE_WARNINGS=0
 
@@ -735,7 +736,7 @@ fi
 
 # Check 11: Branch policy for PR workflow (BLOCKS commit to main/master)
 echo ""
-echo "[11/12] Checking branch policy..."
+echo "[11/13] Checking branch policy..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
@@ -762,6 +763,77 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   fi
 else
   echo "✓ Git not available (skipping branch policy check)"
+fi
+
+# Check 13: Test co-presence (advisory, full mode only)
+# Warns when staged source files have no corresponding test file
+if [[ $_FAST_MODE -eq 1 ]]; then
+  : # skip in fast mode
+else
+  echo ""
+  echo "═══════════════════════════════════════════════════════════════════════"
+  echo "[13/13] Checking test co-presence (advisory)..."
+
+  STAGED_SOURCE_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E '\.(ts|tsx|js|jsx|py|go|rs|rb|java|swift|kt)$' | grep -vE '(\.test\.|\.spec\.|_test\.|test_|\.d\.ts$|__tests__|\.config\.|\.stories\.)' | grep -vE '^(tests?/|spec/|\.agentic/)' || true)
+  UNTESTED_FILES=0
+  UNTESTED_LIST=""
+
+  while IFS= read -r src_file; do
+    [[ -z "$src_file" ]] && continue
+    # Skip non-source files (configs, types, declarations)
+    base=$(basename "$src_file")
+    case "$base" in
+      index.*|types.*|constants.*|config.*|*.config.*|*.d.ts) continue ;;
+    esac
+
+    dir=$(dirname "$src_file")
+    name="${base%.*}"
+    ext="${base##*.}"
+
+    # Build test patterns list — includes cross-extension checks for tsx→ts, jsx→js
+    test_patterns=(
+      "${dir}/${name}.test.${ext}"
+      "${dir}/${name}.spec.${ext}"
+      "${dir}/__tests__/${name}.test.${ext}"
+      "tests/${dir}/${name}.test.${ext}"
+      "test/${dir}/${name}.test.${ext}"
+      "${dir}/test_${name}.py"
+      "tests/test_${name}.py"
+      "${dir}/${name}_test.go"
+      "${dir}/${name}_test.rs"
+    )
+    # tsx/jsx components are often tested with plain ts/js test files
+    case "$ext" in
+      tsx) test_patterns+=("${dir}/${name}.test.ts" "${dir}/__tests__/${name}.test.ts") ;;
+      jsx) test_patterns+=("${dir}/${name}.test.js" "${dir}/__tests__/${name}.test.js") ;;
+    esac
+
+    found_test=false
+    for test_pattern in "${test_patterns[@]}"; do
+      if [ -f "$test_pattern" ]; then
+        found_test=true
+        break
+      fi
+    done
+
+    if [ "$found_test" = false ]; then
+      UNTESTED_FILES=$((UNTESTED_FILES + 1))
+      UNTESTED_LIST="${UNTESTED_LIST}\n   - ${src_file}"
+    fi
+  done <<< "$STAGED_SOURCE_FILES"
+
+  if [[ $UNTESTED_FILES -gt 0 ]]; then
+    echo "⚠️  $UNTESTED_FILES source file(s) with no test file detected:"
+    echo -e "$UNTESTED_LIST"
+    echo ""
+    echo "   (Advisory only — not blocking commit)"
+  else
+    if [[ -n "$STAGED_SOURCE_FILES" ]]; then
+      echo "✓ All staged source files have test files"
+    else
+      echo "✓ No source files staged (test check skipped)"
+    fi
+  fi
 fi
 
 # Summary

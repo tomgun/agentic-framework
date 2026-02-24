@@ -15,6 +15,7 @@ On first message of a conversation, give a briefing:
 - Never auto-commit without human approval
 - Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts)
 - Log user's design insights and direction to CONTRIBUTIONS.md (their ideas, not agent's implementation work)
+- Every PR: bump VERSION (at least patch) and update CONTRIBUTIONS.md
 
 ## Development Process
 

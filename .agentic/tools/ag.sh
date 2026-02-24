@@ -635,6 +635,24 @@ cmd_implement() {
         fi
     fi
 
+    # 0c. Auto-save plans from session-scoped tool directories to durable location
+    # Claude Code uses .claude/plans/, Cursor uses .cursor/plans/
+    local durable_plan="$ROOT_DIR/.agentic-journal/plans/${feature_id}-plan.md"
+    if [ ! -f "$durable_plan" ]; then
+        for plan_dir in "$ROOT_DIR/.claude/plans" "$ROOT_DIR/.cursor/plans"; do
+            [ -d "$plan_dir" ] || continue
+            for f in "$plan_dir/"*; do
+                if [ -f "$f" ] && grep -q "$feature_id" "$f" 2>/dev/null; then
+                    mkdir -p "$ROOT_DIR/.agentic-journal/plans"
+                    cp "$f" "$durable_plan"
+                    local source_rel="${plan_dir#"$ROOT_DIR"/}"
+                    echo -e "${GREEN}Plan auto-saved: ${source_rel}/ -> .agentic-journal/plans/${feature_id}-plan.md${NC}"
+                    break 2
+                fi
+            done
+        done
+    fi
+
     # 1. Spec-first gate (BLOCKING unless SKIP_SPEC_CHECK=1)
     if [ "${SKIP_SPEC_CHECK:-}" = "1" ]; then
         echo -e "${YELLOW}⚠ SKIP_SPEC_CHECK: Bypassing spec-first gate${NC}"
@@ -2267,6 +2285,24 @@ cmd_todo() {
             ;;
     esac
 }
+
+# Self-healing: ensure pre-commit hooks are installed on every ag invocation
+# Addresses D2 (Deterministic Enforcement) — hooks must survive git config resets
+_ensure_hooks() {
+    local hook_mode
+    hook_mode=$(get_setting "pre_commit_hook" "fast")
+    [[ "$hook_mode" == "no" ]] && return 0
+    [[ ! -d "$ROOT_DIR/.agentic/hooks" ]] && return 0
+    command -v git >/dev/null 2>&1 || return 0
+    git rev-parse --git-dir >/dev/null 2>&1 || return 0
+    local hooks_path
+    hooks_path=$(git config core.hooksPath 2>/dev/null || echo "")
+    if [[ "$hooks_path" != ".agentic/hooks" ]]; then
+        git config core.hooksPath .agentic/hooks
+        echo -e "${YELLOW}Auto-fixed: pre-commit hooks installed (core.hooksPath)${NC}" >&2
+    fi
+}
+_ensure_hooks
 
 # Main command dispatch
 case "${1:-help}" in
