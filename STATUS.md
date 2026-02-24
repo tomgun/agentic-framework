@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- TODO audit cleanup — 4 quick fixes done, PR pending (Updated: 2026-02-24 14:02 EET)
+- T-0005 + T-0011 done, PR pending (Updated: 2026-02-24 14:08 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

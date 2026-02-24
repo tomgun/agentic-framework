@@ -886,3 +886,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-24 14:08 - Python migration + git tags (v0.32.3)
+
+**Accomplished**:
+- Removed read_profile() wrappers from doctor.py and verify.py (T-0005). Added git tag instruction to all 4 instruction files (T-0011)
+
+**Next steps**:
+- Remaining TODOs: T-0001,T-0002,T-0003,T-0007,T-0010
+
+**Blockers**: None
+

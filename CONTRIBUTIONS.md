@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.32.2)
+**Period**: Initial Development (v0.1.0 → v0.32.3)
 **Date**: 2026-02-19
 
 ---
@@ -2362,10 +2362,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: Fixed blocker.sh double-write bug (T-0004). Cleaned up HUMAN_NEEDED.md resolved items with proper dates/outcomes (T-0006). Replaced stale Cursor prompt stubs with `ag set profile formal` (T-0008). Fixed README.md template placeholder (T-0009). Logged 6 new TODOs from audit findings.
 
+### Settings Migration Completion & Git Tag Habit (v0.32.3)
+
+**User insight**: F-0131 (settings-over-profiles) was marked shipped but Python tools still had duplicate `read_profile()` wrappers instead of using `get_setting()` directly. Also identified that VERSION bumps happen but no git tags are created, making releases untraceable.
+
+**User direction**: Complete the F-0131 migration by inlining the wrappers. Add git tag creation instruction to all instruction files so tags happen automatically after every PR merge.
+
+**Result**: Removed `read_profile()` from doctor.py and verify.py (both now call `get_setting()` directly). Added `git tag v$(cat VERSION) && git push origin v$(cat VERSION)` to all 4 framework-dev instruction files.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.32.2
+**Current Version**: v0.32.3
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions
