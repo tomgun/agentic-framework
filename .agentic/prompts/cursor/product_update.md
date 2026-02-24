@@ -44,8 +44,6 @@ Please help me update:
 
 **Tip:** If the project is growing complex and you find yourself wishing for more structure, consider upgrading to Formal mode:
 ```bash
-# TODO: upgrade_profile.sh not yet implemented
-# For now: manually run scaffold.sh with formal profile
-bash .agentic/init/scaffold.sh
+ag set profile formal
 ```
 

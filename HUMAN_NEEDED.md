@@ -27,66 +27,50 @@ _No active items_
 ### HN-0002: PR #27: Infrastructure validation tests
 - **Type**: review
 - **Added**: 2026-02-12
-- **Context**: https://github.com/tomgun/agentic-framework/pull/27
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
+- **Resolved**: 2026-02-12
+- **Outcome**: PR #27 merged
 
 ### HN-0003: Plan: Map FEATURES.md to Principles (F/D/R)
 - **Type**: planning
 - **Added**: 2026-02-14
-- **Context**: Add a Principle: field to FEATURES.md feature schema (98 features). Natural extension of the DAG hierarchy. Scope: (1) Add Principle: to spec schema (required for new, optional backfill). (2) Backfill ~30 already mapped in HOW_IT_WORKS.md first. (3) Backfill rest incrementally. (4) Add validate_framework.sh warning for missing Principle:. Infrastructure features use 'Principle: infrastructure'. Makes orphan detection scriptable, closes traceability gap Principle→Feature→Test. HOW_IT_WORKS.md and TRACEABILITY_MATRIX.md should derive from FEATURES.md as single source.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
+- **Resolved**: 2026-02-14
+- **Outcome**: Decided to add Principle: field to FEATURES.md schema. Partial backfill done via HOW_IT_WORKS.md; rest incremental.
 
 ### HN-0004: PR #29: F-0130 rough specs & structural nudging
 - **Type**: review
 - **Added**: 2026-02-15
-- **Context**: https://github.com/tomgun/agentic-framework/pull/29
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
+- **Resolved**: 2026-02-14
+- **Outcome**: PR #29 merged (v0.25.8)
 
 ### HN-0005: Review PR #31: settings-over-profiles
 - **Type**: review
 - **Added**: 2026-02-17
-- **Context**: https://github.com/tomgun/agentic-framework/pull/31 — 27 files, settings architecture replacing profile branching
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
+- **Resolved**: 2026-02-17
+- **Outcome**: PR #31 merged
 
 ### HN-0006: PR #32: Spec-first gate (F-0132)
 - **Type**: review
 - **Added**: 2026-02-18
-- **Context**: Programmatic gates for ag plan/implement — needs review before merge
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
+- **Resolved**: 2026-02-17
+- **Outcome**: PR #32 merged
 
 ### HN-0007: PR #35: DEVELOPER_GUIDE rewrite (F-0134)
 - **Type**: review
 - **Added**: 2026-02-18
-- **Context**: https://github.com/tomgun/agentic-framework/pull/35
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
+- **Resolved**: 2026-02-18
+- **Outcome**: PR #35 merged (v0.27.1)
 
 ### HN-0008: PR #36: NFR content validation
 - **Type**: review
 - **Added**: 2026-02-18
-- **Context**: feat/nfr-spec-role - NFR content validation and dogfooding
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
+- **Resolved**: 2026-02-18
+- **Outcome**: PR #36 merged
 
 ### HN-0009: PR #37: Plan-mode-exit trigger
 - **Type**: review
 - **Added**: 2026-02-18
-- **Context**: feat/plan-mode-exit-trigger — trigger for durable save + review after plan mode
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
+- **Resolved**: 2026-02-18
+- **Outcome**: PR #37 merged
 
 ### HN-0010: PR #39: Documentation deduplication v0.28.1
 - **Type**: pr_review
@@ -94,3 +78,8 @@ _No active items_
 - **Resolved**: 2026-02-19
 - **Outcome**: PR merged — v0.28.1
 
+### HN-0011: PR #44: Self-healing hooks + plan auto-save (F-0142)
+- **Type**: review
+- **Added**: 2026-02-24
+- **Resolved**: 2026-02-24
+- **Outcome**: PR #44 merged (v0.32.1)
