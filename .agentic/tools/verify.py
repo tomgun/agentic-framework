@@ -17,11 +17,6 @@ NFR_ID_RE = re.compile(r"\b(NFR-\d{4})\b")
 ADR_ID_RE = re.compile(r"\b(ADR-\d{4})\b")
 
 
-def read_profile(root: Path) -> str:
-    """Determine profile via shared settings library."""
-    return get_setting(root, "profile", "discovery")
-
-
 def core_checks(root: Path) -> list[str]:
     required = ["STACK.md", "CONTEXT_PACK.md", "STATUS.md", "HUMAN_NEEDED.md", "AGENTS.md"]
     issues: list[str] = []
@@ -182,7 +177,7 @@ def read_test_command(root: Path) -> str | None:
 
 def main() -> int:
     root = Path.cwd()
-    profile = read_profile(root)
+    profile = get_setting(root, "profile", "discovery")
     all_issues = []
     
     print("=== agentic verify ===\n")
