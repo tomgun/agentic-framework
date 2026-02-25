@@ -897,3 +897,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-25 16:47 - Fix upgrade.sh gaps with DRY config
+
+**Why**: Upgrade was missing instruction regen and state file creation; three places defined required files with drift
+
+**Accomplished**:
+- Created state-files.conf as single source of truth; upgrade.sh: added instruction regen (5c), state file creation (6b), sync check (8b), memory-seed marker, feature registry; verify.py reads config; scaffold.sh reads config; extracted AGENTS.md template; fixed pre-existing local-at-script-level bug; fixed test assertion; 285/0 validation
+
+**Next steps**:
+- Version bump, PR
+
+**Blockers**: None
+

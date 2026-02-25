@@ -2370,10 +2370,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: Removed `read_profile()` from doctor.py and verify.py (both now call `get_setting()` directly). Added `git tag v$(cat VERSION) && git push origin v$(cat VERSION)` to all 4 framework-dev instruction files.
 
+### DRY State-File Config & Upgrade Gaps (v0.33.0)
+
+**User insight**: Audit revealed upgrade.sh replaces `.agentic/` framework directories but never regenerates root-level instruction files (CLAUDE.md, .cursorrules, etc.) or creates state files introduced in newer versions. Deeper problem: "what files should exist" was defined in 3 separate places (scaffold.sh, verify.py, upgrade.sh) with drift — verify.py's required list was missing TODO.md and OVERVIEW.md.
+
+**User direction**: Extract the state file list into a single config file, then have all three tools read from it. Also: AGENTS.md should be included (extracted to template), sync.sh should run post-upgrade even if some false positives are expected, and new settings from profile defaults must be supported during upgrade without overwriting user customizations.
+
+**Result**: `state-files.conf` as single source of truth (14 state files with destination, template, profile). upgrade.sh gains 3 new steps: instruction file regeneration (setup-agent.sh all), config-driven state file creation, sync --check for post-upgrade drift detection. Memory-seed re-read added to upgrade marker TODO. AGENTS.md extracted from scaffold.sh inline block to template. Pre-existing `local`-at-script-level bug fixed in upgrade.sh settings migration.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.32.3
+**Current Version**: v0.33.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions

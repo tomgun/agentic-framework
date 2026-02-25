@@ -529,7 +529,8 @@ else
   fail "ISSUES.template.md missing"
 fi
 
-if grep -q "ISSUES.template.md" "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null; then
+if grep -q "ISSUES.template.md" "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null || \
+   grep -q "ISSUES.md" "${FRAMEWORK_ROOT}/.agentic/init/state-files.conf" 2>/dev/null; then
   pass "Scaffold includes ISSUES.md"
 else
   fail "Scaffold missing ISSUES.md"
