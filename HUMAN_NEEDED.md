@@ -51,7 +51,7 @@ _No active items_
 ### HN-0006: PR #32: Spec-first gate (F-0132)
 - **Type**: review
 - **Added**: 2026-02-18
-- **Resolved**: 2026-02-17
+- **Resolved**: 2026-02-18
 - **Outcome**: PR #32 merged
 
 ### HN-0007: PR #35: DEVELOPER_GUIDE rewrite (F-0134)

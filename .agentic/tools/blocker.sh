@@ -92,6 +92,7 @@ case "${ACTION}" in
 - **Context**: ${DETAILS}\\
 - **Why human needed**: Requires human action/decision\\
 - **Impact**: Blocking: [specify what's blocked]\\
+\\
 " "${BLOCKER_FILE}"
     rm -f "${BLOCKER_FILE}.bak"
     
