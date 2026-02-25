@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- T-0005 + T-0011 done, PR pending (Updated: 2026-02-24 14:08 EET)
+- upgrade.sh gaps fixed (DRY config), ready for version bump + PR (Updated: 2026-02-25 16:47 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

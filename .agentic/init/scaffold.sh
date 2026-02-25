@@ -209,12 +209,18 @@ else
   copy_if_missing "${ROOT_DIR}/.agentic/init/OVERVIEW.template.md" "${ROOT_DIR}/OVERVIEW.md"
 fi
 
-# JOURNAL.md moved to .agentic-journal/ directory (v0.23.0+)
-mkdir -p "${ROOT_DIR}/.agentic-journal"
-copy_if_missing "${ROOT_DIR}/.agentic/spec/JOURNAL.template.md" "${ROOT_DIR}/.agentic-journal/JOURNAL.md"
-
-copy_if_missing "${ROOT_DIR}/.agentic/spec/HUMAN_NEEDED.template.md" "${ROOT_DIR}/HUMAN_NEEDED.md"
-copy_if_missing "${ROOT_DIR}/.agentic/spec/TODO.template.md" "${ROOT_DIR}/TODO.md"
+# Create remaining state files from config (single source of truth)
+# Files handled by the brownfield block above are skipped here to avoid duplicate output
+BROWNFIELD_HANDLED="STATUS.md STACK.md CONTEXT_PACK.md OVERVIEW.md"
+STATE_FILES_CONF="${ROOT_DIR}/.agentic/init/state-files.conf"
+if [[ -f "$STATE_FILES_CONF" ]]; then
+  while IFS=: read -r dst_rel src_rel file_profile; do
+    [[ "$dst_rel" =~ ^#|^[[:space:]]*$ ]] && continue
+    [[ "$file_profile" == "formal" && "$PROFILE" != "formal" ]] && continue
+    [[ " $BROWNFIELD_HANDLED " == *" $dst_rel "* ]] && continue
+    copy_if_missing "${ROOT_DIR}/${src_rel}" "${ROOT_DIR}/${dst_rel}"
+  done < "$STATE_FILES_CONF"
+fi
 
 # Configure STACK.md settings for selected profile
 if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
@@ -247,51 +253,7 @@ if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
   fi
 fi
 
-# Shared agent rules at repo root (recommended).
-# Keep agentic framework content in .agentic/, but place a small entrypoint at repo root for tools that only read root files.
-if [[ ! -f "${ROOT_DIR}/AGENTS.md" ]]; then
-  cat > "${ROOT_DIR}/AGENTS.md" <<'EOF'
-# AGENTS.md
-
-> **Note**: This file is a REFERENCE document. It is NOT auto-loaded by AI tools.
-> The auto-loaded files (CLAUDE.md, .cursorrules, etc.) point to this file.
-
-This repo uses the **Agentic Framework** located at `.agentic/`.
-
-## Non-negotiables
-
-**Document blockers immediately:**
-- When you identify something requiring human action (install dependency, make decision, access credentials), ADD IT TO `HUMAN_NEEDED.md` IMMEDIATELY
-- Don't just mention it in chat - document it so it's not forgotten
-
-**Keep documentation current:**
-- Update `.agentic-journal/JOURNAL.md` before ending ANY session (if session ends abruptly, JOURNAL is the only record)
-- Keep `OVERVIEW.md` up to date with vision and completed capabilities
-- Keep `CONTEXT_PACK.md` current when architecture changes
-- If this repo uses the Formal profile: keep `STATUS.md` and `/spec/*` truthful
-
-**Code quality:**
-- Add/update tests for new or changed logic
-- Run smoke tests before claiming features work
-- Separate business logic from UI for testability
-
-## Full Guidelines
-
-See `.agentic/agents/shared/agent_operating_guidelines.md`
-
-## Tool-Specific Files
-
-These are auto-loaded by your AI tool:
-- **Claude Code**: `CLAUDE.md`
-- **Cursor**: `.cursorrules`
-- **GitHub Copilot**: `.github/copilot-instructions.md`
-
-To regenerate: `bash .agentic/tools/setup-agent.sh all`
-EOF
-  echo "NEW : ${ROOT_DIR}/AGENTS.md (entrypoint)"
-else
-  echo "OK  : ${ROOT_DIR}/AGENTS.md exists"
-fi
+# AGENTS.md is now created by the config loop above (from .agentic/init/AGENTS.template.md)
 
 if [[ "${PROFILE}" == "discovery" ]]; then
   # Configure git hooks for Discovery profile too
@@ -373,16 +335,10 @@ else
   echo "OK  : spec/TECH_SPEC.md exists"
 fi
 
+# FEATURES.md: prefer brownfield proposal over template (other formal files already created by config loop)
 if [[ "$DISCOVERY_RAN" == "yes" && -f "${ROOT_DIR}/.agentic-state/proposals/FEATURES.md" ]]; then
   copy_or_propose "${ROOT_DIR}/.agentic-state/proposals/FEATURES.md" "${ROOT_DIR}/spec/FEATURES.md"
-else
-  copy_if_missing "${ROOT_DIR}/.agentic/spec/FEATURES.template.md" "${ROOT_DIR}/spec/FEATURES.md"
 fi
-copy_if_missing "${ROOT_DIR}/.agentic/spec/ISSUES.template.md" "${ROOT_DIR}/spec/ISSUES.md"
-copy_if_missing "${ROOT_DIR}/.agentic/spec/LESSONS.template.md" "${ROOT_DIR}/spec/LESSONS.md"
-copy_if_missing "${ROOT_DIR}/.agentic/spec/NFR.template.md" "${ROOT_DIR}/spec/NFR.md"
-copy_if_missing "${ROOT_DIR}/.agentic/spec/REFERENCES.template.md" "${ROOT_DIR}/spec/REFERENCES.md"
-copy_if_missing "${ROOT_DIR}/.agentic/spec/acceptance/README.template.md" "${ROOT_DIR}/spec/acceptance/README.md"
 
 # Configure git hooks via core.hooksPath (both profiles)
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
