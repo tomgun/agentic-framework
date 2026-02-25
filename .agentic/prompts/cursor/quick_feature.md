@@ -50,5 +50,5 @@ Please follow this streamlined workflow for Discovery mode:
 **If you need more structure:**
 - Consider upgrading to Formal mode
 - Adds feature tracking, acceptance criteria files, sequential pipelines
-- Run: `bash .agentic/init/scaffold.sh` (TODO: upgrade_profile.sh)
+- Run: `ag set profile formal`
 

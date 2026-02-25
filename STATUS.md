@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0142: Performance review fixes — 4 fixes implemented, ready to commit (Updated: 2026-02-24 12:38 EET)
+- T-0005 + T-0011 done, PR pending (Updated: 2026-02-24 14:08 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

@@ -83,20 +83,9 @@ case "${ACTION}" in
     NEXT_NUM=$((10#${LAST_ID#HN-} + 1))
     NEXT_ID=$(printf "HN-%04d" ${NEXT_NUM})
     
-    # Append new blocker
-    {
-      echo ""
-      echo "### ${NEXT_ID}: ${DESCRIPTION}"
-      echo "- **Type**: ${TYPE}"
-      echo "- **Added**: ${TIMESTAMP}"
-      echo "- **Context**: ${DETAILS}"
-      echo "- **Why human needed**: Requires human action/decision"
-      echo "- **Impact**: Blocking: [specify what's blocked]"
-      echo ""
-    } >> "${BLOCKER_FILE}"
-    
-    # Insert before "## Resolved" section
+    # Insert before "## Resolved" section (places in Active section)
     sed -i.bak "/^## Resolved/i\\
+\\
 ### ${NEXT_ID}: ${DESCRIPTION}\\
 - **Type**: ${TYPE}\\
 - **Added**: ${TIMESTAMP}\\
