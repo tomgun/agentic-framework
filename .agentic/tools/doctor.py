@@ -319,11 +319,6 @@ class Check:
     purpose: str
 
 
-def read_profile(root: Path) -> str:
-    """Determine profile via shared settings library."""
-    return get_setting(root, "profile", "discovery")
-
-
 def checks_for_profile(profile: str, root: Path | None = None) -> list[Check]:
     # Determine JOURNAL.md location with fallback
     from pathlib import Path
@@ -919,7 +914,7 @@ def main() -> int:
     args = parser.parse_args()
 
     root = Path.cwd()
-    profile = read_profile(root)
+    profile = get_setting(root, "profile", "discovery")
     detected_stack = None  # Will be set if stack detection runs
 
     # Handle --summary mode (for session greeting)

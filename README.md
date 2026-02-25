@@ -509,6 +509,6 @@ To purchase white-label license: **tomas@kipina.fi**
 
 - **Documentation**: Start at [`.agentic/START_HERE.md`](.agentic/START_HERE.md)
 - **Examples**: See [`examples/`](examples/) directory
-- **Issues**: [Your issue tracker]
+- **Issues**: [GitHub Issues](https://github.com/tomgun/agentic-framework/issues)
 
 ---

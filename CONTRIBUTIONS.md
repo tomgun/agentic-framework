@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.32.1)
-**Date**: 2026-02-19
+**Period**: Initial Development (v0.1.0 → v0.32.3)
+**Date**: 2026-02-25
 
 ---
 
@@ -2354,10 +2354,26 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: `_ensure_hooks()` preamble in ag.sh auto-fixes `core.hooksPath` on every invocation. `cmd_implement()` auto-saves plans from `.claude/plans/` and `.cursor/plans/`. Check 13 (advisory test co-presence) added to pre-commit. CONTEXT_PACK placeholder detection added to `ag sync`. Full review artifact saved to `.agentic-journal/reviews/`.
 
+### TODO Audit & Housekeeping (v0.32.2)
+
+**User insight**: Previous session's audit of forgotten work was interrupted by rate limits and never completed. User requested the audit be finished and findings captured as TODOs so they wouldn't be lost again. Also identified that planned features (F-0108) with no TODO entry get forgotten — the FEATURES.md "planned" status alone doesn't surface them as actionable.
+
+**User direction**: Run the full audit, log all findings as TODOs, then work through the quick fixes. Established habit: git tag versions after PR merge.
+
+**Result**: Fixed blocker.sh double-write bug (T-0004). Cleaned up HUMAN_NEEDED.md resolved items with proper dates/outcomes (T-0006). Replaced stale Cursor prompt stubs with `ag set profile formal` (T-0008). Fixed README.md template placeholder (T-0009). Logged 6 new TODOs from audit findings.
+
+### Settings Migration Completion & Git Tag Habit (v0.32.3)
+
+**User insight**: F-0131 (settings-over-profiles) was marked shipped but Python tools still had duplicate `read_profile()` wrappers instead of using `get_setting()` directly. Also identified that VERSION bumps happen but no git tags are created, making releases untraceable.
+
+**User direction**: Complete the F-0131 migration by inlining the wrappers. Add git tag creation instruction to all instruction files so tags happen automatically after every PR merge.
+
+**Result**: Removed `read_profile()` from doctor.py and verify.py (both now call `get_setting()` directly). Added `git tag v$(cat VERSION) && git push origin v$(cat VERSION)` to all 4 framework-dev instruction files.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.32.1
+**Current Version**: v0.32.3
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions
