@@ -18,18 +18,33 @@ ADR_ID_RE = re.compile(r"\b(ADR-\d{4})\b")
 
 
 def core_checks(root: Path) -> list[str]:
-    required = ["STACK.md", "CONTEXT_PACK.md", "STATUS.md", "HUMAN_NEEDED.md", "AGENTS.md"]
     issues: list[str] = []
-    for p in required:
-        if not (root / p).exists():
-            issues.append(f"Missing {p} (run: bash .agentic/init/scaffold.sh --profile discovery)")
+    profile = get_setting(root, "profile", "discovery")
 
-    # Check JOURNAL.md with fallback
-    journal_path = root / ".agentic-journal" / "JOURNAL.md"
-    if not journal_path.exists():
-        journal_path = root / "JOURNAL.md"
-    if not journal_path.exists():
-        issues.append(f"Missing JOURNAL.md (run: bash .agentic/init/scaffold.sh --profile discovery)")
+    # Read required files from config (single source of truth)
+    config = root / ".agentic" / "init" / "state-files.conf"
+    if config.exists():
+        for line in config.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.split(":")
+            if len(parts) >= 3:
+                dst, _, file_profile = parts[0], parts[1], parts[2].strip()
+                if file_profile == "formal" and profile != "formal":
+                    continue
+                if not (root / dst).exists():
+                    issues.append(f"Missing {dst} (run: bash .agentic/init/scaffold.sh)")
+    else:
+        # Fallback: hardcoded list if config missing
+        for p in ["STACK.md", "CONTEXT_PACK.md", "STATUS.md", "HUMAN_NEEDED.md", "AGENTS.md"]:
+            if not (root / p).exists():
+                issues.append(f"Missing {p}")
+
+    # Handle JOURNAL.md legacy location fallback
+    if any("JOURNAL.md" in i for i in issues):
+        if (root / "JOURNAL.md").exists():
+            issues = [i for i in issues if not i.startswith("Missing .agentic-journal/JOURNAL.md")]
 
     return issues
 
