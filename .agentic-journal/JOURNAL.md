@@ -910,3 +910,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-25 23:34 - Upgrade review fixes
+
+**Why**: Saktris upgrade review revealed multiple issues
+
+**Accomplished**:
+- Fixed BSD sed settings bug, added profile rename + JOURNAL migration + OVERVIEW skip in upgrade.sh
+
+**Next steps**:
+- Commit and bump version
+
+**Blockers**: None
+
