@@ -288,12 +288,13 @@ if [[ -f "$TARGET_PROJECT_DIR/.agentic/lib/settings.sh" ]]; then
   source "$TARGET_PROJECT_DIR/.agentic/lib/settings.sh"
   PROFILE="$(get_setting "profile" "")"
 fi
-# If settings library returned empty/default, check legacy Profile: line in STACK.md
-if [[ -z "$PROFILE" || "$PROFILE" == "discovery" ]] && [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+# If settings library couldn't determine profile, check legacy Profile: line in STACK.md
+# (get_setting returns "discovery" as fallback even for old profile names like core+product)
+if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
   PROFILE_LINE=$(grep -Ei "^[[:space:]]*-[[:space:]]*Profile:" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null | head -1 || echo "")
   case "$PROFILE_LINE" in
-    *formal*|*core+product*|*core+pm*) PROFILE="formal" ;;
-    *discovery*|*core*) PROFILE="discovery" ;;
+    *core+product*|*core+pm*) PROFILE="formal" ;;
+    *formal*) PROFILE="formal" ;;
   esac
 fi
 [[ -z "$PROFILE" ]] && PROFILE="discovery"
@@ -340,8 +341,7 @@ if [[ "$DRY_RUN" != "yes" ]]; then
     echo -e "  ${GREEN}✓${NC} Migrated JOURNAL.md → .agentic-journal/JOURNAL.md"
   elif [[ -f "$TARGET_PROJECT_DIR/JOURNAL.md" ]] && [[ -f "$TARGET_PROJECT_DIR/.agentic-journal/JOURNAL.md" ]]; then
     # Both exist — merge legacy content into new if new is template-only
-    new_lines=$(wc -l < "$TARGET_PROJECT_DIR/.agentic-journal/JOURNAL.md" | tr -d ' ')
-    if [[ "$new_lines" -lt 20 ]]; then
+    if head -3 "$TARGET_PROJECT_DIR/.agentic-journal/JOURNAL.md" | grep -qi "template\|<!-- format"; then
       cat "$TARGET_PROJECT_DIR/JOURNAL.md" >> "$TARGET_PROJECT_DIR/.agentic-journal/JOURNAL.md"
       rm "$TARGET_PROJECT_DIR/JOURNAL.md"
       echo -e "  ${GREEN}✓${NC} Merged legacy JOURNAL.md into .agentic-journal/JOURNAL.md"
