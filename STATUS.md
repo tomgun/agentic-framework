@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Upgrade review fixes — BSD sed, profile rename, JOURNAL migration (Updated: 2026-02-25 23:34 EET)
+- Settings repair + template format for upgrade.sh (Updated: 2026-02-26 10:57 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

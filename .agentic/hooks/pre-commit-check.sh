@@ -554,6 +554,8 @@ else
 
     LONG_FILES=0
     while IFS= read -r file; do
+      # Skip framework-owned files (not user code)
+      [[ "$file" == .agentic/* ]] && continue
       if [[ -f "$file" ]] && [[ "$file" =~ \.($CODE_EXTENSIONS)$ ]]; then
         LINES=$(wc -l < "$file" 2>/dev/null | tr -d ' ')
         if [[ $LINES -gt $MAX_CODE_FILE_LEN ]]; then
