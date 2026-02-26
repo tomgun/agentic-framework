@@ -475,35 +475,85 @@ COMPLEXITY_EOF
     fi
   fi
 
-  # Add ## Settings section to STACK.md if missing (v0.27.0+)
+  # Add or repair ## Settings section in STACK.md (v0.27.0+)
   if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
-    if ! grep -q "^## Settings" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null; then
-      echo "  Adding ## Settings section to STACK.md..."
-      # Determine current profile for preset defaults
-      SETTINGS_PROFILE="$PROFILE"
-      cat >> "$TARGET_PROJECT_DIR/STACK.md" <<SETTINGS_EOF
+    TEMPLATE_FILE="$NEW_FRAMEWORK_DIR/.agentic/init/STACK.template.md"
+    PRESETS_FILE="$NEW_FRAMEWORK_DIR/.agentic/presets/profiles.conf"
+    STACK_FILE="$TARGET_PROJECT_DIR/STACK.md"
+
+    # Repair concatenated settings lines from v0.33.0 BSD sed bug
+    # Pattern: "- key: value- key2: value2" on a single line
+    if grep -qE '^- [a-z_]+: .+- [a-z_]+:' "$STACK_FILE"; then
+      python3 -c "
+import re, sys
+text = open(sys.argv[1]).read()
+# Split concatenated settings: '- key: val- key2: val2' on one line
+for _ in range(20):
+    new = re.sub(r'(\w)(- [a-z_]+:)', r'\1\n\2', text)
+    if new == text: break
+    text = new
+open(sys.argv[1], 'w').write(text)" "$STACK_FILE"
+      echo -e "  ${GREEN}✓${NC} Repaired concatenated settings lines (v0.33.0 bug)"
+    fi
+
+    # Remove duplicate settings (keep first occurrence of each key)
+    python3 -c "
+import sys, re
+lines = open(sys.argv[1]).readlines()
+seen = set()
+out = []
+for line in lines:
+    m = re.match(r'^- ([a-z_]+):', line)
+    if m:
+        key = m.group(1)
+        if key in seen:
+            continue
+        seen.add(key)
+    out.append(line)
+open(sys.argv[1], 'w').writelines(out)" "$STACK_FILE"
+
+    if ! grep -q "^## Settings" "$STACK_FILE" 2>/dev/null; then
+      # Create Settings from template with full comments and subheadings
+      echo "  Adding ## Settings section from template..."
+      if [[ -f "$TEMPLATE_FILE" ]] && [[ -f "$PRESETS_FILE" ]]; then
+        # Extract ## Settings section from template (up to next ## or blank line after ### block)
+        SETTINGS_BLOCK=$(awk '/^## Settings/{found=1} found && /^## [^S#]/{exit} found{print}' "$TEMPLATE_FILE")
+        # Substitute profile values
+        while IFS='=' read -r preset_key preset_value; do
+          [[ "$preset_key" =~ ^#|^$ ]] && continue
+          [[ -z "$preset_key" ]] && continue
+          if [[ "$preset_key" =~ ^${PROFILE}\.(.*) ]]; then
+            sname="${BASH_REMATCH[1]}"
+            SETTINGS_BLOCK=$(echo "$SETTINGS_BLOCK" | sed "s/^- ${sname}: .*$/- ${sname}: ${preset_value}/")
+          fi
+        done < "$PRESETS_FILE"
+        # Set profile line
+        SETTINGS_BLOCK=$(echo "$SETTINGS_BLOCK" | sed "s/^- profile: .*$/- profile: ${PROFILE}/")
+        printf '\n%s\n' "$SETTINGS_BLOCK" >> "$STACK_FILE"
+        echo -e "  ${GREEN}✓${NC} Added ## Settings section with descriptions (profile: ${PROFILE})"
+      else
+        # Fallback: bare section if template unavailable
+        cat >> "$STACK_FILE" <<SETTINGS_EOF
 
 ## Settings
 <!-- Use \`ag set <key> <value>\` to change, \`ag set --show\` to view all. -->
-- profile: ${SETTINGS_PROFILE}
+- profile: ${PROFILE}
 SETTINGS_EOF
-      echo -e "  ${GREEN}✓${NC} Added ## Settings section (profile: ${SETTINGS_PROFILE})"
+        echo -e "  ${GREEN}✓${NC} Added ## Settings section (profile: ${PROFILE})"
+      fi
     else
       echo -e "  ${GREEN}✓${NC} ## Settings section already exists"
     fi
 
-    # Populate missing explicit settings from profile defaults (F-0141)
-    PRESETS_FILE="$NEW_FRAMEWORK_DIR/.agentic/presets/profiles.conf"
+    # Populate any missing settings from profile defaults
     if [[ -f "$PRESETS_FILE" ]]; then
-      # Collect all missing settings first (avoid BSD sed 'a\' newline bug)
       missing_settings=()
       while IFS='=' read -r preset_key preset_value; do
         [[ "$preset_key" =~ ^#|^$ ]] && continue
         [[ -z "$preset_key" ]] && continue
         if [[ "$preset_key" =~ ^${PROFILE}\.(.*) ]]; then
           sname="${BASH_REMATCH[1]}"
-          # Only add if setting line doesn't exist yet (don't overwrite)
-          if ! grep -q "^- ${sname}:" "$TARGET_PROJECT_DIR/STACK.md"; then
+          if ! grep -q "^- ${sname}:" "$STACK_FILE"; then
             missing_settings+=("- ${sname}: ${preset_value}")
           fi
         fi
@@ -511,24 +561,22 @@ SETTINGS_EOF
 
       settings_added=${#missing_settings[@]}
       if [[ $settings_added -gt 0 ]]; then
-        # Find insertion point: last "- " line in ## Settings section
-        settings_start=$(grep -n "^## Settings" "$TARGET_PROJECT_DIR/STACK.md" | head -1 | cut -d: -f1)
-        settings_end=$(awk -v start="$settings_start" 'NR > start && /^## [^#]/ { print NR; exit }' "$TARGET_PROJECT_DIR/STACK.md")
-        [[ -z "$settings_end" ]] && settings_end=$(wc -l < "$TARGET_PROJECT_DIR/STACK.md")
-        last_setting_line=$(sed -n "${settings_start},${settings_end}p" "$TARGET_PROJECT_DIR/STACK.md" | grep -n "^- " | tail -1 | cut -d: -f1)
+        settings_start=$(grep -n "^## Settings" "$STACK_FILE" | head -1 | cut -d: -f1)
+        settings_end=$(awk -v start="$settings_start" 'NR > start && /^## [^#]/ { print NR; exit }' "$STACK_FILE")
+        [[ -z "$settings_end" ]] && settings_end=$(wc -l < "$STACK_FILE")
+        last_setting_line=$(sed -n "${settings_start},${settings_end}p" "$STACK_FILE" | grep -n "^- " | tail -1 | cut -d: -f1)
         if [[ -n "$last_setting_line" ]]; then
           abs_line=$((settings_start + last_setting_line - 1))
-          # Insert all settings at once using head/tail (cross-platform safe)
           {
-            head -n "$abs_line" "$TARGET_PROJECT_DIR/STACK.md"
+            head -n "$abs_line" "$STACK_FILE"
             for s in "${missing_settings[@]}"; do
               echo "$s"
             done
-            tail -n +"$((abs_line + 1))" "$TARGET_PROJECT_DIR/STACK.md"
-          } > "$TARGET_PROJECT_DIR/STACK.md.tmp"
-          mv "$TARGET_PROJECT_DIR/STACK.md.tmp" "$TARGET_PROJECT_DIR/STACK.md"
+            tail -n +"$((abs_line + 1))" "$STACK_FILE"
+          } > "$STACK_FILE.tmp"
+          mv "$STACK_FILE.tmp" "$STACK_FILE"
         fi
-        echo -e "  ${GREEN}✓${NC} Added $settings_added missing explicit settings for ${PROFILE} profile"
+        echo -e "  ${GREEN}✓${NC} Added $settings_added missing settings for ${PROFILE} profile"
       fi
     fi
   fi
