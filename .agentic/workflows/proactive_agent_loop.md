@@ -1,3 +1,10 @@
+---
+summary: "Proactive agent behavior: anticipate needs, suggest next steps"
+trigger: "proactive, anticipate, suggest, autonomous"
+tokens: ~6200
+phase: implementation
+---
+
 # Proactive Agent Operating Loop
 
 **Purpose**: Make human-machine collaboration fluent by having agents proactively manage workflow, surface blockers, and suggest next steps.

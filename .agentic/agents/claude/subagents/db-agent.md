@@ -1,3 +1,11 @@
+---
+role: database
+model_tier: mid-tier
+summary: "Database design, query optimization, migrations"
+use_when: "Schema design, query performance, database selection, indexing"
+tokens: ~800
+---
+
 # Database Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs data modeling expertise

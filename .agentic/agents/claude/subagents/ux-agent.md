@@ -1,3 +1,11 @@
+---
+role: ux
+model_tier: mid-tier
+summary: "Evaluate usability, accessibility, and user experience"
+use_when: "UI/UX reviews, accessibility audits, usability testing"
+tokens: ~800
+---
+
 # UX Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs empathy and analysis

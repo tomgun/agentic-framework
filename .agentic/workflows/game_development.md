@@ -1,3 +1,10 @@
+---
+summary: "Game development best practices: Theory of Fun, playtesting, iteration"
+trigger: "game, game dev, gameplay, playtesting"
+tokens: ~6900
+phase: domain
+---
+
 # Game Development Support - Theory of Fun & Best Practices
 
 **Purpose**: Comprehensive guide for developing fun, engaging, and polished games using Agentic AF.

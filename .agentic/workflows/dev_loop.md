@@ -1,3 +1,10 @@
+---
+summary: "Core development cycle: plan, implement, test, commit"
+trigger: "development loop, workflow, how to develop"
+tokens: ~500
+phase: implementation
+---
+
 # Development loop (agent-friendly)
 
 Goal: ship in **small, test-backed increments** while keeping `STATUS.md` and specs trustworthy.

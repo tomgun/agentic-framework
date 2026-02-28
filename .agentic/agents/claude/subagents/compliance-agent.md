@@ -1,3 +1,11 @@
+---
+role: compliance
+model_tier: mid-tier
+summary: "Verify framework compliance, check quality gates, ensure standards"
+use_when: "Pre-release checks, framework compliance audits, gate verification"
+tokens: ~700
+---
+
 # Compliance Agent (Claude Code)
 
 **Model Selection**: Mid-tier (e.g., sonnet) - needs reasoning for rule verification

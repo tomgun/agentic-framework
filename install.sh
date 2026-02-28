@@ -141,11 +141,11 @@ else
 fi
 echo ""
 
-# Step 6: Generate Claude Skills (if subagents exist)
+# Step 6: Generate Claude Skills (if skill sources exist)
 echo -e "${BLUE}[6/7] Generating Claude Skills${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-if [[ -f ".agentic/tools/generate-skills.sh" ]] && [[ -d ".agentic/agents/claude/subagents" ]]; then
+if [[ -f ".agentic/tools/generate-skills.sh" ]] && [[ -d ".agentic/agents/claude/skills" ]]; then
   bash .agentic/tools/generate-skills.sh 2>/dev/null || true
   if [[ -d ".claude/skills" ]]; then
     SKILL_COUNT=$(ls -1 .claude/skills/ 2>/dev/null | wc -l | tr -d ' ')
@@ -153,7 +153,7 @@ if [[ -f ".agentic/tools/generate-skills.sh" ]] && [[ -d ".agentic/agents/claude
     echo "    Skills are auto-discovered by Claude Code based on task description."
   fi
 else
-  echo -e "  ${YELLOW}⚠${NC} Skipping (no subagents found)"
+  echo -e "  ${YELLOW}⚠${NC} Skipping (no skill sources found)"
 fi
 echo ""
 

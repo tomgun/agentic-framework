@@ -1,3 +1,11 @@
+---
+role: spec-management
+model_tier: cheap
+summary: "Update FEATURES.md and other spec files after implementation"
+use_when: "Post-implementation spec sync, feature status updates"
+tokens: ~400
+---
+
 # Spec Update Agent (Claude Code)
 
 **Model Selection**: Cheap/Fast tier (e.g., haiku, gpt-4o-mini) - structured updates only

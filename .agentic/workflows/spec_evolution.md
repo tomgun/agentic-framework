@@ -1,3 +1,10 @@
+---
+summary: "How specs evolve during implementation: amendments, scope changes"
+trigger: "spec change, scope change, amend spec, evolve"
+tokens: ~2000
+phase: implementation
+---
+
 # Spec Evolution During Implementation
 
 **Principle**: Specs are discovered, not fully designed upfront. This is expected and encouraged.

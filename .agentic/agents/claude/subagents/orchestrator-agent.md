@@ -1,3 +1,11 @@
+---
+role: orchestration
+model_tier: mid-tier
+summary: "Coordinate specialized agents, ensure framework compliance, manage feature pipeline"
+use_when: "Complex multi-agent tasks, feature pipeline management, compliance enforcement"
+tokens: ~900
+---
+
 # Orchestrator Agent (Claude Code)
 
 **Model Selection**: Mid-tier (e.g., sonnet, gpt-4o) - needs reasoning for coordination

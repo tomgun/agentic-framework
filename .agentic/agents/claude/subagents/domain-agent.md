@@ -1,3 +1,11 @@
+---
+role: domain
+model_tier: mid-tier
+summary: "Design and validate business logic, game rules, domain models"
+use_when: "Complex business rules, domain modeling, game mechanics"
+tokens: ~600
+---
+
 # Domain Agent (Claude Code)
 
 **Model Selection**: Mid-tier to Powerful - needs deep reasoning for business logic

@@ -1,3 +1,11 @@
+---
+role: planning
+model_tier: high-tier
+summary: "Create detailed implementation plans for features before coding begins"
+use_when: "Complex features requiring architectural planning, multi-file changes"
+tokens: ~1000
+---
+
 # Plan Creator Agent
 
 **Purpose**: Create detailed implementation plans for features before coding begins.

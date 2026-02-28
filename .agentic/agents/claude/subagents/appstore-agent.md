@@ -1,3 +1,11 @@
+---
+role: app-store
+model_tier: mid-tier
+summary: "App Store and Play Store submission, compliance, optimization"
+use_when: "App submissions, store compliance, ASO, review guidelines"
+tokens: ~900
+---
+
 # App Store Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs platform knowledge

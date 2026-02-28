@@ -1,3 +1,10 @@
+---
+summary: "Validate spec file format: required fields, sections, consistency"
+trigger: "spec validation, validate spec, check spec format"
+tokens: ~5600
+phase: testing
+---
+
 # Spec Format & Validation
 
 **Purpose**: Use structured, validatable formats for spec documents to prevent errors, enable tooling, and maintain consistency.

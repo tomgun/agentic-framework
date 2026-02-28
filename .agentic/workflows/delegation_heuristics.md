@@ -1,3 +1,10 @@
+---
+summary: "When to delegate to agents vs do it yourself"
+trigger: "delegate, should I use agent, agent vs manual"
+tokens: ~1500
+phase: planning
+---
+
 # When to Use AI Agents vs. Do It Yourself
 
 ## Core Philosophy: Just Try It

@@ -1,3 +1,10 @@
+---
+summary: "When to use libraries vs custom code: evaluation criteria"
+trigger: "library, dependency, package, npm, pip, custom vs library"
+tokens: ~4000
+phase: planning
+---
+
 # Library Selection & Custom Implementation Guidelines
 
 **Purpose**: Guide agents in choosing between using libraries vs. custom implementation, especially for domains with well-known standards (games, protocols, formats).

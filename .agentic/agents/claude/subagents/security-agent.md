@@ -1,3 +1,11 @@
+---
+role: security
+model_tier: mid-tier
+summary: "Security audits, vulnerability scanning, secure code review"
+use_when: "Security-sensitive features, dependency audits, OWASP checks"
+tokens: ~800
+---
+
 # Security Agent (Claude Code)
 
 **Model Selection**: Mid-tier to Powerful - security requires careful reasoning

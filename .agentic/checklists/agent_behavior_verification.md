@@ -1,3 +1,10 @@
+---
+summary: "Verify agent follows framework rules: triggers, gates, artifacts"
+trigger: "verify behavior, agent test, compliance check"
+tokens: ~1500
+phase: testing
+---
+
 # Agent Behavior Verification Checklist
 
 **Purpose**: Manual verification of agent behavior that cannot be automated.

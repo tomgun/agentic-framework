@@ -1,3 +1,10 @@
+---
+summary: "Multi-agent coordination: register, avoid conflicts, handoff"
+trigger: "multi agent, coordination, parallel, conflict"
+tokens: ~1400
+phase: implementation
+---
+
 # Multi-Agent Coordination
 
 **Purpose**: Enable multiple agents to work on different features simultaneously without conflicts.

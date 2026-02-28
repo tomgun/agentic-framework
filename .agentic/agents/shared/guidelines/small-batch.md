@@ -1,3 +1,10 @@
+---
+summary: "Small batch development: max 5-10 files, break large tasks"
+trigger: "small batch, too big, break down, max files"
+tokens: ~830
+phase: always
+---
+
 # Small Batch Development (NON-NEGOTIABLE)
 
 **The single most important quality principle: WORK IN SMALL, ISOLATED BATCHES.**

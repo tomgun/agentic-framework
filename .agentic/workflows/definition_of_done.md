@@ -1,3 +1,10 @@
+---
+summary: "What 'done' means: code, tests, docs, review criteria"
+trigger: "definition of done, what is done, DoD, acceptance"
+tokens: ~500
+phase: completion
+---
+
 # Definition of Done
 
 **⚠️ This document is now a summary. For the full checklist, see [`../checklists/feature_complete.md`](../checklists/feature_complete.md)**

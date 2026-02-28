@@ -5,7 +5,7 @@
 Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Agentic framework
-- Version: 0.33.2
+- Version: 0.34.0
 - Profile: formal
 - This IS the framework (dogfooding)
 - Source: https://github.com/tomgun/agentic-framework

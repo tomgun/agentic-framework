@@ -1,3 +1,11 @@
+---
+role: planning
+model_tier: mid-tier
+summary: "Define features and write acceptance criteria"
+use_when: "New feature requests, acceptance criteria drafting, scope definition"
+tokens: ~500
+---
+
 # Planning Agent (Claude Code)
 
 **Model Selection**: Mid-tier (e.g., sonnet, gpt-4o) - needs reasoning for requirements

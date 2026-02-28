@@ -1,3 +1,11 @@
+---
+role: research
+model_tier: mid-tier
+summary: "Web search, documentation lookup, technology research"
+use_when: "Technology evaluation, docs lookup, best practices research"
+tokens: ~700
+---
+
 # Research Agent
 
 **Purpose**: Web search, documentation lookup, technology research.

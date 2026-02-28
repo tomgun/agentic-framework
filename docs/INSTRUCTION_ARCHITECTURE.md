@@ -1,7 +1,7 @@
 # Instruction Architecture Design Document
 
 **Status**: Authoritative design basis for the Agentic AI Framework's instruction file architecture.
-**Last validated**: 2026-02-07
+**Last validated**: 2026-02-28
 **Owner**: Framework maintainer (whoever merges changes to `.agentic/`)
 
 **Rule**: When source research documents and this design document disagree, this document wins.
@@ -39,14 +39,14 @@ This design synthesizes two independent research efforts:
 
 **Files**: CLAUDE.md, .cursorrules, copilot-instructions.md, codex-instructions.md
 
-**Current state**: 69-92 lines across tools (template CLAUDE.md: 79, root CLAUDE.md: 92, cursorrules: 71, copilot: 69, codex: 71). These mix constitutional rules with playbook content.
+**Current state**: 38-54 lines across tools (template CLAUDE.md: 40, root CLAUDE.md: 54, cursorrules: 27, copilot: 38, codex: 40). For Claude Code, trigger words have moved to Skills (see Layer 2).
 
 **Research says**: 300-800 tokens, invariant rules only (ChatGPT); under 100 lines for attention quality (L-0002).
 
 **Design principle**: Instruction files ARE the constitution. They should contain ONLY rules that cannot be structurally enforced.
 
 **What stays** (cannot be structurally enforced — agent must choose to comply):
-- Trigger table — tested, tests 003/010 pass
+- Trigger table — tested, tests 003/010 pass. **For Claude Code, the trigger table has been moved to Skills (`.claude/skills/*/SKILL.md` descriptions, F-0143). Other tools retain the trigger table in their instruction files.**
 - Token-efficient scripts references — tested, tests 004/019 pass
 - "Never auto-commit" — behavioral rule
 - "Never fabricate APIs" — behavioral rule
@@ -66,6 +66,17 @@ This design synthesizes two independent research efforts:
 **Loading mechanism**: `ag` commands print relevant instructions at the right moment. auto_orchestration.md is NOT referenced in any instruction file — it is accessed indirectly when agents run `ag implement`, `ag commit`, etc., which print task-specific guidance. This is intentional: just-in-time delivery via scripts.
 
 **Gap**: `ag` commands don't explicitly tell the agent WHICH playbook file to read for deeper details. See Gap 3.
+
+#### Skills (Claude Code-specific playbook delivery)
+
+Skills are Claude Code's native mechanism for delivering playbook-level instructions. They implement the same principle as Layer 2 (just-in-time delivery) via tool-native UI — Claude Code surfaces the right skill based on task description, so agents receive workflow instructions without loading the full auto_orchestration.md playbook.
+
+- **Source**: `.agentic/agents/claude/skills/` (hand-crafted, 12 skills)
+- **Generated to**: `.claude/skills/` (by `generate-skills.sh`)
+- **Each skill bundles**: `SKILL.md` (instructions) + `scripts/` (gates/validation) + `references/` (playbook copies)
+- **Progressive disclosure**: YAML frontmatter on 79 playbook/subagent files enables ~50x discovery savings (scan ~50-token summaries vs load ~2500-token full files)
+
+Other tools (Cursor, Copilot, Codex) continue using `auto_orchestration.md` + `ag` commands for Layer 2 delivery. Skills are additive — they don't replace the existing Layer 2 mechanism, they provide a tool-native alternative for Claude Code (F-0143).
 
 ### Layer 3: Project State
 
@@ -125,7 +136,7 @@ These mechanisms are proven and stable. Changes require strong justification:
 - **LLM behavioral test suite** — 48+ tests validating instruction compliance
 - **auto_orchestration.md** — primary playbook for agent workflows
 - **`ag` gateway** — structural enforcement entry point
-- **Trigger table format** in instruction files — tested (003/010 pass), proven
+- **Trigger table format** in instruction files — tested (003/010 pass), proven. Claude Code: trigger delivery moved to Skills (F-0143); other tools retain trigger table
 - **AGENT_QUICK_START.md** — "one rule: run doctor.sh" pattern
 - **Manifest-based guideline injection** in context-for-role.sh — 7 of 24 manifests currently include anti-hallucination.md
 - **STACK.md parsing** via ag.sh (grep/sed) — works today, no need to replace
@@ -150,7 +161,7 @@ These mechanisms are proven and stable. Changes require strong justification:
 | Root .github/copilot-instructions.md | 77 | 49 | 36% |
 | Root .cursorrules | 27 | 27 | unchanged (already lean) |
 
-Moved content (gates table, delegation/agent mode, session protocols, agent boundaries) to `auto_orchestration.md` (334 → 442 lines). All templates now contain only constitutional content: trigger table, token-efficient scripts, core behavioral rules, and a playbook pointer.
+Moved content (gates table, delegation/agent mode, session protocols, agent boundaries) to `auto_orchestration.md` (334 → 442 lines). All templates now contain constitutional content. Claude Code further offloads triggers to Skills (F-0143), achieving ~40-line templates.
 
 **Note**: Original design doc baseline for `.cursorrules` was incorrectly listed as 71 lines (that was the codex template). Actual root `.cursorrules` is 27 lines.
 
@@ -222,7 +233,7 @@ The design makes assumptions that should be validated over time. Each has a stat
 | A5 | Subagents don't inherit .cursorrules (Cursor) | CONFIRMED — official docs + changelog | Check docs on major tool updates |
 | A6 | Distributed enforcement achieves same guarantees as centralized orchestrator | ASSUMED — architectural reasoning, not empirically tested | Run full workflow with deliberate violations, check if gates catch them |
 | A7 | `ag` command stdout has high salience to agents | UNTESTED — proposed in Gap 3 | Create LLM test: does agent follow instruction printed by `ag` command? |
-| A8 | ~40-50 lines is achievable while keeping trigger table + token scripts + core rules | UNTESTED — proposed in Gap 1 | Attempt the slimdown and run LLM tests |
+| A8 | ~40-50 lines is achievable while keeping trigger table + token scripts + core rules | VALIDATED — template CLAUDE.md at 40 lines, root at 54, all under 100-line ceiling (F-0143) | Achieved via Skills offloading triggers |
 | A9 | Copilot loads copilot-instructions.md into subagent sessions | UNKNOWN — contradictory docs | Empirical test with distinctive instruction |
 | A10 | Git-tracked STATUS.md survives cross-machine workflow | RESOLVED — status.json eliminated; STATUS.md is the sole cross-machine state file | N/A — STATUS.md is already git-tracked and used directly |
 
@@ -234,7 +245,7 @@ The design makes assumptions that should be validated over time. Each has a stat
 
 ### Blocks implementation decisions (resolve before implementing gaps)
 
-- **How aggressively to slim instruction files?** Proposed ~40-50 lines (keep tested content, remove structurally-enforced content) — directly affects Gap 1
+- ~~**How aggressively to slim instruction files?**~~ RESOLVED — triggers moved to Skills for Claude Code, ~40-line templates achieved (F-0143). Other tools retain trigger tables in instruction files.
 - **Does `ag` command stdout have higher salience than file content?** (Untested) — directly affects Gap 3
 
 ### Exploratory (can be deferred)

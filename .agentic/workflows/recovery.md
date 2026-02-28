@@ -1,3 +1,10 @@
+---
+summary: "Recovery from interruptions: detect, assess, resume or rollback"
+trigger: "recovery, interrupted, crashed, resume, rollback"
+tokens: ~4200
+phase: session
+---
+
 # Recovery Protocol
 
 **Purpose**: Structured recovery when work is interrupted, context resets, or agents fail mid-task.

@@ -1,3 +1,10 @@
+---
+summary: "Progressive complexity: when to add agents, pipelines, automation"
+trigger: "scaling, growing, more agents, complexity"
+tokens: ~2900
+phase: planning
+---
+
 # Scaling guidance (progressive complexity)
 
 Purpose: lightweight guidance for agents to suggest reorganization when project complexity crosses useful thresholds.

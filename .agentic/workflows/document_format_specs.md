@@ -1,3 +1,10 @@
+---
+summary: "Format specifications for framework documents (STATUS, JOURNAL, etc.)"
+trigger: "format, document format, file format, spec format"
+tokens: ~4400
+phase: documentation
+---
+
 # Document Format Specifications
 
 **Purpose**: Define format expectations for all durable artifacts to ensure tool compatibility and enable future evolution.

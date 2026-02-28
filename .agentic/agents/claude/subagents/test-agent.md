@@ -1,3 +1,11 @@
+---
+role: testing
+model_tier: mid-tier
+summary: "Write and run tests for implemented features"
+use_when: "New features need tests, TDD cycles, test coverage gaps"
+tokens: ~700
+---
+
 # Test Agent
 
 **Purpose**: Write and run tests for implemented features.

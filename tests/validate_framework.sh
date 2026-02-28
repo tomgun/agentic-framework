@@ -2218,15 +2218,19 @@ for file in \
   "${FRAMEWORK_ROOT}/.agentic/agents/copilot/copilot-instructions.md" \
   "${FRAMEWORK_ROOT}/.agentic/agents/codex/codex-instructions.md"; do
   name=$(basename "$file")
-  # Plan-mode-exit row must mention ag implement
+  # Plan-mode-exit row must mention ag implement, OR skills handle triggers
   if grep -i "plan.*mode\|plan.*approved\|planning complete" "$file" | grep -q "ag implement"; then
     pass "F-0140: $name plan-mode-exit → ag implement"
+  elif grep -q "Skills.*\.claude/skills\|skills/" "$file" 2>/dev/null; then
+    pass "F-0140: $name plan-mode-exit handled by skills"
   else
     fail "F-0140: $name plan-mode-exit row missing ag implement chaining"
   fi
-  # Build row must mention (creates WIP)
+  # Build row must mention (creates WIP), OR skills handle triggers
   if grep -i "Build.*implement.*create" "$file" | grep -q "creates WIP"; then
     pass "F-0140: $name Build trigger has (creates WIP)"
+  elif grep -q "Skills.*\.claude/skills\|skills/" "$file" 2>/dev/null; then
+    pass "F-0140: $name Build trigger handled by skills"
   else
     fail "F-0140: $name Build trigger missing (creates WIP) annotation"
   fi

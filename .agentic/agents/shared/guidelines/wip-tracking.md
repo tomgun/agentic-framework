@@ -1,3 +1,10 @@
+---
+summary: "WIP tracking: start, checkpoint, complete, recover"
+trigger: "wip, work in progress, tracking, checkpoint"
+tokens: ~1280
+phase: implementation
+---
+
 # Work-In-Progress (WIP) Tracking
 
 **Purpose**: Never lose work when tokens run out, tools crash, or context gets compacted.

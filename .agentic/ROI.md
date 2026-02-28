@@ -30,6 +30,15 @@ The Agentic Framework delivers **50-80% cost reduction** in AI-assisted developm
 - Expensive models only for complex reasoning when needed
 - Context isolation prevents bloated prompts
 
+### Progressive Disclosure via Frontmatter
+
+| Discovery Method | Tokens per File | For 79 Files | Savings |
+|------------------|----------------|--------------|---------|
+| Load full file | ~2,500 | ~197,500 | — |
+| Scan frontmatter summary | ~50 | ~3,950 | **98%** |
+
+All playbook, checklist, workflow, guideline, quality, and subagent files include YAML frontmatter with `summary`, `trigger`, and `tokens` fields. Agents scan summaries to decide which files to load — avoiding ~193K tokens of unnecessary reads per full discovery pass.
+
 ### Token Savings Example
 
 | Monthly AI Spend | Expected Savings | New Monthly Cost |
