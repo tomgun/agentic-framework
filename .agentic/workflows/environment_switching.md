@@ -1,3 +1,10 @@
+---
+summary: "Switching between dev environments and tool configurations"
+trigger: "environment, switch, different tool, cursor, copilot"
+tokens: ~3500
+phase: session
+---
+
 # Environment Switching Workflow
 
 **Purpose**: Seamlessly switch between Claude Code, Cursor, and Copilot as tokens run out or tool availability changes.

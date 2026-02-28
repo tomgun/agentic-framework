@@ -1,3 +1,10 @@
+---
+summary: "Continuous quality checks: automated validation during development"
+trigger: "quality validation, continuous check, automated quality"
+tokens: ~9700
+phase: testing
+---
+
 # Continuous Quality Validation
 
 **Purpose**: Automated, stack-specific quality gates that run before every commit to ensure production-ready code.

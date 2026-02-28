@@ -1,3 +1,10 @@
+---
+summary: "Verify documentation is current and accurate after changes"
+trigger: "verify docs, documentation check, docs current"
+tokens: ~2000
+phase: documentation
+---
+
 # Documentation Verification Protocol
 
 **Purpose**: Ensure agents use current, version-correct documentation when generating code to avoid implementing deprecated patterns, removed APIs, or outdated best practices.

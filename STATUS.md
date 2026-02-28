@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Doc architecture review — implemented R1,R3,R9,R10. Ready to commit. (Updated: 2026-02-28 15:04 EET)
+- F-0143: Skills-primary architecture complete — 12 skills, 79 files with YAML frontmatter, all validations pass. Ready for PR. (Updated: 2026-02-28 21:37 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

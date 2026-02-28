@@ -1,3 +1,10 @@
+---
+summary: "Multi-agent coordination: registration, file locking, conflict avoidance"
+trigger: "multi agent, coordination, parallel agents, conflict"
+tokens: ~6500
+phase: implementation
+---
+
 # Multi-Agent Coordination Protocol
 
 **Purpose**: Enable multiple AI agents to work simultaneously on different features without conflicts, using Git worktrees and coordination files.

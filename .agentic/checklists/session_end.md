@@ -1,3 +1,10 @@
+---
+summary: "Session wrap-up: update journal, status, capture next steps"
+trigger: "ending session, wrapping up, goodbye, signing off"
+tokens: ~2800
+phase: session
+---
+
 # Session End Checklist
 
 **Purpose**: Ensure clean session closure with clear handoff to next session (or human).

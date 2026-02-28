@@ -1,3 +1,11 @@
+---
+role: infrastructure
+model_tier: mid-tier
+summary: "AWS architecture, service selection, infrastructure setup"
+use_when: "AWS deployments, service configuration, cloud architecture on AWS"
+tokens: ~1000
+---
+
 # AWS Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs AWS service knowledge

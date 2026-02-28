@@ -1,3 +1,10 @@
+---
+summary: "Project retrospective: what worked, what didn't, lessons learned"
+trigger: "retrospective, retro, what went well, lessons"
+tokens: ~3400
+phase: review
+---
+
 # Retrospective Checklist
 
 **Purpose**: Systematic project health review to improve quality and processes.

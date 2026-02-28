@@ -1,3 +1,11 @@
+---
+role: review
+model_tier: mid-tier
+summary: "Code review, quality checks, refactoring suggestions"
+use_when: "PR reviews, code quality audits, pre-commit review"
+tokens: ~700
+---
+
 # Review Agent
 
 **Purpose**: Code review, quality checks, refactoring suggestions.

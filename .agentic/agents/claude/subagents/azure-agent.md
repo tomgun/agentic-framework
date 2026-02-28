@@ -1,3 +1,11 @@
+---
+role: infrastructure
+model_tier: mid-tier
+summary: "Azure architecture, service selection, infrastructure setup"
+use_when: "Azure deployments, service configuration, cloud architecture on Azure"
+tokens: ~1000
+---
+
 # Azure Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs Azure service knowledge

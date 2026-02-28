@@ -1,3 +1,11 @@
+---
+role: infrastructure
+model_tier: mid-tier
+summary: "Google Cloud architecture, service selection, infrastructure setup"
+use_when: "GCP deployments, service configuration, cloud architecture on GCP"
+tokens: ~1100
+---
+
 # GCP Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs GCP service knowledge

@@ -1,3 +1,10 @@
+---
+summary: "Migrate spec files between format versions"
+trigger: "spec migration, upgrade spec, format change"
+tokens: ~3900
+phase: maintenance
+---
+
 # Spec Migrations (Optional)
 
 **Purpose**: Track the evolution of specs as atomic changes, complementing the current-state specs with a historical truth that helps AI agents work with smaller context windows.

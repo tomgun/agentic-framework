@@ -1,3 +1,10 @@
+---
+summary: "Media asset sourcing: images, icons, fonts, audio"
+trigger: "media, assets, images, icons, fonts, audio"
+tokens: ~7200
+phase: domain
+---
+
 # Media Asset Sourcing & Generation
 
 **Purpose**: Enable agents and developers to source, generate, and manage media assets (images, sprites, sound effects, music) for projects.

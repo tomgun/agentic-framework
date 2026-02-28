@@ -1,3 +1,10 @@
+---
+summary: "Token optimization: use scripts, delegate, minimize context"
+trigger: "token, efficiency, cost, optimize, save tokens"
+tokens: ~1000
+phase: always
+---
+
 # Token Efficiency Guidelines
 
 **Purpose**: Minimize token usage while maintaining quality.

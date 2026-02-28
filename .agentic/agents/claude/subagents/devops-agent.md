@@ -1,3 +1,11 @@
+---
+role: devops
+model_tier: mid-tier
+summary: "CI/CD pipelines, infrastructure as code, deployment automation"
+use_when: "Pipeline setup, IaC, Docker, Kubernetes, deployment workflows"
+tokens: ~1100
+---
+
 # DevOps Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs infrastructure knowledge

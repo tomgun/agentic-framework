@@ -38,6 +38,12 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0015: F-XXXX: Structural enforcement for durable plan saving. ag implement should check that a plan exists in .agentic-journal/plans/ and warn/block if missing. Needs a setting (e.g. plan_persistence: off|warning|blocking) since not every project wants saved plans. The plan-review loop (ag plan with plan_review_enabled) especially needs this — reviewed plans are high-value artifacts that should never be lost to session-scoped .claude/plans/. Implementation: add check in ag implement, add setting to profiles.conf (discovery: off, formal: warning), add to STACK.template.md ## Settings. See 2026-02-28-document-architecture-effectiveness-review.md for context.
 - **Added**: 2026-02-28
 
+### T-0016: Worktree auto-detection: Agent should automatically use git worktree when another agent is active. Check .agentic-state/AGENTS_ACTIVE.md at session start and auto-enter worktree if occupied. Currently requires user to remind agent. See CLAUDE.md Framework Development section - rule exists but isn't enforced structurally.
+- **Added**: 2026-02-28
+
+### T-0017: AGENTS_ACTIVE.md is never written: Referenced in 30+ files but no script or hook creates/updates it. Need a mechanism (session start hook? ag.sh command?) that registers agent presence and cleans up on exit. Currently a dead feature - pure behavioral instruction with zero structural backing.
+- **Added**: 2026-02-28
+
 ## Done
 
 <!-- Resolved/triaged items move here with outcome -->

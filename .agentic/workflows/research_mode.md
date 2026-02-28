@@ -1,3 +1,10 @@
+---
+summary: "Deep research: web search, docs lookup, technology evaluation"
+trigger: "research, investigate, look up, find docs, evaluate"
+tokens: ~4500
+phase: research
+---
+
 # Research Mode (Deep Investigation)
 
 **Purpose**: Structured, deep research into specific topics to inform decisions, discover alternatives, and stay current with field developments.

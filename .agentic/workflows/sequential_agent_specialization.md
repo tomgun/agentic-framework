@@ -1,3 +1,10 @@
+---
+summary: "Sequential agent pipeline: orchestrator dispatches specialized agents"
+trigger: "pipeline, sequential agents, orchestrator, dispatch"
+tokens: ~10000
+phase: implementation
+---
+
 # Sequential Agent Specialization (Agent Pipeline)
 
 **Purpose**: Enable specialized agents to work sequentially on tasks, each focusing on their expertise while maintaining context through durable artifacts.

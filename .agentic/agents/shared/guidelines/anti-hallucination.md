@@ -1,3 +1,10 @@
+---
+summary: "Verification rules: check before creating, never fabricate paths or APIs"
+trigger: "hallucination, fabrication, verify, check first"
+tokens: ~1200
+phase: always
+---
+
 # Anti-Hallucination Rules (NON-NEGOTIABLE)
 
 **Core Problem**: LLM hallucination undermines ALL quality principles. If the foundation is fabricated, tests and validation are meaningless.

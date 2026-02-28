@@ -1,3 +1,11 @@
+---
+role: performance
+model_tier: mid-tier
+summary: "Identify and resolve performance bottlenecks"
+use_when: "Slow operations, memory issues, optimization needs, profiling"
+tokens: ~800
+---
+
 # Performance Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs analytical reasoning

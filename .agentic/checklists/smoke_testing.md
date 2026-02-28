@@ -1,3 +1,11 @@
+---
+summary: "Smoke test checklist: verify feature works end-to-end before committing"
+trigger: "smoke test, verify, does it work, quick test"
+tokens: ~3300
+requires: [feature_implementation.md]
+phase: testing
+---
+
 # Smoke Testing Checklist
 
 **Purpose**: Verify the application ACTUALLY WORKS before claiming it's done. Don't rely on "it should work" - RUN IT and CHECK IT.

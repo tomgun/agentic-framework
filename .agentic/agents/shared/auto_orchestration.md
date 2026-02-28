@@ -1,5 +1,7 @@
 # Automatic Orchestration Rules
 
+> **Claude Code users**: Workflow triggers are primarily handled by Skills in `.claude/skills/`. This file serves Cursor, Copilot, Codex, and other non-Claude tools.
+
 **Purpose**: Agents automatically detect task type and follow the correct systematic process.
 
 **Design basis**: Implements Principles F3 (Token & Context Optimization), D2 (Deterministic Enforcement), and D3 (Durable Artifacts). Architecture: `docs/INSTRUCTION_ARCHITECTURE.md`.

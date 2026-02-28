@@ -1,3 +1,10 @@
+---
+summary: "Git practices: branching, PRs, commit messages, merge strategy"
+trigger: "git, branch, PR, pull request, merge"
+tokens: ~5000
+phase: commit
+---
+
 # Git Workflow for Agentic Development
 
 **Purpose**: Define how agents interact with Git, including commit protocols, PR workflows, and multi-agent coordination.

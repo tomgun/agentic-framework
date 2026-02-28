@@ -1,3 +1,10 @@
+---
+summary: "Auto-logging checkpoints: when and what to journal"
+trigger: "journal, log, checkpoint, auto journal"
+tokens: ~2800
+phase: session
+---
+
 # Automatic Journaling Workflow
 
 **Purpose**: Log progress automatically at natural checkpoints WITHOUT waiting for session end or user reminders.

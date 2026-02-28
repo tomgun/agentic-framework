@@ -2176,6 +2176,21 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ---
 
+## F-0143: Skills-Primary Architecture for Claude Code
+
+**Status**: in_progress
+**Priority**: high
+**Complexity**: high
+**Added**: 2026-02-28
+
+**Description**: Spec-compliant Claude Skills as the primary workflow delivery for Claude Code. Hand-crafted SKILL.md files with proper YAML frontmatter (name, description, compatibility, metadata), instructions, examples, and troubleshooting. Generator copies from hand-crafted sources and assembles references. CLAUDE.md thinned to ~35 lines. Playbooks gain YAML frontmatter for progressive disclosure.
+
+**Dependencies**: F-0098 (Generate Claude Skills from Subagents)
+
+**Acceptance**: See `spec/acceptance/F-0143.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |

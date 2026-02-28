@@ -960,3 +960,29 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-28 20:36 - F-0143 Skills-Primary Architecture
+
+**Why**: Skills become primary workflow delivery for Claude Code, backed by structural enforcement
+
+**Accomplished**:
+- Implemented all 6 phases: YAML frontmatter on 52 playbooks, hand-crafted 12 spec-compliant skills, rewrote generate-skills.sh (copy from sources + validate + assemble references), thinned CLAUDE.md template to 39 lines, updated upgrade.sh migration, added auto_orchestration.md header note, created validate_skills.sh test suite
+
+**Next steps**:
+- Commit changes, create PR, run trigger tests
+
+**Blockers**: None
+
+
+### Session: 2026-02-28 21:37 - F-0143: Skills-Primary Architecture
+
+**Why**: Anthropic Skills spec compliance, progressive disclosure for all tools
+
+**Accomplished**:
+- Implemented all 8 phases: 12 spec-compliant skills, 52 playbook frontmatters, 27 subagent frontmatters, generator rewrite, CLAUDE.md thinned, validation scripts, coverage gap fixes
+
+**Next steps**:
+- PR review and merge, post-merge tagging
+
+**Blockers**: None
+

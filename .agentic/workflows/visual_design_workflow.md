@@ -1,3 +1,10 @@
+---
+summary: "Visual design process: mockups, assets, CSS, responsive"
+trigger: "design, visual, UI, CSS, mockup, responsive"
+tokens: ~2700
+phase: domain
+---
+
 # Visual Design Workflow
 
 **Purpose**: Enable agents and developers to work with wireframes, screenshots, and visual designs for accurate UI/UX implementation.

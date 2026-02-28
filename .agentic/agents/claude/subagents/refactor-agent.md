@@ -1,3 +1,11 @@
+---
+role: refactoring
+model_tier: mid-tier
+summary: "Improve code structure without changing behavior"
+use_when: "Code smell cleanup, pattern extraction, architecture improvement"
+tokens: ~700
+---
+
 # Refactor Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs code understanding

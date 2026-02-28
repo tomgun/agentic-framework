@@ -1,3 +1,11 @@
+---
+role: exploration
+model_tier: cheap
+summary: "Quick codebase exploration, finding files, understanding structure"
+use_when: "Finding files, understanding architecture, codebase navigation"
+tokens: ~500
+---
+
 # Explore Agent
 
 **Purpose**: Quick codebase exploration, finding files, understanding structure.

@@ -1,3 +1,11 @@
+---
+role: review
+model_tier: high-tier
+summary: "Critically review implementation plans before coding begins"
+use_when: "Plan quality assurance, risk identification, approach validation"
+tokens: ~1200
+---
+
 # Plan Reviewer Agent
 
 **Purpose**: Critically review implementation plans before coding begins. Find flaws early.
