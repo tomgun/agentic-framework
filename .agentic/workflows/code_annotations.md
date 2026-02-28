@@ -1,3 +1,10 @@
+---
+summary: "Spec-to-code linking: @feature, @decision annotations"
+trigger: "annotations, traceability, @feature, link spec to code"
+tokens: ~2100
+phase: implementation
+---
+
 # Code annotations (spec-to-code linking)
 
 Purpose: create bidirectional links between code and specifications so agents and humans can trace feature implementations.

@@ -1,3 +1,10 @@
+---
+summary: "Constitutional minimum: no fabrication, no auto-commit, use token scripts"
+trigger: "core rules, constitution, minimum rules"
+tokens: ~170
+phase: always
+---
+
 # Core Rules (Constitutional Minimum)
 
 These rules apply to ALL agent roles. Injected automatically by `context-for-role.sh`.

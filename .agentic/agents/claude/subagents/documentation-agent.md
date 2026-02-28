@@ -1,3 +1,11 @@
+---
+role: documentation
+model_tier: cheap
+summary: "Update documentation and README files after feature completion"
+use_when: "Post-feature doc updates, README refresh, API docs"
+tokens: ~600
+---
+
 # Documentation Agent (Claude Code)
 
 **Model Selection**: Cheap/Fast tier (e.g., haiku, gpt-4o-mini) - structured writing

@@ -1,3 +1,11 @@
+---
+role: implementation
+model_tier: mid-tier
+summary: "Write production code, implement features, fix bugs"
+use_when: "Features >20 lines, complex bugs, refactoring, multi-file changes"
+tokens: ~600
+---
+
 # Implementation Agent
 
 **Purpose**: Write production code, implement features, fix bugs.

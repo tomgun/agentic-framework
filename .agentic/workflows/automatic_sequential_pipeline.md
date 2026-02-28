@@ -1,3 +1,10 @@
+---
+summary: "Automated pipeline execution: trigger, sequence, handoff between agents"
+trigger: "automatic pipeline, auto sequence, pipeline run"
+tokens: ~8000
+phase: implementation
+---
+
 # Automatic Sequential Agent Pipeline
 
 **Purpose**: Enable automatic coordination of specialized agents working sequentially on features without manual handoff orchestration.

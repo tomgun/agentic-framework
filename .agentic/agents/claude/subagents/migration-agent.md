@@ -1,3 +1,11 @@
+---
+role: migration
+model_tier: mid-tier
+summary: "Plan and execute data migrations, schema changes, system upgrades"
+use_when: "Database migrations, system upgrades, data transformation"
+tokens: ~900
+---
+
 # Migration Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs careful planning

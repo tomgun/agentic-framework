@@ -1,3 +1,10 @@
+---
+summary: "WIP tracking: start, checkpoint, recover interrupted work"
+trigger: "wip, interrupted, recovery, checkpoint"
+tokens: ~4400
+phase: implementation
+---
+
 # Work-In-Progress (WIP) Tracking & Recovery
 
 **Purpose**: Prevent loss of work when tokens run out, tools crash, or context gets compacted. Automatic detection and recovery of interrupted work.

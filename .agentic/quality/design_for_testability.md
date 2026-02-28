@@ -1,3 +1,10 @@
+---
+summary: "Testability patterns: dependency injection, interfaces, seams"
+trigger: "testability, DI, dependency injection, testable"
+tokens: ~220
+phase: implementation
+---
+
 # Design for testability
 
 ## Core idea

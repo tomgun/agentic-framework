@@ -20,6 +20,7 @@
 - **Sequential agents** - specialized context per role (30K-45K tokens vs. 200K)
 - **Structured reading protocols** - explicit budgets prevent waste
 - **Fresh subagent context** - spawn focused agents instead of accumulating drift
+- **YAML frontmatter progressive disclosure** — agents scan ~50-token summaries instead of loading ~2500-token full files (~50x discovery savings). 79 playbook and subagent files now have machine-parseable frontmatter.
 
 ---
 
@@ -105,7 +106,7 @@
 - **Git worktrees** - isolated working directories
 - **PR mode** - optional team workflow
 - **Two profiles** - Discovery (simple) vs Formal (complex)
-- **Progressive disclosure** - start simple, add features as needed
+- **Progressive disclosure** — YAML frontmatter on all playbook files lets agents scan summaries before loading full content. Claude Skills deliver workflow instructions just-in-time via tool-native UI.
 
 ---
 

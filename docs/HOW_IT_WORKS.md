@@ -395,7 +395,7 @@ These features exist but don't clearly derive from the 13 principles:
 | **Spec Migration System** (F-0117) | Track how specs evolved over time | D5 (Living Docs) |
 | **Documentation Drift Detection** (F-0118) | Detect stale docs | D5 (Living Docs) |
 | **Feature Change Manifests** (F-0119) | Git history per feature | D3 (Durable Artifacts) |
-| **Claude Skills Generation** (F-0098) | Generate `.claude/skills/` from subagent definitions | F3 (Token & Context Optimization) |
+| **Claude Skills** (F-0098, F-0143) | Hand-crafted Claude Skills with Anthropic spec compliance | F3 (Token & Context Optimization) |
 
 ---
 
@@ -463,7 +463,7 @@ These features exist but don't clearly derive from the 13 principles:
 │                  BEHAVIORAL RULES                        │
 │  (Instruction files + memory - probabilistic)            │
 │                                                          │
-│  CLAUDE.md trigger table (intent-matched)                │
+│  CLAUDE.md rules + Claude Skills (Claude Code)            │
 │  Memory seed (imperative action rules)                   │
 │  Auto-orchestration playbook (just-in-time)              │
 │  core-rules.md (always-injected to subagents)            │

@@ -1,3 +1,10 @@
+---
+summary: "Validate file format compliance (frontmatter, sections, structure)"
+trigger: "format validation, validate format, check format"
+tokens: ~2800
+phase: testing
+---
+
 # Format Validation & Expectations
 
 **Purpose**: Document expected formats for files parsed by framework tools, and provide validation to catch format inconsistencies early.

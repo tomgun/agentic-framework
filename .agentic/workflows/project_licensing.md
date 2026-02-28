@@ -1,3 +1,10 @@
+---
+summary: "Open source licensing guide: choosing, applying, compliance"
+trigger: "license, licensing, open source, MIT, GPL"
+tokens: ~6300
+phase: domain
+---
+
 # Project Licensing Guide
 
 **Purpose**: Help developers choose the right license for their project and understand how it affects dependencies, assets, and contributions.

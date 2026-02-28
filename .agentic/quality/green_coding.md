@@ -1,3 +1,10 @@
+---
+summary: "Sustainable coding: performance, resource efficiency, battery-friendly"
+trigger: "green coding, performance, sustainability, efficient"
+tokens: ~10200
+phase: implementation
+---
+
 # Green Coding Standards
 
 **Purpose**: Guidelines for environmentally responsible software development that minimizes energy consumption and carbon footprint.

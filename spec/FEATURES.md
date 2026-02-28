@@ -1490,17 +1490,17 @@
 
 ## F-0098: Generate Claude Skills from Subagents
 
-**Status**: in_progress
+**Status**: shipped
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.11.5
 
-**Description**: Generate Claude Code Skills (`.claude/skills/`) from subagent definitions, enabling auto-discovery while maintaining single source of truth. Skills are regenerated during install/upgrade.
+**Description**: Generate Claude Code Skills (`.claude/skills/`) from subagent definitions, enabling auto-discovery while maintaining single source of truth. Skills are regenerated during install/upgrade. Superseded by F-0143 hand-crafted skills approach.
 
 **Dependencies**: None
 
 **Implementation**:
-- State: partial
+- State: complete
 - Code: `.agentic/tools/generate-skills.sh`
 - Tests: manual validation
 
@@ -2173,6 +2173,21 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Dependencies**: F-0009 (Settings System)
 
 **Acceptance**: See `spec/acceptance/F-0141.md`
+
+---
+
+## F-0143: Skills-Primary Architecture for Claude Code
+
+**Status**: shipped
+**Priority**: high
+**Complexity**: high
+**Added**: 2026-02-28
+
+**Description**: Spec-compliant Claude Skills as the primary workflow delivery for Claude Code. Hand-crafted SKILL.md files with proper YAML frontmatter (name, description, compatibility, metadata), instructions, examples, and troubleshooting. Generator copies from hand-crafted sources and assembles references. CLAUDE.md thinned to ~35 lines. Playbooks gain YAML frontmatter for progressive disclosure.
+
+**Dependencies**: F-0098 (Generate Claude Skills from Subagents)
+
+**Acceptance**: See `spec/acceptance/F-0143.md`
 
 ---
 

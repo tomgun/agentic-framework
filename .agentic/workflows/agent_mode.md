@@ -1,3 +1,10 @@
+---
+summary: "Agent mode selection: premium, balanced, economy trade-offs"
+trigger: "agent mode, premium, economy, cost, quality"
+tokens: ~1400
+phase: planning
+---
+
 # Agent Mode: Quality vs Cost Tradeoff
 
 ## What is Agent Mode?

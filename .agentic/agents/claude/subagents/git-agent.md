@@ -1,3 +1,11 @@
+---
+role: git
+model_tier: cheap
+summary: "Handle git operations: commits, branches, PRs"
+use_when: "Committing, branching, PR creation, merge operations"
+tokens: ~500
+---
+
 # Git Agent (Claude Code)
 
 **Model Selection**: Cheap/Fast tier (e.g., haiku, gpt-4o-mini) - simple commands

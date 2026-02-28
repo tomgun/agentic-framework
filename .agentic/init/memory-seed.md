@@ -1,6 +1,6 @@
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.31.0 -->
+<!-- memory-seed v0.34.0 -->
 <!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.

@@ -1,3 +1,10 @@
+---
+summary: "Integration test strategies: API, database, service boundaries"
+trigger: "integration test, API test, database test, service test"
+tokens: ~3500
+phase: testing
+---
+
 # Integration testing
 
 Purpose: guide when and how to write integration tests that verify component boundaries and external dependencies.

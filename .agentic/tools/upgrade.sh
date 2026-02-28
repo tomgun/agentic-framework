@@ -238,10 +238,11 @@ if [[ "$DRY_RUN" == "yes" ]]; then
 elif [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/generate-skills.sh" ]]; then
   # Remove old generated skills (keep custom skills)
   if [[ -d "$TARGET_PROJECT_DIR/.claude/skills" ]]; then
-    # Only remove skills that have the "Generated from:" marker
+    # Remove skills from old subagent-based generator or current framework generator
     for skill_dir in "$TARGET_PROJECT_DIR/.claude/skills"/*; do
       if [[ -d "$skill_dir" ]] && [[ -f "$skill_dir/SKILL.md" ]]; then
-        if grep -q "Generated from: .agentic/agents/claude/subagents" "$skill_dir/SKILL.md" 2>/dev/null; then
+        if grep -q "Generated from: .agentic/agents/claude/subagents" "$skill_dir/SKILL.md" 2>/dev/null || \
+           grep -q "author: agentic-framework" "$skill_dir/SKILL.md" 2>/dev/null; then
           rm -rf "$skill_dir"
         fi
       fi

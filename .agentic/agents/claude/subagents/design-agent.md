@@ -1,3 +1,11 @@
+---
+role: design
+model_tier: mid-tier
+summary: "Create UI/UX designs, wireframes, design system components"
+use_when: "UI mockups, design systems, component libraries, visual design"
+tokens: ~700
+---
+
 # Design Agent (Claude Code)
 
 **Model Selection**: Mid-tier - creative but structured output

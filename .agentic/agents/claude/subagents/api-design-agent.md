@@ -1,3 +1,11 @@
+---
+role: api-design
+model_tier: mid-tier
+summary: "Design RESTful APIs, GraphQL schemas, API contracts"
+use_when: "API design, endpoint planning, schema definition, versioning"
+tokens: ~900
+---
+
 # API Design Agent (Claude Code)
 
 **Model Selection**: Mid-tier - needs consistency and standards knowledge

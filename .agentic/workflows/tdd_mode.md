@@ -1,3 +1,10 @@
+---
+summary: "Test-driven development: red-green-refactor cycle"
+trigger: "tdd, test first, red green refactor"
+tokens: ~5500
+phase: implementation
+---
+
 # TDD Mode (Test-Driven Development)
 
 **📌 OPTIONAL alternative to the default Acceptance-Driven approach.**

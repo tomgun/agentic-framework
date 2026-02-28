@@ -1,15 +1,33 @@
 #!/usr/bin/env bash
-# generate-skills.sh: Generate Claude Skills from subagent definitions
+# generate-skills.sh: Generate Claude Skills from hand-crafted skill sources
 #
 # Usage:
 #   bash .agentic/tools/generate-skills.sh           # Generate all skills
 #   bash .agentic/tools/generate-skills.sh --clean   # Remove generated skills first
+#   bash .agentic/tools/generate-skills.sh --validate # Validate only, don't generate
 #
-# This creates .claude/skills/ from .agentic/agents/claude/subagents/
-# Skills are auto-discovered by Claude Code based on task description.
+# Source of truth: .agentic/agents/claude/skills/*/SKILL.md (hand-crafted)
+# Generated output: .claude/skills/*/ (SKILL.md + scripts/ + references/)
 #
-# Source of truth: .agentic/agents/claude/subagents/*.md
-# Generated output: .claude/skills/*/SKILL.md
+# What the generator does:
+#   1. Copies SKILL.md from source, injects VERSION into metadata
+#   2. Copies scripts/, makes them executable
+#   3. Copies references from .agentic/ sources (mapping table below)
+#   4. Validates all spec requirements
+#
+# Reference copy mapping (source → skill/references/):
+#   implementing-features: feature_start.md, feature_implementation.md, programming_standards.md
+#   committing-changes: before_commit.md
+#   reviewing-code: review_checklist.md, programming_standards.md
+#   session-start: session_start.md
+#   fixing-bugs: debugging_playbook.md
+#   completing-work: feature_complete.md
+#   writing-tests: test_strategy.md
+#   planning-features: plan_review_loop.md
+#   exploring-codebase: (none)
+#   researching-topics: (none)
+#   updating-documentation: (none)
+#   managing-specs: (none)
 
 set -euo pipefail
 
@@ -19,165 +37,257 @@ PROJECT_ROOT="$(cd "$AGENTIC_DIR/.." && pwd)"
 
 # Colors
 GREEN='\033[0;32m'
+RED='\033[0;31m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-SUBAGENTS_DIR="$AGENTIC_DIR/agents/claude/subagents"
-SKILLS_DIR="$PROJECT_ROOT/.claude/skills"
+SKILLS_SRC="$AGENTIC_DIR/agents/claude/skills"
+SKILLS_OUT="$PROJECT_ROOT/.claude/skills"
+VERSION=$(cat "$PROJECT_ROOT/VERSION" 2>/dev/null || echo "0.0.0")
 
-# Clean existing generated skills if requested
-if [[ "${1:-}" == "--clean" ]]; then
-    if [[ -d "$SKILLS_DIR" ]]; then
-        echo -e "${YELLOW}Removing existing skills...${NC}"
-        rm -rf "$SKILLS_DIR"
-    fi
-    shift
-fi
+VALIDATE_ONLY=false
+ERRORS=0
+WARNINGS=0
 
-# Check for subagents
-if [[ ! -d "$SUBAGENTS_DIR" ]]; then
-    echo "No subagents found at $SUBAGENTS_DIR"
-    exit 0
-fi
-
-echo -e "${BLUE}Generating Claude Skills from subagent definitions...${NC}"
-echo ""
-
-# Create skills directory
-mkdir -p "$SKILLS_DIR"
-
-# Track what we generate
-GENERATED=0
-
-# Process each subagent
-for subagent_file in "$SUBAGENTS_DIR"/*.md; do
-    [[ -f "$subagent_file" ]] || continue
-
-    filename=$(basename "$subagent_file")
-
-    # Skip README or non-agent files
-    [[ "$filename" == "README.md" ]] && continue
-
-    # Extract agent name (remove -agent.md suffix)
-    agent_name=$(echo "$filename" | sed 's/-agent\.md$//' | sed 's/\.md$//')
-
-    # Create skill directory
-    skill_dir="$SKILLS_DIR/$agent_name"
-    mkdir -p "$skill_dir"
-
-    # Extract key info from subagent file
-    purpose=$(grep -A1 "^\*\*Purpose\*\*:" "$subagent_file" | head -1 | sed 's/\*\*Purpose\*\*: //')
-
-    # Extract "When to Use" section for triggers
-    when_to_use=$(sed -n '/^## When to Use/,/^## /p' "$subagent_file" | grep "^- " | head -6)
-
-    # Extract model recommendation (handles different formats)
-    model_line=$(grep -i "model" "$subagent_file" | grep -i "tier\|selection\|recommended" | head -1)
-    if echo "$model_line" | grep -qi "cheap\|fast\|haiku\|mini"; then
-        model="haiku"
-    elif echo "$model_line" | grep -qi "opus\|expensive"; then
-        model="opus"
-    else
-        model="sonnet"
-    fi
-
-    # Determine allowed tools based on agent type
-    case "$agent_name" in
-        explore)
-            allowed_tools="Glob, Grep, Read, Bash"
+# Parse flags
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --clean)
+            if [[ -d "$SKILLS_OUT" ]]; then
+                echo -e "${YELLOW}Removing existing skills...${NC}"
+                rm -rf "$SKILLS_OUT"
+            fi
+            shift
             ;;
-        research)
-            allowed_tools="WebSearch, WebFetch, Read, Write"
-            ;;
-        review)
-            allowed_tools="Read, Grep, Glob"
-            ;;
-        implementation)
-            allowed_tools="Read, Write, Edit, Bash, Glob, Grep"
-            ;;
-        test)
-            allowed_tools="Read, Write, Edit, Bash, Glob, Grep"
-            ;;
-        git)
-            allowed_tools="Bash, Read"
-            ;;
-        documentation)
-            allowed_tools="Read, Write, Edit, Glob"
-            ;;
-        planning)
-            allowed_tools="Read, Glob, Grep"
+        --validate)
+            VALIDATE_ONLY=true
+            shift
             ;;
         *)
-            allowed_tools=""
+            shift
             ;;
     esac
+done
 
-    # Capitalize first letter (portable approach)
-    first_char=$(echo "${agent_name:0:1}" | tr '[:lower:]' '[:upper:]')
-    agent_title="${first_char}${agent_name:1}"
+# Check for skill sources
+if [[ ! -d "$SKILLS_SRC" ]]; then
+    echo -e "${RED}No skill sources found at $SKILLS_SRC${NC}"
+    exit 1
+fi
 
-    # Generate SKILL.md
-    cat > "$skill_dir/SKILL.md" << SKILLEOF
----
-description: ${purpose}
-model: ${model}
-SKILLEOF
+# ── Reference mapping ──────────────────────────────────────
+# Maps skill-name → space-separated source files (relative to .agentic/)
+# Uses a function instead of associative arrays for bash 3 compatibility (macOS)
+get_refs() {
+    case "$1" in
+        implementing-features) echo "checklists/feature_start.md checklists/feature_implementation.md quality/programming_standards.md" ;;
+        committing-changes)    echo "checklists/before_commit.md" ;;
+        reviewing-code)        echo "quality/review_checklist.md quality/programming_standards.md" ;;
+        session-start)         echo "checklists/session_start.md" ;;
+        fixing-bugs)           echo "workflows/debugging_playbook.md" ;;
+        completing-work)       echo "checklists/feature_complete.md" ;;
+        writing-tests)         echo "quality/test_strategy.md" ;;
+        planning-features)     echo "workflows/plan_review_loop.md" ;;
+        *)                     echo "" ;;  # no references
+    esac
+}
 
-    if [[ -n "$allowed_tools" ]]; then
-        echo "allowed-tools: [$allowed_tools]" >> "$skill_dir/SKILL.md"
+# ── Validation functions ───────────────────────────────────
+validate_skill() {
+    local skill_dir="$1"
+    local skill_name
+    skill_name=$(basename "$skill_dir")
+    local skill_md="$skill_dir/SKILL.md"
+    local local_errors=0
+
+    if [[ ! -f "$skill_md" ]]; then
+        echo -e "  ${RED}✗${NC} $skill_name: missing SKILL.md"
+        ERRORS=$((ERRORS + 1))
+        return
     fi
 
-    cat >> "$skill_dir/SKILL.md" << SKILLEOF
----
+    # Extract frontmatter (between first --- and second ---)
+    local frontmatter
+    frontmatter=$(sed -n '2,/^---$/p' "$skill_md" | sed '$d')
 
-# ${agent_title} Skill
-
-${purpose}
-
-## When This Skill Activates
-
-This skill is auto-discovered when your task involves:
-${when_to_use}
-
-## Instructions
-
-SKILLEOF
-
-    # Extract prompt template content (between ``` markers)
-    # Portable: extract section, then use sed to get content between first ``` and last ```
-    prompt_content=$(sed -n '/^## Prompt Template/,/^## /p' "$subagent_file" | \
-        sed -n '/^```/,/^```/p' | sed '1d;$d' 2>/dev/null || echo "")
-    if [[ -n "$prompt_content" ]]; then
-        echo "$prompt_content" >> "$skill_dir/SKILL.md"
+    # V1: name field present and matches folder
+    local name_field
+    name_field=$(echo "$frontmatter" | grep "^name:" | sed 's/^name: *//' | tr -d '"' | tr -d "'" || true)
+    if [[ -z "$name_field" ]]; then
+        echo -e "  ${RED}✗${NC} $skill_name: missing 'name' field"
+        local_errors=$((local_errors + 1))
+    elif [[ "$name_field" != "$skill_name" ]]; then
+        echo -e "  ${RED}✗${NC} $skill_name: name '$name_field' doesn't match folder '$skill_name'"
+        local_errors=$((local_errors + 1))
     fi
 
-    # Add expected deliverables if prompt doesn't include output format
-    deliverables=$(sed -n '/^## Expected Deliverables/,/^## /p' "$subagent_file" | grep "^- " || true)
-    if [[ -n "$deliverables" ]] && ! echo "$prompt_content" | grep -qi "output format"; then
-        cat >> "$skill_dir/SKILL.md" << SKILLEOF
-
-## Expected Output
-
-SKILLEOF
-        echo "$deliverables" >> "$skill_dir/SKILL.md"
+    # V2: name doesn't contain "claude" or "anthropic"
+    if echo "$name_field" | grep -qi "claude\|anthropic"; then
+        echo -e "  ${RED}✗${NC} $skill_name: name contains 'claude' or 'anthropic'"
+        local_errors=$((local_errors + 1))
     fi
 
-    cat >> "$skill_dir/SKILL.md" << SKILLEOF
+    # V3: description <1024 characters
+    local desc_len
+    desc_len=$(echo "$frontmatter" | sed -n '/^description:/,/^[a-z]/p' | sed '$d' | wc -c | tr -d ' ')
+    if [[ "$desc_len" -gt 1024 ]]; then
+        echo -e "  ${RED}✗${NC} $skill_name: description too long (${desc_len} > 1024 chars)"
+        local_errors=$((local_errors + 1))
+    fi
 
----
-*Generated from: .agentic/agents/claude/subagents/${filename}*
-*To modify, edit the source file and run: bash .agentic/tools/generate-skills.sh*
-SKILLEOF
+    # V4: No model field
+    if echo "$frontmatter" | grep -q "^model:"; then
+        echo -e "  ${RED}✗${NC} $skill_name: non-standard 'model' field present (remove it)"
+        local_errors=$((local_errors + 1))
+    fi
 
-    echo -e "  ${GREEN}✓${NC} $agent_name → .claude/skills/$agent_name/SKILL.md"
-    ((GENERATED++))
+    # V5: No XML tags in frontmatter
+    if echo "$frontmatter" | grep -qE '<[a-zA-Z]'; then
+        echo -e "  ${RED}✗${NC} $skill_name: XML tags found in frontmatter"
+        local_errors=$((local_errors + 1))
+    fi
+
+    # V6: No README.md in skill folder
+    if [[ -f "$skill_dir/README.md" ]]; then
+        echo -e "  ${RED}✗${NC} $skill_name: README.md not allowed in skill folder"
+        local_errors=$((local_errors + 1))
+    fi
+
+    # V7: Body <5000 words
+    local body
+    body=$(sed -n '/^---$/,$ p' "$skill_md" | tail -n +2)  # After second ---
+    local word_count
+    word_count=$(echo "$body" | wc -w | tr -d ' ')
+    if [[ "$word_count" -gt 5000 ]]; then
+        echo -e "  ${RED}✗${NC} $skill_name: body too long (${word_count} > 5000 words)"
+        local_errors=$((local_errors + 1))
+    fi
+
+    # V8: No {PLACEHOLDER} syntax (allow ${VERSION} — replaced during generation)
+    local placeholders
+    placeholders=$(grep -oE '\{[A-Z_]+\}' "$skill_md" 2>/dev/null | grep -v 'VERSION' | sort -u || true)
+    if [[ -n "$placeholders" ]]; then
+        echo -e "  ${RED}✗${NC} $skill_name: unresolved placeholders: $placeholders"
+        local_errors=$((local_errors + 1))
+    fi
+
+    # V9: compatibility field present
+    if ! echo "$frontmatter" | grep -q "^compatibility:"; then
+        echo -e "  ${RED}✗${NC} $skill_name: missing 'compatibility' field"
+        local_errors=$((local_errors + 1))
+    fi
+
+    # V10: metadata with author and version
+    if ! echo "$frontmatter" | grep -q "author:"; then
+        echo -e "  ${RED}✗${NC} $skill_name: missing metadata.author"
+        local_errors=$((local_errors + 1))
+    fi
+    if ! echo "$frontmatter" | grep -q "version:"; then
+        echo -e "  ${RED}✗${NC} $skill_name: missing metadata.version"
+        local_errors=$((local_errors + 1))
+    fi
+
+    # V11: scripts are executable (check source)
+    if [[ -d "$skill_dir/scripts" ]]; then
+        for script in "$skill_dir/scripts"/*.sh; do
+            [[ -f "$script" ]] || continue
+            if [[ ! -x "$script" ]]; then
+                echo -e "  ${YELLOW}⚠${NC} $skill_name: $(basename "$script") not executable"
+                WARNINGS=$((WARNINGS + 1))
+            fi
+        done
+    fi
+
+    if [[ $local_errors -eq 0 ]]; then
+        echo -e "  ${GREEN}✓${NC} $skill_name: valid"
+    else
+        ERRORS=$((ERRORS + local_errors))
+    fi
+}
+
+# ── Validate-only mode ─────────────────────────────────────
+if $VALIDATE_ONLY; then
+    echo -e "${BLUE}Validating skill sources...${NC}"
+    for skill_src_dir in "$SKILLS_SRC"/*/; do
+        [[ -d "$skill_src_dir" ]] || continue
+        validate_skill "$skill_src_dir"
+    done
+    echo ""
+    if [[ $ERRORS -gt 0 ]]; then
+        echo -e "${RED}Validation failed: $ERRORS error(s), $WARNINGS warning(s)${NC}"
+        exit 1
+    else
+        echo -e "${GREEN}All skills valid ($WARNINGS warning(s))${NC}"
+        exit 0
+    fi
+fi
+
+# ── Generate skills ────────────────────────────────────────
+echo -e "${BLUE}Generating Claude Skills from hand-crafted sources...${NC}"
+echo -e "  Source: .agentic/agents/claude/skills/"
+echo -e "  Output: .claude/skills/"
+echo -e "  Version: $VERSION"
+echo ""
+
+mkdir -p "$SKILLS_OUT"
+
+GENERATED=0
+
+for skill_src_dir in "$SKILLS_SRC"/*/; do
+    [[ -d "$skill_src_dir" ]] || continue
+    skill_name=$(basename "$skill_src_dir")
+
+    # Validate source first
+    validate_skill "$skill_src_dir"
+
+    dest_dir="$SKILLS_OUT/$skill_name"
+    mkdir -p "$dest_dir"
+
+    # 1. Copy SKILL.md with version injection
+    sed "s/\${VERSION}/$VERSION/g" "$skill_src_dir/SKILL.md" > "$dest_dir/SKILL.md"
+
+    # 2. Copy scripts/ and make executable
+    if [[ -d "$skill_src_dir/scripts" ]]; then
+        mkdir -p "$dest_dir/scripts"
+        for script in "$skill_src_dir/scripts"/*; do
+            [[ -f "$script" ]] || continue
+            cp "$script" "$dest_dir/scripts/"
+            chmod +x "$dest_dir/scripts/$(basename "$script")"
+        done
+    fi
+
+    # 3. Copy references from mapping table
+    ref_sources=$(get_refs "$skill_name")
+    if [[ -n "$ref_sources" ]]; then
+        mkdir -p "$dest_dir/references"
+        for ref_source in $ref_sources; do
+            local_path="$AGENTIC_DIR/$ref_source"
+            if [[ -f "$local_path" ]]; then
+                cp "$local_path" "$dest_dir/references/$(basename "$ref_source")"
+            else
+                echo -e "  ${YELLOW}⚠${NC} Reference not found: $ref_source"
+                WARNINGS=$((WARNINGS + 1))
+            fi
+        done
+    fi
+
+    echo -e "  ${GREEN}✓${NC} $skill_name → .claude/skills/$skill_name/"
+    GENERATED=$((GENERATED + 1))
 done
 
 echo ""
-echo -e "${GREEN}Generated $GENERATED skills in .claude/skills/${NC}"
+if [[ $ERRORS -gt 0 ]]; then
+    echo -e "${RED}Generated $GENERATED skills with $ERRORS error(s) and $WARNINGS warning(s)${NC}"
+    echo "Fix validation errors in source files before deploying."
+    exit 1
+else
+    echo -e "${GREEN}Generated $GENERATED skills ($WARNINGS warning(s))${NC}"
+fi
+
 echo ""
 echo "Skills are auto-discovered by Claude Code based on task description."
-echo "Source of truth: .agentic/agents/claude/subagents/*.md"
+echo "Source of truth: .agentic/agents/claude/skills/"
 echo ""
-echo "To regenerate after changes: bash .agentic/tools/generate-skills.sh"
+echo "To regenerate: bash .agentic/tools/generate-skills.sh"
+echo "To validate only: bash .agentic/tools/generate-skills.sh --validate"
