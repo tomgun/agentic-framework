@@ -1072,17 +1072,19 @@ bash .agentic/tools/suggest-agents.sh
 #### `generate-skills.sh` - Claude Skills Generator
 
 **What it does:**
-- Generates Claude Skills from subagent definitions
-- Creates skill files for Claude Code integration
+- Copies hand-crafted Claude Skills from `.agentic/agents/claude/skills/` to `.claude/skills/`
+- Injects VERSION into skill metadata, assembles references from playbook files
+- Validates Anthropic spec compliance (name, description length, no XML, word count)
 
 ```bash
 bash .agentic/tools/generate-skills.sh           # Generate all skills
-bash .agentic/tools/generate-skills.sh planning  # Generate specific skill
+bash .agentic/tools/generate-skills.sh --validate # Validate sources only
+bash .agentic/tools/generate-skills.sh --clean    # Remove + regenerate
 ```
 
 **When to run:**
-- After modifying subagent definitions
-- Setting up Claude Code integration
+- After modifying skill sources in `.agentic/agents/claude/skills/`
+- After VERSION bump (updates metadata in generated skills)
 
 #### `list-tools.sh` - Tool Discovery Menu
 

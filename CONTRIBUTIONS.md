@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.32.3)
-**Date**: 2026-02-25
+**Period**: Initial Development (v0.1.0 → v0.34.0)
+**Date**: 2026-02-28
 
 ---
 
@@ -936,7 +936,7 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 > "What's best in the long run for the framework to work as intended?"
 
 **Result - Generate Skills from Subagents**:
-- `generate-skills.sh` creates `.claude/skills/` from `.agentic/agents/claude/subagents/`
+- `generate-skills.sh` creates `.claude/skills/` from `.agentic/agents/claude/skills/` (hand-crafted sources)
 - Skills are auto-discovered by Claude Code based on task description
 - Single source of truth maintained (subagent markdown files)
 - 10 skills generated: research, review, test, implementation, explore, etc.
@@ -2378,10 +2378,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: `state-files.conf` as single source of truth (14 state files with destination, template, profile). upgrade.sh gains 3 new steps: instruction file regeneration (setup-agent.sh all), config-driven state file creation, sync --check for post-upgrade drift detection. Memory-seed re-read added to upgrade marker TODO. AGENTS.md extracted from scaffold.sh inline block to template. Pre-existing `local`-at-script-level bug fixed in upgrade.sh settings migration.
 
+### Skills-Primary Architecture (F-0143, v0.34.0)
+
+**User insight**: Auto-generated skills from subagent definitions were low-quality stubs — generic descriptions, no workflow instructions, no validation gates. Claude Code couldn't effectively match tasks to skills because descriptions were just subagent summaries. The framework needed hand-crafted skills that deliver real workflow value, not auto-generated wrappers.
+
+**User direction**: Replace auto-generation with hand-crafted skills that bundle instructions + scripts + references. Each skill should be a complete workflow delivery unit. Add YAML frontmatter to all playbook files for progressive disclosure — agents should scan ~50-token summaries instead of loading ~2500-token full files. Validate against Anthropic's skill spec (name, description length, no XML). CLAUDE.md should thin further by moving triggers to skills.
+
+**Result**: 12 hand-crafted Claude Skills replace 10 auto-generated stubs. `generate-skills.sh` rewritten to copy from `.agentic/agents/claude/skills/`, inject VERSION, assemble references. 79 playbook/subagent files gained YAML frontmatter. `validate_skills.sh` enforces Anthropic spec compliance. Template CLAUDE.md thinned from ~79 to ~40 lines. ~50x discovery savings via frontmatter progressive disclosure.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.33.0
+**Current Version**: v0.34.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions

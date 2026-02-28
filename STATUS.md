@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0143: Skills-primary architecture complete — 12 skills, 79 files with YAML frontmatter, all validations pass. Ready for PR. (Updated: 2026-02-28 21:37 EET)
+- Post-F-0143 doc sync — PR pending (Updated: 2026-02-28 23:47 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

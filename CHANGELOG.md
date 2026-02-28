@@ -5,6 +5,31 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.34.0] - 2026-02-28
+
+### Added
+- **Skills-Primary Architecture (F-0143)** — 12 hand-crafted Claude Skills replace 10 auto-generated stubs. Skills are now the primary workflow delivery mechanism for Claude Code, with SKILL.md instructions, scripts/ gates, and references/ playbook copies.
+- **YAML frontmatter on 79 files** — All playbook, checklist, workflow, guideline, quality, and subagent files now have machine-parseable frontmatter (summary, trigger, tokens). Enables ~50x discovery savings (scan ~50-token summaries vs load ~2500-token full files).
+- **`validate_skills.sh`** — Validates Anthropic spec compliance (name length, description, no XML, word count) for all 12 skills.
+- **`generate-skills.sh` rewrite** — Copies hand-crafted skill sources from `.agentic/agents/claude/skills/`, injects VERSION, assembles references. Replaces old auto-generation from subagent definitions.
+
+### Changed
+- **CLAUDE.md thinned** — Template reduced from ~79 to ~40 lines; trigger table moved to Skills for Claude Code. Other tools retain trigger tables in their instruction files.
+- **Skills source directory** — Moved from auto-generated (from `.agentic/agents/claude/subagents/`) to hand-crafted sources in `.agentic/agents/claude/skills/`.
+
+## [0.33.0] - 2026-02-24
+
+### Added
+- **Explicit Settings in STACK.md (F-0141)** — Settings section with typed key-value pairs, `ag set` command for validated changes.
+- **Self-Healing Hooks + Plan Auto-Save (F-0142)** — Plan-mode-exit auto-saves to `.agentic-journal/plans/`, test co-presence check for acceptance criteria.
+- **DRY State-File Config** — `upgrade.sh` instruction regeneration + state file creation from STACK.md settings.
+
+### Fixed
+- **upgrade.sh BSD sed settings bug** — Legacy migrations for BSD compatibility.
+- **Concatenated settings** — Template-format Settings section repair.
+- **TODO audit cleanup** — blocker.sh, HUMAN_NEEDED, stale prompts.
+- **Doc enforcement gaps** — Retired stale.sh, added staleness check to sync.sh.
+
 ## [0.31.0] - 2026-02-20
 
 ### Added

@@ -1490,17 +1490,17 @@
 
 ## F-0098: Generate Claude Skills from Subagents
 
-**Status**: in_progress
+**Status**: shipped
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.11.5
 
-**Description**: Generate Claude Code Skills (`.claude/skills/`) from subagent definitions, enabling auto-discovery while maintaining single source of truth. Skills are regenerated during install/upgrade.
+**Description**: Generate Claude Code Skills (`.claude/skills/`) from subagent definitions, enabling auto-discovery while maintaining single source of truth. Skills are regenerated during install/upgrade. Superseded by F-0143 hand-crafted skills approach.
 
 **Dependencies**: None
 
 **Implementation**:
-- State: partial
+- State: complete
 - Code: `.agentic/tools/generate-skills.sh`
 - Tests: manual validation
 
