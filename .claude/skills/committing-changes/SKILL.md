@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with shell access and git."
 allowed-tools: [Bash, Read, Edit, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.33.3"
+  version: "0.34.0"
 ---
 
 # Committing Changes

@@ -986,3 +986,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-28 23:47 - Post-F-0143 Doc Sync
+
+**Why**: Stale docs still referenced old auto-generated skills approach after F-0143 shipped
+
+**Accomplished**:
+- Updated 12 files: INSTRUCTION_ARCHITECTURE Skills layer, CHANGELOG v0.33-v0.34, DEVELOPER_GUIDE generate-skills docs, CONTRIBUTIONS F-0143 section, FEATURES F-0098 shipped, HOW_IT_WORKS fixes, memory-seed/STACK version bumps, install.sh skills condition, ROI/VALUE_PROP frontmatter benefits, skills regenerated
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+
