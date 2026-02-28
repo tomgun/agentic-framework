@@ -336,14 +336,13 @@ phase_state_freshness() {
     fi
 
     # --- Advisory doc staleness (ported from stale.sh) ---
-    # Checks spec docs that are not covered above. Advisory only, 15-commit threshold.
+    # Checks spec docs not covered above. Advisory only, 15-commit threshold.
+    # Note: counts all commits (including state-file updates), not just code commits.
     local advisory_docs=("spec/FEATURES.md" "spec/TECH_SPEC.md" "spec/NFR.md")
-    local advisory_labels=("FEATURES" "TECH_SPEC" "NFR")
     local advisory_stale=0
 
     for i in "${!advisory_docs[@]}"; do
         local adoc="$ROOT_DIR/${advisory_docs[$i]}"
-        local alabel="${advisory_labels[$i]}"
         if [ -f "$adoc" ]; then
             local adoc_commits=0
             local adoc_date
