@@ -26,6 +26,15 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0010: Implement multi-agent helper scripts (F-0108) — agents_active.sh, check_agent_conflicts.sh, sync_worktrees.sh referenced as TODO in multi_agent_coordination.md and doc-check.sh allowlist
 - **Added**: 2026-02-24
 
+### T-0012: Update FEATURES.md status: F-0136, F-0139, F-0140, F-0141 are shipped (PRs merged) but still marked in_progress
+- **Added**: 2026-02-28
+
+### T-0013: Close or formally assess F-0103 (Agent Mode Selection) — in_progress since v0.12.2, functionally complete. Either ship or document what's missing
+- **Added**: 2026-02-28
+
+### T-0014: Verify shipped acceptance criteria for F-0131, F-0132, F-0133, F-0134, F-0135 — check boxes that are actually done, identify genuinely incomplete items
+- **Added**: 2026-02-28
+
 ## Done
 
 <!-- Resolved/triaged items move here with outcome -->
