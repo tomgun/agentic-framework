@@ -28,7 +28,7 @@ When running a retrospective, the agent should:
 ```bash
 bash .agentic/tools/verify.sh      # Comprehensive checks
 bash .agentic/tools/drift.sh      # Spec/code drift
-bash .agentic/tools/stale.sh       # Stale documentation
+bash .agentic/tools/sync.sh --check # Staleness + drift detection
 bash .agentic/tools/version_check.sh # Version mismatches
 ```
 
@@ -199,7 +199,7 @@ bash .agentic/tools/drift.sh --check  # Spec/code drift
 ### Automated Tools
 - verify.sh: [PASS/FAIL - summary]
 - drift.sh: [X issues found]
-- stale.sh: [X stale docs]
+- sync.sh: [X issues found]
 
 ### Key Metrics
 - Features shipped: [N]

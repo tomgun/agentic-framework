@@ -736,15 +736,12 @@ bash .agentic/tools/worktree.sh remove F-0001
 bash .agentic/tools/deps.sh
 ```
 
-#### `stale.sh` - Staleness Detector
+#### `stale.sh` - Staleness Detector (DEPRECATED)
 
-**What it shows:**
-- Files not updated in >N days
-- Potentially outdated documentation
-- Old research that might need refreshing
+> **Deprecated**: Use `bash .agentic/tools/sync.sh` instead. Staleness checks are now in sync.sh Phase 2.
 
 ```bash
-bash .agentic/tools/stale.sh --days 90
+bash .agentic/tools/sync.sh --check  # Includes staleness + all other checks
 ```
 
 #### `query_features.py` - Feature Query & Search (NEW - v0.3.0)
@@ -1603,8 +1600,8 @@ tail -50 JOURNAL.md
 # Run verification
 bash .agentic/tools/doctor.sh --full
 
-# Check staleness
-bash .agentic/tools/stale.sh --days 90
+# Check staleness (includes all doc checks)
+bash .agentic/tools/sync.sh --check
 
 # Agent should update docs in same commit as code
 # Check agent_operating_guidelines.md "Documentation Sync Rule"
@@ -2050,7 +2047,7 @@ Evening:  "Let's wrap up and commit" → agent verifies + commits with approval
 | Check test coverage | `bash .agentic/tools/coverage.sh` |
 | Visualize dependencies | `bash .agentic/tools/feature_graph.sh` |
 | Check health | `bash .agentic/tools/doctor.sh` |
-| Check staleness | `bash .agentic/tools/stale.sh --days 90` |
+| Check staleness | `bash .agentic/tools/sync.sh --check` |
 | Mark feature accepted | `bash .agentic/tools/accept.sh F-####` |
 | Check retro due | `bash .agentic/tools/retro_check.sh` |
 
