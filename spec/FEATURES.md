@@ -2178,7 +2178,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0143: Skills-Primary Architecture for Claude Code
 
-**Status**: in_progress
+**Status**: shipped
 **Priority**: high
 **Complexity**: high
 **Added**: 2026-02-28
