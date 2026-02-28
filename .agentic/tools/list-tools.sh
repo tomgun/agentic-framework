@@ -56,7 +56,7 @@ ${BOLD}PROJECT SETUP${NC}
 ${BOLD}CODE QUALITY${NC}
   coverage.sh         Check code annotation coverage
   deps.sh             Dependency analysis
-  stale.sh            Find stale documentation
+  stale.sh            Find stale documentation (deprecated, use sync.sh)
   sync_docs.sh        Sync documentation scaffolding
   drift.sh            Check for spec/code drift
 

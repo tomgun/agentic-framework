@@ -947,3 +947,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-02-28 15:04 - Doc Architecture Review
+
+**Why**: Closing enforcement gaps identified in document architecture effectiveness review
+
+**Accomplished**:
+- Implemented R1 (OVERVIEW+CONTEXT_PACK staleness in sync.sh), R3 (auto-register docs in scaffold), R9 (retired stale.sh into sync.sh), R10 (fixed broken test/review agent refs). Dropped R2 (already implemented), R5 (wrong approach), R6 (already done). Deferred R4, R7, R8.
+
+**Next steps**:
+- Commit changes, bump version
+
+**Blockers**: None
+

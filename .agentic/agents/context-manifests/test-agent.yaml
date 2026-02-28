@@ -8,7 +8,7 @@ description: Write failing tests for acceptance criteria (TDD red phase)
 required:
   - spec/acceptance/{feature_id}.md       # What to test
   - STACK.md[test_framework,test_commands]  # How to test
-  - .agentic/quality/testing_standards.md   # Testing guidelines
+  - .agentic/quality/test_strategy.md       # Testing guidelines
   - .agentic/agents/shared/guidelines/anti-hallucination.md
 
 optional:

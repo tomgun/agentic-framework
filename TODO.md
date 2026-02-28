@@ -35,6 +35,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0014: Verify shipped acceptance criteria for F-0131, F-0132, F-0133, F-0134, F-0135 — check boxes that are actually done, identify genuinely incomplete items
 - **Added**: 2026-02-28
 
+### T-0015: F-XXXX: Structural enforcement for durable plan saving. ag implement should check that a plan exists in .agentic-journal/plans/ and warn/block if missing. Needs a setting (e.g. plan_persistence: off|warning|blocking) since not every project wants saved plans. The plan-review loop (ag plan with plan_review_enabled) especially needs this — reviewed plans are high-value artifacts that should never be lost to session-scoped .claude/plans/. Implementation: add check in ag implement, add setting to profiles.conf (discovery: off, formal: warning), add to STACK.template.md ## Settings. See 2026-02-28-document-architecture-effectiveness-review.md for context.
+- **Added**: 2026-02-28
+
 ## Done
 
 <!-- Resolved/triaged items move here with outcome -->
