@@ -12,7 +12,7 @@ required:
   # Changed files passed dynamically from pipeline
 
 optional:
-  - .agentic/quality/testing_standards.md     # Test quality review
+  - .agentic/quality/test_strategy.md         # Test quality review
   - .agentic/checklists/before_commit.md      # Pre-commit checklist
 
 exclude:

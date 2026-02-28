@@ -1,62 +1,12 @@
 #!/usr/bin/env bash
-# Staleness detector - finds documentation files not updated recently
-set -euo pipefail
+# DEPRECATED: Use `bash .agentic/tools/sync.sh` instead.
+# Staleness checks are now consolidated in sync.sh Phase 2.
+# This wrapper will be removed in a future version.
 
-DAYS="${1:-30}"
-
-echo "=== Staleness Check (files not updated in $DAYS days) ==="
+echo "⚠ stale.sh is deprecated — use 'ag sync' or 'bash .agentic/tools/sync.sh' instead."
+echo "  Staleness checks are now part of sync.sh Phase 2."
+echo "  The --days parameter is no longer supported; sync.sh uses a 15-commit threshold."
 echo ""
 
-if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  echo "Not a git repository. Cannot check staleness."
-  exit 1
-fi
-
-# Key documentation files to check
-# Note: JOURNAL.md location is resolved below
-FILES=(
-  "CONTEXT_PACK.md"
-  "STATUS.md"
-  "spec/FEATURES.md"
-  "spec/TECH_SPEC.md"
-  "spec/NFR.md"
-  "spec/OVERVIEW.md"
-)
-
-# Resolve JOURNAL.md path
-if [[ -f ".agentic-journal/JOURNAL.md" ]]; then
-  FILES+=(".agentic-journal/JOURNAL.md")
-elif [[ -f "JOURNAL.md" ]]; then
-  FILES+=("JOURNAL.md")
-fi
-
-stale_count=0
-
-for file in "${FILES[@]}"; do
-  if [[ ! -f "$file" ]]; then
-    continue
-  fi
-  
-  # Get last modification date
-  last_modified=$(git log -1 --format="%ar" -- "$file" 2>/dev/null || echo "never")
-  last_commit_days=$(git log -1 --format="%cr" -- "$file" 2>/dev/null | grep -oE '[0-9]+' | head -1 || echo "999")
-  
-  if [[ "$last_commit_days" -gt "$DAYS" ]]; then
-    echo "⚠ $file - last updated $last_modified"
-    stale_count=$((stale_count + 1))
-  fi
-done
-
-echo ""
-
-if [[ $stale_count -eq 0 ]]; then
-  echo "✓ All key documentation files updated recently"
-else
-  echo "Found $stale_count stale file(s)"
-  echo ""
-  echo "Stale documentation may indicate:"
-  echo "  - No recent development activity (OK if intentional)"
-  echo "  - Agents not updating docs (check Documentation Sync Rule)"
-  echo "  - Files need manual review and update"
-fi
-
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec bash "$SCRIPT_DIR/sync.sh" --check

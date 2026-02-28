@@ -247,11 +247,12 @@ phase_state_freshness() {
         fi
     fi
 
-    # --- CONTEXT_PACK.md placeholder detection ---
+    # --- CONTEXT_PACK.md placeholder detection + staleness ---
     local ctx_pack="$ROOT_DIR/CONTEXT_PACK.md"
     if [ -f "$ctx_pack" ]; then
         local placeholder_count
-        placeholder_count=$(grep -cE '<!-- (1|fill|bullets|e\.g\.|path )' "$ctx_pack" 2>/dev/null || echo "0")
+        placeholder_count=$(grep -cE '<!-- (1|fill|bullets|e\.g\.|path )' "$ctx_pack" 2>/dev/null || true)
+        placeholder_count="${placeholder_count:-0}"
 
         if [ "$placeholder_count" -ge 3 ]; then
             record_issue "CONTEXT_PACK.md has template placeholders"
@@ -260,15 +261,118 @@ phase_state_freshness() {
                 echo -e "            Fix: Replace <!-- fill ... --> placeholders with real project content"
             fi
         else
-            record_ok
-            if [ "$MODE" != "quiet" ]; then
-                echo -e "CONTEXT_PACK: ${GREEN}OK${NC}"
+            # Check commit-age staleness (advisory, every 15 commits)
+            local ctx_commits_since=0
+            local ctx_last_date
+            ctx_last_date=$(git log -1 --format="%ci" -- "$ctx_pack" 2>/dev/null | cut -d' ' -f1 || echo "")
+            if [ -n "$ctx_last_date" ]; then
+                ctx_commits_since=$(git log --oneline --since="$ctx_last_date" 2>/dev/null | wc -l | tr -d ' ')
+            fi
+            if [ "$ctx_commits_since" -ge 15 ]; then
+                record_issue "CONTEXT_PACK.md stale"
+                if [ "$MODE" != "quiet" ]; then
+                    echo -e "CONTEXT_PACK: ${YELLOW}STALE ($ctx_commits_since commits since last update)${NC}"
+                    echo -e "            Review and update if architecture has changed"
+                fi
+            else
+                record_ok
+                if [ "$MODE" != "quiet" ]; then
+                    echo -e "CONTEXT_PACK: ${GREEN}OK${NC}"
+                fi
             fi
         fi
     else
         record_ok
         if [ "$MODE" != "quiet" ]; then
             echo -e "CONTEXT_PACK: ${DIM}skipped (no CONTEXT_PACK.md)${NC}"
+        fi
+    fi
+
+    # --- OVERVIEW.md placeholder + staleness detection ---
+    local overview_file=""
+    if [ -f "$ROOT_DIR/spec/OVERVIEW.md" ]; then
+        overview_file="$ROOT_DIR/spec/OVERVIEW.md"
+    elif [ -f "$ROOT_DIR/OVERVIEW.md" ]; then
+        overview_file="$ROOT_DIR/OVERVIEW.md"
+    fi
+
+    if [ -n "$overview_file" ]; then
+        local overview_placeholders
+        overview_placeholders=$(grep -cE '<!-- (fill|1-2|e\.g\.)' "$overview_file" 2>/dev/null || true)
+        overview_placeholders="${overview_placeholders:-0}"
+
+        if [ "$overview_placeholders" -ge 3 ]; then
+            record_issue "OVERVIEW.md has template placeholders"
+            if [ "$MODE" != "quiet" ]; then
+                echo -e "OVERVIEW:   ${YELLOW}STALE ($overview_placeholders template placeholders — never filled in)${NC}"
+                echo -e "            Fix: Replace placeholders with real project vision and goals"
+            fi
+        else
+            # Check commit-age staleness (advisory, every 15 commits)
+            local ov_commits_since=0
+            local ov_last_date
+            ov_last_date=$(git log -1 --format="%ci" -- "$overview_file" 2>/dev/null | cut -d' ' -f1 || echo "")
+            if [ -n "$ov_last_date" ]; then
+                ov_commits_since=$(git log --oneline --since="$ov_last_date" 2>/dev/null | wc -l | tr -d ' ')
+            fi
+            if [ "$ov_commits_since" -ge 15 ]; then
+                record_issue "OVERVIEW.md stale"
+                if [ "$MODE" != "quiet" ]; then
+                    echo -e "OVERVIEW:   ${YELLOW}STALE ($ov_commits_since commits since last update)${NC}"
+                    echo -e "            Review and update if project vision has evolved"
+                fi
+            else
+                record_ok
+                if [ "$MODE" != "quiet" ]; then
+                    echo -e "OVERVIEW:   ${GREEN}OK${NC}"
+                fi
+            fi
+        fi
+    else
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "OVERVIEW:   ${DIM}skipped (no OVERVIEW.md)${NC}"
+        fi
+    fi
+
+    # --- Advisory doc staleness (ported from stale.sh) ---
+    # Checks spec docs not covered above. Advisory only, 15-commit threshold.
+    # Note: counts all commits (including state-file updates), not just code commits.
+    local advisory_docs=("spec/FEATURES.md" "spec/TECH_SPEC.md" "spec/NFR.md")
+    local advisory_stale=0
+
+    for i in "${!advisory_docs[@]}"; do
+        local adoc="$ROOT_DIR/${advisory_docs[$i]}"
+        if [ -f "$adoc" ]; then
+            local adoc_commits=0
+            local adoc_date
+            adoc_date=$(git log -1 --format="%ci" -- "$adoc" 2>/dev/null | cut -d' ' -f1 || echo "")
+            if [ -n "$adoc_date" ]; then
+                adoc_commits=$(git log --oneline --since="$adoc_date" 2>/dev/null | wc -l | tr -d ' ')
+            fi
+            if [ "$adoc_commits" -ge 15 ]; then
+                ((advisory_stale++))
+                if [ "$MODE" != "quiet" ]; then
+                    if [ "$advisory_stale" -eq 1 ]; then
+                        echo -e "Spec docs:  ${YELLOW}some stale${NC}"
+                    fi
+                    echo -e "            ${advisory_docs[$i]}: $adoc_commits commits since last update"
+                fi
+            fi
+        fi
+    done
+
+    if [ "$advisory_stale" -gt 0 ]; then
+        record_issue "$advisory_stale spec doc(s) stale"
+    elif [ "$MODE" != "quiet" ]; then
+        # Only show OK if any spec docs exist
+        local any_spec_doc=false
+        for adoc_path in "${advisory_docs[@]}"; do
+            [ -f "$ROOT_DIR/$adoc_path" ] && any_spec_doc=true && break
+        done
+        if [ "$any_spec_doc" = true ]; then
+            record_ok
+            echo -e "Spec docs:  ${GREEN}OK${NC}"
         fi
     fi
 }

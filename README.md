@@ -388,7 +388,7 @@ bash .agentic/tools/feature_graph.sh   # Dependency visualization
 bash .agentic/tools/whatchanged.sh # Recent changes
 bash .agentic/tools/deps.sh        # Feature dependencies
 bash .agentic/tools/accept.sh      # Run acceptance tests
-bash .agentic/tools/stale.sh       # Find stale docs
+bash .agentic/tools/sync.sh --check # Check doc staleness + drift
 bash .agentic/tools/task.sh        # Create task files
 
 # Advanced quality (optional)

@@ -257,7 +257,7 @@ bash .agentic/tools/sync_docs.sh
 30+ scripts in `.agentic/tools/`. Key categories:
 - **Health**: `doctor.sh`, `report.sh`, `verify.sh`
 - **Traceability**: `ag trace`, `coverage.sh`, `drift.sh`
-- **Analysis**: `feature_graph.sh`, `stale.sh`, `deps.sh`
+- **Analysis**: `feature_graph.sh`, `sync.sh`, `deps.sh`
 
 Run `ag tools` or see [`DEVELOPER_GUIDE.md#automation--scripts`](DEVELOPER_GUIDE.md#automation--scripts) for full documentation.
 

@@ -601,7 +601,7 @@ These will always rely on behavioral reinforcement:
 `context-for-role.sh`, `worktree.sh`, `setup-agent.sh`, `suggest-agents.sh`, `create-agent.sh`, `project-health.sh`
 
 ### Sync & Maintenance
-`sync.sh`, `sync_docs.py`/`sync_docs.sh`, `stale.sh`, `memory-check.sh`, `manifest.sh`, `migration.sh`, `upgrade.sh`, `framework_age.sh`
+`sync.sh`, `sync_docs.py`/`sync_docs.sh`, `memory-check.sh`, `manifest.sh`, `migration.sh`, `upgrade.sh`, `framework_age.sh`
 
 ### Testing
 `tests/llm/harness.sh`, `mutation_test.sh`, `llm-test-status.sh`

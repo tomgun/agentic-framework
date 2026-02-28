@@ -213,8 +213,8 @@ Purpose: a single source of truth for "how we build and run software here".
      Note: pr-trigger docs only fire in formal profile (formal uses PRs).
      To fire on multiple triggers, add two entries with the same path.
      Types (built-in): changelog | readme | adr | lessons | architecture | runbook | tech-spec | custom -->
-<!-- - doc: CHANGELOG.md          | changelog    | pr           -->
-<!-- - doc: README.md             | readme       | pr           -->
+- doc: CHANGELOG.md          | changelog    | pr
+- doc: README.md             | readme       | pr
 <!-- - doc: docs/lessons.md       | lessons      | feature_done -->
 <!-- - doc: docs/architecture.md  | architecture | feature_done -->
 <!-- - doc: docs/adr/             | adr          | manual       -->
