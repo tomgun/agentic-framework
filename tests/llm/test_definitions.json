@@ -1330,6 +1330,79 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "066_skill_activation_implement",
+      "description": "Skills-primary: 'implement feature' should activate implementing-features skill behavior",
+      "section": "skills",
+      "category": "Important",
+      "llm_test_id": "LLM-066",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "spec/FEATURES.md": "# Features\n\n## F-0010: Search Feature\n\n**Status**: planned\n**Priority**: high\n\n**Description**: Add search functionality.\n\n**Acceptance**: See `spec/acceptance/F-0010.md`",
+          "spec/acceptance/F-0010.md": "# F-0010: Search Feature\n\n## Tests\n- Search returns matching results\n- Empty search returns all items\n\n## Acceptance Criteria\n- [ ] Search input field on main page\n- [ ] Results update as user types"
+        }
+      },
+      "prompt": "Implement F-0010, the search feature",
+      "expected": {
+        "output_contains": [
+          "ag implement|acceptance|criteria|plan|WIP|spec.acceptance|F-0010"
+        ],
+        "output_contains_any": [],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "067_skill_routing_bugfix",
+      "description": "Skills-primary: 'fix a bug' should activate fixing-bugs skill (test-first behavior)",
+      "section": "skills",
+      "category": "Important",
+      "llm_test_id": "LLM-067",
+      "profile": "discovery",
+      "setup": {
+        "files": {
+          "src/calculator.js": "function divide(a, b) {\n  return a / b;\n}\n\nfunction calculateAverage(numbers) {\n  let sum = 0;\n  for (const n of numbers) {\n    sum += n;\n  }\n  return divide(sum, numbers.length);\n}\n\nmodule.exports = { divide, calculateAverage };"
+        }
+      },
+      "prompt": "There's a bug: calculateAverage crashes when given an empty array. Can you fix it?",
+      "expected": {
+        "output_contains": [
+          "test|reproduc|verify|failing|TDD|assert|expect|division.*zero|empty.*array"
+        ],
+        "output_contains_any": [],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "068_skill_commit_workflow",
+      "description": "Skills-primary: 'commit changes' should activate committing-changes skill (pre-commit workflow)",
+      "section": "skills",
+      "category": "Important",
+      "llm_test_id": "LLM-068",
+      "profile": "discovery",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "I want to commit these changes",
+      "expected": {
+        "output_contains": [
+          "journal|status|pre.commit|show.*change|review.*change|diff|ag commit|JOURNAL|STATUS"
+        ],
+        "output_contains_any": [],
+        "output_not_contains": [
+          "^git commit.*-m|^committed successfully|^done.*committed"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }
