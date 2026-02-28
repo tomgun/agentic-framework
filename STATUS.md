@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Skills regenerated with v0.34.0 — PR pending (Updated: 2026-02-28 23:47 EET)
+- Doc sync PR — ready to push (Updated: 2026-02-28 23:48 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)
