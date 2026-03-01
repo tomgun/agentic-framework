@@ -1,3 +1,8 @@
+---
+summary: "Update user-facing and developer documentation after changes"
+tokens: ~344
+---
+
 # Documentation Agent
 
 **Role**: Update user-facing and developer documentation.

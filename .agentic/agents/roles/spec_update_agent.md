@@ -1,3 +1,8 @@
+---
+summary: "Update spec documents to reflect completed work"
+tokens: ~335
+---
+
 # Spec Update Agent
 
 **Role**: Update spec documents to reflect completed work.

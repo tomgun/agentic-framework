@@ -1,3 +1,8 @@
+---
+summary: "Advise on pricing strategies, revenue models, payment flows"
+tokens: ~346
+---
+
 # Monetization Agent
 
 **Purpose**: Advise on pricing strategies, revenue models, payment flows, and conversion optimization.

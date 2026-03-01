@@ -1012,3 +1012,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-01 11:31 - F-0144 Frontmatter Coverage
+
+**Why**: Systematic frontmatter enables progressive disclosure on all agent-facing files, not just playbooks
+
+**Accomplished**:
+- Added YAML frontmatter to 71 remaining .agentic/ files (168/212 total). Created add-remaining-frontmatter.sh with --batch and --dry-run support. Updated ROI.md, FRAMEWORK_VALUE_PROPOSITION.md, INSTRUCTION_ARCHITECTURE.md counts. Added 8-check coverage validation to validate_framework.sh.
+
+**Next steps**:
+- Create PR, merge to main
+
+**Blockers**: None
+

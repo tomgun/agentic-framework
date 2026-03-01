@@ -1,3 +1,8 @@
+---
+summary: "Gather peer-reviewed papers, benchmarks, and reference implementations"
+tokens: ~352
+---
+
 # Scientific Research Agent
 
 **Purpose**: Gather peer-reviewed information, academic papers, benchmarks, and reference implementations for the project domain.
