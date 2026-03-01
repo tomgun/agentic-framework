@@ -2191,6 +2191,21 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ---
 
+## F-0144: Systematic Frontmatter Coverage
+
+**Status**: in-progress
+**Priority**: medium
+**Complexity**: low
+**Added**: 2026-03-01
+
+**Description**: Complete YAML frontmatter coverage across all `.agentic/` files that agents might scan for discovery. Extends F-0143's initial 97-file coverage to 168/212 files. Adds frontmatter to agent roles, shared docs, root docs, token efficiency guides, cursor prompts, init files, spec docs, and support docs. Excludes templates, READMEs, and instruction files. Includes validation check in `validate_framework.sh`.
+
+**Dependencies**: F-0143 (Skills-Primary Architecture)
+
+**Acceptance**: See `spec/acceptance/F-0144.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
