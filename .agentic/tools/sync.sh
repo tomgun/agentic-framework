@@ -6,7 +6,7 @@
 #   bash .agentic/tools/sync.sh --check      # Dry run: detect only, no auto-fixes
 #   bash .agentic/tools/sync.sh --quiet      # One-line summary (for ag start probe)
 #
-# Seven check phases:
+# Eight check phases:
 #   1. Memory seed integrity
 #   2. State freshness (journal, STATUS, CHANGELOG)
 #   3. Feature reconciliation (Formal only)
@@ -14,6 +14,7 @@
 #   5. Tool parity (instruction files + trigger tables)
 #   6. Git hook configuration
 #   7. Periodic checks (orphaned plans, retro, agent freshness)
+#   8. PR cleanup (auto-resolve merged/closed PRs in HUMAN_NEEDED.md)
 #
 # Exit code: always 0 (advisory tool).
 
@@ -639,6 +640,81 @@ phase_periodic() {
 }
 
 # ============================================================================
+# Phase 8: PR cleanup (auto-resolve merged/closed PRs in HUMAN_NEEDED.md)
+# ============================================================================
+phase_pr_cleanup() {
+    local hn_file="$ROOT_DIR/HUMAN_NEEDED.md"
+
+    # Early returns: no file or no gh CLI
+    if [ ! -f "$hn_file" ]; then
+        return 0
+    fi
+    if ! command -v gh >/dev/null 2>&1; then
+        return 0
+    fi
+
+    # Extract active section only
+    local active_section
+    active_section=$(awk '/^## Active items/,/^---$/' "$hn_file" 2>/dev/null || true)
+
+    if [ -z "$active_section" ]; then
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "PR cleanup: ${GREEN}OK${NC}"
+        fi
+        return 0
+    fi
+
+    local resolved_count=0
+    local checked_count=0
+
+    # Loop through active HN entries that mention PR numbers
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^###[[:space:]]+(HN-[0-9]{4}):.+PR[[:space:]]*#([0-9]+) ]]; then
+            local hn_id="${BASH_REMATCH[1]}"
+            local pr_num="${BASH_REMATCH[2]}"
+            ((checked_count++))
+
+            # Check PR state via gh CLI
+            local pr_state
+            pr_state=$(gh pr view "$pr_num" --json state -q .state 2>/dev/null || echo "")
+            pr_state=$(echo "$pr_state" | tr '[:upper:]' '[:lower:]')
+
+            if [ "$pr_state" = "merged" ] || [ "$pr_state" = "closed" ]; then
+                ((resolved_count++))
+                if [ "$MODE" = "full" ]; then
+                    bash "$SCRIPT_DIR/blocker.sh" resolve "$hn_id" "PR #$pr_num $pr_state (auto-detected by sync)" || true
+                    record_fixed
+                else
+                    record_issue "$hn_id: PR #$pr_num $pr_state"
+                fi
+            fi
+        fi
+    done <<< "$active_section"
+
+    if [ "$resolved_count" -gt 0 ]; then
+        if [ "$MODE" != "quiet" ]; then
+            if [ "$MODE" = "full" ]; then
+                echo -e "PR cleanup: ${GREEN}FIXED ($resolved_count merged/closed PR(s) resolved)${NC}"
+            else
+                echo -e "PR cleanup: ${YELLOW}$resolved_count merged/closed PR(s) still in Active${NC}"
+                echo -e "            Fix: bash .agentic/tools/sync.sh (full mode auto-resolves)"
+            fi
+        fi
+    elif [ "$checked_count" -gt 0 ]; then
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "PR cleanup: ${GREEN}OK ($checked_count open PR(s))${NC}"
+        fi
+    else
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "PR cleanup: ${GREEN}OK (no PR entries in active)${NC}"
+        fi
+    fi
+}
+
+# ============================================================================
 # Main
 # ============================================================================
 main() {
@@ -651,6 +727,7 @@ main() {
         phase_tool_parity
         phase_hooks
         phase_periodic
+        phase_pr_cleanup
 
         # Output one-line summary only if issues exist
         if [ "$ISSUE_COUNT" -gt 0 ]; then
@@ -679,6 +756,7 @@ main() {
     phase_tool_parity
     phase_hooks
     phase_periodic
+    phase_pr_cleanup
 
     # Summary
     echo ""

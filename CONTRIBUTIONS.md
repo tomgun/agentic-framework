@@ -2420,10 +2420,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **User insight**: NFRs shouldn't be dead references in acceptance criteria — they should be live invariants that propagate. Five-part model: (1) Acceptance criteria should separate "Invariants (from NFR.md)" from feature-specific criteria — these are system-imposed constraints, not author choices. (2) Test-writing should check applicable NFRs first, before feature tests. (3) When NFR.md changes, all features referencing that NFR should be flagged for review. (4) **NFR capture trigger**: when a developer or agent expresses an invariant quality ("it must always...", "never do X", performance/security constraints), recognize it as an NFR and write it to `spec/NFR.md` — invariants must not stay informal or get lost in conversation. (5) **Scale distinction**: the framework itself has 2 structural NFRs, but projects using the framework may have dozens covering performance, security, accessibility, compliance, etc. — the workflow must handle mixed types (structural, behavioral, design invariants) at scale. Captured as T-0025.
 
+### Auto-Resolve HUMAN_NEEDED PR Entries (T-0026, v0.36.1)
+
+**User insight**: When agents create PRs, they log them to HUMAN_NEEDED.md so the human sees them at session start. After merge, these entries accumulate as resolved noise. Also identified that `ag start` blocker count was inflated — counting all HN entries (including resolved) rather than scoping to the active section.
+
+**User direction**: `ag sync` should check if PR entries are still open (`gh pr view` if available) and auto-clear merged ones. Keeps HUMAN_NEEDED clean without losing the write-on-create signaling pattern. Also insisted on proper test coverage — the feature should have tests verifying the actual resolve behavior, not just structural grep checks.
+
+**Result**: sync.sh phase 8 (`phase_pr_cleanup`) detects merged/closed PRs via `gh pr view` and auto-resolves them. `ag start` blocker count scoped to active section via awk. blocker.sh `**Resolution**` → `**Outcome**` field name fixed. macOS compatibility fix (`head -n -1` → `sed '$d'`). 9 dedicated tests in `test_pr_cleanup.sh`.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.36.0
+**Current Version**: v0.36.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions

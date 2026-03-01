@@ -62,6 +62,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ## Done
 
 
+### T-0026: Auto-resolve HUMAN_NEEDED PR entries: ag sync should check if PR entries are still open (gh pr view if available, else prompt human) and auto-clear merged ones. Keeps HUMAN_NEEDED clean without losing the write-on-create signaling pattern.
+- **Resolved**: 2026-03-01 — resolved
+
 ### T-0012: Update FEATURES.md status: F-0136, F-0139, F-0140, F-0141 are shipped (PRs merged) but still marked in_progress
 - **Resolved**: 2026-03-01 — Marked F-0136, F-0139, F-0140, F-0141 as shipped
 
