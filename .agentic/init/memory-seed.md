@@ -1,11 +1,11 @@
 ---
 summary: "Action rules agents write to persistent memory at session start"
-tokens: ~1066
+tokens: ~1130
 ---
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.34.0 -->
+<!-- memory-seed v0.37.0 -->
 <!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
@@ -27,11 +27,11 @@ Never write implementation code before acceptance criteria exist. This is a stru
 
 If they say "implement entire", "full system", "complete", or describe something that would touch >10 files: **STOP — TOO BIG.** Break into 3-5 smaller tasks first.
 
-## After exiting plan mode
+## After exiting plan mode — SAVE THE PLAN IMMEDIATELY
 
-When you exit the tool's native plan mode and the plan is approved:
+When the plan is approved, your **VERY FIRST action** — before any implementation:
 
-1. Save the plan to `.agentic-journal/plans/F-XXXX-plan.md` using `ag plan --save <plan-file> F-XXXX` (tool-specific plan locations are session-scoped and will be lost)
+1. **SAVE THE PLAN NOW.** Copy from the tool's plan location to `.agentic-journal/plans/F-XXXX-plan.md` using `ag plan --save <plan-file> F-XXXX`. Tool plan locations (e.g. `~/.claude/plans/`) are session-scoped and WILL BE LOST. Do this BEFORE anything else.
 2. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
 3. Check `plan_review_enabled` in STACK.md — if `yes`, invoke `/review` on the saved plan file first
 4. Only proceed to implementation after the review completes (or if review is disabled)
@@ -53,6 +53,12 @@ If the user wants to commit, push, save, ship, or finalize changes:
 If the user says remember, todo, idea, note for later, tasklist, or mentions something to track:
 
 **STOP.** Run `ag todo "description"` to capture it in TODO.md (git-tracked, survives context compression).
+
+## When the user expresses a system invariant or quality constraint
+
+If the user says "it must always...", "never do X", "performance must stay under...", "security requirement", "accessibility", or describes a cross-cutting constraint that applies beyond a single feature:
+
+**STOP.** This is a Non-Functional Requirement. Check `spec/NFR.md` — if no matching NFR exists, assign the next NFR-XXXX ID and write it there. NFRs are invariants that must hold across all features, not just the one being discussed. Don't let them stay informal in conversation.
 
 ## When work is done
 
@@ -109,6 +115,7 @@ Do NOT put development tasks in HUMAN_NEEDED.md.
 
 - **Never auto-commit.** Human reviews every change first.
 - **Never bypass gates.** Do not use `--no-verify` or skip quality checks.
+- **Never destroy unstaged work.** Do not `git stash`, `git checkout -- .`, `git restore .`, or `git reset --hard` with uncommitted changes. These silently destroy the user's work. If you need a clean tree, commit or ask the user first.
 - **One feature at a time.** Complete current WIP before starting another.
 - **Small batches.** Max 5-10 files per commit. If bigger, break it up.
 - **Smoke test before "done".** Actually run the feature. "Tests pass" does not mean "it works."

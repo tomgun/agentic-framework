@@ -1060,3 +1060,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-01 17:56 - F-0147 Spec-Writing Workflow
+
+**Why**: Deterministic shipped-spec protection + canonical spec-writing workflow
+
+**Accomplished**:
+- Phase 1-3 implemented: shipped spec protection gates (Checks 14-16), Check 2 grep fix, spec_writing workflow/checklist, ag spec command, Claude skill rename, Gate 4 plan-review, doc sync
+
+**Next steps**:
+- Create PR for review
+
+**Blockers**: None
+

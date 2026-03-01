@@ -41,6 +41,13 @@
 
 ---
 
+## NFR Compliance
+
+<!-- List any NFRs that constrain this feature. Remove section if none apply. -->
+- [ ] NFR-XXXX: Description
+
+---
+
 ## Out of Scope
 
 <!-- Explicitly note what this feature does NOT do, to prevent scope creep. -->

@@ -69,7 +69,7 @@ if [[ "$SKILL_COUNT" -ne "$SRC_COUNT" ]]; then
 fi
 
 # Expected skills list
-EXPECTED_SKILLS="committing-changes completing-work exploring-codebase fixing-bugs implementing-features managing-specs planning-features researching-topics reviewing-code session-start updating-documentation writing-tests"
+EXPECTED_SKILLS="committing-changes completing-work exploring-codebase fixing-bugs implementing-features planning-features researching-topics reviewing-code session-start updating-documentation writing-specs writing-tests"
 
 for expected in $EXPECTED_SKILLS; do
     if [[ ! -d "$SKILLS_DIR/$expected" ]]; then

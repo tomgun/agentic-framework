@@ -73,7 +73,7 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
   - **Layer 1 — Constitution** (instruction files: CLAUDE.md, .cursorrules, etc.): Only rules that cannot be structurally enforced. Keep under 100 lines (L-0002 empirical ceiling).
   - **Layer 2 — Playbooks** (auto_orchestration.md, checklists, workflows): Loaded just-in-time by `ag` commands, not pinned in context.
   - **Layer 3 — Project State** (STACK.md, STATUS.md): Machine-readable config parsed by scripts. Git-tracked state vs gitignored session-local state.
-- **Enforcement model**: Distributed — `ag implement` (planning gates), `pre-commit-check.sh` (11 structural checks), `ag done` (completion validation). No single orchestrator process; each script enforces its phase.
+- **Enforcement model**: Distributed — `ag implement` (planning gates), `pre-commit-check.sh` (16 structural checks), `ag done` (completion validation). No single orchestrator process; each script enforces its phase.
 - **Defense-in-depth**: `memory-seed.md` seeds behavioral patterns into tool persistent memory. Memory reinforces; scripts enforce. Memory fades during long sessions (context compression); structural gates are the only reliable late-session enforcement.
 - **Multi-tool support**: Claude Code, Cursor, Windsurf, Copilot, Codex — each has different instruction file formats and memory mechanisms. Templates in `.agentic/agents/<tool>/`.
 - **Key principle**: Structural enforcement > behavioral instruction > memory reinforcement. If a rule can be checked by a script, don't rely on the agent remembering it.

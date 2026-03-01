@@ -1,9 +1,9 @@
-<!-- migration-id: 001 -->
+<!-- migration-id: 002 -->
 <!-- date: 2026-01-04 -->
 <!-- author: agent-name | human-name -->
 <!-- type: feature | refactor | bugfix | deprecation | architectural -->
 
-# Migration 001: Add real-time notifications
+# Migration 002: Add real-time notifications
 
 ## Context & Why
 
