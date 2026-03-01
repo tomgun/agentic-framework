@@ -1,3 +1,8 @@
+---
+summary: "Analyze project to recommend specialized agents for its domain"
+tokens: ~514
+---
+
 # Analyze Project for Specialized Agents
 
 **When to use**: After project setup, or when tackling new domains.

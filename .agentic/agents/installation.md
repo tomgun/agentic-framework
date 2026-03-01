@@ -1,3 +1,8 @@
+---
+summary: "Guide for installing agent tool integrations (AGENTS.md is reference-only)"
+tokens: ~530
+---
+
 # Agent Tool Installation Guide
 
 **Critical**: `AGENTS.md` is a **reference file** that is NOT auto-loaded by any AI coding tool!

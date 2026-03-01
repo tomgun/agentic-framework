@@ -1,3 +1,8 @@
+---
+summary: "Stack profile for ML/Python projects: training, evaluation, deployment"
+tokens: ~751
+---
+
 # Stack profile: Python ML project
 
 Quick guidance for initializing a machine learning project with Python and this framework.

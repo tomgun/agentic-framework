@@ -1,3 +1,8 @@
+---
+summary: "Template for project README documentation"
+tokens: ~58
+---
+
 # Docs (system documentation)
 
 Purpose: long-lived “how the software works” documentation.

@@ -1,3 +1,8 @@
+---
+summary: "Google Material Design system reference for UI components"
+tokens: ~915
+---
+
 # Material Design System
 
 **Philosophy**: Bold, graphic, intentional. Google's design language.

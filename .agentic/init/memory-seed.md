@@ -1,3 +1,8 @@
+---
+summary: "Action rules agents write to persistent memory at session start"
+tokens: ~1066
+---
+
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.34.0 -->

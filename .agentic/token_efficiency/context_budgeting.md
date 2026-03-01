@@ -1,3 +1,8 @@
+---
+summary: "Context budgeting principles: minimize token waste strategically"
+tokens: ~204
+---
+
 # Context budgeting (token efficiency)
 
 ## Principle

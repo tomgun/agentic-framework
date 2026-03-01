@@ -2386,6 +2386,22 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: 12 hand-crafted Claude Skills replace 10 auto-generated stubs. `generate-skills.sh` rewritten to copy from `.agentic/agents/claude/skills/`, inject VERSION, assemble references. 79 playbook/subagent files gained YAML frontmatter. `validate_skills.sh` enforces Anthropic spec compliance. Template CLAUDE.md thinned from ~79 to ~40 lines. ~50x discovery savings via frontmatter progressive disclosure.
 
+### Systematic Frontmatter Coverage (F-0144)
+
+**User direction**: Extend F-0143's initial 79-file frontmatter coverage to all agent-scannable files in `.agentic/`. Inconsistent coverage (workflows had it, roles/support/prompts didn't) undermined the progressive disclosure promise.
+
+**Result**: 168 of 212 `.agentic/` files now have YAML frontmatter. Three schemas (minimal, playbook, prompt). Remaining 44 are templates/READMEs/instruction files where frontmatter is inappropriate. `validate_framework.sh` enforces coverage threshold.
+
+### Frontmatter Context Impact Analysis
+
+**User question**: "Does all this frontmatter rot the context?" — prompted investigation into whether 168 files of frontmatter pollute Claude's system prompt.
+
+**Key finding**: Two completely separate frontmatter systems exist. Only `.claude/skills/` descriptions (~900 tokens) are always loaded. `.agentic/` frontmatter is inert — never auto-loaded, zero token cost until explicitly read. No context rot risk. Research documented at `docs/research/2026-03-01-frontmatter-context-impact.md`.
+
+### Memory Seed Staleness Gap
+
+**User observation**: MEMORY.md was at v0.24.0 while seed was at v0.34.0 — 10 versions stale despite `memory-check.sh` existing. Root cause: (1) worktree bug — `memory-check.sh` resolves to worktree memory path, not main repo; (2) sync mechanism is entirely behavioral (print warning, hope agent acts). Identified need for script-prepared diffs that reduce the LLM's merge burden. Captured as T-0022.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework

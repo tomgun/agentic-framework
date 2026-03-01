@@ -1,3 +1,8 @@
+---
+summary: "Built-in document type definitions for the doc lifecycle system"
+tokens: ~586
+---
+
 # Doc Types Reference
 
 Built-in doc type definitions for the doc lifecycle system (F-0139).

@@ -1,3 +1,8 @@
+---
+summary: "Cloud-platform expertise for AWS, GCP, Azure deployments"
+tokens: ~355
+---
+
 # Cloud Expert Agent
 
 **Purpose**: Provide cloud-platform-specific expertise (AWS, GCP, Azure), best practices, and implementation guidance.

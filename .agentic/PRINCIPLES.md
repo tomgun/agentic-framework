@@ -1,3 +1,8 @@
+---
+summary: "Core values and principles guiding every framework design decision"
+tokens: ~4088
+---
+
 # Framework Principles
 
 **Purpose**: Core values and principles that guide the Agentic AI Framework. Every design decision traces back to these principles.

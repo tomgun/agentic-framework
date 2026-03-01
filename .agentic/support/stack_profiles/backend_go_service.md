@@ -1,3 +1,8 @@
+---
+summary: "Stack profile for Go backend services: structure, testing, deployment"
+tokens: ~527
+---
+
 # Stack profile: Go backend service
 
 Quick guidance for initializing a Go-based backend service with this framework.

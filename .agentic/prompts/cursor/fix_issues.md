@@ -1,3 +1,8 @@
+---
+command: /fix-issues
+description: Fix linter errors, test failures, or other issues
+---
+
 # Fix Issues Prompt
 
 I have linter errors, test failures, or other issues that need fixing.

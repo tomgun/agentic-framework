@@ -1,3 +1,8 @@
+---
+summary: "Claude-specific token optimization based on official usage guide"
+tokens: ~606
+---
+
 # Claude Token Efficiency Best Practices
 
 Based on [Claude's official usage optimization guide](https://support.claude.com/en/articles/9797557-usage-limit-best-practices).

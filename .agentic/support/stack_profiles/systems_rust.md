@@ -1,3 +1,8 @@
+---
+summary: "Stack profile for Rust systems projects: safety, performance, testing"
+tokens: ~687
+---
+
 # Stack profile: Rust systems programming
 
 Quick guidance for initializing a Rust systems project with this framework.

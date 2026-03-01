@@ -1,3 +1,8 @@
+---
+summary: "Review code quality, security, and adherence to standards"
+tokens: ~480
+---
+
 # Review Agent
 
 **Role**: Review code quality, security, and adherence to standards.

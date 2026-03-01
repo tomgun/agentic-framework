@@ -1012,3 +1012,38 @@
 
 **Blockers**: None
 
+
+
+### Session: 2026-03-01 11:31 - F-0144 Frontmatter Coverage
+
+**Why**: Systematic frontmatter enables progressive disclosure on all agent-facing files, not just playbooks
+
+**Accomplished**:
+- Added YAML frontmatter to 71 remaining .agentic/ files (168/212 total). Created add-remaining-frontmatter.sh with --batch and --dry-run support. Updated ROI.md, FRAMEWORK_VALUE_PROPOSITION.md, INSTRUCTION_ARCHITECTURE.md counts. Added 8-check coverage validation to validate_framework.sh.
+
+**Next steps**:
+- Create PR, merge to main
+
+**Blockers**: None
+
+
+### Session: 2026-03-01 11:53 - Frontmatter context research
+
+**Accomplished**:
+- Research doc confirming .agentic/ frontmatter is inert (0 tokens). Added context cost note to INSTRUCTION_ARCHITECTURE.md.
+
+**Next steps**:
+- Push branch, PR ready
+
+**Blockers**: None
+
+### Session: 2026-03-01 12:17 - PR #53 review fixes
+
+**Accomplished**:
+- Marked F-0144 shipped, updated CONTRIBUTIONS.md with F-0144 + context research + memory seed gap
+
+**Next steps**:
+- Merge PR #53
+
+**Blockers**: None
+

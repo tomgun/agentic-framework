@@ -1,3 +1,8 @@
+---
+summary: "Template for research topic documentation"
+tokens: ~255
+---
+
 # Research: [TOPIC]
 
 **Research question**: What are we trying to learn?

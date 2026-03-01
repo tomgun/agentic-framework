@@ -1,3 +1,8 @@
+---
+summary: "Why subagents work: fresh context is the primary benefit, not cheaper models"
+tokens: ~664
+---
+
 # Agent Delegation: Fresh Context is the Primary Benefit
 
 **Core Principle**: Subagents work better because they start with fresh, focused context - not because they use cheaper models.

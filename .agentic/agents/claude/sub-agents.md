@@ -1,3 +1,8 @@
+---
+summary: "How to use Claude Code native sub-agent capabilities with the framework"
+tokens: ~1056
+---
+
 # Claude Code Sub-Agent Integration
 
 This guide explains how to use Claude Code's native sub-agent capabilities with the Agentic Framework.

@@ -1,3 +1,8 @@
+---
+summary: "Canonical schema defining structure, fields, and valid values for all specs"
+tokens: ~4195
+---
+
 # Specification Schema Reference
 
 **Purpose**: Define the canonical structure, fields, and valid values for all specification documents.

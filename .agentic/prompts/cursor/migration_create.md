@@ -1,3 +1,8 @@
+---
+command: /migration-create
+description: Create database or system migration
+---
+
 # Create Spec Migration Prompt (Formal Mode)
 
 I want to create a new spec migration for: **[brief description of change]**

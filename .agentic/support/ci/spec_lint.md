@@ -1,3 +1,8 @@
+---
+summary: "CI lint rules validating durable context artifacts agents rely on"
+tokens: ~100
+---
+
 # Spec lint rules (CI template)
 
 This is intentionally technology-agnostic. It validates that the repo maintains the **durable context artifacts** agents rely on.

@@ -1,3 +1,8 @@
+---
+summary: "Write tests based on acceptance criteria before implementation (TDD)"
+tokens: ~339
+---
+
 # Test Agent
 
 **Role**: Write tests based on acceptance criteria BEFORE implementation (TDD).

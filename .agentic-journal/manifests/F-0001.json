@@ -1,7 +1,7 @@
 {
   "feature": "F-0001",
   "mode": "feature",
-  "generated": "2026-02-28T21:45:45Z",
+  "generated": "2026-03-01T09:30:51Z",
   "commits": [
     {"hash": "b380b37", "date": "2026-02-28", "message": "chore: add F-0001 context manifest", "additions": 27, "deletions": 0},
     {"hash": "0ba7b66", "date": "2026-01-08", "message": "feat: add framework specs and acceptance criteria (dogfooding)", "additions": 2032, "deletions": 0},

@@ -1,3 +1,8 @@
+---
+summary: "Strategic reading patterns to maximize development efficiency per token"
+tokens: ~1760
+---
+
 # Reading protocols (token budgeting)
 
 Purpose: maximize development efficiency by minimizing token waste through strategic reading patterns.
