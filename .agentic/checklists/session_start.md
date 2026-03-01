@@ -276,9 +276,9 @@ This is a **suggestion**, not a block. The user may choose to work on something 
   - If exists, read to determine your role
   - Load role-specific context (see sequential_agent_specialization.md)
 
-- [ ] **If `retrospective_enabled: yes`**: Check if retrospective is due
-  - Run `bash .agentic/tools/retro_check.sh` or check manually
-  - If due, suggest to human (wait for approval before running)
+- [ ] **If `retrospective_enabled: yes`**: Retro checks are handled automatically
+  - Periodic checks (sync Phase 7) evaluate retro frequency
+  - If `ag sync` reports "retrospective due", suggest to human
 
 - [ ] **If `quality_validation_enabled: yes`**: Verify quality checks exist
   - Check if `quality_checks.sh` exists at repo root

@@ -6,13 +6,14 @@
 #   bash .agentic/tools/sync.sh --check      # Dry run: detect only, no auto-fixes
 #   bash .agentic/tools/sync.sh --quiet      # One-line summary (for ag start probe)
 #
-# Six check phases:
+# Seven check phases:
 #   1. Memory seed integrity
 #   2. State freshness (journal, STATUS, CHANGELOG)
 #   3. Feature reconciliation (Formal only)
 #   4. Spec/doc drift (skipped in --quiet)
 #   5. Tool parity (instruction files + trigger tables)
 #   6. Git hook configuration
+#   7. Periodic checks (orphaned plans, retro, agent freshness)
 #
 # Exit code: always 0 (advisory tool).
 
@@ -605,6 +606,39 @@ phase_hooks() {
 }
 
 # ============================================================================
+# Phase 7: Periodic checks (orphaned plans, retro, agent freshness)
+# ============================================================================
+phase_periodic() {
+    local periodic_script="$SCRIPT_DIR/periodic-checks.sh"
+    if [ ! -f "$periodic_script" ]; then
+        return 0
+    fi
+
+    # Increment session counter once (separate from checks to avoid double-counting)
+    bash "$periodic_script" --increment > /dev/null 2>&1 || true
+
+    if [ "$MODE" = "quiet" ]; then
+        local periodic_output
+        periodic_output=$(bash "$periodic_script" --check 2>&1 || true)
+        if [ -n "$periodic_output" ]; then
+            record_issue "periodic checks"
+        else
+            record_ok
+        fi
+    else
+        # Run checks with visible output (periodic-checks.sh prints its own lines)
+        local periodic_output
+        periodic_output=$(bash "$periodic_script" --check 2>&1 || true)
+        if [ -n "$periodic_output" ]; then
+            echo "$periodic_output"
+            record_issue "periodic checks"
+        else
+            record_ok
+        fi
+    fi
+}
+
+# ============================================================================
 # Main
 # ============================================================================
 main() {
@@ -616,6 +650,7 @@ main() {
         # Skip phase 4 (slow)
         phase_tool_parity
         phase_hooks
+        phase_periodic
 
         # Output one-line summary only if issues exist
         if [ "$ISSUE_COUNT" -gt 0 ]; then
@@ -643,6 +678,7 @@ main() {
     phase_spec_drift
     phase_tool_parity
     phase_hooks
+    phase_periodic
 
     # Summary
     echo ""

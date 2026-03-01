@@ -50,6 +50,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0021: Clarify subagents vs skills distinction in framework docs. Subagents (.agentic/agents/claude/subagents/) = role context for Task tool spawning, tool-agnostic. Skills (.agentic/agents/claude/skills/) = Claude Code workflow delivery bundles. Naming overlap (review, test, etc.) causes confusion. Need clear explanation in DEVELOPER_GUIDE, INSTRUCTION_ARCHITECTURE, and possibly a dedicated ADR.
 - **Added**: 2026-03-01
 
+### T-0022: Review all shipped specialization .conf content and other "project stack specific examples" — determine which details are time-proof (detection patterns, conventional dirs) which save tokens in the whole (no need for everybody to do the same research) vs temporal advice that should be LLM-synthesized JIT. Goal: ship stable knowledge that saves tokens, remove anything that risks going stale. Covers react/fastapi/django/go/godot confs.
+- **Added**: 2026-03-01
+
 ## Done
 
 

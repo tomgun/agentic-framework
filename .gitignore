@@ -34,6 +34,7 @@ tests/llm/.test-state
 .agentic-state/.verification-state
 .agentic-state/discovery_report.json
 .agentic-state/proposals/
+.agentic-state/sync-state.conf
 # Note: .agentic-journal/ IS committed (persistent history: manifests, lessons, plans, JOURNAL.md)
 
 # Local notes (not part of framework)

@@ -1,12 +1,23 @@
 #!/bin/bash
-# Analyze project and suggest useful custom agents
-# Usage: bash .agentic/tools/suggest-agents.sh
+# DEPRECATED: Use `ag agents generate` instead.
+# This script redirects to the new generation pipeline.
+# Original purpose: Analyze project and suggest useful custom agents
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
+echo "NOTE: suggest-agents.sh is deprecated. Use: ag agents generate"
+echo ""
+echo "Running generate-project-agents.sh --dry-run instead..."
+echo ""
+
+if [ -f "$SCRIPT_DIR/generate-project-agents.sh" ]; then
+    exec bash "$SCRIPT_DIR/generate-project-agents.sh" --dry-run "$@"
+fi
+
+# Fallback: original behavior if generate-project-agents.sh is missing
 # Colors
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'

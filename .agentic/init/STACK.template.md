@@ -34,6 +34,14 @@ Purpose: a single source of truth for "how we build and run software here".
 - docs_gate: off
 # Doc staleness check at ag done. Profile defaults — Discovery: off | Formal: blocking
 
+### Periodic checks
+- periodic_orphaned_plans: every_session
+# Scan for unsaved plans. Options: every_session | off
+- periodic_retro_check: every_5_sessions
+# Retrospective due check. Options: every_N_sessions | off. Discovery default: off
+- periodic_agent_refresh: every_20_sessions
+# Suggest agent regeneration. Options: every_N_sessions | off. Discovery default: off
+
 ### Complexity limits
 - max_files_per_commit: 15
 # Blocking limit in pre-commit. Profile defaults — Discovery: 15 | Formal: 10
