@@ -113,8 +113,12 @@ else
     }
   }
 
-  IN_FEATURE && field == "status" && /^- Status:/ {
-    print "- Status: " value
+  IN_FEATURE && field == "status" && /^(\*\*Status\*\*|- Status):/ {
+    if ($0 ~ /^\*\*Status\*\*/) {
+      print "**Status**: " value
+    } else {
+      print "- Status: " value
+    }
     next
   }
 

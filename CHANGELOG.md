@@ -5,6 +5,20 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.36.0] - 2026-03-01
+
+### Added
+- **Spec-Writing Workflow (F-0147)** — Canonical workflow with five protection levels (draft → planned → in-progress → shipped → retired), NFR integration, delta tracking via migrations, and shipped-spec enforcement. `ag spec` command, `check-spec-health.sh`, and `writing-specs` Claude Skill with spec_writing, spec_evolution, and spec_protection references.
+- **Pre-commit checks 14-16** — Block modifications to shipped acceptance criteria without migration, block deletion of shipped test files, block status downgrades. No escape hatch.
+- **Plan-review gate** — Gate 4 in `check-gates.sh` requires approved plan when `plan_review_enabled=yes`.
+
+## [0.35.0] - 2026-03-01
+
+### Added
+- **Periodic Check System (F-0145)** — `periodic-checks.sh` with frequency-gated checks (every_session, every_N_sessions, off), session counter, state persistence in `.agentic-state/sync-state.conf`. Includes orphaned plan detection and retro-due migration from session_start.md.
+- **Project-Specific Agent Generation (F-0146)** — `generate-project-agents.sh` detects project stack from STACK.md + file presence + package deps, applies specialization rules (`.agentic/agents/specialization/*.conf`) to generate project-specific agents. Skills integration via `<!-- PROJECT-RULES -->` markers. CLI: `ag agents generate|list|clean`.
+- **Post-F-0143 documentation sync** — Updated DEVELOPER_GUIDE, README, INSTRUCTION_ARCHITECTURE, and other docs for skills-primary architecture.
+
 ## [0.34.0] - 2026-02-28
 
 ### Added
