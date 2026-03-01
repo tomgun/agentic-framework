@@ -115,8 +115,10 @@ else
 fi
 cleanup_test_env
 
-test_case "Full mode: reports session number"
+test_case "Full mode: reports session number after increment"
 setup_test_env
+# Increment first (as sync.sh does), then run checks
+bash .agentic/tools/periodic-checks.sh --increment > /dev/null 2>&1
 output=$(bash .agentic/tools/periodic-checks.sh 2>&1)
 if echo "$output" | grep -q "session #1"; then
     pass

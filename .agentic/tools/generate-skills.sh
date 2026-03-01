@@ -307,6 +307,12 @@ if [[ -d "$PROJECT_AGENTS_DIR" ]] && ! $VALIDATE_ONLY; then
         project_content=$(sed -n '/^## Project-Specific Rules/,/^---$/p' "$agent_file" | sed '$d')
         [[ -z "$project_content" ]] && continue
 
+        # Strip any existing PROJECT-RULES block before appending (idempotent re-runs)
+        if grep -q '<!-- PROJECT-RULES-START' "$skill_md" 2>/dev/null; then
+            local tmp_skill="${skill_md}.tmp"
+            sed '/<!-- PROJECT-RULES-START/,/<!-- PROJECT-RULES-END/d' "$skill_md" > "$tmp_skill" && mv "$tmp_skill" "$skill_md"
+        fi
+
         # Append project-specific rules to the skill
         printf '\n<!-- PROJECT-RULES-START (auto-injected from subagents-project/) -->\n%s\n<!-- PROJECT-RULES-END -->\n' "$project_content" >> "$skill_md"
 

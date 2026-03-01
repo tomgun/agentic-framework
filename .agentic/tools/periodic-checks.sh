@@ -78,9 +78,11 @@ save_state_value() {
         echo "# Sync state (auto-maintained by periodic-checks.sh)" > "$STATE_FILE"
     fi
     if grep -q "^${key}=" "$STATE_FILE" 2>/dev/null; then
-        # Update existing — portable sed (BSD + GNU)
+        # Update existing — use grep+write to avoid sed escaping issues with URLs/special chars
         local tmp_file="${STATE_FILE}.tmp"
-        sed "s|^${key}=.*|${key}=${value}|" "$STATE_FILE" > "$tmp_file" && mv "$tmp_file" "$STATE_FILE"
+        grep -v "^${key}=" "$STATE_FILE" > "$tmp_file" || true
+        echo "${key}=${value}" >> "$tmp_file"
+        mv "$tmp_file" "$STATE_FILE"
     else
         echo "${key}=${value}" >> "$STATE_FILE"
     fi
@@ -185,24 +187,36 @@ check_orphaned_plans() {
     local last_sync
     last_sync=$(load_state_value "last_sync" "1970-01-01")
 
-    # Scan plans modified recently
+    # Scan plans modified since last sync (or all if first run)
     local orphans=()
     local plan_journal_dir="$ROOT_DIR/.agentic-journal/plans"
+    local find_newer_args=()
+    if [ "$last_sync" != "1970-01-01" ]; then
+        # Create a reference file with the last_sync timestamp for -newer comparison
+        local ref_file="${STATE_DIR}/.sync-date-ref"
+        touch -t "$(echo "$last_sync" | sed 's/-//g')0000" "$ref_file" 2>/dev/null || true
+        if [ -f "$ref_file" ]; then
+            find_newer_args=(-newer "$ref_file")
+        fi
+    fi
 
     while IFS= read -r plan_file; do
         [ -f "$plan_file" ] || continue
         local plan_basename
         plan_basename=$(basename "$plan_file")
 
-        # Check if plan matches this project (fingerprint or feature IDs)
+        # Check if plan matches this project
+        # Priority: fingerprint match (reliable) > feature ID match (may collide across projects)
         local matches=false
 
-        if grep -q "$fingerprint" "$plan_file" 2>/dev/null; then
+        if grep -qF "$fingerprint" "$plan_file" 2>/dev/null; then
             matches=true
-        fi
-
-        if [ -n "$feature_ids" ] && [ "$matches" = false ]; then
-            if grep -oE 'F-[0-9]{4}' "$plan_file" 2>/dev/null | grep -qE "^($feature_ids)$" 2>/dev/null; then
+        elif [ -n "$feature_ids" ]; then
+            # Feature ID matching: only use if plan has >=2 matching IDs (reduces false positives
+            # from common IDs like F-0001 appearing in unrelated projects)
+            local match_count
+            match_count=$(grep -oE 'F-[0-9]{4}' "$plan_file" 2>/dev/null | grep -cE "^($feature_ids)$" 2>/dev/null || echo "0")
+            if [ "$match_count" -ge 2 ]; then
                 matches=true
             fi
         fi
@@ -225,7 +239,7 @@ check_orphaned_plans() {
                 orphans+=("$plan_basename")
             fi
         fi
-    done < <(find "$claude_plans_dir" -name "*.md" -type f 2>/dev/null)
+    done < <(if [ ${#find_newer_args[@]} -gt 0 ]; then find "$claude_plans_dir" -name "*.md" -type f "${find_newer_args[@]}" 2>/dev/null; else find "$claude_plans_dir" -name "*.md" -type f 2>/dev/null; fi)
 
     if [ ${#orphans[@]} -gt 0 ]; then
         record_issue "${#orphans[@]} orphaned plan(s)"
@@ -295,14 +309,17 @@ check_agent_freshness() {
 # Main
 # ============================================================================
 main() {
-    # Always increment session counter
-    local session_num
-    session_num=$(increment_session_count)
-
+    # --increment: just bump counter and exit (sync.sh calls this separately)
     if [ "$MODE" = "increment" ]; then
+        local session_num
+        session_num=$(increment_session_count)
         echo "$session_num"
         exit 0
     fi
+
+    # All other modes: read current session count (don't increment)
+    local session_num
+    session_num=$(load_state_value "session_count" "0")
 
     # Get frequencies from settings
     local freq_orphaned_plans
@@ -329,13 +346,14 @@ main() {
     fi
 
     # Output summary
-    if [ "$MODE" = "quiet" ]; then
+    if [ "$MODE" = "quiet" ] || [ "$MODE" = "check" ]; then
+        # In quiet/check modes, only print if there are issues
         if [ "$ISSUE_COUNT" -gt 0 ]; then
             local summary
             summary=$(IFS=', '; echo "${ISSUE_SUMMARY[*]}")
             echo "Periodic: $ISSUE_COUNT issue(s) ($summary)"
         fi
-    elif [ "$ISSUE_COUNT" -eq 0 ] && [ "$MODE" != "check" ]; then
+    elif [ "$ISSUE_COUNT" -eq 0 ]; then
         echo -e "Periodic:   ${GREEN}all checks passed (session #$session_num)${NC}"
     fi
 

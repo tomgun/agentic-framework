@@ -614,29 +614,24 @@ phase_periodic() {
         return 0
     fi
 
-    local periodic_output
+    # Increment session counter once (separate from checks to avoid double-counting)
+    bash "$periodic_script" --increment > /dev/null 2>&1 || true
+
     if [ "$MODE" = "quiet" ]; then
-        periodic_output=$(bash "$periodic_script" --quiet 2>&1 || true)
+        local periodic_output
+        periodic_output=$(bash "$periodic_script" --check 2>&1 || true)
         if [ -n "$periodic_output" ]; then
             record_issue "periodic checks"
         else
             record_ok
         fi
     else
-        # Run with visible output (periodic-checks.sh prints its own lines)
-        bash "$periodic_script" 2>&1 || true
-        # We can't easily capture issue counts from the subscript,
-        # so we run a quiet check separately just for counting
-        local quiet_result
-        quiet_result=$(bash "$periodic_script" --quiet 2>&1 || true)
-        if [ -n "$quiet_result" ]; then
-            local pcount
-            pcount=$(echo "$quiet_result" | grep -oE '[0-9]+ issue' | grep -oE '[0-9]+' || echo "0")
-            local i=0
-            while [ "$i" -lt "${pcount:-0}" ]; do
-                record_issue "periodic"
-                ((i++))
-            done
+        # Run checks with visible output (periodic-checks.sh prints its own lines)
+        local periodic_output
+        periodic_output=$(bash "$periodic_script" --check 2>&1 || true)
+        if [ -n "$periodic_output" ]; then
+            echo "$periodic_output"
+            record_issue "periodic checks"
         else
             record_ok
         fi

@@ -63,7 +63,7 @@ if [ "$CLEAN" = true ]; then
         echo "No project agents to clean."
         exit 0
     fi
-    local_removed=0
+    clean_count=0
     for f in "$PROJECT_AGENTS_DIR"/*.md; do
         [ -f "$f" ] || continue
         if head -5 "$f" | grep -q '<!-- AUTO-GENERATED -->'; then
@@ -71,13 +71,17 @@ if [ "$CLEAN" = true ]; then
                 echo "Would remove: $(basename "$f")"
             else
                 rm "$f"
-                ((local_removed++))
             fi
+            ((clean_count++))
         else
             echo -e "${DIM}Skipping (CUSTOMIZED): $(basename "$f")${NC}"
         fi
     done
-    echo "Removed $local_removed auto-generated agent(s)."
+    if [ "$DRY_RUN" = true ]; then
+        echo "Would remove $clean_count auto-generated agent(s)."
+    else
+        echo "Removed $clean_count auto-generated agent(s)."
+    fi
     exit 0
 fi
 
@@ -347,25 +351,22 @@ main() {
         echo "  2. Run: bash .agentic/tools/generate-skills.sh  (to update Claude skills)"
         echo "  3. Customize: add <!-- CUSTOMIZED --> to any file you want to hand-edit"
 
-        # Update state for freshness tracking
+        # Update state for freshness tracking (use grep+write to avoid sed escaping issues)
         local state_dir="$ROOT_DIR/.agentic-state"
         mkdir -p "$state_dir"
         local state_file="$state_dir/sync-state.conf"
         local stack_hash
         stack_hash=$(git log -1 --format="%H" -- STACK.md 2>/dev/null || echo "none")
         if [ -f "$state_file" ]; then
-            if grep -q "^agent_gen.stack_hash=" "$state_file" 2>/dev/null; then
-                local tmp_file="${state_file}.tmp"
-                sed "s|^agent_gen.stack_hash=.*|agent_gen.stack_hash=${stack_hash}|" "$state_file" > "$tmp_file" && mv "$tmp_file" "$state_file"
-            else
-                echo "agent_gen.stack_hash=${stack_hash}" >> "$state_file"
-            fi
-            if grep -q "^agent_gen.last_run=" "$state_file" 2>/dev/null; then
-                local tmp_file="${state_file}.tmp"
-                sed "s|^agent_gen.last_run=.*|agent_gen.last_run=$(date +%Y-%m-%d)|" "$state_file" > "$tmp_file" && mv "$tmp_file" "$state_file"
-            else
-                echo "agent_gen.last_run=$(date +%Y-%m-%d)" >> "$state_file"
-            fi
+            local tmp_file="${state_file}.tmp"
+            grep -v "^agent_gen\." "$state_file" > "$tmp_file" 2>/dev/null || true
+            echo "agent_gen.stack_hash=${stack_hash}" >> "$tmp_file"
+            echo "agent_gen.last_run=$(date +%Y-%m-%d)" >> "$tmp_file"
+            mv "$tmp_file" "$state_file"
+        else
+            echo "# Sync state (auto-maintained)" > "$state_file"
+            echo "agent_gen.stack_hash=${stack_hash}" >> "$state_file"
+            echo "agent_gen.last_run=$(date +%Y-%m-%d)" >> "$state_file"
         fi
     fi
 }
