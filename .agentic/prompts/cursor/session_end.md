@@ -1,3 +1,8 @@
+---
+command: /session-end
+description: Wrap up session, update journal and status
+---
+
 # Session End Prompt
 
 I'm wrapping up this coding session. Please help me document what was done:

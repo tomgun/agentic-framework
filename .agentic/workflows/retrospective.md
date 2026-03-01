@@ -1,3 +1,8 @@
+---
+summary: "Periodic agent-led project health review and improvement suggestions"
+tokens: ~2378
+---
+
 # Project Retrospective (Automated Health Check)
 
 **Purpose**: Periodic agent-led review of project health, suggesting improvements to architecture, testing, specs, and development practices.

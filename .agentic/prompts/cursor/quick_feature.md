@@ -1,3 +1,8 @@
+---
+command: /quick-feature
+description: Implement a small feature in discovery mode
+---
+
 # Quick Feature Implementation Prompt (Discovery Mode)
 
 I want to implement a small feature: **[brief description]**

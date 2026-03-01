@@ -1,3 +1,8 @@
+---
+command: /retrospective
+description: Run project retrospective and health check
+---
+
 # Project Retrospective Prompt
 
 I want to run a retrospective on this project.
