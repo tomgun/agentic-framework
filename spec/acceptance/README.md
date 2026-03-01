@@ -21,16 +21,20 @@ Each file follows the pattern `F-####.md` and contains:
 
 ## Feature Categories
 
-| Range | Category | Description |
-|-------|----------|-------------|
-| F-0001 - F-0010 | Core | Initialization, profiles, spec-driven development |
-| F-0011 - F-0020 | Quality | Programming/testing standards, quality gates |
-| F-0021 - F-0030 | Session | Session start/end, journaling, context |
-| F-0031 - F-0040 | Multi-Agent | Worktrees, coordination, pipelines |
-| F-0041 - F-0050 | Tooling | Scripts, automation, token efficiency |
-| F-0051 - F-0060 | Recovery | WIP tracking, error recovery, resilience |
-| F-0061 - F-0070 | Developer Experience | Documentation, onboarding, usability |
-| F-0071 - F-0080 | Design Principles | Core framework principles as specs |
+Features use sequential IDs (`F-XXXX`). Category is metadata on each feature entry, not encoded in the ID.
+
+| Category | Description |
+|----------|-------------|
+| Core | Initialization, profiles, spec-driven development |
+| Quality | Programming/testing standards, quality gates |
+| Session | Session start/end, journaling, context |
+| Multi-Agent | Worktrees, coordination, pipelines |
+| Tooling | Scripts, automation, token efficiency |
+| Recovery | WIP tracking, error recovery, resilience |
+| Developer Experience | Documentation, onboarding, usability |
+| Design Principles | Core framework principles as specs |
+| Agent System | Specialized agents, orchestration, token efficiency |
+| Verification & Enforcement | Gate-based verification, phase detection |
 
 ## Current Coverage
 

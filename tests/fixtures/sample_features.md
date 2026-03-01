@@ -6,6 +6,7 @@ This is a test fixture with sample features for testing framework tools.
 ## F-0001: User Authentication
 - Parent: none
 - Dependencies: none
+- Category: Core
 - Complexity: M
 - Tags: [auth, backend, security]
 - Layer: business-logic
@@ -36,6 +37,7 @@ This is a test fixture with sample features for testing framework tools.
 ## F-0002: Login UI
 - Parent: F-0001
 - Dependencies: F-0001 (complete)
+- Category: Core
 - Complexity: S
 - Tags: [auth, ui, frontend]
 - Layer: presentation
@@ -96,6 +98,7 @@ This is a test fixture with sample features for testing framework tools.
 ## F-0004: API Rate Limiting
 - Parent: none
 - Dependencies: none
+- Category: Tooling
 - Complexity: L
 - Tags: [api, security, infrastructure]
 - Layer: infrastructure

@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- v0.36 dogfooding sync — PR ready (Updated: 2026-03-01 21:49 EET)
+- PR #58 review — sequential feature IDs with category metadata (v0.37.0) (Updated: 2026-03-02 00:12 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

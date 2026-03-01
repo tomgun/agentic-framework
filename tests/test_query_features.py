@@ -36,6 +36,7 @@ def test_filter_by_status():
         owner = None
         complexity = None
         parent = None
+        category = None
     
     filtered = filter_features(features, Args())
     assert len(filtered) == 2, f"Expected 2 in_progress, got {len(filtered)}"
@@ -56,6 +57,7 @@ def test_filter_by_tags():
         owner = None
         complexity = None
         parent = None
+        category = None
 
     filtered = filter_features(features, Args())
     assert len(filtered) == 5, f"Expected 5 auth features, got {len(filtered)}"
@@ -76,6 +78,7 @@ def test_filter_by_layer():
         owner = None
         complexity = None
         parent = None
+        category = None
 
     filtered = filter_features(features, Args())
     assert len(filtered) == 4, f"Expected 4 presentation features, got {len(filtered)}"
@@ -96,10 +99,32 @@ def test_filter_combined():
         owner = None
         complexity = None
         parent = None
+        category = None
     
     filtered = filter_features(features, Args())
     assert len(filtered) == 1, f"Expected 1 feature, got {len(filtered)}"
     assert filtered[0]["id"] == "F-0002"
+
+
+def test_filter_by_category():
+    """Test filtering by category."""
+    fixtures_dir = Path(__file__).parent / "fixtures"
+    features = load_features_flat(fixtures_dir / "sample_features.md")
+
+    class Args:
+        status = None
+        tags = None
+        layer = None
+        domain = None
+        priority = None
+        owner = None
+        complexity = None
+        parent = None
+        category = "Core"
+
+    filtered = filter_features(features, Args())
+    assert len(filtered) == 2, f"Expected 2 Core features, got {len(filtered)}"
+    assert all(f.get("category") == "Core" for f in filtered)
 
 
 def test_filter_by_owner():
@@ -116,6 +141,7 @@ def test_filter_by_owner():
         owner = "alice@example.com"
         complexity = None
         parent = None
+        category = None
 
     filtered = filter_features(features, Args())
     assert len(filtered) == 2, f"Expected 2 features for alice, got {len(filtered)}"
@@ -245,6 +271,9 @@ if __name__ == "__main__":
 
     test_filter_combined()
     print("✓ test_filter_combined")
+
+    test_filter_by_category()
+    print("✓ test_filter_by_category")
 
     test_filter_by_owner()
     print("✓ test_filter_by_owner")
