@@ -53,6 +53,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0022: Review all shipped specialization .conf content and other "project stack specific examples" — determine which details are time-proof (detection patterns, conventional dirs) which save tokens in the whole (no need for everybody to do the same research) vs temporal advice that should be LLM-synthesized JIT. Goal: ship stable knowledge that saves tokens, remove anything that risks going stale. Covers react/fastapi/django/go/godot confs.
 - **Added**: 2026-03-01
 
+### T-0023: F-idea: Smarter memory-seed sync — memory-check.sh should: (1) fix worktree bug (resolve to main repo memory path, not worktree path), (2) when stale, generate a precise diff showing what changed between memory version and current seed (not just 'go re-read the file'), (3) output structured instructions the LLM can apply as targeted patches. Script prepares the changes, LLM merges them (preserving project-specific memory). Reduces behavioral burden from 'read 115 lines and figure it out' to 'apply these 3 specific changes'.
+- **Added**: 2026-03-01
+
 ## Done
 
 
