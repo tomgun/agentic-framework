@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Query features by status, tags, layer, domain, priority, or owner.
+Query features by status, category, tags, layer, domain, priority, or owner.
 Fast filtering for large feature sets (200+ features).
 
 Usage:
     python query_features.py --status=in_progress
+    python query_features.py --category=Core
     python query_features.py --tags=auth --tags=ui
     python query_features.py --layer=presentation --priority=critical
     python query_features.py --owner=alice@example.com
@@ -22,6 +23,7 @@ from typing import List, Dict, Optional
 # Regex patterns
 FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):\s*(.+?)\s*$")
 KEY_RE = re.compile(r"^\s*-\s+([\w][\w\s/.-]*?):\s*(.*?)\s*$")
+BOLD_KEY_RE = re.compile(r"^\*\*(\w[\w\s/&.-]*?)\*\*:\s*(.*?)\s*$")
 TAG_RE = re.compile(r'\[([^\]]+)\]')
 
 
@@ -40,6 +42,7 @@ def parse_features(md: str) -> List[Dict]:
                 "id": m.group(1),
                 "name": m.group(2),
                 "status": None,
+                "category": None,
                 "tags": [],
                 "layer": None,
                 "domain": None,
@@ -53,16 +56,20 @@ def parse_features(md: str) -> List[Dict]:
         if not current:
             continue
 
-        # Key-value pairs
+        # Key-value pairs (support both `- Key: value` and `**Key**: value` formats)
         km = KEY_RE.match(line)
         if not km:
+            km = BOLD_KEY_RE.match(line)
+        if not km:
             continue
-        
+
         key = km.group(1).strip().lower()
         val = km.group(2).strip()
 
         if key == "status":
-            current["status"] = val.lower() if val else None
+            current["status"] = val.lower().replace("-", "_") if val else None
+        elif key == "category":
+            current["category"] = val if val else None
         elif key == "tags":
             # Parse [tag1, tag2, tag3]
             tag_match = TAG_RE.search(val)
@@ -136,6 +143,10 @@ def filter_features(features: List[Dict], args) -> List[Dict]:
 
     if args.parent:
         filtered = [f for f in filtered if f.get("parent") == args.parent]
+
+    if args.category:
+        cat_lower = args.category.lower()
+        filtered = [f for f in filtered if f.get("category") and f["category"].lower() == cat_lower]
 
     return filtered
 
@@ -250,6 +261,8 @@ def print_features(features: List[Dict], show_details: bool = True):
         if show_details:
             # Build detail string
             details = []
+            if f.get("category"):
+                details.append(f"category:{f['category']}")
             if f.get("tags"):
                 details.append(f"tags:{','.join(f['tags'])}")
             if f.get("layer"):
@@ -281,7 +294,13 @@ def print_counts(features: List[Dict]):
     status_counts = Counter(f.get("status", "unknown") for f in features)
     for status, count in sorted(status_counts.items()):
         print(f"  {status}: {count}")
-    
+
+    # By category
+    print("\nBy Category:")
+    category_counts = Counter(f.get("category") or "none" for f in features)
+    for category, count in sorted(category_counts.items(), key=lambda x: -x[1]):
+        print(f"  {category}: {count}")
+
     # By layer
     print("\nBy Layer:")
     layer_counts = Counter(f.get("layer") or "none" for f in features)
@@ -328,6 +347,8 @@ Examples:
   %(prog)s --status=in_progress
   %(prog)s --tags=auth --tags=ui
   %(prog)s --layer=presentation --priority=critical
+  %(prog)s --category=Core  # All Core features
+  %(prog)s --category=Tooling --status=shipped
   %(prog)s --domain=payments --status=planned
   %(prog)s --owner=alice@example.com
   %(prog)s --count  # Show counts by category
@@ -346,6 +367,7 @@ Examples:
     parser.add_argument("--owner", help="Filter by owner (email or username)")
     parser.add_argument("--complexity", help="Filter by complexity (S|M|L|XL)")
     parser.add_argument("--parent", help="Filter by parent feature ID")
+    parser.add_argument("--category", help="Filter by category (e.g., Core, Quality, Tooling)")
     parser.add_argument("--children", metavar="F-ID", help="List children of a feature (e.g., --children=F-0001)")
     parser.add_argument("--recursive", action="store_true", help="With --children: show all descendants in tree format")
     parser.add_argument("--count", action="store_true", help="Show counts by category instead of listing features")

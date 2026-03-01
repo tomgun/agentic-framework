@@ -313,7 +313,19 @@ if [[ "$FORMAT" == "json" ]]; then
         echo "  }"
         echo "}"
 
-    } > "$OUTPUT_FILE"
+    } > "${OUTPUT_FILE}.tmp"
+
+    # Skip write if only the timestamp changed (idempotent output)
+    if [[ -f "$OUTPUT_FILE" ]]; then
+        OLD_CONTENT=$(grep -v '"generated"' "$OUTPUT_FILE")
+        NEW_CONTENT=$(grep -v '"generated"' "${OUTPUT_FILE}.tmp")
+        if [[ "$OLD_CONTENT" == "$NEW_CONTENT" ]]; then
+            rm "${OUTPUT_FILE}.tmp"
+            echo "✅ Manifest unchanged: $OUTPUT_FILE"
+            exit 0
+        fi
+    fi
+    mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE"
 
 else
     # Markdown format for human readability
@@ -386,7 +398,19 @@ else
             echo "_None_"
         fi
 
-    } > "$OUTPUT_FILE"
+    } > "${OUTPUT_FILE}.tmp"
+
+    # Skip write if only the timestamp changed (idempotent output)
+    if [[ -f "$OUTPUT_FILE" ]]; then
+        OLD_CONTENT=$(grep -v '^Generated:' "$OUTPUT_FILE")
+        NEW_CONTENT=$(grep -v '^Generated:' "${OUTPUT_FILE}.tmp")
+        if [[ "$OLD_CONTENT" == "$NEW_CONTENT" ]]; then
+            rm "${OUTPUT_FILE}.tmp"
+            echo "✅ Manifest unchanged: $OUTPUT_FILE"
+            exit 0
+        fi
+    fi
+    mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE"
 fi
 
 echo "✅ Generated $OUTPUT_FILE"

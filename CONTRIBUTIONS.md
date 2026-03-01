@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.36.0)
-**Date**: 2026-03-01
+**Period**: Initial Development (v0.1.0 → v0.37.0)
+**Date**: 2026-03-02
 
 ---
 
@@ -2428,10 +2428,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Result**: sync.sh phase 8 (`phase_pr_cleanup`) detects merged/closed PRs via `gh pr view` and auto-resolves them. `ag start` blocker count scoped to active section via awk. blocker.sh `**Resolution**` → `**Outcome**` field name fixed. macOS compatibility fix (`head -n -1` → `sed '$d'`). 9 dedicated tests in `test_pr_cleanup.sh`.
 
+### Sequential Feature IDs with Category Metadata (v0.37.0)
+
+**User direction**: Feature numbering used fixed 10-slot ranges per category (Core=F-0001-0010, Quality=F-0011-0020, etc.). Three categories were already full, and 41% of features sat in an overflow range with no category meaning. Identified that category-in-ID encoding was already broken and proposed dropping it entirely — keep sequential IDs, make category metadata instead.
+
+**Key decisions**: Zero-migration approach — 559 files reference F-XXXX patterns, renumbering would be multi-day high-risk. Category becomes a `**Category**:` field on each feature entry. Rejected alternatives: wider fixed ranges (still hits ceilings), category prefix like `CORE-001` (breaks all regex/tooling), hybrid old+new (permanent dual-format tax). Also caught that SPEC_SCHEMA.md shouldn't hardcode framework-specific categories — the schema field should be project-defined.
+
+**Bugs found during implementation**: (1) `quick_feature.sh` had an octal interpretation bug — `$((0147 + 1))` = 104 (octal) instead of 148 (decimal), causing ID collisions. (2) `query_features.py` and `feature_stats.py` couldn't parse `**Key**: value` bold format at all — every metadata field (status, priority, etc.) was silently lost, showing "none" for all 114 features. (3) `manifest.sh` was non-idempotent — `"generated"` timestamp changed on every run, creating perpetually dirty files even with identical commit data.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.36.1
+**Current Version**: v0.37.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions
