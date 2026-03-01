@@ -24,10 +24,10 @@
 #   completing-work: feature_complete.md
 #   writing-tests: test_strategy.md
 #   planning-features: plan_review_loop.md
+#   writing-specs: spec_writing.md, spec_evolution.md, spec_protection.md (custom)
 #   exploring-codebase: (none)
 #   researching-topics: (none)
 #   updating-documentation: (none)
-#   managing-specs: (none)
 
 set -euo pipefail
 
@@ -89,6 +89,7 @@ get_refs() {
         completing-work)       echo "checklists/feature_complete.md" ;;
         writing-tests)         echo "quality/test_strategy.md" ;;
         planning-features)     echo "workflows/plan_review_loop.md" ;;
+        writing-specs)         echo "workflows/spec_writing.md workflows/spec_evolution.md" ;;
         *)                     echo "" ;;  # no references
     esac
 }
@@ -268,6 +269,19 @@ for skill_src_dir in "$SKILLS_SRC"/*/; do
             else
                 echo -e "  ${YELLOW}⚠${NC} Reference not found: $ref_source"
                 WARNINGS=$((WARNINGS + 1))
+            fi
+        done
+    fi
+
+    # 3b. Copy source skill's own references/ (skill-specific, not in mapping)
+    if [[ -d "$skill_src_dir/references" ]]; then
+        mkdir -p "$dest_dir/references"
+        for src_ref in "$skill_src_dir/references"/*; do
+            [[ -f "$src_ref" ]] || continue
+            ref_basename=$(basename "$src_ref")
+            # Don't overwrite mapping-sourced references
+            if [[ ! -f "$dest_dir/references/$ref_basename" ]]; then
+                cp "$src_ref" "$dest_dir/references/$ref_basename"
             fi
         done
     fi
