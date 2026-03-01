@@ -94,7 +94,7 @@ graph TB
     subgraph MECHANISMS["MECHANISMS (How)"]
         %% Scripts
         M_AG[ag.sh gateway<br/>20+ commands]
-        M_PRECOMMIT[pre-commit-check.sh<br/>11 structural gates]
+        M_PRECOMMIT[pre-commit-check.sh<br/>16 structural gates]
         M_WIP_SH[wip.sh<br/>state machine]
         M_STATUS_SH[status.sh / journal.sh<br/>token-efficient updates]
         M_FEATURE_SH[feature.sh<br/>status transitions]
@@ -319,7 +319,7 @@ graph TB
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
-| **Pre-Commit Gates** (F-0016, F-0116) | `pre-commit-check.sh` — 11 structural checks. Exit code 1 blocks commit. Checks: WIP lock, acceptance criteria, JOURNAL staleness, FEATURES.md staleness, batch size, test execution, complexity limits, untracked files, instruction file size, branch policy. | ACTIVE - proven by mutation tests |
+| **Pre-Commit Gates** (F-0016, F-0116) | `pre-commit-check.sh` — 16 structural checks. Exit code 1 blocks commit. Checks: WIP lock, acceptance criteria, JOURNAL staleness, FEATURES.md staleness, batch size, test execution, complexity limits, untracked files, instruction file size, branch policy, shipped spec protection (migration required), test file deletion protection, status downgrade protection. | ACTIVE - proven by mutation tests |
 | **Git Hook Enforcement** (F-0129) | `git config core.hooksPath .agentic/hooks` wired in scaffold.sh + upgrade.sh. Git calls pre-commit dispatcher which routes to pre-commit-check.sh. CI detection skips hooks in automated builds. `pre_commit_hook: fast|full|no` in STACK.md. | ACTIVE - mutation-test proven |
 | **Gate-Based Verification** (F-0091) | `doctor.py` with modes: `--quick` (advisory), `--full` (comprehensive), `--pre-commit` (blocking), `--phase planning|complete` (phase-specific). Single verification command. | ACTIVE |
 | **Phase Detection** (F-0092) | `phase_detect.py` automatically detects dev phase (start, planning, implement, complete, blocked) and runs appropriate gates. | ACTIVE - used by doctor.py |
@@ -448,7 +448,7 @@ These features exist but don't clearly derive from the 13 principles:
 │                    STRUCTURAL GATES                      │
 │  (Scripts with exit codes - impossible to bypass)        │
 │                                                          │
-│  pre-commit-check.sh (11 checks)                        │
+│  pre-commit-check.sh (16 checks)                        │
 │  git core.hooksPath → .agentic/hooks/                   │
 │  ag implement → requires acceptance criteria             │
 │  ag work → blocks without feature ID (Formal)          │
@@ -552,7 +552,7 @@ This would allow projects to declare their stack (e.g., `stack_type: web-react` 
 ### Working Well (Actively Delivering Value)
 
 1. **Token-efficient scripts** — Used in every session. Proven 40x efficiency gain.
-2. **Pre-commit gates** — 11 checks, mutation-test proven. Cannot be bypassed.
+2. **Pre-commit gates** — 16 checks, mutation-test proven. Cannot be bypassed.
 3. **Git hook enforcement** — `core.hooksPath` wiring means hooks actually run.
 4. **Durable artifacts** — STATUS/JOURNAL/CONTEXT_PACK survive context resets reliably.
 5. **Three-layer architecture** — Clear separation of constitution/playbook/state.

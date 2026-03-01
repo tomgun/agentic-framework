@@ -26,7 +26,8 @@ ${BOLD}GATEWAY (Start Here)${NC}
 ${BOLD}VERIFICATION${NC}
   doctor.sh           Health check (--full, --phase, --pre-commit)
   verify.sh           Run all validation checks
-  pre-commit-check.sh Pre-commit structural checks (11 gates)
+  pre-commit-check.sh Pre-commit structural checks (16 gates)
+  check-spec-health.sh Spec validation (acceptance, NFRs, migrations)
 
 ${BOLD}SESSION MANAGEMENT${NC}
   wip.sh              Track work-in-progress (start, checkpoint, complete)
