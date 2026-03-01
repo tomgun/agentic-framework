@@ -6,7 +6,7 @@ Always consult: AGENTS.md (if present), `.agentic/agents/shared/agent_operating_
 
 Note: Codex runs commands in a sandbox. Append `|| true` to commands that may fail to prevent non-zero exit codes from halting execution.
 
-Quick Commands: `ag start` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag spec` | `ag docs` | `ag todo`
 
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |
@@ -17,6 +17,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
 | Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, flush pending ideas to TODO.md via `ag todo`. |
 | Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
+| Write spec / create spec / acceptance criteria / evolve spec | STOP -> Run `ag spec F-XXXX`. Follow spec protection levels. |
 | Plan created / planning complete | STOP -> Save plan durably, then `ag implement F-XXXX` (creates WIP). If `plan_review_enabled: yes`: run `/review` on plan before coding. |
 
 Acceptance criteria: Formal requires spec/acceptance/F-####.md before coding | Discovery: define criteria (any form) before coding.
@@ -35,7 +36,7 @@ Rules:
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):
 - STATUS.md: `bash .agentic/tools/status.sh focus "Task"`
-- JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
+- JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"`
 - HUMAN_NEEDED.md: `bash .agentic/tools/blocker.sh add "Title" "type" "Details"`
 - FEATURES.md: `bash .agentic/tools/feature.sh F-#### status shipped`
 - TODO.md: `bash .agentic/tools/todo.sh add "Idea"` or `ag todo "Idea"`

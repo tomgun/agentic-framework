@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.32.0
+**Version**: 0.36.0
 
 ---
 
@@ -2108,7 +2108,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ## F-0136: Centralized TODO Tracking
 
-**Status**: in_progress
+**Status**: shipped
 **Priority**: high
 **Added**: 2026-02-18
 
@@ -2136,7 +2136,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ## F-0139: Doc Lifecycle System
 
-**Status**: in_progress
+**Status**: shipped
 **Priority**: medium
 **Added**: 2026-02-19
 
@@ -2150,7 +2150,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 
 ## F-0140: Proactive WIP Creation in Agent Instructions
 
-**Status**: in_progress
+**Status**: shipped
 **Priority**: high
 **Added**: 2026-02-20
 
@@ -2164,7 +2164,7 @@ Ensures the plan-mode-exit trigger chains to `ag implement` (which creates WIP t
 
 ## F-0141: Explicit Settings in STACK.md
 
-**Status**: in_progress
+**Status**: shipped
 **Priority**: high
 **Added**: 2026-02-23
 
@@ -2208,7 +2208,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0145: Periodic Check System (Lifecycle Triggers)
 
-**Status**: in-progress
+**Status**: shipped
 **Priority**: medium
 **Complexity**: medium
 **Added**: 2026-03-01
@@ -2223,7 +2223,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0146: Project-Specific Agent Generation (Layer A)
 
-**Status**: in-progress
+**Status**: shipped
 **Priority**: medium
 **Complexity**: medium
 **Added**: 2026-03-01
@@ -2238,7 +2238,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0147: Spec-Writing Workflow with Delta Tracking & Plan-Review Gate
 
-**Status**: in-progress
+**Status**: shipped
 **Priority**: high
 **Complexity**: high
 **Added**: 2026-03-01

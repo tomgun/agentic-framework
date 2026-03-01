@@ -1,30 +1,36 @@
-You are working ON the Agentic Framework itself (not a project using it).
+THIS IS FRAMEWORK DEVELOPMENT. You are working ON the agentic framework itself, not a project using it. Framework changes affect ALL users - extra care required.
 
-Read first: FRAMEWORK_QUICK_START.md
+Read first: `FRAMEWORK_QUICK_START.md`, `FRAMEWORK_DEVELOPMENT.md`, `.agentic/PRINCIPLES.md`
 
-## Session Start
+Full template: `.agentic/agents/cursor/cursorrules.txt`
 
-On first message of a conversation, give a briefing:
-- Read STATUS.md, HUMAN_NEEDED.md, JOURNAL.md, VERSION, and git status
-- Greet the user and summarize: current state, focus, blockers, next steps, recent work
-- Do NOT wait to be asked
+Always consult: `.agentic/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, STATUS.md, spec/* and spec/adr/* as the source of truth.
 
-## Git Workflow
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag spec` | `ag docs` | `ag todo`
 
-- Always create a separate git worktree on a feature branch before making changes (another agent may be working on main)
-- Never auto-commit without human approval
-- Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts)
-- Log user's design insights and direction to CONTRIBUTIONS.md (their ideas, not agent's implementation work)
-- Every PR: bump VERSION (at least patch) and update CONTRIBUTIONS.md. After merge: `git tag v$(cat VERSION) && git push origin v$(cat VERSION)`
+STOP! Trigger Words (match on intent, not just exact words):
+| User intent | Action |
+|-------------|--------|
+| Build / implement / add / create / set up / develop / make something | STOP -> Run `ag plan F-XXXX` first, then `ag implement` (creates WIP) |
+| Build something large (>10 files, "entire", "full system") | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
+| Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
+| Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
+| Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, flush pending ideas to TODO.md via `ag todo`. |
+| Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
+| Write spec / create spec / acceptance criteria / evolve spec | STOP -> Run `ag spec F-XXXX`. Follow spec protection levels. |
+| Exited plan mode (plan approved) | STOP -> Save plan durably, then `ag implement F-XXXX` (creates WIP). If `plan_review_enabled: yes`: run `/review` on plan before coding. |
 
-## Development Process
-
-- Spec → Acceptance → Code → Tests → Docs (all must match)
-- Add F-#### to spec/FEATURES.md BEFORE implementing
-- Create spec/acceptance/F-####.md BEFORE coding
-- Add tests to tests/validate_framework.sh
-- Test in scratch project before committing
+Rules:
+- Never auto-commit. Show changes to human first.
+- PR by default: create feature branches and PRs (check `git_workflow` in STACK.md).
+- Add/update tests for new/changed logic.
+- Code + docs = done (update docs with code, not later). Use `ag docs` for doc lifecycle.
+- Keep changes small and scoped (max 5-10 files per commit).
+- Every PR: bump VERSION (at least patch) and update CONTRIBUTIONS.md.
+- Log user's design insights to CONTRIBUTIONS.md.
+- Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
+- Worktree: Use `git worktree` on feature branches when another agent may be working on main.
 
 Verify: bash tests/validate_framework.sh
 
-Reference: FRAMEWORK_DEVELOPMENT.md, .agentic/PRINCIPLES.md
+Workflows, delegation, gates, checklists: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`
