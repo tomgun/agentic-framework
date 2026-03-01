@@ -1,3 +1,8 @@
+---
+summary: "Visual guide showing how all framework components fit together"
+tokens: ~1252
+---
+
 # Framework Map: Visual Guide
 
 This document shows how all parts of the agentic framework fit together.

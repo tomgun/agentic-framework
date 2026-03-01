@@ -1,3 +1,8 @@
+---
+summary: "Complete operating rules for all AI agents across all tools"
+tokens: ~952
+---
+
 # Agent Operating Guidelines (All Tools)
 
 > **📚 REFERENCE MATERIAL (v0.22)**

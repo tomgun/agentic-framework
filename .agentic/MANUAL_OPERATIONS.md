@@ -1,3 +1,8 @@
+---
+summary: "Commands to check project state without consuming AI tokens"
+tokens: ~1779
+---
+
 # Manual Operations Guide
 
 **Purpose**: Run these commands yourself to check project state **without consuming AI tokens**. Save agent sessions for actual development work.

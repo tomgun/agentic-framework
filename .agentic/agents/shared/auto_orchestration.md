@@ -1,3 +1,8 @@
+---
+summary: "Workflow trigger rules for Cursor, Copilot, Codex (non-Claude tools)"
+tokens: ~3254
+---
+
 # Automatic Orchestration Rules
 
 > **Claude Code users**: Workflow triggers are primarily handled by Skills in `.claude/skills/`. This file serves Cursor, Copilot, Codex, and other non-Claude tools.

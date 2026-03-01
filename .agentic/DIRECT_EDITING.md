@@ -1,3 +1,8 @@
+---
+summary: "How to edit spec files directly without agent involvement"
+tokens: ~1328
+---
+
 # Direct Editing Workflow
 
 **You can edit spec files directly without talking to an agent.** The agent will pick up your changes when it starts the next session.

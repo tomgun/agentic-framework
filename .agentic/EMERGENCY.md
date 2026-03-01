@@ -1,3 +1,8 @@
+---
+summary: "Emergency quick reference for when tokens run out or agent unavailable"
+tokens: ~600
+---
+
 # 🚨 Emergency Quick Reference
 
 **Print this or keep it visible. For when tokens run out or you need to work without the agent.**
