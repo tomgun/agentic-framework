@@ -1,3 +1,8 @@
+---
+command: /session-start
+description: Start new session with context loading
+---
+
 # Session Start Prompt
 
 I'm starting a new coding session on this project, which uses the Agentic AI Framework.

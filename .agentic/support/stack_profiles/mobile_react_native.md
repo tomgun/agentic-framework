@@ -1,3 +1,8 @@
+---
+summary: "Stack profile for React Native apps: cross-platform mobile development"
+tokens: ~846
+---
+
 # Stack profile: React Native mobile app
 
 Quick guidance for initializing a React Native mobile project with this framework.

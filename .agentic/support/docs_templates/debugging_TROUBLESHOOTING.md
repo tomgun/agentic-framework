@@ -1,3 +1,8 @@
+---
+summary: "Template for troubleshooting and debugging guides"
+tokens: ~28
+---
+
 # Troubleshooting
 
 ## Common issues

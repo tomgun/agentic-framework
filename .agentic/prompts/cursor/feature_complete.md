@@ -1,3 +1,8 @@
+---
+command: /feature-complete
+description: Mark feature as done, run completion checklist
+---
+
 # Mark Feature Complete Prompt (Formal Mode)
 
 Feature **F-[XXXX]** is ready to be marked complete.

@@ -1,3 +1,8 @@
+---
+summary: "Modern minimal design system: clean typography, whitespace, restraint"
+tokens: ~1078
+---
+
 # Modern Minimal Design System
 
 **Philosophy**: Clean, functional, content-first. Inspired by Tailwind CSS, Vercel, Linear.

@@ -1,3 +1,8 @@
+---
+summary: "Agent-guided repo initialization: produce durable artifacts in one session"
+tokens: ~5404
+---
+
 # Repo Init (Agent-Guided) Playbook
 
 Goal: in one short planning session, produce **durable repo artifacts** so any agent can work effectively with minimal repeated context.

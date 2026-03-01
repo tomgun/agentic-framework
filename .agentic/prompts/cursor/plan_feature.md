@@ -1,3 +1,8 @@
+---
+command: /plan-feature
+description: Plan a feature with acceptance criteria and ADR
+---
+
 # Plan Complex Feature Prompt
 
 I want to plan a complex feature before implementing: **[feature description]**

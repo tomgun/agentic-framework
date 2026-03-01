@@ -1,3 +1,8 @@
+---
+command: /run-quality
+description: Run quality checks and validation suite
+---
+
 # Run Quality Checks Prompt
 
 I want to run quality checks before committing.

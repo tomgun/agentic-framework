@@ -1,3 +1,8 @@
+---
+summary: "Write code to make failing tests pass (TDD green phase)"
+tokens: ~479
+---
+
 # Implementation Agent
 
 **Role**: Write code to make failing tests pass (TDD green phase).

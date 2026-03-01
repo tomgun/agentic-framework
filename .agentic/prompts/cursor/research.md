@@ -1,3 +1,8 @@
+---
+command: /research
+description: Research technology choices or best practices
+---
+
 # Research Mode Prompt
 
 I need to research: **[topic, technology, approach, or problem]**

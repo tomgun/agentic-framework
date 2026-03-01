@@ -1,3 +1,8 @@
+---
+summary: "Stack profile for JUCE audio plugins: VST/AU build, testing, DSP"
+tokens: ~183
+---
+
 # JUCE VST/AU plugin profile
 
 ## Constraints to make explicit

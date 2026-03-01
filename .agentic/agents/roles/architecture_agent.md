@@ -1,3 +1,8 @@
+---
+summary: "Design system architecture, evaluate patterns, ensure scalability"
+tokens: ~310
+---
+
 # Architecture Agent
 
 **Purpose**: Design system architecture, evaluate patterns, ensure scalability and maintainability.

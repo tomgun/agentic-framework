@@ -1,3 +1,8 @@
+---
+summary: "Business case: 50-80% cost reduction via token efficiency and automation"
+tokens: ~2935
+---
+
 # Agentic Framework ROI Analysis
 
 **How much can a company save by using this framework?**
@@ -32,12 +37,12 @@ The Agentic Framework delivers **50-80% cost reduction** in AI-assisted developm
 
 ### Progressive Disclosure via Frontmatter
 
-| Discovery Method | Tokens per File | For 79 Files | Savings |
-|------------------|----------------|--------------|---------|
-| Load full file | ~2,500 | ~197,500 | — |
-| Scan frontmatter summary | ~50 | ~3,950 | **98%** |
+| Discovery Method | Tokens per File | For 168 Files | Savings |
+|------------------|----------------|---------------|---------|
+| Load full file | ~1,150 | ~192,600 | — |
+| Scan frontmatter summary | ~50 | ~8,400 | **96%** |
 
-All playbook, checklist, workflow, guideline, quality, and subagent files include YAML frontmatter with `summary`, `trigger`, and `tokens` fields. Agents scan summaries to decide which files to load — avoiding ~193K tokens of unnecessary reads per full discovery pass.
+168 of 212 `.agentic/` markdown files include YAML frontmatter with `summary` and `tokens` fields (the remaining 44 are templates, READMEs, and instruction files that don't need discovery). Agents scan summaries to decide which files to load — avoiding ~184K tokens of unnecessary reads per full discovery pass.
 
 ### Token Savings Example
 

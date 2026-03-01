@@ -1,3 +1,8 @@
+---
+summary: "Capabilities and best practices for each AI coding environment"
+tokens: ~1700
+---
+
 # AI Environment Research
 
 **Purpose**: Track capabilities and optimal practices for each AI coding environment.

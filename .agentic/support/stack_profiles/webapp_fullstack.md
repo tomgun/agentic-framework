@@ -1,3 +1,8 @@
+---
+summary: "Stack profile for full-stack web apps: frontend, backend, database"
+tokens: ~124
+---
+
 # Webapp + backend profile
 
 ## Typical choices to decide early

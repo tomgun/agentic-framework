@@ -1,3 +1,8 @@
+---
+summary: "Template for project architecture documentation"
+tokens: ~76
+---
+
 # Architecture
 
 ## Purpose

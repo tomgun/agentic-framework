@@ -1,3 +1,8 @@
+---
+summary: "Coordinate specialized agents, enforce compliance, manage pipeline"
+tokens: ~1182
+---
+
 # Orchestrator Agent (Manager/Puppeteer)
 
 **Purpose**: Coordinate specialized agents, ensure framework compliance, manage feature pipeline.

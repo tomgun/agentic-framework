@@ -1,3 +1,8 @@
+---
+summary: "Concise onboarding for agents: gates, scripts, workflow in ~60 lines"
+tokens: ~482
+---
+
 # Agent Quick Start
 
 **Read this first. It's ~60 lines. Gates enforce quality - you don't need to memorize checklists.**

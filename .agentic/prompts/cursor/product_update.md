@@ -1,3 +1,8 @@
+---
+command: /product-update
+description: Write product update announcement for stakeholders
+---
+
 # Update OVERVIEW.md Prompt (Discovery Mode)
 
 I've made changes to the project and need to update `OVERVIEW.md`.

@@ -1,3 +1,8 @@
+---
+summary: "Handle version control operations: commits, branches, PRs"
+tokens: ~387
+---
+
 # Git Agent
 
 **Role**: Handle version control - commits, branches, PRs.

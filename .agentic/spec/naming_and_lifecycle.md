@@ -1,3 +1,8 @@
+---
+summary: "Spec naming conventions and document lifecycle rules"
+tokens: ~215
+---
+
 # Spec naming & lifecycle
 
 **⚠️ For the canonical schema defining valid values, field types, and validation rules, see [`SPEC_SCHEMA.md`](SPEC_SCHEMA.md).**

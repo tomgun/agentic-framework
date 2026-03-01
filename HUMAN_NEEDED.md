@@ -15,6 +15,14 @@ _No active items_
 
 ---
 
+
+### HN-0012: PR #52: Post-F-0143 doc sync
+- **Type**: pr_review
+- **Added**: 2026-02-28
+- **Context**: https://github.com/tomgun/agentic-framework/pull/52 — 12 docs updated for skills-primary architecture
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 <!-- Archive resolved items here with date and outcome -->

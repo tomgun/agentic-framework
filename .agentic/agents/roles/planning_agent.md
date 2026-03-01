@@ -1,3 +1,8 @@
+---
+summary: "Define features, write acceptance criteria, create ADRs"
+tokens: ~411
+---
+
 # Planning Agent
 
 **Role**: Define features, write and update acceptance criteria, create ADRs for decisions.

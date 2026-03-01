@@ -1,3 +1,8 @@
+---
+summary: "Complete guide for developers: manual workflow, tools, customization"
+tokens: ~10114
+---
+
 # Developer Guide: Working with Agentic AF
 
 **Purpose**: Complete guide for developers using the Agentic AI Framework. Learn how to work manually, use automation tools, customize the framework, and collaborate effectively with AI agents.
