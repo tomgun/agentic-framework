@@ -1,11 +1,11 @@
 ---
 summary: "Action rules agents write to persistent memory at session start"
-tokens: ~1066
+tokens: ~1130
 ---
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.36.0 -->
+<!-- memory-seed v0.37.0 -->
 <!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
@@ -53,6 +53,12 @@ If the user wants to commit, push, save, ship, or finalize changes:
 If the user says remember, todo, idea, note for later, tasklist, or mentions something to track:
 
 **STOP.** Run `ag todo "description"` to capture it in TODO.md (git-tracked, survives context compression).
+
+## When the user expresses a system invariant or quality constraint
+
+If the user says "it must always...", "never do X", "performance must stay under...", "security requirement", "accessibility", or describes a cross-cutting constraint that applies beyond a single feature:
+
+**STOP.** This is a Non-Functional Requirement. Check `spec/NFR.md` — if no matching NFR exists, assign the next NFR-XXXX ID and write it there. NFRs are invariants that must hold across all features, not just the one being discussed. Don't let them stay informal in conversation.
 
 ## When work is done
 
