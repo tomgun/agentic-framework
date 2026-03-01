@@ -26,9 +26,6 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0010: Implement multi-agent helper scripts (F-0108) — agents_active.sh, check_agent_conflicts.sh, sync_worktrees.sh referenced as TODO in multi_agent_coordination.md and doc-check.sh allowlist
 - **Added**: 2026-02-24
 
-### T-0012: Update FEATURES.md status: F-0136, F-0139, F-0140, F-0141 are shipped (PRs merged) but still marked in_progress
-- **Added**: 2026-02-28
-
 ### T-0013: Close or formally assess F-0103 (Agent Mode Selection) — in_progress since v0.12.2, functionally complete. Either ship or document what's missing
 - **Added**: 2026-02-28
 
@@ -64,6 +61,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 
 ## Done
 
+
+### T-0012: Update FEATURES.md status: F-0136, F-0139, F-0140, F-0141 are shipped (PRs merged) but still marked in_progress
+- **Resolved**: 2026-03-01 — Marked F-0136, F-0139, F-0140, F-0141 as shipped
 
 ### T-0020: LLM tests for F-0143 Skills: (1) Skill activation — does 'implement feature X' trigger implementing-features skill instructions (ag implement, acceptance criteria check)? (2) Trigger regression — do tests 003/010 still pass with 40-line CLAUDE.md where triggers are in Skills not instruction file? (3) Skill routing — does 'fix a bug' activate fixing-bugs skill (test-first behavior)? Skills are installed via install.sh in harness and visible to Claude Code via --print.
 - **Resolved**: 2026-03-01 — resolved

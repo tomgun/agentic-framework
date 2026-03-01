@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0147: spec-writing workflow — creating PR (Updated: 2026-03-01 17:56 EET)
+- v0.36 dogfooding sync — PR ready (Updated: 2026-03-01 21:49 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

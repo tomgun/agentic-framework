@@ -24,10 +24,14 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
     - `small-batch.md` - Implementation tasks
     - `multi-agent.md` - Parallel agent work
     - `wip-tracking.md` - Interrupted sessions
+- **Claude Skills** (primary workflow delivery for Claude Code): `.claude/skills/`
+  - Source: `.agentic/agents/claude/skills/` (hand-crafted, 12 skills)
+  - Generator: `.agentic/tools/generate-skills.sh` (assembles references, injects VERSION)
+  - Key skills: `implementing-features`, `committing-changes`, `fixing-bugs`, `writing-specs`, `session-start`, `completing-work`, `planning-features`, `writing-tests`, `reviewing-code`, `exploring-codebase`, `researching-topics`, `updating-documentation`
 - Claude-specific: `.agentic/agents/claude/CLAUDE.md` (consolidated quick reference)
 - Framework specs: `spec/FEATURES.md` (100+ features)
 - Acceptance criteria: `spec/acceptance/F-####.md`
-- Validation tests: `tests/validate_framework.sh` (180+ tests)
+- Validation tests: `tests/validate_framework.sh` (200+ tests)
 - Templates: `.agentic/init/*.template.md`, `.agentic/spec/*.template.md`
 - Workflows: `.agentic/workflows/`
 - Quality guides: `.agentic/quality/`
@@ -59,11 +63,17 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
     - `status.sh` - Direct STATUS.md section updates (focus, progress, next, blocker)
     - `feature.sh` - Field updates to FEATURES.md
     - `blocker.sh` - Append-only HUMAN_NEEDED.md updates
+    - `todo.sh` - TODO.md CRUD (add/done/drop/triage/list)
     - `wip.sh` - Work-in-progress tracking
     - `migration.sh` - Spec migration management (create/list/show/search/apply)
     - `drift.sh --docs` - Documentation drift detection
+    - `docs.sh` - Doc lifecycle context assembler (wired into `ag done` and `ag docs`)
     - `manifest.sh` - Feature change manifest generation from git history
     - `memory-check.sh` - Advisory memory-seed integrity check (session start)
+    - `periodic-checks.sh` - Frequency-gated checks (orphan plans, retro, agent freshness)
+    - `check-spec-health.sh` - Spec validation (missing criteria, unchecked items)
+    - `generate-project-agents.sh` - Stack detection → project-specific agent generation
+    - `generate-skills.sh` - Assemble Claude Skills from hand-crafted sources
 - Data flow: Framework installed → Project initialized → Agents follow guidelines → Quality gates enforced
 - External dependencies: None (pure bash/Python, no npm/pip packages)
 
@@ -73,13 +83,15 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
   - **Layer 1 — Constitution** (instruction files: CLAUDE.md, .cursorrules, etc.): Only rules that cannot be structurally enforced. Keep under 100 lines (L-0002 empirical ceiling).
   - **Layer 2 — Playbooks** (auto_orchestration.md, checklists, workflows): Loaded just-in-time by `ag` commands, not pinned in context.
   - **Layer 3 — Project State** (STACK.md, STATUS.md): Machine-readable config parsed by scripts. Git-tracked state vs gitignored session-local state.
-- **Enforcement model**: Distributed — `ag implement` (planning gates), `pre-commit-check.sh` (16 structural checks), `ag done` (completion validation). No single orchestrator process; each script enforces its phase.
+- **Skills-primary architecture** (F-0143): Claude Code uses 12 hand-crafted Skills (`.claude/skills/`) as primary workflow delivery. Cursor/Copilot/Codex use `auto_orchestration.md` trigger tables. Skills contain instructions + scripts/ + references/ (playbook copies).
+- **STACK.md `## Settings`** (F-0141): Typed key-value settings with `ag set` command. Profiles (discovery/formal) set defaults; individual settings override. Settings drive gates, workflows, and tool behavior.
+- **Enforcement model**: Distributed — `ag implement` (planning gates), `pre-commit-check.sh` (16 structural checks), `ag done` (completion validation), `ag docs` (doc lifecycle). No single orchestrator process; each script enforces its phase.
 - **Defense-in-depth**: `memory-seed.md` seeds behavioral patterns into tool persistent memory. Memory reinforces; scripts enforce. Memory fades during long sessions (context compression); structural gates are the only reliable late-session enforcement.
 - **Multi-tool support**: Claude Code, Cursor, Windsurf, Copilot, Codex — each has different instruction file formats and memory mechanisms. Templates in `.agentic/agents/<tool>/`.
 - **Key principle**: Structural enforcement > behavioral instruction > memory reinforcement. If a rule can be checked by a script, don't rely on the agent remembering it.
 
 ## Quality gates (current)
-- Validation tests required: `tests/validate_framework.sh` must pass (180+ tests)
+- Validation tests required: `tests/validate_framework.sh` must pass (200+ tests)
 - Acceptance criteria: Every feature needs `spec/acceptance/F-####.md`
 - Definition of Done: See `.agentic/workflows/definition_of_done.md`
 

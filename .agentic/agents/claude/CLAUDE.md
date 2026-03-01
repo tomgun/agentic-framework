@@ -31,7 +31,7 @@ Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"
 
 ## Skills & Workflows
 
-Workflow triggers are handled by Skills in `.claude/skills/`. Each skill has instructions, scripts, and references for its workflow. Key skills: `implementing-features`, `committing-changes`, `fixing-bugs`, `session-start`, `completing-work`, `planning-features`.
+Workflow triggers are handled by Skills in `.claude/skills/`. Each skill has instructions, scripts, and references for its workflow. Key skills: `implementing-features`, `committing-changes`, `fixing-bugs`, `writing-specs`, `session-start`, `completing-work`, `planning-features`, `writing-tests`, `reviewing-code`, `updating-documentation`.
 
 Subagent context: `bash .agentic/tools/context-for-role.sh <role> <feature-id>`. Subagents do NOT inherit CLAUDE.md.
 

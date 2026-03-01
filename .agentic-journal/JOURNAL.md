@@ -1073,3 +1073,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-01 21:49 - v0.36 dogfooding sync
+
+**Why**: Framework-dev instruction files were stale after F-0143 through F-0147 shipped
+
+**Accomplished**:
+- Marked F-0136/0139/0140/0141/0145/0146/0147 shipped. Synced versions (STACK.md, FEATURES.md, .agentic/VERSION, memory-seed). Added CHANGELOG 0.35+0.36 entries. Updated all instruction files (CONTEXT_PACK, guidelines, cursorrules, CLAUDE.md templates, copilot/codex) with Skills architecture, spec-writing trigger, doc lifecycle, --why flag. Fixed feature.sh markdown bold format bug.
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+
