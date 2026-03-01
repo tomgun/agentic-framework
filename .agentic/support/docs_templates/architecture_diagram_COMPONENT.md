@@ -1,3 +1,8 @@
+---
+summary: "Template for component-level architecture diagrams"
+tokens: ~432
+---
+
 # Architecture Diagram: [COMPONENT NAME]
 
 **Purpose**: Visual representation of [component/system/subsystem] architecture.

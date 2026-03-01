@@ -89,7 +89,6 @@ fi
 # ============================================================
 # F-0002: Profile Selection
 # ============================================================
-echo ""
 echo "--- F-0002: Profile Selection ---"
 
 if grep -qi "discovery\|core" "${FRAMEWORK_ROOT}/.agentic/init/init_playbook.md" 2>/dev/null; then
@@ -107,7 +106,6 @@ fi
 # ============================================================
 # F-0006: Acceptance-Driven Development
 # ============================================================
-echo ""
 echo "--- F-0006: Acceptance-Driven Development ---"
 
 if grep -q "Acceptance-Driven Development" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
@@ -131,7 +129,6 @@ fi
 # ============================================================
 # F-0007: Small Batch Development
 # ============================================================
-echo ""
 echo "--- F-0007: Small Batch Development ---"
 
 if grep -q "Small Batch" "${FRAMEWORK_ROOT}/.agentic/PRINCIPLES.md" 2>/dev/null; then
@@ -155,7 +152,6 @@ fi
 # ============================================================
 # F-0013: Smoke Testing
 # ============================================================
-echo ""
 echo "--- F-0013: Smoke Testing ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/checklists/smoke_testing.md" ]]; then
@@ -173,7 +169,6 @@ fi
 # ============================================================
 # F-0016: Pre-Commit Quality Gates
 # ============================================================
-echo ""
 echo "--- F-0016: Pre-Commit Quality Gates ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" ]]; then
@@ -197,7 +192,6 @@ fi
 # ============================================================
 # F-0021: Session Start Protocol
 # ============================================================
-echo ""
 echo "--- F-0021: Session Start Protocol ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/checklists/session_start.md" ]]; then
@@ -215,7 +209,6 @@ fi
 # ============================================================
 # F-0031: Multi-Agent Coordination
 # ============================================================
-echo ""
 echo "--- F-0031: Multi-Agent Coordination ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/workflows/multi_agent_coordination.md" ]]; then
@@ -239,7 +232,6 @@ fi
 # ============================================================
 # F-0035: Agent Role Definitions
 # ============================================================
-echo ""
 echo "--- F-0035: Agent Role Definitions ---"
 
 ROLES_DIR="${FRAMEWORK_ROOT}/.agentic/agents/roles"
@@ -260,7 +252,6 @@ done
 # ============================================================
 # F-0036: Native Sub-Agent Integration
 # ============================================================
-echo ""
 echo "--- F-0036: Native Sub-Agent Integration ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/agents/claude/sub-agents.md" ]]; then
@@ -290,7 +281,6 @@ fi
 # ============================================================
 # F-0037: Project Health Monitoring
 # ============================================================
-echo ""
 echo "--- F-0037: Project Health Monitoring ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/tools/project-health.sh" ]]; then
@@ -307,7 +297,6 @@ fi
 # ============================================================
 # F-0041: Token-Efficient Scripts
 # ============================================================
-echo ""
 echo "--- F-0041: Token-Efficient Scripts ---"
 
 for script in journal.sh status.sh feature.sh blocker.sh; do
@@ -321,7 +310,6 @@ done
 # ============================================================
 # F-0051: WIP Tracking
 # ============================================================
-echo ""
 echo "--- F-0051: WIP Tracking ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/tools/wip.sh" ]]; then
@@ -345,7 +333,6 @@ fi
 # ============================================================
 # F-0055: Anti-Hallucination Rules
 # ============================================================
-echo ""
 echo "--- F-0055: Anti-Hallucination Rules ---"
 
 if grep -qi "anti-hallucination\|hallucination" "${FRAMEWORK_ROOT}/.agentic/agents/shared/agent_operating_guidelines.md" 2>/dev/null; then
@@ -363,7 +350,6 @@ fi
 # ============================================================
 # F-0061: DEVELOPER_GUIDE.md
 # ============================================================
-echo ""
 echo "--- F-0061: DEVELOPER_GUIDE.md ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/DEVELOPER_GUIDE.md" ]]; then
@@ -381,7 +367,6 @@ fi
 # ============================================================
 # F-0062: START_HERE.md
 # ============================================================
-echo ""
 echo "--- F-0062: START_HERE.md ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/START_HERE.md" ]]; then
@@ -393,7 +378,6 @@ fi
 # ============================================================
 # F-0066: Template Quality
 # ============================================================
-echo ""
 echo "--- F-0066: Template Quality ---"
 
 for template in STACK.template.md OVERVIEW.template.md; do
@@ -407,7 +391,6 @@ done
 # ============================================================
 # F-0069: Checklist-Driven Workflows
 # ============================================================
-echo ""
 echo "--- F-0069: Checklist-Driven Workflows ---"
 
 CHECKLISTS=(session_start.md session_end.md feature_implementation.md before_commit.md feature_complete.md smoke_testing.md)
@@ -422,7 +405,6 @@ done
 # ============================================================
 # F-0071: Token Economics
 # ============================================================
-echo ""
 echo "--- F-0071: Token Economics ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/init/CONTEXT_PACK.template.md" ]]; then
@@ -442,7 +424,6 @@ done
 # ============================================================
 # F-0073: Human-Agent Collaboration
 # ============================================================
-echo ""
 echo "--- F-0073: Human-Agent Collaboration ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/MANUAL_OPERATIONS.md" ]]; then
@@ -460,7 +441,6 @@ fi
 # ============================================================
 # F-0074: Green Coding
 # ============================================================
-echo ""
 echo "--- F-0074: Green Coding ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/quality/green_coding.md" ]]; then
@@ -478,7 +458,6 @@ fi
 # ============================================================
 # F-0077: Emergency Quick Reference
 # ============================================================
-echo ""
 echo "--- F-0077: Emergency Quick Reference ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/EMERGENCY.md" ]]; then
@@ -502,7 +481,6 @@ fi
 # ============================================================
 # F-0078: Quick Feature & Issue Scripts
 # ============================================================
-echo ""
 echo "--- F-0078: Quick Feature & Issue Scripts ---"
 
 if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/quick_feature.sh" ]]; then
@@ -520,7 +498,6 @@ fi
 # ============================================================
 # F-0079: Issue/Bug Tracking
 # ============================================================
-echo ""
 echo "--- F-0079: Issue/Bug Tracking ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/ISSUES.template.md" ]]; then
@@ -539,7 +516,6 @@ fi
 # ============================================================
 # F-0080: Upgrade Marker System
 # ============================================================
-echo ""
 echo "--- F-0080: Upgrade Marker System ---"
 
 if grep -q "upgrade_pending" "${FRAMEWORK_ROOT}/.agentic/tools/upgrade.sh" 2>/dev/null; then
@@ -562,7 +538,6 @@ fi
 
 # F-0081: Orchestrator Agent
 # ============================================================
-echo ""
 echo "--- F-0081: Orchestrator Agent ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/agents/roles/orchestrator-agent.md" ]]; then
@@ -585,7 +560,6 @@ fi
 
 # F-0082: Tier-Based Model Selection
 # ============================================================
-echo ""
 echo "--- F-0082: Tier-Based Model Selection ---"
 
 if grep -qi "Cheap/Fast\|Mid-tier\|Powerful" "${FRAMEWORK_ROOT}/.agentic/agents/claude/subagents/explore-agent.md" 2>/dev/null; then
@@ -602,7 +576,6 @@ fi
 
 # F-0083: Agent Token Savings Documentation
 # ============================================================
-echo ""
 echo "--- F-0083: Agent Token Savings Documentation ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/token_efficiency/agent_delegation_savings.md" ]]; then
@@ -625,7 +598,6 @@ fi
 
 # F-0084: Untracked Files Protection
 # ============================================================
-echo ""
 echo "--- F-0084: Untracked Files Protection ---"
 
 if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/check-untracked.sh" ]]; then
@@ -655,7 +627,6 @@ fi
 # ============================================================
 # F-0091: Gate-Based Verification
 # ============================================================
-echo ""
 echo "--- F-0091: Gate-Based Verification ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/tools/doctor.sh" ]]; then
@@ -698,7 +669,6 @@ fi
 # ============================================================
 # F-0092: Phase Detection
 # ============================================================
-echo ""
 echo "--- F-0092: Phase Detection ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/tools/phase_detect.py" ]]; then
@@ -722,7 +692,6 @@ fi
 # ============================================================
 # F-0093: AGENT_QUICK_START.md
 # ============================================================
-echo ""
 echo "--- F-0093: AGENT_QUICK_START.md ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/agents/shared/AGENT_QUICK_START.md" ]]; then
@@ -746,7 +715,6 @@ fi
 # ============================================================
 # F-0094: Version-Aware Upgrade Features
 # ============================================================
-echo ""
 echo "--- F-0094: Version-Aware Upgrade Features ---"
 
 if grep -q "FEATURE_REGISTRY" "${FRAMEWORK_ROOT}/.agentic/tools/upgrade.sh" 2>/dev/null; then
@@ -770,7 +738,6 @@ fi
 # ============================================================
 # F-0095: Cross-Platform Tool Compatibility
 # ============================================================
-echo ""
 echo "--- F-0095: Cross-Platform Tool Compatibility ---"
 
 if grep -q "awk" "${FRAMEWORK_ROOT}/.agentic/tools/status.sh" 2>/dev/null; then
@@ -789,7 +756,6 @@ fi
 # ============================================================
 # F-0096: PR-Based Workflow Default
 # ============================================================
-echo ""
 echo "--- F-0096: PR-Based Workflow Default ---"
 
 # AC-001: STACK.template.md has git_workflow setting (explicit, discovery default = direct)
@@ -830,7 +796,6 @@ fi
 # ============================================================
 # F-0097: Worktree Management Tool
 # ============================================================
-echo ""
 echo "--- F-0097: Worktree Management Tool ---"
 
 # AC-001: worktree.sh exists and is executable
@@ -871,7 +836,6 @@ fi
 # ============================================================
 # F-0114: Scope & Diff Verification
 # ============================================================
-echo ""
 echo "--- F-0114: Scope & Diff Verification ---"
 
 # AC-001: scope_check.sh exists and is executable
@@ -924,7 +888,6 @@ fi
 # ============================================================
 # F-0115: Git Workflow Branch Check
 # ============================================================
-echo ""
 echo "--- F-0115: Git Workflow Branch Check ---"
 
 # AC-001: Branch policy check exists in pre-commit
@@ -986,7 +949,6 @@ fi
 # ============================================================
 # F-0121: Tool-Specific Instructions Parity
 # ============================================================
-echo ""
 echo "--- F-0121: Tool-Specific Instructions Parity ---"
 
 # Constitutional content templates must have (trigger table, token scripts, small batch)
@@ -1068,7 +1030,6 @@ fi
 # ============================================================
 # F-0122: Multi-Tool LLM Testing Infrastructure
 # ============================================================
-echo ""
 echo "--- F-0122: Multi-Tool LLM Testing Infrastructure ---"
 
 # Test definitions JSON exists
@@ -1142,7 +1103,6 @@ fi
 # ============================================================
 # PROFILE-AWARE INSTALLATION TESTS
 # ============================================================
-echo ""
 echo "--- Profile-Aware Installation Tests ---"
 
 # Create unique temp directories
@@ -1259,7 +1219,6 @@ fi
 # ============================================================
 # FUNCTIONAL TESTS (Key Tools)
 # ============================================================
-echo ""
 echo "--- Functional Tests ---"
 
 # Test in PM directory (has FEATURES.md)
@@ -1312,7 +1271,6 @@ cd "${FRAMEWORK_ROOT}"
 # ============================================================
 # DOCUMENTATION SYNC CHECKS
 # ============================================================
-echo ""
 echo "--- Documentation Sync Checks ---"
 
 # Check for undocumented tools (warning, not blocking)
@@ -1356,7 +1314,6 @@ fi
 # ============================================================
 # CODE QUALITY CHECKS
 # ============================================================
-echo ""
 echo "--- Code Quality Checks ---"
 
 # Check for no remaining STATUS.md || OVERVIEW.md conditional patterns in core files
@@ -1441,7 +1398,6 @@ done
 # ============================================================
 # F-0130: Rough Specs & Structural Nudging
 # ============================================================
-echo ""
 echo "--- F-0130: Rough Specs & Structural Nudging ---"
 
 # Phase removed from STATUS template
@@ -1518,7 +1474,6 @@ fi
 # ============================================================
 # Settings Infrastructure (Settings-Over-Profiles)
 # ============================================================
-echo ""
 echo "--- Settings Infrastructure ---"
 
 # settings.sh exists
@@ -1867,7 +1822,6 @@ fi
 # ============================================================
 # F-0138: Documentation Impact Tracking
 # ============================================================
-echo ""
 echo "--- Acceptance Criteria Template ---"
 
 # acceptance.template.md exists
@@ -2045,7 +1999,6 @@ fi
 # ============================================================
 # F-0139: Doc Lifecycle System
 # ============================================================
-echo ""
 echo "--- F-0139: Doc Lifecycle System ---"
 
 # docs.sh exists and is executable
@@ -2208,7 +2161,6 @@ fi
 # F-0140: Proactive WIP Creation in Agent Instructions
 # ============================================================
 
-echo ""
 echo "--- F-0140: Proactive WIP Creation in Agent Instructions ---"
 
 # Plan-mode-exit trigger chains to ag implement across all instruction files
@@ -2278,7 +2230,6 @@ fi
 # ============================================================
 # F-0141: Explicit Settings in STACK.md
 # ============================================================
-echo ""
 echo "--- F-0141: Explicit Settings in STACK.md ---"
 
 # Test: STACK.template.md has all profiles.conf settings uncommented
@@ -2387,7 +2338,6 @@ else
 fi
 
 # Functional test: scaffold with discovery profile produces all settings
-echo ""
 echo "--- F-0141: Functional scaffold tests ---"
 F0141_SCRATCH=$(mktemp -d)
 mkdir -p "$F0141_SCRATCH/.agentic"
@@ -2463,6 +2413,62 @@ if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0141.md" ]]; then
   pass "F-0141: acceptance criteria file exists"
 else
   fail "F-0141: acceptance criteria file missing"
+fi
+
+# ============================================================
+# F-0144: Systematic Frontmatter Coverage
+# ============================================================
+echo "--- F-0144: Systematic Frontmatter Coverage ---"
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/add-remaining-frontmatter.sh" ]]; then
+  pass "add-remaining-frontmatter.sh exists and is executable"
+else
+  fail "add-remaining-frontmatter.sh missing or not executable"
+fi
+
+# Count files with frontmatter (first line is ---)
+FM_COUNT=0
+TOTAL_COUNT=0
+while IFS= read -r mdfile; do
+  TOTAL_COUNT=$((TOTAL_COUNT + 1))
+  if head -1 "$mdfile" 2>/dev/null | grep -q "^---"; then
+    FM_COUNT=$((FM_COUNT + 1))
+  fi
+done < <(find "${FRAMEWORK_ROOT}/.agentic" -name "*.md" -type f)
+
+if [[ $FM_COUNT -ge 160 ]]; then
+  pass "Frontmatter coverage: ${FM_COUNT}/${TOTAL_COUNT} files (>= 160 threshold)"
+else
+  fail "Frontmatter coverage too low: ${FM_COUNT}/${TOTAL_COUNT} files (need >= 160)"
+fi
+
+# Verify no template files have frontmatter
+TEMPLATE_WITH_FM=0
+while IFS= read -r tmpl; do
+  if head -1 "$tmpl" 2>/dev/null | grep -q "^---"; then
+    TEMPLATE_WITH_FM=$((TEMPLATE_WITH_FM + 1))
+  fi
+done < <(find "${FRAMEWORK_ROOT}/.agentic" \( -name "*.template.md" -o -name "*.reference.md" \) -type f)
+
+if [[ $TEMPLATE_WITH_FM -eq 0 ]]; then
+  pass "No template/reference files have frontmatter"
+else
+  fail "${TEMPLATE_WITH_FM} template/reference files incorrectly have frontmatter"
+fi
+
+# Spot-check key files have frontmatter
+for keyfile in agents/roles/implementation_agent.md agents/shared/auto_orchestration.md PRINCIPLES.md token_efficiency/reading_protocols.md; do
+  if head -1 "${FRAMEWORK_ROOT}/.agentic/${keyfile}" 2>/dev/null | grep -q "^---"; then
+    pass "${keyfile} has frontmatter"
+  else
+    fail "${keyfile} missing frontmatter"
+  fi
+done
+
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0144.md" ]]; then
+  pass "F-0144: acceptance criteria file exists"
+else
+  fail "F-0144: acceptance criteria file missing"
 fi
 
 # ============================================================

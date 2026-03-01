@@ -20,7 +20,7 @@
 - **Sequential agents** - specialized context per role (30K-45K tokens vs. 200K)
 - **Structured reading protocols** - explicit budgets prevent waste
 - **Fresh subagent context** - spawn focused agents instead of accumulating drift
-- **YAML frontmatter progressive disclosure** — agents scan ~50-token summaries instead of loading ~2500-token full files (~50x discovery savings). 79 playbook and subagent files now have machine-parseable frontmatter.
+- **YAML frontmatter progressive disclosure** — 168 of 212 `.agentic/` files have machine-parseable frontmatter (`summary`, `tokens`). Agents scan ~50-token summaries instead of loading full files — saving ~184K tokens per full discovery pass (~96% reduction).
 
 ---
 

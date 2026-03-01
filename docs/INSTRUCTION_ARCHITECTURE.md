@@ -74,7 +74,7 @@ Skills are Claude Code's native mechanism for delivering playbook-level instruct
 - **Source**: `.agentic/agents/claude/skills/` (hand-crafted, 12 skills)
 - **Generated to**: `.claude/skills/` (by `generate-skills.sh`)
 - **Each skill bundles**: `SKILL.md` (instructions) + `scripts/` (gates/validation) + `references/` (playbook copies)
-- **Progressive disclosure**: YAML frontmatter on 79 playbook/subagent files enables ~50x discovery savings (scan ~50-token summaries vs load ~2500-token full files)
+- **Progressive disclosure**: YAML frontmatter on 168 of 212 `.agentic/` files enables ~96% discovery savings (~184K tokens saved per full scan)
 
 Other tools (Cursor, Copilot, Codex) continue using `auto_orchestration.md` + `ag` commands for Layer 2 delivery. Skills are additive — they don't replace the existing Layer 2 mechanism, they provide a tool-native alternative for Claude Code (F-0143).
 
