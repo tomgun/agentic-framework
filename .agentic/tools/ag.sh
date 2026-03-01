@@ -129,6 +129,7 @@ COMMANDS:
     approve-onboarding  Review/approve auto-discovered proposals
     trace [options]     Spec-code traceability (drift + coverage)
     test llm [options]  Run LLM behavioral tests
+    agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
@@ -155,6 +156,9 @@ EXAMPLES:
     ag test llm                 # Run all LLM behavioral tests
     ag test llm --critical      # Run critical tests only
     ag tools                    # Discover available tools
+    ag agents generate          # Generate project-specific agents from stack
+    ag agents generate --dry-run # Preview what would be generated
+    ag agents list              # List current project agents
 
 No formal feature tracking. Use STATUS.md for focus.
 EOF
@@ -180,6 +184,7 @@ COMMANDS:
     approve-onboarding  Review/approve auto-discovered proposals
     trace [options]     Spec-code traceability (drift + coverage)
     test llm [options]  Run LLM behavioral tests
+    agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
@@ -209,6 +214,9 @@ EXAMPLES:
     ag test llm                 # Run all LLM behavioral tests
     ag test llm --critical      # Run critical tests only
     ag tools                    # Discover available tools
+    ag agents generate          # Generate project-specific agents from stack
+    ag agents generate --dry-run # Preview what would be generated
+    ag agents list              # List current project agents
     ag docs F-0042              # Draft docs for feature F-0042
     ag docs --list              # Show doc registry from STACK.md
     ag docs --pr                # Draft PR-trigger docs only
@@ -1054,6 +1062,46 @@ cmd_done() {
 }
 
 # Tools command - list all tools
+# Agents command — project-specific agent management
+cmd_agents() {
+    local subcmd="${1:-}"
+    shift 2>/dev/null || true
+
+    case "$subcmd" in
+        generate)
+            bash "$SCRIPT_DIR/generate-project-agents.sh" "$@"
+            ;;
+        list)
+            local project_dir="$SCRIPT_DIR/../agents/claude/subagents-project"
+            if [ -d "$project_dir" ] && ls "$project_dir"/*.md >/dev/null 2>&1; then
+                echo -e "${BOLD}Project-specific agents:${NC}"
+                for f in "$project_dir"/*.md; do
+                    [ -f "$f" ] || continue
+                    local name
+                    name=$(basename "$f" .md)
+                    local marker="AUTO-GENERATED"
+                    if head -5 "$f" | grep -q 'CUSTOMIZED'; then
+                        marker="CUSTOMIZED"
+                    fi
+                    echo -e "  $name ($marker)"
+                done
+            else
+                echo "No project-specific agents. Run: ag agents generate"
+            fi
+            ;;
+        clean)
+            bash "$SCRIPT_DIR/generate-project-agents.sh" --clean "$@"
+            ;;
+        *)
+            echo "Usage: ag agents <generate|list|clean> [options]"
+            echo ""
+            echo "  generate [--dry-run]  Generate project agents from stack detection"
+            echo "  list                  Show current project agents"
+            echo "  clean [--dry-run]     Remove auto-generated agents (keeps CUSTOMIZED)"
+            ;;
+    esac
+}
+
 cmd_tools() {
     bash "$SCRIPT_DIR/list-tools.sh" 2>/dev/null || {
         echo -e "${BOLD}=== Available Tools ===${NC}"
@@ -2348,6 +2396,10 @@ case "${1:-help}" in
     test)
         shift
         cmd_test "$@"
+        ;;
+    agents)
+        shift
+        cmd_agents "$@"
         ;;
     tools)
         cmd_tools
