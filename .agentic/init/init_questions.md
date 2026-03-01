@@ -1,3 +1,8 @@
+---
+summary: "Canonical questions for project initialization — ask only what's necessary"
+tokens: ~784
+---
+
 # Init questions (canonical)
 
 The agent should ask only what’s necessary to produce durable context artifacts.

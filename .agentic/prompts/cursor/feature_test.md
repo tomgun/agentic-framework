@@ -1,3 +1,8 @@
+---
+command: /feature-test
+description: Write tests for a feature using TDD approach
+---
+
 # Create Tests for Feature Prompt (TDD Workflow)
 
 I want to create tests for feature **F-[XXXX]** (replace with actual feature ID).

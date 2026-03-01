@@ -1,3 +1,8 @@
+---
+command: /feature-start
+description: Start feature implementation with formal workflow
+---
+
 # Start Feature Implementation Prompt (Formal Mode)
 
 I want to implement feature **F-[XXXX]** (replace with actual feature ID).

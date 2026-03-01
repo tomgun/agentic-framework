@@ -1,3 +1,8 @@
+---
+summary: "Small changes save tokens and reduce risk — batch size guidance"
+tokens: ~147
+---
+
 # Change small (to save tokens and reduce risk)
 
 ## Why
