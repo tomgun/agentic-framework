@@ -56,6 +56,12 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0023: F-idea: Smarter memory-seed sync — memory-check.sh should: (1) fix worktree bug (resolve to main repo memory path, not worktree path), (2) when stale, generate a precise diff showing what changed between memory version and current seed (not just 'go re-read the file'), (3) output structured instructions the LLM can apply as targeted patches. Script prepares the changes, LLM merges them (preserving project-specific memory). Reduces behavioral burden from 'read 115 lines and figure it out' to 'apply these 3 specific changes'.
 - **Added**: 2026-03-01
 
+### T-0024: Consider relaxing max_staged_files for PR workflow — commits get squashed on merge, making per-commit file limits unnecessary friction for multi-phase features
+- **Added**: 2026-03-01
+
+### T-0025: F-idea: NFRs as live invariants — NFR.md should be the source of truth that propagates to features, not a dead reference. Key changes: (1) Acceptance criteria should have a separate 'Invariants (from NFR.md)' section auto-derived from NFR scoping, distinct from feature-specific criteria. (2) Test-writing workflow should check applicable NFRs before writing feature tests. (3) check-spec-health.sh should cross-reference NFR modification dates vs feature spec dates — if NFR changed after spec was written and feature references it, flag for review. (4) NFR capture trigger: when a developer or agent expresses an invariant quality for the system ("it must always...", "never do X", performance/security/reliability constraints), recognize it and write it to spec/NFR.md — don't let invariants stay informal. (5) Important distinction: framework NFR.md has 2 structural NFRs; projects using the framework may have dozens (performance, security, accessibility, compliance, etc.) — the workflow/tooling must scale to a longer list with mixed types (structural, behavioral, design invariants).
+- **Added**: 2026-03-01
+
 ## Done
 
 

@@ -2236,6 +2236,21 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ---
 
+## F-0147: Spec-Writing Workflow with Delta Tracking & Plan-Review Gate
+
+**Status**: in-progress
+**Priority**: high
+**Complexity**: high
+**Added**: 2026-03-01
+
+**Description**: Canonical spec-writing workflow with five protection levels, NFR integration, delta tracking via migrations, and shipped-spec contract enforcement. Includes pre-commit gates (Checks 14-16) that deterministically block shipped spec modifications without migration, test file deletions for shipped features, and status downgrades. Adds `ag spec` command, check-spec-health.sh validator, and plan-review gate in check-gates.sh. Renames managing-specs skill to writing-specs with expanded scope.
+
+**Dependencies**: F-0003 (Spec-Driven Development), F-0143 (Skills-Primary Architecture)
+
+**Acceptance**: See `spec/acceptance/F-0147.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -2250,6 +2265,6 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 28 | 5 | 1 | 34 |
-| **Total** | **100** | **6** | **1** | **108** |
+| Framework Infrastructure (F-0101+) | 28 | 6 | 1 | 35 |
+| **Total** | **100** | **7** | **1** | **109** |
 

@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Bash, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.34.0"
+  version: "0.36.0"
 ---
 
 # Session Start

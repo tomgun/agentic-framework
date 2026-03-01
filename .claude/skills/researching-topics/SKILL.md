@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with web access."
 allowed-tools: [WebSearch, WebFetch, Read, Write]
 metadata:
   author: agentic-framework
-  version: "0.34.0"
+  version: "0.36.0"
 ---
 
 # Researching Topics

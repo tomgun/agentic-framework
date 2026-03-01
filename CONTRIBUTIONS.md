@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.34.0)
+**Period**: Initial Development (v0.1.0 → v0.36.0)
 **Date**: 2026-03-01
 
 ---
@@ -2408,10 +2408,22 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Key decisions**: Flat key=value state file (no jq dependency). Specialization via `.conf` files per stack (not YAML). LLM-optimized output format — "every token must earn its place." Two-layer approach: Layer A (template-based, deterministic, free) now; Layer B (LLM-synthesized, expensive, on-demand) later. Generated agents inject into hand-crafted skills via `<!-- PROJECT-RULES -->` markers.
 
+### Spec-Writing Workflow & Shipped-Spec Protection (F-0147)
+
+**User direction**: Specs are contracts that protect working features from AI agents accidentally changing them. Identified six gaps: (1) no delta tracking — 1 migration across 108+ features, (2) no spec-writing workflow, (3) no plan-review enforcement, (4) NFRs disconnected from spec workflow, (5) agents can modify shipped specs without justification, (6) pre-commit Check 2 has a grep bug silently passing all shipped-feature checks.
+
+**Key decisions**: Three new pre-commit gates (Checks 14-16) making shipped-spec protection deterministic: spec changes without migration blocked, test file deletion blocked, status downgrade blocked. No escape hatch — deliberate design. Tool-agnostic workflow in `.agentic/workflows/` first, Claude skill wraps it. Renamed `managing-specs` → `writing-specs` skill covering both creation and lifecycle. Plan-review gate (Gate 4) in `check-gates.sh` enforces spec → plan → implement sequence.
+
+**Review rigor**: Two rounds of code review on PR #55. Found and fixed: false success message from global counter, false-positive feature ID leaking from adjacent diff hunks, ERE regex bug (`\|` silently fails with `grep -oE`), basename pipe ordering on multi-line input. All 29 dedicated tests pass.
+
+### NFRs as Live Invariants (Design Insight)
+
+**User insight**: NFRs shouldn't be dead references in acceptance criteria — they should be live invariants that propagate. Five-part model: (1) Acceptance criteria should separate "Invariants (from NFR.md)" from feature-specific criteria — these are system-imposed constraints, not author choices. (2) Test-writing should check applicable NFRs first, before feature tests. (3) When NFR.md changes, all features referencing that NFR should be flagged for review. (4) **NFR capture trigger**: when a developer or agent expresses an invariant quality ("it must always...", "never do X", performance/security constraints), recognize it as an NFR and write it to `spec/NFR.md` — invariants must not stay informal or get lost in conversation. (5) **Scale distinction**: the framework itself has 2 structural NFRs, but projects using the framework may have dozens covering performance, security, accessibility, compliance, etc. — the workflow must handle mixed types (structural, behavioral, design invariants) at scale. Captured as T-0025.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.34.0
+**Current Version**: v0.36.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions

@@ -121,7 +121,7 @@ The framework uses a **distributed enforcement model** — this is a conscious d
 
 **Enforcement points**:
 - `ag implement` — checks acceptance criteria + approved plan
-- `pre-commit-check.sh` — runs 11 structural checks
+- `pre-commit-check.sh` — runs 16 structural checks
 - `ag done` — runs `doctor.sh --phase complete` (but `|| true` in `cmd_done()` currently suppresses failures — see Gap 4)
 - `context-for-role.sh` — assembles role-specific context for subagents
 
@@ -131,7 +131,7 @@ The framework uses a **distributed enforcement model** — this is a conscious d
 
 These mechanisms are proven and stable. Changes require strong justification:
 
-- **pre-commit-check.sh** — 11 structural gates
+- **pre-commit-check.sh** — 16 structural gates
 - **context-for-role.sh** + 24 context manifests — subagent context injection
 - **Token-efficient scripts** — journal.sh, status.sh, feature.sh, blocker.sh
 - **LLM behavioral test suite** — 48+ tests validating instruction compliance

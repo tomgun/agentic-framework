@@ -123,7 +123,7 @@ This audit verifies that each claim in `FRAMEWORK_VALUE_PROPOSITION.md` is backe
 **Verdict**: ✅ IMPLEMENTED
 
 **Evidence**:
-- `.agentic/hooks/pre-commit-check.sh` - 11 validation checks
+- `.agentic/hooks/pre-commit-check.sh` - 16 validation checks
 - Checks: WIP, acceptance criteria, untracked files, tests, complexity
 - Blocking on hard rules, warning on soft signals
 - Referenced in CLAUDE.md enforcement table
@@ -277,7 +277,7 @@ This audit verifies that each claim in `FRAMEWORK_VALUE_PROPOSITION.md` is backe
 
 **Evidence**:
 - `.agentic/hooks/pre-commit-check.sh` - comprehensive enforcement
-- 11 checks documented in CLAUDE.md enforcement table
+- 16 checks documented in CLAUDE.md enforcement table
 - Blocking on hard rules (acceptance, WIP)
 - Warning on soft signals (scope drift, size)
 

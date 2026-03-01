@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0145/F-0146: Lifecycle triggers + project-specific agents — implementation complete, pending commit (Updated: 2026-03-01 12:36 EET)
+- F-0147: spec-writing workflow — creating PR (Updated: 2026-03-01 17:56 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

@@ -2472,6 +2472,129 @@ else
 fi
 
 # ============================================================
+# F-0147: Spec-Writing Workflow with Delta Tracking
+# ============================================================
+echo "--- F-0147: Spec-Writing Workflow with Delta Tracking ---"
+
+# Core files exist
+for f in \
+  ".agentic/workflows/spec_writing.md" \
+  ".agentic/checklists/spec_writing.md" \
+  ".agentic/tools/check-spec-health.sh" \
+  ".agentic/agents/claude/skills/writing-specs/SKILL.md" \
+  ".claude/skills/writing-specs/SKILL.md" \
+  "spec/acceptance/F-0147.md"; do
+  if [[ -f "${FRAMEWORK_ROOT}/${f}" ]]; then
+    pass "F-0147: $(basename "$f") exists"
+  else
+    fail "F-0147: $(basename "$f") missing"
+  fi
+done
+
+# check-spec-health.sh is executable
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/tools/check-spec-health.sh" ]]; then
+  pass "F-0147: check-spec-health.sh is executable"
+else
+  fail "F-0147: check-spec-health.sh not executable"
+fi
+
+# Pre-commit checks 14-16 present
+for check_num in 14 15 16; do
+  if grep -q "\[${check_num}/16\]" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+    pass "F-0147: Check ${check_num} present in pre-commit-check.sh"
+  else
+    fail "F-0147: Check ${check_num} missing from pre-commit-check.sh"
+  fi
+done
+
+# Check 2 grep pattern uses correct format (not plain "Status: shipped")
+if grep -q 'status.*shipped' "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "F-0147: Check 2 grep pattern handles markdown bold format"
+else
+  fail "F-0147: Check 2 grep pattern may not match **Status**: shipped format"
+fi
+
+# managing-specs replaced by writing-specs
+if [[ ! -d "${FRAMEWORK_ROOT}/.agentic/agents/claude/skills/managing-specs" ]]; then
+  pass "F-0147: managing-specs skill removed (source)"
+else
+  fail "F-0147: managing-specs skill still exists (source)"
+fi
+if [[ ! -d "${FRAMEWORK_ROOT}/.claude/skills/managing-specs" ]]; then
+  pass "F-0147: managing-specs skill removed (generated)"
+else
+  fail "F-0147: managing-specs skill still exists (generated)"
+fi
+
+# writing-specs references
+for ref in spec_writing.md spec_evolution.md spec_protection.md; do
+  if [[ -f "${FRAMEWORK_ROOT}/.claude/skills/writing-specs/references/${ref}" ]]; then
+    pass "F-0147: writing-specs reference ${ref} exists"
+  else
+    fail "F-0147: writing-specs reference ${ref} missing"
+  fi
+done
+
+# Gate 4 in check-gates.sh
+if grep -q "plan_review_enabled" "${FRAMEWORK_ROOT}/.claude/skills/implementing-features/scripts/check-gates.sh" 2>/dev/null; then
+  pass "F-0147: Gate 4 (plan-review) in check-gates.sh"
+else
+  fail "F-0147: Gate 4 (plan-review) missing from check-gates.sh"
+fi
+
+# ag spec command in ag.sh
+if grep -q "cmd_spec\b\|cmd_spec()" "${FRAMEWORK_ROOT}/.agentic/tools/ag.sh" 2>/dev/null; then
+  pass "F-0147: ag spec command in ag.sh"
+else
+  fail "F-0147: ag spec command missing from ag.sh"
+fi
+
+# Spec-writing pipeline in auto_orchestration.md
+if grep -q "Spec-Writing Pipeline" "${FRAMEWORK_ROOT}/.agentic/agents/shared/auto_orchestration.md" 2>/dev/null; then
+  pass "F-0147: Spec-Writing Pipeline in auto_orchestration.md"
+else
+  fail "F-0147: Spec-Writing Pipeline missing from auto_orchestration.md"
+fi
+
+# NFR Compliance section in acceptance template
+if grep -q "NFR Compliance" "${FRAMEWORK_ROOT}/.agentic/spec/acceptance.template.md" 2>/dev/null; then
+  pass "F-0147: NFR Compliance section in acceptance template"
+else
+  fail "F-0147: NFR Compliance section missing from acceptance template"
+fi
+
+# Migration index integrity
+MIGRATION_FILES=$(ls "${FRAMEWORK_ROOT}/spec/migrations/"[0-9]*.md 2>/dev/null | wc -l | tr -d ' ')
+MIGRATION_INDEX_COUNT=$(grep -c '"id":' "${FRAMEWORK_ROOT}/spec/migrations/_index.json" 2>/dev/null || echo "0")
+if [[ "$MIGRATION_FILES" -eq "$MIGRATION_INDEX_COUNT" ]]; then
+  pass "F-0147: migration files ($MIGRATION_FILES) match index entries ($MIGRATION_INDEX_COUNT)"
+else
+  fail "F-0147: migration files ($MIGRATION_FILES) != index entries ($MIGRATION_INDEX_COUNT)"
+fi
+
+# No duplicate migration prefixes
+DUPLICATE_PREFIXES=$(ls "${FRAMEWORK_ROOT}/spec/migrations/"[0-9]*.md 2>/dev/null | sed 's/.*\///' | cut -c1-3 | sort | uniq -d)
+if [[ -z "$DUPLICATE_PREFIXES" ]]; then
+  pass "F-0147: no duplicate migration ID prefixes"
+else
+  fail "F-0147: duplicate migration prefixes: $DUPLICATE_PREFIXES"
+fi
+
+# generate-skills.sh includes writing-specs in reference mapping
+if grep -q "writing-specs" "${FRAMEWORK_ROOT}/.agentic/tools/generate-skills.sh" 2>/dev/null; then
+  pass "F-0147: writing-specs in generate-skills.sh reference mapping"
+else
+  fail "F-0147: writing-specs missing from generate-skills.sh"
+fi
+
+# validate_skills.sh expects writing-specs
+if grep -q "writing-specs" "${FRAMEWORK_ROOT}/tests/validate_skills.sh" 2>/dev/null; then
+  pass "F-0147: writing-specs in validate_skills.sh expected list"
+else
+  fail "F-0147: writing-specs missing from validate_skills.sh"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

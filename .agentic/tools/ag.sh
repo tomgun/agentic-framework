@@ -174,6 +174,7 @@ COMMANDS:
     init                Run project initialization interview
     plan F-XXXX         Create plan with review loop (before implementing)
     implement F-XXXX    Verify acceptance exists, start WIP tracking
+    spec [F-XXXX]       Write/check spec for a feature (single feature workflow)
     specs               Systematic brownfield spec generation by domain
     todo <args>         Quick-capture ideas/tasks to TODO.md inbox
     commit              Run all pre-commit gates
@@ -197,6 +198,9 @@ EXAMPLES:
     ag plan F-0042              # Create plan with iterative review
     ag plan F-0042 --no-review  # Create plan without review loop
     ag implement F-0042         # Start working on feature F-0042
+    ag spec                     # Print spec-writing checklist for new feature
+    ag spec F-0042              # Show spec status for F-0042
+    ag spec --check             # Run spec health check on all features
     ag specs                    # Start/resume brownfield spec generation
     ag specs --status           # Show domain progress
     ag todo "Try new library"   # Capture idea to TODO.md
@@ -1835,6 +1839,37 @@ cmd_test_llm() {
     esac
 }
 
+# Spec command - single feature spec writing/checking
+cmd_spec() {
+    local arg="${1:-}"
+
+    if [[ "$arg" == "--check" ]]; then
+        echo -e "${BLUE}Running spec health check on all features...${NC}"
+        echo ""
+        bash .agentic/tools/check-spec-health.sh --all
+        return
+    fi
+
+    if [[ -n "$arg" ]] && echo "$arg" | grep -qE '^(F|NFR)-[0-9]+$'; then
+        echo -e "${BLUE}Spec status for $arg${NC}"
+        echo ""
+        bash .agentic/tools/check-spec-health.sh "$arg"
+        return
+    fi
+
+    # Default: print spec-writing checklist for new feature
+    echo -e "${BLUE}Spec-Writing Checklist${NC}"
+    echo ""
+    if [[ -f ".agentic/checklists/spec_writing.md" ]]; then
+        cat .agentic/checklists/spec_writing.md
+    else
+        echo "Checklist not found at .agentic/checklists/spec_writing.md"
+    fi
+    echo ""
+    echo -e "Full workflow: ${BLUE}.agentic/workflows/spec_writing.md${NC}"
+    echo -e "Usage: ag spec F-XXXX    (check feature)  |  ag spec --check  (check all)"
+}
+
 # Specs command - systematic brownfield spec generation
 cmd_specs() {
     local arg="${1:-}"
@@ -2368,6 +2403,9 @@ case "${1:-help}" in
         ;;
     implement)
         cmd_implement "${2:-}"
+        ;;
+    spec)
+        cmd_spec "${2:-}"
         ;;
     specs)
         cmd_specs "${2:-}"
