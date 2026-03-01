@@ -16,13 +16,6 @@ _No active items_
 ---
 
 
-### HN-0012: PR #52: Post-F-0143 doc sync
-- **Type**: pr_review
-- **Added**: 2026-02-28
-- **Context**: https://github.com/tomgun/agentic-framework/pull/52 — 12 docs updated for skills-primary architecture
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
 ## Resolved
 
 <!-- Archive resolved items here with date and outcome -->
@@ -91,3 +84,15 @@ _No active items_
 - **Added**: 2026-02-24
 - **Resolved**: 2026-02-24
 - **Outcome**: PR #44 merged (v0.32.1)
+
+### HN-0012: PR #52: Post-F-0143 doc sync
+- **Type**: pr_review
+- **Added**: 2026-02-28
+- **Resolved**: 2026-03-01
+- **Outcome**: PR #52 merged
+
+### HN-0013: PR #55: F-0147 spec-writing workflow
+- **Type**: review
+- **Added**: 2026-03-01
+- **Resolved**: 2026-03-01
+- **Outcome**: PR #55 merged (v0.36.0)
