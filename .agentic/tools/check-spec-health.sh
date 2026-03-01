@@ -118,7 +118,7 @@ check_feature() {
     local HAS_MIGRATION
     HAS_MIGRATION=$(grep -rl "$FID" spec/migrations/*.md 2>/dev/null || true)
     if [[ -n "$HAS_MIGRATION" ]]; then
-        echo -e "  ${GREEN}✓${NC} Migration found: $(basename "$HAS_MIGRATION" | head -1)"
+        echo -e "  ${GREEN}✓${NC} Migration found: $(echo "$HAS_MIGRATION" | head -1 | xargs basename)"
     else
         echo -e "  ${BLUE}ℹ${NC} No migration found (info for legacy, required for new features)"
         INFO=$((INFO + 1))

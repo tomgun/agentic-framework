@@ -910,7 +910,6 @@ if [[ -f "spec/FEATURES.md" ]]; then
     DOWNGRADED_IDS=""
     DIFF_OUTPUT=$(git diff --cached -U20 spec/FEATURES.md 2>/dev/null || true)
     LAST_FID=""
-    IN_REMOVAL=0
     while IFS= read -r line; do
       # Reset context at hunk boundaries
       if echo "$line" | grep -qE "^@@"; then
@@ -922,10 +921,7 @@ if [[ -f "spec/FEATURES.md" ]]; then
       fi
       # Detect removed shipped status — must be on a deletion line (starts with -)
       if echo "$line" | grep -qE "^-.*[Ss]tatus.*shipped"; then
-        # Verify this feature actually had shipped status by checking the removed line
-        # is within the same feature block as LAST_FID
         if [[ -n "$LAST_FID" ]]; then
-          # Confirm the feature heading was also a removed or context line (not an add)
           DOWNGRADED_IDS="$DOWNGRADED_IDS $LAST_FID"
           HAS_DOWNGRADE=1
         fi
