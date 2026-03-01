@@ -2,7 +2,7 @@
 
 **Project**: Agentic AI Framework
 **Period**: Initial Development (v0.1.0 → v0.34.0)
-**Date**: 2026-02-28
+**Date**: 2026-03-01
 
 ---
 
@@ -2401,6 +2401,12 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 ### Memory Seed Staleness Gap
 
 **User observation**: MEMORY.md was at v0.24.0 while seed was at v0.34.0 — 10 versions stale despite `memory-check.sh` existing. Root cause: (1) worktree bug — `memory-check.sh` resolves to worktree memory path, not main repo; (2) sync mechanism is entirely behavioral (print warning, hope agent acts). Identified need for script-prepared diffs that reduce the LLM's merge burden. Captured as T-0022.
+
+### Lifecycle Triggers + Project-Specific Agents (F-0145, F-0146)
+
+**User direction**: Two connected gaps — (1) no unified lifecycle trigger mechanism (5 ad-hoc trigger patterns with different config/state/invocation), and (2) no auto-generated project-specific agents (React project gets same agents as FastAPI). Designed comprehensive plan combining frequency-gated periodic checks with template-based agent generation from specialization rules.
+
+**Key decisions**: Flat key=value state file (no jq dependency). Specialization via `.conf` files per stack (not YAML). LLM-optimized output format — "every token must earn its place." Two-layer approach: Layer A (template-based, deterministic, free) now; Layer B (LLM-synthesized, expensive, on-demand) later. Generated agents inject into hand-crafted skills via `<!-- PROJECT-RULES -->` markers.
 
 ---
 
