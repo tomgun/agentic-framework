@@ -1,3 +1,8 @@
+---
+summary: "Apple Human Interface Guidelines reference for iOS design"
+tokens: ~1374
+---
+
 # iOS Human Interface Guidelines Design System
 
 **Philosophy**: Clarity, deference, depth. Apple's design language for iOS.

@@ -1,3 +1,8 @@
+---
+summary: "Default stack profile for projects without a specific template"
+tokens: ~135
+---
+
 # Generic default profile
 
 Use this when you don’t yet know the full stack, or when the project is standard.
