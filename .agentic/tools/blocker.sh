@@ -123,7 +123,7 @@ case "${ACTION}" in
     fi
     
     # Extract blocker text
-    BLOCKER_TEXT=$(sed -n "/^### ${HN_ID}:/,/^$/p" "${BLOCKER_FILE}" | head -n -1)
+    BLOCKER_TEXT=$(sed -n "/^### ${HN_ID}:/,/^$/p" "${BLOCKER_FILE}" | sed '$d')
     BLOCKER_TITLE=$(echo "${BLOCKER_TEXT}" | head -1)
     
     # Remove from Active section
@@ -134,7 +134,7 @@ case "${ACTION}" in
 \\
 ${BLOCKER_TITLE}\\
 - **Resolved**: ${TIMESTAMP}\\
-- **Resolution**: ${RESOLUTION}\\
+- **Outcome**: ${RESOLUTION}\\
 " "${BLOCKER_FILE}"
     rm -f "${BLOCKER_FILE}.bak"
     
