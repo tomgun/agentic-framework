@@ -22,6 +22,9 @@
 #   3d. NFR.md updated when NFR spec files changed (BLOCKING, Formal only)
 #   11. Branch policy for PR workflow (blocks commit to main if pull_request mode)
 #   13. Test co-presence check (advisory, full mode only — warns when source files lack tests)
+#   14. Shipped spec changes require migration (BLOCKING)
+#   15. Test file deletion blocked if referenced by shipped feature (BLOCKING)
+#   16. Status downgrade protection for shipped features (BLOCKING)
 #
 # Escape hatches (use sparingly, blocked on main/master):
 #   SKIP_TESTS=1      Skip test execution
@@ -130,7 +133,7 @@ fi
 FAILURES=0
 
 # Check 1: .agentic-state/WIP.md must not exist
-echo "[1/13] Checking for incomplete work (.agentic-state/WIP.md)..."
+echo "[1/16] Checking for incomplete work (.agentic-state/WIP.md)..."
 if [[ -f ".agentic-state/WIP.md" ]]; then
   echo "❌ BLOCKED: .agentic-state/WIP.md exists - work is incomplete!"
   echo ""
@@ -149,10 +152,11 @@ fi
 # Check 2: Shipped features must have acceptance criteria
 if [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[2/13] Checking shipped features have acceptance criteria..."
+  echo "[2/16] Checking shipped features have acceptance criteria..."
   
   # Extract feature IDs marked as shipped
-  SHIPPED_FEATURES=$(grep -A3 "^## F-" spec/FEATURES.md | grep -B3 "Status: shipped" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
+  # Format: **Status**: shipped (markdown bold wrapping)
+  SHIPPED_FEATURES=$(grep -A5 "^## F-" spec/FEATURES.md | grep -B5 -i "status.*shipped" | grep "^## F-" | cut -d: -f1 | sed 's/^## //' || echo "")
   
   if [[ -n "$SHIPPED_FEATURES" ]]; then
     MISSING_ACCEPTANCE=""
@@ -182,7 +186,7 @@ if [[ -f "spec/FEATURES.md" ]]; then
   fi
 else
   echo ""
-  echo "[2/13] Skipping shipped features check (Discovery profile, no spec/FEATURES.md)"
+  echo "[2/16] Skipping shipped features check (Discovery profile, no spec/FEATURES.md)"
   echo ""
   echo "  📋 Discovery checklist (review, not blocking):"
   echo "     □ Defined what success looks like (even 2-3 bullet points)"
@@ -202,7 +206,7 @@ fi
 
 if [[ -n "$JOURNAL_PATH" ]]; then
   echo ""
-  echo "[3/13] Checking JOURNAL.md freshness..."
+  echo "[3/16] Checking JOURNAL.md freshness..."
 
   if [[ -n "${SKIP_STALENESS:-}" ]]; then
     echo "  ⚠ Skipped (SKIP_STALENESS set)"
@@ -238,13 +242,13 @@ if [[ -n "$JOURNAL_PATH" ]]; then
   fi
 else
   echo ""
-  echo "[3/13] Skipping JOURNAL.md check (file not found)"
+  echo "[3/16] Skipping JOURNAL.md check (file not found)"
 fi
 
 # Check 3b: STATUS.md updated since last commit (BLOCKING)
 if [[ -f "STATUS.md" ]]; then
   echo ""
-  echo "[3b/13] Checking STATUS.md freshness..."
+  echo "[3b/16] Checking STATUS.md freshness..."
 
   if [[ -n "${SKIP_STALENESS:-}" ]]; then
     echo "  ⚠ Skipped (SKIP_STALENESS set)"
@@ -284,7 +288,7 @@ fi
 FEATURE_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep "^spec/" | grep -v "^spec/NFR\.md$" | grep -v "^spec/acceptance/NFR-" | grep -v "^$" || true)
 if [[ -n "$FEATURE_SPEC_STAGED" ]] && [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[3c/13] Checking FEATURES.md freshness (feature spec files staged)..."
+  echo "[3c/16] Checking FEATURES.md freshness (feature spec files staged)..."
 
   if [[ -n "${SKIP_STALENESS:-}" ]]; then
     echo "  ⚠ Skipped (SKIP_STALENESS set)"
@@ -325,7 +329,7 @@ fi
 NFR_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^spec/(NFR\.md|acceptance/NFR-)" || true)
 if [[ -n "$NFR_SPEC_STAGED" ]] && [[ -f "spec/NFR.md" ]]; then
   echo ""
-  echo "[3d/13] Checking NFR.md freshness (NFR spec files staged)..."
+  echo "[3d/16] Checking NFR.md freshness (NFR spec files staged)..."
 
   if [[ -n "${SKIP_STALENESS:-}" ]]; then
     echo "  ⚠ Skipped (SKIP_STALENESS set)"
@@ -363,7 +367,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 elif [[ -f "STACK.md" ]]; then
   echo ""
-  echo "[4/13] Checking STACK.md version consistency..."
+  echo "[4/16] Checking STACK.md version consistency..."
   
   # Example: Check Node.js version if package.json exists
   if [[ -f "package.json" ]] && command -v node >/dev/null 2>&1; then
@@ -393,7 +397,7 @@ elif [[ -f "STACK.md" ]]; then
   fi
 else
   echo ""
-  echo "[4/13] Skipping STACK.md check (file not found)"
+  echo "[4/16] Skipping STACK.md check (file not found)"
 fi
 
 # Check 5: Batch size warning (small batches = quality)
@@ -401,7 +405,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 elif command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   echo ""
-  echo "[5/13] Checking batch size (small batches = quality)..."
+  echo "[5/16] Checking batch size (small batches = quality)..."
 
   # Count staged files
   CHANGED_FILES=$(git diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
@@ -439,12 +443,12 @@ if [[ $_FAST_MODE -eq 1 ]]; then
 elif [[ -n "${SKIP_TESTS:-}" ]]; then
   echo ""
   echo "═══════════════════════════════════════════════════════════════════════"
-  echo "[6/13] Running tests..."
+  echo "[6/16] Running tests..."
   echo "  ⚠ Skipped (SKIP_TESTS set)"
 else
   echo ""
   echo "═══════════════════════════════════════════════════════════════════════"
-  echo "[6/13] Running tests..."
+  echo "[6/16] Running tests..."
   # Prefer fast tests for pre-commit, fall back to full test command
   TEST_CMD=""
   if [[ -f "STACK.md" ]]; then
@@ -512,7 +516,7 @@ fi
 # Check 7: Complexity limits (BLOCKING)
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════"
-echo "[7/13] Checking complexity limits..."
+echo "[7/16] Checking complexity limits..."
 
 if [[ -n "${SKIP_COMPLEXITY:-}" ]]; then
   echo "  ⚠ Skipped (SKIP_COMPLEXITY set)"
@@ -602,7 +606,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 elif command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   echo ""
-  echo "[8/13] Checking for untracked files in project directories..."
+  echo "[8/16] Checking for untracked files in project directories..."
   # Directories that should typically have files tracked
   CHECK_DIRS=("src" "lib" "app" "assets" "public" "tests" "test" "spec" "docs" "scripts")
   
@@ -648,7 +652,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 elif [[ -f ".agentic/tools/llm-test-status.sh" ]] && [[ -f "tests/VERIFICATION_REPORT.md" ]]; then
   echo ""
-  echo "[9/13] Checking LLM behavioral test status..."
+  echo "[9/16] Checking LLM behavioral test status..."
   if bash .agentic/tools/llm-test-status.sh --quiet 2>/dev/null; then
     echo "✓ LLM behavioral tests are current"
   else
@@ -663,7 +667,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 else
 echo ""
-echo "[10/13] Checking agent instruction file sizes..."
+echo "[10/16] Checking agent instruction file sizes..."
 
 SIZE_WARNINGS=0
 
@@ -704,7 +708,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
   : # skip in fast mode
 elif [[ -f "spec/FEATURES.md" ]]; then
   echo ""
-  echo "[12/13] Checking workflow compliance (Formal)..."
+  echo "[12/16] Checking workflow compliance (Formal)..."
 
   # Only check when new files are being added in implementation directories
   NEW_IMPL_FILES=$(git diff --cached --name-only --diff-filter=A 2>/dev/null | grep -E '^(src/|lib/|app/|\.agentic/tools/|\.agentic/hooks/)' || true)
@@ -738,7 +742,7 @@ fi
 
 # Check 11: Branch policy for PR workflow (BLOCKS commit to main/master)
 echo ""
-echo "[11/13] Checking branch policy..."
+echo "[11/16] Checking branch policy..."
 
 if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
@@ -774,7 +778,7 @@ if [[ $_FAST_MODE -eq 1 ]]; then
 else
   echo ""
   echo "═══════════════════════════════════════════════════════════════════════"
-  echo "[13/13] Checking test co-presence (advisory)..."
+  echo "[13/16] Checking test co-presence (advisory)..."
 
   STAGED_SOURCE_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E '\.(ts|tsx|js|jsx|py|go|rs|rb|java|swift|kt)$' | grep -vE '(\.test\.|\.spec\.|_test\.|test_|\.d\.ts$|__tests__|\.config\.|\.stories\.)' | grep -vE '^(tests?/|spec/|\.agentic/)' || true)
   UNTESTED_FILES=0
@@ -835,6 +839,97 @@ else
     else
       echo "✓ No source files staged (test check skipped)"
     fi
+  fi
+fi
+
+# Check 14: Shipped spec changes require migration (BLOCKING)
+if [[ -f "spec/FEATURES.md" ]]; then
+  echo ""
+  echo "[14/16] Checking shipped spec protection..."
+
+  SHIPPED_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^spec/acceptance/(F|NFR)-[0-9]+\.md$" || true)
+  if [[ -n "$SHIPPED_SPEC_STAGED" ]]; then
+    for spec_file in $SHIPPED_SPEC_STAGED; do
+      FID=$(basename "$spec_file" .md)
+      # Match **Status**: shipped format in FEATURES.md
+      IS_SHIPPED=$(grep -A5 "^## ${FID}:" spec/FEATURES.md 2>/dev/null | grep -i "status.*shipped" || true)
+      if [[ -n "$IS_SHIPPED" ]]; then
+        MIGRATION_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^spec/migrations/[0-9]+.*\.md$" || true)
+        if [[ -z "$MIGRATION_STAGED" ]] || ! git diff --cached -- $MIGRATION_STAGED 2>/dev/null | grep -q "$FID"; then
+          echo "❌ BLOCKED: Shipped feature $FID acceptance criteria modified without migration"
+          echo "  Create: bash .agentic/tools/migration.sh create 'Update $FID ...'"
+          FAILURES=$((FAILURES + 1))
+        fi
+      fi
+    done
+    if [[ $FAILURES -eq 0 ]] || ! echo "$SHIPPED_SPEC_STAGED" | grep -q .; then
+      echo "✓ Shipped spec changes have migration coverage"
+    fi
+  else
+    echo "✓ No shipped spec acceptance files modified"
+  fi
+fi
+
+# Check 15: Deleting test files referenced by shipped features (BLOCKING)
+if [[ -f "spec/FEATURES.md" ]]; then
+  echo ""
+  echo "[15/16] Checking shipped feature test protection..."
+
+  DELETED_TEST_FILES=$(git diff --cached --diff-filter=D --name-only 2>/dev/null | grep -E "^tests/" || true)
+  CHECK15_FAIL=0
+  if [[ -n "$DELETED_TEST_FILES" ]]; then
+    for test_file in $DELETED_TEST_FILES; do
+      REFERENCING_SPECS=$(grep -rl "$test_file" spec/acceptance/ 2>/dev/null || true)
+      for spec in $REFERENCING_SPECS; do
+        FID=$(basename "$spec" .md)
+        IS_SHIPPED=$(grep -A5 "^## ${FID}:" spec/FEATURES.md 2>/dev/null | grep -i "status.*shipped" || true)
+        if [[ -n "$IS_SHIPPED" ]]; then
+          echo "❌ BLOCKED: Cannot delete $test_file — referenced by shipped feature $FID"
+          FAILURES=$((FAILURES + 1))
+          CHECK15_FAIL=1
+        fi
+      done
+    done
+  fi
+  if [[ $CHECK15_FAIL -eq 0 ]]; then
+    echo "✓ No shipped feature test files being deleted"
+  fi
+fi
+
+# Check 16: Status downgrade protection for shipped features (BLOCKING)
+if [[ -f "spec/FEATURES.md" ]]; then
+  echo ""
+  echo "[16/16] Checking shipped feature status protection..."
+
+  if git diff --cached --name-only 2>/dev/null | grep -q "^spec/FEATURES.md$"; then
+    # Look for lines where "shipped" was removed (- line)
+    # Use -U10 context to find the feature ID from the nearest ## F-XXXX heading
+    HAS_DOWNGRADE=0
+    DOWNGRADED_IDS=""
+    DIFF_OUTPUT=$(git diff --cached -U10 spec/FEATURES.md 2>/dev/null || true)
+    LAST_FID=""
+    while IFS= read -r line; do
+      # Track current feature context from both context and added/removed lines
+      if echo "$line" | grep -qE "^[ +@-].*## F-[0-9]+:"; then
+        LAST_FID=$(echo "$line" | grep -oE "F-[0-9]+" | head -1)
+      fi
+      # Detect removed shipped status
+      if echo "$line" | grep -qE "^-.*[Ss]tatus.*shipped"; then
+        if [[ -n "$LAST_FID" ]]; then
+          DOWNGRADED_IDS="$DOWNGRADED_IDS $LAST_FID"
+          HAS_DOWNGRADE=1
+        fi
+      fi
+    done <<< "$DIFF_OUTPUT"
+    if [[ $HAS_DOWNGRADE -eq 1 ]]; then
+      echo "❌ BLOCKED: Shipped feature status downgraded:$DOWNGRADED_IDS"
+      echo "  Shipped features cannot be un-shipped without explicit migration"
+      FAILURES=$((FAILURES + 1))
+    else
+      echo "✓ No shipped feature status downgrades"
+    fi
+  else
+    echo "✓ FEATURES.md not modified"
   fi
 fi
 
