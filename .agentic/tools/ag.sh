@@ -304,7 +304,7 @@ cmd_start() {
     # 5. Check HUMAN_NEEDED.md for blockers
     if [ -f "$ROOT_DIR/HUMAN_NEEDED.md" ]; then
         local blocker_count
-        blocker_count=$(grep -c "^### HN-" "$ROOT_DIR/HUMAN_NEEDED.md" 2>/dev/null || echo "0")
+        blocker_count=$(awk '/^## Active items/,/^---$/' "$ROOT_DIR/HUMAN_NEEDED.md" 2>/dev/null | grep -c "^### HN-" || true)
         if [ "$blocker_count" -gt 0 ]; then
             echo -e "${YELLOW}Blockers: $blocker_count item(s) need human input${NC}"
         fi
