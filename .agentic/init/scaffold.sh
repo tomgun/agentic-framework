@@ -278,6 +278,11 @@ if [[ "${PROFILE}" == "discovery" ]]; then
   if [[ -f "${ROOT_DIR}/.agentic/tools/setup-agent.sh" ]]; then
     bash "${ROOT_DIR}/.agentic/tools/setup-agent.sh" all 2>/dev/null || true
   fi
+  # Generate project-specific agents from detected stack (Layer A)
+  if [[ "$DISCOVERY_RAN" == "yes" ]] && [[ -f "${ROOT_DIR}/.agentic/tools/generate-project-agents.sh" ]]; then
+    echo "Generating project-specific agents..."
+    bash "${ROOT_DIR}/.agentic/tools/generate-project-agents.sh" 2>/dev/null || true
+  fi
   echo ""
   if [[ "$DISCOVERY_RAN" == "yes" ]]; then
     echo "Done (Discovery + auto-discovery). Proposals in .agentic-state/proposals/"
@@ -375,6 +380,13 @@ if [[ -f "${ROOT_DIR}/.agentic/tools/setup-agent.sh" ]]; then
   echo ""
   echo "Setting up multi-agent pipeline infrastructure..."
   bash "${ROOT_DIR}/.agentic/tools/setup-agent.sh" pipeline 2>/dev/null || true
+fi
+
+# Generate project-specific agents from detected stack (Layer A)
+if [[ "$DISCOVERY_RAN" == "yes" ]] && [[ -f "${ROOT_DIR}/.agentic/tools/generate-project-agents.sh" ]]; then
+  echo ""
+  echo "Generating project-specific agents..."
+  bash "${ROOT_DIR}/.agentic/tools/generate-project-agents.sh" 2>/dev/null || true
 fi
 
 echo ""

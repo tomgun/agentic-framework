@@ -2206,6 +2206,36 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ---
 
+## F-0145: Periodic Check System (Lifecycle Triggers)
+
+**Status**: in-progress
+**Priority**: medium
+**Complexity**: medium
+**Added**: 2026-03-01
+
+**Description**: Frequency-gated periodic checks in sync.sh. State file (`.agentic-state/sync-state.conf`) tracks last-run per check. Supports `every_session`, `every_N_sessions`, `off` frequencies. Includes orphaned plan detection, retro check migration, agent freshness check. Session counter increments on each sync run.
+
+**Dependencies**: None
+
+**Acceptance**: See `spec/acceptance/F-0145.md`
+
+---
+
+## F-0146: Project-Specific Agent Generation (Layer A)
+
+**Status**: in-progress
+**Priority**: medium
+**Complexity**: medium
+**Added**: 2026-03-01
+
+**Description**: Template-based (no LLM) project-specific agent generation. Detects tech stacks from STACK.md + file presence, matches specialization rules (`.agentic/agents/specialization/*.conf`), generates project-specific agents in `subagents-project/`. Ships with 5 stacks: React, FastAPI, Django, Go, Godot. Integrates with generate-skills.sh to inject project rules into Claude skills.
+
+**Dependencies**: F-0145 (for periodic agent refresh trigger)
+
+**Acceptance**: See `spec/acceptance/F-0146.md`
+
+---
+
 ## Summary
 
 | Category | Shipped | In Progress | Planned | Total |
@@ -2220,6 +2250,6 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 | Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
 | Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
 | Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 28 | 3 | 1 | 32 |
-| **Total** | **100** | **4** | **1** | **106** |
+| Framework Infrastructure (F-0101+) | 28 | 5 | 1 | 34 |
+| **Total** | **100** | **6** | **1** | **108** |
 

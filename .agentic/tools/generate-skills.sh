@@ -276,18 +276,64 @@ for skill_src_dir in "$SKILLS_SRC"/*/; do
     GENERATED=$((GENERATED + 1))
 done
 
+# ── Inject project-specific rules from subagents-project/ ─
+# Maps agent type → skill name
+agent_to_skill() {
+    case "$1" in
+        implementation) echo "implementing-features" ;;
+        test)           echo "writing-tests" ;;
+        review)         echo "reviewing-code" ;;
+        *)              echo "" ;;
+    esac
+}
+
+PROJECT_AGENTS_DIR="$AGENTIC_DIR/agents/claude/subagents-project"
+INJECTED=0
+
+if [[ -d "$PROJECT_AGENTS_DIR" ]] && ! $VALIDATE_ONLY; then
+    for agent_file in "$PROJECT_AGENTS_DIR"/*-agent.md; do
+        [[ -f "$agent_file" ]] || continue
+
+        # Extract agent type from filename (e.g., implementation-agent.md → implementation)
+        agent_type=$(basename "$agent_file" | sed 's/-agent\.md$//')
+        skill_name=$(agent_to_skill "$agent_type")
+        [[ -z "$skill_name" ]] && continue
+
+        skill_md="$SKILLS_OUT/$skill_name/SKILL.md"
+        [[ -f "$skill_md" ]] || continue
+
+        # Extract project-specific content (everything from "## Project-Specific Rules" onward,
+        # stopping before the footer separator)
+        project_content=$(sed -n '/^## Project-Specific Rules/,/^---$/p' "$agent_file" | sed '$d')
+        [[ -z "$project_content" ]] && continue
+
+        # Append project-specific rules to the skill
+        printf '\n<!-- PROJECT-RULES-START (auto-injected from subagents-project/) -->\n%s\n<!-- PROJECT-RULES-END -->\n' "$project_content" >> "$skill_md"
+
+        echo -e "  ${GREEN}+${NC} injected project rules → $skill_name"
+        INJECTED=$((INJECTED + 1))
+    done
+fi
+
 echo ""
 if [[ $ERRORS -gt 0 ]]; then
     echo -e "${RED}Generated $GENERATED skills with $ERRORS error(s) and $WARNINGS warning(s)${NC}"
     echo "Fix validation errors in source files before deploying."
     exit 1
 else
-    echo -e "${GREEN}Generated $GENERATED skills ($WARNINGS warning(s))${NC}"
+    local_msg="${GREEN}Generated $GENERATED skills"
+    if [[ $INJECTED -gt 0 ]]; then
+        local_msg="$local_msg + $INJECTED project-specific injections"
+    fi
+    echo -e "$local_msg ($WARNINGS warning(s))${NC}"
 fi
 
 echo ""
 echo "Skills are auto-discovered by Claude Code based on task description."
 echo "Source of truth: .agentic/agents/claude/skills/"
+if [[ $INJECTED -gt 0 ]]; then
+    echo "Project rules from: .agentic/agents/claude/subagents-project/"
+fi
 echo ""
 echo "To regenerate: bash .agentic/tools/generate-skills.sh"
 echo "To validate only: bash .agentic/tools/generate-skills.sh --validate"

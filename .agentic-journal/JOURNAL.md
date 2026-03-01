@@ -1047,3 +1047,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-01 12:36 - F-0145 + F-0146
+
+**Why**: Two features shipped in one batch after PR #53 merge conflict recovery
+
+**Accomplished**:
+- Implemented periodic-checks.sh (state/frequency/session/orphaned-plans), generate-project-agents.sh (5 stacks: react/fastapi/django/go/godot), 5 specialization .conf files, generate-skills.sh project injection, scaffold hook, ag agents command, 17 tests (all pass), 293/0 validation
+
+**Next steps**:
+- Commit + PR
+
+**Blockers**: None
+
