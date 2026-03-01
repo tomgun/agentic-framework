@@ -38,6 +38,21 @@ else
     echo "⚠ Feature ${FEATURE_ID} not found in spec/FEATURES.md (add it)"
 fi
 
+# Gate 4: Approved plan required (if plan_review_enabled in STACK.md)
+PLAN_REVIEW=$(grep "plan_review_enabled:" STACK.md 2>/dev/null | head -1 | awk '{print $NF}' || true)
+if [[ "$PLAN_REVIEW" == "yes" ]]; then
+    PLAN_FILE=$(find .agentic-journal/plans/ -name "*${FEATURE_ID}*plan*.md" -print -quit 2>/dev/null)
+    if [[ -n "$PLAN_FILE" ]] && grep -q "Status.*APPROVED" "$PLAN_FILE"; then
+        echo "✓ Approved plan exists: $PLAN_FILE"
+    else
+        echo "✗ plan_review_enabled but no approved plan for $FEATURE_ID"
+        echo "  Run: ag plan $FEATURE_ID"
+        ERRORS=$((ERRORS + 1))
+    fi
+else
+    echo "✓ Plan review not required (plan_review_enabled != yes)"
+fi
+
 if [[ $ERRORS -gt 0 ]]; then
     echo ""
     echo "✗ ${ERRORS} gate(s) failed. Fix before implementing."
