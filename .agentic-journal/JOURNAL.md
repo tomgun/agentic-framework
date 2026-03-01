@@ -1025,3 +1025,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-01 11:53 - Frontmatter context research
+
+**Accomplished**:
+- Research doc confirming .agentic/ frontmatter is inert (0 tokens). Added context cost note to INSTRUCTION_ARCHITECTURE.md.
+
+**Next steps**:
+- Push branch, PR ready
+
+**Blockers**: None
+
