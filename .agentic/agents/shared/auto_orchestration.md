@@ -66,6 +66,7 @@ What would you like to work on?
 | "implement F-####" / "build feature" / "create [feature]" | **Feature Pipeline** | Follow Feature Implementation flow |
 | "fix I-####" / "fix bug" / "fix issue" | **Issue Pipeline** | Follow Issue Resolution flow |
 | "commit" / "ready to commit" | **Before Commit** | Run `before_commit.md` checklist |
+| "write spec" / "create spec" / "add acceptance" / "ag spec" | **Spec-Writing Pipeline** | Follow Spec-Writing flow |
 | "done with feature" / "feature complete" | **Feature Complete** | Run `feature_complete.md` checklist |
 | "end session" / "stopping work" | **Session End** | Run `session_end.md` checklist |
 | "review code" / "check this" | **Review** | Run `review_checklist.md` |
@@ -231,6 +232,61 @@ Brownfield spec generation can span multiple sessions:
 - Progress tracked via checkboxes in plan artifact
 - Session start detects active plan → suggests resuming with `ag specs`
 - `ag specs --status` shows domain completion progress
+
+---
+
+## Spec-Writing Pipeline (AUTO-INVOKED)
+
+**Triggers**: "write spec", "create spec", "add acceptance criteria", "spec for F-XXXX", "update spec", "evolve spec", "ag spec"
+
+### Automatic Steps
+
+```
+1. IDENTIFY SCENARIO
+   ├─ New feature (no F-XXXX exists)                   → go to 2
+   └─ Existing feature → check Status field
+       ├─ planned / in_progress                        → go to 3 (Low protection)
+       └─ shipped                                      → go to 4 (HIGH protection)
+
+2. NEW FEATURE SPEC
+   a. Find next F-XXXX ID in spec/FEATURES.md
+   b. Read spec/NFR.md → identify applicable NFRs
+   c. Create FEATURES.md entry (Status: planned, Related NFRs)
+   d. Create spec/acceptance/F-XXXX.md from template
+   e. Show to user for approval
+   f. Run: bash .agentic/tools/migration.sh create "Add F-XXXX [Name]"
+   g. Run: bash .agentic/tools/check-spec-health.sh F-XXXX
+   h. Handoff: "ag plan F-XXXX"
+
+3. UPDATE PLANNED/IN-PROGRESS SPEC
+   a. Read current acceptance criteria
+   b. Update criteria
+   c. Migration if significant (adding/removing criteria, scope change)
+   d. Show to user for approval
+
+4. EVOLVE SHIPPED SPEC (CONTRACT MODIFICATION)
+   a. Read current acceptance criteria + linked tests + NFR references
+   b. Show current state to user
+   c. NEVER delete existing criteria — additive only
+   d. Use markers: [Discovered], [Revised in M-NNN: was "X" now "Y"]
+   e. Require justification (captured in migration)
+   f. Run: bash .agentic/tools/migration.sh create "Evolve F-XXXX: [reason]"
+   g. Run: bash .agentic/tools/drift.sh --check (if available)
+   h. Show changes to user — human MUST approve
+```
+
+### Pre-Commit Enforcement
+
+| Gate | What | If Violated |
+|------|------|-------------|
+| Check 14 | Shipped spec modified without migration | BLOCKED |
+| Check 15 | Test file deleted for shipped feature | BLOCKED |
+| Check 16 | Shipped feature status downgraded | BLOCKED |
+
+No escape hatch. Shipped spec protection is deterministic.
+
+**Checklist**: `.agentic/checklists/spec_writing.md`
+**Full workflow**: `.agentic/workflows/spec_writing.md`
 
 ---
 
