@@ -18,6 +18,7 @@ from typing import List, Dict
 
 FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):\s*(.+?)\s*$")
 KEY_RE = re.compile(r"^\s*-\s+([\w][\w\s/.-]*?):\s*(.*?)\s*$")
+BOLD_KEY_RE = re.compile(r"^\*\*(\w[\w\s/&.-]*?)\*\*:\s*(.*?)\s*$")
 TAG_RE = re.compile(r'\[([^\]]+)\]')
 DATE_RE = re.compile(r'(\d{4}-\d{2}-\d{2})')
 
@@ -36,6 +37,7 @@ def parse_features(md: str) -> List[Dict]:
                 "id": m.group(1),
                 "name": m.group(2),
                 "status": None,
+                "category": None,
                 "tags": [],
                 "layer": None,
                 "domain": None,
@@ -52,13 +54,17 @@ def parse_features(md: str) -> List[Dict]:
 
         km = KEY_RE.match(line)
         if not km:
+            km = BOLD_KEY_RE.match(line)
+        if not km:
             continue
-        
+
         key = km.group(1).strip().lower()
         val = km.group(2).strip()
 
         if key == "status":
-            current["status"] = val.lower() if val else None
+            current["status"] = val.lower().replace("-", "_") if val else None
+        elif key == "category":
+            current["category"] = val if val else None
         elif key == "tags":
             tag_match = TAG_RE.search(val)
             if tag_match:
@@ -118,6 +124,16 @@ def print_dashboard(features: List[Dict], period_days: int = None):
         bar = "█" * int(pct / 2)
         print(f"{status:15} {count:4} ({pct:5.1f}%) {bar}")
     
+    # Category distribution
+    print("\n" + "-" * 70)
+    print("\n📂 CATEGORY DISTRIBUTION")
+    print("-" * 70)
+    category_counts = Counter(f.get("category") or "none" for f in features)
+    for category, count in sorted(category_counts.items(), key=lambda x: -x[1]):
+        pct = (count / total * 100) if total > 0 else 0
+        bar = "█" * int(pct / 2)
+        print(f"{category:30} {count:4} ({pct:5.1f}%) {bar}")
+
     # Layer distribution
     print("\n" + "-" * 70)
     print("\n🏗️  LAYER DISTRIBUTION")

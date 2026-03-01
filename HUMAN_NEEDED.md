@@ -16,6 +16,14 @@ _No active items_
 ---
 
 
+
+### HN-0014: PR #58: Sequential feature IDs with category metadata (v0.37.0)
+- **Type**: review
+- **Added**: 2026-03-02
+- **Context**: https://github.com/tomgun/agentic-framework/pull/58
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 <!-- Archive resolved items here with date and outcome -->

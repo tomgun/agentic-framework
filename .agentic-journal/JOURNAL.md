@@ -1086,3 +1086,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-02 00:05 - Sequential Feature IDs (v0.37.0)
+
+**Why**: 41% of features were in overflow range with no category meaning; fixed 3 pre-existing bugs found during implementation
+
+**Accomplished**:
+- Dropped category-from-ID-range encoding; category is now metadata field on all 114 features. Updated quick_feature.sh (--category flag, octal bug fix), query_features.py and feature_stats.py (bold-key parser fix, --category filter), manifest.sh (idempotent output). SPEC_SCHEMA category field made project-defined. All tests pass (317 validation, 15 query tests).
+
+**Next steps**:
+- PR #58 review
+
+**Blockers**: None
+

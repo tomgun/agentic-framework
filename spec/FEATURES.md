@@ -10,24 +10,27 @@
 
 ## Feature Categories
 
-| Category | Features | Description |
-|----------|----------|-------------|
-| **Core** | F-0001 to F-0010 | Essential framework capabilities |
-| **Quality** | F-0011 to F-0020 | Quality enforcement and standards |
-| **Session** | F-0021 to F-0030 | Session management and continuity |
-| **Multi-Agent** | F-0031 to F-0040 | Multi-agent coordination |
-| **Tooling** | F-0041 to F-0050 | Scripts and automation |
-| **Recovery** | F-0051 to F-0060 | Error recovery and resilience |
-| **Developer Experience** | F-0061 to F-0070 | Documentation, onboarding, usability |
-| **Design Principles** | F-0071 to F-0080 | Core framework principles as specs |
-| **Agent System** | F-0081 to F-0090 | Specialized agents, orchestration, token efficiency |
-| **Verification & Enforcement** | F-0091 to F-0100 | Gate-based verification, phase detection, enforcement |
+Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the ID range.
+
+| Category | Count | Shipped | In Progress | Planned |
+|----------|-------|---------|-------------|---------|
+| **Core** | 14 | 14 | 0 | 0 |
+| **Quality** | 11 | 11 | 0 | 0 |
+| **Session** | 11 | 10 | 0 | 0 |
+| **Multi-Agent** | 9 | 8 | 0 | 1 |
+| **Tooling** | 11 | 11 | 0 | 0 |
+| **Recovery** | 7 | 7 | 0 | 0 |
+| **Developer Experience** | 14 | 13 | 1 | 0 |
+| **Design Principles** | 10 | 10 | 0 | 0 |
+| **Agent System** | 12 | 10 | 2 | 0 |
+| **Verification & Enforcement** | 15 | 15 | 0 | 0 |
 
 ---
 
 ## F-0001: Project Initialization
 
 **Status**: shipped  
+**Category**: Core  
 **Priority**: critical  
 **Complexity**: medium  
 **Since**: v0.1.0
@@ -48,6 +51,7 @@
 ## F-0002: Profile Selection (Discovery vs Formal)
 
 **Status**: shipped  
+**Category**: Core  
 **Priority**: critical  
 **Complexity**: low  
 **Since**: v0.2.0
@@ -68,6 +72,7 @@
 ## F-0003: Spec-Driven Development
 
 **Status**: shipped  
+**Category**: Core  
 **Priority**: high  
 **Complexity**: high  
 **Since**: v0.1.0
@@ -88,6 +93,7 @@
 ## F-0004: Feature Tracking & Status
 
 **Status**: shipped  
+**Category**: Core  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.1.0
@@ -108,6 +114,7 @@
 ## F-0005: Acceptance Criteria Files
 
 **Status**: shipped  
+**Category**: Core  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.1.0
@@ -128,6 +135,7 @@
 ## F-0006: Acceptance-Driven Development
 
 **Status**: shipped  
+**Category**: Core  
 **Priority**: critical  
 **Complexity**: medium  
 **Since**: v0.7.0
@@ -148,6 +156,7 @@
 ## F-0007: Small Batch Development
 
 **Status**: shipped  
+**Category**: Core  
 **Priority**: critical  
 **Complexity**: low  
 **Since**: v0.7.0
@@ -168,6 +177,7 @@
 ## F-0008: TDD Mode (Optional)
 
 **Status**: shipped  
+**Category**: Core  
 **Priority**: medium  
 **Complexity**: medium  
 **Since**: v0.2.0
@@ -188,6 +198,7 @@
 ## F-0009: OVERVIEW.md (Core Profile)
 
 **Status**: shipped  
+**Category**: Core  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.2.0
@@ -208,6 +219,7 @@
 ## F-0010: Spec Evolution Workflow
 
 **Status**: shipped  
+**Category**: Core  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.7.0
@@ -228,6 +240,7 @@
 ## F-0011: Programming Standards
 
 **Status**: shipped  
+**Category**: Quality  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.3.0
@@ -248,6 +261,7 @@
 ## F-0012: Testing Standards
 
 **Status**: shipped  
+**Category**: Quality  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.3.0
@@ -268,6 +282,7 @@
 ## F-0013: Smoke Testing Checklist
 
 **Status**: shipped  
+**Category**: Quality  
 **Priority**: critical  
 **Complexity**: low  
 **Since**: v0.4.3
@@ -288,6 +303,7 @@
 ## F-0014: Library Selection Guidelines
 
 **Status**: shipped  
+**Category**: Quality  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.4.3
@@ -308,6 +324,7 @@
 ## F-0015: Quality Profiles (Stack-Specific)
 
 **Status**: shipped  
+**Category**: Quality  
 **Priority**: medium  
 **Complexity**: high  
 **Since**: v0.3.0
@@ -328,6 +345,7 @@
 ## F-0016: Pre-Commit Quality Gates
 
 **Status**: shipped  
+**Category**: Quality  
 **Priority**: critical  
 **Complexity**: medium  
 **Since**: v0.6.0
@@ -348,6 +366,7 @@
 ## F-0017: Feature Completion Validator
 
 **Status**: shipped  
+**Category**: Quality  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.6.0
@@ -368,6 +387,7 @@
 ## F-0021: Session Start Protocol
 
 **Status**: shipped  
+**Category**: Session  
 **Priority**: critical  
 **Complexity**: medium  
 **Since**: v0.4.0
@@ -388,6 +408,7 @@
 ## F-0022: Session End Protocol
 
 **Status**: shipped  
+**Category**: Session  
 **Priority**: critical  
 **Complexity**: low  
 **Since**: v0.4.0
@@ -408,6 +429,7 @@
 ## F-0023: JOURNAL.md Session Tracking
 
 **Status**: shipped  
+**Category**: Session  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.1.0
@@ -428,6 +450,7 @@
 ## F-0024: STATUS.md Current State
 
 **Status**: shipped  
+**Category**: Session  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.1.0
@@ -448,6 +471,7 @@
 ## F-0025: CONTEXT_PACK.md Architecture
 
 **Status**: shipped  
+**Category**: Session  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.1.0
@@ -468,6 +492,7 @@
 ## F-0026: HUMAN_NEEDED.md Escalation
 
 **Status**: shipped  
+**Category**: Session  
 **Priority**: critical  
 **Complexity**: low  
 **Since**: v0.1.0
@@ -488,6 +513,7 @@
 ## F-0027: Automatic Journaling
 
 **Status**: shipped  
+**Category**: Session  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.4.3
@@ -508,6 +534,7 @@
 ## F-0028: Continue-Here Generator
 
 **Status**: deprecated
+**Category**: Session  
 **Priority**: low
 **Complexity**: medium
 **Since**: v0.3.5
@@ -531,6 +558,7 @@
 ## F-0031: Multi-Agent Coordination
 
 **Status**: shipped  
+**Category**: Multi-Agent  
 **Priority**: high  
 **Complexity**: high  
 **Since**: v0.2.0
@@ -551,6 +579,7 @@
 ## F-0032: Git Worktree Setup
 
 **Status**: shipped  
+**Category**: Multi-Agent  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.2.0
@@ -571,6 +600,7 @@
 ## F-0033: AGENTS_ACTIVE.md Coordination
 
 **Status**: shipped  
+**Category**: Multi-Agent  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.2.0
@@ -591,6 +621,7 @@
 ## F-0034: Sequential Agent Pipeline
 
 **Status**: shipped  
+**Category**: Multi-Agent  
 **Priority**: medium  
 **Complexity**: high  
 **Since**: v0.3.0
@@ -611,6 +642,7 @@
 ## F-0035: Agent Role Definitions
 
 **Status**: shipped  
+**Category**: Multi-Agent  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.9.5
@@ -631,6 +663,7 @@
 ## F-0036: Native Sub-Agent Integration
 
 **Status**: shipped  
+**Category**: Multi-Agent  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.9.5
@@ -651,6 +684,7 @@
 ## F-0037: Project Health Monitoring
 
 **Status**: shipped  
+**Category**: Multi-Agent  
 **Priority**: medium  
 **Complexity**: medium  
 **Since**: v0.9.5
@@ -671,6 +705,7 @@
 ## F-0041: Token-Efficient Update Scripts
 
 **Status**: shipped  
+**Category**: Tooling  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.4.3
@@ -691,6 +726,7 @@
 ## F-0042: Feature Query Tool
 
 **Status**: shipped  
+**Category**: Tooling  
 **Priority**: medium  
 **Complexity**: medium  
 **Since**: v0.3.0
@@ -711,6 +747,7 @@
 ## F-0043: Spec Validation Tool
 
 **Status**: shipped  
+**Category**: Tooling  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.3.0
@@ -731,6 +768,7 @@
 ## F-0044: Framework Age Check
 
 **Status**: shipped  
+**Category**: Tooling  
 **Priority**: low  
 **Complexity**: low  
 **Since**: v0.4.4
@@ -751,6 +789,7 @@
 ## F-0051: WIP Tracking
 
 **Status**: shipped  
+**Category**: Recovery  
 **Priority**: critical  
 **Complexity**: medium  
 **Since**: v0.5.0
@@ -771,6 +810,7 @@
 ## F-0052: WIP.md Lock File
 
 **Status**: shipped
+**Category**: Recovery  
 **Priority**: critical
 **Complexity**: low
 **Since**: v0.5.0
@@ -791,6 +831,7 @@
 ## F-0053: Recovery Protocol
 
 **Status**: shipped  
+**Category**: Recovery  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.6.0
@@ -811,6 +852,7 @@
 ## F-0054: Multi-Environment Support
 
 **Status**: shipped  
+**Category**: Recovery  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.4.4
@@ -831,6 +873,7 @@
 ## F-0055: Anti-Hallucination Rules
 
 **Status**: shipped  
+**Category**: Recovery  
 **Priority**: critical  
 **Complexity**: low  
 **Since**: v0.3.5
@@ -851,6 +894,7 @@
 ## F-0056: Framework Upgrade
 
 **Status**: shipped  
+**Category**: Recovery  
 **Priority**: medium  
 **Complexity**: medium  
 **Since**: v0.2.4
@@ -871,6 +915,7 @@
 ## F-0061: DEVELOPER_GUIDE.md
 
 **Status**: shipped  
+**Category**: Developer Experience  
 **Priority**: high  
 **Complexity**: high  
 **Since**: v0.2.4
@@ -891,6 +936,7 @@
 ## F-0062: START_HERE.md First-Time Guidance
 
 **Status**: shipped  
+**Category**: Developer Experience  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.2.0
@@ -911,6 +957,7 @@
 ## F-0063: README Documentation Quality
 
 **Status**: shipped  
+**Category**: Developer Experience  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.1.0
@@ -931,6 +978,7 @@
 ## F-0064: Script Help Messages
 
 **Status**: shipped  
+**Category**: Developer Experience  
 **Priority**: medium  
 **Complexity**: low  
 **Since**: v0.3.0
@@ -951,6 +999,7 @@
 ## F-0065: Error Message Quality
 
 **Status**: shipped  
+**Category**: Developer Experience  
 **Priority**: medium  
 **Complexity**: low  
 **Since**: v0.3.0
@@ -971,6 +1020,7 @@
 ## F-0066: Template Quality
 
 **Status**: shipped  
+**Category**: Developer Experience  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.1.0
@@ -991,6 +1041,7 @@
 ## F-0067: MANUAL_OPERATIONS.md
 
 **Status**: shipped  
+**Category**: Developer Experience  
 **Priority**: medium  
 **Complexity**: low  
 **Since**: v0.2.0
@@ -1011,6 +1062,7 @@
 ## F-0068: Upgrade Experience
 
 **Status**: shipped  
+**Category**: Developer Experience  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.2.4
@@ -1031,6 +1083,7 @@
 ## F-0069: Checklist-Driven Workflows
 
 **Status**: shipped  
+**Category**: Developer Experience  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.4.0
@@ -1051,6 +1104,7 @@
 ## F-0070: Workflow Document Organization
 
 **Status**: shipped  
+**Category**: Developer Experience  
 **Priority**: medium  
 **Complexity**: low  
 **Since**: v0.7.0
@@ -1071,6 +1125,7 @@
 ## F-0071: Token Economics
 
 **Status**: shipped  
+**Category**: Design Principles  
 **Priority**: critical  
 **Complexity**: high  
 **Since**: v0.1.0
@@ -1091,6 +1146,7 @@
 ## F-0072: Living Documentation
 
 **Status**: shipped  
+**Category**: Design Principles  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.1.0
@@ -1111,6 +1167,7 @@
 ## F-0073: Human-Agent Collaboration
 
 **Status**: shipped  
+**Category**: Design Principles  
 **Priority**: critical  
 **Complexity**: medium  
 **Since**: v0.1.0
@@ -1131,6 +1188,7 @@
 ## F-0074: Green Coding Principles
 
 **Status**: shipped  
+**Category**: Design Principles  
 **Priority**: medium  
 **Complexity**: medium  
 **Since**: v0.3.5
@@ -1151,6 +1209,7 @@
 ## F-0075: Traceability
 
 **Status**: shipped  
+**Category**: Design Principles  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.1.0
@@ -1171,6 +1230,7 @@
 ## F-0076: Iterative & Incremental Development
 
 **Status**: shipped  
+**Category**: Design Principles  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.1.0
@@ -1191,6 +1251,7 @@
 ## F-0077: Emergency Quick Reference
 
 **Status**: shipped  
+**Category**: Design Principles  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.8.1
@@ -1211,6 +1272,7 @@
 ## F-0078: Quick Feature & Issue Scripts
 
 **Status**: shipped  
+**Category**: Design Principles  
 **Priority**: medium  
 **Complexity**: low  
 **Since**: v0.8.1
@@ -1231,6 +1293,7 @@
 ## F-0079: Issue/Bug Tracking
 
 **Status**: shipped  
+**Category**: Design Principles  
 **Priority**: medium  
 **Complexity**: medium  
 **Since**: v0.9.0
@@ -1251,6 +1314,7 @@
 ## F-0080: Upgrade Marker System
 
 **Status**: shipped  
+**Category**: Design Principles  
 **Priority**: medium  
 **Complexity**: medium  
 **Since**: v0.8.1
@@ -1271,6 +1335,7 @@
 ## F-0081: Orchestrator Agent
 
 **Status**: shipped  
+**Category**: Agent System  
 **Priority**: high  
 **Complexity**: medium  
 **Since**: v0.9.7
@@ -1291,6 +1356,7 @@
 ## F-0082: Tier-Based Model Selection
 
 **Status**: shipped  
+**Category**: Agent System  
 **Priority**: medium  
 **Complexity**: low  
 **Since**: v0.9.7
@@ -1311,6 +1377,7 @@
 ## F-0083: Agent Token Savings Documentation
 
 **Status**: shipped  
+**Category**: Agent System  
 **Priority**: medium  
 **Complexity**: low  
 **Since**: v0.9.7
@@ -1331,6 +1398,7 @@
 ## F-0084: Untracked Files Protection
 
 **Status**: shipped  
+**Category**: Agent System  
 **Priority**: high  
 **Complexity**: low  
 **Since**: v0.9.7
@@ -1351,6 +1419,7 @@
 ## F-0091: Gate-Based Verification
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: critical
 **Complexity**: high
 **Since**: v0.11.0
@@ -1371,6 +1440,7 @@
 ## F-0092: Phase Detection
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.11.0
@@ -1391,6 +1461,7 @@
 ## F-0093: AGENT_QUICK_START.md
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: high
 **Complexity**: low
 **Since**: v0.11.0
@@ -1411,6 +1482,7 @@
 ## F-0094: Version-Aware Upgrade Features
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.11.3
@@ -1431,6 +1503,7 @@
 ## F-0095: Cross-Platform Tool Compatibility
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.11.1
@@ -1451,6 +1524,7 @@
 ## F-0096: PR-Based Workflow Default
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: high
 **Complexity**: low
 **Since**: v0.11.3
@@ -1471,6 +1545,7 @@
 ## F-0097: Worktree Management Tool
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.11.3
@@ -1491,6 +1566,7 @@
 ## F-0098: Generate Claude Skills from Subagents
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.11.5
@@ -1511,6 +1587,7 @@
 ## F-0101: Framework Architecture Decision Records (ADRs)
 
 **Status**: shipped
+**Category**: Developer Experience  
 **Priority**: high
 **Complexity**: low
 **Since**: v0.11.3
@@ -1531,6 +1608,7 @@
 ## F-0102: Modular Guidelines for Token Efficiency
 
 **Status**: shipped
+**Category**: Agent System  
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.11.3
@@ -1551,8 +1629,8 @@
 ## F-0103: Agent Mode Selection (Quality vs Cost)
 
 **Status**: in_progress
+**Category**: Agent System
 **Since**: v0.12.2
-**Category**: Framework Infrastructure
 
 **Description**: Allow users to choose an agent quality/cost tradeoff mode that affects model selection across all agent tasks. Critical tasks like planning and speccing use best models in all modes.
 
@@ -1584,6 +1662,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0108: Multi-Agent Helper Scripts
 
 **Status**: planned
+**Category**: Multi-Agent  
 **Priority**: medium
 **Profile**: Both
 
@@ -1608,6 +1687,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0109: Spec-Code Traceability Enhancements
 
 **Status**: shipped
+**Category**: Tooling  
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.15.0
@@ -1628,6 +1708,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0110: Feature Hierarchy Query
 
 **Status**: shipped
+**Category**: Tooling  
 **Priority**: low
 **Complexity**: small
 **Since**: v0.15.0
@@ -1648,6 +1729,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0111: Three-Tier Agent Boundaries
 
 **Status**: shipped
+**Category**: Agent System  
 **Priority**: medium
 **Complexity**: small
 **Since**: v0.15.0
@@ -1668,6 +1750,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0112: Code Style Examples in CONTEXT_PACK
 
 **Status**: shipped
+**Category**: Developer Experience  
 **Priority**: low
 **Complexity**: small
 **Since**: v0.15.0
@@ -1688,6 +1771,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0113: Delegation Heuristics Guide
 
 **Status**: shipped
+**Category**: Multi-Agent  
 **Priority**: low
 **Complexity**: small
 **Since**: v0.15.0
@@ -1708,6 +1792,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0114: Scope & Diff Verification
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: medium
 **Complexity**: small
 **Since**: v0.15.0
@@ -1728,6 +1813,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0115: Git Workflow Branch Check
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: medium
 **Complexity**: small
 **Since**: v0.15.1
@@ -1748,6 +1834,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0116: Maintainability Enforcement Gates
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.16.0
@@ -1768,6 +1855,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0117: Spec Migration System
 
 **Status**: shipped
+**Category**: Tooling  
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.16.0
@@ -1788,6 +1876,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0118: Documentation Drift Detection
 
 **Status**: shipped
+**Category**: Quality  
 **Priority**: low
 **Complexity**: medium
 **Since**: v0.16.0
@@ -1808,6 +1897,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0119: Feature Change Manifest Generation
 
 **Status**: shipped
+**Category**: Tooling  
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.16.0
@@ -1828,6 +1918,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0120: Plan-Review Loop
 
 **Status**: shipped
+**Category**: Agent System  
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.18.0
@@ -1848,6 +1939,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0121: Tool-Specific Instructions Parity
 
 **Status**: in_progress
+**Category**: Agent System  
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.18.0
@@ -1868,6 +1960,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0122: Multi-Tool LLM Testing Infrastructure
 
 **Status**: shipped
+**Category**: Quality  
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.18.0
@@ -1888,6 +1981,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0123: Intelligent Onboarding for Existing Projects
 
 **Status**: shipped
+**Category**: Core  
 **Priority**: high
 **Complexity**: high
 **Since**: v0.24.0
@@ -1908,6 +2002,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0124: Domain Categories & Systematic Brownfield Spec Generation
 
 **Status**: shipped
+**Category**: Core  
 **Priority**: high
 **Complexity**: high
 **Since**: v0.25.0
@@ -1928,6 +2023,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0125: Unified Drift Detection (`ag sync`)
 
 **Status**: shipped
+**Category**: Tooling  
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.25.4
@@ -1948,6 +2044,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0126: Discoverability Reminders
 
 **Status**: shipped
+**Category**: Session  
 **Priority**: medium
 **Complexity**: low
 **Since**: v0.25.4
@@ -1967,6 +2064,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0127: Tip of the Day
 
 **Status**: shipped
+**Category**: Session  
 **Priority**: low
 **Complexity**: low
 **Since**: v0.25.4
@@ -1986,6 +2084,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0128: Specs-Before-Code Structural Enforcement
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: critical
 **Complexity**: medium
 **Since**: v0.25.5
@@ -2006,6 +2105,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0130: Rough Specs & Structural Nudging
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: high
 **Complexity**: low
 **Since**: v0.25.8
@@ -2027,6 +2127,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0131: Settings-Over-Profiles Architecture
 
 **Status**: shipped
+**Category**: Core  
 **Priority**: high
 **Added**: 2026-02-17
 
@@ -2051,6 +2152,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0132: Programmatic Spec-First Gate
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: high
 **Added**: 2026-02-17
 **Since**: v0.27.0
@@ -2066,6 +2168,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0133: Durable Plan Artifacts
 
 **Status**: shipped
+**Category**: Session  
 **Priority**: medium
 **Added**: 2026-02-16
 **Since**: v0.27.0
@@ -2081,6 +2184,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0134: DEVELOPER_GUIDE Rewrite — User-First Framing
 
 **Status**: shipped
+**Category**: Developer Experience  
 **Priority**: high
 **Added**: 2026-02-18
 **Since**: v0.27.1
@@ -2094,6 +2198,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0135: Memory-Seed Defense-in-Depth Layer
 
 **Status**: shipped
+**Category**: Agent System  
 **Priority**: high
 **Added**: 2026-02-18
 **Since**: v0.25.3
@@ -2109,6 +2214,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0136: Centralized TODO Tracking
 
 **Status**: shipped
+**Category**: Tooling  
 **Priority**: high
 **Added**: 2026-02-18
 
@@ -2123,6 +2229,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0138: Documentation Impact Tracking
 
 **Status**: shipped
+**Category**: Quality  
 **Priority**: medium
 **Added**: 2026-02-19
 
@@ -2137,6 +2244,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0139: Doc Lifecycle System
 
 **Status**: shipped
+**Category**: Quality  
 **Priority**: medium
 **Added**: 2026-02-19
 
@@ -2151,6 +2259,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0140: Proactive WIP Creation in Agent Instructions
 
 **Status**: shipped
+**Category**: Recovery  
 **Priority**: high
 **Added**: 2026-02-20
 
@@ -2165,6 +2274,7 @@ Ensures the plan-mode-exit trigger chains to `ag implement` (which creates WIP t
 ## F-0141: Explicit Settings in STACK.md
 
 **Status**: shipped
+**Category**: Core  
 **Priority**: high
 **Added**: 2026-02-23
 
@@ -2179,6 +2289,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 ## F-0143: Skills-Primary Architecture for Claude Code
 
 **Status**: shipped
+**Category**: Agent System  
 **Priority**: high
 **Complexity**: high
 **Added**: 2026-02-28
@@ -2194,6 +2305,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 ## F-0144: Systematic Frontmatter Coverage
 
 **Status**: in-progress
+**Category**: Developer Experience  
 **Priority**: medium
 **Complexity**: low
 **Added**: 2026-03-01
@@ -2209,6 +2321,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 ## F-0145: Periodic Check System (Lifecycle Triggers)
 
 **Status**: shipped
+**Category**: Tooling  
 **Priority**: medium
 **Complexity**: medium
 **Added**: 2026-03-01
@@ -2224,6 +2337,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 ## F-0146: Project-Specific Agent Generation (Layer A)
 
 **Status**: shipped
+**Category**: Agent System  
 **Priority**: medium
 **Complexity**: medium
 **Added**: 2026-03-01
@@ -2239,6 +2353,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 ## F-0147: Spec-Writing Workflow with Delta Tracking & Plan-Review Gate
 
 **Status**: shipped
+**Category**: Verification & Enforcement  
 **Priority**: high
 **Complexity**: high
 **Added**: 2026-03-01
@@ -2253,18 +2368,17 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## Summary
 
-| Category | Shipped | In Progress | Planned | Total |
-|----------|---------|-------------|---------|-------|
-| Core (F-0001-0010) | 10 | 0 | 0 | 10 |
-| Quality (F-0011-0020) | 7 | 0 | 0 | 7 |
-| Session (F-0021-0030) | 7 | 0 | 0 | 8 |
-| Multi-Agent (F-0031-0040) | 7 | 0 | 0 | 7 |
-| Tooling (F-0041-0050) | 4 | 0 | 0 | 4 |
-| Recovery (F-0051-0060) | 6 | 0 | 0 | 6 |
-| Developer Experience (F-0061-0070) | 10 | 0 | 0 | 10 |
-| Design Principles (F-0071-0080) | 10 | 0 | 0 | 10 |
-| Agent System (F-0081-0090) | 4 | 0 | 0 | 4 |
-| Verification & Enforcement (F-0091-0100) | 7 | 1 | 0 | 8 |
-| Framework Infrastructure (F-0101+) | 28 | 6 | 1 | 35 |
-| **Total** | **100** | **7** | **1** | **109** |
+| Category | Count | Shipped | In Progress | Planned |
+|----------|-------|---------|-------------|---------|
+| Core | 14 | 14 | 0 | 0 |
+| Quality | 11 | 11 | 0 | 0 |
+| Session | 11 | 10 | 0 | 0 |
+| Multi-Agent | 9 | 8 | 0 | 1 |
+| Tooling | 11 | 11 | 0 | 0 |
+| Recovery | 7 | 7 | 0 | 0 |
+| Developer Experience | 14 | 13 | 1 | 0 |
+| Design Principles | 10 | 10 | 0 | 0 |
+| Agent System | 12 | 10 | 2 | 0 |
+| Verification & Enforcement | 15 | 15 | 0 | 0 |
+| **Total** | **114** | **109** | **3** | **1** |
 

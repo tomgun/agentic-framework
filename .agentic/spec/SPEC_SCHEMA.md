@@ -1,6 +1,6 @@
 ---
 summary: "Canonical schema defining structure, fields, and valid values for all specs"
-tokens: ~4195
+tokens: ~4300
 ---
 
 # Specification Schema Reference
@@ -58,6 +58,7 @@ spec/acceptance/F-0001.md
 ## F-####: Feature Name
 - Parent: [none | F-####]
 - Dependencies: [none | F-#### (status), ...]
+- Category: [project-defined category name]
 - Complexity: [S | M | L | XL]
 - Tags: [[tag1, tag2, ...] | empty]  <!-- NEW in v0.3.0 -->
 - Layer: [presentation | business-logic | data | infrastructure | other | none]  <!-- NEW in v0.3.0 -->
@@ -94,6 +95,7 @@ spec/acceptance/F-0001.md
 | **Feature Name** | string | any | ✅ | Human-readable name |
 | **Parent** | ID | `none` or `F-####` | ✅ | Parent feature for hierarchy |
 | **Dependencies** | ID list | `none` or `F-#### (status), ...` | ✅ | Features that must be complete first |
+| **Category** | string | Project-defined category name | ⚠️ Optional | Feature category for grouping (project defines its own categories) |
 | **Complexity** | enum | `S`, `M`, `L`, `XL` | ⚠️ Optional | Size estimate |
 | **Tags** | list | `[tag1, tag2, ...]` | ⚠️ Optional | Lowercase, hyphen-separated tags for search/filtering (v0.3.0+) |
 | **Layer** | enum | `presentation`, `business-logic`, `data`, `infrastructure`, `other` | ⚠️ Optional | Architectural layer (v0.3.0+) |
@@ -567,6 +569,7 @@ When removing fields:
 ## F-0042: User authentication
 - Parent: none
 - Dependencies: none
+- Category: Core
 - Complexity: M
 - Status: in_progress
 - PRD: spec/PRD.md#authentication
