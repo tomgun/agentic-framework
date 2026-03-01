@@ -5,7 +5,7 @@ tokens: ~952
 
 # Agent Operating Guidelines (All Tools)
 
-> **📚 REFERENCE MATERIAL (v0.22)**
+> **📚 REFERENCE MATERIAL (v0.36)**
 >
 > For daily use: **Quick Start** → `.agentic/agents/shared/AGENT_QUICK_START.md`
 > Detailed modules: `.agentic/agents/shared/guidelines/`
@@ -23,10 +23,12 @@ tokens: ~952
 | WIP before commit | `wip_before_commit` | **blocking** | warning | Script-enforced |
 | Pre-commit checks | `pre_commit_checks` | **full** | fast | Script-enforced |
 | Feature tracking | `feature_tracking` | **yes** | no | Script-enforced |
+| Docs gate | `docs_gate` | **blocking** | off | Script-enforced |
+| Spec directory | `spec_directory` | **yes** | no | Script-enforced |
 
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 
-**Quick Commands**: `ag start` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done`
+**Quick Commands**: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag spec` | `ag docs` | `ag todo`
 
 ---
 
@@ -82,6 +84,7 @@ Update docs **in the same commit** as code changes:
 - CONTEXT_PACK.md → architecture changes
 - STATUS.md → focus/progress changes
 - FEATURES.md → feature status (Formal)
+- Doc lifecycle: `ag docs F-XXXX` drafts registered docs; `ag done` triggers doc updates automatically when `docs_gate` is enabled
 
 ---
 
@@ -150,4 +153,6 @@ After creating any file, always `git add` it (or add to .gitignore). Untracked f
 - Programming standards: `.agentic/quality/programming_standards.md`
 - Test strategy: `.agentic/quality/test_strategy.md`
 - Workflows: `.agentic/agents/shared/auto_orchestration.md`
+- Spec workflow: `.agentic/workflows/spec_writing.md` (protection levels, evolution, health checks)
+- Claude Skills: `.agentic/agents/claude/skills/` (Claude Code primary workflow delivery)
 - Framework development: `FRAMEWORK_DEVELOPMENT.md`

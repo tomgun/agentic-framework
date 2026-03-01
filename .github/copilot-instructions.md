@@ -8,7 +8,7 @@ Full template: `.agentic/agents/copilot/copilot-instructions.md`
 
 Always consult: AGENTS.md (if present), `.agentic/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, STATUS.md, spec/* and spec/adr/* as the source of truth.
 
-Quick Commands: `ag start` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag spec` | `ag docs` | `ag todo`
 
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |
@@ -17,7 +17,9 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Build something large (>10 files, "entire", "full system") | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
 | Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
 | Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
-| Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX` |
+| Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, flush pending ideas to TODO.md via `ag todo`. |
+| Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
+| Write spec / create spec / acceptance criteria / evolve spec | STOP -> Run `ag spec F-XXXX`. Follow spec protection levels. |
 
 DO NOT PROCEED without acceptance criteria: spec/acceptance/F-####.md must exist. Criteria before code. No exceptions.
 
@@ -33,7 +35,7 @@ Rules:
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):
 - STATUS.md: `bash .agentic/tools/status.sh focus "Task"`
-- JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
+- JOURNAL.md: `bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"`
 - HUMAN_NEEDED.md: `bash .agentic/tools/blocker.sh add "Title" "type" "Details"`
 - FEATURES.md: `bash .agentic/tools/feature.sh F-#### status shipped`
 
