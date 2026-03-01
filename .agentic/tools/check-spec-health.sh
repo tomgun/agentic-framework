@@ -92,7 +92,7 @@ check_feature() {
 
             # Check test files referenced in ## Tests section exist
             local TEST_FILES
-            TEST_FILES=$(sed -n '/^## Tests/,/^## /p' "$ACCEPT_FILE" | grep -oE '`[^`]+\.(test|spec|_test)\.[a-z]+`\|`tests/[^`]+`' | tr -d '`' || true)
+            TEST_FILES=$(sed -n '/^## Tests/,/^## /p' "$ACCEPT_FILE" | grep -oE '`[^`]+\.(test|spec|_test)\.[a-z]+`|`tests/[^`]+`' | tr -d '`' || true)
             if [[ -n "$TEST_FILES" ]]; then
                 while IFS= read -r test_ref; do
                     if [[ -f "$test_ref" ]]; then

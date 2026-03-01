@@ -1850,7 +1850,7 @@ cmd_spec() {
         return
     fi
 
-    if [[ -n "$arg" ]] && echo "$arg" | grep -qE '^F-[0-9]+$'; then
+    if [[ -n "$arg" ]] && echo "$arg" | grep -qE '^(F|NFR)-[0-9]+$'; then
         echo -e "${BLUE}Spec status for $arg${NC}"
         echo ""
         bash .agentic/tools/check-spec-health.sh "$arg"

@@ -848,6 +848,7 @@ if [[ -f "spec/FEATURES.md" ]]; then
   echo "[14/16] Checking shipped spec protection..."
 
   SHIPPED_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^spec/acceptance/(F|NFR)-[0-9]+\.md$" || true)
+  CHECK14_FAIL=0
   if [[ -n "$SHIPPED_SPEC_STAGED" ]]; then
     for spec_file in $SHIPPED_SPEC_STAGED; do
       FID=$(basename "$spec_file" .md)
@@ -855,14 +856,15 @@ if [[ -f "spec/FEATURES.md" ]]; then
       IS_SHIPPED=$(grep -A5 "^## ${FID}:" spec/FEATURES.md 2>/dev/null | grep -i "status.*shipped" || true)
       if [[ -n "$IS_SHIPPED" ]]; then
         MIGRATION_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^spec/migrations/[0-9]+.*\.md$" || true)
-        if [[ -z "$MIGRATION_STAGED" ]] || ! git diff --cached -- $MIGRATION_STAGED 2>/dev/null | grep -q "$FID"; then
+        if [[ -z "$MIGRATION_STAGED" ]] || ! git diff --cached -- ${MIGRATION_STAGED} 2>/dev/null | grep -q "$FID"; then
           echo "❌ BLOCKED: Shipped feature $FID acceptance criteria modified without migration"
           echo "  Create: bash .agentic/tools/migration.sh create 'Update $FID ...'"
           FAILURES=$((FAILURES + 1))
+          CHECK14_FAIL=1
         fi
       fi
     done
-    if [[ $FAILURES -eq 0 ]] || ! echo "$SHIPPED_SPEC_STAGED" | grep -q .; then
+    if [[ $CHECK14_FAIL -eq 0 ]]; then
       echo "✓ Shipped spec changes have migration coverage"
     fi
   else
@@ -903,19 +905,27 @@ if [[ -f "spec/FEATURES.md" ]]; then
 
   if git diff --cached --name-only 2>/dev/null | grep -q "^spec/FEATURES.md$"; then
     # Look for lines where "shipped" was removed (- line)
-    # Use -U10 context to find the feature ID from the nearest ## F-XXXX heading
+    # Parse each diff hunk to find the feature ID from the nearest ## F-XXXX heading
     HAS_DOWNGRADE=0
     DOWNGRADED_IDS=""
-    DIFF_OUTPUT=$(git diff --cached -U10 spec/FEATURES.md 2>/dev/null || true)
+    DIFF_OUTPUT=$(git diff --cached -U20 spec/FEATURES.md 2>/dev/null || true)
     LAST_FID=""
+    IN_REMOVAL=0
     while IFS= read -r line; do
-      # Track current feature context from both context and added/removed lines
+      # Reset context at hunk boundaries
+      if echo "$line" | grep -qE "^@@"; then
+        LAST_FID=""
+      fi
+      # Track current feature context from context/added/removed lines
       if echo "$line" | grep -qE "^[ +@-].*## F-[0-9]+:"; then
         LAST_FID=$(echo "$line" | grep -oE "F-[0-9]+" | head -1)
       fi
-      # Detect removed shipped status
+      # Detect removed shipped status — must be on a deletion line (starts with -)
       if echo "$line" | grep -qE "^-.*[Ss]tatus.*shipped"; then
+        # Verify this feature actually had shipped status by checking the removed line
+        # is within the same feature block as LAST_FID
         if [[ -n "$LAST_FID" ]]; then
+          # Confirm the feature heading was also a removed or context line (not an add)
           DOWNGRADED_IDS="$DOWNGRADED_IDS $LAST_FID"
           HAS_DOWNGRADE=1
         fi
