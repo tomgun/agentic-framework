@@ -13,7 +13,7 @@ compatibility: "Requires Claude Code with file access and ag commands."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.36.0"
+  version: "0.38.0"
 ---
 
 # Writing Specs
@@ -41,10 +41,15 @@ Determine the spec operation and its protection level:
 2. Read `spec/NFR.md` — identify applicable NFRs
 3. Create FEATURES.md entry (Status: planned, Related NFRs)
 4. Create `spec/acceptance/F-XXXX.md` from `.agentic/spec/acceptance.template.md`
-5. Show draft to user for approval
-6. `bash .agentic/tools/migration.sh create "Add F-XXXX [Name]"`
-7. `bash .agentic/tools/check-spec-health.sh F-XXXX`
-8. Handoff: "Run `ag plan F-XXXX` before implementing"
+   - Write `## Behavior` section first (technology-agnostic user goal)
+   - Group ACs with priority tags: (P1 — MVP), (P2 — enhanced)
+   - Add `**Verify independently**` per AC group
+   - Place Tests under `## Verification`
+5. Run Clarification Pass (Step 3 below) for features with 3+ ACs
+6. Show draft to user for approval
+7. `bash .agentic/tools/migration.sh create "Add F-XXXX [Name]"`
+8. `bash .agentic/tools/check-spec-health.sh F-XXXX`
+9. Handoff: "Run `ag plan F-XXXX` before implementing"
 
 **For status updates:**
 ```bash
@@ -66,7 +71,24 @@ bash .agentic/tools/check-spec-health.sh F-XXXX   # Single feature
 bash .agentic/tools/check-spec-health.sh --all     # All features
 ```
 
-### Step 3: Validate
+### Step 3: Clarification Pass (after drafting ACs)
+
+For non-trivial features (3+ ACs), scan the acceptance criteria against this taxonomy:
+
+1. **Functional Scope** — Are all user-facing behaviors specified?
+2. **Data & Domain Model** — Are entities, relationships, and validation rules clear?
+3. **Edge Cases & Failure Handling** — What happens when things go wrong?
+4. **Non-Functional Requirements** — Performance, security, accessibility constraints?
+5. **Integration & Dependencies** — External systems, APIs, data sources?
+6. **Completion Signals** — How do we know it's done? What does "shipped" look like?
+
+For each gap found, ask the user (max 5 questions, multiple-choice with
+recommended answer). Record answers as `[Clarified]` markers:
+- [ ] **AC-NNN**: [criterion] `[Clarified: user chose option B — offline-first]`
+
+Skip this pass for trivial features (<3 ACs) unless the user requests it.
+
+### Step 4: Validate
 
 After any spec change:
 - Feature status in FEATURES.md matches reality

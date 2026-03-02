@@ -171,6 +171,11 @@ for dir in "${DIRS_TO_REPLACE[@]}"; do
   echo "    - .agentic/$dir/"
 done
 
+echo "  Preserved (not touched):"
+echo "    - .agentic-local/  (user extensions)"
+echo "    - .agentic-journal/ (session history)"
+echo "    - .agentic-state/  (session state)"
+
 echo "  Files to replace:"
 for file in "${FILES_TO_REPLACE[@]}"; do
   if [[ -f "$NEW_FRAMEWORK_DIR/.agentic/$file" ]]; then
@@ -254,7 +259,15 @@ elif [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/generate-skills.sh" ]]; then
 
   if [[ -d "$TARGET_PROJECT_DIR/.claude/skills" ]]; then
     SKILL_COUNT=$(ls -1 "$TARGET_PROJECT_DIR/.claude/skills/" 2>/dev/null | wc -l | tr -d ' ')
-    echo -e "  ${GREEN}✓${NC} Regenerated $SKILL_COUNT Claude Skills"
+    EXT_SKILL_COUNT=0
+    if [[ -d "$TARGET_PROJECT_DIR/.agentic-local/extensions/skills" ]]; then
+      EXT_SKILL_COUNT=$(find "$TARGET_PROJECT_DIR/.agentic-local/extensions/skills" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+    fi
+    if [[ $EXT_SKILL_COUNT -gt 0 ]]; then
+      echo -e "  ${GREEN}✓${NC} Regenerated $SKILL_COUNT Claude Skills (including $EXT_SKILL_COUNT extension skills)"
+    else
+      echo -e "  ${GREEN}✓${NC} Regenerated $SKILL_COUNT Claude Skills"
+    fi
   else
     echo -e "  ${YELLOW}⚠${NC} No skills generated"
   fi
@@ -800,6 +813,10 @@ declare -a FEATURE_REGISTRY=(
   "0.26.0:Profile rename:See STACK.md:Profiles renamed: Core→Discovery, Core+PM→Formal"
   "0.33.0:Instruction file auto-refresh:Automatic:CLAUDE.md, .cursorrules, copilot, codex regenerated on upgrade"
   "0.33.0:DRY state file config:See .agentic/init/state-files.conf:Single source of truth for required state files"
+  "0.39.0:Spec format evolution:See .agentic/spec/acceptance.template.md:Priority tiers (P1/P2), Behavior section, Verification heading (F-0148)"
+  "0.39.0:User extensions:.agentic-local/extensions/:Custom skills, gates, hooks, rules that survive upgrades (F-0151)"
+  "0.39.0:Semantic spec analysis:bash .agentic/tools/spec-analyze.sh F-XXXX:Advisory checks before implementation — ambiguity, NFR, coverage gaps (F-0152)"
+  "0.39.0:AC-level test coverage:python3 .agentic/tools/coverage.py --ac-coverage F-XXXX:Per-acceptance-criterion test mapping (F-0153)"
 )
 
 # Filter features based on version range

@@ -2,7 +2,7 @@
 
 **Purpose**: Comprehensive map of how every principle is implemented, what mechanisms exist, which are actively working, and which are dormant or underutilized.
 
-**Generated**: 2026-02-14 | **Framework Version**: 0.25.8
+**Generated**: 2026-03-02 | **Framework Version**: 0.39.0
 
 ---
 
@@ -89,12 +89,20 @@ graph TB
         F_LLM_TESTS[LLM Behavioral Tests<br/>F-0122]
         F_MUTATION[Mutation Tests<br/>infrastructure validation]
         F_FRAMEWORK_TESTS[Framework Validation<br/>validate_framework.sh]
+
+        %% SDD Toolkit Insights (v0.39.0)
+        F_SPEC_FORMAT[Spec Format Evolution<br/>F-0148]
+        F_CLARIFICATION[Clarification Taxonomy<br/>F-0149]
+        F_CHECKPOINTS[Checkpoints & Execution Order<br/>F-0150]
+        F_EXTENSIONS[User Extensions<br/>F-0151]
+        F_SPEC_ANALYZE[Semantic Spec Analysis<br/>F-0152]
+        F_AC_COVERAGE[AC-Level Coverage<br/>F-0153]
     end
 
     subgraph MECHANISMS["MECHANISMS (How)"]
         %% Scripts
         M_AG[ag.sh gateway<br/>20+ commands]
-        M_PRECOMMIT[pre-commit-check.sh<br/>16 structural gates]
+        M_PRECOMMIT[pre-commit-check.sh<br/>17 structural gates]
         M_WIP_SH[wip.sh<br/>state machine]
         M_STATUS_SH[status.sh / journal.sh<br/>token-efficient updates]
         M_FEATURE_SH[feature.sh<br/>status transitions]
@@ -113,7 +121,9 @@ graph TB
         %% Testing
         M_HARNESS[harness.sh<br/>LLM test runner]
         M_MUTATION_SH[mutation_test.sh<br/>infrastructure proofs]
-        M_VALIDATE[validate_framework.sh<br/>184 acceptance tests]
+        M_VALIDATE[validate_framework.sh<br/>367 acceptance tests]
+        M_SPEC_ANALYZE[spec-analyze.sh<br/>semantic consistency]
+        M_AC_COV[coverage.py --ac-coverage<br/>per-AC test mapping]
 
         %% Quality
         M_QUALITY_DOCS[.agentic/quality/<br/>7 standard documents]
@@ -182,9 +192,17 @@ graph TB
     D4 --> F_SMALL_BATCH
     D4 --> F_PLAN_REVIEW
     D4 --> F_QUALITY
+    D4 --> F_SPEC_FORMAT
+    D4 --> F_CLARIFICATION
+    D4 --> F_CHECKPOINTS
+
+    %% D2 → new features
+    D2 --> F_SPEC_ANALYZE
+    D2 --> F_EXTENSIONS
 
     %% D5: Living Documentation
     D5 --> F_DISCOVERY
+    D5 --> F_AC_COVERAGE
 
     %% D6: Green Coding
     D6 --> F_TOKEN_SCRIPTS
@@ -214,6 +232,12 @@ graph TB
     F_PLAN_REVIEW --> M_AG
     F_QUALITY --> M_QUALITY_DOCS
     F_QUALITY --> M_QUALITY_WIRING
+
+    %% SDD Toolkit features → mechanisms
+    F_SPEC_ANALYZE --> M_SPEC_ANALYZE
+    F_AC_COVERAGE --> M_AC_COV
+    F_EXTENSIONS --> M_PRECOMMIT
+    F_CHECKPOINTS --> M_AG
 
     %% Styling
     classDef principle fill:#4a90d9,color:#fff,stroke:#2a5f9e
@@ -319,7 +343,7 @@ graph TB
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
-| **Pre-Commit Gates** (F-0016, F-0116) | `pre-commit-check.sh` — 16 structural checks. Exit code 1 blocks commit. Checks: WIP lock, acceptance criteria, JOURNAL staleness, FEATURES.md staleness, batch size, test execution, complexity limits, untracked files, instruction file size, branch policy, shipped spec protection (migration required), test file deletion protection, status downgrade protection. | ACTIVE - proven by mutation tests |
+| **Pre-Commit Gates** (F-0016, F-0116) | `pre-commit-check.sh` — 17 structural checks. Exit code 1 blocks commit. Checks: WIP lock, acceptance criteria, JOURNAL staleness, FEATURES.md staleness, batch size, test execution, complexity limits, untracked files, instruction file size, branch policy, shipped spec protection (migration required), test file deletion protection, status downgrade protection, custom extension gates. | ACTIVE - proven by mutation tests |
 | **Git Hook Enforcement** (F-0129) | `git config core.hooksPath .agentic/hooks` wired in scaffold.sh + upgrade.sh. Git calls pre-commit dispatcher which routes to pre-commit-check.sh. CI detection skips hooks in automated builds. `pre_commit_hook: fast|full|no` in STACK.md. | ACTIVE - mutation-test proven |
 | **Gate-Based Verification** (F-0091) | `doctor.py` with modes: `--quick` (advisory), `--full` (comprehensive), `--pre-commit` (blocking), `--phase planning|complete` (phase-specific). Single verification command. | ACTIVE |
 | **Phase Detection** (F-0092) | `phase_detect.py` automatically detects dev phase (start, planning, implement, complete, blocked) and runs appropriate gates. | ACTIVE - used by doctor.py |
@@ -448,7 +472,7 @@ These features exist but don't clearly derive from the 13 principles:
 │                    STRUCTURAL GATES                      │
 │  (Scripts with exit codes - impossible to bypass)        │
 │                                                          │
-│  pre-commit-check.sh (16 checks)                        │
+│  pre-commit-check.sh (17 checks)                        │
 │  git core.hooksPath → .agentic/hooks/                   │
 │  ag implement → requires acceptance criteria             │
 │  ag work → blocks without feature ID (Formal)          │
@@ -552,7 +576,7 @@ This would allow projects to declare their stack (e.g., `stack_type: web-react` 
 ### Working Well (Actively Delivering Value)
 
 1. **Token-efficient scripts** — Used in every session. Proven 40x efficiency gain.
-2. **Pre-commit gates** — 16 checks, mutation-test proven. Cannot be bypassed.
+2. **Pre-commit gates** — 17 checks, mutation-test proven. Cannot be bypassed.
 3. **Git hook enforcement** — `core.hooksPath` wiring means hooks actually run.
 4. **Durable artifacts** — STATUS/JOURNAL/CONTEXT_PACK survive context resets reliably.
 5. **Three-layer architecture** — Clear separation of constitution/playbook/state.

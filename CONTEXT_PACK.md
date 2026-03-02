@@ -25,13 +25,13 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
     - `multi-agent.md` - Parallel agent work
     - `wip-tracking.md` - Interrupted sessions
 - **Claude Skills** (primary workflow delivery for Claude Code): `.claude/skills/`
-  - Source: `.agentic/agents/claude/skills/` (hand-crafted, 12 skills)
-  - Generator: `.agentic/tools/generate-skills.sh` (assembles references, injects VERSION)
+  - Source: `.agentic/agents/claude/skills/` (hand-crafted, 12 skills + project-specific extensions)
+  - Generator: `.agentic/tools/generate-skills.sh` (assembles references, injects VERSION, merges extensions)
   - Key skills: `implementing-features`, `committing-changes`, `fixing-bugs`, `writing-specs`, `session-start`, `completing-work`, `planning-features`, `writing-tests`, `reviewing-code`, `exploring-codebase`, `researching-topics`, `updating-documentation`
 - Claude-specific: `.agentic/agents/claude/CLAUDE.md` (consolidated quick reference)
 - Framework specs: `spec/FEATURES.md` (100+ features)
 - Acceptance criteria: `spec/acceptance/F-####.md`
-- Validation tests: `tests/validate_framework.sh` (200+ tests)
+- Validation tests: `tests/validate_framework.sh` (367 tests)
 - Templates: `.agentic/init/*.template.md`, `.agentic/spec/*.template.md`
 - Workflows: `.agentic/workflows/`
 - Quality guides: `.agentic/quality/`
@@ -74,6 +74,9 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
     - `check-spec-health.sh` - Spec validation (missing criteria, unchecked items)
     - `generate-project-agents.sh` - Stack detection → project-specific agent generation
     - `generate-skills.sh` - Assemble Claude Skills from hand-crafted sources
+    - `spec-analyze.sh` - Semantic spec analysis: ambiguity detection, AC↔test gaps, NFR measurability (advisory)
+    - `coverage.py --ac-coverage` - Per-AC test coverage mapping via naming conventions
+  - User customization: `.agentic-local/extensions/` (custom skills, gates, hooks, rules — survives upgrades)
 - Data flow: Framework installed → Project initialized → Agents follow guidelines → Quality gates enforced
 - External dependencies: None (pure bash/Python, no npm/pip packages)
 
@@ -85,7 +88,7 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
   - **Layer 3 — Project State** (STACK.md, STATUS.md): Machine-readable config parsed by scripts. Git-tracked state vs gitignored session-local state.
 - **Skills-primary architecture** (F-0143): Claude Code uses 12 hand-crafted Skills (`.claude/skills/`) as primary workflow delivery. Cursor/Copilot/Codex use `auto_orchestration.md` trigger tables. Skills contain instructions + scripts/ + references/ (playbook copies).
 - **STACK.md `## Settings`** (F-0141): Typed key-value settings with `ag set` command. Profiles (discovery/formal) set defaults; individual settings override. Settings drive gates, workflows, and tool behavior.
-- **Enforcement model**: Distributed — `ag implement` (planning gates), `pre-commit-check.sh` (16 structural checks), `ag done` (completion validation), `ag docs` (doc lifecycle). No single orchestrator process; each script enforces its phase.
+- **Enforcement model**: Distributed — `ag implement` (planning gates), `spec-analyze.sh` (advisory pre-implementation analysis), `pre-commit-check.sh` (17 structural checks), `ag done` (completion validation), `ag docs` (doc lifecycle). No single orchestrator process; each script enforces its phase.
 - **Defense-in-depth**: `memory-seed.md` seeds behavioral patterns into tool persistent memory. Memory reinforces; scripts enforce. Memory fades during long sessions (context compression); structural gates are the only reliable late-session enforcement.
 - **Multi-tool support**: Claude Code, Cursor, Windsurf, Copilot, Codex — each has different instruction file formats and memory mechanisms. Templates in `.agentic/agents/<tool>/`.
 - **Key principle**: Structural enforcement > behavioral instruction > memory reinforcement. If a rule can be checked by a script, don't rely on the agent remembering it.

@@ -5,7 +5,7 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.36.0 -->
+<!-- memory-seed v0.39.0 -->
 <!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
@@ -20,6 +20,7 @@ If the user's intent is to build, implement, add, create, set up, develop, make,
 2. Create spec/acceptance/F-XXXX.md with acceptance criteria FIRST
 3. Run `ag plan F-XXXX` (starts the plan-review loop)
 4. Run `ag implement F-XXXX` after the plan is approved
+5. If `spec_analysis` is enabled (default: on for formal, off for discovery), `spec-analyze.sh` runs advisory checks — review findings but proceed regardless
 
 `ag implement` auto-creates WIP tracking. If bypassing ag: run `bash .agentic/tools/wip.sh start F-XXXX "desc" "files"` before coding.
 

@@ -69,6 +69,8 @@
 **How We Solve It**:
 - **Acceptance-Driven Development** - criteria before code
 - **Mandatory acceptance files** - no shipping without criteria
+- **Semantic spec analysis** - catches vague requirements ("fast", "scalable") before implementation starts
+- **AC↔test coverage tracking** - maps individual acceptance criteria to tests, flags gaps
 - **Shipped ≠ Accepted** - human validation is final gate
 - **Stack-specific quality checks** - domain-appropriate validation
 - **Pre-commit enforcement** - automated quality gates

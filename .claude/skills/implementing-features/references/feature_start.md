@@ -15,21 +15,22 @@ phase: planning
 
 ```
 □ Does spec/acceptance/F-####.md exist?
-  ├─ YES → Check: does it have a ## Tests section?
+  ├─ YES → Check: does it have a Tests section (## Tests or ## Verification > ### Tests)?
   │         ├─ YES → Proceed to Gate 2
-  │         └─ NO  → Add ## Tests section before coding (see template)
+  │         └─ NO  → Add Tests section before coding (see template)
   └─ NO  → 🛑 STOP. Create acceptance criteria FIRST.
            DO NOT write any code until criteria exist.
 ```
 
 **If no acceptance criteria:**
 1. Draft criteria using `.agentic/spec/acceptance.template.md`
-2. Fill in the `## Tests` section — what tests will verify each criterion?
+2. Fill in the Tests section — what tests will verify each criterion?
+   (New format: `## Verification > ### Tests`. Legacy: `## Tests`. Both accepted.)
 3. Show to user for approval
 4. Create `spec/acceptance/F-####.md`
 5. ONLY THEN proceed
 
-**The `## Tests` section is required.** Tests are part of the feature definition, not a follow-up task. An acceptance file without a tests section is incomplete.
+**The Tests section is required.** Tests are part of the feature definition, not a follow-up task. An acceptance file without a tests section is incomplete.
 
 ---
 

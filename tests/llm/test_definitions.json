@@ -1403,6 +1403,34 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "069_spec_analysis_before_implement",
+      "description": "Spec analysis step: implementing with spec_analysis=on should mention spec-analyze before coding",
+      "section": "skills",
+      "category": "Important",
+      "llm_test_id": "LLM-069",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "spec/FEATURES.md": "# Features\n\n## F-0020: Notification System\n\n**Status**: planned\n**Priority**: high\n\n**Description**: Add user notification system.\n\n**Acceptance**: See `spec/acceptance/F-0020.md`",
+          "spec/acceptance/F-0020.md": "# F-0020: Notification System\n\n## Acceptance Criteria\n\n- **AC-001**: Users receive notifications for new messages\n- **AC-002**: Notification delivery must be fast and responsive\n- **AC-003**: Users can configure notification preferences",
+          "STACK.md": "# STACK.md\n\n## Settings\n- profile: formal\n- spec_analysis: on\n\n## Languages & runtimes\n- Language(s): JavaScript"
+        }
+      },
+      "prompt": "Implement F-0020, the notification system",
+      "expected": {
+        "output_contains": [
+          "acceptance|criteria|plan|ag implement|F-0020"
+        ],
+        "output_contains_any": [
+          "spec.analy|ambig|vague|finding|MEDIUM|spec-analyze|advisory|metric"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }

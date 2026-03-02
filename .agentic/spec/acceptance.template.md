@@ -4,40 +4,53 @@
 
 ---
 
-## Tests
+## Behavior (what the user needs — technology-agnostic)
 
-<!-- Plan your tests HERE, before writing code. This is not optional.
-     Specify: what type, what file/suite, what scenario each test covers.
-     The implementation is not done until these tests exist and pass. -->
+<!-- Why this feature matters. What user goal it serves.
+     Write from the user's perspective: what changes for them?
+     Keep technology-neutral — describe the "what", not the "how". -->
 
-### Unit Tests
-- [ ] `[test file]` — [what it verifies]
-- [ ] `[test file]` — [what it verifies]
-
-### Integration Tests (if crossing module/service boundaries)
-- [ ] `[test file]` — [what it verifies]
-
-### Behavioral / LLM Tests (if feature changes agent decision-making)
-- [ ] **[TEST-ID]**: [prompt scenario] → agent should [expected behavior]
-
-<!-- Remove sections that don't apply. At minimum, unit tests are required. -->
+[User-facing behavior description]
 
 ---
 
 ## Acceptance Criteria
 
-### [Group name, e.g. "Core Behavior"]
+### [Core Behavior] (P1 — MVP)
+**Verify independently**: [how to test this group alone]
 
 - [ ] **AC-001**: [Criterion — specific, testable, unambiguous]
 - [ ] **AC-002**: [Criterion]
 
-### [Group name, e.g. "Edge Cases"]
+### [Enhanced Experience] (P2 — better but optional)
+**Verify independently**: [how to test this group alone]
 
 - [ ] **AC-003**: [Criterion]
 
-### [Group name, e.g. "Settings / Config"]
+### [Edge Cases]
 
 - [ ] **AC-004**: [Criterion]
+
+---
+
+## Verification
+
+### Tests
+
+<!-- Plan your tests HERE, before writing code. This is not optional.
+     Specify: what type, what file/suite, what scenario each test covers.
+     The implementation is not done until these tests exist and pass. -->
+
+#### Unit Tests
+- [ ] `[test file]` — [what it verifies]
+
+#### Integration Tests (if crossing module/service boundaries)
+- [ ] `[test file]` — [what it verifies]
+
+#### Behavioral / LLM Tests (if feature changes agent decision-making)
+- [ ] **[TEST-ID]**: [prompt scenario] → agent should [expected behavior]
+
+<!-- Remove sections that don't apply. At minimum, unit tests are required. -->
 
 ---
 

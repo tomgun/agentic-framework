@@ -1,7 +1,7 @@
 # Instruction Architecture Design Document
 
 **Status**: Authoritative design basis for the Agentic AI Framework's instruction file architecture.
-**Last validated**: 2026-02-28
+**Last validated**: 2026-03-02
 **Owner**: Framework maintainer (whoever merges changes to `.agentic/`)
 
 **Rule**: When source research documents and this design document disagree, this document wins.
@@ -71,8 +71,8 @@ This design synthesizes two independent research efforts:
 
 Skills are Claude Code's native mechanism for delivering playbook-level instructions. They implement the same principle as Layer 2 (just-in-time delivery) via tool-native UI — Claude Code surfaces the right skill based on task description, so agents receive workflow instructions without loading the full auto_orchestration.md playbook.
 
-- **Source**: `.agentic/agents/claude/skills/` (hand-crafted, 12 skills)
-- **Generated to**: `.claude/skills/` (by `generate-skills.sh`)
+- **Source**: `.agentic/agents/claude/skills/` (hand-crafted, 12 skills) + `.agentic-local/extensions/skills/` (project-specific, F-0151)
+- **Generated to**: `.claude/skills/` (by `generate-skills.sh`, merges framework + extension skills)
 - **Each skill bundles**: `SKILL.md` (instructions) + `scripts/` (gates/validation) + `references/` (playbook copies)
 - **Progressive disclosure**: YAML frontmatter on 168 of 212 `.agentic/` files enables ~96% discovery savings (~184K tokens saved per full scan)
 - **Context cost**: Only skill descriptions (~900 tokens) are always loaded in the system prompt. `.agentic/` frontmatter is inert — never auto-loaded, zero token cost until explicitly read. Full analysis: `docs/research/2026-03-01-frontmatter-context-impact.md`
@@ -121,7 +121,7 @@ The framework uses a **distributed enforcement model** — this is a conscious d
 
 **Enforcement points**:
 - `ag implement` — checks acceptance criteria + approved plan
-- `pre-commit-check.sh` — runs 16 structural checks
+- `pre-commit-check.sh` — runs 17 structural checks
 - `ag done` — runs `doctor.sh --phase complete` (but `|| true` in `cmd_done()` currently suppresses failures — see Gap 4)
 - `context-for-role.sh` — assembles role-specific context for subagents
 
@@ -131,7 +131,7 @@ The framework uses a **distributed enforcement model** — this is a conscious d
 
 These mechanisms are proven and stable. Changes require strong justification:
 
-- **pre-commit-check.sh** — 16 structural gates
+- **pre-commit-check.sh** — 17 structural gates
 - **context-for-role.sh** + 24 context manifests — subagent context injection
 - **Token-efficient scripts** — journal.sh, status.sh, feature.sh, blocker.sh
 - **LLM behavioral test suite** — 48+ tests validating instruction compliance
