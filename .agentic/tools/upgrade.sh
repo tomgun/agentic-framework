@@ -813,6 +813,10 @@ declare -a FEATURE_REGISTRY=(
   "0.26.0:Profile rename:See STACK.md:Profiles renamed: Core→Discovery, Core+PM→Formal"
   "0.33.0:Instruction file auto-refresh:Automatic:CLAUDE.md, .cursorrules, copilot, codex regenerated on upgrade"
   "0.33.0:DRY state file config:See .agentic/init/state-files.conf:Single source of truth for required state files"
+  "0.39.0:Spec format evolution:See .agentic/spec/acceptance.template.md:Priority tiers (P1/P2), Behavior section, Verification heading (F-0148)"
+  "0.39.0:User extensions:.agentic-local/extensions/:Custom skills, gates, hooks, rules that survive upgrades (F-0151)"
+  "0.39.0:Semantic spec analysis:bash .agentic/tools/spec-analyze.sh F-XXXX:Advisory checks before implementation — ambiguity, NFR, coverage gaps (F-0152)"
+  "0.39.0:AC-level test coverage:python3 .agentic/tools/coverage.py --ac-coverage F-XXXX:Per-acceptance-criterion test mapping (F-0153)"
 )
 
 # Filter features based on version range
