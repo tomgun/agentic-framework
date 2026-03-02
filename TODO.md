@@ -59,6 +59,32 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0025: F-idea: NFRs as live invariants — NFR.md should be the source of truth that propagates to features, not a dead reference. Key changes: (1) Acceptance criteria should have a separate 'Invariants (from NFR.md)' section auto-derived from NFR scoping, distinct from feature-specific criteria. (2) Test-writing workflow should check applicable NFRs before writing feature tests. (3) check-spec-health.sh should cross-reference NFR modification dates vs feature spec dates — if NFR changed after spec was written and feature references it, flag for review. (4) NFR capture trigger: when a developer or agent expresses an invariant quality for the system ("it must always...", "never do X", performance/security/reliability constraints), recognize it and write it to spec/NFR.md — don't let invariants stay informal. (5) Important distinction: framework NFR.md has 2 structural NFRs; projects using the framework may have dozens (performance, security, accessibility, compliance, etc.) — the workflow/tooling must scale to a longer list with mixed types (structural, behavioral, design invariants).
 - **Added**: 2026-03-01
 
+### T-0027: Revisit D4: phased checkpoints vs file-count limits as small-batch proxy (L493 insight from SDD toolkit analysis)
+- **Added**: 2026-03-02
+
+### T-0028: Migrate .agentic-journal/ and .agentic-state/ into .agentic-local/ umbrella (directory consolidation)
+- **Added**: 2026-03-02
+
+### T-0029: F-idea: Spec clarification taxonomy — resurface + enhance structured clarification in writing-specs skill. 6-category ambiguity taxonomy (functional, data model, edge cases, NFRs, integrations, completion signals), max 5 multiple-choice questions per spec, records [Clarified] markers. ~2K tokens/spec. Pre-existing framework idea resurfaced via SDD toolkit analysis (R1). Contributor: Tomas
+- **Added**: 2026-03-02
+- **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §3.1, §3.3, R1
+
+### T-0030: F-idea: Verification loop — autonomous test→fix→retest cycle (bounded 3-5 iterations) after implementation. On failure: analyze, attempt fix, retest. On convergence: report to human. On exhaustion: escalate with diagnostic context. Token budget per loop, rollback safety via git branches, security-sensitive code always escalates. ~10-50K tokens/loop. Start with human-in-the-loop prototype before full autonomy. Pre-existing framework idea (R5 in SDD analysis). Contributor: Tomas
+- **Added**: 2026-03-02
+- **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §11, R5
+
+### T-0031: F-idea: Auto-dev loop — full spec→finished feature automation by chaining skills: writing-specs→planning→implementing→verification loop→completing-work. Three autonomy levels: supervised (3 human checkpoints), semi-autonomous (human approves spec only), fully autonomous (intent to PR). Depends on verification loop (T-0030) being proven first. Pre-existing framework idea (R8 in SDD analysis). Contributor: Tomas
+- **Added**: 2026-03-02
+- **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §11, R8
+
+### T-0032: F-0152 P2: Cross-feature semantic checks — three deferred checks for spec-analyze.sh: (AC-009) cross-feature terminology consistency (detects naming drift across spec files), (AC-010) AC contradiction detection (finds conflicting ACs within or across features), (AC-011) constitution alignment (checks ACs against PRINCIPLES.md). Requires LLM analysis — not deterministic. New insight from SDD toolkit analysis (their /analyze command's 6-pass approach). Contributor: Tomas
+- **Added**: 2026-03-02
+- **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §3.2, R2
+
+### T-0033: Investigate: Task IDs and execution prioritization for small-batch development and parallelization. The SDD toolkit uses T### IDs with [P] parallel markers and phased execution (Setup→Foundation→Stories→Polish). We partially addressed this with F-0150 (checkpoint validation at P1/P2 boundaries) and execution order sections in plans. Open question: would explicit task-level parallelization markers and dependency chains meaningfully improve multi-agent dispatch and small-batch sizing? Or is the current AC-group + plan phasing sufficient? Related: T-0027 (phased checkpoints vs file-count limits).
+- **Added**: 2026-03-02
+- **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §9, §3.5
+
 ## Done
 
 

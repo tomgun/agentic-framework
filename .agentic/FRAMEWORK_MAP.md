@@ -40,6 +40,12 @@ graph TB
         COVERAGE[coverage.sh<br/>annotations]
         GRAPH[feature_graph.sh<br/>dependencies]
     end
+
+    subgraph extensions [.agentic-local/extensions/]
+        EXT_SKILLS[skills/<br/>custom skills]
+        EXT_GATES[gates/<br/>custom quality gates]
+        EXT_RULES[rules/<br/>rule injection]
+    end
     
     PRD --> FEATURES
     TECH --> FEATURES

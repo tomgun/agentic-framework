@@ -278,6 +278,13 @@ You shouldn't need to edit these - they're the framework:
 - **tools/**: Automation scripts (brief.sh, report.sh, verify.sh, etc.)
 - **workflows/**: Development workflows (dev loop, debugging, etc.)
 
+### In `.agentic-local/` (your project customizations)
+Survives framework upgrades — `.agentic/` gets replaced, `.agentic-local/` does not:
+- **extensions/skills/**: Custom Claude Code skills (same format as framework skills)
+- **extensions/gates/**: Custom pre-commit quality gates (bash scripts, exit 1 = block)
+- **extensions/hooks/**: Lifecycle hooks (future)
+- **extensions/rules/**: Rule injection into framework skills
+
 ---
 
 ## Document Index

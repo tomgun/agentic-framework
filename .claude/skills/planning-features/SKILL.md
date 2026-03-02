@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with plan mode support."
 allowed-tools: [Read, Glob, Grep, Bash, Agent]
 metadata:
   author: agentic-framework
-  version: "0.36.0"
+  version: "0.38.0"
 ---
 
 # Planning Features
@@ -42,13 +42,38 @@ Write a plan covering:
 - **Acceptance criteria**: How to verify success
 - **Risks**: What could go wrong
 
-### Step 4: Save Plan Durably
+### Step 4: Add Execution Order (for features with >5 ACs)
+
+After creating the plan, add an Execution Order section that maps ACs to phases:
+
+```
+### Execution Order
+
+#### Phase 1: Foundation (do first, blocks everything)
+- AC-001, AC-002
+
+#### Phase 2: Core (P1 — MVP)
+- AC-003 [P], AC-004 [P]  ← [P] = parallelizable (different files, no dependency)
+- AC-005 (depends on AC-003 + AC-004)
+✅ CHECKPOINT: Run tests, verify core works
+
+#### Phase 3: Enhanced (P2)
+- AC-006, AC-007
+```
+
+`[P]` markers indicate ACs that can be assigned to parallel agents in
+multi-agent workflows. Even for single-agent work, this clarifies which
+ACs are independent.
+
+Skip this section for simple features (≤5 ACs) unless multi-agent dispatch is planned.
+
+### Step 5: Save Plan Durably
 
 After approval, save the plan to `.agentic-journal/plans/F-XXXX-plan.md`.
 
 Plans in `~/.claude/plans/` are session-scoped and will be lost. Always copy to the durable location.
 
-### Step 5: Hand Off to Implementation
+### Step 6: Hand Off to Implementation
 
 After plan approval, start implementation:
 ```bash

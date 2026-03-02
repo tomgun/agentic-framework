@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with shell access and test runners."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.36.0"
+  version: "0.38.0"
 ---
 
 # Writing Tests
