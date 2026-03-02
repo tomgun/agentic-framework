@@ -169,6 +169,8 @@ Instead of agents re-reading the entire codebase every session, maintain:
 - Test strategy: [`.agentic/quality/test_strategy.md`](quality/test_strategy.md)
 - Code review: [`.agentic/quality/review_checklist.md`](quality/review_checklist.md)
 - Definition of done: [`.agentic/workflows/definition_of_done.md`](workflows/definition_of_done.md)
+- Spec analysis: `bash .agentic/tools/spec-analyze.sh F-####` (ambiguity, NFR, AC↔test gaps — advisory)
+- AC coverage: `python3 .agentic/tools/coverage.py --ac-coverage F-####` (per-AC test mapping)
 
 ### Development workflow
 
@@ -256,7 +258,7 @@ Details: [`.agentic/workflows/dev_loop.md`](workflows/dev_loop.md)
 - **NFR.md**: Non-functional requirements (performance, security, etc.)
 - **LESSONS.md**: Lessons learned, caveats
 - **REFERENCES.md**: External resources (papers, docs)
-- **acceptance/F-####.md**: Detailed acceptance criteria per feature
+- **acceptance/F-####.md**: Detailed acceptance criteria per feature (with Behavior section, P1/P2 priority tiers)
 - **adr/ADR-####.md**: Architecture decision records
 - **tasks/**: Task tracking (optional, for complex work)
 

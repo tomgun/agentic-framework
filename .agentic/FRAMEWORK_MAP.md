@@ -163,38 +163,50 @@ graph TD
         VER[verify.sh]
         COV[coverage.sh]
         GRAPH[feature_graph.sh]
+        ANALYZE[spec-analyze.sh]
+        ACCOV[coverage.py<br/>--ac-coverage]
     end
-    
+
     subgraph outputs [Outputs/Checks]
         Structure[Structure valid?]
         FeatStatus[Feature status<br/>summary]
         CrossRef[Cross-references<br/>valid?]
         Coverage[Annotation<br/>coverage %]
         DepGraph[Dependency<br/>visualization]
+        SpecQuality[Ambiguity/<br/>NFR/gap analysis]
+        ACCoverage[Per-AC test<br/>coverage %]
     end
-    
+
     FEAT --> DOC
     NFRS --> DOC
     STAT --> DOC
     ACC --> DOC
-    
+
     DOC --> Structure
-    
+
     FEAT --> REP
     REP --> FeatStatus
-    
+
     FEAT --> VER
     NFRS --> VER
     STAT --> VER
     ACC --> VER
     VER --> CrossRef
-    
+
     FEAT --> COV
     CODE --> COV
     COV --> Coverage
-    
+
     FEAT --> GRAPH
     GRAPH --> DepGraph
+
+    ACC --> ANALYZE
+    NFRS --> ANALYZE
+    ANALYZE --> ACCOV
+    ANALYZE --> SpecQuality
+    ACC --> ACCOV
+    CODE --> ACCOV
+    ACCOV --> ACCoverage
 ```
 
 ---

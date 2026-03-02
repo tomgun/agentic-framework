@@ -40,7 +40,7 @@ A custom rules file is a great start. This framework builds on the same idea but
 **What's designed for** (implemented with tooling, growing in real-world usage):
 - Multi-agent coordination at scale, sequential agent pipelines, automated retrospectives
 
-**How we know it works**: 171 acceptance tests + 22 LLM behavioral tests verify that agents actually follow the rules. See [TRACEABILITY_MATRIX.md](tests/TRACEABILITY_MATRIX.md) for principle → feature → test mapping.
+**How we know it works**: 367 acceptance tests + 55 LLM behavioral tests verify that agents actually follow the rules. See [TRACEABILITY_MATRIX.md](tests/TRACEABILITY_MATRIX.md) for principle → feature → test mapping.
 
 **📖 Detailed problem analysis**: [FRAMEWORK_VALUE_PROPOSITION.md](docs/FRAMEWORK_VALUE_PROPOSITION.md)
 
@@ -59,10 +59,12 @@ A custom rules file is a great start. This framework builds on the same idea but
 
 - **Formal**: Everything in Discovery, plus formal specs
   - Feature tracking with F-#### IDs
-  - Acceptance criteria per feature
+  - Acceptance criteria per feature (priority tiers P1/P2, Behavior section)
   - STATUS.md for current focus
   - spec/FEATURES.md, NFR.md, ADRs
   - Cross-reference validation
+  - Semantic spec analysis (ambiguity detection, AC↔test coverage gaps, NFR measurability)
+  - User-extension directory (`.agentic-local/extensions/` for custom skills and gates)
 
 **🔄 Multi-Environment Support:**
 Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out or use the best tool for each task. All environments share the same project state for perfect continuity. [Learn more](.agentic/workflows/environment_switching.md)

@@ -563,3 +563,37 @@ However, full automation is limited because:
 - Context/conversation state matters
 
 **Recommended approach**: Semi-automated with human oversight.
+
+---
+
+## SDD Toolkit Features (F-0148–F-0153) — v0.39.0
+
+### LLM-069: Spec Analysis Before Implementation
+- **Profile**: Formal (`spec_analysis: on`)
+- **Setup**: Feature with vague AC text ("fast and responsive" without metrics)
+- **Prompt**: "Implement F-0020, the notification system"
+- **Expected**: Agent mentions spec analysis findings (ambiguity, vague terms) before proceeding
+- **Also expected**: Agent follows standard implementation workflow (acceptance criteria, plan)
+- **Automated**: `tests/llm/tests/069_spec_analysis_before_implement.sh`
+
+### Proposed Additional Tests (not yet automated)
+
+**LLM-070: AC Priority Tiers in Planning** (F-0148/F-0150)
+- Agent recognizes P1/P2 priority tags in acceptance criteria
+- Plans implementation in P1-first order
+
+**LLM-071: Clarification Taxonomy** (F-0149)
+- Agent asks structured clarification questions when writing spec for ambiguous feature
+- Questions span functional scope, edge cases, NFRs, integrations
+
+**LLM-072: Checkpoint Validation** (F-0150)
+- Agent validates P1 completion before proceeding to P2 work
+- Reports checkpoint status to user
+
+**LLM-073: Extension Discovery** (F-0151)
+- Agent discovers custom skills from `.agentic-local/extensions/skills/`
+- Custom gates run during pre-commit
+
+**LLM-074: AC Coverage Reporting** (F-0153)
+- Agent runs `coverage.py --ac-coverage F-XXXX` when asked about test coverage
+- Reports per-AC status (covered vs uncovered)
