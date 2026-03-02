@@ -191,6 +191,20 @@ fi
 mkdir -p "${ROOT_DIR}/docs" "${ROOT_DIR}/docs/research" "${ROOT_DIR}/docs/architecture/diagrams"
 echo "OK  : ensured directories docs/, docs/research/, docs/architecture/diagrams/"
 
+# User-extension directory (survives framework upgrades)
+if [[ ! -d "${ROOT_DIR}/.agentic-local/extensions" ]]; then
+  mkdir -p "${ROOT_DIR}/.agentic-local/extensions/skills"
+  mkdir -p "${ROOT_DIR}/.agentic-local/extensions/gates"
+  mkdir -p "${ROOT_DIR}/.agentic-local/extensions/hooks"
+  mkdir -p "${ROOT_DIR}/.agentic-local/extensions/rules"
+  if [[ -f "${ROOT_DIR}/.agentic/init/extensions-readme.md" ]]; then
+    cp "${ROOT_DIR}/.agentic/init/extensions-readme.md" "${ROOT_DIR}/.agentic-local/extensions/README.md"
+  fi
+  echo "NEW : .agentic-local/extensions/ (project-specific customizations)"
+else
+  echo "OK  : .agentic-local/extensions/ exists"
+fi
+
 # Use discovery proposals if available, otherwise use templates
 if [[ "$DISCOVERY_RAN" == "yes" && -d "${ROOT_DIR}/.agentic-state/proposals" ]]; then
   copy_or_propose "${ROOT_DIR}/.agentic-state/proposals/STACK.md" "${ROOT_DIR}/STACK.md"

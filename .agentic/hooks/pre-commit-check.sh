@@ -939,6 +939,26 @@ if [[ -f "spec/FEATURES.md" ]]; then
   fi
 fi
 
+# Check 17: Run custom gates from .agentic-local/extensions/gates/
+EXT_GATES_DIR="${PROJECT_ROOT}/.agentic-local/extensions/gates"
+if [[ -d "$EXT_GATES_DIR" ]]; then
+  GATE_FILES=$(find "$EXT_GATES_DIR" -name '*.sh' -type f 2>/dev/null | sort)
+  if [[ -n "$GATE_FILES" ]]; then
+    echo ""
+    echo "[17/17] Running custom quality gates..."
+    while IFS= read -r gate; do
+      [[ -f "$gate" ]] || continue
+      gate_name=$(basename "$gate")
+      if bash "$gate" 2>&1; then
+        echo "  ✓ $gate_name passed"
+      else
+        echo "  ❌ BLOCKED: Custom gate failed: $gate_name"
+        FAILURES=$((FAILURES + 1))
+      fi
+    done <<< "$GATE_FILES"
+  fi
+fi
+
 # Summary
 echo ""
 echo "═══════════════════════════════════════════════════════"

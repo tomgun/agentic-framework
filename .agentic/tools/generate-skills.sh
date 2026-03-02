@@ -290,6 +290,51 @@ for skill_src_dir in "$SKILLS_SRC"/*/; do
     GENERATED=$((GENERATED + 1))
 done
 
+# ── Generate extension skills from .agentic-local/extensions/skills/ ─
+EXT_SKILLS_DIR="$PROJECT_ROOT/.agentic-local/extensions/skills"
+EXT_GENERATED=0
+
+if [[ -d "$EXT_SKILLS_DIR" ]] && ! $VALIDATE_ONLY; then
+    for ext_skill_dir in "$EXT_SKILLS_DIR"/*/; do
+        [[ -d "$ext_skill_dir" ]] || continue
+        ext_skill_name=$(basename "$ext_skill_dir")
+        ext_skill_md="$ext_skill_dir/SKILL.md"
+
+        [[ -f "$ext_skill_md" ]] || continue
+
+        # Validate extension skill
+        validate_skill "$ext_skill_dir"
+
+        dest_dir="$SKILLS_OUT/$ext_skill_name"
+        mkdir -p "$dest_dir"
+
+        # Copy SKILL.md (no version injection for user extensions)
+        cp "$ext_skill_md" "$dest_dir/SKILL.md"
+
+        # Copy scripts/ and make executable
+        if [[ -d "$ext_skill_dir/scripts" ]]; then
+            mkdir -p "$dest_dir/scripts"
+            for script in "$ext_skill_dir/scripts"/*; do
+                [[ -f "$script" ]] || continue
+                cp "$script" "$dest_dir/scripts/"
+                chmod +x "$dest_dir/scripts/$(basename "$script")"
+            done
+        fi
+
+        # Copy references/
+        if [[ -d "$ext_skill_dir/references" ]]; then
+            mkdir -p "$dest_dir/references"
+            for ref in "$ext_skill_dir/references"/*; do
+                [[ -f "$ref" ]] || continue
+                cp "$ref" "$dest_dir/references/"
+            done
+        fi
+
+        echo -e "  ${GREEN}✓${NC} $ext_skill_name → .claude/skills/$ext_skill_name/ (extension)"
+        EXT_GENERATED=$((EXT_GENERATED + 1))
+    done
+fi
+
 # ── Inject project-specific rules from subagents-project/ ─
 # Maps agent type → skill name
 agent_to_skill() {
@@ -335,6 +380,43 @@ if [[ -d "$PROJECT_AGENTS_DIR" ]] && ! $VALIDATE_ONLY; then
     done
 fi
 
+# ── Inject rules from .agentic-local/extensions/rules/ ──
+EXT_RULES_DIR="$PROJECT_ROOT/.agentic-local/extensions/rules"
+if [[ -d "$EXT_RULES_DIR" ]] && ! $VALIDATE_ONLY; then
+    for rule_file in "$EXT_RULES_DIR"/*-agent.md "$EXT_RULES_DIR"/*.md; do
+        [[ -f "$rule_file" ]] || continue
+
+        # Determine target skill from filename or content
+        rule_basename=$(basename "$rule_file" .md)
+        # Try mapping agent-style names (e.g., implementation-agent.md)
+        agent_type=$(echo "$rule_basename" | sed 's/-agent$//')
+        skill_name=$(agent_to_skill "$agent_type")
+
+        # If no mapping, try using filename directly as skill name
+        if [[ -z "$skill_name" ]]; then
+            [[ -d "$SKILLS_OUT/$rule_basename" ]] && skill_name="$rule_basename"
+        fi
+        [[ -z "$skill_name" ]] && continue
+
+        skill_md="$SKILLS_OUT/$skill_name/SKILL.md"
+        [[ -f "$skill_md" ]] || continue
+
+        project_content=$(sed -n '/^## Project-Specific Rules/,/^---$/p' "$rule_file" | sed '$d')
+        [[ -z "$project_content" ]] && project_content=$(cat "$rule_file")
+        [[ -z "$project_content" ]] && continue
+
+        # Strip existing EXT-RULES block (idempotent)
+        if grep -q '<!-- EXT-RULES-START' "$skill_md" 2>/dev/null; then
+            sed '/<!-- EXT-RULES-START/,/<!-- EXT-RULES-END/d' "$skill_md" > "${skill_md}.tmp" && mv "${skill_md}.tmp" "$skill_md"
+        fi
+
+        printf '\n<!-- EXT-RULES-START (auto-injected from .agentic-local/extensions/rules/) -->\n%s\n<!-- EXT-RULES-END -->\n' "$project_content" >> "$skill_md"
+
+        echo -e "  ${GREEN}+${NC} injected extension rules → $skill_name"
+        INJECTED=$((INJECTED + 1))
+    done
+fi
+
 echo ""
 if [[ $ERRORS -gt 0 ]]; then
     echo -e "${RED}Generated $GENERATED skills with $ERRORS error(s) and $WARNINGS warning(s)${NC}"
@@ -342,6 +424,9 @@ if [[ $ERRORS -gt 0 ]]; then
     exit 1
 else
     local_msg="${GREEN}Generated $GENERATED skills"
+    if [[ $EXT_GENERATED -gt 0 ]]; then
+        local_msg="$local_msg + $EXT_GENERATED extension skills"
+    fi
     if [[ $INJECTED -gt 0 ]]; then
         local_msg="$local_msg + $INJECTED project-specific injections"
     fi

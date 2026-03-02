@@ -171,6 +171,11 @@ for dir in "${DIRS_TO_REPLACE[@]}"; do
   echo "    - .agentic/$dir/"
 done
 
+echo "  Preserved (not touched):"
+echo "    - .agentic-local/  (user extensions)"
+echo "    - .agentic-journal/ (session history)"
+echo "    - .agentic-state/  (session state)"
+
 echo "  Files to replace:"
 for file in "${FILES_TO_REPLACE[@]}"; do
   if [[ -f "$NEW_FRAMEWORK_DIR/.agentic/$file" ]]; then
@@ -254,7 +259,15 @@ elif [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/generate-skills.sh" ]]; then
 
   if [[ -d "$TARGET_PROJECT_DIR/.claude/skills" ]]; then
     SKILL_COUNT=$(ls -1 "$TARGET_PROJECT_DIR/.claude/skills/" 2>/dev/null | wc -l | tr -d ' ')
-    echo -e "  ${GREEN}✓${NC} Regenerated $SKILL_COUNT Claude Skills"
+    EXT_SKILL_COUNT=0
+    if [[ -d "$TARGET_PROJECT_DIR/.agentic-local/extensions/skills" ]]; then
+      EXT_SKILL_COUNT=$(find "$TARGET_PROJECT_DIR/.agentic-local/extensions/skills" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+    fi
+    if [[ $EXT_SKILL_COUNT -gt 0 ]]; then
+      echo -e "  ${GREEN}✓${NC} Regenerated $SKILL_COUNT Claude Skills (including $EXT_SKILL_COUNT extension skills)"
+    else
+      echo -e "  ${GREEN}✓${NC} Regenerated $SKILL_COUNT Claude Skills"
+    fi
   else
     echo -e "  ${YELLOW}⚠${NC} No skills generated"
   fi
