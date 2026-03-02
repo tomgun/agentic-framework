@@ -2,8 +2,8 @@
 
 **Single source of truth for ALL test results.**
 
-**Generated**: 2026-02-06
-**Framework Version**: 0.22.0
+**Generated**: 2026-03-02
+**Framework Version**: 0.39.0
 
 ---
 
@@ -11,11 +11,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Acceptance Tests (validate_framework.sh) | 171 passed, 0 failed |
+| Acceptance Tests (validate_framework.sh) | 367 passed, 0 failed |
 | Unit Tests (run_tests.sh) | 21/21 passed |
-| LLM Behavioral Tests (Cursor CLI) | 17/23 passed (74%) |
-| **Total Tests** | **209 passing / 215 total** |
-| Test Pass Rate | 97.2% |
+| LLM Behavioral Tests (harness.sh) | 55 defined (17/23 verified via Cursor CLI) |
+| **Total Tests** | **388+ passing** |
+| Test Pass Rate | 100% (acceptance + unit) |
 | Principles Covered | 13/13 |
 | Profile Coverage | Discovery ✅, Formal ✅ |
 
@@ -25,8 +25,9 @@
 
 | Environment | Last Tested | Version | Result | Tester |
 |-------------|-------------|---------|--------|--------|
+| validate_framework.sh | 2026-03-02 | 0.39.0 | **367/367 (100%)** | bash |
 | Cursor CLI (agent) | 2026-02-06 | 0.22.0 | **17/23 (74%)** | Cursor Agent CLI v2026.01.28 |
-| Claude Code | _not yet_ | - | - | - |
+| Claude Code | _pending_ | 0.39.0 | 55 tests defined | - |
 | GitHub Copilot | _not yet_ | - | - | - |
 
 ---
@@ -36,8 +37,8 @@
 | Tier | Meaning | Examples |
 |------|---------|----------|
 | **Battle-tested** | Proven through months of real development | Durable artifacts, token-efficient scripts, session continuity, acceptance-driven dev |
-| **LLM-verified** | Agent behavioral tests confirm compliance | 28 tests across all principle categories |
-| **Structurally verified** | Files/scripts exist and pass functional tests | 171 acceptance + 21 unit tests |
+| **LLM-verified** | Agent behavioral tests confirm compliance | 55 tests across all principle categories |
+| **Structurally verified** | Files/scripts exist and pass functional tests | 367 acceptance + 21 unit tests |
 | **Designed for** | Implemented with tooling, growing usage | Multi-agent at scale, sequential pipelines |
 
 ---

@@ -33,6 +33,8 @@ Purpose: a single source of truth for "how we build and run software here".
 # Create spec/ directory for features. Profile defaults — Discovery: no | Formal: yes
 - docs_gate: off
 # Doc staleness check at ag done. Profile defaults — Discovery: off | Formal: blocking
+- spec_analysis: off
+# Advisory spec analysis before implementation. Profile defaults — Discovery: off | Formal: on
 
 ### Periodic checks
 - periodic_orphaned_plans: every_session

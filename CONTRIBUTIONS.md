@@ -2436,10 +2436,39 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Bugs found during implementation**: (1) `quick_feature.sh` had an octal interpretation bug — `$((0147 + 1))` = 104 (octal) instead of 148 (decimal), causing ID collisions. (2) `query_features.py` and `feature_stats.py` couldn't parse `**Key**: value` bold format at all — every metadata field (status, priority, etc.) was silently lost, showing "none" for all 114 features. (3) `manifest.sh` was non-idempotent — `"generated"` timestamp changed on every run, creating perpetually dirty files even with identical commit data.
 
+### SDD Analysis — Corrections & Design Direction (v0.38.0)
+
+**Report corrections** (user review annotations on the SDD analysis):
+- Corrected underselling of our spec system: "also we have Feature specs + AC, not just AC + NFRs!" — FEATURES.md (rich metadata) + acceptance files + NFR.md
+- Corrected multi-agent count: report only counted 4 instruction-file agents, but we have 30 subagent roles + multi-agent orchestration (AGENTS_ACTIVE.md, worktrees, context injection)
+- Corrected plan format description: plans are free-form markdown, not rigid "problem + approach + files + risks"
+- Scoped principles compliance: "this applies to framework development itself only" — PRINCIPLES.md is framework-internal, not a general feature
+
+**Design signals** that shaped implementation:
+- "which we also had in the beginning of this project" (R1 clarification) — confirmed: resurface existing capability, don't reinvent
+- "was on our task list as well" (R3 extensions) — confirmed priority from real production pain
+- "marking task as doable in parallel — then give them to parallel agents" — boosted [P] markers for multi-agent dispatch
+- "I like this idea" (WHAT vs HOW separation) — confirmed Behavior section in acceptance template
+- "tracking and organizing the order/parallelization still would be useful and more systematic (helpful in more automatic development loops)!" — saw execution order as foundation for auto-dev loops
+- "our own idea, not from anyu other source (scope creep in this plan)" — correctly scoped R5/R8 (verification + auto-dev loops) out of SDD analysis implementation
+- "more according to 'work in small batches' than the stupid 'commit file limit' rule we have" — key design insight: phased checkpoints may be a better expression of D4 (Small Batch) than file-count limits. Captured as T-0027.
+
+**Feature naming**: "don't name this like F-0148: SDD Insights — they should be their own features" — directed decomposition of insights into 6 independent features (F-0148 through F-0153) instead of one monolithic feature.
+
+### Semantic Analysis & Deferred Items Triage (v0.39.0, F-0152/F-0153)
+
+**Directed implementation** of deferred R2 (Semantic Consistency Analysis) and R7 (AC-Level Coverage Tracking) — "i think r2 and r7 are worth doing" — expanding the SDD insights from 4 features to 6.
+
+**Deferred items triage**: Reviewed all rejected/deferred items from SDD analysis and directed:
+- Add R1 (spec clarification taxonomy), R5 (verification loop), R8 (auto-dev loop) as TODOs — noted these are pre-existing framework ideas, not new from the study
+- Add F-0152 P2 (cross-feature semantic checks) as TODO — identified as the genuinely new insight from the studied tool
+- Investigate task IDs/prioritization for parallelization — "if it would help in small batch development and parallelisation" — despite being initially rejected, worth evaluating for multi-agent dispatch value
+- Required all TODOs reference the analysis plan for background context
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.37.0
+**Current Version**: v0.39.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions

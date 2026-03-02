@@ -5,6 +5,17 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.39.0] - 2026-03-02
+
+### Added
+- **Spec Format Evolution (F-0148)** — Acceptance template gains `## Behavior` section, priority tags (`<!-- P1 -->` / `<!-- P2 -->`), `## Verification` heading. `verify-independently` marker for reviewable ACs.
+- **Spec Clarification Taxonomy (F-0149)** — Writing-specs skill includes 6-category structured clarification (functional scope, data model, edge cases, NFRs, integrations, completion signals). Max 5 targeted questions per spec.
+- **Execution Order & Checkpoints (F-0150)** — Plan template includes `## Execution Order` with `[P]` parallel markers. Implementing-features skill gains scope-check + checkpoint validation at P1/P2 boundaries.
+- **User-Extension Directory (F-0151)** — `.agentic-local/extensions/` for custom skills, gates, hooks, and rules that survive framework upgrades. Integrated with `scaffold.sh`, `generate-skills.sh`, `pre-commit-check.sh`, and `upgrade.sh`.
+- **Semantic Consistency Analysis (F-0152)** — `spec-analyze.sh` runs 3 deterministic checks: ambiguity detection (vague adjectives without metrics), AC↔test coverage gaps (via coverage.py), NFR measurability audit. Advisory only (exit 0 always). New `spec_analysis` setting (on for formal, off for discovery).
+- **AC-Level Coverage Tracking (F-0153)** — `coverage.py --ac-coverage F-XXXX` maps individual ACs to tests via naming conventions with proximity-based matching. Human-readable + JSON output. Standalone or integrated with spec-analyze.sh.
+- **LLM-069** — New behavioral test: spec analysis advisory before implementation.
+
 ## [0.36.0] - 2026-03-01
 
 ### Added

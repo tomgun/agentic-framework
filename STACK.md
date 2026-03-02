@@ -34,6 +34,8 @@ Purpose: Configuration for developing the Agentic Framework itself.
 # Create spec/ directory for features. Profile defaults — Discovery: no | Formal: yes
 - docs_gate: blocking
 # Doc staleness check at ag done. Profile defaults — Discovery: off | Formal: blocking
+- spec_analysis: on
+# Advisory spec analysis before implementation. Profile defaults — Discovery: off | Formal: on
 
 ### Complexity limits
 - max_files_per_commit: 15

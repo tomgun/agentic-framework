@@ -666,6 +666,40 @@ bash .agentic/tools/coverage.sh --test-mapping  # Infer test→feature mapping
 - Before major reviews
 - To verify code traceability
 
+#### `spec-analyze.sh` - Semantic Consistency Analysis (v0.39.0)
+
+**What it checks:**
+- Ambiguity detection — flags vague adjectives without metrics in acceptance criteria
+- AC↔test coverage gaps — identifies ACs with no corresponding test (uses `coverage.py --ac-coverage`)
+- NFR measurability audit — flags NFRs without quantifiable success criteria
+
+```bash
+bash .agentic/tools/spec-analyze.sh F-0148    # Analyze one feature
+bash .agentic/tools/spec-analyze.sh --help     # Usage info
+```
+
+**When to run:**
+- Before implementing a feature (runs automatically if `spec_analysis: on` in STACK.md)
+- When reviewing spec quality
+
+Results are severity-rated (CRITICAL/HIGH/MEDIUM/LOW) and advisory — always exits 0.
+
+#### `coverage.py --ac-coverage` - Per-AC Coverage Tracking (v0.39.0)
+
+**What it shows:**
+- Per-acceptance-criterion test coverage for a feature
+- Which ACs have tests (by naming convention) and which don't
+- Coverage percentage at AC level
+
+```bash
+python3 .agentic/tools/coverage.py --ac-coverage F-0148        # Human-readable
+python3 .agentic/tools/coverage.py --ac-coverage F-0148 --json # JSON output
+```
+
+**When to run:**
+- To check test completeness per AC before declaring a feature done
+- Called automatically by `spec-analyze.sh`
+
 #### `ag trace` - Unified Traceability CLI (NEW - v0.15.0)
 
 **What it does:**
@@ -1447,6 +1481,30 @@ This repo uses the agentic framework located at `.agentic/`.
 
 Full rules: `.agentic/agents/shared/agent_operating_guidelines.md`
 ```
+
+### User Extensions (`.agentic-local/extensions/`)
+
+The `.agentic-local/` directory holds project-specific customizations that **survive framework upgrades** (`.agentic/` gets replaced, `.agentic-local/` does not).
+
+Created automatically by `scaffold.sh`. Structure:
+
+```
+.agentic-local/
+└── extensions/
+    ├── README.md      # Explains extension points and formats
+    ├── skills/        # Custom Claude Code skills (same SKILL.md format)
+    ├── gates/         # Custom quality gates (bash, exit 1 = block commit)
+    ├── hooks/         # Lifecycle hooks (future: after-implement, after-commit)
+    └── rules/         # Rule injection into framework skills
+```
+
+**Custom skills**: Place a skill folder in `extensions/skills/my-skill/SKILL.md` using the same frontmatter format as framework skills. Run `bash .agentic/tools/generate-skills.sh` to pick them up.
+
+**Custom gates**: Place `.sh` scripts in `extensions/gates/`. They run during pre-commit — exit 0 to pass, exit 1 to block.
+
+**Custom rules**: Place rule files in `extensions/rules/`. Content from `## Project-Specific Rules` sections is injected into matching framework skills during generation.
+
+See `.agentic-local/extensions/README.md` for detailed examples.
 
 ### Adding Custom Scripts
 

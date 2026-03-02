@@ -15,15 +15,15 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 | Category | Count | Shipped | In Progress | Planned |
 |----------|-------|---------|-------------|---------|
 | **Core** | 14 | 14 | 0 | 0 |
-| **Quality** | 11 | 11 | 0 | 0 |
+| **Quality** | 14 | 11 | 2 | 1 |
 | **Session** | 11 | 10 | 0 | 0 |
-| **Multi-Agent** | 9 | 8 | 0 | 1 |
+| **Multi-Agent** | 10 | 8 | 1 | 1 |
 | **Tooling** | 11 | 11 | 0 | 0 |
 | **Recovery** | 7 | 7 | 0 | 0 |
-| **Developer Experience** | 14 | 13 | 1 | 0 |
+| **Developer Experience** | 15 | 13 | 2 | 0 |
 | **Design Principles** | 10 | 10 | 0 | 0 |
 | **Agent System** | 12 | 10 | 2 | 0 |
-| **Verification & Enforcement** | 15 | 15 | 0 | 0 |
+| **Verification & Enforcement** | 16 | 15 | 0 | 1 |
 
 ---
 
@@ -2366,19 +2366,115 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ---
 
+## F-0148: Spec Format Evolution (Behavior Section, Priority Tags, Verify-Independently)
+
+**Status**: in_progress
+**Category**: Quality
+**Priority**: high
+**Complexity**: low
+**Added**: 2026-03-02
+
+**Description**: Evolves the acceptance criteria template with a technology-agnostic Behavior section (WHAT vs HOW separation), priority tags (P1/P2) on AC groups for incremental delivery, verify-independently fields per group, and Tests restructured under a Verification heading. Backward compatible with existing specs.
+
+**Dependencies**: F-0147 (Spec-Writing Workflow)
+
+**Acceptance**: See `spec/acceptance/F-0148.md`
+
+---
+
+## F-0149: Spec Clarification Taxonomy
+
+**Status**: in_progress
+**Category**: Quality
+**Priority**: high
+**Complexity**: low
+**Added**: 2026-03-02
+
+**Description**: Adds a structured 6-category clarification pass to the writing-specs skill, run after drafting acceptance criteria. Categories: Functional Scope, Data & Domain Model, Edge Cases & Failure Handling, Non-Functional Requirements, Integration & Dependencies, Completion Signals. Max 5 questions with recommended answers. Skipped for trivial features (<3 ACs).
+
+**Dependencies**: F-0147 (Spec-Writing Workflow), F-0143 (Skills-Primary Architecture)
+
+**Acceptance**: See `spec/acceptance/F-0149.md`
+
+---
+
+## F-0150: Execution Order and Parallelization Markers in Plans
+
+**Status**: in_progress
+**Category**: Multi-Agent
+**Priority**: medium
+**Complexity**: low
+**Added**: 2026-03-02
+
+**Description**: Adds execution order section guidance to the planning-features skill for features with >5 ACs, with [P] markers indicating parallelizable ACs for multi-agent dispatch. Adds checkpoint validation to implementing-features skill requiring user confirmation after P1 completion before proceeding to P2.
+
+**Dependencies**: F-0143 (Skills-Primary Architecture)
+
+**Acceptance**: See `spec/acceptance/F-0150.md`
+
+---
+
+## F-0151: User-Extension Directory (.agentic-local/extensions/)
+
+**Status**: in_progress
+**Category**: Developer Experience
+**Priority**: high
+**Complexity**: medium
+**Added**: 2026-03-02
+
+**Description**: Adds upgrade-safe project customization via `.agentic-local/extensions/` directory with subdirectories for custom skills, quality gates, lifecycle hooks, and rule injection. Integrated into scaffold.sh (creation), generate-skills.sh (skill scanning + rule injection), pre-commit-check.sh (custom gate execution), and upgrade.sh (explicit preservation). Maintains backward compatibility with existing subagents-project/ mechanism.
+
+**Dependencies**: F-0143 (Skills-Primary Architecture)
+
+**Acceptance**: See `spec/acceptance/F-0151.md`
+
+---
+
+## F-0152: Semantic Consistency Analysis
+
+**Status**: in_progress
+**Category**: Quality
+**Priority**: high
+**Complexity**: medium
+**Added**: 2026-03-02
+
+**Description**: Deterministic cross-artifact consistency analysis tool (`spec-analyze.sh`) that runs 3 core checks before implementation: ambiguity detection (vague adjectives without metrics), AC↔test coverage gaps, and NFR measurability audit. Results are severity-rated (CRITICAL/HIGH/MEDIUM/LOW) and advisory (warn, don't block). No LLM calls — pure regex/pattern matching. Skippable for offline development. P2 adds LLM-powered cross-feature terminology consistency, AC contradiction detection, and constitution alignment checks.
+
+**Dependencies**: F-0148 (Spec Format Evolution)
+
+**Acceptance**: See `spec/acceptance/F-0152.md`
+
+---
+
+## F-0153: AC-Level Coverage Tracking
+
+**Status**: in_progress
+**Category**: Verification & Enforcement
+**Priority**: medium
+**Complexity**: medium
+**Added**: 2026-03-02
+
+**Description**: Extends coverage tracking from feature-level to individual acceptance criteria. Maps specific tests to specific ACs using naming conventions (deterministic) with optional LLM semantic mapping (advisory). Output: per-AC coverage status showing which ACs have tests and which don't. Informational gate — warns but doesn't block. Can integrate with spec-analyze.sh (F-0152) or run standalone.
+
+**Dependencies**: F-0152 (Semantic Consistency Analysis)
+
+**Acceptance**: See `spec/acceptance/F-0153.md`
+
+---
+
 ## Summary
 
 | Category | Count | Shipped | In Progress | Planned |
 |----------|-------|---------|-------------|---------|
 | Core | 14 | 14 | 0 | 0 |
-| Quality | 11 | 11 | 0 | 0 |
+| Quality | 14 | 11 | 2 | 1 |
 | Session | 11 | 10 | 0 | 0 |
-| Multi-Agent | 9 | 8 | 0 | 1 |
+| Multi-Agent | 10 | 8 | 1 | 1 |
 | Tooling | 11 | 11 | 0 | 0 |
 | Recovery | 7 | 7 | 0 | 0 |
-| Developer Experience | 14 | 13 | 1 | 0 |
+| Developer Experience | 15 | 13 | 2 | 0 |
 | Design Principles | 10 | 10 | 0 | 0 |
 | Agent System | 12 | 10 | 2 | 0 |
-| Verification & Enforcement | 15 | 15 | 0 | 0 |
-| **Total** | **114** | **109** | **3** | **1** |
+| Verification & Enforcement | 16 | 15 | 0 | 1 |
+| **Total** | **120** | **109** | **7** | **3** |
 

@@ -11,7 +11,7 @@ compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Agent]
 metadata:
   author: agentic-framework
-  version: "0.36.0"
+  version: "0.38.0"
 ---
 
 # Implementing Features
@@ -36,6 +36,14 @@ Check for `spec/acceptance/F-XXXX.md`. If it does not exist:
 If no feature ID exists yet, create one in `spec/FEATURES.md` first.
 
 **Do NOT write any code until acceptance criteria exist.**
+
+### Step 1b: Spec Analysis (advisory)
+
+Check if spec analysis is enabled:
+1. Read `spec_analysis` setting from STACK.md (default: on for formal, off for discovery)
+2. If enabled, run: `bash .agentic/tools/spec-analyze.sh F-XXXX`
+3. Review findings but proceed regardless (advisory, not blocking)
+4. If any HIGH/CRITICAL findings, mention them to the user before coding
 
 ### Step 2: Scope Check
 
@@ -63,9 +71,19 @@ This creates `.agentic-state/WIP.md` — a lock that prevents premature commits.
    bash .agentic/tools/wip.sh checkpoint "Completed step X"
    ```
 
-### Step 5: Verify Before Declaring Done
+### Step 5: Checkpoint Validation (priority-grouped ACs)
 
-- All acceptance criteria met
+When acceptance criteria have priority groups (P1/P2):
+1. Complete all P1 ACs first
+2. Run tests for P1 group
+3. Report to user: "P1 complete — core feature works. Proceed to P2?"
+4. Only proceed to P2 after user confirmation
+
+This ensures MVP is solid before adding enhancements.
+
+### Step 6: Verify Before Declaring Done
+
+- All acceptance criteria met (P1 at minimum, P2 if confirmed)
 - Tests pass
 - No unrelated files changed
 - Code follows project conventions
