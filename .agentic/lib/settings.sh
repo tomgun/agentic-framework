@@ -327,6 +327,8 @@ show_all_settings() {
         "development_mode"
         "agent_mode"
         "pre_commit_hook"
+        "docs_gate"
+        "spec_analysis"
         "plan_review_max_iterations"
         "pipeline_enabled"
     )

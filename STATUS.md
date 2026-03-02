@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- PR #58 review — sequential feature IDs with category metadata (v0.37.0) (Updated: 2026-03-02 00:12 EET)
+- PR: SDD toolkit insights F-0148 through F-0153 (v0.39.0) (Updated: 2026-03-02 11:58 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

@@ -1831,11 +1831,11 @@ else
   fail "Acceptance template: acceptance.template.md missing (ag implement references it)"
 fi
 
-# acceptance.template.md has a ## Tests section
-if grep -q "^## Tests" "${FRAMEWORK_ROOT}/.agentic/spec/acceptance.template.md" 2>/dev/null; then
-  pass "Acceptance template: has ## Tests section"
+# acceptance.template.md has a Tests section (## Tests or ### Tests under ## Verification)
+if grep -q "^## Tests\|^### Tests" "${FRAMEWORK_ROOT}/.agentic/spec/acceptance.template.md" 2>/dev/null; then
+  pass "Acceptance template: has Tests section"
 else
-  fail "Acceptance template: missing ## Tests section"
+  fail "Acceptance template: missing Tests section"
 fi
 
 # feature_start.md gates the ## Tests section
@@ -2592,6 +2592,389 @@ if grep -q "writing-specs" "${FRAMEWORK_ROOT}/tests/validate_skills.sh" 2>/dev/n
   pass "F-0147: writing-specs in validate_skills.sh expected list"
 else
   fail "F-0147: writing-specs missing from validate_skills.sh"
+fi
+
+# ============================================================
+# F-0148: Spec Format Evolution
+# ============================================================
+echo "--- F-0148: Spec Format Evolution ---"
+
+if grep -q "^## Behavior" "${FRAMEWORK_ROOT}/.agentic/spec/acceptance.template.md" 2>/dev/null; then
+  pass "F-0148: acceptance.template.md has Behavior section"
+else
+  fail "F-0148: acceptance.template.md missing Behavior section"
+fi
+
+if grep -q "(P1\|P2" "${FRAMEWORK_ROOT}/.agentic/spec/acceptance.template.md" 2>/dev/null; then
+  pass "F-0148: acceptance.template.md has priority tags (P1/P2)"
+else
+  fail "F-0148: acceptance.template.md missing priority tags"
+fi
+
+if grep -q "\*\*Verify independently\*\*:" "${FRAMEWORK_ROOT}/.agentic/spec/acceptance.template.md" 2>/dev/null; then
+  pass "F-0148: acceptance.template.md has 'Verify independently' field"
+else
+  fail "F-0148: acceptance.template.md missing 'Verify independently' field"
+fi
+
+if grep -q "^## Verification" "${FRAMEWORK_ROOT}/.agentic/spec/acceptance.template.md" 2>/dev/null; then
+  pass "F-0148: acceptance.template.md has Verification section"
+else
+  fail "F-0148: acceptance.template.md missing Verification section"
+fi
+
+# AC-005: existing specs NOT modified (F-0001 should keep old format)
+if ! grep -q "^## Behavior" "${FRAMEWORK_ROOT}/spec/acceptance/F-0001.md" 2>/dev/null; then
+  pass "F-0148: existing F-0001 maintains old format (backward compatible)"
+else
+  warn "F-0148: F-0001 has new format (not required, just noting)"
+fi
+
+# AC-006: feature_start.md accepts both formats
+if grep -q "Verification.*Tests\|## Tests" "${FRAMEWORK_ROOT}/.agentic/checklists/feature_start.md" 2>/dev/null; then
+  pass "F-0148: feature_start.md accepts both old and new test section formats"
+else
+  fail "F-0148: feature_start.md missing dual-format support"
+fi
+
+# AC-007: README.template.md documents new format
+if grep -q "Behavior" "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/README.template.md" 2>/dev/null; then
+  pass "F-0148: acceptance README.template.md updated with new format"
+else
+  fail "F-0148: acceptance README.template.md not updated"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0148.md" ]]; then
+  pass "F-0148: acceptance criteria file exists"
+else
+  fail "F-0148: acceptance criteria file missing"
+fi
+
+# ============================================================
+# F-0149: Spec Clarification Taxonomy
+# ============================================================
+echo "--- F-0149: Spec Clarification Taxonomy ---"
+
+WRITING_SPECS_SKILL="${FRAMEWORK_ROOT}/.agentic/agents/claude/skills/writing-specs/SKILL.md"
+
+if grep -qi "Clarification Pass" "$WRITING_SPECS_SKILL" 2>/dev/null; then
+  pass "F-0149: writing-specs skill includes clarification pass"
+else
+  fail "F-0149: writing-specs skill missing clarification pass"
+fi
+
+if grep -qi "Functional Scope" "$WRITING_SPECS_SKILL" 2>/dev/null && \
+   grep -qi "Data.*Domain" "$WRITING_SPECS_SKILL" 2>/dev/null && \
+   grep -qi "Edge Cases" "$WRITING_SPECS_SKILL" 2>/dev/null && \
+   grep -qi "Non-Functional" "$WRITING_SPECS_SKILL" 2>/dev/null && \
+   grep -qi "Integration.*Dependencies" "$WRITING_SPECS_SKILL" 2>/dev/null && \
+   grep -qi "Completion Signals" "$WRITING_SPECS_SKILL" 2>/dev/null; then
+  pass "F-0149: writing-specs has 6-category taxonomy"
+else
+  fail "F-0149: writing-specs missing taxonomy categories"
+fi
+
+if grep -qi "max 5 questions" "$WRITING_SPECS_SKILL" 2>/dev/null; then
+  pass "F-0149: clarification limited to max 5 questions"
+else
+  fail "F-0149: clarification max limit not documented"
+fi
+
+if grep -qi "trivial.*<3\|Skip.*pass.*trivial" "$WRITING_SPECS_SKILL" 2>/dev/null; then
+  pass "F-0149: trivial features skip clarification"
+else
+  fail "F-0149: trivial feature skip not documented"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0149.md" ]]; then
+  pass "F-0149: acceptance criteria file exists"
+else
+  fail "F-0149: acceptance criteria file missing"
+fi
+
+# ============================================================
+# F-0150: Execution Order and Parallelization Markers
+# ============================================================
+echo "--- F-0150: Execution Order and Parallelization Markers ---"
+
+PLANNING_SKILL="${FRAMEWORK_ROOT}/.agentic/agents/claude/skills/planning-features/SKILL.md"
+IMPLEMENTING_SKILL="${FRAMEWORK_ROOT}/.agentic/agents/claude/skills/implementing-features/SKILL.md"
+
+if grep -qi "Execution Order" "$PLANNING_SKILL" 2>/dev/null; then
+  pass "F-0150: planning-features has Execution Order section"
+else
+  fail "F-0150: planning-features missing Execution Order"
+fi
+
+if grep -q "\[P\]" "$PLANNING_SKILL" 2>/dev/null; then
+  pass "F-0150: planning-features documents [P] markers"
+else
+  fail "F-0150: planning-features missing [P] marker docs"
+fi
+
+if grep -qi "Checkpoint Validation" "$IMPLEMENTING_SKILL" 2>/dev/null; then
+  pass "F-0150: implementing-features has checkpoint validation"
+else
+  fail "F-0150: implementing-features missing checkpoint validation"
+fi
+
+if grep -qi "Proceed to P2\|P1.*complete" "$IMPLEMENTING_SKILL" 2>/dev/null; then
+  pass "F-0150: implementing-features requires user confirmation for P2"
+else
+  fail "F-0150: implementing-features missing P2 confirmation"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0150.md" ]]; then
+  pass "F-0150: acceptance criteria file exists"
+else
+  fail "F-0150: acceptance criteria file missing"
+fi
+
+# ============================================================
+# F-0151: User-Extension Directory
+# ============================================================
+echo "--- F-0151: User-Extension Directory ---"
+
+# AC-001/002: scaffold creates extension dirs
+if grep -q "agentic-local/extensions" "${FRAMEWORK_ROOT}/.agentic/init/scaffold.sh" 2>/dev/null; then
+  pass "F-0151: scaffold.sh creates .agentic-local/extensions/"
+else
+  fail "F-0151: scaffold.sh missing .agentic-local/extensions/ creation"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/init/extensions-readme.md" ]]; then
+  pass "F-0151: extensions-readme.md template exists"
+else
+  fail "F-0151: extensions-readme.md template missing"
+fi
+
+# AC-003: generate-skills.sh scans extension skills
+if grep -q "agentic-local/extensions/skills" "${FRAMEWORK_ROOT}/.agentic/tools/generate-skills.sh" 2>/dev/null; then
+  pass "F-0151: generate-skills.sh scans extension skills"
+else
+  fail "F-0151: generate-skills.sh missing extension skills scanning"
+fi
+
+# AC-004: pre-commit-check.sh runs custom gates
+if grep -q "agentic-local/extensions/gates" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "F-0151: pre-commit-check.sh runs custom gates"
+else
+  fail "F-0151: pre-commit-check.sh missing custom gates integration"
+fi
+
+# AC-005: upgrade.sh explicitly preserves .agentic-local/
+if grep -q "agentic-local" "${FRAMEWORK_ROOT}/.agentic/tools/upgrade.sh" 2>/dev/null; then
+  pass "F-0151: upgrade.sh references .agentic-local/ preservation"
+else
+  fail "F-0151: upgrade.sh missing .agentic-local/ preservation"
+fi
+
+# AC-006: subagents-project/ mechanism still works
+if grep -q "subagents-project" "${FRAMEWORK_ROOT}/.agentic/tools/generate-skills.sh" 2>/dev/null; then
+  pass "F-0151: generate-skills.sh retains subagents-project/ support"
+else
+  fail "F-0151: generate-skills.sh missing subagents-project/ backward compat"
+fi
+
+# AC-007: generate-skills --validate passes
+if bash "${FRAMEWORK_ROOT}/.agentic/tools/generate-skills.sh" --validate >/dev/null 2>&1; then
+  pass "F-0151: generate-skills --validate passes"
+else
+  fail "F-0151: generate-skills --validate fails"
+fi
+
+# AC-008: empty .agentic-local/extensions/ dirs don't cause errors
+# Tested implicitly: this framework repo has no .agentic-local/ and generate-skills runs fine
+
+# Documentation
+if grep -q "agentic-local" "${FRAMEWORK_ROOT}/.agentic/DEVELOPER_GUIDE.md" 2>/dev/null; then
+  pass "F-0151: DEVELOPER_GUIDE.md documents extension directory"
+else
+  fail "F-0151: DEVELOPER_GUIDE.md missing extension directory docs"
+fi
+
+if grep -q "agentic-local" "${FRAMEWORK_ROOT}/.agentic/START_HERE.md" 2>/dev/null; then
+  pass "F-0151: START_HERE.md mentions extension directory"
+else
+  fail "F-0151: START_HERE.md missing extension directory mention"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0151.md" ]]; then
+  pass "F-0151: acceptance criteria file exists"
+else
+  fail "F-0151: acceptance criteria file missing"
+fi
+
+# ============================================================
+# F-0152: Semantic Consistency Analysis
+# ============================================================
+echo "--- F-0152: Semantic Consistency Analysis ---"
+
+SPEC_ANALYZE="${FRAMEWORK_ROOT}/.agentic/tools/spec-analyze.sh"
+
+# AC-001: spec-analyze.sh exists and is executable
+if [[ -x "$SPEC_ANALYZE" ]]; then
+  pass "F-0152: AC-001: spec-analyze.sh exists and is executable"
+else
+  fail "F-0152: AC-001: spec-analyze.sh missing or not executable"
+fi
+
+# AC-001: --help exits 0
+if bash "$SPEC_ANALYZE" --help >/dev/null 2>&1; then
+  pass "F-0152: AC-001: spec-analyze.sh --help exits 0"
+else
+  fail "F-0152: AC-001: spec-analyze.sh --help fails"
+fi
+
+# AC-002: ambiguity detection — contains vague word list
+if grep -qE 'fast\|slow\|scalable\|easy' "$SPEC_ANALYZE" 2>/dev/null; then
+  pass "F-0152: AC-002: spec-analyze.sh contains ambiguity word list"
+else
+  fail "F-0152: AC-002: spec-analyze.sh missing ambiguity word list"
+fi
+
+# AC-003: AC↔test coverage — calls coverage.py --ac-coverage
+if grep -q 'coverage.py' "$SPEC_ANALYZE" 2>/dev/null && grep -q '\-\-ac-coverage' "$SPEC_ANALYZE" 2>/dev/null; then
+  pass "F-0152: AC-003: spec-analyze.sh calls coverage.py --ac-coverage"
+else
+  fail "F-0152: AC-003: spec-analyze.sh missing coverage.py --ac-coverage call"
+fi
+
+# AC-004: NFR measurability — checks NFR.md
+if grep -q 'NFR.md\|How to measure' "$SPEC_ANALYZE" 2>/dev/null; then
+  pass "F-0152: AC-004: spec-analyze.sh contains NFR measurability check"
+else
+  fail "F-0152: AC-004: spec-analyze.sh missing NFR measurability check"
+fi
+
+# AC-005: severity ratings in output
+if grep -qE 'CRITICAL|HIGH|MEDIUM|LOW' "$SPEC_ANALYZE" 2>/dev/null; then
+  pass "F-0152: AC-005: spec-analyze.sh has severity ratings"
+else
+  fail "F-0152: AC-005: spec-analyze.sh missing severity ratings"
+fi
+
+# AC-006: implementing-features skill references spec-analyze
+IMPLEMENTING_SKILL="${FRAMEWORK_ROOT}/.agentic/agents/claude/skills/implementing-features/SKILL.md"
+if grep -q 'spec-analyze' "$IMPLEMENTING_SKILL" 2>/dev/null; then
+  pass "F-0152: AC-006: implementing-features skill references spec-analyze"
+else
+  fail "F-0152: AC-006: implementing-features skill missing spec-analyze reference"
+fi
+
+# AC-007: advisory — always exits 0
+if bash "$SPEC_ANALYZE" F-9999 >/dev/null 2>&1; then
+  pass "F-0152: AC-007: spec-analyze.sh exits 0 (advisory) even for missing feature"
+else
+  fail "F-0152: AC-007: spec-analyze.sh exits non-zero (should be advisory)"
+fi
+
+# AC-008: spec_analysis setting in profiles.conf
+if grep -q 'spec_analysis' "${FRAMEWORK_ROOT}/.agentic/presets/profiles.conf" 2>/dev/null; then
+  pass "F-0152: AC-008: profiles.conf has spec_analysis setting"
+else
+  fail "F-0152: AC-008: profiles.conf missing spec_analysis setting"
+fi
+
+# AC-012: missing acceptance file produces clear error, not crash
+ANALYZE_OUTPUT=$(bash "$SPEC_ANALYZE" F-9999 2>&1)
+if echo "$ANALYZE_OUTPUT" | grep -qi "not found\|missing"; then
+  pass "F-0152: AC-012: missing acceptance file produces clear error"
+else
+  fail "F-0152: AC-012: missing acceptance file doesn't produce clear error"
+fi
+
+# AC-013: handles both old and new test section formats
+if grep -qE '## Tests|## Verification' "$SPEC_ANALYZE" 2>/dev/null || grep -q 'accept_file' "$SPEC_ANALYZE" 2>/dev/null; then
+  pass "F-0152: AC-013: spec-analyze.sh handles acceptance file parsing"
+else
+  fail "F-0152: AC-013: spec-analyze.sh missing format handling"
+fi
+
+# Acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0152.md" ]]; then
+  pass "F-0152: acceptance criteria file exists"
+else
+  fail "F-0152: acceptance criteria file missing"
+fi
+
+# ============================================================
+# F-0153: AC-Level Coverage Tracking
+# ============================================================
+echo "--- F-0153: AC-Level Coverage Tracking ---"
+
+COVERAGE_PY="${FRAMEWORK_ROOT}/.agentic/tools/coverage.py"
+
+# AC-001/002: --ac-coverage argument support with naming convention matching
+if grep -q '\-\-ac-coverage' "$COVERAGE_PY" 2>/dev/null; then
+  pass "F-0153: AC-001: coverage.py has --ac-coverage argument"
+else
+  fail "F-0153: AC-001: coverage.py missing --ac-coverage argument"
+fi
+
+# AC-002: AC pattern regex for naming convention matching
+if grep -qE 'AC[-_].*RE|AC_ID_RE|AC_TEST_RE' "$COVERAGE_PY" 2>/dev/null; then
+  pass "F-0153: AC-002: coverage.py contains AC pattern regex"
+else
+  fail "F-0153: AC-002: coverage.py missing AC pattern regex"
+fi
+
+# AC-001: ac_level_coverage function exists
+if grep -q 'def ac_level_coverage' "$COVERAGE_PY" 2>/dev/null; then
+  pass "F-0153: AC-001: coverage.py has ac_level_coverage function"
+else
+  fail "F-0153: AC-001: coverage.py missing ac_level_coverage function"
+fi
+
+# AC-003: output includes per-AC status
+if python3 "$COVERAGE_PY" --ac-coverage F-0148 2>/dev/null | grep -qE '(AC-|NO TEST FOUND|covered|not_covered)'; then
+  pass "F-0153: AC-003: --ac-coverage output includes per-AC status"
+else
+  fail "F-0153: AC-003: --ac-coverage output missing per-AC status"
+fi
+
+# AC-007: works as standalone tool (human-readable output)
+if python3 "$COVERAGE_PY" --ac-coverage F-0148 2>/dev/null | grep -q 'AC Coverage'; then
+  pass "F-0153: AC-007: --ac-coverage works standalone with human-readable output"
+else
+  fail "F-0153: AC-007: --ac-coverage standalone output not working"
+fi
+
+# AC-007: --json flag produces valid JSON
+if python3 "$COVERAGE_PY" --ac-coverage F-0148 --json 2>/dev/null | python3 -c "import json,sys; json.load(sys.stdin)" 2>/dev/null; then
+  pass "F-0153: AC-007: --ac-coverage --json produces valid JSON"
+else
+  fail "F-0153: AC-007: --ac-coverage --json invalid output"
+fi
+
+# AC-008: works with validate_framework.sh tests (test file has .sh extension)
+if python3 "$COVERAGE_PY" --ac-coverage F-0148 2>/dev/null | grep -q 'validate_framework.sh'; then
+  pass "F-0153: AC-008: --ac-coverage finds tests in validate_framework.sh"
+else
+  fail "F-0153: AC-008: --ac-coverage doesn't find validate_framework.sh tests"
+fi
+
+# AC-009: features with no tests report 0/N, not error
+NO_TEST_OUTPUT=$(python3 "$COVERAGE_PY" --ac-coverage F-9999 2>/dev/null)
+NO_TEST_EXIT=$?
+if [[ $NO_TEST_EXIT -eq 0 ]]; then
+  pass "F-0153: AC-009: --ac-coverage for nonexistent feature exits 0"
+else
+  fail "F-0153: AC-009: --ac-coverage for nonexistent feature exits non-zero"
+fi
+
+# AC-010: features with no acceptance file produce clear error
+if echo "$NO_TEST_OUTPUT" | grep -qi "not found\|error"; then
+  pass "F-0153: AC-010: missing acceptance file produces clear error"
+else
+  fail "F-0153: AC-010: missing acceptance file doesn't produce clear error"
+fi
+
+# Acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/spec/acceptance/F-0153.md" ]]; then
+  pass "F-0153: acceptance criteria file exists"
+else
+  fail "F-0153: acceptance criteria file missing"
 fi
 
 # ============================================================

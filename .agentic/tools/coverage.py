@@ -8,6 +8,7 @@ Usage:
   coverage.py --json       # JSON output (machine-readable)
   coverage.py --reverse FILE  # What features does FILE implement?
   coverage.py --test-mapping  # Infer test→feature mapping
+  coverage.py --ac-coverage F-XXXX  # Per-AC test coverage for a feature
 """
 from __future__ import annotations
 
@@ -23,6 +24,10 @@ FEATURE_ANNOTATION_RE = re.compile(r"@feature\s+(F-\d{4})")
 FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):", re.MULTILINE)
 # Test file naming pattern: test_F0003_*.py or test_F-0003_*.py
 TEST_FEATURE_RE = re.compile(r"test[_-]?F[-_]?(\d{4})", re.IGNORECASE)
+# AC ID pattern in acceptance files: **AC-001**: description
+AC_ID_RE = re.compile(r"\*\*AC-(\d{3,4})\*\*:?\s*(.*)")
+# AC ID references in test files: AC-001, AC_001, ac001 (various conventions)
+AC_TEST_RE = re.compile(r"AC[-_]?(\d{3,4})", re.IGNORECASE)
 CODE_EXTENSIONS = {
     ".ts", ".tsx", ".js", ".jsx",
     ".py", ".pyi",
@@ -295,6 +300,171 @@ def output_json(
     return result
 
 
+def ac_level_coverage(root: Path, feature_id: str) -> dict:
+    """Map individual ACs to tests using naming conventions.
+
+    Strategy (deterministic, no LLM):
+    1. Parse acceptance file for AC IDs (regex: **AC-NNN**: text)
+    2. Find test files that reference this feature
+    3. Within those test files, search for AC ID references
+    4. Report: {ac_id: [matched_tests] or "NO TEST FOUND"}
+
+    @feature F-0153
+    """
+    accept_path = root / "spec" / "acceptance" / f"{feature_id}.md"
+
+    # Edge case: no acceptance file (AC-010)
+    if not accept_path.exists():
+        return {
+            "feature": feature_id,
+            "error": f"Acceptance file not found: spec/acceptance/{feature_id}.md",
+            "total_acs": 0,
+            "covered": 0,
+            "coverage_pct": 0,
+            "acs": [],
+        }
+
+    # 1. Parse acceptance file for AC IDs and their text
+    try:
+        content = accept_path.read_text(encoding="utf-8")
+    except Exception:
+        return {
+            "feature": feature_id,
+            "error": f"Cannot read acceptance file: spec/acceptance/{feature_id}.md",
+            "total_acs": 0,
+            "covered": 0,
+            "coverage_pct": 0,
+            "acs": [],
+        }
+
+    acs: dict[str, str] = {}  # {ac_id: description_text}
+    for match in AC_ID_RE.finditer(content):
+        ac_num = match.group(1)
+        ac_id = f"AC-{ac_num}"
+        ac_text = match.group(2).strip().rstrip("*").strip()
+        acs[ac_id] = ac_text
+
+    if not acs:
+        return {
+            "feature": feature_id,
+            "total_acs": 0,
+            "covered": 0,
+            "coverage_pct": 0,
+            "acs": [],
+        }
+
+    # 2. Find test files that reference this feature
+    # Normalize feature ID for search: F-0148 -> patterns F-0148, F_0148, F0148
+    fid_num = feature_id.split("-")[1]
+    feature_patterns = [
+        feature_id,           # F-0148
+        f"F_{fid_num}",       # F_0148
+        f"F{fid_num}",        # F0148
+    ]
+
+    # Search test directories and all shell/script test files
+    test_dirs = []
+    for name in ["tests", "test", "spec", "__tests__"]:
+        test_dir = root / name
+        if test_dir.exists():
+            test_dirs.append(test_dir)
+
+    # Collect test files that mention this feature
+    test_extensions = {".py", ".ts", ".js", ".tsx", ".jsx", ".sh", ".bash"}
+    feature_test_files: list[Path] = []
+
+    for test_dir in test_dirs:
+        for test_file in test_dir.rglob("*"):
+            if not test_file.is_file():
+                continue
+            if test_file.suffix not in test_extensions:
+                continue
+            if "__pycache__" in test_file.parts:
+                continue
+            try:
+                file_content = test_file.read_text(encoding="utf-8", errors="ignore")
+                if any(pat in file_content for pat in feature_patterns):
+                    feature_test_files.append(test_file)
+            except Exception:
+                continue
+
+    # 3. For each AC, search test files for references
+    ac_results: list[dict] = []
+    covered_count = 0
+
+    for ac_id in sorted(acs.keys(), key=lambda x: int(x.split("-")[1])):
+        ac_text = acs[ac_id]
+        ac_num = ac_id.split("-")[1]
+        # Patterns to match: AC-001, AC_001, AC001, ac-001, ac_001
+        ac_patterns_str = [
+            f"AC-{ac_num}",
+            f"AC_{ac_num}",
+            f"AC{ac_num}",
+            f"ac-{ac_num}",
+            f"ac_{ac_num}",
+        ]
+
+        matched_tests: list[str] = []
+
+        for test_file in feature_test_files:
+            try:
+                lines = test_file.read_text(encoding="utf-8", errors="ignore").splitlines()
+            except Exception:
+                continue
+
+            rel_path = str(test_file.relative_to(root))
+
+            # Strategy: prefer lines that have BOTH feature ID and AC ID.
+            # Fallback: AC ID within 50 lines of a feature ID reference.
+            best_match: str | None = None
+            feature_line_nums: list[int] = []
+
+            for line_num, line in enumerate(lines, 1):
+                if any(pat in line for pat in feature_patterns):
+                    feature_line_nums.append(line_num)
+
+            for line_num, line in enumerate(lines, 1):
+                if any(pat in line for pat in ac_patterns_str):
+                    # Best: same line has both feature ID and AC ID
+                    if any(pat in line for pat in feature_patterns):
+                        best_match = f"{rel_path}:{line_num}"
+                        break
+                    # Good: AC ID is within 50 lines of a feature ID ref
+                    if any(abs(line_num - fl) <= 50 for fl in feature_line_nums):
+                        if best_match is None:
+                            best_match = f"{rel_path}:{line_num}"
+                        # Keep looking for a same-line match
+
+            if best_match:
+                matched_tests.append(best_match)
+
+        if matched_tests:
+            covered_count += 1
+            ac_results.append({
+                "id": ac_id,
+                "status": "covered",
+                "text": ac_text,
+                "tests": matched_tests,
+            })
+        else:
+            ac_results.append({
+                "id": ac_id,
+                "status": "not_covered",
+                "text": ac_text,
+            })
+
+    total = len(acs)
+    coverage_pct = int(covered_count / total * 100) if total > 0 else 0
+
+    return {
+        "feature": feature_id,
+        "total_acs": total,
+        "covered": covered_count,
+        "coverage_pct": coverage_pct,
+        "acs": ac_results,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Code annotation coverage tool",
@@ -305,11 +475,14 @@ Examples:
   coverage.py --json       # JSON output (machine-readable)
   coverage.py --reverse src/auth.py    # What features does auth.py implement?
   coverage.py --test-mapping           # Infer test→feature mapping
+  coverage.py --ac-coverage F-0148     # Per-AC test coverage
+  coverage.py --ac-coverage F-0148 --json  # Per-AC coverage as JSON
 """,
     )
     parser.add_argument("--json", action="store_true", help="Output JSON format")
     parser.add_argument("--reverse", metavar="FILE", help="Find features for a specific file")
     parser.add_argument("--test-mapping", action="store_true", help="Infer test→feature mapping")
+    parser.add_argument("--ac-coverage", metavar="F-XXXX", help="Per-AC test coverage for a feature")
 
     args = parser.parse_args()
 
@@ -318,6 +491,34 @@ Examples:
 
     # Get features from spec
     features = parse_features(features_path)
+
+    # Handle --ac-coverage mode
+    if args.ac_coverage:
+        result = ac_level_coverage(root, args.ac_coverage)
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            if "error" in result:
+                print(f"Error: {result['error']}")
+                return 0  # Advisory, don't fail
+
+            fid = result["feature"]
+            total = result["total_acs"]
+            covered = result["covered"]
+            pct = result["coverage_pct"]
+            print(f"=== AC Coverage: {fid} ===\n")
+            print(f"Feature: {total} ACs, {covered} with tests ({pct}%)")
+
+            for ac in result["acs"]:
+                ac_id = ac["id"]
+                if ac["status"] == "covered":
+                    tests = ", ".join(ac["tests"])
+                    print(f"  \u2705 {ac_id}: {tests}")
+                else:
+                    text = ac.get("text", "")
+                    suffix = f' \u2014 "{text}"' if text else ""
+                    print(f"  \u274c {ac_id}: NO TEST FOUND{suffix}")
+        return 0
 
     # Handle --reverse mode
     if args.reverse:

@@ -1099,3 +1099,29 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-02 08:57 - F-0148 SDD Toolkit Insights
+
+**Why**: Implements prioritized subset of SDD toolkit analysis recommendations
+
+**Accomplished**:
+- Implemented 4 groups: spec format evolution (Behavior section, priority tags, verify-independently), clarification taxonomy in writing-specs, execution order + [P] markers in planning/implementing, user-extension directory (.agentic-local/extensions/). Fixed report characterization errors. All 317 validation tests pass.
+
+**Next steps**:
+- PR review, merge, update FEATURES.md to shipped
+
+**Blockers**: None
+
+
+### Session: 2026-03-02 11:58 - F-0148–F-0153 Implementation
+
+**Why**: Completing SDD toolkit insights batch 1+2
+
+**Accomplished**:
+- Implemented 6 SDD toolkit features: spec format evolution, structured clarification, checkpoint validation, user-extensions, semantic spec analysis, AC-level coverage tracking
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+
