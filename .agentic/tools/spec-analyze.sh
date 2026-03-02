@@ -13,6 +13,8 @@
 # Results are severity-rated and advisory (exit 0 always).
 # @feature F-0152
 
+# Note: -e intentionally omitted — script always exits 0 (advisory mode).
+# Individual command failures are handled per-check via || true guards.
 set -uo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -43,13 +45,15 @@ METRIC_INDICATORS='[0-9]+\s*(ms|s|sec|min|%|percent|MB|GB|KB|bytes|req/s|rps|tps
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+SEP=$'\x1f'  # ASCII Unit Separator — safe delimiter for finding fields
+
 add_finding() {
     local severity="$1"
     local id="$2"
     local message="$3"
     local suggestion="${4:-}"
 
-    FINDINGS+=("${severity}|${id}|${message}|${suggestion}")
+    FINDINGS+=("${severity}${SEP}${id}${SEP}${message}${SEP}${suggestion}")
 
     case "$severity" in
         CRITICAL) CRITICAL=$((CRITICAL + 1)) ;;
@@ -61,7 +65,7 @@ add_finding() {
 
 print_findings() {
     for finding in "${FINDINGS[@]}"; do
-        IFS='|' read -r severity id message suggestion <<< "$finding"
+        IFS="$SEP" read -r severity id message suggestion <<< "$finding"
         case "$severity" in
             CRITICAL) color="$RED" ;;
             HIGH)     color="$RED" ;;
@@ -110,22 +114,22 @@ check_ambiguity() {
 
     while IFS= read -r line; do
         # Track whether we're in the Acceptance Criteria section
-        if echo "$line" | grep -qE '^## Acceptance Criteria'; then
+        if [[ "$line" =~ ^'## Acceptance Criteria' ]]; then
             in_ac_section=1
             continue
         fi
-        if [[ $in_ac_section -eq 1 ]] && echo "$line" | grep -qE '^## [^#]'; then
+        if [[ $in_ac_section -eq 1 ]] && [[ "$line" =~ ^'## '[^#] ]]; then
             in_ac_section=0
             continue
         fi
 
         # Only scan AC lines (lines with AC-XXX identifiers)
-        if [[ $in_ac_section -eq 1 ]] && echo "$line" | grep -qiE '\*\*AC-[0-9]+\*\*'; then
+        if [[ $in_ac_section -eq 1 ]] && [[ "$line" =~ \*\*AC-[0-9]+\*\* ]]; then
             # Extract the AC ID
             local ac_id
-            ac_id=$(echo "$line" | grep -oE 'AC-[0-9]+' | head -1)
+            [[ "$line" =~ (AC-[0-9]+) ]] && ac_id="${BASH_REMATCH[1]}"
 
-            # Check each vague word
+            # Check each vague word (case-insensitive via grep fallback for portability)
             while IFS='|' read -r word; do
                 if echo "$line" | grep -qiw "$word"; then
                     # Check if there's a metric nearby on the same line

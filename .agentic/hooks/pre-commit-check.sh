@@ -949,10 +949,13 @@ if [[ -d "$EXT_GATES_DIR" ]]; then
     while IFS= read -r gate; do
       [[ -f "$gate" ]] || continue
       gate_name=$(basename "$gate")
-      if bash "$gate" 2>&1; then
+      gate_output=$(bash "$gate" 2>&1)
+      gate_exit=$?
+      if [[ $gate_exit -eq 0 ]]; then
         echo "  ✓ $gate_name passed"
       else
         echo "  ❌ BLOCKED: Custom gate failed: $gate_name"
+        echo "$gate_output" | sed 's/^/    /'
         FAILURES=$((FAILURES + 1))
       fi
     done <<< "$GATE_FILES"

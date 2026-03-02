@@ -2438,7 +2438,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Complexity**: medium
 **Added**: 2026-03-02
 
-**Description**: LLM-powered cross-artifact consistency analysis tool (`spec-analyze.sh`) that runs 3 core checks before implementation: ambiguity detection (vague adjectives without metrics), AC↔test coverage gaps, and NFR measurability audit. Results are severity-rated (CRITICAL/HIGH/MEDIUM/LOW) and advisory (warn, don't block). Skippable for offline development. P2 adds cross-feature terminology consistency, AC contradiction detection, and constitution alignment checks.
+**Description**: Deterministic cross-artifact consistency analysis tool (`spec-analyze.sh`) that runs 3 core checks before implementation: ambiguity detection (vague adjectives without metrics), AC↔test coverage gaps, and NFR measurability audit. Results are severity-rated (CRITICAL/HIGH/MEDIUM/LOW) and advisory (warn, don't block). No LLM calls — pure regex/pattern matching. Skippable for offline development. P2 adds LLM-powered cross-feature terminology consistency, AC contradiction detection, and constitution alignment checks.
 
 **Dependencies**: F-0148 (Spec Format Evolution)
 

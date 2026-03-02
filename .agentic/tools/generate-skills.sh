@@ -383,8 +383,11 @@ fi
 # ── Inject rules from .agentic-local/extensions/rules/ ──
 EXT_RULES_DIR="$PROJECT_ROOT/.agentic-local/extensions/rules"
 if [[ -d "$EXT_RULES_DIR" ]] && ! $VALIDATE_ONLY; then
+    declare -A _seen_rules=()
     for rule_file in "$EXT_RULES_DIR"/*-agent.md "$EXT_RULES_DIR"/*.md; do
         [[ -f "$rule_file" ]] || continue
+        [[ -n "${_seen_rules[$rule_file]:-}" ]] && continue
+        _seen_rules["$rule_file"]=1
 
         # Determine target skill from filename or content
         rule_basename=$(basename "$rule_file" .md)

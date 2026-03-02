@@ -2855,7 +2855,7 @@ else
 fi
 
 # AC-006: implementing-features skill references spec-analyze
-IMPLEMENTING_SKILL="${FRAMEWORK_ROOT}/.agentic/agents/claude/skills/implementing-features/SKILL.md"
+# (IMPLEMENTING_SKILL already defined in F-0150 section)
 if grep -q 'spec-analyze' "$IMPLEMENTING_SKILL" 2>/dev/null; then
   pass "F-0152: AC-006: implementing-features skill references spec-analyze"
 else
@@ -2884,11 +2884,12 @@ else
   fail "F-0152: AC-012: missing acceptance file doesn't produce clear error"
 fi
 
-# AC-013: handles both old and new test section formats
-if grep -qE '## Tests|## Verification' "$SPEC_ANALYZE" 2>/dev/null || grep -q 'accept_file' "$SPEC_ANALYZE" 2>/dev/null; then
-  pass "F-0152: AC-013: spec-analyze.sh handles acceptance file parsing"
+# AC-013: parses Acceptance Criteria section from acceptance file
+# Verify the script identifies the AC section boundary and extracts AC IDs
+if grep -q '## Acceptance Criteria' "$SPEC_ANALYZE" 2>/dev/null && grep -qE 'AC-\[0-9\]|BASH_REMATCH|ac_id' "$SPEC_ANALYZE" 2>/dev/null; then
+  pass "F-0152: AC-013: spec-analyze.sh parses Acceptance Criteria section"
 else
-  fail "F-0152: AC-013: spec-analyze.sh missing format handling"
+  fail "F-0152: AC-013: spec-analyze.sh missing AC section parsing"
 fi
 
 # Acceptance criteria file

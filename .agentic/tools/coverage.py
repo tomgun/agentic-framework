@@ -27,7 +27,7 @@ TEST_FEATURE_RE = re.compile(r"test[_-]?F[-_]?(\d{4})", re.IGNORECASE)
 # AC ID pattern in acceptance files: **AC-001**: description
 AC_ID_RE = re.compile(r"\*\*AC-(\d{3,4})\*\*:?\s*(.*)")
 # AC ID references in test files: AC-001, AC_001, ac001 (various conventions)
-AC_TEST_RE = re.compile(r"AC[-_]?(\d{3,4})", re.IGNORECASE)
+# (Used by ac_level_coverage for inline pattern building; kept as module-level documentation)
 CODE_EXTENSIONS = {
     ".ts", ".tsx", ".js", ".jsx",
     ".py", ".pyi",
@@ -355,6 +355,15 @@ def ac_level_coverage(root: Path, feature_id: str) -> dict:
 
     # 2. Find test files that reference this feature
     # Normalize feature ID for search: F-0148 -> patterns F-0148, F_0148, F0148
+    if "-" not in feature_id:
+        return {
+            "feature": feature_id,
+            "error": f"Invalid feature ID format: {feature_id} (expected F-XXXX)",
+            "total_acs": 0,
+            "covered": 0,
+            "coverage_pct": 0,
+            "acs": [],
+        }
     fid_num = feature_id.split("-")[1]
     feature_patterns = [
         feature_id,           # F-0148
@@ -389,6 +398,14 @@ def ac_level_coverage(root: Path, feature_id: str) -> dict:
                 continue
 
     # 3. For each AC, search test files for references
+    # Cache file contents to avoid re-reading per AC
+    file_cache: dict[Path, list[str]] = {}
+    for tf in feature_test_files:
+        try:
+            file_cache[tf] = tf.read_text(encoding="utf-8", errors="ignore").splitlines()
+        except Exception:
+            file_cache[tf] = []
+
     ac_results: list[dict] = []
     covered_count = 0
 
@@ -407,9 +424,8 @@ def ac_level_coverage(root: Path, feature_id: str) -> dict:
         matched_tests: list[str] = []
 
         for test_file in feature_test_files:
-            try:
-                lines = test_file.read_text(encoding="utf-8", errors="ignore").splitlines()
-            except Exception:
+            lines = file_cache.get(test_file, [])
+            if not lines:
                 continue
 
             rel_path = str(test_file.relative_to(root))
