@@ -2979,6 +2979,45 @@ else
 fi
 
 # ============================================================
+# T-0035/T-0036/T-0037: Enforcement Gap Fixes
+# ============================================================
+
+# T-0036: SKIP_COMPLEXITY per-file warnings
+if grep -q "SKIP_COMPLEXITY set.*showing bypassed" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh"; then
+  pass "T-0036: SKIP_COMPLEXITY shows per-file warnings"
+else
+  fail "T-0036: SKIP_COMPLEXITY still shows 1-line skip message"
+fi
+
+if grep -q "OVERLIMIT_COUNT" "${FRAMEWORK_ROOT}/.agentic/hooks/pre-commit-check.sh"; then
+  pass "T-0036: per-file over-limit scanning implemented"
+else
+  fail "T-0036: per-file scanning not found"
+fi
+
+# T-0035: Unregistered code detection phase exists
+if grep -q "phase_unregistered_code" "${FRAMEWORK_ROOT}/.agentic/tools/sync.sh"; then
+  pass "T-0035: phase_unregistered_code exists in sync.sh"
+else
+  fail "T-0035: phase_unregistered_code missing from sync.sh"
+fi
+
+# T-0035: Wired into both quiet and non-quiet main paths
+QUIET_WIRE=$(grep -A 20 "MODE.*=.*quiet" "${FRAMEWORK_ROOT}/.agentic/tools/sync.sh" | grep -c "phase_unregistered_code" || true)
+if [[ "$QUIET_WIRE" -ge 1 ]]; then
+  pass "T-0035: phase_unregistered_code wired into quiet mode"
+else
+  fail "T-0035: phase_unregistered_code not in quiet mode path"
+fi
+
+# T-0037: Session start mentions unregistered code
+if grep -q "unregistered shipped code" "${FRAMEWORK_ROOT}/.agentic/checklists/session_start.md"; then
+  pass "T-0037: session_start.md mentions unregistered code detection"
+else
+  fail "T-0037: session_start.md missing unregistered code mention"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

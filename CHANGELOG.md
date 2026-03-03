@@ -5,6 +5,14 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.0] - 2026-03-03
+
+### Added
+- **SKIP_COMPLEXITY Per-File Warnings (F-0154)** — When `SKIP_COMPLEXITY` is set, pre-commit now shows per-file details (filename, line count, limit) instead of silent skip. Agents see exactly which files are over-limit and by how much.
+- **Unregistered Shipped Code Detection (F-0155)** — New sync.sh phase 3b detects commits without `F-####` references that touch 3+ source files with 1+ new file. Flags possible unregistered features. Active when `feature_tracking=yes`. Runs in both quiet (ag start) and full sync modes.
+- **Session Start Spec Drift Surfacing (F-0156)** — Unregistered code detection feeds into `ag start` sync probe via quiet mode. Falls out of F-0155 architecture.
+- 8 new unit tests (`test_unregistered_features.sh`), 5 validation checks (372 total).
+
 ## [0.39.0] - 2026-03-02
 
 ### Added

@@ -519,7 +519,35 @@ echo "════════════════════════�
 echo "[7/16] Checking complexity limits..."
 
 if [[ -n "${SKIP_COMPLEXITY:-}" ]]; then
-  echo "  ⚠ Skipped (SKIP_COMPLEXITY set)"
+  echo "  ⚠ SKIP_COMPLEXITY set — showing bypassed files:"
+
+  # Show which files are actually over-limit (so agent can make informed decision)
+  MAX_CODE_FILE_LEN_BT=$(get_setting "max_code_file_length" "500")
+  CODE_EXTENSIONS_BT="py|js|ts|tsx|jsx|go|rs|rb|java|c|cpp|h|sh|swift|kt|scala|cs|php|vue|svelte"
+  if [[ -f "STACK.md" ]]; then
+    STACK_CODE_EXT_BT=$(grep -iE "code_extensions:" "STACK.md" 2>/dev/null | sed 's/.*: *//' | tr ',' '|' || true)
+    [[ -n "$STACK_CODE_EXT_BT" ]] && CODE_EXTENSIONS_BT="$STACK_CODE_EXT_BT"
+  fi
+
+  OVERLIMIT_COUNT=0
+  while IFS= read -r file; do
+    [[ "$file" == .agentic/* ]] && continue
+    if [[ -f "$file" ]] && [[ "$file" =~ \.($CODE_EXTENSIONS_BT)$ ]]; then
+      LINES=$(wc -l < "$file" 2>/dev/null | tr -d ' ')
+      if [[ $LINES -gt $MAX_CODE_FILE_LEN_BT ]]; then
+        OVERLIMIT_COUNT=$((OVERLIMIT_COUNT + 1))
+        echo "  ⚠️  $file: $LINES lines (limit: $MAX_CODE_FILE_LEN_BT)"
+      fi
+    fi
+  done < <(git diff --cached --name-only --diff-filter=d 2>/dev/null)
+
+  if [[ $OVERLIMIT_COUNT -gt 0 ]]; then
+    echo ""
+    echo "  Consider: ag todo \"Refactor over-limit files\" or split before next commit"
+    echo "  SKIP_COMPLEXITY should be temporary, not permanent."
+  else
+    echo "  (No staged files currently over the limit)"
+  fi
 else
   COMPLEXITY_FAILURES=0
 

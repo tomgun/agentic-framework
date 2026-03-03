@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- PR: SDD toolkit insights F-0148 through F-0153 (v0.39.0) (Updated: 2026-03-02 11:58 EET)
+- Enforcement gap fixes v0.40.0 — ready for commit (Updated: 2026-03-03 22:07 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)
