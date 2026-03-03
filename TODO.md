@@ -91,6 +91,15 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ## Done
 
 
+### T-0037: Session start: add 'untracked shipped features?' check — surface spec drift proactively every session, not just when ag sync is manually run (dogfooding: Cursor never ran ag sync, spec drift accumulated silently)
+- **Resolved**: 2026-03-03 — Implemented as F-0156 — falls out of F-0155 quiet mode
+
+### T-0036: SKIP_COMPLEXITY expiry/escalation — track bypass count per file in .agentic-state/, escalate after 3+ bypasses on same file: 'Either fix the file or create a refactor feature entry' (dogfooding: Cursor bypassed MainScene.ts complexity gate on every commit instead of fixing it)
+- **Resolved**: 2026-03-03 — Implemented as F-0154 — per-file warnings in pre-commit-check.sh
+
+### T-0035: Unregistered shipped code detector — ag sync should heuristically compare recently modified source files against FEATURES.md and flag new capabilities with no F-#### entry (dogfooding: Cursor shipped F-0011–F-0014 without feature entries, hooks had nothing to check)
+- **Resolved**: 2026-03-03 — Implemented as F-0155 — phase_unregistered_code in sync.sh
+
 ### T-0026: Auto-resolve HUMAN_NEEDED PR entries: ag sync should check if PR entries are still open (gh pr view if available, else prompt human) and auto-clear merged ones. Keeps HUMAN_NEEDED clean without losing the write-on-create signaling pattern.
 - **Resolved**: 2026-03-01 — resolved
 

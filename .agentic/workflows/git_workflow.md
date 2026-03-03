@@ -384,7 +384,7 @@ For legitimate bypasses (WIP branches, urgent hotfixes):
 | Variable | Effect | When to Use |
 |----------|--------|-------------|
 | `SKIP_TESTS=1` | Skip test execution | WIP commits, broken test suite |
-| `SKIP_COMPLEXITY=1` | Skip file/line limits | Large refactors |
+| `SKIP_COMPLEXITY=1` | Skip file/line limits (still shows per-file warnings) | Large refactors |
 
 **Rules:**
 - NEVER use on main/master (blocked by hook)

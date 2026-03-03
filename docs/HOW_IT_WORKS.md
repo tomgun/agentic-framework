@@ -108,7 +108,7 @@ graph TB
         M_FEATURE_SH[feature.sh<br/>status transitions]
         M_DOCTOR_PY[doctor.py<br/>multi-phase verification]
         M_CONTEXT_ROLE[context-for-role.sh<br/>+ ALWAYS_INJECT]
-        M_SYNC[sync.sh<br/>5-phase drift detection]
+        M_SYNC[sync.sh<br/>9-phase drift detection]
         M_DISCOVER[discover.py<br/>brownfield analysis]
 
         %% Structural
@@ -121,7 +121,7 @@ graph TB
         %% Testing
         M_HARNESS[harness.sh<br/>LLM test runner]
         M_MUTATION_SH[mutation_test.sh<br/>infrastructure proofs]
-        M_VALIDATE[validate_framework.sh<br/>367 acceptance tests]
+        M_VALIDATE[validate_framework.sh<br/>372 acceptance tests]
         M_SPEC_ANALYZE[spec-analyze.sh<br/>semantic consistency]
         M_AC_COV[coverage.py --ac-coverage<br/>per-AC test mapping]
 
@@ -518,7 +518,7 @@ These features exist but don't clearly derive from the 13 principles:
 | Command | What It Does | Enforcement |
 |---------|-------------|-------------|
 | `ag start` | Read state, check WIP, memory integrity, display dashboard | Advisory (soft start) |
-| `ag sync` | 5-phase drift detection + auto-fix | Advisory (user-initiated) |
+| `ag sync` | 9-phase drift detection + auto-fix | Advisory (user-initiated) |
 | `ag work "desc"` | Create WIP, start task. Formal: BLOCKS without feature ID. | Structural (Formal) |
 | `ag plan F-XXXX` | Create plan with optional review loop | Structural (must have acceptance) |
 | `ag implement F-XXXX` | Check acceptance, check approved plan, create WIP, print guidance | Structural (multiple gates) |

@@ -171,7 +171,7 @@ Sync: 2 issue(s) (journal stale, STATUS.md stale)
   Run ag sync to auto-fix and see details
 ```
 
-Suggest running `ag sync` to the user. It checks memory, journal/STATUS freshness, feature status drift, spec/doc drift, and tool file parity. Safe fixes (like STATUS.md inference) are applied automatically; everything else is report-only with suggested commands.
+Suggest running `ag sync` to the user. It checks memory, journal/STATUS freshness, feature status consistency, **unregistered shipped code** (commits without F-#### refs), tool parity, git hooks, periodic lifecycle checks, and PR cleanup. Safe fixes (like STATUS.md inference) are applied automatically; everything else is report-only with suggested commands.
 
 ```bash
 ag sync          # Full sync: detect + auto-fix safe things

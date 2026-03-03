@@ -1138,3 +1138,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-03 22:07 - Enforcement Gap Fixes (F-0154/F-0155/F-0156)
+
+**Why**: Dogfooding feedback from Cursor revealed three enforcement gaps
+
+**Accomplished**:
+- Implemented T-0036 (SKIP_COMPLEXITY per-file warnings), T-0035 (unregistered shipped code detector in sync.sh), T-0037 (session start spec drift surfacing). 8 new tests, 5 validation checks, 3 acceptance files. 372/0 validation, 8/8 unit tests.
+
+**Next steps**:
+- Show changes to human, create feature branch and PR
+
+**Blockers**: None
+

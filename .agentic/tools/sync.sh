@@ -6,10 +6,11 @@
 #   bash .agentic/tools/sync.sh --check      # Dry run: detect only, no auto-fixes
 #   bash .agentic/tools/sync.sh --quiet      # One-line summary (for ag start probe)
 #
-# Eight check phases:
+# Nine check phases:
 #   1. Memory seed integrity
 #   2. State freshness (journal, STATUS, CHANGELOG)
 #   3. Feature reconciliation (Formal only)
+#   3b. Unregistered shipped code detection (feature_tracking only)
 #   4. Spec/doc drift (skipped in --quiet)
 #   5. Tool parity (instruction files + trigger tables)
 #   6. Git hook configuration
@@ -484,6 +485,83 @@ phase_features() {
 }
 
 # ============================================================================
+# Phase 3b: Unregistered shipped code detection
+# ============================================================================
+phase_unregistered_code() {
+    local ft
+    ft="$(get_setting "feature_tracking" "no")"
+    if [ "$ft" != "yes" ]; then
+        return 0
+    fi
+
+    # Use last sync date as window (from sync-state.conf)
+    local state_file="$ROOT_DIR/.agentic-state/sync-state.conf"
+    local since_date=""
+    if [ -f "$state_file" ]; then
+        since_date=$(grep "^last_sync=" "$state_file" 2>/dev/null | sed 's/^last_sync=//' || echo "")
+    fi
+    # Fallback: 14 days ago
+    if [ -z "$since_date" ]; then
+        since_date=$(date -v-14d "+%Y-%m-%d" 2>/dev/null || date -d "14 days ago" "+%Y-%m-%d" 2>/dev/null || echo "")
+    fi
+    [ -z "$since_date" ] && return 0
+
+    local CODE_EXT_PATTERN='\.(py|js|ts|tsx|jsx|go|rs|rb|java|c|cpp|h|sh|swift|kt)$'
+    local SKIP_DIRS='^(tests?/|spec/|docs/|\.agentic/|\.github/|node_modules/)'
+    local suspects=()
+
+    while IFS= read -r commit_line; do
+        [ -z "$commit_line" ] && continue
+        local hash msg
+        hash=$(echo "$commit_line" | cut -d' ' -f1)
+        msg=$(echo "$commit_line" | cut -d' ' -f2-)
+
+        # Skip if references F-####
+        echo "$msg" | grep -qE 'F-[0-9]{4}' && continue
+
+        # Skip merge commits
+        local parent_count
+        parent_count=$(git cat-file -p "$hash" 2>/dev/null | grep -c "^parent " || echo "0")
+        [ "$parent_count" -gt 1 ] && continue
+
+        # Count source files (excluding test/doc/config dirs)
+        local src_files new_files src_count new_count
+        src_files=$(git diff-tree --no-commit-id -r --name-only "$hash" 2>/dev/null | grep -E "$CODE_EXT_PATTERN" | grep -vE "$SKIP_DIRS" || true)
+        [ -z "$src_files" ] && continue
+        src_count=$(echo "$src_files" | wc -l | tr -d ' ')
+
+        new_files=$(git diff-tree --no-commit-id -r --diff-filter=A --name-only "$hash" 2>/dev/null | grep -E "$CODE_EXT_PATTERN" | grep -vE "$SKIP_DIRS" || true)
+        new_count=0
+        [ -n "$new_files" ] && new_count=$(echo "$new_files" | wc -l | tr -d ' ')
+
+        # Threshold: 3+ source files AND 1+ new
+        if [ "$src_count" -ge 3 ] && [ "$new_count" -ge 1 ]; then
+            suspects+=("${hash:0:7} (${src_count} files, ${new_count} new): $msg")
+        fi
+    done < <(git log --oneline --since="$since_date" --no-merges 2>/dev/null | head -30)
+
+    if [ ${#suspects[@]} -gt 0 ]; then
+        local show_count=${#suspects[@]}
+        [ "$show_count" -gt 3 ] && show_count=3
+        record_issue "${#suspects[@]} possible unregistered feature(s)"
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "Unregistered: ${YELLOW}${#suspects[@]} commit(s) may be unregistered features${NC}"
+            for i in $(seq 0 $((show_count - 1))); do
+                echo -e "            ${suspects[$i]}"
+            done
+            [ "${#suspects[@]}" -gt 3 ] && echo -e "            ... and $((${#suspects[@]} - 3)) more"
+            echo -e "            ${DIM}Register with: bash .agentic/tools/feature.sh F-#### ...${NC}"
+            echo -e "            ${DIM}If maintenance, ignore this advisory.${NC}"
+        fi
+    else
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "Unregistered: ${GREEN}OK (all recent work references features)${NC}"
+        fi
+    fi
+}
+
+# ============================================================================
 # Phase 4: Spec/doc drift (skipped in --quiet mode)
 # ============================================================================
 phase_spec_drift() {
@@ -723,6 +801,7 @@ main() {
         phase_memory
         phase_state_freshness
         phase_features
+        phase_unregistered_code
         # Skip phase 4 (slow)
         phase_tool_parity
         phase_hooks
@@ -752,6 +831,7 @@ main() {
     phase_memory
     phase_state_freshness
     phase_features
+    phase_unregistered_code
     phase_spec_drift
     phase_tool_parity
     phase_hooks

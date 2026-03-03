@@ -2479,10 +2479,14 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Key insight**: "The hook is reactive (checks existing features) not proactive (detects new shippable work)" — identifies the next enforcement frontier for the framework.
 
+### Enforcement Gap Fixes (v0.40.0)
+
+**User direction** (continuing from v0.39.1 dogfooding): Implemented the three enforcement gaps identified above. T-0036 → F-0154 (SKIP_COMPLEXITY per-file warnings), T-0035 → F-0155 (unregistered shipped code detection in sync.sh phase 3b), T-0037 → F-0156 (sync probe surfaces unregistered work at session start). Plan reviewed by fresh agent and simplified — dropped per-file bypass tracking, conventional-commit prefix filter, and tips array changes as over-engineering.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.39.1
+**Current Version**: v0.40.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions
