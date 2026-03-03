@@ -16,7 +16,22 @@ phase: commit
 
 ---
 
-## Branch Check (BEFORE ANYTHING ELSE!)
+## Git Hooks Check (BEFORE ANYTHING ELSE!)
+
+- [ ] **Are git hooks installed?**
+  ```bash
+  actual=$(git config core.hooksPath 2>/dev/null || echo "")
+  if [ "$actual" != ".agentic/hooks" ]; then
+    echo "WARNING: hooks not installed — run: git config core.hooksPath .agentic/hooks"
+  fi
+  ```
+  - If not installed: **fix immediately** before proceeding
+  - Without hooks, pre-commit quality gates are silently skipped
+  - This is the #1 cause of unvalidated commits slipping through
+
+---
+
+## Branch Check
 
 - [ ] **Am I on a feature branch?**
   ```bash

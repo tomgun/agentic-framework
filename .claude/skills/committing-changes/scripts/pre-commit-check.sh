@@ -6,6 +6,16 @@ set -euo pipefail
 ERRORS=0
 WARNINGS=0
 
+# Check 0: Verify git hooks are installed (core.hooksPath)
+HOOKS_PATH=$(git config core.hooksPath 2>/dev/null || echo "")
+if [[ "$HOOKS_PATH" != ".agentic/hooks" ]]; then
+    echo "✗ Git hooks not installed (core.hooksPath='$HOOKS_PATH', expected '.agentic/hooks')"
+    echo "  Fix: git config core.hooksPath .agentic/hooks"
+    ERRORS=$((ERRORS + 1))
+else
+    echo "✓ Git hooks installed (core.hooksPath=.agentic/hooks)"
+fi
+
 # Check 1: WIP must not be active
 if [[ -f ".agentic-state/WIP.md" ]]; then
     echo "✗ WIP still active — complete work first: bash .agentic/tools/wip.sh complete"

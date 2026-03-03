@@ -85,6 +85,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 - **Added**: 2026-03-02
 - **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §9, §3.5
 
+### T-0034: Cursor agent leaves work uncommitted and jumps to new tasks — add commit nudge after completing work (compressed context makes it hard to recall what was accomplished later)
+- **Added**: 2026-03-03
+
 ## Done
 
 
