@@ -2483,7 +2483,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0154: SKIP_COMPLEXITY Per-File Warnings
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Quality
 **Priority**: medium
 **Complexity**: low
@@ -2504,7 +2504,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0155: Unregistered Shipped Code Detection
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Verification & Enforcement
 **Priority**: medium
 **Complexity**: medium
@@ -2525,7 +2525,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0156: Session Start Spec Drift Surfacing
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Session
 **Priority**: low
 **Complexity**: low
