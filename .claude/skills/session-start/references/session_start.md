@@ -259,6 +259,16 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 
 ## Settings-Aware Checks
 
+- [ ] **Git Hooks Check** — verify pre-commit hooks are installed
+  ```bash
+  actual=$(git config core.hooksPath 2>/dev/null || echo "")
+  if [ "$actual" != ".agentic/hooks" ]; then
+    echo "WARNING: git hooks not installed (run: git config core.hooksPath .agentic/hooks)"
+  fi
+  ```
+  - If missing, offer to install: `git config core.hooksPath .agentic/hooks`
+  - Without hooks, pre-commit quality gates are silently skipped
+
 - [ ] **Check settings** in `STACK.md` `## Settings` section
   - `feature_tracking=yes` → Full spec tracking (feature IDs, acceptance criteria)
   - `feature_tracking=no` → Lightweight workflow

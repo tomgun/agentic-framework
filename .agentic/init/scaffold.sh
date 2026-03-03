@@ -9,6 +9,14 @@ if [[ ! -d "${ROOT_DIR}/.agentic/init" ]]; then
   exit 1
 fi
 
+# Ensure git is initialized — framework requires git for hooks, branching, WIP tracking
+if command -v git >/dev/null 2>&1; then
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    git init
+    echo "NEW : git repository initialized"
+  fi
+fi
+
 usage() {
   cat <<'EOF'
 Usage:

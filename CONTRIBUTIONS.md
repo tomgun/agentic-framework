@@ -2465,10 +2465,24 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 - Investigate task IDs/prioritization for parallelization — "if it would help in small batch development and parallelisation" — despite being initially rejected, worth evaluating for multi-agent dispatch value
 - Required all TODOs reference the analysis plan for background context
 
+### Dogfooding: Git Hooks Verification Gap (v0.39.1)
+
+**User discovery** (from Cursor dogfooding on `virtual-tree` project): Init playbook said hooks were "already installed via `core.hooksPath`" but never verified. Cursor agent committed multiple times without pre-commit hooks ever running — all quality gates silently bypassed.
+
+**User direction**: Three defense-in-depth layers needed — init verification, session-start check, pre-commit agent-side check. Also identified broader pattern: framework gates are **reactive** (check known features) but not **proactive** (detect unregistered work).
+
+**Additional dogfooding insights captured**:
+- T-0034: Cursor leaves work uncommitted and jumps to new tasks — needs commit nudge
+- T-0035: No "unregistered shipped code" detector — code ships without F-#### entries, hooks have nothing to check
+- T-0036: SKIP_COMPLEXITY has no expiry — agent bypassed same gate 5+ times without escalation
+- T-0037: `ag sync` spec drift check is opt-in — should be proactive at session start
+
+**Key insight**: "The hook is reactive (checks existing features) not proactive (detects new shippable work)" — identifies the next enforcement frontier for the framework.
+
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.39.0
+**Current Version**: v0.39.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions

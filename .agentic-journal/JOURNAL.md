@@ -1125,3 +1125,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-03 18:59 - Git hooks verification fix
+
+**Why**: Dogfooding feedback from virtual-tree project revealed hooks were never verified after init
+
+**Accomplished**:
+- Implemented three defense-in-depth layers for git hooks: init verification in scaffold.sh, session-start check, pre-commit agent-side check. 8 files modified. PR #60 created. Also captured 4 dogfooding TODOs from Cursor feedback (T-0034–T-0037).
+
+**Next steps**:
+- Merge PR #60. Consider prioritizing T-0035 (unregistered shipped code detector) and T-0036 (SKIP_COMPLEXITY escalation) as next dogfooding fixes.
+
+**Blockers**: None
+

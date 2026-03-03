@@ -26,6 +26,8 @@ bash .agentic/init/scaffold.sh
 This creates all expected files/folders with templates/placeholders so you can start development immediately.
 If the project has existing code, scaffold will automatically run discovery and generate proposals.
 
+**Git init**: Scaffold automatically runs `git init` if the project is not yet a git repository. The framework requires git for hooks, branching, and WIP tracking.
+
 ## Step 0.5: Review Discovery Results (brownfield projects only)
 
 **If `.agentic-state/discovery_report.json` exists**, this is an existing project with auto-discovered data:
@@ -668,7 +670,16 @@ Type a/b/c/d:"
    - Generic: `.agentic/quality_profiles/generic.sh`
 
 3. **Copy to project root** as `quality_checks.sh` and customize thresholds
-4. **Pre-commit hook** (already installed via `core.hooksPath`):
+4. **Pre-commit hook** — verify installation, then configure mode:
+   ```bash
+   # Verify git hooks are installed (scaffold should have done this)
+   actual=$(git config core.hooksPath 2>/dev/null || echo "")
+   if [ "$actual" != ".agentic/hooks" ]; then
+     echo "WARNING: git hooks not installed — installing now"
+     git config core.hooksPath .agentic/hooks
+   fi
+   echo "core.hooksPath = $(git config core.hooksPath)"
+   ```
    - Default mode is `fast` (structural checks only, skips slow tests)
    - Ask user if they want `full` mode (runs tests on every commit) or `no` (disable)
    - Update `pre_commit_hook:` in STACK.md accordingly
