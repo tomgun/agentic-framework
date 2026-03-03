@@ -32,6 +32,21 @@ bash .agentic/tools/wip.sh complete
 
 **Never commit while WIP.md exists** — it indicates incomplete work.
 
+### Step 1.5: Verify Git Hooks Installed
+
+```bash
+actual=$(git config core.hooksPath 2>/dev/null || echo "")
+if [ "$actual" != ".agentic/hooks" ]; then
+  echo "WARNING: git hooks not installed — pre-commit quality gates will be skipped!"
+  echo "Fix: git config core.hooksPath .agentic/hooks"
+fi
+```
+
+If hooks are not installed, **offer to auto-fix** before proceeding:
+- Run `git config core.hooksPath .agentic/hooks`
+- Confirm with: `git config core.hooksPath` (should print `.agentic/hooks`)
+- **Do not skip this** — without hooks, commits bypass all pre-commit checks
+
 ### Step 2: Branch Check
 
 ```bash
