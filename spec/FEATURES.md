@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.36.0
+**Version**: 0.40.0
 
 ---
 
@@ -15,15 +15,15 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 | Category | Count | Shipped | In Progress | Planned |
 |----------|-------|---------|-------------|---------|
 | **Core** | 14 | 14 | 0 | 0 |
-| **Quality** | 14 | 11 | 2 | 1 |
-| **Session** | 11 | 10 | 0 | 0 |
+| **Quality** | 15 | 12 | 2 | 1 |
+| **Session** | 12 | 11 | 0 | 0 |
 | **Multi-Agent** | 10 | 8 | 1 | 1 |
 | **Tooling** | 11 | 11 | 0 | 0 |
 | **Recovery** | 7 | 7 | 0 | 0 |
 | **Developer Experience** | 15 | 13 | 2 | 0 |
 | **Design Principles** | 10 | 10 | 0 | 0 |
 | **Agent System** | 12 | 10 | 2 | 0 |
-| **Verification & Enforcement** | 16 | 15 | 0 | 1 |
+| **Verification & Enforcement** | 17 | 16 | 0 | 1 |
 
 ---
 
@@ -2467,14 +2467,78 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 | Category | Count | Shipped | In Progress | Planned |
 |----------|-------|---------|-------------|---------|
 | Core | 14 | 14 | 0 | 0 |
-| Quality | 14 | 11 | 2 | 1 |
-| Session | 11 | 10 | 0 | 0 |
+| Quality | 15 | 12 | 2 | 1 |
+| Session | 12 | 11 | 0 | 0 |
 | Multi-Agent | 10 | 8 | 1 | 1 |
 | Tooling | 11 | 11 | 0 | 0 |
 | Recovery | 7 | 7 | 0 | 0 |
 | Developer Experience | 15 | 13 | 2 | 0 |
 | Design Principles | 10 | 10 | 0 | 0 |
 | Agent System | 12 | 10 | 2 | 0 |
-| Verification & Enforcement | 16 | 15 | 0 | 1 |
-| **Total** | **120** | **109** | **7** | **3** |
+| Verification & Enforcement | 17 | 16 | 0 | 1 |
+| **Total** | **123** | **112** | **7** | **3** |
+
+
+---
+
+## F-0154: SKIP_COMPLEXITY Per-File Warnings
+
+**Status**: in_progress
+**Category**: Quality
+**Priority**: medium
+**Complexity**: low
+**Since**: v0.40.0
+
+**Description**: When SKIP_COMPLEXITY is set, pre-commit still scans staged files and shows per-file details (file name, line count, limit) instead of a silent 1-line skip. Gives agents visibility into which files are over-limit so they can make informed decisions.
+
+**Dependencies**: none
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/hooks/pre-commit-check.sh`
+- Tests: `tests/validate_framework.sh` (T-0036 checks)
+
+**Acceptance**: See `spec/acceptance/F-0154.md`
+
+---
+
+## F-0155: Unregistered Shipped Code Detection
+
+**Status**: in_progress
+**Category**: Verification & Enforcement
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.40.0
+
+**Description**: New sync.sh phase that detects commits without F-#### references that touch 3+ source files with at least 1 new file. Flags them as possible unregistered features so agents register work in FEATURES.md. Runs in both quiet and full sync modes. Only active when feature_tracking=yes.
+
+**Dependencies**: none
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/tools/sync.sh` (phase_unregistered_code)
+- Tests: `tests/test_unregistered_features.sh` (8 tests), `tests/validate_framework.sh` (T-0035 checks)
+
+**Acceptance**: See `spec/acceptance/F-0155.md`
+
+---
+
+## F-0156: Session Start Spec Drift Surfacing
+
+**Status**: in_progress
+**Category**: Session
+**Priority**: low
+**Complexity**: low
+**Since**: v0.40.0
+
+**Description**: Unregistered feature detection (F-0155) runs in quiet sync mode and feeds into ag start's sync probe output. Session start checklist updated to document the new check. No separate implementation needed — falls out of F-0155 architecture.
+
+**Dependencies**: F-0155 (Unregistered Shipped Code Detection)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/checklists/session_start.md`
+- Tests: `tests/validate_framework.sh` (T-0037 checks)
+
+**Acceptance**: See `spec/acceptance/F-0156.md`
 
