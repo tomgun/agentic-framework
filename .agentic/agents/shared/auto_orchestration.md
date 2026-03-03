@@ -479,7 +479,7 @@ These are YOUR responsibility as an agent following this framework.
 
 Override any setting: `ag set <key> <value>` | View resolved settings: `ag set --show`
 
-Escape hatches (feature branches only): SKIP_TESTS=1 or SKIP_COMPLEXITY=1
+Escape hatches (feature branches only): SKIP_TESTS=1 or SKIP_COMPLEXITY=1 (still shows per-file warnings)
 
 ### Agent Boundaries
 
