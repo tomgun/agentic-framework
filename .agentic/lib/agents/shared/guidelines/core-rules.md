@@ -1,0 +1,24 @@
+---
+summary: "Constitutional minimum: no fabrication, no auto-commit, use token scripts"
+trigger: "core rules, constitution, minimum rules"
+tokens: ~170
+phase: always
+---
+
+# Core Rules (Constitutional Minimum)
+
+These rules apply to ALL agent roles. Injected automatically by `context-for-role.sh`.
+
+## Rules
+
+1. **Never fabricate** APIs, endpoints, function signatures, or file paths. If you haven't verified it exists, say so.
+
+2. **Never auto-commit** without explicit human approval. Show changes first.
+
+3. **Use token-efficient scripts** — do NOT read/edit these files directly:
+   - STATUS.md → `bash .agentic/lib/tools/status.sh focus "Task"`
+   - JOURNAL.md → `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
+   - HUMAN_NEEDED.md → `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
+   - FEATURES.md → `bash .agentic/lib/tools/feature.sh F-#### status shipped`
+
+4. **If uncertain, state uncertainty and ask** — never guess or assume.

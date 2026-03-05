@@ -25,15 +25,15 @@ phase: planning
 
 ## New Feature Spec
 
-1. **Find next F-XXXX ID** — scan `spec/FEATURES.md` for highest ID, increment
-2. **Check NFRs** — read `spec/NFR.md`, identify applicable constraints
+1. **Find next F-XXXX ID** — scan `.agentic/.agentic/spec/FEATURES.md` for highest ID, increment
+2. **Check NFRs** — read `.agentic/.agentic/spec/NFR.md`, identify applicable constraints
 3. **Create FEATURES.md entry** — Status: planned, include Related NFRs
-4. **Create acceptance file** — `spec/acceptance/F-XXXX.md` from `.agentic/spec/acceptance.template.md`
+4. **Create acceptance file** — `.agentic/.agentic/spec/acceptance/F-XXXX.md` from `.agentic/lib/templates/acceptance.template.md`
    - Required sections: Tests, Acceptance Criteria, Out of Scope
    - Add NFR Compliance section if NFRs apply
 5. **Show draft to user** — human reviews before committing
-6. **Create migration** — `bash .agentic/tools/migration.sh create "Add F-XXXX [Name]"`
-7. **Validate** — `bash .agentic/tools/check-spec-health.sh F-XXXX`
+6. **Create migration** — `bash .agentic/lib/tools/migration.sh create "Add F-XXXX [Name]"`
+7. **Validate** — `bash .agentic/lib/tools/check-spec-health.sh F-XXXX`
 8. **Handoff** — "Run `ag plan F-XXXX` before implementing"
 
 ---
@@ -73,15 +73,15 @@ phase: planning
 2. Show current state to user
 3. Add new criteria with appropriate markers (additive only)
 4. Require justification (captured in migration)
-5. `bash .agentic/tools/migration.sh create "Evolve F-XXXX: [reason]"`
-6. `bash .agentic/tools/drift.sh --check` (if available)
+5. `bash .agentic/lib/tools/migration.sh create "Evolve F-XXXX: [reason]"`
+6. `bash .agentic/lib/tools/drift.sh --check` (if available)
 7. Show changes to user — human MUST approve
 
 ---
 
 ## Discovery During Implementation
 
-See also: `.agentic/workflows/spec_evolution.md`
+See also: `.agentic/lib/workflows/spec_evolution.md`
 
 When implementing and discovering new requirements:
 
@@ -95,7 +95,7 @@ When implementing and discovering new requirements:
 
 For any spec operation:
 
-1. Read `spec/NFR.md` — identify NFRs that constrain the feature
+1. Read `.agentic/.agentic/spec/NFR.md` — identify NFRs that constrain the feature
 2. Add `Related NFRs:` field to FEATURES.md entry
 3. Add `### NFR Compliance` section to acceptance criteria
 4. For shipped features, verify spec changes don't violate linked NFRs
@@ -108,17 +108,17 @@ Read-only health check:
 
 ```bash
 # Single feature
-bash .agentic/tools/check-spec-health.sh F-XXXX
+bash .agentic/lib/tools/check-spec-health.sh F-XXXX
 
 # All features
-bash .agentic/tools/check-spec-health.sh --all
+bash .agentic/lib/tools/check-spec-health.sh --all
 ```
 
 ---
 
 ## WIP Warning
 
-If `.agentic-state/WIP.md` exists for the feature being modified, show a warning:
+If `.agentic/session/WIP.md` exists for the feature being modified, show a warning:
 > WIP active for this feature. Spec changes during implementation should use `[Discovered]` markers.
 
 ---

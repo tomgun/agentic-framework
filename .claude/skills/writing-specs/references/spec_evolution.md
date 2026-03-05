@@ -20,7 +20,7 @@ phase: implementation
 | Profile | Where criteria live | When to formalize |
 |---------|-------------------|-------------------|
 | **Discovery** | WIP.md, JOURNAL.md, or inline | Upgrade to Formal when persistence needed |
-| **Formal** | `spec/acceptance/F-####.md` | Can start rough, evolve during implementation |
+| **Formal** | `.agentic/spec/acceptance/F-####.md` | Can start rough, evolve during implementation |
 
 Rough specs lower the barrier to thinking about success criteria — the alternative (no criteria at all) is worse than imperfect criteria.
 
@@ -36,7 +36,7 @@ Discovery projects keep criteria informally (WIP.md, JOURNAL.md, conversation). 
 
 **How to graduate**:
 1. Set `Profile: formal` in STACK.md
-2. Create `spec/FEATURES.md` and `spec/acceptance/` directory
+2. Create `.agentic/.agentic/spec/FEATURES.md` and `.agentic/.agentic/spec/acceptance/` directory
 3. Move existing criteria from JOURNAL.md/WIP.md into acceptance files
 4. Existing rough bullets become the starting spec — no need to rewrite
 
@@ -102,7 +102,7 @@ Use the feature.sh tool to update without reading the whole file:
 
 ```bash
 # Update acceptance criteria
-bash .agentic/tools/feature.sh F-0010 note "Discovered: Need rate limiting for failed attempts"
+bash .agentic/lib/tools/feature.sh F-0010 note "Discovered: Need rate limiting for failed attempts"
 ```
 
 ### Include in Commit
@@ -110,7 +110,7 @@ bash .agentic/tools/feature.sh F-0010 note "Discovered: Need rate limiting for f
 Include spec changes in the same commit as the code:
 
 ```bash
-git add spec/acceptance/F-0010.md src/auth/login.ts
+git add .agentic/.agentic/spec/acceptance/F-0010.md src/auth/login.ts
 git commit -m "feat(F-0010): implement login with rate limiting"
 ```
 

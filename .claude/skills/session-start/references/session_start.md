@@ -22,11 +22,11 @@ phase: session
 ```bash
 # Read these silently (don't dump to user)
 # IMPORTANT: Every command must have "|| true" to prevent exit code errors
-cat STATUS.md 2>/dev/null || true
-cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
-cat .agentic-state/AGENTS_ACTIVE.md 2>/dev/null || true
-ls .agentic-state/WIP.md 2>/dev/null || true
-bash .agentic/tools/todo.sh list 2>/dev/null || true
+cat .agentic/STATUS.md 2>/dev/null || true
+cat .agentic/HUMAN_NEEDED.md 2>/dev/null | head -20 || true
+cat .agentic/session/AGENTS_ACTIVE.md 2>/dev/null || true
+ls .agentic/session/WIP.md 2>/dev/null || true
+bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
 ```
 
 ## Step 2: Greet User with Recap
@@ -36,8 +36,8 @@ bash .agentic/tools/todo.sh list 2>/dev/null || true
 ```
 👋 Welcome back! Here's where we are:
 
-**Last session**: [Summary from JOURNAL.md or STATUS.md]
-**Current focus**: [From STATUS.md "Current focus"]
+**Last session**: [Summary from JOURNAL.md or .agentic/STATUS.md]
+**Current focus**: [From .agentic/STATUS.md "Current focus"]
 **Progress**: [What's done, what's in progress]
 
 **Next steps** (pick one or tell me something else):
@@ -54,11 +54,11 @@ What would you like to work on?
 
 ## Step 3: Handle Special Cases
 
-**If .agentic-state/WIP.md exists** (interrupted work):
+**If .agentic/session/WIP.md exists** (interrupted work):
 ```
 ⚠️ Previous work was interrupted!
-Feature: [from .agentic-state/WIP.md]
-Files changed: [from .agentic-state/WIP.md or git diff]
+Feature: [from .agentic/session/WIP.md]
+Files changed: [from .agentic/session/WIP.md or git diff]
 
 Options:
 1. Continue from checkpoint
@@ -66,7 +66,7 @@ Options:
 3. Roll back to last commit
 ```
 
-**If HUMAN_NEEDED.md has unresolved items**:
+**If .agentic/HUMAN_NEEDED.md has unresolved items**:
 ```
 📋 There are [N] items waiting for your input:
 - [H-0001]: [Brief description]
@@ -81,7 +81,7 @@ I'll quickly apply the updates, then we'll continue.
 [Handle upgrade, then return to normal greeting]
 ```
 
-**If .agentic-state/AGENTS_ACTIVE.md shows other agents working**:
+**If .agentic/session/AGENTS_ACTIVE.md shows other agents working**:
 ```
 👥 Another agent is currently active!
 
@@ -90,11 +90,11 @@ Agent 1 (Claude - Main Window):
 - Files: [their files]
 
 To avoid conflicts, I should work on different files/features.
-What would you like me to work on? (I'll register myself in .agentic-state/AGENTS_ACTIVE.md)
+What would you like me to work on? (I'll register myself in .agentic/session/AGENTS_ACTIVE.md)
 ```
 
 **CRITICAL - Multi-agent coordination:**
-1. **Read .agentic-state/AGENTS_ACTIVE.md** to see who else is working
+1. **Read .agentic/session/AGENTS_ACTIVE.md** to see who else is working
 2. **Register yourself** by adding your entry
 3. **Avoid their files** - pick different features/files
 4. **Update when done** - remove your entry or mark complete
@@ -111,12 +111,12 @@ What would you like me to work on? (I'll register myself in .agentic-state/AGENT
 
 - [ ] **Run WIP check**:
   ```bash
-  bash .agentic/tools/wip.sh check
+  bash .agentic/lib/tools/wip.sh check
   ```
 
 **If interrupted work detected (exit code 1):**
 - ⚠️ Previous session stopped mid-task (tokens out, crash, or abrupt close)
-- .agentic-state/WIP.md shows what was in progress
+- .agentic/session/WIP.md shows what was in progress
 - Git diff shows uncommitted changes
 - **STOP and review before continuing!**
 
@@ -148,7 +148,7 @@ What would you like me to work on? (I'll register myself in .agentic-state/AGENT
 After the WIP check, verify that Claude Code's auto-memory still contains framework behavioral patterns from `memory-seed.md`. This runs automatically via `ag start`.
 
 ```bash
-bash .agentic/tools/memory-check.sh
+bash .agentic/lib/tools/memory-check.sh
 ```
 
 **What it checks** (Claude Code only; skips other tools):
@@ -156,7 +156,7 @@ bash .agentic/tools/memory-check.sh
 - Version marker matches current `memory-seed.md`
 - Core sentinel patterns haven't been overwritten
 
-**If stale or missing**: Re-read `.agentic/init/memory-seed.md` and write the patterns to your persistent memory. Preserve any other project-specific content already in memory.
+**If stale or missing**: Re-read `.agentic/lib/init/memory-seed.md` and write the patterns to your persistent memory. Preserve any other project-specific content already in memory.
 
 **Why**: Memory-seed is a defense-in-depth layer. Scripts enforce workflow structurally; memory reinforces it behaviorally. If memory gets overwritten during development, this check catches it at session start.
 
@@ -184,7 +184,7 @@ ag sync --check  # Dry run: detect only
 
 - [ ] **Check for brownfield spec plan in progress**:
   ```bash
-  ls .agentic-journal/plans/*-specs-plan.md 2>/dev/null || echo "No specs plan"
+  ls .agentic/journal/plans/*-specs-plan.md 2>/dev/null || echo "No specs plan"
   ```
 
 **If a specs plan exists with uncompleted domains:**
@@ -234,7 +234,7 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 
 ## Essential Reads (Always)
 
-- [ ] **Read `OVERVIEW.md`** (if exists, ≈300-500 tokens)
+- [ ] **Read `.agentic/OVERVIEW.md`** (if exists, ≈300-500 tokens)
   - Product vision and goals
   - Why we're building this
   - Core capabilities and scope
@@ -246,13 +246,13 @@ This is a **suggestion**, not a block. The user may choose to work on something 
   - Architecture snapshot
   - Known risks/constraints
 
-- [ ] **Read `STATUS.md`** (≈300-800 tokens)
+- [ ] **Read `.agentic/STATUS.md`** (≈300-800 tokens)
   - Current focus
   - What's in progress
   - Next steps
   - Known blockers
 
-- [ ] **Read `JOURNAL.md`** - Last 2-3 session entries (≈500-1000 tokens)
+- [ ] **Read `.agentic/journal/JOURNAL.md`** - Last 2-3 session entries (≈500-1000 tokens)
   - Recent progress
   - What worked/didn't work
   - Avoid repeating failed approaches
@@ -276,13 +276,13 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 ## Conditional Checks
 
 - [ ] **If `feature_tracking=yes`**: Check for active feature
-  - Look at `STATUS.md` → "Current focus"
-  - Read relevant `spec/acceptance/F-####.md` if working on feature
-  - Check `spec/FEATURES.md` for that feature's status
-  - **If in-progress work exists** (WIP.md or active branch): verify it has an F-XXXX in FEATURES.md with acceptance criteria. If missing, create them before continuing.
+  - Look at `.agentic/STATUS.md` → "Current focus"
+  - Read relevant `.agentic/.agentic/spec/acceptance/F-####.md` if working on feature
+  - Check `.agentic/.agentic/spec/FEATURES.md` for that feature's status
+  - **If in-progress work exists** (WIP.md or active branch): verify it has an F-XXXX in .agentic/.agentic/spec/FEATURES.md with acceptance criteria. If missing, create them before continuing.
 
 - [ ] **If `pipeline_enabled: yes`**: Check for active pipeline
-  - Look for `.agentic/pipeline/F-####-pipeline.md`
+  - Look for `.agentic/session/pipeline/F-####-pipeline.md`
   - If exists, read to determine your role
   - Load role-specific context (see sequential_agent_specialization.md)
 
@@ -298,7 +298,7 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 
 - [ ] **Review available agents** (for delegation opportunities)
   ```bash
-  ls .agentic/agents/claude/subagents/ 2>/dev/null || echo "No subagents defined"
+  ls .agentic/lib/agents/claude/subagents/ 2>/dev/null || echo "No subagents defined"
   ```
   - Consider if subtasks can be delegated to specialized agents
   - Use `explore-agent` (haiku) for codebase searches
@@ -307,11 +307,11 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 
 ## Blockers Check
 
-- [ ] **Read `HUMAN_NEEDED.md`** (if exists and not empty)
+- [ ] **Read `.agentic/HUMAN_NEEDED.md`** (if exists and not empty)
   - Are there unresolved blockers?
   - Do you need to address them before starting new work?
   - **IMPORTANT**: Proactively surface blockers to user at session start
-  - Ask: "There are N items in HUMAN_NEEDED.md. Should we address these first?"
+  - Ask: "There are N items in .agentic/HUMAN_NEEDED.md. Should we address these first?"
 
 ## Development Mode Check
 
@@ -322,13 +322,13 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 
 ## Proactive Context Setting (Make Collaboration Fluent)
 
-- [ ] **Check for planned work** (from `STATUS.md`)
+- [ ] **Check for planned work** (from `.agentic/STATUS.md`)
   - Read "Next up" or "Next immediate step" section
   - Identify 2-3 highest priority items
   - **Present options to user**: "I see we have [A], [B], [C] planned. Which should we tackle first?"
 
 - [ ] **Surface blockers proactively**
-  - If `HUMAN_NEEDED.md` has items, mention them BEFORE asking what to work on
+  - If `.agentic/HUMAN_NEEDED.md` has items, mention them BEFORE asking what to work on
   - Example: "Before we start, there are 2 items in HUMAN_NEEDED.md that need your input: [H-0001: API auth method unclear], [H-0002: UI color scheme decision]. Should we resolve these first?"
 
 - [ ] **Check for stale work**
@@ -344,9 +344,9 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 After completing checklist, provide structured summary:
 
 **Context Summary:**
-- Current focus: [from STATUS.md]
+- Current focus: [from .agentic/STATUS.md]
 - Recent progress: [1-2 sentences from JOURNAL.md]
-- Active blockers: [list from HUMAN_NEEDED.md or "None"]
+- Active blockers: [list from .agentic/HUMAN_NEEDED.md or "None"]
 
 **Options for this session:**
 1. [Highest priority planned work]
@@ -360,8 +360,8 @@ After completing checklist, provide structured summary:
 ## Anti-Patterns
 
 ❌ **Don't** read entire codebase at session start  
-❌ **Don't** skip JOURNAL.md (you'll repeat mistakes)  
-❌ **Don't** assume you know the status (check STATUS.md)  
+❌ **Don't** skip JOURNAL.md (you'll repeat mistakes)
+❌ **Don't** assume you know the status (check .agentic/STATUS.md)  
 ❌ **Don't** start coding without this checklist  
 
 ✅ **Do** follow token budget strictly  

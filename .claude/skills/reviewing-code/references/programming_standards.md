@@ -79,7 +79,7 @@ function saveUserToDatabase(user): Promise<void> { ... }
 - Inject dependencies (don't use globals/singletons)
 - Separate pure logic from side effects
 - Small functions are easier to test
-- **See `.agentic/checklists/smoke_testing.md` for testable architecture patterns**
+- **See `.agentic/lib/checklists/smoke_testing.md` for testable architecture patterns**
 
 **Critical lesson from real projects:**
 ```typescript

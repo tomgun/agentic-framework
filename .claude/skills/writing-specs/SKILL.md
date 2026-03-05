@@ -37,23 +37,23 @@ Determine the spec operation and its protection level:
 ### Step 2: Execute Workflow
 
 **For new features:**
-1. Find next F-XXXX ID in `spec/FEATURES.md`
-2. Read `spec/NFR.md` — identify applicable NFRs
+1. Find next F-XXXX ID in `.agentic/.agentic/spec/FEATURES.md`
+2. Read `.agentic/.agentic/spec/NFR.md` — identify applicable NFRs
 3. Create FEATURES.md entry (Status: planned, Related NFRs)
-4. Create `spec/acceptance/F-XXXX.md` from `.agentic/spec/acceptance.template.md`
+4. Create `.agentic/.agentic/spec/acceptance/F-XXXX.md` from `.agentic/lib/templates/acceptance.template.md`
    - Write `## Behavior` section first (technology-agnostic user goal)
    - Group ACs with priority tags: (P1 — MVP), (P2 — enhanced)
    - Add `**Verify independently**` per AC group
    - Place Tests under `## Verification`
 5. Run Clarification Pass (Step 3 below) for features with 3+ ACs
 6. Show draft to user for approval
-7. `bash .agentic/tools/migration.sh create "Add F-XXXX [Name]"`
-8. `bash .agentic/tools/check-spec-health.sh F-XXXX`
+7. `bash .agentic/lib/tools/migration.sh create "Add F-XXXX [Name]"`
+8. `bash .agentic/lib/tools/check-spec-health.sh F-XXXX`
 9. Handoff: "Run `ag plan F-XXXX` before implementing"
 
 **For status updates:**
 ```bash
-bash .agentic/tools/feature.sh F-XXXX status shipped
+bash .agentic/lib/tools/feature.sh F-XXXX status shipped
 ```
 
 **For evolving shipped specs (CONTRACT MODIFICATION):**
@@ -62,13 +62,13 @@ bash .agentic/tools/feature.sh F-XXXX status shipped
 3. **NEVER** delete existing criteria — additive only
 4. Use markers: `[Discovered]`, `[Revised in M-NNN: was "X" now "Y"]`
 5. Require justification
-6. `bash .agentic/tools/migration.sh create "Evolve F-XXXX: [reason]"`
+6. `bash .agentic/lib/tools/migration.sh create "Evolve F-XXXX: [reason]"`
 7. Show changes to user — **human MUST approve**
 
 **For audit:**
 ```bash
-bash .agentic/tools/check-spec-health.sh F-XXXX   # Single feature
-bash .agentic/tools/check-spec-health.sh --all     # All features
+bash .agentic/lib/tools/check-spec-health.sh F-XXXX   # Single feature
+bash .agentic/lib/tools/check-spec-health.sh --all     # All features
 ```
 
 ### Step 3: Clarification Pass (after drafting ACs)
@@ -94,7 +94,7 @@ After any spec change:
 - Feature status in FEATURES.md matches reality
 - Acceptance criteria file exists and has required sections
 - Migration created for shipped spec changes
-- `bash .agentic/tools/check-spec-health.sh F-XXXX` passes
+- `bash .agentic/lib/tools/check-spec-health.sh F-XXXX` passes
 
 ### References
 
@@ -115,17 +115,17 @@ Steps: Read current spec → show to user → add `[Discovered]` criteria → cr
 
 **Example 3: Mark feature shipped**
 User says: "F-0125 is done"
-Steps: `bash .agentic/tools/feature.sh F-0125 status shipped` → verify acceptance criteria met.
+Steps: `bash .agentic/lib/tools/feature.sh F-0125 status shipped` → verify acceptance criteria met.
 
 **Example 4: Audit specs**
 User says: "ag spec --check"
-Steps: `bash .agentic/tools/check-spec-health.sh --all` → report issues.
+Steps: `bash .agentic/lib/tools/check-spec-health.sh --all` → report issues.
 
 ## Troubleshooting
 
 **Pre-commit blocks shipped spec change**
 Cause: Modified acceptance criteria for a shipped feature without migration.
-Solution: `bash .agentic/tools/migration.sh create "Evolve F-XXXX: [reason]"` and include the migration in the commit.
+Solution: `bash .agentic/lib/tools/migration.sh create "Evolve F-XXXX: [reason]"` and include the migration in the commit.
 
 **Pre-commit blocks status downgrade**
 Cause: Changed a shipped feature's status back to in_progress.

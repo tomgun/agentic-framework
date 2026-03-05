@@ -8,8 +8,8 @@
 setup_test_project "formal"
 
 # Create an in-progress brownfield specs plan
-mkdir -p "$TEST_PROJECT/.agentic-journal/plans"
-cat > "$TEST_PROJECT/.agentic-journal/plans/brownfield-specs-plan.md" << 'EOF'
+mkdir -p "$TEST_PROJECT/.agentic/journal/plans"
+cat > "$TEST_PROJECT/.agentic/journal/plans/brownfield-specs-plan.md" << 'EOF'
 # Brownfield Spec Generation Plan
 
 **Status**: APPROVED
@@ -26,7 +26,7 @@ cat > "$TEST_PROJECT/.agentic-journal/plans/brownfield-specs-plan.md" << 'EOF'
 - Cross-match frontend features with backend endpoints
 EOF
 
-git -C "$TEST_PROJECT" add .agentic-journal/plans/
+git -C "$TEST_PROJECT" add .agentic/journal/plans/
 git -C "$TEST_PROJECT" commit -m "Add brownfield specs plan" --quiet
 
 # Start a session — agent should notice the active plan

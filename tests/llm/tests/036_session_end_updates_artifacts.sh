@@ -29,7 +29,7 @@ EOF
 
 # Create JOURNAL.md
 mkdir -p "$TEST_PROJECT/.agentic-journal"
-cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/journal/JOURNAL.md" << 'EOF'
 # Development Journal
 
 ### Session: 2026-01-28
@@ -49,7 +49,7 @@ export class PaymentService {
 }
 EOF
 
-git -C "$TEST_PROJECT" add STATUS.md .agentic-journal/JOURNAL.md src/payments.ts
+git -C "$TEST_PROJECT" add STATUS.md .agentic/journal/JOURNAL.md src/payments.ts
 git -C "$TEST_PROJECT" commit -m "Add project files" --quiet
 
 # Ask to wrap up session

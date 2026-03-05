@@ -12,14 +12,14 @@ bash .agentic/tools/wip.sh check 2>/dev/null || true
 
 echo ""
 echo "--- Current Focus ---"
-grep -A2 "^## Current" STATUS.md 2>/dev/null | head -5 || echo "(no STATUS.md)"
+grep -A2 "^## Current" .agentic/STATUS.md 2>/dev/null | head -5 || echo "(no .agentic/STATUS.md)"
 
 echo ""
 echo "--- Active Blockers ---"
-if grep -q "^_No active items_" HUMAN_NEEDED.md 2>/dev/null; then
+if grep -q "^_No active items_" .agentic/HUMAN_NEEDED.md 2>/dev/null; then
     echo "None"
 else
-    grep "^### HN-" HUMAN_NEEDED.md 2>/dev/null | head -5 || echo "None"
+    grep "^### HN-" .agentic/HUMAN_NEEDED.md 2>/dev/null | head -5 || echo "None"
 fi
 
 echo ""

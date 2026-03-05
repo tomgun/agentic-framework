@@ -1,10 +1,10 @@
 THIS IS FRAMEWORK DEVELOPMENT. You are working ON the agentic framework itself, not a project using it. Framework changes affect ALL users - extra care required.
 
-Read first: `FRAMEWORK_QUICK_START.md`, `FRAMEWORK_DEVELOPMENT.md`, `.agentic/PRINCIPLES.md`
+Read first: `FRAMEWORK_QUICK_START.md`, `FRAMEWORK_DEVELOPMENT.md`, `.agentic/lib/PRINCIPLES.md`
 
-Full template: `.agentic/agents/cursor/cursorrules.txt`
+Full template: `.agentic/lib/agents/cursor/cursorrules.txt`
 
-Always consult: `.agentic/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, STATUS.md, spec/* and spec/adr/* as the source of truth.
+Always consult: `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
 Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag spec` | `ag docs` | `ag todo`
 
@@ -14,8 +14,8 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Build / implement / add / create / set up / develop / make something | STOP -> Run `ag plan F-XXXX` first, then `ag implement` (creates WIP) |
 | Build something large (>10 files, "entire", "full system") | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
 | Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
-| Commit / push / ship / finalize changes | STOP -> Check .agentic-state/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
-| Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, flush pending ideas to TODO.md via `ag todo`. |
+| Commit / push / ship / finalize changes | STOP -> Check .agentic/session/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
+| Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, flush pending ideas to .agentic/TODO.md via `ag todo`. |
 | Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
 | Write spec / create spec / acceptance criteria / evolve spec | STOP -> Run `ag spec F-XXXX`. Follow spec protection levels. |
 | Exited plan mode (plan approved) | STOP -> Save plan durably, then `ag implement F-XXXX` (creates WIP). If `plan_review_enabled: yes`: run `/review` on plan before coding. |
@@ -26,11 +26,11 @@ Rules:
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later). Use `ag docs` for doc lifecycle.
 - Keep changes small and scoped (max 5-10 files per commit).
-- Every PR: bump VERSION (at least patch) and update CONTRIBUTIONS.md.
-- Log user's design insights to CONTRIBUTIONS.md.
-- Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
+- Every PR: bump VERSION (at least patch) and update .agentic/CONTRIBUTIONS.md.
+- Log user's design insights to .agentic/CONTRIBUTIONS.md.
+- Update .agentic/journal/JOURNAL.md and .agentic/STATUS.md before every commit (use token-efficient scripts).
 - Worktree: Use `git worktree` on feature branches when another agent may be working on main.
 
 Verify: bash tests/validate_framework.sh
 
-Workflows, delegation, gates, checklists: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`
+Workflows, delegation, gates, checklists: run `ag` commands or see `.agentic/lib/agents/shared/auto_orchestration.md`

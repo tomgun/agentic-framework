@@ -22,12 +22,12 @@ Pre-commit quality gates and branch management with human approval.
 ### Step 1: Check WIP Status
 
 ```bash
-bash .agentic/tools/wip.sh check
+bash .agentic/lib/tools/wip.sh check
 ```
 
-If `.agentic-state/WIP.md` exists, work is still in progress. Complete it first:
+If `.agentic/session/WIP.md` exists, work is still in progress. Complete it first:
 ```bash
-bash .agentic/tools/wip.sh complete
+bash .agentic/lib/tools/wip.sh complete
 ```
 
 **Never commit while WIP.md exists** — it indicates incomplete work.
@@ -63,11 +63,11 @@ git branch --show-current
 Before committing, update the durable artifacts using token-efficient scripts:
 
 ```bash
-bash .agentic/tools/journal.sh "Topic" "What was done" "Next steps" "Blockers"
-bash .agentic/tools/status.sh focus "Current state"
+bash .agentic/lib/tools/journal.sh "Topic" "What was done" "Next steps" "Blockers"
+bash .agentic/lib/tools/status.sh focus "Current state"
 ```
 
-**Never edit JOURNAL.md or STATUS.md directly** — always use the scripts.
+**Never edit JOURNAL.md or .agentic/STATUS.md directly** — always use the scripts.
 
 ### Step 4: Quality Gates
 
@@ -98,9 +98,9 @@ After human approves:
 2. Commit with descriptive message
 3. Create PR if on feature branch: `gh pr create --title "..." --body "..."`
 4. Bump VERSION (at least patch)
-5. Log PR in HUMAN_NEEDED.md for review tracking:
+5. Log PR in .agentic/HUMAN_NEEDED.md for review tracking:
    ```bash
-   bash .agentic/tools/blocker.sh add "PR #N: Description" "review" "Details"
+   bash .agentic/lib/tools/blocker.sh add "PR #N: Description" "review" "Details"
    ```
 
 ### Step 7: Post-Merge Tagging
@@ -121,12 +121,12 @@ Steps taken:
 4. Run tests — all pass
 5. Show `git diff --stat` to user: "3 files changed, 85 insertions"
 6. User approves, commit and create PR
-Result: PR #42 created, logged in HUMAN_NEEDED.md.
+Result: PR #42 created, logged in .agentic/HUMAN_NEEDED.md.
 
 **Example 2: WIP still active**
 User says: "let's ship this"
 Steps taken:
-1. Check WIP — `.agentic-state/WIP.md` exists for F-0125
+1. Check WIP — `.agentic/session/WIP.md` exists for F-0125
 2. **BLOCK**: "Work is still in progress for F-0125. Complete it first with `wip.sh complete`, or should I mark it complete now?"
 Result: User confirms completion, then proceed with commit flow.
 
@@ -142,7 +142,7 @@ Solution: Fix failing tests before committing. Do not skip tests.
 
 **Error: WIP.md still exists**
 Cause: Feature work not formally completed.
-Solution: Run `bash .agentic/tools/wip.sh complete` after verifying all acceptance criteria are met.
+Solution: Run `bash .agentic/lib/tools/wip.sh complete` after verifying all acceptance criteria are met.
 
 ## References
 

@@ -16,7 +16,7 @@ phase: implementation
 
 ## Prerequisite: Feature Start Checklist
 
-**🚨 Complete `.agentic/checklists/feature_start.md` FIRST** — it covers acceptance criteria, scope check, delegation decisions, and context handoff. Do not start implementation without passing those gates.
+**🚨 Complete `.agentic/lib/checklists/feature_start.md` FIRST** — it covers acceptance criteria, scope check, delegation decisions, and context handoff. Do not start implementation without passing those gates.
 
 - [ ] **WIP tracking active** (`ag implement` creates this; manual: `wip.sh start F-#### "desc" "files"`)
 
@@ -32,7 +32,7 @@ phase: implementation
   - Are there edge cases explicitly mentioned?
 
 - [ ] **Check dependencies** (Formal only)
-  - Look at `Dependencies:` field in `spec/FEATURES.md`
+  - Look at `Dependencies:` field in `.agentic/.agentic/spec/FEATURES.md`
   - Are dependent features complete?
   - If not, implement dependencies first
 
@@ -99,14 +99,14 @@ phase: implementation
 
 ### Code Quality Checks (Both Modes)
 
-- [ ] **Follow programming standards** (`.agentic/quality/programming_standards.md`)
+- [ ] **Follow programming standards** (`.agentic/lib/quality/programming_standards.md`)
   - Clear, descriptive names
   - Small functions (<50 lines ideal)
   - Explicit error handling
   - No magic numbers
   - Max nesting depth <4
 
-- [ ] **Follow testing standards** (`.agentic/quality/testing_standards.md`)
+- [ ] **Follow testing standards** (`.agentic/lib/quality/testing_standards.md`)
   - Test happy path
   - Test edge cases
   - Test invalid input
@@ -131,7 +131,7 @@ phase: implementation
 
 ### Update Tracking (Formal)
 
-- [ ] **Update `spec/FEATURES.md`**
+- [ ] **Update `.agentic/.agentic/spec/FEATURES.md`**
   - Status: `planned` → `in_progress` → `shipped`
   - Implementation State: `none` → `partial` → `complete`
   - Implementation Code: Add actual file paths
@@ -141,7 +141,7 @@ phase: implementation
 
 ### Update Tracking (Core)
 
-- [ ] **Update `OVERVIEW.md`**
+- [ ] **Update `.agentic/OVERVIEW.md`**
   - Mark implemented capabilities with [x]
   - Update "What works now" section
   - Keep "Known limitations" current
@@ -155,7 +155,7 @@ phase: implementation
   - Blockers encountered (if any)
   - What's next
 
-- [ ] **Update `STATUS.md`** (Formal)
+- [ ] **Update `.agentic/STATUS.md`** (Formal)
   - Current session state
   - Completed this session
   - Next immediate step
@@ -186,7 +186,7 @@ phase: implementation
 
 ## Before Committing
 
-- [ ] **Follow `.agentic/checklists/before_commit.md`** — covers branch check, WIP lock, tests, docs sync, human approval
+- [ ] **Follow `.agentic/lib/checklists/before_commit.md`** — covers branch check, WIP lock, tests, docs sync, human approval
 
 ---
 
@@ -203,7 +203,7 @@ phase: implementation
 4. Check for timing issues - add delays if testing async code
 5. Verify test framework is configured correctly
 
-**If still stuck after 15 min**: Add to HUMAN_NEEDED.md with test code, implementation code, and error message
+**If still stuck after 15 min**: Add to .agentic/HUMAN_NEEDED.md with test code, implementation code, and error message
 
 ---
 
@@ -230,7 +230,7 @@ phase: implementation
 **Immediate actions**:
 1. **Don't guess**: Stop coding immediately
 2. **Document confusion**: What specifically is unclear?
-3. **Add to HUMAN_NEEDED.md**: With specific questions and options
+3. **Add to .agentic/HUMAN_NEEDED.md**: With specific questions and options
 4. **Work on something else**: Switch to feature with clear requirements
 
 **Example escalation**:
@@ -263,7 +263,7 @@ Blocking: F-0010 implementation
 - Implement dependencies first (if small)
 - Use mocks/stubs for now, integrate later
 - Switch to feature without dependencies
-- Add to HUMAN_NEEDED.md if dependency priority unclear
+- Add to .agentic/HUMAN_NEEDED.md if dependency priority unclear
 
 ---
 
@@ -335,6 +335,6 @@ Blocking: F-0010 implementation
 ✅ **Do** small increments (easier to review)  
 ✅ **Do** update tracking in same commit as code  
 ✅ **Do** write tests (TDD: first; Standard: alongside)  
-✅ **Do** keep FEATURES.md/OVERVIEW.md accurate  
+✅ **Do** keep FEATURES.md/.agentic/OVERVIEW.md accurate  
 ✅ **Do** add code annotations
 

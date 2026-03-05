@@ -49,7 +49,7 @@ def test_no_wip_returns_start():
 
 
 def test_wip_without_acceptance_returns_planning():
-    """.agentic-state/WIP.md with feature but no acceptance file should return 'planning'."""
+    """.agentic/session/WIP.md with feature but no acceptance file should return 'planning'."""
     _clear_settings_cache()
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
@@ -63,7 +63,7 @@ def test_wip_without_acceptance_returns_planning():
 
 
 def test_wip_with_acceptance_returns_implement():
-    """.agentic-state/WIP.md with feature and acceptance file should return 'implement'."""
+    """.agentic/session/WIP.md with feature and acceptance file should return 'implement'."""
     _clear_settings_cache()
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)

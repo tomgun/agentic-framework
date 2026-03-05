@@ -61,7 +61,7 @@ git commit -m "add shipped feature F-0099" --quiet --no-verify
 # ── Test 14: Modify shipped spec WITHOUT migration → BLOCKED ──
 
 echo "# Added criteria" >> spec/acceptance/F-0099.md
-touch .agentic-journal/JOURNAL.md STATUS.md
+touch .agentic/journal/JOURNAL.md STATUS.md
 sleep 1
 git add spec/acceptance/F-0099.md
 
@@ -87,7 +87,7 @@ cat > spec/migrations/001_update_f0099.md << 'EOF'
 - F-0099: Added new criteria
 EOF
 
-touch .agentic-journal/JOURNAL.md STATUS.md
+touch .agentic/journal/JOURNAL.md STATUS.md
 sleep 1
 git add spec/acceptance/F-0099.md spec/migrations/001_update_f0099.md
 
@@ -108,7 +108,7 @@ git checkout -- . 2>/dev/null
 # ── Test 15: Delete test file referenced by shipped spec → BLOCKED ──
 
 git rm tests/test_feature.sh --quiet
-touch .agentic-journal/JOURNAL.md STATUS.md
+touch .agentic/journal/JOURNAL.md STATUS.md
 sleep 1
 git add -A
 
@@ -126,7 +126,7 @@ git checkout -- . 2>/dev/null
 
 sed -i.bak 's/\*\*Status\*\*: shipped/**Status**: in-progress/' spec/FEATURES.md
 rm -f spec/FEATURES.md.bak
-touch .agentic-journal/JOURNAL.md STATUS.md
+touch .agentic/journal/JOURNAL.md STATUS.md
 sleep 1
 git add spec/FEATURES.md
 

@@ -71,7 +71,7 @@ This design synthesizes two independent research efforts:
 
 Skills are Claude Code's native mechanism for delivering playbook-level instructions. They implement the same principle as Layer 2 (just-in-time delivery) via tool-native UI — Claude Code surfaces the right skill based on task description, so agents receive workflow instructions without loading the full auto_orchestration.md playbook.
 
-- **Source**: `.agentic/agents/claude/skills/` (hand-crafted, 12 skills) + `.agentic-local/extensions/skills/` (project-specific, F-0151)
+- **Source**: `.agentic/agents/claude/skills/` (hand-crafted, 12 skills) + `.agentic/local/extensions/skills/` (project-specific, F-0151)
 - **Generated to**: `.claude/skills/` (by `generate-skills.sh`, merges framework + extension skills)
 - **Each skill bundles**: `SKILL.md` (instructions) + `scripts/` (gates/validation) + `references/` (playbook copies)
 - **Progressive disclosure**: YAML frontmatter on 168 of 212 `.agentic/` files enables ~96% discovery savings (~184K tokens saved per full scan)
@@ -86,8 +86,8 @@ Other tools (Cursor, Copilot, Codex) continue using `auto_orchestration.md` + `a
 - STATUS.md — holds all runtime state (focus, progress, next, blocker) plus roadmap, risks, decisions. Updated directly by status.sh.
 
 **Session-local state** (gitignored):
-- `.agentic-state/WIP.md` — work-in-progress lock
-- `.agentic-state/AGENTS_ACTIVE.md` — multi-agent coordination
+- `.agentic/session/WIP.md` — work-in-progress lock
+- `.agentic/session/AGENTS_ACTIVE.md` — multi-agent coordination
 
 **Design property**: State that must survive across machines goes in git-tracked files. State that is session-local goes in gitignored files. This distinction must be preserved.
 

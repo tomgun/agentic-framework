@@ -19,13 +19,13 @@ phase: completion
 ## Acceptance Criteria Met
 
 - [ ] **All acceptance criteria satisfied**
-  - Formal: Every item in `spec/acceptance/F-####.md`
-  - Core: Every item in `OVERVIEW.md` or user requirements
+  - Formal: Every item in `.agentic/.agentic/spec/acceptance/F-####.md`
+  - Core: Every item in `.agentic/OVERVIEW.md` or user requirements
   - No partial completion
   - No "mostly works" items
 
 - [ ] **Smoke test passed** (CRITICAL - RUN THE APPLICATION!)
-  - **See `.agentic/checklists/smoke_testing.md` for full checklist**
+  - **See `.agentic/lib/checklists/smoke_testing.md` for full checklist**
   - [ ] Run application in target environment (browser, simulator, etc.)
   - [ ] Application starts without errors (no console errors, no crashes)
   - [ ] Feature works end-to-end (perform the user action)
@@ -95,7 +95,7 @@ phase: completion
 
 ### Test Quality
 
-- [ ] **Tests follow testing standards** — see `.agentic/quality/testing_standards.md`
+- [ ] **Tests follow testing standards** — see `.agentic/lib/quality/testing_standards.md`
 - [ ] **Mutation testing considered** (for critical code — auth, payments, data integrity)
 
 ---
@@ -104,7 +104,7 @@ phase: completion
 
 ### Core Profile
 
-- [ ] **`OVERVIEW.md` updated**
+- [ ] **`.agentic/OVERVIEW.md` updated**
   - Feature marked as implemented [x]
   - "What works now" includes this feature
   - Usage examples if complex
@@ -112,7 +112,7 @@ phase: completion
 
 ### Formal Profile
 
-- [ ] **`spec/FEATURES.md` updated**
+- [ ] **`.agentic/.agentic/spec/FEATURES.md` updated**
   - Status: `shipped` (not `planned` or `in_progress`)
   - Implementation State: `complete` (not `none` or `partial`)
   - Implementation Code: All file paths listed
@@ -121,7 +121,7 @@ phase: completion
   - **CRITICAL**: Never mark as shipped without setting these correctly
 
 - [ ] **Acceptance file complete**
-  - `spec/acceptance/F-####.md` exists
+  - `.agentic/.agentic/spec/acceptance/F-####.md` exists
   - Has actual criteria (not placeholder)
   - Criteria are testable
   - Criteria match what was implemented
@@ -151,7 +151,7 @@ phase: completion
 
 Before marking feature as complete:
 
-- [ ] **Run `bash .agentic/tools/ag.sh trace`** (or `drift.sh`) to verify:
+- [ ] **Run `bash .agentic/lib/tools/ag.sh trace`** (or `drift.sh`) to verify:
   - No untracked implementation files related to this feature
   - Feature status in FEATURES.md matches acceptance criteria completion
   - No template markers left in project files (e.g., "(Template)" in title)
@@ -162,7 +162,7 @@ Before marking feature as complete:
 ## Quality Checks
 
 - [ ] **Spec ↔ Code alignment verified**
-  - Run `bash .agentic/tools/drift.sh --check`
+  - Run `bash .agentic/lib/tools/drift.sh --check`
   - No undocumented code (non-coders can read specs)
   - Acceptance criteria match implementation
   - Fix any drift before marking complete
@@ -188,9 +188,9 @@ Before marking feature as complete:
 ## Context & Tracking Updated
 
 - [ ] **Change manifest generated** (for documentation patching)
-  - Run: `bash .agentic/tools/manifest.sh F-####`
+  - Run: `bash .agentic/lib/tools/manifest.sh F-####`
   - Or: `ag done F-####` (auto-generates manifest)
-  - Creates `.agentic-journal/manifests/F-####.manifest.md` with:
+  - Creates `.agentic/journal/manifests/F-####.manifest.md` with:
     - All commits related to feature
     - Files changed (code, tests, docs, config)
     - Lines added/removed
@@ -202,7 +202,7 @@ Before marking feature as complete:
   - Any challenges/learnings noted
   - Consider: `--feature F-#### --files N` flags for metadata
 
-- [ ] **`STATUS.md` updated** (Formal)
+- [ ] **`.agentic/STATUS.md` updated** (Formal)
   - Moved feature from "Current focus" to "Recently completed"
   - Or updated "Next up" if more work queued
 
@@ -259,7 +259,7 @@ If ANY answer is "No" or "Not sure" → Feature is NOT ready to be marked shippe
 
 - [ ] **Update VERSION file first** (`echo "X.Y.Z" > VERSION`)
 - [ ] **Update STACK.md version** to match
-- [ ] **Update spec/FEATURES.md version** to match
+- [ ] **Update .agentic/spec/FEATURES.md version** to match
 - [ ] **THEN run tests** (`bash tests/validate_framework.sh`)
 - [ ] **Update test result files** with new version:
   - `tests/VERIFICATION_REPORT.md`
@@ -269,13 +269,13 @@ If ANY answer is "No" or "Not sure" → Feature is NOT ready to be marked shippe
 
 ### Core Profile
 
-- [ ] **Update `OVERVIEW.md`**
+- [ ] **Update `.agentic/OVERVIEW.md`**
   - Mark capability as [x] implemented
   - Update "What works now"
 
 ### Formal Profile
 
-- [ ] **Update `spec/FEATURES.md`**
+- [ ] **Update `.agentic/.agentic/spec/FEATURES.md`**
   ```markdown
   Status: shipped
   Implementation:

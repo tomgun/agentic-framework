@@ -12,7 +12,7 @@ This repo uses the **Agentic Framework** located at `.agentic/`.
 - Don't just mention it in chat - document it so it's not forgotten
 
 **Keep documentation current:**
-- Update `.agentic-journal/JOURNAL.md` before ending ANY session (if session ends abruptly, JOURNAL is the only record)
+- Update `.agentic/journal/JOURNAL.md` before ending ANY session (if session ends abruptly, JOURNAL is the only record)
 - Keep `OVERVIEW.md` up to date with vision and completed capabilities
 - Keep `CONTEXT_PACK.md` current when architecture changes
 - If this repo uses the Formal profile: keep `STATUS.md` and `/spec/*` truthful

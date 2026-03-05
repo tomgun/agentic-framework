@@ -57,7 +57,7 @@ phase: planning
 
 ## Plan Artifact Format
 
-Plans are written to `.agentic-journal/plans/F-XXXX-plan.md`:
+Plans are written to `.agentic/journal/plans/F-XXXX-plan.md`:
 
 ```markdown
 # Plan: F-XXXX [Feature Title]
@@ -135,7 +135,7 @@ Plan is solid. Ready for implementation.
 When creating/revising a plan:
 
 1. **Read context first**:
-   - `spec/acceptance/F-XXXX.md` (requirements)
+   - `.agentic/.agentic/spec/acceptance/F-XXXX.md` (requirements)
    - `CONTEXT_PACK.md` (architecture)
    - Related code files
 
@@ -212,9 +212,9 @@ Task(
     model="opus",  # or from STACK.md
     prompt="""
     Create implementation plan for F-XXXX.
-    Read: spec/acceptance/F-XXXX.md, CONTEXT_PACK.md
-    Write plan to: .agentic-journal/plans/F-XXXX-plan.md
-    Follow format in: .agentic/workflows/plan_review_loop.md
+    Read: .agentic/.agentic/spec/acceptance/F-XXXX.md, CONTEXT_PACK.md
+    Write plan to: .agentic/journal/plans/F-XXXX-plan.md
+    Follow format in: .agentic/lib/workflows/plan_review_loop.md
     """
 )
 
@@ -223,8 +223,8 @@ Task(
     subagent_type="general-purpose",
     model="opus",  # critical review needs quality
     prompt="""
-    Critically review plan at .agentic-journal/plans/F-XXXX-plan.md
-    Follow reviewer instructions in: .agentic/workflows/plan_review_loop.md
+    Critically review plan at .agentic/journal/plans/F-XXXX-plan.md
+    Follow reviewer instructions in: .agentic/lib/workflows/plan_review_loop.md
     Add your review to the Review History section.
     Set verdict: APPROVED, REVISION_NEEDED, or ESCALATE
     """
@@ -256,7 +256,7 @@ Cursor's agent mode can orchestrate the loop via the orchestrator agent.
 When `ESCALATE` verdict or `max_iterations` reached:
 
 1. Plan file shows current state and all review history
-2. Agent notifies human: "Plan needs your input - see .agentic-journal/plans/F-XXXX-plan.md"
+2. Agent notifies human: "Plan needs your input - see .agentic/journal/plans/F-XXXX-plan.md"
 3. Human can:
    - Edit plan directly and set status to `APPROVED`
    - Provide guidance and request another iteration

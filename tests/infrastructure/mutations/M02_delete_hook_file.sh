@@ -11,8 +11,8 @@ cd "$PROJECT"
 
 # Create WIP to give hook something to catch
 mkdir -p .agentic-state
-echo "Feature: test" > .agentic-state/WIP.md
-git add .agentic-state/WIP.md
+echo "Feature: test" > .agentic/session/WIP.md
+git add .agentic/session/WIP.md
 git commit -m "add WIP" --quiet --no-verify
 
 # ── Baseline: hook should block ──

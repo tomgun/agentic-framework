@@ -64,7 +64,7 @@ A custom rules file is a great start. This framework builds on the same idea but
   - spec/FEATURES.md, NFR.md, ADRs
   - Cross-reference validation
   - Semantic spec analysis (ambiguity detection, AC↔test coverage gaps, NFR measurability)
-  - User-extension directory (`.agentic-local/extensions/` for custom skills and gates)
+  - User-extension directory (`.agentic/local/extensions/` for custom skills and gates)
 
 **🔄 Multi-Environment Support:**
 Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out or use the best tool for each task. All environments share the same project state for perfect continuity. [Learn more](.agentic/workflows/environment_switching.md)
@@ -203,7 +203,7 @@ Instruction files (`CLAUDE.md`, `.cursorrules`, `copilot-instructions.md`) — k
 Workflows, checklists, and orchestration rules (`auto_orchestration.md`, `checklists/`, `workflows/`) — loaded by `ag` commands when needed, never pinned in the instruction file. This keeps the constitution small while providing deep guidance for specific tasks.
 
 ### Layer 3: State (Durable Artifacts)
-Project truth that survives context resets (`STACK.md`, `STATUS.md`, `CONTEXT_PACK.md`, `JOURNAL.md`). Git-tracked files work cross-machine; gitignored files (`.agentic-state/`) are session-local. Agents read these first; humans can `cat STATUS.md` for instant awareness at zero token cost.
+Project truth that survives context resets (`STACK.md`, `STATUS.md`, `CONTEXT_PACK.md`, `JOURNAL.md`). Git-tracked files work cross-machine; gitignored files (`.agentic/session/`) are session-local. Agents read these first; humans can `cat STATUS.md` for instant awareness at zero token cost.
 
 ### Distributed Enforcement
 Three scripts enforce behavior regardless of which AI tool runs them:
@@ -408,7 +408,7 @@ Quick-start guidance for common technology stacks:
 ### Discovery Profile Files
 **Project State:**
 - `STACK.md` - How to build, test, run, and deploy (with profile setting)
-- `.agentic-journal/JOURNAL.md` - Session-by-session progress log
+- `.agentic/journal/JOURNAL.md` - Session-by-session progress log
 - `CONTEXT_PACK.md` - Durable context (architecture, where things are)
 - `HUMAN_NEEDED.md` - Items requiring human decision/intervention
 

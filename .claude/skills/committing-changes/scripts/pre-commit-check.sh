@@ -17,7 +17,7 @@ else
 fi
 
 # Check 1: WIP must not be active
-if [[ -f ".agentic-state/WIP.md" ]]; then
+if [[ -f ".agentic/session/WIP.md" ]]; then
     echo "✗ WIP still active — complete work first: bash .agentic/tools/wip.sh complete"
     ERRORS=$((ERRORS + 1))
 else

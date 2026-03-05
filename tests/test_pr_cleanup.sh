@@ -43,16 +43,16 @@ setup_test_env() {
     mkdir -p "$TEST_DIR/bin"
 
     # Copy required scripts
-    cp "$FRAMEWORK_ROOT/.agentic/tools/sync.sh" "$TEST_DIR/.agentic/tools/"
-    cp "$FRAMEWORK_ROOT/.agentic/tools/blocker.sh" "$TEST_DIR/.agentic/tools/"
-    cp "$FRAMEWORK_ROOT/.agentic/tools/memory-check.sh" "$TEST_DIR/.agentic/tools/" 2>/dev/null || true
-    cp "$FRAMEWORK_ROOT/.agentic/tools/check-environment.sh" "$TEST_DIR/.agentic/tools/" 2>/dev/null || true
-    cp "$FRAMEWORK_ROOT/.agentic/tools/periodic-checks.sh" "$TEST_DIR/.agentic/tools/" 2>/dev/null || true
-    cp "$FRAMEWORK_ROOT/.agentic/tools/drift.sh" "$TEST_DIR/.agentic/tools/" 2>/dev/null || true
-    cp "$FRAMEWORK_ROOT/.agentic/tools/doc-check.sh" "$TEST_DIR/.agentic/tools/" 2>/dev/null || true
-    cp "$FRAMEWORK_ROOT/.agentic/tools/status.sh" "$TEST_DIR/.agentic/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/sync.sh" "$TEST_DIR/.agentic/lib/tools/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/blocker.sh" "$TEST_DIR/.agentic/lib/tools/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/memory-check.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/check-environment.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/periodic-checks.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/drift.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/doc-check.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/status.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
-    cp "$FRAMEWORK_ROOT/.agentic/presets/profiles.conf" "$TEST_DIR/.agentic/presets/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
 
     # Create minimal STACK.md
     cat > "$TEST_DIR/STACK.md" << 'EOF'
@@ -152,7 +152,7 @@ test_case "sync --quiet: merged PRs reported as issues"
 setup_test_env
 create_human_needed_with_prs
 create_mock_gh "MERGED"
-output=$(PATH="$TEST_DIR/bin:$PATH" bash .agentic/tools/sync.sh --quiet 2>&1)
+output=$(PATH="$TEST_DIR/bin:$PATH" bash .agentic/lib/tools/sync.sh --quiet 2>&1)
 if echo "$output" | grep -q "PR #"; then
     pass
 else
@@ -164,7 +164,7 @@ test_case "sync full: merged PRs auto-resolved from HUMAN_NEEDED.md"
 setup_test_env
 create_human_needed_with_prs
 create_mock_gh "MERGED"
-PATH="$TEST_DIR/bin:$PATH" bash .agentic/tools/sync.sh 2>&1 > /dev/null
+PATH="$TEST_DIR/bin:$PATH" bash .agentic/lib/tools/sync.sh 2>&1 > /dev/null
 # After sync, active section should NOT contain the PR entries
 active_prs=$(awk '/^## Active items/,/^---$/' "$TEST_DIR/HUMAN_NEEDED.md" | grep -c "^### HN-.*PR #" || true)
 if [ "$active_prs" = "0" ]; then
@@ -178,7 +178,7 @@ test_case "sync full: non-PR entries preserved in active section"
 setup_test_env
 create_human_needed_with_prs
 create_mock_gh "MERGED"
-PATH="$TEST_DIR/bin:$PATH" bash .agentic/tools/sync.sh 2>&1 > /dev/null
+PATH="$TEST_DIR/bin:$PATH" bash .agentic/lib/tools/sync.sh 2>&1 > /dev/null
 # Non-PR entry (HN-0012) should still be active
 if awk '/^## Active items/,/^---$/' "$TEST_DIR/HUMAN_NEEDED.md" | grep -q "HN-0012"; then
     pass
@@ -191,7 +191,7 @@ test_case "sync full: only merged/closed PRs resolved, open PRs kept"
 setup_test_env
 create_human_needed_with_prs
 create_mock_gh_per_pr  # PR 99=MERGED, PR 100=OPEN
-PATH="$TEST_DIR/bin:$PATH" bash .agentic/tools/sync.sh 2>&1 > /dev/null
+PATH="$TEST_DIR/bin:$PATH" bash .agentic/lib/tools/sync.sh 2>&1 > /dev/null
 active_section=$(awk '/^## Active items/,/^---$/' "$TEST_DIR/HUMAN_NEEDED.md")
 has_99=$(echo "$active_section" | grep -c "PR #99" || true)
 has_100=$(echo "$active_section" | grep -c "PR #100" || true)
@@ -206,7 +206,7 @@ test_case "sync full: resolved entries use Outcome field (not Resolution)"
 setup_test_env
 create_human_needed_with_prs
 create_mock_gh "MERGED"
-PATH="$TEST_DIR/bin:$PATH" bash .agentic/tools/sync.sh 2>&1 > /dev/null
+PATH="$TEST_DIR/bin:$PATH" bash .agentic/lib/tools/sync.sh 2>&1 > /dev/null
 if grep -qF '**Outcome**' "$TEST_DIR/HUMAN_NEEDED.md"; then
     pass
 else
@@ -218,7 +218,7 @@ test_case "sync: graceful when gh CLI missing"
 setup_test_env
 create_human_needed_with_prs
 # Don't add mock gh to PATH — use a PATH without gh
-output=$(PATH="/usr/bin:/bin" bash .agentic/tools/sync.sh --quiet 2>&1)
+output=$(PATH="/usr/bin:/bin" bash .agentic/lib/tools/sync.sh --quiet 2>&1)
 exit_code=$?
 if [ "$exit_code" -eq 0 ]; then
     pass
@@ -244,7 +244,7 @@ _No active items_
 ## Resolved
 EOF
 create_mock_gh "MERGED"
-output=$(PATH="$TEST_DIR/bin:$PATH" bash .agentic/tools/sync.sh --quiet 2>&1)
+output=$(PATH="$TEST_DIR/bin:$PATH" bash .agentic/lib/tools/sync.sh --quiet 2>&1)
 if echo "$output" | grep -q "PR"; then
     fail "Unexpected PR output when no active PR entries: $output"
 else

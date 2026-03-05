@@ -14,7 +14,7 @@ phase: planning
 ## GATE 1: Acceptance Criteria (BLOCKING)
 
 ```
-□ Does spec/acceptance/F-####.md exist?
+□ Does .agentic/.agentic/spec/acceptance/F-####.md exist?
   ├─ YES → Check: does it have a Tests section (## Tests or ## Verification > ### Tests)?
   │         ├─ YES → Proceed to Gate 2
   │         └─ NO  → Add Tests section before coding (see template)
@@ -23,11 +23,11 @@ phase: planning
 ```
 
 **If no acceptance criteria:**
-1. Draft criteria using `.agentic/spec/acceptance.template.md`
+1. Draft criteria using `.agentic/lib/templates/acceptance.template.md`
 2. Fill in the Tests section — what tests will verify each criterion?
    (New format: `## Verification > ### Tests`. Legacy: `## Tests`. Both accepted.)
 3. Show to user for approval
-4. Create `spec/acceptance/F-####.md`
+4. Create `.agentic/.agentic/spec/acceptance/F-####.md`
 5. ONLY THEN proceed
 
 **The Tests section is required.** Tests are part of the feature definition, not a follow-up task. An acceptance file without a tests section is incomplete.
@@ -75,7 +75,7 @@ phase: planning
 
 Pass to subagent ONLY:
 - Feature ID and name
-- Acceptance criteria (from spec/acceptance/F-####.md)
+- Acceptance criteria (from .agentic/.agentic/spec/acceptance/F-####.md)
 - Relevant file paths (max 3-5 files)
 - STACK.md technology info
 
@@ -95,7 +95,7 @@ DO NOT pass:
 □ Will update specs when done
 ```
 
-**Next**: Follow `.agentic/checklists/feature_implementation.md` for the implementation phase.
+**Next**: Follow `.agentic/lib/checklists/feature_implementation.md` for the implementation phase.
 
 ---
 

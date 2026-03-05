@@ -15,7 +15,7 @@ FAILURES=0
 
 check_output_contains "session\|welcome\|status\|here\|working on\|focus" "Agent mentions session context" || ((FAILURES++))
 check_output_contains "CONTEXT_PACK\|framework\|agentic\|checklists" "Agent references framework/project info" || ((FAILURES++))
-check_file_not_exists ".agentic-state/WIP.md" "No WIP created for simple greeting" || ((FAILURES++))
+check_file_not_exists ".agentic/session/WIP.md" "No WIP created for simple greeting" || ((FAILURES++))
 
 # Cleanup
 cleanup_test_project

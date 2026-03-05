@@ -11,7 +11,7 @@ setup_test_project "discovery"
 
 # Create a realistic multi-session journal (larger than 004's simple journal)
 mkdir -p "$TEST_PROJECT/.agentic-journal"
-cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/journal/JOURNAL.md" << 'EOF'
 # Development Journal
 
 ## Session Log
@@ -41,7 +41,7 @@ cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
 - Deployment: Kubernetes with Helm charts
 EOF
 
-git -C "$TEST_PROJECT" add .agentic-journal/JOURNAL.md
+git -C "$TEST_PROJECT" add .agentic/journal/JOURNAL.md
 git -C "$TEST_PROJECT" commit -m "Add journal" --quiet
 
 # Ask to add a journal entry

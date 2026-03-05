@@ -23,17 +23,17 @@ Acceptance-driven feature implementation with structural enforcement gates.
 ### Step 1: Verify Acceptance Criteria Exist
 
 ```bash
-bash .agentic/tools/wip.sh check
+bash .agentic/lib/tools/wip.sh check
 ```
 
-Check for `spec/acceptance/F-XXXX.md`. If it does not exist:
+Check for `.agentic/.agentic/spec/acceptance/F-XXXX.md`. If it does not exist:
 
-1. Draft acceptance criteria using `.agentic/spec/acceptance.template.md`
+1. Draft acceptance criteria using `.agentic/lib/templates/acceptance.template.md`
 2. Include a `## Tests` section — tests are part of the feature definition
 3. Show to user for approval before proceeding
-4. Create the file at `spec/acceptance/F-XXXX.md`
+4. Create the file at `.agentic/.agentic/spec/acceptance/F-XXXX.md`
 
-If no feature ID exists yet, create one in `spec/FEATURES.md` first.
+If no feature ID exists yet, create one in `.agentic/.agentic/spec/FEATURES.md` first.
 
 **Do NOT write any code until acceptance criteria exist.**
 
@@ -41,7 +41,7 @@ If no feature ID exists yet, create one in `spec/FEATURES.md` first.
 
 Check if spec analysis is enabled:
 1. Read `spec_analysis` setting from STACK.md (default: on for formal, off for discovery)
-2. If enabled, run: `bash .agentic/tools/spec-analyze.sh F-XXXX`
+2. If enabled, run: `bash .agentic/lib/tools/spec-analyze.sh F-XXXX`
 3. Review findings but proceed regardless (advisory, not blocking)
 4. If any HIGH/CRITICAL findings, mention them to the user before coding
 
@@ -52,10 +52,10 @@ Verify the feature is small batch (max 5-10 files). If larger, break into smalle
 ### Step 3: Start WIP Tracking
 
 ```bash
-bash .agentic/tools/wip.sh start F-XXXX "Description" "file1 file2"
+bash .agentic/lib/tools/wip.sh start F-XXXX "Description" "file1 file2"
 ```
 
-This creates `.agentic-state/WIP.md` — a lock that prevents premature commits.
+This creates `.agentic/session/WIP.md` — a lock that prevents premature commits.
 
 ### Step 4: Implement
 
@@ -68,7 +68,7 @@ This creates `.agentic-state/WIP.md` — a lock that prevents premature commits.
    - Run tests after each significant change
 5. Checkpoint progress periodically:
    ```bash
-   bash .agentic/tools/wip.sh checkpoint "Completed step X"
+   bash .agentic/lib/tools/wip.sh checkpoint "Completed step X"
    ```
 
 ### Step 5: Checkpoint Validation (priority-grouped ACs)
@@ -95,8 +95,8 @@ Then hand off to the `committing-changes` workflow (do NOT commit directly).
 **Example 1: Implementing a new CLI command**
 User says: "Add an `ag sync` command"
 Steps taken:
-1. Check `spec/acceptance/F-0125.md` exists — it does, read criteria
-2. Start WIP: `wip.sh start F-0125 "ag sync command" "ag .agentic/tools/sync.sh"`
+1. Check `.agentic/.agentic/spec/acceptance/F-0125.md` exists — it does, read criteria
+2. Start WIP: `wip.sh start F-0125 "ag sync command" "ag .agentic/lib/tools/sync.sh"`
 3. Read CONTEXT_PACK.md, find existing ag commands in `ag` script
 4. Implement sync.sh following existing tool patterns
 5. Add test in tests/
@@ -106,9 +106,9 @@ Result: Feature implemented, tests passing, ready for commit workflow.
 **Example 2: User describes functionality without a feature ID**
 User says: "Build a dark mode toggle"
 Steps taken:
-1. No F-XXXX exists — create F-0150 in spec/FEATURES.md
+1. No F-XXXX exists — create F-0150 in .agentic/.agentic/spec/FEATURES.md
 2. Draft acceptance criteria, show to user for approval
-3. Create spec/acceptance/F-0150.md
+3. Create .agentic/.agentic/spec/acceptance/F-0150.md
 4. Start WIP, implement, test
 Result: Feature tracked from spec through implementation.
 
@@ -116,11 +116,11 @@ Result: Feature tracked from spec through implementation.
 
 **Error: wip.sh exits "WIP already active"**
 Cause: Previous work was interrupted or not completed.
-Solution: Run `bash .agentic/tools/wip.sh check` to see what's in progress. Either complete it (`wip.sh complete`) or abandon it (`wip.sh abandon`) before starting new work.
+Solution: Run `bash .agentic/lib/tools/wip.sh check` to see what's in progress. Either complete it (`wip.sh complete`) or abandon it (`wip.sh abandon`) before starting new work.
 
 **Error: No acceptance criteria found**
 Cause: Feature work attempted without spec.
-Solution: Create `spec/acceptance/F-XXXX.md` first. Use the template at `.agentic/spec/acceptance.template.md`.
+Solution: Create `.agentic/.agentic/spec/acceptance/F-XXXX.md` first. Use the template at `.agentic/lib/templates/acceptance.template.md`.
 
 **Error: Scope too large (>10 files)**
 Cause: Feature is too big for one batch.

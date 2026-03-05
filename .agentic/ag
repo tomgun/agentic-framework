@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# ag — Agentic Framework entry point
+# Bootstraps lib/ if needed, then delegates to lib/tools/ag.sh
+AGENTIC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+bash "$AGENTIC_DIR/bootstrap.sh" || { echo "Bootstrap failed" >&2; exit 1; }
+exec bash "$AGENTIC_DIR/lib/tools/ag.sh" "$@"

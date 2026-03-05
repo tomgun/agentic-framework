@@ -15,7 +15,7 @@ phase: testing
 
 ## Test pyramid (default)
 - Unit: most tests, fast, deterministic
-- Integration: fewer, cover boundaries (DB/network/FS) - see `.agentic/quality/integration_testing.md`
+- Integration: fewer, cover boundaries (DB/network/FS) - see `.agentic/lib/quality/integration_testing.md`
 - Acceptance/E2E: smallest set, cover critical flows
 
 ## What counts as a "unit"
@@ -25,7 +25,7 @@ phase: testing
 ## Principles
 - Deterministic and isolated: no reliance on time/network/global state.
 - Clear assertions: test one behavior, one reason to fail.
-- Prefer contract tests at boundaries (see `.agentic/quality/integration_testing.md` for details).
+- Prefer contract tests at boundaries (see `.agentic/lib/quality/integration_testing.md` for details).
 - **Test edge cases and errors, not just happy paths** (see below).
 
 ---
@@ -340,7 +340,7 @@ When running tests for a release:
 
 1. **Update VERSION first**: `echo "X.Y.Z" > VERSION`
 2. **Update STACK.md version** to match
-3. **Update spec/FEATURES.md version** to match
+3. **Update .agentic/.agentic/spec/FEATURES.md version** to match
 4. **THEN run tests**: `bash tests/validate_framework.sh`
 5. **Update result files** with new version:
    - `tests/VERIFICATION_REPORT.md` - Test counts, feature list
@@ -366,8 +366,8 @@ bash tests/validate_framework.sh  # Shows v0.16.0
 
 ## See Also
 
-- TDD workflow: `.agentic/workflows/tdd_mode.md`
-- Integration testing: `.agentic/quality/integration_testing.md`
-- Design for testability: `.agentic/quality/design_for_testability.md`
-- Review checklist: `.agentic/quality/review_checklist.md`
+- TDD workflow: `.agentic/lib/workflows/tdd_mode.md`
+- Integration testing: `.agentic/lib/quality/integration_testing.md`
+- Design for testability: `.agentic/lib/quality/design_for_testability.md`
+- Review checklist: `.agentic/lib/quality/review_checklist.md`
 

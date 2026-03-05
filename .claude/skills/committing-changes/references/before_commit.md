@@ -51,20 +51,20 @@ phase: commit
 
 ## Work-In-Progress Check (FIRST!)
 
-- [ ] **.agentic-state/WIP.md must be completed**
+- [ ] **.agentic/session/WIP.md must be completed**
   ```bash
   # Check if WIP lock exists (no output = doesn't exist = OK)
-  ls .agentic-state/WIP.md 2>/dev/null || true
+  ls .agentic/session/WIP.md 2>/dev/null || true
   ```
   
-  - **If .agentic-state/WIP.md exists**: Work is not yet complete!
-    - Complete work first: `bash .agentic/tools/wip.sh complete`
+  - **If .agentic/session/WIP.md exists**: Work is not yet complete!
+    - Complete work first: `bash .agentic/lib/tools/wip.sh complete`
     - This removes the WIP lock file
-    - **NEVER commit while .agentic-state/WIP.md exists** (indicates incomplete work)
+    - **NEVER commit while .agentic/session/WIP.md exists** (indicates incomplete work)
   
-  - **If .agentic-state/WIP.md does not exist**: ✓ OK to proceed with commit checks
+  - **If .agentic/session/WIP.md does not exist**: ✓ OK to proceed with commit checks
 
-**Why**: .agentic-state/WIP.md is a lock file that tracks in-progress work. If it exists, the work is not ready for commit.
+**Why**: .agentic/session/WIP.md is a lock file that tracks in-progress work. If it exists, the work is not ready for commit.
 
 ---
 
@@ -76,7 +76,7 @@ phase: commit
   - No test failures or errors
 
 - [ ] **Smoke test passed** (CRITICAL for user-facing changes)
-  - See `.agentic/checklists/smoke_testing.md` for full checklist
+  - See `.agentic/lib/checklists/smoke_testing.md` for full checklist
   - Quick: app starts, primary action works, no errors
   - **If smoke test fails, DO NOT commit - fix it first**
 
@@ -87,7 +87,7 @@ phase: commit
   - Stack-specific checks must pass
 
 - [ ] **Code follows standards**
-  - Check `.agentic/quality/programming_standards.md`
+  - Check `.agentic/lib/quality/programming_standards.md`
   - Clear names, small functions, explicit errors
   - No obvious code smells
 
@@ -102,7 +102,7 @@ phase: commit
 
 ### Core Profile
 
-- [ ] **`OVERVIEW.md` reflects reality**
+- [ ] **`.agentic/OVERVIEW.md` reflects reality**
   - Implemented capabilities marked with [x]
   - "What works now" is accurate
   - "Known limitations" is current
@@ -120,7 +120,7 @@ phase: commit
 
 ### Formal Profile (All Core items plus:)
 
-- [ ] **`spec/FEATURES.md` reflects reality**
+- [ ] **`.agentic/.agentic/spec/FEATURES.md` reflects reality**
   - Status accurate (`planned` / `in_progress` / `shipped`)
   - Implementation State accurate (`none` / `partial` / `complete`)
   - **CRITICAL**: Never `State: none` if code exists
@@ -128,13 +128,13 @@ phase: commit
   - Tests: Accurate state (`todo` / `partial` / `complete`)
   - Verification: `Accepted: no` (human will accept later)
 
-- [ ] **`STATUS.md` updated**
+- [ ] **`.agentic/STATUS.md` updated**
   - Current session state reflects work done
   - Completed this session lists accomplishments
   - Next immediate step is clear
   - Blockers documented (if any)
 
-- [ ] **`spec/acceptance/F-####.md` exists** (if feature work)
+- [ ] **`.agentic/.agentic/spec/acceptance/F-####.md` exists** (if feature work)
   - Acceptance criteria defined
   - Not a placeholder
   - Testable conditions listed
@@ -221,7 +221,7 @@ docs(readme): update installation instructions
 - [ ] **Check for untracked files** (CRITICAL - prevents deployment issues!)
   ```bash
   git status --short | grep '??'
-  # Or: bash .agentic/tools/check-untracked.sh
+  # Or: bash .agentic/lib/tools/check-untracked.sh
   ```
   - Check: assets/, src/, tests/, spec/, docs/ for untracked files
   - **If you created new files, they MUST be git added!**
@@ -264,7 +264,7 @@ docs(readme): update installation instructions
 ❌ **Don't** commit without human approval
 ❌ **Don't** commit with failing tests
 ❌ **Don't** commit without updating JOURNAL.md
-❌ **Don't** commit with stale FEATURES.md/OVERVIEW.md
+❌ **Don't** commit with stale FEATURES.md/.agentic/OVERVIEW.md
 ❌ **Don't** commit with "(Not yet created)" placeholders
 ❌ **Don't** commit debug code (console.log, etc.)
 

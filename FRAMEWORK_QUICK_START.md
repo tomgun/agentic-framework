@@ -45,7 +45,7 @@ Framework features apply to different profiles:
 
 | Profile | What Users Get | Key Files |
 |---------|---------------|-----------|
-| **Discovery** | Token efficiency, developer UX, workflows, quality gates | STATUS.md, CONTEXT_PACK.md, JOURNAL.md, .agentic-state/WIP.md |
+| **Discovery** | Token efficiency, developer UX, workflows, quality gates | STATUS.md, CONTEXT_PACK.md, JOURNAL.md, .agentic/session/WIP.md |
 | **Formal** | Discovery + formal specs, feature tracking, acceptance criteria | + spec/FEATURES.md, spec/acceptance/ |
 
 **When adding framework features, know which profile it affects:**
@@ -150,7 +150,7 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 | Agent guidelines | `.agentic/agents/shared/` |
 | Full dev guide | `FRAMEWORK_DEVELOPMENT.md` |
 | Principles | `.agentic/PRINCIPLES.md` |
-| Change manifests | `.agentic-journal/manifests/` (use `manifest.sh F-####`) |
+| Change manifests | `.agentic/journal/manifests/` (use `manifest.sh F-####`) |
 | Doc drift check | `drift.sh --docs` or `drift.sh --docs --manifest F-####` |
 
 ---

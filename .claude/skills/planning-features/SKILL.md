@@ -22,7 +22,7 @@ Create thorough implementation plans with review loops before coding.
 ### Step 1: Understand the Request
 
 1. Read the user's description of what they want to build
-2. Check `spec/FEATURES.md` for related features
+2. Check `.agentic/.agentic/spec/FEATURES.md` for related features
 3. Check existing code for patterns to follow
 
 ### Step 2: Research and Explore
@@ -69,7 +69,7 @@ Skip this section for simple features (≤5 ACs) unless multi-agent dispatch is 
 
 ### Step 5: Save Plan Durably
 
-After approval, save the plan to `.agentic-journal/plans/F-XXXX-plan.md`.
+After approval, save the plan to `.agentic/journal/plans/F-XXXX-plan.md`.
 
 Plans in `~/.claude/plans/` are session-scoped and will be lost. Always copy to the durable location.
 
@@ -77,7 +77,7 @@ Plans in `~/.claude/plans/` are session-scoped and will be lost. Always copy to 
 
 After plan approval, start implementation:
 ```bash
-bash .agentic/tools/wip.sh start F-XXXX "Description" "files"
+bash .agentic/lib/tools/wip.sh start F-XXXX "Description" "files"
 ```
 
 Then follow the `implementing-features` workflow.
@@ -90,7 +90,7 @@ Steps taken:
 1. Explore codebase for existing caching patterns
 2. Check STACK.md for technology constraints
 3. Present plan: Redis for session cache, in-memory for hot paths
-4. User approves, save to `.agentic-journal/plans/F-0155-plan.md`
+4. User approves, save to `.agentic/journal/plans/F-0155-plan.md`
 Result: Clear plan with file list, ready for implementation.
 
 **Example 2: User wants to think before coding**

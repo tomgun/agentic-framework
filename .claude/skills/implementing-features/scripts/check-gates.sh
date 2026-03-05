@@ -14,11 +14,11 @@ fi
 ERRORS=0
 
 # Gate 1: Acceptance criteria
-if [[ -f "spec/acceptance/${FEATURE_ID}.md" ]]; then
-    echo "✓ Acceptance criteria found: spec/acceptance/${FEATURE_ID}.md"
+if [[ -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
+    echo "✓ Acceptance criteria found: .agentic/spec/acceptance/${FEATURE_ID}.md"
 else
-    echo "✗ No acceptance criteria at spec/acceptance/${FEATURE_ID}.md"
-    echo "  Create criteria FIRST: use .agentic/spec/acceptance.template.md"
+    echo "✗ No acceptance criteria at .agentic/spec/acceptance/${FEATURE_ID}.md"
+    echo "  Create criteria FIRST: use .agentic/lib/templates/acceptance.template.md"
     ERRORS=$((ERRORS + 1))
 fi
 
@@ -31,17 +31,17 @@ else
 fi
 
 # Gate 3: Feature in FEATURES.md
-if grep -q "## ${FEATURE_ID}:" spec/FEATURES.md 2>/dev/null || \
-   grep -q "## ${FEATURE_ID} " spec/FEATURES.md 2>/dev/null; then
-    echo "✓ Feature tracked in spec/FEATURES.md"
+if grep -q "## ${FEATURE_ID}:" .agentic/spec/FEATURES.md 2>/dev/null || \
+   grep -q "## ${FEATURE_ID} " .agentic/spec/FEATURES.md 2>/dev/null; then
+    echo "✓ Feature tracked in .agentic/spec/FEATURES.md"
 else
-    echo "⚠ Feature ${FEATURE_ID} not found in spec/FEATURES.md (add it)"
+    echo "⚠ Feature ${FEATURE_ID} not found in .agentic/spec/FEATURES.md (add it)"
 fi
 
 # Gate 4: Approved plan required (if plan_review_enabled in STACK.md)
 PLAN_REVIEW=$(grep "plan_review_enabled:" STACK.md 2>/dev/null | head -1 | awk '{print $NF}' || true)
 if [[ "$PLAN_REVIEW" == "yes" ]]; then
-    PLAN_FILE=$(find .agentic-journal/plans/ -name "*${FEATURE_ID}*plan*.md" -print -quit 2>/dev/null)
+    PLAN_FILE=$(find .agentic/journal/plans/ -name "*${FEATURE_ID}*plan*.md" -print -quit 2>/dev/null)
     if [[ -n "$PLAN_FILE" ]] && grep -q "^.*Status.*APPROVED" "$PLAN_FILE"; then
         echo "✓ Approved plan exists: $PLAN_FILE"
     else

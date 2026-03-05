@@ -351,7 +351,7 @@ This audit verifies that each claim in `FRAMEWORK_VALUE_PROPOSITION.md` is backe
 
 **Evidence**:
 - `.agentic/tools/wip.sh` (11507 bytes) - comprehensive WIP tracking
-- `.agentic-state/WIP.md` for tracking state
+- `.agentic/session/WIP.md` for tracking state
 - `.agentic/workflows/work_in_progress.md` - workflow documentation
 - Pre-commit blocks if WIP.md exists
 
