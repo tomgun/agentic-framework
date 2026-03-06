@@ -132,6 +132,7 @@ COMMANDS:
     test llm [options]  Run LLM behavioral tests
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
+    auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -146,6 +147,9 @@ EXAMPLES:
     ag todo done T-0001 "done"  # Resolve item
     ag docs                     # Draft docs for current work
     ag docs --list              # Show doc registry
+    ag auto init                # Set up auto mode settings
+    ag auto status              # Check engine state
+    ag auto pause               # Pause running engine
     ag sync                     # Full sync: detect + auto-fix
     ag sync --check             # Dry run: detect only
     ag commit                   # Verify ready to commit
@@ -188,6 +192,7 @@ COMMANDS:
     test llm [options]  Run LLM behavioral tests
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
+    auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -209,6 +214,13 @@ EXAMPLES:
     ag todo done T-0001 "done"  # Resolve item
     ag commit                   # Verify ready to commit
     ag done F-0042              # Check feature completion
+    ag auto init                # Set up auto mode (generates settings.json)
+    ag auto init --tier 1       # Set up for Docker sandbox
+    ag auto status              # Check engine state
+    ag auto pause               # Pause running engine
+    ag auto resume              # Resume paused engine
+    ag auto stop                # Stop running engine
+    ag auto feedback AC-003 "use existing auth"
     ag approve-onboarding       # List unapproved proposals
     ag approve-onboarding --all # Approve all proposals
     ag trace                    # Full drift + coverage report
@@ -1242,6 +1254,72 @@ cmd_hooks() {
             echo "  install             Set core.hooksPath to .agentic/hooks"
             echo "  status              Show current hook configuration"
             echo "  disable --confirm   Remove core.hooksPath (disables all quality gates)"
+            ;;
+    esac
+}
+
+# Auto command - autonomous workflow engine
+cmd_auto() {
+    local subcmd="${1:-}"
+    shift 2>/dev/null || true
+
+    local auto_dir="$SCRIPT_DIR/../auto"
+
+    case "$subcmd" in
+        init)
+            # Generate settings.json for auto mode
+            local tier_flag=""
+            local dry_run=""
+            while [[ $# -gt 0 ]]; do
+                case "$1" in
+                    --tier) tier_flag="--tier $2"; shift 2 ;;
+                    --dry-run) dry_run="--dry-run"; shift ;;
+                    *) shift ;;
+                esac
+            done
+            python3 "$auto_dir/init.py" --project-root "$ROOT_DIR" $tier_flag $dry_run
+            ;;
+        status|pause|resume|stop)
+            python3 "$auto_dir/control.py" "$subcmd" --project-root "$ROOT_DIR"
+            ;;
+        verify)
+            # Autonomous test-fix loop (F-0161)
+            python3 "$auto_dir/verify.py" --project-root "$ROOT_DIR" "$@"
+            ;;
+        task)
+            # Single-feature implementation (F-0162)
+            python3 "$auto_dir/task.py" --project-root "$ROOT_DIR" "$@"
+            ;;
+        crunch)
+            # Multi-feature batch mode (F-0163)
+            python3 "$auto_dir/crunch.py" --project-root "$ROOT_DIR" "$@"
+            ;;
+        feedback)
+            python3 "$auto_dir/control.py" feedback "$@" --project-root "$ROOT_DIR"
+            ;;
+        ""|--help)
+            echo "ag auto - Autonomous workflow engine"
+            echo ""
+            echo "COMMANDS:"
+            echo "  init [--tier N]       Generate settings.json (N=1 sandboxed, 2 scoped, 3 interactive)"
+            echo "  verify                Run test-fix loop until green (F-0161)"
+            echo "  task <F-XXXX>         Implement a single feature autonomously (F-0162)"
+            echo "  crunch [--features .] Implement multiple features in batch (F-0163)"
+            echo "  status                Show engine state"
+            echo "  pause                 Pause running engine"
+            echo "  resume                Resume paused engine"
+            echo "  stop                  Stop running engine"
+            echo "  feedback <AC> <text>  Send feedback for an acceptance criterion"
+            echo ""
+            echo "TIERS:"
+            echo "  1: Sandboxed   - Docker/VM + --dangerously-skip-permissions"
+            echo "  2: Scoped      - settings.json with explicit permissions (default)"
+            echo "  3: Interactive - Normal approval prompts (safest, slowest)"
+            ;;
+        *)
+            echo -e "${RED}Unknown auto command: $subcmd${NC}"
+            echo "Run 'ag auto --help' for usage."
+            exit 1
             ;;
     esac
 }
@@ -2442,6 +2520,10 @@ case "${1:-help}" in
         ;;
     tools)
         cmd_tools
+        ;;
+    auto)
+        shift
+        cmd_auto "$@"
         ;;
     sync)
         cmd_sync "${2:-}"

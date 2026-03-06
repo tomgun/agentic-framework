@@ -2507,6 +2507,33 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## Autonomous Workflow Mode Design (v0.42.0, 2026-03-06)
+
+### Research & Architecture Direction
+
+**User direction**: Initiated autonomous workflow mode research. Identified three open-source autonomous Claude orchestrators and directed comparative analysis to extract patterns. Key architectural insights:
+- Fresh Claude instance per task unit (prevents context degradation)
+- Doer + verifier separation (two-agent pattern)
+- Post-processing in deterministic code, not AI (state reliability)
+- Acceptance criteria as executable verification contracts (framework's unique advantage)
+
+**Review decisions** (from plan review session):
+- Python engine over shell (stdlib only, zero deps) — shell won't hold for JSON state, subprocess management, signal handling
+- Per-batch verification, not per-AC (test suite after each AC, verification agent once per feature)
+- Three-tier trust model: Sandboxed (Docker) / Scoped (settings.json) / Interactive (approval prompts)
+- Friendly cost warnings, not hard budget caps
+- Feature ordering: Foundation → verify → task → crunch → GUI
+
+### Open Question Resolutions
+
+**Control mechanism**: Directed Unix domain socket design over control-file polling or signals. Bidirectional JSON protocol with ack responses. CLI client (`ag auto pause/resume/stop/feedback/status`). Stale socket detection via connection attempt.
+
+**Settings.json template**: Scoped permissions for Tier 2 — file ops, git, test runners, framework scripts allowed; destructive ops denied. Template generated from STACK.md by `ag auto init`.
+
+**Oversized AC handling**: Detect-and-escalate, not auto-split. Pre-flight complexity estimation (one prompt), runtime context exhaustion detection (>80% window + failing tests). Skip oversized ACs and continue — splitting ACs changes the spec (human decision).
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.41.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

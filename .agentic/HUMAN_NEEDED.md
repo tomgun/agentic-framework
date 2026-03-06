@@ -24,6 +24,14 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0018: Review PR #62: restructure .agentic/ directory (v0.41.0)
+- **Type**: pr_review
+- **Added**: 2026-03-06
+- **Context**: Major restructure — lib/ separation, tarball distribution, path consolidation. 678 files changed. https://github.com/tomgun/agentic-framework/pull/62
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 ### HN-0017: PR #61: Enforcement gap fixes v0.40.0 (F-0154/F-0155/F-0156)

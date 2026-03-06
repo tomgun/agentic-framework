@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "Bash(git *)",
+      "Bash(cd * && npm test *)",
+      "Bash(cd * && npm run *)",
+      "Bash(cd * && pnpm *)",
+      "Bash(cd * && bun *)",
+      "Bash(cd * && python *)",
+      "Bash(cd * && bash tests/*)",
+      "Bash(cd * && bash .agentic/*)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(curl * | bash*)",
+      "Bash(wget * | bash*)"
+    ]
+  }
+}

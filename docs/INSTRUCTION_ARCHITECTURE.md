@@ -1,7 +1,7 @@
 # Instruction Architecture Design Document
 
 **Status**: Authoritative design basis for the Agentic AI Framework's instruction file architecture.
-**Last validated**: 2026-03-02
+**Last validated**: 2026-03-06
 **Owner**: Framework maintainer (whoever merges changes to `.agentic/`)
 
 **Rule**: When source research documents and this design document disagree, this document wins.
@@ -34,6 +34,52 @@ This design synthesizes two independent research efforts:
 ---
 
 ## 2. The Three-Layer Architecture
+
+```mermaid
+graph TB
+    subgraph L1["Layer 1: Constitution"]
+        CLAUDE[CLAUDE.md<br/>~40 lines]
+        CURSOR[.cursorrules<br/>~27 lines]
+        COPILOT[copilot-instructions.md]
+        CODEX[codex-instructions.md]
+    end
+
+    subgraph L2["Layer 2: Playbooks"]
+        SKILLS[Claude Skills<br/>12 hand-crafted]
+        AUTO_ORCH[auto_orchestration.md<br/>442 lines]
+        CHECKLISTS[9 checklists]
+        AG[ag.sh gateway<br/>25+ commands]
+    end
+
+    subgraph L3["Layer 3: Project State"]
+        subgraph GIT_TRACKED["Git-tracked"]
+            STACK[STACK.md]
+            STATUS[STATUS.md]
+            JOURNAL[JOURNAL.md]
+            FEATURES[FEATURES.md]
+        end
+        subgraph SESSION["Session-local (gitignored)"]
+            WIP[WIP.md]
+            AGENTS_ACTIVE[AGENTS_ACTIVE.md]
+            AUTO_STATE[auto-state.json<br/>auto.sock / auto.pid]
+        end
+    end
+
+    subgraph DEFENSE["Defense-in-Depth"]
+        MEMORY[memory-seed.md<br/>persistent memory]
+        HOOKS[git core.hooksPath<br/>pre-commit gates]
+    end
+
+    L1 -->|"agent reads<br/>at session start"| L2
+    L2 -->|"ag commands<br/>load just-in-time"| L3
+    HOOKS -->|"structural<br/>enforcement"| L3
+    MEMORY -.->|"reinforces<br/>(redundant)"| L1
+
+    style L1 fill:#4a90d9,color:#fff
+    style L2 fill:#50b356,color:#fff
+    style L3 fill:#e8a838,color:#fff
+    style DEFENSE fill:#999,color:#fff
+```
 
 ### Layer 1: Constitution (instruction files)
 
@@ -88,6 +134,10 @@ Other tools (Cursor, Copilot, Codex) continue using `auto_orchestration.md` + `a
 **Session-local state** (gitignored):
 - `.agentic/session/WIP.md` — work-in-progress lock
 - `.agentic/session/AGENTS_ACTIVE.md` — multi-agent coordination
+- `.agentic/session/auto.sock` — Unix domain socket for engine control
+- `.agentic/session/auto.pid` — engine PID file
+- `.agentic/session/auto-state.json` — engine progress state
+- `.agentic/session/crunch-state.json` — batch mode progress
 
 **Design property**: State that must survive across machines goes in git-tracked files. State that is session-local goes in gitignored files. This distinction must be preserved.
 
@@ -124,6 +174,7 @@ The framework uses a **distributed enforcement model** — this is a conscious d
 - `pre-commit-check.sh` — runs 17 structural checks
 - `ag done` — runs `doctor.sh --phase complete` (but `|| true` in `cmd_done()` currently suppresses failures — see Gap 4)
 - `context-for-role.sh` — assembles role-specific context for subagents
+- `ag auto verify/task/crunch` — autonomous engine with Unix socket control, per-AC Claude instances, three-tier trust model (F-0160–F-0163)
 
 ---
 

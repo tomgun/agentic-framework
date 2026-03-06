@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.40.0
+**Version**: 0.42.0
 
 ---
 
@@ -24,6 +24,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 | **Design Principles** | 10 | 10 | 0 | 0 |
 | **Agent System** | 12 | 10 | 2 | 0 |
 | **Verification & Enforcement** | 17 | 16 | 0 | 1 |
+| **Autonomous** | 4 | 4 | 0 | 0 |
 
 ---
 
@@ -2605,4 +2606,79 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 - Tests: `tests/validate_framework.sh`
 
 **Acceptance**: See `spec/acceptance/F-0159.md`
+
+---
+
+## F-0160: Autonomous Engine Foundation
+
+**Status**: shipped
+**Category**: Autonomous
+**Priority**: critical
+**Complexity**: high
+**Since**: v0.42.0
+
+**Description**: Foundation for autonomous workflow engine. Python engine (stdlib only) with thread-safe state management, Unix domain socket control plane (pause/resume/stop/feedback/status), three-tier permission model with `ag auto init` settings.json generator, acceptance criteria loader, pre-flight complexity estimation, and LARGE AC auto-decomposition into sub-tasks.
+
+**Dependencies**: F-0157 (directory restructure), F-0158 (path resolution)
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/lib/auto/engine.py`, `.agentic/lib/auto/control.py`, `.agentic/lib/auto/init.py`, `.agentic/lib/auto/settings-template.json`, `.agentic/lib/auto/prompts/`
+- Tests: `tests/test_auto_engine.py` (32 tests), `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0160.md`
+
+---
+
+## F-0161: Autonomous Verify Mode
+
+**Status**: shipped
+**Category**: Autonomous
+**Priority**: high
+**Complexity**: medium
+
+**Description**: Test-fix loop mode (`ag auto verify`). Runs project test suite, spawns fresh Claude instance with failure output + relevant code, Claude fixes failures, re-runs tests, repeats until green or max iterations. Highest value, lowest risk entry point for autonomous mode.
+
+**Dependencies**: F-0160
+
+**Implementation**:
+- State: not started
+
+**Acceptance**: See `spec/acceptance/F-0161.md`
+
+---
+
+## F-0162: Autonomous Task Mode
+
+**Status**: shipped
+**Category**: Autonomous
+**Priority**: high
+**Complexity**: high
+
+**Description**: Single feature implementation mode (`ag auto task F-XXXX`). Reads spec + acceptance criteria, creates feature branch + worktree, loops fresh Claude instances per AC, runs tests after each, commits if passing, creates PR for human review. Uses F-0160 control plane and state management.
+
+**Dependencies**: F-0160, F-0161
+
+**Implementation**:
+- State: not started
+
+**Acceptance**: See `spec/acceptance/F-0162.md`
+
+---
+
+## F-0163: Autonomous Crunch Mode
+
+**Status**: shipped
+**Category**: Autonomous
+**Priority**: medium
+**Complexity**: high
+
+**Description**: Multi-feature batch mode (`ag auto crunch`). Orchestrates multiple F-0162 task runs in priority order, tracks overall progress, per-batch verification agent review, stops on max errors or human intervention.
+
+**Dependencies**: F-0160, F-0161, F-0162
+
+**Implementation**:
+- State: not started
+
+**Acceptance**: See `spec/acceptance/F-0163.md`
 
