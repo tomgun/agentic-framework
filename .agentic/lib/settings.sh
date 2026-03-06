@@ -329,6 +329,10 @@ show_all_settings() {
         "pre_commit_hook"
         "docs_gate"
         "spec_analysis"
+        "docs_stale_days"
+        "periodic_orphaned_plans"
+        "periodic_retro_check"
+        "periodic_agent_refresh"
         "plan_review_max_iterations"
         "pipeline_enabled"
     )
