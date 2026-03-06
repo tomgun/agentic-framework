@@ -1239,3 +1239,93 @@
 
 **Blockers**: none
 
+
+### Session: 2026-03-05 22:18 - smoke-test
+
+**Accomplished**:
+- paths.sh migration
+
+**Next steps**:
+- verify
+
+**Blockers**: none
+
+
+### Session: 2026-03-05 22:19 - Test Entry
+
+**Accomplished**:
+- Did testing
+
+**Next steps**:
+- More tests
+
+**Blockers**: None
+
+
+### Session: 2026-03-05 22:30 - Test Entry
+
+**Accomplished**:
+- Did testing
+
+**Next steps**:
+- More tests
+
+**Blockers**: None
+
+
+### Session: 2026-03-05 22:32 - Test Entry
+
+**Accomplished**:
+- Did testing
+
+**Next steps**:
+- More tests
+
+**Blockers**: None
+
+
+### Session: 2026-03-06 15:50 - smoke-test
+
+**Accomplished**:
+- paths.sh migration
+
+**Next steps**:
+- verify
+
+**Blockers**: none
+
+
+### Session: 2026-03-06 15:51 - Test Entry
+
+**Accomplished**:
+- Did testing
+
+**Next steps**:
+- More tests
+
+**Blockers**: None
+
+
+### Session: 2026-03-06 16:23 - smoke-test
+
+**Accomplished**:
+- paths.sh migration
+
+**Next steps**:
+- verify
+
+**Blockers**: none
+
+
+### Session: 2026-03-06 16:29 - v0.41.0 Directory Restructure
+
+**Why**: Major architectural change reducing user repo footprint from 369 files to 5
+
+**Accomplished**:
+- Completed 4-phase restructure: paths.sh abstraction, lib/ separation, project file consolidation, tarball release pipeline. Fixed review issues: pre-commit CI detection, macOS grep compat, stale docs. Updated CONTRIBUTIONS.md.
+
+**Next steps**:
+- Merge PR #62 after human review. Test upgrade path from v0.40.0.
+
+**Blockers**: PR #62 awaiting review
+

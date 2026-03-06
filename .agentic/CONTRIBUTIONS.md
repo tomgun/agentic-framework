@@ -1,7 +1,7 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.37.0)
+**Period**: Initial Development (v0.1.0 → v0.41.0)
 **Date**: 2026-03-02
 
 ---
@@ -2485,8 +2485,30 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+## Directory Restructure & Tarball Distribution (v0.41.0, 2026-03-06)
+
+### Consolidating Everything Under `.agentic/`
+
+**User direction**: The project root was cluttered with 18 .md files, 3 separate `.agentic*` directories (`.agentic/`, `.agentic-journal/`, `.agentic-state/`), and 369 framework library files committed to every user repo (~1.1MB). Restructure everything under a single `.agentic/` directory with clear separation: `lib/` for framework runtime (gitignored in user projects), flat tracking files at `.agentic/` root, `spec/`, `journal/`, `session/`, `local/` as siblings.
+
+**Key design decisions**:
+- Framework runtime (`tools/`, `agents/`, `workflows/`, `quality/`, etc.) moves into `.agentic/lib/` — committed in framework repo, gitignored in user projects
+- User projects commit only thin wrappers (`bootstrap.sh`, `ag`, hook delegates) + a tarball (~250KB) — `bootstrap.sh` auto-extracts `lib/` at runtime
+- Central path resolver (`paths.sh`/`paths.py`) with `_resolve_path()` backward-compat helper — single source of truth for all paths, checks new location first, falls back to legacy
+- Tracking files (STATUS.md, TODO.md, HUMAN_NEEDED.md) move from project root to `.agentic/` root
+- `.agentic-journal/` → `.agentic/journal/`, `.agentic-state/` → `.agentic/session/`, `spec/` → `.agentic/spec/`
+- `.agentic/lib/templates/` (renamed from `spec/` inside lib) to avoid confusion with project specs
+- GitHub Actions release workflow builds `agentic-lib-v{VERSION}.tar.gz` as a release artifact
+- Pre-commit thin wrapper retains CI detection + STACK.md mode reading before delegating to `lib/hooks/`
+- 30+ places with `STATUS.md || OVERVIEW.md` conditional logic
+- Removed all conditional patterns (`STATUS.md || OVERVIEW.md`)
+
+**Impact**: User repo footprint drops from ~1.1MB/369 files to ~250KB/5 committed files. Project root reduced to 7 files. Single `.agentic/` directory replaces 3 separate directories. `paths.sh` abstraction makes future file moves trivial. 680 files changed, ~70 scripts migrated to use path resolver. Tests: 372/0 validation, 42/42 path smoke test.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.40.0
+**Current Version**: v0.41.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions
