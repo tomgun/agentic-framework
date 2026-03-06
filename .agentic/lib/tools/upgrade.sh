@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # upgrade.sh: Upgrades the Agentic Framework in an existing project
-# Usage: bash path/to/new-framework/.agentic/tools/upgrade.sh /path/to/your-project
+# Usage: bash path/to/new-framework/.agentic/lib/tools/upgrade.sh /path/to/your-project
 # Debug: DEBUG=yes bash upgrade.sh /path/to/project
 set -euo pipefail
 
@@ -82,7 +82,7 @@ if [[ ! -d "$NEW_FRAMEWORK_DIR/.agentic" ]]; then
   echo -e "${RED}✗ Error: New framework structure invalid${NC}"
   echo "  Expected: $NEW_FRAMEWORK_DIR/.agentic/"
   echo "  This script must be run FROM the new framework directory"
-  echo "  Usage: bash /path/to/new-framework/.agentic/tools/upgrade.sh /path/to/your-project"
+  echo "  Usage: bash /path/to/new-framework/.agentic/lib/tools/upgrade.sh /path/to/your-project"
   exit 1
 fi
 
@@ -240,13 +240,13 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 if [[ "$DRY_RUN" == "yes" ]]; then
   echo "  [DRY RUN] Would regenerate Claude Skills"
-elif [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/generate-skills.sh" ]]; then
+elif [[ -f "$TARGET_PROJECT_DIR/.agentic/lib/tools/generate-skills.sh" ]]; then
   # Remove old generated skills (keep custom skills)
   if [[ -d "$TARGET_PROJECT_DIR/.claude/skills" ]]; then
     # Remove skills from old subagent-based generator or current framework generator
     for skill_dir in "$TARGET_PROJECT_DIR/.claude/skills"/*; do
       if [[ -d "$skill_dir" ]] && [[ -f "$skill_dir/SKILL.md" ]]; then
-        if grep -q "Generated from: .agentic/agents/claude/subagents" "$skill_dir/SKILL.md" 2>/dev/null || \
+        if grep -q "Generated from: .agentic/lib/agents/claude/subagents" "$skill_dir/SKILL.md" 2>/dev/null || \
            grep -q "author: agentic-framework" "$skill_dir/SKILL.md" 2>/dev/null; then
           rm -rf "$skill_dir"
         fi
@@ -255,7 +255,7 @@ elif [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/generate-skills.sh" ]]; then
   fi
 
   # Generate fresh skills
-  bash "$TARGET_PROJECT_DIR/.agentic/tools/generate-skills.sh" 2>/dev/null || true
+  bash "$TARGET_PROJECT_DIR/.agentic/lib/tools/generate-skills.sh" 2>/dev/null || true
 
   if [[ -d "$TARGET_PROJECT_DIR/.claude/skills" ]]; then
     SKILL_COUNT=$(ls -1 "$TARGET_PROJECT_DIR/.claude/skills/" 2>/dev/null | wc -l | tr -d ' ')
@@ -283,8 +283,8 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 if [[ "$DRY_RUN" == "yes" ]]; then
   echo "  [DRY RUN] Would regenerate instruction files (CLAUDE.md, .cursorrules, copilot, codex)"
-elif [[ -x "$TARGET_PROJECT_DIR/.agentic/tools/setup-agent.sh" ]]; then
-  bash "$TARGET_PROJECT_DIR/.agentic/tools/setup-agent.sh" all 2>/dev/null || true
+elif [[ -x "$TARGET_PROJECT_DIR/.agentic/lib/tools/setup-agent.sh" ]]; then
+  bash "$TARGET_PROJECT_DIR/.agentic/lib/tools/setup-agent.sh" all 2>/dev/null || true
   echo -e "  ${GREEN}✓${NC} Instruction files regenerated (CLAUDE.md, .cursorrules, copilot, codex)"
 else
   echo -e "  ${YELLOW}⚠ setup-agent.sh not found, skipping${NC}"
@@ -319,14 +319,14 @@ fi
 if [[ ! -f "$TARGET_PROJECT_DIR/STATUS.md" ]]; then
   echo "  STATUS.md not found - creating (now required for all profiles)"
 
-  if [[ -f "$NEW_FRAMEWORK_DIR/.agentic/init/STATUS.template.md" ]]; then
-    cp "$NEW_FRAMEWORK_DIR/.agentic/init/STATUS.template.md" "$TARGET_PROJECT_DIR/STATUS.md"
+  if [[ -f "$NEW_FRAMEWORK_DIR/.agentic/lib/init/STATUS.template.md" ]]; then
+    cp "$NEW_FRAMEWORK_DIR/.agentic/lib/init/STATUS.template.md" "$TARGET_PROJECT_DIR/STATUS.md"
     echo -e "  ${GREEN}✓${NC} Created STATUS.md from template"
 
     # Add to upgrade marker TODO
     STATUS_MD_MIGRATION="yes"
   else
-    echo -e "  ${YELLOW}⚠${NC} Template not found - run: bash .agentic/init/scaffold.sh"
+    echo -e "  ${YELLOW}⚠${NC} Template not found - run: bash .agentic/lib/init/scaffold.sh"
   fi
 else
   echo -e "  ${GREEN}✓${NC} STATUS.md already exists"
@@ -376,7 +376,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 if [[ "$DRY_RUN" == "yes" ]]; then
   echo "  [DRY RUN] Would create any missing state files"
 else
-  STATE_FILES_CONF="$TARGET_PROJECT_DIR/.agentic/init/state-files.conf"
+  STATE_FILES_CONF="$TARGET_PROJECT_DIR/.agentic/lib/init/state-files.conf"
   if [[ -f "$STATE_FILES_CONF" ]]; then
     CREATED_COUNT=0
     while IFS=: read -r dst_rel src_rel file_profile; do
@@ -493,7 +493,7 @@ COMPLEXITY_EOF
 
   # Add or repair ## Settings section in STACK.md (v0.27.0+)
   if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
-    TEMPLATE_FILE="$NEW_FRAMEWORK_DIR/.agentic/init/STACK.template.md"
+    TEMPLATE_FILE="$NEW_FRAMEWORK_DIR/.agentic/lib/init/STACK.template.md"
     PRESETS_FILE="$NEW_FRAMEWORK_DIR/.agentic/presets/profiles.conf"
     STACK_FILE="$TARGET_PROJECT_DIR/STACK.md"
 
@@ -649,20 +649,20 @@ if [[ "$DRY_RUN" == "yes" ]]; then
   echo "  [DRY RUN] Would run verification checks"
 else
   # Run doctor.sh if available
-  if [[ -x "$TARGET_PROJECT_DIR/.agentic/tools/doctor.sh" ]]; then
+  if [[ -x "$TARGET_PROJECT_DIR/.agentic/lib/tools/doctor.sh" ]]; then
     echo "  Running doctor.sh..."
-    if bash "$TARGET_PROJECT_DIR/.agentic/tools/doctor.sh" > /dev/null 2>&1; then
+    if bash "$TARGET_PROJECT_DIR/.agentic/lib/tools/doctor.sh" > /dev/null 2>&1; then
       echo -e "${GREEN}  ✓ Structure verification passed${NC}"
     else
       echo -e "${YELLOW}  ⚠ Some checks failed (see below)${NC}"
-      bash "$TARGET_PROJECT_DIR/.agentic/tools/doctor.sh" 2>&1 | grep -E "^(Missing|NEW)" || true
+      bash "$TARGET_PROJECT_DIR/.agentic/lib/tools/doctor.sh" 2>&1 | grep -E "^(Missing|NEW)" || true
     fi
   fi
 
   # Check for spec validation
-  if [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/validate_specs.py" ]] && command -v python3 >/dev/null 2>&1; then
+  if [[ -f "$TARGET_PROJECT_DIR/.agentic/lib/tools/validate_specs.py" ]] && command -v python3 >/dev/null 2>&1; then
     echo "  Running spec validation..."
-    VALIDATION_OUTPUT=$(python3 "$TARGET_PROJECT_DIR/.agentic/tools/validate_specs.py" 2>&1)
+    VALIDATION_OUTPUT=$(python3 "$TARGET_PROJECT_DIR/.agentic/lib/tools/validate_specs.py" 2>&1)
     VALIDATION_EXIT=$?
     
     if [[ $VALIDATION_EXIT -eq 0 ]]; then
@@ -673,14 +673,14 @@ else
     else
       echo -e "${YELLOW}  ⚠ Spec validation found issues:${NC}"
       echo "$VALIDATION_OUTPUT" | head -10
-      echo "    Run manually: python3 .agentic/tools/validate_specs.py"
+      echo "    Run manually: python3 .agentic/lib/tools/validate_specs.py"
     fi
   fi
 
   # Run spec format upgrade if available
-  if [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/upgrade_spec_format.py" ]] && command -v python3 >/dev/null 2>&1; then
+  if [[ -f "$TARGET_PROJECT_DIR/.agentic/lib/tools/upgrade_spec_format.py" ]] && command -v python3 >/dev/null 2>&1; then
     echo "  Running spec format upgrade..."
-    UPGRADE_OUTPUT=$(python3 "$TARGET_PROJECT_DIR/.agentic/tools/upgrade_spec_format.py" 2>&1)
+    UPGRADE_OUTPUT=$(python3 "$TARGET_PROJECT_DIR/.agentic/lib/tools/upgrade_spec_format.py" 2>&1)
     UPGRADE_EXIT=$?
     
     if [[ $UPGRADE_EXIT -eq 0 ]]; then
@@ -704,7 +704,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 if [[ "$DRY_RUN" == "yes" ]]; then
   echo "  [DRY RUN] Would run sync --check"
-elif [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/sync.sh" ]]; then
+elif [[ -f "$TARGET_PROJECT_DIR/.agentic/lib/tools/sync.sh" ]]; then
   SYNC_OUTPUT=$(cd "$TARGET_PROJECT_DIR" && bash .agentic/tools/sync.sh --check 2>&1) || true
   if [[ -n "$SYNC_OUTPUT" ]]; then
     echo -e "  ${YELLOW}⚠ Sync check found drift (expected after upgrade):${NC}"
@@ -818,7 +818,7 @@ declare -a FEATURE_REGISTRY=(
   "0.39.0:Spec format evolution:See .agentic/spec/acceptance.template.md:Priority tiers (P1/P2), Behavior section, Verification heading (F-0148)"
   "0.39.0:User extensions:.agentic/local/extensions/:Custom skills, gates, hooks, rules that survive upgrades (F-0151)"
   "0.39.0:Semantic spec analysis:bash .agentic/tools/spec-analyze.sh F-XXXX:Advisory checks before implementation — ambiguity, NFR, coverage gaps (F-0152)"
-  "0.39.0:AC-level test coverage:python3 .agentic/tools/coverage.py --ac-coverage F-XXXX:Per-acceptance-criterion test mapping (F-0153)"
+  "0.39.0:AC-level test coverage:python3 .agentic/lib/tools/coverage.py --ac-coverage F-XXXX:Per-acceptance-criterion test mapping (F-0153)"
 )
 
 # Filter features based on version range
@@ -862,7 +862,7 @@ else
 2. [ ] If "STACK.md updated: no" above → manually update: \`- Version: ${VERSION_TO_USE:-unknown}\`
 3. [ ] Read .agentic/START_HERE.md (5 min) for new workflows
 4. [ ] Re-read .agentic/init/memory-seed.md and update persistent memory
-5. [ ] Validate specs: \`python3 .agentic/tools/validate_specs.py\`
+5. [ ] Validate specs: \`python3 .agentic/lib/tools/validate_specs.py\`
 6. [ ] Review CHANGELOG for ${VERSION_TO_USE:-unknown} changes (see link below)
 $(echo -e "$NEW_FEATURES_SECTION")
 
@@ -889,7 +889,7 @@ echo ""
 # Environment check - show what tool files exist, suggest if missing
 echo ""
 echo "[11/11] Environment check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [[ -f "$TARGET_PROJECT_DIR/.agentic/tools/check-environment.sh" ]]; then
+if [[ -f "$TARGET_PROJECT_DIR/.agentic/lib/tools/check-environment.sh" ]]; then
   cd "$TARGET_PROJECT_DIR"
   bash .agentic/tools/check-environment.sh --list 2>/dev/null || true
   cd - > /dev/null

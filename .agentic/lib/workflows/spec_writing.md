@@ -140,4 +140,4 @@ These gates have **no escape hatch** by design.
 - [Spec Evolution](spec_evolution.md) — how specs grow during implementation
 - [Spec Migrations](spec_migrations.md) — migration format and tooling
 - [Definition of Done](definition_of_done.md)
-- [Acceptance Template](../spec/acceptance.template.md)
+- [Acceptance Template](../templates/acceptance.template.md)

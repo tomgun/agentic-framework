@@ -16,8 +16,8 @@ If the user's intent is to build, implement, add, create, set up, develop, make,
 
 **STOP.** Do not write code yet.
 
-1. If no feature ID exists: assign the next available F-XXXX in .agentic/.agentic/spec/FEATURES.md
-2. Create .agentic/.agentic/spec/acceptance/F-XXXX.md with acceptance criteria FIRST
+1. If no feature ID exists: assign the next available F-XXXX in .agentic/spec/FEATURES.md
+2. Create .agentic/spec/acceptance/F-XXXX.md with acceptance criteria FIRST
 3. Run `ag plan F-XXXX` (starts the plan-review loop)
 4. Run `ag implement F-XXXX` after the plan is approved
 5. If `spec_analysis` is enabled (default: on for formal, off for discovery), `spec-analyze.sh` runs advisory checks — review findings but proceed regardless
@@ -59,7 +59,7 @@ If the user says remember, todo, idea, note for later, tasklist, or mentions som
 
 If the user says "it must always...", "never do X", "performance must stay under...", "security requirement", "accessibility", or describes a cross-cutting constraint that applies beyond a single feature:
 
-**STOP.** This is a Non-Functional Requirement. Check `.agentic/.agentic/spec/NFR.md` — if no matching NFR exists, assign the next NFR-XXXX ID and write it there. NFRs are invariants that must hold across all features, not just the one being discussed. Don't let them stay informal in conversation.
+**STOP.** This is a Non-Functional Requirement. Check `.agentic/spec/NFR.md` — if no matching NFR exists, assign the next NFR-XXXX ID and write it there. NFRs are invariants that must hold across all features, not just the one being discussed. Don't let them stay informal in conversation.
 
 ## When work is done
 
@@ -92,7 +92,7 @@ Never read or edit these files directly. Always use the scripts:
 | .agentic/STATUS.md | `bash .agentic/lib/tools/status.sh focus "Task"` |
 | .agentic/journal/JOURNAL.md | `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"` |
 | .agentic/HUMAN_NEEDED.md | `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"` |
-| .agentic/.agentic/spec/FEATURES.md | `bash .agentic/lib/tools/feature.sh F-#### status shipped` |
+| .agentic/spec/FEATURES.md | `bash .agentic/lib/tools/feature.sh F-#### status shipped` |
 | .agentic/TODO.md | `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"` |
 
 ## Session start
@@ -107,8 +107,8 @@ When a session begins, immediately:
 
 - Development idea or task → `ag todo "description"` (.agentic/TODO.md)
 - Needs human action (PR review, credentials, decision) → `blocker.sh` (.agentic/HUMAN_NEEDED.md)
-- Bug or technical debt → .agentic/.agentic/spec/ISSUES.md
-- New capability to spec → .agentic/.agentic/spec/FEATURES.md
+- Bug or technical debt → .agentic/spec/ISSUES.md
+- New capability to spec → .agentic/spec/FEATURES.md
 
 Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 

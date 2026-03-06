@@ -208,5 +208,5 @@ git commit -m "feat(F-0010): implement login with rate limiting"
 - [Acceptance-Driven Development](../PRINCIPLES.md#acceptance-driven-development)
 - [Feature Implementation Checklist](../checklists/feature_implementation.md)
 - [Definition of Done](definition_of_done.md)
-- [Feature Tracking](../spec/FEATURES.reference.md)
+- [Feature Tracking](../templates/FEATURES.reference.md)
 
