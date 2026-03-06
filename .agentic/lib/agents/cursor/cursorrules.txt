@@ -29,6 +29,7 @@ Rules:
 - Never auto-commit. Show changes to human first.
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later).
+- Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
 - Keep changes small and scoped.
 - Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
 - Multi-agent: read `.agentic-state/AGENTS_ACTIVE.md` before starting work.

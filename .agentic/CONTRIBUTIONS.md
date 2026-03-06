@@ -1,12 +1,17 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.45.0)
+**Period**: Initial Development (v0.1.0 → v0.45.1)
 **Date**: 2026-03-07
 
 ---
 
 ## Recent Contributions
+
+### Spec Protection Surfacing (v0.45.1)
+- Caught that spec protection was invisible in agent entry points — agents only discovered it when pre-commit Check 14 blocked them
+- Caught that plan only covered Claude's CLAUDE.md template but missed Cursor, Copilot, and Codex instruction files — internal consistency requires all tools get the same rules
+- Updated README project name/tagline
 
 ### F-0168: Visual Verification (v0.45.0)
 - Designed two-phase approach: screenshot collection + AI visual review
