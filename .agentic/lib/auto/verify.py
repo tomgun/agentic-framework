@@ -1,13 +1,23 @@
 """
-verify.py -- Autonomous test-fix loop (F-0161).
+verify.py -- Autonomous test-fix loop with tiered execution (F-0161, F-0164).
 
-Runs the project's test suite, captures failures, spawns fresh Claude
-instances to fix them, re-runs tests, repeats until green or max iterations.
+Runs the project's test tiers (unit, integration, e2e, etc.) in order,
+captures failures, spawns fresh Claude instances to fix them, re-runs tests,
+repeats until green or max iterations per tier.
+
+Supports multiple named test tiers parsed from STACK.md's `Test commands:`
+section, with per-tier fix loops and configurable failure behavior.
 
 Usage:
     from auto.verify import VerifyLoop
     loop = VerifyLoop(project_root=Path("."))
     result = loop.run(max_iterations=10)
+
+    # Single tier:
+    result = loop.run(tier_filter="unit")
+
+    # Backward compatible — explicit test_command creates a single tier:
+    loop = VerifyLoop(project_root=Path("."), test_command="npm test")
 """
 from __future__ import annotations
 
@@ -40,11 +50,29 @@ TEST_RUNNER_PATTERNS = [
     ("tests/run_tests.sh", "bash tests/run_tests.sh"),
 ]
 
-# STACK.md field patterns
+# STACK.md field patterns (old format, backward compat)
 STACK_TEST_PATTERNS = [
     (r"Test runner:\s*(.+)", None),
     (r"Test command:\s*(.+)", None),
 ]
+
+# Tier name patterns for fix prompt selection
+_UNIT_TIER_RE = re.compile(r"unit|integration", re.IGNORECASE)
+_E2E_TIER_RE = re.compile(r"e2e|ui|visual|dsp|playwright|cypress", re.IGNORECASE)
+
+
+# ---------------------------------------------------------------------------
+# Data classes
+# ---------------------------------------------------------------------------
+
+@dataclass
+class TestTier:
+    """A named test tier with its own command and fix-loop settings."""
+    name: str
+    command: str
+    timeout: int = 120
+    max_fix_iterations: int = 5
+    continue_on_failure: bool = False
 
 
 @dataclass
@@ -61,6 +89,27 @@ class IterationResult:
 
 
 @dataclass
+class TierResult:
+    """Result of running one test tier through its fix loop."""
+    tier_name: str
+    success: bool
+    iterations_used: int
+    tests_passed: int = 0
+    tests_failed: int = 0
+    iterations: list[IterationResult] = field(default_factory=list)
+    final_test_output: str = ""
+
+    def to_dict(self) -> dict:
+        return {
+            "tier_name": self.tier_name,
+            "success": self.success,
+            "iterations_used": self.iterations_used,
+            "tests_passed": self.tests_passed,
+            "tests_failed": self.tests_failed,
+        }
+
+
+@dataclass
 class VerifyResult:
     """Final result of the verify loop."""
     success: bool
@@ -71,9 +120,11 @@ class VerifyResult:
     final_test_output: str = ""
     final_tests_passed: int = 0
     final_tests_failed: int = 0
+    # New: per-tier results
+    tier_results: list[TierResult] = field(default_factory=list)
 
     def to_dict(self) -> dict:
-        return {
+        d = {
             "success": self.success,
             "iterations_used": self.iterations_used,
             "max_iterations": self.max_iterations,
@@ -92,16 +143,19 @@ class VerifyResult:
                 for it in self.iterations
             ],
         }
+        if self.tier_results:
+            d["tier_results"] = [tr.to_dict() for tr in self.tier_results]
+        return d
 
 
 class VerifyLoop:
-    """Test-fix loop engine.
+    """Test-fix loop engine with tiered execution.
 
-    1. Detect test runner from STACK.md or project files
-    2. Run tests
-    3. If failures: spawn fresh Claude to fix them
-    4. Re-run tests
-    5. Repeat until green or max iterations
+    1. Detect test tiers from STACK.md or project files
+    2. Run each tier in order, each with its own fix loop
+    3. Per tier: run tests -> if fail, spawn Claude fix -> re-run -> repeat
+    4. Fast-fail by default (tier failure stops subsequent tiers)
+    5. continue_on_failure per tier overrides fast-fail
     """
 
     def __init__(
@@ -110,29 +164,49 @@ class VerifyLoop:
         test_command: Optional[str] = None,
         claude_command: str = "claude",
         on_iteration: Optional[callable] = None,
+        on_tier: Optional[callable] = None,
     ) -> None:
         self.project_root = project_root.resolve()
         self.paths = get_paths(project_root)
-        self.test_command = test_command or self._detect_test_command()
         self.claude_command = claude_command
         self.on_iteration = on_iteration  # callback(IterationResult)
+        self.on_tier = on_tier  # callback(TierResult)
+
+        # Detect tiers — explicit test_command creates a single tier
+        if test_command:
+            self.tiers = [TestTier(name="default", command=test_command)]
+        else:
+            self.tiers = self._detect_test_tiers()
+
+        # Backward compat: expose first tier's command as test_command
+        self.test_command = self.tiers[0].command if self.tiers else "echo 'No test runner detected'"
 
     def run(
         self,
         max_iterations: int = 10,
         timeout_per_test: int = 120,
         timeout_per_fix: int = 300,
+        tier_filter: Optional[str] = None,
     ) -> VerifyResult:
-        """Run the test-fix loop.
+        """Run the tiered test-fix loop.
 
         Args:
-            max_iterations: Max fix attempts before giving up.
-            timeout_per_test: Seconds to allow for test run.
+            max_iterations: Default max fix attempts per tier (overridden by tier config).
+            timeout_per_test: Default seconds for test run (overridden by tier config).
             timeout_per_fix: Seconds to allow for Claude fix attempt.
+            tier_filter: If set, only run tiers whose name starts with this (case-insensitive).
 
         Returns:
-            VerifyResult with full iteration history.
+            VerifyResult with full iteration history and per-tier results.
         """
+        tiers = self._filter_tiers(tier_filter) if tier_filter else self.tiers
+
+        # Single-tier fast path preserves original behavior exactly
+        if len(tiers) == 1 and tiers[0].name == "default":
+            return self._run_single_tier_compat(
+                tiers[0], max_iterations, timeout_per_test, timeout_per_fix
+            )
+
         result = VerifyResult(
             success=False,
             iterations_used=0,
@@ -140,15 +214,58 @@ class VerifyLoop:
             test_command=self.test_command,
         )
 
+        all_passed = True
+        for tier in tiers:
+            tier_timeout = tier.timeout if tier.timeout != 120 else timeout_per_test
+            tier_max_iter = tier.max_fix_iterations if tier.max_fix_iterations != 5 else max_iterations
+
+            tier_result = self._run_tier(tier, tier_max_iter, tier_timeout, timeout_per_fix)
+            result.tier_results.append(tier_result)
+            result.iterations.extend(tier_result.iterations)
+            result.iterations_used += tier_result.iterations_used
+
+            if self.on_tier:
+                self.on_tier(tier_result)
+
+            if not tier_result.success:
+                all_passed = False
+                if not tier.continue_on_failure:
+                    break
+
+        # Aggregate results
+        result.success = all_passed
+        total_passed = sum(tr.tests_passed for tr in result.tier_results)
+        total_failed = sum(tr.tests_failed for tr in result.tier_results)
+        result.final_tests_passed = total_passed
+        result.final_tests_failed = total_failed
+        if result.tier_results:
+            result.final_test_output = result.tier_results[-1].final_test_output
+
+        return result
+
+    def _run_tier(
+        self,
+        tier: TestTier,
+        max_iterations: int,
+        timeout_per_test: int,
+        timeout_per_fix: int,
+    ) -> TierResult:
+        """Run one tier through its fix loop."""
+        tier_result = TierResult(
+            tier_name=tier.name,
+            success=False,
+            iterations_used=0,
+        )
+
         for i in range(1, max_iterations + 1):
             start = time.time()
             iter_result = IterationResult(iteration=i)
 
-            # Run tests
-            test_output, test_exit_code = self._run_tests(timeout_per_test)
+            test_output, test_exit_code = self._run_tests(
+                tier.command, timeout_per_test
+            )
             iter_result.test_output = test_output
 
-            # Parse test results
             passed, failed, total = self._parse_test_output(
                 test_output, test_exit_code
             )
@@ -157,7 +274,73 @@ class VerifyLoop:
             iter_result.tests_failed = failed
 
             if test_exit_code == 0 and failed == 0:
-                # All tests pass — done
+                iter_result.duration_seconds = time.time() - start
+                tier_result.iterations.append(iter_result)
+                tier_result.success = True
+                tier_result.iterations_used = i
+                tier_result.tests_passed = passed
+                tier_result.tests_failed = 0
+                tier_result.final_test_output = test_output
+                if self.on_iteration:
+                    self.on_iteration(iter_result)
+                break
+
+            claude_output = self._spawn_claude_fix(
+                test_output, failed, timeout_per_fix, tier.name
+            )
+            iter_result.claude_output = claude_output
+            iter_result.fix_applied = bool(
+                claude_output and "error" not in claude_output.lower()[:50]
+            )
+            iter_result.duration_seconds = time.time() - start
+
+            tier_result.iterations.append(iter_result)
+            tier_result.iterations_used = i
+
+            if self.on_iteration:
+                self.on_iteration(iter_result)
+        else:
+            # Max iterations exhausted
+            final_output, _ = self._run_tests(tier.command, timeout_per_test)
+            passed, failed, _ = self._parse_test_output(final_output, 1)
+            tier_result.final_test_output = final_output
+            tier_result.tests_passed = passed
+            tier_result.tests_failed = failed
+
+        return tier_result
+
+    def _run_single_tier_compat(
+        self,
+        tier: TestTier,
+        max_iterations: int,
+        timeout_per_test: int,
+        timeout_per_fix: int,
+    ) -> VerifyResult:
+        """Run single-tier mode preserving exact original behavior."""
+        result = VerifyResult(
+            success=False,
+            iterations_used=0,
+            max_iterations=max_iterations,
+            test_command=tier.command,
+        )
+
+        for i in range(1, max_iterations + 1):
+            start = time.time()
+            iter_result = IterationResult(iteration=i)
+
+            test_output, test_exit_code = self._run_tests(
+                tier.command, timeout_per_test
+            )
+            iter_result.test_output = test_output
+
+            passed, failed, total = self._parse_test_output(
+                test_output, test_exit_code
+            )
+            iter_result.tests_run = total
+            iter_result.tests_passed = passed
+            iter_result.tests_failed = failed
+
+            if test_exit_code == 0 and failed == 0:
                 iter_result.duration_seconds = time.time() - start
                 result.iterations.append(iter_result)
                 result.success = True
@@ -169,12 +352,13 @@ class VerifyLoop:
                     self.on_iteration(iter_result)
                 break
 
-            # Tests failing — spawn Claude to fix
             claude_output = self._spawn_claude_fix(
-                test_output, failed, timeout_per_fix
+                test_output, failed, timeout_per_fix, tier.name
             )
             iter_result.claude_output = claude_output
-            iter_result.fix_applied = bool(claude_output and "error" not in claude_output.lower()[:50])
+            iter_result.fix_applied = bool(
+                claude_output and "error" not in claude_output.lower()[:50]
+            )
             iter_result.duration_seconds = time.time() - start
 
             result.iterations.append(iter_result)
@@ -183,8 +367,7 @@ class VerifyLoop:
             if self.on_iteration:
                 self.on_iteration(iter_result)
         else:
-            # Max iterations exhausted — run final test to capture state
-            final_output, _ = self._run_tests(timeout_per_test)
+            final_output, _ = self._run_tests(tier.command, timeout_per_test)
             passed, failed, _ = self._parse_test_output(final_output, 1)
             result.final_test_output = final_output
             result.final_tests_passed = passed
@@ -192,32 +375,119 @@ class VerifyLoop:
 
         return result
 
-    def _detect_test_command(self) -> str:
-        """Detect the test command from STACK.md or project files."""
-        # Try STACK.md first
+    def _filter_tiers(self, prefix: str) -> list[TestTier]:
+        """Filter tiers by name prefix (case-insensitive)."""
+        prefix_lower = prefix.lower()
+        matched = [t for t in self.tiers if t.name.lower().startswith(prefix_lower)]
+        if not matched:
+            # Fallback: substring match
+            matched = [t for t in self.tiers if prefix_lower in t.name.lower()]
+        return matched or self.tiers  # fall back to all tiers if no match
+
+    # -----------------------------------------------------------------------
+    # Tier detection from STACK.md
+    # -----------------------------------------------------------------------
+
+    def _detect_test_tiers(self) -> list[TestTier]:
+        """Detect test tiers from STACK.md, falling back to single-tier detection."""
         stack_file = self.paths.stack_file
         if stack_file.exists():
             content = stack_file.read_text()
+
+            # 1. Try new multi-tier format: `Test commands:` section
+            tiers = self._parse_test_commands_section(content)
+            if tiers:
+                return tiers
+
+            # 2. Try old single-command format
             for pattern, _ in STACK_TEST_PATTERNS:
                 match = re.search(pattern, content, re.IGNORECASE)
                 if match:
                     cmd = match.group(1).strip()
-                    if cmd and cmd != "<!--" and not cmd.startswith("<!--"):
-                        return cmd
+                    if cmd and not self._is_placeholder(cmd):
+                        return [TestTier(name="unit", command=cmd)]
 
-        # Fall back to file detection
+        # 3. File-based detection
         for indicator, command in TEST_RUNNER_PATTERNS:
             if (self.project_root / indicator).exists():
-                return command
+                return [TestTier(name="unit", command=command)]
 
-        # Last resort
-        return "echo 'No test runner detected'"
+        return [TestTier(name="default", command="echo 'No test runner detected'")]
 
-    def _run_tests(self, timeout: int) -> tuple[str, int]:
-        """Run the test suite and return (output, exit_code)."""
+    def _parse_test_commands_section(self, content: str) -> list[TestTier]:
+        """Parse the `Test commands:` multi-tier section from STACK.md.
+
+        Format:
+            Test commands:
+              - Unit: `npm run test`
+              - E2E API: `pytest tests/e2e/api/`
+              - E2E UI: `npx playwright test`
+        """
+        # Find the "Test commands:" line
+        match = re.search(r"^[- ]*Test commands:\s*$", content, re.MULTILINE | re.IGNORECASE)
+        if not match:
+            return []
+
+        tiers = []
+        # Parse indented entries after "Test commands:"
+        lines = content[match.end():].split("\n")
+        # Pattern: "  - Name: `command`" or "  - Name: command"
+        tier_line_re = re.compile(
+            r"^\s+-\s+(?P<name>[^:]+):\s*(?:`(?P<cmd_bt>[^`]+)`|(?P<cmd_plain>[^<\n]+))\s*$"
+        )
+
+        for line in lines:
+            # Stop at next section or non-indented non-empty line
+            stripped = line.strip()
+            if stripped and not stripped.startswith("-") and not stripped.startswith("<!--"):
+                break
+
+            m = tier_line_re.match(line)
+            if m:
+                name = m.group("name").strip()
+                cmd = (m.group("cmd_bt") or m.group("cmd_plain") or "").strip()
+                if cmd and not self._is_placeholder(cmd):
+                    tier = TestTier(name=name, command=cmd)
+                    # Suggest longer timeout for e2e tiers
+                    if _E2E_TIER_RE.search(name):
+                        tier.timeout = 300
+                    tiers.append(tier)
+
+        return tiers
+
+    @staticmethod
+    def _is_placeholder(cmd: str) -> bool:
+        """Check if a command is a placeholder/comment."""
+        cmd = cmd.strip()
+        return (
+            not cmd
+            or cmd.startswith("<!--")
+            or cmd == "N/A"
+            or cmd.lower() == "n/a"
+            or "fill" in cmd.lower() and "-->" in cmd
+        )
+
+    # Old API preserved for backward compat
+    def _detect_test_command(self) -> str:
+        """Detect the test command (backward compat, delegates to _detect_test_tiers)."""
+        tiers = self._detect_test_tiers()
+        return tiers[0].command if tiers else "echo 'No test runner detected'"
+
+    # -----------------------------------------------------------------------
+    # Test execution and parsing
+    # -----------------------------------------------------------------------
+
+    def _run_tests(self, command: Optional[str] = None, timeout: int = 120) -> tuple[str, int]:
+        """Run a test command and return (output, exit_code).
+
+        Args:
+            command: Test command to run. If None, uses self.test_command.
+            timeout: Seconds before timeout.
+        """
+        cmd = command or self.test_command
         try:
             proc = subprocess.run(
-                self.test_command,
+                cmd,
                 shell=True,
                 cwd=str(self.project_root),
                 capture_output=True,
@@ -238,14 +508,13 @@ class VerifyLoop:
 
         Returns (passed, failed, total). Best-effort parsing.
         """
-        # pytest format: "X passed, Y failed"
-        pytest_match = re.search(
-            r"(\d+) passed(?:.*?(\d+) failed)?", output
-        )
-        if pytest_match:
-            passed = int(pytest_match.group(1))
-            failed = int(pytest_match.group(2) or 0)
-            return passed, failed, passed + failed
+        # Cypress format: "Passing: N" + "Failing: N" (check first, very specific)
+        cy_passing = re.search(r"Passing:\s*(\d+)", output)
+        cy_failing = re.search(r"Failing:\s*(\d+)", output)
+        if cy_passing:
+            p = int(cy_passing.group(1))
+            f = int(cy_failing.group(1)) if cy_failing else 0
+            return p, f, p + f
 
         # Jest/npm format: "Tests: X passed, Y failed, Z total"
         jest_match = re.search(
@@ -254,6 +523,20 @@ class VerifyLoop:
         )
         if jest_match:
             return int(jest_match.group(1)), int(jest_match.group(2)), int(jest_match.group(3))
+
+        # pytest format: "X passed, Y failed" (same line, comma-separated)
+        pytest_match = re.search(
+            r"(\d+) passed(?:,.*?(\d+) failed)?", output
+        )
+        if pytest_match:
+            passed = int(pytest_match.group(1))
+            failed = int(pytest_match.group(2) or 0)
+            # Verify this isn't a multi-line Playwright output with separate "failed" line
+            pw_failed = re.search(r"(\d+) failed", output)
+            if failed == 0 and pw_failed:
+                # "passed" and "failed" on different lines — use both
+                return passed, int(pw_failed.group(1)), passed + int(pw_failed.group(1))
+            return passed, failed, passed + failed
 
         # Go format: "ok" or "FAIL"
         go_ok = len(re.findall(r"^ok\s", output, re.MULTILINE))
@@ -275,24 +558,56 @@ class VerifyLoop:
             return 1, 0, 1
         return 0, 1, 1
 
-    def _spawn_claude_fix(
-        self, test_output: str, num_failures: int, timeout: int
+    # -----------------------------------------------------------------------
+    # Claude fix spawning
+    # -----------------------------------------------------------------------
+
+    def _build_fix_prompt(
+        self, test_output: str, num_failures: int, tier_name: str
     ) -> str:
-        """Spawn a fresh Claude instance to fix test failures.
+        """Build a tier-appropriate fix prompt."""
+        # Determine context size and prompt flavor based on tier name
+        if _E2E_TIER_RE.search(tier_name):
+            max_output = 8000
+            flavor = (
+                f"The {tier_name} tests have {num_failures} failure(s). "
+                f"These tests simulate real user behavior / end-to-end scenarios. "
+                f"Fix the application behavior so these tests pass. "
+                f"Do NOT modify the tests.\n\n"
+            )
+        elif _UNIT_TIER_RE.search(tier_name):
+            max_output = 4000
+            flavor = (
+                f"The {tier_name} tests have {num_failures} failure(s). "
+                f"Fix the code so all tests pass. "
+                f"Do NOT modify the tests unless the tests themselves have bugs.\n\n"
+            )
+        else:
+            max_output = 4000
+            flavor = (
+                f"The test suite has {num_failures} failure(s). "
+                f"Fix the code so all tests pass. Do NOT modify the tests unless "
+                f"the tests themselves have bugs.\n\n"
+            )
 
-        Uses --print mode for non-interactive, single-shot fixing.
-        """
-        # Truncate test output if too long (keep last 4000 chars — the failures)
-        if len(test_output) > 4000:
-            test_output = "...(truncated)...\n" + test_output[-4000:]
+        if len(test_output) > max_output:
+            test_output = "...(truncated)...\n" + test_output[-max_output:]
 
-        prompt = (
-            f"The test suite has {num_failures} failure(s). "
-            f"Fix the code so all tests pass. Do NOT modify the tests unless "
-            f"the tests themselves have bugs.\n\n"
+        return (
+            f"{flavor}"
             f"Test output:\n```\n{test_output}\n```\n\n"
             f"Fix the failing code. Be minimal — change only what's needed."
         )
+
+    def _spawn_claude_fix(
+        self,
+        test_output: str,
+        num_failures: int,
+        timeout: int,
+        tier_name: str = "default",
+    ) -> str:
+        """Spawn a fresh Claude instance to fix test failures."""
+        prompt = self._build_fix_prompt(test_output, num_failures, tier_name)
 
         try:
             proc = subprocess.run(
@@ -343,6 +658,12 @@ def main() -> int:
         help="Project root directory",
     )
     parser.add_argument(
+        "--tier",
+        type=str,
+        default=None,
+        help="Run only tiers matching this prefix (e.g., 'unit', 'e2e')",
+    )
+    parser.add_argument(
         "--json",
         action="store_true",
         help="Output result as JSON",
@@ -358,18 +679,35 @@ def main() -> int:
             f"({it.duration_seconds:.1f}s){fix}"
         )
 
+    def print_tier(tr: TierResult) -> None:
+        status = "PASS" if tr.success else "FAIL"
+        print(
+            f"\n  Tier '{tr.tier_name}': {status} "
+            f"({tr.tests_passed} passed, {tr.tests_failed} failed, "
+            f"{tr.iterations_used} iteration(s))"
+        )
+
     loop = VerifyLoop(
         project_root=args.project_root,
         test_command=args.test_command,
         on_iteration=None if args.json else print_iteration,
+        on_tier=None if args.json else print_tier,
     )
 
     if not args.json:
-        print(f"Test command: {loop.test_command}")
+        if len(loop.tiers) > 1:
+            print(f"Test tiers: {', '.join(t.name for t in loop.tiers)}")
+        else:
+            print(f"Test command: {loop.test_command}")
         print(f"Max iterations: {args.max_iterations}")
+        if args.tier:
+            print(f"Tier filter: {args.tier}")
         print()
 
-    result = loop.run(max_iterations=args.max_iterations)
+    result = loop.run(
+        max_iterations=args.max_iterations,
+        tier_filter=args.tier,
+    )
 
     if args.json:
         print(json.dumps(result.to_dict(), indent=2))
