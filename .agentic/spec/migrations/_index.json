@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 7,
+  "last_migration": 8,
   "migrations": [
     {
       "id": 1,
@@ -43,6 +43,12 @@
       "file": "007_add_f0164_tiered_verify_loop_acceptance_criteria.md",
       "date": "2026-03-06",
       "description": "Add F-0164 tiered verify loop acceptance criteria"
+    },
+    {
+      "id": 8,
+      "file": "008_mark_f0168_acs_as_checked_all_implemented_and_tested.md",
+      "date": "2026-03-07",
+      "description": "Mark F-0168 ACs as checked (all implemented and tested)"
     }
   ]
 }
