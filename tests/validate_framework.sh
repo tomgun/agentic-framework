@@ -1473,6 +1473,137 @@ else
 fi
 
 # ============================================================
+# F-0160: Autonomous Engine Foundation
+# ============================================================
+echo ""
+echo "--- F-0160: Autonomous Engine Foundation ---"
+
+# AC-001/002: Engine core files exist
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py" ]]; then
+  pass "F-0160: engine.py exists"
+else
+  fail "F-0160: engine.py missing"
+fi
+
+# Control client
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/control.py" ]]; then
+  pass "F-0160: control.py exists"
+else
+  fail "F-0160: control.py missing"
+fi
+
+# AC-012: init.py for settings generation
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/init.py" ]]; then
+  pass "F-0160: init.py exists"
+else
+  fail "F-0160: init.py missing"
+fi
+
+# AC-019: Settings template
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/settings-template.json" ]]; then
+  pass "F-0160: settings-template.json exists"
+else
+  fail "F-0160: settings-template.json missing"
+fi
+
+# AC-015: Settings template denies dangerous ops
+if grep -q "rm -rf" "${FRAMEWORK_ROOT}/.agentic/lib/auto/settings-template.json"; then
+  pass "F-0160: settings template denies rm -rf"
+else
+  fail "F-0160: settings template missing rm -rf deny"
+fi
+if grep -q "sudo" "${FRAMEWORK_ROOT}/.agentic/lib/auto/settings-template.json"; then
+  pass "F-0160: settings template denies sudo"
+else
+  fail "F-0160: settings template missing sudo deny"
+fi
+
+# Prompt templates
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/prompts/estimate-complexity.md" ]]; then
+  pass "F-0160: estimate-complexity prompt exists"
+else
+  fail "F-0160: estimate-complexity prompt missing"
+fi
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/prompts/decompose-ac.md" ]]; then
+  pass "F-0160: decompose-ac prompt exists"
+else
+  fail "F-0160: decompose-ac prompt missing"
+fi
+
+# AC-033: Gitignored session files
+if grep -q "auto.sock" "${FRAMEWORK_ROOT}/.gitignore"; then
+  pass "F-0160: auto.sock gitignored"
+else
+  fail "F-0160: auto.sock not gitignored"
+fi
+if grep -q "auto.pid" "${FRAMEWORK_ROOT}/.gitignore"; then
+  pass "F-0160: auto.pid gitignored"
+else
+  fail "F-0160: auto.pid not gitignored"
+fi
+if grep -q "auto-state.json" "${FRAMEWORK_ROOT}/.gitignore"; then
+  pass "F-0160: auto-state.json gitignored"
+else
+  fail "F-0160: auto-state.json not gitignored"
+fi
+
+# AC-034/035: ag auto in help text
+if grep -q "auto" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "F-0160: ag auto command exists in ag.sh"
+else
+  fail "F-0160: ag auto command missing from ag.sh"
+fi
+
+# AC-030: Thread safety (EngineState uses threading.Lock)
+if grep -q "threading.Lock" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
+  pass "F-0160: engine uses threading.Lock for thread safety"
+else
+  fail "F-0160: engine missing threading.Lock"
+fi
+
+# AC-008: Cleanup handlers registered
+if grep -q "atexit.register" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
+  pass "F-0160: atexit cleanup registered"
+else
+  fail "F-0160: atexit cleanup missing"
+fi
+if grep -q "signal.SIGTERM" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
+  pass "F-0160: SIGTERM handler registered"
+else
+  fail "F-0160: SIGTERM handler missing"
+fi
+
+# AC-025: Decomposition support
+if grep -q "_decompose_ac" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
+  pass "F-0160: AC decomposition method exists"
+else
+  fail "F-0160: AC decomposition method missing"
+fi
+
+# Tests exist
+if [[ -f "${FRAMEWORK_ROOT}/tests/test_auto_engine.py" ]]; then
+  pass "F-0160: test_auto_engine.py exists"
+else
+  fail "F-0160: test_auto_engine.py missing"
+fi
+
+# Acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0160.md" ]]; then
+  pass "F-0160: acceptance criteria file exists"
+else
+  fail "F-0160: acceptance criteria file missing"
+fi
+
+# Planned features registered
+for fid in F-0161 F-0162 F-0163; do
+  if grep -q "## ${fid}:" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md"; then
+    pass "F-0160: ${fid} registered in FEATURES.md"
+  else
+    fail "F-0160: ${fid} missing from FEATURES.md"
+  fi
+done
+
+# ============================================================
 # Settings Infrastructure (Settings-Over-Profiles)
 # ============================================================
 echo "--- Settings Infrastructure ---"

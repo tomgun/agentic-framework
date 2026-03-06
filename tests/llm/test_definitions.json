@@ -22,7 +22,9 @@
         ],
         "output_not_contains": [],
         "file_exists": [],
-        "file_not_exists": [".agentic/session/WIP.md"],
+        "file_not_exists": [
+          ".agentic/session/WIP.md"
+        ],
         "max_commits": 1
       }
     },
@@ -445,7 +447,7 @@
       "profile": "discovery",
       "setup": {
         "files": {
-          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-02-04: Critical bug fix session\n- Fixed critical race condition in auth module\n- Root cause: concurrent token refresh requests\n- Solution: Added mutex lock on refresh endpoint\n- Also updated error logging to capture stack traces\n- Tests: Added 3 concurrency tests, all passing\n\n### 2026-02-03: Performance optimization\n- Identified N+1 query in product listing\n- Added DataLoader for batch fetching\n- Response time: 800ms → 120ms\n- Memory usage reduced by 40%\n\n### 2026-02-02: Feature development\n- Started shopping cart implementation\n- Added cart model and API endpoints\n- Frontend: CartDrawer component with animations"
+          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-02-04: Critical bug fix session\n- Fixed critical race condition in auth module\n- Root cause: concurrent token refresh requests\n- Solution: Added mutex lock on refresh endpoint\n- Also updated error logging to capture stack traces\n- Tests: Added 3 concurrency tests, all passing\n\n### 2026-02-03: Performance optimization\n- Identified N+1 query in product listing\n- Added DataLoader for batch fetching\n- Response time: 800ms \u2192 120ms\n- Memory usage reduced by 40%\n\n### 2026-02-02: Feature development\n- Started shopping cart implementation\n- Added cart model and API endpoints\n- Frontend: CartDrawer component with animations"
         }
       },
       "prompt": "What did we accomplish in the last session?",
@@ -1243,7 +1245,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "CONTEXT_PACK.md": "# CONTEXT_PACK.md\n\n## Documentation\n\n- `README.md` — User-facing overview and install\n- `docs/API.md` — API reference\n- `docs/CONFIG.md` — Configuration guide\n",
+          "CONTEXT_PACK.md": "# CONTEXT_PACK.md\n\n## Documentation\n\n- `README.md` \u2014 User-facing overview and install\n- `docs/API.md` \u2014 API reference\n- `docs/CONFIG.md` \u2014 Configuration guide\n",
           "STACK.md": "# STACK.md\n\n## Settings\n- profile: formal\n- docs_gate: blocking\n\n## Languages & runtimes\n- Language(s): Python\n\n## Testing\n- Unit test framework: pytest\n- Test commands:\n  - Unit: `pytest`"
         }
       },
@@ -1429,6 +1431,60 @@
         "output_not_contains": [],
         "file_exists": [],
         "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "070_auto_help",
+      "description": "ag auto --help should show autonomous workflow commands and three trust tiers",
+      "section": "auto",
+      "category": "Important",
+      "llm_test_id": "LLM-070",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Settings\n- profile: formal\n- feature_tracking: yes\n\n## Languages & runtimes\n- Language(s): Python\n\n## Tooling\n- Package manager: pip"
+        }
+      },
+      "prompt": "Run ag auto --help and explain what autonomous mode does",
+      "expected": {
+        "output_contains": [
+          "auto|autonomous"
+        ],
+        "output_contains_any": [
+          "pause|resume|stop|status|feedback|init|tier|sandbox|scoped|interactive"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "071_auto_init_settings",
+      "description": "ag auto init --dry-run should generate settings.json with project-specific permissions from STACK.md",
+      "section": "auto",
+      "category": "Important",
+      "llm_test_id": "LLM-071",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# STACK.md\n\n## Settings\n- profile: formal\n\n## Languages & runtimes\n- Language(s): TypeScript, Python\n\n## Tooling\n- Package manager: npm"
+        }
+      },
+      "prompt": "Run ag auto init --dry-run and show me the generated settings",
+      "expected": {
+        "output_contains": [
+          "permission|allow|deny|settings"
+        ],
+        "output_contains_any": [
+          "npm|python|Read|Edit|Glob|Grep|git|Tier 2|scoped"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [
+          ".claude/settings.json"
+        ],
         "max_commits": null
       }
     }

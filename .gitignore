@@ -36,6 +36,9 @@ tests/llm/.test-state
 .agentic/session/proposals/
 .agentic/session/sync-state.conf
 .agentic/session/.sync-date-ref
+.agentic/session/auto.sock
+.agentic/session/auto.pid
+.agentic/session/auto-state.json
 # Note: .agentic/journal/ IS committed (persistent history: manifests, lessons, plans, JOURNAL.md)
 
 # Local notes (not part of framework)
