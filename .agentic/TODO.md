@@ -91,6 +91,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0040: F-idea: Post-PR auto-review loop in autonomous mode — after creating a PR automatically, run a one-time review (code quality + conformance against plan and acceptance criteria). If the review causes changes, re-run the verification loop, then do one final review. Report the situation to the user after (at most 2 review passes to avoid infinite review→fix→review cycles). Fits into the autonomous workflow engine (F-0160–F-0163) as a PR-quality gate.
 - **Added**: 2026-03-06
 
+### T-0041: F-idea: Auto-versioning and tagging — structural enforcement for VERSION bump + git tag after PR merge. Currently behavioral-only (instruction in committing-changes skill). Needs a hook or GitHub Action to make it impossible to forget. Options: post-merge git hook, GitHub Action on PR close, or pre-commit check that VERSION was bumped when on a feature branch.
+- **Added**: 2026-03-06
+
 ## Done
 
 
