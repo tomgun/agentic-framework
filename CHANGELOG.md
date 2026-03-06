@@ -5,6 +5,21 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.0] - 2026-03-06
+
+### Added
+- **Autonomous Engine Foundation (F-0160)** — Control plane with Unix domain socket for bidirectional commands (pause/resume/stop/feedback/status), thread-safe engine state with `threading.Lock`, settings.json generation from STACK.md (three-tier trust model: Docker sandbox, scoped permissions, interactive), AC loading/decomposition with complexity estimation, atomic JSON state persistence, signal handling (SIGTERM/SIGINT) and atexit cleanup.
+- **Autonomous Verify Mode (F-0161)** — Test-fix loop (`ag auto verify`). Detects test runner from STACK.md or project files (pytest, Jest, Go, Cargo), spawns fresh Claude instances to fix failures, re-runs until green or max iterations. Configurable `--max-iterations`, `--test-command`, `--json` output.
+- **Autonomous Task Mode (F-0162)** — Single-feature implementation (`ag auto task F-XXXX`). Reads acceptance criteria, creates feature branch, spawns Claude per AC, runs tests, commits passing work, runs full verify loop, creates PR for human review. User feedback via `ag auto feedback` incorporated into next Claude instance.
+- **Autonomous Crunch Mode (F-0163)** — Multi-feature batch (`ag auto crunch`). Reads planned/in-progress features from FEATURES.md, processes each via task mode, stops on max errors threshold or human `ag auto stop`, saves progress to dashboard state file.
+- **`ag auto` CLI** — New subcommands: `init`, `verify`, `task`, `crunch`, `status`, `pause`, `resume`, `stop`, `feedback`.
+- 75 Python unit tests across 4 test files, 60+ validation checks, 5 LLM behavioral tests (070–074).
+
+## [0.42.0] - 2026-03-06
+
+### Added
+- **`.agentic/` directory restructure (v0.41.0)** — `lib/` separation, tarball distribution, path resolution.
+
 ## [0.40.0] - 2026-03-03
 
 ### Added

@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- v0.41.0 restructure — all tests fixed and passing (Updated: 2026-03-06 18:05 EET)
+- F-0161–F-0163: Autonomous workflow modes shipped, PR pending (Updated: 2026-03-06 20:52 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

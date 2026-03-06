@@ -1473,6 +1473,365 @@ else
 fi
 
 # ============================================================
+# F-0160: Autonomous Engine Foundation
+# ============================================================
+echo ""
+echo "--- F-0160: Autonomous Engine Foundation ---"
+
+# AC-001/002: Engine core files exist
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py" ]]; then
+  pass "F-0160: engine.py exists"
+else
+  fail "F-0160: engine.py missing"
+fi
+
+# Control client
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/control.py" ]]; then
+  pass "F-0160: control.py exists"
+else
+  fail "F-0160: control.py missing"
+fi
+
+# AC-012: init.py for settings generation
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/init.py" ]]; then
+  pass "F-0160: init.py exists"
+else
+  fail "F-0160: init.py missing"
+fi
+
+# AC-019: Settings template
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/settings-template.json" ]]; then
+  pass "F-0160: settings-template.json exists"
+else
+  fail "F-0160: settings-template.json missing"
+fi
+
+# AC-015: Settings template denies dangerous ops
+if grep -q "rm -rf" "${FRAMEWORK_ROOT}/.agentic/lib/auto/settings-template.json"; then
+  pass "F-0160: settings template denies rm -rf"
+else
+  fail "F-0160: settings template missing rm -rf deny"
+fi
+if grep -q "sudo" "${FRAMEWORK_ROOT}/.agentic/lib/auto/settings-template.json"; then
+  pass "F-0160: settings template denies sudo"
+else
+  fail "F-0160: settings template missing sudo deny"
+fi
+
+# Prompt templates
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/prompts/estimate-complexity.md" ]]; then
+  pass "F-0160: estimate-complexity prompt exists"
+else
+  fail "F-0160: estimate-complexity prompt missing"
+fi
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/prompts/decompose-ac.md" ]]; then
+  pass "F-0160: decompose-ac prompt exists"
+else
+  fail "F-0160: decompose-ac prompt missing"
+fi
+
+# AC-033: Gitignored session files
+if grep -q "auto.sock" "${FRAMEWORK_ROOT}/.gitignore"; then
+  pass "F-0160: auto.sock gitignored"
+else
+  fail "F-0160: auto.sock not gitignored"
+fi
+if grep -q "auto.pid" "${FRAMEWORK_ROOT}/.gitignore"; then
+  pass "F-0160: auto.pid gitignored"
+else
+  fail "F-0160: auto.pid not gitignored"
+fi
+if grep -q "auto-state.json" "${FRAMEWORK_ROOT}/.gitignore"; then
+  pass "F-0160: auto-state.json gitignored"
+else
+  fail "F-0160: auto-state.json not gitignored"
+fi
+
+# AC-034/035: ag auto in help text
+if grep -q "auto" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "F-0160: ag auto command exists in ag.sh"
+else
+  fail "F-0160: ag auto command missing from ag.sh"
+fi
+
+# AC-030: Thread safety (EngineState uses threading.Lock)
+if grep -q "threading.Lock" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
+  pass "F-0160: engine uses threading.Lock for thread safety"
+else
+  fail "F-0160: engine missing threading.Lock"
+fi
+
+# AC-008: Cleanup handlers registered
+if grep -q "atexit.register" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
+  pass "F-0160: atexit cleanup registered"
+else
+  fail "F-0160: atexit cleanup missing"
+fi
+if grep -q "signal.SIGTERM" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
+  pass "F-0160: SIGTERM handler registered"
+else
+  fail "F-0160: SIGTERM handler missing"
+fi
+
+# AC-025: Decomposition support
+if grep -q "_decompose_ac" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
+  pass "F-0160: AC decomposition method exists"
+else
+  fail "F-0160: AC decomposition method missing"
+fi
+
+# Tests exist
+if [[ -f "${FRAMEWORK_ROOT}/tests/test_auto_engine.py" ]]; then
+  pass "F-0160: test_auto_engine.py exists"
+else
+  fail "F-0160: test_auto_engine.py missing"
+fi
+
+# Acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0160.md" ]]; then
+  pass "F-0160: acceptance criteria file exists"
+else
+  fail "F-0160: acceptance criteria file missing"
+fi
+
+# Planned features registered
+for fid in F-0161 F-0162 F-0163; do
+  if grep -q "## ${fid}:" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md"; then
+    pass "F-0160: ${fid} registered in FEATURES.md"
+  else
+    fail "F-0160: ${fid} missing from FEATURES.md"
+  fi
+done
+
+# ============================================================
+# F-0161: Autonomous Verify Mode
+# ============================================================
+
+echo "--- F-0161: Autonomous Verify Mode ---"
+
+# verify.py exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/verify.py" ]]; then
+  pass "F-0161: verify.py exists"
+else
+  fail "F-0161: verify.py missing"
+fi
+
+# verify.py has VerifyLoop class
+if grep -q "class VerifyLoop" "${FRAMEWORK_ROOT}/.agentic/lib/auto/verify.py"; then
+  pass "F-0161: VerifyLoop class defined"
+else
+  fail "F-0161: VerifyLoop class missing"
+fi
+
+# verify.py detects test command from STACK.md
+if grep -q "_detect_test_command" "${FRAMEWORK_ROOT}/.agentic/lib/auto/verify.py"; then
+  pass "F-0161: test command detection exists"
+else
+  fail "F-0161: test command detection missing"
+fi
+
+# verify.py parses test output (pytest, Jest, Go, Cargo)
+if grep -q "_parse_test_output" "${FRAMEWORK_ROOT}/.agentic/lib/auto/verify.py"; then
+  pass "F-0161: test output parsing exists"
+else
+  fail "F-0161: test output parsing missing"
+fi
+
+# verify.py spawns Claude fix
+if grep -q "_spawn_claude_fix" "${FRAMEWORK_ROOT}/.agentic/lib/auto/verify.py"; then
+  pass "F-0161: Claude fix spawning exists"
+else
+  fail "F-0161: Claude fix spawning missing"
+fi
+
+# verify.py has max_iterations param
+if grep -q "max_iterations" "${FRAMEWORK_ROOT}/.agentic/lib/auto/verify.py"; then
+  pass "F-0161: max iterations configurable"
+else
+  fail "F-0161: max iterations not configurable"
+fi
+
+# ag auto verify command in ag.sh
+if grep -q "verify)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "F-0161: ag auto verify in ag.sh"
+else
+  fail "F-0161: ag auto verify missing from ag.sh"
+fi
+
+# test file exists
+if [[ -f "${FRAMEWORK_ROOT}/tests/test_auto_verify.py" ]]; then
+  pass "F-0161: test_auto_verify.py exists"
+else
+  fail "F-0161: test_auto_verify.py missing"
+fi
+
+# acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0161.md" ]]; then
+  pass "F-0161: acceptance criteria file exists"
+else
+  fail "F-0161: acceptance criteria file missing"
+fi
+
+# ============================================================
+# F-0162: Autonomous Task Mode
+# ============================================================
+
+echo "--- F-0162: Autonomous Task Mode ---"
+
+# task.py exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/task.py" ]]; then
+  pass "F-0162: task.py exists"
+else
+  fail "F-0162: task.py missing"
+fi
+
+# task.py has TaskRunner class
+if grep -q "class TaskRunner" "${FRAMEWORK_ROOT}/.agentic/lib/auto/task.py"; then
+  pass "F-0162: TaskRunner class defined"
+else
+  fail "F-0162: TaskRunner class missing"
+fi
+
+# task.py creates feature branch
+if grep -q "_create_branch" "${FRAMEWORK_ROOT}/.agentic/lib/auto/task.py"; then
+  pass "F-0162: branch creation exists"
+else
+  fail "F-0162: branch creation missing"
+fi
+
+# task.py spawns Claude per AC
+if grep -q "_spawn_claude_implement" "${FRAMEWORK_ROOT}/.agentic/lib/auto/task.py"; then
+  pass "F-0162: Claude implementation spawning exists"
+else
+  fail "F-0162: Claude implementation spawning missing"
+fi
+
+# task.py commits passing ACs
+if grep -q "_commit_ac" "${FRAMEWORK_ROOT}/.agentic/lib/auto/task.py"; then
+  pass "F-0162: AC committing exists"
+else
+  fail "F-0162: AC committing missing"
+fi
+
+# task.py runs verify after all ACs
+if grep -q "VerifyLoop" "${FRAMEWORK_ROOT}/.agentic/lib/auto/task.py"; then
+  pass "F-0162: post-AC verify integration"
+else
+  fail "F-0162: post-AC verify integration missing"
+fi
+
+# task.py supports user feedback
+if grep -q "get_pending_feedback" "${FRAMEWORK_ROOT}/.agentic/lib/auto/task.py"; then
+  pass "F-0162: user feedback integration"
+else
+  fail "F-0162: user feedback integration missing"
+fi
+
+# ag auto task in ag.sh
+if grep -q "task)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "F-0162: ag auto task in ag.sh"
+else
+  fail "F-0162: ag auto task missing from ag.sh"
+fi
+
+# test file exists
+if [[ -f "${FRAMEWORK_ROOT}/tests/test_auto_task.py" ]]; then
+  pass "F-0162: test_auto_task.py exists"
+else
+  fail "F-0162: test_auto_task.py missing"
+fi
+
+# acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0162.md" ]]; then
+  pass "F-0162: acceptance criteria file exists"
+else
+  fail "F-0162: acceptance criteria file missing"
+fi
+
+# ============================================================
+# F-0163: Autonomous Crunch Mode
+# ============================================================
+
+echo "--- F-0163: Autonomous Crunch Mode ---"
+
+# crunch.py exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/crunch.py" ]]; then
+  pass "F-0163: crunch.py exists"
+else
+  fail "F-0163: crunch.py missing"
+fi
+
+# crunch.py has CrunchRunner class
+if grep -q "class CrunchRunner" "${FRAMEWORK_ROOT}/.agentic/lib/auto/crunch.py"; then
+  pass "F-0163: CrunchRunner class defined"
+else
+  fail "F-0163: CrunchRunner class missing"
+fi
+
+# crunch.py reads features from FEATURES.md
+if grep -q "_read_planned_features" "${FRAMEWORK_ROOT}/.agentic/lib/auto/crunch.py"; then
+  pass "F-0163: reads features from FEATURES.md"
+else
+  fail "F-0163: reads features from FEATURES.md missing"
+fi
+
+# crunch.py uses TaskRunner
+if grep -q "TaskRunner" "${FRAMEWORK_ROOT}/.agentic/lib/auto/crunch.py"; then
+  pass "F-0163: TaskRunner integration"
+else
+  fail "F-0163: TaskRunner integration missing"
+fi
+
+# crunch.py has max_errors threshold
+if grep -q "max_errors" "${FRAMEWORK_ROOT}/.agentic/lib/auto/crunch.py"; then
+  pass "F-0163: max errors threshold"
+else
+  fail "F-0163: max errors threshold missing"
+fi
+
+# crunch.py saves progress
+if grep -q "_save_progress" "${FRAMEWORK_ROOT}/.agentic/lib/auto/crunch.py"; then
+  pass "F-0163: progress persistence"
+else
+  fail "F-0163: progress persistence missing"
+fi
+
+# crunch.py handles stop command
+if grep -q '"stopping"' "${FRAMEWORK_ROOT}/.agentic/lib/auto/crunch.py"; then
+  pass "F-0163: stop command handling"
+else
+  fail "F-0163: stop command handling missing"
+fi
+
+# ag auto crunch in ag.sh
+if grep -q "crunch)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "F-0163: ag auto crunch in ag.sh"
+else
+  fail "F-0163: ag auto crunch missing from ag.sh"
+fi
+
+# test file exists
+if [[ -f "${FRAMEWORK_ROOT}/tests/test_auto_crunch.py" ]]; then
+  pass "F-0163: test_auto_crunch.py exists"
+else
+  fail "F-0163: test_auto_crunch.py missing"
+fi
+
+# acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0163.md" ]]; then
+  pass "F-0163: acceptance criteria file exists"
+else
+  fail "F-0163: acceptance criteria file missing"
+fi
+
+# crunch-state.json gitignored
+if grep -q "crunch-state.json" "${FRAMEWORK_ROOT}/.gitignore"; then
+  pass "F-0163: crunch-state.json gitignored"
+else
+  fail "F-0163: crunch-state.json not gitignored"
+fi
+
+# ============================================================
 # Settings Infrastructure (Settings-Over-Profiles)
 # ============================================================
 echo "--- Settings Infrastructure ---"

@@ -112,6 +112,24 @@
 
 ---
 
+### 7. Autonomous Execution at Scale
+
+**The Problem**: Even with great AI assistants, human bottlenecks remain:
+- Humans must drive every implementation step interactively
+- Test failures require back-and-forth debugging sessions
+- Implementing a feature with 10 acceptance criteria takes 10 manual conversations
+- Batch processing multiple features requires constant human presence
+
+**How We Solve It**:
+- **Autonomous verify mode** (`ag auto verify`) - test-fix loop that runs tests, spawns fresh Claude to fix failures, repeats until green
+- **Autonomous task mode** (`ag auto task F-XXXX`) - reads acceptance criteria, implements each with a fresh Claude instance, commits passing work, creates PR
+- **Autonomous crunch mode** (`ag auto crunch`) - batch processes planned features from FEATURES.md
+- **Three-tier trust model** - Docker sandbox, scoped permissions, or interactive prompts
+- **Human control at any point** - pause, resume, stop, or send feedback via `ag auto feedback`
+- **Fresh Claude per task unit** - prevents context degradation that causes compounding errors in long sessions
+
+---
+
 ## Most Valuable Features
 
 ### For Solo Developers
@@ -143,6 +161,7 @@
 | **Mutation testing** | Verify tests catch bugs |
 | **Research mode** | Deep investigation before implementation |
 | **Retrospectives** | Continuous improvement |
+| **Autonomous modes** | Implement features while you sleep |
 
 ### For Long-Term Maintainability
 
@@ -183,7 +202,7 @@
 **It optimizes for**:
 - **Sustainability** over quick hacks
 - **Quality** over speed
-- **Human judgment** over AI autonomy
+- **Human judgment** over unchecked AI autonomy (autonomous modes keep human control via pause/stop/feedback)
 - **Clarity** over cleverness
 - **Partnership** over replacement
 
@@ -200,6 +219,6 @@
 
 ---
 
-**Last Updated**: 2026-02-14
-**Framework Version**: 0.25.7
+**Last Updated**: 2026-03-06
+**Framework Version**: 0.43.0
 
