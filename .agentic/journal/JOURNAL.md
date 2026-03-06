@@ -1392,3 +1392,14 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-06 22:53 - Advisory batch limits
+
+**What changed**:
+- Implemented advisory batch-size limits on feature branches (T-0024, T-0027, v0.44.2). PR #65 created.
+
+**Next steps**:
+- Human review of PR #65
+
+**Blockers**: None
+

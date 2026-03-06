@@ -43,6 +43,8 @@ Purpose: a single source of truth for "how we build and run software here".
 # Retrospective due check. Options: every_N_sessions | off. Discovery default: off
 - periodic_agent_refresh: every_20_sessions
 # Suggest agent regeneration. Options: every_N_sessions | off. Discovery default: off
+- docs_stale_days: 30
+# Days before a doc is flagged stale by docs.sh. Default: 30
 
 ### Complexity limits
 - max_files_per_commit: 15
