@@ -36,15 +36,15 @@ fail() {
 # Create a test project that mimics a React/Next.js project
 setup_react_project() {
     TEST_DIR=$(mktemp -d "/tmp/gen-agents-test-XXXXXX")
-    mkdir -p "$TEST_DIR/.agentic/tools"
-    mkdir -p "$TEST_DIR/.agentic/lib"
-    mkdir -p "$TEST_DIR/.agentic/presets"
+    mkdir -p "$TEST_DIR/.agentic/lib/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/presets"
     mkdir -p "$TEST_DIR/.agentic/lib/agents/specialization"
     mkdir -p "$TEST_DIR/.agentic/lib/agents/claude/subagents"
-    mkdir -p "$TEST_DIR/.agentic-state"
+    mkdir -p "$TEST_DIR/.agentic/session"
 
     # Copy scripts
     cp "$GEN_SCRIPT" "$TEST_DIR/.agentic/lib/tools/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
 
@@ -86,14 +86,14 @@ EOF
 
 setup_go_project() {
     TEST_DIR=$(mktemp -d "/tmp/gen-agents-test-XXXXXX")
-    mkdir -p "$TEST_DIR/.agentic/tools"
-    mkdir -p "$TEST_DIR/.agentic/lib"
-    mkdir -p "$TEST_DIR/.agentic/presets"
+    mkdir -p "$TEST_DIR/.agentic/lib/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/presets"
     mkdir -p "$TEST_DIR/.agentic/lib/agents/specialization"
     mkdir -p "$TEST_DIR/.agentic/lib/agents/claude/subagents"
-    mkdir -p "$TEST_DIR/.agentic-state"
+    mkdir -p "$TEST_DIR/.agentic/session"
 
     cp "$GEN_SCRIPT" "$TEST_DIR/.agentic/lib/tools/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/agents/specialization/go.conf" "$TEST_DIR/.agentic/lib/agents/specialization/"
@@ -149,8 +149,9 @@ cleanup_test_env
 
 test_case "No false positives on empty project"
 TEST_DIR=$(mktemp -d "/tmp/gen-agents-test-XXXXXX")
-mkdir -p "$TEST_DIR/.agentic/tools" "$TEST_DIR/.agentic/lib" "$TEST_DIR/.agentic/presets" "$TEST_DIR/.agentic/lib/agents/specialization" "$TEST_DIR/.agentic/lib/agents/claude/subagents" "$TEST_DIR/.agentic-state"
+mkdir -p "$TEST_DIR/.agentic/lib/tools" "$TEST_DIR/.agentic/lib/presets" "$TEST_DIR/.agentic/lib/agents/specialization" "$TEST_DIR/.agentic/lib/agents/claude/subagents" "$TEST_DIR/.agentic/session"
 cp "$GEN_SCRIPT" "$TEST_DIR/.agentic/lib/tools/"
+cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/"
 cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
 cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
 cp "$FRAMEWORK_ROOT/.agentic/lib/agents/specialization/"*.conf "$TEST_DIR/.agentic/lib/agents/specialization/"

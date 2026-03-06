@@ -35,11 +35,10 @@ fail() {
 # Create temp test project with HUMAN_NEEDED.md containing an active PR entry
 setup_test_env() {
     TEST_DIR=$(mktemp -d "/tmp/pr-cleanup-test-XXXXXX")
-    mkdir -p "$TEST_DIR/.agentic/tools"
-    mkdir -p "$TEST_DIR/.agentic/lib"
-    mkdir -p "$TEST_DIR/.agentic/presets"
-    mkdir -p "$TEST_DIR/.agentic-state"
-    mkdir -p "$TEST_DIR/.agentic-journal"
+    mkdir -p "$TEST_DIR/.agentic/lib/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/presets"
+    mkdir -p "$TEST_DIR/.agentic/session"
+    mkdir -p "$TEST_DIR/.agentic/journal"
     mkdir -p "$TEST_DIR/bin"
 
     # Copy required scripts
@@ -51,6 +50,7 @@ setup_test_env() {
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/drift.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/doc-check.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/status.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
 

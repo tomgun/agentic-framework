@@ -39,10 +39,15 @@ fail() {
 # Create temp test project
 setup_test_env() {
     TEST_DIR=$(mktemp -d "/tmp/ag-test-XXXXXX")
-    mkdir -p "$TEST_DIR/.agentic/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/presets"
+    mkdir -p "$TEST_DIR/.agentic/session"
     cp "$AG_SCRIPT" "$TEST_DIR/.agentic/lib/tools/ag.sh"
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/list-tools.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/wip.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/" 2>/dev/null || true
     cd "$TEST_DIR"
 }
 
@@ -62,10 +67,10 @@ cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: discovery
 EOF
 output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Discovery Profile"; then
+if echo "$output" | grep -q "No formal feature tracking"; then
     pass
 else
-    fail "Expected 'Discovery Profile' in output"
+    fail "Expected 'No formal feature tracking' for discovery profile"
 fi
 cleanup_test_env
 
@@ -76,31 +81,31 @@ cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: formal
 EOF
 output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Formal Profile"; then
+if echo "$output" | grep -q "Feature Tracking"; then
     pass
 else
-    fail "Expected 'Formal Profile' in output"
+    fail "Expected 'Feature Tracking' for formal profile"
 fi
 cleanup_test_env
 
 test_case "Profile detection: Formal from spec/ directory"
 setup_test_env
-mkdir -p "$TEST_DIR/spec"
+mkdir -p "$TEST_DIR/.agentic/spec"
 output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Formal Profile"; then
+if echo "$output" | grep -q "Feature Tracking"; then
     pass
 else
-    fail "Expected 'Formal Profile' from spec/ directory"
+    fail "Expected 'Feature Tracking' from .agentic/spec/ directory"
 fi
 cleanup_test_env
 
 test_case "Profile detection: Default to Discovery when no indicators"
 setup_test_env
 output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Discovery Profile"; then
+if echo "$output" | grep -q "No formal feature tracking"; then
     pass
 else
-    fail "Expected default 'Discovery Profile'"
+    fail "Expected default 'No formal feature tracking'"
 fi
 cleanup_test_env
 
@@ -123,7 +128,7 @@ cleanup_test_env
 
 test_case "Help shows ag implement for Formal profile"
 setup_test_env
-mkdir -p "$TEST_DIR/spec"
+mkdir -p "$TEST_DIR/.agentic/spec"
 output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
 if echo "$output" | grep -q "ag implement"; then
     pass
@@ -159,7 +164,6 @@ setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: discovery
 EOF
-mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
 echo "test" > "$TEST_DIR/.agentic/session/WIP.md"
 output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" commit 2>&1) || true
 if echo "$output" | grep -q "WARNING"; then
@@ -171,8 +175,7 @@ cleanup_test_env
 
 test_case "ag commit: Formal profile shows BLOCKED for WIP"
 setup_test_env
-mkdir -p "$TEST_DIR/spec"
-mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
+mkdir -p "$TEST_DIR/.agentic/spec"
 echo "test" > "$TEST_DIR/.agentic/session/WIP.md"
 output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" commit 2>&1) || true
 if echo "$output" | grep -q "BLOCKED"; then
@@ -184,8 +187,7 @@ cleanup_test_env
 
 test_case "ag commit: Formal exits non-zero when blocked"
 setup_test_env
-mkdir -p "$TEST_DIR/spec"
-mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
+mkdir -p "$TEST_DIR/.agentic/spec"
 echo "test" > "$TEST_DIR/.agentic/session/WIP.md"
 result=0
 bash "$TEST_DIR/.agentic/lib/tools/ag.sh" commit >/dev/null 2>&1 || result=$?
@@ -301,8 +303,8 @@ cleanup_test_env
 # Helper: set up Formal with acceptance criteria for ag plan
 setup_plan_env() {
     setup_test_env
-    mkdir -p "$TEST_DIR/spec/acceptance"
-    cat > "$TEST_DIR/spec/acceptance/F-0042.md" << 'EOF'
+    mkdir -p "$TEST_DIR/.agentic/spec/acceptance"
+    cat > "$TEST_DIR/.agentic/spec/acceptance/F-0042.md" << 'EOF'
 # F-0042: Test Feature
 ## Acceptance Criteria
 - [ ] Basic functionality works
@@ -405,12 +407,12 @@ Profile: formal
 - plan_review_auto_for: [implement]
 EOF
 # Add feature to FEATURES.md
-cat > "$TEST_DIR/spec/FEATURES.md" << 'EOF'
+cat > "$TEST_DIR/.agentic/spec/FEATURES.md" << 'EOF'
 ## F-0042: Test Feature
 - Status: in_progress
 EOF
 output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" implement F-0042 2>&1) || true
-if echo "$output" | grep -q "No plan found\|consider running.*ag plan"; then
+if echo "$output" | grep -q "No.*plan found\|consider running.*ag plan"; then
     pass
 else
     fail "Expected warning about missing plan when auto_for includes implement"

@@ -35,11 +35,10 @@ fail() {
 # Create temp test project with git repo and feature_tracking=yes
 setup_test_env() {
     TEST_DIR=$(mktemp -d "/tmp/unreg-feature-test-XXXXXX")
-    mkdir -p "$TEST_DIR/.agentic/tools"
-    mkdir -p "$TEST_DIR/.agentic/lib"
-    mkdir -p "$TEST_DIR/.agentic/presets"
-    mkdir -p "$TEST_DIR/.agentic-state"
-    mkdir -p "$TEST_DIR/.agentic-journal"
+    mkdir -p "$TEST_DIR/.agentic/lib/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/presets"
+    mkdir -p "$TEST_DIR/.agentic/session"
+    mkdir -p "$TEST_DIR/.agentic/journal"
 
     # Copy required scripts
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/sync.sh" "$TEST_DIR/.agentic/lib/tools/"
@@ -50,6 +49,7 @@ setup_test_env() {
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/drift.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/doc-check.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/status.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
 
@@ -67,14 +67,13 @@ EOF
     git commit -q -m "Initial commit" --allow-empty
 
     # Create FEATURES.md and other state files
-    mkdir -p "$TEST_DIR/spec"
-    echo "# FEATURES" > "$TEST_DIR/spec/FEATURES.md"
+    mkdir -p "$TEST_DIR/.agentic/spec"
+    echo "# FEATURES" > "$TEST_DIR/.agentic/spec/FEATURES.md"
     touch "$TEST_DIR/STATUS.md"
     touch "$TEST_DIR/HUMAN_NEEDED.md"
     echo "# Journal" > "$TEST_DIR/.agentic/journal/JOURNAL.md"
 
     # Set sync date to 30 days ago so all commits are in window
-    mkdir -p "$TEST_DIR/.agentic-state"
     echo "last_sync=$(date -v-30d '+%Y-%m-%d' 2>/dev/null || date -d '30 days ago' '+%Y-%m-%d')" > "$TEST_DIR/.agentic/session/sync-state.conf"
 
     git add -A
@@ -238,7 +237,6 @@ cleanup_test_env
 test_case ".agentic/ files are excluded from source count"
 setup_test_env
 cd "$TEST_DIR"
-mkdir -p .agentic/tools
 echo "#!/bin/bash" > .agentic/lib/tools/new_tool.sh
 echo "helper" > .agentic/lib/tools/helper.sh
 echo "lib" > .agentic/lib/tools/lib.sh

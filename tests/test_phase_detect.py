@@ -6,8 +6,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-# Add .agentic/tools to path
-sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "tools"))
+# Add .agentic/lib/tools to path
+sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "lib" / "tools"))
 
 from phase_detect import detect_phase
 
@@ -43,8 +43,8 @@ def test_no_wip_returns_start():
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         _create_formal_stack(root)
-        (root / "spec").mkdir()
-        (root / "STATUS.md").write_text("# Status\n")
+        (root / ".agentic" / "spec").mkdir(parents=True)
+        (root / ".agentic" / "STATUS.md").write_text("# Status\n")
         assert detect_phase(root) == "start"
 
 
@@ -54,11 +54,10 @@ def test_wip_without_acceptance_returns_planning():
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         _create_formal_stack(root)
-        (root / "spec").mkdir()
-        (root / "spec" / "acceptance").mkdir()
-        (root / "STATUS.md").write_text("# Status\n")
-        (root / ".agentic-state").mkdir()
-        (root / ".agentic-state" / "WIP.md").write_text("**Feature**: F-0001: Test feature\n")
+        (root / ".agentic" / "spec" / "acceptance").mkdir(parents=True)
+        (root / ".agentic" / "STATUS.md").write_text("# Status\n")
+        (root / ".agentic" / "session").mkdir(parents=True, exist_ok=True)
+        (root / ".agentic" / "session" / "WIP.md").write_text("**Feature**: F-0001: Test feature\n")
         assert detect_phase(root) == "planning"
 
 
@@ -68,12 +67,11 @@ def test_wip_with_acceptance_returns_implement():
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         _create_formal_stack(root)
-        (root / "spec").mkdir()
-        (root / "spec" / "acceptance").mkdir()
-        (root / "STATUS.md").write_text("# Status\n")
-        (root / ".agentic-state").mkdir()
-        (root / ".agentic-state" / "WIP.md").write_text("**Feature**: F-0001: Test feature\n")
-        (root / "spec" / "acceptance" / "F-0001.md").write_text("# Acceptance\n")
+        (root / ".agentic" / "spec" / "acceptance").mkdir(parents=True)
+        (root / ".agentic" / "STATUS.md").write_text("# Status\n")
+        (root / ".agentic" / "session").mkdir(parents=True, exist_ok=True)
+        (root / ".agentic" / "session" / "WIP.md").write_text("**Feature**: F-0001: Test feature\n")
+        (root / ".agentic" / "spec" / "acceptance" / "F-0001.md").write_text("# Acceptance\n")
         assert detect_phase(root) == "implement"
 
 
@@ -83,9 +81,9 @@ def test_blocker_returns_blocked():
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         _create_formal_stack(root)
-        (root / "spec").mkdir()
-        (root / "STATUS.md").write_text("# Status\n")
-        (root / "HUMAN_NEEDED.md").write_text("## HN-0001: Need help\n")
+        (root / ".agentic" / "spec").mkdir(parents=True)
+        (root / ".agentic" / "STATUS.md").write_text("# Status\n")
+        (root / ".agentic" / "HUMAN_NEEDED.md").write_text("## HN-0001: Need help\n")
         assert detect_phase(root) == "blocked"
 
 

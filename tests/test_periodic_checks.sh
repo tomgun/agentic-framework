@@ -36,13 +36,13 @@ fail() {
 # Create temp test project
 setup_test_env() {
     TEST_DIR=$(mktemp -d "/tmp/periodic-test-XXXXXX")
-    mkdir -p "$TEST_DIR/.agentic/tools"
-    mkdir -p "$TEST_DIR/.agentic/lib"
-    mkdir -p "$TEST_DIR/.agentic/presets"
-    mkdir -p "$TEST_DIR/.agentic-state"
+    mkdir -p "$TEST_DIR/.agentic/lib/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/presets"
+    mkdir -p "$TEST_DIR/.agentic/session"
 
     # Copy required scripts
     cp "$PERIODIC_SCRIPT" "$TEST_DIR/.agentic/lib/tools/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/retro_check.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true

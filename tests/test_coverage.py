@@ -12,7 +12,7 @@ from pathlib import Path
 # Get paths
 TESTS_DIR = Path(__file__).parent
 ROOT_DIR = TESTS_DIR.parent
-TOOLS_DIR = ROOT_DIR / ".agentic" / "tools"
+TOOLS_DIR = ROOT_DIR / ".agentic" / "lib" / "tools"
 COVERAGE_PY = TOOLS_DIR / "coverage.py"
 EXAMPLE_DIR = ROOT_DIR / "examples" / "traced_notes_app"
 
