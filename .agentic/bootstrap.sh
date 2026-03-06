@@ -26,7 +26,7 @@ fi
 
 # Fallback: download from GitHub releases
 PROJECT_ROOT="$(cd "$AGENTIC_DIR/.." && pwd)"
-version=$(grep -oP 'Version:\s*\K[\d.]+' "$PROJECT_ROOT/STACK.md" 2>/dev/null || true)
+version=$(grep -E '^- Version:' "$PROJECT_ROOT/STACK.md" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | tr -d ' ')
 if [[ -n "$version" ]]; then
     echo "Downloading agentic-lib-v${version}.tar.gz..." >&2
     tmp_dir="$AGENTIC_DIR/.lib-extracting-$$"

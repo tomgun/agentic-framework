@@ -1,7 +1,7 @@
 {
   "feature": "F-0001",
   "mode": "feature",
-  "generated": "2026-03-05T18:50:36Z",
+  "generated": "2026-03-06T14:23:13Z",
   "commits": [
     {"hash": "6aa9942", "date": "2026-03-01", "message": "feat: Skills-primary architecture + systematic frontmatter (F-0143, F-0144) (#53)", "additions": 1102, "deletions": 59},
     {"hash": "355871c", "date": "2026-03-01", "message": "docs: post-F-0143 documentation sync for skills-primary architecture (#52)", "additions": 9550, "deletions": 589},

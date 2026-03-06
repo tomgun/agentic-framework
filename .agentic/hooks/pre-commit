@@ -1,5 +1,48 @@
 #!/usr/bin/env bash
 # Thin wrapper — delegates to lib/hooks/pre-commit-check.sh
+# Handles CI detection and STACK.md mode reading before delegating.
+
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_ROOT="$(cd "$DIR/.." && pwd)"
+
+# CI detection: skip hooks in CI environments
+if [ "${CI:-}" = "true" ] || [ -n "${GITHUB_ACTIONS:-}" ] || \
+   [ -n "${GITLAB_CI:-}" ] || [ -n "${JENKINS_URL:-}" ] || \
+   [ -n "${BUILDKITE:-}" ]; then
+    exit 0
+fi
+
+# Read pre_commit_hook setting from STACK.md (default: fast)
+HOOK_MODE="fast"
+if [ -f "$PROJECT_ROOT/STACK.md" ]; then
+    RAW_MODE=$(grep -iE "^[- ]*pre_commit_hook:" "$PROJECT_ROOT/STACK.md" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | tr -d ' ')
+    if [ -n "$RAW_MODE" ]; then
+        case "$RAW_MODE" in
+            yes) HOOK_MODE="fast" ;;
+            no|fast|full) HOOK_MODE="$RAW_MODE" ;;
+            *) HOOK_MODE="fast" ;;
+        esac
+    fi
+fi
+
+# Skip if disabled
+if [ "$HOOK_MODE" = "no" ]; then
+    exit 0
+fi
+
+# Bootstrap framework lib
 bash "$DIR/bootstrap.sh" 2>/dev/null || { echo "Warning: framework not bootstrapped"; exit 0; }
-exec bash "$DIR/lib/hooks/pre-commit-check.sh" "$@"
+
+# Spec validation: only for Formal profile
+if [ -f "$PROJECT_ROOT/.agentic/spec/FEATURES.md" ] && [ -f "$PROJECT_ROOT/.agentic/lib/tools/validate_specs.py" ]; then
+    if command -v python3 >/dev/null 2>&1; then
+        if ! python3 "$PROJECT_ROOT/.agentic/lib/tools/validate_specs.py" 2>/dev/null; then
+            echo "Pre-commit: spec validation failed"
+            echo "Fix spec file errors before committing."
+            exit 1
+        fi
+    fi
+fi
+
+# Delegate to pre-commit-check.sh with mode
+exec bash "$DIR/lib/hooks/pre-commit-check.sh" --mode "$HOOK_MODE"
