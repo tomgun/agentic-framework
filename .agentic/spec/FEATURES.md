@@ -2476,7 +2476,8 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 | Design Principles | 10 | 10 | 0 | 0 |
 | Agent System | 12 | 10 | 2 | 0 |
 | Verification & Enforcement | 17 | 16 | 0 | 1 |
-| **Total** | **123** | **112** | **7** | **3** |
+| Architecture | 3 | 3 | 0 | 0 |
+| **Total** | **126** | **115** | **7** | **3** |
 
 
 ---
@@ -2541,4 +2542,67 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 - Tests: `tests/validate_framework.sh` (T-0037 checks)
 
 **Acceptance**: See `spec/acceptance/F-0156.md`
+
+---
+
+## F-0157: Directory Restructure & Tarball Distribution
+
+**Status**: shipped
+**Category**: Architecture
+**Priority**: high
+**Complexity**: high
+**Since**: v0.41.0
+
+**Description**: Restructure `.agentic/` directory layout to separate framework runtime (`lib/`) from project state. Framework dirs (tools, agents, workflows, quality, etc.) move into `.agentic/lib/`, gitignored in user projects and extracted at runtime from a committed tarball. Project tracking files (STATUS.md, TODO.md, HUMAN_NEEDED.md) move from project root to `.agentic/` root. Separate directories (`.agentic-journal/`, `.agentic-state/`, `spec/`) consolidate under `.agentic/` as `journal/`, `session/`, `spec/`. GitHub Actions release workflow builds lib tarball as release artifact. User repo footprint drops from ~1.1MB/369 files to ~250KB/5 committed files.
+
+**Dependencies**: none
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/bootstrap.sh`, `.agentic/ag`, `.agentic/hooks/`, `.agentic/lib/paths.sh`, `.agentic/lib/paths.py`, `install.sh`, `remote-install.sh`, `.github/workflows/release.yml`
+- Tests: `tests/test_paths.sh` (42 tests), `tests/validate_framework.sh` (372 checks)
+
+**Acceptance**: See `spec/acceptance/F-0157.md`
+
+---
+
+## F-0158: Central Path Resolution
+
+**Status**: shipped
+**Category**: Architecture
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.41.0
+
+**Description**: Central path resolver (`paths.sh` for bash, `paths.py` for Python) as single source of truth for all framework file paths. `_resolve_path()` helper checks new location first, falls back to legacy location for backward compatibility. All ~70 scripts migrated from hardcoded paths. Double-source guard prevents re-initialization.
+
+**Dependencies**: F-0157
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/lib/paths.sh`, `.agentic/lib/paths.py`
+- Tests: `tests/test_paths.sh` (42 tests)
+
+**Acceptance**: See `spec/acceptance/F-0158.md`
+
+---
+
+## F-0159: Bootstrap & Thin Wrapper Mechanism
+
+**Status**: shipped
+**Category**: Architecture
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.41.0
+
+**Description**: Bootstrap mechanism for user projects: `bootstrap.sh` checks for `lib/`, extracts from committed tarball if missing, falls back to GitHub release download. Thin wrappers (`ag`, `hooks/pre-commit`, `hooks/claude/*.sh`) delegate to `lib/` after bootstrapping. Atomic extraction via PID-namespaced temp dirs. Pre-commit wrapper retains CI detection and STACK.md mode reading.
+
+**Dependencies**: F-0157
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/bootstrap.sh`, `.agentic/ag`, `.agentic/hooks/pre-commit`, `.agentic/hooks/claude/*.sh`
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0159.md`
 

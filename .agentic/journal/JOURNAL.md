@@ -1329,3 +1329,16 @@
 
 **Blockers**: PR #62 awaiting review
 
+
+### Session: 2026-03-06 16:39 - F-0157/F-0158/F-0159 Specs
+
+**Why**: Formal spec coverage for v0.41.0 architectural changes
+
+**Accomplished**:
+- Added feature specs and acceptance criteria for directory restructure (F-0157), central path resolution (F-0158), bootstrap mechanism (F-0159). 41 total acceptance criteria.
+
+**Next steps**:
+- Merge PR #62.
+
+**Blockers**: None
+
