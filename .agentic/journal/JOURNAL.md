@@ -1319,7 +1319,7 @@
 
 ### Session: 2026-03-06 16:29 - v0.41.0 Directory Restructure
 
-**Why**: Major architectural change reducing user repo footprint from 369 files to 5
+**Why**: Major architectural change — 369 framework lib files replaced by single tarball
 
 **Accomplished**:
 - Completed 4-phase restructure: paths.sh abstraction, lib/ separation, project file consolidation, tarball release pipeline. Fixed review issues: pre-commit CI detection, macOS grep compat, stale docs. Updated CONTRIBUTIONS.md.

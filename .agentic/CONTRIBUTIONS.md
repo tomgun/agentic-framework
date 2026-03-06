@@ -2503,7 +2503,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 - 30+ places with `STATUS.md || OVERVIEW.md` conditional logic
 - Removed all conditional patterns (`STATUS.md || OVERVIEW.md`)
 
-**Impact**: User repo footprint drops from ~1.1MB/369 files to ~250KB/5 committed files. Project root reduced to 7 files. Single `.agentic/` directory replaces 3 separate directories. `paths.sh` abstraction makes future file moves trivial. 680 files changed, ~70 scripts migrated to use path resolver. Tests: 372/0 validation, 42/42 path smoke test.
+**Impact**: User repos no longer commit 369 framework library files (~1.1MB) — `lib/` replaced by a single tarball (~250KB) extracted at runtime. Project root reduced to 7 files. Three separate directories (`.agentic-journal/`, `.agentic-state/`, `spec/`) consolidated under `.agentic/`. `paths.sh` abstraction makes future file moves trivial. 680 files changed, ~70 scripts migrated to use path resolver. Tests: 372/0 validation, 42/42 path smoke test.
 
 ---
 

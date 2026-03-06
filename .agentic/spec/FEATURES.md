@@ -2553,7 +2553,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Complexity**: high
 **Since**: v0.41.0
 
-**Description**: Restructure `.agentic/` directory layout to separate framework runtime (`lib/`) from project state. Framework dirs (tools, agents, workflows, quality, etc.) move into `.agentic/lib/`, gitignored in user projects and extracted at runtime from a committed tarball. Project tracking files (STATUS.md, TODO.md, HUMAN_NEEDED.md) move from project root to `.agentic/` root. Separate directories (`.agentic-journal/`, `.agentic-state/`, `spec/`) consolidate under `.agentic/` as `journal/`, `session/`, `spec/`. GitHub Actions release workflow builds lib tarball as release artifact. User repo footprint drops from ~1.1MB/369 files to ~250KB/5 committed files.
+**Description**: Restructure `.agentic/` directory layout to separate framework runtime (`lib/`) from project state. Framework dirs (tools, agents, workflows, quality, etc.) move into `.agentic/lib/`, gitignored in user projects and extracted at runtime from a committed tarball. Project tracking files (STATUS.md, TODO.md, HUMAN_NEEDED.md) move from project root to `.agentic/` root. Separate directories (`.agentic-journal/`, `.agentic-state/`, `spec/`) consolidate under `.agentic/` as `journal/`, `session/`, `spec/`. GitHub Actions release workflow builds lib tarball as release artifact. User repos no longer commit 369 framework library files (~1.1MB) — lib/ is replaced by a single tarball (~250KB) extracted at runtime.
 
 **Dependencies**: none
 
