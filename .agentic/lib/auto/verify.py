@@ -33,6 +33,7 @@ from typing import Optional
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
+from auto import spawn_claude  # noqa: E402
 
 # Test runner detection patterns: (file_indicator, command)
 TEST_RUNNER_PATTERNS = [
@@ -609,26 +610,12 @@ class VerifyLoop:
         """Spawn a fresh Claude instance to fix test failures."""
         prompt = self._build_fix_prompt(test_output, num_failures, tier_name)
 
-        try:
-            proc = subprocess.run(
-                [
-                    self.claude_command,
-                    "--print",
-                    "--dangerously-skip-permissions",
-                    prompt,
-                ],
-                cwd=str(self.project_root),
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-            )
-            return proc.stdout + proc.stderr
-        except FileNotFoundError:
-            return "error: claude command not found"
-        except subprocess.TimeoutExpired:
-            return f"error: Claude fix timed out after {timeout}s"
-        except Exception as e:
-            return f"error: {e}"
+        return spawn_claude(
+            self.claude_command,
+            self.project_root,
+            prompt,
+            timeout=timeout,
+        )
 
 
 # ---------------------------------------------------------------------------

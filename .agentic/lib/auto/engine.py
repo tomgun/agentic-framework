@@ -29,6 +29,7 @@ from typing import Optional
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
+from auto import spawn_claude  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -260,8 +261,10 @@ class AutoEngine:
     run tests -> track progress -> handle control commands.
     """
 
-    def __init__(self, project_root: Path) -> None:
+    def __init__(self, project_root: Path, claude_command: str = "claude") -> None:
         self.paths = get_paths(project_root)
+        self.project_root = project_root.resolve()
+        self.claude_command = claude_command
         self.session_dir = self.paths.session_dir
         self.socket_path = self.session_dir / SOCKET_FILENAME
         self.pid_path = self.session_dir / PID_FILENAME
@@ -380,10 +383,27 @@ class AutoEngine:
     ) -> str:
         """Estimate AC complexity: SMALL, MEDIUM, or LARGE.
 
-        In production, this spawns a short Claude prompt. For now, returns
-        a heuristic estimate based on text length and keywords.
+        Tries Claude-based estimation first, falls back to keyword heuristic.
         """
-        # Heuristic fallback (production: Claude prompt from estimate-complexity.md)
+        prompt_template = _LIB_DIR / "auto" / "prompts" / "estimate-complexity.md"
+        if self.engine_state.state == "running" and prompt_template.exists():
+            template = prompt_template.read_text()
+            prompt = template.replace("{ac_id}", ac_id).replace(
+                "{ac_text}", ac_text
+            ).replace("{codebase_summary}", "See project CLAUDE.md for context.")
+
+            output = spawn_claude(
+                self.claude_command,
+                self.project_root,
+                prompt,
+                timeout=60,
+            )
+            # Extract one-word answer
+            for word in ("LARGE", "MEDIUM", "SMALL"):
+                if word in output.upper():
+                    return word
+
+        # Heuristic fallback
         large_keywords = [
             "full system", "complete implementation", "entire", "infrastructure",
             "database schema", "migration", "authentication system",
@@ -400,41 +420,90 @@ class AutoEngine:
     ) -> dict:
         """Implement a single acceptance criterion (or sub-task).
 
-        In production, this:
         1. Spawns a fresh Claude instance with focused context
         2. Runs the test suite
-        3. Detects context exhaustion — if exhausted and tests still
-           failing, returns 'needs_decomposition' so the caller can
-           break it into sub-tasks and retry.
-
-        Returns dict with 'status': 'passed' | 'failed' | 'needs_decomposition'
+        3. Returns 'passed', 'failed', or 'needs_decomposition'
         """
-        # Check for user feedback before starting
         feedback = self.engine_state.get_pending_feedback(ac_id)
+        feedback_text = ""
+        if feedback:
+            feedback_text = "\n\nUser feedback:\n" + "\n".join(
+                f"- {f['text']}" for f in feedback
+            )
 
-        # Placeholder: production implementation spawns Claude CLI via subprocess
-        # and monitors context usage. For now, return a structure for testing.
-        return {
-            "status": "pending",
-            "ac_id": ac_id,
-            "complexity": complexity,
-            "feedback_applied": len(feedback),
-        }
+        feature_id = self.engine_state._feature_id or "unknown"
+        prompt = (
+            f"Implement acceptance criterion {ac_id} for feature {feature_id}.\n\n"
+            f"Criterion: {ac_text}\n\n"
+            f"Complexity estimate: {complexity}\n\n"
+            f"Instructions:\n"
+            f"- Read the spec file at .agentic/spec/acceptance/{feature_id}.md for full context\n"
+            f"- Read the existing code to understand the codebase\n"
+            f"- Implement the minimum code needed to satisfy this criterion\n"
+            f"- Ensure tests pass after your changes\n"
+            f"- Do NOT modify unrelated code\n"
+            f"{feedback_text}"
+        )
+
+        timeout = 600 if complexity == "LARGE" else 300
+        output = spawn_claude(
+            self.claude_command,
+            self.project_root,
+            prompt,
+            timeout=timeout,
+        )
+
+        if output.startswith("error:"):
+            return {"status": "failed", "ac_id": ac_id, "error": output}
+
+        # Run tests to verify implementation
+        test_passed = self._run_tests()
+        if test_passed:
+            return {"status": "passed", "ac_id": ac_id}
+
+        return {"status": "failed", "ac_id": ac_id}
 
     def _decompose_ac(self, ac_id: str, ac_text: str) -> list[dict]:
         """Decompose a large AC into smaller sub-tasks.
 
-        In production, this spawns a short Claude prompt asking it to break
-        the AC into 2-5 sequential sub-tasks, each small enough for one
-        context window.
-
-        The AC itself is NOT modified — sub-tasks are internal to the engine.
-        All sub-tasks must pass for the parent AC to be marked complete.
+        Spawns Claude with the decompose-ac.md prompt to break the AC into
+        2-5 sequential sub-tasks. Falls back to a single wrapper sub-task.
 
         Returns list of sub-task dicts: [{"id": "AC-001.1", "text": "...", "status": "pending"}]
         """
-        # Placeholder: production sends a decomposition prompt to Claude.
-        # For now, return a single sub-task wrapping the original AC.
+        prompt_template = _LIB_DIR / "auto" / "prompts" / "decompose-ac.md"
+        if self.engine_state.state == "running" and prompt_template.exists():
+            template = prompt_template.read_text()
+            prompt = template.replace("{ac_id}", ac_id).replace(
+                "{ac_text}", ac_text
+            ).replace("{codebase_summary}", "See project CLAUDE.md for context.")
+
+            output = spawn_claude(
+                self.claude_command,
+                self.project_root,
+                prompt,
+                timeout=120,
+            )
+
+            # Parse JSON array from output
+            try:
+                import re as _re
+                json_match = _re.search(r"\[.*\]", output, _re.DOTALL)
+                if json_match:
+                    items = json.loads(json_match.group())
+                    if isinstance(items, list) and len(items) >= 2:
+                        return [
+                            {
+                                "id": f"{ac_id}.{i+1}",
+                                "text": item.get("text", str(item)),
+                                "status": "pending",
+                            }
+                            for i, item in enumerate(items)
+                        ]
+            except (json.JSONDecodeError, AttributeError):
+                pass
+
+        # Fallback: single sub-task wrapping the original AC
         return [
             {
                 "id": f"{ac_id}.1",
@@ -506,6 +575,16 @@ class AutoEngine:
             return {"status": "partial"}
         else:
             return {"status": "failed"}
+
+    def _run_tests(self) -> bool:
+        """Run the project test suite and return True if all pass."""
+        from auto.verify import VerifyLoop
+        verify = VerifyLoop(
+            project_root=self.project_root,
+            claude_command=self.claude_command,
+        )
+        _, exit_code = verify._run_tests(command=verify.test_command, timeout=120)
+        return exit_code == 0
 
     def _save_state(self) -> None:
         """Persist current state to auto-state.json."""

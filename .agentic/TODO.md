@@ -94,6 +94,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0041: F-idea: Auto-versioning and tagging — structural enforcement for VERSION bump + git tag after PR merge. Currently behavioral-only (instruction in committing-changes skill). Needs a hook or GitHub Action to make it impossible to forget. Options: post-merge git hook, GitHub Action on PR close, or pre-commit check that VERSION was bumped when on a feature branch.
 - **Added**: 2026-03-06
 
+### T-0042: T-0042: Multi-tool auto modes — investigate and implement support for Cursor, Codex, Gemini CLI (currently Claude-only). Abstract the spawn_claude helper into a tool-agnostic interface.
+- **Added**: 2026-03-06
+
 ## Done
 
 

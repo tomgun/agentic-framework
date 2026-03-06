@@ -23,6 +23,7 @@ _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
 
+from auto import spawn_claude  # noqa: E402
 from auto.engine import AutoEngine, EngineState  # noqa: E402
 from auto.verify import VerifyLoop  # noqa: E402
 
@@ -237,6 +238,7 @@ class TaskRunner:
             f"Implement acceptance criterion {ac_id} for feature {feature_id}.\n\n"
             f"Criterion: {ac_text}\n\n"
             f"Instructions:\n"
+            f"- Read the spec file at .agentic/spec/acceptance/{feature_id}.md for full context\n"
             f"- Read the existing code to understand the codebase\n"
             f"- Implement the minimum code needed to satisfy this criterion\n"
             f"- Ensure tests pass after your changes\n"
@@ -244,21 +246,12 @@ class TaskRunner:
             f"{feedback_text}"
         )
 
-        try:
-            proc = subprocess.run(
-                [self.claude_command, "--print", "--dangerously-skip-permissions", prompt],
-                cwd=str(self.project_root),
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-            )
-            return proc.stdout + proc.stderr
-        except FileNotFoundError:
-            return "error: claude command not found"
-        except subprocess.TimeoutExpired:
-            return f"error: Claude timed out after {timeout}s"
-        except Exception as e:
-            return f"error: {e}"
+        return spawn_claude(
+            self.claude_command,
+            self.project_root,
+            prompt,
+            timeout=timeout,
+        )
 
     def _run_tests(self) -> bool:
         """Run the test suite and return True if all pass."""
@@ -282,7 +275,7 @@ class TaskRunner:
             )
             message = f"feat({feature_id}): implement {ac_id} — {ac_text[:60]}"
             subprocess.run(
-                ["git", "commit", "-m", message, "--no-verify"],
+                ["git", "commit", "-m", message],
                 cwd=str(self.project_root),
                 capture_output=True,
                 check=True,

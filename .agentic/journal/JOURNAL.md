@@ -1403,3 +1403,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-06 23:38 - Auto mode fixes
+
+**Why**: Auto modes had placeholder code and unsafe defaults
+
+**What changed**:
+- Wired up engine.py placeholders, tier-aware permissions, removed --no-verify, cleaned HUMAN_NEEDED
+
+**Next steps**:
+- Test crunch mode end-to-end
+
+**Blockers**: None
+
