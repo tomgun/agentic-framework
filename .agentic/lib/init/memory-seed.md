@@ -30,14 +30,18 @@ Never write implementation code before acceptance criteria exist. This is a stru
 
 If they say "implement entire", "full system", "complete", or describe something that would touch >10 files: **STOP — TOO BIG.** Break into 3-5 smaller tasks first.
 
-## After exiting plan mode — SAVE THE PLAN IMMEDIATELY
+## Plans must be saved — ALWAYS
 
-When the plan is approved, your **VERY FIRST action** — before any implementation:
+Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal/plans/`. Save them regardless of how they arrive:
 
-1. **SAVE THE PLAN NOW.** Copy from the tool's plan location to `.agentic/journal/plans/F-XXXX-plan.md` using `ag plan --save <plan-file> F-XXXX`. Tool plan locations (e.g. `~/.claude/plans/`) are session-scoped and WILL BE LOST. Do this BEFORE anything else.
-2. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
-3. Check `plan_review_enabled` in STACK.md — if `yes`, invoke `/review` on the saved plan file first
-4. Only proceed to implementation after the review completes (or if review is disabled)
+**After exiting plan mode**: Copy from the tool's plan location to `.agentic/journal/plans/F-XXXX-plan.md` using `ag plan --save <plan-file> F-XXXX`. Tool plan locations (e.g. `~/.claude/plans/`) are session-scoped and WILL BE LOST.
+
+**When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-<slug>-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
+
+Then:
+1. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
+2. Check `plan_review_enabled` in STACK.md — if `yes`, invoke `/review` on the saved plan file first
+3. Only proceed to implementation after the review completes (or if review is disabled)
 
 ## When the user reports a bug or wants a fix
 
