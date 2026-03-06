@@ -135,7 +135,7 @@ Plan is solid. Ready for implementation.
 When creating/revising a plan:
 
 1. **Read context first**:
-   - `.agentic/.agentic/spec/acceptance/F-XXXX.md` (requirements)
+   - `.agentic/spec/acceptance/F-XXXX.md` (requirements)
    - `CONTEXT_PACK.md` (architecture)
    - Related code files
 
@@ -212,7 +212,7 @@ Task(
     model="opus",  # or from STACK.md
     prompt="""
     Create implementation plan for F-XXXX.
-    Read: .agentic/.agentic/spec/acceptance/F-XXXX.md, CONTEXT_PACK.md
+    Read: .agentic/spec/acceptance/F-XXXX.md, CONTEXT_PACK.md
     Write plan to: .agentic/journal/plans/F-XXXX-plan.md
     Follow format in: .agentic/lib/workflows/plan_review_loop.md
     """

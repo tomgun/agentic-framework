@@ -11,7 +11,7 @@ compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Agent]
 metadata:
   author: agentic-framework
-  version: "0.38.0"
+  version: "0.41.0"
 ---
 
 # Implementing Features
@@ -26,14 +26,14 @@ Acceptance-driven feature implementation with structural enforcement gates.
 bash .agentic/lib/tools/wip.sh check
 ```
 
-Check for `.agentic/.agentic/spec/acceptance/F-XXXX.md`. If it does not exist:
+Check for `.agentic/spec/acceptance/F-XXXX.md`. If it does not exist:
 
-1. Draft acceptance criteria using `.agentic/lib/templates/acceptance.template.md`
+1. Draft acceptance criteria using `.agentic/spec/acceptance.template.md`
 2. Include a `## Tests` section — tests are part of the feature definition
 3. Show to user for approval before proceeding
-4. Create the file at `.agentic/.agentic/spec/acceptance/F-XXXX.md`
+4. Create the file at `.agentic/spec/acceptance/F-XXXX.md`
 
-If no feature ID exists yet, create one in `.agentic/.agentic/spec/FEATURES.md` first.
+If no feature ID exists yet, create one in `.agentic/spec/FEATURES.md` first.
 
 **Do NOT write any code until acceptance criteria exist.**
 
@@ -95,7 +95,7 @@ Then hand off to the `committing-changes` workflow (do NOT commit directly).
 **Example 1: Implementing a new CLI command**
 User says: "Add an `ag sync` command"
 Steps taken:
-1. Check `.agentic/.agentic/spec/acceptance/F-0125.md` exists — it does, read criteria
+1. Check `.agentic/spec/acceptance/F-0125.md` exists — it does, read criteria
 2. Start WIP: `wip.sh start F-0125 "ag sync command" "ag .agentic/lib/tools/sync.sh"`
 3. Read CONTEXT_PACK.md, find existing ag commands in `ag` script
 4. Implement sync.sh following existing tool patterns
@@ -106,9 +106,9 @@ Result: Feature implemented, tests passing, ready for commit workflow.
 **Example 2: User describes functionality without a feature ID**
 User says: "Build a dark mode toggle"
 Steps taken:
-1. No F-XXXX exists — create F-0150 in .agentic/.agentic/spec/FEATURES.md
+1. No F-XXXX exists — create F-0150 in .agentic/spec/FEATURES.md
 2. Draft acceptance criteria, show to user for approval
-3. Create .agentic/.agentic/spec/acceptance/F-0150.md
+3. Create .agentic/spec/acceptance/F-0150.md
 4. Start WIP, implement, test
 Result: Feature tracked from spec through implementation.
 
@@ -120,7 +120,7 @@ Solution: Run `bash .agentic/lib/tools/wip.sh check` to see what's in progress. 
 
 **Error: No acceptance criteria found**
 Cause: Feature work attempted without spec.
-Solution: Create `.agentic/.agentic/spec/acceptance/F-XXXX.md` first. Use the template at `.agentic/lib/templates/acceptance.template.md`.
+Solution: Create `.agentic/spec/acceptance/F-XXXX.md` first. Use the template at `.agentic/spec/acceptance.template.md`.
 
 **Error: Scope too large (>10 files)**
 Cause: Feature is too big for one batch.

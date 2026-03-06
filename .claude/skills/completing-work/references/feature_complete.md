@@ -19,7 +19,7 @@ phase: completion
 ## Acceptance Criteria Met
 
 - [ ] **All acceptance criteria satisfied**
-  - Formal: Every item in `.agentic/.agentic/spec/acceptance/F-####.md`
+  - Formal: Every item in `.agentic/spec/acceptance/F-####.md`
   - Core: Every item in `.agentic/OVERVIEW.md` or user requirements
   - No partial completion
   - No "mostly works" items
@@ -112,7 +112,7 @@ phase: completion
 
 ### Formal Profile
 
-- [ ] **`.agentic/.agentic/spec/FEATURES.md` updated**
+- [ ] **`.agentic/spec/FEATURES.md` updated**
   - Status: `shipped` (not `planned` or `in_progress`)
   - Implementation State: `complete` (not `none` or `partial`)
   - Implementation Code: All file paths listed
@@ -121,7 +121,7 @@ phase: completion
   - **CRITICAL**: Never mark as shipped without setting these correctly
 
 - [ ] **Acceptance file complete**
-  - `.agentic/.agentic/spec/acceptance/F-####.md` exists
+  - `.agentic/spec/acceptance/F-####.md` exists
   - Has actual criteria (not placeholder)
   - Criteria are testable
   - Criteria match what was implemented
@@ -275,7 +275,7 @@ If ANY answer is "No" or "Not sure" → Feature is NOT ready to be marked shippe
 
 ### Formal Profile
 
-- [ ] **Update `.agentic/.agentic/spec/FEATURES.md`**
+- [ ] **Update `.agentic/spec/FEATURES.md`**
   ```markdown
   Status: shipped
   Implementation:

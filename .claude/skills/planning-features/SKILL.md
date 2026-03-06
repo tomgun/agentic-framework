@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with plan mode support."
 allowed-tools: [Read, Glob, Grep, Bash, Agent]
 metadata:
   author: agentic-framework
-  version: "0.38.0"
+  version: "0.41.0"
 ---
 
 # Planning Features
@@ -22,7 +22,7 @@ Create thorough implementation plans with review loops before coding.
 ### Step 1: Understand the Request
 
 1. Read the user's description of what they want to build
-2. Check `.agentic/.agentic/spec/FEATURES.md` for related features
+2. Check `.agentic/spec/FEATURES.md` for related features
 3. Check existing code for patterns to follow
 
 ### Step 2: Research and Explore

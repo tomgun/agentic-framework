@@ -120,7 +120,7 @@ phase: commit
 
 ### Formal Profile (All Core items plus:)
 
-- [ ] **`.agentic/.agentic/spec/FEATURES.md` reflects reality**
+- [ ] **`.agentic/spec/FEATURES.md` reflects reality**
   - Status accurate (`planned` / `in_progress` / `shipped`)
   - Implementation State accurate (`none` / `partial` / `complete`)
   - **CRITICAL**: Never `State: none` if code exists
@@ -134,7 +134,7 @@ phase: commit
   - Next immediate step is clear
   - Blockers documented (if any)
 
-- [ ] **`.agentic/.agentic/spec/acceptance/F-####.md` exists** (if feature work)
+- [ ] **`.agentic/spec/acceptance/F-####.md` exists** (if feature work)
   - Acceptance criteria defined
   - Not a placeholder
   - Testable conditions listed
@@ -264,7 +264,7 @@ docs(readme): update installation instructions
 ❌ **Don't** commit without human approval
 ❌ **Don't** commit with failing tests
 ❌ **Don't** commit without updating JOURNAL.md
-❌ **Don't** commit with stale FEATURES.md/.agentic/OVERVIEW.md
+❌ **Don't** commit with stale FEATURES.md/OVERVIEW.md
 ❌ **Don't** commit with "(Not yet created)" placeholders
 ❌ **Don't** commit debug code (console.log, etc.)
 

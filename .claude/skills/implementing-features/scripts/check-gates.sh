@@ -3,6 +3,8 @@
 # Delegates to framework tools — this is a thin wrapper.
 set -euo pipefail
 
+source "${CLAUDE_PROJECT_DIR:-.}/.agentic/lib/paths.sh" 2>/dev/null || true
+
 FEATURE_ID="${1:-}"
 
 if [[ -z "$FEATURE_ID" ]]; then
@@ -23,7 +25,7 @@ else
 fi
 
 # Gate 2: WIP check
-if bash .agentic/tools/wip.sh check 2>/dev/null; then
+if bash .agentic/lib/tools/wip.sh check 2>/dev/null; then
     echo "✓ No conflicting WIP active"
 else
     echo "✗ WIP already active — complete or abandon existing work first"

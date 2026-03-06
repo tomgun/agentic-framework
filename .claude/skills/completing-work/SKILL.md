@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Edit, Bash, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.38.0"
+  version: "0.41.0"
 ---
 
 # Completing Work
@@ -21,7 +21,7 @@ Verify acceptance criteria, mark features done, update specs, and cleanup.
 
 ### Step 1: Verify Acceptance Criteria
 
-Read `.agentic/.agentic/spec/acceptance/F-XXXX.md` and verify each criterion is met:
+Read `.agentic/spec/acceptance/F-XXXX.md` and verify each criterion is met:
 
 1. All criteria have passing tests
 2. Documentation is updated
@@ -65,7 +65,7 @@ Surface any items that should be addressed before moving on.
 **Example 1: Completing a feature**
 User says: "I think we're done with F-0125"
 Steps taken:
-1. Read .agentic/.agentic/spec/acceptance/F-0125.md — 4 criteria, all verified
+1. Read .agentic/spec/acceptance/F-0125.md — 4 criteria, all verified
 2. Run `wip.sh complete` — WIP cleared
 3. Run `feature.sh F-0125 status shipped`
 4. Update journal and status
@@ -87,7 +87,7 @@ Solution: Proceed with status updates. WIP tracking is a guard, not a blocker fo
 
 **Error: Feature ID not found in FEATURES.md**
 Cause: Feature was implemented without a spec entry.
-Solution: Add the feature to .agentic/.agentic/spec/FEATURES.md retroactively before marking shipped.
+Solution: Add the feature to .agentic/spec/FEATURES.md retroactively before marking shipped.
 
 ## References
 

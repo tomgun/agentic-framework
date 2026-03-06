@@ -32,7 +32,7 @@ phase: implementation
   - Are there edge cases explicitly mentioned?
 
 - [ ] **Check dependencies** (Formal only)
-  - Look at `Dependencies:` field in `.agentic/.agentic/spec/FEATURES.md`
+  - Look at `Dependencies:` field in `.agentic/spec/FEATURES.md`
   - Are dependent features complete?
   - If not, implement dependencies first
 
@@ -131,7 +131,7 @@ phase: implementation
 
 ### Update Tracking (Formal)
 
-- [ ] **Update `.agentic/.agentic/spec/FEATURES.md`**
+- [ ] **Update `.agentic/spec/FEATURES.md`**
   - Status: `planned` → `in_progress` → `shipped`
   - Implementation State: `none` → `partial` → `complete`
   - Implementation Code: Add actual file paths
@@ -203,7 +203,7 @@ phase: implementation
 4. Check for timing issues - add delays if testing async code
 5. Verify test framework is configured correctly
 
-**If still stuck after 15 min**: Add to .agentic/HUMAN_NEEDED.md with test code, implementation code, and error message
+**If still stuck after 15 min**: Add to HUMAN_NEEDED.md with test code, implementation code, and error message
 
 ---
 
@@ -230,7 +230,7 @@ phase: implementation
 **Immediate actions**:
 1. **Don't guess**: Stop coding immediately
 2. **Document confusion**: What specifically is unclear?
-3. **Add to .agentic/HUMAN_NEEDED.md**: With specific questions and options
+3. **Add to HUMAN_NEEDED.md**: With specific questions and options
 4. **Work on something else**: Switch to feature with clear requirements
 
 **Example escalation**:
@@ -263,7 +263,7 @@ Blocking: F-0010 implementation
 - Implement dependencies first (if small)
 - Use mocks/stubs for now, integrate later
 - Switch to feature without dependencies
-- Add to .agentic/HUMAN_NEEDED.md if dependency priority unclear
+- Add to HUMAN_NEEDED.md if dependency priority unclear
 
 ---
 
@@ -335,6 +335,6 @@ Blocking: F-0010 implementation
 ✅ **Do** small increments (easier to review)  
 ✅ **Do** update tracking in same commit as code  
 ✅ **Do** write tests (TDD: first; Standard: alongside)  
-✅ **Do** keep FEATURES.md/.agentic/OVERVIEW.md accurate  
+✅ **Do** keep FEATURES.md/OVERVIEW.md accurate  
 ✅ **Do** add code annotations
 

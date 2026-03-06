@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with shell access and git."
 allowed-tools: [Bash, Read, Edit, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.38.0"
+  version: "0.41.0"
 ---
 
 # Committing Changes
@@ -32,21 +32,6 @@ bash .agentic/lib/tools/wip.sh complete
 
 **Never commit while WIP.md exists** — it indicates incomplete work.
 
-### Step 1.5: Verify Git Hooks Installed
-
-```bash
-actual=$(git config core.hooksPath 2>/dev/null || echo "")
-if [ "$actual" != ".agentic/hooks" ]; then
-  echo "WARNING: git hooks not installed — pre-commit quality gates will be skipped!"
-  echo "Fix: git config core.hooksPath .agentic/hooks"
-fi
-```
-
-If hooks are not installed, **offer to auto-fix** before proceeding:
-- Run `git config core.hooksPath .agentic/hooks`
-- Confirm with: `git config core.hooksPath` (should print `.agentic/hooks`)
-- **Do not skip this** — without hooks, commits bypass all pre-commit checks
-
 ### Step 2: Branch Check
 
 ```bash
@@ -67,7 +52,7 @@ bash .agentic/lib/tools/journal.sh "Topic" "What was done" "Next steps" "Blocker
 bash .agentic/lib/tools/status.sh focus "Current state"
 ```
 
-**Never edit JOURNAL.md or .agentic/STATUS.md directly** — always use the scripts.
+**Never edit JOURNAL.md or STATUS.md directly** — always use the scripts.
 
 ### Step 4: Quality Gates
 
@@ -98,7 +83,7 @@ After human approves:
 2. Commit with descriptive message
 3. Create PR if on feature branch: `gh pr create --title "..." --body "..."`
 4. Bump VERSION (at least patch)
-5. Log PR in .agentic/HUMAN_NEEDED.md for review tracking:
+5. Log PR in HUMAN_NEEDED.md for review tracking:
    ```bash
    bash .agentic/lib/tools/blocker.sh add "PR #N: Description" "review" "Details"
    ```
@@ -121,7 +106,7 @@ Steps taken:
 4. Run tests — all pass
 5. Show `git diff --stat` to user: "3 files changed, 85 insertions"
 6. User approves, commit and create PR
-Result: PR #42 created, logged in .agentic/HUMAN_NEEDED.md.
+Result: PR #42 created, logged in HUMAN_NEEDED.md.
 
 **Example 2: WIP still active**
 User says: "let's ship this"
