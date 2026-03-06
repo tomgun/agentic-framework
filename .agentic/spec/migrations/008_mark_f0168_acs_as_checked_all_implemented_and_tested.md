@@ -1,60 +1,42 @@
 <!-- migration-id: 008 -->
 <!-- date: 2026-03-07 -->
-<!-- author: Tomas Günther -->
+<!-- author: Tomas Gunther -->
 <!-- type: feature -->
 
 # Migration 008: Mark F-0168 ACs as checked (all implemented and tested)
 
 ## Context & Why
 
-<!-- Describe the problem or need that led to this change -->
-<!-- Include business need and technical driver -->
+F-0168 (Visual Verification — screenshot collection + AI visual review) was
+implemented and all 13 acceptance criteria passed testing. This migration
+records the spec-to-shipped transition: all ACs marked [x] in F-0168.md
+and status changed to `shipped` in FEATURES.md.
 
 ## Changes
 
-### Features Added
-
-<!-- List new features with F-XXXX IDs -->
-<!-- - F-XXXX: Feature name -->
-<!--   - Detail 1 -->
-<!--   - Detail 2 -->
-
 ### Features Modified
 
-<!-- List modified features -->
-<!-- - F-XXXX: What changed -->
-
-### Features Deprecated
-
-<!-- List deprecated features -->
-<!-- - F-XXXX: Why deprecated, migration path -->
-
-## Dependencies
-
-- **Requires**: None
-- **Blocks**: None
-- **Related**: None
+- F-0168: Visual Verification & Screenshot Collection
+  - All 13 ACs marked as checked (implemented and tested)
+  - Status changed from `in_progress` to `shipped`
 
 ## Acceptance Criteria
 
-- [ ] Criterion 1
-- [ ] Criterion 2
+- [x] F-0168.md has all 13 ACs checked
+- [x] FEATURES.md shows F-0168 as shipped
 
 ## Implementation Notes
 
-<!-- Technical details, patterns used, gotchas -->
+Shipped as part of v0.45.0 (PR #66). Includes screenshot collection,
+AI visual review via Anthropic API, --visual CLI flag, and E2E
+scaffolding docs.
 
 ## Rollback Plan
 
-<!-- Step-by-step instructions to undo this migration -->
-1. Step 1
-2. Step 2
+1. Revert F-0168.md AC checkboxes to unchecked
+2. Change FEATURES.md F-0168 status back to in_progress
 
 ## Related Files
 
-<!-- List files created, modified, or deleted -->
-<!-- - `path/to/file.md` - Action taken -->
-
-## Notes
-
-<!-- Any additional context, future considerations -->
+- `.agentic/spec/acceptance/F-0168.md` — ACs marked checked
+- `.agentic/spec/FEATURES.md` — Status changed to shipped

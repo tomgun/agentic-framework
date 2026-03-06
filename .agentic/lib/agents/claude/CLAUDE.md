@@ -17,6 +17,7 @@ Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX`
 - PR by default: create feature branches and PRs (check `git_workflow` in STACK.md).
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later).
+- Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval.
 - Multi-agent: read `.agentic/session/AGENTS_ACTIVE.md` before starting work.
