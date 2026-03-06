@@ -98,7 +98,7 @@ schema: "feature" | "nfr"
 
 ### Session: YYYY-MM-DD HH:MM
 **Feature**: F-####
-**Accomplished**:
+**What changed**:
 - ...
 **Next steps**:
 - ...

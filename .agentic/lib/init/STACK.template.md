@@ -107,6 +107,10 @@ Purpose: a single source of truth for "how we build and run software here".
   - Unit: `<!-- fill -->`
   - Integration: `<!-- fill or N/A -->`
   - E2E: `<!-- fill or N/A -->`
+  <!-- Multiple e2e-level tiers (uncomment and customize): -->
+  <!-- - E2E API: `pytest tests/e2e/api/` -->
+  <!-- - E2E UI: `npx playwright test` -->
+  <!-- - DSP: `python3 tests/dsp_validation.py` -->
 
 ## Development approach (optional)
 <!-- Choose development workflow mode -->

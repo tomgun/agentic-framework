@@ -384,7 +384,7 @@ deprecated ← ← ← ← ← ← ← ← ┘
 | **Feature** | ID | `F-####` or `none` | ⚠️ Optional | Feature worked on |
 | **Task** | ID | `TASK-####` or `none` | ⚠️ Optional | Task worked on |
 | **Goal for session** | text | Free text | ✅ | What was intended |
-| **Accomplished** | list | Bullets | ✅ | What was done |
+| **What changed** / **Accomplished** | list | Bullets | ✅ | What was done |
 | **Next steps** | list | Bullets | ✅ | What to do next |
 | **Blockers/Issues** | list | Bullets or `none` | ⚠️ Optional | Problems hit |
 | **Decisions made** | list | Bullets or `none` | ⚠️ Optional | Decisions (link ADRs) |

@@ -88,6 +88,12 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0034: Cursor agent leaves work uncommitted and jumps to new tasks — add commit nudge after completing work (compressed context makes it hard to recall what was accomplished later)
 - **Added**: 2026-03-03
 
+### T-0038: PR2: Visual verification for tiered verify loop — screenshot collection, AI review in autonomous mode (F-0168, see plan in session transcript)
+- **Added**: 2026-03-06
+
+### T-0039: PR3: E2E scaffolding — discover.py detection, setup guide, testing contract, quality profiles (see plan in session transcript)
+- **Added**: 2026-03-06
+
 ## Done
 
 
