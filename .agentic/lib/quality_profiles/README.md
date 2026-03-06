@@ -13,6 +13,7 @@ Agents copy and customize these during project initialization to create `quality
 ## Available Profiles
 
 ### Web Applications
+- **webapp_with_e2e.sh** - Web app with E2E tests (Playwright/Cypress) + screenshot collection
 - **webapp_fullstack.sh** (todo) - Full-stack web app validation
 - **webapp_frontend.sh** (todo) - Frontend-only validation
 

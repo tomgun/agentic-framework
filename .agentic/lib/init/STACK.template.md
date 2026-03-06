@@ -113,6 +113,8 @@ Purpose: a single source of truth for "how we build and run software here".
   <!-- - E2E API: `pytest tests/e2e/api/` -->
   <!-- - E2E UI: `npx playwright test` -->
   <!-- - DSP: `python3 tests/dsp_validation.py` -->
+  <!-- E2E screenshots (for visual verification): -->
+  <!-- - E2E screenshots: test-results/ -->
 
 ## Development approach (optional)
 <!-- Choose development workflow mode -->

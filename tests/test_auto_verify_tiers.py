@@ -50,6 +50,7 @@ class TestTestTierDataclass:
         assert tier.timeout == 120
         assert tier.max_fix_iterations == 5
         assert tier.continue_on_failure is False
+        assert tier.screenshot_dir == ""
 
     def test_custom_values(self):
         tier = TestTier(

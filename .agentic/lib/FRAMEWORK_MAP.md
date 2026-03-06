@@ -328,22 +328,66 @@ graph LR
     Review -->|Pass| Tests{Tests Pass?}
     Review -->|Fail| Fix1[Fix Issues]
     Fix1 --> Review
-    
+
     Tests -->|Fail| Fix2[Fix Code/Tests]
     Fix2 --> Tests
-    
+
     Tests -->|Pass| Docs{Docs Updated?}
     Docs -->|No| UpdateDocs[Update STATUS.md<br/>FEATURES.md<br/>JOURNAL.md]
     UpdateDocs --> Docs
-    
+
     Docs -->|Yes| Verify{verify.sh clean?}
-    
+
     Verify -->|Fail| Fix3[Fix Issues]
     Fix3 --> Verify
-    
+
     Verify -->|Pass| Done([Ready to commit])
-    
+
     style Done fill:#90EE90
+```
+
+---
+
+## Autonomous modes (v0.43+)
+
+```mermaid
+graph TD
+    subgraph verify ["ag auto verify"]
+        V1[Run test tier] --> V2{Pass?}
+        V2 -->|No| V3[Spawn Claude fix]
+        V3 --> V1
+        V2 -->|Yes| V4[Next tier]
+        V4 --> V5{More tiers?}
+        V5 -->|Yes| V1
+        V5 -->|No| V6{--visual?}
+        V6 -->|Yes| V7[Collect screenshots<br/>AI visual review]
+        V6 -->|No| V8([Done])
+        V7 --> V8
+    end
+
+    subgraph task ["ag auto task F-XXXX"]
+        T1[Load ACs] --> T2[Create branch]
+        T2 --> T3[Spawn Claude per AC]
+        T3 --> T4{Tests pass?}
+        T4 -->|Yes| T5[Commit AC]
+        T4 -->|No| T6[Retry]
+        T6 --> T3
+        T5 --> T7{More ACs?}
+        T7 -->|Yes| T3
+        T7 -->|No| T8[Run verify loop]
+        T8 --> T9[Create PR]
+    end
+
+    subgraph crunch ["ag auto crunch"]
+        C1[Read planned features] --> C2[Run task mode per feature]
+        C2 --> C3{Max errors?}
+        C3 -->|No| C2
+        C3 -->|Yes| C4([Stop])
+    end
+
+    style V8 fill:#90EE90
+    style T9 fill:#90EE90
+    style C4 fill:#FFB347
 ```
 
 ---

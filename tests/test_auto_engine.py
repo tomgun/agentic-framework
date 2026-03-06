@@ -18,6 +18,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "lib"))
 sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "lib" / "auto"))
 
+from auto import build_claude_cmd
 from auto.engine import AutoEngine, ControlServer, EngineState
 from auto.control import send_command, format_status
 from auto.init import detect_stack, generate_settings
@@ -473,3 +474,67 @@ class TestFormatStatus:
         assert "Decomposed" in output
         assert "AC-002" in output
         assert "2/3 sub-tasks passed" in output
+
+
+# ---------------------------------------------------------------------------
+# build_claude_cmd tests (shared helper from auto/__init__.py)
+# ---------------------------------------------------------------------------
+
+class TestBuildClaudeCmd:
+    def test_no_settings_uses_interactive(self):
+        """Without settings.json, no permission flags (safe default)."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            cmd = build_claude_cmd("claude", root, "hello")
+            assert "--dangerously-skip-permissions" not in cmd
+            assert "--settings" not in cmd
+            assert "--print" in cmd
+            assert "hello" in cmd
+
+    def test_tier1_uses_dangerous_skip(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            (root / ".claude").mkdir()
+            (root / ".claude" / "settings.json").write_text(
+                json.dumps({"_tier": 1, "permissions": {"allow": ["*"], "deny": []}})
+            )
+            cmd = build_claude_cmd("claude", root, "hello")
+            assert "--dangerously-skip-permissions" in cmd
+
+    def test_tier2_uses_settings_file(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            (root / ".claude").mkdir()
+            settings_path = root / ".claude" / "settings.json"
+            settings_path.write_text(
+                json.dumps({"_tier": 2, "permissions": {"allow": ["Read"], "deny": []}})
+            )
+            cmd = build_claude_cmd("claude", root, "hello")
+            assert "--settings" in cmd
+            assert str(settings_path) in cmd
+            assert "--dangerously-skip-permissions" not in cmd
+
+    def test_tier3_uses_interactive(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            (root / ".claude").mkdir()
+            (root / ".claude" / "settings.json").write_text(
+                json.dumps({"_tier": 3, "permissions": {"allow": [], "deny": []}})
+            )
+            cmd = build_claude_cmd("claude", root, "hello")
+            assert "--dangerously-skip-permissions" not in cmd
+            assert "--settings" not in cmd
+
+    def test_corrupt_settings_falls_to_interactive(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            (root / ".claude").mkdir()
+            (root / ".claude" / "settings.json").write_text("not valid json")
+            cmd = build_claude_cmd("claude", root, "hello")
+            assert "--dangerously-skip-permissions" not in cmd
+
+    def test_print_mode_disabled(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            cmd = build_claude_cmd("claude", root, "hello", print_mode=False)
+            assert "--print" not in cmd

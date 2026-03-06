@@ -15,40 +15,23 @@ _No active items_
 
 ---
 
-
-### HN-0016: PR #60: Fix git hooks not installed on init + missing verification (v0.39.1)
-- **Type**: review
-- **Added**: 2026-03-03
-- **Context**: https://github.com/tomgun/agentic-framework/pull/60
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0018: Review PR #62: restructure .agentic/ directory (v0.41.0)
-- **Type**: pr_review
-- **Added**: 2026-03-06
-- **Context**: Major restructure — lib/ separation, tarball distribution, path consolidation. 678 files changed. https://github.com/tomgun/agentic-framework/pull/62
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-### HN-0019: PR #63: Autonomous workflow engine (F-0160–F-0163)
-- **Type**: pr_review
-- **Added**: 2026-03-06
-- **Context**: https://github.com/tomgun/agentic-framework/pull/63
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
+## Resolved
 
 ### HN-0020: PR #64: Tiered verify loop (F-0164, v0.44.0)
-- **Type**: pr_review
-- **Added**: 2026-03-06
-- **Context**: https://github.com/tomgun/agentic-framework/pull/64
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
+- **Resolved**: 2026-03-06
+- **Outcome**: PR #64 merged
 
-## Resolved
+### HN-0019: PR #63: Autonomous workflow engine (F-0160–F-0163)
+- **Resolved**: 2026-03-06
+- **Outcome**: PR #63 merged
+
+### HN-0018: Review PR #62: restructure .agentic/ directory (v0.41.0)
+- **Resolved**: 2026-03-06
+- **Outcome**: PR #62 merged
+
+### HN-0016: PR #60: Fix git hooks not installed on init + missing verification (v0.39.1)
+- **Resolved**: 2026-03-06
+- **Outcome**: PR #60 merged
 
 ### HN-0017: PR #61: Enforcement gap fixes v0.40.0 (F-0154/F-0155/F-0156)
 - **Resolved**: 2026-03-03

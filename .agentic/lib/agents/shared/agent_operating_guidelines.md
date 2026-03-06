@@ -29,6 +29,7 @@ tokens: ~952
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 
 **Quick Commands**: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag spec` | `ag docs` | `ag todo`
+**Autonomous**: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch`
 
 ---
 
@@ -144,6 +145,27 @@ Check for `.agentic/.upgrade_pending` at session start. If it exists, read and f
 ## Git File Tracking
 
 After creating any file, always `git add` it (or add to .gitignore). Untracked files = missing from deployment.
+
+---
+
+## Autonomous Modes (v0.43+)
+
+When the user wants hands-off execution, offer these:
+
+| Mode | Command | When to suggest |
+|------|---------|-----------------|
+| **Verify** | `ag auto verify` | "fix all tests", "make tests pass", "run the test loop" |
+| **Verify + Visual** | `ag auto verify --visual` | Same + project has E2E screenshots configured |
+| **Task** | `ag auto task F-XXXX` | "implement this feature autonomously", "auto-implement" |
+| **Crunch** | `ag auto crunch` | "implement all planned features", "batch process features" |
+
+**How they work**: Verify spawns fresh Claude instances to fix test failures in a loop. Task reads acceptance criteria, implements per-AC, runs verify, creates PR. Crunch runs task mode for each planned feature.
+
+**When NOT to use**: Interactive exploration, design decisions, refactoring without tests. These modes need clear test commands in STACK.md and (for task/crunch) acceptance criteria in `spec/acceptance/`.
+
+**Visual verification** (`--visual`): Requires `E2E screenshots:` configured in STACK.md, `pip install anthropic`, and `ANTHROPIC_API_KEY`. Visual concerns are advisory only (never block).
+
+Details: `.agentic/lib/DEVELOPER_GUIDE.md` (Autonomous Modes section)
 
 ---
 
