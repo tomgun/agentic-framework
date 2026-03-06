@@ -5,7 +5,7 @@
 Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Agentic framework
-- Version: 0.43.0
+- Version: 0.44.1
 - Profile: formal
 - This IS the framework (dogfooding)
 - Source: https://github.com/tomgun/agentic-framework
@@ -36,12 +36,22 @@ Purpose: Configuration for developing the Agentic Framework itself.
 # Doc staleness check at ag done. Profile defaults — Discovery: off | Formal: blocking
 - spec_analysis: on
 # Advisory spec analysis before implementation. Profile defaults — Discovery: off | Formal: on
+- docs_stale_days: 30
+# Days before a doc is flagged stale by docs.sh. Default: 30
+
+### Periodic checks
+- periodic_orphaned_plans: every_session
+# Scan for unsaved plans. Options: every_session | off
+- periodic_retro_check: every_5_sessions
+# Retrospective due check. Options: every_N_sessions | off. Discovery default: off
+- periodic_agent_refresh: every_20_sessions
+# Suggest agent regeneration. Options: every_N_sessions | off. Discovery default: off
 
 ### Complexity limits
-- max_files_per_commit: 15
-# Blocking limit in pre-commit. Profile defaults — Discovery: 15 | Formal: 10
-- max_added_lines: 1200
-# Blocking limit for added lines. Profile defaults — Discovery: 1000 | Formal: 500
+- max_files_per_commit: 10
+# Blocking limit in pre-commit (advisory on feature branches in PR workflow). Profile defaults — Discovery: 15 | Formal: 10
+- max_added_lines: 500
+# Blocking limit for added lines (advisory on feature branches in PR workflow). Profile defaults — Discovery: 1000 | Formal: 500
 - max_code_file_length: 2500
 # Blocking limit for single file length. Profile defaults — Discovery: 1000 | Formal: 500
 
@@ -72,9 +82,8 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - test_fast: bash tests/validate_framework.sh
 - Test commands:
   - Unit: `bash tests/validate_framework.sh`
-  - Integration: N/A
-  - E2E: Manual testing in scratch projects
-  - LLM: `ag test llm` or `python3 tests/llm/interactive_runner.py`
+  - Integration: `python3 -m pytest tests/ -x --ignore=tests/llm`
+  - LLM: `python3 tests/llm/interactive_runner.py --critical`
 
 ## Development approach
 - development_mode: standard  # Acceptance-Driven

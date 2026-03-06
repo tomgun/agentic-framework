@@ -557,13 +557,24 @@ else
   MAX_ADDED_LINES=$(get_setting "max_added_lines" "500")
   MAX_CODE_FILE_LEN=$(get_setting "max_code_file_length" "500")
 
+  # Downgrade batch-size limits to warnings on feature branches in PR workflow
+  BATCH_ADVISORY=0
+  GIT_WORKFLOW=$(get_setting "git_workflow" "direct")
+  if [[ "$GIT_WORKFLOW" == "pull_request" && "$CURRENT_BRANCH" != "main" && "$CURRENT_BRANCH" != "master" ]]; then
+    BATCH_ADVISORY=1
+  fi
+
   if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
     # Count staged files (excluding deletions)
     STAGED_COUNT=$(git diff --cached --name-only --diff-filter=d 2>/dev/null | wc -l | tr -d ' ')
     if [[ $STAGED_COUNT -gt $MAX_FILES ]]; then
-      echo "  ❌ BLOCKED: $STAGED_COUNT files staged (max: $MAX_FILES)"
-      echo "     Split into smaller commits for easier review and safer rollback"
-      COMPLEXITY_FAILURES=$((COMPLEXITY_FAILURES + 1))
+      if [[ $BATCH_ADVISORY -eq 1 ]]; then
+        echo "  ⚠ Advisory: $STAGED_COUNT files staged (guideline: $MAX_FILES) — OK on feature branch, PR is the review unit"
+      else
+        echo "  ❌ BLOCKED: $STAGED_COUNT files staged (max: $MAX_FILES)"
+        echo "     Split into smaller commits for easier review and safer rollback"
+        COMPLEXITY_FAILURES=$((COMPLEXITY_FAILURES + 1))
+      fi
     else
       echo "  ✓ File count: $STAGED_COUNT/$MAX_FILES"
     fi
@@ -571,9 +582,13 @@ else
     # Count ADDED lines only (not total file size, not deletions)
     ADDED_LINES=$(git diff --cached --numstat 2>/dev/null | awk '{sum += $1} END {print sum+0}')
     if [[ $ADDED_LINES -gt $MAX_ADDED_LINES ]]; then
-      echo "  ❌ BLOCKED: $ADDED_LINES lines added (max: $MAX_ADDED_LINES)"
-      echo "     Split into smaller commits"
-      COMPLEXITY_FAILURES=$((COMPLEXITY_FAILURES + 1))
+      if [[ $BATCH_ADVISORY -eq 1 ]]; then
+        echo "  ⚠ Advisory: $ADDED_LINES lines added (guideline: $MAX_ADDED_LINES) — OK on feature branch, PR is the review unit"
+      else
+        echo "  ❌ BLOCKED: $ADDED_LINES lines added (max: $MAX_ADDED_LINES)"
+        echo "     Split into smaller commits"
+        COMPLEXITY_FAILURES=$((COMPLEXITY_FAILURES + 1))
+      fi
     else
       echo "  ✓ Added lines: $ADDED_LINES/$MAX_ADDED_LINES"
     fi
