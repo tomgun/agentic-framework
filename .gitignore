@@ -39,6 +39,7 @@ tests/llm/.test-state
 .agentic/session/auto.sock
 .agentic/session/auto.pid
 .agentic/session/auto-state.json
+.agentic/session/crunch-state.json
 # Note: .agentic/journal/ IS committed (persistent history: manifests, lessons, plans, JOURNAL.md)
 
 # Local notes (not part of framework)

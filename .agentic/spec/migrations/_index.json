@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 3,
+  "last_migration": 5,
   "migrations": [
     {
       "id": 1,
@@ -19,6 +19,18 @@
       "file": "003_initial_spec_creation_for_f0157_f0158_f0159.md",
       "date": "2026-03-06",
       "description": "Initial spec creation for F-0157, F-0158, F-0159"
+    },
+    {
+      "id": 4,
+      "file": "004_add_f0160_autonomous_engine_foundation_acceptance_criteria.md",
+      "date": "2026-03-06",
+      "description": "Add F-0160 autonomous engine foundation acceptance criteria"
+    },
+    {
+      "id": 5,
+      "file": "005_add_f0161_f0162_f0163_autonomous_modes.md",
+      "date": "2026-03-06",
+      "description": "Add F-0161, F-0162, F-0163 autonomous modes"
     }
   ]
 }

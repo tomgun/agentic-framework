@@ -39,8 +39,9 @@ A custom rules file is a great start. This framework builds on the same idea but
 
 **What's designed for** (implemented with tooling, growing in real-world usage):
 - Multi-agent coordination at scale, sequential agent pipelines, automated retrospectives
+- Autonomous workflow modes: test-fix loops, per-AC feature implementation, multi-feature batch processing
 
-**How we know it works**: 367 acceptance tests + 55 LLM behavioral tests verify that agents actually follow the rules. See [TRACEABILITY_MATRIX.md](tests/TRACEABILITY_MATRIX.md) for principle → feature → test mapping.
+**How we know it works**: 430+ acceptance tests + 58 LLM behavioral tests verify that agents actually follow the rules. See [TRACEABILITY_MATRIX.md](tests/TRACEABILITY_MATRIX.md) for principle → feature → test mapping.
 
 **📖 Detailed problem analysis**: [FRAMEWORK_VALUE_PROPOSITION.md](docs/FRAMEWORK_VALUE_PROPOSITION.md)
 
@@ -365,6 +366,7 @@ Enable later: `bash .agentic/lib/tools/enable-formal.sh` | Customize settings: `
 - **Continuous quality validation**: Stack-specific quality gates before commits
 - **Multi-agent coordination**: Multiple AI agents working simultaneously with Git worktrees
 - **PR workflow**: Optional pull request mode for team collaboration
+- **Autonomous workflow modes**: Test-fix loops (`ag auto verify`), per-feature implementation (`ag auto task`), multi-feature batch processing (`ag auto crunch`) with three-tier trust model
 
 ### Tooling
 ```bash
@@ -385,6 +387,12 @@ bash .agentic/lib/tools/brief.sh       # Quick project brief
 bash .agentic/lib/tools/dashboard.sh   # Comprehensive dashboard
 bash .agentic/lib/tools/coverage.sh    # Code annotation coverage
 bash .agentic/lib/tools/feature_graph.sh   # Dependency visualization
+
+# Autonomous workflow modes
+ag auto verify                    # Test-fix loop until green
+ag auto task F-XXXX               # Implement single feature autonomously
+ag auto crunch                    # Batch implement planned features
+ag auto init --tier 2             # Generate scoped permissions
 
 # Manual operations (token-free)
 bash .agentic/lib/tools/whatchanged.sh # Recent changes

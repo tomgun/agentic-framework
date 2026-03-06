@@ -2,7 +2,7 @@
 
 **Purpose**: Comprehensive map of how every principle is implemented, what mechanisms exist, which are actively working, and which are dormant or underutilized.
 
-**Generated**: 2026-03-02 | **Framework Version**: 0.39.0
+**Generated**: 2026-03-06 | **Framework Version**: 0.43.0
 
 ---
 
@@ -90,6 +90,12 @@ graph TB
         F_MUTATION[Mutation Tests<br/>infrastructure validation]
         F_FRAMEWORK_TESTS[Framework Validation<br/>validate_framework.sh]
 
+        %% Autonomous Workflow (v0.43.0)
+        F_AUTO_ENGINE[Autonomous Engine<br/>F-0160]
+        F_AUTO_VERIFY[Auto Verify Mode<br/>F-0161]
+        F_AUTO_TASK[Auto Task Mode<br/>F-0162]
+        F_AUTO_CRUNCH[Auto Crunch Mode<br/>F-0163]
+
         %% SDD Toolkit Insights (v0.39.0)
         F_SPEC_FORMAT[Spec Format Evolution<br/>F-0148]
         F_CLARIFICATION[Clarification Taxonomy<br/>F-0149]
@@ -101,7 +107,8 @@ graph TB
 
     subgraph MECHANISMS["MECHANISMS (How)"]
         %% Scripts
-        M_AG[ag.sh gateway<br/>20+ commands]
+        M_AG[ag.sh gateway<br/>25+ commands]
+        M_AUTO_ENGINE[auto/ engine<br/>socket control + state]
         M_PRECOMMIT[pre-commit-check.sh<br/>17 structural gates]
         M_WIP_SH[wip.sh<br/>state machine]
         M_STATUS_SH[status.sh / journal.sh<br/>token-efficient updates]
@@ -121,7 +128,7 @@ graph TB
         %% Testing
         M_HARNESS[harness.sh<br/>LLM test runner]
         M_MUTATION_SH[mutation_test.sh<br/>infrastructure proofs]
-        M_VALIDATE[validate_framework.sh<br/>372 acceptance tests]
+        M_VALIDATE[validate_framework.sh<br/>430+ acceptance tests]
         M_SPEC_ANALYZE[spec-analyze.sh<br/>semantic consistency]
         M_AC_COV[coverage.py --ac-coverage<br/>per-AC test mapping]
 
@@ -233,6 +240,18 @@ graph TB
     F_QUALITY --> M_QUALITY_DOCS
     F_QUALITY --> M_QUALITY_WIRING
 
+    %% Autonomous features → mechanisms
+    F_AUTO_ENGINE --> M_AUTO_ENGINE
+    F_AUTO_ENGINE --> M_AG
+    F_AUTO_VERIFY --> M_AUTO_ENGINE
+    F_AUTO_TASK --> M_AUTO_ENGINE
+    F_AUTO_CRUNCH --> M_AUTO_ENGINE
+
+    %% Autonomous features ← principles
+    D1 --> F_AUTO_ENGINE
+    D4 --> F_AUTO_TASK
+    F2 --> F_AUTO_VERIFY
+
     %% SDD Toolkit features → mechanisms
     F_SPEC_ANALYZE --> M_SPEC_ANALYZE
     F_AC_COVERAGE --> M_AC_COV
@@ -248,9 +267,100 @@ graph TB
 
     class F1,F2,F3 foundation
     class D1,D2,D3,D4,D5,D6,D7,R1,R2,R3,KISS principle
-    class F_SESSION,F_WIP,F_MULTI_ENV,F_HUMAN_NEEDED,F_MANUAL_OPS,F_PR_WORKFLOW,F_TOKEN_SCRIPTS,F_AGENT_ROLES,F_ORCHESTRATOR,F_CONTEXT_MANIFESTS,F_PRE_COMMIT,F_GIT_HOOKS,F_DOCTOR,F_PHASE,F_MEMORY_SEED,F_THREE_LAYER,F_STATUS,F_JOURNAL,F_CONTEXT_PACK,F_FEATURES_MD,F_SPECS,F_PLAN_REVIEW,F_SMALL_BATCH,F_MULTI_AGENT,F_WORKTREE,F_SEQ_PIPELINE,F_INIT,F_DISCOVERY,F_BROWNFIELD,F_LLM_TESTS,F_MUTATION,F_FRAMEWORK_TESTS,F_QUALITY,F_TIP,F_REMIND feature
-    class M_AG,M_PRECOMMIT,M_WIP_SH,M_STATUS_SH,M_FEATURE_SH,M_DOCTOR_PY,M_CONTEXT_ROLE,M_SYNC,M_DISCOVER,M_HOOKS_PATH,M_CLAUDE_MD,M_AUTO_ORCH,M_MEMORY,M_STACK,M_HARNESS,M_MUTATION_SH,M_VALIDATE,M_QUALITY_DOCS,M_QUALITY_WIRING mechanism
+    class F_SESSION,F_WIP,F_MULTI_ENV,F_HUMAN_NEEDED,F_MANUAL_OPS,F_PR_WORKFLOW,F_TOKEN_SCRIPTS,F_AGENT_ROLES,F_ORCHESTRATOR,F_CONTEXT_MANIFESTS,F_PRE_COMMIT,F_GIT_HOOKS,F_DOCTOR,F_PHASE,F_MEMORY_SEED,F_THREE_LAYER,F_STATUS,F_JOURNAL,F_CONTEXT_PACK,F_FEATURES_MD,F_SPECS,F_PLAN_REVIEW,F_SMALL_BATCH,F_MULTI_AGENT,F_WORKTREE,F_SEQ_PIPELINE,F_INIT,F_DISCOVERY,F_BROWNFIELD,F_LLM_TESTS,F_MUTATION,F_FRAMEWORK_TESTS,F_QUALITY,F_TIP,F_REMIND,F_AUTO_ENGINE,F_AUTO_VERIFY,F_AUTO_TASK,F_AUTO_CRUNCH feature
+    class M_AG,M_PRECOMMIT,M_WIP_SH,M_STATUS_SH,M_FEATURE_SH,M_DOCTOR_PY,M_CONTEXT_ROLE,M_SYNC,M_DISCOVER,M_HOOKS_PATH,M_CLAUDE_MD,M_AUTO_ORCH,M_MEMORY,M_STACK,M_HARNESS,M_MUTATION_SH,M_VALIDATE,M_QUALITY_DOCS,M_QUALITY_WIRING,M_AUTO_ENGINE mechanism
     class F_AGENT_MODE dormant
+```
+
+---
+
+## Autonomous Workflow Modes (v0.43.0)
+
+Three modes build on each other: Verify → Task → Crunch.
+
+### Verify Mode — Test-Fix Loop
+
+```mermaid
+flowchart LR
+    A[Run tests] --> B{All pass?}
+    B -->|Yes| C[Done ✓]
+    B -->|No| D[Spawn fresh Claude<br/>with failure output]
+    D --> E[Claude fixes code]
+    E --> F{Max iterations?}
+    F -->|No| A
+    F -->|Yes| G[Report failures]
+```
+
+### Task Mode — Per-Feature Implementation
+
+```mermaid
+flowchart TB
+    START[ag auto task F-XXXX] --> LOAD[Load acceptance criteria]
+    LOAD --> BRANCH[Create feature branch]
+    BRANCH --> AC_LOOP
+
+    subgraph AC_LOOP["For each AC"]
+        CHECK_FB[Check user feedback] --> SPAWN[Spawn fresh Claude]
+        SPAWN --> TEST{Tests pass?}
+        TEST -->|Yes| COMMIT[Commit AC]
+        TEST -->|No| RETRY{Retries left?}
+        RETRY -->|Yes| SPAWN
+        RETRY -->|No| MARK_FAIL[Mark AC failed]
+    end
+
+    AC_LOOP --> VERIFY[Run verify loop<br/>F-0161]
+    VERIFY --> PR[Create PR for review]
+
+    style AC_LOOP fill:#f0f0f0,stroke:#999
+```
+
+### Crunch Mode — Multi-Feature Batch
+
+```mermaid
+flowchart TB
+    START[ag auto crunch] --> READ[Read planned features<br/>from FEATURES.md]
+    READ --> FEAT_LOOP
+
+    subgraph FEAT_LOOP["For each feature"]
+        TASK[Run task mode<br/>F-0162]
+        TASK --> RESULT{Success?}
+        RESULT -->|Yes| NEXT[Next feature]
+        RESULT -->|No| ERR_COUNT{Max errors<br/>reached?}
+        ERR_COUNT -->|No| NEXT
+        ERR_COUNT -->|Yes| STOP_ERR[Stop batch]
+    end
+
+    FEAT_LOOP --> SUMMARY[Final summary:<br/>completed / failed / skipped]
+
+    CONTROL[ag auto pause/stop/feedback] -.->|"control socket"| FEAT_LOOP
+
+    style FEAT_LOOP fill:#f0f0f0,stroke:#999
+```
+
+### Three-Tier Trust Model
+
+```mermaid
+graph LR
+    subgraph T1["Tier 1: Sandbox"]
+        D[Docker container]
+        D --> SKIP["--dangerously-skip-permissions"]
+    end
+    subgraph T2["Tier 2: Scoped"]
+        S[settings.json]
+        S --> ALLOW["Read/Edit/Glob/Grep/git/test"]
+        S --> DENY["No rm -rf, sudo, curl|bash"]
+    end
+    subgraph T3["Tier 3: Interactive"]
+        P[Normal prompts]
+        P --> APPROVE["Human approves each action"]
+    end
+
+    T1 ---|"most autonomous"| T2
+    T2 ---|"most controlled"| T3
+
+    style T1 fill:#e74c3c,color:#fff
+    style T2 fill:#f39c12,color:#fff
+    style T3 fill:#27ae60,color:#fff
 ```
 
 ---

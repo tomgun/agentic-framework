@@ -1282,6 +1282,18 @@ cmd_auto() {
         status|pause|resume|stop)
             python3 "$auto_dir/control.py" "$subcmd" --project-root "$ROOT_DIR"
             ;;
+        verify)
+            # Autonomous test-fix loop (F-0161)
+            python3 "$auto_dir/verify.py" --project-root "$ROOT_DIR" "$@"
+            ;;
+        task)
+            # Single-feature implementation (F-0162)
+            python3 "$auto_dir/task.py" --project-root "$ROOT_DIR" "$@"
+            ;;
+        crunch)
+            # Multi-feature batch mode (F-0163)
+            python3 "$auto_dir/crunch.py" --project-root "$ROOT_DIR" "$@"
+            ;;
         feedback)
             python3 "$auto_dir/control.py" feedback "$@" --project-root "$ROOT_DIR"
             ;;
@@ -1290,6 +1302,9 @@ cmd_auto() {
             echo ""
             echo "COMMANDS:"
             echo "  init [--tier N]       Generate settings.json (N=1 sandboxed, 2 scoped, 3 interactive)"
+            echo "  verify                Run test-fix loop until green (F-0161)"
+            echo "  task <F-XXXX>         Implement a single feature autonomously (F-0162)"
+            echo "  crunch [--features .] Implement multiple features in batch (F-0163)"
             echo "  status                Show engine state"
             echo "  pause                 Pause running engine"
             echo "  resume                Resume paused engine"

@@ -1487,6 +1487,78 @@
         ],
         "max_commits": null
       }
+    },
+    {
+      "id": "072_auto_verify_help",
+      "description": "ag auto verify --help should show test-fix loop options including max-iterations and test-command",
+      "section": "auto",
+      "category": "Important",
+      "llm_test_id": "LLM-072",
+      "profile": "formal",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "Show me the help for ag auto verify",
+      "expected": {
+        "output_contains": [
+          "max-iterations|iteration|test"
+        ],
+        "output_contains_any": [
+          "verify|test-fix|loop|fix"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "073_auto_task_help",
+      "description": "ag auto task --help should show single-feature implementation options",
+      "section": "auto",
+      "category": "Important",
+      "llm_test_id": "LLM-073",
+      "profile": "formal",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "Show me the help for ag auto task",
+      "expected": {
+        "output_contains": [
+          "feature|F-XXXX|feature_id"
+        ],
+        "output_contains_any": [
+          "task|implement|acceptance|branch|PR|retries"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "074_auto_crunch_help",
+      "description": "ag auto crunch --help should show multi-feature batch options",
+      "section": "auto",
+      "category": "Important",
+      "llm_test_id": "LLM-074",
+      "profile": "formal",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "Show me the help for ag auto crunch",
+      "expected": {
+        "output_contains": [
+          "feature|batch|multi|crunch"
+        ],
+        "output_contains_any": [
+          "max-errors|features|FEATURES.md|batch"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }

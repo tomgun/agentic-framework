@@ -63,6 +63,9 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 | "Plan this first" | `ag plan` | Creates reviewable plan, saves to journal |
 | "Commit this" | `ag commit` | Runs all quality gates, blocks if issues |
 | "We're done" | `ag done` | Checks docs updated, tests pass, acceptance met |
+| "Fix tests automatically" | `ag auto verify` | Test-fix loop until green or max iterations |
+| "Implement this feature" | `ag auto task F-XXXX` | Autonomous per-AC implementation + PR |
+| "Process all planned features" | `ag auto crunch` | Batch implementation of planned features |
 
 You don't need to memorize these commands. The agent picks the right one.
 
@@ -642,6 +645,38 @@ Missing acceptance criteria: F-0007, F-0010
 Needs acceptance validation:
   F-0005 (shipped but not accepted)
   F-0006 (shipped but not accepted)
+```
+
+### Autonomous Workflow Mode
+
+The framework includes an autonomous engine that can implement features with minimal human intervention.
+
+#### Three Modes
+
+| Mode | Command | What it does |
+|------|---------|-------------|
+| **Verify** | `ag auto verify` | Test-fix loop: runs tests, spawns Claude to fix failures, repeats until green |
+| **Task** | `ag auto task F-XXXX` | Implements one feature: reads ACs, spawns Claude per AC, commits passing work, creates PR |
+| **Crunch** | `ag auto crunch` | Batch mode: reads planned features from FEATURES.md, runs task mode for each |
+
+#### Three Trust Tiers
+
+```bash
+ag auto init --tier 1   # Docker sandbox (--dangerously-skip-permissions)
+ag auto init --tier 2   # Scoped settings.json with explicit permissions (default)
+ag auto init --tier 3   # Interactive prompts (safest, slowest)
+```
+
+#### Control Commands
+
+While the engine runs, use these from another terminal:
+
+```bash
+ag auto status             # Show current progress
+ag auto pause              # Pause the engine
+ag auto resume             # Resume from pause
+ag auto stop               # Stop gracefully
+ag auto feedback AC-003 "use the existing auth module"  # Guide next implementation
 ```
 
 ### Analysis Scripts
