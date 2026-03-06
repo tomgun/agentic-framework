@@ -630,6 +630,11 @@ def main() -> None:
         default=Path.cwd(),
         help="Project root directory",
     )
+    parser.add_argument(
+        "--visual",
+        action="store_true",
+        help="Enable AI visual review (used at final verification step)",
+    )
     args = parser.parse_args()
 
     engine = AutoEngine(args.project_root)

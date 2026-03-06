@@ -69,6 +69,19 @@ The user is helping enforce quality. Run `doctor.sh --full` immediately and repo
 | `quick_issue.sh` | Log bugs to ISSUES.md |
 | `wip.sh` | Track work-in-progress |
 
+## Autonomous Modes
+
+For hands-off execution when tests and acceptance criteria are already defined:
+
+| Command | What it does |
+|---------|-------------|
+| `ag auto verify` | Test-fix loop: runs tests, spawns Claude to fix failures, repeats until green |
+| `ag auto verify --visual` | Same + AI visual review of E2E screenshots |
+| `ag auto task F-XXXX` | Implements feature: reads ACs, codes per AC, tests, commits, creates PR |
+| `ag auto crunch` | Batch: processes all planned features via task mode |
+
+**Prerequisites**: Test commands configured in STACK.md. For task/crunch: acceptance criteria in `spec/acceptance/F-XXXX.md`.
+
 ## Feature Work
 
 For implementing features, consider using the orchestrator:

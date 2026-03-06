@@ -1,8 +1,17 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.41.0)
-**Date**: 2026-03-02
+**Period**: Initial Development (v0.1.0 → v0.45.0)
+**Date**: 2026-03-07
+
+---
+
+## Recent Contributions
+
+### F-0168: Visual Verification (v0.45.0)
+- Designed two-phase approach: screenshot collection + AI visual review
+- Plan review identified 6 improvements (feature_id coupling, engine.py scope, collection timing, dedup, cap mismatch, init_playbook scope)
+- Advisory-only visual concerns (never block) as core design principle
 
 ---
 
@@ -2554,8 +2563,28 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### Visual Verification & E2E Scaffolding (F-0168, v0.45.0)
+
+**Design decisions**: Visual review uses the Anthropic API directly (not Claude CLI) for multimodal image analysis. Screenshots collected per-tier (not per-project) — an e2e tier with `screenshot_dir` gets screenshots collected, unit tiers don't. AI visual review is advisory-only — concerns never block the build. Graceful degradation: no `anthropic` SDK or `ANTHROPIC_API_KEY` = warning + skip, not error.
+
+**E2E detection**: `discover.py` now detects Playwright, Cypress, Detox, WebdriverIO via config files and package.json devDependencies. E2E testing contract documented as tool-agnostic: shell command + parseable output + screenshots directory + server management is the test's responsibility.
+
+**Autonomous mode discoverability**: Surfaced `ag auto verify`, `ag auto task`, `ag auto crunch` across all 5 agent instruction files (Claude, Cursor, Copilot, Codex, shared guidelines), orchestration docs, quick starts, START_HERE, FRAMEWORK_MAP, and DEVELOPER_GUIDE. Added trigger-word rows for when agents should suggest autonomous modes.
+
+---
+
+### Task Scheduling & Parallel Execution in Auto Modes (design direction)
+
+**User insight**: Before the auto engine executes tasks, there should be a **scheduling phase** that analyzes dependencies and priorities. This applies at **two levels**: (1) In crunch mode, the task list is **features from FEATURES.md** — independent features should run in parallel on separate worktrees, dependent features should be ordered. (2) Within a single feature (task mode), ACs can also be scheduled — independent ACs in parallel, dependent ACs sequential. The crunch-level scheduling is arguably more impactful since independent features touch entirely different files, making parallel execution safer.
+
+**Resource-aware strategy**: When tokens/budget are abundant, spin up parallel work streams for independent tasks. When tokens are scarce, go sequential to avoid wasting context on dead-end branches that hit the wall. The agent mode setting (`premium`/`balanced`/`economy`) should influence this — premium enables parallelism, economy forces sequential.
+
+**Scheduling model**: Tasks → dependency analysis → priority sort → execution graph. Independent tasks fan out to parallel worktrees. Dependent tasks chain sequentially. This connects the plan-level annotations ([P] markers, phased execution from F-0148) to the runtime engine — making the planning work actually drive execution, not just document intent. Related: T-0033, T-0043, SDD toolkit analysis §9.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.44.0
+**Current Version**: v0.45.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions

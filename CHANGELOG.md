@@ -5,6 +5,13 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.0] - 2026-03-07
+
+### Added
+- **Visual Verification (F-0168)** — Screenshot collection from E2E test tiers and AI-powered visual review. `TestTier.screenshot_dir` and `TierResult.screenshots` fields. Parses `E2E screenshots:` from STACK.md. `--visual` flag on verify.py, task.py, engine.py triggers Anthropic API multimodal review. Graceful degradation (no SDK/key = warning + skip). Visual concerns are advisory only (never block). New `VisualReviewResult` dataclass with full serialization.
+- **E2E Scaffolding** — `_detect_e2e_framework()` in discover.py detects Playwright, Cypress, Detox, WebdriverIO from config files and package.json. E2E testing contract doc, setup guide, and `webapp_with_e2e.sh` quality profile. STACK.template.md gains `E2E screenshots:` config line.
+- 41 new tests in `test_auto_visual.py` (screenshot collection, parsing, visual review, E2E detection).
+
 ## [0.43.0] - 2026-03-06
 
 ### Added

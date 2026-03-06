@@ -93,11 +93,13 @@ class TaskRunner:
         project_root: Path,
         claude_command: str = "claude",
         on_ac_done: Optional[callable] = None,
+        visual: bool = False,
     ) -> None:
         self.project_root = project_root.resolve()
         self.paths = get_paths(project_root)
         self.claude_command = claude_command
         self.on_ac_done = on_ac_done
+        self.visual = visual
         self.engine = AutoEngine(project_root)
 
     def run(
@@ -188,6 +190,7 @@ class TaskRunner:
         verify_loop = VerifyLoop(
             project_root=self.project_root,
             claude_command=self.claude_command,
+            visual=self.visual,
         )
         verify_result = verify_loop.run(max_iterations=5)
         result.verification_passed = verify_result.success
@@ -359,6 +362,11 @@ def main() -> int:
         action="store_true",
         help="Output result as JSON",
     )
+    parser.add_argument(
+        "--visual",
+        action="store_true",
+        help="Run AI visual review on collected screenshots",
+    )
     args = parser.parse_args()
 
     def print_ac(ac: ACResult) -> None:
@@ -371,6 +379,7 @@ def main() -> int:
     runner = TaskRunner(
         project_root=args.project_root,
         on_ac_done=None if args.json else print_ac,
+        visual=args.visual,
     )
 
     if not args.json:

@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -74,6 +75,7 @@ class TestTier:
     timeout: int = 120
     max_fix_iterations: int = 5
     continue_on_failure: bool = False
+    screenshot_dir: str = ""
 
 
 @dataclass
@@ -99,15 +101,40 @@ class TierResult:
     tests_failed: int = 0
     iterations: list[IterationResult] = field(default_factory=list)
     final_test_output: str = ""
+    screenshots: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
-        return {
+        d = {
             "tier_name": self.tier_name,
             "success": self.success,
             "iterations_used": self.iterations_used,
             "tests_passed": self.tests_passed,
             "tests_failed": self.tests_failed,
         }
+        if self.screenshots:
+            d["screenshots"] = self.screenshots
+        return d
+
+
+@dataclass
+class VisualReviewResult:
+    """Result of an AI-powered visual review of screenshots."""
+    performed: bool = False
+    screenshots_reviewed: int = 0
+    concerns: list[str] = field(default_factory=list)
+    summary: str = ""
+    error: str = ""
+
+    def to_dict(self) -> dict:
+        d: dict = {"performed": self.performed}
+        if self.performed:
+            d["screenshots_reviewed"] = self.screenshots_reviewed
+            d["summary"] = self.summary
+            if self.concerns:
+                d["concerns"] = self.concerns
+        if self.error:
+            d["error"] = self.error
+        return d
 
 
 @dataclass
@@ -121,8 +148,8 @@ class VerifyResult:
     final_test_output: str = ""
     final_tests_passed: int = 0
     final_tests_failed: int = 0
-    # New: per-tier results
     tier_results: list[TierResult] = field(default_factory=list)
+    visual_review: Optional[VisualReviewResult] = None
 
     def to_dict(self) -> dict:
         d = {
@@ -146,6 +173,8 @@ class VerifyResult:
         }
         if self.tier_results:
             d["tier_results"] = [tr.to_dict() for tr in self.tier_results]
+        if self.visual_review:
+            d["visual_review"] = self.visual_review.to_dict()
         return d
 
 
@@ -166,12 +195,14 @@ class VerifyLoop:
         claude_command: str = "claude",
         on_iteration: Optional[callable] = None,
         on_tier: Optional[callable] = None,
+        visual: bool = False,
     ) -> None:
         self.project_root = project_root.resolve()
         self.paths = get_paths(project_root)
         self.claude_command = claude_command
         self.on_iteration = on_iteration  # callback(IterationResult)
         self.on_tier = on_tier  # callback(TierResult)
+        self.visual = visual
 
         # Detect tiers — explicit test_command creates a single tier
         if test_command:
@@ -242,6 +273,10 @@ class VerifyLoop:
         if result.tier_results:
             result.final_test_output = result.tier_results[-1].final_test_output
 
+        # Visual review (advisory only)
+        if self.visual:
+            result.visual_review = self._run_visual_review(result.tier_results)
+
         return result
 
     def _run_tier(
@@ -307,6 +342,9 @@ class VerifyLoop:
             tier_result.final_test_output = final_output
             tier_result.tests_passed = passed
             tier_result.tests_failed = failed
+
+        # Collect screenshots after tier completes (pass or fail)
+        tier_result.screenshots = self._collect_screenshots(tier)
 
         return tier_result
 
@@ -374,6 +412,11 @@ class VerifyLoop:
             result.final_tests_passed = passed
             result.final_tests_failed = failed
 
+        # Visual review (advisory only)
+        if self.visual:
+            screenshots = self._collect_screenshots(tier)
+            result.visual_review = self._run_visual_review_from_paths(screenshots)
+
         return result
 
     def _filter_tiers(self, prefix: str) -> list[TestTier]:
@@ -398,6 +441,12 @@ class VerifyLoop:
             # 1. Try new multi-tier format: `Test commands:` section
             tiers = self._parse_test_commands_section(content)
             if tiers:
+                # Apply screenshot_dir to e2e tiers
+                screenshot_dir = self._parse_screenshot_dir(content)
+                if screenshot_dir:
+                    for tier in tiers:
+                        if _E2E_TIER_RE.search(tier.name):
+                            tier.screenshot_dir = screenshot_dir
                 return tiers
 
             # 2. Try old single-command format
@@ -467,6 +516,69 @@ class VerifyLoop:
             or cmd.lower() == "n/a"
             or "fill" in cmd.lower() and "-->" in cmd
         )
+
+    @staticmethod
+    def _parse_screenshot_dir(content: str) -> str:
+        """Parse `E2E screenshots:` from STACK.md content."""
+        match = re.search(
+            r"^[- ]*E2E screenshots:\s*(?:`([^`]+)`|([^<\n]+))",
+            content,
+            re.MULTILINE | re.IGNORECASE,
+        )
+        if not match:
+            return ""
+        val = (match.group(1) or match.group(2) or "").strip()
+        if VerifyLoop._is_placeholder(val):
+            return ""
+        return val
+
+    _SCREENSHOT_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
+    _MAX_SCREENSHOTS = 20
+
+    def _collect_screenshots(self, tier: TestTier) -> list[str]:
+        """Collect screenshots from a tier's screenshot_dir into session dir."""
+        if not tier.screenshot_dir:
+            return []
+        src_dir = self.project_root / tier.screenshot_dir
+        if not src_dir.is_dir():
+            return []
+
+        images = [
+            p for p in src_dir.rglob("*")
+            if p.is_file() and p.suffix.lower() in self._SCREENSHOT_EXTENSIONS
+        ]
+        if not images:
+            return []
+        images = sorted(images)[:self._MAX_SCREENSHOTS]
+
+        # Copy to session screenshots dir
+        tier_slug = re.sub(r"[^a-z0-9]+", "-", tier.name.lower()).strip("-")
+        dest_dir = self.paths.session_dir / "screenshots" / tier_slug
+        dest_dir.mkdir(parents=True, exist_ok=True)
+
+        paths = []
+        for img in images:
+            dest = dest_dir / img.name
+            shutil.copy2(str(img), str(dest))
+            paths.append(str(dest))
+        return paths
+
+    def _run_visual_review(self, tier_results: list[TierResult]) -> VisualReviewResult:
+        """Run visual review on all screenshots from tier results."""
+        all_screenshots = []
+        for tr in tier_results:
+            all_screenshots.extend(tr.screenshots)
+        return self._run_visual_review_from_paths(all_screenshots)
+
+    def _run_visual_review_from_paths(self, screenshot_paths: list[str]) -> VisualReviewResult:
+        """Run visual review on a list of screenshot paths."""
+        if not screenshot_paths:
+            return VisualReviewResult(
+                performed=False,
+                error="No screenshots found for visual review",
+            )
+        from auto.visual import visual_review
+        return visual_review(screenshot_paths)
 
     # Old API preserved for backward compat
     def _detect_test_command(self) -> str:
@@ -655,6 +767,11 @@ def main() -> int:
         action="store_true",
         help="Output result as JSON",
     )
+    parser.add_argument(
+        "--visual",
+        action="store_true",
+        help="Run AI visual review on collected screenshots",
+    )
     args = parser.parse_args()
 
     def print_iteration(it: IterationResult) -> None:
@@ -679,6 +796,7 @@ def main() -> int:
         test_command=args.test_command,
         on_iteration=None if args.json else print_iteration,
         on_tier=None if args.json else print_tier,
+        visual=args.visual,
     )
 
     if not args.json:
@@ -710,6 +828,21 @@ def main() -> int:
                 f"Still {result.final_tests_failed} failure(s) after "
                 f"{result.iterations_used} iterations."
             )
+
+        # Print visual review results
+        vr = result.visual_review
+        if vr and vr.performed:
+            print(f"\nVisual review ({vr.screenshots_reviewed} screenshots):")
+            if vr.summary:
+                print(f"  Summary: {vr.summary}")
+            if vr.concerns:
+                print("  Concerns (advisory):")
+                for c in vr.concerns:
+                    print(f"    - {c}")
+            else:
+                print("  No visual concerns found.")
+        elif vr and vr.error:
+            print(f"\nVisual review: {vr.error}")
 
     return 0 if result.success else 1
 

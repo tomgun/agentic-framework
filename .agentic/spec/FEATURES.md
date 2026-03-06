@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.44.0
+**Version**: 0.45.0
 
 ---
 
@@ -24,7 +24,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 | **Design Principles** | 10 | 10 | 0 | 0 |
 | **Agent System** | 12 | 10 | 2 | 0 |
 | **Verification & Enforcement** | 17 | 16 | 0 | 1 |
-| **Autonomous** | 5 | 5 | 0 | 0 |
+| **Autonomous** | 6 | 5 | 1 | 0 |
 
 ---
 
@@ -2714,4 +2714,25 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 - Tests: `tests/test_auto_verify_tiers.py` (40 tests), `tests/test_auto_verify.py` (23 existing, backward compat)
 
 **Acceptance**: See `spec/acceptance/F-0164.md`
+
+---
+
+## F-0168: Visual Verification
+
+**Status**: in_progress
+**Category**: Autonomous
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.45.0
+
+**Description**: Screenshot collection from e2e test tiers and AI-powered visual review via Anthropic API. Parses `E2E screenshots:` from STACK.md, copies screenshots to session dir, optional `--visual` flag triggers multimodal AI review. Graceful degradation (no SDK/key = warning). Visual concerns are advisory only (never block).
+
+**Dependencies**: F-0164
+
+**Implementation**:
+- State: in_progress
+- Code: `.agentic/lib/auto/verify.py` (screenshot collection, wiring), `.agentic/lib/auto/visual.py` (AI review)
+- Tests: `tests/test_auto_visual.py`
+
+**Acceptance**: See `spec/acceptance/F-0168.md`
 
