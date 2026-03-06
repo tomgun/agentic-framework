@@ -24,7 +24,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 | **Design Principles** | 10 | 10 | 0 | 0 |
 | **Agent System** | 12 | 10 | 2 | 0 |
 | **Verification & Enforcement** | 17 | 16 | 0 | 1 |
-| **Autonomous** | 6 | 5 | 1 | 0 |
+| **Autonomous** | 6 | 6 | 0 | 0 |
 
 ---
 
@@ -2719,7 +2719,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0168: Visual Verification
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: medium
 **Complexity**: medium
@@ -2730,7 +2730,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Dependencies**: F-0164
 
 **Implementation**:
-- State: in_progress
+- State: shipped
 - Code: `.agentic/lib/auto/verify.py` (screenshot collection, wiring), `.agentic/lib/auto/visual.py` (AI review)
 - Tests: `tests/test_auto_visual.py`
 

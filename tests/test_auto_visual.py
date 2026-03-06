@@ -138,6 +138,22 @@ class TestScreenshotCollection:
 
         assert len(screenshots) == 2
 
+    def test_handles_filename_collisions(self, project_dir):
+        """Same filename in different subdirs should not overwrite."""
+        (project_dir / "STACK.md").write_text("## Settings\n")
+        ss_dir = project_dir / "test-results"
+        _make_image(ss_dir / "chromium" / "test.png", size=50)
+        _make_image(ss_dir / "firefox" / "test.png", size=80)
+
+        loop = VerifyLoop(project_dir, test_command="echo ok")
+        tier = TestTier(name="E2E", command="echo ok", screenshot_dir="test-results")
+        screenshots = loop._collect_screenshots(tier)
+
+        assert len(screenshots) == 2
+        # Both files should exist with different names
+        names = [Path(s).name for s in screenshots]
+        assert len(set(names)) == 2  # no duplicates
+
 
 # ---------------------------------------------------------------------------
 # TestScreenshotDirParsing

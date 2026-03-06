@@ -1416,3 +1416,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-07 00:39 - F-0168 Review Fixes
+
+**Why**: Code review found 6 issues
+
+**What changed**:
+- Fixed screenshot collision bug, module-level import, spec/changelog gaps, marked F-0168 shipped
+
+**Next steps**:
+- Push PR, merge
+
+**Blockers**: None
+

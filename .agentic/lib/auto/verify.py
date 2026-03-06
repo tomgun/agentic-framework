@@ -557,8 +557,14 @@ class VerifyLoop:
         dest_dir.mkdir(parents=True, exist_ok=True)
 
         paths = []
+        seen_names: set[str] = set()
         for img in images:
-            dest = dest_dir / img.name
+            name = img.name
+            if name in seen_names:
+                # Prefix with parent dir to avoid collision
+                name = f"{img.parent.name}_{name}"
+            seen_names.add(name)
+            dest = dest_dir / name
             shutil.copy2(str(img), str(dest))
             paths.append(str(dest))
         return paths

@@ -15,6 +15,7 @@ from __future__ import annotations
 import atexit
 import json
 import os
+import re
 import signal
 import socket
 import sys
@@ -487,8 +488,7 @@ class AutoEngine:
 
             # Parse JSON array from output
             try:
-                import re as _re
-                json_match = _re.search(r"\[.*\]", output, _re.DOTALL)
+                json_match = re.search(r"\[.*\]", output, re.DOTALL)
                 if json_match:
                     items = json.loads(json_match.group())
                     if isinstance(items, list) and len(items) >= 2:
@@ -633,9 +633,12 @@ def main() -> None:
     parser.add_argument(
         "--visual",
         action="store_true",
-        help="Enable AI visual review (used at final verification step)",
+        help="Enable AI visual review (used at final verification step, not per-AC)",
     )
     args = parser.parse_args()
+
+    if args.visual:
+        print("Note: --visual is applied at final verification only, not per-AC iteration.")
 
     engine = AutoEngine(args.project_root)
     result = engine.start(feature_id=args.feature_id, mode=args.mode)
