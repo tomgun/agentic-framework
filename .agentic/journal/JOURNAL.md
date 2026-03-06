@@ -1442,3 +1442,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-07 01:02 - Spec Protection Docs
+
+**Why**: Spec protection was invisible in entry points agents read first — only discovered at pre-commit block time
+
+**What changed**:
+- Filled migration 008 stub, added spec protection bullet to all 5 agent entry points (CLAUDE.md, cursorrules, copilot, codex, claude template), added callout to FRAMEWORK_QUICK_START.md, added section to agent_operating_guidelines.md
+
+**Next steps**:
+- Commit and PR
+
+**Blockers**: None
+

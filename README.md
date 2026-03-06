@@ -1,8 +1,10 @@
 # Agentic AI Framework
 
-**Portable, token-efficient, test-driven framework for AI-assisted software development.**
+**Portable, token-efficient, spec-and-test-driven framework for agentic/assisted software development.**
 
 *Shortname: Agentic AF*
+*Alternative name: Agentic Spec-Driven Framework, short: ASDF*
+
 
 [![Latest Release](https://img.shields.io/github/v/release/tomgun/agentic-framework?label=version)](https://github.com/tomgun/agentic-framework/releases/latest)
 

@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0164 Tiered Verify Loop — PR1 ready, PR2/PR3 pending (Updated: 2026-03-06 22:20 EET)
+- Spec protection docs — ready to commit (Updated: 2026-03-07 01:02 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)
