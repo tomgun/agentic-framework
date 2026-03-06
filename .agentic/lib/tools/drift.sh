@@ -411,7 +411,7 @@ check_status_drift() {
 #=============================================================================
 
 check_tests_drift() {
-    local acceptance_dir="$ROOT_DIR/spec/acceptance"
+    local acceptance_dir="${ACCEPTANCE_DIR:-$ROOT_DIR/.agentic/spec/acceptance}"
 
     if [[ ! -d "$acceptance_dir" ]]; then
         return 0  # No acceptance criteria (Core profile)
@@ -955,7 +955,8 @@ output_json() {
 
     # Count issues by type
     local type_counts="{}"
-    for issue in "${JSON_ISSUES[@]}"; do
+    for issue in "${JSON_ISSUES[@]+"${JSON_ISSUES[@]}"}"; do
+        [[ -z "$issue" ]] && continue
         local issue_type
         issue_type=$(echo "$issue" | grep -oE '"type":"[^"]+"' | cut -d'"' -f4)
         # Simple counting - for more complex needs, use jq
@@ -964,7 +965,7 @@ output_json() {
     # Build issues array
     local issues_json="["
     local first=true
-    for issue in "${JSON_ISSUES[@]}"; do
+    for issue in "${JSON_ISSUES[@]+"${JSON_ISSUES[@]}"}"; do
         if [[ "$first" == "true" ]]; then
             first=false
         else

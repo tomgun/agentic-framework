@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 2,
+  "last_migration": 3,
   "migrations": [
     {
       "id": 1,
@@ -13,6 +13,12 @@
       "file": "002_add_realtime_notifications.md",
       "date": "2026-01-04",
       "description": "Add real-time notifications (template)"
+    },
+    {
+      "id": 3,
+      "file": "003_initial_spec_creation_for_f0157_f0158_f0159.md",
+      "date": "2026-03-06",
+      "description": "Initial spec creation for F-0157, F-0158, F-0159"
     }
   ]
 }

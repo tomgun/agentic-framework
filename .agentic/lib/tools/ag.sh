@@ -540,7 +540,7 @@ cmd_plan() {
         echo "  - CONTEXT_PACK.md"
         echo ""
         echo "Write plan to: .agentic/journal/plans/${feature_id}-plan.md"
-        echo "Follow format in: .agentic/workflows/plan_review_loop.md"
+        echo "Follow format in: .agentic/lib/workflows/plan_review_loop.md"
         echo "Set status to: APPROVED (no review)"
         return 0
     fi
@@ -561,14 +561,14 @@ cmd_plan() {
     echo "    prompt: \"Create implementation plan for $feature_id."
     echo "            Read: .agentic/spec/acceptance/${feature_id}.md, CONTEXT_PACK.md"
     echo "            Write to: .agentic/journal/plans/${feature_id}-plan.md"
-    echo "            Follow: .agentic/workflows/plan_review_loop.md\""
+    echo "            Follow: .agentic/lib/workflows/plan_review_loop.md\""
     echo ""
     echo -e "${BLUE}STEP 2: REVIEWER critiques the plan${NC}"
     echo "  Task tool:"
     echo "    subagent_type: general-purpose"
     echo "    model: opus  # Critical review needs quality"
     echo "    prompt: \"Critically review plan at .agentic/journal/plans/${feature_id}-plan.md"
-    echo "            Follow reviewer instructions in .agentic/workflows/plan_review_loop.md"
+    echo "            Follow reviewer instructions in .agentic/lib/workflows/plan_review_loop.md"
     echo "            Add review to Review History section."
     echo "            Set verdict: APPROVED, REVISION_NEEDED, or ESCALATE\""
     echo ""
@@ -580,7 +580,7 @@ cmd_plan() {
     echo -e "${BOLD}═══════════════════════════════════════════════════════════════${NC}"
     echo ""
     echo "Plan artifact: .agentic/journal/plans/${feature_id}-plan.md"
-    echo "Workflow docs: .agentic/workflows/plan_review_loop.md"
+    echo "Workflow docs: .agentic/lib/workflows/plan_review_loop.md"
 }
 
 # Implement command - verify acceptance exists, start WIP (Formal only)
@@ -620,7 +620,7 @@ cmd_implement() {
         if [ -n "$current_wip" ] && [ "$current_wip" != "$feature_id" ]; then
             echo -e "${RED}BLOCKED: $current_wip is already in progress${NC}"
             echo "  Complete it first: ag done $current_wip"
-            echo "  Or clear WIP: bash .agentic/tools/wip.sh complete"
+            echo "  Or clear WIP: bash .agentic/lib/tools/wip.sh complete"
             exit 1
         fi
     fi
@@ -723,8 +723,8 @@ cmd_implement() {
     echo "Remember: Update FEATURES.md status to 'in_progress'"
     echo ""
     echo -e "${BOLD}References:${NC}"
-    echo "  Playbook: .agentic/agents/shared/auto_orchestration.md"
-    echo "  Checklist: .agentic/checklists/feature_implementation.md"
+    echo "  Playbook: .agentic/lib/agents/shared/auto_orchestration.md"
+    echo "  Checklist: .agentic/lib/checklists/feature_implementation.md"
 }
 
 # Commit command - pre-commit gates (profile-aware)
@@ -738,12 +738,12 @@ cmd_commit() {
     if [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
         if [ "$wip_mode" = "warning" ]; then
             echo -e "${YELLOW}WARNING: .agentic/session/WIP.md exists${NC}"
-            echo "  Consider completing WIP: bash .agentic/tools/wip.sh complete"
+            echo "  Consider completing WIP: bash .agentic/lib/tools/wip.sh complete"
             echo ""
         else
             echo -e "${RED}BLOCKED: .agentic/session/WIP.md exists${NC}"
             echo "  Work-in-progress must be completed before committing."
-            echo "  Run: bash .agentic/tools/wip.sh complete"
+            echo "  Run: bash .agentic/lib/tools/wip.sh complete"
             echo ""
             exit 1
         fi
@@ -773,8 +773,8 @@ cmd_commit() {
         echo ""
         echo ""
         echo -e "${BOLD}Pre-commit artifacts check:${NC}"
-        echo "   Have you updated JOURNAL.md?  (bash .agentic/tools/journal.sh ...)"
-        echo "   Have you updated STATUS.md?   (bash .agentic/tools/status.sh ...)"
+        echo "   Have you updated JOURNAL.md?  (bash .agentic/lib/tools/journal.sh ...)"
+        echo "   Have you updated STATUS.md?   (bash .agentic/lib/tools/status.sh ...)"
         echo ""
         echo -e "${GREEN}Ready to commit${NC}"
         echo "  git add <files>"
@@ -794,21 +794,21 @@ cmd_commit() {
                         echo ""
                         echo -e "${YELLOW}WARNING: Spec files staged but FEATURES.md not updated${NC}"
                         echo "  Staged spec files: $(echo $spec_staged | tr '\n' ' ')"
-                        echo "  Update with: bash .agentic/tools/feature.sh F-#### status <status>"
+                        echo "  Update with: bash .agentic/lib/tools/feature.sh F-#### status <status>"
                     fi
                 fi
             fi
 
             echo ""
             echo -e "${BOLD}Pre-commit artifacts check:${NC}"
-            echo "   Have you updated JOURNAL.md?  (bash .agentic/tools/journal.sh ...)"
-            echo "   Have you updated STATUS.md?   (bash .agentic/tools/status.sh ...)"
+            echo "   Have you updated JOURNAL.md?  (bash .agentic/lib/tools/journal.sh ...)"
+            echo "   Have you updated STATUS.md?   (bash .agentic/lib/tools/status.sh ...)"
             echo ""
             echo "Ready to commit. Suggested workflow:"
             echo "  git add <files>"
             echo "  git commit -m \"feat(F-XXXX): description\""
             echo ""
-            echo -e "${BOLD}Checklist:${NC} .agentic/checklists/before_commit.md"
+            echo -e "${BOLD}Checklist:${NC} .agentic/lib/checklists/before_commit.md"
         else
             echo ""
             echo -e "${RED}Pre-commit gates FAILED - fix issues above${NC}"
@@ -842,7 +842,7 @@ cmd_done() {
         # Check if WIP is complete
         if [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
             echo -e "${YELLOW}Note: WIP tracking still active. Complete it with:${NC}"
-            echo "  bash .agentic/tools/wip.sh complete"
+            echo "  bash .agentic/lib/tools/wip.sh complete"
         fi
         return
     fi
@@ -956,7 +956,7 @@ cmd_done() {
             if ! grep -qE "^## ${feature_id}:" "$features_file" && \
                ! grep -qE "^\|[[:space:]]*${feature_id}[[:space:]]*\|" "$features_file"; then
                 echo -e "${RED}BLOCKED: $feature_id not found in FEATURES.md${NC}"
-                echo "  Register it first, or use: bash .agentic/tools/feature.sh $feature_id status shipped"
+                echo "  Register it first, or use: bash .agentic/lib/tools/feature.sh $feature_id status shipped"
                 done_failures=$((done_failures + 1))
             fi
         fi
@@ -1025,7 +1025,7 @@ cmd_done() {
             if [ "$feature_found" = true ] && [ "$is_shipped" = false ]; then
                 echo ""
                 echo -e "${YELLOW}Note: $feature_id not marked as 'shipped' in FEATURES.md${NC}"
-                echo "  To update: bash .agentic/tools/feature.sh $feature_id status shipped"
+                echo "  To update: bash .agentic/lib/tools/feature.sh $feature_id status shipped"
             fi
         fi
 
@@ -1050,19 +1050,19 @@ cmd_done() {
     echo "  [ ] Smoke tested (actually RUN it)"
     echo "  [ ] JOURNAL.md updated"
     echo ""
-    echo "Full checklist: .agentic/checklists/feature_complete.md"
+    echo "Full checklist: .agentic/lib/checklists/feature_complete.md"
 
     # Check if WIP is complete
     if [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
         echo ""
         echo -e "${YELLOW}Note: WIP tracking still active. Complete it with:${NC}"
-        echo "  bash .agentic/tools/wip.sh complete"
+        echo "  bash .agentic/lib/tools/wip.sh complete"
     fi
 
     # Suggest drift detection
     echo ""
     echo -e "${BLUE}Recommended: Run drift detection${NC}"
-    echo "  bash .agentic/tools/drift.sh"
+    echo "  bash .agentic/lib/tools/drift.sh"
     echo "  (Checks: untracked files, feature status, template markers)"
 }
 
@@ -1111,13 +1111,13 @@ cmd_tools() {
     bash "$SCRIPT_DIR/list-tools.sh" 2>/dev/null || {
         echo -e "${BOLD}=== Available Tools ===${NC}"
         echo ""
-        echo "Tools in .agentic/tools/:"
+        echo "Tools in .agentic/lib/tools/:"
         echo ""
         ls -1 "$SCRIPT_DIR"/*.sh 2>/dev/null | xargs -I{} basename {} | sort | while read -r tool; do
             printf "  %-25s\n" "$tool"
         done
         echo ""
-        echo "Run tool with: bash .agentic/tools/<tool>.sh"
+        echo "Run tool with: bash .agentic/lib/tools/<tool>.sh"
     }
 }
 
@@ -1847,27 +1847,27 @@ cmd_spec() {
     if [[ "$arg" == "--check" ]]; then
         echo -e "${BLUE}Running spec health check on all features...${NC}"
         echo ""
-        bash .agentic/tools/check-spec-health.sh --all
+        bash .agentic/lib/tools/check-spec-health.sh --all
         return
     fi
 
     if [[ -n "$arg" ]] && echo "$arg" | grep -qE '^(F|NFR)-[0-9]+$'; then
         echo -e "${BLUE}Spec status for $arg${NC}"
         echo ""
-        bash .agentic/tools/check-spec-health.sh "$arg"
+        bash .agentic/lib/tools/check-spec-health.sh "$arg"
         return
     fi
 
     # Default: print spec-writing checklist for new feature
     echo -e "${BLUE}Spec-Writing Checklist${NC}"
     echo ""
-    if [[ -f ".agentic/checklists/spec_writing.md" ]]; then
-        cat .agentic/checklists/spec_writing.md
+    if [[ -f ".agentic/lib/checklists/spec_writing.md" ]]; then
+        cat .agentic/lib/checklists/spec_writing.md
     else
-        echo "Checklist not found at .agentic/checklists/spec_writing.md"
+        echo "Checklist not found at .agentic/lib/checklists/spec_writing.md"
     fi
     echo ""
-    echo -e "Full workflow: ${BLUE}.agentic/workflows/spec_writing.md${NC}"
+    echo -e "Full workflow: ${BLUE}.agentic/lib/workflows/spec_writing.md${NC}"
     echo -e "Usage: ag spec F-XXXX    (check feature)  |  ag spec --check  (check all)"
 }
 
@@ -1890,7 +1890,7 @@ cmd_specs() {
     if [ ! -f "$report" ]; then
         echo -e "${YELLOW}No discovery report found.${NC}"
         echo "Run discovery first:"
-        echo "  python3 .agentic/tools/discover.py --root . --output .agentic/session/discovery_report.json --profile formal"
+        echo "  python3 .agentic/lib/tools/discover.py --root . --output .agentic/session/discovery_report.json --profile formal"
         echo ""
         echo "Or run: ag init (for full initialization)"
         exit 1
@@ -1942,7 +1942,7 @@ cmd_specs() {
             echo "     f. Mark domain as completed: change '- [ ]' to '- [x]' in plan"
             echo "  5. After all domains: cross-domain review (duplicates, gaps)"
             echo ""
-            echo "Pipeline details: .agentic/agents/shared/auto_orchestration.md"
+            echo "Pipeline details: .agentic/lib/agents/shared/auto_orchestration.md"
         elif [ "$status" = "DRAFT" ] || [ "$status" = "REVIEWING" ] || [ "$status" = "REVISION_NEEDED" ]; then
             echo -e "${YELLOW}Plan needs review.${NC}"
             echo "  Continue the plan-review loop:"
@@ -1994,7 +1994,7 @@ for d in domains:
     echo "  3. Use the plan-review loop to validate"
     echo "  4. After APPROVED: run 'ag specs' again to begin execution"
     echo ""
-    echo "Pipeline details: .agentic/agents/shared/auto_orchestration.md"
+    echo "Pipeline details: .agentic/lib/agents/shared/auto_orchestration.md"
 
     # Token cost suggestion
     local feature_count
@@ -2008,7 +2008,7 @@ print(total)
         echo ""
         echo -e "${YELLOW}Token cost note: Estimated $feature_count features.${NC}"
         echo "  After generation, consider splitting FEATURES.md:"
-        echo "  python3 .agentic/tools/organize_features.py --by domain"
+        echo "  python3 .agentic/lib/tools/organize_features.py --by domain"
     fi
 }
 
@@ -2236,7 +2236,7 @@ _settings_set_value() {
     if [[ "$key" == "profile" ]]; then
         local old_profile presets_file
         old_profile="${_PREV_PROFILE:-discovery}"
-        presets_file="$ROOT_DIR/.agentic/presets/profiles.conf"
+        presets_file="$ROOT_DIR/.agentic/lib/presets/profiles.conf"
         if [[ -f "$presets_file" ]]; then
             local changed=0
             while IFS='=' read -r preset_key preset_value; do

@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- smoke test (Updated: 2026-03-05 21:26 EET)
+- v0.41.0 restructure — all tests fixed and passing (Updated: 2026-03-06 18:05 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

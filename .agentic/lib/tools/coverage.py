@@ -290,8 +290,8 @@ def output_json(
         "summary": {
             "total_features": len(features),
             "implemented_features": len([f for f, m in features.items()
-                                         if m.get("state", "").strip().lower() in {"partial", "complete"}
-                                         or m.get("status", "").strip().lower() == "shipped"]),
+                                         if (m.get("state") or "").strip().lower() in {"partial", "complete"}
+                                         or (m.get("status") or "").strip().lower() == "shipped"]),
             "annotated_features": len(implemented),
             "orphaned_annotations": len(orphaned),
             "missing_annotations": len(missing),

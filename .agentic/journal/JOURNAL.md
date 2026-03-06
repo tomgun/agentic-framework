@@ -1342,3 +1342,27 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-06 16:48 - smoke-test
+
+**Accomplished**:
+- paths.sh migration
+
+**Next steps**:
+- verify
+
+**Blockers**: none
+
+
+### Session: 2026-03-06 18:05 - v0.41.0 test fixes
+
+**Why**: All 209 framework + 101 unit tests now pass
+
+**Accomplished**:
+- Fixed all automated tests: settings.sh profile resolution, ag.sh stale paths, drift.sh/coverage.py bugs, periodic-checks.sh state dir, test assertions updated
+
+**Next steps**:
+- Push to PR, human review
+
+**Blockers**: None
+

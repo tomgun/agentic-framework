@@ -52,7 +52,7 @@ for arg in "$@"; do
 done
 
 # --- State file management ---
-STATE_DIR="$ROOT_DIR/.agentic-state"
+STATE_DIR="${SESSION_DIR:-$ROOT_DIR/.agentic/session}"
 STATE_FILE="$STATE_DIR/sync-state.conf"
 
 # Ensure state dir exists
