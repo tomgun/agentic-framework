@@ -40,6 +40,14 @@ _No active items_
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
+
+### HN-0020: PR #64: Tiered verify loop (F-0164, v0.44.0)
+- **Type**: pr_review
+- **Added**: 2026-03-06
+- **Context**: https://github.com/tomgun/agentic-framework/pull/64
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 ### HN-0017: PR #61: Enforcement gap fixes v0.40.0 (F-0154/F-0155/F-0156)
