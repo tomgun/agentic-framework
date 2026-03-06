@@ -1,0 +1,51 @@
+#!/bin/bash
+# Pre-commit hook dispatcher for Agentic Framework
+# Routes to validate_specs.py and/or pre-commit-check.sh based on STACK.md config
+#
+# Installed via: git config core.hooksPath .agentic/hooks
+
+set -e
+
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+# CI detection: skip hooks in CI environments
+if [ "${CI:-}" = "true" ] || [ -n "${GITHUB_ACTIONS:-}" ] || \
+   [ -n "${GITLAB_CI:-}" ] || [ -n "${JENKINS_URL:-}" ] || \
+   [ -n "${BUILDKITE:-}" ]; then
+    exit 0
+fi
+
+# Read pre_commit_hook setting from STACK.md (default: fast)
+HOOK_MODE="fast"
+if [ -f "$PROJECT_ROOT/STACK.md" ]; then
+    RAW_MODE=$(grep -iE "^[- ]*pre_commit_hook:" "$PROJECT_ROOT/STACK.md" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | tr -d ' ')
+    if [ -n "$RAW_MODE" ]; then
+        # Backward compat: yes → fast
+        case "$RAW_MODE" in
+            yes) HOOK_MODE="fast" ;;
+            no|fast|full) HOOK_MODE="$RAW_MODE" ;;
+            *) HOOK_MODE="fast" ;;
+        esac
+    fi
+fi
+
+# Skip if disabled
+if [ "$HOOK_MODE" = "no" ]; then
+    exit 0
+fi
+
+# Spec validation: only for Formal profile (detected by spec/FEATURES.md existence)
+if [ -f "$PROJECT_ROOT/spec/FEATURES.md" ] && [ -f "$PROJECT_ROOT/.agentic/tools/validate_specs.py" ]; then
+    if command -v python3 >/dev/null 2>&1; then
+        if ! python3 "$PROJECT_ROOT/.agentic/tools/validate_specs.py" 2>/dev/null; then
+            echo "Pre-commit: spec validation failed"
+            echo "Fix spec file errors before committing."
+            exit 1
+        fi
+    fi
+fi
+
+# Route to pre-commit-check.sh
+if [ -f "$PROJECT_ROOT/.agentic/hooks/pre-commit-check.sh" ]; then
+    exec bash "$PROJECT_ROOT/.agentic/hooks/pre-commit-check.sh" --mode "$HOOK_MODE"
+fi

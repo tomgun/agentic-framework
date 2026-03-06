@@ -125,7 +125,7 @@ scaffold_test_project() {
 
     # Create durable artifacts so staleness checks can work
     mkdir -p .agentic-journal
-    echo "# Journal" > .agentic-journal/JOURNAL.md
+    echo "# Journal" > .agentic/journal/JOURNAL.md
     echo "# Status" > STATUS.md
 
     # Initial commit
@@ -145,7 +145,7 @@ attempt_commit() {
     echo "// change $(date +%s)" >> dummy.txt
 
     # Touch journal and status so staleness checks pass
-    touch .agentic-journal/JOURNAL.md
+    touch .agentic/journal/JOURNAL.md
     touch STATUS.md
 
     # Small sleep to ensure mtime > last commit time

@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with file access."
 allowed-tools: [Read, Write, Edit, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.38.0"
+  version: "0.41.0"
 ---
 
 # Updating Documentation
@@ -48,8 +48,8 @@ Common documentation updates:
 
 For framework-managed docs:
 ```bash
-bash .agentic/tools/journal.sh "Topic" "Done" "Next" "Blockers"
-bash .agentic/tools/status.sh focus "Current state"
+bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers"
+bash .agentic/lib/tools/status.sh focus "Current state"
 ```
 
 ## Examples

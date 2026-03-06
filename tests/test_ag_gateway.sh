@@ -7,7 +7,7 @@ set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-AG_SCRIPT="$FRAMEWORK_ROOT/.agentic/tools/ag.sh"
+AG_SCRIPT="$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh"
 
 # Colors
 RED='\033[0;31m'
@@ -39,10 +39,15 @@ fail() {
 # Create temp test project
 setup_test_env() {
     TEST_DIR=$(mktemp -d "/tmp/ag-test-XXXXXX")
-    mkdir -p "$TEST_DIR/.agentic/tools"
-    cp "$AG_SCRIPT" "$TEST_DIR/.agentic/tools/ag.sh"
-    cp "$FRAMEWORK_ROOT/.agentic/tools/list-tools.sh" "$TEST_DIR/.agentic/tools/" 2>/dev/null || true
-    cp "$FRAMEWORK_ROOT/.agentic/tools/wip.sh" "$TEST_DIR/.agentic/tools/" 2>/dev/null || true
+    mkdir -p "$TEST_DIR/.agentic/lib/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/presets"
+    mkdir -p "$TEST_DIR/.agentic/session"
+    cp "$AG_SCRIPT" "$TEST_DIR/.agentic/lib/tools/ag.sh"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/list-tools.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/wip.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/" 2>/dev/null || true
     cd "$TEST_DIR"
 }
 
@@ -61,11 +66,11 @@ cat > "$TEST_DIR/STACK.md" << 'EOF'
 # Stack
 Profile: discovery
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Discovery Profile"; then
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
+if echo "$output" | grep -q "No formal feature tracking"; then
     pass
 else
-    fail "Expected 'Discovery Profile' in output"
+    fail "Expected 'No formal feature tracking' for discovery profile"
 fi
 cleanup_test_env
 
@@ -75,32 +80,32 @@ cat > "$TEST_DIR/STACK.md" << 'EOF'
 # Stack
 Profile: formal
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Formal Profile"; then
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
+if echo "$output" | grep -q "Feature Tracking"; then
     pass
 else
-    fail "Expected 'Formal Profile' in output"
+    fail "Expected 'Feature Tracking' for formal profile"
 fi
 cleanup_test_env
 
 test_case "Profile detection: Formal from spec/ directory"
 setup_test_env
-mkdir -p "$TEST_DIR/spec"
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Formal Profile"; then
+mkdir -p "$TEST_DIR/.agentic/spec"
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
+if echo "$output" | grep -q "Feature Tracking"; then
     pass
 else
-    fail "Expected 'Formal Profile' from spec/ directory"
+    fail "Expected 'Feature Tracking' from .agentic/spec/ directory"
 fi
 cleanup_test_env
 
 test_case "Profile detection: Default to Discovery when no indicators"
 setup_test_env
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
-if echo "$output" | grep -qi "Discovery Profile"; then
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
+if echo "$output" | grep -q "No formal feature tracking"; then
     pass
 else
-    fail "Expected default 'Discovery Profile'"
+    fail "Expected default 'No formal feature tracking'"
 fi
 cleanup_test_env
 
@@ -113,7 +118,7 @@ setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: discovery
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
 if echo "$output" | grep -q "ag work"; then
     pass
 else
@@ -123,8 +128,8 @@ cleanup_test_env
 
 test_case "Help shows ag implement for Formal profile"
 setup_test_env
-mkdir -p "$TEST_DIR/spec"
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" help 2>&1)
+mkdir -p "$TEST_DIR/.agentic/spec"
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" help 2>&1)
 if echo "$output" | grep -q "ag implement"; then
     pass
 else
@@ -142,8 +147,8 @@ cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: core
 EOF
 mkdir -p "$TEST_DIR/.agentic"
-bash "$TEST_DIR/.agentic/tools/ag.sh" work "Test task" >/dev/null 2>&1 || true
-if [[ -f "$TEST_DIR/.agentic-state/WIP.md" ]]; then
+bash "$TEST_DIR/.agentic/lib/tools/ag.sh" work "Test task" >/dev/null 2>&1 || true
+if [[ -f "$TEST_DIR/.agentic/session/WIP.md" ]]; then
     pass
 else
     fail "WIP.md not created"
@@ -159,9 +164,8 @@ setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: discovery
 EOF
-mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
-echo "test" > "$TEST_DIR/.agentic-state/WIP.md"
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" commit 2>&1) || true
+echo "test" > "$TEST_DIR/.agentic/session/WIP.md"
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" commit 2>&1) || true
 if echo "$output" | grep -q "WARNING"; then
     pass
 else
@@ -171,10 +175,9 @@ cleanup_test_env
 
 test_case "ag commit: Formal profile shows BLOCKED for WIP"
 setup_test_env
-mkdir -p "$TEST_DIR/spec"
-mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
-echo "test" > "$TEST_DIR/.agentic-state/WIP.md"
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" commit 2>&1) || true
+mkdir -p "$TEST_DIR/.agentic/spec"
+echo "test" > "$TEST_DIR/.agentic/session/WIP.md"
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" commit 2>&1) || true
 if echo "$output" | grep -q "BLOCKED"; then
     pass
 else
@@ -184,11 +187,10 @@ cleanup_test_env
 
 test_case "ag commit: Formal exits non-zero when blocked"
 setup_test_env
-mkdir -p "$TEST_DIR/spec"
-mkdir -p "$TEST_DIR/.agentic" "$TEST_DIR/.agentic-state"
-echo "test" > "$TEST_DIR/.agentic-state/WIP.md"
+mkdir -p "$TEST_DIR/.agentic/spec"
+echo "test" > "$TEST_DIR/.agentic/session/WIP.md"
 result=0
-bash "$TEST_DIR/.agentic/tools/ag.sh" commit >/dev/null 2>&1 || result=$?
+bash "$TEST_DIR/.agentic/lib/tools/ag.sh" commit >/dev/null 2>&1 || result=$?
 if [[ $result -ne 0 ]]; then
     pass
 else
@@ -203,13 +205,13 @@ cleanup_test_env
 test_case "ag tools runs without error"
 setup_test_env
 # Create a minimal list-tools.sh
-cat > "$TEST_DIR/.agentic/tools/list-tools.sh" << 'EOF'
+cat > "$TEST_DIR/.agentic/lib/tools/list-tools.sh" << 'EOF'
 #!/usr/bin/env bash
 echo "Tools available"
 EOF
-chmod +x "$TEST_DIR/.agentic/tools/list-tools.sh"
+chmod +x "$TEST_DIR/.agentic/lib/tools/list-tools.sh"
 result=0
-bash "$TEST_DIR/.agentic/tools/ag.sh" tools >/dev/null 2>&1 || result=$?
+bash "$TEST_DIR/.agentic/lib/tools/ag.sh" tools >/dev/null 2>&1 || result=$?
 if [[ $result -eq 0 ]]; then
     pass
 else
@@ -236,7 +238,7 @@ cat > "$TEST_DIR/CONTEXT_PACK.md" << 'EOF'
 - What this repo is: <!-- 1–2 sentences -->
 - Entry points: <!-- e.g., src/main.ts -->
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" start 2>&1)
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" start 2>&1)
 if echo "$output" | grep -q "NOT INITIALIZED"; then
     pass
 else
@@ -263,7 +265,7 @@ cat > "$TEST_DIR/STATUS.md" << 'EOF'
 ## Current Focus
 Building the core task CRUD operations
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" start 2>&1)
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" start 2>&1)
 if echo "$output" | grep -q "NOT INITIALIZED"; then
     fail "Should NOT warn for initialized project"
 else
@@ -286,7 +288,7 @@ cat > "$TEST_DIR/CONTEXT_PACK.md" << 'EOF'
 - What this repo is: <!-- 1–2 sentences -->
 - Entry points: <!-- e.g., src/main.ts -->
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" init 2>&1)
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" init 2>&1)
 if echo "$output" | grep -q "needs initialization"; then
     pass
 else
@@ -301,8 +303,8 @@ cleanup_test_env
 # Helper: set up Formal with acceptance criteria for ag plan
 setup_plan_env() {
     setup_test_env
-    mkdir -p "$TEST_DIR/spec/acceptance"
-    cat > "$TEST_DIR/spec/acceptance/F-0042.md" << 'EOF'
+    mkdir -p "$TEST_DIR/.agentic/spec/acceptance"
+    cat > "$TEST_DIR/.agentic/spec/acceptance/F-0042.md" << 'EOF'
 # F-0042: Test Feature
 ## Acceptance Criteria
 - [ ] Basic functionality works
@@ -316,7 +318,7 @@ Profile: formal
 - plan_review_enabled: yes
 - plan_review_max_iterations: 3
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 2>&1)
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" plan F-0042 2>&1)
 if echo "$output" | grep -q "Review loop: ENABLED"; then
     pass
 else
@@ -330,7 +332,7 @@ cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: formal
 - plan_review_enabled: no
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 2>&1)
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" plan F-0042 2>&1)
 if echo "$output" | grep -q "Review loop: SKIPPED"; then
     pass
 else
@@ -344,7 +346,7 @@ cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: formal
 - plan_review_enabled: yes
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 --no-review 2>&1)
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" plan F-0042 --no-review 2>&1)
 if echo "$output" | grep -q "Review loop: SKIPPED"; then
     pass
 else
@@ -359,7 +361,7 @@ Profile: formal
 - plan_review_enabled: yes
 - plan_review_max_iterations: 5
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 2>&1)
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" plan F-0042 2>&1)
 if echo "$output" | grep -q "max 5 iterations"; then
     pass
 else
@@ -372,7 +374,7 @@ setup_plan_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: formal
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 2>&1)
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" plan F-0042 2>&1)
 if echo "$output" | grep -q "Review loop: ENABLED"; then
     pass
 else
@@ -386,7 +388,7 @@ cat > "$TEST_DIR/STACK.md" << 'EOF'
 Profile: discovery
 EOF
 result=0
-bash "$TEST_DIR/.agentic/tools/ag.sh" plan F-0042 >/dev/null 2>&1 || result=$?
+bash "$TEST_DIR/.agentic/lib/tools/ag.sh" plan F-0042 >/dev/null 2>&1 || result=$?
 if [[ $result -ne 0 ]]; then
     pass
 else
@@ -405,12 +407,12 @@ Profile: formal
 - plan_review_auto_for: [implement]
 EOF
 # Add feature to FEATURES.md
-cat > "$TEST_DIR/spec/FEATURES.md" << 'EOF'
+cat > "$TEST_DIR/.agentic/spec/FEATURES.md" << 'EOF'
 ## F-0042: Test Feature
 - Status: in_progress
 EOF
-output=$(bash "$TEST_DIR/.agentic/tools/ag.sh" implement F-0042 2>&1) || true
-if echo "$output" | grep -q "No plan found\|consider running.*ag plan"; then
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" implement F-0042 2>&1) || true
+if echo "$output" | grep -q "No.*plan found\|consider running.*ag plan"; then
     pass
 else
     fail "Expected warning about missing plan when auto_for includes implement"

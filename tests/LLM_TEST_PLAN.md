@@ -591,7 +591,7 @@ However, full automation is limited because:
 - Reports checkpoint status to user
 
 **LLM-073: Extension Discovery** (F-0151)
-- Agent discovers custom skills from `.agentic-local/extensions/skills/`
+- Agent discovers custom skills from `.agentic/local/extensions/skills/`
 - Custom gates run during pre-commit
 
 **LLM-074: AC Coverage Reporting** (F-0153)

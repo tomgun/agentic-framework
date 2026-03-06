@@ -13,11 +13,11 @@ When working on the framework repository (`agentic-framework`), you have additio
 ### 1. **Maintain Internal Consistency**
 
 Every change must maintain consistency across:
-- ✅ Templates in `.agentic/init/` and `.agentic/spec/`
+- ✅ Templates in `.agentic/lib/init/` and `.agentic/lib/templates/`
 - ✅ Example projects in `examples/`
 - ✅ Documentation in `README.md`, `START_HERE.md`, `DEVELOPER_GUIDE.md`
-- ✅ Agent guidelines in `.agentic/agents/`
-- ✅ Tool scripts in `.agentic/tools/`
+- ✅ Agent guidelines in `.agentic/lib/agents/`
+- ✅ Tool scripts in `.agentic/lib/tools/`
 
 **Rule**: If you change a template, workflow, or guideline → update examples and docs to match.
 
@@ -74,10 +74,10 @@ Example projects demonstrate best practices and verify workflows actually work.
 
 #### Agent Instruction Files (CLAUDE.md, Cursor Rules, etc.)
 
-**Canonical source**: `.agentic/agents/<tool>/` contains what users receive.
+**Canonical source**: `.agentic/lib/agents/<tool>/` contains what users receive.
 
 ```
-.agentic/agents/claude/CLAUDE.md     ← CANONICAL (develop features here)
+.agentic/lib/agents/claude/CLAUDE.md     ← CANONICAL (develop features here)
          ↓
 /CLAUDE.md (root)                    ← Framework-specific wrapper only
 ```
@@ -88,7 +88,7 @@ Example projects demonstrate best practices and verify workflows actually work.
 3. **Never let root diverge** - if root has features template doesn't, backport immediately
 
 **When adding new features to CLAUDE.md**:
-1. Add to `.agentic/agents/claude/CLAUDE.md` FIRST
+1. Add to `.agentic/lib/agents/claude/CLAUDE.md` FIRST
 2. Test that users would benefit from it
 3. Only then update root `/CLAUDE.md` if framework-dev needs something extra
 4. CLAUDE.md is loaded for the orchestrating agent only. Subagents do NOT inherit it — confirmed for Claude Code (Task tool) and Cursor; Copilot behavior unverified; Codex subagents experimental. Keep templates under 100 lines for orchestrator attention quality (L-0002). Run LLM behavioral tests (`bash tests/llm/harness.sh --critical`) after changes.
@@ -97,7 +97,7 @@ Example projects demonstrate best practices and verify workflows actually work.
 
 **Template vs Root — what differs and why**:
 
-| Content | Template (`.agentic/agents/`) | Root (`CLAUDE.md`, etc.) |
+| Content | Template (`.agentic/lib/agents/`) | Root (`CLAUDE.md`, etc.) |
 |---------|-------------------------------|--------------------------|
 | Context opener | "You are working in a repo that uses..." | "THIS IS FRAMEWORK DEVELOPMENT. You are working ON the framework..." |
 | "Read first" directive | NO | YES — `FRAMEWORK_QUICK_START.md`, `FRAMEWORK_DEVELOPMENT.md`, `PRINCIPLES.md` |
@@ -119,7 +119,7 @@ Example projects demonstrate best practices and verify workflows actually work.
 
 #### Memory Seed Maintenance
 
-`.agentic/init/memory-seed.md` seeds behavioral patterns into tool persistent memory during init. It is a **subset** of instruction files/playbooks — redundant for resilience, not a place for new rules.
+`.agentic/lib/init/memory-seed.md` seeds behavioral patterns into tool persistent memory during init. It is a **subset** of instruction files/playbooks — redundant for resilience, not a place for new rules.
 
 **When to update memory-seed.md**:
 - Workflow changes (new pre-commit steps, new `ag` commands)
@@ -127,7 +127,7 @@ Example projects demonstrate best practices and verify workflows actually work.
 - Version bumps (always bump `<!-- memory-seed vX.Y.Z -->` when content changes)
 
 **Update process**:
-1. Edit `.agentic/init/memory-seed.md`
+1. Edit `.agentic/lib/init/memory-seed.md`
 2. Bump the version marker: `<!-- memory-seed vX.Y.Z -->`
 3. Verify sentinel strings still present: `pre-commit sequence`, `token-efficient scripts`, `ag commit`, `ag done`
 4. Run `bash .agentic/tools/memory-check.sh` to verify alignment
@@ -235,8 +235,8 @@ Example projects demonstrate best practices and verify workflows actually work.
 4. **Document breaking changes**: In CHANGELOG.md and UPGRADING.md
 
 **Template files**:
-- `.agentic/init/*.template.md` - Initial project files
-- `.agentic/spec/*.template.md` - Spec document structures
+- `.agentic/lib/init/*.template.md` - Initial project files
+- `.agentic/lib/templates/*.template.md` - Spec document structures
 
 **When changing template structure**:
 1. Update the template
@@ -393,8 +393,8 @@ refactor(docs): eliminate documentation duplication
 - [ ] Example projects updated and working
 - [ ] **`bash .agentic/tools/drift.sh --docs` passes** (no stale docs)
 - [ ] Documentation accurate and up-to-date
-- [ ] **`spec/FEATURES.md` updated with new features (F-####)**
-- [ ] **`spec/acceptance/F-####.md` created for new features**
+- [ ] **`.agentic/spec/FEATURES.md` updated with new features (F-####)**
+- [ ] **`.agentic/spec/acceptance/F-####.md` created for new features**
 - [ ] **`tests/validate_framework.sh` updated if new acceptance criteria**
 - [ ] **`FEATURE_REGISTRY` in upgrade.sh updated if user-visible feature**
 - [ ] **Manifests generated**: `bash .agentic/tools/manifest.sh F-####` for each feature
@@ -425,14 +425,14 @@ refactor(docs): eliminate documentation duplication
 ### 12. **Common Framework Development Patterns**
 
 **Adding a new workflow document**:
-1. Create `.agentic/workflows/new_workflow.md`
+1. Create `.agentic/lib/workflows/new_workflow.md`
 2. Link from `agent_operating_guidelines.md` if agents should follow it
 3. Link from `DEVELOPER_GUIDE.md` if users should know about it
 4. Add example to relevant example project
 5. Update `START_HERE.md` document index if major workflow
 
 **Adding a new tool script**:
-1. Create `.agentic/tools/new_tool.sh` or `.agentic/tools/new_tool.py`
+1. Create `.agentic/lib/tools/new_tool.sh` or `.agentic/lib/tools/new_tool.py`
 2. Add shebang and error handling
 3. Add help text (`-h` flag)
 4. Test in scratch project
@@ -441,7 +441,7 @@ refactor(docs): eliminate documentation duplication
 7. Update `START_HERE.md` tools list
 
 **Adding a new agent role**:
-1. Create `.agentic/agents/[role]/README.md`
+1. Create `.agentic/lib/agents/[role]/README.md`
 2. Define what agent loads/doesn't load (context budget)
 3. Define handoff protocol (input/output)
 4. Update `sequential_agent_specialization.md`
@@ -450,7 +450,7 @@ refactor(docs): eliminate documentation duplication
 7. Document in `DEVELOPER_GUIDE.md`
 
 **Changing existing template**:
-1. Update `.agentic/init/*.template.md` or `.agentic/spec/*.template.md`
+1. Update `.agentic/lib/init/*.template.md` or `.agentic/lib/templates/*.template.md`
 2. Update validation (`validate_specs.py`, `doctor.py`)
 3. Update upgrade.sh for migration (if breaking)
 4. Update examples to new structure
@@ -459,10 +459,10 @@ refactor(docs): eliminate documentation duplication
 7. Document in CHANGELOG (if breaking: major/minor version bump)
 
 **Adding a new framework feature**:
-1. Add feature spec to `spec/FEATURES.md` (F-#### format)
-2. Create acceptance criteria in `spec/acceptance/F-####.md`
+1. Add feature spec to `.agentic/spec/FEATURES.md` (F-#### format)
+2. Create acceptance criteria in `.agentic/spec/acceptance/F-####.md`
 3. Add structural tests to `tests/validate_framework.sh` (verifies files exist, settings present, script behaviour)
-4. If the feature changes how agents behave: add LLM behavioral tests to `tests/llm/test_definitions.json` and list them in `spec/acceptance/F-####.md` under `## LLM Behavioral Tests`
+4. If the feature changes how agents behave: add LLM behavioral tests to `tests/llm/test_definitions.json` and list them in `.agentic/spec/acceptance/F-####.md` under `## LLM Behavioral Tests`
 5. If user-visible during upgrade, add to FEATURE_REGISTRY (see below)
 6. Run `bash .agentic/tools/drift.sh --docs` to check for stale docs
 7. Update CHANGELOG.md
@@ -477,7 +477,7 @@ refactor(docs): eliminate documentation duplication
 **Adding to FEATURE_REGISTRY (upgrade notifications)**:
 When adding a user-visible feature that should be offered during upgrades:
 
-1. Edit `.agentic/tools/upgrade.sh`
+1. Edit `.agentic/lib/tools/upgrade.sh`
 2. Find the `FEATURE_REGISTRY` array (~line 360)
 3. Add entry: `"X.Y.Z:Feature Name:setup command:Description"`
    - X.Y.Z = version where feature is introduced

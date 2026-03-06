@@ -10,7 +10,7 @@ setup_test_project "discovery"
 
 # Create JOURNAL.md with multiple sessions
 mkdir -p "$TEST_PROJECT/.agentic-journal"
-cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/journal/JOURNAL.md" << 'EOF'
 # Development Journal
 
 ## Session Log
@@ -34,7 +34,7 @@ cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
 - Frontend: CartDrawer component with animations
 EOF
 
-git -C "$TEST_PROJECT" add .agentic-journal/JOURNAL.md
+git -C "$TEST_PROJECT" add .agentic/journal/JOURNAL.md
 git -C "$TEST_PROJECT" commit -m "Add journal" --quiet
 
 # Ask about past sessions

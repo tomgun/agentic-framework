@@ -23,7 +23,7 @@ EOF
 
 # Create journal (should NOT be read for this simple task)
 mkdir -p "$TEST_PROJECT/.agentic-journal"
-cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/journal/JOURNAL.md" << 'EOF'
 # Development Journal
 
 ## Session Log
@@ -40,7 +40,7 @@ cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
 - Query performance improved 3x
 EOF
 
-git -C "$TEST_PROJECT" add index.js .agentic-journal/JOURNAL.md
+git -C "$TEST_PROJECT" add index.js .agentic/journal/JOURNAL.md
 git -C "$TEST_PROJECT" commit -m "Add files" --quiet
 
 # Ask for a simple code change

@@ -12,8 +12,8 @@ cd "$PROJECT"
 
 # Create WIP so the hook has something to catch (guarantees non-zero exit + output)
 mkdir -p .agentic-state
-echo "Feature: test" > .agentic-state/WIP.md
-git add .agentic-state/WIP.md
+echo "Feature: test" > .agentic/session/WIP.md
+git add .agentic/session/WIP.md
 git commit -m "add WIP" --quiet --no-verify
 
 # Attempt commit — we don't care if it passes or fails,

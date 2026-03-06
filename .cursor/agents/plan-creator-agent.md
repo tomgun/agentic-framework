@@ -27,7 +27,7 @@
 3. Design implementation approach
 4. Document trade-offs considered
 5. Identify risks and mitigations
-6. Write comprehensive plan to `.agentic-journal/plans/F-XXXX-plan.md`
+6. Write comprehensive plan to `.agentic/journal/plans/F-XXXX-plan.md`
 
 ## Prompt Template
 
@@ -42,7 +42,7 @@ Read First:
 - Related code files
 
 Create Plan:
-Write to: .agentic-journal/plans/{FEATURE_ID}-plan.md
+Write to: .agentic/journal/plans/{FEATURE_ID}-plan.md
 
 Follow the format in .agentic/workflows/plan_review_loop.md:
 - Context: What problem, constraints, dependencies
@@ -95,7 +95,7 @@ Key sections:
 
 ## Handoff
 
-→ After creating/revising plan: "Plan ready for review at .agentic-journal/plans/F-XXXX-plan.md"
+→ After creating/revising plan: "Plan ready for review at .agentic/journal/plans/F-XXXX-plan.md"
 → Reviewer will add critique and set verdict
 
 ## Example Invocation
@@ -106,6 +106,6 @@ Task tool:
   model: opus
   prompt: "Create implementation plan for F-0042.
            Read: spec/acceptance/F-0042.md, CONTEXT_PACK.md
-           Write to: .agentic-journal/plans/F-0042-plan.md
+           Write to: .agentic/journal/plans/F-0042-plan.md
            Follow: .agentic/workflows/plan_review_loop.md"
 ```

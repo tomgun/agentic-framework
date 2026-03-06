@@ -171,7 +171,7 @@
 1. **Incremental complexity** - Start with Core, add features as needed
 2. **Enforcement > Documentation** - Pre-commit gates work better than guidelines
 3. **Tool parity matters** - Claude, Codex, Cursor, Copilot need same enforcement
-4. **State isolation** - `.agentic-state/` for transient, `.agentic-journal/` for persistent
+4. **State isolation** - `.agentic/session/` for transient, `.agentic/journal/` for persistent
 5. **Machine-readable specs** - JSON/YAML enables tooling and validation
 
 ---

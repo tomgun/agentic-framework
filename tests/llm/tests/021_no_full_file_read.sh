@@ -18,7 +18,7 @@ mkdir -p "$TEST_PROJECT/.agentic-journal"
     echo "- Made progress on features"
     echo ""
   done
-} > "$TEST_PROJECT/.agentic-journal/JOURNAL.md"
+} > "$TEST_PROJECT/.agentic/journal/JOURNAL.md"
 
 git -C "$TEST_PROJECT" add -A
 git -C "$TEST_PROJECT" commit -m "Add journal history" --quiet

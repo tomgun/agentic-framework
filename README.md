@@ -64,10 +64,10 @@ A custom rules file is a great start. This framework builds on the same idea but
   - spec/FEATURES.md, NFR.md, ADRs
   - Cross-reference validation
   - Semantic spec analysis (ambiguity detection, AC↔test coverage gaps, NFR measurability)
-  - User-extension directory (`.agentic-local/extensions/` for custom skills and gates)
+  - User-extension directory (`.agentic/local/extensions/` for custom skills and gates)
 
 **🔄 Multi-Environment Support:**
-Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out or use the best tool for each task. All environments share the same project state for perfect continuity. [Learn more](.agentic/workflows/environment_switching.md)
+Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out or use the best tool for each task. All environments share the same project state for perfect continuity. [Learn more](.agentic/lib/workflows/environment_switching.md)
 
 ## Installation
 
@@ -106,7 +106,7 @@ The install script will:
 
 **After installation**, tell your agent:
 
-> "Read `.agentic/init/init_playbook.md` and help me initialize this project by filling in STACK.md, OVERVIEW.md, and CONTEXT_PACK.md based on what we're building."
+> "Read `.agentic/lib/init/init_playbook.md` and help me initialize this project by filling in STACK.md, OVERVIEW.md, and CONTEXT_PACK.md based on what we're building."
 
 The agent will:
 - Ask what you're building
@@ -172,7 +172,7 @@ No stale placeholders. DRY (cross-reference, don't duplicate). Explicit over imp
 
 ### D6. Green Coding
 **Efficient software reduces energy consumption and cost.**
-Token efficiency IS green for framework ops. For project code: algorithms, caching, event-driven patterns. See [green_coding.md](.agentic/quality/green_coding.md) for comprehensive guidelines.
+Token efficiency IS green for framework ops. For project code: algorithms, caching, event-driven patterns. See [green_coding.md](.agentic/lib/quality/green_coding.md) for comprehensive guidelines.
 
 ### D7. Multi-Environment Portability
 **Work seamlessly across Claude Code, Cursor, Copilot, and Codex.**
@@ -182,7 +182,7 @@ Same project state, same conventions, same enforcement — regardless of which t
 
 ### R1. Anti-Hallucination
 **Agents NEVER make things up — accuracy over speed.**
-"I don't know" is explicitly encouraged. Verify against version-specific docs. Wrong code that looks right is worse than no code. See [agent guidelines](.agentic/agents/shared/agent_operating_guidelines.md) for complete rules.
+"I don't know" is explicitly encouraged. Verify against version-specific docs. Wrong code that looks right is worse than no code. See [agent guidelines](.agentic/lib/agents/shared/agent_operating_guidelines.md) for complete rules.
 
 ### R2. No Auto-Commits
 **Human approval required before every commit.** The safety gate that prevents compounding mistakes.
@@ -203,7 +203,7 @@ Instruction files (`CLAUDE.md`, `.cursorrules`, `copilot-instructions.md`) — k
 Workflows, checklists, and orchestration rules (`auto_orchestration.md`, `checklists/`, `workflows/`) — loaded by `ag` commands when needed, never pinned in the instruction file. This keeps the constitution small while providing deep guidance for specific tasks.
 
 ### Layer 3: State (Durable Artifacts)
-Project truth that survives context resets (`STACK.md`, `STATUS.md`, `CONTEXT_PACK.md`, `JOURNAL.md`). Git-tracked files work cross-machine; gitignored files (`.agentic-state/`) are session-local. Agents read these first; humans can `cat STATUS.md` for instant awareness at zero token cost.
+Project truth that survives context resets (`STACK.md`, `STATUS.md`, `CONTEXT_PACK.md`, `JOURNAL.md`). Git-tracked files work cross-machine; gitignored files (`.agentic/session/`) are session-local. Agents read these first; humans can `cat STATUS.md` for instant awareness at zero token cost.
 
 ### Distributed Enforcement
 Three scripts enforce behavior regardless of which AI tool runs them:
@@ -221,7 +221,7 @@ This works across Claude Code, Cursor, Copilot, and Codex — no single orchestr
 
 **After installation**, tell your agent:
 
-> "Read `.agentic/init/init_playbook.md` and help me initialize this project."
+> "Read `.agentic/lib/init/init_playbook.md` and help me initialize this project."
 
 **Or use a ready-made prompt**: Copy from `.agentic/prompts/cursor/session_start.md` or `.agentic/prompts/claude/session_start.md`
 
@@ -236,7 +236,7 @@ The agent will:
 
 **New to the framework?** → Tell your agent: *"Read `.agentic/START_HERE.md` and explain how to use this framework"*
 
-**Pre-project planning?** → See `.agentic/init/VISION.template.md` for ideation-phase template.
+**Pre-project planning?** → See `.agentic/lib/init/VISION.template.md` for ideation-phase template.
 
 ### Upgrading existing projects
 
@@ -248,7 +248,7 @@ curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remot
 Or manually:
 ```bash
 curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
-bash agentic-framework-0.13.0/.agentic/tools/upgrade.sh /path/to/your-project
+bash agentic-framework/install.sh /path/to/your-project
 ```
 
 The upgrade script will:
@@ -304,7 +304,7 @@ During `init_playbook.md`, choose **"a) Multiple (RECOMMENDED)"** and the framew
 - Set up token-efficient scripts
 
 **Learn more:**
-- [Environment Switching Workflow](.agentic/workflows/environment_switching.md) - Complete handoff guide
+- [Environment Switching Workflow](.agentic/lib/workflows/environment_switching.md) - Complete handoff guide
 - [Environment Research](.agentic/support/environment_research.md) - Capabilities & optimizations
 
 ### Best Tool for Each Task
@@ -349,7 +349,7 @@ During `init_playbook.md`, choose **"a) Multiple (RECOMMENDED)"** and the framew
 - **Quality automation**: Stack-specific pre-commit validation
 - **Retrospectives**: Periodic project health checks
 
-Enable later: `bash .agentic/tools/enable-formal.sh` | Customize settings: `ag set --show`
+Enable later: `bash .agentic/lib/tools/enable-formal.sh` | Customize settings: `ag set --show`
 
 ### For Complex Projects
 - **Session continuity**: JOURNAL.md tracks progress across context resets
@@ -369,32 +369,32 @@ Enable later: `bash .agentic/tools/enable-formal.sh` | Customize settings: `ag s
 ### Tooling
 ```bash
 # Project health & verification (v0.11.2: doctor.sh is THE verification command)
-bash .agentic/tools/doctor.sh              # Quick health check
-bash .agentic/tools/doctor.sh --full       # Comprehensive verification
-bash .agentic/tools/doctor.sh --phase X    # Phase-specific (start/planning/implement/complete/commit)
-bash .agentic/tools/doctor.sh --pre-commit # Pre-commit gate checks
-bash .agentic/tools/report.sh              # Feature status summary
-python3 .agentic/tools/phase_detect.py     # Detect current development phase
+bash .agentic/lib/tools/doctor.sh              # Quick health check
+bash .agentic/lib/tools/doctor.sh --full       # Comprehensive verification
+bash .agentic/lib/tools/doctor.sh --phase X    # Phase-specific (start/planning/implement/complete/commit)
+bash .agentic/lib/tools/doctor.sh --pre-commit # Pre-commit gate checks
+bash .agentic/lib/tools/report.sh              # Feature status summary
+python3 .agentic/lib/tools/phase_detect.py     # Detect current development phase
 
 # Retrospectives & version checking
-bash .agentic/tools/retro_check.sh    # Check if retrospective is due
-bash .agentic/tools/version_check.sh  # Check dependency versions
+bash .agentic/lib/tools/retro_check.sh    # Check if retrospective is due
+bash .agentic/lib/tools/version_check.sh  # Check dependency versions
 
 # Context & analysis
-bash .agentic/tools/brief.sh       # Quick project brief
-bash .agentic/tools/dashboard.sh   # Comprehensive dashboard
-bash .agentic/tools/coverage.sh    # Code annotation coverage
-bash .agentic/tools/feature_graph.sh   # Dependency visualization
+bash .agentic/lib/tools/brief.sh       # Quick project brief
+bash .agentic/lib/tools/dashboard.sh   # Comprehensive dashboard
+bash .agentic/lib/tools/coverage.sh    # Code annotation coverage
+bash .agentic/lib/tools/feature_graph.sh   # Dependency visualization
 
 # Manual operations (token-free)
-bash .agentic/tools/whatchanged.sh # Recent changes
-bash .agentic/tools/deps.sh        # Feature dependencies
-bash .agentic/tools/accept.sh      # Run acceptance tests
-bash .agentic/tools/sync.sh --check # Check doc staleness + drift
-bash .agentic/tools/task.sh        # Create task files
+bash .agentic/lib/tools/whatchanged.sh # Recent changes
+bash .agentic/lib/tools/deps.sh        # Feature dependencies
+bash .agentic/lib/tools/accept.sh      # Run acceptance tests
+bash .agentic/lib/tools/sync.sh --check # Check doc staleness + drift
+bash .agentic/lib/tools/task.sh        # Create task files
 
 # Advanced quality (optional)
-bash .agentic/tools/mutation_test.sh [path]  # Mutation testing for critical code
+bash .agentic/lib/tools/mutation_test.sh [path]  # Mutation testing for critical code
 ```
 
 ### Stack Profiles
@@ -408,7 +408,7 @@ Quick-start guidance for common technology stacks:
 ### Discovery Profile Files
 **Project State:**
 - `STACK.md` - How to build, test, run, and deploy (with profile setting)
-- `.agentic-journal/JOURNAL.md` - Session-by-session progress log
+- `.agentic/journal/JOURNAL.md` - Session-by-session progress log
 - `CONTEXT_PACK.md` - Durable context (architecture, where things are)
 - `HUMAN_NEEDED.md` - Items requiring human decision/intervention
 

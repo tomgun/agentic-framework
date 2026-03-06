@@ -9,7 +9,7 @@ setup_test_project "formal"
 
 # Create WIP.md with an active feature
 mkdir -p "$TEST_PROJECT/.agentic-state"
-cat > "$TEST_PROJECT/.agentic-state/WIP.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/session/WIP.md" << 'EOF'
 # Work In Progress
 
 - **Feature**: F-0001: User Authentication
@@ -30,7 +30,7 @@ cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 - Status: planned
 EOF
 
-git -C "$TEST_PROJECT" add .agentic-state/ spec/
+git -C "$TEST_PROJECT" add .agentic/session/ spec/
 git -C "$TEST_PROJECT" commit -m "Add WIP and features" --quiet
 
 # Try to start a second feature

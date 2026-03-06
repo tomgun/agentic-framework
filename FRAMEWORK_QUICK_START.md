@@ -45,13 +45,13 @@ Framework features apply to different profiles:
 
 | Profile | What Users Get | Key Files |
 |---------|---------------|-----------|
-| **Discovery** | Token efficiency, developer UX, workflows, quality gates | STATUS.md, CONTEXT_PACK.md, JOURNAL.md, .agentic-state/WIP.md |
-| **Formal** | Discovery + formal specs, feature tracking, acceptance criteria | + spec/FEATURES.md, spec/acceptance/ |
+| **Discovery** | Token efficiency, developer UX, workflows, quality gates | STATUS.md, CONTEXT_PACK.md, JOURNAL.md, .agentic/session/WIP.md |
+| **Formal** | Discovery + formal specs, feature tracking, acceptance criteria | + .agentic/spec/FEATURES.md, .agentic/spec/acceptance/ |
 
 **When adding framework features, know which profile it affects:**
 - Discovery features → affect ALL users
 - Formal features → only users who enable formal specs
-- Both → document clearly in spec/FEATURES.md
+- Both → document clearly in .agentic/spec/FEATURES.md
 
 **Discovery is the foundation** - Token Economics and Developer UX must work without any specs.
 
@@ -74,8 +74,8 @@ Ask yourself:
 
 | # | File | Action | Why |
 |---|------|--------|-----|
-| 1 | `spec/FEATURES.md` | Add F-#### entry | Dogfooding: we spec our own features |
-| 2 | `spec/acceptance/F-####.md` | Create acceptance criteria FIRST | Acceptance-Driven: criteria before code |
+| 1 | `.agentic/spec/FEATURES.md` | Add F-#### entry | Dogfooding: we spec our own features |
+| 2 | `.agentic/spec/acceptance/F-####.md` | Create acceptance criteria FIRST | Acceptance-Driven: criteria before code |
 | 3 | Code | Implement the feature | Now you know what "done" means |
 | 4 | `tests/validate_framework.sh` | Add validation tests | Gates > Guidelines: enforce, don't advise |
 | 5 | Scratch project | Test the feature works | Documentation = Reality |
@@ -117,8 +117,8 @@ gh pr create --title "feat: Description (F-0098)"
 ## 🔄 RELEASE CHECKLIST (Abbreviated)
 
 ```
-[ ] spec/FEATURES.md has new features (F-####)
-[ ] spec/acceptance/F-####.md exists for each new feature
+[ ] .agentic/spec/FEATURES.md has new features (F-####)
+[ ] .agentic/spec/acceptance/F-####.md exists for each new feature
 [ ] tests/validate_framework.sh passes (ALL tests)
 [ ] LLM behavioral tests current (bash .agentic/tools/llm-test-status.sh)
 [ ] Tested in scratch project (install.sh, init, upgrade)
@@ -138,9 +138,9 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 
 | Purpose | File |
 |---------|------|
-| Framework specs | `spec/FEATURES.md` |
-| Acceptance criteria | `spec/acceptance/F-####.md` |
-| Spec migrations | `spec/migrations/` (use `migration.sh create "title"`) |
+| Framework specs | `.agentic/spec/FEATURES.md` |
+| Acceptance criteria | `.agentic/spec/acceptance/F-####.md` |
+| Spec migrations | `.agentic/spec/migrations/` (use `migration.sh create "title"`) |
 | Validation tests | `tests/validate_framework.sh` |
 | LLM test plan | `tests/LLM_TEST_PLAN.md` |
 | LLM test results | `tests/LLM_TEST_RESULTS.md` |
@@ -150,7 +150,7 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 | Agent guidelines | `.agentic/agents/shared/` |
 | Full dev guide | `FRAMEWORK_DEVELOPMENT.md` |
 | Principles | `.agentic/PRINCIPLES.md` |
-| Change manifests | `.agentic-journal/manifests/` (use `manifest.sh F-####`) |
+| Change manifests | `.agentic/journal/manifests/` (use `manifest.sh F-####`) |
 | Doc drift check | `drift.sh --docs` or `drift.sh --docs --manifest F-####` |
 
 ---

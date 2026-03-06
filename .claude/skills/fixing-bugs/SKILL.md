@@ -11,7 +11,7 @@ compatibility: "Requires Claude Code with shell access."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Agent]
 metadata:
   author: agentic-framework
-  version: "0.38.0"
+  version: "0.41.0"
 ---
 
 # Fixing Bugs
@@ -54,9 +54,9 @@ Use `Grep` and `Read` to trace the code path. Do NOT guess — observe the actua
 
 1. Run the failing test — it should now pass
 2. Run the full test suite — no regressions
-3. Update `STATUS.md` if the bug was tracked:
+3. Update `.agentic/STATUS.md` if the bug was tracked:
    ```bash
-   bash .agentic/tools/status.sh focus "Fixed: description"
+   bash .agentic/lib/tools/status.sh focus "Fixed: description"
    ```
 
 ### Step 5: Hand Off to Commit Workflow

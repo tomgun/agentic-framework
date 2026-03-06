@@ -49,7 +49,7 @@ echo ""
 echo "=== check-spec-health.sh ==="
 echo ""
 
-HEALTH_SCRIPT="$FRAMEWORK_ROOT/.agentic/tools/check-spec-health.sh"
+HEALTH_SCRIPT="$FRAMEWORK_ROOT/.agentic/lib/tools/check-spec-health.sh"
 
 test_case "check-spec-health.sh exists and is executable"
 if [[ -x "$HEALTH_SCRIPT" ]]; then
@@ -121,7 +121,7 @@ echo ""
 echo "=== ag spec command ==="
 echo ""
 
-AG_SCRIPT="$FRAMEWORK_ROOT/.agentic/tools/ag.sh"
+AG_SCRIPT="$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh"
 cd "$FRAMEWORK_ROOT"
 
 test_case "ag spec (no args) prints checklist"

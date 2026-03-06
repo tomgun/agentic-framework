@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # S02: WIP.md blocks commit via hook
-# Creating .agentic-state/WIP.md should prevent git commit
+# Creating .agentic/session/WIP.md should prevent git commit
 set -euo pipefail
 source "$(dirname "$0")/../lib/helpers.sh"
 
@@ -11,8 +11,8 @@ cd "$PROJECT"
 
 # Create WIP lock
 mkdir -p .agentic-state
-echo "Feature: test" > .agentic-state/WIP.md
-git add .agentic-state/WIP.md
+echo "Feature: test" > .agentic/session/WIP.md
+git add .agentic/session/WIP.md
 git commit -m "add WIP" --quiet --no-verify
 
 # Now attempt a normal commit — hook should block

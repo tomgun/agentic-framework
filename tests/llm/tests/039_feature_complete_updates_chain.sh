@@ -39,7 +39,7 @@ EOF
 
 # Create JOURNAL.md
 mkdir -p "$TEST_PROJECT/.agentic-journal"
-cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/journal/JOURNAL.md" << 'EOF'
 # Development Journal
 
 ### Session: 2026-02-04
@@ -58,7 +58,7 @@ cat > "$TEST_PROJECT/CHANGELOG.md" << 'EOF'
 - Product catalog shipped
 EOF
 
-git -C "$TEST_PROJECT" add spec/ .agentic-journal/JOURNAL.md CHANGELOG.md
+git -C "$TEST_PROJECT" add spec/ .agentic/journal/JOURNAL.md CHANGELOG.md
 git -C "$TEST_PROJECT" commit -m "Add project files" --quiet
 
 # Tell agent the feature is complete

@@ -3,7 +3,7 @@
 # Usage: curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
 #
 # Options (via environment variables):
-#   VERSION=v0.13.0  - Install specific version (default: latest)
+#   VERSION=v0.41.0  - Install specific version (default: latest)
 #   TARGET=/path     - Install to specific directory (default: current directory)
 
 set -euo pipefail
@@ -39,14 +39,16 @@ else
   echo "Version: $VERSION"
 fi
 
+VERSION_NUM="${VERSION#v}"  # Strip 'v' prefix
+
 # Create temp directory
 TEMP_DIR=$(mktemp -d)
 trap "rm -rf $TEMP_DIR" EXIT
 
-# Download and extract
-echo -n "Downloading... "
-TARBALL_URL="https://github.com/$REPO/archive/refs/tags/$VERSION.tar.gz"
-curl -fsSL "$TARBALL_URL" | tar xz -C "$TEMP_DIR"
+# Download source tarball (for install.sh, thin wrappers, and templates)
+echo -n "Downloading source... "
+SOURCE_URL="https://github.com/$REPO/archive/refs/tags/$VERSION.tar.gz"
+curl -fsSL "$SOURCE_URL" | tar xz -C "$TEMP_DIR"
 echo "done"
 
 # Find extracted directory
@@ -54,6 +56,16 @@ FRAMEWORK_DIR=$(ls -d "$TEMP_DIR"/agentic-framework-* 2>/dev/null | head -n1)
 if [ -z "$FRAMEWORK_DIR" ]; then
   echo -e "${RED}Failed to extract framework${NC}"
   exit 1
+fi
+
+# Try to download pre-built lib tarball from release assets
+LIB_TARBALL="agentic-lib-v${VERSION_NUM}.tar.gz"
+LIB_URL="https://github.com/$REPO/releases/download/$VERSION/$LIB_TARBALL"
+echo -n "Downloading lib tarball... "
+if curl -fsSL -o "$FRAMEWORK_DIR/.agentic/$LIB_TARBALL" "$LIB_URL" 2>/dev/null; then
+  echo "done"
+else
+  echo "not available (will build from source)"
 fi
 
 # Run install.sh
@@ -65,4 +77,4 @@ echo ""
 echo -e "${GREEN}Installation complete!${NC}"
 echo ""
 echo "Next: Open your AI agent and say:"
-echo "  \"Read .agentic/init/init_playbook.md and help me initialize this project\""
+echo "  \"Read .agentic/lib/init/init_playbook.md and help me initialize this project\""
