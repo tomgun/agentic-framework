@@ -11,9 +11,9 @@
 ### Format A: Simple (recommended for most projects)
 ```markdown
 ### Session: YYYY-MM-DD HH:MM
-**Feature**: F-####
-**Accomplished**:
-- Items completed
+**Why**: Problem being solved or motivation for this work
+**What changed**:
+- Outcome-oriented descriptions (what the project can do now, not what files were edited)
 **Next steps**:
 - Immediate actions
 **Blockers**:
@@ -53,20 +53,19 @@
 ### Format A Example
 
 ### Session: 2025-12-31 14:30
-**Feature**: F-0004 (Persistence)
 
-**Accomplished**:
-- Implemented localStorage adapter with quota handling
-- Added unit tests for happy path and quota exceeded
-- Updated FEATURES.md: F-0004 implementation state = partial
+**Why**: App data was lost on page refresh — users had to re-enter everything.
+
+**What changed**:
+- App now persists state to localStorage with automatic quota handling
+- Gracefully degrades when storage is full (warns user, continues working)
 
 **Next steps**:
-- Add Safari private mode fallback (in-memory storage)
-- Update TECH_SPEC.md with persistence architecture
-- Add integration test for full save/load cycle
+- Safari private mode fallback (throws on access, not just quota)
+- Integration test for full save/load cycle
 
 **Blockers**:
-- Safari private mode throws on localStorage access (not just quota) - need research on detection strategy
+- Safari private mode throws on localStorage access — need research on detection strategy
 
 ---
 
@@ -110,16 +109,17 @@
 - When encountering blockers worth documenting
 
 ### What to include
-- **Accomplished**: Concrete items (code, tests, docs)
+- **Why**: The problem or motivation (lead with this — it's the most important context for future readers)
+- **What changed**: Outcomes and capabilities, not implementation details. "Projects can now declare multiple test tiers" not "Added TestTier dataclass to verify.py"
 - **Next steps**: Immediate actionable items (not long-term plans)
 - **Blockers**: Specific issues preventing progress
-- **Feature ID**: Link to feature if applicable
+- **Lessons**: What was learned that wasn't obvious (optional but valuable)
 
 ### What NOT to include
+- File names and line counts (that's what git log is for)
 - Vague statements ("worked on feature")
 - Long explanations (keep bullets concise)
 - Future plans (use STATUS.md for roadmap)
-- Every single file change (focus on meaningful progress)
 
 ### Keep it clean
 - Most recent entries at top

@@ -83,7 +83,7 @@ You can also run `ag docs F-XXXX` manually to draft registered docs for a featur
 
 Every time before committing, execute these commands in order:
 
-1. `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Problem being solved"` — update .agentic/journal/JOURNAL.md (always include --why)
+1. `bash .agentic/lib/tools/journal.sh "Topic" "What changed (outcomes, not files)" "Next" "Blockers" --why "Problem being solved"` — update JOURNAL.md (always include --why, describe outcomes not implementation details)
 2. `bash .agentic/lib/tools/status.sh focus "Current task"` — update .agentic/STATUS.md
 3. If shipping a feature (Formal): `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 4. `ag commit` — runs quality gates, shows diff, waits for human approval
@@ -96,7 +96,7 @@ Never read or edit these files directly. Always use the scripts:
 | File | Command |
 |------|---------|
 | .agentic/STATUS.md | `bash .agentic/lib/tools/status.sh focus "Task"` |
-| .agentic/journal/JOURNAL.md | `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"` |
+| .agentic/journal/JOURNAL.md | `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes" "Next" "Blockers" --why "Why"` |
 | .agentic/HUMAN_NEEDED.md | `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"` |
 | .agentic/spec/FEATURES.md | `bash .agentic/lib/tools/feature.sh F-#### status shipped` |
 | .agentic/TODO.md | `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"` |
