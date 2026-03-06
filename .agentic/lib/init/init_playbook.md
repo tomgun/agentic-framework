@@ -735,7 +735,7 @@ Common blockers discovered during init:
 ```markdown
 ### Session: YYYY-MM-DD HH:MM - Project Initialization
 
-**Accomplished**:
+**What changed**:
 - Initialized [Project Name] with [Stack]
 - Profile: [Discovery | Formal]
 - Created STACK.md, STATUS.md, OVERVIEW.md (optional), CONTEXT_PACK.md
