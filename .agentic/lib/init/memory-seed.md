@@ -20,6 +20,8 @@ If the user's intent is to build, implement, add, create, set up, develop, make,
 2. Create .agentic/spec/acceptance/F-XXXX.md with acceptance criteria FIRST
 3. Run `ag plan F-XXXX` (starts the plan-review loop)
 4. Run `ag implement F-XXXX` after the plan is approved
+
+**A plan is NOT a spec.** Even when implementing from a detailed plan, create the formal artifacts (FEATURES.md entry + acceptance file) BEFORE writing any code. Plans contain design; specs contain the testable contract.
 5. If `spec_analysis` is enabled (default: on for formal, off for discovery), `spec-analyze.sh` runs advisory checks — review findings but proceed regardless
 
 `ag implement` auto-creates WIP tracking. If bypassing ag: run `bash .agentic/lib/tools/wip.sh start F-XXXX "desc" "files"` before coding.

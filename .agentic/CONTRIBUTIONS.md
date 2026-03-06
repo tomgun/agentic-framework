@@ -2534,8 +2534,20 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### E2E Testing in the Verify Loop (F-0164, v0.44.0)
+
+**Design insight**: E2E means different things per project type — web apps have Playwright UI + API tests, VST plugins have DSP validation + plugin UI tests, backends have endpoint smoke tests. A single project can have BOTH visual and non-visual e2e tiers. Visual verification should be per-tier (based on whether that tier produces screenshots), not per-project.
+
+**Tiered verify loop**: Extended the single-command verify loop to support an ordered list of named test tiers parsed from STACK.md. Each tier has its own fix loop, timeout, and continue_on_failure setting. Fast-fail by default. Fully backward compatible — projects with only one test command work exactly as before.
+
+**Server lifecycle deferral**: Starting/stopping dev servers is the hardest part with the most edge cases. E2e frameworks already solve this (Playwright's `webServer` config, Cypress plugins, `start-server-and-test`). Document this in setup guides rather than reimplementing it.
+
+**Phased delivery**: Three PRs — PR1 (tiered verify + STACK.md config), PR2 (visual verification with AI screenshot review), PR3 (scaffolding with detection + setup guides).
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.41.0
+**Current Version**: v0.44.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions
