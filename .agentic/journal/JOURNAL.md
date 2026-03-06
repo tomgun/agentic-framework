@@ -1403,3 +1403,42 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-06 23:38 - Auto mode fixes
+
+**Why**: Auto modes had placeholder code and unsafe defaults
+
+**What changed**:
+- Wired up engine.py placeholders, tier-aware permissions, removed --no-verify, cleaned HUMAN_NEEDED
+
+**Next steps**:
+- Test crunch mode end-to-end
+
+**Blockers**: None
+
+
+### Session: 2026-03-07 00:39 - F-0168 Review Fixes
+
+**Why**: Code review found 6 issues
+
+**What changed**:
+- Fixed screenshot collision bug, module-level import, spec/changelog gaps, marked F-0168 shipped
+
+**Next steps**:
+- Push PR, merge
+
+**Blockers**: None
+
+
+### Session: 2026-03-07 00:42 - F-0168 Visual Verification + E2E Scaffolding (v0.45.0)
+
+**Why**: PR2+PR3 of tiered verify loop plan
+
+**What changed**:
+- Implemented visual verification (screenshot collection, AI review via Anthropic API), E2E scaffolding (detect Playwright/Cypress/Detox/WebdriverIO), surfaced auto modes across all agent instruction files and framework docs. 42 new tests, all 260 validation checks pass.
+
+**Next steps**:
+- Merge PR #66, tag v0.45.0. Next: T-0043 AC scheduling/parallel execution in auto modes
+
+**Blockers**: None
+

@@ -34,7 +34,7 @@ If the project has existing code, scaffold will automatically run discovery and 
 
 1. Read `.agentic/session/discovery_report.json`
 2. Present a human-readable summary to the user:
-   - **Detected stack**: language, framework, package manager, test framework
+   - **Detected stack**: language, framework, package manager, test framework, E2E framework (if any)
    - **Sub-projects**: detected sub-projects with their frameworks (e.g., frontend/React, functions/Azure Functions, mobile/React Native)
    - **Architecture**: entry points, components, monorepo status
    - **Project description**: extracted from README
@@ -527,7 +527,8 @@ Interview the user to understand:
 3. **Tech stack?** (languages, frameworks, runtimes)
 4. **Key constraints?** (performance, security, compliance, offline-first, etc.)
 5. **Testing approach?** (TDD recommended, what test frameworks?)
-6. **Project license?** (See Step 2a below - IMPORTANT!)
+6. **E2E testing?** If the project has a UI (web, mobile, game), ask about E2E tests. Suggest a framework based on stack — see `.agentic/lib/quality/e2e_setup_guide.md` for per-stack recommendations. If they want E2E, help configure `Test commands:` and `E2E screenshots:` in STACK.md.
+7. **Project license?** (See Step 2a below - IMPORTANT!)
 
 ### Step 2a: Ask about project licensing ⭐
 
@@ -661,6 +662,7 @@ Type a/b/c/d:"
 
 1. **Ask user about their tech stack** (from STACK.md)
 2. **Copy appropriate quality profile:**
+   - Web app with E2E: `.agentic/lib/quality_profiles/webapp_with_e2e.sh` (if Playwright/Cypress detected or configured)
    - Web/mobile: `.agentic/quality_profiles/web_mobile.sh`
    - Backend: `.agentic/quality_profiles/backend.sh`
    - Desktop: `.agentic/quality_profiles/desktop.sh`
@@ -668,6 +670,7 @@ Type a/b/c/d:"
    - Audio plugin: `.agentic/quality_profiles/audio_plugin.sh`
    - Game: `.agentic/quality_profiles/game.sh`
    - Generic: `.agentic/quality_profiles/generic.sh`
+   - See also: `.agentic/lib/quality/e2e_testing_contract.md` for E2E integration contract
 
 3. **Copy to project root** as `quality_checks.sh` and customize thresholds
 4. **Pre-commit hook** — verify installation, then configure mode:

@@ -506,6 +506,30 @@ Check `agent_mode` in STACK.md: `premium` | `balanced` (default) | `economy`
 | Implementation | `general-purpose` | opus | sonnet | haiku |
 | Testing/review | `general-purpose` | opus | sonnet | haiku |
 
+### Autonomous Workflow Modes (v0.43+)
+
+For hands-off execution. Require test commands in STACK.md; task/crunch require acceptance criteria.
+
+| Mode | Command | What it does |
+|------|---------|-------------|
+| **Verify** | `ag auto verify` | Test-fix loop: runs tests, spawns fresh Claude to fix failures, repeats until green or max iterations |
+| **Verify + Visual** | `ag auto verify --visual` | Same + collects E2E screenshots + AI visual review via Anthropic API |
+| **Task** | `ag auto task F-XXXX` | Reads ACs, creates branch, spawns Claude per AC, tests, commits passing work, creates PR |
+| **Task + Visual** | `ag auto task F-XXXX --visual` | Same + visual review at final verification step |
+| **Crunch** | `ag auto crunch` | Reads planned features from FEATURES.md, runs task mode for each, stops on max errors |
+
+**Tiered test execution** (v0.44+): STACK.md `Test commands:` section defines ordered tiers (unit, integration, e2e). Each tier has its own fix loop. Fast-fail by default (tier failure stops subsequent tiers).
+
+**Visual verification** (v0.45+): Configure `E2E screenshots:` in STACK.md. Requires `pip install anthropic` + `ANTHROPIC_API_KEY`. Visual concerns are advisory only.
+
+**Control commands**: `ag auto pause` | `ag auto resume` | `ag auto stop` | `ag auto status` | `ag auto feedback AC-001 "text"`
+
+**When to suggest autonomous modes to user**:
+- "fix all tests" / "make tests green" → `ag auto verify`
+- "implement F-XXXX hands-off" → `ag auto task F-XXXX`
+- "process all planned features" → `ag auto crunch`
+- Project has E2E + screenshots → suggest `--visual`
+
 ### Session Protocols
 
 - **START**: Run `ag start`. Read .agentic/STATUS.md, HUMAN_NEEDED.md, check .agentic/session/WIP.md. If WIP.md exists: warn about interrupted work and suggest resuming.

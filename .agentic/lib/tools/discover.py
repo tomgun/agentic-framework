@@ -201,6 +201,9 @@ def detect_stack(root: Path) -> dict:
     # --- Test framework ---
     stack["test_framework"] = _detect_test_framework(root, stack.get("language"))
 
+    # --- E2E framework ---
+    stack["e2e_framework"] = _detect_e2e_framework(root, stack.get("language"))
+
     return stack
 
 
@@ -364,6 +367,69 @@ def _detect_test_framework(root: Path, language: str | None) -> str | None:
         if (root / "spec").is_dir():
             return "rspec"
         return "minitest"
+
+    return None
+
+
+def _detect_e2e_framework(root: Path, language: str | None) -> str | None:
+    """Detect E2E testing framework from config files and dependencies."""
+    # Config file detection (highest confidence)
+    config_signals = [
+        ("playwright.config.ts", "playwright"),
+        ("playwright.config.js", "playwright"),
+        ("playwright.config.mjs", "playwright"),
+        ("cypress.config.ts", "cypress"),
+        ("cypress.config.js", "cypress"),
+        ("cypress.json", "cypress"),
+        (".detoxrc.js", "detox"),
+        (".detoxrc.json", "detox"),
+        ("wdio.conf.js", "webdriverio"),
+        ("wdio.conf.ts", "webdriverio"),
+    ]
+    for filename, framework in config_signals:
+        if (root / filename).exists():
+            return framework
+
+    # package.json devDependencies
+    pkg_json = root / "package.json"
+    if pkg_json.exists():
+        try:
+            pkg = json.loads(pkg_json.read_text())
+            dev_deps = pkg.get("devDependencies", {})
+            deps = pkg.get("dependencies", {})
+            all_deps = {**deps, **dev_deps}
+            e2e_deps = [
+                ("@playwright/test", "playwright"),
+                ("cypress", "cypress"),
+                ("detox", "detox"),
+                ("webdriverio", "webdriverio"),
+            ]
+            for pkg_name, framework in e2e_deps:
+                if pkg_name in all_deps:
+                    return framework
+        except Exception:
+            pass
+
+    # Python: check for playwright in requirements
+    lang = (language or "").lower()
+    if "python" in lang:
+        for req_file in ["requirements.txt", "requirements-dev.txt"]:
+            req_path = root / req_file
+            if req_path.exists():
+                try:
+                    content = req_path.read_text().lower()
+                    if "playwright" in content:
+                        return "playwright"
+                except Exception:
+                    pass
+        pyproject = root / "pyproject.toml"
+        if pyproject.exists():
+            try:
+                content = pyproject.read_text().lower()
+                if "playwright" in content:
+                    return "playwright"
+            except Exception:
+                pass
 
     return None
 

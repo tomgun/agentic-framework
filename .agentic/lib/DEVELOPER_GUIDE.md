@@ -656,8 +656,43 @@ The framework includes an autonomous engine that can implement features with min
 | Mode | Command | What it does |
 |------|---------|-------------|
 | **Verify** | `ag auto verify` | Test-fix loop: runs tests, spawns Claude to fix failures, repeats until green |
+| **Verify + Visual** | `ag auto verify --visual` | Same as above, plus AI visual review of collected E2E screenshots |
 | **Task** | `ag auto task F-XXXX` | Implements one feature: reads ACs, spawns Claude per AC, commits passing work, creates PR |
+| **Task + Visual** | `ag auto task F-XXXX --visual` | Same as above, plus visual review at final verification |
 | **Crunch** | `ag auto crunch` | Batch mode: reads planned features from FEATURES.md, runs task mode for each |
+
+#### Tiered Test Execution (v0.44+)
+
+STACK.md's `Test commands:` section defines ordered tiers. Each tier has its own fix loop:
+
+```markdown
+## Testing
+- Test commands:
+  - Unit: `npm run test`
+  - E2E API: `pytest tests/e2e/api/`
+  - E2E UI: `npx playwright test`
+```
+
+Tiers run in order. Fast-fail by default (unit failure skips e2e). E2E tiers get longer timeouts (300s vs 120s). Filter with `--tier e2e` to run only matching tiers.
+
+#### Visual Verification (v0.45+)
+
+AI-powered screenshot review for E2E tests. Add to STACK.md:
+
+```markdown
+- E2E screenshots: test-results/
+```
+
+Then run with `--visual`:
+
+```bash
+ag auto verify --visual           # Collects screenshots, sends to Anthropic API
+ag auto task F-XXXX --visual      # Visual review at final verification step
+```
+
+**Requirements**: `pip install anthropic` + `ANTHROPIC_API_KEY` env var. If either is missing, visual review is skipped with a warning. Visual concerns are **advisory only** — they never block.
+
+See: `.agentic/lib/quality/e2e_testing_contract.md` (integration contract), `.agentic/lib/quality/e2e_setup_guide.md` (per-stack setup)
 
 #### Three Trust Tiers
 

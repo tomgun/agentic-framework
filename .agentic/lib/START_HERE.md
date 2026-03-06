@@ -200,6 +200,25 @@ Specialized agents work sequentially for optimal context efficiency:
 
 ---
 
+**Autonomous Modes** (hands-off execution, v0.43+):
+
+When tests and acceptance criteria are defined, the framework can work autonomously:
+
+| Command | What it does |
+|---------|-------------|
+| `ag auto verify` | Test-fix loop: runs tests, fixes failures with fresh Claude instances, repeats until green |
+| `ag auto verify --visual` | Same + AI visual review of E2E screenshots (requires Anthropic API key) |
+| `ag auto task F-XXXX` | Implements one feature: reads ACs, codes per AC, tests, commits, creates PR |
+| `ag auto crunch` | Batch: processes all planned features via task mode |
+
+**Prerequisites**: Test commands in STACK.md. For task/crunch: acceptance criteria in `spec/acceptance/F-XXXX.md`. For visual: `E2E screenshots:` in STACK.md + `pip install anthropic` + `ANTHROPIC_API_KEY`.
+
+**Control**: `ag auto pause` | `ag auto resume` | `ag auto stop` | `ag auto status`
+
+Details: [`.agentic/lib/DEVELOPER_GUIDE.md`](DEVELOPER_GUIDE.md) (Autonomous Modes section)
+
+---
+
 **Single Agent Mode** (for simple features or when learning):
 
 **TDD mode** (✅ RECOMMENDED):
@@ -304,6 +323,9 @@ Survives framework upgrades — `.agentic/` gets replaced, `.agentic/local/` doe
 - Acceptance criteria: `.agentic/spec/acceptance/F-####.md`
 - Dev workflow: `.agentic/lib/workflows/dev_loop.md`
 - TDD mode (recommended): `.agentic/lib/workflows/tdd_mode.md`
+- **Autonomous implementation**: `ag auto task F-####` (hands-off, creates PR)
+- **Autonomous test-fix**: `ag auto verify` (loop until green)
+- **Batch implementation**: `ag auto crunch` (all planned features)
 - Git workflow: `.agentic/lib/workflows/git_workflow.md`
 - Code annotations: `.agentic/lib/workflows/code_annotations.md`
 
@@ -343,6 +365,10 @@ Survives framework upgrades — `.agentic/` gets replaced, `.agentic/local/` doe
 - Definition of done: `.agentic/lib/workflows/definition_of_done.md`
 - Continuous quality validation: `.agentic/lib/workflows/continuous_quality_validation.md`
 - Run verification: `bash .agentic/lib/tools/verify.sh`
+- **Autonomous test-fix loop**: `ag auto verify` (auto-fixes failing tests)
+- **Visual verification**: `ag auto verify --visual` (AI reviews E2E screenshots)
+- E2E testing contract: `.agentic/lib/quality/e2e_testing_contract.md`
+- E2E setup guide: `.agentic/lib/quality/e2e_setup_guide.md`
 
 **Get project health:**
 - `bash .agentic/lib/tools/doctor.sh` - Check structure

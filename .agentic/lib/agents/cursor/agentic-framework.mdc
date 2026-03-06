@@ -33,5 +33,10 @@ Custom models: check `models:` section. Full docs: `.agentic/workflows/agent_mod
 ## Developer UX
 - Always end with: what changed, what's next, and what you need from the user.
 
+## Autonomous modes
+- `ag auto verify` — test-fix loop until green (add `--visual` for AI screenshot review)
+- `ag auto task F-XXXX` — implements feature from ACs, creates PR
+- `ag auto crunch` — batch processes all planned features
+
 Workflows, gates, delegation: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`
 

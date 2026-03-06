@@ -23,6 +23,7 @@ _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
 
+from auto import spawn_claude  # noqa: E402
 from auto.engine import AutoEngine, EngineState  # noqa: E402
 from auto.verify import VerifyLoop  # noqa: E402
 
@@ -92,11 +93,13 @@ class TaskRunner:
         project_root: Path,
         claude_command: str = "claude",
         on_ac_done: Optional[callable] = None,
+        visual: bool = False,
     ) -> None:
         self.project_root = project_root.resolve()
         self.paths = get_paths(project_root)
         self.claude_command = claude_command
         self.on_ac_done = on_ac_done
+        self.visual = visual
         self.engine = AutoEngine(project_root)
 
     def run(
@@ -187,6 +190,7 @@ class TaskRunner:
         verify_loop = VerifyLoop(
             project_root=self.project_root,
             claude_command=self.claude_command,
+            visual=self.visual,
         )
         verify_result = verify_loop.run(max_iterations=5)
         result.verification_passed = verify_result.success
@@ -237,6 +241,7 @@ class TaskRunner:
             f"Implement acceptance criterion {ac_id} for feature {feature_id}.\n\n"
             f"Criterion: {ac_text}\n\n"
             f"Instructions:\n"
+            f"- Read the spec file at .agentic/spec/acceptance/{feature_id}.md for full context\n"
             f"- Read the existing code to understand the codebase\n"
             f"- Implement the minimum code needed to satisfy this criterion\n"
             f"- Ensure tests pass after your changes\n"
@@ -244,21 +249,12 @@ class TaskRunner:
             f"{feedback_text}"
         )
 
-        try:
-            proc = subprocess.run(
-                [self.claude_command, "--print", "--dangerously-skip-permissions", prompt],
-                cwd=str(self.project_root),
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-            )
-            return proc.stdout + proc.stderr
-        except FileNotFoundError:
-            return "error: claude command not found"
-        except subprocess.TimeoutExpired:
-            return f"error: Claude timed out after {timeout}s"
-        except Exception as e:
-            return f"error: {e}"
+        return spawn_claude(
+            self.claude_command,
+            self.project_root,
+            prompt,
+            timeout=timeout,
+        )
 
     def _run_tests(self) -> bool:
         """Run the test suite and return True if all pass."""
@@ -282,7 +278,7 @@ class TaskRunner:
             )
             message = f"feat({feature_id}): implement {ac_id} — {ac_text[:60]}"
             subprocess.run(
-                ["git", "commit", "-m", message, "--no-verify"],
+                ["git", "commit", "-m", message],
                 cwd=str(self.project_root),
                 capture_output=True,
                 check=True,
@@ -366,6 +362,11 @@ def main() -> int:
         action="store_true",
         help="Output result as JSON",
     )
+    parser.add_argument(
+        "--visual",
+        action="store_true",
+        help="Run AI visual review on collected screenshots",
+    )
     args = parser.parse_args()
 
     def print_ac(ac: ACResult) -> None:
@@ -378,6 +379,7 @@ def main() -> int:
     runner = TaskRunner(
         project_root=args.project_root,
         on_ac_done=None if args.json else print_ac,
+        visual=args.visual,
     )
 
     if not args.json:
