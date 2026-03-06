@@ -15,6 +15,8 @@
       "Bash(cd * && bun *)",
       "Bash(cd * && python *)",
       "Bash(cd * && bash tests/*)",
+      "Bash(cd * && npx playwright test *)",
+      "Bash(cd * && npx cypress run *)",
       "Bash(cd * && bash .agentic/*)",
       "Bash(ls *)",
       "Bash(cat *)",

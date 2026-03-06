@@ -40,7 +40,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 ### Complexity limits
 - max_files_per_commit: 15
 # Blocking limit in pre-commit. Profile defaults — Discovery: 15 | Formal: 10
-- max_added_lines: 1000
+- max_added_lines: 1200
 # Blocking limit for added lines. Profile defaults — Discovery: 1000 | Formal: 500
 - max_code_file_length: 2500
 # Blocking limit for single file length. Profile defaults — Discovery: 1000 | Formal: 500

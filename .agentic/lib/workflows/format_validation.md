@@ -65,7 +65,7 @@ Define explicit format expectations and provide validation tools.
 ```markdown
 ### Session: YYYY-MM-DD HH:MM
 **Feature**: F-####
-**Accomplished**:
+**What changed**:
 - Item 1
 - Item 2
 **Next steps**:
@@ -104,7 +104,7 @@ Define explicit format expectations and provide validation tools.
 **Critical patterns:**
 - Session headers: `^### Session:` OR `^## \d{4}-\d{2}-\d{2}`
 - Date formats: `YYYY-MM-DD HH:MM` or `YYYY-MM-DD-HHMM` or `YYYY-MM-DD`
-- Bold sections: `**Accomplished**:`, `**What was done:**`, etc.
+- Bold sections: `**What changed**:`, `**Accomplished**:`, `**What was done:**`, etc.
 
 **Issue found**: Template shows `### Session:` but examples use `## YYYY-MM-DD`. Tools now support both.
 

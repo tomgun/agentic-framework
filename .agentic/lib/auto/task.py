@@ -266,7 +266,7 @@ class TaskRunner:
             project_root=self.project_root,
             claude_command=self.claude_command,
         )
-        _, exit_code = verify._run_tests(timeout=120)
+        _, exit_code = verify._run_tests(command=verify.test_command, timeout=120)
         return exit_code == 0
 
     def _commit_ac(

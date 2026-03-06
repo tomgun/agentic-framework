@@ -222,7 +222,7 @@ Your final message should include:
 ```
 ## Session Summary
 
-**Accomplished:**
+**What changed:**
 - [bullet points of what was done]
 
 **Next Steps:**

@@ -45,11 +45,13 @@ def parse_journal_entries(journal_path: Path) -> list[dict]:
         # Extract features mentioned
         features = set(re.findall(r"\b(F-\d{4})\b", session_content))
         
-        # Extract accomplished items
+        # Extract accomplished/what-changed items (support both old and new format)
         accomplished = []
-        if "**Accomplished**:" in session_content:
-            acc_section = session_content.split("**Accomplished**:")[1].split("**")[0]
-            accomplished = [line.strip("- ").strip() for line in acc_section.split("\n") if line.strip().startswith("-")]
+        for label in ("**What changed**:", "**Accomplished**:"):
+            if label in session_content:
+                acc_section = session_content.split(label)[1].split("**")[0]
+                accomplished = [line.strip("- ").strip() for line in acc_section.split("\n") if line.strip().startswith("-")]
+                break
         
         entries.append({
             "date": date,
@@ -135,7 +137,7 @@ def main() -> int:
             print(f"   Features: {', '.join(sorted(entry['features']))}")
         
         if entry["accomplished"]:
-            print("   Accomplished:")
+            print("   What changed:")
             for item in entry["accomplished"][:5]:  # Limit to 5 items
                 print(f"     • {item}")
             if len(entry["accomplished"]) > 5:

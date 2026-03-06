@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 5,
+  "last_migration": 7,
   "migrations": [
     {
       "id": 1,
@@ -31,6 +31,18 @@
       "file": "005_add_f0161_f0162_f0163_autonomous_modes.md",
       "date": "2026-03-06",
       "description": "Add F-0161, F-0162, F-0163 autonomous modes"
+    },
+    {
+      "id": 6,
+      "file": "006_extend_f0161_with_f0164_reference.md",
+      "date": "2026-03-06",
+      "description": "Extend F-0161 with F-0164 reference"
+    },
+    {
+      "id": 7,
+      "file": "007_add_f0164_tiered_verify_loop_acceptance_criteria.md",
+      "date": "2026-03-06",
+      "description": "Add F-0164 tiered verify loop acceptance criteria"
     }
   ]
 }

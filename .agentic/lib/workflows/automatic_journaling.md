@@ -80,7 +80,7 @@ Implemented user login with JWT tokens. Tests passing. Ready for review.
 
 **Feature**: F-0003 (User Authentication)
 
-**Accomplished**:
+**What changed**:
 - Implemented JWT token generation and validation
 - Added bcrypt password hashing
 - Created login and signup endpoints
