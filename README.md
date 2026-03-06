@@ -7,6 +7,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/tomgun/agentic-framework?label=version)](https://github.com/tomgun/agentic-framework/releases/latest)
 
 **📖 Quick Links:**
+- [**WTF.md**](WTF.md) ⭐ - Welcome to the Framework — concise overview with diagrams
 - [**DEVELOPER_GUIDE.md**](.agentic/DEVELOPER_GUIDE.md) ⭐ - Complete usage guide (daily workflows, scripts, customization)
 - [**PRINCIPLES.md**](.agentic/PRINCIPLES.md) ⭐ - Framework values & why we do what we do
 - [**CREDITS.md**](CREDITS.md) - Contributors and acknowledgments
