@@ -36,7 +36,7 @@ Discovery projects keep criteria informally (WIP.md, JOURNAL.md, conversation). 
 
 **How to graduate**:
 1. Set `Profile: formal` in STACK.md
-2. Create `.agentic/.agentic/spec/FEATURES.md` and `.agentic/.agentic/spec/acceptance/` directory
+2. Create `.agentic/spec/FEATURES.md` and `.agentic/spec/acceptance/` directory
 3. Move existing criteria from JOURNAL.md/WIP.md into acceptance files
 4. Existing rough bullets become the starting spec — no need to rewrite
 
@@ -110,7 +110,7 @@ bash .agentic/lib/tools/feature.sh F-0010 note "Discovered: Need rate limiting f
 Include spec changes in the same commit as the code:
 
 ```bash
-git add .agentic/.agentic/spec/acceptance/F-0010.md src/auth/login.ts
+git add .agentic/spec/acceptance/F-0010.md src/auth/login.ts
 git commit -m "feat(F-0010): implement login with rate limiting"
 ```
 
@@ -208,5 +208,5 @@ git commit -m "feat(F-0010): implement login with rate limiting"
 - [Acceptance-Driven Development](../PRINCIPLES.md#acceptance-driven-development)
 - [Feature Implementation Checklist](../checklists/feature_implementation.md)
 - [Definition of Done](definition_of_done.md)
-- [Feature Tracking](../spec/FEATURES.reference.md)
+- [Feature Tracking](../templates/FEATURES.reference.md)
 

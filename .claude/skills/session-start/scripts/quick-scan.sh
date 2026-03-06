@@ -3,28 +3,30 @@
 # Delegates to framework tools — this is a thin wrapper.
 set -euo pipefail
 
+source "${CLAUDE_PROJECT_DIR:-.}/.agentic/lib/paths.sh" 2>/dev/null || true
+
 echo "=== Session State Scan ==="
 echo ""
 
 # WIP check
 echo "--- WIP Status ---"
-bash .agentic/tools/wip.sh check 2>/dev/null || true
+bash .agentic/lib/tools/wip.sh check 2>/dev/null || true
 
 echo ""
 echo "--- Current Focus ---"
-grep -A2 "^## Current" .agentic/STATUS.md 2>/dev/null | head -5 || echo "(no .agentic/STATUS.md)"
+grep -A2 "^## Current" STATUS.md 2>/dev/null | head -5 || echo "(no STATUS.md)"
 
 echo ""
 echo "--- Active Blockers ---"
-if grep -q "^_No active items_" .agentic/HUMAN_NEEDED.md 2>/dev/null; then
+if grep -q "^_No active items_" HUMAN_NEEDED.md 2>/dev/null; then
     echo "None"
 else
-    grep "^### HN-" .agentic/HUMAN_NEEDED.md 2>/dev/null | head -5 || echo "None"
+    grep "^### HN-" HUMAN_NEEDED.md 2>/dev/null | head -5 || echo "None"
 fi
 
 echo ""
 echo "--- TODO Items ---"
-bash .agentic/tools/todo.sh list 2>/dev/null | head -10 || echo "None"
+bash .agentic/lib/tools/todo.sh list 2>/dev/null | head -10 || echo "None"
 
 echo ""
 echo "--- Upgrade Pending ---"

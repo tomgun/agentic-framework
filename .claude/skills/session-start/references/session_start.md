@@ -22,8 +22,8 @@ phase: session
 ```bash
 # Read these silently (don't dump to user)
 # IMPORTANT: Every command must have "|| true" to prevent exit code errors
-cat .agentic/STATUS.md 2>/dev/null || true
-cat .agentic/HUMAN_NEEDED.md 2>/dev/null | head -20 || true
+cat STATUS.md 2>/dev/null || true
+cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
 cat .agentic/session/AGENTS_ACTIVE.md 2>/dev/null || true
 ls .agentic/session/WIP.md 2>/dev/null || true
 bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
@@ -36,8 +36,8 @@ bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
 ```
 👋 Welcome back! Here's where we are:
 
-**Last session**: [Summary from JOURNAL.md or .agentic/STATUS.md]
-**Current focus**: [From .agentic/STATUS.md "Current focus"]
+**Last session**: [Summary from JOURNAL.md or STATUS.md]
+**Current focus**: [From STATUS.md "Current focus"]
 **Progress**: [What's done, what's in progress]
 
 **Next steps** (pick one or tell me something else):
@@ -66,7 +66,7 @@ Options:
 3. Roll back to last commit
 ```
 
-**If .agentic/HUMAN_NEEDED.md has unresolved items**:
+**If HUMAN_NEEDED.md has unresolved items**:
 ```
 📋 There are [N] items waiting for your input:
 - [H-0001]: [Brief description]
@@ -171,7 +171,7 @@ Sync: 2 issue(s) (journal stale, STATUS.md stale)
   Run ag sync to auto-fix and see details
 ```
 
-Suggest running `ag sync` to the user. It checks memory, journal/STATUS freshness, feature status drift, spec/doc drift, and tool file parity. Safe fixes (like STATUS.md inference) are applied automatically; everything else is report-only with suggested commands.
+Suggest running `ag sync` to the user. It checks memory, journal/STATUS freshness, feature status consistency, **unregistered shipped code** (commits without F-#### refs), tool parity, git hooks, periodic lifecycle checks, and PR cleanup. Safe fixes (like STATUS.md inference) are applied automatically; everything else is report-only with suggested commands.
 
 ```bash
 ag sync          # Full sync: detect + auto-fix safe things
@@ -252,7 +252,7 @@ This is a **suggestion**, not a block. The user may choose to work on something 
   - Next steps
   - Known blockers
 
-- [ ] **Read `.agentic/journal/JOURNAL.md`** - Last 2-3 session entries (≈500-1000 tokens)
+- [ ] **Read `JOURNAL.md`** - Last 2-3 session entries (≈500-1000 tokens)
   - Recent progress
   - What worked/didn't work
   - Avoid repeating failed approaches
@@ -277,12 +277,12 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 
 - [ ] **If `feature_tracking=yes`**: Check for active feature
   - Look at `.agentic/STATUS.md` → "Current focus"
-  - Read relevant `.agentic/.agentic/spec/acceptance/F-####.md` if working on feature
-  - Check `.agentic/.agentic/spec/FEATURES.md` for that feature's status
-  - **If in-progress work exists** (WIP.md or active branch): verify it has an F-XXXX in .agentic/.agentic/spec/FEATURES.md with acceptance criteria. If missing, create them before continuing.
+  - Read relevant `.agentic/spec/acceptance/F-####.md` if working on feature
+  - Check `.agentic/spec/FEATURES.md` for that feature's status
+  - **If in-progress work exists** (WIP.md or active branch): verify it has an F-XXXX in FEATURES.md with acceptance criteria. If missing, create them before continuing.
 
 - [ ] **If `pipeline_enabled: yes`**: Check for active pipeline
-  - Look for `.agentic/session/pipeline/F-####-pipeline.md`
+  - Look for `.agentic/pipeline/F-####-pipeline.md`
   - If exists, read to determine your role
   - Load role-specific context (see sequential_agent_specialization.md)
 
@@ -311,7 +311,7 @@ This is a **suggestion**, not a block. The user may choose to work on something 
   - Are there unresolved blockers?
   - Do you need to address them before starting new work?
   - **IMPORTANT**: Proactively surface blockers to user at session start
-  - Ask: "There are N items in .agentic/HUMAN_NEEDED.md. Should we address these first?"
+  - Ask: "There are N items in HUMAN_NEEDED.md. Should we address these first?"
 
 ## Development Mode Check
 
@@ -344,9 +344,9 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 After completing checklist, provide structured summary:
 
 **Context Summary:**
-- Current focus: [from .agentic/STATUS.md]
+- Current focus: [from STATUS.md]
 - Recent progress: [1-2 sentences from JOURNAL.md]
-- Active blockers: [list from .agentic/HUMAN_NEEDED.md or "None"]
+- Active blockers: [list from HUMAN_NEEDED.md or "None"]
 
 **Options for this session:**
 1. [Highest priority planned work]
@@ -360,8 +360,8 @@ After completing checklist, provide structured summary:
 ## Anti-Patterns
 
 ❌ **Don't** read entire codebase at session start  
-❌ **Don't** skip JOURNAL.md (you'll repeat mistakes)
-❌ **Don't** assume you know the status (check .agentic/STATUS.md)  
+❌ **Don't** skip JOURNAL.md (you'll repeat mistakes)  
+❌ **Don't** assume you know the status (check STATUS.md)  
 ❌ **Don't** start coding without this checklist  
 
 ✅ **Do** follow token budget strictly  

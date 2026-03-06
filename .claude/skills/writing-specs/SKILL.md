@@ -13,7 +13,7 @@ compatibility: "Requires Claude Code with file access and ag commands."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.38.0"
+  version: "0.41.0"
 ---
 
 # Writing Specs
@@ -37,10 +37,10 @@ Determine the spec operation and its protection level:
 ### Step 2: Execute Workflow
 
 **For new features:**
-1. Find next F-XXXX ID in `.agentic/.agentic/spec/FEATURES.md`
-2. Read `.agentic/.agentic/spec/NFR.md` — identify applicable NFRs
+1. Find next F-XXXX ID in `.agentic/spec/FEATURES.md`
+2. Read `.agentic/spec/NFR.md` — identify applicable NFRs
 3. Create FEATURES.md entry (Status: planned, Related NFRs)
-4. Create `.agentic/.agentic/spec/acceptance/F-XXXX.md` from `.agentic/lib/templates/acceptance.template.md`
+4. Create `.agentic/spec/acceptance/F-XXXX.md` from `.agentic/spec/acceptance.template.md`
    - Write `## Behavior` section first (technology-agnostic user goal)
    - Group ACs with priority tags: (P1 — MVP), (P2 — enhanced)
    - Add `**Verify independently**` per AC group

@@ -25,10 +25,10 @@ phase: planning
 
 ## New Feature Spec
 
-1. **Find next F-XXXX ID** — scan `.agentic/.agentic/spec/FEATURES.md` for highest ID, increment
-2. **Check NFRs** — read `.agentic/.agentic/spec/NFR.md`, identify applicable constraints
+1. **Find next F-XXXX ID** — scan `.agentic/spec/FEATURES.md` for highest ID, increment
+2. **Check NFRs** — read `.agentic/spec/NFR.md`, identify applicable constraints
 3. **Create FEATURES.md entry** — Status: planned, include Related NFRs
-4. **Create acceptance file** — `.agentic/.agentic/spec/acceptance/F-XXXX.md` from `.agentic/lib/templates/acceptance.template.md`
+4. **Create acceptance file** — `.agentic/spec/acceptance/F-XXXX.md` from `.agentic/spec/acceptance.template.md`
    - Required sections: Tests, Acceptance Criteria, Out of Scope
    - Add NFR Compliance section if NFRs apply
 5. **Show draft to user** — human reviews before committing
@@ -95,7 +95,7 @@ When implementing and discovering new requirements:
 
 For any spec operation:
 
-1. Read `.agentic/.agentic/spec/NFR.md` — identify NFRs that constrain the feature
+1. Read `.agentic/spec/NFR.md` — identify NFRs that constrain the feature
 2. Add `Related NFRs:` field to FEATURES.md entry
 3. Add `### NFR Compliance` section to acceptance criteria
 4. For shipped features, verify spec changes don't violate linked NFRs
@@ -140,4 +140,4 @@ These gates have **no escape hatch** by design.
 - [Spec Evolution](spec_evolution.md) — how specs grow during implementation
 - [Spec Migrations](spec_migrations.md) — migration format and tooling
 - [Definition of Done](definition_of_done.md)
-- [Acceptance Template](../spec/acceptance.template.md)
+- [Acceptance Template](../templates/acceptance.template.md)

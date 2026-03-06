@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Bash, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.38.0"
+  version: "0.41.0"
 ---
 
 # Session Start
@@ -24,8 +24,8 @@ Initialize a new session by checking project state and presenting a dashboard.
 Read these files silently (do not dump raw content to user):
 
 ```bash
-cat .agentic/STATUS.md 2>/dev/null || true
-cat .agentic/HUMAN_NEEDED.md 2>/dev/null | head -20 || true
+cat STATUS.md 2>/dev/null || true
+cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
 bash .agentic/lib/tools/wip.sh check 2>/dev/null || true
 bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
 ```
@@ -87,13 +87,13 @@ Dashboard: "Previous work on F-0125 was interrupted. 3 uncommitted changes. Cont
 
 ## Troubleshooting
 
-**Error: .agentic/STATUS.md not found**
+**Error: STATUS.md not found**
 Cause: Project not initialized with agentic framework.
 Solution: Run `bash .agentic/lib/init/scaffold.sh` or check if this is a framework project.
 
 **Error: JOURNAL.md empty or missing**
 Cause: First session or journal was never created.
-Solution: This is normal for new projects. Proceed with available context from .agentic/STATUS.md.
+Solution: This is normal for new projects. Proceed with available context from STATUS.md.
 
 ## References
 

@@ -340,7 +340,7 @@ When running tests for a release:
 
 1. **Update VERSION first**: `echo "X.Y.Z" > VERSION`
 2. **Update STACK.md version** to match
-3. **Update .agentic/.agentic/spec/FEATURES.md version** to match
+3. **Update .agentic/spec/FEATURES.md version** to match
 4. **THEN run tests**: `bash tests/validate_framework.sh`
 5. **Update result files** with new version:
    - `tests/VERIFICATION_REPORT.md` - Test counts, feature list
