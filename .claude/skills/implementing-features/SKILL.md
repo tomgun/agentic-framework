@@ -45,6 +45,14 @@ Check if spec analysis is enabled:
 3. Review findings but proceed regardless (advisory, not blocking)
 4. If any HIGH/CRITICAL findings, mention them to the user before coding
 
+### Step 1c: AC Coverage Check (advisory)
+
+Run AC-level coverage tracking to see which criteria already have tests:
+```bash
+python3 .agentic/lib/tools/coverage.py F-XXXX
+```
+Review the per-AC coverage report. Flag any untested ACs for attention during implementation.
+
 ### Step 2: Scope Check
 
 Verify the feature is small batch (max 5-10 files). If larger, break into smaller features first and confirm with user.

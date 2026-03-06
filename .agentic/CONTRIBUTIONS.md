@@ -2546,6 +2546,14 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### Batch-Size Limits as Advisory on Feature Branches (v0.44.2)
+
+**Design insight**: Per-commit file-count and line-count limits are a crude proxy for "small batch" discipline. In PR workflows, the PR is the review unit — individual commits get squash-merged. Phased checkpoints (F-0150, P1/P2 AC groups) are the real small-batch mechanism now. Blocking commits on feature branches creates unnecessary friction without improving review quality.
+
+**Decision**: Downgrade `max_files_per_commit` and `max_added_lines` to advisory warnings on feature branches when `git_workflow: pull_request`. Keep them blocking on `main`/`master`. Keep `max_code_file_length` always blocking — it's a code quality invariant, not a batch-size proxy. (T-0024, T-0027)
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.44.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

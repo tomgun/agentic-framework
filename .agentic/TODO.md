@@ -53,14 +53,8 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0023: F-idea: Smarter memory-seed sync — memory-check.sh should: (1) fix worktree bug (resolve to main repo memory path, not worktree path), (2) when stale, generate a precise diff showing what changed between memory version and current seed (not just 'go re-read the file'), (3) output structured instructions the LLM can apply as targeted patches. Script prepares the changes, LLM merges them (preserving project-specific memory). Reduces behavioral burden from 'read 115 lines and figure it out' to 'apply these 3 specific changes'.
 - **Added**: 2026-03-01
 
-### T-0024: Consider relaxing max_staged_files for PR workflow — commits get squashed on merge, making per-commit file limits unnecessary friction for multi-phase features
-- **Added**: 2026-03-01
-
 ### T-0025: F-idea: NFRs as live invariants — NFR.md should be the source of truth that propagates to features, not a dead reference. Key changes: (1) Acceptance criteria should have a separate 'Invariants (from NFR.md)' section auto-derived from NFR scoping, distinct from feature-specific criteria. (2) Test-writing workflow should check applicable NFRs before writing feature tests. (3) check-spec-health.sh should cross-reference NFR modification dates vs feature spec dates — if NFR changed after spec was written and feature references it, flag for review. (4) NFR capture trigger: when a developer or agent expresses an invariant quality for the system ("it must always...", "never do X", performance/security/reliability constraints), recognize it and write it to spec/NFR.md — don't let invariants stay informal. (5) Important distinction: framework NFR.md has 2 structural NFRs; projects using the framework may have dozens (performance, security, accessibility, compliance, etc.) — the workflow/tooling must scale to a longer list with mixed types (structural, behavioral, design invariants).
 - **Added**: 2026-03-01
-
-### T-0027: Revisit D4: phased checkpoints vs file-count limits as small-batch proxy (L493 insight from SDD toolkit analysis)
-- **Added**: 2026-03-02
 
 ### T-0028: Migrate .agentic-journal/ and .agentic-state/ into .agentic-local/ umbrella (directory consolidation)
 - **Added**: 2026-03-02
@@ -94,8 +88,17 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0039: PR3: E2E scaffolding — discover.py detection, setup guide, testing contract, quality profiles (see plan in session transcript)
 - **Added**: 2026-03-06
 
+### T-0040: F-idea: Post-PR auto-review loop in autonomous mode — after creating a PR automatically, run a one-time review (code quality + conformance against plan and acceptance criteria). If the review causes changes, re-run the verification loop, then do one final review. Report the situation to the user after (at most 2 review passes to avoid infinite review→fix→review cycles). Fits into the autonomous workflow engine (F-0160–F-0163) as a PR-quality gate.
+- **Added**: 2026-03-06
+
 ## Done
 
+
+### T-0024: Consider relaxing max_staged_files for PR workflow — commits get squashed on merge, making per-commit file limits unnecessary friction for multi-phase features
+- **Resolved**: 2026-03-06 — Batch-size limits (max_files_per_commit, max_added_lines) downgraded to advisory warnings on feature branches in PR workflow
+
+### T-0027: Revisit D4: phased checkpoints vs file-count limits as small-batch proxy (L493 insight from SDD toolkit analysis)
+- **Resolved**: 2026-03-06 — Batch-size limits downgraded to advisory on feature branches; phased checkpoints (F-0150) are the primary small-batch mechanism now
 
 ### T-0037: Session start: add 'untracked shipped features?' check — surface spec drift proactively every session, not just when ag sync is manually run (dogfooding: Cursor never ran ag sync, spec drift accumulated silently)
 - **Resolved**: 2026-03-03 — Implemented as F-0156 — falls out of F-0155 quiet mode

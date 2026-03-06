@@ -2636,13 +2636,17 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Category**: Autonomous
 **Priority**: high
 **Complexity**: medium
+**Since**: v0.43.0
 
 **Description**: Test-fix loop mode (`ag auto verify`). Runs project test suite, spawns fresh Claude instance with failure output + relevant code, Claude fixes failures, re-runs tests, repeats until green or max iterations. Highest value, lowest risk entry point for autonomous mode.
 
 **Dependencies**: F-0160
 
 **Implementation**:
-- State: not started
+- State: complete
+- Code: `.agentic/lib/auto/verify.py`
+- Tests: `tests/test_auto_verify.py` (23 tests), `tests/test_auto_verify_tiers.py` (40 tests)
+- Note: Shipped but not self-activated in framework dev — deliberate choice (human oversight for framework-critical work)
 
 **Acceptance**: See `spec/acceptance/F-0161.md`
 
@@ -2654,13 +2658,17 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Category**: Autonomous
 **Priority**: high
 **Complexity**: high
+**Since**: v0.43.0
 
 **Description**: Single feature implementation mode (`ag auto task F-XXXX`). Reads spec + acceptance criteria, creates feature branch + worktree, loops fresh Claude instances per AC, runs tests after each, commits if passing, creates PR for human review. Uses F-0160 control plane and state management.
 
 **Dependencies**: F-0160, F-0161
 
 **Implementation**:
-- State: not started
+- State: complete
+- Code: `.agentic/lib/auto/task.py`
+- Tests: `tests/test_auto_task.py` (8 tests)
+- Note: Shipped but not self-activated in framework dev — deliberate choice (human oversight for framework-critical work)
 
 **Acceptance**: See `spec/acceptance/F-0162.md`
 
@@ -2672,13 +2680,17 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Category**: Autonomous
 **Priority**: medium
 **Complexity**: high
+**Since**: v0.43.0
 
 **Description**: Multi-feature batch mode (`ag auto crunch`). Orchestrates multiple F-0162 task runs in priority order, tracks overall progress, per-batch verification agent review, stops on max errors or human intervention.
 
 **Dependencies**: F-0160, F-0161, F-0162
 
 **Implementation**:
-- State: not started
+- State: complete
+- Code: `.agentic/lib/auto/crunch.py`
+- Tests: `tests/test_auto_crunch.py` (8 tests)
+- Note: Shipped but not self-activated in framework dev — deliberate choice (human oversight for framework-critical work)
 
 **Acceptance**: See `spec/acceptance/F-0163.md`
 

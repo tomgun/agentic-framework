@@ -1323,6 +1323,8 @@ Example: if your profile is `discovery` (which defaults `feature_tracking=no`) b
 | `max_added_lines` | 1000 | 500 |
 | `max_code_file_length` | 1000 | 500 |
 
+> **PR workflow note:** When `git_workflow: pull_request`, `max_files_per_commit` and `max_added_lines` become **advisory warnings** on feature branches (the PR is the review unit, not individual commits). They remain blocking on `main`/`master`. `max_code_file_length` always blocks regardless of branch — it's a code quality limit, not a batch-size proxy.
+
 **Switch from Discovery to Formal:**
 ```bash
 bash .agentic/lib/tools/enable-formal.sh
