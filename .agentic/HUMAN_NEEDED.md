@@ -15,7 +15,12 @@ _No active items_
 
 ---
 
+
 ## Resolved
+
+### HN-0021: PR #66: Visual verification, E2E scaffolding & auto mode docs (F-0168, v0.45.0)
+- **Resolved**: 2026-03-07
+- **Outcome**: PR #66 merged, v0.45.0 tagged
 
 ### HN-0020: PR #64: Tiered verify loop (F-0164, v0.44.0)
 - **Resolved**: 2026-03-06
