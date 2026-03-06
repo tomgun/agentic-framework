@@ -1,0 +1,295 @@
+# Claude Code Hooks for Agentic AF
+
+**Purpose**: Automated lifecycle hooks that enhance Claude Code with real-time validation, automatic context injection, and state preservation.
+
+**Requirements**: Claude Code with hooks enabled (available in Claude Code settings)
+
+---
+
+## What Are Hooks?
+
+Hooks are scripts that run automatically at specific points in the Claude Code lifecycle:
+
+| Hook | When It Runs | Purpose |
+|------|--------------|---------|
+| `SessionStart.sh` | When you start a new Claude chat | Validate environment, show project status from STATUS.md |
+| `UserPromptSubmit.sh` | Before Claude processes your first prompt | Phase-aware verification (acceptance criteria check) |
+| `PostToolUse.sh` | After Claude uses any tool (file edit, terminal, etc.) | Run quick linter checks |
+| `PreCompact.sh` | Before context window gets compacted | Save state to `JOURNAL.md`, preserve WIP |
+| `Stop.sh` | When session ends | Remind about uncommitted changes and documentation |
+
+---
+
+## Setup
+
+### 1. Enable Hooks in Claude Code
+
+1. Open Claude Code settings
+2. Go to **Advanced** or **Developer** section
+3. Enable **Custom Hooks** or **Project Hooks**
+4. Specify hooks configuration file: `.agentic/lib/claude-hooks/hooks.json`
+
+**Note**: Hook support varies by Claude Code version. Check official Claude documentation for your version.
+
+### 2. Copy Hooks to Your Project
+
+After installing Agentic AF with `install.sh`, the hooks are already in `.agentic/lib/claude-hooks/`.
+
+If you installed manually, ensure `hooks.json` and all `.sh` files are executable:
+
+```bash
+chmod +x .agentic/lib/claude-hooks/*.sh
+```
+
+### 3. Configure Claude Project
+
+In Claude Code, when creating or configuring a project:
+
+1. Set **Project Directory**: `/path/to/your-project`
+2. Enable **Custom Hooks**: Yes
+3. **Hooks Config**: `.agentic/lib/claude-hooks/hooks.json`
+
+---
+
+## What Each Hook Does
+
+### `SessionStart.sh`
+
+**Runs**: At the beginning of each Claude session
+
+**Actions**:
+- ✓ Check if this is an Agentic AF project
+- ✓ Show framework version
+- ✓ Show current focus from `.agentic/STATUS.md`
+- ✓ Check for blockers in `.agentic/HUMAN_NEEDED.md`
+- ✓ Run quick health check (`doctor.sh --quick`)
+- ✓ Show git status (uncommitted changes, last commit)
+
+**Output Example**:
+```
+🚀 Agentic AF Session Start
+
+📦 Framework version: 0.19.0
+✓ Session context available
+  📍 Focus: Implementing user authentication
+⚠ 2 blocker(s) in HUMAN_NEEDED.md
+  Review these before continuing development
+📝 3 uncommitted change(s)
+🔗 Last commit: a1b2c3d feat: add user login
+
+✓ Session ready
+```
+
+---
+
+### `UserPromptSubmit.sh`
+
+**Runs**: Before Claude processes prompts that contain implementation triggers
+
+**Actions**:
+- Detect implementation triggers (e.g., "implement F-0005")
+- Check if acceptance criteria file exists for the feature
+- Warn if no acceptance criteria found (gate enforcement)
+
+**Benefits**:
+- **Phase-aware validation**: Catches missing acceptance criteria before implementation
+- **Early warning**: Prompts developer to define criteria first
+- **Non-blocking**: Advisory warning, lets you proceed if needed
+
+**Output Example** (when implementing without criteria):
+```
+⚠️  GATE WARNING: No acceptance criteria for F-0005
+   Create .agentic/spec/acceptance/F-0005.md before implementing
+   Run: doctor.sh --phase planning F-0005
+```
+
+---
+
+### `PostToolUse.sh`
+
+**Runs**: After Claude uses any tool (writes a file, runs a command, etc.)
+
+**Actions**:
+- Detect recent file modifications (last 1 minute)
+- If code files changed, run fast linter:
+  - JavaScript/TypeScript: `eslint --quiet`
+  - Rust: `cargo check --quiet`
+  - Python: `ruff check --quiet`
+- Report issues (advisory only, doesn't block Claude)
+
+**Benefits**:
+- **Immediate feedback**: Catch syntax errors right after writing code
+- **Non-blocking**: Claude continues working, but you see warnings
+- **Fast**: Only runs quick checks (no tests, those are slow)
+
+**Output Example**:
+```
+⚠️  Quick lint check found issues. Run your linter to see details.
+```
+
+---
+
+### `PreCompact.sh`
+
+**Runs**: Before Claude compacts the context window (when it gets full)
+
+**Actions**:
+- Update `.agentic/STATUS.md` with compaction note
+- Add `JOURNAL.md` entry with compaction timestamp
+- Note uncommitted changes
+- Remind about in-progress features and blockers
+
+**Benefits**:
+- **Never lose progress**: State is saved before compaction
+- **Seamless resume**: After compaction, Claude reads STATUS.md and JOURNAL.md
+- **Audit trail**: `JOURNAL.md` tracks compaction events
+
+**Output Example**:
+```
+💾 Context compaction detected - preserving state...
+
+✓ Updated STATUS.md with current state
+✓ Added JOURNAL.md entry
+Note: 1 feature(s) in progress (check FEATURES.md after resuming)
+⚠ Reminder: 2 blocker(s) in HUMAN_NEEDED.md
+
+✓ State preservation complete
+```
+
+---
+
+### `Stop.sh`
+
+**Runs**: When Claude session is ending (you close the chat, quit app, etc.)
+
+**Actions**:
+- Check for uncommitted git changes
+- Check if `JOURNAL.md` was updated this session
+- Note in-progress features
+- Check WIP.md for interrupted work
+- Show session end checklist
+
+**Benefits**:
+- **Don't forget to commit**: Reminds you to save work
+- **Documentation hygiene**: Encourages updating `JOURNAL.md`
+- **Smooth handoff**: Ensures next session has fresh context
+
+**Output Example**:
+```
+👋 Session ending - final checks...
+
+⚠️  3 uncommitted change(s)
+   Run: git status
+⚠️  JOURNAL.md not updated in this session
+   Consider adding session summary
+
+⚠️  2 reminder(s) above
+
+Session end checklist:
+- [ ] Commit changes (git add + git commit)
+- [ ] Update JOURNAL.md with session summary
+- [ ] Update STATUS.md if needed
+```
+
+---
+
+## Customization
+
+All hooks are bash scripts that you can customize for your project:
+
+### Example: Add Custom Linter
+
+Edit `.agentic/lib/claude-hooks/PostToolUse.sh`:
+
+```bash
+# Add your custom linter
+if [[ -f ".mylinter.config" ]]; then
+  mylinter check --fast
+fi
+```
+
+### Example: Custom Session Start Message
+
+Edit `.agentic/lib/claude-hooks/SessionStart.sh`:
+
+```bash
+# Add project-specific checks
+if [[ -f "API_KEYS_NEEDED.md" ]]; then
+  echo "⚠️  Check API_KEYS_NEEDED.md for required credentials"
+fi
+```
+
+### Example: Skip Hooks Temporarily
+
+To temporarily disable a hook, rename it:
+
+```bash
+mv .agentic/lib/claude-hooks/PostToolUse.sh .agentic/lib/claude-hooks/PostToolUse.sh.disabled
+```
+
+Or modify `hooks.json` to remove the hook entry.
+
+---
+
+## Troubleshooting
+
+### Hooks Not Running
+
+**Check**:
+1. Hooks enabled in Claude Code settings?
+2. `.agentic/lib/claude-hooks/hooks.json` exists and is valid JSON?
+3. Hook scripts are executable? (`ls -la .agentic/lib/claude-hooks/*.sh`)
+4. Claude has permission to run scripts? (macOS: check Security & Privacy)
+
+**Debug**:
+- Run hooks manually to see output: `bash .agentic/lib/claude-hooks/SessionStart.sh`
+- Check Claude Code logs (location varies by OS)
+
+### Hook Timeout Errors
+
+If hooks time out (take too long), increase timeout in `hooks.json`:
+
+```json
+{
+  "timeout": 10000  // 10 seconds instead of 5
+}
+```
+
+Or optimize the hook script to run faster (skip slow checks).
+
+### Hooks Breaking Claude
+
+All hooks are designed to **never block Claude** (they exit with code 0 even on errors). If Claude seems stuck:
+
+1. Check hook script syntax: `bash -n .agentic/lib/claude-hooks/SessionStart.sh`
+2. Run hook manually and look for infinite loops or hangs
+3. Temporarily disable hooks, restart Claude, re-enable one by one to isolate issue
+
+---
+
+## Compatibility
+
+| Feature | Required Version | Notes |
+|---------|-----------------|-------|
+| Hooks API | Claude Code 1.x+ | Check official docs for your version |
+| `SessionStart` | All versions | Basic hook support |
+| `UserPromptSubmit` | Newer versions | May not be available in older Claude Code |
+| `PreCompact` | Newer versions | Context compaction is a recent feature |
+
+**If hooks don't work in your Claude Code version**:
+- You can still use the scripts manually
+- Example: Run `ag start` before starting a session
+- Example: Run `.agentic/lib/claude-hooks/Stop.sh` manually before ending a session
+
+---
+
+## See Also
+
+- [`.agentic/prompts/claude/README.md`](../prompts/claude/README.md) - Ready-to-use Claude prompts
+- [`.agentic/DEVELOPER_GUIDE.md`](../DEVELOPER_GUIDE.md) - Complete framework guide
+- [`.agentic/lib/tools/ag.sh`](../tools/ag.sh) - Gateway script for common commands
+
+---
+
+**Note**: Hooks are a Claude Code feature. For Cursor or GitHub Copilot, use manual workflows or ready-to-use prompts instead.
+

@@ -2,16 +2,16 @@
 
 THIS IS FRAMEWORK DEVELOPMENT. You are working ON the agentic framework itself, not a project using it. Framework changes affect ALL users - extra care required.
 
-Read first: `FRAMEWORK_QUICK_START.md`, `FRAMEWORK_DEVELOPMENT.md`, `.agentic/PRINCIPLES.md`
+Read first: `FRAMEWORK_QUICK_START.md`, `FRAMEWORK_DEVELOPMENT.md`, `.agentic/lib/PRINCIPLES.md`
 
-Full template: `.agentic/agents/codex/codex-instructions.md`
+Full template: `.agentic/lib/agents/codex/codex-instructions.md`
 
 ---
 
 ## Session Start
 
 On first message, give a briefing:
-- Read STATUS.md, HUMAN_NEEDED.md, JOURNAL.md, VERSION, and git status
+- Read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, .agentic/journal/JOURNAL.md, VERSION, and git status
 - Greet user with: current state, focus, blockers, next steps, recent work
 - Do NOT wait to be asked
 
@@ -34,12 +34,12 @@ All must match. All must be in sync with committed code.
 
 | Step | Action |
 |------|--------|
-| 1 | Add F-#### to `spec/FEATURES.md` |
-| 2 | Create `spec/acceptance/F-####.md` BEFORE coding |
+| 1 | Add F-#### to `.agentic/spec/FEATURES.md` |
+| 2 | Create `.agentic/spec/acceptance/F-####.md` BEFORE coding |
 | 3 | Implement the feature |
 | 4 | Add tests to `tests/validate_framework.sh` |
 | 5 | Update `CHANGELOG.md` |
-| 6 | Update `CONTRIBUTIONS.md` |
+| 6 | Update `.agentic/CONTRIBUTIONS.md` |
 | 7 | If user-visible during upgrade: add to `FEATURE_REGISTRY` in `upgrade.sh` |
 
 Verify: `bash tests/validate_framework.sh` must pass
@@ -71,6 +71,6 @@ Verify: `bash tests/validate_framework.sh` must pass
 
 - Quick start: `FRAMEWORK_QUICK_START.md`
 - Full guide: `FRAMEWORK_DEVELOPMENT.md`
-- Principles: `.agentic/PRINCIPLES.md`
-- Specs: `spec/FEATURES.md`
+- Principles: `.agentic/lib/PRINCIPLES.md`
+- Specs: `.agentic/spec/FEATURES.md`
 - Validation: `tests/validate_framework.sh`

@@ -6,7 +6,7 @@ set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-PERIODIC_SCRIPT="$FRAMEWORK_ROOT/.agentic/tools/periodic-checks.sh"
+PERIODIC_SCRIPT="$FRAMEWORK_ROOT/.agentic/lib/tools/periodic-checks.sh"
 
 # Colors
 RED='\033[0;31m'
@@ -36,16 +36,16 @@ fail() {
 # Create temp test project
 setup_test_env() {
     TEST_DIR=$(mktemp -d "/tmp/periodic-test-XXXXXX")
-    mkdir -p "$TEST_DIR/.agentic/tools"
-    mkdir -p "$TEST_DIR/.agentic/lib"
-    mkdir -p "$TEST_DIR/.agentic/presets"
-    mkdir -p "$TEST_DIR/.agentic-state"
+    mkdir -p "$TEST_DIR/.agentic/lib/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/presets"
+    mkdir -p "$TEST_DIR/.agentic/session"
 
     # Copy required scripts
-    cp "$PERIODIC_SCRIPT" "$TEST_DIR/.agentic/tools/"
+    cp "$PERIODIC_SCRIPT" "$TEST_DIR/.agentic/lib/tools/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
-    cp "$FRAMEWORK_ROOT/.agentic/presets/profiles.conf" "$TEST_DIR/.agentic/presets/"
-    cp "$FRAMEWORK_ROOT/.agentic/tools/retro_check.sh" "$TEST_DIR/.agentic/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/retro_check.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
 
     # Create minimal STACK.md
     cat > "$TEST_DIR/STACK.md" << 'EOF'
@@ -68,8 +68,8 @@ cleanup_test_env() {
 
 test_case "State file creation on first run"
 setup_test_env
-bash .agentic/tools/periodic-checks.sh --increment > /dev/null 2>&1
-if [ -f ".agentic-state/sync-state.conf" ]; then
+bash .agentic/lib/tools/periodic-checks.sh --increment > /dev/null 2>&1
+if [ -f ".agentic/session/sync-state.conf" ]; then
     pass
 else
     fail "sync-state.conf not created"
@@ -78,9 +78,9 @@ cleanup_test_env
 
 test_case "Session counter increments"
 setup_test_env
-result1=$(bash .agentic/tools/periodic-checks.sh --increment 2>/dev/null)
-result2=$(bash .agentic/tools/periodic-checks.sh --increment 2>/dev/null)
-result3=$(bash .agentic/tools/periodic-checks.sh --increment 2>/dev/null)
+result1=$(bash .agentic/lib/tools/periodic-checks.sh --increment 2>/dev/null)
+result2=$(bash .agentic/lib/tools/periodic-checks.sh --increment 2>/dev/null)
+result3=$(bash .agentic/lib/tools/periodic-checks.sh --increment 2>/dev/null)
 if [ "$result3" = "3" ]; then
     pass
 else
@@ -90,10 +90,10 @@ cleanup_test_env
 
 test_case "State file preserves values across runs"
 setup_test_env
-bash .agentic/tools/periodic-checks.sh --increment > /dev/null 2>&1
-bash .agentic/tools/periodic-checks.sh --increment > /dev/null 2>&1
-local_count=$(grep '^session_count=' .agentic-state/sync-state.conf 2>/dev/null | sed 's/session_count=//')
-local_sync=$(grep '^last_sync=' .agentic-state/sync-state.conf 2>/dev/null | sed 's/last_sync=//')
+bash .agentic/lib/tools/periodic-checks.sh --increment > /dev/null 2>&1
+bash .agentic/lib/tools/periodic-checks.sh --increment > /dev/null 2>&1
+local_count=$(grep '^session_count=' .agentic/session/sync-state.conf 2>/dev/null | sed 's/session_count=//')
+local_sync=$(grep '^last_sync=' .agentic/session/sync-state.conf 2>/dev/null | sed 's/last_sync=//')
 if [ "$local_count" = "2" ] && [ -n "$local_sync" ]; then
     pass
 else
@@ -107,7 +107,7 @@ cleanup_test_env
 
 test_case "Quiet mode: no output when no issues"
 setup_test_env
-output=$(bash .agentic/tools/periodic-checks.sh --quiet 2>&1)
+output=$(bash .agentic/lib/tools/periodic-checks.sh --quiet 2>&1)
 if [ -z "$output" ]; then
     pass
 else
@@ -118,8 +118,8 @@ cleanup_test_env
 test_case "Full mode: reports session number after increment"
 setup_test_env
 # Increment first (as sync.sh does), then run checks
-bash .agentic/tools/periodic-checks.sh --increment > /dev/null 2>&1
-output=$(bash .agentic/tools/periodic-checks.sh 2>&1)
+bash .agentic/lib/tools/periodic-checks.sh --increment > /dev/null 2>&1
+output=$(bash .agentic/lib/tools/periodic-checks.sh 2>&1)
 if echo "$output" | grep -q "session #1"; then
     pass
 else
@@ -133,7 +133,7 @@ cleanup_test_env
 
 test_case "Graceful when ~/.claude/plans/ doesn't exist"
 setup_test_env
-output=$(bash .agentic/tools/periodic-checks.sh 2>&1)
+output=$(bash .agentic/lib/tools/periodic-checks.sh 2>&1)
 exit_code=$?
 if [ "$exit_code" -eq 0 ]; then
     pass
@@ -149,9 +149,9 @@ cleanup_test_env
 test_case "Multiple runs: session counter increments correctly"
 setup_test_env
 for i in 1 2 3 4 5; do
-    bash .agentic/tools/periodic-checks.sh --increment > /dev/null 2>&1
+    bash .agentic/lib/tools/periodic-checks.sh --increment > /dev/null 2>&1
 done
-final=$(grep '^session_count=' .agentic-state/sync-state.conf | sed 's/session_count=//')
+final=$(grep '^session_count=' .agentic/session/sync-state.conf | sed 's/session_count=//')
 if [ "$final" = "5" ]; then
     pass
 else
@@ -161,9 +161,9 @@ cleanup_test_env
 
 test_case "State file has correct format"
 setup_test_env
-bash .agentic/tools/periodic-checks.sh --quiet > /dev/null 2>&1
+bash .agentic/lib/tools/periodic-checks.sh --quiet > /dev/null 2>&1
 # Verify no empty lines or malformed entries
-bad_lines=$(grep -v '^#' .agentic-state/sync-state.conf 2>/dev/null | grep -v '^$' | grep -v '^[a-z_.].*=.*$' | wc -l | tr -d ' ')
+bad_lines=$(grep -v '^#' .agentic/session/sync-state.conf 2>/dev/null | grep -v '^$' | grep -v '^[a-z_.].*=.*$' | wc -l | tr -d ' ')
 if [ "$bad_lines" = "0" ]; then
     pass
 else

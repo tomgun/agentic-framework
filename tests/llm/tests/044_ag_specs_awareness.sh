@@ -9,7 +9,7 @@ setup_test_project "formal"
 
 # Create a discovery report with multiple domains (generic e-commerce example)
 mkdir -p "$TEST_PROJECT/.agentic-state"
-cat > "$TEST_PROJECT/.agentic-state/discovery_report.json" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/session/discovery_report.json" << 'EOF'
 {
   "version": "2.0.0",
   "profile": "formal",
@@ -41,7 +41,7 @@ cat > "$TEST_PROJECT/.agentic-state/discovery_report.json" << 'EOF'
 }
 EOF
 
-git -C "$TEST_PROJECT" add .agentic-state/discovery_report.json
+git -C "$TEST_PROJECT" add .agentic/session/discovery_report.json
 git -C "$TEST_PROJECT" commit -m "Add discovery report" --quiet
 
 # Ask about generating specs for this brownfield project

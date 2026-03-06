@@ -5,8 +5,8 @@ Tests for query_features.py - validates core claim: fast filtering.
 import sys
 from pathlib import Path
 
-# Add .agentic/tools to path
-sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "tools"))
+# Add .agentic/lib/tools to path
+sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "lib" / "tools"))
 
 from query_features import parse_features, filter_features, load_features_flat, get_children
 

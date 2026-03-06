@@ -51,7 +51,7 @@ EOF
 
 # Create journal showing recent work
 mkdir -p "$TEST_PROJECT/.agentic-journal"
-cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/journal/JOURNAL.md" << 'EOF'
 # Development Journal
 
 ### Session: 2026-02-04
@@ -60,7 +60,7 @@ cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
 - Next: monitoring and analytics
 EOF
 
-git -C "$TEST_PROJECT" add STATUS.md VERSION CHANGELOG.md .agentic-journal/JOURNAL.md
+git -C "$TEST_PROJECT" add STATUS.md VERSION CHANGELOG.md .agentic/journal/JOURNAL.md
 git -C "$TEST_PROJECT" commit -m "Add project files with stale status" --quiet
 
 # Start a new session

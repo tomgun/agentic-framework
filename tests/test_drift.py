@@ -11,7 +11,7 @@ from pathlib import Path
 # Get paths
 TESTS_DIR = Path(__file__).parent
 ROOT_DIR = TESTS_DIR.parent
-TOOLS_DIR = ROOT_DIR / ".agentic" / "tools"
+TOOLS_DIR = ROOT_DIR / ".agentic" / "lib" / "tools"
 DRIFT_SH = TOOLS_DIR / "drift.sh"
 
 
@@ -135,7 +135,7 @@ class TestDriftDetection:
         for issue in data["issues"]:
             if issue["type"] == "missing_tests":
                 assert "feature" in issue
-                assert issue["feature"].startswith("F-")
+                assert issue["feature"].startswith("F-") or issue["feature"].startswith("NFR-")
 
 
 if __name__ == "__main__":

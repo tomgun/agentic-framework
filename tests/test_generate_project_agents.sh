@@ -6,7 +6,7 @@ set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-GEN_SCRIPT="$FRAMEWORK_ROOT/.agentic/tools/generate-project-agents.sh"
+GEN_SCRIPT="$FRAMEWORK_ROOT/.agentic/lib/tools/generate-project-agents.sh"
 
 # Colors
 RED='\033[0;31m'
@@ -36,25 +36,25 @@ fail() {
 # Create a test project that mimics a React/Next.js project
 setup_react_project() {
     TEST_DIR=$(mktemp -d "/tmp/gen-agents-test-XXXXXX")
-    mkdir -p "$TEST_DIR/.agentic/tools"
-    mkdir -p "$TEST_DIR/.agentic/lib"
-    mkdir -p "$TEST_DIR/.agentic/presets"
-    mkdir -p "$TEST_DIR/.agentic/agents/specialization"
-    mkdir -p "$TEST_DIR/.agentic/agents/claude/subagents"
-    mkdir -p "$TEST_DIR/.agentic-state"
+    mkdir -p "$TEST_DIR/.agentic/lib/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/presets"
+    mkdir -p "$TEST_DIR/.agentic/lib/agents/specialization"
+    mkdir -p "$TEST_DIR/.agentic/lib/agents/claude/subagents"
+    mkdir -p "$TEST_DIR/.agentic/session"
 
     # Copy scripts
-    cp "$GEN_SCRIPT" "$TEST_DIR/.agentic/tools/"
+    cp "$GEN_SCRIPT" "$TEST_DIR/.agentic/lib/tools/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
-    cp "$FRAMEWORK_ROOT/.agentic/presets/profiles.conf" "$TEST_DIR/.agentic/presets/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
 
     # Copy specialization rules
-    cp "$FRAMEWORK_ROOT/.agentic/agents/specialization/react.conf" "$TEST_DIR/.agentic/agents/specialization/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/specialization/react.conf" "$TEST_DIR/.agentic/lib/agents/specialization/"
 
     # Copy generic agents
-    cp "$FRAMEWORK_ROOT/.agentic/agents/claude/subagents/implementation-agent.md" "$TEST_DIR/.agentic/agents/claude/subagents/"
-    cp "$FRAMEWORK_ROOT/.agentic/agents/claude/subagents/test-agent.md" "$TEST_DIR/.agentic/agents/claude/subagents/"
-    cp "$FRAMEWORK_ROOT/.agentic/agents/claude/subagents/review-agent.md" "$TEST_DIR/.agentic/agents/claude/subagents/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/implementation-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/test-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/review-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
 
     # Create package.json with React
     cat > "$TEST_DIR/package.json" << 'EOF'
@@ -86,20 +86,20 @@ EOF
 
 setup_go_project() {
     TEST_DIR=$(mktemp -d "/tmp/gen-agents-test-XXXXXX")
-    mkdir -p "$TEST_DIR/.agentic/tools"
-    mkdir -p "$TEST_DIR/.agentic/lib"
-    mkdir -p "$TEST_DIR/.agentic/presets"
-    mkdir -p "$TEST_DIR/.agentic/agents/specialization"
-    mkdir -p "$TEST_DIR/.agentic/agents/claude/subagents"
-    mkdir -p "$TEST_DIR/.agentic-state"
+    mkdir -p "$TEST_DIR/.agentic/lib/tools"
+    mkdir -p "$TEST_DIR/.agentic/lib/presets"
+    mkdir -p "$TEST_DIR/.agentic/lib/agents/specialization"
+    mkdir -p "$TEST_DIR/.agentic/lib/agents/claude/subagents"
+    mkdir -p "$TEST_DIR/.agentic/session"
 
-    cp "$GEN_SCRIPT" "$TEST_DIR/.agentic/tools/"
+    cp "$GEN_SCRIPT" "$TEST_DIR/.agentic/lib/tools/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
-    cp "$FRAMEWORK_ROOT/.agentic/presets/profiles.conf" "$TEST_DIR/.agentic/presets/"
-    cp "$FRAMEWORK_ROOT/.agentic/agents/specialization/go.conf" "$TEST_DIR/.agentic/agents/specialization/"
-    cp "$FRAMEWORK_ROOT/.agentic/agents/claude/subagents/implementation-agent.md" "$TEST_DIR/.agentic/agents/claude/subagents/"
-    cp "$FRAMEWORK_ROOT/.agentic/agents/claude/subagents/test-agent.md" "$TEST_DIR/.agentic/agents/claude/subagents/"
-    cp "$FRAMEWORK_ROOT/.agentic/agents/claude/subagents/review-agent.md" "$TEST_DIR/.agentic/agents/claude/subagents/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/specialization/go.conf" "$TEST_DIR/.agentic/lib/agents/specialization/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/implementation-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/test-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
+    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/review-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
 
     # Go detection: go.mod file
     cat > "$TEST_DIR/go.mod" << 'EOF'
@@ -129,7 +129,7 @@ cleanup_test_env() {
 
 test_case "React detection via package.json"
 setup_react_project
-output=$(bash .agentic/tools/generate-project-agents.sh --dry-run 2>&1)
+output=$(bash .agentic/lib/tools/generate-project-agents.sh --dry-run 2>&1)
 if echo "$output" | grep -q "React"; then
     pass
 else
@@ -139,7 +139,7 @@ cleanup_test_env
 
 test_case "Go detection via go.mod"
 setup_go_project
-output=$(bash .agentic/tools/generate-project-agents.sh --dry-run 2>&1)
+output=$(bash .agentic/lib/tools/generate-project-agents.sh --dry-run 2>&1)
 if echo "$output" | grep -q "Go"; then
     pass
 else
@@ -149,18 +149,19 @@ cleanup_test_env
 
 test_case "No false positives on empty project"
 TEST_DIR=$(mktemp -d "/tmp/gen-agents-test-XXXXXX")
-mkdir -p "$TEST_DIR/.agentic/tools" "$TEST_DIR/.agentic/lib" "$TEST_DIR/.agentic/presets" "$TEST_DIR/.agentic/agents/specialization" "$TEST_DIR/.agentic/agents/claude/subagents" "$TEST_DIR/.agentic-state"
-cp "$GEN_SCRIPT" "$TEST_DIR/.agentic/tools/"
+mkdir -p "$TEST_DIR/.agentic/lib/tools" "$TEST_DIR/.agentic/lib/presets" "$TEST_DIR/.agentic/lib/agents/specialization" "$TEST_DIR/.agentic/lib/agents/claude/subagents" "$TEST_DIR/.agentic/session"
+cp "$GEN_SCRIPT" "$TEST_DIR/.agentic/lib/tools/"
+cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/"
 cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
-cp "$FRAMEWORK_ROOT/.agentic/presets/profiles.conf" "$TEST_DIR/.agentic/presets/"
-cp "$FRAMEWORK_ROOT/.agentic/agents/specialization/"*.conf "$TEST_DIR/.agentic/agents/specialization/"
+cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
+cp "$FRAMEWORK_ROOT/.agentic/lib/agents/specialization/"*.conf "$TEST_DIR/.agentic/lib/agents/specialization/"
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 ## Settings
 - profile: discovery
 EOF
 cd "$TEST_DIR"
 git init -q 2>/dev/null || true
-output=$(bash .agentic/tools/generate-project-agents.sh --dry-run 2>&1)
+output=$(bash .agentic/lib/tools/generate-project-agents.sh --dry-run 2>&1)
 if echo "$output" | grep -q "No matching tech stacks"; then
     pass
 else
@@ -174,8 +175,8 @@ cleanup_test_env
 
 test_case "Generate creates files in subagents-project/"
 setup_react_project
-bash .agentic/tools/generate-project-agents.sh > /dev/null 2>&1
-if [ -f ".agentic/agents/claude/subagents-project/implementation-agent.md" ]; then
+bash .agentic/lib/tools/generate-project-agents.sh > /dev/null 2>&1
+if [ -f ".agentic/lib/agents/claude/subagents-project/implementation-agent.md" ]; then
     pass
 else
     fail "implementation-agent.md not created in subagents-project/"
@@ -184,8 +185,8 @@ cleanup_test_env
 
 test_case "Generated files have AUTO-GENERATED marker"
 setup_react_project
-bash .agentic/tools/generate-project-agents.sh > /dev/null 2>&1
-if head -1 .agentic/agents/claude/subagents-project/implementation-agent.md | grep -q "AUTO-GENERATED"; then
+bash .agentic/lib/tools/generate-project-agents.sh > /dev/null 2>&1
+if head -1 .agentic/lib/agents/claude/subagents-project/implementation-agent.md | grep -q "AUTO-GENERATED"; then
     pass
 else
     fail "Missing AUTO-GENERATED marker"
@@ -194,9 +195,9 @@ cleanup_test_env
 
 test_case "Generated files contain purpose suffix and key dirs"
 setup_react_project
-bash .agentic/tools/generate-project-agents.sh > /dev/null 2>&1
-if grep -q "React/TypeScript" .agentic/agents/claude/subagents-project/implementation-agent.md && \
-   grep -q "src/components/" .agentic/agents/claude/subagents-project/implementation-agent.md; then
+bash .agentic/lib/tools/generate-project-agents.sh > /dev/null 2>&1
+if grep -q "React/TypeScript" .agentic/lib/agents/claude/subagents-project/implementation-agent.md && \
+   grep -q "src/components/" .agentic/lib/agents/claude/subagents-project/implementation-agent.md; then
     pass
 else
     fail "Missing React purpose suffix or key dirs"
@@ -210,13 +211,13 @@ cleanup_test_env
 test_case "CUSTOMIZED files are not overwritten"
 setup_react_project
 # Generate first
-bash .agentic/tools/generate-project-agents.sh > /dev/null 2>&1
+bash .agentic/lib/tools/generate-project-agents.sh > /dev/null 2>&1
 # Mark as customized
-sed -i.bak 's/AUTO-GENERATED/CUSTOMIZED/' .agentic/agents/claude/subagents-project/implementation-agent.md
-echo "# My custom content" >> .agentic/agents/claude/subagents-project/implementation-agent.md
+sed -i.bak 's/AUTO-GENERATED/CUSTOMIZED/' .agentic/lib/agents/claude/subagents-project/implementation-agent.md
+echo "# My custom content" >> .agentic/lib/agents/claude/subagents-project/implementation-agent.md
 # Re-generate
-bash .agentic/tools/generate-project-agents.sh > /dev/null 2>&1
-if grep -q "My custom content" .agentic/agents/claude/subagents-project/implementation-agent.md; then
+bash .agentic/lib/tools/generate-project-agents.sh > /dev/null 2>&1
+if grep -q "My custom content" .agentic/lib/agents/claude/subagents-project/implementation-agent.md; then
     pass
 else
     fail "CUSTOMIZED file was overwritten"
@@ -229,10 +230,10 @@ cleanup_test_env
 
 test_case "Go: generates implementation agent with purpose and key dirs"
 setup_go_project
-bash .agentic/tools/generate-project-agents.sh > /dev/null 2>&1
-if [ -f ".agentic/agents/claude/subagents-project/implementation-agent.md" ] && \
-   grep -q "Go applications" .agentic/agents/claude/subagents-project/implementation-agent.md && \
-   grep -q "cmd/" .agentic/agents/claude/subagents-project/implementation-agent.md; then
+bash .agentic/lib/tools/generate-project-agents.sh > /dev/null 2>&1
+if [ -f ".agentic/lib/agents/claude/subagents-project/implementation-agent.md" ] && \
+   grep -q "Go applications" .agentic/lib/agents/claude/subagents-project/implementation-agent.md && \
+   grep -q "cmd/" .agentic/lib/agents/claude/subagents-project/implementation-agent.md; then
     pass
 else
     fail "Missing Go implementation agent or content"
@@ -241,10 +242,10 @@ cleanup_test_env
 
 test_case "Go: agents without overrides are not generated"
 setup_go_project
-bash .agentic/tools/generate-project-agents.sh > /dev/null 2>&1
+bash .agentic/lib/tools/generate-project-agents.sh > /dev/null 2>&1
 # test-agent and review-agent have no overrides in go.conf (Layer A detection only)
-if [ ! -f ".agentic/agents/claude/subagents-project/test-agent.md" ] && \
-   [ ! -f ".agentic/agents/claude/subagents-project/review-agent.md" ]; then
+if [ ! -f ".agentic/lib/agents/claude/subagents-project/test-agent.md" ] && \
+   [ ! -f ".agentic/lib/agents/claude/subagents-project/review-agent.md" ]; then
     pass
 else
     fail "Agents without overrides should not be generated"

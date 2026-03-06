@@ -10,8 +10,8 @@ Skips gracefully if not installed.
 import sys
 from pathlib import Path
 
-# Add .agentic/tools to path
-sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "tools"))
+# Add .agentic/lib/tools to path
+sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "lib" / "tools"))
 
 try:
     from validate_specs import (

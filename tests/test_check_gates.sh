@@ -36,21 +36,26 @@ setup_gate_env() {
     cd "$test_dir"
 
     # Minimal framework structure
-    mkdir -p .agentic/tools .agentic-journal/plans spec/acceptance .claude/skills/implementing-features/scripts
+    mkdir -p .agentic/lib/tools .agentic/lib/presets .agentic/journal/plans .agentic/spec/acceptance .claude/skills/implementing-features/scripts
 
     # Copy check-gates.sh
     cp "$GATES_SCRIPT" .claude/skills/implementing-features/scripts/check-gates.sh
 
+    # Copy paths.sh, settings.sh, profiles.conf for path resolution
+    cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" .agentic/lib/ 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" .agentic/lib/ 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" .agentic/lib/presets/ 2>/dev/null || true
+
     # Create a minimal wip.sh that always succeeds
-    cat > .agentic/tools/wip.sh << 'EOF'
+    cat > .agentic/lib/tools/wip.sh << 'EOF'
 #!/bin/bash
 [[ "${1:-}" == "check" ]] && exit 0
 EOF
-    chmod +x .agentic/tools/wip.sh
+    chmod +x .agentic/lib/tools/wip.sh
 
     # Create feature entry and acceptance
-    echo "## F-0050: Test Feature" > spec/FEATURES.md
-    echo "# Acceptance" > spec/acceptance/F-0050.md
+    echo "## F-0050: Test Feature" > .agentic/spec/FEATURES.md
+    echo "# Acceptance" > .agentic/spec/acceptance/F-0050.md
 
     echo "$test_dir"
 }
@@ -117,7 +122,7 @@ cd "$TEST_DIR"
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 plan_review_enabled: yes
 EOF
-cat > "$TEST_DIR/.agentic-journal/plans/F-0050-test-plan.md" << 'EOF'
+cat > "$TEST_DIR/.agentic/journal/plans/F-0050-test-plan.md" << 'EOF'
 # Plan: F-0050
 
 Status: APPROVED
@@ -141,7 +146,7 @@ cd "$TEST_DIR"
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 plan_review_enabled: yes
 EOF
-cat > "$TEST_DIR/.agentic-journal/plans/2026-03-01-F-0050-plan.md" << 'EOF'
+cat > "$TEST_DIR/.agentic/journal/plans/2026-03-01-F-0050-plan.md" << 'EOF'
 # Plan
 
 Status: APPROVED

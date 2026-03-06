@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with shell access and git."
 allowed-tools: [Bash, Read, Edit, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.38.0"
+  version: "0.41.0"
 ---
 
 # Committing Changes
@@ -22,30 +22,15 @@ Pre-commit quality gates and branch management with human approval.
 ### Step 1: Check WIP Status
 
 ```bash
-bash .agentic/tools/wip.sh check
+bash .agentic/lib/tools/wip.sh check
 ```
 
-If `.agentic-state/WIP.md` exists, work is still in progress. Complete it first:
+If `.agentic/session/WIP.md` exists, work is still in progress. Complete it first:
 ```bash
-bash .agentic/tools/wip.sh complete
+bash .agentic/lib/tools/wip.sh complete
 ```
 
 **Never commit while WIP.md exists** — it indicates incomplete work.
-
-### Step 1.5: Verify Git Hooks Installed
-
-```bash
-actual=$(git config core.hooksPath 2>/dev/null || echo "")
-if [ "$actual" != ".agentic/hooks" ]; then
-  echo "WARNING: git hooks not installed — pre-commit quality gates will be skipped!"
-  echo "Fix: git config core.hooksPath .agentic/hooks"
-fi
-```
-
-If hooks are not installed, **offer to auto-fix** before proceeding:
-- Run `git config core.hooksPath .agentic/hooks`
-- Confirm with: `git config core.hooksPath` (should print `.agentic/hooks`)
-- **Do not skip this** — without hooks, commits bypass all pre-commit checks
 
 ### Step 2: Branch Check
 
@@ -63,8 +48,8 @@ git branch --show-current
 Before committing, update the durable artifacts using token-efficient scripts:
 
 ```bash
-bash .agentic/tools/journal.sh "Topic" "What was done" "Next steps" "Blockers"
-bash .agentic/tools/status.sh focus "Current state"
+bash .agentic/lib/tools/journal.sh "Topic" "What was done" "Next steps" "Blockers"
+bash .agentic/lib/tools/status.sh focus "Current state"
 ```
 
 **Never edit JOURNAL.md or STATUS.md directly** — always use the scripts.
@@ -100,7 +85,7 @@ After human approves:
 4. Bump VERSION (at least patch)
 5. Log PR in HUMAN_NEEDED.md for review tracking:
    ```bash
-   bash .agentic/tools/blocker.sh add "PR #N: Description" "review" "Details"
+   bash .agentic/lib/tools/blocker.sh add "PR #N: Description" "review" "Details"
    ```
 
 ### Step 7: Post-Merge Tagging
@@ -126,7 +111,7 @@ Result: PR #42 created, logged in HUMAN_NEEDED.md.
 **Example 2: WIP still active**
 User says: "let's ship this"
 Steps taken:
-1. Check WIP — `.agentic-state/WIP.md` exists for F-0125
+1. Check WIP — `.agentic/session/WIP.md` exists for F-0125
 2. **BLOCK**: "Work is still in progress for F-0125. Complete it first with `wip.sh complete`, or should I mark it complete now?"
 Result: User confirms completion, then proceed with commit flow.
 
@@ -142,7 +127,7 @@ Solution: Fix failing tests before committing. Do not skip tests.
 
 **Error: WIP.md still exists**
 Cause: Feature work not formally completed.
-Solution: Run `bash .agentic/tools/wip.sh complete` after verifying all acceptance criteria are met.
+Solution: Run `bash .agentic/lib/tools/wip.sh complete` after verifying all acceptance criteria are met.
 
 ## References
 

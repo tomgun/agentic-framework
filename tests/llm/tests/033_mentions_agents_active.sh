@@ -10,7 +10,7 @@ setup_test_project "discovery"
 
 # Create AGENTS_ACTIVE with an active agent working on auth
 mkdir -p "$TEST_PROJECT/.agentic-state"
-cat > "$TEST_PROJECT/.agentic-state/AGENTS_ACTIVE.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/session/AGENTS_ACTIVE.md" << 'EOF'
 # Active Agents
 
 ## Agent: claude-agent-1
@@ -22,7 +22,7 @@ cat > "$TEST_PROJECT/.agentic-state/AGENTS_ACTIVE.md" << 'EOF'
 EOF
 
 # Force-add the gitignored file
-git -C "$TEST_PROJECT" add -f .agentic-state/AGENTS_ACTIVE.md
+git -C "$TEST_PROJECT" add -f .agentic/session/AGENTS_ACTIVE.md
 git -C "$TEST_PROJECT" commit -m "Add active agents" --quiet
 
 # Ask about parallel work on a different feature

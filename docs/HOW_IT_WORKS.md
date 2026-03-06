@@ -285,7 +285,7 @@ graph TB
 | **Session End Protocol** (F-0022) | `session_end.md` checklist: update JOURNAL, document blockers, clean up WIP. | ACTIVE - behavioral |
 | **JOURNAL.md Tracking** (F-0023) | `journal.sh` appends entries without reading the file (token-efficient). Append-only log of session progress. | ACTIVE - structurally enforced (staleness gate in pre-commit) |
 | **STATUS.md Current State** (F-0024) | `status.sh focus "Task"` updates STATUS without full-file rewrite. Zero-token human readability. | ACTIVE - staleness gate enforced |
-| **WIP Recovery** (F-0051-0053) | `wip.sh start/checkpoint/complete` creates `.agentic-state/WIP.md` lock. Pre-commit blocks if WIP exists. Session start warns of interrupted work. 5-step recovery protocol. | ACTIVE - structural gate |
+| **WIP Recovery** (F-0051-0053) | `wip.sh start/checkpoint/complete` creates `.agentic/session/WIP.md` lock. Pre-commit blocks if WIP exists. Session start warns of interrupted work. 5-step recovery protocol. | ACTIVE - structural gate |
 | **Multi-Environment Support** (F-0054) | Documented workflow for switching between Claude/Cursor/Copilot when tokens run out. Durable artifacts ensure state survives tool switches. | PASSIVE - documented workflow, no enforcement |
 | **Upgrade System** (F-0056, F-0094) | `upgrade.sh` with FEATURE_REGISTRY. Version-aware: only shows features new since user's previous version. `.upgrade_pending` marker. | ACTIVE - structural |
 | **Quality Standards** (F-0015) | 7 quality documents in `.agentic/quality/`. Programming standards, test strategy, review checklist, library selection, green coding, integration testing, design for testability. | ACTIVE - wired via context manifests |
@@ -644,7 +644,7 @@ These will always rely on behavioral reinforcement:
 The 24 YAML manifests and `context-for-role.sh` are the framework's most sophisticated yet invisible feature. When `ag implement F-XXXX` runs, it should print: "Assemble subagent context with: `bash .agentic/tools/context-for-role.sh implementation-agent F-XXXX`". This would activate the entire agent specialization stack with zero new code.
 
 ### Priority 2: Enforce Plan-Review Gate
-`ag implement` checks for an approved plan but doesn't hard-block without one. Making this structural (exit 1 if no `.agentic-journal/plans/F-XXXX-plan.md` with Status: APPROVED) would ensure the plan-review loop is consistently used for complex features.
+`ag implement` checks for an approved plan but doesn't hard-block without one. Making this structural (exit 1 if no `.agentic/journal/plans/F-XXXX-plan.md` with Status: APPROVED) would ensure the plan-review loop is consistently used for complex features.
 
 ### Priority 3: Real-World Multi-Agent Test
 Set up a two-agent worktree scenario on a real project. This would validate F-0031-0033, F-0097, and expose gaps in the coordination protocol before documenting it as "working."

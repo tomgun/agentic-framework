@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 # Add tools directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "tools"))
+sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "lib" / "tools"))
 
 from discover import (
     detect_stack,

@@ -9,7 +9,7 @@ setup_test_project "discovery"
 
 # Create JOURNAL.md so there's something to update
 mkdir -p "$TEST_PROJECT/.agentic-journal"
-cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/journal/JOURNAL.md" << 'EOF'
 # Development Journal
 
 ## Session Log
@@ -19,7 +19,7 @@ cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
 - Added basic configuration
 EOF
 
-git -C "$TEST_PROJECT" add .agentic-journal/JOURNAL.md
+git -C "$TEST_PROJECT" add .agentic/journal/JOURNAL.md
 git -C "$TEST_PROJECT" commit -m "Add journal" --quiet
 
 # Ask to update journal

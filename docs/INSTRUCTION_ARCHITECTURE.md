@@ -57,7 +57,7 @@ This design synthesizes two independent research efforts:
 - Delegation table — orchestrator implementation detail
 - Session protocol details — structurally handled by `ag start`
 
-**Applies to both**: Root CLAUDE.md (framework development) AND template CLAUDE.md (`.agentic/agents/claude/CLAUDE.md`). Different audiences, same constitutional principle.
+**Applies to both**: Root CLAUDE.md (framework development) AND template CLAUDE.md (`.agentic/lib/agents/claude/CLAUDE.md`). Different audiences, same constitutional principle.
 
 ### Layer 2: Playbooks (already exist)
 
@@ -71,7 +71,7 @@ This design synthesizes two independent research efforts:
 
 Skills are Claude Code's native mechanism for delivering playbook-level instructions. They implement the same principle as Layer 2 (just-in-time delivery) via tool-native UI — Claude Code surfaces the right skill based on task description, so agents receive workflow instructions without loading the full auto_orchestration.md playbook.
 
-- **Source**: `.agentic/agents/claude/skills/` (hand-crafted, 12 skills) + `.agentic-local/extensions/skills/` (project-specific, F-0151)
+- **Source**: `.agentic/lib/agents/claude/skills/` (hand-crafted, 12 skills) + `.agentic/local/extensions/skills/` (project-specific, F-0151)
 - **Generated to**: `.claude/skills/` (by `generate-skills.sh`, merges framework + extension skills)
 - **Each skill bundles**: `SKILL.md` (instructions) + `scripts/` (gates/validation) + `references/` (playbook copies)
 - **Progressive disclosure**: YAML frontmatter on 168 of 212 `.agentic/` files enables ~96% discovery savings (~184K tokens saved per full scan)
@@ -86,8 +86,8 @@ Other tools (Cursor, Copilot, Codex) continue using `auto_orchestration.md` + `a
 - STATUS.md — holds all runtime state (focus, progress, next, blocker) plus roadmap, risks, decisions. Updated directly by status.sh.
 
 **Session-local state** (gitignored):
-- `.agentic-state/WIP.md` — work-in-progress lock
-- `.agentic-state/AGENTS_ACTIVE.md` — multi-agent coordination
+- `.agentic/session/WIP.md` — work-in-progress lock
+- `.agentic/session/AGENTS_ACTIVE.md` — multi-agent coordination
 
 **Design property**: State that must survive across machines goes in git-tracked files. State that is session-local goes in gitignored files. This distinction must be preserved.
 
@@ -95,7 +95,7 @@ Other tools (Cursor, Copilot, Codex) continue using `auto_orchestration.md` + `a
 
 ### Defense-in-Depth: Memory Seed Layer
 
-The framework includes a **memory-seed** mechanism (`.agentic/init/memory-seed.md`) that seeds key workflow patterns into each tool's persistent memory during init. This coexists with this document's design principle #2 in §5 ("Never rely on memory") [note: this is the doc's own design principle list, not framework principle D2] because memory-seed is **redundant reinforcement, not primary enforcement**.
+The framework includes a **memory-seed** mechanism (`.agentic/lib/init/memory-seed.md`) that seeds key workflow patterns into each tool's persistent memory during init. This coexists with this document's design principle #2 in §5 ("Never rely on memory") [note: this is the doc's own design principle list, not framework principle D2] because memory-seed is **redundant reinforcement, not primary enforcement**.
 
 **The relationship**: Scripts enforce; memory reinforces. `pre-commit-check.sh` structurally blocks bad commits regardless of what the agent remembers. Memory-seed makes the agent *less likely* to attempt the bad commit in the first place. If memory fails, structural gates still catch the violation.
 

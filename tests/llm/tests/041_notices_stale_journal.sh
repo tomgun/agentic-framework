@@ -10,7 +10,7 @@ setup_test_project "discovery"
 
 # Create a stale JOURNAL.md (last entry Jan 10, project is now in Sprint 7)
 mkdir -p "$TEST_PROJECT/.agentic-journal"
-cat > "$TEST_PROJECT/.agentic-journal/JOURNAL.md" << 'EOF'
+cat > "$TEST_PROJECT/.agentic/journal/JOURNAL.md" << 'EOF'
 # Development Journal
 
 ### Session: 2026-01-10
@@ -60,7 +60,7 @@ cat > "$TEST_PROJECT/CHANGELOG.md" << 'EOF'
 - Product catalog
 EOF
 
-git -C "$TEST_PROJECT" add .agentic-journal/JOURNAL.md STATUS.md CHANGELOG.md
+git -C "$TEST_PROJECT" add .agentic/journal/JOURNAL.md STATUS.md CHANGELOG.md
 git -C "$TEST_PROJECT" commit -m "Add project files with stale journal" --quiet
 
 # Ask to continue work - agent should notice stale journal

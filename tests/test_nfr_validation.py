@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-# Add .agentic/tools to path
-sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "tools"))
+# Add .agentic/lib/tools to path
+sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "lib" / "tools"))
 # Add .agentic/lib to path (for settings import)
 sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "lib"))
 
@@ -349,11 +349,11 @@ def test_validate_skips_acceptance_check_for_unknown_status(tmp_path):
 
 
 def test_framework_nfr_passes_validation():
-    """The framework's own spec/NFR.md must pass content validation."""
+    """The framework's own .agentic/spec/NFR.md must pass content validation."""
     root = Path(__file__).parent.parent
-    nfr_path = root / "spec" / "NFR.md"
+    nfr_path = root / ".agentic" / "spec" / "NFR.md"
     if not nfr_path.exists():
-        pytest.skip("No spec/NFR.md — not running in framework repo")
+        pytest.skip("No .agentic/spec/NFR.md — not running in framework repo")
 
     issues = validate_nfr_content(root)
     assert issues == [], f"Framework NFR.md has validation issues: {issues}"

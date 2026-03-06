@@ -22,7 +22,7 @@
         ],
         "output_not_contains": [],
         "file_exists": [],
-        "file_not_exists": [".agentic-state/WIP.md"],
+        "file_not_exists": [".agentic/session/WIP.md"],
         "max_commits": 1
       }
     },
@@ -35,7 +35,7 @@
       "profile": "discovery",
       "setup": {
         "files": {
-          ".agentic-state/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2025-01-18\n**Status**: In progress\n\n## Current Focus\nWorking on test feature\n\n## Next Steps\n- Complete implementation"
+          ".agentic/session/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2025-01-18\n**Status**: In progress\n\n## Current Focus\nWorking on test feature\n\n## Next Steps\n- Complete implementation"
         }
       },
       "prompt": "please commit my changes",
@@ -109,7 +109,7 @@
       "profile": "discovery",
       "setup": {
         "files": {
-          ".agentic-journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2025-01-17: Initial setup\n- Created project structure\n- Added basic configuration"
+          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2025-01-17: Initial setup\n- Created project structure\n- Added basic configuration"
         }
       },
       "prompt": "Please add a journal entry about completing the login feature",
@@ -135,7 +135,7 @@
       "profile": "discovery",
       "setup": {
         "files": {
-          ".agentic-state/WIP.md": "**Feature**: F-0042: User authentication\n**Started**: 2026-01-15\n**Status**: In progress\n\n## Current Focus\nImplementing login form validation\n\n## Completed\n- Created login form component\n- Added basic validation\n\n## Next Steps\n- Add password strength check\n- Connect to auth API"
+          ".agentic/session/WIP.md": "**Feature**: F-0042: User authentication\n**Started**: 2026-01-15\n**Status**: In progress\n\n## Current Focus\nImplementing login form validation\n\n## Completed\n- Created login form component\n- Added basic validation\n\n## Next Steps\n- Add password strength check\n- Connect to auth API"
         }
       },
       "prompt": "hi, what should I work on?",
@@ -258,7 +258,7 @@
       "profile": "discovery",
       "setup": {
         "files": {
-          ".agentic-journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-01-15: Authentication Module\n- Implemented JWT token generation\n- Added refresh token rotation\n- Fixed CORS issues with auth endpoints\n- Performance: 2ms avg response time\n\n### 2026-01-14: Database Migration\n- Migrated from SQLite to PostgreSQL\n- Added connection pooling\n- Schema: users, sessions, tokens tables\n- Benchmark: 500 concurrent connections stable\n\n### 2026-01-13: Initial Setup\n- Created project structure\n- Added CI/CD pipeline\n- Configured linting and formatting\n- Set up Docker development environment\n\n### 2026-01-12: Planning Session\n- Defined architecture: microservices with API gateway\n- Tech stack: Node.js, TypeScript, PostgreSQL\n- Testing strategy: unit + integration + e2e\n- Deployment: Kubernetes with Helm charts"
+          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-01-15: Authentication Module\n- Implemented JWT token generation\n- Added refresh token rotation\n- Fixed CORS issues with auth endpoints\n- Performance: 2ms avg response time\n\n### 2026-01-14: Database Migration\n- Migrated from SQLite to PostgreSQL\n- Added connection pooling\n- Schema: users, sessions, tokens tables\n- Benchmark: 500 concurrent connections stable\n\n### 2026-01-13: Initial Setup\n- Created project structure\n- Added CI/CD pipeline\n- Configured linting and formatting\n- Set up Docker development environment\n\n### 2026-01-12: Planning Session\n- Defined architecture: microservices with API gateway\n- Tech stack: Node.js, TypeScript, PostgreSQL\n- Testing strategy: unit + integration + e2e\n- Deployment: Kubernetes with Helm charts"
         }
       },
       "prompt": "Add a journal entry about completing the authentication feature",
@@ -315,7 +315,7 @@
       "setup": {
         "files": {
           "index.js": "const app = require('express')();\n\napp.get('/', (req, res) => {\n  res.send('Hello World');\n});\n\napp.listen(3000, () => {\n  console.log('Server running on port 3000');\n});",
-          ".agentic-journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-01-20: Major refactor\n- Rewrote authentication module\n- Added rate limiting\n- Updated all API endpoints\n- Fixed 15 bugs\n\n### 2026-01-19: Database optimization\n- Added indexes on frequently queried columns\n- Implemented connection pooling\n- Query performance improved 3x"
+          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-01-20: Major refactor\n- Rewrote authentication module\n- Added rate limiting\n- Updated all API endpoints\n- Fixed 15 bugs\n\n### 2026-01-19: Database optimization\n- Added indexes on frequently queried columns\n- Implemented connection pooling\n- Query performance improved 3x"
         }
       },
       "prompt": "Add a console.log statement to index.js that logs 'Request received' when the root endpoint is hit",
@@ -445,7 +445,7 @@
       "profile": "discovery",
       "setup": {
         "files": {
-          ".agentic-journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-02-04: Critical bug fix session\n- Fixed critical race condition in auth module\n- Root cause: concurrent token refresh requests\n- Solution: Added mutex lock on refresh endpoint\n- Also updated error logging to capture stack traces\n- Tests: Added 3 concurrency tests, all passing\n\n### 2026-02-03: Performance optimization\n- Identified N+1 query in product listing\n- Added DataLoader for batch fetching\n- Response time: 800ms → 120ms\n- Memory usage reduced by 40%\n\n### 2026-02-02: Feature development\n- Started shopping cart implementation\n- Added cart model and API endpoints\n- Frontend: CartDrawer component with animations"
+          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n## Session Log\n\n### 2026-02-04: Critical bug fix session\n- Fixed critical race condition in auth module\n- Root cause: concurrent token refresh requests\n- Solution: Added mutex lock on refresh endpoint\n- Also updated error logging to capture stack traces\n- Tests: Added 3 concurrency tests, all passing\n\n### 2026-02-03: Performance optimization\n- Identified N+1 query in product listing\n- Added DataLoader for batch fetching\n- Response time: 800ms → 120ms\n- Memory usage reduced by 40%\n\n### 2026-02-02: Feature development\n- Started shopping cart implementation\n- Added cart model and API endpoints\n- Frontend: CartDrawer component with animations"
         }
       },
       "prompt": "What did we accomplish in the last session?",
@@ -497,7 +497,7 @@
       "profile": "discovery",
       "setup": {
         "files": {
-          ".agentic-state/AGENTS_ACTIVE.md": "# Active Agents\n\n## Agent: claude-agent-1\n- **Feature**: F-0099: User Authentication\n- **Branch**: feat/auth\n- **Started**: 2026-02-07\n- **Working on**: Login form and JWT integration\n- **Files**: src/auth/*.ts, tests/auth/*.test.ts"
+          ".agentic/session/AGENTS_ACTIVE.md": "# Active Agents\n\n## Agent: claude-agent-1\n- **Feature**: F-0099: User Authentication\n- **Branch**: feat/auth\n- **Started**: 2026-02-07\n- **Working on**: Login form and JWT integration\n- **Files**: src/auth/*.ts, tests/auth/*.test.ts"
         }
       },
       "prompt": "I want to start working on the payment feature while my colleague works on auth in parallel",
@@ -570,7 +570,7 @@
       "setup": {
         "files": {
           "STATUS.md": "# Project Status\n\n## Current Focus\nImplementing payment gateway\n\n## In Progress\n- Stripe integration (70%)\n- Webhook handlers\n\n## Next Steps\n- Complete webhook handlers\n- Add invoice generation\n\n## Blockers\n- None",
-          ".agentic-journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-01-28\n- Started Stripe integration\n- Added payment intent API\n- Next: webhook handlers",
+          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-01-28\n- Started Stripe integration\n- Added payment intent API\n- Next: webhook handlers",
           "src/payments.ts": "export class PaymentService {\n  async createIntent(amount: number) {\n    // Stripe payment intent creation\n    return { id: 'pi_test', status: 'created' };\n  }\n}"
         }
       },
@@ -600,7 +600,7 @@
           "STATUS.md": "# Project Status\n\n## Version: 0.5.0\n\n## Current Focus\nImplementing user login form\n\n## In Progress\n- Login form component\n- Basic password validation\n\n## Next Steps\n- Add email verification\n- Connect to auth API\n\n## Blockers\n- None",
           "VERSION": "0.20.0",
           "CHANGELOG.md": "# Changelog\n\n## [0.20.0] - 2026-02-05\n- Payment gateway fully integrated\n- Order management system complete\n- Admin dashboard shipped\n\n## [0.15.0] - 2026-01-20\n- User authentication complete\n- Product catalog launched\n\n## [0.5.0] - 2025-12-01\n- Initial user login form",
-          ".agentic-journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-02-04\n- Completed admin dashboard\n- All payment tests passing\n- Next: monitoring and analytics"
+          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-02-04\n- Completed admin dashboard\n- All payment tests passing\n- Next: monitoring and analytics"
         }
       },
       "prompt": "Hi, let's start a new session. What should we work on?",
@@ -656,7 +656,7 @@
         "files": {
           "spec/FEATURES.md": "# Features\n\n## F-0001: User Authentication\n- Status: in_progress\n- Priority: high\n- Acceptance: spec/acceptance/F-0001.md\n\n## F-0002: Product Catalog\n- Status: shipped\n- Priority: high",
           "spec/acceptance/F-0001.md": "# F-0001: User Authentication\n\n## Acceptance Criteria\n- [x] Users can register with email/password\n- [x] Users can login and receive JWT\n- [x] Password reset via email\n- [x] Session management with refresh tokens\n\n## Tests\n- All 12 auth tests passing",
-          ".agentic-journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-02-04\n- Finished password reset flow\n- All acceptance criteria met\n- 12/12 tests passing",
+          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-02-04\n- Finished password reset flow\n- All acceptance criteria met\n- 12/12 tests passing",
           "CHANGELOG.md": "# Changelog\n\n## [Unreleased]\n\n## [0.19.0] - 2026-02-01\n- Product catalog shipped"
         }
       },
@@ -711,7 +711,7 @@
       "profile": "discovery",
       "setup": {
         "files": {
-          ".agentic-journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-01-10\n- Set up project structure\n- Added initial configuration\n- Next: start building auth module",
+          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-01-10\n- Set up project structure\n- Added initial configuration\n- Next: start building auth module",
           "STATUS.md": "# Project Status\n\n## Current Focus\nBuilding admin dashboard (Sprint 7)\n\n## In Progress\n- Admin user management\n- Analytics dashboard\n\n## Completed Recently\n- Payment gateway (Sprint 5-6)\n- Order management (Sprint 6)\n- User auth (Sprint 3-4)\n\n## Next Steps\n- Deploy admin dashboard\n- Set up monitoring\n\n## Blockers\n- None",
           "CHANGELOG.md": "# Changelog\n\n## [0.18.0] - 2026-02-04\n- Admin dashboard MVP\n- Analytics charts\n\n## [0.15.0] - 2026-01-25\n- Payment gateway complete\n- Order management\n\n## [0.10.0] - 2026-01-15\n- User authentication\n- Product catalog"
         }
@@ -763,7 +763,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          ".agentic-state/discovery_report.json": "{\"version\":\"2.0.0\",\"profile\":\"formal\",\"stack\":{\"language\":\"TypeScript\"},\"sub_projects\":[{\"name\":\"web\",\"framework\":\"Next.js\"},{\"name\":\"api\",\"framework\":\"Express\"},{\"name\":\"admin\",\"framework\":\"React\"}],\"domains\":[{\"name\":\"web\",\"type\":\"frontend\",\"estimated_features\":10},{\"name\":\"api\",\"type\":\"backend\",\"estimated_features\":8},{\"name\":\"admin\",\"type\":\"frontend\",\"estimated_features\":5}],\"feature_clusters\":[{\"name\":\"checkout\"},{\"name\":\"catalog\"},{\"name\":\"orders\"},{\"name\":\"users\"},{\"name\":\"reports\"}],\"infra_patterns\":[],\"features\":[]}"
+          ".agentic/session/discovery_report.json": "{\"version\":\"2.0.0\",\"profile\":\"formal\",\"stack\":{\"language\":\"TypeScript\"},\"sub_projects\":[{\"name\":\"web\",\"framework\":\"Next.js\"},{\"name\":\"api\",\"framework\":\"Express\"},{\"name\":\"admin\",\"framework\":\"React\"}],\"domains\":[{\"name\":\"web\",\"type\":\"frontend\",\"estimated_features\":10},{\"name\":\"api\",\"type\":\"backend\",\"estimated_features\":8},{\"name\":\"admin\",\"type\":\"frontend\",\"estimated_features\":5}],\"feature_clusters\":[{\"name\":\"checkout\"},{\"name\":\"catalog\"},{\"name\":\"orders\"},{\"name\":\"users\"},{\"name\":\"reports\"}],\"infra_patterns\":[],\"features\":[]}"
         }
       },
       "prompt": "This is an existing codebase with web frontend, API backend, and admin panel. I need to generate specs for all of it. How should we approach this?",
@@ -817,7 +817,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          ".agentic-journal/plans/brownfield-specs-plan.md": "# Brownfield Spec Generation Plan\n\n**Status**: APPROVED\n**Created**: 2026-02-08\n\n## Domains\n\n- [x] Frontend Web App (type: frontend, ~12 features)\n- [ ] Backend API (type: backend, ~10 features)\n- [ ] Mobile App (type: mobile, ~5 features)\n\n## Approach\n- Work domains in priority order"
+          ".agentic/journal/plans/brownfield-specs-plan.md": "# Brownfield Spec Generation Plan\n\n**Status**: APPROVED\n**Created**: 2026-02-08\n\n## Domains\n\n- [x] Frontend Web App (type: frontend, ~12 features)\n- [ ] Backend API (type: backend, ~10 features)\n- [ ] Mobile App (type: mobile, ~5 features)\n\n## Approach\n- Work domains in priority order"
         }
       },
       "prompt": "Hi, starting a new session. What should we work on?",
@@ -894,7 +894,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          ".agentic-state/WIP.md": "# Work In Progress\n\n- **Feature**: F-0001: User Authentication\n- **Started**: 2026-02-08\n- **Phase**: Implementation\n- **Branch**: feat/auth",
+          ".agentic/session/WIP.md": "# Work In Progress\n\n- **Feature**: F-0001: User Authentication\n- **Started**: 2026-02-08\n- **Phase**: Implementation\n- **Branch**: feat/auth",
           "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: in_progress\n\n## F-0002: Product Catalog\n- Status: planned"
         }
       },
@@ -1058,7 +1058,7 @@
       "setup": {
         "files": {
           "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: discovery\n- wip_before_commit: blocking\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
-          ".agentic-state/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2026-02-15\n**Status**: In progress\n\n## Current Focus\nWorking on test feature",
+          ".agentic/session/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2026-02-15\n**Status**: In progress\n\n## Current Focus\nWorking on test feature",
           "index.js": "console.log('hello');"
         }
       },
@@ -1086,7 +1086,7 @@
       "setup": {
         "files": {
           "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: formal\n- wip_before_commit: warning\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
-          ".agentic-state/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2026-02-15\n**Status**: In progress\n\n## Current Focus\nWorking on test feature",
+          ".agentic/session/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2026-02-15\n**Status**: In progress\n\n## Current Focus\nWorking on test feature",
           "index.js": "console.log('hello');"
         }
       },

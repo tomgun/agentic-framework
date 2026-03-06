@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with shell access and test runners."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.38.0"
+  version: "0.41.0"
 ---
 
 # Writing Tests
@@ -21,7 +21,7 @@ Write tests that verify acceptance criteria and prevent regressions.
 
 ### Step 1: Understand What to Test
 
-1. Read acceptance criteria from `spec/acceptance/F-XXXX.md` if available
+1. Read acceptance criteria from `.agentic/spec/acceptance/F-XXXX.md` if available
 2. Read the code to understand behavior and edge cases
 3. Check `STACK.md` for test framework and conventions
 
@@ -67,7 +67,7 @@ Result: 6 test cases covering happy path, edge cases, and errors.
 **Example 2: Tests for acceptance criteria**
 User says: "/test F-0125"
 Steps taken:
-1. Read spec/acceptance/F-0125.md — 4 criteria listed
+1. Read .agentic/spec/acceptance/F-0125.md — 4 criteria listed
 2. Write one or more tests per criterion
 3. Run tests — 3 pass, 1 fails (reveals incomplete implementation)
 Result: "Tests written. 3 pass, 1 fails — AC-3 (empty input handling) not yet implemented."
