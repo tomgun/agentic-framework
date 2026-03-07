@@ -1507,3 +1507,13 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-07 18:14 - Plan-Aware Code Review (F-0176)
+
+**Why**: Review skill had no plan awareness — missed the most valuable review dimension for plan-driven development
+
+**What changed**:
+- Added Step 1b plan lookup + Plan Alignment dimension to reviewing-code skill. Spec, acceptance, migration, 8 validation tests.
+
+**Blockers**: None
+

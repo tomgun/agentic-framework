@@ -2383,6 +2383,66 @@ else
   fail "F-0175: QA suite plan not saved to journal/plans/"
 fi
 
+# ============================================================
+# F-0176: Plan-Aware Code Review
+# ============================================================
+echo "--- F-0176: Plan-Aware Code Review ---"
+
+# SKILL.md mentions plan alignment
+if grep -q "Plan Alignment\|plan.*found\|journal/plans" "${FRAMEWORK_ROOT}/.claude/skills/reviewing-code/SKILL.md"; then
+  pass "F-0176: reviewing-code SKILL.md has plan alignment"
+else
+  fail "F-0176: reviewing-code SKILL.md missing plan alignment"
+fi
+
+# Template SKILL.md also updated
+if grep -q "Plan Alignment\|plan.*found\|journal/plans" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/reviewing-code/SKILL.md"; then
+  pass "F-0176: template reviewing-code SKILL.md has plan alignment"
+else
+  fail "F-0176: template reviewing-code SKILL.md missing plan alignment"
+fi
+
+# Review checklist has plan section
+if grep -q "Plan Alignment" "${FRAMEWORK_ROOT}/.claude/skills/reviewing-code/references/review_checklist.md"; then
+  pass "F-0176: review_checklist.md has Plan Alignment section"
+else
+  fail "F-0176: review_checklist.md missing Plan Alignment section"
+fi
+
+# Step 1b exists
+if grep -q "Step 1b" "${FRAMEWORK_ROOT}/.claude/skills/reviewing-code/SKILL.md"; then
+  pass "F-0176: SKILL.md has Step 1b"
+else
+  fail "F-0176: SKILL.md missing Step 1b"
+fi
+
+# Mentions missing deliverables and unplanned additions
+if grep -q "Missing deliverables\|missing deliverables" "${FRAMEWORK_ROOT}/.claude/skills/reviewing-code/SKILL.md"; then
+  pass "F-0176: SKILL.md flags missing deliverables"
+else
+  fail "F-0176: SKILL.md missing 'missing deliverables' concept"
+fi
+
+if grep -q "Unplanned additions\|unplanned additions" "${FRAMEWORK_ROOT}/.claude/skills/reviewing-code/SKILL.md"; then
+  pass "F-0176: SKILL.md flags unplanned additions"
+else
+  fail "F-0176: SKILL.md missing 'unplanned additions' concept"
+fi
+
+# Acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0176.md" ]]; then
+  pass "F-0176: acceptance criteria file exists"
+else
+  fail "F-0176: acceptance criteria file missing"
+fi
+
+# Feature registered in FEATURES.md
+if grep -q "F-0176" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md"; then
+  pass "F-0176: registered in FEATURES.md"
+else
+  fail "F-0176: not registered in FEATURES.md"
+fi
+
 # Test missing STACK.md uses profile preset (inferred discovery → feature_tracking=no)
 (
   source "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" 2>/dev/null || exit 1
