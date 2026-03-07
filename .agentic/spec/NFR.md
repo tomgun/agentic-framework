@@ -37,3 +37,27 @@ Purpose: capture cross-cutting constraints that apply across many features (perf
 - Current status: met
 - Acceptance: spec/acceptance/NFR-0002.md
 - Notes: context-for-role.sh counts tokens and warns when over budget at runtime
+
+## NFR-0003: Small batch commits
+- Category: process
+- Statement: Commits must touch at most 10 files (Formal) or 15 files (Discovery) to keep changes reviewable
+- Applies to: all commits (global)
+- How to measure: `git diff --cached --name-only | wc -l` in pre-commit
+- Where enforced:
+  - Tests: `tests/validate_framework.sh` (batch size checks)
+  - CI: pre-commit-check.sh max_files_per_commit gate
+- Current status: met
+- Acceptance: spec/acceptance/NFR-0003.md
+- Notes: Configurable via `max_files_per_commit` setting in STACK.md
+
+## NFR-0004: Spec-first development
+- Category: process
+- Statement: Acceptance criteria must exist before implementation code is written for any feature
+- Applies to: all features in Formal profile (global)
+- How to measure: `ag implement` gate checks acceptance file exists; pre-commit checks FEATURES.md staleness
+- Where enforced:
+  - Tests: `tests/validate_framework.sh` (spec-first checks), `tests/infrastructure/structural/S07_*`
+  - CI: pre-commit-check.sh Check 3c, ag.sh implement gate
+- Current status: met
+- Acceptance: spec/acceptance/NFR-0004.md
+- Notes: Discovery profile uses `acceptance_criteria: recommended` (advisory). Formal uses `blocking`.

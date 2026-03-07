@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 8,
+  "last_migration": 9,
   "migrations": [
     {
       "id": 1,
@@ -49,6 +49,12 @@
       "file": "008_mark_f0168_acs_as_checked_all_implemented_and_tested.md",
       "date": "2026-03-07",
       "description": "Mark F-0168 ACs as checked (all implemented and tested)"
+    },
+    {
+      "id": 9,
+      "file": "009_add_qa_suite_f0169f0175_nfr_catalog_spec_verification_propagation_qa_tracker_retro_enforcement.md",
+      "date": "2026-03-07",
+      "description": "Add QA Suite: F-0169–F-0175 (NFR catalog, spec verification, propagation, QA tracker, retro enforcement)"
     }
   ]
 }

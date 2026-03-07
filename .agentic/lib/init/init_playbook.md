@@ -529,6 +529,7 @@ Interview the user to understand:
 5. **Testing approach?** (TDD recommended, what test frameworks?)
 6. **E2E testing?** If the project has a UI (web, mobile, game), ask about E2E tests. Suggest a framework based on stack — see `.agentic/lib/quality/e2e_setup_guide.md` for per-stack recommendations. If they want E2E, help configure `Test commands:` and `E2E screenshots:` in STACK.md.
 7. **Project license?** (See Step 2a below - IMPORTANT!)
+8. **Quality constraints / NFRs?** (See Step 2c below)
 
 ### Step 2a: Ask about project licensing ⭐
 
@@ -599,6 +600,56 @@ Choose **Proprietary (f)** if:
 - **Proprietary**: Can use MIT, Apache, BSD deps. CANNOT use GPL/AGPL!
 
 **See**: `.agentic/lib/workflows/project_licensing.md` for comprehensive licensing guide.
+
+### Step 2c: NFR Discovery (quality constraints)
+
+**After the interview questions**, use the answers to suggest relevant NFRs.
+
+1. **Read STACK.md** `Primary platform:` to determine project type
+2. **Load catalog**: Read `.agentic/lib/init/nfr-catalog.md`
+3. **Present type-specific suggestions** based on platform:
+   - web → Web App + Universal + Framework Promises
+   - service/api/backend → API/Backend + Universal + Framework Promises
+   - mobile → Mobile + Universal + Framework Promises
+   - game → Game + Universal + Framework Promises
+   - audio/dsp → Audio/DSP + Universal + Framework Promises
+   - cli → CLI + Universal + Framework Promises
+   - desktop → Desktop + Universal + Framework Promises
+
+4. **Formalize any constraints from question 4** ("Key constraints?"):
+   - If the user mentioned performance/security/compliance constraints earlier, map them to catalog entries or create custom NFRs
+
+5. **Ask the developer to pick and customize**:
+
+```
+"Based on your stack, here are suggested quality constraints (NFRs).
+Pick the ones that matter and adjust thresholds:
+
+Performance:
+  [ ] Response time p95 < 200ms (default: 200ms, adjust?)
+  [ ] Bundle size < 250KB (default: 250KB, adjust?)
+
+Security:
+  [ ] XSS protection on user inputs
+  [ ] CSRF protection on state-changing endpoints
+
+Process:
+  [ ] Small batch commits (max 10 files)
+  [ ] Spec-first development
+
+Which do you want? (e.g., 'all', '1,3,5', or 'none for now')"
+```
+
+6. **Write selected NFRs** to `.agentic/spec/NFR.md`:
+   - Assign NFR-XXXX IDs (continuing from existing IDs)
+   - Fill in all fields: Category, Statement, How to measure, Where enforced, Current status
+   - Create acceptance files for each: `.agentic/spec/acceptance/NFR-XXXX.md`
+
+7. **Profile behavior**:
+   - **Formal** (required): NFRs link to acceptance criteria, formally tracked in specs
+   - **Discovery** (optional but recommended): NFRs serve as quality guidelines without formal linking. Captured early so they're ready when/if transitioning to Formal.
+
+**If user says "none for now"**: That's fine. NFRs can be added anytime via `ag nfr discover`.
 
 ### Step 2b: Ask about development style (multi-agent)
 

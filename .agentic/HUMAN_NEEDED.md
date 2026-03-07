@@ -16,6 +16,14 @@ _No active items_
 ---
 
 
+
+### HN-0022: PR #67: Fill migration 008, surface spec protection in entry points (v0.45.1)
+- **Type**: review
+- **Added**: 2026-03-07
+- **Context**: Docs-only change — 8 content files, all small edits
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 ### HN-0021: PR #66: Visual verification, E2E scaffolding & auto mode docs (F-0168, v0.45.0)

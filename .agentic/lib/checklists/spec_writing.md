@@ -26,13 +26,19 @@ phase: planning
 
 ```
 □ Find next F-XXXX ID in .agentic/spec/FEATURES.md
-□ Read .agentic/spec/NFR.md → identify applicable NFRs
-□ Create FEATURES.md entry (Status: planned, Related NFRs)
+□ NFR Gate — Active matching (not passive):
+  □ Read .agentic/spec/NFR.md
+  □ For EACH defined NFR: evaluate applicability to this feature
+  □ If applicable: note for FEATURES.md NFRs field + acceptance NFR Compliance
+  □ If none applicable: set NFRs: none (proves check was done)
+  □ If NFR.md empty: note "No project NFRs defined" (info only)
+  □ Promotion check: scan 3+ acceptance files for recurring constraints not in NFR.md
+□ Create FEATURES.md entry (Status: planned, NFRs: [IDs or none])
 □ Create .agentic/spec/acceptance/F-XXXX.md from template
   □ Has ## Tests section
   □ Has ## Acceptance Criteria section
   □ Has ## Out of Scope section
-  □ Has ### NFR Compliance section (if NFRs apply)
+  □ Has ### NFR Compliance section (with specific criteria per applicable NFR)
 □ Show draft to user for approval
 □ bash .agentic/lib/tools/migration.sh create "Add F-XXXX [Name]"
 □ bash .agentic/lib/tools/check-spec-health.sh F-XXXX

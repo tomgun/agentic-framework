@@ -40,6 +40,7 @@ tests/llm/.test-state
 .agentic/session/auto.pid
 .agentic/session/auto-state.json
 .agentic/session/crunch-state.json
+.agentic/session/.qa-tracker.json
 .agentic/session/screenshots/
 # Note: .agentic/journal/ IS committed (persistent history: manifests, lessons, plans, JOURNAL.md)
 

@@ -133,6 +133,8 @@ COMMANDS:
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
     auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
+    audit [options]     Spec verification & QA audit (--full, --status, --propagate)
+    nfr [sub]           NFR management (list, discover, coverage)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -193,6 +195,8 @@ COMMANDS:
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
     auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
+    audit [options]     Spec verification & QA audit (--full, --status, --propagate)
+    nfr [sub]           NFR management (list, discover, coverage)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -2448,6 +2452,82 @@ cmd_todo() {
     esac
 }
 
+# --- ag audit ---
+cmd_audit() {
+    local arg="${1:-}"
+    case "$arg" in
+        --full|--report)
+            bash "$SCRIPT_DIR/spec-audit.sh" --report
+            ;;
+        --status)
+            bash "$SCRIPT_DIR/spec-audit.sh" --status
+            ;;
+        --propagate)
+            bash "$SCRIPT_DIR/spec-audit.sh" --propagate "${2:-}"
+            ;;
+        --since-last|"")
+            bash "$SCRIPT_DIR/spec-audit.sh" --since-last
+            ;;
+        *)
+            if [[ "$arg" =~ ^F-[0-9]{4}$ ]]; then
+                bash "$SCRIPT_DIR/spec-audit.sh" "$arg"
+            else
+                bash "$SCRIPT_DIR/spec-audit.sh" "$arg"
+            fi
+            ;;
+    esac
+}
+
+# --- ag nfr ---
+cmd_nfr() {
+    local subcmd="${1:-}"
+    case "$subcmd" in
+        list|"")
+            bash "$SCRIPT_DIR/nfr.sh" list
+            ;;
+        discover)
+            echo -e "${BOLD}NFR Discovery${NC}"
+            echo ""
+            echo "Read .agentic/lib/init/nfr-catalog.md for type-specific NFR suggestions."
+            echo "Select relevant NFRs and write them to .agentic/spec/NFR.md."
+            echo ""
+            if [ -f "$ROOT_DIR/STACK.md" ]; then
+                local platform
+                platform=$(grep -E '^\s*-?\s*Primary platform:' "$ROOT_DIR/STACK.md" 2>/dev/null | sed 's/.*: *//' | sed 's/<!--.*-->//' | tr -d ' ' || echo "unknown")
+                if [ -n "$platform" ] && [ "$platform" != "unknown" ]; then
+                    echo "Detected platform: $platform"
+                    echo "Relevant catalog sections: Universal + $(echo "$platform" | sed 's/web/Web App/;s/api\|backend\|service/API \/ Backend/;s/mobile/Mobile/;s/game/Game/;s/audio\|dsp/Audio \/ DSP/;s/cli/CLI/;s/desktop/Desktop/') + Framework Promises"
+                fi
+            fi
+            ;;
+        coverage)
+            # Simple NFR coverage report
+            echo -e "${BOLD}NFR Coverage Report${NC}"
+            echo ""
+            if [ ! -f "$ROOT_DIR/.agentic/spec/NFR.md" ]; then
+                echo "No NFR.md found."
+                return
+            fi
+            bash "$SCRIPT_DIR/nfr.sh" list
+            echo ""
+            # Count features referencing each NFR
+            while IFS= read -r nfr_id; do
+                [ -z "$nfr_id" ] && continue
+                local ref_count
+                ref_count=$( { grep "$nfr_id" "$ROOT_DIR/.agentic/spec/FEATURES.md" 2>/dev/null || true; } | wc -l | tr -d ' ')
+                echo "  $nfr_id: referenced by ${ref_count} feature(s)"
+            done < <(grep -oE 'NFR-[0-9]{4}' "$ROOT_DIR/.agentic/spec/NFR.md" 2>/dev/null | sort -u)
+            ;;
+        *)
+            if [[ "$subcmd" =~ ^NFR-[0-9]{4}$ ]]; then
+                bash "$SCRIPT_DIR/nfr.sh" "$subcmd" "${2:-show}"
+            else
+                echo "Usage: ag nfr [list|discover|coverage|NFR-XXXX]"
+            fi
+            ;;
+    esac
+}
+
 # Self-healing: ensure pre-commit hooks are installed on every ag invocation
 # Addresses D2 (Deterministic Enforcement) — hooks must survive git config resets
 _ensure_hooks() {
@@ -2524,6 +2604,14 @@ case "${1:-help}" in
     auto)
         shift
         cmd_auto "$@"
+        ;;
+    audit)
+        shift
+        cmd_audit "$@"
+        ;;
+    nfr)
+        shift
+        cmd_nfr "$@"
         ;;
     sync)
         cmd_sync "${2:-}"
