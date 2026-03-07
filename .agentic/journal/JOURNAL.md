@@ -1481,3 +1481,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-07 17:49 - NFR-0003 Reframe
+
+**Why**: Pre-commit file limit is too late; the constraint belongs at decomposition time
+
+**What changed**:
+- Reframed from 'small batch commits' to 'small batch work' — enforcement at planning time, not pre-commit
+
+**Next steps**:
+- Push and update PR
+
+**Blockers**: None
+

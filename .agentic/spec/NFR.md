@@ -38,17 +38,18 @@ Purpose: capture cross-cutting constraints that apply across many features (perf
 - Acceptance: spec/acceptance/NFR-0002.md
 - Notes: context-for-role.sh counts tokens and warns when over budget at runtime
 
-## NFR-0003: Small batch commits
+## NFR-0003: Small batch work
 - Category: process
-- Statement: Commits must touch at most 10 files (Formal) or 15 files (Discovery) to keep changes within reasoning context — both agent and human must be able to hold the full changeset in mind
-- Applies to: all commits (global)
-- How to measure: `git diff --cached --name-only | wc -l` in pre-commit
+- Statement: Work should be planned and executed in batches small enough that both agent and human can hold the full changeset in reasoning context (~10 files Formal, ~15 Discovery). The constraint belongs at planning time, not pre-commit — by the time a commit is too large, the damage is done.
+- Applies to: all work (global)
+- How to measure: Batch size at planning/decomposition time; pre-commit file count is a lagging indicator, not the enforcement point
 - Where enforced:
+  - Primary: memory-seed.md "TOO BIG" rule (>10 files → break into 3-5 tasks), `ag plan` decomposition
+  - Advisory: pre-commit-check.sh warns on large commits (too late to be the real gate)
   - Tests: `tests/validate_framework.sh` (batch size checks)
-  - CI: pre-commit-check.sh max_files_per_commit gate
 - Current status: met
 - Acceptance: spec/acceptance/NFR-0003.md
-- Notes: Configurable via `max_files_per_commit` setting in STACK.md
+- Notes: Configurable via `max_files_per_commit` setting in STACK.md. The pre-commit warning is a safety net, not the strategy — the strategy is planning small.
 
 ## NFR-0004: Spec-first development
 - Category: process
