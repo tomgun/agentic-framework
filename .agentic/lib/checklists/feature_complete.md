@@ -136,8 +136,12 @@ phase: completion
 - [ ] **Code comments added**
   - @feature annotations on implementation
   - @acceptance annotations on acceptance tests
-  - @nfr annotations if relevant
+  - @nfr annotations on code enforcing NFR constraints (if feature has linked NFRs)
   - Explain "why" not "what"
+
+- [ ] **NFR compliance verified** (if feature has linked NFRs)
+  - Each linked NFR criterion in acceptance file is checked/met
+  - `@nfr` annotation exists in code where constraints are enforced
 
 - [ ] **README/docs updated** (if user-facing)
   - Usage examples

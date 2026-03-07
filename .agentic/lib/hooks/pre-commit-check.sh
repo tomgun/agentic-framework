@@ -1006,6 +1006,26 @@ if [[ -d "$EXT_GATES_DIR" ]]; then
   fi
 fi
 
+# --- Advisory: QA propagation items ---
+QA_TRACKER="$ROOT_DIR/.agentic/session/.qa-tracker.json"
+if [[ -f "$QA_TRACKER" ]] && command -v python3 &>/dev/null; then
+  PENDING_COUNT=$(python3 -c "
+import json
+try:
+    with open('$QA_TRACKER') as f:
+        data = json.load(f)
+    pending = data.get('propagation', {}).get('pending', [])
+    total = sum(sum(1 for i in p.get('items', []) if i.get('status') == 'open') for p in pending)
+    print(total)
+except: print(0)
+" 2>/dev/null || echo "0")
+  if [[ "$PENDING_COUNT" -gt 0 ]]; then
+    echo ""
+    echo "⚠️  Advisory: $PENDING_COUNT open QA propagation item(s)"
+    echo "   Run: ag audit --status  or  bash .agentic/lib/tools/qa-tracker.sh pending"
+  fi
+fi
+
 # Summary
 echo ""
 echo "═══════════════════════════════════════════════════════"

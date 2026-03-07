@@ -181,6 +181,44 @@ phase: review
 
 ---
 
+## Spec Verification Audit (Formal only)
+
+- [ ] **Run spec audit**
+  ```bash
+  bash .agentic/lib/tools/spec-audit.sh --since-last --report
+  ```
+- [ ] **Review test quality concerns** — tests that assert nothing meaningful
+- [ ] **Review coverage gaps** — ACs without test references
+- [ ] **Review vague criteria** — ACs that can't be tested meaningfully
+- [ ] **Review git changes** since last audit for unaudited features
+- [ ] **Address critical findings** before starting next feature
+
+---
+
+## NFR Health Review
+
+- [ ] **Run NFR coverage check**
+  ```bash
+  bash .agentic/lib/tools/ag.sh nfr coverage
+  ```
+- [ ] **Promotion check**: are any feature-scoped constraints ready for promotion to project NFR?
+- [ ] **Threshold check**: are existing NFR thresholds still appropriate for project maturity?
+- [ ] **Gap check**: have bugs/incidents revealed quality gaps that should become NFRs?
+- [ ] **Catalog refresh**: re-run `ag nfr discover` — any new catalog suggestions relevant now?
+
+---
+
+## Propagation Items Review (Formal only)
+
+- [ ] **Check pending propagation items**
+  ```bash
+  bash .agentic/lib/tools/qa-tracker.sh pending
+  ```
+- [ ] **Resolve or defer all BLOCKING items** — retro cannot complete with unaddressed blocking items
+- [ ] **Review deferred items** — are defer reasons still valid?
+
+---
+
 ## Create Retrospective Document
 
 - [ ] **Create retro document**

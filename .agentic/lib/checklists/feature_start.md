@@ -16,7 +16,9 @@ phase: planning
 ```
 □ Does .agentic/spec/acceptance/F-####.md exist?
   ├─ YES → Check: does it have a Tests section (## Tests or ## Verification > ### Tests)?
-  │         ├─ YES → Proceed to Gate 2
+  │         ├─ YES → Check: has NFR Compliance been resolved?
+  │         │         ├─ Has ### NFR Compliance section OR NFRs: none in FEATURES.md → Proceed to Gate 2
+  │         │         └─ Neither → Add NFR evaluation before coding (see spec_writing checklist STEP 2)
   │         └─ NO  → Add Tests section before coding (see template)
   └─ NO  → 🛑 STOP. Create acceptance criteria FIRST.
            DO NOT write any code until criteria exist.

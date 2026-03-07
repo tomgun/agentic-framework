@@ -45,6 +45,14 @@ Purpose: a single source of truth for "how we build and run software here".
 # Suggest agent regeneration. Options: every_N_sessions | off. Discovery default: off
 - docs_stale_days: 30
 # Days before a doc is flagged stale by docs.sh. Default: 30
+- retrospective_enabled: no
+# Enable periodic retrospectives. Profile defaults — Discovery: no | Formal: yes
+- qa_propagation_warn_days: 3
+# Days before propagation items trigger WARNING. Default: 3
+- qa_propagation_escalate_days: 7
+# Days before propagation items trigger ESCALATE. Default: 7
+- qa_audit_freshness_days: 30
+# Days before full audit is flagged overdue. Default: 30
 
 ### Complexity limits
 - max_files_per_commit: 15

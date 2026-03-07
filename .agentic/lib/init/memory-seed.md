@@ -5,7 +5,7 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.39.0 -->
+<!-- memory-seed v0.46.0 -->
 <!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
@@ -79,6 +79,12 @@ After `ag done F-XXXX` completes, if STACK.md has a `## Docs` section with entri
 the doc lifecycle fires automatically (docs.sh assembles context, you draft the docs).
 You can also run `ag docs F-XXXX` manually to draft registered docs for a feature.
 
+## Who tests the tests?
+
+When reviewing test quality — whether during implementation, retro, or audit — ask: "Could this test pass with a broken implementation?" If the answer is yes, the test is weak.
+
+Run `ag audit` to verify the spec→AC→test chain. Use `ag audit --propagate NFR-XXXX` to trace NFR changes downstream.
+
 ## Pre-commit sequence (never skip steps)
 
 Every time before committing, execute these commands in order:
@@ -108,6 +114,12 @@ When a session begins, immediately:
 1. Read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, last 2-3 .agentic/journal/JOURNAL.md entries
 2. Run `bash .agentic/lib/tools/wip.sh check` for interrupted work
 3. Greet user with dashboard: current focus, recent progress, blockers, suggested next steps
+
+## NFR proactive suggestion
+
+If NFR.md exists but only has template content (no project-specific NFRs) after 3+ features are shipped, suggest NFR discovery at session start:
+
+> "You've shipped 3+ features but haven't defined project-specific NFRs yet. Quality constraints help catch issues early. Run `ag nfr discover` to review suggestions for your stack."
 
 ## Where to log things
 
