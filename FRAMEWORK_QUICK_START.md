@@ -140,6 +140,26 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 
 ## 📁 KEY FILES
 
+## 🔍 QUALITY ASSURANCE SUITE (v0.46.0+)
+
+The framework includes a formal QA pipeline — "who tests the tests?"
+
+| Command | What It Does |
+|---------|-------------|
+| `ag audit` | Verify spec→AC→test chain (structural, coverage, heuristics, LLM review) |
+| `ag audit --full` | Full audit report to `docs/retrospectives/` |
+| `ag audit --propagate NFR-XXXX` | Trace NFR changes to affected features downstream |
+| `ag audit --status` | Show QA tracker summary |
+| `ag nfr list` | List all project NFRs with status |
+| `ag nfr discover` | Suggest NFRs from catalog based on project stack |
+| `ag nfr coverage` | Show which features reference each NFR |
+
+**Key tools**: `spec-audit.sh` (verification), `qa-tracker.sh` (state machine with escalation), `test-review-prompt.md` (LLM test intent review)
+
+**Escalation**: propagation items auto-escalate from info → warn (3d) → escalate (7d) → block retro (14d). Configurable via `qa_propagation_warn_days` / `qa_propagation_escalate_days` settings.
+
+---
+
 | Purpose | File |
 |---------|------|
 | Framework specs | `.agentic/spec/FEATURES.md` |
@@ -149,6 +169,9 @@ Full checklist: `FRAMEWORK_DEVELOPMENT.md` → Section 11
 | LLM test plan | `tests/LLM_TEST_PLAN.md` |
 | LLM test results | `tests/LLM_TEST_RESULTS.md` |
 | How to run LLM tests | `tests/RUN_LLM_TESTS.md` |
+| QA audit tool | `.agentic/lib/tools/spec-audit.sh` |
+| QA tracker | `.agentic/lib/tools/qa-tracker.sh` |
+| NFR catalog | `.agentic/lib/init/nfr-catalog.md` |
 | Upgrade notifications | `.agentic/tools/upgrade.sh` → FEATURE_REGISTRY |
 | Templates | `.agentic/init/*.template.md` |
 | Agent guidelines | `.agentic/agents/shared/` |

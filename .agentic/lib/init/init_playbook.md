@@ -651,6 +651,30 @@ Which do you want? (e.g., 'all', '1,3,5', or 'none for now')"
 
 **If user says "none for now"**: That's fine. NFRs can be added anytime via `ag nfr discover`.
 
+### Step 2d: Retrospective cadence (Formal profile only)
+
+If Formal profile, ask:
+
+```
+"How often should we do quality retrospectives?
+
+a) After every 10 features shipped (default)
+b) Every 2 weeks of active development
+c) Both time and feature triggers
+d) Manual only — I'll say when
+e) Disable retrospectives
+
+Retros review spec quality, test coverage, NFR health, and process improvements."
+```
+
+Write choice to STACK.md Settings:
+- `retrospective_enabled: yes|no`
+- `retrospective_trigger: time|features|both` (if enabled)
+- `retrospective_interval_days: 14` (if time-based)
+- `retrospective_interval_features: 10` (if feature-based)
+
+**Discovery profile**: Skip — retros are disabled by default. Can be enabled later via `ag set retrospective_enabled yes`.
+
 ### Step 2b: Ask about development style (multi-agent)
 
 Ask the user:

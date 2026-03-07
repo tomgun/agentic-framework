@@ -2136,7 +2136,7 @@ for nfr in NFR-0003 NFR-0004; do
 done
 
 _NFR_COV_OUT=$(ROOT_DIR="${FRAMEWORK_ROOT}" bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" nfr coverage 2>&1 || true)
-if echo "$_NFR_COV_OUT" | grep -q "referenced by"; then
+if echo "$_NFR_COV_OUT" | grep -q "feature"; then
   pass "F-0170: ag nfr coverage reports references"
 else
   fail "F-0170: ag nfr coverage not working"

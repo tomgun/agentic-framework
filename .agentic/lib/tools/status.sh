@@ -112,6 +112,22 @@ update_md() {
     esac
 
     _apply_to_md "$focus" "$progress" "$next_step" "$blocker"
+
+    # Append QA summary if tracker exists
+    local qa_tracker
+    qa_tracker="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/qa-tracker.sh"
+    if [[ -x "$qa_tracker" ]]; then
+        local qa_line
+        qa_line=$(bash "$qa_tracker" status 2>/dev/null | head -1 || true)
+        if [[ -n "$qa_line" && "$qa_line" != "No QA tracker"* ]]; then
+            # Replace or append QA line in STATUS.md
+            if grep -q "^- QA:" "${STATUS_FILE}" 2>/dev/null; then
+                sed -i.bak "s/^- QA:.*$/- QA: ${qa_line}/" "${STATUS_FILE}" && rm -f "${STATUS_FILE}.bak"
+            else
+                echo "- QA: ${qa_line}" >> "${STATUS_FILE}"
+            fi
+        fi
+    fi
 }
 
 # Infer current project state from history data

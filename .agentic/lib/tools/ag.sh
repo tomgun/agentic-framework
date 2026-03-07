@@ -2501,22 +2501,7 @@ cmd_nfr() {
             fi
             ;;
         coverage)
-            # Simple NFR coverage report
-            echo -e "${BOLD}NFR Coverage Report${NC}"
-            echo ""
-            if [ ! -f "$ROOT_DIR/.agentic/spec/NFR.md" ]; then
-                echo "No NFR.md found."
-                return
-            fi
-            bash "$SCRIPT_DIR/nfr.sh" list
-            echo ""
-            # Count features referencing each NFR
-            while IFS= read -r nfr_id; do
-                [ -z "$nfr_id" ] && continue
-                local ref_count
-                ref_count=$( { grep "$nfr_id" "$ROOT_DIR/.agentic/spec/FEATURES.md" 2>/dev/null || true; } | wc -l | tr -d ' ')
-                echo "  $nfr_id: referenced by ${ref_count} feature(s)"
-            done < <(grep -oE 'NFR-[0-9]{4}' "$ROOT_DIR/.agentic/spec/NFR.md" 2>/dev/null | sort -u)
+            bash "$SCRIPT_DIR/nfr-coverage.sh" "${2:-summary}"
             ;;
         *)
             if [[ "$subcmd" =~ ^NFR-[0-9]{4}$ ]]; then
