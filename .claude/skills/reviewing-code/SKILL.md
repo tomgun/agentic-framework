@@ -33,16 +33,35 @@ Or if reviewing a PR:
 gh pr diff <number>
 ```
 
+### Step 1b: Check for Associated Plan
+
+Extract feature IDs (F-XXXX patterns) from the PR title, branch name, or diff content. Search for matching plan files:
+
+```bash
+ls .agentic/journal/plans/*F-XXXX* 2>/dev/null
+```
+
+Also check for plans matching the PR date or description if feature IDs aren't obvious.
+
+**If a plan file is found**: Read it. Use it as the primary review input — the plan defines what _should_ have been built. You will compare plan vs implementation in Step 2.
+
+**If no plan file is found**: Skip silently — proceed with standard review.
+
 ### Step 2: Review Against Checklist
 
 Check each dimension:
 
-1. **Correctness**: Does the code do what it claims? Edge cases handled?
-2. **Security**: Input validation, injection risks, auth checks?
-3. **Performance**: Unnecessary loops, N+1 queries, missing caching?
-4. **Style**: Follows project conventions? Consistent naming?
-5. **Tests**: Are changed paths covered by tests?
-6. **Documentation**: Are comments and docs updated?
+1. **Plan Alignment** (if plan found): Does the implementation match the plan?
+   - **Missing deliverables**: Items the plan specified but the diff doesn't include
+   - **Unplanned additions**: Changes in the diff not mentioned in the plan
+   - **Deviations**: Implementation differs from what the plan specified (different approach, different files, different scope)
+   - Note: not every deviation is wrong — plans evolve. Flag them for human judgment.
+2. **Correctness**: Does the code do what it claims? Edge cases handled?
+3. **Security**: Input validation, injection risks, auth checks?
+4. **Performance**: Unnecessary loops, N+1 queries, missing caching?
+5. **Style**: Follows project conventions? Consistent naming?
+6. **Tests**: Are changed paths covered by tests?
+7. **Documentation**: Are comments and docs updated?
 
 ### Step 3: Report Findings
 
