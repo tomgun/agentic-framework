@@ -40,7 +40,7 @@ Purpose: capture cross-cutting constraints that apply across many features (perf
 
 ## NFR-0003: Small batch commits
 - Category: process
-- Statement: Commits must touch at most 10 files (Formal) or 15 files (Discovery) to keep changes reviewable
+- Statement: Commits must touch at most 10 files (Formal) or 15 files (Discovery) to keep changes within reasoning context — both agent and human must be able to hold the full changeset in mind
 - Applies to: all commits (global)
 - How to measure: `git diff --cached --name-only | wc -l` in pre-commit
 - Where enforced:
