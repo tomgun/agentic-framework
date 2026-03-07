@@ -339,7 +339,6 @@ USAGE
     *)
         echo "Unknown command: ${1:-}"
         echo "Run: bash qa-tracker.sh --help"
-        exit 1
         ;;
 esac
 

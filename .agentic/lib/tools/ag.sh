@@ -2469,11 +2469,7 @@ cmd_audit() {
             bash "$SCRIPT_DIR/spec-audit.sh" --since-last
             ;;
         *)
-            if [[ "$arg" =~ ^F-[0-9]{4}$ ]]; then
-                bash "$SCRIPT_DIR/spec-audit.sh" "$arg"
-            else
-                bash "$SCRIPT_DIR/spec-audit.sh" "$arg"
-            fi
+            bash "$SCRIPT_DIR/spec-audit.sh" "$arg"
             ;;
     esac
 }

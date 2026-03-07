@@ -136,8 +136,6 @@ if [[ "${SUBCMD}" == "status" ]]; then
   if [[ -x "$QA_TRACKER" ]]; then
     FEATURES_FILE="$(dirname "${NFR_FILE}")/FEATURES.md"
     if [[ -f "$FEATURES_FILE" ]]; then
-      AFFECTED=$( { grep -l "${NFR_ID}" "$FEATURES_FILE" 2>/dev/null && grep -oE 'F-[0-9]{4}' "$FEATURES_FILE" 2>/dev/null; } | sort -u | grep '^F-' | tr '\n' ',' | sed 's/,$//' || true)
-      # More precise: find features that reference this NFR
       AFFECTED=$(awk -v nfr="${NFR_ID}" '/^## F-[0-9]{4}:/{fid=$2; sub(/:$/,"",fid)} fid && $0 ~ nfr {print fid; fid=""}' "$FEATURES_FILE" | sort -u | tr '\n' ',' | sed 's/,$//')
       if [[ -n "$AFFECTED" ]]; then
         bash "$QA_TRACKER" add-propagation "${NFR_ID}" "status changed to ${VALUE}" "$AFFECTED" 2>/dev/null || true

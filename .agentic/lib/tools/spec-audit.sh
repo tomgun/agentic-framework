@@ -189,9 +189,8 @@ verify_feature() {
         done
     fi
 
-    # Return issue count
-    echo "${#issues[@]}" > /dev/null
-    return ${#issues[@]}
+    # Return 0 if clean, 1 if issues found
+    [[ ${#issues[@]} -eq 0 ]]
 }
 
 # Run verification on a list of features
@@ -395,7 +394,8 @@ _propagate_nfr() {
     echo ""
     if [ "$gap_count" -gt 0 ]; then
         echo -e "${YELLOW}$gap_count propagation gap(s) found.${NC}"
-        echo -e "${DIM}Consider adding these as propagation items: bash qa-tracker.sh add-propagation \"$nfr_id\" \"threshold change\" \"$(echo "$affected_features" | tr '\n' ',')\""
+        echo -e "${DIM}Consider adding these as propagation items:${NC}"
+        echo "  bash qa-tracker.sh add-propagation \"$nfr_id\" \"threshold change\" \"$(echo "$affected_features" | tr '\n' ',' | sed 's/,$//')\""
     else
         echo -e "${GREEN}All referencing features are in sync.${NC}"
     fi
