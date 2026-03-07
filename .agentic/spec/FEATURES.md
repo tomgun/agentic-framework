@@ -2890,3 +2890,25 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Acceptance**: See `spec/acceptance/F-0175.md`
 
+---
+
+## F-0176: Plan-Aware Code Review
+
+**Status**: shipped
+**Category**: Quality
+**Priority**: medium
+**Complexity**: low
+**Since**: v0.46.1
+
+**Description**: The reviewing-code skill gains plan awareness. When reviewing a PR or diff associated with feature IDs, the skill searches `.agentic/journal/plans/` for matching plan files, reads the plan, and adds a "Plan Alignment" dimension to the review. Flags missing deliverables, unplanned additions, and deviations. This is the most valuable review dimension for plan-driven development — generic code quality checks miss whether the implementation actually matches what was agreed.
+
+**Dependencies**: F-0143 (Skills-Primary Architecture)
+**NFRs**: none
+
+**Implementation**:
+- State: complete
+- Code: `.claude/skills/reviewing-code/SKILL.md`, `.agentic/lib/agents/claude/skills/reviewing-code/SKILL.md`, `.claude/skills/reviewing-code/references/review_checklist.md`
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0176.md`
+

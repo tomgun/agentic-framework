@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- QA Suite v0.46.0 — implemented, awaiting commit+PR (Updated: 2026-03-07 13:48 EET)
+- F-0176 plan-aware review — review fixes applied, rebased onto v0.46.0 (Updated: 2026-03-07 18:14 EET)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)

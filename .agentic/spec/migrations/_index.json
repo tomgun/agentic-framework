@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 10,
+  "last_migration": 11,
   "migrations": [
     {
       "id": 1,
@@ -61,6 +61,12 @@
       "file": "010_add_autopropagation_acs_to_f0172_and_f0173_implemented_but_not_originally_specified.md",
       "date": "2026-03-07",
       "description": "Add auto-propagation ACs to F-0172 and F-0173 (implemented but not originally specified)"
+    },
+    {
+      "id": 11,
+      "file": "011_add_f0176_planaware_code_review.md",
+      "date": "2026-03-07",
+      "description": "Add F-0176 plan-aware code review"
     }
   ]
 }
