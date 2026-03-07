@@ -204,6 +204,8 @@ except: print(0)
             last_ts=$(gdate -d "${last_retro_date}" +%s 2>/dev/null || echo "0")
             current_ts=$(gdate +%s)
             days_diff=$(( (current_ts - last_ts) / 86400 ))
+        else
+            echo "Warning: Cannot compute days since last retro (need python3 or gdate)"
         fi
 
         echo "Days since last retrospective: ${days_diff}"

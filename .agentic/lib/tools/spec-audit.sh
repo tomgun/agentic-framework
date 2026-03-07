@@ -501,7 +501,10 @@ data['verification']['last_full_audit'] = now
 data['verification']['last_audit_commit'] = commit
 data['summary']['features_total'] = $total
 data['summary']['features_verified'] = $verified
-data['summary']['pending_propagation_items'] = len(data.get('propagation', {}).get('pending', []))
+data['summary']['pending_propagation_items'] = sum(
+    sum(1 for i in p.get('items', []) if i.get('status') == 'open')
+    for p in data.get('propagation', {}).get('pending', [])
+)
 
 # Calculate days since audit
 data['summary']['days_since_full_audit'] = 0

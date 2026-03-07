@@ -258,8 +258,10 @@ check_orphaned_plans() {
 
 # --- Check: Retro Due ---
 check_retro_due() {
-    # Only run if retrospectives are enabled in STACK.md
-    if ! grep -qE '^\s*-?\s*retrospective_enabled:\s*yes' "$ROOT_DIR/STACK.md" 2>/dev/null; then
+    # Only run if retrospectives are enabled (via settings framework, respects profile defaults)
+    local retro_enabled
+    retro_enabled=$(get_setting "retrospective_enabled" "no")
+    if [ "$retro_enabled" != "yes" ]; then
         return 0
     fi
 

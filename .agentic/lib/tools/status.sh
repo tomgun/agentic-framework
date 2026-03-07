@@ -119,7 +119,7 @@ update_md() {
     if [[ -x "$qa_tracker" ]]; then
         local qa_line
         qa_line=$(bash "$qa_tracker" status 2>/dev/null | head -1 || true)
-        if [[ -n "$qa_line" && "$qa_line" != "No QA tracker"* ]]; then
+        if [[ -n "$qa_line" && "$qa_line" != *"not initialized"* && "$qa_line" != *"tracker error"* ]]; then
             # Replace or append QA line in STATUS.md
             if grep -q "^- QA:" "${STATUS_FILE}" 2>/dev/null; then
                 sed -i.bak "s/^- QA:.*$/- QA: ${qa_line}/" "${STATUS_FILE}" && rm -f "${STATUS_FILE}.bak"

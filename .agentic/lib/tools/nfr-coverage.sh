@@ -6,7 +6,7 @@
 #   bash nfr-coverage.sh --detail     # Detailed: show exact acceptance criteria per NFR
 #   bash nfr-coverage.sh NFR-XXXX     # Single NFR coverage
 #
-set -euo pipefail
+set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../paths.sh"
@@ -16,13 +16,12 @@ FEATURES_FILE="${PROJECT_ROOT}/.agentic/spec/FEATURES.md"
 ACCEPTANCE_DIR="${PROJECT_ROOT}/.agentic/spec/acceptance"
 
 # Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-BOLD='\033[1m'
-NC='\033[0m'
+if [ -t 1 ]; then
+    RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'; CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
+else
+    RED='' GREEN='' YELLOW='' BLUE='' CYAN='' BOLD='' NC=''
+fi
 
 if [[ ! -f "$NFR_FILE" ]]; then
     echo "No NFR.md found at $NFR_FILE"
@@ -127,3 +126,5 @@ echo -e "${BOLD}Summary${NC}: ${total_nfrs} NFRs, ${total_refs} total references
 if [[ $nfrs_with_zero -gt 0 ]]; then
     echo -e "  ${YELLOW}⚠${NC} ${nfrs_with_zero} NFR(s) with zero feature references"
 fi
+
+exit 0

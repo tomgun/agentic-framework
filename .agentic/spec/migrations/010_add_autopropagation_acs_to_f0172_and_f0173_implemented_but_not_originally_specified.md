@@ -38,6 +38,7 @@ and F-0173 but not captured in their acceptance criteria. Adding ACs to match im
 ## Implementation Notes
 
 ACs document behavior already implemented in `nfr.sh` (lines 139-148) and `migration.sh` (propagation hook).
+F-0172 AC-005/006 and F-0173 AC-013/014 moved from `## NFR Compliance` to `## Acceptance Criteria` section (structural fix — these are functional ACs, not NFR items).
 
 ## Rollback Plan
 
