@@ -265,6 +265,18 @@ MIGEOF
   # Update index.json
   update_index "$next_id" "$filename" "$date" "$title"
 
+  # Auto-create QA propagation items for affected features
+  local qa_tracker="$SCRIPT_DIR/qa-tracker.sh"
+  if [[ -x "$qa_tracker" ]]; then
+    # Extract feature IDs mentioned in the migration template
+    local affected_features
+    affected_features=$(grep -oE 'F-[0-9]{4}' "$filepath" 2>/dev/null | sort -u | tr '\n' ',' | sed 's/,$//')
+    if [[ -n "$affected_features" ]]; then
+      bash "$qa_tracker" add-propagation "migration:$padded_id" "$title" "$affected_features" 2>/dev/null || true
+      echo -e "${YELLOW}📋${NC} QA propagation items created for: $affected_features"
+    fi
+  fi
+
   echo -e "${GREEN}✓${NC} Created migration $padded_id: $title"
   echo "   File: $filepath"
   echo ""

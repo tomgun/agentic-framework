@@ -60,6 +60,16 @@ bash .agentic/lib/tools/todo.sh list
 
 Surface any items that should be addressed before moving on.
 
+### Step 6: Retrospective Check
+
+After shipping, check if a retrospective is due:
+
+```bash
+bash .agentic/lib/tools/retro_check.sh 2>/dev/null
+```
+
+If exit code is 1 (due): inform user "Retrospective is due! Run `ag retro` when ready."
+
 ## Examples
 
 **Example 1: Completing a feature**

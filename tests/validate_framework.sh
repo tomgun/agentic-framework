@@ -2030,6 +2030,359 @@ else
   fail "Settings: constraint validation should detect violations"
 fi
 
+# ============================================================
+# F-0169: NFR Discovery & Catalog
+# ============================================================
+echo "--- F-0169: NFR Discovery & Catalog ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/init/nfr-catalog.md" ]]; then
+  pass "F-0169: nfr-catalog.md exists"
+else
+  fail "F-0169: nfr-catalog.md missing"
+fi
+
+# Catalog has type-specific sections
+for section in "Universal" "Web App" "API" "Game" "Mobile" "CLI" "Desktop" "Framework Promises"; do
+  if grep -qi "$section" "${FRAMEWORK_ROOT}/.agentic/lib/init/nfr-catalog.md"; then
+    pass "F-0169: catalog has ${section} section"
+  else
+    fail "F-0169: catalog missing ${section} section"
+  fi
+done
+
+# Init playbook has Step 2c NFR Discovery
+if grep -q "Step 2c\|NFR Discovery" "${FRAMEWORK_ROOT}/.agentic/lib/init/init_playbook.md"; then
+  pass "F-0169: init_playbook.md has NFR Discovery step"
+else
+  fail "F-0169: init_playbook.md missing NFR Discovery step"
+fi
+
+# Memory seed has NFR proactive suggestion
+if grep -q "nfr.*discover\|NFR.*proactive\|ag nfr discover" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
+  pass "F-0169: memory-seed.md has NFR proactive suggestion"
+else
+  fail "F-0169: memory-seed.md missing NFR proactive suggestion"
+fi
+
+# ag nfr discover command works
+_NFR_DISCOVER_OUT=$(ROOT_DIR="${FRAMEWORK_ROOT}" bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" nfr discover 2>&1 || true)
+if echo "$_NFR_DISCOVER_OUT" | grep -qi "catalog\|NFR\|suggestion"; then
+  pass "F-0169: ag nfr discover produces output"
+else
+  fail "F-0169: ag nfr discover produces no output"
+fi
+
+# ag nfr list command works
+_NFR_LIST_OUT=$(ROOT_DIR="${FRAMEWORK_ROOT}" bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" nfr list 2>&1 || true)
+if echo "$_NFR_LIST_OUT" | grep -q "NFR-0001"; then
+  pass "F-0169: ag nfr list shows NFR-0001"
+else
+  fail "F-0169: ag nfr list missing NFR-0001"
+fi
+
+# ============================================================
+# F-0170: NFR Enforcement in Spec Writing
+# ============================================================
+echo "--- F-0170: NFR Enforcement in Spec Writing ---"
+
+if grep -q "Active NFR\|active.*matching\|evaluate.*each.*NFR\|EACH.*NFR" "${FRAMEWORK_ROOT}/.agentic/lib/workflows/spec_writing.md"; then
+  pass "F-0170: spec_writing workflow has active NFR matching"
+else
+  fail "F-0170: spec_writing workflow missing active NFR matching"
+fi
+
+if grep -q "NFR.*gate\|NFR.*Gate\|Read.*NFR.md\|Evaluate.*each.*NFR" "${FRAMEWORK_ROOT}/.agentic/lib/checklists/spec_writing.md"; then
+  pass "F-0170: spec_writing checklist has NFR gate"
+else
+  fail "F-0170: spec_writing checklist missing NFR gate"
+fi
+
+if grep -q "promot\|3.*feature" "${FRAMEWORK_ROOT}/.agentic/lib/workflows/spec_writing.md"; then
+  pass "F-0170: spec_writing has promotion detection"
+else
+  fail "F-0170: spec_writing missing promotion detection"
+fi
+
+if grep -q "NFR.*[Cc]ompliance\|NFR.*none" "${FRAMEWORK_ROOT}/.agentic/lib/checklists/feature_start.md"; then
+  pass "F-0170: feature_start checks NFR compliance"
+else
+  fail "F-0170: feature_start missing NFR compliance check"
+fi
+
+if grep -q "NFR.*verif\|@nfr\|NFR.*criterion\|NFR.*compliance" "${FRAMEWORK_ROOT}/.agentic/lib/checklists/feature_complete.md"; then
+  pass "F-0170: feature_complete verifies NFR compliance"
+else
+  fail "F-0170: feature_complete missing NFR verification"
+fi
+
+if grep -q "NFR-0003" "${FRAMEWORK_ROOT}/.agentic/spec/NFR.md"; then
+  pass "F-0170: NFR-0003 (small batch commits) exists"
+else
+  fail "F-0170: NFR-0003 missing from NFR.md"
+fi
+
+if grep -q "NFR-0004" "${FRAMEWORK_ROOT}/.agentic/spec/NFR.md"; then
+  pass "F-0170: NFR-0004 (spec-first development) exists"
+else
+  fail "F-0170: NFR-0004 missing from NFR.md"
+fi
+
+for nfr in NFR-0003 NFR-0004; do
+  if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/${nfr}.md" ]]; then
+    pass "F-0170: ${nfr} acceptance criteria exists"
+  else
+    fail "F-0170: ${nfr} acceptance criteria missing"
+  fi
+done
+
+_NFR_COV_OUT=$(ROOT_DIR="${FRAMEWORK_ROOT}" bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" nfr coverage 2>&1 || true)
+if echo "$_NFR_COV_OUT" | grep -q "feature"; then
+  pass "F-0170: ag nfr coverage reports references"
+else
+  fail "F-0170: ag nfr coverage not working"
+fi
+
+# ============================================================
+# F-0171: Spec Verification Tool
+# ============================================================
+echo "--- F-0171: Spec Verification Tool ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/spec-audit.sh" ]]; then
+  pass "F-0171: spec-audit.sh exists"
+  if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/spec-audit.sh" ]]; then
+    pass "F-0171: spec-audit.sh is executable"
+  else
+    fail "F-0171: spec-audit.sh not executable"
+  fi
+else
+  fail "F-0171: spec-audit.sh missing"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/test-review-prompt.md" ]]; then
+  pass "F-0171: test-review-prompt.md exists"
+else
+  fail "F-0171: test-review-prompt.md missing"
+fi
+
+if grep -q "broken implementation\|pass with a broken" "${FRAMEWORK_ROOT}/.agentic/lib/tools/test-review-prompt.md"; then
+  pass "F-0171: test-review-prompt asks 'could this pass with broken implementation?'"
+else
+  fail "F-0171: test-review-prompt missing key question"
+fi
+
+if grep -q "cmd_audit\|audit)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "F-0171: ag.sh has audit command"
+else
+  fail "F-0171: ag.sh missing audit command"
+fi
+
+_AUDIT_OUT=$(ROOT_DIR="${FRAMEWORK_ROOT}" bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" audit --status 2>&1 || true)
+if echo "$_AUDIT_OUT" | grep -qi "audit\|tracker\|verif"; then
+  pass "F-0171: ag audit --status produces output"
+else
+  fail "F-0171: ag audit --status not working"
+fi
+
+# ============================================================
+# F-0172: Change Propagation Pipeline
+# ============================================================
+echo "--- F-0172: Change Propagation Pipeline ---"
+
+if grep -q "\-\-propagate" "${FRAMEWORK_ROOT}/.agentic/lib/tools/spec-audit.sh"; then
+  pass "F-0172: spec-audit.sh has --propagate mode"
+else
+  fail "F-0172: spec-audit.sh missing --propagate mode"
+fi
+
+if grep -q "NFR.*reference\|grep.*NFR\|nfr_id\|trace.*downstream\|affected.*feature" "${FRAMEWORK_ROOT}/.agentic/lib/tools/spec-audit.sh"; then
+  pass "F-0172: spec-audit.sh traces NFR references downstream"
+else
+  fail "F-0172: spec-audit.sh missing NFR downstream tracing"
+fi
+
+if grep -q "migration\|Migration" "${FRAMEWORK_ROOT}/.agentic/lib/tools/spec-audit.sh"; then
+  pass "F-0172: spec-audit.sh handles migration propagation"
+else
+  fail "F-0172: spec-audit.sh missing migration propagation"
+fi
+
+# ============================================================
+# F-0173: QA Tracker State Machine
+# ============================================================
+echo "--- F-0173: QA Tracker State Machine ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/qa-tracker.sh" ]]; then
+  pass "F-0173: qa-tracker.sh exists"
+  if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/qa-tracker.sh" ]]; then
+    pass "F-0173: qa-tracker.sh is executable"
+  else
+    fail "F-0173: qa-tracker.sh not executable"
+  fi
+else
+  fail "F-0173: qa-tracker.sh missing"
+fi
+
+for cmd in "status" "pending" "add-propagation" "resolve" "defer" "check-escalation"; do
+  if grep -q "$cmd" "${FRAMEWORK_ROOT}/.agentic/lib/tools/qa-tracker.sh"; then
+    pass "F-0173: qa-tracker.sh has ${cmd} command"
+  else
+    fail "F-0173: qa-tracker.sh missing ${cmd} command"
+  fi
+done
+
+if grep -q "qa-tracker" "${FRAMEWORK_ROOT}/.gitignore"; then
+  pass "F-0173: .qa-tracker.json is gitignored"
+else
+  fail "F-0173: .qa-tracker.json not gitignored"
+fi
+
+if grep -q "qa-tracker\|QA.*tracker\|QA.*status" "${FRAMEWORK_ROOT}/.agentic/lib/checklists/session_start.md"; then
+  pass "F-0173: session_start.md shows QA tracker status"
+else
+  fail "F-0173: session_start.md missing QA tracker status"
+fi
+
+if grep -q "qa-tracker\|propagation" "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commit-check.sh"; then
+  pass "F-0173: pre-commit-check.sh has propagation warning"
+else
+  fail "F-0173: pre-commit-check.sh missing propagation warning"
+fi
+
+if grep -q "qa_health\|check_qa_health\|qa-tracker" "${FRAMEWORK_ROOT}/.agentic/lib/tools/periodic-checks.sh"; then
+  pass "F-0173: periodic-checks.sh has QA health check"
+else
+  fail "F-0173: periodic-checks.sh missing QA health check"
+fi
+
+if grep -q "qa_propagation_warn_days\|qa_propagation_escalate_days" "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf"; then
+  pass "F-0173: profiles.conf has escalation thresholds"
+else
+  fail "F-0173: profiles.conf missing escalation thresholds"
+fi
+
+# ============================================================
+# F-0174: Retrospective Enforcement
+# ============================================================
+echo "--- F-0174: Retrospective Enforcement ---"
+
+if grep -q "get_setting\|settings\.sh" "${FRAMEWORK_ROOT}/.agentic/lib/tools/retro_check.sh"; then
+  pass "F-0174: retro_check.sh uses settings framework"
+else
+  fail "F-0174: retro_check.sh missing settings framework"
+fi
+
+if grep -q "\-\-status" "${FRAMEWORK_ROOT}/.agentic/lib/tools/retro_check.sh"; then
+  pass "F-0174: retro_check.sh has --status mode"
+else
+  fail "F-0174: retro_check.sh missing --status mode"
+fi
+
+if grep -q "retrospective_enabled" "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf"; then
+  pass "F-0174: profiles.conf has retrospective_enabled"
+else
+  fail "F-0174: profiles.conf missing retrospective_enabled"
+fi
+
+for setting in "retrospective_enabled" "qa_propagation_warn_days" "qa_audit_freshness_days"; do
+  if grep -q "$setting" "${FRAMEWORK_ROOT}/.agentic/lib/init/STACK.template.md"; then
+    pass "F-0174: STACK template has ${setting}"
+  else
+    fail "F-0174: STACK template missing ${setting}"
+  fi
+done
+
+if grep -q "Spec.*Verification\|spec-audit\|spec.audit" "${FRAMEWORK_ROOT}/.agentic/lib/checklists/retrospective.md"; then
+  pass "F-0174: retrospective checklist has spec audit section"
+else
+  fail "F-0174: retrospective checklist missing spec audit section"
+fi
+
+if grep -q "NFR.*Health\|NFR.*Review\|nfr.*review" "${FRAMEWORK_ROOT}/.agentic/lib/checklists/retrospective.md"; then
+  pass "F-0174: retrospective checklist has NFR review section"
+else
+  fail "F-0174: retrospective checklist missing NFR review section"
+fi
+
+if grep -q "3\.5\|Spec.*Verification.*Audit" "${FRAMEWORK_ROOT}/.agentic/lib/workflows/retrospective.md"; then
+  pass "F-0174: retrospective workflow has Section 3.5"
+else
+  fail "F-0174: retrospective workflow missing Section 3.5"
+fi
+
+if grep -q "3\.6\|NFR.*Health.*Review" "${FRAMEWORK_ROOT}/.agentic/lib/workflows/retrospective.md"; then
+  pass "F-0174: retrospective workflow has Section 3.6"
+else
+  fail "F-0174: retrospective workflow missing Section 3.6"
+fi
+
+if grep -q "retro.*check\|retro_check\|Retrospective.*Check\|Step 6" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/completing-work/SKILL.md"; then
+  pass "F-0174: completing-work SKILL.md has retro check"
+else
+  fail "F-0174: completing-work SKILL.md missing retro check"
+fi
+
+if grep -q "retro.*check\|retro_check\|Retrospective.*Check\|Step 6" "${FRAMEWORK_ROOT}/.claude/skills/completing-work/SKILL.md"; then
+  pass "F-0174: root completing-work SKILL.md has retro check"
+else
+  fail "F-0174: root completing-work SKILL.md missing retro check"
+fi
+
+if grep -q "retro.*action\|check_retro_action" "${FRAMEWORK_ROOT}/.agentic/lib/tools/periodic-checks.sh"; then
+  pass "F-0174: periodic-checks.sh has retro action items check"
+else
+  fail "F-0174: periodic-checks.sh missing retro action items check"
+fi
+
+# ============================================================
+# F-0175: QA Suite Glue & Documentation
+# ============================================================
+echo "--- F-0175: QA Suite Glue & Documentation ---"
+
+for fid in F-0169 F-0170 F-0171 F-0172 F-0173 F-0174 F-0175; do
+  if grep -q "$fid" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md"; then
+    pass "F-0175: ${fid} registered in FEATURES.md"
+  else
+    fail "F-0175: ${fid} missing from FEATURES.md"
+  fi
+done
+
+for fid in F-0169 F-0170 F-0171 F-0172 F-0173 F-0174 F-0175; do
+  if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/${fid}.md" ]]; then
+    pass "F-0175: ${fid} acceptance criteria exists"
+  else
+    fail "F-0175: ${fid} acceptance criteria missing"
+  fi
+done
+
+if ls "${FRAMEWORK_ROOT}/.agentic/spec/migrations/009_"* 1>/dev/null 2>&1; then
+  pass "F-0175: migration 009 exists"
+else
+  fail "F-0175: migration 009 missing"
+fi
+
+if grep -q "who tests the tests\|Who tests the tests" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
+  pass "F-0175: memory-seed has 'who tests the tests?' trigger"
+else
+  fail "F-0175: memory-seed missing 'who tests the tests?' trigger"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/VERSION" ]]; then
+  CURRENT_VERSION=$(cat "${FRAMEWORK_ROOT}/VERSION" | tr -d '[:space:]')
+  if [[ "$CURRENT_VERSION" == "0.46."* ]] || [[ "$CURRENT_VERSION" > "0.46.0" ]]; then
+    pass "F-0175: VERSION is ${CURRENT_VERSION} (>= 0.46.0)"
+  else
+    fail "F-0175: VERSION is ${CURRENT_VERSION} (expected >= 0.46.0)"
+  fi
+else
+  fail "F-0175: VERSION file missing"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/journal/plans/2026-03-07-F-0169-qa-suite-plan.md" ]]; then
+  pass "F-0175: QA suite plan saved to journal/plans/"
+else
+  fail "F-0175: QA suite plan not saved to journal/plans/"
+fi
+
 # Test missing STACK.md uses profile preset (inferred discovery → feature_tracking=no)
 (
   source "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" 2>/dev/null || exit 1

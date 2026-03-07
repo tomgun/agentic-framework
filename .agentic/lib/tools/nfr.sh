@@ -129,6 +129,20 @@ if [[ "${SUBCMD}" == "status" ]]; then
 
   mv "${TEMP_FILE}" "${NFR_FILE}"
   echo "Updated ${NFR_ID} status -> ${VALUE} in .agentic/spec/NFR.md"
+
+  # Auto-create QA propagation items for features referencing this NFR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  QA_TRACKER="$SCRIPT_DIR/qa-tracker.sh"
+  if [[ -x "$QA_TRACKER" ]]; then
+    FEATURES_FILE="$(dirname "${NFR_FILE}")/FEATURES.md"
+    if [[ -f "$FEATURES_FILE" ]]; then
+      AFFECTED=$(awk -v nfr="${NFR_ID}" '/^## F-[0-9]{4}:/{fid=$2; sub(/:$/,"",fid)} fid && $0 ~ nfr {print fid; fid=""}' "$FEATURES_FILE" | sort -u | tr '\n' ',' | sed 's/,$//')
+      if [[ -n "$AFFECTED" ]]; then
+        bash "$QA_TRACKER" add-propagation "${NFR_ID}" "status changed to ${VALUE}" "$AFFECTED" 2>/dev/null || true
+        echo "📋 QA propagation items created for: $AFFECTED"
+      fi
+    fi
+  fi
   exit 0
 fi
 

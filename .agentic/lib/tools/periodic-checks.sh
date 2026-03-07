@@ -258,8 +258,10 @@ check_orphaned_plans() {
 
 # --- Check: Retro Due ---
 check_retro_due() {
-    # Only run if retrospectives are enabled in STACK.md
-    if ! grep -qE '^\s*-?\s*retrospective_enabled:\s*yes' "$ROOT_DIR/STACK.md" 2>/dev/null; then
+    # Only run if retrospectives are enabled (via settings framework, respects profile defaults)
+    local retro_enabled
+    retro_enabled=$(get_setting "retrospective_enabled" "no")
+    if [ "$retro_enabled" != "yes" ]; then
         return 0
     fi
 
@@ -306,6 +308,66 @@ check_agent_freshness() {
     fi
 }
 
+# --- Check: QA Health (propagation items, audit freshness) ---
+check_qa_health() {
+    local tracker_file="$ROOT_DIR/.agentic/session/.qa-tracker.json"
+    if [ ! -f "$tracker_file" ]; then
+        return 0
+    fi
+
+    local escalation_output
+    escalation_output=$(bash "$SCRIPT_DIR/qa-tracker.sh" check-escalation 2>/dev/null || echo "")
+
+    if [ -n "$escalation_output" ]; then
+        local escalation_count
+        escalation_count=$(echo "$escalation_output" | wc -l | tr -d ' ')
+        record_issue "$escalation_count QA escalation(s)"
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "QA:         ${YELLOW}${escalation_count} escalation(s)${NC}"
+            echo "$escalation_output" | while IFS= read -r line; do
+                echo -e "            ${DIM}$line${NC}"
+            done
+        fi
+    elif [ "$MODE" != "quiet" ] && [ "$MODE" != "increment" ]; then
+        local qa_status
+        qa_status=$(bash "$SCRIPT_DIR/qa-tracker.sh" status 2>/dev/null || echo "")
+        if [ -n "$qa_status" ]; then
+            echo -e "QA:         ${GREEN}$qa_status${NC}"
+        fi
+    fi
+}
+
+# --- Check: Retro Action Items ---
+check_retro_action_items() {
+    local total
+    total=$(grep "^retro.action_items_total=" "$STATE_FILE" 2>/dev/null | tail -1 | sed 's/.*=//' || echo "0")
+    local completed
+    completed=$(grep "^retro.action_items_completed=" "$STATE_FILE" 2>/dev/null | tail -1 | sed 's/.*=//' || echo "0")
+
+    if [ "$total" -gt 0 ] && [ "$completed" -lt "$total" ]; then
+        local remaining=$((total - completed))
+        # Check age of last retro
+        local last_date
+        last_date=$(grep "^retro.last_date=" "$STATE_FILE" 2>/dev/null | tail -1 | sed 's/.*=//' || echo "")
+        if [ -n "$last_date" ] && command -v python3 &>/dev/null; then
+            local days_old
+            days_old=$(python3 -c "
+from datetime import datetime
+try:
+    d = datetime.strptime('$last_date', '%Y-%m-%d')
+    print((datetime.now() - d).days)
+except: print(0)
+" 2>/dev/null || echo "0")
+            if [ "$days_old" -ge 7 ]; then
+                record_issue "$remaining retro action item(s) unresolved ($days_old days)"
+                if [ "$MODE" != "quiet" ]; then
+                    echo -e "Retro:      ${YELLOW}$remaining/$total action items unresolved ($days_old days old)${NC}"
+                fi
+            fi
+        fi
+    fi
+}
+
 # ============================================================================
 # Main
 # ============================================================================
@@ -345,6 +407,12 @@ main() {
         check_agent_freshness
         mark_check_run "agent_freshness"
     fi
+
+    # QA health: always check if tracker exists (no frequency gating — it's cheap)
+    check_qa_health
+
+    # Retro action items: check every session
+    check_retro_action_items
 
     # Output summary
     if [ "$MODE" = "quiet" ] || [ "$MODE" = "check" ]; then

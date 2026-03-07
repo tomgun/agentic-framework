@@ -117,6 +117,33 @@ bash .agentic/lib/tools/drift.sh --check  # Spec/code drift
 - Libraries to upgrade or replace
 - Patterns to adopt
 
+### 3.5. Spec Verification Audit (5 min) — Formal only
+
+**"Who tests the tests?"** — verify that tests actually prove what ACs claim.
+
+```bash
+bash .agentic/lib/tools/spec-audit.sh --since-last --report
+```
+
+**Review findings:**
+- Test quality concerns (empty bodies, zero assertions, wrong assertions)
+- Coverage gaps (ACs without test references)
+- NFR compliance gaps (features linking NFRs without compliance sections)
+
+**If critical issues found**: create action items to address before next feature.
+
+### 3.6. NFR Health Review (5 min)
+
+```bash
+bash .agentic/lib/tools/ag.sh nfr coverage
+```
+
+**Check:**
+- Feature-scoped constraints ready for promotion to project NFR?
+- Existing NFR thresholds still appropriate?
+- Bugs/incidents revealing quality gaps that should become NFRs?
+- `ag nfr discover` — any new catalog suggestions relevant now?
+
 ### 5. Development Workflow Review (5 min)
 
 **Questions to ask:**

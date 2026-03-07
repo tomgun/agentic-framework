@@ -469,6 +469,14 @@ refactor(docs): eliminate documentation duplication
 8. Update CONTRIBUTIONS.md
 9. Generate manifest: `bash .agentic/tools/manifest.sh F-####`
 
+**Running QA audits on framework changes**:
+1. `ag audit` — verify spec→AC→test chain for recently changed features
+2. `ag audit --full` — full audit report to `docs/retrospectives/`
+3. `ag audit --propagate NFR-XXXX` — after changing an NFR, trace downstream impact
+4. `ag nfr coverage` — check which features reference each NFR
+5. QA tracker (`qa-tracker.sh`) auto-creates propagation items when migrations or NFR changes occur
+6. Propagation items escalate over time: info → warn (3d) → escalate (7d)
+
 **For spec changes (adding/modifying features in FEATURES.md)**:
 - Use `bash .agentic/tools/migration.sh create "description"` to create a migration
 - Migrations provide auditable history of spec evolution

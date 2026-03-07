@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.45.0
+**Version**: 0.46.0
 
 ---
 
@@ -15,7 +15,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 | Category | Count | Shipped | In Progress | Planned |
 |----------|-------|---------|-------------|---------|
 | **Core** | 14 | 14 | 0 | 0 |
-| **Quality** | 15 | 12 | 2 | 1 |
+| **Quality** | 22 | 19 | 2 | 1 |
 | **Session** | 12 | 11 | 0 | 0 |
 | **Multi-Agent** | 10 | 8 | 1 | 1 |
 | **Tooling** | 11 | 11 | 0 | 0 |
@@ -2735,4 +2735,158 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 - Tests: `tests/test_auto_visual.py`
 
 **Acceptance**: See `spec/acceptance/F-0168.md`
+
+---
+
+## F-0169: NFR Discovery & Catalog
+
+**Status**: shipped
+**Category**: Quality
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.46.0
+
+**Description**: NFRs become a living, first-class concern. NFR catalog with suggestions by project type (web, API, game, mobile, audio, CLI, desktop). Init playbook Step 2c guides developers through NFR selection. Memory-seed proactive suggestion when NFR.md is template-only after 3+ shipped features.
+
+**Dependencies**: None
+**NFRs**: none
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/lib/init/nfr-catalog.md`, `.agentic/lib/init/init_playbook.md` (Step 2c), `.agentic/lib/init/memory-seed.md`
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0169.md`
+
+---
+
+## F-0170: NFR Enforcement in Spec Writing
+
+**Status**: shipped
+**Category**: Quality
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.46.0
+
+**Description**: Spec-writing actively enforces NFR consideration. Active matching evaluates EACH NFR for applicability. Promotion detection identifies recurring constraints that should be project-wide NFRs. Feature start gate checks NFR Compliance resolution. Framework dogfooding with NFR-0003 (small batch) and NFR-0004 (spec-first).
+
+**Dependencies**: F-0169
+**NFRs**: NFR-0004
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/lib/workflows/spec_writing.md`, `.agentic/lib/checklists/spec_writing.md`, `.agentic/lib/checklists/feature_start.md`, `.agentic/lib/checklists/feature_complete.md`, `.agentic/spec/NFR.md` (NFR-0003, NFR-0004)
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0170.md`
+
+---
+
+## F-0171: Spec Verification Tool
+
+**Status**: shipped
+**Category**: Quality
+**Priority**: high
+**Complexity**: high
+**Since**: v0.46.0
+
+**Description**: Solves "Who tests the tests?" — verification that tests actually prove what ACs claim. Multi-layer: structural (file exists), coverage (ACs defined), test heuristics (empty bodies, zero assertions), LLM review (intent match prompt template). `spec-audit.sh` orchestrates all layers. `ag audit` command entry point.
+
+**Dependencies**: None
+**NFRs**: none
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/lib/tools/spec-audit.sh`, `.agentic/lib/tools/test-review-prompt.md`, `.agentic/lib/tools/ag.sh` (audit command)
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0171.md`
+
+---
+
+## F-0172: Change Propagation Pipeline
+
+**Status**: shipped
+**Category**: Quality
+**Priority**: high
+**Complexity**: high
+**Since**: v0.46.0
+
+**Description**: When specs/NFRs change, trace the ripple effect downstream and generate remediation plans. `spec-audit.sh --propagate` traces NFR and migration changes to affected features. Generates actionable gap reports with severity levels.
+
+**Dependencies**: F-0171
+**NFRs**: none
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/lib/tools/spec-audit.sh` (propagation mode)
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0172.md`
+
+---
+
+## F-0173: QA Tracker State Machine
+
+**Status**: shipped
+**Category**: Quality
+**Priority**: high
+**Complexity**: high
+**Since**: v0.46.0
+
+**Description**: Persistent tracking with enforcement. Every verification and propagation event tracked in `.qa-tracker.json`. Escalation model (warn at 3 days, escalate at 7, block retro at 14). Surfaces at session start, pre-commit (advisory), `ag status`, and retrospective. Configurable via `qa_propagation_warn_days`, `qa_propagation_escalate_days`, `qa_audit_freshness_days`.
+
+**Dependencies**: F-0171, F-0172
+**NFRs**: none
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/lib/tools/qa-tracker.sh`, `.agentic/lib/tools/periodic-checks.sh`, `.agentic/lib/hooks/pre-commit-check.sh`, `.agentic/lib/checklists/session_start.md`, `.agentic/lib/presets/profiles.conf`
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0173.md`
+
+---
+
+## F-0174: Retrospective Enforcement
+
+**Status**: shipped
+**Category**: Quality
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.46.0
+
+**Description**: Retrospectives active by default for Formal profile. `retro_check.sh` refactored to use settings framework. Proactive triggers at session start and feature completion. Spec audit + NFR review integrated into retro checklist and workflow. Retro tracking via sync-state.conf.
+
+**Dependencies**: F-0171
+**NFRs**: none
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/lib/tools/retro_check.sh`, `.agentic/lib/checklists/retrospective.md`, `.agentic/lib/workflows/retrospective.md`, `.agentic/lib/agents/claude/skills/completing-work/SKILL.md`, `.agentic/lib/presets/profiles.conf`, `.agentic/lib/init/STACK.template.md`
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0174.md`
+
+---
+
+## F-0175: QA Suite Glue & Documentation
+
+**Status**: shipped
+**Category**: Quality
+**Priority**: low
+**Complexity**: low
+**Since**: v0.46.0
+
+**Description**: Connect all QA suite features, update docs, ensure discoverability. Feature registration, memory-seed triggers, version bump, migration.
+
+**Dependencies**: F-0169, F-0170, F-0171, F-0172, F-0173, F-0174
+**NFRs**: none
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/spec/FEATURES.md`, `.agentic/lib/init/memory-seed.md`, `VERSION`
+- Tests: `tests/validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0175.md`
 

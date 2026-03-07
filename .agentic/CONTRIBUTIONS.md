@@ -1,12 +1,20 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.45.1)
+**Period**: Initial Development (v0.1.0 → v0.46.0)
 **Date**: 2026-03-07
 
 ---
 
 ## Recent Contributions
+
+### QA Suite — "Who Tests the Tests?" (v0.46.0)
+- Identified the core quality problem: LLMs produce tests that look correct and pass CI, but assert nothing meaningful — a test checking `status == 200` "covers" an AC about pagination
+- Framed the three distinct quality problems: creation (spec chain), verification (do tests actually prove what ACs claim?), and propagation (does the chain stay intact after changes?)
+- Designed the NFR lifecycle as a living concern with promotion detection (recurring constraints in 3+ features → suggest project-wide NFR)
+- Designed the LLM test review layer — the breakthrough insight that only an LLM can catch "looks like a test but proves nothing"
+- Designed the escalation model for propagation items (info → warn → escalate → block) with configurable thresholds
+- Insisted on retrospective enforcement as the recurring trigger that makes quality audit systematic rather than ad-hoc
 
 ### Spec Protection Surfacing (v0.45.1)
 - Caught that spec protection was invisible in agent entry points — agents only discovered it when pre-commit Check 14 blocked them

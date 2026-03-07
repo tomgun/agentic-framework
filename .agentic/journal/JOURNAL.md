@@ -1455,3 +1455,55 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-07 13:48 - QA Suite (F-0169–F-0175)
+
+**Why**: LLMs produce tests that look correct but prove nothing — framework needs formal quality assurance for the spec→AC→test chain
+
+**What changed**:
+- Implemented all 5 phases: NFR catalog+discovery, NFR enforcement in spec-writing, spec-audit.sh verification tool, change propagation pipeline, qa-tracker state machine, retrospective enforcement, and glue/docs. 260 tests pass, 0 failures. All new ag commands work: audit, nfr list/discover/coverage.
+
+**Next steps**:
+- Show changeset for human review, commit to feature branch, create PR
+
+**Blockers**: None
+
+
+### Session: 2026-03-07 17:38 - QA Suite Tests
+
+**Why**: Tests were missing from initial QA suite commit
+
+**What changed**:
+- Added 76 validation tests for F-0169–F-0175 (336 total, 0 failures). Added 4 LLM behavioral tests. Saved plan to journal/plans/. Fixed NFR-0003 statement: context management.
+
+**Next steps**:
+- Push and update PR
+
+**Blockers**: None
+
+
+### Session: 2026-03-07 17:49 - NFR-0003 Reframe
+
+**Why**: Pre-commit file limit is too late; the constraint belongs at decomposition time
+
+**What changed**:
+- Reframed from 'small batch commits' to 'small batch work' — enforcement at planning time, not pre-commit
+
+**Next steps**:
+- Push and update PR
+
+**Blockers**: None
+
+
+### Session: 2026-03-07 18:06 - QA Suite Gap Closure
+
+**Why**: Plan specified these integrations but they were missed in initial implementation
+
+**What changed**:
+- Closed all 6 gaps: nfr-coverage.sh standalone tool, migration.sh auto-propagation, nfr.sh auto-propagation, status.sh QA summary, init_playbook retro cadence question, FRAMEWORK docs updated
+
+**Next steps**:
+- Push to PR
+
+**Blockers**: None
+
