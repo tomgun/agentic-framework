@@ -197,11 +197,18 @@ class CrunchRunner:
         return result
 
     def _read_planned_features(self) -> list[str]:
-        """Read features that need work from FEATURES.md.
+        """Read features that need work.
 
-        Uses the state machine to find all features with available
-        forward transitions (any state before 'shipped' or 'deprecated').
+        Priority order:
+        1. BACKLOG.json (if it exists and has feature items)
+        2. State machine (features with available forward transitions)
+        3. FEATURES.md fallback (planned/implementing features)
         """
+        # Try backlog first
+        backlog_features = self._read_backlog_features()
+        if backlog_features:
+            return backlog_features
+
         try:
             from auto.state_machine import FeatureStateMachine
             sm = FeatureStateMachine(project_root=self.project_root)
@@ -210,6 +217,23 @@ class CrunchRunner:
         except Exception:
             # Fallback: read FEATURES.md directly
             return self._read_planned_features_fallback()
+
+    def _read_backlog_features(self) -> list[str]:
+        """Read feature items from BACKLOG.json in queue order."""
+        backlog_file = self.paths.backlog_file
+        if not backlog_file.exists():
+            return []
+        try:
+            items = json.loads(backlog_file.read_text())
+            if not isinstance(items, list):
+                return []
+            return [
+                item["id"]
+                for item in items
+                if item.get("type") == "feature" and item.get("id")
+            ]
+        except (json.JSONDecodeError, OSError, KeyError):
+            return []
 
     def _read_planned_features_fallback(self) -> list[str]:
         """Fallback: read planned/implementing features from FEATURES.md."""

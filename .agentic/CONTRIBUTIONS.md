@@ -1,12 +1,20 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.47.1)
+**Period**: Initial Development (v0.1.0 → v0.49.0)
 **Date**: 2026-03-08
 
 ---
 
 ## Recent Contributions
+
+### Backlog / Structural Work Assignment (v0.49.0, F-0190)
+
+**User insight**: Tomas designed the backlog concept to solve cross-session, cross-machine work continuity. Key contributions:
+- **Backlog IS the focus**: No separate "focus lock" — position 0 = current work. One concept, one file, one source of truth.
+- **Git-tracked queue**: The requirement "if local git is up to date, agents should know what to do next" drove the decision for BACKLOG.json as a git-tracked file rather than session state.
+- **Auto-upsert on implement**: Rather than requiring manual backlog management, `ag implement` auto-adds the feature at position 0 if it's not already in the backlog. The backlog forms organically from work patterns.
+- **Advisory vs hard block**: Dependencies use advisory warnings (human may know better), while wrong-item implement is a hard block. The distinction matches the framework's "structural, not bureaucratic" principle.
 
 ### Docker Sandbox with Security Interview (v0.47.1)
 

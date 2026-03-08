@@ -11,6 +11,10 @@
 # Good: "Projects can now declare multiple test tiers in STACK.md"
 # Bad:  "Implemented multi-tier test execution in verify.py, 40 new tests"
 #
+# "Next steps": reference the backlog, don't duplicate the queue.
+# Good: "See backlog (ag backlog list)" or "Next per backlog: F-0201"
+# Bad:  Manually listing 5 features that are already in BACKLOG.json
+#
 # Token efficiency: APPENDS to file, never reads whole file
 #
 set -euo pipefail

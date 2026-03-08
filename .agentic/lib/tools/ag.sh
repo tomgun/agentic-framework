@@ -132,6 +132,7 @@ COMMANDS:
     test llm [options]  Run LLM behavioral tests
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
+    backlog <sub>       Ordered work queue (add|list|done|move|remove|clear)
     auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
@@ -144,6 +145,8 @@ COMMANDS:
 EXAMPLES:
     ag start                    # Begin a new session
     ag init                     # Initialize project (if not done)
+    ag backlog add --task "X"   # Add task to work queue
+    ag backlog list             # Show ordered queue
     ag work "Add login form"    # Start working on a task
     ag todo "Try new library"   # Capture idea to TODO.md
     ag todo list                # Show inbox items
@@ -195,6 +198,7 @@ COMMANDS:
     test llm [options]  Run LLM behavioral tests
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
+    backlog <sub>       Ordered work queue (add|list|done|move|remove|clear)
     auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
@@ -207,6 +211,10 @@ COMMANDS:
 EXAMPLES:
     ag start                    # Begin a new session
     ag init                     # Initialize project (if not done)
+    ag backlog add F-0042       # Add feature to work queue
+    ag backlog add F-0042 -p 0  # Make it current work
+    ag backlog list             # Show full queue
+    ag backlog done             # Mark current done, advance
     ag plan F-0042              # Create plan with iterative review
     ag plan F-0042 --no-review  # Create plan without review loop
     ag implement F-0042         # Start working on feature F-0042
@@ -338,6 +346,70 @@ cmd_start() {
         fi
     fi
 
+    # 5c. Backlog display (PROMINENT)
+    local backlog_current
+    backlog_current=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || true
+    if [ -n "$backlog_current" ]; then
+        echo ""
+        echo -e "${BOLD}═══════════════════════════════════════${NC}"
+
+        local bl_id bl_desc bl_notes bl_next_id bl_next_desc bl_total
+        bl_id=$(echo "$backlog_current" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id',d.get('description','')))" 2>/dev/null) || bl_id=""
+        bl_desc=$(echo "$backlog_current" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('description',''))" 2>/dev/null) || bl_desc=""
+        bl_notes=$(echo "$backlog_current" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('notes',''))" 2>/dev/null) || bl_notes=""
+
+        if [ -n "$bl_id" ]; then
+            if [ -n "$bl_desc" ] && [ "$bl_desc" != "$bl_id" ]; then
+                echo -e "  ${BOLD}CURRENT: $bl_id — $bl_desc${NC}"
+            else
+                echo -e "  ${BOLD}CURRENT: $bl_id${NC}"
+            fi
+        fi
+
+        if [ -n "$bl_notes" ]; then
+            echo -e "  ${DIM}NOTE:    $bl_notes${NC}"
+        fi
+
+        # Show refs
+        echo "$backlog_current" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+for r in d.get('refs', []):
+    print(f'  REF:    {r}')
+" 2>/dev/null || true
+
+        # Show next item
+        local backlog_next
+        backlog_next=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || true
+        # Actually get next (position 1)
+        local all_items
+        all_items=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-all 2>/dev/null) || true
+        if [ -n "$all_items" ]; then
+            bl_total=$(echo "$all_items" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))" 2>/dev/null) || bl_total="?"
+            bl_next_id=$(echo "$all_items" | python3 -c "import sys,json; items=json.load(sys.stdin); print(items[1].get('id',items[1].get('description','')) if len(items)>1 else '')" 2>/dev/null) || bl_next_id=""
+            bl_next_desc=$(echo "$all_items" | python3 -c "import sys,json; items=json.load(sys.stdin); print(items[1].get('description','') if len(items)>1 else '')" 2>/dev/null) || bl_next_desc=""
+
+            if [ -n "$bl_next_id" ]; then
+                if [ -n "$bl_next_desc" ] && [ "$bl_next_desc" != "$bl_next_id" ]; then
+                    echo -e "  ${DIM}NEXT:    $bl_next_id — $bl_next_desc${NC}"
+                else
+                    echo -e "  ${DIM}NEXT:    $bl_next_id${NC}"
+                fi
+            fi
+
+            echo -e "  ${DIM}Queue:   $bl_total item(s) total${NC}"
+        fi
+
+        # Resume hint
+        if echo "$bl_id" | grep -qE '^F-[0-9]{4}$' 2>/dev/null; then
+            echo -e "  ${DIM}Resume:  ag implement $bl_id${NC}"
+        fi
+        echo -e "${BOLD}═══════════════════════════════════════${NC}"
+
+        # Staleness check
+        python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" check-staleness 2>/dev/null || true
+    fi
+
     # 6. Run doctor quick check
     echo ""
     echo -e "${BOLD}Quick Health Check:${NC}"
@@ -401,9 +473,28 @@ cmd_work() {
         exit 1
     fi
 
-    # Feature tracking: hard block — require feature ID with acceptance criteria
+    # Backlog gate: block if backlog has feature items AND feature_tracking=yes
     local ft
     ft=$(get_setting "feature_tracking" "no")
+    if [ "${SKIP_BACKLOG:-}" != "1" ] && [ "$ft" = "yes" ]; then
+        local bl_current_json
+        bl_current_json=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || true
+        if [ -n "$bl_current_json" ]; then
+            local bl_type
+            bl_type=$(echo "$bl_current_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('type',''))" 2>/dev/null) || bl_type=""
+            if [ "$bl_type" = "feature" ]; then
+                local bl_cur_id
+                bl_cur_id=$(echo "$bl_current_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null) || bl_cur_id=""
+                echo -e "${RED}BLOCKED: Backlog has feature work queued (current: $bl_cur_id).${NC}"
+                echo "  Work on it: ag implement $bl_cur_id"
+                echo "  Clear:      ag backlog clear"
+                echo "  Override:   SKIP_BACKLOG=1 ag work \"$description\""
+                exit 1
+            fi
+        fi
+    fi
+
+    # Feature tracking: hard block — require feature ID with acceptance criteria
     if [ "$ft" = "yes" ]; then
         echo -e "${RED}BLOCKED: Feature tracking is enabled — requires a feature ID with acceptance criteria.${NC}"
         echo ""
@@ -495,7 +586,10 @@ cmd_plan() {
     echo -e "${BOLD}=== Plan: $feature_id ===${NC}"
     echo ""
 
-    # 0. Check feature exists in FEATURES.md (BLOCKING)
+    # 0. Advisory: backlog alignment check
+    _backlog_advisory "$feature_id" "plan"
+
+    # 0a. Check feature exists in FEATURES.md (BLOCKING)
     if [ "${SKIP_SPEC_CHECK:-}" = "1" ]; then
         echo -e "${YELLOW}⚠ SKIP_SPEC_CHECK: Bypassing spec-first gate${NC}"
     else
@@ -643,7 +737,50 @@ cmd_implement() {
         fi
     fi
 
-    # 0b. Check plan-review (BLOCKING when enabled)
+    # 0b. Backlog gate
+    if [ "${SKIP_BACKLOG:-}" = "1" ]; then
+        echo -e "${YELLOW}SKIP_BACKLOG: Bypassing backlog gate${NC}" >&2
+    else
+        # Check if feature is shipped/deprecated (lifecycle cross-check)
+        if [ -f "$ROOT_DIR/.agentic/spec/FEATURES.md" ]; then
+            local feat_status_line
+            feat_status_line=$(grep -A2 "^## ${feature_id}:" "$ROOT_DIR/.agentic/spec/FEATURES.md" 2>/dev/null | grep -i "status" | head -1 || true)
+            if echo "$feat_status_line" | grep -qi "shipped\|deprecated"; then
+                echo -e "${RED}BLOCKED: $feature_id lifecycle state is shipped/deprecated${NC}"
+                echo "  Cannot implement a feature that's already shipped."
+                echo "  Override: SKIP_BACKLOG=1 ag implement $feature_id"
+                exit 1
+            fi
+        fi
+
+        # Auto-upsert into backlog (add at position 0 if not present)
+        local bl_position
+        bl_position=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" upsert "$feature_id" 2>/dev/null) || bl_position=""
+
+        if [ -n "$bl_position" ] && [ "$bl_position" != "0" ]; then
+            # Feature is in backlog but NOT at position 0 — HARD BLOCK
+            local bl_current_id
+            bl_current_id=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null) || bl_current_id="unknown"
+            echo -e "${RED}BLOCKED: Backlog says current work is $bl_current_id.${NC}"
+            echo "  Work on it:   ag implement $bl_current_id"
+            echo "  Reprioritize: ag backlog move $feature_id 0"
+            echo "  Override:     SKIP_BACKLOG=1 ag implement $feature_id"
+            exit 1
+        fi
+
+        # Check dependencies (advisory warning)
+        local dep_check
+        dep_check=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" check-deps "$feature_id" 2>/dev/null) || true
+        if [ -n "$dep_check" ]; then
+            echo -e "${YELLOW}WARNING: $feature_id has unmet dependencies:${NC}"
+            echo "$dep_check" | while read -r line; do
+                echo "  $line"
+            done
+            echo ""
+        fi
+    fi
+
+    # 0c. Check plan-review (BLOCKING when enabled)
     local plan_review_enabled
     plan_review_enabled=$(get_plan_review_config "plan_review_enabled" "no")
     if [ "$plan_review_enabled" = "yes" ]; then
@@ -666,7 +803,7 @@ cmd_implement() {
         fi
     fi
 
-    # 0c. Auto-save plans from session-scoped tool directories to durable location
+    # 0d. Auto-save plans from session-scoped tool directories to durable location
     # Claude Code uses .claude/plans/, Cursor uses .cursor/plans/
     local durable_plan="$ROOT_DIR/.agentic/journal/plans/${feature_id}-plan.md"
     if [ ! -f "$durable_plan" ]; then
@@ -1082,6 +1219,21 @@ cmd_done() {
     echo -e "${BLUE}Recommended: Run drift detection${NC}"
     echo "  bash .agentic/lib/tools/drift.sh"
     echo "  (Checks: untracked files, feature status, template markers)"
+
+    # Backlog auto-advance
+    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        local bl_current_json
+        bl_current_json=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || true
+        if [ -n "$bl_current_json" ]; then
+            local bl_cur_id
+            bl_cur_id=$(echo "$bl_current_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null) || bl_cur_id=""
+            if [ "$bl_cur_id" = "$feature_id" ]; then
+                echo ""
+                echo -e "${BOLD}=== Backlog Advance ===${NC}"
+                bash "$SCRIPT_DIR/backlog.sh" done 2>/dev/null || true
+            fi
+        fi
+    fi
 }
 
 # Tools command - list all tools
@@ -1928,6 +2080,11 @@ cmd_test_llm() {
 cmd_spec() {
     local arg="${1:-}"
 
+    # Advisory: backlog alignment check
+    if [[ -n "$arg" ]] && echo "$arg" | grep -qE '^F-[0-9]{4}$'; then
+        _backlog_advisory "$arg" "spec"
+    fi
+
     if [[ "$arg" == "--check" ]]; then
         echo -e "${BLUE}Running spec health check on all features...${NC}"
         echo ""
@@ -2511,6 +2668,61 @@ cmd_nfr() {
     esac
 }
 
+# Backlog command — manage ordered work queue
+cmd_backlog() {
+    local subcmd="${1:-}"
+    shift 2>/dev/null || true
+
+    case "$subcmd" in
+        add|current|next|done|list|remove|move|clear)
+            bash "$SCRIPT_DIR/backlog.sh" "$subcmd" "$@"
+            ;;
+        ""|--help)
+            echo "ag backlog — Ordered work queue"
+            echo ""
+            echo "COMMANDS:"
+            echo "  (none)           Show current + next"
+            echo "  list             Full queue with positions"
+            echo "  add F-XXXX       Append feature to queue (auto-discovers refs)"
+            echo "  add F-XXXX -p 0  Make it current (top of queue)"
+            echo "  add --task \"X\"   Add non-feature task"
+            echo "  done             Remove position 0, advance"
+            echo "  move F-XXXX N    Reprioritize to position N"
+            echo "  remove F-XXXX    Remove from queue"
+            echo "  clear            Empty queue"
+            ;;
+        *)
+            # Default: show current + next
+            echo -e "${BOLD}=== Backlog ===${NC}"
+            echo ""
+            bash "$SCRIPT_DIR/backlog.sh" current 2>/dev/null || echo "  (empty)"
+            echo ""
+            bash "$SCRIPT_DIR/backlog.sh" next 2>/dev/null || true
+            ;;
+    esac
+}
+
+# Backlog advisory warning helper (for plan/spec commands)
+_backlog_advisory() {
+    local feature_id="$1"
+    local command_name="$2"
+    [ -z "$feature_id" ] && return
+    echo "$feature_id" | grep -qE '^F-[0-9]{4}$' || return
+
+    local current_json
+    current_json=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || return
+    [ -z "$current_json" ] && return
+
+    local current_id
+    current_id=$(echo "$current_json" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id',''))" 2>/dev/null) || return
+
+    if [ -n "$current_id" ] && [ "$current_id" != "$feature_id" ]; then
+        echo -e "${YELLOW}ADVISORY: Backlog says current work is $current_id (running $command_name for $feature_id)${NC}"
+        echo -e "  ${DIM}Work on current: ag implement $current_id${NC}"
+        echo ""
+    fi
+}
+
 # Self-healing: ensure pre-commit hooks are installed on every ag invocation
 # Addresses D2 (Deterministic Enforcement) — hooks must survive git config resets
 _ensure_hooks() {
@@ -2587,6 +2799,10 @@ case "${1:-help}" in
     auto)
         shift
         cmd_auto "$@"
+        ;;
+    backlog)
+        shift
+        cmd_backlog "$@"
         ;;
     transition)
         shift

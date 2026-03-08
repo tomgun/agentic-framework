@@ -1595,3 +1595,19 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 19:22 - F-0190 Backlog Work Assignment
+
+**Why**: Work assignments got lost between sessions and machines — no structural mechanism for ordered work
+
+**What changed**:
+- Agents on any machine now know what to work on next via git-tracked BACKLOG.json queue. Structural gates enforce queue order at implement/work/done commands.
+
+**Next steps**:
+- See backlog (ag backlog list). Merge PR, then follow-up: STATUS.md simplification.
+
+**Blockers**: None
+
+**Metadata**:
+- Feature: F-0190
+
