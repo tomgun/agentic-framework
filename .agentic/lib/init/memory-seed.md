@@ -5,8 +5,8 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.49.0 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog -->
+<!-- memory-seed v0.50.0 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -39,9 +39,9 @@ Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal
 **When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-<slug>-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
 
 Then:
-1. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
-2. Check `plan_review_enabled` in STACK.md — if `yes`, invoke `/review` on the saved plan file first
-3. Only proceed to implementation after the review completes (or if review is disabled)
+1. If `plan_review_enabled: yes` in STACK.md: run dialectical review — spawn Critic + Advocate agents in parallel (fresh context), synthesize both perspectives (with Revision Guidance), present to user. User decides: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject. No automated enforcement.
+2. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
+3. Only proceed to implementation after the plan is APPROVED (or if review is disabled)
 
 ## When the user reports a bug or wants a fix
 

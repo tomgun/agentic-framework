@@ -1,0 +1,26 @@
+# Context Manifest: Plan Advocate Agent
+# Defensive analysis of finalized plans with fresh context
+
+role: plan-advocate-agent
+token_budget: 3000
+description: Explain trade-offs, defend decisions, acknowledge weaknesses in finalized plans
+
+required:
+  - .agentic/journal/plans/{feature_id}-plan.md  # The plan to defend
+  - spec/acceptance/{feature_id}.md               # Acceptance criteria to map
+  - .agentic/agents/shared/guidelines/anti-hallucination.md
+
+optional:
+  - CONTEXT_PACK.md[entry_points,modules]         # Architecture context (if budget allows)
+  - STACK.md[settings]                            # Project constraints
+
+exclude:
+  - JOURNAL.md              # Historical noise
+  - STATUS.md               # Session state
+  - src/                    # Not reviewing code
+  - tests/                  # Not reviewing tests
+  - docs/research/          # Research phase output
+  - .agentic/workflows/     # Meta-documentation
+
+variables:
+  - feature_id   # e.g., F-0042

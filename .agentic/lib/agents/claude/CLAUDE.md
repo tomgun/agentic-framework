@@ -19,7 +19,7 @@ Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX`
 - Code + docs = done (update docs with code, not later).
 - Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
 - Keep changes small and scoped (max 5-10 files per commit).
-- Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval.
+- Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
 - Multi-agent: read `.agentic/session/AGENTS_ACTIVE.md` before starting work.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 
