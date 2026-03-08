@@ -20,6 +20,14 @@ Acceptance-driven feature implementation with structural enforcement gates.
 
 ## Instructions
 
+### Step 0: Backlog Check
+
+If `.agentic/BACKLOG.json` exists and has items, `ag implement F-XXXX` enforces queue order:
+- If F-XXXX is at position 0: proceeds normally
+- If F-XXXX is not in backlog: auto-adds at position 0 and proceeds
+- If F-XXXX is in backlog but NOT at position 0: **BLOCKED** — work on the current item first, or reprioritize with `ag backlog move F-XXXX 0`
+- Override: `SKIP_BACKLOG=1 ag implement F-XXXX`
+
 ### Step 1: Verify Acceptance Criteria Exist
 
 ```bash

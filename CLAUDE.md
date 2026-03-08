@@ -11,7 +11,7 @@ Read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, and last 2-3 entries of .agen
 
 Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
-Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog`
 
 ## Core Rules
 
@@ -53,3 +53,4 @@ New features: Add to `.agentic/spec/FEATURES.md` FIRST, create acceptance criter
 Breaking changes: Provide upgrade path in `upgrade.sh`.
 Test in scratch project before committing framework changes.
 Worktree: Use `git worktree` on feature branches when another agent may be working on main.
+Instruction files are part of the feature: new `ag` commands/gates/workflows MUST update all instruction files (CLAUDE.md templates, cursorrules, copilot, codex, agent_operating_guidelines, auto_orchestration, memory-seed, relevant skills/checklists, DEVELOPER_GUIDE, HOW_IT_WORKS).

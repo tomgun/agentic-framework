@@ -37,6 +37,17 @@ bash .agentic/lib/tools/wip.sh complete
 
 This removes the `.agentic/session/WIP.md` lock file.
 
+### Step 2b: Verify Documentation Updated
+
+Before marking shipped, verify documentation is current:
+
+1. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
+2. Check that CONTEXT_PACK.md reflects any architecture changes
+3. If `docs_gate: blocking` in STACK.md, `ag done` enforces this automatically
+4. For framework development: verify all instruction files updated (see CLAUDE.md § Framework Development)
+
+**Do not mark shipped with stale documentation.** Code + docs = done.
+
 ### Step 3: Update Feature Status
 
 ```bash
@@ -49,6 +60,10 @@ bash .agentic/lib/tools/feature.sh F-XXXX status shipped
 bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Project can now [capability]" "Next: [what's next]" "None" --why "Problem solved"
 bash .agentic/lib/tools/status.sh focus "F-XXXX shipped, ready for next task"
 ```
+
+### Step 4b: Backlog Advancement
+
+If `.agentic/BACKLOG.json` exists and the completed feature is at position 0, `ag done` auto-advances the backlog — removing the completed item and promoting the next item to position 0. The agent shows which item is next.
 
 ### Step 5: Flush Pending Items
 

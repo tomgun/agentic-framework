@@ -24,7 +24,21 @@ _No active items_
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
+
+
+### HN-0024: PR #78: Backlog/roadmap structural work assignment (F-0190, v0.49.0)
+- **Type**: review
+- **Added**: 2026-03-08
+- **Context**: 18 files, 1724 lines. Core: backlog_helpers.py + backlog.sh + ag.sh gates. Tests: 44 pytest + 19 validation.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
+
+### HN-0023: PR #77: Doc enforcement at feature acceptance (F-0189)
+- **Resolved**: 2026-03-08
+- **Outcome**: PR #77 merged
 
 ### HN-0021: PR #66: Visual verification, E2E scaffolding & auto mode docs (F-0168, v0.45.0)
 - **Resolved**: 2026-03-07

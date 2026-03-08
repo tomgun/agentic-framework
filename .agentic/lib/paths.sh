@@ -71,6 +71,7 @@ TODO_FILE="$(_resolve_path "$AGENTIC_ROOT/TODO.md" "$PROJECT_ROOT/TODO.md")"
 HUMAN_NEEDED_FILE="$(_resolve_path "$AGENTIC_ROOT/HUMAN_NEEDED.md" "$PROJECT_ROOT/HUMAN_NEEDED.md")"
 CONTRIBUTIONS_FILE="$(_resolve_path "$AGENTIC_ROOT/CONTRIBUTIONS.md" "$PROJECT_ROOT/CONTRIBUTIONS.md")"
 OVERVIEW_FILE="$(_resolve_path "$AGENTIC_ROOT/OVERVIEW.md" "$PROJECT_ROOT/OVERVIEW.md")"
+BACKLOG_FILE="$AGENTIC_ROOT/BACKLOG.json"
 
 # ---------------------------------------------------------------------------
 # Journal (.agentic/journal/)
