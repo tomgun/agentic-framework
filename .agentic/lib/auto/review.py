@@ -23,9 +23,11 @@ CLI:
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
@@ -38,6 +40,21 @@ _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
 from settings import get_setting  # noqa: E402
+
+
+# ---------------------------------------------------------------------------
+# Feature ID validation
+# ---------------------------------------------------------------------------
+
+_FEATURE_ID_RE = re.compile(r"^F-\d{4,}$")
+
+
+def _validate_feature_id(feature_id: str) -> None:
+    """Validate feature ID format to prevent path traversal."""
+    if not _FEATURE_ID_RE.match(feature_id):
+        raise ValueError(
+            f"Invalid feature ID: '{feature_id}'. Must match F-XXXX format."
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -56,6 +73,9 @@ class ReviewMode(Enum):
 # ---------------------------------------------------------------------------
 
 # Maps (from_state, to_state) → setting key in STACK.md/profiles.conf
+# Uses FeatureState values (strings) to avoid circular import with state_machine.
+# The _build_regression_pairs() function derives regression pairs from the
+# state_machine source of truth at import time.
 TRANSITION_REVIEW_MAP: dict[tuple[str, str], str] = {
     # Forward transitions
     ("planned", "specced"): "review_spec",
@@ -71,15 +91,20 @@ TRANSITION_REVIEW_MAP: dict[tuple[str, str], str] = {
     ("implementing", "committed"): "review_code",
 }
 
-# All regression transitions use review_regression
-_REGRESSION_PAIRS = {
-    ("implementing", "specced"),
-    ("implementing", "criteria_set"),
-    ("verified", "implementing"),
-    ("verified", "criteria_set"),
-    ("committed", "implementing"),
-    ("shipped", "specced"),
-}
+# Unmapped forward transitions (auto by default, structural gates suffice):
+# criteria_set → tests_written, implementing → verified, verified → documented
+
+# Derive regression pairs from state_machine.REGRESSION_TRANSITIONS (source of truth)
+# to avoid sync drift between the two modules.
+def _build_regression_pairs() -> set[tuple[str, str]]:
+    from auto.state_machine import REGRESSION_TRANSITIONS
+    return {(fr.value, to.value) for fr, to in REGRESSION_TRANSITIONS}
+
+_REGRESSION_PAIRS: set[tuple[str, str]] = _build_regression_pairs()
+
+# review_decomposition and review_taste exist in profiles.conf and STACK.md
+# but are not wired to transitions yet. They are placeholders for future
+# features (epic decomposition, subjective design decisions).
 
 
 def _get_review_setting_key(from_state: str, to_state: str) -> Optional[str]:
@@ -121,7 +146,7 @@ def check_review(
     """Check if a review is needed for this transition.
 
     Returns (can_proceed, messages).
-    - auto: (True, [])
+    - auto: auto-approves (True, []) — structural gates still apply
     - human/critical_agent: creates pending review, returns (False, [instructions])
 
     If a verdict artifact already exists, returns (True, []) to prevent
@@ -215,8 +240,8 @@ def create_pending_review(
                 capture_output=True, text=True,
                 cwd=str(project_root),
             )
-            # Parse HN-ID from blocker.sh output
-            match = re.search(r"HN-\d{4}", result.stdout)
+            # Parse HN-ID from blocker.sh output (supports any digit count)
+            match = re.search(r"HN-\d+", result.stdout)
             if match:
                 hn_id = match.group(0)
         except (OSError, subprocess.SubprocessError):
@@ -269,10 +294,13 @@ def resolve_review(
     1. Stores verdict artifact (prevents re-review loop)
     2. Deletes pending review JSON
     3. Resolves HUMAN_NEEDED entry
-    4. Calls state machine transition
+    4. If approved, calls state machine transition
 
-    Returns (success, messages).
+    Returns (success, messages). Success means the review was resolved
+    successfully — both approvals and rejections return True. A rejection
+    is a valid resolution; False means an error occurred.
     """
+    _validate_feature_id(feature_id)
     paths = get_paths(project_root)
     messages = []
 
@@ -294,6 +322,7 @@ def resolve_review(
     hn_id = review_data.get("hn_id")
 
     # 1. Store verdict artifact first (prevents re-review loop)
+    #    Write to temp file then rename for atomicity
     verdict_dir = paths.reviews_dir / feature_id
     verdict_dir.mkdir(parents=True, exist_ok=True)
     verdict_file = verdict_dir / f"{from_state}_to_{target_state}.md"
@@ -308,11 +337,25 @@ def resolve_review(
         f"## Reasoning\n"
         f"{reasoning if reasoning else 'No reasoning provided.'}\n"
     )
-    verdict_file.write_text(verdict_content)
+    fd, tmp_path = tempfile.mkstemp(
+        dir=str(verdict_dir), suffix=".tmp", prefix=".verdict-"
+    )
+    try:
+        os.write(fd, verdict_content.encode())
+        os.close(fd)
+        os.rename(tmp_path, str(verdict_file))
+    except OSError:
+        os.close(fd) if not os.get_inheritable(fd) else None
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise
     messages.append(f"Verdict recorded: {verdict}")
 
     # 2. Delete pending review JSON
-    pending_file.unlink()
+    try:
+        pending_file.unlink()
+    except OSError:
+        messages.append("Warning: Could not remove pending review file")
     messages.append("Pending review cleared")
 
     # 3. Resolve HUMAN_NEEDED entry
@@ -374,13 +417,13 @@ def main() -> int:
         default=None,
         help="Target state to review (e.g., specced)",
     )
-    parser.add_argument(
+    verdict_group = parser.add_mutually_exclusive_group()
+    verdict_group.add_argument(
         "--approve",
         action="store_true",
-        default=True,
         help="Approve the review (default)",
     )
-    parser.add_argument(
+    verdict_group.add_argument(
         "--reject",
         action="store_true",
         help="Reject the review",
@@ -414,6 +457,13 @@ def main() -> int:
                 f"({r['review_setting']}, mode: {r['review_mode']})"
             )
         return 0
+
+    # Validate feature_id format
+    try:
+        _validate_feature_id(args.feature_id)
+    except ValueError as e:
+        print(f"Error: {e}")
+        return 1
 
     # Feature-specific list: no target_state
     if not args.target_state:
