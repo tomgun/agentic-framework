@@ -22,8 +22,7 @@ echo "Next steps: [WHAT'S LEFT]" >> JOURNAL.md
 
 # 2. If there's uncommitted code you want to keep
 git add -A
-git stash -m "WIP: tokens ran out"  # OR
-git commit -m "WIP: partial progress"
+git commit -m "WIP: partial progress"  # NEVER use git stash (silent data loss in multi-agent)
 
 # 3. Note anything for next session
 echo "- [ ] TODO: [THING TO DO]" >> STATUS.md
