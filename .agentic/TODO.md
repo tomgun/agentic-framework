@@ -100,6 +100,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0043: F-idea: AC scheduling phase in auto engine — before executing ACs, analyze dependencies and priorities to build an execution graph. Independent ACs run in parallel (git worktree per stream), dependent ACs chain sequentially. Connects plan-level [P] markers (F-0148) to runtime execution. Resource-aware: premium mode enables parallelism, economy forces sequential. Supersedes T-0033 (which was investigation-only). See CONTRIBUTIONS.md 'Task Scheduling & Parallel Execution' and SDD analysis §9.
 - **Added**: 2026-03-07
 
+### T-0044: F-NEW: Post-merge dogfooding workflow — after framework PR merge, systematically verify: (1) ag commands work with new code, (2) root entry points sync with template changes, (3) state files valid, (4) session-start loads correctly. Currently dogfooding is a principle but has no enforcement after merge. User insight from F-0177 PR session.
+- **Added**: 2026-03-08
+
 ## Done
 
 
