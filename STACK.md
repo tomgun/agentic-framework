@@ -5,7 +5,7 @@
 Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Agentic framework
-- Version: 0.44.1
+- Version: 0.49.0
 - Profile: formal
 - This IS the framework (dogfooding)
 - Source: https://github.com/tomgun/agentic-framework
@@ -54,6 +54,26 @@ Purpose: Configuration for developing the Agentic Framework itself.
 # Blocking limit for added lines (advisory on feature branches in PR workflow). Profile defaults — Discovery: 1000 | Formal: 500
 - max_code_file_length: 2500
 # Blocking limit for single file length. Profile defaults — Discovery: 1000 | Formal: 500
+
+### Review checkpoints
+<!-- Who reviews each transition. Options: human | critical_agent | auto -->
+<!-- critical_agent falls back to human until F-0182 ships -->
+- review_spec: critical_agent
+# planned → specced. Discovery: auto | Formal: critical_agent
+- review_criteria: critical_agent
+# specced → criteria_set. Discovery: auto | Formal: critical_agent
+- review_plan: critical_agent
+# plan review before implementing. Discovery: auto | Formal: critical_agent
+- review_code: human
+# documented → committed. Discovery: critical_agent | Formal: human
+- review_merge: human
+# committed → shipped. Discovery: human | Formal: human
+- review_decomposition: critical_agent
+# Epic decomposition (future). Discovery: auto | Formal: critical_agent
+- review_regression: human
+# Any regression transition. Discovery: critical_agent | Formal: human
+- review_taste: critical_agent
+# Subjective decisions (future). Discovery: auto | Formal: critical_agent
 
 ## Summary
 - What are we building: AI-assisted development framework with spec-driven methodology

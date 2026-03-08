@@ -62,6 +62,26 @@ Purpose: a single source of truth for "how we build and run software here".
 - max_code_file_length: 1000
 # Blocking limit for single file length. Profile defaults — Discovery: 1000 | Formal: 500
 
+### Review checkpoints
+<!-- Who reviews each transition. Options: human | critical_agent | auto -->
+<!-- critical_agent falls back to human until F-0182 ships -->
+- review_spec: auto
+# planned → specced. Discovery: auto | Formal: critical_agent
+- review_criteria: auto
+# specced → criteria_set. Discovery: auto | Formal: critical_agent
+- review_plan: auto
+# plan review before implementing. Discovery: auto | Formal: critical_agent
+- review_code: critical_agent
+# documented → committed. Discovery: critical_agent | Formal: human
+- review_merge: human
+# committed → shipped. Discovery: human | Formal: human
+- review_decomposition: auto
+# Epic decomposition (future). Discovery: auto | Formal: critical_agent
+- review_regression: critical_agent
+# Any regression transition. Discovery: critical_agent | Formal: human
+- review_taste: auto
+# Subjective decisions (future). Discovery: auto | Formal: critical_agent
+
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
 - Primary platform: <!-- web/service/mobile/desktop/cli -->
