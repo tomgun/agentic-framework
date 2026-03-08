@@ -50,6 +50,7 @@ def parse_features(md: str) -> List[Dict]:
                 "owner": None,
                 "parent": None,
                 "complexity": None,
+                "component": None,
             }
             continue
 
@@ -88,6 +89,8 @@ def parse_features(md: str) -> List[Dict]:
             current["parent"] = val if val and val.lower() != "none" else None
         elif key == "complexity":
             current["complexity"] = val.upper() if val and val.upper() in ['S', 'M', 'L', 'XL'] else None
+        elif key == "component":
+            current["component"] = val if val and val.lower() != "none" else None
     
     if current:
         features.append(current)
@@ -147,6 +150,9 @@ def filter_features(features: List[Dict], args) -> List[Dict]:
     if args.category:
         cat_lower = args.category.lower()
         filtered = [f for f in filtered if f.get("category") and f["category"].lower() == cat_lower]
+
+    if hasattr(args, "component") and args.component:
+        filtered = [f for f in filtered if f.get("component") == args.component]
 
     return filtered
 
@@ -368,6 +374,7 @@ Examples:
     parser.add_argument("--complexity", help="Filter by complexity (S|M|L|XL)")
     parser.add_argument("--parent", help="Filter by parent feature ID")
     parser.add_argument("--category", help="Filter by category (e.g., Core, Quality, Tooling)")
+    parser.add_argument("--component", help="Filter by component name (from STACK.md ## Components)")
     parser.add_argument("--children", metavar="F-ID", help="List children of a feature (e.g., --children=F-0001)")
     parser.add_argument("--recursive", action="store_true", help="With --children: show all descendants in tree format")
     parser.add_argument("--count", action="store_true", help="Show counts by category instead of listing features")
