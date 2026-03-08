@@ -1569,3 +1569,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 14:05 - ADR-001 Feature Decomposition
+
+**Why**: Decomposing ADR-001 roadmap into trackable, ordered feature items
+
+**What changed**:
+- Registered 10 features (F-0179 to F-0188) across ADR-001 Phases 2-7 with acceptance criteria. Phase ordering: Components → Review Framework → Autonomous Profile → Critical Agent → Taste Settings → Epics → MCP Server → Scheduler → Multi-Repo → E2E Flow. Also marked F-0177/F-0178 as shipped.
+
+**Next steps**:
+- Create PR for feature registration. Phase 2 (F-0179 Components) is next for implementation.
+
+**Blockers**: None
+

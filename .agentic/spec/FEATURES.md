@@ -2955,3 +2955,214 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Acceptance**: See `spec/acceptance/F-0178.md`
 
+---
+
+## F-0179: Component Registry and Scoped Context
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.48.0
+
+**Description**: Optional component registry in STACK.md (name | path | type | test_command). Features gain optional `Component` field. `context-for-role.sh` filters context to component scope. `discover.py` auto-detects components in monorepos. State machine gates use component-specific test commands. ADR-001 Phase 2, Section 1.
+
+**Dependencies**: F-0177
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/components.py` (new), modifications to `context-for-role.sh`, `discover.py`, `query_features.py`, `gates.py`, `STACK.template.md`
+- Tests: `tests/test_components.py` (new)
+
+**Acceptance**: See `spec/acceptance/F-0179.md`
+
+---
+
+## F-0180: Review Checkpoint Framework
+
+**Status**: planned
+**Category**: Workflow
+**Priority**: high
+**Complexity**: high
+**Since**: v0.48.0
+
+**Description**: Configurable review gates on state machine transitions. Three modes: `human | critical_agent | auto` per transition, per profile. Settings in STACK.md (`review_spec`, `review_criteria`, `review_plan`, `review_code`, `review_merge`). State machine blocks at review checkpoints when mode is `human`. `critical_agent` mode falls back to `human` until Phase 4 ships. ADR-001 Phase 3, Section 5.1.
+
+**Dependencies**: F-0177
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/review.py` (new), modifications to `state_machine.py`, `ag.sh`, `STACK.template.md`
+- Tests: `tests/test_review.py` (new), `tests/test_state_machine_with_reviews.py` (new)
+
+**Acceptance**: See `spec/acceptance/F-0180.md`
+
+---
+
+## F-0181: Autonomous Formal Profile
+
+**Status**: planned
+**Category**: Workflow
+**Priority**: medium
+**Complexity**: low
+**Since**: v0.48.0
+
+**Description**: New `autonomous_formal` profile in `profiles.conf` with agent-friendly review defaults: auto/critical_agent for most checkpoints, human only for final merge. Defines review checkpoint defaults per profile (Discovery, Formal, Autonomous Formal). ADR-001 Phase 3.
+
+**Dependencies**: F-0180
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/presets/profiles.conf`, `upgrade.sh`
+- Tests: Profile validation in `tests/test_review.py`
+
+**Acceptance**: See `spec/acceptance/F-0181.md`
+
+---
+
+## F-0182: Critical Review Agent
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: high
+**Complexity**: high
+**Since**: v0.49.0
+
+**Description**: Adversarial review agent — separate Claude instance with read-only access. Can approve, request-changes, or escalate to human. Structured review verdicts stored as artifacts. Uses `review` model from STACK.md. Adversarial mandate: find problems, not rubber-stamp. "If in doubt, escalate" prevents weak approvals. ADR-001 Phase 4, Section 5.1.
+
+**Dependencies**: F-0180
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/critical_agent.py` (new), `.agentic/lib/auto/prompts/critical_review.md` (new), modifications to `review.py`
+- Tests: `tests/test_critical_agent.py` (new)
+
+**Acceptance**: See `spec/acceptance/F-0182.md`
+
+---
+
+## F-0183: Taste and Style Settings
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.49.0
+
+**Description**: Style/taste settings in STACK.md: `style_guide`, `design_system`, `api_style`. Loaded into critical agent context for taste-sensitive reviews. Critical agent validates consistency with declared style direction. ADR-001 Phase 4, Section 5.2.
+
+**Dependencies**: F-0182
+
+**Implementation**:
+- State: none
+- Code: Modifications to `STACK.template.md`, `critical_agent.py`, `.agentic/lib/auto/prompts/taste_review.md` (new)
+- Tests: Taste review tests in `tests/test_critical_agent.py`
+
+**Acceptance**: See `spec/acceptance/F-0183.md`
+
+---
+
+## F-0184: Epic Decomposition
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: high
+**Complexity**: high
+**Since**: v0.50.0
+
+**Description**: `ag decompose F-XXXX` command: analyze epic acceptance criteria, identify components (using component registry), propose child features, route through `review_decomposition` checkpoint. Parent-child cascade: child regression triggers epic status recomputation. Epic ships when all children ship + integration verification passes. ADR-001 Phase 5, Section 2.
+
+**Dependencies**: F-0179, F-0180
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/epic.py` (new), modifications to `state_machine.py`, `components.py`, `ag.sh`, `query_features.py`, `feature.sh`
+- Tests: `tests/test_epic.py` (new)
+
+**Acceptance**: See `spec/acceptance/F-0184.md`
+
+---
+
+## F-0185: MCP Server for Agent Coordination
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: medium
+**Complexity**: high
+**Since**: v0.51.0
+
+**Description**: Python MCP server with 8 tools: `claim_feature`, `release_feature`, `transition_state`, `get_unblocked`, `subscribe_state`, `report_status`, `request_review`, `submit_review`. Thin wrapper delegating to existing classes. Graceful degradation: if MCP unavailable, framework uses file-based coordination. ADR-001 Phase 6, Section 4.
+
+**Dependencies**: F-0177, F-0180, F-0184
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/mcp_server.py` (new), `.agentic/lib/auto/mcp_tools.py` (new), modifications to `ag.sh`, `engine.py`
+- Tests: `tests/test_mcp_server.py` (new)
+
+**Acceptance**: See `spec/acceptance/F-0185.md`
+
+---
+
+## F-0186: Autonomous Scheduler
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: high
+**Complexity**: high
+**Since**: v0.52.0
+
+**Description**: `AutonomousScheduler` class: `get_unblocked() → spawn worker → review gate → repeat` loop. Non-blocking reviews: while one feature awaits human/escalated review, scheduler advances others. Worker agents scoped to components. Evolves `crunch.py` into scheduler-backed execution. `ag auto epic F-XXXX` command. ADR-001 Phase 7, Section 3.
+
+**Dependencies**: F-0182, F-0184
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/scheduler.py` (new), modifications to `crunch.py`, `ag.sh`, `profiles.conf`
+- Tests: `tests/test_scheduler.py` (new)
+
+**Acceptance**: See `spec/acceptance/F-0186.md`
+
+---
+
+## F-0187: Multi-Repo Umbrella
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: medium
+**Complexity**: high
+**Since**: v0.52.0
+
+**Description**: `Repo` column in component registry for cross-repo projects. Umbrella pattern: orchestrator in main repo, components in parallel repos. Cross-repo contract checking. User input collection: structured prompts for vision, style refs, research before decomposition. ADR-001 Phase 7, Section 6.
+
+**Dependencies**: F-0179, F-0186
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/umbrella.py` (new), modifications to `components.py`
+- Tests: `tests/test_umbrella.py` (new)
+
+**Acceptance**: See `spec/acceptance/F-0187.md`
+
+---
+
+## F-0188: End-to-End Autonomous Flow
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: high
+**Complexity**: high
+**Since**: v0.52.0
+
+**Description**: Full autonomous pipeline: epic → decompose → schedule → implement → review → ship. Integrates all ADR-001 components. User provides prompt + research + style guidelines, agents handle everything. Integration verification across all phases. ADR-001 Phase 7 capstone.
+
+**Dependencies**: F-0186, F-0187
+
+**Implementation**:
+- State: none
+- Code: Integration across all auto/ modules
+- Tests: `tests/test_e2e_autonomous.py` (new)
+
+**Acceptance**: See `spec/acceptance/F-0188.md`
+
+
