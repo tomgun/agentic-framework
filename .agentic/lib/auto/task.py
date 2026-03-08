@@ -195,6 +195,9 @@ class TaskRunner:
         verify_result = verify_loop.run(max_iterations=5)
         result.verification_passed = verify_result.success
 
+        # Doc check: run drift.sh --docs --check if docs_gate is enabled
+        self._check_and_update_docs(feature_id)
+
         # Create PR
         if not skip_pr and result.acs_passed > 0:
             pr_url = self._create_pr(feature_id, result)
@@ -264,6 +267,76 @@ class TaskRunner:
         )
         _, exit_code = verify._run_tests(command=verify.test_command, timeout=120)
         return exit_code == 0
+
+    def _check_and_update_docs(self, feature_id: str) -> None:
+        """Run doc drift check and spawn Claude to fix if needed."""
+        from settings import get_setting
+
+        docs_gate = get_setting(self.project_root, "docs_gate", "off")
+        if docs_gate == "off":
+            return
+
+        drift_script = self.project_root / ".agentic" / "lib" / "tools" / "drift.sh"
+        if not drift_script.exists():
+            return
+
+        print(f"Checking documentation drift for {feature_id}...")
+
+        try:
+            proc = subprocess.run(
+                ["bash", str(drift_script), "--docs", "--check",
+                 "--manifest", feature_id],
+                cwd=str(self.project_root),
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+        except (subprocess.TimeoutExpired, OSError):
+            print("  Warning: drift.sh timed out or failed to run")
+            return
+
+        if proc.returncode == 0:
+            print("  No documentation drift detected")
+            return
+
+        # Drift detected — spawn Claude to update docs
+        print("  Documentation drift detected — spawning Claude to update docs...")
+        drift_output = proc.stdout.strip()
+        prompt = (
+            f"Documentation drift detected for feature {feature_id}.\n\n"
+            f"Drift report:\n{drift_output}\n\n"
+            f"Instructions:\n"
+            f"- Read the flagged documentation files\n"
+            f"- Update them to reflect the current code changes\n"
+            f"- Add a CHANGELOG.md entry for {feature_id} if missing\n"
+            f"- Do NOT modify code files, only documentation\n"
+        )
+
+        spawn_claude(
+            self.claude_command,
+            self.project_root,
+            prompt,
+            timeout=120,
+        )
+
+        # Commit doc updates separately (only modified tracked files)
+        try:
+            subprocess.run(
+                ["git", "add", "-u"],
+                cwd=str(self.project_root),
+                capture_output=True,
+                check=True,
+            )
+            subprocess.run(
+                ["git", "commit", "-m",
+                 f"docs({feature_id}): update documentation for feature"],
+                cwd=str(self.project_root),
+                capture_output=True,
+                check=True,
+            )
+            print("  Documentation updates committed")
+        except subprocess.CalledProcessError:
+            pass  # No changes to commit
 
     def _commit_ac(
         self, feature_id: str, ac_id: str, ac_text: str

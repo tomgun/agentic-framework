@@ -81,10 +81,22 @@ When acceptance criteria have priority groups (P1/P2):
 
 This ensures MVP is solid before adding enhancements.
 
-### Step 6: Verify Before Declaring Done
+### Step 6: Documentation
+
+Before declaring done, check which project docs need updating:
+
+1. Run `bash .agentic/lib/tools/docs.sh --list` to see the project's doc registry
+2. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
+3. Update docs in the same change as code — don't defer to a follow-up
+4. If you created a new user-facing artifact, add it to the `## Docs` section in STACK.md
+
+Doc updates are enforced at feature acceptance (`ag done`) when `docs_gate: blocking`.
+
+### Step 7: Verify Before Declaring Done
 
 - All acceptance criteria met (P1 at minimum, P2 if confirmed)
 - Tests pass
+- Documentation updated (Step 6)
 - No unrelated files changed
 - Code follows project conventions
 

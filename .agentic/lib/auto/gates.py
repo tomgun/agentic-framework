@@ -18,6 +18,7 @@ Usage:
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -26,6 +27,7 @@ from typing import Callable
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
+from settings import get_setting  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -310,8 +312,18 @@ def gate_implementing_to_verified(feature_id: str, project_root: Path) -> GateRe
 # ---------------------------------------------------------------------------
 
 def gate_verified_to_documented(feature_id: str, project_root: Path) -> GateResult:
-    """Advisory checks for documentation updates."""
+    """Check documentation updates based on docs_gate setting.
+
+    - docs_gate=off: skip all checks
+    - docs_gate=warning: run drift.sh --docs --check, warn if drift found
+    - docs_gate=blocking: run drift.sh --docs --check, block if drift found
+    """
+    docs_gate = get_setting(project_root, "docs_gate", "off")
     warnings: list[str] = []
+    reasons: list[str] = []
+
+    if docs_gate == "off":
+        return GateResult.ok()
 
     # Advisory: CHANGELOG should mention the feature
     changelog = project_root / "CHANGELOG.md"
@@ -325,10 +337,48 @@ def gate_verified_to_documented(feature_id: str, project_root: Path) -> GateResu
     else:
         warnings.append("No CHANGELOG.md found")
 
-    # Advisory: docs should be updated (general reminder)
-    warnings.append(
-        "Advisory: ensure documentation is updated alongside code changes"
-    )
+    # Run drift.sh --docs --check to detect stale docs
+    drift_script = project_root / ".agentic" / "lib" / "tools" / "drift.sh"
+    drift_output = ""
+    drift_found = False
+
+    if drift_script.exists():
+        cmd = ["bash", str(drift_script), "--docs", "--check"]
+        if feature_id:
+            cmd.extend(["--manifest", feature_id])
+        try:
+            proc = subprocess.run(
+                cmd,
+                cwd=str(project_root),
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+            drift_output = proc.stdout.strip()
+            drift_found = proc.returncode != 0
+        except (subprocess.TimeoutExpired, OSError):
+            warnings.append("drift.sh --docs --check timed out or failed to run")
+
+    if drift_found:
+        drift_msg = f"Documentation drift detected for {feature_id}"
+        if drift_output:
+            # Strip ANSI escape codes for clean gate messages
+            ansi_re = re.compile(r"\033\[[0-9;]*m")
+            clean_output = ansi_re.sub("", drift_output)
+            # Extract just the summary line(s) from drift output
+            summary_lines = [
+                line.strip() for line in clean_output.splitlines()
+                if "stale" in line.lower() or "\u26a0" in line
+            ]
+            if summary_lines:
+                drift_msg += ": " + "; ".join(summary_lines[:3])
+
+        if docs_gate == "blocking":
+            reasons.append(drift_msg)
+            return GateResult.blocked(reasons, warnings)
+        else:
+            # warning mode
+            warnings.append(drift_msg)
 
     return GateResult.ok(warnings)
 

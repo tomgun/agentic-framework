@@ -3165,4 +3165,24 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Acceptance**: See `spec/acceptance/F-0188.md`
 
+---
+
+## F-0189: Doc Enforcement at Feature Acceptance
+
+**Status**: implementing
+**Category**: Verification & Enforcement
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.47.0
+
+**Description**: Wire existing doc drift detection (`drift.sh --docs`, `docs_gate` setting) into feature acceptance and merge gates. Enforces documentation updates when features complete — not on every commit (too noisy), but at the gates that matter: state machine transition, autonomode pipeline, implementing/reviewing skills.
+
+**Dependencies**: F-0138
+
+**Implementation**:
+- State: partial
+- Code: `drift.sh`, `gates.py`, `task.py`, `engine.py`, skills
+- Tests: `tests/test_gates.py`
+
+**Acceptance**: See `spec/acceptance/F-0189.md`
 
