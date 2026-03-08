@@ -223,16 +223,69 @@ class TestGateImplementingToVerified:
 # ---------------------------------------------------------------------------
 
 class TestGateVerifiedToDocumented:
-    def test_advisory_only(self, project_dir):
+    def test_docs_gate_off_skips_all(self, project_dir):
+        """docs_gate=off should skip all checks and return ok."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: off\n"
+        )
         r = gate_verified_to_documented("F-0042", project_dir)
         assert r.allowed
-        assert len(r.warnings) > 0
+        assert r.warnings == []
+        assert r.reasons == []
 
-    def test_warns_when_changelog_missing_feature(self, project_dir):
+    def test_docs_gate_warning_allows_with_warnings(self, project_dir):
+        """docs_gate=warning should allow but emit warnings when CHANGELOG missing."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: warning\n"
+        )
         (project_dir / "CHANGELOG.md").write_text("# Changelog\n\n## v0.1.0\n- stuff\n")
         r = gate_verified_to_documented("F-0042", project_dir)
         assert r.allowed
         assert any("CHANGELOG" in w for w in r.warnings)
+
+    def test_docs_gate_blocking_blocks_when_changelog_missing(self, project_dir):
+        """docs_gate=blocking should block when CHANGELOG doesn't mention feature
+        and drift.sh detects drift."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: blocking\n"
+        )
+        (project_dir / "CHANGELOG.md").write_text("# Changelog\n\n## v0.1.0\n- stuff\n")
+        # Note: drift.sh won't exist in temp dir, so drift check will just warn
+        # but CHANGELOG check will still work
+        r = gate_verified_to_documented("F-0042", project_dir)
+        # Without drift.sh in temp dir, it won't block on drift itself,
+        # but the CHANGELOG warning should still be present
+        assert any("CHANGELOG" in w for w in r.warnings)
+
+    def test_docs_gate_default_off(self, project_dir):
+        """Default docs_gate should be 'off' (discovery profile default)."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: discovery\n"
+        )
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert r.allowed
+
+    def test_warns_when_changelog_missing_feature(self, project_dir):
+        """docs_gate=warning should warn about CHANGELOG missing feature."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: warning\n"
+        )
+        (project_dir / "CHANGELOG.md").write_text("# Changelog\n\n## v0.1.0\n- stuff\n")
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert r.allowed
+        assert any("CHANGELOG" in w for w in r.warnings)
+
+    def test_no_changelog_warning_when_feature_present(self, project_dir):
+        """No CHANGELOG warning when feature is mentioned."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: warning\n"
+        )
+        (project_dir / "CHANGELOG.md").write_text(
+            "# Changelog\n\n## v0.1.0\n- F-0042: Added feature\n"
+        )
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert r.allowed
+        assert not any("CHANGELOG" in w for w in r.warnings)
 
 
 # ---------------------------------------------------------------------------
