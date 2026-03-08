@@ -438,7 +438,7 @@ Each forward transition has a **gate function** checking filesystem precondition
 **Review checkpoints** (after gates pass, before transition writes):
 - Configurable per transition via `review_*` settings in STACK.md (modes: `human`, `critical_agent`, `auto`)
 - When `human` or `critical_agent`: transition blocks, creates HUMAN_NEEDED entry, awaits `ag review F-XXXX <state>`
-- When `auto`: proceeds without review
+- When `auto`: auto-approves (structural gates still apply, but no human/agent review pause)
 - Verdict artifacts stored in `.agentic/spec/reviews/F-XXXX/` (git-tracked, permanent record)
 
 CLI: `ag transition F-XXXX <state>`, `ag transition F-XXXX --status`, `ag transition --unblocked`
