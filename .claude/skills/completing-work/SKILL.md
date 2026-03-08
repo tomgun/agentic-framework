@@ -37,6 +37,17 @@ bash .agentic/lib/tools/wip.sh complete
 
 This removes the `.agentic/session/WIP.md` lock file.
 
+### Step 2b: Verify Documentation Updated
+
+Before marking shipped, verify documentation is current:
+
+1. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
+2. Check that CONTEXT_PACK.md reflects any architecture changes
+3. If `docs_gate: blocking` in STACK.md, `ag done` enforces this automatically
+4. For framework development: verify all instruction files updated (see CLAUDE.md § Framework Development)
+
+**Do not mark shipped with stale documentation.** Code + docs = done.
+
 ### Step 3: Update Feature Status
 
 ```bash
