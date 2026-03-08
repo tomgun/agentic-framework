@@ -1,18 +1,24 @@
 ---
 role: review
 model_tier: high-tier
-summary: "Critically review implementation plans before coding begins"
-use_when: "Plan quality assurance, risk identification, approach validation"
+summary: "DEPRECATED — use plan-critic-agent.md + plan-advocate-agent.md instead"
+use_when: "Do not use. Superseded by dialectical review (critic + advocate)."
 tokens: ~1200
+deprecated: true
+superseded_by: "plan-critic-agent.md, plan-advocate-agent.md"
 ---
 
 # Plan Reviewer Agent
+
+> **DEPRECATED**: This agent is superseded by the dialectical review mechanism (F-0191).
+> Plan review now uses **plan-critic-agent.md** (adversarial) + **plan-advocate-agent.md** (defensive)
+> running in parallel with fresh context. See `.agentic/lib/workflows/dialectical_review.md`.
 
 **Purpose**: Critically review implementation plans before coding begins. Find flaws early.
 
 **Recommended Model Tier**: High-tier (e.g., `opus`, `gpt-4`) - critical review needs quality reasoning
 
-**Context**: Used in plan-review loop. See `.agentic/lib/workflows/plan_review_loop.md`
+**Context**: Previously used in plan-review loop. Now superseded by dialectical review.
 
 ## When to Use
 

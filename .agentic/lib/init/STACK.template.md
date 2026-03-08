@@ -28,7 +28,7 @@ Purpose: a single source of truth for "how we build and run software here".
 - git_workflow: direct
 # Commit policy for main branch. Profile defaults — Discovery: direct | Formal: pull_request
 - plan_review_enabled: no
-# Review plan before implementation. Profile defaults — Discovery: no | Formal: yes
+# Review plan before implementation (uses dialectical critic+advocate). Profile defaults — Discovery: no | Formal: yes
 - spec_directory: no
 # Create spec/ directory for features. Profile defaults — Discovery: no | Formal: yes
 - docs_gate: off

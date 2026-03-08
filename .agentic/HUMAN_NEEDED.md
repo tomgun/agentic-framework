@@ -35,15 +35,19 @@ _No active items_
 
 
 
-### HN-0025: PR #79: F-0180 Review Checkpoint Framework
-- **Type**: decision
+### HN-0025: PR #81: F-0191 Dialectical Plan-Review Merge
+- **Type**: pr_review
 - **Added**: 2026-03-08
-- **Context**: 9 files, 1055 lines. Review checkpoints (human/critical_agent/auto) per transition, ag review command, 30 tests. Needs smoke test verification.
+- **Context**: Merge dialectical review into plan-review loop. Smoke test: walk through full plan-review cycle with real feature.
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
 
 ## Resolved
+
+### HN-0026: PR #79: F-0180 Review Checkpoint Framework
+- **Resolved**: 2026-03-08
+- **Outcome**: PR #79 merged
 
 ### HN-0023: PR #77: Doc enforcement at feature acceptance (F-0189)
 - **Resolved**: 2026-03-08

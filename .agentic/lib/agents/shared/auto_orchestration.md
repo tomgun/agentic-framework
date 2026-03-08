@@ -146,8 +146,9 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
 
 2. CHECK PLAN-REVIEW SETTING
    └─ Read STACK.md → plan_review_enabled (default: yes for formal profile)
-   ├─ If yes: Run `ag plan F-####` first — tell user review loop is active
-   │          and mention max iterations from plan_review_max_iterations
+   ├─ If yes: Run `ag plan F-####` — uses dialectical review (Critic + Advocate
+   │          in parallel, fresh context). User decides Proceed/Revise/Reject.
+   │          Mention max iterations from plan_review_max_iterations.
    └─ If no: Proceed directly (or run ag plan --no-review for simple plan)
 
 3. CHECK DEVELOPMENT MODE
