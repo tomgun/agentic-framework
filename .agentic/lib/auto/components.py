@@ -126,10 +126,6 @@ def parse_components_table(content: str) -> list[Component]:
 
     # Parse each data row
     for row in table_rows:
-        cells = [c.strip() for c in row.split("|")]
-        # Remove empty first/last cells from leading/trailing pipes
-        cells = [c for c in cells if c or cells.index(c) not in (0, len(cells) - 1)]
-        # Filter truly empty strings from split
         cells = [c.strip() for c in row.strip("|").split("|")]
 
         if len(cells) >= 4:
