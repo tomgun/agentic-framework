@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.46.0
+**Version**: 0.49.0
 
 ---
 
@@ -15,16 +15,18 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 | Category | Count | Shipped | In Progress | Planned |
 |----------|-------|---------|-------------|---------|
 | **Core** | 14 | 14 | 0 | 0 |
-| **Quality** | 22 | 19 | 2 | 1 |
-| **Session** | 12 | 11 | 0 | 0 |
+| **Quality** | 23 | 20 | 3 | 0 |
+| **Session** | 13 | 13 | 0 | 0 |
 | **Multi-Agent** | 10 | 8 | 1 | 1 |
 | **Tooling** | 11 | 11 | 0 | 0 |
 | **Recovery** | 7 | 7 | 0 | 0 |
-| **Developer Experience** | 15 | 13 | 2 | 0 |
+| **Developer Experience** | 15 | 13 | 1 | 1 |
 | **Design Principles** | 10 | 10 | 0 | 0 |
 | **Agent System** | 12 | 10 | 2 | 0 |
-| **Verification & Enforcement** | 17 | 16 | 0 | 1 |
-| **Autonomous** | 6 | 6 | 0 | 0 |
+| **Verification & Enforcement** | 18 | 17 | 1 | 0 |
+| **Autonomous** | 11 | 6 | 0 | 5 |
+| **Architecture** | 6 | 4 | 0 | 2 |
+| **Workflow** | 4 | 2 | 0 | 2 |
 
 ---
 
@@ -2917,7 +2919,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0177: Formal Feature State Machine
 
-**Status**: implementing
+**Status**: shipped
 **Category**: Workflow
 **Priority**: critical
 **Complexity**: high
@@ -2938,7 +2940,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0178: State Machine Blast Radius Update
 
-**Status**: implementing
+**Status**: shipped
 **Category**: Workflow
 **Priority**: high
 **Complexity**: high
@@ -2959,7 +2961,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0179: Component Registry and Scoped Context
 
-**Status**: planned
+**Status**: shipped
 **Category**: Architecture
 **Priority**: high
 **Complexity**: medium
@@ -3190,7 +3192,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0190: Backlog/Roadmap — Structural Work Assignment
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Session
 **Priority**: critical
 **Complexity**: high

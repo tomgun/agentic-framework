@@ -5,31 +5,28 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0190 Backlog/Roadmap — PR ready for review (Updated: 2026-03-08 19:22 UTC)
+- Dogfooding audit complete, backlog populated with ADR-001 roadmap (Updated: 2026-03-08)
 
 ## Current focus
-- Infrastructure validation tests shipped (v0.25.6, PR #27)
-- Three-layer enforcement proven: git hooks + CLAUDE.md triggers + memory seed
+- ADR-001 roadmap execution: F-0180 (Review Checkpoint Framework) is next
+- v0.49.0: Backlog, doc enforcement, component registry, state machine all shipped
 
 ## In progress
-- PR #27 awaiting review (infrastructure validation tests)
+- Backlog seeded with 9 ADR-001 features in dependency order
 
 ## Next up
-- Run infrastructure LLM tests (`bash tests/infrastructure/run.sh --with-llm`)
-- Run interactive memory tests (`bash tests/infrastructure/run.sh --interactive`)
-- Real-world project validation (non-framework project)
+- F-0180: Review Checkpoint Framework (current backlog item)
+- F-0181: Autonomous Formal Profile
+- F-0182: Critical Review Agent
 
 ## Known issues / risks
-- Some CHANGELOG.md historical references point to old file locations (acceptable — historical records)
+- Some CHANGELOG.md historical references point to old file locations (acceptable)
 
 ## Decisions needed
 - None currently
 
 ## Release notes (optional)
-- v0.25.0: Domain categories, `ag specs` brownfield pipeline, infra pattern detection, 3 new LLM tests, 16 new pytest tests
-- v0.23.0: Three-layer architecture visibility, persistent artifacts consolidation, 30 LLM tests, settings functional tests
-- v0.22.0: Instruction file slimdown ~70% (L-0002 fix), LLM test bug fixes, subagent context waste documented
-- v0.21.0: Structural enforcement for durable artifacts, `status.sh infer`, 6 new artifact-maintenance LLM tests
-- v0.20.0: Traceability overhaul, test consolidation, Context7 MCP update, KISS meta-principle
+- v0.49.0: F-0190 backlog work assignment, F-0189 doc enforcement, F-0179 component registry, F-0177/F-0178 state machine
+- v0.47.1: Docker sandbox for autonomous Claude Code
+- v0.47.0: Formal state machine for feature lifecycle (ADR-001 Phase 1)
 - See CHANGELOG.md for full history
-- QA: QA: 0/1 verified, 2 pending

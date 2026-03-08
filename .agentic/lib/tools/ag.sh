@@ -2732,21 +2732,22 @@ cmd_backlog() {
 _backlog_advisory() {
     local feature_id="$1"
     local command_name="$2"
-    [ -z "$feature_id" ] && return
-    echo "$feature_id" | grep -qE '^F-[0-9]{4}$' || return
+    [ -z "$feature_id" ] && return 0
+    echo "$feature_id" | grep -qE '^F-[0-9]{4}$' || return 0
 
     local current_json
-    current_json=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || return
-    [ -z "$current_json" ] && return
+    current_json=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || return 0
+    [ -z "$current_json" ] && return 0
 
     local current_id
-    current_id=$(echo "$current_json" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id',''))" 2>/dev/null) || return
+    current_id=$(echo "$current_json" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id',''))" 2>/dev/null) || return 0
 
     if [ -n "$current_id" ] && [ "$current_id" != "$feature_id" ]; then
         echo -e "${YELLOW}ADVISORY: Backlog says current work is $current_id (running $command_name for $feature_id)${NC}"
         echo -e "  ${DIM}Work on current: ag implement $current_id${NC}"
         echo ""
     fi
+    return 0
 }
 
 # Self-healing: ensure pre-commit hooks are installed on every ag invocation
