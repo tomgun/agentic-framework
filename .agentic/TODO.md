@@ -103,6 +103,12 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0044: F-NEW: Post-merge dogfooding workflow — after framework PR merge, systematically verify: (1) ag commands work with new code, (2) root entry points sync with template changes, (3) state files valid, (4) session-start loads correctly. Currently dogfooding is a principle but has no enforcement after merge. User insight from F-0177 PR session.
 - **Added**: 2026-03-08
 
+### T-0045: F-0193: Collision-proof feature IDs — current sequential F-XXXX IDs collide when multiple agents/branches assign independently. Research slug-based IDs, atomic allocation, or other approaches. See conversation notes on options.
+- **Added**: 2026-03-08
+
+### T-0046: F-0194: Worktree-by-default for feature branches — agents should always work in git worktrees when on feature branches, not dirty the main worktree. Needs: clear instruction in CLAUDE.md/skills, a STACK.md setting (e.g., worktree_mode: always|multi-agent|off), and possibly ag implement auto-creating the worktree. Current instruction exists but is too weak ('Use git worktree on feature branches when another agent may be working on main').
+- **Added**: 2026-03-08
+
 ## Done
 
 

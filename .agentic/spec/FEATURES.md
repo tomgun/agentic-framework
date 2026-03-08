@@ -3228,3 +3228,43 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Acceptance**: See `spec/acceptance/F-0191.md`
 
+---
+
+## F-0192: Review Subagent Delegation
+
+**Status**: verified
+**Category**: Quality
+**Priority**: medium
+**Complexity**: low
+
+**Description**: The /review skill delegates to a fresh-context subagent instead of running inline, keeping review diffs, file reads, and checklist references out of the main conversation context. Saves tokens by discarding disposable review context after producing a compact findings summary.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: none
+- Code: `.claude/skills/reviewing-code/SKILL.md`
+- Tests: Behavioral (verify subagent is spawned)
+
+**Acceptance**: See `spec/acceptance/F-0192.md`
+
+---
+
+## F-0193: Collision-Proof Feature IDs
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: high
+**Complexity**: medium
+
+**Description**: Sequential F-XXXX IDs collide when multiple agents or branches assign independently. Two agents picking "next ID" from the same FEATURES.md will choose the same number, causing merge conflicts and broken references across acceptance files, plans, journal entries, and code annotations. Needs research into slug-based IDs, atomic allocation, or other collision-proof schemes.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: none
+- Code: TBD (feature.sh, FEATURES.md format, possibly all spec tooling)
+- Tests: TBD
+
+**Acceptance**: TBD — requires design phase first
+
