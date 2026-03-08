@@ -32,6 +32,7 @@ MODE="${1:-interactive}"
 DRIFT_COUNT=0
 FIXED_COUNT=0
 DOCS_MODE=false
+DOCS_CHECK=false
 MANIFEST_FEATURE=""
 
 # Parse arguments
@@ -39,7 +40,6 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --docs)
             DOCS_MODE=true
-            MODE="--docs"
             shift
             ;;
         --manifest)
@@ -47,7 +47,12 @@ while [[ $# -gt 0 ]]; do
             MANIFEST_FEATURE="${1:-}"
             shift
             ;;
-        --check|--report|--json|interactive)
+        --check)
+            MODE="--check"
+            DOCS_CHECK=true
+            shift
+            ;;
+        --report|--json|interactive)
             MODE="$1"
             shift
             ;;
@@ -1000,7 +1005,11 @@ main() {
         check_documentation_drift
         if [[ $DRIFT_COUNT -gt 0 ]]; then
             echo -e "${YELLOW}Found $DRIFT_COUNT potential documentation drift issue(s).${NC}"
-            echo "  (Advisory only - review recommended)"
+            if [[ "$DOCS_CHECK" == "true" ]]; then
+                exit 1
+            else
+                echo "  (Advisory only - review recommended)"
+            fi
         fi
         return 0
     fi

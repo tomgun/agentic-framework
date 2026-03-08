@@ -223,16 +223,82 @@ class TestGateImplementingToVerified:
 # ---------------------------------------------------------------------------
 
 class TestGateVerifiedToDocumented:
-    def test_advisory_only(self, project_dir):
+    def test_docs_gate_off_skips_all(self, project_dir):
+        """docs_gate=off should skip all checks and return ok."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: off\n"
+        )
         r = gate_verified_to_documented("F-0042", project_dir)
         assert r.allowed
-        assert len(r.warnings) > 0
+        assert r.warnings == []
+        assert r.reasons == []
 
-    def test_warns_when_changelog_missing_feature(self, project_dir):
+    def test_docs_gate_warning_allows_with_warnings(self, project_dir):
+        """docs_gate=warning should allow but emit warnings when CHANGELOG missing."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: warning\n"
+        )
         (project_dir / "CHANGELOG.md").write_text("# Changelog\n\n## v0.1.0\n- stuff\n")
         r = gate_verified_to_documented("F-0042", project_dir)
         assert r.allowed
         assert any("CHANGELOG" in w for w in r.warnings)
+
+    def test_docs_gate_blocking_warns_changelog_without_drift_script(self, project_dir):
+        """docs_gate=blocking without drift.sh still warns about CHANGELOG."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: blocking\n"
+        )
+        (project_dir / "CHANGELOG.md").write_text("# Changelog\n\n## v0.1.0\n- stuff\n")
+        # drift.sh won't exist in temp dir, so drift check is skipped
+        # but CHANGELOG check still fires
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert any("CHANGELOG" in w for w in r.warnings)
+
+    def test_docs_gate_blocking_blocks_when_drift_found(self, project_dir):
+        """docs_gate=blocking with a drift.sh that exits non-zero should block."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: blocking\n"
+        )
+        # Create a fake drift.sh that always reports drift (exit 1)
+        tools_dir = project_dir / ".agentic" / "lib" / "tools"
+        tools_dir.mkdir(parents=True, exist_ok=True)
+        (tools_dir / "drift.sh").write_text(
+            '#!/usr/bin/env bash\necho "stale docs found"\nexit 1\n'
+        )
+        (tools_dir / "drift.sh").chmod(0o755)
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert not r.allowed
+        assert any("drift" in reason.lower() for reason in r.reasons)
+
+    def test_docs_gate_default_off(self, project_dir):
+        """Default docs_gate should be 'off' (discovery profile default)."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: discovery\n"
+        )
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert r.allowed
+
+    def test_warns_when_changelog_missing_feature(self, project_dir):
+        """docs_gate=warning should warn about CHANGELOG missing feature."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: warning\n"
+        )
+        (project_dir / "CHANGELOG.md").write_text("# Changelog\n\n## v0.1.0\n- stuff\n")
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert r.allowed
+        assert any("CHANGELOG" in w for w in r.warnings)
+
+    def test_no_changelog_warning_when_feature_present(self, project_dir):
+        """No CHANGELOG warning when feature is mentioned."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: warning\n"
+        )
+        (project_dir / "CHANGELOG.md").write_text(
+            "# Changelog\n\n## v0.1.0\n- F-0042: Added feature\n"
+        )
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert r.allowed
+        assert not any("CHANGELOG" in w for w in r.warnings)
 
 
 # ---------------------------------------------------------------------------

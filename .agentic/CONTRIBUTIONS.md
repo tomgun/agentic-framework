@@ -2641,8 +2641,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### Doc Enforcement at Feature Acceptance (F-0189, v0.48.1)
+
+**User insight**: The framework principle "Code + docs = done" was stated in CLAUDE.md but had no real enforcement. The `verified → documented` state machine gate was purely advisory (always returned `GateResult.ok()`). Autonomode had no doc step at all. Agents routinely skipped doc updates and the user had to constantly remind them. The pieces existed — `drift.sh --docs`, `docs_gate` setting, state machine gate — they just weren't connected to the right moments.
+
+**User direction**: Enforce documentation at feature acceptance and merge time — not on every commit (too noisy). Wire existing tools into the gates that matter. Designed the plan identifying 6 specific connection points: drift.sh exit codes, state machine gate, autonomode pipeline, AC prompt, and both implementing/reviewing skills. Key principle: no new tooling needed, just connect what exists.
+
+**Result**: `drift.sh --docs --check` returns non-zero on drift (was always advisory). `gate_verified_to_documented` reads `docs_gate` setting (off/warning/blocking) and blocks or warns accordingly. `task.py` spawns doc-update Claude between verify loop and PR creation. `engine.py` AC prompt includes doc instruction. Both implementing-features and reviewing-code skills get actionable doc steps with specific tool commands (`docs.sh --list`, `drift.sh --docs`).
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.45.0
+**Current Version**: v0.48.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions

@@ -1582,3 +1582,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 20:48 - F-0189 Doc Enforcement
+
+**Why**: Agents routinely skip doc updates; enforcement was advisory-only
+
+**What changed**:
+- Documentation drift detection wired into feature acceptance gates — state machine blocks/warns per docs_gate setting, autonomode spawns doc-update Claude before PR, agent skills get explicit doc steps
+
+**Next steps**:
+- Merge PR #77
+
+**Blockers**: None
+

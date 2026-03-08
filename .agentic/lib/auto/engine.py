@@ -442,6 +442,7 @@ class AutoEngine:
             f"- Read the existing code to understand the codebase\n"
             f"- Implement the minimum code needed to satisfy this criterion\n"
             f"- Ensure tests pass after your changes\n"
+            f"- If your changes affect documented behavior (README, CHANGELOG, docs/), update those docs in the same change\n"
             f"- Do NOT modify unrelated code\n"
             f"{feedback_text}"
         )
