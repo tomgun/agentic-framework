@@ -5,6 +5,11 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.48.0] - 2026-03-08
+
+### Added
+- **Component Registry (F-0179, ADR-001 Phase 2)** — Optional `## Components` table in STACK.md for multi-component/monorepo projects. `components.py` with Component dataclass, ComponentRegistry (get, list, reverse path lookup, validation), markdown table parsing, and monorepo auto-detection. Scoped context via `context-for-role.sh --component`. `query_features.py --component` filter. Component-aware gate advisory in `implementing → verified` transition. 25 new tests.
+
 ## [0.47.0] - 2026-03-08
 
 ### Added
