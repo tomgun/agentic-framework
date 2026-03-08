@@ -18,6 +18,7 @@ Usage:
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -26,6 +27,7 @@ from typing import Callable
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
+from settings import get_setting  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -316,9 +318,6 @@ def gate_verified_to_documented(feature_id: str, project_root: Path) -> GateResu
     - docs_gate=warning: run drift.sh --docs --check, warn if drift found
     - docs_gate=blocking: run drift.sh --docs --check, block if drift found
     """
-    import subprocess
-    from settings import get_setting
-
     docs_gate = get_setting(project_root, "docs_gate", "off")
     warnings: list[str] = []
     reasons: list[str] = []
@@ -363,10 +362,13 @@ def gate_verified_to_documented(feature_id: str, project_root: Path) -> GateResu
     if drift_found:
         drift_msg = f"Documentation drift detected for {feature_id}"
         if drift_output:
+            # Strip ANSI escape codes for clean gate messages
+            ansi_re = re.compile(r"\033\[[0-9;]*m")
+            clean_output = ansi_re.sub("", drift_output)
             # Extract just the summary line(s) from drift output
             summary_lines = [
-                line for line in drift_output.splitlines()
-                if "stale" in line.lower() or "⚠" in line
+                line.strip() for line in clean_output.splitlines()
+                if "stale" in line.lower() or "\u26a0" in line
             ]
             if summary_lines:
                 drift_msg += ": " + "; ".join(summary_lines[:3])

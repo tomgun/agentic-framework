@@ -243,19 +243,32 @@ class TestGateVerifiedToDocumented:
         assert r.allowed
         assert any("CHANGELOG" in w for w in r.warnings)
 
-    def test_docs_gate_blocking_blocks_when_changelog_missing(self, project_dir):
-        """docs_gate=blocking should block when CHANGELOG doesn't mention feature
-        and drift.sh detects drift."""
+    def test_docs_gate_blocking_warns_changelog_without_drift_script(self, project_dir):
+        """docs_gate=blocking without drift.sh still warns about CHANGELOG."""
         (project_dir / "STACK.md").write_text(
             "## Settings\n- profile: formal\n- docs_gate: blocking\n"
         )
         (project_dir / "CHANGELOG.md").write_text("# Changelog\n\n## v0.1.0\n- stuff\n")
-        # Note: drift.sh won't exist in temp dir, so drift check will just warn
-        # but CHANGELOG check will still work
+        # drift.sh won't exist in temp dir, so drift check is skipped
+        # but CHANGELOG check still fires
         r = gate_verified_to_documented("F-0042", project_dir)
-        # Without drift.sh in temp dir, it won't block on drift itself,
-        # but the CHANGELOG warning should still be present
         assert any("CHANGELOG" in w for w in r.warnings)
+
+    def test_docs_gate_blocking_blocks_when_drift_found(self, project_dir):
+        """docs_gate=blocking with a drift.sh that exits non-zero should block."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: blocking\n"
+        )
+        # Create a fake drift.sh that always reports drift (exit 1)
+        tools_dir = project_dir / ".agentic" / "lib" / "tools"
+        tools_dir.mkdir(parents=True, exist_ok=True)
+        (tools_dir / "drift.sh").write_text(
+            '#!/usr/bin/env bash\necho "stale docs found"\nexit 1\n'
+        )
+        (tools_dir / "drift.sh").chmod(0o755)
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert not r.allowed
+        assert any("drift" in reason.lower() for reason in r.reasons)
 
     def test_docs_gate_default_off(self, project_dir):
         """Default docs_gate should be 'off' (discovery profile default)."""
