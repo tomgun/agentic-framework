@@ -280,6 +280,8 @@ class TaskRunner:
         if not drift_script.exists():
             return
 
+        print(f"Checking documentation drift for {feature_id}...")
+
         try:
             proc = subprocess.run(
                 ["bash", str(drift_script), "--docs", "--check",
@@ -290,12 +292,15 @@ class TaskRunner:
                 timeout=30,
             )
         except (subprocess.TimeoutExpired, OSError):
+            print("  Warning: drift.sh timed out or failed to run")
             return
 
         if proc.returncode == 0:
-            return  # No drift
+            print("  No documentation drift detected")
+            return
 
         # Drift detected — spawn Claude to update docs
+        print("  Documentation drift detected — spawning Claude to update docs...")
         drift_output = proc.stdout.strip()
         prompt = (
             f"Documentation drift detected for feature {feature_id}.\n\n"
@@ -314,10 +319,10 @@ class TaskRunner:
             timeout=120,
         )
 
-        # Commit doc updates separately
+        # Commit doc updates separately (only modified tracked files)
         try:
             subprocess.run(
-                ["git", "add", "-A"],
+                ["git", "add", "-u"],
                 cwd=str(self.project_root),
                 capture_output=True,
                 check=True,
@@ -329,6 +334,7 @@ class TaskRunner:
                 capture_output=True,
                 check=True,
             )
+            print("  Documentation updates committed")
         except subprocess.CalledProcessError:
             pass  # No changes to commit
 

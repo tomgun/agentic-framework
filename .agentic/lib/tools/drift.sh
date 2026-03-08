@@ -40,10 +40,6 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --docs)
             DOCS_MODE=true
-            # Only set MODE to --docs if not already set to --check
-            if [[ "$MODE" == "${1:-interactive}" ]]; then
-                MODE="--docs"
-            fi
             shift
             ;;
         --manifest)
@@ -1008,11 +1004,10 @@ main() {
     if [[ "$DOCS_MODE" == "true" ]]; then
         check_documentation_drift
         if [[ $DRIFT_COUNT -gt 0 ]]; then
+            echo -e "${YELLOW}Found $DRIFT_COUNT potential documentation drift issue(s).${NC}"
             if [[ "$DOCS_CHECK" == "true" ]]; then
-                echo -e "${YELLOW}Found $DRIFT_COUNT potential documentation drift issue(s).${NC}"
                 exit 1
             else
-                echo -e "${YELLOW}Found $DRIFT_COUNT potential documentation drift issue(s).${NC}"
                 echo "  (Advisory only - review recommended)"
             fi
         fi
