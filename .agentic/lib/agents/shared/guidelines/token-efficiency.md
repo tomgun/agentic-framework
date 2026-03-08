@@ -52,7 +52,7 @@ bash .agentic/lib/tools/context-for-role.sh implementation-agent F-0042 --dry-ru
 
 | File to Update | USE THIS SCRIPT |
 |----------------|-----------------|
-| JOURNAL.md | `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers"` |
+| JOURNAL.md | `bash .agentic/lib/tools/journal.sh "Topic" "Outcome" "Next" "Blockers" --why "Problem"` |
 | STATUS.md | `bash .agentic/lib/tools/status.sh focus "Task"` |
 | HUMAN_NEEDED.md | `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"` |
 | .agentic/spec/FEATURES.md | `bash .agentic/lib/tools/feature.sh F-#### status shipped` |
