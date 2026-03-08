@@ -1689,3 +1689,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 21:55 - F-0192 Review Subagent
+
+**Why**: Token efficiency: review context is large but disposable
+
+**What changed**:
+- Review skill delegates to fresh-context subagent — diffs and file reads stay out of main conversation, only structured findings report comes back
+
+**Next steps**:
+- PR review, merge
+
+**Blockers**: None
+

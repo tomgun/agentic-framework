@@ -503,6 +503,7 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 | **Instruction File Size Limits** | L-0002 empirical finding: compliance degrades past ~100 lines. All templates slimmed to 38-53 lines. Pre-commit Check 10 warns if instruction files exceed limits. | ACTIVE - structural + empirically validated |
 | **Reading Protocols** | `reading_protocols.md` defines token budgets per task type (3-5K for focused feature, not 50K). | DOCUMENTED - behavioral |
 | **Tier-Based Model Selection** (F-0082) | Model recommendations use tiers (Cheap/Fast, Mid-tier, Powerful) instead of specific names. Future-proof. | ACTIVE - documented in orchestration tables |
+| **Review Subagent Delegation** (F-0192) | `/review` skill delegates to a fresh-context subagent. Diffs, file reads, and checklist processing stay in the subagent's disposable context — main conversation only receives a structured findings report (Must Fix / Should Fix / Consider / Verdict). Small targeted questions can still be reviewed inline. | ACTIVE |
 
 **Hidden mechanism**: The `ag` command gateway is itself a context-efficiency mechanism. By printing just-in-time instructions (playbook references) when agents run commands, it avoids front-loading auto_orchestration.md (442 lines) into every session. Zero tokens until the agent actually needs the guidance.
 
