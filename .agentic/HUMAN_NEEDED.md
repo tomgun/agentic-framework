@@ -42,7 +42,12 @@ _No active items_
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
+
 ## Resolved
+
+### HN-0026: PR #79: F-0180 Review Checkpoint Framework
+- **Resolved**: 2026-03-08
+- **Outcome**: PR #79 merged
 
 ### HN-0023: PR #77: Doc enforcement at feature acceptance (F-0189)
 - **Resolved**: 2026-03-08

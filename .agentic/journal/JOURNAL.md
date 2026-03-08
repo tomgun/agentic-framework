@@ -1650,3 +1650,42 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 21:06 - F-0180 Review Checkpoints
+
+**Why**: Quality gates between lifecycle states — gates check structure, reviews check quality
+
+**What changed**:
+- Review checkpoint framework with configurable modes (human/critical_agent/auto) per transition, ag review command, verdict artifacts, 30 tests — all passing
+
+**Next steps**:
+- Instruction file updates, VERSION bump, smoke test
+
+**Blockers**: None
+
+
+### Session: 2026-03-08 21:12 - F-0180 instruction files
+
+**Why**: Framework features must update instruction files to reach agents in user projects
+
+**What changed**:
+- Added ag review to all instruction files (13 files), 21 framework validation tests, trigger word tables, memory-seed, auto_orchestration, DEVELOPER_GUIDE, HOW_IT_WORKS
+
+**Next steps**:
+- Smoke test, VERSION bump
+
+**Blockers**: None
+
+
+### Session: 2026-03-08 21:25 - F-0180 code review fixes
+
+**Why**: Harden review checkpoint framework after code review
+
+**What changed**:
+- Fixed all 14 code review findings: feature ID validation, regression pairs sync with state_machine, atomic verdict writes, safe file operations, flexible HN-ID regex, mutually exclusive CLI flags, cache-clearing test fixture, 12 new tests
+
+**Next steps**:
+- Feature complete
+
+**Blockers**: None
+

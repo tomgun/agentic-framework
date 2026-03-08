@@ -8,7 +8,7 @@ Full template: `.agentic/lib/agents/copilot/copilot-instructions.md`
 
 Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
-Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog` | `ag spec` | `ag docs` | `ag todo`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog` | `ag review` | `ag spec` | `ag docs` | `ag todo`
 
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |
@@ -21,6 +21,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
 | Backlog / queue / what's next / prioritize / reorder work | STOP -> `ag backlog` to see queue. `ag backlog add F-XXXX` to add. |
 | Write spec / create spec / acceptance criteria / evolve spec | STOP -> Run `ag spec F-XXXX`. Follow spec protection levels. |
+| Review blocked / approve transition / reject transition | STOP -> Run `ag review` to list pending. `ag review F-XXXX <state>` to approve. `--reject` to reject. |
 
 DO NOT PROCEED without acceptance criteria: .agentic/spec/acceptance/F-####.md must exist. Criteria before code. No exceptions.
 

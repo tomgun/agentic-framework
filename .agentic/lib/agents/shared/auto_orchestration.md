@@ -72,6 +72,7 @@ What would you like to work on?
 | "done with feature" / "feature complete" | **Feature Complete** | Run `feature_complete.md` checklist |
 | "end session" / "stopping work" | **Session End** | Run `session_end.md` checklist |
 | "review code" / "check this" | **Review** | Run `review_checklist.md` |
+| "review blocked" / "approve transition" / "pending review" | **Review Checkpoint** | Run `ag review` to list pending. `ag review F-XXXX <state>` to resolve. |
 
 ### Domain & Design Triggers
 

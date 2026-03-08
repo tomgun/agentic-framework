@@ -135,6 +135,7 @@ COMMANDS:
     backlog <sub>       Ordered work queue (add|list|done|move|remove|clear)
     auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
+    review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
     nfr [sub]           NFR management (list, discover, coverage)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
@@ -201,6 +202,7 @@ COMMANDS:
     backlog <sub>       Ordered work queue (add|list|done|move|remove|clear)
     auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
+    review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
     nfr [sub]           NFR management (list, discover, coverage)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
@@ -2457,6 +2459,12 @@ _settings_set_value() {
                 exit 1
             fi
             ;;
+        review_spec|review_criteria|review_plan|review_code|review_merge|review_decomposition|review_regression|review_taste)
+            if [[ ! "$value" =~ ^(human|critical_agent|auto)$ ]]; then
+                echo -e "${RED}Error: $key must be 'human', 'critical_agent', or 'auto', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
     esac
 
     if [ ! -f "$stack_file" ]; then
@@ -2855,6 +2863,10 @@ case "${1:-help}" in
     transition)
         shift
         python3 "$SCRIPT_DIR/../auto/state_machine.py" --project-root "$ROOT_DIR" "$@"
+        ;;
+    review)
+        shift
+        python3 "$SCRIPT_DIR/../auto/review.py" --project-root "$ROOT_DIR" "$@"
         ;;
     audit)
         shift
