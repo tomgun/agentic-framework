@@ -46,7 +46,7 @@ bash .agentic/lib/tools/feature.sh F-XXXX status shipped
 ### Step 4: Update Artifacts
 
 ```bash
-bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Implemented [description]" "Next: [what's next]" "None"
+bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Project can now [capability]" "Next: [what's next]" "None" --why "Problem solved"
 bash .agentic/lib/tools/status.sh focus "F-XXXX shipped, ready for next task"
 ```
 
