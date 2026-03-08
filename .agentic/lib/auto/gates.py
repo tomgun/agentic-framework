@@ -372,11 +372,19 @@ DEFAULT_GATES: list[tuple[str, str, GateFunc]] = [
 ]
 
 
-def register_default_gates(sm: object) -> None:
-    """Register all default gate functions on a FeatureStateMachine instance."""
-    from auto.state_machine import FeatureState  # deferred to avoid circular
+def register_default_gates(sm: object, state_enum: type | None = None) -> None:
+    """Register all default gate functions on a FeatureStateMachine instance.
+
+    Args:
+        sm: FeatureStateMachine instance with register_gate(from, to, fn) method.
+        state_enum: FeatureState enum class. If None, imports from auto.state_machine.
+            Pass explicitly when calling from __main__ to avoid dual-import issues.
+    """
+    if state_enum is None:
+        from auto.state_machine import FeatureState
+        state_enum = FeatureState
 
     for from_str, to_str, gate_fn in DEFAULT_GATES:
-        from_state = FeatureState(from_str)
-        to_state = FeatureState(to_str)
+        from_state = state_enum(from_str)
+        to_state = state_enum(to_str)
         sm.register_gate(from_state, to_state, gate_fn)

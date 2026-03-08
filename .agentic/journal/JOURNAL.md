@@ -1518,13 +1518,21 @@
 **Blockers**: None
 
 
-### Session: 2026-03-08 13:24 - F-0177 Review Fixes
+### Session: 2026-03-08 — F-0177/F-0178 State Machine PR + Review Fixes (v0.47.0)
+
+**Why**: Feature lifecycle had no formal state tracking — features jumped from planned to shipped with no enforced intermediate gates
 
 **What changed**:
-- Deduplicated GateResult, removed dual registry, bumped VERSION to 0.47.0, added CHANGELOG + HOW_IT_WORKS docs
+- Created PR #70 with formal 9-state feature lifecycle (state_machine.py, gates.py, ADR-001, 22 blast radius files, 65 tests)
+- Code review found 4 design issues: duplicate GateResult class, dual gate registry, fragile 2000-char parser cap, gates not wired in CLI
+- Fixed all: GateResult single source in gates.py, removed module-level GATE_REGISTRY, removed char cap, wired register_default_gates in main()
+- Found and fixed __main__ dual-import bug: running state_machine.py as script caused gates to register on a different FeatureState enum than the one used by main(). Fix: pass state_enum explicitly to avoid circular import creating duplicate module
+- Added missing release artifacts: VERSION 0.46.1→0.47.0, CHANGELOG v0.47.0 entry, HOW_IT_WORKS.md state machine section + diagram update
+
+**Key lesson**: End-to-end CLI smoke test caught a real bug that unit tests missed — gates were never called from the CLI because register_default_gates wasn't invoked in main(). Then the fix revealed a subtler Python dual-import issue (__main__ vs module identity). Unit tests alone are insufficient for CLI tools.
 
 **Next steps**:
-- Push to PR, human review
+- Human review of PR #70
 
 **Blockers**: None
 

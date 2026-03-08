@@ -36,7 +36,7 @@ _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
 
-from auto.gates import GateResult  # noqa: E402 — single source of truth
+from auto.gates import GateResult, register_default_gates  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -462,6 +462,9 @@ def main() -> int:
     sm = FeatureStateMachine(
         project_root=args.project_root, enforce=args.enforce
     )
+
+    # Wire up default gate functions (pass FeatureState to avoid __main__ dual-import)
+    register_default_gates(sm, state_enum=FeatureState)
 
     # --unblocked does not require feature_id
     if args.unblocked:
