@@ -17,7 +17,7 @@ These rules apply to ALL agent roles. Injected automatically by `context-for-rol
 
 3. **Use token-efficient scripts** — do NOT read/edit these files directly:
    - STATUS.md → `bash .agentic/lib/tools/status.sh focus "Task"`
-   - JOURNAL.md → `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers"`
+   - JOURNAL.md → `bash .agentic/lib/tools/journal.sh "Topic" "Outcome for the project" "Next" "Blockers" --why "Problem solved"`
    - HUMAN_NEEDED.md → `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
    - FEATURES.md → `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 

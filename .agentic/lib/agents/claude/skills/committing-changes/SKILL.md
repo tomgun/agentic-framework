@@ -48,9 +48,13 @@ git branch --show-current
 Before committing, update the durable artifacts using token-efficient scripts:
 
 ```bash
-bash .agentic/lib/tools/journal.sh "Topic" "What was done" "Next steps" "Blockers"
+bash .agentic/lib/tools/journal.sh "Topic" "Outcome for the project" "Next steps" "Blockers" --why "Problem solved"
 bash .agentic/lib/tools/status.sh focus "Current state"
 ```
+
+**Journal entries must be outcome-focused** — describe what the project can do now, not what files were edited.
+- Good: "Agents can now scope context to a single component via --component flag"
+- Bad: "Fixed indentation in query_features.py, removed dead code in components.py"
 
 **Never edit JOURNAL.md or STATUS.md directly** — always use the scripts.
 

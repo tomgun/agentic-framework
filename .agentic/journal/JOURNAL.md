@@ -1570,29 +1570,15 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
-### Session: 2026-03-08 14:05 - ADR-001 Feature Decomposition
+### Session: 2026-03-08 17:48 - Journal outcome-focused hints
 
-**Why**: Decomposing ADR-001 roadmap into trackable, ordered feature items
-
-**What changed**:
-- Registered 10 features (F-0179 to F-0188) across ADR-001 Phases 2-7 with acceptance criteria. Phase ordering: Components → Review Framework → Autonomous Profile → Critical Agent → Taste Settings → Epics → MCP Server → Scheduler → Multi-Repo → E2E Flow. Also marked F-0177/F-0178 as shipped.
-
-**Next steps**:
-- Create PR for feature registration. Phase 2 (F-0179 Components) is next for implementation.
-
-**Blockers**: None
-
-
-### Session: 2026-03-08 14:19 - F-0179 Review Fixes
-
-**Why**: Code review of PR #75 found incomplete component scoping and parsing bugs
+**Why**: Agents kept writing implementation-focused journal entries because skill files had stale hints like 'Done' and 'What was done'
 
 **What changed**:
-- context-for-role.sh --component now actually filters files to component scope (was resolving path but never using it)
-- Component table parser no longer has dead code path that could mask parsing edge cases
+- All 13 instruction files now prompt agents to write outcome-focused journal entries instead of listing file names
 
 **Next steps**:
-- Merge PR #74 (specs) and PR #75 (component registry), then Phase 3 (F-0180 Review Checkpoints)
+- Merge PR
 
 **Blockers**: None
 

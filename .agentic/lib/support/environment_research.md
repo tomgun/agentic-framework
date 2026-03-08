@@ -192,7 +192,7 @@ This repo uses Agentic Framework (`.agentic/`).
 2. Check `.agentic/HUMAN_NEEDED.md` (blockers)
 3. Use scripts (NOT file edits):
    ```bash
-   bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers"
+   bash .agentic/lib/tools/journal.sh "Topic" "Outcome for the project" "Next" "Blockers" --why "Problem solved"
    bash .agentic/lib/tools/feature.sh F-#### status shipped
    ```
 

@@ -137,7 +137,7 @@ bash .agentic/lib/tools/journal.sh \
 
 **Use scripts** (token-efficient):
 ```bash
-bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers"
+bash .agentic/lib/tools/journal.sh "Topic" "Outcome for the project" "Next" "Blockers" --why "Problem solved"
 bash .agentic/lib/tools/session_log.sh "Checkpoint" "Details" "key=value"
 ```
 
