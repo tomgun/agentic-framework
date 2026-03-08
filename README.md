@@ -68,6 +68,7 @@ A custom rules file is a great start. This framework builds on the same idea but
   - spec/FEATURES.md, NFR.md, ADRs
   - Cross-reference validation
   - Semantic spec analysis (ambiguity detection, AC↔test coverage gaps, NFR measurability)
+  - Component registry for monorepos (`## Components` in STACK.md — scoped context, test commands, feature tracking)
   - User-extension directory (`.agentic/local/extensions/` for custom skills and gates)
 
 **🔄 Multi-Environment Support:**
