@@ -34,8 +34,9 @@ Arguments:
     feature_id    Feature ID for variable substitution (e.g., F-0042)
 
 Options:
-    --dry-run     Show what would be loaded without outputting content
-    --help        Show this help message
+    --component NAME  Scope context to a specific component (from STACK.md)
+    --dry-run         Show what would be loaded without outputting content
+    --help            Show this help message
 
 Examples:
     # Get context for implementation agent
@@ -103,7 +104,8 @@ main() {
     local role=""
     local feature_id=""
     local dry_run=false
-    
+    local component_name=""
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -114,6 +116,10 @@ main() {
             --dry-run)
                 dry_run=true
                 shift
+                ;;
+            --component)
+                component_name="$2"
+                shift 2
                 ;;
             *)
                 if [[ -z "$role" ]]; then
@@ -154,7 +160,26 @@ main() {
         echo -e "Description: ${description}"
         echo -e "Token budget: ${token_budget}"
         echo -e "Feature ID: ${feature_id:-'(none)'}"
+        if [[ -n "$component_name" ]]; then
+            echo -e "Component: ${component_name} (scoped context)"
+        fi
         echo ""
+    fi
+
+    # Resolve component path for scoped context filtering
+    local component_path=""
+    if [[ -n "$component_name" ]]; then
+        component_path=$(python3 -c "
+import sys; sys.path.insert(0, '$SCRIPT_DIR/../')
+from auto.components import load_registry
+from pathlib import Path
+r = load_registry(Path('$PROJECT_ROOT'))
+c = r.get('$component_name')
+print(c.path if c else '')
+" 2>/dev/null || true)
+        if [[ -z "$component_path" ]]; then
+            echo -e "${YELLOW}Warning: Component '$component_name' not found in STACK.md${NC}" >&2
+        fi
     fi
     
     local total_tokens=0
