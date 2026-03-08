@@ -830,7 +830,7 @@ The 24 YAML manifests and `context-for-role.sh` are the framework's most sophist
 ### Priority 2: Enforce Plan-Review Gate
 `ag implement` checks for an approved plan but doesn't hard-block without one. Making this structural (exit 1 if no `.agentic/journal/plans/F-XXXX-plan.md` with Status: APPROVED) would ensure the plan-review loop is consistently used for complex features.
 
-**Update (v0.50.0)**: Dialectical review (F-0191) adds a complementary mechanism — after plan-review produces an APPROVED plan, Critic + Advocate agents run in parallel with fresh context. This catches issues the shared-context reviewer may have normalized. The plan-review gate enforcement gap remains a separate issue.
+**Update (v0.50.0)**: Plan review now uses dialectical mechanism (F-0191) — Critic + Advocate agents replace the single reviewer. The mechanism is complete; the enforcement gap (hard-blocking `ag implement` without APPROVED plan) remains a separate issue.
 
 ### Priority 3: Real-World Multi-Agent Test
 Set up a two-agent worktree scenario on a real project. This would validate F-0031-0033, F-0097, and expose gaps in the coordination protocol before documenting it as "working."
