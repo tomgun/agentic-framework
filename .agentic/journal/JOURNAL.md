@@ -1582,3 +1582,17 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 14:19 - F-0179 Review Fixes
+
+**Why**: Code review of PR #75 found incomplete component scoping and parsing bugs
+
+**What changed**:
+- context-for-role.sh --component now actually filters files to component scope (was resolving path but never using it)
+- Component table parser no longer has dead code path that could mask parsing edge cases
+
+**Next steps**:
+- Merge PR #74 (specs) and PR #75 (component registry), then Phase 3 (F-0180 Review Checkpoints)
+
+**Blockers**: None
+

@@ -50,7 +50,7 @@ def parse_features(md: str) -> List[Dict]:
                 "owner": None,
                 "parent": None,
                 "complexity": None,
-            "component": None,
+                "component": None,
             }
             continue
 

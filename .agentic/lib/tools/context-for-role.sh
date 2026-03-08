@@ -248,8 +248,18 @@ print(c.path if c else '')
         local full_path="$PROJECT_ROOT/$file_path"
         
         if [[ -f "$full_path" ]]; then
+            # Component scoping: skip files outside component path
+            if [[ -n "$component_path" && "$file_path" != "$component_path"* \
+                && "$file_path" != ".agentic/"* && "$file_path" != "spec/"* \
+                && "$file_path" != "STACK.md" && "$file_path" != "CONTEXT_PACK.md" ]]; then
+                if $dry_run; then
+                    echo -e "  ${YELLOW}⊘${NC} $file_path (outside component scope: $component_path)"
+                fi
+                continue
+            fi
+
             local content=""
-            
+
             if [[ -n "$sections" ]]; then
                 # Extract specific sections
                 IFS=',' read -ra section_list <<< "$sections"
@@ -268,11 +278,11 @@ print(c.path if c else '')
             else
                 content=$(cat "$full_path")
             fi
-            
+
             local file_tokens=$(count_tokens "$content")
             total_tokens=$((total_tokens + file_tokens))
             files_loaded+=("$file_path")
-            
+
             if $dry_run; then
                 echo -e "  ${GREEN}✓${NC} $file_path (~${file_tokens} tokens)"
             else
@@ -304,9 +314,19 @@ print(c.path if c else '')
         local full_path="$PROJECT_ROOT/$file_path"
         
         if [[ -f "$full_path" ]]; then
+            # Component scoping: skip files outside component path
+            if [[ -n "$component_path" && "$file_path" != "$component_path"* \
+                && "$file_path" != ".agentic/"* && "$file_path" != "spec/"* \
+                && "$file_path" != "STACK.md" && "$file_path" != "CONTEXT_PACK.md" ]]; then
+                if $dry_run; then
+                    echo -e "  ${YELLOW}⊘${NC} $file_path (outside component scope: $component_path)"
+                fi
+                continue
+            fi
+
             local content=$(cat "$full_path")
             local file_tokens=$(count_tokens "$content")
-            
+
             if (( total_tokens + file_tokens <= token_budget )); then
                 total_tokens=$((total_tokens + file_tokens))
                 files_loaded+=("$file_path")
