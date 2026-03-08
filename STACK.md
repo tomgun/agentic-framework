@@ -5,7 +5,7 @@
 Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Agentic framework
-- Version: 0.49.0
+- Version: 0.50.1
 - Profile: formal
 - This IS the framework (dogfooding)
 - Source: https://github.com/tomgun/agentic-framework
@@ -29,7 +29,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - git_workflow: pull_request
 # Commit policy for main branch. Profile defaults — Discovery: direct | Formal: pull_request
 - plan_review_enabled: yes
-# Review plan before implementation. Profile defaults — Discovery: no | Formal: yes
+# Review plan before implementation (uses dialectical critic+advocate). Profile defaults — Discovery: no | Formal: yes
 - spec_directory: yes
 # Create spec/ directory for features. Profile defaults — Discovery: no | Formal: yes
 - docs_gate: blocking

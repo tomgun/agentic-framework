@@ -69,13 +69,42 @@ Skip this section for simple features (≤5 ACs) unless multi-agent dispatch is 
 
 ### Step 5: Save Plan Durably
 
-After approval, save the plan to `.agentic/journal/plans/F-XXXX-plan.md`.
+After creating/revising the plan, save to `.agentic/journal/plans/F-XXXX-plan.md`.
 
 Plans in `~/.claude/plans/` are session-scoped and will be lost. Always copy to the durable location.
 
+### Step 5.5: Dialectical Review (if `plan_review_enabled: yes`)
+
+Check `plan_review_enabled` in STACK.md (default: yes for Formal, no for Discovery).
+
+If enabled, run dialectical review on the saved plan:
+
+1. **Spawn Critic + Advocate in parallel** (both with fresh context):
+
+```
+Agent(subagent_type="general-purpose",
+  prompt="You are a PLAN CRITIC with fresh context.
+    Read plan: .agentic/journal/plans/F-XXXX-plan.md
+    Read requirements: .agentic/spec/acceptance/F-XXXX.md
+    Follow: .agentic/lib/agents/claude/subagents/plan-critic-agent.md
+    Output your structured critique.")
+
+Agent(subagent_type="general-purpose",
+  prompt="You are a PLAN ADVOCATE with fresh context.
+    Read plan: .agentic/journal/plans/F-XXXX-plan.md
+    Read requirements: .agentic/spec/acceptance/F-XXXX.md
+    Follow: .agentic/lib/agents/claude/subagents/plan-advocate-agent.md
+    Output your structured defense.")
+```
+
+2. **Synthesize both perspectives** using rules from `references/dialectical_review.md`
+3. **Present synthesis inline** (including Revision Guidance section)
+4. **User decides**: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject
+5. If Revise: Planner revises the saved plan, then fresh Critic + Advocate run again (new iteration)
+
 ### Step 6: Hand Off to Implementation
 
-After plan approval, start implementation:
+After plan approval (user chooses Proceed), start implementation:
 ```bash
 bash .agentic/lib/tools/wip.sh start F-XXXX "Description" "files"
 ```
@@ -114,4 +143,5 @@ Solution: Break into 3-5 smaller plans, each implementable in one batch (max 5-1
 
 ## References
 
-- For plan-review workflow: see `references/plan_review_loop.md`
+- For plan-review lifecycle: see `references/plan_review_loop.md`
+- For dialectical review mechanism: see `references/dialectical_review.md`
