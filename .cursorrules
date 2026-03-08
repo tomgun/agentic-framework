@@ -33,5 +33,6 @@ Rules:
 - Worktree: Use `git worktree` on feature branches when another agent may be working on main.
 
 Verify: bash tests/validate_framework.sh
+Instruction files are part of the feature: new `ag` commands/gates MUST update all instruction files (templates, skills, checklists, memory-seed, DEVELOPER_GUIDE, HOW_IT_WORKS).
 
 Workflows, delegation, gates, checklists: run `ag` commands or see `.agentic/lib/agents/shared/auto_orchestration.md`
