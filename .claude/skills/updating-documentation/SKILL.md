@@ -48,7 +48,7 @@ Common documentation updates:
 
 For framework-managed docs:
 ```bash
-bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers"
+bash .agentic/lib/tools/journal.sh "Topic" "Outcome for the project" "Next" "Blockers" --why "Problem solved"
 bash .agentic/lib/tools/status.sh focus "Current state"
 ```
 

@@ -41,7 +41,7 @@ Rules:
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
-- JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"`
+- JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcome for the project" "Next" "Blockers" --why "Problem solved"`
 - HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
 - FEATURES.md: `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 - TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`

@@ -26,7 +26,7 @@ Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX`
 ## Token-Efficient Scripts (ALWAYS use these, NEVER edit state files directly)
 
 - .agentic/STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
-- .agentic/journal/JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"`
+- .agentic/journal/JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcome for the project" "Next" "Blockers" --why "Problem solved"`
 - .agentic/HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
 - .agentic/.agentic/spec/FEATURES.md: `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 - .agentic/TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`
