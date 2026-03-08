@@ -4,7 +4,7 @@
 
 **Purpose**: Define what the Agentic AI Framework can reliably do at each version.
 
-**Version**: 0.49.0
+**Version**: 0.50.0
 
 ---
 
@@ -15,7 +15,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 | Category | Count | Shipped | In Progress | Planned |
 |----------|-------|---------|-------------|---------|
 | **Core** | 14 | 14 | 0 | 0 |
-| **Quality** | 23 | 20 | 3 | 0 |
+| **Quality** | 24 | 20 | 4 | 0 |
 | **Session** | 13 | 13 | 0 | 0 |
 | **Multi-Agent** | 10 | 8 | 1 | 1 |
 | **Tooling** | 11 | 11 | 0 | 0 |
@@ -3208,4 +3208,23 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 - Tests: `tests/test_backlog_helpers.py`, `validate_framework.sh`
 
 **Acceptance**: See `spec/acceptance/F-0190.md`
+
+## F-0191: Dialectical Plan Review
+
+**Status**: in_progress
+**Category**: Quality
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.50.0
+
+**Description**: Plan review uses dialectical mechanism — Critic (adversarial) + Advocate (defensive) agents run in parallel with fresh context. Orchestrator synthesizes both perspectives into a balanced assessment with Revision Guidance. User decides: Proceed, Revise, or Reject. Supports iteration. Replaces the single-reviewer model in the plan-review loop (F-0120). Controlled by `plan_review_enabled` (no separate setting).
+
+**Dependencies**: F-0120
+
+**Implementation**:
+- State: implementing
+- Code: `dialectical_review.md` mechanism, `plan_review_loop.md` lifecycle, `plan-critic-agent.md`, `plan-advocate-agent.md`, `ag.sh` integration
+- Tests: `validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0191.md`
 

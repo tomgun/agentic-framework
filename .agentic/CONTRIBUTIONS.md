@@ -8,6 +8,16 @@
 
 ## Recent Contributions
 
+### Dialectical Plan Review (v0.50.0, F-0191)
+
+**User insight**: Tomas identified a fundamental authority problem in plan review — the reviewer's word is treated as authoritative, but reviewers often suggest changes that contradict the purpose of the work. Key contributions:
+- **Debate over verdict**: The core insight that users should see a debate, not a verdict. Neither the critic nor advocate gets authority — the user decides after seeing both perspectives.
+- **Merge, don't layer**: Dialectical review IS how plan review works — not a separate step after it. One setting (`plan_review_enabled`), one mechanism. The old single-reviewer model is replaced, not complemented.
+- **Fresh context as feature**: Recognized that shared context creates groupthink. Fresh-context agents catch things the planner has normalized.
+- **Iteration with fresh eyes**: Each revision gets fresh Critic + Advocate, not the same reviewers carrying over bias. More expensive, worth it.
+- **No enforcement mechanism**: Deliberately chose not to add blocking gates or verdicts. The problem was too much authority in the reviewer — adding more authority would recreate the problem.
+- **Copilot self-play fallback**: Acknowledged that Copilot can't spawn independent agents, so the self-play adaptation (same context, less independent) is an honest compromise rather than pretending it's equivalent.
+
 ### Backlog / Structural Work Assignment (v0.49.0, F-0190)
 
 **User insight**: Tomas designed the backlog concept to solve cross-session, cross-machine work continuity. Key contributions:
