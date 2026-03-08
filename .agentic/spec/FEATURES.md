@@ -3232,7 +3232,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0192: Review Subagent Delegation
 
-**Status**: verified
+**Status**: implementing
 **Category**: Quality
 **Priority**: medium
 **Complexity**: low
@@ -3264,6 +3264,26 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Implementation**:
 - State: none
 - Code: TBD (feature.sh, FEATURES.md format, possibly all spec tooling)
+- Tests: TBD
+
+**Acceptance**: TBD — requires design phase first
+
+---
+
+## F-0194: Worktree-by-Default for Feature Branches
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: high
+**Complexity**: medium
+
+**Description**: Agents should always work in git worktrees when on feature branches, not dirty the main worktree. Current instruction exists but is too weak ("Use git worktree on feature branches when another agent may be working on main"). Needs: clear mandatory instruction in CLAUDE.md/skills, a STACK.md setting (e.g., worktree_mode: always|multi-agent|off), and possibly ag implement auto-creating the worktree.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: none
+- Code: TBD (ag.sh, STACK.md template, CLAUDE.md templates, skills)
 - Tests: TBD
 
 **Acceptance**: TBD — requires design phase first

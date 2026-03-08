@@ -24,7 +24,8 @@ Systematic code review delegated to a fresh-context subagent for token efficienc
 Figure out what needs reviewing. Do NOT read diffs or files yourself — just determine the scope:
 
 - **PR review**: Extract the PR number from the user's message (e.g., "/review PR #42" → PR 42)
-- **Staged/unstaged changes**: No PR number → review current working tree changes
+- **Branch review**: If on a feature branch (not main), review all commits on the branch vs origin/main
+- **Staged/unstaged changes**: On main with no PR number → review current working tree changes
 - **Specific files**: If the user names specific files, note them
 
 ### Step 1b: Check for Associated Plan
@@ -54,7 +55,11 @@ You are a code reviewer. Perform a systematic review and return a structured fin
 
 ## What to Review
 
-[INSERT: "Run `gh pr diff <NUMBER>`" OR "Run `git diff` for unstaged and `git diff --cached` for staged changes" OR "Review these files: <list>"]
+[INSERT one of:
+- "Run `gh pr diff <NUMBER>`" (PR review)
+- "Run `git diff origin/main` and `git diff origin/main --stat`" (branch review)
+- "Run `git diff` for unstaged and `git diff --cached` for staged changes" (working tree review)
+- "Review these files: <list>" (specific files)]
 
 ## Review Protocol
 
@@ -79,7 +84,7 @@ Check each dimension:
 4. **Performance**: Unnecessary loops, N+1 queries, missing caching?
 5. **Style**: Follows project conventions? Consistent naming?
 6. **Tests**: Are changed paths covered by tests?
-7. **Documentation**: Run `bash .agentic/lib/tools/docs.sh --list` to see registered docs, then `bash .agentic/lib/tools/drift.sh --docs` to check for drift. Check CHANGELOG updated for behavior changes. Check if new user-facing artifacts need adding to `## Docs` in STACK.md. Flag missing doc updates as "Must Fix" when `docs_gate: blocking`.
+7. **Documentation**: If `.agentic/lib/tools/docs.sh` exists, run `bash .agentic/lib/tools/docs.sh --list` and `bash .agentic/lib/tools/drift.sh --docs` to check for drift. Check CHANGELOG updated for behavior changes. Check if new user-facing artifacts need adding to `## Docs` in STACK.md. Flag missing doc updates as "Must Fix" when `docs_gate: blocking`.
 
 ### 4. Return Structured Report
 

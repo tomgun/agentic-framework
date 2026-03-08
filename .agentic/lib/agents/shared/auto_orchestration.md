@@ -71,7 +71,7 @@ What would you like to work on?
 | "write spec" / "create spec" / "add acceptance" / "ag spec" | **Spec-Writing Pipeline** | Follow Spec-Writing flow |
 | "done with feature" / "feature complete" | **Feature Complete** | Run `feature_complete.md` checklist |
 | "end session" / "stopping work" | **Session End** | Run `session_end.md` checklist |
-| "review code" / "check this" | **Review** | Run `review_checklist.md` |
+| "review code" / "check this" | **Review** | Claude Code: delegate to review subagent (fresh context) via `reviewing-code` skill. Others: run `review_checklist.md` inline. |
 | "review blocked" / "approve transition" / "pending review" | **Review Checkpoint** | Run `ag review` to list pending. `ag review F-XXXX <state>` to resolve. |
 
 ### Domain & Design Triggers
