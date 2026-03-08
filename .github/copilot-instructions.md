@@ -50,3 +50,4 @@ Validation: `bash tests/validate_framework.sh` must pass before committing.
 New features: Add to `.agentic/spec/FEATURES.md` FIRST, create acceptance criteria before coding.
 Breaking changes: Provide upgrade path in `upgrade.sh`.
 Test in scratch project before committing framework changes.
+Instruction files are part of the feature: new `ag` commands/gates MUST update all instruction files (templates, skills, checklists, memory-seed, DEVELOPER_GUIDE, HOW_IT_WORKS).
