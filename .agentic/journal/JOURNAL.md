@@ -1624,3 +1624,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 19:34 - F-0190 doc updates
+
+**Why**: Backlog feature was code-complete but agents had no awareness of it — instruction files ARE the feature delivery
+
+**What changed**:
+- All agent instruction files now reference backlog: 18 files across quick commands, trigger tables, where-to-log routing, session start, feature workflow gates, and completion flow
+
+**Next steps**:
+- Push to PR #78, re-review
+
+**Blockers**: None
+
