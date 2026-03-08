@@ -5,6 +5,20 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.0] - 2026-03-08
+
+### Added
+- **Formal Feature State Machine (F-0177)** — 9-state feature lifecycle per ADR-001 Section 5: `planned → specced → criteria_set → tests_written → implementing → verified → documented → committed → shipped` (+ `deprecated` terminal). `state_machine.py` with FeatureState enum, transition tables (forward/regression/skip), advisory/enforce modes, cascade invalidations, CLI interface. `gates.py` with 8 filesystem-based gate functions for transition preconditions.
+- **State Machine Blast Radius Update (F-0178)** — All 22 downstream tools updated for 9-state lifecycle: validate_formats, doctor, feature.sh, query_features, feature_stats, feature_graph, consistency, crunch, ag.sh, pre-commit-check, checklists, templates, spec schemas. `ag transition` CLI command.
+- **ADR-001** — Multi-component architecture decision record (7 sections) covering state machine design, component model, epic decomposition, and autonomous workflow vision.
+- 42 state machine tests, 23 gate tests, 12 crunch tests updated. Framework validation: 507/507 pass.
+
+### Fixed
+- `validate_framework.sh`: remove `set -e` that silently crashed script mid-run, fix `((count++))` under `set -e`, fix settings test `_reset_settings_cache`
+- `nfr.sh`: awk regex using unsupported `{4}` quantifier
+- `STACK.template.md`: stale commented `retrospective_enabled` config
+- `validate_specs.py`: graceful exit when pyyaml is not installed
+
 ## [0.45.0] - 2026-03-07
 
 ### Added

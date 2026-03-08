@@ -25,7 +25,6 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
-from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Callable, Optional
@@ -36,6 +35,8 @@ from typing import Callable, Optional
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
+
+from auto.gates import GateResult  # noqa: E402 — single source of truth
 
 
 # ---------------------------------------------------------------------------
@@ -107,18 +108,6 @@ SKIP_TRANSITIONS: set[tuple[FeatureState, FeatureState]] = {
     # Allow implementing -> committed
     (FeatureState.IMPLEMENTING, FeatureState.COMMITTED),
 }
-
-
-# ---------------------------------------------------------------------------
-# Gate result
-# ---------------------------------------------------------------------------
-
-@dataclass
-class GateResult:
-    """Result of a transition gate check."""
-    allowed: bool
-    reasons: list[str] = field(default_factory=list)   # blocking reasons
-    warnings: list[str] = field(default_factory=list)   # advisory (don't block)
 
 
 # ---------------------------------------------------------------------------
@@ -196,9 +185,9 @@ class FeatureStateMachine:
         if not match:
             return None
 
-        # Extract the section (up to the next feature header or 2000 chars)
+        # Extract the section (up to the next feature header or end of file)
         section_start = match.end()
-        section = content[section_start:section_start + 2000]
+        section = content[section_start:]
         next_header = re.search(r"^## F-\d{4}:", section, re.MULTILINE)
         if next_header:
             section = section[:next_header.start()]

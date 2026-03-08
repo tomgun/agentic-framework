@@ -2,7 +2,7 @@
 
 **Purpose**: Comprehensive map of how every principle is implemented, what mechanisms exist, which are actively working, and which are dormant or underutilized.
 
-**Generated**: 2026-03-06 | **Framework Version**: 0.43.0
+**Generated**: 2026-03-08 | **Framework Version**: 0.47.0
 
 ---
 
@@ -96,6 +96,9 @@ graph TB
         F_AUTO_TASK[Auto Task Mode<br/>F-0162]
         F_AUTO_CRUNCH[Auto Crunch Mode<br/>F-0163]
 
+        %% Formal State Machine (v0.47.0)
+        F_STATE_MACHINE[Feature State Machine<br/>F-0177, F-0178]
+
         %% SDD Toolkit Insights (v0.39.0)
         F_SPEC_FORMAT[Spec Format Evolution<br/>F-0148]
         F_CLARIFICATION[Clarification Taxonomy<br/>F-0149]
@@ -128,7 +131,8 @@ graph TB
         %% Testing
         M_HARNESS[harness.sh<br/>LLM test runner]
         M_MUTATION_SH[mutation_test.sh<br/>infrastructure proofs]
-        M_VALIDATE[validate_framework.sh<br/>430+ acceptance tests]
+        M_STATE_MACHINE[state_machine.py + gates.py<br/>9-state lifecycle]
+        M_VALIDATE[validate_framework.sh<br/>500+ acceptance tests]
         M_SPEC_ANALYZE[spec-analyze.sh<br/>semantic consistency]
         M_AC_COV[coverage.py --ac-coverage<br/>per-AC test mapping]
 
@@ -247,6 +251,12 @@ graph TB
     F_AUTO_TASK --> M_AUTO_ENGINE
     F_AUTO_CRUNCH --> M_AUTO_ENGINE
 
+    %% State machine ← principles
+    D2 --> F_STATE_MACHINE
+    D4 --> F_STATE_MACHINE
+    F_STATE_MACHINE --> M_STATE_MACHINE
+    F_STATE_MACHINE --> M_FEATURE_SH
+
     %% Autonomous features ← principles
     D1 --> F_AUTO_ENGINE
     D4 --> F_AUTO_TASK
@@ -267,8 +277,8 @@ graph TB
 
     class F1,F2,F3 foundation
     class D1,D2,D3,D4,D5,D6,D7,R1,R2,R3,KISS principle
-    class F_SESSION,F_WIP,F_MULTI_ENV,F_HUMAN_NEEDED,F_MANUAL_OPS,F_PR_WORKFLOW,F_TOKEN_SCRIPTS,F_AGENT_ROLES,F_ORCHESTRATOR,F_CONTEXT_MANIFESTS,F_PRE_COMMIT,F_GIT_HOOKS,F_DOCTOR,F_PHASE,F_MEMORY_SEED,F_THREE_LAYER,F_STATUS,F_JOURNAL,F_CONTEXT_PACK,F_FEATURES_MD,F_SPECS,F_PLAN_REVIEW,F_SMALL_BATCH,F_MULTI_AGENT,F_WORKTREE,F_SEQ_PIPELINE,F_INIT,F_DISCOVERY,F_BROWNFIELD,F_LLM_TESTS,F_MUTATION,F_FRAMEWORK_TESTS,F_QUALITY,F_TIP,F_REMIND,F_AUTO_ENGINE,F_AUTO_VERIFY,F_AUTO_TASK,F_AUTO_CRUNCH feature
-    class M_AG,M_PRECOMMIT,M_WIP_SH,M_STATUS_SH,M_FEATURE_SH,M_DOCTOR_PY,M_CONTEXT_ROLE,M_SYNC,M_DISCOVER,M_HOOKS_PATH,M_CLAUDE_MD,M_AUTO_ORCH,M_MEMORY,M_STACK,M_HARNESS,M_MUTATION_SH,M_VALIDATE,M_QUALITY_DOCS,M_QUALITY_WIRING,M_AUTO_ENGINE mechanism
+    class F_SESSION,F_WIP,F_MULTI_ENV,F_HUMAN_NEEDED,F_MANUAL_OPS,F_PR_WORKFLOW,F_TOKEN_SCRIPTS,F_AGENT_ROLES,F_ORCHESTRATOR,F_CONTEXT_MANIFESTS,F_PRE_COMMIT,F_GIT_HOOKS,F_DOCTOR,F_PHASE,F_MEMORY_SEED,F_THREE_LAYER,F_STATUS,F_JOURNAL,F_CONTEXT_PACK,F_FEATURES_MD,F_SPECS,F_PLAN_REVIEW,F_SMALL_BATCH,F_MULTI_AGENT,F_WORKTREE,F_SEQ_PIPELINE,F_INIT,F_DISCOVERY,F_BROWNFIELD,F_LLM_TESTS,F_MUTATION,F_FRAMEWORK_TESTS,F_QUALITY,F_TIP,F_REMIND,F_AUTO_ENGINE,F_AUTO_VERIFY,F_AUTO_TASK,F_AUTO_CRUNCH,F_STATE_MACHINE feature
+    class M_AG,M_PRECOMMIT,M_WIP_SH,M_STATUS_SH,M_FEATURE_SH,M_DOCTOR_PY,M_CONTEXT_ROLE,M_SYNC,M_DISCOVER,M_HOOKS_PATH,M_CLAUDE_MD,M_AUTO_ORCH,M_MEMORY,M_STACK,M_HARNESS,M_MUTATION_SH,M_VALIDATE,M_QUALITY_DOCS,M_QUALITY_WIRING,M_AUTO_ENGINE,M_STATE_MACHINE mechanism
     class F_AGENT_MODE dormant
 ```
 
@@ -362,6 +372,35 @@ graph LR
     style T2 fill:#f39c12,color:#fff
     style T3 fill:#27ae60,color:#fff
 ```
+
+---
+
+## Formal Feature State Machine (v0.47.0)
+
+Features follow a 9-state lifecycle enforced by `state_machine.py` + `gates.py`:
+
+```
+planned → specced → criteria_set → tests_written → implementing
+→ verified → documented → committed → shipped   (+ deprecated)
+```
+
+- **Forward transitions**: sequential, one step at a time (8 transitions)
+- **Regression transitions**: going backward (e.g. verified → implementing) with cascade invalidation of intermediate states
+- **Skip transitions**: legacy shortcuts (planned → implementing, planned → shipped) for backward compatibility
+- **Advisory mode** (default): invalid transitions log warnings but proceed
+- **Enforce mode**: invalid transitions are blocked
+
+Each forward transition has a **gate function** checking filesystem preconditions:
+- `planned → specced`: Feature exists in FEATURES.md with Description
+- `specced → criteria_set`: Acceptance criteria file exists with AC lines
+- `criteria_set → tests_written`: Test files reference the feature ID
+- `tests_written → implementing`: Advisory TDD reminder
+- `implementing → verified`: AC file + test files exist
+- `verified → documented`: Advisory changelog/docs reminder
+- `documented → committed`: Advisory pre-commit reminder
+- `committed → shipped`: Advisory push/PR/VERSION reminder
+
+CLI: `ag transition F-XXXX <state>`, `ag transition F-XXXX --status`, `ag transition --unblocked`
 
 ---
 

@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "lib" / "auto
 
 from auto.gates import (
     GateResult,
+    DEFAULT_GATES,
     gate_planned_to_specced,
     gate_specced_to_criteria_set,
     gate_criteria_set_to_tests_written,
@@ -24,7 +25,6 @@ from auto.gates import (
     gate_documented_to_committed,
     gate_committed_to_shipped,
     register_default_gates,
-    GATE_REGISTRY,
 )
 
 
@@ -261,14 +261,13 @@ class TestGateCommittedToShipped:
 # ---------------------------------------------------------------------------
 
 class TestRegistration:
-    def test_register_default_gates_populates_registry(self):
-        GATE_REGISTRY.clear()
-        register_default_gates()
-        assert len(GATE_REGISTRY) == 8
-        assert ("planned", "specced") in GATE_REGISTRY
-        assert ("committed", "shipped") in GATE_REGISTRY
+    def test_default_gates_covers_all_forward_transitions(self):
+        assert len(DEFAULT_GATES) == 8
+        from_to_pairs = [(f, t) for f, t, _ in DEFAULT_GATES]
+        assert ("planned", "specced") in from_to_pairs
+        assert ("committed", "shipped") in from_to_pairs
 
-    def test_register_default_gates_with_state_machine(self, project_dir):
+    def test_register_default_gates_on_state_machine(self, project_dir):
         from auto.state_machine import FeatureStateMachine, FeatureState
         sm = FeatureStateMachine(project_root=project_dir)
         register_default_gates(sm)

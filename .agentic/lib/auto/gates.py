@@ -18,7 +18,6 @@ Usage:
 from __future__ import annotations
 
 import re
-import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -357,53 +356,27 @@ def gate_committed_to_shipped(feature_id: str, project_root: Path) -> GateResult
 
 
 # ---------------------------------------------------------------------------
-# Gate registry
+# Gate registration
 # ---------------------------------------------------------------------------
 
-# Maps (from_state, to_state) -> gate function
-GATE_REGISTRY: dict[tuple[str, str], GateFunc] = {}
+# Default gate list for bulk registration
+DEFAULT_GATES: list[tuple[str, str, GateFunc]] = [
+    ("planned", "specced", gate_planned_to_specced),
+    ("specced", "criteria_set", gate_specced_to_criteria_set),
+    ("criteria_set", "tests_written", gate_criteria_set_to_tests_written),
+    ("tests_written", "implementing", gate_tests_written_to_implementing),
+    ("implementing", "verified", gate_implementing_to_verified),
+    ("verified", "documented", gate_verified_to_documented),
+    ("documented", "committed", gate_documented_to_committed),
+    ("committed", "shipped", gate_committed_to_shipped),
+]
 
 
-def register_gate(from_state: str, to_state: str, gate: GateFunc) -> None:
-    """Register a gate function for a specific transition."""
-    GATE_REGISTRY[(from_state, to_state)] = gate
-
-
-def check_gate(
-    from_state: str, to_state: str, feature_id: str, project_root: Path,
-) -> GateResult:
-    """Run the gate for a transition and return the result.
-
-    If no gate is registered for the transition, the transition is allowed.
-    """
-    gate = GATE_REGISTRY.get((from_state, to_state))
-    if gate is None:
-        return GateResult.ok()
-    return gate(feature_id, project_root)
-
-
-def register_default_gates(sm: object | None = None) -> None:
-    """Register all default gate functions.
-
-    If *sm* (a FeatureStateMachine instance) is provided, gates are
-    registered on it via ``register_gate(FeatureState, FeatureState, fn)``.
-    Gates are always stored in the module-level GATE_REGISTRY too.
-    """
+def register_default_gates(sm: object) -> None:
+    """Register all default gate functions on a FeatureStateMachine instance."""
     from auto.state_machine import FeatureState  # deferred to avoid circular
 
-    gates = [
-        (FeatureState.PLANNED, FeatureState.SPECCED, gate_planned_to_specced),
-        (FeatureState.SPECCED, FeatureState.CRITERIA_SET, gate_specced_to_criteria_set),
-        (FeatureState.CRITERIA_SET, FeatureState.TESTS_WRITTEN, gate_criteria_set_to_tests_written),
-        (FeatureState.TESTS_WRITTEN, FeatureState.IMPLEMENTING, gate_tests_written_to_implementing),
-        (FeatureState.IMPLEMENTING, FeatureState.VERIFIED, gate_implementing_to_verified),
-        (FeatureState.VERIFIED, FeatureState.DOCUMENTED, gate_verified_to_documented),
-        (FeatureState.DOCUMENTED, FeatureState.COMMITTED, gate_documented_to_committed),
-        (FeatureState.COMMITTED, FeatureState.SHIPPED, gate_committed_to_shipped),
-    ]
-
-    for from_state, to_state, gate_fn in gates:
-        register_gate(from_state.value, to_state.value, gate_fn)
-
-        if sm is not None and hasattr(sm, "register_gate"):
-            sm.register_gate(from_state, to_state, gate_fn)
+    for from_str, to_str, gate_fn in DEFAULT_GATES:
+        from_state = FeatureState(from_str)
+        to_state = FeatureState(to_str)
+        sm.register_gate(from_state, to_state, gate_fn)
