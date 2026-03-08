@@ -27,6 +27,7 @@ cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
 cat .agentic/session/AGENTS_ACTIVE.md 2>/dev/null || true
 ls .agentic/session/WIP.md 2>/dev/null || true
 bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
+bash .agentic/lib/tools/backlog.sh current 2>/dev/null || true
 ```
 
 ## Step 2: Greet User with Recap
@@ -45,7 +46,8 @@ bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
 2. [Second option if exists]
 3. [Review blockers in HUMAN_NEEDED.md - if any exist]
 
-**Available workflows**: `ag plan` (plan-review before building) | `ag sync` (detect & fix drift)
+**Backlog**: [Current item from BACKLOG.json, or "empty"]
+**Available workflows**: `ag plan` (plan-review before building) | `ag sync` (detect & fix drift) | `ag backlog` (work queue)
 
 💡 **Tip**: [Random framework tip — shown automatically by `ag start`]
 
@@ -330,6 +332,11 @@ This is a **suggestion**, not a block. The user may choose to work on something 
   - Affects your workflow significantly
 
 ## Proactive Context Setting (Make Collaboration Fluent)
+
+- [ ] **Check backlog** (from `.agentic/BACKLOG.json`)
+  - If backlog exists and has items, position 0 = current work
+  - Show current item prominently: "Backlog says current work is F-XXXX: [description]"
+  - Suggest: `ag implement F-XXXX` to resume, or `ag backlog list` to see full queue
 
 - [ ] **Check for planned work** (from `.agentic/STATUS.md`)
   - Read "Next up" or "Next immediate step" section

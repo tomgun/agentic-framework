@@ -11,6 +11,23 @@ phase: planning
 
 ---
 
+## GATE 0: Backlog Check (ENFORCED BY `ag implement`)
+
+```
+□ Is .agentic/BACKLOG.json present with items?
+  ├─ NO  → Proceed (no backlog constraint)
+  └─ YES → Is F-XXXX at position 0?
+           ├─ YES → Proceed
+           ├─ NOT IN BACKLOG → Auto-added at position 0, proceed
+           └─ WRONG POSITION → 🛑 BLOCKED. Work on position 0 first,
+              or reprioritize: ag backlog move F-XXXX 0
+              Override: SKIP_BACKLOG=1 ag implement F-XXXX
+```
+
+This gate is enforced automatically by `ag implement`. You don't need to check manually.
+
+---
+
 ## GATE 1: Acceptance Criteria (BLOCKING)
 
 ```
