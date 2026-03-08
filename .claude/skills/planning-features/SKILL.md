@@ -100,7 +100,7 @@ Agent(subagent_type="general-purpose",
 2. **Synthesize both perspectives** using rules from `references/dialectical_review.md`
 3. **Present synthesis inline** (including Revision Guidance section)
 4. **User decides**: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject
-5. If Revise: loop back to Step 3 (Planner revises) then fresh Critic + Advocate run again
+5. If Revise: Planner revises the saved plan, then fresh Critic + Advocate run again (new iteration)
 
 ### Step 6: Hand Off to Implementation
 
