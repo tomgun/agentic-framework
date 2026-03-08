@@ -3866,6 +3866,113 @@ else
 fi
 
 # ============================================================
+# F-0180: Review Checkpoint Framework
+# ============================================================
+echo "--- F-0180: Review Checkpoint Framework ---"
+
+# T-0055: review.py module exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/review.py" ]]; then
+  pass "T-0055: review.py module exists"
+else
+  fail "T-0055: review.py module not found"
+fi
+
+# T-0056: review.py has ReviewMode enum
+if grep -q "class ReviewMode" "${FRAMEWORK_ROOT}/.agentic/lib/auto/review.py"; then
+  pass "T-0056: review.py has ReviewMode enum"
+else
+  fail "T-0056: review.py missing ReviewMode enum"
+fi
+
+# T-0057: review.py has core functions
+for func in check_review has_pending_review resolve_review get_review_mode create_pending_review get_pending_reviews; do
+  if grep -q "def $func" "${FRAMEWORK_ROOT}/.agentic/lib/auto/review.py"; then
+    pass "T-0057: review.py has $func"
+  else
+    fail "T-0057: review.py missing $func"
+  fi
+done
+
+# T-0058: state_machine.py integrates review checks
+if grep -q "check_review\|has_pending_review" "${FRAMEWORK_ROOT}/.agentic/lib/auto/state_machine.py"; then
+  pass "T-0058: state_machine.py integrates review checks"
+else
+  fail "T-0058: state_machine.py missing review integration"
+fi
+
+# T-0059: ag.sh has review command dispatch
+if grep -q "review)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0059: ag.sh has review command dispatch"
+else
+  fail "T-0059: ag.sh missing review command"
+fi
+
+# T-0060: ag.sh validates review_* settings
+if grep -q "review_spec\|review_code\|review_merge" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0060: ag.sh validates review settings"
+else
+  fail "T-0060: ag.sh missing review settings validation"
+fi
+
+# T-0061: profiles.conf has review defaults for both profiles
+if grep -q "discovery.review_spec=" "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" && \
+   grep -q "formal.review_spec=" "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf"; then
+  pass "T-0061: profiles.conf has review defaults for both profiles"
+else
+  fail "T-0061: profiles.conf missing review defaults"
+fi
+
+# T-0062: STACK.template.md has review checkpoints section
+if grep -q "Review checkpoints" "${FRAMEWORK_ROOT}/.agentic/lib/init/STACK.template.md"; then
+  pass "T-0062: STACK.template.md has review checkpoints section"
+else
+  fail "T-0062: STACK.template.md missing review checkpoints"
+fi
+
+# T-0063: paths.py has reviews_dir and pending_reviews_dir
+if grep -q "reviews_dir" "${FRAMEWORK_ROOT}/.agentic/lib/paths.py" && \
+   grep -q "pending_reviews_dir" "${FRAMEWORK_ROOT}/.agentic/lib/paths.py"; then
+  pass "T-0063: paths.py has review path properties"
+else
+  fail "T-0063: paths.py missing review path properties"
+fi
+
+# T-0064: ag review documented in instruction files
+if grep -q "ag review" "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/agent_operating_guidelines.md"; then
+  pass "T-0064a: ag review in agent_operating_guidelines"
+else
+  fail "T-0064a: ag review missing from agent_operating_guidelines"
+fi
+if grep -q "ag review" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
+  pass "T-0064b: ag review in memory-seed"
+else
+  fail "T-0064b: ag review missing from memory-seed"
+fi
+if grep -q "ag review" "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/auto_orchestration.md"; then
+  pass "T-0064c: ag review in auto_orchestration"
+else
+  fail "T-0064c: ag review missing from auto_orchestration"
+fi
+
+# T-0065: Review trigger in instruction file trigger tables
+for file in ".agentic/lib/agents/copilot/copilot-instructions.md" \
+            ".agentic/lib/agents/codex/codex-instructions.md" \
+            ".agentic/lib/agents/cursor/cursorrules.txt"; do
+  if grep -qi "review blocked\|approve transition" "${FRAMEWORK_ROOT}/$file" 2>/dev/null; then
+    pass "T-0065: Review trigger in $(basename "$file")"
+  else
+    fail "T-0065: Review trigger missing from $(basename "$file")"
+  fi
+done
+
+# T-0066: Unit tests exist for review module
+if [[ -f "${FRAMEWORK_ROOT}/tests/test_review.py" ]]; then
+  pass "T-0066: test_review.py exists"
+else
+  fail "T-0066: test_review.py not found"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""
