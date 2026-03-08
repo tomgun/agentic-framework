@@ -121,7 +121,7 @@ phase: commit
 ### Formal Profile (All Core items plus:)
 
 - [ ] **`.agentic/spec/FEATURES.md` reflects reality**
-  - Status accurate (`planned` / `in_progress` / `shipped`)
+  - Status accurate (9-state lifecycle: planned → specced → criteria_set → tests_written → implementing → verified → documented → committed → shipped)
   - Implementation State accurate (`none` / `partial` / `complete`)
   - **CRITICAL**: Never `State: none` if code exists
   - Implementation Code: Actual file paths listed
