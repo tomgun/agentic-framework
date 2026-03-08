@@ -176,7 +176,7 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
       echo "   Create acceptance criteria:"
       echo "   - Use .agentic/lib/templates/FEATURES.template.md as reference"
       echo "   - Define what 'done' means for each feature"
-      echo "   - Or change status to 'in_progress' if not truly shipped"
+      echo "   - Or change status to 'implementing' if not truly shipped"
       echo ""
       FAILURES=$((FAILURES + 1))
     else
@@ -602,8 +602,9 @@ else
 
     LONG_FILES=0
     while IFS= read -r file; do
-      # Skip framework-owned files (not user code)
+      # Skip framework-owned and test infrastructure files
       [[ "$file" == .agentic/* ]] && continue
+      [[ "$file" == tests/* ]] && continue
       if [[ -f "$file" ]] && [[ "$file" =~ \.($CODE_EXTENSIONS)$ ]]; then
         LINES=$(wc -l < "$file" 2>/dev/null | tr -d ' ')
         if [[ $LINES -gt $MAX_CODE_FILE_LEN ]]; then

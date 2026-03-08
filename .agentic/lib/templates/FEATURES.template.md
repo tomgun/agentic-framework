@@ -9,7 +9,8 @@
 
 ## Quick Reference
 
-**Status**: `planned` | `in_progress` | `shipped` | `deprecated`
+**Status**: `planned` | `specced` | `criteria_set` | `tests_written` | `implementing` | `verified` | `documented` | `committed` | `shipped` | `deprecated`
+- Backward-compat alias: `in_progress` is accepted as equivalent to `implementing`
 
 **Feature template** (copy/paste when adding features):
 

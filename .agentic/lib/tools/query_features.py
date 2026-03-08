@@ -359,7 +359,7 @@ Examples:
 """
     )
 
-    parser.add_argument("--status", help="Filter by status (planned|in_progress|shipped|deprecated)")
+    parser.add_argument("--status", help="Filter by status (planned|specced|criteria_set|tests_written|implementing|verified|documented|committed|shipped|deprecated)")
     parser.add_argument("--tags", action="append", help="Filter by tags (can specify multiple)")
     parser.add_argument("--layer", help="Filter by layer (presentation|business-logic|data|infrastructure|other)")
     parser.add_argument("--domain", help="Filter by domain (auth, payments, etc.)")

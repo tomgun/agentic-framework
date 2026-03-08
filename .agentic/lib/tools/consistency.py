@@ -85,9 +85,9 @@ def check_consistency(features: dict[str, dict], repo_root: Path) -> list[str]:
         if state == "complete" and tests in {"todo", "tbd"}:
             issues.append(f"{fid}: State is 'complete' but tests are marked 'todo'")
         
-        # Issue: In progress but state is none
-        if status == "in_progress" and state == "none":
-            issues.append(f"{fid}: Status is 'in_progress' but State is 'none' (should be at least 'partial')")
+        # Issue: In progress / implementing but state is none
+        if status in {"in_progress", "implementing"} and state == "none":
+            issues.append(f"{fid}: Status is '{status}' but State is 'none' (should be at least 'partial')")
         
         # Issue: Code paths don't exist
         if code and code not in {"<!-- paths/modules -->", "(to be filled)", "none", "n/a"}:

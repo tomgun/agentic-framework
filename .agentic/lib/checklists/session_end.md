@@ -49,7 +49,7 @@ phase: session
 ### Formal Profile (Additional items:)
 
 - [ ] **`.agentic/spec/FEATURES.md` updated** (if working on features)
-  - Status accurate (planned/in_progress/shipped)
+  - Status accurate (9-state lifecycle: planned → specced → criteria_set → tests_written → implementing → verified → documented → committed → shipped)
   - Implementation State accurate (none/partial/complete)
   - All fields current
   - No stale information

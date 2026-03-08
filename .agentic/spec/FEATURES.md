@@ -2912,3 +2912,46 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Acceptance**: See `spec/acceptance/F-0176.md`
 
+
+---
+
+## F-0177: Formal Feature State Machine
+
+**Status**: implementing
+**Category**: Workflow
+**Priority**: critical
+**Complexity**: high
+**Since**: v0.47.0
+
+**Description**: 9-state feature lifecycle implemented as Python code (ADR-001 Section 5). States: planned -> specced -> criteria_set -> tests_written -> implementing -> verified -> documented -> committed -> shipped. Forward transitions with gates, regression transitions with cascade invalidations, skip transitions for backward compatibility. Advisory mode (default) warns but doesn't block; enforce mode blocks.
+
+**Dependencies**: none
+
+**Implementation**:
+- State: complete
+- Code: `.agentic/lib/auto/state_machine.py`, `.agentic/lib/auto/gates.py`
+- Tests: `tests/test_state_machine.py` (42 tests), `tests/test_gates.py` (23 tests)
+
+**Acceptance**: See `spec/acceptance/F-0177.md`
+
+---
+
+## F-0178: State Machine Blast Radius Update
+
+**Status**: implementing
+**Category**: Workflow
+**Priority**: high
+**Complexity**: high
+**Since**: v0.47.0
+
+**Description**: Update all files that hard-code the old 4-status model (planned/in_progress/shipped/deprecated) to support 9 states. Covers: validation (validate_formats.py, doctor.py), queries (query_features.py, feature_stats.py), tools (feature.sh, ag.sh), autonomous mode (crunch.py), checklists, spec schema, and pre-commit hooks.
+
+**Dependencies**: F-0177
+
+**Implementation**:
+- State: complete
+- Code: 19 files modified across tools, validation, checklists, templates
+- Tests: `tests/test_auto_crunch.py` updated, `tests/test_state_machine.py`, `tests/test_gates.py`
+
+**Acceptance**: See `spec/acceptance/F-0178.md`
+

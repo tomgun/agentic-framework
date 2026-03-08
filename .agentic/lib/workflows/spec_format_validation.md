@@ -188,7 +188,7 @@ The YAML frontmatter above is the source of truth for structured data.
     },
     "status": {
       "type": "string",
-      "enum": ["planned", "in_progress", "shipped", "deprecated"]
+      "enum": ["planned", "specced", "criteria_set", "tests_written", "implementing", "verified", "documented", "committed", "shipped", "deprecated"]
     },
     "parent": {
       "type": ["string", "null"],
@@ -471,7 +471,7 @@ def lint_features(file_path: Path) -> list[str]:
     status_pattern = r'- Status:\s*(\w+)'
     for match in re.finditer(status_pattern, content):
         status = match.group(1)
-        if status not in ['planned', 'in_progress', 'shipped', 'deprecated']:
+        if status not in ['planned', 'specced', 'criteria_set', 'tests_written', 'implementing', 'verified', 'documented', 'committed', 'shipped', 'deprecated']:
             errors.append(f"Invalid status: '{status}'")
     
     # Check for valid feature IDs

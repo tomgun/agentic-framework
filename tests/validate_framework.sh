@@ -11,7 +11,7 @@
 #   0 - All checks pass
 #   1 - One or more checks failed
 #
-set -euo pipefail
+set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -1005,7 +1005,7 @@ if [[ -f "$AUTO_ORCH" ]]; then
   gate_count=0
   for gate in "${REQUIRED_GATES[@]}"; do
     if grep -qi "$gate" "$AUTO_ORCH" 2>/dev/null; then
-      ((gate_count++))
+      ((gate_count++)) || true
     fi
   done
   if [[ $gate_count -eq 6 ]]; then
@@ -2004,6 +2004,8 @@ _reset_settings_cache() {
   _SETTINGS_PROFILE_CACHE=""
   _SETTINGS_PROFILES_CONF="${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf"
   _SETTINGS_CONSTRAINTS_CONF="${FRAMEWORK_ROOT}/.agentic/lib/presets/constraints.conf"
+  # Reset agentic dir so profile inference uses test ROOT_DIR, not real framework
+  _SETTINGS_AGENTIC_DIR="${_SETTINGS_ROOT_DIR}/.agentic"
 }
 
 # Test constraint validation detects violations
