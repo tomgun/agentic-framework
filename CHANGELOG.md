@@ -5,6 +5,15 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.2] - 2026-03-08
+
+### Changed
+- **Review Subagent Delegation (F-0192)** — The `/review` skill now delegates to a fresh-context subagent instead of running inline. Diffs, file reads, and checklist processing stay in the subagent's disposable context — main conversation only receives a structured findings report (Must Fix / Should Fix / Consider / Verdict). Small, targeted code questions can still be reviewed inline. Saves significant tokens on large changesets.
+
+### Added
+- **F-0193** (planned) — Collision-proof feature IDs: research into slug-based IDs, atomic allocation, or other schemes to prevent F-XXXX collisions across parallel agents/branches.
+- **F-0194** (planned) — Worktree-by-default for feature branches: agents should work in git worktrees to avoid dirtying the main worktree.
+
 ## [0.49.0] - 2026-03-08
 
 ### Added

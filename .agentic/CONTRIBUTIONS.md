@@ -1,12 +1,19 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.49.0)
+**Period**: Initial Development (v0.1.0 → v0.50.2)
 **Date**: 2026-03-08
 
 ---
 
 ## Recent Contributions
+
+### Review Subagent Delegation (v0.50.2, F-0192)
+
+**User insight**: Tomas identified that `/review` running inline wastes tokens — review context (diffs, file reads, checklists) is disposable but stays in the main conversation window permanently. Key contributions:
+- **Fresh context as token savings**: The same "fresh context" principle from F-0191 (dialectical review) applies to code review. The review's working data is large but its output is small — a structured report. Subagent isolation is the natural fit.
+- **Collision-proof IDs (F-0193)**: Observed that sequential F-XXXX IDs are a collision vector when multiple agents/branches assign independently. Identified slug-based IDs as a potential solution.
+- **Worktree enforcement (F-0194)**: Identified that the existing worktree instruction is too weak — agents should default to worktrees on feature branches, not just "when another agent may be working on main."
 
 ### Dialectical Plan Review (v0.50.0, F-0191)
 

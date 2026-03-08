@@ -3228,3 +3228,63 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Acceptance**: See `spec/acceptance/F-0191.md`
 
+---
+
+## F-0192: Review Subagent Delegation
+
+**Status**: implementing
+**Category**: Quality
+**Priority**: medium
+**Complexity**: low
+
+**Description**: The /review skill delegates to a fresh-context subagent instead of running inline, keeping review diffs, file reads, and checklist references out of the main conversation context. Saves tokens by discarding disposable review context after producing a compact findings summary.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: none
+- Code: `.claude/skills/reviewing-code/SKILL.md`
+- Tests: Behavioral (verify subagent is spawned)
+
+**Acceptance**: See `spec/acceptance/F-0192.md`
+
+---
+
+## F-0193: Collision-Proof Feature IDs
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: high
+**Complexity**: medium
+
+**Description**: Sequential F-XXXX IDs collide when multiple agents or branches assign independently. Two agents picking "next ID" from the same FEATURES.md will choose the same number, causing merge conflicts and broken references across acceptance files, plans, journal entries, and code annotations. Needs research into slug-based IDs, atomic allocation, or other collision-proof schemes.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: none
+- Code: TBD (feature.sh, FEATURES.md format, possibly all spec tooling)
+- Tests: TBD
+
+**Acceptance**: TBD — requires design phase first
+
+---
+
+## F-0194: Worktree-by-Default for Feature Branches
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: high
+**Complexity**: medium
+
+**Description**: Agents should always work in git worktrees when on feature branches, not dirty the main worktree. Current instruction exists but is too weak ("Use git worktree on feature branches when another agent may be working on main"). Needs: clear mandatory instruction in CLAUDE.md/skills, a STACK.md setting (e.g., worktree_mode: always|multi-agent|off), and possibly ag implement auto-creating the worktree.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: none
+- Code: TBD (ag.sh, STACK.md template, CLAUDE.md templates, skills)
+- Tests: TBD
+
+**Acceptance**: TBD — requires design phase first
+
