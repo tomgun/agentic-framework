@@ -28,7 +28,7 @@ Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"
 
 Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - .agentic/STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
-- .agentic/journal/JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"`
+- .agentic/journal/JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes (not files)" "Next" "Blockers" --why "Problem being solved"`
 - .agentic/HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
 - .agentic/spec/FEATURES.md: `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 - .agentic/TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`
