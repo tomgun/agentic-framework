@@ -82,6 +82,20 @@ def _read_feature_block(feature_id: str, project_root: Path) -> str | None:
     return None
 
 
+def _read_feature_component(feature_id: str, project_root: Path) -> str | None:
+    """Extract the Component field from a feature block, or None."""
+    block = _read_feature_block(feature_id, project_root)
+    if not block:
+        return None
+    m = re.search(r"\*\*Component\*\*:\s*(\S+)", block)
+    if not m:
+        m = re.search(r"-\s*Component:\s*(\S+)", block)
+    if m:
+        val = m.group(1).strip()
+        return val if val.lower() != "none" else None
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Gate 1: planned -> specced
 # ---------------------------------------------------------------------------
@@ -270,6 +284,21 @@ def gate_implementing_to_verified(feature_id: str, project_root: Path) -> GateRe
                 f"Advisory: verify that tests cover all {len(set(ac_ids))} "
                 f"acceptance criteria"
             )
+
+    # Advisory: if feature has a Component, note its test_command
+    component_name = _read_feature_component(feature_id, project_root)
+    if component_name:
+        try:
+            from auto.components import load_registry
+            registry = load_registry(project_root)
+            comp = registry.get(component_name)
+            if comp and comp.test_command:
+                warnings.append(
+                    f"Component '{component_name}': consider running "
+                    f"'{comp.test_command}' for scoped verification"
+                )
+        except ImportError:
+            pass  # components module not available
 
     if reasons:
         return GateResult.blocked(reasons, warnings)

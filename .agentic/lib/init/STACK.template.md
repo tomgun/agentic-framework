@@ -221,6 +221,15 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--       worktree: /path/to/worktree-2 -->
 <!-- When enabled, agents use Git worktrees and coordinate via .agentic/session/AGENTS_ACTIVE.md -->
 
+## Components (optional, for monorepos)
+<!-- Uncomment and fill for multi-component projects.
+     Each component gets scoped context, test commands, and feature tracking.
+     See: .agentic/lib/auto/components.py -->
+<!-- | name | path | type | test_command | -->
+<!-- |------|------|------|--------------|  -->
+<!-- | api  | packages/api | python | pytest packages/api/tests/ | -->
+<!-- | web  | packages/web | typescript | npm run test --workspace=web | -->
+
 ## Data & integrations
 - Primary datastore: <!-- postgres/sqlite/mongo/redis/etc -->
 - Messaging/queues (if any): <!-- kafka/sqs/rabbitmq/etc -->
