@@ -324,6 +324,27 @@ class FeatureStateMachine:
 
         current = self.get_current_state(feature_id)
 
+        # Review checkpoint: after gates pass, before transition writes
+        from auto.review import check_review, has_pending_review
+
+        if has_pending_review(self.project_root, feature_id, target.value):
+            return False, [
+                f"Review pending for {feature_id} → {target.value}. "
+                f"Resolve with: ag review {feature_id} {target.value}"
+            ]
+
+        can_proceed, review_msgs = check_review(
+            self.project_root, feature_id,
+            current.value if current else "unknown", target.value,
+        )
+        if not can_proceed:
+            if dry_run:
+                messages.append(
+                    f"DRY RUN: Would block for review ({target.value})"
+                )
+                return True, messages
+            return False, review_msgs
+
         # Log regression cascades
         if current and self.is_regression(current, target):
             invalidated = self.cascade_invalidations(current, target)

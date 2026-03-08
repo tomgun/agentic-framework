@@ -90,6 +90,9 @@ class AgenticPaths:
         self.migrations_dir = self._resolve(
             self.agentic_root / "spec" / "migrations",
             self.project_root / "spec" / "migrations")
+        self.reviews_dir = self._resolve(
+            self.agentic_root / "spec" / "reviews",
+            self.project_root / "spec" / "reviews")
 
         # Session / ephemeral (.agentic/session/)
         self.session_dir = self._resolve(
@@ -104,6 +107,9 @@ class AgenticPaths:
         self.proposals_dir = self._resolve(
             self.agentic_root / "session" / "proposals",
             self.project_root / ".agentic-state" / "proposals")
+        self.pending_reviews_dir = self._resolve(
+            self.agentic_root / "session" / "reviews",
+            self.project_root / ".agentic-state" / "reviews")
         self.verification_state = self._resolve(
             self.agentic_root / "session" / ".verification-state",
             self.project_root / ".agentic-state" / ".verification-state")

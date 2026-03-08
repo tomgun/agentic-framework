@@ -6,7 +6,7 @@ tokens: ~1130
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.50.0 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -72,6 +72,12 @@ If the user says backlog, queue, next up, what's next, what should I work on, pr
 If the user says "it must always...", "never do X", "performance must stay under...", "security requirement", "accessibility", or describes a cross-cutting constraint that applies beyond a single feature:
 
 **STOP.** This is a Non-Functional Requirement. Check `.agentic/spec/NFR.md` — if no matching NFR exists, assign the next NFR-XXXX ID and write it there. NFRs are invariants that must hold across all features, not just the one being discussed. Don't let them stay informal in conversation.
+
+## When a transition is blocked by a review checkpoint
+
+If a state machine transition is blocked by a review checkpoint, or the user says review, approve, reject, pending review:
+
+**STOP.** Run `ag review` to list all pending reviews. To resolve: `ag review F-XXXX <state>` (approves by default), or `ag review F-XXXX <state> --reject --reason "why"`. Review modes (human/critical_agent/auto) are configurable per transition in STACK.md `### Review checkpoints`.
 
 ## When work is done
 
