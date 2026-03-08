@@ -34,6 +34,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0025: PR #79: F-0180 Review Checkpoint Framework
+- **Type**: decision
+- **Added**: 2026-03-08
+- **Context**: 9 files, 1055 lines. Review checkpoints (human/critical_agent/auto) per transition, ag review command, 30 tests. Needs smoke test verification.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0023: PR #77: Doc enforcement at feature acceptance (F-0189)

@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Dogfooding audit complete, backlog populated with ADR-001 roadmap (Updated: 2026-03-08)
+- F-0180 code review fixes committed (Updated: 2026-03-08 21:25 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0180 (Review Checkpoint Framework) is next
@@ -30,3 +30,4 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - v0.47.1: Docker sandbox for autonomous Claude Code
 - v0.47.0: Formal state machine for feature lifecycle (ADR-001 Phase 1)
 - See CHANGELOG.md for full history
+- QA: QA: 0/1 verified, 2 pending

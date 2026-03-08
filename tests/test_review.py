@@ -4,17 +4,23 @@ Tests for the review checkpoint framework (F-0180, ADR-001 Phase 3).
 
 Covers:
 - ReviewMode enum
-- Transition → review setting map
+- Transition → review setting map (including sync with state_machine)
 - get_review_mode resolution from profiles + STACK.md overrides
 - check_review: auto proceeds, human blocks, critical_agent falls back
-- Pending review lifecycle: create/find/list
+- Pending review lifecycle: create/find/list (including malformed JSON)
 - resolve_review: verdict artifact creation, pending cleanup, transition
+- resolve_review: atomic writes, unlink error handling
 - Profile switch mid-feature: pending reviews keep snapshotted mode (AC-008)
 - Verdict artifact format and storage
+- CLI entry point (main)
+- Feature ID validation (path traversal prevention)
+- Regression pairs sync with state_machine.REGRESSION_TRANSITIONS
+- Re-review prevention loop (verdict artifact blocks second review)
 """
 import json
 import sys
 import tempfile
+from io import StringIO
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
@@ -28,18 +34,38 @@ from auto.review import (
     TRANSITION_REVIEW_MAP,
     _REGRESSION_PAIRS,
     _get_review_setting_key,
+    _validate_feature_id,
     get_review_mode,
     check_review,
     create_pending_review,
     has_pending_review,
     get_pending_reviews,
     resolve_review,
+    main,
 )
+from auto.state_machine import REGRESSION_TRANSITIONS
 
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
+@pytest.fixture(autouse=True)
+def clear_caches():
+    """Clear settings and paths caches between tests."""
+    import settings as settings_mod
+    import paths as paths_mod
+    yield
+    # Clear after each test to prevent stale cache between temp dirs
+    if hasattr(settings_mod, '_settings_cache'):
+        settings_mod._settings_cache.clear()
+    if hasattr(settings_mod, '_profile_cache'):
+        settings_mod._profile_cache.clear()
+    if hasattr(settings_mod, '_presets_cache'):
+        settings_mod._presets_cache.clear()
+    if hasattr(paths_mod, '_paths_cache'):
+        paths_mod._paths_cache.clear()
+
 
 @pytest.fixture
 def project_dir():
@@ -89,6 +115,33 @@ def write_features(root: Path, features: list[tuple[str, str, str]]) -> None:
 
 
 # ---------------------------------------------------------------------------
+# TestFeatureIdValidation
+# ---------------------------------------------------------------------------
+
+class TestFeatureIdValidation:
+    def test_valid_feature_id(self):
+        _validate_feature_id("F-0042")
+        _validate_feature_id("F-0001")
+        _validate_feature_id("F-99999")  # 5+ digits ok
+
+    def test_path_traversal_rejected(self):
+        with pytest.raises(ValueError, match="Invalid feature ID"):
+            _validate_feature_id("../../etc")
+
+    def test_empty_string_rejected(self):
+        with pytest.raises(ValueError, match="Invalid feature ID"):
+            _validate_feature_id("")
+
+    def test_missing_prefix_rejected(self):
+        with pytest.raises(ValueError, match="Invalid feature ID"):
+            _validate_feature_id("0042")
+
+    def test_wrong_format_rejected(self):
+        with pytest.raises(ValueError, match="Invalid feature ID"):
+            _validate_feature_id("F-abc")
+
+
+# ---------------------------------------------------------------------------
 # TestReviewMode
 # ---------------------------------------------------------------------------
 
@@ -135,6 +188,20 @@ class TestTransitionReviewMap:
         assert _get_review_setting_key("criteria_set", "tests_written") is None
         assert _get_review_setting_key("implementing", "verified") is None
         assert _get_review_setting_key("verified", "documented") is None
+
+    def test_regression_pairs_sync_with_state_machine(self):
+        """Verify _REGRESSION_PAIRS is derived from state_machine.REGRESSION_TRANSITIONS."""
+        expected = {(fr.value, to.value) for fr, to in REGRESSION_TRANSITIONS}
+        assert _REGRESSION_PAIRS == expected, (
+            f"_REGRESSION_PAIRS out of sync with REGRESSION_TRANSITIONS.\n"
+            f"Missing: {expected - _REGRESSION_PAIRS}\n"
+            f"Extra: {_REGRESSION_PAIRS - expected}"
+        )
+
+    def test_deprecated_transition_returns_none(self):
+        """Transitions to deprecated have no review (auto by default)."""
+        assert _get_review_setting_key("implementing", "deprecated") is None
+        assert _get_review_setting_key("shipped", "deprecated") is None
 
 
 # ---------------------------------------------------------------------------
@@ -262,6 +329,19 @@ class TestPendingReview:
         assert data["review_mode"] == "human"
         assert data["hn_id"] == "HN-0030"
 
+    @patch("auto.review.subprocess.run")
+    def test_create_pending_review_5digit_hn_id(self, mock_run, project_dir):
+        """HN-ID regex supports more than 4 digits."""
+        mock_run.return_value = MagicMock(
+            stdout="✓ Added HN-10001: Review: F-0042 → specced\n",
+            returncode=0,
+        )
+        hn_id = create_pending_review(
+            project_dir, "F-0042", "planned", "specced",
+            "review_spec", "human",
+        )
+        assert hn_id == "HN-10001"
+
     def test_has_pending_review(self, project_dir):
         assert not has_pending_review(project_dir, "F-0042", "specced")
 
@@ -301,6 +381,20 @@ class TestPendingReview:
         reviews = get_pending_reviews(project_dir)
         assert reviews == []
 
+    def test_get_pending_reviews_skips_malformed_json(self, project_dir):
+        """Malformed JSON files are skipped without crashing."""
+        reviews_dir = project_dir / ".agentic" / "session" / "reviews"
+        reviews_dir.mkdir(parents=True, exist_ok=True)
+
+        (reviews_dir / "F-0042_specced.json").write_text("not valid json{{{")
+        (reviews_dir / "F-0043_shipped.json").write_text(
+            json.dumps({"feature_id": "F-0043", "to_state": "shipped"})
+        )
+
+        reviews = get_pending_reviews(project_dir)
+        assert len(reviews) == 1
+        assert reviews[0]["feature_id"] == "F-0043"
+
 
 # ---------------------------------------------------------------------------
 # TestResolveReview
@@ -330,6 +424,10 @@ class TestResolveReview:
         )
         assert success is False
         assert any("No pending review" in m for m in msgs)
+
+    def test_invalid_feature_id_rejected(self, project_dir):
+        with pytest.raises(ValueError, match="Invalid feature ID"):
+            resolve_review(project_dir, "../../etc", "specced", "approved")
 
     @patch("auto.review.subprocess.run")
     def test_approve_creates_verdict_artifact(self, mock_run, project_dir):
@@ -396,12 +494,6 @@ class TestResolveReview:
         mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
         self._setup_pending(project_dir)
 
-        # Create fake blocker.sh so the exists() check passes
-        # paths.tools_dir resolves to .agentic/lib/tools (new layout)
-        tools_dir = project_dir / ".agentic" / "lib" / "tools"
-        tools_dir.mkdir(parents=True, exist_ok=True)
-        (tools_dir / "blocker.sh").write_text("#!/bin/bash\n")
-
         resolve_review(project_dir, "F-0042", "specced", "rejected")
 
         # Check blocker.sh resolve was called with HN-0025
@@ -412,6 +504,66 @@ class TestResolveReview:
         assert len(calls) >= 1
         resolve_call = calls[0]
         assert "HN-0025" in str(resolve_call)
+
+    @patch("auto.review.subprocess.run")
+    def test_unlink_failure_does_not_crash(self, mock_run, project_dir):
+        """If pending file unlink fails, resolve continues with a warning."""
+        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+        self._setup_pending(project_dir)
+
+        pending_file = (
+            project_dir / ".agentic" / "session" / "reviews"
+            / "F-0042_specced.json"
+        )
+
+        with patch.object(Path, "unlink", side_effect=OSError("permission denied")):
+            success, msgs = resolve_review(
+                project_dir, "F-0042", "specced", "rejected"
+            )
+
+        assert success is True
+        assert any("Could not remove" in m for m in msgs)
+
+    @patch("auto.review.subprocess.run")
+    def test_malformed_pending_json_fails_gracefully(self, mock_run, project_dir):
+        """Malformed pending review JSON returns an error, not a crash."""
+        reviews_dir = project_dir / ".agentic" / "session" / "reviews"
+        reviews_dir.mkdir(parents=True, exist_ok=True)
+        (reviews_dir / "F-0042_specced.json").write_text("not valid json")
+
+        success, msgs = resolve_review(
+            project_dir, "F-0042", "specced", "approved"
+        )
+        assert success is False
+        assert any("Failed to read" in m for m in msgs)
+
+
+# ---------------------------------------------------------------------------
+# TestReReviewPrevention
+# ---------------------------------------------------------------------------
+
+class TestReReviewPrevention:
+    def test_verdict_artifact_prevents_second_review(self, project_dir):
+        """After a verdict artifact exists, check_review returns (True, [])
+        regardless of the current review mode setting."""
+        # Set up a human review mode
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- review_spec: human\n"
+        )
+
+        # Create verdict artifact (as if already reviewed)
+        verdict_dir = project_dir / ".agentic" / "spec" / "reviews" / "F-0042"
+        verdict_dir.mkdir(parents=True, exist_ok=True)
+        (verdict_dir / "planned_to_specced.md").write_text(
+            "# Review: F-0042 planned → specced\n- **Verdict**: approved\n"
+        )
+
+        # Even though review_spec=human, the verdict artifact means it's done
+        can_proceed, msgs = check_review(
+            project_dir, "F-0042", "planned", "specced"
+        )
+        assert can_proceed is True
+        assert msgs == []
 
 
 # ---------------------------------------------------------------------------
@@ -437,8 +589,7 @@ class TestProfileSwitchMidFeature:
         }
         (reviews_dir / "F-0042_shipped.json").write_text(json.dumps(data))
 
-        # Switch profile to discovery (which has review_merge=human too,
-        # but the principle is that the snapshotted mode doesn't change)
+        # Switch profile to discovery with review_merge: auto
         (project_dir / "STACK.md").write_text(
             "## Settings\n- profile: discovery\n- review_merge: auto\n"
         )
@@ -501,3 +652,92 @@ class TestReviewVerdict:
         verdict_file.write_text("test")
         assert verdict_file.exists()
         assert "spec/reviews/F-0042" in str(verdict_file)
+
+
+# ---------------------------------------------------------------------------
+# TestCLI
+# ---------------------------------------------------------------------------
+
+class TestCLI:
+    def test_list_no_pending(self, project_dir, capsys):
+        with patch("sys.argv", ["review", "--project-root", str(project_dir)]):
+            result = main()
+        assert result == 0
+        assert "No pending reviews" in capsys.readouterr().out
+
+    def test_list_with_pending(self, project_dir, capsys):
+        reviews_dir = project_dir / ".agentic" / "session" / "reviews"
+        reviews_dir.mkdir(parents=True, exist_ok=True)
+        data = {
+            "feature_id": "F-0042",
+            "from_state": "planned",
+            "to_state": "specced",
+            "review_setting": "review_spec",
+            "review_mode": "human",
+        }
+        (reviews_dir / "F-0042_specced.json").write_text(json.dumps(data))
+
+        with patch("sys.argv", ["review", "--project-root", str(project_dir)]):
+            result = main()
+        assert result == 0
+        out = capsys.readouterr().out
+        assert "F-0042" in out
+        assert "review_spec" in out
+
+    def test_feature_list(self, project_dir, capsys):
+        reviews_dir = project_dir / ".agentic" / "session" / "reviews"
+        reviews_dir.mkdir(parents=True, exist_ok=True)
+        data = {
+            "feature_id": "F-0042",
+            "from_state": "planned",
+            "to_state": "specced",
+            "review_setting": "review_spec",
+            "review_mode": "human",
+        }
+        (reviews_dir / "F-0042_specced.json").write_text(json.dumps(data))
+
+        with patch("sys.argv", ["review", "F-0042", "--project-root", str(project_dir)]):
+            result = main()
+        assert result == 0
+        assert "planned" in capsys.readouterr().out
+
+    def test_invalid_feature_id_rejected(self, project_dir, capsys):
+        with patch("sys.argv", ["review", "../../etc", "--project-root", str(project_dir)]):
+            result = main()
+        assert result == 1
+        assert "Invalid feature ID" in capsys.readouterr().out
+
+    def test_reject_flag(self, project_dir, capsys):
+        """--reject flag produces rejected verdict."""
+        reviews_dir = project_dir / ".agentic" / "session" / "reviews"
+        reviews_dir.mkdir(parents=True, exist_ok=True)
+        data = {
+            "feature_id": "F-0042",
+            "from_state": "planned",
+            "to_state": "specced",
+            "review_setting": "review_spec",
+            "review_mode": "human",
+            "hn_id": None,
+            "created_at": "2026-03-08T14:30:00+00:00",
+        }
+        (reviews_dir / "F-0042_specced.json").write_text(json.dumps(data))
+
+        with patch("sys.argv", [
+            "review", "F-0042", "specced", "--reject",
+            "--reason", "Needs work",
+            "--project-root", str(project_dir),
+        ]):
+            result = main()
+        assert result == 0
+        out = capsys.readouterr().out
+        assert "rejected" in out
+
+    def test_approve_reject_mutually_exclusive(self, project_dir):
+        """--approve and --reject cannot be used together."""
+        with pytest.raises(SystemExit):
+            with patch("sys.argv", [
+                "review", "F-0042", "specced",
+                "--approve", "--reject",
+                "--project-root", str(project_dir),
+            ]):
+                main()
