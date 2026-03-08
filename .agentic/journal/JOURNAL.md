@@ -1556,3 +1556,16 @@
 sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Identified post-merge dogfooding gap (T-0044): framework has dogfooding as principle but no enforcement after PR merge.
 
 **Next steps**:
+
+### Session: 2026-03-08 15:49 - Docker Sandbox
+
+**Why**: Enable autonomous Claude Code in isolated containers with user-configurable security
+
+**What changed**:
+- Devcontainer with iptables firewall, GH_TOKEN auth, zsh history, sandbox-setup skill with security interview (Open/Standard/Locked profiles)
+
+**Next steps**:
+- Merge PR, add sandbox quick-start to README
+
+**Blockers**: None
+
