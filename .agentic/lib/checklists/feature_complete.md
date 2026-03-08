@@ -309,8 +309,13 @@ If ANY answer is "No" or "Not sure" → Feature is NOT ready to be marked shippe
   - Wait for human to test and accept
   - Human will update `Verification: Accepted: yes` when satisfied
 
+- [ ] **Backlog auto-advances** (if BACKLOG.json exists)
+  - `ag done` automatically removes the completed item from position 0
+  - The next backlog item is promoted to current
+  - Shows: "Backlog advanced — next up: F-XXXX"
+
 - [ ] **Move to next work**
-  - Check STATUS.md for next focus
+  - Check backlog (`ag backlog`) or STATUS.md for next focus
   - Don't start immediately - ask human what's next
   - Update STATUS.md with new focus
 

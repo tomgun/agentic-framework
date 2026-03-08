@@ -26,6 +26,7 @@ cat STATUS.md 2>/dev/null || true
 cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
 cat .agentic/session/AGENTS_ACTIVE.md 2>/dev/null || true
 ls .agentic/session/WIP.md 2>/dev/null || true
+bash .agentic/lib/tools/backlog.sh current 2>/dev/null || true
 ```
 
 ### 2. Greet User with Recap
@@ -63,7 +64,8 @@ What would you like to work on?
 | User Request Pattern | Auto-Trigger | What To Do |
 |---------------------|--------------|------------|
 | (first message) | **Proactive Start** | Greet with context + options |
-| "implement F-####" / "build feature" / "create [feature]" | **Feature Pipeline** | Follow Feature Implementation flow |
+| "implement F-####" / "build feature" / "create [feature]" | **Feature Pipeline** | Follow Feature Implementation flow (respects backlog order) |
+| "backlog" / "queue" / "what's next" / "prioritize" / "reorder" | **Backlog Management** | Run `ag backlog` to show queue; `ag backlog add/done/move/list` to manage |
 | "fix I-####" / "fix bug" / "fix issue" | **Issue Pipeline** | Follow Issue Resolution flow |
 | "commit" / "ready to commit" | **Before Commit** | Run `before_commit.md` checklist |
 | "write spec" / "create spec" / "add acceptance" / "ag spec" | **Spec-Writing Pipeline** | Follow Spec-Writing flow |
@@ -357,6 +359,7 @@ No escape hatch. Shipped spec protection is deterministic.
 □ All acceptance criteria met
 □ Smoke test passed (actually ran the app)
 □ All tests pass
+□ Documentation updated (drift.sh --docs, CONTEXT_PACK.md if architecture changed)
 □ FEATURES.md/OVERVIEW.md updated with status: shipped
 □ Code annotations added (@feature, @acceptance)
 □ JOURNAL.md updated

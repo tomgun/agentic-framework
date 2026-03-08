@@ -16,8 +16,9 @@ phase: implementation
 
 ## Prerequisite: Feature Start Checklist
 
-**🚨 Complete `.agentic/lib/checklists/feature_start.md` FIRST** — it covers acceptance criteria, scope check, delegation decisions, and context handoff. Do not start implementation without passing those gates.
+**🚨 Complete `.agentic/lib/checklists/feature_start.md` FIRST** — it covers backlog ordering, acceptance criteria, scope check, delegation decisions, and context handoff. Do not start implementation without passing those gates.
 
+- [ ] **Backlog check passed** (`ag implement` enforces this — F-XXXX must be at position 0 if backlog exists)
 - [ ] **WIP tracking active** (`ag implement` creates this; manual: `wip.sh start F-#### "desc" "files"`)
 
 ---

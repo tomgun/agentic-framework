@@ -28,6 +28,7 @@ cat STATUS.md 2>/dev/null || true
 cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
 bash .agentic/lib/tools/wip.sh check 2>/dev/null || true
 bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
+bash .agentic/lib/tools/backlog.sh current 2>/dev/null || true
 ```
 
 Also read the last 2-3 entries from `.agentic/journal/JOURNAL.md`.
@@ -59,7 +60,8 @@ Welcome back! Here's where we are:
 2. [Second option]
 3. [Address blockers — if any in HUMAN_NEEDED.md]
 
-**Available workflows**: `ag plan` | `ag sync` | `ag implement F-XXXX`
+**Backlog**: [Current item from BACKLOG.json, or "empty"]
+**Available workflows**: `ag plan` | `ag sync` | `ag implement F-XXXX` | `ag backlog`
 ```
 
 ### Step 4: Handle Special Cases

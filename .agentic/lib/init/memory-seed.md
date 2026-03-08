@@ -5,8 +5,8 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.46.0 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo -->
+<!-- memory-seed v0.49.0 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -60,6 +60,12 @@ If the user wants to commit, push, save, ship, or finalize changes:
 If the user says remember, todo, idea, note for later, tasklist, or mentions something to track:
 
 **STOP.** Run `ag todo "description"` to capture it in .agentic/TODO.md (git-tracked, survives context compression).
+
+## When the user asks about work queue, backlog, or what's next
+
+If the user says backlog, queue, next up, what's next, what should I work on, prioritize, reorder, or mentions work assignment:
+
+**STOP.** Run `ag backlog` to see the current work queue. Use `ag backlog add F-XXXX` to add items, `ag backlog done` to advance, `ag backlog move F-XXXX 0` to reprioritize. Position 0 = current work. `ag implement` enforces backlog order.
 
 ## When the user expresses a system invariant or quality constraint
 
@@ -123,10 +129,13 @@ If NFR.md exists but only has template content (no project-specific NFRs) after 
 
 ## Where to log things
 
+- Prioritized work item → `ag backlog add F-XXXX` or `ag backlog add --task "desc"` (.agentic/BACKLOG.json)
 - Development idea or task → `ag todo "description"` (.agentic/TODO.md)
 - Needs human action (PR review, credentials, decision) → `blocker.sh` (.agentic/HUMAN_NEEDED.md)
 - Bug or technical debt → .agentic/spec/ISSUES.md
 - New capability to spec → .agentic/spec/FEATURES.md
+
+**Backlog vs TODO**: Backlog = committed, ordered work queue (what to do next). TODO = unfiltered idea inbox. Flow: idea → `ag todo` → triage → `ag backlog add`.
 
 Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 

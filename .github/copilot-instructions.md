@@ -8,7 +8,7 @@ Full template: `.agentic/lib/agents/copilot/copilot-instructions.md`
 
 Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
-Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag spec` | `ag docs` | `ag todo`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog` | `ag spec` | `ag docs` | `ag todo`
 
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |
@@ -19,6 +19,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Commit / push / ship / finalize changes | STOP -> Check .agentic/session/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
 | Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, flush pending ideas to .agentic/TODO.md via `ag todo`. |
 | Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
+| Backlog / queue / what's next / prioritize / reorder work | STOP -> `ag backlog` to see queue. `ag backlog add F-XXXX` to add. |
 | Write spec / create spec / acceptance criteria / evolve spec | STOP -> Run `ag spec F-XXXX`. Follow spec protection levels. |
 
 DO NOT PROCEED without acceptance criteria: .agentic/spec/acceptance/F-####.md must exist. Criteria before code. No exceptions.
@@ -49,3 +50,4 @@ Validation: `bash tests/validate_framework.sh` must pass before committing.
 New features: Add to `.agentic/spec/FEATURES.md` FIRST, create acceptance criteria before coding.
 Breaking changes: Provide upgrade path in `upgrade.sh`.
 Test in scratch project before committing framework changes.
+Instruction files are part of the feature: new `ag` commands/gates MUST update all instruction files (templates, skills, checklists, memory-seed, DEVELOPER_GUIDE, HOW_IT_WORKS).

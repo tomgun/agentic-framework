@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0176 plan-aware review — review fixes applied, rebased onto v0.46.0 (Updated: 2026-03-07 18:14 EET)
+- F-0190 Backlog/Roadmap — PR ready for review (Updated: 2026-03-08 19:22 UTC)
 
 ## Current focus
 - Infrastructure validation tests shipped (v0.25.6, PR #27)
@@ -32,3 +32,4 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - v0.21.0: Structural enforcement for durable artifacts, `status.sh infer`, 6 new artifact-maintenance LLM tests
 - v0.20.0: Traceability overhaul, test consolidation, Context7 MCP update, KISS meta-principle
 - See CHANGELOG.md for full history
+- QA: QA: 0/1 verified, 2 pending

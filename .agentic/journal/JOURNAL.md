@@ -1595,3 +1595,58 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 19:22 - F-0190 Backlog Work Assignment
+
+**Why**: Work assignments got lost between sessions and machines — no structural mechanism for ordered work
+
+**What changed**:
+- Agents on any machine now know what to work on next via git-tracked BACKLOG.json queue. Structural gates enforce queue order at implement/work/done commands.
+
+**Next steps**:
+- See backlog (ag backlog list). Merge PR, then follow-up: STATUS.md simplification.
+
+**Blockers**: None
+
+**Metadata**:
+- Feature: F-0190
+
+
+### Session: 2026-03-08 19:28 - F-0190 review fixes
+
+**Why**: Code review found issues that should be fixed before merge
+
+**What changed**:
+- Fixed 3 code review issues: unknown backlog subcommand now errors, F-0190 Since version corrected to v0.49.0, cmd_start backlog display consolidated to single python3 call
+
+**Next steps**:
+- Push fixes to PR #78 for re-review
+
+**Blockers**: None
+
+
+### Session: 2026-03-08 19:34 - F-0190 doc updates
+
+**Why**: Backlog feature was code-complete but agents had no awareness of it — instruction files ARE the feature delivery
+
+**What changed**:
+- All agent instruction files now reference backlog: 18 files across quick commands, trigger tables, where-to-log routing, session start, feature workflow gates, and completion flow
+
+**Next steps**:
+- Push to PR #78, re-review
+
+**Blockers**: None
+
+
+### Session: 2026-03-08 19:36 - F-0190 user-facing docs
+
+**Why**: Instruction files were updated but actual documentation (HOW_IT_WORKS, DEVELOPER_GUIDE) was still missing backlog content
+
+**What changed**:
+- HOW_IT_WORKS.md has backlog section + mermaid diagram, DEVELOPER_GUIDE.md has backlog in workflows, memory-seed has instruction-files-are-features rule
+
+**Next steps**:
+- Push final docs to PR #78
+
+**Blockers**: None
+

@@ -28,7 +28,7 @@ tokens: ~952
 
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 
-**Quick Commands**: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag spec` | `ag docs` | `ag todo`
+**Quick Commands**: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog` | `ag spec` | `ag docs` | `ag todo`
 **Autonomous**: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch`
 
 ---
@@ -93,12 +93,15 @@ Update docs **in the same commit** as code changes:
 
 | What | Target | Command |
 |------|--------|---------|
+| Prioritized work item | BACKLOG.json | `ag backlog add F-XXXX` or `ag backlog add --task "desc"` |
 | Task / idea / reminder | TODO.md | `ag todo "description"` |
 | Human blocker (PR review, credentials, decision) | HUMAN_NEEDED.md | `blocker.sh add "Title" "type" "Details"` |
 | Bug / technical debt | ISSUES.md | `quick_issue.sh "Title" "Details"` |
 | New capability to spec | FEATURES.md | `feature.sh add "Title"` |
 
 Do NOT put development tasks in HUMAN_NEEDED.md.
+
+**Backlog vs TODO**: Backlog = committed, ordered work queue (what to do next). TODO = unfiltered idea inbox (raw capture). Flow: idea → `ag todo` → triage → `ag backlog add`.
 
 ## When to Escalate
 

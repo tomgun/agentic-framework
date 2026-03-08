@@ -44,6 +44,7 @@ class AgenticPaths:
             self.agentic_root / "CONTRIBUTIONS.md", self.project_root / "CONTRIBUTIONS.md")
         self.overview_file = self._resolve(
             self.agentic_root / "OVERVIEW.md", self.project_root / "OVERVIEW.md")
+        self.backlog_file = self.agentic_root / "BACKLOG.json"
 
         # Journal (.agentic/journal/)
         self.journal_dir = self._resolve(
