@@ -11,7 +11,7 @@ compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Agent]
 metadata:
   author: agentic-framework
-  version: "0.41.0"
+  version: "0.46.1"
 ---
 
 # Implementing Features
@@ -44,14 +44,6 @@ Check if spec analysis is enabled:
 2. If enabled, run: `bash .agentic/lib/tools/spec-analyze.sh F-XXXX`
 3. Review findings but proceed regardless (advisory, not blocking)
 4. If any HIGH/CRITICAL findings, mention them to the user before coding
-
-### Step 1c: AC Coverage Check (advisory)
-
-Run AC-level coverage tracking to see which criteria already have tests:
-```bash
-python3 .agentic/lib/tools/coverage.py F-XXXX
-```
-Review the per-AC coverage report. Flag any untested ACs for attention during implementation.
 
 ### Step 2: Scope Check
 

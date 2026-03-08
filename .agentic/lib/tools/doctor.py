@@ -355,7 +355,12 @@ def checks_for_profile(profile: str, root: Path | None = None) -> list[Check]:
 FEATURE_ID_RE = re.compile(r"\b(F-\d{4})\b")
 NFR_ID_RE = re.compile(r"\b(NFR-\d{4})\b")
 FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):\s*(.+?)\s*$", re.MULTILINE)
-STATUS_VALUES = {"planned", "in_progress", "shipped", "deprecated"}
+STATUS_VALUES = {
+    "planned", "specced", "criteria_set", "tests_written",
+    "implementing", "verified", "documented", "committed",
+    "shipped", "deprecated",
+    "in_progress",  # backward-compat alias for implementing
+}
 
 
 def looks_like_template(text: str) -> bool:

@@ -252,8 +252,8 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ## Retrospectives (optional)
 <!-- Agent-led periodic project health checks. See .agentic/lib/workflows/retrospective.md -->
-<!-- Uncomment to enable: -->
-<!-- - retrospective_enabled: yes -->
+<!-- retrospective_enabled is in ## Settings above (profile-aware: Discovery=no, Formal=yes) -->
+<!-- Additional retrospective options (uncomment to customize): -->
 <!-- - retrospective_trigger: both  # time | features | both -->
 <!-- - retrospective_interval_days: 14 -->
 <!-- - retrospective_interval_features: 10 -->

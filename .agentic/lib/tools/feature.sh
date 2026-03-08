@@ -32,7 +32,7 @@ if [[ -z "${FEATURE_ID}" ]] || [[ -z "${FIELD}" ]] || [[ -z "${VALUE}" ]]; then
 Usage: bash feature.sh <feature-id> <field> <value>
 
 Fields:
-  status       - planned | in_progress | shipped | deprecated
+  status       - planned | specced | criteria_set | tests_written | implementing | verified | documented | committed | shipped | deprecated
   impl-state   - none | partial | complete
   tests        - todo | partial | complete | n/a
   accepted     - yes | no

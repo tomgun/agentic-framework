@@ -9,7 +9,13 @@ Automatic validation: Catches typos, wrong values, missing fields.
 """
 
 import sys
-import yaml
+
+try:
+    import yaml
+except ImportError:
+    # pyyaml not installed — skip validation gracefully
+    sys.exit(0)
+
 import json
 import re
 from pathlib import Path

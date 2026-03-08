@@ -38,15 +38,25 @@ def project_dir():
 
 
 def write_features_md(root: Path, features: list[tuple[str, str]]) -> None:
-    """Write a minimal FEATURES.md with given (id, status) entries."""
-    lines = [
-        "# Features",
-        "",
-        "| ID | Category | Status | Description |",
-        "|----|----------|--------|-------------|",
-    ]
+    """Write a minimal FEATURES.md with given (id, status) entries.
+
+    Uses heading format (the actual FEATURES.md format) instead of table format.
+    """
+    lines = ["# Features", ""]
     for fid, status in features:
-        lines.append(f"| {fid} | Test | {status} | Test feature |")
+        # Normalize in-progress to the heading-style format
+        status_val = status.replace("-", "_")
+        lines.extend([
+            f"## {fid}: Test Feature",
+            "",
+            f"**Status**: {status_val}",
+            "**Category**: Test",
+            "",
+            f"**Description**: Test feature {fid}.",
+            "",
+            "---",
+            "",
+        ])
     (root / ".agentic" / "spec" / "FEATURES.md").write_text("\n".join(lines) + "\n")
 
 

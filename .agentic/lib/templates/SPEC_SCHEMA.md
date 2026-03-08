@@ -65,7 +65,7 @@ ADR-0007
 - Domain: [domain-name | none]  <!-- NEW in v0.3.0 -->
 - Priority: [critical | high | medium | low | none]  <!-- NEW in v0.3.0 -->
 - Owner: [email | username | none]  <!-- NEW in v0.3.0 -->
-- Status: [planned | in_progress | shipped | deprecated]
+- Status: [planned | specced | criteria_set | tests_written | implementing | verified | documented | committed | shipped | deprecated]
 - PRD: [spec/PRD.md#anchor | none]
 - Requirements: [R-####, ... | none]
 - NFRs: [NFR-####, ... | none]
@@ -102,7 +102,7 @@ ADR-0007
 | **Domain** | string | domain name | ⚠️ Optional | Business domain (auth, payments, content, etc.) (v0.3.0+) |
 | **Priority** | enum | `critical`, `high`, `medium`, `low` | ⚠️ Optional | Business priority level (v0.3.0+) |
 | **Owner** | string | email or username | ⚠️ Optional | Person responsible for this feature (v0.3.0+) |
-| **Status** | enum | `planned`, `in_progress`, `shipped`, `deprecated` | ✅ | Current development status |
+| **Status** | enum | `planned`, `specced`, `criteria_set`, `tests_written`, `implementing`, `verified`, `documented`, `committed`, `shipped`, `deprecated` | ✅ | Current development status |
 | **PRD** | reference | `spec/PRD.md#anchor` or `none` | ✅ | Link to product requirement |
 | **Requirements** | ID list | `R-####, ...` or `none` | ✅ | Requirements this feature satisfies |
 | **NFRs** | ID list | `NFR-####, ...` or `none` | ✅ | NFRs this feature must satisfy |
@@ -123,15 +123,22 @@ ADR-0007
 ### Status Transitions
 
 ```
-planned → in_progress → shipped
-   ↓                        ↓
-deprecated ← ← ← ← ← ← ← ← ┘
+planned → specced → criteria_set → tests_written → implementing → verified → documented → committed → shipped
+   ↓                                                                                                    ↓
+deprecated ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ┘
 ```
 
 **Rules**:
-- Only move to `shipped` when `Implementation: State = complete` AND `Accepted = yes`
-- Only move to `in_progress` when actively being worked on
-- Use `deprecated` for features no longer needed
+- `planned`: Feature identified, not yet specced
+- `specced`: Spec/design written
+- `criteria_set`: Acceptance criteria defined in acceptance file
+- `tests_written`: Tests written before implementation (TDD)
+- `implementing`: Actively being coded
+- `verified`: Implementation passes acceptance criteria (`Accepted = yes`)
+- `documented`: Code + docs updated together
+- `committed`: Changes committed (pre-merge/ship)
+- `shipped`: Released / merged to main (`Implementation: State = complete` AND `Accepted = yes`)
+- `deprecated`: Feature no longer needed (terminal state, reachable from any state)
 
 ---
 
@@ -536,7 +543,7 @@ When removing fields:
 ## Quick Reference Card
 
 ### Status Values
-- **Features**: `planned`, `in_progress`, `shipped`, `deprecated`
+- **Features**: `planned`, `specced`, `criteria_set`, `tests_written`, `implementing`, `verified`, `documented`, `committed`, `shipped`, `deprecated`
 - **Implementation**: `none`, `partial`, `complete`
 - **Tests**: `todo`, `partial`, `complete`, `n/a`
 - **ADRs**: `Proposed`, `Accepted`, `Superseded`

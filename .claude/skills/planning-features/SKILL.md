@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with plan mode support."
 allowed-tools: [Read, Glob, Grep, Bash, Agent]
 metadata:
   author: agentic-framework
-  version: "0.41.0"
+  version: "0.46.1"
 ---
 
 # Planning Features

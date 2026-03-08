@@ -132,7 +132,7 @@ phase: implementation
 ### Update Tracking (Formal)
 
 - [ ] **Update `.agentic/spec/FEATURES.md`**
-  - Status: `planned` → `in_progress` → `shipped`
+  - Status follows 9-state lifecycle: planned → specced → criteria_set → tests_written → implementing → verified → documented → committed → shipped (use `ag transition F-XXXX <state>`)
   - Implementation State: `none` → `partial` → `complete`
   - Implementation Code: Add actual file paths
   - Tests: `todo` → `partial` → `complete`
@@ -171,6 +171,13 @@ phase: implementation
   - Run full test suite
   - No skipped or ignored tests
   - Check test output carefully
+
+- [ ] **End-to-end smoke test** (CRITICAL — unit tests are not enough)
+  - Run the feature the way a user would (CLI command, API call, UI action)
+  - Verify the output is correct and complete, not just "no errors"
+  - If the feature has a CLI: run it against the real project, not just test fixtures
+  - If the feature has integration points: verify they're actually wired up
+  - **Why**: Unit tests verify isolated logic. Smoke tests verify the pieces are connected. A feature can have 100% test coverage and still be broken if wiring is missing (e.g., a function exists but is never called from the entry point).
 
 - [ ] **Run quality checks** (if enabled)
   - `bash quality_checks.sh` (if exists)

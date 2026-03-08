@@ -11,7 +11,8 @@
   - If you don't, leave the "Requirements" field empty and rely on the feature acceptance criteria file instead.
 
 ## Status vocabulary
-- `planned` | `in_progress` | `shipped` | `deprecated`
+- `planned` | `specced` | `criteria_set` | `tests_written` | `implementing` | `verified` | `documented` | `committed` | `shipped` | `deprecated`
+- Backward-compat alias: `in_progress` is accepted as equivalent to `implementing`
 
 ## How to reference
 - Feature IDs: `F-####`, …
@@ -39,7 +40,7 @@ You can add an index at the top for quick navigation:
 - Domain: example  <!-- Optional: business domain (auth, payments, content, etc.) -->
 - Priority: medium  <!-- Optional: critical | high | medium | low -->
 - Owner:  <!-- Optional: email or username -->
-- Status: planned  <!-- planned | in_progress | shipped | deprecated -->
+- Status: planned  <!-- planned | specced | criteria_set | tests_written | implementing | verified | documented | committed | shipped | deprecated -->
 - PRD: spec/PRD.md#requirements  <!-- Optional: link to requirements doc -->
 - Requirements: R-0001  <!-- Optional: requirement IDs this feature satisfies -->
 - NFRs: none  <!-- Optional: list NFR-#### only if the feature has specific constraints -->
@@ -104,7 +105,8 @@ For simpler projects, you can use a minimal version:
 - `none` if no dependencies
 
 **Status**
-- Current state: `planned` | `in_progress` | `shipped` | `deprecated`
+- Current state: `planned` | `specced` | `criteria_set` | `tests_written` | `implementing` | `verified` | `documented` | `committed` | `shipped` | `deprecated`
+- Backward-compat alias: `in_progress` is accepted as equivalent to `implementing`
 
 **Acceptance**
 - Link to acceptance criteria file (`.agentic/spec/acceptance/F-####.md`)

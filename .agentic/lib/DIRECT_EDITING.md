@@ -12,7 +12,7 @@ tokens: ~1328
 **All spec edits (human or agent) must follow the defined schema**: [`.agentic/spec/SPEC_SCHEMA.md`](.agentic/spec/SPEC_SCHEMA.md)
 
 This ensures:
-- Valid status values (`planned`, `in_progress`, `shipped`, `deprecated`)
+- Valid status values (`planned`, `specced`, `criteria_set`, `tests_written`, `implementing`, `verified`, `documented`, `committed`, `shipped`, `deprecated`)
 - Correct field names and formats
 - Consistent cross-references (`F-####`, `NFR-####`, `R-####`)
 - Tools can validate your edits

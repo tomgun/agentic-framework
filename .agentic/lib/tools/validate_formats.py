@@ -44,7 +44,12 @@ def validate_features_md(path: Path) -> List[str]:
                 status_match = re.search(r"- Status:\s*(\w+)", section)
                 if status_match:
                     status = status_match.group(1)
-                    valid_statuses = {"shipped", "in_progress", "planned", "deprecated"}
+                    valid_statuses = {
+                        "planned", "specced", "criteria_set", "tests_written",
+                        "implementing", "verified", "documented", "committed",
+                        "shipped", "deprecated",
+                        "in_progress",  # backward-compat alias for implementing
+                    }
                     if status not in valid_statuses:
                         issues.append(
                             f"{feature_id} (line {i}): Invalid status '{status}'. "

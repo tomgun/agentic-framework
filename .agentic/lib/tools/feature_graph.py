@@ -4,7 +4,7 @@ Feature dependency graph generator with filtering.
 Outputs mermaid diagram showing feature dependencies and status.
 
 Filters:
-  --status=<status>     Filter by status (planned|in_progress|shipped|deprecated)
+  --status=<status>     Filter by status (planned|specced|criteria_set|tests_written|implementing|verified|documented|committed|shipped|deprecated)
   --layer=<layer>       Filter by layer (presentation|business-logic|data|infrastructure)
   --tags=<tag>          Filter by tag (can specify multiple times)
   --focus=<F-####>      Focus on single feature + immediate neighbors
