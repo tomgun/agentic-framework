@@ -99,6 +99,9 @@ graph TB
         %% Formal State Machine (v0.47.0)
         F_STATE_MACHINE[Feature State Machine<br/>F-0177, F-0178]
 
+        %% Backlog/Roadmap (v0.49.0)
+        F_BACKLOG[Backlog Work Queue<br/>F-0190]
+
         %% SDD Toolkit Insights (v0.39.0)
         F_SPEC_FORMAT[Spec Format Evolution<br/>F-0148]
         F_CLARIFICATION[Clarification Taxonomy<br/>F-0149]
@@ -257,6 +260,11 @@ graph TB
     F_STATE_MACHINE --> M_STATE_MACHINE
     F_STATE_MACHINE --> M_FEATURE_SH
 
+    %% Backlog ← principles
+    D1 --> F_BACKLOG
+    D3 --> F_BACKLOG
+    F_BACKLOG --> M_AG
+
     %% Autonomous features ← principles
     D1 --> F_AUTO_ENGINE
     D4 --> F_AUTO_TASK
@@ -281,6 +289,33 @@ graph TB
     class M_AG,M_PRECOMMIT,M_WIP_SH,M_STATUS_SH,M_FEATURE_SH,M_DOCTOR_PY,M_CONTEXT_ROLE,M_SYNC,M_DISCOVER,M_HOOKS_PATH,M_CLAUDE_MD,M_AUTO_ORCH,M_MEMORY,M_STACK,M_HARNESS,M_MUTATION_SH,M_VALIDATE,M_QUALITY_DOCS,M_QUALITY_WIRING,M_AUTO_ENGINE,M_STATE_MACHINE mechanism
     class F_AGENT_MODE dormant
 ```
+
+---
+
+## Backlog / Work Queue (v0.49.0)
+
+Git-tracked ordered work queue (`.agentic/BACKLOG.json`) that tells any agent on any machine what to work on next.
+
+**How it works:**
+- Position 0 = current work. `ag implement` enforces this — agents can't skip ahead.
+- `ag done` auto-advances the queue.
+- `ag start` shows current + next prominently.
+- `ag backlog add/done/move/list/remove/clear` manages the queue.
+- `SKIP_BACKLOG=1` escape hatch for overrides.
+
+**Key mechanisms:**
+- `backlog_helpers.py` — Python JSON manipulation (add/remove/move/list/current/done)
+- `backlog.sh` — shell wrapper for CLI
+- `ag.sh` gates — `cmd_implement` hard block, `cmd_work` hard block, `cmd_done` auto-advance, `cmd_plan`/`cmd_spec` advisory
+
+**Cross-machine flow:** Create backlog → commit → push → pull on another machine → `ag start` shows same queue.
+
+**Relationship to other files:**
+- **BACKLOG.json** = execution ORDER (what to work on next)
+- **FEATURES.md** = feature REGISTRY + lifecycle state
+- **TODO.md** = unfiltered idea inbox (flow: idea → TODO → triage → backlog)
+- **STATUS.md** = session snapshot (will eventually reference backlog for "Current focus")
+- **WIP.md** = session-level crash recovery (backlog = WHY, WIP = HOW)
 
 ---
 
