@@ -1676,3 +1676,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 21:25 - F-0180 code review fixes
+
+**Why**: Harden review checkpoint framework after code review
+
+**What changed**:
+- Fixed all 14 code review findings: feature ID validation, regression pairs sync with state_machine, atomic verdict writes, safe file operations, flexible HN-ID regex, mutually exclusive CLI flags, cache-clearing test fixture, 12 new tests
+
+**Next steps**:
+- Feature complete
+
+**Blockers**: None
+
