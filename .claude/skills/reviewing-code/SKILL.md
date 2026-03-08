@@ -61,7 +61,7 @@ Check each dimension:
 4. **Performance**: Unnecessary loops, N+1 queries, missing caching?
 5. **Style**: Follows project conventions? Consistent naming?
 6. **Tests**: Are changed paths covered by tests?
-7. **Documentation**: Are comments and docs updated?
+7. **Documentation**: Run `bash .agentic/lib/tools/docs.sh --list` to see registered docs, then `bash .agentic/lib/tools/drift.sh --docs` to check for drift. Check CHANGELOG updated for behavior changes. Check if new user-facing artifacts need adding to `## Docs` in STACK.md. Flag missing doc updates as "Must Fix" when `docs_gate: blocking`.
 
 ### Step 3: Report Findings
 
