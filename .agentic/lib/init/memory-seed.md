@@ -134,7 +134,7 @@ Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 
 - **Never auto-commit.** Human reviews every change first.
 - **Never bypass gates.** Do not use `--no-verify` or skip quality checks.
-- **Never destroy unstaged work.** Do not `git stash`, `git checkout -- .`, `git restore .`, or `git reset --hard` with uncommitted changes. These silently destroy the user's work. If you need a clean tree, commit or ask the user first.
+- **NEVER `git stash`.** Stash pop does a silent merge — in multi-agent contexts, when another agent modified the same files, it quietly picks one version with no error, causing data loss. Safe alternatives: worktrees, temp branch + cherry-pick, or commit before switching. Also never `git checkout -- .`, `git restore .`, or `git reset --hard` with uncommitted changes.
 - **One feature at a time.** Complete current WIP before starting another.
 - **Small batches.** Max 5-10 files per commit. If bigger, break it up.
 - **Smoke test before "done".** Actually run the feature. "Tests pass" does not mean "it works."
