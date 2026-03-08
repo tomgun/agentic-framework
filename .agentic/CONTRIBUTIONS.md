@@ -1,12 +1,26 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.47.0)
+**Period**: Initial Development (v0.1.0 → v0.47.1)
 **Date**: 2026-03-08
 
 ---
 
 ## Recent Contributions
+
+### Docker Sandbox with Security Interview (v0.47.1)
+
+**User insight**: Tomas drove the entire devcontainer security design through iterative testing inside a real Docker container. Key contributions:
+- **macOS Keychain problem**: Discovered that mounting `~/.config/gh` into Linux containers fails silently because `gh` on macOS stores tokens in Keychain, not config files. Led to the `GH_TOKEN` env var approach with auto-extraction via `gh auth token`.
+- **Fine-grained token scoping**: Raised the concern that default `repo` scope lets agents delete repositories. Drove the recommendation for fine-grained PATs with minimal permissions (Contents + PRs + Issues only, no Administration).
+- **Web research as default-open**: Decided HTTPS/HTTP should be open by default for agent research capability, with the firewall still blocking non-HTTP protocols.
+- **Security interview wizard**: Requested an LLM-optimized setup skill that interviews users about their risk tolerance (Open/Standard/Locked profiles) and generates matching configs, rather than requiring manual configuration.
+- **Zsh history fix**: Caught that the container had no command history (up-arrow broken) — root cause was bash-style `PROMPT_COMMAND` config in a zsh shell.
+- **Plan visibility**: Identified that Claude inside the container couldn't see plans from the host, driving the bind-mount approach and memory symlink solution.
+
+### Post-Merge Dogfooding Workflow (v0.47.0+)
+
+**User insight**: After the F-0177 PR session, Tomas asked "is there something else to dogfood beyond CLAUDE.md/memory.md?" — identifying that the framework has dogfooding as a stated principle but **no systematic post-merge workflow to enforce it**. After merging a framework PR, nothing verifies: `ag` commands work with new code, root entry points stay synced with template changes, state files remain valid, session-start loads correctly. The gap means framework changes can break the framework's own use of itself (as happened 2026-02-26 dogfooding audit). Captured as T-0044 for a new feature: post-merge validation checklist/script.
 
 ### End-to-End Smoke Testing as Gate (v0.47.0)
 
