@@ -359,6 +359,7 @@ No escape hatch. Shipped spec protection is deterministic.
 □ All acceptance criteria met
 □ Smoke test passed (actually ran the app)
 □ All tests pass
+□ Documentation updated (drift.sh --docs, CONTEXT_PACK.md if architecture changed)
 □ FEATURES.md/OVERVIEW.md updated with status: shipped
 □ Code annotations added (@feature, @acceptance)
 □ JOURNAL.md updated
