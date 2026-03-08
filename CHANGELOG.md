@@ -5,6 +5,11 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.49.0] - 2026-03-08
+
+### Added
+- **Backlog / Structural Work Assignment (F-0190)** — Git-tracked ordered work queue (`BACKLOG.json`) that tells any agent on any machine what to work on next. Position 0 = current work. `backlog_helpers.py` with 13 commands (add, current, next, done, list, remove, move, clear, upsert, check-deps, check-staleness, json-current, json-all). `backlog.sh` shell wrapper. `ag backlog` top-level command. Structural gates: `ag implement` hard-blocks wrong item, auto-upserts if not in backlog; `ag work` blocks when feature queue exists; `ag done` auto-advances. Advisory warnings on `ag plan`/`ag spec`. Backlog display at `ag start`. Staleness detection (7-day threshold). Dependency tracking (`depends_on` with unmet dep warnings). Lifecycle cross-check (shipped/deprecated features blocked). `SKIP_BACKLOG=1` escape hatch. `crunch.py` reads backlog order for autonomous mode. 44 pytest tests, 10 validation tests.
+
 ## [0.48.0] - 2026-03-08
 
 ### Added

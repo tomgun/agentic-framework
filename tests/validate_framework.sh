@@ -3785,6 +3785,87 @@ else
 fi
 
 # ============================================================
+# F-0190: Backlog / Structural Work Assignment
+# ============================================================
+
+# T-0045: BACKLOG_FILE defined in paths.sh
+if grep -q "BACKLOG_FILE=" "${FRAMEWORK_ROOT}/.agentic/lib/paths.sh"; then
+  pass "T-0045: BACKLOG_FILE defined in paths.sh"
+else
+  fail "T-0045: BACKLOG_FILE not defined in paths.sh"
+fi
+
+# T-0046: BACKLOG_FILE defined in paths.py
+if grep -q "backlog_file" "${FRAMEWORK_ROOT}/.agentic/lib/paths.py"; then
+  pass "T-0046: backlog_file defined in paths.py"
+else
+  fail "T-0046: backlog_file not defined in paths.py"
+fi
+
+# T-0047: backlog_helpers.py exists and has core commands
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/backlog_helpers.py" ]]; then
+  pass "T-0047: backlog_helpers.py exists"
+  for cmd in cmd_add cmd_current cmd_done cmd_list cmd_remove cmd_move cmd_clear cmd_upsert cmd_check_deps; do
+    if grep -q "def $cmd" "${FRAMEWORK_ROOT}/.agentic/lib/tools/backlog_helpers.py"; then
+      pass "T-0047b: backlog_helpers.py has $cmd"
+    else
+      fail "T-0047b: backlog_helpers.py missing $cmd"
+    fi
+  done
+else
+  fail "T-0047: backlog_helpers.py not found"
+fi
+
+# T-0048: backlog.sh exists and is executable
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/backlog.sh" ]]; then
+  pass "T-0048: backlog.sh exists"
+else
+  fail "T-0048: backlog.sh not found"
+fi
+
+# T-0049: ag.sh has backlog dispatch
+if grep -q "cmd_backlog" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0049: ag.sh has cmd_backlog"
+else
+  fail "T-0049: ag.sh missing cmd_backlog"
+fi
+
+# T-0050: ag.sh backlog gate in cmd_implement (upsert)
+if grep -q "upsert" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0050: cmd_implement has backlog upsert gate"
+else
+  fail "T-0050: cmd_implement missing backlog upsert gate"
+fi
+
+# T-0051: ag.sh SKIP_BACKLOG escape hatch
+if grep -q "SKIP_BACKLOG" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0051: SKIP_BACKLOG escape hatch present"
+else
+  fail "T-0051: SKIP_BACKLOG escape hatch missing"
+fi
+
+# T-0052: crunch.py reads backlog
+if grep -q "_read_backlog_features" "${FRAMEWORK_ROOT}/.agentic/lib/auto/crunch.py"; then
+  pass "T-0052: crunch.py reads backlog for feature ordering"
+else
+  fail "T-0052: crunch.py missing backlog integration"
+fi
+
+# T-0053: cmd_start shows backlog
+if grep -q "backlog_current\|json-current" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0053: cmd_start shows backlog display"
+else
+  fail "T-0053: cmd_start missing backlog display"
+fi
+
+# T-0054: cmd_done auto-advances backlog
+if grep -A 5 "Backlog Advance" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" | grep -q "backlog.sh.*done"; then
+  pass "T-0054: cmd_done auto-advances backlog"
+else
+  fail "T-0054: cmd_done missing backlog advance"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

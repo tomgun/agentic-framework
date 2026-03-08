@@ -3169,7 +3169,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0189: Doc Enforcement at Feature Acceptance
 
-**Status**: implementing
+**Status**: shipped
 **Category**: Verification & Enforcement
 **Priority**: high
 **Complexity**: medium
@@ -3185,4 +3185,25 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 - Tests: `tests/test_gates.py`
 
 **Acceptance**: See `spec/acceptance/F-0189.md`
+
+---
+
+## F-0190: Backlog/Roadmap — Structural Work Assignment
+
+**Status**: in_progress
+**Category**: Session
+**Priority**: critical
+**Complexity**: high
+**Since**: v0.48.0
+
+**Description**: Git-tracked ordered work queue (BACKLOG.json) that tells any agent on any machine what to work on next. Position 0 = current work. Structural gates in ag implement/work/done enforce queue order. Escape hatch via SKIP_BACKLOG=1.
+
+**Dependencies**: F-0177
+
+**Implementation**:
+- State: implementing
+- Code: `backlog_helpers.py`, `backlog.sh`, `ag.sh` gates
+- Tests: `tests/test_backlog_helpers.py`, `validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0190.md`
 
