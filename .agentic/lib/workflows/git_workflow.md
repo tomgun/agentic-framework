@@ -238,6 +238,12 @@ git worktree add ../project-agent3-F0044 -b feature/F-0044
 2. **Update `.agentic/session/AGENTS_ACTIVE.md` every 15-30 min**: Keep others informed
 3. **Coordinate on shared files**: If you must edit `FEATURES.md`, sync carefully
 4. **Use feature toggles**: If your code depends on incomplete features
+5. **NEVER use `git stash`**: Stash pop does a silent merge — when another agent has modified the same files in the shared working tree, the merge quietly picks one version with no conflict markers and no error, causing silent data loss. This has happened repeatedly.
+
+**Safe alternatives to stash:**
+- **Worktrees** (preferred): Each agent works in its own worktree — no shared state
+- **Temp branch + cherry-pick**: Commit to a throwaway branch, switch, cherry-pick back
+- **Commit before switching**: Don't leave uncommitted work floating — commit it (even as WIP) before changing branches
 
 **Before committing:**
 1. **Check `.agentic/session/AGENTS_ACTIVE.md` again**: Any conflicts emerged?
