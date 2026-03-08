@@ -91,6 +91,12 @@ When reviewing test quality — whether during implementation, retro, or audit �
 
 Run `ag audit` to verify the spec→AC→test chain. Use `ag audit --propagate NFR-XXXX` to trace NFR changes downstream.
 
+## Instruction files ARE the feature (never skip doc updates)
+
+When shipping a new `ag` command, gate, or workflow feature, you MUST update ALL instruction files that reference similar features. These files are not "documentation" — they are the delivery mechanism for agent behavior. A feature that isn't in these files does not exist for agents.
+
+**Always check**: CLAUDE.md (root + template), .cursorrules (root + template), copilot instructions (root + template), codex instructions (root + template), agent_operating_guidelines.md, auto_orchestration.md, memory-seed.md, relevant skills in .claude/skills/, relevant checklists in .agentic/lib/checklists/, DEVELOPER_GUIDE.md, HOW_IT_WORKS.md.
+
 ## Pre-commit sequence (never skip steps)
 
 Every time before committing, execute these commands in order:

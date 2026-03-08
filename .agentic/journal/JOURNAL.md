@@ -1637,3 +1637,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 19:36 - F-0190 user-facing docs
+
+**Why**: Instruction files were updated but actual documentation (HOW_IT_WORKS, DEVELOPER_GUIDE) was still missing backlog content
+
+**What changed**:
+- HOW_IT_WORKS.md has backlog section + mermaid diagram, DEVELOPER_GUIDE.md has backlog in workflows, memory-seed has instruction-files-are-features rule
+
+**Next steps**:
+- Push final docs to PR #78
+
+**Blockers**: None
+

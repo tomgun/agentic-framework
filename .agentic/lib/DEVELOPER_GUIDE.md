@@ -59,10 +59,11 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 
 | When you say... | Agent runs | What happens |
 |-----------------|-----------|--------------|
-| "Let's build X" | `ag implement` / `ag work` | Verifies specs exist, starts WIP tracking |
+| "Let's build X" | `ag implement` / `ag work` | Verifies specs exist, checks backlog order, starts WIP tracking |
+| "What's next?" | `ag backlog` | Shows ordered work queue — position 0 = current work |
 | "Plan this first" | `ag plan` | Creates reviewable plan, saves to journal |
 | "Commit this" | `ag commit` | Runs all quality gates, blocks if issues |
-| "We're done" | `ag done` | Checks docs updated, tests pass, acceptance met |
+| "We're done" | `ag done` | Checks docs, tests, acceptance; auto-advances backlog |
 | "Fix tests automatically" | `ag auto verify` | Test-fix loop until green or max iterations |
 | "Implement this feature" | `ag auto task F-XXXX` | Autonomous per-AC implementation + PR |
 | "Process all planned features" | `ag auto crunch` | Batch implementation of planned features |
@@ -76,6 +77,7 @@ Most of the time, conversation is enough. But a few commands are useful to run y
 ```bash
 ag start              # Quick orientation at session start
 ag status             # See current focus and profile
+ag backlog            # See ordered work queue (what to work on next)
 ag set <key> <value>  # Change a setting (e.g., ag set feature_tracking no)
 ```
 
