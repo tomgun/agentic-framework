@@ -1536,3 +1536,16 @@
 
 **Blockers**: None
 
+
+### Session: 2026-03-08 13:35 - Smoke Test Gate
+
+**Why**: Unit tests verify logic but not wiring — features can pass all tests and still be broken
+
+**What changed**:
+- Added end-to-end smoke testing as required gate in feature_implementation, before_commit, and feature_complete checklists. User insight: 'how do we know it works?' revealed gates weren't wired in CLI despite 65 passing unit tests.
+
+**Next steps**:
+- Human review PR #70
+
+**Blockers**: None
+

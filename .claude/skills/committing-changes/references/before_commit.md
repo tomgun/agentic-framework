@@ -75,10 +75,13 @@ phase: commit
   - Check output carefully (no ignored/skipped tests that shouldn't be)
   - No test failures or errors
 
-- [ ] **Smoke test passed** (CRITICAL for user-facing changes)
-  - See `.agentic/lib/checklists/smoke_testing.md` for full checklist
-  - Quick: app starts, primary action works, no errors
-  - **If smoke test fails, DO NOT commit - fix it first**
+- [ ] **Smoke test passed** (CRITICAL — unit tests alone are not enough)
+  - Run the feature end-to-end the way a user would (CLI, API, UI)
+  - For CLI tools: run against the real project, not just test fixtures
+  - Verify outputs are correct and complete, not just "no errors"
+  - Check that components are actually wired together (entry points call the right functions, gates fire, hooks trigger)
+  - **Why**: A feature can pass all unit tests but be broken if wiring is missing. This has happened — catch it before the PR, not after.
+  - **If smoke test fails, DO NOT commit — fix it first**
 
 - [ ] **Quality checks pass** (if enabled)
   - If `quality_validation_enabled: yes` in STACK.md

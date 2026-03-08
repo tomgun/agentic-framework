@@ -1,12 +1,16 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.46.0)
-**Date**: 2026-03-07
+**Period**: Initial Development (v0.1.0 → v0.47.0)
+**Date**: 2026-03-08
 
 ---
 
 ## Recent Contributions
+
+### End-to-End Smoke Testing as Gate (v0.47.0)
+
+**User insight**: After PR #70 review, Tomas asked "how do we know it works?" — prompting an end-to-end CLI smoke test that revealed the state machine's gates were never wired in `main()`. 65 unit tests passed but the feature was broken in production use. Led to the principle: **unit tests verify logic, smoke tests verify wiring**. Added as a required gate in `feature_implementation.md`, `before_commit.md`, and `feature_complete.md`. Also uncovered a Python `__main__` dual-import bug that would have been invisible to unit tests.
 
 ### ADR-001: Multi-Component Architecture & Workflow Engine (v0.47.0)
 
