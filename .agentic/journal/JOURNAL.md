@@ -1549,3 +1549,10 @@
 
 **Blockers**: None
 
+- T-0044 (post-merge dogfood workflow) queued. PR #70 closed.
+
+**Blockers**: None
+
+sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Identified post-merge dogfooding gap (T-0044): framework has dogfooding as principle but no enforcement after PR merge.
+
+**Next steps**:
