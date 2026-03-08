@@ -346,68 +346,97 @@ cmd_start() {
         fi
     fi
 
-    # 5c. Backlog display (PROMINENT)
-    local backlog_current
-    backlog_current=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || true
-    if [ -n "$backlog_current" ]; then
-        echo ""
-        echo -e "${BOLD}═══════════════════════════════════════${NC}"
-
-        local bl_id bl_desc bl_notes bl_next_id bl_next_desc bl_total
-        bl_id=$(echo "$backlog_current" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id',d.get('description','')))" 2>/dev/null) || bl_id=""
-        bl_desc=$(echo "$backlog_current" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('description',''))" 2>/dev/null) || bl_desc=""
-        bl_notes=$(echo "$backlog_current" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('notes',''))" 2>/dev/null) || bl_notes=""
-
-        if [ -n "$bl_id" ]; then
-            if [ -n "$bl_desc" ] && [ "$bl_desc" != "$bl_id" ]; then
-                echo -e "  ${BOLD}CURRENT: $bl_id — $bl_desc${NC}"
-            else
-                echo -e "  ${BOLD}CURRENT: $bl_id${NC}"
-            fi
-        fi
-
-        if [ -n "$bl_notes" ]; then
-            echo -e "  ${DIM}NOTE:    $bl_notes${NC}"
-        fi
-
-        # Show refs
-        echo "$backlog_current" | python3 -c "
+    # 5c. Backlog display (PROMINENT) — single python3 call for performance
+    local bl_display
+    bl_display=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-all 2>/dev/null) || true
+    if [ -n "$bl_display" ] && [ "$bl_display" != "[]" ]; then
+        # Parse all fields in one python3 invocation
+        local bl_formatted
+        bl_formatted=$(echo "$bl_display" | python3 -c "
 import sys, json
-d = json.load(sys.stdin)
-for r in d.get('refs', []):
-    print(f'  REF:    {r}')
-" 2>/dev/null || true
+from datetime import datetime, timezone
+items = json.load(sys.stdin)
+if not items:
+    sys.exit(1)
+c = items[0]
+cid = c.get('id', c.get('description', ''))
+desc = c.get('description', '')
+if desc and desc != cid:
+    print(f'ID={cid}')
+    print(f'DESC={desc}')
+else:
+    print(f'ID={cid}')
+    print('DESC=')
+print(f'NOTES={c.get(\"notes\", \"\")}')
+for r in c.get('refs', []):
+    print(f'REF={r}')
+if len(items) > 1:
+    n = items[1]
+    nid = n.get('id', n.get('description', ''))
+    ndesc = n.get('description', '')
+    if ndesc and ndesc != nid:
+        print(f'NEXT={nid} — {ndesc}')
+    else:
+        print(f'NEXT={nid}')
+print(f'TOTAL={len(items)}')
+# Staleness check
+became = c.get('became_current_at', '')
+if became:
+    try:
+        dt = datetime.fromisoformat(became.replace('Z', '+00:00'))
+        age = (datetime.now(timezone.utc) - dt).days
+        if age >= 7:
+            print(f'STALE={age}')
+    except (ValueError, TypeError):
+        pass
+" 2>/dev/null) || true
 
-        # Show next item
-        local backlog_next
-        backlog_next=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || true
-        # Actually get next (position 1)
-        local all_items
-        all_items=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-all 2>/dev/null) || true
-        if [ -n "$all_items" ]; then
-            bl_total=$(echo "$all_items" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))" 2>/dev/null) || bl_total="?"
-            bl_next_id=$(echo "$all_items" | python3 -c "import sys,json; items=json.load(sys.stdin); print(items[1].get('id',items[1].get('description','')) if len(items)>1 else '')" 2>/dev/null) || bl_next_id=""
-            bl_next_desc=$(echo "$all_items" | python3 -c "import sys,json; items=json.load(sys.stdin); print(items[1].get('description','') if len(items)>1 else '')" 2>/dev/null) || bl_next_desc=""
+        if [ -n "$bl_formatted" ]; then
+            echo ""
+            echo -e "${BOLD}═══════════════════════════════════════${NC}"
 
-            if [ -n "$bl_next_id" ]; then
-                if [ -n "$bl_next_desc" ] && [ "$bl_next_desc" != "$bl_next_id" ]; then
-                    echo -e "  ${DIM}NEXT:    $bl_next_id — $bl_next_desc${NC}"
-                else
-                    echo -e "  ${DIM}NEXT:    $bl_next_id${NC}"
+            local bl_id="" bl_desc="" bl_notes="" bl_total=""
+            while IFS= read -r line; do
+                case "$line" in
+                    ID=*)    bl_id="${line#ID=}" ;;
+                    DESC=*)  bl_desc="${line#DESC=}" ;;
+                    NOTES=*) bl_notes="${line#NOTES=}" ;;
+                    REF=*)   echo -e "  ${DIM}REF:    ${line#REF=}${NC}" ;;
+                    NEXT=*)  echo -e "  ${DIM}NEXT:    ${line#NEXT=}${NC}" ;;
+                    TOTAL=*) bl_total="${line#TOTAL=}" ;;
+                    STALE=*) ;; # handled below
+                esac
+                # Print CURRENT/NOTES before REFs (order matters)
+                if [[ "$line" == "NOTES="* ]]; then
+                    if [ -n "$bl_id" ]; then
+                        if [ -n "$bl_desc" ]; then
+                            echo -e "  ${BOLD}CURRENT: $bl_id — $bl_desc${NC}"
+                        else
+                            echo -e "  ${BOLD}CURRENT: $bl_id${NC}"
+                        fi
+                    fi
+                    if [ -n "$bl_notes" ]; then
+                        echo -e "  ${DIM}NOTE:    $bl_notes${NC}"
+                    fi
                 fi
+            done <<< "$bl_formatted"
+
+            if [ -n "$bl_total" ]; then
+                echo -e "  ${DIM}Queue:   $bl_total item(s) total${NC}"
             fi
+            if echo "$bl_id" | grep -qE '^F-[0-9]{4}$' 2>/dev/null; then
+                echo -e "  ${DIM}Resume:  ag implement $bl_id${NC}"
+            fi
+            echo -e "${BOLD}═══════════════════════════════════════${NC}"
 
-            echo -e "  ${DIM}Queue:   $bl_total item(s) total${NC}"
+            # Staleness warning (from same parsed output)
+            local stale_days
+            stale_days=$(echo "$bl_formatted" | grep '^STALE=' | head -1 | cut -d= -f2)
+            if [ -n "$stale_days" ]; then
+                echo -e "${YELLOW}WARNING: Current backlog item has been active for $stale_days days ($bl_id)${NC}"
+                echo "  Still relevant? Or: ag backlog done | ag backlog clear"
+            fi
         fi
-
-        # Resume hint
-        if echo "$bl_id" | grep -qE '^F-[0-9]{4}$' 2>/dev/null; then
-            echo -e "  ${DIM}Resume:  ag implement $bl_id${NC}"
-        fi
-        echo -e "${BOLD}═══════════════════════════════════════${NC}"
-
-        # Staleness check
-        python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" check-staleness 2>/dev/null || true
     fi
 
     # 6. Run doctor quick check
@@ -2692,12 +2721,9 @@ cmd_backlog() {
             echo "  clear            Empty queue"
             ;;
         *)
-            # Default: show current + next
-            echo -e "${BOLD}=== Backlog ===${NC}"
-            echo ""
-            bash "$SCRIPT_DIR/backlog.sh" current 2>/dev/null || echo "  (empty)"
-            echo ""
-            bash "$SCRIPT_DIR/backlog.sh" next 2>/dev/null || true
+            echo "Unknown backlog subcommand: $subcmd" >&2
+            echo "Run 'ag backlog --help' for usage." >&2
+            return 1
             ;;
     esac
 }

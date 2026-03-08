@@ -3194,7 +3194,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Category**: Session
 **Priority**: critical
 **Complexity**: high
-**Since**: v0.48.0
+**Since**: v0.49.0
 
 **Description**: Git-tracked ordered work queue (BACKLOG.json) that tells any agent on any machine what to work on next. Position 0 = current work. Structural gates in ag implement/work/done enforce queue order. Escape hatch via SKIP_BACKLOG=1.
 

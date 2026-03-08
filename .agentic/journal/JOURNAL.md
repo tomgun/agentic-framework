@@ -1611,3 +1611,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Metadata**:
 - Feature: F-0190
 
+
+### Session: 2026-03-08 19:28 - F-0190 review fixes
+
+**Why**: Code review found issues that should be fixed before merge
+
+**What changed**:
+- Fixed 3 code review issues: unknown backlog subcommand now errors, F-0190 Since version corrected to v0.49.0, cmd_start backlog display consolidated to single python3 call
+
+**Next steps**:
+- Push fixes to PR #78 for re-review
+
+**Blockers**: None
+
