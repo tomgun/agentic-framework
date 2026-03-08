@@ -1,12 +1,36 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.46.0)
-**Date**: 2026-03-07
+**Period**: Initial Development (v0.1.0 → v0.47.0)
+**Date**: 2026-03-08
 
 ---
 
 ## Recent Contributions
+
+### End-to-End Smoke Testing as Gate (v0.47.0)
+
+**User insight**: After PR #70 review, Tomas asked "how do we know it works?" — prompting an end-to-end CLI smoke test that revealed the state machine's gates were never wired in `main()`. 65 unit tests passed but the feature was broken in production use. Led to the principle: **unit tests verify logic, smoke tests verify wiring**. Added as a required gate in `feature_implementation.md`, `before_commit.md`, and `feature_complete.md`. Also uncovered a Python `__main__` dual-import bug that would have been invisible to unit tests.
+
+### ADR-001: Multi-Component Architecture & Workflow Engine (v0.47.0)
+
+**Originating vision** — Tomas created a comprehensive visual sketch (Excalidraw) mapping the full project lifecycle (left side: idea → research → discovery → dev loop → maintenance) and per-feature dev loop (right side: plan → specs → criteria → tests → implement → verify → commit). This sketch, with its explicitly drawn feedback arrows for backward transitions, was the primary artifact driving the entire design session.
+
+Core design contributions:
+
+- **Full autonomous end-to-end vision**: Articulated the target — user provides a prompt + background research + visual/stylistic guidelines, agents handle everything from ideation through shipped software. Scoped it realistically: "if software simple enough, so it doesn't require setting accounts/creating databases etc." Optional prototype presentation as part of the flow.
+- **Multi-component problem framing**: Introduced the multi-component question unprompted — "What if the project has multiple components like web frontend / mobile app / backend / infra or VST GUI + Synthesis engine lib + MIDI composing lib?" Framed the motivation as **clarity and small-batch context optimization**, not just organization — each agent's context stays small and focused.
+- **"Superfeatures" concept** (became Epics): Proposed features that span components, viewed "from the UI/DB reporting view point" — product-level features decomposed into component-scoped implementation features.
+- **Multi-repo as a hard requirement**: Rejected monorepo-only design. Components must live in parallel repositories with "the agentic working in a main repository" as orchestrator — directly shaped the umbrella repo pattern.
+- **MCP server for agent coordination**: Brought from external inspiration ("a colleague has implemented an MCP server for communication between agents"). Pragmatic framing: "if that helps our framework work faster/more reliably, we should use it." Established the key constraint: file-based persistence for cross-machine portability, MCP for session-local real-time coordination. Explicitly decided session-local non-transferable state is an acceptable tradeoff.
+- **Formal state machines — the pivotal idea**: Interrupted Claude's plan-writing to redirect: "could/should we represent these workflows and loops as formal CODE and state machines, to make it clear how the whole thing is/should be working and we can easily pinpoint weaker logical points?" Motivation was **debuggability** — finding where workflow design has gaps. Explicitly chose "Python code" as implementation, not prose checklists.
+- **Non-linear workflows with feedback loops**: Corrected the overly linear state machine Claude presented — "Remember that there are points of feedback on possible return to previous states." These backward transitions were already in the original visual sketch; Claude had flattened them. Insisted they're first-class workflow elements, not edge cases.
+- **ADR as the capture format**: Chose Architecture Decision Record when asked how to capture the discussion — introducing a new artifact type to the framework.
+- **"Both together"**: When asked whether to prioritize feature loop vs project orchestration, insisted both be designed as a unified system — they're interconnected, not separable layers.
+- **Gates and skills are implementation details**: Corrected Claude when it added gates/skills to the high-level process diagram — "I don't want that image to have those gates — they are really implementation details." Kept the design at the right abstraction level.
+- **Review checkpoints throughout, not just at commit**: Identified that autonomous flow needs review gates at spec, criteria, plan, code, and merge — not just at the end. Designed three-mode resolution (human / critical_agent / auto) configurable per transition and per profile.
+- **Critical review agent concept**: Separate agent instance with adversarial mandate, read-only (can't modify, only approve/reject/escalate) — prevents self-approval in autonomous mode.
+- **Taste & aesthetic decision framework**: Agents aren't blind to subjective choices — they (a) can research best practices, (b) can follow broader-level style guidelines and vision the user provides, to make "probably correct" choices. Critical agent validates consistency with declared direction rather than imposing preferences.
 
 ### QA Suite — "Who Tests the Tests?" (v0.46.0)
 - Identified the core quality problem: LLMs produce tests that look correct and pass CI, but assert nothing meaningful — a test checking `status == 200` "covers" an AC about pagination
@@ -39,6 +63,8 @@
 - Emphasized human-agent partnership (not agent replacement)
 - Insisted on lightweight, practical solutions over heavy infrastructure
 - Defined modularity requirement (Core vs Core+PM profiles)
+- **End-to-end autonomous vision with realistic boundaries**: User provides prompt + research + visual guidelines → agents deliver shipped software. But scoped pragmatically — simple enough to not need external accounts/infra setup. Optional prototype step. Human checkpoints configurable per profile.
+- **Abstraction discipline**: High-level process thinking separate from implementation mechanisms. Gates, skills, scripts are implementation details — the workflow design should be understandable without them.
 - Pushed for green coding as core value
 
 ---
@@ -64,6 +90,11 @@
 - Asked for PR mode support (optional, with human review)
 - Requested sequential specialized agents for context optimization
 - Added build and deploy agents to pipeline
+- **Critical review agent as quality gate**: Designed the separation between worker agents (produce) and critical agents (review) — prevents self-approval, enables autonomous flow without sacrificing quality
+- **Multi-component project support**: Introduced the problem with concrete examples across domains (SaaS: web/mobile/backend/infra; audio: VST GUI/synthesis engine/MIDI lib). Motivated by context optimization — each agent works with only its component's context
+- **Multi-repo as a first-class pattern**: Rejected monorepo-only. Components in parallel repos, framework orchestrating from umbrella repo
+- **MCP for real-time coordination**: Brought from external colleague's work. Pragmatic adoption: files for durability, MCP for speed. Session-local state acceptable tradeoff for portability
+- **Formal state machine for workflow enforcement**: Feature lifecycle as Python code with programmatic gates. Key motivation: "easily pinpoint weaker logical points" — debuggability over formality. Non-linear by design: backward transitions (from original visual sketch) are first-class, not edge cases
 
 ### 4. Documentation & User Experience
 - Requested comprehensive user guide (DEVELOPER_GUIDE.md)

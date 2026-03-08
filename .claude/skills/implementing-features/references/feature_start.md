@@ -16,26 +16,21 @@ phase: planning
 ```
 □ Does .agentic/spec/acceptance/F-####.md exist?
   ├─ YES → Check: does it have a Tests section (## Tests or ## Verification > ### Tests)?
-  │         ├─ YES → Proceed to Gate 2
+  │         ├─ YES → Check: has NFR Compliance been resolved?
+  │         │         ├─ Has ### NFR Compliance section OR NFRs: none in FEATURES.md → Proceed to Gate 2
+  │         │         └─ Neither → Add NFR evaluation before coding (see spec_writing checklist STEP 2)
   │         └─ NO  → Add Tests section before coding (see template)
   └─ NO  → 🛑 STOP. Create acceptance criteria FIRST.
            DO NOT write any code until criteria exist.
-
-□ Does F-#### exist in .agentic/spec/FEATURES.md?
-  ├─ YES → Proceed
-  └─ NO  → Register it FIRST (even if a plan already defines it).
 ```
 
-**A plan is NOT a spec.** Even when implementing from a detailed plan, the formal artifacts must exist before coding:
-1. Register the feature in `.agentic/spec/FEATURES.md` (assign F-XXXX if needed)
-2. Create `.agentic/spec/acceptance/F-XXXX.md` with acceptance criteria
-   - Draft using `.agentic/spec/acceptance.template.md`
-   - Fill in the Tests section — what tests will verify each criterion?
-   - (New format: `## Verification > ### Tests`. Legacy: `## Tests`. Both accepted.)
+**If no acceptance criteria:**
+1. Draft criteria using `.agentic/spec/acceptance.template.md`
+2. Fill in the Tests section — what tests will verify each criterion?
+   (New format: `## Verification > ### Tests`. Legacy: `## Tests`. Both accepted.)
 3. Show to user for approval
-4. ONLY THEN proceed
-
-Plans contain design and rationale. Specs contain the testable contract. Both are needed.
+4. Create `.agentic/spec/acceptance/F-####.md`
+5. ONLY THEN proceed
 
 **The Tests section is required.** Tests are part of the feature definition, not a follow-up task. An acceptance file without a tests section is incomplete.
 

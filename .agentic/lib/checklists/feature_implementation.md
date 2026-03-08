@@ -132,7 +132,7 @@ phase: implementation
 ### Update Tracking (Formal)
 
 - [ ] **Update `.agentic/spec/FEATURES.md`**
-  - Status: `planned` → `in_progress` → `shipped`
+  - Status follows 9-state lifecycle: planned → specced → criteria_set → tests_written → implementing → verified → documented → committed → shipped (use `ag transition F-XXXX <state>`)
   - Implementation State: `none` → `partial` → `complete`
   - Implementation Code: Add actual file paths
   - Tests: `todo` → `partial` → `complete`

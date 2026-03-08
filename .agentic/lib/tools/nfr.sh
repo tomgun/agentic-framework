@@ -45,7 +45,7 @@ if [[ "${CMD}" == "list" ]]; then
   echo "NFRs in .agentic/spec/NFR.md:"
   echo "---"
   awk '
-  /^## NFR-[0-9]{4}:/ {
+  /^## NFR-[0-9][0-9][0-9][0-9]:/ {
     if (id != "") {
       printf "  %-10s [%-8s] %s\n", id, status, name
     }
@@ -136,7 +136,7 @@ if [[ "${SUBCMD}" == "status" ]]; then
   if [[ -x "$QA_TRACKER" ]]; then
     FEATURES_FILE="$(dirname "${NFR_FILE}")/FEATURES.md"
     if [[ -f "$FEATURES_FILE" ]]; then
-      AFFECTED=$(awk -v nfr="${NFR_ID}" '/^## F-[0-9]{4}:/{fid=$2; sub(/:$/,"",fid)} fid && $0 ~ nfr {print fid; fid=""}' "$FEATURES_FILE" | sort -u | tr '\n' ',' | sed 's/,$//')
+      AFFECTED=$(awk -v nfr="${NFR_ID}" '/^## F-[0-9][0-9][0-9][0-9]:/{fid=$2; sub(/:$/,"",fid)} fid && $0 ~ nfr {print fid; fid=""}' "$FEATURES_FILE" | sort -u | tr '\n' ',' | sed 's/,$//')
       if [[ -n "$AFFECTED" ]]; then
         bash "$QA_TRACKER" add-propagation "${NFR_ID}" "status changed to ${VALUE}" "$AFFECTED" 2>/dev/null || true
         echo "📋 QA propagation items created for: $AFFECTED"

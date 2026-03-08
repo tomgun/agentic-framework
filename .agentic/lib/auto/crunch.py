@@ -75,7 +75,7 @@ class CrunchResult:
 class CrunchRunner:
     """Multi-feature batch orchestrator.
 
-    1. Read planned/in-progress features from FEATURES.md
+    1. Read features needing work (any pre-shipped state) from FEATURES.md
     2. Process each via TaskRunner (F-0162)
     3. Track progress in dashboard state
     4. Stop on: all done, max errors, or human stop command
@@ -197,25 +197,45 @@ class CrunchRunner:
         return result
 
     def _read_planned_features(self) -> list[str]:
-        """Read planned/in-progress features from FEATURES.md.
+        """Read features that need work from FEATURES.md.
 
-        Returns feature IDs in priority order (as listed in the file).
+        Uses the state machine to find all features with available
+        forward transitions (any state before 'shipped' or 'deprecated').
         """
+        try:
+            from auto.state_machine import FeatureStateMachine
+            sm = FeatureStateMachine(project_root=self.project_root)
+            unblocked = sm.get_unblocked()
+            return [fid for fid, _state, _nexts in unblocked]
+        except Exception:
+            # Fallback: read FEATURES.md directly
+            return self._read_planned_features_fallback()
+
+    def _read_planned_features_fallback(self) -> list[str]:
+        """Fallback: read planned/implementing features from FEATURES.md."""
         features_file = self.paths.features_file
         if not features_file.exists():
             return []
 
         features = []
         content = features_file.read_text()
+        # Match heading format: ## F-XXXX: Name followed by **Status**: value
+        current_fid = None
         for line in content.splitlines():
-            # Match lines like "| F-0042 | planned |" or "| F-0042 | in-progress |"
-            match = re.match(
-                r"\|\s*(F-\d{4})\s*\|.*?\|\s*(planned|in-progress)\s*\|",
-                line,
-                re.IGNORECASE,
-            )
-            if match:
-                features.append(match.group(1))
+            header = re.match(r"^## (F-\d{4}):", line)
+            if header:
+                current_fid = header.group(1)
+                continue
+            if current_fid:
+                status_match = re.match(
+                    r"\*\*Status\*\*:\s*(\S+)", line.strip()
+                )
+                if status_match:
+                    status = status_match.group(1).lower().replace("-", "_")
+                    if status in ("planned", "specced", "criteria_set",
+                                  "tests_written", "implementing", "in_progress"):
+                        features.append(current_fid)
+                    current_fid = None
         return features
 
     def _save_progress(self, result: CrunchResult) -> None:

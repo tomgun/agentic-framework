@@ -6,7 +6,7 @@
 features:
   - id: F-0001
     name: Example feature name
-    status: planned  # planned | in_progress | shipped | deprecated
+    status: planned  # planned | specced | criteria_set | tests_written | implementing | verified | documented | committed | shipped | deprecated
     parent: null  # null or F-#### for hierarchy
     dependencies: []  # List of F-#### that must be complete first
     complexity: M  # S | M | L | XL
@@ -47,7 +47,7 @@ features:
 ### Automatic Validation
 Catches errors immediately:
 - ✅ Typos in field names (`Statuss:` → Error!)
-- ✅ Invalid values (`Status: done` → Error! Must be `planned|in_progress|shipped|deprecated`)
+- ✅ Invalid values (`Status: done` → Error! Must be `planned|specced|criteria_set|tests_written|implementing|verified|documented|committed|shipped|deprecated`)
 - ✅ Missing required fields
 - ✅ Wrong ID formats (`F-1` → Error! Must be `F-####`)
 - ✅ Invalid dates, wrong types
@@ -80,7 +80,7 @@ Benefits:
   - If you don't, leave the "Requirements" field empty and rely on the feature acceptance criteria file instead.
 
 ## Status vocabulary
-- `planned` | `in_progress` | `shipped` | `deprecated`
+- `planned` | `specced` | `criteria_set` | `tests_written` | `implementing` | `verified` | `documented` | `committed` | `shipped` | `deprecated`
 
 ## How to reference
 - Feature IDs: `F-0001`, `F-0002`, …

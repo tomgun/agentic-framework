@@ -136,8 +136,12 @@ phase: completion
 - [ ] **Code comments added**
   - @feature annotations on implementation
   - @acceptance annotations on acceptance tests
-  - @nfr annotations if relevant
+  - @nfr annotations on code enforcing NFR constraints (if feature has linked NFRs)
   - Explain "why" not "what"
+
+- [ ] **NFR compliance verified** (if feature has linked NFRs)
+  - Each linked NFR criterion in acceptance file is checked/met
+  - `@nfr` annotation exists in code where constraints are enforced
 
 - [ ] **README/docs updated** (if user-facing)
   - Usage examples
@@ -160,6 +164,12 @@ Before marking feature as complete:
 ---
 
 ## Quality Checks
+
+- [ ] **End-to-end smoke test passed** (CRITICAL — before calling it done)
+  - Run the feature the way a user would (CLI command, API call, UI action)
+  - Verify outputs are correct and complete against the real project
+  - Check that all components are wired: entry points call functions, gates fire, hooks trigger
+  - **Unit tests passing does NOT mean the feature works.** A feature can have full test coverage and still be broken if the wiring is missing (function exists but is never called, gate is defined but never registered, etc.)
 
 - [ ] **Spec ↔ Code alignment verified**
   - Run `bash .agentic/lib/tools/drift.sh --check`

@@ -289,6 +289,15 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 - [ ] **If `retrospective_enabled: yes`**: Retro checks are handled automatically
   - Periodic checks (sync Phase 7) evaluate retro frequency
   - If `ag sync` reports "retrospective due", suggest to human
+  - Run `bash .agentic/lib/tools/retro_check.sh --status 2>/dev/null` to show retro tracking
+
+- [ ] **QA Tracker status** (if `.agentic/session/.qa-tracker.json` exists):
+  ```bash
+  bash .agentic/lib/tools/qa-tracker.sh status 2>/dev/null
+  ```
+  - Shows: "QA: X/Y verified, Z pending propagation"
+  - If propagation items exist, surface in dashboard
+  - If audit overdue, surface warning
 
 - [ ] **If `quality_validation_enabled: yes`**: Verify quality checks exist
   - Check if `quality_checks.sh` exists at repo root

@@ -133,6 +133,7 @@ COMMANDS:
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
     auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
+    transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
     nfr [sub]           NFR management (list, discover, coverage)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
@@ -195,6 +196,7 @@ COMMANDS:
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
     auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
+    transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
     nfr [sub]           NFR management (list, discover, coverage)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
@@ -2585,6 +2587,10 @@ case "${1:-help}" in
     auto)
         shift
         cmd_auto "$@"
+        ;;
+    transition)
+        shift
+        python3 "$SCRIPT_DIR/../auto/state_machine.py" --project-root "$ROOT_DIR" "$@"
         ;;
     audit)
         shift
