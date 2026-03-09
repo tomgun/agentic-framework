@@ -381,7 +381,30 @@ class FeatureStateMachine:
             f"Transitioned {feature_id}: "
             f"{current.value if current else '?'} -> {target.value}",
         )
+
+        # Post-transition hook: recompute parent epic status (F-0184)
+        self._recompute_parent_if_needed(feature_id, messages)
+
         return True, messages
+
+    def _recompute_parent_if_needed(
+        self, feature_id: str, messages: list[str]
+    ) -> None:
+        """If this feature has a parent, recompute the parent's derived status."""
+        try:
+            from auto.epic import _get_feature_parent, recompute_epic_status
+
+            parent_id = _get_feature_parent(
+                self.paths.features_file, feature_id
+            )
+            if parent_id:
+                changed, recomp_msgs = recompute_epic_status(
+                    self.project_root, parent_id
+                )
+                messages.extend(recomp_msgs)
+        except Exception:
+            # Don't let epic recomputation failure block the transition
+            pass
 
     # -- Query helpers -------------------------------------------------------
 
