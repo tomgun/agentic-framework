@@ -17,6 +17,14 @@ _No active items_
 
 ## Resolved
 
+### HN-0028: PR #91: Silent session start
+- **Resolved**: 2026-03-09
+- **Outcome**: PR #91 merged
+
+### HN-0027: PR #90: F-0195 Multi-Session Collision Prevention (v0.52.0)
+- **Resolved**: 2026-03-09
+- **Outcome**: PR #90 merged
+
 ### HN-0025: PR #81: F-0191 Dialectical Plan-Review Merge
 - **Resolved**: 2026-03-08
 - **Outcome**: PR #81 merged

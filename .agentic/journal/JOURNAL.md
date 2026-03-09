@@ -1806,3 +1806,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 21:56 - Dashboard self-rendering (v0.52.2)
+
+**Why**: Agents kept reformatting the dashboard despite instruction hardening; moved rendering into the script itself
+
+**What changed**:
+- dashboard.sh now renders final emoji dashboard — agents output verbatim, no parsing needed
+
+**Next steps**:
+- F-0180 Review Checkpoint Framework
+
+**Blockers**: None
+
