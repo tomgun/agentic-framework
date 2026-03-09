@@ -46,7 +46,7 @@ fi
 # WIP (interrupted work)
 # ---------------------------------------------------------------------------
 section "WIP"
-wip_output=$(bash "$TOOLS_DIR/wip.sh" check 2>&1) && wip_status="clean" || wip_status="interrupted"
+bash "$TOOLS_DIR/wip.sh" check >/dev/null 2>&1 && wip_status="clean" || wip_status="interrupted"
 echo "$wip_status"
 if [[ "$wip_status" == "interrupted" ]]; then
     section "WIP_DETAIL"
@@ -78,7 +78,6 @@ section "JOURNAL_LAST"
 if [[ -f "${JOURNAL_FILE:-}" ]]; then
     # Get last session header and its "What changed" line
     last_header=$(grep "^### Session:" "$JOURNAL_FILE" 2>/dev/null | tail -1 | sed 's/^### Session: //')
-    last_why=""
     last_changed=""
     # Find the last "What changed" block
     last_changed=$(awk '/^### Session:/{block=""} /\*\*What changed\*\*:/{found=1; next} found && /^-/{print; found=0}' "$JOURNAL_FILE" 2>/dev/null | tail -1 | sed 's/^- //')
