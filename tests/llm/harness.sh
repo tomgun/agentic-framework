@@ -307,7 +307,7 @@ setup_test_project() {
     echo "n" | bash "$FRAMEWORK_ROOT/install.sh" .
 
     # Create minimal project structure based on profile
-    if [[ "$profile" == "formal" ]]; then
+    if [[ "$profile" == "formal" || "$profile" == "autonomous_formal" ]]; then
         mkdir -p spec/acceptance
         echo "# Features" > spec/FEATURES.md
         echo "# Status" > STATUS.md
