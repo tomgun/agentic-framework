@@ -66,7 +66,7 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ### Review checkpoints
 <!-- Who reviews each transition. Options: human | critical_agent | skip -->
-<!-- critical_agent falls back to human until F-0182 ships -->
+<!-- critical_agent spawns adversarial AI reviewer -->
 - review_spec: skip
 # planned → specced. Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
 - review_criteria: skip
