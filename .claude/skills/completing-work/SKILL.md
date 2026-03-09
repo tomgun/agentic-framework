@@ -63,9 +63,15 @@ bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Project can now [capabilit
 bash .agentic/lib/tools/status.sh focus "F-XXXX shipped, ready for next task"
 ```
 
-### Step 4b: Backlog Advancement
+### Step 4b: Advance Backlog
 
-If `.agentic/BACKLOG.json` exists and the completed feature is at position 0, `ag done` auto-advances the backlog — removing the completed item and promoting the next item to position 0. The agent shows which item is next.
+If `.agentic/BACKLOG.json` exists and the completed feature is at position 0:
+
+```bash
+bash .agentic/lib/tools/backlog.sh done
+```
+
+This removes the completed item and promotes the next. Include BACKLOG.json in the next commit.
 
 ### Step 5: Flush Pending Items
 

@@ -1,42 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0180",
-    "description": "Review Checkpoint Framework (ADR-001 Phase 3)",
-    "added_at": "2026-03-08T19:57:08Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0180.md"
-    ],
-    "notes": "Next ADR-001 feature. Enables human/critical_agent/auto review gates on state transitions.",
-    "became_current_at": "2026-03-08T19:57:08Z"
-  },
-  {
-    "type": "feature",
-    "id": "F-0181",
-    "description": "Autonomous Formal Profile",
-    "added_at": "2026-03-08T19:57:12Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0181.md"
-    ],
-    "notes": "Low complexity. Profile presets for review modes.",
-    "depends_on": ["F-0180"]
-  },
-  {
-    "type": "feature",
-    "id": "F-0182",
-    "description": "Critical Review Agent (ADR-001 Phase 4)",
-    "added_at": "2026-03-08T19:57:14Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0182.md"
-    ],
-    "notes": "AI-powered code review agent.",
-    "depends_on": ["F-0180"]
-  },
-  {
-    "type": "feature",
     "id": "F-0184",
     "description": "Epic Decomposition (ADR-001 Phase 2)",
     "added_at": "2026-03-08T19:57:15Z",
@@ -45,7 +9,11 @@
       ".agentic/spec/acceptance/F-0184.md"
     ],
     "notes": "Parent/child feature hierarchy. ag decompose command.",
-    "depends_on": ["F-0179", "F-0180"]
+    "depends_on": [
+      "F-0179",
+      "F-0180"
+    ],
+    "became_current_at": "2026-03-09T20:59:08Z"
   },
   {
     "type": "feature",
@@ -57,7 +25,9 @@
       ".agentic/spec/acceptance/F-0183.md"
     ],
     "notes": "Subjective review guidance hierarchy.",
-    "depends_on": ["F-0182"]
+    "depends_on": [
+      "F-0182"
+    ]
   },
   {
     "type": "feature",
@@ -69,7 +39,10 @@
       ".agentic/spec/acceptance/F-0186.md"
     ],
     "notes": "Finds unblocked features, spawns workers.",
-    "depends_on": ["F-0182", "F-0184"]
+    "depends_on": [
+      "F-0182",
+      "F-0184"
+    ]
   },
   {
     "type": "feature",
@@ -81,7 +54,11 @@
       ".agentic/spec/acceptance/F-0185.md"
     ],
     "notes": "Real-time agent coordination layer.",
-    "depends_on": ["F-0177", "F-0180", "F-0184"]
+    "depends_on": [
+      "F-0177",
+      "F-0180",
+      "F-0184"
+    ]
   },
   {
     "type": "feature",
@@ -93,7 +70,10 @@
       ".agentic/spec/acceptance/F-0187.md"
     ],
     "notes": "Cross-repo coordination.",
-    "depends_on": ["F-0179", "F-0186"]
+    "depends_on": [
+      "F-0179",
+      "F-0186"
+    ]
   },
   {
     "type": "feature",
@@ -105,6 +85,9 @@
       ".agentic/spec/acceptance/F-0188.md"
     ],
     "notes": "Full autonomous pipeline.",
-    "depends_on": ["F-0186", "F-0187"]
+    "depends_on": [
+      "F-0186",
+      "F-0187"
+    ]
   }
 ]
