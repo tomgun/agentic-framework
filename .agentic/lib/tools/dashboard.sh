@@ -78,31 +78,42 @@ D_BACKLOG_REMAINING=0
 if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/backlog_helpers.py" ]]; then
     _tmpf=$(mktemp)
     _py "$TOOLS_DIR/backlog_helpers.py" --project-root "$PROJECT_ROOT" json-all >"$_tmpf" 2>/dev/null || echo "[]" >"$_tmpf"
-    eval "$(_py -c "
-import json, sys
+    # Parse backlog JSON safely via line-delimited output (no eval)
+    _backlog_out=$(_py -c "
+import json, sys, re
+def safe(s):
+    return re.sub(r'[^\w\s\-.,;:()/#&@!+=]', '', str(s))[:120]
 with open('$_tmpf') as f:
     items = json.load(f)
 total = len(items)
-print(f'D_BACKLOG_TOTAL={total}')
+print(total)
 if total > 0:
     c = items[0]
-    fid = c.get('id', c.get('feature_id', c.get('task', '?')))
-    desc = c.get('description', c.get('task', ''))
-    ref = (c.get('refs', ['']) or [''])[0]
-    since = c.get('became_current_at', '')
-    print(f'D_BACKLOG_CUR_ID=\"{fid}\"')
-    print(f'D_BACKLOG_CUR_DESC=\"{desc}\"')
-    if ref: print(f'D_BACKLOG_CUR_REF=\"{ref}\"')
-    if since: print(f'D_BACKLOG_CUR_SINCE=\"{since}\"')
+    print(safe(c.get('id', c.get('feature_id', c.get('task', '?')))))
+    print(safe(c.get('description', c.get('task', ''))))
+    print(safe((c.get('refs', ['']) or [''])[0]))
+    print(safe(c.get('became_current_at', '')))
+else:
+    print(''); print(''); print(''); print('')
 if total > 1:
     n = items[1]
-    nid = n.get('id', n.get('feature_id', n.get('task', '?')))
-    ndesc = n.get('description', n.get('task', ''))
-    print(f'D_BACKLOG_NEXT_ID=\"{nid}\"')
-    print(f'D_BACKLOG_NEXT_DESC=\"{ndesc}\"')
-remaining = max(0, total - 2) if total > 2 else 0
-print(f'D_BACKLOG_REMAINING={remaining}')
-" 2>/dev/null)" 2>/dev/null || true
+    print(safe(n.get('id', n.get('feature_id', n.get('task', '?')))))
+    print(safe(n.get('description', n.get('task', ''))))
+else:
+    print(''); print('')
+print(max(0, total - 2) if total > 2 else 0)
+" 2>/dev/null) || _backlog_out=""
+    if [[ -n "$_backlog_out" ]]; then
+        { read -r D_BACKLOG_TOTAL
+          read -r D_BACKLOG_CUR_ID
+          read -r D_BACKLOG_CUR_DESC
+          read -r D_BACKLOG_CUR_REF
+          read -r D_BACKLOG_CUR_SINCE
+          read -r D_BACKLOG_NEXT_ID
+          read -r D_BACKLOG_NEXT_DESC
+          read -r D_BACKLOG_REMAINING
+        } <<< "$_backlog_out"
+    fi
     rm -f "$_tmpf"
 fi
 
@@ -114,12 +125,6 @@ if [[ -f "${HUMAN_NEEDED_FILE:-}" ]]; then
     else
         D_BLOCKERS=$(awk '/^## Active items/,/^## Resolved/' "$HUMAN_NEEDED_FILE" 2>/dev/null | grep -c "^### HN-" || echo "0")
     fi
-fi
-
-# TODO count
-D_TODO_COUNT=0
-if [[ -f "${TODO_FILE:-}" ]]; then
-    D_TODO_COUNT=$(grep -c "^### T-" "$TODO_FILE" 2>/dev/null || echo "0")
 fi
 
 # AGENTS
@@ -194,8 +199,6 @@ if $RAW_MODE; then
     echo "remaining=$D_BACKLOG_REMAINING"
     echo "===BLOCKERS==="
     echo "$D_BLOCKERS"
-    echo "===TODO_COUNT==="
-    echo "$D_TODO_COUNT"
     echo "===AGENTS==="
     echo "$D_AGENTS"
     echo "===HEALTH==="
