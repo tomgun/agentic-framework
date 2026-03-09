@@ -21,4 +21,6 @@ These rules apply to ALL agent roles. Injected automatically by `context-for-rol
    - HUMAN_NEEDED.md → `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
    - FEATURES.md → `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 
-4. **If uncertain, state uncertainty and ask** — never guess or assume.
+4. **Keep main in sync with origin.** Push immediately after any direct-to-main commit. Before creating a feature branch, always pull/rebase from origin first. Stale local main causes conflicts and content loss during PR rebases.
+
+5. **If uncertain, state uncertainty and ask** — never guess or assume.
