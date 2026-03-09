@@ -257,12 +257,11 @@ Not sure when to use the agent? See **[`.agentic/lib/workflows/delegation_heuris
 
 **Agents follow a proactive operating loop** to make collaboration fluent. See [`.agentic/lib/workflows/proactive_agent_loop.md`](workflows/proactive_agent_loop.md) for full details.
 
-**At Session Start**:
-1. Load context efficiently (~2-3K tokens)
+**At Session Start** (silent — no preamble, dashboard is the first text output):
+1. Silently load context (~2-3K tokens)
 2. Check for blockers (HUMAN_NEEDED.md)
 3. Check for incomplete work from last session
-4. Present structured summary with prioritized options
-5. Suggest next work based on STATUS.md
+4. Show dashboard with prioritized next-step options
 
 **During Work**:
 - Update you on progress periodically
