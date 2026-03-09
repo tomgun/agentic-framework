@@ -1,12 +1,20 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.50.2)
-**Date**: 2026-03-08
+**Period**: Initial Development (v0.1.0 → v0.51.0)
+**Date**: 2026-03-09
 
 ---
 
 ## Recent Contributions
+
+### AGENTS.json Registry + Worktree-by-Default (v0.51.0, F-0194)
+
+**User insight**: Tomas identified that the existing worktree instruction ("use worktrees when another agent may be working on main") is too weak and that markdown-based coordination files are fundamentally wrong for multi-agent scenarios. Key contributions:
+- **Single JSON registry**: Recognized that WIP.md and AGENTS_ACTIVE.md serving overlapping purposes in different formats (both markdown, neither machine-parseable) is the root cause of coordination failures. One JSON file with file locking replaces both.
+- **Worktree enforcement over suggestion**: The existing worktree.sh infrastructure was complete but never triggered automatically. The insight was that `worktree_mode: always` should make `ag implement` auto-create worktrees — infrastructure without wiring is dead code.
+- **Main-repo resolution**: Identified that AGENTS.json must always live in the main repo (not worktrees), requiring `MAIN_PROJECT_ROOT` via `git rev-parse --git-common-dir` — without this, each worktree would have its own registry, defeating the purpose.
+- **Graceful degradation**: Insisted on WIP.md fallback when python3 is unavailable, preserving framework functionality in minimal environments.
 
 ### Review Subagent Delegation (v0.50.2, F-0192)
 
