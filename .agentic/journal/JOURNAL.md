@@ -1832,3 +1832,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 23:20 - Backlog commit fix
+
+**Why**: Backlog advancement was silently lost between sessions because skills never staged BACKLOG.json
+
+**What changed**:
+- Completing-work and committing-changes skills now ensure BACKLOG.json changes are committed alongside feature completions
+
+**Next steps**:
+- Review and merge PR
+
+**Blockers**: None
+
