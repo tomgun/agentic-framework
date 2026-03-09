@@ -15,6 +15,15 @@ _No active items_
 
 ---
 
+
+### HN-0027: Review PR #86: F-0181 Autonomous Formal Profile
+- **Type**: pr
+- **Added**: 2026-03-09
+- **Context**: https://github.com/tomgun/agentic-framework/pull/86
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0025: PR #81: F-0191 Dialectical Plan-Review Merge

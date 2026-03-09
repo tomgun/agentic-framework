@@ -5,19 +5,18 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0180 code review fixes committed (Updated: 2026-03-08 21:25 UTC)
+- F-0181 Autonomous Formal Profile - PR 86 open, awaiting review (Updated: 2026-03-09 16:14 UTC)
 
 ## Current focus
-- ADR-001 roadmap execution: F-0180 (Review Checkpoint Framework) is next
-- v0.49.0: Backlog, doc enforcement, component registry, state machine all shipped
+- F-0181: Autonomous Formal Profile — implemented, PR #86 awaiting review
+- ADR-001 roadmap execution
 
 ## In progress
-- Backlog seeded with 9 ADR-001 features in dependency order
+- F-0181 PR review
 
 ## Next up
-- F-0180: Review Checkpoint Framework (current backlog item)
-- F-0181: Autonomous Formal Profile
 - F-0182: Critical Review Agent
+- F-0184: Epic Decomposition
 
 ## Known issues / risks
 - Some CHANGELOG.md historical references point to old file locations (acceptable)
