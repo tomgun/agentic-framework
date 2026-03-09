@@ -84,6 +84,24 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   echo -e "🔗 Last commit: ${LAST_COMMIT}"
 fi
 
+# 7. Multi-session collision prevention (F-0195)
+# Register this session and warn if others are active on the same checkout.
+# $PPID is stable across hook invocations (wrappers use exec bash).
+AGENTIC_LIB="$PROJECT_ROOT/.agentic/lib"
+if [[ -f "$AGENTIC_LIB/tools/agents_helpers.py" ]]; then
+  python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
+    --project-root "$PROJECT_ROOT" cleanup-stale 2>/dev/null || true
+  python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
+    --project-root "$PROJECT_ROOT" session-register "$PROJECT_ROOT" "claude-code" --pid $PPID 2>/dev/null || true
+  OTHERS=$(python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
+    --project-root "$PROJECT_ROOT" count-others "$PROJECT_ROOT" --pid $PPID 2>/dev/null || echo "0")
+  if [[ "$OTHERS" -gt 0 ]]; then
+    echo -e "${RED}⚠️  COLLISION RISK: $OTHERS other session(s) active on this checkout.${NC}"
+    echo "   FORBIDDEN: git stash, git checkout ., git restore ., git reset --hard, git clean -f"
+    echo "   SAFE alternatives: commit first, use a worktree (ag worktree), or ask human."
+  fi
+fi
+
 echo ""
 echo -e "${GREEN}✓ Session ready${NC}"
 echo ""

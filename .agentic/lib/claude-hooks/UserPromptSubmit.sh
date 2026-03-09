@@ -83,5 +83,24 @@ if [[ "$USER_PROMPT" =~ [Ii]mplement.*(F-[0-9]{4}) ]]; then
   fi
 fi
 
+# --- Multi-session collision warning (F-0195) ---
+# Advisory: injects warning into model context when other sessions are active.
+# $PPID is stable across hook invocations (wrappers use exec bash).
+AGENTIC_LIB="$PROJECT_ROOT/.agentic/lib"
+if [[ -f "$AGENTIC_LIB/tools/agents_helpers.py" ]]; then
+  OTHERS=$(python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
+    --project-root "$PROJECT_ROOT" count-others "$PROJECT_ROOT" --pid $PPID 2>/dev/null || echo "0")
+  if [[ "$OTHERS" -gt 0 ]]; then
+    echo ""
+    echo "⚠️ COLLISION RISK: $OTHERS other session(s) active on this checkout."
+    echo "FORBIDDEN: git stash, git checkout ., git restore ., git reset --hard, git clean -f"
+    echo "SAFE alternatives: commit first, use a worktree (ag worktree), or ask human."
+    echo ""
+  fi
+  # Heartbeat: update last_checkpoint for crash recovery
+  python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
+    --project-root "$PROJECT_ROOT" session-heartbeat --pid $PPID 2>/dev/null || true
+fi
+
 exit 0
 

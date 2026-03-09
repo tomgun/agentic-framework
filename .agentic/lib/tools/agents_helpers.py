@@ -4,6 +4,9 @@ agents_helpers.py -- JSON manipulation for AGENTS.json (agent/WIP registry).
 Replaces both WIP.md and AGENTS_ACTIVE.md with a single machine-parseable registry.
 Called by wip.sh and ag.sh. Handles register/activate/checkpoint/complete/list.
 
+Session tracking (F-0195): session-register/session-deregister/count-others/
+cleanup-stale/session-heartbeat for multi-session collision prevention.
+
 AGENTS.json schema (array of entries):
 [
   {
@@ -19,6 +22,10 @@ AGENTS.json schema (array of entries):
     "files": ["ag.sh", "worktree.sh"]
   }
 ]
+
+Session entries additionally have:
+  "type": "session",
+  "pid": 12345
 """
 from __future__ import annotations
 
@@ -420,6 +427,168 @@ def cmd_migrate_wip(agents_file: Path, wip_path: str) -> int:
 
 
 # ---------------------------------------------------------------------------
+# Session tracking (F-0195: Multi-session collision prevention)
+# ---------------------------------------------------------------------------
+_STALE_HEARTBEAT_MINUTES = 30
+
+
+def _is_pid_alive(pid: int) -> bool:
+    """Check if a process is alive (POSIX: os.kill with signal 0)."""
+    try:
+        os.kill(pid, 0)
+        return True
+    except (ProcessLookupError, OSError):
+        return False
+
+
+def _find_session_by_pid(items: list[dict], worktree: str, pid: int) -> int:
+    """Find session entry matching worktree + PID."""
+    norm = os.path.normpath(worktree)
+    for i, item in enumerate(items):
+        if (item.get("type") == "session"
+                and item.get("pid") == pid
+                and os.path.normpath(item.get("worktree", "")) == norm):
+            return i
+    return -1
+
+
+def cmd_session_register(agents_file: Path, worktree: str,
+                         agent: str = "claude-code", pid: int = 0) -> int:
+    """Register a session entry with PID for collision detection."""
+    now = _now_iso()
+    if pid <= 0:
+        pid = os.getpid()
+
+    def _do(items):
+        # Deduplicate: if same worktree+pid already registered, update
+        idx = _find_session_by_pid(items, worktree, pid)
+        if idx >= 0:
+            items[idx]["last_checkpoint"] = now
+            items[idx]["status"] = "active"
+            return items
+        items.append({
+            "feature_id": f"session-{pid}",
+            "description": "Claude Code session",
+            "worktree": os.path.normpath(worktree),
+            "branch": "",
+            "agent": agent,
+            "started": now,
+            "last_checkpoint": now,
+            "status": "active",
+            "type": "session",
+            "pid": pid,
+            "progress": [],
+            "files": [],
+        })
+        return items
+
+    _with_lock(agents_file, _do)
+    return 0
+
+
+def cmd_session_deregister(agents_file: Path, worktree: str,
+                           pid: int = 0) -> int:
+    """Remove a session entry by worktree + PID."""
+    if pid <= 0:
+        pid = os.getpid()
+
+    def _do(items):
+        idx = _find_session_by_pid(items, worktree, pid)
+        if idx >= 0:
+            items.pop(idx)
+        return items
+
+    _with_lock(agents_file, _do)
+    return 0
+
+
+def cmd_count_others(agents_file: Path, worktree: str,
+                     pid: int = 0) -> int:
+    """Count other active entries on the same worktree (excludes self by PID).
+
+    Counts ALL entry types (sessions and feature entries) since any concurrent
+    work on the same checkout is a collision risk. Prints count and exits 0.
+    """
+    if pid <= 0:
+        pid = os.getpid()
+    items = _load_unlocked(agents_file)
+    norm = os.path.normpath(worktree)
+    count = 0
+    for item in items:
+        if item.get("status") not in ("active", "created"):
+            continue
+        if os.path.normpath(item.get("worktree", "")) != norm:
+            continue
+        # Exclude self: match by PID for session entries
+        if item.get("type") == "session" and item.get("pid") == pid:
+            continue
+        count += 1
+    print(count)
+    return 0
+
+
+def cmd_cleanup_stale(agents_file: Path) -> int:
+    """Remove stale session entries where PID is dead OR heartbeat expired.
+
+    An entry is stale if:
+    - PID is dead (os.kill(pid, 0) fails), OR
+    - last_checkpoint is older than _STALE_HEARTBEAT_MINUTES (PID recycling guard)
+    """
+    now = datetime.now(timezone.utc)
+    removed = []
+
+    def _do(items):
+        keep = []
+        for item in items:
+            if item.get("type") != "session":
+                keep.append(item)
+                continue
+            pid = item.get("pid", 0)
+            # Check 1: PID alive?
+            pid_alive = _is_pid_alive(pid) if pid > 0 else False
+            # Check 2: Heartbeat recent?
+            heartbeat_ok = True
+            checkpoint = item.get("last_checkpoint", "")
+            if checkpoint:
+                try:
+                    ref_dt = datetime.fromisoformat(
+                        checkpoint.replace("Z", "+00:00"))
+                    age_min = (now - ref_dt).total_seconds() / 60
+                    if age_min > _STALE_HEARTBEAT_MINUTES:
+                        heartbeat_ok = False
+                except (ValueError, TypeError):
+                    pass
+            # Stale if PID dead OR heartbeat expired
+            if not pid_alive or not heartbeat_ok:
+                removed.append(item.get("feature_id", "?"))
+            else:
+                keep.append(item)
+        return keep
+
+    _with_lock(agents_file, _do)
+    if removed:
+        print(f"Cleaned {len(removed)} stale session(s): {', '.join(removed)}")
+    return 0
+
+
+def cmd_session_heartbeat(agents_file: Path, pid: int = 0) -> int:
+    """Update last_checkpoint for a session entry (heartbeat for crash recovery)."""
+    if pid <= 0:
+        pid = os.getpid()
+    now = _now_iso()
+
+    def _do(items):
+        for item in items:
+            if item.get("type") == "session" and item.get("pid") == pid:
+                item["last_checkpoint"] = now
+                break
+        return items
+
+    _with_lock(agents_file, _do)
+    return 0
+
+
+# ---------------------------------------------------------------------------
 # CLI dispatch
 # ---------------------------------------------------------------------------
 def main() -> int:
@@ -444,10 +613,30 @@ def main() -> int:
     cmd = clean_args[0]
     rest = clean_args[1:]
 
+    # Extract --pid (for session commands)
+    pid_val = 0
+    clean_args2: list[str] = []
+    j = 0
+    while j < len(clean_args):
+        if clean_args[j] == "--pid" and j + 1 < len(clean_args):
+            try:
+                pid_val = int(clean_args[j + 1])
+            except ValueError:
+                pass
+            j += 2
+        else:
+            clean_args2.append(clean_args[j])
+            j += 1
+    clean_args = clean_args2
+    cmd = clean_args[0]
+    rest = clean_args[1:]
+
     valid_cmds = {
         "register", "activate", "checkpoint", "complete", "unregister",
         "check-worktree", "get-active", "get-current-feature", "list",
         "migrate-wip",
+        "session-register", "session-deregister", "count-others",
+        "cleanup-stale", "session-heartbeat",
     }
     if cmd not in valid_cmds:
         print(f"Unknown command: {cmd}", file=sys.stderr)
@@ -504,6 +693,26 @@ def main() -> int:
             print("Error: WIP.md path required", file=sys.stderr)
             return 1
         return cmd_migrate_wip(agents_file, rest[0])
+    elif cmd == "session-register":
+        if not rest:
+            print("Error: worktree path required", file=sys.stderr)
+            return 1
+        agent = rest[1] if len(rest) > 1 else "claude-code"
+        return cmd_session_register(agents_file, rest[0], agent, pid_val)
+    elif cmd == "session-deregister":
+        if not rest:
+            print("Error: worktree path required", file=sys.stderr)
+            return 1
+        return cmd_session_deregister(agents_file, rest[0], pid_val)
+    elif cmd == "count-others":
+        if not rest:
+            print("Error: worktree path required", file=sys.stderr)
+            return 1
+        return cmd_count_others(agents_file, rest[0], pid_val)
+    elif cmd == "cleanup-stale":
+        return cmd_cleanup_stale(agents_file)
+    elif cmd == "session-heartbeat":
+        return cmd_session_heartbeat(agents_file, pid_val)
     return 1
 
 
