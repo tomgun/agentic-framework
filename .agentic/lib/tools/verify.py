@@ -10,7 +10,7 @@ from pathlib import Path
 
 # Import shared settings library
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from settings import get_setting
+from settings import get_setting, is_formal_like
 from paths import get_paths
 
 FEATURE_ID_RE = re.compile(r"\b(F-\d{4})\b")
@@ -32,7 +32,7 @@ def core_checks(root: Path) -> list[str]:
             parts = line.split(":")
             if len(parts) >= 3:
                 dst, _, file_profile = parts[0], parts[1], parts[2].strip()
-                if file_profile == "formal" and profile != "formal":
+                if file_profile == "formal" and not is_formal_like(profile):
                     continue
                 if not (root / dst).exists():
                     issues.append(f"Missing {dst} (run: bash .agentic/init/scaffold.sh)")

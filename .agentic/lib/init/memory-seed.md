@@ -5,8 +5,8 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.50.0 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, AGENTS.json -->
+<!-- memory-seed v0.51.0 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, AGENTS.json, autonomous_formal -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -22,7 +22,9 @@ If the user's intent is to build, implement, add, create, set up, develop, make,
 4. Run `ag implement F-XXXX` after the plan is approved
 
 **A plan is NOT a spec.** Even when implementing from a detailed plan, create the formal artifacts (FEATURES.md entry + acceptance file) BEFORE writing any code. Plans contain design; specs contain the testable contract.
-5. If `spec_analysis` is enabled (default: on for formal, off for discovery), `spec-analyze.sh` runs advisory checks — review findings but proceed regardless
+5. If `spec_analysis` is enabled (default: on for formal/autonomous_formal, off for discovery), `spec-analyze.sh` runs advisory checks — review findings but proceed regardless
+
+**Profiles**: `discovery` (lightweight), `formal` (full spec-driven), `autonomous_formal` (formal rigor but review_code/review_regression delegated to critical_agent — only review_merge stays human). Use `is_formal_like()` to check if a profile has formal rigor (returns true for both formal and autonomous_formal).
 
 `ag implement` auto-creates WIP tracking. If `worktree_mode: always` in STACK.md, `ag implement` also auto-creates a git worktree for the feature branch. Use `ag worktree` (create|list|remove|path|status) to manage worktrees manually. If bypassing ag: run `bash .agentic/lib/tools/wip.sh start F-XXXX "desc" "files"` before coding.
 

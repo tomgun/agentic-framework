@@ -27,7 +27,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -h|--help)
-      echo "Usage: bash .agentic/tools/discover.sh [--profile discovery|formal] [--root DIR]"
+      echo "Usage: bash .agentic/tools/discover.sh [--profile discovery|formal|autonomous_formal] [--root DIR]"
       echo "Analyzes existing codebase and generates onboarding proposals."
       exit 0
       ;;

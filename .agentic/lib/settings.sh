@@ -35,6 +35,22 @@ _SETTINGS_PROFILE_CACHE=""
 _SETTINGS_PROFILE_RESOLVED=0
 
 # ---------------------------------------------------------------------------
+# is_formal_like: Returns 0 if profile is formal or autonomous_formal
+# Usage: if is_formal_like; then ... fi
+#        if is_formal_like "$some_profile"; then ... fi
+# ---------------------------------------------------------------------------
+is_formal_like() {
+    local profile="${1:-}"
+    if [[ -z "$profile" ]]; then
+        profile=$(_get_profile)
+    fi
+    case "$profile" in
+        formal|autonomous_formal) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+# ---------------------------------------------------------------------------
 # _extract_settings_section: Pull text between ## Settings and next ## heading
 # ---------------------------------------------------------------------------
 _extract_settings_section() {
@@ -120,7 +136,7 @@ _get_profile() {
     local val
     val=$(_get_from_settings_section "profile") && {
         case "$val" in
-            discovery|formal) _SETTINGS_PROFILE_CACHE="$val" ;;
+            discovery|formal|autonomous_formal) _SETTINGS_PROFILE_CACHE="$val" ;;
             *) _SETTINGS_PROFILE_CACHE="" ;;
         esac
     }
@@ -130,7 +146,7 @@ _get_profile() {
         val=$(_get_from_whole_file "Profile") && {
             val=$(echo "$val" | tr '[:upper:]' '[:lower:]')
             case "$val" in
-                discovery|formal) _SETTINGS_PROFILE_CACHE="$val" ;;
+                discovery|formal|autonomous_formal) _SETTINGS_PROFILE_CACHE="$val" ;;
             esac
         }
     fi

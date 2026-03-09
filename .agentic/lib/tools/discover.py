@@ -1431,7 +1431,7 @@ def main():
     parser.add_argument("--root", type=str, default=".", help="Project root directory")
     parser.add_argument("--output", type=str, required=True, help="Output JSON report path")
     parser.add_argument("--profile", type=str, default="discovery",
-                        choices=["discovery", "formal"],
+                        choices=["discovery", "formal", "autonomous_formal"],
                         help="Agentic Framework profile")
     args = parser.parse_args()
 

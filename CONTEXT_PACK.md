@@ -6,7 +6,7 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 - What this repo is: The Agentic AI Framework - a spec-driven development framework for AI-assisted coding with quality gates, session continuity, and multi-agent coordination.
 - Main user workflow:
   1. Install framework into project (`install.sh`)
-  2. Initialize with profile selection (Discovery or Formal)
+  2. Initialize with profile selection (Discovery, Formal, or Autonomous Formal)
   3. Work with AI agents following framework protocols
 - Current top priorities:
   - Maintain spec ↔ acceptance ↔ tests ↔ code chain

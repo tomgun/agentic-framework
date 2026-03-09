@@ -42,12 +42,12 @@ Tell the agent what you want in plain language:
 "We're done with this feature"                 → agent runs completion checklist
 ```
 
-The framework detects your profile (Discovery or Formal) automatically:
+The framework detects your profile (Discovery, Formal, or Autonomous Formal) automatically:
 
 ```
 You say: "Let's implement the login feature"
 
-# Formal profile → agent verifies specs exist, tracks feature IDs internally
+# Formal / Autonomous Formal → agent verifies specs exist, tracks feature IDs internally
 # Discovery profile → agent starts simpler task tracking, no IDs needed
 ```
 
@@ -128,7 +128,7 @@ cd /path/to/your-project
 
 The agent will:
 1. Ask what you're building
-2. Offer profile choice (a=Discovery, b=Formal)
+2. Offer profile choice (a=Discovery, b=Formal, c=Autonomous Formal)
 3. Interview you about tech stack
 4. Create all necessary files
 5. Set up quality checks for your stack
@@ -140,6 +140,9 @@ The agent will:
 
 - **b) Formal**: Everything in Discovery plus formal specs, feature tracking (`F-####` IDs), roadmap
   - Good for: Long-term projects (3+ months), complex products, audit trails
+
+- **c) Autonomous Formal**: Same rigor as Formal, but most review checkpoints are delegated to `critical_agent` instead of human. Only `review_merge` stays human.
+  - Good for: Autonomous agent workflows, CI/CD pipelines, batch processing
 
 ---
 
