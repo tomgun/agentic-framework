@@ -150,6 +150,7 @@ COMMANDS:
     auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
+    decompose F-XXXX    Break epic into child features by component
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
     nfr [sub]           NFR management (list, discover, coverage)
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
@@ -218,6 +219,7 @@ COMMANDS:
     auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
+    decompose F-XXXX    Break epic into child features by component
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
     nfr [sub]           NFR management (list, discover, coverage)
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
@@ -246,6 +248,7 @@ EXAMPLES:
     ag todo done T-0001 "done"  # Resolve item
     ag commit                   # Verify ready to commit
     ag done F-0042              # Check feature completion
+    ag decompose F-0042         # Break epic into child features
     ag auto init                # Set up auto mode (generates settings.json)
     ag auto init --tier 1       # Set up for Docker sandbox
     ag auto status              # Check engine state
