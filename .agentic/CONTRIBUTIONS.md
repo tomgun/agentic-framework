@@ -1,12 +1,16 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.52.0)
+**Period**: Initial Development (v0.1.0 → v0.52.1)
 **Date**: 2026-03-09
 
 ---
 
 ## Recent Contributions
+
+### Silent Session Start (v0.52.1)
+
+**User insight**: Tomas noticed that every new session opened with verbose narration ("Starting a new session. Let me check the current state...") before the dashboard appeared — wasting screen space and attention. The fix was not just behavioral (auto-memory) but structural: the "no preamble" rule needed to be enforced across all 9 instruction files that define session-start behavior (CLAUDE.md templates, skills, checklists, auto_orchestration, memory-seed, Cursor/Claude prompts) so that every tool's agent gets the same silent-start behavior.
 
 ### Critical Review Agent (v0.52.0, F-0182)
 
