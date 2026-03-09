@@ -1,0 +1,124 @@
+# F-0195: Multi-Session Collision Prevention
+
+**Status**: APPROVED (rev 2, reviewed 2026-03-09)
+**Created**: 2026-03-09
+
+## Context
+
+Multiple agents/sessions working on the same repo checkout destroy each other's work via destructive git operations (`git stash`, `git checkout .`, `git reset --hard`, `git restore .`). This has happened repeatedly. Today, AGENTS.json only tracks sessions that call `ag implement` — casual sessions are invisible. Git has NO pre-checkout or pre-stash hooks, and Claude Code has NO PreToolUse hook, so we can't intercept destructive commands before they execute.
+
+## Design: Three Layers
+
+### Layer 1: Auto-Registration (make sessions visible)
+
+Every Claude session auto-registers in AGENTS.json at start, deregisters at end.
+
+**Session identity**: Hooks run as transient child processes — `$$` dies immediately. Instead, use `$PPID` (Claude Code's own PID) which is stable for the session lifetime. At registration, write a breadcrumb file `.agentic/session/.session-<PPID>` so subsequent hooks can read back the session PID without relying on their own `$$`. `cleanup-stale` checks if the PPID stored in each entry is still alive.
+
+**agents_helpers.py** — add 4 new commands:
+
+| Command | Purpose |
+|---------|---------|
+| `session-register <worktree> [agent]` | Create session entry with caller-supplied PID (`--pid`), type="session" |
+| `session-deregister <worktree>` | Remove session entry by worktree + caller-supplied PID (`--pid`) |
+| `count-others <worktree>` | Count OTHER active entries on same worktree (excludes caller PID via `--pid`). Prints count, exits 0. |
+| `cleanup-stale` | Remove entries where stored PID is dead (`os.kill(pid, 0)` check) |
+
+All commands accept `--pid <N>` to identify the session. Hooks pass `$PPID`.
+
+New session entry schema (extends existing):
+```json
+{
+  "feature_id": "session-<ppid>",
+  "description": "Claude Code session",
+  "worktree": "/abs/path",
+  "branch": "main",
+  "agent": "claude-code",
+  "started": "2026-03-09T14:30:00Z",
+  "last_checkpoint": "2026-03-09T14:30:00Z",
+  "status": "active",
+  "type": "session",
+  "pid": 12345,
+  "progress": [],
+  "files": []
+}
+```
+
+**SessionStart.sh** (~5 lines added):
+1. Call `cleanup-stale` (remove dead sessions)
+2. Call `session-register "$PROJECT_ROOT" "claude-code" --pid $PPID`
+3. Call `count-others "$PROJECT_ROOT" --pid $PPID` — if >0, print warning
+
+**Stop.sh** (~2 lines added):
+1. Call `session-deregister "$PROJECT_ROOT" --pid $PPID`
+
+**Crash recovery**: If Stop.sh never runs (SIGKILL, machine shutdown), the stale entry persists until the next session's `cleanup-stale` at start removes it (PPID will be dead). Additionally, UserPromptSubmit updates `last_checkpoint` as a heartbeat — `cleanup-stale` can use a time-based fallback (no heartbeat in 30 min = stale) for edge cases where PID was recycled.
+
+### Layer 2: Warning Injection via UserPromptSubmit (advisory)
+
+**UserPromptSubmit.sh** — add multi-session check. This is **advisory, not blocking**: the warning is injected into the model's context so the LLM sees it and adjusts behavior. Claude Code's hook model does not support hard blocking via exit codes on UserPromptSubmit.
+
+```bash
+# Read session PID from breadcrumb file
+SESSION_PID=$(cat "$PROJECT_ROOT/.agentic/session/.session-ppid" 2>/dev/null || echo "$PPID")
+
+OTHERS=$(python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
+  --project-root "$PROJECT_ROOT" count-others "$PROJECT_ROOT" --pid "$SESSION_PID" 2>/dev/null || echo "0")
+if [[ "$OTHERS" -gt 0 ]]; then
+  echo "⚠️ COLLISION RISK: $OTHERS other session(s) active on this checkout."
+  echo "FORBIDDEN: git stash, git checkout ., git restore ., git reset --hard, git clean -f"
+  echo "SAFE alternatives: commit first, use a worktree (ag worktree), or ask human."
+fi
+
+# Heartbeat: update last_checkpoint for crash recovery
+python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
+  --project-root "$PROJECT_ROOT" session-heartbeat --pid "$SESSION_PID" 2>/dev/null || true
+```
+
+### Layer 3: Instruction Hardening
+
+Update instruction files with multi-session collision rules, **differentiated by agent capability**:
+
+**Claude Code agents** (have hook support — can run `count-others`):
+1. `.agentic/lib/agents/claude/CLAUDE.md` (template) — add rule with `count-others` check
+2. `.agentic/lib/init/memory-seed.md` — add to "Rules That Always Apply" with `count-others` check
+3. `.agentic/lib/agents/shared/agent_operating_guidelines.md` — add collision guard to gates table
+4. Root `CLAUDE.md` — add rule (framework-dev wrapper)
+
+**Non-Claude agents** (no hook support — behavioral rule only):
+5. `.agentic/lib/agents/cursor/cursorrules.txt` — "Never run destructive git ops when other sessions may be active on the same checkout"
+6. `.agentic/lib/agents/copilot/copilot-instructions.md` — same behavioral rule
+7. `.agentic/lib/agents/codex/codex-instructions.md` — same behavioral rule
+
+### Layer 4: safe-git shell wrapper — DEFERRED to F-0196
+
+Cut from this PR to keep scope within small-batch philosophy (~14 files vs ~18). Layers 1-3 provide the core value. Layer 4 (safe-git wrapper + `ag hooks install/uninstall` + STACK.md `safe_git` setting) ships separately.
+
+## Files to Modify
+
+| File | Change |
+|------|--------|
+| `.agentic/lib/tools/agents_helpers.py` | Add session-register, session-deregister, count-others, cleanup-stale, session-heartbeat + `--pid` param |
+| `.agentic/lib/claude-hooks/SessionStart.sh` | Auto-register with `$PPID` + warn if others active |
+| `.agentic/lib/claude-hooks/Stop.sh` | Auto-deregister with `$PPID` |
+| `.agentic/lib/claude-hooks/UserPromptSubmit.sh` | Advisory collision warning + heartbeat |
+| `.agentic/lib/agents/claude/CLAUDE.md` | Add collision rule with `count-others` check |
+| `.agentic/lib/agents/cursor/cursorrules.txt` | Add behavioral collision rule (no tool ref) |
+| `.agentic/lib/agents/copilot/copilot-instructions.md` | Add behavioral collision rule (no tool ref) |
+| `.agentic/lib/agents/codex/codex-instructions.md` | Add behavioral collision rule (no tool ref) |
+| `.agentic/lib/init/memory-seed.md` | Add collision rule to "Rules That Always Apply" |
+| `.agentic/lib/agents/shared/agent_operating_guidelines.md` | Add collision guard to gates table |
+| `CLAUDE.md` (root) | Add collision rule |
+| `.agentic/spec/FEATURES.md` | Register F-0195 |
+| `.agentic/spec/acceptance/F-0195.md` | Acceptance criteria |
+| `tests/test_agents_helpers.py` | Unit tests for new commands |
+| `VERSION`, `CHANGELOG.md` | Version bump |
+
+## Verification
+
+1. **Unit test**: session-register with PID → count-others from different PID returns 1 → session-deregister → count returns 0
+2. **Stale cleanup test**: Register with fake dead PID → cleanup-stale removes it
+3. **Heartbeat test**: session-heartbeat updates last_checkpoint
+4. **Structural test**: instruction files contain collision rule
+5. **Manual test**: Two Claude sessions on same repo — second sees collision warning
+6. **`validate_framework.sh`** must pass
