@@ -65,6 +65,7 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 | "Commit this" | `ag commit` | Runs all quality gates, blocks if issues |
 | "We're done" | `ag done` | Checks docs, tests, acceptance; auto-advances backlog |
 | "Approve this" | `ag review` | Lists/resolves pending review checkpoints |
+| "Break this into children" | `ag decompose F-XXXX` | Analyzes epic AC, proposes child features by component, review checkpoint |
 | "Fix tests automatically" | `ag auto verify` | Test-fix loop until green or max iterations |
 | "Implement this feature" | `ag auto task F-XXXX` | Autonomous per-AC implementation + PR |
 | "Process all planned features" | `ag auto crunch` | Batch implementation of planned features |
