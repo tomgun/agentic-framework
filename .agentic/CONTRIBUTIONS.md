@@ -1,12 +1,16 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.52.2)
-**Date**: 2026-03-09
+**Period**: Initial Development (v0.1.0 → v0.52.4)
+**Date**: 2026-03-10
 
 ---
 
 ## Recent Contributions
+
+### Epic Decomposition (v0.52.4, F-0184)
+
+**User insight**: Tomas enforced the full post-plan dialectical review workflow, which caught 5 design issues in the original plan — the most critical being that the synthetic review pair approach (`check_review()` with a fake transition) would crash because the function validates against `TRANSITION_REVIEW_MAP`. The revision switched to using `get_setting()` directly. Tomas also caught that instruction files and documentation were missing from the initial implementation — reinforcing the framework's own "instruction files are part of the feature" rule. The review should have flagged these as missing, highlighting a gap in the review skill's checklist for framework development.
 
 ### Dashboard Renders Itself (v0.52.2)
 
