@@ -1793,3 +1793,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 20:02 - F-0195 Collision Prevention
+
+**Why**: Preventing destructive git ops from destroying work when multiple sessions share a checkout
+
+**What changed**:
+- Three-layer multi-session collision prevention: session auto-registration, advisory UserPromptSubmit warning, instruction hardening across all agent templates. 18 unit tests + 13 structural validation tests.
+
+**Next steps**:
+- PR #90 review and merge
+
+**Blockers**: None
+

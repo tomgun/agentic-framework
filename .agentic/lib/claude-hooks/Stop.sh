@@ -88,7 +88,14 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
   fi
 fi
 
-# 5. Summary
+# 5. Deregister session (F-0195: multi-session collision prevention)
+AGENTIC_LIB="$PROJECT_ROOT/.agentic/lib"
+if [[ -f "$AGENTIC_LIB/tools/agents_helpers.py" ]]; then
+  python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
+    --project-root "$PROJECT_ROOT" session-deregister "$PROJECT_ROOT" --pid "$PPID" 2>/dev/null || true
+fi
+
+# 6. Summary
 echo ""
 if [[ $WARNINGS -eq 0 ]]; then
   echo "✓ All good! See you next time."

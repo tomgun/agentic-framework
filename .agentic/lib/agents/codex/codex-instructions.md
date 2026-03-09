@@ -39,6 +39,7 @@ Rules:
 - Keep changes small and scoped.
 - Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
 - Multi-agent: check AGENTS.json for active agents before starting work.
+- Multi-session safety: Never run destructive git ops (stash, checkout ., restore ., reset --hard, clean -f) when other sessions may be active on the same checkout. Use a worktree or commit first.
 - **Where to log**: Prioritized work → `ag backlog add`; task/idea → `ag todo`; human blocker (PR, credential, decision) → `blocker.sh`; bug → `quick_issue.sh`; new capability → `feature.sh`. Do NOT put development tasks in HUMAN_NEEDED.md.
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):
