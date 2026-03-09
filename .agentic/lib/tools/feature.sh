@@ -36,6 +36,7 @@ Fields:
   impl-state   - none | partial | complete
   tests        - todo | partial | complete | n/a
   accepted     - yes | no
+  parent       - F-XXXX (parent feature ID)
 
 Examples:
   bash feature.sh F-0003 status in_progress
@@ -43,6 +44,7 @@ Examples:
   bash feature.sh F-0003 impl-state complete
   bash feature.sh F-0003 tests complete
   bash feature.sh F-0003 accepted yes
+  bash feature.sh F-0003 parent F-0001
 USAGE
   exit 1
 fi
@@ -81,6 +83,7 @@ if [[ "${FORMAT}" == "table" ]]; then
     impl-state) COL=4; VALUE=$(echo "${VALUE}" | sed 's/none/-/; s/partial/partial/; s/complete/complete/') ;;
     tests)      COL=5; VALUE=$(echo "${VALUE}" | sed 's/todo/-/; s/n\/a/-/') ;;
     accepted)   COL=6 ;;
+    parent)     echo "Error: parent field not supported in table format"; exit 1 ;;
     *) echo "Error: Unknown field ${FIELD}"; exit 1 ;;
   esac
 
@@ -129,6 +132,15 @@ else
 
   IN_FEATURE && field == "tests" && /^  - Unit:/ {
     print "  - Unit: " value
+    next
+  }
+
+  IN_FEATURE && field == "parent" && /^(\*\*Parent\*\*|- Parent):/ {
+    if ($0 ~ /^\*\*Parent\*\*/) {
+      print "**Parent**: " value
+    } else {
+      print "- Parent: " value
+    }
     next
   }
 
