@@ -22,6 +22,7 @@ DOCKER_ARGS=(
   -v "$HOME/.ssh:/home/node/.ssh:ro"
   -v "claude-sandbox-history:/commandhistory"
   -e "GH_TOKEN=$GH_TOKEN"
+  -e "TZ=${TZ:-UTC}"
   -v "$PROJECT_DIR:/workspace"
 )
 

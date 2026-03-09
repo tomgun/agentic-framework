@@ -63,6 +63,7 @@ Your project directory          → /workspace             read/write
 ~/.ssh (SSH keys)               → /home/node/.ssh        read-only
 Docker volume (zsh history)     → /commandhistory        read/write
 GH_TOKEN env var                → GH_TOKEN               env var
+TZ env var (default: UTC)       → TZ                     env var
 ```
 
 There is no mount for your home directory, other projects, or system files. Docker bind mounts are explicit — unmounted paths don't exist inside the container.
@@ -238,6 +239,19 @@ If your project has `.env` files, credentials, or API keys, Claude can read and 
 ```
 
 ## Customizing the sandbox
+
+### Timezone
+
+The container defaults to **UTC**. To use your local timezone, set `TZ` in your shell profile:
+
+```bash
+# ~/.zshrc or ~/.bashrc
+export TZ="America/New_York"    # or Europe/London, Asia/Tokyo, etc.
+```
+
+Both `run.sh` and `devcontainer.json` read `TZ` from the host environment and pass it into the container. Journal timestamps, `date` output, and log entries will use this timezone.
+
+If `TZ` is not set on the host, the container uses UTC.
 
 ### Adjusting the firewall
 
