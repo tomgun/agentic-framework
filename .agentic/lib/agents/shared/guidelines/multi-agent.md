@@ -19,33 +19,21 @@ phase: implementation
 
 ---
 
-## Coordination File: AGENTS_ACTIVE.md
+## Coordination File: AGENTS.json
 
-**Location**: `.agentic/session/AGENTS_ACTIVE.md`
+**Location**: `.agentic/session/AGENTS.json` (always in main repo, not worktrees)
 
 **At session start, check for other agents:**
 ```bash
-cat .agentic/session/AGENTS_ACTIVE.md 2>/dev/null
+python3 .agentic/lib/tools/agents_helpers.py --project-root . list
 ```
 
 **If other agents are active:**
 - See what files they're working on
 - Choose different files/features
-- Register yourself
+- Register yourself via `wip.sh start`
 
-**Register yourself when starting work:**
-```markdown
-## Active Agents
-
-| Agent | Feature | Files | Started |
-|-------|---------|-------|---------|
-| Claude-1 | F-0042 | src/auth/* | 2026-01-26 10:00 |
-| YOUR-ID | F-0043 | src/api/* | 2026-01-26 10:30 |
-```
-
-**Deregister when done:**
-- Remove your row from AGENTS_ACTIVE.md
-- Or mark as complete
+**Registration is automatic** — `wip.sh start` and `ag implement` create AGENTS.json entries.
 
 ---
 
@@ -53,44 +41,47 @@ cat .agentic/session/AGENTS_ACTIVE.md 2>/dev/null
 
 1. **One feature per agent** - Each agent works on ONE feature at a time
 2. **Avoid file conflicts** - Don't touch files another agent is modifying
-3. **Use worktrees** - Separate Git worktrees for parallel features
-4. **Communicate via files** - AGENTS_ACTIVE.md, WIP.md, HUMAN_NEEDED.md
+3. **Use worktrees** - Separate Git worktrees for parallel features (`worktree_mode: always` in STACK.md)
+4. **Communicate via AGENTS.json** - Single registry for all agent/WIP state
 
 ---
 
-## WIP Files as Locks
+## AGENTS.json as Lock Registry
 
-**.agentic/session/WIP.md acts as a lock file:**
+Entries track active work with status and timestamps:
 
-| WIP Age | Meaning | Action |
-|---------|---------|--------|
-| < 5 minutes | Agent actively working | Wait or coordinate |
-| 5-60 minutes | Agent may have paused | Check AGENTS_ACTIVE.md |
-| > 60 minutes | Agent likely crashed | Review changes, decide |
+| Status | Meaning | Action |
+|--------|---------|--------|
+| `created` | Worktree created, work not started | Safe to wait |
+| `active` (< 5 min) | Agent actively working | Wait or coordinate |
+| `active` (> 60 min) | Agent likely crashed | Review changes, decide |
+| `created` (> 30 min) | Stale entry, agent crashed before starting | Clean up |
 
-**Never start new work while another agent's WIP.md is fresh (<5 min).**
+**Never start new work while another agent has a fresh active entry.**
 
 ---
 
 ## Git Worktrees for Parallel Features
 
-Each agent can have its own worktree:
+**Automatic (recommended):** Set `worktree_mode: always` in STACK.md.
+`ag implement F-XXXX` auto-creates a worktree and registers in AGENTS.json.
 
+**Manual:**
 ```bash
-# Create worktree for agent-2 working on F-0043
-git worktree add ../project-F0043 -b feature/F-0043
+# Create worktree for F-0043
+bash .agentic/lib/tools/worktree.sh create F-0043 "API endpoints"
 
-# Agent-2 works in ../project-F0043/
+# Agent works in ../project-f-0043/
 # Main agent continues in ./
 
-# When done, merge and clean up
-git worktree remove ../project-F0043
+# When done, clean up
+bash .agentic/lib/tools/worktree.sh auto-remove F-0043
 ```
 
 **Benefits:**
 - Complete isolation between agents
 - No merge conflicts during work
-- Each agent has own WIP.md
+- Single AGENTS.json in main repo tracks all worktrees
 - Can run tests independently
 
 ---
@@ -107,19 +98,7 @@ bash .agentic/lib/tools/wip.sh checkpoint "Handing off to Cursor"
 ### In new environment:
 ```bash
 bash .agentic/lib/tools/wip.sh check
-# Output: "✓ Recent checkpoint (3 minutes ago) - Active handoff detected"
-# Continue seamlessly!
-```
-
----
-
-## Proactive Session Start Check
-
-**If AGENTS_ACTIVE.md has entries, tell user:**
-
-```
-👥 Another agent is working on F-0042 (src/auth/*).
-I'll register myself and work on different files.
+# Output: "✓ Recent checkpoint — Active handoff detected"
 ```
 
 ---
@@ -140,10 +119,10 @@ I'll register myself and work on different files.
 
 | Check | When | Tool |
 |-------|------|------|
-| Other agents active? | Session start | `cat .agentic/session/AGENTS_ACTIVE.md` |
-| WIP exists? | Session start | `bash .agentic/lib/tools/wip.sh check` |
-| Register yourself | Starting work | Edit AGENTS_ACTIVE.md |
-| Deregister | Work complete | Edit AGENTS_ACTIVE.md |
+| Other agents active? | Session start | `agents_helpers.py list` |
+| WIP exists? | Session start | `wip.sh check` |
+| Register yourself | Starting work | `wip.sh start` (auto) |
+| Deregister | Work complete | `wip.sh complete` (auto) |
 | Before handoff | Environment switch | `wip.sh checkpoint` |
 
-**Parallel work is safe when agents coordinate via files.**
+**Parallel work is safe when agents coordinate via AGENTS.json.**

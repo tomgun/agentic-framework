@@ -11,7 +11,7 @@ Read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, and last 2-3 entries of .agen
 
 Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
-Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog` | `ag review`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog` | `ag review` | `ag worktree`
 
 ## Core Rules
 
@@ -22,7 +22,7 @@ Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"
 - Shipped specs are contracts: never modify shipped acceptance criteria without `bash .agentic/lib/tools/migration.sh create`. Pre-commit Checks 14-16 enforce this with no escape hatch.
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval.
-- Multi-agent: read `.agentic/session/AGENTS_ACTIVE.md` before starting work.
+- Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.
 - Log user's design insights to .agentic/CONTRIBUTIONS.md. Every PR: bump VERSION (at least patch).
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 

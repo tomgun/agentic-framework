@@ -17,7 +17,7 @@ phase: session
 
 **Detect these scenarios automatically at session start:**
 
-1. **.agentic/session/WIP.md exists** → Previous work interrupted (token limit, crash, etc.)
+1. **AGENTS.json (or legacy WIP.md) exists** → Previous work interrupted (token limit, crash, etc.)
 2. **Uncommitted changes in git** → Work in progress, not yet saved
 3. **JOURNAL.md stale** (>24h) → Lost session continuity
 4. **Features "in_progress" but no activity** → Abandoned work
@@ -45,7 +45,7 @@ bash .agentic/lib/tools/wip.sh check
 
 ### Step 2: Assess the Situation
 
-**.agentic/session/WIP.md provides:**
+**AGENTS.json (or legacy WIP.md) provides:**
 - Feature being worked on (e.g., F-0005: User Authentication)
 - Agent/environment (claude-desktop, cursor, copilot)
 - When work started
@@ -124,7 +124,7 @@ git diff <files>  # Review what changed
    > Reviewed git diff: code looks good, will continue."
 
 2. Resume from checkpoint:
-   - Read .agentic/session/WIP.md progress checklist
+   - Read AGENTS.json (or legacy WIP.md) progress checklist
    - Continue from last unchecked item
    - Update WIP checkpoint as you work:
      ```bash
@@ -211,7 +211,7 @@ git diff <files>  # Review what changed
 ### Scenario 1: Token Limit Reached Mid-Edit
 
 **Symptoms**:
-- .agentic/session/WIP.md exists
+- AGENTS.json (or legacy WIP.md) exists
 - Last checkpoint recent (<30 min)
 - Git diff shows work in progress
 
@@ -234,7 +234,7 @@ git diff src/auth/login.ts
 ### Scenario 2: Tool Crash / Computer Restart
 
 **Symptoms**:
-- .agentic/session/WIP.md exists
+- AGENTS.json (or legacy WIP.md) exists
 - Last checkpoint 15-60 min ago
 - Git diff shows partial work
 - Uncertainty about work state
@@ -259,7 +259,7 @@ git diff src/auth/login.ts
 ### Scenario 3: Context Compaction (Claude)
 
 **Symptoms**:
-- .agentic/session/WIP.md updated by PreCompact hook
+- AGENTS.json (or legacy WIP.md) updated by PreCompact hook
 - Checkpoint says "Context compaction triggered"
 - Git diff shows work in progress
 
@@ -281,7 +281,7 @@ bash .agentic/lib/tools/wip.sh check
 ### Scenario 4: Environment Switch (Multi-Agent)
 
 **Symptoms**:
-- .agentic/session/WIP.md exists
+- AGENTS.json (or legacy WIP.md) exists
 - Last checkpoint says "Switching to [tool]"
 - Checkpoint very recent (<5 min)
 - Git diff shows active work
@@ -303,7 +303,7 @@ bash .agentic/lib/tools/wip.sh check
 ### Scenario 5: Abandoned Work (Stale)
 
 **Symptoms**:
-- .agentic/session/WIP.md exists
+- AGENTS.json (or legacy WIP.md) exists
 - Last checkpoint >24 hours ago
 - Git diff shows old changes
 - Unclear what was being done
@@ -411,7 +411,7 @@ git log -1 --stat          # Last commit for reference
 
 **Recovery Protocol Steps:**
 1. **Detect**: `wip.sh check` at session start
-2. **Assess**: Review .agentic/session/WIP.md + git diff + SESSION_LOG.md
+2. **Assess**: Review AGENTS.json (or legacy WIP.md) + git diff + SESSION_LOG.md
 3. **Determine**: Fresh (<5min) | Normal (5-60min) | Stale (>60min)
 4. **Decide**: Continue | Review & Fix | Rollback
 5. **Execute**: Follow decision tree, update WIP, resume work

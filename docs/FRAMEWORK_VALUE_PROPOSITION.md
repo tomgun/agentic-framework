@@ -104,7 +104,7 @@
 - Different skill levels need different features
 
 **How We Solve It**:
-- **Multi-agent coordination** - AGENTS_ACTIVE.md, file locks
+- **Multi-agent coordination** - AGENTS.json, file locks
 - **Git worktrees** - isolated working directories
 - **PR mode** - optional team workflow
 - **Two profiles** - Discovery (simple) vs Formal (complex)

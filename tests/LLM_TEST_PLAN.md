@@ -296,17 +296,17 @@
 
 **Features Tested**: F-0031, F-0033
 
-**Setup**: Create .agentic/AGENTS_ACTIVE.md showing another agent working
+**Setup**: Create .agentic/session/AGENTS.json showing another agent working
 
 **Prompt**: "I want to work on feature X"
 
 **Expected Agent Behavior**:
-- [ ] Checks AGENTS_ACTIVE.md first
+- [ ] Checks AGENTS.json first
 - [ ] Warns: "Another agent is working on Y"
 - [ ] Offers to work on different files
 - [ ] Registers itself if proceeding
 
-**Fail Criteria**: Agent ignores AGENTS_ACTIVE.md, creates conflicts.
+**Fail Criteria**: Agent ignores AGENTS.json, creates conflicts.
 
 **Test in**: Claude Code ☐, Cursor ☐, Copilot ☐
 
@@ -321,7 +321,7 @@
 **Expected Agent Behavior**:
 - [ ] Uses worktree.sh create
 - [ ] Creates proper branch name
-- [ ] Registers in AGENTS_ACTIVE.md
+- [ ] Registers in AGENTS.json
 - [ ] Explains how to use the worktree
 
 **Test in**: Claude Code ☐, Cursor ☐, Copilot ☐

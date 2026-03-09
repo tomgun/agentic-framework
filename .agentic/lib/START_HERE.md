@@ -332,7 +332,7 @@ Survives framework upgrades — `.agentic/` gets replaced, `.agentic/local/` doe
 **Work with a team / multiple agents:**
 - Multi-agent coordination: `.agentic/lib/workflows/multi_agent_coordination.md`
 - Git worktrees: `.agentic/lib/workflows/multi_agent_coordination.md#git-worktrees`
-- Agent coordination file: `AGENTS_ACTIVE.md`
+- Agent coordination file: `AGENTS.json`
 - PR workflow: `.agentic/lib/workflows/git_workflow.md#pull-request-workflow`
 
 **Write tests:**

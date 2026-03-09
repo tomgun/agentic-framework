@@ -55,7 +55,7 @@ Detailed rules are in `.agentic/lib/agents/shared/guidelines/`:
 | `token-efficiency.md` | When updating STATUS/JOURNAL/FEATURES/HUMAN_NEEDED |
 | `small-batch.md` | Implementation — Small Batch, max 5-10 files per commit (NON-NEGOTIABLE) |
 | `wip-tracking.md` | Interrupted sessions — wip.sh start/checkpoint/complete |
-| `multi-agent.md` | Parallel agent work — AGENTS_ACTIVE.md coordination |
+| `multi-agent.md` | Parallel agent work — AGENTS.json coordination |
 
 ---
 

@@ -24,8 +24,8 @@ phase: session
 # IMPORTANT: Every command must have "|| true" to prevent exit code errors
 cat STATUS.md 2>/dev/null || true
 cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
-cat .agentic/session/AGENTS_ACTIVE.md 2>/dev/null || true
-ls .agentic/session/WIP.md 2>/dev/null || true
+python3 .agentic/lib/tools/agents_helpers.py --project-root . list 2>/dev/null || true
+bash .agentic/lib/tools/wip.sh check 2>/dev/null || true
 bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
 ```
 
@@ -54,11 +54,11 @@ What would you like to work on?
 
 ## Step 3: Handle Special Cases
 
-**If .agentic/session/WIP.md exists** (interrupted work):
+**If interrupted work detected** (via `wip.sh check` or AGENTS.json):
 ```
 ⚠️ Previous work was interrupted!
-Feature: [from .agentic/session/WIP.md]
-Files changed: [from .agentic/session/WIP.md or git diff]
+Feature: [from AGENTS.json or WIP.md fallback]
+Files changed: [from AGENTS.json or git diff]
 
 Options:
 1. Continue from checkpoint
@@ -81,7 +81,7 @@ I'll quickly apply the updates, then we'll continue.
 [Handle upgrade, then return to normal greeting]
 ```
 
-**If .agentic/session/AGENTS_ACTIVE.md shows other agents working**:
+**If AGENTS.json shows other agents working**:
 ```
 👥 Another agent is currently active!
 
@@ -90,14 +90,14 @@ Agent 1 (Claude - Main Window):
 - Files: [their files]
 
 To avoid conflicts, I should work on different files/features.
-What would you like me to work on? (I'll register myself in .agentic/session/AGENTS_ACTIVE.md)
+What would you like me to work on? (I'll register via wip.sh start)
 ```
 
 **CRITICAL - Multi-agent coordination:**
-1. **Read .agentic/session/AGENTS_ACTIVE.md** to see who else is working
-2. **Register yourself** by adding your entry
+1. **Check AGENTS.json** (`python3 .agentic/lib/tools/agents_helpers.py --project-root . list`) to see who else is working
+2. **Register yourself** via `wip.sh start` (auto-creates AGENTS.json entry)
 3. **Avoid their files** - pick different features/files
-4. **Update when done** - remove your entry or mark complete
+4. **Update when done** - `wip.sh complete` removes your entry
 
 ---
 
@@ -116,7 +116,7 @@ What would you like me to work on? (I'll register myself in .agentic/session/AGE
 
 **If interrupted work detected (exit code 1):**
 - ⚠️ Previous session stopped mid-task (tokens out, crash, or abrupt close)
-- .agentic/session/WIP.md shows what was in progress
+- AGENTS.json (or WIP.md fallback) shows what was in progress
 - Git diff shows uncommitted changes
 - **STOP and review before continuing!**
 

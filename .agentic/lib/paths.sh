@@ -37,6 +37,18 @@ else
     PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$AGENTIC_ROOT/.." && pwd)}"
 fi
 
+# MAIN_PROJECT_ROOT: always the main repo (not a worktree)
+# In a worktree, git-common-dir differs from git-dir; the main repo is the parent of git-common-dir.
+MAIN_PROJECT_ROOT="$PROJECT_ROOT"
+if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+    _git_common=$(git rev-parse --git-common-dir 2>/dev/null)
+    _git_dir=$(git rev-parse --git-dir 2>/dev/null)
+    if [[ -n "$_git_common" && -n "$_git_dir" && "$_git_common" != "$_git_dir" ]]; then
+        MAIN_PROJECT_ROOT=$(cd "$(dirname "$_git_common")" && pwd)
+    fi
+fi
+AGENTS_JSON="$MAIN_PROJECT_ROOT/.agentic/session/AGENTS.json"
+
 # ---------------------------------------------------------------------------
 # Backward-compatibility helper
 # Returns $1 if it exists, else $2 if it exists, else $1 (new location)
@@ -138,4 +150,4 @@ LOCAL_DIR="$(_resolve_path "$AGENTIC_ROOT/local" "$PROJECT_ROOT/.agentic-local")
 # Convenience: export ROOT_DIR for scripts that expect it
 # ---------------------------------------------------------------------------
 ROOT_DIR="$PROJECT_ROOT"
-export ROOT_DIR PROJECT_ROOT AGENTIC_ROOT AGENTIC_LIB
+export ROOT_DIR PROJECT_ROOT MAIN_PROJECT_ROOT AGENTIC_ROOT AGENTIC_LIB

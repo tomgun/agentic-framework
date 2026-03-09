@@ -63,7 +63,9 @@ Verify the feature is small batch (max 5-10 files). If larger, break into smalle
 bash .agentic/lib/tools/wip.sh start F-XXXX "Description" "file1 file2"
 ```
 
-This creates `.agentic/session/WIP.md` — a lock that prevents premature commits.
+This registers active work in `.agentic/session/AGENTS.json` — a lock that prevents premature commits.
+
+If `ag implement` created a worktree (when `worktree_mode: always` in STACK.md), `cd` to the worktree path it prints. Run `wip.sh start` from the worktree.
 
 ### Step 4: Implement
 

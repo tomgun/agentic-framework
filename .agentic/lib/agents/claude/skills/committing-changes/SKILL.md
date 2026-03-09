@@ -25,12 +25,12 @@ Pre-commit quality gates and branch management with human approval.
 bash .agentic/lib/tools/wip.sh check
 ```
 
-If `.agentic/session/WIP.md` exists, work is still in progress. Complete it first:
+If `wip.sh check` reports active work (tracked in `.agentic/session/AGENTS.json`), complete it first:
 ```bash
 bash .agentic/lib/tools/wip.sh complete
 ```
 
-**Never commit while WIP.md exists** — it indicates incomplete work.
+**Never commit while WIP is active** — it indicates incomplete work.
 
 ### Step 2: Branch Check
 
@@ -115,7 +115,7 @@ Result: PR #42 created, logged in HUMAN_NEEDED.md.
 **Example 2: WIP still active**
 User says: "let's ship this"
 Steps taken:
-1. Check WIP — `.agentic/session/WIP.md` exists for F-0125
+1. Check WIP — active WIP found in AGENTS.json for F-0125
 2. **BLOCK**: "Work is still in progress for F-0125. Complete it first with `wip.sh complete`, or should I mark it complete now?"
 Result: User confirms completion, then proceed with commit flow.
 
@@ -129,7 +129,7 @@ Solution: Create branch now: `git checkout -b feature/description`. Changes are 
 Cause: Code has regressions or incomplete implementation.
 Solution: Fix failing tests before committing. Do not skip tests.
 
-**Error: WIP.md still exists**
+**Error: WIP still active**
 Cause: Feature work not formally completed.
 Solution: Run `bash .agentic/lib/tools/wip.sh complete` after verifying all acceptance criteria are met.
 

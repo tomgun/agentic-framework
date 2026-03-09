@@ -7,6 +7,8 @@ phase: implementation
 
 # Work-In-Progress (WIP) Tracking & Recovery
 
+**Note (F-0194)**: WIP tracking now uses AGENTS.json instead of WIP.md. The `wip.sh` tool handles the migration transparently. Legacy WIP.md is still supported as fallback.
+
 **Purpose**: Prevent loss of work when tokens run out, tools crash, or context gets compacted. Automatic detection and recovery of interrupted work.
 
 **Core idea**: A lock file tracks "I'm working on X". If lock exists at session start but work not completed = interrupted work detected.
@@ -35,11 +37,11 @@ phase: implementation
 
 ---
 
-## Solution: WIP.md Lock File
+## Solution: AGENTS.json WIP Tracking
 
 ### Location
 
-`.agentic/session/WIP.md` in project root (visible, easy to find)
+`.agentic/session/AGENTS.json` in project root (visible, easy to find). Legacy `.agentic/session/WIP.md` is still supported as fallback.
 
 ### Content Format
 
@@ -220,7 +222,7 @@ bash .agentic/lib/tools/wip.sh checkpoint "Switching from Claude to Cursor"
 
 ### 5. Multi-Agent Coordination
 
-**.agentic/session/WIP.md acts as a lock for multi-agent scenarios:**
+**AGENTS.json acts as a lock for multi-agent scenarios (replaces both WIP.md and AGENTS_ACTIVE.md):**
 
 ```bash
 # Check if another agent is working
@@ -228,7 +230,7 @@ bash .agentic/lib/tools/wip.sh check
 
 # If WIP is fresh (<5 min old):
 #   "Agent 'claude-desktop' is currently working on F-0005"
-#   "Wait for them to finish or coordinate in AGENTS_ACTIVE.md"
+#   "Wait for them to finish or coordinate in AGENTS.json"
 
 # If WIP is stale (>60 min old):
 #   "Stale WIP detected. Previous agent may have crashed."

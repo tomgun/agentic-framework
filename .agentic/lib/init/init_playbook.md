@@ -693,7 +693,7 @@ b) Specialized agents - Different agents for research, testing, coding, review
 
 c) Parallel features - Multiple agents on different features simultaneously
    Uses git worktrees for isolation
-   Requires: AGENTS_ACTIVE.md coordination
+   Requires: AGENTS.json coordination
    Good for: Large projects, team development
 
 d) Not sure - Start simple, enable later

@@ -68,7 +68,7 @@ Welcome back! Here's where we are:
 
 - **HUMAN_NEEDED.md has items**: Surface them before asking what to work on
 - **Upgrade pending** (`.agentic/.upgrade_pending`): Follow the TODO in that file
-- **Other agents active** (`.agentic/session/AGENTS_ACTIVE.md`): Register self, avoid their files
+- **Other agents active** (`.agentic/session/AGENTS.json`): Register self, avoid their files
 - **Memory stale**: Run `bash .agentic/lib/tools/memory-check.sh`
 
 ## Examples
