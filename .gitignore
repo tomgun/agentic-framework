@@ -31,6 +31,7 @@ tests/llm/.test-state
 # Agentic session files - transient, don't commit
 .agentic/session/WIP.md
 .agentic/session/AGENTS_ACTIVE.md
+.agentic/session/AGENTS.json
 .agentic/session/.verification-state
 .agentic/session/discovery_report.json
 .agentic/session/proposals/

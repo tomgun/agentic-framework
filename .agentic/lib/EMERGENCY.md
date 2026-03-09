@@ -66,7 +66,7 @@ head -30 STATUS.md
 tail -30 JOURNAL.md
 
 # Any unfinished work?
-cat .agentic/session/WIP.md 2>/dev/null || echo "No WIP"
+bash .agentic/lib/tools/wip.sh check 2>/dev/null || echo "WIP detected"
 
 # Uncommitted changes?
 git status
@@ -126,7 +126,7 @@ Or shorter:
 |------|---------|--------------|
 | `.agentic/STATUS.md` | Current focus, priorities | Always |
 | `JOURNAL.md` | Session history | To remember context |
-| `.agentic/session/WIP.md` | Interrupted work | If exists = work interrupted |
+| `AGENTS.json` | Agent/WIP tracking | `wip.sh check` detects interrupted work |
 | `.agentic/HUMAN_NEEDED.md` | Decisions needed | Before starting |
 | `.agentic/spec/FEATURES.md` | All features | To add/check features |
 | `.agentic/spec/ISSUES.md` | Bugs & issues | To log/check bugs |

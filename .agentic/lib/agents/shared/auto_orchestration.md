@@ -24,8 +24,7 @@ tokens: ~3254
 # Every command needs || true to prevent exit code errors
 cat STATUS.md 2>/dev/null || true
 cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
-cat .agentic/session/AGENTS_ACTIVE.md 2>/dev/null || true
-ls .agentic/session/WIP.md 2>/dev/null || true
+python3 .agentic/lib/tools/agents_helpers.py list 2>/dev/null || true
 bash .agentic/lib/tools/backlog.sh current 2>/dev/null || true
 ```
 
@@ -49,7 +48,7 @@ What would you like to work on?
 
 | Situation | Response |
 |-----------|----------|
-| .agentic/session/WIP.md exists | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
+| `wip.sh check` detects active WIP (AGENTS.json) | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
 | HUMAN_NEEDED has items | "📋 [N] items need your input" |
 | Upgrade pending | "🔄 Framework upgraded to vX.Y.Z, applying updates..." |
 
@@ -155,6 +154,7 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
    └─ Read STACK.md → development_mode (default: standard)
 
 4. IMPLEMENT
+   ├─ If `worktree_mode: always` in STACK.md, `ag implement` auto-creates a worktree — `cd` to it
    ├─ Write code meeting acceptance criteria
    ├─ Add @feature annotations
    └─ Keep small, focused changes
@@ -338,7 +338,7 @@ No escape hatch. Shipped spec protection is deterministic.
    └─ cat .agentic/.upgrade_pending (follow if exists)
    
 2. CHECK FOR WIP
-   └─ ls .agentic/session/WIP.md (resume if exists)
+   └─ bash .agentic/lib/tools/wip.sh check (resume if WIP detected in AGENTS.json)
    
 3. READ CONTEXT
    ├─ STATUS.md (what's current focus)
@@ -380,7 +380,7 @@ No escape hatch. Shipped spec protection is deterministic.
 ### Automatic Checks (ALL MUST PASS)
 
 ```
-□ No .agentic/session/WIP.md exists (work is complete)
+□ No active WIP in AGENTS.json (work is complete)
 □ All tests pass
 □ Smoke test passed (for user-facing changes)
 □ Quality checks pass (if enabled)
@@ -537,7 +537,7 @@ For hands-off execution. Require test commands in STACK.md; task/crunch require 
 
 ### Session Protocols
 
-- **START**: Run `ag start`. Read .agentic/STATUS.md, HUMAN_NEEDED.md, check .agentic/session/WIP.md. If WIP.md exists: warn about interrupted work and suggest resuming.
+- **START**: Run `ag start`. Read .agentic/STATUS.md, HUMAN_NEEDED.md, check AGENTS.json for WIP (via `wip.sh check`). If WIP exists: warn about interrupted work and suggest resuming.
 - **END**: Run `.agentic/lib/checklists/session_end.md`, update JOURNAL.md.
 - **DONE**: Run `.agentic/lib/checklists/feature_complete.md` before claiming done.
 

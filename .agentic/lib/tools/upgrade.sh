@@ -220,16 +220,39 @@ else
   echo ""
   echo "  Restoring project state files from backup..."
   STATE_FILES=(
-    "WIP.md"              # Work in progress tracking
-    "AGENTS_ACTIVE.md"    # Multi-agent coordination
+    "WIP.md"              # Work in progress tracking (legacy, migrated to AGENTS.json)
+    "AGENTS_ACTIVE.md"    # Multi-agent coordination (legacy, replaced by AGENTS.json)
+    "AGENTS.json"         # Agent/WIP registry (F-0194)
     ".verification-state" # Verification state
   )
   for state_file in "${STATE_FILES[@]}"; do
     if [[ -f "$TARGET_PROJECT_DIR/$BACKUP_DIR/$state_file" ]]; then
-      cp "$TARGET_PROJECT_DIR/$BACKUP_DIR/$state_file" "$TARGET_PROJECT_DIR/.agentic/"
-      echo -e "${GREEN}  ✓ Restored: .agentic/$state_file${NC}"
+      cp "$TARGET_PROJECT_DIR/$BACKUP_DIR/$state_file" "$TARGET_PROJECT_DIR/.agentic/session/"
+      echo -e "${GREEN}  ✓ Restored: .agentic/session/$state_file${NC}"
     fi
   done
+
+  # Step 4b: Migrate WIP.md → AGENTS.json (F-0194)
+  if [[ -f "$TARGET_PROJECT_DIR/.agentic/session/WIP.md" ]]; then
+    echo ""
+    echo "  Migrating WIP.md → AGENTS.json..."
+    if command -v python3 >/dev/null 2>&1; then
+      local _script_dir
+      _script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+      python3 "$_script_dir/agents_helpers.py" --project-root "$TARGET_PROJECT_DIR" \
+          migrate-wip "$TARGET_PROJECT_DIR/.agentic/session/WIP.md" 2>/dev/null && \
+          echo -e "${GREEN}  ✓ WIP.md migrated to AGENTS.json${NC}" || \
+          echo -e "${YELLOW}  WIP.md migration skipped (parse error)${NC}"
+    else
+      echo -e "${YELLOW}  WIP.md migration skipped (python3 not available)${NC}"
+    fi
+  fi
+  # Clean up old AGENTS_ACTIVE.md (replaced by AGENTS.json)
+  if [[ -f "$TARGET_PROJECT_DIR/.agentic/session/AGENTS_ACTIVE.md" ]]; then
+    echo "  Removing deprecated AGENTS_ACTIVE.md..."
+    rm "$TARGET_PROJECT_DIR/.agentic/session/AGENTS_ACTIVE.md"
+    echo -e "${GREEN}  ✓ Removed AGENTS_ACTIVE.md${NC}"
+  fi
 fi
 
 echo ""

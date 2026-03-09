@@ -1,5 +1,5 @@
 ---
-summary: "Initialize session: check WIP, read state files, greet user with dashboard"
+summary: "Initialize session: check AGENTS.json for WIP, read state files, greet user with dashboard"
 trigger: "session start, first message, where were we, ag start"
 tokens: ~3500
 phase: session
@@ -24,8 +24,7 @@ phase: session
 # IMPORTANT: Every command must have "|| true" to prevent exit code errors
 cat STATUS.md 2>/dev/null || true
 cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
-cat .agentic/session/AGENTS_ACTIVE.md 2>/dev/null || true
-ls .agentic/session/WIP.md 2>/dev/null || true
+python3 .agentic/lib/tools/agents_helpers.py list 2>/dev/null || true
 bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
 bash .agentic/lib/tools/backlog.sh current 2>/dev/null || true
 ```
@@ -56,11 +55,11 @@ What would you like to work on?
 
 ## Step 3: Handle Special Cases
 
-**If .agentic/session/WIP.md exists** (interrupted work):
+**If `wip.sh check` detects interrupted work** (via AGENTS.json):
 ```
 ⚠️ Previous work was interrupted!
-Feature: [from .agentic/session/WIP.md]
-Files changed: [from .agentic/session/WIP.md or git diff]
+Feature: [from AGENTS.json WIP entry]
+Files changed: [from AGENTS.json or git diff]
 
 Options:
 1. Continue from checkpoint
@@ -83,7 +82,7 @@ I'll quickly apply the updates, then we'll continue.
 [Handle upgrade, then return to normal greeting]
 ```
 
-**If .agentic/session/AGENTS_ACTIVE.md shows other agents working**:
+**If AGENTS.json shows other agents working** (via `agents_helpers.py list`):
 ```
 👥 Another agent is currently active!
 
@@ -92,14 +91,14 @@ Agent 1 (Claude - Main Window):
 - Files: [their files]
 
 To avoid conflicts, I should work on different files/features.
-What would you like me to work on? (I'll register myself in .agentic/session/AGENTS_ACTIVE.md)
+What would you like me to work on? (I'll register myself in AGENTS.json)
 ```
 
 **CRITICAL - Multi-agent coordination:**
-1. **Read .agentic/session/AGENTS_ACTIVE.md** to see who else is working
-2. **Register yourself** by adding your entry
+1. **Query AGENTS.json** (via `agents_helpers.py list`) to see who else is working
+2. **Register yourself** via `agents_helpers.py register`
 3. **Avoid their files** - pick different features/files
-4. **Update when done** - remove your entry or mark complete
+4. **Update when done** - deregister via `agents_helpers.py deregister`
 
 ---
 
@@ -118,7 +117,7 @@ What would you like me to work on? (I'll register myself in .agentic/session/AGE
 
 **If interrupted work detected (exit code 1):**
 - ⚠️ Previous session stopped mid-task (tokens out, crash, or abrupt close)
-- .agentic/session/WIP.md shows what was in progress
+- AGENTS.json shows what was in progress
 - Git diff shows uncommitted changes
 - **STOP and review before continuing!**
 
@@ -281,7 +280,7 @@ This is a **suggestion**, not a block. The user may choose to work on something 
   - Look at `.agentic/STATUS.md` → "Current focus"
   - Read relevant `.agentic/spec/acceptance/F-####.md` if working on feature
   - Check `.agentic/spec/FEATURES.md` for that feature's status
-  - **If in-progress work exists** (WIP.md or active branch): verify it has an F-XXXX in FEATURES.md with acceptance criteria. If missing, create them before continuing.
+  - **If in-progress work exists** (AGENTS.json WIP or active branch): verify it has an F-XXXX in FEATURES.md with acceptance criteria. If missing, create them before continuing.
 
 - [ ] **If `pipeline_enabled: yes`**: Check for active pipeline
   - Look for `.agentic/pipeline/F-####-pipeline.md`

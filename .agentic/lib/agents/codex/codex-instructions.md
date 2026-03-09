@@ -15,7 +15,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Build / implement / add / create / set up / develop / make something | STOP -> Run `ag plan F-XXXX` first, then `ag implement` (creates WIP) |
 | Build something large (>10 files, "entire", "full system") | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
 | Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
-| Commit / push / ship / finalize changes | STOP -> Check .agentic/session/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
+| Commit / push / ship / finalize changes | STOP -> Check active WIP (AGENTS.json); if exists BLOCK and warn. Else run `ag commit` |
 | Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, flush pending ideas to TODO.md via `ag todo`. |
 | Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
 | Backlog / queue / what's next / prioritize / reorder work | STOP -> `ag backlog` to see queue. `ag backlog add F-XXXX` to add. Position 0 = current work. |
@@ -38,7 +38,7 @@ Rules:
 - Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
 - Keep changes small and scoped.
 - Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
-- Multi-agent: read `.agentic/session/AGENTS_ACTIVE.md` before starting work.
+- Multi-agent: check AGENTS.json for active agents before starting work.
 - **Where to log**: Prioritized work → `ag backlog add`; task/idea → `ag todo`; human blocker (PR, credential, decision) → `blocker.sh`; bug → `quick_issue.sh`; new capability → `feature.sh`. Do NOT put development tasks in HUMAN_NEEDED.md.
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):

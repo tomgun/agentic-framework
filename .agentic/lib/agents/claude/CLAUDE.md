@@ -8,7 +8,7 @@ Read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, and last 2-3 entries of .agen
 
 Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/.agentic/spec/adr/* as the source of truth.
 
-Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog` | `ag review`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog` | `ag review` | `ag worktree`
 Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch`
 
 ## Core Rules
@@ -20,7 +20,7 @@ Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX`
 - Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
-- Multi-agent: read `.agentic/session/AGENTS_ACTIVE.md` before starting work.
+- Multi-agent: check `.agentic/session/AGENTS.json` before starting work (use `python3 .agentic/lib/tools/agents_helpers.py --project-root . list` or `wip.sh check`).
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 
 ## Token-Efficient Scripts (ALWAYS use these, NEVER edit state files directly)

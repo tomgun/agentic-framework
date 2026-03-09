@@ -14,7 +14,7 @@
 #   
 # Multi-agent setup:
 #   cursor-agents  - Creates .cursor/agents/ with role definitions
-#   pipeline       - Creates .agentic/pipeline/ and AGENTS_ACTIVE.md
+#   pipeline       - Creates .agentic/pipeline/ and AGENTS.json registry
 #
 # Why this matters:
 #   AGENTS.md is NOT auto-loaded by any tool. Each tool has its own file:
@@ -266,41 +266,14 @@ setup_pipeline() {
   
   echo -e "${GREEN}  ✓${NC} Created .agentic/pipeline/"
   
-  # Create AGENTS_ACTIVE.md if not exists
-  if [[ ! -f "$PROJECT_ROOT/AGENTS_ACTIVE.md" ]]; then
-    if [[ -f "$AGENTIC_DIR/spec/AGENTS_ACTIVE.template.md" ]]; then
-      cp "$AGENTIC_DIR/spec/AGENTS_ACTIVE.template.md" "$PROJECT_ROOT/AGENTS_ACTIVE.md"
-    else
-      cat > "$PROJECT_ROOT/AGENTS_ACTIVE.md" << 'EOF'
-# Active Agents
-
-Track which agents are working on which features.
-
-## Currently Active
-
-| Agent | Feature | Status | Started | Last Update |
-|-------|---------|--------|---------|-------------|
-| - | - | - | - | - |
-
-## Feature Locks
-
-To prevent conflicts, agents should "lock" features they're working on:
-
-| Feature | Locked By | Since | Worktree |
-|---------|-----------|-------|----------|
-| - | - | - | - |
-
-## Coordination Rules
-
-1. Check this file before starting work on a feature
-2. Add yourself when starting
-3. Remove yourself when done
-4. Don't work on locked features
-EOF
-    fi
-    echo -e "${GREEN}  ✓${NC} Created AGENTS_ACTIVE.md"
+  # Create AGENTS.json registry if not exists
+  AGENTS_JSON="$PROJECT_ROOT/.agentic/session/AGENTS.json"
+  mkdir -p "$PROJECT_ROOT/.agentic/session"
+  if [[ ! -f "$AGENTS_JSON" ]]; then
+    echo "[]" > "$AGENTS_JSON"
+    echo -e "${GREEN}  ✓${NC} Created .agentic/session/AGENTS.json"
   else
-    echo -e "${YELLOW}  ⚠${NC} AGENTS_ACTIVE.md already exists"
+    echo -e "${YELLOW}  ⚠${NC} AGENTS.json already exists"
   fi
   
   # Create pipeline template
@@ -367,7 +340,7 @@ EOF
   echo "To start a feature pipeline:"
   echo "  1. Copy TEMPLATE.md to F-####-pipeline.md"
   echo "  2. Update feature ID and name"
-  echo "  3. Register in AGENTS_ACTIVE.md"
+  echo "  3. Register via wip.sh start (auto-creates AGENTS.json entry)"
   echo "  4. Start with Research Agent"
   echo ""
   echo "See: .agentic/workflows/multi_agent_coordination.md"

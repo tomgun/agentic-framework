@@ -202,7 +202,7 @@ All Cursor agents should:
 
 When multiple agents work on same project:
 - Use worktrees for different features
-- Lock files in AGENTS_ACTIVE.md
+- Register in AGENTS.json (via `wip.sh start` or `agents_helpers.py`)
 - Don't modify shared files simultaneously
 
 ## Best Practices

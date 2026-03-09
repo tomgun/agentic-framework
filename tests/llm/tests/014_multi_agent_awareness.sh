@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Description: Agent should check AGENTS_ACTIVE.md and warn about other agents
+# Description: Agent should check AGENTS.json and warn about other agents
 # Section: session
 # Category: Important
 # Tests: LLM-050
@@ -7,21 +7,26 @@
 # Setup
 setup_test_project "discovery"
 
-# Create AGENTS_ACTIVE.md showing another agent working
-mkdir -p "$TEST_PROJECT/.agentic-state"
-cat > "$TEST_PROJECT/.agentic/session/AGENTS_ACTIVE.md" << 'EOF'
-# Active Agents
-
-## Agent 1 (Cursor - Window 1)
-- **Feature**: F-0042 (user authentication)
-- **Branch**: feature/F-0042-auth
-- **Files**: src/auth.js, src/login.js, tests/auth.test.js
-- **Status**: in_progress
-- **Started**: 2026-01-21 10:00
-- **Last update**: 2026-01-21 10:30
+# Create AGENTS.json showing another agent working
+mkdir -p "$TEST_PROJECT/.agentic/session"
+cat > "$TEST_PROJECT/.agentic/session/AGENTS.json" << 'EOF'
+[
+  {
+    "feature_id": "F-0042",
+    "description": "user authentication",
+    "worktree": "",
+    "branch": "feature/F-0042-auth",
+    "agent": "cursor-window-1",
+    "started": "2026-01-21T10:00:00Z",
+    "last_checkpoint": "2026-01-21T10:30:00Z",
+    "status": "active",
+    "progress": ["Login form and JWT integration"],
+    "files": ["src/auth.js", "src/login.js", "tests/auth.test.js"]
+  }
+]
 EOF
 
-git -C "$TEST_PROJECT" add -A
+git -C "$TEST_PROJECT" add -f .agentic/session/AGENTS.json
 git -C "$TEST_PROJECT" commit -m "Add active agent" --quiet
 
 # Start session and ask to work on auth

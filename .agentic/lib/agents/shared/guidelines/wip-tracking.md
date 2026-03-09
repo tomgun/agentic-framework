@@ -106,16 +106,16 @@ When multiple agents work in parallel:
 
 1. Each agent maintains their own WIP in their worktree
 2. WIP files are NOT shared between worktrees
-3. Use `.agentic/session/AGENTS_ACTIVE.md` to coordinate
+3. Use `AGENTS.json` (via `agents_helpers.py`) to coordinate
 4. Check for conflicting file modifications
 
 ---
 
 ## WIP File Location
 
-- Location: `.agentic/session/WIP.md`
+- Location: `AGENTS.json` (replaces `.agentic/session/WIP.md`)
 - Contains:
-  - Feature/task being worked on
+  - Agent registrations with feature/task being worked on
   - Files being modified
   - Checkpoint history
   - Recovery instructions

@@ -335,6 +335,7 @@ show_all_settings() {
         "periodic_agent_refresh"
         "plan_review_max_iterations"
         "pipeline_enabled"
+        "worktree_mode"
     )
 
     printf "%-28s %-20s %s\n" "SETTING" "VALUE" "SOURCE"

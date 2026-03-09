@@ -83,7 +83,7 @@ graph TB
 
 **Key Practices**:
 - **Session dashboard**: `ag start` reconstructs context — current focus, recent progress, blockers, suggested next steps
-- **State carries over**: STATUS.md, JOURNAL.md, and WIP.md carry state across sessions so the developer doesn't have to explain what happened
+- **State carries over**: STATUS.md, JOURNAL.md, and AGENTS.json carry state across sessions so the developer doesn't have to explain what happened
 - **Decision surfacing**: HUMAN_NEEDED.md surfaces items requiring human judgment, `ag sync` detects drift
 - **Discoverability**: Tips of the day, `ag sync` reminders, guided workflows help developers discover framework capabilities over time
 - **Zero-token access**: MANUAL_OPERATIONS.md lets humans check project state without starting an agent session
@@ -165,7 +165,7 @@ graph TB
 
 **Key Practices**:
 - **Scripts > Documentation**: `wip.sh check` returns exit code, doesn't just advise
-- **Hard gates for hard rules**: Pre-commit hooks block if WIP.md exists or acceptance files missing
+- **Hard gates for hard rules**: Pre-commit hooks block if AGENTS.json has active WIP or acceptance files missing
 - **Soft warnings for soft signals**: Scope drift, change size — WARN, don't block (human judges)
 - **Machine-readable specs**: YAML frontmatter enables automated validation (not just human reading)
 - **Graceful degradation**: Advisory guidelines may be skipped by some agents; script-enforced rules cannot be. Framework remains functional even with partial guideline compliance.

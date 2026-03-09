@@ -72,7 +72,7 @@ Multiple agents CAN work on different features simultaneously using Git worktree
 
 **Rules for parallel work:**
 - Each agent follows "one feature at a time" in their own worktree
-- Register in `.agentic/session/AGENTS_ACTIVE.md`
+- Register in `.agentic/session/AGENTS.json` (via `wip.sh start`)
 - Avoid touching the same files
 - See `workflows/multi_agent_coordination.md`
 

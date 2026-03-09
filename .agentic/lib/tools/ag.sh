@@ -28,6 +28,19 @@ fi
 # Profile resolved via settings.sh (sourced above)
 PROFILE=$(get_setting "profile" "discovery")
 
+# ---------------------------------------------------------------------------
+# AGENTS.json helpers (F-0194: replaces direct WIP.md checks)
+# ---------------------------------------------------------------------------
+_agents_py() {
+    python3 "$SCRIPT_DIR/agents_helpers.py" --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" "$@" 2>/dev/null
+}
+_has_active_wip() {
+    _agents_py check-worktree "$PROJECT_ROOT" >/dev/null 2>&1
+}
+_get_wip_feature() {
+    _agents_py get-current-feature 2>/dev/null || echo ""
+}
+
 # Check if framework is installed but not initialized
 check_initialization() {
     local issues=()
@@ -138,6 +151,7 @@ COMMANDS:
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
     nfr [sub]           NFR management (list, discover, coverage)
+    worktree <sub>      Manage git worktrees (create|list|remove|path|status)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -205,6 +219,7 @@ COMMANDS:
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
     nfr [sub]           NFR management (list, discover, coverage)
+    worktree <sub>      Manage git worktrees (create|list|remove|path|status)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -296,20 +311,20 @@ cmd_start() {
     echo -e "${BOLD}=== Session Start ===${NC}"
     echo ""
 
-    # 1. Check for other active agents
-    if [ -f "$ROOT_DIR/.agentic/session/AGENTS_ACTIVE.md" ]; then
-        local active_count
-        active_count=$(grep -c "^##" "$ROOT_DIR/.agentic/session/AGENTS_ACTIVE.md" 2>/dev/null || echo "0")
-        if [ "$active_count" -gt 0 ]; then
-            echo -e "${YELLOW}Multi-agent: $active_count agent(s) active${NC}"
-            head -20 "$ROOT_DIR/.agentic/session/AGENTS_ACTIVE.md" 2>/dev/null | grep "^##" || true
-            echo ""
-        fi
+    # 1. Check for other active agents (AGENTS.json)
+    if _has_active_wip; then
+        echo -e "${YELLOW}Active agent(s) detected:${NC}"
+        _agents_py list 2>/dev/null || true
+        echo ""
     fi
 
-    # 2. Check for WIP (interrupted work)
-    if [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
+    # 2. Check for WIP (interrupted work) — AGENTS.json, with WIP.md fallback
+    if _has_active_wip; then
         echo -e "${YELLOW}WIP detected - previous work was interrupted${NC}"
+        bash "$SCRIPT_DIR/wip.sh" check 2>/dev/null || true
+        echo ""
+    elif [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
+        echo -e "${YELLOW}WIP detected (legacy WIP.md) - previous work was interrupted${NC}"
         bash "$SCRIPT_DIR/wip.sh" check 2>/dev/null || true
         echo ""
     fi
@@ -542,10 +557,10 @@ cmd_work() {
     echo "Task: $description"
     echo ""
 
-    # Start WIP tracking
+    # Start WIP tracking (writes to AGENTS.json)
     echo "Starting WIP tracking..."
     bash "$SCRIPT_DIR/wip.sh" start "task" "$description" "" 2>/dev/null || \
-        echo -e "${YELLOW}WIP tracking not started (wip.sh not available or already active)${NC}"
+        echo -e "${YELLOW}WIP tracking not started (already active or unavailable)${NC}"
 
     echo ""
     echo -e "${GREEN}Ready to work on: $description${NC}"
@@ -776,17 +791,14 @@ cmd_implement() {
     echo -e "${BOLD}=== Implement: $feature_id ===${NC}"
     echo ""
 
-    # 0a. Check: one feature at a time (WIP conflict detection)
-    if [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
-        # WIP.md format: "- **Feature**: F-XXXX: description" (from wip.sh line 159)
-        local current_wip
-        current_wip=$(grep -oE 'F-[0-9]{4}' "$ROOT_DIR/.agentic/session/WIP.md" | head -1)
-        if [ -n "$current_wip" ] && [ "$current_wip" != "$feature_id" ]; then
-            echo -e "${RED}BLOCKED: $current_wip is already in progress${NC}"
-            echo "  Complete it first: ag done $current_wip"
-            echo "  Or clear WIP: bash .agentic/lib/tools/wip.sh complete"
-            exit 1
-        fi
+    # 0a. Check: one feature at a time (WIP conflict detection via AGENTS.json)
+    local current_wip
+    current_wip=$(_get_wip_feature)
+    if [ -n "$current_wip" ] && [ "$current_wip" != "$feature_id" ]; then
+        echo -e "${RED}BLOCKED: $current_wip is already in progress${NC}"
+        echo "  Complete it first: ag done $current_wip"
+        echo "  Or clear WIP: bash .agentic/lib/tools/wip.sh complete"
+        exit 1
     fi
 
     # 0b. Backlog gate
@@ -912,18 +924,37 @@ cmd_implement() {
         exit 1
     fi
 
-    # 4. Start WIP tracking
-    echo ""
-    echo "Starting WIP tracking..."
-
-    # Get feature name from FEATURES.md if available
+    # 4. Get feature name from FEATURES.md if available
     local feature_name=""
     if [ -f "$features_file" ]; then
         feature_name=$(grep "^## ${feature_id}:" "$features_file" | sed "s/^## ${feature_id}: //" || echo "")
     fi
 
-    bash "$SCRIPT_DIR/wip.sh" start "$feature_id" "${feature_name:-$feature_id}" "" 2>/dev/null || \
-        echo -e "${YELLOW}WIP tracking not started (wip.sh not available or already active)${NC}"
+    # 5. Worktree creation (when worktree_mode == always)
+    local wt_mode
+    wt_mode=$(get_setting "worktree_mode" "off")
+    local worktree_path=""
+
+    if [ "$wt_mode" = "always" ]; then
+        echo ""
+        echo "Creating worktree for ${feature_id}..."
+        worktree_path=$(bash "$SCRIPT_DIR/worktree.sh" create "$feature_id" "${feature_name:-$feature_id}" 2>/dev/null | tail -1) || true
+        if [ -n "$worktree_path" ] && [ -d "$worktree_path" ]; then
+            echo -e "${GREEN}Worktree ready: $worktree_path${NC}"
+            echo "  cd $worktree_path"
+            echo "  Then run: bash .agentic/lib/tools/wip.sh start $feature_id \"${feature_name:-$feature_id}\" \"\""
+        else
+            echo -e "${YELLOW}Worktree creation failed — continuing in main repo${NC}"
+        fi
+    fi
+
+    # 6. Start WIP tracking (skip if worktree_mode=always — agent starts WIP in worktree)
+    if [ "$wt_mode" != "always" ]; then
+        echo ""
+        echo "Starting WIP tracking..."
+        bash "$SCRIPT_DIR/wip.sh" start "$feature_id" "${feature_name:-$feature_id}" "" 2>/dev/null || \
+            echo -e "${YELLOW}WIP tracking not started (already active or unavailable)${NC}"
+    fi
 
     echo ""
     echo -e "${GREEN}Ready to implement ${feature_id}${NC}"
@@ -939,16 +970,16 @@ cmd_commit() {
     echo -e "${BOLD}=== Pre-Commit Gates ===${NC}"
     echo ""
 
-    # 1. Check WIP exists
+    # 1. Check WIP exists (AGENTS.json, with WIP.md fallback)
     local wip_mode
     wip_mode=$(get_setting "wip_before_commit" "warning")
-    if [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
+    if _has_active_wip || [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
         if [ "$wip_mode" = "warning" ]; then
-            echo -e "${YELLOW}WARNING: .agentic/session/WIP.md exists${NC}"
+            echo -e "${YELLOW}WARNING: Active WIP detected${NC}"
             echo "  Consider completing WIP: bash .agentic/lib/tools/wip.sh complete"
             echo ""
         else
-            echo -e "${RED}BLOCKED: .agentic/session/WIP.md exists${NC}"
+            echo -e "${RED}BLOCKED: Active WIP detected${NC}"
             echo "  Work-in-progress must be completed before committing."
             echo "  Run: bash .agentic/lib/tools/wip.sh complete"
             echo ""
@@ -1047,7 +1078,7 @@ cmd_done() {
         fi
         echo ""
         # Check if WIP is complete
-        if [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
+        if _has_active_wip || [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
             echo -e "${YELLOW}Note: WIP tracking still active. Complete it with:${NC}"
             echo "  bash .agentic/lib/tools/wip.sh complete"
         fi
@@ -1260,7 +1291,7 @@ cmd_done() {
     echo "Full checklist: .agentic/lib/checklists/feature_complete.md"
 
     # Check if WIP is complete
-    if [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
+    if _has_active_wip || [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
         echo ""
         echo -e "${YELLOW}Note: WIP tracking still active. Complete it with:${NC}"
         echo "  bash .agentic/lib/tools/wip.sh complete"
@@ -1354,8 +1385,12 @@ cmd_docs() {
         feature_id="$arg1"
         shift 2>/dev/null || true
         arg1="${1:-}"
-    elif [[ -f "$ROOT_DIR/.agentic/session/WIP.md" ]]; then
-        feature_id=$(grep -oE 'F-[0-9]{4}' "$ROOT_DIR/.agentic/session/WIP.md" 2>/dev/null | head -1 || true)
+    else
+        # Try AGENTS.json first, then WIP.md fallback
+        feature_id=$(_get_wip_feature)
+        if [[ -z "$feature_id" ]] && [[ -f "$ROOT_DIR/.agentic/session/WIP.md" ]]; then
+            feature_id=$(grep -oE 'F-[0-9]{4}' "$ROOT_DIR/.agentic/session/WIP.md" 2>/dev/null | head -1 || true)
+        fi
     fi
 
     case "$arg1" in
@@ -1723,9 +1758,12 @@ cmd_status() {
     get_verification_summary
     echo ""
 
-    # WIP status
-    if [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
+    # WIP status (AGENTS.json, with WIP.md fallback)
+    if _has_active_wip; then
         echo -e "${YELLOW}Active WIP:${NC}"
+        _agents_py list 2>/dev/null || true
+    elif [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
+        echo -e "${YELLOW}Active WIP (legacy):${NC}"
         head -10 "$ROOT_DIR/.agentic/session/WIP.md" 2>/dev/null | grep -E "^(Feature|Task|Started|Last):" || true
     else
         echo "No active WIP"
@@ -2875,6 +2913,10 @@ case "${1:-help}" in
     nfr)
         shift
         cmd_nfr "$@"
+        ;;
+    worktree)
+        shift
+        bash "$SCRIPT_DIR/worktree.sh" "$@"
         ;;
     sync)
         cmd_sync "${2:-}"

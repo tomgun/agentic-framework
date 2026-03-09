@@ -7,6 +7,8 @@ phase: implementation
 
 # Multi-Agent Coordination Protocol
 
+**Note (F-0194)**: Multi-agent coordination now uses AGENTS.json instead of AGENTS_ACTIVE.md. The `wip.sh` tool handles the migration transparently. Legacy AGENTS_ACTIVE.md is still supported as fallback.
+
 **Purpose**: Enable multiple AI agents to work simultaneously on different features without conflicts, using Git worktrees and coordination files.
 
 ---
@@ -90,7 +92,7 @@ Use Git worktrees for **parallel work on different features**:
 ```bash
 # Main worktree (coordination hub)
 /Users/dev/project/           # main branch
-├── .agentic/session/AGENTS_ACTIVE.md          # Shared coordination file
+├── .agentic/session/AGENTS.json          # Shared coordination file
 ├── STACK.md                  # Shared (read-only for workers)
 ├── CONTEXT_PACK.md           # Shared (read-only for workers)
 ├── spec/                     # Shared specs
@@ -136,13 +138,13 @@ git worktree list
 
 **Each agent now works in their own directory.**
 
-## Coordination File: `.agentic/session/AGENTS_ACTIVE.md`
+## Coordination File: `.agentic/session/AGENTS.json`
 
 **Location**: Repo root (main worktree)
 
-**Purpose**: Central coordination hub for all agents
+**Purpose**: Central coordination hub for all agents (replaces legacy AGENTS_ACTIVE.md)
 
-**Template:**
+**Legacy template (now stored as JSON in AGENTS.json):**
 
 ```markdown
 # Active Agents
@@ -215,9 +217,9 @@ Last sync: 2026-01-02 16:00
 **Every agent must:**
 
 1. **Open their worktree** (not main repo)
-2. **Read `.agentic/session/AGENTS_ACTIVE.md`** from main worktree:
+2. **Read `.agentic/session/AGENTS.json`** from main worktree:
    ```bash
-   cat /Users/dev/project/.agentic/session/AGENTS_ACTIVE.md
+   cat /Users/dev/project/.agentic/session/AGENTS.json
    ```
 3. **Update their entry**:
    - Last update timestamp
@@ -237,23 +239,23 @@ Last sync: 2026-01-02 16:00
 Agent 1: "Starting session in worktree /Users/dev/project-F0042
           Feature: F-0042 (password validation)
           
-          Checking .agentic/session/AGENTS_ACTIVE.md...
+          Checking .agentic/session/AGENTS.json...
           - Agent 2 is working on F-0043 (profile page), blocked by my work
           - Agent 3 is working on F-0044 (emails), independent
           - No file conflicts detected
           
-          Proceeding with implementation. Will update .agentic/session/AGENTS_ACTIVE.md every 15 min."
+          Proceeding with implementation. Will update .agentic/session/AGENTS.json every 15 min."
 ```
 
 ### Phase 2: During Work
 
-**Every 15-30 minutes, agent updates `.agentic/session/AGENTS_ACTIVE.md`:**
+**Every 15-30 minutes, agent updates `.agentic/session/AGENTS.json`:**
 
 ```bash
 # From agent's worktree, access main worktree file
 cd /Users/dev/project  # Main worktree
-# Edit .agentic/session/AGENTS_ACTIVE.md: update "Last update", "Phase", "Notes"
-git add .agentic/session/AGENTS_ACTIVE.md
+# Edit .agentic/session/AGENTS.json: update "Last update", "Phase", "Notes"
+git add .agentic/session/AGENTS.json
 git commit -m "docs: Agent 1 progress update (F-0042 60% done)"
 git push origin main
 ```
@@ -270,7 +272,7 @@ git push origin main
 
 **If file conflict detected:**
 - Check if another agent is editing the same file
-- Coordinate in `.agentic/session/AGENTS_ACTIVE.md` notes: "Coordinating with Agent 2 on FEATURES.md edits"
+- Coordinate in `.agentic/session/AGENTS.json` notes: "Coordinating with Agent 2 on FEATURES.md edits"
 
 ### Phase 3: Before Committing
 
@@ -285,7 +287,7 @@ git push origin main
    - If trivial (docs): Resolve automatically
    - If non-trivial (code): Present to human for review
 3. **Re-run tests** after merge
-4. **Update `.agentic/session/AGENTS_ACTIVE.md`** (mark ready for review):
+4. **Update `.agentic/session/AGENTS.json`** (mark ready for review):
    ```markdown
    - **Status**: ready_for_review
    - **Phase**: complete
@@ -305,7 +307,7 @@ gh pr create \
   --label "agent-generated"
 ```
 
-**Update `.agentic/session/AGENTS_ACTIVE.md`:**
+**Update `.agentic/session/AGENTS.json`:**
 
 ```markdown
 - **Status**: pr_created
@@ -317,7 +319,7 @@ gh pr create \
 
 **Agent or orchestrator:**
 
-1. **Update `.agentic/session/AGENTS_ACTIVE.md`**:
+1. **Update `.agentic/session/AGENTS.json`**:
    - Move entry to "Recent Merges" section
    - Remove from active list (or mark status: complete)
 2. **Notify dependent agents**:
@@ -340,7 +342,7 @@ gh pr create \
 | `spec/TECH_SPEC.md` | Main worktree | Read-only | Tech decisions, don't edit |
 | `.agentic/spec/NFR.md` | Main worktree | Read-only | Constraints, don't edit |
 | **Coordination (Shared Write)** ||||
-| `.agentic/session/AGENTS_ACTIVE.md` | Main worktree | ⚠️ Update your entry only | Central coordination |
+| `.agentic/session/AGENTS.json` | Main worktree | ⚠️ Update your entry only | Central coordination |
 | `.agentic/spec/FEATURES.md` | Main worktree | ⚠️ Update your feature only | Lock before editing |
 | **Per-Agent (Private)** ||||
 | `.agentic/STATUS.md` | Agent worktree | Read/write freely | Your local status |
@@ -353,7 +355,7 @@ gh pr create \
 
 **Before editing shared files:**
 
-1. **Check `.agentic/session/AGENTS_ACTIVE.md` → "Shared File Locks"**
+1. **Check `.agentic/session/AGENTS.json` → "Shared File Locks"**
 2. **If file is locked**: Wait or coordinate
 3. **If file is free**: Add lock entry
    ```markdown
@@ -377,7 +379,7 @@ gh pr create \
 
 **Option A: Wait (if tightly coupled)**
 ```markdown
-# Agent 2 in .agentic/session/AGENTS_ACTIVE.md
+# Agent 2 in .agentic/session/AGENTS.json
 - **Status**: blocked
 - **Blocked by**: F-0042 (needs validatePassword function)
 - **Notes**: Waiting for F-0042 to merge. Will start UI design in meantime.
@@ -405,7 +407,7 @@ function validatePassword(password: string): boolean {
 
 **Strategy:**
 
-1. **Coordinate in `.agentic/session/AGENTS_ACTIVE.md`**:
+1. **Coordinate in `.agentic/session/AGENTS.json`**:
    ```markdown
    ## Coordination Notes
    - Agent 1 & Agent 2: Both need User type changes
@@ -428,19 +430,19 @@ function validatePassword(password: string): boolean {
 **Responsibilities:**
 
 1. **Assign features** to worker agents
-2. **Maintain `.agentic/session/AGENTS_ACTIVE.md`** (update statuses, merge queue)
+2. **Maintain `.agentic/session/AGENTS.json`** (update statuses, merge queue)
 3. **Resolve conflicts** (prioritize work, reorder merge queue)
 4. **Merge PRs** in dependency order
 5. **Update shared docs** after merges (FEATURES.md, CONTEXT_PACK.md)
 6. **Monitor progress** (check if agents are blocked)
 
-**Not needed for**: 2-3 agents with independent features (self-coordination via .agentic/session/AGENTS_ACTIVE.md)
+**Not needed for**: 2-3 agents with independent features (self-coordination via .agentic/session/AGENTS.json)
 
 **Orchestrator workflow:**
 
 ```markdown
 # Orchestrator session (every 30-60 min)
-1. Read all agent entries in .agentic/session/AGENTS_ACTIVE.md
+1. Read all agent entries in .agentic/session/AGENTS.json
 2. Check for blockers:
    - Is Agent 2 blocked by Agent 1? → Prioritize Agent 1's PR review
    - Are agents editing same files? → Coordinate sequencing
@@ -449,7 +451,7 @@ function validatePassword(password: string): boolean {
    - Wait for Agent 2 to rebase and update PR
    - Merge F-0043
 4. Update shared docs (FEATURES.md, CONTEXT_PACK.md) after merges
-5. Notify agents of changes via .agentic/session/AGENTS_ACTIVE.md notes
+5. Notify agents of changes via .agentic/session/AGENTS.json notes
 ```
 
 ## Conflict Resolution
@@ -474,7 +476,7 @@ git merge origin/main
 4. **Agents continue**
 
 **Prevention:**
-- Coordinate in `.agentic/session/AGENTS_ACTIVE.md` before editing shared files
+- Coordinate in `.agentic/session/AGENTS.json` before editing shared files
 - Use feature branches (not shared branches)
 - Keep features small and independent
 
@@ -483,7 +485,7 @@ git merge origin/main
 **Scenario**: Agent 1 and Agent 2 both need resource X
 
 **Resolution:**
-1. **Check `.agentic/session/AGENTS_ACTIVE.md` → Merge Queue`**: Who's ahead?
+1. **Check `.agentic/session/AGENTS.json` → Merge Queue`**: Who's ahead?
 2. **Follow queue order**: First come, first served
 3. **Or human decides**: "Agent 1 is higher priority, Agent 2 waits"
 
@@ -500,7 +502,7 @@ git merge origin/main
 
 > **TODO (F-0108)**: The scripts below are planned but not yet implemented. For now use:
 > - `worktree.sh` for Git worktree management
-> - `.agentic/session/AGENTS_ACTIVE.md` for manual coordination
+> - `.agentic/session/AGENTS.json` for manual coordination
 > - `wip.sh` for work-in-progress tracking
 
 ### `.agentic/lib/tools/agents_active.sh` (TODO)
@@ -509,7 +511,7 @@ git merge origin/main
 #!/usr/bin/env bash
 # Show active agents and their status
 
-cat .agentic/session/AGENTS_ACTIVE.md | grep -A 10 "^## Agent"
+cat .agentic/session/AGENTS.json | grep -A 10 "^## Agent"
 ```
 
 ### `.agentic/lib/tools/check_agent_conflicts.sh` (TODO)
@@ -521,7 +523,7 @@ cat .agentic/session/AGENTS_ACTIVE.md | grep -A 10 "^## Agent"
 AGENT_ID=$1
 FILES_EDITING=$2  # Comma-separated
 
-# Parse .agentic/session/AGENTS_ACTIVE.md
+# Parse .agentic/session/AGENTS.json
 # Check if FILES_EDITING overlap with other agents' "Files editing"
 # Output: conflicts or "No conflicts detected"
 ```
@@ -544,7 +546,7 @@ done
 
 ### For Agents:
 
-1. **Update `.agentic/session/AGENTS_ACTIVE.md` frequently** (every 15-30 min)
+1. **Update `.agentic/session/AGENTS.json` frequently** (every 15-30 min)
 2. **Check for blockers** before starting work
 3. **Coordinate on shared files** (use locks)
 4. **Pull main frequently** (every hour or before committing)
@@ -555,13 +557,13 @@ done
 1. **Assign independent features** to different agents
 2. **Review PRs quickly** (don't let agents block each other)
 3. **Resolve conflicts promptly** (agents can't do this well)
-4. **Monitor `.agentic/session/AGENTS_ACTIVE.md`** (check for stuck agents)
+4. **Monitor `.agentic/session/AGENTS.json`** (check for stuck agents)
 5. **Start with 2 agents**, scale up only if working well
 
 ### For Teams:
 
 1. **Use orchestrator agent** for 4+ agents
-2. **Daily sync meetings** (or async updates via .agentic/session/AGENTS_ACTIVE.md)
+2. **Daily sync meetings** (or async updates via .agentic/session/AGENTS.json)
 3. **Clear feature ownership** (one feature = one agent)
 4. **Define integration points** upfront (APIs, interfaces)
 5. **Automate testing** (catch integration bugs early)
@@ -611,7 +613,7 @@ Agent 2: Still blocked, working on docs
 **Day 2 (10:00):**
 ```
 Human: Reviews PR #123 (Agent 1), merges
-Agent 1: Updates .agentic/session/AGENTS_ACTIVE.md: "F-0042 merged"
+Agent 1: Updates .agentic/session/AGENTS.json: "F-0042 merged"
 Agent 2: Pulls main, integrates auth, completes F-0043, PR created (#125)
 Human: Merges PR #124 (Agent 3) - independent, no conflicts
 ```
@@ -625,7 +627,7 @@ All features complete!
 ## Troubleshooting
 
 ### "Agent is stuck/blocked"
-- Check `.agentic/session/AGENTS_ACTIVE.md` → "Blocked by"
+- Check `.agentic/session/AGENTS.json` → "Blocked by"
 - Prioritize unblocking PR review/merge
 - Consider reassigning feature if blocker is long-term
 
@@ -634,7 +636,7 @@ All features complete!
 - Agents editing same files → Use file locks or sequential work
 - Merge more frequently → Don't let branches diverge
 
-### ".agentic/session/AGENTS_ACTIVE.md not being updated"
+### ".agentic/session/AGENTS.json not being updated"
 - Remind agents to update every 15-30 min
 - Add to agent guidelines as non-negotiable
 - Use orchestrator to monitor and prompt updates

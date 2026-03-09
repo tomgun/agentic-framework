@@ -36,6 +36,8 @@ Purpose: Configuration for developing the Agentic Framework itself.
 # Doc staleness check at ag done. Profile defaults — Discovery: off | Formal: blocking
 - spec_analysis: on
 # Advisory spec analysis before implementation. Profile defaults — Discovery: off | Formal: on
+- worktree_mode: off
+# Auto-create worktrees for feature branches. Options: off | always. Profile defaults — Discovery: off | Formal: off
 - docs_stale_days: 30
 # Days before a doc is flagged stale by docs.sh. Default: 30
 

@@ -88,6 +88,8 @@ echo "--- Test 1: Direct sourcing ---"
     assert_set "SESSION_DIR set" "$SESSION_DIR"
     assert_set "WIP_FILE set" "$WIP_FILE"
     assert_set "AGENTS_ACTIVE_FILE set" "$AGENTS_ACTIVE_FILE"
+    assert_set "AGENTS_JSON set" "$AGENTS_JSON"
+    assert_set "MAIN_PROJECT_ROOT set" "$MAIN_PROJECT_ROOT"
 
     # Framework dirs
     assert_set "TOOLS_DIR set" "$TOOLS_DIR"
