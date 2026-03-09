@@ -1,12 +1,19 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.51.0)
+**Period**: Initial Development (v0.1.0 → v0.52.0)
 **Date**: 2026-03-09
 
 ---
 
 ## Recent Contributions
+
+### Clean Session Dashboard + Agent-Agnostic Enforcement (v0.52.0)
+
+**User insight**: Tomas caught that `dashboard.sh` was placed exclusively in `.claude/skills/` — violating the agent-agnostic principle. Key contributions:
+- **"Nothing in this framework is Claude-only"**: The practical rule was implicit (PRINCIPLES.md D7 says "multi-environment portability") but nowhere did it say "scripts go in `.agentic/`, not `.claude/`". Tomas identified that the rule needs to be explicit in FRAMEWORK_DEVELOPMENT.md where framework developers actually read it.
+- **Auto-memory is machine-local**: Pointed out that framework-dev lessons stored in auto-memory (`~/.claude/projects/`) are invisible on other machines. Durable lessons must live in the repo (FRAMEWORK_DEVELOPMENT.md), not in local memory files. Led to migrating all lessons from `patterns.md` to a new "Lessons Learned" section.
+- **Plans given as messages don't auto-save**: Identified that plans pasted as user messages (vs. created through plan mode) never get saved to `~/.claude/plans/`, so the "copy plan after approval" rule silently doesn't apply.
 
 ### AGENTS.json Registry + Worktree-by-Default (v0.51.0, F-0194)
 
