@@ -8,6 +8,10 @@
 
 ## Recent Contributions
 
+### Dashboard Renders Itself (v0.52.2)
+
+**User insight**: Tomas observed that despite multiple rounds of instruction hardening, agents still reformatted or narrated the dashboard — because the design asked agents to parse structured `===SECTION===` markers and render a formatted dashboard from data. This was inherently fragile: every agent (Claude, Cursor, Copilot) had to implement the same rendering logic, and each had different failure modes. The fix was architectural: move rendering INTO `dashboard.sh` itself so it outputs the final emoji-bordered dashboard ready to display. Agents now just run one tool call and output verbatim — zero parsing, zero rendering, zero divergence. Added `--raw` flag for scripts that still need structured data. Simplified all 7 instruction files from complex "parse and render" instructions to "output verbatim."
+
 ### Multi-Session Collision Prevention (v0.52.2, F-0195)
 
 **User insight**: Tomas caught gaps in the implementation during review:

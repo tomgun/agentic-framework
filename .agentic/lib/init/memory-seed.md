@@ -127,11 +127,13 @@ Never read or edit these files directly. Always use the scripts:
 
 ## Session start
 
-When a session begins, immediately:
+When a session begins, issue ONE tool call:
 
-1. Silently read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, last 2-3 .agentic/journal/JOURNAL.md entries
-2. Run `bash .agentic/lib/tools/wip.sh check` for interrupted work
-3. Show ONLY the dashboard — no text before it. No "let me check...", no narration. The dashboard is the first thing the user sees.
+```bash
+bash .agentic/lib/tools/dashboard.sh 2>/dev/null
+```
+
+Output the result **verbatim** as your first text response. No other tool calls, no preamble, no narration, no reformatting. The script renders the final dashboard (with emoji, borders, next steps). Just copy its output.
 
 ## NFR proactive suggestion
 

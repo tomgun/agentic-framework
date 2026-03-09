@@ -1,5 +1,5 @@
 ---
-summary: "Initialize session: check WIP, read state files, greet user with dashboard"
+summary: "Initialize session: check AGENTS.json for WIP, read state files, greet user with dashboard"
 trigger: "session start, first message, where were we, ag start"
 tokens: ~3500
 phase: session
@@ -17,19 +17,19 @@ phase: session
 
 **When a new session starts (first message, tokens reset, or user returns), automatically:**
 
-## Step 1: Quick Context Scan (Silent — NO text output)
+## Step 1: Quick Context Scan (ONE tool call, verbatim output)
 
-**CRITICAL**: Do NOT output any text before the dashboard. No "Starting session...", no "Let me check the current state", no narration. Run tool calls silently, then the dashboard is your FIRST text output.
+**CRITICAL**: Do NOT output any text before the dashboard. No "Starting session...", no "Let me check the current state", no narration.
+
+**CRITICAL**: Issue exactly ONE tool call:
 
 ```bash
-# Read these silently (don't dump to user)
-# IMPORTANT: Every command must have "|| true" to prevent exit code errors
-cat STATUS.md 2>/dev/null || true
-cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
-python3 .agentic/lib/tools/agents_helpers.py --project-root . list 2>/dev/null || true
-bash .agentic/lib/tools/wip.sh check 2>/dev/null || true
-bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
+bash .agentic/lib/tools/dashboard.sh 2>/dev/null
 ```
+
+This consolidates STATUS, JOURNAL, HUMAN_NEEDED, WIP, backlog, agents, health AND renders the final dashboard. Output the result **verbatim** as your first text response — no reformatting, no summarizing, no wrapping in markdown.
+
+Do NOT add Read calls (JOURNAL.md, STATUS.md, etc.) — `dashboard.sh` covers everything. Extra tool calls add visible noise before the dashboard.
 
 ## Step 2: Greet User with Recap
 
@@ -47,7 +47,8 @@ bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
 2. [Second option if exists]
 3. [Review blockers in HUMAN_NEEDED.md - if any exist]
 
-**Available workflows**: `ag plan` (plan-review before building) | `ag sync` (detect & fix drift)
+**Backlog**: [Current item from BACKLOG.json, or "empty"]
+**Available workflows**: `ag plan` (plan-review before building) | `ag sync` (detect & fix drift) | `ag backlog` (work queue)
 
 💡 **Tip**: [Random framework tip — shown automatically by `ag start`]
 
@@ -56,10 +57,10 @@ What would you like to work on?
 
 ## Step 3: Handle Special Cases
 
-**If interrupted work detected** (via `wip.sh check` or AGENTS.json):
+**If `wip.sh check` detects interrupted work** (via AGENTS.json):
 ```
 ⚠️ Previous work was interrupted!
-Feature: [from AGENTS.json or WIP.md fallback]
+Feature: [from AGENTS.json WIP entry]
 Files changed: [from AGENTS.json or git diff]
 
 Options:
@@ -83,7 +84,7 @@ I'll quickly apply the updates, then we'll continue.
 [Handle upgrade, then return to normal greeting]
 ```
 
-**If AGENTS.json shows other agents working**:
+**If AGENTS.json shows other agents working** (via `agents_helpers.py list`):
 ```
 👥 Another agent is currently active!
 
@@ -92,14 +93,14 @@ Agent 1 (Claude - Main Window):
 - Files: [their files]
 
 To avoid conflicts, I should work on different files/features.
-What would you like me to work on? (I'll register via wip.sh start)
+What would you like me to work on? (I'll register myself in AGENTS.json)
 ```
 
 **CRITICAL - Multi-agent coordination:**
-1. **Check AGENTS.json** (`python3 .agentic/lib/tools/agents_helpers.py --project-root . list`) to see who else is working
-2. **Register yourself** via `wip.sh start` (auto-creates AGENTS.json entry)
+1. **Query AGENTS.json** (via `agents_helpers.py list`) to see who else is working
+2. **Register yourself** via `agents_helpers.py register`
 3. **Avoid their files** - pick different features/files
-4. **Update when done** - `wip.sh complete` removes your entry
+4. **Update when done** - deregister via `agents_helpers.py deregister`
 
 ---
 
@@ -118,7 +119,7 @@ What would you like me to work on? (I'll register via wip.sh start)
 
 **If interrupted work detected (exit code 1):**
 - ⚠️ Previous session stopped mid-task (tokens out, crash, or abrupt close)
-- AGENTS.json (or WIP.md fallback) shows what was in progress
+- AGENTS.json shows what was in progress
 - Git diff shows uncommitted changes
 - **STOP and review before continuing!**
 
@@ -281,7 +282,7 @@ This is a **suggestion**, not a block. The user may choose to work on something 
   - Look at `.agentic/STATUS.md` → "Current focus"
   - Read relevant `.agentic/spec/acceptance/F-####.md` if working on feature
   - Check `.agentic/spec/FEATURES.md` for that feature's status
-  - **If in-progress work exists** (WIP.md or active branch): verify it has an F-XXXX in FEATURES.md with acceptance criteria. If missing, create them before continuing.
+  - **If in-progress work exists** (AGENTS.json WIP or active branch): verify it has an F-XXXX in FEATURES.md with acceptance criteria. If missing, create them before continuing.
 
 - [ ] **If `pipeline_enabled: yes`**: Check for active pipeline
   - Look for `.agentic/pipeline/F-####-pipeline.md`
@@ -333,6 +334,11 @@ This is a **suggestion**, not a block. The user may choose to work on something 
 
 ## Proactive Context Setting (Make Collaboration Fluent)
 
+- [ ] **Check backlog** (from `.agentic/BACKLOG.json`)
+  - If backlog exists and has items, position 0 = current work
+  - Show current item prominently: "Backlog says current work is F-XXXX: [description]"
+  - Suggest: `ag implement F-XXXX` to resume, or `ag backlog list` to see full queue
+
 - [ ] **Check for planned work** (from `.agentic/STATUS.md`)
   - Read "Next up" or "Next immediate step" section
   - Identify 2-3 highest priority items
@@ -370,9 +376,10 @@ After completing checklist, provide structured summary:
 
 ## Anti-Patterns
 
-❌ **Don't** read entire codebase at session start  
-❌ **Don't** skip JOURNAL.md (you'll repeat mistakes)  
-❌ **Don't** assume you know the status (check STATUS.md)  
+❌ **Don't** output text before the dashboard (no "let me check...", no preamble)
+❌ **Don't** read entire codebase at session start
+❌ **Don't** skip JOURNAL.md (you'll repeat mistakes)
+❌ **Don't** assume you know the status (check STATUS.md)
 ❌ **Don't** start coding without this checklist  
 
 ✅ **Do** follow token budget strictly  
