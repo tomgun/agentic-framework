@@ -71,7 +71,7 @@ If `.agentic/BACKLOG.json` exists and the completed feature is at position 0:
 bash .agentic/lib/tools/backlog.sh done
 ```
 
-This removes the completed item and promotes the next. Include BACKLOG.json in the next commit.
+This removes the completed item and promotes the next item to position 0. The command is a no-op if the completed feature is not at position 0. Include BACKLOG.json in the next commit.
 
 ### Step 5: Flush Pending Items
 
