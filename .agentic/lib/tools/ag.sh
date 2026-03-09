@@ -32,13 +32,14 @@ PROFILE=$(get_setting "profile" "discovery")
 # AGENTS.json helpers (F-0194: replaces direct WIP.md checks)
 # ---------------------------------------------------------------------------
 _agents_py() {
-    python3 "$SCRIPT_DIR/agents_helpers.py" --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" "$@" 2>/dev/null
+    command -v python3 >/dev/null 2>&1 || return 1
+    python3 "$SCRIPT_DIR/agents_helpers.py" --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" "$@"
 }
 _has_active_wip() {
     _agents_py check-worktree "$PROJECT_ROOT" >/dev/null 2>&1
 }
 _get_wip_feature() {
-    _agents_py get-current-feature 2>/dev/null || echo ""
+    _agents_py get-current-feature "$PROJECT_ROOT" 2>/dev/null || echo ""
 }
 
 # Check if framework is installed but not initialized
@@ -311,14 +312,16 @@ cmd_start() {
     echo -e "${BOLD}=== Session Start ===${NC}"
     echo ""
 
-    # 1. Check for other active agents (AGENTS.json)
-    if _has_active_wip; then
+    # 1. Check for other active agents (AGENTS.json — all entries, not just this worktree)
+    local _all_agents
+    _all_agents=$(_agents_py list 2>/dev/null || true)
+    if echo "$_all_agents" | grep -q '\[active\]\|\[created\]'; then
         echo -e "${YELLOW}Active agent(s) detected:${NC}"
-        _agents_py list 2>/dev/null || true
+        echo "$_all_agents"
         echo ""
     fi
 
-    # 2. Check for WIP (interrupted work) — AGENTS.json, with WIP.md fallback
+    # 2. Check for WIP (interrupted work) — this worktree only
     if _has_active_wip; then
         echo -e "${YELLOW}WIP detected - previous work was interrupted${NC}"
         bash "$SCRIPT_DIR/wip.sh" check 2>/dev/null || true
@@ -1295,6 +1298,24 @@ cmd_done() {
         echo ""
         echo -e "${YELLOW}Note: WIP tracking still active. Complete it with:${NC}"
         echo "  bash .agentic/lib/tools/wip.sh complete"
+    fi
+
+    # Worktree auto-cleanup (when worktree_mode=always and feature_id provided)
+    local wt_mode
+    wt_mode=$(get_setting "worktree_mode" "off")
+    if [ "$wt_mode" = "always" ] && [ -n "$feature_id" ]; then
+        local wt_path
+        wt_path=$(bash "$SCRIPT_DIR/worktree.sh" path "$feature_id" 2>/dev/null) || wt_path=""
+        if [ -n "$wt_path" ] && [ -d "$wt_path" ]; then
+            echo ""
+            echo -e "${BOLD}=== Worktree Cleanup ===${NC}"
+            if bash "$SCRIPT_DIR/worktree.sh" auto-remove "$feature_id" 2>/dev/null; then
+                echo -e "${GREEN}✓ Worktree cleaned up${NC}"
+            else
+                echo -e "${YELLOW}⚠ Worktree has uncommitted changes — preserved at: $wt_path${NC}"
+                echo "  Clean up manually after committing/discarding changes"
+            fi
+        fi
     fi
 
     # Suggest drift detection

@@ -34,7 +34,7 @@ _has_python() {
 }
 
 _agents_py() {
-  python3 "$SCRIPT_DIR/agents_helpers.py" --project-root "$MAIN_PROJECT_ROOT" "$@" 2>/dev/null
+  python3 "$SCRIPT_DIR/agents_helpers.py" --project-root "$MAIN_PROJECT_ROOT" "$@"
 }
 
 # Check if AGENTS.json has an entry for this worktree or feature
@@ -44,7 +44,7 @@ _has_agents_entry() {
 
 # Get current feature from AGENTS.json
 _get_agents_feature() {
-  _has_python && _agents_py get-current-feature 2>/dev/null || echo ""
+  _has_python && _agents_py get-current-feature "$PROJECT_ROOT" 2>/dev/null || echo ""
 }
 
 # Detect current agent/environment

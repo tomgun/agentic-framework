@@ -40,7 +40,7 @@ def _now_iso() -> str:
 
 
 # ---------------------------------------------------------------------------
-# File locking (best-effort: fcntl on Unix, no-op elsewhere)
+# File locking (best-effort: fcntl on Unix, msvcrt on Windows, no-op elsewhere)
 # ---------------------------------------------------------------------------
 try:
     import fcntl
@@ -55,10 +55,13 @@ except ImportError:
         import msvcrt
 
         def _lock(f):
-            msvcrt.locking(f.fileno(), msvcrt.LK_LOCK, 1)
+            # Lock the whole file (up to 1MB — well beyond any AGENTS.json)
+            f.seek(0)
+            msvcrt.locking(f.fileno(), msvcrt.LK_LOCK, 1024 * 1024)
 
         def _unlock(f):
-            msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
+            f.seek(0)
+            msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1024 * 1024)
     except ImportError:
         def _lock(f):
             pass
@@ -68,18 +71,15 @@ except ImportError:
 
 
 # ---------------------------------------------------------------------------
-# Load / Save with locking
+# Atomic read-modify-write via _with_lock
 # ---------------------------------------------------------------------------
-def _load(agents_file: Path) -> list[dict]:
+def _load_unlocked(agents_file: Path) -> list[dict]:
+    """Read-only load (no locking). Use _with_lock for mutations."""
     if not agents_file.exists():
         return []
     try:
         with open(agents_file, "r") as f:
-            _lock(f)
-            try:
-                data = json.load(f)
-            finally:
-                _unlock(f)
+            data = json.load(f)
         if not isinstance(data, list):
             return []
         return data
@@ -87,15 +87,39 @@ def _load(agents_file: Path) -> list[dict]:
         return []
 
 
-def _save(agents_file: Path, items: list[dict]) -> None:
+def _with_lock(agents_file: Path, fn):
+    """Atomic read-modify-write. fn receives items list, returns modified list.
+
+    Opens file with r+ (or creates it), acquires exclusive lock, reads,
+    calls fn(items), writes result, truncates, and releases lock.
+    """
     agents_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(agents_file, "w") as f:
+
+    # Create file if it doesn't exist
+    if not agents_file.exists():
+        agents_file.write_text("[]\n")
+
+    with open(agents_file, "r+") as f:
         _lock(f)
         try:
-            json.dump(items, f, indent=2)
+            f.seek(0)
+            try:
+                data = json.load(f)
+                if not isinstance(data, list):
+                    data = []
+            except (json.JSONDecodeError, ValueError):
+                data = []
+
+            result = fn(data)
+
+            f.seek(0)
+            json.dump(result, f, indent=2)
             f.write("\n")
+            f.truncate()
         finally:
             _unlock(f)
+
+    return result
 
 
 def _find_by_feature(items: list[dict], feature_id: str) -> int:
@@ -119,32 +143,31 @@ def _find_by_worktree(items: list[dict], worktree_path: str) -> int:
 def cmd_register(agents_file: Path, feature_id: str, worktree: str,
                  branch: str, description: str = "") -> int:
     """Register a new agent entry (status: created)."""
-    items = _load(agents_file)
-    idx = _find_by_feature(items, feature_id)
-    if idx >= 0:
-        # Already registered — update worktree/branch if needed
-        items[idx]["worktree"] = worktree
-        items[idx]["branch"] = branch
-        if description:
-            items[idx]["description"] = description
-        _save(agents_file, items)
-        print(f"Updated: {feature_id}")
-        return 0
+    now = _now_iso()
 
-    entry = {
-        "feature_id": feature_id,
-        "description": description or feature_id,
-        "worktree": worktree,
-        "branch": branch,
-        "agent": "",
-        "started": _now_iso(),
-        "last_checkpoint": _now_iso(),
-        "status": "created",
-        "progress": [],
-        "files": [],
-    }
-    items.append(entry)
-    _save(agents_file, items)
+    def _do(items):
+        idx = _find_by_feature(items, feature_id)
+        if idx >= 0:
+            items[idx]["worktree"] = worktree
+            items[idx]["branch"] = branch
+            if description:
+                items[idx]["description"] = description
+        else:
+            items.append({
+                "feature_id": feature_id,
+                "description": description or feature_id,
+                "worktree": worktree,
+                "branch": branch,
+                "agent": "",
+                "started": now,
+                "last_checkpoint": now,
+                "status": "created",
+                "progress": [],
+                "files": [],
+            })
+        return items
+
+    _with_lock(agents_file, _do)
     print(f"Registered: {feature_id}")
     return 0
 
@@ -152,66 +175,82 @@ def cmd_register(agents_file: Path, feature_id: str, worktree: str,
 def cmd_activate(agents_file: Path, feature_id: str, description: str = "",
                  files: str = "", agent: str = "") -> int:
     """Activate an entry (status: active). Creates if not exists."""
-    items = _load(agents_file)
-    idx = _find_by_feature(items, feature_id)
     now = _now_iso()
+    file_list = [f.strip() for f in files.split(",") if f.strip()] if files else []
+    project_root = os.environ.get("PROJECT_ROOT", os.getcwd())
 
-    if idx >= 0:
-        items[idx]["status"] = "active"
-        if description:
-            items[idx]["description"] = description
-        if files:
-            items[idx]["files"] = [f.strip() for f in files.split(",") if f.strip()]
-        if agent:
-            items[idx]["agent"] = agent
-        items[idx]["last_checkpoint"] = now
-    else:
-        # Auto-create entry (no worktree — working in main repo)
-        items.append({
-            "feature_id": feature_id,
-            "description": description or feature_id,
-            "worktree": os.environ.get("PROJECT_ROOT", os.getcwd()),
-            "branch": "",
-            "agent": agent,
-            "started": now,
-            "last_checkpoint": now,
-            "status": "active",
-            "progress": [],
-            "files": [f.strip() for f in files.split(",") if f.strip()] if files else [],
-        })
+    def _do(items):
+        idx = _find_by_feature(items, feature_id)
+        if idx >= 0:
+            items[idx]["status"] = "active"
+            if description:
+                items[idx]["description"] = description
+            if file_list:
+                items[idx]["files"] = file_list
+            if agent:
+                items[idx]["agent"] = agent
+            items[idx]["last_checkpoint"] = now
+        else:
+            items.append({
+                "feature_id": feature_id,
+                "description": description or feature_id,
+                "worktree": project_root,
+                "branch": "",
+                "agent": agent,
+                "started": now,
+                "last_checkpoint": now,
+                "status": "active",
+                "progress": [],
+                "files": file_list,
+            })
+        return items
 
-    _save(agents_file, items)
+    _with_lock(agents_file, _do)
     print(f"Activated: {feature_id}")
     return 0
 
 
 def cmd_checkpoint(agents_file: Path, feature_id: str, note: str) -> int:
     """Update checkpoint timestamp and append progress note."""
-    items = _load(agents_file)
-    idx = _find_by_feature(items, feature_id)
-    if idx < 0:
+    now = _now_iso()
+    found = [False]
+
+    def _do(items):
+        idx = _find_by_feature(items, feature_id)
+        if idx < 0:
+            found[0] = False
+            return items
+        found[0] = True
+        items[idx]["last_checkpoint"] = now
+        items[idx].setdefault("progress", []).append(note)
+        return items
+
+    _with_lock(agents_file, _do)
+    if not found[0]:
         print(f"Error: {feature_id} not found", file=sys.stderr)
         return 1
-
-    items[idx]["last_checkpoint"] = _now_iso()
-    items[idx].setdefault("progress", []).append(note)
-    _save(agents_file, items)
     print(f"Checkpoint: {feature_id} — {note}")
     return 0
 
 
 def cmd_complete(agents_file: Path, feature_id: str) -> int:
     """Remove entry (feature complete)."""
-    items = _load(agents_file)
-    idx = _find_by_feature(items, feature_id)
-    if idx < 0:
-        # Not found is OK — idempotent
-        print(f"No entry for {feature_id} (already complete)")
-        return 0
+    removed = [False]
 
-    items.pop(idx)
-    _save(agents_file, items)
-    print(f"Completed: {feature_id}")
+    def _do(items):
+        idx = _find_by_feature(items, feature_id)
+        if idx < 0:
+            removed[0] = False
+            return items
+        removed[0] = True
+        items.pop(idx)
+        return items
+
+    _with_lock(agents_file, _do)
+    if removed[0]:
+        print(f"Completed: {feature_id}")
+    else:
+        print(f"No entry for {feature_id} (already complete)")
     return 0
 
 
@@ -222,7 +261,7 @@ def cmd_unregister(agents_file: Path, feature_id: str) -> int:
 
 def cmd_check_worktree(agents_file: Path, worktree_path: str) -> int:
     """Check if a worktree has an active entry. Exit 0 = has entry, 1 = no entry."""
-    items = _load(agents_file)
+    items = _load_unlocked(agents_file)
     idx = _find_by_worktree(items, worktree_path)
     if idx >= 0:
         entry = items[idx]
@@ -233,7 +272,7 @@ def cmd_check_worktree(agents_file: Path, worktree_path: str) -> int:
 
 def cmd_get_active(agents_file: Path, feature_id: Optional[str] = None) -> int:
     """Get active entry. If feature_id given, get that specific entry."""
-    items = _load(agents_file)
+    items = _load_unlocked(agents_file)
     if feature_id:
         idx = _find_by_feature(items, feature_id)
         if idx < 0:
@@ -248,9 +287,24 @@ def cmd_get_active(agents_file: Path, feature_id: Optional[str] = None) -> int:
     return 1
 
 
-def cmd_get_current_feature(agents_file: Path) -> int:
-    """Print the feature_id of the first active entry."""
-    items = _load(agents_file)
+def cmd_get_current_feature(agents_file: Path,
+                            worktree_path: Optional[str] = None) -> int:
+    """Print the feature_id of the current worktree's active entry.
+
+    If worktree_path is given, returns the feature for that worktree.
+    Otherwise returns the first active/created entry (single-agent compat).
+    """
+    items = _load_unlocked(agents_file)
+
+    # Per-worktree lookup (preferred — avoids H-4 wrong-feature completion)
+    if worktree_path:
+        idx = _find_by_worktree(items, worktree_path)
+        if idx >= 0 and items[idx].get("status") in ("active", "created"):
+            print(items[idx]["feature_id"])
+            return 0
+        return 1
+
+    # Fallback: first active/created entry (single-agent case)
     for item in items:
         if item.get("status") in ("active", "created"):
             print(item["feature_id"])
@@ -260,7 +314,7 @@ def cmd_get_current_feature(agents_file: Path) -> int:
 
 def cmd_list(agents_file: Path) -> int:
     """Print all entries in human-readable format."""
-    items = _load(agents_file)
+    items = _load_unlocked(agents_file)
     if not items:
         print("No active agents")
         return 0
@@ -271,17 +325,20 @@ def cmd_list(agents_file: Path) -> int:
         desc = item.get("description", "")
         status = item.get("status", "?")
         wt = item.get("worktree", "")
-        started = item.get("started", "")
         checkpoint = item.get("last_checkpoint", "")
+        ts = item.get("started", "")
 
-        # Stale detection: "created" status for > 30 min
+        # Stale detection
         stale_warning = ""
-        if status == "created" and started:
+        ref_ts = checkpoint or ts
+        if ref_ts:
             try:
-                started_dt = datetime.fromisoformat(started.replace("Z", "+00:00"))
-                age_min = (now - started_dt).total_seconds() / 60
-                if age_min > 30:
-                    stale_warning = f"  ⚠️  STALE ({int(age_min)} min in 'created' status)"
+                ref_dt = datetime.fromisoformat(ref_ts.replace("Z", "+00:00"))
+                age_min = (now - ref_dt).total_seconds() / 60
+                if status == "created" and age_min > 30:
+                    stale_warning = f"  ⚠️  STALE ({int(age_min)} min in 'created' — agent may have crashed)"
+                elif status == "active" and age_min > 60:
+                    stale_warning = f"  ⚠️  STALE ({int(age_min)} min since last checkpoint — agent may have crashed)"
             except (ValueError, TypeError):
                 pass
 
@@ -336,21 +393,28 @@ def cmd_migrate_wip(agents_file: Path, wip_path: str) -> int:
     if not feature_id:
         feature_id = "task"
 
-    items = _load(agents_file)
-    entry = {
-        "feature_id": feature_id,
-        "description": description or feature_id,
-        "worktree": str(wip_file.parent.parent.parent),  # .agentic/session/WIP.md → project root
-        "branch": "",
-        "agent": agent,
-        "started": started or _now_iso(),
-        "last_checkpoint": checkpoint or _now_iso(),
-        "status": "active",
-        "progress": ["Migrated from WIP.md"],
-        "files": files,
-    }
-    items.append(entry)
-    _save(agents_file, items)
+    wip_worktree = str(wip_file.parent.parent.parent)  # .agentic/session/WIP.md → project root
+    now = _now_iso()
+
+    def _do(items):
+        # Skip if already migrated (M-3: dedup)
+        if _find_by_feature(items, feature_id) >= 0:
+            return items
+        items.append({
+            "feature_id": feature_id,
+            "description": description or feature_id,
+            "worktree": wip_worktree,
+            "branch": "",
+            "agent": agent,
+            "started": started or now,
+            "last_checkpoint": checkpoint or now,
+            "status": "active",
+            "progress": ["Migrated from WIP.md"],
+            "files": files,
+        })
+        return items
+
+    _with_lock(agents_file, _do)
     print(f"Migrated WIP.md → AGENTS.json: {feature_id}")
     return 0
 
@@ -431,7 +495,8 @@ def main() -> int:
         fid = rest[0] if rest else None
         return cmd_get_active(agents_file, fid)
     elif cmd == "get-current-feature":
-        return cmd_get_current_feature(agents_file)
+        wt = rest[0] if rest else None
+        return cmd_get_current_feature(agents_file, wt)
     elif cmd == "list":
         return cmd_list(agents_file)
     elif cmd == "migrate-wip":
