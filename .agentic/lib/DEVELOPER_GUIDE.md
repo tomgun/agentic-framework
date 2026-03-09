@@ -141,7 +141,7 @@ The agent will:
 - **b) Formal**: Everything in Discovery plus formal specs, feature tracking (`F-####` IDs), roadmap
   - Good for: Long-term projects (3+ months), complex products, audit trails
 
-- **c) Autonomous Formal**: Same rigor as Formal, but most review checkpoints are delegated to `critical_agent` instead of human. Only `review_merge` stays human.
+- **c) Autonomous Formal**: Same rigor as Formal, but most review checkpoints are delegated to `critical_agent` instead of human. Only `review_merge` stays human. The critical agent spawns an adversarial Claude instance that reviews changes and returns structured verdicts (approved/request_changes/escalate).
   - Good for: Autonomous agent workflows, CI/CD pipelines, batch processing
 
 ---

@@ -130,7 +130,7 @@ If large, tell the user:
 > **c) Autonomous Formal (Agent-Driven Reviews)**
 > - Same rigor as Formal, but most review checkpoints delegated to `critical_agent`
 > - Only `review_merge` (final merge) stays human
-> - `critical_agent` falls back to human until F-0182 ships
+> - `critical_agent` spawns adversarial AI reviewer for automated review
 > - Good for: Autonomous agent workflows, CI/CD pipelines, batch processing
 >
 > Type 'a' for Discovery, 'b' for Formal, or 'c' for Autonomous Formal"
@@ -173,7 +173,7 @@ If large, tell the user:
 - ✅ Everything in Formal, with review delegation:
 - ✅ `review_code` and `review_regression` → `critical_agent` (instead of human)
 - ✅ Only `review_merge` stays human (final merge always needs human approval)
-- ✅ `critical_agent` falls back to human until F-0182 ships (forward-compatible)
+- ✅ `critical_agent` spawns adversarial AI reviewer for automated review (F-0182)
 - **Good for**:
   - Autonomous agent workflows (ag auto task, ag auto crunch)
   - CI/CD pipelines with minimal human intervention

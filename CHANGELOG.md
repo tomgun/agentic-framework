@@ -5,6 +5,15 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.52.0] - 2026-03-09
+
+### Added
+- **Critical Review Agent (F-0182, ADR-001 Phase 4)** — `critical_agent` review mode is now functional. When a review checkpoint is set to `critical_agent`, spawns an adversarial Claude instance that reviews the transition (spec, code, plan, or regression). Returns structured JSON verdicts: `approved` (proceeds automatically), `request_changes` (blocks with specific issues), or `escalate` (falls back to human). Features: per-review-type context assembly (git diff, specs, ACs, NFRs), model selection via `## Model customization` section or `agent_mode` mapping, adversarial prompt with "if in doubt, escalate" mandate, retry-once on transient errors with human fallback, 600s timeout, diff truncation at 3000 lines. New files: `critical_agent.py` (~290 lines), `prompts/critical_review.md`. 46 new tests. Shared `_write_verdict_artifact()` helper extracted from `resolve_review()`.
+
+### Changed
+- `spawn_claude()` and `build_claude_cmd()` in `__init__.py` now accept optional `model` parameter for `--model` flag support
+- Removed "falls back to human until F-0182 ships" placeholders from STACK.md, profiles.conf, init_playbook.md, STACK.template.md
+
 ## [0.50.2] - 2026-03-08
 
 ### Changed
