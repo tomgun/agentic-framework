@@ -107,14 +107,16 @@ You stay in control: `ag auto pause`, `ag auto stop`, `ag auto feedback AC-003 "
 
 ### Two Profiles
 
-| | **Discovery** | **Formal** |
-|--|-------------|----------|
-| Best for | Prototypes, solo devs | Production, teams |
-| Specs | Optional | Required before coding |
-| Feature tracking | Light | F-XXXX IDs + acceptance criteria |
-| Quality gates | Fast checks | Full validation suite |
+| | **Discovery** | **Formal** | **Autonomous Formal** |
+|--|-------------|----------|---------------------|
+| Best for | Prototypes, solo devs | Production, teams | Autonomous agents, CI/CD |
+| Specs | Optional | Required before coding | Required before coding |
+| Feature tracking | Light | F-XXXX IDs + acceptance criteria | F-XXXX IDs + acceptance criteria |
+| Quality gates | Fast checks | Full validation suite | Full validation suite |
+| Code review | critical_agent | human | critical_agent |
+| Merge review | human | human | human |
 
-Switch anytime: `ag set profile discovery` or `ag set profile formal`
+Switch anytime: `ag set profile discovery` or `ag set profile formal` or `ag set profile autonomous_formal`
 
 ---
 

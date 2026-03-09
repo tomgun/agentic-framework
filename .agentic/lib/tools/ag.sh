@@ -2465,8 +2465,8 @@ _settings_set_value() {
     # Validate values for enum settings
     case "$key" in
         profile)
-            if [[ ! "$value" =~ ^(discovery|formal)$ ]]; then
-                echo -e "${RED}Error: profile must be 'discovery' or 'formal', got '$value'${NC}"
+            if [[ ! "$value" =~ ^(discovery|formal|autonomous_formal)$ ]]; then
+                echo -e "${RED}Error: profile must be 'discovery', 'formal', or 'autonomous_formal', got '$value'${NC}"
                 exit 1
             fi
             ;;

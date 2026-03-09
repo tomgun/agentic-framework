@@ -68,9 +68,10 @@ Full guidance: `.agentic/lib/quality/green_coding.md`
 
 ## Profile-Specific Workflows
 
-Valid profiles: **`discovery`** and **`formal`** (only these two). Profiles are presets — they set bundles of settings. Individual settings can be overridden via `ag set <key> <value>`.
+Valid profiles: **`discovery`**, **`formal`**, and **`autonomous_formal`**. Profiles are presets — they set bundles of settings. Individual settings can be overridden via `ag set <key> <value>`.
 - **Discovery**: No F-#### IDs. Tests enforced for changed files only.
-- **Formal**: Feature IDs, acceptance criteria, full gates.
+- **Formal**: Feature IDs, acceptance criteria, full gates. `review_code` and `review_regression` require human.
+- **Autonomous Formal**: Same as Formal but `review_code` and `review_regression` use `critical_agent` instead of human. Only `review_merge` stays human. Enables autonomous agent workflows.
 
 > **Settings override**: Check `ag set --show` to see which settings are active. The `## Settings` section in STACK.md holds explicit overrides.
 

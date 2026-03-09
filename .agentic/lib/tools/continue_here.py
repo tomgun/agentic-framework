@@ -144,7 +144,8 @@ def detect_mode(project_root):
             sys.path.insert(0, _lib_dir)
         from settings import get_setting
         profile = get_setting(Path(project_root), "profile", "discovery")
-        return "Formal" if profile == "formal" else "Discovery"
+        from settings import is_formal_like
+        return "Formal" if is_formal_like(profile) else "Discovery"
     except Exception:
         # Fallback
         if os.path.isdir(os.path.join(project_root, 'spec')):

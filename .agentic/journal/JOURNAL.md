@@ -1754,3 +1754,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 16:12 - F-0181 Autonomous Formal
+
+**Why**: ADR-001 Phase 3: enable autonomous agent workflows with formal rigor
+
+**What changed**:
+- Added autonomous_formal profile with is_formal_like() helper, 22 files updated, 18 tests passing, PR #86 created
+
+**Next steps**:
+- Human review of PR #86
+
+**Blockers**: None
+
