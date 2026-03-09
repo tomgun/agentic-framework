@@ -2927,6 +2927,10 @@ case "${1:-help}" in
         shift
         python3 "$SCRIPT_DIR/../auto/review.py" --project-root "$ROOT_DIR" "$@"
         ;;
+    decompose)
+        shift
+        python3 "$SCRIPT_DIR/../auto/epic.py" decompose --project-root "$ROOT_DIR" "$@"
+        ;;
     audit)
         shift
         cmd_audit "$@"
