@@ -115,6 +115,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0048: ag review / /review: check that durable plan file exists for the feature being reviewed. If missing, flag as advisory finding. Complements T-0048 (ag implement gate) — catches plans that slipped through.
 - **Added**: 2026-03-09
 
+### T-0049: Auto-load dashboard after completing work / merging PR — nice UX touch to show updated status immediately after ag done or PR merge
+- **Added**: 2026-03-09
+
 ## Done
 
 
