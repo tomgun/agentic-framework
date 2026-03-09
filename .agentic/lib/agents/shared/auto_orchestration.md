@@ -366,6 +366,7 @@ No escape hatch. Shipped spec protection is deterministic.
 □ All tests pass
 □ Documentation updated (drift.sh --docs, CONTEXT_PACK.md if architecture changed)
 □ FEATURES.md/OVERVIEW.md updated with status: shipped
+□ Backlog advanced (if completed feature was current backlog item)
 □ Code annotations added (@feature, @acceptance)
 □ JOURNAL.md updated
 □ No untracked files
@@ -389,6 +390,7 @@ No escape hatch. Shipped spec protection is deterministic.
 □ Quality checks pass (if enabled)
 □ FEATURES.md/OVERVIEW.md updated
 □ JOURNAL.md updated
+□ State files staged (BACKLOG.json, STATUS.md, JOURNAL.md if modified)
 □ No untracked files in project directories
 □ Human approval obtained
 ```
