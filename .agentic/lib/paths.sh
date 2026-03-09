@@ -150,4 +150,4 @@ LOCAL_DIR="$(_resolve_path "$AGENTIC_ROOT/local" "$PROJECT_ROOT/.agentic-local")
 # Convenience: export ROOT_DIR for scripts that expect it
 # ---------------------------------------------------------------------------
 ROOT_DIR="$PROJECT_ROOT"
-export ROOT_DIR PROJECT_ROOT MAIN_PROJECT_ROOT AGENTIC_ROOT AGENTIC_LIB
+export ROOT_DIR PROJECT_ROOT MAIN_PROJECT_ROOT AGENTIC_ROOT AGENTIC_LIB AGENTS_JSON

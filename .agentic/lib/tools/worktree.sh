@@ -207,8 +207,12 @@ cmd_auto_remove() {
         exit 1
     fi
 
-    # Remove worktree
-    git worktree remove "$worktree_path" --force 2>/dev/null || rm -rf "$worktree_path"
+    # Remove worktree (no --force: dirty check above already confirmed clean)
+    if ! git worktree remove "$worktree_path" 2>/dev/null; then
+        echo -e "${RED}Failed to remove worktree: $worktree_path${NC}"
+        echo "  Remove manually: git worktree remove $worktree_path"
+        exit 1
+    fi
     echo -e "${GREEN}✓ Auto-removed worktree: $worktree_path${NC}"
 
     # Unregister from AGENTS.json
