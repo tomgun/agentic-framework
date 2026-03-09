@@ -9,13 +9,13 @@ Please follow the session start workflow from `.agentic/prompts/claude/session_s
 
 Specifically:
 
-1. Load essential context (CONTEXT_PACK, STATUS/PRODUCT, JOURNAL, HUMAN_NEEDED)
-2. Check for:
+1. Silently load essential context (CONTEXT_PACK, STATUS/PRODUCT, JOURNAL, HUMAN_NEEDED)
+2. Silently check for:
    - Blockers in HUMAN_NEEDED.md
    - In-progress work from last session
    - Features awaiting acceptance
-3. Present session context with prioritized options
-4. Ask what I'd like to focus on
+3. Show ONLY the dashboard — no preamble text, no "let me check...", no narration. The dashboard is the first thing I see.
+4. Include suggested next steps to pick from
 
 **If Claude hooks are enabled**: Session context may have been auto-injected, so acknowledge that and proceed from there.
 

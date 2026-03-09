@@ -17,7 +17,9 @@ phase: session
 
 **When a new session starts (first message, tokens reset, or user returns), automatically:**
 
-## Step 1: Quick Context Scan (Silent)
+## Step 1: Quick Context Scan (Silent — NO text output)
+
+**CRITICAL**: Do NOT output any text before the dashboard. No "Starting session...", no "Let me check the current state", no narration. Run tool calls silently, then the dashboard is your FIRST text output.
 
 ```bash
 # Read these silently (don't dump to user)

@@ -4,7 +4,7 @@ You are working in a repo that uses the agentic development framework (folder: .
 
 ## Session Start (do this FIRST on every new conversation)
 
-Read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, and last 2-3 entries of .agentic/journal/JOURNAL.md. Check `bash .agentic/lib/tools/wip.sh check` for interrupted work. Then greet the user with a dashboard: current focus, recent progress, blockers, and suggested next steps. Full protocol: `.agentic/lib/checklists/session_start.md`
+Silently read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, and last 2-3 entries of .agentic/journal/JOURNAL.md. Check `bash .agentic/lib/tools/wip.sh check` for interrupted work. Do NOT output any text before the dashboard — no "let me check", no narration of tool calls. The dashboard IS the first thing the user sees. Full protocol: `.agentic/lib/checklists/session_start.md`
 
 Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/.agentic/spec/adr/* as the source of truth.
 

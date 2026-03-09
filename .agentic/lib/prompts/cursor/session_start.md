@@ -15,13 +15,11 @@ Please help me get oriented by:
 4. Checking `.agentic/session/WIP.md` for any interrupted work
 5. For Formal mode: Check for active features in `.agentic/spec/FEATURES.md` (status: in_progress)
 
-Then provide a brief summary of:
+Then show ONLY a concise dashboard — no preamble text, no "let me check", no narration of what you're reading. The dashboard is the first thing I see. Include:
 - Where we left off
 - Any blockers or decisions needed
 - What makes sense to work on next
-- Any quality or validation checks that should be run
-
-Finally, ask me what I'd like to focus on in this session.
+- Suggested next steps to pick from
 
 ---
 
