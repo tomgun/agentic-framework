@@ -36,7 +36,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 # Doc staleness check at ag done. Profile defaults — Discovery: off | Formal: blocking
 - spec_analysis: on
 # Advisory spec analysis before implementation. Profile defaults — Discovery: off | Formal: on
-- worktree_mode: off
+- worktree_mode: always
 # Auto-create worktrees for feature branches. Options: off | always. Profile defaults — Discovery: off | Formal: off
 - docs_stale_days: 30
 # Days before a doc is flagged stale by docs.sh. Default: 30
@@ -58,24 +58,24 @@ Purpose: Configuration for developing the Agentic Framework itself.
 # Blocking limit for single file length. Profile defaults — Discovery: 1000 | Formal: 500
 
 ### Review checkpoints
-<!-- Who reviews each transition. Options: human | critical_agent | auto -->
+<!-- Who reviews each transition. Options: human | critical_agent | skip -->
 <!-- critical_agent falls back to human until F-0182 ships -->
 - review_spec: critical_agent
-# planned → specced. Discovery: auto | Formal: critical_agent
+# planned → specced. Discovery: skip | Formal: critical_agent
 - review_criteria: critical_agent
-# specced → criteria_set. Discovery: auto | Formal: critical_agent
+# specced → criteria_set. Discovery: skip | Formal: critical_agent
 - review_plan: critical_agent
-# plan review before implementing. Discovery: auto | Formal: critical_agent
+# plan review before implementing. Discovery: skip | Formal: critical_agent
 - review_code: human
 # documented → committed. Discovery: critical_agent | Formal: human
 - review_merge: human
 # committed → shipped. Discovery: human | Formal: human
 - review_decomposition: critical_agent
-# Epic decomposition (future). Discovery: auto | Formal: critical_agent
+# Epic decomposition (future). Discovery: skip | Formal: critical_agent
 - review_regression: human
 # Any regression transition. Discovery: critical_agent | Formal: human
 - review_taste: critical_agent
-# Subjective decisions (future). Discovery: auto | Formal: critical_agent
+# Subjective decisions (future). Discovery: skip | Formal: critical_agent
 
 ## Summary
 - What are we building: AI-assisted development framework with spec-driven methodology

@@ -33,6 +33,8 @@ from auto.review import (
     ReviewMode,
     TRANSITION_REVIEW_MAP,
     _REGRESSION_PAIRS,
+    _LEGACY_MODE_ALIASES,
+    _normalize_review_value,
     _get_review_setting_key,
     _validate_feature_id,
     get_review_mode,
@@ -149,16 +151,52 @@ class TestReviewMode:
     def test_enum_values(self):
         assert ReviewMode.HUMAN.value == "human"
         assert ReviewMode.CRITICAL_AGENT.value == "critical_agent"
-        assert ReviewMode.AUTO.value == "auto"
+        assert ReviewMode.SKIP.value == "skip"
 
     def test_enum_from_string(self):
         assert ReviewMode("human") == ReviewMode.HUMAN
         assert ReviewMode("critical_agent") == ReviewMode.CRITICAL_AGENT
-        assert ReviewMode("auto") == ReviewMode.AUTO
+        assert ReviewMode("skip") == ReviewMode.SKIP
 
     def test_invalid_value_raises(self):
         with pytest.raises(ValueError):
             ReviewMode("invalid")
+
+    def test_legacy_auto_not_valid_enum(self):
+        """'auto' is no longer a valid enum value — use _normalize_review_value."""
+        with pytest.raises(ValueError):
+            ReviewMode("auto")
+
+
+# ---------------------------------------------------------------------------
+# TestBackwardCompatibility (auto → skip rename, v0.51.0)
+# ---------------------------------------------------------------------------
+
+class TestBackwardCompatibility:
+    """Tests for auto→skip backward compatibility (v0.51.0 rename)."""
+
+    def test_normalize_auto_to_skip(self):
+        assert _normalize_review_value("auto") == "skip"
+
+    def test_normalize_skip_unchanged(self):
+        assert _normalize_review_value("skip") == "skip"
+
+    def test_normalize_human_unchanged(self):
+        assert _normalize_review_value("human") == "human"
+
+    def test_normalize_critical_agent_unchanged(self):
+        assert _normalize_review_value("critical_agent") == "critical_agent"
+
+    def test_legacy_alias_mapping(self):
+        assert _LEGACY_MODE_ALIASES == {"auto": "skip"}
+
+    def test_auto_in_stack_resolves_to_skip(self, project_dir):
+        """STACK.md with legacy 'auto' value should resolve to SKIP mode."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: discovery\n- review_spec: auto\n"
+        )
+        mode = get_review_mode(project_dir, "planned", "specced")
+        assert mode == ReviewMode.SKIP
 
 
 # ---------------------------------------------------------------------------
@@ -199,7 +237,7 @@ class TestTransitionReviewMap:
         )
 
     def test_deprecated_transition_returns_none(self):
-        """Transitions to deprecated have no review (auto by default)."""
+        """Transitions to deprecated have no review (skip by default)."""
         assert _get_review_setting_key("implementing", "deprecated") is None
         assert _get_review_setting_key("shipped", "deprecated") is None
 
@@ -209,9 +247,9 @@ class TestTransitionReviewMap:
 # ---------------------------------------------------------------------------
 
 class TestGetReviewMode:
-    def test_auto_for_unmapped(self, project_dir):
+    def test_skip_for_unmapped(self, project_dir):
         mode = get_review_mode(project_dir, "criteria_set", "tests_written")
-        assert mode == ReviewMode.AUTO
+        assert mode == ReviewMode.SKIP
 
     def test_formal_profile_defaults(self, project_dir):
         # Formal profile: review_spec=critical_agent
@@ -227,21 +265,21 @@ class TestGetReviewMode:
             "## Settings\n- profile: discovery\n"
         )
         mode = get_review_mode(project_dir, "planned", "specced")
-        assert mode == ReviewMode.AUTO
+        assert mode == ReviewMode.SKIP
 
     def test_explicit_override_in_stack(self, project_dir):
         (project_dir / "STACK.md").write_text(
-            "## Settings\n- profile: formal\n- review_spec: auto\n"
+            "## Settings\n- profile: formal\n- review_spec: skip\n"
         )
         mode = get_review_mode(project_dir, "planned", "specced")
-        assert mode == ReviewMode.AUTO
+        assert mode == ReviewMode.SKIP
 
-    def test_invalid_mode_falls_back_to_auto(self, project_dir):
+    def test_invalid_mode_falls_back_to_skip(self, project_dir):
         (project_dir / "STACK.md").write_text(
             "## Settings\n- profile: formal\n- review_spec: invalid_mode\n"
         )
         mode = get_review_mode(project_dir, "planned", "specced")
-        assert mode == ReviewMode.AUTO
+        assert mode == ReviewMode.SKIP
 
 
 # ---------------------------------------------------------------------------
@@ -250,7 +288,7 @@ class TestGetReviewMode:
 
 class TestCheckReview:
     @patch("auto.review.create_pending_review", return_value=None)
-    def test_auto_proceeds(self, mock_create, project_dir):
+    def test_skip_proceeds(self, mock_create, project_dir):
         (project_dir / "STACK.md").write_text(
             "## Settings\n- profile: discovery\n"
         )

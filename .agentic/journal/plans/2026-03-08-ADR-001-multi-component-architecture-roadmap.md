@@ -134,9 +134,9 @@ Purely additive, no breaking changes. With the state machine (Phase 1), componen
 
 ### What Gets Built
 
-- Three review modes: `human | critical_agent | auto` — per transition, per profile
+- Three review modes: `human | critical_agent | skip` — per transition, per profile
 - Review checkpoint settings in STACK.md (`review_spec`, `review_criteria`, `review_plan`, `review_code`, `review_merge`, `review_decomposition`, `review_regression`, `review_taste`)
-- `state_machine.transition()` checks review settings; if `human`, blocks and creates HUMAN_NEEDED entry; if `auto`, proceeds; if `critical_agent`, defers to Phase 4
+- `state_machine.transition()` checks review settings; if `human`, blocks and creates HUMAN_NEEDED entry; if `skip`, proceeds; if `critical_agent`, defers to Phase 4
 - **New profile**: `autonomous_formal` defined in `profiles.conf` (Formal gates + agent reviews + auto-merge except final merge)
 - `ag review F-XXXX <transition>` for human review flow
 - Review artifact format (structured verdict stored alongside feature)
@@ -147,14 +147,14 @@ Purely additive, no breaking changes. With the state machine (Phase 1), componen
 
 | Checkpoint | Discovery | Formal | Autonomous Formal |
 |-----------|-----------|--------|-------------------|
-| review_spec | auto | critical_agent | critical_agent |
-| review_criteria | auto | critical_agent | critical_agent |
-| review_plan | auto | critical_agent | critical_agent |
+| review_spec | skip | critical_agent | critical_agent |
+| review_criteria | skip | critical_agent | critical_agent |
+| review_plan | skip | critical_agent | critical_agent |
 | review_code | critical_agent | human | critical_agent |
 | review_merge | human | human | human |
-| review_decomposition | auto | critical_agent | critical_agent |
+| review_decomposition | skip | critical_agent | critical_agent |
 | review_regression | critical_agent | human | critical_agent |
-| review_taste | auto | critical_agent | critical_agent |
+| review_taste | skip | critical_agent | critical_agent |
 
 ### Key Files
 
