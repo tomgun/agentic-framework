@@ -12,6 +12,7 @@ def build_claude_cmd(
     prompt: str,
     *,
     print_mode: bool = True,
+    model: str | None = None,
 ) -> list[str]:
     """Build Claude CLI command with tier-appropriate permission flags.
 
@@ -24,6 +25,9 @@ def build_claude_cmd(
     autonomous modes. Without it, spawned Claude runs interactively.
     """
     cmd = [claude_command]
+
+    if model:
+        cmd.extend(["--model", model])
 
     if print_mode:
         cmd.append("--print")
@@ -54,6 +58,7 @@ def spawn_claude(
     *,
     print_mode: bool = True,
     timeout: int = 300,
+    model: str | None = None,
 ) -> str:
     """Spawn a Claude CLI instance and return combined stdout+stderr.
 
@@ -62,6 +67,7 @@ def spawn_claude(
     cmd = build_claude_cmd(
         claude_command, project_root, prompt,
         print_mode=print_mode,
+        model=model,
     )
 
     try:

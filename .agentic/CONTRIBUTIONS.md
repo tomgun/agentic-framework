@@ -8,6 +8,13 @@
 
 ## Recent Contributions
 
+### Critical Review Agent (v0.52.0, F-0182)
+
+**User insight**: Tomas drove the dialectical review process for the plan — insisting the review workflow actually run (rather than jumping straight to implementation), which caught 3 critical issues in the original plan:
+- **Model resolution was unspecified**: The `## Model customization` section in STACK.md uses nested YAML-like format wrapped in HTML comments — fundamentally different from the flat `- key: value` format that `settings.py` handles. The plan originally handwaved this as "parse from STACK.md" without addressing the format mismatch. The review forced a concrete 3-level fallback chain (explicit model → agent_mode mapping → CLI default).
+- **Error handling was vague**: AC-007 requires specific retry/fallback behavior for different error types. The original plan said "wire retry logic" without defining error classification. The review forced concrete error string matching tied to `spawn_claude()` return values.
+- **Verdict artifact helper was missing**: The plan referenced `_store_agent_verdict()` but never defined it. The review forced extraction of `_write_verdict_artifact()` as a shared helper from `resolve_review()`.
+
 ### Rename "auto" → "skip" Review Mode + Plan Review Wiring (v0.51.1)
 
 **User insight**: Tomas identified two UX issues in the review gate system:

@@ -153,6 +153,77 @@ def get_review_mode(
         return ReviewMode.SKIP
 
 
+def _write_verdict_artifact(
+    paths,
+    feature_id: str,
+    from_state: str,
+    to_state: str,
+    review_setting: str,
+    verdict: str,
+    reasoning: str,
+    reviewer: str,
+    review_mode: str,
+) -> Path:
+    """Write a verdict artifact atomically. Returns the verdict file path.
+
+    Shared by resolve_review() (human) and check_review() (critical_agent).
+    """
+    verdict_dir = paths.reviews_dir / feature_id
+    verdict_dir.mkdir(parents=True, exist_ok=True)
+    verdict_file = verdict_dir / f"{from_state}_to_{to_state}.md"
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    verdict_content = (
+        f"# Review: {feature_id} {from_state} → {to_state}\n"
+        f"- **Verdict**: {verdict}\n"
+        f"- **Reviewer**: {reviewer}\n"
+        f"- **Date**: {today}\n"
+        f"- **Setting**: {review_setting} (mode: {review_mode})\n"
+        f"\n"
+        f"## Reasoning\n"
+        f"{reasoning if reasoning else 'No reasoning provided.'}\n"
+    )
+    fd, tmp_path = tempfile.mkstemp(
+        dir=str(verdict_dir), suffix=".tmp", prefix=".verdict-"
+    )
+    try:
+        os.write(fd, verdict_content.encode())
+        os.close(fd)
+        os.rename(tmp_path, str(verdict_file))
+    except OSError:
+        try:
+            os.close(fd)
+        except OSError:
+            pass
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise
+    return verdict_file
+
+
+def _fallback_to_human(
+    project_root: Path,
+    paths,
+    feature_id: str,
+    from_state: str,
+    to_state: str,
+    review_setting: str,
+    reason: str,
+) -> tuple[bool, list[str]]:
+    """Fall back to human review when critical agent fails or escalates."""
+    hn_id = create_pending_review(
+        project_root, feature_id, from_state, to_state,
+        review_setting, "human",
+    )
+    messages = [
+        reason,
+        f"Falling back to human review: {feature_id} {from_state} → {to_state}",
+        f"Resolve with: ag review {feature_id} {to_state}",
+    ]
+    if hn_id:
+        messages.append(f"Tracked as {hn_id} in HUMAN_NEEDED.md")
+    return False, messages
+
+
 def check_review(
     project_root: Path,
     feature_id: str,
@@ -179,32 +250,61 @@ def check_review(
     if mode == ReviewMode.SKIP:
         return True, []
 
-    # human or critical_agent → block
     setting_key = _get_review_setting_key(from_state, to_state) or "unknown"
 
+    # critical_agent → spawn adversarial reviewer
     if mode == ReviewMode.CRITICAL_AGENT:
-        fallback_msg = (
-            f"Note: critical_agent review not yet available (F-0182). "
-            f"Falling back to human review."
-        )
-    else:
-        fallback_msg = None
+        from auto.critical_agent import CriticalAgent
 
+        agent = CriticalAgent(project_root)
+        print(
+            f"Running critical agent review for {feature_id} "
+            f"({from_state} → {to_state})...",
+            file=sys.stderr,
+        )
+        try:
+            verdict = agent.review(
+                feature_id, from_state, to_state, setting_key,
+            )
+        except Exception as e:
+            return _fallback_to_human(
+                project_root, paths, feature_id, from_state, to_state,
+                setting_key, f"Critical agent error: {e}",
+            )
+
+        if verdict.verdict == "approved":
+            _write_verdict_artifact(
+                paths, feature_id, from_state, to_state,
+                setting_key, "approved", verdict.summary,
+                "critical_agent", mode.value,
+            )
+            return True, [f"Critical agent approved: {verdict.summary}"]
+        elif verdict.verdict == "escalate":
+            return _fallback_to_human(
+                project_root, paths, feature_id, from_state, to_state,
+                setting_key,
+                f"Critical agent escalated: {verdict.summary}",
+            )
+        else:  # request_changes
+            issue_lines = [
+                f"  - [{i.get('severity', '?')}] {i.get('description', '?')}"
+                for i in verdict.issues
+            ]
+            return False, [
+                f"Critical agent requests changes: {verdict.summary}",
+            ] + issue_lines
+
+    # human → block and create pending review
     hn_id = create_pending_review(
         project_root, feature_id, from_state, to_state,
         setting_key, mode.value,
     )
 
-    messages = []
-    if fallback_msg:
-        messages.append(fallback_msg)
-    messages.append(
+    messages = [
         f"Review required: {feature_id} {from_state} → {to_state} "
-        f"(setting: {setting_key}, mode: {mode.value})"
-    )
-    messages.append(
-        f"Resolve with: ag review {feature_id} {to_state}"
-    )
+        f"(setting: {setting_key}, mode: {mode.value})",
+        f"Resolve with: ag review {feature_id} {to_state}",
+    ]
     if hn_id:
         messages.append(f"Tracked as {hn_id} in HUMAN_NEEDED.md")
 
@@ -338,33 +438,10 @@ def resolve_review(
     hn_id = review_data.get("hn_id")
 
     # 1. Store verdict artifact first (prevents re-review loop)
-    #    Write to temp file then rename for atomicity
-    verdict_dir = paths.reviews_dir / feature_id
-    verdict_dir.mkdir(parents=True, exist_ok=True)
-    verdict_file = verdict_dir / f"{from_state}_to_{target_state}.md"
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    verdict_content = (
-        f"# Review: {feature_id} {from_state} → {target_state}\n"
-        f"- **Verdict**: {verdict}\n"
-        f"- **Reviewer**: human\n"
-        f"- **Date**: {today}\n"
-        f"- **Setting**: {review_setting} (mode: {review_mode})\n"
-        f"\n"
-        f"## Reasoning\n"
-        f"{reasoning if reasoning else 'No reasoning provided.'}\n"
+    _write_verdict_artifact(
+        paths, feature_id, from_state, target_state,
+        review_setting, verdict, reasoning, "human", review_mode,
     )
-    fd, tmp_path = tempfile.mkstemp(
-        dir=str(verdict_dir), suffix=".tmp", prefix=".verdict-"
-    )
-    try:
-        os.write(fd, verdict_content.encode())
-        os.close(fd)
-        os.rename(tmp_path, str(verdict_file))
-    except OSError:
-        os.close(fd) if not os.get_inheritable(fd) else None
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
-        raise
     messages.append(f"Verdict recorded: {verdict}")
 
     # 2. Delete pending review JSON
