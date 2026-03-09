@@ -360,6 +360,7 @@ class TestCreateChildFeatures:
         features_file = _write_features(tmp_project, textwrap.dedent("""\
             ## F-0100: Test Epic
             **Status**: planned
+            **Category**: Core
         """))
         children = [
             {
@@ -402,6 +403,24 @@ class TestCreateChildFeatures:
         content = ac_file.read_text()
         assert "**Parent**: F-0100" in content
         assert "Test criterion" in content
+
+    def test_inherits_parent_category(self, tmp_project):
+        _write_features(tmp_project, textwrap.dedent("""\
+            ## F-0100: Epic
+            **Status**: planned
+            **Category**: Quality
+        """))
+        children = [{
+            "id": "F-0101",
+            "name": "Child",
+            "parent": "F-0100",
+            "component": None,
+            "ac_lines": ["- [ ] **AC-001**: Test thing"],
+        }]
+        create_child_features(tmp_project, "F-0100", children)
+
+        content = (tmp_project / ".agentic" / "spec" / "FEATURES.md").read_text()
+        assert "**Category**: Quality" in content.split("## F-0101")[1]
 
     def test_component_scoped_ac(self, tmp_project):
         _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")

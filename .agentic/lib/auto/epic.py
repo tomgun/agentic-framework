@@ -30,8 +30,10 @@ from typing import Optional
 # ---------------------------------------------------------------------------
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
+sys.path.insert(0, str(_LIB_DIR / "tools"))
 from paths import get_paths  # noqa: E402
 from settings import get_setting  # noqa: E402
+from auto.components import Component, load_registry  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Feature ID validation
@@ -224,7 +226,6 @@ def propose_decomposition(
         )
 
     # Load component registry (may be empty)
-    from auto.components import load_registry
     registry = load_registry(project_root)
     components = registry.list_all()
 
@@ -277,13 +278,14 @@ def create_child_features(
     if not features_file.exists():
         return False, ["FEATURES.md not found"]
 
-    # Get epic name for context
+    # Get epic metadata for context
     epic_name = _get_feature_name(features_file, epic_id) or epic_id
+    epic_category = _get_feature_category(features_file, epic_id)
 
     # Build FEATURES.md entries
     new_sections: list[str] = []
     for child in children:
-        section = _build_feature_section(child, epic_name)
+        section = _build_feature_section(child, epic_name, epic_category)
         new_sections.append(section)
 
     # Append to FEATURES.md
@@ -449,6 +451,25 @@ def _get_feature_name(features_file: Path, feature_id: str) -> Optional[str]:
     return match.group(1) if match else None
 
 
+def _get_feature_category(features_file: Path, feature_id: str) -> Optional[str]:
+    """Read a feature's category from FEATURES.md."""
+    if not features_file.exists():
+        return None
+    content = features_file.read_text()
+    pattern = re.compile(
+        rf"^## {re.escape(feature_id)}:.*$", re.MULTILINE
+    )
+    match = pattern.search(content)
+    if not match:
+        return None
+
+    section = _extract_section(content, match.end())
+    cat_match = re.search(r"\*\*Category\*\*:\s*(\S+)", section)
+    if not cat_match:
+        cat_match = re.search(r"- Category:\s*(\S+)", section)
+    return cat_match.group(1) if cat_match else None
+
+
 def _get_feature_parent(features_file: Path, feature_id: str) -> Optional[str]:
     """Read a feature's parent from FEATURES.md."""
     if not features_file.exists():
@@ -476,9 +497,7 @@ def _get_children_statuses(
         return []
     content = features_file.read_text()
 
-    # Use query_features parsing
-    sys.path.insert(0, str(_LIB_DIR / "tools"))
-    from query_features import parse_features, get_children  # noqa: E402
+    from query_features import parse_features, get_children
 
     features = parse_features(content)
     children = get_children(features, parent_id)
@@ -495,7 +514,11 @@ def _extract_section(content: str, start: int) -> str:
 
 
 def _get_next_feature_id(features_file: Path) -> int:
-    """Get the next available feature ID number."""
+    """Get the next available feature ID number.
+
+    Note: not atomic — concurrent decompositions could allocate overlapping IDs.
+    Acceptable because decomposition is human-gated and rare.
+    """
     if not features_file.exists():
         return 1
 
@@ -558,8 +581,8 @@ def _derive_child_name(ac_id: str, ac_text: str, epic_id: str) -> str:
 def _match_component(
     ac_text: str,
     ac_lines: list[str],
-    components: list,
-) -> Optional[object]:
+    components: list[Component],
+) -> Optional[Component]:
     """Match AC text to a component by keyword/path overlap."""
     if not components:
         return None
@@ -587,13 +610,16 @@ def _match_component(
     return best_match if best_score > 0 else None
 
 
-def _build_feature_section(child: dict, epic_name: str) -> str:
+def _build_feature_section(
+    child: dict, epic_name: str, category: Optional[str] = None
+) -> str:
     """Build a FEATURES.md section for a child feature."""
+    cat = category or "Uncategorized"
     lines = [
         f"## {child['id']}: {child['name']}",
         "",
         "**Status**: planned",
-        f"**Category**: Architecture",
+        f"**Category**: {cat}",
         f"**Parent**: {child['parent']}",
     ]
     if child.get("component"):
