@@ -223,6 +223,13 @@ if [[ -f "$PROJECT_ROOT/.agentic/OVERVIEW.md" ]]; then
 fi
 # Fallback: skip generic "OVERVIEW.md" title
 if [[ -z "$proj_name" ]] || [[ "$proj_name" == "OVERVIEW.md" ]] || [[ "$proj_name" == "OVERVIEW" ]]; then
+    # Try git remote name (useful when dir name is generic, e.g. /workspace in Docker)
+    _remote_url=$(git -C "$PROJECT_ROOT" remote get-url origin 2>/dev/null)
+    if [[ -n "$_remote_url" ]]; then
+        proj_name=$(basename "$_remote_url" .git | sed 's/\.git$//')
+    fi
+fi
+if [[ -z "$proj_name" ]]; then
     proj_name=$(basename "$PROJECT_ROOT")
 fi
 
