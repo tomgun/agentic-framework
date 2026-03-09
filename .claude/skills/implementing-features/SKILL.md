@@ -28,6 +28,21 @@ If `.agentic/BACKLOG.json` exists and has items, `ag implement F-XXXX` enforces 
 - If F-XXXX is in backlog but NOT at position 0: **BLOCKED** — work on the current item first, or reprioritize with `ag backlog move F-XXXX 0`
 - Override: `SKIP_BACKLOG=1 ag implement F-XXXX`
 
+### Step 0.5: Plan Review Check (safety net)
+
+If `plan_review_enabled: yes` in STACK.md AND a plan file exists at
+`.agentic/journal/plans/F-XXXX-plan.md`:
+
+1. Read the plan file and check the `**Status**:` line
+2. If status is `APPROVED` → proceed to Step 1
+3. If status is `DRAFT` or `REVIEWING` or `REVISION_NEEDED` → the dialectical review
+   was never run (planning skill Phase 2 was skipped). Run it now:
+   - Follow Step 5.5 from the `planning-features` skill
+   - Wait for user approval before proceeding
+4. If no plan file exists → proceed normally (plan is optional unless `ag implement` blocks)
+
+This catches the case where plan mode ended but the review didn't fire.
+
 ### Step 1: Verify Acceptance Criteria Exist
 
 ```bash

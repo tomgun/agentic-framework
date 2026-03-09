@@ -36,13 +36,16 @@ If they say "implement entire", "full system", "complete", or describe something
 
 Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal/plans/`. Save them regardless of how they arrive:
 
-**After exiting plan mode**: Copy from the tool's plan location to `.agentic/journal/plans/F-XXXX-plan.md` using `ag plan --save <plan-file> F-XXXX`. Tool plan locations (e.g. `~/.claude/plans/`) are session-scoped and WILL BE LOST.
+**After exiting plan mode**: IMMEDIATELY continue with the post-plan-mode steps — do NOT wait for user to say "implement":
+1. Save plan to `.agentic/journal/plans/F-XXXX-plan.md` with status DRAFT (tool plan locations like `~/.claude/plans/` are session-scoped and WILL BE LOST)
+2. If `plan_review_enabled: yes` in STACK.md: run dialectical review — spawn Critic + Advocate agents in parallel (fresh context), synthesize both perspectives (with Revision Guidance), present to user. User decides: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject
+3. If review not enabled: set plan status to APPROVED directly
 
 **When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-<slug>-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
 
 Then:
-1. If `plan_review_enabled: yes` in STACK.md: run dialectical review — spawn Critic + Advocate agents in parallel (fresh context), synthesize both perspectives (with Revision Guidance), present to user. User decides: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject. No automated enforcement.
-2. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
+1. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
+2. `ag implement` checks for an approved plan — if plan exists but status is not APPROVED, it triggers review first
 3. Only proceed to implementation after the plan is APPROVED (or if review is disabled)
 
 ## When the user reports a bug or wants a fix
@@ -79,7 +82,7 @@ If the user says "it must always...", "never do X", "performance must stay under
 
 If a state machine transition is blocked by a review checkpoint, or the user says review, approve, reject, pending review:
 
-**STOP.** Run `ag review` to list all pending reviews. To resolve: `ag review F-XXXX <state>` (approves by default), or `ag review F-XXXX <state> --reject --reason "why"`. Review modes (human/critical_agent/auto) are configurable per transition in STACK.md `### Review checkpoints`.
+**STOP.** Run `ag review` to list all pending reviews. To resolve: `ag review F-XXXX <state>` (approves by default), or `ag review F-XXXX <state> --reject --reason "why"`. Review modes (human/critical_agent/skip) are configurable per transition in STACK.md `### Review checkpoints`. Legacy value "auto" is accepted and mapped to "skip".
 
 ## When work is done
 

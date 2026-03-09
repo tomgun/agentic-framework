@@ -19,6 +19,19 @@ Create thorough implementation plans with review loops before coding.
 
 ## Instructions
 
+This workflow has two phases separated by a plan-mode boundary.
+
+**Phase 1** (Steps 1-4) runs during plan mode — read-only exploration and plan creation.
+**Phase 2** (Steps 5-6) runs after plan mode ends — save, review, and hand off.
+
+**CRITICAL**: After plan mode exits, IMMEDIATELY continue with Phase 2. Do not wait
+for the user to say "implement." The plan save and review are part of the planning
+workflow, not the implementation workflow.
+
+---
+
+### Phase 1: Plan Creation (during plan mode)
+
 ### Step 1: Understand the Request
 
 1. Read the user's description of what they want to build
@@ -67,9 +80,18 @@ ACs are independent.
 
 Skip this section for simple features (≤5 ACs) unless multi-agent dispatch is planned.
 
+---
+
+### Phase 2: Save, Review, Hand Off (after plan mode ends)
+
+Plan mode is read-only — agent spawning and file writes can't happen there.
+These steps MUST run after plan mode exits.
+
 ### Step 5: Save Plan Durably
 
-After creating/revising the plan, save to `.agentic/journal/plans/F-XXXX-plan.md`.
+**Do this IMMEDIATELY after plan mode ends.**
+
+Save the plan to `.agentic/journal/plans/F-XXXX-plan.md` with status `DRAFT`.
 
 Plans in `~/.claude/plans/` are session-scoped and will be lost. Always copy to the durable location.
 
@@ -101,6 +123,8 @@ Agent(subagent_type="general-purpose",
 3. **Present synthesis inline** (including Revision Guidance section)
 4. **User decides**: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject
 5. If Revise: Planner revises the saved plan, then fresh Critic + Advocate run again (new iteration)
+
+If review is not enabled, set plan status to `APPROVED` directly.
 
 ### Step 6: Hand Off to Implementation
 

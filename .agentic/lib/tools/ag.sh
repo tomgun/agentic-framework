@@ -2519,8 +2519,8 @@ _settings_set_value() {
             fi
             ;;
         review_spec|review_criteria|review_plan|review_code|review_merge|review_decomposition|review_regression|review_taste)
-            if [[ ! "$value" =~ ^(human|critical_agent|auto)$ ]]; then
-                echo -e "${RED}Error: $key must be 'human', 'critical_agent', or 'auto', got '$value'${NC}"
+            if [[ ! "$value" =~ ^(human|critical_agent|skip|auto)$ ]]; then
+                echo -e "${RED}Error: $key must be 'human', 'critical_agent', or 'skip', got '$value'${NC}"
                 exit 1
             fi
             ;;

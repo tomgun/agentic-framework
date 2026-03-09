@@ -25,7 +25,7 @@ tokens: ~952
 | Feature tracking | `feature_tracking` | **yes** | no | Script-enforced |
 | Docs gate | `docs_gate` | **blocking** | off | Script-enforced |
 | Spec directory | `spec_directory` | **yes** | no | Script-enforced |
-| Review checkpoints | `review_*` | **human/critical_agent** | auto | Script-enforced |
+| Review checkpoints | `review_*` | **human/critical_agent** | skip | Script-enforced |
 
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 
