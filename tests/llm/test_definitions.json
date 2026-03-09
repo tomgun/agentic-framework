@@ -20,7 +20,7 @@
         "output_contains_any": [
           "CONTEXT_PACK|framework|agentic|checklists|assist"
         ],
-        "output_not_contains": [],
+        "output_not_contains": ["let me check|let me read|starting a new session|I'll check|I'll read"],
         "file_exists": [],
         "file_not_exists": [
           ".agentic/session/WIP.md"

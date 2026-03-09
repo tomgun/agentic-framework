@@ -17,7 +17,9 @@ phase: session
 
 **When a new session starts (first message, tokens reset, or user returns), automatically:**
 
-## Step 1: Quick Context Scan (Silent)
+## Step 1: Quick Context Scan (Silent — NO text output)
+
+**CRITICAL**: Do NOT output any text before the dashboard. No "Starting session...", no "Let me check the current state", no narration. Run tool calls silently, then the dashboard is your FIRST text output.
 
 ```bash
 # Read these silently (don't dump to user)
@@ -374,9 +376,10 @@ After completing checklist, provide structured summary:
 
 ## Anti-Patterns
 
-❌ **Don't** read entire codebase at session start  
-❌ **Don't** skip JOURNAL.md (you'll repeat mistakes)  
-❌ **Don't** assume you know the status (check STATUS.md)  
+❌ **Don't** output text before the dashboard (no "let me check...", no preamble)
+❌ **Don't** read entire codebase at session start
+❌ **Don't** skip JOURNAL.md (you'll repeat mistakes)
+❌ **Don't** assume you know the status (check STATUS.md)
 ❌ **Don't** start coding without this checklist  
 
 ✅ **Do** follow token budget strictly  

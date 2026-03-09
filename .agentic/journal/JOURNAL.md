@@ -1780,3 +1780,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 17:56 - Silent session start
+
+**Why**: Agents were outputting verbose narration before the dashboard, wasting screen space and user attention
+
+**What changed**:
+- Session start dashboard is now the first text output across all tools — no preamble narration before dashboard in Claude, Cursor, Copilot, Codex instruction layers
+
+**Next steps**:
+- Commit and PR
+
+**Blockers**: None
+
