@@ -117,6 +117,20 @@ Example projects demonstrate best practices and verify workflows actually work.
 
 **Anti-pattern**: ❌ Adding `ag` CLI commands to root CLAUDE.md but not the template users get.
 
+#### Agent-Agnostic by Default
+
+The framework supports Claude, Cursor, Copilot, Codex equally. **Practical consequence for framework developers:**
+
+- Scripts and tools go in `.agentic/lib/tools/`, NOT in `.claude/skills/*/scripts/`
+- `.claude/skills/` are a "works even better in Claude Code" enhancement layer — they reference `.agentic/` tools, they don't contain the tools
+- Each agent tool has its own delivery mechanism (`.claude/skills/`, `.cursor/rules/`, `copilot-instructions.md`), but the shared infrastructure lives in `.agentic/`
+- If a capability only exists in one tool's directory, other agents can't use it
+
+**Anti-pattern**: ❌ Putting a scanner script in `.claude/skills/session-start/scripts/` instead of `.agentic/lib/tools/`.
+**Correct**: Script in `.agentic/lib/tools/dashboard.sh`, Claude skill calls it via `bash .agentic/lib/tools/dashboard.sh`.
+
+Design basis: PRINCIPLES.md D7 (Multi-Environment Portability).
+
 #### Memory Seed Maintenance
 
 `.agentic/lib/init/memory-seed.md` seeds behavioral patterns into tool persistent memory during init. It is a **subset** of instruction files/playbooks — redundant for resilience, not a place for new rules.
@@ -569,6 +583,52 @@ Users already past X.Y.Z will NOT see it (prevents repeated prompts).
 **Why wrong**: "Do as I say, not as I do" kills credibility.
 
 **Correct**: Framework follows its own quality, testing, documentation standards.
+
+---
+
+## Lessons Learned
+
+Hard-won insights from framework development. These live here (in the repo) so they're available to any agent on any machine — NOT in auto-memory, which is machine-local.
+
+### Plans given as user messages don't auto-save
+
+Only plans created through plan mode (`/plan` / `EnterPlanMode`) get saved to `~/.claude/plans/`. When a user pastes a plan as a regular message ("Implement the following plan:"), there's nothing in `~/.claude/plans/` to copy. The "save plan after approval" rule silently doesn't apply. **Always save the plan to `.agentic/journal/plans/`** — whether it came from plan mode or a user message. If the plan is in the conversation but not in a file, write it to a file yourself.
+
+### Plan mode bypasses spec-first workflow (I-0002)
+
+Plan mode + session continuation are **blind spots** for the "create F-XXXX FIRST" trigger. The plan file feels like "we already planned it" but it's NOT a feature spec — it's session-scoped. **Always check**: does this work have an F-XXXX in FEATURES.md and `spec/acceptance/F-XXXX.md`? If not, create them before writing code — even if a plan exists. Tracked as I-0002 in `spec/ISSUES.md`.
+
+### Finalize artifacts before announcing "done"
+
+JOURNAL.md and STATUS.md must be updated BEFORE saying "ready to commit." Sequence: implement → tests pass → update journal/status → THEN announce readiness. Don't wait for the user to remind you.
+
+### Don't remove features when slimming instruction files
+
+Build Artifact Stamping was accidentally removed during guidelines slimming — it was a real feature. When slimming files, CHECK each section: is it dead weight or active functionality? If in doubt, keep it and ask.
+
+### Never destroy another agent's work on main
+
+`git clean -fd` on main destroys untracked files that may belong to another agent's in-progress work. Untracked files (plans, specs, new scripts) are NOT in git stash unless `--include-untracked` was used. Safe approach: move to /tmp first, or don't touch main at all. For tagging after merge: `git tag v0.X.0 origin/main && git push origin v0.X.0` — no checkout needed.
+
+### Path reference updates after file moves
+
+When moving a file (`git mv docs/X docs/Y`), grep ALL files for old path — including gitignored files (`.agentic/session/`).
+
+### ag.sh / validate_framework.sh length
+
+Both exceed `max_code_file_length=1200` (ag.sh ~2100, validate_framework.sh ~1890). Commits touching these require temporarily raising the limit. Needs eventual splitting/refactoring.
+
+### D4 "Small Batch" is about agent context, not commit size
+
+The 5-10 file limit per commit is a proxy for the real constraint: each agent task must fit within context with full comprehension. A PR can legitimately touch many files across multiple commits. Enforcement should move from commit-time to planning-time. Source: user clarification (2026-03-01).
+
+### Settings env var overrides for testing
+
+`settings.sh` supports `_SETTINGS_ROOT_DIR`, `_SETTINGS_STACK_FILE`, `_SETTINGS_PROFILES_CONF` env overrides. Combined with `ROOT_DIR` override in ag.sh and `_AGENTIC_SETTINGS_LOADED=""` to force re-init. Essential for isolated gate tests in `validate_framework.sh`.
+
+### Framework skills vs Task tool agents
+
+Framework roles (review, test, implementation) → invoked via `/review`, `/test` (Skill tool). Built-in agent types (Bash, general-purpose, Explore, Plan) → invoked via Agent tool. Completely separate systems.
 
 ---
 

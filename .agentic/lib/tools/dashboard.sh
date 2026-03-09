@@ -1,136 +1,227 @@
 #!/usr/bin/env bash
-# Dashboard view - shows complete project status at a glance
-set -euo pipefail
+# dashboard.sh — Consolidated session scanner for session-start workflow
+#
+# Outputs structured key-value sections delimited by ===SECTION=== markers.
+# The agent parses this output to render a polished dashboard in one tool call.
+#
+# Usage: bash .agentic/lib/tools/dashboard.sh
+#
+set -uo pipefail  # no -e: we want to keep going if individual checks fail
 
+# ---------------------------------------------------------------------------
+# Bootstrap paths
+# ---------------------------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../paths.sh"
+PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$SCRIPT_DIR/../../.." && pwd)}"
+cd "$PROJECT_ROOT"
 
-echo "╔════════════════════════════════════════════════════════════════╗"
-echo "║              AGENTIC PROJECT DASHBOARD                         ║"
-echo "╚════════════════════════════════════════════════════════════════╝"
-echo ""
+# Source framework paths (provides all *_FILE variables)
+source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
 
-# Current focus
-echo "▶ CURRENT FOCUS"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [[ -f STATUS.md ]]; then
-  sed -n '/## Current focus/,/##/p' STATUS.md | sed '$d' | tail -n +2
+TOOLS_DIR="${TOOLS_DIR:-$PROJECT_ROOT/.agentic/lib/tools}"
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+section() { echo "===$1==="; }
+
+# Safe python3 caller
+_py() { command -v python3 >/dev/null 2>&1 && python3 "$@"; }
+
+# ---------------------------------------------------------------------------
+# VERSION
+# ---------------------------------------------------------------------------
+section "VERSION"
+if [[ -f "${VERSION_FILE:-}" ]]; then
+    cat "$VERSION_FILE" | tr -d '[:space:]'
+    echo
+elif [[ -f "$PROJECT_ROOT/.agentic/lib/VERSION" ]]; then
+    cat "$PROJECT_ROOT/.agentic/lib/VERSION" | tr -d '[:space:]'
+    echo
 else
-  echo "STATUS.md not found"
-fi
-echo ""
-
-# Last session
-echo "▶ LAST SESSION"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-JOURNAL_PATH=""
-if [[ -f ".agentic/journal/JOURNAL.md" ]]; then
-  JOURNAL_PATH=".agentic/journal/JOURNAL.md"
-elif [[ -f "JOURNAL.md" ]]; then
-  JOURNAL_PATH="JOURNAL.md"
+    echo "unknown"
 fi
 
-if [[ -n "$JOURNAL_PATH" ]]; then
-  # Find the last session entry (supports both "### Session:" and "## YYYY-MM-DD" formats)
-  grep -A 12 "^## [0-9]" "$JOURNAL_PATH" | head -14 | tail -13 2>/dev/null || \
-  grep -A 12 "^### Session:" "$JOURNAL_PATH" | tail -13 2>/dev/null || \
-  echo "No sessions logged yet"
-else
-  echo "JOURNAL.md not found"
-fi
-echo ""
-
-# Health check
-echo "▶ HEALTH CHECK"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [[ -f .agentic/tools/doctor.py ]]; then
-  if command -v python3 >/dev/null 2>&1; then
-    python3 .agentic/tools/doctor.py 2>/dev/null | grep -E "^(OK|Missing|NEW|Validation)" | head -8 || echo "All checks passed"
-  else
-    echo "Python3 not available"
-  fi
-else
-  echo "doctor.py not found"
-fi
-echo ""
-
-# Feature summary
-echo "▶ FEATURES SUMMARY"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [[ -f .agentic/tools/report.py ]]; then
-  if command -v python3 >/dev/null 2>&1; then
-    python3 .agentic/tools/report.py 2>/dev/null | grep -E "^(===|-).*:" | head -8 || echo "No features yet"
-  else
-    echo "Python3 not available"
-  fi
-else
-  echo "report.py not found"
-fi
-echo ""
-
-# Human attention needed
-echo "▶ NEEDS HUMAN ATTENTION"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [[ -f HUMAN_NEEDED.md ]]; then
-  count=$(grep -c "^### HN-" HUMAN_NEEDED.md 2>/dev/null || echo "0")
-  if [[ "$count" -gt 0 ]]; then
-    grep "^### HN-" HUMAN_NEEDED.md | head -5
-    if [[ "$count" -gt 5 ]]; then
-      echo "... and $((count - 5)) more"
+# ---------------------------------------------------------------------------
+# WIP (interrupted work)
+# ---------------------------------------------------------------------------
+section "WIP"
+bash "$TOOLS_DIR/wip.sh" check >/dev/null 2>&1 && wip_status="clean" || wip_status="interrupted"
+echo "$wip_status"
+if [[ "$wip_status" == "interrupted" ]]; then
+    section "WIP_DETAIL"
+    # Extract feature ID from agents_helpers or WIP.md
+    feature_id=$(_py "$TOOLS_DIR/agents_helpers.py" --project-root "${MAIN_PROJECT_ROOT:-$PROJECT_ROOT}" get-current-feature "$PROJECT_ROOT" 2>/dev/null || echo "")
+    if [[ -n "$feature_id" ]]; then
+        echo "feature=$feature_id"
     fi
-  else
-    echo "✓ Nothing pending"
-  fi
-else
-  echo "HUMAN_NEEDED.md not found"
+    # Show changed files count
+    changed=$(git status --short 2>/dev/null | wc -l | tr -d ' ')
+    echo "changed_files=$changed"
 fi
-echo ""
 
-# Active Pipeline (if enabled)
-echo "▶ ACTIVE PIPELINE"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [[ -f STACK.md ]]; then
-  PIPELINE_ENABLED=$(grep -E "^- pipeline_enabled:" STACK.md | sed 's/.*: //' || echo "no")
-  if [[ "$PIPELINE_ENABLED" == "yes" ]]; then
-    PIPELINE_DIR=$(grep -E "^- pipeline_coordination_file:" STACK.md | sed 's/.*: //' || echo "..agentic/pipeline")
-    if [[ -d "$PIPELINE_DIR" ]]; then
-      ACTIVE=$(find "$PIPELINE_DIR" -name "*-pipeline.md" -type f | head -1)
-      if [[ -n "$ACTIVE" ]]; then
-        FEATURE=$(basename "$ACTIVE" | sed 's/-pipeline.md//')
-        CURRENT_AGENT=$(grep -E "^- Current agent:" "$ACTIVE" | sed 's/.*: //' | head -1 || echo "Unknown")
-        PHASE=$(grep -E "^- Phase:" "$ACTIVE" | sed 's/.*: //' | head -1 || echo "Unknown")
-        COMPLETED_COUNT=$(grep -c "^- ✅" "$ACTIVE" || echo "0")
-        echo "Feature: $FEATURE"
-        echo "Current: $CURRENT_AGENT ($PHASE)"
-        echo "Completed: $COMPLETED_COUNT agents"
-        echo "Details: bash .agentic/tools/pipeline_status.sh $FEATURE"
-      else
-        echo "No active pipeline"
-      fi
+# ---------------------------------------------------------------------------
+# STATUS (current focus)
+# ---------------------------------------------------------------------------
+section "STATUS"
+if [[ -f "${STATUS_FILE:-}" ]]; then
+    # Extract the "Current focus" bullet(s)
+    grep -A5 "^## Current focus" "$STATUS_FILE" 2>/dev/null | grep "^-" | head -2 | sed 's/^- //' || echo "No focus set"
+else
+    echo "No STATUS.md found"
+fi
+
+# ---------------------------------------------------------------------------
+# JOURNAL (last entry summary)
+# ---------------------------------------------------------------------------
+section "JOURNAL_LAST"
+if [[ -f "${JOURNAL_FILE:-}" ]]; then
+    # Get last session header and its "What changed" line
+    last_header=$(grep "^### Session:" "$JOURNAL_FILE" 2>/dev/null | tail -1 | sed 's/^### Session: //')
+    last_changed=""
+    # Find the last "What changed" block
+    last_changed=$(awk '/^### Session:/{block=""} /\*\*What changed\*\*:/{found=1; next} found && /^-/{print; found=0}' "$JOURNAL_FILE" 2>/dev/null | tail -1 | sed 's/^- //')
+    if [[ -n "$last_header" ]]; then
+        echo "date=$last_header"
+    fi
+    if [[ -n "$last_changed" ]]; then
+        echo "summary=$last_changed"
+    fi
+else
+    echo "No journal found"
+fi
+
+# ---------------------------------------------------------------------------
+# BACKLOG (current, next, total)
+# ---------------------------------------------------------------------------
+section "BACKLOG"
+if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/backlog_helpers.py" ]]; then
+    # Use a temp file to avoid shell quoting issues with JSON
+    _tmpf=$(mktemp)
+    _py "$TOOLS_DIR/backlog_helpers.py" --project-root "$PROJECT_ROOT" json-all >"$_tmpf" 2>/dev/null || echo "[]" >"$_tmpf"
+    _py -c "
+import json, sys
+with open('$_tmpf') as f:
+    items = json.load(f)
+total = len(items)
+print(f'total={total}')
+if total > 0:
+    c = items[0]
+    fid = c.get('id', c.get('feature_id', c.get('task', '?')))
+    desc = c.get('description', c.get('task', ''))
+    ref = c.get('refs', [''])[0] if c.get('refs') else ''
+    became = c.get('became_current_at', '')
+    print(f'current_id={fid}')
+    print(f'current_desc={desc}')
+    if ref: print(f'current_ref={ref}')
+    if became: print(f'current_since={became}')
+if total > 1:
+    n = items[1]
+    nid = n.get('id', n.get('feature_id', n.get('task', '?')))
+    ndesc = n.get('description', n.get('task', ''))
+    print(f'next_id={nid}')
+    print(f'next_desc={ndesc}')
+remaining = max(0, total - 2) if total > 2 else 0
+print(f'remaining={remaining}')
+" 2>/dev/null || echo "total=0"
+    rm -f "$_tmpf"
+else
+    echo "total=0"
+fi
+
+# ---------------------------------------------------------------------------
+# BLOCKERS (active HUMAN_NEEDED items)
+# ---------------------------------------------------------------------------
+section "BLOCKERS"
+if [[ -f "${HUMAN_NEEDED_FILE:-}" ]]; then
+    if grep -q "^_No active items_" "$HUMAN_NEEDED_FILE" 2>/dev/null; then
+        echo "0"
     else
-      echo "No pipelines created yet"
+        # Count ### HN- entries in "Active items" section (before "## Resolved")
+        active_count=$(awk '/^## Active items/,/^## Resolved/' "$HUMAN_NEEDED_FILE" 2>/dev/null | grep -c "^### HN-" || echo "0")
+        echo "$active_count"
     fi
-  else
-    echo "Pipeline mode disabled"
-    echo "To enable: Edit STACK.md, set pipeline_enabled: yes"
-  fi
 else
-  echo "STACK.md not found"
+    echo "0"
 fi
-echo ""
 
-# Next up
-echo "▶ NEXT UP"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [[ -f STATUS.md ]]; then
-  sed -n '/## Next up/,/##/p' STATUS.md | sed '$d' | tail -n +2 | head -5
+# ---------------------------------------------------------------------------
+# TODO count
+# ---------------------------------------------------------------------------
+section "TODO_COUNT"
+if [[ -f "${TODO_FILE:-}" ]]; then
+    # Count T-XXXX items that are not done/dropped
+    todo_count=$(grep -c "^### T-" "$TODO_FILE" 2>/dev/null || echo "0")
+    echo "$todo_count"
 else
-  echo "STATUS.md not found"
+    echo "0"
 fi
-echo ""
 
-echo "╔════════════════════════════════════════════════════════════════╗"
-echo "║  Run 'bash .agentic/tools/verify.sh' for detailed checks       ║"
-echo "║  See '.agentic/MANUAL_OPERATIONS.md' for more commands         ║"
-echo "╚════════════════════════════════════════════════════════════════╝"
+# ---------------------------------------------------------------------------
+# AGENTS (active multi-agent entries)
+# ---------------------------------------------------------------------------
+section "AGENTS"
+if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/agents_helpers.py" ]]; then
+    agents_out=$(_py "$TOOLS_DIR/agents_helpers.py" --project-root "${MAIN_PROJECT_ROOT:-$PROJECT_ROOT}" list 2>&1) || agents_out=""
+    if [[ -z "$agents_out" ]] || echo "$agents_out" | grep -q "No active agents"; then
+        echo "none"
+    else
+        echo "$agents_out"
+    fi
+else
+    echo "none"
+fi
 
+# ---------------------------------------------------------------------------
+# HEALTH (quick doctor check)
+# ---------------------------------------------------------------------------
+section "HEALTH"
+if [[ -f "$TOOLS_DIR/doctor.sh" ]]; then
+    health_out=$(bash "$TOOLS_DIR/doctor.sh" --summary 2>/dev/null) || true
+    if [[ -z "$health_out" ]]; then
+        echo "ok"
+    else
+        echo "$health_out"
+    fi
+else
+    echo "ok"
+fi
+
+# ---------------------------------------------------------------------------
+# UPGRADE pending
+# ---------------------------------------------------------------------------
+section "UPGRADE"
+if [[ -f "$PROJECT_ROOT/.agentic/.upgrade_pending" ]]; then
+    echo "pending"
+else
+    echo "none"
+fi
+
+# ---------------------------------------------------------------------------
+# TIP (random from curated list)
+# ---------------------------------------------------------------------------
+section "TIP"
+tips=(
+    "Run \`ag sync\` to detect drift across memory, specs, and docs."
+    "Use \`ag plan F-XXXX\` to start a plan-review loop before coding."
+    "Run \`ag trace\` to see which code implements which features."
+    "Use \`ag test llm\` to verify agents follow framework rules."
+    "Run \`ag sync --check\` for a dry run — see what's drifted."
+    "Use \`ag trace --gaps\` to find shipped features with no code annotations."
+    "Run \`ag verify --full\` for a comprehensive framework health check."
+    "Use \`ag specs\` to generate specs for existing code, domain by domain."
+    "Run \`ag tools\` to discover all available framework tools and scripts."
+    "Use \`ag backlog\` to view and manage the ordered work queue."
+)
+tip_index=$((RANDOM % ${#tips[@]}))
+echo "${tips[$tip_index]}"
+
+# ---------------------------------------------------------------------------
+# STALE check (is current backlog item > 7 days old?)
+# ---------------------------------------------------------------------------
+section "STALE"
+if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/backlog_helpers.py" ]]; then
+    _py "$TOOLS_DIR/backlog_helpers.py" --project-root "$PROJECT_ROOT" check-staleness 7 >/dev/null 2>&1 && echo "yes" || echo "no"
+else
+    echo "no"
+fi
