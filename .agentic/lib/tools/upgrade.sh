@@ -404,7 +404,12 @@ else
     CREATED_COUNT=0
     while IFS=: read -r dst_rel src_rel file_profile; do
       [[ "$dst_rel" =~ ^#|^[[:space:]]*$ ]] && continue
-      [[ "$file_profile" == "formal" && "$PROFILE" != "formal" ]] && continue
+      # Use is_formal_like if available, else inline check
+      if type is_formal_like &>/dev/null; then
+        [[ "$file_profile" == "formal" ]] && ! is_formal_like "$PROFILE" && continue
+      else
+        [[ "$file_profile" == "formal" && "$PROFILE" != "formal" && "$PROFILE" != "autonomous_formal" ]] && continue
+      fi
       dst="$TARGET_PROJECT_DIR/$dst_rel"
       src="$TARGET_PROJECT_DIR/$src_rel"
       if [[ ! -f "$dst" ]] && [[ -f "$src" ]]; then

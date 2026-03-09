@@ -38,7 +38,7 @@ If the project has existing code, scaffold will automatically run discovery and 
    - **Sub-projects**: detected sub-projects with their frameworks (e.g., frontend/React, functions/Azure Functions, mobile/React Native)
    - **Architecture**: entry points, components, monorepo status
    - **Project description**: extracted from README
-   - **Discovered features** (Formal only): modules, routes, packages
+   - **Discovered features** (Formal/Autonomous Formal only): modules, routes, packages
 3. For each section, ask: "Does this look right? Want to edit anything?"
 4. For confirmed sections: the proposal file from `.agentic/session/proposals/` is already copied to the project root
 5. For rejected sections: user fills in manually during Step 2 interview
@@ -50,7 +50,7 @@ After review, run `ag approve-onboarding` to strip markers from confirmed files.
 
 **If no discovery report exists**, skip to Step 1 (standard init for new projects).
 
-### Step 0.5b: Feature Discovery Deep Dive (Formal only)
+### Step 0.5b: Feature Discovery Deep Dive (Formal/Autonomous Formal only)
 
 **If the report contains `feature_clusters`**, run this enhanced feature synthesis:
 
@@ -86,7 +86,7 @@ After review, run `ag approve-onboarding` to strip markers from confirmed files.
    - Write .agentic/spec/acceptance/F-####.md files with criteria
    - Features with user-confirmed criteria get `Accepted: yes`
 
-### Step 0.5c: Size-Aware Routing (Formal only)
+### Step 0.5c: Size-Aware Routing (Formal/Autonomous Formal only)
 
 After reviewing discovery results, evaluate whether the project is small or large:
 
@@ -107,7 +107,7 @@ If large, tell the user:
 **Token cost** (evaluated after features exist):
 - > 50 features in FEATURES.md → suggest `organize_features.py --by domain` for hierarchical splitting
 
-## Step 1: Choose profile (Discovery vs Formal)
+## Step 1: Choose profile (Discovery vs Formal vs Autonomous Formal)
 
 **Ask the user which profile they want:**
 
@@ -127,7 +127,13 @@ If large, tell the user:
 > - STATUS.md, NFR.md, ADRs, cross-reference validation
 > - Good for: Long-term projects (3+ months), complex products, audit trails
 >
-> Type 'a' for Discovery or 'b' for Formal"
+> **c) Autonomous Formal (Agent-Driven Reviews)**
+> - Same rigor as Formal, but most review checkpoints delegated to `critical_agent`
+> - Only `review_merge` (final merge) stays human
+> - `critical_agent` falls back to human until F-0182 ships
+> - Good for: Autonomous agent workflows, CI/CD pipelines, batch processing
+>
+> Type 'a' for Discovery, 'b' for Formal, or 'c' for Autonomous Formal"
 
 ### Discovery Profile (a)
 **Full framework capabilities with lightweight planning:**
@@ -157,16 +163,27 @@ If large, tell the user:
 - ✅ `.agentic/STATUS.md` for roadmap and metrics
 - ✅ Acceptance criteria per feature
 - ✅ Sequential pipeline (specialized agents)
-- **Good for**: 
+- **Good for**:
   - Long-term projects (3+ months of development)
   - Human-machine teams collaborating on product
   - Complex products requiring traceability
   - Projects needing audit trails and formal specs
 
+### Autonomous Formal Profile (c)
+- ✅ Everything in Formal, with review delegation:
+- ✅ `review_code` and `review_regression` → `critical_agent` (instead of human)
+- ✅ Only `review_merge` stays human (final merge always needs human approval)
+- ✅ `critical_agent` falls back to human until F-0182 ships (forward-compatible)
+- **Good for**:
+  - Autonomous agent workflows (ag auto task, ag auto crunch)
+  - CI/CD pipelines with minimal human intervention
+  - Batch feature processing
+
 **Update `STACK.md`** with the chosen profile:
 ```markdown
-- Profile: discovery  <!-- if user chose 'a' -->
-- Profile: formal  <!-- if user chose 'b' -->
+- Profile: discovery          <!-- if user chose 'a' -->
+- Profile: formal             <!-- if user chose 'b' -->
+- Profile: autonomous_formal  <!-- if user chose 'c' -->
 ```
 
 ### Step 1 (cont.): Greenfield Domain Question (Formal only, new projects)
@@ -487,7 +504,7 @@ Please research current best practices for [environment]:
 
 ## Step 1c: Git Workflow Preference (Discovery profile only)
 
-**SKIP this step for Formal profile** - Formal defaults to `pull_request` (formal tracking implies formal review).
+**SKIP this step for Formal/Autonomous Formal profiles** - both default to `pull_request` (formal tracking implies formal review).
 
 **For Discovery profile, ask the user:**
 

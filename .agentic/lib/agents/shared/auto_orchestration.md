@@ -144,7 +144,7 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
    └─ If missing: CREATE THEM FIRST (rough is OK)
 
 2. CHECK PLAN-REVIEW SETTING
-   └─ Read STACK.md → plan_review_enabled (default: yes for formal profile)
+   └─ Read STACK.md → plan_review_enabled (default: yes for formal/autonomous_formal profiles)
    ├─ If yes: Run `ag plan F-####` — uses dialectical review (Critic + Advocate
    │          in parallel, fresh context). User decides Proceed/Revise/Reject.
    │          Mention max iterations from plan_review_max_iterations.
@@ -177,7 +177,7 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
 8. DOC LIFECYCLE (if STACK.md ## Docs has entries)
    ├─ `ag docs F-####` or `docs.sh --trigger feature_done`
    ├─ Drafts registered docs (lessons, architecture, changelog, etc.)
-   ├─ Formal profile: also drafts pr-trigger docs (changelog, readme)
+   ├─ Formal/autonomous_formal profile: also drafts pr-trigger docs (changelog, readme)
    └─ Human reviews drafts in git diff, removes `<!-- draft: -->` markers
 
 9. BEFORE COMMIT

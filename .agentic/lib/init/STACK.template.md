@@ -12,7 +12,7 @@ Purpose: a single source of truth for "how we build and run software here".
 ## Settings
 <!-- Use `ag set <key> <value>` to change, `ag set --show` to view all. -->
 - profile: discovery
-<!-- discovery | formal -->
+<!-- discovery | formal | autonomous_formal -->
 
 ### Workflow
 - feature_tracking: no
@@ -68,21 +68,21 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- Who reviews each transition. Options: human | critical_agent | auto -->
 <!-- critical_agent falls back to human until F-0182 ships -->
 - review_spec: auto
-# planned → specced. Discovery: auto | Formal: critical_agent
+# planned → specced. Discovery: auto | Formal: critical_agent | Autonomous Formal: critical_agent
 - review_criteria: auto
-# specced → criteria_set. Discovery: auto | Formal: critical_agent
+# specced → criteria_set. Discovery: auto | Formal: critical_agent | Autonomous Formal: critical_agent
 - review_plan: auto
-# plan review before implementing. Discovery: auto | Formal: critical_agent
+# plan review before implementing. Discovery: auto | Formal: critical_agent | Autonomous Formal: critical_agent
 - review_code: critical_agent
-# documented → committed. Discovery: critical_agent | Formal: human
+# documented → committed. Discovery: critical_agent | Formal: human | Autonomous Formal: critical_agent
 - review_merge: human
-# committed → shipped. Discovery: human | Formal: human
+# committed → shipped. Discovery: human | Formal: human | Autonomous Formal: human
 - review_decomposition: auto
-# Epic decomposition (future). Discovery: auto | Formal: critical_agent
+# Epic decomposition (future). Discovery: auto | Formal: critical_agent | Autonomous Formal: critical_agent
 - review_regression: critical_agent
-# Any regression transition. Discovery: critical_agent | Formal: human
+# Any regression transition. Discovery: critical_agent | Formal: human | Autonomous Formal: critical_agent
 - review_taste: auto
-# Subjective decisions (future). Discovery: auto | Formal: critical_agent
+# Subjective decisions (future). Discovery: auto | Formal: critical_agent | Autonomous Formal: critical_agent
 
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
