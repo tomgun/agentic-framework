@@ -429,6 +429,20 @@ bash .agentic/lib/tools/worktree.sh remove F-0006
 
 See `.agentic/lib/workflows/multi_agent_coordination.md` for full guide.
 
+### Multi-Session Collision Prevention (F-0195)
+
+When multiple Claude sessions share a checkout, destructive git ops (`stash`, `checkout .`, `restore .`, `reset --hard`, `clean -f`) can destroy each other's work. The framework provides three-layer defense:
+
+1. **Auto-Registration**: Sessions auto-register in AGENTS.json at start (via `$PPID`), deregister at stop. Stale entries cleaned up automatically (dead PID or heartbeat >30min).
+2. **Advisory Warning**: `UserPromptSubmit` hook injects a COLLISION RISK warning into the model's context on every prompt when other sessions are detected.
+3. **Instruction Hardening**: All agent instruction files include collision prevention rules.
+
+**For Claude Code agents**, the check is automated via hooks. **For other agents** (Cursor, Copilot, Codex), the behavioral rule in instruction files reminds agents to avoid destructive ops when other sessions may be active.
+
+**Manual check**: `python3 .agentic/lib/tools/agents_helpers.py --project-root . count-others "$(pwd)" --pid $$`
+
+**Best practice**: Always use worktrees (`ag worktree`) when running multiple agents on the same repo.
+
 ---
 
 ## Manual Operations

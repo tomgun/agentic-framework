@@ -5,8 +5,8 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.51.1 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, AGENTS.json, autonomous_formal, silent session start -->
+<!-- memory-seed v0.52.2 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, AGENTS.json, autonomous_formal, silent session start, collision guard -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -156,6 +156,7 @@ Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 - **Never auto-commit.** Human reviews every change first.
 - **Never bypass gates.** Do not use `--no-verify` or skip quality checks.
 - **NEVER `git stash`.** Stash pop does a silent merge — in multi-agent contexts, when another agent modified the same files, it quietly picks one version with no error, causing data loss. Safe alternatives: worktrees, temp branch + cherry-pick, or commit before switching. Also never `git checkout -- .`, `git restore .`, or `git reset --hard` with uncommitted changes.
+- **Multi-session collision guard.** Sessions auto-register in AGENTS.json at start. Before any destructive git op, the framework checks for other active sessions on the same checkout. If others are active, you'll see a COLLISION RISK warning — do NOT proceed with destructive ops. Use a worktree (`ag worktree`) or commit first.
 - **One feature at a time.** Complete current WIP before starting another.
 - **Small batches.** Max 5-10 files per commit. If bigger, break it up.
 - **Smoke test before "done".** Actually run the feature. "Tests pass" does not mean "it works."

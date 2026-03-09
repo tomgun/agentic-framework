@@ -17,7 +17,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 | **Core** | 14 | 14 | 0 | 0 |
 | **Quality** | 24 | 20 | 4 | 0 |
 | **Session** | 13 | 13 | 0 | 0 |
-| **Multi-Agent** | 10 | 8 | 1 | 1 |
+| **Multi-Agent** | 11 | 9 | 1 | 1 |
 | **Tooling** | 11 | 11 | 0 | 0 |
 | **Recovery** | 7 | 7 | 0 | 0 |
 | **Developer Experience** | 15 | 13 | 1 | 1 |
@@ -3287,4 +3287,23 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 - Tests: TBD
 
 **Acceptance**: TBD — requires design phase first
+
+## F-0195: Multi-Session Collision Prevention
+
+**Status**: shipped
+**Category**: Multi-Agent
+**Priority**: high
+**Complexity**: medium
+**Principle**: R2 (Anti-Hallucination), D2 (Deterministic Enforcement)
+
+**Description**: Multiple agents/sessions on the same checkout destroy each other's work via destructive git ops. Three-layer defense: (1) auto-registration of sessions in AGENTS.json, (2) advisory collision warnings via UserPromptSubmit hook, (3) instruction hardening across all agent templates.
+
+**Dependencies**: F-0194 (AGENTS.json infrastructure)
+
+**Implementation**:
+- State: agents_helpers.py session commands, hook scripts, instruction files
+- Code: session-register/deregister/count-others/cleanup-stale/heartbeat
+- Tests: test_session_tracking.py
+
+**Acceptance**: spec/acceptance/F-0195.md
 

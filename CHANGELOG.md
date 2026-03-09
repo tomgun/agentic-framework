@@ -5,6 +5,11 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.52.2] - 2026-03-09
+
+### Added
+- **Multi-Session Collision Prevention (F-0195)** — Three-layer defense against destructive git ops when multiple sessions share a checkout. Layer 1: auto-registration of sessions in AGENTS.json at SessionStart (with `$PPID` for stable identity across hook invocations), deregistration at Stop, stale cleanup for crash recovery (PID dead OR heartbeat >30min). Layer 2: advisory collision warning injected into model context via UserPromptSubmit on every prompt when other sessions detected. Layer 3: instruction hardening across all agent templates — Claude Code gets `count-others` check rule, non-Claude agents (Cursor, Copilot, Codex) get behavioral rule. New `agents_helpers.py` commands: `session-register`, `session-deregister`, `count-others`, `cleanup-stale`, `session-heartbeat`. 18 pytest tests + 13 structural validation tests.
+
 ## [0.52.1] - 2026-03-09
 
 ### Changed
