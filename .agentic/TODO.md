@@ -118,6 +118,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0049: Auto-load dashboard after completing work / merging PR — nice UX touch to show updated status immediately after ag done or PR merge
 - **Added**: 2026-03-09
 
+### T-0050: Spec/backlog status drift: FEATURES.md status (planned/shipped) and BACKLOG.json can diverge. When discrepancy found, don't assume either is truth — check JOURNAL.md, CHANGELOG.md, and git history to determine actual state. Consider adding a drift-check tool.
+- **Added**: 2026-03-09
+
 ## Done
 
 

@@ -85,6 +85,8 @@ Present a summary of changes. **Never auto-commit.** Wait for human approval.
 
 After human approves:
 1. Stage files: `git add <specific-files>` (not `git add .`)
+   Include any modified state files from the workflow: `.agentic/BACKLOG.json`,
+   `.agentic/STATUS.md`, `.agentic/journal/JOURNAL.md`, `.agentic/HUMAN_NEEDED.md`.
 2. Commit with descriptive message
 3. Create PR if on feature branch: `gh pr create --title "..." --body "..."`
 4. Bump VERSION (at least patch)

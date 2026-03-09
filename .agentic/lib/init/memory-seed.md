@@ -109,8 +109,9 @@ Every time before committing, execute these commands in order:
 1. `bash .agentic/lib/tools/journal.sh "Topic" "What changed (outcomes, not files)" "Next" "Blockers" --why "Problem being solved"` — update JOURNAL.md (always include --why, describe outcomes not implementation details)
 2. `bash .agentic/lib/tools/status.sh focus "Current task"` — update .agentic/STATUS.md
 3. If shipping a feature (Formal): `bash .agentic/lib/tools/feature.sh F-#### status shipped`
-4. `ag commit` — runs quality gates, shows diff, waits for human approval
-5. Only THEN announce ready — never say "done" before artifacts are updated
+4. Stage any modified state files: BACKLOG.json, STATUS.md, JOURNAL.md, HUMAN_NEEDED.md
+5. `ag commit` — runs quality gates, shows diff, waits for human approval
+6. Only THEN announce ready — never say "done" before artifacts are updated
 
 ## Token-efficient scripts (always use these)
 

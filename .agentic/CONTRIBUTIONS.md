@@ -2718,8 +2718,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### Passive Skill Instructions Don't Drive Agent Behavior (v0.52.3)
+
+**User insight**: Describing what a CLI command does ("ag done auto-advances the backlog") is not the same as telling an agent to do it. The completing-work skill passively described backlog advancement but agents never executed it — they followed the skill's explicit command steps and skipped the descriptive paragraph. Similarly, the committing-changes skill said `git add <specific-files>` but never mentioned state files like BACKLOG.json, so they were never staged. Result: shipped features stayed atop the backlog across sessions because BACKLOG.json changes were silently lost.
+
+**Design principle**: Every agent action must be an explicit command step, not a description of what happens elsewhere. Skills are instruction scripts — if it's not a numbered step with a code block, agents won't do it. State files modified during workflows (BACKLOG.json, STATUS.md, JOURNAL.md) must be explicitly called out in the staging step, not assumed.
+
+**Secondary insight**: When FEATURES.md and BACKLOG.json disagree on whether a feature is shipped, neither is automatically the truth. Check JOURNAL.md, CHANGELOG.md, and git history to determine actual state. Tracked as T-0050.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.48.1
+**Current Version**: v0.52.3
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions
