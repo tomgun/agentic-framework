@@ -6,7 +6,7 @@ tokens: ~1130
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.50.0 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, AGENTS.json -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -24,7 +24,7 @@ If the user's intent is to build, implement, add, create, set up, develop, make,
 **A plan is NOT a spec.** Even when implementing from a detailed plan, create the formal artifacts (FEATURES.md entry + acceptance file) BEFORE writing any code. Plans contain design; specs contain the testable contract.
 5. If `spec_analysis` is enabled (default: on for formal, off for discovery), `spec-analyze.sh` runs advisory checks — review findings but proceed regardless
 
-`ag implement` auto-creates WIP tracking. If bypassing ag: run `bash .agentic/lib/tools/wip.sh start F-XXXX "desc" "files"` before coding.
+`ag implement` auto-creates WIP tracking. If `worktree_mode: always` in STACK.md, `ag implement` also auto-creates a git worktree for the feature branch. Use `ag worktree` (create|list|remove|path|status) to manage worktrees manually. If bypassing ag: run `bash .agentic/lib/tools/wip.sh start F-XXXX "desc" "files"` before coding.
 
 Never write implementation code before acceptance criteria exist. This is a structural rule, not a suggestion.
 
@@ -53,7 +53,7 @@ If the user's intent is to fix, debug, repair, resolve, investigate, troubleshoo
 
 If the user wants to commit, push, save, ship, or finalize changes:
 
-**STOP.** Check `.agentic/session/WIP.md` first — if it exists, BLOCK and warn. Otherwise, follow the pre-commit sequence below, then run `ag commit`.
+**STOP.** Check AGENTS.json for active WIP (via `bash .agentic/lib/tools/wip.sh check`) — if WIP exists, BLOCK and warn. Otherwise, follow the pre-commit sequence below, then run `ag commit`.
 
 ## When the user mentions an idea, todo, or reminder
 
@@ -118,6 +118,7 @@ Never read or edit these files directly. Always use the scripts:
 | .agentic/HUMAN_NEEDED.md | `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"` |
 | .agentic/spec/FEATURES.md | `bash .agentic/lib/tools/feature.sh F-#### status shipped` |
 | .agentic/TODO.md | `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"` |
+| AGENTS.json | Replaces WIP.md and AGENTS_ACTIVE.md for agent/WIP tracking |
 
 ## Session start
 

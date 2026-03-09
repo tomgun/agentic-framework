@@ -35,7 +35,9 @@ If any criteria are not met, list what remains and ask user how to proceed.
 bash .agentic/lib/tools/wip.sh complete
 ```
 
-This removes the `.agentic/session/WIP.md` lock file.
+This clears the active WIP entry from `.agentic/session/AGENTS.json`.
+
+In a worktree: commit and push from the worktree, run `wip.sh complete`, then `cd` back to the main worktree and run `ag done F-XXXX`. When `worktree_mode: always`, `ag done` auto-cleans the worktree.
 
 ### Step 2b: Verify Documentation Updated
 
@@ -106,7 +108,7 @@ Result: User decides to add the test first.
 
 ## Troubleshooting
 
-**Error: No WIP.md found**
+**Error: No active WIP found**
 Cause: Work was never formally started or already completed.
 Solution: Proceed with status updates. WIP tracking is a guard, not a blocker for completion.
 

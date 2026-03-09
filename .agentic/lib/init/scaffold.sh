@@ -421,7 +421,7 @@ else
 fi
 echo ""
 echo "Multi-agent setup:"
-echo "  - Pipeline infrastructure: ✓ Created (AGENTS_ACTIVE.md, .agentic/pipeline/)"
+echo "  - Pipeline infrastructure: ✓ Created (AGENTS.json, .agentic/pipeline/)"
 echo "  - Agent roles: Available in .agentic/lib/agents/roles/"
 echo "  - To copy roles to Cursor: bash .agentic/lib/tools/setup-agent.sh cursor-agents"
 

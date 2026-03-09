@@ -61,10 +61,10 @@
 | 001_session_start | Agent greets with context at session start | LLM | ✅ |
 | 006_wip_recovery | Agent warns about interrupted work | LLM | ❌ Cursor CLI |
 | 015_session_end_summary | Agent provides session end handoff | LLM | ✅ |
-| 014_multi_agent_awareness | Agent checks AGENTS_ACTIVE.md | LLM | ❌ Cursor CLI |
+| 014_multi_agent_awareness | Agent checks AGENTS.json | LLM | ❌ Cursor CLI |
 | 030_reads_status_on_start | Agent reads STATUS.md, references current work | LLM | ✅ |
 | 031_references_journal_history | Agent reads JOURNAL.md, reports history | LLM | ✅ |
-| 033_mentions_agents_active | Agent mentions AGENTS_ACTIVE coordination | LLM | ✅ |
+| 033_mentions_agents_active | Agent mentions AGENTS.json coordination | LLM | ✅ |
 | 034_suggests_worktree | Agent recommends worktree for parallel work | LLM | ✅ |
 | _Acceptance_ | journal.sh, status.sh, wip.sh, quality docs, context manifests | Structural | ✅ (13 tests) |
 

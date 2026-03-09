@@ -26,11 +26,11 @@ These tests require a real LLM agent interacting with the framework.
 
 ### Session Start
 - [ ] Agent reads session_start.md checklist (or equivalent)
-- [ ] Agent checks AGENTS_ACTIVE.md for other active agents
+- [ ] Agent checks AGENTS.json for other active agents
 - [ ] Agent reads CONTEXT_PACK.md before coding
 - [ ] Agent reads STATUS.md for current focus
 - [ ] Agent checks for .upgrade_pending marker
-- [ ] Agent checks for .agentic/session/WIP.md (interrupted work)
+- [ ] Agent checks for interrupted work (AGENTS.json / WIP.md)
 
 ### Session End
 - [ ] Agent updates JOURNAL.md with session summary
@@ -105,7 +105,7 @@ These tests require a real LLM agent interacting with the framework.
 ## 6. Recovery Tests
 
 ### Interrupted Session
-- [ ] Agent reads .agentic/session/WIP.md if present
+- [ ] Agent detects interrupted work via AGENTS.json or WIP.md
 - [ ] Agent can resume work from where it left off
 - [ ] Agent uses JOURNAL.md for context recovery
 
@@ -119,7 +119,7 @@ These tests require a real LLM agent interacting with the framework.
 ## 7. Multi-Agent Coordination Tests
 
 ### Agent Awareness
-- [ ] Agent detects other active agents via AGENTS_ACTIVE.md
+- [ ] Agent detects other active agents via AGENTS.json
 - [ ] Agent communicates with user about coordination
 - [ ] Agent does NOT overwrite other agents' work
 

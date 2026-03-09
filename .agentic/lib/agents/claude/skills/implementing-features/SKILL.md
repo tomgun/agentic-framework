@@ -55,7 +55,7 @@ Verify the feature is small batch (max 5-10 files). If larger, break into smalle
 bash .agentic/lib/tools/wip.sh start F-XXXX "Description" "file1 file2"
 ```
 
-This creates `.agentic/session/WIP.md` — a lock that prevents premature commits.
+This registers active work in `.agentic/session/AGENTS.json` — a lock that prevents premature commits.
 
 ### Step 4: Implement
 

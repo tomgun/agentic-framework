@@ -1702,3 +1702,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 11:37 - F-0194 review fixes
+
+**Why**: Code review found critical locking bugs and missing worktree cleanup wiring
+
+**What changed**:
+- Fixed all code review findings: atomic file locking (C-1/C-2/C-3), global agent detection in cmd_start (H-2), worktree auto-cleanup in ag done (H-3), per-worktree feature resolution (H-4), AGENTS_JSON export (H-6), migrate dedup (M-3), active stale detection (M-5), safe auto-remove (M-6), targeted stderr suppression (M-9)
+
+**Next steps**:
+- PR ready for re-review
+
+**Blockers**: None
+

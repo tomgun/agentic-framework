@@ -499,14 +499,14 @@
       "profile": "discovery",
       "setup": {
         "files": {
-          ".agentic/session/AGENTS_ACTIVE.md": "# Active Agents\n\n## Agent: claude-agent-1\n- **Feature**: F-0099: User Authentication\n- **Branch**: feat/auth\n- **Started**: 2026-02-07\n- **Working on**: Login form and JWT integration\n- **Files**: src/auth/*.ts, tests/auth/*.test.ts"
+          ".agentic/session/AGENTS.json": "[{\"feature_id\":\"F-0099\",\"description\":\"User Authentication\",\"worktree\":\"\",\"branch\":\"feat/auth\",\"agent\":\"claude-agent-1\",\"started\":\"2026-02-07T00:00:00Z\",\"last_checkpoint\":\"2026-02-07T00:00:00Z\",\"status\":\"active\",\"progress\":[\"Login form and JWT integration\"],\"files\":[\"src/auth/*.ts\",\"tests/auth/*.test.ts\"]}]"
         }
       },
       "prompt": "I want to start working on the payment feature while my colleague works on auth in parallel",
       "expected": {
         "output_contains": [],
         "output_contains_any": [
-          "AGENTS_ACTIVE|coordination|parallel|worktree|conflict|branch|isolat|concurrent|separate"
+          "AGENTS.json|AGENTS_ACTIVE|coordination|parallel|worktree|conflict|branch|isolat|concurrent|separate"
         ],
         "output_not_contains": [],
         "file_exists": [],
