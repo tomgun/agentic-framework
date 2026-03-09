@@ -4104,6 +4104,101 @@ else
   fail "T-0082: upgrade.sh missing AGENTS.json migration"
 fi
 
+# --- F-0195: Multi-Session Collision Prevention ---
+echo ""
+echo "--- F-0195: Multi-Session Collision Prevention ---"
+
+# T-0083: agents_helpers.py has session commands
+if grep -q "session-register" "${FRAMEWORK_ROOT}/.agentic/lib/tools/agents_helpers.py"; then
+  pass "T-0083: agents_helpers.py has session-register command"
+else
+  fail "T-0083: agents_helpers.py missing session-register command"
+fi
+
+if grep -q "count-others" "${FRAMEWORK_ROOT}/.agentic/lib/tools/agents_helpers.py"; then
+  pass "T-0084: agents_helpers.py has count-others command"
+else
+  fail "T-0084: agents_helpers.py missing count-others command"
+fi
+
+if grep -q "cleanup-stale" "${FRAMEWORK_ROOT}/.agentic/lib/tools/agents_helpers.py"; then
+  pass "T-0085: agents_helpers.py has cleanup-stale command"
+else
+  fail "T-0085: agents_helpers.py missing cleanup-stale command"
+fi
+
+# T-0086: SessionStart.sh registers session
+if grep -q "session-register" "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/SessionStart.sh"; then
+  pass "T-0086: SessionStart.sh calls session-register"
+else
+  fail "T-0086: SessionStart.sh missing session-register call"
+fi
+
+# T-0087: Stop.sh deregisters session
+if grep -q "session-deregister" "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh"; then
+  pass "T-0087: Stop.sh calls session-deregister"
+else
+  fail "T-0087: Stop.sh missing session-deregister call"
+fi
+
+# T-0088: UserPromptSubmit.sh has collision warning
+if grep -q "count-others" "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
+  pass "T-0088: UserPromptSubmit.sh has collision warning"
+else
+  fail "T-0088: UserPromptSubmit.sh missing collision warning"
+fi
+
+# T-0089: Collision rule in Claude CLAUDE.md template
+if grep -q "collision\|count-others" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md"; then
+  pass "T-0089: Claude CLAUDE.md template has collision rule"
+else
+  fail "T-0089: Claude CLAUDE.md template missing collision rule"
+fi
+
+# T-0090: Collision rule in cursorrules.txt (behavioral)
+if grep -qi "destructive git\|collision\|multi-session" "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/cursorrules.txt"; then
+  pass "T-0090: cursorrules.txt has collision rule"
+else
+  fail "T-0090: cursorrules.txt missing collision rule"
+fi
+
+# T-0091: Collision rule in copilot-instructions.md (behavioral)
+if grep -qi "destructive git\|collision\|multi-session" "${FRAMEWORK_ROOT}/.agentic/lib/agents/copilot/copilot-instructions.md"; then
+  pass "T-0091: copilot-instructions.md has collision rule"
+else
+  fail "T-0091: copilot-instructions.md missing collision rule"
+fi
+
+# T-0092: Collision rule in codex-instructions.md (behavioral)
+if grep -qi "destructive git\|collision\|multi-session" "${FRAMEWORK_ROOT}/.agentic/lib/agents/codex/codex-instructions.md"; then
+  pass "T-0092: codex-instructions.md has collision rule"
+else
+  fail "T-0092: codex-instructions.md missing collision rule"
+fi
+
+# T-0093: Collision rule in memory-seed.md
+if grep -qi "collision\|count-others\|multi-session" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
+  pass "T-0093: memory-seed.md has collision rule"
+else
+  fail "T-0093: memory-seed.md missing collision rule"
+fi
+
+# T-0094: Collision guard in agent_operating_guidelines.md
+if grep -qi "collision\|Collision" "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/agent_operating_guidelines.md"; then
+  pass "T-0094: agent_operating_guidelines.md has collision guard"
+else
+  fail "T-0094: agent_operating_guidelines.md missing collision guard"
+fi
+
+# T-0095: Hooks use $PPID not $$ for session identity
+if grep -q 'PPID' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/SessionStart.sh" && \
+   grep -q 'PPID' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh" && \
+   grep -q 'PPID' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
+  pass "T-0095: All hooks use \$PPID for session identity"
+else
+  fail "T-0095: Some hooks missing \$PPID (should not use \$\$)"
+fi
+
 echo ""
 
 # ============================================================
