@@ -216,8 +216,8 @@ class CriticalAgent:
                 capture_output=True, text=True, cwd=str(self.project_root),
             ).stdout.strip()
 
+            # Feature branch: try diff against main/master first
             if branch and branch not in ("main", "master"):
-                # Feature branch: diff against main (or master)
                 for base in ("main", "master"):
                     result = subprocess.run(
                         ["git", "diff", f"{base}...HEAD"],
@@ -226,22 +226,16 @@ class CriticalAgent:
                     )
                     if result.returncode == 0 and result.stdout.strip():
                         return self._truncate_diff(result.stdout)
-                # Fallback if no base branch found
-                result = subprocess.run(
-                    ["git", "diff", "HEAD~1"],
-                    capture_output=True, text=True,
-                    cwd=str(self.project_root),
-                )
-            else:
-                result = subprocess.run(
-                    ["git", "diff", "HEAD~1"],
-                    capture_output=True, text=True,
-                    cwd=str(self.project_root),
-                )
 
+            # Main branch or feature branch with no base diff: use HEAD~1
+            result = subprocess.run(
+                ["git", "diff", "HEAD~1"],
+                capture_output=True, text=True,
+                cwd=str(self.project_root),
+            )
             if result.returncode == 0:
                 return self._truncate_diff(result.stdout)
-        except (FileNotFoundError, OSError):
+        except (FileNotFoundError, OSError, Exception):
             pass
         return ""
 
@@ -321,13 +315,18 @@ class CriticalAgent:
                 break
 
             # Track HTML comment boundaries
+            # Handle single-line comments (<!-- ... -->) and multi-line
+            if "<!--" in line and "-->" in line:
+                # Entire comment on one line — skip it, don't change state
+                continue
             if "<!--" in line:
                 in_comment = True
+                continue
             if "-->" in line:
                 in_comment = False
                 continue
 
-            # Skip commented-out lines
+            # Skip lines inside multi-line comments
             if in_comment:
                 continue
 
@@ -398,15 +397,20 @@ class CriticalAgent:
             except (json.JSONDecodeError, KeyError):
                 pass
 
-        # 2. Try bare JSON — find outermost { ... }
-        brace_start = output.find("{")
-        brace_end = output.rfind("}")
-        if brace_start != -1 and brace_end > brace_start:
+        # 2. Try bare JSON — scan for { ... } blocks starting from each {
+        start = 0
+        while True:
+            brace_start = output.find("{", start)
+            if brace_start == -1:
+                break
+            brace_end = output.rfind("}")
+            if brace_end <= brace_start:
+                break
             try:
                 data = json.loads(output[brace_start:brace_end + 1])
                 return self._verdict_from_dict(data, output)
             except (json.JSONDecodeError, KeyError):
-                pass
+                start = brace_start + 1
 
         # 3. Parsing failed → escalate (never auto-approve)
         return ReviewVerdict(
