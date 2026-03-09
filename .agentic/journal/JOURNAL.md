@@ -1819,3 +1819,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 22:47 - Dashboard project name
+
+**Why**: Dashboard showed 'workspace' instead of real project name in containers
+
+**What changed**:
+- Derive repo name from git remote when dir name is generic (e.g. Docker /workspace)
+
+**Next steps**:
+- None
+
+**Blockers**: None
+
