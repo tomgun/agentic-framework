@@ -2988,7 +2988,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Complexity**: high
 **Since**: v0.48.0
 
-**Description**: Configurable review gates on state machine transitions. Three modes: `human | critical_agent | auto` per transition, per profile. Settings in STACK.md (`review_spec`, `review_criteria`, `review_plan`, `review_code`, `review_merge`). State machine blocks at review checkpoints when mode is `human`. `critical_agent` mode falls back to `human` until Phase 4 ships. ADR-001 Phase 3, Section 5.1.
+**Description**: Configurable review gates on state machine transitions. Three modes: `human | critical_agent | skip` per transition, per profile. Settings in STACK.md (`review_spec`, `review_criteria`, `review_plan`, `review_code`, `review_merge`). State machine blocks at review checkpoints when mode is `human`. `critical_agent` mode falls back to `human` until Phase 4 ships. ADR-001 Phase 3, Section 5.1.
 
 **Dependencies**: F-0177
 
@@ -3009,7 +3009,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Complexity**: low
 **Since**: v0.48.0
 
-**Description**: New `autonomous_formal` profile in `profiles.conf` with agent-friendly review defaults: auto/critical_agent for most checkpoints, human only for final merge. Defines review checkpoint defaults per profile (Discovery, Formal, Autonomous Formal). ADR-001 Phase 3.
+**Description**: New `autonomous_formal` profile in `profiles.conf` with agent-friendly review defaults: skip/critical_agent for most checkpoints, human only for final merge. Defines review checkpoint defaults per profile (Discovery, Formal, Autonomous Formal). ADR-001 Phase 3.
 
 **Dependencies**: F-0180
 

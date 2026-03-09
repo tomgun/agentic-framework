@@ -1,8 +1,11 @@
 """
 review.py -- Review checkpoint framework for the Agentic Framework.
 
-Implements ADR-001 Phase 3: configurable review modes (human/critical_agent/auto)
+Implements ADR-001 Phase 3: configurable review modes (human/critical_agent/skip)
 per state transition. Reviews happen after gates pass, before the transition writes.
+
+"skip" means "no review gate — proceed if preconditions pass."
+Legacy alias "auto" is accepted for backward compatibility and mapped to "skip".
 
 Usage:
     from auto.review import check_review, has_pending_review, resolve_review
@@ -65,7 +68,14 @@ class ReviewMode(Enum):
     """Review mode for a transition checkpoint."""
     HUMAN = "human"
     CRITICAL_AGENT = "critical_agent"
-    AUTO = "auto"
+    SKIP = "skip"
+
+
+# Backward compatibility: "auto" was renamed to "skip" in v0.51.0.
+# Accept both values during transition.
+_LEGACY_MODE_ALIASES: dict[str, str] = {
+    "auto": "skip",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -91,7 +101,7 @@ TRANSITION_REVIEW_MAP: dict[tuple[str, str], str] = {
     ("implementing", "committed"): "review_code",
 }
 
-# Unmapped forward transitions (auto by default, structural gates suffice):
+# Unmapped forward transitions (skip by default, structural gates suffice):
 # criteria_set → tests_written, implementing → verified, verified → documented
 
 # Derive regression pairs from state_machine.REGRESSION_TRANSITIONS (source of truth)
@@ -114,7 +124,7 @@ def _get_review_setting_key(from_state: str, to_state: str) -> Optional[str]:
         return TRANSITION_REVIEW_MAP[pair]
     if pair in _REGRESSION_PAIRS:
         return "review_regression"
-    # Unmapped forward transitions default to auto (no setting needed)
+    # Unmapped forward transitions default to skip (no setting needed)
     return None
 
 
@@ -122,19 +132,25 @@ def _get_review_setting_key(from_state: str, to_state: str) -> Optional[str]:
 # Public API
 # ---------------------------------------------------------------------------
 
+def _normalize_review_value(value: str) -> str:
+    """Map legacy review mode values to current ones."""
+    return _LEGACY_MODE_ALIASES.get(value, value)
+
+
 def get_review_mode(
     project_root: Path, from_state: str, to_state: str
 ) -> ReviewMode:
     """Resolve the review mode for a transition via settings."""
     setting_key = _get_review_setting_key(from_state, to_state)
     if setting_key is None:
-        return ReviewMode.AUTO
+        return ReviewMode.SKIP
 
-    value = get_setting(project_root, setting_key, "auto")
+    value = get_setting(project_root, setting_key, "skip")
+    value = _normalize_review_value(value)
     try:
         return ReviewMode(value)
     except ValueError:
-        return ReviewMode.AUTO
+        return ReviewMode.SKIP
 
 
 def check_review(
@@ -146,7 +162,7 @@ def check_review(
     """Check if a review is needed for this transition.
 
     Returns (can_proceed, messages).
-    - auto: auto-approves (True, []) — structural gates still apply
+    - skip: auto-approves (True, []) — structural gates still apply
     - human/critical_agent: creates pending review, returns (False, [instructions])
 
     If a verdict artifact already exists, returns (True, []) to prevent
@@ -160,7 +176,7 @@ def check_review(
         return True, []
 
     mode = get_review_mode(project_root, from_state, to_state)
-    if mode == ReviewMode.AUTO:
+    if mode == ReviewMode.SKIP:
         return True, []
 
     # human or critical_agent → block

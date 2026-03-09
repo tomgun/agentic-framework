@@ -55,6 +55,20 @@ phase: planning
 
 ---
 
+## Plan-Mode Boundary
+
+Plan creation happens in plan mode (read-only). Plan save, review, and approval
+happen **after** plan mode ends. This is a critical boundary:
+
+- **During plan mode**: Steps 1-4 of the planning skill (explore, research, create plan, add execution order). No file writes, no agent spawning.
+- **After plan mode exits**: Steps 5-6 (save plan durably with DRAFT status, run dialectical review if enabled, hand off to implementation).
+
+The planning-features skill explicitly instructs the agent to continue with Phase 2
+immediately after plan mode ends. The implementing-features skill has a safety net
+(Step 0.5) that catches unapproved plans and triggers the review before proceeding.
+
+---
+
 ## Plan Artifact Format
 
 Plans are written to `.agentic/journal/plans/F-XXXX-plan.md`:
