@@ -540,7 +540,7 @@ For hands-off execution. Require test commands in STACK.md; task/crunch require 
 
 ### Session Protocols
 
-- **START**: Run `ag start`. Read .agentic/STATUS.md, HUMAN_NEEDED.md, check AGENTS.json for WIP (via `wip.sh check`). If WIP exists: warn about interrupted work and suggest resuming.
+- **START**: Run `ag start`. Use `dashboard.sh` — one tool call, output verbatim. Script renders the full dashboard. If WIP exists: dashboard shows interrupted work warning.
 - **END**: Run `.agentic/lib/checklists/session_end.md`, update JOURNAL.md.
 - **DONE**: Run `.agentic/lib/checklists/feature_complete.md` before claiming done.
 

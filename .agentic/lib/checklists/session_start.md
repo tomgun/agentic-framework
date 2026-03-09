@@ -17,19 +17,19 @@ phase: session
 
 **When a new session starts (first message, tokens reset, or user returns), automatically:**
 
-## Step 1: Quick Context Scan (Silent — NO text output)
+## Step 1: Quick Context Scan (ONE tool call, verbatim output)
 
-**CRITICAL**: Do NOT output any text before the dashboard. No "Starting session...", no "Let me check the current state", no narration. Run tool calls silently, then the dashboard is your FIRST text output.
+**CRITICAL**: Do NOT output any text before the dashboard. No "Starting session...", no "Let me check the current state", no narration.
+
+**CRITICAL**: Issue exactly ONE tool call:
 
 ```bash
-# Read these silently (don't dump to user)
-# IMPORTANT: Every command must have "|| true" to prevent exit code errors
-cat STATUS.md 2>/dev/null || true
-cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
-python3 .agentic/lib/tools/agents_helpers.py list 2>/dev/null || true
-bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
-bash .agentic/lib/tools/backlog.sh current 2>/dev/null || true
+bash .agentic/lib/tools/dashboard.sh 2>/dev/null
 ```
+
+This consolidates STATUS, JOURNAL, HUMAN_NEEDED, WIP, backlog, agents, health AND renders the final dashboard. Output the result **verbatim** as your first text response — no reformatting, no summarizing, no wrapping in markdown.
+
+Do NOT add Read calls (JOURNAL.md, STATUS.md, etc.) — `dashboard.sh` covers everything. Extra tool calls add visible noise before the dashboard.
 
 ## Step 2: Greet User with Recap
 

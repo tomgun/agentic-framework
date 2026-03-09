@@ -7,7 +7,7 @@ description: >
   or returns after being away.
   Do NOT use for: mid-session tasks, implementing features, committing code.
 compatibility: "Requires Claude Code with shell access and ag commands."
-allowed-tools: [Read, Bash, Glob, Grep]
+allowed-tools: [Read, Bash]
 metadata:
   author: agentic-framework
   version: "${VERSION}"
@@ -15,86 +15,70 @@ metadata:
 
 # Session Start
 
-Initialize a new session by checking project state and presenting a dashboard.
+Initialize a new session by checking project state and presenting a polished dashboard.
 
 ## Instructions
 
-### Step 1: Quick Context Scan (Silent)
-
-Read these files silently (do not dump raw content to user):
+### Step 1: Run Dashboard (ONE tool call)
 
 ```bash
-cat STATUS.md 2>/dev/null || true
-cat HUMAN_NEEDED.md 2>/dev/null | head -20 || true
-bash .agentic/lib/tools/wip.sh check 2>/dev/null || true
-bash .agentic/lib/tools/todo.sh list 2>/dev/null || true
+bash .agentic/lib/tools/dashboard.sh 2>/dev/null
 ```
 
-Also read the last 2-3 entries from `.agentic/journal/JOURNAL.md`.
+This is the ONLY tool call. No Read calls, no ad-hoc checks. The script consolidates all state (STATUS, JOURNAL, BACKLOG, WIP, BLOCKERS, AGENTS, HEALTH) and renders the final dashboard.
 
-### Step 2: Check for Interrupted Work
+### Step 2: Output Verbatim
 
-If `wip.sh check` reports interrupted work:
+Output the dashboard.sh result as your first text response. **No preamble, no narration, no reformatting.** Do not add "Welcome back!", do not summarize it differently, do not wrap in markdown. Copy the output exactly.
 
-Present to user:
-- What feature was in progress
-- What files were changed (`git diff --stat`)
-- Options: continue, review changes, or roll back
+### Step 3: Handle Critical Special Cases
 
-**Do not proceed to new work until interrupted work is addressed.**
+After outputting the dashboard, check if the output contains any of these — and if so, note them briefly:
 
-### Step 3: Greet with Dashboard
-
-Present a structured greeting:
-
-```
-Welcome back! Here's where we are:
-
-**Last session**: [Summary from JOURNAL.md]
-**Current focus**: [From STATUS.md]
-**Progress**: [What's done, what's in progress]
-
-**Next steps** (pick one or tell me something else):
-1. [Next planned task]
-2. [Second option]
-3. [Address blockers — if any in HUMAN_NEEDED.md]
-
-**Available workflows**: `ag plan` | `ag sync` | `ag implement F-XXXX`
-```
-
-### Step 4: Handle Special Cases
-
-- **HUMAN_NEEDED.md has items**: Surface them before asking what to work on
-- **Upgrade pending** (`.agentic/.upgrade_pending`): Follow the TODO in that file
-- **Other agents active** (`.agentic/session/AGENTS.json`): Register self, avoid their files
-- **Memory stale**: Run `bash .agentic/lib/tools/memory-check.sh`
+- **Upgrade pending** (🔄 line present): User should handle before new work.
+- **Interrupted work** (⚠️ line present): Focus on recovery, don't suggest new features.
+- **Memory stale** (health mentions memory): Note it as action item.
 
 ## Examples
 
-**Example 1: Clean start, no interruptions**
-Steps taken:
-1. Read .agentic/STATUS.md — focus is "Infrastructure validation tests"
-2. WIP check — clean, no interrupted work
-3. Read JOURNAL.md — last session fixed doc architecture
-4. Check HUMAN_NEEDED — no active items
-Dashboard: "Last session: doc architecture review. Current focus: infra tests. Next: run LLM tests or start new feature."
+**Example: Clean start**
 
-**Example 2: Interrupted work detected**
-Steps taken:
-1. WIP check — F-0125 was in progress, interrupted 2 hours ago
-2. git diff shows 3 uncommitted files
-Dashboard: "Previous work on F-0125 was interrupted. 3 uncommitted changes. Continue, review, or roll back?"
+One tool call visible: `Bash(dashboard.sh)`
+
+Agent text output (verbatim from script):
+```
+My Project · v1.2.0
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 Last session   Shipped auth improvements
+🎯 Focus          API rate limiting
+✅ Health         Clean · No blockers
+
+📌 Backlog
+   Current → F-0042  Rate limit middleware
+   Next    → F-0043  Usage dashboard
+   Queue     3 remaining
+
+⚡ Next steps
+   1. Start building — `ag implement F-0042`
+   2. Plan first — `ag plan F-0042`
+   3. View queue — `ag backlog list`
+
+💡 Tip: Use `ag sync` to detect drift across specs and docs.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
 
 ## Troubleshooting
 
-**Error: STATUS.md not found**
-Cause: Project not initialized with agentic framework.
-Solution: Run `bash .agentic/lib/init/scaffold.sh` or check if this is a framework project.
+**Error: dashboard.sh not found**
+Cause: Tool script missing or path incorrect.
+Solution: Verify `.agentic/lib/tools/dashboard.sh` exists and is executable.
 
-**Error: JOURNAL.md empty or missing**
-Cause: First session or journal was never created.
-Solution: This is normal for new projects. Proceed with available context from STATUS.md.
+**Error: STATUS.md or JOURNAL.md not found**
+Cause: Project not initialized or first session.
+Solution: Normal for new projects. Dashboard will show "No focus set" / "First session".
 
 ## References
 
-- For full session start protocol: see `references/session_start.md`
+- Dashboard scanner: `.agentic/lib/tools/dashboard.sh`
+- Full session start protocol: `references/session_start.md`
