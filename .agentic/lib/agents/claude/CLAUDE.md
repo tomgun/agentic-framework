@@ -21,6 +21,7 @@ Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX`
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
 - Multi-agent: check `.agentic/session/AGENTS.json` before starting work (use `python3 .agentic/lib/tools/agents_helpers.py --project-root . list` or `wip.sh check`).
+- Multi-session safety: Before ANY destructive git op (stash, checkout ., restore ., reset --hard, clean -f), run `python3 .agentic/lib/tools/agents_helpers.py --project-root . count-others "$(pwd)" --pid $PPID`. If >0, DO NOT PROCEED — use a worktree or commit first.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 
 ## Token-Efficient Scripts (ALWAYS use these, NEVER edit state files directly)
