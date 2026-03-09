@@ -92,7 +92,7 @@ fi
 AGENTIC_LIB="$PROJECT_ROOT/.agentic/lib"
 if [[ -f "$AGENTIC_LIB/tools/agents_helpers.py" ]]; then
   python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
-    --project-root "$PROJECT_ROOT" session-deregister "$PROJECT_ROOT" --pid $PPID 2>/dev/null || true
+    --project-root "$PROJECT_ROOT" session-deregister "$PROJECT_ROOT" --pid "$PPID" 2>/dev/null || true
 fi
 
 # 6. Summary

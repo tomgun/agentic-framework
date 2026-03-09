@@ -5,9 +5,7 @@ Tests for session tracking in agents_helpers.py (F-0195: Multi-Session Collision
 import json
 import os
 import sys
-import tempfile
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -20,8 +18,7 @@ from tools.agents_helpers import (
     cmd_count_others,
     cmd_cleanup_stale,
     cmd_session_heartbeat,
-    _load_unlocked,
-    _STALE_HEARTBEAT_MINUTES,
+    cmd_prompt_check,
 )
 
 
@@ -218,18 +215,96 @@ class TestSessionHeartbeat:
         old_items = json.loads(agents_file.read_text())
         old_checkpoint = old_items[0]["last_checkpoint"]
 
-        # Small delay not needed — just verify it updates
-        cmd_session_heartbeat(agents_file, pid=12345)
+        cmd_session_heartbeat(agents_file, "/tmp/project", pid=12345)
         new_items = json.loads(agents_file.read_text())
-        # Checkpoint should be updated (or same if within same second)
         assert new_items[0]["last_checkpoint"] >= old_checkpoint
 
     def test_noop_for_unknown_pid(self, agents_file):
         cmd_session_register(agents_file, "/tmp/project", "claude-code", pid=12345)
-        cmd_session_heartbeat(agents_file, pid=99999)
+        cmd_session_heartbeat(agents_file, "/tmp/project", pid=99999)
         # Should not crash, entry unchanged
         items = json.loads(agents_file.read_text())
         assert len(items) == 1
+
+    def test_fallback_pid_only(self, agents_file):
+        """Backwards compat: heartbeat with no worktree matches by PID only."""
+        cmd_session_register(agents_file, "/tmp/project", "claude-code", pid=12345)
+        cmd_session_heartbeat(agents_file, "", pid=12345)
+        items = json.loads(agents_file.read_text())
+        assert len(items) == 1
+
+
+# ---------------------------------------------------------------------------
+# Integration: full lifecycle
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# prompt-check (combined count-others + heartbeat)
+# ---------------------------------------------------------------------------
+
+class TestPromptCheck:
+    def test_returns_count_and_updates_heartbeat(self, agents_file, capsys):
+        """prompt-check does count + heartbeat in one call."""
+        cmd_session_register(agents_file, "/tmp/project", "claude-code", pid=111)
+        cmd_session_register(agents_file, "/tmp/project", "claude-code", pid=222)
+
+        cmd_prompt_check(agents_file, "/tmp/project", pid=111)
+        assert capsys.readouterr().out.strip() == "1"
+
+        # Verify heartbeat was updated
+        items = json.loads(agents_file.read_text())
+        session_111 = [i for i in items if i["pid"] == 111][0]
+        assert session_111["last_checkpoint"]  # non-empty
+
+    def test_zero_when_alone(self, agents_file, capsys):
+        cmd_session_register(agents_file, "/tmp/project", "claude-code", pid=111)
+        cmd_prompt_check(agents_file, "/tmp/project", pid=111)
+        assert capsys.readouterr().out.strip() == "0"
+
+
+# ---------------------------------------------------------------------------
+# CLI dispatch: --pid parsing
+# ---------------------------------------------------------------------------
+
+class TestCliPidParsing:
+    @pytest.fixture
+    def cli_project(self, tmp_path):
+        """Create a project layout that get_paths() can resolve."""
+        session_dir = tmp_path / ".agentic" / "session"
+        session_dir.mkdir(parents=True)
+        agents_file = session_dir / "AGENTS.json"
+        agents_file.write_text("[]\n")
+        return tmp_path, agents_file
+
+    def test_malformed_pid_defaults_to_zero(self, cli_project):
+        """Malformed --pid value is silently ignored (defaults to os.getpid())."""
+        from tools.agents_helpers import main
+        project_root, agents_file = cli_project
+        sys.argv = [
+            "agents_helpers.py",
+            "--project-root", str(project_root),
+            "session-register", "/tmp/proj", "claude-code",
+            "--pid", "abc",
+        ]
+        main()
+        items = json.loads(agents_file.read_text())
+        assert len(items) == 1
+        # PID should be os.getpid() since "abc" was invalid
+        assert items[0]["pid"] == os.getpid()
+
+    def test_valid_pid_passed_through(self, cli_project):
+        from tools.agents_helpers import main
+        project_root, agents_file = cli_project
+        sys.argv = [
+            "agents_helpers.py",
+            "--project-root", str(project_root),
+            "session-register", "/tmp/proj", "claude-code",
+            "--pid", "42",
+        ]
+        main()
+        items = json.loads(agents_file.read_text())
+        assert len(items) == 1
+        assert items[0]["pid"] == 42
 
 
 # ---------------------------------------------------------------------------

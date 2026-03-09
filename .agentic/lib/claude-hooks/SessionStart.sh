@@ -92,9 +92,9 @@ if [[ -f "$AGENTIC_LIB/tools/agents_helpers.py" ]]; then
   python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
     --project-root "$PROJECT_ROOT" cleanup-stale 2>/dev/null || true
   python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
-    --project-root "$PROJECT_ROOT" session-register "$PROJECT_ROOT" "claude-code" --pid $PPID 2>/dev/null || true
+    --project-root "$PROJECT_ROOT" session-register "$PROJECT_ROOT" "claude-code" --pid "$PPID" 2>/dev/null || true
   OTHERS=$(python3 "$AGENTIC_LIB/tools/agents_helpers.py" \
-    --project-root "$PROJECT_ROOT" count-others "$PROJECT_ROOT" --pid $PPID 2>/dev/null || echo "0")
+    --project-root "$PROJECT_ROOT" count-others "$PROJECT_ROOT" --pid "$PPID" 2>/dev/null || echo "0")
   if [[ "$OTHERS" -gt 0 ]]; then
     echo -e "${RED}⚠️  COLLISION RISK: $OTHERS other session(s) active on this checkout.${NC}"
     echo "   FORBIDDEN: git stash, git checkout ., git restore ., git reset --hard, git clean -f"

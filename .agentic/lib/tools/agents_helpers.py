@@ -571,20 +571,64 @@ def cmd_cleanup_stale(agents_file: Path) -> int:
     return 0
 
 
-def cmd_session_heartbeat(agents_file: Path, pid: int = 0) -> int:
+def cmd_session_heartbeat(agents_file: Path, worktree: str = "",
+                          pid: int = 0) -> int:
     """Update last_checkpoint for a session entry (heartbeat for crash recovery)."""
     if pid <= 0:
         pid = os.getpid()
     now = _now_iso()
 
     def _do(items):
-        for item in items:
-            if item.get("type") == "session" and item.get("pid") == pid:
-                item["last_checkpoint"] = now
-                break
+        if worktree:
+            idx = _find_session_by_pid(items, worktree, pid)
+            if idx >= 0:
+                items[idx]["last_checkpoint"] = now
+        else:
+            # Fallback: match by PID only (backwards compat)
+            for item in items:
+                if item.get("type") == "session" and item.get("pid") == pid:
+                    item["last_checkpoint"] = now
+                    break
         return items
 
     _with_lock(agents_file, _do)
+    return 0
+
+
+def cmd_prompt_check(agents_file: Path, worktree: str,
+                     pid: int = 0) -> int:
+    """Combined count-others + heartbeat in one invocation (UserPromptSubmit hot path).
+
+    Prints the count of other active entries on the same worktree, then updates
+    the session heartbeat — all in a single Python startup and file lock cycle.
+    """
+    if pid <= 0:
+        pid = os.getpid()
+    now = _now_iso()
+    norm = os.path.normpath(worktree)
+    count_result = [0]
+
+    def _do(items):
+        # Count others (same logic as cmd_count_others)
+        count = 0
+        for item in items:
+            if item.get("status") not in ("active", "created"):
+                continue
+            if os.path.normpath(item.get("worktree", "")) != norm:
+                continue
+            if item.get("type") == "session" and item.get("pid") == pid:
+                continue
+            count += 1
+        count_result[0] = count
+
+        # Heartbeat (same logic as cmd_session_heartbeat)
+        idx = _find_session_by_pid(items, worktree, pid)
+        if idx >= 0:
+            items[idx]["last_checkpoint"] = now
+        return items
+
+    _with_lock(agents_file, _do)
+    print(count_result[0])
     return 0
 
 
@@ -636,7 +680,7 @@ def main() -> int:
         "check-worktree", "get-active", "get-current-feature", "list",
         "migrate-wip",
         "session-register", "session-deregister", "count-others",
-        "cleanup-stale", "session-heartbeat",
+        "cleanup-stale", "session-heartbeat", "prompt-check",
     }
     if cmd not in valid_cmds:
         print(f"Unknown command: {cmd}", file=sys.stderr)
@@ -712,7 +756,13 @@ def main() -> int:
     elif cmd == "cleanup-stale":
         return cmd_cleanup_stale(agents_file)
     elif cmd == "session-heartbeat":
-        return cmd_session_heartbeat(agents_file, pid_val)
+        wt = rest[0] if rest else ""
+        return cmd_session_heartbeat(agents_file, wt, pid_val)
+    elif cmd == "prompt-check":
+        if not rest:
+            print("Error: worktree path required", file=sys.stderr)
+            return 1
+        return cmd_prompt_check(agents_file, rest[0], pid_val)
     return 1
 
 
