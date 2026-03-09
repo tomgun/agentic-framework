@@ -19,6 +19,8 @@ Initialize a new session by checking project state and presenting a polished das
 
 ## Instructions
 
+**CRITICAL: No preamble.** Do NOT output any text before the dashboard — no "Starting session...", no "Let me check...", no narration of tool calls. Run the tool calls silently, then the dashboard is your FIRST text output.
+
 ### Step 1: Run Dashboard Scanner
 
 Run the consolidated scanner (one Bash call replaces all individual checks):

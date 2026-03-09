@@ -5,8 +5,8 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.51.0 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, AGENTS.json, autonomous_formal -->
+<!-- memory-seed v0.51.1 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, AGENTS.json, autonomous_formal, silent session start -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -129,9 +129,9 @@ Never read or edit these files directly. Always use the scripts:
 
 When a session begins, immediately:
 
-1. Read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, last 2-3 .agentic/journal/JOURNAL.md entries
+1. Silently read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, last 2-3 .agentic/journal/JOURNAL.md entries
 2. Run `bash .agentic/lib/tools/wip.sh check` for interrupted work
-3. Greet user with dashboard: current focus, recent progress, blockers, suggested next steps
+3. Show ONLY the dashboard — no text before it. No "let me check...", no narration. The dashboard is the first thing the user sees.
 
 ## NFR proactive suggestion
 

@@ -455,7 +455,7 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
-| **Session Start Protocol** (F-0021) | `ag start` reads STATUS.md, JOURNAL.md, HUMAN_NEEDED.md, checks WIP.md. Agent greets user with dashboard of current state. | ACTIVE - proven by LLM test 001 |
+| **Session Start Protocol** (F-0021) | `ag start` silently reads STATUS.md, JOURNAL.md, HUMAN_NEEDED.md, checks WIP.md. Dashboard is the first text output — no preamble narration. | ACTIVE - proven by LLM test 001 |
 | **STATUS.md Current State** (F-0024) | `status.sh focus "Task"` updates STATUS without full-file rewrite. Zero-token human readability. | ACTIVE - staleness gate enforced |
 | **Manual Operations** (F-0067) | `MANUAL_OPERATIONS.md` documents all queries humans can run without agent (zero tokens). `cat STATUS.md`, `grep` patterns for feature status. | ACTIVE - documentation |
 | **HUMAN_NEEDED.md Escalation** (F-0026) | `blocker.sh add "Title" "type" "Details"` creates entries. Agents read at session start. Humans can `cat HUMAN_NEEDED.md` for zero-token check. | ACTIVE |
@@ -473,7 +473,7 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
-| **Session Start Protocol** (F-0021) | `ag start` reads STATUS.md, JOURNAL.md, HUMAN_NEEDED.md, checks WIP.md. Agent greets user with dashboard of current state. | ACTIVE - proven by LLM test 001 |
+| **Session Start Protocol** (F-0021) | `ag start` silently reads STATUS.md, JOURNAL.md, HUMAN_NEEDED.md, checks WIP.md. Dashboard is the first text output — no preamble narration. | ACTIVE - proven by LLM test 001 |
 | **Session End Protocol** (F-0022) | `session_end.md` checklist: update JOURNAL, document blockers, clean up WIP. | ACTIVE - behavioral |
 | **JOURNAL.md Tracking** (F-0023) | `journal.sh` appends entries without reading the file (token-efficient). Append-only log of session progress. | ACTIVE - structurally enforced (staleness gate in pre-commit) |
 | **STATUS.md Current State** (F-0024) | `status.sh focus "Task"` updates STATUS without full-file rewrite. Zero-token human readability. | ACTIVE - staleness gate enforced |

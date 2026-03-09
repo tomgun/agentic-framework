@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0180 code review fixes committed (Updated: 2026-03-08 21:25 UTC)
+- Silent session start fix committed (Updated: 2026-03-09 17:56 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0180 (Review Checkpoint Framework) is next

@@ -19,7 +19,10 @@ tokens: ~3254
 
 **At first message, tokens reset, or user returns - DO THIS AUTOMATICALLY:**
 
-### 1. Silently Read Context
+### 1. Silently Read Context (NO text output before dashboard)
+
+**Do NOT output any text before the dashboard.** No "Starting session...", no narration of tool calls. The dashboard is the first thing the user sees.
+
 ```bash
 # Every command needs || true to prevent exit code errors
 cat STATUS.md 2>/dev/null || true
