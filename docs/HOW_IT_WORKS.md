@@ -564,7 +564,7 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 | **FEATURES.md** (F-0003, F-0004) | Feature tracking with lifecycle (planned → in_progress → shipped). Machine-readable YAML frontmatter. Updated via `feature.sh`. Staleness enforced when spec files change. | ACTIVE - Formal only |
 | **HUMAN_NEEDED.md** (F-0026) | Blockers requiring human action. Updated via `blocker.sh`. | ACTIVE |
 | **Acceptance Criteria** (F-0005) | `spec/acceptance/F-####.md` per feature. Pre-commit blocks if shipped feature has no acceptance file. | ACTIVE - structural gate |
-| **STACK.md** | Machine-readable project config. Parsed by ag.sh (grep/sed), doctor.py (YAML). Profile, git workflow, agent mode, plan-review settings, complexity limits. | ACTIVE - core config |
+| **STACK.md** | Machine-readable project config. Parsed by ag.sh (grep/sed), doctor.py (YAML). Profile (discovery/formal/autonomous_formal), git workflow, agent mode, plan-review settings, complexity limits. | ACTIVE - core config |
 
 **Hidden mechanism**: The git-tracked vs gitignored state split is deliberate: STATUS.md/JOURNAL.md in git (survives across machines), WIP.md/AGENTS_ACTIVE.md gitignored (session-local). This means a human can `git pull` and instantly see project state without any agent.
 

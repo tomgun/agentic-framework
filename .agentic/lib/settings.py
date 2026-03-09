@@ -145,18 +145,27 @@ def _resolve_profile(root: Path) -> str:
     # Try ## Settings section first
     settings = _extract_settings_section(stack)
     raw = settings.get("profile", "")
-    if raw.lower() in ("discovery", "formal"):
+    if raw.lower() in ("discovery", "formal", "autonomous_formal"):
         return raw.lower()
 
     # Try whole-file search (backward compat)
     raw = _search_whole_file(stack, "Profile") or ""
-    if raw.lower() in ("discovery", "formal"):
+    if raw.lower() in ("discovery", "formal", "autonomous_formal"):
         return raw.lower()
 
     # Infer from directory structure
     if (root / "spec").is_dir():
         return "formal"
     return "discovery"
+
+
+# ---------------------------------------------------------------------------
+# Helper: is_formal_like
+# ---------------------------------------------------------------------------
+
+def is_formal_like(profile: str) -> bool:
+    """Return True if profile is formal or autonomous_formal."""
+    return profile in ("formal", "autonomous_formal")
 
 
 # ---------------------------------------------------------------------------

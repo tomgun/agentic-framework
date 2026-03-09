@@ -51,6 +51,14 @@ if [[ "$CURRENT_PROFILE" == "formal" ]]; then
   exit 0
 fi
 
+if [[ "$CURRENT_PROFILE" == "autonomous_formal" ]]; then
+  echo -e "${YELLOW}⚠ Autonomous Formal profile is already enabled (superset of Formal).${NC}"
+  echo "Switching to 'formal' would downgrade review_code and review_regression from critical_agent to human."
+  echo ""
+  echo "Current profile: autonomous_formal"
+  exit 0
+fi
+
 echo -e "${BLUE}Current profile: $CURRENT_PROFILE${NC}"
 echo ""
 

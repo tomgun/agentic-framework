@@ -400,7 +400,7 @@ def main():
     parser.add_argument("--templates", type=str, required=True, help="Path to template directory")
     parser.add_argument("--output", type=str, required=True, help="Output directory for proposals")
     parser.add_argument("--profile", type=str, default="discovery",
-                        choices=["discovery", "formal"])
+                        choices=["discovery", "formal", "autonomous_formal"])
     args = parser.parse_args()
 
     report_path = Path(args.report)

@@ -20,14 +20,14 @@ fi
 usage() {
   cat <<'EOF'
 Usage:
-  bash .agentic/lib/init/scaffold.sh [--profile discovery|formal] [--non-interactive]
+  bash .agentic/lib/init/scaffold.sh [--profile discovery|formal|autonomous_formal] [--non-interactive]
 
 Options:
-  --profile discovery|formal  Set the profile (default: discovery)
+  --profile discovery|formal|autonomous_formal  Set the profile (default: discovery)
   --non-interactive           Skip profile prompt, use default or specified profile
 
 Notes:
-  - You can also set: AGENTIC_PROFILE=discovery|formal
+  - You can also set: AGENTIC_PROFILE=discovery|formal|autonomous_formal
   - In non-interactive mode, agent will set profile during init_playbook
 EOF
 }
@@ -61,9 +61,9 @@ if [[ -z "${PROFILE}" ]]; then
 fi
 
 case "${PROFILE}" in
-  discovery|formal) ;; # valid
+  discovery|formal|autonomous_formal) ;; # valid
   *)
-    echo "ERROR: invalid profile '${PROFILE}' (expected: discovery | formal)"
+    echo "ERROR: invalid profile '${PROFILE}' (expected: discovery | formal | autonomous_formal)"
     exit 2
     ;;
 esac
@@ -238,7 +238,11 @@ STATE_FILES_CONF="${ROOT_DIR}/.agentic/lib/init/state-files.conf"
 if [[ -f "$STATE_FILES_CONF" ]]; then
   while IFS=: read -r dst_rel src_rel file_profile; do
     [[ "$dst_rel" =~ ^#|^[[:space:]]*$ ]] && continue
-    [[ "$file_profile" == "formal" && "$PROFILE" != "formal" ]] && continue
+    # Source settings.sh for is_formal_like if not already loaded
+    if ! type is_formal_like &>/dev/null && [[ -f "$ROOT_DIR/.agentic/lib/settings.sh" ]]; then
+      source "$ROOT_DIR/.agentic/lib/settings.sh"
+    fi
+    [[ "$file_profile" == "formal" ]] && ! is_formal_like "$PROFILE" && continue
     [[ " $BROWNFIELD_HANDLED " == *" $dst_rel "* ]] && continue
     copy_if_missing "${ROOT_DIR}/${src_rel}" "${ROOT_DIR}/${dst_rel}"
   done < "$STATE_FILES_CONF"
