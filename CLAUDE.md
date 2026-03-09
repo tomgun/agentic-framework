@@ -23,6 +23,7 @@ Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval.
 - Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.
+- Multi-session safety: Before ANY destructive git op (stash, checkout ., restore ., reset --hard, clean -f), run `python3 .agentic/lib/tools/agents_helpers.py --project-root . count-others "$(pwd)" --pid $PPID`. If >0, DO NOT PROCEED — use a worktree or commit first.
 - Log user's design insights to .agentic/CONTRIBUTIONS.md. Every PR: bump VERSION (at least patch).
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 
