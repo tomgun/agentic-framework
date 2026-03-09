@@ -626,6 +626,10 @@ The 5-10 file limit per commit is a proxy for the real constraint: each agent ta
 
 `settings.sh` supports `_SETTINGS_ROOT_DIR`, `_SETTINGS_STACK_FILE`, `_SETTINGS_PROFILES_CONF` env overrides. Combined with `ROOT_DIR` override in ag.sh and `_AGENTIC_SETTINGS_LOADED=""` to force re-init. Essential for isolated gate tests in `validate_framework.sh`.
 
+### Never `git reset --hard` to reconcile diverged branches
+
+When local main and remote main diverge (e.g., local has direct commits, remote has PR merge commits), **do not** use `git reset --hard origin/main` to "fix" the divergence. This silently drops local-only commits with no recovery path. In the v0.52.2 session, this destroyed a TZ config fix that had no corresponding PR. Safe approach: `git log origin/main..main --stat` to inspect what's local-only, verify each commit has a remote counterpart, then `git pull --rebase` to reconcile. The rule already exists in memory-seed ("Never destroy unstaged work") — this is the same principle applied to committed-but-unpushed work.
+
 ### Framework skills vs Task tool agents
 
 Framework roles (review, test, implementation) → invoked via `/review`, `/test` (Skill tool). Built-in agent types (Bash, general-purpose, Explore, Plan) → invoked via Agent tool. Completely separate systems.
