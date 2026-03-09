@@ -159,4 +159,5 @@ Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 - **Multi-session collision guard.** Sessions auto-register in AGENTS.json at start. Before any destructive git op, the framework checks for other active sessions on the same checkout. If others are active, you'll see a COLLISION RISK warning — do NOT proceed with destructive ops. Use a worktree (`ag worktree`) or commit first.
 - **One feature at a time.** Complete current WIP before starting another.
 - **Small batches.** Max 5-10 files per commit. If bigger, break it up.
+- **Keep main in sync with origin.** Push immediately after any direct-to-main commit. Before creating a feature branch, `git pull --rebase origin main` first. Stale local main causes conflicts and content loss during PR rebases.
 - **Smoke test before "done".** Actually run the feature. "Tests pass" does not mean "it works."
