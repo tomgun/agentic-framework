@@ -4141,8 +4141,8 @@ else
   fail "T-0087: Stop.sh missing session-deregister call"
 fi
 
-# T-0088: UserPromptSubmit.sh has collision warning
-if grep -q "count-others" "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
+# T-0088: UserPromptSubmit.sh has collision warning (via prompt-check or count-others)
+if grep -q "prompt-check\|count-others" "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
   pass "T-0088: UserPromptSubmit.sh has collision warning"
 else
   fail "T-0088: UserPromptSubmit.sh missing collision warning"

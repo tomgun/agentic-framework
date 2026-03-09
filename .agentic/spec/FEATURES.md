@@ -17,7 +17,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 | **Core** | 14 | 14 | 0 | 0 |
 | **Quality** | 24 | 20 | 4 | 0 |
 | **Session** | 13 | 13 | 0 | 0 |
-| **Multi-Agent** | 11 | 8 | 2 | 1 |
+| **Multi-Agent** | 11 | 9 | 1 | 1 |
 | **Tooling** | 11 | 11 | 0 | 0 |
 | **Recovery** | 7 | 7 | 0 | 0 |
 | **Developer Experience** | 15 | 13 | 1 | 1 |
@@ -3290,7 +3290,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0195: Multi-Session Collision Prevention
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Multi-Agent
 **Priority**: high
 **Complexity**: medium
