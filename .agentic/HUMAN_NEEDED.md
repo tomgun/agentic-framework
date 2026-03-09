@@ -15,35 +15,19 @@ _No active items_
 
 ---
 
-
-
-### HN-0022: PR #67: Fill migration 008, surface spec protection in entry points (v0.45.1)
-- **Type**: review
-- **Added**: 2026-03-07
-- **Context**: Docs-only change — 8 content files, all small edits
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0024: PR #78: Backlog/roadmap structural work assignment (F-0190, v0.49.0)
-- **Type**: review
-- **Added**: 2026-03-08
-- **Context**: 18 files, 1724 lines. Core: backlog_helpers.py + backlog.sh + ag.sh gates. Tests: 44 pytest + 19 validation.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
+## Resolved
 
 ### HN-0025: PR #81: F-0191 Dialectical Plan-Review Merge
-- **Type**: pr_review
-- **Added**: 2026-03-08
-- **Context**: Merge dialectical review into plan-review loop. Smoke test: walk through full plan-review cycle with real feature.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
+- **Resolved**: 2026-03-08
+- **Outcome**: PR #81 merged
 
+### HN-0024: PR #78: Backlog/roadmap structural work assignment (F-0190, v0.49.0)
+- **Resolved**: 2026-03-08
+- **Outcome**: PR #78 merged
 
-## Resolved
+### HN-0022: PR #67: Fill migration 008, surface spec protection in entry points (v0.45.1)
+- **Resolved**: 2026-03-08
+- **Outcome**: PR #67 merged
 
 ### HN-0026: PR #79: F-0180 Review Checkpoint Framework
 - **Resolved**: 2026-03-08

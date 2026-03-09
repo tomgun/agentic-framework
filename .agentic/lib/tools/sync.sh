@@ -722,7 +722,7 @@ phase_periodic() {
 # Phase 8: PR cleanup (auto-resolve merged/closed PRs in HUMAN_NEEDED.md)
 # ============================================================================
 phase_pr_cleanup() {
-    local hn_file="$ROOT_DIR/HUMAN_NEEDED.md"
+    local hn_file="$HUMAN_NEEDED_FILE"
 
     # Early returns: no file or no gh CLI
     if [ ! -f "$hn_file" ]; then

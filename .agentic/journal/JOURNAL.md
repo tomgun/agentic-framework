@@ -1728,3 +1728,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 13:04 - Fix HUMAN_NEEDED path
+
+**Why**: Post-merge PR auto-resolve was broken since directory restructure
+
+**What changed**:
+- sync.sh and ag.sh now use $HUMAN_NEEDED_FILE from paths.sh instead of hardcoded root path — PR cleanup phase was silently skipping the file after directory restructure
+
+**Next steps**:
+- None
+
+**Blockers**: None
+
