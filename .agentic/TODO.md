@@ -109,6 +109,12 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0046: F-0194: Worktree-by-default for feature branches — agents should always work in git worktrees when on feature branches, not dirty the main worktree. Needs: clear instruction in CLAUDE.md/skills, a STACK.md setting (e.g., worktree_mode: always|multi-agent|off), and possibly ag implement auto-creating the worktree. Current instruction exists but is too weak ('Use git worktree on feature branches when another agent may be working on main').
 - **Added**: 2026-03-08
 
+### T-0047: ag implement: gate on durable plan file (.agentic/journal/plans/F-XXXX-*-plan.md). Plans keep getting lost in ~/.claude/plans/. New setting: plan_save_gate (discovery: advisory, formal: blocking, off to disable). Builds habit early so formal transition is seamless. Same pattern as acceptance_criteria/wip_before_commit settings.
+- **Added**: 2026-03-09
+
+### T-0048: ag review / /review: check that durable plan file exists for the feature being reviewed. If missing, flag as advisory finding. Complements T-0048 (ag implement gate) — catches plans that slipped through.
+- **Added**: 2026-03-09
+
 ## Done
 
 
