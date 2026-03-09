@@ -5,8 +5,8 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.52.2 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, AGENTS.json, autonomous_formal, silent session start, collision guard -->
+<!-- memory-seed v0.51.1 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, AGENTS.json, autonomous_formal, silent session start -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -127,11 +127,13 @@ Never read or edit these files directly. Always use the scripts:
 
 ## Session start
 
-When a session begins, immediately:
+When a session begins, issue ONE tool call:
 
-1. Silently read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, last 2-3 .agentic/journal/JOURNAL.md entries
-2. Run `bash .agentic/lib/tools/wip.sh check` for interrupted work
-3. Show ONLY the dashboard — no text before it. No "let me check...", no narration. The dashboard is the first thing the user sees.
+```bash
+bash .agentic/lib/tools/dashboard.sh 2>/dev/null
+```
+
+Output the result **verbatim** as your first text response. No other tool calls, no preamble, no narration, no reformatting. The script renders the final dashboard (with emoji, borders, next steps). Just copy its output.
 
 ## NFR proactive suggestion
 
@@ -156,7 +158,6 @@ Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 - **Never auto-commit.** Human reviews every change first.
 - **Never bypass gates.** Do not use `--no-verify` or skip quality checks.
 - **NEVER `git stash`.** Stash pop does a silent merge — in multi-agent contexts, when another agent modified the same files, it quietly picks one version with no error, causing data loss. Safe alternatives: worktrees, temp branch + cherry-pick, or commit before switching. Also never `git checkout -- .`, `git restore .`, or `git reset --hard` with uncommitted changes.
-- **Multi-session collision guard.** Sessions auto-register in AGENTS.json at start. Before any destructive git op, the framework checks for other active sessions on the same checkout. If others are active, you'll see a COLLISION RISK warning — do NOT proceed with destructive ops. Use a worktree (`ag worktree`) or commit first.
 - **One feature at a time.** Complete current WIP before starting another.
 - **Small batches.** Max 5-10 files per commit. If bigger, break it up.
 - **Keep main in sync with origin.** Push immediately after any direct-to-main commit. Before creating a feature branch, `git pull --rebase origin main` first. Stale local main causes conflicts and content loss during PR rebases.

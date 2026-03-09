@@ -19,109 +19,35 @@ Initialize a new session by checking project state and presenting a polished das
 
 ## Instructions
 
-**CRITICAL: No preamble.** Do NOT output any text before the dashboard — no "Starting session...", no "Let me check...", no narration of tool calls. Run the tool calls silently, then the dashboard is your FIRST text output.
-
-### Step 1: Run Dashboard Scanner
-
-Run the consolidated scanner (one Bash call replaces all individual checks):
+### Step 1: Run Dashboard (ONE tool call)
 
 ```bash
 bash .agentic/lib/tools/dashboard.sh 2>/dev/null
 ```
 
-Parse the output by section markers (`===SECTION===`). Extract all key-value pairs.
+This is the ONLY tool call. No Read calls, no ad-hoc checks. The script consolidates all state (STATUS, JOURNAL, BACKLOG, WIP, BLOCKERS, AGENTS, HEALTH) and renders the final dashboard.
 
-### Step 2: Read Journal for Context
+### Step 2: Output Verbatim
 
-Read the last 50 lines of `.agentic/journal/JOURNAL.md` to get deeper context about recent sessions.
+Output the dashboard.sh result as your first text response. **No preamble, no narration, no reformatting.** Do not add "Welcome back!", do not summarize it differently, do not wrap in markdown. Copy the output exactly.
 
-### Step 3: Render Dashboard
+### Step 3: Handle Critical Special Cases
 
-Using the parsed data, render this dashboard. Use emoji-accented style:
+After outputting the dashboard, check if the output contains any of these — and if so, note them briefly:
 
-```
-<project-name> · v{VERSION}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 Last session   {JOURNAL_LAST summary, one line}
-🎯 Focus          {STATUS first line}
-✅ Health         {HEALTH summary} · {BLOCKERS count} blockers
-
-📌 Backlog
-   Current → {current_id}  {current_desc}
-   Next    → {next_id}  {next_desc}
-   Queue     {remaining} remaining
-
-⚡ Next steps
-   1. {Primary action based on context}
-   2. {Secondary action}
-   3. {Tertiary action or "View queue — ag backlog list"}
-
-💡 Tip: {TIP}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-**Formatting rules:**
-- Use the horizontal bar (━) for top and bottom borders
-- Align values after labels using spaces for a clean columnar look
-- Keep the "Last session" summary to one short line
-- For "Health": say "Clean" if HEALTH is "ok" and BLOCKERS is 0; otherwise summarize issues
-
-**Conditional sections** (insert these BETWEEN the Health line and Backlog section, only when relevant):
-
-- **Interrupted work** (WIP != "clean"):
-  ```
-  ⚠️ Interrupted   {WIP_DETAIL feature} — {changed_files} uncommitted files
-                    Options: continue, review (`git diff`), or clear (`wip.sh complete`)
-  ```
-
-- **Blockers** (BLOCKERS > 0):
-  ```
-  🚫 Blockers      {count} items need human input — check HUMAN_NEEDED.md
-  ```
-
-- **Active agents** (AGENTS != "none"):
-  ```
-  👥 Agents        {agent summary from AGENTS output}
-  ```
-
-- **Stale backlog** (STALE == "yes"):
-  ```
-  ⏰ Stale          Current backlog item is >7 days old — review priority
-  ```
-
-- **Upgrade pending** (UPGRADE == "pending"):
-  ```
-  🔄 Upgrade        Pending — read `.agentic/.upgrade_pending`
-  ```
-
-### Step 4: Determine Next Steps
-
-Choose 3 suggested actions based on context:
-
-- **If WIP interrupted**: First action should be "Resume interrupted work on {feature}"
-- **If blockers exist**: Include "Address blockers in HUMAN_NEEDED.md"
-- **If backlog has items**: Include "Start building — `ag implement {current_id}`" and "Plan first — `ag plan {current_id}`"
-- **If backlog is empty**: Suggest "Seed backlog — `ag backlog add`" or "Explore — `ag sync`"
-- **Always include** at least one exploratory option like "View queue — `ag backlog list`" or "Check health — `ag verify`"
-
-### Step 5: Handle Critical Special Cases
-
-These require immediate attention before normal workflow:
-
-- **Upgrade pending**: Mention it prominently. User should handle before new work.
-- **Interrupted work**: Do NOT proceed to suggest new features. Focus on recovery.
-- **Memory stale**: If health mentions memory issues, note it in next steps.
+- **Upgrade pending** (🔄 line present): User should handle before new work.
+- **Interrupted work** (⚠️ line present): Focus on recovery, don't suggest new features.
+- **Memory stale** (health mentions memory): Note it as action item.
 
 ## Examples
 
-**Example 1: Clean start**
+**Example: Clean start**
 
-Tool calls visible to user: `Bash(dashboard.sh)` + `Read(JOURNAL.md)`
+One tool call visible: `Bash(dashboard.sh)`
 
-Output:
+Agent text output (verbatim from script):
 ```
-Agentic Framework · v0.51.0
+My Project · v0.51.0
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📋 Last session   F-0194 shipped as v0.51.0
@@ -139,55 +65,6 @@ Agentic Framework · v0.51.0
    3. View queue — `ag backlog list`
 
 💡 Tip: Use `ag sync` to detect drift across specs and docs.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-**Example 2: Interrupted work + blockers**
-
-```
-Agentic Framework · v0.49.0
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 Last session   Started F-0180 review checkpoint framework
-🎯 Focus          ADR-001 Phase 3
-⚠️ Interrupted   F-0180 — 5 uncommitted files
-                  Options: continue, review (`git diff`), or clear (`wip.sh complete`)
-🚫 Blockers      2 items need human input — check HUMAN_NEEDED.md
-✅ Health         Needs attention · 2 blockers
-
-📌 Backlog
-   Current → F-0180  Review Checkpoint Framework
-   Next    → F-0181  Autonomous Formal Profile
-   Queue     7 remaining
-
-⚡ Next steps
-   1. Resume interrupted work on F-0180
-   2. Address 2 blockers in HUMAN_NEEDED.md
-   3. Review changes — `git diff`
-
-💡 Tip: Run `ag verify --full` for a comprehensive health check.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-**Example 3: Empty backlog**
-
-```
-My Project · v1.2.0
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 Last session   Shipped auth improvements
-🎯 Focus          No active focus set
-✅ Health         Clean · No blockers
-
-📌 Backlog
-   Empty — no queued work items
-
-⚡ Next steps
-   1. Seed backlog — `ag backlog add F-XXXX`
-   2. Run health check — `ag verify`
-   3. Explore — `ag sync --check`
-
-💡 Tip: Use `ag specs` to generate specs for existing code.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 

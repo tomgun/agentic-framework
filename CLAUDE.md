@@ -7,7 +7,7 @@ Architecture: `docs/INSTRUCTION_ARCHITECTURE.md` (three-layer design: Constituti
 
 ## Session Start (do this FIRST on every new conversation)
 
-Silently read .agentic/STATUS.md, .agentic/HUMAN_NEEDED.md, and last 2-3 entries of .agentic/journal/JOURNAL.md. Check `bash .agentic/lib/tools/wip.sh check` for interrupted work. Do NOT output any text before the dashboard — no "let me check", no narration of tool calls. The dashboard IS the first thing the user sees. Full protocol: `.agentic/lib/checklists/session_start.md`
+Run `bash .agentic/lib/tools/dashboard.sh 2>/dev/null` — ONE tool call, no others. Output the result verbatim as your first text response. No preamble, no narration, no reformatting. Full protocol: `.agentic/lib/checklists/session_start.md`
 
 Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
@@ -23,7 +23,6 @@ Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval.
 - Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.
-- Multi-session safety: Before ANY destructive git op (stash, checkout ., restore ., reset --hard, clean -f), run `python3 .agentic/lib/tools/agents_helpers.py --project-root . count-others "$(pwd)" --pid $PPID`. If >0, DO NOT PROCEED — use a worktree or commit first.
 - Log user's design insights to .agentic/CONTRIBUTIONS.md. Every PR: bump VERSION (at least patch).
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 
