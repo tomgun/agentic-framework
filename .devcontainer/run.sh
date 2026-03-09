@@ -14,25 +14,24 @@ GH_TOKEN="${GH_TOKEN:-$(gh auth token 2>/dev/null)}"
 # Build the image if needed
 docker build -t claude-sandbox "$SCRIPT_DIR"
 
-# Run with host auth mounted in
+# Common docker args
+DOCKER_ARGS=(
+  -it --rm
+  --cap-add=NET_ADMIN --cap-add=NET_RAW
+  -v "$HOME/.claude:/home/node/.claude"
+  -v "$HOME/.ssh:/home/node/.ssh:ro"
+  -v "claude-sandbox-history:/commandhistory"
+  -e "GH_TOKEN=$GH_TOKEN"
+  -v "$PROJECT_DIR:/workspace"
+)
+
+# Post-start: firewall + git credential helper (mirrors devcontainer.json postStartCommand)
+POST_START="sudo /usr/local/bin/init-firewall.sh && if [ -n \"\$GH_TOKEN\" ]; then gh auth setup-git; fi"
+
 if [ $# -eq 0 ]; then
   # Interactive: drop into shell, user runs claude manually
-  docker run -it --rm \
-    --cap-add=NET_ADMIN --cap-add=NET_RAW \
-    -v "$HOME/.claude:/home/node/.claude" \
-    -v "$HOME/.ssh:/home/node/.ssh:ro" \
-    -v "claude-sandbox-history:/commandhistory" \
-    -e "GH_TOKEN=$GH_TOKEN" \
-    -v "$PROJECT_DIR:/workspace" \
-    claude-sandbox zsh
+  docker run "${DOCKER_ARGS[@]}" claude-sandbox zsh -c "$POST_START && exec zsh"
 else
   # One-shot: pass args directly to claude
-  docker run -it --rm \
-    --cap-add=NET_ADMIN --cap-add=NET_RAW \
-    -v "$HOME/.claude:/home/node/.claude" \
-    -v "$HOME/.ssh:/home/node/.ssh:ro" \
-    -v "claude-sandbox-history:/commandhistory" \
-    -e "GH_TOKEN=$GH_TOKEN" \
-    -v "$PROJECT_DIR:/workspace" \
-    claude-sandbox claude --dangerously-skip-permissions "$@"
+  docker run "${DOCKER_ARGS[@]}" claude-sandbox zsh -c "$POST_START && exec claude --dangerously-skip-permissions \"\$@\"" -- "$@"
 fi
