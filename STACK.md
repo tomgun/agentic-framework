@@ -59,7 +59,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 
 ### Review checkpoints
 <!-- Who reviews each transition. Options: human | critical_agent | skip -->
-<!-- critical_agent falls back to human until F-0182 ships -->
+<!-- critical_agent spawns adversarial Claude reviewer (F-0182) -->
 - review_spec: critical_agent
 # planned → specced. Discovery: skip | Formal: critical_agent
 - review_criteria: critical_agent

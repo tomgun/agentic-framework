@@ -6,7 +6,7 @@ Covers:
 - ReviewMode enum
 - Transition → review setting map (including sync with state_machine)
 - get_review_mode resolution from profiles + STACK.md overrides
-- check_review: auto proceeds, human blocks, critical_agent falls back
+- check_review: auto proceeds, human blocks, critical_agent delegates
 - Pending review lifecycle: create/find/list (including malformed JSON)
 - resolve_review: verdict artifact creation, pending cleanup, transition
 - resolve_review: atomic writes, unlink error handling
@@ -312,8 +312,34 @@ class TestCheckReview:
         assert any("ag review F-0042 shipped" in m for m in msgs)
         mock_create.assert_called_once()
 
+    @patch("auto.critical_agent.spawn_claude")
+    def test_critical_agent_delegates_to_agent(self, mock_spawn, project_dir):
+        """AC-008: critical_agent mode delegates to CriticalAgent."""
+        import json as _json
+        mock_spawn.return_value = '```json\n' + _json.dumps({
+            "verdict": "approved",
+            "confidence": "high",
+            "summary": "Looks good",
+            "issues": [],
+            "recommendation": "Proceed",
+        }) + '\n```'
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- review_spec: critical_agent\n"
+        )
+        can_proceed, msgs = check_review(
+            project_dir, "F-0042", "planned", "specced"
+        )
+        assert can_proceed is True
+        assert any("approved" in m.lower() for m in msgs)
+        mock_spawn.assert_called_once()
+
     @patch("auto.review.create_pending_review", return_value="HN-0026")
-    def test_critical_agent_falls_back_to_human(self, mock_create, project_dir):
+    @patch("auto.critical_agent.CriticalAgent.review")
+    def test_critical_agent_error_falls_back_to_human(
+        self, mock_review, mock_create, project_dir,
+    ):
+        """Critical agent error → falls back to human review."""
+        mock_review.side_effect = RuntimeError("timeout")
         (project_dir / "STACK.md").write_text(
             "## Settings\n- profile: formal\n- review_spec: critical_agent\n"
         )
@@ -321,7 +347,31 @@ class TestCheckReview:
             project_dir, "F-0042", "planned", "specced"
         )
         assert can_proceed is False
-        assert any("critical_agent" in m and "F-0182" in m for m in msgs)
+        assert any("Falling back" in m for m in msgs)
+        mock_create.assert_called_once()
+
+    @patch("auto.critical_agent.spawn_claude")
+    def test_critical_agent_request_changes(self, mock_spawn, project_dir):
+        """Critical agent request_changes → returns issues."""
+        import json as _json
+        mock_spawn.return_value = '```json\n' + _json.dumps({
+            "verdict": "request_changes",
+            "confidence": "high",
+            "summary": "Missing tests",
+            "issues": [
+                {"severity": "high", "description": "No unit tests"},
+            ],
+            "recommendation": "Add tests",
+        }) + '\n```'
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- review_spec: critical_agent\n"
+        )
+        can_proceed, msgs = check_review(
+            project_dir, "F-0042", "planned", "specced"
+        )
+        assert can_proceed is False
+        assert any("request" in m.lower() for m in msgs)
+        assert any("No unit tests" in m for m in msgs)
 
     def test_existing_verdict_skips_review(self, project_dir):
         # Create verdict artifact

@@ -1767,3 +1767,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 17:34 - F-0182 Critical Review Agent
+
+**Why**: Making critical_agent functional is the key enabler for autonomous workflows (F-0186) and the full ADR-001 Phase 4 vision
+
+**What changed**:
+- critical_agent review mode now spawns adversarial Claude instance with structured verdicts, model resolution, error handling + retry, human fallback. 46 new tests, 574/574 framework validation. Replaces F-0182 placeholder.
+
+**Next steps**:
+- F-0183 Taste/Style or F-0184 Epic Decomposition (both unblocked by F-0182)
+
+**Blockers**: None
+
