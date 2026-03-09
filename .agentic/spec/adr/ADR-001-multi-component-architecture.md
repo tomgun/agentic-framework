@@ -250,18 +250,18 @@ Each review checkpoint can be resolved by one of:
 |------|--------------|----------|
 | **Human** | `human` | Blocks until human approves. Default for `committed` and `shipped`. |
 | **Critical agent** | `critical_agent` | A separate agent instance reviews adversarially. Can approve, request changes, or escalate to human. |
-| **Auto** | `auto` | No review gate — transition proceeds if preconditions pass. For trusted/low-risk transitions. |
+| **Skip** | `skip` | No review gate — transition proceeds if preconditions pass. For trusted/low-risk transitions. |
 
 #### Settings
 
 ```markdown
 ## Review checkpoints
 - review_spec: critical_agent
-# Who reviews planned → specced. Options: human | critical_agent | auto
+# Who reviews planned → specced. Options: human | critical_agent | skip
 - review_criteria: critical_agent
-# Who reviews specced → criteria_set. Options: human | critical_agent | auto
+# Who reviews specced → criteria_set. Options: human | critical_agent | skip
 - review_plan: critical_agent
-# Who reviews plan before implementation. Options: human | critical_agent | auto
+# Who reviews plan before implementation. Options: human | critical_agent | skip
 - review_code: human
 # Who reviews documented → committed. Options: human | critical_agent
 - review_merge: human
@@ -273,7 +273,7 @@ Each review checkpoint can be resolved by one of:
 ```
 
 Defaults are profile-dependent:
-- **Discovery**: most checkpoints default to `auto` or `critical_agent`
+- **Discovery**: most checkpoints default to `skip` or `critical_agent`
 - **Formal**: early checkpoints default to `critical_agent`, code review and merge default to `human`
 - **Locked-down**: all checkpoints default to `human`
 
@@ -316,7 +316,7 @@ Agents handle subjective decisions through a hierarchy of guidance:
 - api_style: rest-jsonapi
 # API design convention. Options: rest-jsonapi | rest-simple | graphql | rpc
 - taste_review: critical_agent
-# Who reviews subjective/aesthetic decisions. Options: human | critical_agent | auto
+# Who reviews subjective/aesthetic decisions. Options: human | critical_agent | skip
 ```
 
 #### How This Interacts with Reviews
@@ -425,7 +425,7 @@ The autonomous scheduler is simple because the state machine encodes all the com
 5. If the transition has a review checkpoint:
    - If `critical_agent`: spawn a **critical agent** to review; it may approve, request changes, or escalate
    - If `human`: block and notify; scheduler moves to other unblocked work
-   - If `auto`: proceed immediately
+   - If `skip`: proceed immediately
 6. On approval, scheduler re-evaluates and picks next unblocked transitions
 7. Repeat until all features in the epic reach `shipped`
 
@@ -453,14 +453,14 @@ This means autonomous mode can handle most aesthetic decisions without blocking,
 
 | Checkpoint | Default (Formal) | Default (Discovery) | What's Reviewed |
 |-----------|-------------------|---------------------|-----------------|
-| Decomposition | critical_agent | auto | Epic → feature breakdown, component assignments |
-| Spec | critical_agent | auto | Feature description, scope, dependencies |
-| Criteria | critical_agent | auto | Acceptance criteria quality, testability |
-| Plan | critical_agent | auto | Implementation approach, risks |
+| Decomposition | critical_agent | skip | Epic → feature breakdown, component assignments |
+| Spec | critical_agent | skip | Feature description, scope, dependencies |
+| Criteria | critical_agent | skip | Acceptance criteria quality, testability |
+| Plan | critical_agent | skip | Implementation approach, risks |
 | Code | human | critical_agent | Diff quality, correctness, style |
 | Merge | human | human | Final approval before shipping |
 | Regression | human | critical_agent | Justification for going backward |
-| Taste | critical_agent | auto | Consistency with style guidelines |
+| Taste | critical_agent | skip | Consistency with style guidelines |
 
 ---
 

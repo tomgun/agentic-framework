@@ -654,6 +654,18 @@ else
     fi
   fi
 
+  # Migrate review_*: auto → skip in STACK.md (v0.51.0: "auto" renamed to "skip")
+  if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+    if grep -qE "^[- ]*review_[a-z_]+:[[:space:]]*auto" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null; then
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' -E 's/^([- ]*review_[a-z_]+:[[:space:]]*)auto([[:space:]]|$)/\1skip\2/' "$TARGET_PROJECT_DIR/STACK.md"
+      else
+        sed -i -E 's/^([- ]*review_[a-z_]+:[[:space:]]*)auto([[:space:]]|$)/\1skip\2/' "$TARGET_PROJECT_DIR/STACK.md"
+      fi
+      echo -e "  ${GREEN}✓${NC} Migrated review_*: auto → skip"
+    fi
+  fi
+
   # Migrate pre_commit_hook: yes → fast in STACK.md
   if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
     if grep -qE "^[- ]*pre_commit_hook:[[:space:]]*yes" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null; then

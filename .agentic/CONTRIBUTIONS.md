@@ -8,6 +8,12 @@
 
 ## Recent Contributions
 
+### Rename "auto" → "skip" Review Mode + Plan Review Wiring (v0.51.1)
+
+**User insight**: Tomas identified two UX issues in the review gate system:
+- **"auto" is confusing**: The word "auto" reads like "automatically select a model" instead of its actual meaning "skip this review checkpoint." Renamed to "skip" — unambiguous, no keyword collision, no negative connotation. Backward compat accepts "auto" and maps to "skip" during transition.
+- **Plan review never fires after plan mode**: The dialectical review (Critic + Advocate) is fully designed in the planning skill (Step 5.5) but plan mode is read-only — agent spawning can't happen there, and after ExitPlanMode nothing continues the workflow. Restructured the planning skill into two explicit phases (during plan mode / after plan mode) with a safety net in implementing-features.
+
 ### Clean Session Dashboard + Agent-Agnostic Enforcement (v0.52.0)
 
 **User insight**: Tomas caught that `dashboard.sh` was placed exclusively in `.claude/skills/` — violating the agent-agnostic principle. Key contributions:
@@ -82,7 +88,7 @@ Core design contributions:
 - **ADR as the capture format**: Chose Architecture Decision Record when asked how to capture the discussion — introducing a new artifact type to the framework.
 - **"Both together"**: When asked whether to prioritize feature loop vs project orchestration, insisted both be designed as a unified system — they're interconnected, not separable layers.
 - **Gates and skills are implementation details**: Corrected Claude when it added gates/skills to the high-level process diagram — "I don't want that image to have those gates — they are really implementation details." Kept the design at the right abstraction level.
-- **Review checkpoints throughout, not just at commit**: Identified that autonomous flow needs review gates at spec, criteria, plan, code, and merge — not just at the end. Designed three-mode resolution (human / critical_agent / auto) configurable per transition and per profile.
+- **Review checkpoints throughout, not just at commit**: Identified that autonomous flow needs review gates at spec, criteria, plan, code, and merge — not just at the end. Designed three-mode resolution (human / critical_agent / skip) configurable per transition and per profile.
 - **Critical review agent concept**: Separate agent instance with adversarial mandate, read-only (can't modify, only approve/reject/escalate) — prevents self-approval in autonomous mode.
 - **Taste & aesthetic decision framework**: Agents aren't blind to subjective choices — they (a) can research best practices, (b) can follow broader-level style guidelines and vision the user provides, to make "probably correct" choices. Critical agent validates consistency with declared direction rather than imposing preferences.
 
