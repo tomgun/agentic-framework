@@ -1715,3 +1715,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 12:10 - F-0194 shipped
+
+**Why**: Post-merge housekeeping
+
+**What changed**:
+- AGENTS.json registry + worktree-by-default merged and tagged v0.51.0. Added T-0048/T-0049: plan file gate for ag implement and /review.
+
+**Next steps**:
+- Next feature from backlog
+
+**Blockers**: None
+
