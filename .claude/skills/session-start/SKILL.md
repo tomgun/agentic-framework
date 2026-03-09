@@ -24,7 +24,7 @@ Initialize a new session by checking project state and presenting a polished das
 Run the consolidated scanner (one Bash call replaces all individual checks):
 
 ```bash
-bash .claude/skills/session-start/scripts/dashboard.sh 2>/dev/null
+bash .agentic/lib/tools/dashboard.sh 2>/dev/null
 ```
 
 Parse the output by section markers (`===SECTION===`). Extract all key-value pairs.
@@ -192,8 +192,8 @@ My Project · v1.2.0
 ## Troubleshooting
 
 **Error: dashboard.sh not found**
-Cause: Skill scripts directory missing or path incorrect.
-Solution: Verify `.claude/skills/session-start/scripts/dashboard.sh` exists and is executable.
+Cause: Tool script missing or path incorrect.
+Solution: Verify `.agentic/lib/tools/dashboard.sh` exists and is executable.
 
 **Error: Empty sections in dashboard output**
 Cause: Individual tools (backlog_helpers.py, doctor.py) may be missing or python3 unavailable.
@@ -205,6 +205,6 @@ Solution: Normal for new projects. Dashboard will show "No focus set" / "First s
 
 ## References
 
-- Dashboard scanner: `scripts/dashboard.sh`
+- Dashboard scanner: `.agentic/lib/tools/dashboard.sh`
 - Legacy scanner (deprecated): `scripts/quick-scan.sh`
 - Full session start protocol: `references/session_start.md`

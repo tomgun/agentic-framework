@@ -1741,3 +1741,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-09 14:39 - Agent-agnostic cleanup
+
+**Why**: Enforcing agent-agnostic principle: scripts belong in .agentic/ not .claude/
+
+**What changed**:
+- dashboard.sh moved to .agentic/lib/tools/, FRAMEWORK_DEVELOPMENT.md gains Agent-Agnostic and Lessons Learned sections, auto-memory slimmed to pointers
+
+**Next steps**:
+- Commit and push to PR #85
+
+**Blockers**: None
+

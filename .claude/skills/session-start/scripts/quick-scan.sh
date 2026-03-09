@@ -5,5 +5,6 @@
 # Remove in a future release.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo "⚠ quick-scan.sh is deprecated. Use dashboard.sh instead." >&2
-exec bash "$SCRIPT_DIR/dashboard.sh" "$@"
+PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$SCRIPT_DIR/../../../.." && pwd)}"
+echo "⚠ quick-scan.sh is deprecated. Use .agentic/lib/tools/dashboard.sh instead." >&2
+exec bash "$PROJECT_ROOT/.agentic/lib/tools/dashboard.sh" "$@"
