@@ -36,12 +36,12 @@ START → PLANNING → IMPLEMENT → COMPLETE → COMMIT
 - **PLANNING**: Acceptance criteria exist for the feature?
 - **IMPLEMENT**: Tests exist? Code matches acceptance?
 - **COMPLETE**: Tests pass? FEATURES.md updated? Docs synced?
-- **COMMIT**: No .agentic/session/WIP.md? No untracked files? All gates pass?
+- **COMMIT**: No active WIP in AGENTS.json? No untracked files? All gates pass?
 
 ## Session Start Protocol
 
-1. Check `.agentic/AGENTS_ACTIVE.md` - other agents working? Register yourself, avoid their files
-2. Check `.agentic/session/WIP.md` - interrupted work?
+1. Check AGENTS.json - other agents working? Register yourself, avoid their files
+2. Check AGENTS.json for interrupted WIP
 3. Read: `CONTEXT_PACK.md` → `.agentic/STATUS.md` → `JOURNAL.md` (last 3 entries)
 4. Greet user with context summary and options
 

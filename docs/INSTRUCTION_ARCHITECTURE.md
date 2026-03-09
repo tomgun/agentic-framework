@@ -59,8 +59,7 @@ graph TB
             FEATURES[FEATURES.md]
         end
         subgraph SESSION["Session-local (gitignored)"]
-            WIP[WIP.md]
-            AGENTS_ACTIVE[AGENTS_ACTIVE.md]
+            AGENTS_JSON[AGENTS.json<br/>agent + WIP tracking]
             AUTO_STATE[auto-state.json<br/>auto.sock / auto.pid]
         end
     end
@@ -132,8 +131,7 @@ Other tools (Cursor, Copilot, Codex) continue using `auto_orchestration.md` + `a
 - STATUS.md — holds all runtime state (focus, progress, next, blocker) plus roadmap, risks, decisions. Updated directly by status.sh.
 
 **Session-local state** (gitignored):
-- `.agentic/session/WIP.md` — work-in-progress lock
-- `.agentic/session/AGENTS_ACTIVE.md` — multi-agent coordination
+- `AGENTS.json` — agent registration + work-in-progress tracking (replaces WIP.md and AGENTS_ACTIVE.md)
 - `.agentic/session/auto.sock` — Unix domain socket for engine control
 - `.agentic/session/auto.pid` — engine PID file
 - `.agentic/session/auto-state.json` — engine progress state
@@ -192,7 +190,7 @@ These mechanisms are proven and stable. Changes require strong justification:
 - **AGENT_QUICK_START.md** — "one rule: run doctor.sh" pattern
 - **Manifest-based guideline injection** in context-for-role.sh — 7 of 24 manifests currently include anti-hallucination.md
 - **STACK.md parsing** via ag.sh (grep/sed) — works today, no need to replace
-- **Git-tracked vs gitignored state split** — STATUS.md in git for cross-machine; WIP.md/AGENTS_ACTIVE.md gitignored for session-local
+- **Git-tracked vs gitignored state split** — STATUS.md in git for cross-machine; AGENTS.json gitignored for session-local
 
 ---
 

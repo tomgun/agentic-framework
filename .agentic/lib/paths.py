@@ -27,6 +27,10 @@ class AgenticPaths:
         self.agentic_root = self.project_root / ".agentic"
         self.agentic_lib = self.agentic_root / "lib"
 
+        # Main project root (not a worktree) for shared state like AGENTS.json
+        self.main_project_root = self._resolve_main_root(self.project_root)
+        self.agents_json = self.main_project_root / ".agentic" / "session" / "AGENTS.json"
+
         # Project config (stays at project root)
         self.claude_md = self.project_root / "CLAUDE.md"
         self.stack_file = self.project_root / "STACK.md"
@@ -164,6 +168,29 @@ class AgenticPaths:
         if legacy_path.exists():
             return legacy_path
         return new_path
+
+    @staticmethod
+    def _resolve_main_root(project_root: Path) -> Path:
+        """Resolve the main repo root (not a worktree).
+
+        In a git worktree, git-common-dir points to the main repo's .git,
+        so the main repo is its parent directory.
+        """
+        import subprocess
+        try:
+            git_common = subprocess.run(
+                ["git", "rev-parse", "--git-common-dir"],
+                capture_output=True, text=True, cwd=str(project_root),
+            ).stdout.strip()
+            git_dir = subprocess.run(
+                ["git", "rev-parse", "--git-dir"],
+                capture_output=True, text=True, cwd=str(project_root),
+            ).stdout.strip()
+            if git_common and git_dir and git_common != git_dir:
+                return Path(git_common).resolve().parent
+        except (FileNotFoundError, OSError):
+            pass
+        return project_root
 
 
 # Module-level cache

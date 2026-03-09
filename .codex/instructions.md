@@ -16,7 +16,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Build / implement / add / create / set up / develop / make something | STOP -> Run `ag plan F-XXXX` first, then `ag implement` |
 | Build something large (>10 files, "entire", "full system") | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
 | Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
-| Commit / push / ship / finalize changes | STOP -> Check .agentic/session/WIP.md first; if exists BLOCK and warn. Else run `ag commit` |
+| Commit / push / ship / finalize changes | STOP -> Check WIP status (`wip.sh check`); if active BLOCK and warn. Else run `ag commit` |
 | Done / complete / finished / wrapped up | STOP -> Run `ag done F-XXXX`. Before ending, flush pending ideas to .agentic/TODO.md via `ag todo`. |
 | Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
 | Backlog / queue / what's next / prioritize / reorder work | STOP -> `ag backlog` to see queue. `ag backlog add F-XXXX` to add. |
@@ -33,7 +33,7 @@ Rules:
 - Code + docs = done (update docs with code, not later).
 - Keep changes small and scoped.
 - **Every PR**: Bump VERSION (at least patch) and update .agentic/CONTRIBUTIONS.md with user's insight/direction. After merge: `git tag v$(cat VERSION) && git push origin v$(cat VERSION)`.
-- Multi-agent: read `.agentic/session/AGENTS_ACTIVE.md` before starting work.
+- Multi-agent: check `.agentic/session/AGENTS.json` (or `python3 .agentic/lib/tools/agents_helpers.py --project-root . list`) before starting work.
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):
 - .agentic/STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`

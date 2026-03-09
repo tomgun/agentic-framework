@@ -35,6 +35,8 @@ Purpose: a single source of truth for "how we build and run software here".
 # Doc staleness check at ag done. Profile defaults — Discovery: off | Formal: blocking
 - spec_analysis: off
 # Advisory spec analysis before implementation. Profile defaults — Discovery: off | Formal: on
+- worktree_mode: off
+# Auto-create worktrees for feature branches. Options: off | always. Profile defaults — Discovery: off | Formal: off
 
 ### Periodic checks
 - periodic_orphaned_plans: every_session
@@ -239,7 +241,7 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--       worktree: /path/to/worktree-1 -->
 <!--     - id: cursor-agent-2 -->
 <!--       worktree: /path/to/worktree-2 -->
-<!-- When enabled, agents use Git worktrees and coordinate via .agentic/session/AGENTS_ACTIVE.md -->
+<!-- When enabled, agents use Git worktrees and coordinate via .agentic/session/AGENTS.json -->
 
 ## Components (optional, for monorepos)
 <!-- Uncomment and fill for multi-component projects.

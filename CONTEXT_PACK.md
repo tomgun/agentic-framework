@@ -99,8 +99,7 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 - Definition of Done: See `.agentic/workflows/definition_of_done.md`
 
 ## State files
-- `.agentic/session/WIP.md` - Work-in-progress tracking (recovery)
-- `.agentic/session/AGENTS_ACTIVE.md` - Multi-agent coordination
+- `AGENTS.json` - Work-in-progress tracking and multi-agent coordination
 - `.agentic/journal/manifests/` - Feature change manifests (git history snapshots)
 - `.agentic/journal/lessons/` - Operational learnings (L-#### files)
 
@@ -116,7 +115,7 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
 - `spec/TECH_SPEC.md` — Technical architecture details
 
 ## Known risks / sharp edges
-- Multiple agents can work simultaneously - must coordinate via `.agentic/session/AGENTS_ACTIVE.md`
+- Multiple agents can work simultaneously - must coordinate via AGENTS.json (`agents_helpers.py list`)
 - Template changes affect ALL future projects - test in scratch first
 - Version references scattered across files - update ALL on release
 - Upgrade path must preserve user customizations

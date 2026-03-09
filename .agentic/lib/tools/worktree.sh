@@ -2,16 +2,12 @@
 # worktree.sh - Manage git worktrees for parallel agent development
 #
 # Usage:
-#   bash .agentic/tools/worktree.sh create <feature-id> "<description>"
-#   bash .agentic/tools/worktree.sh list
-#   bash .agentic/tools/worktree.sh remove <feature-id>
-#   bash .agentic/tools/worktree.sh status
-#
-# Examples:
-#   bash .agentic/tools/worktree.sh create F-0001 "User authentication"
-#   bash .agentic/tools/worktree.sh create auth "Login system"  # non-feature work
-#   bash .agentic/tools/worktree.sh list
-#   bash .agentic/tools/worktree.sh remove F-0001
+#   bash .agentic/lib/tools/worktree.sh create <feature-id> "<description>"
+#   bash .agentic/lib/tools/worktree.sh list
+#   bash .agentic/lib/tools/worktree.sh remove <feature-id>
+#   bash .agentic/lib/tools/worktree.sh auto-remove <feature-id>
+#   bash .agentic/lib/tools/worktree.sh path <feature-id>
+#   bash .agentic/lib/tools/worktree.sh status
 
 set -e
 
@@ -25,33 +21,30 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Get repo root
-REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+# Use MAIN_PROJECT_ROOT for repo root (always main repo, not worktree)
+REPO_ROOT="${MAIN_PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 if [[ -z "$REPO_ROOT" ]]; then
     echo -e "${RED}Error: Not in a git repository${NC}"
     exit 1
 fi
 
-AGENTS_FILE="$REPO_ROOT/.agentic/session/AGENTS_ACTIVE.md"
 REPO_NAME=$(basename "$REPO_ROOT")
 PARENT_DIR=$(dirname "$REPO_ROOT")
 
-# Ensure AGENTS_ACTIVE.md exists
-ensure_agents_file() {
-    if [[ ! -f "$AGENTS_FILE" ]]; then
-        mkdir -p "$(dirname "$AGENTS_FILE")"
-        cat > "$AGENTS_FILE" << 'EOF'
-# Active Agents
+# Python helper for AGENTS.json
+_agents_py() {
+    python3 "$SCRIPT_DIR/agents_helpers.py" --project-root "$REPO_ROOT" "$@" 2>/dev/null
+}
 
-<!-- Auto-managed by worktree.sh -->
-<!-- Agents register here when starting work -->
+_has_python() {
+    command -v python3 >/dev/null 2>&1
+}
 
-## Currently Active
-
-<!-- No agents currently active -->
-EOF
-        echo -e "${GREEN}Created .agentic/session/AGENTS_ACTIVE.md${NC}"
-    fi
+# Derive worktree path for a feature ID
+_worktree_path() {
+    local feature_id="$1"
+    local safe_id=$(echo "$feature_id" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
+    echo "$PARENT_DIR/${REPO_NAME}-${safe_id}"
 }
 
 # Create a new worktree
@@ -69,16 +62,21 @@ cmd_create() {
         description="$feature_id work"
     fi
 
-    # Normalize feature ID for branch/path naming
-    local safe_id=$(echo "$feature_id" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
     local branch_name="feature/$feature_id"
-    local worktree_path="$PARENT_DIR/${REPO_NAME}-${safe_id}"
+    local worktree_path=$(_worktree_path "$feature_id")
 
-    # Check if worktree already exists
+    # Check if worktree already exists — return 0, not error (H-07)
     if [[ -d "$worktree_path" ]]; then
-        echo -e "${YELLOW}Worktree already exists: $worktree_path${NC}"
-        echo "Use 'worktree.sh remove $feature_id' first if you want to recreate it."
-        exit 1
+        # Validate it's a working tree
+        if git -C "$worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            echo -e "${GREEN}Worktree already exists: $worktree_path${NC}"
+            echo "$worktree_path"
+            return 0
+        else
+            echo -e "${YELLOW}Directory exists but is not a valid worktree: $worktree_path${NC}"
+            echo "Remove it manually or use a different feature ID."
+            exit 1
+        fi
     fi
 
     # Check if branch already exists
@@ -90,12 +88,19 @@ cmd_create() {
         git worktree add "$worktree_path" -b "$branch_name"
     fi
 
+    # Validate creation (H-04)
+    if ! git -C "$worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        echo -e "${RED}Error: Worktree creation failed validation${NC}"
+        exit 1
+    fi
+
     echo -e "${GREEN}✓ Created worktree: $worktree_path${NC}"
     echo -e "${GREEN}✓ Branch: $branch_name${NC}"
 
-    # Register in AGENTS_ACTIVE.md
-    ensure_agents_file
-    register_agent "$feature_id" "$description" "$worktree_path" "$branch_name"
+    # Register in AGENTS.json
+    if _has_python; then
+        _agents_py register "$feature_id" "$worktree_path" "$branch_name" "$description" || true
+    fi
 
     echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -106,31 +111,7 @@ cmd_create() {
     echo ""
     echo "Or open a new Claude/Cursor window in that directory."
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-}
-
-# Register agent in AGENTS_ACTIVE.md
-register_agent() {
-    local feature_id="$1"
-    local description="$2"
-    local worktree_path="$3"
-    local branch_name="$4"
-    local timestamp=$(date '+%Y-%m-%d %H:%M')
-
-    # Remove the "no agents" placeholder if present
-    sed -i.bak '/<!-- No agents currently active -->/d' "$AGENTS_FILE" && rm -f "$AGENTS_FILE.bak"
-
-    # Add agent entry
-    cat >> "$AGENTS_FILE" << EOF
-
-### $feature_id
-- **Description**: $description
-- **Worktree**: $worktree_path
-- **Branch**: $branch_name
-- **Started**: $timestamp
-- **Status**: active
-EOF
-
-    echo -e "${GREEN}✓ Registered in .agentic/session/AGENTS_ACTIVE.md${NC}"
+    echo "$worktree_path"
 }
 
 # List active worktrees
@@ -140,16 +121,14 @@ cmd_list() {
     git worktree list
     echo ""
 
-    if [[ -f "$AGENTS_FILE" ]]; then
-        echo -e "${BLUE}Registered Agents (.agentic/session/AGENTS_ACTIVE.md):${NC}"
+    if _has_python; then
+        echo -e "${BLUE}Registered Agents (AGENTS.json):${NC}"
         echo ""
-        grep -A5 "^### " "$AGENTS_FILE" 2>/dev/null || echo "No agents registered"
-    else
-        echo -e "${YELLOW}No .agentic/session/AGENTS_ACTIVE.md file${NC}"
+        _agents_py list || echo "No agents registered"
     fi
 }
 
-# Remove a worktree
+# Remove a worktree (interactive — prompts for confirmation)
 cmd_remove() {
     local feature_id="$1"
 
@@ -159,14 +138,12 @@ cmd_remove() {
         exit 1
     fi
 
-    local safe_id=$(echo "$feature_id" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
-    local worktree_path="$PARENT_DIR/${REPO_NAME}-${safe_id}"
+    local worktree_path=$(_worktree_path "$feature_id")
     local branch_name="feature/$feature_id"
 
     # Check if worktree exists
     if [[ ! -d "$worktree_path" ]]; then
         echo -e "${YELLOW}Worktree not found: $worktree_path${NC}"
-        # Still try to clean up AGENTS_ACTIVE.md
     else
         # Check for uncommitted changes
         if [[ -n $(git -C "$worktree_path" status --porcelain 2>/dev/null) ]]; then
@@ -186,19 +163,9 @@ cmd_remove() {
         echo -e "${GREEN}✓ Removed worktree: $worktree_path${NC}"
     fi
 
-    # Unregister from AGENTS_ACTIVE.md
-    if [[ -f "$AGENTS_FILE" ]]; then
-        # Remove the agent section (### feature_id through next ### or end)
-        # Using awk for cross-platform compatibility
-        awk -v id="$feature_id" '
-            /^### / {
-                if ($2 == id) { skip=1; next }
-                else { skip=0 }
-            }
-            !skip { print }
-        ' "$AGENTS_FILE" > "$AGENTS_FILE.tmp" && mv "$AGENTS_FILE.tmp" "$AGENTS_FILE"
-
-        echo -e "${GREEN}✓ Unregistered from .agentic/session/AGENTS_ACTIVE.md${NC}"
+    # Unregister from AGENTS.json
+    if _has_python; then
+        _agents_py unregister "$feature_id" || true
     fi
 
     # Optionally delete branch
@@ -212,6 +179,56 @@ cmd_remove() {
             echo "Use 'git branch -D $branch_name' to force delete"
         fi
     fi
+}
+
+# Auto-remove worktree (non-interactive, for ag done)
+cmd_auto_remove() {
+    local feature_id="$1"
+
+    if [[ -z "$feature_id" ]]; then
+        echo -e "${RED}Usage: worktree.sh auto-remove <feature-id>${NC}"
+        exit 1
+    fi
+
+    local worktree_path=$(_worktree_path "$feature_id")
+
+    if [[ ! -d "$worktree_path" ]]; then
+        # Not found — clean up AGENTS.json entry if exists
+        if _has_python; then
+            _agents_py unregister "$feature_id" 2>/dev/null || true
+        fi
+        return 0
+    fi
+
+    # Check for uncommitted changes (H-08: exit 1 if dirty)
+    if [[ -n $(git -C "$worktree_path" status --porcelain 2>/dev/null) ]]; then
+        echo -e "${YELLOW}Worktree has uncommitted changes — preserving: $worktree_path${NC}"
+        echo "  Clean up manually: git worktree remove $worktree_path --force"
+        exit 1
+    fi
+
+    # Remove worktree (no --force: dirty check above already confirmed clean)
+    if ! git worktree remove "$worktree_path" 2>/dev/null; then
+        echo -e "${RED}Failed to remove worktree: $worktree_path${NC}"
+        echo "  Remove manually: git worktree remove $worktree_path"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Auto-removed worktree: $worktree_path${NC}"
+
+    # Unregister from AGENTS.json
+    if _has_python; then
+        _agents_py unregister "$feature_id" 2>/dev/null || true
+    fi
+}
+
+# Print worktree path for a feature ID
+cmd_path() {
+    local feature_id="$1"
+    if [[ -z "$feature_id" ]]; then
+        echo -e "${RED}Usage: worktree.sh path <feature-id>${NC}"
+        exit 1
+    fi
+    _worktree_path "$feature_id"
 }
 
 # Show current worktree status
@@ -231,7 +248,7 @@ cmd_status() {
 
     if [[ "$git_common" != "$git_dir" ]]; then
         echo -e "${YELLOW}This is a worktree (not the main repository)${NC}"
-        echo "  Main repo: $git_common"
+        echo "  Main repo: $(dirname "$git_common")"
     else
         echo "This is the main repository"
     fi
@@ -251,7 +268,9 @@ USAGE:
 COMMANDS:
     create <id> "<desc>"   Create new worktree for feature/task
     list                   List all worktrees and registered agents
-    remove <id>            Remove worktree and unregister
+    remove <id>            Remove worktree (interactive, prompts)
+    auto-remove <id>       Remove worktree (non-interactive, for ag done)
+    path <id>              Print worktree path for feature ID
     status                 Show current worktree status
     help                   Show this help
 
@@ -260,21 +279,19 @@ EXAMPLES:
     worktree.sh create F-0001 "User authentication"
 
     # Creates: ../project-f-0001/ on branch feature/F-0001
-    # Registers in .agentic/session/AGENTS_ACTIVE.md
+    # Registers in AGENTS.json
 
     # List all worktrees
     worktree.sh list
 
+    # Get path for a feature
+    worktree.sh path F-0001
+
     # Remove when done (will prompt about uncommitted changes)
     worktree.sh remove F-0001
 
-WORKFLOW:
-    1. Main window: worktree.sh create F-0001 "Auth feature"
-    2. Open new Claude/Cursor in ../project-f-0001/
-    3. Work in parallel - no conflicts!
-    4. Create PRs from each branch
-    5. Merge PRs
-    6. Cleanup: worktree.sh remove F-0001
+    # Auto-remove (non-interactive, used by ag done)
+    worktree.sh auto-remove F-0001
 
 EOF
 }
@@ -282,13 +299,19 @@ EOF
 # Main
 case "${1:-}" in
     create)
-        cmd_create "$2" "$3"
+        cmd_create "${2:-}" "${3:-}"
         ;;
     list)
         cmd_list
         ;;
     remove|delete)
-        cmd_remove "$2"
+        cmd_remove "${2:-}"
+        ;;
+    auto-remove)
+        cmd_auto_remove "${2:-}"
+        ;;
+    path)
+        cmd_path "${2:-}"
         ;;
     status)
         cmd_status
@@ -297,7 +320,7 @@ case "${1:-}" in
         cmd_help
         ;;
     *)
-        if [[ -n "$1" ]]; then
+        if [[ -n "${1:-}" ]]; then
             echo -e "${RED}Unknown command: $1${NC}"
             echo ""
         fi

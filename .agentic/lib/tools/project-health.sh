@@ -232,22 +232,31 @@ echo ""
 echo -e "${BLUE}Active Agents${NC}"
 echo "───────────────────────────────────────────────────────────────"
 
-if [[ -f "AGENTS_ACTIVE.md" ]]; then
-  # Count non-empty rows in the active table
-  ACTIVE_AGENTS=$(grep -E "^\| [A-Za-z]" AGENTS_ACTIVE.md | grep -v "Agent" | grep -v "^\| -" | wc -l | tr -d ' ')
-  
+AGENTS_FILE=".agentic/session/AGENTS.json"
+if [[ -f "$AGENTS_FILE" ]] && command -v python3 >/dev/null 2>&1; then
+  ACTIVE_AGENTS=$(python3 "$SCRIPT_DIR/agents_helpers.py" --project-root "$PROJECT_ROOT" list 2>/dev/null | grep -c "active\|created" || echo "0")
+
   if [[ "$ACTIVE_AGENTS" -gt 0 ]]; then
     echo "  $ACTIVE_AGENTS agent(s) registered as active"
-    
+
     if [[ "$VERBOSE" == "--verbose" ]]; then
-      grep -E "^\| [A-Za-z]" AGENTS_ACTIVE.md | grep -v "Agent" | grep -v "^\| -"
+      python3 "$SCRIPT_DIR/agents_helpers.py" --project-root "$PROJECT_ROOT" list 2>/dev/null
     fi
   else
     echo "  No agents currently active"
   fi
+elif [[ -f "AGENTS_ACTIVE.md" ]]; then
+  # Legacy fallback
+  ACTIVE_AGENTS=$(grep -E "^\| [A-Za-z]" AGENTS_ACTIVE.md | grep -v "Agent" | grep -v "^\| -" | wc -l | tr -d ' ')
+
+  if [[ "$ACTIVE_AGENTS" -gt 0 ]]; then
+    echo "  $ACTIVE_AGENTS agent(s) registered as active (legacy AGENTS_ACTIVE.md)"
+  else
+    echo "  No agents currently active"
+  fi
 else
-  echo "  AGENTS_ACTIVE.md not set up"
-  echo "  Run: bash .agentic/tools/setup-agent.sh pipeline"
+  echo "  No agent registry found"
+  echo "  Agents auto-register via wip.sh start"
 fi
 
 echo ""

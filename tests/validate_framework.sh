@@ -223,10 +223,10 @@ else
   fail "Worktree documentation missing"
 fi
 
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/templates/AGENTS_ACTIVE.template.md" ]]; then
-  pass "AGENTS_ACTIVE template exists"
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/agents_helpers.py" ]]; then
+  pass "AGENTS.json registry helper exists (agents_helpers.py)"
 else
-  fail "AGENTS_ACTIVE template missing"
+  fail "AGENTS.json registry helper missing (agents_helpers.py)"
 fi
 
 # ============================================================
@@ -859,11 +859,11 @@ else
   fail "pre-commit-check.sh missing scope_check.sh integration"
 fi
 
-# AC-004: WIP template has scope fields
-if grep -q "IN_SCOPE:" "${FRAMEWORK_ROOT}/.agentic/lib/tools/wip.sh" 2>/dev/null; then
-  pass "wip.sh template includes IN_SCOPE field"
+# AC-004: WIP tracking uses AGENTS.json (F-0194 migration)
+if grep -q "agents_helpers.py" "${FRAMEWORK_ROOT}/.agentic/lib/tools/wip.sh" 2>/dev/null; then
+  pass "wip.sh uses agents_helpers.py for WIP tracking"
 else
-  fail "wip.sh missing IN_SCOPE field"
+  fail "wip.sh missing agents_helpers.py integration"
 fi
 
 # AC-005: Principles cover human review and soft signals (merged into core principles)
@@ -1231,20 +1231,19 @@ else
   fail "wip.sh check failed"
 fi
 
-# Test wip.sh start (requires: feature_id, description, files)
-# WIP.md is created in .agentic/ (framework internal state)
+# Test wip.sh start (F-0194: writes to AGENTS.json, not WIP.md)
 if bash .agentic/lib/tools/wip.sh start "TEST-001" "Testing WIP functionality" "test.md" >/dev/null 2>&1; then
-  if [[ -f ".agentic/session/WIP.md" ]]; then
-    pass "wip.sh start creates .agentic/session/WIP.md"
+  if [[ -f ".agentic/session/AGENTS.json" ]] || [[ -f ".agentic/session/WIP.md" ]]; then
+    pass "wip.sh start creates WIP entry (AGENTS.json or WIP.md)"
   else
-    fail "wip.sh start did not create .agentic/session/WIP.md"
+    fail "wip.sh start did not create any WIP entry"
   fi
 else
   fail "wip.sh start failed"
 fi
 
 # Clean up WIP
-bash .agentic/lib/tools/wip.sh done >/dev/null 2>&1 || true
+bash .agentic/lib/tools/wip.sh complete >/dev/null 2>&1 || true
 
 # Test journal.sh
 if bash .agentic/lib/tools/journal.sh "Test Entry" "Did testing" "More tests" "None" >/dev/null 2>&1; then
@@ -1423,11 +1422,11 @@ else
   fail "F-0130: ag work missing improved nudge"
 fi
 
-# WIP.md templates have Success Criteria
-if grep -q "Success Criteria" "${FRAMEWORK_ROOT}/.agentic/lib/tools/wip.sh" 2>/dev/null; then
-  pass "F-0130: WIP template has Success Criteria section"
+# WIP tracking uses AGENTS.json (F-0194) — Success Criteria moved to acceptance specs
+if grep -q "agents_helpers.py" "${FRAMEWORK_ROOT}/.agentic/lib/tools/wip.sh" 2>/dev/null; then
+  pass "F-0130: WIP tracking integrated with AGENTS.json"
 else
-  fail "F-0130: WIP template missing Success Criteria"
+  fail "F-0130: WIP tracking missing AGENTS.json integration"
 fi
 
 # Pre-commit Discovery checklist
@@ -3971,6 +3970,141 @@ if [[ -f "${FRAMEWORK_ROOT}/tests/test_review.py" ]]; then
 else
   fail "T-0066: test_review.py not found"
 fi
+
+# ============================================================
+# F-0194: Worktree-by-Default for Feature Branches
+# ============================================================
+echo "--- F-0194: Worktree-by-Default for Feature Branches ---"
+
+# T-0067: MAIN_PROJECT_ROOT in paths.sh
+if grep -q "MAIN_PROJECT_ROOT" "${FRAMEWORK_ROOT}/.agentic/lib/paths.sh"; then
+  pass "T-0067: MAIN_PROJECT_ROOT defined in paths.sh"
+else
+  fail "T-0067: MAIN_PROJECT_ROOT not found in paths.sh"
+fi
+
+# T-0068: AGENTS_JSON in paths.sh
+if grep -q "AGENTS_JSON" "${FRAMEWORK_ROOT}/.agentic/lib/paths.sh"; then
+  pass "T-0068: AGENTS_JSON defined in paths.sh"
+else
+  fail "T-0068: AGENTS_JSON not found in paths.sh"
+fi
+
+# T-0069: main_project_root in paths.py
+if grep -q "main_project_root" "${FRAMEWORK_ROOT}/.agentic/lib/paths.py"; then
+  pass "T-0069: main_project_root defined in paths.py"
+else
+  fail "T-0069: main_project_root not found in paths.py"
+fi
+
+# T-0070: agents_json in paths.py
+if grep -q "agents_json" "${FRAMEWORK_ROOT}/.agentic/lib/paths.py"; then
+  pass "T-0070: agents_json defined in paths.py"
+else
+  fail "T-0070: agents_json not found in paths.py"
+fi
+
+# T-0071: agents_helpers.py exists with all commands
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/agents_helpers.py" ]]; then
+  pass "T-0071: agents_helpers.py exists"
+  for cmd in register activate checkpoint complete unregister check-worktree get-active get-current-feature list migrate-wip; do
+    if grep -q "\"$cmd\"" "${FRAMEWORK_ROOT}/.agentic/lib/tools/agents_helpers.py"; then
+      pass "T-0071: agents_helpers.py has '$cmd' command"
+    else
+      fail "T-0071: agents_helpers.py missing '$cmd' command"
+    fi
+  done
+else
+  fail "T-0071: agents_helpers.py not found"
+fi
+
+# T-0072: worktree.sh has auto-remove and path commands
+if grep -q "auto-remove" "${FRAMEWORK_ROOT}/.agentic/lib/tools/worktree.sh"; then
+  pass "T-0072: worktree.sh has auto-remove command"
+else
+  fail "T-0072: worktree.sh missing auto-remove command"
+fi
+
+if grep -q "cmd_path" "${FRAMEWORK_ROOT}/.agentic/lib/tools/worktree.sh"; then
+  pass "T-0072: worktree.sh has path command"
+else
+  fail "T-0072: worktree.sh missing path command"
+fi
+
+# T-0073: ag worktree in ag.sh dispatch
+if grep -q "worktree)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0073: ag worktree command in ag.sh dispatch"
+else
+  fail "T-0073: ag worktree command missing from ag.sh dispatch"
+fi
+
+# T-0074: worktree_mode in profiles.conf
+if grep -q "worktree_mode" "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf"; then
+  pass "T-0074: worktree_mode defined in profiles.conf"
+else
+  fail "T-0074: worktree_mode not found in profiles.conf"
+fi
+
+# T-0075: worktree_mode in STACK.template.md
+if grep -q "worktree_mode" "${FRAMEWORK_ROOT}/.agentic/lib/init/STACK.template.md"; then
+  pass "T-0075: worktree_mode defined in STACK.template.md"
+else
+  fail "T-0075: worktree_mode not found in STACK.template.md"
+fi
+
+# T-0076: worktree_mode in settings.sh show_all_settings
+if grep -q "worktree_mode" "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh"; then
+  pass "T-0076: worktree_mode in settings.sh"
+else
+  fail "T-0076: worktree_mode not found in settings.sh"
+fi
+
+# T-0077: AGENTS.json in .gitignore
+if grep -q "AGENTS.json" "${FRAMEWORK_ROOT}/.gitignore"; then
+  pass "T-0077: AGENTS.json in .gitignore"
+else
+  fail "T-0077: AGENTS.json not in .gitignore"
+fi
+
+# T-0078: No direct WIP.md file-existence checks in ag.sh without AGENTS.json companion
+# WIP.md checks are OK as fallbacks (elif after _has_active_wip, or || with _has_active_wip)
+# The old pattern was 9 standalone checks; now they should be fallbacks only
+WIP_DIRECT_CHECKS=$(grep -c '\[ -f.*WIP\.md' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null || echo "0")
+if [[ "$WIP_DIRECT_CHECKS" -le 6 ]]; then
+  pass "T-0078: ag.sh has minimal direct WIP.md checks ($WIP_DIRECT_CHECKS — fallbacks only)"
+else
+  fail "T-0078: ag.sh still has $WIP_DIRECT_CHECKS direct WIP.md checks (expected ≤6 fallbacks)"
+fi
+
+# T-0079: ag.sh has _agents_py helper
+if grep -q "_agents_py()" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0079: ag.sh has _agents_py() helper"
+else
+  fail "T-0079: ag.sh missing _agents_py() helper"
+fi
+
+# T-0080: wip.sh uses agents_helpers.py
+if grep -q "agents_helpers.py" "${FRAMEWORK_ROOT}/.agentic/lib/tools/wip.sh"; then
+  pass "T-0080: wip.sh references agents_helpers.py"
+else
+  fail "T-0080: wip.sh does not reference agents_helpers.py"
+fi
+
+# T-0081: worktree.sh uses MAIN_PROJECT_ROOT
+if grep -q "MAIN_PROJECT_ROOT" "${FRAMEWORK_ROOT}/.agentic/lib/tools/worktree.sh"; then
+  pass "T-0081: worktree.sh uses MAIN_PROJECT_ROOT"
+else
+  fail "T-0081: worktree.sh missing MAIN_PROJECT_ROOT"
+fi
+
+# T-0082: upgrade.sh has AGENTS.json migration
+if grep -q "AGENTS.json" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh"; then
+  pass "T-0082: upgrade.sh has AGENTS.json migration"
+else
+  fail "T-0082: upgrade.sh missing AGENTS.json migration"
+fi
+
+echo ""
 
 # ============================================================
 # Summary

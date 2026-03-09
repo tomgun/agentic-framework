@@ -9,7 +9,7 @@ This directory contains focused guideline modules extracted from `agent_operatin
 | `core-rules.md` | Constitutional minimum: no fabrication, no auto-commit, token scripts, ask when uncertain | **Always** (auto-injected by `context-for-role.sh` for ALL roles) |
 | `anti-hallucination.md` | Comprehensive verification rules, check-before-creating | Always (core rule) |
 | `token-efficiency.md` | Scripts, delegation, context optimization | When updating docs |
-| `multi-agent.md` | Coordination, AGENTS_ACTIVE.md, worktrees | Parallel agent work |
+| `multi-agent.md` | Coordination, AGENTS.json, worktrees | Parallel agent work |
 | `wip-tracking.md` | Work-in-progress, recovery | Interrupted sessions |
 | `small-batch.md` | Breaking large tasks, commit limits | Implementation |
 

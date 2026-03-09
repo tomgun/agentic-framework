@@ -64,7 +64,7 @@ b) **Specialized agents** - Different agents for research, testing, coding, revi
    - Better for complex features with clear phases
    - Requires: pipeline setup, agent role definitions
 c) **Parallel features** - Multiple agents on different features simultaneously
-   - Requires: git worktrees, AGENTS_ACTIVE.md coordination
+   - Requires: git worktrees, AGENTS.json coordination
    - Best for: large projects with independent features
 d) **Not sure** - Start with single agent, enable later
 
