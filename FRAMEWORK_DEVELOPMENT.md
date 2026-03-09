@@ -590,6 +590,10 @@ Users already past X.Y.Z will NOT see it (prevents repeated prompts).
 
 Hard-won insights from framework development. These live here (in the repo) so they're available to any agent on any machine — NOT in auto-memory, which is machine-local.
 
+### Plans given as user messages don't auto-save
+
+Only plans created through plan mode (`/plan` / `EnterPlanMode`) get saved to `~/.claude/plans/`. When a user pastes a plan as a regular message ("Implement the following plan:"), there's nothing in `~/.claude/plans/` to copy. The "save plan after approval" rule silently doesn't apply. **Always save the plan to `.agentic/journal/plans/`** — whether it came from plan mode or a user message. If the plan is in the conversation but not in a file, write it to a file yourself.
+
 ### Plan mode bypasses spec-first workflow (I-0002)
 
 Plan mode + session continuation are **blind spots** for the "create F-XXXX FIRST" trigger. The plan file feels like "we already planned it" but it's NOT a feature spec — it's session-scoped. **Always check**: does this work have an F-XXXX in FEATURES.md and `spec/acceptance/F-XXXX.md`? If not, create them before writing code — even if a plan exists. Tracked as I-0002 in `spec/ISSUES.md`.
