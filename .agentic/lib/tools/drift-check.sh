@@ -29,9 +29,9 @@ count_acs() {
     local total=0 checked=0
 
     while IFS= read -r line; do
-        if echo "$line" | grep -qE '^\s*- \[[ x]\]\s*\*?\*?AC-'; then
+        if echo "$line" | grep -qE '^[[:space:]]*- \[[ x]\][[:space:]]*\*?\*?AC-'; then
             total=$((total + 1))
-            if echo "$line" | grep -qE '^\s*- \[x\]'; then
+            if echo "$line" | grep -qE '^[[:space:]]*- \[x\]'; then
                 checked=$((checked + 1))
             fi
         elif echo "$line" | grep -qE '^### AC-'; then
@@ -47,7 +47,7 @@ check_shipped_ac_drift() {
     [ ! -f "$FEATURES_FILE" ] && return 0
 
     local shipped_features
-    shipped_features=$(grep -B2 -iE '\*\*Status\*\*:\s*shipped' "$FEATURES_FILE" 2>/dev/null \
+    shipped_features=$(grep -B2 -iE '\*\*Status\*\*:[[:space:]]*shipped' "$FEATURES_FILE" 2>/dev/null \
         | grep -oE 'F-[0-9]+' || true)
 
     for fid in $shipped_features; do
@@ -89,7 +89,9 @@ check_backlog_drift() {
 
         if [ -n "$status" ]; then
             issues=$((issues + 1))
-            echo -e "${YELLOW}Drift:${NC} $fid is in BACKLOG.json but FEATURES.md says '${status}'"
+            if [ "$QUIET" = false ] || [ "$issues" -eq 1 ]; then
+                echo -e "${YELLOW}Drift:${NC} $fid is in BACKLOG.json but FEATURES.md says '${status}'"
+            fi
         fi
     done
 }

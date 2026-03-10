@@ -154,9 +154,9 @@ if [[ -d "$PROJECT_ROOT/.agentic/spec/acceptance" ]] && [[ -f "$PROJECT_ROOT/.ag
         [[ ! -f "$acc_file" ]] && continue
         total=0; checked=0
         while IFS= read -r line; do
-            if echo "$line" | grep -qE '^\s*- \[[ x]\]\s*\*?\*?AC-'; then
+            if echo "$line" | grep -qE '^[[:space:]]*- \[[ x]\][[:space:]]*\*?\*?AC-'; then
                 total=$((total + 1))
-                echo "$line" | grep -qE '^\s*- \[x\]' && checked=$((checked + 1))
+                echo "$line" | grep -qE '^[[:space:]]*- \[x\]' && checked=$((checked + 1))
             elif echo "$line" | grep -qE '^### AC-'; then
                 total=$((total + 1))
             fi
@@ -165,7 +165,7 @@ if [[ -d "$PROJECT_ROOT/.agentic/spec/acceptance" ]] && [[ -f "$PROJECT_ROOT/.ag
             pct=$((checked * 100 / total))
             [[ "$pct" -lt 50 ]] && D_AC_DRIFT_COUNT=$((D_AC_DRIFT_COUNT + 1))
         fi
-    done < <(grep -B2 -iE '\*\*Status\*\*:\s*shipped' "$PROJECT_ROOT/.agentic/spec/FEATURES.md" 2>/dev/null \
+    done < <(grep -B2 -iE '\*\*Status\*\*:[[:space:]]*shipped' "$PROJECT_ROOT/.agentic/spec/FEATURES.md" 2>/dev/null \
         | grep -oE 'F-[0-9]+' || true)
 fi
 
