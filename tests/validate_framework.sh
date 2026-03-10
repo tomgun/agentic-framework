@@ -4352,6 +4352,55 @@ else
   fail "T-0113: AC gate missing get_setting for configurable enforcement"
 fi
 
+# ============================================================
+# F-0199: Instruction File Sync Detection
+# ============================================================
+echo ""
+echo "--- F-0199: Instruction File Sync Detection ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh" ]]; then
+  pass "F-0199 AC-001: instruction-sync.sh exists"
+else
+  fail "F-0199 AC-001: instruction-sync.sh missing"
+fi
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh" ]]; then
+  pass "F-0199 AC-001: instruction-sync.sh is executable"
+else
+  fail "F-0199 AC-001: instruction-sync.sh is not executable"
+fi
+
+# AC-002: Parses ag.sh case statement to discover subcommands
+if grep -q 'Main command dispatch' "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh"; then
+  pass "F-0199 AC-002: instruction-sync.sh parses ag.sh main dispatch"
+else
+  fail "F-0199 AC-002: instruction-sync.sh does not parse ag.sh dispatch"
+fi
+
+# AC-003 through AC-008: Checks instruction files
+for check_file in "CLAUDE.md" "cursorrules.txt" "copilot-instructions.md" "codex-instructions.md" "auto_orchestration.md" "memory-seed.md"; do
+  if grep -q "$check_file" "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh"; then
+    pass "F-0199: instruction-sync.sh checks $check_file"
+  else
+    fail "F-0199: instruction-sync.sh does not check $check_file"
+  fi
+done
+
+# AC-009: Reports missing commands per file with clear output
+if grep -q 'missing commands' "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh"; then
+  pass "F-0199 AC-009: instruction-sync.sh reports missing commands per file"
+else
+  fail "F-0199 AC-009: instruction-sync.sh does not report missing commands"
+fi
+
+# AC-010: Wired into validate_framework.sh (this very check runs it in warning mode)
+# Run it and report as warning (not blocking)
+if bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh" --quiet 2>/dev/null; then
+  pass "F-0199 AC-010: instruction-sync check passes (all commands in sync)"
+else
+  warn "F-0199 AC-010: instruction-sync detected drift (advisory — run instruction-sync.sh for details)"
+fi
+
 echo ""
 
 # ============================================================
