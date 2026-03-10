@@ -278,8 +278,8 @@ class FeatureStateMachine:
             return False, [f"Feature {feature_id} not found in FEATURES.md"]
 
         if current == target:
-            return False, [
-                f"Feature {feature_id} is already in state '{target.value}'"
+            return True, [
+                f"Feature {feature_id} already in state '{target.value}' (no-op)"
             ]
 
         if not self.is_valid_transition(current, target):
@@ -323,6 +323,12 @@ class FeatureStateMachine:
             return False, messages
 
         current = self.get_current_state(feature_id)
+
+        # Short-circuit: already in target state — skip review, file write, logs
+        if current == target:
+            return True, [
+                f"Feature {feature_id} already in state '{target.value}' (no-op)"
+            ]
 
         # Review checkpoint: after gates pass, before transition writes
         from auto.review import check_review, has_pending_review

@@ -302,11 +302,13 @@ class TestCanTransition:
         allowed, msgs = sm.can_transition("F-0042", FeatureState.SPECCED)
         assert allowed
 
-    def test_same_state_rejected(self, project_dir):
+    def test_same_state_idempotent_noop(self, project_dir):
+        """Transitioning to the same state is a no-op, not an error (AC-001)."""
         write_features(project_dir, [("F-0042", "Test", "planned")])
         sm = FeatureStateMachine(project_root=project_dir)
         allowed, msgs = sm.can_transition("F-0042", FeatureState.PLANNED)
-        assert not allowed
+        assert allowed
+        assert "no-op" in msgs[0]
         assert "already in state" in msgs[0]
 
     def test_missing_feature_rejected(self, project_dir):
@@ -314,6 +316,21 @@ class TestCanTransition:
         sm = FeatureStateMachine(project_root=project_dir)
         allowed, msgs = sm.can_transition("F-9999", FeatureState.SPECCED)
         assert not allowed
+
+    def test_same_state_transition_short_circuits(self, project_dir):
+        """transition() short-circuits when current == target (AC-002).
+
+        Must not call check_review(), has_pending_review(), or feature.sh.
+        """
+        write_features(project_dir, [("F-0042", "Test", "implementing")])
+        sm = FeatureStateMachine(project_root=project_dir)
+        with patch("auto.review.check_review") as mock_review, \
+             patch("auto.review.has_pending_review") as mock_pending:
+            ok, msgs = sm.transition("F-0042", FeatureState.IMPLEMENTING)
+            assert ok
+            assert "no-op" in msgs[0]
+            mock_review.assert_not_called()
+            mock_pending.assert_not_called()
 
     def test_invalid_transition_advisory_mode(self, project_dir):
         """In advisory mode, invalid transitions warn but allow."""
