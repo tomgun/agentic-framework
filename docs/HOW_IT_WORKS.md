@@ -720,8 +720,7 @@ These features exist but don't clearly derive from the 13 principles:
 |---------|-------------|-------------|
 | `ag start` | Read state, check WIP, memory integrity, display dashboard | Advisory (soft start) |
 
-| `ag sync` | 10-phase drift detection + auto-fix (includes AC/backlog drift check via `drift-check.sh`) | Advisory (user-initiated) |
-| `ag sync` | 10-phase drift detection + auto-fix | Advisory (user-initiated) |
+| `ag sync` | 11-phase drift detection + auto-fix (includes AC/backlog drift check via `drift-check.sh`) | Advisory (user-initiated) |
 | `ag work "desc"` | Create WIP, start task. Formal: BLOCKS without feature ID. | Structural (Formal) |
 | `ag plan F-XXXX` | Create plan with optional review loop | Structural (must have acceptance) |
 | `ag implement F-XXXX` | Check acceptance, check approved plan, create WIP, print guidance | Structural (multiple gates) |
@@ -748,6 +747,7 @@ These features exist but don't clearly derive from the 13 principles:
 | 6 | Git hooks | Hook configuration drift (`core.hooksPath` not set) |
 | 7 | Periodic checks | Orphaned plans, overdue retros, stale agent registrations |
 | 8 | PR cleanup | Merged/closed PRs still listed in HUMAN_NEEDED.md |
+| 9 | Plan durability | Unsaved plans in ephemeral directories (via `plan-scan.sh`). Scans `~/.claude/plans/`, `.cursor/plans/`, and custom dirs from `plan_scan_dirs` in STACK.md. Auto-copies plans with valid F-XXXX IDs to `.agentic/journal/plans/` |
 
 ---
 
@@ -846,8 +846,7 @@ These will always rely on behavioral reinforcement:
 
 ### Sync & Maintenance
 
-`sync.sh`, `drift-check.sh`, `instruction-sync.sh`, `sync_docs.py`/`sync_docs.sh`, `memory-check.sh`, `manifest.sh`, `migration.sh`, `upgrade.sh`, `framework_age.sh`
-`sync.sh`, `instruction-sync.sh`, `sync_docs.py`/`sync_docs.sh`, `memory-check.sh`, `manifest.sh`, `migration.sh`, `upgrade.sh`, `framework_age.sh`
+`sync.sh`, `drift-check.sh`, `instruction-sync.sh`, `plan-scan.sh`, `sync_docs.py`/`sync_docs.sh`, `memory-check.sh`, `manifest.sh`, `migration.sh`, `upgrade.sh`, `framework_age.sh`
 
 ### Testing
 `tests/llm/harness.sh`, `mutation_test.sh`, `llm-test-status.sh`
