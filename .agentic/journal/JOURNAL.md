@@ -1923,3 +1923,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-10 15:52 - Fix stray conflict marker
+
+**Why**: validate_framework.sh had syntax error from stray conflict marker
+
+**What changed**:
+- Removed =======  marker left in validate_framework.sh from PR merge
+
+**Next steps**:
+- Merge to main
+
+**Blockers**: None
+
