@@ -1149,6 +1149,24 @@ cmd_done() {
         return
     fi
 
+    # --- Intent-driven execution (F-0200) ---
+    # Write intent before any mutable work. Each step is checkpointed.
+    # If the process dies mid-sequence, ag sync can resume from last checkpoint.
+    local enforcement
+    enforcement=$(_get_state_enforcement)
+
+    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        # Build step list based on what will actually run
+        local intent_steps="generate_manifest,check_drift,check_ac_completion"
+        if [ "$enforcement" != "off" ]; then
+            intent_steps="${intent_steps},transition_verified,transition_documented,transition_committed,transition_shipped"
+        fi
+        intent_steps="${intent_steps},complete_wip,advance_backlog"
+
+        # Write intent (advisory — failure does not block)
+        intent_write "$feature_id" "shipped" "done" "$intent_steps" "" || true
+    fi
+
     # Generate manifest for feature (Formal profile)
     if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
         echo -e "${BOLD}=== Generating Change Manifest ===${NC}"
@@ -1167,6 +1185,7 @@ cmd_done() {
             echo -e "${YELLOW}Could not generate manifest (no matching commits?)${NC}"
         fi
         echo ""
+        intent_checkpoint "$feature_id" "generate_manifest" || true
     fi
 
     # Doc drift gate (controlled by docs_gate setting)
@@ -1195,6 +1214,9 @@ cmd_done() {
             fi
         fi
         echo ""
+    fi
+    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        intent_checkpoint "$feature_id" "check_drift" || true
     fi
 
     # Doc lifecycle: draft docs from registry (after docs_gate, before complete check)
@@ -1303,6 +1325,7 @@ cmd_done() {
             echo -e "${RED}$done_failures blocking issue(s). Fix before marking complete.${NC}"
             exit 1
         fi
+        intent_checkpoint "$feature_id" "check_ac_completion" || true
 
         # Check for untracked feature files
         echo ""
@@ -1389,6 +1412,37 @@ cmd_done() {
     echo ""
     echo "Full checklist: .agentic/lib/checklists/feature_complete.md"
 
+    # State transitions (controlled by state_enforcement setting)
+    # Reliability (crash recovery) is always active via intent checkpoints above.
+    # State machine transitions are only attempted when state_enforcement != off.
+    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$' && [ "$enforcement" != "off" ]; then
+        echo ""
+        echo -e "${BOLD}=== State Transitions ===${NC}"
+        local _done_states="verified documented committed shipped"
+        for _target_state in $_done_states; do
+            local _trans_out=""
+            local _trans_rc=0
+            _trans_out=$(python3 "$SCRIPT_DIR/../auto/state_machine.py" \
+                --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" \
+                transition "$feature_id" "$_target_state" 2>&1) || _trans_rc=$?
+            if [ "$_trans_rc" -eq 0 ] || echo "$_trans_out" | grep -q "no-op"; then
+                echo -e "${GREEN}State: $_target_state${NC}"
+            else
+                if [ "$enforcement" = "blocking" ]; then
+                    echo -e "${RED}BLOCKED: State transition to $_target_state failed${NC}"
+                    echo "$_trans_out"
+                    intent_cancel "$feature_id" || true
+                    exit 1
+                else
+                    # advisory: warn and continue
+                    echo -e "${YELLOW}WARNING: Transition to $_target_state failed (advisory, continuing)${NC}"
+                    echo "$_trans_out" | head -3
+                fi
+            fi
+            intent_checkpoint "$feature_id" "transition_${_target_state}" || true
+        done
+    fi
+
     # Check if WIP is complete
     if _has_active_wip || [ -f "$ROOT_DIR/.agentic/session/WIP.md" ]; then
         echo ""
@@ -1413,6 +1467,9 @@ cmd_done() {
             fi
         fi
     fi
+    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        intent_checkpoint "$feature_id" "complete_wip" || true
+    fi
 
     # Suggest drift detection
     echo ""
@@ -1433,6 +1490,7 @@ cmd_done() {
                 bash "$SCRIPT_DIR/backlog.sh" done 2>/dev/null || true
             fi
         fi
+        intent_checkpoint "$feature_id" "advance_backlog" || true
     fi
 
     # VERSION bump + flush (only on main — worktrees skip this)
@@ -1463,6 +1521,11 @@ cmd_done() {
     else
         echo ""
         echo -e "${BLUE}On branch '$current_branch' — run 'ag flush --features' after returning to main.${NC}"
+    fi
+
+    # Clear intent — all steps complete
+    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        intent_clear "$feature_id" || true
     fi
 }
 
