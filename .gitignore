@@ -41,6 +41,7 @@ tests/llm/.test-state
 .agentic/session/auto.pid
 .agentic/session/auto-state.json
 .agentic/session/crunch-state.json
+.agentic/session/scheduler-state.json
 .agentic/session/.qa-tracker.json
 .agentic/session/screenshots/
 .agentic/session/intents.json

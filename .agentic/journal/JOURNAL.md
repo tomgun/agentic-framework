@@ -1962,3 +1962,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-10 19:35 - F-0186 Autonomous Scheduler
+
+**Why**: ADR-001 Phase 7: scheduling is the final piece for fully autonomous execution — reviews no longer stall the pipeline
+
+**What changed**:
+- AutonomousScheduler class enables non-blocking epic execution: finds unblocked features, spawns component-scoped workers, handles review escalations without stalling other features. Crunch mode now backed by scheduler. ag auto epic F-XXXX command available.
+
+**Next steps**:
+- Wire F-0186 validation into validate_framework.sh, update instruction files (memory-seed, auto_orchestration)
+
+**Blockers**: None
+
