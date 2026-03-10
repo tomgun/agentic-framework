@@ -145,6 +145,30 @@ if [[ -f "$TOOLS_DIR/doctor.sh" ]]; then
     fi
 fi
 
+# AC DRIFT (F-0197)
+D_AC_DRIFT_COUNT=0
+if [[ -d "$PROJECT_ROOT/.agentic/spec/acceptance" ]] && [[ -f "$PROJECT_ROOT/.agentic/spec/FEATURES.md" ]]; then
+    while IFS= read -r fid; do
+        [[ -z "$fid" ]] && continue
+        acc_file="$PROJECT_ROOT/.agentic/spec/acceptance/${fid}.md"
+        [[ ! -f "$acc_file" ]] && continue
+        total=0; checked=0
+        while IFS= read -r line; do
+            if echo "$line" | grep -qE '^\s*- \[[ x]\]\s*\*?\*?AC-'; then
+                total=$((total + 1))
+                echo "$line" | grep -qE '^\s*- \[x\]' && checked=$((checked + 1))
+            elif echo "$line" | grep -qE '^### AC-'; then
+                total=$((total + 1))
+            fi
+        done < "$acc_file"
+        if [[ "$total" -gt 0 ]]; then
+            pct=$((checked * 100 / total))
+            [[ "$pct" -lt 50 ]] && D_AC_DRIFT_COUNT=$((D_AC_DRIFT_COUNT + 1))
+        fi
+    done < <(grep -B2 -iE '\*\*Status\*\*:\s*shipped' "$PROJECT_ROOT/.agentic/spec/FEATURES.md" 2>/dev/null \
+        | grep -oE 'F-[0-9]+' || true)
+fi
+
 # UPGRADE
 D_UPGRADE="none"
 [[ -f "$PROJECT_ROOT/.agentic/.upgrade_pending" ]] && D_UPGRADE="pending"
@@ -303,6 +327,9 @@ if [[ "$D_UPGRADE" == "pending" ]]; then
     echo "🔄 Upgrade        Pending — read \`.agentic/.upgrade_pending\`"
 fi
 
+if [[ "$D_AC_DRIFT_COUNT" -gt 0 ]]; then
+    echo "⚠️  AC Drift       $D_AC_DRIFT_COUNT shipped feature(s) with <50% ACs checked"
+fi
 echo "✅ Health         $health_line"
 echo ""
 

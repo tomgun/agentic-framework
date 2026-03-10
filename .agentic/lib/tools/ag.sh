@@ -1212,6 +1212,41 @@ cmd_done() {
             fi
         fi
 
+        # Gate 3: AC completion check (F-0197)
+        if [ -f "$acc_file" ]; then
+            local total_acs=0 checked_acs=0
+            while IFS= read -r line; do
+                if echo "$line" | grep -qE '^\s*- \[[ x]\]\s*\*?\*?AC-'; then
+                    total_acs=$((total_acs + 1))
+                    if echo "$line" | grep -qE '^\s*- \[x\]'; then
+                        checked_acs=$((checked_acs + 1))
+                    fi
+                elif echo "$line" | grep -qE '^### AC-'; then
+                    total_acs=$((total_acs + 1))
+                    # Heading-format ACs: check if next non-empty line starts with ✅ or "Status: done/complete"
+                    # For simplicity, heading-format ACs count as unchecked unless explicitly marked
+                fi
+            done < "$acc_file"
+
+            if [ "$total_acs" -gt 0 ]; then
+                local ac_pct=$((checked_acs * 100 / total_acs))
+                echo ""
+                echo -e "${BOLD}AC Completion:${NC} ${checked_acs}/${total_acs} (${ac_pct}%)"
+
+                if [ "$ac_pct" -lt 80 ]; then
+                    local ac_setting
+                    ac_setting="$(get_setting "acceptance_criteria" "blocking")"
+                    if [ "$ac_setting" = "blocking" ]; then
+                        echo -e "${RED}BLOCKED: AC completion ${ac_pct}% < 80% threshold${NC}"
+                        echo "  Check off passing ACs in .agentic/spec/acceptance/${feature_id}.md"
+                        done_failures=$((done_failures + 1))
+                    else
+                        echo -e "${YELLOW}WARNING: AC completion ${ac_pct}% < 80% threshold${NC}"
+                    fi
+                fi
+            fi
+        fi
+
         if [ "$done_failures" -gt 0 ]; then
             echo ""
             echo -e "${RED}$done_failures blocking issue(s). Fix before marking complete.${NC}"
