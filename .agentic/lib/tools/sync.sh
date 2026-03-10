@@ -486,6 +486,32 @@ phase_features() {
 }
 
 # ============================================================================
+# Phase 3a+: AC drift check (F-0197)
+# ============================================================================
+phase_drift_check() {
+    local ft
+    ft="$(get_setting "feature_tracking" "no")"
+    if [ "$ft" != "yes" ]; then
+        return 0
+    fi
+
+    local drift_output
+    drift_output=$(bash "$SCRIPT_DIR/drift-check.sh" --quiet 2>/dev/null || true)
+
+    if [ -n "$drift_output" ]; then
+        record_issue "ac-drift"
+        if [ "$MODE" != "quiet" ]; then
+            echo "$drift_output"
+        fi
+    else
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "AC Drift:   ${GREEN}OK${NC}"
+        fi
+    fi
+}
+
+# ============================================================================
 # Phase 3b: Unregistered shipped code detection
 # ============================================================================
 phase_unregistered_code() {
@@ -832,6 +858,7 @@ main() {
     phase_memory
     phase_state_freshness
     phase_features
+    phase_drift_check
     phase_unregistered_code
     phase_spec_drift
     phase_tool_parity

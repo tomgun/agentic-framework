@@ -895,13 +895,18 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
   SHIPPED_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^.agentic/spec/acceptance/(F|NFR)-[0-9]+\.md$" || true)
   CHECK14_FAIL=0
   if [[ -n "$SHIPPED_SPEC_STAGED" ]]; then
+    # Pre-fetch migration diff once (avoids pipefail+SIGPIPE bug with grep -q)
+    MIGRATION_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^.agentic/spec/migrations/[0-9]+.*\.md$" || true)
+    MIGRATION_DIFF=""
+    if [[ -n "$MIGRATION_STAGED" ]]; then
+      MIGRATION_DIFF=$(git diff --cached -- .agentic/spec/migrations/ 2>/dev/null || true)
+    fi
     for spec_file in $SHIPPED_SPEC_STAGED; do
       FID=$(basename "$spec_file" .md)
       # Match **Status**: shipped format in FEATURES.md
       IS_SHIPPED=$(grep -A5 "^## ${FID}:" .agentic/spec/FEATURES.md 2>/dev/null | grep -i "status.*shipped" || true)
       if [[ -n "$IS_SHIPPED" ]]; then
-        MIGRATION_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^.agentic/spec/migrations/[0-9]+.*\.md$" || true)
-        if [[ -z "$MIGRATION_STAGED" ]] || ! git diff --cached -- ${MIGRATION_STAGED} 2>/dev/null | grep -q "$FID"; then
+        if [[ -z "$MIGRATION_STAGED" ]] || ! echo "$MIGRATION_DIFF" | grep -q "$FID"; then
           echo "❌ BLOCKED: Shipped feature $FID acceptance criteria modified without migration"
           echo "  Create: bash .agentic/lib/tools/migration.sh create 'Update $FID ...'"
           FAILURES=$((FAILURES + 1))
@@ -973,9 +978,26 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
       fi
     done <<< "$DIFF_OUTPUT"
     if [[ $HAS_DOWNGRADE -eq 1 ]]; then
-      echo "❌ BLOCKED: Shipped feature status downgraded:$DOWNGRADED_IDS"
-      echo "  Shipped features cannot be un-shipped without explicit migration"
-      FAILURES=$((FAILURES + 1))
+      # Check if migration covers the downgraded features
+      # Pre-fetch diff to avoid pipefail+SIGPIPE bug with grep -q
+      MIGRATION_STAGED_16=$(git diff --cached --name-only 2>/dev/null | grep -E "^.agentic/spec/migrations/[0-9]+.*\.md$" || true)
+      MIGRATION_DIFF_16=""
+      if [[ -n "$MIGRATION_STAGED_16" ]]; then
+        MIGRATION_DIFF_16=$(git diff --cached -- .agentic/spec/migrations/ 2>/dev/null || true)
+      fi
+      UNCOVERED_IDS=""
+      for DID in $DOWNGRADED_IDS; do
+        if [[ -z "$MIGRATION_STAGED_16" ]] || ! echo "$MIGRATION_DIFF_16" | grep -q "$DID"; then
+          UNCOVERED_IDS="$UNCOVERED_IDS $DID"
+        fi
+      done
+      if [[ -n "$UNCOVERED_IDS" ]]; then
+        echo "❌ BLOCKED: Shipped feature status downgraded without migration:$UNCOVERED_IDS"
+        echo "  Create: bash .agentic/lib/tools/migration.sh create 'Deprecate ...'"
+        FAILURES=$((FAILURES + 1))
+      else
+        echo "✓ Shipped feature status changes covered by migration"
+      fi
     else
       echo "✓ No shipped feature status downgrades"
     fi
