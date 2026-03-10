@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 11,
+  "last_migration": 12,
   "migrations": [
     {
       "id": 1,
@@ -67,6 +67,12 @@
       "file": "011_add_f0176_planaware_code_review.md",
       "date": "2026-03-07",
       "description": "Add F-0176 plan-aware code review"
+    },
+    {
+      "id": 12,
+      "file": "012_f0196_ac024_version_moves_to_ag_flush_allowlist__multipr_version_conflicts_make_inpr_bumping_unworkable_postmerge_bump_via_ag_done_is_conflictfree.md",
+      "date": "2026-03-10",
+      "description": "F-0196 AC-024: VERSION moves to ag flush allowlist — multi-PR VERSION conflicts make in-PR bumping unworkable; post-merge bump via ag done is conflict-free"
     }
   ]
 }
