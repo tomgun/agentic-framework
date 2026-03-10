@@ -7,7 +7,9 @@ Python classes where possible; claim/release use agents_helpers directly.
 """
 from __future__ import annotations
 
+import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -81,11 +83,12 @@ def transition_state(project_root: Path, params: dict) -> dict:
         return {"error": f"invalid target state: {target}",
                 "valid_states": valid}
 
-    # Constraint: RPC always skips review (blocking reviews go through CLI).
-    # Temporarily override review settings to skip.
+    # Constraint: RPC always skips review checkpoints. Blocking reviews
+    # (critical-agent, 60+ seconds) would hold the dispatch lock and freeze
+    # all other RPC requests. Transitions needing review go through CLI.
     sm = FeatureStateMachine(project_root, enforce=False)
     success, messages = sm.transition(feature_id, target_state,
-                                      dry_run=dry_run)
+                                      dry_run=dry_run, skip_review=True)
     return {"success": success, "messages": messages,
             "feature_id": feature_id, "target": target}
 
@@ -143,7 +146,6 @@ def poll_changes(project_root: Path, params: dict) -> dict:
 
     if changed:
         # Return current state of both files
-        import json
         if paths.features_file.exists():
             # Parse feature statuses from FEATURES.md
             result["features"] = _parse_feature_statuses(paths.features_file)
@@ -159,7 +161,6 @@ def poll_changes(project_root: Path, params: dict) -> dict:
 
 def _parse_feature_statuses(features_file: Path) -> list[dict]:
     """Extract feature IDs and statuses from FEATURES.md."""
-    import re
     features = []
     content = features_file.read_text()
     current_id = None

@@ -15,9 +15,10 @@ Auth: Bearer token (generated on start, written to .agentic/session/coord.token)
 from __future__ import annotations
 
 import argparse
-import atexit
+import hmac
 import json
 import os
+import re
 import secrets
 import signal
 import subprocess
@@ -37,7 +38,6 @@ DEFAULT_PORT = 4185
 DEFAULT_BIND = "127.0.0.1"
 PID_FILENAME = "coord.pid"
 TOKEN_FILENAME = "coord.token"
-LOG_FILENAME = "coord.log"
 
 # JSON-RPC 2.0 error codes
 PARSE_ERROR = -32700
@@ -71,10 +71,10 @@ class CoordRequestHandler(BaseHTTPRequestHandler):
             self._send_json(404, {"error": "not found"})
             return
 
-        # Auth check
+        # Auth check (constant-time comparison to prevent timing attacks)
         auth = self.headers.get("Authorization", "")
         expected = f"Bearer {self.server.token}"
-        if auth != expected:
+        if not hmac.compare_digest(auth, expected):
             self._send_json(401, _jsonrpc_error(
                 None, AUTH_ERROR, "unauthorized"))
             return
@@ -205,7 +205,6 @@ def _read_settings(project_root: Path) -> dict:
     if not stack_file.exists():
         return settings
     try:
-        import re
         content = stack_file.read_text()
         for line in content.splitlines():
             for key in settings:
@@ -257,14 +256,25 @@ def cmd_start(project_root: Path, port: int = 0, bind: str = "") -> int:
     server = CoordHTTPServer((bind, port), CoordRequestHandler,
                              project_root, token)
 
-    # Cleanup on exit
+    # Cleanup with idempotency guard (prevents double cleanup from
+    # atexit + finally, or signal + finally)
+    _cleaned_up = False
+
     def _cleanup(*_args):
+        nonlocal _cleaned_up
+        if _cleaned_up:
+            return
+        _cleaned_up = True
         server.shutdown()
         pid_path.unlink(missing_ok=True)
         token_path.unlink(missing_ok=True)
 
-    atexit.register(_cleanup)
-    signal.signal(signal.SIGTERM, lambda s, f: (_cleanup(), sys.exit(0)))
+    # SIGTERM: set flag to break serve_forever loop (no sys.exit in signal
+    # handler — that can deadlock if the handler runs while a lock is held)
+    def _sigterm_handler(signum, frame):
+        server._BaseServer__shutdown_request = True
+
+    signal.signal(signal.SIGTERM, _sigterm_handler)
 
     print(f"Coordination server started on {bind}:{port} (PID {os.getpid()})")
     print(f"Token written to {token_path}")
