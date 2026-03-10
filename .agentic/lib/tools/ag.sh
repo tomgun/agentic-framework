@@ -149,7 +149,7 @@ COMMANDS:
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
     backlog <sub>       Ordered work queue (add|list|done|move|remove|clear)
-    auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
+    auto <sub>           Autonomous workflow (init|epic|status|pause|resume|stop|feedback)
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     decompose F-XXXX    Break epic into child features by component
@@ -224,7 +224,7 @@ COMMANDS:
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
     backlog <sub>       Ordered work queue (add|list|done|move|remove|clear)
-    auto <sub>           Autonomous workflow (init|status|pause|resume|stop|feedback)
+    auto <sub>           Autonomous workflow (init|epic|status|pause|resume|stop|feedback)
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     decompose F-XXXX    Break epic into child features by component
@@ -267,6 +267,7 @@ EXAMPLES:
     ag auto pause               # Pause running engine
     ag auto resume              # Resume paused engine
     ag auto stop                # Stop running engine
+    ag auto epic F-0042         # Autonomously execute epic's children
     ag auto feedback AC-003 "use existing auth"
     ag approve-onboarding       # List unapproved proposals
     ag approve-onboarding --all # Approve all proposals
@@ -1874,8 +1875,12 @@ cmd_auto() {
             python3 "$auto_dir/task.py" --project-root "$ROOT_DIR" "$@"
             ;;
         crunch)
-            # Multi-feature batch mode (F-0163)
+            # Multi-feature batch mode (F-0163, backed by scheduler F-0186)
             python3 "$auto_dir/crunch.py" --project-root "$ROOT_DIR" "$@"
+            ;;
+        epic)
+            # Autonomous epic execution (F-0186)
+            python3 "$auto_dir/scheduler.py" --project-root "$ROOT_DIR" "$@"
             ;;
         feedback)
             python3 "$auto_dir/control.py" feedback "$@" --project-root "$ROOT_DIR"
@@ -1888,6 +1893,7 @@ cmd_auto() {
             echo "  verify                Run test-fix loop until green (F-0161)"
             echo "  task <F-XXXX>         Implement a single feature autonomously (F-0162)"
             echo "  crunch [--features .] Implement multiple features in batch (F-0163)"
+            echo "  epic <F-XXXX>         Autonomous epic execution — schedule children (F-0186)"
             echo "  status                Show engine state"
             echo "  pause                 Pause running engine"
             echo "  resume                Resume paused engine"

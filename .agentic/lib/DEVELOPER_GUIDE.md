@@ -681,6 +681,7 @@ The framework includes an autonomous engine that can implement features with min
 | **Task** | `ag auto task F-XXXX` | Implements one feature: reads ACs, spawns Claude per AC, commits passing work, creates PR |
 | **Task + Visual** | `ag auto task F-XXXX --visual` | Same as above, plus visual review at final verification |
 | **Crunch** | `ag auto crunch` | Batch mode: reads planned features from FEATURES.md, runs task mode for each |
+| **Epic** | `ag auto epic F-XXXX` | Epic mode: reads child features of an epic, schedules component-scoped workers with non-blocking reviews |
 
 #### Tiered Test Execution (v0.44+)
 

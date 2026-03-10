@@ -1,8 +1,10 @@
 """
 crunch.py -- Autonomous multi-feature batch mode (F-0163).
 
-Reads planned/in-progress features from FEATURES.md, processes each via
-F-0162 task mode, tracks overall progress, stops on threshold errors.
+Now backed by AutonomousScheduler (F-0186) for non-blocking review handling,
+component-scoped workers, and intelligent scheduling. CrunchRunner delegates
+to the scheduler and adapts the result to the CrunchResult format for
+backward compatibility.
 
 Usage:
     from auto.crunch import CrunchRunner
@@ -14,7 +16,6 @@ from __future__ import annotations
 import json
 import re
 import sys
-import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -23,8 +24,9 @@ _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
 
-from auto.task import TaskRunner, TaskResult  # noqa: E402
 from auto.engine import EngineState  # noqa: E402
+from auto.task import TaskRunner  # noqa: E402 — used by scheduler, kept for traceability
+from auto.scheduler import AutonomousScheduler, SchedulerResult  # noqa: E402
 
 
 @dataclass
@@ -72,13 +74,51 @@ class CrunchResult:
         }
 
 
+def _scheduler_to_crunch_result(sr: SchedulerResult) -> CrunchResult:
+    """Convert SchedulerResult to CrunchResult for backward compatibility."""
+    cr = CrunchResult(
+        success=sr.success,
+        features_total=sr.features_total,
+        features_completed=sr.features_completed,
+        features_failed=sr.features_failed,
+        # review_blocked treated as skipped in crunch's simpler model
+        features_skipped=sr.features_skipped + sr.features_review_blocked,
+        stopped_reason=sr.stopped_reason,
+    )
+    for fw in sr.feature_work:
+        status_map = {
+            "completed": "completed",
+            "failed": "failed",
+            "review_blocked": "skipped",
+            "skipped": "skipped",
+            "pending": "pending",
+            "working": "pending",
+        }
+        tr = fw.task_result
+        cr.feature_results.append(FeatureBatchResult(
+            feature_id=fw.feature_id,
+            status=status_map.get(fw.status, fw.status),
+            acs_passed=tr.acs_passed if tr else 0,
+            acs_total=tr.acs_total if tr else 0,
+            pr_url=tr.pr_url if tr else "",
+            duration_seconds=fw.duration_seconds,
+            error=fw.error,
+        ))
+    return cr
+
+
 class CrunchRunner:
     """Multi-feature batch orchestrator.
 
-    1. Read features needing work (any pre-shipped state) from FEATURES.md
-    2. Process each via TaskRunner (F-0162)
-    3. Track progress in dashboard state
-    4. Stop on: all done, max errors, or human stop command
+    Delegates to AutonomousScheduler (F-0186) for the scheduling loop,
+    which provides non-blocking review handling, component-scoped workers,
+    and intelligent feature ordering.
+
+    Engine control (engine_state "stopping" / "paused") is passed through
+    to the scheduler, which respects pause/stop signals.
+
+    Backward compatible: same constructor, same run() signature, same
+    CrunchResult output.
     """
 
     def __init__(
@@ -100,7 +140,7 @@ class CrunchRunner:
         feature_ids: Optional[list[str]] = None,
         skip_pr: bool = False,
     ) -> CrunchResult:
-        """Run batch feature implementation.
+        """Run batch feature implementation via scheduler.
 
         Args:
             max_errors: Stop after this many feature failures.
@@ -110,91 +150,43 @@ class CrunchRunner:
         Returns:
             CrunchResult with per-feature status.
         """
-        result = CrunchResult(success=False)
-
-        # Get features to process
+        # Resolve features to process
         features = feature_ids or self._read_planned_features()
         if not features:
-            result.stopped_reason = "no planned features found"
-            return result
-        result.features_total = len(features)
+            return CrunchResult(
+                success=False,
+                stopped_reason="no planned features found",
+            )
 
-        self.engine_state.state = "running"
-        error_count = 0
+        # Adapt on_feature_done callback from FeatureWork to FeatureBatchResult
+        adapted_callback = None
+        if self.on_feature_done:
+            def adapted_callback(fw):
+                tr = fw.task_result
+                self.on_feature_done(FeatureBatchResult(
+                    feature_id=fw.feature_id,
+                    status=fw.status if fw.status != "review_blocked" else "skipped",
+                    acs_passed=tr.acs_passed if tr else 0,
+                    acs_total=tr.acs_total if tr else 0,
+                    pr_url=tr.pr_url if tr else "",
+                    duration_seconds=fw.duration_seconds,
+                    error=fw.error,
+                ))
 
-        for feature_id in features:
-            if self.engine_state.state == "stopping":
-                result.stopped_reason = "stopped by user"
-                break
-
-            # Wait while paused
-            while self.engine_state.state == "paused":
-                time.sleep(0.5)
-                if self.engine_state.state == "stopping":
-                    break
-            if self.engine_state.state == "stopping":
-                result.stopped_reason = "stopped by user"
-                break
-
-            start = time.time()
-            feat_result = FeatureBatchResult(feature_id=feature_id)
-
-            try:
-                task_runner = TaskRunner(
-                    project_root=self.project_root,
-                    claude_command=self.claude_command,
-                )
-                task_result = task_runner.run(
-                    feature_id=feature_id,
-                    skip_pr=skip_pr,
-                )
-
-                feat_result.acs_passed = task_result.acs_passed
-                feat_result.acs_total = task_result.acs_total
-                feat_result.pr_url = task_result.pr_url
-
-                if task_result.success:
-                    feat_result.status = "completed"
-                    result.features_completed += 1
-                else:
-                    feat_result.status = "failed"
-                    result.features_failed += 1
-                    error_count += 1
-            except Exception as e:
-                feat_result.status = "failed"
-                feat_result.error = str(e)
-                result.features_failed += 1
-                error_count += 1
-
-            feat_result.duration_seconds = time.time() - start
-            result.feature_results.append(feat_result)
-
-            if self.on_feature_done:
-                self.on_feature_done(feat_result)
-
-            # Save progress
-            self._save_progress(result)
-
-            # Check error threshold
-            if error_count >= max_errors:
-                result.stopped_reason = f"max errors reached ({max_errors})"
-                break
-
-        # Mark remaining as skipped
-        processed = {r.feature_id for r in result.feature_results}
-        for fid in features:
-            if fid not in processed:
-                result.feature_results.append(
-                    FeatureBatchResult(feature_id=fid, status="skipped")
-                )
-                result.features_skipped += 1
-
-        result.success = (
-            result.features_completed == result.features_total
+        # Delegate to scheduler
+        scheduler = AutonomousScheduler(
+            project_root=self.project_root,
+            claude_command=self.claude_command,
+            engine_state=self.engine_state,
+            on_feature_done=adapted_callback,
         )
-        self.engine_state.state = "stopped"
-        self._save_progress(result)
-        return result
+        scheduler_result = scheduler.run(
+            feature_ids=features,
+            max_errors=max_errors,
+            skip_pr=skip_pr,
+        )
+
+        return _scheduler_to_crunch_result(scheduler_result)
 
     def _read_planned_features(self) -> list[str]:
         """Read features that need work.
@@ -261,16 +253,6 @@ class CrunchRunner:
                         features.append(current_fid)
                     current_fid = None
         return features
-
-    def _save_progress(self, result: CrunchResult) -> None:
-        """Save batch progress to session state."""
-        state_file = self.paths.session_dir / "crunch-state.json"
-        self.paths.session_dir.mkdir(parents=True, exist_ok=True)
-        state = result.to_dict()
-        state["updated_at"] = time.time()
-        tmp = state_file.with_suffix(".tmp")
-        tmp.write_text(json.dumps(state, indent=2) + "\n")
-        tmp.rename(state_file)
 
 
 # ---------------------------------------------------------------------------
