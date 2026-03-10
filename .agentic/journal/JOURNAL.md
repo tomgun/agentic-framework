@@ -2040,3 +2040,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 00:11 - Key Insights Doc
+
+**Why**: Capturing hard-won architectural lessons from 50+ versions of framework development
+
+**What changed**:
+- Created docs/KEY_INSIGHTS.md with 8 strategic patterns for AI agent control, added contribution entry
+
+**Next steps**:
+- Continue with backlog (T-0051 or F-0187)
+
+**Blockers**: None
+
