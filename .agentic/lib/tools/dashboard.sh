@@ -358,10 +358,10 @@ if [[ "$D_BLOCKERS" -gt 0 ]]; then
     step=$((step + 1))
 fi
 if [[ "$D_BACKLOG_TOTAL" -gt 0 ]] && [[ "$D_WIP" == "clean" ]]; then
-    echo "   $step. Start building — \`ag implement $D_BACKLOG_CUR_ID\`"
+    echo "   $step. Plan first — \`ag plan $D_BACKLOG_CUR_ID\`"
     step=$((step + 1))
     if [[ $step -le 3 ]]; then
-        echo "   $step. Plan first — \`ag plan $D_BACKLOG_CUR_ID\`"
+        echo "   $step. Start building — \`ag implement $D_BACKLOG_CUR_ID\`"
         step=$((step + 1))
     fi
 fi
