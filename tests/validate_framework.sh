@@ -4297,6 +4297,61 @@ else
   fail "T-0106: state-commit.sh missing push failure recovery"
 fi
 
+# ============================================================
+# F-0197: Registry Integrity — Drift Check & AC Gate
+# ============================================================
+echo "--- F-0197: Registry Integrity (Drift Check & AC Gate) ---"
+
+# T-0107: drift-check.sh exists and is executable
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/drift-check.sh" ]]; then
+  pass "T-0107: drift-check.sh exists"
+else
+  fail "T-0107: drift-check.sh missing"
+fi
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/drift-check.sh" ]]; then
+  pass "T-0108: drift-check.sh is executable"
+else
+  fail "T-0108: drift-check.sh is not executable"
+fi
+
+# T-0109: drift-check.sh contains key functions
+for func in check_shipped_ac_drift check_backlog_drift count_acs; do
+  if grep -q "$func" "${FRAMEWORK_ROOT}/.agentic/lib/tools/drift-check.sh"; then
+    pass "T-0109: drift-check.sh contains function $func"
+  else
+    fail "T-0109: drift-check.sh missing function $func"
+  fi
+done
+
+# T-0110: drift-check.sh supports --quiet flag
+if grep -q '\-\-quiet' "${FRAMEWORK_ROOT}/.agentic/lib/tools/drift-check.sh"; then
+  pass "T-0110: drift-check.sh supports --quiet flag"
+else
+  fail "T-0110: drift-check.sh missing --quiet flag support"
+fi
+
+# T-0111: drift-check.sh is wired into sync.sh
+if grep -q 'drift-check' "${FRAMEWORK_ROOT}/.agentic/lib/tools/sync.sh"; then
+  pass "T-0111: drift-check.sh is wired into sync.sh"
+else
+  fail "T-0111: drift-check.sh not wired into sync.sh"
+fi
+
+# T-0112: AC gate exists in ag.sh cmd_done
+if grep -q 'AC Completion' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0112: AC completion gate exists in ag.sh"
+else
+  fail "T-0112: AC completion gate missing from ag.sh"
+fi
+
+# T-0113: AC gate uses get_setting for configurable enforcement
+if grep -q 'get_setting.*acceptance_criteria' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0113: AC gate uses get_setting for configurable enforcement"
+else
+  fail "T-0113: AC gate missing get_setting for configurable enforcement"
+fi
+
 echo ""
 
 # ============================================================

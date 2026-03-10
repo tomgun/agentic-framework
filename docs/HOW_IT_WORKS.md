@@ -121,7 +121,7 @@ graph TB
         M_FEATURE_SH[feature.sh<br/>status transitions]
         M_DOCTOR_PY[doctor.py<br/>multi-phase verification]
         M_CONTEXT_ROLE[context-for-role.sh<br/>+ ALWAYS_INJECT]
-        M_SYNC[sync.sh<br/>9-phase drift detection]
+        M_SYNC[sync.sh<br/>10-phase drift detection]
         M_DISCOVER[discover.py<br/>brownfield analysis]
 
         %% Structural
@@ -587,7 +587,7 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 | **Small Batch Enforcement** (F-0007) | Pre-commit Check 7: blocks >10 files staged, >500 lines added, >500-line code files. Configurable in STACK.md. | ACTIVE - structural gate |
 | **Acceptance-Driven Flow** (F-0006) | Define criteria → implement → test → update specs → commit. `ag implement` requires `spec/acceptance/F-####.md` to exist. | ACTIVE - structural gate (Formal) |
 | **Plan-Review Loop** (F-0120) | Planner + Reviewer agents iterate on plans before implementation. Max 3 iterations before human escalation. Configurable: `plan_review_enabled`, `plan_review_max_iterations` in STACK.md. | ACTIVE but invocation is inconsistent |
-| **Feature Completion Validator** (F-0017) | `feature-complete.sh` validates all criteria met before marking shipped. `ag done` triggers this. | ACTIVE |
+| **Feature Completion Validator** (F-0017) | `feature-complete.sh` validates all criteria met before marking shipped. `ag done` triggers this. AC completion gate (F-0197) warns/blocks when <80% ACs checked — configurable via `acceptance_criteria: blocking|advisory` in STACK.md. | ACTIVE |
 | **Spec Evolution** (F-0010) | Specs evolve during implementation. Discoveries get documented. Not rigid waterfall. | ACTIVE - workflow |
 
 ---
@@ -677,7 +677,7 @@ These features exist but don't clearly derive from the 13 principles:
 │  git core.hooksPath → .agentic/hooks/                   │
 │  ag implement → requires acceptance criteria             │
 │  ag work → blocks without feature ID (Formal)          │
-│  ag done → runs doctor.sh --phase complete              │
+│  ag done → runs doctor.sh --phase complete + AC gate    │
 │  wip.sh → one-feature-at-a-time lock                    │
 │  complexity limits → max files/lines/length              │
 │  branch policy → blocks commits to main (PR workflow)    │
@@ -719,12 +719,12 @@ These features exist but don't clearly derive from the 13 principles:
 | Command | What It Does | Enforcement |
 |---------|-------------|-------------|
 | `ag start` | Read state, check WIP, memory integrity, display dashboard | Advisory (soft start) |
-| `ag sync` | 9-phase drift detection + auto-fix | Advisory (user-initiated) |
+| `ag sync` | 10-phase drift detection + auto-fix (includes AC/backlog drift check via `drift-check.sh`) | Advisory (user-initiated) |
 | `ag work "desc"` | Create WIP, start task. Formal: BLOCKS without feature ID. | Structural (Formal) |
 | `ag plan F-XXXX` | Create plan with optional review loop | Structural (must have acceptance) |
 | `ag implement F-XXXX` | Check acceptance, check approved plan, create WIP, print guidance | Structural (multiple gates) |
 | `ag commit` | Run pre-commit-check.sh, show diff, wait for approval | Structural (exit codes) |
-| `ag done F-XXXX` | Run doctor.sh --phase complete, feature.sh status shipped | Structural (validation) |
+| `ag done F-XXXX` | Run doctor.sh --phase complete, AC completion gate (configurable via `acceptance_criteria` setting), feature.sh status shipped, VERSION bump | Structural (validation) |
 | `ag specs` | Brownfield spec generation with plan-review | Structural (domain-by-domain) |
 | `ag trace F-XXXX` | Show spec-code traceability | Read-only |
 | `ag hooks install\|status\|disable` | Git hook management | Structural |
@@ -826,7 +826,7 @@ These will always rely on behavioral reinforcement:
 `context-for-role.sh`, `worktree.sh`, `setup-agent.sh`, `suggest-agents.sh`, `create-agent.sh`, `project-health.sh`
 
 ### Sync & Maintenance
-`sync.sh`, `sync_docs.py`/`sync_docs.sh`, `memory-check.sh`, `manifest.sh`, `migration.sh`, `upgrade.sh`, `framework_age.sh`
+`sync.sh`, `drift-check.sh`, `sync_docs.py`/`sync_docs.sh`, `memory-check.sh`, `manifest.sh`, `migration.sh`, `upgrade.sh`, `framework_age.sh`
 
 ### Testing
 `tests/llm/harness.sh`, `mutation_test.sh`, `llm-test-status.sh`
