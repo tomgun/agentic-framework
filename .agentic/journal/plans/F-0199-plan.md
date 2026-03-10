@@ -1,0 +1,26 @@
+# F-0199: Instruction File Sync Detection — Plan
+
+**Status**: APPROVED
+**Parent Plan**: reliability-fix-plan.md (Priority 4)
+
+## Scope
+
+PR 3 of the Reliability Fix Plan:
+- instruction-sync.sh: parse ag.sh subcommands, cross-check 8+ instruction files
+- Wire into validate_framework.sh (warning mode)
+- Wire into pre-commit-check.sh (warn if ag.sh changed without instruction files)
+
+## Implementation Steps
+
+1. Create instruction-sync.sh
+2. Parse ag.sh case statement for subcommand names
+3. Check each against instruction file templates
+4. Report missing per file
+5. Wire into validate_framework.sh
+6. Wire into pre-commit-check.sh
+
+## Files Changed
+
+- `.agentic/lib/tools/instruction-sync.sh` (new)
+- `tests/validate_framework.sh`
+- `.agentic/lib/hooks/pre-commit-check.sh`
