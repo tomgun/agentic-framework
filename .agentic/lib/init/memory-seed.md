@@ -5,8 +5,8 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.52.5 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard -->
+<!-- memory-seed v0.52.6 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -101,6 +101,12 @@ If the user indicates a feature is complete — in any phrasing (e.g. "done", "c
 After `ag done F-XXXX` completes, if STACK.md has a `## Docs` section with entries:
 the doc lifecycle fires automatically (docs.sh assembles context, you draft the docs).
 You can also run `ag docs F-XXXX` manually to draft registered docs for a feature.
+
+## When work was interrupted or a session crashed
+
+If the user mentions interrupted work, crashed session, stuck intent, orphaned work, resume, or recovery — in any phrasing:
+
+**STOP.** Run `ag intent list` to see pending and orphaned intents. Orphaned intents are from crashed sessions (dead PID). Use `ag intent clear F-XXXX` to discard an intent, or run `ag sync` to auto-adopt orphans into the current session. The intent journal provides crash recovery: `ag implement` and `ag done` write checkpoints so interrupted work can resume.
 
 ## Who tests the tests?
 
