@@ -4,6 +4,25 @@
 
 **Audience**: Anyone building an agentic coding workflow — whether using this framework or designing their own.
 
+**Contributor**: These insights were discovered by Tomas through hands-on building, testing, breaking, and rebuilding across 50+ framework versions. Each pattern was earned through real failures — lost plans, ignored rules, corrupted state, skipped workflows — and the stubborn insistence on understanding *why* things failed, not just fixing them.
+
+---
+
+## At a Glance
+
+| # | Insight | Core Idea | Token Impact |
+|---|---------|-----------|-------------|
+| 1 | [Tiny Instruction File + Memory](#1-tiny-instruction-file--memory-reinforcement) | Main file <50 lines; memory as redundant reinforcement | ~1K always-loaded vs ~10K+ if everything inline |
+| 2 | [Skills with Frontmatter](#2-skills-with-frontmatter-descriptions) | Workflow bundles loaded just-in-time by intent match | ~900 tokens always vs ~24K if all loaded |
+| 3 | [Scripts Over Instructions](#3-scripts-over-instructions--token-savings--determinism) | Deterministic scripts replace read-modify-write | ~50 tokens vs ~3K+ per state update |
+| 4 | [Structural Gates via Hooks](#4-git-hooks-and-structural-gates) | Rules enforced by exit codes, not hope | Zero tokens — enforcement is automatic |
+| 5 | [Keyword + Intent Triggers](#5-trigger-tables-keywords--intent--reliable-routing) | STOP → workflow routing via trigger tables + skill descriptions | ~20 lines in instruction file |
+| 6 | [Durable Git-Tracked State](#6-durable-plans-and-state--or-they-dont-exist) | If it's not in git, it doesn't survive | N/A — architectural principle |
+| 7 | [Distributed Enforcement](#7-distributed-enforcement-over-central-orchestrator) | Each script enforces its own phase, no central orchestrator | N/A — works across all AI tools |
+| 8 | [LLM Behavioral Testing](#8-llm-behavioral-testing--verify-what-agents-actually-do) | Instruction files are code — they need tests | N/A — verification mechanism |
+
+**Meta-lesson**: structural enforcement > behavioral instructions > hope.
+
 ---
 
 ## 1. Tiny Instruction File + Memory Reinforcement
