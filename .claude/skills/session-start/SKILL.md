@@ -3,8 +3,9 @@ name: session-start
 description: >
   Initialize session, check for interrupted work, show dashboard with current
   status and suggested next steps. Use when: first message in conversation,
-  user says "start", "where were we", "what's the status", "ag start",
-  or returns after being away.
+  or the user wants to catch up on status — e.g. "start", "where were we",
+  "what's the status", "catch me up", "recap", "ag start", or returns after
+  being away. Match intent, not exact words.
   Do NOT use for: mid-session tasks, implementing features, committing code.
 compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Bash]

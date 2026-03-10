@@ -4,9 +4,11 @@ description: >
   Spec-writing workflow: create new specs, update planned/in-progress specs,
   evolve shipped specs with contract protection. Handles NFR integration,
   delta tracking via migrations, and spec health checks.
-  Use when user says "write spec", "create spec", "add acceptance criteria",
-  "update spec", "evolve spec", "spec for F-XXXX", "ag spec", "mark shipped",
-  "feature status", "ag specs", "add feature to FEATURES.md", "track this feature".
+  Use when the user wants to define, update, or review specs — e.g. "write
+  spec", "create spec", "add acceptance criteria", "update spec", "evolve
+  spec", "spec for F-XXXX", "ag spec", "define requirements", "feature
+  status", "track this feature", or any request about feature specifications.
+  Match intent, not exact words.
   Do NOT use for: implementing features (use implementing-features),
   planning architecture (use planning-features).
 compatibility: "Requires Claude Code with file access and ag commands."

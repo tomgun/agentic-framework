@@ -1,9 +1,11 @@
 ---
 name: planning-features
 description: >
-  Create implementation plans with iterative review. Use when user says "plan",
-  "design", "ag plan", "how should we build", "let's plan", "architecture",
-  or wants to think through an approach before coding.
+  Create implementation plans with iterative review. Use when the user wants
+  to think through an approach before coding — e.g. "plan", "design",
+  "ag plan", "how should we build", "let's plan", "architecture", "scope
+  this", "think through", or any request to design before implementing.
+  Match intent, not exact words.
   Do NOT use for: implementing (use implementing-features after plan approval),
   reviewing existing code (use reviewing-code).
 compatibility: "Requires Claude Code with plan mode support."
