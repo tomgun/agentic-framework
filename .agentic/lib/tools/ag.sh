@@ -1216,9 +1216,9 @@ cmd_done() {
         if [ -f "$acc_file" ]; then
             local total_acs=0 checked_acs=0
             while IFS= read -r line; do
-                if echo "$line" | grep -qE '^\s*- \[[ x]\]\s*\*?\*?AC-'; then
+                if echo "$line" | grep -qE '^[[:space:]]*- \[[ x]\][[:space:]]*\*?\*?AC-'; then
                     total_acs=$((total_acs + 1))
-                    if echo "$line" | grep -qE '^\s*- \[x\]'; then
+                    if echo "$line" | grep -qE '^[[:space:]]*- \[x\]'; then
                         checked_acs=$((checked_acs + 1))
                     fi
                 elif echo "$line" | grep -qE '^### AC-'; then
