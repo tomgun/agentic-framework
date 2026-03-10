@@ -1,10 +1,10 @@
 # Key Insights: What Actually Works for AI Agent Control
 
-**Purpose**: Strategic lessons from 50+ versions of framework development. Not tactical mistakes (those are in `FRAMEWORK_DEVELOPMENT.md` § Lessons Learned) — these are the **design patterns that make AI agents reliably productive**.
+**Purpose**: Strategic lessons from v0.1.0 through v0.53.2 (~1400 commits) of framework development. Not tactical mistakes (those are in `FRAMEWORK_DEVELOPMENT.md` § Lessons Learned) — these are the **design patterns that make AI agents reliably productive**.
 
 **Audience**: Anyone building an agentic coding workflow — whether using this framework or designing their own.
 
-**Contributor**: These insights were discovered by Tomas through hands-on building, testing, breaking, and rebuilding across 50+ framework versions. Each pattern was earned through real failures — lost plans, ignored rules, corrupted state, skipped workflows — and the stubborn insistence on understanding *why* things failed, not just fixing them.
+**Contributor**: These insights were discovered by Tomas through hands-on building, testing, breaking, and rebuilding across 53 framework versions and ~1400 commits. Each pattern was earned through real failures — lost plans, ignored rules, corrupted state, skipped workflows — and the stubborn insistence on understanding *why* things failed, not just fixing them.
 
 ---
 
@@ -20,6 +20,9 @@
 | 6 | [Durable Git-Tracked State](#6-durable-plans-and-state--or-they-dont-exist) | If it's not in git, it doesn't survive | N/A — architectural principle |
 | 7 | [Distributed Enforcement](#7-distributed-enforcement-over-central-orchestrator) | Each script enforces its own phase, no central orchestrator | N/A — works across all AI tools |
 | 8 | [LLM Behavioral Testing](#8-llm-behavioral-testing--verify-what-agents-actually-do) | Instruction files are code — they need tests | N/A — verification mechanism |
+| 9 | [Deliberate Context Management](#9-deliberate-context-management) | Curated context beats "read everything" — CONTEXT_PACK, specs, role manifests, fresh subagents | 5–10K focused vs 100K+ bloated |
+| 10 | [Dialectical Plan Review](#10-dialectical-plan-review--trust-only-the-critics-words) | Multi-round Critic + Advocate review; trust only the Critic | Catches design flaws before implementation |
+| 11 | [Revision Guidance — Don't Trust the Critic Blindly](#11-revision-guidance--dont-trust-the-critic-blindly) | Critic finds real issues but proposes wrong fixes — planner must judge | Prevents removing features that were the whole point |
 
 **Meta-lesson**: structural enforcement > behavioral instructions > hope.
 
@@ -186,6 +189,65 @@ Design your workflow around this reality. Every valuable output must reach a git
 
 ---
 
+## 9. Deliberate Context Management
+
+**The problem**: AI agents default to reading everything they can find. A new session starts, the agent reads 20 source files, 5 config files, the entire README — and burns 80K tokens before doing any work. Then mid-task it reads more files, context fills up, early instructions get compressed out, and the agent loses the plot. Worse: subagents spawned via the Task tool inherit NONE of the parent's context — they start completely blank.
+
+**What works**: A layered context management system where every agent — main or sub — receives exactly the context it needs, no more:
+
+**Layer 1 — CONTEXT_PACK.md** (~2–5K tokens): A curated architecture snapshot that every agent reads first. Where things are, how they connect, key decisions. This single file replaces the "let me explore the codebase" phase that burns 20–50K tokens. Updated in the same commit as code changes (Living Documentation principle).
+
+**Layer 2 — Spec files as context**: Acceptance criteria files (`spec/acceptance/F-XXXX.md`) aren't just contracts — they're the most token-efficient way to tell an agent what a feature should do. Instead of reading the implementation to understand intent, read the 20-line spec. FEATURES.md provides the index.
+
+**Layer 3 — Role-specific context manifests**: `context-for-role.sh` assembles context packages for 24 different agent roles (reviewer, tester, implementer, etc.). Each manifest declares exactly which files that role needs. A review agent gets the spec + changed files + quality standards. An implementer gets the spec + architecture + relevant source. No role gets everything.
+
+**Layer 4 — Fresh subagents over bloated sessions**: When context grows past ~50K tokens, spawn a subagent with fresh, focused context (5–10K) instead of continuing in the degraded main session. The subagent does one job well — review, test, research — and returns results. This is why `context-for-role.sh` exists: it builds the context injection that makes subagents immediately productive without inheriting the parent's accumulated drift.
+
+**The key principle**: Context is a budget, not a buffet. Every token loaded is a token of attention diluted from everything else. Curate aggressively.
+
+**See**: `.agentic/lib/PRINCIPLES.md` F3 (Token Optimization), `context-for-role.sh`, CONTEXT_PACK.md
+
+---
+
+## 10. Dialectical Plan Review — Multi-Round Critic + Advocate
+
+**The problem**: A single review pass — whether human or AI — catches surface issues but misses structural flaws. The planner is biased toward their own design. A single reviewer is biased by their review lens. Plans that "look good" at first glance often have fundamental problems that only emerge when examined from opposing perspectives.
+
+**What works**: A dialectical review process with three distinct roles:
+
+1. **Critic agent** (fresh context): Attacks the plan. Looks for missing edge cases, violated principles, over-engineering, under-engineering, security gaps, scalability issues. The Critic's job is to find problems — they have no investment in the plan.
+2. **Advocate agent** (fresh context): Defends the plan's strengths. Explains why design decisions make sense. Catches cases where the Critic is wrong or overly conservative. The Advocate prevents good ideas from being killed by excessive caution.
+3. **Planner** (original context): Synthesizes both perspectives. Decides which Critic findings are real issues vs. false positives. Revises the plan.
+
+**Why fresh context matters**: Both Critic and Advocate are spawned as subagents with ONLY the plan + project context — they haven't seen the conversation that led to the plan. This prevents groupthink. They evaluate the plan on its merits, not on the social dynamics of the conversation.
+
+**Multi-round**: If the Critic finds serious issues and the plan is revised, the revised plan gets a fresh review cycle. This continues until the plan is clean or the user decides to proceed. Typically 1–3 rounds.
+
+**The setting**: `plan_review_enabled: yes` in STACK.md activates this. Discovery profile skips it (lightweight). Formal profile uses it (rigorous).
+
+**See**: `.agentic/journal/plans/` (reviewed plans), `ag plan` workflow
+
+---
+
+## 11. Revision Guidance — Don't Trust the Critic Blindly
+
+**The problem**: The dialectical review (insight #10) works well at finding problems. But there's a subtle trap: the Critic is good at identifying *what's wrong* but often bad at proposing *how to fix it*. Specifically, the Critic tends to recommend removing features or simplifying to the point where the plan no longer achieves its original purpose. The Critic optimizes for "no risk" — the planner must optimize for "right tradeoffs."
+
+**What actually happened**: In multiple framework planning sessions, the Critic correctly identified real concerns (complexity, scope, edge cases) but then recommended removing the very capabilities that were the entire motivation for the feature. Left unchecked, following the Critic's suggested fixes would produce a plan that's "safe" but pointless — all the ambition surgically removed.
+
+**What works**: A **Revision Guidance** step between the review and the revision:
+
+1. Critic and Advocate deliver their findings
+2. Before the planner revises, a synthesis step explicitly separates: **(a)** problems the Critic found (these are usually valid) from **(b)** solutions the Critic proposed (these often miss the point)
+3. The planner addresses each problem with their own solution that preserves the plan's intent
+4. The revision explicitly notes: "Accepted finding X, but used a different fix because the Critic's suggestion would have removed [core capability]"
+
+**The meta-lesson**: In AI-assisted review, treat findings and fixes as independent. Accept the diagnosis, prescribe your own treatment. This applies beyond plan review — code review, spec review, any multi-agent review process where one agent evaluates another's work.
+
+**See**: `CONTRIBUTIONS.md` § Critical Review Agent (F-0182)
+
+---
+
 ## Summary: The Pattern
 
 These insights form a coherent pattern:
@@ -196,9 +258,13 @@ Tiny instruction file (50 lines)     → agent reads it all, reliably
   + Skills with frontmatter          → right instructions at right time
   + Scripts for deterministic ops    → cheap, reliable, portable
   + Git hooks / structural gates     → rules that can't be ignored
+  + Keyword + intent triggers        → reliable workflow routing
   + Git-tracked durable artifacts    → state that survives sessions
   + Distributed enforcement          → works across all AI tools
   + LLM behavioral tests             → verify it actually works
+  + Deliberate context management    → right context to right agent
+  + Dialectical plan review          → opposing perspectives catch flaws
+  + Revision guidance                → accept findings, prescribe your own fixes
 ```
 
 The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation.
