@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0197: Registry Integrity & AC Gate — committing implementation (Updated: 2026-03-10 14:53 EET)
+- F-0199: Instruction sync detection — implementation complete, creating PR (Updated: 2026-03-10 15:00 EET)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

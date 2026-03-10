@@ -1911,15 +1911,15 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
-### Session: 2026-03-10 14:53 - F-0197 Registry Integrity & AC Gate
+### Session: 2026-03-10 15:00 - F-0199 Instruction Sync
 
-**Why**: F-0197: Ensure shipped features have verified ACs and registry stays clean
+**Why**: Detect instruction file divergence so ag commands don't ship without being documented in all instruction files
 
 **What changed**:
-- Implemented drift-check.sh, AC gate in ag done, dashboard AC drift summary, sync.sh drift phase, pre-commit check 14+16 fixes, deprecation migrations
+- Implemented instruction-sync.sh that parses ag.sh dispatch to discover commands, checks 6 instruction files for coverage; wired into validate_framework.sh (warning mode), pre-commit-check.sh (advisory when ag.sh staged), and sync.sh (phase 5b)
 
 **Next steps**:
-- Push branch, create PR
+- Create PR for review
 
 **Blockers**: None
 

@@ -1006,6 +1006,26 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
   fi
 fi
 
+# Check 18: Instruction sync advisory (framework-dev only)
+# Warns if ag.sh changed but instruction files weren't modified in the same commit
+if [[ $_FAST_MODE -eq 0 ]] && [[ -f ".agentic/lib/tools/instruction-sync.sh" ]]; then
+  AG_SH_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -c "ag\.sh" || true)
+  if [[ "$AG_SH_STAGED" -gt 0 ]]; then
+    echo ""
+    echo "[18/18] Checking instruction file sync (ag.sh staged)..."
+    INSTR_FILES_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -cE "(CLAUDE\.md|cursorrules|copilot-instructions|codex-instructions|auto_orchestration|memory-seed)" || true)
+    if [[ "$INSTR_FILES_STAGED" -eq 0 ]]; then
+      echo "⚠️  WARNING: ag.sh modified but no instruction files updated"
+      echo "   If you added/changed ag commands, update instruction files too."
+      echo "   Run: bash .agentic/lib/tools/instruction-sync.sh"
+      echo ""
+      echo "   (This is advisory, not blocking commit)"
+    else
+      echo "✓ ag.sh and instruction files both staged"
+    fi
+  fi
+fi
+
 # Check 17: Run custom gates from .agentic/local/extensions/gates/
 EXT_GATES_DIR="${PROJECT_ROOT}/.agentic/local/extensions/gates"
 if [[ -d "$EXT_GATES_DIR" ]]; then
