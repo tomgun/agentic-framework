@@ -8,7 +8,7 @@ Full template: `.agentic/lib/agents/copilot/copilot-instructions.md`
 
 Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
-Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag spec` | `ag docs` | `ag todo`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag spec` | `ag docs` | `ag todo`
 
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |

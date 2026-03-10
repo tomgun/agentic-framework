@@ -94,7 +94,7 @@ If a state machine transition is blocked by a review checkpoint, or the user say
 
 If the user indicates a feature is complete — in any phrasing (e.g. "done", "complete", "finished", "merged", "PR merged", "shipped", "landed", "wrapped up", "it's in"). Match intent, not exact words.
 
-**STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. Before ending, check your TaskList for pending items and flush them to .agentic/TODO.md via `ag todo`.
+**STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. Before ending, check your TaskList for pending items and flush them to .agentic/TODO.md via `ag todo`. If on main (not in a worktree), run `ag flush --features` to commit state files directly to main.
 
 ## When work is done (doc lifecycle)
 
@@ -116,6 +116,7 @@ Every time before committing, execute these commands in order:
 2. `bash .agentic/lib/tools/status.sh focus "Current task"` — update .agentic/STATUS.md
 3. If shipping a feature (Formal): `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 4. Stage any modified state files: BACKLOG.json, STATUS.md, JOURNAL.md, HUMAN_NEEDED.md
+   Or use `ag flush` to commit state files directly to main (no PR needed).
 5. `ag commit` — runs quality gates, shows diff, waits for human approval
 6. Only THEN announce ready — never say "done" before artifacts are updated
 
@@ -163,7 +164,7 @@ Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 ## Rules that always apply
 
 - **Never auto-commit.** Human reviews every change first.
-- **Never bypass gates.** Do not use `--no-verify` or skip quality checks.
+- **Never bypass gates.** Do not use `--no-verify` or skip quality checks — except `ag flush` which uses `--no-verify` with its own stricter validation (hardcoded allowlist, branch check, JSON validation). See `state-commit.sh` header comment for the conditions that make this safe.
 - **NEVER `git stash`.** Stash pop does a silent merge — in multi-agent contexts, when another agent modified the same files, it quietly picks one version with no error, causing data loss. Safe alternatives: worktrees, temp branch + cherry-pick, or commit before switching. Also never `git checkout -- .`, `git restore .`, or `git reset --hard` with uncommitted changes.
 - **Multi-session collision guard.** Sessions auto-register in AGENTS.json at start. Before any destructive git op, the framework checks for other active sessions on the same checkout. If others are active, you'll see a COLLISION RISK warning — do NOT proceed with destructive ops. Use a worktree (`ag worktree`) or commit first.
 - **One feature at a time.** Complete current WIP before starting another.
