@@ -683,6 +683,30 @@ phase_tool_parity() {
 }
 
 # ============================================================================
+# Phase 5b: Instruction sync (framework-dev advisory)
+# ============================================================================
+phase_instruction_sync() {
+    # Only run in framework-dev context (instruction-sync.sh exists)
+    local sync_script="$SCRIPT_DIR/instruction-sync.sh"
+    if [ ! -f "$sync_script" ]; then
+        return 0
+    fi
+
+    if bash "$sync_script" --quiet 2>/dev/null; then
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "Instr sync: ${GREEN}OK (all ag commands in instruction files)${NC}"
+        fi
+    else
+        record_issue "instruction file drift"
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "Instr sync: ${YELLOW}DRIFT (ag commands missing from instruction files)${NC}"
+            echo -e "            Run: bash .agentic/lib/tools/instruction-sync.sh"
+        fi
+    fi
+}
+
+# ============================================================================
 # Phase 6: Git hook configuration
 # ============================================================================
 phase_hooks() {
@@ -831,6 +855,7 @@ main() {
         phase_unregistered_code
         # Skip phase 4 (slow)
         phase_tool_parity
+        phase_instruction_sync
         phase_hooks
         phase_periodic
         phase_pr_cleanup
@@ -862,6 +887,7 @@ main() {
     phase_unregistered_code
     phase_spec_drift
     phase_tool_parity
+    phase_instruction_sync
     phase_hooks
     phase_periodic
     phase_pr_cleanup
