@@ -109,18 +109,18 @@ DIRTY_STATE=()
 GIT_STATUS=$(git status --porcelain 2>/dev/null || echo "")
 
 for allowed in "${ALLOWLIST[@]}"; do
-    if echo "$GIT_STATUS" | grep -q "$allowed"; then
+    if echo "$GIT_STATUS" | grep -qF "$allowed"; then
         DIRTY_STATE+=("$allowed")
     fi
 done
 
 # Step 4: FEATURES.md handling
 FEATURES_FILE=".agentic/spec/FEATURES.md"
-if $INCLUDE_FEATURES && echo "$GIT_STATUS" | grep -q "$FEATURES_FILE"; then
+if $INCLUDE_FEATURES && echo "$GIT_STATUS" | grep -qF "$FEATURES_FILE"; then
     # Validate diff is status-only
     FEATURES_DIFF=$(git diff -- "$FEATURES_FILE" 2>/dev/null || echo "")
     # Check every added/removed content line (skip diff metadata)
-    BAD_LINES=$(echo "$FEATURES_DIFF" | grep -E '^\+|^-' | grep -v '^+++' | grep -v '^---' | grep -v '^\+\+\+' | grep -v '^\-\-\-' | grep -v '\*\*Status\*\*:' || true)
+    BAD_LINES=$(echo "$FEATURES_DIFF" | grep -E '^[+-]' | grep -v '^+++' | grep -v '^---' | grep -v '\*\*Status\*\*:' || true)
     if [[ -n "$BAD_LINES" ]]; then
         echo "Error: FEATURES.md has non-status changes. Use a PR for prose edits."
         echo "Non-status lines found:"
@@ -142,14 +142,14 @@ if [[ -n "$STAGED" ]]; then
     NON_ALLOWLIST=()
     while IFS= read -r staged_file; do
         [[ -z "$staged_file" ]] && continue
-        local_match=false
+        is_allowed=false
         for allowed in "${ALLOWED_SET[@]}"; do
             if [[ "$staged_file" == "$allowed" ]]; then
-                local_match=true
+                is_allowed=true
                 break
             fi
         done
-        if ! $local_match; then
+        if ! $is_allowed; then
             NON_ALLOWLIST+=("$staged_file")
         fi
     done <<< "$STAGED"
@@ -185,7 +185,12 @@ if $DRY_RUN; then
         echo "  $f"
     done
     echo ""
-    echo "Commit message: chore(state): update $(IFS=', '; echo "${DIRTY_STATE[*]}" | sed 's|\.agentic/||g')"
+    # Preview uses same basename format as the real commit message
+    _preview_names=()
+    for _f in "${DIRTY_STATE[@]}"; do
+        _preview_names+=("$(basename "$_f")")
+    done
+    echo "Commit message: chore(state): update $(IFS=', '; echo "${_preview_names[*]}")"
     exit 0
 fi
 
