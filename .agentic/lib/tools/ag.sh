@@ -11,6 +11,7 @@ ROOT_DIR="${ROOT_DIR:-$(cd "$SCRIPT_DIR/../../.." && pwd)}"
 # Source shared libraries
 source "$SCRIPT_DIR/../paths.sh"
 source "$SCRIPT_DIR/../settings.sh"
+source "$SCRIPT_DIR/intent-helpers.sh"
 
 # Colors (disabled if not TTY)
 if [ -t 1 ]; then
@@ -943,11 +944,26 @@ cmd_implement() {
         feature_name=$(grep "^## ${feature_id}:" "$features_file" | sed "s/^## ${feature_id}: //" || echo "")
     fi
 
-    # 5. Worktree creation (when worktree_mode == always)
+    # --- Intent-driven execution (F-0200) ---
+    # Write intent before any mutable work. Each step is checkpointed.
+    # If the process dies mid-sequence, ag sync can resume from last checkpoint.
     local wt_mode
     wt_mode=$(get_setting "worktree_mode" "off")
     local worktree_path=""
+    local enforcement
+    enforcement=$(_get_state_enforcement)
 
+    # Build step list based on what will actually run
+    local intent_steps="register_wip,create_worktree"
+    if [ "$enforcement" != "off" ]; then
+        intent_steps="${intent_steps},transition_state"
+    fi
+    intent_steps="${intent_steps},update_status"
+
+    # Write intent (advisory — failure does not block)
+    intent_write "$feature_id" "implementing" "implement" "$intent_steps" "" || true
+
+    # 5. Worktree creation (when worktree_mode == always)
     if [ "$wt_mode" = "always" ]; then
         echo ""
         echo "Creating worktree for ${feature_id}..."
@@ -960,6 +976,7 @@ cmd_implement() {
             echo -e "${YELLOW}Worktree creation failed — continuing in main repo${NC}"
         fi
     fi
+    intent_checkpoint "$feature_id" "create_worktree" || true
 
     # 6. Start WIP tracking (skip if worktree_mode=always — agent starts WIP in worktree)
     if [ "$wt_mode" != "always" ]; then
@@ -968,6 +985,40 @@ cmd_implement() {
         bash "$SCRIPT_DIR/wip.sh" start "$feature_id" "${feature_name:-$feature_id}" "" 2>/dev/null || \
             echo -e "${YELLOW}WIP tracking not started (already active or unavailable)${NC}"
     fi
+    intent_checkpoint "$feature_id" "register_wip" || true
+
+    # 7. State transition (controlled by state_enforcement setting)
+    if [ "$enforcement" != "off" ]; then
+        echo ""
+        echo "Transitioning state to implementing..."
+        local transition_out=""
+        local transition_rc=0
+        transition_out=$(python3 "$SCRIPT_DIR/../auto/state_machine.py" \
+            --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" \
+            transition "$feature_id" implementing 2>&1) || transition_rc=$?
+        if [ "$transition_rc" -eq 0 ] || echo "$transition_out" | grep -q "no-op"; then
+            echo -e "${GREEN}State: implementing${NC}"
+            intent_checkpoint "$feature_id" "transition_state" || true
+        else
+            if [ "$enforcement" = "blocking" ]; then
+                echo -e "${RED}BLOCKED: State transition failed${NC}"
+                echo "$transition_out"
+                intent_cancel "$feature_id" || true
+                exit 1
+            else
+                # advisory: warn and continue
+                echo -e "${YELLOW}WARNING: State transition failed (advisory mode, continuing)${NC}"
+                echo "$transition_out" | head -3
+                intent_checkpoint "$feature_id" "transition_state" || true
+            fi
+        fi
+    fi
+
+    # 8. Update status
+    intent_checkpoint "$feature_id" "update_status" || true
+
+    # Clear intent — all steps complete
+    intent_clear "$feature_id" || true
 
     echo ""
     echo -e "${GREEN}Ready to implement ${feature_id}${NC}"
