@@ -245,6 +245,7 @@ These principles govern future framework changes to instruction architecture:
 4. **State = machine-readable** — STACK.md parsed by ag.sh; STATUS.md sections parsed by status.sh
 5. **Distributed enforcement** — ag.sh + pre-commit-check.sh + context-for-role.sh each own their phase. Framework design choice diverging from ChatGPT's centralized recommendation; rationale: cross-tool compatibility
 6. **Test behavioral rules empirically** — LLM tests prove which instruction file content agents actually follow. No behavioral rule should be added without a corresponding test
+7. **LLM-optimized formats** — every file agents read should be structured for AI parsing: YAML frontmatter for discovery (~20 tokens to decide relevance vs ~2K to read the file), consistent field patterns for grep-parsing (`**Status**: shipped`), tables for lookup. Human-readable AND LLM-scannable — these are not competing goals. See `PRINCIPLES.md` F3 and `docs/KEY_INSIGHTS.md` §12
 
 ---
 
