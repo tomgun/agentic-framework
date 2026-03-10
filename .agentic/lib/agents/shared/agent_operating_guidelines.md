@@ -31,7 +31,7 @@ tokens: ~952
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 
 **Quick Commands**: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag spec` | `ag docs` | `ag todo`
-**Autonomous**: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch`
+**Autonomous**: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX`
 
 ---
 
@@ -164,8 +164,9 @@ When the user wants hands-off execution, offer these:
 | **Verify + Visual** | `ag auto verify --visual` | Same + project has E2E screenshots configured |
 | **Task** | `ag auto task F-XXXX` | "implement this feature autonomously", "auto-implement" |
 | **Crunch** | `ag auto crunch` | "implement all planned features", "batch process features" |
+| **Epic** | `ag auto epic F-XXXX` | "execute this epic", "implement all child features of F-XXXX" |
 
-**How they work**: Verify spawns fresh Claude instances to fix test failures in a loop. Task reads acceptance criteria, implements per-AC, runs verify, creates PR. Crunch runs task mode for each planned feature.
+**How they work**: Verify spawns fresh Claude instances to fix test failures in a loop. Task reads acceptance criteria, implements per-AC, runs verify, creates PR. Crunch runs task mode for each planned feature. Epic autonomously executes an epic's child features using component-scoped workers with non-blocking reviews.
 
 **When NOT to use**: Interactive exploration, design decisions, refactoring without tests. These modes need clear test commands in STACK.md and (for task/crunch) acceptance criteria in `spec/acceptance/`.
 

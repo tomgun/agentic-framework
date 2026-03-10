@@ -552,6 +552,121 @@ class TestResultSerialization:
         assert fw.review_blocked_at == ""
         assert fw.task_result is None
 
+    def test_already_shipped_counted_as_completed(self, project_root):
+        """Features already shipped should be marked completed in _get_actionable."""
+        from auto.scheduler import AutonomousScheduler, FeatureWork, SchedulerResult
+
+        scheduler = AutonomousScheduler(project_root=project_root)
+
+        # F-0103 is shipped in the fixture's FEATURES.md
+        fw = FeatureWork(feature_id="F-0103", status="pending")
+        work_map = {"F-0103": fw}
+        result = SchedulerResult(success=False, features_total=1)
+        result.feature_work.append(fw)
+
+        actionable = scheduler._get_actionable(work_map, result)
+
+        assert actionable == []
+        assert fw.status == "completed"
+        assert result.features_completed == 1
+
+    @patch("auto.scheduler.TaskRunner")
+    def test_component_scoped_work_root(self, mock_runner_cls, project_root):
+        """_run_feature should pass component path to TaskRunner when component exists."""
+        from auto.scheduler import AutonomousScheduler, FeatureWork
+
+        # Create component directory and STACK.md with components table
+        api_dir = project_root / "packages" / "api"
+        api_dir.mkdir(parents=True)
+        stack_file = project_root / "STACK.md"
+        stack_file.write_text(textwrap.dedent("""\
+            # Stack
+
+            ## Components
+            | name | path | type | test_command |
+            |------|------|------|--------------|
+            | api  | packages/api | python | pytest packages/api/tests/ |
+        """))
+
+        mock_runner = MagicMock()
+        from auto.task import TaskResult
+        mock_runner.run.return_value = TaskResult(
+            feature_id="F-0101", success=True,
+            acs_total=1, acs_passed=1,
+        )
+        mock_runner_cls.return_value = mock_runner
+
+        scheduler = AutonomousScheduler(project_root=project_root)
+        fw = FeatureWork(feature_id="F-0101", component="api")
+        scheduler._run_feature(fw)
+
+        # TaskRunner should have been created with the component path
+        call_args = mock_runner_cls.call_args
+        actual_root = call_args[1].get("project_root")
+        assert actual_root == api_dir
+
+    @patch("auto.scheduler.TaskRunner")
+    def test_no_component_uses_project_root(self, mock_runner_cls, project_root):
+        """_run_feature should use project_root when no component."""
+        from auto.scheduler import AutonomousScheduler, FeatureWork
+
+        mock_runner = MagicMock()
+        from auto.task import TaskResult
+        mock_runner.run.return_value = TaskResult(
+            feature_id="F-0100", success=True,
+            acs_total=1, acs_passed=1,
+        )
+        mock_runner_cls.return_value = mock_runner
+
+        scheduler = AutonomousScheduler(project_root=project_root)
+        fw = FeatureWork(feature_id="F-0100", component=None)
+        scheduler._run_feature(fw)
+
+        call_args = mock_runner_cls.call_args
+        actual_root = call_args[1].get("project_root") or call_args[0][0] if call_args[0] else call_args[1].get("project_root")
+        assert actual_root == project_root
+
+    @patch("auto.scheduler.TaskRunner")
+    def test_escalation_called_on_review_block(self, mock_runner_cls, project_root):
+        """_handle_escalation should be called when a feature becomes review-blocked."""
+        from auto.scheduler import AutonomousScheduler
+        from auto.task import TaskResult
+
+        # Create a pending review for F-0101 that will appear AFTER task failure
+        pending_dir = project_root / ".agentic" / "session" / "reviews"
+
+        mock_runner = MagicMock()
+        mock_runner.run.return_value = TaskResult(
+            feature_id="F-0101", success=False,
+            acs_total=1, acs_passed=0,
+        )
+        mock_runner_cls.return_value = mock_runner
+
+        scheduler = AutonomousScheduler(
+            project_root=project_root,
+            poll_interval=0.05,
+            max_poll_cycles=1,
+        )
+
+        # Mock _is_review_blocked to return True after task runs
+        original_is_blocked = scheduler._is_review_blocked
+        call_count = {"n": 0}
+
+        def mock_is_blocked(fid):
+            call_count["n"] += 1
+            # First call from _get_actionable: not blocked (so it runs)
+            # Second call after task failure: blocked (so escalation fires)
+            if call_count["n"] <= 1:
+                return False
+            return True
+
+        scheduler._is_review_blocked = mock_is_blocked
+
+        with patch.object(scheduler, '_handle_escalation') as mock_escalation:
+            result = scheduler.run(feature_ids=["F-0101"])
+            mock_escalation.assert_called_once()
+            assert "F-0101" in mock_escalation.call_args[0]
+
     def test_progress_saved_to_disk(self, project_root):
         """Scheduler should save progress to session state."""
         from auto.scheduler import AutonomousScheduler

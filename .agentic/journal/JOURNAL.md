@@ -1975,3 +1975,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-10 19:50 - F-0186 Review Fixes
+
+**Why**: Code review found correctness gaps and missing documentation
+
+**What changed**:
+- Applied 5 review findings: shipped-feature counting, escalation wiring, component-scoped work_root via load_registry, dead code cleanup in crunch.py. Added 4 new tests (23 total). Documented ag auto epic in all 9 instruction files.
+
+**Next steps**:
+- Push to PR #109 for re-review
+
+**Blockers**: None
+

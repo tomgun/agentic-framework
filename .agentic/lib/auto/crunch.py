@@ -16,7 +16,6 @@ from __future__ import annotations
 import json
 import re
 import sys
-import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -254,16 +253,6 @@ class CrunchRunner:
                         features.append(current_fid)
                     current_fid = None
         return features
-
-    def _save_progress(self, result: CrunchResult) -> None:
-        """Save batch progress to session state."""
-        state_file = self.paths.session_dir / "crunch-state.json"
-        self.paths.session_dir.mkdir(parents=True, exist_ok=True)
-        state = result.to_dict()
-        state["updated_at"] = time.time()
-        tmp = state_file.with_suffix(".tmp")
-        tmp.write_text(json.dumps(state, indent=2) + "\n")
-        tmp.rename(state_file)
 
 
 # ---------------------------------------------------------------------------

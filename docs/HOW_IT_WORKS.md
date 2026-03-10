@@ -454,6 +454,7 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 - Routes through the `review_decomposition` checkpoint (configurable: human/critical_agent/skip)
 - Created children get `Parent: F-XXXX` in FEATURES.md, queryable via `query_features.py --children F-XXXX`
 - **Automatic status cascade**: after any child feature transitions, the parent epic's status is automatically recomputed from its children (pure derivation, not a state transition). Rules: all shipped → epic shipped; any implementing/verified → epic implementing; all criteria_set or earlier → epic criteria_set; any regression → epic implementing
+- **Autonomous epic execution** (F-0186): `ag auto epic F-XXXX` reads the epic's child features, schedules component-scoped workers (AutonomousScheduler) with non-blocking reviews, and executes each child feature autonomously. Builds on decomposition + task mode.
 
 ---
 

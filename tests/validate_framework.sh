@@ -1788,8 +1788,9 @@ else
   fail "F-0163: max errors threshold missing"
 fi
 
-# crunch.py saves progress
-if grep -q "_save_progress" "${FRAMEWORK_ROOT}/.agentic/lib/auto/crunch.py"; then
+# Progress persistence (crunch delegates to scheduler which saves progress)
+if grep -q "_save_progress" "${FRAMEWORK_ROOT}/.agentic/lib/auto/crunch.py" \
+   || grep -q "_save_progress" "${FRAMEWORK_ROOT}/.agentic/lib/auto/scheduler.py"; then
   pass "F-0163: progress persistence"
 else
   fail "F-0163: progress persistence missing"
