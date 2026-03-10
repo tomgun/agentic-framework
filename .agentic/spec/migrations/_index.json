@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 12,
+  "last_migration": 16,
   "migrations": [
     {
       "id": 1,
@@ -73,6 +73,30 @@
       "file": "012_f0196_ac024_version_moves_to_ag_flush_allowlist__multipr_version_conflicts_make_inpr_bumping_unworkable_postmerge_bump_via_ag_done_is_conflictfree.md",
       "date": "2026-03-10",
       "description": "F-0196 AC-024: VERSION moves to ag flush allowlist — multi-PR VERSION conflicts make in-PR bumping unworkable; post-merge bump via ag done is conflict-free"
+    },
+    {
+      "id": 13,
+      "file": "013_check_off_verified_acs_for_f0179_69_pass_3_partial.md",
+      "date": "2026-03-10",
+      "description": "Check off verified ACs for F-0179 (6/9 pass, 3 partial)"
+    },
+    {
+      "id": 14,
+      "file": "014_check_off_all_11_verified_acs_for_f0189.md",
+      "date": "2026-03-10",
+      "description": "Check off all 11 verified ACs for F-0189"
+    },
+    {
+      "id": 15,
+      "file": "015_check_off_all_28_verified_acs_for_f0190.md",
+      "date": "2026-03-10",
+      "description": "Check off all 28 verified ACs for F-0190"
+    },
+    {
+      "id": 16,
+      "file": "016_deprecate_f0033_superseded_by_agentsjson_f0194_and_f0098_superseded_by_f0143_handcrafted_skills.md",
+      "date": "2026-03-10",
+      "description": "Deprecate F-0033 (superseded by AGENTS.json F-0194) and F-0098 (superseded by F-0143 hand-crafted skills)"
     }
   ]
 }

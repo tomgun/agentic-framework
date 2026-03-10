@@ -602,19 +602,19 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0033: AGENTS_ACTIVE.md Coordination
 
-**Status**: shipped  
-**Category**: Multi-Agent  
-**Priority**: high  
-**Complexity**: low  
+**Status**: deprecated
+**Category**: Multi-Agent
+**Priority**: high
+**Complexity**: low
 **Since**: v0.2.0
 
-**Description**: Shared file tracking which agents are working on what features.
+**Description**: Shared file tracking which agents are working on what features. **Superseded by AGENTS.json (F-0194).**
 
 **Dependencies**: F-0031
 
 **Implementation**:
 - State: complete
-- Code: `.agentic/spec/AGENTS_ACTIVE.template.md`
+- Code: `.agentic/spec/AGENTS_ACTIVE.template.md` (deleted — superseded by AGENTS.json)
 - Tests: format validation
 
 **Acceptance**: See `spec/acceptance/F-0033.md`
@@ -1568,13 +1568,13 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0098: Generate Claude Skills from Subagents
 
-**Status**: shipped
-**Category**: Verification & Enforcement  
+**Status**: deprecated
+**Category**: Verification & Enforcement
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.11.5
 
-**Description**: Generate Claude Code Skills (`.claude/skills/`) from subagent definitions, enabling auto-discovery while maintaining single source of truth. Skills are regenerated during install/upgrade. Superseded by F-0143 hand-crafted skills approach.
+**Description**: Generate Claude Code Skills (`.claude/skills/`) from subagent definitions, enabling auto-discovery while maintaining single source of truth. Skills are regenerated during install/upgrade. **Superseded by F-0143 hand-crafted skills approach.**
 
 **Dependencies**: None
 
@@ -2972,9 +2972,9 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Dependencies**: F-0177
 
 **Implementation**:
-- State: none
-- Code: `.agentic/lib/auto/components.py` (new), modifications to `context-for-role.sh`, `discover.py`, `query_features.py`, `gates.py`, `STACK.template.md`
-- Tests: `tests/test_components.py` (new)
+- State: complete
+- Code: `.agentic/lib/auto/components.py`, modifications to `context-for-role.sh`, `discover.py`, `query_features.py`, `gates.py`, `STACK.template.md`
+- Tests: `tests/test_components.py`
 
 **Acceptance**: See `spec/acceptance/F-0179.md`
 
@@ -3203,7 +3203,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 **Dependencies**: F-0177
 
 **Implementation**:
-- State: implementing
+- State: complete
 - Code: `backlog_helpers.py`, `backlog.sh`, `ag.sh` gates
 - Tests: `tests/test_backlog_helpers.py`, `validate_framework.sh`
 
@@ -3327,7 +3327,7 @@ One command (`ag flush`) commits + pushes state-only changes directly to main wi
 
 ## F-0197: FEATURES.md Registry Integrity + AC Verification Gate
 
-**Status**: planned
+**Status**: in_progress
 **Category**: Reliability
 **Priority**: high
 **Complexity**: medium
@@ -3337,8 +3337,8 @@ Fix 5 features with status/implementation mismatches (deprecate F-0033, F-0098; 
 **Dependencies**: None
 
 **Implementation**:
-- State: FEATURES.md data corrections, new drift-check.sh, AC gate in cmd_done
-- Code: .agentic/lib/tools/drift-check.sh, .agentic/lib/tools/ag.sh
+- State: complete
+- Code: .agentic/lib/tools/drift-check.sh, .agentic/lib/tools/ag.sh, .agentic/lib/tools/sync.sh, .agentic/lib/tools/dashboard.sh
 - Tests: validate_framework.sh
 
 **Acceptance**: spec/acceptance/F-0197.md
@@ -3396,4 +3396,3 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 - Tests: tests/test_intents.py, validate_framework.sh
 
 **Acceptance**: spec/acceptance/F-0200.md
-
