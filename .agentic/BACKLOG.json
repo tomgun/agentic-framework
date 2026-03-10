@@ -1,21 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0183",
-    "description": "Taste and Style Settings",
-    "added_at": "2026-03-08T19:57:16Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0183.md"
-    ],
-    "notes": "Subjective review guidance hierarchy.",
-    "depends_on": [
-      "F-0182"
-    ],
-    "became_current_at": "2026-03-09T23:06:54Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0186",
     "description": "Autonomous Scheduler (ADR-001 Phase 6)",
     "added_at": "2026-03-08T19:57:17Z",
@@ -27,7 +12,8 @@
     "depends_on": [
       "F-0182",
       "F-0184"
-    ]
+    ],
+    "became_current_at": "2026-03-10T11:23:02Z"
   },
   {
     "type": "feature",

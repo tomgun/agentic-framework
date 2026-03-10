@@ -1871,3 +1871,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-10 13:22 - F-0196 Shipped
+
+**Why**: Eliminated friction from state file commits in PR workflow
+
+**What changed**:
+- ag flush command now available — state files (BACKLOG.json, STATUS.md, JOURNAL.md, etc.) can be committed directly to main without a PR
+
+**Next steps**:
+- Next backlog item
+
+**Blockers**: None
+
