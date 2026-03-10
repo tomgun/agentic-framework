@@ -1911,12 +1911,12 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
-### Session: 2026-03-10 15:00 - F-0199 Instruction Sync
+### Session: 2026-03-10 15:00 - F-0198 Plan Durability
 
-**Why**: Detect instruction file divergence so ag commands don't ship without being documented in all instruction files
+**Why**: Prevent plan loss from ephemeral session storage
 
 **What changed**:
-- Implemented instruction-sync.sh that parses ag.sh dispatch to discover commands, checks 6 instruction files for coverage; wired into validate_framework.sh (warning mode), pre-commit-check.sh (advisory when ag.sh staged), and sync.sh (phase 5b)
+- Implemented plan-scan.sh standalone script and wired into ag sync as phase 9. Scans Claude and Cursor ephemeral plan dirs, copies unsaved plans to durable storage. Agent-agnostic design, extensible via plan_scan_dirs setting.
 
 **Next steps**:
 - Create PR for review
