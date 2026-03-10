@@ -4,11 +4,13 @@
 # WHY --no-verify IS SAFE HERE (and NOT a precedent):
 # This script enforces its own validation that is STRICTER than the pre-commit
 # hook: hardcoded file allowlist, branch+worktree check, diff-level FEATURES.md
-# validation, JSON validation for structured files. The hook is redundant, not
-# bypassed. Future tool authors should NOT cite this as justification for
-# --no-verify — the conditions are: (1) hardcoded file allowlist, (2) no
-# user-editable configuration, (3) self-contained validation that rejects on
-# any violation. If your script doesn't meet all three, use the hook.
+# validation, JSON validation for structured files. VERSION is in the allowlist
+# (bumped post-merge by ag done, which validates semver before writing).
+# The hook is redundant, not bypassed. Future tool authors should NOT cite this
+# as justification for --no-verify — the conditions are: (1) hardcoded file
+# allowlist, (2) no user-editable configuration, (3) self-contained validation
+# that rejects on any violation. If your script doesn't meet all three, use
+# the hook.
 #
 # Usage:
 #   ag flush                  # Commit + push dirty state files to main
@@ -31,6 +33,7 @@ ALLOWLIST=(
     ".agentic/BACKLOG.json"
     ".agentic/journal/JOURNAL.md"
     ".agentic/CONTRIBUTIONS.md"
+    "VERSION"
 )
 
 # ---------------------------------------------------------------------------
@@ -217,12 +220,18 @@ if command -v python3 >/dev/null 2>&1 && [[ -f "$SCRIPT_DIR/agents_helpers.py" ]
 fi
 
 # ---------------------------------------------------------------------------
-# Step 10: Pull from remote (if exists)
+# Step 10-11: Stage dirty files, then pull from remote
 # ---------------------------------------------------------------------------
+# Stage BEFORE pull — git pull --rebase fails with unstaged changes
+for f in "${DIRTY_STATE[@]}"; do
+    git add "$f"
+done
+
 if $HAS_REMOTE; then
     if ! git pull --rebase origin "$BRANCH" 2>/dev/null; then
-        # Rebase conflict — abort and give clear instructions
+        # Rebase conflict — unstage and abort
         git rebase --abort 2>/dev/null || true
+        git reset HEAD -- "${DIRTY_STATE[@]}" 2>/dev/null || true
         echo "Error: State conflict during pull. Resolve manually, then re-run: ag flush"
         echo "Hint: git pull --rebase origin $BRANCH, resolve conflicts, git rebase --continue"
         exit 1
@@ -230,13 +239,8 @@ if $HAS_REMOTE; then
 fi
 
 # ---------------------------------------------------------------------------
-# Step 11-12: Stage + commit
+# Step 12: Commit (files already staged in Step 10)
 # ---------------------------------------------------------------------------
-for f in "${DIRTY_STATE[@]}"; do
-    git add "$f"
-done
-
-# Build concise commit message
 SHORT_NAMES=()
 for f in "${DIRTY_STATE[@]}"; do
     SHORT_NAMES+=("$(basename "$f")")

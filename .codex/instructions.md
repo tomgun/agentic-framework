@@ -32,7 +32,7 @@ Rules:
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later).
 - Keep changes small and scoped.
-- **Every PR**: Bump VERSION (at least patch) and update .agentic/CONTRIBUTIONS.md with user's insight/direction. After merge: `git tag v$(cat VERSION) && git push origin v$(cat VERSION)`.
+- **Every merge**: Bump VERSION via `ag done` (not in the PR). Update .agentic/CONTRIBUTIONS.md with user's insight/direction during the PR.
 - Multi-agent: check `.agentic/session/AGENTS.json` (or `python3 .agentic/lib/tools/agents_helpers.py --project-root . list`) before starting work.
 
 Token-efficient scripts (ALWAYS use these, NEVER read/edit these files directly):

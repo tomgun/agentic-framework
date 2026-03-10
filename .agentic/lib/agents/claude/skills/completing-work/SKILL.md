@@ -43,6 +43,11 @@ This clears the active WIP entry from `.agentic/session/AGENTS.json`.
 bash .agentic/lib/tools/feature.sh F-XXXX status shipped
 ```
 
+### Step 3b: Bump VERSION and Flush
+
+`ag done` auto-bumps VERSION (patch) and flushes state to main when on main.
+For minor/major bumps, edit VERSION manually before running `ag done`.
+
 ### Step 4: Update Artifacts
 
 ```bash

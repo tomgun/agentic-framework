@@ -117,8 +117,9 @@ Every time before committing, execute these commands in order:
 3. If shipping a feature (Formal): `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 4. Stage any modified state files: BACKLOG.json, STATUS.md, JOURNAL.md, HUMAN_NEEDED.md
    Or use `ag flush` to commit state files directly to main (no PR needed).
-5. `ag commit` — runs quality gates, shows diff, waits for human approval
-6. Only THEN announce ready — never say "done" before artifacts are updated
+5. VERSION is bumped post-merge by `ag done`, not in PRs.
+6. `ag commit` — runs quality gates, shows diff, waits for human approval
+7. Only THEN announce ready — never say "done" before artifacts are updated
 
 ## Token-efficient scripts (always use these)
 

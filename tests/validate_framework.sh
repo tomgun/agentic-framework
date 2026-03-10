@@ -4220,12 +4220,12 @@ else
   fail "T-0097: state-commit.sh missing allowlist or expected state files"
 fi
 
-# T-0098: VERSION is NOT in the allowlist (security boundary)
+# T-0098: VERSION IS in the allowlist (bumped post-merge by ag done)
 if grep -q 'ALLOWLIST=' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" && \
-   ! grep -A20 'ALLOWLIST=(' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" | grep -q 'VERSION'; then
-  pass "T-0098: VERSION is NOT in the state-commit.sh allowlist"
+   grep -A20 'ALLOWLIST=(' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" | grep -q 'VERSION'; then
+  pass "T-0098: VERSION is in the state-commit.sh allowlist (post-merge bump via ag done)"
 else
-  fail "T-0098: VERSION found in state-commit.sh allowlist (should be excluded)"
+  fail "T-0098: VERSION not found in state-commit.sh allowlist (should be included for post-merge bump)"
 fi
 
 # T-0099: ag.sh dispatches flush command

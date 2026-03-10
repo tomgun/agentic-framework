@@ -1884,3 +1884,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-10 13:24 - ag flush bugfix
+
+**Why**: ag flush failed on first real use due to unstaged changes blocking rebase
+
+**What changed**:
+- Fixed ag flush failure when dirty state files exist during git pull --rebase — stage files before pull, unstage on conflict
+
+**Next steps**:
+- None
+
+**Blockers**: None
+
+
+### Session: 2026-03-10 14:01 - VERSION Post-Merge Workflow
+
+**Why**: Multi-PR VERSION conflicts made in-PR bumping unworkable
+
+**What changed**:
+- VERSION bumps now happen post-merge via ag done instead of in PRs, eliminating multi-PR merge conflicts on VERSION file
+
+**Next steps**:
+- Merge PR, verify ag done bumps VERSION on main
+
+**Blockers**: None
+

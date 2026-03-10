@@ -75,17 +75,13 @@ bash .agentic/lib/tools/backlog.sh done
 
 This removes the completed item and promotes the next item to position 0. The command is a no-op if the completed feature is not at position 0. Include BACKLOG.json in the next commit.
 
-### Step 4c: Flush State
+### Step 4c: Flush State (including VERSION)
 
-If on main (not in a worktree), flush state files directly to main:
+`ag done` auto-bumps VERSION (patch) and flushes state files (STATUS.md, JOURNAL.md,
+BACKLOG.json, FEATURES.md status, VERSION, etc.) directly to main when on main.
+For minor/major bumps, edit VERSION manually before running `ag done`.
 
-```bash
-bash .agentic/lib/tools/ag.sh flush --features
-```
-
-This commits state-only changes (STATUS.md, JOURNAL.md, BACKLOG.json, FEATURES.md status, etc.) directly to main without a PR. This is a sub-step of the human-approved `ag done` flow, not an auto-commit.
-
-If in a worktree, skip this step — state files will be flushed after returning to main.
+If in a worktree, this step is skipped — state files will be flushed after returning to main.
 
 ### Step 5: Flush Pending Items
 

@@ -29,7 +29,7 @@ Rules:
 - Add/update tests for new/changed logic.
 - Code + docs = done (update docs with code, not later). Use `ag docs` for doc lifecycle.
 - Keep changes small and scoped (max 5-10 files per commit).
-- Every PR: bump VERSION (at least patch) and update .agentic/CONTRIBUTIONS.md.
+- Every merge: bump VERSION via `ag done`. Update CONTRIBUTIONS.md during the PR.
 - Log user's design insights to .agentic/CONTRIBUTIONS.md.
 - Update .agentic/journal/JOURNAL.md and .agentic/STATUS.md before every commit (use token-efficient scripts).
 - Worktree: Use `git worktree` on feature branches when another agent may be working on main.
