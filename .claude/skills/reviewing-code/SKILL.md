@@ -1,9 +1,11 @@
 ---
 name: reviewing-code
 description: >
-  Code review for quality, bugs, security, and conventions. Use when user says
-  "review", "/review", "check this code", "look at my changes", "code review",
-  "is this good", "any issues", or asks for feedback on code.
+  Code review for quality, bugs, security, and conventions. Use when the user
+  wants feedback on code — e.g. "review", "/review", "check this code",
+  "look at my changes", "code review", "is this good", "any issues",
+  "review PR", "audit", or any request for code feedback. Match intent,
+  not exact words.
   Do NOT use for: implementing features (use implementing-features), writing
   tests (use writing-tests), committing code (use committing-changes).
 compatibility: "Requires Claude Code with file access."

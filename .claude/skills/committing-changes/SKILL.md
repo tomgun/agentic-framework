@@ -2,8 +2,10 @@
 name: committing-changes
 description: >
   Pre-commit quality gates, branch management, and PR creation.
-  Use when user says "commit", "push", "ship", "finalize", "create PR",
-  "ag commit", "ready to commit", or wants to save completed work.
+  Use when the user wants to commit, push, save, ship, or finalize changes —
+  e.g. "commit", "push", "ship", "finalize", "create PR", "save changes",
+  "ag commit", "ready to commit", or any phrasing that means persisting work.
+  Match intent, not exact words.
   Do NOT use for: writing code (use implementing-features), running tests
   (use writing-tests), reviewing code (use reviewing-code).
 compatibility: "Requires Claude Code with shell access and git."

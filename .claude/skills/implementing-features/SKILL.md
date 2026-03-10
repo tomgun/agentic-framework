@@ -2,8 +2,10 @@
 name: implementing-features
 description: >
   Implements features using acceptance-driven workflow with structural gates.
-  Use when user says "build", "implement", "add feature", "create [thing]",
-  "implement F-XXXX", "ag implement", or describes new functionality to build.
+  Use when the user wants to build new functionality — e.g. "build",
+  "implement", "add feature", "create [thing]", "develop", "wire up",
+  "implement F-XXXX", "ag implement", or any description of new work to do.
+  Match intent, not exact words.
   Do NOT use for: one-line fixes (use fixing-bugs), writing tests only
   (use writing-tests), code review (use reviewing-code), documentation-only
   changes (use updating-documentation).

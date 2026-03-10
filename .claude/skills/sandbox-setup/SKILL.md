@@ -4,8 +4,10 @@ description: >
   Set up a Docker sandbox for autonomous Claude Code with configurable
   security. Interviews the user about permissions, generates devcontainer
   config, firewall rules, and GitHub token scoping.
-  Use when: user says "setup sandbox", "configure docker", "sandbox setup",
-  "devcontainer setup", "ag sandbox", or asks about running Claude in Docker.
+  Use when the user wants to set up a sandboxed environment for Claude —
+  e.g. "setup sandbox", "configure docker", "sandbox setup", "devcontainer
+  setup", "ag sandbox", "container setup", or asks about running Claude in
+  Docker. Match intent, not exact words.
   Do NOT use for: running commands inside an existing container, general
   Docker questions unrelated to Claude.
 compatibility: "Requires Docker installed on the host."
