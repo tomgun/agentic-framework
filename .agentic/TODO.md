@@ -23,8 +23,8 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0007: Batch-verify or grandfather ~50 shipped features with fully unchecked acceptance criteria (F-0001 through F-0102 era). Recent features F-0125+ are properly checked
 - **Added**: 2026-02-24
 
-### T-0010: Implement multi-agent helper scripts (F-0108) — agents_active.sh, check_agent_conflicts.sh, sync_worktrees.sh referenced as TODO in multi_agent_coordination.md and doc-check.sh allowlist
-- **Added**: 2026-02-24
+### ~~T-0010: Implement multi-agent helper scripts (F-0108)~~ **OBSOLETE**: Fully superseded by AGENTS.json (F-0194) and agents_helpers.py. F-0108 marked deprecated in FEATURES.md.
+- **Added**: 2026-02-24 · **Closed**: 2026-03-10
 
 ### T-0013: Close or formally assess F-0103 (Agent Mode Selection) — in_progress since v0.12.2, functionally complete. Either ship or document what's missing
 - **Added**: 2026-02-28
@@ -35,8 +35,8 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0015: F-XXXX: Structural enforcement for durable plan saving. ag implement should check that a plan exists in .agentic-journal/plans/ and warn/block if missing. Needs a setting (e.g. plan_persistence: off|warning|blocking) since not every project wants saved plans. The plan-review loop (ag plan with plan_review_enabled) especially needs this — reviewed plans are high-value artifacts that should never be lost to session-scoped .claude/plans/. Implementation: add check in ag implement, add setting to profiles.conf (discovery: off, formal: warning), add to STACK.template.md ## Settings. See 2026-02-28-document-architecture-effectiveness-review.md for context.
 - **Added**: 2026-02-28
 
-### T-0016: Worktree auto-detection: Agent should automatically use git worktree when another agent is active. Check .agentic-state/AGENTS_ACTIVE.md at session start and auto-enter worktree if occupied. Currently requires user to remind agent. See CLAUDE.md Framework Development section - rule exists but isn't enforced structurally.
-- **Added**: 2026-02-28
+### ~~T-0016: Worktree auto-detection~~ **OBSOLETE**: Duplicate of T-0046; core shipped in F-0194 (ag implement auto-creates worktree, worktree_mode setting).
+- **Added**: 2026-02-28 · **Closed**: 2026-03-10
 
 ### ~~T-0017: AGENTS_ACTIVE.md is never written~~ **CLOSED** (F-0197): Superseded by AGENTS.json (F-0194). F-0033 deprecated.
 - **Added**: 2026-02-28 · **Closed**: 2026-03-10
@@ -63,21 +63,18 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 - **Added**: 2026-03-02
 - **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §3.1, §3.3, R1
 
-### T-0030: F-idea: Verification loop — autonomous test→fix→retest cycle (bounded 3-5 iterations) after implementation. On failure: analyze, attempt fix, retest. On convergence: report to human. On exhaustion: escalate with diagnostic context. Token budget per loop, rollback safety via git branches, security-sensitive code always escalates. ~10-50K tokens/loop. Start with human-in-the-loop prototype before full autonomy. Pre-existing framework idea (R5 in SDD analysis). Contributor: Tomas
-- **Added**: 2026-03-02
-- **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §11, R5
+### ~~T-0030: Verification loop~~ **DONE**: Shipped as F-0161 (Tiered Test Execution) + F-0164 (Verify Loop). Bounded test→fix→retest with tiered execution, escalation on exhaustion, diagnostic context. 100% complete.
+- **Added**: 2026-03-02 · **Closed**: 2026-03-10
 
-### T-0031: F-idea: Auto-dev loop — full spec→finished feature automation by chaining skills: writing-specs→planning→implementing→verification loop→completing-work. Three autonomy levels: supervised (3 human checkpoints), semi-autonomous (human approves spec only), fully autonomous (intent to PR). Depends on verification loop (T-0030) being proven first. Pre-existing framework idea (R8 in SDD analysis). Contributor: Tomas
-- **Added**: 2026-03-02
-- **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §11, R8
+### ~~T-0031: Auto-dev loop~~ **DONE**: Shipped as F-0160–F-0163 (Autonomous Workflow Engine) + F-0186 (Autonomous Scheduler). Full spec→feature chain exists (TaskRunner reads spec → loops ACs → verify → PR). Deliberately not self-activated in framework dev (by design). ~90% complete, closed.
+- **Added**: 2026-03-02 · **Closed**: 2026-03-10
 
 ### T-0032: F-0152 P2: Cross-feature semantic checks — three deferred checks for spec-analyze.sh: (AC-009) cross-feature terminology consistency (detects naming drift across spec files), (AC-010) AC contradiction detection (finds conflicting ACs within or across features), (AC-011) constitution alignment (checks ACs against PRINCIPLES.md). Requires LLM analysis — not deterministic. New insight from SDD toolkit analysis (their /analyze command's 6-pass approach). Contributor: Tomas
 - **Added**: 2026-03-02
 - **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §3.2, R2
 
-### T-0033: Investigate: Task IDs and execution prioritization for small-batch development and parallelization. The SDD toolkit uses T### IDs with [P] parallel markers and phased execution (Setup→Foundation→Stories→Polish). We partially addressed this with F-0150 (checkpoint validation at P1/P2 boundaries) and execution order sections in plans. Open question: would explicit task-level parallelization markers and dependency chains meaningfully improve multi-agent dispatch and small-batch sizing? Or is the current AC-group + plan phasing sufficient? Related: T-0027 (phased checkpoints vs file-count limits).
-- **Added**: 2026-03-02
-- **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §9, §3.5
+### ~~T-0033: Task IDs and execution prioritization~~ **OBSOLETE**: Superseded by T-0043 (AC scheduling phase) which covers the same ground more concretely with AC-level dependency graphs and parallel execution.
+- **Added**: 2026-03-02 · **Closed**: 2026-03-10
 
 ### T-0034: Cursor agent leaves work uncommitted and jumps to new tasks — add commit nudge after completing work (compressed context makes it hard to recall what was accomplished later)
 - **Added**: 2026-03-03

@@ -2027,3 +2027,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-10 23:53 - TODO Triage
+
+**Why**: Post-F-0185/F-0186 cleanup — 38 TODOs accumulated, many obsolete
+
+**What changed**:
+- Closed 5 obsolete/shipped TODOs (T-0010, T-0016, T-0030, T-0031, T-0033), deprecated F-0108, promoted T-0051 to backlog position 0
+
+**Next steps**:
+- Implement T-0051 (AC check-off enforcement) or continue with F-0187
+
+**Blockers**: None
+

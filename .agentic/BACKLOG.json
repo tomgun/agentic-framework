@@ -1,5 +1,11 @@
 [
   {
+    "type": "task",
+    "description": "T-0051: AC check-off enforcement in pre-commit",
+    "added_at": "2026-03-10T21:19:27Z",
+    "added_by": "agent"
+  },
+  {
     "type": "feature",
     "id": "F-0187",
     "description": "Multi-Repo Umbrella (ADR-001 Phase 3)",

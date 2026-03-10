@@ -1664,7 +1664,7 @@ agent_mode: balanced  # premium | balanced | economy
 
 ## F-0108: Multi-Agent Helper Scripts
 
-**Status**: planned
+**Status**: deprecated
 **Category**: Multi-Agent
 **Priority**: medium
 **Profile**: Both
