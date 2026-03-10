@@ -32,10 +32,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0001: Project Initialization
 
-**Status**: shipped  
-**Category**: Core  
-**Priority**: critical  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Core
+**Priority**: critical
+**Complexity**: medium
 **Since**: v0.1.0
 
 **Description**: Initialize a new project with the Agentic framework, choosing between Discovery and Formal profiles.
@@ -53,10 +53,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0002: Profile Selection (Discovery vs Formal)
 
-**Status**: shipped  
-**Category**: Core  
-**Priority**: critical  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Core
+**Priority**: critical
+**Complexity**: low
 **Since**: v0.2.0
 
 **Description**: Two framework profiles - Discovery (quality + workflows) and Formal (adds spec-driven development, feature tracking).
@@ -74,10 +74,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0003: Spec-Driven Development
 
-**Status**: shipped  
-**Category**: Core  
-**Priority**: high  
-**Complexity**: high  
+**Status**: shipped
+**Category**: Core
+**Priority**: high
+**Complexity**: high
 **Since**: v0.1.0
 
 **Description**: Manage features through markdown specifications with status tracking, dependencies, and acceptance criteria.
@@ -95,10 +95,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0004: Feature Tracking & Status
 
-**Status**: shipped  
-**Category**: Core  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Core
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.1.0
 
 **Description**: Track feature lifecycle (planned → in_progress → shipped), implementation state, test coverage.
@@ -116,10 +116,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0005: Acceptance Criteria Files
 
-**Status**: shipped  
-**Category**: Core  
-**Priority**: high  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Core
+**Priority**: high
+**Complexity**: low
 **Since**: v0.1.0
 
 **Description**: Each feature must have acceptance criteria in `spec/acceptance/F-####.md`.
@@ -137,10 +137,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0006: Acceptance-Driven Development
 
-**Status**: shipped  
-**Category**: Core  
-**Priority**: critical  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Core
+**Priority**: critical
+**Complexity**: medium
 **Since**: v0.7.0
 
 **Description**: Primary development methodology - implement feature, then verify with acceptance tests. Specs evolve during implementation.
@@ -158,10 +158,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0007: Small Batch Development
 
-**Status**: shipped  
-**Category**: Core  
-**Priority**: critical  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Core
+**Priority**: critical
+**Complexity**: low
 **Since**: v0.7.0
 
 **Description**: Work in small, isolated batches - one feature at a time per agent, max 5-10 files per commit.
@@ -179,10 +179,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0008: TDD Mode (Optional)
 
-**Status**: shipped  
-**Category**: Core  
-**Priority**: medium  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Core
+**Priority**: medium
+**Complexity**: medium
 **Since**: v0.2.0
 
 **Description**: Optional test-driven development mode - write tests first, then implement.
@@ -200,10 +200,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0009: OVERVIEW.md (Core Profile)
 
-**Status**: shipped  
-**Category**: Core  
-**Priority**: high  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Core
+**Priority**: high
+**Complexity**: low
 **Since**: v0.2.0
 
 **Description**: Lightweight product documentation for Core profile - vision, capabilities, known issues.
@@ -221,10 +221,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0010: Spec Evolution Workflow
 
-**Status**: shipped  
-**Category**: Core  
-**Priority**: high  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Core
+**Priority**: high
+**Complexity**: low
 **Since**: v0.7.0
 
 **Description**: Documented workflow for updating specs during implementation with discoveries.
@@ -242,10 +242,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0011: Programming Standards
 
-**Status**: shipped  
-**Category**: Quality  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Quality
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.3.0
 
 **Description**: Comprehensive code quality guidelines - naming, functions, error handling, security, green coding.
@@ -263,10 +263,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0012: Testing Standards
 
-**Status**: shipped  
-**Category**: Quality  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Quality
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.3.0
 
 **Description**: Comprehensive testing guidelines - happy path, edge cases, invalid input, time-based, concurrency.
@@ -284,10 +284,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0013: Smoke Testing Checklist
 
-**Status**: shipped  
-**Category**: Quality  
-**Priority**: critical  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Quality
+**Priority**: critical
+**Complexity**: low
 **Since**: v0.4.3
 
 **Description**: Mandatory verification that code actually works before committing user-facing changes.
@@ -305,10 +305,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0014: Library Selection Guidelines
 
-**Status**: shipped  
-**Category**: Quality  
-**Priority**: high  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Quality
+**Priority**: high
+**Complexity**: low
 **Since**: v0.4.3
 
 **Description**: Decision framework for choosing libraries vs custom code, especially for custom/hybrid projects.
@@ -326,10 +326,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0015: Quality Profiles (Stack-Specific)
 
-**Status**: shipped  
-**Category**: Quality  
-**Priority**: medium  
-**Complexity**: high  
+**Status**: shipped
+**Category**: Quality
+**Priority**: medium
+**Complexity**: high
 **Since**: v0.3.0
 
 **Description**: Stack-specific quality checks - audio plugins, web apps, mobile, backend, games.
@@ -347,10 +347,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0016: Pre-Commit Quality Gates
 
-**Status**: shipped  
-**Category**: Quality  
-**Priority**: critical  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Quality
+**Priority**: critical
+**Complexity**: medium
 **Since**: v0.6.0
 
 **Description**: Blocking validation before commits - WIP check, acceptance criteria, batch size warning.
@@ -368,10 +368,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0017: Feature Completion Validator
 
-**Status**: shipped  
-**Category**: Quality  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Quality
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.6.0
 
 **Description**: Validate feature meets definition of done before marking as shipped.
@@ -389,10 +389,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0021: Session Start Protocol
 
-**Status**: shipped  
-**Category**: Session  
-**Priority**: critical  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Session
+**Priority**: critical
+**Complexity**: medium
 **Since**: v0.4.0
 
 **Description**: Mandatory steps when starting a work session - WIP check, read context, understand state.
@@ -410,10 +410,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0022: Session End Protocol
 
-**Status**: shipped  
-**Category**: Session  
-**Priority**: critical  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Session
+**Priority**: critical
+**Complexity**: low
 **Since**: v0.4.0
 
 **Description**: Mandatory steps when ending a work session - update JOURNAL, document blockers, clean up.
@@ -431,10 +431,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0023: JOURNAL.md Session Tracking
 
-**Status**: shipped  
-**Category**: Session  
-**Priority**: high  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Session
+**Priority**: high
+**Complexity**: low
 **Since**: v0.1.0
 
 **Description**: Session-by-session progress log with achievements, decisions, blockers.
@@ -452,10 +452,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0024: STATUS.md Current State
 
-**Status**: shipped  
-**Category**: Session  
-**Priority**: high  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Session
+**Priority**: high
+**Complexity**: low
 **Since**: v0.1.0
 
 **Description**: Current project state - focus, progress, next steps.
@@ -473,10 +473,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0025: CONTEXT_PACK.md Architecture
 
-**Status**: shipped  
-**Category**: Session  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Session
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.1.0
 
 **Description**: Architecture snapshot - modules, entry points, key files.
@@ -494,10 +494,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0026: HUMAN_NEEDED.md Escalation
 
-**Status**: shipped  
-**Category**: Session  
-**Priority**: critical  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Session
+**Priority**: critical
+**Complexity**: low
 **Since**: v0.1.0
 
 **Description**: Document blockers requiring human action - credentials, decisions, manual setup.
@@ -515,10 +515,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0027: Automatic Journaling
 
-**Status**: shipped  
-**Category**: Session  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Session
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.4.3
 
 **Description**: Two-tier logging - SESSION_LOG.md for checkpoints, JOURNAL.md for milestones.
@@ -537,7 +537,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0028: Continue-Here Generator
 
 **Status**: deprecated
-**Category**: Session  
+**Category**: Session
 **Priority**: low
 **Complexity**: medium
 **Since**: v0.3.5
@@ -560,10 +560,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0031: Multi-Agent Coordination
 
-**Status**: shipped  
-**Category**: Multi-Agent  
-**Priority**: high  
-**Complexity**: high  
+**Status**: shipped
+**Category**: Multi-Agent
+**Priority**: high
+**Complexity**: high
 **Since**: v0.2.0
 
 **Description**: Multiple AI agents working simultaneously on different features using Git worktrees.
@@ -581,10 +581,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0032: Git Worktree Setup
 
-**Status**: shipped  
-**Category**: Multi-Agent  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Multi-Agent
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.2.0
 
 **Description**: Each agent gets dedicated worktree and branch for isolation.
@@ -623,10 +623,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0034: Sequential Agent Pipeline
 
-**Status**: shipped  
-**Category**: Multi-Agent  
-**Priority**: medium  
-**Complexity**: high  
+**Status**: shipped
+**Category**: Multi-Agent
+**Priority**: medium
+**Complexity**: high
 **Since**: v0.3.0
 
 **Description**: Specialized agents work in sequence - Research → Plan → Test → Implement → Review.
@@ -644,10 +644,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0035: Agent Role Definitions
 
-**Status**: shipped  
-**Category**: Multi-Agent  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Multi-Agent
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.9.5
 
 **Description**: 9 specialized agent roles (Orchestrator, Research, Planning, Test, Implementation, Review, Spec Update, Documentation, Git) with clear responsibilities, context requirements, and handoff protocols.
@@ -665,10 +665,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0036: Native Sub-Agent Integration
 
-**Status**: shipped  
-**Category**: Multi-Agent  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Multi-Agent
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.9.5
 
 **Description**: Integration guides for Claude Code and Cursor native sub-agent capabilities.
@@ -686,10 +686,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0037: Project Health Monitoring
 
-**Status**: shipped  
-**Category**: Multi-Agent  
-**Priority**: medium  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Multi-Agent
+**Priority**: medium
+**Complexity**: medium
 **Since**: v0.9.5
 
 **Description**: Manager oversight script for monitoring pipeline status, stalled agents, feature completion, documentation currency.
@@ -707,10 +707,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0041: Token-Efficient Update Scripts
 
-**Status**: shipped  
-**Category**: Tooling  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Tooling
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.4.3
 
 **Description**: Shell scripts for updating docs without reading entire files - journal.sh, status.sh, feature.sh, blocker.sh.
@@ -728,10 +728,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0042: Feature Query Tool
 
-**Status**: shipped  
-**Category**: Tooling  
-**Priority**: medium  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Tooling
+**Priority**: medium
+**Complexity**: medium
 **Since**: v0.3.0
 
 **Description**: Query and filter features by status, complexity, category.
@@ -749,10 +749,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0043: Spec Validation Tool
 
-**Status**: shipped  
-**Category**: Tooling  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Tooling
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.3.0
 
 **Description**: Validate spec file format, required fields, cross-references.
@@ -770,10 +770,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0044: Framework Age Check
 
-**Status**: shipped  
-**Category**: Tooling  
-**Priority**: low  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Tooling
+**Priority**: low
+**Complexity**: low
 **Since**: v0.4.4
 
 **Description**: Check if framework installation is >1 month old and suggest research for updates.
@@ -791,10 +791,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0051: WIP Tracking
 
-**Status**: shipped  
-**Category**: Recovery  
-**Priority**: critical  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Recovery
+**Priority**: critical
+**Complexity**: medium
 **Since**: v0.5.0
 
 **Description**: Track work-in-progress to prevent loss from interruptions, crashes, token limits.
@@ -813,7 +813,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0052: WIP.md Lock File
 
 **Status**: shipped
-**Category**: Recovery  
+**Category**: Recovery
 **Priority**: critical
 **Complexity**: low
 **Since**: v0.5.0
@@ -833,10 +833,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0053: Recovery Protocol
 
-**Status**: shipped  
-**Category**: Recovery  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Recovery
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.6.0
 
 **Description**: Formal 5-step recovery process for interrupted work.
@@ -854,10 +854,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0054: Multi-Environment Support
 
-**Status**: shipped  
-**Category**: Recovery  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Recovery
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.4.4
 
 **Description**: Seamlessly work across Claude, Cursor, Copilot - switch when tokens run out.
@@ -875,10 +875,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0055: Anti-Hallucination Rules
 
-**Status**: shipped  
-**Category**: Recovery  
-**Priority**: critical  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Recovery
+**Priority**: critical
+**Complexity**: low
 **Since**: v0.3.5
 
 **Description**: Non-negotiable rules preventing agents from making things up.
@@ -896,10 +896,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0056: Framework Upgrade
 
-**Status**: shipped  
-**Category**: Recovery  
-**Priority**: medium  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Recovery
+**Priority**: medium
+**Complexity**: medium
 **Since**: v0.2.4
 
 **Description**: Upgrade existing project to newer framework version.
@@ -917,10 +917,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0061: DEVELOPER_GUIDE.md
 
-**Status**: shipped  
-**Category**: Developer Experience  
-**Priority**: high  
-**Complexity**: high  
+**Status**: shipped
+**Category**: Developer Experience
+**Priority**: high
+**Complexity**: high
 **Since**: v0.2.4
 
 **Description**: Comprehensive user guide covering installation, usage, customization, troubleshooting.
@@ -938,10 +938,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0062: START_HERE.md First-Time Guidance
 
-**Status**: shipped  
-**Category**: Developer Experience  
-**Priority**: high  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Developer Experience
+**Priority**: high
+**Complexity**: low
 **Since**: v0.2.0
 
 **Description**: Clear entry point for new users with profile selection and next steps.
@@ -959,10 +959,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0063: README Documentation Quality
 
-**Status**: shipped  
-**Category**: Developer Experience  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Developer Experience
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.1.0
 
 **Description**: Clear, accurate README with quick start, installation, feature overview.
@@ -980,10 +980,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0064: Script Help Messages
 
-**Status**: shipped  
-**Category**: Developer Experience  
-**Priority**: medium  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Developer Experience
+**Priority**: medium
+**Complexity**: low
 **Since**: v0.3.0
 
 **Description**: All scripts have clear --help / usage messages with examples.
@@ -1001,10 +1001,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0065: Error Message Quality
 
-**Status**: shipped  
-**Category**: Developer Experience  
-**Priority**: medium  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Developer Experience
+**Priority**: medium
+**Complexity**: low
 **Since**: v0.3.0
 
 **Description**: Scripts provide clear, actionable error messages when things go wrong.
@@ -1022,10 +1022,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0066: Template Quality
 
-**Status**: shipped  
-**Category**: Developer Experience  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Developer Experience
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.1.0
 
 **Description**: All templates are well-documented with examples and clear placeholders.
@@ -1043,10 +1043,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0067: MANUAL_OPERATIONS.md
 
-**Status**: shipped  
-**Category**: Developer Experience  
-**Priority**: medium  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Developer Experience
+**Priority**: medium
+**Complexity**: low
 **Since**: v0.2.0
 
 **Description**: Human-readable guide for querying project state without AI agents.
@@ -1064,10 +1064,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0068: Upgrade Experience
 
-**Status**: shipped  
-**Category**: Developer Experience  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Developer Experience
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.2.4
 
 **Description**: Clear upgrade path with UPGRADING.md guide and upgrade.sh script.
@@ -1085,10 +1085,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0069: Checklist-Driven Workflows
 
-**Status**: shipped  
-**Category**: Developer Experience  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Developer Experience
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.4.0
 
 **Description**: All major workflows have clear checklists that agents can follow systematically.
@@ -1106,10 +1106,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0070: Workflow Document Organization
 
-**Status**: shipped  
-**Category**: Developer Experience  
-**Priority**: medium  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Developer Experience
+**Priority**: medium
+**Complexity**: low
 **Since**: v0.7.0
 
 **Description**: Clear README in workflows/ explaining which documents to use when.
@@ -1127,10 +1127,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0071: Token Economics
 
-**Status**: shipped  
-**Category**: Design Principles  
-**Priority**: critical  
-**Complexity**: high  
+**Status**: shipped
+**Category**: Design Principles
+**Priority**: critical
+**Complexity**: high
 **Since**: v0.1.0
 
 **Description**: Durable artifacts prevent repeated context waste - CONTEXT_PACK, JOURNAL, structured reading protocols.
@@ -1148,10 +1148,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0072: Living Documentation
 
-**Status**: shipped  
-**Category**: Design Principles  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Design Principles
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.1.0
 
 **Description**: Documentation stays current - specs updated with code, no stale placeholders, automatic sync.
@@ -1169,10 +1169,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0073: Human-Agent Collaboration
 
-**Status**: shipped  
-**Category**: Design Principles  
-**Priority**: critical  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Design Principles
+**Priority**: critical
+**Complexity**: medium
 **Since**: v0.1.0
 
 **Description**: Both humans and agents work on project truth - readable specs, clear escalation, dual editing.
@@ -1190,10 +1190,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0074: Green Coding Principles
 
-**Status**: shipped  
-**Category**: Design Principles  
-**Priority**: medium  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Design Principles
+**Priority**: medium
+**Complexity**: medium
 **Since**: v0.3.5
 
 **Description**: Efficient software reduces environmental impact - algorithm optimization, resource minimization, caching.
@@ -1211,10 +1211,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0075: Traceability
 
-**Status**: shipped  
-**Category**: Design Principles  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Design Principles
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.1.0
 
 **Description**: Clear path from requirements to code to tests - stable IDs, @feature annotations, dependency visualization.
@@ -1232,10 +1232,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0076: Iterative & Incremental Development
 
-**Status**: shipped  
-**Category**: Design Principles  
-**Priority**: high  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Design Principles
+**Priority**: high
+**Complexity**: low
 **Since**: v0.1.0
 
 **Description**: Ship in small, validated steps - learn and adapt through building.
@@ -1253,10 +1253,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0077: Emergency Quick Reference
 
-**Status**: shipped  
-**Category**: Design Principles  
-**Priority**: high  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Design Principles
+**Priority**: high
+**Complexity**: low
 **Since**: v0.8.1
 
 **Description**: EMERGENCY.md provides instant guidance when tokens run out or developer needs to work without agent.
@@ -1274,10 +1274,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0078: Quick Feature & Issue Scripts
 
-**Status**: shipped  
-**Category**: Design Principles  
-**Priority**: medium  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Design Principles
+**Priority**: medium
+**Complexity**: low
 **Since**: v0.8.1
 
 **Description**: One-liner scripts to add features and issues without agent assistance.
@@ -1295,10 +1295,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0079: Issue/Bug Tracking
 
-**Status**: shipped  
-**Category**: Design Principles  
-**Priority**: medium  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Design Principles
+**Priority**: medium
+**Complexity**: medium
 **Since**: v0.9.0
 
 **Description**: Formal issue tracking (I-####) parallel to feature tracking (F-####).
@@ -1316,10 +1316,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0080: Upgrade Marker System
 
-**Status**: shipped  
-**Category**: Design Principles  
-**Priority**: medium  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Design Principles
+**Priority**: medium
+**Complexity**: medium
 **Since**: v0.8.1
 
 **Description**: Efficient upgrade detection via .upgrade_pending marker file instead of version comparison every session.
@@ -1337,10 +1337,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0081: Orchestrator Agent
 
-**Status**: shipped  
-**Category**: Agent System  
-**Priority**: high  
-**Complexity**: medium  
+**Status**: shipped
+**Category**: Agent System
+**Priority**: high
+**Complexity**: medium
 **Since**: v0.9.7
 
 **Description**: Manager/puppeteer agent that coordinates specialized agents, ensures framework compliance, and manages feature pipeline. Delegates work but never implements itself.
@@ -1358,10 +1358,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0082: Tier-Based Model Selection
 
-**Status**: shipped  
-**Category**: Agent System  
-**Priority**: medium  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Agent System
+**Priority**: medium
+**Complexity**: low
 **Since**: v0.9.7
 
 **Description**: Model recommendations use tiers (Cheap/Fast, Mid-tier, Powerful) instead of specific model names. Future-proof as model names change frequently.
@@ -1379,10 +1379,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0083: Agent Token Savings Documentation
 
-**Status**: shipped  
-**Category**: Agent System  
-**Priority**: medium  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Agent System
+**Priority**: medium
+**Complexity**: low
 **Since**: v0.9.7
 
 **Description**: Quantified documentation of token savings from agent delegation (60-83% typical), based on Claude best practices.
@@ -1400,10 +1400,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0084: Untracked Files Protection
 
-**Status**: shipped  
-**Category**: Agent System  
-**Priority**: high  
-**Complexity**: low  
+**Status**: shipped
+**Category**: Agent System
+**Priority**: high
+**Complexity**: low
 **Since**: v0.9.7
 
 **Description**: Prevent deployment failures from files created but not git-tracked. Pre-commit warning, session/commit checklists, and tool for verification.
@@ -1422,7 +1422,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0091: Gate-Based Verification
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: critical
 **Complexity**: high
 **Since**: v0.11.0
@@ -1443,7 +1443,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0092: Phase Detection
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.11.0
@@ -1464,7 +1464,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0093: AGENT_QUICK_START.md
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: high
 **Complexity**: low
 **Since**: v0.11.0
@@ -1485,7 +1485,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0094: Version-Aware Upgrade Features
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.11.3
@@ -1506,7 +1506,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0095: Cross-Platform Tool Compatibility
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.11.1
@@ -1527,7 +1527,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0096: PR-Based Workflow Default
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: high
 **Complexity**: low
 **Since**: v0.11.3
@@ -1548,7 +1548,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0097: Worktree Management Tool
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.11.3
@@ -1590,7 +1590,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0101: Framework Architecture Decision Records (ADRs)
 
 **Status**: shipped
-**Category**: Developer Experience  
+**Category**: Developer Experience
 **Priority**: high
 **Complexity**: low
 **Since**: v0.11.3
@@ -1611,7 +1611,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 ## F-0102: Modular Guidelines for Token Efficiency
 
 **Status**: shipped
-**Category**: Agent System  
+**Category**: Agent System
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.11.3
@@ -1665,7 +1665,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0108: Multi-Agent Helper Scripts
 
 **Status**: planned
-**Category**: Multi-Agent  
+**Category**: Multi-Agent
 **Priority**: medium
 **Profile**: Both
 
@@ -1690,7 +1690,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0109: Spec-Code Traceability Enhancements
 
 **Status**: shipped
-**Category**: Tooling  
+**Category**: Tooling
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.15.0
@@ -1711,7 +1711,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0110: Feature Hierarchy Query
 
 **Status**: shipped
-**Category**: Tooling  
+**Category**: Tooling
 **Priority**: low
 **Complexity**: small
 **Since**: v0.15.0
@@ -1732,7 +1732,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0111: Three-Tier Agent Boundaries
 
 **Status**: shipped
-**Category**: Agent System  
+**Category**: Agent System
 **Priority**: medium
 **Complexity**: small
 **Since**: v0.15.0
@@ -1753,7 +1753,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0112: Code Style Examples in CONTEXT_PACK
 
 **Status**: shipped
-**Category**: Developer Experience  
+**Category**: Developer Experience
 **Priority**: low
 **Complexity**: small
 **Since**: v0.15.0
@@ -1774,7 +1774,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0113: Delegation Heuristics Guide
 
 **Status**: shipped
-**Category**: Multi-Agent  
+**Category**: Multi-Agent
 **Priority**: low
 **Complexity**: small
 **Since**: v0.15.0
@@ -1795,7 +1795,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0114: Scope & Diff Verification
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: medium
 **Complexity**: small
 **Since**: v0.15.0
@@ -1816,7 +1816,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0115: Git Workflow Branch Check
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: medium
 **Complexity**: small
 **Since**: v0.15.1
@@ -1837,7 +1837,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0116: Maintainability Enforcement Gates
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.16.0
@@ -1858,7 +1858,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0117: Spec Migration System
 
 **Status**: shipped
-**Category**: Tooling  
+**Category**: Tooling
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.16.0
@@ -1879,7 +1879,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0118: Documentation Drift Detection
 
 **Status**: shipped
-**Category**: Quality  
+**Category**: Quality
 **Priority**: low
 **Complexity**: medium
 **Since**: v0.16.0
@@ -1900,7 +1900,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0119: Feature Change Manifest Generation
 
 **Status**: shipped
-**Category**: Tooling  
+**Category**: Tooling
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.16.0
@@ -1921,7 +1921,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0120: Plan-Review Loop
 
 **Status**: shipped
-**Category**: Agent System  
+**Category**: Agent System
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.18.0
@@ -1942,7 +1942,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0121: Tool-Specific Instructions Parity
 
 **Status**: in_progress
-**Category**: Agent System  
+**Category**: Agent System
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.18.0
@@ -1963,7 +1963,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0122: Multi-Tool LLM Testing Infrastructure
 
 **Status**: shipped
-**Category**: Quality  
+**Category**: Quality
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.18.0
@@ -1984,7 +1984,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0123: Intelligent Onboarding for Existing Projects
 
 **Status**: shipped
-**Category**: Core  
+**Category**: Core
 **Priority**: high
 **Complexity**: high
 **Since**: v0.24.0
@@ -2005,7 +2005,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0124: Domain Categories & Systematic Brownfield Spec Generation
 
 **Status**: shipped
-**Category**: Core  
+**Category**: Core
 **Priority**: high
 **Complexity**: high
 **Since**: v0.25.0
@@ -2026,7 +2026,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0125: Unified Drift Detection (`ag sync`)
 
 **Status**: shipped
-**Category**: Tooling  
+**Category**: Tooling
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.25.4
@@ -2047,7 +2047,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0126: Discoverability Reminders
 
 **Status**: shipped
-**Category**: Session  
+**Category**: Session
 **Priority**: medium
 **Complexity**: low
 **Since**: v0.25.4
@@ -2067,7 +2067,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0127: Tip of the Day
 
 **Status**: shipped
-**Category**: Session  
+**Category**: Session
 **Priority**: low
 **Complexity**: low
 **Since**: v0.25.4
@@ -2087,7 +2087,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0128: Specs-Before-Code Structural Enforcement
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: critical
 **Complexity**: medium
 **Since**: v0.25.5
@@ -2108,7 +2108,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0130: Rough Specs & Structural Nudging
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: high
 **Complexity**: low
 **Since**: v0.25.8
@@ -2130,7 +2130,7 @@ agent_mode: balanced  # premium | balanced | economy
 ## F-0131: Settings-Over-Profiles Architecture
 
 **Status**: shipped
-**Category**: Core  
+**Category**: Core
 **Priority**: high
 **Added**: 2026-02-17
 
@@ -2155,7 +2155,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0132: Programmatic Spec-First Gate
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: high
 **Added**: 2026-02-17
 **Since**: v0.27.0
@@ -2171,7 +2171,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0133: Durable Plan Artifacts
 
 **Status**: shipped
-**Category**: Session  
+**Category**: Session
 **Priority**: medium
 **Added**: 2026-02-16
 **Since**: v0.27.0
@@ -2187,7 +2187,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0134: DEVELOPER_GUIDE Rewrite — User-First Framing
 
 **Status**: shipped
-**Category**: Developer Experience  
+**Category**: Developer Experience
 **Priority**: high
 **Added**: 2026-02-18
 **Since**: v0.27.1
@@ -2201,7 +2201,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0135: Memory-Seed Defense-in-Depth Layer
 
 **Status**: shipped
-**Category**: Agent System  
+**Category**: Agent System
 **Priority**: high
 **Added**: 2026-02-18
 **Since**: v0.25.3
@@ -2217,7 +2217,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0136: Centralized TODO Tracking
 
 **Status**: shipped
-**Category**: Tooling  
+**Category**: Tooling
 **Priority**: high
 **Added**: 2026-02-18
 
@@ -2232,7 +2232,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0138: Documentation Impact Tracking
 
 **Status**: shipped
-**Category**: Quality  
+**Category**: Quality
 **Priority**: medium
 **Added**: 2026-02-19
 
@@ -2247,7 +2247,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0139: Doc Lifecycle System
 
 **Status**: shipped
-**Category**: Quality  
+**Category**: Quality
 **Priority**: medium
 **Added**: 2026-02-19
 
@@ -2262,7 +2262,7 @@ Replace all-or-nothing profile branching with granular individual settings. Prof
 ## F-0140: Proactive WIP Creation in Agent Instructions
 
 **Status**: shipped
-**Category**: Recovery  
+**Category**: Recovery
 **Priority**: high
 **Added**: 2026-02-20
 
@@ -2277,7 +2277,7 @@ Ensures the plan-mode-exit trigger chains to `ag implement` (which creates WIP t
 ## F-0141: Explicit Settings in STACK.md
 
 **Status**: shipped
-**Category**: Core  
+**Category**: Core
 **Priority**: high
 **Added**: 2026-02-23
 
@@ -2292,7 +2292,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 ## F-0143: Skills-Primary Architecture for Claude Code
 
 **Status**: shipped
-**Category**: Agent System  
+**Category**: Agent System
 **Priority**: high
 **Complexity**: high
 **Added**: 2026-02-28
@@ -2308,7 +2308,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 ## F-0144: Systematic Frontmatter Coverage
 
 **Status**: in-progress
-**Category**: Developer Experience  
+**Category**: Developer Experience
 **Priority**: medium
 **Complexity**: low
 **Added**: 2026-03-01
@@ -2324,7 +2324,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 ## F-0145: Periodic Check System (Lifecycle Triggers)
 
 **Status**: shipped
-**Category**: Tooling  
+**Category**: Tooling
 **Priority**: medium
 **Complexity**: medium
 **Added**: 2026-03-01
@@ -2340,7 +2340,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 ## F-0146: Project-Specific Agent Generation (Layer A)
 
 **Status**: shipped
-**Category**: Agent System  
+**Category**: Agent System
 **Priority**: medium
 **Complexity**: medium
 **Added**: 2026-03-01
@@ -2356,7 +2356,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 ## F-0147: Spec-Writing Workflow with Delta Tracking & Plan-Review Gate
 
 **Status**: shipped
-**Category**: Verification & Enforcement  
+**Category**: Verification & Enforcement
 **Priority**: high
 **Complexity**: high
 **Added**: 2026-03-01
@@ -3108,7 +3108,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0186: Autonomous Scheduler
 
-**Status**: shipped  
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: high
 **Complexity**: high
