@@ -64,6 +64,7 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 | "Plan this first" | `ag plan` | Creates reviewable plan, saves to journal |
 | "Commit this" | `ag commit` | Runs all quality gates, blocks if issues |
 | "We're done" | `ag done` | Checks docs, tests, acceptance; auto-advances backlog |
+| "Flush state" / after `ag done` | `ag flush` | Commits state files (STATUS.md, BACKLOG.json, etc.) directly to main — no PR |
 | "Approve this" | `ag review` | Lists/resolves pending review checkpoints |
 | "Break this into children" | `ag decompose F-XXXX` | Analyzes epic AC, proposes child features by component, review checkpoint |
 | "Fix tests automatically" | `ag auto verify` | Test-fix loop until green or max iterations |

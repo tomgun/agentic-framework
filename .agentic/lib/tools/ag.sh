@@ -138,6 +138,7 @@ COMMANDS:
     todo <args>         Quick-capture ideas/tasks to TODO.md inbox
     commit              Run all pre-commit gates
     done                Task complete validation
+    flush [opts]        Commit state files to main (no PR). --dry-run, --check, --features
     docs [F-XXXX]       Draft docs from registry (STACK.md ## Docs)
     set [key] [value]   View/change settings (--show, --validate, --migrate)
     hooks <sub>         Manage git hooks (install|status|disable)
@@ -168,6 +169,8 @@ EXAMPLES:
     ag todo "Try new library"   # Capture idea to TODO.md
     ag todo list                # Show inbox items
     ag todo done T-0001 "done"  # Resolve item
+    ag flush                    # Commit state files to main
+    ag flush --dry-run          # Preview what would be flushed
     ag docs                     # Draft docs for current work
     ag docs --list              # Show doc registry
     ag auto init                # Set up auto mode settings
@@ -207,6 +210,7 @@ COMMANDS:
     todo <args>         Quick-capture ideas/tasks to TODO.md inbox
     commit              Run all pre-commit gates
     done [F-XXXX]       Feature complete validation
+    flush [opts]        Commit state files to main (no PR). --dry-run, --check, --features
     docs [F-XXXX]       Draft docs from registry (STACK.md ## Docs)
     set [key] [value]   View/change settings (--show, --validate, --migrate)
     hooks <sub>         Manage git hooks (install|status|disable)
@@ -246,6 +250,9 @@ EXAMPLES:
     ag todo "Try new library"   # Capture idea to TODO.md
     ag todo list                # Show inbox items
     ag todo done T-0001 "done"  # Resolve item
+    ag flush                    # Commit state files to main
+    ag flush --dry-run          # Preview what would be flushed
+    ag flush --features         # Include FEATURES.md status changes
     ag commit                   # Verify ready to commit
     ag done F-0042              # Check feature completion
     ag decompose F-0042         # Break epic into child features
@@ -2941,6 +2948,10 @@ case "${1:-help}" in
     nfr)
         shift
         cmd_nfr "$@"
+        ;;
+    flush)
+        shift
+        bash "$SCRIPT_DIR/state-commit.sh" "$@"
         ;;
     worktree)
         shift
