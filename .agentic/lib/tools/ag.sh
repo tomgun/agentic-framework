@@ -1348,6 +1348,36 @@ cmd_done() {
             fi
         fi
     fi
+
+    # VERSION bump + flush (only on main — worktrees skip this)
+    local current_branch
+    current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+    if [[ "$current_branch" == "main" || "$current_branch" == "master" ]]; then
+        # VERSION bump (patch by default)
+        if [ -f "$ROOT_DIR/VERSION" ]; then
+            local current_ver new_ver major minor patch_num
+            current_ver=$(tr -d '[:space:]' < "$ROOT_DIR/VERSION")
+            if [[ "$current_ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                IFS='.' read -r major minor patch_num <<< "$current_ver"
+                new_ver="${major}.${minor}.$((patch_num + 1))"
+                echo ""
+                echo -e "${BOLD}=== VERSION Bump ===${NC}"
+                echo "  $current_ver → $new_ver"
+                echo "$new_ver" > "$ROOT_DIR/VERSION"
+                echo -e "${GREEN}✓ VERSION bumped to $new_ver${NC}"
+            else
+                echo -e "${YELLOW}⚠ VERSION file format unexpected: $current_ver (skipping auto-bump)${NC}"
+            fi
+        fi
+
+        # Flush state files to main
+        echo ""
+        echo -e "${BOLD}=== Flushing State ===${NC}"
+        bash "$SCRIPT_DIR/state-commit.sh" --features || true
+    else
+        echo ""
+        echo -e "${BLUE}On branch '$current_branch' — run 'ag flush --features' after returning to main.${NC}"
+    fi
 }
 
 # Tools command - list all tools
