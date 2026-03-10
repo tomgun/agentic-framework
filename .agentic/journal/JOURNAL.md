@@ -1911,15 +1911,15 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
-### Session: 2026-03-10 15:00 - F-0198 Plan Durability
+### Session: 2026-03-10 15:03 - F-0200 PR1: State Machine Idempotency + intents.py
 
-**Why**: Prevent plan loss from ephemeral session storage
+**Why**: Prerequisite for intent journal: state machine must handle re-execution gracefully
 
 **What changed**:
-- Implemented plan-scan.sh standalone script and wired into ag sync as phase 9. Scans Claude and Cursor ephemeral plan dirs, copies unsaved plans to durable storage. Agent-agnostic design, extensible via plan_scan_dirs setting.
+- Fixed can_transition/transition idempotency (AC-001/002), created intents.py module with 7 functions and 38 unit tests (AC-003 through AC-009)
 
 **Next steps**:
-- Create PR for review
+- PR2: intent-helpers.sh + cmd_implement wiring
 
 **Blockers**: None
 
