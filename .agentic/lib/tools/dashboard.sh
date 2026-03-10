@@ -161,6 +161,7 @@ tips=(
     "Use \`ag specs\` to generate specs for existing code, domain by domain."
     "Run \`ag tools\` to discover all available framework tools and scripts."
     "Use \`ag backlog\` to view and manage the ordered work queue."
+    "Use \`ag flush\` to commit state files directly to main without a PR."
 )
 D_TIP="${tips[$((RANDOM % ${#tips[@]}))]}"
 
