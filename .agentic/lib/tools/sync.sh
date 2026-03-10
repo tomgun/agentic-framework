@@ -6,7 +6,7 @@
 #   bash .agentic/tools/sync.sh --check      # Dry run: detect only, no auto-fixes
 #   bash .agentic/tools/sync.sh --quiet      # One-line summary (for ag start probe)
 #
-# Nine check phases:
+# Ten check phases:
 #   1. Memory seed integrity
 #   2. State freshness (journal, STATUS, CHANGELOG)
 #   3. Feature reconciliation (Formal only)
@@ -16,6 +16,7 @@
 #   6. Git hook configuration
 #   7. Periodic checks (orphaned plans, retro, agent freshness)
 #   8. PR cleanup (auto-resolve merged/closed PRs in HUMAN_NEEDED.md)
+#   9. Plan durability (scan ephemeral plan dirs, copy unsaved plans)
 #
 # Exit code: always 0 (advisory tool).
 
@@ -844,6 +845,54 @@ phase_pr_cleanup() {
 }
 
 # ============================================================================
+# Phase 9: Plan durability (scan ephemeral plan dirs for unsaved plans)
+# ============================================================================
+phase_plan_scan() {
+    local plan_scan_script="$SCRIPT_DIR/plan-scan.sh"
+    if [ ! -f "$plan_scan_script" ]; then
+        return 0
+    fi
+
+    if [ "$MODE" = "quiet" ]; then
+        local output
+        output=$(bash "$plan_scan_script" --quiet 2>&1 || true)
+        if [ -n "$output" ]; then
+            record_issue "unsaved plans"
+        else
+            record_ok
+        fi
+    elif [ "$MODE" = "check" ]; then
+        local output
+        output=$(bash "$plan_scan_script" --check 2>&1 || true)
+        if echo "$output" | grep -q "unsaved\|detected"; then
+            record_issue "unsaved plans"
+            echo -e "Plans:      ${YELLOW}$(echo "$output" | head -1)${NC}"
+            echo "$output" | tail -n +2
+        else
+            record_ok
+            echo -e "Plans:      ${GREEN}OK${NC}"
+        fi
+    else
+        # Full mode: actually copy plans
+        local output
+        output=$(bash "$plan_scan_script" 2>&1 || true)
+        if echo "$output" | grep -q "saved to"; then
+            record_fixed
+            echo -e "Plans:      ${GREEN}FIXED ($(echo "$output" | head -1))${NC}"
+            echo "$output" | tail -n +2
+        elif echo "$output" | grep -q "already saved"; then
+            record_ok
+            echo -e "Plans:      ${GREEN}OK (ephemeral plans already saved)${NC}"
+        else
+            record_ok
+            if [ "$MODE" != "quiet" ]; then
+                echo -e "Plans:      ${GREEN}OK${NC}"
+            fi
+        fi
+    fi
+}
+
+# ============================================================================
 # Main
 # ============================================================================
 main() {
@@ -859,6 +908,7 @@ main() {
         phase_hooks
         phase_periodic
         phase_pr_cleanup
+        phase_plan_scan
 
         # Output one-line summary only if issues exist
         if [ "$ISSUE_COUNT" -gt 0 ]; then
@@ -891,6 +941,7 @@ main() {
     phase_hooks
     phase_periodic
     phase_pr_cleanup
+    phase_plan_scan
 
     # Summary
     echo ""
