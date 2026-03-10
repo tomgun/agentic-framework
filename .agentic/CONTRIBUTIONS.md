@@ -8,6 +8,10 @@
 
 ## Recent Contributions
 
+### Intent-Based Skill Triggers (v0.52.5)
+
+**User insight**: Tomas discovered that after merging F-0184's PR on GitHub and telling the agent "merged", the completing-work skill didn't fire — because the trigger description only listed exact keywords ("done", "complete", "finished", "wrapped up") and "merged" wasn't among them. The deeper insight was that the entire trigger approach was brittle: skill descriptions were being read as keyword lists rather than intent signals. Tomas pointed out that the fix shouldn't just add "merged" — it should make ALL skill triggers intent-based ("Match intent, not exact words") with keywords as examples rather than exhaustive lists. Applied across all 13 skills and memory-seed.
+
 ### Epic Decomposition (v0.52.4, F-0184)
 
 **User insight**: Tomas enforced the full post-plan dialectical review workflow, which caught 5 design issues in the original plan — the most critical being that the synthetic review pair approach (`check_review()` with a fake transition) would crash because the function validates against `TRANSITION_REVIEW_MAP`. The revision switched to using `get_setting()` directly. Tomas also caught that instruction files and documentation were missing from the initial implementation — reinforcing the framework's own "instruction files are part of the feature" rule. The review should have flagged these as missing, highlighting a gap in the review skill's checklist for framework development.
@@ -2733,7 +2737,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 ---
 
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.52.3
+**Current Version**: v0.52.5
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions

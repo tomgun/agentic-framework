@@ -1,9 +1,10 @@
 ---
 name: updating-documentation
 description: >
-  Update documentation and README files after feature work. Use when user says
-  "update docs", "write readme", "document this", "add docs", "update
-  documentation", or after completing a feature that needs doc updates.
+  Update documentation and README files after feature work. Use when the user
+  wants documentation updated — e.g. "update docs", "write readme", "document
+  this", "add docs", "update documentation", "sync docs", or after completing
+  a feature that needs doc updates. Match intent, not exact words.
   Do NOT use for: code changes (use implementing-features), reading docs for
   understanding (use exploring-codebase).
 compatibility: "Requires Claude Code with file access."
