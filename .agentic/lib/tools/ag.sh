@@ -156,6 +156,7 @@ COMMANDS:
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
     nfr [sub]           NFR management (list, discover, coverage)
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
+    intent [sub]        Manage intent journal (list|clear F-XXXX)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -177,6 +178,8 @@ EXAMPLES:
     ag auto init                # Set up auto mode settings
     ag auto status              # Check engine state
     ag auto pause               # Pause running engine
+    ag intent list              # Show pending/orphaned intents
+    ag intent clear F-0042      # Cancel a stuck intent
     ag sync                     # Full sync: detect + auto-fix
     ag sync --check             # Dry run: detect only
     ag commit                   # Verify ready to commit
@@ -228,6 +231,7 @@ COMMANDS:
     audit [options]     Spec verification & QA audit (--full, --status, --propagate)
     nfr [sub]           NFR management (list, discover, coverage)
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
+    intent [sub]        Manage intent journal (list|clear F-XXXX)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     status              Show current project status
@@ -281,6 +285,8 @@ EXAMPLES:
     ag docs --list              # Show doc registry from STACK.md
     ag docs --pr                # Draft PR-trigger docs only
     ag docs --check             # Dry run: what would be drafted
+    ag intent list              # Show pending/orphaned intents
+    ag intent clear F-0042      # Cancel a stuck intent
     ag sync                     # Full sync: detect + auto-fix
     ag sync --check             # Dry run: detect only
     ag verify --full            # Full verification
@@ -1527,6 +1533,124 @@ cmd_done() {
     if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
         intent_clear "$feature_id" || true
     fi
+}
+
+# Intent command — manage write-ahead intents for crash recovery (F-0200)
+cmd_intent() {
+    local subcmd="${1:-list}"
+    shift 2>/dev/null || true
+
+    local main_root="${MAIN_PROJECT_ROOT:-$ROOT_DIR}"
+    local intents_script="$SCRIPT_DIR/../auto/intents.py"
+
+    if [ ! -f "$intents_script" ]; then
+        echo -e "${RED}intents.py not found${NC}" >&2
+        return 1
+    fi
+    if ! command -v python3 >/dev/null 2>&1; then
+        echo -e "${RED}python3 required${NC}" >&2
+        return 1
+    fi
+
+    case "$subcmd" in
+        list)
+            echo -e "${BOLD}=== Intent Journal ===${NC}"
+            echo ""
+
+            # Current session intents
+            local sid_file="$main_root/.agentic/session/.current-session-id"
+            local session_id=""
+            if [ -f "$sid_file" ]; then
+                session_id=$(cat "$sid_file" 2>/dev/null | tr -d '[:space:]')
+            fi
+
+            if [ -n "$session_id" ]; then
+                local pending
+                pending=$(python3 "$intents_script" --project-root "$main_root" \
+                    get-pending --session-id "$session_id" 2>/dev/null || true)
+                if [ -n "$pending" ]; then
+                    echo -e "${YELLOW}Pending intents (current session):${NC}"
+                    echo "$pending" | python3 -c "
+import sys, json
+items = json.load(sys.stdin)
+for i in items:
+    fid = i.get('feature_id', '?')
+    cmd = i.get('command', '?')
+    target = i.get('target_state', '?')
+    remaining = i.get('steps_remaining', [])
+    completed = i.get('steps_completed', [])
+    attempts = i.get('attempt_count', 1)
+    print(f'  {fid}: ag {cmd} -> {target}')
+    print(f'    Completed: {completed}')
+    print(f'    Remaining: {remaining}')
+    print(f'    Attempts: {attempts}')
+    print()
+" 2>/dev/null || echo "  (parse error)"
+                else
+                    echo -e "${GREEN}No pending intents in current session.${NC}"
+                fi
+            else
+                echo -e "${DIM}No current session.${NC}"
+            fi
+
+            # Orphaned intents
+            local orphans
+            orphans=$(python3 "$intents_script" --project-root "$main_root" \
+                get-orphaned 2>/dev/null || true)
+            if [ -n "$orphans" ]; then
+                echo ""
+                echo -e "${YELLOW}Orphaned intents (from crashed sessions):${NC}"
+                echo "$orphans" | python3 -c "
+import sys, json
+items = json.load(sys.stdin)
+for i in items:
+    fid = i.get('feature_id', '?')
+    cmd = i.get('command', '?')
+    created = i.get('created_at', '?')
+    remaining = i.get('steps_remaining', [])
+    print(f'  {fid}: ag {cmd} (created {created})')
+    print(f'    Remaining: {remaining}')
+    print()
+" 2>/dev/null || echo "  (parse error)"
+                echo -e "${DIM}Run \`ag intent clear F-XXXX\` to discard, or \`ag sync\` to auto-adopt.${NC}"
+            fi
+
+            echo ""
+            ;;
+        clear)
+            local feature_id="${1:-}"
+            if [ -z "$feature_id" ]; then
+                echo "Usage: ag intent clear <F-XXXX>" >&2
+                return 1
+            fi
+
+            # Cancel intent (marks as cancelled, undoes completed steps)
+            intent_cancel "$feature_id"
+            local exit_code=$?
+
+            if [ $exit_code -eq 0 ]; then
+                echo -e "${GREEN}Cancelled intent for $feature_id${NC}"
+                echo -e "${DIM}Note: If worktree or WIP was created, remove manually if no longer needed.${NC}"
+            else
+                echo -e "${YELLOW}No active intent found for $feature_id${NC}"
+            fi
+            ;;
+        --help|-h|help)
+            echo "Usage: ag intent [list|clear] [options]"
+            echo ""
+            echo "  list              Show all intents (current session + orphaned)"
+            echo "  clear F-XXXX      Cancel intent and mark for cleanup"
+            echo ""
+            echo "Intents are write-ahead journal entries for crash recovery."
+            echo "When an ag command is interrupted, \`ag sync\` can resume from"
+            echo "the last checkpoint."
+            ;;
+        *)
+            echo "Unknown intent subcommand: $subcmd" >&2
+            echo "Run 'ag intent --help' for usage." >&2
+            return 1
+            ;;
+    esac
 }
 
 # Tools command - list all tools
@@ -3135,6 +3259,10 @@ case "${1:-help}" in
     worktree)
         shift
         bash "$SCRIPT_DIR/worktree.sh" "$@"
+        ;;
+    intent)
+        shift
+        cmd_intent "$@"
         ;;
     sync)
         cmd_sync "${2:-}"

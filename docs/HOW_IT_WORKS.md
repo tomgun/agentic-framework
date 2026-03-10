@@ -102,6 +102,9 @@ graph TB
         %% Backlog/Roadmap (v0.49.0)
         F_BACKLOG[Backlog Work Queue<br/>F-0190]
 
+        %% Intent Journal (v0.53.0)
+        F_INTENT[Intent Journal + Reconciliation<br/>F-0200]
+
         %% SDD Toolkit Insights (v0.39.0)
         F_SPEC_FORMAT[Spec Format Evolution<br/>F-0148]
         F_CLARIFICATION[Clarification Taxonomy<br/>F-0149]
@@ -122,6 +125,7 @@ graph TB
         M_DOCTOR_PY[doctor.py<br/>multi-phase verification]
         M_CONTEXT_ROLE[context-for-role.sh<br/>+ ALWAYS_INJECT]
         M_SYNC[sync.sh<br/>10-phase drift detection]
+        M_INTENTS[intents.py<br/>write-ahead intent journal]
         M_DISCOVER[discover.py<br/>brownfield analysis]
 
         %% Structural

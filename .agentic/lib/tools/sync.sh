@@ -17,6 +17,7 @@
 #   7. Periodic checks (orphaned plans, retro, agent freshness)
 #   8. PR cleanup (auto-resolve merged/closed PRs in HUMAN_NEEDED.md)
 #   9. Plan durability (scan ephemeral plan dirs, copy unsaved plans)
+#  10. Intent reconciliation (adopt orphans, resume pending)
 #
 # Exit code: always 0 (advisory tool).
 
@@ -893,6 +894,126 @@ phase_plan_scan() {
 }
 
 # ============================================================================
+# Phase 10: Intent reconciliation (adopt orphans, resume pending)
+# ============================================================================
+phase_intents() {
+    # Requires python3 and intents.py
+    local intents_script="$SCRIPT_DIR/../auto/intents.py"
+    if ! command -v python3 >/dev/null 2>&1 || [ ! -f "$intents_script" ]; then
+        return 0
+    fi
+
+    # Resolve main project root (for worktree-aware session storage)
+    local main_root="$ROOT_DIR"
+    if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+        local git_common git_dir
+        git_common=$(git rev-parse --git-common-dir 2>/dev/null) || true
+        git_dir=$(git rev-parse --git-dir 2>/dev/null) || true
+        if [ -n "$git_common" ] && [ -n "$git_dir" ] && [ "$git_common" != "$git_dir" ]; then
+            main_root=$(cd "$(dirname "$git_common")" && pwd)
+        fi
+    fi
+
+    local sid_file="$main_root/.agentic/session/.current-session-id"
+    local session_id=""
+    if [ -f "$sid_file" ]; then
+        session_id=$(cat "$sid_file" 2>/dev/null | tr -d '[:space:]')
+    fi
+
+    # Phase 9a: Adopt orphaned intents (dead PID, different session)
+    local orphans
+    orphans=$(python3 "$intents_script" --project-root "$main_root" get-orphaned 2>/dev/null || true)
+
+    if [ -n "$orphans" ]; then
+        # Generate session ID if we don't have one
+        if [ -z "$session_id" ]; then
+            mkdir -p "$main_root/.agentic/session" 2>/dev/null
+            if command -v uuidgen >/dev/null 2>&1; then
+                session_id=$(uuidgen 2>/dev/null | tr '[:upper:]' '[:lower:]')
+            elif [ -r /proc/sys/kernel/random/uuid ]; then
+                session_id=$(cat /proc/sys/kernel/random/uuid 2>/dev/null)
+            else
+                session_id=$(python3 -c "import uuid; print(uuid.uuid4())" 2>/dev/null)
+            fi
+            echo "$session_id" > "$sid_file" 2>/dev/null
+        fi
+
+        # Count orphans
+        local orphan_count
+        orphan_count=$(echo "$orphans" | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d))" 2>/dev/null || echo "?")
+        local orphan_features
+        orphan_features=$(echo "$orphans" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+print(', '.join(i.get('feature_id','?') for i in d))
+" 2>/dev/null || echo "?")
+
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "Intents:    ${YELLOW}$orphan_count orphaned intent(s) from crashed session ($orphan_features)${NC}"
+        fi
+
+        if [ "$MODE" = "full" ]; then
+            # Auto-adopt into current session
+            local adopted
+            adopted=$(python3 "$intents_script" --project-root "$main_root" \
+                adopt-orphans --session-id "$session_id" --pid "${PPID:-$$}" 2>/dev/null || true)
+            if [ -n "$adopted" ]; then
+                record_fixed
+                if [ "$MODE" != "quiet" ]; then
+                    echo -e "            ${GREEN}Adopted into current session. Run \`ag sync\` to resume.${NC}"
+                fi
+            fi
+        else
+            record_issue "$orphan_count orphaned intent(s)"
+            if [ "$MODE" != "quiet" ]; then
+                echo -e "            Fix: run \`ag sync\` (full mode) to adopt, or \`ag intent clear F-XXXX\` to discard"
+            fi
+        fi
+    fi
+
+    # Phase 9b: Check for pending intents in current session
+    if [ -n "$session_id" ]; then
+        local pending
+        pending=$(python3 "$intents_script" --project-root "$main_root" \
+            get-pending --session-id "$session_id" 2>/dev/null || true)
+
+        if [ -n "$pending" ]; then
+            local pending_count
+            pending_count=$(echo "$pending" | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d))" 2>/dev/null || echo "?")
+            local pending_features
+            pending_features=$(echo "$pending" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+for i in d:
+    fid = i.get('feature_id', '?')
+    cmd = i.get('command', '?')
+    remaining = len(i.get('steps_remaining', []))
+    completed = len(i.get('steps_completed', []))
+    attempts = i.get('attempt_count', 1)
+    print(f'  {fid}: ag {cmd} — {completed} done, {remaining} remaining (attempt {attempts})')
+" 2>/dev/null || echo "  (parse error)")
+
+            record_issue "$pending_count pending intent(s)"
+            if [ "$MODE" != "quiet" ]; then
+                echo -e "Intents:    ${YELLOW}$pending_count pending intent(s) from current session:${NC}"
+                echo -e "$pending_features"
+                echo -e "            Resume: re-run the original ag command, or \`ag intent clear F-XXXX\` to discard"
+            fi
+        elif [ -z "$orphans" ]; then
+            record_ok
+            if [ "$MODE" != "quiet" ]; then
+                echo -e "Intents:    ${GREEN}OK (no pending work)${NC}"
+            fi
+        fi
+    elif [ -z "$orphans" ]; then
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "Intents:    ${GREEN}OK (no session)${NC}"
+        fi
+    fi
+}
+
+# ============================================================================
 # Main
 # ============================================================================
 main() {
@@ -909,6 +1030,7 @@ main() {
         phase_periodic
         phase_pr_cleanup
         phase_plan_scan
+        phase_intents
 
         # Output one-line summary only if issues exist
         if [ "$ISSUE_COUNT" -gt 0 ]; then
@@ -942,6 +1064,7 @@ main() {
     phase_periodic
     phase_pr_cleanup
     phase_plan_scan
+    phase_intents
 
     # Summary
     echo ""

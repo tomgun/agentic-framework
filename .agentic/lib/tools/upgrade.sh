@@ -654,6 +654,25 @@ else
     fi
   fi
 
+  # Add intent journal entries to .gitignore (v0.53.0, F-0200)
+  if [[ -f "$TARGET_PROJECT_DIR/.gitignore" ]]; then
+    local gitignore_updated=false
+    if ! grep -q "intents.json" "$TARGET_PROJECT_DIR/.gitignore" 2>/dev/null; then
+      echo ".agentic/session/intents.json" >> "$TARGET_PROJECT_DIR/.gitignore"
+      gitignore_updated=true
+    fi
+    if ! grep -q ".current-session-id" "$TARGET_PROJECT_DIR/.gitignore" 2>/dev/null; then
+      echo ".agentic/session/.current-session-id" >> "$TARGET_PROJECT_DIR/.gitignore"
+      gitignore_updated=true
+    fi
+    if [[ "$gitignore_updated" == "true" ]]; then
+      echo -e "  ${GREEN}✓${NC} Added intent journal entries to .gitignore"
+    fi
+  fi
+
+  # Ensure .agentic/session/ exists for intent journal
+  mkdir -p "$TARGET_PROJECT_DIR/.agentic/session" 2>/dev/null
+
   # Migrate review_*: auto → skip in STACK.md (v0.51.0: "auto" renamed to "skip")
   if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
     if grep -qE "^[- ]*review_[a-z_]+:[[:space:]]*auto" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null; then
@@ -859,6 +878,7 @@ declare -a FEATURE_REGISTRY=(
   "0.39.0:User extensions:.agentic/local/extensions/:Custom skills, gates, hooks, rules that survive upgrades (F-0151)"
   "0.39.0:Semantic spec analysis:bash .agentic/tools/spec-analyze.sh F-XXXX:Advisory checks before implementation — ambiguity, NFR, coverage gaps (F-0152)"
   "0.39.0:AC-level test coverage:python3 .agentic/lib/tools/coverage.py --ac-coverage F-XXXX:Per-acceptance-criterion test mapping (F-0153)"
+  "0.53.0:Intent journal + crash recovery:ag intent list:Write-ahead log for ag implement/done with reconciliation via ag sync (F-0200)"
 )
 
 # Filter features based on version range
