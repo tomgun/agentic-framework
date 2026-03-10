@@ -1,6 +1,35 @@
 [
   {
     "type": "feature",
+    "id": "F-0197",
+    "description": "F-0197",
+    "added_at": "2026-03-10T12:28:44Z",
+    "added_by": "agent",
+    "became_current_at": "2026-03-10T12:28:49Z"
+  },
+  {
+    "type": "feature",
+    "id": "F-0198",
+    "description": "F-0198",
+    "added_at": "2026-03-10T12:28:43Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0199",
+    "description": "F-0199",
+    "added_at": "2026-03-10T12:28:43Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0200",
+    "description": "F-0200",
+    "added_at": "2026-03-10T12:28:42Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
     "id": "F-0186",
     "description": "Autonomous Scheduler (ADR-001 Phase 6)",
     "added_at": "2026-03-08T19:57:17Z",
