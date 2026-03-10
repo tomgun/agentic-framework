@@ -43,6 +43,8 @@ tests/llm/.test-state
 .agentic/session/crunch-state.json
 .agentic/session/.qa-tracker.json
 .agentic/session/screenshots/
+.agentic/session/intents.json
+.agentic/session/.current-session-id
 # Note: .agentic/journal/ IS committed (persistent history: manifests, lessons, plans, JOURNAL.md)
 
 # Local notes (not part of framework)
