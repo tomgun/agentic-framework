@@ -3325,3 +3325,75 @@ One command (`ag flush`) commits + pushes state-only changes directly to main wi
 
 **Acceptance**: spec/acceptance/F-0196.md
 
+## F-0197: FEATURES.md Registry Integrity + AC Verification Gate
+
+**Status**: planned
+**Category**: Reliability
+**Priority**: high
+**Complexity**: medium
+
+Fix 5 features with status/implementation mismatches (deprecate F-0033, F-0098; correct F-0179, F-0189, F-0190). Add drift-check tool comparing FEATURES.md status against AC completion. Add AC completion gate to `ag done` (<80% checked → warn/block). Part of Reliability Fix Plan (PR 1).
+
+**Dependencies**: None
+
+**Implementation**:
+- State: FEATURES.md data corrections, new drift-check.sh, AC gate in cmd_done
+- Code: .agentic/lib/tools/drift-check.sh, .agentic/lib/tools/ag.sh
+- Tests: validate_framework.sh
+
+**Acceptance**: spec/acceptance/F-0197.md
+
+## F-0198: Plan Durability (Multi-Tool Scan)
+
+**Status**: planned
+**Category**: Reliability
+**Priority**: medium
+**Complexity**: small
+
+Scan tool-specific plan directories (~/.claude/plans/, .cursor/plans/) for files mentioning F-XXXX IDs during `ag sync`. Auto-copy to `.agentic/journal/plans/` if not already saved. Prevents plan loss from session-scoped storage. Part of Reliability Fix Plan (PR 2). Closes T-0047.
+
+**Dependencies**: None
+
+**Implementation**:
+- State: sync.sh plan scan phase
+- Code: .agentic/lib/tools/sync.sh
+- Tests: validate_framework.sh
+
+**Acceptance**: spec/acceptance/F-0198.md
+
+## F-0199: Instruction File Sync Detection
+
+**Status**: planned
+**Category**: Reliability
+**Priority**: high
+**Complexity**: medium
+
+Detect when ag.sh commands are added but instruction files (CLAUDE.md, cursorrules, copilot, codex, auto_orchestration, memory-seed) are not updated. Parse ag.sh case statement, cross-reference against all 8+ instruction files. Wire into validate_framework.sh (warning initially) and pre-commit-check.sh. Part of Reliability Fix Plan (PR 3).
+
+**Dependencies**: None
+
+**Implementation**:
+- State: new instruction-sync.sh, validate_framework.sh wiring
+- Code: .agentic/lib/tools/instruction-sync.sh
+- Tests: validate_framework.sh, pre-commit-check.sh
+
+**Acceptance**: spec/acceptance/F-0199.md
+
+## F-0200: Intent Journal + Reconciliation
+
+**Status**: planned
+**Category**: Reliability
+**Priority**: high
+**Complexity**: large
+
+Write-ahead log for multi-step ag.sh operations (implement, done) with crash recovery via reconciliation in `ag sync`. Fixes gates.py/state_machine.py being defined but never invoked from CLI. Three enforcement modes (off/advisory/blocking) via STACK.md. Includes intents.py module, intent-helpers.sh extraction, reconciler with adopt-orphan recovery, `ag intent` commands. Prerequisite: state_machine.py idempotency fix. Part of Reliability Fix Plan (PRs 4-7).
+
+**Dependencies**: F-0197 (AC gate wired into cmd_done first)
+
+**Implementation**:
+- State: intents.py, intent-helpers.sh, ag.sh refactor, sync.sh reconciler
+- Code: .agentic/lib/auto/intents.py, .agentic/lib/tools/intent-helpers.sh, .agentic/lib/auto/state_machine.py
+- Tests: tests/test_intents.py, validate_framework.sh
+
+**Acceptance**: spec/acceptance/F-0200.md
+
