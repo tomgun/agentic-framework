@@ -4297,6 +4297,53 @@ else
   fail "T-0106: state-commit.sh missing push failure recovery"
 fi
 
+# --- F-0200: Intent Helpers (Write-Ahead Intent Journal) ---
+
+echo ""
+echo "--- F-0200: Intent Helpers (Write-Ahead Intent Journal) ---"
+
+# T-0107: intent-helpers.sh exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/intent-helpers.sh" ]]; then
+  pass "T-0107: intent-helpers.sh exists"
+else
+  fail "T-0107: intent-helpers.sh missing"
+fi
+
+# T-0108: intent-helpers.sh contains all 4 public functions
+intent_public_ok=true
+for func in intent_write intent_checkpoint intent_clear intent_cancel; do
+  if ! grep -q "^${func}()" "${FRAMEWORK_ROOT}/.agentic/lib/tools/intent-helpers.sh" 2>/dev/null; then
+    intent_public_ok=false
+    break
+  fi
+done
+if $intent_public_ok; then
+  pass "T-0108: intent-helpers.sh has all 4 public functions (write/checkpoint/clear/cancel)"
+else
+  fail "T-0108: intent-helpers.sh missing one or more public functions (intent_write/checkpoint/clear/cancel)"
+fi
+
+# T-0109: intent-helpers.sh contains internal helpers _get_main_root and _get_session_id
+intent_internal_ok=true
+for func in _get_main_root _get_session_id; do
+  if ! grep -q "^${func}()" "${FRAMEWORK_ROOT}/.agentic/lib/tools/intent-helpers.sh" 2>/dev/null; then
+    intent_internal_ok=false
+    break
+  fi
+done
+if $intent_internal_ok; then
+  pass "T-0109: intent-helpers.sh has internal helpers (_get_main_root, _get_session_id)"
+else
+  fail "T-0109: intent-helpers.sh missing internal helpers (_get_main_root or _get_session_id)"
+fi
+
+# T-0110: intent-helpers.sh is sourced by ag.sh
+if grep -q 'intent-helpers\.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+  pass "T-0110: ag.sh sources intent-helpers.sh"
+else
+  fail "T-0110: ag.sh does not source intent-helpers.sh"
+fi
+
 echo ""
 
 # ============================================================
