@@ -1356,7 +1356,7 @@ cmd_done() {
         # VERSION bump (patch by default)
         if [ -f "$ROOT_DIR/VERSION" ]; then
             local current_ver new_ver major minor patch_num
-            current_ver=$(cat "$ROOT_DIR/VERSION" | tr -d '[:space:]')
+            current_ver=$(tr -d '[:space:]' < "$ROOT_DIR/VERSION")
             if [[ "$current_ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
                 IFS='.' read -r major minor patch_num <<< "$current_ver"
                 new_ver="${major}.${minor}.$((patch_num + 1))"
