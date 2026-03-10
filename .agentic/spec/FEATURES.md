@@ -3087,7 +3087,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0185: Coordination Server for Agent Coordination
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: medium
 **Complexity**: high

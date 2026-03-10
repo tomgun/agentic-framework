@@ -1,22 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0185",
-    "description": "MCP Server for Agent Coordination (ADR-001 Phase 4)",
-    "added_at": "2026-03-08T19:57:19Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0185.md"
-    ],
-    "notes": "Real-time agent coordination layer.",
-    "depends_on": [
-      "F-0177",
-      "F-0180",
-      "F-0184"
-    ]
-  },
-  {
-    "type": "feature",
     "id": "F-0187",
     "description": "Multi-Repo Umbrella (ADR-001 Phase 3)",
     "added_at": "2026-03-08T19:57:20Z",

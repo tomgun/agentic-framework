@@ -1,0 +1,25 @@
+{
+  "feature": "F-0185",
+  "mode": "feature",
+  "generated": "2026-03-10T21:06:04Z",
+  "commits": [
+    {"hash": "1f88303", "date": "2026-03-10", "message": "Merge pull request #110 from tomgun/feature/F-0185-coordination-server", "additions": 0, "deletions": 0},
+    {"hash": "56c39d4", "date": "2026-03-10", "message": "docs: rewrite F-0185 contributions to credit design-phase inputs", "additions": 1, "deletions": 1},
+    {"hash": "d863bdf", "date": "2026-03-10", "message": "fix: address code review findings for coordination server", "additions": 70, "deletions": 34},
+    {"hash": "31229af", "date": "2026-03-10", "message": "feat: F-0185 Coordination Server for parallel agent coordination", "additions": 1860, "deletions": 17},
+    {"hash": "68abccd", "date": "2026-03-08", "message": "feat: decompose ADR-001 roadmap into 10 tracked features (F-0179–F-0188)", "additions": 370, "deletions": 0},
+    {"hash": "c015a4e", "date": "2026-03-08", "message": "feat: decompose ADR-001 roadmap into 10 tracked features (F-0179–F-0188)", "additions": 370, "deletions": 0}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/lib/auto/coord_server.py"}, {"file": ".agentic/lib/auto/coord_tools.py"}, {"file": ".agentic/lib/auto/state_machine.py"}, {"file": ".agentic/lib/tools/ag.sh"}, {"file": ".agentic/lib/tools/agents_helpers.py"}],
+    "tests": [{"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/acceptance/F-0179.md"}, {"file": ".agentic/spec/acceptance/F-0180.md"}, {"file": ".agentic/spec/acceptance/F-0181.md"}, {"file": ".agentic/spec/acceptance/F-0182.md"}, {"file": ".agentic/spec/acceptance/F-0183.md"}, {"file": ".agentic/spec/acceptance/F-0184.md"}, {"file": ".agentic/spec/acceptance/F-0185.md"}, {"file": ".agentic/spec/acceptance/F-0186.md"}, {"file": ".agentic/spec/acceptance/F-0187.md"}, {"file": ".agentic/spec/acceptance/F-0188.md"}, {"file": "tests/test_coord_server.py"}],
+    "docs": [{"file": ".agentic/CONTRIBUTIONS.md"}, {"file": ".agentic/STATUS.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/lib/agents/claude/CLAUDE.md"}, {"file": ".agentic/lib/agents/codex/codex-instructions.md"}, {"file": ".agentic/lib/agents/copilot/copilot-instructions.md"}, {"file": ".agentic/lib/agents/cursor/cursorrules.txt"}, {"file": ".agentic/lib/agents/shared/auto_orchestration.md"}, {"file": ".agentic/lib/init/STACK.template.md"}, {"file": ".agentic/lib/init/memory-seed.md"}, {"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/acceptance/F-0179.md"}, {"file": ".agentic/spec/acceptance/F-0180.md"}, {"file": ".agentic/spec/acceptance/F-0181.md"}, {"file": ".agentic/spec/acceptance/F-0182.md"}, {"file": ".agentic/spec/acceptance/F-0183.md"}, {"file": ".agentic/spec/acceptance/F-0184.md"}, {"file": ".agentic/spec/acceptance/F-0185.md"}, {"file": ".agentic/spec/acceptance/F-0186.md"}, {"file": ".agentic/spec/acceptance/F-0187.md"}, {"file": ".agentic/spec/acceptance/F-0188.md"}, {"file": "docs/HOW_IT_WORKS.md"}],
+    "config": []
+  },
+  "stats": {
+    "total_commits": 6,
+    "total_files": 29,
+    "additions": 2671,
+    "deletions": 52
+  }
+}
