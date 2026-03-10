@@ -164,6 +164,12 @@ tips=(
 )
 D_TIP="${tips[$((RANDOM % ${#tips[@]}))]}"
 
+# DIRTY STATE FILES (ag flush)
+D_DIRTY_STATE=0
+if [[ -f "$TOOLS_DIR/state-commit.sh" ]]; then
+    bash "$TOOLS_DIR/state-commit.sh" --check >/dev/null 2>&1 && D_DIRTY_STATE=1
+fi
+
 # STALE
 D_STALE="no"
 if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/backlog_helpers.py" ]]; then
@@ -207,6 +213,8 @@ if $RAW_MODE; then
     echo "$D_UPGRADE"
     echo "===TIP==="
     echo "$D_TIP"
+    echo "===DIRTY_STATE==="
+    echo "$D_DIRTY_STATE"
     echo "===STALE==="
     echo "$D_STALE"
     exit 0
@@ -277,6 +285,11 @@ fi
 # Conditional: active agents
 if [[ "$D_AGENTS" != "none" ]]; then
     echo "👥 Agents        $D_AGENTS"
+fi
+
+# Conditional: dirty state files
+if [[ "$D_DIRTY_STATE" -eq 1 ]]; then
+    echo "📤 Dirty state    Uncommitted state files. Run: ag flush"
 fi
 
 # Conditional: stale

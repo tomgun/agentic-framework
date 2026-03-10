@@ -1858,3 +1858,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-10 13:09 - F-0196 ag flush
+
+**Why**: State files accumulated dirty across sessions because PR workflow was disproportionate for bookkeeping changes
+
+**What changed**:
+- Framework now has ag flush command to commit state-only files directly to main without a PR — hardcoded allowlist enforces security boundary
+
+**Next steps**:
+- Merge PR, bump VERSION, mark shipped
+
+**Blockers**: None
+

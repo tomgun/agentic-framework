@@ -30,7 +30,7 @@ tokens: ~952
 
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 
-**Quick Commands**: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag spec` | `ag docs` | `ag todo`
+**Quick Commands**: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag spec` | `ag docs` | `ag todo`
 **Autonomous**: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch`
 
 ---

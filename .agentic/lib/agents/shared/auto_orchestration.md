@@ -76,6 +76,7 @@ What would you like to work on?
 | "review code" / "check this" | **Review** | Claude Code: delegate to review subagent (fresh context) via `reviewing-code` skill. Others: run `review_checklist.md` inline. |
 | "review blocked" / "approve transition" / "pending review" | **Review Checkpoint** | Run `ag review` to list pending. `ag review F-XXXX <state>` to resolve. |
 | "decompose" / "break down epic" / "split into children" | **Epic Decomposition** | Run `ag decompose F-XXXX`. Analyzes AC, proposes child features scoped to components, routes through review_decomposition. |
+| "flush state" / "commit state files" / dirty state after `ag done` | **State Flush** | Run `ag flush` (or `ag flush --features`) to commit state-only files directly to main. No PR needed. |
 
 ### Domain & Design Triggers
 

@@ -3307,3 +3307,21 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Acceptance**: spec/acceptance/F-0195.md
 
+## F-0196: Fluent State File Commits (ag flush)
+
+**Status**: in_progress
+**Category**: Developer Experience
+**Priority**: high
+**Complexity**: medium
+
+One command (`ag flush`) commits + pushes state-only changes directly to main without a PR. Uses a hardcoded allowlist as a security boundary — code changes still require PRs. Self-contained validation with `--no-verify` (stricter than the pre-commit hook).
+
+**Dependencies**: None
+
+**Implementation**:
+- State: state-commit.sh, ag.sh dispatch, dashboard integration
+- Code: .agentic/lib/tools/state-commit.sh
+- Tests: validate_framework.sh structural checks
+
+**Acceptance**: spec/acceptance/F-0196.md
+
