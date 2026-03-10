@@ -6,7 +6,7 @@ tokens: ~1130
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.52.6 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -83,6 +83,12 @@ If the user says "it must always...", "never do X", "performance must stay under
 If the user says decompose, break down, split into children, break apart, subdivide, or wants to turn a large feature into smaller child features:
 
 **STOP.** Run `ag decompose F-XXXX`. This analyzes the epic's acceptance criteria, maps them to components, proposes child features, and routes through the `review_decomposition` checkpoint. Child features get `Parent: F-XXXX` in FEATURES.md. The epic's status is automatically derived from its children's statuses after any child transition.
+
+## When the user wants to execute an epic autonomously
+
+If the user says execute epic, implement all children, run epic autonomously, process epic features, or wants to autonomously implement all child features of an epic:
+
+**STOP.** Run `ag auto epic F-XXXX`. This reads the epic's child features, schedules component-scoped workers with non-blocking reviews, and executes each child feature autonomously. Requires the epic to be decomposed first (children must exist in FEATURES.md with acceptance criteria).
 
 ## When a transition is blocked by a review checkpoint
 

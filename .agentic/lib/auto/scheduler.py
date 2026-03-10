@@ -175,7 +175,7 @@ class AutonomousScheduler:
                 break
 
             # Find actionable features
-            actionable = self._get_actionable(work_map)
+            actionable = self._get_actionable(work_map, result)
             review_blocked = [
                 fw for fw in work_map.values()
                 if fw.status == "review_blocked"
@@ -231,7 +231,11 @@ class AutonomousScheduler:
                             fw.review_blocked_at = self._get_blocked_transition(
                                 fw.feature_id,
                             )
-                            result.features_review_blocked += 1
+                            # AC-006: log escalation if review was created
+                            self._handle_escalation(
+                                fw.feature_id,
+                                f"blocked at {fw.review_blocked_at}",
+                            )
                         else:
                             fw.status = "failed"
                             result.features_failed += 1
@@ -308,9 +312,25 @@ class AutonomousScheduler:
         fw: FeatureWork,
         skip_pr: bool = False,
     ) -> TaskResult:
-        """Run a single feature via TaskRunner with component scoping."""
+        """Run a single feature via TaskRunner with component scoping.
+
+        AC-003: When a feature has a component, the worker is scoped to that
+        component's path via the component registry. This narrows the context
+        the worker agent sees.
+        """
+        # Resolve component-scoped project root if component is set
+        work_root = self.project_root
+        if fw.component:
+            from auto.components import load_registry
+            registry = load_registry(self.project_root)
+            comp = registry.get(fw.component)
+            if comp:
+                comp_path = self.project_root / comp.path
+                if comp_path.is_dir():
+                    work_root = comp_path
+
         runner = TaskRunner(
-            project_root=self.project_root,
+            project_root=work_root,
             claude_command=self.claude_command,
         )
         return runner.run(
@@ -322,11 +342,15 @@ class AutonomousScheduler:
 
     def _get_actionable(
         self, work_map: dict[str, FeatureWork],
+        result: SchedulerResult,
     ) -> list[FeatureWork]:
         """Find features that can make progress now.
 
         Actionable = pending AND not review-blocked AND has unblocked
         transitions in the state machine.
+
+        Side effects: marks already-shipped features as completed and
+        increments result.features_completed for accurate counts.
         """
         from auto.state_machine import FeatureStateMachine, FeatureState
 
@@ -349,6 +373,7 @@ class AutonomousScheduler:
                 continue
             if current in (FeatureState.SHIPPED, FeatureState.DEPRECATED):
                 fw.status = "completed"
+                result.features_completed += 1
                 continue
 
             next_states = sm.get_next_states(fid)
@@ -386,7 +411,6 @@ class AutonomousScheduler:
 
         Returns True if a review was resolved, False if timed out.
         """
-        blocked_ids = [fw.feature_id for fw in blocked]
         print(
             f"\nAll {len(blocked)} remaining features blocked on review:",
             file=sys.stderr,
