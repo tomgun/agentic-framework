@@ -23,6 +23,8 @@
 | 9 | [Deliberate Context Management](#9-deliberate-context-management) | Curated context beats "read everything" — CONTEXT_PACK, specs, role manifests, fresh subagents | 5–10K focused vs 100K+ bloated |
 | 10 | [Dialectical Plan Review](#10-dialectical-plan-review--trust-only-the-critics-words) | Multi-round Critic + Advocate review; trust only the Critic | Catches design flaws before implementation |
 | 11 | [Revision Guidance — Don't Trust the Critic Blindly](#11-revision-guidance--dont-trust-the-critic-blindly) | Critic finds real issues but proposes wrong fixes — planner must judge | Prevents removing features that were the whole point |
+| 12 | [LLM-Optimized Formats](#12-llm-optimized-formats-for-everything) | Structure all files so LLMs parse them efficiently — frontmatter, markdown, tables | Faster parsing, fewer misunderstandings, less re-reading |
+| 13 | [Plans Are Never Done After One Pass](#13-plans-are-never-done-after-one-pass) | AI plans are impressive but always have gaps — multi-round review is essential, not optional | Catches flaws that cost 10x more to fix in code |
 
 **Meta-lesson**: structural enforcement > behavioral instructions > hope.
 
@@ -46,11 +48,11 @@
 
 **The problem**: Agents need different instructions for different tasks — implementing a feature requires different workflow than committing code or reviewing a PR. You can't put all workflows in the instruction file (see insight #1). Loading everything at start wastes context.
 
-**What works**: Claude Code's Skills system — each workflow is a self-contained bundle (instructions + scripts + references) with a YAML frontmatter description. Only the descriptions (~900 tokens total for 12 skills) are loaded at session start. When a user says "implement feature X", Claude matches the intent to the `implementing-features` skill and loads ONLY that skill's full instructions.
+**What works**: Claude Code's Skills system — each workflow is a self-contained bundle (instructions + scripts + references) with a YAML frontmatter description. Only the descriptions (~900 tokens total for 13 skills) are loaded at session start. When a user says "implement feature X", Claude matches the intent to the `implementing-features` skill and loads ONLY that skill's full instructions.
 
 **Why this is powerful**:
 - **Intent matching, not keyword matching**: Frontmatter descriptions use natural language. "build", "create", "add feature" all trigger `implementing-features` without explicit keyword lists in the instruction file.
-- **Progressive disclosure**: 12 skills × ~2K tokens each = ~24K of workflow instructions. Only ~900 tokens loaded always. The rest loads just-in-time. ~96% token savings.
+- **Progressive disclosure**: 13 skills × ~2K tokens each = ~26K of workflow instructions. Only ~900 tokens loaded always. The rest loads just-in-time. ~96% token savings.
 - **Composable**: Each skill is independent. Adding a new workflow doesn't bloat the main instruction file or interfere with others.
 - **Testable**: You can verify skill triggering with LLM behavioral tests (does "fix this bug" activate the test-first workflow?).
 
@@ -89,7 +91,7 @@
 
 **The problem**: You can write "never commit without updating the journal" in the instruction file. The agent will follow it... sometimes. Under context pressure, after long sessions, with competing priorities — behavioral rules get dropped. The more rules you add, the less reliably any single rule is followed.
 
-**What works**: `pre-commit-check.sh` as a git hook. It runs 17 checks automatically on every commit attempt. The agent literally cannot commit if the journal is stale, if acceptance criteria files are missing, if there's active WIP from another agent, or if complexity limits are exceeded. No instruction needed — the commit just fails with a clear error message telling the agent what to fix.
+**What works**: `pre-commit-check.sh` as a git hook. It runs 16 checks automatically on every commit attempt. The agent literally cannot commit if the journal is stale, if acceptance criteria files are missing, if there's active WIP from another agent, or if complexity limits are exceeded. No instruction needed — the commit just fails with a clear error message telling the agent what to fix.
 
 **The hierarchy**:
 1. **Structural gates** (script exit codes): Cannot be bypassed. Agent must fix the issue. Examples: pre-commit hook, `ag implement` requiring spec files, `ag done` validation.
@@ -106,7 +108,7 @@
 
 **The counterbalance**: Not everything should be a hard gate. Soft warnings (scope drift, change size, advisory checks) are better for signals that require human judgment. Hard gates for invariants; soft warnings for heuristics.
 
-**See**: `.agentic/lib/PRINCIPLES.md` D2 (Deterministic Enforcement), `docs/INSTRUCTION_ARCHITECTURE.md` §5.1
+**See**: `.agentic/lib/PRINCIPLES.md` D2 (Deterministic Enforcement), `docs/INSTRUCTION_ARCHITECTURE.md` §5
 
 ---
 
@@ -181,7 +183,7 @@ Design your workflow around this reality. Every valuable output must reach a git
 
 **The problem**: You write an instruction. Does the agent follow it? You don't know unless you test. Different models interpret the same instruction differently. Updates to instruction files can silently break compliance.
 
-**What works**: A test suite (48+ tests) that runs real LLM prompts against the framework's instruction files and checks agent behavior. "Given this instruction file, when the user says 'implement feature X', does the agent run `ag implement`?" (LLM-003). "When asked to commit, does the agent check for human approval?" (LLM-005).
+**What works**: A test suite (62+ tests) that runs real LLM prompts against the framework's instruction files and checks agent behavior. "Given this instruction file, when the user says 'implement feature X', does the agent run `ag implement`?" (LLM-003). "When asked to commit, does the agent check for human approval?" (LLM-005).
 
 **The key insight**: Instruction files are code. They need tests. Without tests, you're guessing whether your instructions work. With tests, you can refactor instruction files, slim them down, move content to skills — and verify nothing broke.
 
@@ -248,6 +250,55 @@ Design your workflow around this reality. Every valuable output must reach a git
 
 ---
 
+## 12. LLM-Optimized Formats for Everything
+
+**The problem**: LLMs process text sequentially. A 500-line unstructured log, a deeply nested JSON config, or a prose paragraph explaining a feature's status all cost the same tokens to read — but yield vastly different comprehension. Most project files are written for humans (or for machines via JSON/YAML). Neither format is optimized for what LLMs actually need: structured, scannable, self-describing content with clear semantic boundaries.
+
+**What works today**: The framework already uses LLM-friendly patterns in many places:
+
+- **YAML frontmatter on everything**: 168 of 212 `.agentic/` files have frontmatter with `summary` and `tokens` fields. An agent can read the 2-line summary (~20 tokens) instead of the full file (~2K tokens) to decide if it's relevant. This enables ~96% discovery savings.
+- **Structured markdown with clear headings**: FEATURES.md, JOURNAL.md, STATUS.md all use consistent heading hierarchies and field patterns (`**Status**: shipped`, `**Added**: date`). LLMs can grep/parse these reliably without understanding natural language.
+- **Tables over prose**: The trigger word table (insight #5) works because it's a compact lookup structure, not a paragraph. Same for the summary table at the top of this document — an LLM can route to the right section without reading 250 lines.
+- **Token-efficient scripts as interfaces**: Instead of "read this file and understand its format", the agent calls `journal.sh` with structured arguments. The format is hidden behind a script API.
+
+**What's still missing** (future work):
+- **Spec files**: Acceptance criteria are free-form markdown. A structured format (e.g., each AC as a YAML block with `id`, `description`, `testable`, `checked` fields) would enable automated parsing, dependency graphing, and progress tracking without LLM interpretation.
+- **State files**: STATUS.md and JOURNAL.md use markdown that requires some parsing intelligence. Machine-readable structured formats (with markdown rendering for humans) would make agent access more deterministic.
+- **Config consolidation**: Settings are split across STACK.md (grep-parsed), profiles.conf, and various script defaults. A single structured config (YAML/TOML) with schema validation would reduce the "where is this setting?" problem for both agents and humans.
+- **Conversation-to-artifact extraction**: Much valuable context lives in conversation transcripts (design decisions, rejected alternatives, rationale). No systematic format exists for extracting and persisting these as structured, LLM-queryable artifacts.
+
+**The principle**: Every file an LLM reads should be structured for LLM consumption. Frontmatter for discovery. Clear field patterns for parsing. Tables for lookup. Prose only for content that genuinely requires natural language (explanations, rationale, design discussion).
+
+**See**: `docs/research/2026-03-01-frontmatter-context-impact.md`, `.agentic/lib/PRINCIPLES.md` F3 (Token Optimization)
+
+---
+
+## 13. Plans Are Never Done After One Pass
+
+**The problem**: Modern AI models produce impressively detailed implementation plans. A single Claude or Cursor planning session can generate a multi-phase plan with file lists, dependency ordering, and risk analysis in minutes. It *looks* complete. It *feels* authoritative. And in our experience, it is **always still wrong in important ways**.
+
+**What we've seen repeatedly**: Every single plan in 53 versions of this framework — without exception — had issues that only surfaced after review:
+
+- **Missing integration points**: The plan describes component A and component B perfectly, but doesn't wire them together. Functions are defined but never called from entry points. Gates are created but never registered in the CLI. F-0177 had 65 passing unit tests and a completely unwired state machine.
+- **Contradicting the project's own rules**: The plan proposes a solution that violates existing principles or shipped specs. The AI doesn't have full context of every rule, and plans are where these gaps surface.
+- **Over-engineering**: The plan adds abstractions, configurability, and future-proofing that nobody asked for. Left unchecked, a 3-file feature becomes a 15-file architecture.
+- **Under-specifying edge cases**: The happy path is detailed. Error handling, concurrency, cleanup on failure — these are hand-waved or missing entirely.
+- **Scope creep disguised as thoroughness**: The plan includes "while we're at it" items that seem logical but double the implementation effort.
+
+**What works**: Treat every plan as a **first draft**, no matter how impressive it looks. The dialectical review process (insight #10) exists precisely because of this pattern. But even without formal review, the minimum discipline is:
+
+1. **Read the plan skeptically**: Ask "what's missing?" not "does this look good?"
+2. **Check wiring**: For every new function/gate/endpoint, verify the plan shows where it's called from
+3. **Check against existing constraints**: Does this plan respect shipped specs? Existing principles? Current architecture?
+4. **Size check**: Count the files. If it's >10 for what seemed like a simple feature, the plan has scope creep
+5. **Multiple rounds**: Plan → review → revise → review again. Two rounds minimum for anything non-trivial
+
+**The meta-lesson**: AI plans are a massive productivity multiplier — they compress hours of human design into minutes. But they're a starting point, not a finished product. The value isn't in the first plan; it's in the second or third revision after adversarial review. Building this review loop into your workflow (not as an optional step but as a structural requirement) is what separates projects that ship from projects that debug.
+
+**See**: Insights #10 (Dialectical Review) and #11 (Revision Guidance), `FRAMEWORK_DEVELOPMENT.md` § "Plans given as user messages don't auto-save"
+
+---
+
 ## Summary: The Pattern
 
 These insights form a coherent pattern:
@@ -265,6 +316,8 @@ Tiny instruction file (50 lines)     → agent reads it all, reliably
   + Deliberate context management    → right context to right agent
   + Dialectical plan review          → opposing perspectives catch flaws
   + Revision guidance                → accept findings, prescribe your own fixes
+  + LLM-optimized formats            → structure files for AI consumption
+  + Plans are never done in one pass → review loop is essential, not optional
 ```
 
 The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation.
