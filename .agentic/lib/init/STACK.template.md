@@ -37,6 +37,8 @@ Purpose: a single source of truth for "how we build and run software here".
 # Advisory spec analysis before implementation. Profile defaults — Discovery: off | Formal: on
 - worktree_mode: off
 # Auto-create worktrees for feature branches. Options: off | always. Profile defaults — Discovery: off | Formal: off
+- state_enforcement: off
+# Intent journal state enforcement. off: crash recovery only (skip transitions). advisory: warn on gate failures. blocking: block on gate failures. Profile defaults — Discovery: off | Formal: advisory
 
 ### Periodic checks
 - periodic_orphaned_plans: every_session

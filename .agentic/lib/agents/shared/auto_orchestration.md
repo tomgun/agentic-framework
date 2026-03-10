@@ -52,6 +52,7 @@ What would you like to work on?
 | Situation | Response |
 |-----------|----------|
 | `wip.sh check` detects active WIP (AGENTS.json) | "⚠️ Previous work interrupted! Continue, review, or rollback?" |
+| `ag intent list` shows orphaned intents | "⚠️ Found interrupted work from crashed session. Run `ag sync` to adopt or `ag intent clear F-XXXX` to discard." |
 | HUMAN_NEEDED has items | "📋 [N] items need your input" |
 | Upgrade pending | "🔄 Framework upgraded to vX.Y.Z, applying updates..." |
 
@@ -77,6 +78,7 @@ What would you like to work on?
 | "review blocked" / "approve transition" / "pending review" | **Review Checkpoint** | Run `ag review` to list pending. `ag review F-XXXX <state>` to resolve. |
 | "decompose" / "break down epic" / "split into children" | **Epic Decomposition** | Run `ag decompose F-XXXX`. Analyzes AC, proposes child features scoped to components, routes through review_decomposition. |
 | "flush state" / "commit state files" / dirty state after `ag done` | **State Flush** | Run `ag flush` (or `ag flush --features`) to commit state-only files directly to main. No PR needed. |
+| "interrupted" / "crashed" / "stuck" / "orphaned" / "resume work" | **Intent Recovery** | Run `ag intent list` to see pending/orphaned intents. `ag intent clear F-XXXX` to discard. `ag sync` auto-adopts orphans from crashed sessions. |
 
 ### Domain & Design Triggers
 
