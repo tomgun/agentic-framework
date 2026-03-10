@@ -43,6 +43,9 @@ tests/llm/.test-state
 .agentic/session/crunch-state.json
 .agentic/session/scheduler-state.json
 .agentic/session/.qa-tracker.json
+.agentic/session/coord.pid
+.agentic/session/coord.token
+.agentic/session/coord.log
 .agentic/session/screenshots/
 .agentic/session/intents.json
 .agentic/session/.current-session-id

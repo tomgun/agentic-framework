@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0186 Autonomous Scheduler: implemented, 19 tests passing, ready for PR review (Updated: 2026-03-10 19:35 EET)
+- F-0185 Coordination Server — PR ready (Updated: 2026-03-10 22:37 EET)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

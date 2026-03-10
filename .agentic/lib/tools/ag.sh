@@ -150,6 +150,7 @@ COMMANDS:
     tools               List all available tools by category
     backlog <sub>       Ordered work queue (add|list|done|move|remove|clear)
     auto <sub>           Autonomous workflow (init|epic|status|pause|resume|stop|feedback)
+    coord <sub>          Coordination server (start|stop|status)
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     decompose F-XXXX    Break epic into child features by component
@@ -225,6 +226,7 @@ COMMANDS:
     tools               List all available tools by category
     backlog <sub>       Ordered work queue (add|list|done|move|remove|clear)
     auto <sub>           Autonomous workflow (init|epic|status|pause|resume|stop|feedback)
+    coord <sub>          Coordination server (start|stop|status)
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     decompose F-XXXX    Break epic into child features by component
@@ -1913,6 +1915,38 @@ cmd_auto() {
     esac
 }
 
+# Coordination server command (F-0185)
+cmd_coord() {
+    local subcmd="${1:-}"
+    shift 2>/dev/null || true
+
+    local auto_dir="$SCRIPT_DIR/../auto"
+
+    case "$subcmd" in
+        start|stop|status)
+            python3 "$auto_dir/coord_server.py" "$subcmd" --project-root "$ROOT_DIR" "$@"
+            ;;
+        ""|--help)
+            echo "ag coord - Coordination Server for parallel agent coordination"
+            echo ""
+            echo "COMMANDS:"
+            echo "  start [--port N] [--bind ADDR]   Start coordination server"
+            echo "  stop                              Stop coordination server"
+            echo "  status                            Check server status"
+            echo ""
+            echo "SETTINGS (in STACK.md):"
+            echo "  coord_enabled: yes|no             Enable server (default: no)"
+            echo "  coord_port: 4185                  HTTP port"
+            echo "  coord_bind: 127.0.0.1             Bind address (0.0.0.0 for Docker)"
+            ;;
+        *)
+            echo -e "${RED}Unknown coord command: $subcmd${NC}"
+            echo "Run 'ag coord --help' for usage."
+            exit 1
+            ;;
+    esac
+}
+
 # Sync command - unified drift detection + auto-fix
 cmd_sync() {
     local flag="${1:-}"
@@ -3237,6 +3271,10 @@ case "${1:-help}" in
     auto)
         shift
         cmd_auto "$@"
+        ;;
+    coord)
+        shift
+        cmd_coord "$@"
         ;;
     backlog)
         shift

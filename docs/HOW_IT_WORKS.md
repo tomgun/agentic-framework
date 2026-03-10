@@ -414,6 +414,100 @@ graph LR
 
 ---
 
+## Coordination Server (v0.53.0)
+
+The coordination server (F-0185) provides a network-accessible JSON-RPC API for parallel agent coordination, remote review approval, and mobile status monitoring.
+
+### Architecture
+
+```mermaid
+flowchart TB
+    subgraph Clients["Clients (all require Bearer token)"]
+        MOBILE[Mobile/Web]
+        HOST[Host Claude]
+        DOCKER[Docker Claude]
+        ORG[Organizer Agent]
+    end
+
+    Clients --> SERVER["Coordination Server<br/>HTTP JSON-RPC 2.0<br/>127.0.0.1:4185"]
+
+    SERVER --> TOOLS[Tool Layer]
+
+    TOOLS --> SM[state_machine.py]
+    TOOLS --> REV[review.py]
+    TOOLS --> AH[agents_helpers.py]
+
+    SM --> FS[".agentic/* files<br/>(sole source of truth)"]
+    REV --> FS
+    AH --> FS
+
+    style SERVER fill:#3498db,color:#fff
+    style FS fill:#27ae60,color:#fff
+```
+
+### 8 Coordination Tools
+
+| Tool | Delegates To | Purpose |
+|------|-------------|---------|
+| `claim_feature` | `agents_helpers.cmd_claim()` | Atomically assign a feature to an agent (PID-tracked) |
+| `release_feature` | `agents_helpers.cmd_release()` | Release a feature claim |
+| `transition_state` | `FeatureStateMachine.transition()` | Move feature forward/back (review_mode=skip via RPC) |
+| `get_unblocked` | `FeatureStateMachine.get_unblocked()` | Query features with available forward transitions |
+| `poll_changes` | File mtime check on FEATURES.md + AGENTS.json | Stateless change detection since a timestamp |
+| `report_status` | `agents_helpers.cmd_checkpoint()` | Agent progress update |
+| `request_review` | `review.create_pending_review()` | Submit feature for review |
+| `submit_review` | `review.resolve_review()` | Approve or reject a pending review |
+
+### Key Design Principles
+
+**Files are authoritative**: No in-memory cache. Every request reads directly from `.agentic/` files. Cache invalidation is a solved problem — by not having a cache.
+
+**Two-scope locking**: `threading.Lock` serializes intra-process requests (HTTP threads). `fcntl.flock` serializes inter-process file access (CLI + server). Both are cheap (microseconds) and both are necessary because `fcntl.flock` is per-fd, not per-thread.
+
+**Stale claim detection**: `claim_feature` stores the claiming process's PID. On each new claim, dead PIDs are detected via `os.kill(pid, 0)` and their entries are auto-released. This prevents crashed agents from permanently blocking features.
+
+**Stateless polling**: `poll_changes(since=timestamp)` checks file mtimes and returns current state if anything changed. No per-client snapshots, no memory growth, no client identity needed (bearer token is shared).
+
+### Auth Model
+
+- Bearer token generated on `ag coord start` — random 32-byte hex
+- Written to `.agentic/session/coord.token` (0600 permissions)
+- Required on all `/rpc` requests, not required for `/health`
+- Default bind: `127.0.0.1` (local only); Docker mode: `0.0.0.0`
+
+### CLI
+
+```
+ag coord start [--port N] [--bind ADDR]   # Start server (foreground)
+ag coord stop                              # Stop running server
+ag coord status                            # Check if server is running
+```
+
+### STACK.md Settings
+
+```
+- coord_enabled: no          # Enable coordination server (yes|no)
+- coord_port: 4185           # HTTP port
+- coord_bind: 127.0.0.1      # Bind address (0.0.0.0 for Docker)
+```
+
+### Graceful Degradation
+
+The server is optional. Without it, the framework uses file-based coordination (the default for `ag implement`, `ag done`, etc.). The server adds network accessibility — it does not replace the file-based path. CLI commands and the autonomous scheduler continue to work identically whether the server is running or not.
+
+### Endgame Support
+
+| Capability | How |
+|-----------|-----|
+| Parallel feature workers | `claim_feature` prevents conflicts atomically |
+| Organizer + workers | Organizer calls `get_unblocked`, workers `claim_feature` |
+| Remote review approval | `submit_review` via HTTP from phone |
+| Remote status monitoring | `poll_changes` from any HTTP client |
+| Future MCP adapter | Thin MCP protocol wrapper in front of this server |
+| Future web dashboard | Server already speaks HTTP JSON — add a static page |
+
+---
+
 ## Formal Feature State Machine (v0.47.0)
 
 Features follow a 9-state lifecycle enforced by `state_machine.py` + `gates.py`:
@@ -847,7 +941,7 @@ These will always rely on behavioral reinforcement:
 `discover.py`, `discover.sh`, `render_proposals.py`, `accept.py`/`accept.sh`
 
 ### Multi-Agent
-`context-for-role.sh`, `worktree.sh`, `setup-agent.sh`, `suggest-agents.sh`, `create-agent.sh`, `project-health.sh`
+`context-for-role.sh`, `worktree.sh`, `setup-agent.sh`, `suggest-agents.sh`, `create-agent.sh`, `project-health.sh`, `coord_server.py`, `coord_tools.py`
 
 ### Sync & Maintenance
 
