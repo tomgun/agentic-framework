@@ -234,6 +234,16 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--   - No PR creation, fast iteration -->
 <!--   - Use: git_workflow: direct -->
 
+## Coordination server (optional)
+<!-- Network-accessible coordination API for parallel agents, remote review, and mobile monitoring. -->
+<!-- See: F-0185 — `ag coord start|stop|status` -->
+- coord_enabled: no
+# Enable coordination server (yes|no)
+- coord_port: 4185
+# HTTP port
+- coord_bind: 127.0.0.1
+# Bind address (0.0.0.0 for Docker)
+
 ## Multi-agent coordination (optional)
 <!-- Multiple AI agents working simultaneously. See .agentic/lib/workflows/multi_agent_coordination.md -->
 <!-- - multi_agent_enabled: no  # yes | no -->

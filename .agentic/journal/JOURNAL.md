@@ -1988,3 +1988,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-10 22:36 - F-0185 Coordination Server
+
+**Why**: Enable parallel agents, remote review, and mobile monitoring via network API
+
+**What changed**:
+- HTTP JSON-RPC coordination server with 8 tools, atomic claim/release, concurrent access safety, bearer auth, 60 tests, full docs in HOW_IT_WORKS.md
+
+**Next steps**:
+- PR review, then ag done F-0185
+
+**Blockers**: None
+
+
+### Session: 2026-03-10 22:51 - F-0185 review fixes
+
+**Why**: Code review of PR #110 found HIGH issue (review checkpoints not actually skipped in RPC) plus MEDIUM/LOW security and reliability issues
+
+**What changed**:
+- Fixed 4 code review findings: skip_review param on transition(), flag-based SIGTERM handler, idempotent cleanup guard, constant-time token comparison. Added CONTRIBUTIONS.md entry.
+
+**Next steps**:
+- Push to PR, merge
+
+**Blockers**: None
+

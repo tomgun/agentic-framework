@@ -544,6 +544,7 @@ For hands-off execution. Require test commands in STACK.md; task/crunch require 
 - "implement F-XXXX hands-off" → `ag auto task F-XXXX`
 - "process all planned features" → `ag auto crunch`
 - "execute this epic" / "implement all children of F-XXXX" → `ag auto epic F-XXXX`
+- "start coordination server" / "parallel agents" / "remote control" → `ag coord start`
 - Project has E2E + screenshots → suggest `--visual`
 
 ### Session Protocols

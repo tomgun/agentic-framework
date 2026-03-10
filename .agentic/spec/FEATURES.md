@@ -3085,22 +3085,22 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ---
 
-## F-0185: MCP Server for Agent Coordination
+## F-0185: Coordination Server for Agent Coordination
 
-**Status**: planned
+**Status**: in_progress
 **Category**: Autonomous
 **Priority**: medium
 **Complexity**: high
 **Since**: v0.51.0
 
-**Description**: Python MCP server with 8 tools: `claim_feature`, `release_feature`, `transition_state`, `get_unblocked`, `subscribe_state`, `report_status`, `request_review`, `submit_review`. Thin wrapper delegating to existing classes. Graceful degradation: if MCP unavailable, framework uses file-based coordination. ADR-001 Phase 6, Section 4.
+**Description**: HTTP JSON-RPC coordination server with 8 tools: `claim_feature`, `release_feature`, `transition_state`, `get_unblocked`, `poll_changes`, `report_status`, `request_review`, `submit_review`. Delegates to existing Python classes. Files remain authoritative (no in-memory cache). Bearer token auth, binds 127.0.0.1:4185 by default. Graceful degradation: without server, framework uses file-based coordination. ADR-001 Phase 6, Section 4.
 
 **Dependencies**: F-0177, F-0180, F-0184
 
 **Implementation**:
 - State: none
-- Code: `.agentic/lib/auto/mcp_server.py` (new), `.agentic/lib/auto/mcp_tools.py` (new), modifications to `ag.sh`, `engine.py`
-- Tests: `tests/test_mcp_server.py` (new)
+- Code: `.agentic/lib/auto/coord_server.py` (new), `.agentic/lib/auto/coord_tools.py` (new), modifications to `ag.sh`, `agents_helpers.py`
+- Tests: `tests/test_coord_server.py` (new)
 
 **Acceptance**: See `spec/acceptance/F-0185.md`
 

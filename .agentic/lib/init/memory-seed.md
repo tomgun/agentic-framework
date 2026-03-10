@@ -6,7 +6,7 @@ tokens: ~1130
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.52.6 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -89,6 +89,12 @@ If the user says decompose, break down, split into children, break apart, subdiv
 If the user says execute epic, implement all children, run epic autonomously, process epic features, or wants to autonomously implement all child features of an epic:
 
 **STOP.** Run `ag auto epic F-XXXX`. This reads the epic's child features, schedules component-scoped workers with non-blocking reviews, and executes each child feature autonomously. Requires the epic to be decomposed first (children must exist in FEATURES.md with acceptance criteria).
+
+## When the user wants parallel agent coordination
+
+If the user says start coordination server, parallel agents, remote control, remote review, mobile status, or wants multiple agents working in parallel on different features:
+
+**STOP.** Run `ag coord start` to start the coordination server. This provides an HTTP JSON-RPC API (default 127.0.0.1:4185) with 8 tools: claim_feature, release_feature, transition_state, get_unblocked, poll_changes, report_status, request_review, submit_review. Bearer token auth is generated automatically. Use `ag coord status` to check and `ag coord stop` to shut down.
 
 ## When a transition is blocked by a review checkpoint
 

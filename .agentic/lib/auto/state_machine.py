@@ -312,11 +312,19 @@ class FeatureStateMachine:
         feature_id: str,
         target: FeatureState,
         dry_run: bool = False,
+        skip_review: bool = False,
     ) -> tuple[bool, list[str]]:
         """Execute a state transition.
 
         Updates FEATURES.md status field via feature.sh for consistency.
         Returns (success, messages).
+
+        Args:
+            skip_review: If True, bypass review checkpoints entirely. Used by
+                the coordination server (RPC) to prevent blocking all requests
+                while a critical-agent review runs (60+ seconds under the
+                dispatch lock). Transitions requiring review should go through
+                the CLI/file-based path instead.
         """
         allowed, messages = self.can_transition(feature_id, target)
         if not allowed:
@@ -331,25 +339,26 @@ class FeatureStateMachine:
             ]
 
         # Review checkpoint: after gates pass, before transition writes
-        from auto.review import check_review, has_pending_review
+        if not skip_review:
+            from auto.review import check_review, has_pending_review
 
-        if has_pending_review(self.project_root, feature_id, target.value):
-            return False, [
-                f"Review pending for {feature_id} → {target.value}. "
-                f"Resolve with: ag review {feature_id} {target.value}"
-            ]
+            if has_pending_review(self.project_root, feature_id, target.value):
+                return False, [
+                    f"Review pending for {feature_id} → {target.value}. "
+                    f"Resolve with: ag review {feature_id} {target.value}"
+                ]
 
-        can_proceed, review_msgs = check_review(
-            self.project_root, feature_id,
-            current.value if current else "unknown", target.value,
-        )
-        if not can_proceed:
-            if dry_run:
-                messages.append(
-                    f"DRY RUN: Would block for review ({target.value})"
-                )
-                return True, messages
-            return False, review_msgs
+            can_proceed, review_msgs = check_review(
+                self.project_root, feature_id,
+                current.value if current else "unknown", target.value,
+            )
+            if not can_proceed:
+                if dry_run:
+                    messages.append(
+                        f"DRY RUN: Would block for review ({target.value})"
+                    )
+                    return True, messages
+                return False, review_msgs
 
         # Log regression cascades
         if current and self.is_regression(current, target):

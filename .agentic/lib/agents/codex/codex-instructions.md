@@ -8,6 +8,7 @@ Note: Codex runs commands in a sandbox. Append `|| true` to commands that may fa
 
 Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag spec` | `ag docs` | `ag todo` | `ag intent`
 Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX`
+Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |

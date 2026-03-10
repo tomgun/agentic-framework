@@ -266,6 +266,107 @@ def cmd_unregister(agents_file: Path, feature_id: str) -> int:
     return cmd_complete(agents_file, feature_id)
 
 
+def _cleanup_stale_claims(items: list[dict]) -> list[dict]:
+    """Clean up stale feature claims where the claiming PID is dead.
+
+    Unlike _cleanup_stale() which only targets session entries, this targets
+    feature entries with a 'claim_pid' field whose process is no longer alive.
+    Dead entries are marked completed with outcome 'stale_claim'.
+    """
+    for item in items:
+        if item.get("type") == "session":
+            continue
+        if item.get("status") != "active":
+            continue
+        claim_pid = item.get("claim_pid")
+        if claim_pid and not _is_pid_alive(claim_pid):
+            item["status"] = "completed"
+            item["outcome"] = "stale_claim"
+            item["last_checkpoint"] = _now_iso()
+    return items
+
+
+def cmd_claim(agents_file: Path, feature_id: str, agent: str = "",
+              description: str = "", pid: int = 0) -> int:
+    """Atomic claim: reject if feature already has an active entry.
+
+    Uses fcntl.flock for inter-process safety. Stores claiming PID
+    for stale-claim detection. Returns 0 on success, 1 if already claimed.
+    """
+    claim_pid = pid if pid > 0 else os.getpid()
+    now = _now_iso()
+    claimed = [False]
+    conflict_agent = [""]
+
+    def _do(items):
+        items = _cleanup_stale_claims(items)
+        for e in items:
+            if (e.get("feature_id") == feature_id
+                    and e.get("status") == "active"):
+                conflict_agent[0] = e.get("agent", "unknown")
+                claimed[0] = False
+                return items
+        # Unclaimed — activate with PID stored
+        items.append({
+            "feature_id": feature_id,
+            "description": description or feature_id,
+            "worktree": "",
+            "branch": "",
+            "agent": agent,
+            "started": now,
+            "last_checkpoint": now,
+            "status": "active",
+            "claim_pid": claim_pid,
+            "progress": [],
+            "files": [],
+        })
+        claimed[0] = True
+        return items
+
+    _with_lock(agents_file, _do)
+    if claimed[0]:
+        print(f"Claimed: {feature_id} (agent={agent or 'unset'}, pid={claim_pid})")
+        return 0
+    else:
+        print(f"Already claimed by {conflict_agent[0]}", file=sys.stderr)
+        return 1
+
+
+def cmd_release(agents_file: Path, feature_id: str, pid: int = 0) -> int:
+    """Release a feature claim. Marks entry as completed.
+
+    If the releasing PID differs from the claiming PID, logs a warning
+    but allows the release (needed for manual cleanup).
+    Returns 0 on success, 1 if not found.
+    """
+    release_pid = pid if pid > 0 else os.getpid()
+    released = [False]
+
+    def _do(items):
+        for e in items:
+            if (e.get("feature_id") == feature_id
+                    and e.get("status") == "active"):
+                claim_pid = e.get("claim_pid", 0)
+                if claim_pid and claim_pid != release_pid:
+                    print(f"Warning: releasing PID {release_pid} != claiming PID {claim_pid}",
+                          file=sys.stderr)
+                e["status"] = "completed"
+                e["outcome"] = "released"
+                e["last_checkpoint"] = _now_iso()
+                released[0] = True
+                return items
+        released[0] = False
+        return items
+
+    _with_lock(agents_file, _do)
+    if released[0]:
+        print(f"Released: {feature_id}")
+        return 0
+    else:
+        print(f"No active claim for {feature_id}", file=sys.stderr)
+        return 1
+
+
 def cmd_check_worktree(agents_file: Path, worktree_path: str) -> int:
     """Check if a worktree has an active entry. Exit 0 = has entry, 1 = no entry."""
     items = _load_unlocked(agents_file)
@@ -678,7 +779,7 @@ def main() -> int:
     valid_cmds = {
         "register", "activate", "checkpoint", "complete", "unregister",
         "check-worktree", "get-active", "get-current-feature", "list",
-        "migrate-wip",
+        "migrate-wip", "claim", "release",
         "session-register", "session-deregister", "count-others",
         "cleanup-stale", "session-heartbeat", "prompt-check",
     }
@@ -737,6 +838,18 @@ def main() -> int:
             print("Error: WIP.md path required", file=sys.stderr)
             return 1
         return cmd_migrate_wip(agents_file, rest[0])
+    elif cmd == "claim":
+        if not rest:
+            print("Error: feature_id required", file=sys.stderr)
+            return 1
+        agent = rest[1] if len(rest) > 1 else ""
+        desc = rest[2] if len(rest) > 2 else ""
+        return cmd_claim(agents_file, rest[0], agent, desc, pid_val)
+    elif cmd == "release":
+        if not rest:
+            print("Error: feature_id required", file=sys.stderr)
+            return 1
+        return cmd_release(agents_file, rest[0], pid_val)
     elif cmd == "session-register":
         if not rest:
             print("Error: worktree path required", file=sys.stderr)
