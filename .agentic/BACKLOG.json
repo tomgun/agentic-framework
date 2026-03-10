@@ -1,22 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0186",
-    "description": "Autonomous Scheduler (ADR-001 Phase 6)",
-    "added_at": "2026-03-08T19:57:17Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0186.md"
-    ],
-    "notes": "Finds unblocked features, spawns workers.",
-    "depends_on": [
-      "F-0182",
-      "F-0184"
-    ],
-    "became_current_at": "2026-03-10T16:17:27Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0185",
     "description": "MCP Server for Agent Coordination (ADR-001 Phase 4)",
     "added_at": "2026-03-08T19:57:19Z",

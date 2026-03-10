@@ -15,6 +15,15 @@ _No active items_
 
 ---
 
+
+### HN-0029: PR #109: F-0186 Autonomous Scheduler
+- **Type**: review
+- **Added**: 2026-03-10
+- **Context**: Non-blocking review scheduling, ag auto epic command. 19 tests, 626 validation checks pass.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0028: PR #91: Silent session start
