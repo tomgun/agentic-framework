@@ -8,14 +8,14 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - F-0183 next (Updated: 2026-03-10 09:47 EET)
 
 ## Current focus
-- ADR-001 roadmap execution: F-0180 (Review Checkpoint Framework) is next
-- v0.49.0: Backlog, doc enforcement, component registry, state machine all shipped
+- ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item
+- v0.52.5: Intent-based skill triggers shipped, F-0184 epic decomposition shipped
 
 ## In progress
-- Backlog seeded with 9 ADR-001 features in dependency order
+- F-0183: Taste and Style Settings (current)
 
 ## Next up
-- F-0180: Review Checkpoint Framework (current backlog item)
+- F-0180: Review Checkpoint Framework
 - F-0181: Autonomous Formal Profile
 - F-0182: Critical Review Agent
 

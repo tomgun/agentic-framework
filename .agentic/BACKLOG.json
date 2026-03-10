@@ -2,11 +2,15 @@
   {
     "type": "feature",
     "id": "F-0183",
-    "description": "F-0183",
-    "added_at": "2026-03-09T23:06:52Z",
+    "description": "Taste and Style Settings",
+    "added_at": "2026-03-08T19:57:16Z",
     "added_by": "agent",
     "refs": [
       ".agentic/spec/acceptance/F-0183.md"
+    ],
+    "notes": "Subjective review guidance hierarchy.",
+    "depends_on": [
+      "F-0182"
     ],
     "became_current_at": "2026-03-09T23:06:54Z"
   },

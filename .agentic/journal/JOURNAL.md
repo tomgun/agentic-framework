@@ -1846,17 +1846,6 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
-### Session: 2026-03-10 01:08 - list
-
-**What changed**:
-- No details provided
-
-**Next steps**:
-- TBD
-
-**Blockers**: None
-
-
 ### Session: 2026-03-10 09:47 - Intent-Based Skill Triggers
 
 **Why**: Agent missed completing-work workflow when user said 'merged' because trigger words were a brittle keyword list
