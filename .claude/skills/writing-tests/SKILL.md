@@ -1,9 +1,10 @@
 ---
 name: writing-tests
 description: >
-  Write and run tests for features or bug fixes. Use when user says "write
-  tests", "add tests", "/test", "test this", "need tests for", "add coverage",
-  or asks specifically for test creation.
+  Write and run tests for features or bug fixes. Use when the user wants
+  tests written — e.g. "write tests", "add tests", "/test", "test this",
+  "need tests for", "add coverage", "unit test", "integration test", or
+  any request to create or improve test coverage. Match intent, not exact words.
   Do NOT use for: running existing tests only (just run them), implementing
   features (use implementing-features), fixing bugs (use fixing-bugs).
 compatibility: "Requires Claude Code with shell access and test runners."

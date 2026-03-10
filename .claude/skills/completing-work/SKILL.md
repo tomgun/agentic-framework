@@ -2,8 +2,10 @@
 name: completing-work
 description: >
   Feature completion workflow: verify acceptance criteria, mark done, update
-  specs, cleanup WIP. Use when user says "done", "complete", "finished",
-  "wrapped up", "ag done", "mark as done", or indicates work is finished.
+  specs, cleanup WIP. Use when the user indicates a feature is finished —
+  e.g. "done", "complete", "finished", "merged", "PR merged", "shipped",
+  "landed", "wrapped up", "ag done", "mark as done", "it's in", or any
+  phrasing that means the work is complete. Match intent, not exact words.
   Do NOT use for: committing code (use committing-changes), starting new
   features (use implementing-features).
 compatibility: "Requires Claude Code with shell access and ag commands."

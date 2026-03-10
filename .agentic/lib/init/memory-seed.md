@@ -5,7 +5,7 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.52.3 -->
+<!-- memory-seed v0.52.5 -->
 <!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
@@ -50,13 +50,13 @@ Then:
 
 ## When the user reports a bug or wants a fix
 
-If the user's intent is to fix, debug, repair, resolve, investigate, troubleshoot, or address a bug/issue/error:
+If the user's intent is to fix, debug, repair, resolve, investigate, troubleshoot, or address a bug/issue/error — in any phrasing (e.g. "crash", "fails", "regression", "not working", "something's wrong"):
 
 **STOP.** Write a failing test that reproduces the bug FIRST. Then fix it. Then verify the test passes.
 
 ## When committing or pushing
 
-If the user wants to commit, push, save, ship, or finalize changes:
+If the user wants to commit, push, save, ship, or finalize changes — in any phrasing (e.g. "save changes", "create PR", "ready to go"):
 
 **STOP.** Check AGENTS.json for active WIP (via `bash .agentic/lib/tools/wip.sh check`) — if WIP exists, BLOCK and warn. Otherwise, follow the pre-commit sequence below, then run `ag commit`.
 
@@ -92,7 +92,7 @@ If a state machine transition is blocked by a review checkpoint, or the user say
 
 ## When work is done
 
-If the user says done, complete, finished, wrapped up, or indicates a feature is ready:
+If the user indicates a feature is complete — in any phrasing (e.g. "done", "complete", "finished", "merged", "PR merged", "shipped", "landed", "wrapped up", "it's in"). Match intent, not exact words.
 
 **STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. Before ending, check your TaskList for pending items and flush them to .agentic/TODO.md via `ag todo`.
 
