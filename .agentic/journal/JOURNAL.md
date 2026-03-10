@@ -1949,3 +1949,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-10 18:57 - ag done post-merge gaps
+
+**Why**: Completed features stayed in_progress in FEATURES.md and lingered in backlog because ag done only warned (didn't act) and only advanced position-0 items
+
+**What changed**:
+- ag done now auto-marks features as shipped and removes them from backlog by ID (not position). Fixed feature.sh awk regex that silently failed on heading-format FEATURES.md — root cause of T-0050 status drift.
+
+**Next steps**:
+- Review and merge PR
+
+**Blockers**: None
+
