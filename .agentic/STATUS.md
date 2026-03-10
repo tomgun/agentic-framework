@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0199: Instruction sync detection — implementation complete, creating PR (Updated: 2026-03-10 15:00 EET)
+- Fix ag done post-merge gaps (Updated: 2026-03-10 18:59 EET)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item
@@ -30,4 +30,4 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - v0.47.1: Docker sandbox for autonomous Claude Code
 - v0.47.0: Formal state machine for feature lifecycle (ADR-001 Phase 1)
 - See CHANGELOG.md for full history
-- QA: QA: 0/1 verified, 2 pending
+- QA: QA: 0/1 verified, 3 pending

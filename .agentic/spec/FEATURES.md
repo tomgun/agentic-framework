@@ -3327,7 +3327,7 @@ One command (`ag flush`) commits + pushes state-only changes directly to main wi
 
 ## F-0197: FEATURES.md Registry Integrity + AC Verification Gate
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Reliability
 **Priority**: high
 **Complexity**: medium
@@ -3345,7 +3345,7 @@ Fix 5 features with status/implementation mismatches (deprecate F-0033, F-0098; 
 
 ## F-0198: Plan Durability (Multi-Tool Scan)
 
-**Status**: planned
+**Status**: shipped
 **Category**: Reliability
 **Priority**: medium
 **Complexity**: small
@@ -3363,7 +3363,7 @@ Scan tool-specific plan directories (~/.claude/plans/, .cursor/plans/) for files
 
 ## F-0199: Instruction File Sync Detection
 
-**Status**: planned
+**Status**: shipped
 **Category**: Reliability
 **Priority**: high
 **Complexity**: medium
@@ -3381,7 +3381,7 @@ Detect when ag.sh commands are added but instruction files (CLAUDE.md, cursorrul
 
 ## F-0200: Intent Journal + Reconciliation
 
-**Status**: planned
+**Status**: shipped
 **Category**: Reliability
 **Priority**: high
 **Complexity**: large

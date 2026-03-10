@@ -3857,11 +3857,11 @@ else
   fail "T-0053: cmd_start missing backlog display"
 fi
 
-# T-0054: cmd_done auto-advances backlog
-if grep -A 5 "Backlog Advance" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" | grep -q "backlog.sh.*done"; then
-  pass "T-0054: cmd_done auto-advances backlog"
+# T-0054: cmd_done auto-removes completed feature from backlog
+if grep -A 5 "Backlog Cleanup" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" | grep -q "backlog.sh.*remove"; then
+  pass "T-0054: cmd_done auto-removes completed feature from backlog"
 else
-  fail "T-0054: cmd_done missing backlog advance"
+  fail "T-0054: cmd_done missing backlog removal"
 fi
 
 # ============================================================

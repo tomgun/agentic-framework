@@ -1390,8 +1390,13 @@ cmd_done() {
 
             if [ "$feature_found" = true ] && [ "$is_shipped" = false ]; then
                 echo ""
-                echo -e "${YELLOW}Note: $feature_id not marked as 'shipped' in FEATURES.md${NC}"
-                echo "  To update: bash .agentic/lib/tools/feature.sh $feature_id status shipped"
+                echo -e "${BOLD}Auto-marking $feature_id as shipped in FEATURES.md${NC}"
+                if bash "$SCRIPT_DIR/feature.sh" "$feature_id" status shipped 2>/dev/null; then
+                    echo -e "${GREEN}✓ $feature_id marked as shipped${NC}"
+                else
+                    echo -e "${YELLOW}⚠ Could not auto-mark $feature_id as shipped${NC}"
+                    echo "  Manual update: bash .agentic/lib/tools/feature.sh $feature_id status shipped"
+                fi
             fi
         fi
 
@@ -1483,17 +1488,16 @@ cmd_done() {
     echo "  bash .agentic/lib/tools/drift.sh"
     echo "  (Checks: untracked files, feature status, template markers)"
 
-    # Backlog auto-advance
+    # Backlog auto-remove completed feature (by ID, regardless of position)
     if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
-        local bl_current_json
-        bl_current_json=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || true
-        if [ -n "$bl_current_json" ]; then
-            local bl_cur_id
-            bl_cur_id=$(echo "$bl_current_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null) || bl_cur_id=""
-            if [ "$bl_cur_id" = "$feature_id" ]; then
-                echo ""
-                echo -e "${BOLD}=== Backlog Advance ===${NC}"
-                bash "$SCRIPT_DIR/backlog.sh" done 2>/dev/null || true
+        # Check if feature is in the backlog at all
+        if python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" list 2>/dev/null | grep -q "$feature_id"; then
+            echo ""
+            echo -e "${BOLD}=== Backlog Cleanup ===${NC}"
+            if bash "$SCRIPT_DIR/backlog.sh" remove "$feature_id" 2>/dev/null; then
+                echo -e "${GREEN}✓ $feature_id removed from backlog${NC}"
+            else
+                echo -e "${YELLOW}⚠ Could not remove $feature_id from backlog${NC}"
             fi
         fi
         intent_checkpoint "$feature_id" "advance_backlog" || true
