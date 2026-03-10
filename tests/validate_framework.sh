@@ -4400,7 +4400,8 @@ if bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh" --quiet 2>/de
   pass "F-0199 AC-010: instruction-sync check passes (all commands in sync)"
 else
   warn "F-0199 AC-010: instruction-sync detected drift (advisory — run instruction-sync.sh for details)"
-=======
+fi
+
 # F-0198: Plan Durability Scanning
 # ============================================================
 echo ""
