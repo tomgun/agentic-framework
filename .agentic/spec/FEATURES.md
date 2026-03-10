@@ -2982,7 +2982,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0180: Review Checkpoint Framework
 
-**Status**: planned
+**Status**: shipped
 **Category**: Workflow
 **Priority**: high
 **Complexity**: high
@@ -3003,7 +3003,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0181: Autonomous Formal Profile
 
-**Status**: planned
+**Status**: shipped
 **Category**: Workflow
 **Priority**: medium
 **Complexity**: low
@@ -3024,7 +3024,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0182: Critical Review Agent
 
-**Status**: planned
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: high
 **Complexity**: high
@@ -3066,7 +3066,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0184: Epic Decomposition
 
-**Status**: planned
+**Status**: shipped
 **Category**: Architecture
 **Priority**: high
 **Complexity**: high
