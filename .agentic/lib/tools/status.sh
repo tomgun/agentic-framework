@@ -122,7 +122,9 @@ update_md() {
         if [[ -n "$qa_line" && "$qa_line" != *"not initialized"* && "$qa_line" != *"tracker error"* ]]; then
             # Replace or append QA line in STATUS.md
             if grep -q "^- QA:" "${STATUS_FILE}" 2>/dev/null; then
-                sed -i.bak "s/^- QA:.*$/- QA: ${qa_line}/" "${STATUS_FILE}" && rm -f "${STATUS_FILE}.bak"
+                local escaped_qa_line
+                escaped_qa_line=$(printf '%s\n' "$qa_line" | sed 's/[&/\]/\\&/g')
+                sed -i.bak "s|^- QA:.*$|- QA: ${escaped_qa_line}|" "${STATUS_FILE}" && rm -f "${STATUS_FILE}.bak"
             else
                 echo "- QA: ${qa_line}" >> "${STATUS_FILE}"
             fi

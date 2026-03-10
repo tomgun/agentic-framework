@@ -45,6 +45,7 @@ setup_test_env() {
     cp "$AG_SCRIPT" "$TEST_DIR/.agentic/lib/tools/ag.sh"
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/list-tools.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/wip.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/intent-helpers.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/" 2>/dev/null || true
@@ -416,6 +417,110 @@ if echo "$output" | grep -q "No.*plan found\|consider running.*ag plan"; then
     pass
 else
     fail "Expected warning about missing plan when auto_for includes implement"
+fi
+cleanup_test_env
+
+#=============================================================================
+# Done Command: FEATURES.md Auto-Ship + Backlog Advance Tests
+#=============================================================================
+
+# Helper: set up a formal project with feature infrastructure for ag done tests
+setup_done_env() {
+    setup_test_env
+    mkdir -p "$TEST_DIR/.agentic/spec/acceptance"
+    mkdir -p "$TEST_DIR/.agentic/journal/manifests"
+    mkdir -p "$TEST_DIR/.agentic/lib/auto"
+    # Copy all tool scripts needed by ag done
+    for tool in backlog_helpers.py backlog.sh feature.sh manifest.sh drift.sh doctor.sh intent-helpers.sh; do
+        cp "$FRAMEWORK_ROOT/.agentic/lib/tools/$tool" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    done
+    cp "$FRAMEWORK_ROOT/.agentic/lib/auto/state_machine.py" "$TEST_DIR/.agentic/lib/auto/" 2>/dev/null || true
+    # Create STACK.md for formal profile
+    cat > "$TEST_DIR/STACK.md" << 'EOF'
+Profile: formal
+- state_enforcement: off
+EOF
+    # Create FEATURES.md with an in_progress feature
+    cat > "$TEST_DIR/.agentic/spec/FEATURES.md" << 'EOF'
+# Features
+
+## F-0042: Test Feature
+
+**Status**: in_progress
+
+**Description**: A test feature for done command tests
+
+**Acceptance**: spec/acceptance/F-0042.md
+EOF
+    # Create acceptance criteria
+    cat > "$TEST_DIR/.agentic/spec/acceptance/F-0042.md" << 'EOF'
+# F-0042: Test Feature
+
+## Acceptance Criteria
+- [x] AC-001: Basic functionality works
+EOF
+    # Init git so manifest.sh doesn't fail
+    git -C "$TEST_DIR" init --quiet 2>/dev/null || true
+    git -C "$TEST_DIR" add -A 2>/dev/null || true
+    git -C "$TEST_DIR" commit -m "init" --quiet 2>/dev/null || true
+}
+
+test_case "ag done: auto-marks feature as shipped in FEATURES.md"
+setup_done_env
+# Verify feature is NOT shipped before
+if grep -A5 "^## F-0042:" "$TEST_DIR/.agentic/spec/FEATURES.md" | grep -qi "shipped"; then
+    fail "Pre-condition: feature should not be shipped yet"
+    cleanup_test_env
+else
+    # Run ag done
+    output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" done F-0042 2>&1) || true
+    # Feature should now be shipped
+    if grep -A5 "^## F-0042:" "$TEST_DIR/.agentic/spec/FEATURES.md" | grep -qi "shipped"; then
+        pass
+    else
+        fail "ag done should auto-mark feature as shipped in FEATURES.md"
+    fi
+    cleanup_test_env
+fi
+
+test_case "ag done: advances backlog even when feature is not at position 0"
+setup_done_env
+# Create BACKLOG.json with F-0042 at position 1 (not current)
+mkdir -p "$TEST_DIR/.agentic"
+cat > "$TEST_DIR/.agentic/BACKLOG.json" << 'EOF'
+[
+  {"id": "F-0099", "description": "Other feature"},
+  {"id": "F-0042", "description": "Test Feature"}
+]
+EOF
+git -C "$TEST_DIR" add -A 2>/dev/null || true
+git -C "$TEST_DIR" commit -m "add backlog" --quiet 2>/dev/null || true
+# Run ag done
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" done F-0042 2>&1) || true
+# F-0042 should be removed from backlog
+if python3 "$TEST_DIR/.agentic/lib/tools/backlog_helpers.py" --project-root "$TEST_DIR" list 2>/dev/null | grep -q "F-0042"; then
+    fail "F-0042 should be removed from backlog after ag done"
+else
+    pass
+fi
+cleanup_test_env
+
+test_case "ag done: shows feedback when removing non-current feature from backlog"
+setup_done_env
+# Create BACKLOG.json with F-0042 at position 1 (not current)
+cat > "$TEST_DIR/.agentic/BACKLOG.json" << 'EOF'
+[
+  {"id": "F-0099", "description": "Other feature"},
+  {"id": "F-0042", "description": "Test Feature"}
+]
+EOF
+git -C "$TEST_DIR" add -A 2>/dev/null || true
+git -C "$TEST_DIR" commit -m "add backlog" --quiet 2>/dev/null || true
+output=$(bash "$TEST_DIR/.agentic/lib/tools/ag.sh" done F-0042 2>&1) || true
+if echo "$output" | grep -qi "backlog"; then
+    pass
+else
+    fail "ag done should show backlog feedback even for non-current features"
 fi
 cleanup_test_env
 
