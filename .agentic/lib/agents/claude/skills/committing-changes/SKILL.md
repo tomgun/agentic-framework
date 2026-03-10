@@ -84,20 +84,20 @@ Present a summary of changes. **Never auto-commit.** Wait for human approval.
 
 After human approves:
 1. Stage files: `git add <specific-files>` (not `git add .`)
+   Include JOURNAL.md, STATUS.md, and CONTRIBUTIONS.md — they document the work.
+   Do NOT include VERSION, BACKLOG.json, FEATURES.md status — these are
+   updated post-merge by `ag done`.
 2. Commit with descriptive message
 3. Create PR if on feature branch: `gh pr create --title "..." --body "..."`
-4. Bump VERSION (at least patch)
-5. Log PR in HUMAN_NEEDED.md for review tracking:
+4. Log PR in HUMAN_NEEDED.md for review tracking:
    ```bash
    bash .agentic/lib/tools/blocker.sh add "PR #N: Description" "review" "Details"
    ```
 
-### Step 7: Post-Merge Tagging
+### Step 7: Post-Merge
 
-After a PR is merged, tag the release:
-```bash
-git tag v$(cat VERSION) && git push origin v$(cat VERSION)
-```
+After merge, run `ag done F-XXXX` on main. This bumps VERSION, updates
+FEATURES.md status, advances the backlog, and flushes state to main.
 
 ## Examples
 

@@ -4,11 +4,12 @@
 # WHY --no-verify IS SAFE HERE (and NOT a precedent):
 # This script enforces its own validation that is STRICTER than the pre-commit
 # hook: hardcoded file allowlist, branch+worktree check, diff-level FEATURES.md
-# validation, JSON validation for structured files. The hook is redundant, not
-# bypassed. Future tool authors should NOT cite this as justification for
-# --no-verify — the conditions are: (1) hardcoded file allowlist, (2) no
-# user-editable configuration, (3) self-contained validation that rejects on
-# any violation. If your script doesn't meet all three, use the hook.
+# validation, JSON validation for structured files, VERSION semver validation.
+# The hook is redundant, not bypassed. Future tool authors should NOT cite this
+# as justification for --no-verify — the conditions are: (1) hardcoded file
+# allowlist, (2) no user-editable configuration, (3) self-contained validation
+# that rejects on any violation. If your script doesn't meet all three, use
+# the hook.
 #
 # Usage:
 #   ag flush                  # Commit + push dirty state files to main
@@ -31,6 +32,7 @@ ALLOWLIST=(
     ".agentic/BACKLOG.json"
     ".agentic/journal/JOURNAL.md"
     ".agentic/CONTRIBUTIONS.md"
+    "VERSION"
 )
 
 # ---------------------------------------------------------------------------
