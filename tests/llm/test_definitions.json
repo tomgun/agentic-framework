@@ -1559,6 +1559,55 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "075_ag_flush_dirty_state",
+      "description": "Agent suggests ag flush (not PR) when state files are dirty",
+      "section": "trigger",
+      "category": "Important",
+      "llm_test_id": "LLM-075",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          ".agentic/STATUS.md": "## Current focus\n- Implementing F-0100\n"
+        }
+      },
+      "prompt": "My state files are dirty after updating the backlog. How should I commit them?",
+      "expected": {
+        "output_contains": [
+          "ag flush|flush|state.commit"
+        ],
+        "output_not_contains": [
+          "gh pr create|git checkout -b|feature branch"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
+    },
+    {
+      "id": "076_ag_flush_after_done",
+      "description": "Agent uses ag flush --features after completing a feature",
+      "section": "trigger",
+      "category": "Important",
+      "llm_test_id": "LLM-076",
+      "profile": "formal",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "F-0100 PR was merged. Mark it as done and flush the state.",
+      "expected": {
+        "output_contains": [
+          "ag flush|flush.*state|flush.*features"
+        ],
+        "output_contains_any": [
+          "ag done|done|complete|shipped"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }

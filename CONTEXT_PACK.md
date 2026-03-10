@@ -64,6 +64,7 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
     - `feature.sh` - Field updates to FEATURES.md
     - `blocker.sh` - Append-only HUMAN_NEEDED.md updates
     - `todo.sh` - TODO.md CRUD (add/done/drop/triage/list)
+    - `state-commit.sh` - Flush state files to main without PR (`ag flush`)
     - `wip.sh` - Work-in-progress tracking
     - `migration.sh` - Spec migration management (create/list/show/search/apply)
     - `drift.sh --docs` - Documentation drift detection

@@ -4199,6 +4199,104 @@ else
   fail "T-0095: Some hooks missing \$PPID (should not use \$\$)"
 fi
 
+# --- F-0196: Fluent State File Commits (ag flush) ---
+
+echo ""
+echo "--- F-0196: Fluent State File Commits (ag flush) ---"
+
+# T-0096: state-commit.sh exists and is executable
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" ]]; then
+  pass "T-0096: state-commit.sh exists and is executable"
+else
+  fail "T-0096: state-commit.sh missing or not executable"
+fi
+
+# T-0097: state-commit.sh has hardcoded allowlist
+if grep -q "ALLOWLIST=" "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" && \
+   grep -q "STATUS.md" "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" && \
+   grep -q "BACKLOG.json" "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh"; then
+  pass "T-0097: state-commit.sh has hardcoded allowlist with expected files"
+else
+  fail "T-0097: state-commit.sh missing allowlist or expected state files"
+fi
+
+# T-0098: VERSION is NOT in the allowlist (security boundary)
+if grep -q 'ALLOWLIST=' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" && \
+   ! grep -A20 'ALLOWLIST=(' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" | grep -q 'VERSION'; then
+  pass "T-0098: VERSION is NOT in the state-commit.sh allowlist"
+else
+  fail "T-0098: VERSION found in state-commit.sh allowlist (should be excluded)"
+fi
+
+# T-0099: ag.sh dispatches flush command
+if grep -q 'flush)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" && \
+   grep -q 'state-commit.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0099: ag.sh dispatches flush to state-commit.sh"
+else
+  fail "T-0099: ag.sh missing flush dispatch"
+fi
+
+# T-0100: state-commit.sh has --no-verify justification comment
+if grep -q 'NOT a precedent' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh"; then
+  pass "T-0100: state-commit.sh has --no-verify justification (not a precedent)"
+else
+  fail "T-0100: state-commit.sh missing --no-verify justification comment"
+fi
+
+# T-0101: dashboard.sh has dirty state detection
+if grep -q 'state-commit.sh\|DIRTY_STATE\|ag flush' "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "T-0101: dashboard.sh has dirty state file detection"
+else
+  fail "T-0101: dashboard.sh missing dirty state detection"
+fi
+
+# T-0102: ag flush in instruction files
+flush_in_all=true
+for f in "${FRAMEWORK_ROOT}/CLAUDE.md" \
+         "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" \
+         "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/cursorrules.txt" \
+         "${FRAMEWORK_ROOT}/.agentic/lib/agents/copilot/copilot-instructions.md" \
+         "${FRAMEWORK_ROOT}/.agentic/lib/agents/codex/codex-instructions.md" \
+         "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/agent_operating_guidelines.md"; do
+  if ! grep -q 'ag flush' "$f" 2>/dev/null; then
+    flush_in_all=false
+    break
+  fi
+done
+if $flush_in_all; then
+  pass "T-0102: ag flush referenced in all instruction files"
+else
+  fail "T-0102: ag flush missing from some instruction files"
+fi
+
+# T-0103: memory-seed has --no-verify exception for ag flush
+if grep -q 'except.*ag flush\|ag flush.*--no-verify' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
+  pass "T-0103: memory-seed.md has --no-verify exception for ag flush"
+else
+  fail "T-0103: memory-seed.md missing --no-verify exception for ag flush"
+fi
+
+# T-0104: state-commit.sh validates JSON for BACKLOG.json
+if grep -q 'json.tool\|json_tool\|jq' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh"; then
+  pass "T-0104: state-commit.sh validates BACKLOG.json as JSON"
+else
+  fail "T-0104: state-commit.sh missing JSON validation for BACKLOG.json"
+fi
+
+# T-0105: state-commit.sh has worktree detection
+if grep -q 'worktree list' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh"; then
+  pass "T-0105: state-commit.sh has worktree detection via git worktree list"
+else
+  fail "T-0105: state-commit.sh missing worktree detection"
+fi
+
+# T-0106: state-commit.sh has push failure recovery (git reset --soft)
+if grep -q 'reset --soft' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh"; then
+  pass "T-0106: state-commit.sh has push failure recovery (git reset --soft HEAD~1)"
+else
+  fail "T-0106: state-commit.sh missing push failure recovery"
+fi
+
 echo ""
 
 # ============================================================

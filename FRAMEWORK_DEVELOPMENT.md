@@ -143,7 +143,7 @@ Design basis: PRINCIPLES.md D7 (Multi-Environment Portability).
 **Update process**:
 1. Edit `.agentic/lib/init/memory-seed.md`
 2. Bump the version marker: `<!-- memory-seed vX.Y.Z -->`
-3. Verify sentinel strings still present: `pre-commit sequence`, `token-efficient scripts`, `ag commit`, `ag done`
+3. Verify sentinel strings still present: `pre-commit sequence`, `token-efficient scripts`, `ag commit`, `ag done`, `ag flush`
 4. Run `bash .agentic/tools/memory-check.sh` to verify alignment
 5. If sentinels change, update the `SENTINELS` array in `memory-check.sh` and the `<!-- sentinels: ... -->` comment in memory-seed.md
 
