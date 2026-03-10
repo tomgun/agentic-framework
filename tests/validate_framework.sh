@@ -4299,6 +4299,7 @@ fi
 
 # ============================================================
 # F-0197: Registry Integrity — Drift Check & AC Gate
+# =====================================================
 # ============================================================
 echo "--- F-0197: Registry Integrity (Drift Check & AC Gate) ---"
 
@@ -4399,6 +4400,73 @@ if bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh" --quiet 2>/de
   pass "F-0199 AC-010: instruction-sync check passes (all commands in sync)"
 else
   warn "F-0199 AC-010: instruction-sync detected drift (advisory — run instruction-sync.sh for details)"
+=======
+# F-0198: Plan Durability Scanning
+# ============================================================
+echo ""
+echo "--- F-0198: Plan Durability Scanning ---"
+
+# AC-001: plan-scan.sh exists and is executable
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh" ]]; then
+  pass "F-0198 AC-001: plan-scan.sh exists"
+else
+  fail "F-0198 AC-001: plan-scan.sh missing"
+fi
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh" ]]; then
+  pass "F-0198 AC-001: plan-scan.sh is executable"
+else
+  fail "F-0198 AC-001: plan-scan.sh is not executable"
+fi
+
+# AC-002: plan-scan.sh contains key feature detection function
+if grep -q 'extract_primary_feature' "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh"; then
+  pass "F-0198 AC-002: plan-scan.sh has extract_primary_feature function"
+else
+  fail "F-0198 AC-002: plan-scan.sh missing extract_primary_feature function"
+fi
+
+# AC-003: plan-scan.sh supports agent-agnostic scan dirs (Claude + Cursor)
+if grep -q '\.claude/plans' "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh" && \
+   grep -q '\.cursor/plans' "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh"; then
+  pass "F-0198 AC-003: plan-scan.sh scans both Claude and Cursor plan directories"
+else
+  fail "F-0198 AC-003: plan-scan.sh missing agent-agnostic scan directories"
+fi
+
+# AC-004: plan-scan.sh supports extensible dirs via plan_scan_dirs setting
+if grep -q 'plan_scan_dirs' "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh"; then
+  pass "F-0198 AC-004: plan-scan.sh supports custom dirs via plan_scan_dirs setting"
+else
+  fail "F-0198 AC-004: plan-scan.sh missing plan_scan_dirs extensibility"
+fi
+
+# AC-005: plan-scan.sh validates feature IDs against FEATURES.md
+if grep -q 'FEATURES_FILE\|FEATURES\.md' "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh"; then
+  pass "F-0198 AC-005: plan-scan.sh validates feature IDs against FEATURES.md"
+else
+  fail "F-0198 AC-005: plan-scan.sh missing FEATURES.md validation"
+fi
+
+# AC-006: plan-scan.sh supports --quiet and --check modes
+if grep -q '\-\-quiet' "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh" && \
+   grep -q '\-\-check' "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh"; then
+  pass "F-0198 AC-006: plan-scan.sh supports --quiet and --check modes"
+else
+  fail "F-0198 AC-006: plan-scan.sh missing --quiet or --check mode support"
+fi
+
+# AC-007: plan-scan.sh is wired into sync.sh as phase_plan_scan
+if grep -q 'phase_plan_scan' "${FRAMEWORK_ROOT}/.agentic/lib/tools/sync.sh"; then
+  pass "F-0198 AC-007: plan-scan.sh is wired into sync.sh (phase_plan_scan)"
+else
+  fail "F-0198 AC-007: plan-scan.sh is NOT wired into sync.sh"
+fi
+
+if grep -q 'plan-scan\.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/sync.sh"; then
+  pass "F-0198 AC-007: sync.sh references plan-scan.sh"
+else
+  fail "F-0198 AC-007: sync.sh does not reference plan-scan.sh"
 fi
 
 echo ""

@@ -109,9 +109,6 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0046: F-0194: Worktree-by-default for feature branches — agents should always work in git worktrees when on feature branches, not dirty the main worktree. Needs: clear instruction in CLAUDE.md/skills, a STACK.md setting (e.g., worktree_mode: always|multi-agent|off), and possibly ag implement auto-creating the worktree. Current instruction exists but is too weak ('Use git worktree on feature branches when another agent may be working on main').
 - **Added**: 2026-03-08
 
-### T-0047: ag implement: gate on durable plan file (.agentic/journal/plans/F-XXXX-*-plan.md). Plans keep getting lost in ~/.claude/plans/. New setting: plan_save_gate (discovery: advisory, formal: blocking, off to disable). Builds habit early so formal transition is seamless. Same pattern as acceptance_criteria/wip_before_commit settings.
-- **Added**: 2026-03-09
-
 ### T-0048: ag review / /review: check that durable plan file exists for the feature being reviewed. If missing, flag as advisory finding. Complements T-0048 (ag implement gate) — catches plans that slipped through.
 - **Added**: 2026-03-09
 
@@ -123,6 +120,8 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 
 ## Done
 
+### T-0047: ag implement: gate on durable plan file (.agentic/journal/plans/F-XXXX-*-plan.md). Plans keep getting lost in ~/.claude/plans/.
+- **Resolved**: 2026-03-10 — Implemented as F-0198: plan-scan.sh in ag sync scans ephemeral plan dirs and auto-copies to .agentic/journal/plans/
 
 ### T-0024: Consider relaxing max_staged_files for PR workflow — commits get squashed on merge, making per-commit file limits unnecessary friction for multi-phase features
 - **Resolved**: 2026-03-06 — Batch-size limits (max_files_per_commit, max_added_lines) downgraded to advisory warnings on feature branches in PR workflow
