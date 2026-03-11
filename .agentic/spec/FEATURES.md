@@ -3599,3 +3599,42 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 - Tests: TBD
 
 **Acceptance**: See `spec/acceptance/F-0210.md`
+
+---
+
+## F-0211: Project-Specific Customization Layer
+
+**Status**: planned
+**Category**: Developer Experience
+**Priority**: high
+**Complexity**: high
+**Since**: v0.53.10
+
+User-editable project-specific configuration files that customize framework behavior without modifying framework internals. Includes: custom Definition of Done checklist, project document registry overrides, workflow phase directions (what to do during plan/implement/review/commit), coding conventions, and any project-specific rules. These files live in a dedicated user-controlled location (e.g., `.agentic/project/`) and survive framework upgrades intact. Files use LLM-optimized formats (frontmatter + structured markdown) so agents can consume them efficiently — either read live during workflows, or pre-processed into framework artifacts at defined intervals.
+
+**Implementation**:
+- State: none
+- Code: TBD
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0211.md`
+
+---
+
+## F-0212: Project Customization Auto-Sync
+
+**Status**: planned
+**Category**: Developer Experience
+**Priority**: high
+**Complexity**: high
+**Since**: v0.53.10
+**Related**: F-0211
+
+Automatic synchronization mechanism that keeps framework-consumed artifacts (skills, CLAUDE.md, memory) in sync with project-specific customization files (F-0211). Two triggers: (a) after an agentic framework update (`upgrade.sh`), re-process project customizations into the updated framework structure; (b) after a user modifies a project customization file, regenerate the affected framework artifacts. Approach options per file type: live reading (agent reads project file directly during workflow — zero sync needed), frontmatter processing (periodic scan merges project overrides into framework files), or template re-rendering (project values injected into framework skill/instruction templates). Must handle conflicts gracefully — user customizations take precedence over framework defaults.
+
+**Implementation**:
+- State: none
+- Code: TBD
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0212.md`
