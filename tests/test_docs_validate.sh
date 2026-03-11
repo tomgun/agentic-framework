@@ -113,6 +113,29 @@ else
     pass "Config files excluded from scan"
 fi
 
+# --- Test 6: --coverage output ---
+echo ""
+echo "Test 6: --coverage groups by type"
+cat > "$TMPDIR/STACK.md" << 'EOF'
+## Docs
+- doc: docs/guide.md      | architecture | feature_done
+- doc: docs/adr/          | adr          | manual
+- doc: README.md          | readme       | pr
+EOF
+
+OUTPUT=$(ROOT_DIR="$TMPDIR" bash "$TMPDIR/.agentic/lib/tools/docs.sh" --coverage 2>&1)
+if echo "$OUTPUT" | grep -q "architecture"; then
+    pass "--coverage shows type grouping"
+else
+    fail "--coverage should show type groups"
+fi
+
+if echo "$OUTPUT" | grep -q "docs/guide.md"; then
+    pass "--coverage lists paths"
+else
+    fail "--coverage should list doc paths"
+fi
+
 # --- Summary ---
 echo ""
 echo "═══════════════════════════════════"

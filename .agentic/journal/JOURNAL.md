@@ -2209,3 +2209,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 23:01 - F-0207 Review Fixes
+
+**Why**: PR review feedback on structural doc lifecycle feature
+
+**What changed**:
+- Fixed 6 PR review issues: return overflow in docs.sh, pre-commit check 19 now shows both missing and unregistered counts, added --coverage test, updated before_commit.md/auto_orchestration.md/HOW_IT_WORKS.md
+
+**Next steps**:
+- Push fixes, merge PR
+
+**Blockers**: None
+

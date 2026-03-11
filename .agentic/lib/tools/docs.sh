@@ -173,7 +173,8 @@ parse_registry() {
 
 # ─── Check registered files exist ─────────────────────────────────
 
-# Returns count of issues found. Prints warnings to stdout.
+# Prints one "registered-but-missing" line per issue to stdout.
+# Returns 0 if clean, 1 if issues found.
 check_registered_exist() {
     local entries
     entries=$(parse_registry)
@@ -190,13 +191,14 @@ check_registered_exist() {
             issues=$((issues + 1))
         fi
     done <<< "$entries"
-    return $issues
+    [[ $issues -eq 0 ]] && return 0 || return 1
 }
 
 # ─── Find unregistered .md files ─────────────────────────────────
 
-# Scans project for .md files not in the registry. Prints warnings.
-# Returns count of unregistered files found.
+# Scans project for .md files not in the registry.
+# Prints one "unregistered" line per issue to stdout.
+# Returns 0 if clean, 1 if issues found.
 find_unregistered() {
     local entries
     entries=$(parse_registry)
@@ -262,7 +264,7 @@ find_unregistered() {
             2>/dev/null | sort
     )
 
-    return $issues
+    [[ $issues -eq 0 ]] && return 0 || return 1
 }
 
 # ─── Validate registry ───────────────────────────────────────────
@@ -276,8 +278,9 @@ validate_registry() {
     # Part 1: registered-but-missing
     echo -e "${BOLD}Registered-but-missing:${NC}"
     local missing_output
-    missing_output=$(check_registered_exist 2>&1)
-    local missing_count=$?
+    missing_output=$(check_registered_exist 2>&1) || true
+    local missing_count
+    missing_count=$(echo "$missing_output" | grep -c "registered-but-missing" || true)
     if [[ $missing_count -gt 0 ]]; then
         echo "$missing_output"
         total_issues=$((total_issues + missing_count))
@@ -290,8 +293,9 @@ validate_registry() {
     # Part 2: existing-but-unregistered
     echo -e "${BOLD}Existing-but-unregistered:${NC}"
     local unreg_output
-    unreg_output=$(find_unregistered 2>&1)
-    local unreg_count=$?
+    unreg_output=$(find_unregistered 2>&1) || true
+    local unreg_count
+    unreg_count=$(echo "$unreg_output" | grep -c "unregistered:" || true)
     if [[ $unreg_count -gt 0 ]]; then
         echo "$unreg_output"
         total_issues=$((total_issues + unreg_count))

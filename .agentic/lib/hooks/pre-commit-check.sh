@@ -1061,8 +1061,11 @@ if [[ $_FAST_MODE -eq 0 ]]; then
       VALIDATE_OUTPUT=$(bash "$DOCS_SH" --validate 2>/dev/null) || true
       # Advisory only — show issues but don't block
       MISSING_COUNT=$(echo "$VALIDATE_OUTPUT" | grep -c "registered-but-missing" || true)
-      if [[ "$MISSING_COUNT" -gt 0 ]]; then
-        echo "  ⚠ Registry has missing files — run: bash .agentic/lib/tools/docs.sh --validate"
+      UNREG_COUNT=$(echo "$VALIDATE_OUTPUT" | grep -c "unregistered:" || true)
+      if [[ "$MISSING_COUNT" -gt 0 ]] || [[ "$UNREG_COUNT" -gt 0 ]]; then
+        [[ "$MISSING_COUNT" -gt 0 ]] && echo "  ⚠ ${MISSING_COUNT} registered doc(s) missing from disk"
+        [[ "$UNREG_COUNT" -gt 0 ]] && echo "  ⚠ ${UNREG_COUNT} unregistered doc(s) found"
+        echo "  Run: bash .agentic/lib/tools/docs.sh --validate"
       else
         echo "  ✓ Doc registry healthy"
       fi
