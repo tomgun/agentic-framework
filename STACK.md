@@ -203,6 +203,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - doc: .agentic/spec/NFR.md         | tech-spec    | feature_done
 - doc: .agentic/spec/ISSUES.md      | custom       | feature_done
 - doc: .agentic/spec/REFERENCES.md  | custom       | manual
+- doc: .agentic/OVERVIEW.md          | architecture | feature_done
 - doc: .agentic/CONTRIBUTIONS.md    | changelog    | pr
 - doc: spec/adr/                   | adr          | manual
 
