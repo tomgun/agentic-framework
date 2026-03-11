@@ -26,6 +26,7 @@ tokens: ~952
 | Docs gate | `docs_gate` | **blocking** | off | Script-enforced |
 | Spec directory | `spec_directory` | **yes** | no | Script-enforced |
 | Review checkpoints | `review_*` | **human/critical_agent** | skip | Script-enforced |
+| Taste review (F-0183) | `review_taste` | **critical_agent** | skip | Script-enforced (piggybacks on code review transitions; requires `## Style & taste` in STACK.md) |
 | Collision guard | — | **on** | **on** | Hook-advisory (SessionStart/UserPromptSubmit warn when other sessions active) |
 
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`

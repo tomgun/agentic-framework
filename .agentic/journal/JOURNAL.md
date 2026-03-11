@@ -2053,3 +2053,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 09:32 - F-0183 + T-0051
+
+**Why**: ADR-002 gap: review_taste was a placeholder, now functional
+
+**What changed**:
+- Taste review wired into checkpoint system; AC check-off advisory in pre-commit; all doc updates done
+
+**Next steps**:
+- PR review, merge
+
+**Blockers**: None
+

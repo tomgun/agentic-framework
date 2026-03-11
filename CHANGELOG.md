@@ -5,6 +5,15 @@ All notable changes to the Agentic AI Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Taste & Style Review (F-0183, ADR-002 §2.2)** — `review_taste` setting is now wired into the review checkpoint system. When set to `critical_agent` or `human`, taste reviews fire alongside code review transitions (documented→committed, implementing→committed). New `## Style & taste` section in STACK.md declares `style_guide`, `design_system`, `api_style` preferences. Critical agent receives a dedicated `taste_review.md` prompt focused on naming conventions, API consistency, and design system alignment. Taste verdict artifacts use `taste_` filename prefix to coexist with code review verdicts. Omitting style settings preserves existing behavior (AC-004). 36 tests.
+- **AC Check-off Advisory (T-0051)** — Pre-commit check now warns when in_progress features have unchecked acceptance criteria. Advisory only (non-blocking). Uses heading-only feature ID extraction to avoid spurious matches from body text. 10 bash tests.
+
+### Changed
+- Pending review filenames now include review_setting (`{feature_id}_{review_setting}_{to_state}.json`) to prevent collisions between code and taste reviews. Legacy format has fallback support.
+
 ## [0.52.3] - 2026-03-09
 
 ### Fixed

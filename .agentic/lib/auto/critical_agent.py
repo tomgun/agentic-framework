@@ -73,6 +73,10 @@ _REVIEW_FOCUS: dict[str, str] = {
         "Focus on: justification for regression, impact analysis, "
         "affected tests, rollback plan."
     ),
+    "review_taste": (
+        "Focus on: consistency with declared style guide, design system alignment, "
+        "API convention adherence, naming pattern consistency, public surface quality."
+    ),
 }
 
 
@@ -188,7 +192,7 @@ class CriticalAgent:
             sections.append(f"## Acceptance Criteria\n{ac_content}")
 
         # Review-type-specific context
-        if review_setting in ("review_code", "review_merge", "review_regression"):
+        if review_setting in ("review_code", "review_merge", "review_regression", "review_taste"):
             diff = self._get_git_diff()
             if diff:
                 sections.append(f"## Code Changes (git diff)\n```\n{diff}\n```")
@@ -337,22 +341,96 @@ class CriticalAgent:
 
         return None
 
+    # -- Style settings (F-0183) -------------------------------------------
+
+    def _load_style_settings(self) -> str:
+        """Load style settings from ## Style & taste section of STACK.md.
+
+        Returns formatted string of active (uncommented) settings, or empty
+        string if section is missing or fully commented out.
+        Handles multi-line HTML comments to avoid false positives.
+        """
+        stack_path = self.project_root / "STACK.md"
+        try:
+            text = stack_path.read_text(encoding="utf-8")
+        except OSError:
+            return ""
+
+        _VALID_KEYS = {"style_guide", "design_system", "api_style"}
+        settings: list[str] = []
+        in_section = False
+        in_comment = False
+
+        for line in text.splitlines():
+            if not in_section:
+                if re.match(r"^##\s+Style\s*&\s*taste", line, re.IGNORECASE):
+                    in_section = True
+                continue
+
+            # Stop at next H2 heading
+            if re.match(r"^##\s+[^#]", line):
+                break
+
+            # Track multi-line HTML comment boundaries
+            if "<!--" in line and "-->" in line:
+                continue
+            if "<!--" in line:
+                in_comment = True
+                continue
+            if "-->" in line:
+                in_comment = False
+                continue
+            if in_comment:
+                continue
+
+            # Match setting lines
+            m = re.match(
+                r"^\s*-\s*(?P<key>[a-z_]+)\s*:\s*(?P<value>[^#\n]+)", line,
+            )
+            if m and m.group("key") in _VALID_KEYS:
+                val = m.group("value").strip()
+                # Path traversal guard
+                if ".." not in val:
+                    settings.append(f"- {m.group('key')}: {val}")
+
+        return "\n".join(settings)
+
     # -- Prompt building ---------------------------------------------------
 
     def _build_prompt(self, context: str, review_setting: str) -> str:
-        """Load critical_review.md template and substitute context."""
-        template_path = (
-            Path(__file__).resolve().parent / "prompts" / "critical_review.md"
-        )
-        try:
-            template = template_path.read_text(encoding="utf-8")
-        except OSError:
-            # Fallback inline prompt if template missing
-            template = (
-                "You are a CRITICAL REVIEWER. Review the following and "
-                "respond with a JSON verdict.\n\n{context}\n\n{focus}\n\n"
-                "{verdict_schema}"
-            )
+        """Load review template and substitute context.
+
+        For taste reviews (review_taste), loads taste_review.md and injects
+        style context. For all other reviews, loads critical_review.md.
+        """
+        prompts_dir = Path(__file__).resolve().parent / "prompts"
+
+        if review_setting == "review_taste":
+            template_path = prompts_dir / "taste_review.md"
+            try:
+                template = template_path.read_text(encoding="utf-8")
+            except OSError:
+                template = (
+                    "You are a TASTE REVIEWER. Review for style consistency.\n\n"
+                    "{style_context}\n\n{context}\n\n{focus}\n\n{verdict_schema}"
+                )
+            # Load style context only for taste reviews
+            style_context = self._load_style_settings()
+            if style_context:
+                style_context = f"## Declared Style Settings\n{style_context}"
+            else:
+                style_context = "## Declared Style Settings\nNo style settings declared."
+        else:
+            template_path = prompts_dir / "critical_review.md"
+            try:
+                template = template_path.read_text(encoding="utf-8")
+            except OSError:
+                template = (
+                    "You are a CRITICAL REVIEWER. Review the following and "
+                    "respond with a JSON verdict.\n\n{context}\n\n{focus}\n\n"
+                    "{verdict_schema}"
+                )
+            style_context = ""
 
         focus = _REVIEW_FOCUS.get(review_setting, "Perform a general review.")
         verdict_schema = (
@@ -371,12 +449,16 @@ class CriticalAgent:
             '```'
         )
 
-        return (
+        result = (
             template
             .replace("{context}", context)
             .replace("{focus}", focus)
             .replace("{verdict_schema}", verdict_schema)
         )
+        # Only substitute {style_context} for taste reviews
+        if review_setting == "review_taste":
+            result = result.replace("{style_context}", style_context)
+        return result
 
     # -- Verdict parsing ---------------------------------------------------
 

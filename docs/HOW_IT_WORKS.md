@@ -118,7 +118,7 @@ graph TB
         %% Scripts
         M_AG[ag.sh gateway<br/>25+ commands]
         M_AUTO_ENGINE[auto/ engine<br/>socket control + state]
-        M_PRECOMMIT[pre-commit-check.sh<br/>17 structural gates]
+        M_PRECOMMIT[pre-commit-check.sh<br/>17 structural gates + advisories]
         M_WIP_SH[wip.sh<br/>state machine]
         M_STATUS_SH[status.sh / journal.sh<br/>token-efficient updates]
         M_FEATURE_SH[feature.sh<br/>status transitions]
@@ -642,7 +642,8 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
-| **Pre-Commit Gates** (F-0016, F-0116) | `pre-commit-check.sh` — 17 structural checks. Exit code 1 blocks commit. Checks: WIP lock, acceptance criteria, JOURNAL staleness, FEATURES.md staleness, batch size, test execution, complexity limits, untracked files, instruction file size, branch policy, shipped spec protection (migration required), test file deletion protection, status downgrade protection, custom extension gates. | ACTIVE - proven by mutation tests |
+| **Pre-Commit Gates** (F-0016, F-0116, T-0051) | `pre-commit-check.sh` — 17 structural checks + advisories. Exit code 1 blocks commit. Checks: WIP lock, acceptance criteria, JOURNAL staleness, FEATURES.md staleness, batch size, test execution, complexity limits, untracked files, instruction file size, branch policy, shipped spec protection (migration required), test file deletion protection, status downgrade protection, custom extension gates. Advisories: QA propagation, AC check-off (T-0051 — warns when in_progress features have unchecked ACs). | ACTIVE - proven by mutation tests |
+| **Taste Review Checkpoint** (F-0183) | `review_taste` piggybacks on code review transitions. When `critical_agent`: spawns adversarial reviewer with `taste_review.md` prompt + style context from STACK.md `## Style & taste` section. When `human`: creates pending review. Taste verdicts use `taste_` filename prefix to coexist with code review verdicts. Omitting style settings silently skips (AC-004). | ACTIVE |
 | **Git Hook Enforcement** (F-0129) | `git config core.hooksPath .agentic/hooks` wired in scaffold.sh + upgrade.sh. Git calls pre-commit dispatcher which routes to pre-commit-check.sh. CI detection skips hooks in automated builds. `pre_commit_hook: fast|full|no` in STACK.md. | ACTIVE - mutation-test proven |
 | **Gate-Based Verification** (F-0091) | `doctor.py` with modes: `--quick` (advisory), `--full` (comprehensive), `--pre-commit` (blocking), `--phase planning|complete` (phase-specific). Single verification command. | ACTIVE |
 | **Phase Detection** (F-0092) | `phase_detect.py` automatically detects dev phase (start, planning, implement, complete, blocked) and runs appropriate gates. | ACTIVE - used by doctor.py |

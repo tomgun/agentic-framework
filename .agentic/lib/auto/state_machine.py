@@ -340,7 +340,7 @@ class FeatureStateMachine:
 
         # Review checkpoint: after gates pass, before transition writes
         if not skip_review:
-            from auto.review import check_review, has_pending_review
+            from auto.review import check_review, check_taste_review, has_pending_review
 
             if has_pending_review(self.project_root, feature_id, target.value):
                 return False, [
@@ -359,6 +359,21 @@ class FeatureStateMachine:
                     )
                     return True, messages
                 return False, review_msgs
+
+            # Taste review piggybacks on code review transitions (F-0183)
+            taste_ok, taste_msgs = check_taste_review(
+                self.project_root, feature_id,
+                current.value if current else "unknown", target.value,
+            )
+            if taste_msgs:
+                messages.extend(taste_msgs)
+            if not taste_ok:
+                if dry_run:
+                    messages.append(
+                        f"DRY RUN: Would block for taste review ({target.value})"
+                    )
+                    return True, messages
+                return False, taste_msgs
 
         # Log regression cascades
         if current and self.is_regression(current, target):
