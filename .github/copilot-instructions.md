@@ -31,7 +31,7 @@ Small batch development: When user asks for something large ("entire", "full", "
 Rules:
 - Never auto-commit. Show changes to human first.
 - Add/update tests for new/changed logic.
-- Code + docs = done (update docs with code, not later).
+- Spec + code + tests + docs = done (update all artifacts together, not later).
 - Keep changes small and scoped.
 - **Every merge**: Bump VERSION via `ag done` (not in the PR). Update .agentic/CONTRIBUTIONS.md with user's insight/direction during the PR.
 - Update .agentic/journal/JOURNAL.md and .agentic/STATUS.md before every commit (use token-efficient scripts).

@@ -36,7 +36,7 @@ Rules:
 - **PR by default**: Create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to HUMAN_NEEDED.md for review tracking.
 - Never auto-commit. Show changes to human first.
 - Add/update tests for new/changed logic.
-- Code + docs = done (update docs with code, not later).
+- Spec + code + tests + docs = done (update all artifacts together, not later).
 - Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
 - Keep changes small and scoped.
 - Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).

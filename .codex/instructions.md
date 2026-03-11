@@ -30,7 +30,7 @@ Rules:
 - **PR by default**: Create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking.
 - Never auto-commit. Show changes to human first.
 - Add/update tests for new/changed logic.
-- Code + docs = done (update docs with code, not later).
+- Spec + code + tests + docs = done (update all artifacts together, not later).
 - Keep changes small and scoped.
 - **Every merge**: Bump VERSION via `ag done` (not in the PR). Update .agentic/CONTRIBUTIONS.md with user's insight/direction during the PR.
 - Multi-agent: check `.agentic/session/AGENTS.json` (or `python3 .agentic/lib/tools/agents_helpers.py --project-root . list`) before starting work.

@@ -121,7 +121,7 @@ phase: commit
 ### Project Documentation
 
 - [ ] **Project docs updated with code changes**
-  - Code + docs = done — don't defer doc updates to a follow-up
+  - Spec + code + tests + docs = done — don't defer artifact updates to a follow-up
   - Run `bash .agentic/lib/tools/docs.sh --list` to see the doc registry and which components they cover
   - Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
   - If you changed user-facing behavior, update the relevant docs
