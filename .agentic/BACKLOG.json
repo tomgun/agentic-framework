@@ -111,7 +111,7 @@
   },
   {
     "type": "task",
-    "description": "Quick wins: T-0013, T-0014, T-0018, T-0034, T-0048, T-0049",
+    "description": "Quick wins: T-0013, T-0018, T-0034, T-0048, T-0049 (T-0014 deferred)",
     "added_at": "2026-03-11T08:16:40Z",
     "added_by": "agent"
   }

@@ -680,9 +680,9 @@ def _check_plan_file(project_root: Path, feature_id: str) -> None:
     """Print advisory if no durable plan file exists for the feature."""
     plans_dir = project_root / ".agentic" / "journal" / "plans"
     if not plans_dir.is_dir():
-        print(f"  Advisory: no plans/ directory found — consider saving plans durably.")
+        print("  Advisory: no plans/ directory found — consider saving plans durably.")
         return
-    pattern = f"{feature_id}*plan*"
+    pattern = f"*{feature_id}*plan*"
     matches = list(plans_dir.glob(pattern))
     if not matches:
         print(f"  Advisory: no durable plan file found for {feature_id} in .agentic/journal/plans/.")
