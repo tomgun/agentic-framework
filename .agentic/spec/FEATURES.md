@@ -3546,3 +3546,22 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 - Tests: TBD
 
 **Acceptance**: See `spec/acceptance/F-0207.md`
+
+## F-0208: Deferred Documentation Mode (docs_mode setting)
+
+**Status**: planned
+**Category**: Quality
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.53.7
+
+**Description**: A `docs_mode` setting in STACK.md that controls when documentation is updated. Options: `inline` (current default — update docs with code in the same commit), `deferred` (skip doc updates during fast iteration, queue them for later). In deferred mode, doc updates are triggered explicitly (`ag docs generate`) or at natural checkpoints (feature_done, PR creation). Automatic doc generation synthesizes content from specs, acceptance criteria, and code — with good specs in place, most documentation can be reliably generated rather than manually maintained in real-time. The `docs_gate` setting interacts: `blocking` + `deferred` means docs must be generated before `ag done` but not during each commit. Enables fast iteration without doc overhead while ensuring docs are never forgotten.
+
+**Dependencies**: F-0207 (Project Documentation Lifecycle)
+
+**Implementation**:
+- State: none
+- Code: TBD
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0208.md`

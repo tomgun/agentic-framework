@@ -102,5 +102,16 @@
     "added_at": "2026-03-11T15:51:55Z",
     "added_by": "agent",
     "notes": "Reliable doc creation, staleness detection, trigger-based updates, coverage tracking. High priority \u2014 recurring agent blind spot."
+  },
+  {
+    "type": "feature",
+    "id": "F-0208",
+    "description": "Deferred Documentation Mode (docs_mode setting)",
+    "added_at": "2026-03-11T15:56:19Z",
+    "added_by": "agent",
+    "notes": "docs_mode: inline|deferred. Deferred skips doc updates during fast iteration, auto-generates from specs+AC+code at checkpoints. Enables speed without forgetting docs.",
+    "depends_on": [
+      "F-0207"
+    ]
   }
 ]
