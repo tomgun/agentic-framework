@@ -1,29 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0201",
-    "description": "Vision-to-Backlog Pipeline (ag kickoff)",
-    "added_at": "2026-03-11T00:00:00Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0201.md"
-    ],
-    "notes": "ADR-002 priority 2. THE linchpin \u2014 feeds ag auto epic.",
-    "depends_on": [
-      "F-0186"
-    ],
-    "became_current_at": "2026-03-11T07:34:26Z"
-  },
-  {
-    "type": "task",
-    "id": "T-0054",
-    "description": "Doc + LLM test gates in implementing-features and committing-changes skills",
-    "added_at": "2026-03-11T07:38:47Z",
-    "added_by": "agent",
-    "notes": "Recurring issue: agent forgets doc updates + LLM test checks. Fix skills with explicit gates."
-  },
-  {
-    "type": "feature",
     "id": "F-0202",
     "description": "Preview Capability (ag preview)",
     "added_at": "2026-03-11T00:00:00Z",
@@ -31,7 +8,8 @@
     "refs": [
       ".agentic/spec/acceptance/F-0202.md"
     ],
-    "notes": "ADR-002 priority 3. Enables Mode 2 feedback loop."
+    "notes": "ADR-002 priority 3. Enables Mode 2 feedback loop.",
+    "became_current_at": "2026-03-11T15:01:42Z"
   },
   {
     "type": "feature",
