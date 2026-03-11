@@ -7,6 +7,92 @@
   },
   {
     "type": "feature",
+    "id": "F-0183",
+    "description": "Taste and Style Settings",
+    "added_at": "2026-03-11T00:00:00Z",
+    "added_by": "agent",
+    "refs": [
+      ".agentic/spec/acceptance/F-0183.md"
+    ],
+    "notes": "ADR-002 priority 1. Low-dependency start for autonomy pipeline.",
+    "depends_on": [
+      "F-0182"
+    ]
+  },
+  {
+    "type": "feature",
+    "id": "F-0201",
+    "description": "Vision-to-Backlog Pipeline (ag kickoff)",
+    "added_at": "2026-03-11T00:00:00Z",
+    "added_by": "agent",
+    "refs": [
+      ".agentic/spec/acceptance/F-0201.md"
+    ],
+    "notes": "ADR-002 priority 2. THE linchpin — feeds ag auto epic.",
+    "depends_on": [
+      "F-0186"
+    ]
+  },
+  {
+    "type": "feature",
+    "id": "F-0202",
+    "description": "Preview Capability (ag preview)",
+    "added_at": "2026-03-11T00:00:00Z",
+    "added_by": "agent",
+    "refs": [
+      ".agentic/spec/acceptance/F-0202.md"
+    ],
+    "notes": "ADR-002 priority 3. Enables Mode 2 feedback loop."
+  },
+  {
+    "type": "feature",
+    "id": "F-0203",
+    "description": "Auto-Commit/Merge Mode (R2 Amendment)",
+    "added_at": "2026-03-11T00:00:00Z",
+    "added_by": "agent",
+    "refs": [
+      ".agentic/spec/acceptance/F-0203.md"
+    ],
+    "notes": "ADR-002 priority 4. ~15 files, R2 principle amendment.",
+    "depends_on": [
+      "F-0182"
+    ]
+  },
+  {
+    "type": "feature",
+    "id": "F-0204",
+    "description": "Epic Integration Verification",
+    "added_at": "2026-03-11T00:00:00Z",
+    "added_by": "agent",
+    "refs": [
+      ".agentic/spec/acceptance/F-0204.md"
+    ],
+    "notes": "ADR-002 priority 5. Quality gate for epics.",
+    "depends_on": [
+      "F-0186"
+    ]
+  },
+  {
+    "type": "feature",
+    "id": "F-0205",
+    "description": "Discovery-to-Formal Migration (ag formalize)",
+    "added_at": "2026-03-11T00:00:00Z",
+    "added_by": "agent",
+    "notes": "ADR-002 priority 7. New ag formalize command."
+  },
+  {
+    "type": "feature",
+    "id": "F-0206",
+    "description": "Feedback Capture System",
+    "added_at": "2026-03-11T00:00:00Z",
+    "added_by": "agent",
+    "notes": "ADR-002 priority 8. DEFERRED until F-0202 generates real patterns.",
+    "depends_on": [
+      "F-0202"
+    ]
+  },
+  {
+    "type": "feature",
     "id": "F-0187",
     "description": "Multi-Repo Umbrella (ADR-001 Phase 3)",
     "added_at": "2026-03-08T19:57:20Z",
@@ -14,7 +100,7 @@
     "refs": [
       ".agentic/spec/acceptance/F-0187.md"
     ],
-    "notes": "Cross-repo coordination.",
+    "notes": "Cross-repo coordination. No longer prerequisite for F-0188.",
     "depends_on": [
       "F-0179",
       "F-0186"
@@ -29,10 +115,9 @@
     "refs": [
       ".agentic/spec/acceptance/F-0188.md"
     ],
-    "notes": "Full autonomous pipeline.",
+    "notes": "Capstone. Children: F-0201, F-0202, F-0204, F-0206.",
     "depends_on": [
-      "F-0186",
-      "F-0187"
+      "F-0186"
     ]
   }
 ]
