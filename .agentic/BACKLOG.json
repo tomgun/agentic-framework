@@ -1,25 +1,5 @@
 [
   {
-    "type": "task",
-    "description": "T-0051: AC check-off enforcement in pre-commit",
-    "added_at": "2026-03-10T21:19:27Z",
-    "added_by": "agent"
-  },
-  {
-    "type": "feature",
-    "id": "F-0183",
-    "description": "Taste and Style Settings",
-    "added_at": "2026-03-11T00:00:00Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0183.md"
-    ],
-    "notes": "ADR-002 priority 1. Low-dependency start for autonomy pipeline.",
-    "depends_on": [
-      "F-0182"
-    ]
-  },
-  {
     "type": "feature",
     "id": "F-0201",
     "description": "Vision-to-Backlog Pipeline (ag kickoff)",
@@ -28,7 +8,7 @@
     "refs": [
       ".agentic/spec/acceptance/F-0201.md"
     ],
-    "notes": "ADR-002 priority 2. THE linchpin — feeds ag auto epic.",
+    "notes": "ADR-002 priority 2. THE linchpin \u2014 feeds ag auto epic.",
     "depends_on": [
       "F-0186"
     ]

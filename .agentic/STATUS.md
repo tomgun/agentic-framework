@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0185 shipped, running ag done cleanup (Updated: 2026-03-10 23:06 EET)
+- T-0051 + F-0183 shipped. Committing to feature branch. (Updated: 2026-03-11 08:51 EET)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item
@@ -30,4 +30,4 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - v0.47.1: Docker sandbox for autonomous Claude Code
 - v0.47.0: Formal state machine for feature lifecycle (ADR-001 Phase 1)
 - See CHANGELOG.md for full history
-- QA: QA: 0/1 verified, 3 pending
+- QA: QA: 0/1 verified, 4 pending

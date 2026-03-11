@@ -2053,3 +2053,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 08:51 - T-0051 + F-0183: AC Advisory + Taste Settings
+
+**Why**: Enable style/aesthetic consistency reviews; prevent forgotten AC check-offs
+
+**What changed**:
+- Shipped: pre-commit AC check-off advisory (T-0051), taste & style review system (F-0183). Fixed all review findings: verdict artifact prefix, pending review collision, double style context, multi-line comment parsing, path traversal guard, spurious feature ID extraction.
+
+**Next steps**:
+- Advance backlog to F-0201
+
+**Blockers**: None
+

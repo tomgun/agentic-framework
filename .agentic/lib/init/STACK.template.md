@@ -84,7 +84,19 @@ Purpose: a single source of truth for "how we build and run software here".
 - review_regression: critical_agent
 # Any regression transition. Discovery: critical_agent | Formal: human | Autonomous Formal: critical_agent
 - review_taste: skip
-# Subjective decisions (future). Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
+# Style/taste reviews (F-0183). Requires ## Style & taste settings below. Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
+
+## Style & taste
+<!-- Declare style direction for taste-sensitive reviews (F-0183). -->
+<!-- Uncomment and fill to enable taste reviews by the critical agent. -->
+<!-- When present and review_taste != skip, the critical agent validates -->
+<!-- consistency with these declared guidelines during code review. -->
+<!-- - style_guide: -->
+<!--   # Path to visual/UI style guide (e.g., docs/style-guide.md, Figma URL) -->
+<!-- - design_system: -->
+<!--   # Path to design system docs (e.g., docs/design-system.md, Storybook URL) -->
+<!-- - api_style: -->
+<!--   # API style preference (e.g., rest-jsonapi, graphql, grpc, rest-openapi) -->
 
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
