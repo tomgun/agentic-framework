@@ -21,6 +21,16 @@ Verify acceptance criteria, mark features done, update specs, and cleanup.
 
 ## Instructions
 
+### Step 0: Check Uncommitted Changes
+
+Before completing, ensure all work is committed:
+
+```bash
+git status --porcelain
+```
+
+If there are uncommitted changes, commit first (`ag commit`) before proceeding. Uncommitted work gets lost in compressed context and is easy to forget.
+
 ### Step 1: Verify Acceptance Criteria
 
 Read `.agentic/spec/acceptance/F-XXXX.md` and verify each criterion is met:
