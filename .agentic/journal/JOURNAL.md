@@ -2144,3 +2144,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 17:25 - Fix: manifest + backlog guards
+
+**Why**: manifest.sh regenerated duplicates after rebases, backlog.sh done silently dropped unshipped features
+
+**What changed**:
+- Manifests are now frozen after first generation (no rebase noise), commits deduped by message+date. Backlog done validates shipped status. State flush includes manifests.
+
+**Next steps**:
+- Merge PR, ag done
+
+**Blockers**: None
+

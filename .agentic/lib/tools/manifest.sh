@@ -46,6 +46,7 @@ USAGE:
 OPTIONS:
     --output FILE     Override output file path
     --markdown        Output Markdown format instead of JSON
+    --force           Regenerate even if manifest already exists
     -h, --help        Show this help
 
 EXAMPLES:
@@ -60,6 +61,8 @@ OUTPUT:
     Part of persistent history (always committed).
 EOF
 }
+
+_ORIG_ARGS="$*"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -82,6 +85,9 @@ while [[ $# -gt 0 ]]; do
             FORMAT="markdown"
             shift
             ;;
+        --force)
+            shift
+            ;;
         --output)
             OUTPUT_FILE="$2"
             shift 2
@@ -102,6 +108,22 @@ while [[ $# -gt 0 ]]; do
 done
 
 [[ -z "$MODE" ]] && error "Must specify F-XXXX, --branch, --since, or --commits"
+
+# For feature mode: skip if manifest already exists (frozen after first generation)
+# Manifests are point-in-time snapshots generated at `ag done`. Regenerating after
+# rebases introduces duplicate commits with different hashes for the same logical
+# change — confusing noise for anyone reading the manifest. Use --force to override.
+FORCE=false
+[[ "$_ORIG_ARGS" == *"--force"* ]] && FORCE=true
+
+if [[ "$MODE" == "feature" && "$FORCE" == "false" ]]; then
+    existing_json="$MANIFESTS_DIR/${VALUE}.json"
+    existing_md="$MANIFESTS_DIR/${VALUE}.manifest.md"
+    if [[ -f "$existing_json" || -f "$existing_md" ]]; then
+        echo "✅ Manifest already exists for $VALUE (use --force to regenerate)"
+        exit 0
+    fi
+fi
 
 # Find commits based on mode
 find_commits() {
@@ -177,11 +199,14 @@ json_escape() {
     printf '%s' "$str"
 }
 
-# Collect all data first
+# Collect all data first, deduplicating by message+date.
+# After rebases, the same logical commit gets a new hash. Without dedup,
+# the manifest shows duplicate entries — confusing for readers.
 TOTAL_ADDED=0
 TOTAL_REMOVED=0
 ALL_FILES=""
 COMMITS_DATA=""
+SEEN_COMMITS=""  # "date|message" dedup key
 
 while IFS= read -r commit; do
     [[ -z "$commit" ]] && continue
@@ -190,6 +215,13 @@ while IFS= read -r commit; do
     SHORT=$(git log -1 --format="%h" "$commit" 2>/dev/null) || continue
     DATE=$(git log -1 --format="%cs" "$commit")
     MSG=$(git log -1 --format="%s" "$commit")
+
+    # Dedup by date+message (survives rebases that change hashes)
+    DEDUP_KEY="${DATE}|${MSG}"
+    if echo "$SEEN_COMMITS" | grep -qF "$DEDUP_KEY"; then
+        continue
+    fi
+    SEEN_COMMITS="$SEEN_COMMITS$DEDUP_KEY"$'\n'
 
     # Get file stats
     STATS=$(git log -1 --numstat --format="" "$commit")

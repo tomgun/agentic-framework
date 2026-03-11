@@ -133,6 +133,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ## Done
 
 
+### T-0057: T-0057: manifest.sh regenerates on every dashboard/status call, creating dirty working tree noise. Also duplicates commits after rebase (dedup by message not just hash). Should either: (1) only regenerate when explicitly asked, or (2) gitignore manifests, or (3) dedup properly.
+- **Resolved**: 2026-03-11 — resolved
+
 ### T-0054: Agent forgets doc updates and LLM test checks during feature implementation. Root cause: implementing-features and committing-changes skills don't have explicit gates for (1) checking if project docs (HOW_IT_WORKS, DEVELOPER_GUIDE, CHANGELOG, instruction files) need updating, and (2) checking if new LLM tests should be added. The doc check in implementing-features Step 6 only runs drift.sh and checks the doc registry — it doesn't check framework instruction files. Fix: add framework-dev doc gate to implementing-features Step 6 (when in framework repo, check all instruction files per CLAUDE.md § Framework Development), and add LLM test advisory to committing-changes (when new ag commands or behavioral rules are added, suggest LLM test). This is a recurring issue — user has had to remind multiple times.
 - **Resolved**: 2026-03-11 — resolved
 ### T-0047: ag implement: gate on durable plan file (.agentic/journal/plans/F-XXXX-*-plan.md). Plans keep getting lost in ~/.claude/plans/.
