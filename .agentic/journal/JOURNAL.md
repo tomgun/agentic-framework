@@ -2118,3 +2118,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 16:58 - T-0054: Doc + LLM test gates
+
+**Why**: Agents repeatedly forgot to update project docs and never considered LLM behavioral tests when shipping features
+
+**What changed**:
+- Agents now have explicit doc-update decision flow and LLM test advisory at three instruction layers (skills, memory-seed, before_commit checklist). Doc registry maintenance is part of the workflow, not an afterthought.
+
+**Next steps**:
+- Merge PR, ag done
+
+**Blockers**: None
+
