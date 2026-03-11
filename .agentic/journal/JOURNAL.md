@@ -2170,3 +2170,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 17:55 - Definition of done slogan
+
+**Why**: Old slogan understated the full artifact lifecycle — specs and tests were missing from the definition of done
+
+**What changed**:
+- Updated 'code + docs = done' to 'spec + code + tests + docs = done' across all 11 instruction files
+
+**Next steps**:
+- PR review, merge, ag done
+
+**Blockers**: None
+

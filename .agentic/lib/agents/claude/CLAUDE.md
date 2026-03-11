@@ -17,7 +17,7 @@ Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 - Never auto-commit. Show changes to human first.
 - PR by default: create feature branches and PRs (check `git_workflow` in STACK.md).
 - Add/update tests for new/changed logic.
-- Code + docs = done (update docs with code, not later).
+- Spec + code + tests + docs = done (update all artifacts together, not later).
 - Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).

@@ -60,7 +60,7 @@ Before marking shipped, verify documentation is current:
 3. If `docs_gate: blocking` in STACK.md, `ag done` enforces this automatically
 4. For framework development: verify all instruction files updated (see CLAUDE.md § Framework Development)
 
-**Do not mark shipped with stale documentation.** Code + docs = done.
+**Do not mark shipped with stale artifacts.** Spec + code + tests + docs = done.
 
 ### Step 3: Update Feature Status
 

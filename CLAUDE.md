@@ -18,7 +18,7 @@ Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"
 - Never auto-commit. Show changes to human first.
 - PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking.
 - Add/update tests for new/changed logic.
-- Code + docs = done (update docs with code, not later).
+- Spec + code + tests + docs = done (update all artifacts together, not later).
 - Shipped specs are contracts: never modify shipped acceptance criteria without `bash .agentic/lib/tools/migration.sh create`. Pre-commit Checks 14-16 enforce this with no escape hatch.
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval.
