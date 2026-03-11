@@ -200,6 +200,10 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - doc: docs/FRAMEWORK_VALUE_PROPOSITION.md | tech-spec | manual
 - doc: .agentic/lib/README.md       | readme       | pr
 - doc: .agentic/lib/DEVELOPER_GUIDE.md | architecture | feature_done
+- doc: .agentic/spec/NFR.md         | tech-spec    | feature_done
+- doc: .agentic/spec/ISSUES.md      | custom       | feature_done
+- doc: .agentic/spec/REFERENCES.md  | custom       | manual
+- doc: .agentic/CONTRIBUTIONS.md    | changelog    | pr
 - doc: spec/adr/                   | adr          | manual
 
 ## Constraints & non-negotiables
