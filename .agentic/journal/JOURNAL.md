@@ -2092,3 +2092,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 12:31 - Quick Wins Batch Shipped
+
+**Why**: Reduce maintenance debt and improve agent completion UX
+
+**What changed**:
+- 5 TODOs closed: F-0103 shipped, legacy manifests removed, commit nudge in ag done + skill + cursorrules, plan advisory in ag review, dashboard after ag done
+
+**Next steps**:
+- Next backlog item
+
+**Blockers**: None
+
