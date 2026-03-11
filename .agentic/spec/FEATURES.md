@@ -3532,7 +3532,7 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0207: Project Documentation Lifecycle
 
-**Status**: planned
+**Status**: shipped
 **Category**: Quality
 **Priority**: high
 **Complexity**: medium

@@ -2222,3 +2222,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 23:03 - F-0207 Complete
+
+**Why**: Doc lifecycle was reactive — agents forgot to check registry. Now structural gates catch gaps.
+
+**What changed**:
+- Projects can now validate doc registry health (registered-but-missing + unregistered docs), scaffold new docs with auto-registration, and see coverage reports — enforced at ag done and pre-commit check 19
+
+**Next steps**:
+- Next: advance backlog
+
+**Blockers**: None
+
