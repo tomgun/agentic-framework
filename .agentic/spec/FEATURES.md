@@ -3565,3 +3565,20 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 - Tests: TBD
 
 **Acceptance**: See `spec/acceptance/F-0208.md`
+
+## F-0209: TDD Mode — Structural Test-First Enforcement
+
+**Status**: planned
+**Category**: Quality
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.53.9
+
+**Description**: When `development_mode: tdd` in STACK.md, the implementing-features workflow structurally enforces a red-green-refactor loop: (1) write a failing test for the next AC, (2) run it to confirm it fails (RED), (3) write minimal code to pass (GREEN), (4) refactor, (5) repeat for next AC. Currently TDD is just a label — the implementing-features skill says "check development_mode" but the actual workflow is identical for standard and tdd modes. This feature makes TDD a real behavioral mode: the skill instructions change (test-first ordering enforced per AC), `wip.sh checkpoint` records RED/GREEN transitions, and the pre-commit hook can optionally verify test-before-code commit ordering. The existing `tdd_mode.md` workflow doc exists but isn't wired into skills or gates.
+
+**Implementation**:
+- State: none
+- Code: TBD
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0209.md`

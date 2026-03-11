@@ -114,5 +114,13 @@
     "depends_on": [
       "F-0186"
     ]
+  },
+  {
+    "type": "feature",
+    "id": "F-0209",
+    "description": "TDD Mode \u2014 Structural Test-First Enforcement",
+    "added_at": "2026-03-11T16:35:13Z",
+    "added_by": "agent",
+    "notes": "development_mode: tdd becomes real \u2014 red-green-refactor loop enforced per AC in implementing-features skill, not just a label."
   }
 ]
