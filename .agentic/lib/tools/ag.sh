@@ -1158,6 +1158,12 @@ cmd_done() {
         return
     fi
 
+    # Warn about uncommitted changes (structural nudge — T-0034)
+    if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+        echo -e "${YELLOW}⚠ You have uncommitted changes.${NC} Consider running \`ag commit\` first."
+        echo ""
+    fi
+
     # --- Intent-driven execution (F-0200) ---
     # Write intent before any mutable work. Each step is checkpointed.
     # If the process dies mid-sequence, ag sync can resume from last checkpoint.
@@ -1539,6 +1545,12 @@ cmd_done() {
     # Clear intent — all steps complete
     if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
         intent_clear "$feature_id" || true
+    fi
+
+    # Show dashboard for status summary (T-0049)
+    if [ -t 1 ]; then
+        echo ""
+        bash "$SCRIPT_DIR/dashboard.sh" 2>/dev/null || true
     fi
 }
 

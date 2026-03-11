@@ -1631,9 +1631,10 @@ Features use sequential IDs (`F-XXXX`). Category is metadata, not encoded in the
 
 ## F-0103: Agent Mode Selection (Quality vs Cost)
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Agent System
 **Since**: v0.12.2
+**Note**: Heading-format ACs (pre-checkbox convention) verified manually 2026-03-11.
 
 **Description**: Allow users to choose an agent quality/cost tradeoff mode that affects model selection across all agent tasks. Critical tasks like planning and speccing use best models in all modes.
 
@@ -1654,7 +1655,7 @@ agent_mode: balanced  # premium | balanced | economy
 **Dependencies**: None
 
 **Implementation**:
-- State: in_progress
+- State: shipped
 - Code: STACK.template.md, CLAUDE.md, agent_operating_guidelines.md
 - Tests: validation of agent_mode values
 

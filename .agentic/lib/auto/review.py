@@ -672,6 +672,24 @@ def check_taste_review(
 
 
 # ---------------------------------------------------------------------------
+# Plan file advisory (T-0048)
+# ---------------------------------------------------------------------------
+
+
+def _check_plan_file(project_root: Path, feature_id: str) -> None:
+    """Print advisory if no durable plan file exists for the feature."""
+    plans_dir = project_root / ".agentic" / "journal" / "plans"
+    if not plans_dir.is_dir():
+        print("  Advisory: no plans/ directory found — consider saving plans durably.")
+        return
+    pattern = f"*{feature_id}*plan*"
+    matches = list(plans_dir.glob(pattern))
+    if not matches:
+        print(f"  Advisory: no durable plan file found for {feature_id} in .agentic/journal/plans/.")
+        print(f"  If a plan exists in ~/.claude/plans/, copy it with: ag sync")
+
+
+# ---------------------------------------------------------------------------
 # CLI entry point
 # ---------------------------------------------------------------------------
 
@@ -764,6 +782,11 @@ def main() -> int:
     )
     for msg in messages:
         print(msg)
+
+    # Plan file advisory (T-0048) — only on successful resolve
+    if success:
+        _check_plan_file(project_root, args.feature_id)
+
     return 0 if success else 1
 
 

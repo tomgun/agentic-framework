@@ -2079,3 +2079,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 11:48 - Quick Wins Batch
+
+**Why**: Batch of 5 quick-win TODO closures to reduce maintenance debt
+
+**What changed**:
+- Ship F-0103, remove legacy manifests, commit nudge, plan advisory in review, dashboard after done
+
+**Next steps**:
+- PR review, merge
+
+**Blockers**: None
+
