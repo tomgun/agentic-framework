@@ -3538,7 +3538,7 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 **Complexity**: medium
 **Since**: v0.53.7
 
-**Description**: Reliable creation, update, and maintenance of project documentation throughout the development lifecycle. Covers: doc registry in STACK.md as single source of truth for what docs exist and when they're checked; automated staleness detection (drift.sh, docs.sh); trigger-based update prompts (feature_done, pr, session, manual); agent decision flow for when to create vs update docs; component/area coverage tracking to identify documentation gaps. Ensures "code + docs = done" is structurally enforced, not just a behavioral rule.
+**Description**: Reliable creation, update, and maintenance of all project artifacts (specs, code, tests, docs) throughout the development lifecycle. "Specs + code + tests + docs = done" — not just code + docs. Covers: doc registry in STACK.md as single source of truth for what artifacts exist and when they're checked; automated staleness detection across all artifact types (drift.sh, docs.sh, spec health checks); trigger-based update prompts (feature_done, pr, session, manual); agent decision flow for when to create vs update artifacts; component/area coverage tracking to identify gaps in any artifact layer. Ensures the full definition of done is structurally enforced, not just a behavioral rule.
 
 **Implementation**:
 - State: none
