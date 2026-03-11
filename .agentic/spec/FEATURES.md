@@ -3158,7 +3158,9 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Description**: Full autonomous pipeline: epic → decompose → schedule → implement → review → ship. Integrates all ADR-001 components. User provides prompt + research + style guidelines, agents handle everything. Integration verification across all phases. ADR-001 Phase 7 capstone.
 
-**Dependencies**: F-0186, F-0187
+**Dependencies**: F-0186 (F-0187 optional — multi-repo is enhancement, not prerequisite for single-repo autonomy)
+
+**Children**: F-0201, F-0202, F-0204, F-0206
 
 **Implementation**:
 - State: none
@@ -3396,3 +3398,133 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 - Tests: tests/test_intents.py, validate_framework.sh
 
 **Acceptance**: spec/acceptance/F-0200.md
+
+---
+
+## F-0201: Vision-to-Backlog Pipeline (ag kickoff)
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: high
+**Complexity**: high
+**Since**: v0.53.2
+
+**Description**: `ag kickoff` command that converts a product vision into a structured backlog. Two modes: script (non-interactive, single prompt) and playbook (multi-turn interview). Output goes to staging area (`.agentic/session/kickoff-draft/`) for validation before promotion to real spec files. Reuses `ag decompose` and `backlog_helpers.py`. Token budget: 5–10K (script), 15–25K (playbook). THE linchpin for Modes 2 and 3. ADR-002 §3.
+
+**Dependencies**: F-0186
+**Parent**: F-0188
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/tools/kickoff.sh`, `.agentic/lib/auto/kickoff.py`, kickoff skill
+- Tests: `tests/test_kickoff.py`, `validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0201.md`
+
+---
+
+## F-0202: Preview Capability (ag preview)
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.53.2
+
+**Description**: `ag preview` command that detects stack from STACK.md and helps user run their software. MVP: documentation-first (detect stack → tell user how to run). P2: automated single-process dev server startup with health check and URL reporting. Enables Mode 2 feedback loop. ADR-002 §5.1.
+
+**Dependencies**: None
+**Parent**: F-0188
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/tools/preview.sh`
+- Tests: `validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0202.md`
+
+---
+
+## F-0203: Auto-Commit/Merge Mode (R2 Amendment)
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: medium
+**Complexity**: high
+**Since**: v0.53.2
+
+**Description**: New `review_commit: human | critical_agent` setting. Proposes amendment to Principle R2 distinguishing interactive sessions (never auto-commit) from automated execution (critical agent reviews diff, auto-commits if approved). ~15 files need conditional logic. Formalizes existing task.py behavior. ADR-002 §4.
+
+**Dependencies**: F-0182 (Critical Review Agent)
+
+**Implementation**:
+- State: none
+- Code: ~15 files (core-rules.md, agent templates, memory-seed, PRINCIPLES.md, git_workflow, LLM test 005, NFR catalog, committing-changes skill, profiles.conf)
+- Tests: LLM test 005 (make conditional), `validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0203.md`
+
+---
+
+## F-0204: Epic Integration Verification
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: medium
+**Complexity**: medium
+**Since**: v0.53.2
+
+**Description**: When all children of an epic reach `verified`, run integration test suite (if defined in epic's acceptance criteria). Verify cross-component contracts. Only then mark epic as `verified`. ADR-001 §6, ADR-002 §8.
+
+**Dependencies**: F-0186 (Autonomous Scheduler)
+**Parent**: F-0188
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/scheduler.py` (integration gate), `ag.sh` (cmd_verify_epic)
+- Tests: `tests/test_integration_verify.py`
+
+**Acceptance**: See `spec/acceptance/F-0204.md`
+
+---
+
+## F-0205: Discovery-to-Formal Migration (ag formalize)
+
+**Status**: planned
+**Category**: Workflow
+**Priority**: low
+**Complexity**: medium
+**Since**: v0.53.2
+
+**Description**: New `ag formalize` command that migrates discovery-phase content into formal spec structure: TODO items → FEATURES.md entries with auto-assigned IDs, journal plans → formal plan files, informal decisions → ADR stubs. Distinct from `migration.sh` (shipped spec evolution) and `enable-formal.sh` (directory creation). ADR-002 §7 (of gap analysis plan).
+
+**Dependencies**: None
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/tools/formalize.sh`
+- Tests: `validate_framework.sh`
+
+**Acceptance**: See `spec/acceptance/F-0205.md`
+
+---
+
+## F-0206: Feedback Capture System
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: low
+**Complexity**: medium
+**Since**: v0.53.2
+
+**Description**: Structured feedback capture after user tests working software via preview. Auto-converts to: bugs → ISSUES.md, features → TODO.md/FEATURES.md, acceptance criteria adjustments. Iteration loop: feedback → reprioritize → implement → preview again. DEFERRED until F-0202 (Preview) generates real usage patterns. ADR-002 §5.2.
+
+**Dependencies**: F-0202 (Preview Capability)
+**Parent**: F-0188
+
+**Implementation**:
+- State: none
+- Code: TBD (depends on real feedback patterns)
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0206.md`
