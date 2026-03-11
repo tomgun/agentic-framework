@@ -204,6 +204,12 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - doc: .agentic/spec/ISSUES.md      | custom       | feature_done
 - doc: .agentic/spec/REFERENCES.md  | custom       | manual
 - doc: .agentic/OVERVIEW.md          | architecture | feature_done
+- doc: .agentic/lib/START_HERE.md    | readme       | feature_done
+- doc: .agentic/lib/PRINCIPLES.md   | architecture | feature_done
+- doc: .agentic/lib/FRAMEWORK_MAP.md | architecture | feature_done
+- doc: .agentic/lib/DIRECT_EDITING.md | runbook     | manual
+- doc: .agentic/lib/EMERGENCY.md     | runbook      | manual
+- doc: .agentic/lib/MANUAL_OPERATIONS.md | runbook   | manual
 - doc: .agentic/CONTRIBUTIONS.md    | changelog    | pr
 - doc: spec/adr/                   | adr          | manual
 
