@@ -3045,7 +3045,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0183: Taste and Style Settings
 
-**Status**: planned
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: medium
 **Complexity**: medium

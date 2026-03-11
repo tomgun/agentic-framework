@@ -112,9 +112,20 @@ def _build_regression_pairs() -> set[tuple[str, str]]:
 
 _REGRESSION_PAIRS: set[tuple[str, str]] = _build_regression_pairs()
 
-# review_decomposition and review_taste exist in profiles.conf and STACK.md
-# but are not wired to transitions yet. They are placeholders for future
-# features (epic decomposition, subjective design decisions).
+# review_decomposition exists in profiles.conf and STACK.md but is not wired
+# to transitions yet — placeholder for epic decomposition (F-0204).
+#
+# review_taste is wired via check_taste_review() (F-0183) — piggybacks on
+# code review transitions (documented → committed). It runs as a separate
+# review pass with taste-specific prompt and style context.
+
+# Transitions that trigger an additional taste review when review_taste != skip
+_TASTE_REVIEW_TRANSITIONS: set[tuple[str, str]] = {
+    ("documented", "committed"),
+    ("implementing", "committed"),
+    ("planned", "shipped"),
+    ("implementing", "shipped"),
+}
 
 
 def _get_review_setting_key(from_state: str, to_state: str) -> Optional[str]:
@@ -303,6 +314,136 @@ def check_review(
     messages = [
         f"Review required: {feature_id} {from_state} → {to_state} "
         f"(setting: {setting_key}, mode: {mode.value})",
+        f"Resolve with: ag review {feature_id} {to_state}",
+    ]
+    if hn_id:
+        messages.append(f"Tracked as {hn_id} in HUMAN_NEEDED.md")
+
+    return False, messages
+
+
+def _has_style_settings(project_root: Path) -> bool:
+    """Check if STACK.md has uncommented settings in ## Style & taste section."""
+    paths = get_paths(project_root)
+    try:
+        content = paths.stack_file.read_text(encoding="utf-8")
+    except OSError:
+        return False
+
+    in_section = False
+    for line in content.splitlines():
+        if line.startswith("## Style & taste"):
+            in_section = True
+            continue
+        if in_section and line.startswith("## "):
+            break
+        if in_section:
+            stripped = line.strip()
+            # Uncommented setting line (not in HTML comment)
+            if (
+                stripped.startswith("- ")
+                and ":" in stripped
+                and not stripped.startswith("<!--")
+            ):
+                return True
+    return False
+
+
+def get_taste_review_mode(project_root: Path) -> ReviewMode:
+    """Resolve the review_taste setting."""
+    value = get_setting(project_root, "review_taste", "skip")
+    value = _normalize_review_value(value)
+    try:
+        return ReviewMode(value)
+    except ValueError:
+        return ReviewMode.SKIP
+
+
+def check_taste_review(
+    project_root: Path,
+    feature_id: str,
+    from_state: str,
+    to_state: str,
+) -> tuple[bool, list[str]]:
+    """Check if a taste review is needed for this transition.
+
+    Piggybacks on code review transitions. Only fires when:
+    1. The transition is in _TASTE_REVIEW_TRANSITIONS
+    2. review_taste setting is not skip
+    3. Style settings exist in STACK.md
+
+    Returns (can_proceed, messages) — same contract as check_review().
+    """
+    pair = (from_state, to_state)
+    if pair not in _TASTE_REVIEW_TRANSITIONS:
+        return True, []
+
+    mode = get_taste_review_mode(project_root)
+    if mode == ReviewMode.SKIP:
+        return True, []
+
+    # No style settings declared → skip gracefully (AC-004)
+    if not _has_style_settings(project_root):
+        return True, []
+
+    # Check for existing taste verdict artifact
+    paths = get_paths(project_root)
+    verdict_dir = paths.reviews_dir / feature_id
+    verdict_file = verdict_dir / f"taste_{from_state}_to_{to_state}.md"
+    if verdict_file.exists():
+        return True, []
+
+    # critical_agent → spawn taste reviewer
+    if mode == ReviewMode.CRITICAL_AGENT:
+        from auto.critical_agent import CriticalAgent
+
+        agent = CriticalAgent(project_root)
+        print(
+            f"Running taste review for {feature_id} "
+            f"({from_state} → {to_state})...",
+            file=sys.stderr,
+        )
+        try:
+            verdict = agent.review(
+                feature_id, from_state, to_state, "review_taste",
+            )
+        except Exception as e:
+            return _fallback_to_human(
+                project_root, paths, feature_id, from_state, to_state,
+                "review_taste", f"Taste review error: {e}",
+            )
+
+        if verdict.verdict == "approved":
+            _write_verdict_artifact(
+                paths, feature_id, from_state, to_state,
+                "review_taste", "approved", verdict.summary,
+                "critical_agent", mode.value,
+            )
+            return True, [f"Taste review approved: {verdict.summary}"]
+        elif verdict.verdict == "escalate":
+            return _fallback_to_human(
+                project_root, paths, feature_id, from_state, to_state,
+                "review_taste",
+                f"Taste review escalated: {verdict.summary}",
+            )
+        else:  # request_changes
+            issue_lines = [
+                f"  - [{i.get('severity', '?')}] {i.get('description', '?')}"
+                for i in verdict.issues
+            ]
+            return False, [
+                f"Taste review requests changes: {verdict.summary}",
+            ] + issue_lines
+
+    # human → block and create pending review
+    hn_id = create_pending_review(
+        project_root, feature_id, from_state, to_state,
+        "review_taste", mode.value,
+    )
+
+    messages = [
+        f"Taste review required: {feature_id} {from_state} → {to_state} "
+        f"(mode: {mode.value})",
         f"Resolve with: ag review {feature_id} {to_state}",
     ]
     if hn_id:

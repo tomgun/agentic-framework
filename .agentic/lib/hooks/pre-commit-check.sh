@@ -25,6 +25,7 @@
 #   14. Shipped spec changes require migration (BLOCKING)
 #   15. Test file deletion blocked if referenced by shipped feature (BLOCKING)
 #   16. Status downgrade protection for shipped features (BLOCKING)
+#   17. Unchecked acceptance criteria advisory (advisory, non-blocking)
 #
 # Escape hatches (use sparingly, blocked on main/master):
 #   SKIP_TESTS=1      Skip test execution
@@ -1046,6 +1047,32 @@ if [[ -d "$EXT_GATES_DIR" ]]; then
         FAILURES=$((FAILURES + 1))
       fi
     done <<< "$GATE_FILES"
+  fi
+fi
+
+# --- Advisory: Unchecked acceptance criteria ---
+FEATURES_FILE="$ROOT_DIR/.agentic/spec/FEATURES.md"
+AC_DIR="$ROOT_DIR/.agentic/spec/acceptance"
+if [[ -f "$FEATURES_FILE" && -d "$AC_DIR" ]]; then
+  # Extract feature IDs with in_progress status
+  IN_PROGRESS_IDS=$(grep -B 3 '^\*\*Status\*\*: in_progress' "$FEATURES_FILE" \
+    | grep -oE 'F-[0-9]+' | sort -u 2>/dev/null || true)
+  AC_WARNINGS=""
+  for fid in $IN_PROGRESS_IDS; do
+    AC_FILE="$AC_DIR/$fid.md"
+    if [[ -f "$AC_FILE" ]]; then
+      TOTAL=$(grep -cE '^\s*- \[[ x]\]' "$AC_FILE" 2>/dev/null) || TOTAL=0
+      UNCHECKED=$(grep -cE '^\s*- \[ \]' "$AC_FILE" 2>/dev/null) || UNCHECKED=0
+      CHECKED=$((TOTAL - UNCHECKED))
+      if [[ "$UNCHECKED" -gt 0 ]]; then
+        AC_WARNINGS="${AC_WARNINGS}\n   $fid: $CHECKED/$TOTAL acceptance criteria checked off"
+      fi
+    fi
+  done
+  if [[ -n "$AC_WARNINGS" ]]; then
+    echo ""
+    echo -e "⚠️  Advisory: In-progress features with unchecked acceptance criteria:$AC_WARNINGS"
+    echo "   Consider checking off completed ACs in this commit"
   fi
 fi
 

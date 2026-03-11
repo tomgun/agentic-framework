@@ -73,6 +73,11 @@ _REVIEW_FOCUS: dict[str, str] = {
         "Focus on: justification for regression, impact analysis, "
         "affected tests, rollback plan."
     ),
+    "review_taste": (
+        "Focus on: consistency with declared style guide, design system alignment, "
+        "naming conventions, API pattern consistency, public surface quality. "
+        "Only flag significant style inconsistencies — minor internal deviations are OK."
+    ),
 }
 
 
@@ -188,7 +193,9 @@ class CriticalAgent:
             sections.append(f"## Acceptance Criteria\n{ac_content}")
 
         # Review-type-specific context
-        if review_setting in ("review_code", "review_merge", "review_regression"):
+        if review_setting in (
+            "review_code", "review_merge", "review_regression", "review_taste",
+        ):
             diff = self._get_git_diff()
             if diff:
                 sections.append(f"## Code Changes (git diff)\n```\n{diff}\n```")
@@ -201,12 +208,70 @@ class CriticalAgent:
             if plan_content:
                 sections.append(f"## Implementation Plan\n{plan_content}")
 
+        # Style & taste settings (taste reviews)
+        if review_setting == "review_taste":
+            style_context = self._load_style_settings()
+            if style_context:
+                sections.append(f"## Style Settings\n{style_context}")
+
         # NFRs (all review types)
         nfr_content = self._read_file(self._paths.nfr_file)
         if nfr_content:
             sections.append(f"## Non-Functional Requirements\n{nfr_content}")
 
         return "\n\n".join(sections)
+
+    def _load_style_settings(self) -> str:
+        """Load style & taste settings from STACK.md's ## Style & taste section."""
+        stack_content = self._read_file(self._paths.stack_file)
+        if not stack_content:
+            return ""
+
+        # Extract the ## Style & taste section
+        lines = stack_content.splitlines()
+        in_section = False
+        section_lines: list[str] = []
+        for line in lines:
+            if line.startswith("## Style & taste"):
+                in_section = True
+                continue
+            if in_section and line.startswith("## "):
+                break
+            if in_section:
+                # Skip HTML comments but include uncommented settings
+                stripped = line.strip()
+                if stripped.startswith("<!--") and stripped.endswith("-->"):
+                    continue
+                if stripped.startswith("- ") and ":" in stripped:
+                    section_lines.append(stripped)
+
+        if not section_lines:
+            return ""
+
+        # Also load referenced files if they exist
+        result_parts = ["### Declared Settings"]
+        for sl in section_lines:
+            result_parts.append(sl)
+
+        # Try to load referenced files (style_guide, design_system paths)
+        for sl in section_lines:
+            key_val = sl.lstrip("- ").split(":", 1)
+            if len(key_val) == 2:
+                key = key_val[0].strip()
+                val = key_val[1].strip()
+                if key in ("style_guide", "design_system") and val:
+                    ref_path = self.project_root / val
+                    ref_content = self._read_file(ref_path)
+                    if ref_content:
+                        # Truncate to keep context manageable
+                        truncated = ref_content[:5000]
+                        if len(ref_content) > 5000:
+                            truncated += "\n... (truncated)"
+                        result_parts.append(
+                            f"\n### {key} ({val})\n{truncated}"
+                        )
+
+        return "\n".join(result_parts)
 
     def _get_git_diff(self) -> str:
         """Get git diff, choosing ref range based on branch. Truncates."""
@@ -340,10 +405,15 @@ class CriticalAgent:
     # -- Prompt building ---------------------------------------------------
 
     def _build_prompt(self, context: str, review_setting: str) -> str:
-        """Load critical_review.md template and substitute context."""
-        template_path = (
-            Path(__file__).resolve().parent / "prompts" / "critical_review.md"
-        )
+        """Load review template and substitute context."""
+        prompts_dir = Path(__file__).resolve().parent / "prompts"
+
+        # Taste reviews use their own template
+        if review_setting == "review_taste":
+            template_path = prompts_dir / "taste_review.md"
+        else:
+            template_path = prompts_dir / "critical_review.md"
+
         try:
             template = template_path.read_text(encoding="utf-8")
         except OSError:
@@ -371,8 +441,14 @@ class CriticalAgent:
             '```'
         )
 
+        # Taste template has {style_context} placeholder
+        style_context = ""
+        if review_setting == "review_taste":
+            style_context = self._load_style_settings() or "No style settings declared."
+
         return (
             template
+            .replace("{style_context}", style_context)
             .replace("{context}", context)
             .replace("{focus}", focus)
             .replace("{verdict_schema}", verdict_schema)

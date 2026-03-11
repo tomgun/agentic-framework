@@ -2053,3 +2053,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 08:10 - T-0051: AC Check-Off Advisory
+
+**Why**: Acceptance criteria were repeatedly left unchecked in implementation PRs
+
+**What changed**:
+- Added check 17 to pre-commit-check.sh — scans in_progress features for unchecked ACs, emits non-blocking advisory. 8 tests passing.
+
+**Next steps**:
+- Advance backlog: ag backlog done, begin F-0183
+
+**Blockers**: None
+
+
+### Session: 2026-03-11 08:18 - F-0183: Taste and Style Settings
+
+**Why**: Enable style/aesthetic consistency reviews in autonomous workflows
+
+**What changed**:
+- Shipped: STACK.template.md style section (AC-001/007), taste_review.md prompt (AC-003), critical_agent taste focus + style context loading (AC-002), review_taste wired to code review transitions in review.py + state_machine.py (AC-006), graceful skip when no settings (AC-004), 22 tests passing (AC-005).
+
+**Next steps**:
+- Advance backlog to F-0201 (Vision-to-Backlog Pipeline)
+
+**Blockers**: None
+
