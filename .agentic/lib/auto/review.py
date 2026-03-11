@@ -112,9 +112,11 @@ def _build_regression_pairs() -> set[tuple[str, str]]:
 
 _REGRESSION_PAIRS: set[tuple[str, str]] = _build_regression_pairs()
 
-# review_decomposition and review_taste exist in profiles.conf and STACK.md
-# but are not wired to transitions yet. They are placeholders for future
-# features (epic decomposition, subjective design decisions).
+# review_decomposition exists in profiles.conf and STACK.md but is not wired
+# to transitions yet. It is a placeholder for future epic decomposition.
+#
+# review_taste (F-0183) piggybacks on code review transitions — it fires
+# alongside check_review for transitions in _TASTE_REVIEW_TRANSITIONS.
 
 
 def _get_review_setting_key(from_state: str, to_state: str) -> Optional[str]:
@@ -163,14 +165,17 @@ def _write_verdict_artifact(
     reasoning: str,
     reviewer: str,
     review_mode: str,
+    filename_prefix: str = "",
 ) -> Path:
     """Write a verdict artifact atomically. Returns the verdict file path.
 
     Shared by resolve_review() (human) and check_review() (critical_agent).
+    filename_prefix separates verdict namespaces (e.g. "taste_" for taste reviews)
+    to prevent clobbering code review verdicts.
     """
     verdict_dir = paths.reviews_dir / feature_id
     verdict_dir.mkdir(parents=True, exist_ok=True)
-    verdict_file = verdict_dir / f"{from_state}_to_{to_state}.md"
+    verdict_file = verdict_dir / f"{filename_prefix}{from_state}_to_{to_state}.md"
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     verdict_content = (
         f"# Review: {feature_id} {from_state} → {to_state}\n"
@@ -338,7 +343,7 @@ def create_pending_review(
         "created_at": now,
     }
 
-    review_file = reviews_dir / f"{feature_id}_{to_state}.json"
+    review_file = reviews_dir / f"{feature_id}_{review_setting}_{to_state}.json"
 
     # Create HUMAN_NEEDED entry via blocker.sh
     blocker_sh = paths.tools_dir / "blocker.sh"
@@ -374,8 +379,14 @@ def has_pending_review(
 ) -> bool:
     """Check if a pending review exists for this feature/state."""
     paths = get_paths(project_root)
-    review_file = paths.pending_reviews_dir / f"{feature_id}_{to_state}.json"
-    return review_file.exists()
+    reviews_dir = paths.pending_reviews_dir
+    if not reviews_dir.exists():
+        return False
+    # New format: {feature_id}_{review_setting}_{to_state}.json
+    if list(reviews_dir.glob(f"{feature_id}_*_{to_state}.json")):
+        return True
+    # Legacy format: {feature_id}_{to_state}.json
+    return (reviews_dir / f"{feature_id}_{to_state}.json").exists()
 
 
 def get_pending_reviews(
@@ -420,9 +431,19 @@ def resolve_review(
     paths = get_paths(project_root)
     messages = []
 
-    # Load pending review data
-    pending_file = paths.pending_reviews_dir / f"{feature_id}_{target_state}.json"
-    if not pending_file.exists():
+    # Load pending review data (new format first, then legacy)
+    pending_file = None
+    reviews_dir = paths.pending_reviews_dir
+    if reviews_dir.exists():
+        matches = sorted(reviews_dir.glob(f"{feature_id}_*_{target_state}.json"))
+        if matches:
+            pending_file = matches[0]
+    if pending_file is None:
+        legacy = reviews_dir / f"{feature_id}_{target_state}.json"
+        if legacy.exists():
+            pending_file = legacy
+
+    if pending_file is None or not pending_file.exists():
         return False, [
             f"No pending review for {feature_id} → {target_state}"
         ]
@@ -438,9 +459,12 @@ def resolve_review(
     hn_id = review_data.get("hn_id")
 
     # 1. Store verdict artifact first (prevents re-review loop)
+    # Taste reviews use "taste_" prefix to avoid clobbering code review verdicts
+    filename_prefix = "taste_" if review_setting == "review_taste" else ""
     _write_verdict_artifact(
         paths, feature_id, from_state, target_state,
         review_setting, verdict, reasoning, "human", review_mode,
+        filename_prefix=filename_prefix,
     )
     messages.append(f"Verdict recorded: {verdict}")
 
@@ -485,6 +509,166 @@ def resolve_review(
         messages.append(f"Review rejected — transition {from_state} → {target_state} blocked")
 
     return True, messages
+
+
+# ---------------------------------------------------------------------------
+# Taste review (F-0183) — piggybacks on code review transitions
+# ---------------------------------------------------------------------------
+
+# Transitions that trigger taste review (alongside the normal code review).
+# These are the same transitions where code diff context is available.
+_TASTE_REVIEW_TRANSITIONS: set[tuple[str, str]] = {
+    ("documented", "committed"),
+    ("implementing", "committed"),
+    ("implementing", "shipped"),
+    ("planned", "shipped"),
+}
+
+
+def _has_style_settings(project_root: Path) -> bool:
+    """Check if STACK.md has any uncommented style settings in ## Style & taste."""
+    stack_path = project_root / "STACK.md"
+    try:
+        text = stack_path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+
+    in_section = False
+    in_comment = False
+    for line in text.splitlines():
+        if not in_section:
+            if re.match(r"^##\s+Style\s*&\s*taste", line, re.IGNORECASE):
+                in_section = True
+            continue
+
+        # Stop at next H2 heading
+        if re.match(r"^##\s+[^#]", line):
+            break
+
+        # Track multi-line HTML comment boundaries
+        if "<!--" in line and "-->" in line:
+            continue  # single-line comment, skip
+        if "<!--" in line:
+            in_comment = True
+            continue
+        if "-->" in line:
+            in_comment = False
+            continue
+        if in_comment:
+            continue
+
+        # Match setting lines: "- key: value"
+        if re.match(r"^\s*-\s*(?:style_guide|design_system|api_style)\s*:", line):
+            return True
+
+    return False
+
+
+def get_taste_review_mode(project_root: Path) -> ReviewMode:
+    """Resolve the review mode for taste review via settings."""
+    value = get_setting(project_root, "review_taste", "skip")
+    value = _normalize_review_value(value)
+    try:
+        return ReviewMode(value)
+    except ValueError:
+        return ReviewMode.SKIP
+
+
+def check_taste_review(
+    project_root: Path,
+    feature_id: str,
+    from_state: str,
+    to_state: str,
+) -> tuple[bool, list[str]]:
+    """Check if a taste review should fire for this transition.
+
+    Taste review piggybacks on code review transitions. It only fires when:
+    1. The transition is in _TASTE_REVIEW_TRANSITIONS
+    2. review_taste is not skip
+    3. STACK.md has uncommented style settings in ## Style & taste
+
+    Returns (can_proceed, messages). AC-004: omitting style settings preserves
+    existing behavior — taste review silently skips.
+    """
+    pair = (from_state, to_state)
+    if pair not in _TASTE_REVIEW_TRANSITIONS:
+        return True, []
+
+    mode = get_taste_review_mode(project_root)
+    if mode == ReviewMode.SKIP:
+        return True, []
+
+    # AC-004: no style settings → skip silently
+    if not _has_style_settings(project_root):
+        return True, []
+
+    # Check for existing taste verdict artifact
+    paths = get_paths(project_root)
+    verdict_dir = paths.reviews_dir / feature_id
+    taste_verdict = verdict_dir / f"taste_{from_state}_to_{to_state}.md"
+    if taste_verdict.exists():
+        return True, []
+
+    # critical_agent → spawn taste reviewer
+    if mode == ReviewMode.CRITICAL_AGENT:
+        from auto.critical_agent import CriticalAgent
+
+        agent = CriticalAgent(project_root)
+        print(
+            f"Running taste review for {feature_id} "
+            f"({from_state} → {to_state})...",
+            file=sys.stderr,
+        )
+        try:
+            verdict = agent.review(
+                feature_id, from_state, to_state, "review_taste",
+            )
+        except Exception as e:
+            # Taste review failure is non-blocking — warn and proceed
+            return True, [f"Taste review error (non-blocking): {e}"]
+
+        if verdict.verdict == "approved":
+            _write_verdict_artifact(
+                paths, feature_id, from_state, to_state,
+                "review_taste", "approved", verdict.summary,
+                "critical_agent", mode.value,
+                filename_prefix="taste_",
+            )
+            return True, [f"Taste review approved: {verdict.summary}"]
+        elif verdict.verdict == "escalate":
+            hn_id = create_pending_review(
+                project_root, feature_id, from_state, to_state,
+                "review_taste", "human",
+            )
+            msgs = [
+                f"Taste review escalated: {verdict.summary}",
+                f"Resolve with: ag review {feature_id} {to_state}",
+            ]
+            if hn_id:
+                msgs.append(f"Tracked as {hn_id} in HUMAN_NEEDED.md")
+            return False, msgs
+        else:  # request_changes
+            issue_lines = [
+                f"  - [{i.get('severity', '?')}] {i.get('description', '?')}"
+                for i in verdict.issues
+            ]
+            return False, [
+                f"Taste review requests changes: {verdict.summary}",
+            ] + issue_lines
+
+    # human → block and create pending review
+    hn_id = create_pending_review(
+        project_root, feature_id, from_state, to_state,
+        "review_taste", mode.value,
+    )
+    messages = [
+        f"Taste review required: {feature_id} {from_state} → {to_state} "
+        f"(setting: review_taste, mode: {mode.value})",
+        f"Resolve with: ag review {feature_id} {to_state}",
+    ]
+    if hn_id:
+        messages.append(f"Tracked as {hn_id} in HUMAN_NEEDED.md")
+    return False, messages
 
 
 # ---------------------------------------------------------------------------

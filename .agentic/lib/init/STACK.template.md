@@ -84,7 +84,7 @@ Purpose: a single source of truth for "how we build and run software here".
 - review_regression: critical_agent
 # Any regression transition. Discovery: critical_agent | Formal: human | Autonomous Formal: critical_agent
 - review_taste: skip
-# Subjective decisions (future). Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
+# Style/taste consistency review (F-0183). Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
 
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
@@ -292,6 +292,14 @@ Purpose: a single source of truth for "how we build and run software here".
 - Security/compliance: <!-- PII, GDPR, etc -->
 - Performance: <!-- latency, throughput -->
 - Reliability: <!-- SLOs if known -->
+
+## Style & taste (optional)
+<!-- Declare project style preferences so the critical agent can review for consistency. -->
+<!-- These settings are loaded into taste-sensitive reviews when review_taste != skip. -->
+<!-- See: F-0183, ADR-002 §2.2 -->
+<!-- - style_guide: https://example.com/style-guide  # URL or path to style guide -->
+<!-- - design_system: material-design-3  # Design system name/version -->
+<!-- - api_style: rest-jsonapi  # API style: rest-jsonapi | graphql | grpc | rpc -->
 
 ## Retrospectives (optional)
 <!-- Agent-led periodic project health checks. See .agentic/lib/workflows/retrospective.md -->

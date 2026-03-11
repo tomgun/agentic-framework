@@ -1069,6 +1069,32 @@ except: print(0)
   fi
 fi
 
+# --- Advisory: Unchecked acceptance criteria for in_progress features (T-0051) ---
+if [[ -f ".agentic/spec/FEATURES.md" ]]; then
+  # Heading-only extraction avoids spurious matches from body text
+  IN_PROGRESS_FEATURES=$(grep -B 3 -i "status.*in_progress" .agentic/spec/FEATURES.md | grep -oP '^## \KF-[0-9]+' || echo "")
+
+  if [[ -n "$IN_PROGRESS_FEATURES" ]]; then
+    AC_WARNINGS=""
+    while IFS= read -r fid; do
+      AC_FILE=".agentic/spec/acceptance/${fid}.md"
+      if [[ -f "$AC_FILE" ]]; then
+        TOTAL=$(grep -cE '^\s*- \[ \]' "$AC_FILE") || TOTAL=0
+        if [[ "$TOTAL" -gt 0 ]]; then
+          AC_WARNINGS="${AC_WARNINGS}\n   ${fid}: ${TOTAL} unchecked AC(s) in ${AC_FILE}"
+        fi
+      fi
+    done <<< "$IN_PROGRESS_FEATURES"
+
+    if [[ -n "$AC_WARNINGS" ]]; then
+      echo ""
+      echo "⚠️  Advisory: In-progress features with unchecked acceptance criteria"
+      echo -e "$AC_WARNINGS"
+      echo "   Consider checking off completed ACs before committing."
+    fi
+  fi
+fi
+
 # Summary
 echo ""
 echo "═══════════════════════════════════════════════════════"
