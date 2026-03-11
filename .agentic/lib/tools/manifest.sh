@@ -46,7 +46,6 @@ USAGE:
 OPTIONS:
     --output FILE     Override output file path
     --markdown        Output Markdown format instead of JSON
-    --force           Regenerate even if manifest already exists
     -h, --help        Show this help
 
 EXAMPLES:
@@ -61,8 +60,6 @@ OUTPUT:
     Part of persistent history (always committed).
 EOF
 }
-
-_ORIG_ARGS="$*"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -83,9 +80,6 @@ while [[ $# -gt 0 ]]; do
             ;;
         --markdown)
             FORMAT="markdown"
-            shift
-            ;;
-        --force)
             shift
             ;;
         --output)
@@ -109,21 +103,9 @@ done
 
 [[ -z "$MODE" ]] && error "Must specify F-XXXX, --branch, --since, or --commits"
 
-# For feature mode: skip if manifest already exists (frozen after first generation)
-# Manifests are point-in-time snapshots generated at `ag done`. Regenerating after
-# rebases introduces duplicate commits with different hashes for the same logical
-# change — confusing noise for anyone reading the manifest. Use --force to override.
-FORCE=false
-[[ "$_ORIG_ARGS" == *"--force"* ]] && FORCE=true
-
-if [[ "$MODE" == "feature" && "$FORCE" == "false" ]]; then
-    existing_json="$MANIFESTS_DIR/${VALUE}.json"
-    existing_md="$MANIFESTS_DIR/${VALUE}.manifest.md"
-    if [[ -f "$existing_json" || -f "$existing_md" ]]; then
-        echo "✅ Manifest already exists for $VALUE (use --force to regenerate)"
-        exit 0
-    fi
-fi
+# Manifests are regenerable — dedup by message+date prevents rebase noise.
+# The idempotency check (below, after generation) skips the write if content
+# is unchanged, so repeated `ag done` calls on a stable feature are no-ops.
 
 # Find commits based on mode
 find_commits() {

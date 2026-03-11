@@ -719,7 +719,7 @@ These features exist but don't clearly derive from the 13 principles:
 | **ADRs** (F-0101) | Architecture Decision Records | D5 (Living Docs) |
 | **Spec Migration System** (F-0117) | Track how specs evolved over time | D5 (Living Docs) |
 | **Documentation Drift Detection** (F-0118) | Detect stale docs | D5 (Living Docs) |
-| **Feature Change Manifests** (F-0119) | Git history per feature. Generated once at `ag done`, frozen after (no rebase noise). Commits deduped by message+date. `--force` to regenerate. Flushed via `ag flush`. | D3 (Durable Artifacts) |
+| **Feature Change Manifests** (F-0119) | Git history per feature. Generated at `ag done`, regenerable without noise (commits deduped by message+date survive rebases). Idempotent — unchanged content skips write. Flushed via `ag flush`. | D3 (Durable Artifacts) |
 | **Claude Skills** (F-0098, F-0143) | Hand-crafted Claude Skills with Anthropic spec compliance | F3 (Token & Context Optimization) |
 
 ---
