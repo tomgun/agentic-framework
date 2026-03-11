@@ -195,6 +195,11 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - doc: README.md                   | readme       | pr
 - doc: spec/LESSONS.md             | lessons      | feature_done
 - doc: docs/INSTRUCTION_ARCHITECTURE.md | architecture | feature_done
+- doc: docs/HOW_IT_WORKS.md         | architecture | feature_done
+- doc: docs/KEY_INSIGHTS.md         | lessons      | manual
+- doc: docs/FRAMEWORK_VALUE_PROPOSITION.md | tech-spec | manual
+- doc: .agentic/lib/README.md       | readme       | pr
+- doc: .agentic/lib/DEVELOPER_GUIDE.md | architecture | feature_done
 - doc: spec/adr/                   | adr          | manual
 
 ## Constraints & non-negotiables

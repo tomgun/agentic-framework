@@ -2157,3 +2157,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 17:39 - PR #117 merged
+
+**Why**: Bug fixes for backlog safety and manifest regeneration
+
+**What changed**:
+- Backlog done guard prevents removing unshipped features; manifest dedup by message+date survives rebases; ag flush can commit manifests via prefix patterns
+
+**Next steps**:
+- STACK.md doc registry update, then next backlog item
+
+**Blockers**: None
+
