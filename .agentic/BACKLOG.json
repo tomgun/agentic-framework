@@ -94,5 +94,13 @@
     "depends_on": [
       "F-0186"
     ]
+  },
+  {
+    "type": "feature",
+    "id": "F-0207",
+    "description": "Project Documentation Lifecycle",
+    "added_at": "2026-03-11T15:51:55Z",
+    "added_by": "agent",
+    "notes": "Reliable doc creation, staleness detection, trigger-based updates, coverage tracking. High priority \u2014 recurring agent blind spot."
   }
 ]

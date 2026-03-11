@@ -3529,3 +3529,20 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 - Tests: TBD
 
 **Acceptance**: See `spec/acceptance/F-0206.md`
+
+## F-0207: Project Documentation Lifecycle
+
+**Status**: planned
+**Category**: Quality
+**Priority**: high
+**Complexity**: medium
+**Since**: v0.53.7
+
+**Description**: Reliable creation, update, and maintenance of project documentation throughout the development lifecycle. Covers: doc registry in STACK.md as single source of truth for what docs exist and when they're checked; automated staleness detection (drift.sh, docs.sh); trigger-based update prompts (feature_done, pr, session, manual); agent decision flow for when to create vs update docs; component/area coverage tracking to identify documentation gaps. Ensures "code + docs = done" is structurally enforced, not just a behavioral rule.
+
+**Implementation**:
+- State: none
+- Code: TBD
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0207.md`
