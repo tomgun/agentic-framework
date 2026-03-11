@@ -17,8 +17,8 @@ source "$SCRIPT_DIR/../paths.sh"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 # Manifests live in .agentic/journal/ (persistent history, always committed)
 # Separate from .agentic/session/ (transient state, mostly gitignored)
-JOURNAL_DIR="$PROJECT_ROOT/.agentic-journal"
-MANIFEST_DIR="$JOURNAL_DIR/manifests"
+# Use MANIFESTS_DIR from paths.sh (resolves canonical vs legacy location)
+MANIFEST_DIR="$MANIFESTS_DIR"
 
 # Error handling
 error() { echo "❌ Error: $1" >&2; exit 1; }

@@ -32,8 +32,8 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0014: Verify shipped acceptance criteria for F-0131, F-0132, F-0133, F-0134, F-0135 — check boxes that are actually done, identify genuinely incomplete items
 - **Added**: 2026-02-28
 
-### T-0015: F-XXXX: Structural enforcement for durable plan saving. ag implement should check that a plan exists in .agentic-journal/plans/ and warn/block if missing. Needs a setting (e.g. plan_persistence: off|warning|blocking) since not every project wants saved plans. The plan-review loop (ag plan with plan_review_enabled) especially needs this — reviewed plans are high-value artifacts that should never be lost to session-scoped .claude/plans/. Implementation: add check in ag implement, add setting to profiles.conf (discovery: off, formal: warning), add to STACK.template.md ## Settings. See 2026-02-28-document-architecture-effectiveness-review.md for context.
-- **Added**: 2026-02-28
+### ~~T-0015: Structural enforcement for durable plan saving~~ **DONE**: Core covered by F-0198 (plan-scan.sh in ag sync auto-copies plans) + ag implement already checks plan file existence. The `plan_persistence` setting is a nice-to-have, not urgent.
+- **Added**: 2026-02-28 · **Closed**: 2026-03-11
 
 ### ~~T-0016: Worktree auto-detection~~ **OBSOLETE**: Duplicate of T-0046; core shipped in F-0194 (ag implement auto-creates worktree, worktree_mode setting).
 - **Added**: 2026-02-28 · **Closed**: 2026-03-10
@@ -56,8 +56,8 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0025: F-idea: NFRs as live invariants — NFR.md should be the source of truth that propagates to features, not a dead reference. Key changes: (1) Acceptance criteria should have a separate 'Invariants (from NFR.md)' section auto-derived from NFR scoping, distinct from feature-specific criteria. (2) Test-writing workflow should check applicable NFRs before writing feature tests. (3) check-spec-health.sh should cross-reference NFR modification dates vs feature spec dates — if NFR changed after spec was written and feature references it, flag for review. (4) NFR capture trigger: when a developer or agent expresses an invariant quality for the system ("it must always...", "never do X", performance/security/reliability constraints), recognize it and write it to spec/NFR.md — don't let invariants stay informal. (5) Important distinction: framework NFR.md has 2 structural NFRs; projects using the framework may have dozens (performance, security, accessibility, compliance, etc.) — the workflow/tooling must scale to a longer list with mixed types (structural, behavioral, design invariants).
 - **Added**: 2026-03-01
 
-### T-0028: Migrate .agentic-journal/ and .agentic-state/ into .agentic-local/ umbrella (directory consolidation)
-- **Added**: 2026-03-02
+### ~~T-0028: Migrate .agentic-journal/ and .agentic-state/ into .agentic-local/ umbrella~~ **OBSOLETE**: Both directories already migrated — .agentic-journal/ → .agentic/journal/ (T-0018), .agentic-state/ → .agentic/session/ (F-0194). Backward-compat fallbacks in paths.sh. No .agentic-local/ umbrella needed.
+- **Added**: 2026-03-02 · **Closed**: 2026-03-11
 
 ### T-0029: F-idea: Spec clarification taxonomy — resurface + enhance structured clarification in writing-specs skill. 6-category ambiguity taxonomy (functional, data model, edge cases, NFRs, integrations, completion signals), max 5 multiple-choice questions per spec, records [Clarified] markers. ~2K tokens/spec. Pre-existing framework idea resurfaced via SDD toolkit analysis (R1). Contributor: Tomas
 - **Added**: 2026-03-02
@@ -127,8 +127,8 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0054: Agent forgets doc updates and LLM test checks during feature implementation. Root cause: implementing-features and committing-changes skills don't have explicit gates for (1) checking if project docs (HOW_IT_WORKS, DEVELOPER_GUIDE, CHANGELOG, instruction files) need updating, and (2) checking if new LLM tests should be added. The doc check in implementing-features Step 6 only runs drift.sh and checks the doc registry — it doesn't check framework instruction files. Fix: add framework-dev doc gate to implementing-features Step 6 (when in framework repo, check all instruction files per CLAUDE.md § Framework Development), and add LLM test advisory to committing-changes (when new ag commands or behavioral rules are added, suggest LLM test). This is a recurring issue — user has had to remind multiple times.
 - **Added**: 2026-03-11
 
-### T-0055: manifest.sh hardcodes legacy .agentic-journal path (line 20-21) instead of using MANIFESTS_DIR from paths.sh. Now that legacy dir is removed (T-0018), new manifests may go to a recreated ghost directory. Fix: use $MANIFESTS_DIR.
-- **Added**: 2026-03-11
+### ~~T-0055: manifest.sh hardcodes legacy .agentic-journal path~~ **DONE**: Replaced hardcoded `$PROJECT_ROOT/.agentic-journal` with `$MANIFESTS_DIR` from paths.sh.
+- **Added**: 2026-03-11 · **Closed**: 2026-03-11
 
 ## Done
 
