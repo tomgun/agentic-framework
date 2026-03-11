@@ -100,7 +100,7 @@ If the user says start coordination server, parallel agents, remote control, rem
 
 If a state machine transition is blocked by a review checkpoint, or the user says review, approve, reject, pending review:
 
-**STOP.** Run `ag review` to list all pending reviews. To resolve: `ag review F-XXXX <state>` (approves by default), or `ag review F-XXXX <state> --reject --reason "why"`. Review modes (human/critical_agent/skip) are configurable per transition in STACK.md `### Review checkpoints`. Legacy value "auto" is accepted and mapped to "skip".
+**STOP.** Run `ag review` to list all pending reviews. To resolve: `ag review F-XXXX <state>` (approves by default), or `ag review F-XXXX <state> --reject --reason "why"`. Review modes (human/critical_agent/skip) are configurable per transition in STACK.md `### Review checkpoints`. Legacy value "auto" is accepted and mapped to "skip". Taste review (`review_taste`) piggybacks on code review transitions — if style settings are declared in STACK.md `## Style & taste`, the critical agent also validates style consistency.
 
 ## When work is done
 

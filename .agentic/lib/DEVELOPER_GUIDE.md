@@ -145,6 +145,7 @@ The agent will:
 
 - **c) Autonomous Formal**: Same rigor as Formal, but most review checkpoints are delegated to `critical_agent` instead of human. Only `review_merge` stays human. The critical agent spawns an adversarial Claude instance that reviews changes and returns structured verdicts (approved/request_changes/escalate).
   - Good for: Autonomous agent workflows, CI/CD pipelines, batch processing
+  - **Taste review** (`review_taste`): When set to `critical_agent` or `human`, code review transitions also trigger a style consistency review. Declare preferences in STACK.md `## Style & taste` section (`style_guide`, `design_system`, `api_style`). Omitting style settings silently skips taste review.
 
 ---
 
