@@ -114,5 +114,21 @@
     "depends_on": [
       "F-0186"
     ]
+  },
+  {
+    "type": "feature",
+    "id": "F-0209",
+    "description": "TDD Mode \u2014 Structural Test-First Enforcement",
+    "added_at": "2026-03-11T16:40:39Z",
+    "added_by": "agent",
+    "notes": "Investigation needed: can red-green-refactor be reliably enforced through skills? tdd_mode.md exists but isn't wired."
+  },
+  {
+    "type": "feature",
+    "id": "F-0210",
+    "description": "Configurable Definition of Done per Task Type",
+    "added_at": "2026-03-11T16:40:39Z",
+    "added_by": "agent",
+    "notes": "Investigation needed: feasibility of task-type-aware DoD checklists in ag done. Behavioral branching risk."
   }
 ]
