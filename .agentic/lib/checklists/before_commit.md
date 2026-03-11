@@ -118,6 +118,16 @@ phase: commit
   - Entry points still accurate?
   - Architecture snapshot current?
 
+### Project Documentation
+
+- [ ] **Project docs updated with code changes**
+  - Code + docs = done — don't defer doc updates to a follow-up
+  - Run `bash .agentic/lib/tools/docs.sh --list` to see the doc registry and which components they cover
+  - Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
+  - If you changed user-facing behavior, update the relevant docs
+  - If your change touches a component with no registered doc, decide whether it needs one
+  - If you created or changed a doc, ensure its `## Docs` entry in STACK.md has correct component/area tags
+
 ### Formal Profile (All Core items plus:)
 
 - [ ] **`.agentic/spec/FEATURES.md` reflects reality**
@@ -138,6 +148,24 @@ phase: commit
   - Acceptance criteria defined
   - Not a placeholder
   - Testable conditions listed
+
+---
+
+## Framework Development Only
+
+These checks apply only when working on the agentic framework repo itself:
+
+- [ ] **Instruction files updated** (if `ag` commands/gates/workflows changed)
+  - CLAUDE.md templates, cursorrules.txt, copilot-instructions.md, codex-instructions.md
+  - agent_operating_guidelines.md, auto_orchestration.md
+  - memory-seed.md, DEVELOPER_GUIDE.md, HOW_IT_WORKS.md
+  - Skills/checklists that reference the changed behavior
+  - Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift
+
+- [ ] **LLM test coverage considered** (if behavioral changes)
+  - If this commit adds/changes `ag` commands, trigger words, or agent workflows
+  - Check `tests/llm/test_definitions.json` for existing coverage
+  - LLM tests verify agents actually follow instructions — unit tests can't catch behavioral gaps
 
 ---
 

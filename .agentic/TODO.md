@@ -124,14 +124,17 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0053: F-idea: Migrate STACK.md to structured config format (YAML/TOML) with schema validation. Current grep/sed parsing is fragile and settings lack discoverability. New format should: (1) support inline comments documenting valid options for each setting (e.g. git_workflow: pull_request # options: pull_request | direct), (2) enable tab-completion or validation of setting values, (3) remain human-editable in any text editor, (4) preserve the single-file simplicity (no splitting into multiple configs). Related: T-0052 (LLM-optimized format pass), PRINCIPLES.md F3.
 - **Added**: 2026-03-11
 
-### T-0054: Agent forgets doc updates and LLM test checks during feature implementation. Root cause: implementing-features and committing-changes skills don't have explicit gates for (1) checking if project docs (HOW_IT_WORKS, DEVELOPER_GUIDE, CHANGELOG, instruction files) need updating, and (2) checking if new LLM tests should be added. The doc check in implementing-features Step 6 only runs drift.sh and checks the doc registry — it doesn't check framework instruction files. Fix: add framework-dev doc gate to implementing-features Step 6 (when in framework repo, check all instruction files per CLAUDE.md § Framework Development), and add LLM test advisory to committing-changes (when new ag commands or behavioral rules are added, suggest LLM test). This is a recurring issue — user has had to remind multiple times.
-- **Added**: 2026-03-11
-
 ### ~~T-0055: manifest.sh hardcodes legacy .agentic-journal path~~ **DONE**: Replaced hardcoded `$PROJECT_ROOT/.agentic-journal` with `$MANIFESTS_DIR` from paths.sh.
 - **Added**: 2026-03-11 · **Closed**: 2026-03-11
 
+### T-0056: T-0056: Plan file naming regression — saved plans missing YYYY-MM-DD date prefix (should be YYYY-MM-DD-F-XXXX-...-plan.md)
+- **Added**: 2026-03-11
+
 ## Done
 
+
+### T-0054: Agent forgets doc updates and LLM test checks during feature implementation. Root cause: implementing-features and committing-changes skills don't have explicit gates for (1) checking if project docs (HOW_IT_WORKS, DEVELOPER_GUIDE, CHANGELOG, instruction files) need updating, and (2) checking if new LLM tests should be added. The doc check in implementing-features Step 6 only runs drift.sh and checks the doc registry — it doesn't check framework instruction files. Fix: add framework-dev doc gate to implementing-features Step 6 (when in framework repo, check all instruction files per CLAUDE.md § Framework Development), and add LLM test advisory to committing-changes (when new ag commands or behavioral rules are added, suggest LLM test). This is a recurring issue — user has had to remind multiple times.
+- **Resolved**: 2026-03-11 — resolved
 ### T-0047: ag implement: gate on durable plan file (.agentic/journal/plans/F-XXXX-*-plan.md). Plans keep getting lost in ~/.claude/plans/.
 - **Resolved**: 2026-03-10 — Implemented as F-0198: plan-scan.sh in ag sync scans ephemeral plan dirs and auto-copies to .agentic/journal/plans/
 

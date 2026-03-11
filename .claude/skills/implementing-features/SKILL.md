@@ -112,12 +112,22 @@ This ensures MVP is solid before adding enhancements.
 
 Before declaring done, check which project docs need updating:
 
-1. Run `bash .agentic/lib/tools/docs.sh --list` to see the project's doc registry
+1. Run `bash .agentic/lib/tools/docs.sh --list` to see the project's doc registry and which components they cover
 2. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
-3. Update docs in the same change as code — don't defer to a follow-up
-4. If you created a new user-facing artifact, add it to the `## Docs` section in STACK.md
+3. Update stale docs in the same change as code — don't defer to a follow-up
+4. If your feature touches a component/area with **no registered doc**, decide whether it needs one — create it and register it in `## Docs` in STACK.md
+5. If you created or substantially changed a doc, ensure its `## Docs` entry has correct component/area tags — this is how `drift.sh` and `docs.sh` know which docs to check
 
 Doc updates are enforced at feature acceptance (`ag done`) when `docs_gate: blocking`.
+
+**Framework development only** (when working on the agentic framework repo itself):
+If you added or changed an `ag` command, gate, workflow, or behavioral rule, also check:
+- Instruction files: CLAUDE.md templates, cursorrules.txt, copilot-instructions.md, codex-instructions.md
+- Orchestration: agent_operating_guidelines.md, auto_orchestration.md
+- Onboarding: memory-seed.md, DEVELOPER_GUIDE.md, HOW_IT_WORKS.md
+- Skills/checklists that reference the changed behavior
+
+Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift.
 
 ### Step 7: Verify Before Declaring Done
 
