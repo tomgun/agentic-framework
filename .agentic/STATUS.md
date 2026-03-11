@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Quick wins batch shipped (v0.53.4), ready for next backlog item (Updated: 2026-03-11 12:31 EET)
+- Quick wins batch 2 shipped (v0.53.5). Next: T-0054 doc+LLM test gates (Updated: 2026-03-11 14:18 EET)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

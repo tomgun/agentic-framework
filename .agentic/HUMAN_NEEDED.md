@@ -33,6 +33,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0031: PR #115: Quick wins batch 2 — T-0015/T-0028/T-0055
+- **Type**: pr_review
+- **Added**: 2026-03-11
+- **Context**: https://github.com/tomgun/agentic-framework/pull/115
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0028: PR #91: Silent session start
