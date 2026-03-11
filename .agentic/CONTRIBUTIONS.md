@@ -8,7 +8,7 @@
 
 ## Recent Contributions
 
-### Definition of Done — Full Artifact Lifecycle (PR #118, F-0207)
+### Definition of Done — Full Artifact Lifecycle (PR #118, F-0207/F-0208)
 
 **User insight**: Tomas caught that the framework's core slogan "code + docs = done" was incomplete — it omitted specs and tests from the definition of done, sending agents the implicit message that only code and documentation matter. The correct definition is **"spec + code + tests + docs = done"**: all four artifact types must be current before work is complete. This wasn't cosmetic — the old slogan was embedded in 11 active instruction files across all three architecture layers (constitution, playbooks, checklists), reinforced by memory-seed, and internalized by agents as the actual standard. Tomas also identified that the doc registry in STACK.md was missing ~10 docs (HOW_IT_WORKS, DEVELOPER_GUIDE, PRINCIPLES, FRAMEWORK_MAP, START_HERE, NFR, ISSUES, REFERENCES, OVERVIEW, CONTRIBUTIONS, both READMEs) — meaning `drift.sh` couldn't detect staleness on half the project's documentation. Additionally, Tomas proposed F-0208 (Deferred Documentation Mode): a `docs_mode: deferred` setting that lets agents skip doc updates during fast iteration, with automatic doc generation triggered later from specs + AC + code — recognizing that with good specs in place, documentation can be reliably synthesized rather than manually maintained in real-time.
 
