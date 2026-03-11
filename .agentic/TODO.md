@@ -20,8 +20,8 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 - **Added**: 2026-02-18
 - **Context**: Migrated from STATUS.md Backlog
 
-### T-0007: Batch-verify or grandfather ~50 shipped features with fully unchecked acceptance criteria (F-0001 through F-0102 era). Recent features F-0125+ are properly checked
-- **Added**: 2026-02-24
+### ~~T-0007: Batch-verify ~50 shipped features with unchecked ACs~~ **OBSOLETE**: Legacy v0.1–v0.12 era features. T-0051 now warns on in_progress features going forward. Retroactive verification has diminishing returns.
+- **Added**: 2026-02-24 · **Closed**: 2026-03-11
 
 ### ~~T-0010: Implement multi-agent helper scripts (F-0108)~~ **OBSOLETE**: Fully superseded by AGENTS.json (F-0194) and agents_helpers.py. F-0108 marked deprecated in FEATURES.md.
 - **Added**: 2026-02-24 · **Closed**: 2026-03-10
@@ -91,8 +91,8 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0041: F-idea: Auto-versioning and tagging — structural enforcement for VERSION bump + git tag after PR merge. Currently behavioral-only (instruction in committing-changes skill). Needs a hook or GitHub Action to make it impossible to forget. Options: post-merge git hook, GitHub Action on PR close, or pre-commit check that VERSION was bumped when on a feature branch.
 - **Added**: 2026-03-06
 
-### T-0042: T-0042: Multi-tool auto modes — investigate and implement support for Cursor, Codex, Gemini CLI, etc (currently Claude-only). Abstract the spawn_claude helper into a tool-agnostic interface.
-- **Added**: 2026-03-06
+### ~~T-0042: Multi-tool auto modes~~ **OBSOLETE**: Overly broad. Per-tool support should be scoped individually when needed, not as a single abstraction task.
+- **Added**: 2026-03-06 · **Closed**: 2026-03-11
 
 ### T-0043: F-idea: AC scheduling phase in auto engine — before executing ACs, analyze dependencies and priorities to build an execution graph. Independent ACs run in parallel (git worktree per stream), dependent ACs chain sequentially. Connects plan-level [P] markers (F-0148) to runtime execution. Resource-aware: premium mode enables parallelism, economy forces sequential. Supersedes T-0033 (which was investigation-only). See CONTRIBUTIONS.md 'Task Scheduling & Parallel Execution' and SDD analysis §9.
 - **Added**: 2026-03-07
@@ -103,8 +103,8 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0045: F-0193: Collision-proof feature IDs — current sequential F-XXXX IDs collide when multiple agents/branches assign independently. Research slug-based IDs, atomic allocation, or other approaches. See conversation notes on options.
 - **Added**: 2026-03-08
 
-### T-0046: F-0194: Worktree-by-default for feature branches — agents should always work in git worktrees when on feature branches, not dirty the main worktree. Needs: clear instruction in CLAUDE.md/skills, a STACK.md setting (e.g., worktree_mode: always|multi-agent|off), and possibly ag implement auto-creating the worktree. Current instruction exists but is too weak ('Use git worktree on feature branches when another agent may be working on main').
-- **Added**: 2026-03-08
+### ~~T-0046: Worktree-by-default for feature branches~~ **DONE**: Shipped as F-0194. `worktree_mode: always` in STACK.md, `ag implement` auto-creates worktrees, `ag done` auto-cleans.
+- **Added**: 2026-03-08 · **Closed**: 2026-03-11
 
 ### T-0048: ag review / /review: check that durable plan file exists for the feature being reviewed. If missing, flag as advisory finding. Complements T-0048 (ag implement gate) — catches plans that slipped through.
 - **Added**: 2026-03-09
@@ -115,13 +115,16 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0050: Spec/backlog status drift: FEATURES.md status (planned/shipped) and BACKLOG.json can diverge. When discrepancy found, don't assume either is truth — check JOURNAL.md, CHANGELOG.md, and git history to determine actual state. Consider adding a drift-check tool.
 - **Added**: 2026-03-09
 
-### T-0051: AC check-offs must be part of the implementation PR, not left for ag done — agent keeps forgetting this step
-- **Added**: 2026-03-10
+### ~~T-0051: AC check-offs must be part of the implementation PR~~ **DONE**: Shipped as advisory pre-commit check. Warns when in_progress features have unchecked ACs. 10 bash tests.
+- **Added**: 2026-03-10 · **Closed**: 2026-03-11
 
 ### T-0052: F-idea: Systematic LLM-optimized format pass — convert remaining unstructured files to LLM-friendly formats (YAML frontmatter, structured markdown, consistent field patterns). Priority targets: acceptance criteria files (free-form → structured AC blocks), STATUS.md/JOURNAL.md (markdown → more parseable), STACK.md settings (grep-parsed → schema-validated YAML/TOML). Constraint: must remain human-readable — optimized for both audiences. See PRINCIPLES.md F3, KEY_INSIGHTS.md §12
 - **Added**: 2026-03-11
 
 ### T-0053: F-idea: Migrate STACK.md to structured config format (YAML/TOML) with schema validation. Current grep/sed parsing is fragile and settings lack discoverability. New format should: (1) support inline comments documenting valid options for each setting (e.g. git_workflow: pull_request # options: pull_request | direct), (2) enable tab-completion or validation of setting values, (3) remain human-editable in any text editor, (4) preserve the single-file simplicity (no splitting into multiple configs). Related: T-0052 (LLM-optimized format pass), PRINCIPLES.md F3.
+- **Added**: 2026-03-11
+
+### T-0054: Agent forgets doc updates and LLM test checks during feature implementation. Root cause: implementing-features and committing-changes skills don't have explicit gates for (1) checking if project docs (HOW_IT_WORKS, DEVELOPER_GUIDE, CHANGELOG, instruction files) need updating, and (2) checking if new LLM tests should be added. The doc check in implementing-features Step 6 only runs drift.sh and checks the doc registry — it doesn't check framework instruction files. Fix: add framework-dev doc gate to implementing-features Step 6 (when in framework repo, check all instruction files per CLAUDE.md § Framework Development), and add LLM test advisory to committing-changes (when new ag commands or behavioral rules are added, suggest LLM test). This is a recurring issue — user has had to remind multiple times.
 - **Added**: 2026-03-11
 
 ## Done
