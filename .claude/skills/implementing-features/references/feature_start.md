@@ -11,6 +11,22 @@ phase: planning
 
 ---
 
+## GATE 0: Plan Exists (BLOCKING)
+
+```
+□ Does .agentic/journal/plans/F-####-plan.md exist?
+  ├─ YES → Check **Status**: line
+  │         ├─ APPROVED → Proceed to Gate 1
+  │         └─ DRAFT/REVIEWING/REVISION_NEEDED → Run review loop first
+  └─ NO  → 🛑 STOP. Plan first.
+           Run planning-features workflow (explore → plan → save → review → approve).
+           Do NOT write code or even acceptance criteria without a plan.
+```
+
+**A plan is NOT optional.** Even simple features need a quick plan — it identifies files to change, scope, and risks. Planning takes minutes and saves hours of rework.
+
+---
+
 ## GATE 1: Acceptance Criteria (BLOCKING)
 
 ```
@@ -105,11 +121,11 @@ DO NOT pass:
 
 | User Says | You MUST Do First |
 |-----------|-------------------|
-| "build X" | Check acceptance criteria exist |
-| "implement X" | Check acceptance criteria exist |
-| "add feature X" | Check acceptance criteria exist |
-| "create X" | Check acceptance criteria exist |
-| "let's do X" | Check acceptance criteria exist |
+| "build X" | Plan first, then check acceptance criteria |
+| "implement X" | Plan first, then check acceptance criteria |
+| "add feature X" | Plan first, then check acceptance criteria |
+| "create X" | Plan first, then check acceptance criteria |
+| "let's do X" | Plan first, then check acceptance criteria |
 
-**NO EXCEPTIONS. Criteria before code.**
+**NO EXCEPTIONS. Plan → criteria → code.**
 

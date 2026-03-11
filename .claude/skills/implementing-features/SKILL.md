@@ -30,20 +30,23 @@ If `.agentic/BACKLOG.json` exists and has items, `ag implement F-XXXX` enforces 
 - If F-XXXX is in backlog but NOT at position 0: **BLOCKED** — work on the current item first, or reprioritize with `ag backlog move F-XXXX 0`
 - Override: `SKIP_BACKLOG=1 ag implement F-XXXX`
 
-### Step 0.5: Plan Review Check (safety net)
+### Step 0.5: Plan Gate (plan before code)
 
-If `plan_review_enabled: yes` in STACK.md AND a plan file exists at
-`.agentic/journal/plans/F-XXXX-plan.md`:
+Check for a plan at `.agentic/journal/plans/F-XXXX-plan.md`:
 
-1. Read the plan file and check the `**Status**:` line
-2. If status is `APPROVED` → proceed to Step 1
-3. If status is `DRAFT` or `REVIEWING` or `REVISION_NEEDED` → the dialectical review
-   was never run (planning skill Phase 2 was skipped). Run it now:
-   - Follow Step 5.5 from the `planning-features` skill
+1. **Plan exists, status `APPROVED`** → proceed to Step 1
+2. **Plan exists, status `DRAFT`/`REVIEWING`/`REVISION_NEEDED`** → the review loop
+   was never completed. Run it now:
+   - Follow Step 5.5 from the `planning-features` skill (dialectical review)
    - Wait for user approval before proceeding
-4. If no plan file exists → proceed normally (plan is optional unless `ag implement` blocks)
+3. **No plan exists** → **STOP. Plan first.**
+   - Enter plan mode and follow the `planning-features` workflow (Phase 1: explore + create plan)
+   - After plan mode ends, save plan durably to `.agentic/journal/plans/F-XXXX-plan.md` with status `DRAFT`
+   - If `plan_review_enabled: yes` in STACK.md: run the dialectical review loop (Phase 2)
+   - Wait for user approval (status becomes `APPROVED`)
+   - Then return here and proceed to Step 1
 
-This catches the case where plan mode ended but the review didn't fire.
+**Do NOT skip planning.** A plan is how you understand the feature scope, identify files to change, and avoid wasted work. Even simple features benefit from a quick plan — it takes minutes and saves hours.
 
 ### Step 1: Verify Acceptance Criteria Exist
 
