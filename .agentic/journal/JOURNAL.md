@@ -2183,3 +2183,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 18:14 - Plan gate enforcement
+
+**Why**: Agents were skipping planning and jumping straight to AC/code when 'implement' was triggered without a plan
+
+**What changed**:
+- implementing-features now requires an approved plan before coding — no plan = STOP and plan first, not skip planning
+
+**Next steps**:
+- Commit, PR, then plan F-0207 properly
+
+**Blockers**: None
+

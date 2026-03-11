@@ -45,7 +45,7 @@ Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal
 
 Then:
 1. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
-2. `ag implement` checks for an approved plan — if plan exists but status is not APPROVED, it triggers review first
+2. `ag implement` requires an approved plan — if no plan exists, it triggers the planning workflow first (plan → save → review → approve). If plan exists but status is not APPROVED, it triggers review first
 3. Only proceed to implementation after the plan is APPROVED (or if review is disabled)
 
 ## When the user reports a bug or wants a fix
