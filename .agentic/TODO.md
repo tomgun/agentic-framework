@@ -130,6 +130,12 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0056: T-0056: Plan file naming regression — saved plans missing YYYY-MM-DD date prefix (should be YYYY-MM-DD-F-XXXX-...-plan.md)
 - **Added**: 2026-03-11
 
+### T-0058: Investigation: F-0209 TDD Mode — can red-green-refactor loop be reliably enforced through skills/workflows, or is it too behavioral? Current tdd_mode.md exists but isn't wired. Need to test if agents actually follow test-first ordering when instructed.
+- **Added**: 2026-03-11
+
+### T-0059: Investigation: F-0210 Configurable DoD per task type — feasibility study. Can agents reliably switch between different 'done' checklists based on task type (implementation vs design vs spike vs bugfix)? Risk: behavioral branching is hard to enforce structurally.
+- **Added**: 2026-03-11
+
 ## Done
 
 
