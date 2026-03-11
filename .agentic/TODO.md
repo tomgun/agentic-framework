@@ -136,6 +136,12 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0059: Investigation: F-0210 Configurable DoD per task type — feasibility study. Can agents reliably switch between different 'done' checklists based on task type (implementation vs design vs spike vs bugfix)? Risk: behavioral branching is hard to enforce structurally.
 - **Added**: 2026-03-11
 
+### T-0060: F-0207 enhancement: --validate should read file content to determine if .md file is a project doc needing upkeep vs internal/config. LLM-assisted classification.
+- **Added**: 2026-03-11
+
+### T-0061: F-0207 enhancement: cache scan results for files already classified as non-doc, skip re-scanning unless changed
+- **Added**: 2026-03-11
+
 ## Done
 
 

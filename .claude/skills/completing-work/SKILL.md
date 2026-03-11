@@ -55,8 +55,9 @@ In a worktree: commit and push from the worktree, run `wip.sh complete`, then `c
 
 Before marking shipped, verify documentation is current:
 
-1. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
-2. Check that CONTEXT_PACK.md reflects any architecture changes
+1. Run `bash .agentic/lib/tools/docs.sh --validate` to check registry health (missing files, unregistered docs)
+2. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
+3. Check that CONTEXT_PACK.md reflects any architecture changes
 3. If `docs_gate: blocking` in STACK.md, `ag done` enforces this automatically
 4. For framework development: verify all instruction files updated (see CLAUDE.md § Framework Development)
 

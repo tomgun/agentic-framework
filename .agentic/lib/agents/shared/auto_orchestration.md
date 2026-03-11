@@ -368,7 +368,7 @@ No escape hatch. Shipped spec protection is deterministic.
 □ All acceptance criteria met
 □ Smoke test passed (actually ran the app)
 □ All tests pass
-□ Documentation updated (drift.sh --docs, CONTEXT_PACK.md if architecture changed)
+□ Documentation updated (docs.sh --validate, drift.sh --docs, CONTEXT_PACK.md if architecture changed)
 □ FEATURES.md/OVERVIEW.md updated with status: shipped
 □ Backlog advanced (if completed feature was current backlog item)
 □ Code annotations added (@feature, @acceptance)
@@ -489,7 +489,7 @@ These are YOUR responsibility as an agent following this framework.
 | Complexity limits | `max_files_per_commit` etc. | 10/500/500 | 15/1000/1000 |
 | Pre-commit checks | `pre_commit_checks` | **full** | fast |
 | Feature status | `feature_tracking` | **yes** (shipped needs acceptance) | no |
-| Docs reviewed | `docs_gate` | **blocking** | off |
+| Docs reviewed | `docs_gate` | **blocking** (`docs.sh --validate` at `ag done` + pre-commit check 19) | off |
 
 Override any setting: `ag set <key> <value>` | View resolved settings: `ag set --show`
 

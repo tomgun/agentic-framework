@@ -122,10 +122,11 @@ phase: commit
 
 - [ ] **Project docs updated with code changes**
   - Spec + code + tests + docs = done — don't defer artifact updates to a follow-up
+  - Run `bash .agentic/lib/tools/docs.sh --validate` to check registry health (missing files, unregistered docs)
   - Run `bash .agentic/lib/tools/docs.sh --list` to see the doc registry and which components they cover
   - Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
   - If you changed user-facing behavior, update the relevant docs
-  - If your change touches a component with no registered doc, decide whether it needs one
+  - If your change touches a component with no registered doc, decide whether it needs one — use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold and auto-register
   - If you created or changed a doc, ensure its `## Docs` entry in STACK.md has correct component/area tags
 
 ### Formal Profile (All Core items plus:)

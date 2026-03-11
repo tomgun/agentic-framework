@@ -1213,10 +1213,21 @@ cmd_done() {
         else
             bash "$SCRIPT_DIR/drift.sh" --docs 2>/dev/null || true
         fi
+
+        # Registry validation (registered-but-missing + unregistered docs)
+        echo ""
+        if [[ -f "$SCRIPT_DIR/docs.sh" ]]; then
+            bash "$SCRIPT_DIR/docs.sh" --validate 2>/dev/null
+            local validate_exit=$?
+        fi
+
         if [ "$docs_gate_mode" = "blocking" ]; then
             if [ "${SKIP_DOCS_GATE:-0}" = "1" ] || [ ! -t 0 ]; then
                 echo -e "${YELLOW}docs_gate: blocking — skipped (non-interactive or SKIP_DOCS_GATE=1)${NC}"
             else
+                if [ "${validate_exit:-0}" -ne 0 ]; then
+                    echo -e "${YELLOW}⚠ Registry validation found issues (see above)${NC}"
+                fi
                 echo ""
                 echo -e "${YELLOW}docs_gate: blocking — confirm docs are updated before marking complete${NC}"
                 printf "  Continue marking feature complete? [y/N] "

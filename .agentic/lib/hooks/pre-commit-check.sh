@@ -25,6 +25,7 @@
 #   14. Shipped spec changes require migration (BLOCKING)
 #   15. Test file deletion blocked if referenced by shipped feature (BLOCKING)
 #   16. Status downgrade protection for shipped features (BLOCKING)
+#   19. Doc registry health (advisory, respects docs_gate setting)
 #
 # Escape hatches (use sparingly, blocked on main/master):
 #   SKIP_TESTS=1      Skip test execution
@@ -45,7 +46,7 @@ source "${PROJECT_ROOT}/.agentic/lib/paths.sh"
 source "${PROJECT_ROOT}/.agentic/lib/settings.sh"
 
 # === Mode flag ===
-# --mode fast: skip slow/advisory checks (4,5,6,8,9,10,12,13)
+# --mode fast: skip slow/advisory checks (4,5,6,8,9,10,12,13,19)
 # --mode full: run all checks (default when called directly)
 _FAST_MODE=0
 for _arg in "$@"; do
@@ -1046,6 +1047,29 @@ if [[ -d "$EXT_GATES_DIR" ]]; then
         FAILURES=$((FAILURES + 1))
       fi
     done <<< "$GATE_FILES"
+  fi
+fi
+
+# Check 19: Doc registry health (advisory, respects docs_gate)
+if [[ $_FAST_MODE -eq 0 ]]; then
+  DOCS_GATE=$(get_setting "docs_gate" "off" 2>/dev/null || echo "off")
+  if [[ "$DOCS_GATE" != "off" ]]; then
+    DOCS_SH="${PROJECT_ROOT}/.agentic/lib/tools/docs.sh"
+    if [[ -f "$DOCS_SH" ]]; then
+      echo ""
+      echo "[19] Doc registry health (advisory)..."
+      VALIDATE_OUTPUT=$(bash "$DOCS_SH" --validate 2>/dev/null) || true
+      # Advisory only — show issues but don't block
+      MISSING_COUNT=$(echo "$VALIDATE_OUTPUT" | grep -c "registered-but-missing" || true)
+      UNREG_COUNT=$(echo "$VALIDATE_OUTPUT" | grep -c "unregistered:" || true)
+      if [[ "$MISSING_COUNT" -gt 0 ]] || [[ "$UNREG_COUNT" -gt 0 ]]; then
+        [[ "$MISSING_COUNT" -gt 0 ]] && echo "  ⚠ ${MISSING_COUNT} registered doc(s) missing from disk"
+        [[ "$UNREG_COUNT" -gt 0 ]] && echo "  ⚠ ${UNREG_COUNT} unregistered doc(s) found"
+        echo "  Run: bash .agentic/lib/tools/docs.sh --validate"
+      else
+        echo "  ✓ Doc registry healthy"
+      fi
+    fi
   fi
 fi
 

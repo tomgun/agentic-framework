@@ -115,11 +115,12 @@ This ensures MVP is solid before adding enhancements.
 
 Before declaring done, check which project docs need updating:
 
-1. Run `bash .agentic/lib/tools/docs.sh --list` to see the project's doc registry and which components they cover
-2. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
-3. Update stale docs in the same change as code — don't defer to a follow-up
-4. If your feature touches a component/area with **no registered doc**, decide whether it needs one — create it and register it in `## Docs` in STACK.md
-5. If you created or substantially changed a doc, ensure its `## Docs` entry has correct component/area tags — this is how `drift.sh` and `docs.sh` know which docs to check
+1. Run `bash .agentic/lib/tools/docs.sh --validate` to check registry health (missing files, unregistered docs)
+2. Run `bash .agentic/lib/tools/docs.sh --list` to see the project's doc registry and which components they cover
+3. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
+4. Update stale docs in the same change as code — don't defer to a follow-up
+5. If your feature touches a component/area with **no registered doc**, decide whether it needs one — use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold and auto-register
+6. If you created or substantially changed a doc, ensure its `## Docs` entry has correct component/area tags — this is how `drift.sh` and `docs.sh` know which docs to check
 
 Doc updates are enforced at feature acceptance (`ag done`) when `docs_gate: blocking`.
 

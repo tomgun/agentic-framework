@@ -6,7 +6,7 @@ tokens: ~1130
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.53.6 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -60,7 +60,7 @@ If the user wants to commit, push, save, ship, or finalize changes — in any ph
 
 **STOP.** Check AGENTS.json for active WIP (via `bash .agentic/lib/tools/wip.sh check`) — if WIP exists, BLOCK and warn. Otherwise, follow the pre-commit sequence below, then run `ag commit`.
 
-**Spec + code + tests + docs = done.** If your change affects user-visible behavior, run `bash .agentic/lib/tools/drift.sh --docs` to detect stale project docs. Update all artifacts in the same commit — don't defer to a follow-up. If you add or substantially change a doc, ensure `## Docs` in STACK.md lists it with correct component/area tags.
+**Spec + code + tests + docs = done.** If your change affects user-visible behavior, run `bash .agentic/lib/tools/drift.sh --docs` to detect stale project docs and `bash .agentic/lib/tools/docs.sh --validate` to check registry health. Update all artifacts in the same commit — don't defer to a follow-up. If you add or substantially change a doc, ensure `## Docs` in STACK.md lists it with correct component/area tags. Use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold a new doc and auto-register it.
 
 ## When the user mentions an idea, todo, or reminder
 
@@ -192,6 +192,6 @@ Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 - **Small batches.** Max 5-10 files per commit. If bigger, break it up.
 - **Keep main in sync with origin.** Push immediately after any direct-to-main commit. Before creating a feature branch, `git pull --rebase origin main` first. Stale local main causes conflicts and content loss during PR rebases.
 - **Smoke test before "done".** Actually run the feature. "Tests pass" does not mean "it works."
-- **Spec + code + tests + docs = done.** If code changes user-facing behavior, update all artifacts in the same commit. Run `docs.sh --list` to see the registry and what components are covered, then `drift.sh --docs` to detect staleness. If your change touches a component with no registered doc, decide whether it needs one. Don't defer updates to a follow-up.
+- **Spec + code + tests + docs = done.** If code changes user-facing behavior, update all artifacts in the same commit. Run `docs.sh --validate` to check registry health (missing files, unregistered docs), `docs.sh --list` to see the registry, and `drift.sh --docs` to detect staleness. If your change touches a component with no registered doc, decide whether it needs one — use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold and auto-register. Don't defer updates to a follow-up.
 - **Framework dev only — instruction files are part of the feature.** When changing `ag` commands/gates/workflows, also update instruction files (CLAUDE.md templates, cursorrules, copilot, codex, agent_operating_guidelines, auto_orchestration, memory-seed, skills/checklists, DEVELOPER_GUIDE, HOW_IT_WORKS). Run `instruction-sync.sh` to detect drift.
 - **Framework dev only — LLM test advisory.** When committing behavioral changes (ag commands, trigger words, agent workflows), check whether `tests/llm/` needs coverage. Unit tests can't catch behavioral gaps.

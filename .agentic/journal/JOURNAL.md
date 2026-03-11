@@ -2196,3 +2196,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 22:47 - F-0207 Doc Lifecycle Validation
+
+**Why**: Doc registry had no structural enforcement — entries could point to missing files, docs could exist unregistered
+
+**What changed**:
+- Docs can now be validated (--validate: registry health), scaffolded (--create: template + auto-register), and coverage-reported (--coverage: type breakdown). Pre-commit check 19 and ag done both enforce registry health when docs_gate is enabled.
+
+**Next steps**:
+- Merge, ag done, advance backlog
+
+**Blockers**: None
+
+
+### Session: 2026-03-11 23:01 - F-0207 Review Fixes
+
+**Why**: PR review feedback on structural doc lifecycle feature
+
+**What changed**:
+- Fixed 6 PR review issues: return overflow in docs.sh, pre-commit check 19 now shows both missing and unregistered counts, added --coverage test, updated before_commit.md/auto_orchestration.md/HOW_IT_WORKS.md
+
+**Next steps**:
+- Push fixes, merge PR
+
+**Blockers**: None
+
