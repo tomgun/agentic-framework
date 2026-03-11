@@ -14,6 +14,9 @@
 #   bash .agentic/tools/docs.sh --trigger session                  # Staleness check
 #   bash .agentic/tools/docs.sh --check --manifest F-####          # Dry run
 #   bash .agentic/tools/docs.sh --draft <path> --type <type> [--manifest F-####]  # Single doc
+#   bash .agentic/tools/docs.sh --validate                         # Registry health check
+#   bash .agentic/tools/docs.sh --coverage                         # Area coverage report
+#   bash .agentic/tools/docs.sh --create <path> --type <type> --trigger <trigger>  # Scaffold + register
 #
 set -uo pipefail
 
@@ -56,6 +59,10 @@ TRIGGER=""
 MANIFEST=""
 DRAFT_PATH=""
 DRAFT_TYPE=""
+CREATE_PATH=""
+CREATE_TYPE=""
+CREATE_TRIGGER=""
+CREATE_FORCE=false
 CHECK_ONLY=false
 
 while [[ $# -gt 0 ]]; do
@@ -64,11 +71,31 @@ while [[ $# -gt 0 ]]; do
             MODE="list"
             shift
             ;;
+        --validate)
+            MODE="validate"
+            shift
+            ;;
+        --coverage)
+            MODE="coverage"
+            shift
+            ;;
+        --create)
+            MODE="create"
+            shift
+            CREATE_PATH="${1:-}"
+            shift
+            ;;
         --trigger)
-            MODE="trigger"
-            shift
-            TRIGGER="${1:-}"
-            shift
+            if [[ "$MODE" == "create" ]]; then
+                shift
+                CREATE_TRIGGER="${1:-}"
+                shift
+            else
+                MODE="trigger"
+                shift
+                TRIGGER="${1:-}"
+                shift
+            fi
             ;;
         --check)
             CHECK_ONLY=true
@@ -87,11 +114,20 @@ while [[ $# -gt 0 ]]; do
             ;;
         --type)
             shift
-            DRAFT_TYPE="${1:-}"
+            if [[ "$MODE" == "create" ]]; then
+                CREATE_TYPE="${1:-}"
+            else
+                DRAFT_TYPE="${1:-}"
+            fi
+            shift
+            ;;
+        --force)
+            CREATE_FORCE=true
             shift
             ;;
         -h|--help)
-            echo "Usage: docs.sh [--list | --trigger <trigger> | --check | --draft <path>] [--manifest F-####] [--type <type>]"
+            echo "Usage: docs.sh [--list | --trigger <trigger> | --check | --draft <path> | --validate | --coverage | --create <path>]"
+            echo "               [--manifest F-####] [--type <type>] [--trigger <trigger>] [--force]"
             exit 0
             ;;
         *)
@@ -133,6 +169,364 @@ parse_registry() {
             fi
         fi
     done < "$STACK_FILE"
+}
+
+# ─── Check registered files exist ─────────────────────────────────
+
+# Returns count of issues found. Prints warnings to stdout.
+check_registered_exist() {
+    local entries
+    entries=$(parse_registry)
+    [[ -z "$entries" ]] && return 0
+
+    local issues=0
+    while IFS='|' read -r path type trigger; do
+        local full_path="$ROOT_DIR/$path"
+        if [[ -d "$full_path" ]]; then
+            # Directory entry (e.g., docs/adr/) — exists, fine
+            continue
+        elif [[ ! -f "$full_path" ]]; then
+            echo -e "${RED}✗ registered-but-missing: ${path}${NC}"
+            issues=$((issues + 1))
+        fi
+    done <<< "$entries"
+    return $issues
+}
+
+# ─── Find unregistered .md files ─────────────────────────────────
+
+# Scans project for .md files not in the registry. Prints warnings.
+# Returns count of unregistered files found.
+find_unregistered() {
+    local entries
+    entries=$(parse_registry)
+
+    # Build set of registered paths (normalized, no leading ./)
+    local -A registered_paths
+    if [[ -n "$entries" ]]; then
+        while IFS='|' read -r path type trigger; do
+            registered_paths["$path"]=1
+            # If directory entry, mark it so we skip files inside
+            if [[ "$path" == */ ]]; then
+                registered_paths["__dir__${path}"]=1
+            fi
+        done <<< "$entries"
+    fi
+
+    local issues=0
+
+    # Find all .md files with exclusions
+    while IFS= read -r file; do
+        # Strip leading ./ for comparison
+        local rel="${file#./}"
+
+        # Skip if registered
+        [[ -n "${registered_paths[$rel]:-}" ]] && continue
+
+        # Skip if inside a registered directory
+        local skip_dir=false
+        for key in "${!registered_paths[@]}"; do
+            if [[ "$key" == __dir__* ]]; then
+                local dir_path="${key#__dir__}"
+                if [[ "$rel" == ${dir_path}* ]]; then
+                    skip_dir=true
+                    break
+                fi
+            fi
+        done
+        $skip_dir && continue
+
+        echo -e "${YELLOW}? unregistered: ${rel}${NC}"
+        issues=$((issues + 1))
+    done < <(
+        cd "$ROOT_DIR" && find . -name '*.md' \
+            -not -path './.git/*' \
+            -not -path './node_modules/*' -not -path './vendor/*' \
+            -not -path './dist/*' -not -path './build/*' \
+            -not -path './examples/*' \
+            -not -path './.agentic/lib/*' \
+            -not -path './.agentic/session/*' \
+            -not -path './.agentic/journal/*' \
+            -not -path './.agentic/spec/acceptance/*' \
+            -not -path './.agentic/spec/migrations/*' \
+            -not -path './.claude/*' -not -path './.cursor/*' \
+            -not -path './.codex/*' -not -path './.github/*' \
+            -not -path './tests/*' -not -path './.pytest_cache/*' \
+            -not -name 'STACK.md' -not -name 'CLAUDE.md' \
+            -not -name 'CONTEXT_PACK.md' -not -name 'AGENTS.md' \
+            -not -name 'SESSION_LOG.md' -not -name 'CODEX.md' \
+            -not -name 'STATUS.md' -not -name 'JOURNAL.md' \
+            -not -name 'HUMAN_NEEDED.md' -not -name 'TODO.md' \
+            -not -name 'FEATURES.md' \
+            -not -name '*.template.md' -not -name '*.template-*.md' \
+            2>/dev/null | sort
+    )
+
+    return $issues
+}
+
+# ─── Validate registry ───────────────────────────────────────────
+
+validate_registry() {
+    echo -e "${BOLD}=== Doc Registry Validation ===${NC}"
+    echo ""
+
+    local total_issues=0
+
+    # Part 1: registered-but-missing
+    echo -e "${BOLD}Registered-but-missing:${NC}"
+    local missing_output
+    missing_output=$(check_registered_exist 2>&1)
+    local missing_count=$?
+    if [[ $missing_count -gt 0 ]]; then
+        echo "$missing_output"
+        total_issues=$((total_issues + missing_count))
+    else
+        echo -e "  ${GREEN}All registered docs exist${NC}"
+    fi
+
+    echo ""
+
+    # Part 2: existing-but-unregistered
+    echo -e "${BOLD}Existing-but-unregistered:${NC}"
+    local unreg_output
+    unreg_output=$(find_unregistered 2>&1)
+    local unreg_count=$?
+    if [[ $unreg_count -gt 0 ]]; then
+        echo "$unreg_output"
+        total_issues=$((total_issues + unreg_count))
+    else
+        echo -e "  ${GREEN}No unregistered docs found${NC}"
+    fi
+
+    echo ""
+    if [[ $total_issues -gt 0 ]]; then
+        echo -e "${YELLOW}${total_issues} issue(s) found${NC}"
+        return 1
+    else
+        echo -e "${GREEN}Registry is healthy${NC}"
+        return 0
+    fi
+}
+
+# ─── Get valid doc types from doc_types.md ────────────────────────
+
+get_valid_types() {
+    if [[ ! -f "$DOC_TYPES_FILE" ]]; then
+        echo "changelog readme lessons architecture adr runbook tech-spec custom"
+        return
+    fi
+    # Only extract type headings (## at top level, not inside code blocks)
+    awk '
+        /^```/ { in_block = !in_block; next }
+        !in_block && /^## / {
+            sub(/^## /, "")
+            if ($0 != "Doc Types Reference" && $0 !~ /^#/) print
+        }
+    ' "$DOC_TYPES_FILE" | tr '\n' ' '
+}
+
+# ─── Extract template for a doc type ─────────────────────────────
+
+extract_template() {
+    local doc_type="$1"
+    if [[ ! -f "$DOC_TYPES_FILE" ]]; then
+        echo "# $(echo "$doc_type" | sed 's/.*/\u&/')"
+        return
+    fi
+    # Extract content between the LAST ``` fences under the matching ## type heading
+    # (the "New file template" block is always last in the section)
+    local found=false in_block=false
+    local template_lines=()
+    while IFS= read -r line; do
+        if [[ "$line" == "## $doc_type" ]]; then
+            found=true
+            continue
+        fi
+        # Only break on next ## heading when NOT inside a code block
+        if $found && ! $in_block && [[ "$line" =~ ^##\  ]]; then
+            break
+        fi
+        if $found && [[ "$line" == '```' ]]; then
+            if $in_block; then
+                # End of code block — save captured lines as template
+                in_block=false
+            else
+                # Start of code block — begin capturing
+                in_block=true
+                template_lines=()
+            fi
+            continue
+        fi
+        if $found && $in_block; then
+            template_lines+=("$line")
+        fi
+    done < "$DOC_TYPES_FILE"
+
+    # Output the last captured template
+    for tl in "${template_lines[@]}"; do
+        echo "$tl"
+    done
+}
+
+# ─── Create doc + register ────────────────────────────────────────
+
+create_doc() {
+    local doc_path="$1"
+    local doc_type="$2"
+    local doc_trigger="$3"
+    local force="$4"
+
+    # Validate type
+    local valid_types
+    valid_types=$(get_valid_types)
+    local type_valid=false
+    for t in $valid_types; do
+        if [[ "$t" == "$doc_type" ]]; then
+            type_valid=true
+            break
+        fi
+    done
+    if ! $type_valid; then
+        echo -e "${RED}Error: invalid type '${doc_type}'. Valid types: ${valid_types}${NC}" >&2
+        return 1
+    fi
+
+    # Validate trigger
+    if [[ ! "$doc_trigger" =~ ^(feature_done|pr|session|manual)$ ]]; then
+        echo -e "${RED}Error: invalid trigger '${doc_trigger}'. Valid: feature_done, pr, session, manual${NC}" >&2
+        return 1
+    fi
+
+    local full_path="$ROOT_DIR/$doc_path"
+
+    # Check if already registered (idempotency)
+    local entries
+    entries=$(parse_registry)
+    if [[ -n "$entries" ]]; then
+        while IFS='|' read -r path type trigger; do
+            if [[ "$path" == "$doc_path" ]]; then
+                echo -e "${YELLOW}Already registered: ${doc_path} (type: ${type}, trigger: ${trigger})${NC}"
+                return 0
+            fi
+        done <<< "$entries"
+    fi
+
+    # Check if file exists
+    if [[ -f "$full_path" ]] && ! $force; then
+        echo -e "${RED}Error: file already exists: ${doc_path}. Use --force to register without overwriting.${NC}" >&2
+        return 1
+    fi
+
+    # Step 1: Register in STACK.md first (so no orphan on failure)
+    if [[ ! -f "$STACK_FILE" ]]; then
+        echo -e "${RED}Error: STACK.md not found at ${STACK_FILE}${NC}" >&2
+        return 1
+    fi
+
+    # Find the line number of the next ## heading after ## Docs
+    local insert_line
+    insert_line=$(awk '
+        /^## Docs/ { in_docs=1; next }
+        in_docs && /^## / { print NR; exit }
+    ' "$STACK_FILE")
+
+    if [[ -z "$insert_line" ]]; then
+        # ## Docs is the last section — append before EOF
+        insert_line=$(wc -l < "$STACK_FILE")
+        insert_line=$((insert_line + 1))
+    fi
+
+    # Format entry to match existing alignment
+    local entry="- doc: ${doc_path}"
+    # Pad to align pipe columns (aim for ~40 char path column)
+    local pad_len=$((40 - ${#doc_path}))
+    [[ $pad_len -lt 1 ]] && pad_len=1
+    local padding
+    padding=$(printf '%*s' "$pad_len" '')
+    entry="${entry}${padding}| ${doc_type}"
+    # Pad type column to ~15 chars
+    local type_pad=$((15 - ${#doc_type}))
+    [[ $type_pad -lt 1 ]] && type_pad=1
+    local type_padding
+    type_padding=$(printf '%*s' "$type_pad" '')
+    entry="${entry}${type_padding}| ${doc_trigger}"
+
+    # Insert the entry
+    sed -i "${insert_line}i\\${entry}" "$STACK_FILE"
+
+    # Step 2: Create the file (if it doesn't exist or --force)
+    if [[ ! -f "$full_path" ]]; then
+        # Ensure directory exists
+        mkdir -p "$(dirname "$full_path")"
+        local template
+        template=$(extract_template "$doc_type")
+        if [[ -n "$template" ]]; then
+            echo "$template" > "$full_path"
+        else
+            echo "# $(basename "$doc_path" .md)" > "$full_path"
+        fi
+        echo -e "${GREEN}✓ Created: ${doc_path}${NC}"
+    else
+        echo -e "${GREEN}✓ File exists, registered only: ${doc_path}${NC}"
+    fi
+
+    echo -e "${GREEN}✓ Registered in STACK.md: ${doc_path} | ${doc_type} | ${doc_trigger}${NC}"
+    return 0
+}
+
+# ─── Coverage report ──────────────────────────────────────────────
+
+show_coverage() {
+    local entries
+    entries=$(parse_registry)
+
+    if [[ -z "$entries" ]]; then
+        echo "No docs registered in STACK.md ## Docs"
+        return 0
+    fi
+
+    echo -e "${BOLD}Doc Coverage by Type${NC}"
+    echo ""
+
+    # Collect types and their docs
+    local -A type_docs
+    local -A type_counts
+    while IFS='|' read -r path type trigger; do
+        type_counts["$type"]=$(( ${type_counts["$type"]:-0} + 1 ))
+        if [[ -n "${type_docs[$type]:-}" ]]; then
+            type_docs["$type"]="${type_docs[$type]}"$'\n'"    ${path}"
+        else
+            type_docs["$type"]="    ${path}"
+        fi
+    done <<< "$entries"
+
+    # Known types from doc_types.md
+    local known_types
+    known_types=$(get_valid_types)
+
+    # Print coverage for each known type
+    for t in $known_types; do
+        local count="${type_counts[$t]:-0}"
+        if [[ $count -gt 0 ]]; then
+            echo -e "  ${GREEN}${t}${NC}: ${count} doc(s)"
+            echo "${type_docs[$t]}"
+        else
+            echo -e "  ${YELLOW}${t}${NC}: 0 docs"
+        fi
+    done
+
+    # Print any custom types not in the known list
+    for t in "${!type_counts[@]}"; do
+        local is_known=false
+        for kt in $known_types; do
+            [[ "$kt" == "$t" ]] && is_known=true && break
+        done
+        if ! $is_known; then
+            echo -e "  ${BLUE}${t}${NC}: ${type_counts[$t]} doc(s)"
+            echo "${type_docs[$t]}"
+        fi
+    done
 }
 
 # ─── Check for existing draft markers ──────────────────────────────
@@ -244,7 +638,7 @@ check_staleness() {
                 stale_count=$((stale_count + 1))
             fi
         elif [[ ! -d "$full_path" ]]; then
-            # File doesn't exist (and it's not a directory like docs/adr/)
+            # Reuse shared check — file doesn't exist
             echo -e "${YELLOW}⚠ ${path}: file does not exist${NC}"
             stale_count=$((stale_count + 1))
         fi
@@ -355,17 +749,46 @@ case "$MODE" in
         fi
         ;;
 
+    validate)
+        validate_registry
+        ;;
+
+    coverage)
+        show_coverage
+        ;;
+
+    create)
+        if [[ -z "$CREATE_PATH" ]]; then
+            echo -e "${RED}Error: --create requires <path>${NC}" >&2
+            exit 1
+        fi
+        if [[ -z "$CREATE_TYPE" ]]; then
+            echo -e "${RED}Error: --create requires --type <type>${NC}" >&2
+            exit 1
+        fi
+        if [[ -z "$CREATE_TRIGGER" ]]; then
+            echo -e "${RED}Error: --create requires --trigger <trigger>${NC}" >&2
+            exit 1
+        fi
+        create_doc "$CREATE_PATH" "$CREATE_TYPE" "$CREATE_TRIGGER" "$CREATE_FORCE"
+        ;;
+
     "")
-        echo "Usage: docs.sh [--list | --trigger <trigger> | --check | --draft <path>] [--manifest F-####] [--type <type>]"
+        echo "Usage: docs.sh [--list | --trigger <trigger> | --check | --draft <path> | --validate | --coverage | --create <path>]"
+        echo "               [--manifest F-####] [--type <type>] [--trigger <trigger>] [--force]"
         echo ""
         echo "Commands:"
         echo "  --list                          Show doc registry from STACK.md"
         echo "  --trigger <trigger>             Run docs for trigger (feature_done|pr|session|manual)"
         echo "  --check                         Dry run (combine with --trigger or --draft)"
         echo "  --draft <path> --type <type>    Draft a single doc"
+        echo "  --validate                      Registry health check (registered-but-missing + unregistered)"
+        echo "  --coverage                      Show doc coverage by type"
+        echo "  --create <path> --type <type> --trigger <trigger>  Scaffold doc + register"
         echo ""
         echo "Options:"
         echo "  --manifest F-####              Feature ID for context"
+        echo "  --force                         Allow --create to register existing files"
         exit 0
         ;;
 
