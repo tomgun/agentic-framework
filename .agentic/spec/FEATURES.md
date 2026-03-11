@@ -3582,3 +3582,20 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 - Tests: TBD
 
 **Acceptance**: See `spec/acceptance/F-0209.md`
+
+## F-0210: Configurable Definition of Done per Task Type
+
+**Status**: planned
+**Category**: Quality
+**Priority**: medium
+**Complexity**: high
+**Since**: v0.53.9
+
+**Description**: User-configurable Definition of Done (DoD) checklists that vary by task type. Currently the framework has one implicit DoD ("spec + code + tests + docs = done") enforced through scattered gates and behavioral rules. This feature makes DoD explicit, configurable, and task-type-aware. Example task types and their DoD: **implementation** (AC verified, tests passing, docs updated, PR created), **design/spec** (spec exists, reviewed, feedback incorporated, acceptance criteria defined), **investigation/spike** (findings documented, decision recorded in ADR, next steps captured), **bug fix** (failing test written, fix implemented, test passes, regression test added), **documentation** (content written, reviewed, registered in STACK.md). DoD definitions live in STACK.md or a dedicated `.agentic/spec/DOD.md` file. The `ag done` command validates the appropriate DoD checklist based on task type (derived from FEATURES.md category, backlog item type, or explicit tag). Gates become task-type-aware: a spike doesn't need "tests passing" but does need "findings documented."
+
+**Implementation**:
+- State: none
+- Code: TBD
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0210.md`

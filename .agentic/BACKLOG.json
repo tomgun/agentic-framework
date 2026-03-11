@@ -122,5 +122,13 @@
     "added_at": "2026-03-11T16:35:13Z",
     "added_by": "agent",
     "notes": "development_mode: tdd becomes real \u2014 red-green-refactor loop enforced per AC in implementing-features skill, not just a label."
+  },
+  {
+    "type": "feature",
+    "id": "F-0210",
+    "description": "Configurable Definition of Done per Task Type",
+    "added_at": "2026-03-11T16:37:44Z",
+    "added_by": "agent",
+    "notes": "Task-type-aware DoD: implementation, design, investigation, bug fix, docs each have different 'done' checklists. ag done validates the right one. Currently one implicit DoD for everything."
   }
 ]
