@@ -2105,3 +2105,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 13:47 - Quick Wins Batch 2
+
+**Why**: Follow-up cleanup from quick wins batch 1
+
+**What changed**:
+- Fix manifest.sh legacy path (T-0055), close T-0015 and T-0028 as superseded
+
+**Next steps**:
+- Next backlog item
+
+**Blockers**: None
+
