@@ -2066,3 +2066,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 09:34 - F-0183 + T-0051 shipped
+
+**Why**: ADR-002 implementation: review_taste now functional, backlog advances
+
+**What changed**:
+- Taste review wired into checkpoint system; AC advisory in pre-commit; all docs updated; VERSION 0.53.3
+
+**Next steps**:
+- Next: F-0201 Vision-to-Backlog Pipeline
+
+**Blockers**: None
+
