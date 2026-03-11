@@ -2131,3 +2131,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-11 17:12 - Fix: backlog done guard
+
+**Why**: backlog.sh done blindly popped position 0 without checking FEATURES.md status, causing F-0201 to be silently dropped
+
+**What changed**:
+- backlog.sh done now validates feature is shipped before removing — prevents accidental advancement of unimplemented features
+
+**Next steps**:
+- Merge, ag done
+
+**Blockers**: None
+
