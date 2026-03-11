@@ -103,6 +103,10 @@ done
 
 [[ -z "$MODE" ]] && error "Must specify F-XXXX, --branch, --since, or --commits"
 
+# Manifests are regenerable — dedup by message+date prevents rebase noise.
+# The idempotency check (below, after generation) skips the write if content
+# is unchanged, so repeated `ag done` calls on a stable feature are no-ops.
+
 # Find commits based on mode
 find_commits() {
     case "$MODE" in
@@ -177,11 +181,14 @@ json_escape() {
     printf '%s' "$str"
 }
 
-# Collect all data first
+# Collect all data first, deduplicating by message+date.
+# After rebases, the same logical commit gets a new hash. Without dedup,
+# the manifest shows duplicate entries — confusing for readers.
 TOTAL_ADDED=0
 TOTAL_REMOVED=0
 ALL_FILES=""
 COMMITS_DATA=""
+SEEN_COMMITS=""  # "date|message" dedup key
 
 while IFS= read -r commit; do
     [[ -z "$commit" ]] && continue
@@ -190,6 +197,13 @@ while IFS= read -r commit; do
     SHORT=$(git log -1 --format="%h" "$commit" 2>/dev/null) || continue
     DATE=$(git log -1 --format="%cs" "$commit")
     MSG=$(git log -1 --format="%s" "$commit")
+
+    # Dedup by date+message (survives rebases that change hashes)
+    DEDUP_KEY="${DATE}|${MSG}"
+    if echo "$SEEN_COMMITS" | grep -qF "$DEDUP_KEY"; then
+        continue
+    fi
+    SEEN_COMMITS="$SEEN_COMMITS$DEDUP_KEY"$'\n'
 
     # Get file stats
     STATS=$(git log -1 --numstat --format="" "$commit")

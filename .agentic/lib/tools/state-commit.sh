@@ -35,6 +35,10 @@ ALLOWLIST=(
     ".agentic/CONTRIBUTIONS.md"
     "VERSION"
 )
+# Prefix patterns — files under these dirs are also allowed
+ALLOWLIST_PREFIXES=(
+    ".agentic/journal/manifests/"
+)
 
 # ---------------------------------------------------------------------------
 # Parse flags
@@ -116,6 +120,16 @@ for allowed in "${ALLOWLIST[@]}"; do
         DIRTY_STATE+=("$allowed")
     fi
 done
+# Also pick up files matching prefix patterns (e.g., manifests)
+for prefix in "${ALLOWLIST_PREFIXES[@]}"; do
+    while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
+        file="${line:3}"  # Strip status prefix (e.g., " M ")
+        if [[ "$file" == "$prefix"* ]]; then
+            DIRTY_STATE+=("$file")
+        fi
+    done <<< "$GIT_STATUS"
+done
 
 # Step 4: FEATURES.md handling
 FEATURES_FILE=".agentic/spec/FEATURES.md"
@@ -152,6 +166,14 @@ if [[ -n "$STAGED" ]]; then
                 break
             fi
         done
+        if ! $is_allowed; then
+            for prefix in "${ALLOWLIST_PREFIXES[@]}"; do
+                if [[ "$staged_file" == "$prefix"* ]]; then
+                    is_allowed=true
+                    break
+                fi
+            done
+        fi
         if ! $is_allowed; then
             NON_ALLOWLIST+=("$staged_file")
         fi

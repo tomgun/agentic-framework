@@ -305,6 +305,7 @@ Git-tracked ordered work queue (`.agentic/BACKLOG.json`) that tells any agent on
 - `ag done` auto-advances the queue.
 - `ag start` shows current + next prominently.
 - `ag backlog add/done/move/list/remove/clear` manages the queue.
+- `ag backlog done` validates the feature is shipped in FEATURES.md before removing — prevents accidental advancement of unimplemented features. Use `ag backlog remove F-XXXX` to force-remove.
 - `SKIP_BACKLOG=1` escape hatch for overrides.
 
 **Key mechanisms:**
@@ -601,7 +602,7 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 | Feature | How It Works | Status |
 |---------|-------------|--------|
 | **Token-Efficient Scripts** (F-0041) | `status.sh`, `journal.sh`, `feature.sh`, `blocker.sh` — surgical updates without reading entire files. ~40x more efficient than read-modify-write. | ACTIVE - core mechanism |
-| **State File Flush** (F-0196) | `ag flush` commits state-only files (STATUS.md, BACKLOG.json, JOURNAL.md, etc.) directly to main without a PR. Hardcoded allowlist enforces security boundary — code files cannot bypass PR review. Uses `--no-verify` with self-contained validation stricter than the pre-commit hook. `--features` flag allows FEATURES.md status-line-only changes. | ACTIVE |
+| **State File Flush** (F-0196) | `ag flush` commits state-only files (STATUS.md, BACKLOG.json, JOURNAL.md, etc.) directly to main without a PR. Hardcoded allowlist + prefix patterns (manifests/) enforce security boundary — code files cannot bypass PR review. Uses `--no-verify` with self-contained validation stricter than the pre-commit hook. `--features` flag allows FEATURES.md status-line-only changes. | ACTIVE |
 | **Subagent Context Assembly** (F-0036) | `context-for-role.sh` + 24 YAML manifests. Each agent gets 2-6K tokens of role-specific context instead of loading everything. `ALWAYS_INJECT` array ensures core-rules.md (~300 tokens) always present. Supports section extraction (e.g., `STACK.md[## Build]`). | AVAILABLE but UNDERUTILIZED in practice |
 | **Sequential Agent Pipeline** (F-0034) | 8 specialist agents work in sequence: Research → Plan → Test → Implement → Review → Spec Update → Documentation → Git. Each loads only role-relevant context (<50K vs 150-200K for general agent). | DOCUMENTED but RARELY USED in practice |
 | **Orchestrator Agent** (F-0081) | Coordinates pipeline, delegates to specialists. Never implements itself. Ensures framework compliance across handoffs. | DOCUMENTED but RARELY INVOKED manually |
@@ -718,7 +719,7 @@ These features exist but don't clearly derive from the 13 principles:
 | **ADRs** (F-0101) | Architecture Decision Records | D5 (Living Docs) |
 | **Spec Migration System** (F-0117) | Track how specs evolved over time | D5 (Living Docs) |
 | **Documentation Drift Detection** (F-0118) | Detect stale docs | D5 (Living Docs) |
-| **Feature Change Manifests** (F-0119) | Git history per feature | D3 (Durable Artifacts) |
+| **Feature Change Manifests** (F-0119) | Git history per feature. Generated at `ag done`, regenerable without noise (commits deduped by message+date survive rebases). Idempotent — unchanged content skips write. Flushed via `ag flush`. | D3 (Durable Artifacts) |
 | **Claude Skills** (F-0098, F-0143) | Hand-crafted Claude Skills with Anthropic spec compliance | F3 (Token & Context Optimization) |
 
 ---

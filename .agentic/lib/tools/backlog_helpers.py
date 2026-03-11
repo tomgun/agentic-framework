@@ -209,12 +209,41 @@ def cmd_next(backlog_file: Path) -> int:
     return 0
 
 
-def cmd_done(backlog_file: Path) -> int:
-    """Remove position 0, advance queue."""
+def _is_feature_shipped(project_root: Path, feature_id: str) -> bool:
+    """Check if a feature is marked as shipped in FEATURES.md."""
+    paths = get_paths(project_root)
+    ff = paths.features_file
+    if not ff.exists():
+        return True  # no registry = no check
+    content = ff.read_text()
+    # Find the feature section and check its status
+    import re
+    pattern = rf"## {re.escape(feature_id)}:.*?\n(.*?)(?=\n## [A-Z]|\Z)"
+    match = re.search(pattern, content, re.DOTALL)
+    if not match:
+        return True  # feature not in registry = allow removal
+    section = match.group(1)
+    status_match = re.search(r"\*\*Status\*\*:\s*(\w+)", section)
+    if not status_match:
+        return True  # no status field = allow removal
+    return status_match.group(1) == "shipped"
+
+
+def cmd_done(project_root: Path, backlog_file: Path) -> int:
+    """Remove position 0, advance queue. Validates feature is actually shipped."""
     items = _load(backlog_file)
     if not items:
         print("Backlog is empty", file=sys.stderr)
         return 1
+
+    current = items[0]
+    # Safety check: if it's a feature, verify it's actually shipped
+    if current.get("type") == "feature" and current.get("id"):
+        fid = current["id"]
+        if not _is_feature_shipped(project_root, fid):
+            print(f"BLOCKED: {fid} is not shipped in FEATURES.md", file=sys.stderr)
+            print(f"  Complete the feature first, or use 'backlog.sh remove {fid}' to force-remove", file=sys.stderr)
+            return 1
 
     removed = items.pop(0)
     label = removed.get("id", removed.get("description", "task"))
@@ -457,7 +486,7 @@ def main() -> int:
     elif cmd == "next":
         return cmd_next(backlog_file)
     elif cmd == "done":
-        return cmd_done(backlog_file)
+        return cmd_done(project_root, backlog_file)
     elif cmd == "list":
         return cmd_list(backlog_file)
     elif cmd == "remove":
