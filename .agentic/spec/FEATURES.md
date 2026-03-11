@@ -3638,3 +3638,29 @@ Automatic synchronization mechanism that keeps framework-consumed artifacts (ski
 - Tests: TBD
 
 **Acceptance**: See `spec/acceptance/F-0212.md`
+
+---
+
+## F-0213: Unified Work Queue & Feature Registry Redesign
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: high
+**Complexity**: high
+**Since**: v0.53.10
+**Related**: F-0208, F-0210
+
+Rethink how the framework tracks features and work items. Current state: FEATURES.md holds everything (planned through shipped, 200+ entries), BACKLOG.json is a simple ordered queue of feature IDs, TODO.md is an unstructured inbox, ISSUES.md tracks bugs separately. Problems: FEATURES.md is bloated with planning noise alongside shipped contracts; the backlog can only hold feature IDs (not TODOs, issues, deferred work, or update tasks); no dependency tracking between items; no way to log deferred obligations (e.g., "skipped docs in fast mode — here's what changed, come back later").
+
+Proposed restructuring:
+1. **Feature registry split** — shipped features stay in FEATURES.md as the stable contract registry. Planned/in-progress features move to a separate tracking location (e.g., `.agentic/spec/PLANNED.md` or structured format) that's optimized for active work, not historical record.
+2. **Unified backlog** — single ordered work queue that can hold heterogeneous item types: features (F-XXXX), issues (I-XXXX), TODOs (T-XXXX), update tasks (deferred doc updates, deferred test coverage, post-fast-mode cleanup), and arbitrary pending items. Each item has: type, ID, description, priority, dependencies (list of other item IDs that must complete first), and optional metadata (deferred-from, context-link, skip-reason).
+3. **Deferred work tracking** — when the agent operates in a reduced-ceremony mode (fast mode, spike, time-pressure), it logs what was skipped with enough context to resume: what changed, where the details are, what specifically needs doing. These become backlog items with type "deferred" and a link back to the originating commit/feature.
+4. **Dependency graph** — items can declare `depends_on: [F-XXXX, T-YYYY]`. The backlog respects this: blocked items can't be scheduled until dependencies are resolved. `ag backlog` shows the critical path.
+
+**Implementation**:
+- State: none
+- Code: TBD
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0213.md`
