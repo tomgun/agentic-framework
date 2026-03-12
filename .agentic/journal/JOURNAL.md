@@ -2235,3 +2235,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-12 12:29 - F-0208 Deferred Documentation Mode
+
+**Why**: No way to opt out of inline doc updates without disabling all doc checks — users need to move fast AND eventually get docs
+
+**What changed**:
+- Projects can now set docs_mode: deferred to skip inline doc updates during fast iteration, with deferred-docs.json tracking what's owed and ag docs generate processing the queue later
+
+**Next steps**:
+- PR review, then ag done F-0208
+
+**Blockers**: None
+

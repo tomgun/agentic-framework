@@ -176,6 +176,7 @@ EXAMPLES:
     ag flush --dry-run          # Preview what would be flushed
     ag docs                     # Draft docs for current work
     ag docs --list              # Show doc registry
+    ag docs generate            # Generate all deferred docs
     ag auto init                # Set up auto mode settings
     ag auto status              # Check engine state
     ag auto pause               # Pause running engine
@@ -288,6 +289,8 @@ EXAMPLES:
     ag docs --list              # Show doc registry from STACK.md
     ag docs --pr                # Draft PR-trigger docs only
     ag docs --check             # Dry run: what would be drafted
+    ag docs generate            # Generate all deferred docs
+    ag docs generate F-0042     # Generate deferred docs for one feature
     ag intent list              # Show pending/orphaned intents
     ag intent clear F-0042      # Cancel a stuck intent
     ag sync                     # Full sync: detect + auto-fix
@@ -1128,6 +1131,182 @@ cmd_commit() {
     fi
 }
 
+# ---------------------------------------------------------------------------
+# _defer_docs: Log deferred doc entries instead of triggering inline drafting
+#   $1 = feature_id (optional)
+# Requires jq. Writes to $MAIN_PROJECT_ROOT/.agentic/deferred-docs.json
+# ---------------------------------------------------------------------------
+_defer_docs() {
+    local fid="${1:-}"
+    local deferred_log="${MAIN_PROJECT_ROOT:-$ROOT_DIR}/.agentic/deferred-docs.json"
+
+    if ! command -v jq >/dev/null 2>&1; then
+        echo -e "${YELLOW}Warning: jq not found — cannot defer docs. Install jq or set docs_mode: inline${NC}"
+        return 1
+    fi
+
+    # Get doc registry entries with feature_done/pr trigger via parse_registry pattern
+    # Collect path|type pairs, then build JSON array in one jq call
+    local stack_file="${ROOT_DIR}/STACK.md"
+    local doc_pairs=""
+    if [[ -f "$stack_file" ]]; then
+        local in_docs=false
+        while IFS= read -r line; do
+            if [[ "$line" =~ ^##[[:space:]]+Docs ]]; then
+                in_docs=true; continue
+            fi
+            if $in_docs && [[ "$line" =~ ^##[[:space:]] ]]; then
+                break
+            fi
+            if $in_docs && [[ "$line" =~ ^-[[:space:]]*doc:[[:space:]]* ]]; then
+                local entry="${line#*doc:}"
+                local d_path d_type d_trigger
+                d_path=$(echo "$entry" | awk -F'|' '{gsub(/^[[:space:]]+|[[:space:]]+$/,"",$1); print $1}')
+                d_type=$(echo "$entry" | awk -F'|' '{gsub(/^[[:space:]]+|[[:space:]]+$/,"",$2); print $2}')
+                d_trigger=$(echo "$entry" | awk -F'|' '{gsub(/^[[:space:]]+|[[:space:]]+$/,"",$3); print $3}')
+                if [[ "$d_trigger" == "feature_done" || "$d_trigger" == "pr" ]]; then
+                    doc_pairs+="${d_path}|${d_type}"$'\n'
+                fi
+            fi
+        done < "$stack_file"
+    fi
+
+    # Build stale_docs JSON from collected pairs in one jq call
+    local stale_docs_json="[]"
+    if [[ -n "$doc_pairs" ]]; then
+        stale_docs_json=$(printf '%s' "$doc_pairs" | grep -v '^$' | while IFS='|' read -r p t; do
+            printf '{"path":"%s","type":"%s"}\n' "$p" "$t"
+        done | jq -s '.')
+    fi
+
+    local doc_count
+    doc_count=$(echo "$stale_docs_json" | jq 'length')
+    if [[ "$doc_count" -eq 0 ]]; then
+        return 0
+    fi
+
+    # Get changed files (build JSON array in one jq call for performance)
+    local files_json="[]"
+    local manifest_file="$ROOT_DIR/.agentic/journal/manifests/${fid}.manifest.md"
+    local files_list=""
+    if [[ -n "$fid" && -f "$manifest_file" ]]; then
+        files_list=$(sed -n 's/^- `\([^`]*\)`.*/\1/p' "$manifest_file" 2>/dev/null || true)
+    else
+        files_list=$(git diff --name-only HEAD~1 2>/dev/null || true)
+    fi
+    if [[ -n "$files_list" ]]; then
+        files_json=$(printf '%s\n' "$files_list" | jq -R . | jq -s .)
+    fi
+
+    local commit_sha
+    commit_sha=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    local description="Deferred doc updates for ${fid:-unknown feature}"
+
+    # Initialize file if missing
+    if [[ ! -f "$deferred_log" ]]; then
+        echo "[]" > "$deferred_log"
+    fi
+
+    # Append entry atomically
+    local tmp_file="${deferred_log}.tmp"
+    jq --arg fid "${fid:-}" \
+       --arg ts "$timestamp" \
+       --arg desc "$description" \
+       --arg sha "$commit_sha" \
+       --argjson files "$files_json" \
+       --argjson stale "$stale_docs_json" \
+       '. + [{"feature_id": $fid, "timestamp": $ts, "files_changed": $files, "description": $desc, "stale_docs": $stale, "commit_sha": $sha}]' \
+       "$deferred_log" > "$tmp_file" && mv "$tmp_file" "$deferred_log"
+
+    echo -e "${GREEN}Deferred doc updates for ${doc_count} doc(s). Run \`ag docs generate\` later.${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# _docs_generate: Process deferred doc entries
+#   $1 = feature_id filter (optional, empty = all)
+# ---------------------------------------------------------------------------
+_docs_generate() {
+    local filter_fid="${1:-}"
+    local deferred_log="${MAIN_PROJECT_ROOT:-$ROOT_DIR}/.agentic/deferred-docs.json"
+
+    if ! command -v jq >/dev/null 2>&1; then
+        echo -e "${RED}Error: jq required for deferred docs. Install jq.${NC}"
+        exit 1
+    fi
+
+    if [[ ! -f "$deferred_log" ]]; then
+        echo "No deferred docs pending."
+        return 0
+    fi
+
+    local total
+    total=$(jq 'length' "$deferred_log")
+    if [[ "$total" -eq 0 ]]; then
+        echo "No deferred docs pending."
+        return 0
+    fi
+
+    # Get entries to process (filtered or all)
+    local entries
+    if [[ -n "$filter_fid" ]]; then
+        entries=$(jq -c --arg fid "$filter_fid" '[.[] | select(.feature_id == $fid)]' "$deferred_log")
+    else
+        entries=$(jq -c '.' "$deferred_log")
+    fi
+
+    local count
+    count=$(echo "$entries" | jq 'length')
+    if [[ "$count" -eq 0 ]]; then
+        echo "No deferred docs pending${filter_fid:+ for $filter_fid}."
+        return 0
+    fi
+
+    echo -e "${BOLD}=== Generating Deferred Docs ($count entries) ===${NC}"
+    echo ""
+
+    local processed=0
+    for i in $(seq 0 $((count - 1))); do
+        local entry
+        entry=$(echo "$entries" | jq -c ".[$i]")
+        local fid
+        fid=$(echo "$entry" | jq -r '.feature_id')
+        local sha
+        sha=$(echo "$entry" | jq -r '.commit_sha')
+
+        echo -e "${BOLD}--- ${fid:-unknown} (commit: ${sha}) ---${NC}"
+
+        # Trigger doc generation
+        if [[ -n "$fid" && "$fid" != "null" && "$fid" != "" ]]; then
+            bash "$SCRIPT_DIR/docs.sh" --trigger feature_done --manifest "$fid" 2>/dev/null || true
+        else
+            bash "$SCRIPT_DIR/docs.sh" --trigger feature_done 2>/dev/null || true
+        fi
+
+        # Remove this entry from the log (one-by-one for interruption safety)
+        local tmp_file="${deferred_log}.tmp"
+        jq --arg fid "$fid" --arg sha "$sha" \
+           '[.[] | select(.feature_id != $fid or .commit_sha != $sha)]' \
+           "$deferred_log" > "$tmp_file" && mv "$tmp_file" "$deferred_log"
+
+        processed=$((processed + 1))
+        echo ""
+    done
+
+    echo -e "${GREEN}Processed $processed deferred doc entries.${NC}"
+
+    # Clean up empty log
+    local remaining
+    remaining=$(jq 'length' "$deferred_log" 2>/dev/null || echo "0")
+    if [[ "$remaining" -eq 0 ]]; then
+        rm -f "$deferred_log"
+        echo "Deferred log cleared."
+    else
+        echo "$remaining entries remaining."
+    fi
+}
+
 # Done command - feature/task complete validation
 cmd_done() {
     local feature_id="${1:-}"
@@ -1206,6 +1385,9 @@ cmd_done() {
     # Doc drift gate (controlled by docs_gate setting)
     local docs_gate_mode
     docs_gate_mode=$(get_setting "docs_gate" "off")
+    local docs_mode_val
+    docs_mode_val=$(get_setting "docs_mode" "inline")
+
     if [ "$docs_gate_mode" != "off" ]; then
         echo -e "${BOLD}=== Documentation Drift Check ===${NC}"
         if [ -n "$feature_id" ]; then
@@ -1221,7 +1403,8 @@ cmd_done() {
             local validate_exit=$?
         fi
 
-        if [ "$docs_gate_mode" = "blocking" ]; then
+        # In deferred mode, skip the blocking prompt (drift check still runs for awareness)
+        if [ "$docs_mode_val" = "inline" ] && [ "$docs_gate_mode" = "blocking" ]; then
             if [ "${SKIP_DOCS_GATE:-0}" = "1" ] || [ ! -t 0 ]; then
                 echo -e "${YELLOW}docs_gate: blocking — skipped (non-interactive or SKIP_DOCS_GATE=1)${NC}"
             else
@@ -1238,6 +1421,8 @@ cmd_done() {
                     exit 1
                 fi
             fi
+        elif [ "$docs_mode_val" = "deferred" ]; then
+            echo -e "${YELLOW}docs_mode: deferred — blocking prompt suppressed. Docs will be logged for later.${NC}"
         fi
         echo ""
     fi
@@ -1246,25 +1431,33 @@ cmd_done() {
     fi
 
     # Doc lifecycle: draft docs from registry (after docs_gate, before complete check)
-    if [[ -f "$SCRIPT_DIR/docs.sh" ]]; then
+    # Guarded by docs_gate != off (no doc work when docs_gate: off)
+    if [ "$docs_gate_mode" != "off" ] && [[ -f "$SCRIPT_DIR/docs.sh" ]]; then
         local has_docs_registry
         has_docs_registry=$(bash "$SCRIPT_DIR/docs.sh" --list 2>/dev/null | grep -c "^  " || true)
         if [[ "$has_docs_registry" -gt 1 ]]; then
-            echo -e "${BOLD}=== Doc Lifecycle ===${NC}"
-            # feature_done trigger: both profiles
-            if [ -n "$feature_id" ]; then
-                bash "$SCRIPT_DIR/docs.sh" --trigger feature_done --manifest "$feature_id" 2>/dev/null || true
+            if [ "$docs_mode_val" = "deferred" ]; then
+                # Deferred mode: log what would be drafted, don't trigger inline
+                echo -e "${BOLD}=== Doc Lifecycle (deferred) ===${NC}"
+                _defer_docs "$feature_id"
             else
-                bash "$SCRIPT_DIR/docs.sh" --trigger feature_done 2>/dev/null || true
-            fi
-            # pr trigger: formal profile only
-            local profile_val
-            profile_val=$(get_setting "profile" "discovery")
-            if [[ "$profile_val" == "formal" ]]; then
+                # Inline mode (default): trigger doc drafting immediately
+                echo -e "${BOLD}=== Doc Lifecycle ===${NC}"
+                # feature_done trigger: both profiles
                 if [ -n "$feature_id" ]; then
-                    bash "$SCRIPT_DIR/docs.sh" --trigger pr --manifest "$feature_id" 2>/dev/null || true
+                    bash "$SCRIPT_DIR/docs.sh" --trigger feature_done --manifest "$feature_id" 2>/dev/null || true
                 else
-                    bash "$SCRIPT_DIR/docs.sh" --trigger pr 2>/dev/null || true
+                    bash "$SCRIPT_DIR/docs.sh" --trigger feature_done 2>/dev/null || true
+                fi
+                # pr trigger: formal profile only
+                local profile_val
+                profile_val=$(get_setting "profile" "discovery")
+                if [[ "$profile_val" == "formal" ]]; then
+                    if [ -n "$feature_id" ]; then
+                        bash "$SCRIPT_DIR/docs.sh" --trigger pr --manifest "$feature_id" 2>/dev/null || true
+                    else
+                        bash "$SCRIPT_DIR/docs.sh" --trigger pr 2>/dev/null || true
+                    fi
                 fi
             fi
             echo ""
@@ -1770,6 +1963,10 @@ cmd_docs() {
                 exit 1
             fi
             ;;
+        --generate|generate)
+            # Generate deferred docs (all pending, or filtered by feature ID)
+            _docs_generate "${feature_id:-}"
+            ;;
         --pr)
             if [[ -n "$feature_id" ]]; then
                 bash "$SCRIPT_DIR/docs.sh" --trigger pr --manifest "$feature_id"
@@ -1790,7 +1987,7 @@ cmd_docs() {
             ;;
         *)
             echo -e "${RED}Unknown docs subcommand: $arg1${NC}"
-            echo "Usage: ag docs [F-####] [--list|--check|--pr]"
+            echo "Usage: ag docs [F-####] [--list|--check|--pr|--generate]"
             exit 1
             ;;
     esac
@@ -2871,6 +3068,12 @@ _settings_set_value() {
         docs_gate)
             if [[ ! "$value" =~ ^(off|warning|blocking)$ ]]; then
                 echo -e "${RED}Error: docs_gate must be 'off', 'warning', or 'blocking', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        docs_mode)
+            if [[ ! "$value" =~ ^(inline|deferred)$ ]]; then
+                echo -e "${RED}Error: docs_mode must be 'inline' or 'deferred', got '$value'${NC}"
                 exit 1
             fi
             ;;

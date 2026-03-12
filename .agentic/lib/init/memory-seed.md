@@ -5,8 +5,8 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.53.6 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create -->
+<!-- memory-seed v0.53.7 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -62,6 +62,8 @@ If the user wants to commit, push, save, ship, or finalize changes — in any ph
 
 **Spec + code + tests + docs = done.** If your change affects user-visible behavior, run `bash .agentic/lib/tools/drift.sh --docs` to detect stale project docs and `bash .agentic/lib/tools/docs.sh --validate` to check registry health. Update all artifacts in the same commit — don't defer to a follow-up. If you add or substantially change a doc, ensure `## Docs` in STACK.md lists it with correct component/area tags. Use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold a new doc and auto-register it.
 
+**Exception: `docs_mode: deferred`** — when set in STACK.md, skip inline doc updates during implementation. `ag done` will log what docs are needed to `.agentic/deferred-docs.json` instead of triggering immediate drafting. Run `ag docs generate` later to process the deferred queue. Framework instruction file updates (framework dev only) are NOT deferred — always inline.
+
 ## When the user mentions an idea, todo, or reminder
 
 If the user says remember, todo, idea, note for later, tasklist, or mentions something to track:
@@ -115,6 +117,8 @@ If the user indicates a feature is complete — in any phrasing (e.g. "done", "c
 After `ag done F-XXXX` completes, if STACK.md has a `## Docs` section with entries:
 the doc lifecycle fires automatically (docs.sh assembles context, you draft the docs).
 You can also run `ag docs F-XXXX` manually to draft registered docs for a feature.
+
+If `docs_mode: deferred` in STACK.md, `ag done` logs deferred items to `.agentic/deferred-docs.json` instead of triggering immediate drafting. Run `ag docs generate` later to process all pending entries, or `ag docs generate F-XXXX` for a single feature.
 
 ## When work was interrupted or a session crashed
 

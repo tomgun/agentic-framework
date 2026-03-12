@@ -113,6 +113,11 @@ This ensures MVP is solid before adding enhancements.
 
 ### Step 6: Documentation
 
+**Check `docs_mode` in STACK.md first:**
+- If `deferred`: skip inline doc updates. `ag done` will log what's needed. Focus on code + tests.
+  Note: framework instruction file updates (framework dev only) are NOT deferred — always inline.
+- If `inline` (default): proceed with the doc update steps below.
+
 Before declaring done, check which project docs need updating:
 
 1. Run `bash .agentic/lib/tools/docs.sh --validate` to check registry health (missing files, unregistered docs)
