@@ -100,6 +100,12 @@ If the user says kickoff, vision, draft epic from idea, generate features, turn 
 
 **STOP.** Run `ag kickoff "vision description"`. This generates OVERVIEW.md, FEATURES.md entries, acceptance criteria stubs, and BACKLOG.json in a staging area (`.agentic/session/kickoff-draft/`). Use `ag kickoff --review` to present staging for review/iteration, `ag kickoff --approve` to promote to real spec files, `ag kickoff --discard` to start over. After approval, suggest `ag auto epic` for autonomous execution.
 
+## When the user wants to know how to run the project
+
+If the user says run, how to run, dev server, start the app, run commands, what commands, or wants to know how to run/start/build/test the project:
+
+**STOP.** Run `ag run`. This detects the stack from STACK.md and auto-detection, then displays dev server, build, and test commands with source attribution (STACK.md vs auto-detected).
+
 ## When the user wants parallel agent coordination
 
 If the user says start coordination server, parallel agents, remote control, remote review, mobile status, or wants multiple agents working in parallel on different features:
