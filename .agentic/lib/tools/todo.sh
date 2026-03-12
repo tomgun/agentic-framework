@@ -12,8 +12,17 @@
 #
 set -euo pipefail
 
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../paths.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../paths.sh"
 # TODO_FILE provided by paths.sh
+
+# Auto-flush: commit TODO.md to main after mutating operations.
+# Best-effort — only runs when on main (feature branches flush on return to main).
+_try_flush() {
+    if [[ -f "$SCRIPT_DIR/state-commit.sh" ]]; then
+        bash "$SCRIPT_DIR/state-commit.sh" 2>/dev/null || true
+    fi
+}
 
 # Create file if doesn't exist
 if [[ ! -f "${TODO_FILE}" ]]; then
@@ -118,6 +127,7 @@ case "${ACTION}" in
     mv "${TODO_FILE}.tmp" "${TODO_FILE}"
 
     echo "✓ Added ${NEXT_ID}: ${DESCRIPTION}"
+    _try_flush
     ;;
 
   done)
@@ -165,6 +175,7 @@ case "${ACTION}" in
     mv "${TODO_FILE}.tmp" "${TODO_FILE}"
 
     echo "✓ Resolved ${TODO_ID}: ${RESOLUTION}"
+    _try_flush
     ;;
 
   drop)
@@ -208,6 +219,7 @@ case "${ACTION}" in
     mv "${TODO_FILE}.tmp" "${TODO_FILE}"
 
     echo "✓ Dropped ${TODO_ID}: ${REASON}"
+    _try_flush
     ;;
 
   triage)
@@ -268,6 +280,7 @@ case "${ACTION}" in
 
     echo "✓ Triaged ${TODO_ID} → ${TARGET}: ${NOTES:-promoted}"
     echo "Note: Create the ${TARGET} entry separately (e.g., feature.sh or quick_issue.sh)"
+    _try_flush
     ;;
 
   list)

@@ -8,6 +8,10 @@
 
 ## Recent Contributions
 
+### State File Auto-Flush Pattern (post-F-0201 fixes)
+
+**User insight**: Tomas identified a systemic dirty-tree problem caused by token-efficient scripts (blocker.sh, todo.sh, etc.) modifying state files without committing them. The symptoms: `git pull --rebase` failures at session start, stale HUMAN_NEEDED.md entries persisting across sessions, and friction from manual `ag flush` calls. The root cause was architectural — state file scripts were designed as pure writers with no commit responsibility, leaving flush coordination to the caller. Tomas drove three fixes: (1) **HUMAN_NEEDED after PR creation** — the committing-changes skill now switches to main, writes the blocker entry, and runs `ag flush` immediately (instead of leaving it dirty on the feature branch); (2) **Manifest idempotency** — `manifest.sh` now strips all volatile JSON fields (hash, total_commits, additions, deletions) from its comparison, not just timestamps — preventing phantom dirty state after rebases; (3) **TODO auto-flush** — `todo.sh` now calls `state-commit.sh` after every mutating operation (add, done, drop, triage), with best-effort semantics (flushes when on main, silently skips on feature branches). The pattern Tomas established: state file scripts should be self-flushing, not rely on callers to remember `ag flush`.
+
 ### Autonomous Framework Verification Loop (T-0062, idea)
 
 **User insight**: Tomas proposed a self-healing framework verification system: the agent builds real example projects (todo app, API service, CLI tool) end-to-end using the framework, acting as developer/architect. When a framework bug surfaces during the build, the agent (1) fixes the framework code, (2) restarts the example project from scratch, (3) repeats until the full lifecycle completes without errors. This creates a closed loop — build → hit bug → fix → rebuild → verify — that catches behavioral gaps unit tests and LLM tests structurally cannot. Key design constraints from Tomas: hard guards against touching main/real branches (worktrees and ephemeral branches only), automatic cleanup, and abort on any main-branch mutation attempt.
