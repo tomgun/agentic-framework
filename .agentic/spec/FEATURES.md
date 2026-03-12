@@ -3404,7 +3404,7 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0201: Vision-to-Backlog Pipeline (ag kickoff)
 
-**Status**: planned
+**Status**: criteria_set
 **Category**: Autonomous
 **Priority**: high
 **Complexity**: high

@@ -114,6 +114,7 @@ class AgenticPaths:
         self.pending_reviews_dir = self._resolve(
             self.agentic_root / "session" / "reviews",
             self.project_root / ".agentic-state" / "reviews")
+        self.kickoff_staging_dir = self.session_dir / "kickoff-draft"
         self.verification_state = self._resolve(
             self.agentic_root / "session" / ".verification-state",
             self.project_root / ".agentic-state" / ".verification-state")

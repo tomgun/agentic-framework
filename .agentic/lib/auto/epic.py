@@ -230,7 +230,7 @@ def propose_decomposition(
     components = registry.list_all()
 
     # Get next available feature ID
-    next_id = _get_next_feature_id(paths.features_file)
+    next_id = get_next_feature_id(paths.features_file)
 
     # Build child proposals
     children: list[dict] = []
@@ -513,11 +513,13 @@ def _extract_section(content: str, start: int) -> str:
     return section
 
 
-def _get_next_feature_id(features_file: Path) -> int:
+def get_next_feature_id(features_file: Path) -> int:
     """Get the next available feature ID number.
 
-    Note: not atomic — concurrent decompositions could allocate overlapping IDs.
-    Acceptable because decomposition is human-gated and rare.
+    Note: not atomic — concurrent operations could allocate overlapping IDs.
+    Acceptable because callers (decompose, kickoff) are human-gated.
+
+    Public API — used by kickoff.py for ID allocation at promotion time.
     """
     if not features_file.exists():
         return 1

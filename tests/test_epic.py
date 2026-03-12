@@ -27,7 +27,7 @@ from auto.epic import (
     _get_feature_status,
     _get_feature_parent,
     _get_children_statuses,
-    _get_next_feature_id,
+    get_next_feature_id,
 )
 
 
@@ -209,7 +209,7 @@ class TestDeriveChildName:
 
 
 # ---------------------------------------------------------------------------
-# _get_next_feature_id tests
+# get_next_feature_id tests
 # ---------------------------------------------------------------------------
 
 class TestGetNextFeatureId:
@@ -221,10 +221,10 @@ class TestGetNextFeatureId:
             ## F-0005: Fifth
             **Status**: planned
         """))
-        assert _get_next_feature_id(features_file) == 6
+        assert get_next_feature_id(features_file) == 6
 
     def test_nonexistent_file(self, tmp_path):
-        assert _get_next_feature_id(tmp_path / "nonexistent.md") == 1
+        assert get_next_feature_id(tmp_path / "nonexistent.md") == 1
 
 
 # ---------------------------------------------------------------------------

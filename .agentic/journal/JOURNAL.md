@@ -2261,3 +2261,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-12 18:39 - F-0201 ag kickoff
+
+**Why**: Enable Mode 2/3 autonomous flow by converting product visions to structured specs in one command
+
+**What changed**:
+- Vision-to-backlog pipeline: kickoff.py backend (generate, validate, promote, edit ops, discard), ag.sh cmd_kickoff (script mode, review loop, settings), all 10 instruction files updated
+
+**Next steps**:
+- PR review, playbook mode (deferred to child)
+
+**Blockers**: None
+
