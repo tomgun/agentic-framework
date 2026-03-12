@@ -1,14 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0201",
-    "description": "F-0201",
-    "added_at": "2026-03-11T15:03:01Z",
-    "added_by": "agent",
-    "became_current_at": "2026-03-12T11:31:04Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0202",
     "description": "Preview Capability (ag preview)",
     "added_at": "2026-03-11T00:00:00Z",
@@ -17,7 +9,7 @@
       ".agentic/spec/acceptance/F-0202.md"
     ],
     "notes": "ADR-002 priority 3. Enables Mode 2 feedback loop.",
-    "became_current_at": "2026-03-11T15:01:42Z"
+    "became_current_at": "2026-03-12T16:55:39Z"
   },
   {
     "type": "feature",

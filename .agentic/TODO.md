@@ -142,6 +142,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0061: F-0207 enhancement: cache scan results for files already classified as non-doc, skip re-scanning unless changed
 - **Added**: 2026-03-11
 
+### T-0062: F-IDEA: Autonomous Framework Verification Loop — agent builds example projects (todo app, API service, CLI tool) using the framework end-to-end, acting as developer/architect. Uses git worktrees or temp branches (HARD GUARD: never touch main/real branches). Agent handles its own review requests, commit approvals, kickoff flows. Catches behavioral gaps that unit/LLM tests miss. Think: ag auto verify-framework --project todo-app. Could reuse ag auto task/crunch infrastructure. Key constraints: isolated worktrees, ephemeral branches only, auto-cleanup, abort on any main-branch mutation attempt.
+- **Added**: 2026-03-12
+
 ## Done
 
 

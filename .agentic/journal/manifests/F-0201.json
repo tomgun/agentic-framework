@@ -1,0 +1,26 @@
+{
+  "feature": "F-0201",
+  "mode": "feature",
+  "generated": "2026-03-12T16:55:27Z",
+  "commits": [
+    {"hash": "a4cb635", "date": "2026-03-12", "message": "Merge pull request #122 from tomgun/feature/F-0201-kickoff-pipeline", "additions": 0, "deletions": 0},
+    {"hash": "fc7767d", "date": "2026-03-12", "message": "feat(kickoff): F-0201 — vision-to-backlog pipeline (ag kickoff)", "additions": 2562, "deletions": 18},
+    {"hash": "ad452eb", "date": "2026-03-12", "message": "chore(state): F-0208 shipped — flush state files", "additions": 41, "deletions": 15},
+    {"hash": "e5386c4", "date": "2026-03-11", "message": "fix: manifest frozen-by-default + dedup, backlog done guard, flush manifests", "additions": 71, "deletions": 1},
+    {"hash": "d5198be", "date": "2026-03-11", "message": "fix: backlog done validates feature is shipped before removing", "additions": 53, "deletions": 3},
+    {"hash": "a8714ef", "date": "2026-03-11", "message": "chore: populate backlog with ADR-002 implementation order + update F-0183 ACs", "additions": 92, "deletions": 5},
+    {"hash": "ae0f651", "date": "2026-03-11", "message": "docs: add ADR-002 (User Involvement Modes) + register 6 new features", "additions": 350, "deletions": 1}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/lib/auto/epic.py"}, {"file": ".agentic/lib/auto/kickoff.py"}, {"file": ".agentic/lib/paths.py"}, {"file": ".agentic/lib/tools/ag.sh"}, {"file": ".agentic/lib/tools/backlog_helpers.py"}, {"file": ".agentic/lib/tools/kickoff.sh"}, {"file": ".agentic/lib/tools/manifest.sh"}, {"file": ".agentic/lib/tools/state-commit.sh"}],
+    "tests": [{"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/acceptance/F-0183.md"}, {"file": ".agentic/spec/acceptance/F-0201.md"}, {"file": ".agentic/spec/adr/ADR-002-user-involvement-modes.md"}, {"file": "tests/test_epic.py"}, {"file": "tests/test_kickoff.py"}],
+    "docs": [{"file": ".agentic/STATUS.md"}, {"file": ".agentic/TODO.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/journal/plans/F-0201-plan.md"}, {"file": ".agentic/lib/DEVELOPER_GUIDE.md"}, {"file": ".agentic/lib/agents/claude/CLAUDE.md"}, {"file": ".agentic/lib/agents/codex/codex-instructions.md"}, {"file": ".agentic/lib/agents/copilot/copilot-instructions.md"}, {"file": ".agentic/lib/agents/cursor/cursorrules.txt"}, {"file": ".agentic/lib/agents/shared/agent_operating_guidelines.md"}, {"file": ".agentic/lib/agents/shared/auto_orchestration.md"}, {"file": ".agentic/lib/init/STACK.template.md"}, {"file": ".agentic/lib/init/memory-seed.md"}, {"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/acceptance/F-0183.md"}, {"file": ".agentic/spec/acceptance/F-0201.md"}, {"file": ".agentic/spec/adr/ADR-002-user-involvement-modes.md"}, {"file": "CLAUDE.md"}, {"file": "docs/HOW_IT_WORKS.md"}],
+    "config": [{"file": ".agentic/BACKLOG.json"}, {"file": ".agentic/journal/manifests/F-0208.json"}]
+  },
+  "stats": {
+    "total_commits": 7,
+    "total_files": 33,
+    "additions": 3169,
+    "deletions": 43
+  }
+}
