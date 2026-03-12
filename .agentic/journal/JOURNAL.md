@@ -2248,3 +2248,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-12 13:30 - F-0208 Complete
+
+**Why**: Shipped deferred documentation mode
+
+**What changed**:
+- Projects can now set docs_mode: deferred to skip inline doc updates during fast iteration — deferred-docs.json tracks what's owed, ag docs generate processes the queue later
+
+**Next steps**:
+- Next backlog item
+
+**Blockers**: None
+

@@ -1,0 +1,25 @@
+{
+  "feature": "F-0208",
+  "mode": "feature",
+  "generated": "2026-03-12T11:30:38Z",
+  "commits": [
+    {"hash": "9d47a2c", "date": "2026-03-12", "message": "Merge pull request #121 from tomgun/feature/F-0208-deferred-docs-mode", "additions": 0, "deletions": 0},
+    {"hash": "1ee685a", "date": "2026-03-12", "message": "feat(docs): F-0208 — add deferred documentation mode (docs_mode setting)", "additions": 485, "deletions": 18},
+    {"hash": "00a552e", "date": "2026-03-11", "message": "chore: ag done PR #120 — bump VERSION 0.53.10", "additions": 18, "deletions": 13},
+    {"hash": "38c71a1", "date": "2026-03-11", "message": "chore(state): reprioritize backlog — F-0207/F-0208 to top", "additions": 20, "deletions": 19},
+    {"hash": "57a562b", "date": "2026-03-11", "message": "fix: CONTRIBUTIONS header — reference both F-0207 and F-0208", "additions": 1, "deletions": 1},
+    {"hash": "3bd1638", "date": "2026-03-11", "message": "chore: add F-0208 Deferred Documentation Mode, update CONTRIBUTIONS", "additions": 34, "deletions": 0}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/lib/settings.sh"}, {"file": ".agentic/lib/tools/ag.sh"}],
+    "tests": [{"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/acceptance/F-0208.md"}],
+    "docs": [{"file": ".agentic/CONTRIBUTIONS.md"}, {"file": ".agentic/STATUS.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/journal/plans/F-0208-plan.md"}, {"file": ".agentic/lib/init/STACK.template.md"}, {"file": ".agentic/lib/init/memory-seed.md"}, {"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/acceptance/F-0208.md"}, {"file": ".claude/skills/completing-work/SKILL.md"}, {"file": ".claude/skills/implementing-features/SKILL.md"}, {"file": "STACK.md"}],
+    "config": [{"file": ".agentic/BACKLOG.json"}]
+  },
+  "stats": {
+    "total_commits": 6,
+    "total_files": 16,
+    "additions": 558,
+    "deletions": 51
+  }
+}

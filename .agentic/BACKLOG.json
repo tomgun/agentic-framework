@@ -1,23 +1,11 @@
 [
   {
     "type": "feature",
-    "id": "F-0208",
-    "description": "Deferred Documentation Mode (docs_mode setting)",
-    "added_at": "2026-03-11T15:56:19Z",
-    "added_by": "agent",
-    "notes": "docs_mode: inline|deferred. Deferred skips doc updates during fast iteration, auto-generates from specs+AC+code at checkpoints. Enables speed without forgetting docs.",
-    "depends_on": [
-      "F-0207"
-    ],
-    "became_current_at": "2026-03-11T21:03:24Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0201",
     "description": "F-0201",
     "added_at": "2026-03-11T15:03:01Z",
     "added_by": "agent",
-    "became_current_at": "2026-03-11T15:03:47Z"
+    "became_current_at": "2026-03-12T11:31:04Z"
   },
   {
     "type": "feature",

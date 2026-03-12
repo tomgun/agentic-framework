@@ -3549,7 +3549,7 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0208: Deferred Documentation Mode (docs_mode setting)
 
-**Status**: planned
+**Status**: shipped
 **Category**: Quality
 **Priority**: medium
 **Complexity**: medium
