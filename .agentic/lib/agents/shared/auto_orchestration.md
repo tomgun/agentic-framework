@@ -80,6 +80,7 @@ What would you like to work on?
 | "flush state" / "commit state files" / dirty state after `ag done` | **State Flush** | Run `ag flush` (or `ag flush --features`) to commit state-only files directly to main. No PR needed. |
 | "interrupted" / "crashed" / "stuck" / "orphaned" / "resume work" | **Intent Recovery** | Run `ag intent list` to see pending/orphaned intents. `ag intent clear F-XXXX` to discard. `ag sync` auto-adopts orphans from crashed sessions. |
 | "vision" / "kickoff" / "draft epic" / "generate features from idea" | **Vision-to-Backlog Pipeline** | Run `ag kickoff "vision description"`. Generates OVERVIEW.md, FEATURES.md entries, AC stubs, and BACKLOG.json in staging. Review with `--review`, approve with `--approve`, discard with `--discard`. |
+| "preview" / "how to run" / "dev server" / "start the app" / "run commands" | **Project Preview** | Run `ag preview`. Shows stack summary, dev/build/test commands with source attribution (STACK.md vs auto-detected). |
 
 ### Domain & Design Triggers
 

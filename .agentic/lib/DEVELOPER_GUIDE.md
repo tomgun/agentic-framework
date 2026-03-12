@@ -71,6 +71,7 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 | "Fix tests automatically" | `ag auto verify` | Test-fix loop until green or max iterations |
 | "Implement this feature" | `ag auto task F-XXXX` | Autonomous per-AC implementation + PR |
 | "Process all planned features" | `ag auto crunch` | Batch implementation of planned features |
+| "How do I run this?" | `ag preview` | Shows dev/build/test commands from STACK.md + auto-detection |
 
 You don't need to memorize these commands. The agent picks the right one.
 
