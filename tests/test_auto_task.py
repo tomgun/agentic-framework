@@ -153,6 +153,104 @@ class TestTaskRunner:
         assert "feat/auto-f-0042" in result.stdout
 
 
+# ---------------------------------------------------------------------------
+# F-0203: review_commit conditional commit tests
+# ---------------------------------------------------------------------------
+
+class TestCommitAcReviewCommit:
+    """Tests for _commit_ac() with review_commit setting (F-0203)."""
+
+    @patch("auto.task.get_setting", return_value="human")
+    def test_human_mode_stages_only(self, mock_setting, project_dir):
+        """review_commit: human — stages files but does NOT commit."""
+        import subprocess
+        # Create a file to stage
+        (project_dir / "test.py").write_text("print('hello')")
+        runner = TaskRunner(project_dir)
+        result = runner._commit_ac("F-0042", "AC-001", "test criterion")
+        assert result is False
+        # Verify file was staged
+        status = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=str(project_dir), capture_output=True, text=True,
+        )
+        assert "test.py" in status.stdout
+
+    @patch("auto.task.get_setting", return_value="critical_agent")
+    @patch("auto.critical_agent.CriticalAgent.review_commit")
+    def test_critical_agent_approved(self, mock_review, mock_setting, project_dir):
+        """review_commit: critical_agent + approved — commits successfully."""
+        mock_review.return_value = MagicMock(verdict="approved", summary="LGTM")
+        # Create a file to commit
+        (project_dir / "feature.py").write_text("# new feature")
+        runner = TaskRunner(project_dir)
+        result = runner._commit_ac("F-0042", "AC-001", "test criterion")
+        assert result is True
+        mock_review.assert_called_once_with("F-0042", "AC-001", "test criterion")
+
+    @patch("auto.task.get_setting", return_value="critical_agent")
+    @patch("auto.critical_agent.CriticalAgent.review_commit")
+    def test_critical_agent_rejected(self, mock_review, mock_setting, project_dir):
+        """review_commit: critical_agent + rejected — unstages, returns False."""
+        mock_review.return_value = MagicMock(
+            verdict="request_changes", summary="Issues found"
+        )
+        (project_dir / "bad.py").write_text("# bad code")
+        runner = TaskRunner(project_dir)
+        result = runner._commit_ac("F-0042", "AC-001", "test criterion")
+        assert result is False
+
+    @patch("auto.task.get_setting", return_value="critical_agent")
+    @patch("auto.critical_agent.CriticalAgent.review_commit")
+    def test_critical_agent_timeout(self, mock_review, mock_setting, project_dir):
+        """review_commit: critical_agent + exception — unstages, returns False."""
+        mock_review.side_effect = RuntimeError("Critical agent timed out")
+        (project_dir / "timeout.py").write_text("# code")
+        runner = TaskRunner(project_dir)
+        result = runner._commit_ac("F-0042", "AC-001", "test criterion")
+        assert result is False
+
+    @patch("auto.task.get_setting", return_value="critical_agent")
+    def test_staging_fails(self, mock_setting, project_dir):
+        """Staging failure returns False without calling agent."""
+        import subprocess
+        # Make .git read-only to cause staging failure
+        runner = TaskRunner(project_dir)
+        with patch("subprocess.run") as mock_run:
+            mock_run.side_effect = [
+                MagicMock(returncode=1, check_returncode=MagicMock(
+                    side_effect=subprocess.CalledProcessError(1, "git add")
+                ))
+            ]
+            # Use side_effect to raise CalledProcessError
+            mock_run.side_effect = subprocess.CalledProcessError(1, "git add")
+            result = runner._commit_ac("F-0042", "AC-001", "test criterion")
+            assert result is False
+
+    @patch("auto.task.get_setting", return_value="human")
+    def test_unrecognized_value_falls_back_to_human(self, mock_setting, project_dir):
+        """Unrecognized values for review_commit fall back to human behavior."""
+        mock_setting.return_value = "invalid_value"
+        (project_dir / "test2.py").write_text("print('test')")
+        runner = TaskRunner(project_dir)
+        result = runner._commit_ac("F-0042", "AC-001", "test criterion")
+        assert result is False  # staged but not committed
+
+    def test_unstage_or_warn_success(self, project_dir):
+        """_unstage_or_warn succeeds silently."""
+        runner = TaskRunner(project_dir)
+        # Should not raise
+        runner._unstage_or_warn()
+
+    @patch("auto.task.get_setting", return_value="human")
+    def test_check_docs_human_mode_stages_only(self, mock_setting, project_dir):
+        """_check_and_update_docs with review_commit: human stages but doesn't commit."""
+        runner = TaskRunner(project_dir)
+        # Docs gate off by default, method returns early
+        runner._check_and_update_docs("F-0042")
+        # No error = success
+
+
 class TestTaskResult:
     def test_to_dict(self):
         result = TaskResult(

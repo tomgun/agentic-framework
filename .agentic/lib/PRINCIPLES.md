@@ -338,21 +338,21 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 ---
 
-### R2. No Auto-Commits Without Approval
+### R2. No Auto-Commits Without Approval (Conditional)
 
-**What**: Agents NEVER commit changes without explicit human approval.
+**What**: In interactive development sessions, agents NEVER commit changes without explicit human approval. In autonomous workflows (`ag auto task`, `ag auto epic`), agents may commit after adversarial review by the critical agent, when explicitly opted-in via `review_commit: critical_agent` (F-0203).
 
-**Why**: Humans need to review what changed and why. This is the safety gate that prevents compounding mistakes. Agents present changes, wait for approval, then commit.
+**Why**: Humans need to review what changed and why. This is the safety gate that prevents compounding mistakes. Agents present changes, wait for approval, then commit. In automated execution, the critical agent provides equivalent oversight.
 
 **Derives from**: D1 (humans must approve), D2 (enforcement gate)
 
-**Enforcement**: Behavioral — LLM test (LLM-005) verifies compliance. Cannot be structurally gated since git commit always succeeds.
+**Enforcement**: Behavioral — LLM test (LLM-005) verifies interactive sessions comply. Structural — `task.py._commit_ac()` checks `review_commit` setting; `CriticalAgent.review_commit()` evaluates every staged diff.
 
-**Exception**: User may grant blanket approval for a session.
+**Exception**: User may grant blanket approval for a session. Automated execution may auto-commit when `review_commit: critical_agent` — critical agent evaluates every diff before commit (F-0203).
 
-**Anti-pattern**: "I've committed your changes" (past tense, no approval). Blanket auto-commit by default.
+**Anti-pattern**: "I've committed your changes" (past tense, no approval). Blanket auto-commit by default. Auto-commit in interactive sessions.
 
-**Reference**: `git_workflow.md`
+**Reference**: `git_workflow.md`, ADR-002 §4
 
 ---
 

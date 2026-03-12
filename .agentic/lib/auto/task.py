@@ -23,6 +23,8 @@ _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
 
+from settings import get_setting  # noqa: E402
+
 from auto import spawn_claude  # noqa: E402
 from auto.engine import AutoEngine, EngineState  # noqa: E402
 from auto.verify import VerifyLoop  # noqa: E402
@@ -319,7 +321,7 @@ class TaskRunner:
             timeout=120,
         )
 
-        # Commit doc updates separately (only modified tracked files)
+        # Stage doc updates (tracked files only — preserves existing git add -u)
         try:
             subprocess.run(
                 ["git", "add", "-u"],
@@ -327,6 +329,34 @@ class TaskRunner:
                 capture_output=True,
                 check=True,
             )
+        except subprocess.CalledProcessError:
+            return  # Nothing to stage
+
+        review_commit = get_setting(self.project_root, "review_commit", "human")
+        if review_commit != "critical_agent":
+            print(f"  Doc updates staged. Commit skipped (review_commit: human).")
+            return
+
+        # critical_agent mode — review doc changes before committing
+        from auto.critical_agent import CriticalAgent
+
+        agent = CriticalAgent(self.project_root)
+        try:
+            verdict = agent.review_commit(feature_id, "docs", "documentation updates")
+        except Exception as e:
+            print(f"  Critical agent error on docs: {e}. Unstaging.", file=sys.stderr)
+            self._unstage_or_warn()
+            return
+
+        if verdict.verdict != "approved":
+            print(
+                f"  Critical agent rejected doc commit: {verdict.summary}",
+                file=sys.stderr,
+            )
+            self._unstage_or_warn()
+            return
+
+        try:
             subprocess.run(
                 ["git", "commit", "-m",
                  f"docs({feature_id}): update documentation for feature"],
@@ -341,7 +371,15 @@ class TaskRunner:
     def _commit_ac(
         self, feature_id: str, ac_id: str, ac_text: str
     ) -> bool:
-        """Commit current changes for a passing AC."""
+        """Commit current changes for a passing AC (respects review_commit).
+
+        Returns True if changes were committed, False otherwise.
+        With review_commit: human, stages only (returns False — expected).
+        With review_commit: critical_agent, commits after adversarial review.
+        """
+        review_commit = get_setting(self.project_root, "review_commit", "human")
+
+        # Always stage changes
         try:
             subprocess.run(
                 ["git", "add", "-A"],
@@ -349,7 +387,36 @@ class TaskRunner:
                 capture_output=True,
                 check=True,
             )
-            message = f"feat({feature_id}): implement {ac_id} — {ac_text[:60]}"
+        except subprocess.CalledProcessError:
+            return False
+
+        if review_commit != "critical_agent":
+            # human (default) — stage only, don't commit
+            print(f"  Changes staged for {ac_id}. Commit skipped (review_commit: human).")
+            return False
+
+        # critical_agent mode — adversarial review then commit
+        from auto.critical_agent import CriticalAgent
+
+        agent = CriticalAgent(self.project_root)
+        try:
+            verdict = agent.review_commit(feature_id, ac_id, ac_text)
+        except Exception as e:
+            print(f"  Critical agent error: {e}. Unstaging.", file=sys.stderr)
+            self._unstage_or_warn()
+            return False
+
+        if verdict.verdict != "approved":
+            print(
+                f"  Critical agent rejected commit for {ac_id}: {verdict.summary}",
+                file=sys.stderr,
+            )
+            self._unstage_or_warn()
+            return False
+
+        # Approved — commit
+        message = f"feat({feature_id}): implement {ac_id} — {ac_text[:60]}"
+        try:
             subprocess.run(
                 ["git", "commit", "-m", message],
                 cwd=str(self.project_root),
@@ -359,6 +426,21 @@ class TaskRunner:
             return True
         except subprocess.CalledProcessError:
             return False
+
+    def _unstage_or_warn(self) -> None:
+        """Unstage all files. Warn if unstaging fails."""
+        result = subprocess.run(
+            ["git", "reset", "HEAD"],
+            cwd=str(self.project_root),
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            print(
+                f"  WARNING: git reset HEAD failed ({result.returncode}). "
+                f"Files may remain staged. Run 'git reset HEAD' manually.",
+                file=sys.stderr,
+            )
 
     def _create_pr(self, feature_id: str, result: TaskResult) -> str:
         """Create a pull request with implementation summary."""

@@ -87,6 +87,8 @@ Purpose: a single source of truth for "how we build and run software here".
 # Any regression transition. Discovery: critical_agent | Formal: human | Autonomous Formal: critical_agent
 - review_taste: skip
 # Style/taste consistency review (F-0183). Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
+- review_commit: human
+# Auto-commit in automated execution (`ag auto task/epic`). human: stage only, human reviews (default) | critical_agent: adversarial review then auto-commit. Discovery: human | Formal: human | Autonomous Formal: critical_agent
 
 - kickoff_confirm: skip
 # Kickoff confirmation checkpoints. Discovery: skip | Formal: ask | Autonomous Formal: skip
