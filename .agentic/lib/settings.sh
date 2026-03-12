@@ -344,6 +344,7 @@ show_all_settings() {
         "agent_mode"
         "pre_commit_hook"
         "docs_gate"
+        "docs_mode"
         "spec_analysis"
         "docs_stale_days"
         "periodic_orphaned_plans"

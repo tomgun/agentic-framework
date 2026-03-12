@@ -53,6 +53,8 @@ In a worktree: commit and push from the worktree, run `wip.sh complete`, then `c
 
 ### Step 2b: Verify Documentation Updated
 
+If `docs_mode: deferred` in STACK.md: skip doc verification — `ag done` logs deferred items automatically. Proceed to Step 3.
+
 Before marking shipped, verify documentation is current:
 
 1. Run `bash .agentic/lib/tools/docs.sh --validate` to check registry health (missing files, unregistered docs)
