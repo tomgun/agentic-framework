@@ -88,6 +88,9 @@ Purpose: a single source of truth for "how we build and run software here".
 - review_taste: skip
 # Style/taste consistency review (F-0183). Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
 
+- kickoff_confirm: skip
+# Kickoff confirmation checkpoints. Discovery: skip | Formal: ask | Autonomous Formal: skip
+
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
 - Primary platform: <!-- web/service/mobile/desktop/cli -->

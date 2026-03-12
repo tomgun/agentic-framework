@@ -66,6 +66,7 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 | "We're done" | `ag done` | Checks docs, tests, acceptance; auto-advances backlog |
 | "Flush state" / after `ag done` | `ag flush` | Commits state files (STATUS.md, BACKLOG.json, etc.) directly to main — no PR |
 | "Approve this" | `ag review` | Lists/resolves pending review checkpoints |
+| "Here's my product vision" | `ag kickoff "vision"` | Generates features, ACs, backlog from a vision prompt — staging → review → approve |
 | "Break this into children" | `ag decompose F-XXXX` | Analyzes epic AC, proposes child features by component, review checkpoint |
 | "Fix tests automatically" | `ag auto verify` | Test-fix loop until green or max iterations |
 | "Implement this feature" | `ag auto task F-XXXX` | Autonomous per-AC implementation + PR |

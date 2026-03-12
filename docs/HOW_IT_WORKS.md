@@ -551,6 +551,13 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 - **Automatic status cascade**: after any child feature transitions, the parent epic's status is automatically recomputed from its children (pure derivation, not a state transition). Rules: all shipped → epic shipped; any implementing/verified → epic implementing; all criteria_set or earlier → epic criteria_set; any regression → epic implementing
 - **Autonomous epic execution** (F-0186): `ag auto epic F-XXXX` reads the epic's child features, schedules component-scoped workers (AutonomousScheduler) with non-blocking reviews, and executes each child feature autonomously. Builds on decomposition + task mode.
 
+**Vision-to-Backlog Pipeline** (F-0201): Converts a product vision into structured spec artifacts in a single command:
+- `ag kickoff "Build a todo app with collaboration"` generates OVERVIEW.md, FEATURES.md entries, acceptance criteria stubs, and BACKLOG.json — all in a staging area (`.agentic/session/kickoff-draft/`)
+- Staging uses placeholder IDs (`F-NEW-001`, `F-NEW-002`) that get real sequential IDs at promotion time
+- Review loop: `ag kickoff --review` presents staging for iteration (merge, split, rename, reorder, remove features), `ag kickoff --approve` validates and promotes to real spec files, `ag kickoff --discard` starts over
+- Routes through `review_decomposition` checkpoint before promotion
+- Settings: `kickoff_confirm` (ask/skip) controls confirmation checkpoints in script mode
+
 ---
 
 ## Principle-by-Principle Breakdown
