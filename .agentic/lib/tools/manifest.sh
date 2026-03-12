@@ -330,10 +330,11 @@ if [[ "$FORMAT" == "json" ]]; then
 
     } > "${OUTPUT_FILE}.tmp"
 
-    # Skip write if only the timestamp changed (idempotent output)
+    # Skip write if only volatile fields changed (idempotent output)
+    # Strip: "generated" (timestamp), "hash" (changes on rebase), stats (shift on rebase)
     if [[ -f "$OUTPUT_FILE" ]]; then
-        OLD_CONTENT=$(grep -v '"generated"' "$OUTPUT_FILE")
-        NEW_CONTENT=$(grep -v '"generated"' "${OUTPUT_FILE}.tmp")
+        OLD_CONTENT=$(sed -E '/"generated"|"hash"|"total_commits"|"additions"|"deletions"/d' "$OUTPUT_FILE")
+        NEW_CONTENT=$(sed -E '/"generated"|"hash"|"total_commits"|"additions"|"deletions"/d' "${OUTPUT_FILE}.tmp")
         if [[ "$OLD_CONTENT" == "$NEW_CONTENT" ]]; then
             rm "${OUTPUT_FILE}.tmp"
             echo "✅ Manifest unchanged: $OUTPUT_FILE"
@@ -415,10 +416,11 @@ else
 
     } > "${OUTPUT_FILE}.tmp"
 
-    # Skip write if only the timestamp changed (idempotent output)
+    # Skip write if only volatile fields changed (idempotent output)
+    # Strip: Generated line, commit hashes (change on rebase)
     if [[ -f "$OUTPUT_FILE" ]]; then
-        OLD_CONTENT=$(grep -v '^Generated:' "$OUTPUT_FILE")
-        NEW_CONTENT=$(grep -v '^Generated:' "${OUTPUT_FILE}.tmp")
+        OLD_CONTENT=$(sed -E '/^Generated:|^\| `[a-f0-9]+`/d' "$OUTPUT_FILE")
+        NEW_CONTENT=$(sed -E '/^Generated:|^\| `[a-f0-9]+`/d' "${OUTPUT_FILE}.tmp")
         if [[ "$OLD_CONTENT" == "$NEW_CONTENT" ]]; then
             rm "${OUTPUT_FILE}.tmp"
             echo "✅ Manifest unchanged: $OUTPUT_FILE"
