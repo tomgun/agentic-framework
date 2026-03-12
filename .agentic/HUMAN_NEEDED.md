@@ -42,6 +42,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0032: PR #123: ag preview — F-0202
+- **Type**: review
+- **Added**: 2026-03-12
+- **Context**: Stack-aware project preview command. 22 files, 3 commits.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0028: PR #91: Silent session start
