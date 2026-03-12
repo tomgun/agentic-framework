@@ -8,6 +8,10 @@
 
 ## Recent Contributions
 
+### Autonomous Framework Verification Loop (T-0062, idea)
+
+**User insight**: Tomas proposed a self-healing framework verification system: the agent builds real example projects (todo app, API service, CLI tool) end-to-end using the framework, acting as developer/architect. When a framework bug surfaces during the build, the agent (1) fixes the framework code, (2) restarts the example project from scratch, (3) repeats until the full lifecycle completes without errors. This creates a closed loop — build → hit bug → fix → rebuild → verify — that catches behavioral gaps unit tests and LLM tests structurally cannot. Key design constraints from Tomas: hard guards against touching main/real branches (worktrees and ephemeral branches only), automatic cleanup, and abort on any main-branch mutation attempt.
+
 ### Project Documentation Lifecycle — Validation & Creation (PR #120, F-0207)
 
 **User insight**: Tomas caught a fundamental design flaw mid-implementation: the initial `docs.sh --validate` scan hardcoded framework-specific paths (`.agentic/lib/prompts/`, `docs/INSTRUCTION_ARCHITECTURE.md`, etc.) to detect unregistered docs. Tomas's correction: "We are not building this framework to build this framework. We are building this framework to use it when building other software with the framework." This reframed the entire scan design — from a list of known framework paths to a generic `.md` discovery with exclusions, so it works for any project (Rails, React, Python CLI). Tomas also pushed for broad scanning ("the scan should read the new files and determine if they are the project's documentation") and proposed scan result caching (captured as T-0061). The 4-iteration dialectical review (R1-R4) was driven by this insight — R1/R2 addressed technical issues, R3 removed framework-specific paths entirely, R4 broadened the scan approach.
