@@ -161,14 +161,14 @@ COMMANDS:
     intent [sub]        Manage intent journal (list|clear F-XXXX)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
-    preview             Show how to run this project
+    run                 Show how to run this project
     status              Show current project status
     help                Show this help
 
 EXAMPLES:
     ag start                    # Begin a new session
     ag init                     # Initialize project (if not done)
-    ag preview                  # Show how to run this project
+    ag run                      # Show how to run this project
     ag backlog add --task "X"   # Add task to work queue
     ag backlog list             # Show ordered queue
     ag work "Add login form"    # Start working on a task
@@ -241,14 +241,14 @@ COMMANDS:
     intent [sub]        Manage intent journal (list|clear F-XXXX)
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
-    preview             Show how to run this project
+    run                 Show how to run this project
     status              Show current project status
     help                Show this help
 
 EXAMPLES:
     ag start                    # Begin a new session
     ag init                     # Initialize project (if not done)
-    ag preview                  # Show how to run this project
+    ag run                      # Show how to run this project
     ag backlog add F-0042       # Add feature to work queue
     ag backlog add F-0042 -p 0  # Make it current work
     ag backlog list             # Show full queue
@@ -3789,8 +3789,8 @@ case "${1:-help}" in
         shift
         cmd_set "$@"
         ;;
-    preview)
-        bash "$SCRIPT_DIR/preview.sh"
+    run)
+        bash "$SCRIPT_DIR/run.sh"
         ;;
     help|--help|-h)
         show_help

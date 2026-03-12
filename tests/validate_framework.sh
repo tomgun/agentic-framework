@@ -4472,37 +4472,37 @@ else
 fi
 
 # ============================================================
-# F-0202: Preview Capability (ag preview)
+# F-0202: Run Info (ag run)
 # ============================================================
 echo ""
-echo "--- F-0202: Preview Capability (ag preview) ---"
+echo "--- F-0202: Run Info (ag run) ---"
 
-# T-0114: preview.sh exists
-if [[ -f "$FRAMEWORK_ROOT/.agentic/lib/tools/preview.sh" ]]; then
-  pass "T-0114: preview.sh exists"
+# T-0114: run.sh exists
+if [[ -f "$FRAMEWORK_ROOT/.agentic/lib/tools/run.sh" ]]; then
+  pass "T-0114: run.sh exists"
 else
-  fail "T-0114: preview.sh missing"
+  fail "T-0114: run.sh missing"
 fi
 
-# T-0115: preview.sh is executable
-if [[ -x "$FRAMEWORK_ROOT/.agentic/lib/tools/preview.sh" ]]; then
-  pass "T-0115: preview.sh is executable"
+# T-0115: run.sh is executable
+if [[ -x "$FRAMEWORK_ROOT/.agentic/lib/tools/run.sh" ]]; then
+  pass "T-0115: run.sh is executable"
 else
-  fail "T-0115: preview.sh is not executable"
+  fail "T-0115: run.sh is not executable"
 fi
 
-# T-0116: ag preview dispatch exists in ag.sh
-if grep -q 'preview)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
-  pass "T-0116: ag preview dispatch exists in ag.sh"
+# T-0116: ag run dispatch exists in ag.sh
+if grep -q '    run)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0116: ag run dispatch exists in ag.sh"
 else
-  fail "T-0116: ag preview dispatch missing from ag.sh"
+  fail "T-0116: ag run dispatch missing from ag.sh"
 fi
 
-# T-0117: preview.sh sources paths.sh
-if grep -q 'paths\.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/preview.sh"; then
-  pass "T-0117: preview.sh sources paths.sh"
+# T-0117: run.sh sources paths.sh
+if grep -q 'paths\.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/run.sh"; then
+  pass "T-0117: run.sh sources paths.sh"
 else
-  fail "T-0117: preview.sh does not source paths.sh"
+  fail "T-0117: run.sh does not source paths.sh"
 fi
 
 # T-0118: discover.py has FRAMEWORK_DEV_COMMANDS mapping
@@ -4526,11 +4526,11 @@ else
   fail "T-0120: discover.py missing --preview flag"
 fi
 
-# T-0121: preview appears in ag.sh help text
-if grep -q 'preview.*Show how to run' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
-  pass "T-0121: preview appears in ag.sh help text"
+# T-0121: run appears in ag.sh help text
+if grep -q 'run.*Show how to run' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0121: run appears in ag.sh help text"
 else
-  fail "T-0121: preview missing from ag.sh help text"
+  fail "T-0121: run missing from ag.sh help text"
 fi
 
 # T-0122: discover.py has PM_RUN_PREFIX for package manager awareness

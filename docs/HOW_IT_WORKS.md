@@ -558,8 +558,8 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 - Routes through `review_decomposition` checkpoint before promotion
 - Settings: `kickoff_confirm` (ask/skip) controls confirmation checkpoints in script mode
 
-**Project Preview** (F-0202): Shows how to run the project — dev server, build, and test commands:
-- `ag preview` detects stack from STACK.md + auto-detection fallback via `discover.py`
+**Project Run Info** (F-0202): Shows how to run the project — dev server, build, and test commands:
+- `ag run` detects stack from STACK.md + auto-detection fallback via `discover.py`
 - Outputs stack summary (language, framework, platform), dev/build/test commands
 - Shows source attribution ("from STACK.md" vs "auto-detected") so users know what to trust
 - Package-manager-aware: uses pnpm/yarn/bun commands when those lockfiles are detected

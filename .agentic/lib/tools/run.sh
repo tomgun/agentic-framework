@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# preview.sh — Show how to run this project
+# run.sh — Show how to run this project
 #
 # Detects stack from STACK.md + auto-detection and displays
 # dev server, build, and test commands. All detection logic
@@ -70,7 +70,7 @@ _src() {
 
 # Display
 echo ""
-echo -e "${BOLD}Project Preview${NC}"
+echo -e "${BOLD}How to Run${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Stack
