@@ -2274,3 +2274,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-12 21:12 - F-0202: ag preview
+
+**Why**: Enable Mode 2 feedback loops — users test working software rather than reviewing diffs
+
+**What changed**:
+- Projects can now show dev/build/test commands via ag preview — detects stack from STACK.md with auto-detection fallback, PM-aware commands (pnpm/yarn/bun), source attribution
+
+**Next steps**:
+- Ship F-0202, update memory-seed version sentinel
+
+**Blockers**: None
+

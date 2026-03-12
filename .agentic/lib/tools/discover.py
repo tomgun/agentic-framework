@@ -55,6 +55,266 @@ MAX_FILES_SCAN = 10000
 MAX_DEPTH = 5
 MAX_FEATURES = 50
 
+# Framework-to-dev-command mapping (single source of truth for preview)
+FRAMEWORK_DEV_COMMANDS = {
+    "Next.js": "dev", "Nuxt": "dev", "Remix": "dev",
+    "Astro": "dev", "SvelteKit": "dev", "Vue": "dev",
+    "Gatsby": "develop", "Angular": "start",
+    "React": "start", "Express": "start", "Fastify": "start",
+    "Koa": "start", "Hono": "start", "Electron": "start",
+    "React Native": "start",
+    "FastAPI": "uvicorn main:app --reload",
+    "Django": "python manage.py runserver",
+    "Flask": "flask run",
+    "Gin": "go run .", "Echo": "go run .", "Chi": "go run .",
+    "Fiber": "go run .",
+    "Actix Web": "cargo run", "Axum": "cargo run", "Rocket": "cargo run",
+    "Bevy": "cargo run", "Tauri": "cargo run",
+}
+
+# Package-manager-aware run prefix (for Node script names)
+PM_RUN_PREFIX = {
+    "npm": "npm run",
+    "pnpm": "pnpm",
+    "yarn": "yarn",
+    "bun": "bun run",
+}
+
+# Node frameworks whose dev commands are package.json script names
+_NODE_FRAMEWORKS = {
+    "Next.js", "Nuxt", "Remix", "Astro", "SvelteKit", "Vue",
+    "Gatsby", "Angular", "React", "Express", "Fastify",
+    "Koa", "Hono", "Electron", "React Native",
+}
+
+
+def _is_template_comment(value: str | None) -> bool:
+    """Check if a STACK.md value is just an HTML comment placeholder."""
+    if not value:
+        return True
+    stripped = value.strip()
+    return stripped.startswith("<!--") and stripped.endswith("-->")
+
+
+def _parse_stack_md_sections(root: Path) -> dict[str, str]:
+    """Parse STACK.md into section→content mapping (H2 boundaries)."""
+    stack_file = root / "STACK.md"
+    if not stack_file.exists():
+        return {}
+    try:
+        content = stack_file.read_text()
+    except Exception:
+        return {}
+
+    sections: dict[str, str] = {}
+    current_section = ""
+    current_lines: list[str] = []
+
+    for line in content.split("\n"):
+        if line.startswith("## "):
+            if current_section:
+                sections[current_section] = "\n".join(current_lines)
+            current_section = line[3:].strip().lower()
+            current_lines = []
+        else:
+            current_lines.append(line)
+
+    if current_section:
+        sections[current_section] = "\n".join(current_lines)
+    return sections
+
+
+def _extract_field(section_text: str, field_name: str) -> str | None:
+    """Extract a field value from a STACK.md section (- Key: Value format)."""
+    for line in section_text.split("\n"):
+        stripped = line.strip()
+        if stripped.startswith(f"- {field_name}:"):
+            value = stripped[len(f"- {field_name}:"):].strip()
+            return value if not _is_template_comment(value) else None
+    return None
+
+
+def _build_dev_command(framework: str | None, pm: str | None, root: Path) -> tuple[str | None, str]:
+    """Build the dev server command from framework + package manager.
+
+    Returns (command, source) where source is 'stack.md' or 'auto'.
+    """
+    if not framework:
+        return None, "auto"
+
+    script_name = FRAMEWORK_DEV_COMMANDS.get(framework)
+    if not script_name:
+        # Try substring matching for free-text framework names
+        fw_lower = framework.lower()
+        for key, val in FRAMEWORK_DEV_COMMANDS.items():
+            if key.lower() in fw_lower:
+                script_name = val
+                framework = key  # normalize
+                break
+
+    if not script_name:
+        return None, "auto"
+
+    # For Node frameworks, the script_name is a package.json script
+    if framework in _NODE_FRAMEWORKS:
+        # Check package.json scripts for the exact script name
+        pkg_json = root / "package.json"
+        if pkg_json.exists():
+            try:
+                pkg = json.loads(pkg_json.read_text())
+                scripts = pkg.get("scripts", {})
+                # Prefer package.json script if it exists
+                if script_name in scripts:
+                    prefix = PM_RUN_PREFIX.get(pm or "npm", "npm run")
+                    return f"{prefix} {script_name}", "auto"
+            except Exception:
+                pass
+        # Fallback: use PM prefix anyway
+        prefix = PM_RUN_PREFIX.get(pm or "npm", "npm run")
+        return f"{prefix} {script_name}", "auto"
+
+    # Non-Node: command is used directly
+    return script_name, "auto"
+
+
+def _build_build_command(framework: str | None, pm: str | None, root: Path) -> tuple[str | None, str]:
+    """Build the build command from framework + package manager."""
+    # Check package.json for build script
+    pkg_json = root / "package.json"
+    if pkg_json.exists():
+        try:
+            pkg = json.loads(pkg_json.read_text())
+            scripts = pkg.get("scripts", {})
+            if "build" in scripts:
+                prefix = PM_RUN_PREFIX.get(pm or "npm", "npm run")
+                return f"{prefix} build", "auto"
+        except Exception:
+            pass
+
+    # Language-specific build commands
+    if framework in ("Actix Web", "Axum", "Rocket", "Bevy", "Tauri"):
+        return "cargo build", "auto"
+    if framework in ("Gin", "Echo", "Chi", "Fiber"):
+        return "go build ./...", "auto"
+
+    return None, "auto"
+
+
+def preview_info(root: Path) -> dict:
+    """Aggregate stack, entry points, and dev/build/test commands for preview."""
+    sections = _parse_stack_md_sections(root)
+    sources: dict[str, str] = {}
+    warnings: list[str] = []
+
+    # --- Language / Framework / Platform from STACK.md ---
+    lang_section = sections.get("languages & runtimes", "")
+    summary_section = sections.get("summary", "")
+    tooling_section = sections.get("tooling", "")
+    testing_section = sections.get("testing (required)", sections.get("testing", ""))
+
+    language = _extract_field(lang_section, "Language(s)")
+    if language:
+        sources["language"] = "stack.md"
+    framework_field = _extract_field(lang_section, "Framework(s)")
+    platform = _extract_field(summary_section, "Primary platform")
+    pm_field = _extract_field(tooling_section, "Package manager")
+
+    if platform:
+        sources["platform"] = "stack.md"
+    else:
+        warnings.append("Primary platform not configured in STACK.md")
+
+    if pm_field:
+        sources["package_manager"] = "stack.md"
+
+    # --- Auto-detection fallback ---
+    stack = detect_stack(root)
+    entry_points = detect_entry_points(root)
+
+    if not language:
+        language = stack.get("language")
+        sources["language"] = "auto"
+    if not framework_field:
+        framework_field = stack.get("framework")
+        sources["framework"] = "auto" if framework_field else "none"
+    else:
+        sources["framework"] = "stack.md"
+
+    pm = pm_field or stack.get("package_manager")
+    if not pm_field and pm:
+        sources["package_manager"] = "auto"
+
+    # --- Dev command ---
+    dev_cmd, dev_src = _build_dev_command(framework_field, pm, root)
+    sources["dev_command"] = dev_src
+
+    # --- Build command ---
+    build_cmd, build_src = _build_build_command(framework_field, pm, root)
+    sources["build_command"] = build_src
+
+    # --- Test commands from STACK.md ---
+    test_commands: dict[str, str | None] = {"unit": None, "integration": None, "e2e": None}
+    _strip_backticks = lambda v: v.strip("`").strip() if v else v
+    if testing_section:
+        for line in testing_section.split("\n"):
+            stripped = line.strip()
+            lower = stripped.lower()
+            if lower.startswith("- unit:") or lower.startswith("- unit test"):
+                val = stripped.split(":", 1)[1].strip() if ":" in stripped else None
+                if val and not _is_template_comment(val):
+                    test_commands["unit"] = _strip_backticks(val)
+            elif lower.startswith("- integration:"):
+                val = stripped.split(":", 1)[1].strip() if ":" in stripped else None
+                if val and not _is_template_comment(val):
+                    test_commands["integration"] = _strip_backticks(val)
+            elif lower.startswith("- e2e:") or lower.startswith("- llm:"):
+                val = stripped.split(":", 1)[1].strip() if ":" in stripped else None
+                if val and not _is_template_comment(val):
+                    test_commands["e2e"] = _strip_backticks(val)
+        # Also check backtick-wrapped commands in "Test commands:" subsection
+        in_test_commands = False
+        for line in testing_section.split("\n"):
+            stripped = line.strip()
+            if stripped.startswith("- Test commands:"):
+                in_test_commands = True
+                continue
+            if in_test_commands:
+                if stripped.startswith("- ") and not stripped.startswith("  "):
+                    in_test_commands = False
+                    continue
+                lower = stripped.lower()
+                cmd_match = re.search(r'`([^`]+)`', stripped)
+                cmd_val = cmd_match.group(1) if cmd_match else None
+                if cmd_val:
+                    if "unit" in lower:
+                        test_commands["unit"] = test_commands["unit"] or cmd_val
+                    elif "integration" in lower:
+                        test_commands["integration"] = test_commands["integration"] or cmd_val
+                    elif "e2e" in lower or "llm" in lower:
+                        test_commands["e2e"] = test_commands["e2e"] or cmd_val
+        sources["test_commands"] = "stack.md"
+    else:
+        sources["test_commands"] = "none"
+        warnings.append("No Testing section in STACK.md")
+
+    # Warn about unconfigured fields
+    for field_name, value in [("Language", language), ("Framework", framework_field)]:
+        if not value:
+            warnings.append(f"{field_name} not configured in STACK.md and not auto-detected")
+
+    return {
+        "language": language,
+        "framework": framework_field,
+        "platform": platform,
+        "package_manager": pm,
+        "dev_command": dev_cmd,
+        "build_command": build_cmd,
+        "test_commands": test_commands,
+        "entry_points": [ep.get("path", "") for ep in entry_points[:5]],
+        "sources": sources,
+        "warnings": warnings,
+    }
+
 
 def should_exclude(path: Path) -> bool:
     """Check if a path should be excluded from scanning."""
@@ -1429,15 +1689,27 @@ def generate_report(root: Path, profile: str, feature_tracking: bool = False) ->
 def main():
     parser = argparse.ArgumentParser(description="Analyze existing codebase for onboarding")
     parser.add_argument("--root", type=str, default=".", help="Project root directory")
-    parser.add_argument("--output", type=str, required=True, help="Output JSON report path")
+    parser.add_argument("--output", type=str, default=None, help="Output JSON report path")
     parser.add_argument("--profile", type=str, default="discovery",
                         choices=["discovery", "formal", "autonomous_formal"],
                         help="Agentic Framework profile")
+    parser.add_argument("--preview", action="store_true",
+                        help="Output preview info as JSON (for ag preview)")
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
     if not root.is_dir():
         print(f"ERROR: {root} is not a directory")
+        raise SystemExit(1)
+
+    # Preview mode: output preview info and exit
+    if args.preview:
+        info = preview_info(root)
+        print(json.dumps(info, indent=2))
+        raise SystemExit(0)
+
+    if not args.output:
+        print("ERROR: --output is required (unless using --preview)")
         raise SystemExit(1)
 
     profile = args.profile
