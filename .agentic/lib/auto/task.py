@@ -272,7 +272,6 @@ class TaskRunner:
 
     def _check_and_update_docs(self, feature_id: str) -> None:
         """Run doc drift check and spawn Claude to fix if needed."""
-        from settings import get_setting
 
         docs_gate = get_setting(self.project_root, "docs_gate", "off")
         if docs_gate == "off":
@@ -342,15 +341,15 @@ class TaskRunner:
 
         agent = CriticalAgent(self.project_root)
         try:
-            verdict = agent.review_commit(feature_id, "docs", "documentation updates")
+            review_result = agent.review_commit(feature_id, "docs", "documentation updates")
         except Exception as e:
             print(f"  Critical agent error on docs: {e}. Unstaging.", file=sys.stderr)
             self._unstage_or_warn()
             return
 
-        if verdict.verdict != "approved":
+        if review_result.verdict != "approved":
             print(
-                f"  Critical agent rejected doc commit: {verdict.summary}",
+                f"  Critical agent rejected doc commit: {review_result.summary}",
                 file=sys.stderr,
             )
             self._unstage_or_warn()
@@ -400,15 +399,15 @@ class TaskRunner:
 
         agent = CriticalAgent(self.project_root)
         try:
-            verdict = agent.review_commit(feature_id, ac_id, ac_text)
+            review_result = agent.review_commit(feature_id, ac_id, ac_text)
         except Exception as e:
             print(f"  Critical agent error: {e}. Unstaging.", file=sys.stderr)
             self._unstage_or_warn()
             return False
 
-        if verdict.verdict != "approved":
+        if review_result.verdict != "approved":
             print(
-                f"  Critical agent rejected commit for {ac_id}: {verdict.summary}",
+                f"  Critical agent rejected commit for {ac_id}: {review_result.summary}",
                 file=sys.stderr,
             )
             self._unstage_or_warn()

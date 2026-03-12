@@ -214,23 +214,15 @@ class TestCommitAcReviewCommit:
     def test_staging_fails(self, mock_setting, project_dir):
         """Staging failure returns False without calling agent."""
         import subprocess
-        # Make .git read-only to cause staging failure
         runner = TaskRunner(project_dir)
         with patch("subprocess.run") as mock_run:
-            mock_run.side_effect = [
-                MagicMock(returncode=1, check_returncode=MagicMock(
-                    side_effect=subprocess.CalledProcessError(1, "git add")
-                ))
-            ]
-            # Use side_effect to raise CalledProcessError
             mock_run.side_effect = subprocess.CalledProcessError(1, "git add")
             result = runner._commit_ac("F-0042", "AC-001", "test criterion")
             assert result is False
 
-    @patch("auto.task.get_setting", return_value="human")
+    @patch("auto.task.get_setting", return_value="invalid_value")
     def test_unrecognized_value_falls_back_to_human(self, mock_setting, project_dir):
         """Unrecognized values for review_commit fall back to human behavior."""
-        mock_setting.return_value = "invalid_value"
         (project_dir / "test2.py").write_text("print('test')")
         runner = TaskRunner(project_dir)
         result = runner._commit_ac("F-0042", "AC-001", "test criterion")
@@ -242,13 +234,49 @@ class TestCommitAcReviewCommit:
         # Should not raise
         runner._unstage_or_warn()
 
-    @patch("auto.task.get_setting", return_value="human")
-    def test_check_docs_human_mode_stages_only(self, mock_setting, project_dir):
+    @patch("auto.task.TaskRunner._spawn_claude_implement")
+    @patch("auto.task.get_setting")
+    def test_check_docs_human_mode_stages_only(self, mock_setting, mock_spawn, project_dir):
         """_check_and_update_docs with review_commit: human stages but doesn't commit."""
+        # docs_gate must be non-off to reach review_commit logic
+        mock_setting.side_effect = lambda root, key, default="": {
+            "docs_gate": "blocking",
+            "review_commit": "human",
+        }.get(key, default)
+        # drift.sh must exist and report drift (non-zero exit)
+        drift_script = project_dir / ".agentic" / "lib" / "tools" / "drift.sh"
+        drift_script.parent.mkdir(parents=True, exist_ok=True)
+        drift_script.write_text("#!/bin/bash\necho 'drift detected'\nexit 1\n")
+        drift_script.chmod(0o755)
+        mock_spawn.return_value = "Updated docs"
         runner = TaskRunner(project_dir)
-        # Docs gate off by default, method returns early
         runner._check_and_update_docs("F-0042")
-        # No error = success
+        # Should have staged but NOT committed
+
+    @patch("auto.task.TaskRunner._spawn_claude_implement")
+    @patch("auto.critical_agent.CriticalAgent.review_commit")
+    @patch("auto.task.get_setting")
+    def test_check_docs_critical_agent_approved(self, mock_setting, mock_review, mock_spawn, project_dir):
+        """_check_and_update_docs with critical_agent — commits on approval."""
+        mock_setting.side_effect = lambda root, key, default="": {
+            "docs_gate": "blocking",
+            "review_commit": "critical_agent",
+        }.get(key, default)
+        drift_script = project_dir / ".agentic" / "lib" / "tools" / "drift.sh"
+        drift_script.parent.mkdir(parents=True, exist_ok=True)
+        drift_script.write_text("#!/bin/bash\necho 'drift detected'\nexit 1\n")
+        drift_script.chmod(0o755)
+        mock_spawn.return_value = "Updated docs"
+        mock_review.return_value = MagicMock(verdict="approved", summary="LGTM")
+        # Create a tracked file change so git add -u has something
+        (project_dir / "README.md").write_text("# Project")
+        import subprocess
+        subprocess.run(["git", "add", "README.md"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(["git", "commit", "-m", "add readme"], cwd=str(project_dir), capture_output=True)
+        (project_dir / "README.md").write_text("# Updated Project")
+        runner = TaskRunner(project_dir)
+        runner._check_and_update_docs("F-0042")
+        mock_review.assert_called_once()
 
 
 class TestTaskResult:

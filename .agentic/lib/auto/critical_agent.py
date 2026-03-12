@@ -216,45 +216,6 @@ class CriticalAgent:
 
         return self._parse_verdict(output)
 
-    def _assemble_commit_context(
-        self,
-        feature_id: str,
-        ac_id: str,
-        ac_text: str,
-    ) -> str:
-        """Assemble minimal context for commit review (F3-optimized).
-
-        Only includes: the AC being implemented + the staged diff.
-        Does NOT load full feature spec or all ACs (unlike _assemble_context).
-        """
-        sections: list[str] = []
-
-        sections.append(
-            f"## Commit Review\n"
-            f"Feature: {feature_id}, AC: {ac_id}\n"
-            f"Criterion: {ac_text}"
-        )
-
-        # Staged diff only (not full branch diff)
-        try:
-            diff_result = subprocess.run(
-                ["git", "diff", "--cached"],
-                cwd=str(self.project_root),
-                capture_output=True,
-                text=True,
-            )
-            if diff_result.returncode == 0 and diff_result.stdout.strip():
-                diff = self._truncate_diff(diff_result.stdout)
-                sections.append(
-                    f"## Staged Changes\n```diff\n{diff}\n```"
-                )
-            else:
-                sections.append("## Staged Changes\nNo staged changes detected.")
-        except (FileNotFoundError, OSError):
-            sections.append("## Staged Changes\nUnable to read staged diff.")
-
-        return "\n\n".join(sections)
-
     # -- Context assembly --------------------------------------------------
 
     def _assemble_context(
@@ -306,6 +267,45 @@ class CriticalAgent:
         nfr_content = self._read_file(self._paths.nfr_file)
         if nfr_content:
             sections.append(f"## Non-Functional Requirements\n{nfr_content}")
+
+        return "\n\n".join(sections)
+
+    def _assemble_commit_context(
+        self,
+        feature_id: str,
+        ac_id: str,
+        ac_text: str,
+    ) -> str:
+        """Assemble minimal context for commit review (F3-optimized).
+
+        Only includes: the AC being implemented + the staged diff.
+        Does NOT load full feature spec or all ACs (unlike _assemble_context).
+        """
+        sections: list[str] = []
+
+        sections.append(
+            f"## Commit Review\n"
+            f"Feature: {feature_id}, AC: {ac_id}\n"
+            f"Criterion: {ac_text}"
+        )
+
+        # Staged diff only (not full branch diff)
+        try:
+            diff_result = subprocess.run(
+                ["git", "diff", "--cached"],
+                cwd=str(self.project_root),
+                capture_output=True,
+                text=True,
+            )
+            if diff_result.returncode == 0 and diff_result.stdout.strip():
+                diff = self._truncate_diff(diff_result.stdout)
+                sections.append(
+                    f"## Staged Changes\n```diff\n{diff}\n```"
+                )
+            else:
+                sections.append("## Staged Changes\nNo staged changes detected.")
+        except (FileNotFoundError, OSError):
+            sections.append("## Staged Changes\nUnable to read staged diff.")
 
         return "\n\n".join(sections)
 
