@@ -95,10 +95,13 @@ After human approves:
    updated post-merge by `ag done`.
 2. Commit with descriptive message
 3. Create PR if on feature branch: `gh pr create --title "..." --body "..."`
-4. Log PR in HUMAN_NEEDED.md for review tracking:
+4. Switch to main, log PR in HUMAN_NEEDED.md, and flush (so it doesn't leave a dirty working tree):
    ```bash
+   git checkout main -q
    bash .agentic/lib/tools/blocker.sh add "PR #N: Description" "review" "Details"
+   ag flush
    ```
+   Stay on main — the feature branch work is done (it's in the PR now).
 
 ### Step 7: Post-Merge
 
