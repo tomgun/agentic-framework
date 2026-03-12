@@ -1,18 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0202",
-    "description": "Preview Capability (ag preview)",
-    "added_at": "2026-03-11T00:00:00Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0202.md"
-    ],
-    "notes": "ADR-002 priority 3. Enables Mode 2 feedback loop.",
-    "became_current_at": "2026-03-12T16:55:39Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0203",
     "description": "Auto-Commit/Merge Mode (R2 Amendment)",
     "added_at": "2026-03-11T00:00:00Z",
@@ -23,7 +11,8 @@
     "notes": "ADR-002 priority 4. ~15 files, R2 principle amendment.",
     "depends_on": [
       "F-0182"
-    ]
+    ],
+    "became_current_at": "2026-03-12T19:44:31Z"
   },
   {
     "type": "feature",

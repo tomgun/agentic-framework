@@ -8,6 +8,10 @@
 
 ## Recent Contributions
 
+### Command Naming: Describe What It Does (F-0202)
+
+**User insight**: During F-0202 implementation, the command was initially named `ag preview` (from ADR-002 §5.1). Tomas challenged the name through iterative refinement: "preview" implies "before the final thing" but the command always shows the current state; "view" works for P2 (viewing running software) but "view how to start everything" doesn't describe MVP behavior; "peek" is fun but lightweight. The decisive criterion Tomas articulated: **"I don't like it that it doesn't describe what the script does."** This led to `ag run` — honest at every stage (MVP: shows run commands, P2: actually runs them), no semantic gap. The insight generalizes: name commands for what they do across their full lifecycle, not just one phase.
+
 ### State File Auto-Flush Pattern (post-F-0201 fixes)
 
 **User insight**: Tomas identified a systemic dirty-tree problem caused by token-efficient scripts (blocker.sh, todo.sh, etc.) modifying state files without committing them. The symptoms: `git pull --rebase` failures at session start, stale HUMAN_NEEDED.md entries persisting across sessions, and friction from manual `ag flush` calls. The root cause was architectural — state file scripts were designed as pure writers with no commit responsibility, leaving flush coordination to the caller. Tomas drove three fixes: (1) **HUMAN_NEEDED after PR creation** — the committing-changes skill now switches to main, writes the blocker entry, and runs `ag flush` immediately (instead of leaving it dirty on the feature branch); (2) **Manifest idempotency** — `manifest.sh` now strips all volatile JSON fields (hash, total_commits, additions, deletions) from its comparison, not just timestamps — preventing phantom dirty state after rebases; (3) **TODO auto-flush** — `todo.sh` now calls `state-commit.sh` after every mutating operation (add, done, drop, triage), with best-effort semantics (flushes when on main, silently skips on feature branches). The pattern Tomas established: state file scripts should be self-flushing, not rely on callers to remember `ag flush`.

@@ -3426,7 +3426,7 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0202: Preview Capability (ag preview)
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: medium
 **Complexity**: medium

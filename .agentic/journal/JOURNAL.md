@@ -2287,3 +2287,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-12 21:44 - F-0202 shipped
+
+**Why**: Enable Mode 2 feedback loops
+
+**What changed**:
+- ag run command available — shows dev/build/test commands with stack detection and PM awareness
+
+**Next steps**:
+- Next backlog item
+
+**Blockers**: None
+
