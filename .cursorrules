@@ -6,7 +6,7 @@ Full template: `.agentic/lib/agents/cursor/cursorrules.txt`
 
 Always consult: `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
-Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag decompose F-XXXX` | `ag spec` | `ag docs` | `ag todo`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag decompose F-XXXX` | `ag spec` | `ag docs` | `ag todo` | `ag preview`
 
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |
