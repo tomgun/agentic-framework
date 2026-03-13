@@ -15,6 +15,15 @@ _No active items_
 
 ---
 
+
+### HN-0036: PR #129: ag formalize — F-0205
+- **Type**: review
+- **Added**: 2026-03-13
+- **Context**: Discovery-to-formal migration command
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0035: PR #126: Orphaned plan detection at session start
