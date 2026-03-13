@@ -139,6 +139,15 @@ class TestParseIntegrationSection:
         commands = _parse_integration_section(content)
         assert commands == ["pytest"]
 
+    def test_heading_with_parenthetical_suffix(self):
+        """Matches STACK template heading: ## Integration tests (optional, for epics)"""
+        content = textwrap.dedent("""\
+            ## Integration tests (optional, for epics)
+            - `pytest tests/integration/`
+        """)
+        commands = _parse_integration_section(content)
+        assert commands == ["pytest tests/integration/"]
+
 
 # ---------------------------------------------------------------------------
 # load_integration_commands tests (AC-003)

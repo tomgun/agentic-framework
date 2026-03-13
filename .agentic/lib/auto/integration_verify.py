@@ -139,7 +139,7 @@ def _parse_integration_section(content: str) -> list[str]:
     """
     # Find the ## Integration tests heading
     match = re.search(
-        r"^##\s+Integration\s+tests\s*$", content, re.MULTILINE | re.IGNORECASE,
+        r"^##\s+Integration\s+tests\b", content, re.MULTILINE | re.IGNORECASE,
     )
     if not match:
         return []

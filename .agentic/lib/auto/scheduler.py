@@ -537,10 +537,11 @@ class AutonomousScheduler:
     def _run_integration_verify(self, epic_id: str):
         """Run integration verification for an epic after all children complete.
 
-        Returns IntegrationResult or None if import fails.
+        Returns IntegrationResult. On error, returns a failed result (fail-closed)
+        rather than None — prevents silent bypass of the verification gate.
         """
         try:
-            from auto.integration_verify import run_integration_verify
+            from auto.integration_verify import run_integration_verify, IntegrationResult
             return run_integration_verify(
                 self.project_root,
                 epic_id,
@@ -548,10 +549,15 @@ class AutonomousScheduler:
             )
         except Exception as e:
             print(
-                f"  Integration verification error for {epic_id}: {e}",
+                f"  ERROR: Integration verification failed for {epic_id}: {e}",
                 file=sys.stderr,
             )
-            return None
+            from auto.integration_verify import IntegrationResult
+            return IntegrationResult(
+                epic_id=epic_id,
+                success=False,
+                error=f"Verification error: {e}",
+            )
 
     # -- Engine control helpers --------------------------------------------
 

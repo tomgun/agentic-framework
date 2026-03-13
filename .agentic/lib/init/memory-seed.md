@@ -6,7 +6,7 @@ tokens: ~1130
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.54.1 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -105,6 +105,12 @@ If the user says kickoff, vision, draft epic from idea, generate features, turn 
 If the user says run, how to run, dev server, start the app, run commands, what commands, or wants to know how to run/start/build/test the project:
 
 **STOP.** Run `ag run`. This detects the stack from STACK.md and auto-detection, then displays dev server, build, and test commands with source attribution (STACK.md vs auto-detected).
+
+## When an epic needs integration verification
+
+If the user says verify epic, integration tests, cross-component tests, or wants to validate that an epic's children work together before the epic ships:
+
+**STOP.** Run `ag auto verify-epic F-XXXX`. This loads integration test commands (epic AC `## Integration tests` > STACK.md `## Integration tests` > skip), runs them via VerifyLoop, and stores a pass/fail artifact. The `review_integration` setting (human/critical_agent/skip) controls whether the critical agent reviews results. If no integration tests are defined, the epic ships immediately. If tests fail, the epic stays at "implementing" until re-run succeeds.
 
 ## When the user wants parallel agent coordination
 
