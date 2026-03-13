@@ -6,7 +6,7 @@ tokens: ~1130
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.54.1 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -75,6 +75,12 @@ If the user says remember, todo, idea, note for later, tasklist, or mentions som
 If the user says backlog, queue, next up, what's next, what should I work on, prioritize, reorder, or mentions work assignment:
 
 **STOP.** Run `ag backlog` to see the current work queue. Use `ag backlog add F-XXXX` to add items, `ag backlog done` to advance, `ag backlog move F-XXXX 0` to reprioritize. Position 0 = current work. `ag implement` enforces backlog order.
+
+## When the user wants to formalize TODO items
+
+If the user says formalize, promote to formal, migrate to formal, make TODOs into features, promote items, or wants to convert discovery-mode TODO items into formal spec artifacts:
+
+**STOP.** Run `ag formalize` to list promotable TODO inbox items. Use `ag formalize T-XXXX` to promote specific items, or `ag formalize --all` for bulk promotion. Each promoted item gets a FEATURES.md entry (auto-assigned F-ID) + an acceptance criteria stub. The TODO item is triaged to Done. Does NOT change the profile — content migration only.
 
 ## When the user expresses a system invariant or quality constraint
 

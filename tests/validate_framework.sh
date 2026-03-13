@@ -4601,6 +4601,23 @@ else
   fail "T-0130: task.py missing _unstage_or_warn helper"
 fi
 
+# ============================================================
+# F-0205: Discovery-to-Formal Migration
+# ============================================================
+echo "--- F-0205: Discovery-to-Formal Migration ---"
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/formalize.sh" ]]; then
+  pass "formalize.sh exists and is executable"
+else
+  fail "formalize.sh missing or not executable"
+fi
+
+if grep -q 'formalize)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+  pass "ag.sh has formalize dispatch"
+else
+  fail "ag.sh missing formalize dispatch"
+fi
+
 echo ""
 
 # ============================================================

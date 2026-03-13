@@ -2378,3 +2378,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-13 19:06 - F-0205 ag formalize
+
+**Why**: No automated path from discovery-mode TODO items to formal spec artifacts — manual copy/reformat was tedious and error-prone
+
+**What changed**:
+- Projects can now promote TODO inbox items to formal spec structure (FEATURES.md entries + AC stubs) via ag formalize. Reuses quick_feature.sh and todo.sh triage. Supports single-item, multi-item, --all, and --dry-run modes.
+
+**Next steps**:
+- Merge PR, run ag done F-0205
+
+**Blockers**: None
+
