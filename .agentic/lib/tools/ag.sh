@@ -3549,6 +3549,40 @@ cmd_todo() {
     esac
 }
 
+# --- ag feedback ---
+cmd_feedback() {
+    local first_arg="${1:-}"
+
+    if [ -z "$first_arg" ]; then
+        echo -e "${RED}Error: Subcommand or feedback text required${NC}"
+        echo "Usage: ag feedback \"text\"                      # classify + persist"
+        echo "       ag feedback --bug \"text\"                 # direct route to ISSUES.md"
+        echo "       ag feedback --feature \"text\"             # direct route to TODO.md"
+        echo "       ag feedback --ac F-XXXX AC-XXX \"text\"    # AC adjustment"
+        echo "       ag feedback log [--pending]              # show entries"
+        echo "       ag feedback route FB-XXXX                # route pending item"
+        echo "       ag feedback classify FB-XXXX type        # reclassify"
+        echo "       ag feedback done FB-XXXX [\"resolution\"]  # mark resolved"
+        exit 1
+    fi
+
+    case "$first_arg" in
+        log|route|classify|done)
+            shift
+            bash "$SCRIPT_DIR/feedback.sh" "$first_arg" "$@"
+            ;;
+        --bug|--feature|--ac)
+            # Direct type flags: pass everything to add
+            bash "$SCRIPT_DIR/feedback.sh" add "$@"
+            ;;
+        *)
+            # Default: treat as "add" with text
+            shift
+            bash "$SCRIPT_DIR/feedback.sh" add "$first_arg" "$@"
+            ;;
+    esac
+}
+
 # --- ag audit ---
 cmd_audit() {
     local arg="${1:-}"
@@ -3703,6 +3737,10 @@ case "${1:-help}" in
     todo)
         shift
         cmd_todo "$@"
+        ;;
+    feedback)
+        shift
+        cmd_feedback "$@"
         ;;
     commit)
         cmd_commit

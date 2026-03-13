@@ -143,9 +143,26 @@ def main() -> int:
     socket_path = paths.session_dir / SOCKET_FILENAME
 
     if parsed.command == "feedback":
-        if len(parsed.args) < 2:
-            print("Usage: ag auto feedback <AC-ID> <text>", file=sys.stderr)
+        if len(parsed.args) < 1:
+            print("Usage: ag auto feedback [AC-ID] <text>", file=sys.stderr)
             return 1
+        # When engine is not running, fall back to feedback.sh directly
+        if not socket_path.exists():
+            import subprocess
+            feedback_sh = paths.project_root / ".agentic" / "lib" / "tools" / "feedback.sh"
+            if not feedback_sh.exists():
+                print("Error: feedback.sh not found", file=sys.stderr)
+                return 1
+            # If first arg looks like AC-ID, use --ac flag
+            if len(parsed.args) >= 2 and parsed.args[0].startswith("AC-"):
+                ac_id = parsed.args[0]
+                text = " ".join(parsed.args[1:])
+                cmd = ["bash", str(feedback_sh), "add", text, "--ac", "unknown", ac_id]
+            else:
+                text = " ".join(parsed.args)
+                cmd = ["bash", str(feedback_sh), "add", text]
+            result = subprocess.run(cmd, capture_output=False)
+            return result.returncode
         ac_id = parsed.args[0]
         text = " ".join(parsed.args[1:])
         request = {"cmd": "feedback", "ac": ac_id, "text": text}
