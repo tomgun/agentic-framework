@@ -6,7 +6,10 @@ Full template: `.agentic/lib/agents/cursor/cursorrules.txt`
 
 Always consult: `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
-Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag decompose F-XXXX` | `ag spec` | `ag docs` | `ag todo` | `ag run`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag worktree` | `ag spec` | `ag docs` | `ag todo` | `ag intent` | `ag kickoff "vision"` | `ag run`
+Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX`
+Kickoff: `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve` | `ag kickoff --discard`
+Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |
@@ -21,7 +24,12 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Write spec / create spec / acceptance criteria / evolve spec | STOP -> Run `ag spec F-XXXX`. Follow spec protection levels. |
 | Review blocked / approve transition / reject transition | STOP -> Run `ag review` to list pending. `ag review F-XXXX <state>` to approve. `--reject` to reject. |
 | Decompose / break down epic / split into children | STOP -> Run `ag decompose F-XXXX`. Analyzes AC, proposes child features scoped to components, routes through review_decomposition checkpoint. |
-| Exited plan mode (plan approved) | STOP -> Save plan durably, then `ag implement F-XXXX` (creates WIP). If `plan_review_enabled: yes`: run `/review` on plan before coding. |
+| Exited plan mode (plan approved) | STOP -> Save plan durably. If `plan_review_enabled: yes`: run dialectical review (Critic + Advocate in parallel, fresh context), synthesize, user decides Proceed/Revise/Reject. Then `ag implement F-XXXX` (creates WIP). |
+| Interrupted / crashed / stuck intent / orphaned work / resume | STOP -> Run `ag intent list` to see pending/orphaned intents. `ag intent clear F-XXXX` to discard. `ag sync` auto-adopts orphans. |
+| Fix all tests / make tests pass / run test loop automatically | Suggest `ag auto verify` (add `--visual` if E2E screenshots configured) |
+| Implement autonomously / auto-implement / hands-off | Suggest `ag auto task F-XXXX` (needs acceptance criteria) |
+| Process all features / batch implement / implement everything | Suggest `ag auto crunch` (processes all planned features) |
+| Execute epic / implement all children of epic / run epic autonomously | Suggest `ag auto epic F-XXXX` (executes epic's child features with component-scoped workers) |
 
 Rules:
 - Never auto-commit in interactive sessions. Show changes to human first. (Autonomous workflows use `review_commit` setting — F-0203.)
