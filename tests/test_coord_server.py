@@ -226,12 +226,10 @@ class TestClaimFeature:
         })
         assert result["claimed"] is True
 
-        # Verify stale entry was marked completed
+        # Verify stale entry was removed entirely
         agents = _load_agents(project_dir)
         stale = [e for e in agents if e.get("agent") == "dead-agent"]
-        assert len(stale) == 1
-        assert stale[0]["status"] == "completed"
-        assert stale[0]["outcome"] == "stale_claim"
+        assert len(stale) == 0
 
     def test_claim_without_claim_pid_not_cleaned(self, project_dir):
         """Entries without claim_pid are NOT cleaned by stale detection."""
@@ -269,16 +267,14 @@ class TestClaimFeature:
 # release_feature
 # ---------------------------------------------------------------------------
 class TestReleaseFeature:
-    def test_release_marks_entry_completed(self, project_dir):
-        """Release must set status=completed and outcome=released in the file."""
+    def test_release_removes_entry(self, project_dir):
+        """Release must remove the entry from AGENTS.json entirely."""
         claim_feature(project_dir, {"feature_id": "F-0001", "agent": "a"})
         result = release_feature(project_dir, {"feature_id": "F-0001"})
         assert result["released"] is True
 
         agents = _load_agents(project_dir)
-        entry = [e for e in agents if e["feature_id"] == "F-0001"][0]
-        assert entry["status"] == "completed"
-        assert entry["outcome"] == "released"
+        assert not any(e["feature_id"] == "F-0001" for e in agents)
 
     def test_release_nonexistent_feature(self, project_dir):
         result = release_feature(project_dir, {"feature_id": "F-9999"})
