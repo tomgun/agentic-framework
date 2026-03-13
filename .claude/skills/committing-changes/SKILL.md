@@ -103,10 +103,13 @@ After human approves:
    ```
    Stay on main — the feature branch work is done (it's in the PR now).
 
-### Step 7: Post-Merge
+### Step 7: Post-Merge (run automatically — don't wait for user)
 
-After merge, run `ag done F-XXXX` on main. This bumps VERSION, updates
-FEATURES.md status, advances the backlog, and flushes state to main.
+When you merge a PR (via `gh pr merge`) or the user says "merge", IMMEDIATELY
+run `ag done F-XXXX` on main as the next step. Do not suggest it — just do it.
+This bumps VERSION, updates FEATURES.md status, advances the backlog, and
+flushes state to main. The post-merge flow is part of the merge, not a
+separate action.
 
 ## Examples
 
