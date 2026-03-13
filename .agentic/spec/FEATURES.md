@@ -3469,7 +3469,7 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0204: Epic Integration Verification
 
-**Status**: implementing
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: medium
 **Complexity**: medium

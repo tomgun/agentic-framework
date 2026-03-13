@@ -1,26 +1,12 @@
 [
   {
     "type": "feature",
-    "id": "F-0204",
-    "description": "Epic Integration Verification",
-    "added_at": "2026-03-11T00:00:00Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0204.md"
-    ],
-    "notes": "ADR-002 priority 5. Quality gate for epics.",
-    "depends_on": [
-      "F-0186"
-    ],
-    "became_current_at": "2026-03-13T10:22:19Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0205",
     "description": "Discovery-to-Formal Migration (ag formalize)",
     "added_at": "2026-03-11T00:00:00Z",
     "added_by": "agent",
-    "notes": "ADR-002 priority 7. New ag formalize command."
+    "notes": "ADR-002 priority 7. New ag formalize command.",
+    "became_current_at": "2026-03-13T15:46:32Z"
   },
   {
     "type": "feature",

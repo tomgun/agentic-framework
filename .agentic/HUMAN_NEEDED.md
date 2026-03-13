@@ -43,6 +43,15 @@ _No active items_
 
 
 
+
+### HN-0034: PR #125: F-0204 Epic Integration Verification
+- **Type**: pr_review
+- **Added**: 2026-03-13
+- **Context**: Review PR #125. Plan is DRAFT — dialectical review in progress. Implementation may be revised.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0033: PR #124: F-0203 review_commit setting — R2 conditional amendment
