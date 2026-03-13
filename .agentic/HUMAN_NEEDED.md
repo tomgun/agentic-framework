@@ -24,6 +24,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0037: PR #130: F-0206 Feedback Capture System (ag feedback)
+- **Type**: review
+- **Added**: 2026-03-13
+- **Context**: Adds ag feedback command with keyword classification, routing to ISSUES.md/TODO.md, persistent FEEDBACK_LOG.md. 12 new validation tests.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0035: PR #126: Orphaned plan detection at session start
