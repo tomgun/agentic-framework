@@ -84,6 +84,10 @@ _REVIEW_FOCUS: dict[str, str] = {
         "code correctness, breaking changes to other features, "
         "no regression indicators. (Tests already passed before this review.)"
     ),
+    "review_integration": (
+        "Focus on: cross-component contract satisfaction, API compatibility, "
+        "shared state consistency, integration test coverage of epic acceptance criteria."
+    ),
 }
 
 

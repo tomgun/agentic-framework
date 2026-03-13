@@ -3469,21 +3469,21 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0204: Epic Integration Verification
 
-**Status**: planned
+**Status**: implementing
 **Category**: Autonomous
 **Priority**: medium
 **Complexity**: medium
 **Since**: v0.53.2
 
-**Description**: When all children of an epic reach `verified`, run integration test suite (if defined in epic's acceptance criteria). Verify cross-component contracts. Only then mark epic as `verified`. ADR-001 §6, ADR-002 §8.
+**Description**: Integration verification gate between "all children shipped" and "epic shipped". When all children ship, checks for integration test artifact before allowing epic to advance. Integration test commands resolved from epic AC file > STACK.md > skip. ADR-001 §6, ADR-002 §8 item 5.
 
 **Dependencies**: F-0186 (Autonomous Scheduler)
 **Parent**: F-0188
 
 **Implementation**:
-- State: none
-- Code: `.agentic/lib/auto/scheduler.py` (integration gate), `ag.sh` (cmd_verify_epic)
-- Tests: `tests/test_integration_verify.py`
+- State: implementing
+- Code: `.agentic/lib/auto/integration_verify.py` (core), `epic.py` (gate), `scheduler.py` (hook), `critical_agent.py` (focus), `profiles.conf`, `ag.sh`, `STACK.template.md`
+- Tests: `tests/test_integration_verify.py` (36 tests)
 
 **Acceptance**: See `spec/acceptance/F-0204.md`
 
