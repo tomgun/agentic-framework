@@ -18,7 +18,7 @@ On first message, give a briefing:
 ## Git Workflow
 
 - Always create a separate git worktree on a feature branch before making changes (another agent may be working on main)
-- Never auto-commit without human approval
+- Never auto-commit in interactive sessions without human approval. (Autonomous workflows use `review_commit` setting — F-0203.)
 
 ---
 

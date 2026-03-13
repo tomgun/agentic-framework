@@ -788,7 +788,7 @@ Closes F-0042
 - ❌ Most other specs
 
 **Responsibilities**:
-1. **CRITICAL**: Show all changes to human (NEVER auto-commit!)
+1. **CRITICAL**: Show all changes to human in interactive sessions (NEVER auto-commit in interactive sessions! Autonomous workflows use `review_commit` setting — F-0203.)
 2. Wait for **explicit human approval** ("commit", "looks good", "yes")
 3. Create conventional commit message (feat/fix/docs/etc)
 4. Run pre-commit checks (`quality_checks.sh --pre-commit`)

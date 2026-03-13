@@ -13,7 +13,7 @@ These rules apply to ALL agent roles. Injected automatically by `context-for-rol
 
 1. **Never fabricate** APIs, endpoints, function signatures, or file paths. If you haven't verified it exists, say so.
 
-2. **Never auto-commit** without explicit human approval. Show changes first.
+2. **Never auto-commit** in interactive sessions without explicit human approval. Show changes first. (Autonomous workflows with `review_commit: critical_agent` may commit after adversarial review — F-0203.)
 
 3. **Use token-efficient scripts** — do NOT read/edit these files directly:
    - STATUS.md → `bash .agentic/lib/tools/status.sh focus "Task"`

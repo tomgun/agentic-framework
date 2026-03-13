@@ -148,6 +148,7 @@ The agent will:
 - **c) Autonomous Formal**: Same rigor as Formal, but most review checkpoints are delegated to `critical_agent` instead of human. Only `review_merge` stays human. The critical agent spawns an adversarial Claude instance that reviews changes and returns structured verdicts (approved/request_changes/escalate).
   - Good for: Autonomous agent workflows, CI/CD pipelines, batch processing
   - **Taste review** (`review_taste`): When set to `critical_agent` or `human`, code review transitions also trigger a style consistency review. Declare preferences in STACK.md `## Style & taste` section (`style_guide`, `design_system`, `api_style`). Omitting style settings silently skips taste review.
+  - **Commit review** (`review_commit`): Controls whether `ag auto task/epic` can auto-commit. Values: `human` (default, stage only) | `critical_agent` (adversarial AI review then commit). Profile defaults: discovery=human, formal=human, autonomous_formal=critical_agent. Unrecognized values fall back to `human`. Adds ~30-60s per AC for adversarial review. Per-AC reviews assume the test suite catches cross-AC invariant violations; the full verify loop and human `review_merge` are additional safety nets. See F-0203, ADR-002 §4.
 
 ---
 
@@ -332,7 +333,7 @@ Agents are trained to:
 - ✅ Follow TDD by default (write tests first)
 - ✅ Update documentation automatically
 - ✅ Ask for approval before committing
-- ❌ Never auto-commit without permission
+- ❌ Never auto-commit in interactive sessions without permission (autonomous workflows use `review_commit` setting)
 
 ### Effective Agent Prompts
 

@@ -2300,3 +2300,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-13 00:08 - F-0203 Auto-Commit Review
+
+**Why**: Formalizing known R2 violation in task.py — auto-commit existed without review; now gated by review_commit setting
+
+**What changed**:
+- R2 principle now conditional: interactive sessions preserve absolute no-auto-commit rule; autonomous workflows (ag auto task/epic) can auto-commit after adversarial CriticalAgent review when review_commit: critical_agent. Dedicated review_commit() method with minimal context (staged diff + single AC only). 15 instruction files amended, 8 unit tests, 8 structural tests.
+
+**Next steps**:
+- PR review, merge, ag done
+
+**Blockers**: None
+

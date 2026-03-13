@@ -84,7 +84,7 @@ git diff --stat
 git diff
 ```
 
-Present a summary of changes. **Never auto-commit.** Wait for human approval.
+Present a summary of changes. **Never auto-commit in interactive sessions.** Wait for human approval. (Autonomous workflows use `review_commit` setting — F-0203.)
 
 ### Step 6: Commit and PR
 

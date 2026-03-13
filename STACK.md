@@ -76,6 +76,8 @@ Purpose: Configuration for developing the Agentic Framework itself.
 # Any regression transition. Discovery: critical_agent | Formal: human
 - review_taste: critical_agent
 # Subjective decisions (future). Discovery: skip | Formal: critical_agent
+- review_commit: human
+# Auto-commit in automated execution. human: stage only (default) | critical_agent: adversarial review then commit. Discovery: human | Formal: human | Autonomous Formal: critical_agent
 
 - docs_mode: inline
 # inline: update docs with code (default). deferred: log what's needed, generate later via `ag docs generate`.

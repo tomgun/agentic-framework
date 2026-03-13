@@ -27,6 +27,7 @@ tokens: ~952
 | Spec directory | `spec_directory` | **yes** | no | Script-enforced |
 | Review checkpoints | `review_*` | **human/critical_agent** | skip | Script-enforced |
 | Taste review (F-0183) | `review_taste` | **critical_agent** | skip | Script-enforced (piggybacks on code review transitions; requires `## Style & taste` in STACK.md) |
+| Commit review (F-0203) | `review_commit` | **human** | human | Code-enforced (`task.py._commit_ac()`). human: stage only. critical_agent: adversarial review then commit |
 | Collision guard | — | **on** | **on** | Hook-advisory (SessionStart/UserPromptSubmit warn when other sessions active) |
 
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
@@ -41,7 +42,7 @@ Profiles set default bundles. Override any setting: `ag set <key> <value>` | Vie
 
 **Autonomous**: Run tests, update specs, use token-efficient scripts, follow patterns, PR-based workflow by default.
 **Ask first**: Add dependencies, change architecture, delete files, modify APIs, large refactors.
-**Never**: Commit without approval, push to main, modify secrets, skip acceptance criteria, fabricate.
+**Never**: Commit without approval in interactive sessions, push to main, modify secrets, skip acceptance criteria, fabricate. (Autonomous workflows with `review_commit: critical_agent` may auto-commit after adversarial review.)
 
 **Plans**: Save approved plans to `.agentic/journal/plans/F-XXXX-plan.md` (durable, git-tracked). Tool-specific plan locations (`.claude/plans/`) are session-scoped.
 

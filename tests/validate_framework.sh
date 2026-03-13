@@ -4542,6 +4542,67 @@ fi
 
 echo ""
 
+echo "--- F-0203: Auto-Commit/Merge Mode (R2 Amendment) ---"
+
+# T-0123: review_commit in profiles.conf (all 3 profiles)
+REVIEW_COMMIT_COUNT=$(grep -c 'review_commit' "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" || true)
+if [[ "$REVIEW_COMMIT_COUNT" -ge 3 ]]; then
+  pass "T-0123: review_commit in profiles.conf (${REVIEW_COMMIT_COUNT} profiles)"
+else
+  fail "T-0123: review_commit in profiles.conf (expected 3, got ${REVIEW_COMMIT_COUNT})"
+fi
+
+# T-0124: review_commit in STACK.template.md
+if grep -q 'review_commit' "${FRAMEWORK_ROOT}/.agentic/lib/init/STACK.template.md"; then
+  pass "T-0124: review_commit in STACK.template.md"
+else
+  fail "T-0124: review_commit missing from STACK.template.md"
+fi
+
+# T-0125: task.py references review_commit
+if grep -q 'review_commit' "${FRAMEWORK_ROOT}/.agentic/lib/auto/task.py"; then
+  pass "T-0125: task.py references review_commit"
+else
+  fail "T-0125: task.py missing review_commit reference"
+fi
+
+# T-0126: critical_agent.py has review_commit method
+if grep -q 'def review_commit' "${FRAMEWORK_ROOT}/.agentic/lib/auto/critical_agent.py"; then
+  pass "T-0126: critical_agent.py has review_commit() method"
+else
+  fail "T-0126: critical_agent.py missing review_commit() method"
+fi
+
+# T-0127: critical_agent.py has review_commit focus entry
+if grep -q '"review_commit"' "${FRAMEWORK_ROOT}/.agentic/lib/auto/critical_agent.py"; then
+  pass "T-0127: critical_agent.py has review_commit focus entry"
+else
+  fail "T-0127: critical_agent.py missing review_commit focus entry"
+fi
+
+# T-0128: PRINCIPLES.md has conditional R2 language
+if grep -q 'interactive.*sessions.*NEVER commit' "${FRAMEWORK_ROOT}/.agentic/lib/PRINCIPLES.md"; then
+  pass "T-0128: PRINCIPLES.md has conditional R2 language"
+else
+  fail "T-0128: PRINCIPLES.md missing conditional R2 language"
+fi
+
+# T-0129: memory-seed.md has review_commit sentinel
+if grep -q 'review_commit' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
+  pass "T-0129: memory-seed.md has review_commit sentinel"
+else
+  fail "T-0129: memory-seed.md missing review_commit sentinel"
+fi
+
+# T-0130: task.py has _unstage_or_warn helper
+if grep -q '_unstage_or_warn' "${FRAMEWORK_ROOT}/.agentic/lib/auto/task.py"; then
+  pass "T-0130: task.py has _unstage_or_warn helper"
+else
+  fail "T-0130: task.py missing _unstage_or_warn helper"
+fi
+
+echo ""
+
 # ============================================================
 # Summary
 # ============================================================

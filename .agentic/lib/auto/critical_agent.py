@@ -77,6 +77,13 @@ _REVIEW_FOCUS: dict[str, str] = {
         "Focus on: consistency with declared style guide, design system alignment, "
         "API convention adherence, naming pattern consistency, public surface quality."
     ),
+    "review_commit": (
+        "Focus on: does the staged diff satisfy the acceptance criterion? "
+        "Check for: AC requirement alignment, secrets or credentials in diff, "
+        "unintended file additions/deletions, scope creep beyond this AC, "
+        "code correctness, breaking changes to other features, "
+        "no regression indicators. (Tests already passed before this review.)"
+    ),
 }
 
 
@@ -158,6 +165,57 @@ class CriticalAgent:
 
         return self._parse_verdict(output)
 
+    def review_commit(
+        self,
+        feature_id: str,
+        ac_id: str,
+        ac_text: str,
+    ) -> ReviewVerdict:
+        """Review a staged diff for a single AC before auto-commit (F-0203).
+
+        Unlike review() which handles state transitions with full feature context,
+        this method is lightweight: only the staged diff + the specific AC.
+        Designed for per-AC commit review in automated execution.
+
+        Error semantics for callers:
+        - RuntimeError raised → caller should unstage and return False
+        - verdict="escalate" returned → treated same as rejection (unstage)
+        - verdict="request_changes" → treated same as rejection
+        - Only verdict="approved" results in a commit
+
+        On transient errors, retries once before raising.
+        On timeout/unavailable, raises immediately.
+        """
+        context = self._assemble_commit_context(feature_id, ac_id, ac_text)
+        prompt = self._build_prompt(context, "review_commit")
+        model = self._resolve_model()
+
+        # First attempt
+        output = spawn_claude(
+            self.claude_command, self.project_root, prompt,
+            print_mode=True, timeout=_REVIEW_TIMEOUT, model=model,
+        )
+
+        if self._is_error(output):
+            error_type = self._classify_error(output)
+            if error_type == "transient":
+                time.sleep(_RETRY_DELAY)
+                output = spawn_claude(
+                    self.claude_command, self.project_root, prompt,
+                    print_mode=True, timeout=_REVIEW_TIMEOUT, model=model,
+                )
+                if self._is_error(output):
+                    raise RuntimeError(
+                        f"Critical agent commit review failed after retry: "
+                        f"{output[:200]}"
+                    )
+            else:
+                raise RuntimeError(
+                    f"Critical agent commit review {error_type}: {output[:200]}"
+                )
+
+        return self._parse_verdict(output)
+
     # -- Context assembly --------------------------------------------------
 
     def _assemble_context(
@@ -209,6 +267,45 @@ class CriticalAgent:
         nfr_content = self._read_file(self._paths.nfr_file)
         if nfr_content:
             sections.append(f"## Non-Functional Requirements\n{nfr_content}")
+
+        return "\n\n".join(sections)
+
+    def _assemble_commit_context(
+        self,
+        feature_id: str,
+        ac_id: str,
+        ac_text: str,
+    ) -> str:
+        """Assemble minimal context for commit review (F3-optimized).
+
+        Only includes: the AC being implemented + the staged diff.
+        Does NOT load full feature spec or all ACs (unlike _assemble_context).
+        """
+        sections: list[str] = []
+
+        sections.append(
+            f"## Commit Review\n"
+            f"Feature: {feature_id}, AC: {ac_id}\n"
+            f"Criterion: {ac_text}"
+        )
+
+        # Staged diff only (not full branch diff)
+        try:
+            diff_result = subprocess.run(
+                ["git", "diff", "--cached"],
+                cwd=str(self.project_root),
+                capture_output=True,
+                text=True,
+            )
+            if diff_result.returncode == 0 and diff_result.stdout.strip():
+                diff = self._truncate_diff(diff_result.stdout)
+                sections.append(
+                    f"## Staged Changes\n```diff\n{diff}\n```"
+                )
+            else:
+                sections.append("## Staged Changes\nNo staged changes detected.")
+        except (FileNotFoundError, OSError):
+            sections.append("## Staged Changes\nUnable to read staged diff.")
 
         return "\n\n".join(sections)
 

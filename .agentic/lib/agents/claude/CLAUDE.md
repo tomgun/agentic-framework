@@ -15,7 +15,7 @@ Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 
 ## Core Rules
 
-- Never auto-commit. Show changes to human first.
+- Never auto-commit in interactive sessions. Show changes to human first. (Autonomous workflows use `review_commit` setting — F-0203.)
 - PR by default: create feature branches and PRs (check `git_workflow` in STACK.md).
 - Add/update tests for new/changed logic.
 - Spec + code + tests + docs = done (update all artifacts together, not later).

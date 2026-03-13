@@ -3448,7 +3448,7 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0203: Auto-Commit/Merge Mode (R2 Amendment)
 
-**Status**: planned
+**Status**: in_progress
 **Category**: Autonomous
 **Priority**: medium
 **Complexity**: high

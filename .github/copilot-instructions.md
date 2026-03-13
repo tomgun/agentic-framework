@@ -29,7 +29,7 @@ DO NOT PROCEED without acceptance criteria: .agentic/spec/acceptance/F-####.md m
 Small batch development: When user asks for something large ("entire", "full", "complete system"), STOP - TOO BIG for one task. Break into smaller pieces (3-5 files max each). Max 5-10 files per commit.
 
 Rules:
-- Never auto-commit. Show changes to human first.
+- Never auto-commit in interactive sessions. Show changes to human first. (Autonomous workflows use `review_commit` setting — F-0203.)
 - Add/update tests for new/changed logic.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
 - Keep changes small and scoped.

@@ -5,8 +5,8 @@ tokens: ~1130
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.54.0 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area -->
+<!-- memory-seed v0.54.1 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -200,7 +200,7 @@ Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 
 ## Rules that always apply
 
-- **Never auto-commit.** Human reviews every change first.
+- **Never auto-commit in interactive sessions.** Human reviews every change first. Autonomous workflows (`ag auto task/epic`) may commit when `review_commit: critical_agent` (F-0203).
 - **Never bypass gates.** Do not use `--no-verify` or skip quality checks — except `ag flush` which uses `--no-verify` with its own stricter validation (hardcoded allowlist, branch check, JSON validation). See `state-commit.sh` header comment for the conditions that make this safe.
 - **NEVER `git stash`.** Stash pop does a silent merge — in multi-agent contexts, when another agent modified the same files, it quietly picks one version with no error, causing data loss. Safe alternatives: worktrees, temp branch + cherry-pick, or commit before switching. Also never `git checkout -- .`, `git restore .`, or `git reset --hard` with uncommitted changes.
 - **Multi-session collision guard.** Sessions auto-register in AGENTS.json at start. Before any destructive git op, the framework checks for other active sessions on the same checkout. If others are active, you'll see a COLLISION RISK warning — do NOT proceed with destructive ops. Use a worktree (`ag worktree`) or commit first.

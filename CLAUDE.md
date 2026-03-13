@@ -15,7 +15,7 @@ Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"
 
 ## Core Rules
 
-- Never auto-commit. Show changes to human first.
+- Never auto-commit in interactive sessions. Show changes to human first. (Autonomous workflows use `review_commit` setting — F-0203.)
 - PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking.
 - Add/update tests for new/changed logic.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
