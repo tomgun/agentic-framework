@@ -63,9 +63,10 @@ class SchedulerResult:
     features_skipped: int = 0
     feature_work: list[FeatureWork] = field(default_factory=list)
     stopped_reason: str = ""
+    integration_result: Optional[dict] = None  # F-0204
 
     def to_dict(self) -> dict:
-        return {
+        d = {
             "success": self.success,
             "features_total": self.features_total,
             "features_completed": self.features_completed,
@@ -85,6 +86,9 @@ class SchedulerResult:
                 for fw in self.feature_work
             ],
         }
+        if self.integration_result:
+            d["integration_result"] = self.integration_result
+        return d
 
 
 # ---------------------------------------------------------------------------
@@ -299,11 +303,23 @@ class AutonomousScheduler:
                 success=False,
                 stopped_reason=f"no unshipped children found for {epic_id}",
             )
-        return self.run(
+        result = self.run(
             feature_ids=children,
             max_errors=max_errors,
             skip_pr=skip_pr,
         )
+
+        # F-0204: Post-completion integration verification hook
+        if result.success:
+            iv_result = self._run_integration_verify(epic_id)
+            if iv_result and not iv_result.success and not iv_result.skipped:
+                result.success = False
+                result.stopped_reason = (
+                    f"Integration verification failed for {epic_id}"
+                )
+                result.integration_result = iv_result.to_dict()
+
+        return result
 
     # -- Feature execution -------------------------------------------------
 
@@ -515,6 +531,27 @@ class AutonomousScheduler:
             c["id"] for c in children
             if c.get("status") not in ("shipped", "deprecated")
         ]
+
+    # -- Integration verification (F-0204) ---------------------------------
+
+    def _run_integration_verify(self, epic_id: str):
+        """Run integration verification for an epic after all children complete.
+
+        Returns IntegrationResult or None if import fails.
+        """
+        try:
+            from auto.integration_verify import run_integration_verify
+            return run_integration_verify(
+                self.project_root,
+                epic_id,
+                claude_command=self.claude_command,
+            )
+        except Exception as e:
+            print(
+                f"  Integration verification error for {epic_id}: {e}",
+                file=sys.stderr,
+            )
+            return None
 
     # -- Engine control helpers --------------------------------------------
 

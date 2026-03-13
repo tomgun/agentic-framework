@@ -89,6 +89,8 @@ Purpose: a single source of truth for "how we build and run software here".
 # Style/taste consistency review (F-0183). Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
 - review_commit: human
 # Auto-commit in automated execution (`ag auto task/epic`). human: stage only, human reviews (default) | critical_agent: adversarial review then auto-commit. Discovery: human | Formal: human | Autonomous Formal: critical_agent
+- review_integration: skip
+# Epic integration verification (F-0204). Reviews integration test results before epic ships. Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
 
 - kickoff_confirm: skip
 # Kickoff confirmation checkpoints. Discovery: skip | Formal: ask | Autonomous Formal: skip
@@ -154,6 +156,12 @@ Purpose: a single source of truth for "how we build and run software here".
   <!-- - DSP: `python3 tests/dsp_validation.py` -->
   <!-- E2E screenshots (for visual verification): -->
   <!-- - E2E screenshots: test-results/ -->
+
+## Integration tests (optional, for epics)
+<!-- Cross-component integration tests run when all epic children ship (F-0204). -->
+<!-- Override per-epic in epic AC file's ## Integration tests section. -->
+<!-- - `pytest tests/integration/` -->
+<!-- - `npm run test:integration` -->
 
 ## Development approach (optional)
 <!-- Choose development workflow mode -->

@@ -2335,6 +2335,10 @@ cmd_auto() {
             # Autonomous epic execution (F-0186)
             python3 "$auto_dir/scheduler.py" --project-root "$ROOT_DIR" "$@"
             ;;
+        verify-epic)
+            # Integration verification for an epic (F-0204)
+            python3 "$auto_dir/integration_verify.py" --project-root "$ROOT_DIR" "$@"
+            ;;
         feedback)
             python3 "$auto_dir/control.py" feedback "$@" --project-root "$ROOT_DIR"
             ;;
@@ -2347,6 +2351,7 @@ cmd_auto() {
             echo "  task <F-XXXX>         Implement a single feature autonomously (F-0162)"
             echo "  crunch [--features .] Implement multiple features in batch (F-0163)"
             echo "  epic <F-XXXX>         Autonomous epic execution — schedule children (F-0186)"
+            echo "  verify-epic <F-XXXX>  Run integration verification for epic (F-0204)"
             echo "  status                Show engine state"
             echo "  pause                 Pause running engine"
             echo "  resume                Resume paused engine"

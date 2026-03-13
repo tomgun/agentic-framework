@@ -153,6 +153,21 @@ def recompute_epic_status(
     if derived is None:
         return False, []
 
+    # Integration verification gate (F-0204): when all children shipped,
+    # check for integration test artifact before allowing epic to ship.
+    if derived == "shipped":
+        from auto.integration_verify import get_integration_result, load_integration_commands
+        commands = load_integration_commands(project_root, epic_id)
+        if commands:
+            iv_result = get_integration_result(project_root, epic_id)
+            if iv_result is None or not iv_result.success:
+                pending_or_failed = "pending" if iv_result is None else "failed"
+                messages.append(
+                    f"Epic {epic_id}: integration verification {pending_or_failed} "
+                    f"— run `ag auto verify-epic {epic_id}`"
+                )
+                derived = "implementing"
+
     # Get current epic status
     current = _get_feature_status(paths.features_file, epic_id)
     if current == derived:
