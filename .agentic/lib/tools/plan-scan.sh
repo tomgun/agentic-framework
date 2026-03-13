@@ -143,7 +143,7 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
         # Check if a durable plan already exists for this feature
         # Look for any file matching F-XXXX*plan* in PLANS_DIR
         local_plan_exists=false
-        for existing in "$PLANS_DIR"/*"${primary_fid}"*plan* "$PLANS_DIR"/"${primary_fid}"-plan.md; do
+        for existing in "$PLANS_DIR"/*"${primary_fid}"*plan*; do
             if [[ -f "$existing" ]]; then
                 local_plan_exists=true
                 break
@@ -156,7 +156,7 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
         fi
 
         # No durable plan exists — copy it
-        dest_name="${primary_fid}-plan.md"
+        dest_name="$(date +%Y-%m-%d)-${primary_fid}-plan.md"
         if [[ "$CHECK_ONLY" == true ]]; then
             COPIED_PLANS+=("$primary_fid (from $(basename "$scan_dir")/$(basename "$plan_file"))")
             ((COPIED_COUNT++))
