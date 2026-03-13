@@ -201,6 +201,21 @@ if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/backlog_helpers.py" ]
     _py "$TOOLS_DIR/backlog_helpers.py" --project-root "$PROJECT_ROOT" check-staleness 7 >/dev/null 2>&1 && D_STALE="yes"
 fi
 
+# ORPHANED PLANS (unsaved session-scoped plans needing review)
+# Note: This is distinct from periodic-checks.sh check_orphaned_plans() which uses
+# fingerprint matching and a 2+ feature ID threshold. dashboard uses plan-scan.sh
+# because it's the action tool (saves plans), while periodic-checks is advisory.
+D_ORPHAN_PLANS=0
+D_ORPHAN_PLAN_SUMMARY=""
+if [[ -f "$TOOLS_DIR/plan-scan.sh" ]]; then
+    _ps_out=$(bash "$TOOLS_DIR/plan-scan.sh" --check --quiet 2>/dev/null) || true
+    if [[ -n "$_ps_out" ]]; then
+        D_ORPHAN_PLANS=$(echo "$_ps_out" | grep -oE '[0-9]+' | head -1)
+        D_ORPHAN_PLANS="${D_ORPHAN_PLANS:-0}"
+        D_ORPHAN_PLAN_SUMMARY="$_ps_out"
+    fi
+fi
+
 # ---------------------------------------------------------------------------
 # Output: --raw mode (for scripts) or rendered dashboard (for agents)
 # ---------------------------------------------------------------------------
@@ -236,6 +251,8 @@ if $RAW_MODE; then
     echo "$D_HEALTH"
     echo "===UPGRADE==="
     echo "$D_UPGRADE"
+    echo "===ORPHAN_PLANS==="
+    echo "$D_ORPHAN_PLANS"
     echo "===TIP==="
     echo "$D_TIP"
     echo "===DIRTY_STATE==="
@@ -330,6 +347,9 @@ fi
 if [[ "$D_AC_DRIFT_COUNT" -gt 0 ]]; then
     echo "⚠️  AC Drift       $D_AC_DRIFT_COUNT shipped feature(s) with <50% ACs checked"
 fi
+if [[ "$D_ORPHAN_PLANS" -gt 0 ]]; then
+    echo "📝 Orphan plans   $D_ORPHAN_PLAN_SUMMARY"
+fi
 echo "✅ Health         $health_line"
 echo ""
 
@@ -349,6 +369,10 @@ echo ""
 # Next steps
 echo "⚡ Next steps"
 step=1
+if [[ "$D_ORPHAN_PLANS" -gt 0 ]]; then
+    echo "   $step. Save orphaned plan(s) and run dialectical review before implementing"
+    step=$((step + 1))
+fi
 if [[ "$D_WIP" == "interrupted" ]]; then
     echo "   $step. Resume interrupted work on ${D_WIP_FEATURE:-current feature}"
     step=$((step + 1))

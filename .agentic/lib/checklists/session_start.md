@@ -77,6 +77,12 @@ Options:
 Want to address these first, or continue with planned work?
 ```
 
+**If dashboard shows orphaned plan(s)** (📝 line present):
+- Previous session created a plan but it was never saved/reviewed
+- FIRST: Run `bash .agentic/lib/tools/plan-scan.sh` to save to durable storage
+- THEN: If `plan_review_enabled: yes`, run dialectical review (Critic + Advocate → synthesis → user approval)
+- Do NOT start implementation — unsaved plan + review enabled = hard gate
+
 **If upgrade pending**:
 ```
 🔄 Framework was upgraded to v[X.Y.Z]!

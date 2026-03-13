@@ -55,6 +55,7 @@ What would you like to work on?
 | `ag intent list` shows orphaned intents | "⚠️ Found interrupted work from crashed session. Run `ag sync` to adopt or `ag intent clear F-XXXX` to discard." |
 | HUMAN_NEEDED has items | "📋 [N] items need your input" |
 | Upgrade pending | "🔄 Framework upgraded to vX.Y.Z, applying updates..." |
+| Dashboard shows orphaned plans (📝) | "📝 Orphaned plan(s) detected. Saving to journal and running dialectical review before implementation." |
 
 **Why proactive**: User shouldn't ask "where were we?" - you tell them automatically.
 

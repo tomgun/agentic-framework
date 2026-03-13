@@ -186,6 +186,8 @@ bash .agentic/lib/tools/dashboard.sh 2>/dev/null
 
 Output the result **verbatim** as your first text response. No other tool calls, no preamble, no narration, no reformatting. The script renders the final dashboard (with emoji, borders, next steps). Just copy its output.
 
+**At session start with orphaned plans**: If the dashboard shows orphaned plans (📝 line), saving and reviewing them is your FIRST action — not implementation, not exploration. Run `plan-scan.sh` to save, then run dialectical review if `plan_review_enabled: yes`. This takes priority over backlog items, interrupted work, or any other next step.
+
 ## NFR proactive suggestion
 
 If NFR.md exists but only has template content (no project-specific NFRs) after 3+ features are shipped, suggest NFR discovery at session start:

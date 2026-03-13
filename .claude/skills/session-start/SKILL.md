@@ -36,6 +36,9 @@ Output the dashboard.sh result as your first text response. **No preamble, no na
 
 After outputting the dashboard, check if the output contains any of these — and if so, note them briefly:
 
+- **Orphaned plan detected** (📝 line present): A plan from a previous session was never saved
+  or reviewed. Run `plan-scan.sh` to save it to `.agentic/journal/plans/`, then run the
+  dialectical review loop (Critic + Advocate). Do NOT proceed to implementation until APPROVED.
 - **Upgrade pending** (🔄 line present): User should handle before new work.
 - **Interrupted work** (⚠️ line present): Focus on recovery, don't suggest new features.
 - **Memory stale** (health mentions memory): Note it as action item.
