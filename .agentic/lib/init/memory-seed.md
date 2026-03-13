@@ -142,6 +142,8 @@ If the user indicates a feature is complete — in any phrasing (e.g. "done", "c
 
 **STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. Before ending, check your TaskList for pending items and flush them to .agentic/TODO.md via `ag todo`. If on main (not in a worktree), run `ag flush --features` to commit state files directly to main.
 
+**Critical**: When YOU merge a PR (via `gh pr merge`), IMMEDIATELY run `ag done F-XXXX` as the next step. The post-merge flow (VERSION bump, feature status, backlog advance) is part of the merge — not a separate action the user should have to request.
+
 ## When work is done (doc lifecycle)
 
 After `ag done F-XXXX` completes, if STACK.md has a `## Docs` section with entries:

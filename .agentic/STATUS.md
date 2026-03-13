@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0206: Feedback Capture System — ready for PR (Updated: 2026-03-13 21:40 UTC)
+- Post-merge ag done instruction fix — ready to commit (Updated: 2026-03-13 21:58 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

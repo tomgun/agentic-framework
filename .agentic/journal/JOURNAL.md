@@ -2404,3 +2404,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-13 21:58 - Post-merge ag done
+
+**Why**: Agent merged PR #130 but told user to run ag done instead of running it automatically
+
+**What changed**:
+- Agents now automatically run ag done after merging a PR via gh pr merge — no manual user prompt
+
+**Next steps**:
+- None — fix complete
+
+**Blockers**: None
+
