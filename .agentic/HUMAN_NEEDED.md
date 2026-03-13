@@ -43,24 +43,15 @@ _No active items_
 
 
 
-### HN-0032: PR #123: ag preview — F-0202
-- **Type**: review
-- **Added**: 2026-03-12
-- **Context**: Stack-aware project preview command. 22 files, 3 commits.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
+## Resolved
 
 ### HN-0033: PR #124: F-0203 review_commit setting — R2 conditional amendment
-- **Type**: review
-- **Added**: 2026-03-13
-- **Context**: Adds review_commit: human|critical_agent to gate auto-commits in task.py. 30 files, 952 insertions. Tests pass.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
+- **Resolved**: 2026-03-13
+- **Outcome**: PR #124 merged
 
-
-## Resolved
+### HN-0032: PR #123: ag preview — F-0202
+- **Resolved**: 2026-03-13
+- **Outcome**: PR #123 merged
 
 ### HN-0028: PR #91: Silent session start
 - **Resolved**: 2026-03-09

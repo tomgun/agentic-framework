@@ -1,21 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0203",
-    "description": "Auto-Commit/Merge Mode (R2 Amendment)",
-    "added_at": "2026-03-11T00:00:00Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0203.md"
-    ],
-    "notes": "ADR-002 priority 4. ~15 files, R2 principle amendment.",
-    "depends_on": [
-      "F-0182"
-    ],
-    "became_current_at": "2026-03-12T19:44:31Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0204",
     "description": "Epic Integration Verification",
     "added_at": "2026-03-11T00:00:00Z",
@@ -26,7 +11,8 @@
     "notes": "ADR-002 priority 5. Quality gate for epics.",
     "depends_on": [
       "F-0186"
-    ]
+    ],
+    "became_current_at": "2026-03-13T10:22:19Z"
   },
   {
     "type": "feature",

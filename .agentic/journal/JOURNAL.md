@@ -2313,3 +2313,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-13 10:22 - F-0203 Complete
+
+**Why**: R2 principle amended to enable autonomous workflows without sacrificing safety
+
+**What changed**:
+- Framework now supports conditional auto-commit via review_commit setting — agents can commit autonomously when profile allows (autonomous_formal→critical_agent), while preserving human review by default
+
+**Next steps**:
+- Next: F-0204 Epic Integration Verification
+
+**Blockers**: None
+
