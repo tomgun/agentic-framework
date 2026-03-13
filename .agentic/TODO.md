@@ -154,6 +154,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0065: Discovery profile documentation — ensure discovery profile is clearly documented as the rapid Idea-to-Ship pipeline for users wanting lighter workflow ceremony
 - **Added**: 2026-03-13
 
+### T-0066: Support for protected main branch: ag done/flush currently commit state files (BACKLOG.json, STATUS.md, FEATURES.md, VERSION) directly to main. With branch protection rules (no direct push, require PR review), this breaks. Design alternatives: (1) long-lived state branch auto-synced via rebase, (2) auto-PR for state flushes with auto-merge label, (3) bot-exempt bypass token for state-only commits, (4) state files live outside git (e.g. GitHub API, external store). Must audit all direct-to-main paths: ag done, ag flush, state-commit.sh. Consider: what if state diverges while PR waits? Merge conflict risk with parallel agents.
+- **Added**: 2026-03-13
+
 ## Done
 
 
