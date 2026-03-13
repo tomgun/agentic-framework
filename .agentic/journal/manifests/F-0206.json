@@ -1,0 +1,24 @@
+{
+  "feature": "F-0206",
+  "mode": "feature",
+  "generated": "2026-03-13T21:52:56Z",
+  "commits": [
+    {"hash": "0b67fc5", "date": "2026-03-13", "message": "Merge pull request #130 from tomgun/feature/F-0206-feedback-capture", "additions": 0, "deletions": 0},
+    {"hash": "fb15e8d", "date": "2026-03-13", "message": "chore: log PR #130 (F-0206) in HUMAN_NEEDED.md [state flush]", "additions": 9, "deletions": 0},
+    {"hash": "e17a606", "date": "2026-03-13", "message": "feat: add F-0206 Feedback Capture System (ag feedback)", "additions": 834, "deletions": 16},
+    {"hash": "a8714ef", "date": "2026-03-11", "message": "chore: populate backlog with ADR-002 implementation order + update F-0183 ACs", "additions": 92, "deletions": 5},
+    {"hash": "ae0f651", "date": "2026-03-11", "message": "docs: add ADR-002 (User Involvement Modes) + register 6 new features", "additions": 350, "deletions": 1}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/lib/auto/control.py"}, {"file": ".agentic/lib/auto/engine.py"}, {"file": ".agentic/lib/paths.sh"}, {"file": ".agentic/lib/tools/ag.sh"}, {"file": ".agentic/lib/tools/feedback.sh"}],
+    "tests": [{"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/FEEDBACK_LOG.template.md"}, {"file": ".agentic/spec/ISSUES.md"}, {"file": ".agentic/spec/acceptance/F-0183.md"}, {"file": ".agentic/spec/acceptance/F-0206.md"}, {"file": ".agentic/spec/adr/ADR-002-user-involvement-modes.md"}, {"file": "tests/validate_framework.sh"}],
+    "docs": [{"file": ".agentic/FEEDBACK_LOG.md"}, {"file": ".agentic/HUMAN_NEEDED.md"}, {"file": ".agentic/STATUS.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/journal/plans/2026-03-13-F-0206-plan.md"}, {"file": ".agentic/lib/agents/claude/CLAUDE.md"}, {"file": ".agentic/lib/agents/codex/codex-instructions.md"}, {"file": ".agentic/lib/agents/copilot/copilot-instructions.md"}, {"file": ".agentic/lib/agents/cursor/cursorrules.txt"}, {"file": ".agentic/lib/agents/shared/agent_operating_guidelines.md"}, {"file": ".agentic/lib/agents/shared/auto_orchestration.md"}, {"file": ".agentic/lib/init/STACK.template.md"}, {"file": ".agentic/lib/init/memory-seed.md"}, {"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/FEEDBACK_LOG.template.md"}, {"file": ".agentic/spec/ISSUES.md"}, {"file": ".agentic/spec/acceptance/F-0183.md"}, {"file": ".agentic/spec/acceptance/F-0206.md"}, {"file": ".agentic/spec/adr/ADR-002-user-involvement-modes.md"}, {"file": "CLAUDE.md"}],
+    "config": [{"file": ".agentic/BACKLOG.json"}]
+  },
+  "stats": {
+    "total_commits": 5,
+    "total_files": 28,
+    "additions": 1285,
+    "deletions": 22
+  }
+}
