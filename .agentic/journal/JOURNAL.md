@@ -2365,3 +2365,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-13 18:05 - Instruction file sync
+
+**Why**: Templates and root instruction files had drifted — missing commands, wrong paths, stale triggers
+
+**What changed**:
+- Fixed cursor template path bugs, synced Quick Commands and trigger words across all 4 templates and 4 root files, added extends note to root CLAUDE.md
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+
