@@ -84,6 +84,7 @@ HUMAN_NEEDED_FILE="$(_resolve_path "$AGENTIC_ROOT/HUMAN_NEEDED.md" "$PROJECT_ROO
 CONTRIBUTIONS_FILE="$(_resolve_path "$AGENTIC_ROOT/CONTRIBUTIONS.md" "$PROJECT_ROOT/CONTRIBUTIONS.md")"
 OVERVIEW_FILE="$(_resolve_path "$AGENTIC_ROOT/OVERVIEW.md" "$PROJECT_ROOT/OVERVIEW.md")"
 BACKLOG_FILE="$AGENTIC_ROOT/BACKLOG.json"
+FEEDBACK_LOG_FILE="$(_resolve_path "$AGENTIC_ROOT/FEEDBACK_LOG.md" "$PROJECT_ROOT/FEEDBACK_LOG.md")"
 
 # ---------------------------------------------------------------------------
 # Journal (.agentic/journal/)

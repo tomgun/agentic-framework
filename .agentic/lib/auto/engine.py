@@ -598,12 +598,37 @@ class AutoEngine:
         tmp.rename(self.state_path)
 
     def _cleanup(self) -> None:
-        """Clean up socket, PID file, and control server."""
+        """Clean up socket, PID file, control server, and flush feedback."""
+        # Flush any remaining in-flight feedback to FEEDBACK_LOG.md
+        self._flush_feedback()
         self.control_server.stop()
         try:
             self.pid_path.unlink()
         except FileNotFoundError:
             pass
+
+    def _flush_feedback(self) -> None:
+        """Persist in-flight feedback items to FEEDBACK_LOG.md via feedback.sh."""
+        with self.engine_state._lock:
+            pending = list(self.engine_state._feedback)
+        if not pending:
+            return
+        feedback_sh = self.project_root / ".agentic" / "lib" / "tools" / "feedback.sh"
+        if not feedback_sh.exists():
+            return
+        import subprocess
+        for item in pending:
+            text = item.get("text", "")
+            ac_id = item.get("ac", "")
+            if not text:
+                continue
+            cmd = ["bash", str(feedback_sh), "add", text]
+            if ac_id:
+                cmd.extend(["--ac", self.engine_state._feature_id or "", ac_id])
+            try:
+                subprocess.run(cmd, timeout=10, capture_output=True)
+            except Exception:
+                pass  # best-effort flush
 
     def _signal_handler(self, signum: int, frame) -> None:
         """Handle SIGTERM/SIGINT gracefully."""

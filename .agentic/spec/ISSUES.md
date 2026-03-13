@@ -12,7 +12,7 @@
 
 | Status | Count |
 |--------|-------|
-| Open | 2 |
+| Open | 4 |
 | In Progress | 0 |
 | Fixed | 3 |
 | Won't Fix | 0 |
@@ -61,6 +61,7 @@ What's wrong? What's the expected vs actual behavior?
 ---
 
 ## Open Issues
+
 
 ## I-0001: CLAUDE.md dogfooding inverted - template should be canonical source
 

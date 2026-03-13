@@ -4618,6 +4618,108 @@ else
   fail "ag.sh missing formalize dispatch"
 fi
 
+# ============================================================
+# F-0206: Feedback Capture System
+# ============================================================
+echo ""
+echo "--- F-0206: Feedback Capture System ---"
+
+# T-0131: feedback.sh exists and is executable
+if [[ -x "$FRAMEWORK_ROOT/.agentic/lib/tools/feedback.sh" ]]; then
+  pass "T-0131: feedback.sh exists and is executable"
+else
+  fail "T-0131: feedback.sh missing or not executable"
+fi
+
+# T-0132: feedback.sh sources paths.sh
+if grep -q 'paths\.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/feedback.sh"; then
+  pass "T-0132: feedback.sh sources paths.sh"
+else
+  fail "T-0132: feedback.sh does not source paths.sh"
+fi
+
+# T-0133: FEEDBACK_LOG_FILE in paths.sh
+if grep -q 'FEEDBACK_LOG_FILE' "${FRAMEWORK_ROOT}/.agentic/lib/paths.sh"; then
+  pass "T-0133: FEEDBACK_LOG_FILE defined in paths.sh"
+else
+  fail "T-0133: FEEDBACK_LOG_FILE missing from paths.sh"
+fi
+
+# T-0134: ag feedback dispatch exists in ag.sh
+if grep -q '    feedback)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "T-0134: ag feedback dispatch exists in ag.sh"
+else
+  fail "T-0134: ag feedback dispatch missing from ag.sh"
+fi
+
+# T-0135: FEEDBACK_LOG.template.md exists
+if [[ -f "$FRAMEWORK_ROOT/.agentic/spec/FEEDBACK_LOG.template.md" ]]; then
+  pass "T-0135: FEEDBACK_LOG.template.md exists"
+else
+  fail "T-0135: FEEDBACK_LOG.template.md missing"
+fi
+
+# T-0136: feedback_mode in profiles.conf (all 3 profiles)
+FEEDBACK_MODE_COUNT=$(grep -c 'feedback_mode' "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" || true)
+if [[ "$FEEDBACK_MODE_COUNT" -ge 3 ]]; then
+  pass "T-0136: feedback_mode in profiles.conf (${FEEDBACK_MODE_COUNT} profiles)"
+else
+  fail "T-0136: feedback_mode in profiles.conf (expected 3, got ${FEEDBACK_MODE_COUNT})"
+fi
+
+# T-0137: feedback.sh has classify function
+if grep -q '_classify()' "${FRAMEWORK_ROOT}/.agentic/lib/tools/feedback.sh"; then
+  pass "T-0137: feedback.sh has _classify heuristic function"
+else
+  fail "T-0137: feedback.sh missing _classify function"
+fi
+
+# T-0138: engine.py has _flush_feedback method
+if grep -q '_flush_feedback' "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
+  pass "T-0138: engine.py has _flush_feedback method"
+else
+  fail "T-0138: engine.py missing _flush_feedback method"
+fi
+
+# T-0139: memory-seed has ag feedback sentinel
+if grep -q 'ag feedback' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
+  pass "T-0139: memory-seed.md has ag feedback sentinel"
+else
+  fail "T-0139: memory-seed.md missing ag feedback sentinel"
+fi
+
+# T-0140: instruction files have ag feedback in quick commands
+INSTRUCTION_FEEDBACK_COUNT=0
+for f in \
+  "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" \
+  "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/cursorrules.txt" \
+  "${FRAMEWORK_ROOT}/.agentic/lib/agents/copilot/copilot-instructions.md" \
+  "${FRAMEWORK_ROOT}/.agentic/lib/agents/codex/codex-instructions.md" \
+  "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/agent_operating_guidelines.md"; do
+  if grep -q 'ag feedback' "$f" 2>/dev/null; then
+    INSTRUCTION_FEEDBACK_COUNT=$((INSTRUCTION_FEEDBACK_COUNT + 1))
+  fi
+done
+if [[ "$INSTRUCTION_FEEDBACK_COUNT" -ge 5 ]]; then
+  pass "T-0140: ag feedback in instruction files (${INSTRUCTION_FEEDBACK_COUNT}/5)"
+else
+  fail "T-0140: ag feedback in instruction files (${INSTRUCTION_FEEDBACK_COUNT}/5, expected 5)"
+fi
+
+# T-0141: auto_orchestration.md has feedback trigger row
+if grep -q 'Feedback Capture' "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/auto_orchestration.md"; then
+  pass "T-0141: auto_orchestration.md has Feedback Capture trigger"
+else
+  fail "T-0141: auto_orchestration.md missing Feedback Capture trigger"
+fi
+
+# T-0142: acceptance criteria file exists
+if [[ -f "$FRAMEWORK_ROOT/.agentic/spec/acceptance/F-0206.md" ]]; then
+  pass "T-0142: F-0206 acceptance criteria file exists"
+else
+  fail "T-0142: F-0206 acceptance criteria file missing"
+fi
+
 echo ""
 
 # ============================================================

@@ -6,7 +6,7 @@ tokens: ~1130
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.54.1 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -106,6 +106,12 @@ If the user says kickoff, vision, draft epic from idea, generate features, turn 
 
 **STOP.** Run `ag kickoff "vision description"`. This generates OVERVIEW.md, FEATURES.md entries, acceptance criteria stubs, and BACKLOG.json in a staging area (`.agentic/session/kickoff-draft/`). Use `ag kickoff --review` to present staging for review/iteration, `ag kickoff --approve` to promote to real spec files, `ag kickoff --discard` to start over. After approval, suggest `ag auto epic` for autonomous execution.
 
+## When the user gives feedback after testing
+
+If the user says feedback, tested it, tried it, after testing, user reported, found a bug, would be nice if, or provides feedback on working software — in any phrasing:
+
+**STOP.** Run `ag feedback "text"`. This classifies feedback via keyword heuristics (bug/feature/ac-adjust/unclear) and persists to FEEDBACK_LOG.md with a FB-XXXX ID. Use `--bug` or `--feature` to override classification, or `--ac F-XXXX AC-XXX` for acceptance criteria adjustments. Use `ag feedback log` to view entries, `ag feedback route FB-XXXX` to route to ISSUES.md/TODO.md, `ag feedback done FB-XXXX` to resolve.
+
 ## When the user wants to know how to run the project
 
 If the user says run, how to run, dev server, start the app, run commands, what commands, or wants to know how to run/start/build/test the project:
@@ -180,6 +186,7 @@ Never read or edit these files directly. Always use the scripts:
 | .agentic/HUMAN_NEEDED.md | `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"` |
 | .agentic/spec/FEATURES.md | `bash .agentic/lib/tools/feature.sh F-#### status shipped` |
 | .agentic/TODO.md | `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"` |
+| .agentic/FEEDBACK_LOG.md | `bash .agentic/lib/tools/feedback.sh add "text"` or `ag feedback "text"` |
 | AGENTS.json | Replaces WIP.md and AGENTS_ACTIVE.md for agent/WIP tracking |
 
 ## Session start

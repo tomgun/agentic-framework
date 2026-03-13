@@ -3512,20 +3512,20 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0206: Feedback Capture System
 
-**Status**: planned
+**Status**: in-progress
 **Category**: Autonomous
 **Priority**: low
 **Complexity**: medium
 **Since**: v0.53.2
 
-**Description**: Structured feedback capture after user tests working software via preview. Auto-converts to: bugs → ISSUES.md, features → TODO.md/FEATURES.md, acceptance criteria adjustments. Iteration loop: feedback → reprioritize → implement → preview again. DEFERRED until F-0202 (Preview) generates real usage patterns. ADR-002 §5.2.
+**Description**: Structured feedback capture after user tests working software via preview. Keyword-based classification routes feedback to existing tools: bugs → ISSUES.md (via quick_issue.sh), features → TODO.md (via todo.sh), AC adjustments → logged with cross-reference. Persistent FEEDBACK_LOG.md with FB-XXXX IDs. ADR-002 §5.2.
 
 **Dependencies**: F-0202 (Preview Capability)
 **Parent**: F-0188
 
 **Implementation**:
-- State: none
-- Code: TBD (depends on real feedback patterns)
+- State: in-progress
+- Code: `.agentic/lib/tools/feedback.sh`, `ag.sh` cmd_feedback()
 - Tests: TBD
 
 **Acceptance**: See `spec/acceptance/F-0206.md`

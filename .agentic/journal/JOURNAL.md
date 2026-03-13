@@ -2391,3 +2391,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-13 21:40 - F-0206: Feedback Capture System
+
+**Why**: No structured way to capture and route user feedback after testing — feedback stayed in chat and was lost between sessions
+
+**What changed**:
+- Users can now capture, classify, and route feedback after testing working software via ag feedback. Keyword heuristics auto-classify as bug/feature/ac-adjust/unclear. Routes to existing tools (ISSUES.md, TODO.md). Persistent FEEDBACK_LOG.md with FB-XXXX IDs. Engine cleanup flushes in-flight feedback.
+
+**Next steps**:
+- Ship F-0206, advance backlog
+
+**Blockers**: None
+
