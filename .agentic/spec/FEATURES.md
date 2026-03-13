@@ -3512,7 +3512,7 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0206: Feedback Capture System
 
-**Status**: in-progress
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: low
 **Complexity**: medium
