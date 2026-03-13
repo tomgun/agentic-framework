@@ -83,6 +83,7 @@ What would you like to work on?
 | "vision" / "kickoff" / "draft epic" / "generate features from idea" | **Vision-to-Backlog Pipeline** | Run `ag kickoff "vision description"`. Generates OVERVIEW.md, FEATURES.md entries, AC stubs, and BACKLOG.json in staging. Review with `--review`, approve with `--approve`, discard with `--discard`. |
 | "verify epic" / "integration tests" / "cross-component tests" | **Epic Integration Verification** | Run `ag auto verify-epic F-XXXX`. Loads integration test commands (epic AC > STACK.md > skip), runs via VerifyLoop, stores artifact. `review_integration` setting controls critical agent review. |
 | "run" / "how to run" / "dev server" / "start the app" / "run commands" | **Project Run Info** | Run `ag run`. Shows stack summary, dev/build/test commands with source attribution (STACK.md vs auto-detected). |
+| "formalize" / "promote to formal" / "migrate to formal" / "make TODOs into features" | **Discovery-to-Formal Migration** | Run `ag formalize` to list promotable TODO items. `ag formalize T-XXXX` promotes specific items to FEATURES.md entries + AC stubs. `ag formalize --all` promotes everything. |
 
 ### Domain & Design Triggers
 

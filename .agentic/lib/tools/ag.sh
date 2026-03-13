@@ -159,6 +159,7 @@ COMMANDS:
     nfr [sub]           NFR management (list, discover, coverage)
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
     intent [sub]        Manage intent journal (list|clear F-XXXX)
+    formalize [T-XXXX...]  Promote TODO items to formal features + AC stubs
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     run                 Show how to run this project
@@ -239,6 +240,7 @@ COMMANDS:
     nfr [sub]           NFR management (list, discover, coverage)
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
     intent [sub]        Manage intent journal (list|clear F-XXXX)
+    formalize [T-XXXX...]  Promote TODO items to formal features + AC stubs
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     verify [--full]     Run doctor verification
     run                 Show how to run this project
@@ -3796,6 +3798,10 @@ case "${1:-help}" in
         ;;
     run)
         bash "$SCRIPT_DIR/run.sh"
+        ;;
+    formalize)
+        shift
+        bash "$SCRIPT_DIR/formalize.sh" "$@"
         ;;
     help|--help|-h)
         show_help

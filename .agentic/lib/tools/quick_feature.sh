@@ -150,6 +150,7 @@ ${CATEGORY_LINE}**Priority**: $PRIORITY
 # Append to FEATURES.md
 echo "$FEATURE_ENTRY" >> "$FEATURES_FILE"
 
+# NOTE: Output format "✓ Created F-XXXX: ..." is parsed by formalize.sh
 echo -e "${GREEN}✓ Created $FEATURE_ID: $FEATURE_NAME${NC}"
 echo ""
 echo "Added to: $FEATURES_FILE"
