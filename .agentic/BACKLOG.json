@@ -1,15 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0205",
-    "description": "Discovery-to-Formal Migration (ag formalize)",
-    "added_at": "2026-03-11T00:00:00Z",
-    "added_by": "agent",
-    "notes": "ADR-002 priority 7. New ag formalize command.",
-    "became_current_at": "2026-03-13T15:46:32Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0206",
     "description": "Feedback Capture System",
     "added_at": "2026-03-11T00:00:00Z",
@@ -17,7 +8,8 @@
     "notes": "ADR-002 priority 8. DEFERRED until F-0202 generates real patterns.",
     "depends_on": [
       "F-0202"
-    ]
+    ],
+    "became_current_at": "2026-03-13T20:20:18Z"
   },
   {
     "type": "feature",

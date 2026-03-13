@@ -53,7 +53,7 @@ fi
 
 # STATUS (current focus)
 if [[ -f "${STATUS_FILE:-}" ]]; then
-    D_STATUS=$(grep -A5 "^## Current focus" "$STATUS_FILE" 2>/dev/null | grep "^-" | head -1 | sed 's/^- //' || echo "No focus set")
+    D_STATUS=$(grep -A5 "^## Current session state" "$STATUS_FILE" 2>/dev/null | grep "^-" | head -1 | sed 's/^- //' | sed 's/ (Updated:.*)$//' || echo "No focus set")
 else
     D_STATUS="No focus set"
 fi

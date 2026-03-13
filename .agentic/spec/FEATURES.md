@@ -3491,7 +3491,7 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0205: Discovery-to-Formal Migration (ag formalize)
 
-**Status**: planned
+**Status**: shipped
 **Category**: Workflow
 **Priority**: low
 **Complexity**: medium

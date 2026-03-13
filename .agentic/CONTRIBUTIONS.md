@@ -1,8 +1,8 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.53.1)
-**Date**: 2026-03-10
+**Period**: Initial Development (v0.1.0 → v0.55.0)
+**Date**: 2026-03-13
 
 ---
 
@@ -2791,6 +2791,30 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 **User insight**: When an epic's children all ship, `recompute_epic_status()` auto-derives the epic to "shipped" with no cross-component validation. Individual features pass their own tests but nothing verifies they work together. The user designed the dual-gate architecture: (1) `recompute_epic_status()` checks for a passing integration artifact before allowing "shipped" status, (2) `scheduler.run_epic()` post-completion hook triggers the verification. Gate is passive (reads artifact), trigger is active (runs tests). `derive_epic_status()` stays pure.
 
 **Design decisions**: Integration test commands resolved from epic AC file > STACK.md > skip (parallels existing `Test commands:` pattern). VerifyLoop reuse for test execution. Artifact-based state in session dir. `review_integration` setting (human/critical_agent/skip) follows established checkpoint pattern. Fail-closed on errors (revised from fail-open after dialectical review identified this as a silent bypass risk).
+
+---
+
+### Discovery-to-Formal Migration — ag formalize (F-0205, v0.55.0)
+
+**User insight**: The TODO inbox (`ag todo`) was a dead end. Ideas went in but never came out as real work — there was no structured path from "idea captured" to "feature in backlog with acceptance criteria." Users had to manually create FEATURES.md entries, write AC files, and add to the backlog — three separate steps that agents routinely forgot or did inconsistently. The gap wasn't capture (TODO worked fine) but promotion: turning a rough idea into a formal spec artifact.
+
+**Design direction**: Single command `ag formalize` that walks the full promotion path: pick a TODO item → create FEATURES.md entry → generate acceptance criteria stub → optionally add to backlog. Interactive selection when multiple TODOs exist. The command bridges discovery-profile informality with formal-profile rigor — it's the on-ramp from "I had an idea" to "this is tracked work with criteria." Key constraint: formalize creates the structure but doesn't fill in the AC detail — that's still a human/agent decision during planning.
+
+---
+
+### Instruction File Drift Is a Silent Feature Gap (PR #128, v0.55.0)
+
+**User insight**: Multiple `ag` commands and workflow triggers existed in the codebase but were missing from instruction file templates (cursorrules, copilot, codex). The `ag worktree` command was absent from all non-Claude templates. The cursor template had stale trigger words that didn't match the canonical set. The root instruction files (which framework developers use) had drifted from the templates (which users receive). This meant features were shipped but invisible to agents running in non-Claude editors.
+
+**Design principle**: Instruction files are the delivery mechanism — a feature that isn't in the instruction files doesn't reach agents. The fix wasn't just adding missing commands; it was recognizing that template-to-root sync needs to be checked on every feature ship, not just when someone notices the gap. Reinforces the existing "instruction files are part of the feature" rule with concrete evidence of what happens when it's skipped.
+
+---
+
+### Dashboard Focus Desync — Structural State Coupling Bug (v0.55.0)
+
+**User insight**: The dashboard showed F-0183 as focus while the backlog showed F-0205 as current — two sources of truth that had diverged silently over multiple sessions. The user identified this as a root-cause problem, not a display bug. Two independent failures: (1) `backlog.sh done/remove/move` mutated BACKLOG.json but never updated STATUS.md, so focus went stale every time the queue advanced; (2) `dashboard.sh` read from `## Current focus` but `status.sh` wrote to `## Current session state` — reading and writing different sections of the same file.
+
+**Design direction**: Fix the coupling, not the symptom. `backlog.sh` now runs `_sync_focus()` after any queue-mutating command, reading the new position-0 item and calling `status.sh focus` to keep STATUS.md in sync. Dashboard reads from the section that `status.sh` actually writes to. The principle: when two state sources must agree, the mutation point is responsible for synchronization — not the reader, not a periodic check, not the next session's agent.
 
 ---
 
