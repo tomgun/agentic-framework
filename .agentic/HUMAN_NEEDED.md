@@ -15,44 +15,27 @@ _No active items_
 
 ---
 
+## Resolved
 
-### HN-0029: PR #109: F-0186 Autonomous Scheduler
-- **Type**: review
-- **Added**: 2026-03-10
-- **Context**: Non-blocking review scheduling, ag auto epic command. 19 tests, 626 validation checks pass.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0030: PR #114: Quick wins batch T-0013/T-0018/T-0034/T-0048/T-0049
-- **Type**: pr_review
-- **Added**: 2026-03-11
-- **Context**: https://github.com/tomgun/agentic-framework/pull/114
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0031: PR #115: Quick wins batch 2 — T-0015/T-0028/T-0055
-- **Type**: pr_review
-- **Added**: 2026-03-11
-- **Context**: https://github.com/tomgun/agentic-framework/pull/115
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
+### HN-0035: PR #126: Orphaned plan detection at session start
+- **Resolved**: 2026-03-13
+- **Outcome**: PR #126 merged
 
 ### HN-0034: PR #125: F-0204 Epic Integration Verification
-- **Type**: pr_review
-- **Added**: 2026-03-13
-- **Context**: Review PR #125. Plan is DRAFT — dialectical review in progress. Implementation may be revised.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
+- **Resolved**: 2026-03-13
+- **Outcome**: PR #125 merged
 
+### HN-0031: PR #115: Quick wins batch 2 — T-0015/T-0028/T-0055
+- **Resolved**: 2026-03-13
+- **Outcome**: PR #115 merged
 
-## Resolved
+### HN-0030: PR #114: Quick wins batch T-0013/T-0018/T-0034/T-0048/T-0049
+- **Resolved**: 2026-03-13
+- **Outcome**: PR #114 merged
+
+### HN-0029: PR #109: F-0186 Autonomous Scheduler
+- **Resolved**: 2026-03-13
+- **Outcome**: PR #109 merged
 
 ### HN-0033: PR #124: F-0203 review_commit setting — R2 conditional amendment
 - **Resolved**: 2026-03-13

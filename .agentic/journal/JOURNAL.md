@@ -2339,3 +2339,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-13 17:09 - PR cleanup + sandbox fixes
+
+**Why**: Housekeeping after F-0204 + post-mortem fix landed
+
+**What changed**:
+- Merged PR #126 (orphaned plan detection), resolved 5 stale HUMAN_NEEDED entries, hardened sandbox firewall
+
+**Next steps**:
+- Next backlog item
+
+**Blockers**: None
+
