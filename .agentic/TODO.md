@@ -145,6 +145,15 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0062: F-IDEA: Autonomous Framework Verification Loop — agent builds example projects (todo app, API service, CLI tool) using the framework end-to-end, acting as developer/architect. Uses git worktrees or temp branches (HARD GUARD: never touch main/real branches). Agent handles its own review requests, commit approvals, kickoff flows. Self-healing loop: when a framework issue is found, (1) auto-fix the framework code, (2) restart the example project from scratch, (3) repeat until the full lifecycle completes without errors. Build project → hit framework bug → fix framework → rebuild → verify fix. Catches behavioral gaps that unit/LLM tests miss. Think: ag auto verify-framework --project todo-app. Could reuse ag auto task/crunch infrastructure. Key constraints: isolated worktrees, ephemeral branches only, auto-cleanup, abort on any main-branch mutation attempt. **Prerequisite**: state-commit.sh and other scripts that hardcode "main"/"master" must accept a configurable trunk branch (env var or setting) so verification runs don't pollute real main. **Coverage**: must exercise all three operation modes (tech lead/formal, visioneer/interview, full autonomous) and key settings matrix (discovery vs formal profiles, review modes human/critical_agent/skip, docs_mode inline/deferred, worktree_mode, kickoff_confirm ask/skip, git_workflow direct/pull_request). **Delivery**: all framework fixes discovered during verification must be collected into a single PR at the end. The verification loop runs on an ephemeral trunk branch where agents auto-merge their fix PRs as they go; once the full loop passes clean, the accumulated fixes are delivered as one PR against real main for human review.
 - **Added**: 2026-03-12
 
+### T-0063: HTTP dashboard endpoint on coord server — GET /dashboard route returning dashboard.sh output as text/JSON for lightweight remote status checking (phone browser, curl, future web UI)
+- **Added**: 2026-03-13
+
+### T-0064: ag preview command — stack-specific hook triggering preview deployment (Vercel/Netlify/etc), returns URL. Quality profile extension, not core.
+- **Added**: 2026-03-13
+
+### T-0065: Discovery profile documentation — ensure discovery profile is clearly documented as the rapid Idea-to-Ship pipeline for users wanting lighter workflow ceremony
+- **Added**: 2026-03-13
+
 ## Done
 
 
