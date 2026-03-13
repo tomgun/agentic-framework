@@ -271,19 +271,17 @@ def _cleanup_stale_claims(items: list[dict]) -> list[dict]:
 
     Unlike _cleanup_stale() which only targets session entries, this targets
     feature entries with a 'claim_pid' field whose process is no longer alive.
-    Dead entries are marked completed with outcome 'stale_claim'.
+    Dead entries are removed entirely.
     """
-    for item in items:
-        if item.get("type") == "session":
-            continue
-        if item.get("status") != "active":
-            continue
-        claim_pid = item.get("claim_pid")
-        if claim_pid and not _is_pid_alive(claim_pid):
-            item["status"] = "completed"
-            item["outcome"] = "stale_claim"
-            item["last_checkpoint"] = _now_iso()
-    return items
+    return [
+        item for item in items
+        if not (
+            item.get("type") != "session"
+            and item.get("status") == "active"
+            and item.get("claim_pid")
+            and not _is_pid_alive(item["claim_pid"])
+        )
+    ]
 
 
 def cmd_claim(agents_file: Path, feature_id: str, agent: str = "",
@@ -333,7 +331,7 @@ def cmd_claim(agents_file: Path, feature_id: str, agent: str = "",
 
 
 def cmd_release(agents_file: Path, feature_id: str, pid: int = 0) -> int:
-    """Release a feature claim. Marks entry as completed.
+    """Release a feature claim. Removes the entry entirely.
 
     If the releasing PID differs from the claiming PID, logs a warning
     but allows the release (needed for manual cleanup).
@@ -343,16 +341,14 @@ def cmd_release(agents_file: Path, feature_id: str, pid: int = 0) -> int:
     released = [False]
 
     def _do(items):
-        for e in items:
+        for i, e in enumerate(items):
             if (e.get("feature_id") == feature_id
                     and e.get("status") == "active"):
                 claim_pid = e.get("claim_pid", 0)
                 if claim_pid and claim_pid != release_pid:
                     print(f"Warning: releasing PID {release_pid} != claiming PID {claim_pid}",
                           file=sys.stderr)
-                e["status"] = "completed"
-                e["outcome"] = "released"
-                e["last_checkpoint"] = _now_iso()
+                items.pop(i)
                 released[0] = True
                 return items
         released[0] = False
@@ -421,14 +417,24 @@ def cmd_get_current_feature(agents_file: Path,
 
 
 def cmd_list(agents_file: Path) -> int:
-    """Print all entries in human-readable format."""
-    items = _load_unlocked(agents_file)
-    if not items:
+    """Print all entries in human-readable format.
+
+    Automatically purges completed entries (legacy artifacts from
+    release/stale-claim that used to mark-not-remove).
+    """
+    def _purge_completed(items):
+        return [i for i in items if i.get("status") != "completed"]
+
+    items = _with_lock(agents_file, _purge_completed)
+
+    # Filter out session entries for display
+    feature_items = [i for i in items if i.get("type") != "session"]
+    if not feature_items:
         print("No active agents")
         return 0
 
     now = datetime.now(timezone.utc)
-    for item in items:
+    for item in feature_items:
         fid = item.get("feature_id", "?")
         desc = item.get("description", "")
         status = item.get("status", "?")
@@ -458,7 +464,7 @@ def cmd_list(agents_file: Path) -> int:
         if stale_warning:
             print(stale_warning)
 
-    print(f"\n{len(items)} entry(ies)")
+    print(f"\n{len(feature_items)} entry(ies)")
     return 0
 
 
@@ -629,11 +635,14 @@ def cmd_count_others(agents_file: Path, worktree: str,
 
 
 def cmd_cleanup_stale(agents_file: Path) -> int:
-    """Remove stale session entries where PID is dead OR heartbeat expired.
+    """Remove stale entries: dead sessions AND completed feature entries.
 
-    An entry is stale if:
+    A session entry is stale if:
     - PID is dead (os.kill(pid, 0) fails), OR
     - last_checkpoint is older than _STALE_HEARTBEAT_MINUTES (PID recycling guard)
+
+    Feature entries with status "completed" are always removed (legacy
+    artifacts from release/stale-claim that used to mark-not-remove).
     """
     now = datetime.now(timezone.utc)
     removed = []
@@ -641,6 +650,10 @@ def cmd_cleanup_stale(agents_file: Path) -> int:
     def _do(items):
         keep = []
         for item in items:
+            # Purge completed feature entries (no useful data left)
+            if item.get("status") == "completed":
+                removed.append(item.get("feature_id", "?"))
+                continue
             if item.get("type") != "session":
                 keep.append(item)
                 continue
@@ -668,7 +681,7 @@ def cmd_cleanup_stale(agents_file: Path) -> int:
 
     _with_lock(agents_file, _do)
     if removed:
-        print(f"Cleaned {len(removed)} stale session(s): {', '.join(removed)}")
+        print(f"Cleaned {len(removed)} stale entry(ies): {', '.join(removed)}")
     return 0
 
 

@@ -2352,3 +2352,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-13 17:51 - AGENTS.json cleanup
+
+**Why**: Completed entries accumulated forever in AGENTS.json, cluttering dashboard
+
+**What changed**:
+- release() and stale-claim cleanup now remove entries instead of marking completed; cmd_list and cleanup_stale purge legacy completed entries
+
+**Next steps**:
+- PR review, merge
+
+**Blockers**: None
+
