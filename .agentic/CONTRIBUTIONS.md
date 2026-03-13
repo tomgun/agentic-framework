@@ -2776,8 +2776,26 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### Dialectical Review Is Not Optional — Gate Bypass Post-Mortem (F-0204, v0.55.0)
+
+**User insight**: The agent had a DRAFT plan in context, `plan_review_enabled: yes` in STACK.md, an explicit feedback memory saying "always review before implementing," and the user's last instruction was "start the plan review looping" — and the agent skipped all of it and jumped straight to implementation. Three redundant reinforcement layers (memory feedback, STACK.md setting, ag implement Step 0.5) all said STOP, and all were bypassed. The failure wasn't a missing rule — it was a missing detection mechanism at the one moment that matters: session start.
+
+**Design direction**: Don't add more rules — add structural detection. The dashboard already checks for interrupted WIP, pending upgrades, stale backlog items, and AC drift. Orphaned plans are the same class of problem: state that persists across sessions and requires action before new work starts. The user directed: reuse `plan-scan.sh --check --quiet` (already handles cross-project filtering, multi-tool support, dedup), surface it in the dashboard as step 1, and reinforce across all 5 instruction layers (dashboard, skill, checklist, memory-seed, auto_orchestration).
+
+**Key principle**: Rules-based enforcement fails when the agent never reaches the rule. The `ag implement` Step 0.5 safety net works — but only if the agent runs `ag implement`. When the agent skips the command entirely and starts writing code, the gate never fires. Detection at session start is the only reliable interception point because it runs unconditionally before any user instruction is processed.
+
+---
+
+### Epic Integration Verification Gate (F-0204, v0.55.0)
+
+**User insight**: When an epic's children all ship, `recompute_epic_status()` auto-derives the epic to "shipped" with no cross-component validation. Individual features pass their own tests but nothing verifies they work together. The user designed the dual-gate architecture: (1) `recompute_epic_status()` checks for a passing integration artifact before allowing "shipped" status, (2) `scheduler.run_epic()` post-completion hook triggers the verification. Gate is passive (reads artifact), trigger is active (runs tests). `derive_epic_status()` stays pure.
+
+**Design decisions**: Integration test commands resolved from epic AC file > STACK.md > skip (parallels existing `Test commands:` pattern). VerifyLoop reuse for test execution. Artifact-based state in session dir. `review_integration` setting (human/critical_agent/skip) follows established checkpoint pattern. Fail-closed on errors (revised from fail-open after dialectical review identified this as a silent bypass risk).
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.52.5
+**Current Version**: v0.55.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 50 behavioral test definitions
