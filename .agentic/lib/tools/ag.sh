@@ -878,30 +878,8 @@ cmd_implement() {
         fi
     fi
 
-    # 0c. Check plan-review (BLOCKING when enabled)
-    local plan_review_enabled
-    plan_review_enabled=$(get_plan_review_config "plan_review_enabled" "no")
-    if [ "$plan_review_enabled" = "yes" ]; then
-        local plan_file="$ROOT_DIR/.agentic/journal/plans/${feature_id}-plan.md"
-        if [ -f "$plan_file" ]; then
-            local plan_status
-            plan_status=$(grep -E "^\*\*Status\*\*:" "$plan_file" 2>/dev/null | head -1 | sed 's/.*Status\*\*:[[:space:]]*//' || echo "UNKNOWN")
-            if [ "$plan_status" != "APPROVED" ]; then
-                echo -e "${RED}BLOCKED: Plan exists but not approved (status: $plan_status)${NC}"
-                echo "  Complete the review loop: ag plan $feature_id"
-                exit 1
-            else
-                echo -e "${GREEN}Approved plan: EXISTS${NC}"
-            fi
-        else
-            echo -e "${RED}BLOCKED: No approved plan found (plan_review_enabled: yes)${NC}"
-            echo "  Run: ag plan $feature_id"
-            echo "  This starts the plan-review loop before implementation."
-            exit 1
-        fi
-    fi
-
-    # 0d. Auto-save plans from session-scoped tool directories to durable location
+    # 0c. Auto-save plans from session-scoped tool directories to durable location
+    # Must run BEFORE gate check so the gate can find auto-saved plans
     # Claude Code uses .claude/plans/, Cursor uses .cursor/plans/
     local durable_plan="$ROOT_DIR/.agentic/journal/plans/${feature_id}-plan.md"
     if [ ! -f "$durable_plan" ]; then
@@ -917,6 +895,39 @@ cmd_implement() {
                 fi
             done
         done
+    fi
+
+    # 0d. Check plan-review (BLOCKING when enabled)
+    local plan_review_enabled
+    plan_review_enabled=$(get_plan_review_config "plan_review_enabled" "no")
+    if [ "$plan_review_enabled" = "yes" ]; then
+        local plan_file="$ROOT_DIR/.agentic/journal/plans/${feature_id}-plan.md"
+        if [ -f "$plan_file" ]; then
+            local plan_status
+            plan_status=$(grep -E "^\*\*Status\*\*:" "$plan_file" 2>/dev/null | head -1 | sed 's/.*Status\*\*:[[:space:]]*//' || echo "UNKNOWN")
+            if [ "$plan_status" != "APPROVED" ]; then
+                echo -e "${RED}BLOCKED: Plan exists but not approved (status: $plan_status)${NC}"
+                echo ""
+                echo "  REQUIRED: Run dialectical review before implementing."
+                echo "  1. Spawn Critic + Advocate agents (see planning-features Step 5.5)"
+                echo "  2. Present synthesis to user"
+                echo "  3. After user says 'Proceed', update plan status to APPROVED"
+                echo "  4. Re-run: ag implement $feature_id"
+                echo ""
+                echo "  Do NOT assess the plan yourself — the review agents do this with fresh context."
+                exit 1
+            else
+                echo -e "${GREEN}Approved plan: EXISTS${NC}"
+            fi
+        else
+            echo -e "${RED}BLOCKED: No approved plan found (plan_review_enabled: yes)${NC}"
+            echo ""
+            echo "  1. Save your plan to .agentic/journal/plans/${feature_id}-plan.md with Status: DRAFT"
+            echo "  2. Run dialectical review (Critic + Advocate agents)"
+            echo "  3. After user approval, update Status to APPROVED"
+            echo "  4. Re-run: ag implement $feature_id"
+            exit 1
+        fi
     fi
 
     # 1. Spec-first gate (BLOCKING unless SKIP_SPEC_CHECK=1)

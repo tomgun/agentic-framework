@@ -2469,3 +2469,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-14 19:09 - Plan review bypass fix
+
+**Why**: Most repeated user feedback: agent skips review after plan mode exit
+
+**What changed**:
+- Dialectical review gate can no longer be bypassed after plan mode exit — ag.sh reordered, error messages carry review instructions, 9 instruction files updated with rationalization rebuttals
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+

@@ -1,11 +1,11 @@
 ---
 summary: "Action rules agents write to persistent memory at session start"
-tokens: ~1130
+tokens: ~1280
 ---
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.54.1 -->
+<!-- memory-seed v0.58.1 -->
 <!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
@@ -38,8 +38,18 @@ Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal
 
 **After exiting plan mode**: IMMEDIATELY continue with the post-plan-mode steps — do NOT wait for user to say "implement":
 1. Save plan to `.agentic/journal/plans/F-XXXX-plan.md` with status DRAFT (tool plan locations like `~/.claude/plans/` are session-scoped and WILL BE LOST)
-2. If `plan_review_enabled: yes` in STACK.md: run dialectical review — spawn Critic + Advocate agents in parallel (fresh context), synthesize both perspectives (with Revision Guidance), present to user. User decides: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject
-3. If review not enabled: set plan status to APPROVED directly
+2. Run `ag implement F-XXXX` — it will auto-save plans and enforce the review gate
+3. If `plan_review_enabled: yes`: `ag implement` blocks with `exit 1` and prints review instructions. Follow them: spawn Critic + Advocate agents in parallel (fresh context), synthesize both perspectives (with Revision Guidance), present to user. User decides: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject
+4. After user says "Proceed": update plan status to APPROVED, re-run `ag implement`
+5. If review not enabled: set plan status to APPROVED directly
+
+**Rationalizations that are WRONG (do not use):**
+- "The user created the plan, so it's reviewed" — plan mode = drafting, not reviewing
+- "Plan mode exit = approval" — ExitPlanMode = draft complete, not approved
+- "The user said 'implement'" — `ag implement` will block; it's the gate, not a shortcut
+- "Simple plan, review unnecessary" — review is structural, not discretionary
+- "I have it in context" — save durably, then `ag implement`
+- "ag implement told me to review, I'll assess it myself" — spawn Critic + Advocate, don't self-assess
 
 **When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/F-XXXX-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
 

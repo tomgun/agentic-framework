@@ -68,7 +68,7 @@ What would you like to work on?
 | User Request Pattern | Auto-Trigger | What To Do |
 |---------------------|--------------|------------|
 | (first message) | **Proactive Start** | Greet with context + options |
-| "implement F-####" / "build feature" / "create [feature]" | **Feature Pipeline** | Follow Feature Implementation flow (respects backlog order) |
+| "implement F-####" / "build feature" / "create [feature]" | **Feature Pipeline** | Follow Feature Implementation flow (respects backlog order). **After plan mode**: save plan as DRAFT → `ag implement` (blocks if not APPROVED) → dialectical review → APPROVED → re-run `ag implement`. |
 | "backlog" / "queue" / "what's next" / "prioritize" / "reorder" | **Backlog Management** | Run `ag backlog` to show queue; `ag backlog add/done/move/list` to manage |
 | "fix I-####" / "fix bug" / "fix issue" | **Issue Pipeline** | Follow Issue Resolution flow |
 | "commit" / "ready to commit" | **Before Commit** | Run `before_commit.md` checklist |
