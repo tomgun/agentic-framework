@@ -33,6 +33,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0038: PR #132: F-0187 Multi-Repo Umbrella
+- **Type**: review
+- **Added**: 2026-03-14
+- **Context**: https://github.com/tomgun/agentic-framework/pull/132 — multi-repo umbrella support (repo column, umbrella resolution, contract checking, input collection). 62 tests pass.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0035: PR #126: Orphaned plan detection at session start
