@@ -1,26 +1,12 @@
 [
   {
     "type": "feature",
-    "id": "F-0188",
-    "description": "End-to-End Autonomous Flow (ADR-001 Phase 6)",
-    "added_at": "2026-03-08T19:57:21Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0188.md"
-    ],
-    "notes": "Capstone. Children: F-0201, F-0202, F-0204, F-0206.",
-    "depends_on": [
-      "F-0186"
-    ],
-    "became_current_at": "2026-03-14T15:21:09Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0209",
     "description": "TDD Mode \u2014 Structural Test-First Enforcement",
     "added_at": "2026-03-11T16:40:39Z",
     "added_by": "agent",
-    "notes": "Investigation needed: can red-green-refactor be reliably enforced through skills? tdd_mode.md exists but isn't wired."
+    "notes": "Investigation needed: can red-green-refactor be reliably enforced through skills? tdd_mode.md exists but isn't wired.",
+    "became_current_at": "2026-03-14T16:17:30Z"
   },
   {
     "type": "feature",

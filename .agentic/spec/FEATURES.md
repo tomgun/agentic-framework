@@ -3151,7 +3151,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0188: End-to-End Autonomous Flow
 
-**Status**: planned
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: high
 **Complexity**: high

@@ -1,0 +1,26 @@
+{
+  "feature": "F-0188",
+  "mode": "feature",
+  "generated": "2026-03-14T16:17:06Z",
+  "commits": [
+    {"hash": "11f563d", "date": "2026-03-14", "message": "feat: end-to-end autonomous pipeline (F-0188) (#133)", "additions": 1112, "deletions": 22},
+    {"hash": "ead67c1", "date": "2026-03-14", "message": "chore: log PR #133 (F-0188) in HUMAN_NEEDED.md [state flush]", "additions": 11, "deletions": 17},
+    {"hash": "a8714ef", "date": "2026-03-11", "message": "chore: populate backlog with ADR-002 implementation order + update F-0183 ACs", "additions": 92, "deletions": 5},
+    {"hash": "ae0f651", "date": "2026-03-11", "message": "docs: add ADR-002 (User Involvement Modes) + register 6 new features", "additions": 350, "deletions": 1},
+    {"hash": "cc4f723", "date": "2026-03-11", "message": "docs: add autonomy pipeline gap analysis — 3 rounds reviewed, both agents approve", "additions": 618, "deletions": 0},
+    {"hash": "1f2a635", "date": "2026-03-08", "message": "Merge pull request #74 from tomgun/chore/adr-001-feature-decomposition", "additions": 0, "deletions": 0},
+    {"hash": "68abccd", "date": "2026-03-08", "message": "feat: decompose ADR-001 roadmap into 10 tracked features (F-0179–F-0188)", "additions": 370, "deletions": 0}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/lib/auto/kickoff.py"}, {"file": ".agentic/lib/auto/pipeline.py"}, {"file": ".agentic/lib/tools/ag.sh"}],
+    "tests": [{"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/acceptance/F-0179.md"}, {"file": ".agentic/spec/acceptance/F-0180.md"}, {"file": ".agentic/spec/acceptance/F-0181.md"}, {"file": ".agentic/spec/acceptance/F-0182.md"}, {"file": ".agentic/spec/acceptance/F-0183.md"}, {"file": ".agentic/spec/acceptance/F-0184.md"}, {"file": ".agentic/spec/acceptance/F-0185.md"}, {"file": ".agentic/spec/acceptance/F-0186.md"}, {"file": ".agentic/spec/acceptance/F-0187.md"}, {"file": ".agentic/spec/acceptance/F-0188.md"}, {"file": ".agentic/spec/adr/ADR-002-user-involvement-modes.md"}, {"file": "tests/test_e2e_autonomous.py"}],
+    "docs": [{"file": ".agentic/HUMAN_NEEDED.md"}, {"file": ".agentic/STATUS.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/journal/plans/2026-03-14-F-0188-plan.md"}, {"file": ".agentic/journal/plans/autonomy-pipeline-gap-analysis-plan.md"}, {"file": ".agentic/lib/DEVELOPER_GUIDE.md"}, {"file": ".agentic/lib/agents/claude/CLAUDE.md"}, {"file": ".agentic/lib/agents/codex/codex-instructions.md"}, {"file": ".agentic/lib/agents/copilot/copilot-instructions.md"}, {"file": ".agentic/lib/agents/cursor/cursorrules.txt"}, {"file": ".agentic/lib/agents/shared/agent_operating_guidelines.md"}, {"file": ".agentic/lib/agents/shared/auto_orchestration.md"}, {"file": ".agentic/lib/init/memory-seed.md"}, {"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/acceptance/F-0179.md"}, {"file": ".agentic/spec/acceptance/F-0180.md"}, {"file": ".agentic/spec/acceptance/F-0181.md"}, {"file": ".agentic/spec/acceptance/F-0182.md"}, {"file": ".agentic/spec/acceptance/F-0183.md"}, {"file": ".agentic/spec/acceptance/F-0184.md"}, {"file": ".agentic/spec/acceptance/F-0185.md"}, {"file": ".agentic/spec/acceptance/F-0186.md"}, {"file": ".agentic/spec/acceptance/F-0187.md"}, {"file": ".agentic/spec/acceptance/F-0188.md"}, {"file": ".agentic/spec/adr/ADR-002-user-involvement-modes.md"}, {"file": ".codex/instructions.md"}, {"file": ".github/copilot-instructions.md"}, {"file": "CLAUDE.md"}, {"file": "docs/HOW_IT_WORKS.md"}],
+    "config": [{"file": ".agentic/BACKLOG.json"}]
+  },
+  "stats": {
+    "total_commits": 10,
+    "total_files": 36,
+    "additions": 2553,
+    "deletions": 45
+  }
+}
