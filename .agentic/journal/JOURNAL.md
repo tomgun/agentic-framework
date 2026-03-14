@@ -2482,3 +2482,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-14 17:59 - F-0209 shipped
+
+**Why**: development_mode: tdd was a dead label with no enforcement
+
+**What changed**:
+- TDD mode is now a real behavioral mode with three enforcement layers: skill-level branching, --phase checkpoints, and completion gate blocking
+
+**Next steps**:
+- F-0210 next in backlog
+
+**Blockers**: None
+

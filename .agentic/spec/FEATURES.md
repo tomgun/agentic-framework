@@ -3568,7 +3568,7 @@ Write-ahead log for multi-step ag.sh operations (implement, done) with crash rec
 
 ## F-0209: TDD Mode — Structural Test-First Enforcement
 
-**Status**: planned
+**Status**: shipped
 **Category**: Quality
 **Priority**: medium
 **Complexity**: medium

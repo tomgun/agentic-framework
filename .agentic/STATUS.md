@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Fix: plan review bypass after plan mode exit (Updated: 2026-03-14 19:09 EET)
+- F-0209 shipped, F-0210 next (Updated: 2026-03-14 17:59 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item
