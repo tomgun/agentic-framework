@@ -42,6 +42,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0039: PR #133: F-0188 E2E Autonomous Pipeline
+- **Type**: review
+- **Added**: 2026-03-14
+- **Context**: End-to-end pipeline wiring kickoff→promote→epic→schedule. 14 tests, all instruction files updated.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0035: PR #126: Orphaned plan detection at session start

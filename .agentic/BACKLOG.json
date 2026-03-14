@@ -1,22 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0187",
-    "description": "Multi-Repo Umbrella (ADR-001 Phase 3)",
-    "added_at": "2026-03-08T19:57:20Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0187.md"
-    ],
-    "notes": "Cross-repo coordination. No longer prerequisite for F-0188.",
-    "depends_on": [
-      "F-0179",
-      "F-0186"
-    ],
-    "became_current_at": "2026-03-13T21:53:18Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0188",
     "description": "End-to-End Autonomous Flow (ADR-001 Phase 6)",
     "added_at": "2026-03-08T19:57:21Z",
@@ -27,7 +11,8 @@
     "notes": "Capstone. Children: F-0201, F-0202, F-0204, F-0206.",
     "depends_on": [
       "F-0186"
-    ]
+    ],
+    "became_current_at": "2026-03-14T15:21:09Z"
   },
   {
     "type": "feature",
