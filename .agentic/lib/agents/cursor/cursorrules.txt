@@ -25,7 +25,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Fix all tests / make tests pass / run test loop automatically | Suggest `ag auto verify` (add `--visual` if E2E screenshots configured) |
 | Implement autonomously / auto-implement / hands-off | Suggest `ag auto task F-XXXX` (needs acceptance criteria) |
 | Process all features / batch implement / implement everything | Suggest `ag auto crunch` (processes all planned features) |
-| Execute epic / implement all children of epic / run epic autonomously | Suggest `ag auto epic F-XXXX` | `ag auto pipeline` (executes epic's child features with component-scoped workers) |
+| Execute epic / implement all children of epic / run epic autonomously | Suggest `ag auto epic F-XXXX` or `ag auto pipeline` (executes epic's child features with component-scoped workers) |
 | Feedback / tested it / tried it / after testing / user reported | STOP -> Run `ag feedback "text"`. Classifies (bug/feature/ac-adjust/unclear), persists to FEEDBACK_LOG.md. `--bug`/`--feature`/`--ac` for direct routing. `ag feedback log` to view. |
 | Formalize / promote to formal / migrate TODOs to features | STOP -> Run `ag formalize` to list promotable items. `ag formalize T-XXXX` promotes specific items. `ag formalize --all` for bulk. |
 

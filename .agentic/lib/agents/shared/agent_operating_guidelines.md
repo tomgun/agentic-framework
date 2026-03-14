@@ -167,7 +167,8 @@ When the user wants hands-off execution, offer these:
 | **Verify + Visual** | `ag auto verify --visual` | Same + project has E2E screenshots configured |
 | **Task** | `ag auto task F-XXXX` | "implement this feature autonomously", "auto-implement" |
 | **Crunch** | `ag auto crunch` | "implement all planned features", "batch process features" |
-| **Epic** | `ag auto epic F-XXXX` | `ag auto pipeline` | "execute this epic", "implement all child features of F-XXXX" |
+| **Epic** | `ag auto epic F-XXXX` | "execute this epic", "implement all child features of F-XXXX" |
+| **Pipeline** | `ag auto pipeline` | "run full pipeline", "vision to shipped", "end-to-end autonomous" |
 
 **How they work**: Verify spawns fresh Claude instances to fix test failures in a loop. Task reads acceptance criteria, implements per-AC, runs verify, creates PR. Crunch runs task mode for each planned feature. Epic autonomously executes an epic's child features using component-scoped workers with non-blocking reviews.
 
