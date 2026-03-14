@@ -387,6 +387,7 @@ def cmd_check_tdd_phases(agents_file: Path) -> int:
         progress = item.get("progress", [])
         red_count = 0
         green_count = 0
+        refactor_count = 0
         for entry in progress:
             if not isinstance(entry, str):
                 continue
@@ -398,12 +399,10 @@ def cmd_check_tdd_phases(agents_file: Path) -> int:
                     print(f"GREEN before RED in {fid}: \"{entry}\"")
                     return 2
                 green_count += 1
+            elif entry.startswith("REFACTOR:"):
+                refactor_count += 1
 
-        # Check for zero phase entries across all active items
-        phase_count = red_count + green_count
-        for entry in progress:
-            if isinstance(entry, str) and entry.startswith("REFACTOR:"):
-                phase_count += 1
+        phase_count = red_count + green_count + refactor_count
         if phase_count == 0:
             fid = item.get("feature_id", "?")
             print(f"No TDD phase checkpoints in {fid}")
