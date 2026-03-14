@@ -4,7 +4,7 @@ components.py -- Component registry for multi-component projects.
 Parses an optional `## Components` table from STACK.md and provides
 component-scoped context filtering, test commands, and validation.
 
-@feature F-0179
+@feature F-0179, F-0187
 
 Usage:
     from auto.components import load_registry
@@ -16,6 +16,8 @@ Usage:
 from __future__ import annotations
 
 import re
+import sys
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -31,6 +33,7 @@ class Component:
     path: str        # Relative path from project root
     type: str        # e.g., "python", "typescript", "rust", "go"
     test_command: str  # e.g., "pytest packages/api/tests/"
+    repo: str | None = None  # Git URL for cross-repo components (F-0187)
 
 
 @dataclass
@@ -61,9 +64,15 @@ class ComponentRegistry:
         return best_match
 
     def validate(self) -> list[str]:
-        """Validate that component paths exist on disk. Returns error strings."""
+        """Validate that component paths exist on disk. Returns error strings.
+
+        Components with ``repo`` set are skipped — their paths may be outside
+        the project root and should be validated via ``resolve_umbrella`` instead.
+        """
         errors: list[str] = []
         for comp in self.components.values():
+            if comp.repo:
+                continue  # Cross-repo components validated by umbrella
             full_path = self.project_root / comp.path
             if not full_path.is_dir():
                 errors.append(
@@ -72,35 +81,54 @@ class ComponentRegistry:
                 )
         return errors
 
+    # -- F-0187: Multi-repo helpers ----------------------------------------
+
+    def is_multi_repo(self) -> bool:
+        """Return True if any component has a repo URL set."""
+        return any(c.repo for c in self.components.values())
+
+    def get_external_components(self) -> list[Component]:
+        """Return components with a repo URL (cross-repo)."""
+        return [c for c in self.components.values() if c.repo]
+
+    def get_local_components(self) -> list[Component]:
+        """Return components without a repo URL (local/monorepo)."""
+        return [c for c in self.components.values() if not c.repo]
+
 
 # ---------------------------------------------------------------------------
-# Parsing
+# Shared markdown table parser (F-0187)
 # ---------------------------------------------------------------------------
 
-def parse_components_table(content: str) -> list[Component]:
-    """Parse a `## Components` markdown table from STACK.md content.
+def parse_markdown_table(
+    content: str,
+    section_name: str,
+) -> tuple[list[str], list[list[str]]]:
+    """Parse a markdown table from a named ``## Section`` in markdown content.
 
-    Expected format:
-        ## Components
-        | name | path | type | test_command |
-        |------|------|------|--------------|
-        | api  | packages/api | python | pytest packages/api/tests/ |
+    Returns ``(column_names, rows)`` where column_names are lowercased header
+    strings and each row is a list of stripped cell strings.  Returns
+    ``([], [])`` if the section is not found or the table is empty.
     """
-    components: list[Component] = []
-
-    # Find the ## Components section
-    section_re = re.compile(r"^##\s+Components", re.MULTILINE)
+    # Find the ## <section_name> section (match with optional trailing text)
+    section_re = re.compile(
+        rf"^##\s+{re.escape(section_name)}\b", re.MULTILINE,
+    )
     match = section_re.search(content)
     if not match:
-        return components
+        return [], []
 
     # Extract section content (until next ## header or end of file)
     section_start = match.end()
     next_header = re.search(r"^##\s+", content[section_start:], re.MULTILINE)
-    section_text = content[section_start:section_start + next_header.start()] if next_header else content[section_start:]
+    section_text = (
+        content[section_start:section_start + next_header.start()]
+        if next_header
+        else content[section_start:]
+    )
 
-    # Parse markdown table rows
-    table_rows: list[str] = []
+    column_names: list[str] = []
+    rows: list[list[str]] = []
     header_found = False
     separator_found = False
 
@@ -112,34 +140,96 @@ def parse_components_table(content: str) -> list[Component]:
             continue
 
         if not header_found:
+            # Parse header row to get column names
+            column_names = [
+                c.strip().lower()
+                for c in stripped.strip("|").split("|")
+            ]
             header_found = True
-            continue  # Skip header row
+            continue
+
         if not separator_found:
-            # Skip separator row (|---|---|---|---|)
             if re.match(r"^\|[\s\-:|]+\|$", stripped):
                 separator_found = True
                 continue
-            # If no separator, treat as data row
             separator_found = True
 
-        table_rows.append(stripped)
+        # Data row
+        cells = [c.strip() for c in stripped.strip("|").split("|")]
+        rows.append(cells)
 
-    # Parse each data row
-    for row in table_rows:
-        cells = [c.strip() for c in row.strip("|").split("|")]
+    return column_names, rows
 
-        if len(cells) >= 4:
-            name = cells[0].strip()
-            path = cells[1].strip()
-            comp_type = cells[2].strip()
-            test_cmd = cells[3].strip()
-            if name and path:  # Require at least name and path
-                components.append(Component(
-                    name=name,
-                    path=path,
-                    type=comp_type,
-                    test_command=test_cmd,
-                ))
+
+# ---------------------------------------------------------------------------
+# Component table parsing
+# ---------------------------------------------------------------------------
+
+# Column name aliases (lowercased) -> Component field name
+_COMPONENT_COLUMN_MAP = {
+    "name": "name",
+    "path": "path",
+    "type": "type",
+    "test_command": "test_command",
+    "test command": "test_command",
+    "repo": "repo",
+}
+
+
+def parse_components_table(content: str) -> list[Component]:
+    """Parse a ``## Components`` markdown table from STACK.md content.
+
+    Supports both 4-column (legacy) and 5-column (with Repo) tables.
+    Column order does not matter — columns are matched by header name.
+    """
+    column_names, rows = parse_markdown_table(content, "Components")
+    if not column_names or not rows:
+        return []
+
+    # Map header positions to field names
+    col_map: dict[int, str] = {}
+    for i, col in enumerate(column_names):
+        field = _COMPONENT_COLUMN_MAP.get(col)
+        if field:
+            col_map[i] = field
+
+    # Require at least name and path columns
+    field_set = set(col_map.values())
+    if "name" not in field_set or "path" not in field_set:
+        return []
+
+    components: list[Component] = []
+    seen_names: set[str] = set()
+
+    for row in rows:
+        fields: dict[str, str] = {}
+        for i, cell in enumerate(row):
+            if i in col_map:
+                fields[col_map[i]] = cell.strip()
+
+        name = fields.get("name", "")
+        path = fields.get("path", "")
+        if not name or not path:
+            continue
+
+        if name in seen_names:
+            warnings.warn(
+                f"Duplicate component name '{name}' in Components table; "
+                f"keeping last occurrence",
+                stacklevel=2,
+            )
+            # Remove previous entry with same name
+            components = [c for c in components if c.name != name]
+
+        seen_names.add(name)
+        repo = fields.get("repo") or None  # Treat empty string as None
+        components.append(Component(
+            name=name,
+            path=path,
+            type=fields.get("type", ""),
+            test_command=fields.get("test_command", ""),
+            repo=repo,
+        ))
 
     return components
 

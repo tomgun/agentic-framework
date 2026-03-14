@@ -1,9 +1,10 @@
 """Tests for F-0179: Component Registry and Scoped Context.
 
-@feature F-0179
+@feature F-0179, F-0187
 """
 import sys
 import textwrap
+import warnings
 from pathlib import Path
 
 import pytest
@@ -18,6 +19,7 @@ from auto.components import (
     auto_detect_components,
     load_registry,
     parse_components_table,
+    parse_markdown_table,
 )
 
 
@@ -78,6 +80,63 @@ SAMPLE_STACK_COMMENTED = textwrap.dedent("""\
 
 
 # ---------------------------------------------------------------------------
+# parse_markdown_table (F-0187 shared helper)
+# ---------------------------------------------------------------------------
+
+class TestParseMarkdownTable:
+    """Test the shared markdown table parser."""
+
+    def test_parses_section(self):
+        content = textwrap.dedent("""\
+            ## MySection
+            | col_a | col_b |
+            |-------|-------|
+            | x     | y     |
+        """)
+        cols, rows = parse_markdown_table(content, "MySection")
+        assert cols == ["col_a", "col_b"]
+        assert rows == [["x", "y"]]
+
+    def test_returns_empty_for_missing_section(self):
+        cols, rows = parse_markdown_table("## Other\n", "Missing")
+        assert cols == []
+        assert rows == []
+
+    def test_returns_empty_for_empty_table(self):
+        content = textwrap.dedent("""\
+            ## MySection
+            | col_a | col_b |
+            |-------|-------|
+
+            ## Next
+        """)
+        cols, rows = parse_markdown_table(content, "MySection")
+        assert cols == ["col_a", "col_b"]
+        assert rows == []
+
+    def test_columns_are_lowercased(self):
+        content = textwrap.dedent("""\
+            ## Data
+            | Name | PATH | Type |
+            |------|------|------|
+            | a    | b    | c    |
+        """)
+        cols, rows = parse_markdown_table(content, "Data")
+        assert cols == ["name", "path", "type"]
+
+    def test_handles_section_with_trailing_text(self):
+        content = textwrap.dedent("""\
+            ## Components (optional, for monorepos)
+            | name | path |
+            |------|------|
+            | api  | src/ |
+        """)
+        cols, rows = parse_markdown_table(content, "Components")
+        assert cols == ["name", "path"]
+        assert len(rows) == 1
+
+
+# ---------------------------------------------------------------------------
 # parse_components_table
 # ---------------------------------------------------------------------------
 
@@ -93,6 +152,7 @@ class TestParseComponentsTable:
         assert api.path == "packages/api"
         assert api.type == "python"
         assert api.test_command == "pytest packages/api/tests/"
+        assert api.repo is None  # F-0187: no repo column
 
         web = components[1]
         assert web.name == "web"
@@ -134,6 +194,75 @@ class TestParseComponentsTable:
         components = parse_components_table(content)
         assert len(components) == 1
         assert components[0].name == "core"
+
+    # -- F-0187: 5-column table with Repo column ----------------------------
+
+    def test_parses_five_column_table_with_repo(self):
+        """AC-001: Repo column supported."""
+        content = textwrap.dedent("""\
+            ## Components
+            | name | path | repo | type | test_command |
+            |------|------|------|------|--------------|
+            | api  | ../api-service | https://github.com/org/api | python | pytest |
+            | web  | packages/web | | typescript | npm test |
+        """)
+        components = parse_components_table(content)
+        assert len(components) == 2
+
+        api = components[0]
+        assert api.name == "api"
+        assert api.path == "../api-service"
+        assert api.repo == "https://github.com/org/api"
+        assert api.type == "python"
+
+        web = components[1]
+        assert web.name == "web"
+        assert web.repo is None  # Empty repo = None
+
+    def test_reordered_columns(self):
+        """AC-001: Column order doesn't matter — header-aware parsing."""
+        content = textwrap.dedent("""\
+            ## Components
+            | type | name | test_command | repo | path |
+            |------|------|-------------|------|------|
+            | python | api | pytest | https://github.com/org/api | ../api |
+        """)
+        components = parse_components_table(content)
+        assert len(components) == 1
+        assert components[0].name == "api"
+        assert components[0].type == "python"
+        assert components[0].path == "../api"
+        assert components[0].repo == "https://github.com/org/api"
+        assert components[0].test_command == "pytest"
+
+    def test_test_command_with_space_header(self):
+        """'test command' (with space) is accepted as column name."""
+        content = textwrap.dedent("""\
+            ## Components
+            | name | path | type | test command |
+            |------|------|------|-------------|
+            | api  | src/api | python | pytest |
+        """)
+        components = parse_components_table(content)
+        assert len(components) == 1
+        assert components[0].test_command == "pytest"
+
+    def test_duplicate_component_name_warns(self):
+        """Duplicate names produce a warning and keep the last."""
+        content = textwrap.dedent("""\
+            ## Components
+            | name | path | type | test_command |
+            |------|------|------|--------------|
+            | api  | packages/api-v1 | python | pytest v1 |
+            | api  | packages/api-v2 | python | pytest v2 |
+        """)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            components = parse_components_table(content)
+            assert len(components) == 1
+            assert components[0].path == "packages/api-v2"
+            assert len(w) == 1
+            assert "Duplicate component name" in str(w[0].message)
 
 
 # ---------------------------------------------------------------------------
@@ -197,6 +326,39 @@ class TestComponentRegistry:
         assert comp is not None
         assert comp.name == "api-v2"
 
+    # -- F-0187: Multi-repo helpers ----------------------------------------
+
+    def test_is_multi_repo_false(self, registry):
+        """No repo fields → not multi-repo."""
+        assert registry.is_multi_repo() is False
+
+    def test_is_multi_repo_true(self, tmp_path):
+        components = {
+            "api": Component("api", "../api", "python", "", repo="https://github.com/org/api"),
+        }
+        reg = ComponentRegistry(components=components, project_root=tmp_path)
+        assert reg.is_multi_repo() is True
+
+    def test_get_external_components(self, tmp_path):
+        components = {
+            "api": Component("api", "../api", "python", "", repo="https://github.com/org/api"),
+            "web": Component("web", "packages/web", "typescript", ""),
+        }
+        reg = ComponentRegistry(components=components, project_root=tmp_path)
+        external = reg.get_external_components()
+        assert len(external) == 1
+        assert external[0].name == "api"
+
+    def test_get_local_components(self, tmp_path):
+        components = {
+            "api": Component("api", "../api", "python", "", repo="https://github.com/org/api"),
+            "web": Component("web", "packages/web", "typescript", ""),
+        }
+        reg = ComponentRegistry(components=components, project_root=tmp_path)
+        local = reg.get_local_components()
+        assert len(local) == 1
+        assert local[0].name == "web"
+
 
 # ---------------------------------------------------------------------------
 # Validation (AC-008)
@@ -222,6 +384,16 @@ class TestValidation:
         assert "packages/api" in errors[0]
         assert "does not exist" in errors[0]
 
+    def test_skips_cross_repo_components(self, tmp_path):
+        """F-0187: Components with repo set are skipped in validate()."""
+        components = {
+            "api": Component("api", "../api-service", "python", "",
+                             repo="https://github.com/org/api"),
+        }
+        reg = ComponentRegistry(components=components, project_root=tmp_path)
+        errors = reg.validate()
+        assert errors == []  # Skipped, not an error
+
 
 # ---------------------------------------------------------------------------
 # load_registry
@@ -246,6 +418,20 @@ class TestLoadRegistry:
         (tmp_path / "STACK.md").write_text(SAMPLE_STACK_WITHOUT_COMPONENTS)
         registry = load_registry(tmp_path)
         assert len(registry.list_all()) == 0
+
+    def test_loads_five_column_table(self, tmp_path):
+        """F-0187: 5-column table with Repo loads correctly."""
+        (tmp_path / "STACK.md").write_text(textwrap.dedent("""\
+            ## Components
+            | name | path | repo | type | test_command |
+            |------|------|------|------|--------------|
+            | api  | ../api | https://github.com/org/api | python | pytest |
+        """))
+        registry = load_registry(tmp_path)
+        assert len(registry.list_all()) == 1
+        api = registry.get("api")
+        assert api is not None
+        assert api.repo == "https://github.com/org/api"
 
 
 # ---------------------------------------------------------------------------
@@ -324,3 +510,13 @@ class TestAutoDetect:
         assert len(components) == 2
         names = {c.name for c in components}
         assert names == {"api", "web"}
+
+    def test_auto_detected_components_have_no_repo(self, tmp_path):
+        """F-0187: Auto-detected components always have repo=None."""
+        sub = tmp_path / "packages" / "api"
+        sub.mkdir(parents=True)
+        (sub / "pyproject.toml").write_text("[project]")
+
+        components = auto_detect_components(tmp_path)
+        assert len(components) == 1
+        assert components[0].repo is None

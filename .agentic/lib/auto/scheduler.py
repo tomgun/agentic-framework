@@ -333,6 +333,9 @@ class AutonomousScheduler:
         AC-003: When a feature has a component, the worker is scoped to that
         component's path via the component registry. This narrows the context
         the worker agent sees.
+
+        F-0187: For cross-repo components (repo field set), uses
+        resolve_umbrella() for availability checking and clone instructions.
         """
         # Resolve component-scoped project root if component is set
         work_root = self.project_root
@@ -341,9 +344,29 @@ class AutonomousScheduler:
             registry = load_registry(self.project_root)
             comp = registry.get(fw.component)
             if comp:
-                comp_path = self.project_root / comp.path
-                if comp_path.is_dir():
-                    work_root = comp_path
+                if comp.repo:
+                    # F-0187: Cross-repo component — use umbrella resolution
+                    from auto.umbrella import resolve_umbrella
+                    umbrella = resolve_umbrella(self.project_root)
+                    if umbrella and umbrella.missing_repos:
+                        missing_for_comp = [
+                            m for m in umbrella.missing_repos
+                            if comp.name in m
+                        ]
+                        if missing_for_comp:
+                            return TaskResult(
+                                success=False,
+                                error=missing_for_comp[0],
+                            )
+                    if umbrella:
+                        from auto.umbrella import get_component_root
+                        resolved = get_component_root(umbrella, fw.component)
+                        if resolved:
+                            work_root = resolved
+                else:
+                    comp_path = self.project_root / comp.path
+                    if comp_path.is_dir():
+                        work_root = comp_path
 
         runner = TaskRunner(
             project_root=work_root,

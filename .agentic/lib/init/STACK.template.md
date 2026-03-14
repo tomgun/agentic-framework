@@ -273,14 +273,32 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--       worktree: /path/to/worktree-2 -->
 <!-- When enabled, agents use Git worktrees and coordinate via .agentic/session/AGENTS.json -->
 
-## Components (optional, for monorepos)
+## Components (optional, for monorepos or multi-repo)
 <!-- Uncomment and fill for multi-component projects.
      Each component gets scoped context, test commands, and feature tracking.
      See: .agentic/lib/auto/components.py -->
+<!-- Monorepo (components in same repo — no Repo column needed): -->
 <!-- | name | path | type | test_command | -->
 <!-- |------|------|------|--------------|  -->
 <!-- | api  | packages/api | python | pytest packages/api/tests/ | -->
 <!-- | web  | packages/web | typescript | npm run test --workspace=web | -->
+<!--                                                                    -->
+<!-- Multi-repo umbrella (components in separate repos — add Repo column): -->
+<!-- | name | path | repo | type | test_command | -->
+<!-- |------|------|------|------|--------------|  -->
+<!-- | api  | ../api-service | https://github.com/org/api-service | python | pytest | -->
+<!-- | web  | ../web-app | https://github.com/org/web-app | typescript | npm test | -->
+<!-- | shared | packages/shared | | typescript | npm test | -->
+
+## Contracts (optional, for multi-component projects)
+<!-- Declare interface contracts between components.
+     The framework validates file existence and producer/consumer references.
+     Deep schema validation (OpenAPI compat, protobuf breaking changes) belongs in CI.
+     See: .agentic/lib/auto/umbrella.py -->
+<!-- | name | path | format | producer | consumers | -->
+<!-- |------|------|--------|----------|-----------|  -->
+<!-- | user-api | contracts/user-api.yaml | openapi | api | web, mobile | -->
+<!-- | events | contracts/events.proto | protobuf | api | analytics | -->
 
 ## Data & integrations
 - Primary datastore: <!-- postgres/sqlite/mongo/redis/etc -->
