@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Fix: ag done docs_gate exit code bug (Updated: 2026-03-14 16:25 UTC)
+- Fix: plan review bypass after plan mode exit (Updated: 2026-03-14 19:09 EET)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

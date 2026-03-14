@@ -51,6 +51,7 @@ Use the codebase to understand:
 ### Step 3: Create the Plan
 
 Write a plan covering:
+- **Status**: DRAFT (always start with `**Status**: DRAFT` as the first line)
 - **Problem**: What needs to be solved
 - **Approach**: How to solve it (with alternatives considered)
 - **Files to modify**: Specific files and what changes
@@ -81,6 +82,29 @@ multi-agent workflows. Even for single-agent work, this clarifies which
 ACs are independent.
 
 Skip this section for simple features (≤5 ACs) unless multi-agent dispatch is planned.
+
+### Step 4.5: Append Continuation Block (before exiting plan mode)
+
+Before calling ExitPlanMode, append this block to the plan:
+
+```markdown
+---
+## ⚠️ POST-PLAN-MODE ACTIONS (MANDATORY)
+
+Status: DRAFT. This plan is NOT approved for implementation.
+
+After plan mode exits:
+1. Save this plan to `.agentic/journal/plans/F-XXXX-plan.md`
+2. Run `ag implement F-XXXX` — the script will block and print review instructions
+3. Follow those instructions (dialectical review: Critic + Advocate agents)
+4. After user approves → update Status to APPROVED → re-run `ag implement`
+
+Exiting plan mode ≠ approval. Do NOT code, read implementation files, or explore.
+---
+```
+
+Replace `F-XXXX` with the actual feature ID. This block survives the turn boundary
+and directs the agent to the script gate after plan mode ends.
 
 ---
 

@@ -30,25 +30,26 @@ If `.agentic/BACKLOG.json` exists and has items, `ag implement F-XXXX` enforces 
 - If F-XXXX is in backlog but NOT at position 0: **BLOCKED** — work on the current item first, or reprioritize with `ag backlog move F-XXXX 0`
 - Override: `SKIP_BACKLOG=1 ag implement F-XXXX`
 
-### Step 0.5: Plan Gate (BLOCKING — plan before code)
+### Step 0.5: Plan Gate (BLOCKING — enforced by `ag implement`)
 
-Check for a plan at `.agentic/journal/plans/F-XXXX-plan.md`:
+**Your FIRST action must be `ag implement F-XXXX`.**
+This script (ag.sh) enforces the plan-review gate:
+- Auto-saves plans from ~/.claude/plans/ to durable location
+- Checks `**Status**: APPROVED` in `.agentic/journal/plans/F-XXXX-plan.md`
+- Blocks with `exit 1` + review instructions if not approved
 
-1. **Plan exists, status `APPROVED`** → proceed to Step 1
-2. **Plan exists, status `DRAFT`/`REVIEWING`/`REVISION_NEEDED`** → the review loop
-   was never completed. Run it now:
-   - Follow Step 5.5 from the `planning-features` skill (dialectical review)
-   - Wait for user approval before proceeding
-3. **No plan exists** → **STOP. Plan first.**
-   - Enter plan mode and follow the `planning-features` workflow (Phase 1: explore + create plan)
-   - After plan mode ends, save plan durably to `.agentic/journal/plans/F-XXXX-plan.md` with status `DRAFT`
-   - If `plan_review_enabled: yes` in STACK.md: run the dialectical review loop (Phase 2)
-   - Wait for user approval (status becomes `APPROVED`)
-   - Then return here and proceed to Step 1
+If `ag implement` blocks:
+- Follow its printed instructions (dialectical review: Critic + Advocate)
+- After user approves → update plan status → re-run `ag implement`
+- Do NOT self-assess the plan or code around the gate
+
+If you just exited plan mode:
+1. Save the plan to `.agentic/journal/plans/F-XXXX-plan.md` with `**Status**: DRAFT`
+2. Run `ag implement F-XXXX` — it will trigger the gate
 
 **Do NOT skip planning.** A plan is how you understand the feature scope, identify files to change, and avoid wasted work. Even simple features benefit from a quick plan — it takes minutes and saves hours.
 
-**Anti-pattern: Do NOT read implementation files before plan review.** When `plan_review_enabled: yes` and the plan is not yet APPROVED, your ONLY actions should be: (1) save the plan as DRAFT, (2) spawn Critic + Advocate agents. Do not read source files, explore the codebase, or make edits — the review agents do their own file reading with fresh context. Reading files "to prepare" wastes context and signals intent to skip the gate.
+**Anti-pattern: Do NOT read implementation files before plan review.** When `plan_review_enabled: yes` and the plan is not yet APPROVED, your ONLY actions should be: (1) save the plan as DRAFT, (2) run `ag implement` (it will block), (3) follow its printed review instructions. Do not read source files, explore the codebase, or make edits — the review agents do their own file reading with fresh context.
 
 ### Step 1: Verify Acceptance Criteria Exist
 

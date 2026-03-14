@@ -636,6 +636,18 @@ Two rules to prevent local/remote divergence in the first place:
 1. **Push main after committing to it.** Every direct-to-main commit (chores, hotfixes) should be pushed immediately — don't let local main drift ahead of origin. Unpushed commits on main are invisible to PRs and other agents.
 2. **Sync before branching.** Before creating a feature branch from main, always `git pull --rebase origin main` first. A branch created from stale main will have conflicts with content that's already on remote, leading to messy rebases and accidental content loss (as happened in the v0.52.2 dashboard PR).
 
+### LLM agents lose continuity at turn boundaries
+
+When a workflow spans turn boundaries (user message, skill re-matching, context compression), Phase N+1's instructions may not be active when Phase N+1 runs. Concrete example: plan mode exit ends the turn; the user's next message triggers fresh skill matching; planning-features Phase 2 (save + review) never activates.
+
+**Design principles for cross-turn enforcement:**
+1. **Embed enforcement in the artifact, not just instruction files.** The artifact survives turn boundaries because it's the work product, not guidance about the work product.
+2. **Route to script gates, don't replicate their logic textually.** Script gates (`exit 1`) create hard stops. Textual instructions create soft suggestions. Direct the agent to the script; don't ask it to perform the gate's logic itself.
+3. **Name rationalizations, don't just forbid behavior.** "Don't use excuses A, B, C" is harder to bypass than "don't skip step X."
+4. **Textual instructions have diminishing returns.** The 7th file saying "you MUST" has near-zero marginal effect. When the same instruction fails 3+ times, the fix is architectural (change routing), not editorial (add more text).
+
+Applied in: plan-review gate fix (ag.sh reorder, artifact-embedded continuation block, named rationalization rebuttals).
+
 ### Framework skills vs Task tool agents
 
 Framework roles (review, test, implementation) → invoked via `/review`, `/test` (Skill tool). Built-in agent types (Bash, general-purpose, Explore, Plan) → invoked via Agent tool. Completely separate systems.

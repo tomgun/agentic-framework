@@ -26,6 +26,24 @@ Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 - Multi-session safety: Before ANY destructive git op (stash, checkout ., restore ., reset --hard, clean -f), run `python3 .agentic/lib/tools/agents_helpers.py --project-root . count-others "$(pwd)" --pid $PPID`. If >0, DO NOT PROCEED — use a worktree or commit first.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 
+## After Plan Mode Exits (when `plan_review_enabled: yes`)
+
+Exiting plan mode creates a DRAFT. It does NOT approve the plan.
+
+After ExitPlanMode:
+1. Save plan to `.agentic/journal/plans/F-XXXX-plan.md` with `**Status**: DRAFT`
+2. Run `ag implement F-XXXX` — it will block and print dialectical review instructions
+3. Follow the review instructions (spawn Critic + Advocate agents)
+4. After user says "Proceed" → update `**Status**: APPROVED` → re-run `ag implement`
+
+**These rationalizations are WRONG — do not use them:**
+- "The user created the plan, so it's reviewed" — plan mode = drafting, not reviewing
+- "Plan mode exit = approval" — ExitPlanMode = draft complete, not approved
+- "The user said 'implement'" — `ag implement` will block; it's the gate, not a shortcut
+- "Simple plan, review unnecessary" — review is structural, not discretionary
+- "I have it in context" — save durably, then `ag implement`
+- "ag implement told me to review, I'll assess it myself" — spawn Critic + Advocate, don't self-assess
+
 ## Token-Efficient Scripts (ALWAYS use these, NEVER edit state files directly)
 
 - .agentic/STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
