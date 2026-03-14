@@ -74,8 +74,8 @@ If the project has a validation script:
 bash tests/validate_framework.sh
 ```
 
-**LLM test advisory** (framework development only):
-If this commit adds or changes `ag` commands, behavioral rules, trigger words, or agent workflows, check whether an LLM test should be added in `tests/llm/`. LLM tests verify that agents actually follow instructions — unit tests can't catch behavioral gaps. Review `tests/llm/test_definitions.json` for existing coverage.
+**LLM test required for behavioral changes** (framework development only):
+If this commit adds or changes `ag` commands, trigger words, or agent workflows, you MUST add an LLM test in `tests/llm/tests/` + entry in `test_definitions.json`. The LLM behavioral layer decides whether deterministic code ever gets called — without an LLM test, there's no verification that agents will actually invoke the feature. Unit tests validate infrastructure works; LLM tests validate agents use it.
 
 ### Step 5: Show Changes to Human
 

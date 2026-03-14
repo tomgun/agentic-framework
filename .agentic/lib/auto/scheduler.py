@@ -118,6 +118,9 @@ class AutonomousScheduler:
         on_feature_done: Optional[callable] = None,
         poll_interval: float = 10.0,
         max_poll_cycles: int = 360,  # 360 * 10s = 1 hour max wait
+        parallel: bool = False,
+        max_parallel: int = 0,
+        timeout: int = 600,
     ) -> None:
         self.project_root = project_root.resolve()
         self.paths = get_paths(project_root)
@@ -126,6 +129,9 @@ class AutonomousScheduler:
         self.on_feature_done = on_feature_done
         self.poll_interval = poll_interval
         self.max_poll_cycles = max_poll_cycles
+        self.parallel = parallel
+        self.max_parallel = max_parallel
+        self.timeout = timeout
 
     # -- Public API --------------------------------------------------------
 
@@ -145,6 +151,24 @@ class AutonomousScheduler:
         Returns:
             SchedulerResult with per-feature tracking.
         """
+        # F-0214: Delegate to parallel dispatcher when --parallel is set
+        if self.parallel:
+            from auto.parallel import ParallelDispatcher
+            max_p = self.max_parallel
+            if max_p <= 0:
+                from settings import get_setting
+                max_p = int(get_setting(
+                    self.project_root, "max_parallel_agents", "3",
+                ))
+            dispatcher = ParallelDispatcher(
+                project_root=self.project_root,
+                claude_command=self.claude_command,
+                max_parallel=max_p,
+                timeout=self.timeout,
+                skip_pr=skip_pr,
+            )
+            return dispatcher.run(feature_ids)
+
         result = SchedulerResult(success=False, features_total=len(feature_ids))
         if not feature_ids:
             result.stopped_reason = "no features to schedule"
@@ -634,6 +658,23 @@ def main() -> int:
         help="Skip PR creation per feature",
     )
     parser.add_argument(
+        "--parallel",
+        action="store_true",
+        help="Execute children in parallel worktrees (F-0214)",
+    )
+    parser.add_argument(
+        "--max-parallel",
+        type=int,
+        default=0,
+        help="Max concurrent agents (default: max_parallel_agents setting or 3)",
+    )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=600,
+        help="Per-feature timeout in seconds (default: 600)",
+    )
+    parser.add_argument(
         "--json",
         action="store_true",
         help="Output result as JSON",
@@ -656,6 +697,9 @@ def main() -> int:
     scheduler = AutonomousScheduler(
         project_root=args.project_root,
         on_feature_done=None if args.json else print_feature,
+        parallel=args.parallel,
+        max_parallel=args.max_parallel,
+        timeout=args.timeout,
     )
 
     if not args.json:

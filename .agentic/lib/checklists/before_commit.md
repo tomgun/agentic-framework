@@ -163,10 +163,10 @@ These checks apply only when working on the agentic framework repo itself:
   - Skills/checklists that reference the changed behavior
   - Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift
 
-- [ ] **LLM test coverage considered** (if behavioral changes)
-  - If this commit adds/changes `ag` commands, trigger words, or agent workflows
-  - Check `tests/llm/test_definitions.json` for existing coverage
-  - LLM tests verify agents actually follow instructions — unit tests can't catch behavioral gaps
+- [ ] **LLM test required** (if behavioral changes)
+  - If this commit adds/changes `ag` commands, trigger words, or agent workflows → MUST add LLM test
+  - The LLM layer decides if deterministic code gets called — no LLM test = no proof agents use the feature
+  - Add test in `tests/llm/tests/` + entry in `test_definitions.json`
 
 ---
 

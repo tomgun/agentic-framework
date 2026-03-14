@@ -98,6 +98,9 @@ Purpose: a single source of truth for "how we build and run software here".
 - feedback_mode: pr_review
 # How feedback is handled after testing. pr_review: agent logs, human classifies | working_software: agent auto-classifies, human confirms | automated: route immediately. Discovery: pr_review | Formal: pr_review | Autonomous Formal: working_software
 
+- max_parallel_agents: 3
+# Maximum concurrent Claude processes for parallel epic execution (F-0214). Range: 1-10. Discovery: 3 | Formal: 3 | Autonomous Formal: 3
+
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
 - Primary platform: <!-- web/service/mobile/desktop/cli -->

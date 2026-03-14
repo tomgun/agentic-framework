@@ -51,6 +51,31 @@ def build_claude_cmd(
     return cmd
 
 
+def spawn_claude_async(
+    claude_command: str,
+    project_root: Path,
+    prompt: str,
+    *,
+    print_mode: bool = True,
+    model: str | None = None,
+    log_path: Path | None = None,
+) -> subprocess.Popen:
+    """Non-blocking variant of spawn_claude(). Returns Popen for polling.
+
+    F-0214: Used by ParallelDispatcher to spawn concurrent Claude processes.
+    Output goes to log_path if provided, otherwise subprocess.PIPE.
+    """
+    cmd = build_claude_cmd(
+        claude_command, project_root, prompt,
+        print_mode=print_mode, model=model,
+    )
+    log_f = open(log_path, "w") if log_path else subprocess.PIPE
+    return subprocess.Popen(
+        cmd, cwd=str(project_root),
+        stdout=log_f, stderr=subprocess.STDOUT, text=True,
+    )
+
+
 def spawn_claude(
     claude_command: str,
     project_root: Path,
