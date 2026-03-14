@@ -4801,6 +4801,72 @@ fi
 echo ""
 
 # ============================================================
+echo "--- F-0214: Parallel Epic Execution with Worktrees ---"
+
+# T-0152: parallel.py exists with ParallelDispatcher class
+if grep -q 'class ParallelDispatcher' "${FRAMEWORK_ROOT}/.agentic/lib/auto/parallel.py" 2>/dev/null; then
+  pass "T-0152: parallel.py has ParallelDispatcher class"
+else
+  fail "T-0152: parallel.py missing ParallelDispatcher class"
+fi
+
+# T-0153: scheduler.py has --parallel flag in argparser
+if grep -q '\-\-parallel' "${FRAMEWORK_ROOT}/.agentic/lib/auto/scheduler.py"; then
+  pass "T-0153: scheduler.py has --parallel CLI flag"
+else
+  fail "T-0153: scheduler.py missing --parallel CLI flag"
+fi
+
+# T-0154: parallel.py uses worktree.sh for worktree management
+if grep -q 'worktree.sh' "${FRAMEWORK_ROOT}/.agentic/lib/auto/parallel.py" 2>/dev/null; then
+  pass "T-0154: parallel.py uses worktree.sh"
+else
+  fail "T-0154: parallel.py missing worktree.sh integration"
+fi
+
+# T-0155: parallel.py has signal handler for cleanup
+if grep -q 'signal.signal' "${FRAMEWORK_ROOT}/.agentic/lib/auto/parallel.py" 2>/dev/null; then
+  pass "T-0155: parallel.py has signal handler for cleanup"
+else
+  fail "T-0155: parallel.py missing signal handler"
+fi
+
+# T-0156: parallel.py uses AGENTS.json claim/release
+if grep -q 'claim' "${FRAMEWORK_ROOT}/.agentic/lib/auto/parallel.py" 2>/dev/null && \
+   grep -q 'release' "${FRAMEWORK_ROOT}/.agentic/lib/auto/parallel.py" 2>/dev/null; then
+  pass "T-0156: parallel.py has AGENTS.json claim/release"
+else
+  fail "T-0156: parallel.py missing AGENTS.json claim/release"
+fi
+
+# T-0157: parallel.py stores log_file on AgentProcess for proper cleanup
+if grep -q 'log_file' "${FRAMEWORK_ROOT}/.agentic/lib/auto/parallel.py" 2>/dev/null; then
+  pass "T-0157: parallel.py tracks log_file handle on AgentProcess"
+else
+  fail "T-0157: parallel.py missing log_file tracking (fd leak risk)"
+fi
+
+# T-0158: profiles.conf has max_parallel_agents
+if grep -q 'max_parallel_agents' "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf"; then
+  pass "T-0158: profiles.conf has max_parallel_agents setting"
+else
+  fail "T-0158: profiles.conf missing max_parallel_agents"
+fi
+
+# T-0159: test file exists
+if [[ -f "${FRAMEWORK_ROOT}/tests/test_auto_parallel.py" ]]; then
+  pass "T-0159: test_auto_parallel.py exists"
+else
+  fail "T-0159: test_auto_parallel.py missing"
+fi
+
+# T-0160: parallel.py has --skip-branch in prompt
+if grep -q 'skip-branch\|skip_branch' "${FRAMEWORK_ROOT}/.agentic/lib/auto/parallel.py" 2>/dev/null; then
+  pass "T-0160: parallel.py passes --skip-branch to task runner"
+else
+  fail "T-0160: parallel.py missing --skip-branch in prompt"
+fi
+
 # Summary
 # ============================================================
 echo ""

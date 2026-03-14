@@ -60,6 +60,14 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0041: PR #137: F-0214 Parallel Epic Execution
+- **Type**: pr_review
+- **Added**: 2026-03-14
+- **Context**: https://github.com/tomgun/agentic-framework/pull/137
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 ### HN-0035: PR #126: Orphaned plan detection at session start

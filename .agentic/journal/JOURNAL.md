@@ -2495,3 +2495,42 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-14 22:09 - F-0214 Parallel Epic Execution
+
+**Why**: Sequential epic execution bottleneck — 5 children × 10min = 50min serial vs 10min parallel
+
+**What changed**:
+- ParallelDispatcher creates worktrees, spawns concurrent Claude processes, rolling slot management; strengthened LLM test requirement from advisory to mandatory
+
+**Next steps**:
+- PR review, manual testing with real epic
+
+**Blockers**: None
+
+
+### Session: 2026-03-14 20:17 - F-0214 Review Fixes
+
+**Why**: Code review found file descriptor leak and dead code in parallel.py
+
+**What changed**:
+- Fixed fd leak in parallel dispatcher: log_file field on AgentProcess, removed dead spawn_claude_async, removed unused completed_ids
+
+**Next steps**:
+- Update CONTRIBUTIONS.md, merge PR
+
+**Blockers**: None
+
+
+### Session: 2026-03-14 20:17 - F-0214 CONTRIBUTIONS
+
+**Why**: Framework dev rule: CONTRIBUTIONS.md on every PR
+
+**What changed**:
+- Added F-0214 contribution entry documenting parallel epic design and code review fixes
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+

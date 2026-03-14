@@ -111,7 +111,7 @@ If the user says decompose, break down, split into children, break apart, subdiv
 
 If the user says execute epic, implement all children, run epic autonomously, process epic features, or wants to autonomously implement all child features of an epic:
 
-**STOP.** Run `ag auto epic F-XXXX`. This reads the epic's child features, schedules component-scoped workers with non-blocking reviews, and executes each child feature autonomously. Requires the epic to be decomposed first (children must exist in FEATURES.md with acceptance criteria).
+**STOP.** Run `ag auto epic F-XXXX`. This reads the epic's child features, schedules component-scoped workers with non-blocking reviews, and executes each child feature autonomously. Requires the epic to be decomposed first (children must exist in FEATURES.md with acceptance criteria). Add `--parallel` for concurrent execution in separate worktrees (F-0214): `ag auto epic F-XXXX --parallel [--max-parallel N] [--timeout N]`.
 
 ## When the user wants to run the full autonomous pipeline
 
@@ -252,4 +252,4 @@ Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 - **Smoke test before "done".** Actually run the feature. "Tests pass" does not mean "it works."
 - **Spec + code + tests + docs = done.** If code changes user-facing behavior, update all artifacts in the same commit. Run `docs.sh --validate` to check registry health (missing files, unregistered docs), `docs.sh --list` to see the registry, and `drift.sh --docs` to detect staleness. If your change touches a component with no registered doc, decide whether it needs one — use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold and auto-register. Don't defer updates to a follow-up.
 - **Framework dev only — instruction files are part of the feature.** When changing `ag` commands/gates/workflows, also update instruction files (CLAUDE.md templates, cursorrules, copilot, codex, agent_operating_guidelines, auto_orchestration, memory-seed, skills/checklists, DEVELOPER_GUIDE, HOW_IT_WORKS). Run `instruction-sync.sh` to detect drift.
-- **Framework dev only — LLM test advisory.** When committing behavioral changes (ag commands, trigger words, agent workflows), check whether `tests/llm/` needs coverage. Unit tests can't catch behavioral gaps.
+- **Framework dev only — LLM test required for behavioral changes.** When committing changes to `ag` commands, trigger words, or agent workflows, you MUST add an LLM test (`tests/llm/tests/` + `test_definitions.json`). The LLM behavioral layer decides whether deterministic code ever gets called — without an LLM test, there's no proof agents will use the feature. Unit tests validate infrastructure; LLM tests validate agents invoke it.

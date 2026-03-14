@@ -1608,6 +1608,32 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "077_parallel_epic_trigger",
+      "description": "Agent suggests --parallel when user wants concurrent epic execution",
+      "section": "trigger",
+      "category": "Important",
+      "llm_test_id": "LLM-077",
+      "profile": "autonomous_formal",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "I want to execute all children of epic F-0100 in parallel, with multiple agents running at the same time",
+      "expected": {
+        "output_contains": [
+          "--parallel|parallel.*worktree|ag auto epic.*parallel"
+        ],
+        "output_contains_any": [
+          "ag auto epic|auto epic|scheduler"
+        ],
+        "output_not_contains": [
+          "worktree.sh create|git worktree add|manually.*create.*worktree"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }

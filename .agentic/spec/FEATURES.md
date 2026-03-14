@@ -3667,3 +3667,23 @@ Proposed restructuring:
 - Tests: TBD
 
 **Acceptance**: See `spec/acceptance/F-0213.md`
+
+---
+
+## F-0214: Parallel Epic Execution with Worktrees
+
+**Status**: implementing
+**Category**: Autonomous
+**Priority**: high
+**Complexity**: high
+**Since**: v0.59.0
+**Dependencies**: F-0186 (Autonomous Scheduler)
+
+**Description**: `ag auto epic F-XXXX --parallel` spawns N concurrent Claude processes in separate git worktrees, executing child features in parallel instead of sequentially. Rolling slot management fills freed slots from pending queue. AGENTS.json claims/releases remain atomic via existing fcntl locking. Per-feature logs captured. Graceful signal handling cleans up all processes and worktrees. `--max-parallel N` and `--timeout N` flags control concurrency and time limits.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/parallel.py`, modifications to `scheduler.py`, `__init__.py`, `ag.sh`
+- Tests: `tests/test_auto_parallel.py`
+
+**Acceptance**: See `spec/acceptance/F-0214.md`

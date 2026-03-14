@@ -1,6 +1,6 @@
 # Key Insights: What Actually Works for AI Agent Control
 
-**Purpose**: Strategic lessons from v0.1.0 through v0.53.2 (~1400 commits) of framework development. Not tactical mistakes (those are in `FRAMEWORK_DEVELOPMENT.md` § Lessons Learned) — these are the **design patterns that make AI agents reliably productive**.
+**Purpose**: Strategic lessons from v0.1.0 through v0.59.0 (~1500 commits) of framework development. Not tactical mistakes (those are in `FRAMEWORK_DEVELOPMENT.md` § Lessons Learned) — these are the **design patterns that make AI agents reliably productive**.
 
 **Audience**: Anyone building an agentic coding workflow — whether using this framework or designing their own.
 
@@ -25,6 +25,7 @@
 | 11 | [Revision Guidance — Don't Trust the Critic Blindly](#11-revision-guidance--dont-trust-the-critic-blindly) | Critic finds real issues but proposes wrong fixes — planner must judge | Prevents removing features that were the whole point |
 | 12 | [LLM-Optimized Formats](#12-llm-optimized-formats-for-everything) | Structure all files so LLMs parse them efficiently — frontmatter, markdown, tables | Faster parsing, fewer misunderstandings, less re-reading |
 | 13 | [Plans Are Never Done After One Pass](#13-plans-are-never-done-after-one-pass) | AI plans are impressive but always have gaps — multi-round review is essential, not optional | Catches flaws that cost 10x more to fix in code |
+| 14 | [Cross-Turn Workflows Need Artifact-Embedded Enforcement](#14-cross-turn-workflows-need-artifact-embedded-enforcement) | Instruction files lose effect at turn boundaries — embed enforcement in the artifact itself | Prevents agents from skipping multi-turn workflows |
 
 **Meta-lesson**: structural enforcement > behavioral instructions > hope.
 
@@ -299,6 +300,24 @@ Design your workflow around this reality. Every valuable output must reach a git
 
 ---
 
+## 14. Cross-Turn Workflows Need Artifact-Embedded Enforcement
+
+**The problem**: Multi-step workflows that span turn boundaries (plan mode exit → user's next message → skill re-matching) are the hardest thing to enforce with instruction files alone. Each turn boundary is a potential discontinuity — the agent may not have the same instructions active when Phase N+1 starts as when Phase N ended. The plan-review gate was the hardest behavioral fix in the framework: despite the rule existing in 9+ instruction files, the agent would exit plan mode and immediately start coding, completely skipping the mandatory dialectical review.
+
+**What failed**: Adding the rule to more instruction files (skills, memory-seed, checklists, CLAUDE.md, agent guidelines — 9+ files total), adding anti-pattern warnings, and relying on a script gate that had a sequencing bug. Each approach was insufficient alone. The detailed case study with all 4 failed attempts and the specific fixes is in `FRAMEWORK_DEVELOPMENT.md` § "LLM agents lose continuity at turn boundaries."
+
+**What finally worked (three changes together — no single one was sufficient):**
+
+1. **Fix the plumbing first.** A sequencing bug in the script gate meant it checked for the plan file before auto-saving it from the session-scoped directory. Fix the infrastructure before adding more signs — no amount of instruction text can compensate for a structurally broken gate.
+2. **Embed enforcement in the artifact.** Added mandatory next-steps directly into the plan output itself (status: DRAFT, 4 steps to follow). The artifact survives turn boundaries because it's the work product, not guidance about the work product.
+3. **Name the rationalizations.** Listed the 6 specific excuses the agent invents to skip review ("plan mode exit = approval", "simple plan, review unnecessary", etc.) as explicitly wrong in CLAUDE.md. Named rationalizations are harder to use than unnamed ones.
+
+**The meta-lesson**: For workflows that span turn boundaries, enforcement must live in three layers simultaneously: (a) a working script gate (structural — cannot be bypassed), (b) instructions embedded in the work artifact itself (survives turn boundaries), and (c) named rationalization rebuttals (makes self-deception harder). Instruction files alone — no matter how many — are insufficient because they exist outside the artifact and may not be active when the next turn begins. When the same textual instruction fails 3+ times, the fix is architectural, not editorial.
+
+**See**: `FRAMEWORK_DEVELOPMENT.md` § "LLM agents lose continuity at turn boundaries" (full case study), `docs/INSTRUCTION_ARCHITECTURE.md` §5 (principle 8)
+
+---
+
 ## Summary: The Pattern
 
 These insights form a coherent pattern:
@@ -318,6 +337,7 @@ Tiny instruction file (50 lines)     → agent reads it all, reliably
   + Revision guidance                → accept findings, prescribe your own fixes
   + LLM-optimized formats            → structure files for AI consumption
   + Plans are never done in one pass → review loop is essential, not optional
+  + Artifact-embedded enforcement    → cross-turn workflows survive boundaries
 ```
 
 The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation.

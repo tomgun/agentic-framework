@@ -157,6 +157,7 @@ If you added or changed an `ag` command, gate, workflow, or behavioral rule, als
 - Orchestration: agent_operating_guidelines.md, auto_orchestration.md
 - Onboarding: memory-seed.md, DEVELOPER_GUIDE.md, HOW_IT_WORKS.md
 - Skills/checklists that reference the changed behavior
+- **LLM test required**: Add `tests/llm/tests/XXX_*.sh` + entry in `test_definitions.json`. The LLM layer decides if deterministic code gets called — no LLM test = no proof agents use the feature.
 
 Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift.
 
