@@ -236,27 +236,50 @@ class TestSchedulerParallelFlag:
         assert result.success is True
 
 
-class TestSpawnClaudeAsync:
-    """Test the async spawn helper in auto/__init__.py."""
+class TestCloseLog:
+    """Verify log file handles are properly closed."""
 
-    @patch("auto.build_claude_cmd", return_value=["claude", "--print", "test"])
-    @patch("subprocess.Popen")
-    def test_spawn_claude_async_returns_popen(self, mock_popen, mock_build):
-        from auto import spawn_claude_async
-        result = spawn_claude_async("claude", Path("/tmp"), "test prompt")
-        mock_popen.assert_called_once()
-        assert result == mock_popen.return_value
-
-    @patch("auto.build_claude_cmd", return_value=["claude", "--print", "test"])
-    @patch("subprocess.Popen")
-    def test_spawn_claude_async_with_log_path(self, mock_popen, mock_build,
-                                              tmp_path):
-        from auto import spawn_claude_async
-        log = tmp_path / "test.log"
-        result = spawn_claude_async(
-            "claude", Path("/tmp"), "test", log_path=log,
+    def test_close_log_closes_file_handle(self, mock_get_paths):
+        mock_file = MagicMock()
+        mock_file.closed = False
+        agent = AgentProcess(
+            feature_id="F-0001",
+            worktree_path="/tmp/wt",
+            branch_name="feature/F-0001",
+            process=MagicMock(),
+            start_time=time.time(),
+            log_path=Path("/tmp/log"),
+            log_file=mock_file,
         )
-        mock_popen.assert_called_once()
-        # stdout should be a file object, not PIPE
-        call_kwargs = mock_popen.call_args
-        assert call_kwargs[1]["text"] is True
+        d = ParallelDispatcher(Path("/tmp/test"))
+        d._close_log(agent)
+        mock_file.close.assert_called_once()
+
+    def test_close_log_skips_already_closed(self, mock_get_paths):
+        mock_file = MagicMock()
+        mock_file.closed = True
+        agent = AgentProcess(
+            feature_id="F-0001",
+            worktree_path="/tmp/wt",
+            branch_name="feature/F-0001",
+            process=MagicMock(),
+            start_time=time.time(),
+            log_path=Path("/tmp/log"),
+            log_file=mock_file,
+        )
+        d = ParallelDispatcher(Path("/tmp/test"))
+        d._close_log(agent)
+        mock_file.close.assert_not_called()
+
+    def test_close_log_handles_no_file(self, mock_get_paths):
+        agent = AgentProcess(
+            feature_id="F-0001",
+            worktree_path="/tmp/wt",
+            branch_name="feature/F-0001",
+            process=MagicMock(),
+            start_time=time.time(),
+            log_path=Path("/tmp/log"),
+            log_file=None,
+        )
+        d = ParallelDispatcher(Path("/tmp/test"))
+        d._close_log(agent)  # should not raise

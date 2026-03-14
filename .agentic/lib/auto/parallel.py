@@ -36,6 +36,7 @@ class AgentProcess:
     process: subprocess.Popen
     start_time: float
     log_path: Path
+    log_file: Optional[object] = None  # file handle for log output
     status: str = "running"  # running | completed | failed | timed_out
 
 
@@ -92,7 +93,6 @@ class ParallelDispatcher:
             result.feature_work.append(fw)
 
         pending = list(feature_ids)
-        completed_ids: list[str] = []
         self._log_dir.mkdir(parents=True, exist_ok=True)
 
         print(
@@ -149,7 +149,6 @@ class ParallelDispatcher:
                             )
                         self._release_claim(agent.feature_id)
                         self._cleanup_worktree(agent.feature_id)
-                        completed_ids.append(agent.feature_id)
 
                     elif elapsed > self.timeout:
                         # Timeout
@@ -167,7 +166,6 @@ class ParallelDispatcher:
                         )
                         self._release_claim(agent.feature_id)
                         self._cleanup_worktree(agent.feature_id)
-                        completed_ids.append(agent.feature_id)
 
                 # Remove finished from active
                 for agent in finished:
@@ -240,6 +238,7 @@ class ParallelDispatcher:
         )
 
         # Spawn
+        log_f = None
         try:
             log_f = open(log_path, "w")
             proc = subprocess.Popen(
@@ -250,6 +249,8 @@ class ParallelDispatcher:
                 text=True,
             )
         except (OSError, subprocess.SubprocessError) as e:
+            if log_f:
+                log_f.close()
             print(
                 f"  [{feature_id}] spawn failed: {e}",
                 file=sys.stderr,
@@ -273,6 +274,7 @@ class ParallelDispatcher:
             process=proc,
             start_time=time.time(),
             log_path=log_path,
+            log_file=log_f,
         )
 
     def _build_prompt(self, feature_id: str) -> str:
@@ -386,10 +388,10 @@ class ParallelDispatcher:
             pass
 
     def _close_log(self, agent: AgentProcess) -> None:
-        """Close the log file descriptor if the process stdout is a file."""
+        """Close the log file handle."""
         try:
-            if agent.process.stdout and not agent.process.stdout.closed:
-                agent.process.stdout.close()
+            if agent.log_file and not agent.log_file.closed:
+                agent.log_file.close()
         except (OSError, AttributeError):
             pass
 

@@ -2508,3 +2508,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-14 20:17 - F-0214 Review Fixes
+
+**Why**: Code review found file descriptor leak and dead code in parallel.py
+
+**What changed**:
+- Fixed fd leak in parallel dispatcher: log_file field on AgentProcess, removed dead spawn_claude_async, removed unused completed_ids
+
+**Next steps**:
+- Update CONTRIBUTIONS.md, merge PR
+
+**Blockers**: None
+

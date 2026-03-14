@@ -4839,11 +4839,11 @@ else
   fail "T-0156: parallel.py missing AGENTS.json claim/release"
 fi
 
-# T-0157: __init__.py has spawn_claude_async
-if grep -q 'spawn_claude_async' "${FRAMEWORK_ROOT}/.agentic/lib/auto/__init__.py"; then
-  pass "T-0157: auto/__init__.py has spawn_claude_async"
+# T-0157: parallel.py stores log_file on AgentProcess for proper cleanup
+if grep -q 'log_file' "${FRAMEWORK_ROOT}/.agentic/lib/auto/parallel.py" 2>/dev/null; then
+  pass "T-0157: parallel.py tracks log_file handle on AgentProcess"
 else
-  fail "T-0157: auto/__init__.py missing spawn_claude_async"
+  fail "T-0157: parallel.py missing log_file tracking (fd leak risk)"
 fi
 
 # T-0158: profiles.conf has max_parallel_agents
