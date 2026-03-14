@@ -31,8 +31,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 
-import yaml
-
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 sys.path.insert(0, str(_LIB_DIR / "tools"))
@@ -113,12 +111,24 @@ class VerifyResult:
 # Scenario loading
 # ---------------------------------------------------------------------------
 
+def _load_yaml(text: str) -> dict[str, Any]:
+    """Load YAML text, importing PyYAML lazily."""
+    try:
+        import yaml
+    except ImportError:
+        raise ImportError(
+            "PyYAML is required for framework verification. "
+            "Install with: pip install pyyaml"
+        )
+    return yaml.safe_load(text)
+
+
 def load_scenario(name: str) -> dict[str, Any]:
     """Load a scenario YAML by slug name (e.g. 'todo_app')."""
     path = SCENARIOS_DIR / f"{name}.yaml"
     if not path.exists():
         raise FileNotFoundError(f"Scenario not found: {path}")
-    return yaml.safe_load(path.read_text())
+    return _load_yaml(path.read_text())
 
 
 def list_scenarios() -> list[str]:
@@ -358,6 +368,12 @@ def _write_stack_md(
         lines.append(f"- docs_mode: {settings['docs_mode']}")
     if "review_merge" in settings:
         lines.append(f"- review_merge: {settings['review_merge']}")
+    # Formal profiles need these for the full workflow to exercise
+    profile = settings.get("profile", "discovery")
+    if profile in ("formal", "autonomous_formal"):
+        lines.append("- plan_review_enabled: no")
+        lines.append("- acceptance_criteria: blocking")
+        lines.append("- review_commit: skip")
 
     lines.extend([
         "",
@@ -508,6 +524,14 @@ class FrameworkVerifier:
                 "Clean up first: git worktree remove + git branch -D"
             )
 
+        # 4. No stale AG_TRUNK_BRANCH from a previous run
+        if os.environ.get("AG_TRUNK_BRANCH"):
+            errors.append(
+                "AG_TRUNK_BRANCH env var is already set "
+                f"({os.environ['AG_TRUNK_BRANCH']}). "
+                "Another verify run may be active."
+            )
+
         return errors
 
     # -- VW management -------------------------------------------------------
@@ -561,6 +585,19 @@ class FrameworkVerifier:
         # Clean env
         os.environ.pop("AG_TRUNK_BRANCH", None)
 
+    def _cleanup_agents_json(self, scenario_name: str) -> None:
+        """Remove stale AGENTS.json entries from prior scenario attempts."""
+        try:
+            agents_helper = _LIB_DIR / "tools" / "agents_helpers.py"
+            if agents_helper.exists():
+                subprocess.run(
+                    ["python3", str(agents_helper),
+                     "--project-root", str(self.project_root), "cleanup-stale"],
+                    capture_output=True, text=True, timeout=10,
+                )
+        except Exception:
+            pass  # Best-effort cleanup
+
     # -- Run scenario --------------------------------------------------------
 
     def run_scenario(
@@ -582,6 +619,9 @@ class FrameworkVerifier:
                 return run
 
             run.retries = retry
+
+            # Clean up stale AGENTS.json entries from prior attempts
+            self._cleanup_agents_json(name)
 
             # Create fresh project
             project_dir = Path(tempfile.mkdtemp(
@@ -761,7 +801,8 @@ def main() -> None:
     )
     parser.add_argument("--project-root", required=True, help="Framework repo root")
     parser.add_argument("--project", help="Run single scenario by slug name")
-    parser.add_argument("--all", action="store_true", help="Run all scenarios")
+    parser.add_argument("--all", action="store_true", dest="run_all",
+                        help="Run all scenarios")
     parser.add_argument("--settings-index", type=int, default=None,
                         help="Run specific settings combo by index")
     parser.add_argument("--json", action="store_true", dest="json_output",
@@ -772,11 +813,11 @@ def main() -> None:
 
     project_root = Path(args.project_root).resolve()
 
-    if not args.project and not args.all:
+    if not args.project and not args.run_all:
         parser.error("Specify --project <name> or --all")
 
     # Load scenarios
-    if args.all:
+    if args.run_all:
         scenario_names = list_scenarios()
     elif args.project:
         scenario_names = [args.project]
