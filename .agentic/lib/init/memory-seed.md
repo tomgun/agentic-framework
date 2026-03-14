@@ -41,12 +41,13 @@ Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal
 2. If `plan_review_enabled: yes` in STACK.md: run dialectical review — spawn Critic + Advocate agents in parallel (fresh context), synthesize both perspectives (with Revision Guidance), present to user. User decides: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject
 3. If review not enabled: set plan status to APPROVED directly
 
-**When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-<slug>-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
+**When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/F-XXXX-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
 
 Then:
-1. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
-2. `ag implement` requires an approved plan — if no plan exists, it triggers the planning workflow first (plan → save → review → approve). If plan exists but status is not APPROVED, it triggers review first
-3. Only proceed to implementation after the plan is APPROVED (or if review is disabled)
+1. If `plan_review_enabled: yes`: run dialectical review IMMEDIATELY — save plan as DRAFT, spawn Critic + Advocate, present synthesis, wait for user decision. **Do NOT read implementation files, explore code, or make edits before the plan is APPROVED.** The review agents read files themselves with fresh context.
+2. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
+3. `ag implement` requires an approved plan — if no plan exists, it triggers the planning workflow first (plan → save → review → approve). If plan exists but status is not APPROVED, it triggers review first
+4. Only proceed to implementation after the plan is APPROVED (or if review is disabled)
 
 ## When the user reports a bug or wants a fix
 

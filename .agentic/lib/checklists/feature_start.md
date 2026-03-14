@@ -28,6 +28,27 @@ This gate is enforced automatically by `ag implement`. You don't need to check m
 
 ---
 
+## GATE 0.5: Plan Review (BLOCKING when `plan_review_enabled: yes`)
+
+```
+□ Does .agentic/journal/plans/F-####-plan.md exist?
+  ├─ YES → Is Status: APPROVED?
+  │         ├─ YES → Proceed to Gate 1
+  │         └─ NO (DRAFT/REVIEWING/REVISION_NEEDED) →
+  │              🛑 STOP. Run dialectical review NOW.
+  │              1. Spawn Critic + Advocate agents (parallel, fresh context)
+  │              2. Synthesize with Revision Guidance
+  │              3. Present to user for decision
+  │              4. Wait for APPROVED before proceeding
+  └─ NO  → Is plan_review_enabled: yes?
+           ├─ YES → 🛑 STOP. Plan first (use planning-features skill)
+           └─ NO  → Proceed to Gate 1 (plan optional)
+```
+
+**Anti-pattern**: Do NOT read implementation files, explore the codebase, or make ANY edits before the plan is APPROVED. The review agents read files themselves with fresh context. Your only actions before approval: save plan → spawn reviewers → present synthesis.
+
+---
+
 ## GATE 1: Acceptance Criteria (BLOCKING)
 
 ```

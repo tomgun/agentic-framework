@@ -30,7 +30,7 @@ If `.agentic/BACKLOG.json` exists and has items, `ag implement F-XXXX` enforces 
 - If F-XXXX is in backlog but NOT at position 0: **BLOCKED** — work on the current item first, or reprioritize with `ag backlog move F-XXXX 0`
 - Override: `SKIP_BACKLOG=1 ag implement F-XXXX`
 
-### Step 0.5: Plan Gate (plan before code)
+### Step 0.5: Plan Gate (BLOCKING — plan before code)
 
 Check for a plan at `.agentic/journal/plans/F-XXXX-plan.md`:
 
@@ -47,6 +47,8 @@ Check for a plan at `.agentic/journal/plans/F-XXXX-plan.md`:
    - Then return here and proceed to Step 1
 
 **Do NOT skip planning.** A plan is how you understand the feature scope, identify files to change, and avoid wasted work. Even simple features benefit from a quick plan — it takes minutes and saves hours.
+
+**Anti-pattern: Do NOT read implementation files before plan review.** When `plan_review_enabled: yes` and the plan is not yet APPROVED, your ONLY actions should be: (1) save the plan as DRAFT, (2) spawn Critic + Advocate agents. Do not read source files, explore the codebase, or make edits — the review agents do their own file reading with fresh context. Reading files "to prepare" wastes context and signals intent to skip the gate.
 
 ### Step 1: Verify Acceptance Criteria Exist
 
