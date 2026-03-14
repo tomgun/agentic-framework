@@ -1406,9 +1406,9 @@ cmd_done() {
 
         # Registry validation (registered-but-missing + unregistered docs)
         echo ""
+        local validate_exit=0
         if [[ -f "$SCRIPT_DIR/docs.sh" ]]; then
-            bash "$SCRIPT_DIR/docs.sh" --validate 2>/dev/null
-            local validate_exit=$?
+            bash "$SCRIPT_DIR/docs.sh" --validate 2>/dev/null || validate_exit=$?
         fi
 
         # In deferred mode, skip the blocking prompt (drift check still runs for awareness)

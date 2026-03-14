@@ -2456,3 +2456,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-14 16:25 - ag done docs_gate fix
+
+**Why**: set -e killed ag done before reaching flush, leaving FEATURES.md dirty
+
+**What changed**:
+- ag done no longer aborts when docs.sh --validate exits non-zero — VERSION bump and state flush now run reliably
+
+**Next steps**:
+- None
+
+**Blockers**: None
+
