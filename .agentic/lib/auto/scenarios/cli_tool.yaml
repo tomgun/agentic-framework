@@ -1,0 +1,30 @@
+name: "CLI Tool"
+description: "Command-line tool with subcommands and configuration"
+type: single
+timeout: 600
+
+stack:
+  language: python
+  framework: click
+  test_runner: pytest
+
+vision: |
+  Build a command-line file organizer tool with:
+  - Subcommands: organize, search, stats
+  - Configuration file support (YAML)
+  - File type detection and categorization
+  - Unit tests for each subcommand
+
+settings_matrix:
+  - profile: discovery
+    git_workflow: direct
+    docs_mode: deferred
+  - profile: autonomous_formal
+    git_workflow: pull_request
+    review_merge: skip
+
+required_milestones:
+  - kickoff_complete
+  - features_specced
+  - implementation_done
+  - verification_green

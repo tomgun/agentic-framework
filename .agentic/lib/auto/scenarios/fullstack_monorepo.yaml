@@ -1,0 +1,40 @@
+name: "Fullstack Monorepo"
+description: "React frontend + FastAPI backend + shared types in one repo"
+type: monorepo
+timeout: 1200
+
+components:
+  - name: api
+    path: packages/api
+    type: python
+    framework: fastapi
+    test_command: "pytest packages/api/tests/"
+  - name: web
+    path: packages/web
+    type: typescript
+    framework: react
+    test_command: "npm run test --workspace=web"
+  - name: shared
+    path: packages/shared
+    type: typescript
+    test_command: "npm run test --workspace=shared"
+
+vision: |
+  Build a fullstack task management app:
+  - React frontend with task list and creation form
+  - FastAPI backend with REST endpoints
+  - Shared TypeScript types between frontend and API client
+  - Integration tests verifying frontend-to-backend flow
+
+settings_matrix:
+  - profile: formal
+    git_workflow: pull_request
+    review_merge: skip
+
+required_milestones:
+  - kickoff_complete
+  - features_specced
+  - component_features_scoped
+  - implementation_done
+  - integration_verified
+  - verification_green

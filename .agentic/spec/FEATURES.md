@@ -3687,3 +3687,23 @@ Proposed restructuring:
 - Tests: `tests/test_auto_parallel.py`
 
 **Acceptance**: See `spec/acceptance/F-0214.md`
+
+---
+
+## F-0215: Autonomous Framework Verification Loop
+
+**Status**: implementing
+**Category**: Autonomous
+**Priority**: high
+**Complexity**: high
+**Since**: v0.60.0
+**Dependencies**: F-0179 (Component Registry), F-0187 (Multi-Repo Umbrella), F-0204 (Integration Verification)
+
+**Description**: `ag auto verify-framework --project <name>` spawns agents to build example projects from scratch using framework commands, verifying the full lifecycle end-to-end. Self-healing loop: when the agent hits a framework bug, the system classifies the failure, spawns a fix agent in a verification worktree, validates the fix, and restarts the scenario from scratch. Accumulated fixes delivered as a single PR. Supports single-component, monorepo, and multi-repo scenarios with declarative YAML definitions.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/framework_verify.py`, `.agentic/lib/auto/self_heal.py`, `.agentic/lib/auto/scenarios/*.yaml`, `.agentic/lib/auto/prompts/verify_*.md`, modifications to `__init__.py`, `ag.sh`, trunk-branch fixes in 5 scripts
+- Tests: `tests/test_framework_verify.py`, `tests/test_self_heal.py`
+
+**Acceptance**: See `spec/acceptance/F-0215.md`

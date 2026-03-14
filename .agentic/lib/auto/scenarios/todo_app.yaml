@@ -1,0 +1,30 @@
+name: "Todo App"
+description: "CRUD todo app with REST API and persistence"
+type: single
+timeout: 600
+
+stack:
+  language: python
+  framework: fastapi
+  test_runner: pytest
+
+vision: |
+  Build a simple todo application with:
+  - REST API (CRUD operations for todos)
+  - SQLite persistence
+  - Input validation
+  - Unit and integration tests
+
+settings_matrix:
+  - profile: discovery
+    git_workflow: direct
+    docs_mode: deferred
+  - profile: autonomous_formal
+    git_workflow: pull_request
+    review_merge: skip
+
+required_milestones:
+  - kickoff_complete
+  - features_specced
+  - implementation_done
+  - verification_green
