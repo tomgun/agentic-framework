@@ -51,6 +51,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0040: PR #134: fix docs.sh --validate aborting ag done
+- **Type**: review
+- **Added**: 2026-03-14
+- **Context**: One-line fix: unguarded exit code killed ag done via set -e before flush
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0035: PR #126: Orphaned plan detection at session start
