@@ -2417,3 +2417,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-14 10:32 - F-0187 Multi-Repo Umbrella
+
+**Why**: Enable framework to orchestrate components across separate git repositories
+
+**What changed**:
+- Implemented multi-repo umbrella support: header-aware component parsing with optional Repo column, umbrella path resolution with availability/git validation, contract topology validation, structured input collection
+
+**Next steps**:
+- Create PR for review, mark feature shipped after merge
+
+**Blockers**: None
+
