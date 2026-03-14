@@ -3130,7 +3130,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0187: Multi-Repo Umbrella
 
-**Status**: planned
+**Status**: shipped
 **Category**: Architecture
 **Priority**: medium
 **Complexity**: high
