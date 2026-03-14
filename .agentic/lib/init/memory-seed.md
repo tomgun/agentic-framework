@@ -6,7 +6,7 @@ tokens: ~1130
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.54.1 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -100,6 +100,12 @@ If the user says decompose, break down, split into children, break apart, subdiv
 If the user says execute epic, implement all children, run epic autonomously, process epic features, or wants to autonomously implement all child features of an epic:
 
 **STOP.** Run `ag auto epic F-XXXX`. This reads the epic's child features, schedules component-scoped workers with non-blocking reviews, and executes each child feature autonomously. Requires the epic to be decomposed first (children must exist in FEATURES.md with acceptance criteria).
+
+## When the user wants to run the full autonomous pipeline
+
+If the user says run full pipeline, vision to shipped, end-to-end autonomous, build everything from this vision, or wants features designed and implemented without intervention:
+
+**STOP.** Run `ag auto pipeline --features-json '...' --epic-name "..."`. This creates an epic, promotes features with parent links, and schedules all children through implementation → review → integration verify → ship. Requires `review_decomposition` set to `critical_agent` or `skip` (not `human`). The `--features-json` input must be pre-structured; use `ag kickoff` first if starting from a raw vision.
 
 ## When the user has a product vision to turn into a backlog
 

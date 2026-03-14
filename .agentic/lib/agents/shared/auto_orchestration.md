@@ -538,6 +538,7 @@ For hands-off execution. Require test commands in STACK.md; task/crunch require 
 | **Task + Visual** | `ag auto task F-XXXX --visual` | Same + visual review at final verification step |
 | **Crunch** | `ag auto crunch` | Reads planned features from FEATURES.md, runs task mode for each, stops on max errors |
 | **Epic** | `ag auto epic F-XXXX` | Reads epic's child features, schedules component-scoped workers with non-blocking reviews, executes autonomously |
+| **Pipeline** | `ag auto pipeline` | End-to-end: accepts features data, creates epic, promotes to specs, schedules all children through implementation → review → ship |
 
 **Tiered test execution** (v0.44+): STACK.md `Test commands:` section defines ordered tiers (unit, integration, e2e). Each tier has its own fix loop. Fast-fail by default (tier failure stops subsequent tiers).
 
@@ -550,6 +551,7 @@ For hands-off execution. Require test commands in STACK.md; task/crunch require 
 - "implement F-XXXX hands-off" → `ag auto task F-XXXX`
 - "process all planned features" → `ag auto crunch`
 - "execute this epic" / "implement all children of F-XXXX" → `ag auto epic F-XXXX`
+- "run full pipeline" / "vision to shipped" / "end-to-end autonomous" → `ag auto pipeline`
 - "start coordination server" / "parallel agents" / "remote control" → `ag coord start`
 - Project has E2E + screenshots → suggest `--visual`
 

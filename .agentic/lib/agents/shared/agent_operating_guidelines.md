@@ -33,7 +33,7 @@ tokens: ~952
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 
 **Quick Commands**: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag worktree` | `ag spec` | `ag docs` | `ag todo` | `ag feedback` | `ag intent` | `ag formalize` | `ag kickoff "vision"` | `ag run`
-**Autonomous**: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX`
+**Autonomous**: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX` | `ag auto pipeline`
 **Kickoff**: `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve` | `ag kickoff --discard`
 
 ---
@@ -168,6 +168,7 @@ When the user wants hands-off execution, offer these:
 | **Task** | `ag auto task F-XXXX` | "implement this feature autonomously", "auto-implement" |
 | **Crunch** | `ag auto crunch` | "implement all planned features", "batch process features" |
 | **Epic** | `ag auto epic F-XXXX` | "execute this epic", "implement all child features of F-XXXX" |
+| **Pipeline** | `ag auto pipeline` | "run full pipeline", "vision to shipped", "end-to-end autonomous" |
 
 **How they work**: Verify spawns fresh Claude instances to fix test failures in a loop. Task reads acceptance criteria, implements per-AC, runs verify, creates PR. Crunch runs task mode for each planned feature. Epic autonomously executes an epic's child features using component-scoped workers with non-blocking reviews.
 

@@ -802,12 +802,45 @@ def promote_staging(
 
     On failure: staging remains intact for retry.
     """
+    success, messages, _id_map = _promote_staging_impl(
+        project_root, force_overview,
+    )
+    return success, messages
+
+
+def promote_staging_with_ids(
+    project_root: Path,
+    force_overview: bool = False,
+    parent_id: str = "",
+) -> tuple[bool, list[str], dict[str, str]]:
+    """Like promote_staging but also returns id_map {placeholder → real_id}.
+
+    Args:
+        project_root: Project root path.
+        force_overview: Overwrite existing OVERVIEW.md.
+        parent_id: Optional parent feature ID. When set, each promoted
+            feature gets ``**Parent**: {parent_id}`` in its FEATURES.md
+            section (written at creation time, not retroactively).
+
+    Returns:
+        (success, messages, id_map) where id_map maps placeholder IDs
+        to real feature IDs.
+    """
+    return _promote_staging_impl(project_root, force_overview, parent_id)
+
+
+def _promote_staging_impl(
+    project_root: Path,
+    force_overview: bool = False,
+    parent_id: str = "",
+) -> tuple[bool, list[str], dict[str, str]]:
+    """Core promote logic returning (success, messages, id_map)."""
     messages: list[str] = []
 
     # Validate first
     valid, errors = validate_staging(project_root)
     if not valid:
-        return False, ["Validation failed:"] + errors
+        return False, ["Validation failed:"] + errors, {}
 
     staging = _staging_dir(project_root)
     paths = get_paths(project_root)
@@ -833,14 +866,14 @@ def promote_staging(
             return False, [
                 "OVERVIEW.md already exists. Use --force to overwrite, "
                 "or remove the existing file first."
-            ]
+            ], {}
 
     # Load metadata
     metadata_file = staging / ".metadata.json"
     try:
         metadata = json.loads(metadata_file.read_text())
     except (json.JSONDecodeError, OSError):
-        return False, ["Metadata corrupt — cannot promote"]
+        return False, ["Metadata corrupt — cannot promote"], {}
 
     features = metadata.get("features", [])
 
@@ -855,7 +888,7 @@ def promote_staging(
     # Append features to FEATURES.md
     features_file = paths.features_file
     if not features_file.exists():
-        return False, ["FEATURES.md not found"]
+        return False, ["FEATURES.md not found"], {}
 
     new_sections: list[str] = []
     for feature in features:
@@ -871,6 +904,8 @@ def promote_staging(
             "**Status**: planned",
             "**Category**: Proposed",
         ]
+        if parent_id:
+            section_lines.append(f"**Parent**: {parent_id}")
         if real_deps:
             section_lines.append(f"**Dependencies**: {', '.join(real_deps)}")
         section_lines.extend([
@@ -954,7 +989,7 @@ def promote_staging(
     shutil.rmtree(staging)
     messages.append("Staging area removed")
 
-    return True, messages
+    return True, messages, id_map
 
 
 # ---------------------------------------------------------------------------

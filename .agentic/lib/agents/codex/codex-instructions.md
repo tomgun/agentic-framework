@@ -7,7 +7,7 @@ Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operat
 Note: Codex runs commands in a sandbox. Append `|| true` to commands that may fail to prevent non-zero exit codes from halting execution.
 
 Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag worktree` | `ag spec` | `ag docs` | `ag todo` | `ag feedback` | `ag intent` | `ag formalize` | `ag kickoff "vision"` | `ag run`
-Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX`
+Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX` | `ag auto pipeline`
 Kickoff: `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve` | `ag kickoff --discard`
 Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 
@@ -29,7 +29,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Fix all tests / make tests pass / run test loop automatically | Suggest `ag auto verify` (add `--visual` if E2E screenshots configured) |
 | Implement autonomously / auto-implement / hands-off | Suggest `ag auto task F-XXXX` (needs acceptance criteria) |
 | Process all features / batch implement / implement everything | Suggest `ag auto crunch` (processes all planned features) |
-| Execute epic / implement all children of epic / run epic autonomously | Suggest `ag auto epic F-XXXX` (executes epic's child features with component-scoped workers) |
+| Execute epic / implement all children of epic / run epic autonomously | Suggest `ag auto epic F-XXXX` or `ag auto pipeline` (executes epic's child features with component-scoped workers) |
 | Feedback / tested it / tried it / after testing / user reported | STOP -> Run `ag feedback "text"`. Classifies (bug/feature/ac-adjust/unclear), persists to FEEDBACK_LOG.md. `--bug`/`--feature`/`--ac` for direct routing. `ag feedback log` to view. |
 | Formalize / promote to formal / migrate TODOs to features | STOP -> Run `ag formalize` to list promotable items. `ag formalize T-XXXX` promotes specific items. `ag formalize --all` for bulk. |
 

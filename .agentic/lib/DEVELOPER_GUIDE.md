@@ -71,6 +71,7 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 | "Fix tests automatically" | `ag auto verify` | Test-fix loop until green or max iterations |
 | "Implement this feature" | `ag auto task F-XXXX` | Autonomous per-AC implementation + PR |
 | "Process all planned features" | `ag auto crunch` | Batch implementation of planned features |
+| "Run full pipeline" | `ag auto pipeline` | End-to-end: epic → promote → schedule → implement → ship |
 | "How do I run this?" | `ag run` | Shows dev/build/test commands from STACK.md + auto-detection |
 
 You don't need to memorize these commands. The agent picks the right one.
@@ -686,6 +687,7 @@ The framework includes an autonomous engine that can implement features with min
 | **Task + Visual** | `ag auto task F-XXXX --visual` | Same as above, plus visual review at final verification |
 | **Crunch** | `ag auto crunch` | Batch mode: reads planned features from FEATURES.md, runs task mode for each |
 | **Epic** | `ag auto epic F-XXXX` | Epic mode: reads child features of an epic, schedules component-scoped workers with non-blocking reviews |
+| **Pipeline** | `ag auto pipeline` | End-to-end: creates epic, promotes features, schedules all children through implement → review → ship |
 
 #### Tiered Test Execution (v0.44+)
 
