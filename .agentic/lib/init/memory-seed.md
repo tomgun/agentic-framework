@@ -1,6 +1,6 @@
 ---
 summary: "Action rules agents write to persistent memory at session start"
-tokens: ~1130
+tokens: ~1280
 ---
 
 # Memory Seed — Agentic Framework Action Rules
