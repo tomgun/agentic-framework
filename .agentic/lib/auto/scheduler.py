@@ -349,9 +349,10 @@ class AutonomousScheduler:
                     from auto.umbrella import resolve_umbrella
                     umbrella = resolve_umbrella(self.project_root)
                     if umbrella and umbrella.missing_repos:
+                        prefix = f"Component '{comp.name}':"
                         missing_for_comp = [
                             m for m in umbrella.missing_repos
-                            if comp.name in m
+                            if prefix in m
                         ]
                         if missing_for_comp:
                             return TaskResult(

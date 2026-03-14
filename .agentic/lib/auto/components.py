@@ -16,7 +16,6 @@ Usage:
 from __future__ import annotations
 
 import re
-import sys
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
