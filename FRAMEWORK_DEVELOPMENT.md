@@ -636,17 +636,49 @@ Two rules to prevent local/remote divergence in the first place:
 1. **Push main after committing to it.** Every direct-to-main commit (chores, hotfixes) should be pushed immediately — don't let local main drift ahead of origin. Unpushed commits on main are invisible to PRs and other agents.
 2. **Sync before branching.** Before creating a feature branch from main, always `git pull --rebase origin main` first. A branch created from stale main will have conflicts with content that's already on remote, leading to messy rebases and accidental content loss (as happened in the v0.52.2 dashboard PR).
 
-### LLM agents lose continuity at turn boundaries
+### LLM agents lose continuity at turn boundaries (plan-review case study)
 
-When a workflow spans turn boundaries (user message, skill re-matching, context compression), Phase N+1's instructions may not be active when Phase N+1 runs. Concrete example: plan mode exit ends the turn; the user's next message triggers fresh skill matching; planning-features Phase 2 (save + review) never activates.
+When a workflow spans turn boundaries (user message, skill re-matching, context compression), Phase N+1's instructions may not be active when Phase N+1 runs. The plan-review gate was the hardest behavioral fix in the framework — it took multiple attempts across sessions before the agent reliably ran dialectical review after exiting plan mode instead of jumping straight to implementation.
 
-**Design principles for cross-turn enforcement:**
+**The problem:** When `plan_review_enabled: yes`, exiting plan mode should trigger: save plan as DRAFT → dialectical review (Critic + Advocate agents) → user approval → APPROVED → implement. Instead, the agent would exit plan mode and immediately start coding — reading implementation files, exploring the codebase, writing code — completely skipping the review loop.
+
+**What failed (and why):**
+
+1. **Adding instructions to skills (implementing-features SKILL.md).** Added Step 0.5 with plan gate logic, anti-pattern warnings. *Failed because:* plan mode exit ends the turn; the user's next message triggers fresh skill matching; the implementing-features skill activates but the agent has already decided what to do. Skill instructions are guidance, not gates.
+
+2. **Adding instructions to more files (memory-seed, feature_start.md checklist, CLAUDE.md).** Spread the same "you MUST review before implementing" rule across 5+ instruction files. *Failed because:* textual instructions have diminishing returns. The 7th file saying "you MUST" has near-zero marginal effect on behavior. The agent can "agree" with the instruction and still rationalize skipping it.
+
+3. **Adding anti-pattern warnings** ("Do NOT read implementation files before plan review"). *Failed because:* the agent rationalizes around prohibitions. It would acknowledge the warning and then explore files anyway "to prepare" or "to understand context." Telling the agent what not to do doesn't create a hard stop.
+
+4. **Relying on `ag implement` script gate alone.** The gate existed (`exit 1` when plan not approved) but the auto-save step (copying plans from `~/.claude/plans/` to `.agentic/journal/plans/`) ran AFTER the gate check. So the gate would say "no plan found" → exit 1 → agent would interpret this as "I need to create a plan" rather than "the plan I just made needs review." A sequencing bug in ag.sh made the correct gate ineffective.
+
+**What finally worked (three changes together):**
+
+1. **Fix the sequencing bug in ag.sh.** Moved auto-save (step 0c) BEFORE the gate check (step 0d). Now `ag implement` finds the plan saved from `~/.claude/plans/`, checks its status, and blocks with `exit 1` if not APPROVED. The agent hits a real wall, not a suggestion. This was the critical fix — without it, the gate was checking for a file that hadn't been copied yet.
+
+2. **Embed continuation instructions in the plan artifact itself.** Added a `POST-PLAN-MODE ACTIONS (MANDATORY)` block directly into the plan output that plan mode generates. This block says "Status: DRAFT. This plan is NOT approved for implementation." followed by the 4 steps to follow. *Why this works:* the artifact survives turn boundaries because it's the work product, not guidance about the work product. When the next turn starts, the agent sees these instructions in its own output, not in a skill file it may or may not have loaded.
+
+3. **Name the rationalizations the agent uses to skip review.** Added a "These rationalizations are WRONG" block to CLAUDE.md (both template and root) listing the 6 specific excuses the agent invents: "the user created the plan so it's reviewed", "plan mode exit = approval", "the user said implement", "simple plan, review unnecessary", "I have it in context", "ag implement told me to review, I'll assess it myself." *Why this works:* it's harder for the agent to use an excuse when the excuse is pre-labeled as wrong. Generic "don't skip" is easy to rationalize around; named rationalizations force the agent to confront the specific pattern it's about to follow.
+
+**Design principles extracted:**
+
 1. **Embed enforcement in the artifact, not just instruction files.** The artifact survives turn boundaries because it's the work product, not guidance about the work product.
 2. **Route to script gates, don't replicate their logic textually.** Script gates (`exit 1`) create hard stops. Textual instructions create soft suggestions. Direct the agent to the script; don't ask it to perform the gate's logic itself.
-3. **Name rationalizations, don't just forbid behavior.** "Don't use excuses A, B, C" is harder to bypass than "don't skip step X."
-4. **Textual instructions have diminishing returns.** The 7th file saying "you MUST" has near-zero marginal effect. When the same instruction fails 3+ times, the fix is architectural (change routing), not editorial (add more text).
+3. **Fix the plumbing before adding more signs.** The ag.sh sequencing bug meant the gate was structurally broken. No amount of instruction text would fix a gate that checks for a file before that file exists.
+4. **Name rationalizations, don't just forbid behavior.** "Don't use excuses A, B, C" is harder to bypass than "don't skip step X."
+5. **Textual instructions have diminishing returns.** The 7th file saying "you MUST" has near-zero marginal effect. When the same instruction fails 3+ times, the fix is architectural (change routing), not editorial (add more text).
+6. **Multi-layer defense is required for cross-turn workflows.** No single mechanism was sufficient. The fix required: (a) a working script gate, (b) artifact-embedded instructions, and (c) named rationalization rebuttals — all three together.
 
-Applied in: plan-review gate fix (ag.sh reorder, artifact-embedded continuation block, named rationalization rebuttals).
+**Remaining gap:** Even with all fixes, the agent may still read implementation files or explore the codebase before running the review (as observed in v0.59.0). The gate blocks implementation, and the review does happen, but the "don't explore before review" anti-pattern is still only a textual instruction — it has no hard enforcement. A future fix could make `ag implement` the ONLY path forward (removing the agent's ability to take other actions), but that requires tool-level constraints that instruction files alone cannot provide.
+
+### Instruction file edits alone cannot fix cross-turn behavioral failures
+
+When a behavioral rule keeps failing despite being in multiple instruction files, adding it to yet another file is the wrong response. The instinct is editorial ("add more emphasis", "add an anti-pattern warning", "capitalize MUST") but the failure mode is architectural: the instruction isn't active when the agent makes the decision. Symptoms of this pattern:
+- The rule exists in 5+ files but is still violated
+- Each session you add more text and it still fails
+- The agent acknowledges the rule and then ignores it
+
+The fix is to change the enforcement mechanism, not the enforcement text. Move from textual rules to: (a) script gates that `exit 1`, (b) artifact-embedded instructions that survive turn boundaries, (c) named rationalization rebuttals that make self-deception harder. See the plan-review case study above for the full example.
 
 ### Framework skills vs Task tool agents
 
