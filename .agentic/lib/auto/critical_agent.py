@@ -13,6 +13,7 @@ Usage (internal — called by review.py):
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -321,9 +322,13 @@ class CriticalAgent:
                 capture_output=True, text=True, cwd=str(self.project_root),
             ).stdout.strip()
 
-            # Feature branch: try diff against main/master first
-            if branch and branch not in ("main", "master"):
-                for base in ("main", "master"):
+            # Feature branch: try diff against trunk first
+            _ag_trunk = os.environ.get("AG_TRUNK_BRANCH", "")
+            trunk_branches = {"main", "master"}
+            if _ag_trunk:
+                trunk_branches.add(_ag_trunk)
+            if branch and branch not in trunk_branches:
+                for base in trunk_branches:
                     result = subprocess.run(
                         ["git", "diff", f"{base}...HEAD"],
                         capture_output=True, text=True,

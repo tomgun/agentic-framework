@@ -86,9 +86,16 @@ if [[ -f ".git/MERGE_HEAD" ]]; then
 fi
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
-if [[ "$BRANCH" != "main" && "$BRANCH" != "master" ]]; then
-    echo "Error: ag flush only works on main/master (current branch: ${BRANCH:-detached HEAD})."
-    echo "State files should be flushed from the primary checkout, not feature branches."
+TRUNK="${AG_TRUNK_BRANCH:-}"
+if [[ -z "$TRUNK" ]]; then
+    # Auto-detect: default trunk is main or master
+    if [[ "$BRANCH" != "main" && "$BRANCH" != "master" ]]; then
+        echo "Error: ag flush only works on main/master (current branch: ${BRANCH:-detached HEAD})."
+        echo "State files should be flushed from the primary checkout, not feature branches."
+        exit 1
+    fi
+elif [[ "$BRANCH" != "$TRUNK" ]]; then
+    echo "Error: ag flush only works on trunk branch '$TRUNK' (current branch: ${BRANCH:-detached HEAD})."
     exit 1
 fi
 

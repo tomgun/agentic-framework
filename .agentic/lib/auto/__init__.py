@@ -6,6 +6,29 @@ import subprocess
 from pathlib import Path
 
 
+class SpawnResult(str):
+    """Result from spawn_claude() — behaves as str for backward compat, adds metadata.
+
+    Subclasses str so all string operations (.upper(), [:200], .startswith(),
+    ``in``, etc.) work natively on the output. New code can access .returncode
+    and .timed_out for richer control flow.
+    """
+
+    returncode: int
+    timed_out: bool
+
+    def __new__(
+        cls,
+        output: str,
+        returncode: int = 0,
+        timed_out: bool = False,
+    ) -> SpawnResult:
+        instance = super().__new__(cls, output)
+        instance.returncode = returncode
+        instance.timed_out = timed_out
+        return instance
+
+
 def build_claude_cmd(
     claude_command: str,
     project_root: Path,
@@ -59,9 +82,11 @@ def spawn_claude(
     print_mode: bool = True,
     timeout: int = 300,
     model: str | None = None,
-) -> str:
-    """Spawn a Claude CLI instance and return combined stdout+stderr.
+) -> SpawnResult:
+    """Spawn a Claude CLI instance and return a SpawnResult.
 
+    Returns a SpawnResult (str subclass) with .returncode and .timed_out.
+    Backward compatible: all existing string operations work directly.
     Uses tier-appropriate permissions based on .claude/settings.json.
     """
     cmd = build_claude_cmd(
@@ -78,10 +103,14 @@ def spawn_claude(
             text=True,
             timeout=timeout,
         )
-        return proc.stdout + proc.stderr
+        return SpawnResult(proc.stdout + proc.stderr, returncode=proc.returncode)
     except FileNotFoundError:
-        return "error: claude command not found"
+        return SpawnResult("error: claude command not found", returncode=-1)
     except subprocess.TimeoutExpired:
-        return f"error: Claude timed out after {timeout}s"
+        return SpawnResult(
+            f"error: Claude timed out after {timeout}s",
+            returncode=-1,
+            timed_out=True,
+        )
     except Exception as e:
-        return f"error: {e}"
+        return SpawnResult(f"error: {e}", returncode=-1)

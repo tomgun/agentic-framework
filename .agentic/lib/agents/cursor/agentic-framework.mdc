@@ -39,6 +39,7 @@ Custom models: check `models:` section. Full docs: `.agentic/workflows/agent_mod
 - `ag auto crunch` — batch processes all planned features
 - `ag auto epic F-XXXX` — schedules epic's children with non-blocking reviews
 - `ag auto pipeline` — end-to-end: epic → promote → schedule → implement → ship
+- `ag auto verify-framework` — self-test: build example projects, detect & fix framework bugs
 
 Workflows, gates, delegation: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`
 

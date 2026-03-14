@@ -1738,7 +1738,9 @@ cmd_done() {
     # VERSION bump + flush (only on main — worktrees skip this)
     local current_branch
     current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
-    if [[ "$current_branch" == "main" || "$current_branch" == "master" ]]; then
+    local _done_trunk="${AG_TRUNK_BRANCH:-}"
+    if [[ -n "$_done_trunk" && "$current_branch" == "$_done_trunk" ]] \
+       || [[ -z "$_done_trunk" && ("$current_branch" == "main" || "$current_branch" == "master") ]]; then
         # VERSION bump (patch by default)
         if [ -f "$ROOT_DIR/VERSION" ]; then
             local current_ver new_ver major minor patch_num
@@ -2356,6 +2358,10 @@ cmd_auto() {
             # End-to-end autonomous pipeline: vision → epic → ship (F-0188)
             python3 "$auto_dir/pipeline.py" --project-root "$ROOT_DIR" "$@"
             ;;
+        verify-framework)
+            # Framework self-verification loop (F-0215)
+            python3 "$auto_dir/framework_verify.py" --project-root "$ROOT_DIR" "$@"
+            ;;
         feedback)
             python3 "$auto_dir/control.py" feedback "$@" --project-root "$ROOT_DIR"
             ;;
@@ -2372,6 +2378,10 @@ cmd_auto() {
             echo "    --max-parallel N      Max concurrent agents (default: 3)"
             echo "    --timeout N           Per-feature timeout in seconds (default: 600)"
             echo "  verify-epic <F-XXXX>  Run integration verification for epic (F-0204)"
+            echo "  verify-framework      Framework self-verification loop (F-0215)"
+            echo "    --project <name>      Run single scenario (todo-app, api-service, etc.)"
+            echo "    --all                 Run all scenarios × all settings combos"
+            echo "    --json                Machine-readable output"
             echo "  pipeline              End-to-end: vision → epic → implement → ship (F-0188)"
             echo "  status                Show engine state"
             echo "  pause                 Pause running engine"

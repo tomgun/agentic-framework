@@ -115,9 +115,11 @@ find_commits() {
             git log --all --oneline --grep="$VALUE" --format="%H" | head -100
             ;;
         branch)
-            # Get all commits on this branch not in main/master
+            # Get all commits on this branch not in trunk
             local base_branch
-            if git show-ref --verify --quiet refs/heads/main; then
+            if [[ -n "${AG_TRUNK_BRANCH:-}" ]]; then
+                base_branch="$AG_TRUNK_BRANCH"
+            elif git show-ref --verify --quiet refs/heads/main; then
                 base_branch="main"
             elif git show-ref --verify --quiet refs/heads/master; then
                 base_branch="master"

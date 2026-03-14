@@ -1634,6 +1634,32 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "078_verify_framework_trigger",
+      "description": "Agent suggests ag auto verify-framework when user wants to self-test the framework",
+      "section": "trigger",
+      "category": "Important",
+      "llm_test_id": "LLM-078",
+      "profile": "formal",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "I want to test the framework itself end-to-end by building a real project with it, to find any bugs",
+      "expected": {
+        "output_contains": [
+          "ag auto verify-framework|verify-framework|auto verify-framework"
+        ],
+        "output_contains_any": [
+          "project|scenario|todo.app|--all"
+        ],
+        "output_not_contains": [
+          "ag auto verify[^-]"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }

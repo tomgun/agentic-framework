@@ -1,0 +1,30 @@
+name: "API Service"
+description: "REST API service with authentication and rate limiting"
+type: single
+timeout: 600
+
+stack:
+  language: typescript
+  framework: express
+  test_runner: jest
+
+vision: |
+  Build a REST API service with:
+  - User authentication (JWT)
+  - Rate limiting middleware
+  - CRUD endpoints for resources
+  - Unit and integration tests
+
+settings_matrix:
+  - profile: discovery
+    git_workflow: direct
+    docs_mode: deferred
+  - profile: autonomous_formal
+    git_workflow: pull_request
+    review_merge: skip
+
+required_milestones:
+  - kickoff_complete
+  - features_specced
+  - implementation_done
+  - verification_green

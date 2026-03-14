@@ -2534,3 +2534,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-14 21:35 - F-0215 Framework Verification Loop
+
+**Why**: No existing test exercises the framework as a user — unit/LLM tests miss integration gaps
+
+**What changed**:
+- Framework can now self-test by spawning agents that build real projects end-to-end using ag commands, self-healing framework bugs and delivering fixes as a PR
+
+**Next steps**:
+- Smoke test in sandbox, ship
+
+**Blockers**: None
+

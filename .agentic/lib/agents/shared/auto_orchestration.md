@@ -82,6 +82,7 @@ What would you like to work on?
 | "interrupted" / "crashed" / "stuck" / "orphaned" / "resume work" | **Intent Recovery** | Run `ag intent list` to see pending/orphaned intents. `ag intent clear F-XXXX` to discard. `ag sync` auto-adopts orphans from crashed sessions. |
 | "vision" / "kickoff" / "draft epic" / "generate features from idea" | **Vision-to-Backlog Pipeline** | Run `ag kickoff "vision description"`. Generates OVERVIEW.md, FEATURES.md entries, AC stubs, and BACKLOG.json in staging. Review with `--review`, approve with `--approve`, discard with `--discard`. |
 | "verify epic" / "integration tests" / "cross-component tests" | **Epic Integration Verification** | Run `ag auto verify-epic F-XXXX`. Loads integration test commands (epic AC > STACK.md > skip), runs via VerifyLoop, stores artifact. `review_integration` setting controls critical agent review. |
+| "verify framework" / "test the framework" / "self-test" / "framework verification" | **Framework Self-Verification** | Run `ag auto verify-framework --project <name>` or `--all`. Spawns agents to build example projects, self-heals framework bugs, delivers accumulated fixes as PR. |
 | "run" / "how to run" / "dev server" / "start the app" / "run commands" | **Project Run Info** | Run `ag run`. Shows stack summary, dev/build/test commands with source attribution (STACK.md vs auto-detected). |
 | "feedback" / "tested it" / "tried it" / "after testing" / "user reported" | **Feedback Capture** | Run `ag feedback "text"`. Auto-classifies (bug/feature/ac-adjust/unclear) via keywords, persists to FEEDBACK_LOG.md. Use `--bug`/`--feature`/`--ac` for direct routing. `ag feedback log` to view, `ag feedback route FB-XXXX` to route. |
 | "formalize" / "promote to formal" / "migrate to formal" / "make TODOs into features" | **Discovery-to-Formal Migration** | Run `ag formalize` to list promotable TODO items. `ag formalize T-XXXX` promotes specific items to FEATURES.md entries + AC stubs. `ag formalize --all` promotes everything. |
@@ -544,6 +545,7 @@ For hands-off execution. Require test commands in STACK.md; task/crunch require 
 | **Epic** | `ag auto epic F-XXXX` | Reads epic's child features, schedules component-scoped workers with non-blocking reviews, executes autonomously |
 | **Epic (parallel)** | `ag auto epic F-XXXX --parallel` | Same but spawns N concurrent Claude processes in separate worktrees. `--max-parallel N` (default 3), `--timeout N` (default 600s) |
 | **Pipeline** | `ag auto pipeline` | End-to-end: accepts features data, creates epic, promotes to specs, schedules all children through implementation → review → ship |
+| **Verify Framework** | `ag auto verify-framework` | Framework self-verification: spawns agents to build example projects using `ag` commands, self-heals framework bugs, delivers fixes as PR. `--project <name>` or `--all`, `--json` for machine output |
 
 **Tiered test execution** (v0.44+): STACK.md `Test commands:` section defines ordered tiers (unit, integration, e2e). Each tier has its own fix loop. Fast-fail by default (tier failure stops subsequent tiers).
 
@@ -558,6 +560,7 @@ For hands-off execution. Require test commands in STACK.md; task/crunch require 
 - "execute this epic" / "implement all children of F-XXXX" → `ag auto epic F-XXXX`
 - "run epic in parallel" / "parallel execution" / "concurrent agents" → `ag auto epic F-XXXX --parallel`
 - "run full pipeline" / "vision to shipped" / "end-to-end autonomous" → `ag auto pipeline`
+- "verify framework" / "test the framework itself" / "self-test" / "framework verification" → `ag auto verify-framework`
 - "start coordination server" / "parallel agents" / "remote control" → `ag coord start`
 - Project has E2E + screenshots → suggest `--visual`
 

@@ -143,6 +143,12 @@ If the user says verify epic, integration tests, cross-component tests, or wants
 
 **STOP.** Run `ag auto verify-epic F-XXXX`. This loads integration test commands (epic AC `## Integration tests` > STACK.md `## Integration tests` > skip), runs them via VerifyLoop, and stores a pass/fail artifact. The `review_integration` setting (human/critical_agent/skip) controls whether the critical agent reviews results. If no integration tests are defined, the epic ships immediately. If tests fail, the epic stays at "implementing" until re-run succeeds.
 
+## When the user wants to verify the framework itself
+
+If the user says verify framework, test the framework, self-test, framework verification, or wants to test the framework end-to-end by building real projects:
+
+**STOP.** Run `ag auto verify-framework --project <name>` (single scenario) or `ag auto verify-framework --all` (full matrix). This spawns agents to build example projects from scratch using `ag` commands, detects framework bugs via failure classification, self-heals by spawning fix agents, and delivers accumulated fixes as a single PR. Scenarios: todo-app, api-service, cli-tool, fullstack-monorepo, fullstack-multirepo. Use `--json` for machine-readable output.
+
 ## When the user wants parallel agent coordination
 
 If the user says start coordination server, parallel agents, remote control, remote review, mobile status, or wants multiple agents working in parallel on different features:

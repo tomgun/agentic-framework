@@ -552,6 +552,14 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 - **Autonomous epic execution** (F-0186): `ag auto epic F-XXXX` reads the epic's child features, schedules component-scoped workers (AutonomousScheduler) with non-blocking reviews, and executes each child feature autonomously. Builds on decomposition + task mode.
 - **End-to-end pipeline** (F-0188): `ag auto pipeline --features-json '...' --epic-name "..."` wires the full autonomous flow: creates an epic, promotes features with parent links, then schedules all children through implementation → review → integration verify → ship. Requires `review_decomposition` set to `critical_agent` or `skip`. The pipeline is a thin orchestrator — all heavy lifting delegated to existing modules (kickoff, scheduler, task, review, critical_agent, integration_verify).
 
+**Autonomous Framework Verification** (F-0215): `ag auto verify-framework --project todo-app` makes the framework test itself by building real projects end-to-end:
+- Spawns agents that use `ag kickoff`, `ag implement`, `ag commit` etc. to build example projects from scratch
+- Two-context isolation: verification worktree (VW) on ephemeral `verify/run-*` branch for framework fixes, example projects in `/tmp/` with independent git repos
+- Self-healing: when the agent hits a framework bug, the system classifies it (pattern matching → LLM → conservative default), spawns a fix agent in the VW, validates the fix with `validate_framework.sh`, and restarts the scenario from scratch
+- Scenarios: declarative YAML in `.agentic/lib/auto/scenarios/` — single-component (todo-app, api-service, cli-tool), monorepo (fullstack-monorepo), multi-repo (fullstack-multirepo)
+- `AG_TRUNK_BRANCH` env var ensures spawned agents treat the ephemeral branch as trunk (5 scripts patched)
+- Accumulated fixes delivered as a single PR. Safety: max 3 retries/scenario, max 20 total fixes, atexit cleanup
+
 **Vision-to-Backlog Pipeline** (F-0201): Converts a product vision into structured spec artifacts in a single command:
 - `ag kickoff "Build a todo app with collaboration"` generates OVERVIEW.md, FEATURES.md entries, acceptance criteria stubs, and BACKLOG.json — all in a staging area (`.agentic/session/kickoff-draft/`)
 - Staging uses placeholder IDs (`F-NEW-001`, `F-NEW-002`) that get real sequential IDs at promotion time

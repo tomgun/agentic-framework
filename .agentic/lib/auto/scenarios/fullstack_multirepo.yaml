@@ -1,0 +1,55 @@
+name: "Fullstack Multi-Repo"
+description: "Umbrella repo coordinating separate frontend and backend repos"
+type: multirepo
+timeout: 1200
+
+repos:
+  umbrella:
+    description: "Orchestrator with specs and contracts"
+  api-service:
+    language: python
+    framework: fastapi
+  web-app:
+    language: typescript
+    framework: react
+
+components:
+  - name: api
+    path: ../api-service
+    repo: local
+    type: python
+    test_command: "pytest"
+  - name: web
+    path: ../web-app
+    repo: local
+    type: typescript
+    test_command: "npm test"
+
+contracts:
+  - name: task-api
+    format: openapi
+    path: contracts/task-api.yaml
+    producer: api
+    consumers: [web]
+
+vision: |
+  Build a task management system split across repos:
+  - API service repo: FastAPI backend with task CRUD
+  - Web app repo: React frontend consuming the API
+  - Umbrella: OpenAPI contract defining the interface
+  - Contract validation ensures frontend/backend stay in sync
+
+settings_matrix:
+  - profile: autonomous_formal
+    git_workflow: pull_request
+    review_merge: skip
+
+required_milestones:
+  - kickoff_complete
+  - contracts_defined
+  - features_specced
+  - component_features_scoped
+  - implementation_done
+  - contracts_validated
+  - integration_verified
+  - verification_green

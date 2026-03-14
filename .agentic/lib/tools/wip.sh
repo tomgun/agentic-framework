@@ -232,7 +232,9 @@ EOF
           # Check SKIP_TDD escape hatch (blocked on main/master)
           if [[ -n "${SKIP_TDD:-}" ]]; then
             BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
-            if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
+            WIP_TRUNK="${AG_TRUNK_BRANCH:-}"
+            if [[ -n "$WIP_TRUNK" && "$BRANCH" == "$WIP_TRUNK" ]] \
+               || [[ -z "$WIP_TRUNK" && ("$BRANCH" == "main" || "$BRANCH" == "master") ]]; then
               echo "❌ BLOCKED: Cannot use SKIP_TDD on $BRANCH"
               exit 1
             fi
