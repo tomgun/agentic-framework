@@ -165,6 +165,10 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
 
 3. CHECK DEVELOPMENT MODE
    └─ Read STACK.md → development_mode (default: standard)
+   ├─ standard: implement first, test to verify
+   └─ tdd: Per-AC red-green-refactor cycle:
+      RED → GREEN → REFACTOR, checkpoint --phase at each step
+      `wip.sh complete` blocks without phase checkpoints
 
 4. IMPLEMENT
    ├─ If `worktree_mode: always` in STACK.md, `ag implement` auto-creates a worktree — `cd` to it

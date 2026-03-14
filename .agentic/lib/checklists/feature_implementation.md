@@ -59,26 +59,28 @@ phase: implementation
 
 ## During Implementation
 
-### If TDD Mode (Optional)
+### If TDD Mode (`development_mode: tdd`)
+
+When `development_mode: tdd` is set in STACK.md, the red-green-refactor cycle is **mandatory per AC** and enforced by `wip.sh complete` (blocks without phase checkpoints).
 
 - [ ] **Write failing test first** (RED)
-  - Test expresses desired behavior
+  - Test expresses desired behavior from acceptance criteria
   - Run test → verify it fails
-  - Commit: `test: add failing test for [behavior]`
+  - `bash .agentic/lib/tools/wip.sh checkpoint --phase RED "AC-XXX: test for [behavior] fails"`
 
 - [ ] **Write minimal code to pass** (GREEN)
-  - Don't over-engineer
-  - Just make test pass
-  - Run tests → verify they pass
+  - Don't over-engineer — just make the test pass
+  - Run all tests → verify they pass
+  - `bash .agentic/lib/tools/wip.sh checkpoint --phase GREEN "AC-XXX: [behavior] passes"`
 
-- [ ] **Refactor for clarity** (REFACTOR)
-  - Improve names, structure
-  - Remove duplication
+- [ ] **Refactor for clarity** (REFACTOR, optional)
+  - Improve names, structure, remove duplication
   - Tests still pass
+  - `bash .agentic/lib/tools/wip.sh checkpoint --phase REFACTOR "AC-XXX: cleaned up [aspect]"`
 
-- [ ] **Repeat cycle** for next behavior
-  - Small increments (one test at a time)
-  - Clear progress checkpoints
+- [ ] **Repeat cycle** for each acceptance criterion
+  - One AC at a time, small increments
+  - Pre-commit Check #20 validates phase ordering as safety net
 
 ### If Standard Mode (Default - Acceptance-Driven)
 

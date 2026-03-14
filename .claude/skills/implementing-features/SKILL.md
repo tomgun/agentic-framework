@@ -2,10 +2,8 @@
 name: implementing-features
 description: >
   Implements features using acceptance-driven workflow with structural gates.
-  Use when the user wants to build new functionality — e.g. "build",
-  "implement", "add feature", "create [thing]", "develop", "wire up",
-  "implement F-XXXX", "ag implement", or any description of new work to do.
-  Match intent, not exact words.
+  Use when user says "build", "implement", "add feature", "create [thing]",
+  "implement F-XXXX", "ag implement", or describes new functionality to build.
   Do NOT use for: one-line fixes (use fixing-bugs), writing tests only
   (use writing-tests), code review (use reviewing-code), documentation-only
   changes (use updating-documentation).
@@ -13,7 +11,7 @@ compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Agent]
 metadata:
   author: agentic-framework
-  version: "0.46.1"
+  version: "0.58.1"
 ---
 
 # Implementing Features
@@ -88,13 +86,32 @@ bash .agentic/lib/tools/wip.sh start F-XXXX "Description" "file1 file2"
 
 This registers active work in `.agentic/session/AGENTS.json` — a lock that prevents premature commits.
 
-If `ag implement` created a worktree (when `worktree_mode: always` in STACK.md), `cd` to the worktree path it prints. Run `wip.sh start` from the worktree.
-
 ### Step 4: Implement
 
 1. Read and understand acceptance criteria fully
 2. Check `CONTEXT_PACK.md` for "Where to look first"
 3. Check `STACK.md` for `development_mode` (standard or tdd)
+
+**If `development_mode: tdd`** — Per-AC red-green-refactor cycle:
+
+For each acceptance criterion, in order:
+- **RED**: Write a failing test that expresses the desired behavior. Run it to confirm it fails.
+  ```bash
+  bash .agentic/lib/tools/wip.sh checkpoint --phase RED "AC-XXX: test for [behavior] fails"
+  ```
+- **GREEN**: Write the minimal code to make the test pass. Run all tests.
+  ```bash
+  bash .agentic/lib/tools/wip.sh checkpoint --phase GREEN "AC-XXX: [behavior] passes"
+  ```
+- **REFACTOR** (optional): Improve code quality while keeping tests green.
+  ```bash
+  bash .agentic/lib/tools/wip.sh checkpoint --phase REFACTOR "AC-XXX: cleaned up [aspect]"
+  ```
+
+Do NOT write implementation code before its test exists. One AC at a time. `wip.sh complete` blocks without phase checkpoints. See `.agentic/lib/workflows/tdd_mode.md` for error recovery and examples.
+
+**If `development_mode: standard`** (default) — Implement then test:
+
 4. Implement in small increments:
    - Write code following `references/programming_standards.md`
    - Add tests that verify acceptance criteria
@@ -114,38 +131,10 @@ When acceptance criteria have priority groups (P1/P2):
 
 This ensures MVP is solid before adding enhancements.
 
-### Step 6: Documentation
-
-**Check `docs_mode` in STACK.md first:**
-- If `deferred`: skip inline doc updates. `ag done` will log what's needed. Focus on code + tests.
-  Note: framework instruction file updates (framework dev only) are NOT deferred — always inline.
-- If `inline` (default): proceed with the doc update steps below.
-
-Before declaring done, check which project docs need updating:
-
-1. Run `bash .agentic/lib/tools/docs.sh --validate` to check registry health (missing files, unregistered docs)
-2. Run `bash .agentic/lib/tools/docs.sh --list` to see the project's doc registry and which components they cover
-3. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
-4. Update stale docs in the same change as code — don't defer to a follow-up
-5. If your feature touches a component/area with **no registered doc**, decide whether it needs one — use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold and auto-register
-6. If you created or substantially changed a doc, ensure its `## Docs` entry has correct component/area tags — this is how `drift.sh` and `docs.sh` know which docs to check
-
-Doc updates are enforced at feature acceptance (`ag done`) when `docs_gate: blocking`.
-
-**Framework development only** (when working on the agentic framework repo itself):
-If you added or changed an `ag` command, gate, workflow, or behavioral rule, also check:
-- Instruction files: CLAUDE.md templates, cursorrules.txt, copilot-instructions.md, codex-instructions.md
-- Orchestration: agent_operating_guidelines.md, auto_orchestration.md
-- Onboarding: memory-seed.md, DEVELOPER_GUIDE.md, HOW_IT_WORKS.md
-- Skills/checklists that reference the changed behavior
-
-Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift.
-
-### Step 7: Verify Before Declaring Done
+### Step 6: Verify Before Declaring Done
 
 - All acceptance criteria met (P1 at minimum, P2 if confirmed)
 - Tests pass
-- Documentation updated (Step 6)
 - No unrelated files changed
 - Code follows project conventions
 

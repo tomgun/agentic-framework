@@ -26,11 +26,13 @@
 #   15. Test file deletion blocked if referenced by shipped feature (BLOCKING)
 #   16. Status downgrade protection for shipped features (BLOCKING)
 #   19. Doc registry health (advisory, respects docs_gate setting)
+#   20. TDD phase ordering (BLOCKING when development_mode: tdd, safety net)
 #
 # Escape hatches (use sparingly, blocked on main/master):
 #   SKIP_TESTS=1      Skip test execution
 #   SKIP_COMPLEXITY=1  Skip complexity limits
 #   SKIP_STALENESS=1   Skip JOURNAL/STATUS/FEATURES staleness checks
+#   SKIP_TDD=1         Skip TDD phase ordering check
 #
 # Exit codes:
 #   0 - All checks pass, commit allowed
@@ -74,7 +76,7 @@ fi
 
 # Block escape hatches on main/master
 if [[ "$CURRENT_BRANCH" == "main" || "$CURRENT_BRANCH" == "master" ]]; then
-  if [[ -n "${SKIP_TESTS:-}" || -n "${SKIP_COMPLEXITY:-}" || -n "${SKIP_STALENESS:-}" ]]; then
+  if [[ -n "${SKIP_TESTS:-}" || -n "${SKIP_COMPLEXITY:-}" || -n "${SKIP_STALENESS:-}" || -n "${SKIP_TDD:-}" ]]; then
     echo "❌ BLOCKED: Cannot use SKIP_* environment variables on $CURRENT_BRANCH"
     echo "   Escape hatches are only allowed on feature branches."
     exit 1
@@ -1115,6 +1117,38 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
       echo "⚠️  Advisory: In-progress features with unchecked acceptance criteria"
       echo -e "$AC_WARNINGS"
       echo "   Consider checking off completed ACs before committing."
+    fi
+  fi
+fi
+
+# Check 20: TDD phase ordering (BLOCKING when development_mode: tdd)
+# Safety net — primary enforcement is at `wip.sh complete`
+if [[ $_FAST_MODE -eq 0 ]]; then
+  DEV_MODE=$(get_setting "development_mode" "standard" 2>/dev/null || echo "standard")
+  if [[ "$DEV_MODE" == "tdd" ]]; then
+    if [[ -n "${SKIP_TDD:-}" ]]; then
+      echo ""
+      echo "[20] TDD phase ordering (SKIPPED via SKIP_TDD)"
+    elif command -v python3 >/dev/null 2>&1; then
+      echo ""
+      echo "[20] Checking TDD phase ordering (safety net)..."
+      TDD_EXIT=0
+      TDD_OUTPUT=$(python3 .agentic/lib/tools/agents_helpers.py --project-root "$PROJECT_ROOT" check-tdd-phases 2>&1) || TDD_EXIT=$?
+      if [[ $TDD_EXIT -eq 0 ]]; then
+        echo "  ✓ TDD phase ordering OK"
+      elif [[ $TDD_EXIT -eq 2 ]]; then
+        echo "  ❌ BLOCKED: TDD phase ordering violated: GREEN before RED"
+        echo "     $TDD_OUTPUT"
+        echo "     Use: wip.sh checkpoint --phase RED|GREEN|REFACTOR"
+        FAILURES=$((FAILURES + 1))
+      elif [[ $TDD_EXIT -eq 3 ]]; then
+        echo "  ❌ BLOCKED: TDD mode active but no phase checkpoints recorded"
+        echo "     Use: wip.sh checkpoint --phase RED \"test for [behavior] fails\""
+        FAILURES=$((FAILURES + 1))
+      else
+        # Exit 1 = no active entries (already completed) — pass silently
+        echo "  ✓ TDD check passed (no active WIP entries)"
+      fi
     fi
   fi
 fi

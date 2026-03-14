@@ -6,7 +6,7 @@ tokens: ~1280
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.58.1 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -27,6 +27,8 @@ If the user's intent is to build, implement, add, create, set up, develop, make,
 **Profiles**: `discovery` (lightweight), `formal` (full spec-driven), `autonomous_formal` (formal rigor but review_code/review_regression delegated to critical_agent — only review_merge stays human). Use `is_formal_like()` to check if a profile has formal rigor (returns true for both formal and autonomous_formal).
 
 `ag implement` auto-creates WIP tracking. If `worktree_mode: always` in STACK.md, `ag implement` also auto-creates a git worktree for the feature branch. Use `ag worktree` (create|list|remove|path|status) to manage worktrees manually. If bypassing ag: run `bash .agentic/lib/tools/wip.sh start F-XXXX "desc" "files"` before coding.
+
+When `development_mode: tdd` in STACK.md, the implementing-features skill enforces per-AC RED→GREEN→REFACTOR with `wip.sh checkpoint --phase RED|GREEN|REFACTOR "note"`. `wip.sh complete` blocks if no phase checkpoints or ordering violated (GREEN before RED). Pre-commit Check #20 is a safety net. `SKIP_TDD=1` escape hatch on feature branches only.
 
 Never write implementation code before acceptance criteria exist. This is a structural rule, not a suggestion.
 

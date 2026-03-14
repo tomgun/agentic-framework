@@ -35,6 +35,8 @@ STOP! Trigger Words (match on intent, not just exact words):
 
 Acceptance criteria: Formal requires .agentic/spec/acceptance/F-####.md before coding | Discovery: define criteria (any form) before coding.
 
+TDD mode: When `development_mode: tdd` in STACK.md, use per-AC red-green-refactor cycle with `wip.sh checkpoint --phase RED|GREEN|REFACTOR "note"`. `wip.sh complete` blocks without phase checkpoints.
+
 Small batch development: When user asks for something large ("entire", "full", "complete system"), STOP - TOO BIG for one task. Break into smaller pieces (3-5 files max each). Max 5-10 files per commit.
 
 Rules:
