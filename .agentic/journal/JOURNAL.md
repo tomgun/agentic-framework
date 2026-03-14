@@ -2430,3 +2430,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-14 16:09 - F-0188 E2E Pipeline
+
+**Why**: ADR-001 Phase 7 capstone: no single function chained kickoff→promote→epic→schedule before
+
+**What changed**:
+- Full autonomous pipeline wired: ag auto pipeline creates epic, promotes features with parent links, schedules all children through implement→review→ship. Gate check blocks human review mode. 14 E2E tests, all instruction files updated.
+
+**Next steps**:
+- Ship F-0188, advance backlog
+
+**Blockers**: None
+
