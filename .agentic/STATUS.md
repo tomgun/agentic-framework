@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0188 shipped. Next: F-0209 TDD Mode (Updated: 2026-03-14 16:17 UTC)
+- Fix: ag done docs_gate exit code bug (Updated: 2026-03-14 16:25 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item
