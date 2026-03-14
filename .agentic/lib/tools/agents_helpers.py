@@ -363,6 +363,54 @@ def cmd_release(agents_file: Path, feature_id: str, pid: int = 0) -> int:
         return 1
 
 
+def cmd_check_tdd_phases(agents_file: Path) -> int:
+    """Validate TDD phase ordering in progress entries.
+
+    Reads active (non-session) entries from AGENTS.json and checks that
+    every GREEN: entry is preceded by at least one RED: entry at an earlier
+    index. REFACTOR: entries have no ordering constraint.
+
+    Exit codes:
+        0 — valid (phases present and correctly ordered)
+        1 — error (no active entries found)
+        2 — ordering violation (GREEN before RED)
+        3 — zero phase entries (agent ignored --phase)
+    """
+    items = _load_unlocked(agents_file)
+    feature_items = [i for i in items
+                     if i.get("type") != "session"
+                     and i.get("status") in ("active", "created")]
+    if not feature_items:
+        return 1
+
+    for item in feature_items:
+        progress = item.get("progress", [])
+        red_count = 0
+        green_count = 0
+        refactor_count = 0
+        for entry in progress:
+            if not isinstance(entry, str):
+                continue
+            if entry.startswith("RED:"):
+                red_count += 1
+            elif entry.startswith("GREEN:"):
+                if red_count == 0:
+                    fid = item.get("feature_id", "?")
+                    print(f"GREEN before RED in {fid}: \"{entry}\"")
+                    return 2
+                green_count += 1
+            elif entry.startswith("REFACTOR:"):
+                refactor_count += 1
+
+        phase_count = red_count + green_count + refactor_count
+        if phase_count == 0:
+            fid = item.get("feature_id", "?")
+            print(f"No TDD phase checkpoints in {fid}")
+            return 3
+
+    return 0
+
+
 def cmd_check_worktree(agents_file: Path, worktree_path: str) -> int:
     """Check if a worktree has an active entry. Exit 0 = has entry, 1 = no entry."""
     items = _load_unlocked(agents_file)
@@ -791,7 +839,8 @@ def main() -> int:
 
     valid_cmds = {
         "register", "activate", "checkpoint", "complete", "unregister",
-        "check-worktree", "get-active", "get-current-feature", "list",
+        "check-worktree", "check-tdd-phases", "get-active",
+        "get-current-feature", "list",
         "migrate-wip", "claim", "release",
         "session-register", "session-deregister", "count-others",
         "cleanup-stale", "session-heartbeat", "prompt-check",
@@ -838,6 +887,8 @@ def main() -> int:
             print("Error: worktree_path required", file=sys.stderr)
             return 1
         return cmd_check_worktree(agents_file, rest[0])
+    elif cmd == "check-tdd-phases":
+        return cmd_check_tdd_phases(agents_file)
     elif cmd == "get-active":
         fid = rest[0] if rest else None
         return cmd_get_active(agents_file, fid)

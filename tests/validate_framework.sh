@@ -4723,6 +4723,84 @@ fi
 echo ""
 
 # ============================================================
+# F-0209: TDD Mode — Structural Test-First Enforcement
+# ============================================================
+echo ""
+echo "--- F-0209: TDD Mode — Structural Test-First Enforcement ---"
+
+# T-0143: wip.sh supports --phase flag
+if grep -q '\-\-phase' "${FRAMEWORK_ROOT}/.agentic/lib/tools/wip.sh"; then
+  pass "T-0143: wip.sh supports --phase flag"
+else
+  fail "T-0143: wip.sh missing --phase flag support"
+fi
+
+# T-0144: agents_helpers.py has check-tdd-phases command
+if grep -q 'check-tdd-phases' "${FRAMEWORK_ROOT}/.agentic/lib/tools/agents_helpers.py"; then
+  pass "T-0144: agents_helpers.py has check-tdd-phases command"
+else
+  fail "T-0144: agents_helpers.py missing check-tdd-phases command"
+fi
+
+# T-0145: implementing-features SKILL.md has TDD conditional branch (template)
+if grep -q 'development_mode.*tdd' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/implementing-features/SKILL.md"; then
+  pass "T-0145: template SKILL.md has TDD conditional branch"
+else
+  fail "T-0145: template SKILL.md missing TDD conditional branch"
+fi
+
+# T-0146: implementing-features SKILL.md has TDD conditional branch (framework-dev)
+if grep -q 'development_mode.*tdd' "${FRAMEWORK_ROOT}/.claude/skills/implementing-features/SKILL.md"; then
+  pass "T-0146: framework-dev SKILL.md has TDD conditional branch"
+else
+  fail "T-0146: framework-dev SKILL.md missing TDD conditional branch"
+fi
+
+# T-0147: pre-commit-check.sh has Check #20
+if grep -q 'Check 20.*TDD' "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commit-check.sh"; then
+  pass "T-0147: pre-commit-check.sh has Check #20 (TDD)"
+else
+  fail "T-0147: pre-commit-check.sh missing Check #20 (TDD)"
+fi
+
+# T-0148: SKIP_TDD in escape hatch guard
+if grep -q 'SKIP_TDD' "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commit-check.sh"; then
+  pass "T-0148: SKIP_TDD in pre-commit escape hatch guard"
+else
+  fail "T-0148: SKIP_TDD missing from pre-commit escape hatch guard"
+fi
+
+# T-0149: memory-seed has TDD enforcement sentinel
+if grep -q 'checkpoint.*phase' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
+  pass "T-0149: memory-seed.md has TDD enforcement sentinel"
+else
+  fail "T-0149: memory-seed.md missing TDD enforcement sentinel"
+fi
+
+# T-0150: auto_orchestration.md has TDD branch in step 3
+if grep -q 'tdd.*red-green-refactor\|RED.*GREEN.*REFACTOR' "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/auto_orchestration.md" 2>/dev/null; then
+  pass "T-0150: auto_orchestration.md has TDD branch in feature pipeline"
+else
+  fail "T-0150: auto_orchestration.md missing TDD branch"
+fi
+
+# T-0151: wip.sh complete has TDD gate
+if grep -q 'check-tdd-phases' "${FRAMEWORK_ROOT}/.agentic/lib/tools/wip.sh"; then
+  pass "T-0151: wip.sh complete has TDD gate (check-tdd-phases)"
+else
+  fail "T-0151: wip.sh complete missing TDD gate"
+fi
+
+# T-0152: F-0209 acceptance criteria file exists
+if [[ -f "$FRAMEWORK_ROOT/.agentic/spec/acceptance/F-0209.md" ]]; then
+  pass "T-0152: F-0209 acceptance criteria file exists"
+else
+  fail "T-0152: F-0209 acceptance criteria file missing"
+fi
+
+echo ""
+
+# ============================================================
 # Summary
 # ============================================================
 echo ""

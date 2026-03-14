@@ -2,10 +2,8 @@
 name: implementing-features
 description: >
   Implements features using acceptance-driven workflow with structural gates.
-  Use when the user wants to build new functionality — e.g. "build",
-  "implement", "add feature", "create [thing]", "develop", "wire up",
-  "implement F-XXXX", "ag implement", or any description of new work to do.
-  Match intent, not exact words.
+  Use when user says "build", "implement", "add feature", "create [thing]",
+  "implement F-XXXX", "ag implement", or describes new functionality to build.
   Do NOT use for: one-line fixes (use fixing-bugs), writing tests only
   (use writing-tests), code review (use reviewing-code), documentation-only
   changes (use updating-documentation).
@@ -13,7 +11,7 @@ compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Agent]
 metadata:
   author: agentic-framework
-  version: "0.46.1"
+  version: "0.58.1"
 ---
 
 # Implementing Features
@@ -95,6 +93,27 @@ If `ag implement` created a worktree (when `worktree_mode: always` in STACK.md),
 1. Read and understand acceptance criteria fully
 2. Check `CONTEXT_PACK.md` for "Where to look first"
 3. Check `STACK.md` for `development_mode` (standard or tdd)
+
+**If `development_mode: tdd`** — Per-AC red-green-refactor cycle:
+
+For each acceptance criterion, in order:
+- **RED**: Write a failing test that expresses the desired behavior. Run it to confirm it fails.
+  ```bash
+  bash .agentic/lib/tools/wip.sh checkpoint --phase RED "AC-XXX: test for [behavior] fails"
+  ```
+- **GREEN**: Write the minimal code to make the test pass. Run all tests.
+  ```bash
+  bash .agentic/lib/tools/wip.sh checkpoint --phase GREEN "AC-XXX: [behavior] passes"
+  ```
+- **REFACTOR** (optional): Improve code quality while keeping tests green.
+  ```bash
+  bash .agentic/lib/tools/wip.sh checkpoint --phase REFACTOR "AC-XXX: cleaned up [aspect]"
+  ```
+
+Do NOT write implementation code before its test exists. One AC at a time. `wip.sh complete` blocks without phase checkpoints. See `.agentic/lib/workflows/tdd_mode.md` for error recovery and examples.
+
+**If `development_mode: standard`** (default) — Implement then test:
+
 4. Implement in small increments:
    - Write code following `references/programming_standards.md`
    - Add tests that verify acceptance criteria

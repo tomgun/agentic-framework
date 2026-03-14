@@ -8,6 +8,7 @@
 #   bash .agentic/tools/wip.sh start <feature_id> "<description>" "<files>"
 #   bash .agentic/tools/wip.sh start <feature_id> --auto
 #   bash .agentic/tools/wip.sh checkpoint "<progress_note>"
+#   bash .agentic/tools/wip.sh checkpoint --phase RED|GREEN|REFACTOR "<progress_note>"
 #   bash .agentic/tools/wip.sh complete
 #   bash .agentic/tools/wip.sh check
 #
@@ -15,6 +16,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../paths.sh"
+source "$SCRIPT_DIR/../settings.sh"
 cd "${PROJECT_ROOT}"
 
 # SESSION_DIR, WIP_FILE, AGENTS_JSON provided by paths.sh
@@ -159,11 +161,33 @@ EOF
 
   checkpoint)
     if [[ $# -lt 2 ]]; then
-      echo "Usage: wip.sh checkpoint \"<progress_note>\""
+      echo "Usage: wip.sh checkpoint [--phase RED|GREEN|REFACTOR] \"<progress_note>\""
       exit 1
     fi
 
-    PROGRESS_NOTE="$2"
+    PROGRESS_NOTE=""
+
+    # Parse --phase flag (F-0209: TDD phase tracking)
+    if [[ "${2:-}" == "--phase" ]]; then
+      if [[ $# -lt 4 ]]; then
+        echo "Usage: wip.sh checkpoint --phase RED|GREEN|REFACTOR \"<progress_note>\""
+        exit 1
+      fi
+      PHASE=$(echo "$3" | tr '[:lower:]' '[:upper:]')
+      case "$PHASE" in
+        RED|GREEN|REFACTOR)
+          PROGRESS_NOTE="${PHASE}: $4"
+          ;;
+        *)
+          echo "❌ Invalid phase: $3"
+          echo "   Valid phases: RED, GREEN, REFACTOR"
+          echo "   Usage: wip.sh checkpoint --phase RED|GREEN|REFACTOR \"<progress_note>\""
+          exit 1
+          ;;
+      esac
+    else
+      PROGRESS_NOTE="$2"
+    fi
 
     # Try AGENTS.json first
     if _has_python; then
@@ -202,6 +226,36 @@ EOF
     if _has_python; then
       local_feature=$(_get_agents_feature)
       if [[ -n "$local_feature" ]]; then
+        # F-0209: TDD phase gate — validate before deleting entry
+        DEV_MODE=$(get_setting "development_mode" "standard")
+        if [[ "$DEV_MODE" == "tdd" ]]; then
+          # Check SKIP_TDD escape hatch (blocked on main/master)
+          if [[ -n "${SKIP_TDD:-}" ]]; then
+            BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+            if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
+              echo "❌ BLOCKED: Cannot use SKIP_TDD on $BRANCH"
+              exit 1
+            fi
+            echo "⚠️  SKIP_TDD set — bypassing TDD phase validation"
+          else
+            TDD_EXIT=0
+            TDD_OUTPUT=$(_agents_py check-tdd-phases 2>&1) || TDD_EXIT=$?
+            if [[ $TDD_EXIT -eq 2 ]]; then
+              echo "❌ BLOCKED: TDD phase ordering violated"
+              echo "   $TDD_OUTPUT"
+              echo "   Every GREEN must be preceded by a RED. Use: wip.sh checkpoint --phase RED|GREEN|REFACTOR"
+              exit 1
+            elif [[ $TDD_EXIT -eq 3 ]]; then
+              echo "❌ BLOCKED: TDD mode active but no phase checkpoints recorded"
+              echo "   Use: wip.sh checkpoint --phase RED \"test for [behavior] fails\""
+              echo "   Then: wip.sh checkpoint --phase GREEN \"[behavior] passes\""
+              exit 1
+            elif [[ $TDD_EXIT -eq 1 ]]; then
+              echo "⚠️  TDD phase check error (proceeding): $TDD_OUTPUT"
+            fi
+          fi
+        fi
+
         _agents_py complete "$local_feature"
         echo "✓ WIP tracking completed"
         # Also clean up legacy WIP.md if it exists
@@ -321,6 +375,7 @@ EOF
     echo "Commands:"
     echo "  start <feature_id> \"<description>\" \"<files>\""
     echo "  checkpoint \"<progress_note>\""
+    echo "  checkpoint --phase RED|GREEN|REFACTOR \"<progress_note>\""
     echo "  complete"
     echo "  check"
     echo ""
