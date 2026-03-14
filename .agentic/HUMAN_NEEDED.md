@@ -68,6 +68,15 @@ _No active items_
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
+
+### HN-0042: PR #138: F-0215 Framework Verification Loop
+- **Type**: review
+- **Added**: 2026-03-14
+- **Context**: ag auto verify-framework — self-test + self-heal loop
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0035: PR #126: Orphaned plan detection at session start

@@ -1,6 +1,17 @@
 [
   {
     "type": "feature",
+    "id": "F-0215",
+    "description": "F-0215",
+    "added_at": "2026-03-14T21:05:00Z",
+    "added_by": "auto",
+    "became_current_at": "2026-03-14T21:05:00Z",
+    "refs": [
+      ".agentic/journal/plans/F-0215-plan.md"
+    ]
+  },
+  {
+    "type": "feature",
     "id": "F-0210",
     "description": "Configurable Definition of Done per Task Type",
     "added_at": "2026-03-11T16:40:39Z",
