@@ -21,12 +21,7 @@ settings_matrix:
     docs_mode: deferred
     expectations:
       workflow:
-        # Discovery: lightweight but still validates the workflow happened
-        - type: features_have_status
-          status: shipped
-          min: 1
-        - type: acceptance_criteria_checked
-          min: 1
+        # Discovery: no formal features/specs — but journal + hygiene
         - type: journal_updated
         - type: commits_follow_convention
           min: 2

@@ -516,8 +516,8 @@ class TestExpectationChecker:
             exp = s["expectations"]
             assert len(exp) > 0, f"Scenario '{name}' has empty expectations"
 
-    def test_all_settings_have_core_workflow_expectations(self):
-        """All profiles must check journal, AC, and feature status."""
+    def test_all_settings_have_workflow_expectations(self):
+        """All profiles must have at least journal + no_wip checks."""
         from auto.framework_verify import list_scenarios, load_scenario
         for name in list_scenarios():
             s = load_scenario(name)
@@ -529,16 +529,18 @@ class TestExpectationChecker:
                 assert "journal_updated" in types, (
                     f"{name}/{profile}: missing journal_updated workflow check"
                 )
-                assert "acceptance_criteria_checked" in types, (
-                    f"{name}/{profile}: missing acceptance_criteria_checked"
-                )
-                assert "features_have_status" in types, (
-                    f"{name}/{profile}: missing features_have_status"
+                assert "no_wip_at_end" in types, (
+                    f"{name}/{profile}: missing no_wip_at_end workflow check"
                 )
 
-    def test_formal_settings_have_plan_workflow_expectations(self):
-        """Formal/autonomous_formal settings must also check plans."""
+    def test_formal_settings_have_full_workflow_expectations(self):
+        """Formal/autonomous_formal must check plans, AC, features, journal."""
         from auto.framework_verify import list_scenarios, load_scenario
+        required = {
+            "plans_exist", "plans_approved",
+            "acceptance_criteria_checked", "features_have_status",
+            "journal_updated", "commits_follow_convention", "no_wip_at_end",
+        }
         for name in list_scenarios():
             s = load_scenario(name)
             for settings in s.get("settings_matrix", []):
@@ -547,11 +549,9 @@ class TestExpectationChecker:
                     exp = settings.get("expectations", {})
                     workflow = exp.get("workflow", [])
                     types = {w["type"] for w in workflow}
-                    assert "plans_exist" in types, (
-                        f"{name}/{profile}: missing plans_exist workflow check"
-                    )
-                    assert "plans_approved" in types, (
-                        f"{name}/{profile}: missing plans_approved workflow check"
+                    missing = required - types
+                    assert not missing, (
+                        f"{name}/{profile}: missing workflow checks: {missing}"
                     )
 
 
