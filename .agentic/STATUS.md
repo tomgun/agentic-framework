@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Systematic Quality epic merged — ready for next backlog item (Updated: 2026-03-15 20:16 UTC)
+- NFR Lifecycle Epic — Order 0.5 bugfix + Order 0 spec stubs (Updated: 2026-03-15 22:12 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

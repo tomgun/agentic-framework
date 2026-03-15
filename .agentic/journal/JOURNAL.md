@@ -2781,3 +2781,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 22:12 - NFR Lifecycle Epic
+
+**Why**: NFRs are passive documentation — building lifecycle tools to make them active
+
+**What changed**:
+- Plan approved (4 iterations, dialectical review). Order 0: spec stubs for F-0216 through F-0219. Order 0.5: validator bugfix — expanded VALID_NFR_CATEGORIES, added glob path resolution, fixed NFR-0004 test path.
+
+**Next steps**:
+- Implement F-0216 (NFR auto-generation) and F-0217 (NFR test gate) in parallel
+
+**Blockers**: None
+

@@ -57,7 +57,7 @@ Purpose: capture cross-cutting constraints that apply across many features (perf
 - Applies to: all features in Formal profile (global)
 - How to measure: `ag implement` gate checks acceptance file exists; pre-commit checks FEATURES.md staleness
 - Where enforced:
-  - Tests: `tests/validate_framework.sh` (spec-first checks), `tests/infrastructure/structural/S07_*`
+  - Tests: `tests/validate_framework.sh` (spec-first checks), `tests/infrastructure/structural/S07_memory_seed_consistency.sh`
   - CI: pre-commit-check.sh Check 3c, ag.sh implement gate
 - Current status: met
 - Acceptance: spec/acceptance/NFR-0004.md
