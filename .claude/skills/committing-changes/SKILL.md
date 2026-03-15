@@ -2,17 +2,15 @@
 name: committing-changes
 description: >
   Pre-commit quality gates, branch management, and PR creation.
-  Use when the user wants to commit, push, save, ship, or finalize changes —
-  e.g. "commit", "push", "ship", "finalize", "create PR", "save changes",
-  "ag commit", "ready to commit", or any phrasing that means persisting work.
-  Match intent, not exact words.
+  Use when user says "commit", "push", "ship", "finalize", "create PR",
+  "ag commit", "ready to commit", or wants to save completed work.
   Do NOT use for: writing code (use implementing-features), running tests
   (use writing-tests), reviewing code (use reviewing-code).
 compatibility: "Requires Claude Code with shell access and git."
 allowed-tools: [Bash, Read, Edit, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.46.1"
+  version: "0.60.0"
 ---
 
 # Committing Changes
@@ -43,7 +41,6 @@ git branch --show-current
 - If on `main` or `master`: **STOP.** Create a feature branch first:
   `git checkout -b feature/description`
 - If on feature branch: proceed.
-- In a worktree, you're already on the feature branch — no branch switch needed.
 - Only push to main if user explicitly says "push to main directly".
 
 ### Step 3: Update Artifacts
@@ -74,9 +71,6 @@ If the project has a validation script:
 bash tests/validate_framework.sh
 ```
 
-**LLM test required for behavioral changes** (framework development only):
-If this commit adds or changes `ag` commands, trigger words, or agent workflows, you MUST add an LLM test in `tests/llm/tests/` + entry in `test_definitions.json`. The LLM behavioral layer decides whether deterministic code ever gets called — without an LLM test, there's no verification that agents will actually invoke the feature. Unit tests validate infrastructure works; LLM tests validate agents use it.
-
 ### Step 5: Show Changes to Human
 
 ```bash
@@ -84,7 +78,7 @@ git diff --stat
 git diff
 ```
 
-Present a summary of changes. **Never auto-commit in interactive sessions.** Wait for human approval. (Autonomous workflows use `review_commit` setting — F-0203.)
+Present a summary of changes. **Interactive sessions**: wait for human approval before committing. **Autonomous/non-interactive sessions** (e.g. `--print` mode, `ag auto` workflows): commit directly, using `review_commit` setting to determine review level (F-0203).
 
 ### Step 6: Commit and PR
 

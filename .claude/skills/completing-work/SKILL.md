@@ -2,17 +2,16 @@
 name: completing-work
 description: >
   Feature completion workflow: verify acceptance criteria, mark done, update
-  specs, cleanup WIP. Use when the user indicates a feature is finished —
-  e.g. "done", "complete", "finished", "merged", "PR merged", "shipped",
-  "landed", "wrapped up", "ag done", "mark as done", "it's in", or any
-  phrasing that means the work is complete. Match intent, not exact words.
-  Do NOT use for: committing code (use committing-changes), starting new
-  features (use implementing-features).
+  specs, cleanup WIP. Use when user says "done", "complete", "finished",
+  "merged", "PR merged", "shipped", "landed", "wrapped up", "ag done",
+  "mark as done", "it's in", or indicates work is finished. Also triggered
+  automatically after merging a PR. Do NOT use for: committing code (use
+  committing-changes), starting new features (use implementing-features).
 compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Edit, Bash, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.46.1"
+  version: "0.60.0"
 ---
 
 # Completing Work
@@ -21,17 +20,7 @@ Verify acceptance criteria, mark features done, update specs, and cleanup.
 
 ## Instructions
 
-### Step 0: Check Uncommitted Changes
-
-Before completing, ensure all work is committed:
-
-```bash
-git status --porcelain
-```
-
-If there are uncommitted changes, commit first (`ag commit`) before proceeding. Uncommitted work gets lost in compressed context and is easy to forget.
-
-### Step 1: Verify Acceptance Criteria
+### Step 1: Verify and Check Off Acceptance Criteria
 
 Read `.agentic/spec/acceptance/F-XXXX.md` and verify each criterion is met:
 
@@ -39,6 +28,7 @@ Read `.agentic/spec/acceptance/F-XXXX.md` and verify each criterion is met:
 2. Documentation is updated
 3. No known regressions
 
+As you verify each criterion, check it off in the file (`- [ ]` → `- [x]`).
 If any criteria are not met, list what remains and ask user how to proceed.
 
 ### Step 2: Complete WIP Tracking
@@ -49,27 +39,16 @@ bash .agentic/lib/tools/wip.sh complete
 
 This clears the active WIP entry from `.agentic/session/AGENTS.json`.
 
-In a worktree: commit and push from the worktree, run `wip.sh complete`, then `cd` back to the main worktree and run `ag done F-XXXX`. When `worktree_mode: always`, `ag done` auto-cleans the worktree.
-
-### Step 2b: Verify Documentation Updated
-
-If `docs_mode: deferred` in STACK.md: skip doc verification — `ag done` logs deferred items automatically. Proceed to Step 3.
-
-Before marking shipped, verify documentation is current:
-
-1. Run `bash .agentic/lib/tools/docs.sh --validate` to check registry health (missing files, unregistered docs)
-2. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
-3. Check that CONTEXT_PACK.md reflects any architecture changes
-3. If `docs_gate: blocking` in STACK.md, `ag done` enforces this automatically
-4. For framework development: verify all instruction files updated (see CLAUDE.md § Framework Development)
-
-**Do not mark shipped with stale artifacts.** Spec + code + tests + docs = done.
-
 ### Step 3: Update Feature Status
 
 ```bash
 bash .agentic/lib/tools/feature.sh F-XXXX status shipped
 ```
+
+### Step 3b: Bump VERSION and Flush
+
+`ag done` auto-bumps VERSION (patch) and flushes state to main when on main.
+For minor/major bumps, edit VERSION manually before running `ag done`.
 
 ### Step 4: Update Artifacts
 
@@ -77,24 +56,6 @@ bash .agentic/lib/tools/feature.sh F-XXXX status shipped
 bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Project can now [capability]" "Next: [what's next]" "None" --why "Problem solved"
 bash .agentic/lib/tools/status.sh focus "F-XXXX shipped, ready for next task"
 ```
-
-### Step 4b: Advance Backlog
-
-If `.agentic/BACKLOG.json` exists and the completed feature is at position 0:
-
-```bash
-bash .agentic/lib/tools/backlog.sh done
-```
-
-This removes the completed item and promotes the next item to position 0. The command is a no-op if the completed feature is not at position 0. Include BACKLOG.json in the next commit.
-
-### Step 4c: Flush State (including VERSION)
-
-`ag done` auto-bumps VERSION (patch) and flushes state files (STATUS.md, JOURNAL.md,
-BACKLOG.json, FEATURES.md status, VERSION, etc.) directly to main when on main.
-For minor/major bumps, edit VERSION manually before running `ag done`.
-
-If in a worktree, this step is skipped — state files will be flushed after returning to main.
 
 ### Step 5: Flush Pending Items
 

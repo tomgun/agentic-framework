@@ -2716,3 +2716,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 17:12 - Framework fixes from verification findings
+
+**Why**: Verification loop revealed agents block on commit confirmation in autonomous mode and skip AC check-off during done workflow
+
+**What changed**:
+- Amended commit rule across 14 instruction files: interactive=show first, autonomous=commit directly; added AC check-off instruction to completing-work skill
+
+**Next steps**:
+- Merge and push
+
+**Blockers**: None
+

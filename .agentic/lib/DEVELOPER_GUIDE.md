@@ -335,7 +335,7 @@ Agents are trained to:
 - ✅ Follow TDD by default (write tests first)
 - ✅ Update documentation automatically
 - ✅ Ask for approval before committing
-- ❌ Never auto-commit in interactive sessions without permission (autonomous workflows use `review_commit` setting)
+- ❌ Never auto-commit in interactive sessions without permission; autonomous sessions commit directly using `review_commit` setting
 
 ### Effective Agent Prompts
 

@@ -20,7 +20,7 @@ Verify acceptance criteria, mark features done, update specs, and cleanup.
 
 ## Instructions
 
-### Step 1: Verify Acceptance Criteria
+### Step 1: Verify and Check Off Acceptance Criteria
 
 Read `.agentic/spec/acceptance/F-XXXX.md` and verify each criterion is met:
 
@@ -28,6 +28,7 @@ Read `.agentic/spec/acceptance/F-XXXX.md` and verify each criterion is met:
 2. Documentation is updated
 3. No known regressions
 
+As you verify each criterion, check it off in the file (`- [ ]` → `- [x]`).
 If any criteria are not met, list what remains and ask user how to proceed.
 
 ### Step 2: Complete WIP Tracking
