@@ -2560,3 +2560,81 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 09:06 - Behavioral Expectations
+
+**Why**: Milestones only checked process artifacts, not whether the built app actually works
+
+**What changed**:
+- Added ExpectationChecker with files_exist, commands_pass, source_contains checks to all 5 verification scenarios
+
+**Next steps**:
+- Run full verify-framework with expectations to validate end-to-end
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 09:13 - Workflow Expectations
+
+**Why**: Previous expectations only checked app output, not whether the framework workflow was actually followed
+
+**What changed**:
+- Added 7 workflow expectation types: features_have_status, plans_exist, plans_approved, acceptance_criteria_checked, journal_updated, commits_follow_convention, no_wip_at_end. Profile-aware: formal profiles require plans+review+AC checks, discovery only basic flow
+
+**Next steps**:
+- Run autonomous_formal scenario to validate plan review loop is detected
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 09:27 - Repair Loop + Safety Guard
+
+**Why**: Verification should iterate on failures instead of binary pass/fail, and must not run in production projects
+
+**What changed**:
+- Added iterative repair loop: failed expectations get targeted fix agents, up to 3 attempts, then escalate. Added framework-only guard: verify-framework refuses to run in user projects (checks FRAMEWORK_DEVELOPMENT.md)
+
+**Next steps**:
+- Run full verification with repair loop to validate end-to-end
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 10:21 - Settings-driven workflow expectations
+
+**Why**: Workflow expectations were coupled to profile names, not resolved settings — overrides were ignored
+
+**What changed**:
+- derive_workflow_expectations() uses get_setting() 3-level fallback; removed hardcoded workflow expectations from all 5 scenario YAMLs; fixed _write_stack_md to let profile defaults drive plan_review_enabled; added derivation tests
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 10:27 - Agent bootstrap in verification
+
+**Why**: Build agents were spawned without instruction files, operating blind
+
+**What changed**:
+- setup_project now calls setup-agent.sh + generate-skills.sh so build agents get CLAUDE.md, skills, and AGENTS.md — matching what real users get at install time
+
+**Next steps**:
+- PR review
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 10:34 - Review fixes
+
+**Why**: Code review found correctness and efficiency issues in the verification loop
+
+**What changed**:
+- Fixed 5 review issues: multirepo default profile, repair loop targeted re-check via check_one(), index-based milestone separation, journal ### Session: pattern, integration test for derivation wiring
+
+**Next steps**:
+- Push and update PR
+
+**Blockers**: None
+

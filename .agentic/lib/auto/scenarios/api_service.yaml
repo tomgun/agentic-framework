@@ -19,6 +19,7 @@ settings_matrix:
   - profile: discovery
     git_workflow: direct
     docs_mode: deferred
+
   - profile: autonomous_formal
     git_workflow: pull_request
     review_merge: skip
@@ -28,3 +29,18 @@ required_milestones:
   - features_specced
   - implementation_done
   - verification_green
+
+expectations:
+  files_exist:
+    - "src/**/*.ts"
+    - "**/*.test.ts"
+    - "package.json"
+  commands_pass:
+    - "npm install --silent && npm test"
+  source_contains:
+    - pattern: "express|Express"
+      glob: "src/**/*.ts"
+    - pattern: "jwt|JWT|jsonwebtoken"
+      glob: "src/**/*.ts"
+    - pattern: "describe\\(|it\\(|test\\("
+      glob: "**/*.test.ts"

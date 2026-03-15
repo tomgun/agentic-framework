@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import textwrap
 from pathlib import Path
@@ -280,6 +281,39 @@ class TestProjectSetup:
         assert result.returncode == 0
         assert "init" in result.stdout
 
+    def test_setup_bootstraps_agent_files(self, tmp_path):
+        """setup_project must create CLAUDE.md and .claude/skills/ for the build agent."""
+        from auto.framework_verify import setup_project
+        # Use the REAL framework source so templates exist
+        vw = Path(__file__).resolve().parent.parent
+
+        project = tmp_path / "project"
+        scenario = {
+            "type": "single",
+            "description": "Bootstrap test",
+            "stack": {"language": "python"},
+        }
+        settings = {"profile": "discovery", "git_workflow": "direct"}
+        setup_project(scenario, vw, project, settings)
+
+        # CLAUDE.md must exist (auto-loaded by Claude Code)
+        assert (project / "CLAUDE.md").exists(), "CLAUDE.md not bootstrapped"
+        content = (project / "CLAUDE.md").read_text()
+        assert "ag " in content, "CLAUDE.md should reference ag commands"
+
+        # Skills must be generated
+        skills_dir = project / ".claude" / "skills"
+        assert skills_dir.is_dir(), ".claude/skills/ not bootstrapped"
+        skill_names = [d.name for d in skills_dir.iterdir() if d.is_dir()]
+        assert "implementing-features" in skill_names
+        assert "session-start" in skill_names
+
+        # AGENTS.md must exist (non-negotiable rules)
+        assert (project / "AGENTS.md").exists(), "AGENTS.md not bootstrapped"
+
+        # Presets must be accessible for get_setting()
+        assert (project / ".agentic" / "presets" / "profiles.conf").exists()
+
     def test_setup_monorepo_creates_component_dirs(self, tmp_path):
         from auto.framework_verify import setup_project
         vw = tmp_path / "vw"
@@ -313,6 +347,27 @@ class TestProjectSetup:
 # ---------------------------------------------------------------------------
 # VerifyResult tests
 # ---------------------------------------------------------------------------
+
+class TestPreFlight:
+    """Test pre-flight safety checks."""
+
+    def test_framework_only_guard_blocks_user_projects(self, tmp_path):
+        """verify-framework must refuse to run in non-framework repos."""
+        from auto.framework_verify import FrameworkVerifier
+        # tmp_path has no FRAMEWORK_DEVELOPMENT.md
+        verifier = FrameworkVerifier(tmp_path)
+        errors = verifier.pre_flight()
+        assert any("FRAMEWORK_DEVELOPMENT.md" in e for e in errors)
+
+    def test_framework_only_guard_passes_in_framework_repo(self):
+        """verify-framework should pass the guard in the actual framework repo."""
+        from auto.framework_verify import FrameworkVerifier
+        project_root = Path(__file__).parent.parent
+        verifier = FrameworkVerifier(project_root)
+        errors = verifier.pre_flight()
+        # Should not have the framework-only error (may have others like "on main")
+        assert not any("FRAMEWORK_DEVELOPMENT.md" in e for e in errors)
+
 
 class TestVerifyResult:
     """Test result serialization."""
@@ -393,3 +448,412 @@ class TestTrunkBranchEnvVar:
         script = Path(__file__).parent.parent / ".agentic" / "lib" / "tools" / "ag.sh"
         content = script.read_text()
         assert "AG_TRUNK_BRANCH" in content
+
+
+# ---------------------------------------------------------------------------
+# ExpectationChecker tests
+# ---------------------------------------------------------------------------
+
+class TestExpectationChecker:
+    """Test BDD-style behavioral expectations."""
+
+    def test_files_exist_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("print('hello')")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({"files_exist": ["app/**/*.py"]})
+        assert len(results) == 1
+        assert results[0].passed
+
+    def test_files_exist_fail(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({"files_exist": ["app/**/*.py"]})
+        assert len(results) == 1
+        assert not results[0].passed
+
+    def test_command_passes_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({"commands_pass": ["true"]})
+        assert len(results) == 1
+        assert results[0].passed
+
+    def test_command_passes_fail(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({"commands_pass": ["false"]})
+        assert len(results) == 1
+        assert not results[0].passed
+        assert "exit 1" in results[0].detail
+
+    def test_source_contains_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("from fastapi import FastAPI")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "source_contains": [{"pattern": "FastAPI", "glob": "app/**/*.py"}],
+        })
+        assert len(results) == 1
+        assert results[0].passed
+
+    def test_source_contains_fail(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("import flask")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "source_contains": [{"pattern": "FastAPI", "glob": "app/**/*.py"}],
+        })
+        assert len(results) == 1
+        assert not results[0].passed
+
+    def test_source_contains_no_matching_files(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "source_contains": [{"pattern": "FastAPI", "glob": "app/**/*.py"}],
+        })
+        assert len(results) == 1
+        assert not results[0].passed
+        assert "no files" in results[0].detail
+
+    def test_multiple_expectations(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("from fastapi import FastAPI")
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "tests" / "test_app.py").write_text("def test_hello(): pass")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "files_exist": ["app/**/*.py", "tests/test_*.py"],
+            "source_contains": [{"pattern": "def test_", "glob": "tests/**/*.py"}],
+            "commands_pass": ["true"],
+        })
+        assert len(results) == 4
+        assert all(r.passed for r in results)
+
+    def test_empty_expectations(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({})
+        assert results == []
+
+    def test_scenarios_have_expectations(self):
+        """All scenarios should have behavioral expectations."""
+        from auto.framework_verify import list_scenarios, load_scenario
+        for name in list_scenarios():
+            s = load_scenario(name)
+            assert "expectations" in s, f"Scenario '{name}' missing expectations"
+            exp = s["expectations"]
+            assert len(exp) > 0, f"Scenario '{name}' has empty expectations"
+
+    def test_no_workflow_in_yaml(self):
+        """No settings_matrix entry should have workflow expectations (derived at runtime)."""
+        from auto.framework_verify import list_scenarios, load_scenario
+        for name in list_scenarios():
+            s = load_scenario(name)
+            for settings in s.get("settings_matrix", []):
+                exp = settings.get("expectations", {})
+                assert "workflow" not in exp, (
+                    f"{name}/{settings.get('profile', '?')}: "
+                    "workflow expectations must be derived, not hardcoded in YAML"
+                )
+
+
+# ---------------------------------------------------------------------------
+# Workflow expectation tests
+# ---------------------------------------------------------------------------
+
+class TestWorkflowExpectations:
+    """Test framework workflow verification."""
+
+    def test_features_have_status_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        spec_dir = tmp_path / ".agentic" / "spec"
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "FEATURES.md").write_text(
+            "## F-0001: Todo CRUD\n**Status**: shipped\n"
+        )
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "features_have_status", "status": "shipped", "min": 1}],
+        })
+        assert len(results) == 1
+        assert results[0].passed
+
+    def test_features_have_status_fail(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        spec_dir = tmp_path / ".agentic" / "spec"
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "FEATURES.md").write_text(
+            "## F-0001: Todo CRUD\n**Status**: planned\n"
+        )
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "features_have_status", "status": "shipped", "min": 1}],
+        })
+        assert len(results) == 1
+        assert not results[0].passed
+
+    def test_plans_exist_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        plans = tmp_path / ".agentic" / "journal" / "plans"
+        plans.mkdir(parents=True)
+        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "plans_exist", "min": 1}],
+        })
+        assert results[0].passed
+
+    def test_plans_approved_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        plans = tmp_path / ".agentic" / "journal" / "plans"
+        plans.mkdir(parents=True)
+        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "plans_approved", "min": 1}],
+        })
+        assert results[0].passed
+
+    def test_plans_approved_fail_draft(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        plans = tmp_path / ".agentic" / "journal" / "plans"
+        plans.mkdir(parents=True)
+        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: DRAFT\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "plans_approved", "min": 1}],
+        })
+        assert not results[0].passed
+
+    def test_acceptance_criteria_checked_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
+        ac_dir.mkdir(parents=True)
+        (ac_dir / "F-0001.md").write_text("- [x] API returns todos\n- [x] Tests pass\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "acceptance_criteria_checked", "min": 1}],
+        })
+        assert results[0].passed
+
+    def test_acceptance_criteria_checked_fail(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
+        ac_dir.mkdir(parents=True)
+        (ac_dir / "F-0001.md").write_text("- [x] API returns todos\n- [ ] Tests pass\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "acceptance_criteria_checked", "min": 1}],
+        })
+        assert not results[0].passed
+
+    def test_journal_updated_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        journal_dir = tmp_path / ".agentic" / "journal"
+        journal_dir.mkdir(parents=True)
+        (journal_dir / "JOURNAL.md").write_text("### Session: 2026-03-15 - Test\nDid some work\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "journal_updated"}],
+        })
+        assert results[0].passed
+
+    def test_no_wip_at_end_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "no_wip_at_end"}],
+        })
+        assert results[0].passed
+
+    def test_no_wip_at_end_fail_wip(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        session = tmp_path / ".agentic" / "session"
+        session.mkdir(parents=True)
+        (session / "WIP.md").write_text("working on stuff")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "no_wip_at_end"}],
+        })
+        assert not results[0].passed
+
+    def test_commits_follow_convention(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        subprocess.run(["git", "init"], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        (tmp_path / "f1.txt").write_text("init")
+        subprocess.run(["git", "add", "."], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "init: scaffold"],
+                       cwd=str(tmp_path), check=True, capture_output=True)
+        (tmp_path / "f2.txt").write_text("code")
+        subprocess.run(["git", "add", "."], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "feat(F-0001): add todo API"],
+                       cwd=str(tmp_path), check=True, capture_output=True)
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "commits_follow_convention", "min": 1}],
+        })
+        assert results[0].passed
+
+    def test_unknown_workflow_type(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "nonexistent_check"}],
+        })
+        assert not results[0].passed
+        assert "Unknown" in results[0].detail
+
+
+# ---------------------------------------------------------------------------
+# Settings-driven workflow derivation tests
+# ---------------------------------------------------------------------------
+
+class TestDeriveWorkflowExpectations:
+    """Test that workflow expectations are derived from resolved settings."""
+
+    _FRAMEWORK_ROOT = Path(__file__).resolve().parent.parent
+
+    def _setup_test_project(self, root: Path, profile: str,
+                            overrides: dict[str, str] | None = None) -> None:
+        """Create a minimal test project with STACK.md and profiles.conf."""
+        # Copy profiles.conf from the real framework
+        presets_dst = root / ".agentic" / "presets"
+        presets_dst.mkdir(parents=True, exist_ok=True)
+        presets_src = self._FRAMEWORK_ROOT / ".agentic" / "lib" / "presets" / "profiles.conf"
+        shutil.copy2(str(presets_src), str(presets_dst / "profiles.conf"))
+
+        # Write STACK.md with profile + overrides
+        lines = [
+            "# STACK.md", "",
+            "## Settings",
+            f"- profile: {profile}",
+        ]
+        for key, val in (overrides or {}).items():
+            lines.append(f"- {key}: {val}")
+        lines.append("")
+        (root / "STACK.md").write_text("\n".join(lines))
+
+    def test_discovery_gets_base_checks(self, tmp_path):
+        """Discovery profile: only journal + commits + no_wip."""
+        from auto.framework_verify import derive_workflow_expectations
+        self._setup_test_project(tmp_path, "discovery")
+        checks = derive_workflow_expectations(tmp_path)
+        types = {c["type"] for c in checks}
+        assert types == {"journal_updated", "commits_follow_convention", "no_wip_at_end"}
+
+    def test_formal_gets_full_checks(self, tmp_path):
+        """Formal profile: adds features, AC, plans."""
+        from auto.framework_verify import derive_workflow_expectations
+        self._setup_test_project(tmp_path, "formal")
+        checks = derive_workflow_expectations(tmp_path)
+        types = {c["type"] for c in checks}
+        expected = {
+            "journal_updated", "commits_follow_convention", "no_wip_at_end",
+            "features_have_status", "acceptance_criteria_checked",
+            "plans_exist", "plans_approved",
+        }
+        assert types == expected
+
+    def test_override_disables_plans(self, tmp_path):
+        """Formal with plan_review_enabled: no should remove plan checks."""
+        from auto.framework_verify import derive_workflow_expectations
+        self._setup_test_project(tmp_path, "formal", {"plan_review_enabled": "no"})
+        checks = derive_workflow_expectations(tmp_path)
+        types = {c["type"] for c in checks}
+        assert "plans_exist" not in types
+        assert "plans_approved" not in types
+        # But features + AC should still be present
+        assert "features_have_status" in types
+        assert "acceptance_criteria_checked" in types
+
+    def test_override_enables_features_on_discovery(self, tmp_path):
+        """Discovery with feature_tracking: yes should add feature check."""
+        from auto.framework_verify import derive_workflow_expectations
+        self._setup_test_project(tmp_path, "discovery", {"feature_tracking": "yes"})
+        checks = derive_workflow_expectations(tmp_path)
+        types = {c["type"] for c in checks}
+        assert "features_have_status" in types
+        # But no plans or AC (not enabled)
+        assert "plans_exist" not in types
+        assert "acceptance_criteria_checked" not in types
+
+    def test_check_one_returns_single_result(self, tmp_path):
+        """check_one should return only the named expectation."""
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        expectations = {
+            "workflow": [
+                {"type": "journal_updated"},
+                {"type": "no_wip_at_end"},
+            ],
+        }
+        result = checker.check_one(expectations, "no_wip_at_end")
+        assert result is not None
+        assert result.name == "no_wip_at_end"
+        assert result.passed  # no WIP in tmp_path
+
+    def test_check_one_returns_none_for_missing(self, tmp_path):
+        """check_one should return None for non-existent check name."""
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        result = checker.check_one({"workflow": [{"type": "no_wip_at_end"}]}, "nonexistent")
+        assert result is None
+
+    def test_journal_header_only_does_not_pass(self, tmp_path):
+        """A journal with only ## headings (no ### Session entries) should fail."""
+        from auto.framework_verify import ExpectationChecker
+        journal_dir = tmp_path / ".agentic" / "journal"
+        journal_dir.mkdir(parents=True)
+        (journal_dir / "JOURNAL.md").write_text("## Session History\n\nNothing yet.\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({"workflow": [{"type": "journal_updated"}]})
+        assert not results[0].passed
+
+    def test_derive_wired_into_scenario_expectations(self):
+        """Verify that scenario loading + derive produces the right workflow checks.
+
+        Integration test: loads a real scenario, simulates what run_scenario does
+        with the expectation merge, and checks the workflow checks are correct.
+        """
+        from auto.framework_verify import (
+            load_scenario, derive_workflow_expectations, setup_project,
+        )
+        import tempfile
+
+        scenario = load_scenario("todo_app")
+
+        for settings in scenario["settings_matrix"]:
+            with tempfile.TemporaryDirectory() as tmp:
+                project_dir = Path(tmp) / "project"
+                vw = Path(__file__).resolve().parent.parent
+                setup_project(scenario, vw, project_dir, settings)
+
+                # Simulate run_scenario's expectation merge
+                expectations = dict(scenario.get("expectations", {}))
+                expectations["workflow"] = derive_workflow_expectations(project_dir)
+
+                assert "workflow" in expectations
+                types = {c["type"] for c in expectations["workflow"]}
+
+                # All profiles must have base checks
+                assert "journal_updated" in types
+                assert "no_wip_at_end" in types
+
+                profile = settings.get("profile", "")
+                if profile == "autonomous_formal":
+                    # Formal must have plans + features + AC
+                    assert "plans_exist" in types
+                    assert "features_have_status" in types
+                elif profile == "discovery":
+                    # Discovery must NOT have plans or features
+                    assert "plans_exist" not in types
+                    assert "features_have_status" not in types

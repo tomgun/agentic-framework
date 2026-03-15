@@ -42,6 +42,8 @@ from auto import SpawnResult, spawn_claude  # noqa: E402
 # ---------------------------------------------------------------------------
 MAX_RETRIES_PER_SCENARIO = 3
 MAX_TOTAL_FIXES = 20
+MAX_REPAIR_ATTEMPTS = 3
+REPAIR_TIMEOUT = 300  # seconds per repair agent
 SCENARIOS_DIR = Path(__file__).resolve().parent / "scenarios"
 PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 
@@ -65,6 +67,8 @@ class ScenarioRun:
     milestones: list[MilestoneResult] = field(default_factory=list)
     retries: int = 0
     fixes: list[str] = field(default_factory=list)
+    repairs: list[str] = field(default_factory=list)
+    escalations: list[str] = field(default_factory=list)
     error: str = ""
     skipped: bool = False
 
@@ -96,6 +100,8 @@ class VerifyResult:
                     "success": r.success,
                     "retries": r.retries,
                     "fixes": r.fixes,
+                    "repairs": r.repairs,
+                    "escalations": r.escalations,
                     "milestones": [
                         {"name": m.name, "passed": m.passed, "detail": m.detail}
                         for m in r.milestones
@@ -254,6 +260,385 @@ class MilestoneChecker:
 
 
 # ---------------------------------------------------------------------------
+# Behavioral expectations
+# ---------------------------------------------------------------------------
+
+class ExpectationChecker:
+    """Run BDD-style expectations against a built project.
+
+    Expectations are declared in scenario YAML under an `expectations` key:
+
+        expectations:
+          files_exist:            # glob patterns — at least one match required
+            - "app/**/*.py"
+            - "tests/test_*.py"
+          commands_pass:          # shell commands that must exit 0
+            - "pytest"
+          source_contains:       # regex patterns in source files
+            - pattern: "FastAPI"
+              glob: "app/**/*.py"
+    """
+
+    def __init__(self, project_root: Path):
+        self.root = project_root
+
+    def check_all(self, expectations: dict[str, Any]) -> list[MilestoneResult]:
+        """Run all expectations and return results."""
+        results: list[MilestoneResult] = []
+
+        for pattern in expectations.get("files_exist", []):
+            results.append(self._check_files_exist(pattern))
+
+        for cmd in expectations.get("commands_pass", []):
+            results.append(self._check_command_passes(cmd))
+
+        for entry in expectations.get("source_contains", []):
+            results.append(self._check_source_contains(
+                entry["pattern"], entry.get("glob", "**/*"),
+            ))
+
+        # Workflow expectations — verify the framework process was followed
+        for check in expectations.get("workflow", []):
+            results.append(self._check_workflow(check))
+
+        return results
+
+    def check_one(self, expectations: dict[str, Any], name: str) -> MilestoneResult | None:
+        """Re-check a single expectation by name. Returns None if not found."""
+        for result in self.check_all(expectations):
+            if result.name == name:
+                return result
+        return None
+
+    def _check_files_exist(self, pattern: str) -> MilestoneResult:
+        matches = list(self.root.glob(pattern))
+        # Filter out .git and .agentic matches
+        matches = [
+            m for m in matches if m.is_file()
+            and ".git" not in m.parts and ".agentic" not in m.parts
+        ]
+        if matches:
+            return MilestoneResult(
+                f"files_exist({pattern})", True,
+                f"{len(matches)} file(s)",
+            )
+        return MilestoneResult(
+            f"files_exist({pattern})", False,
+            "no matching files",
+        )
+
+    def _check_command_passes(self, cmd: str) -> MilestoneResult:
+        try:
+            result = subprocess.run(
+                ["bash", "-c", cmd],
+                cwd=str(self.root),
+                capture_output=True, text=True,
+                timeout=120,
+            )
+            if result.returncode == 0:
+                return MilestoneResult(
+                    f"command_passes({cmd})", True,
+                )
+            # Include last few lines of output for diagnosis
+            output = (result.stdout + result.stderr).strip().split("\n")
+            tail = "\n".join(output[-5:]) if len(output) > 5 else "\n".join(output)
+            return MilestoneResult(
+                f"command_passes({cmd})", False,
+                f"exit {result.returncode}: {tail[:200]}",
+            )
+        except subprocess.TimeoutExpired:
+            return MilestoneResult(
+                f"command_passes({cmd})", False, "timed out (120s)",
+            )
+        except Exception as e:
+            return MilestoneResult(
+                f"command_passes({cmd})", False, str(e),
+            )
+
+    def _check_source_contains(self, pattern: str, glob: str) -> MilestoneResult:
+        matches = [
+            f for f in self.root.glob(glob)
+            if f.is_file() and ".git" not in f.parts and ".agentic" not in f.parts
+        ]
+        if not matches:
+            return MilestoneResult(
+                f"source_contains({pattern})", False,
+                f"no files matching {glob}",
+            )
+        regex = re.compile(pattern)
+        matched_files = []
+        for f in matches:
+            try:
+                if regex.search(f.read_text(errors="ignore")):
+                    matched_files.append(f.name)
+            except Exception:
+                continue
+        if matched_files:
+            return MilestoneResult(
+                f"source_contains({pattern})", True,
+                f"found in {len(matched_files)} file(s)",
+            )
+        return MilestoneResult(
+            f"source_contains({pattern})", False,
+            f"pattern not found in {len(matches)} file(s)",
+        )
+
+    # -- Workflow expectations ------------------------------------------------
+
+    def _check_workflow(self, check: dict[str, Any]) -> MilestoneResult:
+        """Dispatch a workflow expectation by type."""
+        check_type = check.get("type", "")
+        method = getattr(self, f"_wf_{check_type}", None)
+        if method is None:
+            return MilestoneResult(
+                f"workflow({check_type})", False,
+                f"Unknown workflow check: {check_type}",
+            )
+        return method(check)
+
+    def _wf_features_have_status(self, check: dict) -> MilestoneResult:
+        """At least N features reached the given status."""
+        status = check.get("status", "shipped")
+        min_count = check.get("min", 1)
+        features_path = self.root / ".agentic" / "spec" / "FEATURES.md"
+        if not features_path.exists():
+            return MilestoneResult(
+                f"features_have_status({status})", False,
+                "FEATURES.md not found",
+            )
+        content = features_path.read_text()
+        count = len(re.findall(
+            rf"\*\*Status\*\*:\s*{re.escape(status)}", content,
+        ))
+        if count >= min_count:
+            return MilestoneResult(
+                f"features_have_status({status})", True,
+                f"{count} feature(s) with status '{status}'",
+            )
+        return MilestoneResult(
+            f"features_have_status({status})", False,
+            f"only {count} feature(s) with status '{status}' (need {min_count})",
+        )
+
+    def _wf_acceptance_criteria_checked(self, check: dict) -> MilestoneResult:
+        """At least N AC files have all items checked off [x]."""
+        min_count = check.get("min", 1)
+        ac_dir = self.root / ".agentic" / "spec" / "acceptance"
+        if not ac_dir.exists():
+            return MilestoneResult(
+                "acceptance_criteria_checked", False,
+                "acceptance/ directory not found",
+            )
+        fully_checked = 0
+        for ac_file in ac_dir.glob("F-*.md"):
+            content = ac_file.read_text()
+            unchecked = re.findall(r"- \[ \]", content)
+            checked = re.findall(r"- \[x\]", content)
+            if checked and not unchecked:
+                fully_checked += 1
+        if fully_checked >= min_count:
+            return MilestoneResult(
+                "acceptance_criteria_checked", True,
+                f"{fully_checked} AC file(s) fully checked",
+            )
+        return MilestoneResult(
+            "acceptance_criteria_checked", False,
+            f"only {fully_checked} AC file(s) fully checked (need {min_count})",
+        )
+
+    def _wf_plans_exist(self, check: dict) -> MilestoneResult:
+        """Plans directory has at least N plan files."""
+        min_count = check.get("min", 1)
+        plans_dir = self.root / ".agentic" / "journal" / "plans"
+        if not plans_dir.exists():
+            return MilestoneResult(
+                "plans_exist", False, "plans/ directory not found",
+            )
+        plan_files = list(plans_dir.glob("F-*-plan.md"))
+        if len(plan_files) >= min_count:
+            return MilestoneResult(
+                "plans_exist", True,
+                f"{len(plan_files)} plan file(s)",
+            )
+        return MilestoneResult(
+            "plans_exist", False,
+            f"only {len(plan_files)} plan file(s) (need {min_count})",
+        )
+
+    def _wf_plans_approved(self, check: dict) -> MilestoneResult:
+        """At least N plans have APPROVED status."""
+        min_count = check.get("min", 1)
+        plans_dir = self.root / ".agentic" / "journal" / "plans"
+        if not plans_dir.exists():
+            return MilestoneResult(
+                "plans_approved", False, "plans/ directory not found",
+            )
+        approved = 0
+        for plan in plans_dir.glob("F-*-plan.md"):
+            content = plan.read_text()
+            if re.search(r"\*\*Status\*\*:\s*APPROVED", content):
+                approved += 1
+        if approved >= min_count:
+            return MilestoneResult(
+                "plans_approved", True,
+                f"{approved} plan(s) approved",
+            )
+        return MilestoneResult(
+            "plans_approved", False,
+            f"only {approved} approved plan(s) (need {min_count})",
+        )
+
+    def _wf_journal_updated(self, _check: dict) -> MilestoneResult:
+        """JOURNAL.md has at least one entry beyond the template."""
+        journal = self.root / ".agentic" / "journal" / "JOURNAL.md"
+        if not journal.exists():
+            return MilestoneResult(
+                "journal_updated", False, "JOURNAL.md not found",
+            )
+        content = journal.read_text()
+        # Count session entries (### Session: ...) not file-level headings (## ...)
+        entries = re.findall(r"^###\s+Session:", content, re.MULTILINE)
+        if not entries:
+            # Fallback: any ### heading (some journal formats differ)
+            entries = re.findall(r"^### ", content, re.MULTILINE)
+        if len(entries) >= 1:
+            return MilestoneResult(
+                "journal_updated", True,
+                f"{len(entries)} journal entry/entries",
+            )
+        return MilestoneResult(
+            "journal_updated", False, "no journal entries found",
+        )
+
+    def _wf_commits_follow_convention(self, check: dict) -> MilestoneResult:
+        """Git commits follow conventional format with feature IDs."""
+        min_count = check.get("min", 1)
+        pattern = check.get("pattern", r"^(feat|fix|test|chore|docs)\(?.*\)?:")
+        try:
+            result = subprocess.run(
+                ["git", "log", "--oneline", "-20"],
+                capture_output=True, text=True, cwd=str(self.root),
+                timeout=10,
+            )
+            lines = [
+                l.split(" ", 1)[1] for l in result.stdout.strip().split("\n")
+                if l.strip() and " " in l
+            ]
+            regex = re.compile(pattern)
+            matching = [l for l in lines if regex.search(l)]
+            # Exclude the init commit
+            non_init = [l for l in lines if not l.startswith("init:")]
+            if len(matching) >= min_count:
+                return MilestoneResult(
+                    "commits_follow_convention", True,
+                    f"{len(matching)}/{len(non_init)} commits match",
+                )
+            return MilestoneResult(
+                "commits_follow_convention", False,
+                f"only {len(matching)}/{len(non_init)} commits match pattern",
+            )
+        except Exception as e:
+            return MilestoneResult(
+                "commits_follow_convention", False, str(e),
+            )
+
+    def _wf_no_wip_at_end(self, _check: dict) -> MilestoneResult:
+        """No WIP.md or active AGENTS.json entries at project completion."""
+        wip = self.root / ".agentic" / "session" / "WIP.md"
+        if wip.exists():
+            return MilestoneResult(
+                "no_wip_at_end", False, "WIP.md still exists",
+            )
+        agents = self.root / ".agentic" / "session" / "AGENTS.json"
+        if agents.exists():
+            try:
+                data = json.loads(agents.read_text())
+                if data:  # Non-empty list = active agents
+                    return MilestoneResult(
+                        "no_wip_at_end", False,
+                        f"{len(data)} active agent(s) in AGENTS.json",
+                    )
+            except (json.JSONDecodeError, OSError):
+                pass
+        return MilestoneResult("no_wip_at_end", True)
+
+
+# ---------------------------------------------------------------------------
+# Settings-driven workflow expectations
+# ---------------------------------------------------------------------------
+
+def derive_workflow_expectations(project_root: Path) -> list[dict]:
+    """Derive workflow expectations from the project's resolved settings.
+
+    Uses get_setting() with its three-level fallback (explicit STACK.md →
+    profile preset → default) so expectations adapt to overrides, not just
+    profile names.
+    """
+    import settings as _settings
+    _settings._cache.clear()
+
+    checks: list[dict] = [
+        {"type": "journal_updated"},
+        {"type": "commits_follow_convention", "min": 2},
+        {"type": "no_wip_at_end"},
+    ]
+
+    if _settings.get_setting(project_root, "feature_tracking", "no") == "yes":
+        checks.append({"type": "features_have_status", "status": "shipped", "min": 1})
+
+    if (_settings.get_setting(project_root, "spec_directory", "no") == "yes"
+            and _settings.get_setting(project_root, "acceptance_criteria", "recommended") == "blocking"):
+        checks.append({"type": "acceptance_criteria_checked", "min": 1})
+
+    if _settings.get_setting(project_root, "plan_review_enabled", "no") == "yes":
+        checks.append({"type": "plans_exist", "min": 1})
+        checks.append({"type": "plans_approved", "min": 1})
+
+    return checks
+
+
+# ---------------------------------------------------------------------------
+# Agent bootstrap — create the files Claude Code auto-reads
+# ---------------------------------------------------------------------------
+
+def _bootstrap_agent_files(project_dir: Path) -> None:
+    """Run the real setup-agent.sh and generate-skills.sh scripts.
+
+    Without CLAUDE.md and .claude/skills/, the spawned agent has no
+    auto-loaded instruction file and no skills — it can't follow the
+    framework workflow.  We call the same scripts the install flow uses
+    so the test project matches what real users get.
+    """
+    lib_dir = project_dir / ".agentic" / "lib"
+    tools_dir = lib_dir / "tools"
+    env = {**os.environ, "ROOT_DIR": str(project_dir)}
+
+    # 1. setup-agent.sh claude — creates CLAUDE.md
+    setup_script = tools_dir / "setup-agent.sh"
+    if setup_script.exists():
+        subprocess.run(
+            ["bash", str(setup_script), "claude"],
+            cwd=str(project_dir), env=env,
+            capture_output=True, text=True,
+        )
+
+    # 2. generate-skills.sh — creates .claude/skills/ from skill sources
+    skills_script = tools_dir / "generate-skills.sh"
+    skills_src = lib_dir / "agents" / "claude" / "skills"
+    if skills_script.exists() and skills_src.is_dir():
+        subprocess.run(
+            ["bash", str(skills_script)],
+            cwd=str(project_dir), env=env,
+            capture_output=True, text=True,
+        )
+
+    # 3. AGENTS.md — non-negotiable rules referenced by CLAUDE.md
+    agents_template = lib_dir / "init" / "AGENTS.template.md"
+    if agents_template.exists() and not (project_dir / "AGENTS.md").exists():
+        shutil.copy2(str(agents_template), str(project_dir / "AGENTS.md"))
+
+
+# ---------------------------------------------------------------------------
 # Project setup
 # ---------------------------------------------------------------------------
 
@@ -269,10 +654,19 @@ def setup_project(
     # Copy framework
     shutil.copytree(vw_path / ".agentic", project_dir / ".agentic")
 
+    # Ensure presets are at the path get_setting() expects
+    presets_src = project_dir / ".agentic" / "lib" / "presets"
+    presets_dst = project_dir / ".agentic" / "presets"
+    if presets_src.exists() and not presets_dst.exists():
+        shutil.copytree(str(presets_src), str(presets_dst))
+
     # Create tier-1 settings for non-interactive execution
     claude_dir = project_dir / ".claude"
     claude_dir.mkdir(exist_ok=True)
     (claude_dir / "settings.json").write_text('{"_tier": 1}')
+
+    # Bootstrap agent files (CLAUDE.md, skills, AGENTS.md)
+    _bootstrap_agent_files(project_dir)
 
     # Write STACK.md
     _write_stack_md(project_dir, scenario, settings)
@@ -330,9 +724,19 @@ def setup_multirepo_project(
 
     # Now set up umbrella with resolved paths
     shutil.copytree(vw_path / ".agentic", umbrella_dir / ".agentic")
+
+    # Ensure presets are at the path get_setting() expects
+    presets_src = umbrella_dir / ".agentic" / "lib" / "presets"
+    presets_dst = umbrella_dir / ".agentic" / "presets"
+    if presets_src.exists() and not presets_dst.exists():
+        shutil.copytree(str(presets_src), str(presets_dst))
+
     claude_dir = umbrella_dir / ".claude"
     claude_dir.mkdir(exist_ok=True)
     (claude_dir / "settings.json").write_text('{"_tier": 1}')
+
+    # Bootstrap agent files (CLAUDE.md, skills, AGENTS.md)
+    _bootstrap_agent_files(umbrella_dir)
 
     # Write STACK.md with resolved absolute paths (not 'repo: local')
     _write_multirepo_stack_md(umbrella_dir, scenario, settings, component_paths)
@@ -370,11 +774,12 @@ def _write_stack_md(
         lines.append(f"- docs_mode: {settings['docs_mode']}")
     if "review_merge" in settings:
         lines.append(f"- review_merge: {settings['review_merge']}")
-    # Formal profiles need these for the full workflow to exercise
+    # Formal profiles: let profile defaults drive most settings,
+    # but skip expensive reviews (dialectical review, commit review)
     profile = settings.get("profile", "discovery")
     if profile in ("formal", "autonomous_formal"):
-        lines.append("- plan_review_enabled: no")
         lines.append("- acceptance_criteria: blocking")
+        lines.append("- review_plan: skip")
         lines.append("- review_commit: skip")
 
     lines.extend([
@@ -419,6 +824,13 @@ def _write_multirepo_stack_md(
     ]
     if "review_merge" in settings:
         lines.append(f"- review_merge: {settings['review_merge']}")
+    # Formal profiles: let profile defaults drive most settings,
+    # but skip expensive reviews (dialectical review, commit review)
+    profile = settings.get("profile", "discovery")
+    if profile in ("formal", "autonomous_formal"):
+        lines.append("- acceptance_criteria: blocking")
+        lines.append("- review_plan: skip")
+        lines.append("- review_commit: skip")
 
     # Components with resolved paths and Repo column
     lines.extend(["", "## Components", "",
@@ -511,6 +923,19 @@ class FrameworkVerifier:
     def pre_flight(self) -> list[str]:
         """Run pre-flight checks. Returns list of blocking errors."""
         errors: list[str] = []
+
+        # 0. Framework-only guard: refuse to run in production projects.
+        # verify-framework spawns agents with --dangerously-skip-permissions,
+        # creates worktrees, and consumes significant tokens. It is meant
+        # ONLY for the framework repo itself, not user projects.
+        marker = self.project_root / "FRAMEWORK_DEVELOPMENT.md"
+        if not marker.exists():
+            errors.append(
+                "verify-framework is only available in the framework repo itself. "
+                "This project does not have FRAMEWORK_DEVELOPMENT.md. "
+                "If you are developing the framework, ensure you are in the "
+                "correct directory."
+            )
 
         # 1. Claude availability
         try:
@@ -701,7 +1126,48 @@ class FrameworkVerifier:
                     detail = f" — {m.detail}" if m.detail else ""
                     self._log(f"    {icon} {m.name}{detail}")
 
-                if all(m.passed for m in milestones):
+                # Check behavioral expectations
+                # Scenario-level expectations (files_exist, commands_pass, source_contains)
+                expectations = dict(scenario.get("expectations", {}))
+
+                # Derive workflow expectations from resolved settings
+                expectations["workflow"] = derive_workflow_expectations(project_root)
+
+                # Merge non-workflow settings-level expectations (if any exist in YAML)
+                settings_exp = settings.get("expectations", {})
+                for key, val in settings_exp.items():
+                    if key == "workflow":
+                        continue  # workflow is derived, not from YAML
+                    if key in expectations and isinstance(expectations[key], list):
+                        expectations[key] = expectations[key] + val
+                    else:
+                        expectations[key] = val
+                if expectations:
+                    self._log(f"  Running behavioral expectations...")
+                    exp_checker = ExpectationChecker(project_root)
+                    exp_results = exp_checker.check_all(expectations)
+                    milestones.extend(exp_results)
+                    run.milestones = milestones
+
+                    for m in exp_results:
+                        icon = "+" if m.passed else "✗"
+                        detail = f" — {m.detail}" if m.detail else ""
+                        self._log(f"    {icon} {m.name}{detail}")
+
+                    # Repair loop: attempt to fix failed expectations
+                    failed = [m for m in exp_results if not m.passed]
+                    # Only repair if milestone checks passed (expectations are the problem)
+                    exp_start_idx = len(milestones) - len(exp_results)
+                    if failed and all(m.passed for m in milestones[:exp_start_idx]):
+                        self._repair_expectations(
+                            project_root, exp_checker, expectations,
+                            failed, run, log_file,
+                        )
+                        # Refresh expectations after repairs (keep milestone checks as-is)
+                        refreshed = exp_checker.check_all(expectations)
+                        run.milestones = milestones[:exp_start_idx] + refreshed
+
+                if all(m.passed for m in run.milestones):
                     run.success = True
                     self._log(f"  PASSED")
                     return run
@@ -732,6 +1198,196 @@ class FrameworkVerifier:
                 shutil.rmtree(project_dir, ignore_errors=True)
 
         return run
+
+    # -- Delivery ------------------------------------------------------------
+
+    # -- Repair loop ---------------------------------------------------------
+
+    def _repair_expectations(
+        self,
+        project_root: Path,
+        exp_checker: ExpectationChecker,
+        expectations: dict[str, Any],
+        failed: list[MilestoneResult],
+        run: ScenarioRun,
+        log_file: Path | None,
+    ) -> None:
+        """Iteratively repair failed expectations.
+
+        For each failed expectation:
+        1. Spawn a repair agent targeting that specific failure
+        2. Re-check the expectation
+        3. If still failing, retry with different instructions
+        4. After MAX_REPAIR_ATTEMPTS, escalate and move on
+        """
+        self._log(f"  Entering repair loop: {len(failed)} failed expectation(s)")
+
+        for fail in failed:
+            repaired = False
+            for attempt in range(1, MAX_REPAIR_ATTEMPTS + 1):
+                self._log(
+                    f"    Repairing: {fail.name} "
+                    f"(attempt {attempt}/{MAX_REPAIR_ATTEMPTS})"
+                )
+
+                # Build repair prompt
+                prompt = self._build_repair_prompt(
+                    fail, attempt, project_root,
+                )
+
+                # Determine log file for repair agent
+                repair_log = None
+                if log_file:
+                    base = log_file.stem
+                    safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', fail.name)[:50]
+                    repair_log = log_file.parent / (
+                        f"{base}_repair_{safe_name}_attempt{attempt}.log"
+                    )
+
+                repair_result = spawn_claude(
+                    self.claude_command,
+                    project_root,
+                    prompt,
+                    timeout=REPAIR_TIMEOUT,
+                    log_file=repair_log,
+                    monitor=True,
+                    monitor_interval=15,
+                )
+
+                if repair_result.timed_out:
+                    self._log(f"      Repair agent timed out")
+                    continue
+
+                # Re-check only the specific failed expectation
+                fixed = exp_checker.check_one(expectations, fail.name)
+                if fixed and fixed.passed:
+                    self._log(f"      + Repaired: {fail.name}")
+                    run.repairs.append(f"{fail.name} (attempt {attempt})")
+                    repaired = True
+                    break
+                else:
+                    detail = fixed.detail if fixed else "check not found"
+                    self._log(f"      Still failing: {detail}")
+
+            if not repaired:
+                self._log(f"    ESCALATED: {fail.name} — {fail.detail}")
+                run.escalations.append(f"{fail.name}: {fail.detail}")
+
+    def _build_repair_prompt(
+        self,
+        fail: MilestoneResult,
+        attempt: int,
+        project_root: Path,
+    ) -> str:
+        """Build a targeted repair prompt for a specific failed expectation."""
+        template_path = PROMPTS_DIR / "verify_repair.md"
+        template = template_path.read_text()
+
+        # Count commits for context
+        try:
+            out = subprocess.run(
+                ["git", "rev-list", "--count", "HEAD"],
+                capture_output=True, text=True, cwd=str(project_root),
+                timeout=5,
+            ).stdout.strip()
+            commit_count = out if out.isdigit() else "unknown"
+        except Exception:
+            commit_count = "unknown"
+
+        # Build hints based on check type
+        repair_hint = self._repair_hint(fail, attempt)
+
+        # Describe what was expected
+        expectation_desc = self._expectation_description(fail)
+
+        return template.format(
+            check_name=fail.name,
+            check_detail=fail.detail or "no detail",
+            attempt=attempt,
+            max_attempts=MAX_REPAIR_ATTEMPTS,
+            expectation_description=expectation_desc,
+            commit_count=commit_count,
+            repair_hint=repair_hint,
+        )
+
+    @staticmethod
+    def _expectation_description(fail: MilestoneResult) -> str:
+        """Human-readable description of what an expectation checks."""
+        name = fail.name
+        if name.startswith("files_exist"):
+            return f"Source files matching the pattern should exist in the project."
+        if name.startswith("command_passes"):
+            return f"The command should exit with code 0 (tests pass, build succeeds)."
+        if name.startswith("source_contains"):
+            return f"Source files should contain the expected pattern (correct framework/library used)."
+        if "features_have_status" in name:
+            return "Features in FEATURES.md should have reached 'shipped' status. Run `ag done F-XXXX` for completed features."
+        if "plans_exist" in name:
+            return "Implementation plans should exist at .agentic/journal/plans/F-XXXX-plan.md. Run `ag plan F-XXXX` or `ag implement F-XXXX` which creates plans."
+        if "plans_approved" in name:
+            return "Plans should have **Status**: APPROVED. The plan review process must complete."
+        if "acceptance_criteria_checked" in name:
+            return "Acceptance criteria files should have all items checked [x]. Run `ag done` to mark features complete."
+        if "journal_updated" in name:
+            return "JOURNAL.md should have at least one entry. Use `bash .agentic/lib/tools/journal.sh` to add entries."
+        if "commits_follow_convention" in name:
+            return "Git commits should follow conventional format: feat(scope): description, fix: description, etc."
+        if "no_wip_at_end" in name:
+            return "No WIP.md or active AGENTS.json should remain. Run `ag done` for all features."
+        return f"Expectation '{name}' should pass."
+
+    @staticmethod
+    def _repair_hint(fail: MilestoneResult, attempt: int) -> str:
+        """Progressive hints — more specific guidance on later attempts."""
+        name = fail.name
+        hints = []
+
+        if attempt >= 2:
+            hints.append(
+                "Previous repair attempt did not fix this. "
+                "Try a different approach."
+            )
+        if attempt >= 3:
+            hints.append(
+                "This is the last attempt. Be thorough — check the actual "
+                "file contents and state before making changes."
+            )
+
+        # Check-specific hints
+        if "command_passes" in name:
+            hints.append(
+                "Run the command manually first to see the full error output. "
+                "Common issues: missing dependencies, import errors, test failures."
+            )
+        elif "plans_approved" in name:
+            if attempt == 1:
+                hints.append(
+                    "Check if plans exist but have DRAFT status. "
+                    "Update the status to APPROVED in the plan file."
+                )
+            else:
+                hints.append(
+                    "Create the plan file directly at "
+                    ".agentic/journal/plans/F-XXXX-plan.md with "
+                    "**Status**: APPROVED if the plan review is not possible."
+                )
+        elif "acceptance_criteria_checked" in name:
+            hints.append(
+                "Open .agentic/spec/acceptance/F-*.md files and change "
+                "[ ] to [x] for all completed criteria."
+            )
+        elif "journal_updated" in name:
+            hints.append(
+                "Run: bash .agentic/lib/tools/journal.sh "
+                '"Topic" "What was done" "Next steps" "Blockers"'
+            )
+        elif "features_have_status" in name:
+            hints.append(
+                "Run `ag done F-XXXX` for each completed feature, or "
+                "update FEATURES.md status directly."
+            )
+
+        return "\n".join(hints) if hints else ""
 
     # -- Delivery ------------------------------------------------------------
 
@@ -945,6 +1601,14 @@ def _print_report(result: VerifyResult) -> None:
             print(f"    Error: {run.error}")
         if run.fixes:
             print(f"    Fixes applied: {len(run.fixes)}")
+        if run.repairs:
+            print(f"    Repairs: {len(run.repairs)}")
+            for r in run.repairs:
+                print(f"      + {r}")
+        if run.escalations:
+            print(f"    Escalated: {len(run.escalations)}")
+            for e in run.escalations:
+                print(f"      ! {e}")
         if run.retries > 0:
             print(f"    Retries: {run.retries}")
 

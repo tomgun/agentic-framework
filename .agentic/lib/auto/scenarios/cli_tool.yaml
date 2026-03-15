@@ -19,6 +19,7 @@ settings_matrix:
   - profile: discovery
     git_workflow: direct
     docs_mode: deferred
+
   - profile: autonomous_formal
     git_workflow: pull_request
     review_merge: skip
@@ -28,3 +29,15 @@ required_milestones:
   - features_specced
   - implementation_done
   - verification_green
+
+expectations:
+  files_exist:
+    - "**/*.py"
+    - "tests/test_*.py"
+  commands_pass:
+    - "pip install -q -e . 2>/dev/null; python -m pytest tests/ -x -q"
+  source_contains:
+    - pattern: "click|Click|argparse"
+      glob: "**/*.py"
+    - pattern: "def test_"
+      glob: "tests/**/*.py"
