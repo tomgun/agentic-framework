@@ -2677,3 +2677,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 13:25 - CLI tool discovery verification
+
+**Why**: Validating discovery prompt generalizes across different project types
+
+**What changed**:
+- cli_tool discovery passed on attempt 3: agent built 57-test file organizer with Click, 7 features shipped; all advisory behavioral checks also passed on successful attempt
+
+**Next steps**:
+- Run api_service scenario (TypeScript) to test cross-language discovery
+
+**Blockers**: None
+
