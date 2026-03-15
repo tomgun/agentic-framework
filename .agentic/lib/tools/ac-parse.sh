@@ -47,8 +47,10 @@ _ac_is_unchecked_checkbox() {
 }
 
 # Match a line as a bare (legacy) AC: "- AC-NNN:" without checkbox
+# Must exclude checkbox lines to avoid double-counting
 _ac_is_bare() {
-    echo "$1" | grep -qE "^[[:space:]]*- ${_AC_ID_PATTERN}:" 2>/dev/null
+    echo "$1" | grep -qE "^[[:space:]]*- ${_AC_ID_PATTERN}:" 2>/dev/null && \
+    ! echo "$1" | grep -qE "^[[:space:]]*- \[[ x]\]" 2>/dev/null
 }
 
 # Match a line as a heading AC: "### AC-NNN"
@@ -83,7 +85,8 @@ ac_count_unchecked() {
     [[ -f "$file" ]] || { echo "0"; return; }
     local checkbox_unchecked bare heading
     checkbox_unchecked=$(grep -cE "^[[:space:]]*- \[ \][[:space:]]+(\*\*)?${_AC_ID_PATTERN}(\*\*)?:" "$file" 2>/dev/null) || checkbox_unchecked=0
-    bare=$(grep -cE "^[[:space:]]*- ${_AC_ID_PATTERN}:" "$file" 2>/dev/null) || bare=0
+    # Bare format: "- AC-NNN:" WITHOUT checkbox prefix (exclude [x] and [ ] lines)
+    bare=$(grep -E "^[[:space:]]*- ${_AC_ID_PATTERN}:" "$file" 2>/dev/null | grep -cvE "^[[:space:]]*- \[[ x]\]" 2>/dev/null) || bare=0
     heading=$(grep -cE "^###[[:space:]]+${_AC_ID_PATTERN}" "$file" 2>/dev/null) || heading=0
     # Trim whitespace
     checkbox_unchecked="${checkbox_unchecked//[[:space:]]/}"

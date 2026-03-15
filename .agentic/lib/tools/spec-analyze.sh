@@ -46,25 +46,28 @@ VAGUE_WORDS="fast|slow|scalable|easy|intuitive|efficient|responsive|user-friendl
 # Gate mode: when called with --gate, CRITICAL findings cause non-zero exit
 GATE_MODE=0
 
-# Rewrite suggestions for common vague terms
-declare -A REWRITE_SUGGESTIONS=(
-    [fast]="specify: 'responds within Xms under Y concurrent users'"
-    [slow]="specify: 'completes in under X seconds for Y records'"
-    [scalable]="specify: 'handles X concurrent requests with <Yms p99 latency'"
-    [easy]="specify: 'completable in N steps' or 'requires no configuration'"
-    [intuitive]="specify: 'user completes task without documentation' or 'follows [standard] conventions'"
-    [efficient]="specify: 'uses <X MB memory' or 'processes N items/second'"
-    [responsive]="specify: 'renders within Xms' or 'updates within X frames'"
-    [user-friendly]="specify: 'completes task in N clicks' or 'has WCAG AA compliance'"
-    [seamless]="specify: 'no user action required' or 'completes without errors'"
-    [performant]="specify: 'Xms latency at Y throughput'"
-    [quickly]="specify: 'within X seconds'"
-    [easily]="specify: 'in N steps' or 'with single command'"
-    [appropriate]="specify the exact criteria or threshold"
-    [adequate]="specify the minimum acceptable value"
-    [sufficient]="specify the minimum acceptable value"
-    [reasonable]="specify the exact threshold or range"
-)
+# Rewrite suggestions for common vague terms (portable — no associative arrays)
+_get_rewrite_suggestion() {
+    case "$1" in
+        fast)        echo "specify: 'responds within Xms under Y concurrent users'" ;;
+        slow)        echo "specify: 'completes in under X seconds for Y records'" ;;
+        scalable)    echo "specify: 'handles X concurrent requests with <Yms p99 latency'" ;;
+        easy)        echo "specify: 'completable in N steps' or 'requires no configuration'" ;;
+        intuitive)   echo "specify: 'user completes task without documentation' or 'follows [standard] conventions'" ;;
+        efficient)   echo "specify: 'uses <X MB memory' or 'processes N items/second'" ;;
+        responsive)  echo "specify: 'renders within Xms' or 'updates within X frames'" ;;
+        user-friendly) echo "specify: 'completes task in N clicks' or 'has WCAG AA compliance'" ;;
+        seamless)    echo "specify: 'no user action required' or 'completes without errors'" ;;
+        performant)  echo "specify: 'Xms latency at Y throughput'" ;;
+        quickly)     echo "specify: 'within X seconds'" ;;
+        easily)      echo "specify: 'in N steps' or 'with single command'" ;;
+        appropriate) echo "specify the exact criteria or threshold" ;;
+        adequate)    echo "specify the minimum acceptable value" ;;
+        sufficient)  echo "specify the minimum acceptable value" ;;
+        reasonable)  echo "specify the exact threshold or range" ;;
+        *)           echo "Add a measurable threshold" ;;
+    esac
+}
 
 # Measurement units that indicate a metric is present nearby
 METRIC_INDICATORS='[0-9]+\s*(ms|s|sec|min|%|percent|MB|GB|KB|bytes|req/s|rps|tps|ops|lines|files|items|times|x)\b|[0-9]+\.[0-9]|<\s*[0-9]|>\s*[0-9]|≤|≥|within\s+[0-9]|under\s+[0-9]|below\s+[0-9]|at least\s+[0-9]|at most\s+[0-9]|max\s+[0-9]|min\s+[0-9]'
@@ -163,7 +166,8 @@ check_ambiguity() {
                     if ! echo "$line" | grep -qEi "$METRIC_INDICATORS"; then
                         local severity="MEDIUM"
                         [[ "$GATE_MODE" -eq 1 ]] && severity="CRITICAL"
-                        local suggestion="${REWRITE_SUGGESTIONS[$word]:-"Add a measurable threshold"}"
+                        local suggestion
+                        suggestion=$(_get_rewrite_suggestion "$word")
                         add_finding "$severity" "$ac_id" \
                             "Contains vague term \"$word\" without metric" \
                             "$suggestion"

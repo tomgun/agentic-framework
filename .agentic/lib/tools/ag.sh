@@ -806,15 +806,16 @@ cmd_plan() {
 
 # Implement command - verify acceptance exists, start WIP (Formal only)
 cmd_implement() {
-    # Parse flags before positional args
+    # Parse flags from any position (--skip-clarity can come before or after F-XXXX)
     local skip_clarity="${SKIP_CLARITY:-0}"
-    while [[ "${1:-}" == --* ]]; do
-        case "$1" in
-            --skip-clarity) skip_clarity=1; shift ;;
-            *) break ;;
+    local feature_id=""
+    local arg
+    for arg in "$@"; do
+        case "$arg" in
+            --skip-clarity) skip_clarity=1 ;;
+            *) [[ -z "$feature_id" ]] && feature_id="$arg" ;;
         esac
     done
-    local feature_id="${1:-}"
 
     # Check feature tracking
     local ft

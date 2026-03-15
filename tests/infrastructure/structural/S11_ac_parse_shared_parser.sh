@@ -158,3 +158,25 @@ result="${result//[[:space:]]/}"
 result=$(ac_list "$TMPDIR/grouped.md" | grep "^checked|P1|" | wc -l)
 result="${result//[[:space:]]/}"
 [[ "$result" -eq 2 ]] && pass_test "T-AC23: ac_list P1 checked=2" || fail_test "T-AC23: ac_list P1 checked=2" "got $result"
+
+# --- Double-counting regression: mixed checkbox + bare in same file ---
+cat > "$TMPDIR/mixed_format.md" << 'EOF'
+## Acceptance Criteria
+
+- [x] **AC-001**: Checkbox checked
+- [ ] **AC-002**: Checkbox unchecked
+- AC-003: Bare format legacy
+EOF
+
+result=$(ac_count_total "$TMPDIR/mixed_format.md")
+[[ "$result" -eq 3 ]] && pass_test "T-AC24: mixed checkbox+bare total=3 (no double-count)" || fail_test "T-AC24: mixed checkbox+bare total=3" "got $result"
+
+result=$(ac_count_checked "$TMPDIR/mixed_format.md")
+[[ "$result" -eq 1 ]] && pass_test "T-AC25: mixed checkbox+bare checked=1" || fail_test "T-AC25: mixed checkbox+bare checked=1" "got $result"
+
+result=$(ac_count_unchecked "$TMPDIR/mixed_format.md")
+[[ "$result" -eq 2 ]] && pass_test "T-AC26: mixed checkbox+bare unchecked=2" || fail_test "T-AC26: mixed checkbox+bare unchecked=2" "got $result"
+
+# Verify bare detection excludes checkbox lines
+result=$(echo "- [x] AC-001: test" | { _ac_is_bare "- [x] AC-001: test" && echo "bare" || echo "not_bare"; })
+[[ "$result" == "not_bare" ]] && pass_test "T-AC27: checkbox line not detected as bare" || fail_test "T-AC27: checkbox line not detected as bare" "got $result"

@@ -2755,3 +2755,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 20:11 - Review fixes
+
+**Why**: Code review found correctness and portability bugs
+
+**What changed**:
+- Fixed 4 issues from code review: bare-format double-counting bug, --skip-clarity arg parsing, bash 3.x portability, mixed-format regression test
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
