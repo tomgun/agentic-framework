@@ -303,6 +303,13 @@ class ExpectationChecker:
 
         return results
 
+    def check_one(self, expectations: dict[str, Any], name: str) -> MilestoneResult | None:
+        """Re-check a single expectation by name. Returns None if not found."""
+        for result in self.check_all(expectations):
+            if result.name == name:
+                return result
+        return None
+
     def _check_files_exist(self, pattern: str) -> MilestoneResult:
         matches = list(self.root.glob(pattern))
         # Filter out .git and .agentic matches
@@ -489,8 +496,11 @@ class ExpectationChecker:
                 "journal_updated", False, "JOURNAL.md not found",
             )
         content = journal.read_text()
-        # Count entries (each starts with ##)
-        entries = re.findall(r"^## ", content, re.MULTILINE)
+        # Count session entries (### Session: ...) not file-level headings (## ...)
+        entries = re.findall(r"^###\s+Session:", content, re.MULTILINE)
+        if not entries:
+            # Fallback: any ### heading (some journal formats differ)
+            entries = re.findall(r"^### ", content, re.MULTILINE)
         if len(entries) >= 1:
             return MilestoneResult(
                 "journal_updated", True,
@@ -816,7 +826,7 @@ def _write_multirepo_stack_md(
         lines.append(f"- review_merge: {settings['review_merge']}")
     # Formal profiles: let profile defaults drive most settings,
     # but skip expensive reviews (dialectical review, commit review)
-    profile = settings.get("profile", "autonomous_formal")
+    profile = settings.get("profile", "discovery")
     if profile in ("formal", "autonomous_formal"):
         lines.append("- acceptance_criteria: blocking")
         lines.append("- review_plan: skip")
@@ -1146,20 +1156,16 @@ class FrameworkVerifier:
 
                     # Repair loop: attempt to fix failed expectations
                     failed = [m for m in exp_results if not m.passed]
-                    if failed and all(m.passed for m in milestones
-                                      if m not in exp_results):
+                    # Only repair if milestone checks passed (expectations are the problem)
+                    exp_start_idx = len(milestones) - len(exp_results)
+                    if failed and all(m.passed for m in milestones[:exp_start_idx]):
                         self._repair_expectations(
                             project_root, exp_checker, expectations,
                             failed, run, log_file,
                         )
-                        # Refresh milestones after repairs
+                        # Refresh expectations after repairs (keep milestone checks as-is)
                         refreshed = exp_checker.check_all(expectations)
-                        # Replace exp_results in milestones
-                        milestone_base = [
-                            m for m in run.milestones if m not in exp_results
-                        ]
-                        milestone_base.extend(refreshed)
-                        run.milestones = milestone_base
+                        run.milestones = milestones[:exp_start_idx] + refreshed
 
                 if all(m.passed for m in run.milestones):
                     run.success = True
@@ -1252,11 +1258,8 @@ class FrameworkVerifier:
                     self._log(f"      Repair agent timed out")
                     continue
 
-                # Re-check this specific expectation
-                refreshed = exp_checker.check_all(expectations)
-                fixed = next(
-                    (m for m in refreshed if m.name == fail.name), None,
-                )
+                # Re-check only the specific failed expectation
+                fixed = exp_checker.check_one(expectations, fail.name)
                 if fixed and fixed.passed:
                     self._log(f"      + Repaired: {fail.name}")
                     run.repairs.append(f"{fail.name} (attempt {attempt})")

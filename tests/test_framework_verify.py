@@ -657,7 +657,7 @@ class TestWorkflowExpectations:
         from auto.framework_verify import ExpectationChecker
         journal_dir = tmp_path / ".agentic" / "journal"
         journal_dir.mkdir(parents=True)
-        (journal_dir / "JOURNAL.md").write_text("## Session 1\nDid some work\n")
+        (journal_dir / "JOURNAL.md").write_text("### Session: 2026-03-15 - Test\nDid some work\n")
         checker = ExpectationChecker(tmp_path)
         results = checker.check_all({
             "workflow": [{"type": "journal_updated"}],
@@ -785,3 +785,75 @@ class TestDeriveWorkflowExpectations:
         # But no plans or AC (not enabled)
         assert "plans_exist" not in types
         assert "acceptance_criteria_checked" not in types
+
+    def test_check_one_returns_single_result(self, tmp_path):
+        """check_one should return only the named expectation."""
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        expectations = {
+            "workflow": [
+                {"type": "journal_updated"},
+                {"type": "no_wip_at_end"},
+            ],
+        }
+        result = checker.check_one(expectations, "no_wip_at_end")
+        assert result is not None
+        assert result.name == "no_wip_at_end"
+        assert result.passed  # no WIP in tmp_path
+
+    def test_check_one_returns_none_for_missing(self, tmp_path):
+        """check_one should return None for non-existent check name."""
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        result = checker.check_one({"workflow": [{"type": "no_wip_at_end"}]}, "nonexistent")
+        assert result is None
+
+    def test_journal_header_only_does_not_pass(self, tmp_path):
+        """A journal with only ## headings (no ### Session entries) should fail."""
+        from auto.framework_verify import ExpectationChecker
+        journal_dir = tmp_path / ".agentic" / "journal"
+        journal_dir.mkdir(parents=True)
+        (journal_dir / "JOURNAL.md").write_text("## Session History\n\nNothing yet.\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({"workflow": [{"type": "journal_updated"}]})
+        assert not results[0].passed
+
+    def test_derive_wired_into_scenario_expectations(self):
+        """Verify that scenario loading + derive produces the right workflow checks.
+
+        Integration test: loads a real scenario, simulates what run_scenario does
+        with the expectation merge, and checks the workflow checks are correct.
+        """
+        from auto.framework_verify import (
+            load_scenario, derive_workflow_expectations, setup_project,
+        )
+        import tempfile
+
+        scenario = load_scenario("todo_app")
+
+        for settings in scenario["settings_matrix"]:
+            with tempfile.TemporaryDirectory() as tmp:
+                project_dir = Path(tmp) / "project"
+                vw = Path(__file__).resolve().parent.parent
+                setup_project(scenario, vw, project_dir, settings)
+
+                # Simulate run_scenario's expectation merge
+                expectations = dict(scenario.get("expectations", {}))
+                expectations["workflow"] = derive_workflow_expectations(project_dir)
+
+                assert "workflow" in expectations
+                types = {c["type"] for c in expectations["workflow"]}
+
+                # All profiles must have base checks
+                assert "journal_updated" in types
+                assert "no_wip_at_end" in types
+
+                profile = settings.get("profile", "")
+                if profile == "autonomous_formal":
+                    # Formal must have plans + features + AC
+                    assert "plans_exist" in types
+                    assert "features_have_status" in types
+                elif profile == "discovery":
+                    # Discovery must NOT have plans or features
+                    assert "plans_exist" not in types
+                    assert "features_have_status" not in types

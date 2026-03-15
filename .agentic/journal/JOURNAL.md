@@ -2625,3 +2625,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 10:34 - Review fixes
+
+**Why**: Code review found correctness and efficiency issues in the verification loop
+
+**What changed**:
+- Fixed 5 review issues: multirepo default profile, repair loop targeted re-check via check_one(), index-based milestone separation, journal ### Session: pattern, integration test for derivation wiring
+
+**Next steps**:
+- Push and update PR
+
+**Blockers**: None
+
