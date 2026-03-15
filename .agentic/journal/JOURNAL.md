@@ -2651,3 +2651,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 12:51 - Discovery prompt iteration
+
+**Why**: Discovery prompt too minimal — agents need autonomous context and CLAUDE.md pointer to discover framework workflow
+
+**What changed**:
+- Round 1 revealed agents ask for commit confirmation (no human in --print mode) and skip ag kickoff; added autonomous execution context and CLAUDE.md-first instruction to discovery prompt
+
+**Next steps**:
+- Re-run verification with fixed prompt
+
+**Blockers**: None
+
