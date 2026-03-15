@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -156,6 +157,23 @@ class _ProjectMonitor:
             )
 
 
+def _clean_env_for_spawn() -> dict[str, str]:
+    """Build a clean environment for spawned agents.
+
+    Strips all agentic framework env vars (exported by paths.sh) so the
+    spawned agent discovers paths fresh from its own CWD/project root.
+    Without this, inherited vars like AGENTIC_LIB, ROOT_DIR, PROJECT_ROOT
+    cause the spawned agent to write state files into the parent project
+    instead of its own project directory.
+    """
+    _AGENTIC_ENV_VARS = {
+        "ROOT_DIR", "PROJECT_ROOT", "MAIN_PROJECT_ROOT",
+        "AGENTIC_ROOT", "AGENTIC_LIB", "AGENTS_JSON",
+        "_AGENTIC_PATHS_LOADED",
+    }
+    return {k: v for k, v in os.environ.items() if k not in _AGENTIC_ENV_VARS}
+
+
 def spawn_claude(
     claude_command: str,
     project_root: Path,
@@ -185,6 +203,9 @@ def spawn_claude(
         model=model,
     )
 
+    # Clean environment to prevent path leakage from parent process
+    clean_env = _clean_env_for_spawn()
+
     mon = None
     if monitor:
         mon = _ProjectMonitor(project_root, log_file, interval=monitor_interval)
@@ -197,6 +218,7 @@ def spawn_claude(
                 proc = subprocess.Popen(
                     cmd,
                     cwd=str(project_root),
+                    env=clean_env,
                     stdout=fh,
                     stderr=subprocess.STDOUT,
                     text=True,
@@ -221,6 +243,7 @@ def spawn_claude(
             proc = subprocess.run(
                 cmd,
                 cwd=str(project_root),
+                env=clean_env,
                 capture_output=True,
                 text=True,
                 timeout=timeout,

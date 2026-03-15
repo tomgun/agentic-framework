@@ -37,7 +37,7 @@ expectations:
     - "tests/test_*.py"
     - "requirements.txt"
   commands_pass:
-    - "pip install -q -r requirements.txt && python -m pytest tests/ -x -q"
+    - "python3 -m pip install -q -r requirements.txt && python3 -m pytest tests/ -x -q"
   source_contains:
     - pattern: "fastapi|FastAPI"
       glob: "app/**/*.py"

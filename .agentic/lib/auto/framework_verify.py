@@ -642,6 +642,82 @@ def _bootstrap_agent_files(project_dir: Path) -> None:
 # Project setup
 # ---------------------------------------------------------------------------
 
+def _reset_project_state(project_dir: Path) -> None:
+    """Reset state and spec files so the test project starts fresh.
+
+    After copying .agentic/ from the framework VW, the test project inherits
+    all framework features (F-0001 through F-02XX), backlog entries, journal,
+    etc. This resets those files so the agent starts with a clean slate and
+    feature numbering begins from F-0001.
+    """
+    agentic = project_dir / ".agentic"
+
+    # Reset spec files — empty FEATURES.md, remove acceptance criteria
+    spec_dir = agentic / "spec"
+    if spec_dir.exists():
+        features = spec_dir / "FEATURES.md"
+        if features.exists():
+            features.write_text("# Features\n\n")
+        ac_dir = spec_dir / "acceptance"
+        if ac_dir.exists():
+            shutil.rmtree(ac_dir)
+            ac_dir.mkdir()
+        # Remove ADRs (framework-specific)
+        adr_dir = spec_dir / "adr"
+        if adr_dir.exists():
+            shutil.rmtree(adr_dir)
+            adr_dir.mkdir()
+        # Reset other spec files
+        for f in ("ISSUES.md", "NFR.md", "REFERENCES.md", "LESSONS.md"):
+            p = spec_dir / f
+            if p.exists():
+                p.write_text(f"# {f.replace('.md', '')}\n\n")
+
+    # Reset state files
+    backlog = agentic / "BACKLOG.json"
+    if backlog.exists():
+        backlog.write_text("[]\n")
+
+    status = agentic / "STATUS.md"
+    if status.exists():
+        status.write_text("# Status\n\n## Current session state\n\n## Current focus\n")
+
+    overview = agentic / "OVERVIEW.md"
+    if overview.exists():
+        overview.write_text("# Overview\n\n")
+
+    todo = agentic / "TODO.md"
+    if todo.exists():
+        todo.write_text("# TODO\n\n")
+
+    human_needed = agentic / "HUMAN_NEEDED.md"
+    if human_needed.exists():
+        human_needed.write_text("# Human Needed\n\n")
+
+    contributions = agentic / "CONTRIBUTIONS.md"
+    if contributions.exists():
+        contributions.write_text("# Contributions\n\n")
+
+    # Reset journal
+    journal_dir = agentic / "journal"
+    if journal_dir.exists():
+        journal = journal_dir / "JOURNAL.md"
+        if journal.exists():
+            journal.write_text("# Journal\n\n")
+        # Remove plans and manifests
+        for subdir in ("plans", "manifests", "lessons"):
+            d = journal_dir / subdir
+            if d.exists():
+                shutil.rmtree(d)
+                d.mkdir()
+
+    # Reset session state
+    session_dir = agentic / "session"
+    if session_dir.exists():
+        shutil.rmtree(session_dir)
+        session_dir.mkdir()
+
+
 def setup_project(
     scenario: dict[str, Any],
     vw_path: Path,
@@ -653,6 +729,9 @@ def setup_project(
 
     # Copy framework
     shutil.copytree(vw_path / ".agentic", project_dir / ".agentic")
+
+    # Reset state so the test project starts fresh (clean features, backlog, etc.)
+    _reset_project_state(project_dir)
 
     # Ensure presets are at the path get_setting() expects
     presets_src = project_dir / ".agentic" / "lib" / "presets"
@@ -724,6 +803,9 @@ def setup_multirepo_project(
 
     # Now set up umbrella with resolved paths
     shutil.copytree(vw_path / ".agentic", umbrella_dir / ".agentic")
+
+    # Reset state so the test project starts fresh
+    _reset_project_state(umbrella_dir)
 
     # Ensure presets are at the path get_setting() expects
     presets_src = umbrella_dir / ".agentic" / "lib" / "presets"

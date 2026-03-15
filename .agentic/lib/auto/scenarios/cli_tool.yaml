@@ -35,7 +35,7 @@ expectations:
     - "**/*.py"
     - "tests/test_*.py"
   commands_pass:
-    - "pip install -q -e . 2>/dev/null; python -m pytest tests/ -x -q"
+    - "python3 -m pip install -q -e . 2>/dev/null; python3 -m pytest tests/ -x -q"
   source_contains:
     - pattern: "click|Click|argparse"
       glob: "**/*.py"
