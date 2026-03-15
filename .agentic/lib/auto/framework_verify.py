@@ -554,6 +554,40 @@ class ExpectationChecker:
 
 
 # ---------------------------------------------------------------------------
+# Settings-driven workflow expectations
+# ---------------------------------------------------------------------------
+
+def derive_workflow_expectations(project_root: Path) -> list[dict]:
+    """Derive workflow expectations from the project's resolved settings.
+
+    Uses get_setting() with its three-level fallback (explicit STACK.md →
+    profile preset → default) so expectations adapt to overrides, not just
+    profile names.
+    """
+    import settings as _settings
+    _settings._cache.clear()
+
+    checks: list[dict] = [
+        {"type": "journal_updated"},
+        {"type": "commits_follow_convention", "min": 2},
+        {"type": "no_wip_at_end"},
+    ]
+
+    if _settings.get_setting(project_root, "feature_tracking", "no") == "yes":
+        checks.append({"type": "features_have_status", "status": "shipped", "min": 1})
+
+    if (_settings.get_setting(project_root, "spec_directory", "no") == "yes"
+            and _settings.get_setting(project_root, "acceptance_criteria", "recommended") == "blocking"):
+        checks.append({"type": "acceptance_criteria_checked", "min": 1})
+
+    if _settings.get_setting(project_root, "plan_review_enabled", "no") == "yes":
+        checks.append({"type": "plans_exist", "min": 1})
+        checks.append({"type": "plans_approved", "min": 1})
+
+    return checks
+
+
+# ---------------------------------------------------------------------------
 # Project setup
 # ---------------------------------------------------------------------------
 
@@ -568,6 +602,12 @@ def setup_project(
 
     # Copy framework
     shutil.copytree(vw_path / ".agentic", project_dir / ".agentic")
+
+    # Ensure presets are at the path get_setting() expects
+    presets_src = project_dir / ".agentic" / "lib" / "presets"
+    presets_dst = project_dir / ".agentic" / "presets"
+    if presets_src.exists() and not presets_dst.exists():
+        shutil.copytree(str(presets_src), str(presets_dst))
 
     # Create tier-1 settings for non-interactive execution
     claude_dir = project_dir / ".claude"
@@ -630,6 +670,13 @@ def setup_multirepo_project(
 
     # Now set up umbrella with resolved paths
     shutil.copytree(vw_path / ".agentic", umbrella_dir / ".agentic")
+
+    # Ensure presets are at the path get_setting() expects
+    presets_src = umbrella_dir / ".agentic" / "lib" / "presets"
+    presets_dst = umbrella_dir / ".agentic" / "presets"
+    if presets_src.exists() and not presets_dst.exists():
+        shutil.copytree(str(presets_src), str(presets_dst))
+
     claude_dir = umbrella_dir / ".claude"
     claude_dir.mkdir(exist_ok=True)
     (claude_dir / "settings.json").write_text('{"_tier": 1}')
@@ -670,11 +717,12 @@ def _write_stack_md(
         lines.append(f"- docs_mode: {settings['docs_mode']}")
     if "review_merge" in settings:
         lines.append(f"- review_merge: {settings['review_merge']}")
-    # Formal profiles need these for the full workflow to exercise
+    # Formal profiles: let profile defaults drive most settings,
+    # but skip expensive reviews (dialectical review, commit review)
     profile = settings.get("profile", "discovery")
     if profile in ("formal", "autonomous_formal"):
-        lines.append("- plan_review_enabled: no")
         lines.append("- acceptance_criteria: blocking")
+        lines.append("- review_plan: skip")
         lines.append("- review_commit: skip")
 
     lines.extend([
@@ -719,6 +767,13 @@ def _write_multirepo_stack_md(
     ]
     if "review_merge" in settings:
         lines.append(f"- review_merge: {settings['review_merge']}")
+    # Formal profiles: let profile defaults drive most settings,
+    # but skip expensive reviews (dialectical review, commit review)
+    profile = settings.get("profile", "autonomous_formal")
+    if profile in ("formal", "autonomous_formal"):
+        lines.append("- acceptance_criteria: blocking")
+        lines.append("- review_plan: skip")
+        lines.append("- review_commit: skip")
 
     # Components with resolved paths and Repo column
     lines.extend(["", "## Components", "",
@@ -1014,13 +1069,18 @@ class FrameworkVerifier:
                     detail = f" — {m.detail}" if m.detail else ""
                     self._log(f"    {icon} {m.name}{detail}")
 
-                # Check behavioral expectations (if defined)
-                # Merge scenario-level + settings-level expectations so
-                # profile-specific checks (e.g. plans_approved for formal)
-                # can be declared per settings_matrix entry.
+                # Check behavioral expectations
+                # Scenario-level expectations (files_exist, commands_pass, source_contains)
                 expectations = dict(scenario.get("expectations", {}))
+
+                # Derive workflow expectations from resolved settings
+                expectations["workflow"] = derive_workflow_expectations(project_root)
+
+                # Merge non-workflow settings-level expectations (if any exist in YAML)
                 settings_exp = settings.get("expectations", {})
                 for key, val in settings_exp.items():
+                    if key == "workflow":
+                        continue  # workflow is derived, not from YAML
                     if key in expectations and isinstance(expectations[key], list):
                         expectations[key] = expectations[key] + val
                     else:

@@ -2599,3 +2599,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 10:21 - Settings-driven workflow expectations
+
+**Why**: Workflow expectations were coupled to profile names, not resolved settings — overrides were ignored
+
+**What changed**:
+- derive_workflow_expectations() uses get_setting() 3-level fallback; removed hardcoded workflow expectations from all 5 scenario YAMLs; fixed _write_stack_md to let profile defaults drive plan_review_enabled; added derivation tests
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import textwrap
 from pathlib import Path
@@ -516,43 +517,17 @@ class TestExpectationChecker:
             exp = s["expectations"]
             assert len(exp) > 0, f"Scenario '{name}' has empty expectations"
 
-    def test_all_settings_have_workflow_expectations(self):
-        """All profiles must have at least journal + no_wip checks."""
+    def test_no_workflow_in_yaml(self):
+        """No settings_matrix entry should have workflow expectations (derived at runtime)."""
         from auto.framework_verify import list_scenarios, load_scenario
         for name in list_scenarios():
             s = load_scenario(name)
             for settings in s.get("settings_matrix", []):
-                profile = settings.get("profile", "")
                 exp = settings.get("expectations", {})
-                workflow = exp.get("workflow", [])
-                types = {w["type"] for w in workflow}
-                assert "journal_updated" in types, (
-                    f"{name}/{profile}: missing journal_updated workflow check"
+                assert "workflow" not in exp, (
+                    f"{name}/{settings.get('profile', '?')}: "
+                    "workflow expectations must be derived, not hardcoded in YAML"
                 )
-                assert "no_wip_at_end" in types, (
-                    f"{name}/{profile}: missing no_wip_at_end workflow check"
-                )
-
-    def test_formal_settings_have_full_workflow_expectations(self):
-        """Formal/autonomous_formal must check plans, AC, features, journal."""
-        from auto.framework_verify import list_scenarios, load_scenario
-        required = {
-            "plans_exist", "plans_approved",
-            "acceptance_criteria_checked", "features_have_status",
-            "journal_updated", "commits_follow_convention", "no_wip_at_end",
-        }
-        for name in list_scenarios():
-            s = load_scenario(name)
-            for settings in s.get("settings_matrix", []):
-                profile = settings.get("profile", "")
-                if profile in ("formal", "autonomous_formal"):
-                    exp = settings.get("expectations", {})
-                    workflow = exp.get("workflow", [])
-                    types = {w["type"] for w in workflow}
-                    missing = required - types
-                    assert not missing, (
-                        f"{name}/{profile}: missing workflow checks: {missing}"
-                    )
 
 
 # ---------------------------------------------------------------------------
@@ -703,3 +678,77 @@ class TestWorkflowExpectations:
         })
         assert not results[0].passed
         assert "Unknown" in results[0].detail
+
+
+# ---------------------------------------------------------------------------
+# Settings-driven workflow derivation tests
+# ---------------------------------------------------------------------------
+
+class TestDeriveWorkflowExpectations:
+    """Test that workflow expectations are derived from resolved settings."""
+
+    _FRAMEWORK_ROOT = Path(__file__).resolve().parent.parent
+
+    def _setup_test_project(self, root: Path, profile: str,
+                            overrides: dict[str, str] | None = None) -> None:
+        """Create a minimal test project with STACK.md and profiles.conf."""
+        # Copy profiles.conf from the real framework
+        presets_dst = root / ".agentic" / "presets"
+        presets_dst.mkdir(parents=True, exist_ok=True)
+        presets_src = self._FRAMEWORK_ROOT / ".agentic" / "lib" / "presets" / "profiles.conf"
+        shutil.copy2(str(presets_src), str(presets_dst / "profiles.conf"))
+
+        # Write STACK.md with profile + overrides
+        lines = [
+            "# STACK.md", "",
+            "## Settings",
+            f"- profile: {profile}",
+        ]
+        for key, val in (overrides or {}).items():
+            lines.append(f"- {key}: {val}")
+        lines.append("")
+        (root / "STACK.md").write_text("\n".join(lines))
+
+    def test_discovery_gets_base_checks(self, tmp_path):
+        """Discovery profile: only journal + commits + no_wip."""
+        from auto.framework_verify import derive_workflow_expectations
+        self._setup_test_project(tmp_path, "discovery")
+        checks = derive_workflow_expectations(tmp_path)
+        types = {c["type"] for c in checks}
+        assert types == {"journal_updated", "commits_follow_convention", "no_wip_at_end"}
+
+    def test_formal_gets_full_checks(self, tmp_path):
+        """Formal profile: adds features, AC, plans."""
+        from auto.framework_verify import derive_workflow_expectations
+        self._setup_test_project(tmp_path, "formal")
+        checks = derive_workflow_expectations(tmp_path)
+        types = {c["type"] for c in checks}
+        expected = {
+            "journal_updated", "commits_follow_convention", "no_wip_at_end",
+            "features_have_status", "acceptance_criteria_checked",
+            "plans_exist", "plans_approved",
+        }
+        assert types == expected
+
+    def test_override_disables_plans(self, tmp_path):
+        """Formal with plan_review_enabled: no should remove plan checks."""
+        from auto.framework_verify import derive_workflow_expectations
+        self._setup_test_project(tmp_path, "formal", {"plan_review_enabled": "no"})
+        checks = derive_workflow_expectations(tmp_path)
+        types = {c["type"] for c in checks}
+        assert "plans_exist" not in types
+        assert "plans_approved" not in types
+        # But features + AC should still be present
+        assert "features_have_status" in types
+        assert "acceptance_criteria_checked" in types
+
+    def test_override_enables_features_on_discovery(self, tmp_path):
+        """Discovery with feature_tracking: yes should add feature check."""
+        from auto.framework_verify import derive_workflow_expectations
+        self._setup_test_project(tmp_path, "discovery", {"feature_tracking": "yes"})
+        checks = derive_workflow_expectations(tmp_path)
+        types = {c["type"] for c in checks}
+        assert "features_have_status" in types
+        # But no plans or AC (not enabled)
+        assert "plans_exist" not in types
+        assert "acceptance_criteria_checked" not in types
