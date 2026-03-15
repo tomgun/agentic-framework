@@ -1,7 +1,7 @@
 name: "Fullstack Multi-Repo"
 description: "Umbrella repo coordinating separate frontend and backend repos"
 type: multirepo
-timeout: 1200
+timeout: 7200
 
 repos:
   umbrella:

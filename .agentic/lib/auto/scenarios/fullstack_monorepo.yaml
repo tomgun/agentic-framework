@@ -1,7 +1,7 @@
 name: "Fullstack Monorepo"
 description: "React frontend + FastAPI backend + shared types in one repo"
 type: monorepo
-timeout: 1200
+timeout: 7200
 
 components:
   - name: api

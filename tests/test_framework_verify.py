@@ -84,7 +84,7 @@ class TestScenarioLoading:
         s = load_scenario("todo_app")
         assert s["name"] == "Todo App"
         assert s["type"] == "single"
-        assert s["timeout"] == 600
+        assert s["timeout"] == 3600
         assert len(s["settings_matrix"]) == 2
         assert len(s["required_milestones"]) == 4
 
@@ -93,7 +93,7 @@ class TestScenarioLoading:
         s = load_scenario("fullstack_monorepo")
         assert s["type"] == "monorepo"
         assert len(s["components"]) == 3
-        assert s["timeout"] == 1200
+        assert s["timeout"] == 7200
 
     def test_load_multirepo(self):
         from auto.framework_verify import load_scenario

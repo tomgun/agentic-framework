@@ -61,7 +61,7 @@ class MilestoneResult:
 class ScenarioRun:
     scenario_name: str
     settings_label: str
-    success: bool
+    success: bool = False
     milestones: list[MilestoneResult] = field(default_factory=list)
     retries: int = 0
     fixes: list[str] = field(default_factory=list)
@@ -79,11 +79,13 @@ class VerifyResult:
     pr_url: str = ""
     stopped_at_max_fixes: bool = False
     messages: list[str] = field(default_factory=list)
+    log_dir: str = ""
 
     def to_dict(self) -> dict:
         return {
             "success": self.success,
             "total_fixes": self.total_fixes,
+            "log_dir": self.log_dir,
             "fix_commits": self.fix_commits,
             "pr_url": self.pr_url,
             "stopped_at_max_fixes": self.stopped_at_max_fixes,
@@ -489,6 +491,20 @@ class FrameworkVerifier:
         self.fix_commits: list[str] = []
         self._push_succeeded = False
         self._pr_created = False
+        # Log directory for agent output — stored in workspace for visibility
+        # across containers that share the same workspace mount.
+        log_base = project_root / ".agentic" / "session" / "verify-logs"
+        ts = time.strftime("%Y%m%d-%H%M%S")
+        self.log_dir = log_base / f"run-{ts}"
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+
+    def _log(self, msg: str) -> None:
+        """Print a timestamped progress message to stderr.
+
+        Uses stderr so progress is visible even with --json (which uses stdout).
+        """
+        ts = time.strftime("%H:%M:%S")
+        print(f"[{ts}] {msg}", file=sys.stderr, flush=True)
 
     # -- Pre-flight ----------------------------------------------------------
 
@@ -612,6 +628,8 @@ class FrameworkVerifier:
 
         run = ScenarioRun(scenario_name=name, settings_label=settings_label)
 
+        slug = name.lower().replace(' ', '-')
+
         for retry in range(MAX_RETRIES_PER_SCENARIO):
             if self.total_fixes >= MAX_TOTAL_FIXES:
                 run.skipped = True
@@ -619,14 +637,25 @@ class FrameworkVerifier:
                 return run
 
             run.retries = retry
+            attempt = retry + 1
+            self._log(
+                f"{'─' * 40}\n"
+                f"         {name} [{settings_label}] — attempt {attempt}/{MAX_RETRIES_PER_SCENARIO}"
+            )
 
             # Clean up stale AGENTS.json entries from prior attempts
             self._cleanup_agents_json(name)
 
             # Create fresh project
             project_dir = Path(tempfile.mkdtemp(
-                prefix=f"ag-verify-{name.lower().replace(' ', '-')}-"
+                prefix=f"ag-verify-{slug}-"
             ))
+
+            # Log file for this attempt
+            log_file = self.log_dir / f"{slug}_{settings_label}_attempt{attempt}.log"
+            self._log(f"  Project: {project_dir}")
+            self._log(f"  Log:     {log_file}")
+            self._log(f"  Watch:   tail -f {log_file}")
 
             try:
                 # Set up project based on type
@@ -638,6 +667,8 @@ class FrameworkVerifier:
                     project_root = project_dir
                     setup_project(scenario, self.vw_path, project_dir, settings)
 
+                self._log(f"  Project scaffolded, spawning build agent (timeout={timeout}s)...")
+
                 # Spawn build agent
                 prompt = build_prompt(scenario, settings)
                 result = spawn_claude(
@@ -645,7 +676,18 @@ class FrameworkVerifier:
                     project_root,
                     prompt,
                     timeout=timeout,
+                    log_file=log_file,
+                    monitor=True,
+                    monitor_interval=30,
                 )
+
+                # Report agent exit
+                if result.timed_out:
+                    self._log(f"  Agent timed out after {timeout}s")
+                elif result.returncode == 0:
+                    self._log(f"  Agent finished (exit 0)")
+                else:
+                    self._log(f"  Agent exited with code {result.returncode}")
 
                 # Check milestones
                 checker = MilestoneChecker(project_root, result)
@@ -654,14 +696,21 @@ class FrameworkVerifier:
                 ]
                 run.milestones = milestones
 
+                for m in milestones:
+                    icon = "+" if m.passed else "✗"
+                    detail = f" — {m.detail}" if m.detail else ""
+                    self._log(f"    {icon} {m.name}{detail}")
+
                 if all(m.passed for m in milestones):
                     run.success = True
+                    self._log(f"  PASSED")
                     return run
 
                 # Classify failure
                 from auto.self_heal import SelfHealEngine
                 engine = SelfHealEngine(self.vw_path, self.claude_command)
                 failure_type = engine.classify(result, milestones)
+                self._log(f"  Failure classified as: {failure_type}")
 
                 if failure_type == "framework_bug":
                     fix_msg = engine.attempt_fix(result, milestones, name)
@@ -669,9 +718,11 @@ class FrameworkVerifier:
                         self.total_fixes += 1
                         self.fix_commits.append(fix_msg)
                         run.fixes.append(fix_msg)
+                        self._log(f"  Fix applied: {fix_msg}")
                         # Restart from scratch (continue the retry loop)
                         continue
                     # Fix failed — fall through to retry as agent_error
+                    self._log(f"  Fix attempt failed, retrying as agent_error")
 
                 # agent_error or external — retry from scratch
                 run.error = _summarize_failure(milestones, result)
@@ -743,6 +794,12 @@ class FrameworkVerifier:
         # Create VW
         self.create_vw()
 
+        self._log(f"Verification started")
+        self._log(f"  VW branch: {self.vw_branch}")
+        self._log(f"  VW path:   {self.vw_path}")
+        self._log(f"  Logs:      {self.log_dir}/")
+        self._log(f"  Scenarios: {len(scenarios)}")
+
         # Run scenarios
         for scenario in scenarios:
             for i, settings in enumerate(scenario.get("settings_matrix", [{}])):
@@ -765,10 +822,18 @@ class FrameworkVerifier:
         # Delivery
         result.total_fixes = self.total_fixes
         result.fix_commits = self.fix_commits
+        result.log_dir = str(self.log_dir)
 
         if self.total_fixes > 0:
+            self._log(f"Delivering {self.total_fixes} fix(es) as PR...")
             pr_url = self.create_pr()
             result.pr_url = pr_url
+            self._log(f"  PR: {pr_url}")
+
+        passed = sum(1 for r in result.runs if r.success)
+        total = len(result.runs)
+        self._log(f"Verification complete: {passed}/{total} passed, {self.total_fixes} fixes")
+        self._log(f"Logs preserved at: {self.log_dir}/")
 
         return result
 
@@ -891,6 +956,8 @@ def _print_report(result: VerifyResult) -> None:
     if result.messages:
         for msg in result.messages:
             print(f"  {msg}")
+    if result.log_dir:
+        print(f"  Logs: {result.log_dir}/")
     print()
 
 
