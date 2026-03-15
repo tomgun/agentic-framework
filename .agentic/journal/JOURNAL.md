@@ -2768,3 +2768,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 20:16 - Systematic Quality Epic shipped
+
+**Why**: User projects get agents that write clear ACs, enforce completeness, and catch vague specs
+
+**What changed**:
+- Framework now has shared AC parser, completeness enforcement (P1=100% P2=80% flat=80%), AC clarity gate with rewrite suggestions, NFR→AC inline integration, language-aware test quality checks. 27 unit tests, 675 framework tests passing.
+
+**Next steps**:
+- LLM tests for behavioral changes, T-0067 NFR lifecycle templates
+
+**Blockers**: None
+
