@@ -18,7 +18,7 @@ On first message, give a briefing:
 ## Git Workflow
 
 - Always create a separate git worktree on a feature branch before making changes (another agent may be working on main)
-- Never auto-commit in interactive sessions without human approval. (Autonomous workflows use `review_commit` setting — F-0203.)
+- Interactive sessions: show changes to human before committing. Autonomous/non-interactive sessions (e.g. `ag auto` workflows): commit directly, using `review_commit` setting to determine review level (F-0203).
 
 ---
 

@@ -20,7 +20,7 @@ Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 
 ## Core Rules
 
-- Never auto-commit in interactive sessions. Show changes to human first. (Autonomous workflows use `review_commit` setting — F-0203.)
+- Interactive sessions: show changes to human before committing. Autonomous/non-interactive sessions (e.g. `--print` mode, `ag auto` workflows): commit directly, using the `review_commit` setting to determine review level.
 - PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking.
 - Add/update tests for new/changed logic.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
