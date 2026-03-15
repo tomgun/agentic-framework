@@ -19,9 +19,35 @@ settings_matrix:
   - profile: discovery
     git_workflow: direct
     docs_mode: deferred
+    expectations:
+      workflow:
+        # Discovery: lightweight checks — did it follow the basic flow?
+        - type: features_have_status
+          status: shipped
+          min: 1
+        - type: commits_follow_convention
+          min: 2
+        - type: no_wip_at_end
+
   - profile: autonomous_formal
     git_workflow: pull_request
     review_merge: skip
+    expectations:
+      workflow:
+        # Formal: full rigor — plans, reviews, checked ACs
+        - type: features_have_status
+          status: shipped
+          min: 1
+        - type: plans_exist
+          min: 1
+        - type: plans_approved
+          min: 1
+        - type: acceptance_criteria_checked
+          min: 1
+        - type: journal_updated
+        - type: commits_follow_convention
+          min: 2
+        - type: no_wip_at_end
 
 required_milestones:
   - kickoff_complete
@@ -29,6 +55,7 @@ required_milestones:
   - implementation_done
   - verification_green
 
+# Shared expectations — these apply to ALL settings combos
 expectations:
   files_exist:
     - "app/**/*.py"

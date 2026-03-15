@@ -291,6 +291,10 @@ class ExpectationChecker:
                 entry["pattern"], entry.get("glob", "**/*"),
             ))
 
+        # Workflow expectations — verify the framework process was followed
+        for check in expectations.get("workflow", []):
+            results.append(self._check_workflow(check))
+
         return results
 
     def _check_files_exist(self, pattern: str) -> MilestoneResult:
@@ -365,6 +369,182 @@ class ExpectationChecker:
             f"source_contains({pattern})", False,
             f"pattern not found in {len(matches)} file(s)",
         )
+
+    # -- Workflow expectations ------------------------------------------------
+
+    def _check_workflow(self, check: dict[str, Any]) -> MilestoneResult:
+        """Dispatch a workflow expectation by type."""
+        check_type = check.get("type", "")
+        method = getattr(self, f"_wf_{check_type}", None)
+        if method is None:
+            return MilestoneResult(
+                f"workflow({check_type})", False,
+                f"Unknown workflow check: {check_type}",
+            )
+        return method(check)
+
+    def _wf_features_have_status(self, check: dict) -> MilestoneResult:
+        """At least N features reached the given status."""
+        status = check.get("status", "shipped")
+        min_count = check.get("min", 1)
+        features_path = self.root / ".agentic" / "spec" / "FEATURES.md"
+        if not features_path.exists():
+            return MilestoneResult(
+                f"features_have_status({status})", False,
+                "FEATURES.md not found",
+            )
+        content = features_path.read_text()
+        count = len(re.findall(
+            rf"\*\*Status\*\*:\s*{re.escape(status)}", content,
+        ))
+        if count >= min_count:
+            return MilestoneResult(
+                f"features_have_status({status})", True,
+                f"{count} feature(s) with status '{status}'",
+            )
+        return MilestoneResult(
+            f"features_have_status({status})", False,
+            f"only {count} feature(s) with status '{status}' (need {min_count})",
+        )
+
+    def _wf_acceptance_criteria_checked(self, check: dict) -> MilestoneResult:
+        """At least N AC files have all items checked off [x]."""
+        min_count = check.get("min", 1)
+        ac_dir = self.root / ".agentic" / "spec" / "acceptance"
+        if not ac_dir.exists():
+            return MilestoneResult(
+                "acceptance_criteria_checked", False,
+                "acceptance/ directory not found",
+            )
+        fully_checked = 0
+        for ac_file in ac_dir.glob("F-*.md"):
+            content = ac_file.read_text()
+            unchecked = re.findall(r"- \[ \]", content)
+            checked = re.findall(r"- \[x\]", content)
+            if checked and not unchecked:
+                fully_checked += 1
+        if fully_checked >= min_count:
+            return MilestoneResult(
+                "acceptance_criteria_checked", True,
+                f"{fully_checked} AC file(s) fully checked",
+            )
+        return MilestoneResult(
+            "acceptance_criteria_checked", False,
+            f"only {fully_checked} AC file(s) fully checked (need {min_count})",
+        )
+
+    def _wf_plans_exist(self, check: dict) -> MilestoneResult:
+        """Plans directory has at least N plan files."""
+        min_count = check.get("min", 1)
+        plans_dir = self.root / ".agentic" / "journal" / "plans"
+        if not plans_dir.exists():
+            return MilestoneResult(
+                "plans_exist", False, "plans/ directory not found",
+            )
+        plan_files = list(plans_dir.glob("F-*-plan.md"))
+        if len(plan_files) >= min_count:
+            return MilestoneResult(
+                "plans_exist", True,
+                f"{len(plan_files)} plan file(s)",
+            )
+        return MilestoneResult(
+            "plans_exist", False,
+            f"only {len(plan_files)} plan file(s) (need {min_count})",
+        )
+
+    def _wf_plans_approved(self, check: dict) -> MilestoneResult:
+        """At least N plans have APPROVED status."""
+        min_count = check.get("min", 1)
+        plans_dir = self.root / ".agentic" / "journal" / "plans"
+        if not plans_dir.exists():
+            return MilestoneResult(
+                "plans_approved", False, "plans/ directory not found",
+            )
+        approved = 0
+        for plan in plans_dir.glob("F-*-plan.md"):
+            content = plan.read_text()
+            if re.search(r"\*\*Status\*\*:\s*APPROVED", content):
+                approved += 1
+        if approved >= min_count:
+            return MilestoneResult(
+                "plans_approved", True,
+                f"{approved} plan(s) approved",
+            )
+        return MilestoneResult(
+            "plans_approved", False,
+            f"only {approved} approved plan(s) (need {min_count})",
+        )
+
+    def _wf_journal_updated(self, _check: dict) -> MilestoneResult:
+        """JOURNAL.md has at least one entry beyond the template."""
+        journal = self.root / ".agentic" / "journal" / "JOURNAL.md"
+        if not journal.exists():
+            return MilestoneResult(
+                "journal_updated", False, "JOURNAL.md not found",
+            )
+        content = journal.read_text()
+        # Count entries (each starts with ##)
+        entries = re.findall(r"^## ", content, re.MULTILINE)
+        if len(entries) >= 1:
+            return MilestoneResult(
+                "journal_updated", True,
+                f"{len(entries)} journal entry/entries",
+            )
+        return MilestoneResult(
+            "journal_updated", False, "no journal entries found",
+        )
+
+    def _wf_commits_follow_convention(self, check: dict) -> MilestoneResult:
+        """Git commits follow conventional format with feature IDs."""
+        min_count = check.get("min", 1)
+        pattern = check.get("pattern", r"^(feat|fix|test|chore|docs)\(?.*\)?:")
+        try:
+            result = subprocess.run(
+                ["git", "log", "--oneline", "-20"],
+                capture_output=True, text=True, cwd=str(self.root),
+                timeout=10,
+            )
+            lines = [
+                l.split(" ", 1)[1] for l in result.stdout.strip().split("\n")
+                if l.strip() and " " in l
+            ]
+            regex = re.compile(pattern)
+            matching = [l for l in lines if regex.search(l)]
+            # Exclude the init commit
+            non_init = [l for l in lines if not l.startswith("init:")]
+            if len(matching) >= min_count:
+                return MilestoneResult(
+                    "commits_follow_convention", True,
+                    f"{len(matching)}/{len(non_init)} commits match",
+                )
+            return MilestoneResult(
+                "commits_follow_convention", False,
+                f"only {len(matching)}/{len(non_init)} commits match pattern",
+            )
+        except Exception as e:
+            return MilestoneResult(
+                "commits_follow_convention", False, str(e),
+            )
+
+    def _wf_no_wip_at_end(self, _check: dict) -> MilestoneResult:
+        """No WIP.md or active AGENTS.json entries at project completion."""
+        wip = self.root / ".agentic" / "session" / "WIP.md"
+        if wip.exists():
+            return MilestoneResult(
+                "no_wip_at_end", False, "WIP.md still exists",
+            )
+        agents = self.root / ".agentic" / "session" / "AGENTS.json"
+        if agents.exists():
+            try:
+                data = json.loads(agents.read_text())
+                if data:  # Non-empty list = active agents
+                    return MilestoneResult(
+                        "no_wip_at_end", False,
+                        f"{len(data)} active agent(s) in AGENTS.json",
+                    )
+            except (json.JSONDecodeError, OSError):
+                pass
+        return MilestoneResult("no_wip_at_end", True)
 
 
 # ---------------------------------------------------------------------------
@@ -816,7 +996,16 @@ class FrameworkVerifier:
                     self._log(f"    {icon} {m.name}{detail}")
 
                 # Check behavioral expectations (if defined)
-                expectations = scenario.get("expectations", {})
+                # Merge scenario-level + settings-level expectations so
+                # profile-specific checks (e.g. plans_approved for formal)
+                # can be declared per settings_matrix entry.
+                expectations = dict(scenario.get("expectations", {}))
+                settings_exp = settings.get("expectations", {})
+                for key, val in settings_exp.items():
+                    if key in expectations and isinstance(expectations[key], list):
+                        expectations[key] = expectations[key] + val
+                    else:
+                        expectations[key] = val
                 if expectations:
                     self._log(f"  Running behavioral expectations...")
                     exp_checker = ExpectationChecker(project_root)

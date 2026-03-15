@@ -494,3 +494,174 @@ class TestExpectationChecker:
             assert "expectations" in s, f"Scenario '{name}' missing expectations"
             exp = s["expectations"]
             assert len(exp) > 0, f"Scenario '{name}' has empty expectations"
+
+    def test_formal_settings_have_workflow_expectations(self):
+        """Formal/autonomous_formal settings must have workflow expectations."""
+        from auto.framework_verify import list_scenarios, load_scenario
+        for name in list_scenarios():
+            s = load_scenario(name)
+            for settings in s.get("settings_matrix", []):
+                profile = settings.get("profile", "")
+                if profile in ("formal", "autonomous_formal"):
+                    exp = settings.get("expectations", {})
+                    workflow = exp.get("workflow", [])
+                    types = {w["type"] for w in workflow}
+                    assert "plans_exist" in types, (
+                        f"{name}/{profile}: missing plans_exist workflow check"
+                    )
+                    assert "plans_approved" in types, (
+                        f"{name}/{profile}: missing plans_approved workflow check"
+                    )
+                    assert "acceptance_criteria_checked" in types, (
+                        f"{name}/{profile}: missing acceptance_criteria_checked"
+                    )
+
+
+# ---------------------------------------------------------------------------
+# Workflow expectation tests
+# ---------------------------------------------------------------------------
+
+class TestWorkflowExpectations:
+    """Test framework workflow verification."""
+
+    def test_features_have_status_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        spec_dir = tmp_path / ".agentic" / "spec"
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "FEATURES.md").write_text(
+            "## F-0001: Todo CRUD\n**Status**: shipped\n"
+        )
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "features_have_status", "status": "shipped", "min": 1}],
+        })
+        assert len(results) == 1
+        assert results[0].passed
+
+    def test_features_have_status_fail(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        spec_dir = tmp_path / ".agentic" / "spec"
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "FEATURES.md").write_text(
+            "## F-0001: Todo CRUD\n**Status**: planned\n"
+        )
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "features_have_status", "status": "shipped", "min": 1}],
+        })
+        assert len(results) == 1
+        assert not results[0].passed
+
+    def test_plans_exist_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        plans = tmp_path / ".agentic" / "journal" / "plans"
+        plans.mkdir(parents=True)
+        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "plans_exist", "min": 1}],
+        })
+        assert results[0].passed
+
+    def test_plans_approved_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        plans = tmp_path / ".agentic" / "journal" / "plans"
+        plans.mkdir(parents=True)
+        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "plans_approved", "min": 1}],
+        })
+        assert results[0].passed
+
+    def test_plans_approved_fail_draft(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        plans = tmp_path / ".agentic" / "journal" / "plans"
+        plans.mkdir(parents=True)
+        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: DRAFT\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "plans_approved", "min": 1}],
+        })
+        assert not results[0].passed
+
+    def test_acceptance_criteria_checked_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
+        ac_dir.mkdir(parents=True)
+        (ac_dir / "F-0001.md").write_text("- [x] API returns todos\n- [x] Tests pass\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "acceptance_criteria_checked", "min": 1}],
+        })
+        assert results[0].passed
+
+    def test_acceptance_criteria_checked_fail(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
+        ac_dir.mkdir(parents=True)
+        (ac_dir / "F-0001.md").write_text("- [x] API returns todos\n- [ ] Tests pass\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "acceptance_criteria_checked", "min": 1}],
+        })
+        assert not results[0].passed
+
+    def test_journal_updated_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        journal_dir = tmp_path / ".agentic" / "journal"
+        journal_dir.mkdir(parents=True)
+        (journal_dir / "JOURNAL.md").write_text("## Session 1\nDid some work\n")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "journal_updated"}],
+        })
+        assert results[0].passed
+
+    def test_no_wip_at_end_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "no_wip_at_end"}],
+        })
+        assert results[0].passed
+
+    def test_no_wip_at_end_fail_wip(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        session = tmp_path / ".agentic" / "session"
+        session.mkdir(parents=True)
+        (session / "WIP.md").write_text("working on stuff")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "no_wip_at_end"}],
+        })
+        assert not results[0].passed
+
+    def test_commits_follow_convention(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        subprocess.run(["git", "init"], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        (tmp_path / "f1.txt").write_text("init")
+        subprocess.run(["git", "add", "."], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "init: scaffold"],
+                       cwd=str(tmp_path), check=True, capture_output=True)
+        (tmp_path / "f2.txt").write_text("code")
+        subprocess.run(["git", "add", "."], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "feat(F-0001): add todo API"],
+                       cwd=str(tmp_path), check=True, capture_output=True)
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "commits_follow_convention", "min": 1}],
+        })
+        assert results[0].passed
+
+    def test_unknown_workflow_type(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "workflow": [{"type": "nonexistent_check"}],
+        })
+        assert not results[0].passed
+        assert "Unknown" in results[0].detail

@@ -2573,3 +2573,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 09:13 - Workflow Expectations
+
+**Why**: Previous expectations only checked app output, not whether the framework workflow was actually followed
+
+**What changed**:
+- Added 7 workflow expectation types: features_have_status, plans_exist, plans_approved, acceptance_criteria_checked, journal_updated, commits_follow_convention, no_wip_at_end. Profile-aware: formal profiles require plans+review+AC checks, discovery only basic flow
+
+**Next steps**:
+- Run autonomous_formal scenario to validate plan review loop is detected
+
+**Blockers**: None
+
