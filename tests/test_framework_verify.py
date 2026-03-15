@@ -1016,6 +1016,20 @@ class TestBehavioralExpectations:
         })
         assert result.passed
 
+    def test_workflow_commands_used_kickoff_status_on_different_line(self, tmp_path):
+        """FEATURES.md with F-XXXX and Status on different lines → still detected."""
+        from auto.framework_verify import ExpectationChecker
+        spec_dir = tmp_path / ".agentic" / "spec"
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "FEATURES.md").write_text(
+            "## F-0001: Todo CRUD\n\n**Status**: shipped\n\n**Description**: CRUD ops\n"
+        )
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_workflow_commands_used({
+            "command": "kickoff", "evidence": "features_md_format",
+        })
+        assert result.passed
+
     def test_workflow_commands_used_kickoff_fail(self, tmp_path):
         """FEATURES.md without structured format → kickoff not detected."""
         from auto.framework_verify import ExpectationChecker

@@ -608,6 +608,14 @@ class ExpectationChecker:
                     "no acceptance criteria files found in git history",
                 )
 
+            # Find the scaffold commit to exclude it (it's setup, not agent code)
+            scaffold_result = subprocess.run(
+                ["git", "log", "--reverse", "--format=%H", "--grep=init: project scaffold",
+                 "--max-count=1"],
+                capture_output=True, text=True, cwd=str(self.root), timeout=10,
+            )
+            scaffold_hash = scaffold_result.stdout.strip()
+
             # Find first commit adding source code (common patterns)
             code_globs = ["app/**/*.py", "src/**/*.py", "src/**/*.ts",
                           "*.py", "**/*.py"]
@@ -618,8 +626,8 @@ class ExpectationChecker:
                      "--diff-filter=A", "--", glob],
                     capture_output=True, text=True, cwd=str(self.root), timeout=10,
                 )
-                commits = [h for h in result.stdout.strip().split("\n") if h]
-                # Filter out commits that only touch test/spec files
+                commits = [h for h in result.stdout.strip().split("\n")
+                           if h and h != scaffold_hash]
                 code_commits.extend(commits)
             code_commits = list(dict.fromkeys(code_commits))  # dedupe, preserve order
 
@@ -672,16 +680,17 @@ class ExpectationChecker:
                     "FEATURES.md not found",
                 )
             content = features_path.read_text()
-            # ag kickoff produces structured entries with ## F-XXXX and **Status**/**Description**
-            pattern = r"## F-\d{4}:.*\n\*\*Status\*\*:"
-            if re.search(pattern, content):
+            # Evidence of ag kickoff: F-XXXX entries with Status fields
+            has_feature_ids = re.search(r"## F-\d{4}:", content)
+            has_status_fields = re.search(r"\*\*Status\*\*:", content)
+            if has_feature_ids and has_status_fields:
                 return MilestoneResult(
                     f"workflow_commands_used({command})", True,
-                    "FEATURES.md has structured F-XXXX entries (kickoff format)",
+                    "FEATURES.md has F-XXXX entries with Status fields",
                 )
             return MilestoneResult(
                 f"workflow_commands_used({command})", False,
-                "FEATURES.md exists but lacks structured kickoff format",
+                "FEATURES.md exists but lacks F-XXXX entries with Status fields",
             )
 
         if command == "commit" and evidence_type == "conventional_commits":

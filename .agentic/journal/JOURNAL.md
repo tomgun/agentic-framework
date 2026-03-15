@@ -2664,3 +2664,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 13:06 - Discovery verification round 2 results
+
+**Why**: Iterating on discovery prompt and behavioral checkers based on real verification results
+
+**What changed**:
+- todo_app discovery passed on attempt 2: agent read CLAUDE.md, used ag commands, built 30-test app, shipped 4 features; relaxed kickoff checker regex; fixed spec_before_code to skip scaffold commit
+
+**Next steps**:
+- Run cli_tool scenario, consider testing formal profile
+
+**Blockers**: None
+
