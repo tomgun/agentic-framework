@@ -38,3 +38,14 @@ required_milestones:
   - implementation_done
   - integration_verified
   - verification_green
+
+expectations:
+  files_exist:
+    - "packages/api/**/*.py"
+    - "packages/web/src/**/*.{ts,tsx}"
+    - "packages/shared/**/*.ts"
+  source_contains:
+    - pattern: "fastapi|FastAPI"
+      glob: "packages/api/**/*.py"
+    - pattern: "react|React"
+      glob: "packages/web/src/**/*.{ts,tsx}"

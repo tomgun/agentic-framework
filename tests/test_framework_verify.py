@@ -393,3 +393,104 @@ class TestTrunkBranchEnvVar:
         script = Path(__file__).parent.parent / ".agentic" / "lib" / "tools" / "ag.sh"
         content = script.read_text()
         assert "AG_TRUNK_BRANCH" in content
+
+
+# ---------------------------------------------------------------------------
+# ExpectationChecker tests
+# ---------------------------------------------------------------------------
+
+class TestExpectationChecker:
+    """Test BDD-style behavioral expectations."""
+
+    def test_files_exist_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("print('hello')")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({"files_exist": ["app/**/*.py"]})
+        assert len(results) == 1
+        assert results[0].passed
+
+    def test_files_exist_fail(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({"files_exist": ["app/**/*.py"]})
+        assert len(results) == 1
+        assert not results[0].passed
+
+    def test_command_passes_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({"commands_pass": ["true"]})
+        assert len(results) == 1
+        assert results[0].passed
+
+    def test_command_passes_fail(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({"commands_pass": ["false"]})
+        assert len(results) == 1
+        assert not results[0].passed
+        assert "exit 1" in results[0].detail
+
+    def test_source_contains_pass(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("from fastapi import FastAPI")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "source_contains": [{"pattern": "FastAPI", "glob": "app/**/*.py"}],
+        })
+        assert len(results) == 1
+        assert results[0].passed
+
+    def test_source_contains_fail(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("import flask")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "source_contains": [{"pattern": "FastAPI", "glob": "app/**/*.py"}],
+        })
+        assert len(results) == 1
+        assert not results[0].passed
+
+    def test_source_contains_no_matching_files(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "source_contains": [{"pattern": "FastAPI", "glob": "app/**/*.py"}],
+        })
+        assert len(results) == 1
+        assert not results[0].passed
+        assert "no files" in results[0].detail
+
+    def test_multiple_expectations(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("from fastapi import FastAPI")
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "tests" / "test_app.py").write_text("def test_hello(): pass")
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({
+            "files_exist": ["app/**/*.py", "tests/test_*.py"],
+            "source_contains": [{"pattern": "def test_", "glob": "tests/**/*.py"}],
+            "commands_pass": ["true"],
+        })
+        assert len(results) == 4
+        assert all(r.passed for r in results)
+
+    def test_empty_expectations(self, tmp_path):
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_all({})
+        assert results == []
+
+    def test_scenarios_have_expectations(self):
+        """All scenarios should have behavioral expectations."""
+        from auto.framework_verify import list_scenarios, load_scenario
+        for name in list_scenarios():
+            s = load_scenario(name)
+            assert "expectations" in s, f"Scenario '{name}' missing expectations"
+            exp = s["expectations"]
+            assert len(exp) > 0, f"Scenario '{name}' has empty expectations"

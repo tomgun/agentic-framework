@@ -53,3 +53,10 @@ required_milestones:
   - contracts_validated
   - integration_verified
   - verification_green
+
+expectations:
+  files_exist:
+    - "contracts/*.yaml"
+  source_contains:
+    - pattern: "openapi|swagger|OpenAPI"
+      glob: "contracts/**/*.yaml"

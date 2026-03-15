@@ -254,6 +254,120 @@ class MilestoneChecker:
 
 
 # ---------------------------------------------------------------------------
+# Behavioral expectations
+# ---------------------------------------------------------------------------
+
+class ExpectationChecker:
+    """Run BDD-style expectations against a built project.
+
+    Expectations are declared in scenario YAML under an `expectations` key:
+
+        expectations:
+          files_exist:            # glob patterns — at least one match required
+            - "app/**/*.py"
+            - "tests/test_*.py"
+          commands_pass:          # shell commands that must exit 0
+            - "pytest"
+          source_contains:       # regex patterns in source files
+            - pattern: "FastAPI"
+              glob: "app/**/*.py"
+    """
+
+    def __init__(self, project_root: Path):
+        self.root = project_root
+
+    def check_all(self, expectations: dict[str, Any]) -> list[MilestoneResult]:
+        """Run all expectations and return results."""
+        results: list[MilestoneResult] = []
+
+        for pattern in expectations.get("files_exist", []):
+            results.append(self._check_files_exist(pattern))
+
+        for cmd in expectations.get("commands_pass", []):
+            results.append(self._check_command_passes(cmd))
+
+        for entry in expectations.get("source_contains", []):
+            results.append(self._check_source_contains(
+                entry["pattern"], entry.get("glob", "**/*"),
+            ))
+
+        return results
+
+    def _check_files_exist(self, pattern: str) -> MilestoneResult:
+        matches = list(self.root.glob(pattern))
+        # Filter out .git and .agentic matches
+        matches = [
+            m for m in matches if m.is_file()
+            and ".git" not in m.parts and ".agentic" not in m.parts
+        ]
+        if matches:
+            return MilestoneResult(
+                f"files_exist({pattern})", True,
+                f"{len(matches)} file(s)",
+            )
+        return MilestoneResult(
+            f"files_exist({pattern})", False,
+            "no matching files",
+        )
+
+    def _check_command_passes(self, cmd: str) -> MilestoneResult:
+        try:
+            result = subprocess.run(
+                ["bash", "-c", cmd],
+                cwd=str(self.root),
+                capture_output=True, text=True,
+                timeout=120,
+            )
+            if result.returncode == 0:
+                return MilestoneResult(
+                    f"command_passes({cmd})", True,
+                )
+            # Include last few lines of output for diagnosis
+            output = (result.stdout + result.stderr).strip().split("\n")
+            tail = "\n".join(output[-5:]) if len(output) > 5 else "\n".join(output)
+            return MilestoneResult(
+                f"command_passes({cmd})", False,
+                f"exit {result.returncode}: {tail[:200]}",
+            )
+        except subprocess.TimeoutExpired:
+            return MilestoneResult(
+                f"command_passes({cmd})", False, "timed out (120s)",
+            )
+        except Exception as e:
+            return MilestoneResult(
+                f"command_passes({cmd})", False, str(e),
+            )
+
+    def _check_source_contains(self, pattern: str, glob: str) -> MilestoneResult:
+        matches = [
+            f for f in self.root.glob(glob)
+            if f.is_file() and ".git" not in f.parts and ".agentic" not in f.parts
+        ]
+        if not matches:
+            return MilestoneResult(
+                f"source_contains({pattern})", False,
+                f"no files matching {glob}",
+            )
+        regex = re.compile(pattern)
+        matched_files = []
+        for f in matches:
+            try:
+                if regex.search(f.read_text(errors="ignore")):
+                    matched_files.append(f.name)
+            except Exception:
+                continue
+        if matched_files:
+            return MilestoneResult(
+                f"source_contains({pattern})", True,
+                f"found in {len(matched_files)} file(s)",
+            )
+        return MilestoneResult(
+            f"source_contains({pattern})", False,
+            f"pattern not found in {len(matches)} file(s)",
+        )
+
+
+# ---------------------------------------------------------------------------
 # Project setup
 # ---------------------------------------------------------------------------
 
@@ -700,6 +814,20 @@ class FrameworkVerifier:
                     icon = "+" if m.passed else "✗"
                     detail = f" — {m.detail}" if m.detail else ""
                     self._log(f"    {icon} {m.name}{detail}")
+
+                # Check behavioral expectations (if defined)
+                expectations = scenario.get("expectations", {})
+                if expectations:
+                    self._log(f"  Running behavioral expectations...")
+                    exp_checker = ExpectationChecker(project_root)
+                    exp_results = exp_checker.check_all(expectations)
+                    milestones.extend(exp_results)
+                    run.milestones = milestones
+
+                    for m in exp_results:
+                        icon = "+" if m.passed else "✗"
+                        detail = f" — {m.detail}" if m.detail else ""
+                        self._log(f"    {icon} {m.name}{detail}")
 
                 if all(m.passed for m in milestones):
                     run.success = True
