@@ -77,6 +77,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0043: PR #141: Systematic quality improvement
+- **Type**: review
+- **Added**: 2026-03-15
+- **Context**: Shared AC parser, completeness enforcement, clarity gate, NFR integration, test quality checks
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0035: PR #126: Orphaned plan detection at session start
