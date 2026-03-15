@@ -2560,3 +2560,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 09:06 - Behavioral Expectations
+
+**Why**: Milestones only checked process artifacts, not whether the built app actually works
+
+**What changed**:
+- Added ExpectationChecker with files_exist, commands_pass, source_contains checks to all 5 verification scenarios
+
+**Next steps**:
+- Run full verify-framework with expectations to validate end-to-end
+
+**Blockers**: None
+

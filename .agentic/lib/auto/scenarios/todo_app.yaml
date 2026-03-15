@@ -28,3 +28,18 @@ required_milestones:
   - features_specced
   - implementation_done
   - verification_green
+
+expectations:
+  files_exist:
+    - "app/**/*.py"
+    - "tests/test_*.py"
+    - "requirements.txt"
+  commands_pass:
+    - "pip install -q -r requirements.txt && python -m pytest tests/ -x -q"
+  source_contains:
+    - pattern: "fastapi|FastAPI"
+      glob: "app/**/*.py"
+    - pattern: "sqlite|SQLite|sqlalchemy|SQLAlchemy"
+      glob: "app/**/*.py"
+    - pattern: "def test_"
+      glob: "tests/**/*.py"
