@@ -2703,3 +2703,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 14:07 - Formal profile verification complete
+
+**Why**: Complete verification of discovery-mode prompts across all profiles and languages
+
+**What changed**:
+- todo_app autonomous_formal passed on attempt 1 (with 3 repairs for AC/plans/plan-approval); all 5 advisory behavioral checks passed including plans_reviewed; 4/4 verification scenarios now confirmed working with discovery prompt
+
+**Next steps**:
+- PR ready — all scenarios verified
+
+**Blockers**: None
+
