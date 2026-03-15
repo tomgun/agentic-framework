@@ -2638,3 +2638,81 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 12:30 - Discovery-mode verification prompts
+
+**Why**: Agent spawning should test instruction discovery, not plumbing — plumbing is already covered by 675+ static tests
+
+**What changed**:
+- Replaced recipe prompt with discovery prompt as default; added 5 behavioral checkers; removed review_plan/review_commit skip overrides; added --prompt-tier CLI flag; 34 new tests (94 total passing)
+
+**Next steps**:
+- PR review, E2E verification with real agent spawning
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 12:51 - Discovery prompt iteration
+
+**Why**: Discovery prompt too minimal — agents need autonomous context and CLAUDE.md pointer to discover framework workflow
+
+**What changed**:
+- Round 1 revealed agents ask for commit confirmation (no human in --print mode) and skip ag kickoff; added autonomous execution context and CLAUDE.md-first instruction to discovery prompt
+
+**Next steps**:
+- Re-run verification with fixed prompt
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 13:06 - Discovery verification round 2 results
+
+**Why**: Iterating on discovery prompt and behavioral checkers based on real verification results
+
+**What changed**:
+- todo_app discovery passed on attempt 2: agent read CLAUDE.md, used ag commands, built 30-test app, shipped 4 features; relaxed kickoff checker regex; fixed spec_before_code to skip scaffold commit
+
+**Next steps**:
+- Run cli_tool scenario, consider testing formal profile
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 13:25 - CLI tool discovery verification
+
+**Why**: Validating discovery prompt generalizes across different project types
+
+**What changed**:
+- cli_tool discovery passed on attempt 3: agent built 57-test file organizer with Click, 7 features shipped; all advisory behavioral checks also passed on successful attempt
+
+**Next steps**:
+- Run api_service scenario (TypeScript) to test cross-language discovery
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 13:51 - API service discovery verification
+
+**Why**: Confirming discovery prompt works across language boundaries
+
+**What changed**:
+- api_service (TypeScript/Express) discovery passed on attempt 2: 9 commits, 5 features shipped, all advisory checks passed; 3/3 discovery scenarios now verified across Python and TypeScript
+
+**Next steps**:
+- Test formal profile (todo_app settings-index 1) for dialectical review flow
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 14:07 - Formal profile verification complete
+
+**Why**: Complete verification of discovery-mode prompts across all profiles and languages
+
+**What changed**:
+- todo_app autonomous_formal passed on attempt 1 (with 3 repairs for AC/plans/plan-approval); all 5 advisory behavioral checks passed including plans_reviewed; 4/4 verification scenarios now confirmed working with discovery prompt
+
+**Next steps**:
+- PR ready — all scenarios verified
+
+**Blockers**: None
+

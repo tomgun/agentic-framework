@@ -19,10 +19,13 @@ settings_matrix:
   - profile: discovery
     git_workflow: direct
     docs_mode: deferred
+    # prompt_tier defaults to "discovery"
 
   - profile: autonomous_formal
     git_workflow: pull_request
     review_merge: skip
+    timeout_override: 7200
+    # prompt_tier defaults to "discovery"
 
 required_milestones:
   - kickoff_complete

@@ -19,10 +19,14 @@ settings_matrix:
   - profile: discovery
     git_workflow: direct
     docs_mode: deferred
+    # prompt_tier defaults to "discovery" — agent discovers workflow from instruction files
 
   - profile: autonomous_formal
     git_workflow: pull_request
     review_merge: skip
+    timeout_override: 7200  # 2hrs — plan review + subagents need more time
+    # prompt_tier defaults to "discovery"
+    # review_plan and review_commit use profile defaults (critical_agent)
 
 required_milestones:
   - kickoff_complete
