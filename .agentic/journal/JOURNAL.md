@@ -2742,3 +2742,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 20:05 - Contributions fix
+
+**Why**: Accurate attribution
+
+**What changed**:
+- Corrected CONTRIBUTIONS.md — user framed the problem and directed reviews, did not design implementation details
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
