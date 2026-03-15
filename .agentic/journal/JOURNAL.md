@@ -2547,3 +2547,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 09:03 - Framework Verify Improvements
+
+**Why**: First real verify-framework run revealed crash bug, timeout too short, and no visibility into agent progress
+
+**What changed**:
+- Fixed ScenarioRun crash, increased timeouts (3600s/7200s), added progress monitor thread and per-attempt log files, logs stored in workspace for cross-container visibility
+
+**Next steps**:
+- Run full verification suite (all scenarios)
+
+**Blockers**: None
+

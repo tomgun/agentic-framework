@@ -3,6 +3,10 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
+import tempfile
+import threading
+import time
 from pathlib import Path
 
 
@@ -74,6 +78,84 @@ def build_claude_cmd(
     return cmd
 
 
+class _ProjectMonitor:
+    """Watches a project directory for git commits and file changes.
+
+    Runs in a background thread, printing progress to stderr every
+    `interval` seconds. Stops when `stop()` is called.
+    """
+
+    def __init__(self, project_root: Path, log_file: Path | None, interval: int = 30):
+        self.root = project_root
+        self.log_file = log_file
+        self.interval = interval
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+        self._last_commit_count = 0
+        self._last_file_count = 0
+
+    def start(self) -> None:
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+
+    def stop(self) -> None:
+        self._stop.set()
+        if self._thread:
+            self._thread.join(timeout=5)
+
+    def _run(self) -> None:
+        start = time.time()
+        while not self._stop.wait(self.interval):
+            elapsed = int(time.time() - start)
+            mins, secs = divmod(elapsed, 60)
+
+            # Count git commits
+            try:
+                out = subprocess.run(
+                    ["git", "rev-list", "--count", "HEAD"],
+                    capture_output=True, text=True, cwd=str(self.root),
+                    timeout=5,
+                ).stdout.strip()
+                commits = int(out) if out.isdigit() else 0
+            except Exception:
+                commits = 0
+
+            # Count source files (excluding .agentic/ and .git/)
+            try:
+                src_files = sum(
+                    1 for _ in self.root.rglob("*")
+                    if _.is_file()
+                    and ".git" not in _.parts
+                    and ".agentic" not in _.parts
+                )
+            except Exception:
+                src_files = 0
+
+            # Get latest commit message
+            try:
+                latest = subprocess.run(
+                    ["git", "log", "--oneline", "-1"],
+                    capture_output=True, text=True, cwd=str(self.root),
+                    timeout=5,
+                ).stdout.strip()
+            except Exception:
+                latest = ""
+
+            new_commits = commits > self._last_commit_count
+            new_files = src_files != self._last_file_count
+            self._last_commit_count = commits
+            self._last_file_count = src_files
+
+            marker = " *" if (new_commits or new_files) else ""
+            ts = time.strftime("%H:%M:%S")
+            print(
+                f"[{ts}]   ... {mins}m{secs:02d}s | "
+                f"{commits} commits, {src_files} files{marker}"
+                f"{f' | {latest}' if latest and new_commits else ''}",
+                file=sys.stderr, flush=True,
+            )
+
+
 def spawn_claude(
     claude_command: str,
     project_root: Path,
@@ -82,12 +164,20 @@ def spawn_claude(
     print_mode: bool = True,
     timeout: int = 300,
     model: str | None = None,
+    log_file: Path | None = None,
+    monitor: bool = False,
+    monitor_interval: int = 30,
 ) -> SpawnResult:
     """Spawn a Claude CLI instance and return a SpawnResult.
 
     Returns a SpawnResult (str subclass) with .returncode and .timed_out.
     Backward compatible: all existing string operations work directly.
     Uses tier-appropriate permissions based on .claude/settings.json.
+
+    If log_file is provided, agent output is written to that file.
+    If monitor is True, a background thread prints progress to stderr
+    every monitor_interval seconds by watching git commits and file counts.
+    The .log_file attribute on the result records where output was written.
     """
     cmd = build_claude_cmd(
         claude_command, project_root, prompt,
@@ -95,22 +185,59 @@ def spawn_claude(
         model=model,
     )
 
+    mon = None
+    if monitor:
+        mon = _ProjectMonitor(project_root, log_file, interval=monitor_interval)
+        mon.start()
+
     try:
-        proc = subprocess.run(
-            cmd,
-            cwd=str(project_root),
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-        return SpawnResult(proc.stdout + proc.stderr, returncode=proc.returncode)
+        if log_file:
+            log_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(log_file, "w") as fh:
+                proc = subprocess.Popen(
+                    cmd,
+                    cwd=str(project_root),
+                    stdout=fh,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                )
+                try:
+                    proc.wait(timeout=timeout)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    proc.wait()
+                    output = ""
+                    if log_file.exists():
+                        output = log_file.read_text()
+                    output += f"\n\n--- TIMED OUT after {timeout}s ---"
+                    r = SpawnResult(output, returncode=-1, timed_out=True)
+                    r.log_file = log_file
+                    return r
+            output = log_file.read_text()
+            result = SpawnResult(output, returncode=proc.returncode)
+            result.log_file = log_file
+            return result
+        else:
+            proc = subprocess.run(
+                cmd,
+                cwd=str(project_root),
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+            result = SpawnResult(
+                proc.stdout + proc.stderr, returncode=proc.returncode,
+            )
+            result.log_file = None
+            return result
     except FileNotFoundError:
-        return SpawnResult("error: claude command not found", returncode=-1)
-    except subprocess.TimeoutExpired:
-        return SpawnResult(
-            f"error: Claude timed out after {timeout}s",
-            returncode=-1,
-            timed_out=True,
-        )
+        r = SpawnResult("error: claude command not found", returncode=-1)
+        r.log_file = log_file
+        return r
     except Exception as e:
-        return SpawnResult(f"error: {e}", returncode=-1)
+        r = SpawnResult(f"error: {e}", returncode=-1)
+        r.log_file = log_file
+        return r
+    finally:
+        if mon:
+            mon.stop()

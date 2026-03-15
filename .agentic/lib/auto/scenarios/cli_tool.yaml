@@ -1,7 +1,7 @@
 name: "CLI Tool"
 description: "Command-line tool with subcommands and configuration"
 type: single
-timeout: 600
+timeout: 3600
 
 stack:
   language: python

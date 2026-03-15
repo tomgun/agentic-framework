@@ -1,7 +1,7 @@
 name: "API Service"
 description: "REST API service with authentication and rate limiting"
 type: single
-timeout: 600
+timeout: 3600
 
 stack:
   language: typescript

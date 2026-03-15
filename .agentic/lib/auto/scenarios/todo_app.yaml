@@ -1,7 +1,7 @@
 name: "Todo App"
 description: "CRUD todo app with REST API and persistence"
 type: single
-timeout: 600
+timeout: 3600
 
 stack:
   language: python
