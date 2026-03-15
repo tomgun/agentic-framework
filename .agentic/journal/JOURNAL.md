@@ -2690,3 +2690,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 13:51 - API service discovery verification
+
+**Why**: Confirming discovery prompt works across language boundaries
+
+**What changed**:
+- api_service (TypeScript/Express) discovery passed on attempt 2: 9 commits, 5 features shipped, all advisory checks passed; 3/3 discovery scenarios now verified across Python and TypeScript
+
+**Next steps**:
+- Test formal profile (todo_app settings-index 1) for dialectical review flow
+
+**Blockers**: None
+
