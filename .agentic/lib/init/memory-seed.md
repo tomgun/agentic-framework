@@ -5,8 +5,8 @@ tokens: ~1280
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.58.1 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases -->
+<!-- memory-seed v0.58.2 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -20,6 +20,8 @@ If the user's intent is to build, implement, add, create, set up, develop, make,
 2. Create .agentic/spec/acceptance/F-XXXX.md with acceptance criteria FIRST
 3. Run `ag plan F-XXXX` (starts the plan-review loop)
 4. Run `ag implement F-XXXX` after the plan is approved
+
+AC clarity gate runs on first `ag implement` — vague ACs blocked in formal, advisory in discovery. Bypass: `SKIP_CLARITY=1`.
 
 **A plan is NOT a spec.** Even when implementing from a detailed plan, create the formal artifacts (FEATURES.md entry + acceptance file) BEFORE writing any code. Plans contain design; specs contain the testable contract.
 5. If `spec_analysis` is enabled (default: on for formal/autonomous_formal, off for discovery), `spec-analyze.sh` runs advisory checks — review findings but proceed regardless
@@ -99,7 +101,7 @@ If the user says formalize, promote to formal, migrate to formal, make TODOs int
 
 If the user says "it must always...", "never do X", "performance must stay under...", "security requirement", "accessibility", or describes a cross-cutting constraint that applies beyond a single feature:
 
-**STOP.** This is a Non-Functional Requirement. Check `.agentic/spec/NFR.md` — if no matching NFR exists, assign the next NFR-XXXX ID and write it there. NFRs are invariants that must hold across all features, not just the one being discussed. Don't let them stay informal in conversation.
+**STOP.** This is a Non-Functional Requirement. Check `.agentic/spec/NFR.md` — if no matching NFR exists, assign the next NFR-XXXX ID and write it there. NFRs are invariants that must hold across all features, not just the one being discussed. Don't let them stay informal in conversation. `nfr-applicable.sh F-XXXX` lists applicable NFRs. NFR constraints should be ACs in `### NFR Constraints (P1 — required)` group inside Acceptance Criteria.
 
 ## When the user wants to decompose an epic
 
@@ -165,7 +167,7 @@ If a state machine transition is blocked by a review checkpoint, or the user say
 
 If the user indicates a feature is complete — in any phrasing (e.g. "done", "complete", "finished", "merged", "PR merged", "shipped", "landed", "wrapped up", "it's in"). Match intent, not exact words.
 
-**STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. Before ending, check your TaskList for pending items and flush them to .agentic/TODO.md via `ag todo`. If on main (not in a worktree), run `ag flush --features` to commit state files directly to main.
+**STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. P1 ACs must be 100% checked for priority-grouped specs. Flat-list specs use 80% threshold. Before ending, check your TaskList for pending items and flush them to .agentic/TODO.md via `ag todo`. If on main (not in a worktree), run `ag flush --features` to commit state files directly to main.
 
 **Critical**: When YOU merge a PR (via `gh pr merge`), IMMEDIATELY run `ag done F-XXXX` as the next step. The post-merge flow (VERSION bump, feature status, backlog advance) is part of the merge — not a separate action the user should have to request.
 

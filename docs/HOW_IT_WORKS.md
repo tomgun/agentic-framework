@@ -709,9 +709,9 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 | Feature | How It Works | Status |
 |---------|-------------|--------|
 | **Small Batch Enforcement** (F-0007) | Pre-commit Check 7: blocks >10 files staged, >500 lines added, >500-line code files. Configurable in STACK.md. | ACTIVE - structural gate |
-| **Acceptance-Driven Flow** (F-0006) | Define criteria → implement → test → update specs → commit. `ag implement` requires `spec/acceptance/F-####.md` to exist. | ACTIVE - structural gate (Formal) |
+| **Acceptance-Driven Flow** (F-0006) | Define criteria → implement → test → update specs → commit. `ag implement` requires `spec/acceptance/F-####.md` to exist. AC clarity gate (`spec-analyze.sh --gate`) blocks vague ACs in formal mode. | ACTIVE - structural gate (Formal) |
 | **Plan-Review Loop** (F-0120) | Planner + Reviewer agents iterate on plans before implementation. Max 3 iterations before human escalation. Configurable: `plan_review_enabled`, `plan_review_max_iterations` in STACK.md. | ACTIVE but invocation is inconsistent |
-| **Feature Completion Validator** (F-0017) | `feature-complete.sh` validates all criteria met before marking shipped. `ag done` triggers this. AC completion gate (F-0197) warns/blocks when <80% ACs checked — configurable via `acceptance_criteria: blocking|advisory` in STACK.md. | ACTIVE |
+| **Feature Completion Validator** (F-0017) | `feature-complete.sh` validates all criteria met before marking shipped. `ag done` triggers this. AC completeness enforcement (F-0197) blocks when <80% ACs checked in formal mode (advisory in discovery) — configurable via `acceptance_criteria: blocking|advisory` in STACK.md. | ACTIVE |
 | **Spec Evolution** (F-0010) | Specs evolve during implementation. Discoveries get documented. Not rigid waterfall. | ACTIVE - workflow |
 
 ---

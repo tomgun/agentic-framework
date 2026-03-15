@@ -59,11 +59,11 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 
 | When you say... | Agent runs | What happens |
 |-----------------|-----------|--------------|
-| "Let's build X" | `ag implement` / `ag work` | Verifies specs exist, checks backlog order, starts WIP tracking |
+| "Let's build X" | `ag implement` / `ag work` | Verifies specs exist, runs AC clarity gate (blocks vague ACs in formal mode), checks backlog order, starts WIP tracking |
 | "What's next?" | `ag backlog` | Shows ordered work queue — position 0 = current work |
 | "Plan this first" | `ag plan` | Creates reviewable plan, saves to journal |
 | "Commit this" | `ag commit` | Runs all quality gates, blocks if issues |
-| "We're done" | `ag done` | Checks docs, tests, acceptance; auto-advances backlog |
+| "We're done" | `ag done` | Checks docs, tests, AC completeness (blocks if <80% checked in formal mode); auto-advances backlog |
 | "Flush state" / after `ag done` | `ag flush` | Commits state files (STATUS.md, BACKLOG.json, etc.) directly to main — no PR |
 | "Approve this" | `ag review` | Lists/resolves pending review checkpoints |
 | "Here's my product vision" | `ag kickoff "vision"` | Generates features, ACs, backlog from a vision prompt — staging → review → approve |

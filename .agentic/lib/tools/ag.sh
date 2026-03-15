@@ -12,6 +12,7 @@ ROOT_DIR="${ROOT_DIR:-$(cd "$SCRIPT_DIR/../../.." && pwd)}"
 source "$SCRIPT_DIR/../paths.sh"
 source "$SCRIPT_DIR/../settings.sh"
 source "$SCRIPT_DIR/intent-helpers.sh"
+source "$SCRIPT_DIR/ac-parse.sh"
 
 # Colors (disabled if not TTY)
 if [ -t 1 ]; then
@@ -41,6 +42,13 @@ _has_active_wip() {
 }
 _get_wip_feature() {
     _agents_py get-current-feature "$PROJECT_ROOT" 2>/dev/null || echo ""
+}
+
+# Check if profile is formal or autonomous_formal (both require strict enforcement)
+_is_formal_like() {
+    local p
+    p=$(get_setting "profile" "discovery")
+    [[ "$p" == "formal" || "$p" == "autonomous_formal" ]]
 }
 
 # Check if framework is installed but not initialized
@@ -798,7 +806,16 @@ cmd_plan() {
 
 # Implement command - verify acceptance exists, start WIP (Formal only)
 cmd_implement() {
-    local feature_id="${1:-}"
+    # Parse flags from any position (--skip-clarity can come before or after F-XXXX)
+    local skip_clarity="${SKIP_CLARITY:-0}"
+    local feature_id=""
+    local arg
+    for arg in "$@"; do
+        case "$arg" in
+            --skip-clarity) skip_clarity=1 ;;
+            *) [[ -z "$feature_id" ]] && feature_id="$arg" ;;
+        esac
+    done
 
     # Check feature tracking
     local ft
@@ -959,6 +976,49 @@ cmd_implement() {
             exit 1
         fi
         echo -e "${GREEN}Acceptance criteria: EXISTS${NC}"
+    fi
+
+    # 2. AC clarity gate (spec-analyze --gate) — skipped on re-implement
+    local current_wip
+    current_wip=$(_get_wip_feature)
+    if [[ "$skip_clarity" -eq 1 ]]; then
+        echo -e "${YELLOW}⚠ SKIP_CLARITY: Bypassing AC clarity gate${NC}"
+        bash "$SCRIPT_DIR/journal.sh" "AC clarity gate bypassed" "$feature_id: --skip-clarity used" "" "" 2>/dev/null || true
+    elif [[ -n "$current_wip" && "$current_wip" == "$feature_id" ]]; then
+        # Re-implement: feature already in progress, skip clarity gate
+        true
+    elif [[ -f "$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md" ]]; then
+        local sa_exit=0
+        if _is_formal_like; then
+            # Formal: CRITICAL findings block
+            bash "$SCRIPT_DIR/spec-analyze.sh" "$feature_id" --gate 2>/dev/null || sa_exit=$?
+            if [[ "$sa_exit" -ne 0 ]]; then
+                echo ""
+                echo -e "${RED}BLOCKED: AC clarity gate found CRITICAL issues${NC}"
+                echo "  Fix the vague ACs above, or bypass: SKIP_CLARITY=1 ag implement $feature_id"
+                exit 1
+            fi
+        else
+            # Discovery: advisory only
+            bash "$SCRIPT_DIR/spec-analyze.sh" "$feature_id" --gate 2>/dev/null || true
+        fi
+    fi
+
+    # 2b. NFR staleness detection (advisory)
+    local nfr_file="$ROOT_DIR/.agentic/spec/NFR.md"
+    local acc_file_path="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
+    if [[ -f "$nfr_file" && -f "$acc_file_path" ]]; then
+        # Check if acceptance file references any NFRs
+        if grep -qE 'NFR-[0-9]+' "$acc_file_path" 2>/dev/null; then
+            local nfr_ts acc_ts
+            nfr_ts=$(git log -1 --format=%ct -- "$nfr_file" 2>/dev/null) || nfr_ts=""
+            acc_ts=$(git log -1 --format=%ct -- "$acc_file_path" 2>/dev/null) || acc_ts=""
+            # Only warn if both timestamps exist and NFR.md is newer
+            if [[ -n "$nfr_ts" && -n "$acc_ts" && "$nfr_ts" -gt "$acc_ts" ]]; then
+                echo -e "${YELLOW}⚠ NFR.md has changed since this feature's ACs were written.${NC}"
+                echo "  Run: bash .agentic/lib/tools/nfr-applicable.sh $feature_id"
+            fi
+        fi
     fi
 
     # 3. Run planning phase check (BLOCKING)
@@ -1523,36 +1583,73 @@ cmd_done() {
             fi
         fi
 
-        # Gate 3: AC completion check (F-0197)
+        # Gate 3: AC completion check (F-0197, enhanced with shared parser)
         if [ -f "$acc_file" ]; then
-            local total_acs=0 checked_acs=0
-            while IFS= read -r line; do
-                if echo "$line" | grep -qE '^[[:space:]]*- \[[ x]\][[:space:]]*\*?\*?AC-'; then
-                    total_acs=$((total_acs + 1))
-                    if echo "$line" | grep -qE '^[[:space:]]*- \[x\]'; then
-                        checked_acs=$((checked_acs + 1))
-                    fi
-                elif echo "$line" | grep -qE '^### AC-'; then
-                    total_acs=$((total_acs + 1))
-                    # Heading-format ACs: check if next non-empty line starts with ✅ or "Status: done/complete"
-                    # For simplicity, heading-format ACs count as unchecked unless explicitly marked
-                fi
-            done < "$acc_file"
+            local total_acs=0 checked_acs=0 ac_pct=100
+            total_acs=$(ac_count_total "$acc_file")
+            checked_acs=$(ac_count_checked "$acc_file")
+
+            # Legacy format advisory
+            if ac_has_legacy_format "$acc_file"; then
+                echo -e "  ${BLUE}ℹ${NC} Legacy AC format detected — consider migrating to checkbox format: \`- [ ] **AC-NNN**:\`"
+            fi
 
             if [ "$total_acs" -gt 0 ]; then
-                local ac_pct=$((checked_acs * 100 / total_acs))
+                ac_pct=$(ac_completion_pct "$acc_file")
                 echo ""
                 echo -e "${BOLD}AC Completion:${NC} ${checked_acs}/${total_acs} (${ac_pct}%)"
 
-                if [ "$ac_pct" -lt 80 ]; then
-                    local ac_setting
-                    ac_setting="$(get_setting "acceptance_criteria" "blocking")"
+                local ac_setting
+                ac_setting="$(get_setting "acceptance_criteria" "blocking")"
+                local ac_failed=0
+
+                if ac_has_priority_groups "$acc_file"; then
+                    # Priority-group-aware enforcement:
+                    # P1 groups = 100% required, P2/P3 = 80%
+                    local p1_total p1_checked p1_pct
+                    p1_total=$(ac_count_total_in_group "$acc_file" "P1")
+                    p1_checked=$(ac_count_checked_in_group "$acc_file" "P1")
+                    p1_pct=$(ac_completion_pct_in_group "$acc_file" "P1")
+
+                    # Ungrouped ACs treated as P1 when groups exist (mixed format)
+                    local ug_total ug_checked
+                    ug_total=$(ac_count_total_in_group "$acc_file" "ungrouped")
+                    ug_checked=$(ac_count_checked_in_group "$acc_file" "ungrouped")
+                    p1_total=$((p1_total + ug_total))
+                    p1_checked=$((p1_checked + ug_checked))
+                    if [ "$p1_total" -gt 0 ]; then
+                        p1_pct=$((p1_checked * 100 / p1_total))
+                    fi
+
+                    local p2_total p2_checked p2_pct
+                    p2_total=$(ac_count_total_in_group "$acc_file" "P2")
+                    p2_checked=$(ac_count_checked_in_group "$acc_file" "P2")
+                    p2_pct=$(ac_completion_pct_in_group "$acc_file" "P2")
+
+                    echo -e "  P1: ${p1_checked}/${p1_total} (${p1_pct}%)  P2: ${p2_checked}/${p2_total} (${p2_pct}%)"
+
+                    if [ "$p1_total" -gt 0 ] && [ "$p1_pct" -lt 100 ]; then
+                        ac_failed=1
+                        echo -e "${RED}P1 ACs incomplete: ${p1_pct}% < 100% required${NC}"
+                    fi
+                    if [ "$p2_total" -gt 0 ] && [ "$p2_pct" -lt 80 ]; then
+                        ac_failed=1
+                        echo -e "${RED}P2 ACs incomplete: ${p2_pct}% < 80% threshold${NC}"
+                    fi
+                else
+                    # Flat-list specs: existing 80% threshold (no regression)
+                    if [ "$ac_pct" -lt 80 ]; then
+                        ac_failed=1
+                    fi
+                fi
+
+                if [ "$ac_failed" -eq 1 ]; then
                     if [ "$ac_setting" = "blocking" ]; then
-                        echo -e "${RED}BLOCKED: AC completion ${ac_pct}% < 80% threshold${NC}"
+                        echo -e "${RED}BLOCKED: AC completion below threshold${NC}"
                         echo "  Check off passing ACs in .agentic/spec/acceptance/${feature_id}.md"
                         done_failures=$((done_failures + 1))
                     else
-                        echo -e "${YELLOW}WARNING: AC completion ${ac_pct}% < 80% threshold${NC}"
+                        echo -e "${YELLOW}WARNING: AC completion below threshold${NC}"
                     fi
                 fi
             fi

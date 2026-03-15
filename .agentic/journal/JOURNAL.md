@@ -2729,3 +2729,42 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 20:03 - Systematic Quality Improvement
+
+**Why**: User projects need agents that write clear ACs, implement against them, and prove ACs are met
+
+**What changed**:
+- Shared AC parser, completeness enforcement (P1=100% P2=80% flat=80%), AC clarity gate in ag implement, NFR→AC inline integration with nfr-applicable.sh, language-aware test quality checks — all 4 phases shipped with 23 new unit tests and 675 framework tests passing
+
+**Next steps**:
+- Instruction file sync verification, LLM tests for behavioral changes
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 20:05 - Contributions fix
+
+**Why**: Accurate attribution
+
+**What changed**:
+- Corrected CONTRIBUTIONS.md — user framed the problem and directed reviews, did not design implementation details
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-03-15 20:11 - Review fixes
+
+**Why**: Code review found correctness and portability bugs
+
+**What changed**:
+- Fixed 4 issues from code review: bare-format double-counting bug, --skip-clarity arg parsing, bash 3.x portability, mixed-format regression test
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+

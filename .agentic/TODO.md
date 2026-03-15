@@ -157,6 +157,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0066: Support for protected main branch: ag done/flush currently commit state files (BACKLOG.json, STATUS.md, FEATURES.md, VERSION) directly to main. With branch protection rules (no direct push, require PR review), this breaks. Design alternatives: (1) long-lived state branch auto-synced via rebase, (2) auto-PR for state flushes with auto-merge label, (3) bot-exempt bypass token for state-only commits, (4) state files live outside git (e.g. GitHub API, external store). Must audit all direct-to-main paths: ag done, ag flush, state-commit.sh. Consider: what if state diverges while PR waits? Merge conflict risk with parallel agents.
 - **Added**: 2026-03-13
 
+### T-0067: NFR lifecycle: auto-generate project-appropriate NFRs at init and retrospectives. Categories: testability, performance, security, usability, reportability, scalability, portability, visual impressiveness, immersivity, small deployment size, etc. Pre-filled templates for common project types (web, API, games, music software, mobile, CLI). NFRs may vary per component. Guide user to refine NFRs before they flow into ACs — user may add/change constraints. Trigger points: ag kickoff, ag init, retrospectives, and other natural stops. This ensures NFR→AC→implementation pipeline starts with good NFRs, not afterthoughts.
+- **Added**: 2026-03-15
+
 ## Done
 
 

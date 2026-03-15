@@ -15,7 +15,9 @@
 
 set -euo pipefail
 
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../paths.sh"
+_CSH_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_CSH_SCRIPT_DIR/../paths.sh"
+source "$_CSH_SCRIPT_DIR/ac-parse.sh"
 cd "$PROJECT_ROOT"
 
 # Colors
@@ -65,23 +67,24 @@ check_feature() {
             fi
         done
 
-        # Check NFR Compliance section (info for old features, warning for new)
-        if grep -q "### NFR Compliance" "$ACCEPT_FILE" 2>/dev/null; then
-            echo -e "  ${GREEN}✓${NC} Has NFR Compliance section"
+        # Check NFR section (new ### NFR Constraints or old ## NFR Compliance)
+        if grep -qE '### NFR Constraints' "$ACCEPT_FILE" 2>/dev/null; then
+            echo -e "  ${GREEN}✓${NC} Has NFR Constraints section (inline)"
+        elif grep -qE '###? NFR Compliance' "$ACCEPT_FILE" 2>/dev/null; then
+            echo -e "  ${YELLOW}⚠${NC} Has NFR Compliance section (legacy — consider migrating to inline ### NFR Constraints)"
+            WARNINGS=$((WARNINGS + 1))
         else
-            echo -e "  ${BLUE}ℹ${NC} No NFR Compliance section (optional for legacy specs)"
+            echo -e "  ${BLUE}ℹ${NC} No NFR section (optional for legacy specs)"
             INFO=$((INFO + 1))
         fi
 
         # For shipped features: check criteria completion and test file existence
         if echo "$STATUS" | grep -qi "shipped"; then
-            # Check if all criteria are checked
+            # Check if all criteria are checked (shared parser)
             local UNCHECKED
-            UNCHECKED=$(grep -c "^- \[ \]" "$ACCEPT_FILE" 2>/dev/null || echo "0")
-            UNCHECKED=$(echo "$UNCHECKED" | tr -d '[:space:]')
+            UNCHECKED=$(ac_count_unchecked "$ACCEPT_FILE")
             local CHECKED
-            CHECKED=$(grep -c "^- \[x\]" "$ACCEPT_FILE" 2>/dev/null || echo "0")
-            CHECKED=$(echo "$CHECKED" | tr -d '[:space:]')
+            CHECKED=$(ac_count_checked "$ACCEPT_FILE")
 
             if [[ "$UNCHECKED" -gt 0 ]]; then
                 echo -e "  ${YELLOW}⚠${NC} Shipped but $UNCHECKED unchecked criteria remain ($CHECKED checked)"

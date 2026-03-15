@@ -17,7 +17,9 @@
 # Individual command failures are handled per-check via || true guards.
 set -uo pipefail
 
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../paths.sh"
+_SA_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_SA_SCRIPT_DIR/../paths.sh"
+source "$_SA_SCRIPT_DIR/ac-parse.sh"
 cd "$PROJECT_ROOT"
 
 # Colors
@@ -37,7 +39,35 @@ LOW=0
 FINDINGS=()
 
 # Vague words that need metrics to be meaningful
-VAGUE_WORDS="fast|slow|scalable|easy|simple|intuitive|secure|robust|efficient|flexible|responsive|user-friendly|seamless|modern|clean|good|nice|better|improved|optimal|quickly|easily|performant|lightweight|minimal|adequate|sufficient|reasonable|appropriate"
+# Tightened list: only unambiguous red flags without quantified metrics.
+# Removed context-dependent words (clean, simple, minimal, modern, etc.) that cause false positives.
+VAGUE_WORDS="fast|slow|scalable|easy|intuitive|efficient|responsive|user-friendly|seamless|performant|quickly|easily|appropriate|adequate|sufficient|reasonable"
+
+# Gate mode: when called with --gate, CRITICAL findings cause non-zero exit
+GATE_MODE=0
+
+# Rewrite suggestions for common vague terms (portable — no associative arrays)
+_get_rewrite_suggestion() {
+    case "$1" in
+        fast)        echo "specify: 'responds within Xms under Y concurrent users'" ;;
+        slow)        echo "specify: 'completes in under X seconds for Y records'" ;;
+        scalable)    echo "specify: 'handles X concurrent requests with <Yms p99 latency'" ;;
+        easy)        echo "specify: 'completable in N steps' or 'requires no configuration'" ;;
+        intuitive)   echo "specify: 'user completes task without documentation' or 'follows [standard] conventions'" ;;
+        efficient)   echo "specify: 'uses <X MB memory' or 'processes N items/second'" ;;
+        responsive)  echo "specify: 'renders within Xms' or 'updates within X frames'" ;;
+        user-friendly) echo "specify: 'completes task in N clicks' or 'has WCAG AA compliance'" ;;
+        seamless)    echo "specify: 'no user action required' or 'completes without errors'" ;;
+        performant)  echo "specify: 'Xms latency at Y throughput'" ;;
+        quickly)     echo "specify: 'within X seconds'" ;;
+        easily)      echo "specify: 'in N steps' or 'with single command'" ;;
+        appropriate) echo "specify the exact criteria or threshold" ;;
+        adequate)    echo "specify the minimum acceptable value" ;;
+        sufficient)  echo "specify the minimum acceptable value" ;;
+        reasonable)  echo "specify the exact threshold or range" ;;
+        *)           echo "Add a measurable threshold" ;;
+    esac
+}
 
 # Measurement units that indicate a metric is present nearby
 METRIC_INDICATORS='[0-9]+\s*(ms|s|sec|min|%|percent|MB|GB|KB|bytes|req/s|rps|tps|ops|lines|files|items|times|x)\b|[0-9]+\.[0-9]|<\s*[0-9]|>\s*[0-9]|≤|≥|within\s+[0-9]|under\s+[0-9]|below\s+[0-9]|at least\s+[0-9]|at most\s+[0-9]|max\s+[0-9]|min\s+[0-9]'
@@ -134,9 +164,13 @@ check_ambiguity() {
                 if echo "$line" | grep -qiw "$word"; then
                     # Check if there's a metric nearby on the same line
                     if ! echo "$line" | grep -qEi "$METRIC_INDICATORS"; then
-                        add_finding "MEDIUM" "$ac_id" \
+                        local severity="MEDIUM"
+                        [[ "$GATE_MODE" -eq 1 ]] && severity="CRITICAL"
+                        local suggestion
+                        suggestion=$(_get_rewrite_suggestion "$word")
+                        add_finding "$severity" "$ac_id" \
                             "Contains vague term \"$word\" without metric" \
-                            "Consider adding a measurable threshold"
+                            "$suggestion"
                     fi
                 fi
             done <<< "$(echo "$VAGUE_WORDS" | tr '|' '\n')"
@@ -275,11 +309,16 @@ if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
 fi
 
 if [[ -z "${1:-}" ]]; then
-    echo "Usage: bash .agentic/tools/spec-analyze.sh <F-XXXX|--help>"
+    echo "Usage: bash .agentic/tools/spec-analyze.sh <F-XXXX> [--gate]"
     exit 0
 fi
 
 FEATURE_ID="$1"
+
+# --gate mode: CRITICAL findings cause non-zero exit (used by ag implement)
+if [[ "${2:-}" == "--gate" ]]; then
+    GATE_MODE=1
+fi
 
 # Validate feature ID format
 if ! echo "$FEATURE_ID" | grep -qE '^F-[0-9]{4}$'; then
@@ -332,5 +371,12 @@ fi
 echo ""
 echo -e "Summary: ${RED}${CRITICAL} CRITICAL${NC}, ${RED}${HIGH} HIGH${NC}, ${YELLOW}${MEDIUM} MEDIUM${NC}, ${BLUE}${LOW} LOW${NC}"
 
-# Always exit 0 — advisory only (AC-007)
+# Gate mode: exit non-zero if CRITICAL findings exist (used by ag implement)
+# Default mode: always exit 0 — advisory only (AC-007)
+if [[ "$GATE_MODE" -eq 1 ]] && [[ "$CRITICAL" -gt 0 ]]; then
+    echo ""
+    echo -e "${RED}Gate mode: ${CRITICAL} CRITICAL finding(s) — blocking.${NC}"
+    echo -e "Fix the CRITICAL issues above, or bypass with: SKIP_CLARITY=1 ag implement ${FEATURE_ID}"
+    exit 1
+fi
 exit 0

@@ -19,6 +19,7 @@ Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 - PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking.
 - Add/update tests for new/changed logic.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
+- AC completeness enforced at `ag done`: P1 ACs = 100%, P2/P3 = 80%, flat specs = 80%. AC clarity gate runs on first `ag implement` (formal=blocking, discovery=advisory).
 - Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).

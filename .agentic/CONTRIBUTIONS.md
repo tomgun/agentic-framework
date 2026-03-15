@@ -8,6 +8,10 @@
 
 ## Recent Contributions
 
+### Systematic Quality Improvement for User Projects (Epic)
+
+**User insight**: Tomas framed the problem: user projects need agents that write clear ACs with NFR constraints baked in, implement against those ACs, and write tests that prove ACs are met. He identified three specific pain points — NFRs as paperwork in a separate section, spec-analyze.sh being advisory-only, and no test-to-AC verification — and directed the plan through 4 dialectical review iterations, requiring revisions at each round until the architecture was sound. The review process itself surfaced critical issues: the 95% flat-list fallback gap (which led to the non-regressive 80% threshold), the `--force` flag namespace collision, and the re-implement skip mechanism need.
+
 ### Framework Verification Was Not Testing the Framework (F-0215)
 
 **User insight**: Tomas exposed that the entire auto-verify loop was superficially planned and implemented — it claimed to test the framework end-to-end, but wasn't actually verifying that the framework works. The core problem: the test project setup was fundamentally incomplete. `setup_project()` copied `.agentic/lib/` (the framework's internal library) and wrote a STACK.md, but never ran the actual project initialization flow. The spawned build agent had no CLAUDE.md (the instruction file Claude Code auto-reads), no `.claude/skills/` (the workflow triggers), no AGENTS.md (the non-negotiable rules) — none of the files that make the framework function. It was an agent building a todo app with a generic prompt, not an agent using the framework. You can't verify a framework works if the agent doesn't even have the framework's instructions loaded.
