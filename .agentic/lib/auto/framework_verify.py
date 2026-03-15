@@ -71,6 +71,8 @@ class ScenarioRun:
     escalations: list[str] = field(default_factory=list)
     error: str = ""
     skipped: bool = False
+    prompt_tier: str = "discovery"
+    behavioral_results: list[MilestoneResult] = field(default_factory=list)
 
 
 @dataclass
@@ -106,8 +108,13 @@ class VerifyResult:
                         {"name": m.name, "passed": m.passed, "detail": m.detail}
                         for m in r.milestones
                     ],
+                    "behavioral_results": [
+                        {"name": m.name, "passed": m.passed, "detail": m.detail}
+                        for m in r.behavioral_results
+                    ],
                     "error": r.error,
                     "skipped": r.skipped,
+                    "prompt_tier": r.prompt_tier,
                 }
                 for r in self.runs
             ],
@@ -279,8 +286,9 @@ class ExpectationChecker:
               glob: "app/**/*.py"
     """
 
-    def __init__(self, project_root: Path):
+    def __init__(self, project_root: Path, agent_log: Path | None = None):
         self.root = project_root
+        self.agent_log = agent_log
 
     def check_all(self, expectations: dict[str, Any]) -> list[MilestoneResult]:
         """Run all expectations and return results."""
@@ -562,6 +570,264 @@ class ExpectationChecker:
                 pass
         return MilestoneResult("no_wip_at_end", True)
 
+    # -- Behavioral expectation checkers (discovery mode) -------------------
+
+    def check_behavioral(self, expectations: list[dict]) -> list[MilestoneResult]:
+        """Run behavioral expectations. Results are advisory (severity: warning)."""
+        results: list[MilestoneResult] = []
+        for check in expectations:
+            method = getattr(self, f"_wf_{check['type']}", None)
+            if method:
+                results.append(method(check))
+            else:
+                results.append(MilestoneResult(
+                    f"behavioral({check['type']})", False,
+                    f"Unknown behavioral check: {check['type']}",
+                ))
+        return results
+
+    def _wf_spec_before_code(self, check: dict) -> MilestoneResult:
+        """Verify spec artifacts were committed before or with implementation code.
+
+        Uses git log to find when files were first added. Compares commit
+        position of first AC file vs first source code file. Same-commit
+        counts as passing.
+        """
+        try:
+            # Find first commit adding an AC file
+            ac_result = subprocess.run(
+                ["git", "log", "--reverse", "--format=%H",
+                 "--diff-filter=A", "--", ".agentic/spec/acceptance/*"],
+                capture_output=True, text=True, cwd=str(self.root), timeout=10,
+            )
+            ac_commits = [h for h in ac_result.stdout.strip().split("\n") if h]
+
+            if not ac_commits:
+                return MilestoneResult(
+                    "spec_before_code", False,
+                    "no acceptance criteria files found in git history",
+                )
+
+            # Find first commit adding source code (common patterns)
+            code_globs = ["app/**/*.py", "src/**/*.py", "src/**/*.ts",
+                          "*.py", "**/*.py"]
+            code_commits: list[str] = []
+            for glob in code_globs:
+                result = subprocess.run(
+                    ["git", "log", "--reverse", "--format=%H",
+                     "--diff-filter=A", "--", glob],
+                    capture_output=True, text=True, cwd=str(self.root), timeout=10,
+                )
+                commits = [h for h in result.stdout.strip().split("\n") if h]
+                # Filter out commits that only touch test/spec files
+                code_commits.extend(commits)
+            code_commits = list(dict.fromkeys(code_commits))  # dedupe, preserve order
+
+            if not code_commits:
+                return MilestoneResult(
+                    "spec_before_code", True,
+                    "no source code commits found (spec-only project)",
+                )
+
+            # Get all commit hashes in order to compare positions
+            all_commits = subprocess.run(
+                ["git", "log", "--reverse", "--format=%H"],
+                capture_output=True, text=True, cwd=str(self.root), timeout=10,
+            ).stdout.strip().split("\n")
+
+            first_ac_pos = all_commits.index(ac_commits[0]) if ac_commits[0] in all_commits else -1
+            first_code_pos = all_commits.index(code_commits[0]) if code_commits[0] in all_commits else -1
+
+            if first_ac_pos == -1:
+                return MilestoneResult(
+                    "spec_before_code", False, "AC commit not found in history",
+                )
+            if first_code_pos == -1:
+                return MilestoneResult(
+                    "spec_before_code", True, "code commit not in history",
+                )
+
+            if first_ac_pos <= first_code_pos:
+                return MilestoneResult(
+                    "spec_before_code", True,
+                    f"AC at commit #{first_ac_pos + 1}, code at #{first_code_pos + 1}",
+                )
+            return MilestoneResult(
+                "spec_before_code", False,
+                f"code at commit #{first_code_pos + 1} before AC at #{first_ac_pos + 1}",
+            )
+        except Exception as e:
+            return MilestoneResult("spec_before_code", False, str(e))
+
+    def _wf_workflow_commands_used(self, check: dict) -> MilestoneResult:
+        """Check artifacts for evidence a framework command was discovered and used."""
+        command = check.get("command", "")
+        evidence_type = check.get("evidence", "")
+
+        if command == "kickoff" and evidence_type == "features_md_format":
+            features_path = self.root / ".agentic" / "spec" / "FEATURES.md"
+            if not features_path.exists():
+                return MilestoneResult(
+                    f"workflow_commands_used({command})", False,
+                    "FEATURES.md not found",
+                )
+            content = features_path.read_text()
+            # ag kickoff produces structured entries with ## F-XXXX and **Status**/**Description**
+            pattern = r"## F-\d{4}:.*\n\*\*Status\*\*:"
+            if re.search(pattern, content):
+                return MilestoneResult(
+                    f"workflow_commands_used({command})", True,
+                    "FEATURES.md has structured F-XXXX entries (kickoff format)",
+                )
+            return MilestoneResult(
+                f"workflow_commands_used({command})", False,
+                "FEATURES.md exists but lacks structured kickoff format",
+            )
+
+        if command == "commit" and evidence_type == "conventional_commits":
+            try:
+                out = subprocess.run(
+                    ["git", "log", "--format=%s"],
+                    capture_output=True, text=True, cwd=str(self.root), timeout=10,
+                ).stdout.strip()
+                messages = [m for m in out.split("\n") if m]
+                convention = re.compile(
+                    r"^(feat|fix|test|chore|docs|refactor|style|perf|ci|build)\(?",
+                )
+                matching = [m for m in messages if convention.match(m)]
+                if matching:
+                    return MilestoneResult(
+                        f"workflow_commands_used({command})", True,
+                        f"{len(matching)} conventional commits found",
+                    )
+                return MilestoneResult(
+                    f"workflow_commands_used({command})", False,
+                    "no conventional commit messages found",
+                )
+            except Exception as e:
+                return MilestoneResult(
+                    f"workflow_commands_used({command})", False, str(e),
+                )
+
+        if command == "implement":
+            # Evidence: plan files exist or JOURNAL.md has session entries
+            plans_dir = self.root / ".agentic" / "journal" / "plans"
+            journal = self.root / ".agentic" / "journal" / "JOURNAL.md"
+            has_plans = plans_dir.exists() and any(plans_dir.glob("F-*-plan.md"))
+            has_journal = journal.exists() and "### Session:" in journal.read_text()
+            if has_plans or has_journal:
+                return MilestoneResult(
+                    f"workflow_commands_used({command})", True,
+                    f"plans={'yes' if has_plans else 'no'}, journal={'yes' if has_journal else 'no'}",
+                )
+            return MilestoneResult(
+                f"workflow_commands_used({command})", False,
+                "no plan files or journal session entries found",
+            )
+
+        if command == "done":
+            features_path = self.root / ".agentic" / "spec" / "FEATURES.md"
+            if features_path.exists():
+                content = features_path.read_text()
+                if re.search(r"\*\*Status\*\*:\s*shipped", content):
+                    return MilestoneResult(
+                        f"workflow_commands_used({command})", True,
+                        "features with shipped status found",
+                    )
+            return MilestoneResult(
+                f"workflow_commands_used({command})", False,
+                "no shipped features found",
+            )
+
+        return MilestoneResult(
+            f"workflow_commands_used({command})", False,
+            f"unknown command/evidence combo: {command}/{evidence_type}",
+        )
+
+    def _wf_session_start_ran(self, check: dict) -> MilestoneResult:
+        """Check if agent ran the session-start protocol.
+
+        Evidence: STATUS.md has content beyond default template, or
+        JOURNAL.md has a Session entry.
+        """
+        status_path = self.root / ".agentic" / "STATUS.md"
+        journal_path = self.root / ".agentic" / "journal" / "JOURNAL.md"
+
+        if status_path.exists():
+            content = status_path.read_text().strip()
+            # Default STATUS.md is minimal; any substantial content = session started
+            if content and len(content) > 50:
+                return MilestoneResult(
+                    "session_start_ran", True,
+                    "STATUS.md has content beyond default",
+                )
+
+        if journal_path.exists():
+            content = journal_path.read_text()
+            if "### Session:" in content:
+                return MilestoneResult(
+                    "session_start_ran", True,
+                    "JOURNAL.md has session entry",
+                )
+
+        return MilestoneResult(
+            "session_start_ran", False,
+            "no evidence of session-start protocol in STATUS.md or JOURNAL.md",
+        )
+
+    def _wf_plans_reviewed(self, check: dict) -> MilestoneResult:
+        """Check that plan files show evidence of review (DRAFT → APPROVED)."""
+        plans_dir = self.root / ".agentic" / "journal" / "plans"
+        if not plans_dir.exists():
+            return MilestoneResult(
+                "plans_reviewed", False, "no plans directory found",
+            )
+        plan_files = list(plans_dir.glob("F-*-plan.md"))
+        if not plan_files:
+            return MilestoneResult(
+                "plans_reviewed", False, "no plan files found",
+            )
+        approved = 0
+        for pf in plan_files:
+            content = pf.read_text()
+            if re.search(r"\*\*Status\*\*:\s*APPROVED", content):
+                approved += 1
+        if approved > 0:
+            return MilestoneResult(
+                "plans_reviewed", True,
+                f"{approved}/{len(plan_files)} plan(s) have APPROVED status",
+            )
+        return MilestoneResult(
+            "plans_reviewed", False,
+            f"0/{len(plan_files)} plans have APPROVED status",
+        )
+
+    def _wf_instruction_files_consulted(self, check: dict) -> MilestoneResult:
+        """Grep agent log for evidence of reading instruction files. Supplementary."""
+        if not self.agent_log or not self.agent_log.exists():
+            return MilestoneResult(
+                "instruction_files_consulted", False,
+                "no agent log available",
+            )
+        try:
+            log_content = self.agent_log.read_text(errors="ignore")
+            markers = ["CLAUDE.md", "skills/", "auto_orchestration.md",
+                        "implementing-features", "session-start"]
+            found = [m for m in markers if m in log_content]
+            if len(found) >= 2:
+                return MilestoneResult(
+                    "instruction_files_consulted", True,
+                    f"found references to: {', '.join(found)}",
+                )
+            return MilestoneResult(
+                "instruction_files_consulted", False,
+                f"only found {len(found)} instruction file reference(s) in log",
+            )
+        except Exception as e:
+            return MilestoneResult(
+                "instruction_files_consulted", False, str(e),
+            )
+
 
 # ---------------------------------------------------------------------------
 # Settings-driven workflow expectations
@@ -593,6 +859,35 @@ def derive_workflow_expectations(project_root: Path) -> list[dict]:
     if _settings.get_setting(project_root, "plan_review_enabled", "no") == "yes":
         checks.append({"type": "plans_exist", "min": 1})
         checks.append({"type": "plans_approved", "min": 1})
+
+    return checks
+
+
+def derive_behavioral_expectations(project_root: Path, prompt_tier: str) -> list[dict]:
+    """Derive behavioral expectations for discovery-mode verification.
+
+    Returns empty list for recipe mode — behavioral compliance is meaningless
+    when the agent is told exactly what to do.
+
+    All behavioral checks use severity: warning (advisory, non-blocking).
+    """
+    if prompt_tier == "recipe":
+        return []
+
+    import settings as _settings
+    _settings._cache.clear()
+
+    checks: list[dict] = [
+        {"type": "spec_before_code", "severity": "warning"},
+        {"type": "session_start_ran", "severity": "warning"},
+        {"type": "workflow_commands_used", "command": "kickoff",
+         "evidence": "features_md_format", "severity": "warning"},
+        {"type": "workflow_commands_used", "command": "commit",
+         "evidence": "conventional_commits", "severity": "warning"},
+    ]
+
+    if _settings.get_setting(project_root, "plan_review_enabled", "no") == "yes":
+        checks.append({"type": "plans_reviewed", "severity": "warning"})
 
     return checks
 
@@ -856,13 +1151,13 @@ def _write_stack_md(
         lines.append(f"- docs_mode: {settings['docs_mode']}")
     if "review_merge" in settings:
         lines.append(f"- review_merge: {settings['review_merge']}")
-    # Formal profiles: let profile defaults drive most settings,
-    # but skip expensive reviews (dialectical review, commit review)
+    # Formal profiles: acceptance_criteria is always blocking.
+    # review_plan and review_commit use profile defaults so agents exercise
+    # the full workflow (critical_agent for autonomous_formal, human for formal).
+    # review_merge stays as specified in scenario YAML (must be "skip" for autonomous).
     profile = settings.get("profile", "discovery")
     if profile in ("formal", "autonomous_formal"):
         lines.append("- acceptance_criteria: blocking")
-        lines.append("- review_plan: skip")
-        lines.append("- review_commit: skip")
 
     lines.extend([
         "",
@@ -906,13 +1201,11 @@ def _write_multirepo_stack_md(
     ]
     if "review_merge" in settings:
         lines.append(f"- review_merge: {settings['review_merge']}")
-    # Formal profiles: let profile defaults drive most settings,
-    # but skip expensive reviews (dialectical review, commit review)
+    # Formal profiles: acceptance_criteria is always blocking.
+    # review_plan and review_commit use profile defaults (see _write_stack_md).
     profile = settings.get("profile", "discovery")
     if profile in ("formal", "autonomous_formal"):
         lines.append("- acceptance_criteria: blocking")
-        lines.append("- review_plan: skip")
-        lines.append("- review_commit: skip")
 
     # Components with resolved paths and Repo column
     lines.extend(["", "## Components", "",
@@ -947,19 +1240,41 @@ def _write_multirepo_stack_md(
 # ---------------------------------------------------------------------------
 
 def build_prompt(scenario: dict[str, Any], settings: dict[str, str]) -> str:
-    """Generate the build agent prompt from template + scenario data."""
-    template_path = PROMPTS_DIR / "verify_build.md"
+    """Generate the build agent prompt from template + scenario data.
+
+    Uses discovery template by default (agent discovers workflow from
+    instruction files). Recipe template is used when prompt_tier=recipe
+    (prescriptive step-by-step instructions).
+    """
+    prompt_tier = settings.get("prompt_tier", "discovery")
+
+    if prompt_tier == "recipe":
+        template_path = PROMPTS_DIR / "verify_build.md"
+    else:
+        template_path = PROMPTS_DIR / "verify_build_discovery.md"
+
     template = template_path.read_text()
 
     stack = scenario.get("stack", {})
     stack_desc = ", ".join(f"{k}: {v}" for k, v in stack.items())
 
-    return template.format(
-        vision=scenario.get("vision", "").strip(),
-        stack_description=stack_desc or "See STACK.md",
-        profile=settings.get("profile", "discovery"),
-        git_workflow=settings.get("git_workflow", "direct"),
-    )
+    # Discovery template uses fewer variables than recipe; use safe formatting
+    format_vars = {
+        "vision": scenario.get("vision", "").strip(),
+        "stack_description": stack_desc or "See STACK.md",
+        "profile": settings.get("profile", "discovery"),
+        "git_workflow": settings.get("git_workflow", "direct"),
+    }
+
+    # Only include vars the template actually uses
+    try:
+        return template.format(**format_vars)
+    except KeyError:
+        # Fallback: format only known placeholders
+        result = template
+        for key, val in format_vars.items():
+            result = result.replace(f"{{{key}}}", str(val))
+        return result
 
 
 # ---------------------------------------------------------------------------
@@ -1131,9 +1446,13 @@ class FrameworkVerifier:
         """Run a single scenario with a single settings combo."""
         name = scenario.get("name", "unknown")
         settings_label = settings.get("profile", "default")
-        timeout = scenario.get("timeout", 600)
+        timeout = int(settings.get("timeout_override") or scenario.get("timeout", 600))
+        prompt_tier = settings.get("prompt_tier", "discovery")
 
-        run = ScenarioRun(scenario_name=name, settings_label=settings_label)
+        run = ScenarioRun(
+            scenario_name=name, settings_label=settings_label,
+            prompt_tier=prompt_tier,
+        )
 
         slug = name.lower().replace(' ', '-')
 
@@ -1174,7 +1493,7 @@ class FrameworkVerifier:
                     project_root = project_dir
                     setup_project(scenario, self.vw_path, project_dir, settings)
 
-                self._log(f"  Project scaffolded, spawning build agent (timeout={timeout}s)...")
+                self._log(f"  Project scaffolded, spawning build agent (timeout={timeout}s, prompt={prompt_tier})...")
 
                 # Spawn build agent
                 prompt = build_prompt(scenario, settings)
@@ -1226,7 +1545,7 @@ class FrameworkVerifier:
                         expectations[key] = val
                 if expectations:
                     self._log(f"  Running behavioral expectations...")
-                    exp_checker = ExpectationChecker(project_root)
+                    exp_checker = ExpectationChecker(project_root, agent_log=log_file)
                     exp_results = exp_checker.check_all(expectations)
                     milestones.extend(exp_results)
                     run.milestones = milestones
@@ -1248,6 +1567,20 @@ class FrameworkVerifier:
                         # Refresh expectations after repairs (keep milestone checks as-is)
                         refreshed = exp_checker.check_all(expectations)
                         run.milestones = milestones[:exp_start_idx] + refreshed
+
+                # Discovery-mode behavioral expectations (advisory, non-blocking)
+                behavioral_exps = derive_behavioral_expectations(
+                    project_root, prompt_tier,
+                )
+                if behavioral_exps:
+                    self._log(f"  Running discovery behavioral checks (advisory)...")
+                    beh_checker = ExpectationChecker(project_root, agent_log=log_file)
+                    beh_results = beh_checker.check_behavioral(behavioral_exps)
+                    run.behavioral_results = beh_results
+                    for m in beh_results:
+                        icon = "+" if m.passed else "~"
+                        detail = f" — {m.detail}" if m.detail else ""
+                        self._log(f"    {icon} [advisory] {m.name}{detail}")
 
                 if all(m.passed for m in run.milestones):
                     run.success = True
@@ -1612,6 +1945,8 @@ def main() -> None:
                         help="Machine-readable JSON output")
     parser.add_argument("--claude-command", default="claude",
                         help="Claude CLI command (default: claude)")
+    parser.add_argument("--prompt-tier", choices=["discovery", "recipe"], default=None,
+                        help="Override prompt tier for all scenarios (default: per-scenario)")
     args = parser.parse_args()
 
     project_root = Path(args.project_root).resolve()
@@ -1635,6 +1970,10 @@ def main() -> None:
             print(f"Error: Scenario '{name}' not found", file=sys.stderr)
             print(f"Available: {', '.join(list_scenarios())}", file=sys.stderr)
             sys.exit(1)
+        # Apply --prompt-tier override to all settings matrix entries
+        if args.prompt_tier:
+            for s in scenario.get("settings_matrix", [{}]):
+                s["prompt_tier"] = args.prompt_tier
         # Filter settings matrix if index specified
         if args.settings_index is not None:
             matrix = scenario.get("settings_matrix", [{}])
@@ -1673,12 +2012,19 @@ def _print_report(result: VerifyResult) -> None:
 
     for run in result.runs:
         status = "PASS" if run.success else ("SKIP" if run.skipped else "FAIL")
-        print(f"\n  [{status}] {run.scenario_name} ({run.settings_label})")
+        tier_tag = f" [{run.prompt_tier}]" if run.prompt_tier != "discovery" else ""
+        print(f"\n  [{status}] {run.scenario_name} ({run.settings_label}){tier_tag}")
         if run.milestones:
             for m in run.milestones:
                 icon = "+" if m.passed else "-"
                 detail = f" — {m.detail}" if m.detail else ""
                 print(f"    {icon} {m.name}{detail}")
+        if run.behavioral_results:
+            print(f"    Advisory (discovery behavior):")
+            for m in run.behavioral_results:
+                icon = "+" if m.passed else "~"
+                detail = f" — {m.detail}" if m.detail else ""
+                print(f"      {icon} {m.name}{detail}")
         if run.error:
             print(f"    Error: {run.error}")
         if run.fixes:

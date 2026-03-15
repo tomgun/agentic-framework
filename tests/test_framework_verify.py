@@ -409,7 +409,21 @@ class TestBuildPrompt:
         settings = {"profile": "discovery", "git_workflow": "direct"}
         prompt = build_prompt(scenario, settings)
         assert "Build a todo app" in prompt
+        # Default is discovery template — has "instruction files" not profile name
+        assert "instruction files" in prompt
+
+    def test_build_prompt_recipe_includes_profile(self):
+        from auto.framework_verify import build_prompt
+        scenario = {
+            "vision": "Build a todo app",
+            "stack": {"language": "python"},
+        }
+        settings = {"profile": "discovery", "git_workflow": "direct",
+                     "prompt_tier": "recipe"}
+        prompt = build_prompt(scenario, settings)
+        assert "Build a todo app" in prompt
         assert "discovery" in prompt
+        assert "ag kickoff" in prompt
 
 
 # ---------------------------------------------------------------------------
@@ -857,3 +871,387 @@ class TestDeriveWorkflowExpectations:
                     # Discovery must NOT have plans or features
                     assert "plans_exist" not in types
                     assert "features_have_status" not in types
+
+
+# ---------------------------------------------------------------------------
+# Build prompt discovery/recipe tests
+# ---------------------------------------------------------------------------
+
+class TestBuildPromptTiers:
+    """Test discovery vs recipe prompt selection."""
+
+    def test_default_uses_discovery(self):
+        from auto.framework_verify import build_prompt
+        scenario = {
+            "vision": "Build a todo app",
+            "stack": {"language": "python"},
+        }
+        settings = {"profile": "discovery", "git_workflow": "direct"}
+        prompt = build_prompt(scenario, settings)
+        assert "Build a todo app" in prompt
+        # Discovery prompt should NOT have prescriptive steps
+        assert "ag kickoff" not in prompt
+        assert "ag implement" not in prompt
+        # Discovery prompt should mention instruction files
+        assert "instruction files" in prompt
+
+    def test_recipe_uses_original_template(self):
+        from auto.framework_verify import build_prompt
+        scenario = {
+            "vision": "Build a todo app",
+            "stack": {"language": "python"},
+        }
+        settings = {
+            "profile": "discovery", "git_workflow": "direct",
+            "prompt_tier": "recipe",
+        }
+        prompt = build_prompt(scenario, settings)
+        assert "Build a todo app" in prompt
+        # Recipe prompt has prescriptive steps
+        assert "ag kickoff" in prompt
+        assert "discovery" in prompt
+
+    def test_explicit_discovery_tier(self):
+        from auto.framework_verify import build_prompt
+        scenario = {
+            "vision": "Build a CLI tool",
+            "stack": {"language": "python", "framework": "click"},
+        }
+        settings = {
+            "profile": "formal", "git_workflow": "pull_request",
+            "prompt_tier": "discovery",
+        }
+        prompt = build_prompt(scenario, settings)
+        assert "Build a CLI tool" in prompt
+        assert "instruction files" in prompt
+
+
+# ---------------------------------------------------------------------------
+# Behavioral expectation checker tests
+# ---------------------------------------------------------------------------
+
+class TestBehavioralExpectations:
+    """Test discovery-mode behavioral checkers."""
+
+    def test_spec_before_code_pass(self, tmp_path):
+        """AC committed before code → pass."""
+        from auto.framework_verify import ExpectationChecker
+        subprocess.run(["git", "init"], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        # Commit 1: AC file
+        ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
+        ac_dir.mkdir(parents=True)
+        (ac_dir / "F-0001.md").write_text("- [ ] API works\n")
+        subprocess.run(["git", "add", "."], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "spec: add AC"],
+                       cwd=str(tmp_path), check=True, capture_output=True)
+        # Commit 2: source code
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("print('hello')")
+        subprocess.run(["git", "add", "."], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "feat: add app"],
+                       cwd=str(tmp_path), check=True, capture_output=True)
+
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_spec_before_code({})
+        assert result.passed
+
+    def test_spec_before_code_fail(self, tmp_path):
+        """Code committed before AC → fail."""
+        from auto.framework_verify import ExpectationChecker
+        subprocess.run(["git", "init"], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        # Commit 1: source code first
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("print('hello')")
+        subprocess.run(["git", "add", "."], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "feat: add app"],
+                       cwd=str(tmp_path), check=True, capture_output=True)
+        # Commit 2: AC after code
+        ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
+        ac_dir.mkdir(parents=True)
+        (ac_dir / "F-0001.md").write_text("- [ ] API works\n")
+        subprocess.run(["git", "add", "."], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "spec: add AC"],
+                       cwd=str(tmp_path), check=True, capture_output=True)
+
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_spec_before_code({})
+        assert not result.passed
+
+    def test_spec_before_code_same_commit(self, tmp_path):
+        """AC and code in same commit → pass."""
+        from auto.framework_verify import ExpectationChecker
+        subprocess.run(["git", "init"], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
+        ac_dir.mkdir(parents=True)
+        (ac_dir / "F-0001.md").write_text("- [ ] API works\n")
+        (tmp_path / "app").mkdir()
+        (tmp_path / "app" / "main.py").write_text("print('hello')")
+        subprocess.run(["git", "add", "."], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "feat: add everything"],
+                       cwd=str(tmp_path), check=True, capture_output=True)
+
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_spec_before_code({})
+        assert result.passed
+
+    def test_workflow_commands_used_kickoff(self, tmp_path):
+        """FEATURES.md with structured format → kickoff detected."""
+        from auto.framework_verify import ExpectationChecker
+        spec_dir = tmp_path / ".agentic" / "spec"
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "FEATURES.md").write_text(
+            "## F-0001: Todo CRUD\n**Status**: planned\n**Description**: CRUD ops\n"
+        )
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_workflow_commands_used({
+            "command": "kickoff", "evidence": "features_md_format",
+        })
+        assert result.passed
+
+    def test_workflow_commands_used_kickoff_fail(self, tmp_path):
+        """FEATURES.md without structured format → kickoff not detected."""
+        from auto.framework_verify import ExpectationChecker
+        spec_dir = tmp_path / ".agentic" / "spec"
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "FEATURES.md").write_text("# Features\nSome random text\n")
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_workflow_commands_used({
+            "command": "kickoff", "evidence": "features_md_format",
+        })
+        assert not result.passed
+
+    def test_workflow_commands_used_commit(self, tmp_path):
+        """Conventional commit messages → commit command detected."""
+        from auto.framework_verify import ExpectationChecker
+        subprocess.run(["git", "init"], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        (tmp_path / "f.txt").write_text("x")
+        subprocess.run(["git", "add", "."], cwd=str(tmp_path),
+                       check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "feat(todo): add CRUD API"],
+                       cwd=str(tmp_path), check=True, capture_output=True)
+
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_workflow_commands_used({
+            "command": "commit", "evidence": "conventional_commits",
+        })
+        assert result.passed
+
+    def test_session_start_ran_pass_status(self, tmp_path):
+        """STATUS.md with content → session start detected."""
+        from auto.framework_verify import ExpectationChecker
+        (tmp_path / ".agentic").mkdir()
+        (tmp_path / ".agentic" / "STATUS.md").write_text(
+            "# Current Focus\n\nImplementing F-0001: Todo CRUD API\n\n## Context\nBuilding the app"
+        )
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_session_start_ran({})
+        assert result.passed
+
+    def test_session_start_ran_fail(self, tmp_path):
+        """No STATUS.md or JOURNAL.md → session start not detected."""
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_session_start_ran({})
+        assert not result.passed
+
+    def test_plans_reviewed_pass(self, tmp_path):
+        """Plan with APPROVED status → review detected."""
+        from auto.framework_verify import ExpectationChecker
+        plans = tmp_path / ".agentic" / "journal" / "plans"
+        plans.mkdir(parents=True)
+        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_plans_reviewed({})
+        assert result.passed
+
+    def test_plans_reviewed_fail_draft(self, tmp_path):
+        """Plan with DRAFT status → review not complete."""
+        from auto.framework_verify import ExpectationChecker
+        plans = tmp_path / ".agentic" / "journal" / "plans"
+        plans.mkdir(parents=True)
+        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: DRAFT\n")
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_plans_reviewed({})
+        assert not result.passed
+
+    def test_instruction_files_consulted_pass(self, tmp_path):
+        """Agent log with instruction file references → pass."""
+        from auto.framework_verify import ExpectationChecker
+        log = tmp_path / "agent.log"
+        log.write_text(
+            "Reading CLAUDE.md...\nChecking skills/ directory...\n"
+            "Found implementing-features skill\n"
+        )
+        checker = ExpectationChecker(tmp_path, agent_log=log)
+        result = checker._wf_instruction_files_consulted({})
+        assert result.passed
+
+    def test_instruction_files_consulted_fail_no_log(self, tmp_path):
+        """No agent log → fail."""
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        result = checker._wf_instruction_files_consulted({})
+        assert not result.passed
+
+    def test_check_behavioral_method(self, tmp_path):
+        """check_behavioral dispatches to _wf_ methods."""
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_behavioral([
+            {"type": "session_start_ran", "severity": "warning"},
+        ])
+        assert len(results) == 1
+        assert results[0].name == "session_start_ran"
+
+    def test_check_behavioral_unknown_type(self, tmp_path):
+        """Unknown behavioral check type → fail gracefully."""
+        from auto.framework_verify import ExpectationChecker
+        checker = ExpectationChecker(tmp_path)
+        results = checker.check_behavioral([
+            {"type": "nonexistent_check", "severity": "warning"},
+        ])
+        assert len(results) == 1
+        assert not results[0].passed
+        assert "Unknown" in results[0].detail
+
+
+# ---------------------------------------------------------------------------
+# Derive behavioral expectations tests
+# ---------------------------------------------------------------------------
+
+class TestDeriveBehavioralExpectations:
+    """Test derive_behavioral_expectations()."""
+
+    _FRAMEWORK_ROOT = Path(__file__).resolve().parent.parent
+
+    def _setup_test_project(self, root: Path, profile: str,
+                            overrides: dict[str, str] | None = None) -> None:
+        """Create a minimal test project with STACK.md and profiles.conf."""
+        presets_dst = root / ".agentic" / "presets"
+        presets_dst.mkdir(parents=True, exist_ok=True)
+        presets_src = self._FRAMEWORK_ROOT / ".agentic" / "lib" / "presets" / "profiles.conf"
+        shutil.copy2(str(presets_src), str(presets_dst / "profiles.conf"))
+
+        lines = [
+            "# STACK.md", "",
+            "## Settings",
+            f"- profile: {profile}",
+        ]
+        for key, val in (overrides or {}).items():
+            lines.append(f"- {key}: {val}")
+        lines.append("")
+        (root / "STACK.md").write_text("\n".join(lines))
+
+    def test_recipe_returns_empty(self, tmp_path):
+        """Recipe mode → no behavioral expectations."""
+        from auto.framework_verify import derive_behavioral_expectations
+        self._setup_test_project(tmp_path, "discovery")
+        checks = derive_behavioral_expectations(tmp_path, "recipe")
+        assert checks == []
+
+    def test_discovery_returns_base_checks(self, tmp_path):
+        """Discovery mode → base behavioral checks."""
+        from auto.framework_verify import derive_behavioral_expectations
+        self._setup_test_project(tmp_path, "discovery")
+        checks = derive_behavioral_expectations(tmp_path, "discovery")
+        types = [c["type"] for c in checks]
+        assert "spec_before_code" in types
+        assert "session_start_ran" in types
+        assert "workflow_commands_used" in types
+        # All should be severity: warning
+        assert all(c["severity"] == "warning" for c in checks)
+
+    def test_discovery_no_plans_for_discovery_profile(self, tmp_path):
+        """Discovery profile has no plan_review → no plans_reviewed check."""
+        from auto.framework_verify import derive_behavioral_expectations
+        self._setup_test_project(tmp_path, "discovery")
+        checks = derive_behavioral_expectations(tmp_path, "discovery")
+        types = [c["type"] for c in checks]
+        assert "plans_reviewed" not in types
+
+    def test_formal_adds_plans_reviewed(self, tmp_path):
+        """Formal profile with plan_review → includes plans_reviewed."""
+        from auto.framework_verify import derive_behavioral_expectations
+        self._setup_test_project(tmp_path, "formal")
+        checks = derive_behavioral_expectations(tmp_path, "discovery")
+        types = [c["type"] for c in checks]
+        assert "plans_reviewed" in types
+
+
+# ---------------------------------------------------------------------------
+# timeout_override and prompt_tier in ScenarioRun tests
+# ---------------------------------------------------------------------------
+
+class TestScenarioRunExtensions:
+    """Test prompt_tier and behavioral_results in ScenarioRun."""
+
+    def test_scenario_run_prompt_tier_default(self):
+        from auto.framework_verify import ScenarioRun
+        run = ScenarioRun(scenario_name="Test", settings_label="discovery")
+        assert run.prompt_tier == "discovery"
+        assert run.behavioral_results == []
+
+    def test_scenario_run_prompt_tier_recipe(self):
+        from auto.framework_verify import ScenarioRun
+        run = ScenarioRun(
+            scenario_name="Test", settings_label="formal",
+            prompt_tier="recipe",
+        )
+        assert run.prompt_tier == "recipe"
+
+    def test_to_dict_includes_prompt_tier(self):
+        from auto.framework_verify import VerifyResult, ScenarioRun, MilestoneResult
+        r = VerifyResult(
+            success=True,
+            runs=[
+                ScenarioRun(
+                    scenario_name="Todo App",
+                    settings_label="discovery",
+                    success=True,
+                    prompt_tier="discovery",
+                    milestones=[MilestoneResult("kickoff_complete", True)],
+                    behavioral_results=[
+                        MilestoneResult("session_start_ran", True, "STATUS.md has content"),
+                    ],
+                ),
+            ],
+            total_fixes=0,
+        )
+        d = r.to_dict()
+        assert d["runs"][0]["prompt_tier"] == "discovery"
+        assert len(d["runs"][0]["behavioral_results"]) == 1
+        assert d["runs"][0]["behavioral_results"][0]["name"] == "session_start_ran"
+
+    def test_timeout_override_in_yaml(self):
+        """todo_app.yaml autonomous_formal should have timeout_override."""
+        from auto.framework_verify import load_scenario
+        s = load_scenario("todo_app")
+        formal_settings = [
+            m for m in s["settings_matrix"]
+            if m.get("profile") == "autonomous_formal"
+        ]
+        assert len(formal_settings) == 1
+        assert formal_settings[0].get("timeout_override") == 7200
+
+    def test_prompt_tier_recipe_in_monorepo(self):
+        """fullstack_monorepo should have prompt_tier: recipe."""
+        from auto.framework_verify import load_scenario
+        s = load_scenario("fullstack_monorepo")
+        for settings in s["settings_matrix"]:
+            assert settings.get("prompt_tier") == "recipe"
+
+    def test_prompt_tier_recipe_in_multirepo(self):
+        """fullstack_multirepo should have prompt_tier: recipe."""
+        from auto.framework_verify import load_scenario
+        s = load_scenario("fullstack_multirepo")
+        for settings in s["settings_matrix"]:
+            assert settings.get("prompt_tier") == "recipe"

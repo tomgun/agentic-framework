@@ -30,6 +30,7 @@ settings_matrix:
   - profile: formal
     git_workflow: pull_request
     review_merge: skip
+    prompt_tier: recipe  # complex plumbing — stay prescriptive until simple scenarios stabilize
 
 required_milestones:
   - kickoff_complete

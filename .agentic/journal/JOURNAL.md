@@ -2638,3 +2638,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 12:30 - Discovery-mode verification prompts
+
+**Why**: Agent spawning should test instruction discovery, not plumbing — plumbing is already covered by 675+ static tests
+
+**What changed**:
+- Replaced recipe prompt with discovery prompt as default; added 5 behavioral checkers; removed review_plan/review_commit skip overrides; added --prompt-tier CLI flag; 34 new tests (94 total passing)
+
+**Next steps**:
+- PR review, E2E verification with real agent spawning
+
+**Blockers**: None
+
