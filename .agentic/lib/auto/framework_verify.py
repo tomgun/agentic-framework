@@ -588,6 +588,47 @@ def derive_workflow_expectations(project_root: Path) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
+# Agent bootstrap — create the files Claude Code auto-reads
+# ---------------------------------------------------------------------------
+
+def _bootstrap_agent_files(project_dir: Path) -> None:
+    """Run the real setup-agent.sh and generate-skills.sh scripts.
+
+    Without CLAUDE.md and .claude/skills/, the spawned agent has no
+    auto-loaded instruction file and no skills — it can't follow the
+    framework workflow.  We call the same scripts the install flow uses
+    so the test project matches what real users get.
+    """
+    lib_dir = project_dir / ".agentic" / "lib"
+    tools_dir = lib_dir / "tools"
+    env = {**os.environ, "ROOT_DIR": str(project_dir)}
+
+    # 1. setup-agent.sh claude — creates CLAUDE.md
+    setup_script = tools_dir / "setup-agent.sh"
+    if setup_script.exists():
+        subprocess.run(
+            ["bash", str(setup_script), "claude"],
+            cwd=str(project_dir), env=env,
+            capture_output=True, text=True,
+        )
+
+    # 2. generate-skills.sh — creates .claude/skills/ from skill sources
+    skills_script = tools_dir / "generate-skills.sh"
+    skills_src = lib_dir / "agents" / "claude" / "skills"
+    if skills_script.exists() and skills_src.is_dir():
+        subprocess.run(
+            ["bash", str(skills_script)],
+            cwd=str(project_dir), env=env,
+            capture_output=True, text=True,
+        )
+
+    # 3. AGENTS.md — non-negotiable rules referenced by CLAUDE.md
+    agents_template = lib_dir / "init" / "AGENTS.template.md"
+    if agents_template.exists() and not (project_dir / "AGENTS.md").exists():
+        shutil.copy2(str(agents_template), str(project_dir / "AGENTS.md"))
+
+
+# ---------------------------------------------------------------------------
 # Project setup
 # ---------------------------------------------------------------------------
 
@@ -613,6 +654,9 @@ def setup_project(
     claude_dir = project_dir / ".claude"
     claude_dir.mkdir(exist_ok=True)
     (claude_dir / "settings.json").write_text('{"_tier": 1}')
+
+    # Bootstrap agent files (CLAUDE.md, skills, AGENTS.md)
+    _bootstrap_agent_files(project_dir)
 
     # Write STACK.md
     _write_stack_md(project_dir, scenario, settings)
@@ -680,6 +724,9 @@ def setup_multirepo_project(
     claude_dir = umbrella_dir / ".claude"
     claude_dir.mkdir(exist_ok=True)
     (claude_dir / "settings.json").write_text('{"_tier": 1}')
+
+    # Bootstrap agent files (CLAUDE.md, skills, AGENTS.md)
+    _bootstrap_agent_files(umbrella_dir)
 
     # Write STACK.md with resolved absolute paths (not 'repo: local')
     _write_multirepo_stack_md(umbrella_dir, scenario, settings, component_paths)

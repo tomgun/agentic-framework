@@ -281,6 +281,39 @@ class TestProjectSetup:
         assert result.returncode == 0
         assert "init" in result.stdout
 
+    def test_setup_bootstraps_agent_files(self, tmp_path):
+        """setup_project must create CLAUDE.md and .claude/skills/ for the build agent."""
+        from auto.framework_verify import setup_project
+        # Use the REAL framework source so templates exist
+        vw = Path(__file__).resolve().parent.parent
+
+        project = tmp_path / "project"
+        scenario = {
+            "type": "single",
+            "description": "Bootstrap test",
+            "stack": {"language": "python"},
+        }
+        settings = {"profile": "discovery", "git_workflow": "direct"}
+        setup_project(scenario, vw, project, settings)
+
+        # CLAUDE.md must exist (auto-loaded by Claude Code)
+        assert (project / "CLAUDE.md").exists(), "CLAUDE.md not bootstrapped"
+        content = (project / "CLAUDE.md").read_text()
+        assert "ag " in content, "CLAUDE.md should reference ag commands"
+
+        # Skills must be generated
+        skills_dir = project / ".claude" / "skills"
+        assert skills_dir.is_dir(), ".claude/skills/ not bootstrapped"
+        skill_names = [d.name for d in skills_dir.iterdir() if d.is_dir()]
+        assert "implementing-features" in skill_names
+        assert "session-start" in skill_names
+
+        # AGENTS.md must exist (non-negotiable rules)
+        assert (project / "AGENTS.md").exists(), "AGENTS.md not bootstrapped"
+
+        # Presets must be accessible for get_setting()
+        assert (project / ".agentic" / "presets" / "profiles.conf").exists()
+
     def test_setup_monorepo_creates_component_dirs(self, tmp_path):
         from auto.framework_verify import setup_project
         vw = tmp_path / "vw"

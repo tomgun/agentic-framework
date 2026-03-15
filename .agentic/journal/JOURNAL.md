@@ -2612,3 +2612,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 10:27 - Agent bootstrap in verification
+
+**Why**: Build agents were spawned without instruction files, operating blind
+
+**What changed**:
+- setup_project now calls setup-agent.sh + generate-skills.sh so build agents get CLAUDE.md, skills, and AGENTS.md — matching what real users get at install time
+
+**Next steps**:
+- PR review
+
+**Blockers**: None
+
