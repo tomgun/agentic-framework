@@ -314,6 +314,27 @@ class TestProjectSetup:
 # VerifyResult tests
 # ---------------------------------------------------------------------------
 
+class TestPreFlight:
+    """Test pre-flight safety checks."""
+
+    def test_framework_only_guard_blocks_user_projects(self, tmp_path):
+        """verify-framework must refuse to run in non-framework repos."""
+        from auto.framework_verify import FrameworkVerifier
+        # tmp_path has no FRAMEWORK_DEVELOPMENT.md
+        verifier = FrameworkVerifier(tmp_path)
+        errors = verifier.pre_flight()
+        assert any("FRAMEWORK_DEVELOPMENT.md" in e for e in errors)
+
+    def test_framework_only_guard_passes_in_framework_repo(self):
+        """verify-framework should pass the guard in the actual framework repo."""
+        from auto.framework_verify import FrameworkVerifier
+        project_root = Path(__file__).parent.parent
+        verifier = FrameworkVerifier(project_root)
+        errors = verifier.pre_flight()
+        # Should not have the framework-only error (may have others like "on main")
+        assert not any("FRAMEWORK_DEVELOPMENT.md" in e for e in errors)
+
+
 class TestVerifyResult:
     """Test result serialization."""
 

@@ -42,6 +42,8 @@ from auto import SpawnResult, spawn_claude  # noqa: E402
 # ---------------------------------------------------------------------------
 MAX_RETRIES_PER_SCENARIO = 3
 MAX_TOTAL_FIXES = 20
+MAX_REPAIR_ATTEMPTS = 3
+REPAIR_TIMEOUT = 300  # seconds per repair agent
 SCENARIOS_DIR = Path(__file__).resolve().parent / "scenarios"
 PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 
@@ -65,6 +67,8 @@ class ScenarioRun:
     milestones: list[MilestoneResult] = field(default_factory=list)
     retries: int = 0
     fixes: list[str] = field(default_factory=list)
+    repairs: list[str] = field(default_factory=list)
+    escalations: list[str] = field(default_factory=list)
     error: str = ""
     skipped: bool = False
 
@@ -96,6 +100,8 @@ class VerifyResult:
                     "success": r.success,
                     "retries": r.retries,
                     "fixes": r.fixes,
+                    "repairs": r.repairs,
+                    "escalations": r.escalations,
                     "milestones": [
                         {"name": m.name, "passed": m.passed, "detail": m.detail}
                         for m in r.milestones
@@ -806,6 +812,19 @@ class FrameworkVerifier:
         """Run pre-flight checks. Returns list of blocking errors."""
         errors: list[str] = []
 
+        # 0. Framework-only guard: refuse to run in production projects.
+        # verify-framework spawns agents with --dangerously-skip-permissions,
+        # creates worktrees, and consumes significant tokens. It is meant
+        # ONLY for the framework repo itself, not user projects.
+        marker = self.project_root / "FRAMEWORK_DEVELOPMENT.md"
+        if not marker.exists():
+            errors.append(
+                "verify-framework is only available in the framework repo itself. "
+                "This project does not have FRAMEWORK_DEVELOPMENT.md. "
+                "If you are developing the framework, ensure you are in the "
+                "correct directory."
+            )
+
         # 1. Claude availability
         try:
             subprocess.run(
@@ -1018,7 +1037,24 @@ class FrameworkVerifier:
                         detail = f" — {m.detail}" if m.detail else ""
                         self._log(f"    {icon} {m.name}{detail}")
 
-                if all(m.passed for m in milestones):
+                    # Repair loop: attempt to fix failed expectations
+                    failed = [m for m in exp_results if not m.passed]
+                    if failed and all(m.passed for m in milestones
+                                      if m not in exp_results):
+                        self._repair_expectations(
+                            project_root, exp_checker, expectations,
+                            failed, run, log_file,
+                        )
+                        # Refresh milestones after repairs
+                        refreshed = exp_checker.check_all(expectations)
+                        # Replace exp_results in milestones
+                        milestone_base = [
+                            m for m in run.milestones if m not in exp_results
+                        ]
+                        milestone_base.extend(refreshed)
+                        run.milestones = milestone_base
+
+                if all(m.passed for m in run.milestones):
                     run.success = True
                     self._log(f"  PASSED")
                     return run
@@ -1049,6 +1085,199 @@ class FrameworkVerifier:
                 shutil.rmtree(project_dir, ignore_errors=True)
 
         return run
+
+    # -- Delivery ------------------------------------------------------------
+
+    # -- Repair loop ---------------------------------------------------------
+
+    def _repair_expectations(
+        self,
+        project_root: Path,
+        exp_checker: ExpectationChecker,
+        expectations: dict[str, Any],
+        failed: list[MilestoneResult],
+        run: ScenarioRun,
+        log_file: Path | None,
+    ) -> None:
+        """Iteratively repair failed expectations.
+
+        For each failed expectation:
+        1. Spawn a repair agent targeting that specific failure
+        2. Re-check the expectation
+        3. If still failing, retry with different instructions
+        4. After MAX_REPAIR_ATTEMPTS, escalate and move on
+        """
+        self._log(f"  Entering repair loop: {len(failed)} failed expectation(s)")
+
+        for fail in failed:
+            repaired = False
+            for attempt in range(1, MAX_REPAIR_ATTEMPTS + 1):
+                self._log(
+                    f"    Repairing: {fail.name} "
+                    f"(attempt {attempt}/{MAX_REPAIR_ATTEMPTS})"
+                )
+
+                # Build repair prompt
+                prompt = self._build_repair_prompt(
+                    fail, attempt, project_root,
+                )
+
+                # Determine log file for repair agent
+                repair_log = None
+                if log_file:
+                    base = log_file.stem
+                    safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', fail.name)[:50]
+                    repair_log = log_file.parent / (
+                        f"{base}_repair_{safe_name}_attempt{attempt}.log"
+                    )
+
+                repair_result = spawn_claude(
+                    self.claude_command,
+                    project_root,
+                    prompt,
+                    timeout=REPAIR_TIMEOUT,
+                    log_file=repair_log,
+                    monitor=True,
+                    monitor_interval=15,
+                )
+
+                if repair_result.timed_out:
+                    self._log(f"      Repair agent timed out")
+                    continue
+
+                # Re-check this specific expectation
+                refreshed = exp_checker.check_all(expectations)
+                fixed = next(
+                    (m for m in refreshed if m.name == fail.name), None,
+                )
+                if fixed and fixed.passed:
+                    self._log(f"      + Repaired: {fail.name}")
+                    run.repairs.append(f"{fail.name} (attempt {attempt})")
+                    repaired = True
+                    break
+                else:
+                    detail = fixed.detail if fixed else "check not found"
+                    self._log(f"      Still failing: {detail}")
+
+            if not repaired:
+                self._log(f"    ESCALATED: {fail.name} — {fail.detail}")
+                run.escalations.append(f"{fail.name}: {fail.detail}")
+
+    def _build_repair_prompt(
+        self,
+        fail: MilestoneResult,
+        attempt: int,
+        project_root: Path,
+    ) -> str:
+        """Build a targeted repair prompt for a specific failed expectation."""
+        template_path = PROMPTS_DIR / "verify_repair.md"
+        template = template_path.read_text()
+
+        # Count commits for context
+        try:
+            out = subprocess.run(
+                ["git", "rev-list", "--count", "HEAD"],
+                capture_output=True, text=True, cwd=str(project_root),
+                timeout=5,
+            ).stdout.strip()
+            commit_count = out if out.isdigit() else "unknown"
+        except Exception:
+            commit_count = "unknown"
+
+        # Build hints based on check type
+        repair_hint = self._repair_hint(fail, attempt)
+
+        # Describe what was expected
+        expectation_desc = self._expectation_description(fail)
+
+        return template.format(
+            check_name=fail.name,
+            check_detail=fail.detail or "no detail",
+            attempt=attempt,
+            max_attempts=MAX_REPAIR_ATTEMPTS,
+            expectation_description=expectation_desc,
+            commit_count=commit_count,
+            repair_hint=repair_hint,
+        )
+
+    @staticmethod
+    def _expectation_description(fail: MilestoneResult) -> str:
+        """Human-readable description of what an expectation checks."""
+        name = fail.name
+        if name.startswith("files_exist"):
+            return f"Source files matching the pattern should exist in the project."
+        if name.startswith("command_passes"):
+            return f"The command should exit with code 0 (tests pass, build succeeds)."
+        if name.startswith("source_contains"):
+            return f"Source files should contain the expected pattern (correct framework/library used)."
+        if "features_have_status" in name:
+            return "Features in FEATURES.md should have reached 'shipped' status. Run `ag done F-XXXX` for completed features."
+        if "plans_exist" in name:
+            return "Implementation plans should exist at .agentic/journal/plans/F-XXXX-plan.md. Run `ag plan F-XXXX` or `ag implement F-XXXX` which creates plans."
+        if "plans_approved" in name:
+            return "Plans should have **Status**: APPROVED. The plan review process must complete."
+        if "acceptance_criteria_checked" in name:
+            return "Acceptance criteria files should have all items checked [x]. Run `ag done` to mark features complete."
+        if "journal_updated" in name:
+            return "JOURNAL.md should have at least one entry. Use `bash .agentic/lib/tools/journal.sh` to add entries."
+        if "commits_follow_convention" in name:
+            return "Git commits should follow conventional format: feat(scope): description, fix: description, etc."
+        if "no_wip_at_end" in name:
+            return "No WIP.md or active AGENTS.json should remain. Run `ag done` for all features."
+        return f"Expectation '{name}' should pass."
+
+    @staticmethod
+    def _repair_hint(fail: MilestoneResult, attempt: int) -> str:
+        """Progressive hints — more specific guidance on later attempts."""
+        name = fail.name
+        hints = []
+
+        if attempt >= 2:
+            hints.append(
+                "Previous repair attempt did not fix this. "
+                "Try a different approach."
+            )
+        if attempt >= 3:
+            hints.append(
+                "This is the last attempt. Be thorough — check the actual "
+                "file contents and state before making changes."
+            )
+
+        # Check-specific hints
+        if "command_passes" in name:
+            hints.append(
+                "Run the command manually first to see the full error output. "
+                "Common issues: missing dependencies, import errors, test failures."
+            )
+        elif "plans_approved" in name:
+            if attempt == 1:
+                hints.append(
+                    "Check if plans exist but have DRAFT status. "
+                    "Update the status to APPROVED in the plan file."
+                )
+            else:
+                hints.append(
+                    "Create the plan file directly at "
+                    ".agentic/journal/plans/F-XXXX-plan.md with "
+                    "**Status**: APPROVED if the plan review is not possible."
+                )
+        elif "acceptance_criteria_checked" in name:
+            hints.append(
+                "Open .agentic/spec/acceptance/F-*.md files and change "
+                "[ ] to [x] for all completed criteria."
+            )
+        elif "journal_updated" in name:
+            hints.append(
+                "Run: bash .agentic/lib/tools/journal.sh "
+                '"Topic" "What was done" "Next steps" "Blockers"'
+            )
+        elif "features_have_status" in name:
+            hints.append(
+                "Run `ag done F-XXXX` for each completed feature, or "
+                "update FEATURES.md status directly."
+            )
+
+        return "\n".join(hints) if hints else ""
 
     # -- Delivery ------------------------------------------------------------
 
@@ -1262,6 +1491,14 @@ def _print_report(result: VerifyResult) -> None:
             print(f"    Error: {run.error}")
         if run.fixes:
             print(f"    Fixes applied: {len(run.fixes)}")
+        if run.repairs:
+            print(f"    Repairs: {len(run.repairs)}")
+            for r in run.repairs:
+                print(f"      + {r}")
+        if run.escalations:
+            print(f"    Escalated: {len(run.escalations)}")
+            for e in run.escalations:
+                print(f"      ! {e}")
         if run.retries > 0:
             print(f"    Retries: {run.retries}")
 

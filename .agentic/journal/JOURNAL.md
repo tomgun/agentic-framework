@@ -2586,3 +2586,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 09:27 - Repair Loop + Safety Guard
+
+**Why**: Verification should iterate on failures instead of binary pass/fail, and must not run in production projects
+
+**What changed**:
+- Added iterative repair loop: failed expectations get targeted fix agents, up to 3 attempts, then escalate. Added framework-only guard: verify-framework refuses to run in user projects (checks FRAMEWORK_DEVELOPMENT.md)
+
+**Next steps**:
+- Run full verification with repair loop to validate end-to-end
+
+**Blockers**: None
+
