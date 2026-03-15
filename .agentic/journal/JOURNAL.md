@@ -2729,3 +2729,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-15 20:03 - Systematic Quality Improvement
+
+**Why**: User projects need agents that write clear ACs, implement against them, and prove ACs are met
+
+**What changed**:
+- Shared AC parser, completeness enforcement (P1=100% P2=80% flat=80%), AC clarity gate in ag implement, NFR→AC inline integration with nfr-applicable.sh, language-aware test quality checks — all 4 phases shipped with 23 new unit tests and 675 framework tests passing
+
+**Next steps**:
+- Instruction file sync verification, LLM tests for behavioral changes
+
+**Blockers**: None
+

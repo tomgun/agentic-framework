@@ -157,48 +157,54 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
    ├─ feature_tracking=no: Check OVERVIEW.md has criteria
    └─ If missing: CREATE THEM FIRST (rough is OK)
 
-2. CHECK PLAN-REVIEW SETTING
+2. AC CLARITY GATE
+   └─ `spec-analyze.sh F-XXXX --gate` runs
+   ├─ formal/autonomous_formal: blocking (vague ACs = cannot proceed)
+   ├─ discovery: advisory (warnings only, proceed regardless)
+   └─ Bypass: SKIP_CLARITY=1
+
+3. CHECK PLAN-REVIEW SETTING
    └─ Read STACK.md → plan_review_enabled (default: yes for formal/autonomous_formal profiles)
    ├─ If yes: Run `ag plan F-####` — uses dialectical review (Critic + Advocate
    │          in parallel, fresh context). User decides Proceed/Revise/Reject.
    │          Mention max iterations from plan_review_max_iterations.
    └─ If no: Proceed directly (or run ag plan --no-review for simple plan)
 
-3. CHECK DEVELOPMENT MODE
+4. CHECK DEVELOPMENT MODE
    └─ Read STACK.md → development_mode (default: standard)
    ├─ standard: implement first, test to verify
    └─ tdd: Per-AC red-green-refactor cycle:
       RED → GREEN → REFACTOR, checkpoint --phase at each step
       `wip.sh complete` blocks without phase checkpoints
 
-4. IMPLEMENT
+5. IMPLEMENT
    ├─ If `worktree_mode: always` in STACK.md, `ag implement` auto-creates a worktree — `cd` to it
    ├─ Write code meeting acceptance criteria
    ├─ Add @feature annotations
    └─ Keep small, focused changes
 
-5. TEST
+6. TEST
    ├─ Write tests as specified in .agentic/spec/acceptance/F-####.md → ## Tests
    ├─ All tests must pass
    └─ Smoke test: RUN THE APPLICATION
 
-6. UPDATE SPECS (MANDATORY - NOT OPTIONAL)
+7. UPDATE SPECS (MANDATORY - NOT OPTIONAL)
    ├─ feature_tracking=yes: Update .agentic/spec/FEATURES.md status
    ├─ feature_tracking=no: Update OVERVIEW.md
    └─ This is part of "done", not afterthought
 
-7. UPDATE DOCS
+8. UPDATE DOCS
    ├─ JOURNAL.md (what was accomplished)
    ├─ CONTEXT_PACK.md (if architecture changed)
    └─ STATUS.md (next steps)
 
-8. DOC LIFECYCLE (if STACK.md ## Docs has entries)
+9. DOC LIFECYCLE (if STACK.md ## Docs has entries)
    ├─ `ag docs F-####` or `docs.sh --trigger feature_done`
    ├─ Drafts registered docs (lessons, architecture, changelog, etc.)
    ├─ Formal/autonomous_formal profile: also drafts pr-trigger docs (changelog, readme)
    └─ Human reviews drafts in git diff, removes `<!-- draft: -->` markers
 
-9. BEFORE COMMIT
+10. BEFORE COMMIT
    └─ Run before_commit.md checklist
 ```
 

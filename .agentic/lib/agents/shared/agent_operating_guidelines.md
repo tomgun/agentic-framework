@@ -20,6 +20,7 @@ tokens: ~952
 | Gate | Setting | Formal default | Discovery default | Enforcement |
 |------|---------|----------------|-------------------|-------------|
 | Acceptance criteria | `acceptance_criteria` | **blocking** | recommended | Agent-interpreted |
+| AC Clarity | `acceptance_criteria` | **blocking** | advisory | Script-enforced (`spec-analyze.sh --gate` in `ag implement`) |
 | WIP before commit | `wip_before_commit` | **blocking** | warning | Script-enforced |
 | Pre-commit checks | `pre_commit_checks` | **full** | fast | Script-enforced |
 | Feature tracking | `feature_tracking` | **yes** | no | Script-enforced |

@@ -31,6 +31,13 @@
 
 - [ ] **AC-004**: [Criterion]
 
+### NFR Constraints (P1 — required)
+<!-- Run: bash .agentic/lib/tools/nfr-applicable.sh F-XXXX to see applicable NFRs.
+     Write an AC for each applicable NFR, making the constraint testable for THIS feature.
+     If no NFRs apply, replace this section with: <!-- NFRs: none applicable — evaluated YYYY-MM-DD --> -->
+
+- [ ] **AC-010**: [NFR constraint made testable for this feature] (NFR-XXXX)
+
 ---
 
 ## Verification
@@ -54,10 +61,11 @@
 
 ---
 
-## NFR Compliance
+## NFR Compliance (legacy — migrate to ### NFR Constraints inside Acceptance Criteria)
 
-<!-- List any NFRs that constrain this feature. Remove section if none apply. -->
-- [ ] NFR-XXXX: Description
+<!-- This section is deprecated. NFR constraints should be ACs inside ## Acceptance Criteria.
+     Run: bash .agentic/lib/tools/nfr-migrate.sh F-XXXX to auto-migrate.
+     Both formats are recognized by all tools. -->
 
 ---
 

@@ -25,6 +25,7 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 source "$SCRIPT_DIR/../paths.sh"
 source "$SCRIPT_DIR/../settings.sh"
+source "$SCRIPT_DIR/ac-parse.sh"
 
 # Colors
 if [ -t 1 ]; then
@@ -59,10 +60,10 @@ has_tests_section() {
     grep -qE '^##\s*(Tests|Verification)' "$ac_file" 2>/dev/null
 }
 
-# Check if feature has NFR compliance section
+# Check if feature has NFR compliance (old ## NFR Compliance OR new ### NFR Constraints)
 has_nfr_compliance() {
     local ac_file="$1"
-    grep -qE '^###?\s*NFR Compliance' "$ac_file" 2>/dev/null
+    grep -qE '^###?\s*NFR (Compliance|Constraints)' "$ac_file" 2>/dev/null
 }
 
 # Get NFRs linked to a feature
@@ -75,33 +76,116 @@ get_feature_nfrs() {
     ' "$FEATURES_FILE" 2>/dev/null
 }
 
-# Count acceptance criteria in a file
+# Count acceptance criteria in a file (delegates to shared parser)
 count_ac() {
     local ac_file="$1"
-    grep -cE '^- AC-[0-9]+:' "$ac_file" 2>/dev/null || echo "0"
+    ac_count_total "$ac_file"
 }
 
-# Check for empty/trivial test bodies (heuristic)
+# Discover test directories (STACK.md setting, then common patterns)
+_find_test_dirs() {
+    local test_dir
+    test_dir=$(get_setting "test_directory" "" 2>/dev/null || echo "")
+    if [[ -n "$test_dir" && -d "$ROOT_DIR/$test_dir" ]]; then
+        echo "$ROOT_DIR/$test_dir"
+        return
+    fi
+    # Search common patterns
+    for d in tests test __tests__ spec; do
+        [[ -d "$ROOT_DIR/$d" ]] && echo "$ROOT_DIR/$d"
+    done
+}
+
+# Check for empty/trivial test bodies (language-aware heuristic)
 check_test_heuristics() {
     local fid="$1"
     local issues=0
-    local test_files
+    local test_files=""
 
-    # Find test files referencing this feature
-    test_files=$(grep -rl "$fid" "$ROOT_DIR/tests/" 2>/dev/null || echo "")
-    if [ -z "$test_files" ]; then
+    # Find test files referencing this feature across all test directories
+    local test_dirs
+    test_dirs=$(_find_test_dirs)
+    if [[ -z "$test_dirs" ]]; then
         echo "no_tests"
         return
     fi
 
+    for tdir in $test_dirs; do
+        local found
+        found=$(grep -rl "$fid" "$tdir" 2>/dev/null || true)
+        [[ -n "$found" ]] && test_files="$test_files $found"
+    done
+    # Also check for test files matching *_test.go, *.test.{js,ts} patterns
+    for tdir in $test_dirs; do
+        local go_tests
+        go_tests=$(find "$tdir" -name "*_test.go" 2>/dev/null | head -20 || true)
+        local js_tests
+        js_tests=$(find "$tdir" -name "*.test.js" -o -name "*.test.ts" -o -name "*.test.tsx" 2>/dev/null | head -20 || true)
+        # Check if any of these reference the feature ID
+        for tf in $go_tests $js_tests; do
+            if grep -q "$fid" "$tf" 2>/dev/null; then
+                test_files="$test_files $tf"
+            fi
+        done
+    done
+
+    test_files=$(echo "$test_files" | xargs -n1 2>/dev/null | sort -u)
+    if [[ -z "$test_files" ]]; then
+        echo "no_tests"
+        return
+    fi
+
+    # Detect language from STACK.md
+    local lang
+    lang=$(get_setting "language" "" 2>/dev/null || echo "")
+    lang=$(echo "$lang" | tr '[:upper:]' '[:lower:]')
+
     for tf in $test_files; do
-        # Check for empty test bodies (def test_*...\n\s*pass)
+        # --- Universal: empty test body ---
+        # Python: pass-only bodies
         if grep -qE '^\s*pass\s*$' "$tf" 2>/dev/null; then
             ((issues++))
         fi
-        # Check for zero assertions
+        # Shell: true-only or :-only bodies
+        if echo "$tf" | grep -qE '\.sh$' && grep -qE '^\s*(true|:)\s*$' "$tf" 2>/dev/null; then
+            ((issues++))
+        fi
+
+        # --- Stub assertion detection (language-aware) ---
+        case "$lang" in
+            python*)
+                # Python stubs: assert True, assert 1 == 1, assert len(x) >= 0
+                if grep -qE '^\s*assert\s+True\b' "$tf" 2>/dev/null; then
+                    ((issues++))
+                fi
+                if grep -qE '^\s*assert\s+1\s*==\s*1' "$tf" 2>/dev/null; then
+                    ((issues++))
+                fi
+                if grep -qE 'assert\s+len\([^)]*\)\s*>=\s*0' "$tf" 2>/dev/null; then
+                    ((issues++))
+                fi
+                ;;
+            javascript*|typescript*|js|ts)
+                # JS/TS stubs: expect(true).toBe(true), expect(1).toBe(1)
+                if grep -qE 'expect\(true\)\.toBe\(true\)' "$tf" 2>/dev/null; then
+                    ((issues++))
+                fi
+                if grep -qE 'expect\(1\)\.toBe\(1\)' "$tf" 2>/dev/null; then
+                    ((issues++))
+                fi
+                ;;
+            go*)
+                # Go: t.Skip() without reason
+                if grep -qE 't\.Skip\(\s*\)' "$tf" 2>/dev/null; then
+                    ((issues++))
+                fi
+                ;;
+        esac
+
+        # --- Zero assertions (universal fallback) ---
         local assert_count
-        assert_count=$(grep -cE '(assert|expect|should|must)' "$tf" 2>/dev/null || echo "0")
+        assert_count=$(grep -cE '(assert|expect|should|must|require\.|Equal|NotNil)' "$tf" 2>/dev/null || echo "0")
+        assert_count="${assert_count//[[:space:]]/}"
         if [ "$assert_count" -eq 0 ]; then
             ((issues++))
         fi

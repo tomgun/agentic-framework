@@ -38,11 +38,12 @@ Determine the spec operation and its protection level:
 
 **For new features:**
 1. Find next F-XXXX ID in `.agentic/spec/FEATURES.md`
-2. Read `.agentic/spec/NFR.md` — identify applicable NFRs
+2. Run `bash .agentic/lib/tools/nfr-applicable.sh F-XXXX` to identify applicable NFRs
 3. Create FEATURES.md entry (Status: planned, Related NFRs)
 4. Create `.agentic/spec/acceptance/F-XXXX.md` from `.agentic/spec/acceptance.template.md`
    - Write `## Behavior` section first (technology-agnostic user goal)
    - Group ACs with priority tags: (P1 — MVP), (P2 — enhanced)
+   - Add applicable NFRs as ACs in a `### NFR Constraints (P1 — required)` group
    - Add `**Verify independently**` per AC group
    - Place Tests under `## Verification`
 5. Run Clarification Pass (Step 3 below) for features with 3+ ACs

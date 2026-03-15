@@ -66,6 +66,16 @@ If no feature ID exists yet, create one in `.agentic/spec/FEATURES.md` first.
 
 **Do NOT write any code until acceptance criteria exist.**
 
+When writing ACs, use `bash .agentic/lib/tools/nfr-applicable.sh F-XXXX` to check for applicable NFRs. Add them as ACs in a `### NFR Constraints (P1 — required)` group.
+
+### Step 1.5: AC Clarity Gate (enforced by `ag implement`)
+
+On first `ag implement F-XXXX` (not re-implement), `spec-analyze.sh --gate` runs automatically:
+- **Formal profile**: CRITICAL vague ACs block implementation with rewrite suggestions
+- **Discovery profile**: Advisory only (warns, doesn't block)
+- **Bypass**: `SKIP_CLARITY=1 ag implement F-XXXX` or `ag implement F-XXXX --skip-clarity`
+- **Skipped on re-implement**: If WIP already exists for this feature, gate is skipped
+
 ### Step 1b: Spec Analysis (advisory)
 
 Check if spec analysis is enabled:
