@@ -10,6 +10,7 @@ The complete reference for understanding, using, and maintaining the Agentic Fra
 
 - [Part I: The System at Three Zoom Levels](#part-i-the-system-at-three-zoom-levels)
   - [Section 1: 30-Second Overview](#section-1-30-second-overview)
+  - [Section 1b: How an Idea Becomes a Shipped Feature](#section-1b-how-an-idea-becomes-a-shipped-feature)
   - [Section 2: 5-Minute Walkthrough](#section-2-5-minute-walkthrough)
   - [Section 3: Deep Reference — The 9 Phases](#section-3-deep-reference--the-9-phases)
 - [Part II: Structural Diagrams](#part-ii-structural-diagrams)
@@ -57,6 +58,117 @@ flowchart LR
 **Key principles**:
 - Spec + Code + Tests + Docs = Done. All four artifacts ship together, not sequentially.
 - Shipped specs are immutable contracts — changes require formal migration (see [Section 6](#section-6-spec-evolution-lifecycle)).
+
+---
+
+## Section 1b: How an Idea Becomes a Shipped Feature
+
+The golden path above hides the most important transformation: how a vague idea becomes concrete, testable acceptance criteria. This section zooms into that front half.
+
+### The Idea-to-Implementation Pipeline
+
+```mermaid
+flowchart TD
+    A["💡 Raw Idea\n'We need user login'"] -->|"ag todo / ag kickoff"| B["📥 Captured\nTODO.md or kickoff staging"]
+    B -->|"ag backlog add / ag kickoff --approve"| C["📋 Backlog Item\nBACKLOG.json position + F-XXXX in FEATURES.md"]
+    C -->|"ag plan F-XXXX"| D["🗺️ Plan\njournal/plans/F-XXXX-plan.md\nStatus: DRAFT"]
+    D -->|"dialectical review\n(Formal/Autonomous)"| E["✅ Approved Plan\nStatus: APPROVED"]
+    E -->|"write spec"| F["📝 Acceptance Criteria\nspec/acceptance/F-XXXX.md\nAC-001, AC-002, ..."]
+    F -->|"ag implement F-XXXX\n(gates check all above)"| G["⚙️ Implementation Begins"]
+
+    style A fill:#fff3e0
+    style C fill:#e3f2fd
+    style F fill:#e8f5e9
+    style G fill:#c8e6c9
+```
+
+### What the Artifact Looks Like at Each Stage
+
+**Stage 1 — Raw idea** (a sentence, a chat message, a TODO):
+```
+"We need user login with email and password"
+```
+Captured via `ag todo "user login with email/password"` → lands in TODO.md.
+
+**Stage 2 — Backlog item** (ordered, with an F-ID):
+```
+ag backlog add --task "User login with email/password"
+```
+This creates an F-XXXX entry in FEATURES.md with `Status: planned` and adds it to BACKLOG.json at the end of the queue. Or if starting from a vision, `ag kickoff "build an auth system"` generates multiple features at once into a staging area, then `ag kickoff --approve` promotes them.
+
+**Stage 3 — Plan** (how you'll build it):
+```
+ag plan F-0042
+```
+Agent explores the codebase, drafts an implementation approach, saves to `.agentic/journal/plans/F-0042-plan.md` with `Status: DRAFT`. In Formal profile, dialectical review runs: a Critic agent attacks the plan, an Advocate defends it, they iterate until agreeing or the user decides.
+
+**Stage 4 — Acceptance criteria** (the contract):
+```markdown
+# F-0042: User Login - Acceptance Criteria
+
+**Feature**: Users can authenticate with email and password
+
+## Acceptance Criteria
+
+### Core Login (P1 — MVP)
+- [ ] **AC-001**: User can enter email and password on login form
+- [ ] **AC-002**: Invalid credentials show error message (no credential detail leak)
+- [ ] **AC-003**: Valid credentials redirect to dashboard with session cookie
+
+### Security (P1 — MVP)
+- [ ] **AC-004**: Passwords hashed with bcrypt (cost ≥ 12)
+- [ ] **AC-005**: Rate limit: max 5 failed attempts per 10 minutes per IP
+
+### NFR Constraints (P1 — required)
+- [ ] **AC-010**: Login response under 500ms (NFR-0007)
+
+## Verification
+### Unit Tests
+- [ ] `tests/test_auth.py` — password hashing, session creation
+### Integration Tests
+- [ ] `tests/test_login_flow.py` — full login/redirect cycle
+
+## Out of Scope
+- OAuth / social login (F-0043)
+- Two-factor authentication (F-0044)
+```
+
+This file lives at `spec/acceptance/F-0042.md`. Each AC is specific, testable, and unambiguous. NFRs from `spec/NFR.md` are integrated as testable ACs (not a separate section agents might ignore). Priority groups (P1/P2) indicate what's required vs. nice-to-have.
+
+**Stage 5 — Implementation begins** (`ag implement F-0042`):
+
+The `ag implement` command checks all prior stages are complete:
+- F-0042 is at backlog position 0? ✓
+- Plan exists and is APPROVED? ✓
+- FEATURES.md entry exists? ✓
+- Acceptance criteria file exists with AC lines? ✓
+- AC clarity gate passes (ACs are testable)? ✓
+
+Only then does implementation start. During implementation, new requirements discovered get added as `[Discovered]` entries — the spec grows organically with the code.
+
+### Entry Points — Multiple Roads to the Backlog
+
+Not every idea follows the same path in:
+
+| Entry Point | Command | What Happens | Ends Up As |
+|-------------|---------|-------------|-----------|
+| **Quick idea** | `ag todo "..."` | Saved to TODO.md inbox | Unordered idea — triage later |
+| **Triaged idea** | `ag backlog add --task "..."` | Creates F-XXXX + adds to queue | Ordered backlog item |
+| **Vision / epic** | `ag kickoff "build auth system"` | Generates multiple features + ACs to staging | Staged features (review before promoting) |
+| **Decomposed epic** | `ag decompose F-XXXX` | Breaks parent into component-scoped children | Child features linked to parent |
+| **Promoted TODO** | `ag formalize T-XXXX` | Converts TODO into formal F-XXXX with AC stubs | Feature with skeleton spec |
+| **Direct feature** | `feature.sh F-XXXX status planned` | Manual FEATURES.md entry | Planned feature (needs spec) |
+
+### Discovery vs. Formal — How the Pipeline Differs
+
+| Stage | Discovery | Formal / Autonomous Formal |
+|-------|-----------|---------------------------|
+| **Idea capture** | `ag todo` or just start coding | `ag todo` → `ag backlog add` |
+| **Planning** | Optional — jump to implementation | Required — `ag plan` + dialectical review |
+| **Spec format** | Rough bullets in WIP.md or inline | Structured AC file in `spec/acceptance/` |
+| **AC quality** | "What would success look like?" (2-3 bullets) | Priority-grouped, NFR-integrated, clarity-gated |
+| **Gate enforcement** | Advisory (warns but doesn't block) | Blocking (`ag implement` won't start without spec) |
+| **Spec evolution** | Informal — update as you go | Formal markers: `[Discovered]`, `[Future]`, `[Revised in M-NNN]` |
 
 ---
 
