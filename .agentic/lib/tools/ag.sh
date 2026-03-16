@@ -1455,6 +1455,30 @@ cmd_done() {
         fi
     fi
 
+    # --- Automated verification gate ---
+    # Run automated verification commands from AC file before shipping.
+    # Advisory for discovery, blocking for formal profiles.
+    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
+        if [ -f "$acc_file" ] && grep -q '\*\*Automated\*\*' "$acc_file"; then
+            echo -e "${BOLD}=== Running Automated Verification ===${NC}"
+            if cmd_verify "$feature_id"; then
+                echo ""
+            else
+                local _ac_setting
+                _ac_setting="$(get_setting "acceptance_criteria" "blocking")"
+                if [ "$_ac_setting" = "blocking" ]; then
+                    echo -e "${RED}BLOCKED: Automated verification failed for $feature_id${NC}"
+                    echo -e "${YELLOW}To bypass: set acceptance_criteria: recommended in STACK.md${NC}"
+                    exit 1
+                else
+                    echo -e "${YELLOW}WARNING: Automated verification failed (advisory, continuing)${NC}"
+                fi
+                echo ""
+            fi
+        fi
+    fi
+
     # --- Intent-driven execution (F-0200) ---
     # Write intent before any mutable work. Each step is checkpointed.
     # If the process dies mid-sequence, ag sync can resume from last checkpoint.
@@ -2088,6 +2112,62 @@ cmd_tools() {
     }
 }
 
+# Merge command — wraps gh pr merge + ag done (structural chaining)
+# Ensures post-merge completion always runs. Prevents the §14/§16 failure
+# where the agent merges a PR but forgets to run ag done.
+cmd_merge() {
+    local pr_number="${1:-}"
+    local feature_id="${2:-}"
+
+    if [ -z "$pr_number" ]; then
+        echo -e "${RED}Usage: ag merge <pr-number> [F-XXXX]${NC}"
+        echo "  Merges a PR and runs ag done for the feature."
+        echo ""
+        echo "  If F-XXXX is not provided, attempts to extract from PR title."
+        echo "  Example: ag merge 148 F-0222"
+        exit 1
+    fi
+
+    echo -e "${BOLD}=== Merge PR #$pr_number ===${NC}"
+    echo ""
+
+    # Extract feature ID from PR title if not provided
+    if [ -z "$feature_id" ]; then
+        local pr_title
+        pr_title=$(gh pr view "$pr_number" --json title -q '.title' 2>/dev/null || echo "")
+        feature_id=$(echo "$pr_title" | grep -oE 'F-[0-9]{4}' | head -1 || echo "")
+        if [ -n "$feature_id" ]; then
+            echo "Detected feature: $feature_id (from PR title)"
+        fi
+    fi
+
+    # Merge the PR (squash strategy — matches formal profile convention)
+    echo "Merging PR #$pr_number..."
+    if ! gh pr merge "$pr_number" --squash --delete-branch; then
+        echo -e "${RED}Merge failed${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ PR #$pr_number merged${NC}"
+    echo ""
+
+    # Ensure we're on main
+    local current_branch
+    current_branch=$(git branch --show-current 2>/dev/null)
+    if [ "$current_branch" != "main" ] && [ "$current_branch" != "master" ]; then
+        echo "Switching to main..."
+        git checkout main -q 2>/dev/null || git checkout master -q 2>/dev/null
+    fi
+
+    # Run ag done
+    if [ -n "$feature_id" ]; then
+        echo -e "${BOLD}=== Post-Merge: ag done $feature_id ===${NC}"
+        echo ""
+        cmd_done "$feature_id"
+    else
+        echo -e "${YELLOW}No feature ID detected — run ag done F-XXXX manually${NC}"
+    fi
+}
+
 # Docs command - doc lifecycle system
 cmd_docs() {
     local arg1="${1:-}"
@@ -2589,9 +2669,73 @@ cmd_sync() {
 
 # Verify command - doctor checks
 cmd_verify() {
-    local full="${1:-}"
+    local arg="${1:-}"
 
-    if [ "$full" = "--full" ]; then
+    # ag verify F-XXXX — run automated verification commands from AC file
+    if echo "$arg" | grep -qE '^F-[0-9]{4}$'; then
+        local feature_id="$arg"
+        local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
+        if [ ! -f "$acc_file" ]; then
+            echo -e "${RED}No acceptance criteria file: $acc_file${NC}"
+            return 1
+        fi
+
+        echo -e "${BOLD}=== Verify: $feature_id ===${NC}"
+        echo ""
+
+        # Extract automated verification commands from ## Verification section
+        local in_verification=false
+        local commands=()
+        while IFS= read -r line; do
+            if echo "$line" | grep -q '^## Verification'; then
+                in_verification=true
+                continue
+            fi
+            if [ "$in_verification" = true ] && echo "$line" | grep -qE '^## '; then
+                break
+            fi
+            if [ "$in_verification" = true ] && echo "$line" | grep -q '\*\*Automated\*\*'; then
+                # Extract command between backticks
+                local cmd
+                cmd=$(echo "$line" | sed 's/.*`\([^`]*\)`.*/\1/')
+                if [ -n "$cmd" ] && [ "$cmd" != "$line" ]; then
+                    commands+=("$cmd")
+                fi
+            fi
+        done < "$acc_file"
+
+        if [ ${#commands[@]} -eq 0 ]; then
+            echo -e "${YELLOW}No automated verification commands found in $acc_file${NC}"
+            echo "  Add lines like: - **Automated**: \`pytest tests/test_foo.py -v\`"
+            return 0
+        fi
+
+        local failed=0
+        for cmd in "${commands[@]}"; do
+            echo -e "${BLUE}Running: $cmd${NC}"
+            local _verify_output=""
+            _verify_output=$(bash -c "$cmd" 2>&1)
+            local _verify_rc=$?
+            if [ "$_verify_rc" -eq 0 ]; then
+                echo -e "${GREEN}✓ PASSED${NC}"
+            else
+                echo -e "${RED}✗ FAILED${NC}"
+                echo "$_verify_output" | tail -20
+                failed=$((failed + 1))
+            fi
+            echo ""
+        done
+
+        if [ "$failed" -gt 0 ]; then
+            echo -e "${RED}$failed verification(s) failed${NC}"
+            return 1
+        fi
+        echo -e "${GREEN}All ${#commands[@]} verification(s) passed${NC}"
+        return 0
+    fi
+
+    # ag verify / ag verify --full — general health check
+    if [ "$arg" = "--full" ]; then
         bash "$SCRIPT_DIR/doctor.sh" --full
     else
         bash "$SCRIPT_DIR/doctor.sh"
@@ -3941,6 +4085,9 @@ case "${1:-help}" in
         ;;
     done)
         cmd_done "${2:-}"
+        ;;
+    merge)
+        cmd_merge "${2:-}" "${3:-}"
         ;;
     docs)
         shift

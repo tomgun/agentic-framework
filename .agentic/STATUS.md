@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- ADR-001 roadmap execution: F-0224 (F-0224) is current backlog item (Updated: 2026-03-16 21:28 UTC)
+- ag merge + ag verify commands — structural fix for post-merge completion and AC verification (Updated: 2026-03-16 21:38 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

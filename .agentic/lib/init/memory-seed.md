@@ -180,7 +180,9 @@ If the user indicates a feature is complete — in any phrasing (e.g. "done", "c
 
 **STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. P1 ACs must be 100% checked for priority-grouped specs. Flat-list specs use 80% threshold. Before ending, check your TaskList for pending items and flush them to .agentic/TODO.md via `ag todo`. If on main (not in a worktree), run `ag flush --features` to commit state files directly to main.
 
-**Critical**: When YOU merge a PR (via `gh pr merge`), IMMEDIATELY run `ag done F-XXXX` as the next step. The post-merge flow (VERSION bump, feature status, backlog advance) is part of the merge — not a separate action the user should have to request.
+**Critical**: When merging a PR, use `ag merge <pr#> F-XXXX` instead of `gh pr merge` directly. This structurally chains the merge with `ag done` — no opportunity to forget. If you already ran `gh pr merge`, IMMEDIATELY run `ag done F-XXXX` as the next step. The post-merge flow (VERSION bump, feature status, backlog advance) is part of the merge — not a separate action the user should have to request.
+
+**Automated verification**: `ag done` runs `ag verify F-XXXX` automatically before shipping — extracts `**Automated**:` commands from the AC file's `## Verification` section and executes them. Blocking for formal profiles (`acceptance_criteria: blocking`), advisory for discovery.
 
 ## When work is done (doc lifecycle)
 
