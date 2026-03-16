@@ -20,8 +20,8 @@ else
     BOLD='' GREEN='' YELLOW='' NC=''
 fi
 
-NFR_FILE=".agentic/spec/NFR.md"
-TODO_FILE=".agentic/TODO.md"
+# NFR_FILE provided by paths.sh
+TODO_FILE="${PROJECT_ROOT}/.agentic/TODO.md"
 
 # --- Parse args ---
 STATEMENT="${1:-}"
@@ -63,8 +63,9 @@ else
     # Create NFR.md from template if it doesn't exist
     if [[ -f "$SCRIPT_DIR/../templates/NFR.template.md" ]]; then
         cp "$SCRIPT_DIR/../templates/NFR.template.md" "$NFR_FILE"
-        # Remove the example entry
-        sed -i '/^## NFR-####:/,$d' "$NFR_FILE" 2>/dev/null || true
+        # Remove the example entry (GNU sed -i vs macOS sed -i '')
+        sed -i '/^## NFR-####:/,$d' "$NFR_FILE" 2>/dev/null || \
+            sed -i '' '/^## NFR-####:/,$d' "$NFR_FILE" 2>/dev/null || true
     else
         mkdir -p "$(dirname "$NFR_FILE")"
         echo "# NFR (Non-Functional Requirements)" > "$NFR_FILE"
@@ -74,20 +75,19 @@ fi
 
 NFR_ID=$(printf "NFR-%04d" "$next_num")
 
-# --- Append to NFR.md ---
-cat >> "$NFR_FILE" <<NFREOF
-
-## ${NFR_ID}: ${STATEMENT}
-- Category: ${CATEGORY}
-- Statement: ${STATEMENT}
-- Applies to: ${APPLIES_TO}
-- How to measure: <!-- define measurement -->
-- Where enforced:
-  - Tests: none
-  - CI: none
-- Current status: unknown
-- Notes: Captured from constraint language
-NFREOF
+# --- Append to NFR.md (printf to avoid shell metacharacter expansion) ---
+{
+    printf '\n## %s: %s\n' "$NFR_ID" "$STATEMENT"
+    printf -- '- Category: %s\n' "$CATEGORY"
+    printf -- '- Statement: %s\n' "$STATEMENT"
+    printf -- '- Applies to: %s\n' "$APPLIES_TO"
+    printf -- '- How to measure: <!-- define measurement -->\n'
+    printf -- '- Where enforced:\n'
+    printf -- '  - Tests: none\n'
+    printf -- '  - CI: none\n'
+    printf -- '- Current status: unknown\n'
+    printf -- '- Notes: Captured from constraint language\n'
+} >> "$NFR_FILE"
 
 echo -e "${GREEN}✓${NC} Created ${BOLD}${NFR_ID}${NC}: ${STATEMENT}"
 echo -e "  Written to ${NFR_FILE}"

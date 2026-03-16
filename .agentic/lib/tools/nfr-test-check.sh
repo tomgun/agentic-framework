@@ -32,8 +32,8 @@ if [[ -z "$FEATURE_ID" ]]; then
     exit 1
 fi
 
-NFR_FILE=".agentic/spec/NFR.md"
-ACCEPT_FILE=".agentic/spec/acceptance/${FEATURE_ID}.md"
+# NFR_FILE, ACCEPTANCE_DIR provided by paths.sh
+ACCEPT_FILE="${ACCEPTANCE_DIR}/${FEATURE_ID}.md"
 
 # --- Check prerequisites ---
 if [[ ! -f "$NFR_FILE" ]]; then
@@ -58,8 +58,8 @@ fi
 # --- Extract NFR references from SCOPED sections only ---
 # Extract content from: ## Acceptance Criteria, ### NFR Constraints, ## NFR Compliance
 scoped_content=$(sed -n '/^## Acceptance Criteria/,/^## [^A]/p' "$ACCEPT_FILE" 2>/dev/null || true)
-nfr_constraints=$(sed -n '/^###\? NFR Constraints/,/^###\? [^N]/p' "$ACCEPT_FILE" 2>/dev/null || true)
-nfr_compliance=$(sed -n '/^###\? NFR Compliance/,/^###\? [^N]/p' "$ACCEPT_FILE" 2>/dev/null || true)
+nfr_constraints=$(sed -En '/^###{0,1} NFR Constraints/,/^###{0,1} [^N]/p' "$ACCEPT_FILE" 2>/dev/null || true)
+nfr_compliance=$(sed -En '/^###{0,1} NFR Compliance/,/^###{0,1} [^N]/p' "$ACCEPT_FILE" 2>/dev/null || true)
 
 # Combine scoped sections and extract NFR references
 all_scoped="${scoped_content}${nfr_constraints}${nfr_compliance}"

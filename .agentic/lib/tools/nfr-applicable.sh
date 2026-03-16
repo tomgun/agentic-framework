@@ -96,7 +96,6 @@ for entry in "${nfr_entries[@]}"; do
         confidence="high"
     # Component-scoped NFRs: match "component:X" tags against feature context
     elif echo "$applies_to" | grep -qiE 'component:'; then
-        local comp_tags
         comp_tags=$(echo "$applies_to" | grep -oiE 'component:[a-z0-9_-]+' | sed 's/component://gi' | tr '[:upper:]' '[:lower:]')
         for tag in $comp_tags; do
             if [[ -n "$feature_context" ]] && echo "$feature_context" | grep -qiw "$tag"; then

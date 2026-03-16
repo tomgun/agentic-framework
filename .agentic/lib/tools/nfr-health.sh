@@ -23,11 +23,9 @@ else
     BOLD='' GREEN='' RED='' YELLOW='' BLUE='' DIM='' NC=''
 fi
 
-NFR_FILE=".agentic/spec/NFR.md"
-FEATURES_FILE=".agentic/spec/FEATURES.md"
-ACCEPTANCE_DIR=".agentic/spec/acceptance"
+# NFR_FILE, FEATURES_FILE, ACCEPTANCE_DIR provided by paths.sh
 
-MODE="${1:-detail}"
+MODE="detail"
 COMPONENT_FILTER=""
 
 # Parse args

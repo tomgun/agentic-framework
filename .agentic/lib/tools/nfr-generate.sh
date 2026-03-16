@@ -69,35 +69,34 @@ if [[ -z "$PROJECT_TYPE" ]]; then
 fi
 
 # --- Map project type to catalog section names ---
-# Returns space-separated list of section names to extract
+# Returns one section name per line (avoids fragile multi-word reassembly)
 map_type_to_sections() {
     local ptype="$1"
-    local sections="Universal"
+    echo "Universal"
     case "$ptype" in
         web|webapp|web-app|frontend)
-            sections="$sections Web App" ;;
+            echo "Web App" ;;
         api|backend|service|server)
-            sections="$sections API / Backend" ;;
+            echo "API / Backend" ;;
         mobile|ios|android|react-native)
-            sections="$sections Mobile" ;;
+            echo "Mobile" ;;
         game|gaming)
-            sections="$sections Game" ;;
+            echo "Game" ;;
         audio|dsp|audio-dsp)
-            sections="$sections Audio / DSP" ;;
+            echo "Audio / DSP" ;;
         cli|command-line)
-            sections="$sections CLI" ;;
+            echo "CLI" ;;
         desktop|electron|tauri)
-            sections="$sections Desktop" ;;
+            echo "Desktop" ;;
         library|sdk|lib|package)
-            sections="$sections Library / SDK" ;;
+            echo "Library / SDK" ;;
         data-pipeline|pipeline|etl|data)
-            sections="$sections Data Pipeline" ;;
+            echo "Data Pipeline" ;;
         *)
             echo -e "${YELLOW}Unknown project type: $ptype — showing Universal only${NC}" >&2
             ;;
     esac
-    sections="$sections Framework Promises"
-    echo "$sections"
+    echo "Framework Promises"
 }
 
 # --- Extract NFR entries from a catalog section ---
@@ -195,10 +194,10 @@ sections=$(map_type_to_sections "$PROJECT_TYPE")
 count=0
 
 echo -e "${BOLD}NFR Recommendations for: ${PROJECT_TYPE}${NC}"
-echo -e "${DIM}Sections: ${sections}${NC}"
+echo -e "${DIM}Sections: $(echo "$sections" | tr '\n' ', ' | sed 's/, $//')${NC}"
 echo ""
 
-# Collect all entries
+# Collect all entries (one section per line from map_type_to_sections)
 all_entries=""
 while IFS= read -r section; do
     [[ -z "$section" ]] && continue
@@ -206,19 +205,7 @@ while IFS= read -r section; do
     if [[ -n "$entries" ]]; then
         all_entries="${all_entries}${entries}"$'\n'
     fi
-done <<< "$(echo "$sections" | tr ' ' '\n' | awk '
-    # Reconstruct multi-word section names
-    BEGIN { name="" }
-    {
-        if (name == "") { name = $0 }
-        else if ($0 == "/" || $0 == "App" || $0 == "Backend" || $0 == "DSP" || $0 == "Promises" || $0 == "SDK" || $0 == "Pipeline") {
-            name = name " " $0
-        } else {
-            print name; name = $0
-        }
-    }
-    END { if (name != "") print name }
-')"
+done <<< "$sections"
 
 # Filter and output
 filtered=$(echo "$all_entries" | filter_entries)

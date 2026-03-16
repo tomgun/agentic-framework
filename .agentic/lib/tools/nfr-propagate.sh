@@ -22,9 +22,7 @@ else
     BOLD='' GREEN='' RED='' YELLOW='' DIM='' NC=''
 fi
 
-NFR_FILE=".agentic/spec/NFR.md"
-FEATURES_FILE=".agentic/spec/FEATURES.md"
-ACCEPTANCE_DIR=".agentic/spec/acceptance"
+# NFR_FILE, FEATURES_FILE, ACCEPTANCE_DIR provided by paths.sh
 
 # --- derive: generate ### NFR Constraints section for a feature ---
 cmd_derive() {
@@ -165,14 +163,14 @@ cmd_sync() {
     # Get what's currently in the AC file (scoped extraction)
     local current_content
     current_content=$(sed -n '/^## Acceptance Criteria/,/^## [^A]/p' "$ac_file" 2>/dev/null || true)
-    current_content+=$(sed -n '/^###\? NFR Constraints/,/^###\? [^N]/p' "$ac_file" 2>/dev/null || true)
-    current_content+=$(sed -n '/^###\? NFR Compliance/,/^###\? [^N]/p' "$ac_file" 2>/dev/null || true)
+    current_content+=$(sed -En '/^###{0,1} NFR Constraints/,/^###{0,1} [^N]/p' "$ac_file" 2>/dev/null || true)
+    current_content+=$(sed -En '/^###{0,1} NFR Compliance/,/^###{0,1} [^N]/p' "$ac_file" 2>/dev/null || true)
     local current_ids
     current_ids=$(echo "$current_content" | grep -oE 'NFR-[0-9]+' 2>/dev/null | sort -u || true)
 
     # Check for legacy format
     local has_legacy=0
-    if grep -qE '^###? NFR Compliance' "$ac_file" 2>/dev/null; then
+    if grep -qE '^##(#)? NFR Compliance' "$ac_file" 2>/dev/null; then
         has_legacy=1
     fi
 

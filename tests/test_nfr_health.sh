@@ -11,24 +11,24 @@ PASSES=0
 pass() { PASSES=$((PASSES + 1)); echo "  ✓ $1"; }
 fail() { FAILURES=$((FAILURES + 1)); echo "  ✗ $1"; }
 
-TMPDIR=$(mktemp -d)
-trap 'rm -rf "$TMPDIR"' EXIT
+TEST_TMPDIR=$(mktemp -d)
+trap 'rm -rf "$TEST_TMPDIR"' EXIT
 
 setup_project() {
-    rm -rf "$TMPDIR/.agentic"
-    mkdir -p "$TMPDIR/.agentic/spec/acceptance"
-    mkdir -p "$TMPDIR/.agentic/lib/tools"
-    mkdir -p "$TMPDIR/.agentic/lib"
-    cp "$SCRIPT_DIR/../.agentic/lib/paths.sh" "$TMPDIR/.agentic/lib/paths.sh"
-    cp "$SCRIPT_DIR/../.agentic/lib/tools/nfr-coverage.sh" "$TMPDIR/.agentic/lib/tools/nfr-coverage.sh"
-    cp "$TOOL" "$TMPDIR/.agentic/lib/tools/nfr-health.sh"
+    rm -rf "$TEST_TMPDIR/.agentic"
+    mkdir -p "$TEST_TMPDIR/.agentic/spec/acceptance"
+    mkdir -p "$TEST_TMPDIR/.agentic/lib/tools"
+    mkdir -p "$TEST_TMPDIR/.agentic/lib"
+    cp "$SCRIPT_DIR/../.agentic/lib/paths.sh" "$TEST_TMPDIR/.agentic/lib/paths.sh"
+    cp "$SCRIPT_DIR/../.agentic/lib/tools/nfr-coverage.sh" "$TEST_TMPDIR/.agentic/lib/tools/nfr-coverage.sh"
+    cp "$TOOL" "$TEST_TMPDIR/.agentic/lib/tools/nfr-health.sh"
 
-    cat > "$TMPDIR/.agentic/spec/FEATURES.md" <<'FEAT'
+    cat > "$TEST_TMPDIR/.agentic/spec/FEATURES.md" <<'FEAT'
 ## F-0001: Test Feature
 **Status**: shipped
 FEAT
 
-    cat > "$TMPDIR/.agentic/spec/NFR.md" <<'NFR'
+    cat > "$TEST_TMPDIR/.agentic/spec/NFR.md" <<'NFR'
 ## NFR-0001: Size limit
 - Category: maintainability
 - Statement: Files under 100 lines
@@ -57,7 +57,7 @@ echo ""
 # --- Test 1: Summary mode ---
 echo "Test: Summary mode"
 setup_project
-output=$(cd "$TMPDIR" && bash .agentic/lib/tools/nfr-health.sh --summary 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-health.sh --summary 2>&1)
 if echo "$output" | grep -q "2 defined"; then
     pass "Summary shows correct count"
 else
@@ -73,7 +73,7 @@ fi
 echo ""
 echo "Test: JSON mode"
 setup_project
-output=$(cd "$TMPDIR" && bash .agentic/lib/tools/nfr-health.sh --json 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-health.sh --json 2>&1)
 if echo "$output" | grep -q '"total":2'; then
     pass "JSON has correct total"
 else
@@ -89,8 +89,8 @@ fi
 echo ""
 echo "Test: No NFR.md"
 setup_project
-rm "$TMPDIR/.agentic/spec/NFR.md"
-output=$(cd "$TMPDIR" && bash .agentic/lib/tools/nfr-health.sh --summary 2>&1)
+rm "$TEST_TMPDIR/.agentic/spec/NFR.md"
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-health.sh --summary 2>&1)
 if echo "$output" | grep -qi "no NFR"; then
     pass "No NFR.md handled gracefully"
 else
@@ -101,7 +101,7 @@ fi
 echo ""
 echo "Test: Detail mode"
 setup_project
-output=$(cd "$TMPDIR" && bash .agentic/lib/tools/nfr-health.sh 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-health.sh 2>&1)
 if echo "$output" | grep -q "NFR-0001" && echo "$output" | grep -q "NFR-0002"; then
     pass "Detail mode shows both NFRs"
 else
@@ -116,7 +116,7 @@ fi
 # --- Test 5: Help flag ---
 echo ""
 echo "Test: Help flag"
-output=$(cd "$TMPDIR" && bash .agentic/lib/tools/nfr-health.sh --help 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-health.sh --help 2>&1)
 rc=$?
 if [[ $rc -eq 0 ]] && echo "$output" | grep -q "summary\|json\|coverage"; then
     pass "--help shows modes"
@@ -128,7 +128,7 @@ fi
 echo ""
 echo "Test: Issues detected for non-met status"
 setup_project
-output=$(cd "$TMPDIR" && bash .agentic/lib/tools/nfr-health.sh 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-health.sh 2>&1)
 rc=$?
 if [[ $rc -eq 1 ]]; then
     pass "Exit code 1 when partial/violated NFRs exist"
