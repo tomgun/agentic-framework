@@ -171,6 +171,87 @@ def test_validate_catches_invalid_category(tmp_path):
     assert any("invalid category" in i.lower() for i in issues)
 
 
+def test_validate_accepts_extended_categories(tmp_path):
+    """Categories used in nfr-catalog.md must all be accepted."""
+    extended_categories = [
+        "process", "quality", "documentation",
+        "accessibility", "data", "realtime-safety",
+    ]
+    for cat in extended_categories:
+        nfr_md = f"""\
+# NFR
+
+## NFR-0001: Category {cat}
+- Category: {cat}
+- Statement: something
+- How to measure: run tests
+- Where enforced:
+  - Tests: none
+  - CI: none
+- Current status: unknown
+"""
+        spec_dir = tmp_path / "spec"
+        spec_dir.mkdir(exist_ok=True)
+        (spec_dir / "NFR.md").write_text(nfr_md)
+
+        issues = validate_nfr_content(tmp_path)
+        assert not any("invalid category" in i.lower() for i in issues), \
+            f"Category '{cat}' should be valid but got: {issues}"
+
+
+def test_validate_handles_glob_test_paths(tmp_path):
+    """Glob patterns in test paths should be resolved."""
+    tests_dir = tmp_path / "tests"
+    tests_dir.mkdir()
+    (tests_dir / "test_foo.py").write_text("# test")
+    (tests_dir / "test_bar.py").write_text("# test")
+
+    nfr_md = """\
+# NFR
+
+## NFR-0001: Glob paths
+- Category: performance
+- Statement: something
+- How to measure: run tests
+- Where enforced:
+  - Tests: tests/test_*
+  - CI: none
+- Current status: met
+"""
+    spec_dir = tmp_path / "spec"
+    spec_dir.mkdir()
+    (spec_dir / "NFR.md").write_text(nfr_md)
+    acc_dir = spec_dir / "acceptance"
+    acc_dir.mkdir()
+    (acc_dir / "NFR-0001.md").write_text("# acceptance")
+
+    issues = validate_nfr_content(tmp_path)
+    assert not any("matches no files" in i for i in issues), \
+        f"Glob should match: {issues}"
+
+
+def test_validate_catches_empty_glob(tmp_path):
+    """Glob patterns matching no files should be reported."""
+    nfr_md = """\
+# NFR
+
+## NFR-0001: Empty glob
+- Category: performance
+- Statement: something
+- How to measure: run tests
+- Where enforced:
+  - Tests: tests/nonexistent_*
+  - CI: none
+- Current status: met
+"""
+    spec_dir = tmp_path / "spec"
+    spec_dir.mkdir()
+    (spec_dir / "NFR.md").write_text(nfr_md)
+
+    issues = validate_nfr_content(tmp_path)
+    assert any("matches no files" in i for i in issues)
+
+
 def test_validate_catches_missing_test_file(tmp_path):
     nfr_md = """\
 # NFR

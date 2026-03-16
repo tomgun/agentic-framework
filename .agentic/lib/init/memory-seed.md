@@ -101,7 +101,7 @@ If the user says formalize, promote to formal, migrate to formal, make TODOs int
 
 If the user says "it must always...", "never do X", "performance must stay under...", "security requirement", "accessibility", or describes a cross-cutting constraint that applies beyond a single feature:
 
-**STOP.** This is a Non-Functional Requirement. Check `.agentic/spec/NFR.md` — if no matching NFR exists, assign the next NFR-XXXX ID and write it there. NFRs are invariants that must hold across all features, not just the one being discussed. Don't let them stay informal in conversation. `nfr-applicable.sh F-XXXX` lists applicable NFRs. NFR constraints should be ACs in `### NFR Constraints (P1 — required)` group inside Acceptance Criteria.
+**STOP.** This is a Non-Functional Requirement. Check `.agentic/spec/NFR.md` — if no matching NFR exists, use `bash .agentic/lib/tools/nfr-capture.sh "statement"` to assign the next NFR-XXXX ID and write it. NFRs are invariants that must hold across all features, not just the one being discussed. Don't let them stay informal in conversation. Use `nfr-propagate.sh derive F-XXXX` to auto-generate NFR Constraints sections for feature ACs. `nfr-applicable.sh F-XXXX` lists applicable NFRs. NFR constraints should be ACs in `### NFR Constraints (P1 — required)` group inside Acceptance Criteria.
 
 ## When the user wants to decompose an epic
 

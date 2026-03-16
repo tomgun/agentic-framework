@@ -3734,6 +3734,7 @@ cmd_audit() {
 # --- ag nfr ---
 cmd_nfr() {
     local subcmd="${1:-}"
+    shift 2>/dev/null || true
     case "$subcmd" in
         list|"")
             bash "$SCRIPT_DIR/nfr.sh" list
@@ -3741,26 +3742,54 @@ cmd_nfr() {
         discover)
             echo -e "${BOLD}NFR Discovery${NC}"
             echo ""
-            echo "Read .agentic/lib/init/nfr-catalog.md for type-specific NFR suggestions."
-            echo "Select relevant NFRs and write them to .agentic/spec/NFR.md."
-            echo ""
-            if [ -f "$ROOT_DIR/STACK.md" ]; then
-                local platform
-                platform=$(grep -E '^\s*-?\s*Primary platform:' "$ROOT_DIR/STACK.md" 2>/dev/null | sed 's/.*: *//' | sed 's/<!--.*-->//' | tr -d ' ' || echo "unknown")
-                if [ -n "$platform" ] && [ "$platform" != "unknown" ]; then
-                    echo "Detected platform: $platform"
-                    echo "Relevant catalog sections: Universal + $(echo "$platform" | sed 's/web/Web App/;s/api\|backend\|service/API \/ Backend/;s/mobile/Mobile/;s/game/Game/;s/audio\|dsp/Audio \/ DSP/;s/cli/CLI/;s/desktop/Desktop/') + Framework Promises"
-                fi
+            # Run nfr-generate.sh for smart recommendations
+            local gen_args=()
+            # Pass through any remaining args (--project-type, --components, --all)
+            [[ $# -gt 0 ]] && gen_args=("$@")
+            bash "$SCRIPT_DIR/nfr-generate.sh" "${gen_args[@]}"
+            local rc=$?
+            if [[ $rc -eq 0 ]]; then
+                echo ""
+                echo "--- AGENT INSTRUCTION ---"
+                echo "Present the recommendations above to the user. For each selected NFR:"
+                echo "1. Assign the next NFR-XXXX ID (check existing IDs in .agentic/spec/NFR.md)"
+                echo "2. Let the user customize thresholds (values in {threshold} placeholders)"
+                echo "3. Write selected NFRs to .agentic/spec/NFR.md using the standard format"
+                echo "4. Create acceptance files: .agentic/spec/acceptance/NFR-XXXX.md"
+                echo "'looks good' or 'all' = accept the P1 recommendations with default thresholds."
+                echo "--- END INSTRUCTION ---"
             fi
             ;;
         coverage)
-            bash "$SCRIPT_DIR/nfr-coverage.sh" "${2:-summary}"
+            bash "$SCRIPT_DIR/nfr-health.sh" --coverage-only
+            ;;
+        health)
+            bash "$SCRIPT_DIR/nfr-health.sh" "$@"
+            ;;
+        sync)
+            bash "$SCRIPT_DIR/nfr-propagate.sh" sync "$@"
+            ;;
+        test-check)
+            bash "$SCRIPT_DIR/nfr-test-check.sh" "$@"
+            ;;
+        capture)
+            bash "$SCRIPT_DIR/nfr-capture.sh" "$@"
             ;;
         *)
             if [[ "$subcmd" =~ ^NFR-[0-9]{4}$ ]]; then
-                bash "$SCRIPT_DIR/nfr.sh" "$subcmd" "${2:-show}"
+                bash "$SCRIPT_DIR/nfr.sh" "$subcmd" "${1:-show}"
             else
-                echo "Usage: ag nfr [list|discover|coverage|NFR-XXXX]"
+                echo "Usage: ag nfr <command> [args]"
+                echo ""
+                echo "Commands:"
+                echo "  list               List all NFRs with status"
+                echo "  discover           Smart NFR recommendations based on stack"
+                echo "  health             NFR health report (status, coverage, staleness)"
+                echo "  coverage           NFR coverage across features"
+                echo "  sync F-XXXX        Compare current ACs vs expected NFR constraints"
+                echo "  test-check F-XXXX  Check NFR test coverage for a feature"
+                echo "  capture \"stmt\"     Capture informal invariant as structured NFR"
+                echo "  NFR-XXXX [show]    Show/update specific NFR"
             fi
             ;;
     esac

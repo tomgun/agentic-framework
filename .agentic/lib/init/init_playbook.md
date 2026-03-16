@@ -622,16 +622,10 @@ Choose **Proprietary (f)** if:
 
 **After the interview questions**, use the answers to suggest relevant NFRs.
 
-1. **Read STACK.md** `Primary platform:` to determine project type
-2. **Load catalog**: Read `.agentic/lib/init/nfr-catalog.md`
-3. **Present type-specific suggestions** based on platform:
-   - web → Web App + Universal + Framework Promises
-   - service/api/backend → API/Backend + Universal + Framework Promises
-   - mobile → Mobile + Universal + Framework Promises
-   - game → Game + Universal + Framework Promises
-   - audio/dsp → Audio/DSP + Universal + Framework Promises
-   - cli → CLI + Universal + Framework Promises
-   - desktop → Desktop + Universal + Framework Promises
+1. **Run NFR generation**: `bash .agentic/lib/tools/nfr-generate.sh` (auto-detects project type from STACK.md `Primary platform:`, outputs P1/P2 recommendations filtered by priority tier)
+   - Override detection: `--project-type web` or `--project-type api`
+   - Include structural: `--all` (adds P3 entries)
+   - Supported types: web, api, mobile, game, audio, cli, desktop, library, data-pipeline
 
 4. **Formalize any constraints from question 4** ("Key constraints?"):
    - If the user mentioned performance/security/compliance constraints earlier, map them to catalog entries or create custom NFRs

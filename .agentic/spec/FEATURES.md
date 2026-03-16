@@ -3707,3 +3707,83 @@ Proposed restructuring:
 - Tests: `tests/test_framework_verify.py`, `tests/test_self_heal.py`
 
 **Acceptance**: See `spec/acceptance/F-0215.md`
+
+---
+
+## F-0216: NFR Auto-Generation at Lifecycle Moments
+
+**Status**: planned
+**Category**: Quality
+**Priority**: high
+**Complexity**: medium
+**Since**: —
+**Dependencies**: None
+
+**Description**: Transform `ag nfr discover` from a passive catalog pointer into an active, recommendation-driven generation flow with smart defaults based on stack detection. Integrate into `ag kickoff` at the ag.sh/skill layer. Expand `nfr-catalog.md` with Library/SDK and Data Pipeline project types, add P1/P2/P3 priority tiers, and add component-level scoping to `nfr-applicable.sh`.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/tools/nfr-generate.sh`, modifications to `ag.sh`, `nfr-catalog.md`, `nfr-applicable.sh`, `init_playbook.md`
+- Tests: `tests/test_nfr_generate.sh`, `tests/llm/tests/079_nfr_auto_generation.sh`
+
+**Acceptance**: See `spec/acceptance/F-0216.md`
+
+---
+
+## F-0217: NFR-Aware Test Writing
+
+**Status**: planned
+**Category**: Quality
+**Priority**: high
+**Complexity**: medium
+**Since**: —
+**Dependencies**: None
+
+**Description**: Make the writing-tests workflow check applicable NFRs before designing test plans. New `nfr-test-check.sh` tool reports which NFRs apply to a feature and whether tests cover them. Integrated into writing-tests and implementing-features skills. `spec-audit.sh` gains `--nfr-test-coverage` flag.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/tools/nfr-test-check.sh`, modifications to writing-tests and implementing-features skills, `spec-audit.sh`
+- Tests: `tests/test_nfr_test_check.sh`, `tests/llm/tests/080_nfr_test_awareness.sh`
+
+**Acceptance**: See `spec/acceptance/F-0217.md`
+
+---
+
+## F-0218: NFR Propagation Pipeline
+
+**Status**: planned
+**Category**: Quality
+**Priority**: high
+**Complexity**: high
+**Since**: —
+**Dependencies**: F-0216, F-0217
+
+**Description**: Make NFR.md the living source of truth that actively propagates into feature ACs. `nfr-propagate.sh` auto-derives NFR Constraints sections (derive mode), detects staleness (check mode), and compares current vs desired state (sync mode). `nfr-capture.sh` turns informal invariant statements into structured NFRs. Updates spec_writing.md to use tool-based workflow instead of manual NFR matching.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/tools/nfr-propagate.sh`, `.agentic/lib/tools/nfr-capture.sh`, modifications to `check-spec-health.sh`, `ag.sh`, `spec_writing.md`, `acceptance.template.md`, `memory-seed.md`
+- Tests: `tests/test_nfr_propagate.sh`, `tests/llm/tests/081_nfr_propagation.sh`
+
+**Acceptance**: See `spec/acceptance/F-0218.md`
+
+---
+
+## F-0219: NFR Health Dashboard & Scale
+
+**Status**: planned
+**Category**: Quality
+**Priority**: medium
+**Complexity**: high
+**Since**: —
+**Dependencies**: F-0218
+
+**Description**: Comprehensive NFR health view with dashboard integration, scale handling for 20+ NFRs. `nfr-health.sh` provides per-NFR status/coverage/staleness reports with `--summary`, `--json`, and `--coverage-only` modes. Dashboard shows NFR health line at session start. `nfr-applicable.sh` gains applicability caching and `--p1-only` priority filtering. `ag nfr` becomes a unified subcommand hub for all NFR operations.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/tools/nfr-health.sh`, modifications to `dashboard.sh`, `nfr-applicable.sh`, `ag.sh`, `retrospective.md`
+- Tests: `tests/test_nfr_health.sh`, `tests/llm/tests/082_nfr_health.sh`
+
+**Acceptance**: See `spec/acceptance/F-0219.md`

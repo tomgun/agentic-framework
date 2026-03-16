@@ -156,16 +156,29 @@ if [[ "${1:-}" == "--all" ]]; then
     echo -e "Errors: $ERRORS | Warnings: $WARNINGS | Info: $INFO"
 
     # Run deep validators if available
-    if [[ -f "spec/tools/consistency.py" ]] && command -v python3 >/dev/null 2>&1; then
+    if [[ -f ".agentic/lib/tools/consistency.py" ]] && command -v python3 >/dev/null 2>&1; then
         echo ""
         echo -e "${BLUE}Running consistency check...${NC}"
-        python3 spec/tools/consistency.py 2>/dev/null || echo -e "${YELLOW}⚠ consistency.py had issues${NC}"
+        python3 .agentic/lib/tools/consistency.py 2>/dev/null || echo -e "${YELLOW}⚠ consistency.py had issues${NC}"
     fi
 
-    if [[ -f "spec/tools/nfr_validator.py" ]] && command -v python3 >/dev/null 2>&1; then
+    if [[ -f ".agentic/lib/tools/nfr_validator.py" ]] && command -v python3 >/dev/null 2>&1; then
         echo ""
         echo -e "${BLUE}Running NFR validation...${NC}"
-        python3 spec/tools/nfr_validator.py 2>/dev/null || echo -e "${YELLOW}⚠ nfr_validator.py had issues${NC}"
+        python3 -c "
+import sys; sys.path.insert(0, '.agentic/lib/tools'); sys.path.insert(0, '.agentic/lib')
+from nfr_validator import validate_nfr_content; from pathlib import Path
+issues = validate_nfr_content(Path('.'))
+for i in issues: print(f'  ⚠ {i}')
+if not issues: print('  ✓ NFR validation passed')
+" 2>/dev/null || echo -e "${YELLOW}⚠ nfr_validator.py had issues${NC}"
+    fi
+
+    # NFR staleness check (if nfr-propagate.sh available)
+    if [[ -f "$_CSH_SCRIPT_DIR/nfr-propagate.sh" ]] && [[ -f ".agentic/spec/NFR.md" ]]; then
+        echo ""
+        echo -e "${BLUE}Running NFR staleness check...${NC}"
+        bash "$_CSH_SCRIPT_DIR/nfr-propagate.sh" check --all 2>/dev/null || true
     fi
 
     if [[ $ERRORS -gt 0 ]]; then

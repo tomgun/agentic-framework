@@ -94,6 +94,16 @@ for entry in "${nfr_entries[@]}"; do
     if echo "$applies_to" | grep -qiE 'global|all work|all features'; then
         applicable=1
         confidence="high"
+    # Component-scoped NFRs: match "component:X" tags against feature context
+    elif echo "$applies_to" | grep -qiE 'component:'; then
+        comp_tags=$(echo "$applies_to" | grep -oiE 'component:[a-z0-9_-]+' | sed 's/component://gi' | tr '[:upper:]' '[:lower:]')
+        for tag in $comp_tags; do
+            if [[ -n "$feature_context" ]] && echo "$feature_context" | grep -qiw "$tag"; then
+                applicable=1
+                confidence="high"
+                break
+            fi
+        done
     elif [[ -n "$feature_context" && -n "$applies_to" ]]; then
         # Keyword overlap matching
         applies_words=$(echo "$applies_to" | tr -cs '[:alnum:]' '\n' | awk 'length >= 4' | grep -viE '^(that|this|with|from|they|have|been|when|will|each|must|only|also|into|than|them)$' || true)

@@ -350,6 +350,13 @@ fi
 if [[ "$D_ORPHAN_PLANS" -gt 0 ]]; then
     echo "📝 Orphan plans   $D_ORPHAN_PLAN_SUMMARY"
 fi
+# Conditional: NFR health (only when NFR.md exists)
+if [[ -f "$ROOT_DIR/.agentic/spec/NFR.md" ]] && grep -qE '^## NFR-[0-9]+' "$ROOT_DIR/.agentic/spec/NFR.md" 2>/dev/null; then
+    nfr_summary=$(bash "$TOOLS_DIR/nfr-health.sh" --summary 2>/dev/null || echo "")
+    if [[ -n "$nfr_summary" ]]; then
+        echo "📊 NFRs           $nfr_summary"
+    fi
+fi
 echo "✅ Health         $health_line"
 echo ""
 

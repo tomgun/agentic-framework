@@ -15,6 +15,8 @@ from paths import get_paths
 VALID_NFR_CATEGORIES = {
     "performance", "security", "scalability", "usability",
     "reliability", "maintainability", "compliance",
+    "process", "quality", "documentation", "accessibility",
+    "data", "realtime-safety",
 }
 
 VALID_NFR_STATUSES = {"unknown", "partial", "met", "violated"}
@@ -153,7 +155,17 @@ def validate_nfr_content(root: Path) -> list[str]:
                 # Strip ::method or (description) suffixes
                 file_path = re.split(r"::|[\(\)]", part)[0].strip()
                 file_path = file_path.strip("`")
-                if file_path and not (root / file_path).exists():
+                if not file_path:
+                    continue
+                # Handle glob patterns (e.g., tests/infrastructure/structural/S07_*)
+                if "*" in file_path or "?" in file_path:
+                    resolved = (root / file_path)
+                    matches = list(resolved.parent.glob(resolved.name))
+                    if not matches:
+                        issues.append(
+                            f"{nfr_id}: test glob '{file_path}' matches no files"
+                        )
+                elif not (root / file_path).exists():
                     issues.append(
                         f"{nfr_id}: test path '{file_path}' does not exist"
                     )
