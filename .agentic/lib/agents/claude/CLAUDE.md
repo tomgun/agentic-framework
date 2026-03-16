@@ -20,10 +20,10 @@ Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 - Add/update tests for new/changed logic.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
 - AC completeness enforced at `ag done`: P1 ACs = 100%, P2/P3 = 80%, flat specs = 80%. AC clarity gate runs on first `ag implement` (formal=blocking, discovery=advisory).
-- Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
+- Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration (`bash .agentic/lib/tools/migration.sh create`).
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
-- Multi-agent: check `.agentic/session/AGENTS.json` before starting work (use `python3 .agentic/lib/tools/agents_helpers.py --project-root . list` or `wip.sh check`).
+- Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.
 - Multi-session safety: Before ANY destructive git op (stash, checkout ., restore ., reset --hard, clean -f), run `python3 .agentic/lib/tools/agents_helpers.py --project-root . count-others "$(pwd)" --pid $PPID`. If >0, DO NOT PROCEED — use a worktree or commit first.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 
@@ -45,10 +45,9 @@ After ExitPlanMode:
 - "I have it in context" — save durably, then `ag implement`
 - "ag implement told me to review, I'll assess it myself" — spawn Critic + Advocate, don't self-assess
 
-## Token-Efficient Scripts (ALWAYS use these, NEVER edit state files directly)
-
+Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - .agentic/STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
-- .agentic/journal/JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcome for the project" "Next" "Blockers" --why "Problem solved"`
+- .agentic/journal/JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes (not files)" "Next" "Blockers" --why "Problem being solved"`
 - .agentic/HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
 - .agentic/spec/FEATURES.md: `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 - .agentic/TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`
