@@ -1436,7 +1436,7 @@ cmd_done() {
     plan_review_enabled_done=$(get_plan_review_config "plan_review_enabled" "no")
     if [ "$plan_review_enabled_done" = "yes" ] && [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
         local _plan_glob
-        _plan_glob=$(find "$ROOT_DIR/.agentic/journal/plans/" -name "*${feature_id}*plan*" -type f 2>/dev/null | head -1)
+        _plan_glob=$(find "$ROOT_DIR/.agentic/journal/plans/" \( -name "*${feature_id}-plan.md" -o -name "*${feature_id}-plan-*.md" \) -type f 2>/dev/null | head -1)
         if [ -z "$_plan_glob" ]; then
             echo -e "${RED}BLOCKED: No plan found for $feature_id (plan_review_enabled: yes)${NC}"
             echo "  Create a plan first: ag plan $feature_id"

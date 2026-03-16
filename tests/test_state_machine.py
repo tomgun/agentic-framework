@@ -525,19 +525,29 @@ class TestBlockingEnforcement:
         assert any("Acceptance criteria file not found" in m for m in msgs)
 
     def test_existing_feature_not_retroactively_broken(self, project_dir):
-        """AC7: Feature already at implementing with no AC file is not broken."""
+        """AC7: Feature already at implementing with no AC file is not broken.
+
+        Enforcement is forward-looking: it only blocks when attempting a NEW
+        transition. An existing feature at implementing (even with missing AC)
+        can still be read, and attempting a forward transition may fail on
+        gates but doesn't corrupt the feature's state.
+        """
         write_features(project_dir, [("F-0042", "Test", "implementing")])
         # No acceptance criteria file created
         sm = FeatureStateMachine(project_root=project_dir, enforce=True)
 
-        # Reading state should work fine
+        # Reading state works fine — no retroactive validation
         state = sm.get_current_state("F-0042")
         assert state == FeatureState.IMPLEMENTING
 
-        # Forward transition to verified should work (skip transition)
-        # or fail on gate — but the feature itself is not corrupt
+        # Attempting a forward transition may fail on gate, but doesn't corrupt state
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.SHIPPED)
+        # implementing->shipped is a SKIP_TRANSITION, should succeed
+        assert allowed
+
+        # Feature state is still readable and unchanged after the check
         state_after = sm.get_current_state("F-0042")
-        assert state_after == FeatureState.IMPLEMENTING  # unchanged
+        assert state_after == FeatureState.IMPLEMENTING
 
     def test_invalid_transition_blocked_in_enforce_mode(self, project_dir):
         """AC1/AC2: Invalid transitions (shipped->planned) blocked in enforce mode."""
