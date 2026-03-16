@@ -2141,7 +2141,7 @@ cmd_merge() {
         fi
     fi
 
-    # Merge the PR
+    # Merge the PR (squash strategy — matches formal profile convention)
     echo "Merging PR #$pr_number..."
     if ! gh pr merge "$pr_number" --squash --delete-branch; then
         echo -e "${RED}Merge failed${NC}"
@@ -2677,7 +2677,7 @@ cmd_verify() {
         local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
         if [ ! -f "$acc_file" ]; then
             echo -e "${RED}No acceptance criteria file: $acc_file${NC}"
-            exit 1
+            return 1
         fi
 
         echo -e "${BOLD}=== Verify: $feature_id ===${NC}"
@@ -2713,11 +2713,14 @@ cmd_verify() {
         local failed=0
         for cmd in "${commands[@]}"; do
             echo -e "${BLUE}Running: $cmd${NC}"
-            if eval "$cmd" > /dev/null 2>&1; then
+            local _verify_output=""
+            _verify_output=$(bash -c "$cmd" 2>&1)
+            local _verify_rc=$?
+            if [ "$_verify_rc" -eq 0 ]; then
                 echo -e "${GREEN}✓ PASSED${NC}"
             else
                 echo -e "${RED}✗ FAILED${NC}"
-                echo "  Re-run manually: $cmd"
+                echo "$_verify_output" | tail -20
                 failed=$((failed + 1))
             fi
             echo ""
@@ -2725,7 +2728,7 @@ cmd_verify() {
 
         if [ "$failed" -gt 0 ]; then
             echo -e "${RED}$failed verification(s) failed${NC}"
-            exit 1
+            return 1
         fi
         echo -e "${GREEN}All ${#commands[@]} verification(s) passed${NC}"
         return 0
