@@ -3842,7 +3842,7 @@ Proposed restructuring:
 
 ## F-0222: State Machine Enforcement = Blocking
 
-**Status**: planned
+**Status**: shipped
 **Category**: Quality
 **Priority**: high
 **Complexity**: medium

@@ -2833,3 +2833,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-16 21:28 - F-0222 Shipped
+
+**Why**: Formal profiles had advisory-only enforcement — wiring gap fixed, merged via PR #148
+
+**What changed**:
+- State machine enforcement now blocking for formal profiles; plan backstop in ag done catches retroactive planning; KEY_INSIGHTS §15 + §16
+
+**Next steps**:
+- Next: F-0224 (next backlog item)
+
+**Blockers**: None
+

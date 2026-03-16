@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0222: State Machine Enforcement = Blocking — implementation complete, ready to commit (Updated: 2026-03-16 21:03 UTC)
+- ADR-001 roadmap execution: F-0224 (F-0224) is current backlog item (Updated: 2026-03-16 21:28 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

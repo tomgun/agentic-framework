@@ -88,6 +88,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0045: PR #148: F-0222 State Machine Enforcement = Blocking
+- **Type**: pr_review
+- **Added**: 2026-03-16
+- **Context**: https://github.com/tomgun/agentic-framework/pull/148 — needs review and merge
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0043: PR #141: Systematic quality improvement
