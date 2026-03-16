@@ -449,3 +449,110 @@ class TestGetUnblocked:
         write_features(project_dir, [("F-0042", "Test", "shipped")])
         sm = FeatureStateMachine(project_root=project_dir)
         assert sm.get_unblocked() == []
+
+
+# ---------------------------------------------------------------------------
+# Blocking enforcement (F-0222)
+# ---------------------------------------------------------------------------
+
+class TestBlockingEnforcement:
+    """Tests for state_enforcement=blocking mode (F-0222).
+
+    Verifies that enforce=True makes gate failures block transitions,
+    while enforce=False (advisory) warns but allows them.
+    """
+
+    def test_gate_failure_blocks_when_enforce_true(self, project_dir):
+        """AC1: Gate failure blocks transition in enforce mode."""
+        write_features(project_dir, [("F-0042", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+
+        def blocking_gate(fid, root):
+            return GateResult(allowed=False, reasons=["AC file missing"], warnings=[])
+
+        sm.register_gate(FeatureState.PLANNED, FeatureState.SPECCED, blocking_gate)
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.SPECCED)
+        assert not allowed
+        assert any("AC file missing" in m for m in msgs)
+
+    def test_gate_failure_advisory_when_enforce_false(self, project_dir):
+        """AC1 inverse: Gate failure is advisory when enforce=False."""
+        write_features(project_dir, [("F-0042", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=False)
+
+        def blocking_gate(fid, root):
+            return GateResult(allowed=False, reasons=["AC file missing"], warnings=[])
+
+        sm.register_gate(FeatureState.PLANNED, FeatureState.SPECCED, blocking_gate)
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.SPECCED)
+        assert allowed  # advisory lets it through
+
+    def test_skip_transitions_work_with_enforce(self, project_dir):
+        """AC4: SKIP_TRANSITIONS are valid transitions in blocking mode.
+
+        Skip transitions pass is_valid_transition() so they aren't rejected
+        as invalid. Gates still apply — but the transition itself is allowed.
+        """
+        write_features(project_dir, [("F-0042", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+
+        # No gate registered — skip transition should succeed
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.IMPLEMENTING)
+        assert allowed
+
+    def test_skip_transition_planned_to_shipped_with_enforce(self, project_dir):
+        """AC4: planned->shipped (retroactive tracking) works in blocking mode."""
+        write_features(project_dir, [("F-0042", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.SHIPPED)
+        assert allowed
+
+    def test_error_messages_contain_gate_reason(self, project_dir):
+        """AC5: Blocked transition output includes gate failure reason."""
+        write_features(project_dir, [("F-0042", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+
+        def blocking_gate(fid, root):
+            return GateResult(
+                allowed=False,
+                reasons=["Acceptance criteria file not found"],
+                warnings=["Consider creating spec/acceptance/F-0042.md"],
+            )
+
+        sm.register_gate(FeatureState.PLANNED, FeatureState.SPECCED, blocking_gate)
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.SPECCED)
+        assert not allowed
+        assert any("Acceptance criteria file not found" in m for m in msgs)
+
+    def test_existing_feature_not_retroactively_broken(self, project_dir):
+        """AC7: Feature already at implementing with no AC file is not broken.
+
+        Enforcement is forward-looking: it only blocks when attempting a NEW
+        transition. An existing feature at implementing (even with missing AC)
+        can still be read, and attempting a forward transition may fail on
+        gates but doesn't corrupt the feature's state.
+        """
+        write_features(project_dir, [("F-0042", "Test", "implementing")])
+        # No acceptance criteria file created
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+
+        # Reading state works fine — no retroactive validation
+        state = sm.get_current_state("F-0042")
+        assert state == FeatureState.IMPLEMENTING
+
+        # Attempting a forward transition may fail on gate, but doesn't corrupt state
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.SHIPPED)
+        # implementing->shipped is a SKIP_TRANSITION, should succeed
+        assert allowed
+
+        # Feature state is still readable and unchanged after the check
+        state_after = sm.get_current_state("F-0042")
+        assert state_after == FeatureState.IMPLEMENTING
+
+    def test_invalid_transition_blocked_in_enforce_mode(self, project_dir):
+        """AC1/AC2: Invalid transitions (shipped->planned) blocked in enforce mode."""
+        write_features(project_dir, [("F-0042", "Test", "shipped")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.PLANNED)
+        assert not allowed
+        assert any("Invalid transition" in m for m in msgs)

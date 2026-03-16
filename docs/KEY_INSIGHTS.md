@@ -26,6 +26,8 @@
 | 12 | [LLM-Optimized Formats](#12-llm-optimized-formats-for-everything) | Structure all files so LLMs parse them efficiently — frontmatter, markdown, tables | Faster parsing, fewer misunderstandings, less re-reading |
 | 13 | [Plans Are Never Done After One Pass](#13-plans-are-never-done-after-one-pass) | AI plans are impressive but always have gaps — multi-round review is essential, not optional | Catches flaws that cost 10x more to fix in code |
 | 14 | [Cross-Turn Workflows Need Artifact-Embedded Enforcement](#14-cross-turn-workflows-need-artifact-embedded-enforcement) | Instruction files lose effect at turn boundaries — embed enforcement in the artifact itself | Prevents agents from skipping multi-turn workflows |
+| 15 | [Context Provenance Awareness](#15-agents-cannot-distinguish-context-provenance) | Agents can't tell if context came from the user, a prior session, or automation — default to system-provided | Prevents misattributing intent and skipping gates |
+| 16 | [Retroactive Planning Defeats Forward-Looking Gates](#16-retroactive-planning-defeats-forward-looking-gates) | Gates designed for plan→implement flow become dead code when agent implements first, plans after | Gates must check actual state, not assume ordering |
 
 **Meta-lesson**: structural enforcement > behavioral instructions > hope.
 
@@ -318,6 +320,53 @@ Design your workflow around this reality. Every valuable output must reach a git
 
 ---
 
+## 15. Agents Cannot Distinguish Context Provenance
+
+**The problem**: LLM agents see all context in their conversation as a flat stream — they cannot reliably distinguish between (a) what the user explicitly typed in this session, (b) context carried over from a prior agent in the same session, and (c) output from automated tools (dashboard, system messages). This leads to misattribution of actions: an agent in a new session may claim "the user explicitly said X and pasted the plan" when actually the plan was created by a prior agent in plan mode, the user accepted it, and the prior agent failed to save it durably or run dialectical review — then the new session inherited that context.
+
+**Observed case (F-0222)**: A plan was created in plan mode, reviewed in plan mode, and accepted by the user. The agent then skipped saving the plan durably and skipped dialectical review, jumping straight to implementation. When a new session started, the new agent saw the plan in context and claimed "the user explicitly pasted the plan" — fabricating a narrative about who did what rather than recognizing the plan came from a prior agent session's unsaved work.
+
+**Why it matters**: Misattribution affects workflow gates and trust. If the agent invents a false narrative about what the user did, it may use that narrative to justify skipping gates (e.g., "user provided it, so it's reviewed"). It also erodes user trust — the user knows they were AFK and the agent is confidently wrong about what happened.
+
+**Mitigations**:
+
+1. **Don't fabricate provenance narratives.** If you don't know exactly how context arrived, don't invent a story. Say what you observe ("a plan exists in context") without asserting who put it there or why.
+2. **Default to system-provided.** When unsure who initiated something, treat it as system-provided context — not user action. This is the safe default: it triggers review gates rather than skipping them.
+3. **Don't infer intent from presence.** The existence of a plan in context doesn't mean the user wants to implement it. The existence of a feature ID doesn't mean the user is working on it. Context presence ≠ user intent.
+
+**Relationship to §14**: Cross-turn enforcement (§14) addresses instructions losing effect across turns — which is the root cause of the unsaved plan in the observed case. This insight addresses the *compounding* failure: when a new agent inherits the consequences of a §14 failure and then fabricates a false explanation for how the context arrived, making the situation worse.
+
+**See**: `FRAMEWORK_DEVELOPMENT.md` § "Agents misattribute actions to the user"
+
+---
+
+## 16. Retroactive Planning Defeats Forward-Looking Gates
+
+**The problem**: Workflow gates are designed for a forward flow: plan → review → approve → implement. But agents sometimes do things out of order — implement first, then go back to plan retroactively (often after being caught skipping the planning step). When this happens, all forward-looking gates become dead code:
+
+- **POST-PLAN-MODE block** (§14's artifact-embedded enforcement): The block says "Do NOT code, read implementation files, or explore." But the code is already written. The agent has no motivation to append instructions about what to do "next" — "next" is already done. So it skips Step 4.5 of the planning skill entirely.
+- **`ag implement` gate**: Checks for an approved plan before proceeding. But the agent never runs `ag implement` after retroactive planning — implementation already happened. The gate exists but is never reached.
+- **Dialectical review**: Supposed to catch flaws before implementation. When planning is retroactive, flaws are already in the code. The review becomes academic — the agent treats it as optional documentation rather than a blocking gate.
+
+**Observed case (F-0222)**: Agent implemented without a plan. User caught it and directed the agent to plan retroactively. Agent entered plan mode, created the plan, user accepted it. Agent exited plan mode but skipped: (a) appending the POST-PLAN-MODE block (Step 4.5), (b) saving the plan durably, (c) running dialectical review. All three are forward-looking gates that assume implementation hasn't happened yet.
+
+**Why agents do this**: When the agent has already implemented, the planning workflow feels like a formality. Every instruction that says "before you implement" or "do NOT code" is irrelevant — the code exists. The agent rationally (from its perspective) skips steps that prevent an action already taken.
+
+**Systematic detection**: The feature's state in FEATURES.md is observable. `ag plan` could check: if the feature is already at `implementing` or later, this is retroactive planning. Possible responses:
+
+1. **Warn explicitly**: "⚠ Feature is at `implementing` — this is retroactive planning. All review gates still apply."
+2. **Reframe the POST-PLAN-MODE block**: Instead of "Do NOT code", say "Code exists but plan is NOT approved. Save → dialectical review → approval required before continuing."
+3. **Make `ag implement` re-check**: Even if the feature is already `implementing`, `ag implement` could verify an approved plan exists and block if not — catching the retroactive case.
+4. **State machine gate**: Add a transition gate on `implementing` that requires an approved plan file. If the agent implemented without planning, the next state transition (`ag done`) would catch it.
+
+**The meta-lesson**: Forward-looking gates only work when the workflow runs in order. When agents can execute steps out of order (and they will), gates must check *actual state* (does an approved plan exist?), not *assumed ordering* (the agent must be about to implement). State-based checks are order-independent; workflow-position checks are fragile.
+
+**Relationship to §4 and §14**: Structural gates (§4) work because they check concrete conditions (`exit 1` if file missing). Artifact-embedded enforcement (§14) works because it survives turn boundaries. But both assume forward flow. This insight says: make gate conditions state-based ("approved plan exists") rather than position-based ("you're about to implement"), so they work regardless of execution order.
+
+**See**: `FRAMEWORK_DEVELOPMENT.md` § "Retroactive planning defeats forward-looking gates"
+
+---
+
 ## Summary: The Pattern
 
 These insights form a coherent pattern:
@@ -338,6 +387,8 @@ Tiny instruction file (50 lines)     → agent reads it all, reliably
   + LLM-optimized formats            → structure files for AI consumption
   + Plans are never done in one pass → review loop is essential, not optional
   + Artifact-embedded enforcement    → cross-turn workflows survive boundaries
+  + Context provenance awareness     → don't misattribute automated context to users
+  + State-based gates over position  → work regardless of execution order
 ```
 
 The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation.

@@ -20,7 +20,9 @@
         "output_contains_any": [
           "CONTEXT_PACK|framework|agentic|checklists|assist"
         ],
-        "output_not_contains": ["let me check|let me read|starting a new session|I'll check|I'll read"],
+        "output_not_contains": [
+          "let me check|let me read|starting a new session|I'll check|I'll read"
+        ],
         "file_exists": [],
         "file_not_exists": [
           ".agentic/session/WIP.md"
@@ -1659,6 +1661,34 @@
         "file_exists": [],
         "file_not_exists": [],
         "max_commits": null
+      }
+    },
+    {
+      "id": "079_state_enforcement_blocking",
+      "description": "Agent recognizes blocking enforcement mode blocks transitions on gate failure",
+      "section": "workflow",
+      "category": "Standard",
+      "llm_test_id": "LLM-079",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "## Settings\n- profile: formal\n- state_enforcement: blocking\n- feature_tracking: yes\n",
+          ".agentic/spec/FEATURES.md": "# Feature Specifications\n\n<!-- format: features-v0.2.0 -->\n\n## F-0099: Test Feature\n\n**Status**: planned\n**Category**: Test\n\n**Description**: Test feature.\n\n---\n"
+        }
+      },
+      "prompt": "What happens if I run ag implement F-0099 and the acceptance criteria file is missing?",
+      "expected": {
+        "output_contains": [
+          "block|BLOCKED|fail|error|exit|non-zero|prevent"
+        ],
+        "output_contains_any": [
+          "gate|transition|acceptance|criteria|state_enforcement"
+        ],
+        "output_not_contains": [
+          "advisory|warning only|proceed anyway|continue regardless"
+        ],
+        "file_exists": [],
+        "file_not_exists": []
       }
     }
   ]

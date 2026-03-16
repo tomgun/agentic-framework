@@ -2820,3 +2820,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-16 21:03 - F-0222 State Machine Enforcement = Blocking
+
+**Why**: Formal profiles had advisory-only enforcement despite blocking branches in ag.sh — wiring gap meant state_machine.py never received --enforce flag
+
+**What changed**:
+- Gate failures now block transitions for formal profiles; ag done plan backstop catches retroactive planning; KEY_INSIGHTS §15 + §16 added
+
+**Next steps**:
+- Ship F-0222, update remaining instruction files if needed
+
+**Blockers**: None
+

@@ -1082,10 +1082,15 @@ cmd_implement() {
     if [ "$enforcement" != "off" ]; then
         echo ""
         echo "Transitioning state to implementing..."
+        local _enforce_flag=""
+        if [ "$enforcement" = "blocking" ]; then
+            _enforce_flag="--enforce"
+        fi
         local transition_out=""
         local transition_rc=0
         transition_out=$(python3 "$SCRIPT_DIR/../auto/state_machine.py" \
             --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" \
+            $_enforce_flag \
             transition "$feature_id" implementing 2>&1) || transition_rc=$?
         if [ "$transition_rc" -eq 0 ] || echo "$transition_out" | grep -q "no-op"; then
             echo -e "${GREEN}State: implementing${NC}"
@@ -1094,6 +1099,7 @@ cmd_implement() {
             if [ "$enforcement" = "blocking" ]; then
                 echo -e "${RED}BLOCKED: State transition failed${NC}"
                 echo "$transition_out"
+                echo -e "${YELLOW}To bypass: set state_enforcement: advisory in STACK.md${NC}"
                 intent_cancel "$feature_id" || true
                 exit 1
             else
@@ -1420,6 +1426,33 @@ cmd_done() {
     if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
         echo -e "${YELLOW}⚠ You have uncommitted changes.${NC} Consider running \`ag commit\` first."
         echo ""
+    fi
+
+    # --- Plan backstop (F-0222/§16) ---
+    # Catches retroactive planning: if plan_review_enabled but no approved plan,
+    # block shipping. This is order-independent — works even if ag implement was
+    # never run. State-based check, not workflow-position check.
+    local plan_review_enabled_done
+    plan_review_enabled_done=$(get_plan_review_config "plan_review_enabled" "no")
+    if [ "$plan_review_enabled_done" = "yes" ] && [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        local _plan_glob
+        _plan_glob=$(find "$ROOT_DIR/.agentic/journal/plans/" \( -name "*${feature_id}-plan.md" -o -name "*${feature_id}-plan-*.md" \) -type f 2>/dev/null | head -1)
+        if [ -z "$_plan_glob" ]; then
+            echo -e "${RED}BLOCKED: No plan found for $feature_id (plan_review_enabled: yes)${NC}"
+            echo "  Create a plan first: ag plan $feature_id"
+            echo -e "${YELLOW}To bypass: set plan_review_enabled: no in STACK.md${NC}"
+            exit 1
+        else
+            local _plan_status
+            _plan_status=$(grep -E "^\*\*Status\*\*:" "$_plan_glob" 2>/dev/null | head -1 | sed 's/.*Status\*\*:[[:space:]]*//' || echo "UNKNOWN")
+            if [ "$_plan_status" != "APPROVED" ]; then
+                echo -e "${RED}BLOCKED: Plan for $feature_id is ${_plan_status}, not APPROVED${NC}"
+                echo "  Plan: $_plan_glob"
+                echo "  Run dialectical review and approve the plan first"
+                echo -e "${YELLOW}To bypass: set plan_review_enabled: no in STACK.md${NC}"
+                exit 1
+            fi
+        fi
     fi
 
     # --- Intent-driven execution (F-0200) ---
@@ -1758,12 +1791,17 @@ cmd_done() {
     if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$' && [ "$enforcement" != "off" ]; then
         echo ""
         echo -e "${BOLD}=== State Transitions ===${NC}"
+        local _enforce_flag=""
+        if [ "$enforcement" = "blocking" ]; then
+            _enforce_flag="--enforce"
+        fi
         local _done_states="verified documented committed shipped"
         for _target_state in $_done_states; do
             local _trans_out=""
             local _trans_rc=0
             _trans_out=$(python3 "$SCRIPT_DIR/../auto/state_machine.py" \
                 --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" \
+                $_enforce_flag \
                 transition "$feature_id" "$_target_state" 2>&1) || _trans_rc=$?
             if [ "$_trans_rc" -eq 0 ] || echo "$_trans_out" | grep -q "no-op"; then
                 echo -e "${GREEN}State: $_target_state${NC}"
@@ -1771,6 +1809,7 @@ cmd_done() {
                 if [ "$enforcement" = "blocking" ]; then
                     echo -e "${RED}BLOCKED: State transition to $_target_state failed${NC}"
                     echo "$_trans_out"
+                    echo -e "${YELLOW}To bypass: set state_enforcement: advisory in STACK.md${NC}"
                     intent_cancel "$feature_id" || true
                     exit 1
                 else
