@@ -197,13 +197,18 @@ phase: review
 
 ## NFR Health Review
 
-- [ ] **Run NFR coverage check**
+- [ ] **Run NFR health report**
   ```bash
-  bash .agentic/lib/tools/ag.sh nfr coverage
+  ag nfr health              # Full per-NFR status, coverage, staleness
+  ag nfr health --summary    # One-line status
+  ```
+- [ ] **Run NFR test coverage audit**
+  ```bash
+  bash .agentic/lib/tools/spec-audit.sh --nfr-test-coverage
   ```
 - [ ] **Promotion check**: are any feature-scoped constraints ready for promotion to project NFR?
 - [ ] **Threshold check**: are existing NFR thresholds still appropriate for project maturity?
-- [ ] **Gap check**: have bugs/incidents revealed quality gaps that should become NFRs?
+- [ ] **Gap check**: have bugs/incidents revealed quality gaps that should become NFRs? Use `ag nfr capture "statement"` to formalize.
 - [ ] **Catalog refresh**: re-run `ag nfr discover` — any new catalog suggestions relevant now?
 
 ---

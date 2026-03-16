@@ -3761,18 +3761,34 @@ cmd_nfr() {
             fi
             ;;
         coverage)
-            bash "$SCRIPT_DIR/nfr-coverage.sh" "${1:-summary}"
+            bash "$SCRIPT_DIR/nfr-health.sh" --coverage-only
+            ;;
+        health)
+            bash "$SCRIPT_DIR/nfr-health.sh" "$@"
+            ;;
+        sync)
+            bash "$SCRIPT_DIR/nfr-propagate.sh" sync "$@"
+            ;;
+        test-check)
+            bash "$SCRIPT_DIR/nfr-test-check.sh" "$@"
+            ;;
+        capture)
+            bash "$SCRIPT_DIR/nfr-capture.sh" "$@"
             ;;
         *)
             if [[ "$subcmd" =~ ^NFR-[0-9]{4}$ ]]; then
                 bash "$SCRIPT_DIR/nfr.sh" "$subcmd" "${1:-show}"
             else
-                echo "Usage: ag nfr [list|discover|coverage|NFR-XXXX]"
+                echo "Usage: ag nfr <command> [args]"
                 echo ""
                 echo "Commands:"
                 echo "  list               List all NFRs with status"
                 echo "  discover           Smart NFR recommendations based on stack"
+                echo "  health             NFR health report (status, coverage, staleness)"
                 echo "  coverage           NFR coverage across features"
+                echo "  sync F-XXXX        Compare current ACs vs expected NFR constraints"
+                echo "  test-check F-XXXX  Check NFR test coverage for a feature"
+                echo "  capture \"stmt\"     Capture informal invariant as structured NFR"
                 echo "  NFR-XXXX [show]    Show/update specific NFR"
             fi
             ;;
