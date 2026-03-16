@@ -609,6 +609,36 @@ case "${1:-}" in
     --since-last)
         cmd_verify_since_last
         ;;
+    --nfr-test-coverage)
+        # NFR test coverage across all shipped features with NFR references
+        echo -e "${BOLD}NFR Test Coverage Report${NC}"
+        echo ""
+        local_total=0
+        local_gaps=0
+        if [[ -f "$FEATURES_FILE" ]] && [[ -f "$NFR_FILE" ]]; then
+            shipped_fids=$(grep -E "^## F-[0-9]+:" "$FEATURES_FILE" -A5 | awk '/^## F-/{fid=$2; sub(/:$/,"",fid)} /[Ss]tatus.*shipped/{print fid}')
+            for fid in $shipped_fids; do
+                ac_file="$ACCEPTANCE_DIR/${fid}.md"
+                [[ -f "$ac_file" ]] || continue
+                # Check if this feature has any NFR references
+                if grep -qE 'NFR-[0-9]+' "$ac_file" 2>/dev/null; then
+                    local_total=$((local_total + 1))
+                    result=$(bash "$SCRIPT_DIR/nfr-test-check.sh" "$fid" 2>/dev/null)
+                    rc=$?
+                    if [[ $rc -ne 0 ]]; then
+                        local_gaps=$((local_gaps + 1))
+                        echo -e "  ${YELLOW}⚠${NC} ${fid}: NFR test gaps"
+                    else
+                        echo -e "  ${GREEN}✓${NC} ${fid}: NFR tests covered"
+                    fi
+                fi
+            done
+            echo ""
+            echo -e "${BOLD}Summary${NC}: ${local_total} features with NFR refs, ${local_gaps} with gaps"
+        else
+            echo "No FEATURES.md or NFR.md found."
+        fi
+        ;;
     --report)
         cmd_report
         ;;
@@ -630,6 +660,7 @@ Usage:
   bash spec-audit.sh --report                 # Full markdown report
   bash spec-audit.sh --propagate NFR-XXXX     # Trace NFR change downstream
   bash spec-audit.sh --propagate migration:NNN # Trace migration downstream
+  bash spec-audit.sh --nfr-test-coverage       # NFR test coverage across shipped features
   bash spec-audit.sh --status                 # QA tracker summary
   bash spec-audit.sh --resolve PQ-001         # Resolve propagation item
   bash spec-audit.sh --defer PQ-001 "reason"  # Defer with documented reason

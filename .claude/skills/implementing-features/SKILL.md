@@ -127,6 +127,7 @@ Do NOT write implementation code before its test exists. One AC at a time. `wip.
 4. Implement in small increments:
    - Write code following `references/programming_standards.md`
    - Add tests that verify acceptance criteria
+   - Check NFR test coverage: `bash .agentic/lib/tools/nfr-test-check.sh F-XXXX` — if gaps, add tests for applicable NFR constraints
    - Run tests after each significant change
 5. Checkpoint progress periodically:
    ```bash

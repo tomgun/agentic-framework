@@ -25,6 +25,14 @@ Write tests that verify acceptance criteria and prevent regressions.
 2. Read the code to understand behavior and edge cases
 3. Check `STACK.md` for test framework and conventions
 
+### Step 1.5: Check NFR Test Coverage
+
+If implementing a feature with a feature ID (F-XXXX):
+```bash
+bash .agentic/lib/tools/nfr-test-check.sh F-XXXX
+```
+If gaps are found (exit code 1), include the missing NFR constraints in your test plan below. Each applicable NFR should have at least one test verifying the constraint.
+
 ### Step 2: Design Test Cases
 
 For each acceptance criterion, identify:
