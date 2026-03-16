@@ -545,7 +545,7 @@ When a feature regresses from state A to state B, all intermediate states are **
 | committed → implementing | verified, documented |
 | shipped → specced | criteria_set, tests_written, implementing, verified, documented, committed |
 
-**Mode**: Currently **advisory** (`state_enforcement: advisory` for Formal/Autonomous, `off` for Discovery). Invalid transitions log warnings but don't block. Set `enforce=True` on `FeatureStateMachine` for blocking mode.
+**Mode**: `blocking` for Formal/Autonomous Formal profiles (`state_enforcement: blocking`), `off` for Discovery. In blocking mode, gate failures prevent the transition and `ag implement`/`ag done` exit non-zero. In advisory mode, gate failures warn but allow. To bypass blocking: set `state_enforcement: advisory` in STACK.md.
 
 ---
 
@@ -588,7 +588,7 @@ flowchart TB
 | `acceptance_criteria` | recommended | blocking | blocking |
 | `spec_directory` | no | yes | yes |
 | `spec_analysis` | off | on | on |
-| `state_enforcement` | off | advisory | advisory |
+| `state_enforcement` | off | blocking | blocking |
 | **Planning & Review** | | | |
 | `plan_review_enabled` | no | yes | yes |
 | `review_spec` | skip | critical_agent | critical_agent |

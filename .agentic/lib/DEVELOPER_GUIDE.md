@@ -1383,6 +1383,7 @@ Example: if your profile is `discovery` (which defaults `feature_tracking=no`) b
 | `pre_commit_checks` | fast | **full** |
 | `git_workflow` | direct | **pull_request** |
 | `plan_review_enabled` | no | **yes** |
+| `state_enforcement` | off | **blocking** |
 | `spec_directory` | no | **yes** |
 | `max_files_per_commit` | 15 | 10 |
 | `max_added_lines` | 1000 | 500 |
@@ -1408,6 +1409,7 @@ bash .agentic/lib/tools/enable-formal.sh
 | `max_code_file_length` | `pre-commit-check.sh` |
 | `git_workflow` | `pre-commit-check.sh` |
 | `feature_tracking` | `ag` commands, `session-start.sh` |
+| `state_enforcement` | `ag implement`, `ag done` |
 | `spec_directory` | `ag` commands |
 
 **Agent-interpreted settings** (session start only) — the agent reads STACK.md once at session start:

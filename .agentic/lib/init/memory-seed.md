@@ -69,6 +69,15 @@ If the user's intent is to fix, debug, repair, resolve, investigate, troubleshoo
 
 **STOP.** Write a failing test that reproduces the bug FIRST. Then fix it. Then verify the test passes.
 
+## State machine enforcement (F-0222)
+
+Three modes for `state_enforcement` in STACK.md:
+- **off** (Discovery default): Skip state transitions entirely. Crash recovery only.
+- **advisory**: Warn on gate failures but allow transitions.
+- **blocking** (Formal/Autonomous Formal default): Gate failures block transitions. `ag implement` and `ag done` exit non-zero.
+
+SKIP_TRANSITIONS (planned→implementing, planned→shipped, implementing→shipped, implementing→committed) are always valid regardless of enforcement mode. `ag done` also checks for an approved plan when `plan_review_enabled: yes` — this catches retroactive planning (§16 KEY_INSIGHTS). To bypass blocking: set `state_enforcement: advisory` in STACK.md.
+
 ## When committing or pushing
 
 If the user wants to commit, push, save, ship, or finalize changes — in any phrasing (e.g. "save changes", "create PR", "ready to go"):
