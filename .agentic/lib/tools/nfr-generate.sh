@@ -12,7 +12,9 @@
 #
 # Output: One block per NFR suggestion with ID, category, statement, priority, applies-to
 #
-# Exit codes: 0 = suggestions found, 1 = no catalog/no match
+# Exit codes:
+#   0 = suggestions found (or nothing to do: no catalog)
+#   1 = error (unknown project type with no fallback, missing catalog)
 
 set -uo pipefail
 

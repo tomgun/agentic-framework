@@ -8,7 +8,9 @@
 #   bash nfr-health.sh --coverage-only  # Backward-compatible coverage report
 #   bash nfr-health.sh --component X    # Filter by component
 #
-# Exit codes: 0 = healthy, 1 = issues found
+# Exit codes:
+#   0 = all NFRs met/unknown, or nothing to check (no NFR.md)
+#   1 = issues found (partial or violated NFRs in detail mode)
 
 set -uo pipefail
 
@@ -105,9 +107,35 @@ if [[ "$MODE" == "summary" ]]; then
     exit 0
 fi
 
-# --- JSON mode ---
+# --- JSON mode (per-NFR details + summary) ---
 if [[ "$MODE" == "json" ]]; then
-    echo "{\"total\":${total},\"met\":${met},\"partial\":${partial},\"violated\":${violated},\"unknown\":${unknown}}"
+    printf '{"summary":{"total":%d,"met":%d,"partial":%d,"violated":%d,"unknown":%d},"nfrs":[' \
+        "$total" "$met" "$partial" "$violated" "$unknown"
+    first=1
+    while IFS= read -r nfr_id; do
+        [[ -z "$nfr_id" ]] && continue
+        if [[ -n "$COMPONENT_FILTER" ]]; then
+            applies=$(awk -v id="$nfr_id" '
+                /^## / && $0 ~ id { found=1; next }
+                found && /^- Applies to:/ { sub(/^- Applies to: */, ""); print; exit }
+                found && /^## / { exit }
+            ' "$NFR_FILE")
+            echo "$applies" | grep -qi "$COMPONENT_FILTER" || continue
+        fi
+        nfr_name=$(awk -v id="$nfr_id" '/^## / && $0 ~ id {sub(/^## NFR-[0-9]+: */,""); print; exit}' "$NFR_FILE")
+        nfr_status=$(awk -v id="$nfr_id" '
+            /^## / && $0 ~ id { found=1; next }
+            found && /^- Current status:/ { sub(/^- Current status: */, ""); sub(/<!--.*/, ""); gsub(/^ *| *$/, ""); print; exit }
+            found && /^## / { exit }
+        ' "$NFR_FILE")
+        [[ -z "$nfr_status" ]] && nfr_status="unknown"
+        # Escape quotes in name for JSON safety
+        nfr_name=$(echo "$nfr_name" | sed 's/"/\\"/g')
+        [[ $first -eq 0 ]] && printf ','
+        printf '{"id":"%s","name":"%s","status":"%s"}' "$nfr_id" "$nfr_name" "$nfr_status"
+        first=0
+    done <<< "$NFR_IDS"
+    printf ']}\n'
     exit 0
 fi
 

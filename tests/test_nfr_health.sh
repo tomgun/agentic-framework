@@ -75,7 +75,7 @@ echo "Test: JSON mode"
 setup_project
 output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-health.sh --json 2>&1)
 if echo "$output" | grep -q '"total":2'; then
-    pass "JSON has correct total"
+    pass "JSON has correct total in summary"
 else
     fail "JSON should have total:2 (got: $output)"
 fi
@@ -83,6 +83,16 @@ if echo "$output" | grep -q '"met":1'; then
     pass "JSON has correct met count"
 else
     fail "JSON should have met:1"
+fi
+if echo "$output" | grep -q '"nfrs":\[' && echo "$output" | grep -q '"id":"NFR-0001"'; then
+    pass "JSON has per-NFR details array"
+else
+    fail "JSON should have per-NFR nfrs array with NFR-0001"
+fi
+if echo "$output" | grep -q '"status":"partial"'; then
+    pass "JSON has per-NFR status"
+else
+    fail "JSON should show partial status for NFR-0002"
 fi
 
 # --- Test 3: No NFR.md ---

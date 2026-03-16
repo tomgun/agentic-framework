@@ -6,7 +6,9 @@
 #   bash nfr-propagate.sh check [--all]     # Check NFR staleness across features
 #   bash nfr-propagate.sh sync F-XXXX       # Compare current AC vs derive output
 #
-# Exit codes: 0 = clean, 1 = issues found
+# Exit codes:
+#   0 = clean, or nothing to check (no NFR.md, no features, no applicable NFRs)
+#   1 = issues found (staleness, missing/extra NFR refs, legacy format detected)
 
 set -uo pipefail
 

@@ -7,6 +7,10 @@
 #
 # Assigns next NFR-XXXX ID, writes to NFR.md, optionally checks propagation.
 # Multi-agent safe: checks for other active agents before writing.
+#
+# Exit codes:
+#   0 = NFR captured (or safely logged to TODO.md when another agent is active)
+#   1 = error (no statement provided)
 
 set -uo pipefail
 

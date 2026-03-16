@@ -157,6 +157,27 @@ else
     fail "Mobile project missing M-01"
 fi
 
+# --- Test 13: Components filter includes matching P2 entries ---
+echo ""
+echo "Test: Components filter"
+setup_project "web"
+output=$(cd "$TEST_TMPDIR" && bash "$TOOL" --project-type web --components "security" 2>&1)
+if echo "$output" | grep -q "W-05\|CSRF"; then
+    pass "Components filter includes security-related P2 entries"
+else
+    fail "Components filter should include security-related P2 entries (W-05)"
+fi
+
+# --- Test 14: Audio/DSP project type ---
+echo ""
+echo "Test: Audio/DSP project type"
+output=$(cd "$TEST_TMPDIR" && bash "$TOOL" --project-type audio 2>&1)
+if echo "$output" | grep -q "D-01"; then
+    pass "Audio project includes D-01 (heap allocations)"
+else
+    fail "Audio project missing D-01"
+fi
+
 # --- Summary ---
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

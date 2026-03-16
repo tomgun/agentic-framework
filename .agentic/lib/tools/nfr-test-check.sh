@@ -7,7 +7,9 @@
 # Usage:
 #   bash nfr-test-check.sh F-XXXX
 #
-# Exit codes: 0 = all NFR constraints covered, 1 = gaps found
+# Exit codes:
+#   0 = all covered, or nothing to check (no NFR.md, no AC file, no applicable NFRs)
+#   1 = gaps found (applicable NFRs not referenced in ACs)
 #
 # Parsing: Scoped extraction from ## Acceptance Criteria, ### NFR Constraints,
 # and ## NFR Compliance sections only (NOT whole-file grep).
