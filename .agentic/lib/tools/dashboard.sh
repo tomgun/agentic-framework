@@ -169,6 +169,12 @@ if [[ -d "$PROJECT_ROOT/.agentic/spec/acceptance" ]] && [[ -f "$PROJECT_ROOT/.ag
         | grep -oE 'F-[0-9]+' || true)
 fi
 
+# DESIGN TRACE (pending source docs)
+D_DESIGN_TRACE=""
+if [[ -f "$TOOLS_DIR/design-trace.sh" ]]; then
+    D_DESIGN_TRACE=$(bash "$TOOLS_DIR/design-trace.sh" --quiet 2>/dev/null) || D_DESIGN_TRACE=""
+fi
+
 # UPGRADE
 D_UPGRADE="none"
 [[ -f "$PROJECT_ROOT/.agentic/.upgrade_pending" ]] && D_UPGRADE="pending"
@@ -251,6 +257,8 @@ if $RAW_MODE; then
     echo "$D_HEALTH"
     echo "===UPGRADE==="
     echo "$D_UPGRADE"
+    echo "===DESIGN_TRACE==="
+    echo "$D_DESIGN_TRACE"
     echo "===ORPHAN_PLANS==="
     echo "$D_ORPHAN_PLANS"
     echo "===TIP==="
@@ -356,6 +364,9 @@ if [[ -f "$ROOT_DIR/.agentic/spec/NFR.md" ]] && grep -qE '^## NFR-[0-9]+' "$ROOT
     if [[ -n "$nfr_summary" ]]; then
         echo "📊 NFRs           $nfr_summary"
     fi
+fi
+if [[ -n "$D_DESIGN_TRACE" ]]; then
+    echo "📐 Design trace   $D_DESIGN_TRACE — run: design-trace.sh"
 fi
 echo "✅ Health         $health_line"
 echo ""

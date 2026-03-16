@@ -51,6 +51,7 @@ def parse_features(md: str) -> List[Dict]:
                 "parent": None,
                 "complexity": None,
                 "component": None,
+                "source": None,
             }
             continue
 
@@ -91,6 +92,8 @@ def parse_features(md: str) -> List[Dict]:
             current["complexity"] = val.upper() if val and val.upper() in ['S', 'M', 'L', 'XL'] else None
         elif key == "component":
             current["component"] = val if val and val.lower() != "none" else None
+        elif key == "source":
+            current["source"] = val if val else None
     
     if current:
         features.append(current)

@@ -4867,6 +4867,52 @@ else
   fail "T-0160: parallel.py missing --skip-branch in prompt"
 fi
 
+echo ""
+
+# ============================================================
+echo "--- Design Document Traceability ---"
+
+# design-trace.sh exists and is executable
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/design-trace.sh" ]]; then
+  pass "design-trace.sh exists"
+else
+  fail "design-trace.sh missing"
+fi
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/design-trace.sh" ]]; then
+  pass "design-trace.sh is executable"
+else
+  fail "design-trace.sh is not executable"
+fi
+
+# feature.sh supports source field
+if grep -q 'source' "${FRAMEWORK_ROOT}/.agentic/lib/tools/feature.sh" 2>/dev/null; then
+  pass "feature.sh supports source field"
+else
+  fail "feature.sh missing source field support"
+fi
+
+# query_features.py parses source field
+if grep -q '"source"' "${FRAMEWORK_ROOT}/.agentic/lib/tools/query_features.py" 2>/dev/null; then
+  pass "query_features.py parses source field"
+else
+  fail "query_features.py missing source field"
+fi
+
+# dashboard.sh has design trace integration
+if grep -q 'design-trace' "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh" 2>/dev/null; then
+  pass "dashboard.sh has design trace integration"
+else
+  fail "dashboard.sh missing design trace integration"
+fi
+
+# memory-seed.md mentions source annotation
+if grep -q 'Source annotation' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md" 2>/dev/null; then
+  pass "memory-seed.md has Source annotation trigger"
+else
+  fail "memory-seed.md missing Source annotation trigger"
+fi
+
 # Summary
 # ============================================================
 echo ""
