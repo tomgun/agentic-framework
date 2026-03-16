@@ -449,3 +449,102 @@ class TestGetUnblocked:
         write_features(project_dir, [("F-0042", "Test", "shipped")])
         sm = FeatureStateMachine(project_root=project_dir)
         assert sm.get_unblocked() == []
+
+
+# ---------------------------------------------------------------------------
+# Blocking enforcement (F-0222)
+# ---------------------------------------------------------------------------
+
+class TestBlockingEnforcement:
+    """Tests for state_enforcement=blocking mode (F-0222)."""
+
+    def test_gate_failure_blocks_in_enforce_mode(self, project_dir):
+        """AC1: Gate failures block transitions when enforce=True."""
+        write_features(project_dir, [("F-0042", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+
+        def failing_gate(fid, root):
+            return GateResult(
+                allowed=False,
+                reasons=["Missing acceptance criteria file"],
+                warnings=[],
+            )
+
+        sm.register_gate(FeatureState.PLANNED, FeatureState.SPECCED, failing_gate)
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.SPECCED)
+        assert not allowed
+        assert any("Missing acceptance criteria" in m for m in msgs)
+
+    def test_gate_failure_advisory_allows(self, project_dir):
+        """AC1 inverse: Gate failures are advisory when enforce=False."""
+        write_features(project_dir, [("F-0042", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=False)
+
+        def failing_gate(fid, root):
+            return GateResult(
+                allowed=False,
+                reasons=["Missing acceptance criteria file"],
+                warnings=[],
+            )
+
+        sm.register_gate(FeatureState.PLANNED, FeatureState.SPECCED, failing_gate)
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.SPECCED)
+        assert allowed  # advisory lets it through
+
+    def test_skip_transitions_work_in_enforce_mode(self, project_dir):
+        """AC3: SKIP_TRANSITIONS (planned→implementing, planned→shipped) still work."""
+        write_features(project_dir, [("F-0042", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+
+        # planned -> implementing (legacy flow)
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.IMPLEMENTING)
+        assert allowed
+
+        # planned -> shipped (retroactive tracking)
+        allowed2, msgs2 = sm.can_transition("F-0042", FeatureState.SHIPPED)
+        assert allowed2
+
+    def test_error_messages_contain_gate_reason(self, project_dir):
+        """AC4: Error messages include the gate failure reason."""
+        write_features(project_dir, [("F-0042", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+
+        reason_text = "Spec file not found at spec/acceptance/F-0042.md"
+
+        def failing_gate(fid, root):
+            return GateResult(
+                allowed=False,
+                reasons=[reason_text],
+                warnings=[],
+            )
+
+        sm.register_gate(FeatureState.PLANNED, FeatureState.SPECCED, failing_gate)
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.SPECCED)
+        assert not allowed
+        assert any(reason_text in m for m in msgs)
+
+    def test_existing_features_not_retroactively_broken(self, project_dir):
+        """AC5: Features in inconsistent states aren't broken by enforcement.
+
+        Enforcement is forward-looking: it checks transitions, not existing state.
+        A feature already at 'implementing' with no AC file is fine — enforcement
+        only kicks in when you try to transition.
+        """
+        write_features(project_dir, [("F-0042", "Test", "implementing")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+
+        # Reading current state works fine
+        assert sm.get_current_state("F-0042") == FeatureState.IMPLEMENTING
+
+        # Forward transition from implementing still works (no gate registered)
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.VERIFIED)
+        assert allowed
+
+    def test_invalid_transition_blocked_in_enforce_mode(self, project_dir):
+        """Invalid transitions (not in any table) are blocked in enforce mode."""
+        write_features(project_dir, [("F-0042", "Test", "shipped")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+
+        allowed, msgs = sm.can_transition("F-0042", FeatureState.PLANNED)
+        assert not allowed
+        assert any("Invalid transition" in m for m in msgs)

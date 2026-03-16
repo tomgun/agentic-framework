@@ -40,7 +40,7 @@ Purpose: a single source of truth for "how we build and run software here".
 - worktree_mode: off
 # Auto-create worktrees for feature branches. Options: off | always. Profile defaults — Discovery: off | Formal: off
 - state_enforcement: off
-# Intent journal state enforcement. off: crash recovery only (skip transitions). advisory: warn on gate failures. blocking: block on gate failures. Profile defaults — Discovery: off | Formal: advisory
+# Intent journal state enforcement. off: crash recovery only (skip transitions). advisory: warn on gate failures. blocking: block on gate failures. Profile defaults — Discovery: off | Formal: blocking
 
 ### Periodic checks
 - periodic_orphaned_plans: every_session

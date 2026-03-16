@@ -1084,8 +1084,13 @@ cmd_implement() {
         echo "Transitioning state to implementing..."
         local transition_out=""
         local transition_rc=0
+        local _enforce_flag=""
+        if [ "$enforcement" = "blocking" ]; then
+            _enforce_flag="--enforce"
+        fi
         transition_out=$(python3 "$SCRIPT_DIR/../auto/state_machine.py" \
             --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" \
+            $_enforce_flag \
             transition "$feature_id" implementing 2>&1) || transition_rc=$?
         if [ "$transition_rc" -eq 0 ] || echo "$transition_out" | grep -q "no-op"; then
             echo -e "${GREEN}State: implementing${NC}"
@@ -1094,6 +1099,8 @@ cmd_implement() {
             if [ "$enforcement" = "blocking" ]; then
                 echo -e "${RED}BLOCKED: State transition failed${NC}"
                 echo "$transition_out"
+                echo ""
+                echo -e "${YELLOW}To bypass: set state_enforcement: advisory in STACK.md${NC}"
                 intent_cancel "$feature_id" || true
                 exit 1
             else
@@ -1762,8 +1769,13 @@ cmd_done() {
         for _target_state in $_done_states; do
             local _trans_out=""
             local _trans_rc=0
+            local _enforce_flag=""
+            if [ "$enforcement" = "blocking" ]; then
+                _enforce_flag="--enforce"
+            fi
             _trans_out=$(python3 "$SCRIPT_DIR/../auto/state_machine.py" \
                 --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" \
+                $_enforce_flag \
                 transition "$feature_id" "$_target_state" 2>&1) || _trans_rc=$?
             if [ "$_trans_rc" -eq 0 ] || echo "$_trans_out" | grep -q "no-op"; then
                 echo -e "${GREEN}State: $_target_state${NC}"
@@ -1771,6 +1783,8 @@ cmd_done() {
                 if [ "$enforcement" = "blocking" ]; then
                     echo -e "${RED}BLOCKED: State transition to $_target_state failed${NC}"
                     echo "$_trans_out"
+                    echo ""
+                    echo -e "${YELLOW}To bypass: set state_enforcement: advisory in STACK.md${NC}"
                     intent_cancel "$feature_id" || true
                     exit 1
                 else

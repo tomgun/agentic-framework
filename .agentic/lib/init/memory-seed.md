@@ -23,6 +23,8 @@ If the user's intent is to build, implement, add, create, set up, develop, make,
 
 AC clarity gate runs on first `ag implement` — vague ACs blocked in formal, advisory in discovery. Bypass: `SKIP_CLARITY=1`.
 
+**State enforcement** (`state_enforcement` setting): `off` = skip state machine (discovery default). `advisory` = warn on gate failures but proceed. `blocking` = block on gate failures (formal/autonomous_formal default). SKIP_TRANSITIONS (planned→implementing, planned→shipped) always work in all modes. Bypass: set `state_enforcement: advisory` in STACK.md.
+
 **A plan is NOT a spec.** Even when implementing from a detailed plan, create the formal artifacts (FEATURES.md entry + acceptance file) BEFORE writing any code. Plans contain design; specs contain the testable contract.
 5. If `spec_analysis` is enabled (default: on for formal/autonomous_formal, off for discovery), `spec-analyze.sh` runs advisory checks — review findings but proceed regardless
 

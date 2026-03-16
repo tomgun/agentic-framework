@@ -1387,6 +1387,7 @@ Example: if your profile is `discovery` (which defaults `feature_tracking=no`) b
 | `max_files_per_commit` | 15 | 10 |
 | `max_added_lines` | 1000 | 500 |
 | `max_code_file_length` | 1000 | 500 |
+| `state_enforcement` | off | **blocking** |
 
 > **PR workflow note:** When `git_workflow: pull_request`, `max_files_per_commit` and `max_added_lines` become **advisory warnings** on feature branches (the PR is the review unit, not individual commits). They remain blocking on `main`/`master`. `max_code_file_length` always blocks regardless of branch — it's a code quality limit, not a batch-size proxy.
 
@@ -1409,6 +1410,7 @@ bash .agentic/lib/tools/enable-formal.sh
 | `git_workflow` | `pre-commit-check.sh` |
 | `feature_tracking` | `ag` commands, `session-start.sh` |
 | `spec_directory` | `ag` commands |
+| `state_enforcement` | `ag implement`, `ag done` |
 
 **Agent-interpreted settings** (session start only) — the agent reads STACK.md once at session start:
 

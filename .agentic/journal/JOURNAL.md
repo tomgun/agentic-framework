@@ -2820,3 +2820,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-16 19:17 - F-0222 State Enforcement Blocking
+
+**Why**: Gate failures were advisory-only even in formal profiles because --enforce was never passed to state_machine.py
+
+**What changed**:
+- Wired --enforce flag from ag.sh to state_machine.py, changed formal/autonomous_formal defaults to blocking, added tests and docs
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+

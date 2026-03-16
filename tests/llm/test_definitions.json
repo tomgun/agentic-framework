@@ -1660,6 +1660,34 @@
         "file_not_exists": [],
         "max_commits": null
       }
+    },
+    {
+      "id": "079_state_enforcement_blocking",
+      "description": "Agent blocks transition when state_enforcement is blocking and gate fails",
+      "section": "trigger",
+      "category": "Important",
+      "llm_test_id": "LLM-079",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "## Settings\n- profile: formal\n- state_enforcement: blocking\n"
+        }
+      },
+      "prompt": "I want to implement F-0042 but the acceptance criteria file is missing. What will happen when I run ag implement?",
+      "expected": {
+        "output_contains": [
+          "block|blocking|BLOCKED|fail|reject|prevent"
+        ],
+        "output_contains_any": [
+          "state_enforcement|gate|transition|acceptance criteria"
+        ],
+        "output_not_contains": [
+          "advisory|warning only|proceed anyway"
+        ],
+        "file_exists": [],
+        "file_not_exists": [],
+        "max_commits": null
+      }
     }
   ]
 }
