@@ -2842,6 +2842,16 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### F-0222: State Machine Enforcement = Blocking + Context Provenance Insights
+
+**User insight**: Forward-looking gates only work when the workflow runs in order. When agents implement first and plan retroactively, gates designed for plan→implement flow become dead code. The fix: make gate conditions state-based ("approved plan exists") rather than position-based ("you're about to implement"), so they work regardless of execution order. Led to §16 in KEY_INSIGHTS.md.
+
+**User insight**: Agents cannot distinguish context provenance — they fabricate narratives about what the user did when context actually came from a prior agent session. When the user was AFK and a plan existed from a prior session, the agent claimed "the user explicitly pasted the plan." Don't invent provenance stories — say what you observe. Led to §15 in KEY_INSIGHTS.md.
+
+**Design direction**: `ag done` now has a plan backstop — checks for approved plan when `plan_review_enabled: yes`, catching features that were implemented without proper planning regardless of whether `ag implement` was ever run. State-based check, not workflow-position check.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.55.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

@@ -684,6 +684,22 @@ The fix is to change the enforcement mechanism, not the enforcement text. Move f
 
 Framework roles (review, test, implementation) → invoked via `/review`, `/test` (Skill tool). Built-in agent types (Bash, general-purpose, Explore, Plan) → invoked via Agent tool. Completely separate systems.
 
+### Retroactive planning defeats forward-looking gates
+
+When an agent implements first and plans after (often after being caught), all forward-looking gates become dead code. The POST-PLAN-MODE block says "Do NOT code" — but code already exists, so the agent skips it. `ag implement`'s plan gate is never reached because implementation already happened. Dialectical review feels optional because flaws are already in the code.
+
+**Observed in F-0222**: Agent implemented without a plan → user caught it → agent planned retroactively → exited plan mode → skipped saving plan, skipped POST-PLAN-MODE block, skipped dialectical review. All three are forward-looking gates that assumed implementation hadn't happened yet.
+
+**Fix direction**: Gates must check *actual state* (does an approved plan exist?) not *assumed ordering* (you're about to implement). `ag plan` should detect retroactive planning via feature state in FEATURES.md. `ag done` could verify an approved plan exists before shipping. State-based checks are order-independent; workflow-position checks are fragile.
+
+**Full analysis**: `docs/KEY_INSIGHTS.md` §16 — "Retroactive Planning Defeats Forward-Looking Gates"
+
+### Agents misattribute actions to the user when context comes from other sources
+
+Agents can't distinguish user-typed content from context inherited from prior agents. In the F-0222 session, a plan was created in plan mode and accepted by the user, but the agent skipped saving it durably and skipped dialectical review. When a new session started, the new agent saw the plan in context and fabricated a false narrative: "the user explicitly pasted the plan." The user had been AFK the entire time. Don't invent provenance stories — say what you observe without asserting who put it there.
+
+**Full analysis**: `docs/KEY_INSIGHTS.md` §15 — "Agents Cannot Distinguish Context Provenance"
+
 ---
 
 ## Quick Reference: "I'm changing..."
