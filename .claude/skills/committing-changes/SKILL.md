@@ -10,7 +10,7 @@ compatibility: "Requires Claude Code with shell access and git."
 allowed-tools: [Bash, Read, Edit, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.60.0"
+  version: "0.61.0"
 ---
 
 # Committing Changes
@@ -97,13 +97,22 @@ After human approves:
    ```
    Stay on main — the feature branch work is done (it's in the PR now).
 
-### Step 7: Post-Merge (run automatically — don't wait for user)
+### Step 7: Merge + Complete (structural chaining — don't wait for user)
 
-When you merge a PR (via `gh pr merge`) or the user says "merge", IMMEDIATELY
-run `ag done F-XXXX` on main as the next step. Do not suggest it — just do it.
-This bumps VERSION, updates FEATURES.md status, advances the backlog, and
-flushes state to main. The post-merge flow is part of the merge, not a
-separate action.
+When merging a PR, use `ag merge <pr#> F-XXXX` instead of `gh pr merge`.
+This structurally chains the merge with `ag done` — the completion flow
+runs automatically as part of the merge, not as a separate step.
+
+If the user says "merge" or you need to merge:
+```bash
+bash .agentic/lib/tools/ag.sh merge <pr-number> F-XXXX
+```
+
+This command: merges the PR → switches to main → runs `ag done F-XXXX`
+(which runs automated verification, bumps VERSION, marks shipped, advances backlog).
+
+If you already ran `gh pr merge` directly, IMMEDIATELY run `ag done F-XXXX`
+as the next step. Do not suggest it — just do it.
 
 ## Examples
 
