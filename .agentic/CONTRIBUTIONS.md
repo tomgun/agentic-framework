@@ -8,6 +8,10 @@
 
 ## Recent Contributions
 
+### Design Document Traceability
+
+**User insight**: Tomas identified a gap in the framework's design-to-implementation tracking: when users create big design documents (ADRs, roadmaps, kickoff visions), those documents spawn multiple features over days/weeks, but nothing tracks completion against the original design. Users re-describe ideas because they forgot what was already planned. Tomas asked: "do we have a mechanism to come back to the original plan and review if everything has been specced and implemented?" The initial approach was to auto-scan design docs for F-XXXX references, but Tomas's critical review found this fundamentally broken: ADR-001 describes features in prose (F-IDs get assigned later during decomposition), per-feature plans trivially reference their own F-ID (noise), and reference docs like HOW_IT_WORKS.md contain 93 F-IDs (documentation, not design intent). The link between "ADR-001 said we need components" and "F-0179 implements component registry" exists only in human memory — which is exactly the problem. The solution: explicit `**Source**:` annotation at feature creation time (when the agent has both the design doc and the new feature in context), plus a reverse-index tracker that reports completion % per source document.
+
 ### Systematic Quality Improvement for User Projects (Epic)
 
 **User insight**: Tomas framed the problem: user projects need agents that write clear ACs with NFR constraints baked in, implement against those ACs, and write tests that prove ACs are met. He identified three specific pain points — NFRs as paperwork in a separate section, spec-analyze.sh being advisory-only, and no test-to-AC verification — and directed the plan through 4 dialectical review iterations, requiring revisions at each round until the architecture was sound. The review process itself surfaced critical issues: the 95% flat-list fallback gap (which led to the non-regressive 80% threshold), the `--force` flag namespace collision, and the re-implement skip mechanism need.

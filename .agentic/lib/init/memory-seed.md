@@ -6,7 +6,7 @@ tokens: ~1280
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.58.2 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -108,6 +108,8 @@ If the user says "it must always...", "never do X", "performance must stay under
 If the user says decompose, break down, split into children, break apart, subdivide, or wants to turn a large feature into smaller child features:
 
 **STOP.** Run `ag decompose F-XXXX`. This analyzes the epic's acceptance criteria, maps them to components, proposes child features, and routes through the `review_decomposition` checkpoint. Child features get `Parent: F-XXXX` in FEATURES.md. The epic's status is automatically derived from its children's statuses after any child transition.
+
+**Source annotation**: When creating features from a design document (ADR, roadmap, epic plan, kickoff vision), add `**Source**: <path>` to the FEATURES.md entry. This links features to their originating design doc. Run `bash .agentic/lib/tools/design-trace.sh` to see completion % per source document. `ag decompose` propagates the parent's Source to children automatically.
 
 ## When the user wants to execute an epic autonomously
 

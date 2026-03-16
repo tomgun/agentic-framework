@@ -276,6 +276,7 @@ def create_child_features(
 
     Appends new feature sections to FEATURES.md with Parent field.
     Creates component-scoped AC files in spec/acceptance/.
+    Propagates **Source** from the parent epic to child features.
 
     Args:
         project_root: Project root path.
@@ -296,11 +297,14 @@ def create_child_features(
     # Get epic metadata for context
     epic_name = _get_feature_name(features_file, epic_id) or epic_id
     epic_category = _get_feature_category(features_file, epic_id)
+    epic_source = _get_feature_source(features_file, epic_id)
 
     # Build FEATURES.md entries
     new_sections: list[str] = []
     for child in children:
-        section = _build_feature_section(child, epic_name, epic_category)
+        section = _build_feature_section(
+            child, epic_name, epic_category, epic_source,
+        )
         new_sections.append(section)
 
     # Append to FEATURES.md
@@ -504,6 +508,25 @@ def _get_feature_parent(features_file: Path, feature_id: str) -> Optional[str]:
     return parent_match.group(1) if parent_match else None
 
 
+def _get_feature_source(features_file: Path, feature_id: str) -> Optional[str]:
+    """Read a feature's source design document from FEATURES.md."""
+    if not features_file.exists():
+        return None
+    content = features_file.read_text()
+    pattern = re.compile(
+        rf"^## {re.escape(feature_id)}:.*$", re.MULTILINE
+    )
+    match = pattern.search(content)
+    if not match:
+        return None
+
+    section = _extract_section(content, match.end())
+    source_match = re.search(
+        r"(?:\*\*Source\*\*|- Source):\s*(.+?)$", section, re.MULTILINE
+    )
+    return source_match.group(1).strip() if source_match else None
+
+
 def _get_children_statuses(
     features_file: Path, parent_id: str
 ) -> list[str]:
@@ -628,7 +651,8 @@ def _match_component(
 
 
 def _build_feature_section(
-    child: dict, epic_name: str, category: Optional[str] = None
+    child: dict, epic_name: str, category: Optional[str] = None,
+    source: Optional[str] = None,
 ) -> str:
     """Build a FEATURES.md section for a child feature."""
     cat = category or "Uncategorized"
@@ -639,6 +663,8 @@ def _build_feature_section(
         f"**Category**: {cat}",
         f"**Parent**: {child['parent']}",
     ]
+    if source:
+        lines.append(f"**Source**: {source}")
     if child.get("component"):
         lines.append(f"**Component**: {child['component']}")
     lines.extend([

@@ -37,6 +37,7 @@ Fields:
   tests        - todo | partial | complete | n/a
   accepted     - yes | no
   parent       - F-XXXX (parent feature ID)
+  source       - path to design document (ADR, roadmap, epic plan)
 
 Examples:
   bash feature.sh F-0003 status in_progress
@@ -45,6 +46,7 @@ Examples:
   bash feature.sh F-0003 tests complete
   bash feature.sh F-0003 accepted yes
   bash feature.sh F-0003 parent F-0001
+  bash feature.sh F-0003 source spec/adr/ADR-001.md
 USAGE
   exit 1
 fi
@@ -84,6 +86,7 @@ if [[ "${FORMAT}" == "table" ]]; then
     tests)      COL=5; VALUE=$(echo "${VALUE}" | sed 's/todo/-/; s/n\/a/-/') ;;
     accepted)   COL=6 ;;
     parent)     echo "Error: parent field not supported in table format"; exit 1 ;;
+    source)     echo "Error: source field not supported in table format"; exit 1 ;;
     *) echo "Error: Unknown field ${FIELD}"; exit 1 ;;
   esac
 
@@ -108,9 +111,11 @@ if [[ "${FORMAT}" == "table" ]]; then
 else
   # Heading format: ## F-0003: Name with - Status: lines
   awk -v fid="${FEATURE_ID}" -v field="${FIELD}" -v value="${VALUE}" -v ts="${TIMESTAMP}" '
+  BEGIN { SOURCE_DONE = 0 }
   /^##[#]? F-[0-9][0-9][0-9][0-9]:/ {
     if ($0 ~ fid) {
       IN_FEATURE = 1
+      SOURCE_DONE = 0
     } else {
       IN_FEATURE = 0
     }
@@ -141,6 +146,24 @@ else
     } else {
       print "- Parent: " value
     }
+    next
+  }
+
+  IN_FEATURE && field == "source" && /^(\*\*Source\*\*|- Source):/ {
+    if ($0 ~ /^\*\*Source\*\*/) {
+      print "**Source**: " value
+    } else {
+      print "- Source: " value
+    }
+    SOURCE_DONE = 1
+    next
+  }
+
+  # Insert **Source** after **Status** if not already present
+  IN_FEATURE && field == "source" && !SOURCE_DONE && /^\*\*Status\*\*:/ {
+    print
+    print "**Source**: " value
+    SOURCE_DONE = 1
     next
   }
 

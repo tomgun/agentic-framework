@@ -2964,6 +2964,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Status**: shipped
 **Category**: Architecture
+**Source**: spec/adr/ADR-001-multi-component-architecture.md
 **Priority**: high
 **Complexity**: medium
 **Since**: v0.48.0
@@ -3069,6 +3070,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Status**: shipped
 **Category**: Architecture
+**Source**: spec/adr/ADR-001-multi-component-architecture.md
 **Priority**: high
 **Complexity**: high
 **Since**: v0.50.0
@@ -3111,6 +3113,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Status**: shipped
 **Category**: Autonomous
+**Source**: spec/adr/ADR-001-multi-component-architecture.md
 **Priority**: high
 **Complexity**: high
 **Since**: v0.52.0
@@ -3153,6 +3156,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 **Status**: shipped
 **Category**: Autonomous
+**Source**: spec/adr/ADR-001-multi-component-architecture.md
 **Priority**: high
 **Complexity**: high
 **Since**: v0.52.0
