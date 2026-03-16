@@ -23,13 +23,19 @@ The complete reference for understanding, using, and maintaining the Agentic Fra
   - [Section 9: Autonomous Execution Modes](#section-9-autonomous-execution-modes)
   - [Section 10: Verification Pyramid](#section-10-verification-pyramid)
   - [Section 11: Quality Gates Complete Reference](#section-11-quality-gates-complete-reference)
+- [Part III-B: Deep Pipeline Sections](#part-iii-b-deep-pipeline-sections)
+  - [The Testing Pipeline — End to End](#the-testing-pipeline--end-to-end)
+  - [Section 12: The Spec Derivation Pipeline — From NFRs + Features to Testable ACs](#section-12-the-spec-derivation-pipeline--from-nfrs--features-to-testable-acs)
+  - [Section 13: From ACs to Tests — How Test Types Are Decided](#section-13-from-acs-to-tests--how-test-types-are-decided)
+  - [Section 14: The Verification Loop — From "Tests Fail" to "Commit"](#section-14-the-verification-loop--from-tests-fail-to-commit)
+  - [Section 15: Research Phase and Project-Aware Context Assembly](#section-15-research-phase-and-project-aware-context-assembly)
 - [Part IV: The Bigger Picture](#part-iv-the-bigger-picture)
-  - [Section 12: Current Inventory (v0.61.0)](#section-12-current-inventory-v0610)
-  - [Section 13: What's In Flight](#section-13-whats-in-flight)
-  - [Section 14: Opportunity Map](#section-14-opportunity-map)
+  - [Section 16: Current Inventory (v0.61.0)](#section-16-current-inventory-v0610)
+  - [Section 17: What's In Flight](#section-17-whats-in-flight)
+  - [Section 18: Opportunity Map](#section-18-opportunity-map)
 - [Part V: Quick References](#part-v-quick-references)
-  - [Section 15: Command Quick Reference](#section-15-command-quick-reference)
-  - [Section 16: Recovery Playbook](#section-16-recovery-playbook)
+  - [Section 19: Command Quick Reference](#section-19-command-quick-reference)
+  - [Section 20: Recovery Playbook](#section-20-recovery-playbook)
 
 ---
 
@@ -961,9 +967,595 @@ Six levels of verification, from narrowest to broadest:
 
 ---
 
+# Part III-B: Deep Pipeline Sections
+
+> **Running example**: Every section below follows **F-0042: User Login** — a feature requiring username/password authentication with session management. NFR-0007 constrains response time to < 500ms. By tracing one feature end to end, you can see how each pipeline stage transforms the previous stage's output.
+
+## The Testing Pipeline — End to End
+
+Before zooming into each stage, here's the complete pipeline from NFR + feature definition through to commit:
+
+```mermaid
+flowchart TD
+    subgraph Spec["1. Spec Derivation (Section 12)"]
+        NFR["NFR.md\n(NFR-0007: response < 500ms)"]
+        FEAT["FEATURES.md entry\n(F-0042: User Login)"]
+        NFR --> APPLICABLE["nfr-applicable.sh F-0042\n→ determines which NFRs apply"]
+        FEAT --> APPLICABLE
+        APPLICABLE --> DERIVE["nfr-propagate.sh derive F-0042\n→ generates AC-010+ from NFR statements"]
+        DERIVE --> AC_FILE["spec/acceptance/F-0042.md\nCore ACs (001-009) + NFR ACs (010+)"]
+        AC_FILE --> CLARITY["spec-analyze.sh --gate\n→ checks ACs are testable"]
+    end
+
+    subgraph Tests["2. Test Type Decisions (Section 13)"]
+        CLARITY --> SKILL["writing-tests skill\n+ test_strategy.md guidance"]
+        SKILL --> UNIT["Unit tests\n(AC-001, AC-002, AC-004)"]
+        SKILL --> INTEG["Integration tests\n(AC-003, AC-005, AC-010)"]
+        SKILL --> LLM["LLM behavioral tests\n(AC-020)"]
+    end
+
+    subgraph Verify["3. Verification Loop (Section 14)"]
+        UNIT --> TIER1["Tier 1: Run unit tests"]
+        INTEG --> TIER2["Tier 2: Run integration tests"]
+        LLM --> TIER3["Tier 3: Run LLM tests"]
+        TIER1 -->|"fail → spawn Claude fix → re-run\n(max 5 iterations)"| TIER1
+        TIER1 -->|pass| TIER2
+        TIER2 -->|"fail → fix loop"| TIER2
+        TIER2 -->|pass| TIER3
+        TIER3 -->|pass| POST["Post-verification"]
+    end
+
+    subgraph Post["4. Post-Verification → Commit"]
+        POST --> VIS{"--visual flag?"}
+        VIS -->|yes| VISUAL["Screenshot analysis\n(advisory)"]
+        VIS -->|no| REVIEW
+        VISUAL --> REVIEW{"review_commit\nsetting?"}
+        REVIEW -->|critical_agent| CA["CriticalAgent reviews\nstaged diff + ACs"]
+        REVIEW -->|human| HUMAN["Human reviews diff"]
+        CA -->|approved| DRIFT["drift.sh --docs\n→ check doc staleness"]
+        HUMAN --> DRIFT
+        DRIFT --> COMMIT["git commit"]
+    end
+```
+
+---
+
+## Section 12: The Spec Derivation Pipeline — From NFRs + Features to Testable ACs
+
+**What this section covers**: How a feature entry in FEATURES.md combines with project-wide NFRs to produce a complete, testable acceptance criteria file.
+
+### Running Example: F-0042 Setup
+
+**FEATURES.md entry**:
+```markdown
+## F-0042: User Login
+**Status**: implementing
+**Category**: Backend
+**Description**: Username/password authentication with session management and rate limiting
+```
+
+**NFR.md entry** (one of several that may apply):
+```markdown
+## NFR-0007: API Response Time
+- Category: performance
+- Statement: All API endpoints must respond within 500ms p95 latency
+- Applies to: component:backend, component:api
+- How to measure: Load test results; p95 latency < 500ms
+- Current status: met
+```
+
+### The AC Template Structure
+
+Every acceptance criteria file follows the template at `.agentic/lib/templates/acceptance.template.md`. The key structural elements:
+
+```markdown
+# F-####: [Feature Name] - Acceptance Criteria
+**Feature**: [One-sentence description]
+
+## Behavior (what the user needs — technology-agnostic)
+
+## Acceptance Criteria
+
+### [Core Behavior] (P1 — MVP)
+**Verify independently**: [how to test this group alone]
+- [ ] **AC-001**: [Criterion]
+- [ ] **AC-002**: [Criterion]
+
+### [Enhanced Experience] (P2 — better but optional)
+- [ ] **AC-003**: [Criterion]
+
+### NFR Constraints (P1 — required)
+<!-- Auto-populated by: bash .agentic/lib/tools/nfr-propagate.sh derive F-XXXX -->
+- [ ] **AC-010**: [NFR constraint made testable] (NFR-XXXX)
+
+## Verification
+### Tests
+#### Unit Tests
+- [ ] `[test file]` — [what it verifies]
+#### Integration Tests (if crossing boundaries)
+- [ ] `[test file]` — [what it verifies]
+#### Behavioral / LLM Tests (if feature changes agent decision-making)
+- [ ] **[TEST-ID]**: [prompt scenario] → agent should [behavior]
+
+## Out of Scope
+```
+
+**Key design decision**: Core ACs use IDs 001-009. NFR-derived ACs start at **AC-010**. This deliberate numbering gap means you can always tell at a glance which ACs are feature-specific vs. NFR-derived.
+
+### How `nfr-propagate.sh derive` Works Step by Step
+
+```mermaid
+flowchart LR
+    A["nfr-propagate.sh\nderive F-0042"] --> B["Calls nfr-applicable.sh F-0042"]
+    B --> C["For each applicable NFR:\nextract Statement from NFR.md"]
+    C --> D["Generate AC-010, AC-011, ...\nwith NFR ID in parens"]
+    D --> E["Output: ### NFR Constraints\nsection ready to insert"]
+```
+
+**Step 1 — Determine applicable NFRs**: Calls `nfr-applicable.sh F-0042`, which matches NFRs to the feature using three strategies:
+- **Global NFRs** (match `"global|all work|all features"` in "Applies to:") — always apply, high confidence
+- **Component-scoped** (match `"component:X"` tags against feature category/description) — high confidence
+- **Keyword overlap** (words ≥4 chars from "Applies to:" matched against feature context, excluding stop-words) — low confidence, marked with `(?)`
+
+**Step 2 — Extract statements**: For each applicable NFR, extracts the `Statement:` field from NFR.md.
+
+**Step 3 — Generate ACs**: Formats each as a checkbox line starting at `ac_num=10`:
+```
+- [ ] **AC-010**: All API endpoints must respond within 500ms p95 latency (NFR-0007)
+- [ ] **AC-011**: Work should be planned in small batches (~10 files per commit) (NFR-0003)
+```
+
+**Step 4 — Output**: A complete `### NFR Constraints (P1 — required)` markdown block, ready to paste into the AC file. If no NFRs apply, outputs: `<!-- NFRs: none applicable — evaluated YYYY-MM-DD -->`
+
+### Concrete Before/After for F-0042
+
+**Before** (agent writes core ACs manually):
+```markdown
+## Acceptance Criteria
+
+### Core Login (P1 — MVP)
+**Verify independently**: POST /api/login with valid/invalid credentials
+- [ ] **AC-001**: Login form accepts username and password
+- [ ] **AC-002**: Invalid credentials return 401 with error message
+- [ ] **AC-003**: Successful login redirects to dashboard with session cookie
+
+### Security (P1)
+- [ ] **AC-004**: Passwords stored using bcrypt with cost factor ≥ 12
+- [ ] **AC-005**: Rate limiting: max 5 failed attempts per IP per 15 minutes
+```
+
+**After** (`nfr-propagate.sh derive F-0042` output inserted):
+```markdown
+### NFR Constraints (P1 — required)
+**Verify independently**: Check each constraint against the feature implementation
+- [ ] **AC-010**: All API endpoints must respond within 500ms p95 latency (NFR-0007)
+- [ ] **AC-011**: Acceptance criteria must exist before implementation (NFR-0004)
+```
+
+### Keeping NFRs in Sync
+
+| Tool | Command | Purpose |
+|------|---------|---------|
+| `nfr-applicable.sh` | `nfr-applicable.sh F-0042` | Which NFRs apply to this feature? |
+| `nfr-propagate.sh derive` | `nfr-propagate.sh derive F-0042` | Generate `### NFR Constraints` section |
+| `nfr-propagate.sh check` | `nfr-propagate.sh check --all` | Staleness: is NFR.md newer than AC file? (mtime comparison) |
+| `nfr-propagate.sh sync` | `nfr-propagate.sh sync F-0042` | Diff current AC file vs. fresh derive output (detects MISSING, EXTRA, LEGACY) |
+| `nfr-test-check.sh` | `nfr-test-check.sh F-0042` | Which applicable NFRs lack test references in ACs? |
+| `nfr-coverage.sh` | `nfr-coverage.sh --detail` | Cross-feature: which features reference each NFR? |
+| `spec-analyze.sh` | `spec-analyze.sh F-0042 --gate` | Clarity gate: flags vague terms without metrics, AC↔test gaps, NFR measurability |
+| `check-spec-health.sh` | `check-spec-health.sh F-0042` | Structural health: required sections present, test files exist, ACs checked |
+
+### The Clarity Gate
+
+`spec-analyze.sh` performs three semantic checks on the AC file:
+
+1. **Ambiguity detection** — Scans for vague words (`fast`, `scalable`, `efficient`, `responsive`, `performant`, etc.) and only flags them if **no metric is nearby** (no numbers, no `<`, `>`, `≤`, `within`, `under`, `at least`, etc.). Provides rewrite suggestions.
+
+2. **AC↔test coverage gaps** — Identifies ACs with no corresponding test reference in the Verification section.
+
+3. **NFR measurability** — Checks each referenced NFR exists in NFR.md and has a non-placeholder "How to measure" field.
+
+In **Formal** profile, `--gate` mode makes CRITICAL findings exit 1 (blocking). In **Discovery**, it's advisory only.
+
+---
+
+## Section 13: From ACs to Tests — How Test Types Are Decided
+
+**What this section covers**: The framework doesn't have an automatic routing engine that maps ACs to test types. Instead, it guides agents through three layers of structure that converge on the right test type for each AC.
+
+### Running Example: F-0042 AC-to-Test Mapping
+
+```
+AC file structure                    Test type           Why this type
+──────────────                       ─────────           ─────────────
+### Core Login (P1)
+  AC-001: login form accepts         Unit test           Isolated component rendering
+          username/password
+  AC-002: invalid creds → 401        Unit test           Validation logic, no external deps
+  AC-003: success → redirect         Integration test    Session creation + HTTP redirect
+          with session cookie
+
+### Security (P1)
+  AC-004: bcrypt with cost ≥ 12      Unit test           Pure crypto function
+  AC-005: rate limiting (5/15min)    Integration test    Stateful, time-based, cross-request
+
+### NFR Constraints (P1)
+  AC-010: response < 500ms           Integration test    Performance benchmark under load
+
+### Behavioral / LLM Tests
+  AC-020: agent follows login flow   LLM behavioral      Tests agent decision-making
+```
+
+### The Three Layers That Guide Test Type Decisions
+
+**Layer 1: The AC Template Structure**
+
+The acceptance template's `## Verification` section has explicit sub-sections for each test type (Unit Tests, Integration Tests, Behavioral/LLM Tests). The agent plans tests **in the spec, before writing code** — this is enforced by `feature_start.md` Gate 1. By requiring the agent to assign each AC to a test section during spec writing, the test type decision happens at design time, not as an afterthought.
+
+**Layer 2: The `writing-tests` Skill**
+
+When writing tests, the skill at `.claude/skills/writing-tests/SKILL.md` follows a 4-step process:
+
+1. **Understand what to test** — Read ACs from `spec/acceptance/F-XXXX.md`
+2. **Step 1.5: Check NFR test coverage** — Run `nfr-test-check.sh F-XXXX` to find gaps
+3. **Design test cases** — For each AC: happy path, edge cases, error cases
+4. **Write tests** — Match existing project conventions, run and verify
+
+**Layer 3: The `test_strategy.md` Reference**
+
+The canonical test strategy at `.agentic/lib/quality/test_strategy.md` defines:
+
+- **Test pyramid**: Unit (most, fast, deterministic) → Integration (boundaries: DB, network, filesystem) → E2E (critical user flows, smallest count)
+- **What makes a test "unit"**: Component with **controlled dependencies** (mocked/faked). If it touches real network, DB, or filesystem → integration, not unit.
+- **Seven test categories** every AC should consider:
+
+| Category | When Required | Example for F-0042 |
+|----------|---------------|---------------------|
+| Happy path | Always | Valid login returns 200 + session |
+| Edge cases | Always | Empty password, max-length username |
+| Invalid input | Always | SQL injection in username field |
+| Error cases | Always | DB connection failure during login |
+| Time-based | If applicable | Rate limit window expiration |
+| Concurrency | If applicable | Simultaneous login from same IP |
+| Network failures | If applicable | Auth service timeout handling |
+
+### Agent Context Assembly for Test Writing
+
+When the autonomous engine spawns a test-writing agent, it receives context from the `test-agent.yaml` manifest (4,000 token budget):
+
+| Required file | What it provides |
+|---------------|------------------|
+| `spec/acceptance/{feature_id}.md` | The ACs to write tests for |
+| `STACK.md[test_framework,test_commands]` | Test runner, framework, tier commands |
+| `.agentic/quality/test_strategy.md` | Test pyramid, 7 categories, edge case guidance |
+| `anti-hallucination.md` | Prevent fabricating test expectations |
+
+### STACK.md Test Tier Configuration
+
+STACK.md defines named test tiers that the verification loop (Section 14) uses:
+
+```markdown
+Test commands:
+  - Unit: `npm run test`
+  - E2E API: `pytest tests/e2e/api/`
+  - E2E UI: `npx playwright test`
+```
+
+Each tier becomes a `TestTier` object with its own command, timeout, and fix iteration limit. E2E tiers automatically get 300s timeout (vs. 120s default for unit).
+
+**Auto-detection fallback** — If no `Test commands:` section exists in STACK.md, the framework detects test runners from project files:
+
+| Marker file | Detected command |
+|-------------|-----------------|
+| `pytest.ini` or `pyproject.toml` | `python -m pytest` |
+| `package.json` | `npm test` |
+| `Cargo.toml` | `cargo test` |
+| `go.mod` | `go test ./...` |
+| `tests/run_tests.sh` | `bash tests/run_tests.sh` |
+
+### TDD Workflow
+
+When `development_mode: tdd` is set in STACK.md, the test-first cycle applies per AC:
+
+```
+Pick AC → Write failing test (RED) → Minimal implementation (GREEN) → Refactor → Commit
+```
+
+Pre-commit Check 20 enforces phase ordering. Each phase gets a separate commit with a checkpoint recorded via `wip.sh`.
+
+---
+
+## Section 14: The Verification Loop — From "Tests Fail" to "Commit"
+
+**What this section covers**: The `VerifyLoop` class in `.agentic/lib/auto/verify.py` is the engine that runs tests, detects failures, spawns Claude to fix code, and re-runs until green. This section traces its mechanics with a concrete failure scenario.
+
+### Running Example: AC-005 Rate Limiting Test Fails
+
+The integration test for AC-005 (rate limiting: max 5 failed attempts per IP per 15 minutes) fails because the rate limiter isn't resetting its counter correctly. Here's what the verification loop does.
+
+### VerifyLoop Inner Mechanics
+
+```mermaid
+flowchart TD
+    START["VerifyLoop.run()"] --> DETECT["_detect_test_tiers()\nParse STACK.md → list of TestTier"]
+    DETECT --> LOOP["For each tier (unit → integration → e2e):"]
+
+    LOOP --> RUN["Run tests (subprocess, per-tier timeout)"]
+    RUN --> PARSE["_parse_test_output()\n5 explicit parsers + generic fallback"]
+
+    PARSE --> CHECK{All pass?\nexit_code=0 AND failed=0}
+    CHECK -->|Yes| NEXT_TIER["Next tier"]
+    CHECK -->|No| BUILD["_build_fix_prompt()\ntier-specific flavor"]
+
+    BUILD --> SPAWN["Spawn fresh Claude\nwith failure details"]
+    SPAWN --> APPLIED["Claude applies fix"]
+    APPLIED --> ITER{"Max iterations\nreached?"}
+    ITER -->|No| RUN
+    ITER -->|Yes| FINAL["Run tests one final time\n→ mark tier failed"]
+
+    NEXT_TIER --> MORE{More tiers?}
+    MORE -->|Yes| LOOP
+    MORE -->|No| DONE["All tiers green ✓"]
+
+    FINAL --> FAST_FAIL{"continue_on_failure\nfor this tier?"}
+    FAST_FAIL -->|No| STOP["Stop — skip remaining tiers"]
+    FAST_FAIL -->|Yes| MORE
+```
+
+**Key data structure — `TestTier`**:
+```python
+@dataclass
+class TestTier:
+    name: str                           # "unit", "e2e-ui", etc.
+    command: str                        # The test command
+    timeout: int = 120                  # Seconds per test run (e2e: 300)
+    max_fix_iterations: int = 5         # Fix attempts per tier
+    continue_on_failure: bool = False   # If True, proceed to next tier on fail
+    screenshot_dir: str = ""            # For visual review (e2e tiers)
+```
+
+### Test Output Parsing
+
+`_parse_test_output()` tries 5 explicit format parsers in precedence order, returning `(passed, failed, total)`:
+
+| Parser | Pattern | Example match |
+|--------|---------|---------------|
+| **Cypress** | `Passing: N` / `Failing: N` | `Passing: 12` / `Failing: 3` |
+| **Jest** | `Tests: X passed, Y failed, Z total` | `Tests: 8 passed, 2 failed, 10 total` |
+| **pytest** | `X passed[, Y failed]` | `14 passed, 1 failed` |
+| **Go** | Count `^ok` and `^FAIL` lines | `ok  ./auth  0.3s` / `FAIL ./rate  0.1s` |
+| **Cargo** | `test result: ... X passed; Y failed` | `test result: ok. 6 passed; 0 failed` |
+| **Generic fallback** | exit code only | exit 0 → (1,0,1); else (0,1,1) |
+
+Playwright output is handled by the pytest parser (multi-line variant). There is no dedicated Playwright parser.
+
+### Tier-Aware Fix Prompts
+
+When tests fail, `_build_fix_prompt()` selects context based on the tier type:
+
+**Unit/Integration tiers** (matched by regex `unit|integration`):
+- Max output: **4,000 chars** of test output
+- Prompt flavor: *"Fix the code so all tests pass. Do NOT modify the tests unless the tests themselves have bugs."*
+
+**E2E tiers** (matched by regex `e2e|ui|visual|dsp|playwright|cypress`):
+- Max output: **8,000 chars** of test output (more context for complex failures)
+- Prompt flavor: *"These tests simulate real user behavior / end-to-end scenarios. Fix the application behavior so these tests pass. Do NOT modify the tests."*
+
+If test output exceeds the max, it's truncated to the **tail** (most recent output), prefixed with `...(truncated)...`.
+
+### Walking Through the AC-005 Fix Loop
+
+```
+Iteration 1:
+  Run: pytest tests/integration/test_rate_limit.py
+  Output: "1 passed, 1 failed" (the counter reset test fails)
+  → Build fix prompt (integration tier, 4K output limit)
+  → Spawn Claude: "Fix the code so all tests pass..."
+  → Claude identifies the counter reset bug, patches rate_limiter.py
+
+Iteration 2:
+  Run: pytest tests/integration/test_rate_limit.py
+  Output: "2 passed, 0 failed" ✓
+  → Tier passes, move to next tier
+```
+
+### Post-Verification Pipeline
+
+After all test tiers are green, several more steps happen before commit:
+
+```mermaid
+flowchart TD
+    GREEN["All tiers green ✓"] --> VIS{"--visual flag set?"}
+
+    VIS -->|Yes| COLLECT["Collect e2e screenshots\n(max 20 images from tier.screenshot_dir)"]
+    COLLECT --> API["Send to Anthropic API\n(multimodal, base64-encoded)"]
+    API --> CONCERNS["Parse: SUMMARY + CONCERNS list\n(advisory — does not block)"]
+    CONCERNS --> REVIEW
+
+    VIS -->|No| REVIEW{"review_commit setting?"}
+
+    REVIEW -->|"critical_agent"| CA["CriticalAgent.review_commit()"]
+    CA --> CONTEXT["Assemble context:\nAC text + staged diff (max 3000 lines)"]
+    CONTEXT --> SPAWN_CA["Spawn read-only Claude\nwith critical_review.md prompt"]
+    SPAWN_CA --> VERDICT{"Parse JSON verdict"}
+    VERDICT -->|approved| DRIFT
+    VERDICT -->|request_changes| BLOCK["List issues, block commit"]
+    VERDICT -->|escalate| HUMAN_REVIEW["Fall back to human review"]
+
+    REVIEW -->|"human"| HUMAN_REVIEW2["Human reviews staged diff"]
+    HUMAN_REVIEW2 --> DRIFT
+
+    DRIFT["drift.sh --docs --check"] --> DRIFT_CHECK{"Docs stale?"}
+    DRIFT_CHECK -->|Yes| FIX_DOCS["Spawn Claude to fix docs\n→ CriticalAgent reviews\n→ commit doc changes"]
+    DRIFT_CHECK -->|No| COMMIT["git commit"]
+    FIX_DOCS --> COMMIT
+```
+
+**CriticalAgent verdict structure**:
+```json
+{
+  "verdict": "approved | request_changes | escalate",
+  "confidence": "high | medium | low",
+  "summary": "One-line assessment",
+  "issues": [
+    {"severity": "critical|high|medium|low", "category": "...", "description": "...", "location": "..."}
+  ],
+  "recommendation": "Suggested action"
+}
+```
+
+The CriticalAgent evaluates against an 8-point checklist: correctness, security (OWASP top-10), testing gaps, AC alignment, NFR compliance, breaking changes, error handling, and code conventions.
+
+### Per-AC Autonomous Execution (TaskRunner)
+
+When running `ag auto task F-0042`, the `TaskRunner` class orchestrates per-AC implementation:
+
+1. **Load ACs** from `spec/acceptance/F-0042.md`
+2. **Create feature branch**: `feat/auto-f-0042`
+3. **For each AC** (max 3 retries per AC):
+   - Spawn fresh Claude to implement the AC
+   - Run test suite via `VerifyLoop`
+   - If pass + `review_commit: critical_agent` → CriticalAgent reviews → commit
+   - Commit message: `feat(F-0042): implement AC-005 — Rate limiting: max 5 failed att...`
+4. **Full verification pass** (VerifyLoop across all tiers, max 5 iterations)
+5. **Doc drift check** (if `docs_gate` enabled)
+6. **Create PR** with AC pass/fail summary
+
+### AC Complexity Estimation (AutoEngine)
+
+The `AutoEngine` (in `engine.py`, separate from TaskRunner) adds a complexity estimation step:
+
+- `_estimate_complexity()` sends AC text to Claude with the `estimate-complexity.md` prompt
+- Returns: **SMALL** (1-3 files), **MEDIUM** (4-8 files), or **LARGE** (9+ files / new infrastructure)
+- **Heuristic fallback**: Keywords like "full system", "database schema", "authentication system" → LARGE; text > 200 chars → MEDIUM; else SMALL
+- **LARGE ACs** are decomposed into 2-5 sequential sub-tasks via `decompose-ac.md` prompt, each independently testable
+- Sub-task IDs: `AC-005.1`, `AC-005.2`, etc.
+
+---
+
+## Section 15: Research Phase and Project-Aware Context Assembly
+
+**What this section covers**: How the framework detects a project's tech stack, assembles minimal context for each agent role, and handles the research/exploration phase that precedes planning.
+
+### Context Assembly Pipeline
+
+```mermaid
+flowchart TD
+    subgraph Init["Project Initialization"]
+        DETECT["ag init / ag run\nFile-based stack detection"]
+        DETECT --> STACK["STACK.md\n(language, framework, test runner,\nbuild/test commands per tier)"]
+        DETECT --> CTXPACK["CONTEXT_PACK.md\n(architecture, modules, entry points)"]
+        DETECT --> PROFILE["Profile selected\n(Discovery / Formal / Autonomous Formal)"]
+    end
+
+    subgraph Spawn["Spawning Any Subagent"]
+        ROLE["context-for-role.sh <role> F-XXXX"]
+        ROLE --> MANIFEST["Load role manifest\n(26 role-specific YAML configs)"]
+        MANIFEST --> VARS["Substitute variables\n({feature_id} → F-0042)"]
+        VARS --> LOAD["Load required files +\nextract sections\n(e.g., STACK.md[build_commands])"]
+        LOAD --> TRIM["Trim to token_budget\n(3000-5000 tokens)"]
+        TRIM --> OUTPUT["Output: assembled context\nfor agent prompt"]
+    end
+
+    STACK --> ROLE
+    CTXPACK --> ROLE
+```
+
+### Stack Detection
+
+`discover.py` performs file-based tech stack detection:
+
+| Marker file | Detected stack |
+|-------------|---------------|
+| `tsconfig.json` | TypeScript |
+| `package.json` | JavaScript/TypeScript (+ framework from dependencies) |
+| `pyproject.toml` | Python (+ framework: FastAPI, Django, Flask, etc.) |
+| `Cargo.toml` | Rust (+ framework: Actix, Axum, Rocket, etc.) |
+| `go.mod` | Go (+ framework: Gin, Echo, Chi, Fiber) |
+
+**Framework detection**: Scans dependency manifests — e.g., `package.json` dependencies for Next.js, React, Express; `pyproject.toml` for FastAPI, Django. Results feed into STACK.md, which drives downstream decisions: test runner detection, output parsing, fix prompt flavor.
+
+### 26 Agent Role Manifests
+
+Each YAML manifest at `.agentic/lib/agents/context-manifests/` defines what an agent role needs to see:
+
+```yaml
+# Example: test-agent.yaml
+role: test-agent
+token_budget: 4000
+description: Write failing tests for acceptance criteria (TDD red phase)
+
+required:
+  - spec/acceptance/{feature_id}.md
+  - STACK.md[test_framework,test_commands]    # Section extraction
+  - .agentic/quality/test_strategy.md
+  - .agentic/agents/shared/guidelines/anti-hallucination.md
+
+optional:
+  - tests/
+  - CONTEXT_PACK.md[modules]
+```
+
+**Key roles and their token budgets**:
+
+| Role | Budget | Required context | Purpose |
+|------|--------|-----------------|---------|
+| `implementation-agent` | 5,000 | ACs + build/test commands + code standards | Write code (TDD green phase) |
+| `test-agent` | 4,000 | ACs + test framework + test strategy | Write tests (TDD red phase) |
+| `planning-agent` | 4,000 | Full CONTEXT_PACK + STACK + research | Create implementation plans |
+| `research-agent` | 3,000 | Architecture + stack only | Technology research (no code, no tests) |
+| `review-agent` | 6,000 | ACs + diff + code standards | Code review |
+| `orchestrator-agent` | 2,000 | Minimal coordination context | Coordinate other agents |
+
+**Section extraction**: The syntax `STACK.md[build_commands,test_commands]` loads ONLY the `## Build` and `## Test` sections from STACK.md, not the entire file. This is how agents stay within token budgets even on large projects.
+
+### How `context-for-role.sh` Works
+
+1. **Read YAML manifest** for the requested role
+2. **Substitute variables**: `{feature_id}` → actual feature ID (e.g., `F-0042`)
+3. **Always inject**: `core-rules.md` (mandatory for all roles)
+4. **Load required files**: With section extraction support — AWK-based `##` header matching
+5. **Load optional files**: Only if token budget allows
+6. **Token estimation**: `words × 4/3 ≈ tokens` (since average word ≈ 0.75 tokens)
+7. **Component scoping**: `--component api` filters to files within that component's path (except `.agentic/`, `spec/`, STACK.md, CONTEXT_PACK.md which are always included)
+
+### The Research/Exploration Phase
+
+Before planning begins, two skills handle investigation:
+
+**`exploring-codebase` skill** — Structured codebase navigation:
+- Triggered by: "find", "where is", "explore", "how does this work", "trace"
+- 3-step process: understand the question → search efficiently (Glob for files, Grep for content, `ls` for structure) → present findings with file paths and dependency relationships
+- Consults `CONTEXT_PACK.md` for "where to look first"
+
+**`researching-topics` skill** — Technology research:
+- Triggered by: "research", "compare options", "evaluate", "best practices"
+- 4-step process: clarify question → gather from official docs, community, benchmarks → synthesize findings → save to `docs/research/YYYY-MM-DD-topic.md`
+- Uses WebSearch and WebFetch tools
+
+**Research-agent context manifest**: Loads architecture + stack only (3,000 token budget), **excludes all code and tests** — this forces research-only behavior by ensuring the agent can't accidentally start implementing.
+
+**Research mode** (`.agentic/lib/workflows/research_mode.md`) defines a five-phase protocol for deeper investigation: Define (5 min) → Gather (15-45 min) → Analyze (10-20 min) → Recommend (5-10 min) → Document (5-10 min). Output feeds into planning as understanding of existing patterns, technology constraints, and integration points.
+
+### Scenario Templates for Framework Verification
+
+Five pre-built project archetypes at `.agentic/lib/auto/scenarios/` test the framework against realistic projects:
+
+| Scenario | Description |
+|----------|-------------|
+| `cli_tool.yaml` | Command-line application |
+| `api_service.yaml` | REST/GraphQL service |
+| `todo_app.yaml` | Simple reference application |
+| `fullstack_monorepo.yaml` | Frontend + backend in one repo |
+| `fullstack_multirepo.yaml` | Multi-repository fullstack setup |
+
+Each defines a STACK.md structure for its project type. Used by `ag auto verify-framework` to spawn agents that build example projects from scratch and verify the full lifecycle end-to-end.
+
+---
+
 # Part IV: The Bigger Picture
 
-## Section 12: Current Inventory (v0.61.0)
+## Section 16: Current Inventory (v0.61.0)
 
 ### Metrics Snapshot
 
@@ -1001,7 +1593,7 @@ Six levels of verification, from narrowest to broadest:
 
 ---
 
-## Section 13: What's In Flight
+## Section 17: What's In Flight
 
 ### Features Currently Implementing (12)
 
@@ -1024,7 +1616,7 @@ Track in HUMAN_NEEDED.md — PRs awaiting human review.
 
 ---
 
-## Section 14: Opportunity Map
+## Section 18: Opportunity Map
 
 Organized by impact and effort:
 
@@ -1078,7 +1670,7 @@ Organized by impact and effort:
 
 # Part V: Quick References
 
-## Section 15: Command Quick Reference
+## Section 19: Command Quick Reference
 
 ### By Phase
 
@@ -1166,7 +1758,7 @@ Organized by impact and effort:
 
 ---
 
-## Section 16: Recovery Playbook
+## Section 20: Recovery Playbook
 
 ### Common Recovery Scenarios
 

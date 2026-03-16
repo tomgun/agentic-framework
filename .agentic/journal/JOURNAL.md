@@ -2794,3 +2794,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-16 18:35 - Framework System Map — Deep Pipeline + Opportunity Map
+
+**Why**: Document full framework pipeline transformations and identify maturity gaps
+
+**What changed**:
+- Added Sections 12-15 (spec derivation, AC-to-test, verification loop, research phase) with running F-0042 example. Renumbered Part IV/V. Created comprehensive opportunity map epic plan (19 features, 6 waves) with dialectical review.
+
+**Next steps**:
+- Commit and merge docs/framework-system-map PR. Then begin Wave 0 triage of in-progress features.
+
+**Blockers**: None
+
