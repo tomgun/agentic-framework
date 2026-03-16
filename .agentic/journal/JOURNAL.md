@@ -2859,3 +2859,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-16 21:42 - ag merge + ag verify shipped
+
+**Why**: Agent behavioral failures (forgetting ag done, skipping smoke tests) now structurally prevented
+
+**What changed**:
+- Structural post-merge chaining and AC verification now enforced
+
+**Next steps**:
+- Next backlog item: F-0224
+
+**Blockers**: None
+
