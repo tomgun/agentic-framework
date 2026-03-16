@@ -1,22 +1,175 @@
 [
   {
     "type": "feature",
-    "id": "F-0215",
-    "description": "F-0215",
-    "added_at": "2026-03-14T21:05:00Z",
-    "added_by": "auto",
-    "became_current_at": "2026-03-14T21:05:00Z",
+    "id": "F-0222",
+    "description": "F-0222",
+    "added_at": "2026-03-16T18:56:03Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0224",
+    "description": "F-0224",
+    "added_at": "2026-03-16T18:56:03Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0225",
+    "description": "F-0225",
+    "added_at": "2026-03-16T18:56:04Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0229",
+    "description": "F-0229",
+    "added_at": "2026-03-16T18:56:04Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0226",
+    "description": "F-0226",
+    "added_at": "2026-03-16T18:56:04Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0216",
+    "description": "F-0216",
+    "added_at": "2026-03-16T18:56:04Z",
+    "added_by": "agent",
     "refs": [
-      ".agentic/journal/plans/F-0215-plan.md"
+      ".agentic/spec/acceptance/F-0216.md"
     ]
   },
   {
     "type": "feature",
-    "id": "F-0210",
-    "description": "Configurable Definition of Done per Task Type",
-    "added_at": "2026-03-11T16:40:39Z",
+    "id": "F-0217",
+    "description": "F-0217",
+    "added_at": "2026-03-16T18:56:05Z",
     "added_by": "agent",
-    "notes": "Investigation needed: feasibility of task-type-aware DoD checklists in ag done. Behavioral branching risk.",
-    "became_current_at": "2026-03-14T17:59:16Z"
+    "refs": [
+      ".agentic/spec/acceptance/F-0217.md"
+    ]
+  },
+  {
+    "type": "feature",
+    "id": "F-0218",
+    "description": "F-0218",
+    "added_at": "2026-03-16T18:56:06Z",
+    "added_by": "agent",
+    "refs": [
+      ".agentic/spec/acceptance/F-0218.md"
+    ]
+  },
+  {
+    "type": "feature",
+    "id": "F-0219",
+    "description": "F-0219",
+    "added_at": "2026-03-16T18:56:06Z",
+    "added_by": "agent",
+    "refs": [
+      ".agentic/spec/acceptance/F-0219.md"
+    ]
+  },
+  {
+    "type": "feature",
+    "id": "F-0221",
+    "description": "F-0221",
+    "added_at": "2026-03-16T18:56:12Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0223",
+    "description": "F-0223",
+    "added_at": "2026-03-16T18:56:12Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0220",
+    "description": "F-0220",
+    "added_at": "2026-03-16T18:56:12Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0193",
+    "description": "F-0193",
+    "added_at": "2026-03-16T18:56:13Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0210",
+    "description": "F-0210",
+    "added_at": "2026-03-16T18:56:13Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0213",
+    "description": "F-0213",
+    "added_at": "2026-03-16T18:56:14Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0228",
+    "description": "F-0228",
+    "added_at": "2026-03-16T18:56:15Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0211",
+    "description": "F-0211",
+    "added_at": "2026-03-16T18:56:15Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0212",
+    "description": "F-0212",
+    "added_at": "2026-03-16T18:56:15Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0227",
+    "description": "F-0227",
+    "added_at": "2026-03-16T18:56:15Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0233",
+    "description": "F-0233",
+    "added_at": "2026-03-16T18:56:16Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0230",
+    "description": "F-0230",
+    "added_at": "2026-03-16T18:56:16Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0231",
+    "description": "F-0231",
+    "added_at": "2026-03-16T18:56:16Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "feature",
+    "id": "F-0232",
+    "description": "F-0232",
+    "added_at": "2026-03-16T18:56:16Z",
+    "added_by": "agent"
   }
 ]

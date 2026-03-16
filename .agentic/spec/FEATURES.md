@@ -3653,6 +3653,8 @@ Automatic synchronization mechanism that keeps framework-consumed artifacts (ski
 **Complexity**: high
 **Since**: v0.53.10
 **Related**: F-0208, F-0210
+**Epic**: E-0001 (Opportunity Map), Wave 3
+**Decomposition**: F-0213a (Feature Registry Split) → F-0213b (Unified Work Queue) → F-0213c (Dependency Graph)
 
 Rethink how the framework tracks features and work items. Current state: FEATURES.md holds everything (planned through shipped, 200+ entries), BACKLOG.json is a simple ordered queue of feature IDs, TODO.md is an unstructured inbox, ISSUES.md tracks bugs separately. Problems: FEATURES.md is bloated with planning noise alongside shipped contracts; the backlog can only hold feature IDs (not TODOs, issues, deferred work, or update tasks); no dependency tracking between items; no way to log deferred obligations (e.g., "skipped docs in fast mode — here's what changed, come back later").
 
@@ -3791,3 +3793,311 @@ Proposed restructuring:
 - Tests: `tests/test_nfr_health.sh`, `tests/llm/tests/082_nfr_health.sh`
 
 **Acceptance**: See `spec/acceptance/F-0219.md`
+
+---
+
+## F-0220: Protected Main Branch Support
+
+**Status**: planned
+**Category**: Infrastructure
+**Priority**: medium
+**Complexity**: high
+**Since**: —
+**Dependencies**: —
+**Epic**: E-0001 (Opportunity Map), Wave 2
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: `ag flush` and `ag done` assume direct-to-main push. Add `main_branch_mode: direct|protected|auto-detect`. When protected, `ag flush` creates `state/flush-<timestamp>` branch with auto-created PR. `ag done` VERSION bump goes into feature PR. Auto-detect checks GitHub branch protection rules via `gh` API.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/tools/state-commit.sh`, `.agentic/lib/tools/ag.sh`, `.agentic/lib/presets/profiles.conf`, `.agentic/lib/settings.sh`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0220.md`
+
+---
+
+## F-0221: ag.sh Decomposition
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: high
+**Complexity**: high
+**Since**: —
+**Dependencies**: —
+**Epic**: E-0001 (Opportunity Map), Wave 2
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Extract 36 `cmd_*` functions from the 4,008-line ag.sh monolith into individual files under `.agentic/lib/commands/`. Keep `ag.sh` as ~200-line dispatcher. Each command file is self-contained, sources its own dependencies. Shared helpers stay in `settings.sh`, `paths.sh`, `intent-helpers.sh`, `ac-parse.sh`.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/tools/ag.sh` (refactor to dispatcher), new `.agentic/lib/commands/` directory
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0221.md`
+
+---
+
+## F-0222: State Machine Enforcement = Blocking
+
+**Status**: planned
+**Category**: Quality
+**Priority**: high
+**Complexity**: medium
+**Since**: —
+**Dependencies**: —
+**Epic**: E-0001 (Opportunity Map), Wave 1
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Add `state_enforcement: blocking` option to profiles. When enabled, `FeatureStateMachine` rejects transitions that fail gate checks instead of logging warnings. Discovery profile remains advisory. SKIP_TRANSITIONS (e.g., planned→shipped for retroactive tracking) still work in blocking mode.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/state_machine.py`, `.agentic/lib/auto/gates.py`, `.agentic/lib/presets/profiles.conf`, `.agentic/lib/settings.sh`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0222.md`
+
+---
+
+## F-0223: Later State Machine Gates Strengthening
+
+**Status**: planned
+**Category**: Quality
+**Priority**: medium
+**Complexity**: medium
+**Since**: —
+**Dependencies**: F-0222
+**Epic**: E-0001 (Opportunity Map), Wave 2
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Upgrade gates 6-8 in `gates.py` from advisory-only to conditionally blocking. Gate 6 (verified→documented): journal/status freshness. Gate 7 (documented→committed): pre-commit checks + tests pass. Gate 8 (committed→shipped): PR exists and reviewed (if `git_workflow: pull_request`).
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/gates.py`, `.agentic/lib/auto/state_machine.py`, `.agentic/lib/presets/profiles.conf`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0223.md`
+
+---
+
+## F-0224: Smoke Test Evidence
+
+**Status**: planned
+**Category**: Quality
+**Priority**: medium
+**Complexity**: low
+**Since**: —
+**Dependencies**: —
+**Epic**: E-0001 (Opportunity Map), Wave 1
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Gate in `ag done` checking for smoke test artifact at `.agentic/journal/evidence/F-XXXX-smoke.*`. New setting `smoke_test_evidence: required|recommended|off`. `ag auto verify --visual` output auto-saves as evidence artifact.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/tools/ag.sh`, `.agentic/lib/checklists/feature_complete.md`, `.agentic/lib/checklists/smoke_testing.md`, `.agentic/lib/presets/profiles.conf`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0224.md`
+
+---
+
+## F-0225: Spec Evolution Metrics
+
+**Status**: planned
+**Category**: Quality
+**Priority**: low
+**Complexity**: low
+**Since**: —
+**Dependencies**: —
+**Epic**: E-0001 (Opportunity Map), Wave 1
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: New `spec-metrics.sh` scanning AC files for `[Discovered]` markers, counting spec churn via git log. Surface in `ag audit --metrics` and retrospective checklist. Data feeds F-0210's task-type heuristics.
+
+**Implementation**:
+- State: none
+- Code: New `.agentic/lib/tools/spec-metrics.sh`, `.agentic/lib/tools/ag.sh`, `.agentic/lib/checklists/retrospective.md`, `.agentic/lib/tools/dashboard.sh`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0225.md`
+
+---
+
+## F-0226: Post-Merge Dogfooding
+
+**Status**: planned
+**Category**: Quality
+**Priority**: medium
+**Complexity**: medium
+**Since**: —
+**Dependencies**: —
+**Epic**: E-0001 (Opportunity Map), Wave 1
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: New `post-merge-verify.sh` running after framework PR merge. Leverages F-0215 infrastructure (`framework_verify.py`, scenario YAML files). Runs `ag start` in temp directory, compares root instruction files against templates, validates JSON/MD files, runs critical subset of validate_framework.sh.
+
+**Implementation**:
+- State: none
+- Code: New `.agentic/lib/tools/post-merge-verify.sh`, `.agentic/lib/auto/framework_verify.py`, `.agentic/lib/tools/ag.sh`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0226.md`
+
+---
+
+## F-0227: End-to-End Workflow Integration Test
+
+**Status**: planned
+**Category**: Testing
+**Priority**: high
+**Complexity**: medium
+**Since**: —
+**Dependencies**: F-0222, F-0223, F-0228
+**Epic**: E-0001 (Opportunity Map), Wave 4
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Single test exercising full 9-phase lifecycle in a temp project. Driven by F-0228's `workflow.yaml` — walks each phase, verifies gates fire, checks artifacts created. Leverages F-0215 infrastructure (scenario YAML, `framework_verify.py`). Runs in <60s, integrated into `validate_framework.sh`.
+
+**Implementation**:
+- State: none
+- Code: New `tests/test_e2e_lifecycle.sh` (or `.py`), reads `.agentic/lib/workflow.yaml`
+- Tests: Self-testing (it IS the test)
+
+**Acceptance**: See `spec/acceptance/F-0227.md`
+
+---
+
+## F-0228: Workflow Definition File
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: high
+**Complexity**: high
+**Since**: —
+**Dependencies**: F-0222, F-0223
+**Epic**: E-0001 (Opportunity Map), Wave 3
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Single declarative YAML file (`.agentic/lib/workflow.yaml`) defining: 9 lifecycle phases, required artifacts per phase, gates per transition, profile variations. Validation script checks implementations against definition. Schema designed for machine-readable test generation (F-0227 compatibility).
+
+**Implementation**:
+- State: none
+- Code: New `.agentic/lib/workflow.yaml`, new `.agentic/lib/tools/workflow-validate.sh`, `.agentic/lib/auto/state_machine.py`, `.agentic/lib/auto/gates.py`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0228.md`
+
+---
+
+## F-0229: Code Annotation Enforcement
+
+**Status**: planned
+**Category**: Quality
+**Priority**: medium
+**Complexity**: medium
+**Since**: —
+**Dependencies**: —
+**Epic**: E-0001 (Opportunity Map), Wave 1
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Wire existing `coverage.py` into pre-commit as Check 21. When a feature transitions to `shipped`, validate that at least one `@feature F-XXXX` annotation exists. Controlled by `annotation_enforcement: off|advisory|blocking`. Default `off`, 157 shipped features grandfathered.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/hooks/pre-commit-check.sh`, `.agentic/lib/tools/coverage.py`, `.agentic/lib/presets/profiles.conf`, `.agentic/lib/workflows/code_annotations.md`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0229.md`
+
+---
+
+## F-0230: MCP Coordination Server
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: low
+**Complexity**: high
+**Since**: —
+**Dependencies**: —
+**Epic**: E-0001 (Opportunity Map), Wave 5
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Extend existing `coord_server.py` (F-0185, HTTP JSON-RPC, bearer auth) with MCP protocol support. Wrap existing RPC dispatch in MCP transport layer rather than rewrite.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/coord_server.py`, `.agentic/lib/auto/coord_tools.py`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0230.md`
+
+---
+
+## F-0231: Multi-Repo Umbrella
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: low
+**Complexity**: high
+**Since**: —
+**Dependencies**: F-0230, F-0213
+**Epic**: E-0001 (Opportunity Map), Wave 5
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Cross-repo coordination with shared contracts, unified backlog. Depends on MCP coordination server and unified work queue.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/umbrella.py`, `.agentic/lib/auto/components.py`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0231.md`
+
+---
+
+## F-0232: Full Autonomous Scheduling
+
+**Status**: planned
+**Category**: Autonomous
+**Priority**: low
+**Complexity**: high
+**Since**: —
+**Dependencies**: F-0213, F-0230
+**Epic**: E-0001 (Opportunity Map), Wave 5
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Scheduler finds unblocked transitions, spawns workers, critical agents review. Full automation of the feature lifecycle with dependency-aware scheduling.
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/scheduler.py`, `.agentic/lib/auto/engine.py`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0232.md`
+
+---
+
+## F-0233: Design Phase Formalization
+
+**Status**: planned
+**Category**: Architecture
+**Priority**: medium
+**Complexity**: medium
+**Since**: —
+**Dependencies**: F-0228
+**Epic**: E-0001 (Opportunity Map), Wave 4
+**Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
+
+**Description**: Add explicit "design" phase between planning and specification (10 states total). Opt-in via `design_phase: required|optional|off`. When enabled, gate checks for design artifacts (ADR or design doc). Existing features in PLANNED state not blocked (default off).
+
+**Implementation**:
+- State: none
+- Code: `.agentic/lib/auto/state_machine.py`, `.agentic/lib/auto/gates.py`, `.agentic/lib/workflow.yaml`, `.agentic/lib/presets/profiles.conf`
+- Tests: TBD
+
+**Acceptance**: See `spec/acceptance/F-0233.md`
