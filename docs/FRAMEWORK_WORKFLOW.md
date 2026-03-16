@@ -1,6 +1,6 @@
 # Framework System Map
 
-> **Version**: 0.61.0 · **Date**: 2026-03-16 · **Features**: 157 shipped, 2 implementing, 10 planned
+> **Version**: 0.61.0 · **Date**: 2026-03-16 · **Features**: 157 shipped, 12 implementing, 10 planned
 
 The complete reference for understanding, using, and maintaining the Agentic Framework — from 30-second overview to deep reference.
 
@@ -54,7 +54,9 @@ flowchart LR
 
 **One sentence**: Ideas become plans, plans become specs, specs become tested code, tested code gets documented, documented code passes gates, gated code ships through PRs.
 
-**Key principle**: Spec + Code + Tests + Docs = Done. All four artifacts ship together, not sequentially.
+**Key principles**:
+- Spec + Code + Tests + Docs = Done. All four artifacts ship together, not sequentially.
+- Shipped specs are immutable contracts — changes require formal migration (see [Section 6](#section-6-spec-evolution-lifecycle)).
 
 ---
 
@@ -756,7 +758,7 @@ flowchart TB
 | `framework_verify.py` | Framework self-verification |
 | `integration_verify.py` | Cross-component integration tests |
 | `self_heal.py` | Auto-recovery from failures |
-| `settings-template.json` | Default autonomous settings |
+| `init.py` | `ag auto init` setup (permissions, tier config) |
 | `visual.py` | Visual/screenshot verification |
 | `umbrella.py` | Multi-repo coordination (future) |
 
@@ -771,7 +773,7 @@ Six levels of verification, from narrowest to broadest:
 | **1. Unit** | Individual test cases, per-AC coverage | `pytest`, `bash` test scripts | During implementation |
 | **2. Feature** | Single feature: all ACs, smoke test | `ag auto verify`, `ag audit` | After implementation |
 | **3. Integration** | Cross-component: epic children interact correctly | `ag auto verify-epic F-XXXX` | After epic completion |
-| **4. Framework** | Framework self-consistency: 675+ structural checks | `bash tests/validate_framework.sh` | Before commit (framework dev) |
+| **4. Framework** | Framework self-consistency (675 checks at v0.61.0) | `bash tests/validate_framework.sh` | Before commit (framework dev) |
 | **5. Behavioral** | AI agent behavior: do agents follow rules? | `ag test llm` (67 LLM tests) | Before commit (framework dev) |
 | **6. Drift** | Project state consistency: 10-phase sync check | `ag sync`, `drift.sh`, `drift-check.sh` | Session start, before commit |
 
@@ -857,10 +859,10 @@ Six levels of verification, from narrowest to broadest:
 |--------|-------|
 | Features (total) | 183 |
 | — Shipped | 157 |
-| — Implementing | 2 |
+| — Implementing (incl. legacy `in_progress`) | 12 |
 | — Planned | 10 |
 | — Deprecated | 4 |
-| Shell tools (`.agentic/lib/tools/*.sh`) | 86 |
+| Shell tools (`.agentic/lib/tools/*.sh`) | 81 (+ 5 archived) |
 | Autonomous engine modules (`.agentic/lib/auto/*.py`) | 24 |
 | Workflows (`.agentic/lib/workflows/*.md`) | 35 |
 | Checklists (`.agentic/lib/checklists/*.md`) | 10 |
@@ -873,7 +875,7 @@ Six levels of verification, from narrowest to broadest:
 | NFRs defined | 4 (all met) |
 | ADRs | 2 |
 | CLI gateway (ag.sh) | 4,008 lines |
-| Versions released | 92 (v0.61.0) |
+| Git tags (releases) | 70 |
 
 ### Architecture Components
 
@@ -882,19 +884,16 @@ Six levels of verification, from narrowest to broadest:
 | **Constitution** | CLAUDE.md, .cursorrules, copilot-instructions.md, codex-instructions.md | <100-line instruction files loaded at session start |
 | **Playbooks** | 13 skills, 35 workflows, 10 checklists | Just-in-time guidance loaded by `ag` commands |
 | **State** | STACK.md, STATUS.md, FEATURES.md, JOURNAL.md, BACKLOG.json, AGENTS.json | Durable artifacts tracking project state |
-| **Engine** | 24 auto modules, 86 shell tools, ag.sh gateway | Execution infrastructure |
+| **Engine** | 24 auto modules, 81 shell tools (+ 5 archived), ag.sh gateway | Execution infrastructure |
 | **Verification** | 152 tests, validate_framework.sh, drift checks | Quality assurance |
 
 ---
 
 ## Section 13: What's In Flight
 
-### Features Currently Implementing
+### Features Currently Implementing (12)
 
-| Feature | Description |
-|---------|-------------|
-| F-0192 | Review delegation |
-| F-0214 | Parallel epic execution |
+Includes both `implementing` and legacy `in_progress` status entries. Use `grep "Status.*implement\|in.progress" .agentic/spec/FEATURES.md` to get the current list.
 
 ### Features Planned (10)
 
@@ -908,8 +907,8 @@ Track in HUMAN_NEEDED.md — PRs awaiting human review.
 
 | ADR | Title | Status |
 |-----|-------|--------|
-| ADR-001 | Multi-Component Architecture & Workflow Engine | Proposed |
-| ADR-002 | User Involvement Modes | Proposed |
+| [ADR-001](../.agentic/spec/adr/ADR-001-multi-component-architecture.md) | Multi-Component Architecture & Workflow Engine | Proposed |
+| [ADR-002](../.agentic/spec/adr/ADR-002-user-involvement-modes.md) | User Involvement Modes | Proposed |
 
 ---
 
@@ -1132,5 +1131,18 @@ bash .agentic/lib/tools/feature.sh F-XXXX status <correct-status>
 ```
 
 ---
+
+---
+
+### Keeping This Document Fresh
+
+Metrics (feature counts, module counts, test counts) should be re-verified at each major release. Key verification commands:
+
+```bash
+grep -oP '\*\*Status\*\*: \K\S+' .agentic/spec/FEATURES.md | sort | uniq -c  # Feature counts
+find .agentic/lib/tools -name "*.sh" | wc -l                                   # Tool count
+find tests -name "*.sh" -o -name "*.py" | grep -c test                         # Test count
+wc -l .agentic/lib/tools/ag.sh                                                 # CLI gateway size
+```
 
 *Generated from framework v0.61.0 source. File paths, gate names, settings, and metrics verified against live codebase.*
