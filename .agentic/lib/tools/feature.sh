@@ -111,9 +111,11 @@ if [[ "${FORMAT}" == "table" ]]; then
 else
   # Heading format: ## F-0003: Name with - Status: lines
   awk -v fid="${FEATURE_ID}" -v field="${FIELD}" -v value="${VALUE}" -v ts="${TIMESTAMP}" '
+  BEGIN { SOURCE_DONE = 0 }
   /^##[#]? F-[0-9][0-9][0-9][0-9]:/ {
     if ($0 ~ fid) {
       IN_FEATURE = 1
+      SOURCE_DONE = 0
     } else {
       IN_FEATURE = 0
     }

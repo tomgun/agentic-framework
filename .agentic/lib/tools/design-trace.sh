@@ -69,6 +69,7 @@ fi
 declare -A FEATURE_STATUS
 declare -A FEATURE_SOURCE
 declare -A SOURCE_FEATURES  # source_path → space-separated feature IDs
+SOURCE_COUNT=0
 
 CURRENT_FID=""
 while IFS= read -r line; do
@@ -98,6 +99,7 @@ while IFS= read -r line; do
             SOURCE_FEATURES["$src"]="${SOURCE_FEATURES[$src]} $CURRENT_FID"
         else
             SOURCE_FEATURES["$src"]="$CURRENT_FID"
+            SOURCE_COUNT=$((SOURCE_COUNT + 1))
         fi
         continue
     fi
@@ -106,7 +108,7 @@ done < "$FEATURES_FILE"
 # ---------------------------------------------------------------------------
 # No sources found
 # ---------------------------------------------------------------------------
-if [[ ${#SOURCE_FEATURES[@]} -eq 0 ]]; then
+if [[ "$SOURCE_COUNT" -eq 0 ]]; then
     if [[ "$MODE" == "quiet" ]]; then
         exit 0
     fi
@@ -193,8 +195,14 @@ fi
 echo "Design Traceability Report"
 echo ""
 
+# Sort source keys safely (handles paths with spaces)
+SORTED_SOURCES=()
+while IFS= read -r s; do
+    [[ -n "$s" ]] && SORTED_SOURCES+=("$s")
+done < <(printf '%s\n' "${!SOURCE_FEATURES[@]}" | sort)
+
 incomplete=0
-for src in $(echo "${!SOURCE_FEATURES[@]}" | tr ' ' '\n' | sort); do
+for src in "${SORTED_SOURCES[@]}"; do
     total="${SRC_TOTAL[$src]}"
     shipped="${SRC_SHIPPED[$src]}"
     if [[ "$total" -gt 0 ]]; then

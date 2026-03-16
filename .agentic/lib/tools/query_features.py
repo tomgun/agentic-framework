@@ -157,6 +157,9 @@ def filter_features(features: List[Dict], args) -> List[Dict]:
     if hasattr(args, "component") and args.component:
         filtered = [f for f in filtered if f.get("component") == args.component]
 
+    if hasattr(args, "source") and args.source:
+        filtered = [f for f in filtered if f.get("source") == args.source]
+
     return filtered
 
 
@@ -378,6 +381,7 @@ Examples:
     parser.add_argument("--parent", help="Filter by parent feature ID")
     parser.add_argument("--category", help="Filter by category (e.g., Core, Quality, Tooling)")
     parser.add_argument("--component", help="Filter by component name (from STACK.md ## Components)")
+    parser.add_argument("--source", help="Filter by source design document path")
     parser.add_argument("--children", metavar="F-ID", help="List children of a feature (e.g., --children=F-0001)")
     parser.add_argument("--recursive", action="store_true", help="With --children: show all descendants in tree format")
     parser.add_argument("--count", action="store_true", help="Show counts by category instead of listing features")
