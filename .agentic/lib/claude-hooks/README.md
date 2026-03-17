@@ -15,6 +15,7 @@ Hooks are scripts that run automatically at specific points in the Claude Code l
 | `SessionStart.sh` | When you start a new Claude chat | Validate environment, show project status from STATUS.md |
 | `UserPromptSubmit.sh` | Before Claude processes your first prompt | Phase-aware verification (acceptance criteria check) |
 | `PostToolUse.sh` | After Claude uses any tool (file edit, terminal, etc.) | Run quick linter checks |
+| `ExitPlanMode.sh` | After Claude exits plan mode (PostToolUse matcher) | Auto-save plan, inject review instructions |
 | `PreCompact.sh` | Before context window gets compacted | Save state to `JOURNAL.md`, preserve WIP |
 | `Stop.sh` | When session ends | Remind about uncommitted changes and documentation |
 
@@ -102,6 +103,39 @@ In Claude Code, when creating or configuring a project:
    Create .agentic/spec/acceptance/F-0005.md before implementing
    Run: doctor.sh --phase planning F-0005
 ```
+
+---
+
+### `ExitPlanMode.sh`
+
+**Runs**: After Claude exits plan mode (via PostToolUse hook with `"matcher": "ExitPlanMode"`)
+
+**Actions**:
+- Check if `plan_review_enabled: yes` in STACK.md
+- If enabled, run `plan-scan.sh --quiet` to save ephemeral plan to `.agentic/journal/plans/`
+- Output banner with next-step instructions (dialectical review before implementing)
+
+**Benefits**:
+- **Structural enforcement**: Plan-save + review instructions are injected at the transition point, not relying on agent memory
+- **Universal fallback**: Pre-commit Check 21 blocks commits without an APPROVED plan as backstop
+
+**Output Example** (plan saved successfully):
+```
+═══════════════════════════════════════════════════════
+📋 Plan Mode Exit — Review Required
+═══════════════════════════════════════════════════════
+✅ Plan saved as DRAFT → .agentic/journal/plans/2026-03-17-F-0234-plan.md
+
+⚠️  Plan is NOT approved. Next steps:
+  1. Run `ag implement F-XXXX` — triggers dialectical review
+  2. Follow review instructions (Critic + Advocate agents)
+  3. After approval → re-run `ag implement`
+
+Do NOT start writing code until plan is APPROVED.
+═══════════════════════════════════════════════════════
+```
+
+**Note on hook matchers**: Claude Code's PostToolUse hooks support tool-name matchers. `"matcher": "ExitPlanMode"` fires ONLY when ExitPlanMode is used. The generic `"matcher": ".*"` on PostToolUse.sh fires for ALL tools. Both run independently — the ExitPlanMode hook adds plan-specific behavior without interfering with the generic quality checks.
 
 ---
 
