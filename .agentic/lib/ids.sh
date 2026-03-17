@@ -25,6 +25,20 @@ FEATURE_ID_ERE_ANCHORED='^F-[0-9]{4,}$'
 FEATURE_HEADER_ERE='^## F-[0-9]{4,}:'
 
 # ---------------------------------------------------------------------------
+# Epic ID patterns (ERE — for grep -E / awk)
+# ---------------------------------------------------------------------------
+
+# Unanchored: matches E-0001 or E-10000 anywhere in text
+EPIC_ID_ERE='E-[0-9]{4,}'
+
+# Anchored: entire string must be an epic ID
+EPIC_ID_ERE_ANCHORED='^E-[0-9]{4,}$'
+
+is_epic_id() {
+    [[ "$1" =~ ^E-[0-9]{4,}$ ]]
+}
+
+# ---------------------------------------------------------------------------
 # Shell function — works in all contexts (if, case, etc.)
 # ---------------------------------------------------------------------------
 

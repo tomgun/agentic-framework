@@ -1421,6 +1421,7 @@ bash .agentic/lib/tools/enable-formal.sh
 | `git_workflow` | `pre-commit-check.sh` |
 | `feature_tracking` | `ag` commands, `session-start.sh` |
 | `state_enforcement` | `ag implement`, `ag done` |
+| `smoke_test_evidence` | `ag done` |
 | `spec_directory` | `ag` commands |
 
 **Agent-interpreted settings** (session start only) — the agent reads STACK.md once at session start:

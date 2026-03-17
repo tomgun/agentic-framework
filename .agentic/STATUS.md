@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Dogfood sync + deferred capture — PR in progress (Updated: 2026-03-17 16:10 UTC)
+- F-0224 + plan-scan dedup — PR ready (Updated: 2026-03-17 17:51 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

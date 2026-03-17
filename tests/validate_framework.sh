@@ -4504,10 +4504,10 @@ else
 fi
 
 # AC-002: plan-scan.sh contains key feature detection function
-if grep -q 'extract_primary_feature' "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh"; then
-  pass "F-0198 AC-002: plan-scan.sh has extract_primary_feature function"
+if grep -q 'extract_primary_id' "${FRAMEWORK_ROOT}/.agentic/lib/tools/plan-scan.sh"; then
+  pass "F-0198 AC-002: plan-scan.sh has extract_primary_id function"
 else
-  fail "F-0198 AC-002: plan-scan.sh missing extract_primary_feature function"
+  fail "F-0198 AC-002: plan-scan.sh missing extract_primary_id function"
 fi
 
 # AC-003: plan-scan.sh supports agent-agnostic scan dirs (Claude + Cursor)

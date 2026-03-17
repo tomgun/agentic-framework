@@ -2950,3 +2950,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-17 17:10 - F-0224 Smoke Test Evidence
+
+**Why**: F-0224 was 95% complete; DEVELOPER_GUIDE was the only instruction file missing the setting reference
+
+**What changed**:
+- DEVELOPER_GUIDE settings table now includes smoke_test_evidence — last gap in AC10 instruction file coverage
+
+**Next steps**:
+- Ship F-0224, advance backlog to F-0225
+
+**Blockers**: None
+
+
+### Session: 2026-03-17 17:51 - F-0224 + plan-scan dedup fix
+
+**Why**: plan-scan.sh created duplicate plans when same content existed under different naming (E-0001 vs F-0219)
+
+**What changed**:
+- Smoke test evidence gate complete (DEVELOPER_GUIDE was last gap). Plan-scan now detects epic IDs and deduplicates by content hash — no more phantom F-0219 saves
+
+**Next steps**:
+- Ship PR, advance backlog to F-0225
+
+**Blockers**: None
+

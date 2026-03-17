@@ -205,6 +205,11 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 - **Background**: PR #153 added a "Post-merge dogfood sync" step to the completing-work workflow, but it's guarded to framework-dev only (`FRAMEWORK_DEVELOPMENT.md` existence check). Production projects have a related but different need: when a PR changes behavior, local CLAUDE.md extensions, .cursorrules project-specific sections, and project-level persistent memory (auto-memory) may need updating to reflect the new reality. Examples: a PR adds a new API endpoint → CLAUDE.md's project-specific section should mention it; a PR changes the build system → memory about build commands is stale. This is NOT about syncing `.agentic/lib/` templates (that's framework-internal) — it's about keeping project-level agent context fresh after code changes land.
 - **Related**: PR #153 (dogfood sync), completing-work skill Step 6, `feature_complete.md` "Post-merge dogfood sync" checklist item, F-0226 (Post-Merge Dogfooding planned feature in E-0001 epic)
 
+### T-0077: plan-scan.sh creates duplicates when plan exists under different filename — enforce rigid naming convention: F-XXXX / E-XXXX / slug-based, and match on ID/slug before saving
+- **Added**: 2026-03-17
+- **Background**: `plan-scan.sh` saved `~/.claude/plans/` content as `2026-03-17-F-0219-plan.md` despite identical content already existing as `2026-03-16-E-0001-opportunity-map-epic-plan.md`. Root cause: scan matches by feature ID in filename only, not by content or epic ID. Three plan types need rigid naming: `YYYY-MM-DD-F-XXXX-plan.md`, `YYYY-MM-DD-E-XXXX-plan.md`, `YYYY-MM-DD-<slug>-plan.md` (generic/research). `_find_plan_file()` and `plan-scan.sh` both need updating.
+- **Related**: `plan-scan.sh`, `_find_plan_file()` in ag.sh, `.agentic/journal/plans/`
+
 ## Done
 
 
