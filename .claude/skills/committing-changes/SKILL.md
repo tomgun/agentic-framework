@@ -58,6 +58,10 @@ bash .agentic/lib/tools/status.sh focus "Current state"
 
 **Never edit JOURNAL.md or STATUS.md directly** — always use the scripts.
 
+### Step 3b: Capture Deferred Items
+
+Scan the plan, PR description, and code for any "future", "follow-up", "TODO", "deferred", "later", "PR 2" items. For each, run `ag todo "description"` and immediately add `- **Background**:` and `- **Related**:` fields to the entry. Mandatory when context exists — a one-liner without context is unactionable later.
+
 ### Step 4: Quality Gates
 
 Run these checks:

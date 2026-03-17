@@ -5,7 +5,7 @@ tokens: ~1280
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.59.0 -->
+<!-- memory-seed v0.60.0 -->
 <!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks, centralized-ids -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
@@ -178,11 +178,13 @@ If a state machine transition is blocked by a review checkpoint, or the user say
 
 If the user indicates a feature is complete — in any phrasing (e.g. "done", "complete", "finished", "merged", "PR merged", "shipped", "landed", "wrapped up", "it's in"). Match intent, not exact words.
 
-**STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. P1 ACs must be 100% checked for priority-grouped specs. Flat-list specs use 80% threshold. Before ending, check your TaskList for pending items and flush them to .agentic/TODO.md via `ag todo`. If on main (not in a worktree), run `ag flush --features` to commit state files directly to main.
+**STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. P1 ACs must be 100% checked for priority-grouped specs. Flat-list specs use 80% threshold. Before ending, check your TaskList for pending items and flush them to .agentic/TODO.md via `ag todo`. Also review the plan and PR description for any "future work", "follow-up", "deferred", or "TODO" items — run `ag todo` for each, then IMMEDIATELY add `- **Background**:` and `- **Related**:` fields to the entry (you have the context now; a one-liner without context is unactionable guesswork later). If on main (not in a worktree), run `ag flush --features` to commit state files directly to main.
 
 **Critical**: When merging a PR, use `ag merge <pr#> F-XXXX` instead of `gh pr merge` directly. This structurally chains the merge with `ag done` — no opportunity to forget. If you already ran `gh pr merge`, IMMEDIATELY run `ag done F-XXXX` as the next step. The post-merge flow (VERSION bump, feature status, backlog advance) is part of the merge — not a separate action the user should have to request.
 
 **Automated verification**: `ag done` runs `ag verify F-XXXX` automatically before shipping — extracts `**Automated**:` commands from the AC file's `## Verification` section and executes them. Blocking for formal profiles (`acceptance_criteria: blocking`), advisory for discovery.
+
+**Post-merge dogfood sync** (framework development only): After merging a framework PR, automatically sync the framework-dev environment — compare root instruction files (CLAUDE.md, .cursorrules, copilot, codex) against templates for new shared content, update memory-seed if workflow rules changed, propagate checklist changes to skill references. This is automatic, not a step the user requests.
 
 ## When work is done (doc lifecycle)
 

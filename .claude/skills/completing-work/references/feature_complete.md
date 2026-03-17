@@ -309,11 +309,29 @@ If ANY answer is "No" or "Not sure" → Feature is NOT ready to be marked shippe
 
 ## After Shipping
 
+- [ ] **Capture deferred/future items**
+  - Review the plan (`.agentic/journal/plans/*F-####-plan.md`) and PR description for any "future work", "follow-up", "deferred", or "TODO" items
+  - Run `ag todo "description"` for each one — don't let them stay buried in plans or commit messages
+  - **MANDATORY**: Include `- **Background**:` and `- **Related**:` fields with each TODO — you have the context NOW (source plan, PR, architecture doc, why it matters). A one-liner without context is unactionable guesswork later
+  - Examples: "PR 2 for X", "wrapper for other tools", "field validation needed", "upgrade path for Y"
+  - If an item is substantial enough to be a feature, note that in the TODO for later triage via `ag formalize`
+
 - [ ] **Request human acceptance**
   - "Feature F-#### is now shipped and ready for your validation"
   - Provide test instructions
   - Wait for human to test and accept
   - Human will update `Verification: Accepted: yes` when satisfied
+
+- [ ] **Post-merge dogfood sync** (Framework Development Only — skip if `FRAMEWORK_DEVELOPMENT.md` doesn't exist)
+  - Compare root instruction files against templates for any new shared content from this PR:
+    - `CLAUDE.md` ← `.agentic/lib/agents/claude/CLAUDE.md`
+    - `.cursorrules` ← `.agentic/lib/agents/cursor/cursorrules.txt`
+    - `.github/copilot-instructions.md` ← `.agentic/lib/agents/copilot/copilot-instructions.md`
+    - `.codex/instructions.md` ← `.agentic/lib/agents/codex/codex-instructions.md`
+  - Quick Commands, trigger words, and rules that apply to all users must match
+  - If workflow rules changed: update `.agentic/lib/init/memory-seed.md` version + content
+  - If source checklists changed: propagate to `.claude/skills/*/references/`
+  - This is automatic — don't wait for the user to notice drift
 
 - [ ] **Move to next work**
   - Check STATUS.md for next focus

@@ -67,7 +67,32 @@ bash .agentic/lib/tools/todo.sh list
 
 Surface any items that should be addressed before moving on.
 
-### Step 6: Retrospective Check
+### Step 5b: Capture Deferred/Future Items
+
+Review the plan (`.agentic/journal/plans/*F-XXXX-plan.md`) and PR description for any "future work", "follow-up", "deferred", "PR 2", or "TODO" items that were explicitly scoped out.
+
+For each one, run `ag todo "description"` and then **immediately** edit the entry in TODO.md to add:
+- `- **Background**:` — what it is, why it matters, current state
+- `- **Related**:` — source plan, PR number, architecture doc, related features
+
+This is mandatory when context exists. A one-liner TODO without context is unactionable — the context is cheaper to write now than to rediscover later.
+
+### Step 6: Post-Merge Dogfood Sync (Framework Development Only)
+
+If this is the **framework repo** (check: does `FRAMEWORK_DEVELOPMENT.md` exist?), sync the framework-dev environment with what just shipped:
+
+1. **Instruction file sync**: Compare root files against templates — any new shared content in templates must be reflected in root:
+   - `CLAUDE.md` ← `.agentic/lib/agents/claude/CLAUDE.md`
+   - `.cursorrules` ← `.agentic/lib/agents/cursor/cursorrules.txt`
+   - `.github/copilot-instructions.md` ← `.agentic/lib/agents/copilot/copilot-instructions.md`
+   - `.codex/instructions.md` ← `.agentic/lib/agents/codex/codex-instructions.md`
+   - Quick Commands, trigger words, and rules that apply to all users must match.
+2. **Memory-seed**: If workflow rules changed, update `.agentic/lib/init/memory-seed.md` version + content.
+3. **Skill references**: If source checklists changed, propagate to `.claude/skills/*/references/`.
+
+This sync is automatic — don't wait for the user to notice drift.
+
+### Step 7: Retrospective Check
 
 After shipping, check if a retrospective is due:
 

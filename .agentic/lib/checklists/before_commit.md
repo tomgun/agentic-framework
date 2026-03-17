@@ -170,6 +170,15 @@ These checks apply only when working on the agentic framework repo itself:
 
 ---
 
+## Capture Deferred Items
+
+- [ ] **Any future work mentioned in this PR/plan?**
+  - Scan plan, PR description, and code comments for "future", "follow-up", "TODO", "deferred", "later"
+  - Run `ag todo "description"` for each deferred item — don't let them stay buried in prose
+  - **MANDATORY**: If you have context (source plan, related PR, architecture doc, why it matters), add `- **Background**:` and `- **Related**:` fields to the TODO entry immediately after creating it. A one-liner TODO without available context is unactionable — the context is cheaper to write now than to rediscover later
+
+---
+
 ## No Stale Placeholders
 
 - [ ] **No "(Not yet created)" text**
