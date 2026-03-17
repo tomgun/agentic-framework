@@ -34,8 +34,7 @@ else
     RED='' GREEN='' YELLOW='' BLUE='' BOLD='' DIM='' NC=''
 fi
 
-FEATURES_FILE="$ROOT_DIR/.agentic/spec/FEATURES.md"
-ACCEPTANCE_DIR="$ROOT_DIR/.agentic/spec/acceptance"
+# FEATURES_FILE and ACCEPTANCE_DIR provided by paths.sh
 
 # --- Helpers ---
 
@@ -118,7 +117,7 @@ cmd_discovery() {
     while IFS= read -r fid; do
         [[ -z "$fid" ]] && continue
         local ac_file="$ACCEPTANCE_DIR/${fid}.md"
-        ((total_features++))
+        total_features=$((total_features + 1))
 
         local disc_count
         disc_count=$(count_discovered_markers "$ac_file")
@@ -126,7 +125,7 @@ cmd_discovery() {
         if [[ "$disc_count" -gt 0 ]]; then
             echo -e "  ${YELLOW}⚡${NC} ${BOLD}$fid${NC}: $disc_count discovered requirement(s)"
             total_discoveries=$((total_discoveries + disc_count))
-            ((features_with_discoveries++))
+            features_with_discoveries=$((features_with_discoveries + 1))
         fi
     done <<< "$features"
 
@@ -162,7 +161,7 @@ cmd_churn() {
         [[ -z "$fid" ]] && continue
         local ac_file="$ACCEPTANCE_DIR/${fid}.md"
         [[ ! -f "$ac_file" ]] && continue
-        ((total_features++))
+        total_features=$((total_features + 1))
 
         local commits
         commits=$(count_churn_commits "$fid")
@@ -172,14 +171,14 @@ cmd_churn() {
         case "$level" in
             high)
                 echo -e "  ${RED}▲${NC} ${BOLD}$fid${NC}: $commits commits (high churn)"
-                ((high_churn++))
+                high_churn=$((high_churn + 1))
                 ;;
             medium)
                 echo -e "  ${YELLOW}●${NC} ${BOLD}$fid${NC}: $commits commits (medium)"
-                ((medium_churn++))
+                medium_churn=$((medium_churn + 1))
                 ;;
             low)
-                ((low_churn++))
+                low_churn=$((low_churn + 1))
                 ;;
         esac
     done <<< "$features"
@@ -261,17 +260,10 @@ cmd_summary_line() {
         total_discoveries=$((total_discoveries + disc))
     done <<< "$features"
 
-    local parts=()
     if [[ "$total_discoveries" -gt 0 ]]; then
-        parts+=("${total_discoveries} discovered")
-    fi
-
-    if [[ ${#parts[@]} -eq 0 ]]; then
-        echo "$total_features specs tracked, no anomalies"
+        echo "$total_features specs tracked, ${total_discoveries} discovered"
     else
-        local joined
-        joined=$(IFS=', '; echo "${parts[*]}")
-        echo "$total_features specs tracked, $joined"
+        echo "$total_features specs tracked, no anomalies"
     fi
 }
 
