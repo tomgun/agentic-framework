@@ -1747,7 +1747,7 @@ class FrameworkVerifier:
         if "features_have_status" in name:
             return "Features in FEATURES.md should have reached 'shipped' status. Run `ag done F-XXXX` for completed features."
         if "plans_exist" in name:
-            return "Implementation plans should exist at .agentic/journal/plans/F-XXXX-plan.md. Run `ag plan F-XXXX` or `ag implement F-XXXX` which creates plans."
+            return "Implementation plans should exist at .agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md (dated). Run `ag plan F-XXXX` or `ag implement F-XXXX` which creates plans."
         if "plans_approved" in name:
             return "Plans should have **Status**: APPROVED. The plan review process must complete."
         if "acceptance_criteria_checked" in name:
@@ -1792,7 +1792,7 @@ class FrameworkVerifier:
             else:
                 hints.append(
                     "Create the plan file directly at "
-                    ".agentic/journal/plans/F-XXXX-plan.md with "
+                    ".agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md with "
                     "**Status**: APPROVED if the plan review is not possible."
                 )
         elif "acceptance_criteria_checked" in name:

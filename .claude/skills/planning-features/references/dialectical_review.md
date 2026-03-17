@@ -15,7 +15,7 @@ After both Critic and Advocate return, synthesize using this format:
 ```markdown
 # Dialectical Review: F-XXXX (Iteration N)
 
-**Plan**: `.agentic/journal/plans/F-XXXX-plan.md`
+**Plan**: `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` (dated plan file)
 **Conducted**: YYYY-MM-DD
 
 ## High-Confidence Findings

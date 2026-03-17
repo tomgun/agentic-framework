@@ -91,7 +91,7 @@ You are reading this plan with **fresh context**. This means you must infer the 
 Agent tool:
   subagent_type: general-purpose
   prompt: "You are a PLAN ADVOCATE with fresh context.
-           Read plan: .agentic/journal/plans/F-XXXX-plan.md
+           Read plan: .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
            Read requirements: .agentic/spec/acceptance/F-XXXX.md
            Follow: .agentic/lib/agents/claude/subagents/plan-advocate-agent.md
            Output your structured defense using the format specified."

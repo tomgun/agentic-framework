@@ -2872,3 +2872,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-17 07:29 - F-0224 Smoke Test Evidence
+
+**Why**: ag done had no verification that smoke testing actually happened — tests pass != it works
+
+**What changed**:
+- Evidence-based gate in ag done: checks for .agentic/journal/evidence/F-XXXX-smoke.* files. Three modes (off/recommended/required). verify.py gains --feature flag for auto-generation. Also fixed plan naming convention to always use date prefix.
+
+**Next steps**:
+- PR review, then ag done F-0224
+
+**Blockers**: None
+

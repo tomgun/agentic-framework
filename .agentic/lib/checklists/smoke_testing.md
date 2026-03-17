@@ -324,6 +324,37 @@ jobs:
 
 ---
 
+## Capturing Evidence
+
+When `smoke_test_evidence` is enabled in STACK.md (`recommended` or `required`), `ag done` checks for an evidence artifact before marking a feature complete.
+
+### Manual Evidence
+
+Create a file at `.agentic/journal/evidence/F-XXXX-smoke.md` (or `.txt`, any extension) with:
+- What you tested (environment, steps)
+- What you observed (pass/fail, screenshots, notes)
+- Any concerns or known limitations
+
+### Automated Evidence
+
+Run `ag auto verify --visual --feature F-XXXX` to auto-generate evidence. This:
+1. Runs all test tiers (unit, integration, e2e)
+2. Collects e2e screenshots (requires `E2E screenshots:` configured in STACK.md)
+3. Runs AI visual review on screenshots
+4. Saves structured results to `.agentic/journal/evidence/F-XXXX-smoke.md`
+
+**Note**: `--feature` without `--visual` does not save evidence (visual review is the content).
+
+### Setting Values
+
+| Value | Behavior at `ag done` |
+|-------|----------------------|
+| `off` | Gate skipped entirely (discovery default) |
+| `recommended` | Warns if no evidence, proceeds (formal default) |
+| `required` | Blocks `ag done` until evidence exists. Bypass: `SKIP_SMOKE_EVIDENCE=1` |
+
+---
+
 ## Summary
 
 **The lesson**: Don't trust "it should work" - RUN IT and VERIFY IT.

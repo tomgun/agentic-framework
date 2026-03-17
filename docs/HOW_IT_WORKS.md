@@ -676,7 +676,8 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 | **Distributed Enforcement** | No single orchestrator — ag.sh, pre-commit-check.sh, doctor.py, context-for-role.sh each own their phase. Works across Claude/Cursor/Copilot/Codex. | ACTIVE - architectural design |
 | **Specs-Before-Code** (F-0128) | `ag work` hard-blocks in Formal without feature ID. `ag implement` requires approved plan. `doctor.py` checks blocking. Pre-commit detects workflow bypass. Memory seed reinforces. | ACTIVE - 7 enforcement points |
 | **One-Feature-At-A-Time** | WIP.md lock allows only one feature. `ag implement F-XXXX` blocks if different feature in WIP. | ACTIVE - structural |
-| **Escape Hatches** | `SKIP_TESTS=1`, `SKIP_COMPLEXITY=1`, `SKIP_STALENESS=1` — blocked on main/master branch. Feature branches only. | ACTIVE - safety valve |
+| **Smoke Test Evidence** (F-0224) | `smoke_test_evidence: off\|recommended\|required` in STACK.md. `ag done` checks `.agentic/journal/evidence/F-XXXX-smoke.*`. `recommended` warns, `required` blocks. `ag auto verify --visual --feature F-XXXX` auto-generates evidence. Requires `feature_tracking: yes`. | ACTIVE |
+| **Escape Hatches** | `SKIP_TESTS=1`, `SKIP_COMPLEXITY=1`, `SKIP_STALENESS=1`, `SKIP_SMOKE_EVIDENCE=1` — blocked on main/master branch. Feature branches only. | ACTIVE - safety valve |
 
 **Hidden mechanism**: The "killer test" (S06 in mutation tests) simulates an LLM completely ignoring CLAUDE.md instructions → the git hook still catches the violation. This proves the defense-in-depth architecture actually works: behavioral layers can fail, but structural layers still protect.
 
@@ -989,7 +990,7 @@ These will always rely on behavioral reinforcement:
 The 24 YAML manifests and `context-for-role.sh` are the framework's most sophisticated yet invisible feature. When `ag implement F-XXXX` runs, it should print: "Assemble subagent context with: `bash .agentic/tools/context-for-role.sh implementation-agent F-XXXX`". This would activate the entire agent specialization stack with zero new code.
 
 ### Priority 2: Enforce Plan-Review Gate
-`ag implement` checks for an approved plan but doesn't hard-block without one. Making this structural (exit 1 if no `.agentic/journal/plans/F-XXXX-plan.md` with Status: APPROVED) would ensure the plan-review loop is consistently used for complex features.
+`ag implement` checks for an approved plan but doesn't hard-block without one. Making this structural (exit 1 if no `.agentic/journal/plans/*F-XXXX-plan.md` (dated plan file) with Status: APPROVED) would ensure the plan-review loop is consistently used for complex features.
 
 **Update (v0.50.0)**: Plan review now uses dialectical mechanism (F-0191) — Critic + Advocate agents replace the single reviewer. The mechanism is complete; the enforcement gap (hard-blocking `ag implement` without APPROVED plan) remains a separate issue.
 

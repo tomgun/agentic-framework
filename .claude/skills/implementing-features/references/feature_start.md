@@ -14,7 +14,7 @@ phase: planning
 ## GATE 0: Plan Exists (BLOCKING)
 
 ```
-□ Does .agentic/journal/plans/F-####-plan.md exist?
+□ Does .agentic/journal/plans/*F-####-plan.md exist? (glob — file has date prefix)
   ├─ YES → Check **Status**: line
   │         ├─ APPROVED → Proceed to Gate 1
   │         └─ DRAFT/REVIEWING/REVISION_NEEDED → Run review loop first

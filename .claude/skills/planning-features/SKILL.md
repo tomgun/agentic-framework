@@ -94,7 +94,7 @@ Before calling ExitPlanMode, append this block to the plan:
 Status: DRAFT. This plan is NOT approved for implementation.
 
 After plan mode exits:
-1. Save this plan to `.agentic/journal/plans/F-XXXX-plan.md`
+1. Save this plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md`
 2. Run `ag implement F-XXXX` — the script will block and print review instructions
 3. Follow those instructions (dialectical review: Critic + Advocate agents)
 4. After user approves → update Status to APPROVED → re-run `ag implement`
@@ -117,7 +117,7 @@ These steps MUST run after plan mode exits.
 
 **Do this IMMEDIATELY after plan mode ends.**
 
-Save the plan to `.agentic/journal/plans/F-XXXX-plan.md` with status `DRAFT`.
+Save the plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with status `DRAFT`.
 
 Plans in `~/.claude/plans/` are session-scoped and will be lost. Always copy to the durable location.
 
@@ -132,14 +132,14 @@ If enabled, run dialectical review on the saved plan:
 ```
 Agent(subagent_type="general-purpose",
   prompt="You are a PLAN CRITIC with fresh context.
-    Read plan: .agentic/journal/plans/F-XXXX-plan.md
+    Read plan: .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
     Read requirements: .agentic/spec/acceptance/F-XXXX.md
     Follow: .agentic/lib/agents/claude/subagents/plan-critic-agent.md
     Output your structured critique.")
 
 Agent(subagent_type="general-purpose",
   prompt="You are a PLAN ADVOCATE with fresh context.
-    Read plan: .agentic/journal/plans/F-XXXX-plan.md
+    Read plan: .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
     Read requirements: .agentic/spec/acceptance/F-XXXX.md
     Follow: .agentic/lib/agents/claude/subagents/plan-advocate-agent.md
     Output your structured defense.")
@@ -169,7 +169,7 @@ Steps taken:
 1. Explore codebase for existing caching patterns
 2. Check STACK.md for technology constraints
 3. Present plan: Redis for session cache, in-memory for hot paths
-4. User approves, save to `.agentic/journal/plans/F-0155-plan.md`
+4. User approves, save to `.agentic/journal/plans/YYYY-MM-DD-F-0155-plan.md`
 Result: Clear plan with file list, ready for implementation.
 
 **Example 2: User wants to think before coding**

@@ -102,7 +102,7 @@ The orchestrating agent synthesizes both outputs and presents inline to the user
 ```markdown
 # Dialectical Review: F-XXXX (Iteration N)
 
-**Plan**: `.agentic/journal/plans/F-XXXX-plan.md`
+**Plan**: `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` (dated plan file)
 **Conducted**: YYYY-MM-DD
 
 ## High-Confidence Findings
@@ -159,7 +159,7 @@ Use Agent tool to spawn both in parallel:
 # Both run simultaneously with fresh context
 Agent(
     subagent_type="general-purpose",
-    prompt="""You are a PLAN CRITIC. Read the plan at .agentic/journal/plans/F-XXXX-plan.md
+    prompt="""You are a PLAN CRITIC. Read the dated plan at .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
     and the acceptance criteria at .agentic/spec/acceptance/F-XXXX.md.
     Follow instructions in .agentic/lib/agents/claude/subagents/plan-critic-agent.md.
     Output your structured critique."""
@@ -167,7 +167,7 @@ Agent(
 
 Agent(
     subagent_type="general-purpose",
-    prompt="""You are a PLAN ADVOCATE. Read the plan at .agentic/journal/plans/F-XXXX-plan.md
+    prompt="""You are a PLAN ADVOCATE. Read the dated plan at .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
     and the acceptance criteria at .agentic/spec/acceptance/F-XXXX.md.
     Follow instructions in .agentic/lib/agents/claude/subagents/plan-advocate-agent.md.
     Output your structured defense."""

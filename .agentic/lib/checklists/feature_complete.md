@@ -32,6 +32,10 @@ phase: completion
   - [ ] Verified output matches expectations (visual, functional, data)
   - [ ] Tried different inputs/scenarios
   - **NOT just "tests pass" - ACTUALLY RUN IT and VERIFY IT WORKS**
+  - [ ] **Evidence captured** (if `smoke_test_evidence` != `off` in STACK.md)
+    - Create `.agentic/journal/evidence/F-####-smoke.md` manually, or
+    - Run `ag auto verify --visual --feature F-####` to auto-generate
+    - `ag done` checks for this artifact (`recommended` = warn, `required` = block)
 
 ---
 

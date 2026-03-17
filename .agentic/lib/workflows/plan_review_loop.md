@@ -60,7 +60,7 @@ phase: planning
 
 ## Plan Artifact Format
 
-Plans are written to `.agentic/journal/plans/F-XXXX-plan.md`:
+Plans are written to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md`:
 
 ```markdown
 # Plan: F-XXXX [Feature Title]
@@ -195,7 +195,7 @@ Agent(
     prompt="""
     Create implementation plan for F-XXXX.
     Read: .agentic/spec/acceptance/F-XXXX.md, CONTEXT_PACK.md
-    Write plan to: .agentic/journal/plans/F-XXXX-plan.md
+    Write plan to: .agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md
     Follow format in: .agentic/lib/workflows/plan_review_loop.md
     """
 )
@@ -203,7 +203,7 @@ Agent(
 # Step 2: Critic + Advocate (parallel, fresh context)
 Agent(
     subagent_type="general-purpose",
-    prompt="""You are a PLAN CRITIC. Read plan at .agentic/journal/plans/F-XXXX-plan.md
+    prompt="""You are a PLAN CRITIC. Read dated plan at .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
     and acceptance criteria at .agentic/spec/acceptance/F-XXXX.md.
     Follow: .agentic/lib/agents/claude/subagents/plan-critic-agent.md
     Output structured critique."""
@@ -211,7 +211,7 @@ Agent(
 
 Agent(
     subagent_type="general-purpose",
-    prompt="""You are a PLAN ADVOCATE. Read plan at .agentic/journal/plans/F-XXXX-plan.md
+    prompt="""You are a PLAN ADVOCATE. Read dated plan at .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
     and acceptance criteria at .agentic/spec/acceptance/F-XXXX.md.
     Follow: .agentic/lib/agents/claude/subagents/plan-advocate-agent.md
     Output structured defense."""
@@ -228,7 +228,7 @@ Agent(
 When `max_iterations` reached:
 
 1. Plan file shows current state and all review history
-2. Agent notifies human: "Plan has been through N iterations — see .agentic/journal/plans/F-XXXX-plan.md"
+2. Agent notifies human: "Plan has been through N iterations — see .agentic/journal/plans/*F-XXXX-plan.md (dated plan file)"
 3. This is advisory, not blocking. User can:
    - Approve the plan as-is
    - Edit plan directly and set status to `APPROVED`

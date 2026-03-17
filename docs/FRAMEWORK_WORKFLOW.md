@@ -77,7 +77,7 @@ The golden path above hides the most important transformation: how a vague idea 
 flowchart TD
     A["💡 Raw Idea\n'We need user login'"] -->|"ag todo / ag kickoff"| B["📥 Captured\nTODO.md or kickoff staging"]
     B -->|"ag backlog add / ag kickoff --approve"| C["📋 Backlog Item\nBACKLOG.json position + F-XXXX in FEATURES.md"]
-    C -->|"ag plan F-XXXX"| D["🗺️ Plan\njournal/plans/F-XXXX-plan.md\nStatus: DRAFT"]
+    C -->|"ag plan F-XXXX"| D["🗺️ Plan\njournal/plans/YYYY-MM-DD-F-XXXX-plan.md\nStatus: DRAFT"]
     D -->|"dialectical review\n(Formal/Autonomous)"| E["✅ Approved Plan\nStatus: APPROVED"]
     E -->|"write spec"| F["📝 Acceptance Criteria\nspec/acceptance/F-XXXX.md\nAC-001, AC-002, ..."]
     F -->|"ag implement F-XXXX\n(gates check all above)"| G["⚙️ Implementation Begins"]
@@ -106,7 +106,7 @@ This creates an F-XXXX entry in FEATURES.md with `Status: planned` and adds it t
 ```
 ag plan F-0042
 ```
-Agent explores the codebase, drafts an implementation approach, saves to `.agentic/journal/plans/F-0042-plan.md` with `Status: DRAFT`. In Formal profile, dialectical review runs: a Critic agent attacks the plan, an Advocate defends it, they iterate until agreeing or the user decides.
+Agent explores the codebase, drafts an implementation approach, saves to `.agentic/journal/plans/YYYY-MM-DD-F-0042-plan.md` with `Status: DRAFT`. In Formal profile, dialectical review runs: a Critic agent attacks the plan, an Advocate defends it, they iterate until agreeing or the user decides.
 
 **Stage 4 — Acceptance criteria** (the contract):
 ```markdown
@@ -186,7 +186,7 @@ Not every idea follows the same path in:
 |---|-------|-------------|-------------|-------------|
 | 1 | **Session Start** | Dashboard loads, WIP recovery, orphan plan scan, context hydration | `ag start` / `ag sync` | STATUS.md, AGENTS.json |
 | 2 | **Intent & Routing** | Trigger words route to workflows: "build" → spec-first, "fix" → test-first, "done" → completion | Trigger words / skills | Skill activation |
-| 3 | **Planning** | `ag plan` drafts approach, dialectical review (Critic + Advocate) validates, plan saved durably | `ag plan F-XXXX` | `.agentic/journal/plans/F-XXXX-plan.md` |
+| 3 | **Planning** | `ag plan` drafts approach, dialectical review (Critic + Advocate) validates, plan saved durably | `ag plan F-XXXX` | `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` |
 | 4 | **Specification** | Acceptance criteria written, NFRs integrated, clarity gate validates testability | `ag spec` | `spec/acceptance/F-XXXX.md`, `spec/FEATURES.md` |
 | 5 | **Implementation** | TDD (test-first) or standard flow. WIP tracked. Checkpoints at scope boundaries | `ag implement F-XXXX` | Source code, WIP entry in AGENTS.json |
 | 6 | **Verification** | Tests run, NFR coverage checked, AC completion verified, smoke test | `ag auto verify` | Test results, verification record |
@@ -268,11 +268,11 @@ Not every idea follows the same path in:
 - `ag implement F-XXXX` — checks for approved plan (Gate 0), blocks if missing/draft
 
 **Gates**:
-- Plan must exist at `.agentic/journal/plans/F-XXXX-plan.md` before implementation
+- Plan must exist at `.agentic/journal/plans/*F-XXXX-plan.md` (dated plan file) before implementation
 - Plan status must be APPROVED (not DRAFT) — enforced by `ag implement` Gate 0
 
 **Artifacts**:
-- Created: `.agentic/journal/plans/F-XXXX-plan.md` (status: DRAFT → APPROVED)
+- Created: `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` (status: DRAFT → APPROVED)
 - Read: CONTEXT_PACK.md, STACK.md, FEATURES.md, existing code
 
 **Profile variations**:
@@ -785,7 +785,7 @@ erDiagram
 | FEATURES.md | `.agentic/spec/FEATURES.md` | Yes | Specification | All phases | `feature.sh` | `feature.sh` |
 | Acceptance files | `.agentic/spec/acceptance/F-XXXX.md` | Yes | Specification | Implementation, Verification | Manual / `ag spec` | — |
 | NFR.md | `.agentic/spec/NFR.md` | Yes | Specification | Verification, Implementation | Manual | — |
-| Plan files | `.agentic/journal/plans/F-XXXX-plan.md` | Yes | Planning | Implementation | `ag plan` | — |
+| Plan files | `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` | Yes | Planning | Implementation | `ag plan` | — |
 | JOURNAL.md | `.agentic/journal/JOURNAL.md` | Yes | Documentation | Session Start | `journal.sh` | `journal.sh` |
 | STATUS.md | `.agentic/STATUS.md` | Yes | Session Start | Dashboard | `status.sh` | `status.sh` |
 | STACK.md | `STACK.md` (project root) | Yes | Init | All phases | Manual / `ag set` | `ag set` |
@@ -1778,7 +1778,7 @@ ag implement F-XXXX   # resumes if WIP exists
 # Scan for orphaned plans
 bash .agentic/lib/tools/plan-scan.sh
 # Save to durable location
-cp ~/.claude/plans/<plan-file> .agentic/journal/plans/F-XXXX-plan.md
+cp ~/.claude/plans/<plan-file> .agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md
 ```
 
 **Merge conflict on state files**

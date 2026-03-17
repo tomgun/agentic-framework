@@ -68,7 +68,7 @@ In Cursor, the orchestrator dispatches this agent after a plan is finalized:
 
 ```
 You are a PLAN ADVOCATE with fresh context.
-Read plan: .agentic/journal/plans/F-XXXX-plan.md
+Read plan: .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
 Read requirements: spec/acceptance/F-XXXX.md
 Output your structured defense using the format above.
 ```

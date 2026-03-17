@@ -25,6 +25,7 @@ tokens: ~952
 | Pre-commit checks | `pre_commit_checks` | **full** | fast | Script-enforced |
 | Feature tracking | `feature_tracking` | **yes** | no | Script-enforced |
 | Docs gate | `docs_gate` | **blocking** | off | Script-enforced |
+| Smoke evidence | `smoke_test_evidence` | **recommended** | off | Script-enforced (`ag done` checks `.agentic/journal/evidence/F-XXXX-smoke.*`) |
 | Spec directory | `spec_directory` | **yes** | no | Script-enforced |
 | Review checkpoints | `review_*` | **human/critical_agent** | skip | Script-enforced |
 | Taste review (F-0183) | `review_taste` | **critical_agent** | skip | Script-enforced (piggybacks on code review transitions; requires `## Style & taste` in STACK.md) |
@@ -34,7 +35,7 @@ tokens: ~952
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 
 **Quick Commands**: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag worktree` | `ag spec` | `ag docs` | `ag todo` | `ag feedback` | `ag intent` | `ag formalize` | `ag kickoff "vision"` | `ag run`
-**Autonomous**: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX` | `ag auto epic F-XXXX --parallel` | `ag auto pipeline`
+**Autonomous**: `ag auto verify` | `ag auto verify --visual` | `ag auto verify --visual --feature F-XXXX` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX` | `ag auto epic F-XXXX --parallel` | `ag auto pipeline`
 **Kickoff**: `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve` | `ag kickoff --discard`
 
 ---
@@ -45,7 +46,7 @@ Profiles set default bundles. Override any setting: `ag set <key> <value>` | Vie
 **Ask first**: Add dependencies, change architecture, delete files, modify APIs, large refactors.
 **Never**: Commit without approval in interactive sessions, push to main, modify secrets, skip acceptance criteria, fabricate. (Autonomous workflows with `review_commit: critical_agent` may auto-commit after adversarial review.)
 
-**Plans**: Save approved plans to `.agentic/journal/plans/F-XXXX-plan.md` (durable, git-tracked). Tool-specific plan locations (`.claude/plans/`) are session-scoped.
+**Plans**: Save approved plans to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` (durable, git-tracked). Tool-specific plan locations (`.claude/plans/`) are session-scoped.
 
 **After plan mode exits** (when `plan_review_enabled: yes`): Save plan as DRAFT → run `ag implement F-XXXX` (it blocks with review instructions) → follow instructions (spawn Critic + Advocate) → after user approves, update status to APPROVED → re-run `ag implement`. Do NOT self-assess the plan, read implementation files, or code before the plan is APPROVED.
 

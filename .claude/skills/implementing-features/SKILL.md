@@ -33,7 +33,7 @@ If `.agentic/BACKLOG.json` exists and has items, `ag implement F-XXXX` enforces 
 **Your FIRST action must be `ag implement F-XXXX`.**
 This script (ag.sh) enforces the plan-review gate:
 - Auto-saves plans from ~/.claude/plans/ to durable location
-- Checks `**Status**: APPROVED` in `.agentic/journal/plans/F-XXXX-plan.md`
+- Checks `**Status**: APPROVED` in `.agentic/journal/plans/*F-XXXX-plan.md` (dated plan file)
 - Blocks with `exit 1` + review instructions if not approved
 
 If `ag implement` blocks:
@@ -42,7 +42,7 @@ If `ag implement` blocks:
 - Do NOT self-assess the plan or code around the gate
 
 If you just exited plan mode:
-1. Save the plan to `.agentic/journal/plans/F-XXXX-plan.md` with `**Status**: DRAFT`
+1. Save the plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT`
 2. Run `ag implement F-XXXX` — it will trigger the gate
 
 **Do NOT skip planning.** A plan is how you understand the feature scope, identify files to change, and avoid wasted work. Even simple features benefit from a quick plan — it takes minutes and saves hours.

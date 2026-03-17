@@ -99,7 +99,7 @@ You are reading this plan with **fresh context**. You haven't seen the planning 
 Agent tool:
   subagent_type: general-purpose
   prompt: "You are a PLAN CRITIC with fresh context.
-           Read plan: .agentic/journal/plans/F-XXXX-plan.md
+           Read plan: .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
            Read requirements: .agentic/spec/acceptance/F-XXXX.md
            Follow: .agentic/lib/agents/claude/subagents/plan-critic-agent.md
            Output your structured critique using the format specified."
