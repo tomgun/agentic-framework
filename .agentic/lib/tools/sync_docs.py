@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from paths import get_paths
 
 
-FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):\s*(.+?)\s*$")
+from ids import FEATURE_HEADER_RE
 
 
 def ensure_file(path: Path, content: str) -> None:

@@ -29,7 +29,7 @@ fi
 FEATURE_ID="$1"
 
 # Validate feature ID format
-if ! [[ "$FEATURE_ID" =~ ^F-[0-9]{4}$ ]]; then
+if ! is_feature_id "$FEATURE_ID"; then
   echo "❌ Invalid feature ID format. Expected F-#### (e.g., F-0001)"
   exit 1
 fi

@@ -20,8 +20,10 @@ import argparse
 from pathlib import Path
 from typing import List, Dict, Optional
 
-# Regex patterns
-FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):\s*(.+?)\s*$")
+# Import centralized path resolver
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# Centralized ID patterns
+from ids import FEATURE_HEADER_RE, is_valid_feature_id
 KEY_RE = re.compile(r"^\s*-\s+([\w][\w\s/.-]*?):\s*(.*?)\s*$")
 BOLD_KEY_RE = re.compile(r"^\*\*(\w[\w\s/&.-]*?)\*\*:\s*(.*?)\s*$")
 TAG_RE = re.compile(r'\[([^\]]+)\]')
@@ -420,7 +422,7 @@ Examples:
     # Handle --children query
     if args.children:
         # Validate feature ID format
-        if not re.match(r'^F-\d{4}$', args.children):
+        if not is_valid_feature_id(args.children):
             print(f"Error: Invalid feature ID format: {args.children}", file=sys.stderr)
             print("Expected format: F-XXXX (e.g., F-0001)", file=sys.stderr)
             sys.exit(1)

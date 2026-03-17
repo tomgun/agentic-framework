@@ -25,7 +25,8 @@ def validate_features_md(path: Path) -> List[str]:
     lines = content.splitlines()
     
     # Check for feature headers
-    feature_pattern = re.compile(r"^## (F-\d{4}):\s*(.+?)\s*$")
+    from ids import FEATURE_HEADER_RE
+    feature_pattern = FEATURE_HEADER_RE
     features_found = 0
     
     for i, line in enumerate(lines, 1):

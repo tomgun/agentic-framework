@@ -188,7 +188,7 @@ class FeatureStateMachine:
         # Extract the section (up to the next feature header or end of file)
         section_start = match.end()
         section = content[section_start:]
-        next_header = re.search(r"^## F-\d{4}:", section, re.MULTILINE)
+        next_header = re.search(r"^## F-\d{4,}:", section, re.MULTILINE)
         if next_header:
             section = section[:next_header.start()]
 
@@ -464,7 +464,7 @@ class FeatureStateMachine:
         results: list[tuple[str, FeatureState, list[FeatureState]]] = []
         content = features_file.read_text()
 
-        for match in re.finditer(r"^## (F-\d{4}):", content, re.MULTILINE):
+        for match in re.finditer(r"^## (F-\d{4,}):", content, re.MULTILINE):
             fid = match.group(1)
             current = self.get_current_state(fid)
             if current is None:

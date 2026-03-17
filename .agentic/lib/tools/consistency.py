@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from paths import get_paths
 
 
-FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):", re.MULTILINE)
+from ids import FEATURE_HEADER_RE
 
 
 def parse_features(md: str) -> dict[str, dict]:
@@ -152,7 +152,7 @@ def check_status_staleness(repo_root: Path, features: dict[str, dict]) -> list[s
             in_progress_section = in_progress_match.group(1)
             
             # Find feature IDs mentioned
-            feature_ids = re.findall(r"\b(F-\d{4})\b", in_progress_section)
+            feature_ids = re.findall(r"\b(F-\d{4,})\b", in_progress_section)
             
             for fid in feature_ids:
                 if fid in features:

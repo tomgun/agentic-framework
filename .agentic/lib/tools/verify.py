@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from settings import get_setting, is_formal_like
 from paths import get_paths
 
-FEATURE_ID_RE = re.compile(r"\b(F-\d{4})\b")
+from ids import FEATURE_ID_RE
 NFR_ID_RE = re.compile(r"\b(NFR-\d{4})\b")
 ADR_ID_RE = re.compile(r"\b(ADR-\d{4})\b")
 
@@ -69,7 +69,7 @@ def find_broken_links(root: Path) -> list[str]:
     if features_path.exists():
         try:
             content = features_path.read_text(encoding="utf-8")
-            valid_features = set(re.findall(r"^##\s+(F-\d{4}):", content, re.MULTILINE))
+            valid_features = set(re.findall(r"^##\s+(F-\d{4,}):", content, re.MULTILINE))
         except Exception:
             pass
     
@@ -147,7 +147,7 @@ def check_acceptance_files(root: Path) -> list[str]:
     
     # Find all features
     feature_blocks = re.findall(
-        r"^##\s+(F-\d{4}):\s*(.+?)$.*?^- Status:\s*(\w+)",
+        r"^##\s+(F-\d{4,}):\s*(.+?)$.*?^- Status:\s*(\w+)",
         content,
         re.MULTILINE | re.DOTALL
     )

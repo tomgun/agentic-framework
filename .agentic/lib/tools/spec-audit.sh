@@ -45,7 +45,7 @@ TRACKER_FILE="$ROOT_DIR/.agentic/session/.qa-tracker.json"
 # Get list of shipped feature IDs
 get_shipped_features() {
     grep -B1 'Status.*shipped' "$FEATURES_FILE" 2>/dev/null \
-        | grep -oE 'F-[0-9]{4}' | sort -u
+        | grep -oE "$FEATURE_ID_ERE" | sort -u
 }
 
 # Get acceptance file for a feature
@@ -282,7 +282,7 @@ cmd_verify() {
     local target="${1:-}"
     local features=""
 
-    if [ -n "$target" ] && [[ "$target" =~ ^F-[0-9]{4}$ ]]; then
+    if [ -n "$target" ] && is_feature_id "$target"; then
         features="$target"
     else
         features=$(get_shipped_features)
@@ -340,7 +340,7 @@ except: pass
     # Find features whose acceptance files changed since last audit
     local changed_features
     changed_features=$(git diff --name-only "$last_commit" HEAD -- ".agentic/spec/acceptance/" 2>/dev/null \
-        | grep -oE 'F-[0-9]{4}' | sort -u)
+        | grep -oE "$FEATURE_ID_ERE" | sort -u)
 
     if [ -z "$changed_features" ]; then
         echo -e "${GREEN}No spec changes since last audit ($last_commit).${NC}"
@@ -444,7 +444,7 @@ _propagate_nfr() {
     # Find features referencing this NFR
     local affected_features
     affected_features=$(grep -B5 "$nfr_id" "$FEATURES_FILE" 2>/dev/null \
-        | grep -oE 'F-[0-9]{4}' | sort -u)
+        | grep -oE "$FEATURE_ID_ERE" | sort -u)
 
     if [ -z "$affected_features" ]; then
         echo -e "${GREEN}No features reference $nfr_id.${NC}"
@@ -502,7 +502,7 @@ _propagate_migration() {
 
     # Extract feature IDs mentioned in migration
     local affected_features
-    affected_features=$(grep -oE 'F-[0-9]{4}' "$migration_file" 2>/dev/null | sort -u)
+    affected_features=$(grep -oE "$FEATURE_ID_ERE" "$migration_file" 2>/dev/null | sort -u)
 
     if [ -z "$affected_features" ]; then
         echo -e "${DIM}No feature IDs found in migration content.${NC}"
@@ -670,7 +670,7 @@ USAGE
         cmd_verify ""
         ;;
     *)
-        if [[ "$1" =~ ^F-[0-9]{4}$ ]]; then
+        if is_feature_id "$1"; then
             cmd_verify "$1"
         else
             echo -e "${RED}Unknown argument: $1${NC}"

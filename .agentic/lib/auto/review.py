@@ -49,7 +49,8 @@ from settings import get_setting  # noqa: E402
 # Feature ID validation
 # ---------------------------------------------------------------------------
 
-_FEATURE_ID_RE = re.compile(r"^F-\d{4,}$")
+from ids import FEATURE_ID_STRICT_RE as _FEATURE_ID_RE  # noqa: E402
+from ids import is_valid_feature_id  # noqa: E402
 
 
 def _validate_feature_id(feature_id: str) -> None:

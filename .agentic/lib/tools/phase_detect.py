@@ -55,10 +55,10 @@ def detect_phase(root: Path) -> str:
         return "start"
 
     # Match WIP.md format: **Feature**: F-0001
-    feature_match = re.search(r"\*\*Feature\*\*:\s*(F-\d{4})", wip_content)
+    feature_match = re.search(r"\*\*Feature\*\*:\s*(F-\d{4,})", wip_content)
     if not feature_match:
         # Also try simpler format: Feature: F-0001
-        feature_match = re.search(r"Feature:\s*(F-\d{4})", wip_content)
+        feature_match = re.search(r"Feature:\s*(F-\d{4,})", wip_content)
 
     if not feature_match:
         return "start"

@@ -85,9 +85,9 @@ def _create_epic_entry(
     paths = get_paths(project_root)
     messages: list[str] = []
 
-    from auto.epic import get_next_feature_id
+    from ids import get_next_feature_id, format_feature_id
     next_id = get_next_feature_id(paths.features_file)
-    epic_id = f"F-{next_id:04d}"
+    epic_id = format_feature_id(next_id)
 
     # Append epic section to FEATURES.md
     section = "\n".join([

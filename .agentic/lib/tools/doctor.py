@@ -352,9 +352,8 @@ def checks_for_profile(profile: str, root: Path | None = None) -> list[Check]:
         Check("spec/adr", "dir", "architecture decisions"),
     ]
 
-FEATURE_ID_RE = re.compile(r"\b(F-\d{4})\b")
+from ids import FEATURE_HEADER_RE, FEATURE_ID_RE
 NFR_ID_RE = re.compile(r"\b(NFR-\d{4})\b")
-FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):\s*(.+?)\s*$", re.MULTILINE)
 STATUS_VALUES = {
     "planned", "specced", "criteria_set", "tests_written",
     "implementing", "verified", "documented", "committed",

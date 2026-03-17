@@ -80,7 +80,7 @@ mkdir -p "$PLANS_DIR"
 # This prevents copying plans that belong to OTHER projects
 _known_features=""
 if [[ -f "$FEATURES_FILE" ]]; then
-    _known_features=$(grep -oE 'F-[0-9]{4}' "$FEATURES_FILE" 2>/dev/null | sort -u || true)
+    _known_features=$(grep -oE "$FEATURE_ID_ERE" "$FEATURES_FILE" 2>/dev/null | sort -u || true)
 fi
 
 # --- Helper: extract primary feature ID from a plan file ---
@@ -93,21 +93,21 @@ extract_primary_feature() {
 
     # Pattern 1: "# F-XXXX:" or "## F-XXXX:" (feature ID in heading)
     local fid
-    fid=$(echo "$header" | grep -oE '^#+ F-[0-9]{4}' | head -1 | grep -oE 'F-[0-9]{4}' || true)
+    fid=$(echo "$header" | grep -oE "^#+ $FEATURE_ID_ERE" | head -1 | grep -oE "$FEATURE_ID_ERE" || true)
     if [[ -n "$fid" ]]; then
         echo "$fid"
         return
     fi
 
     # Pattern 2: "F-XXXX" in the first heading line (e.g., "# Plan: Implement F-0198")
-    fid=$(echo "$header" | grep -E '^#' | head -1 | grep -oE 'F-[0-9]{4}' | head -1 || true)
+    fid=$(echo "$header" | grep -E '^#' | head -1 | grep -oE "$FEATURE_ID_ERE" | head -1 || true)
     if [[ -n "$fid" ]]; then
         echo "$fid"
         return
     fi
 
     # Pattern 3: "**Feature**: F-XXXX" or "Feature: F-XXXX" in metadata
-    fid=$(echo "$header" | grep -iE '(feature|feature.id)[:\*]*\s*F-[0-9]{4}' | grep -oE 'F-[0-9]{4}' | head -1 || true)
+    fid=$(echo "$header" | grep -iE "(feature|feature.id)[:\*]*\s*$FEATURE_ID_ERE" | grep -oE "$FEATURE_ID_ERE" | head -1 || true)
     if [[ -n "$fid" ]]; then
         echo "$fid"
         return

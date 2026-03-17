@@ -61,7 +61,7 @@ get_referencing_features() {
     local nfr_id="$1"
     if [[ -f "$FEATURES_FILE" ]]; then
         awk -v nfr="$nfr_id" '
-            /^## F-[0-9]{4}:/ { fid=$2; sub(/:$/,"",fid); fname=$0; sub(/^## F-[0-9]+: */,"",fname) }
+            /^## F-[0-9][0-9][0-9][0-9]+:/ { fid=$2; sub(/:$/,"",fid); fname=$0; sub(/^## F-[0-9]+: */,"",fname) }
             fid && $0 ~ nfr { print fid " " fname; fid="" }
         ' "$FEATURES_FILE"
     fi

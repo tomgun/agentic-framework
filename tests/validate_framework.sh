@@ -5074,6 +5074,74 @@ else
   fail "auto_orchestration.md missing smoke evidence gate"
 fi
 
+# F-0193: Centralized Feature IDs
+# ============================================================
+
+# ids.py exists and exports required symbols
+if [ -f "${FRAMEWORK_ROOT}/.agentic/lib/ids.py" ]; then
+  pass "F-0193: ids.py exists"
+else
+  fail "F-0193: ids.py not found"
+fi
+
+# ids.sh exists and exports required symbols
+if [ -f "${FRAMEWORK_ROOT}/.agentic/lib/ids.sh" ]; then
+  pass "F-0193: ids.sh exists"
+else
+  fail "F-0193: ids.sh not found"
+fi
+
+# is_feature_id function works
+source "${FRAMEWORK_ROOT}/.agentic/lib/ids.sh"
+if is_feature_id "F-0001"; then
+  pass "F-0193: is_feature_id accepts F-0001"
+else
+  fail "F-0193: is_feature_id rejects F-0001"
+fi
+
+if is_feature_id "F-10000"; then
+  pass "F-0193: is_feature_id accepts F-10000"
+else
+  fail "F-0193: is_feature_id rejects F-10000"
+fi
+
+if ! is_feature_id "F-01"; then
+  pass "F-0193: is_feature_id rejects F-01"
+else
+  fail "F-0193: is_feature_id accepts F-01 (should reject)"
+fi
+
+# No hardcoded 4-digit-only patterns in .agentic/lib/ Python files
+hardcoded_py=$(grep -rn 'F-\\d{4}[^,}]' "${FRAMEWORK_ROOT}/.agentic/lib/" --include='*.py' 2>/dev/null | grep -v 'ids.py' | grep -v '__pycache__' || true)
+if [ -z "$hardcoded_py" ]; then
+  pass "F-0193: No hardcoded 4-digit-only Python patterns"
+else
+  fail "F-0193: Hardcoded 4-digit patterns found in Python: $hardcoded_py"
+fi
+
+# No hardcoded 4-digit-only patterns in .agentic/lib/ shell files
+hardcoded_sh=$(grep -rn "F-\[0-9\]{4}[^,}]" "${FRAMEWORK_ROOT}/.agentic/lib/" --include='*.sh' 2>/dev/null | grep -v 'ids.sh' || true)
+if [ -z "$hardcoded_sh" ]; then
+  pass "F-0193: No hardcoded 4-digit-only shell patterns"
+else
+  fail "F-0193: Hardcoded 4-digit patterns found in shell: $hardcoded_sh"
+fi
+
+# paths.sh sources ids.sh
+if grep -q "ids.sh" "${FRAMEWORK_ROOT}/.agentic/lib/paths.sh"; then
+  pass "F-0193: paths.sh sources ids.sh"
+else
+  fail "F-0193: paths.sh does not source ids.sh"
+fi
+
+# JSON schemas use widened pattern
+if grep -q 'F-\[0-9\]{4,}' "${FRAMEWORK_ROOT}/.agentic/lib/schemas/feature.schema.json"; then
+  pass "F-0193: feature.schema.json uses widened pattern"
+else
+  fail "F-0193: feature.schema.json still uses 4-digit-only pattern"
+fi
+
+
 # Summary
 # ============================================================
 echo ""

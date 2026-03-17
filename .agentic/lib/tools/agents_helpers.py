@@ -537,12 +537,12 @@ def cmd_migrate_wip(agents_file: Path, wip_path: str) -> int:
         if line.startswith("- **Feature**:"):
             rest = line.split(":", 1)[1].strip() if ":" in line else ""
             # Try to extract F-XXXX
-            m = re.search(r'F-\d{4}', rest)
+            m = re.search(r'F-\d{4,}', rest)
             if m:
                 feature_id = m.group(0)
             # Description is after the feature ID
             desc_part = re.sub(r'^\*\*Feature\*\*:\s*', '', line.lstrip('- '))
-            desc_part = re.sub(r'F-\d{4}:\s*', '', desc_part)
+            desc_part = re.sub(r'F-\d{4,}:\s*', '', desc_part)
             if desc_part:
                 description = desc_part
         elif line.startswith("- **Agent**:"):

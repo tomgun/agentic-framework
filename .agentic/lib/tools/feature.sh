@@ -52,7 +52,7 @@ USAGE
 fi
 
 # Validate feature ID format
-if [[ ! "${FEATURE_ID}" =~ ^F-[0-9]{4}$ ]]; then
+if ! is_feature_id "${FEATURE_ID}"; then
   echo "Error: Feature ID must be in format F-####"
   exit 1
 fi
@@ -112,7 +112,7 @@ else
   # Heading format: ## F-0003: Name with - Status: lines
   awk -v fid="${FEATURE_ID}" -v field="${FIELD}" -v value="${VALUE}" -v ts="${TIMESTAMP}" '
   BEGIN { SOURCE_DONE = 0 }
-  /^##[#]? F-[0-9][0-9][0-9][0-9]:/ {
+  /^##[#]? F-[0-9][0-9][0-9][0-9]+:/ {
     if ($0 ~ fid) {
       IN_FEATURE = 1
       SOURCE_DONE = 0

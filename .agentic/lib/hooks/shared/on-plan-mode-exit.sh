@@ -47,7 +47,7 @@ if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
     if [[ -n "$LATEST_PLAN" ]]; then
         PLAN_BASENAME=$(basename "$LATEST_PLAN")
         # Extract F-XXXX from filename like 2026-03-17-F-0234-plan.md
-        PARSED_FID=$(echo "$PLAN_BASENAME" | grep -oE 'F-[0-9]{4}' | head -1)
+        PARSED_FID=$(echo "$PLAN_BASENAME" | grep -oE "$FEATURE_ID_ERE" | head -1)
         [[ -n "$PARSED_FID" ]] && FEATURE_ID="$PARSED_FID"
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/$PLAN_BASENAME"
     else

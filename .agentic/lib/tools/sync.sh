@@ -546,7 +546,7 @@ phase_unregistered_code() {
         msg=$(echo "$commit_line" | cut -d' ' -f2-)
 
         # Skip if references F-####
-        echo "$msg" | grep -qE 'F-[0-9]{4}' && continue
+        echo "$msg" | grep -qE "$FEATURE_ID_ERE" && continue
 
         # Skip merge commits
         local parent_count

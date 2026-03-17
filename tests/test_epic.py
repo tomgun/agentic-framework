@@ -55,11 +55,16 @@ def tmp_project(tmp_path):
     if real_feature_sh.exists():
         (tools_dir / "feature.sh").write_text(real_feature_sh.read_text())
 
-    # Copy paths.sh from real project
+    # Copy paths.sh and ids.sh from real project
     real_paths_sh = Path(__file__).parent.parent / ".agentic" / "lib" / "paths.sh"
     if real_paths_sh.exists():
         (tmp_path / ".agentic" / "lib" / "paths.sh").write_text(
             real_paths_sh.read_text()
+        )
+    real_ids_sh = Path(__file__).parent.parent / ".agentic" / "lib" / "ids.sh"
+    if real_ids_sh.exists():
+        (tmp_path / ".agentic" / "lib" / "ids.sh").write_text(
+            real_ids_sh.read_text()
         )
 
     # STACK.md with settings

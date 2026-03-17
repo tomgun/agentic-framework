@@ -566,6 +566,17 @@ Then tell agent:
 
 ---
 
+## Centralized ID Patterns
+
+Feature IDs (`F-XXXX`) are managed through centralized modules — **never hardcode ID regex patterns** in individual files.
+
+| Module | Language | Provides |
+|--------|----------|----------|
+| `.agentic/lib/ids.py` | Python | `FEATURE_ID_RE`, `FEATURE_HEADER_RE`, `FEATURE_ID_STRICT_RE`, `is_valid_feature_id()`, `format_feature_id()`, `get_next_feature_id()` |
+| `.agentic/lib/ids.sh` | Shell | `$FEATURE_ID_ERE`, `$FEATURE_ID_ERE_ANCHORED`, `$FEATURE_HEADER_ERE`, `is_feature_id()`, `format_feature_id()` |
+
+IDs support 4+ digits: `F-0001` through `F-9999` use zero-padding; `F-10000`+ use natural width. `ids.sh` is auto-sourced via `paths.sh`. Python files use `from ids import ...`.
+
 ## Automation & Scripts
 
 The framework includes 30+ automation scripts in `.agentic/lib/tools/`.

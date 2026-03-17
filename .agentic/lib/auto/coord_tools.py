@@ -165,7 +165,7 @@ def _parse_feature_statuses(features_file: Path) -> list[dict]:
     content = features_file.read_text()
     current_id = None
     for line in content.splitlines():
-        m = re.match(r'^## (F-\d{4}):', line)
+        m = re.match(r'^## (F-\d{4,}):', line)
         if m:
             current_id = m.group(1)
             continue

@@ -17,6 +17,10 @@
 [[ -n "${_AGENTIC_PATHS_LOADED:-}" ]] && return 0
 _AGENTIC_PATHS_LOADED=1
 
+# Source centralized ID patterns (ids.sh lives alongside paths.sh)
+_ids_sh="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/ids.sh"
+[[ -f "$_ids_sh" ]] && source "$_ids_sh"
+
 # ---------------------------------------------------------------------------
 # Core directory resolution
 # ---------------------------------------------------------------------------

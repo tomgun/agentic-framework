@@ -56,7 +56,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "pattern": "^F-[0-9]{4}$"
+            "pattern": "^F-[0-9]{4,}$"
           },
           "minItems": 1
         }

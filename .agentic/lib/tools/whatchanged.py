@@ -43,7 +43,7 @@ def parse_journal_entries(journal_path: Path) -> list[dict]:
             date = None
         
         # Extract features mentioned
-        features = set(re.findall(r"\b(F-\d{4})\b", session_content))
+        features = set(re.findall(r"\b(F-\d{4,})\b", session_content))
         
         # Extract accomplished/what-changed items (support both old and new format)
         accomplished = []

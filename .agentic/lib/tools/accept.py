@@ -15,13 +15,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from paths import get_paths
 
 
-FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):", re.MULTILINE)
+from ids import FEATURE_HEADER_RE
 
 
 def parse_feature_tests(features_md: str, feature_id: str) -> dict:
     """Extract test information for a specific feature."""
     # Find the feature section
-    pattern = rf"^## {feature_id}:.*?(?=^## F-\d{{4}}:|$)"
+    pattern = rf"^## {feature_id}:.*?(?=^## F-\d{{4,}}:|$)"
     match = re.search(pattern, features_md, re.MULTILINE | re.DOTALL)
     
     if not match:

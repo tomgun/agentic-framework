@@ -36,10 +36,12 @@ from settings import get_setting  # noqa: E402
 from auto.components import Component, load_registry  # noqa: E402
 
 # ---------------------------------------------------------------------------
-# Feature ID validation
+# Feature ID validation (centralized in ids.py)
 # ---------------------------------------------------------------------------
 
-_FEATURE_ID_RE = re.compile(r"^F-\d{4,}$")
+from ids import FEATURE_ID_STRICT_RE as _FEATURE_ID_RE  # noqa: E402
+from ids import FEATURE_HEADER_RE, is_valid_feature_id, format_feature_id  # noqa: E402
+from ids import get_next_feature_id  # noqa: E402
 
 
 def _validate_feature_id(feature_id: str) -> None:
@@ -250,7 +252,7 @@ def propose_decomposition(
     # Build child proposals
     children: list[dict] = []
     for i, (ac_id, ac_text, ac_lines) in enumerate(ac_groups):
-        child_id = f"F-{next_id + i:04d}"
+        child_id = format_feature_id(next_id + i)
         name = _derive_child_name(ac_id, ac_text, epic_id)
         component = _match_component(ac_text, ac_lines, components)
 
@@ -545,26 +547,10 @@ def _get_children_statuses(
 def _extract_section(content: str, start: int) -> str:
     """Extract a feature section from start position to next header."""
     section = content[start:]
-    next_header = re.search(r"^## F-\d{4}:", section, re.MULTILINE)
+    next_header = re.search(FEATURE_HEADER_RE.pattern, section, re.MULTILINE)
     if next_header:
         section = section[:next_header.start()]
     return section
-
-
-def get_next_feature_id(features_file: Path) -> int:
-    """Get the next available feature ID number.
-
-    Note: not atomic — concurrent operations could allocate overlapping IDs.
-    Acceptable because callers (decompose, kickoff) are human-gated.
-
-    Public API — used by kickoff.py for ID allocation at promotion time.
-    """
-    if not features_file.exists():
-        return 1
-
-    content = features_file.read_text()
-    ids = [int(m.group(1)) for m in re.finditer(r"^## F-(\d{4,}):", content, re.MULTILINE)]
-    return max(ids) + 1 if ids else 1
 
 
 def _parse_ac_groups(ac_content: str) -> list[tuple[str, str, list[str]]]:

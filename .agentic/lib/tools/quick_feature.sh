@@ -115,7 +115,7 @@ fi
 # Find next available feature ID (use 10# prefix to force decimal interpretation)
 LAST_ID=$(grep -oE "^## F-[0-9]+" "$FEATURES_FILE" | grep -oE "[0-9]+" | sort -n | tail -1 || echo "0")
 NEXT_ID=$((10#$LAST_ID + 1))
-FEATURE_ID=$(printf "F-%04d" $NEXT_ID)
+FEATURE_ID=$(format_feature_id $NEXT_ID)
 
 # Build category line
 CATEGORY_LINE=""

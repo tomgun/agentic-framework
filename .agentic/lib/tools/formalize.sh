@@ -156,7 +156,7 @@ promote_one() {
 
     # Parse F-ID from output
     local f_id
-    f_id=$(echo "$qf_output" | grep -oE 'F-[0-9]{4}' | head -1)
+    f_id=$(echo "$qf_output" | grep -oE "$FEATURE_ID_ERE" | head -1)
 
     if [[ -z "$f_id" ]]; then
         echo -e "${RED}Error: Failed to create feature for ${t_id}. quick_feature.sh output:${NC}"
