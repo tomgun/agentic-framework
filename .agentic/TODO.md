@@ -210,6 +210,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 - **Background**: `plan-scan.sh` saved `~/.claude/plans/` content as `2026-03-17-F-0219-plan.md` despite identical content already existing as `2026-03-16-E-0001-opportunity-map-epic-plan.md`. Root cause: scan matches by feature ID in filename only, not by content or epic ID. Three plan types need rigid naming: `YYYY-MM-DD-F-XXXX-plan.md`, `YYYY-MM-DD-E-XXXX-plan.md`, `YYYY-MM-DD-<slug>-plan.md` (generic/research). `_find_plan_file()` and `plan-scan.sh` both need updating.
 - **Related**: `plan-scan.sh`, `_find_plan_file()` in ag.sh, `.agentic/journal/plans/`
 
+### T-0078: ag done verification subprocess leaks sourced env (ROOT_DIR, FRAMEWORK_ROOT) into bash -c, causing functional tests to use wrong project root — 5 phantom failures vs direct run
+- **Added**: 2026-03-17
+
 ## Done
 
 
