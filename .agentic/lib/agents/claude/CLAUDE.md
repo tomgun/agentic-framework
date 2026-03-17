@@ -20,9 +20,10 @@ Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 - Add/update tests for new/changed logic.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
 - AC completeness enforced at `ag done`: P1 ACs = 100%, P2/P3 = 80%, flat specs = 80%. AC clarity gate runs on first `ag implement` (formal=blocking, discovery=advisory).
+- Smoke test evidence: if `smoke_test_evidence` != `off` in STACK.md, `ag done` checks for `.agentic/journal/evidence/F-XXXX-smoke.*`. Generate via `ag auto verify --visual --feature F-XXXX` or create manually.
 - Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration (`bash .agentic/lib/tools/migration.sh create`).
 - Keep changes small and scoped (max 5-10 files per commit).
-- Plans are durable: save to `.agentic/journal/plans/F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
+- Plans are durable: save to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
 - Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.
 - Multi-session safety: Before ANY destructive git op (stash, checkout ., restore ., reset --hard, clean -f), run `python3 .agentic/lib/tools/agents_helpers.py --project-root . count-others "$(pwd)" --pid $PPID`. If >0, DO NOT PROCEED — use a worktree or commit first.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
@@ -32,7 +33,7 @@ Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 Exiting plan mode creates a DRAFT. It does NOT approve the plan.
 
 After ExitPlanMode:
-1. Save plan to `.agentic/journal/plans/F-XXXX-plan.md` with `**Status**: DRAFT`
+1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT`
 2. Run `ag implement F-XXXX` — it will block and print dialectical review instructions
 3. Follow the review instructions (spawn Critic + Advocate agents)
 4. After user says "Proceed" → update `**Status**: APPROVED` → re-run `ag implement`

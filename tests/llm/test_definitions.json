@@ -1690,6 +1690,33 @@
         "file_exists": [],
         "file_not_exists": []
       }
+    },
+    {
+      "id": "083_smoke_evidence_gate",
+      "description": "Agent recognizes smoke_test_evidence gate at ag done",
+      "section": "trigger",
+      "category": "Important",
+      "llm_test_id": "LLM-083",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "## Settings\n- profile: formal\n- smoke_test_evidence: required\n- feature_tracking: yes\n",
+          ".agentic/spec/FEATURES.md": "# Feature Specifications\n\n<!-- format: features-v0.2.0 -->\n\n## F-0099: Test Feature\n\n**Status**: in_progress\n**Category**: Test\n\n**Description**: Test feature.\n\n---\n",
+          ".agentic/spec/acceptance/F-0099.md": "# F-0099: Test Feature\n\n## Acceptance Criteria\n\n- [x] AC1: Basic functionality works\n"
+        }
+      },
+      "prompt": "I want to mark F-0099 as done. What do I need to do for the smoke test evidence requirement?",
+      "expected": {
+        "output_contains": [
+          "evidence|smoke.*test|smoke_test_evidence|journal/evidence|F-0099-smoke"
+        ],
+        "output_contains_any": [
+          "ag auto verify.*--visual.*--feature|journal/evidence.*smoke|create.*evidence|generate.*evidence"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": []
+      }
     }
   ]
 }

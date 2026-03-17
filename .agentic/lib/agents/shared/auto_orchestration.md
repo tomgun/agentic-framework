@@ -507,10 +507,11 @@ These are YOUR responsibility as an agent following this framework.
 | Pre-commit checks | `pre_commit_checks` | **full** | fast |
 | Feature status | `feature_tracking` | **yes** (shipped needs acceptance) | no |
 | Docs reviewed | `docs_gate` | **blocking** (`docs.sh --validate` at `ag done` + pre-commit check 19) | off |
+| Smoke test evidence | `smoke_test_evidence` | **recommended** (warn at `ag done` if no evidence file) | off |
 
 Override any setting: `ag set <key> <value>` | View resolved settings: `ag set --show`
 
-Escape hatches (feature branches only): SKIP_TESTS=1 or SKIP_COMPLEXITY=1 (still shows per-file warnings)
+Escape hatches (feature branches only): SKIP_TESTS=1, SKIP_COMPLEXITY=1, SKIP_SMOKE_EVIDENCE=1 (still shows per-file warnings)
 
 ### Agent Boundaries
 
@@ -544,7 +545,7 @@ For hands-off execution. Require test commands in STACK.md; task/crunch require 
 | Mode | Command | What it does |
 |------|---------|-------------|
 | **Verify** | `ag auto verify` | Test-fix loop: runs tests, spawns fresh Claude to fix failures, repeats until green or max iterations |
-| **Verify + Visual** | `ag auto verify --visual` | Same + collects E2E screenshots + AI visual review via Anthropic API |
+| **Verify + Visual** | `ag auto verify --visual` | Same + collects E2E screenshots + AI visual review via Anthropic API. Add `--feature F-XXXX` to save evidence for smoke test gate. |
 | **Task** | `ag auto task F-XXXX` | Reads ACs, creates branch, spawns Claude per AC, tests, commits passing work, creates PR |
 | **Task + Visual** | `ag auto task F-XXXX --visual` | Same + visual review at final verification step |
 | **Crunch** | `ag auto crunch` | Reads planned features from FEATURES.md, runs task mode for each, stops on max errors |

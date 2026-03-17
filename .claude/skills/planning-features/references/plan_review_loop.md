@@ -71,7 +71,7 @@ immediately after plan mode ends. The implementing-features skill has a safety n
 
 ## Plan Artifact Format
 
-Plans are written to `.agentic/journal/plans/F-XXXX-plan.md`:
+Plans are written to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md`:
 
 ```markdown
 # Plan: F-XXXX [Feature Title]
@@ -227,7 +227,7 @@ Task(
     prompt="""
     Create implementation plan for F-XXXX.
     Read: .agentic/spec/acceptance/F-XXXX.md, CONTEXT_PACK.md
-    Write plan to: .agentic/journal/plans/F-XXXX-plan.md
+    Write plan to: .agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md
     Follow format in: .agentic/lib/workflows/plan_review_loop.md
     """
 )
@@ -237,7 +237,7 @@ Task(
     subagent_type="general-purpose",
     model="opus",  # critical review needs quality
     prompt="""
-    Critically review plan at .agentic/journal/plans/F-XXXX-plan.md
+    Critically review dated plan at .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
     Follow reviewer instructions in: .agentic/lib/workflows/plan_review_loop.md
     Add your review to the Review History section.
     Set verdict: APPROVED, REVISION_NEEDED, or ESCALATE
@@ -270,7 +270,7 @@ Cursor's agent mode can orchestrate the loop via the orchestrator agent.
 When `ESCALATE` verdict or `max_iterations` reached:
 
 1. Plan file shows current state and all review history
-2. Agent notifies human: "Plan needs your input - see .agentic/journal/plans/F-XXXX-plan.md"
+2. Agent notifies human: "Plan needs your input - see .agentic/journal/plans/*F-XXXX-plan.md (dated plan file)"
 3. Human can:
    - Edit plan directly and set status to `APPROVED`
    - Provide guidance and request another iteration

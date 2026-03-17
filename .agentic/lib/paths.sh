@@ -94,6 +94,7 @@ JOURNAL_FILE="$(_resolve_path "$AGENTIC_ROOT/journal/JOURNAL.md" "$PROJECT_ROOT/
 PLANS_DIR="$(_resolve_path "$AGENTIC_ROOT/journal/plans" "$PROJECT_ROOT/.agentic-journal/plans")"
 LESSONS_DIR="$(_resolve_path "$AGENTIC_ROOT/journal/lessons" "$PROJECT_ROOT/.agentic-journal/lessons")"
 MANIFESTS_DIR="$(_resolve_path "$AGENTIC_ROOT/journal/manifests" "$PROJECT_ROOT/.agentic-journal/manifests")"
+EVIDENCE_DIR="$(_resolve_path "$AGENTIC_ROOT/journal/evidence" "$PROJECT_ROOT/.agentic-journal/evidence")"
 
 # ---------------------------------------------------------------------------
 # Specs (.agentic/spec/)

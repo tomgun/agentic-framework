@@ -4995,6 +4995,85 @@ else
   fail "memory-seed.md missing Source annotation trigger"
 fi
 
+# F-0224: Smoke Test Evidence Gate
+# ============================================================
+echo "--- F-0224: Smoke Test Evidence Gate ---"
+
+# profiles.conf has smoke_test_evidence for all 3 profiles
+if grep -q "discovery.smoke_test_evidence=off" "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" 2>/dev/null; then
+  pass "profiles.conf has discovery.smoke_test_evidence"
+else
+  fail "profiles.conf missing discovery.smoke_test_evidence"
+fi
+
+if grep -q "formal.smoke_test_evidence=recommended" "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" 2>/dev/null; then
+  pass "profiles.conf has formal.smoke_test_evidence"
+else
+  fail "profiles.conf missing formal.smoke_test_evidence"
+fi
+
+if grep -q "autonomous_formal.smoke_test_evidence=recommended" "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" 2>/dev/null; then
+  pass "profiles.conf has autonomous_formal.smoke_test_evidence"
+else
+  fail "profiles.conf missing autonomous_formal.smoke_test_evidence"
+fi
+
+# paths.sh has EVIDENCE_DIR
+if grep -q "EVIDENCE_DIR" "${FRAMEWORK_ROOT}/.agentic/lib/paths.sh" 2>/dev/null; then
+  pass "paths.sh has EVIDENCE_DIR"
+else
+  fail "paths.sh missing EVIDENCE_DIR"
+fi
+
+# paths.py has evidence_dir
+if grep -q "evidence_dir" "${FRAMEWORK_ROOT}/.agentic/lib/paths.py" 2>/dev/null; then
+  pass "paths.py has evidence_dir"
+else
+  fail "paths.py missing evidence_dir"
+fi
+
+# ag.sh has smoke test evidence gate
+if grep -q "Smoke Test Evidence Check" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+  pass "ag.sh has smoke test evidence gate"
+else
+  fail "ag.sh missing smoke test evidence gate"
+fi
+
+# ag.sh has smoke_test_evidence validator
+if grep -q "smoke_test_evidence)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+  pass "ag.sh has smoke_test_evidence validator"
+else
+  fail "ag.sh missing smoke_test_evidence validator"
+fi
+
+# verify.py has --feature flag
+if grep -q "\-\-feature" "${FRAMEWORK_ROOT}/.agentic/lib/auto/verify.py" 2>/dev/null; then
+  pass "verify.py has --feature flag"
+else
+  fail "verify.py missing --feature flag"
+fi
+
+# STACK.template.md has smoke_test_evidence
+if grep -q "smoke_test_evidence" "${FRAMEWORK_ROOT}/.agentic/lib/init/STACK.template.md" 2>/dev/null; then
+  pass "STACK.template.md has smoke_test_evidence"
+else
+  fail "STACK.template.md missing smoke_test_evidence"
+fi
+
+# memory-seed.md has smoke evidence sentinel
+if grep -q "smoke-test-evidence" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md" 2>/dev/null; then
+  pass "memory-seed.md has smoke-test-evidence sentinel"
+else
+  fail "memory-seed.md missing smoke-test-evidence sentinel"
+fi
+
+# auto_orchestration.md has smoke evidence gate row
+if grep -q "Smoke test evidence" "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/auto_orchestration.md" 2>/dev/null; then
+  pass "auto_orchestration.md has smoke evidence gate"
+else
+  fail "auto_orchestration.md missing smoke evidence gate"
+fi
+
 # Summary
 # ============================================================
 echo ""

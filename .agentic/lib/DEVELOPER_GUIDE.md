@@ -1441,6 +1441,14 @@ Some combinations are invalid. Run `ag set --validate` to check:
 
 Only settings you want to override need to be listed — unset settings use profile defaults. Projects without a `## Settings` section still work (backward-compatible whole-file search).
 
+#### Smoke Test Evidence (F-0224)
+
+```yaml
+- smoke_test_evidence: recommended   # off | recommended | required
+```
+
+When enabled, `ag done` checks for `.agentic/journal/evidence/F-XXXX-smoke.*` before marking a feature complete. `recommended` warns, `required` blocks. Generate evidence automatically with `ag auto verify --visual --feature F-XXXX`, or create a file manually. Requires `feature_tracking: yes`. Bypass: `SKIP_SMOKE_EVIDENCE=1`.
+
 #### Development Mode
 
 ```yaml

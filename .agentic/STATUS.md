@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- ag merge + ag verify shipped, ready for next backlog item (Updated: 2026-03-16 21:42 UTC)
+- F-0224: Smoke test evidence gate — PR pending review (Updated: 2026-03-17 07:29 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

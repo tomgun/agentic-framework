@@ -5,8 +5,8 @@ tokens: ~1280
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.58.2 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation -->
+<!-- memory-seed v0.58.3 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -41,7 +41,7 @@ If they say "implement entire", "full system", "complete", or describe something
 Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal/plans/`. Save them regardless of how they arrive:
 
 **After exiting plan mode**: IMMEDIATELY continue with the post-plan-mode steps — do NOT wait for user to say "implement":
-1. Save plan to `.agentic/journal/plans/F-XXXX-plan.md` with status DRAFT (tool plan locations like `~/.claude/plans/` are session-scoped and WILL BE LOST)
+1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with status DRAFT (tool plan locations like `~/.claude/plans/` are session-scoped and WILL BE LOST)
 2. Run `ag implement F-XXXX` — it will auto-save plans and enforce the review gate
 3. If `plan_review_enabled: yes`: `ag implement` blocks with `exit 1` and prints review instructions. Follow them: spawn Critic + Advocate agents in parallel (fresh context), synthesize both perspectives (with Revision Guidance), present to user. User decides: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject
 4. After user says "Proceed": update plan status to APPROVED, re-run `ag implement`
@@ -55,7 +55,7 @@ Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal
 - "I have it in context" — save durably, then `ag implement`
 - "ag implement told me to review, I'll assess it myself" — spawn Critic + Advocate, don't self-assess
 
-**When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/F-XXXX-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
+**When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
 
 Then:
 1. If `plan_review_enabled: yes`: run dialectical review IMMEDIATELY — save plan as DRAFT, spawn Critic + Advocate, present synthesis, wait for user decision. **Do NOT read implementation files, explore code, or make edits before the plan is APPROVED.** The review agents read files themselves with fresh context.
@@ -191,6 +191,10 @@ the doc lifecycle fires automatically (docs.sh assembles context, you draft the 
 You can also run `ag docs F-XXXX` manually to draft registered docs for a feature.
 
 If `docs_mode: deferred` in STACK.md, `ag done` logs deferred items to `.agentic/deferred-docs.json` instead of triggering immediate drafting. Run `ag docs generate` later to process all pending entries, or `ag docs generate F-XXXX` for a single feature.
+
+## Smoke test evidence
+
+When `smoke_test_evidence` is enabled in STACK.md (`recommended` or `required`), `ag done` checks for `.agentic/journal/evidence/F-XXXX-smoke.*` before marking complete. Create evidence manually (any format) or run `ag auto verify --visual --feature F-XXXX` to auto-generate it. Setting `required` blocks `ag done` without evidence (bypass: `SKIP_SMOKE_EVIDENCE=1`). Setting `recommended` warns but proceeds. Requires `feature_tracking: yes` to be effective.
 
 ## When work was interrupted or a session crashed
 

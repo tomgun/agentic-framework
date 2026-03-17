@@ -778,7 +778,21 @@ def main() -> int:
         action="store_true",
         help="Run AI visual review on collected screenshots",
     )
+    parser.add_argument(
+        "--feature",
+        type=str,
+        default=None,
+        help="Feature ID (F-XXXX). With --visual, saves evidence to .agentic/journal/evidence/",
+    )
     args = parser.parse_args()
+
+    # Warn if --feature without --visual
+    if args.feature and not args.visual:
+        print(
+            "Warning: --feature requires --visual to generate evidence. "
+            "No evidence saved.",
+            file=sys.stderr,
+        )
 
     def print_iteration(it: IterationResult) -> None:
         status = "PASS" if it.tests_failed == 0 else "FAIL"
@@ -850,7 +864,67 @@ def main() -> int:
         elif vr and vr.error:
             print(f"\nVisual review: {vr.error}")
 
+    # Save evidence if --feature and --visual
+    if args.feature and args.visual:
+        _save_evidence(args.feature, result, loop.paths.evidence_dir)
+
     return 0 if result.success else 1
+
+
+def _save_evidence(
+    feature_id: str, result: VerifyResult, evidence_dir: Path
+) -> None:
+    """Save structured smoke test evidence to the evidence directory."""
+    from datetime import datetime, timezone
+
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+
+    dest = evidence_dir / f"{feature_id}-smoke.md"
+
+    lines = [
+        f"# Smoke Test Evidence: {feature_id}",
+        "",
+        f"**Generated**: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}",
+        f"**Command**: `ag auto verify --visual --feature {feature_id}`",
+        f"**Result**: {'PASS' if result.success else 'FAIL'}",
+        "",
+        "## Test Results",
+        "",
+        f"- Iterations: {result.iterations_used}/{result.max_iterations}",
+        f"- Tests passed: {result.final_tests_passed}",
+        f"- Tests failed: {result.final_tests_failed}",
+        f"- Test command: `{result.test_command}`",
+        "",
+    ]
+
+    vr = result.visual_review
+    if vr and vr.performed:
+        lines.extend([
+            "## Visual Review",
+            "",
+            f"- Screenshots reviewed: {vr.screenshots_reviewed}",
+            f"- Summary: {vr.summary}",
+            "",
+        ])
+        if vr.concerns:
+            lines.append("### Concerns")
+            lines.append("")
+            for c in vr.concerns:
+                lines.append(f"- {c}")
+            lines.append("")
+        else:
+            lines.append("No visual concerns found.")
+            lines.append("")
+    elif vr and vr.error:
+        lines.extend([
+            "## Visual Review",
+            "",
+            f"Error: {vr.error}",
+            "",
+        ])
+
+    dest.write_text("\n".join(lines))
+    print(f"\nEvidence saved: {dest}")
 
 
 if __name__ == "__main__":

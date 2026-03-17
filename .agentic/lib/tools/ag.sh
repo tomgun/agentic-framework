@@ -44,6 +44,25 @@ _get_wip_feature() {
     _agents_py get-current-feature "$PROJECT_ROOT" 2>/dev/null || echo ""
 }
 
+# Resolve plan file for a feature ID — handles both dated and non-dated filenames.
+# Returns the path of the first matching plan, preferring dated files.
+# Usage: plan_file=$(_find_plan_file "$feature_id")
+_find_plan_file() {
+    local fid="$1"
+    local plans_dir="$ROOT_DIR/.agentic/journal/plans"
+    [ -d "$plans_dir" ] || return 1
+    # Glob matches: YYYY-MM-DD-F-XXXX-plan.md or F-XXXX-plan.md
+    local match
+    match=$(find "$plans_dir" \( -name "*${fid}-plan.md" -o -name "*${fid}-plan-*.md" \) -type f 2>/dev/null | sort -r | head -1)
+    [ -n "$match" ] && echo "$match" && return 0
+    return 1
+}
+
+# Generate a dated plan filename: YYYY-MM-DD-F-XXXX-plan.md
+_plan_filename() {
+    echo "$(date +%Y-%m-%d)-${1}-plan.md"
+}
+
 # Check if profile is formal or autonomous_formal (both require strict enforcement)
 _is_formal_like() {
     local p
@@ -630,7 +649,7 @@ cmd_plan() {
         local save_fid="${3:-}"
         if [ -z "$source_file" ] || [ -z "$save_fid" ]; then
             echo -e "${RED}Usage: ag plan --save <source-file> F-XXXX${NC}"
-            echo "  Copies a plan to .agentic/journal/plans/F-XXXX-plan.md"
+            echo "  Copies a plan to .agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md"
             exit 1
         fi
         if [ ! -f "$source_file" ]; then
@@ -639,8 +658,10 @@ cmd_plan() {
         fi
         local dest_dir="$ROOT_DIR/.agentic/journal/plans"
         mkdir -p "$dest_dir"
-        cp "$source_file" "$dest_dir/${save_fid}-plan.md"
-        echo -e "${GREEN}Plan saved: $dest_dir/${save_fid}-plan.md${NC}"
+        local dest_name
+        dest_name=$(_plan_filename "$save_fid")
+        cp "$source_file" "$dest_dir/$dest_name"
+        echo -e "${GREEN}Plan saved: $dest_dir/$dest_name${NC}"
         return 0
     fi
 
@@ -706,10 +727,11 @@ cmd_plan() {
     fi
 
     # 2. Check for existing plan
-    local plan_file="$ROOT_DIR/.agentic/journal/plans/${feature_id}-plan.md"
     mkdir -p "$ROOT_DIR/.agentic/journal/plans"
+    local plan_file
+    plan_file=$(_find_plan_file "$feature_id" || echo "")
 
-    if [ -f "$plan_file" ]; then
+    if [ -n "$plan_file" ] && [ -f "$plan_file" ]; then
         local status
         status=$(grep -E "^\*\*Status\*\*:" "$plan_file" 2>/dev/null | head -1 | sed 's/.*Status\*\*:[[:space:]]*//' || echo "UNKNOWN")
         echo -e "${YELLOW}Existing plan found: $status${NC}"
@@ -739,7 +761,7 @@ cmd_plan() {
         echo "  - .agentic/spec/acceptance/${feature_id}.md"
         echo "  - CONTEXT_PACK.md"
         echo ""
-        echo "Write plan to: .agentic/journal/plans/${feature_id}-plan.md"
+        echo "Write plan to: .agentic/journal/plans/$(date +%Y-%m-%d)-${feature_id}-plan.md"
         echo "Follow format in: .agentic/lib/workflows/plan_review_loop.md"
         echo "Set status to: APPROVED (no review)"
         return 0
@@ -760,7 +782,7 @@ cmd_plan() {
     echo "    subagent_type: Plan"
     echo "    prompt: \"Create implementation plan for $feature_id."
     echo "            Read: .agentic/spec/acceptance/${feature_id}.md, CONTEXT_PACK.md"
-    echo "            Write to: .agentic/journal/plans/${feature_id}-plan.md"
+    echo "            Write to: .agentic/journal/plans/$(date +%Y-%m-%d)-${feature_id}-plan.md"
     echo "            Follow: .agentic/lib/workflows/plan_review_loop.md\""
     echo ""
     echo -e "${BLUE}STEP 2: CRITIC + ADVOCATE review in parallel (fresh context)${NC}"
@@ -770,7 +792,7 @@ cmd_plan() {
     echo "    Agent tool:"
     echo "      subagent_type: general-purpose"
     echo "      prompt: \"You are a PLAN CRITIC with fresh context."
-    echo "              Read plan: .agentic/journal/plans/${feature_id}-plan.md"
+    echo "              Read plan: .agentic/journal/plans/*${feature_id}-plan.md (glob — file has date prefix)"
     echo "              Read requirements: .agentic/spec/acceptance/${feature_id}.md"
     echo "              Follow: .agentic/lib/agents/claude/subagents/plan-critic-agent.md"
     echo "              Output your structured critique.\""
@@ -779,7 +801,7 @@ cmd_plan() {
     echo "    Agent tool:"
     echo "      subagent_type: general-purpose"
     echo "      prompt: \"You are a PLAN ADVOCATE with fresh context."
-    echo "              Read plan: .agentic/journal/plans/${feature_id}-plan.md"
+    echo "              Read plan: .agentic/journal/plans/*${feature_id}-plan.md (glob — file has date prefix)"
     echo "              Read requirements: .agentic/spec/acceptance/${feature_id}.md"
     echo "              Follow: .agentic/lib/agents/claude/subagents/plan-advocate-agent.md"
     echo "              Output your structured defense.\""
@@ -798,7 +820,7 @@ cmd_plan() {
     echo ""
     echo -e "${BOLD}═══════════════════════════════════════════════════════════════${NC}"
     echo ""
-    echo "Plan artifact: .agentic/journal/plans/${feature_id}-plan.md"
+    echo "Plan artifact: .agentic/journal/plans/YYYY-MM-DD-${feature_id}-plan.md"
     echo "Review mechanism: .agentic/lib/workflows/dialectical_review.md"
     echo "Full workflow: .agentic/lib/workflows/plan_review_loop.md"
     echo ""
@@ -898,16 +920,19 @@ cmd_implement() {
     # 0c. Auto-save plans from session-scoped tool directories to durable location
     # Must run BEFORE gate check so the gate can find auto-saved plans
     # Claude Code uses .claude/plans/, Cursor uses .cursor/plans/
-    local durable_plan="$ROOT_DIR/.agentic/journal/plans/${feature_id}-plan.md"
-    if [ ! -f "$durable_plan" ]; then
+    local existing_plan
+    existing_plan=$(_find_plan_file "$feature_id" || echo "")
+    if [ -z "$existing_plan" ]; then
         for plan_dir in "$ROOT_DIR/.claude/plans" "$ROOT_DIR/.cursor/plans"; do
             [ -d "$plan_dir" ] || continue
             for f in "$plan_dir/"*; do
                 if [ -f "$f" ] && grep -q "$feature_id" "$f" 2>/dev/null; then
                     mkdir -p "$ROOT_DIR/.agentic/journal/plans"
-                    cp "$f" "$durable_plan"
+                    local dest_name
+                    dest_name=$(_plan_filename "$feature_id")
+                    cp "$f" "$ROOT_DIR/.agentic/journal/plans/$dest_name"
                     local source_rel="${plan_dir#"$ROOT_DIR"/}"
-                    echo -e "${GREEN}Plan auto-saved: ${source_rel}/ -> .agentic/journal/plans/${feature_id}-plan.md${NC}"
+                    echo -e "${GREEN}Plan auto-saved: ${source_rel}/ -> .agentic/journal/plans/$dest_name${NC}"
                     break 2
                 fi
             done
@@ -918,8 +943,9 @@ cmd_implement() {
     local plan_review_enabled
     plan_review_enabled=$(get_plan_review_config "plan_review_enabled" "no")
     if [ "$plan_review_enabled" = "yes" ]; then
-        local plan_file="$ROOT_DIR/.agentic/journal/plans/${feature_id}-plan.md"
-        if [ -f "$plan_file" ]; then
+        local plan_file
+        plan_file=$(_find_plan_file "$feature_id" || echo "")
+        if [ -n "$plan_file" ] && [ -f "$plan_file" ]; then
             local plan_status
             plan_status=$(grep -E "^\*\*Status\*\*:" "$plan_file" 2>/dev/null | head -1 | sed 's/.*Status\*\*:[[:space:]]*//' || echo "UNKNOWN")
             if [ "$plan_status" != "APPROVED" ]; then
@@ -939,7 +965,7 @@ cmd_implement() {
         else
             echo -e "${RED}BLOCKED: No approved plan found (plan_review_enabled: yes)${NC}"
             echo ""
-            echo "  1. Save your plan to .agentic/journal/plans/${feature_id}-plan.md with Status: DRAFT"
+            echo "  1. Save your plan to .agentic/journal/plans/YYYY-MM-DD-${feature_id}-plan.md with Status: DRAFT"
             echo "  2. Run dialectical review (Critic + Advocate agents)"
             echo "  3. After user approval, update Status to APPROVED"
             echo "  4. Re-run: ag implement $feature_id"
@@ -1436,7 +1462,7 @@ cmd_done() {
     plan_review_enabled_done=$(get_plan_review_config "plan_review_enabled" "no")
     if [ "$plan_review_enabled_done" = "yes" ] && [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
         local _plan_glob
-        _plan_glob=$(find "$ROOT_DIR/.agentic/journal/plans/" \( -name "*${feature_id}-plan.md" -o -name "*${feature_id}-plan-*.md" \) -type f 2>/dev/null | head -1)
+        _plan_glob=$(_find_plan_file "$feature_id" || echo "")
         if [ -z "$_plan_glob" ]; then
             echo -e "${RED}BLOCKED: No plan found for $feature_id (plan_review_enabled: yes)${NC}"
             echo "  Create a plan first: ag plan $feature_id"
@@ -1598,6 +1624,36 @@ cmd_done() {
             fi
             echo ""
         fi
+    fi
+
+    # Smoke test evidence gate
+    local smoke_evidence_mode
+    smoke_evidence_mode=$(get_setting "smoke_test_evidence" "off")
+
+    if [ "$smoke_evidence_mode" != "off" ] && [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        echo -e "${BOLD}=== Smoke Test Evidence Check ===${NC}"
+        mkdir -p "$ROOT_DIR/.agentic/journal/evidence"
+        local evidence_found=""
+        for f in "$ROOT_DIR/.agentic/journal/evidence/${feature_id}-smoke".*; do
+            [ -e "$f" ] && evidence_found="$f" && break
+        done
+        if [ -n "$evidence_found" ]; then
+            echo -e "${GREEN}✓ Evidence found: $(basename "$evidence_found")${NC}"
+        elif [ "$smoke_evidence_mode" = "required" ]; then
+            if [ "${SKIP_SMOKE_EVIDENCE:-0}" = "1" ] || [ ! -t 0 ]; then
+                echo -e "${YELLOW}smoke_test_evidence: required — skipped (non-interactive)${NC}"
+            else
+                echo -e "${RED}BLOCKED: No smoke test evidence for $feature_id${NC}"
+                echo "  Expected: .agentic/journal/evidence/${feature_id}-smoke.*"
+                echo "  Create manually, or run: ag auto verify --visual --feature $feature_id"
+                exit 1
+            fi
+        else
+            echo -e "${YELLOW}⚠ No smoke test evidence for $feature_id${NC}"
+            echo "  Tip: Create .agentic/journal/evidence/${feature_id}-smoke.md manually"
+            echo "  Or run: ag auto verify --visual --feature $feature_id (requires E2E screenshots config)"
+        fi
+        echo ""
     fi
 
     echo -e "${BOLD}=== Feature Complete Check ===${NC}"
@@ -2587,6 +2643,8 @@ cmd_auto() {
             echo "COMMANDS:"
             echo "  init [--tier N]       Generate settings.json (N=1 sandboxed, 2 scoped, 3 interactive)"
             echo "  verify                Run test-fix loop until green (F-0161)"
+            echo "    --visual              Add AI visual review of screenshots"
+            echo "    --feature <F-XXXX>    Save evidence for smoke test gate (with --visual)"
             echo "  task <F-XXXX>         Implement a single feature autonomously (F-0162)"
             echo "  crunch [--features .] Implement multiple features in batch (F-0163)"
             echo "  epic <F-XXXX>         Autonomous epic execution — schedule children (F-0186)"
@@ -3615,6 +3673,12 @@ _settings_set_value() {
         docs_gate)
             if [[ ! "$value" =~ ^(off|warning|blocking)$ ]]; then
                 echo -e "${RED}Error: docs_gate must be 'off', 'warning', or 'blocking', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
+        smoke_test_evidence)
+            if [[ ! "$value" =~ ^(off|recommended|required)$ ]]; then
+                echo -e "${RED}Error: smoke_test_evidence must be 'off', 'recommended', or 'required', got '$value'${NC}"
                 exit 1
             fi
             ;;

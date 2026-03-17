@@ -66,6 +66,9 @@ class AgenticPaths:
         self.manifests_dir = self._resolve(
             self.agentic_root / "journal" / "manifests",
             self.project_root / ".agentic-journal" / "manifests")
+        self.evidence_dir = self._resolve(
+            self.agentic_root / "journal" / "evidence",
+            self.project_root / ".agentic-journal" / "evidence")
 
         # Specs (.agentic/spec/)
         self.spec_dir = self._resolve(

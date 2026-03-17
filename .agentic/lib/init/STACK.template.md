@@ -33,6 +33,8 @@ Purpose: a single source of truth for "how we build and run software here".
 # Create spec/ directory for features. Profile defaults — Discovery: no | Formal: yes
 - docs_gate: off
 # Doc staleness check at ag done. Profile defaults — Discovery: off | Formal: blocking
+- smoke_test_evidence: off
+# Smoke test evidence at ag done. off | recommended | required. Profile defaults — Discovery: off | Formal: recommended. Requires feature_tracking: yes to be effective.
 - docs_mode: inline
 # inline: update docs with code (default). deferred: log what's needed, generate later via `ag docs generate`.
 - spec_analysis: off

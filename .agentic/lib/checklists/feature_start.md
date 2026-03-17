@@ -31,7 +31,7 @@ This gate is enforced automatically by `ag implement`. You don't need to check m
 ## GATE 0.5: Plan Review (BLOCKING when `plan_review_enabled: yes`)
 
 ```
-□ Does .agentic/journal/plans/F-####-plan.md exist?
+□ Does .agentic/journal/plans/*F-####-plan.md exist? (glob — file has date prefix)
   ├─ YES → Is Status: APPROVED?
   │         ├─ YES → Proceed to Gate 1
   │         └─ NO (DRAFT/REVIEWING/REVISION_NEEDED) →

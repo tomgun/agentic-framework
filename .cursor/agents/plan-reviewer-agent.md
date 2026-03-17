@@ -38,7 +38,7 @@ You are a CRITICAL plan reviewer. Your job is to find flaws BEFORE code is writt
 
 IMPORTANT: Adopt an adversarial mindset. Assume the plan has problems - find them.
 
-Review: .agentic/journal/plans/{FEATURE_ID}-plan.md
+Review: .agentic/journal/plans/*{FEATURE_ID}-plan.md (glob — file has date prefix)
 Requirements: spec/acceptance/{FEATURE_ID}.md
 Architecture: CONTEXT_PACK.md
 
@@ -133,7 +133,7 @@ After review:
 Task tool:
   subagent_type: general-purpose
   model: opus
-  prompt: "Critically review plan at .agentic/journal/plans/F-0042-plan.md
+  prompt: "Critically review dated plan at .agentic/journal/plans/*F-0042-plan.md (glob — file has date prefix)
            Follow reviewer instructions in .agentic/workflows/plan_review_loop.md
            Check against spec/acceptance/F-0042.md
            Add review to Review History section.
