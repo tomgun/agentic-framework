@@ -1747,6 +1747,33 @@
         "file_exists": [],
         "file_not_exists": []
       }
+    },
+    {
+      "id": "085_audit_metrics_routing",
+      "description": "Agent routes spec evolution questions to ag audit --metrics",
+      "section": "trigger",
+      "category": "Standard",
+      "llm_test_id": "LLM-085",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "## Settings\n- profile: formal\n- feature_tracking: yes\n",
+          ".agentic/spec/FEATURES.md": "# Feature Specifications\n\n<!-- format: features-v0.2.0 -->\n\n## F-0100: Auth Module\n\n**Status**: shipped\n**Category**: Core\n\n---\n",
+          ".agentic/spec/acceptance/F-0100.md": "# F-0100: Auth Module\n\n## Acceptance Criteria\n\n- [x] **AC-001**: Basic auth works\n- [ ] **AC-002**: [Discovered] Rate limiting needed\n"
+        }
+      },
+      "prompt": "I want to see how our specs have evolved \u2014 are there any discovered requirements or high-churn specs?",
+      "expected": {
+        "output_contains": [
+          "audit.*metrics|spec-metrics|--metrics|discovery|discovered|churn|evolution"
+        ],
+        "output_contains_any": [
+          "ag audit --metrics|spec-metrics.sh|--discovery|--churn"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": []
+      }
     }
   ]
 }

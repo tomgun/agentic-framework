@@ -169,6 +169,12 @@ if [[ -d "$PROJECT_ROOT/.agentic/spec/acceptance" ]] && [[ -f "$PROJECT_ROOT/.ag
         | grep -oE 'F-[0-9]+' || true)
 fi
 
+# SPEC METRICS (F-0225)
+D_SPEC_METRICS=""
+if [[ -f "$TOOLS_DIR/spec-metrics.sh" ]]; then
+    D_SPEC_METRICS=$(bash "$TOOLS_DIR/spec-metrics.sh" --summary-line 2>/dev/null) || D_SPEC_METRICS=""
+fi
+
 # DESIGN TRACE (pending source docs)
 D_DESIGN_TRACE=""
 if [[ -f "$TOOLS_DIR/design-trace.sh" ]]; then
@@ -257,6 +263,8 @@ if $RAW_MODE; then
     echo "$D_HEALTH"
     echo "===UPGRADE==="
     echo "$D_UPGRADE"
+    echo "===SPEC_METRICS==="
+    echo "$D_SPEC_METRICS"
     echo "===DESIGN_TRACE==="
     echo "$D_DESIGN_TRACE"
     echo "===ORPHAN_PLANS==="
@@ -364,6 +372,9 @@ if [[ -f "$ROOT_DIR/.agentic/spec/NFR.md" ]] && grep -qE '^## NFR-[0-9]+' "$ROOT
     if [[ -n "$nfr_summary" ]]; then
         echo "📊 NFRs           $nfr_summary"
     fi
+fi
+if [[ -n "$D_SPEC_METRICS" ]]; then
+    echo "📊 Spec evolution  $D_SPEC_METRICS"
 fi
 if [[ -n "$D_DESIGN_TRACE" ]]; then
     echo "📐 Design trace   $D_DESIGN_TRACE — run: design-trace.sh"

@@ -195,6 +195,19 @@ phase: review
 
 ---
 
+## Spec Evolution Review
+
+- [ ] **Run spec evolution metrics**
+  ```bash
+  bash .agentic/lib/tools/spec-metrics.sh
+  ```
+- [ ] **Review discovery patterns** — features with `[Discovered]` markers indicate scope uncertainty at planning time. Are discoveries concentrated in specific areas?
+- [ ] **Review high-churn specs** — AC files with many git commits suggest unstable requirements. Should these areas get more upfront design?
+- [ ] **Compare to complexity estimates** — do high-churn features correlate with underestimated complexity?
+- [ ] **Process improvement** — if discoveries are frequent, consider more thorough spike/exploration phases before spec writing
+
+---
+
 ## NFR Health Review
 
 - [ ] **Run NFR health report**

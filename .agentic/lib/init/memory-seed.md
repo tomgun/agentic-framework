@@ -208,7 +208,7 @@ If the user mentions interrupted work, crashed session, stuck intent, orphaned w
 
 When reviewing test quality — whether during implementation, retro, or audit — ask: "Could this test pass with a broken implementation?" If the answer is yes, the test is weak.
 
-Run `ag audit` to verify the spec→AC→test chain. Use `ag audit --propagate NFR-XXXX` to trace NFR changes downstream.
+Run `ag audit` to verify the spec→AC→test chain. Use `ag audit --propagate NFR-XXXX` to trace NFR changes downstream. Use `ag audit --metrics` for spec evolution data (discovery markers, churn analysis).
 
 ## Pre-commit sequence (never skip steps)
 
