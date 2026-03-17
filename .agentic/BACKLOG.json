@@ -1,18 +1,11 @@
 [
   {
     "type": "feature",
-    "id": "F-0225",
-    "description": "F-0225",
-    "added_at": "2026-03-16T18:56:04Z",
-    "added_by": "agent",
-    "became_current_at": "2026-03-17T18:11:55Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0229",
     "description": "F-0229",
     "added_at": "2026-03-16T18:56:04Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "became_current_at": "2026-03-17T19:27:49Z"
   },
   {
     "type": "feature",

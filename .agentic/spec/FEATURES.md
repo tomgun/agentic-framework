@@ -3908,7 +3908,7 @@ Proposed restructuring:
 
 ## F-0225: Spec Evolution Metrics
 
-**Status**: planned
+**Status**: shipped
 **Category**: Quality
 **Priority**: low
 **Complexity**: low

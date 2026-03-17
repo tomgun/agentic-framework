@@ -116,15 +116,13 @@ _No active items_
 
 
 
-### HN-0048: PR #155: F-0225 Spec Evolution Metrics
-- **Type**: pr_review
-- **Added**: 2026-03-17
-- **Context**: https://github.com/tomgun/agentic-framework/pull/155 — new spec-metrics.sh tool with ag audit --metrics integration
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
 
 ## Resolved
+
+### HN-0048: PR #155: F-0225 Spec Evolution Metrics
+- **Resolved**: 2026-03-17
+- **Outcome**: 
+
 
 ### HN-0043: PR #141: Systematic quality improvement
 - **Resolved**: 2026-03-15

@@ -3066,3 +3066,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-17 19:27 - F-0225 Shipped
+
+**Why**: Specs evolved invisibly during implementation; now teams can see discovery patterns and scope instability
+
+**What changed**:
+- Framework now surfaces spec evolution metrics — discovery markers and churn analysis — via ag audit --metrics, dashboard, and retrospective checklist
+
+**Next steps**:
+- Next: F-0229
+
+**Blockers**: None
+
