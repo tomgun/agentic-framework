@@ -11,11 +11,20 @@
 #   bash .agentic/lib/tools/plan-scan.sh --quiet       # One-line summary only
 #   bash .agentic/lib/tools/plan-scan.sh --check       # Dry run: report only, no copy
 #
-# Feature detection strategy:
-#   - Extract the PRIMARY feature ID from the plan title/header (first 5 lines)
-#   - Match patterns: "F-XXXX:" in heading, "Feature: F-XXXX", "F-XXXX" in title
-#   - Verify the feature exists in this project's FEATURES.md (avoids cross-project noise)
-#   - Plans without a clear primary feature ID are skipped
+# ID detection strategy (priority order):
+#   1. Epic ID (E-XXXX) from "Epic ID:" metadata or "# Epic Plan:" heading
+#   2. Feature ID (F-XXXX) from heading, title, or "Feature:" metadata
+#   - Verify the ID belongs to this project (FEATURES.md for F-*, feature refs for E-*)
+#   - Plans without a clear primary ID are skipped
+#
+# Dedup strategy:
+#   1. Filename match: checks for *{ID}*plan* in durable plans directory
+#   2. Content hash: catches duplicates saved under different names (e.g., E-0001 vs F-0219)
+#
+# Naming convention (rigid):
+#   - Feature plans: YYYY-MM-DD-F-XXXX-plan.md
+#   - Epic plans: YYYY-MM-DD-E-XXXX-plan.md
+#   - Generic plans: YYYY-MM-DD-<slug>-plan.md (future)
 #
 # Exit code: always 0 (advisory tool).
 
@@ -83,13 +92,33 @@ if [[ -f "$FEATURES_FILE" ]]; then
     _known_features=$(grep -oE "$FEATURE_ID_ERE" "$FEATURES_FILE" 2>/dev/null | sort -u || true)
 fi
 
-# --- Helper: extract primary feature ID from a plan file ---
-# Looks at the first 10 lines for a clear feature reference in the title/header.
-# Returns empty string if no primary feature found.
-extract_primary_feature() {
+# --- Helper: extract primary ID from a plan file ---
+# Looks at the first 10 lines for a clear feature or epic reference.
+# Priority: Epic ID (E-XXXX) > Feature ID in heading > Feature ID in metadata.
+# Returns empty string if no primary ID found.
+EPIC_ID_ERE='E-[0-9]{4}'
+
+extract_primary_id() {
     local file="$1"
     local header
     header=$(head -10 "$file" 2>/dev/null || true)
+
+    # Pattern 0: Epic ID — "Epic ID: E-XXXX" or "**Epic ID**: E-XXXX"
+    local eid
+    eid=$(echo "$header" | grep -iE "(epic.id|epic)[:\*]*\s*$EPIC_ID_ERE" | grep -oE "$EPIC_ID_ERE" | head -1 || true)
+    if [[ -n "$eid" ]]; then
+        echo "$eid"
+        return
+    fi
+
+    # Pattern 0b: "# Epic Plan:" with E-XXXX anywhere in header
+    if echo "$header" | grep -qiE "^#.*epic"; then
+        eid=$(echo "$header" | grep -oE "$EPIC_ID_ERE" | head -1 || true)
+        if [[ -n "$eid" ]]; then
+            echo "$eid"
+            return
+        fi
+    fi
 
     # Pattern 1: "# F-XXXX:" or "## F-XXXX:" (feature ID in heading)
     local fid
@@ -113,7 +142,7 @@ extract_primary_feature() {
         return
     fi
 
-    # No primary feature found
+    # No primary ID found
     echo ""
 }
 
@@ -127,42 +156,68 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
     for plan_file in "$scan_dir"/*; do
         [[ -f "$plan_file" ]] || continue
 
-        # Extract primary feature ID
-        primary_fid=$(extract_primary_feature "$plan_file")
-        [[ -z "$primary_fid" ]] && continue
+        # Extract primary ID (E-XXXX for epics, F-XXXX for features)
+        primary_id=$(extract_primary_id "$plan_file")
+        [[ -z "$primary_id" ]] && continue
 
-        # Verify this feature belongs to THIS project
-        if [[ -n "$_known_features" ]]; then
-            if ! echo "$_known_features" | grep -qF "$primary_fid"; then
+        # Verify this ID belongs to THIS project
+        # For feature IDs: check FEATURES.md. For epic IDs: accept if any feature ref matches.
+        if [[ "$primary_id" == F-* && -n "$_known_features" ]]; then
+            if ! echo "$_known_features" | grep -qF "$primary_id"; then
                 continue
             fi
+        elif [[ "$primary_id" == E-* && -n "$_known_features" ]]; then
+            # Epic: check if the plan references any known feature
+            plan_fids=$(grep -oE "$FEATURE_ID_ERE" "$plan_file" 2>/dev/null | sort -u || true)
+            has_match=false
+            for pfid in $plan_fids; do
+                if echo "$_known_features" | grep -qF "$pfid"; then
+                    has_match=true
+                    break
+                fi
+            done
+            [[ "$has_match" == false ]] && continue
         fi
 
         ((FOUND_COUNT++))
 
-        # Check if a durable plan already exists for this feature
-        # Look for any file matching F-XXXX*plan* in PLANS_DIR
+        # Check 1: filename match — any file with the primary ID in PLANS_DIR
         local_plan_exists=false
-        for existing in "$PLANS_DIR"/*"${primary_fid}"*plan*; do
+        for existing in "$PLANS_DIR"/*"${primary_id}"*plan*; do
             if [[ -f "$existing" ]]; then
                 local_plan_exists=true
                 break
             fi
         done
 
+        # Check 2: content hash — catch duplicates saved under different names
+        if [[ "$local_plan_exists" == false ]]; then
+            plan_hash=$(md5sum "$plan_file" 2>/dev/null | cut -d' ' -f1 || true)
+            if [[ -n "$plan_hash" ]]; then
+                for existing in "$PLANS_DIR"/*plan*; do
+                    [[ -f "$existing" ]] || continue
+                    existing_hash=$(md5sum "$existing" 2>/dev/null | cut -d' ' -f1 || true)
+                    if [[ "$plan_hash" == "$existing_hash" ]]; then
+                        local_plan_exists=true
+                        break
+                    fi
+                done
+            fi
+        fi
+
         if [[ "$local_plan_exists" == true ]]; then
             ((SKIPPED_COUNT++))
             continue
         fi
 
-        # No durable plan exists — copy it
-        dest_name="$(date +%Y-%m-%d)-${primary_fid}-plan.md"
+        # No durable plan exists — copy it with rigid naming: YYYY-MM-DD-{ID}-plan.md
+        dest_name="$(date +%Y-%m-%d)-${primary_id}-plan.md"
         if [[ "$CHECK_ONLY" == true ]]; then
-            COPIED_PLANS+=("$primary_fid (from $(basename "$scan_dir")/$(basename "$plan_file"))")
+            COPIED_PLANS+=("$primary_id (from $(basename "$scan_dir")/$(basename "$plan_file"))")
             ((COPIED_COUNT++))
         else
             cp "$plan_file" "$PLANS_DIR/$dest_name"
-            COPIED_PLANS+=("$primary_fid (from $(basename "$scan_dir")/$(basename "$plan_file"))")
+            COPIED_PLANS+=("$primary_id (from $(basename "$scan_dir")/$(basename "$plan_file"))")
             ((COPIED_COUNT++))
         fi
     done
