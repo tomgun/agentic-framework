@@ -96,7 +96,7 @@ fi
 # Looks at the first 10 lines for a clear feature or epic reference.
 # Priority: Epic ID (E-XXXX) > Feature ID in heading > Feature ID in metadata.
 # Returns empty string if no primary ID found.
-EPIC_ID_ERE='E-[0-9]{4}'
+# EPIC_ID_ERE sourced from ids.sh (via paths.sh)
 
 extract_primary_id() {
     local file="$1"
@@ -192,17 +192,21 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
 
         # Check 2: content hash — catch duplicates saved under different names
         if [[ "$local_plan_exists" == false ]]; then
-            plan_hash=$(md5sum "$plan_file" 2>/dev/null | cut -d' ' -f1 || true)
-            if [[ -n "$plan_hash" ]]; then
-                for existing in "$PLANS_DIR"/*plan*; do
-                    [[ -f "$existing" ]] || continue
-                    existing_hash=$(md5sum "$existing" 2>/dev/null | cut -d' ' -f1 || true)
-                    if [[ "$plan_hash" == "$existing_hash" ]]; then
-                        local_plan_exists=true
-                        break
-                    fi
-                done
-            fi
+            plan_size=$(wc -c < "$plan_file" 2>/dev/null || echo 0)
+            plan_hash=""
+            for existing in "$PLANS_DIR"/*plan*; do
+                [[ -f "$existing" ]] || continue
+                # Short-circuit: skip hash if file sizes differ
+                existing_size=$(wc -c < "$existing" 2>/dev/null || echo 0)
+                [[ "$plan_size" != "$existing_size" ]] && continue
+                # Sizes match — compare hashes
+                [[ -z "$plan_hash" ]] && plan_hash=$(md5sum "$plan_file" 2>/dev/null | cut -d' ' -f1 || true)
+                existing_hash=$(md5sum "$existing" 2>/dev/null | cut -d' ' -f1 || true)
+                if [[ "$plan_hash" == "$existing_hash" ]]; then
+                    local_plan_exists=true
+                    break
+                fi
+            done
         fi
 
         if [[ "$local_plan_exists" == true ]]; then
