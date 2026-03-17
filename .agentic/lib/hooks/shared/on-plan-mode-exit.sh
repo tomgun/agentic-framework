@@ -30,9 +30,8 @@ fi
 
 # --- Run plan-scan to save ephemeral plan to durable location ---
 SCAN_OUTPUT=""
-SCAN_EXIT=0
 if [[ -x "$PROJECT_ROOT/.agentic/lib/tools/plan-scan.sh" ]]; then
-    SCAN_OUTPUT=$(bash "$PROJECT_ROOT/.agentic/lib/tools/plan-scan.sh" --quiet 2>&1) || SCAN_EXIT=$?
+    SCAN_OUTPUT=$(bash "$PROJECT_ROOT/.agentic/lib/tools/plan-scan.sh" --quiet 2>&1) || true
 fi
 
 # --- Output banner ---
@@ -42,18 +41,21 @@ echo "📋 Plan Mode Exit — Review Required"
 echo "═══════════════════════════════════════════════════════"
 
 if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
-    # Plan was saved successfully
-    # Try to find which plan file was just saved
+    # Plan was saved successfully — extract feature ID from plan filename
     LATEST_PLAN=$(ls -t "$PROJECT_ROOT/.agentic/journal/plans/"*-plan.md 2>/dev/null | head -1)
+    FEATURE_ID="F-XXXX"
     if [[ -n "$LATEST_PLAN" ]]; then
         PLAN_BASENAME=$(basename "$LATEST_PLAN")
+        # Extract F-XXXX from filename like 2026-03-17-F-0234-plan.md
+        PARSED_FID=$(echo "$PLAN_BASENAME" | grep -oE 'F-[0-9]{4}' | head -1)
+        [[ -n "$PARSED_FID" ]] && FEATURE_ID="$PARSED_FID"
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/$PLAN_BASENAME"
     else
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/"
     fi
     echo ""
     echo "⚠️  Plan is NOT approved. Next steps:"
-    echo "  1. Run \`ag implement F-XXXX\` — triggers dialectical review"
+    echo "  1. Run \`ag implement $FEATURE_ID\` — triggers dialectical review"
     echo "  2. Follow review instructions (Critic + Advocate agents)"
     echo "  3. After approval → re-run \`ag implement\`"
     echo ""

@@ -1156,32 +1156,34 @@ fi
 
 # Check 21: Approved plan required when plan_review_enabled (BLOCKING)
 # Only gates feature implementation work — requires WIP entry in AGENTS.json
-PLAN_REVIEW_ENABLED=$(get_setting "plan_review_enabled" "no" 2>/dev/null || echo "no")
-if [[ "$PLAN_REVIEW_ENABLED" == "yes" ]] && command -v python3 >/dev/null 2>&1; then
-  WIP_FEATURE=""
-  WIP_FEATURE=$(python3 .agentic/lib/tools/agents_helpers.py --project-root "$PROJECT_ROOT" get-current-feature "$PROJECT_ROOT" 2>/dev/null || true)
+if [[ $_FAST_MODE -eq 0 ]]; then
+  PLAN_REVIEW_ENABLED=$(get_setting "plan_review_enabled" "no" 2>/dev/null || echo "no")
+  if [[ "$PLAN_REVIEW_ENABLED" == "yes" ]] && command -v python3 >/dev/null 2>&1; then
+    WIP_FEATURE=""
+    WIP_FEATURE=$(python3 .agentic/lib/tools/agents_helpers.py --project-root "$PROJECT_ROOT" get-current-feature "$PROJECT_ROOT" 2>/dev/null || true)
 
-  if [[ -n "$WIP_FEATURE" ]] && [[ "$WIP_FEATURE" =~ ^F-[0-9]{4}$ ]]; then
-    echo ""
-    echo "[21] Checking for APPROVED plan ($WIP_FEATURE)..."
+    if [[ -n "$WIP_FEATURE" ]] && [[ "$WIP_FEATURE" =~ ^F-[0-9]{4}$ ]]; then
+      echo ""
+      echo "[21] Checking for APPROVED plan ($WIP_FEATURE)..."
 
-    # Look for an APPROVED plan in the durable plans directory
-    HAS_APPROVED_PLAN=false
-    for plan_file in "$PROJECT_ROOT/.agentic/journal/plans/"*"${WIP_FEATURE}"*plan*; do
-      if [[ -f "$plan_file" ]]; then
-        if grep -qi '^\*\*Status\*\*.*APPROVED' "$plan_file" 2>/dev/null; then
-          HAS_APPROVED_PLAN=true
-          break
+      # Look for an APPROVED plan in the durable plans directory
+      HAS_APPROVED_PLAN=false
+      for plan_file in "$PROJECT_ROOT/.agentic/journal/plans/"*"${WIP_FEATURE}"*plan*; do
+        if [[ -f "$plan_file" ]]; then
+          if grep -qi '^\*\*Status\*\*.*APPROVED' "$plan_file" 2>/dev/null; then
+            HAS_APPROVED_PLAN=true
+            break
+          fi
         fi
-      fi
-    done
+      done
 
-    if [[ "$HAS_APPROVED_PLAN" == true ]]; then
-      echo "  ✓ APPROVED plan found for $WIP_FEATURE"
-    else
-      echo "  ❌ BLOCKED: plan_review_enabled is yes but no APPROVED plan for $WIP_FEATURE."
-      echo "     Run \`ag implement $WIP_FEATURE\` to trigger dialectical review first."
-      FAILURES=$((FAILURES + 1))
+      if [[ "$HAS_APPROVED_PLAN" == true ]]; then
+        echo "  ✓ APPROVED plan found for $WIP_FEATURE"
+      else
+        echo "  ❌ BLOCKED: plan_review_enabled is yes but no APPROVED plan for $WIP_FEATURE."
+        echo "     Run \`ag implement $WIP_FEATURE\` to trigger dialectical review first."
+        FAILURES=$((FAILURES + 1))
+      fi
     fi
   fi
 fi

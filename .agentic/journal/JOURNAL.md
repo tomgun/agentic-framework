@@ -2885,3 +2885,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-17 10:26 - F-0234 Plan-Review Hooks
+
+**Why**: Structural enforcement for plan-save and review at transition points
+
+**What changed**:
+- ExitPlanMode hook + pre-commit Check 21 + architecture doc + 17 tests + LLM test
+
+**Next steps**:
+- Field validation of A11 (ExitPlanMode matcher)
+
+**Blockers**: None
+
