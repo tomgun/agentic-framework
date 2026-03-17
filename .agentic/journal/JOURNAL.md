@@ -2937,3 +2937,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-17 16:09 - Dogfood sync + deferred capture
+
+**Why**: Root instruction files drifted from templates after recent PRs; future items from PRs/plans were not being captured durably
+
+**What changed**:
+- Framework-dev instruction files synced with templates (8 files), deferred-item capture with mandatory context added to workflow (skills, checklists, memory-seed), 8 TODOs captured from F-0234/F-0193 with full background
+
+**Next steps**:
+- Commit and PR for review
+
+**Blockers**: None
+

@@ -160,6 +160,46 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0067: NFR lifecycle: auto-generate project-appropriate NFRs at init and retrospectives. Categories: testability, performance, security, usability, reportability, scalability, portability, visual impressiveness, immersivity, small deployment size, etc. Pre-filled templates for common project types (web, API, games, music software, mobile, CLI). NFRs may vary per component. Guide user to refine NFRs before they flow into ACs — user may add/change constraints. Trigger points: ag kickoff, ag init, retrospectives, and other natural stops. This ensures NFR→AC→implementation pipeline starts with good NFRs, not afterthoughts.
 - **Added**: 2026-03-15
 
+### T-0068: F-0234: Create ExitPlanMode hook wrappers for Cursor, Gemini, Codex, Copilot — shared logic exists at .agentic/lib/hooks/shared/on-plan-mode-exit.sh, needs per-tool wrappers like .agentic/hooks/claude/ExitPlanMode.sh
+- **Added**: 2026-03-17
+- **Background**: F-0234 (PR #151) shipped the ExitPlanMode hook for Claude Code only. The shared hook logic at `.agentic/lib/hooks/shared/on-plan-mode-exit.sh` was designed to be agent-agnostic — it handles plan-save and review-instruction injection. Each tool needs a thin wrapper: Claude has `.agentic/hooks/claude/ExitPlanMode.sh`, but Cursor, Gemini, Codex, and Copilot don't yet. Gemini is closest to ready (mature AfterTool with regex matchers per `docs/INSTRUCTION_ARCHITECTURE.md` line 32). Cursor/Copilot/Codex hook support is emerging.
+- **Related**: F-0234 plan (`.agentic/journal/plans/2026-03-17-F-0234-plan.md`), `docs/INSTRUCTION_ARCHITECTURE.md` §4 Defense-in-Depth: Hooks
+
+### T-0069: F-0234: Field-validate ExitPlanMode hook (A11) — enter/exit plan mode in Claude Code and verify hook fires, PostToolUse banner appears
+- **Added**: 2026-03-17
+- **Background**: F-0234 PR #151 test plan has two unchecked items requiring manual testing in Claude Code. Assumption A11 in `docs/INSTRUCTION_ARCHITECTURE.md` tracks that the ExitPlanMode matcher behavior (PostToolUse with `tool_name == "ExitPlanMode"`) needs field validation — unit tests pass but the actual Claude Code hook dispatch hasn't been tested interactively. Need to: (1) enter plan mode, (2) exit plan mode, (3) verify the hook banner appears with plan-save confirmation and review instructions.
+- **Related**: PR #151 test plan, `docs/INSTRUCTION_ARCHITECTURE.md` Assumption A11, `.agentic/lib/claude-hooks/hooks.json`
+
+### T-0070: F-0234: Field-validate Check 21 — verify pre-commit blocks commit when WIP exists without APPROVED plan
+- **Added**: 2026-03-17
+- **Background**: F-0234 added pre-commit Check 21 (`.agentic/lib/hooks/pre-commit-check.sh` lines 1157-1189) which blocks commits when `plan_review_enabled: yes` and a WIP entry exists in AGENTS.json but no APPROVED plan is found. Unit tests verify the logic, but the actual blocking behavior during a real `git commit` hasn't been validated. Test: create WIP entry without plan, attempt commit, verify it's blocked with clear error message.
+- **Related**: PR #151 test plan, `.agentic/lib/hooks/pre-commit-check.sh` Check 21, `tests/test_plan_review_hooks.sh`
+
+### T-0071: Future hook: PreToolUse(Write|Edit) — block coding without approved plan (from INSTRUCTION_ARCHITECTURE.md transition table)
+- **Added**: 2026-03-17
+- **Background**: `docs/INSTRUCTION_ARCHITECTURE.md` §"Tool-Native Hook Transition Points" (line 330) lists this as a future enforcement point. When an agent tries to write/edit code files without an approved plan existing, the hook would block the action. Currently agents rely on prompt-level instructions to not code without a plan — this would add structural enforcement. Builds on F-0234's hook architecture (shared logic pattern, advisory vs blocking layers).
+- **Related**: `docs/INSTRUCTION_ARCHITECTURE.md` transition table, F-0234 hook architecture, `.agentic/lib/hooks/shared/` pattern
+
+### T-0072: Future hook: PreToolUse(Bash)+parse cmd — prevent stash/reset with active agents (from INSTRUCTION_ARCHITECTURE.md transition table)
+- **Added**: 2026-03-17
+- **Background**: `docs/INSTRUCTION_ARCHITECTURE.md` §"Tool-Native Hook Transition Points" (line 331) lists this as a future enforcement point. Multi-session safety currently relies on prompt instructions ("run agents_helpers.py count-others before destructive ops"). A PreToolUse hook on Bash could parse the command for `git stash`, `git reset --hard`, `git checkout .`, `git restore .`, `git clean -f` and auto-check for other active agents before allowing. Would make the "never git stash" rule structural instead of behavioral.
+- **Related**: `docs/INSTRUCTION_ARCHITECTURE.md` transition table, F-0194 multi-agent safety, CLAUDE.md multi-session safety rule
+
+### T-0073: Future hook: PostToolUse(Bash)+parse cmd — after ag done verify completeness (from INSTRUCTION_ARCHITECTURE.md transition table)
+- **Added**: 2026-03-17
+- **Background**: `docs/INSTRUCTION_ARCHITECTURE.md` §"Tool-Native Hook Transition Points" (line 332) lists this as a future enforcement point. After `ag done` runs, a PostToolUse hook could verify that all expected artifacts were actually created/updated (ACs checked, docs updated, journal entry written, VERSION bumped). Currently `ag done` runs internal checks, but this would add a tool-native verification layer that catches issues even if the agent bypasses `ag done` and runs completion steps manually.
+- **Related**: `docs/INSTRUCTION_ARCHITECTURE.md` transition table, `feature_complete.md` checklist, F-0234 hook architecture
+
+### T-0074: Future hook: PreToolUse(Bash)+parse gh pr — pre-submit check ensuring tests pass before PR creation (from INSTRUCTION_ARCHITECTURE.md transition table)
+- **Added**: 2026-03-17
+- **Background**: `docs/INSTRUCTION_ARCHITECTURE.md` §"Tool-Native Hook Transition Points" (line 333) lists this as a future enforcement point. When an agent runs `gh pr create`, a PreToolUse hook could verify that tests pass, pre-commit checks are clean, and required artifacts exist before allowing the PR to be created. Would prevent PRs with known-failing tests from being submitted for review.
+- **Related**: `docs/INSTRUCTION_ARCHITECTURE.md` transition table, `before_commit.md` checklist, F-0234 hook architecture
+
+### T-0075: F-0193 PR 2: Apply ID centralization to other entity types — NFR-XXXX, T-XXXX, I-XXXX, HN-XXXX, FB-XXXX, R-XXXX (follow-up from F-0193 shipped in v0.57.0)
+- **Added**: 2026-03-17
+- **Background**: F-0193 (PR #152, shipped v0.57.0) centralized Feature ID patterns (`F-XXXX`) into `.agentic/lib/ids.py` and `.agentic/lib/ids.sh`, widening from `\d{4}` to `\d{4,}`. The plan (`.agentic/journal/plans/2026-03-17-F-0193-plan.md`) explicitly scoped PR 1 to Feature IDs only (~40 files) and deferred other entity types to PR 2. Remaining types: NFR-XXXX (non-functional requirements), T-XXXX (TODOs), I-XXXX (issues), HN-XXXX (human-needed items), FB-XXXX (feedback), R-XXXX (references). Same pattern: add to ids.py/ids.sh, update regex consumers.
+- **Related**: F-0193 plan, PR #152, `.agentic/lib/ids.py`, `.agentic/lib/ids.sh`, E-0001 epic plan (`.agentic/journal/plans/2026-03-17-F-0219-plan.md`)
+
 ## Done
 
 

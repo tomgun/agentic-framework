@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0193 shipped — centralized IDs landed (Updated: 2026-03-17 15:46 UTC)
+- Dogfood sync + deferred capture — PR in progress (Updated: 2026-03-17 16:10 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item
