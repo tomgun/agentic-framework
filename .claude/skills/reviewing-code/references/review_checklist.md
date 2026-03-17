@@ -32,6 +32,11 @@ Use this for self-review and PR review.
 - Any new inputs validated?
 - Any secrets or sensitive data handled appropriately?
 
+## Plan Alignment
+- Does the implementation match the approved plan (`.agentic/journal/plans/`)?
+- Are all planned deliverables present? Any unplanned additions?
+- If deviations exist, are they justified and documented?
+
 ## Docs & project truth
 - Is `.agentic/STATUS.md` updated?
 - Are specs/ADRs updated when behavior/decisions changed?
