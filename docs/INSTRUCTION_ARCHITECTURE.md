@@ -29,7 +29,7 @@ This design synthesizes two independent research efforts:
 
 **Constitution size deviation**: The ChatGPT research recommends 300-800 tokens (~15-40 lines). The framework's empirical finding (L-0002) is that compliance degrades past ~100 lines (~1500 tokens). The proposed slimmed target of ~40-50 lines (~800-1000 tokens) exceeds the ChatGPT upper bound by ~25%. This is a conscious choice: the framework's instruction files carry competing high-priority rules (gates, triggers, protocols) that dilute each other faster than single-purpose constitutions. The 100-line upper bound from L-0002 remains the framework's validated ceiling. The ChatGPT recommendation is noted as aspirational guidance without cited empirical basis.
 
-**Gemini**: The ChatGPT research notes Gemini is stateless between calls, supports up to ~1M tokens, and has no native orchestrator memory. Documented here for future reference — the framework doesn't support Gemini yet. Gemini CLI's hook system is mature (AfterTool with regex matchers); support planned as Feature B. Including unactionable findings in the main design would weaken the document's authority.
+**Gemini**: The ChatGPT research notes Gemini is stateless between calls, supports up to ~1M tokens, and has no native orchestrator memory. Documented here for future reference — the framework doesn't support Gemini yet. Gemini CLI's hook system is mature (AfterTool with regex matchers). Including unactionable findings in the main design would weaken the document's authority.
 
 ---
 
@@ -153,7 +153,7 @@ Defense-in-Depth: Hooks
 │   └── pre-commit-check.sh — 21 structural gates
 └── Tool-Native Hooks (per-tool, structural enforcement at transition points)
     ├── Claude Code: PostToolUse(ExitPlanMode), SessionStart, Stop, etc.
-    └── [Other tools: see Feature B/C — Gemini, Codex, Copilot, Cursor]
+    └── [Other tools: future — Gemini, Codex, Copilot, Cursor]
 ```
 
 **Git hooks** run at commit time — they are the universal backstop. **Tool-native hooks** fire at workflow transition points (e.g., exiting plan mode) and can inject instructions into the agent's context before the next action. Together they provide defense-in-depth: tool hooks catch violations early (at the transition), git hooks catch them late (at commit time).
