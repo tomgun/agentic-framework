@@ -3259,7 +3259,7 @@ All profile-aware settings are listed explicitly with values in STACK.md (no com
 
 ## F-0193: Collision-Proof Feature IDs
 
-**Status**: planned
+**Status**: shipped
 **Category**: Architecture
 **Priority**: high
 **Complexity**: medium

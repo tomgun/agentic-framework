@@ -2911,3 +2911,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-17 15:44 - F-0193 shipped
+
+**Why**: 100+ duplicated regex patterns across 50+ files made format changes impractical
+
+**What changed**:
+- Feature ID patterns centralized into ids.py/ids.sh — any future format change is a one-file edit
+
+**Next steps**:
+- Next: PR 2 for other ID types (NFR, T, I, HN, FB, R)
+
+**Blockers**: None
+
+
+### Session: 2026-03-17 15:46 - F-0193 shipped
+
+**Why**: 100+ duplicated regex patterns made format changes impractical
+
+**What changed**:
+- Feature ID patterns centralized into ids.py/ids.sh
+
+**Next steps**:
+- PR 2 for other ID types
+
+**Blockers**: None
+
