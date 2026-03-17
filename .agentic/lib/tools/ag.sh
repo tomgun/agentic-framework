@@ -3011,7 +3011,7 @@ cmd_trace() {
                 shift 2>/dev/null || true
                 arg="${1:-}"
                 ;;
-            F-[0-9]*)
+            F-[0-9][0-9][0-9][0-9]*)
                 # Feature lookup: what files implement this feature?
                 cmd_trace_feature "$arg"
                 return

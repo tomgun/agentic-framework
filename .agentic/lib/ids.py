@@ -18,8 +18,8 @@ from pathlib import Path
 # Inline reference: captures F-XXXX anywhere in text
 FEATURE_ID_RE = re.compile(r"\b(F-\d{4,})\b")
 
-# Markdown header: ## F-XXXX: Title
-FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4,}):\s*(.+?)\s*$")
+# Markdown header: ## F-XXXX: Title (MULTILINE so ^ matches line starts)
+FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4,}):\s*(.+?)\s*$", re.MULTILINE)
 
 # Strict validation: entire string must be a feature ID
 FEATURE_ID_STRICT_RE = re.compile(r"^F-\d{4,}$")

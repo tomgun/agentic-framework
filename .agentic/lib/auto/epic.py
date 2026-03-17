@@ -547,7 +547,7 @@ def _get_children_statuses(
 def _extract_section(content: str, start: int) -> str:
     """Extract a feature section from start position to next header."""
     section = content[start:]
-    next_header = re.search(FEATURE_HEADER_RE.pattern, section, re.MULTILINE)
+    next_header = FEATURE_HEADER_RE.search(section)
     if next_header:
         section = section[:next_header.start()]
     return section

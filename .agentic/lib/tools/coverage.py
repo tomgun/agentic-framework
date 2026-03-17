@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from paths import get_paths
 
 
-from ids import FEATURE_HEADER_RE, FEATURE_ID_RE
+from ids import FEATURE_HEADER_RE
 FEATURE_ANNOTATION_RE = re.compile(r"@feature\s+(F-\d{4,})")
 # Test file naming pattern: test_F0003_*.py or test_F-0003_*.py
 TEST_FEATURE_RE = re.compile(r"test[_-]?F[-_]?(\d{4,})", re.IGNORECASE)
