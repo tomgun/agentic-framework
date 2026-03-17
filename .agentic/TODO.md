@@ -200,6 +200,11 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 - **Background**: F-0193 (PR #152, shipped v0.57.0) centralized Feature ID patterns (`F-XXXX`) into `.agentic/lib/ids.py` and `.agentic/lib/ids.sh`, widening from `\d{4}` to `\d{4,}`. The plan (`.agentic/journal/plans/2026-03-17-F-0193-plan.md`) explicitly scoped PR 1 to Feature IDs only (~40 files) and deferred other entity types to PR 2. Remaining types: NFR-XXXX (non-functional requirements), T-XXXX (TODOs), I-XXXX (issues), HN-XXXX (human-needed items), FB-XXXX (feedback), R-XXXX (references). Same pattern: add to ids.py/ids.sh, update regex consumers.
 - **Related**: F-0193 plan, PR #152, `.agentic/lib/ids.py`, `.agentic/lib/ids.sh`, E-0001 epic plan (`.agentic/journal/plans/2026-03-17-F-0219-plan.md`)
 
+### T-0076: Production project post-merge sync: after merging PRs in production projects, local instruction file extensions (CLAUDE.md, .cursorrules) and project-specific memory may need updating — different from framework dogfood sync which syncs templates↔root
+- **Added**: 2026-03-17
+- **Background**: PR #153 added a "Post-merge dogfood sync" step to the completing-work workflow, but it's guarded to framework-dev only (`FRAMEWORK_DEVELOPMENT.md` existence check). Production projects have a related but different need: when a PR changes behavior, local CLAUDE.md extensions, .cursorrules project-specific sections, and project-level persistent memory (auto-memory) may need updating to reflect the new reality. Examples: a PR adds a new API endpoint → CLAUDE.md's project-specific section should mention it; a PR changes the build system → memory about build commands is stale. This is NOT about syncing `.agentic/lib/` templates (that's framework-internal) — it's about keeping project-level agent context fresh after code changes land.
+- **Related**: PR #153 (dogfood sync), completing-work skill Step 6, `feature_complete.md` "Post-merge dogfood sync" checklist item, F-0226 (Post-Merge Dogfooding planned feature in E-0001 epic)
+
 ## Done
 
 
