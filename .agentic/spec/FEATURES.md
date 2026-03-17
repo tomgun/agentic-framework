@@ -3886,7 +3886,7 @@ Proposed restructuring:
 
 ## F-0224: Smoke Test Evidence
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Quality
 **Priority**: medium
 **Complexity**: low
