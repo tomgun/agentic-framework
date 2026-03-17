@@ -502,7 +502,7 @@ if became:
             if [ -n "$bl_total" ]; then
                 echo -e "  ${DIM}Queue:   $bl_total item(s) total${NC}"
             fi
-            if echo "$bl_id" | grep -qE '^F-[0-9]{4}$' 2>/dev/null; then
+            if is_feature_id "$bl_id" 2>/dev/null; then
                 echo -e "  ${DIM}Resume:  ag implement $bl_id${NC}"
             fi
             echo -e "${BOLD}═══════════════════════════════════════${NC}"
@@ -687,7 +687,7 @@ cmd_plan() {
     fi
 
     # Validate feature ID format
-    if ! echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if ! is_feature_id "$feature_id"; then
         echo -e "${RED}Error: Invalid feature ID format. Expected: F-XXXX (e.g., F-0042)${NC}"
         exit 1
     fi
@@ -856,7 +856,7 @@ cmd_implement() {
     fi
 
     # Validate feature ID format
-    if ! echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if ! is_feature_id "$feature_id"; then
         echo -e "${RED}Error: Invalid feature ID format. Expected: F-XXXX (e.g., F-0042)${NC}"
         exit 1
     fi
@@ -1460,7 +1460,7 @@ cmd_done() {
     # never run. State-based check, not workflow-position check.
     local plan_review_enabled_done
     plan_review_enabled_done=$(get_plan_review_config "plan_review_enabled" "no")
-    if [ "$plan_review_enabled_done" = "yes" ] && [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if [ "$plan_review_enabled_done" = "yes" ] && [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         local _plan_glob
         _plan_glob=$(_find_plan_file "$feature_id" || echo "")
         if [ -z "$_plan_glob" ]; then
@@ -1484,7 +1484,7 @@ cmd_done() {
     # --- Automated verification gate ---
     # Run automated verification commands from AC file before shipping.
     # Advisory for discovery, blocking for formal profiles.
-    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
         if [ -f "$acc_file" ] && grep -q '\*\*Automated\*\*' "$acc_file"; then
             echo -e "${BOLD}=== Running Automated Verification ===${NC}"
@@ -1511,7 +1511,7 @@ cmd_done() {
     local enforcement
     enforcement=$(_get_state_enforcement)
 
-    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         # Build step list based on what will actually run
         local intent_steps="generate_manifest,check_drift,check_ac_completion"
         if [ "$enforcement" != "off" ]; then
@@ -1524,7 +1524,7 @@ cmd_done() {
     fi
 
     # Generate manifest for feature (Formal profile)
-    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         echo -e "${BOLD}=== Generating Change Manifest ===${NC}"
         if bash "$SCRIPT_DIR/manifest.sh" "$feature_id" 2>/dev/null; then
             local manifest_file="$ROOT_DIR/.agentic/journal/manifests/${feature_id}.manifest.md"
@@ -1588,7 +1588,7 @@ cmd_done() {
         fi
         echo ""
     fi
-    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         intent_checkpoint "$feature_id" "check_drift" || true
     fi
 
@@ -1630,7 +1630,7 @@ cmd_done() {
     local smoke_evidence_mode
     smoke_evidence_mode=$(get_setting "smoke_test_evidence" "off")
 
-    if [ "$smoke_evidence_mode" != "off" ] && [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if [ "$smoke_evidence_mode" != "off" ] && [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         echo -e "${BOLD}=== Smoke Test Evidence Check ===${NC}"
         mkdir -p "$ROOT_DIR/.agentic/journal/evidence"
         local evidence_found=""
@@ -1661,7 +1661,7 @@ cmd_done() {
 
     # If feature ID provided, run specific checks
     if [ -n "$feature_id" ]; then
-        if ! echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+        if ! is_feature_id "$feature_id"; then
             echo -e "${RED}Error: Invalid feature ID format. Expected: F-XXXX${NC}"
             exit 1
         fi
@@ -1868,7 +1868,7 @@ cmd_done() {
     # State transitions (controlled by state_enforcement setting)
     # Reliability (crash recovery) is always active via intent checkpoints above.
     # State machine transitions are only attempted when state_enforcement != off.
-    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$' && [ "$enforcement" != "off" ]; then
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id" && [ "$enforcement" != "off" ]; then
         echo ""
         echo -e "${BOLD}=== State Transitions ===${NC}"
         local _enforce_flag=""
@@ -1926,7 +1926,7 @@ cmd_done() {
             fi
         fi
     fi
-    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         intent_checkpoint "$feature_id" "complete_wip" || true
     fi
 
@@ -1937,7 +1937,7 @@ cmd_done() {
     echo "  (Checks: untracked files, feature status, template markers)"
 
     # Backlog auto-remove completed feature (by ID, regardless of position)
-    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         # Check if feature is in the backlog at all
         if python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" list 2>/dev/null | grep -q "$feature_id"; then
             echo ""
@@ -1984,7 +1984,7 @@ cmd_done() {
     fi
 
     # Clear intent — all steps complete
-    if [ -n "$feature_id" ] && echo "$feature_id" | grep -qE '^F-[0-9]{4}$'; then
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         intent_clear "$feature_id" || true
     fi
 
@@ -2191,7 +2191,7 @@ cmd_merge() {
     if [ -z "$feature_id" ]; then
         local pr_title
         pr_title=$(gh pr view "$pr_number" --json title -q '.title' 2>/dev/null || echo "")
-        feature_id=$(echo "$pr_title" | grep -oE 'F-[0-9]{4}' | head -1 || echo "")
+        feature_id=$(echo "$pr_title" | grep -oE "$FEATURE_ID_ERE" | head -1 || echo "")
         if [ -n "$feature_id" ]; then
             echo "Detected feature: $feature_id (from PR title)"
         fi
@@ -2231,7 +2231,7 @@ cmd_docs() {
 
     # Resolve feature ID: explicit arg, or from WIP
     local feature_id=""
-    if [[ "$arg1" =~ ^F-[0-9]{4}$ ]]; then
+    if is_feature_id "$arg1"; then
         feature_id="$arg1"
         shift 2>/dev/null || true
         arg1="${1:-}"
@@ -2239,7 +2239,7 @@ cmd_docs() {
         # Try AGENTS.json first, then WIP.md fallback
         feature_id=$(_get_wip_feature)
         if [[ -z "$feature_id" ]] && [[ -f "$ROOT_DIR/.agentic/session/WIP.md" ]]; then
-            feature_id=$(grep -oE 'F-[0-9]{4}' "$ROOT_DIR/.agentic/session/WIP.md" 2>/dev/null | head -1 || true)
+            feature_id=$(grep -oE "$FEATURE_ID_ERE" "$ROOT_DIR/.agentic/session/WIP.md" 2>/dev/null | head -1 || true)
         fi
     fi
 
@@ -2730,7 +2730,7 @@ cmd_verify() {
     local arg="${1:-}"
 
     # ag verify F-XXXX — run automated verification commands from AC file
-    if echo "$arg" | grep -qE '^F-[0-9]{4}$'; then
+    if is_feature_id "$arg"; then
         local feature_id="$arg"
         local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
         if [ ! -f "$acc_file" ]; then
@@ -3011,7 +3011,7 @@ cmd_trace() {
                 shift 2>/dev/null || true
                 arg="${1:-}"
                 ;;
-            F-[0-9][0-9][0-9][0-9])
+            F-[0-9][0-9][0-9][0-9]*)
                 # Feature lookup: what files implement this feature?
                 cmd_trace_feature "$arg"
                 return
@@ -3374,7 +3374,7 @@ cmd_spec() {
     local arg="${1:-}"
 
     # Advisory: backlog alignment check
-    if [[ -n "$arg" ]] && echo "$arg" | grep -qE '^F-[0-9]{4}$'; then
+    if [[ -n "$arg" ]] && is_feature_id "$arg"; then
         _backlog_advisory "$arg" "spec"
     fi
 
@@ -4078,7 +4078,7 @@ _backlog_advisory() {
     local feature_id="$1"
     local command_name="$2"
     [ -z "$feature_id" ] && return 0
-    echo "$feature_id" | grep -qE '^F-[0-9]{4}$' || return 0
+    is_feature_id "$feature_id" || return 0
 
     local current_json
     current_json=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" json-current 2>/dev/null) || return 0

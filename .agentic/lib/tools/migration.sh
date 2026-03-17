@@ -270,7 +270,7 @@ MIGEOF
   if [[ -x "$qa_tracker" ]]; then
     # Extract feature IDs mentioned in the migration template
     local affected_features
-    affected_features=$(grep -oE 'F-[0-9]{4}' "$filepath" 2>/dev/null | sort -u | tr '\n' ',' | sed 's/,$//')
+    affected_features=$(grep -oE "$FEATURE_ID_ERE" "$filepath" 2>/dev/null | sort -u | tr '\n' ',' | sed 's/,$//')
     if [[ -n "$affected_features" ]]; then
       bash "$qa_tracker" add-propagation "migration:$padded_id" "$title" "$affected_features" 2>/dev/null || true
       echo -e "${YELLOW}📋${NC} QA propagation items created for: $affected_features"

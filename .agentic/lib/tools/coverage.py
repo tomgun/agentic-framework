@@ -24,10 +24,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from paths import get_paths
 
 
-FEATURE_ANNOTATION_RE = re.compile(r"@feature\s+(F-\d{4})")
-FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):", re.MULTILINE)
+from ids import FEATURE_HEADER_RE
+FEATURE_ANNOTATION_RE = re.compile(r"@feature\s+(F-\d{4,})")
 # Test file naming pattern: test_F0003_*.py or test_F-0003_*.py
-TEST_FEATURE_RE = re.compile(r"test[_-]?F[-_]?(\d{4})", re.IGNORECASE)
+TEST_FEATURE_RE = re.compile(r"test[_-]?F[-_]?(\d{4,})", re.IGNORECASE)
 # AC ID pattern in acceptance files: **AC-001**: description
 AC_ID_RE = re.compile(r"\*\*AC-(\d{3,4})\*\*:?\s*(.*)")
 # AC ID references in test files: AC-001, AC_001, ac001 (various conventions)
@@ -224,7 +224,7 @@ def parse_features(features_path: Path) -> dict[str, dict]:
     current_id = None
 
     # Check for table format first (unused for now, but reserved for future)
-    table_format = bool(re.search(r"^\|\s*F-\d{4}", content, re.MULTILINE))
+    table_format = bool(re.search(r"^\|\s*F-\d{4,}", content, re.MULTILINE))
 
     for line in content.splitlines():
         # Check for feature header (markdown heading format)
@@ -232,7 +232,7 @@ def parse_features(features_path: Path) -> dict[str, dict]:
         if m:
             current_id = m.group(1)
             # Extract name from header line
-            name_match = re.search(r"^##\s+F-\d{4}:\s*(.+)$", line)
+            name_match = re.search(r"^##\s+F-\d{4,}:\s*(.+)$", line)
             name = name_match.group(1).strip() if name_match else ""
             features[current_id] = {"status": None, "state": None, "name": name}
             continue

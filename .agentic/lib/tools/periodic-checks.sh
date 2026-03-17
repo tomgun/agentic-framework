@@ -181,7 +181,7 @@ check_orphaned_plans() {
     # Extract feature IDs from FEATURES.md (if it exists)
     local feature_ids=""
     if [ -f "$ROOT_DIR/.agentic/spec/FEATURES.md" ]; then
-        feature_ids=$(grep -oE 'F-[0-9]{4}' "$ROOT_DIR/.agentic/spec/FEATURES.md" 2>/dev/null | sort -u | tr '\n' '|' | sed 's/|$//')
+        feature_ids=$(grep -oE "$FEATURE_ID_ERE" "$ROOT_DIR/.agentic/spec/FEATURES.md" 2>/dev/null | sort -u | tr '\n' '|' | sed 's/|$//')
     fi
 
     # Get last sync date for recency filter
@@ -216,7 +216,7 @@ check_orphaned_plans() {
             # Feature ID matching: only use if plan has >=2 matching IDs (reduces false positives
             # from common IDs like F-0001 appearing in unrelated projects)
             local match_count
-            match_count=$(grep -oE 'F-[0-9]{4}' "$plan_file" 2>/dev/null | grep -cE "^($feature_ids)$" 2>/dev/null || echo "0")
+            match_count=$(grep -oE "$FEATURE_ID_ERE" "$plan_file" 2>/dev/null | grep -cE "^($feature_ids)$" 2>/dev/null || echo "0")
             if [ "$match_count" -ge 2 ]; then
                 matches=true
             fi
@@ -227,7 +227,7 @@ check_orphaned_plans() {
             local already_saved=false
             if [ -d "$plan_journal_dir" ]; then
                 local plan_fids
-                plan_fids=$(grep -oE 'F-[0-9]{4}' "$plan_file" 2>/dev/null | sort -u || echo "")
+                plan_fids=$(grep -oE "$FEATURE_ID_ERE" "$plan_file" 2>/dev/null | sort -u || echo "")
                 for fid in $plan_fids; do
                     if grep -rl "$fid" "$plan_journal_dir/" 2>/dev/null | head -1 | grep -q .; then
                         already_saved=true

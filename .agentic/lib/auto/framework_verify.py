@@ -175,7 +175,7 @@ class MilestoneChecker:
         if not features.exists():
             return MilestoneResult("kickoff_complete", False, "FEATURES.md not found")
         content = features.read_text()
-        if not re.search(r"F-\d{4}", content):
+        if not re.search(r"F-\d{4,}", content):
             return MilestoneResult("kickoff_complete", False, "No F-XXXX entries in FEATURES.md")
         return MilestoneResult("kickoff_complete", True)
 
@@ -681,7 +681,7 @@ class ExpectationChecker:
                 )
             content = features_path.read_text()
             # Evidence of ag kickoff: F-XXXX entries with Status fields
-            has_feature_ids = re.search(r"## F-\d{4}:", content)
+            has_feature_ids = re.search(r"## F-\d{4,}:", content)
             has_status_fields = re.search(r"\*\*Status\*\*:", content)
             if has_feature_ids and has_status_fields:
                 return MilestoneResult(

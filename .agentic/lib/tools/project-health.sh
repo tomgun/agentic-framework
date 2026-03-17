@@ -117,7 +117,7 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
   echo "  Shipped: $SHIPPED | In Progress: $IN_PROGRESS | Planned: $PLANNED"
   
   # Check for features without acceptance criteria
-  FEATURES=$(grep -E "^## F-[0-9]{4}:" .agentic/spec/FEATURES.md | sed 's/## //' | cut -d: -f1 || true)
+  FEATURES=$(grep -E "$FEATURE_HEADER_ERE" .agentic/spec/FEATURES.md | sed 's/## //' | cut -d: -f1 || true)
   for f in $FEATURES; do
     if [[ ! -f ".agentic/spec/acceptance/$f.md" ]]; then
       info "Missing acceptance criteria: $f"

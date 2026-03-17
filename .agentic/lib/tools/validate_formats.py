@@ -13,19 +13,20 @@ from typing import List, Tuple
 # Import centralized path resolver
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from paths import get_paths
+from ids import FEATURE_HEADER_RE
 
 
 def validate_features_md(path: Path) -> List[str]:
     """Validate FEATURES.md format."""
     if not path.exists():
         return []
-    
+
     issues = []
     content = path.read_text(encoding="utf-8")
     lines = content.splitlines()
-    
+
     # Check for feature headers
-    feature_pattern = re.compile(r"^## (F-\d{4}):\s*(.+?)\s*$")
+    feature_pattern = FEATURE_HEADER_RE
     features_found = 0
     
     for i, line in enumerate(lines, 1):

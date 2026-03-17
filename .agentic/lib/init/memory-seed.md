@@ -5,8 +5,8 @@ tokens: ~1280
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.58.3 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks -->
+<!-- memory-seed v0.59.0 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks, centralized-ids -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -220,6 +220,10 @@ Every time before committing, execute these commands in order:
 5. VERSION is bumped post-merge by `ag done`, not in PRs.
 6. `ag commit` — runs quality gates, shows diff, waits for human approval
 7. Only THEN announce ready — never say "done" before artifacts are updated
+
+## Centralized ID patterns
+
+Feature IDs (F-XXXX) are defined in `.agentic/lib/ids.py` (Python) and `.agentic/lib/ids.sh` (shell). Never hardcode feature ID regex patterns — import from these modules. IDs support 4+ digits (F-0001 through F-99999+). Use `format_feature_id(n)` to format, `is_valid_feature_id(s)` to validate.
 
 ## Token-efficient scripts (always use these)
 

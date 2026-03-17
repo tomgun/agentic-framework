@@ -321,7 +321,7 @@ if [[ "${2:-}" == "--gate" ]]; then
 fi
 
 # Validate feature ID format
-if ! echo "$FEATURE_ID" | grep -qE '^F-[0-9]{4}$'; then
+if ! is_feature_id "$FEATURE_ID"; then
     echo "Error: Invalid feature ID format: $FEATURE_ID (expected F-XXXX)"
     exit 0  # Advisory — don't fail
 fi

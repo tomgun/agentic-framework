@@ -2856,6 +2856,16 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### F-0193: Centralized & Future-Proof Feature IDs
+
+**User insight**: The key realization was "centralize first, then any future format change is a one-file edit." Rather than debating the ideal ID format (random hashes, UUIDs, etc.), the user recognized that the 100+ duplicated regex patterns were the real problem — format choice is a policy decision that should be trivially changeable, not baked into every file. This inverts the usual approach of "pick the right format then migrate" into "make migration cheap, then format is a free variable."
+
+**User insight**: Keep zero-padding for existing IDs. The temptation was to "clean up" by removing leading zeros or switching to a new format. The user argued that 233 existing IDs in filenames, git history, plans, and journals make any format change a breaking change — and that `F-0042` sorts correctly as a string while `F-42` wouldn't. The plan widens the ceiling (`\d{4,}`) without changing any existing ID, preserving backward compatibility while removing the F-9999 limit.
+
+**Design direction**: Deferred collision prevention. The plan explicitly chose not to add `fcntl.flock` or atomic ID allocation despite identifying it as a theoretical risk. Rationale: centralization makes adding locking later a one-file change, and the race condition hasn't occurred because callers are human-gated. Complexity deferred until a real trigger (e.g., coord server parallel allocation) makes it necessary.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.55.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

@@ -554,7 +554,7 @@ class AutonomousScheduler:
 
         # Extract section
         section = content[match.end():]
-        next_header = re.search(r"^## F-\d{4}:", section, re.MULTILINE)
+        next_header = re.search(r"^## F-\d{4,}:", section, re.MULTILINE)
         if next_header:
             section = section[:next_header.start()]
 

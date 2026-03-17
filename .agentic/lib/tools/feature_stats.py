@@ -16,7 +16,9 @@ from datetime import datetime, timedelta
 from collections import Counter, defaultdict
 from typing import List, Dict
 
-FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):\s*(.+?)\s*$")
+# Import centralized path resolver
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from ids import FEATURE_HEADER_RE
 KEY_RE = re.compile(r"^\s*-\s+([\w][\w\s/.-]*?):\s*(.*?)\s*$")
 BOLD_KEY_RE = re.compile(r"^\*\*(\w[\w\s/&.-]*?)\*\*:\s*(.*?)\s*$")
 TAG_RE = re.compile(r'\[([^\]]+)\]')

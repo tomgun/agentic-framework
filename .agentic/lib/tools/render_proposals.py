@@ -16,6 +16,7 @@ from pathlib import Path
 # Import shared settings library
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from settings import get_setting
+from ids import format_feature_id
 
 PROPOSAL_HEADER = (
     "<!-- PROPOSAL: Auto-discovered by ag init on {date}. "
@@ -277,7 +278,7 @@ def render_features_md(report: dict) -> str:
     if feature_clusters:
         # Use clusters for richer output with file evidence
         for i, cluster in enumerate(feature_clusters, start=1):
-            fid = f"F-{i:04d}"
+            fid = format_feature_id(i)
             name = cluster["name"].replace("_", " ").title()
             domain_type = cluster_domain_map.get(cluster["name"])
             lines.extend([
@@ -303,7 +304,7 @@ def render_features_md(report: dict) -> str:
     elif features:
         # Fallback to flat features list
         for i, feat in enumerate(features, start=1):
-            fid = f"F-{i:04d}"
+            fid = format_feature_id(i)
             lines.extend([
                 f"## {fid}: {feat['name']}",
                 f"- Status: shipped {confidence_marker(feat.get('confidence', 'medium'))}",
@@ -338,7 +339,7 @@ def render_acceptance_criteria(report: dict, output_dir: Path):
 
     if feature_clusters:
         for i, cluster in enumerate(feature_clusters, start=1):
-            fid = f"F-{i:04d}"
+            fid = format_feature_id(i)
             name = cluster["name"].replace("_", " ").title()
             lines = [
                 PROPOSAL_HEADER.format(date=date),
@@ -368,7 +369,7 @@ def render_acceptance_criteria(report: dict, output_dir: Path):
             (acc_dir / f"{fid}.md").write_text("\n".join(lines))
     else:
         for i, feat in enumerate(features, start=1):
-            fid = f"F-{i:04d}"
+            fid = format_feature_id(i)
             content = "\n".join([
                 PROPOSAL_HEADER.format(date=date),
                 "",

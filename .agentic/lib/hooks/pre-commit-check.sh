@@ -766,7 +766,7 @@ elif [[ -f ".agentic/spec/FEATURES.md" ]]; then
     # Check if WIP tracking is active with a feature ID
     HAS_FEATURE_WIP=false
     if [[ -f ".agentic/session/WIP.md" ]]; then
-      if grep -qE 'F-[0-9]{4}' ".agentic/session/WIP.md" 2>/dev/null; then
+      if grep -qE "$FEATURE_ID_ERE" ".agentic/session/WIP.md" 2>/dev/null; then
         HAS_FEATURE_WIP=true
       fi
     fi
@@ -1162,7 +1162,7 @@ if [[ $_FAST_MODE -eq 0 ]]; then
     WIP_FEATURE=""
     WIP_FEATURE=$(python3 .agentic/lib/tools/agents_helpers.py --project-root "$PROJECT_ROOT" get-current-feature "$PROJECT_ROOT" 2>/dev/null || true)
 
-    if [[ -n "$WIP_FEATURE" ]] && [[ "$WIP_FEATURE" =~ ^F-[0-9]{4}$ ]]; then
+    if [[ -n "$WIP_FEATURE" ]] && is_feature_id "$WIP_FEATURE"; then
       echo ""
       echo "[21] Checking for APPROVED plan ($WIP_FEATURE)..."
 

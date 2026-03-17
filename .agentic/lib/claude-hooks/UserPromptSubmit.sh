@@ -72,7 +72,7 @@ fi
 # --- Phase-aware verification (v0.11.0) ---
 # Check if user prompt contains "implement" trigger and warn if no acceptance
 USER_PROMPT="${CLAUDE_USER_PROMPT:-}"
-if [[ "$USER_PROMPT" =~ [Ii]mplement.*(F-[0-9]{4}) ]]; then
+if [[ "$USER_PROMPT" =~ [Ii]mplement.*(F-[0-9]{4,}) ]]; then
   FEATURE_ID="${BASH_REMATCH[1]}"
   if [[ ! -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
     echo ""

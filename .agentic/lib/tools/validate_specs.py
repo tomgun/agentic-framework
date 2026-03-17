@@ -34,9 +34,8 @@ except ImportError:
     sys.exit(1)
 
 
-# Regex for parsing markdown-format FEATURES.md
-FEATURE_HEADER_RE = re.compile(r"^##\s+(F-\d{4}):\s*(.+?)\s*$")
-FEATURE_ID_RE = re.compile(r"\b(F-\d{4})\b")
+# Centralized ID patterns
+from ids import FEATURE_HEADER_RE, FEATURE_ID_RE
 KEY_RE = re.compile(r"^\s*-\s+([\w][\w\s/.-]*?):\s*(.*?)\s*$")
 FORMAT_VERSION_RE = re.compile(r'<!--\s*spec-format:\s*([a-z0-9-]+)-v([\d.]+)\s*-->')
 

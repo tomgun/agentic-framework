@@ -238,7 +238,7 @@ class CrunchRunner:
         # Match heading format: ## F-XXXX: Name followed by **Status**: value
         current_fid = None
         for line in content.splitlines():
-            header = re.match(r"^## (F-\d{4}):", line)
+            header = re.match(r"^## (F-\d{4,}):", line)
             if header:
                 current_fid = header.group(1)
                 continue

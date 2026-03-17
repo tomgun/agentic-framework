@@ -45,9 +45,12 @@ from settings import get_setting  # noqa: E402
 # Constants
 # ---------------------------------------------------------------------------
 
+from ids import FEATURE_ID_STRICT_RE as _FEATURE_ID_RE  # noqa: E402
+from ids import is_valid_feature_id, format_feature_id  # noqa: E402
+from ids import get_next_feature_id  # noqa: E402
+
 _PROPOSAL_MARKER = "<!-- PROPOSAL -->"
 _PLACEHOLDER_PREFIX = "F-NEW-"
-_FEATURE_ID_RE = re.compile(r"^F-\d{4,}$")
 
 
 # ---------------------------------------------------------------------------
@@ -878,11 +881,10 @@ def _promote_staging_impl(
     features = metadata.get("features", [])
 
     # Allocate fresh IDs
-    from auto.epic import get_next_feature_id
     next_id = get_next_feature_id(paths.features_file)
     id_map: dict[str, str] = {}  # placeholder → real
     for i, feature in enumerate(features):
-        real_id = f"F-{next_id + i:04d}"
+        real_id = format_feature_id(next_id + i)
         id_map[feature["placeholder_id"]] = real_id
 
     # Append features to FEATURES.md

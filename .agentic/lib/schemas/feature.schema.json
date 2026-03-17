@@ -8,7 +8,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^F-[0-9]{4}$",
+      "pattern": "^F-[0-9]{4,}$",
       "description": "Unique feature identifier in format F-####"
     },
     "name": {
@@ -24,14 +24,14 @@
     },
     "parent": {
       "type": ["string", "null"],
-      "pattern": "^F-[0-9]{4}$",
+      "pattern": "^F-[0-9]{4,}$",
       "description": "Parent feature ID for hierarchy"
     },
     "dependencies": {
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^F-[0-9]{4}$"
+        "pattern": "^F-[0-9]{4,}$"
       },
       "description": "Features that must be complete first"
     },
