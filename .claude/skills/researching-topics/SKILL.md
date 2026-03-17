@@ -1,18 +1,16 @@
 ---
 name: researching-topics
 description: >
-  Web search, documentation lookup, and technology evaluation. Use when the
-  user needs information from outside the codebase — e.g. "research",
-  "look up", "find docs", "what is", "compare options", "evaluate", "best
-  practices", "how do I", or any request for external knowledge. Match
-  intent, not exact words.
+  Web search, documentation lookup, and technology evaluation. Use when user
+  says "research", "look up", "find docs", "what is", "compare options",
+  "evaluate", or needs information from outside the codebase.
   Do NOT use for: codebase exploration (use exploring-codebase), implementing
   features (use implementing-features).
 compatibility: "Requires Claude Code with web access."
 allowed-tools: [WebSearch, WebFetch, Read, Write]
 metadata:
   author: agentic-framework
-  version: "0.46.1"
+  version: "0.61.1"
 ---
 
 # Researching Topics

@@ -4,18 +4,16 @@ description: >
   Spec-writing workflow: create new specs, update planned/in-progress specs,
   evolve shipped specs with contract protection. Handles NFR integration,
   delta tracking via migrations, and spec health checks.
-  Use when the user wants to define, update, or review specs — e.g. "write
-  spec", "create spec", "add acceptance criteria", "update spec", "evolve
-  spec", "spec for F-XXXX", "ag spec", "define requirements", "feature
-  status", "track this feature", or any request about feature specifications.
-  Match intent, not exact words.
+  Use when user says "write spec", "create spec", "add acceptance criteria",
+  "update spec", "evolve spec", "spec for F-XXXX", "ag spec", "mark shipped",
+  "feature status", "ag specs", "add feature to FEATURES.md", "track this feature".
   Do NOT use for: implementing features (use implementing-features),
   planning architecture (use planning-features).
 compatibility: "Requires Claude Code with file access and ag commands."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.46.1"
+  version: "0.61.1"
 ---
 
 # Writing Specs
@@ -40,11 +38,12 @@ Determine the spec operation and its protection level:
 
 **For new features:**
 1. Find next F-XXXX ID in `.agentic/spec/FEATURES.md`
-2. Read `.agentic/spec/NFR.md` — identify applicable NFRs
+2. Run `bash .agentic/lib/tools/nfr-applicable.sh F-XXXX` to identify applicable NFRs
 3. Create FEATURES.md entry (Status: planned, Related NFRs)
 4. Create `.agentic/spec/acceptance/F-XXXX.md` from `.agentic/spec/acceptance.template.md`
    - Write `## Behavior` section first (technology-agnostic user goal)
    - Group ACs with priority tags: (P1 — MVP), (P2 — enhanced)
+   - Add applicable NFRs as ACs in a `### NFR Constraints (P1 — required)` group
    - Add `**Verify independently**` per AC group
    - Place Tests under `## Verification`
 5. Run Clarification Pass (Step 3 below) for features with 3+ ACs

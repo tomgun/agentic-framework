@@ -75,13 +75,10 @@ phase: commit
   - Check output carefully (no ignored/skipped tests that shouldn't be)
   - No test failures or errors
 
-- [ ] **Smoke test passed** (CRITICAL — unit tests alone are not enough)
-  - Run the feature end-to-end the way a user would (CLI, API, UI)
-  - For CLI tools: run against the real project, not just test fixtures
-  - Verify outputs are correct and complete, not just "no errors"
-  - Check that components are actually wired together (entry points call the right functions, gates fire, hooks trigger)
-  - **Why**: A feature can pass all unit tests but be broken if wiring is missing. This has happened — catch it before the PR, not after.
-  - **If smoke test fails, DO NOT commit — fix it first**
+- [ ] **Smoke test passed** (CRITICAL for user-facing changes)
+  - See `.agentic/lib/checklists/smoke_testing.md` for full checklist
+  - Quick: app starts, primary action works, no errors
+  - **If smoke test fails, DO NOT commit - fix it first**
 
 - [ ] **Quality checks pass** (if enabled)
   - If `quality_validation_enabled: yes` in STACK.md
@@ -121,6 +118,17 @@ phase: commit
   - Entry points still accurate?
   - Architecture snapshot current?
 
+### Project Documentation
+
+- [ ] **Project docs updated with code changes**
+  - Spec + code + tests + docs = done — don't defer artifact updates to a follow-up
+  - Run `bash .agentic/lib/tools/docs.sh --validate` to check registry health (missing files, unregistered docs)
+  - Run `bash .agentic/lib/tools/docs.sh --list` to see the doc registry and which components they cover
+  - Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
+  - If you changed user-facing behavior, update the relevant docs
+  - If your change touches a component with no registered doc, decide whether it needs one — use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold and auto-register
+  - If you created or changed a doc, ensure its `## Docs` entry in STACK.md has correct component/area tags
+
 ### Formal Profile (All Core items plus:)
 
 - [ ] **`.agentic/spec/FEATURES.md` reflects reality**
@@ -141,6 +149,24 @@ phase: commit
   - Acceptance criteria defined
   - Not a placeholder
   - Testable conditions listed
+
+---
+
+## Framework Development Only
+
+These checks apply only when working on the agentic framework repo itself:
+
+- [ ] **Instruction files updated** (if `ag` commands/gates/workflows changed)
+  - CLAUDE.md templates, cursorrules.txt, copilot-instructions.md, codex-instructions.md
+  - agent_operating_guidelines.md, auto_orchestration.md
+  - memory-seed.md, DEVELOPER_GUIDE.md, HOW_IT_WORKS.md
+  - Skills/checklists that reference the changed behavior
+  - Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift
+
+- [ ] **LLM test required** (if behavioral changes)
+  - If this commit adds/changes `ag` commands, trigger words, or agent workflows → MUST add LLM test
+  - The LLM layer decides if deterministic code gets called — no LLM test = no proof agents use the feature
+  - Add test in `tests/llm/tests/` + entry in `test_definitions.json`
 
 ---
 

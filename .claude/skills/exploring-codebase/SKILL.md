@@ -2,17 +2,15 @@
 name: exploring-codebase
 description: >
   Navigate and understand codebase structure, find files, trace dependencies.
-  Use when the user wants to understand or locate code — e.g. "find",
-  "where is", "explore", "show me", "what files", "how does this work",
-  "trace", "search for", "locate", or asks about code structure/location.
-  Match intent, not exact words.
+  Use when user says "find", "where is", "explore", "show me", "what files",
+  "how does this work", "codebase structure", or asks about code location.
   Do NOT use for: modifying code (use implementing-features), reviewing
   changes (use reviewing-code), web research (use researching-topics).
 compatibility: "Requires Claude Code with file access."
 allowed-tools: [Read, Glob, Grep, Bash]
 metadata:
   author: agentic-framework
-  version: "0.46.1"
+  version: "0.61.1"
 ---
 
 # Exploring Codebase

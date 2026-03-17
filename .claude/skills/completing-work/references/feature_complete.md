@@ -32,6 +32,10 @@ phase: completion
   - [ ] Verified output matches expectations (visual, functional, data)
   - [ ] Tried different inputs/scenarios
   - **NOT just "tests pass" - ACTUALLY RUN IT and VERIFY IT WORKS**
+  - [ ] **Evidence captured** (if `smoke_test_evidence` != `off` in STACK.md)
+    - Create `.agentic/journal/evidence/F-####-smoke.md` manually, or
+    - Run `ag auto verify --visual --feature F-####` to auto-generate
+    - `ag done` checks for this artifact (`recommended` = warn, `required` = block)
 
 ---
 
@@ -164,12 +168,6 @@ Before marking feature as complete:
 ---
 
 ## Quality Checks
-
-- [ ] **End-to-end smoke test passed** (CRITICAL — before calling it done)
-  - Run the feature the way a user would (CLI command, API call, UI action)
-  - Verify outputs are correct and complete against the real project
-  - Check that all components are wired: entry points call functions, gates fire, hooks trigger
-  - **Unit tests passing does NOT mean the feature works.** A feature can have full test coverage and still be broken if the wiring is missing (function exists but is never called, gate is defined but never registered, etc.)
 
 - [ ] **Spec ↔ Code alignment verified**
   - Run `bash .agentic/lib/tools/drift.sh --check`
@@ -322,6 +320,11 @@ If ANY answer is "No" or "Not sure" → Feature is NOT ready to be marked shippe
   - Wait for human to test and accept
   - Human will update `Verification: Accepted: yes` when satisfied
 
+- [ ] **Backlog auto-advances** (if BACKLOG.json exists)
+  - `ag done` automatically removes the completed item from position 0
+  - The next backlog item is promoted to current
+  - Shows: "Backlog advanced — next up: F-XXXX"
+
 - [ ] **Post-merge dogfood sync** (Framework Development Only — skip if `FRAMEWORK_DEVELOPMENT.md` doesn't exist)
   - Compare root instruction files against templates for any new shared content from this PR:
     - `CLAUDE.md` ← `.agentic/lib/agents/claude/CLAUDE.md`
@@ -334,7 +337,7 @@ If ANY answer is "No" or "Not sure" → Feature is NOT ready to be marked shippe
   - This is automatic — don't wait for the user to notice drift
 
 - [ ] **Move to next work**
-  - Check STATUS.md for next focus
+  - Check backlog (`ag backlog`) or STATUS.md for next focus
   - Don't start immediately - ask human what's next
   - Update STATUS.md with new focus
 

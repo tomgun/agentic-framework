@@ -1,11 +1,9 @@
 ---
 name: fixing-bugs
 description: >
-  Bug fix workflow with failing-test-first approach. Use when the user
-  describes a bug or wants something fixed — e.g. "fix", "debug", "repair",
-  "troubleshoot", "there's a bug", "this is broken", "not working", "crash",
-  "error", "fails", "regression", or any description of unexpected behavior.
-  Match intent, not exact words.
+  Bug fix workflow with failing-test-first approach. Use when user says "fix",
+  "debug", "repair", "troubleshoot", "there's a bug", "this is broken",
+  "not working", or describes unexpected behavior.
   Do NOT use for: new features (use implementing-features), refactoring
   without a bug (use implementing-features), writing tests for existing
   features (use writing-tests).
@@ -13,7 +11,7 @@ compatibility: "Requires Claude Code with shell access."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Agent]
 metadata:
   author: agentic-framework
-  version: "0.46.1"
+  version: "0.61.1"
 ---
 
 # Fixing Bugs

@@ -11,7 +11,7 @@ compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Agent]
 metadata:
   author: agentic-framework
-  version: "0.58.1"
+  version: "0.61.1"
 ---
 
 # Implementing Features
@@ -19,35 +19,6 @@ metadata:
 Acceptance-driven feature implementation with structural enforcement gates.
 
 ## Instructions
-
-### Step 0: Backlog Check
-
-If `.agentic/BACKLOG.json` exists and has items, `ag implement F-XXXX` enforces queue order:
-- If F-XXXX is at position 0: proceeds normally
-- If F-XXXX is not in backlog: auto-adds at position 0 and proceeds
-- If F-XXXX is in backlog but NOT at position 0: **BLOCKED** — work on the current item first, or reprioritize with `ag backlog move F-XXXX 0`
-- Override: `SKIP_BACKLOG=1 ag implement F-XXXX`
-
-### Step 0.5: Plan Gate (BLOCKING — enforced by `ag implement`)
-
-**Your FIRST action must be `ag implement F-XXXX`.**
-This script (ag.sh) enforces the plan-review gate:
-- Auto-saves plans from ~/.claude/plans/ to durable location
-- Checks `**Status**: APPROVED` in `.agentic/journal/plans/*F-XXXX-plan.md` (dated plan file)
-- Blocks with `exit 1` + review instructions if not approved
-
-If `ag implement` blocks:
-- Follow its printed instructions (dialectical review: Critic + Advocate)
-- After user approves → update plan status → re-run `ag implement`
-- Do NOT self-assess the plan or code around the gate
-
-If you just exited plan mode:
-1. Save the plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT`
-2. Run `ag implement F-XXXX` — it will trigger the gate
-
-**Do NOT skip planning.** A plan is how you understand the feature scope, identify files to change, and avoid wasted work. Even simple features benefit from a quick plan — it takes minutes and saves hours.
-
-**Anti-pattern: Do NOT read implementation files before plan review.** When `plan_review_enabled: yes` and the plan is not yet APPROVED, your ONLY actions should be: (1) save the plan as DRAFT, (2) run `ag implement` (it will block), (3) follow its printed review instructions. Do not read source files, explore the codebase, or make edits — the review agents do their own file reading with fresh context.
 
 ### Step 1: Verify Acceptance Criteria Exist
 
@@ -96,8 +67,6 @@ bash .agentic/lib/tools/wip.sh start F-XXXX "Description" "file1 file2"
 
 This registers active work in `.agentic/session/AGENTS.json` — a lock that prevents premature commits.
 
-If `ag implement` created a worktree (when `worktree_mode: always` in STACK.md), `cd` to the worktree path it prints. Run `wip.sh start` from the worktree.
-
 ### Step 4: Implement
 
 1. Read and understand acceptance criteria fully
@@ -144,39 +113,10 @@ When acceptance criteria have priority groups (P1/P2):
 
 This ensures MVP is solid before adding enhancements.
 
-### Step 6: Documentation
-
-**Check `docs_mode` in STACK.md first:**
-- If `deferred`: skip inline doc updates. `ag done` will log what's needed. Focus on code + tests.
-  Note: framework instruction file updates (framework dev only) are NOT deferred — always inline.
-- If `inline` (default): proceed with the doc update steps below.
-
-Before declaring done, check which project docs need updating:
-
-1. Run `bash .agentic/lib/tools/docs.sh --validate` to check registry health (missing files, unregistered docs)
-2. Run `bash .agentic/lib/tools/docs.sh --list` to see the project's doc registry and which components they cover
-3. Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
-4. Update stale docs in the same change as code — don't defer to a follow-up
-5. If your feature touches a component/area with **no registered doc**, decide whether it needs one — use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold and auto-register
-6. If you created or substantially changed a doc, ensure its `## Docs` entry has correct component/area tags — this is how `drift.sh` and `docs.sh` know which docs to check
-
-Doc updates are enforced at feature acceptance (`ag done`) when `docs_gate: blocking`.
-
-**Framework development only** (when working on the agentic framework repo itself):
-If you added or changed an `ag` command, gate, workflow, or behavioral rule, also check:
-- Instruction files: CLAUDE.md templates, cursorrules.txt, copilot-instructions.md, codex-instructions.md
-- Orchestration: agent_operating_guidelines.md, auto_orchestration.md
-- Onboarding: memory-seed.md, DEVELOPER_GUIDE.md, HOW_IT_WORKS.md
-- Skills/checklists that reference the changed behavior
-- **LLM test required**: Add `tests/llm/tests/XXX_*.sh` + entry in `test_definitions.json`. The LLM layer decides if deterministic code gets called — no LLM test = no proof agents use the feature.
-
-Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift.
-
-### Step 7: Verify Before Declaring Done
+### Step 6: Verify Before Declaring Done
 
 - All acceptance criteria met (P1 at minimum, P2 if confirmed)
 - Tests pass
-- Documentation updated (Step 6)
 - No unrelated files changed
 - Code follows project conventions
 

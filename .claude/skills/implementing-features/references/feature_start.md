@@ -11,19 +11,41 @@ phase: planning
 
 ---
 
-## GATE 0: Plan Exists (BLOCKING)
+## GATE 0: Backlog Check (ENFORCED BY `ag implement`)
+
+```
+□ Is .agentic/BACKLOG.json present with items?
+  ├─ NO  → Proceed (no backlog constraint)
+  └─ YES → Is F-XXXX at position 0?
+           ├─ YES → Proceed
+           ├─ NOT IN BACKLOG → Auto-added at position 0, proceed
+           └─ WRONG POSITION → 🛑 BLOCKED. Work on position 0 first,
+              or reprioritize: ag backlog move F-XXXX 0
+              Override: SKIP_BACKLOG=1 ag implement F-XXXX
+```
+
+This gate is enforced automatically by `ag implement`. You don't need to check manually.
+
+---
+
+## GATE 0.5: Plan Review (BLOCKING when `plan_review_enabled: yes`)
 
 ```
 □ Does .agentic/journal/plans/*F-####-plan.md exist? (glob — file has date prefix)
-  ├─ YES → Check **Status**: line
-  │         ├─ APPROVED → Proceed to Gate 1
-  │         └─ DRAFT/REVIEWING/REVISION_NEEDED → Run review loop first
-  └─ NO  → 🛑 STOP. Plan first.
-           Run planning-features workflow (explore → plan → save → review → approve).
-           Do NOT write code or even acceptance criteria without a plan.
+  ├─ YES → Is Status: APPROVED?
+  │         ├─ YES → Proceed to Gate 1
+  │         └─ NO (DRAFT/REVIEWING/REVISION_NEEDED) →
+  │              🛑 STOP. Run dialectical review NOW.
+  │              1. Spawn Critic + Advocate agents (parallel, fresh context)
+  │              2. Synthesize with Revision Guidance
+  │              3. Present to user for decision
+  │              4. Wait for APPROVED before proceeding
+  └─ NO  → Is plan_review_enabled: yes?
+           ├─ YES → 🛑 STOP. Plan first (use planning-features skill)
+           └─ NO  → Proceed to Gate 1 (plan optional)
 ```
 
-**A plan is NOT optional.** Even simple features need a quick plan — it identifies files to change, scope, and risks. Planning takes minutes and saves hours of rework.
+**Anti-pattern**: Do NOT read implementation files, explore the codebase, or make ANY edits before the plan is APPROVED. The review agents read files themselves with fresh context. Your only actions before approval: save plan → spawn reviewers → present synthesis.
 
 ---
 
@@ -121,11 +143,11 @@ DO NOT pass:
 
 | User Says | You MUST Do First |
 |-----------|-------------------|
-| "build X" | Plan first, then check acceptance criteria |
-| "implement X" | Plan first, then check acceptance criteria |
-| "add feature X" | Plan first, then check acceptance criteria |
-| "create X" | Plan first, then check acceptance criteria |
-| "let's do X" | Plan first, then check acceptance criteria |
+| "build X" | Check acceptance criteria exist |
+| "implement X" | Check acceptance criteria exist |
+| "add feature X" | Check acceptance criteria exist |
+| "create X" | Check acceptance criteria exist |
+| "let's do X" | Check acceptance criteria exist |
 
-**NO EXCEPTIONS. Plan → criteria → code.**
+**NO EXCEPTIONS. Criteria before code.**
 

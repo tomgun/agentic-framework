@@ -1,18 +1,16 @@
 ---
 name: planning-features
 description: >
-  Create implementation plans with iterative review. Use when the user wants
-  to think through an approach before coding — e.g. "plan", "design",
-  "ag plan", "how should we build", "let's plan", "architecture", "scope
-  this", "think through", or any request to design before implementing.
-  Match intent, not exact words.
+  Create implementation plans with iterative review. Use when user says "plan",
+  "design", "ag plan", "how should we build", "let's plan", "architecture",
+  or wants to think through an approach before coding.
   Do NOT use for: implementing (use implementing-features after plan approval),
   reviewing existing code (use reviewing-code).
 compatibility: "Requires Claude Code with plan mode support."
 allowed-tools: [Read, Glob, Grep, Bash, Agent]
 metadata:
   author: agentic-framework
-  version: "0.46.1"
+  version: "0.61.1"
 ---
 
 # Planning Features
@@ -20,19 +18,6 @@ metadata:
 Create thorough implementation plans with review loops before coding.
 
 ## Instructions
-
-This workflow has two phases separated by a plan-mode boundary.
-
-**Phase 1** (Steps 1-4) runs during plan mode — read-only exploration and plan creation.
-**Phase 2** (Steps 5-6) runs after plan mode ends — save, review, and hand off.
-
-**CRITICAL**: After plan mode exits, IMMEDIATELY continue with Phase 2. Do not wait
-for the user to say "implement." The plan save and review are part of the planning
-workflow, not the implementation workflow.
-
----
-
-### Phase 1: Plan Creation (during plan mode)
 
 ### Step 1: Understand the Request
 
@@ -51,7 +36,6 @@ Use the codebase to understand:
 ### Step 3: Create the Plan
 
 Write a plan covering:
-- **Status**: DRAFT (always start with `**Status**: DRAFT` as the first line)
 - **Problem**: What needs to be solved
 - **Approach**: How to solve it (with alternatives considered)
 - **Files to modify**: Specific files and what changes
@@ -83,78 +67,15 @@ ACs are independent.
 
 Skip this section for simple features (≤5 ACs) unless multi-agent dispatch is planned.
 
-### Step 4.5: Append Continuation Block (before exiting plan mode)
-
-Before calling ExitPlanMode, append this block to the plan:
-
-```markdown
----
-## ⚠️ POST-PLAN-MODE ACTIONS (MANDATORY)
-
-Status: DRAFT. This plan is NOT approved for implementation.
-
-After plan mode exits:
-1. Save this plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md`
-2. Run `ag implement F-XXXX` — the script will block and print review instructions
-3. Follow those instructions (dialectical review: Critic + Advocate agents)
-4. After user approves → update Status to APPROVED → re-run `ag implement`
-
-Exiting plan mode ≠ approval. Do NOT code, read implementation files, or explore.
----
-```
-
-Replace `F-XXXX` with the actual feature ID. This block survives the turn boundary
-and directs the agent to the script gate after plan mode ends.
-
----
-
-### Phase 2: Save, Review, Hand Off (after plan mode ends)
-
-Plan mode is read-only — agent spawning and file writes can't happen there.
-These steps MUST run after plan mode exits.
-
 ### Step 5: Save Plan Durably
 
-**Do this IMMEDIATELY after plan mode ends.**
-
-Save the plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with status `DRAFT`.
+After approval, save the plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md`.
 
 Plans in `~/.claude/plans/` are session-scoped and will be lost. Always copy to the durable location.
 
-### Step 5.5: Dialectical Review (if `plan_review_enabled: yes`)
-
-Check `plan_review_enabled` in STACK.md (default: yes for Formal, no for Discovery).
-
-If enabled, run dialectical review on the saved plan:
-
-1. **Spawn Critic + Advocate in parallel** (both with fresh context):
-
-```
-Agent(subagent_type="general-purpose",
-  prompt="You are a PLAN CRITIC with fresh context.
-    Read plan: .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
-    Read requirements: .agentic/spec/acceptance/F-XXXX.md
-    Follow: .agentic/lib/agents/claude/subagents/plan-critic-agent.md
-    Output your structured critique.")
-
-Agent(subagent_type="general-purpose",
-  prompt="You are a PLAN ADVOCATE with fresh context.
-    Read plan: .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
-    Read requirements: .agentic/spec/acceptance/F-XXXX.md
-    Follow: .agentic/lib/agents/claude/subagents/plan-advocate-agent.md
-    Output your structured defense.")
-```
-
-2. **Synthesize both perspectives** using rules from `references/dialectical_review.md`
-3. **Present synthesis inline** (including Revision Guidance section)
-4. **User decides**: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject
-5. If Revise: Planner revises the saved plan, then fresh Critic + Advocate run again (new iteration)
-
-If review is not enabled, set plan status to `APPROVED` directly.
-
 ### Step 6: Hand Off to Implementation
 
-After plan approval (user chooses Proceed), start implementation:
+After plan approval, start implementation:
 ```bash
 bash .agentic/lib/tools/wip.sh start F-XXXX "Description" "files"
 ```
@@ -193,5 +114,4 @@ Solution: Break into 3-5 smaller plans, each implementable in one batch (max 5-1
 
 ## References
 
-- For plan-review lifecycle: see `references/plan_review_loop.md`
-- For dialectical review mechanism: see `references/dialectical_review.md`
+- For plan-review workflow: see `references/plan_review_loop.md`

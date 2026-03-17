@@ -1,5 +1,5 @@
 ---
-summary: "Plan-review iteration: create plan, review, refine, approve"
+summary: "Plan-review lifecycle: create plan, dialectical review, iterate, approve"
 trigger: "plan, design, ag plan, review plan"
 tokens: ~2800
 phase: planning
@@ -7,28 +7,32 @@ phase: planning
 
 # Plan-Review Loop Workflow
 
-**Purpose**: Improve plan quality through iterative planning and critical review before implementation.
+**Purpose**: Improve plan quality through iterative planning and dialectical review (critic + advocate with fresh context) before implementation.
 
-**Principle**: Two perspectives catch more issues than one. A planner optimizes for solutions; a reviewer optimizes for problems.
+**Principle**: No single reviewer's word is the final truth. The user sees a debate between opposing perspectives and decides.
 
 ---
 
 ## Overview
 
 ```
-┌─────────┐     ┌──────────┐     ┌─────────┐
-│ Planner │────▶│   Plan   │────▶│Reviewer │
-└─────────┘     │ Artifact │     └────┬────┘
-     ▲          └──────────┘          │
-     │                                │
-     │    ┌────────────────────┐      │
-     └────│ REVISE / APPROVED  │◀─────┘
-          └────────────────────┘
+┌─────────┐     ┌──────────┐     ┌────────────────────┐
+│ Planner │────▶│   Plan   │────▶│ Critic + Advocate  │
+└─────────┘     │ Artifact │     │ (parallel, fresh)  │
+     ▲          └──────────┘     └─────────┬──────────┘
+     │                                     │
+     │                              ┌──────▼──────┐
+     │                              │  Synthesis   │
+     │                              └──────┬──────┘
+     │                                     │
+     │          ┌──────────────────────┐    │
+     └──────────│ User: Proceed/Revise │◀──┘
+                └──────────────────────┘
 ```
 
 **When to use**:
 - Complex features (3+ files, architectural decisions)
-- Unfamiliar domains (reviewer catches knowledge gaps)
+- Unfamiliar domains (fresh-context reviewers catch knowledge gaps)
 - High-stakes changes (auth, payments, data migrations)
 
 **When to skip**:
@@ -41,31 +45,16 @@ phase: planning
 ## Configuration (STACK.md)
 
 ```markdown
-## Plan-Review Loop (recommended)
+## Settings
 - plan_review_enabled: yes        <!-- yes | no (default: yes for Formal, no for Discovery) -->
-- plan_review_max_iterations: 3   <!-- Max revisions before human escalation -->
+- plan_review_max_iterations: 3   <!-- Max rounds before suggesting human escalation (advisory) -->
 - plan_review_auto_for: [planning]  <!-- planning | implement | both -->
-<!-- - plan_review_reviewer_model: same  # same | opus | sonnet -->
 ```
 
 **Defaults** (if not specified):
 - `plan_review_enabled: yes` for Formal profile, `no` for Discovery
 - `plan_review_max_iterations: 3`
 - `plan_review_auto_for: [planning]`
-
----
-
-## Plan-Mode Boundary
-
-Plan creation happens in plan mode (read-only). Plan save, review, and approval
-happen **after** plan mode ends. This is a critical boundary:
-
-- **During plan mode**: Steps 1-4 of the planning skill (explore, research, create plan, add execution order). No file writes, no agent spawning.
-- **After plan mode exits**: Steps 5-6 (save plan durably with DRAFT status, run dialectical review if enabled, hand off to implementation).
-
-The planning-features skill explicitly instructs the agent to continue with Phase 2
-immediately after plan mode ends. The implementing-features skill has a safety net
-(Step 0.5) that catches unapproved plans and triggers the review before proceeding.
 
 ---
 
@@ -76,7 +65,7 @@ Plans are written to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md`:
 ```markdown
 # Plan: F-XXXX [Feature Title]
 
-**Status**: DRAFT | REVIEWING | REVISION_NEEDED | APPROVED | ESCALATED
+**Status**: DRAFT | REVIEWING | APPROVED | ESCALATED
 **Iteration**: 1
 **Created**: 2026-02-04
 **Last Updated**: 2026-02-04
@@ -112,32 +101,26 @@ Plans are written to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md`:
 ## Review History
 
 ### Review 1 (2026-02-04) - iteration 1
-**Reviewer**: [agent/human]
 
-**Issues Found**:
-- [ ] CRITICAL: [issue description]
-- [ ] IMPORTANT: [issue description]
-- [ ] SUGGESTION: [nice to have]
-
-**Verdict**: REVISION_NEEDED
+**Critic**: [summary of key concerns]
+**Advocate**: [summary of key strengths and trade-off reasoning]
+**Synthesis**: [what agreed, what contested]
+**User Decision**: Revise — [user's direction]
 
 **Planner Response** (iteration 2):
-- Addressed CRITICAL issue by [change]
-- Addressed IMPORTANT issue by [change]
-- Deferred SUGGESTION to follow-up
+- Addressed [concern] by [change]
+- Kept [decision] because [reasoning]
 
 ---
 
 ### Review 2 (2026-02-04) - iteration 2
-**Reviewer**: [agent/human]
 
-**Issues Found**:
-- None critical
+**Critic**: [summary]
+**Advocate**: [summary]
+**Synthesis**: [summary]
+**User Decision**: Proceed
 
-**Verdict**: APPROVED
-
-**Approval Notes**:
-Plan is solid. Ready for implementation.
+**Status**: APPROVED
 ```
 
 ---
@@ -160,36 +143,22 @@ When creating/revising a plan:
    - Be specific about files and changes
 
 3. **On revision**:
-   - Address ALL critical/important issues
-   - Explain how each issue was addressed
-   - Don't just agree - defend your approach if it's correct
+   - Read the user's direction and the synthesis's Revision Guidance
+   - Address what the user asked for
+   - Defend your approach where it's correct
+   - Increment iteration counter, set status to REVIEWING
 
-### For Reviewer Agent
+### For Review (Dialectical Mechanism)
 
-When reviewing a plan:
+Each review round uses the dialectical mechanism described in `dialectical_review.md`:
 
-1. **Adopt adversarial mindset**:
-   - Assume the plan has flaws (it probably does)
-   - Look for what's MISSING, not just what's wrong
-   - Consider edge cases, error scenarios, security
+1. **Spawn Critic + Advocate** in parallel with fresh context
+2. **Critic** finds flaws, risks, blind spots (no verdicts)
+3. **Advocate** explains trade-off reasoning, defends decisions honestly
+4. **Orchestrator synthesizes** both perspectives with Revision Guidance
+5. **User decides**: Proceed (→ APPROVED), Revise (→ new iteration), or Reject
 
-2. **Check for**:
-   - [ ] Does plan address ALL acceptance criteria?
-   - [ ] Are there simpler approaches not considered?
-   - [ ] What could go wrong? Is it handled?
-   - [ ] Are estimates realistic?
-   - [ ] Is testing strategy adequate?
-   - [ ] Are there hidden dependencies?
-
-3. **Categorize issues**:
-   - **CRITICAL**: Must fix before implementation (blockers, security, data loss)
-   - **IMPORTANT**: Should fix (significant improvement, catches bugs)
-   - **SUGGESTION**: Nice to have (style, minor optimization)
-
-4. **Verdict options**:
-   - `APPROVED`: Plan is ready for implementation
-   - `REVISION_NEEDED`: Has critical/important issues
-   - `ESCALATE`: Fundamental disagreement, need human input
+See `.agentic/lib/workflows/dialectical_review.md` for the full mechanism, synthesis format, and cross-tool adaptation.
 
 ---
 
@@ -198,7 +167,7 @@ When reviewing a plan:
 ### ag plan F-XXXX
 
 ```bash
-ag plan F-XXXX              # Create plan with review loop
+ag plan F-XXXX              # Create plan with dialectical review loop
 ag plan F-XXXX --no-review  # Skip review (simple cases)
 ```
 
@@ -217,13 +186,12 @@ ag implement F-XXXX
 
 ## Claude Code Implementation
 
-Use Task tool to spawn planner and reviewer:
+Use Agent tool to spawn planner and reviewers:
 
 ```python
-# Planner
-Task(
+# Step 1: Planner
+Agent(
     subagent_type="Plan",
-    model="opus",  # or from STACK.md
     prompt="""
     Create implementation plan for F-XXXX.
     Read: .agentic/spec/acceptance/F-XXXX.md, CONTEXT_PACK.md
@@ -232,69 +200,68 @@ Task(
     """
 )
 
-# Reviewer
-Task(
+# Step 2: Critic + Advocate (parallel, fresh context)
+Agent(
     subagent_type="general-purpose",
-    model="opus",  # critical review needs quality
-    prompt="""
-    Critically review dated plan at .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
-    Follow reviewer instructions in: .agentic/lib/workflows/plan_review_loop.md
-    Add your review to the Review History section.
-    Set verdict: APPROVED, REVISION_NEEDED, or ESCALATE
-    """
+    prompt="""You are a PLAN CRITIC. Read dated plan at .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
+    and acceptance criteria at .agentic/spec/acceptance/F-XXXX.md.
+    Follow: .agentic/lib/agents/claude/subagents/plan-critic-agent.md
+    Output structured critique."""
 )
+
+Agent(
+    subagent_type="general-purpose",
+    prompt="""You are a PLAN ADVOCATE. Read dated plan at .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
+    and acceptance criteria at .agentic/spec/acceptance/F-XXXX.md.
+    Follow: .agentic/lib/agents/claude/subagents/plan-advocate-agent.md
+    Output structured defense."""
+)
+
+# Step 3: Orchestrator synthesizes, presents to user
+# Step 4: User decides → iterate or proceed
 ```
-
----
-
-## Cursor Implementation
-
-In `.cursor/agents/`:
-
-```yaml
-# plan-agent.md
-You are a planning agent. Create detailed implementation plans.
-[Include planner instructions from above]
-
-# review-agent.md
-You are a critical reviewer. Find flaws in plans before implementation.
-[Include reviewer instructions from above]
-```
-
-Cursor's agent mode can orchestrate the loop via the orchestrator agent.
 
 ---
 
 ## Human Escalation
 
-When `ESCALATE` verdict or `max_iterations` reached:
+When `max_iterations` reached:
 
 1. Plan file shows current state and all review history
-2. Agent notifies human: "Plan needs your input - see .agentic/journal/plans/*F-XXXX-plan.md (dated plan file)"
-3. Human can:
+2. Agent notifies human: "Plan has been through N iterations — see .agentic/journal/plans/*F-XXXX-plan.md (dated plan file)"
+3. This is advisory, not blocking. User can:
+   - Approve the plan as-is
    - Edit plan directly and set status to `APPROVED`
    - Provide guidance and request another iteration
    - Reject the approach entirely
 
 ---
 
+## Cost Acknowledgment
+
+Fresh context per iteration = 2 agents x N iterations. More expensive than a single-reviewer model. Worth it: independence catches groupthink. Mid-tier models keep costs reasonable.
+
+---
+
 ## Benefits
 
-1. **Catches issues early** - Cheaper to fix in planning than implementation
-2. **Better coverage** - Two perspectives, adversarial review
-3. **Documentation** - Plan artifact documents decisions for future
-4. **Consistency** - Same quality process regardless of agent "mood"
-5. **Learning** - Review history shows common issues to avoid
+1. **No authority problem** - Neither reviewer has the final word; user decides
+2. **Fresh context** - Independent agents catch things the planner has normalized
+3. **Balanced perspective** - Critic finds flaws, Advocate explains reasoning
+4. **Iterative improvement** - User can revise based on synthesis guidance
+5. **Documentation** - Plan artifact with review history documents decisions
 
 ---
 
 ## Anti-patterns
 
-❌ **Rubber-stamp reviews**: Reviewer always approves without critique
-❌ **Infinite loops**: Never approving, always finding issues
-❌ **Scope creep**: Reviewer adding features not in acceptance criteria
-❌ **Bike-shedding**: Focusing on trivial issues, missing critical ones
+- **Rubber-stamp synthesis**: Presenting both views without highlighting disagreements
+- **Infinite loops**: Never approving, always finding issues
+- **Scope creep**: Critic raising issues not related to acceptance criteria
+- **Bike-shedding**: Focusing on trivial issues, missing critical ones
 
-✅ **Good reviews**: Focused on acceptance criteria, security, correctness
-✅ **Constructive**: Issues include suggested solutions
-✅ **Time-bounded**: Max iterations prevents endless loops
+**Good practices**:
+- Focused on acceptance criteria, security, correctness
+- Constructive synthesis with actionable Revision Guidance
+- Time-bounded: max iterations prevents endless loops
+- User authority: no automated enforcement
