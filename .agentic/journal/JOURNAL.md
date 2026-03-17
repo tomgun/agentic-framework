@@ -3053,3 +3053,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-17 19:08 - F-0225 Spec Evolution Metrics
+
+**Why**: Framework lacked visibility into how specs evolve during implementation — discovered requirements and churn were invisible
+
+**What changed**:
+- New spec-metrics.sh tool with discovery counting, churn analysis, JSON output; integrated into ag audit --metrics, dashboard, retrospective checklist; updated 3 instruction files; added LLM test 085
+
+**Next steps**:
+- PR review, merge, ag done
+
+**Blockers**: None
+

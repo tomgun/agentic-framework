@@ -149,6 +149,7 @@ The framework includes a formal QA pipeline — "who tests the tests?"
 | `ag audit` | Verify spec→AC→test chain (structural, coverage, heuristics, LLM review) |
 | `ag audit --full` | Full audit report to `docs/retrospectives/` |
 | `ag audit --propagate NFR-XXXX` | Trace NFR changes to affected features downstream |
+| `ag audit --metrics` | Spec evolution data: discovery markers, churn analysis |
 | `ag audit --status` | Show QA tracker summary |
 | `ag nfr list` | List all project NFRs with status |
 | `ag nfr discover` | Suggest NFRs from catalog based on project stack |
