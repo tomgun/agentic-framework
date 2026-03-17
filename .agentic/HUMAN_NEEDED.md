@@ -106,6 +106,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0047: PR #154: F-0224 smoke test evidence + plan-scan dedup fix
+- **Type**: review
+- **Added**: 2026-03-17
+- **Context**: Completes F-0224 AC10, fixes plan-scan duplicate detection for epic plans
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0043: PR #141: Systematic quality improvement
