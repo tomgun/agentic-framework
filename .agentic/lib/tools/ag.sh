@@ -2643,6 +2643,8 @@ cmd_auto() {
             echo "COMMANDS:"
             echo "  init [--tier N]       Generate settings.json (N=1 sandboxed, 2 scoped, 3 interactive)"
             echo "  verify                Run test-fix loop until green (F-0161)"
+            echo "    --visual              Add AI visual review of screenshots"
+            echo "    --feature <F-XXXX>    Save evidence for smoke test gate (with --visual)"
             echo "  task <F-XXXX>         Implement a single feature autonomously (F-0162)"
             echo "  crunch [--features .] Implement multiple features in batch (F-0163)"
             echo "  epic <F-XXXX>         Autonomous epic execution — schedule children (F-0186)"

@@ -866,19 +866,17 @@ def main() -> int:
 
     # Save evidence if --feature and --visual
     if args.feature and args.visual:
-        _save_evidence(args.feature, result, args.project_root)
+        _save_evidence(args.feature, result, loop.paths.evidence_dir)
 
     return 0 if result.success else 1
 
 
 def _save_evidence(
-    feature_id: str, result: VerifyResult, project_root: Path
+    feature_id: str, result: VerifyResult, evidence_dir: Path
 ) -> None:
     """Save structured smoke test evidence to the evidence directory."""
     from datetime import datetime, timezone
 
-    paths = get_paths(project_root)
-    evidence_dir = paths.evidence_dir
     evidence_dir.mkdir(parents=True, exist_ok=True)
 
     dest = evidence_dir / f"{feature_id}-smoke.md"
