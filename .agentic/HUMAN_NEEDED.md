@@ -97,6 +97,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0046: PR #153: Dogfood sync + deferred item capture
+- **Type**: pr_review
+- **Added**: 2026-03-17
+- **Context**: Instruction file sync, deferred capture workflow, post-merge dogfood step, 8 TODOs with context
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0043: PR #141: Systematic quality improvement
