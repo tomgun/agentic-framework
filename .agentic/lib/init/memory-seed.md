@@ -6,7 +6,7 @@ tokens: ~1280
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.58.3 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -40,7 +40,7 @@ If they say "implement entire", "full system", "complete", or describe something
 
 Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal/plans/`. Save them regardless of how they arrive:
 
-**After exiting plan mode**: IMMEDIATELY continue with the post-plan-mode steps — do NOT wait for user to say "implement":
+**After exiting plan mode**: The ExitPlanMode hook auto-saves the plan and outputs review instructions. If you see the hook banner, follow it. If not (hook didn't fire), IMMEDIATELY continue with post-plan-mode steps — do NOT wait for user to say "implement":
 1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with status DRAFT (tool plan locations like `~/.claude/plans/` are session-scoped and WILL BE LOST)
 2. Run `ag implement F-XXXX` — it will auto-save plans and enforce the review gate
 3. If `plan_review_enabled: yes`: `ag implement` blocks with `exit 1` and prints review instructions. Follow them: spawn Critic + Advocate agents in parallel (fresh context), synthesize both perspectives (with Revision Guidance), present to user. User decides: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject

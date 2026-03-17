@@ -29,7 +29,7 @@ This design synthesizes two independent research efforts:
 
 **Constitution size deviation**: The ChatGPT research recommends 300-800 tokens (~15-40 lines). The framework's empirical finding (L-0002) is that compliance degrades past ~100 lines (~1500 tokens). The proposed slimmed target of ~40-50 lines (~800-1000 tokens) exceeds the ChatGPT upper bound by ~25%. This is a conscious choice: the framework's instruction files carry competing high-priority rules (gates, triggers, protocols) that dilute each other faster than single-purpose constitutions. The 100-line upper bound from L-0002 remains the framework's validated ceiling. The ChatGPT recommendation is noted as aspirational guidance without cited empirical basis.
 
-**Gemini**: The ChatGPT research notes Gemini is stateless between calls, supports up to ~1M tokens, and has no native orchestrator memory. Documented here for future reference — the framework doesn't support Gemini yet. Including unactionable findings in the main design would weaken the document's authority.
+**Gemini**: The ChatGPT research notes Gemini is stateless between calls, supports up to ~1M tokens, and has no native orchestrator memory. Documented here for future reference — the framework doesn't support Gemini yet. Gemini CLI's hook system is mature (AfterTool with regex matchers). Including unactionable findings in the main design would weaken the document's authority.
 
 ---
 
@@ -66,12 +66,14 @@ graph TB
 
     subgraph DEFENSE["Defense-in-Depth"]
         MEMORY[memory-seed.md<br/>persistent memory]
-        HOOKS[git core.hooksPath<br/>pre-commit gates]
+        GIT_HOOKS[git core.hooksPath<br/>pre-commit gates]
+        TOOL_HOOKS[Tool-Native Hooks<br/>PostToolUse, PreToolUse]
     end
 
     L1 -->|"agent reads<br/>at session start"| L2
     L2 -->|"ag commands<br/>load just-in-time"| L3
-    HOOKS -->|"structural<br/>enforcement"| L3
+    GIT_HOOKS -->|"structural<br/>enforcement"| L3
+    TOOL_HOOKS -->|"transition<br/>enforcement"| L2
     MEMORY -.->|"reinforces<br/>(redundant)"| L1
 
     style L1 fill:#4a90d9,color:#fff
@@ -141,6 +143,21 @@ Other tools (Cursor, Copilot, Codex) continue using `auto_orchestration.md` + `a
 
 **Future consideration**: A compact config.json (aggregating STACK.md keys + runtime state) could help subagent context injection. Lower priority than Gaps 1-4 — STACK.md parsing works today.
 
+### Defense-in-Depth: Hooks
+
+The framework uses two categories of hooks for structural enforcement:
+
+```
+Defense-in-Depth: Hooks
+├── Git Hooks (agent-agnostic)
+│   └── pre-commit-check.sh — 21 structural gates
+└── Tool-Native Hooks (per-tool, structural enforcement at transition points)
+    ├── Claude Code: PostToolUse(ExitPlanMode), SessionStart, Stop, etc.
+    └── [Other tools: future — Gemini, Codex, Copilot, Cursor]
+```
+
+**Git hooks** run at commit time — they are the universal backstop. **Tool-native hooks** fire at workflow transition points (e.g., exiting plan mode) and can inject instructions into the agent's context before the next action. Together they provide defense-in-depth: tool hooks catch violations early (at the transition), git hooks catch them late (at commit time).
+
 ### Defense-in-Depth: Memory Seed Layer
 
 The framework includes a **memory-seed** mechanism (`.agentic/lib/init/memory-seed.md`) that seeds key workflow patterns into each tool's persistent memory during init. This coexists with this document's design principle #2 in §5 ("Never rely on memory") [note: this is the doc's own design principle list, not framework principle D2] because memory-seed is **redundant reinforcement, not primary enforcement**.
@@ -169,7 +186,7 @@ The framework uses a **distributed enforcement model** — this is a conscious d
 
 **Enforcement points**:
 - `ag implement` — checks acceptance criteria + approved plan
-- `pre-commit-check.sh` — runs 17 structural checks
+- `pre-commit-check.sh` — runs 21 structural checks
 - `ag done` — runs `doctor.sh --phase complete` (but `|| true` in `cmd_done()` currently suppresses failures — see Gap 4)
 - `context-for-role.sh` — assembles role-specific context for subagents
 - `ag auto verify/task/crunch` — autonomous engine with Unix socket control, per-AC Claude instances, three-tier trust model (F-0160–F-0163)
@@ -180,7 +197,7 @@ The framework uses a **distributed enforcement model** — this is a conscious d
 
 These mechanisms are proven and stable. Changes require strong justification:
 
-- **pre-commit-check.sh** — 17 structural gates
+- **pre-commit-check.sh** — 21 structural gates
 - **context-for-role.sh** + 24 context manifests — subagent context injection
 - **Token-efficient scripts** — journal.sh, status.sh, feature.sh, blocker.sh
 - **LLM behavioral test suite** — 48+ tests validating instruction compliance
@@ -288,6 +305,7 @@ The design makes assumptions that should be validated over time. Each has a stat
 | A8 | ~40-50 lines is achievable while keeping trigger table + token scripts + core rules | VALIDATED — template CLAUDE.md at 40 lines, root at 54, all under 100-line ceiling (F-0143) | Achieved via Skills offloading triggers |
 | A9 | Copilot loads copilot-instructions.md into subagent sessions | UNKNOWN — contradictory docs | Empirical test with distinctive instruction |
 | A10 | Git-tracked STATUS.md survives cross-machine workflow | RESOLVED — status.json eliminated; STATUS.md is the sole cross-machine state file | N/A — STATUS.md is already git-tracked and used directly |
+| A11 | Tool-native PostToolUse hooks fire reliably on ExitPlanMode in Claude Code | UNTESTED — implemented in F-0234, awaiting field validation | Manual test: enter/exit plan mode, verify hook output appears in agent context |
 
 **Update this table** when assumptions are validated or invalidated. Failed assumptions trigger design document amendments.
 
@@ -301,6 +319,18 @@ The design makes assumptions that should be validated over time. Each has a stat
 - **Does `ag` command stdout have higher salience than file content?** (Untested) — directly affects Gap 3
 
 ### Exploratory (can be deferred)
+
+#### Tool-Native Hook Transition Points
+
+Transition points where tool-native hooks can structurally enforce workflow rules:
+
+| Transition | Hook Trigger | Value | Status |
+|---|---|---|---|
+| Plan mode exit → save + review | PostToolUse(ExitPlanMode) | Block coding without approved plan | **Implemented (F-0234)** |
+| Before file edit → verify approved plan | PreToolUse(Write\|Edit) | Block coding without plan | Future |
+| Before destructive git → collision guard | PreToolUse(Bash) + parse cmd | Prevent stash/reset with active agents | Future |
+| After `ag done` → verify completeness | PostToolUse(Bash) + parse cmd | Ensure ACs checked, docs updated | Future |
+| Before PR creation → pre-submit check | PreToolUse(Bash) + parse `gh pr` | Ensure tests pass | Future |
 
 - Does table format (trigger words) have higher compliance than prose format?
 - Would a "router" CLAUDE.md (purely dispatch, no rules) outperform the current hybrid?

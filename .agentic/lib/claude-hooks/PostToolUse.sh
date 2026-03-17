@@ -19,7 +19,8 @@ if [[ ! -d ".agentic" ]]; then
 fi
 
 # Only run checks after file writes (not after reads)
-# Claude doesn't provide tool name in hook, so we check for recent file modifications
+# PostToolUse receives JSON on stdin with tool_name, tool_input, tool_response
+# This generic hook matches all tools (matcher: ".*"), so we infer from file modifications
 RECENT_CHANGES=$(find . -type f -mmin -1 -not -path "./.git/*" -not -path "./.agentic/.cache/*" 2>/dev/null | head -5)
 
 if [[ -z "$RECENT_CHANGES" ]]; then

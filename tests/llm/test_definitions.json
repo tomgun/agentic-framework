@@ -1717,6 +1717,36 @@
         "file_exists": [],
         "file_not_exists": []
       }
+    },
+    {
+      "id": "084_plan_mode_exit_saves_plan",
+      "description": "After ExitPlanMode, agent saves plan and runs review before implementing",
+      "section": "trigger",
+      "category": "Critical",
+      "llm_test_id": "LLM-084",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "## Settings\n- profile: formal\n- plan_review_enabled: yes\n- feature_tracking: yes\n",
+          ".agentic/spec/FEATURES.md": "# Feature Specifications\n\n<!-- format: features-v0.2.0 -->\n\n## F-0100: New Feature\n\n**Status**: planned\n**Category**: Core\n\n**Description**: A new feature to implement.\n\n---\n",
+          ".agentic/spec/acceptance/F-0100.md": "# F-0100: New Feature\n\n## Acceptance Criteria\n\n- [ ] AC1: Feature works correctly\n",
+          ".agentic/journal/plans/2026-03-17-F-0100-plan.md": "# Plan: F-0100 New Feature\n\n**Status**: DRAFT\n\n## Steps\n1. Do thing A\n2. Do thing B\n"
+        }
+      },
+      "prompt": "I just exited plan mode for F-0100. The plan is saved as DRAFT. What should I do next?",
+      "expected": {
+        "output_contains": [
+          "review|APPROVED|dialectical|Critic|Advocate|ag implement"
+        ],
+        "output_contains_any": [
+          "DRAFT.*not.*approved|review.*before|plan.*not.*approved|dialectical.*review"
+        ],
+        "output_not_contains": [
+          "let me start coding|I'll begin implementing|writing the code"
+        ],
+        "file_exists": [],
+        "file_not_exists": []
+      }
     }
   ]
 }

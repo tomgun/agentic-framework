@@ -28,6 +28,17 @@
     ],
     "PostToolUse": [
       {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/ExitPlanMode.sh",
+            "timeout": 5000,
+            "description": "Auto-save plan and inject review instructions after plan mode exit"
+          }
+        ]
+      },
+      {
         "matcher": ".*",
         "hooks": [
           {
