@@ -5142,6 +5142,91 @@ else
 fi
 
 
+# ============================================================
+# F-0234: Agent Definition Parity (roles ↔ subagents ↔ manifests)
+# ============================================================
+echo ""
+echo "--- F-0234: Agent Definition Parity ---"
+
+ROLES_DIR="${FRAMEWORK_ROOT}/.agentic/lib/agents/roles"
+SUBAGENTS_DIR="${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/subagents"
+MANIFESTS_DIR="${FRAMEWORK_ROOT}/.agentic/lib/agents/context-manifests"
+
+# Build list of active (non-deprecated) roles in kebab-case
+active_roles=()
+for role_file in "${ROLES_DIR}"/*.md; do
+  [[ "$(basename "$role_file")" == "README.md" ]] && continue
+  # Check if deprecated
+  if grep -q "^deprecated: true" "$role_file" 2>/dev/null; then
+    info "Deprecated role: $(basename "$role_file")"
+    continue
+  fi
+  # Convert snake_case filename to kebab-case for matching
+  local_name="$(basename "$role_file" .md | tr '_' '-')"
+  active_roles+=("$local_name")
+done
+
+# Check each active role has a subagent
+for role_name in "${active_roles[@]}"; do
+  if [[ -f "${SUBAGENTS_DIR}/${role_name}.md" ]]; then
+    info "Role ${role_name} has subagent"
+  else
+    fail "F-0234: Active role '${role_name}' has no corresponding subagent in subagents/"
+  fi
+done
+
+# Check each active role has a manifest
+for role_name in "${active_roles[@]}"; do
+  if [[ -f "${MANIFESTS_DIR}/${role_name}.yaml" ]]; then
+    info "Role ${role_name} has manifest"
+  else
+    fail "F-0234: Active role '${role_name}' has no corresponding manifest in context-manifests/"
+  fi
+done
+
+# Check deprecated roles have deprecated: true in frontmatter
+for role_file in "${ROLES_DIR}"/*.md; do
+  [[ "$(basename "$role_file")" == "README.md" ]] && continue
+  local_name="$(basename "$role_file" .md | tr '_' '-')"
+  has_subagent=false
+  has_manifest=false
+  [[ -f "${SUBAGENTS_DIR}/${local_name}.md" ]] && has_subagent=true
+  [[ -f "${MANIFESTS_DIR}/${local_name}.yaml" ]] && has_manifest=true
+  if [[ "$has_subagent" == "false" && "$has_manifest" == "false" ]]; then
+    if ! grep -q "^deprecated: true" "$role_file" 2>/dev/null; then
+      fail "F-0234: Role '${local_name}' has no subagent or manifest and is not marked deprecated"
+    fi
+  fi
+done
+
+# Warn about subagents without roles (expected for domain specialists and plan-* agents)
+orphan_subagents=()
+for subagent_file in "${SUBAGENTS_DIR}"/*.md; do
+  [[ "$(basename "$subagent_file")" == "README.md" ]] && continue
+  sub_name="$(basename "$subagent_file" .md)"
+  # Check if any role matches (convert role snake_case to kebab)
+  found=false
+  for role_file in "${ROLES_DIR}"/*.md; do
+    [[ "$(basename "$role_file")" == "README.md" ]] && continue
+    role_kebab="$(basename "$role_file" .md | tr '_' '-')"
+    if [[ "$role_kebab" == "$sub_name" ]]; then
+      found=true
+      break
+    fi
+  done
+  if [[ "$found" == "false" ]]; then
+    orphan_subagents+=("$sub_name")
+  fi
+done
+if [[ ${#orphan_subagents[@]} -gt 0 ]]; then
+  warn "F-0234: ${#orphan_subagents[@]} subagents have no corresponding role (expected for domain/plan-* agents): ${orphan_subagents[*]}"
+fi
+
+# Count for summary
+active_count=${#active_roles[@]}
+pass "F-0234: Agent parity check complete (${active_count} active roles verified)"
+
+
 # Summary
 # ============================================================
 echo ""

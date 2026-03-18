@@ -1,3 +1,8 @@
+---
+summary: "Write tests based on acceptance criteria before implementation (TDD)"
+tokens: ~339
+---
+
 # Test Agent
 
 **Role**: Write tests based on acceptance criteria BEFORE implementation (TDD).
@@ -6,10 +11,10 @@
 
 ## Context to Read
 
-- `spec/acceptance/F-####.md` - Acceptance criteria to test
+- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria to test
 - `STACK.md` - Testing framework info
 - Existing test patterns in `tests/`
-- `.agentic/quality/testing_standards.md` - Testing guidelines
+- `.agentic/lib/quality/testing_standards.md` - Testing guidelines
 
 ## Responsibilities
 

@@ -27,18 +27,29 @@ The orchestrator **delegates** to specialized agents and **verifies** quality ga
 | Documentation Agent | `documentation_agent.md` | Update docs and README |
 | Git Agent | `git_agent.md` | Commits, branches, PRs |
 
-### Domain Expert Agents (Examples)
-
-These are **examples** for reference. The right agents depend on YOUR project.
+### Specialized Agents
 
 | Role | File | Purpose |
 |------|------|---------|
-| Scientific Research | `scientific_research_agent.md` | Peer-reviewed papers, benchmarks |
-| Architecture | `architecture_agent.md` | System design, patterns, scalability |
-| Cloud Expert | `cloud_expert_agent.md` | AWS/GCP/Azure best practices |
-| Monetization | `monetization_agent.md` | Pricing, revenue models, conversion |
+| API Design Agent | `api_design_agent.md` | Design REST/GraphQL APIs, contracts |
+| Security Agent | `security_agent.md` | Security audits, vulnerability scanning |
+| Refactor Agent | `refactor_agent.md` | Improve code structure, preserve behavior |
+| Explore Agent | `explore_agent.md` | Codebase exploration, file finding |
+| Database Agent | `db_agent.md` | Schema design, migrations, query optimization |
+| Design Agent | `design_agent.md` | UI/UX design, wireframes, components |
 
-**These are templates** - create agents specific to your project's needs.
+### Deprecated Roles
+
+These roles are deprecated and not copied to `.cursor/agents/`. They remain as reference only.
+
+| Role | File | Reason |
+|------|------|--------|
+| Architecture | `architecture_agent.md` | Covered by Planning + Research agents |
+| Cloud Expert | `cloud_expert_agent.md` | Use cloud-specific subagents (aws/gcp/azure) |
+| Monetization | `monetization_agent.md` | Domain-specific — promote if there is demand |
+| Scientific Research | `scientific_research_agent.md` | Covered by Research Agent |
+
+**Create project-specific agents** for your domain needs — these are just starting points.
 
 ## Discovering the Right Agents for Your Project
 

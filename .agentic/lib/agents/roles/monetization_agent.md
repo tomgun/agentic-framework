@@ -1,6 +1,8 @@
 ---
 summary: "Advise on pricing strategies, revenue models, payment flows"
 tokens: ~346
+deprecated: true
+deprecated_reason: "No subagent or manifest counterpart. Domain-specific agent — promote to subagent if there is demand."
 ---
 
 # Monetization Agent

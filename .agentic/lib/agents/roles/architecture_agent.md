@@ -1,6 +1,8 @@
 ---
 summary: "Design system architecture, evaluate patterns, ensure scalability"
 tokens: ~310
+deprecated: true
+deprecated_reason: "No subagent or manifest counterpart. Architecture concerns are covered by Planning Agent and Research Agent. See subagents/ for domain specialists."
 ---
 
 # Architecture Agent

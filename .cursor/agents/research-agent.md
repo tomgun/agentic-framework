@@ -1,3 +1,8 @@
+---
+summary: "Investigate technology choices, best practices, external dependencies"
+tokens: ~271
+---
+
 # Research Agent
 
 **Role**: Investigate technology choices, best practices, and external dependencies.

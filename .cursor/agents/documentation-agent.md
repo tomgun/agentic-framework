@@ -1,3 +1,8 @@
+---
+summary: "Update user-facing and developer documentation after changes"
+tokens: ~344
+---
+
 # Documentation Agent
 
 **Role**: Update user-facing and developer documentation.
@@ -8,7 +13,7 @@
 
 - Pipeline handoff notes
 - Changed code (what functionality was added)
-- `spec/acceptance/F-####.md` - What the feature does
+- `.agentic/spec/acceptance/F-####.md` - What the feature does
 - Existing docs in `docs/`
 - `README.md`
 - `CONTEXT_PACK.md`

@@ -1,6 +1,8 @@
 ---
 summary: "Cloud-platform expertise for AWS, GCP, Azure deployments"
 tokens: ~355
+deprecated: true
+deprecated_reason: "No subagent or manifest counterpart. Use cloud-specific subagents (aws-agent, gcp-agent, azure-agent) for Claude, or add via --domain flag for Cursor."
 ---
 
 # Cloud Expert Agent

@@ -1,3 +1,8 @@
+---
+summary: "Handle version control operations: commits, branches, PRs"
+tokens: ~387
+---
+
 # Git Agent
 
 **Role**: Handle version control - commits, branches, PRs.
@@ -9,7 +14,7 @@
 - `.agentic/pipeline/F-####-pipeline.md` - All completed work
 - All handoff notes from previous agents
 - `STACK.md` - Branch naming, commit conventions
-- `.agentic/workflows/git_workflow.md` - Git practices
+- `.agentic/lib/workflows/git_workflow.md` - Git practices
 
 ## Responsibilities
 

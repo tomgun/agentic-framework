@@ -241,18 +241,28 @@ setup_cursor_agents() {
     return 1
   fi
   
-  # Copy each role as a Cursor agent file
+  # Copy each role as a Cursor agent file (skip README and deprecated roles)
+  local copied=0
+  local skipped=0
   for role_file in "$ROLES_DIR"/*.md; do
     if [[ -f "$role_file" ]]; then
       filename=$(basename "$role_file")
+      # Skip README
+      [[ "$filename" == "README.md" ]] && continue
+      # Skip deprecated roles (F-0234: deprecated: true in frontmatter)
+      if grep -q "^deprecated: true" "$role_file" 2>/dev/null; then
+        skipped=$((skipped + 1))
+        continue
+      fi
       # Convert snake_case to kebab-case for Cursor
       agent_name=$(echo "$filename" | sed 's/_/-/g')
       cp "$role_file" "$PROJECT_ROOT/.cursor/agents/$agent_name"
       echo -e "${GREEN}  ✓${NC} Created .cursor/agents/$agent_name"
+      copied=$((copied + 1))
     fi
   done
   
-  echo -e "${GREEN}✓ Created Cursor agents in .cursor/agents/${NC}"
+  echo -e "${GREEN}✓ Created ${copied} Cursor agents in .cursor/agents/ (${skipped} deprecated skipped)${NC}"
   echo "  Reference these agents in Cursor with @agent-name"
   echo "  See: .agentic/agents/cursor/agents-setup.md for usage"
 }

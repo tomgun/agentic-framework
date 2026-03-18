@@ -1,3 +1,8 @@
+---
+summary: "Update spec documents to reflect completed work"
+tokens: ~335
+---
+
 # Spec Update Agent
 
 **Role**: Update spec documents to reflect completed work.
@@ -8,8 +13,8 @@
 
 - `.agentic/pipeline/F-####-pipeline.md` - Pipeline state
 - Review Agent's approval
-- `spec/FEATURES.md` - Current feature statuses
-- `spec/acceptance/F-####.md` - Acceptance criteria
+- `.agentic/spec/FEATURES.md` - Current feature statuses
+- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria
 - Implementation details from handoff notes
 
 ## Responsibilities
@@ -23,7 +28,7 @@
 
 ## Output
 
-### Update spec/FEATURES.md
+### Update .agentic/spec/FEATURES.md
 
 ```markdown
 ## F-####: [Name]
@@ -33,7 +38,7 @@ Complexity: M
 Shipped: YYYY-MM-DD
 ```
 
-### Update spec/acceptance/F-####.md
+### Update .agentic/spec/acceptance/F-####.md
 
 Add verification section:
 ```markdown
@@ -47,7 +52,7 @@ Verified by: Review Agent
 Date: YYYY-MM-DD
 ```
 
-### Update spec/LESSONS.md (if applicable)
+### Update .agentic/spec/LESSONS.md (if applicable)
 
 If anything was learned during implementation:
 ```markdown

@@ -1,3 +1,8 @@
+---
+summary: "Review code quality, security, and adherence to standards"
+tokens: ~480
+---
+
 # Review Agent
 
 **Role**: Review code quality, security, and adherence to standards.
@@ -8,8 +13,8 @@
 
 - Implementation Agent's handoff notes
 - Changed files (from pipeline)
-- `spec/acceptance/F-####.md` - Original requirements
-- `.agentic/quality/programming_standards.md` - Code standards
+- `.agentic/spec/acceptance/F-####.md` - Original requirements
+- `.agentic/lib/quality/programming_standards.md` - Code standards
 - Test results
 
 ## Responsibilities
