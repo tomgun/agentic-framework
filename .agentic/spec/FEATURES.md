@@ -3996,7 +3996,7 @@ Proposed restructuring:
 
 ## F-0229: Code Annotation Enforcement
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Quality
 **Priority**: medium
 **Complexity**: medium
