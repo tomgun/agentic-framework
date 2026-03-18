@@ -37,14 +37,13 @@ done
 
 # --- Colors ---
 if [ -t 1 ]; then
-    RED='\033[0;31m'
     GREEN='\033[0;32m'
     YELLOW='\033[1;33m'
     BOLD='\033[1m'
     DIM='\033[2m'
     NC='\033[0m'
 else
-    RED='' GREEN='' YELLOW='' BOLD='' DIM='' NC=''
+    GREEN='' YELLOW='' BOLD='' DIM='' NC=''
 fi
 
 # --- Framework-dev guard ---
@@ -150,14 +149,14 @@ FILE_PAIRS=(
 is_suppressed() {
     local root_file="$1"
     local sentinel="$2"
-    grep -q "<!-- dogfood:ignore: ${sentinel} -->" "$root_file" 2>/dev/null
+    grep -Fq "<!-- dogfood:ignore: ${sentinel} -->" "$root_file" 2>/dev/null
 }
 
 # Find the line number of a sentinel in a file
 find_line() {
     local file="$1"
     local sentinel="$2"
-    grep -n "$sentinel" "$file" 2>/dev/null | head -1 | cut -d: -f1
+    grep -Fn "$sentinel" "$file" 2>/dev/null | head -1 | cut -d: -f1
 }
 
 phase2_drift=0
@@ -185,8 +184,8 @@ for entry in "${FILE_PAIRS[@]}"; do
     # Always check Quick Commands
     for sentinel in "${SENTINELS_QUICK_COMMANDS[@]}"; do
         # Only check if sentinel is in the template
-        if grep -q "$sentinel" "$template_file" 2>/dev/null; then
-            if ! grep -q "$sentinel" "$root_file" 2>/dev/null; then
+        if grep -Fq "$sentinel" "$template_file" 2>/dev/null; then
+            if ! grep -Fq "$sentinel" "$root_file" 2>/dev/null; then
                 if ! is_suppressed "$root_file" "$sentinel"; then
                     template_line=$(find_line "$template_file" "$sentinel")
                     file_details+=("    ${YELLOW}⚠${NC} Missing: \"$sentinel\" (template line ${template_line:-?})")
@@ -199,8 +198,8 @@ for entry in "${FILE_PAIRS[@]}"; do
     # Full mode: also check Core Rules and Scripts
     if [ "$check_mode" = "full" ]; then
         for sentinel in "${SENTINELS_CORE_RULES[@]}"; do
-            if grep -qi "$sentinel" "$template_file" 2>/dev/null; then
-                if ! grep -qi "$sentinel" "$root_file" 2>/dev/null; then
+            if grep -Fqi "$sentinel" "$template_file" 2>/dev/null; then
+                if ! grep -Fqi "$sentinel" "$root_file" 2>/dev/null; then
                     if ! is_suppressed "$root_file" "$sentinel"; then
                         template_line=$(find_line "$template_file" "$sentinel")
                         file_details+=("    ${YELLOW}⚠${NC} Missing: \"$sentinel\" (template line ${template_line:-?})")
@@ -282,7 +281,7 @@ elif [ "$MODE" = "full" ]; then
     elif [ "$phase3_drift" -eq -1 ]; then
         echo -e "  ${YELLOW}? memory-check.sh not found — skipping${NC}"
     else
-        echo -e "  $phase3_output" | sed 's/^/  /'
+        echo -e "  $phase3_output"
     fi
 fi
 
