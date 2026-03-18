@@ -219,6 +219,8 @@ When the check flags a feature:
 
 The check is skipped in `--mode fast` (used by discovery profile's `pre_commit_checks: fast`).
 
+**Note**: Check 22 requires `python3` to run `coverage.py` and parse JSON. If `python3` is not available, the check is silently skipped even when set to `blocking`.
+
 ## Migration strategy (for existing codebases)
 
 1. Start with new features: annotate as you implement

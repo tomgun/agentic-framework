@@ -347,16 +347,19 @@ assert_contains "parses F-0042 from JSON" "$PARSED" "F-0042"
 assert_contains "parses F-0099 from JSON" "$PARSED" "F-0099"
 assert_not_contains "ignores orphaned_annotation type" "$PARSED" "F-9999"
 
-# Test 13: || fallback pattern correctness
+# Test 13: fallback when tool is missing (mirrors hook's actual pattern)
 echo ""
-echo "[13] Fallback pattern produces valid JSON on tool failure..."
-# Simulate coverage.py failing (command not found)
-FALLBACK_JSON=$(no_such_command_coverage_py --json 2>/dev/null) || FALLBACK_JSON='{"issues":[]}'
+echo "[13] Fallback produces valid JSON when tool is absent..."
+# The hook uses: $(cmd || true) then checks if empty. Mirror that exactly.
+FALLBACK_JSON=$(no_such_command_coverage_py --json 2>/dev/null || true)
+if [[ -z "$FALLBACK_JSON" ]]; then
+  FALLBACK_JSON='{"issues":[]}'
+fi
 FALLBACK_PARSED=$(echo "$FALLBACK_JSON" | python3 -c "
 import sys, json
 data = json.load(sys.stdin)
 print(len(data.get('issues', [])))
-" 2>/dev/null) || FALLBACK_PARSED="PARSE_ERROR"
+" 2>/dev/null || true)
 assert_eq "fallback produces parseable JSON with 0 issues" "0" "$FALLBACK_PARSED"
 
 # Test 14: Exit-code preservation — real output kept when command exits 1
