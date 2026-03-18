@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0229 shipped (v0.63.0), next: F-0226 (Updated: 2026-03-18 20:24 UTC)
+- ADR-001 roadmap execution: F-0216 (F-0216) is current backlog item (Updated: 2026-03-18 21:35 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

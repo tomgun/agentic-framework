@@ -3103,3 +3103,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-18 21:35 - F-0226 Complete
+
+**Why**: Root instruction files were silently drifting from templates after PR merges
+
+**What changed**:
+- Framework now auto-detects root vs template instruction file drift after merges via ag dogfood
+
+**Next steps**:
+- Next: F-0216
+
+**Blockers**: None
+

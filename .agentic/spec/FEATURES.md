@@ -3930,7 +3930,7 @@ Proposed restructuring:
 
 ## F-0226: Post-Merge Dogfooding
 
-**Status**: planned
+**Status**: shipped
 **Category**: Quality
 **Priority**: medium
 **Complexity**: medium
