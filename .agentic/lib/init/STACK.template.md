@@ -100,6 +100,9 @@ Purpose: a single source of truth for "how we build and run software here".
 - feedback_mode: pr_review
 # How feedback is handled after testing. pr_review: agent logs, human classifies | working_software: agent auto-classifies, human confirms | automated: route immediately. Discovery: pr_review | Formal: pr_review | Autonomous Formal: working_software
 
+- annotation_enforcement: off
+# Pre-commit annotation check for newly-shipped features (F-0229). off: skip | advisory: warn | blocking: block commit. Discovery: off | Formal: advisory | Autonomous Formal: blocking
+
 - max_parallel_agents: 3
 # Maximum concurrent Claude processes for parallel epic execution (F-0214). Range: 1-10. Discovery: 3 | Formal: 3 | Autonomous Formal: 3
 

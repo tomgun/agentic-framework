@@ -189,6 +189,36 @@ For reliable test→feature mapping:
 2. **Alternative**: Import files that have `@feature` annotations
 3. **Avoid**: Generic test names that require heuristic matching
 
+## Pre-commit enforcement (Check 22)
+
+The `annotation_enforcement` setting controls whether missing annotations block commits for **newly-shipped features**. Already-shipped features are grandfathered — only features whose status transitions to `shipped` in the current commit are checked.
+
+### Modes
+
+| Mode | Behavior | Default profile |
+|------|----------|----------------|
+| `off` | Check 22 skipped entirely | discovery |
+| `advisory` | Prints warning, commit proceeds | formal |
+| `blocking` | Increments FAILURES, commit blocked | autonomous_formal |
+
+### Override in STACK.md
+
+```markdown
+## Settings
+annotation_enforcement: blocking
+```
+
+### How to satisfy the check
+
+When the check flags a feature:
+
+1. Find the key implementation files for the feature
+2. Add `@feature F-XXXX` annotations to entry points and core logic
+3. Run `python3 .agentic/lib/tools/coverage.py` to verify annotations are detected
+4. Re-stage and commit
+
+The check is skipped in `--mode fast` (used by discovery profile's `pre_commit_checks: fast`).
+
 ## Migration strategy (for existing codebases)
 
 1. Start with new features: annotate as you implement

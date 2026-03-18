@@ -28,6 +28,7 @@
 #   19. Doc registry health (advisory, respects docs_gate setting)
 #   20. TDD phase ordering (BLOCKING when development_mode: tdd, safety net)
 #   21. Approved plan required when plan_review_enabled (BLOCKING)
+#   22. Annotation enforcement for newly-shipped features (respects annotation_enforcement setting)
 #
 # Escape hatches (use sparingly, blocked on main/master):
 #   SKIP_TESTS=1      Skip test execution
@@ -49,7 +50,7 @@ source "${PROJECT_ROOT}/.agentic/lib/paths.sh"
 source "${PROJECT_ROOT}/.agentic/lib/settings.sh"
 
 # === Mode flag ===
-# --mode fast: skip slow/advisory checks (4,5,6,8,9,10,12,13,19)
+# --mode fast: skip slow/advisory checks (4,5,6,8,9,10,12,13,19,22)
 # --mode full: run all checks (default when called directly)
 _FAST_MODE=0
 for _arg in "$@"; do
@@ -1183,6 +1184,80 @@ if [[ $_FAST_MODE -eq 0 ]]; then
         echo "  ❌ BLOCKED: plan_review_enabled is yes but no APPROVED plan for $WIP_FEATURE."
         echo "     Run \`ag implement $WIP_FEATURE\` to trigger dialectical review first."
         FAILURES=$((FAILURES + 1))
+      fi
+    fi
+  fi
+fi
+
+# Check 22: Annotation enforcement for newly-shipped features
+# @feature F-0229
+# Only checks features transitioning to shipped in this commit (grandfathering).
+# Skipped in fast mode and when annotation_enforcement=off.
+if [[ $_FAST_MODE -eq 0 ]]; then
+  ANNOTATION_ENFORCEMENT=$(get_setting "annotation_enforcement" "off" 2>/dev/null || echo "off")
+  if [[ "$ANNOTATION_ENFORCEMENT" != "off" ]] && command -v python3 >/dev/null 2>&1; then
+    echo ""
+    echo "[22] Checking annotation coverage for newly-shipped features..."
+
+    # Parse staged diff to find features transitioning to shipped
+    NEWLY_SHIPPED=()
+    STAGED_DIFF=$(git diff --cached --unified=10 -- ".agentic/spec/FEATURES.md" 2>/dev/null || true)
+    if [[ -n "$STAGED_DIFF" ]]; then
+      # Find added lines with "**Status**: shipped" and look for feature headers above them
+      CURRENT_FEATURE=""
+      while IFS= read -r line; do
+        # Track feature headers (both added and context lines)
+        if [[ "$line" =~ ^[\ +]##\ (F-[0-9]{4,}): ]]; then
+          CURRENT_FEATURE="${BASH_REMATCH[1]}"
+        fi
+        # Detect newly-added shipped status (lines starting with +)
+        if [[ "$line" =~ ^\+\*\*Status\*\*:\ *shipped ]] && [[ -n "$CURRENT_FEATURE" ]]; then
+          NEWLY_SHIPPED+=("$CURRENT_FEATURE")
+        fi
+      done <<< "$STAGED_DIFF"
+    fi
+
+    if [[ ${#NEWLY_SHIPPED[@]} -eq 0 ]]; then
+      echo "  ✓ No features transitioning to shipped — skipped"
+    else
+      # Get missing annotations from coverage.py
+      # NOTE: coverage.py exits 1 when issues found — || true inside subshell
+      # preserves stdout while suppressing the exit code under set -e
+      COVERAGE_JSON=$(python3 .agentic/lib/tools/coverage.py --json 2>/dev/null || true)
+      if [[ -z "$COVERAGE_JSON" ]]; then
+        COVERAGE_JSON='{"issues":[]}'
+      fi
+      MISSING_FEATURES=$(echo "$COVERAGE_JSON" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+for issue in data.get('issues', []):
+    if issue['type'] == 'missing_annotation':
+        print(issue['feature'])
+" 2>/dev/null || true)
+
+      ANNOTATION_VIOLATIONS=0
+      for fid in "${NEWLY_SHIPPED[@]}"; do
+        if echo "$MISSING_FEATURES" | grep -q "^${fid}$"; then
+          ANNOTATION_VIOLATIONS=$((ANNOTATION_VIOLATIONS + 1))
+          if [[ "$ANNOTATION_ENFORCEMENT" == "blocking" ]]; then
+            echo "  ❌ $fid: no @feature annotations found in codebase"
+            FAILURES=$((FAILURES + 1))
+          else
+            echo "  ⚠ $fid: no @feature annotations found in codebase (advisory)"
+          fi
+        else
+          echo "  ✓ $fid: has @feature annotations"
+        fi
+      done
+
+      if [[ $ANNOTATION_VIOLATIONS -eq 0 ]]; then
+        echo "  ✓ All newly-shipped features have annotations"
+      elif [[ "$ANNOTATION_ENFORCEMENT" == "advisory" ]]; then
+        echo "  ℹ Add @feature annotations to key implementation files"
+        echo "    See: .agentic/lib/workflows/code_annotations.md"
+      elif [[ "$ANNOTATION_ENFORCEMENT" == "blocking" ]]; then
+        echo "  ℹ Add @feature annotations before committing"
+        echo "    See: .agentic/lib/workflows/code_annotations.md"
       fi
     fi
   fi
