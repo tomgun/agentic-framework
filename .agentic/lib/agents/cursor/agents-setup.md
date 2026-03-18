@@ -48,8 +48,10 @@ bash .agentic/lib/tools/setup-agent.sh cursor-agents
 ```
 
 This creates:
-- `.cursor/agents/` directory with all role definitions
+- `.cursor/agents/` directory with 15 active role definitions (deprecated roles are skipped)
 - Updated `.cursorrules` with agent references
+
+Available agents include core pipeline (research, planning, test, implementation, review, spec-update, documentation, git, orchestrator) and specialized (api-design, security, refactor, explore, db, design). See `.agentic/lib/agents/roles/README.md` for the full catalog.
 
 ## Manual Setup
 

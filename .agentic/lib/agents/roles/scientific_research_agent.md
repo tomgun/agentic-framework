@@ -1,6 +1,8 @@
 ---
 summary: "Gather peer-reviewed papers, benchmarks, and reference implementations"
 tokens: ~352
+deprecated: true
+deprecated_reason: "No subagent or manifest counterpart. Research needs are covered by Research Agent. Promote to subagent if there is demand for academic-specific research."
 ---
 
 # Scientific Research Agent

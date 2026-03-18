@@ -4101,3 +4101,24 @@ Proposed restructuring:
 - Tests: TBD
 
 **Acceptance**: See `spec/acceptance/F-0233.md`
+
+---
+
+## F-0234: Agent Definition Reconciliation + Drift Detection
+
+**Status**: in_progress
+**Category**: Agent Infrastructure
+**Priority**: medium
+**Complexity**: medium
+**Since**: —
+**Dependencies**: none
+**Source**: `journal/plans/2026-03-18-reconcile-agent-definitions-plan.md`
+
+**Description**: Reconcile diverged agent definition sets (roles/, subagents/, context-manifests/) by adding 6 missing roles, deprecating 4 stale role-only agents, adding 1 missing manifest, and enforcing parity via automated checks in validate_framework.sh. Feature A of a two-part plan — Feature B (manifest surfacing to non-Claude tools) follows separately.
+
+**Implementation**:
+- State: `.agentic/lib/agents/roles/`, `.agentic/lib/agents/context-manifests/`
+- Code: `tests/validate_framework.sh`
+- Tests: Drift detection checks in validate_framework.sh
+
+**Acceptance**: See `spec/acceptance/F-0234.md`

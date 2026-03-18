@@ -14,7 +14,7 @@ This directory contains predefined agent roles for specialized task execution.
 
 Use `@orchestrator-agent` to manage features. It delegates to specialized agents and verifies quality gates.
 
-### Specialized Agents
+### Core Pipeline Agents
 
 | Role | File | Purpose |
 |------|------|---------|
@@ -26,6 +26,17 @@ Use `@orchestrator-agent` to manage features. It delegates to specialized agents
 | Spec Update Agent | `spec-update-agent.md` | Update FEATURES.md and specs |
 | Documentation Agent | `documentation-agent.md` | Update docs and README |
 | Git Agent | `git-agent.md` | Commits, branches, PRs |
+
+### Specialized Agents
+
+| Role | File | Purpose |
+|------|------|---------|
+| API Design Agent | `api-design-agent.md` | Design REST/GraphQL APIs, contracts |
+| Security Agent | `security-agent.md` | Security audits, vulnerability scanning |
+| Refactor Agent | `refactor-agent.md` | Improve code structure, preserve behavior |
+| Explore Agent | `explore-agent.md` | Codebase exploration, file finding |
+| Database Agent | `db-agent.md` | Schema design, migrations, query optimization |
+| Design Agent | `design-agent.md` | UI/UX design, wireframes, components |
 
 ## Usage
 

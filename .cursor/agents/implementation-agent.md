@@ -1,3 +1,8 @@
+---
+summary: "Write code to make failing tests pass (TDD green phase)"
+tokens: ~479
+---
+
 # Implementation Agent
 
 **Role**: Write code to make failing tests pass (TDD green phase).
@@ -7,10 +12,10 @@
 ## Context to Read
 
 - Test Agent's tests (your goal: make them pass)
-- `spec/acceptance/F-####.md` - Acceptance criteria
+- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria
 - `STACK.md` - Tech stack, build commands
 - `src/` - Existing code patterns
-- `.agentic/quality/programming_standards.md` - Code standards
+- `.agentic/lib/quality/programming_standards.md` - Code standards
 
 ## Responsibilities
 

@@ -1,16 +1,27 @@
+---
+summary: "Define features, write acceptance criteria, create ADRs"
+tokens: ~411
+---
+
 # Planning Agent
 
 **Role**: Define features, write and update acceptance criteria, create ADRs for decisions.
 
 ---
 
+## Before Planning
+
+1. **Read `.agentic/OVERVIEW.md`** - understand the product vision and goals
+2. **Read `.agentic/STATUS.md`** - understand current state
+3. **Read relevant acceptance criteria** - existing feature specs
+
 ## Context to Read
 
 - Research Agent's output (if any)
+- `.agentic/OVERVIEW.md` - Product vision and goals
 - `CONTEXT_PACK.md` - Architecture overview
-- `spec/PRD.md` - Product requirements
-- `spec/FEATURES.md` - Existing features
-- `spec/NFR.md` - Non-functional requirements
+- `.agentic/spec/FEATURES.md` - Existing features
+- `.agentic/spec/NFR.md` - Non-functional requirements
 - Implementation Agent handoff notes (if re-planning after discoveries)
 
 ## Responsibilities
@@ -31,12 +42,12 @@ The Planning Agent can be called again during a feature pipeline if:
 - Requirements change or are clarified
 - Scope needs adjustment
 
-In re-planning mode, update existing `spec/acceptance/F-####.md` rather than creating new.
+In re-planning mode, update existing `.agentic/spec/acceptance/F-####.md` rather than creating new.
 
 ## Output
 
 ### Acceptance Criteria File
-Create: `spec/acceptance/F-####.md`
+Create: `.agentic/spec/acceptance/F-####.md`
 ```markdown
 # F-####: [Feature Name] - Acceptance Criteria
 
@@ -50,10 +61,10 @@ Create: `spec/acceptance/F-####.md`
 ```
 
 ### ADR (if significant decision)
-Create: `spec/adr/ADR-####-[decision].md`
+Create: `.agentic/spec/adr/ADR-####-[decision].md`
 
 ### Feature Entry
-Add/update in `spec/FEATURES.md`:
+Add/update in `.agentic/spec/FEATURES.md`:
 ```markdown
 ## F-####: [Name]
 Status: planned
@@ -72,7 +83,7 @@ Dependencies: F-#### (if any)
 
 When done, update `.agentic/pipeline/F-{id}-pipeline.md`:
 ```markdown
-- [x] Planning Agent (HH:MM) → spec/acceptance/F-####.md
+- [x] Planning Agent (HH:MM) → .agentic/spec/acceptance/F-####.md
 ```
 
 Add handoff notes for Test Agent:

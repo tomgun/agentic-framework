@@ -2870,6 +2870,16 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### F-0234: Agent Definition Reconciliation + Drift Detection
+
+**User insight**: The plan came from recognizing that three parallel definition sets (roles/, subagents/, context-manifests/) had silently diverged — 20 subagents with no role counterpart, 4 roles with no subagent. The key design decision was "reconcile once, then enforce forever" — a one-time alignment without automated parity checks would re-diverge within weeks. The drift detection in validate_framework.sh is more valuable than the reconciliation itself.
+
+**User insight**: Scope discipline via Feature A/B split. The original plan tried to solve reconciliation AND manifest surfacing to non-Claude tools in one feature. The dialectical review correctly identified that bash YAML parsing for Cursor enrichment was the highest-risk component with independent value. Splitting into Feature A (structural reconciliation + drift detection) and Feature B (manifest surfacing with Python helper) reduced risk and delivered the enforcement value first.
+
+**Design direction**: Deprecation over deletion. The 4 role-only agents (architecture, cloud-expert, monetization, scientific-research) could have been deleted, but `deprecated: true` in frontmatter is machine-readable, reversible, and self-documenting. `setup_cursor_agents()` skips deprecated roles — they stay as reference but don't pollute user projects.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.55.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
