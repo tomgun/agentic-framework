@@ -117,6 +117,15 @@ _No active items_
 
 
 
+
+### HN-0049: PR #156: F-0229 annotation enforcement gate
+- **Type**: review
+- **Added**: 2026-03-18
+- **Context**: Adds Check 22 — annotation enforcement for newly-shipped features. Three modes: off/advisory/blocking.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics
