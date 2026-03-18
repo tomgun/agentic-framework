@@ -5158,10 +5158,7 @@ for role_file in "${ROLES_DIR}"/*.md; do
   [[ "$(basename "$role_file")" == "README.md" ]] && continue
   # Check if deprecated
   if grep -q "^deprecated: true" "$role_file" 2>/dev/null; then
-    # Verify deprecated frontmatter is present
-    if grep -q "^deprecated: true" "$role_file"; then
-      info "Deprecated role: $(basename "$role_file")"
-    fi
+    info "Deprecated role: $(basename "$role_file")"
     continue
   fi
   # Convert snake_case filename to kebab-case for matching
