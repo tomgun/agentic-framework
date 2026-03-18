@@ -3116,3 +3116,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-18 22:09 - Instruction File Sync
+
+**Why**: 14-day audit found CLAUDE.md missing 9 commands vs other templates
+
+**What changed**:
+- All 8 instruction files now have identical Quick Commands (26 commands). Added audit/nfr/transition triggers to cursor/copilot/codex.
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+
