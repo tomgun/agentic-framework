@@ -4106,7 +4106,7 @@ Proposed restructuring:
 
 ## F-0234: Agent Definition Reconciliation + Drift Detection
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Agent Infrastructure
 **Priority**: medium
 **Complexity**: medium

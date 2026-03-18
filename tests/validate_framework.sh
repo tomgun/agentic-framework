@@ -5200,6 +5200,7 @@ for role_file in "${ROLES_DIR}"/*.md; do
 done
 
 # Warn about subagents without roles (expected for domain specialists and plan-* agents)
+orphan_subagents=()
 for subagent_file in "${SUBAGENTS_DIR}"/*.md; do
   [[ "$(basename "$subagent_file")" == "README.md" ]] && continue
   sub_name="$(basename "$subagent_file" .md)"
@@ -5214,9 +5215,12 @@ for subagent_file in "${SUBAGENTS_DIR}"/*.md; do
     fi
   done
   if [[ "$found" == "false" ]]; then
-    warn "F-0234: Subagent '${sub_name}' has no corresponding role (expected for domain/plan-* agents)"
+    orphan_subagents+=("$sub_name")
   fi
 done
+if [[ ${#orphan_subagents[@]} -gt 0 ]]; then
+  warn "F-0234: ${#orphan_subagents[@]} subagents have no corresponding role (expected for domain/plan-* agents): ${orphan_subagents[*]}"
+fi
 
 # Count for summary
 active_count=${#active_roles[@]}
