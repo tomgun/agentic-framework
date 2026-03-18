@@ -135,6 +135,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0051: PR #158: Post-merge dogfood sync (F-0226)
+- **Type**: pr_review
+- **Added**: 2026-03-18
+- **Context**: https://github.com/tomgun/agentic-framework/pull/158
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics
