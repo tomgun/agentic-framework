@@ -3996,7 +3996,7 @@ Proposed restructuring:
 
 ## F-0229: Code Annotation Enforcement
 
-**Status**: planned
+**Status**: in_progress
 **Category**: Quality
 **Priority**: medium
 **Complexity**: medium
@@ -4005,12 +4005,12 @@ Proposed restructuring:
 **Epic**: E-0001 (Opportunity Map), Wave 1
 **Source**: `journal/plans/E-0001-opportunity-map-epic-plan.md`
 
-**Description**: Wire existing `coverage.py` into pre-commit as Check 21. When a feature transitions to `shipped`, validate that at least one `@feature F-XXXX` annotation exists. Controlled by `annotation_enforcement: off|advisory|blocking`. Default `off`, 157 shipped features grandfathered.
+**Description**: Wire existing `coverage.py` into pre-commit as Check 22. When a feature transitions to `shipped`, validate that at least one `@feature F-XXXX` annotation exists. Controlled by `annotation_enforcement: off|advisory|blocking`. Default `off`, existing shipped features grandfathered.
 
 **Implementation**:
-- State: none
+- State: partial
 - Code: `.agentic/lib/hooks/pre-commit-check.sh`, `.agentic/lib/tools/coverage.py`, `.agentic/lib/presets/profiles.conf`, `.agentic/lib/workflows/code_annotations.md`
-- Tests: TBD
+- Tests: `tests/test_annotation_enforcement.sh`
 
 **Acceptance**: See `spec/acceptance/F-0229.md`
 

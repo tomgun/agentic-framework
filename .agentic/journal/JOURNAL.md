@@ -3079,3 +3079,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-18 13:48 - F-0229 Annotation Enforcement
+
+**Why**: coverage.py detected missing annotations but nothing enforced adding them at commit time
+
+**What changed**:
+- Pre-commit Check 22 gates newly-shipped features for @feature annotations — three modes (off/advisory/blocking) with profile defaults, grandfathering for existing features
+
+**Next steps**:
+- PR review, merge, ag done
+
+**Blockers**: None
+
