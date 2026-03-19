@@ -1,24 +1,14 @@
 [
   {
     "type": "feature",
-    "id": "F-0217",
-    "description": "NFR-Aware Test Writing",
-    "added_at": "2026-03-16T18:56:05Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0217.md"
-    ],
-    "became_current_at": "2026-03-19T17:05:24Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0218",
     "description": "NFR Propagation Pipeline",
     "added_at": "2026-03-16T18:56:06Z",
     "added_by": "agent",
     "refs": [
       ".agentic/spec/acceptance/F-0218.md"
-    ]
+    ],
+    "became_current_at": "2026-03-19T17:10:00Z"
   },
   {
     "type": "feature",

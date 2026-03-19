@@ -3738,7 +3738,7 @@ Proposed restructuring:
 
 ## F-0217: NFR-Aware Test Writing
 
-**Status**: planned
+**Status**: shipped
 **Category**: Quality
 **Priority**: high
 **Complexity**: medium
