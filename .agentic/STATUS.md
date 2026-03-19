@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Dogfood drift fixed. PR #165 (pipeline summary) and PR #166 (drift) merged. (Updated: 2026-03-19 17:56 UTC)
+- F-0220 merged. Post-merge complete. (Updated: 2026-03-19 19:20 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

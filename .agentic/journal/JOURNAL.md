@@ -3373,3 +3373,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 19:19 - PR #168 Merged
+
+**Why**: Doc enforcement + sync safety
+
+**What changed**:
+- Structural doc freshness gate (F-0220) + fix check-environment.sh PROJECT_ROOT bug that caused ag sync to overwrite root files
+
+**Next steps**:
+- Clean up stale branches
+
+**Blockers**: None
+
