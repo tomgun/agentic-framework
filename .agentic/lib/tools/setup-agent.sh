@@ -6,7 +6,7 @@
 #   bash .agentic/tools/setup-agent.sh all
 #
 # Supported tools:
-#   claude       - Creates CLAUDE.md (auto-loaded by Claude Code)
+#   claude       - Creates CLAUDE.md + .claude/ (hooks, skills, subagents)
 #   cursor       - Creates .cursorrules (auto-loaded by Cursor)
 #   copilot      - Creates .github/copilot-instructions.md (auto-loaded by GitHub Copilot)
 #   codex        - Creates .codex/instructions.md (auto-loaded by OpenAI Codex CLI)
@@ -41,7 +41,7 @@ show_help() {
   echo "Usage: bash .agentic/tools/setup-agent.sh <tool>"
   echo ""
   echo "Auto-Loaded Files:"
-  echo "  claude         Create CLAUDE.md for Claude Code"
+  echo "  claude         Create CLAUDE.md + .claude/ (hooks, skills, subagents)"
   echo "  cursor         Create .cursorrules for Cursor"
   echo "  copilot        Create .github/copilot-instructions.md for GitHub Copilot"
   echo "  codex          Create .codex/instructions.md for OpenAI Codex CLI"
@@ -60,23 +60,58 @@ show_help() {
 
 setup_claude() {
   echo -e "${BLUE}Setting up Claude Code...${NC}"
-  
+
+  # 1. CLAUDE.md (auto-loaded instruction file)
   TARGET="$PROJECT_ROOT/CLAUDE.md"
   SOURCE="$AGENTIC_DIR/agents/claude/CLAUDE.md"
-  
+
   if [[ -f "$TARGET" ]]; then
     echo -e "${YELLOW}⚠ CLAUDE.md already exists. Backing up to CLAUDE.md.bak${NC}"
     cp "$TARGET" "$TARGET.bak"
   fi
-  
+
   if [[ -f "$SOURCE" ]]; then
     cp "$SOURCE" "$TARGET"
     echo -e "${GREEN}✓ Created CLAUDE.md${NC}"
-    echo "  Claude Code will now auto-load framework instructions."
   else
     echo -e "${RED}✗ Source file not found: $SOURCE${NC}"
     return 1
   fi
+
+  # 2. Claude Code hooks (.claude/hooks.json)
+  local HOOKS_SOURCE="$AGENTIC_DIR/claude-hooks/hooks.json"
+  if [[ -f "$HOOKS_SOURCE" ]]; then
+    mkdir -p "$PROJECT_ROOT/.claude"
+    cp "$HOOKS_SOURCE" "$PROJECT_ROOT/.claude/hooks.json"
+    echo -e "${GREEN}✓ Installed hooks (.claude/hooks.json)${NC}"
+  fi
+
+  # 3. Claude Skills (.claude/skills/)
+  local SKILLS_GEN="$SCRIPT_DIR/generate-skills.sh"
+  if [[ -f "$SKILLS_GEN" ]] && [[ -d "$AGENTIC_DIR/agents/claude/skills" ]]; then
+    bash "$SKILLS_GEN" 2>/dev/null || true
+    local skill_count
+    skill_count=$(ls -1 "$PROJECT_ROOT/.claude/skills/" 2>/dev/null | wc -l | tr -d ' ')
+    if [[ "$skill_count" -gt 0 ]]; then
+      echo -e "${GREEN}✓ Generated $skill_count Claude Skills (.claude/skills/)${NC}"
+    fi
+  fi
+
+  # 4. Claude Subagents (.claude/subagents/ — symlink to source)
+  local SUBAGENTS_SOURCE="$AGENTIC_DIR/agents/claude/subagents"
+  if [[ -d "$SUBAGENTS_SOURCE" ]]; then
+    mkdir -p "$PROJECT_ROOT/.claude"
+    # Copy subagent definitions so they're available to Claude Code
+    if [[ -d "$PROJECT_ROOT/.claude/subagents" ]]; then
+      rm -rf "$PROJECT_ROOT/.claude/subagents"
+    fi
+    cp -r "$SUBAGENTS_SOURCE" "$PROJECT_ROOT/.claude/subagents"
+    local sub_count
+    sub_count=$(ls -1 "$PROJECT_ROOT/.claude/subagents/"*.md 2>/dev/null | wc -l | tr -d ' ')
+    echo -e "${GREEN}✓ Installed $sub_count subagent definitions (.claude/subagents/)${NC}"
+  fi
+
+  echo "  Claude Code will auto-load framework instructions, hooks, skills, and subagents."
 }
 
 setup_cursor() {

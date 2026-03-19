@@ -257,52 +257,21 @@ fi
 
 echo ""
 
-# Step 5b: Regenerate Claude Skills
-echo -e "${BLUE}[5b/8] Regenerating Claude Skills${NC}"
+# Step 5b: Regenerate Claude Code artifacts (skills, hooks, subagents)
+echo -e "${BLUE}[5b/8] Regenerating Claude Code artifacts${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 if [[ "$DRY_RUN" == "yes" ]]; then
-  echo "  [DRY RUN] Would regenerate Claude Skills"
-elif [[ -f "$TARGET_PROJECT_DIR/.agentic/lib/tools/generate-skills.sh" ]]; then
-  # Remove old generated skills (keep custom skills)
-  if [[ -d "$TARGET_PROJECT_DIR/.claude/skills" ]]; then
-    # Remove skills from old subagent-based generator or current framework generator
-    for skill_dir in "$TARGET_PROJECT_DIR/.claude/skills"/*; do
-      if [[ -d "$skill_dir" ]] && [[ -f "$skill_dir/SKILL.md" ]]; then
-        if grep -q "Generated from: .agentic/lib/agents/claude/subagents" "$skill_dir/SKILL.md" 2>/dev/null || \
-           grep -q "author: agentic-framework" "$skill_dir/SKILL.md" 2>/dev/null; then
-          rm -rf "$skill_dir"
-        fi
-      fi
-    done
-  fi
-
-  # Generate fresh skills
-  bash "$TARGET_PROJECT_DIR/.agentic/lib/tools/generate-skills.sh" 2>/dev/null || true
-
-  if [[ -d "$TARGET_PROJECT_DIR/.claude/skills" ]]; then
-    SKILL_COUNT=$(ls -1 "$TARGET_PROJECT_DIR/.claude/skills/" 2>/dev/null | wc -l | tr -d ' ')
-    EXT_SKILL_COUNT=0
-    if [[ -d "$TARGET_PROJECT_DIR/.agentic/local/extensions/skills" ]]; then
-      EXT_SKILL_COUNT=$(find "$TARGET_PROJECT_DIR/.agentic/local/extensions/skills" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
-    fi
-    if [[ $EXT_SKILL_COUNT -gt 0 ]]; then
-      echo -e "  ${GREEN}✓${NC} Regenerated $SKILL_COUNT Claude Skills (including $EXT_SKILL_COUNT extension skills)"
-    else
-      echo -e "  ${GREEN}✓${NC} Regenerated $SKILL_COUNT Claude Skills"
-    fi
-  else
-    echo -e "  ${YELLOW}⚠${NC} No skills generated"
+  echo "  [DRY RUN] Would regenerate Claude artifacts"
+elif [[ -d "$TARGET_PROJECT_DIR/.claude" ]] || [[ -f "$TARGET_PROJECT_DIR/CLAUDE.md" ]]; then
+  # User has Claude set up — regenerate all Claude artifacts via setup_claude()
+  # This handles: CLAUDE.md, hooks.json, skills, subagents
+  if [[ -x "$TARGET_PROJECT_DIR/.agentic/lib/tools/setup-agent.sh" ]]; then
+    bash "$TARGET_PROJECT_DIR/.agentic/lib/tools/setup-agent.sh" claude 2>/dev/null || true
   fi
 else
-  echo -e "  ${YELLOW}⚠${NC} generate-skills.sh not found, skipping"
-fi
-
-# Update Claude Code hooks.json from template
-if [[ -f "$TARGET_PROJECT_DIR/.agentic/lib/claude-hooks/hooks.json" ]]; then
-  mkdir -p "$TARGET_PROJECT_DIR/.claude"
-  cp "$TARGET_PROJECT_DIR/.agentic/lib/claude-hooks/hooks.json" "$TARGET_PROJECT_DIR/.claude/hooks.json"
-  echo -e "  ${GREEN}✓${NC} Updated Claude Code hooks (.claude/hooks.json)"
+  echo -e "  ${YELLOW}⚠${NC} No .claude/ directory — Claude not configured. Skipping."
+  echo "  Run 'bash .agentic/tools/setup-agent.sh claude' to set up Claude Code."
 fi
 
 echo ""

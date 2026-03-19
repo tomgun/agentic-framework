@@ -193,26 +193,16 @@ else
 fi
 echo ""
 
-# Step 6: Generate Claude Skills (if skill sources exist)
-echo -e "${BLUE}[6/7] Generating Claude Skills${NC}"
+# Step 6: Claude Code artifacts (skills, hooks, subagents)
+# These are generated as part of setup_claude() in setup-agent.sh.
+# scaffold.sh calls setup-agent.sh all, which includes setup_claude().
+# If the user later adds Claude via init_playbook, setup-agent.sh claude handles it.
+echo -e "${BLUE}[6/7] Claude Code Artifacts${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-if [[ -f ".agentic/lib/tools/generate-skills.sh" ]] && [[ -d ".agentic/lib/agents/claude/skills" ]]; then
-  bash .agentic/lib/tools/generate-skills.sh 2>/dev/null || true
-  if [[ -d ".claude/skills" ]]; then
-    SKILL_COUNT=$(ls -1 .claude/skills/ 2>/dev/null | wc -l | tr -d ' ')
-    echo -e "  ${GREEN}✓${NC} Generated $SKILL_COUNT Claude Skills in .claude/skills/"
-    echo "    Skills are auto-discovered by Claude Code based on task description."
-  fi
+if [[ -d ".claude" ]]; then
+  echo -e "  ${GREEN}✓${NC} .claude/ exists (created by scaffold — includes hooks, skills, subagents)"
 else
-  echo -e "  ${YELLOW}⚠${NC} Skipping (no skill sources found)"
-fi
-
-# Copy Claude Code hooks.json if template exists
-if [[ -f ".agentic/lib/claude-hooks/hooks.json" ]]; then
-  mkdir -p .claude
-  cp .agentic/lib/claude-hooks/hooks.json .claude/hooks.json
-  echo -e "  ${GREEN}✓${NC} Installed Claude Code hooks (.claude/hooks.json)"
+  echo -e "  ${YELLOW}⚠${NC} .claude/ not found. Run 'bash .agentic/tools/setup-agent.sh claude' to set up Claude Code."
 fi
 echo ""
 
