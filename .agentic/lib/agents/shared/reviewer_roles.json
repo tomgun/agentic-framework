@@ -1,0 +1,52 @@
+{
+  "roles": {
+    "critic": {
+      "agent_file": "plan-critic-agent.md",
+      "mandate": "Find flaws, risks, blind spots",
+      "required": true,
+      "model_tier": "mid-tier"
+    },
+    "advocate": {
+      "agent_file": "plan-advocate-agent.md",
+      "mandate": "Explain trade-offs, defend decisions",
+      "required": true,
+      "model_tier": "mid-tier"
+    },
+    "ux_designer": {
+      "agent_file": "plan-ux-reviewer-agent.md",
+      "mandate": "User experience impact, interaction flows, accessibility",
+      "required": false,
+      "model_tier": "mid-tier"
+    },
+    "architect": {
+      "agent_file": "plan-architect-reviewer-agent.md",
+      "mandate": "System design, patterns, scalability, coupling",
+      "required": false,
+      "model_tier": "mid-tier"
+    },
+    "qa_expert": {
+      "agent_file": "plan-qa-reviewer-agent.md",
+      "mandate": "Testability, test coverage gaps, test strategy",
+      "required": false,
+      "model_tier": "mid-tier"
+    },
+    "security_expert": {
+      "agent_file": "plan-security-reviewer-agent.md",
+      "mandate": "Security implications, threat modeling, auth, data handling",
+      "required": false,
+      "model_tier": "mid-tier"
+    },
+    "ops_expert": {
+      "agent_file": "plan-ops-reviewer-agent.md",
+      "mandate": "Deployment, monitoring, runbooks, rollback, observability",
+      "required": false,
+      "model_tier": "mid-tier"
+    },
+    "db_expert": {
+      "agent_file": "plan-db-reviewer-agent.md",
+      "mandate": "Data modeling, migration safety, query performance, indexing",
+      "required": false,
+      "model_tier": "mid-tier"
+    }
+  }
+}

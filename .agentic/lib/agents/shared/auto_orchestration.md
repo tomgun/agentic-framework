@@ -166,9 +166,14 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
 
 3. CHECK PLAN-REVIEW SETTING
    └─ Read STACK.md → plan_review_enabled (default: yes for formal/autonomous_formal profiles)
-   ├─ If yes: Run `ag plan F-####` — uses dialectical review (Critic + Advocate
-   │          in parallel, fresh context). User decides Proceed/Revise/Reject.
-   │          Mention max iterations from plan_review_max_iterations.
+   ├─ If yes: Run `ag plan F-####` — uses dialectical review.
+   │   ├─ If plan_review_convergence: auto (F-0236): convergence loop runs
+   │   │   automatically — spawns all reviewers from plan_review_reviewers
+   │   │   (Critic + Advocate + optional experts), synthesizes, checks
+   │   │   convergence, auto-revises until converged or max_iterations
+   │   │   (ENFORCED — escalates to HUMAN_NEEDED at limit).
+   │   └─ If manual: Critic + Advocate in parallel (fresh context).
+   │      User decides Proceed/Revise/Reject.
    └─ If no: Proceed directly (or run ag plan --no-review for simple plan)
 
 4. CHECK DEVELOPMENT MODE
@@ -547,7 +552,7 @@ For hands-off execution. Require test commands in STACK.md; task/crunch require 
 |------|---------|-------------|
 | **Verify** | `ag auto verify` | Test-fix loop: runs tests, spawns fresh Claude to fix failures, repeats until green or max iterations |
 | **Verify + Visual** | `ag auto verify --visual` | Same + collects E2E screenshots + AI visual review via Anthropic API. Add `--feature F-XXXX` to save evidence for smoke test gate. |
-| **Task** | `ag auto task F-XXXX` | Reads ACs, creates branch, spawns Claude per AC, tests, commits passing work, creates PR |
+| **Task** | `ag auto task F-XXXX` | Reads ACs, creates branch, spawns Claude per AC, tests, commits passing work, creates PR. If `review_pr: critical_agent`: auto-reviews PR, auto-fixes findings (up to `pr_fix_max_attempts`), applies verdict to GitHub (F-0235) |
 | **Task + Visual** | `ag auto task F-XXXX --visual` | Same + visual review at final verification step |
 | **Crunch** | `ag auto crunch` | Reads planned features from FEATURES.md, runs task mode for each, stops on max errors |
 | **Epic** | `ag auto epic F-XXXX` | Reads epic's child features, schedules component-scoped workers with non-blocking reviews, executes autonomously |

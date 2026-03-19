@@ -55,9 +55,12 @@ class TaskResult:
     ac_results: list[ACResult] = field(default_factory=list)
     branch_name: str = ""
     pr_url: str = ""
+    pr_review_verdict: str = ""   # approved | request_changes | needs_discussion | skipped
+    pr_review_summary: str = ""
+    pr_fix_attempts: int = 0
 
     def to_dict(self) -> dict:
-        return {
+        d = {
             "feature_id": self.feature_id,
             "success": self.success,
             "acs_total": self.acs_total,
@@ -78,6 +81,11 @@ class TaskResult:
                 for r in self.ac_results
             ],
         }
+        if self.pr_review_verdict:
+            d["pr_review_verdict"] = self.pr_review_verdict
+            d["pr_review_summary"] = self.pr_review_summary
+            d["pr_fix_attempts"] = self.pr_fix_attempts
+        return d
 
 
 class TaskRunner:
@@ -209,7 +217,39 @@ class TaskRunner:
             result.acs_passed == result.acs_total
             and result.verification_passed
         )
+
+        # F-0235: Auto-review PR (fires after success is computed —
+        # result.success reflects implementation correctness only)
+        if result.pr_url and result.success:
+            review_result = self._review_pr(feature_id, result.pr_url)
+            result.pr_review_verdict = review_result.verdict
+            result.pr_review_summary = review_result.summary
+            result.pr_fix_attempts = review_result.fix_attempts
+
         return result
+
+    def _review_pr(self, feature_id: str, pr_url: str):
+        """Run auto-review on a PR (F-0235)."""
+        from auto.pr_review import PRReviewer, PRReviewResult
+
+        # Extract PR number from URL (e.g., https://github.com/org/repo/pull/42)
+        pr_number = 0
+        try:
+            pr_number = int(pr_url.rstrip("/").split("/")[-1])
+        except (ValueError, IndexError):
+            return PRReviewResult(
+                verdict="skipped",
+                summary="Could not parse PR number from URL",
+            )
+
+        reviewer = PRReviewer(
+            project_root=self.project_root,
+            claude_command=self.claude_command,
+        )
+        return reviewer.review_and_fix(
+            pr_number=pr_number,
+            feature_id=feature_id,
+        )
 
     def _create_branch(self, feature_id: str) -> str:
         """Create and checkout a feature branch."""

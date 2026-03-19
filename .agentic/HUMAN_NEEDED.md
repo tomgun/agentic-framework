@@ -144,6 +144,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0052: PR #160: Instruction file doc sync (14-day audit)
+- **Type**: pr
+- **Added**: 2026-03-18
+- **Context**: https://github.com/tomgun/agentic-framework/pull/160 — sync Quick Commands + trigger words across all 8 templates
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics

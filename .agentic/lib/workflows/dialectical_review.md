@@ -97,35 +97,38 @@ Both agents:
 
 ## Synthesis Format
 
-The orchestrating agent synthesizes both outputs and presents inline to the user:
+The orchestrating agent synthesizes all reviewer outputs. When expert reviewers are configured (F-0236), their domain-specific findings are included:
 
 ```markdown
 # Dialectical Review: F-XXXX (Iteration N)
 
 **Plan**: `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` (dated plan file)
 **Conducted**: YYYY-MM-DD
+**Reviewers**: Critic, Advocate[, Security Expert, Architect, ...]
 
 ## High-Confidence Findings
-[Where both critic and advocate agree — strongest signals]
+[Where 2+ reviewers agree on a concern — these MUST be addressed]
 
-## Points of Contention
+## Critic-Advocate Debate
 | Topic | Critic Position | Advocate Position |
 |-------|----------------|-------------------|
 
-## Uncontested Critic Concerns
-[Raised by critic, not addressed by advocate]
+## Expert Advisories
+[Domain-specific findings from expert reviewers, not contested by dialectical pair]
+- **[Expert Role]**: [Finding]
 
-## Uncontested Advocate Strengths
-[Highlighted by advocate, not challenged by critic]
-
-## Revision Guidance (if user chooses to revise)
-1. [Most critical — from High-Confidence Findings]
-2. [Important — from Uncontested Critic Concerns]
-3. [Consider — from Points of Contention where Critic has stronger case]
+## Revision Guidance
+1. [Most critical — drives auto-revision in convergence mode]
+2. [Important]
+3. [Consider]
 
 ## Summary
 [Neutral: what the user should pay attention to before deciding]
 ```
+
+### Extended Reviewer Roles (F-0236)
+
+Beyond Critic + Advocate, teams can configure domain experts via `plan_review_reviewers` in STACK.md. Expert roles are defined in `.agentic/lib/agents/shared/reviewer_roles.json`. Each expert follows the same structured output format for uniform synthesis.
 
 ### Synthesis Rules (for the orchestrating agent)
 

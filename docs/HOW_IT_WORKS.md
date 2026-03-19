@@ -374,6 +374,15 @@ flowchart TB
 
     AC_LOOP --> VERIFY[Run verify loop<br/>F-0161]
     VERIFY --> PR[Create PR for review]
+    PR --> REVIEW{review_pr setting?}
+    REVIEW -->|critical_agent| AUTO_REVIEW[Auto-review PR<br/>F-0235]
+    REVIEW -->|human| BLOCK[Create review block<br/>HUMAN_NEEDED]
+    REVIEW -->|skip| DONE[Done]
+    AUTO_REVIEW --> FIX{Approved?}
+    FIX -->|Yes| DONE
+    FIX -->|No + attempts left| FIX_AGENT[Auto-fix agent]
+    FIX_AGENT --> AUTO_REVIEW
+    FIX -->|No + max attempts| BLOCK
 
     style AC_LOOP fill:#f0f0f0,stroke:#999
 ```
@@ -669,7 +678,7 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 | **HUMAN_NEEDED.md Escalation** (F-0026) | `blocker.sh add "Title" "type" "Details"` creates entries. Agents read at session start. Humans can `cat HUMAN_NEEDED.md` for zero-token check. | ACTIVE |
 | **Manual Operations** (F-0067) | `MANUAL_OPERATIONS.md` documents all queries humans can run without agent (zero tokens). `cat STATUS.md`, `grep` patterns for feature status. | ACTIVE - documentation |
 | **PR Workflow** (F-0096) | Default for Formal. `pre-commit-check.sh` Check 11 blocks commits to main when `git_workflow: pull_request`. Forces feature branches + human review via PRs. | ACTIVE - structural gate |
-| **Plan-Review Loop** (F-0120, F-0191) | Planner creates plan → Critic + Advocate agents review in parallel (fresh context) → orchestrator synthesizes with Revision Guidance → user decides Proceed/Revise/Reject. Iterative. No single reviewer has authority. Configurable: `plan_review_enabled` in STACK.md. | ACTIVE |
+| **Plan-Review Loop** (F-0120, F-0191, F-0236) | Planner creates plan → configurable reviewers (Critic + Advocate + optional experts) review in parallel (fresh context) → synthesis with Revision Guidance → convergence check. In `auto` mode (F-0236): loop auto-revises until converged or max iterations (enforced), then auto-approves (autonomous) or presents to user (interactive). Expert roles from `reviewer_roles.json` catalog. | ACTIVE |
 | **No Auto-Commits** (R2, amended by F-0203) | Interactive sessions: always human review before commit. Autonomous workflows (`ag auto task/epic`): `review_commit: critical_agent` enables adversarial diff review and auto-commit. LLM test 005 validates interactive compliance. Profile defaults: discovery/formal=human, autonomous_formal=critical_agent. | ACTIVE - behavioral + structural |
 | **Scope Drift Warning** (F-0114) | `scope_check.sh` compares changed files against WIP declared scope. Pre-commit warns on drift. Human judges whether drift is acceptable. | ACTIVE - advisory warning |
 | **CONTRIBUTIONS.md** | Logs human design insights and direction. Agent tracks human ideas vs agent implementation work. | ACTIVE - behavioral |
