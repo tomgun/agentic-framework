@@ -2605,18 +2605,18 @@ else:
 
             # NFR auto-generation: capture suggestions and write to staging (AC-008, AC-009)
             local nfr_suggestions=""
-            nfr_suggestions=$(bash "$SCRIPT_DIR/nfr-generate.sh" --machine --limit 8 2>/dev/null || true)
+            nfr_suggestions=$(bash "$SCRIPT_DIR/nfr-generate.sh" --limit 8 2>/dev/null || true)
             if [ -n "$nfr_suggestions" ]; then
                 local staging_dir="$ROOT_DIR/.agentic/session/kickoff-draft"
                 mkdir -p "$staging_dir"
                 echo "$nfr_suggestions" > "$staging_dir/NFR-SUGGESTIONS.md"
                 echo ""
                 echo "NFR SUGGESTIONS (auto-generated, saved to staging):"
-                echo '```'
                 echo "$nfr_suggestions"
-                echo '```'
+                echo ""
                 echo "These NFR suggestions are saved at $staging_dir/NFR-SUGGESTIONS.md"
                 echo "After features are generated, present these to the user for review."
+                echo "To write selected NFRs: bash $SCRIPT_DIR/nfr-generate.sh --machine --limit 8 | bash $SCRIPT_DIR/nfr-write-batch.sh"
             fi
             ;;
     esac
@@ -4034,8 +4034,9 @@ cmd_nfr() {
             echo ""
             # Run nfr-generate.sh for smart recommendations (default limit 8)
             local gen_args=("--limit" "8")
-            # Pass through any remaining args (--project-type, --components, --all, --limit override)
-            [[ $# -gt 0 ]] && gen_args=("$@")
+            # Append any remaining args (--project-type, --components, --all)
+            # User can override --limit by passing their own --limit N (last wins in arg parsing)
+            [[ $# -gt 0 ]] && gen_args+=("$@")
             bash "$SCRIPT_DIR/nfr-generate.sh" "${gen_args[@]}"
             local rc=$?
             if [[ $rc -eq 0 ]]; then

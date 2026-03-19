@@ -25,6 +25,10 @@ FAILURES=0
 check_output_contains "nfr.*discover\|nfr-generate\|nfr.*recommend\|NFR.*suggestion" \
     "Agent should suggest NFR discovery tool or ag nfr discover" || ((FAILURES++))
 
+# Agent should reference batch writer for writing selected NFRs (F-0216)
+check_output_contains "nfr-write-batch\|batch.*writ\|pipe.*nfr\|--machine" \
+    "Agent should reference batch writer or machine output for writing NFRs" || ((FAILURES++))
+
 # Agent should NOT jump to writing code
 check_output_not_contains "npm install\|yarn add\|pip install" \
     "Agent should not jump to installing packages" || ((FAILURES++))
