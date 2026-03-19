@@ -181,9 +181,9 @@ If the user says "write spec", "create spec", "add acceptance criteria", "update
 
 ## When the user wants to run tests
 
-If the user says "run tests", "test", "LLM tests", or "ag test":
+If the user says "run tests", "test", or "ag test":
 
-**STOP.** Run `ag test llm` for LLM behavioral tests. Use `ag test llm --critical` for critical-only subset. These verify agents follow framework rules — the LLM layer decides if deterministic code gets called.
+**STOP.** Run `ag test` to execute the project's test suite (reads test commands from STACK.md `## Testing`). Use `ag test llm` for LLM behavioral tests if the project has them configured (`llm_tests_enabled: yes` in STACK.md).
 
 ## When the user asks about feature state or transitions
 
