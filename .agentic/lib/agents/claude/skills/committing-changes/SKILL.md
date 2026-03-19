@@ -97,6 +97,25 @@ After human approves:
    ```
    Stay on main — the feature branch work is done (it's in the PR now).
 
+### Step 6.5: Pipeline Summary (when presenting PR to user)
+
+After creating the PR, present a numbered summary of all pipeline phases that were executed. This gives the user visibility into what the autonomous pipeline did. One line per phase, skip phases that didn't happen:
+
+1. **Plan review**: What happened (e.g., dialectical review, issues found, plan revised)
+2. **Implementation**: Key files/tools created or modified
+3. **Tests**: Pass counts, any pre-existing failures noted
+4. **PR created**: Commit count, PR number/URL
+5. **Critical agent review**: Issues found, fixes applied
+6. **Fixes pushed**: If review required changes
+
+Example:
+> 1. **Plan review**: Critic + Advocate in parallel. 3 revisions incorporated.
+> 2. **Implementation**: new-tool.sh, ag.sh integration, 2 skill updates
+> 3. **Tests**: 22/22 unit, 12/12 integration, 711 framework validation
+> 4. **PR created**: 2 commits → PR #163
+> 5. **Critical agent review**: Found gen_args bug + missing LLM test, fixed
+> 6. **Fix committed and pushed**
+
 ### Step 7: Post-Merge (run automatically — don't wait for user)
 
 When you merge a PR (via `gh pr merge`) or the user says "merge", IMMEDIATELY
