@@ -258,6 +258,8 @@ If NFR.md exists but only has template content (no project-specific NFRs) after 
 
 > "You've shipped 3+ features but haven't defined project-specific NFRs yet. Quality constraints help catch issues early. Run `ag nfr discover` to review suggestions for your stack."
 
+`ag nfr discover` presents 4-8 pre-selected recommendations (not the full catalog) based on stack detection. User picks which ones matter, then the batch writer handles NFR.md creation: `nfr-generate.sh --machine --limit 8 | nfr-write-batch.sh`. During `ag kickoff`, NFR suggestions are auto-generated and saved to the staging area.
+
 ## Where to log things
 
 - Prioritized work item → `ag backlog add F-XXXX` or `ag backlog add --task "desc"` (.agentic/BACKLOG.json)
