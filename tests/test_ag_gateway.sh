@@ -43,10 +43,17 @@ setup_test_env() {
     mkdir -p "$TEST_DIR/.agentic/lib/presets"
     mkdir -p "$TEST_DIR/.agentic/session"
     cp "$AG_SCRIPT" "$TEST_DIR/.agentic/lib/tools/ag.sh"
+    # Copy command modules (F-0221: ag.sh sources these)
+    if [ -d "$FRAMEWORK_ROOT/.agentic/lib/tools/commands" ]; then
+        mkdir -p "$TEST_DIR/.agentic/lib/tools/commands"
+        cp "$FRAMEWORK_ROOT/.agentic/lib/tools/commands/"*.sh "$TEST_DIR/.agentic/lib/tools/commands/" 2>/dev/null || true
+    fi
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/list-tools.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/wip.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/tools/intent-helpers.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/tools/ac-parse.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/ids.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/" 2>/dev/null || true
     cd "$TEST_DIR"

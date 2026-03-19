@@ -17,6 +17,18 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 VERBOSE="${1:-}"
 
+# F-0221: ag.sh is decomposed into sourced modules under commands/
+# grep_ag searches ag.sh AND all command modules for simple -q checks.
+# Use raw grep against $AG_SH and $AG_CMDS_DIR/*.sh when you need flags
+# like -A (context), -c (count), or -r (recursive with counts).
+AG_SH="${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"
+AG_CMDS_DIR="${FRAMEWORK_ROOT}/.agentic/lib/tools/commands"
+grep_ag() {
+    grep -q "$@" "$AG_SH" 2>/dev/null && return 0
+    [ -d "$AG_CMDS_DIR" ] && grep -rq "$@" "$AG_CMDS_DIR/" 2>/dev/null && return 0
+    return 1
+}
+
 PASSED=0
 FAILED=0
 WARNINGS=0
@@ -1067,13 +1079,13 @@ else
 fi
 
 # ag.sh has test llm command
-if grep -q 'cmd_test_llm' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag 'cmd_test_llm'; then
   pass "ag.sh has cmd_test_llm function"
 else
   fail "ag.sh missing cmd_test_llm function"
 fi
 
-if grep -q 'ag test llm' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag 'ag test llm'; then
   pass "ag.sh documents 'ag test llm' command"
 else
   fail "ag.sh missing 'ag test llm' documentation"
@@ -1498,7 +1510,7 @@ else
 fi
 
 # ag work shows improved nudge
-if grep -q "rough acceptance criteria" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "rough acceptance criteria"; then
   pass "F-0130: ag work has improved criteria nudge"
 else
   fail "F-0130: ag work missing improved nudge"
@@ -1519,7 +1531,7 @@ else
 fi
 
 # ag done surfaces [Discovered] markers
-if grep -q '\[Discovered\]' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag '\[Discovered\]'; then
   pass "F-0130: ag done surfaces discovered markers"
 else
   fail "F-0130: ag done missing discovered marker surfacing"
@@ -1629,7 +1641,7 @@ else
 fi
 
 # AC-034/035: ag auto in help text
-if grep -q "auto" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "auto"; then
   pass "F-0160: ag auto command exists in ag.sh"
 else
   fail "F-0160: ag auto command missing from ag.sh"
@@ -1733,7 +1745,7 @@ else
 fi
 
 # ag auto verify command in ag.sh
-if grep -q "verify)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "verify)"; then
   pass "F-0161: ag auto verify in ag.sh"
 else
   fail "F-0161: ag auto verify missing from ag.sh"
@@ -1809,7 +1821,7 @@ else
 fi
 
 # ag auto task in ag.sh
-if grep -q "task)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "task)"; then
   pass "F-0162: ag auto task in ag.sh"
 else
   fail "F-0162: ag auto task missing from ag.sh"
@@ -1886,7 +1898,7 @@ else
 fi
 
 # ag auto crunch in ag.sh
-if grep -q "crunch)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "crunch)"; then
   pass "F-0163: ag auto crunch in ag.sh"
 else
   fail "F-0163: ag auto crunch missing from ag.sh"
@@ -1971,14 +1983,14 @@ else
 fi
 
 # ag.sh has ag set command
-if grep -q "cmd_set" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "cmd_set"; then
   pass "Settings: ag.sh has set command"
 else
   fail "Settings: ag.sh missing set command"
 fi
 
 # ag.sh sources settings.sh
-if grep -q 'source.*settings.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag 'source.*settings.sh'; then
   pass "Settings: ag.sh sources settings.sh"
 else
   fail "Settings: ag.sh doesn't source settings.sh"
@@ -2254,7 +2266,7 @@ else
   fail "F-0171: test-review-prompt missing key question"
 fi
 
-if grep -q "cmd_audit\|audit)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "cmd_audit\|audit)"; then
   pass "F-0171: ag.sh has audit command"
 else
   fail "F-0171: ag.sh missing audit command"
@@ -2757,19 +2769,19 @@ else
 fi
 
 # ag.sh has docs_gate gate logic in cmd_done
-if grep -q "docs_gate" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "docs_gate"; then
   pass "F-0138: ag.sh has docs_gate logic"
 else
   fail "F-0138: ag.sh missing docs_gate logic"
 fi
-if grep -q "drift.sh.*--docs" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "drift.sh.*--docs"; then
   pass "F-0138: ag.sh calls drift.sh --docs in ag done"
 else
   fail "F-0138: ag.sh missing drift.sh --docs call"
 fi
 
 # ag.sh validates docs_gate enum values in ag set
-if grep -q "docs_gate)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "docs_gate)"; then
   pass "F-0138: ag.sh validates docs_gate enum in ag set"
 else
   fail "F-0138: ag.sh missing docs_gate validation in ag set"
@@ -2885,33 +2897,33 @@ else
 fi
 
 # ag.sh has cmd_docs function
-if grep -q "cmd_docs" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "cmd_docs"; then
   pass "F-0139: ag.sh has cmd_docs function"
 else
   fail "F-0139: ag.sh missing cmd_docs"
 fi
 
 # ag.sh has docs) case in dispatch
-if grep -q "^    docs)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "^    docs)"; then
   pass "F-0139: ag.sh has docs command dispatch"
 else
   fail "F-0139: ag.sh missing docs command dispatch"
 fi
 
 # ag.sh wires docs.sh into cmd_done
-if grep -q "docs.sh.*--trigger feature_done" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "docs.sh.*--trigger feature_done"; then
   pass "F-0139: ag.sh wires docs.sh feature_done into ag done"
 else
   fail "F-0139: ag.sh missing docs.sh feature_done wiring in ag done"
 fi
-if grep -q "docs.sh.*--trigger pr" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "docs.sh.*--trigger pr"; then
   pass "F-0139: ag.sh wires docs.sh pr trigger"
 else
   fail "F-0139: ag.sh missing docs.sh pr trigger wiring"
 fi
 
 # ag.sh wires docs.sh session into ag sync
-if grep -q "docs.sh.*--trigger session" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "docs.sh.*--trigger session"; then
   pass "F-0139: ag.sh wires docs.sh session into ag sync"
 else
   fail "F-0139: ag.sh missing docs.sh session wiring in ag sync"
@@ -3181,14 +3193,14 @@ else
 fi
 
 # Test: ag.sh has pre_commit_hook validation
-if grep -q "pre_commit_hook)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "pre_commit_hook)"; then
   pass "F-0141: ag.sh has pre_commit_hook validation"
 else
   fail "F-0141: ag.sh missing pre_commit_hook validation"
 fi
 
 # Test: ag.sh has profile cascade logic
-if grep -q "_PREV_PROFILE" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "_PREV_PROFILE"; then
   pass "F-0141: ag.sh has smart profile cascade"
 else
   fail "F-0141: ag.sh missing smart profile cascade"
@@ -3392,7 +3404,7 @@ else
 fi
 
 # ag spec command in ag.sh
-if grep -q "cmd_spec\b\|cmd_spec()" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "cmd_spec\b\|cmd_spec()"; then
   pass "F-0147: ag spec command in ag.sh"
 else
   fail "F-0147: ag spec command missing from ag.sh"
@@ -3906,21 +3918,21 @@ else
 fi
 
 # T-0049: ag.sh has backlog dispatch
-if grep -q "cmd_backlog" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "cmd_backlog"; then
   pass "T-0049: ag.sh has cmd_backlog"
 else
   fail "T-0049: ag.sh missing cmd_backlog"
 fi
 
 # T-0050: ag.sh backlog gate in cmd_implement (upsert)
-if grep -q "upsert" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "upsert"; then
   pass "T-0050: cmd_implement has backlog upsert gate"
 else
   fail "T-0050: cmd_implement missing backlog upsert gate"
 fi
 
 # T-0051: ag.sh SKIP_BACKLOG escape hatch
-if grep -q "SKIP_BACKLOG" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "SKIP_BACKLOG"; then
   pass "T-0051: SKIP_BACKLOG escape hatch present"
 else
   fail "T-0051: SKIP_BACKLOG escape hatch missing"
@@ -3934,14 +3946,14 @@ else
 fi
 
 # T-0053: cmd_start shows backlog
-if grep -q "backlog_current\|json-current" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "backlog_current\|json-current"; then
   pass "T-0053: cmd_start shows backlog display"
 else
   fail "T-0053: cmd_start missing backlog display"
 fi
 
 # T-0054: cmd_done auto-removes completed feature from backlog
-if grep -A 5 "Backlog Cleanup" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" | grep -q "backlog.sh.*remove"; then
+if grep -A 5 "Backlog Cleanup" "$AG_SH" "$AG_CMDS_DIR"/*.sh | grep -q "backlog.sh.*remove"; then
   pass "T-0054: cmd_done auto-removes completed feature from backlog"
 else
   fail "T-0054: cmd_done missing backlog removal"
@@ -3983,14 +3995,14 @@ else
 fi
 
 # T-0059: ag.sh has review command dispatch
-if grep -q "review)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "review)"; then
   pass "T-0059: ag.sh has review command dispatch"
 else
   fail "T-0059: ag.sh missing review command"
 fi
 
 # T-0060: ag.sh validates review_* settings
-if grep -q "review_spec\|review_code\|review_merge" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "review_spec\|review_code\|review_merge"; then
   pass "T-0060: ag.sh validates review settings"
 else
   fail "T-0060: ag.sh missing review settings validation"
@@ -4115,7 +4127,7 @@ else
 fi
 
 # T-0073: ag worktree in ag.sh dispatch
-if grep -q "worktree)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "worktree)"; then
   pass "T-0073: ag worktree command in ag.sh dispatch"
 else
   fail "T-0073: ag worktree command missing from ag.sh dispatch"
@@ -4152,7 +4164,7 @@ fi
 # T-0078: No direct WIP.md file-existence checks in ag.sh without AGENTS.json companion
 # WIP.md checks are OK as fallbacks (elif after _has_active_wip, or || with _has_active_wip)
 # The old pattern was 9 standalone checks; now they should be fallbacks only
-WIP_DIRECT_CHECKS=$(grep -c '\[ -f.*WIP\.md' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null || echo "0")
+WIP_DIRECT_CHECKS=$(grep -rc '\[ -f.*WIP\.md' "$AG_SH" "$AG_CMDS_DIR"/*.sh 2>/dev/null | awk -F: '{s+=$NF}END{print s+0}')
 if [[ "$WIP_DIRECT_CHECKS" -le 6 ]]; then
   pass "T-0078: ag.sh has minimal direct WIP.md checks ($WIP_DIRECT_CHECKS — fallbacks only)"
 else
@@ -4160,7 +4172,7 @@ else
 fi
 
 # T-0079: ag.sh has _agents_py helper
-if grep -q "_agents_py()" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag "_agents_py()"; then
   pass "T-0079: ag.sh has _agents_py() helper"
 else
   fail "T-0079: ag.sh missing _agents_py() helper"
@@ -4313,7 +4325,7 @@ fi
 
 # T-0099: ag.sh dispatches flush command
 if grep -q 'flush)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" && \
-   grep -q 'state-commit.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+   grep_ag 'state-commit.sh'; then
   pass "T-0099: ag.sh dispatches flush to state-commit.sh"
 else
   fail "T-0099: ag.sh missing flush dispatch"
@@ -4423,14 +4435,14 @@ else
 fi
 
 # T-0112: AC gate exists in ag.sh cmd_done
-if grep -q 'AC Completion' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag 'AC Completion'; then
   pass "T-0112: AC completion gate exists in ag.sh"
 else
   fail "T-0112: AC completion gate missing from ag.sh"
 fi
 
 # T-0113: AC gate uses get_setting for configurable enforcement
-if grep -q 'get_setting.*acceptance_criteria' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag 'get_setting.*acceptance_criteria'; then
   pass "T-0113: AC gate uses get_setting for configurable enforcement"
 else
   fail "T-0113: AC gate missing get_setting for configurable enforcement"
@@ -4574,7 +4586,7 @@ else
 fi
 
 # T-0116: ag run dispatch exists in ag.sh
-if grep -q '    run)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag '    run)'; then
   pass "T-0116: ag run dispatch exists in ag.sh"
 else
   fail "T-0116: ag run dispatch missing from ag.sh"
@@ -4609,7 +4621,7 @@ else
 fi
 
 # T-0121: run appears in ag.sh help text
-if grep -q 'run.*Show how to run' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag 'run.*Show how to run'; then
   pass "T-0121: run appears in ag.sh help text"
 else
   fail "T-0121: run missing from ag.sh help text"
@@ -4694,7 +4706,7 @@ else
   fail "formalize.sh missing or not executable"
 fi
 
-if grep -q 'formalize)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag 'formalize)'; then
   pass "ag.sh has formalize dispatch"
 else
   fail "ag.sh missing formalize dispatch"
@@ -4728,7 +4740,7 @@ else
 fi
 
 # T-0134: ag feedback dispatch exists in ag.sh
-if grep -q '    feedback)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+if grep_ag '    feedback)'; then
   pass "T-0134: ag feedback dispatch exists in ag.sh"
 else
   fail "T-0134: ag feedback dispatch missing from ag.sh"
@@ -5033,14 +5045,14 @@ else
 fi
 
 # ag.sh has smoke test evidence gate
-if grep -q "Smoke Test Evidence Check" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "Smoke Test Evidence Check"; then
   pass "ag.sh has smoke test evidence gate"
 else
   fail "ag.sh missing smoke test evidence gate"
 fi
 
 # ag.sh has smoke_test_evidence validator
-if grep -q "smoke_test_evidence)" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag "smoke_test_evidence)"; then
   pass "ag.sh has smoke_test_evidence validator"
 else
   fail "ag.sh missing smoke_test_evidence validator"
@@ -5253,14 +5265,14 @@ else
 fi
 
 # AC-005: ag nfr discover uses --limit (default 8)
-if grep -q 'nfr-generate.sh.*--limit\|--limit.*8' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag 'nfr-generate.sh.*--limit\|--limit.*8'; then
   pass "F-0216: ag nfr discover passes --limit to nfr-generate.sh"
 else
   fail "F-0216: ag nfr discover should pass --limit to nfr-generate.sh"
 fi
 
 # AC-008: cmd_kickoff calls nfr-generate.sh
-if grep -q 'nfr-generate.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+if grep_ag 'nfr-generate.sh'; then
   pass "F-0216: cmd_kickoff references nfr-generate.sh"
 else
   fail "F-0216: cmd_kickoff should call nfr-generate.sh for NFR integration"
