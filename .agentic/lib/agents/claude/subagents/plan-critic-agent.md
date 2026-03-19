@@ -76,6 +76,10 @@ You are reading this plan with **fresh context**. You haven't seen the planning 
 [Acceptance criteria or scenarios not addressed by the plan]
 - AC-NNN: [What's missing]
 - Scenario: [Edge case not considered]
+
+### Convergence Signal
+- [ ] Plan is fundamentally sound (no high-severity concerns remaining)
+[Check this ONLY if you have zero High-Confidence Concerns]
 ```
 
 ## Critical Instructions

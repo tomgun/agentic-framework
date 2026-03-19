@@ -103,6 +103,15 @@ Purpose: a single source of truth for "how we build and run software here".
 - annotation_enforcement: off
 # Pre-commit annotation check for newly-shipped features (F-0229). off: skip | advisory: warn | blocking: block commit. Discovery: off | Formal: advisory | Autonomous Formal: blocking
 
+- review_pr: skip
+# Auto-review PRs after creation (F-0235). skip: no auto-review | critical_agent: AI reviews PR diff | human: block for human review. Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
+- pr_fix_max_attempts: 0
+# Max auto-fix cycles for PR review findings (F-0235). 0 = no auto-fix. Discovery: 0 | Formal: 2 | Autonomous Formal: 2
+- plan_review_convergence: manual
+# Plan review convergence mode (F-0236). auto: loop runs to convergence without human per iteration | manual: user decides each iteration. Discovery: manual | Formal: auto | Autonomous Formal: auto
+- plan_review_reviewers: critic,advocate
+# Reviewer roles for plan review (F-0236). Comma-separated from reviewer_roles.json catalog. Required: critic, advocate. Optional: security_expert, architect, qa_expert, ux_designer, ops_expert, db_expert
+
 - max_parallel_agents: 3
 # Maximum concurrent Claude processes for parallel epic execution (F-0214). Range: 1-10. Discovery: 3 | Formal: 3 | Autonomous Formal: 3
 
@@ -208,12 +217,22 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- Iterative planning with critical review before implementation -->
 <!-- See: .agentic/lib/workflows/plan_review_loop.md -->
 <!-- Note: plan_review_enabled is now in ## Settings (profile-aware) -->
-- plan_review_max_iterations: 3  <!-- Max revisions before human escalation -->
+- plan_review_max_iterations: 3  <!-- Max revisions before escalation (ENFORCED) -->
 - plan_review_auto_for: [planning]  <!-- planning | implement | both -->
   <!-- planning: Runs for ag plan commands -->
   <!-- implement: Also runs before ag implement if no approved plan exists -->
   <!-- both: Always runs for both commands -->
+- plan_review_convergence: auto  <!-- auto | manual (F-0236) -->
+  <!-- auto: Loop runs to convergence without human per iteration -->
+  <!-- manual: User decides each iteration -->
+- plan_review_reviewers: [critic, advocate]  <!-- Reviewer roles from catalog (F-0236) -->
+  <!-- Optional experts: security_expert, architect, qa_expert, ux_designer, ops_expert, db_expert -->
 <!-- - plan_review_reviewer_model: same  # same | opus | sonnet (use same model as planner) -->
+
+## PR Review
+<!-- Auto-review PRs after creation in autonomous workflows (F-0235) -->
+<!-- Note: review_pr is in ## Settings (profile-aware) -->
+- pr_fix_max_attempts: 2  <!-- Max auto-fix cycles before escalating to human. 0 = no auto-fix -->
 
 ## Sequential agent pipeline (optional but RECOMMENDED)
 <!-- Enables specialized agents to work sequentially on features for optimal context efficiency -->

@@ -73,6 +73,18 @@ After approval, save the plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.
 
 Plans in `~/.claude/plans/` are session-scoped and will be lost. Always copy to the durable location.
 
+### Step 5.5: Plan Review — Convergence Loop (F-0236)
+
+If `plan_review_convergence: auto` in STACK.md:
+- The convergence loop handles review automatically via `plan_convergence.py`
+- Spawns all configured reviewers (Critic + Advocate + optional experts from `plan_review_reviewers`)
+- Synthesizes outputs, checks convergence criteria, auto-revises if needed
+- Repeats until converged or `plan_review_max_iterations` reached (enforced)
+- In autonomous mode (`ag auto task`): converged plans are auto-approved
+- In interactive mode: converged plan is presented to user for final approval
+
+If `plan_review_convergence: manual`: current behavior — spawn Critic + Advocate manually, user decides each iteration.
+
 ### Step 6: Hand Off to Implementation
 
 After plan approval, start implementation:
@@ -115,3 +127,5 @@ Solution: Break into 3-5 smaller plans, each implementable in one batch (max 5-1
 ## References
 
 - For plan-review workflow: see `references/plan_review_loop.md`
+- For convergence loop and expert reviewers (F-0236): see `.agentic/lib/workflows/dialectical_review.md`
+- Reviewer role catalog: `.agentic/lib/agents/shared/reviewer_roles.json`

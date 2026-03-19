@@ -137,6 +137,18 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - plan_review_auto_for: [planning]
   <!-- planning: Runs for ag plan commands -->
   <!-- implement: Also runs before ag implement if no approved plan exists -->
+- plan_review_convergence: auto
+  <!-- auto: Loop runs to convergence without human per iteration (F-0236) -->
+  <!-- manual: User decides each iteration (current behavior) -->
+- plan_review_reviewers: [critic, advocate]
+  <!-- Reviewer roles from catalog. Required: critic, advocate. -->
+  <!-- Optional: security_expert, architect, qa_expert, ux_designer, ops_expert, db_expert -->
+
+## PR Review
+<!-- Auto-review PRs after creation in autonomous workflows (F-0235) -->
+<!-- Note: review_pr is in ## Settings (profile-aware) -->
+- pr_fix_max_attempts: 2
+  <!-- Max auto-fix cycles before escalating to human. 0 = no auto-fix -->
 
 ## Sequential agent pipeline
 <!-- Specialized agents working sequentially for optimal context efficiency -->

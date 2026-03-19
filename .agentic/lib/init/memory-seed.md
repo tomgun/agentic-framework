@@ -5,8 +5,8 @@ tokens: ~1280
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.60.0 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks, centralized-ids -->
+<!-- memory-seed v0.61.0 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks, centralized-ids, review_pr, pr-auto-fix, plan-convergence-loop, reviewer-catalog, expert-reviewers -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -43,7 +43,7 @@ Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal
 **After exiting plan mode**: The ExitPlanMode hook auto-saves the plan and outputs review instructions. If you see the hook banner, follow it. If not (hook didn't fire), IMMEDIATELY continue with post-plan-mode steps — do NOT wait for user to say "implement":
 1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with status DRAFT (tool plan locations like `~/.claude/plans/` are session-scoped and WILL BE LOST)
 2. Run `ag implement F-XXXX` — it will auto-save plans and enforce the review gate
-3. If `plan_review_enabled: yes`: `ag implement` blocks with `exit 1` and prints review instructions. Follow them: spawn Critic + Advocate agents in parallel (fresh context), synthesize both perspectives (with Revision Guidance), present to user. User decides: Proceed (→ APPROVED), Revise (→ Planner revises, fresh review), or Reject
+3. If `plan_review_enabled: yes`: `ag implement` blocks with `exit 1` and prints review instructions. If `plan_review_convergence: auto` (F-0236): the convergence loop runs automatically — spawns all configured reviewers (Critic + Advocate + optional experts from `plan_review_reviewers`) in parallel, synthesizes, checks convergence, auto-revises if needed, repeats until converged or `plan_review_max_iterations` (enforced, not advisory). In `manual` mode: spawn Critic + Advocate agents in parallel (fresh context), synthesize, present to user. User decides: Proceed (→ APPROVED), Revise, or Reject
 4. After user says "Proceed": update plan status to APPROVED, re-run `ag implement`
 5. If review not enabled: set plan status to APPROVED directly
 
@@ -58,7 +58,7 @@ Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal
 **When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
 
 Then:
-1. If `plan_review_enabled: yes`: run dialectical review IMMEDIATELY — save plan as DRAFT, spawn Critic + Advocate, present synthesis, wait for user decision. **Do NOT read implementation files, explore code, or make edits before the plan is APPROVED.** The review agents read files themselves with fresh context.
+1. If `plan_review_enabled: yes`: run dialectical review IMMEDIATELY — save plan as DRAFT. If `plan_review_convergence: auto`: call `python3 .agentic/lib/auto/plan_convergence.py --feature F-XXXX` which handles the full convergence loop (spawns reviewers, synthesizes, auto-revises). If `manual`: spawn Critic + Advocate, present synthesis, wait for user decision. **Do NOT read implementation files, explore code, or make edits before the plan is APPROVED.** The review agents read files themselves with fresh context.
 2. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
 3. `ag implement` requires an approved plan — if no plan exists, it triggers the planning workflow first (plan → save → review → approve). If plan exists but status is not APPROVED, it triggers review first
 4. Only proceed to implementation after the plan is APPROVED (or if review is disabled)
@@ -274,6 +274,7 @@ Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
 ## Rules that always apply
 
 - **Interactive sessions**: show changes to human before committing. **Autonomous/non-interactive sessions** (e.g. `--print` mode, `ag auto` workflows): commit directly, using `review_commit` setting to determine review level (F-0203).
+- **Post-PR auto-review (F-0235).** When `review_pr: critical_agent`, PRs created by `ag auto task` are automatically reviewed by a review agent against AC + plan. If REQUEST_CHANGES: a fix agent auto-fixes and re-reviews (up to `pr_fix_max_attempts`). If still not approved: HUMAN_NEEDED escalation. `review_pr: human` skips auto-review, creates a review block for human. `review_pr: skip` does nothing. Review fires AFTER `result.success` — implementation correctness and review quality are separate gates.
 - **Never bypass gates.** Do not use `--no-verify` or skip quality checks — except `ag flush` which uses `--no-verify` with its own stricter validation (hardcoded allowlist, branch check, JSON validation). See `state-commit.sh` header comment for the conditions that make this safe.
 - **NEVER `git stash`.** Stash pop does a silent merge — in multi-agent contexts, when another agent modified the same files, it quietly picks one version with no error, causing data loss. Safe alternatives: worktrees, temp branch + cherry-pick, or commit before switching. Also never `git checkout -- .`, `git restore .`, or `git reset --hard` with uncommitted changes.
 - **Multi-session collision guard.** Sessions auto-register in AGENTS.json at start. Before any destructive git op, the framework checks for other active sessions on the same checkout. If others are active, you'll see a COLLISION RISK warning — do NOT proceed with destructive ops. Use a worktree (`ag worktree`) or commit first.

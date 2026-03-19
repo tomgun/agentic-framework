@@ -250,8 +250,22 @@ class AutonomousScheduler:
                     fw.duration_seconds += time.time() - start
 
                     if task_result.success:
-                        fw.status = "completed"
-                        result.features_completed += 1
+                        # F-0235: Check PR review verdict before completing
+                        pr_verdict = getattr(
+                            task_result, "pr_review_verdict", "",
+                        )
+                        if pr_verdict in (
+                            "request_changes", "needs_discussion",
+                        ):
+                            fw.status = "review_blocked"
+                            fw.review_blocked_at = "pr_review"
+                            self._handle_escalation(
+                                fw.feature_id,
+                                f"PR review: {pr_verdict}",
+                            )
+                        else:
+                            fw.status = "completed"
+                            result.features_completed += 1
                     else:
                         # Check if blocked on review
                         if self._is_review_blocked(fw.feature_id):
@@ -495,9 +509,20 @@ class AutonomousScheduler:
 
             time.sleep(self.poll_interval)
 
+            # F-0235: import once for PR review polling
+            from auto.pr_review import PRReviewer
+
             # Check if any review has been resolved
             for fw in blocked:
-                if not self._is_review_blocked(fw.feature_id):
+                resolved = False
+                if fw.review_blocked_at == "pr_review":
+                    resolved = PRReviewer.check_pr_review_resolved(
+                        self.project_root, fw.feature_id,
+                    )
+                else:
+                    resolved = not self._is_review_blocked(fw.feature_id)
+
+                if resolved:
                     # AC-008: Review resolved — feature is unblocked
                     fw.status = "pending"
                     fw.review_blocked_at = ""

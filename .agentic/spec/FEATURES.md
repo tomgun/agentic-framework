@@ -4122,3 +4122,43 @@ Proposed restructuring:
 - Tests: Drift detection checks in validate_framework.sh
 
 **Acceptance**: See `spec/acceptance/F-0234.md`
+
+---
+
+## F-0235: Auto-Review After PR Creation
+
+**Status**: in_progress
+**Category**: Autonomous
+**Priority**: high
+**Complexity**: medium
+**Since**: —
+**Dependencies**: F-0162, F-0182, F-0186
+
+**Description**: Automatically review PRs after creation in autonomous workflows. When `review_pr: critical_agent`, spawns a review agent to assess the PR diff against ACs, then auto-fixes findings (up to `pr_fix_max_attempts` cycles) before escalating to human. Integrates with scheduler polling for `review_pr: human` mode.
+
+**Implementation**:
+- State: `.agentic/lib/auto/pr_review.py`
+- Code: `task.py`, `scheduler.py`, `profiles.conf`
+- Tests: `tests/test_pr_review.py`
+
+**Acceptance**: See `spec/acceptance/F-0235.md`
+
+---
+
+## F-0236: Autonomous Plan Convergence Loop with Expert Reviewers
+
+**Status**: in_progress
+**Category**: Autonomous
+**Priority**: high
+**Complexity**: high
+**Since**: —
+**Dependencies**: F-0120
+
+**Description**: Automates the plan review loop so it converges without human input per iteration. Planner → reviewers (parallel) → synthesis → convergence check → auto-revise or approve. Adds configurable reviewer roles beyond Critic+Advocate (security, UX, architect, QA, ops, DB experts). Enforces `plan_review_max_iterations` as hard limit with HUMAN_NEEDED escalation.
+
+**Implementation**:
+- State: `.agentic/lib/auto/plan_convergence.py`, `.agentic/lib/auto/reviewer_catalog.py`
+- Code: `.agentic/lib/agents/shared/reviewer_roles.json`, expert subagent definitions
+- Tests: `tests/test_plan_convergence.py`, `tests/test_reviewer_catalog.py`
+
+**Acceptance**: See `spec/acceptance/F-0236.md`

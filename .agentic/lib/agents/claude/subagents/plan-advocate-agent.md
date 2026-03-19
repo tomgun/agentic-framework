@@ -68,6 +68,10 @@ You are reading this plan with **fresh context**. This means you must infer the 
 [How the plan maps to requirements]
 - AC-NNN: [How addressed]
 - ...
+
+### Convergence Signal
+- [ ] Plan is fundamentally sound (no high-severity concerns remaining)
+[Check this ONLY if you have zero Honest Weaknesses that are high-severity]
 ```
 
 ## Critical Instructions

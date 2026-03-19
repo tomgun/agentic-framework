@@ -47,14 +47,46 @@ phase: planning
 ```markdown
 ## Settings
 - plan_review_enabled: yes        <!-- yes | no (default: yes for Formal, no for Discovery) -->
-- plan_review_max_iterations: 3   <!-- Max rounds before suggesting human escalation (advisory) -->
+- plan_review_max_iterations: 3   <!-- Max rounds before escalation (ENFORCED, not advisory) -->
 - plan_review_auto_for: [planning]  <!-- planning | implement | both -->
+- plan_review_convergence: auto   <!-- auto | manual (F-0236) -->
+- plan_review_reviewers: [critic, advocate]  <!-- Configurable role list (F-0236) -->
 ```
 
 **Defaults** (if not specified):
 - `plan_review_enabled: yes` for Formal profile, `no` for Discovery
-- `plan_review_max_iterations: 3`
+- `plan_review_max_iterations: 3` (enforced — loop terminates and escalates at max)
 - `plan_review_auto_for: [planning]`
+- `plan_review_convergence: auto` for Formal, `manual` for Discovery
+- `plan_review_reviewers: [critic, advocate]` (required roles always present)
+
+**Available reviewer roles** (from `reviewer_roles.json`):
+- `critic` (required) — Find flaws, risks, blind spots
+- `advocate` (required) — Explain trade-offs, defend decisions
+- `security_expert` — Security implications, threat modeling
+- `architect` — System design, patterns, scalability
+- `qa_expert` — Testability, coverage gaps, test strategy
+- `ux_designer` — User experience, interaction flows
+- `ops_expert` — Deployment, monitoring, rollback
+- `db_expert` — Data modeling, migration safety
+
+### Convergence Loop (F-0236)
+
+When `plan_review_convergence: auto`:
+
+```
+Plan → All reviewers (parallel) → Synthesis → Converged?
+  ↑                                              │
+  └── Auto-revise ←── NO (iterations remain) ────┘
+                                                  │
+                              YES → APPROVED (autonomous) / Present to user (interactive)
+                              NO + max_iterations → ESCALATED → HUMAN_NEEDED
+```
+
+**Convergence criteria** (ALL must be true):
+1. Critic has zero High-Confidence Concerns
+2. No expert reviewer has high-severity findings
+3. Iteration >= 2 (minimum 2 rounds prevents rubber-stamping)
 
 ---
 
