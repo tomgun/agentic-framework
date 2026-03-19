@@ -91,7 +91,7 @@ What would you like to work on?
 | "remember" / "todo" / "note for later" / "ag todo" | **Quick Capture** | Run `ag todo "description"` for persistent capture to TODO.md. |
 | "commit" / "ready to commit" / "ag commit" | **Commit Flow** | Run `ag commit`. Pre-commit quality gates, branch management, PR creation. |
 | "merge PR" / "merge #N" / "ag merge" | **Merge PR** | Run `ag merge <pr#> [F-XXXX]`. Merges PR, then immediately runs `ag done F-XXXX`. |
-| "run tests" / "test" / "ag test" / "LLM tests" | **Test Runner** | Run `ag test llm` for LLM behavioral tests. `ag test llm --critical` for critical-only. |
+| "run tests" / "test" / "ag test" / "LLM tests" | **Test Runner** | Run `ag test` to execute the project's test suite (from STACK.md `## Testing`). For LLM behavioral tests (if `llm_tests_enabled: yes`): `ag test llm` or `ag test llm --critical`. |
 | "transition" / "state change" / "move feature to" / "ag transition" | **Feature State Transition** | Run `ag transition F-XXXX <state>`. `--status` to see current state. `--unblocked` for features ready to advance. |
 | "audit" / "spec health" / "quality check" / "ag audit" | **Spec Audit** | Run `ag audit` for spec verification & QA audit. `--full` for comprehensive. `--status` for pending items. |
 | "NFR" / "non-functional" / "quality constraint" / "ag nfr" | **NFR Management** | Run `ag nfr list` to see NFRs. `ag nfr discover` for recommendations. `ag nfr coverage` for test coverage. |

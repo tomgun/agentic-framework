@@ -190,7 +190,7 @@ tips=(
     "Run \`ag sync\` to detect drift across memory, specs, and docs."
     "Use \`ag plan F-XXXX\` to start a plan-review loop before coding."
     "Run \`ag trace\` to see which code implements which features."
-    "Use \`ag test llm\` to verify agents follow framework rules."
+    "Use \`ag test\` to run your project's test suite."
     "Run \`ag sync --check\` for a dry run — see what's drifted."
     "Use \`ag trace --gaps\` to find shipped features with no code annotations."
     "Run \`ag verify --full\` for a comprehensive framework health check."
