@@ -13,13 +13,13 @@ cat STACK.md | grep "Version:"  # e.g., "Version: 0.1.0"
 
 # 2. Download and extract new framework (in a temp location)
 cd /tmp
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.9.7.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.64.0.tar.gz | tar xz
 
 # 3. Run the NEW upgrade tool, pointing it to your project
-bash agentic-framework-0.9.4/.agentic/tools/upgrade.sh /path/to/your-project
+bash agentic-framework-0.64.0/.agentic/tools/upgrade.sh /path/to/your-project
 
 # 4. Clean up
-rm -rf agentic-framework-0.9.4
+rm -rf agentic-framework-0.64.0
 ```
 
 **Why run the script from the NEW framework?**

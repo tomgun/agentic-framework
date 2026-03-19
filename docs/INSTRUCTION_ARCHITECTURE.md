@@ -1,7 +1,7 @@
 # Instruction Architecture Design Document
 
 **Status**: Authoritative design basis for the Agentic AI Framework's instruction file architecture.
-**Last validated**: 2026-03-06
+**Last validated**: 2026-03-19
 **Owner**: Framework maintainer (whoever merges changes to `.agentic/`)
 
 **Rule**: When source research documents and this design document disagree, this document wins.
