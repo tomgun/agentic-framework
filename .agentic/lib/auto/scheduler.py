@@ -509,12 +509,13 @@ class AutonomousScheduler:
 
             time.sleep(self.poll_interval)
 
+            # F-0235: import once for PR review polling
+            from auto.pr_review import PRReviewer
+
             # Check if any review has been resolved
             for fw in blocked:
                 resolved = False
                 if fw.review_blocked_at == "pr_review":
-                    # F-0235: Check GitHub review state for PR reviews
-                    from auto.pr_review import PRReviewer
                     resolved = PRReviewer.check_pr_review_resolved(
                         self.project_root, fw.feature_id,
                     )

@@ -72,12 +72,8 @@ class ConvergenceDetector:
             return False, "Minimum 2 iterations required"
 
         # Check Critic high-confidence concerns
-        critic_has_concerns = self._has_high_confidence_concerns(critic_output)
-        if critic_has_concerns:
+        if self._has_high_confidence_concerns(critic_output):
             return False, "Critic has high-confidence concerns"
-
-        # Check explicit convergence signal checkbox
-        critic_converged = self._has_convergence_signal(critic_output)
 
         # Check expert outputs for high-severity findings
         for role_name, output in expert_outputs.items():
@@ -85,13 +81,6 @@ class ConvergenceDetector:
                 continue  # handled separately
             if self._has_high_confidence_concerns(output):
                 return False, f"Expert '{role_name}' has high-confidence concerns"
-
-        # Check advocate convergence signal (if present)
-        advocate_output = expert_outputs.get("advocate", "")
-        advocate_converged = self._has_convergence_signal(advocate_output)
-
-        if critic_converged or not critic_has_concerns:
-            return True, "No high-confidence concerns remaining"
 
         return True, "No high-confidence concerns remaining"
 

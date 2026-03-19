@@ -77,6 +77,10 @@ class PRReviewer:
             # Get fresh PR diff
             pr_diff = self._get_pr_diff(pr_number)
             if not pr_diff:
+                print(
+                    f"  Warning: empty PR diff for #{pr_number} — skipping review",
+                    file=sys.stderr,
+                )
                 result.verdict = "skipped"
                 result.summary = "Could not fetch PR diff"
                 return result
@@ -219,11 +223,12 @@ class PRReviewer:
             ac_content=ac_content or "(No acceptance criteria file found)",
         )
 
+        # Fix agent needs file write + git access — NOT print_mode
         return spawn_claude(
             self.claude_command,
             self.project_root,
             prompt,
-            print_mode=True,  # same pattern as VerifyLoop fix agent
+            print_mode=False,
             timeout=300,
         )
 
