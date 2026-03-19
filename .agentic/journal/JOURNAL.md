@@ -3191,3 +3191,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 10:37 - Instruction file gap fix
+
+**Why**: Post-merge dogfood sync was incomplete — instruction files missed new settings
+
+**What changed**:
+- Added F-0235/F-0236 settings to agent_operating_guidelines.md (4 new rows in settings table). Added dogfood sync step to completing-work SKILL.md.
+
+**Next steps**:
+- Done — all instruction files now reference new features
+
+**Blockers**: None
+

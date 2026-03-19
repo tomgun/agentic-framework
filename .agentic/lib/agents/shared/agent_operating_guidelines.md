@@ -30,6 +30,10 @@ tokens: ~952
 | Review checkpoints | `review_*` | **human/critical_agent** | skip | Script-enforced |
 | Taste review (F-0183) | `review_taste` | **critical_agent** | skip | Script-enforced (piggybacks on code review transitions; requires `## Style & taste` in STACK.md) |
 | Commit review (F-0203) | `review_commit` | **human** | human | Code-enforced (`task.py._commit_ac()`). human: stage only. critical_agent: adversarial review then commit |
+| PR review (F-0235) | `review_pr` | **critical_agent** | skip | Code-enforced (`task.py._review_pr()`). skip: none. critical_agent: auto-review + fix loop. human: block for review |
+| PR fix attempts (F-0235) | `pr_fix_max_attempts` | **2** | 0 | Max auto-fix cycles before escalating to human |
+| Plan convergence (F-0236) | `plan_review_convergence` | **auto** | manual | auto: loop runs to convergence. manual: user decides each iteration |
+| Plan reviewers (F-0236) | `plan_review_reviewers` | **critic,advocate** | critic,advocate | Configurable roles from `reviewer_roles.json` catalog |
 | Collision guard | — | **on** | **on** | Hook-advisory (SessionStart/UserPromptSubmit warn when other sessions active) |
 
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`

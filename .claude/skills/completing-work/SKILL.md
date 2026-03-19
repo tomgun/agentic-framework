@@ -67,7 +67,17 @@ bash .agentic/lib/tools/todo.sh list
 
 Surface any items that should be addressed before moving on.
 
-### Step 6: Retrospective Check
+### Step 6: Post-Merge Dogfood Sync (Framework Dev Only)
+
+After merging a framework PR, sync root instruction files with templates:
+
+```bash
+bash .agentic/lib/tools/ag.sh dogfood
+```
+
+Fix any Phase 2 sentinel drift immediately. Phase 1 command parity drift is advisory.
+
+### Step 7: Retrospective Check
 
 After shipping, check if a retrospective is due:
 
