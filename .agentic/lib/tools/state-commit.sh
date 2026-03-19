@@ -249,27 +249,17 @@ if command -v python3 >/dev/null 2>&1 && [[ -f "$SCRIPT_DIR/agents_helpers.py" ]
 fi
 
 # ---------------------------------------------------------------------------
-# Step 10-11: Stage dirty files, then pull from remote
+# Step 10: Stage and commit dirty files locally
 # ---------------------------------------------------------------------------
-# Stage BEFORE pull — git pull --rebase fails with unstaged changes
+# Commit FIRST, then rebase onto remote. The old approach (stage → pull
+# --rebase → commit) breaks after squash merges: git pull --rebase with
+# staged changes creates a temp stash that can conflict with the squash
+# merge's version of the same files, even when local=remote HEAD.
+# Fix: commit locally (cheap, --no-verify), then rebase onto remote.
 for f in "${DIRTY_STATE[@]}"; do
     git add "$f"
 done
 
-if $HAS_REMOTE; then
-    if ! git pull --rebase origin "$BRANCH" 2>/dev/null; then
-        # Rebase conflict — unstage and abort
-        git rebase --abort 2>/dev/null || true
-        git reset HEAD -- "${DIRTY_STATE[@]}" 2>/dev/null || true
-        echo "Error: State conflict during pull. Resolve manually, then re-run: ag flush"
-        echo "Hint: git pull --rebase origin $BRANCH, resolve conflicts, git rebase --continue"
-        exit 1
-    fi
-fi
-
-# ---------------------------------------------------------------------------
-# Step 12: Commit (files already staged in Step 10)
-# ---------------------------------------------------------------------------
 SHORT_NAMES=()
 for f in "${DIRTY_STATE[@]}"; do
     SHORT_NAMES+=("$(basename "$f")")
@@ -279,7 +269,22 @@ COMMIT_MSG="chore(state): update $(IFS=', '; echo "${SHORT_NAMES[*]}")"
 git commit --no-verify -m "$COMMIT_MSG"
 
 # ---------------------------------------------------------------------------
-# Step 13: Push (if remote exists)
+# Step 11: Rebase onto remote (reconcile if remote moved)
+# ---------------------------------------------------------------------------
+if $HAS_REMOTE; then
+    if ! git pull --rebase origin "$BRANCH" 2>/dev/null; then
+        # Rebase conflict — undo our commit, restore working tree
+        git rebase --abort 2>/dev/null || true
+        git reset --soft HEAD~1 2>/dev/null || true
+        git reset HEAD -- "${DIRTY_STATE[@]}" 2>/dev/null || true
+        echo "Error: State conflict during rebase onto remote. Resolve manually, then re-run: ag flush"
+        echo "Hint: git pull --rebase origin $BRANCH, resolve conflicts, git rebase --continue"
+        exit 1
+    fi
+fi
+
+# ---------------------------------------------------------------------------
+# Step 12: Push (if remote exists)
 # ---------------------------------------------------------------------------
 if $HAS_REMOTE; then
     if ! git push origin "$BRANCH" 2>/dev/null; then

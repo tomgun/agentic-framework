@@ -3204,3 +3204,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 10:40 - Systemic fixes: ag flush + auto dogfood
+
+**Why**: ag flush failed after every squash merge; dogfood sync was manual-only, causing recurring drift
+
+**What changed**:
+- Fixed ag flush post-squash-merge failure (commit-first-then-rebase). Added --auto-fix to dogfood-sync.sh for automatic sentinel drift repair. ag done now calls dogfood-sync --auto-fix instead of --brief.
+
+**Next steps**:
+- Done
+
+**Blockers**: None
+

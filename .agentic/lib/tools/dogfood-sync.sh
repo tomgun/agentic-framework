@@ -20,13 +20,17 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 # --- Parse flags ---
 MODE="full"
+AUTO_FIX=false
+AUTOFIX_CHANGED=false
 for arg in "$@"; do
     case "$arg" in
         --brief) MODE="brief" ;;
+        --auto-fix) AUTO_FIX=true ;;
         -h|--help)
-            echo "Usage: bash .agentic/lib/tools/dogfood-sync.sh [--brief]"
+            echo "Usage: bash .agentic/lib/tools/dogfood-sync.sh [--brief] [--auto-fix]"
             echo ""
             echo "Post-merge dogfood sync: detect root vs template instruction file drift."
+            echo "  --auto-fix  Auto-fix sentinel drift by copying sections from template"
             echo ""
             echo "  (no flags)  Full report with fix suggestions per drift item"
             echo "  --brief     One-line summary per phase (for ag done integration)"
@@ -53,6 +57,70 @@ if [ ! -f "$ROOT_DIR/FRAMEWORK_DEVELOPMENT.md" ]; then
 fi
 
 TOTAL_DRIFT=0
+
+# --- Auto-fix helper ---
+# Copies the "Rules:" and "Token-efficient scripts" sections from template to root.
+# Preserves framework-dev-only lines (marked by "Every merge", "CONTRIBUTIONS",
+# "AGENTS.json.*agents_helpers") by re-inserting them after the template section.
+_autofix_sections() {
+    local root_file="$1"
+    local template_file="$2"
+
+    # Extract Rules section from template (from "Rules:" to next section or EOF)
+    local template_rules template_scripts
+    template_rules=$(sed -n '/^Rules:$/,/^[A-Z]/{/^Rules:$/p;/^[A-Z]/!p}' "$template_file" | head -30)
+    template_scripts=$(sed -n '/^Token-efficient scripts/,/^[A-Z]/{/^Token-efficient/p;/^[A-Z]/!p}' "$template_file" | head -15)
+
+    if [ -z "$template_rules" ] || [ -z "$template_scripts" ]; then
+        return 1  # can't find sections in template
+    fi
+
+    # Extract framework-dev-only lines from root's current Rules section
+    local fw_lines=""
+    fw_lines=$(sed -n '/^Rules:$/,/^Token-efficient/p' "$root_file" \
+        | grep -E '(Every merge|CONTRIBUTIONS|agents_helpers|FRAMEWORK_DEVELOPMENT|VERSION)' || true)
+
+    # Build replacement: template rules + framework lines + template scripts
+    local tmpfile
+    tmpfile=$(mktemp)
+
+    # Copy everything before "Rules:" from root
+    sed -n '1,/^Rules:$/{ /^Rules:$/!p }' "$root_file" > "$tmpfile"
+
+    # Add template Rules section
+    echo "$template_rules" >> "$tmpfile"
+
+    # Re-insert framework-dev-only lines (after template rules, before scripts)
+    if [ -n "$fw_lines" ]; then
+        echo "$fw_lines" >> "$tmpfile"
+    fi
+    echo "" >> "$tmpfile"
+
+    # Add template Token-efficient scripts section
+    echo "$template_scripts" >> "$tmpfile"
+    echo "" >> "$tmpfile"
+
+    # Copy everything after Token-efficient scripts section from root
+    # (Agent mode, Workflows line, Framework Development section, etc.)
+    local after_scripts=false
+    local past_scripts=false
+    while IFS= read -r line; do
+        if [ "$past_scripts" = true ]; then
+            echo "$line" >> "$tmpfile"
+        elif echo "$line" | grep -q "^Token-efficient scripts"; then
+            after_scripts=true
+        elif [ "$after_scripts" = true ]; then
+            # Skip lines in the old scripts section until we hit next section
+            if echo "$line" | grep -qE '^[A-Z]|^---$|^$' && ! echo "$line" | grep -q '^- '; then
+                past_scripts=true
+                echo "$line" >> "$tmpfile"
+            fi
+        fi
+    done < "$root_file"
+
+    mv "$tmpfile" "$root_file"
+    return 0
+}
 
 # ═══════════════════════════════════════════════════════════════════
 # Phase 1: AG Command Parity (delegates to instruction-sync.sh)
@@ -228,6 +296,15 @@ for entry in "${FILE_PAIRS[@]}"; do
         for detail in "${file_details[@]}"; do
             phase2_details+=("$detail")
         done
+
+        # Auto-fix: copy Rules + Token-efficient scripts sections from template to root
+        if [ "$AUTO_FIX" = true ] && [ "$check_mode" = "full" ]; then
+            _autofix_sections "$root_file" "$template_file"
+            if [ $? -eq 0 ]; then
+                phase2_details+=("    ${GREEN}✓${NC} Auto-fixed: replaced Rules + Token-efficient scripts from template")
+                AUTOFIX_CHANGED=true
+            fi
+        fi
     else
         phase2_details+=("  ${GREEN}✓${NC} $root_name ← $template_name: in sync ($check_mode mode)")
     fi
@@ -292,10 +369,22 @@ if [ "$MODE" = "full" ]; then
     echo ""
     if [ "$TOTAL_DRIFT" -eq 0 ]; then
         echo -e "${GREEN}No drift detected. Root files are in sync with templates.${NC}"
+    elif [ "$AUTOFIX_CHANGED" = true ]; then
+        echo -e "${YELLOW}$TOTAL_DRIFT drift item(s) detected. Auto-fix applied — review changes and commit.${NC}"
     else
         echo -e "${YELLOW}$TOTAL_DRIFT drift item(s) detected. Review and fix above issues.${NC}"
         echo -e "${DIM}Drift is advisory — fix inline or defer to next session.${NC}"
     fi
+fi
+
+# If auto-fix was applied and we're in ag done context, stage the fixed files
+if [ "$AUTOFIX_CHANGED" = true ] && [ "$AUTO_FIX" = true ]; then
+    for entry in "${FILE_PAIRS[@]}"; do
+        IFS='|' read -r root_file _ _ <<< "$entry"
+        if [ -f "$root_file" ]; then
+            git add "$root_file" 2>/dev/null || true
+        fi
+    done
 fi
 
 [ "$TOTAL_DRIFT" -eq 0 ] && exit 0 || exit 1

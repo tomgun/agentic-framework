@@ -1982,10 +1982,17 @@ cmd_done() {
         bash "$SCRIPT_DIR/state-commit.sh" --features || true
 
         # Post-merge dogfood sync (framework-dev only — F-0226)
+        # --auto-fix: automatically copies missing sentinel content from
+        # template to root instruction files (Rules, Token-efficient scripts).
+        # This prevents drift from accumulating between merges.
         if [ -f "$ROOT_DIR/FRAMEWORK_DEVELOPMENT.md" ]; then
             echo ""
             echo -e "${BOLD}=== Dogfood Sync ===${NC}"
-            bash "$SCRIPT_DIR/dogfood-sync.sh" --brief || true
+            if bash "$SCRIPT_DIR/dogfood-sync.sh" --auto-fix 2>/dev/null; then
+                echo -e "  ${GREEN}✓${NC} No drift detected"
+            else
+                echo -e "  ${YELLOW}⚠${NC} Drift detected — auto-fix attempted. Review changes."
+            fi
         fi
     else
         echo ""
