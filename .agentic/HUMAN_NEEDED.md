@@ -153,6 +153,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0053: PR Review: F-0235 + F-0236 (#162)
+- **Type**: decision
+- **Added**: 2026-03-19
+- **Context**: PR #162 needs human review: auto-review after PR + autonomous plan convergence loop. https://github.com/tomgun/agentic-framework/pull/162
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics
