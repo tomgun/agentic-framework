@@ -157,6 +157,7 @@ Each review round uses the dialectical mechanism described in `dialectical_revie
 3. **Advocate** explains trade-off reasoning, defends decisions honestly
 4. **Orchestrator synthesizes** both perspectives with Revision Guidance
 5. **User decides**: Proceed (→ APPROVED), Revise (→ new iteration), or Reject
+6. **If synthesis has actionable refinements**: Default recommendation is "Revise", not "Proceed with caveats". The plan must be perfected before approval — never defer refinements to implementation.
 
 See `.agentic/lib/workflows/dialectical_review.md` for the full mechanism, synthesis format, and cross-tool adaptation.
 
@@ -259,6 +260,7 @@ Fresh context per iteration = 2 agents x N iterations. More expensive than a sin
 - **Infinite loops**: Never approving, always finding issues
 - **Scope creep**: Critic raising issues not related to acceptance criteria
 - **Bike-shedding**: Focusing on trivial issues, missing critical ones
+- **Deferred refinements**: Recommending "Proceed" while noting refinements to address during implementation — this produces incomplete plans that shift design decisions to the coder
 
 **Good practices**:
 - Focused on acceptance criteria, security, correctness

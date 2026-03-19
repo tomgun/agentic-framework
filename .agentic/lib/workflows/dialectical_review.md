@@ -137,6 +137,7 @@ Beyond Critic + Advocate, teams can configure domain experts via `plan_review_re
 3. **Never add your own opinion**: Neutral reporter only
 4. **No verdicts**: The user decides, not the system
 5. **Revision Guidance is actionable**: If the user chooses to revise, the Planner uses this as direction
+6. **Refinements belong in the plan, not in implementation**: If the synthesis identifies actionable refinements, the recommendation is "Revise" (not "Proceed with caveats"). The plan must be revised to incorporate them before approval. Never recommend "Proceed with refinements addressed during implementation" — that defers design decisions to the coder and defeats the purpose of review.
 
 ---
 
@@ -200,6 +201,7 @@ Copilot self-play acknowledges the independence assumption is weaker — same co
 - **Adding opinion**: Orchestrator inserting own judgment into synthesis
 - **Skipping advocate**: Running only critic (defeats the purpose)
 - **Enforcing**: Adding verdicts or blocking implementation (user decides)
+- **"Proceed with caveats"**: Recommending approval while listing refinements to address during implementation. If there are refinements, the answer is "Revise" — the plan gets perfected before approval, not patched during coding
 
 **Good practices**:
 - Highlights where perspectives align AND diverge

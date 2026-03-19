@@ -54,6 +54,7 @@ Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal
 - "Simple plan, review unnecessary" — review is structural, not discretionary
 - "I have it in context" — save durably, then `ag implement`
 - "ag implement told me to review, I'll assess it myself" — spawn Critic + Advocate, don't self-assess
+- "Proceed with refinements during implementation" — if review found refinements, revise the plan first; never defer design decisions to the coder
 
 **When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
 

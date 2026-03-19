@@ -47,12 +47,13 @@ After both Critic and Advocate return, synthesize using this format:
 3. **Never add your own opinion**: Neutral reporter only
 4. **No verdicts**: The user decides, not the system
 5. **Revision Guidance is actionable**: Gives the Planner direction if user chooses to revise
+6. **Refinements → Revise, not "Proceed with caveats"**: If the synthesis contains actionable refinements, recommend "Revise". The plan must be perfected before approval — never defer refinements to implementation.
 
 ## User Decision
 
 After reading synthesis, user chooses:
-- **Proceed**: Set plan status to APPROVED. Ready for `ag implement`.
-- **Revise**: Tell Planner what to change. Fresh Critic + Advocate run on revised plan.
+- **Proceed**: Set plan status to APPROVED. Ready for `ag implement`. Only when synthesis has no actionable refinements.
+- **Revise**: Tell Planner what to change. Fresh Critic + Advocate run on revised plan. Default when refinements exist.
 - **Reject**: Abandon plan.
 
 ## Cross-Tool Notes

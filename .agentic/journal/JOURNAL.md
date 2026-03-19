@@ -3217,3 +3217,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 13:23 - Plan review rule
+
+**Why**: Agent recommended 'Proceed with refinements during implementation' which defeats the purpose of plan review
+
+**What changed**:
+- Added 'no deferred refinements' rule across 8 dialectical review files + CONTRIBUTIONS.md
+
+**Next steps**:
+- F-0216 implementation (plan is revised and ready for fresh review)
+
+**Blockers**: None
+

@@ -174,6 +174,7 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
    │   │   (ENFORCED — escalates to HUMAN_NEEDED at limit).
    │   └─ If manual: Critic + Advocate in parallel (fresh context).
    │      User decides Proceed/Revise/Reject.
+   │      If synthesis has actionable refinements → default is Revise (never "Proceed with caveats").
    └─ If no: Proceed directly (or run ag plan --no-review for simple plan)
 
 4. CHECK DEVELOPMENT MODE

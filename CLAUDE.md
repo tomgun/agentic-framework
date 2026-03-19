@@ -51,6 +51,7 @@ After ExitPlanMode:
 - "Simple plan, review unnecessary" — review is structural, not discretionary
 - "I have it in context" — save durably, then `ag implement`
 - "ag implement told me to review, I'll assess it myself" — spawn Critic + Advocate, don't self-assess
+- "Proceed with refinements during implementation" — if review found refinements, the plan gets revised first; never defer design decisions to the coder
 
 Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - .agentic/STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
