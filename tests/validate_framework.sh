@@ -18,7 +18,9 @@ FRAMEWORK_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 VERBOSE="${1:-}"
 
 # F-0221: ag.sh is decomposed into sourced modules under commands/
-# grep_ag searches ag.sh AND all command modules
+# grep_ag searches ag.sh AND all command modules for simple -q checks.
+# Use raw grep against $AG_SH and $AG_CMDS_DIR/*.sh when you need flags
+# like -A (context), -c (count), or -r (recursive with counts).
 AG_SH="${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"
 AG_CMDS_DIR="${FRAMEWORK_ROOT}/.agentic/lib/tools/commands"
 grep_ag() {

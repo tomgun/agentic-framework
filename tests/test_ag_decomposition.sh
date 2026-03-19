@@ -65,6 +65,10 @@ fi
 COMMANDS=(
     "help"
     "set --show"
+    "spec"
+    "auto --help"
+    "kickoff --help"
+    "trace --help"
 )
 
 for cmd in "${COMMANDS[@]}"; do
