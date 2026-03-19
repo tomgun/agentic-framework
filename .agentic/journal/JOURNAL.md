@@ -3386,3 +3386,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 20:54 - F-0221 ag.sh Decomposition
+
+**Why**: 4325-line monolith needs decomposition into sourced modules for maintainability
+
+**What changed**:
+- Plan approved after dialectical review; starting implementation
+
+**Next steps**:
+- Phase 1: extract lifecycle modules
+
+**Blockers**: None
+
+
+### Session: 2026-03-19 21:05 - F-0221 Phase 1
+
+**Why**: ag.sh decomposition for maintainability
+
+**What changed**:
+- Extracted 5 lifecycle modules (start, plan, implement, commit, done) to commands/; tests 21/24 pass (3 pre-existing failures)
+
+**Next steps**:
+- Phase 2: extract kickoff, auto, specs
+
+**Blockers**: None
+
