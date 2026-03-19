@@ -3412,3 +3412,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 21:15 - F-0221 Phase 4
+
+**Why**: Complete ag.sh decomposition testing
+
+**What changed**:
+- Created test_ag_decomposition.sh (8 tests), updated validate_framework.sh (grep_ag helper), added LLM-084
+
+**Next steps**:
+- PR creation
+
+**Blockers**: None
+
