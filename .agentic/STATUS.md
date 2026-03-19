@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0218 shipped. Creating pipeline-summary skill PR. (Updated: 2026-03-19 17:29 UTC)
+- Dogfood drift fixed. PR #165 (pipeline summary) and PR #166 (drift) merged. (Updated: 2026-03-19 17:56 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

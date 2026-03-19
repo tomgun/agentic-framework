@@ -3334,3 +3334,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 17:56 - Dogfood Phase 1 Drift Fixed
+
+**Why**: Instruction files are how features reach agents — missing commands mean agents don't know about capabilities
+
+**What changed**:
+- Resolved 18 missing command references across 6 instruction files. ag test made project-agnostic across all templates. Added contributions for autonomous pipeline, pipeline summary, dogfood drift investigation.
+
+**Next steps**:
+- Next backlog item (F-0219)
+
+**Blockers**: None
+
