@@ -1620,11 +1620,8 @@ cmd_done() {
         if [ "$docs_mode_val" = "deferred" ]; then
             # Deferred mode: skip freshness blocking (docs logged for later)
             # But still check registry health — missing files are always an error
-            local missing_output
-            missing_output=$(bash "$SCRIPT_DIR/docs.sh" --validate 2>/dev/null | grep "registered-but-missing" || true)
-            if [[ -n "$missing_output" ]]; then
-                echo -e "${RED}✗ Registered docs missing from disk (even in deferred mode):${NC}"
-                echo "$missing_output"
+            # Reuse validate_exit from earlier drift check section (avoid double --validate call)
+            if [[ "${validate_exit:-0}" -ne 0 ]]; then
                 docs_freshness_exit=1
             fi
         else

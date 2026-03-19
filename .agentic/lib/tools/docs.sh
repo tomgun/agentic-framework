@@ -64,7 +64,6 @@ CREATE_TYPE=""
 CREATE_TRIGGER=""
 CREATE_FORCE=false
 CHECK_ONLY=false
-FRESHNESS_TRIGGER=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -704,10 +703,13 @@ check_freshness() {
     local current_branch
     current_branch=$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 
-    # Get files changed in branch (empty if on base branch)
+    # Get files changed in branch (empty if on base branch or base not available)
     local branch_files=""
     if [[ -n "$current_branch" && "$current_branch" != "$base_branch" ]]; then
-        branch_files=$(git -C "$ROOT_DIR" diff --name-only "${base_branch}...HEAD" 2>/dev/null || true)
+        # Verify merge-base exists (fails in shallow clones without base ref)
+        if git -C "$ROOT_DIR" merge-base "$base_branch" HEAD &>/dev/null; then
+            branch_files=$(git -C "$ROOT_DIR" diff --name-only "${base_branch}...HEAD" 2>/dev/null || true)
+        fi
     fi
 
     # Get files changed in last 5 commits
@@ -715,7 +717,6 @@ check_freshness() {
     recent_files=$(git -C "$ROOT_DIR" log -5 --diff-filter=AMCR --name-only --pretty=format: HEAD 2>/dev/null | sort -u || true)
 
     local stale_count=0
-    local stale_list=""
 
     while IFS='|' read -r path type trigger; do
         # Filter by trigger
@@ -732,7 +733,7 @@ check_freshness() {
         if [[ ! -f "$full_path" ]]; then
             echo -e "${RED}✗ stale (missing): ${path}${NC}"
             stale_count=$((stale_count + 1))
-            stale_list="${stale_list}${path}\n"
+
             continue
         fi
 
