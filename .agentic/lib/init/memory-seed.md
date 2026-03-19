@@ -5,8 +5,8 @@ tokens: ~1280
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.61.0 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks, centralized-ids, review_pr, pr-auto-fix, plan-convergence-loop, reviewer-catalog, expert-reviewers -->
+<!-- memory-seed v0.62.0 -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks, centralized-ids, review_pr, pr-auto-fix, plan-convergence-loop, reviewer-catalog, expert-reviewers, ag start, ag work, ag spec, ag test, ag transition -->
 
 Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
 
@@ -160,6 +160,36 @@ If the user says verify epic, integration tests, cross-component tests, or wants
 If the user says verify framework, test the framework, self-test, framework verification, or wants to test the framework end-to-end by building real projects:
 
 **STOP.** Run `ag auto verify-framework --project <name>` (single scenario) or `ag auto verify-framework --all` (full matrix). This spawns agents to build example projects from scratch using `ag` commands, detects framework bugs via failure classification, self-heals by spawning fix agents, and delivers accumulated fixes as a single PR. Scenarios: todo-app, api-service, cli-tool, fullstack-monorepo, fullstack-multirepo. Use `--json` for machine-readable output.
+
+## When starting a session
+
+If this is the start of a conversation, the user says "start", "where were we", "what's the status", or returns after being away:
+
+**STOP.** Run `ag start`. This runs `dashboard.sh` — output it verbatim as your first response. No preamble, no reformatting. The dashboard shows current focus, backlog, blockers, and suggested next steps.
+
+## When the user wants to do quick ad-hoc work
+
+If the user says "work on", "quick task", or wants to do something without a feature ID:
+
+**STOP.** Run `ag work "description"`. Creates ad-hoc WIP tracking. For feature-tracked work, use `ag implement F-XXXX` instead.
+
+## When the user wants to write or update a spec
+
+If the user says "write spec", "create spec", "add acceptance criteria", "update spec", "evolve spec", or "spec for F-XXXX":
+
+**STOP.** Run `ag spec F-XXXX`. Follow spec protection levels — shipped specs are contracts (require migration.sh for changes). New specs use nfr-propagate.sh derive for auto-generating NFR Constraints sections.
+
+## When the user wants to run tests
+
+If the user says "run tests", "test", or "ag test":
+
+**STOP.** Run `ag test` to execute the project's test suite (reads test commands from STACK.md `## Testing`). Use `ag test llm` for LLM behavioral tests if the project has them configured (`llm_tests_enabled: yes` in STACK.md).
+
+## When the user asks about feature state or transitions
+
+If the user says "transition", "state change", "move feature to", "what state is F-XXXX", or "feature status":
+
+**STOP.** Run `ag transition F-XXXX <state>` to advance. `ag transition F-XXXX --status` to see current state and available transitions. `ag transition --unblocked` to list features ready to advance. State machine enforces gates — some transitions require review checkpoints.
 
 ## When the user wants parallel agent coordination
 

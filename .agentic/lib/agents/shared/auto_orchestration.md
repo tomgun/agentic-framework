@@ -87,6 +87,15 @@ What would you like to work on?
 | "run" / "how to run" / "dev server" / "start the app" / "run commands" | **Project Run Info** | Run `ag run`. Shows stack summary, dev/build/test commands with source attribution (STACK.md vs auto-detected). |
 | "feedback" / "tested it" / "tried it" / "after testing" / "user reported" | **Feedback Capture** | Run `ag feedback "text"`. Auto-classifies (bug/feature/ac-adjust/unclear) via keywords, persists to FEEDBACK_LOG.md. Use `--bug`/`--feature`/`--ac` for direct routing. `ag feedback log` to view, `ag feedback route FB-XXXX` to route. |
 | "formalize" / "promote to formal" / "migrate to formal" / "make TODOs into features" | **Discovery-to-Formal Migration** | Run `ag formalize` to list promotable TODO items. `ag formalize T-XXXX` promotes specific items to FEATURES.md entries + AC stubs. `ag formalize --all` promotes everything. |
+| "quick task" / "work on" / "ag work" | **Quick Work** | Run `ag work "description"`. Creates ad-hoc WIP tracking without a feature ID. |
+| "remember" / "todo" / "note for later" / "ag todo" | **Quick Capture** | Run `ag todo "description"` for persistent capture to TODO.md. |
+| "commit" / "ready to commit" / "ag commit" | **Commit Flow** | Run `ag commit`. Pre-commit quality gates, branch management, PR creation. |
+| "merge PR" / "merge #N" / "ag merge" | **Merge PR** | Run `ag merge <pr#> [F-XXXX]`. Merges PR, then immediately runs `ag done F-XXXX`. |
+| "run tests" / "test" / "ag test" / "LLM tests" | **Test Runner** | Run `ag test` to execute the project's test suite (from STACK.md `## Testing`). For LLM behavioral tests (if `llm_tests_enabled: yes`): `ag test llm` or `ag test llm --critical`. |
+| "transition" / "state change" / "move feature to" / "ag transition" | **Feature State Transition** | Run `ag transition F-XXXX <state>`. `--status` to see current state. `--unblocked` for features ready to advance. |
+| "audit" / "spec health" / "quality check" / "ag audit" | **Spec Audit** | Run `ag audit` for spec verification & QA audit. `--full` for comprehensive. `--status` for pending items. |
+| "NFR" / "non-functional" / "quality constraint" / "ag nfr" | **NFR Management** | Run `ag nfr list` to see NFRs. `ag nfr discover` for recommendations. `ag nfr coverage` for test coverage. |
+| "worktree" / "isolated branch" / "ag worktree" | **Worktree Management** | Run `ag worktree create F-XXXX` for isolated feature work. `ag worktree list` to see active worktrees. |
 
 ### Domain & Design Triggers
 
