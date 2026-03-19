@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0235 + F-0236: Auto-Review After PR + Plan Convergence Loop — implementation complete, ready to commit (Updated: 2026-03-19 08:12 UTC)
+- F-0235 + F-0236 shipped. Post-merge cleanup on main. (Updated: 2026-03-19 10:16 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

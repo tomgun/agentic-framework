@@ -3165,3 +3165,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 10:16 - F-0235 + F-0236 Shipped
+
+**Why**: Post-merge completion workflow
+
+**What changed**:
+- PR #162 merged. Both features shipped: auto-review after PR creation (F-0235) and autonomous plan convergence loop with expert reviewers (F-0236). Review findings fixed before merge (print_mode bug, dead code).
+
+**Next steps**:
+- Post-merge: dogfood sync, version bump
+
+**Blockers**: None
+

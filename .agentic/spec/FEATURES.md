@@ -4127,7 +4127,7 @@ Proposed restructuring:
 
 ## F-0235: Auto-Review After PR Creation
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: high
 **Complexity**: medium
@@ -4147,7 +4147,7 @@ Proposed restructuring:
 
 ## F-0236: Autonomous Plan Convergence Loop with Expert Reviewers
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Autonomous
 **Priority**: high
 **Complexity**: high
