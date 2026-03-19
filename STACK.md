@@ -6,14 +6,14 @@ Purpose: Configuration for developing the Agentic Framework itself.
 
 ## Agentic framework
 - Version: 0.50.1
-- Profile: formal
+- Profile: autonomous_formal
 - This IS the framework (dogfooding)
 - Source: https://github.com/tomgun/agentic-framework
 
 ## Settings
 <!-- Use `ag set <key> <value>` to change, `ag set --show` to view all. -->
-- profile: formal
-<!-- discovery | formal -->
+- profile: autonomous_formal
+<!-- discovery | formal | autonomous_formal -->
 
 ### Workflow
 - feature_tracking: yes
@@ -66,17 +66,17 @@ Purpose: Configuration for developing the Agentic Framework itself.
 # specced → criteria_set. Discovery: skip | Formal: critical_agent
 - review_plan: critical_agent
 # plan review before implementing. Discovery: skip | Formal: critical_agent
-- review_code: human
-# documented → committed. Discovery: critical_agent | Formal: human
+- review_code: critical_agent
+# documented → committed. Discovery: critical_agent | Formal: human | Autonomous Formal: critical_agent
 - review_merge: human
 # committed → shipped. Discovery: human | Formal: human
 - review_decomposition: critical_agent
 # Epic decomposition (future). Discovery: skip | Formal: critical_agent
-- review_regression: human
-# Any regression transition. Discovery: critical_agent | Formal: human
+- review_regression: critical_agent
+# Any regression transition. Discovery: critical_agent | Formal: human | Autonomous Formal: critical_agent
 - review_taste: critical_agent
 # Subjective decisions (future). Discovery: skip | Formal: critical_agent
-- review_commit: human
+- review_commit: critical_agent
 # Auto-commit in automated execution. human: stage only (default) | critical_agent: adversarial review then commit. Discovery: human | Formal: human | Autonomous Formal: critical_agent
 
 - docs_mode: inline

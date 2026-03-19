@@ -9,8 +9,11 @@
 #   bash nfr-generate.sh --project-type web      # Override project type
 #   bash nfr-generate.sh --project-type api --all # Include P3 entries
 #   bash nfr-generate.sh --components "frontend,backend"  # Component-scoped
+#   bash nfr-generate.sh --project-type web --limit 8     # Cap at 8 entries
+#   bash nfr-generate.sh --project-type web --machine      # Pipe-delimited output
 #
 # Output: One block per NFR suggestion with ID, category, statement, priority, applies-to
+# Machine output: pipe-delimited lines (ID|category|statement|measure|enforced|priority|section)
 #
 # Exit codes:
 #   0 = suggestions found (or nothing to do: no catalog)
@@ -37,19 +40,25 @@ STACK_FILE="$PROJECT_ROOT/STACK.md"
 PROJECT_TYPE=""
 COMPONENTS=""
 INCLUDE_ALL=0
+LIMIT=0
+MACHINE=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --project-type) PROJECT_TYPE="$2"; shift 2 ;;
         --components) COMPONENTS="$2"; shift 2 ;;
         --all) INCLUDE_ALL=1; shift ;;
+        --limit) LIMIT="$2"; shift 2 ;;
+        --machine) MACHINE=1; shift ;;
         --help|-h)
-            echo "Usage: nfr-generate.sh [--project-type <type>] [--components <list>] [--all]"
+            echo "Usage: nfr-generate.sh [--project-type <type>] [--components <list>] [--all] [--limit N] [--machine]"
             echo ""
             echo "Options:"
             echo "  --project-type  Override stack detection (web, api, mobile, game, audio, cli, desktop, library, data-pipeline)"
             echo "  --components    Comma-separated component list for P2 filtering"
             echo "  --all           Include P3 (structural/CI-only) entries"
+            echo "  --limit N       Cap output at N entries (applied after filtering)"
+            echo "  --machine       Pipe-delimited output, no header/footer (for piping to nfr-write-batch.sh)"
             exit 0
             ;;
         *) echo "Unknown option: $1"; exit 1 ;;
@@ -74,7 +83,7 @@ fi
 # Returns one section name per line (avoids fragile multi-word reassembly)
 map_type_to_sections() {
     local ptype="$1"
-    echo "Universal"
+    # Type-specific sections FIRST so --limit prioritizes domain-relevant entries
     case "$ptype" in
         web|webapp|web-app|frontend)
             echo "Web App" ;;
@@ -98,6 +107,7 @@ map_type_to_sections() {
             echo -e "${YELLOW}Unknown project type: $ptype — showing Universal only${NC}" >&2
             ;;
     esac
+    echo "Universal"
     echo "Framework Promises"
 }
 
@@ -195,9 +205,12 @@ fi
 sections=$(map_type_to_sections "$PROJECT_TYPE")
 count=0
 
-echo -e "${BOLD}NFR Recommendations for: ${PROJECT_TYPE}${NC}"
-echo -e "${DIM}Sections: $(echo "$sections" | tr '\n' ', ' | sed 's/, $//')${NC}"
-echo ""
+# Header (human mode only)
+if [[ $MACHINE -eq 0 ]]; then
+    echo -e "${BOLD}NFR Recommendations for: ${PROJECT_TYPE}${NC}"
+    echo -e "${DIM}Sections: $(echo "$sections" | tr '\n' ', ' | sed 's/, $//')${NC}"
+    echo ""
+fi
 
 # Collect all entries (one section per line from map_type_to_sections)
 all_entries=""
@@ -213,7 +226,9 @@ done <<< "$sections"
 filtered=$(echo "$all_entries" | filter_entries)
 
 if [[ -z "$filtered" ]]; then
-    echo -e "${YELLOW}No NFR suggestions found for project type: ${PROJECT_TYPE}${NC}"
+    if [[ $MACHINE -eq 0 ]]; then
+        echo -e "${YELLOW}No NFR suggestions found for project type: ${PROJECT_TYPE}${NC}"
+    fi
     exit 1
 fi
 
@@ -221,17 +236,34 @@ while IFS='|' read -r nfr_id category statement measure enforced priority sectio
     [[ -z "$nfr_id" ]] && continue
     count=$((count + 1))
 
-    local_color="$GREEN"
-    [[ "$priority" == "P2" ]] && local_color="$YELLOW"
-    [[ "$priority" == "P3" ]] && local_color="$DIM"
+    # Apply --limit (post-filter cap)
+    if [[ $LIMIT -gt 0 && $count -gt $LIMIT ]]; then
+        break
+    fi
 
-    echo -e "${local_color}[${priority}]${NC} ${BOLD}${nfr_id}${NC}: ${statement}"
-    echo -e "  ${DIM}Category: ${category} | Section: ${section}${NC}"
-    echo -e "  ${DIM}Measure: ${measure}${NC}"
-    echo ""
+    if [[ $MACHINE -eq 1 ]]; then
+        # Pipe-delimited output for machine consumption
+        echo "${nfr_id}|${category}|${statement}|${measure}|${enforced}|${priority}|${section}"
+    else
+        local_color="$GREEN"
+        [[ "$priority" == "P2" ]] && local_color="$YELLOW"
+        [[ "$priority" == "P3" ]] && local_color="$DIM"
+
+        echo -e "${local_color}[${priority}]${NC} ${BOLD}${nfr_id}${NC}: ${statement}"
+        echo -e "  ${DIM}Category: ${category} | Section: ${section}${NC}"
+        echo -e "  ${DIM}Measure: ${measure}${NC}"
+        echo ""
+    fi
 done <<< "$filtered"
 
-echo -e "${BOLD}Total: ${count} suggestion(s)${NC}"
-[[ $INCLUDE_ALL -eq 0 ]] && echo -e "${DIM}Use --all to include P3 (structural/CI-only) entries${NC}"
+# Footer (human mode only)
+if [[ $MACHINE -eq 0 ]]; then
+    # Adjust count if limit was applied
+    if [[ $LIMIT -gt 0 && $count -gt $LIMIT ]]; then
+        count=$LIMIT
+    fi
+    echo -e "${BOLD}Total: ${count} suggestion(s)${NC}"
+    [[ $INCLUDE_ALL -eq 0 ]] && echo -e "${DIM}Use --all to include P3 (structural/CI-only) entries${NC}"
+fi
 
 exit 0

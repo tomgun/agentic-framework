@@ -622,9 +622,11 @@ Choose **Proprietary (f)** if:
 
 **After the interview questions**, use the answers to suggest relevant NFRs.
 
-1. **Run NFR generation**: `bash .agentic/lib/tools/nfr-generate.sh` (auto-detects project type from STACK.md `Primary platform:`, outputs P1/P2 recommendations filtered by priority tier)
+1. **Run NFR generation**: `bash .agentic/lib/tools/nfr-generate.sh --limit 8` (auto-detects project type from STACK.md `Primary platform:`, outputs top 4-8 P1/P2 recommendations filtered by priority tier)
    - Override detection: `--project-type web` or `--project-type api`
    - Include structural: `--all` (adds P3 entries)
+   - Custom limit: `--limit N` (default: shows all; `ag nfr discover` uses `--limit 8`)
+   - Machine output: `--machine` (pipe-delimited, for piping to `nfr-write-batch.sh`)
    - Supported types: web, api, mobile, game, audio, cli, desktop, library, data-pipeline
 
 4. **Formalize any constraints from question 4** ("Key constraints?"):
@@ -651,9 +653,10 @@ Process:
 Which do you want? (e.g., 'all', '1,3,5', or 'none for now')"
 ```
 
-6. **Write selected NFRs** to `.agentic/spec/NFR.md`:
-   - Assign NFR-XXXX IDs (continuing from existing IDs)
-   - Fill in all fields: Category, Statement, How to measure, Where enforced, Current status
+6. **Write selected NFRs** using the batch writer:
+   - All: `bash nfr-generate.sh --machine --limit 8 | bash nfr-write-batch.sh`
+   - Selective: filter machine output to desired entries, then pipe to batch writer
+   - The batch writer auto-assigns collision-free NFR-XXXX IDs and appends to `.agentic/spec/NFR.md`
    - Create acceptance files for each: `.agentic/spec/acceptance/NFR-XXXX.md`
 
 7. **Profile behavior**:

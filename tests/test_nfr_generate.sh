@@ -178,6 +178,74 @@ else
     fail "Audio project missing D-01"
 fi
 
+# --- Test 15: --limit caps output to N entries ---
+echo ""
+echo "Test: --limit caps output"
+output=$(cd "$TEST_TMPDIR" && bash "$TOOL" --project-type web --limit 4 2>&1)
+total=$(echo "$output" | grep -c '^\[P[123]\]')
+if [[ $total -le 4 ]]; then
+    pass "--limit 4 caps output to $total entries (≤4)"
+else
+    fail "--limit 4 should cap at 4 entries, got $total"
+fi
+
+# --- Test 16: --limit prioritizes type-specific over Universal ---
+echo ""
+echo "Test: --limit prioritizes type-specific entries"
+output=$(cd "$TEST_TMPDIR" && bash "$TOOL" --project-type web --limit 4 2>&1)
+if echo "$output" | grep -q "W-01"; then
+    pass "--limit includes type-specific W-01 before Universal entries"
+else
+    fail "--limit should include type-specific W-01"
+fi
+
+# --- Test 17: --machine outputs pipe-delimited format ---
+echo ""
+echo "Test: --machine output format"
+output=$(cd "$TEST_TMPDIR" && bash "$TOOL" --project-type cli --machine 2>&1)
+if echo "$output" | head -1 | grep -qE '^[A-Z]-[0-9]+\|'; then
+    pass "--machine outputs pipe-delimited lines"
+else
+    fail "--machine should output pipe-delimited lines"
+fi
+# Verify no header/footer
+if echo "$output" | grep -q "NFR Recommendations\|Total:"; then
+    fail "--machine should have no header/footer"
+else
+    pass "--machine has no header/footer"
+fi
+
+# --- Test 18: --machine line count matches entry count ---
+echo ""
+echo "Test: --machine line count consistency"
+human_count=$(cd "$TEST_TMPDIR" && bash "$TOOL" --project-type cli 2>&1 | grep -c '^\[P[123]\]')
+machine_count=$(cd "$TEST_TMPDIR" && bash "$TOOL" --project-type cli --machine 2>&1 | grep -cE '^[A-Z]-')
+if [[ $human_count -eq $machine_count ]]; then
+    pass "--machine line count ($machine_count) matches human entry count ($human_count)"
+else
+    fail "--machine count ($machine_count) should match human count ($human_count)"
+fi
+
+# --- Test 19: --limit preserves human-readable format ---
+echo ""
+echo "Test: --limit preserves human format"
+output=$(cd "$TEST_TMPDIR" && bash "$TOOL" --project-type web --limit 2 2>&1)
+if echo "$output" | grep -q "Total:"; then
+    pass "--limit still shows Total in human mode"
+else
+    fail "--limit should preserve human-readable format with Total"
+fi
+
+# --- Test 20: --help shows --limit and --machine ---
+echo ""
+echo "Test: --help shows new flags"
+output=$(cd "$TEST_TMPDIR" && bash "$TOOL" --help 2>&1)
+if echo "$output" | grep -q "\-\-limit" && echo "$output" | grep -q "\-\-machine"; then
+    pass "--help documents --limit and --machine"
+else
+    fail "--help should document --limit and --machine flags"
+fi
+
 # --- Summary ---
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
