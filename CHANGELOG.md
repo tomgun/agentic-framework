@@ -7,14 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.64.0] - 2026-03-18
+
 ### Added
-- **Epic Integration Verification (F-0204, ADR-001 §6)** — Integration verification gate between "all children shipped" and "epic shipped". `recompute_epic_status()` now checks for integration test artifact before advancing an epic to shipped. Integration test commands resolved from epic AC file `## Integration tests` > STACK.md `## Integration tests` > skip. New `ag auto verify-epic F-XXXX` CLI for standalone execution. Scheduler `run_epic()` auto-runs verification after all children complete. `review_integration` setting (human | critical_agent | skip) controls review of results. Profile defaults: discovery=skip, formal=critical_agent, autonomous_formal=critical_agent. Graceful degradation — no tests defined means epic ships immediately.
-- **Auto-Commit Review Mode (F-0203, ADR-002 §4)** — `review_commit: human | critical_agent` setting gates auto-commits in `task.py`. Interactive sessions never auto-commit (preserving R2 principle). Autonomous workflows (`ag auto task/epic`) with `review_commit: critical_agent` spawn an adversarial CriticalAgent review of each AC's staged diff before committing. Dedicated `review_commit()` method with F3-optimized context (staged diff + single AC only). Profile defaults: discovery=`human`, formal=`human`, autonomous_formal=`critical_agent`. R2 principle amended with conditional language. 10 unit tests + 8 structural tests.
-- **Taste & Style Review (F-0183, ADR-002 §2.2)** — `review_taste` setting is now wired into the review checkpoint system. When set to `critical_agent` or `human`, taste reviews fire alongside code review transitions (documented→committed, implementing→committed). New `## Style & taste` section in STACK.md declares `style_guide`, `design_system`, `api_style` preferences. Critical agent receives a dedicated `taste_review.md` prompt focused on naming conventions, API consistency, and design system alignment. Taste verdict artifacts use `taste_` filename prefix to coexist with code review verdicts. Omitting style settings preserves existing behavior (AC-004). 36 tests.
-- **AC Check-off Advisory (T-0051)** — Pre-commit check now warns when in_progress features have unchecked acceptance criteria. Advisory only (non-blocking). Uses heading-only feature ID extraction to avoid spurious matches from body text. 10 bash tests.
+- **Agent Definition Reconciliation (F-0234)** — Reconciled diverged agent definition sets (roles/, subagents/, context-manifests/) by adding 6 new tool-agnostic roles, deprecating 4 stale role-only agents, adding 1 missing manifest, and enforcing parity via automated drift detection checks in `validate_framework.sh`.
+
+## [0.63.0] - 2026-03-18
+
+### Added
+- **Annotation Enforcement Pre-Commit Gate (F-0229)** — Wired `coverage.py` into pre-commit as Check 22. When a feature transitions to `shipped`, validates that at least one `@feature F-XXXX` annotation exists in source code. Controlled by `annotation_enforcement: off | advisory | blocking` in STACK.md. Default `off`; existing shipped features grandfathered.
+
+## [0.60.0] - 2026-03-15
+
+### Added
+- **Autonomous Framework Verification Loop (F-0215)** — `ag auto verify-framework` spawns agents to build example projects from scratch using framework commands, verifying the full lifecycle end-to-end. Self-healing loop classifies failures, spawns fix agents in verification worktrees, validates fixes, and restarts scenarios. Accumulated fixes delivered as a single PR. Supports single-component, monorepo, and multi-repo scenarios with declarative YAML definitions.
+- **NFR Lifecycle Excellence (F-0216 through F-0219)** — Four-feature suite for non-functional requirement management: auto-generation at lifecycle moments with smart stack-based defaults (`ag nfr discover`), NFR-aware test writing that checks applicable NFRs before designing test plans, propagation pipeline that auto-derives NFR constraints into feature ACs with staleness detection, and health dashboard with per-NFR status/coverage reports integrated into `ag start`.
+
+## [0.55.0] - 2026-03-13
+
+### Added
+- **Vision-to-Backlog Pipeline (F-0201)** — `ag kickoff` command converts a product vision into a structured backlog. Two modes: script (non-interactive, single prompt) and playbook (multi-turn interview). Output goes to staging area for validation before promotion to real spec files. Reuses `ag decompose` and `backlog_helpers.py`.
+- **Stack-Aware Preview (F-0202)** — `ag preview` / `ag run` detects stack from STACK.md and helps users run their software. MVP: documentation-first (detect stack, tell user how to run). P2: automated single-process dev server startup with health check and URL reporting.
+- **Auto-Commit Review Mode (F-0203, ADR-002 §4)** — `review_commit: human | critical_agent` setting gates auto-commits in `task.py`. Interactive sessions never auto-commit (preserving R2 principle). Autonomous workflows (`ag auto task/epic`) with `review_commit: critical_agent` spawn an adversarial CriticalAgent review of each AC's staged diff before committing. Profile defaults: discovery=`human`, formal=`human`, autonomous_formal=`critical_agent`.
+- **Epic Integration Verification (F-0204, ADR-001 §6)** — Integration verification gate between "all children shipped" and "epic shipped". `ag auto verify-epic F-XXXX` for standalone execution. Integration test commands resolved from epic AC file > STACK.md > skip. `review_integration` setting (human | critical_agent | skip) controls review of results. Graceful degradation — no tests defined means epic ships immediately.
+- **Discovery-to-Formal Migration (F-0205)** — `ag formalize` command migrates discovery-phase content into formal spec structure: TODO items become FEATURES.md entries with auto-assigned IDs, journal plans become formal plan files, and informal decisions become ADR stubs.
+- **Feedback Capture System (F-0206)** — `ag feedback` provides structured feedback capture after user tests working software. Keyword-based classification routes feedback to existing tools: bugs to ISSUES.md, features to TODO.md, AC adjustments logged with cross-references. Persistent FEEDBACK_LOG.md with FB-XXXX IDs.
+- **Project Documentation Lifecycle (F-0207)** — Doc registry validation, scaffolding, and coverage tracking. `## Docs` registry in STACK.md as single source of truth, automated staleness detection via `drift.sh` and `docs.sh`, trigger-based update prompts, and component/area coverage tracking to identify gaps.
+- **Deferred Documentation Mode (F-0208)** — `docs_mode: inline | deferred` setting in STACK.md controls when documentation is updated. In deferred mode, doc updates are skipped during fast iteration and queued for later via `ag docs generate`. Ensures docs are never forgotten while enabling fast iteration.
+- **Taste & Style Review (F-0183, ADR-002 §2.2)** — `review_taste` setting wired into the review checkpoint system. New `## Style & taste` section in STACK.md declares style preferences. Critical agent receives a dedicated `taste_review.md` prompt focused on naming conventions, API consistency, and design system alignment.
+- **AC Check-off Advisory (T-0051)** — Pre-commit check now warns when in_progress features have unchecked acceptance criteria. Advisory only (non-blocking).
 
 ### Changed
 - Pending review filenames now include review_setting (`{feature_id}_{review_setting}_{to_state}.json`) to prevent collisions between code and taste reviews. Legacy format has fallback support.
+
+## [0.53.0] - 2026-03-10
+
+### Fixed
+- **Plan Durability Scanning (F-0198)** — `ag sync` now scans tool-specific plan directories (`~/.claude/plans/`, `.cursor/plans/`) for files mentioning F-XXXX IDs. Auto-copies to `.agentic/journal/plans/` if not already saved, preventing plan loss from session-scoped storage.
+- **Instruction File Sync Detection (F-0199)** — New `instruction-sync.sh` detects when `ag.sh` commands are added but instruction files (CLAUDE.md, cursorrules, copilot, codex, auto_orchestration, memory-seed) are not updated. Wired into `validate_framework.sh` as a warning.
+- **Intent Journal + Crash Recovery (F-0200)** — Write-ahead log for multi-step `ag.sh` operations (implement, done) with crash recovery via reconciliation in `ag sync`. Three enforcement modes (off/advisory/blocking) via STACK.md. Includes `intents.py` module, `intent-helpers.sh`, reconciler with adopt-orphan recovery, and `ag intent` commands.
 
 ## [0.52.3] - 2026-03-09
 
