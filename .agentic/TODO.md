@@ -213,6 +213,11 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0078: ag done verification subprocess leaks sourced env (ROOT_DIR, FRAMEWORK_ROOT) into bash -c, causing functional tests to use wrong project root — 5 phantom failures vs direct run
 - **Added**: 2026-03-17
 
+### T-0079: Structural gate for project-wide documentation currency at feature completion
+- **Added**: 2026-03-19
+- **Background**: 14-day audit found 13 features shipped without updating CHANGELOG, HOW_IT_WORKS, DEVELOPER_GUIDE, README, FRAMEWORK_WORKFLOW, or other living docs. The "spec + code + tests + docs = done" rule exists in memory-seed, before_commit.md, and skills — but is behavioral only, no structural enforcement. User had to push back 3 times for thorough coverage. Root cause: `docs.sh` and `drift.sh --docs` only track docs in the STACK.md `## Docs` registry; framework-level living documents (README, CHANGELOG, etc.) are invisible to the enforcement layer.
+- **Related**: F-0207 (doc lifecycle), F-0208 (deferred docs), `docs.sh`, `drift.sh --docs`, `before_commit.md` checks 19-20. Candidate approaches: (1) `validate_framework.sh` check comparing shipped features against CHANGELOG/HOW_IT_WORKS mentions, (2) `ag done` gate checking doc coverage, (3) expanding drift.sh to cover framework-level docs, (4) PostToolUse hook on `ag done` (T-0073) that verifies doc artifacts.
+
 ## Done
 
 
