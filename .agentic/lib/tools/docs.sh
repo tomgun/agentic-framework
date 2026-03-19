@@ -90,6 +90,11 @@ while [[ $# -gt 0 ]]; do
                 shift
                 CREATE_TRIGGER="${1:-}"
                 shift
+            elif [[ "$MODE" == "check-freshness" ]]; then
+                # --trigger as filter for --check-freshness (don't change MODE)
+                shift
+                TRIGGER="${1:-}"
+                shift
             else
                 MODE="trigger"
                 shift
@@ -99,6 +104,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --check)
             CHECK_ONLY=true
+            shift
+            ;;
+        --check-freshness)
+            MODE="check-freshness"
             shift
             ;;
         --manifest)
@@ -126,7 +135,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -h|--help)
-            echo "Usage: docs.sh [--list | --trigger <trigger> | --check | --draft <path> | --validate | --coverage | --create <path>]"
+            echo "Usage: docs.sh [--list | --trigger <trigger> | --check | --draft <path> | --validate | --coverage | --create <path> | --check-freshness]"
             echo "               [--manifest F-####] [--type <type>] [--trigger <trigger>] [--force]"
             exit 0
             ;;
@@ -656,6 +665,104 @@ check_staleness() {
     fi
 }
 
+# ─── Freshness check (git-based, deterministic) ──────────────────
+
+# Detect the base branch (not hardcoded)
+detect_base_branch() {
+    local base=""
+    # Try origin/HEAD first (works when remote is configured)
+    if git -C "$ROOT_DIR" rev-parse --verify origin/HEAD &>/dev/null; then
+        base=$(git -C "$ROOT_DIR" rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's|origin/||')
+    fi
+    # Validate result — reject empty or literal "HEAD" (no-remote fallback)
+    if [[ -z "$base" || "$base" == "HEAD" ]]; then
+        # Fallback: check for main or master
+        if git -C "$ROOT_DIR" rev-parse --verify main &>/dev/null; then
+            base="main"
+        elif git -C "$ROOT_DIR" rev-parse --verify master &>/dev/null; then
+            base="master"
+        else
+            base="main"
+        fi
+    fi
+    echo "$base"
+}
+
+# Check freshness of registered docs.
+# Returns 0 if all fresh, 1 if any stale. Prints stale list to stdout.
+# Usage: check_freshness [trigger_filter]
+#   trigger_filter: only check docs with this trigger (default: feature_done)
+check_freshness() {
+    local trigger_filter="${1:-feature_done}"
+    local entries
+    entries=$(parse_registry)
+    [[ -z "$entries" ]] && return 0
+
+    local base_branch
+    base_branch=$(detect_base_branch)
+    local current_branch
+    current_branch=$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+
+    # Get files changed in branch (empty if on base branch or base not available)
+    local branch_files=""
+    if [[ -n "$current_branch" && "$current_branch" != "$base_branch" ]]; then
+        # Verify merge-base exists (fails in shallow clones without base ref)
+        if git -C "$ROOT_DIR" merge-base "$base_branch" HEAD &>/dev/null; then
+            branch_files=$(git -C "$ROOT_DIR" diff --name-only "${base_branch}...HEAD" 2>/dev/null || true)
+        fi
+    fi
+
+    # Get files changed in last 5 commits
+    local recent_files=""
+    recent_files=$(git -C "$ROOT_DIR" log -5 --diff-filter=AMCR --name-only --pretty=format: HEAD 2>/dev/null | sort -u || true)
+
+    local stale_count=0
+
+    while IFS='|' read -r path type trigger; do
+        # Filter by trigger
+        [[ "$trigger" != "$trigger_filter" ]] && continue
+
+        local full_path="$ROOT_DIR/$path"
+
+        # Directory entries — skip freshness (tracked differently)
+        if [[ "$path" == */ ]]; then
+            continue
+        fi
+
+        # File doesn't exist → STALE
+        if [[ ! -f "$full_path" ]]; then
+            echo -e "${RED}✗ stale (missing): ${path}${NC}"
+            stale_count=$((stale_count + 1))
+
+            continue
+        fi
+
+        # File in branch diff → FRESH
+        if [[ -n "$branch_files" ]] && echo "$branch_files" | grep -qx "$path"; then
+            continue
+        fi
+
+        # File in last 5 commits → FRESH
+        if [[ -n "$recent_files" ]] && echo "$recent_files" | grep -qx "$path"; then
+            continue
+        fi
+
+        # Otherwise → STALE
+        echo -e "${YELLOW}✗ stale: ${path}${NC}"
+        stale_count=$((stale_count + 1))
+        stale_list="${stale_list}${path}\n"
+    done <<< "$entries"
+
+    if [[ "$stale_count" -eq 0 ]]; then
+        echo -e "${GREEN}All ${trigger_filter} docs are fresh${NC}"
+        return 0
+    else
+        echo ""
+        echo -e "${RED}${stale_count} doc(s) need updating (trigger: ${trigger_filter})${NC}"
+        return 1
+    fi
+}
+
 # ─── Main ──────────────────────────────────────────────────────────
 
 case "$MODE" in
@@ -761,6 +868,11 @@ case "$MODE" in
         show_coverage
         ;;
 
+    check-freshness)
+        # Use TRIGGER if provided via --trigger, otherwise default to feature_done
+        check_freshness "${TRIGGER:-feature_done}"
+        ;;
+
     create)
         if [[ -z "$CREATE_PATH" ]]; then
             echo -e "${RED}Error: --create requires <path>${NC}" >&2
@@ -778,13 +890,14 @@ case "$MODE" in
         ;;
 
     "")
-        echo "Usage: docs.sh [--list | --trigger <trigger> | --check | --draft <path> | --validate | --coverage | --create <path>]"
+        echo "Usage: docs.sh [--list | --trigger <trigger> | --check | --draft <path> | --validate | --coverage | --create <path> | --check-freshness]"
         echo "               [--manifest F-####] [--type <type>] [--trigger <trigger>] [--force]"
         echo ""
         echo "Commands:"
         echo "  --list                          Show doc registry from STACK.md"
         echo "  --trigger <trigger>             Run docs for trigger (feature_done|pr|session|manual)"
         echo "  --check                         Dry run (combine with --trigger or --draft)"
+        echo "  --check-freshness               Check if registered docs are fresh (git-based)"
         echo "  --draft <path> --type <type>    Draft a single doc"
         echo "  --validate                      Registry health check (registered-but-missing + unregistered)"
         echo "  --coverage                      Show doc coverage by type"
@@ -792,6 +905,7 @@ case "$MODE" in
         echo ""
         echo "Options:"
         echo "  --manifest F-####              Feature ID for context"
+        echo "  --trigger <trigger>             Filter for --check-freshness (default: feature_done)"
         echo "  --force                         Allow --create to register existing files"
         exit 0
         ;;

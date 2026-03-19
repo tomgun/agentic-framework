@@ -1054,22 +1054,29 @@ if [[ -d "$EXT_GATES_DIR" ]]; then
   fi
 fi
 
-# Check 19: Doc registry health (advisory, respects docs_gate)
+# Check 19: Doc registry health (respects docs_gate: off/warning/blocking)
 if [[ $_FAST_MODE -eq 0 ]]; then
   DOCS_GATE=$(get_setting "docs_gate" "off" 2>/dev/null || echo "off")
   if [[ "$DOCS_GATE" != "off" ]]; then
     DOCS_SH="${PROJECT_ROOT}/.agentic/lib/tools/docs.sh"
     if [[ -f "$DOCS_SH" ]]; then
       echo ""
-      echo "[19] Doc registry health (advisory)..."
+      echo "[19] Doc registry health..."
       VALIDATE_OUTPUT=$(bash "$DOCS_SH" --validate 2>/dev/null) || true
-      # Advisory only — show issues but don't block
       MISSING_COUNT=$(echo "$VALIDATE_OUTPUT" | grep -c "registered-but-missing" || true)
       UNREG_COUNT=$(echo "$VALIDATE_OUTPUT" | grep -c "unregistered:" || true)
       if [[ "$MISSING_COUNT" -gt 0 ]] || [[ "$UNREG_COUNT" -gt 0 ]]; then
-        [[ "$MISSING_COUNT" -gt 0 ]] && echo "  ⚠ ${MISSING_COUNT} registered doc(s) missing from disk"
         [[ "$UNREG_COUNT" -gt 0 ]] && echo "  ⚠ ${UNREG_COUNT} unregistered doc(s) found"
-        echo "  Run: bash .agentic/lib/tools/docs.sh --validate"
+        if [[ "$MISSING_COUNT" -gt 0 ]]; then
+          if [[ "$DOCS_GATE" == "blocking" ]]; then
+            echo "  ❌ ${MISSING_COUNT} registered doc(s) missing from disk"
+            echo "  Run: bash .agentic/lib/tools/docs.sh --validate"
+            FAILURES=$((FAILURES + 1))
+          else
+            echo "  ⚠ ${MISSING_COUNT} registered doc(s) missing from disk"
+            echo "  Run: bash .agentic/lib/tools/docs.sh --validate"
+          fi
+        fi
       else
         echo "  ✓ Doc registry healthy"
       fi

@@ -642,7 +642,13 @@ phase_tool_parity() {
 
     if [ "$env_exit" -ne 0 ]; then
         # Missing instruction files
-        if [ "$MODE" = "full" ]; then
+        # In the framework repo, root files are manually maintained with
+        # framework-dev-specific content. setup-agent.sh would overwrite them
+        # with generic templates, so skip auto-fix here.
+        local is_framework_repo=false
+        [[ -f "$ROOT_DIR/FRAMEWORK_DEVELOPMENT.md" ]] && is_framework_repo=true
+
+        if [ "$MODE" = "full" ] && ! $is_framework_repo; then
             # Auto-fix: create missing files
             bash "$SCRIPT_DIR/check-environment.sh" --fix >/dev/null 2>&1 || true
             record_fixed

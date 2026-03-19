@@ -67,6 +67,19 @@ bash .agentic/lib/tools/todo.sh list
 
 Surface any items that should be addressed before moving on.
 
+### Step 5b: Doc Freshness Verification
+
+Before running `ag done`, verify registered docs are up to date:
+
+```bash
+bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done
+```
+
+If any docs are stale:
+1. Update the stale docs with changes from the current feature
+2. Re-run `--check-freshness` to confirm they pass
+3. `ag done` will block if `docs_gate: blocking` and docs are still stale
+
 ### Step 6: Retrospective Check
 
 After shipping, check if a retrospective is due:
