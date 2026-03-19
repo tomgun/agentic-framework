@@ -1044,7 +1044,7 @@ cmd_implement() {
             # Only warn if both timestamps exist and NFR.md is newer
             if [[ -n "$nfr_ts" && -n "$acc_ts" && "$nfr_ts" -gt "$acc_ts" ]]; then
                 echo -e "${YELLOW}⚠ NFR.md has changed since this feature's ACs were written.${NC}"
-                echo "  Run: bash .agentic/lib/tools/nfr-applicable.sh $feature_id"
+                echo "  Run: bash .agentic/lib/tools/nfr-propagate.sh sync $feature_id"
             fi
         fi
     fi
