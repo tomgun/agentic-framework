@@ -3820,7 +3820,7 @@ Proposed restructuring:
 
 ## F-0221: ag.sh Decomposition
 
-**Status**: planned
+**Status**: shipped
 **Category**: Architecture
 **Priority**: high
 **Complexity**: high

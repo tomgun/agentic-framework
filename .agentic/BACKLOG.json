@@ -12,13 +12,6 @@
   },
   {
     "type": "feature",
-    "id": "F-0221",
-    "description": "ag.sh Decomposition",
-    "added_at": "2026-03-16T18:56:12Z",
-    "added_by": "agent"
-  },
-  {
-    "type": "feature",
     "id": "F-0223",
     "description": "Later State Machine Gates Strengthening",
     "added_at": "2026-03-16T18:56:12Z",

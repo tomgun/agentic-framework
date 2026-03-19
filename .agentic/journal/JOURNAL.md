@@ -3425,3 +3425,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 21:27 - F-0221 shipped
+
+**Why**: Maintainability improvement for framework CLI gateway
+
+**What changed**:
+- ag.sh decomposed: 4325→363 lines, 12 sourced modules, PR #169 merged
+
+**Next steps**:
+- Next backlog item
+
+**Blockers**: None
+
