@@ -3282,3 +3282,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 17:05 - F-0216 Shipped
+
+**Why**: Active NFR discovery replaces passive catalog dump
+
+**What changed**:
+- NFR auto-generation with --limit, --machine, batch writer, kickoff integration. Full autonomous pipeline validated.
+
+**Next steps**:
+- Next: F-0217 (NFR-Aware Test Writing)
+
+**Blockers**: None
+

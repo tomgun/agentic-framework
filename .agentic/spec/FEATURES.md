@@ -3718,7 +3718,7 @@ Proposed restructuring:
 
 ## F-0216: NFR Auto-Generation at Lifecycle Moments
 
-**Status**: planned
+**Status**: shipped
 **Category**: Quality
 **Priority**: high
 **Complexity**: medium
