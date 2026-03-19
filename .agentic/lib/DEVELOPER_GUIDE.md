@@ -2175,9 +2175,14 @@ ag nfr discover            # Auto-detect applicable NFRs (4-8 pre-selected, not 
 ag nfr coverage            # Check test coverage for NFR constraints
 ```
 
-**Auto-generation (F-0216):** `ag nfr discover` presents 4-8 pre-selected recommendations based on stack detection (`--limit 8`), prioritizing type-specific entries over universal ones. Selected NFRs are written via batch writer: `nfr-generate.sh --machine --limit 8 | nfr-write-batch.sh` (collision-free IDs, merge with existing). During `ag kickoff`, NFR suggestions are auto-generated and saved to the staging area (`NFR-SUGGESTIONS.md`).
+All four features shipped:
 
-NFRs live in `.agentic/spec/NFR.md`. The framework auto-propagates NFR constraints into feature acceptance criteria (`nfr-propagate.sh`), checks test coverage (`nfr-test-check.sh`), and shows NFR health at session start. `ag audit` verifies the full spec → AC → test chain including NFR coverage.
+- **Auto-generation (F-0216):** `ag nfr discover` presents 4-8 pre-selected recommendations (`--limit 8`). Batch writer: `nfr-generate.sh --machine | nfr-write-batch.sh` (collision-free IDs, merge with existing). `ag kickoff` auto-generates NFR suggestions into staging.
+- **Test awareness (F-0217):** writing-tests skill runs `nfr-test-check.sh F-XXXX` before designing test plans. implementing-features checks NFR coverage during coding.
+- **Propagation (F-0218):** `nfr-propagate.sh derive F-XXXX` auto-generates NFR Constraints sections. `check --all` detects staleness. `sync F-XXXX` compares current vs expected. `nfr-capture.sh` captures informal invariants with concurrency guard.
+- **Health dashboard (F-0219):** `nfr-health.sh` with `--summary`, `--json`, `--coverage-only`, `--component` modes. Dashboard shows NFR status at session start. `ag nfr` is the unified subcommand hub.
+
+NFRs live in `.agentic/spec/NFR.md`. `ag audit` verifies the full spec → AC → test chain including NFR coverage.
 
 ### Feature State Transitions (F-0222)
 
