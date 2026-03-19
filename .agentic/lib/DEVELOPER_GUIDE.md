@@ -2171,9 +2171,11 @@ ag docs --list             # See all registered docs
 
 ```bash
 ag nfr list                # List NFRs with status and coverage
-ag nfr discover            # Auto-detect applicable NFRs from stack
+ag nfr discover            # Auto-detect applicable NFRs (4-8 pre-selected, not full catalog)
 ag nfr coverage            # Check test coverage for NFR constraints
 ```
+
+**Auto-generation (F-0216):** `ag nfr discover` presents 4-8 pre-selected recommendations based on stack detection (`--limit 8`), prioritizing type-specific entries over universal ones. Selected NFRs are written via batch writer: `nfr-generate.sh --machine --limit 8 | nfr-write-batch.sh` (collision-free IDs, merge with existing). During `ag kickoff`, NFR suggestions are auto-generated and saved to the staging area (`NFR-SUGGESTIONS.md`).
 
 NFRs live in `.agentic/spec/NFR.md`. The framework auto-propagates NFR constraints into feature acceptance criteria (`nfr-propagate.sh`), checks test coverage (`nfr-test-check.sh`), and shows NFR health at session start. `ag audit` verifies the full spec → AC → test chain including NFR coverage.
 

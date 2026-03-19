@@ -2425,6 +2425,14 @@ else:
     for e in v.get('errors', []):
         print(f'  - {e}')
 "
+            # Display NFR suggestions if present in staging
+            local staging_nfr="$ROOT_DIR/.agentic/session/kickoff-draft/NFR-SUGGESTIONS.md"
+            if [ -f "$staging_nfr" ]; then
+                echo ""
+                echo -e "${BOLD}NFR Suggestions:${NC}"
+                cat "$staging_nfr"
+            fi
+
             echo ""
             echo -e "${BOLD}AGENT INSTRUCTION:${NC}"
             echo "Present the above to the user. They can:"
@@ -2593,6 +2601,22 @@ else:
             echo "  - STACK.md (tech stack, constraints)"
             if [ -f "$ROOT_DIR/.agentic/spec/NFR.md" ]; then
                 echo "  - .agentic/spec/NFR.md (non-functional requirements)"
+            fi
+
+            # NFR auto-generation: capture suggestions and write to staging (AC-008, AC-009)
+            local nfr_suggestions=""
+            nfr_suggestions=$(bash "$SCRIPT_DIR/nfr-generate.sh" --limit 8 2>/dev/null || true)
+            if [ -n "$nfr_suggestions" ]; then
+                local staging_dir="$ROOT_DIR/.agentic/session/kickoff-draft"
+                mkdir -p "$staging_dir"
+                echo "$nfr_suggestions" > "$staging_dir/NFR-SUGGESTIONS.md"
+                echo ""
+                echo "NFR SUGGESTIONS (auto-generated, saved to staging):"
+                echo "$nfr_suggestions"
+                echo ""
+                echo "These NFR suggestions are saved at $staging_dir/NFR-SUGGESTIONS.md"
+                echo "After features are generated, present these to the user for review."
+                echo "To write selected NFRs: bash $SCRIPT_DIR/nfr-generate.sh --machine --limit 8 | bash $SCRIPT_DIR/nfr-write-batch.sh"
             fi
             ;;
     esac
@@ -4008,21 +4032,25 @@ cmd_nfr() {
         discover)
             echo -e "${BOLD}NFR Discovery${NC}"
             echo ""
-            # Run nfr-generate.sh for smart recommendations
-            local gen_args=()
-            # Pass through any remaining args (--project-type, --components, --all)
-            [[ $# -gt 0 ]] && gen_args=("$@")
+            # Run nfr-generate.sh for smart recommendations (default limit 8)
+            local gen_args=("--limit" "8")
+            # Append any remaining args (--project-type, --components, --all)
+            # User can override --limit by passing their own --limit N (last wins in arg parsing)
+            [[ $# -gt 0 ]] && gen_args+=("$@")
             bash "$SCRIPT_DIR/nfr-generate.sh" "${gen_args[@]}"
             local rc=$?
             if [[ $rc -eq 0 ]]; then
                 echo ""
                 echo "--- AGENT INSTRUCTION ---"
                 echo "Present the recommendations above to the user. For each selected NFR:"
-                echo "1. Assign the next NFR-XXXX ID (check existing IDs in .agentic/spec/NFR.md)"
-                echo "2. Let the user customize thresholds (values in {threshold} placeholders)"
-                echo "3. Write selected NFRs to .agentic/spec/NFR.md using the standard format"
-                echo "4. Create acceptance files: .agentic/spec/acceptance/NFR-XXXX.md"
-                echo "'looks good' or 'all' = accept the P1 recommendations with default thresholds."
+                echo "1. Let the user customize thresholds (values in {threshold} placeholders)"
+                echo "2. Write selected NFRs using the batch writer:"
+                echo "   bash $SCRIPT_DIR/nfr-generate.sh --machine --limit 8 | bash $SCRIPT_DIR/nfr-write-batch.sh"
+                echo "   Or for selective write, filter the machine output to desired entries first."
+                echo "3. Create acceptance files: .agentic/spec/acceptance/NFR-XXXX.md"
+                echo "'looks good' or 'all' = pipe all through batch writer with default thresholds."
+                echo "'just 1,3,5' = filter to those entries, then pipe through batch writer."
+                echo "'none' = skip NFR setup."
                 echo "--- END INSTRUCTION ---"
             fi
             ;;

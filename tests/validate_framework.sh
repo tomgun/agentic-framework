@@ -5227,6 +5227,46 @@ active_count=${#active_roles[@]}
 pass "F-0234: Agent parity check complete (${active_count} active roles verified)"
 
 
+# --- F-0216: NFR Auto-Generation at Lifecycle Moments ---
+echo ""
+echo "--- F-0216: NFR Auto-Generation ---"
+
+# AC-005: --limit flag in nfr-generate.sh
+if bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/nfr-generate.sh" --help 2>&1 | grep -q "\-\-limit"; then
+  pass "F-0216: nfr-generate.sh --help documents --limit flag"
+else
+  fail "F-0216: nfr-generate.sh --help missing --limit flag"
+fi
+
+# AC-005: --machine flag in nfr-generate.sh
+if bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/nfr-generate.sh" --help 2>&1 | grep -q "\-\-machine"; then
+  pass "F-0216: nfr-generate.sh --help documents --machine flag"
+else
+  fail "F-0216: nfr-generate.sh --help missing --machine flag"
+fi
+
+# AC-006: nfr-write-batch.sh exists and is executable
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/nfr-write-batch.sh" ]]; then
+  pass "F-0216: nfr-write-batch.sh exists and is executable"
+else
+  fail "F-0216: nfr-write-batch.sh missing or not executable"
+fi
+
+# AC-005: ag nfr discover uses --limit (default 8)
+if grep -q 'nfr-generate.sh.*--limit\|--limit.*8' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+  pass "F-0216: ag nfr discover passes --limit to nfr-generate.sh"
+else
+  fail "F-0216: ag nfr discover should pass --limit to nfr-generate.sh"
+fi
+
+# AC-008: cmd_kickoff calls nfr-generate.sh
+if grep -q 'nfr-generate.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+  pass "F-0216: cmd_kickoff references nfr-generate.sh"
+else
+  fail "F-0216: cmd_kickoff should call nfr-generate.sh for NFR integration"
+fi
+
+
 # Summary
 # ============================================================
 echo ""

@@ -3256,3 +3256,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 16:27 - F-0216 Prep
+
+**Why**: Enable fully autonomous workflow for backlog processing
+
+**What changed**:
+- Switched to autonomous_formal profile. Approved F-0216 plan after dialectical review with Critic+Advocate agents.
+
+**Next steps**:
+- Implement F-0216 through autonomous pipeline
+
+**Blockers**: None
+
+
+### Session: 2026-03-19 16:39 - F-0216 Implementation
+
+**Why**: Transform passive NFR discovery into active, recommendation-driven flow
+
+**What changed**:
+- Implemented NFR auto-generation: --limit and --machine flags for nfr-generate.sh, new nfr-write-batch.sh for batch NFR creation, ag nfr discover defaults to 8 pre-selected recommendations, ag kickoff writes NFR-SUGGESTIONS.md to staging deterministically
+
+**Next steps**:
+- Create PR, update acceptance criteria
+
+**Blockers**: None
+
