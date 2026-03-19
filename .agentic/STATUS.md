@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- ADR-001 roadmap execution: F-0217 (NFR-Aware Test Writing) is current backlog item (Updated: 2026-03-19 17:05 UTC)
+- F-0218 shipped. Creating pipeline-summary skill PR. (Updated: 2026-03-19 17:29 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

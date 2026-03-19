@@ -3758,7 +3758,7 @@ Proposed restructuring:
 
 ## F-0218: NFR Propagation Pipeline
 
-**Status**: planned
+**Status**: shipped
 **Category**: Quality
 **Priority**: high
 **Complexity**: high

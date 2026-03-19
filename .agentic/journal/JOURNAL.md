@@ -3321,3 +3321,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 17:29 - F-0218 Shipped
+
+**Why**: NFR.md is now a living source of truth that actively propagates into feature ACs
+
+**What changed**:
+- NFR propagation pipeline complete: derive/check/sync tools, capture with concurrency guard, spec-health integration, checklist updated to tool-based workflow
+
+**Next steps**:
+- Pipeline summary skill change PR
+
+**Blockers**: None
+

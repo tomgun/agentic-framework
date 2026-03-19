@@ -1,24 +1,14 @@
 [
   {
     "type": "feature",
-    "id": "F-0218",
-    "description": "NFR Propagation Pipeline",
-    "added_at": "2026-03-16T18:56:06Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0218.md"
-    ],
-    "became_current_at": "2026-03-19T17:10:00Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0219",
     "description": "NFR Health Dashboard & Scale",
     "added_at": "2026-03-16T18:56:06Z",
     "added_by": "agent",
     "refs": [
       ".agentic/spec/acceptance/F-0219.md"
-    ]
+    ],
+    "became_current_at": "2026-03-19T17:29:18Z"
   },
   {
     "type": "feature",
