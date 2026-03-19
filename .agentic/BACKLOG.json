@@ -2,7 +2,7 @@
   {
     "type": "feature",
     "id": "F-0216",
-    "description": "F-0216",
+    "description": "NFR Auto-Generation at Lifecycle Moments",
     "added_at": "2026-03-16T18:56:04Z",
     "added_by": "agent",
     "refs": [
@@ -13,7 +13,7 @@
   {
     "type": "feature",
     "id": "F-0217",
-    "description": "F-0217",
+    "description": "NFR-Aware Test Writing",
     "added_at": "2026-03-16T18:56:05Z",
     "added_by": "agent",
     "refs": [
@@ -23,7 +23,7 @@
   {
     "type": "feature",
     "id": "F-0218",
-    "description": "F-0218",
+    "description": "NFR Propagation Pipeline",
     "added_at": "2026-03-16T18:56:06Z",
     "added_by": "agent",
     "refs": [
@@ -33,7 +33,7 @@
   {
     "type": "feature",
     "id": "F-0219",
-    "description": "F-0219",
+    "description": "NFR Health Dashboard & Scale",
     "added_at": "2026-03-16T18:56:06Z",
     "added_by": "agent",
     "refs": [
@@ -43,98 +43,98 @@
   {
     "type": "feature",
     "id": "F-0221",
-    "description": "F-0221",
+    "description": "ag.sh Decomposition",
     "added_at": "2026-03-16T18:56:12Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0223",
-    "description": "F-0223",
+    "description": "Later State Machine Gates Strengthening",
     "added_at": "2026-03-16T18:56:12Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0220",
-    "description": "F-0220",
+    "description": "Protected Main Branch Support",
     "added_at": "2026-03-16T18:56:12Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0193",
-    "description": "F-0193",
+    "description": "Collision-Proof Feature IDs",
     "added_at": "2026-03-16T18:56:13Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0210",
-    "description": "F-0210",
+    "description": "Configurable Definition of Done per Task Type",
     "added_at": "2026-03-16T18:56:13Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0213",
-    "description": "F-0213",
+    "description": "Unified Work Queue & Feature Registry Redesign",
     "added_at": "2026-03-16T18:56:14Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0228",
-    "description": "F-0228",
+    "description": "Workflow Definition File",
     "added_at": "2026-03-16T18:56:15Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0211",
-    "description": "F-0211",
+    "description": "Project-Specific Customization Layer",
     "added_at": "2026-03-16T18:56:15Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0212",
-    "description": "F-0212",
+    "description": "Project Customization Auto-Sync",
     "added_at": "2026-03-16T18:56:15Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0227",
-    "description": "F-0227",
+    "description": "End-to-End Workflow Integration Test",
     "added_at": "2026-03-16T18:56:15Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0233",
-    "description": "F-0233",
+    "description": "Design Phase Formalization",
     "added_at": "2026-03-16T18:56:16Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0230",
-    "description": "F-0230",
+    "description": "MCP Coordination Server",
     "added_at": "2026-03-16T18:56:16Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0231",
-    "description": "F-0231",
+    "description": "Multi-Repo Umbrella",
     "added_at": "2026-03-16T18:56:16Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
     "id": "F-0232",
-    "description": "F-0232",
+    "description": "Full Autonomous Scheduling",
     "added_at": "2026-03-16T18:56:16Z",
     "added_by": "agent"
   }

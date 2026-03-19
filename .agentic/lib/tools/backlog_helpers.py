@@ -58,6 +58,19 @@ def _auto_discover_refs(project_root: Path, feature_id: str) -> list[str]:
     return refs
 
 
+def _feature_title(project_root: Path, feature_id: str) -> str:
+    """Look up the feature title from FEATURES.md. Returns '' if not found."""
+    paths = get_paths(project_root)
+    ff = paths.features_file
+    if not ff.exists():
+        return ""
+    prefix = f"## {feature_id}: "
+    for line in ff.read_text().splitlines():
+        if line.startswith(prefix):
+            return line[len(prefix):].strip()
+    return ""
+
+
 def _feature_exists_in_registry(project_root: Path, feature_id: str) -> bool:
     """Check if feature is registered in FEATURES.md."""
     paths = get_paths(project_root)
@@ -159,7 +172,7 @@ def cmd_add(project_root: Path, backlog_file: Path, args: list[str]) -> int:
         item = {
             "type": "feature",
             "id": feature_id,
-            "description": description or feature_id,
+            "description": description or _feature_title(project_root, feature_id) or feature_id,
             "added_at": now,
             "added_by": "agent",
         }
@@ -385,7 +398,7 @@ def cmd_upsert(project_root: Path, backlog_file: Path, feature_id: str) -> int:
     item: dict = {
         "type": "feature",
         "id": feature_id,
-        "description": feature_id,
+        "description": _feature_title(project_root, feature_id) or feature_id,
         "added_at": now,
         "added_by": "auto",
         "became_current_at": now,

@@ -3243,3 +3243,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 15:11 - Backlog title fix
+
+**Why**: Dashboard showed 'F-0216 F-0216' instead of feature titles
+
+**What changed**:
+- Backlog entries now resolve feature titles from FEATURES.md instead of storing bare IDs; backfilled 18 existing entries
+
+**Next steps**:
+- F-0216 planning
+
+**Blockers**: None
+
