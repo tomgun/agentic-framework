@@ -173,11 +173,11 @@ The framework includes a formal QA pipeline — "who tests the tests?"
 | QA audit tool | `.agentic/lib/tools/spec-audit.sh` |
 | QA tracker | `.agentic/lib/tools/qa-tracker.sh` |
 | NFR catalog | `.agentic/lib/init/nfr-catalog.md` |
-| Upgrade notifications | `.agentic/tools/upgrade.sh` → FEATURE_REGISTRY |
-| Templates | `.agentic/init/*.template.md` |
-| Agent guidelines | `.agentic/agents/shared/` |
+| Upgrade notifications | `.agentic/lib/tools/upgrade.sh` → FEATURE_REGISTRY |
+| Templates | `.agentic/lib/init/*.template.md` |
+| Agent guidelines | `.agentic/lib/agents/shared/` |
 | Full dev guide | `FRAMEWORK_DEVELOPMENT.md` |
-| Principles | `.agentic/PRINCIPLES.md` |
+| Principles | `.agentic/lib/PRINCIPLES.md` |
 | Change manifests | `.agentic/journal/manifests/` (use `manifest.sh F-####`) |
 | Doc drift check | `drift.sh --docs` or `drift.sh --docs --manifest F-####` |
 

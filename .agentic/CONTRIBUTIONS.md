@@ -2880,9 +2880,19 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### 14-Day Documentation Audit (v0.53–v0.64)
+
+**User insight**: The agent treated documentation updates as a narrow, file-by-file task — updating only the files explicitly mentioned (HOW_IT_WORKS, CHANGELOG) rather than systematically auditing all living documentation. The user had to push back three times: first to say "not just instruction files, also project docs", then "not just HOW_IT_WORKS — what about DEVELOPER_GUIDE?", then "there are other docs too — why are you being superficial?" Each push uncovered another layer of neglect. The root cause: the framework's doc update workflow is behavioral (checklist items in before_commit.md) with no structural enforcement that project-wide documentation stays current when features ship.
+
+**User insight**: Documentation updates must be an automatic, enforced part of the feature lifecycle — not something the user has to remind the agent to do. The fact that 13 features shipped over 14 days without updating CHANGELOG, HOW_IT_WORKS, DEVELOPER_GUIDE, README, FRAMEWORK_WORKFLOW, or FRAMEWORK_DEVELOPMENT means the "spec + code + tests + docs = done" rule is not structurally enforced for project-level documentation. The rule exists in memory-seed, before_commit.md, and multiple skills — but agents skip it because nothing blocks the commit.
+
+**Design direction**: Need a structural gate (not just behavioral rule) that checks project-wide documentation currency at feature completion. Candidate approaches: (1) `validate_framework.sh` check that compares shipped features against doc mentions, (2) `ag done` gate that flags features with no CHANGELOG/HOW_IT_WORKS entry, (3) expanding `drift.sh --docs` to cover framework-level docs (README, CHANGELOG, etc.) not just project docs in the STACK.md registry. The existing `docs_gate` setting and `docs.sh` infrastructure only covers docs registered in STACK.md — framework-level living documents are invisible to it.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.55.0
+**Current Version**: v0.64.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
-**LLM Tests**: 50 behavioral test definitions
+**LLM Tests**: 67 behavioral test definitions
 

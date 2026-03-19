@@ -1,6 +1,6 @@
 # Framework System Map
 
-> **Version**: 0.61.0 · **Date**: 2026-03-16 · **Features**: 157 shipped, 12 implementing, 10 planned
+> **Version**: 0.64.0 · **Date**: 2026-03-19 · **Features**: 179 shipped, 23 implementing, 26 planned
 
 The complete reference for understanding, using, and maintaining the Agentic Framework — from 30-second overview to deep reference.
 
@@ -30,7 +30,7 @@ The complete reference for understanding, using, and maintaining the Agentic Fra
   - [Section 14: The Verification Loop — From "Tests Fail" to "Commit"](#section-14-the-verification-loop--from-tests-fail-to-commit)
   - [Section 15: Research Phase and Project-Aware Context Assembly](#section-15-research-phase-and-project-aware-context-assembly)
 - [Part IV: The Bigger Picture](#part-iv-the-bigger-picture)
-  - [Section 16: Current Inventory (v0.61.0)](#section-16-current-inventory-v0610)
+  - [Section 16: Current Inventory (v0.64.0)](#section-16-current-inventory-v0610)
   - [Section 17: What's In Flight](#section-17-whats-in-flight)
   - [Section 18: Opportunity Map](#section-18-opportunity-map)
 - [Part V: Quick References](#part-v-quick-references)
@@ -891,7 +891,7 @@ Six levels of verification, from narrowest to broadest:
 | **1. Unit** | Individual test cases, per-AC coverage | `pytest`, `bash` test scripts | During implementation |
 | **2. Feature** | Single feature: all ACs, smoke test | `ag auto verify`, `ag audit` | After implementation |
 | **3. Integration** | Cross-component: epic children interact correctly | `ag auto verify-epic F-XXXX` | After epic completion |
-| **4. Framework** | Framework self-consistency (675 checks at v0.61.0) | `bash tests/validate_framework.sh` | Before commit (framework dev) |
+| **4. Framework** | Framework self-consistency (706 checks at v0.64.0) | `bash tests/validate_framework.sh` | Before commit (framework dev) |
 | **5. Behavioral** | AI agent behavior: do agents follow rules? | `ag test llm` (67 LLM tests) | Before commit (framework dev) |
 | **6. Drift** | Project state consistency: 10-phase sync check | `ag sync`, `drift.sh`, `drift-check.sh` | Session start, before commit |
 
@@ -1555,16 +1555,16 @@ Each defines a STACK.md structure for its project type. Used by `ag auto verify-
 
 # Part IV: The Bigger Picture
 
-## Section 16: Current Inventory (v0.61.0)
+## Section 16: Current Inventory (v0.64.0)
 
 ### Metrics Snapshot
 
 | Metric | Count |
 |--------|-------|
-| Features (total) | 183 |
-| — Shipped | 157 |
-| — Implementing (incl. legacy `in_progress`) | 12 |
-| — Planned | 10 |
+| Features (total) | 198 |
+| — Shipped | 179 |
+| — Implementing (incl. legacy `in_progress`) | 23 |
+| — Planned | 26 |
 | — Deprecated | 4 |
 | Shell tools (`.agentic/lib/tools/*.sh`) | 81 (+ 5 archived) |
 | Autonomous engine modules (`.agentic/lib/auto/*.py`) | 24 |
@@ -1849,4 +1849,4 @@ find tests -name "*.sh" -o -name "*.py" | grep -c test                         #
 wc -l .agentic/lib/tools/ag.sh                                                 # CLI gateway size
 ```
 
-*Generated from framework v0.61.0 source. File paths, gate names, settings, and metrics verified against live codebase.*
+*Generated from framework v0.64.0 source. File paths, gate names, settings, and metrics verified against live codebase.*

@@ -44,7 +44,7 @@ A custom rules file is a great start. This framework builds on the same idea but
 - Multi-agent coordination at scale, sequential agent pipelines, automated retrospectives
 - Autonomous workflow modes: test-fix loops, per-AC feature implementation, multi-feature batch processing
 
-**How we know it works**: 430+ acceptance tests + 58 LLM behavioral tests verify that agents actually follow the rules. See [TRACEABILITY_MATRIX.md](tests/TRACEABILITY_MATRIX.md) for principle → feature → test mapping.
+**How we know it works**: 700+ acceptance tests + 67 LLM behavioral tests verify that agents actually follow the rules. See [TRACEABILITY_MATRIX.md](tests/TRACEABILITY_MATRIX.md) for principle → feature → test mapping.
 
 **📖 Detailed problem analysis**: [FRAMEWORK_VALUE_PROPOSITION.md](docs/FRAMEWORK_VALUE_PROPOSITION.md)
 
@@ -85,8 +85,8 @@ curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remot
 
 Options:
 ```bash
-# Install specific version (e.g., v0.15.0)
-VERSION=v0.15.0 curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
+# Install specific version
+VERSION=v0.64.0 curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
 
 # Install to different directory
 TARGET=/path/to/project curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remote-install.sh | bash
@@ -252,7 +252,7 @@ curl -fsSL https://raw.githubusercontent.com/tomgun/agentic-framework/main/remot
 
 Or manually:
 ```bash
-curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.13.0.tar.gz | tar xz
+curl -L https://github.com/tomgun/agentic-framework/archive/refs/tags/v0.64.0.tar.gz | tar xz
 bash agentic-framework/install.sh /path/to/your-project
 ```
 

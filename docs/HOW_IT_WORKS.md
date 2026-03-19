@@ -2,7 +2,7 @@
 
 **Purpose**: Comprehensive map of how every principle is implemented, what mechanisms exist, which are actively working, and which are dormant or underutilized.
 
-**Generated**: 2026-03-08 | **Framework Version**: 0.47.0
+**Generated**: 2026-03-19 | **Framework Version**: 0.63.0
 
 ---
 
@@ -105,6 +105,12 @@ graph TB
         %% Intent Journal (v0.53.0)
         F_INTENT[Intent Journal + Reconciliation<br/>F-0200]
 
+        %% Workflow & Quality (v0.54.0–v0.63.0)
+        F_DOC_LIFECYCLE[Doc Lifecycle<br/>F-0207, F-0208]
+        F_FORMALIZE[ag formalize<br/>F-0205]
+        F_FEEDBACK[ag feedback<br/>F-0206]
+        F_INTEGRATION_VERIFY[Epic Integration Verify<br/>F-0204]
+
         %% SDD Toolkit Insights (v0.39.0)
         F_SPEC_FORMAT[Spec Format Evolution<br/>F-0148]
         F_CLARIFICATION[Clarification Taxonomy<br/>F-0149]
@@ -116,7 +122,7 @@ graph TB
 
     subgraph MECHANISMS["MECHANISMS (How)"]
         %% Scripts
-        M_AG[ag.sh gateway<br/>25+ commands]
+        M_AG[ag.sh gateway<br/>37+ commands]
         M_AUTO_ENGINE[auto/ engine<br/>socket control + state]
         M_PRECOMMIT[pre-commit-check.sh<br/>17 structural gates + advisories]
         M_WIP_SH[wip.sh<br/>state machine]
@@ -221,6 +227,14 @@ graph TB
     %% D5: Living Documentation
     D5 --> F_DISCOVERY
     D5 --> F_AC_COVERAGE
+    D5 --> F_DOC_LIFECYCLE
+
+    %% F1 → new workflow commands
+    F1 --> F_FORMALIZE
+    F1 --> F_FEEDBACK
+
+    %% D2 → integration verification
+    D2 --> F_INTEGRATION_VERIFY
 
     %% D6: Green Coding
     D6 --> F_TOKEN_SCRIPTS
@@ -551,6 +565,7 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 - **Automatic status cascade**: after any child feature transitions, the parent epic's status is automatically recomputed from its children (pure derivation, not a state transition). Rules: all shipped → epic shipped; any implementing/verified → epic implementing; all criteria_set or earlier → epic criteria_set; any regression → epic implementing
 - **Autonomous epic execution** (F-0186): `ag auto epic F-XXXX` reads the epic's child features, schedules component-scoped workers (AutonomousScheduler) with non-blocking reviews, and executes each child feature autonomously. Builds on decomposition + task mode.
 - **End-to-end pipeline** (F-0188): `ag auto pipeline --features-json '...' --epic-name "..."` wires the full autonomous flow: creates an epic, promotes features with parent links, then schedules all children through implementation → review → integration verify → ship. Requires `review_decomposition` set to `critical_agent` or `skip`. The pipeline is a thin orchestrator — all heavy lifting delegated to existing modules (kickoff, scheduler, task, review, critical_agent, integration_verify).
+- **Epic integration verification** (F-0204): Gate between "all children shipped" and "epic shipped". When all children ship, `integration_verify.py` checks for an integration test artifact before the epic can advance. Integration test commands are resolved from the epic's AC file > STACK.md > skip. Configurable via `review_integration` setting. `ag auto verify-epic F-XXXX` runs integration verification explicitly.
 
 **Autonomous Framework Verification** (F-0215): `ag auto verify-framework --project todo-app` makes the framework test itself by building real projects end-to-end:
 - Spawns agents that use `ag kickoff`, `ag implement`, `ag commit` etc. to build example projects from scratch
@@ -572,6 +587,10 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 - Outputs stack summary (language, framework, platform), dev/build/test commands
 - Shows source attribution ("from STACK.md" vs "auto-detected") so users know what to trust
 - Package-manager-aware: uses pnpm/yarn/bun commands when those lockfiles are detected
+
+**Discovery-to-Formal Migration** (F-0205): `ag formalize` migrates discovery-phase content into formal spec structure. TODO items become FEATURES.md entries with auto-assigned IDs, journal plans become formal plan files, and informal decisions become ADR stubs. Distinct from `migration.sh` (shipped spec evolution) and `enable-formal.sh` (directory creation) — formalize handles content migration, not just scaffolding.
+
+**Feedback Capture** (F-0206): `ag feedback` captures structured user feedback after testing working software. Keyword-based classification routes feedback to existing tools: bugs go to ISSUES.md (via `quick_issue.sh`), feature requests go to TODO.md (via `todo.sh`), and AC adjustments are logged with cross-references. Persistent `FEEDBACK_LOG.md` tracks entries with `FB-XXXX` IDs.
 
 ---
 
@@ -651,7 +670,7 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 | **Manual Operations** (F-0067) | `MANUAL_OPERATIONS.md` documents all queries humans can run without agent (zero tokens). `cat STATUS.md`, `grep` patterns for feature status. | ACTIVE - documentation |
 | **PR Workflow** (F-0096) | Default for Formal. `pre-commit-check.sh` Check 11 blocks commits to main when `git_workflow: pull_request`. Forces feature branches + human review via PRs. | ACTIVE - structural gate |
 | **Plan-Review Loop** (F-0120, F-0191) | Planner creates plan → Critic + Advocate agents review in parallel (fresh context) → orchestrator synthesizes with Revision Guidance → user decides Proceed/Revise/Reject. Iterative. No single reviewer has authority. Configurable: `plan_review_enabled` in STACK.md. | ACTIVE |
-| **No Auto-Commits** (R2) | Behavioral rule in CLAUDE.md + memory seed. LLM test 005 validates compliance. Git agent role shows changes and waits for approval. | ACTIVE - behavioral + tested |
+| **No Auto-Commits** (R2, amended by F-0203) | Interactive sessions: always human review before commit. Autonomous workflows (`ag auto task/epic`): `review_commit: critical_agent` enables adversarial diff review and auto-commit. LLM test 005 validates interactive compliance. Profile defaults: discovery/formal=human, autonomous_formal=critical_agent. | ACTIVE - behavioral + structural |
 | **Scope Drift Warning** (F-0114) | `scope_check.sh` compares changed files against WIP declared scope. Pre-commit warns on drift. Human judges whether drift is acceptable. | ACTIVE - advisory warning |
 | **CONTRIBUTIONS.md** | Logs human design insights and direction. Agent tracks human ideas vs agent implementation work. | ACTIVE - behavioral |
 
@@ -743,8 +762,11 @@ These features exist but don't clearly derive from the 13 principles:
 | **ADRs** (F-0101) | Architecture Decision Records | D5 (Living Docs) |
 | **Spec Migration System** (F-0117) | Track how specs evolved over time | D5 (Living Docs) |
 | **Documentation Drift Detection** (F-0118) | Detect stale docs | D5 (Living Docs) |
+| **Doc Lifecycle** (F-0207) | Full artifact lifecycle: doc registry in STACK.md `## Docs` as source of truth, `docs.sh --validate` for registry health, `docs.sh --coverage` for gap detection, trigger-based update prompts at feature_done/PR/session. Pre-commit check 19 enforces registry health when `docs_gate != off`. | D5 (Living Docs) + D2 (Enforcement) |
+| **Deferred Docs Mode** (F-0208) | `docs_mode: inline | deferred` in STACK.md. Inline (default) updates docs with code in the same commit. Deferred skips doc updates during fast iteration, queuing them to `.agentic/deferred-docs.json`; `ag docs generate` synthesizes content from specs and code later. `docs_gate: blocking` + deferred means docs must be generated before `ag done` but not during each commit. | D5 (Living Docs) + F3 (Token Optimization) |
 | **Feature Change Manifests** (F-0119) | Git history per feature. Generated at `ag done`, regenerable without noise (commits deduped by message+date survive rebases). Idempotent — unchanged content skips write. Flushed via `ag flush`. | D3 (Durable Artifacts) |
 | **Claude Skills** (F-0098, F-0143) | Hand-crafted Claude Skills with Anthropic spec compliance | F3 (Token & Context Optimization) |
+| **NFR Lifecycle** (F-0216–F-0219) | Four planned features for non-functional requirement management: **Auto-generation** (F-0216) — `ag nfr discover` generates NFRs with smart defaults based on stack detection, integrated into `ag kickoff`. **Test awareness** (F-0217) — writing-tests skill checks applicable NFRs before designing test plans via `nfr-test-check.sh`. **Propagation** (F-0218) — `nfr-propagate.sh` auto-derives NFR constraint sections in feature ACs, detects staleness, and syncs. **Health dashboard** (F-0219) — `nfr-health.sh` provides per-NFR status/coverage/staleness with `--summary` and `--json` modes; dashboard shows NFR health at session start. `ag nfr` becomes a unified subcommand hub. | F2 (Quality) + D2 (Enforcement) |
 
 ---
 
@@ -825,7 +847,7 @@ These features exist but don't clearly derive from the 13 principles:
 │                     LLM TESTS                            │
 │  (Prove behavioral compliance empirically)               │
 │                                                          │
-│  48+ behavioral tests in tests/llm/                      │
+│  67+ behavioral tests in tests/llm/                      │
 │  Trigger compliance (003, 010)                           │
 │  Token script usage (004, 019)                           │
 │  Anti-hallucination (027, 028, 029)                      │
@@ -855,6 +877,10 @@ These features exist but don't clearly derive from the 13 principles:
 | `ag trace F-XXXX` | Show spec-code traceability | Read-only |
 | `ag hooks install\|status\|disable` | Git hook management | Structural |
 | `ag test llm` | Run LLM behavioral tests | Validation |
+| `ag formalize` | Migrate discovery-phase content (TODOs, plans, decisions) into formal spec structure | Advisory (content migration) |
+| `ag feedback` | Capture structured user feedback, route bugs/features/AC adjustments to existing tools | Advisory (routing + logging) |
+| `ag kickoff "vision"` | Convert product vision into OVERVIEW, FEATURES, ACs, and BACKLOG in staging area | Structural (staging → review → promote) |
+| `ag run` | Detect stack, show dev/build/test commands | Read-only |
 
 #### ag sync Phases
 
@@ -928,7 +954,7 @@ This would allow projects to declare their stack (e.g., `stack_type: web-react` 
 6. **Session start protocol** — Agents consistently resume with context.
 7. **WIP tracking** — Prevents lost work and parallel feature chaos.
 8. **Memory seed** — Behavioral reinforcement that demonstrably improves compliance.
-9. **LLM test infrastructure** — 48+ tests prove framework claims empirically.
+9. **LLM test infrastructure** — 67+ tests prove framework claims empirically.
 10. **Small batch enforcement** — Structural gates prevent runaway commits.
 
 ### Needs Attention (Underutilized Potential)
@@ -945,26 +971,26 @@ This would allow projects to declare their stack (e.g., `stack_type: web-react` 
 
 These will always rely on behavioral reinforcement:
 - Anti-hallucination (R1)
-- No auto-commits (R2)
+- No auto-commits in interactive sessions (R2 — partially structural via F-0203 `review_commit` in autonomous workflows)
 - Check before creating (R3)
 - Smoke testing before "done"
 - Code quality standards (see Task-Specific Quality Standards section above)
 
 ---
 
-## Tool Inventory (67 active tools)
+## Tool Inventory (71 active tools)
 
 ### Core Workflow (daily use)
-`ag.sh`, `status.sh`, `journal.sh`, `feature.sh`, `blocker.sh`, `wip.sh`
+`ag.sh`, `status.sh`, `journal.sh`, `feature.sh`, `blocker.sh`, `wip.sh`, `formalize.sh`, `feedback.sh`
 
 ### Quality Gates
-`pre-commit-check.sh`, `doctor.py`/`doctor.sh`, `validate_specs.py`, `validate_framework.sh` (tests)
+`pre-commit-check.sh`, `doctor.py`/`doctor.sh`, `validate_specs.py`, `validate_framework.sh` (tests), `integration_verify.py`
 
 ### Analysis & Traceability
 `coverage.py`, `drift.sh`, `scope_check.sh`, `consistency.py`, `phase_detect.py`, `query_features.py`, `feature_graph.py`, `deps.py`, `whatchanged.py`
 
 ### Discovery & Onboarding
-`discover.py`, `discover.sh`, `render_proposals.py`, `accept.py`/`accept.sh`
+`discover.py`, `discover.sh`, `render_proposals.py`, `accept.py`/`accept.sh`, `kickoff.sh`/`kickoff.py`
 
 ### Multi-Agent
 `context-for-role.sh`, `worktree.sh`, `setup-agent.sh`, `suggest-agents.sh`, `create-agent.sh`, `project-health.sh`, `coord_server.py`, `coord_tools.py`

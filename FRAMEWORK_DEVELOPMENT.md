@@ -766,8 +766,8 @@ Agents can't distinguish user-typed content from context inherited from prior ag
 
 ---
 
-**Last Updated**: 2026-02-14
-**Framework Version**: 0.25.7
+**Last Updated**: 2026-03-19
+**Framework Version**: 0.64.0
 
 **Note**: These guidelines evolve with the framework. When they change, notify framework contributors and update this document.
 

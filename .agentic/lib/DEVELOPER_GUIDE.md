@@ -85,10 +85,13 @@ Most of the time, conversation is enough. But a few commands are useful to run y
 ag start              # Quick orientation at session start
 ag status             # See current focus and profile
 ag backlog            # See ordered work queue (what to work on next)
+ag run                # See how to run the project (dev server, build, test)
 ag set <key> <value>  # Change a setting (e.g., ag set feature_tracking no)
+ag audit              # Check spec/code/test quality
+ag nfr list           # See non-functional requirements
 ```
 
-### Why 30+ Scripts Exist in a Chat-First Framework
+### Why 70+ Scripts Exist in a Chat-First Framework
 
 The framework ships many scripts. You'll rarely run them directly — they exist for three reasons:
 
@@ -183,6 +186,27 @@ Tell the agent what you want to build. It picks the right workflow based on your
 
 **"Let's plan the authentication changes before coding"**
 - Agent runs `ag plan` to create and review an implementation plan first
+
+**"I have a vision for a new product — generate the initial backlog"**
+- Agent runs `ag kickoff` to convert vision into OVERVIEW, FEATURES, ACs, and BACKLOG
+
+### After Testing: Capture Feedback
+
+After testing a feature (via `ag run` or manually), capture what you found:
+
+```
+"The login flow works but the error message is confusing"  → ag feedback (routes to appropriate tool)
+"This needs a loading spinner"                              → ag feedback --feature (creates TODO)
+"The validation is broken on empty email"                   → ag feedback --bug (creates issue)
+```
+
+### Promoting Discovery Work to Formal
+
+When discovery-mode experiments are ready to become tracked features:
+
+```
+"Let's formalize what we've built"  → ag formalize (migrates TODOs → features, plans → formal files)
+```
 
 ### Evening: Wrap Up
 
@@ -579,7 +603,7 @@ IDs support 4+ digits: `F-0001` through `F-9999` use zero-padding; `F-10000`+ us
 
 ## Automation & Scripts
 
-The framework includes 30+ automation scripts in `.agentic/lib/tools/`.
+The framework includes 70+ automation scripts in `.agentic/lib/tools/`.
 
 ### Session Continuity
 
@@ -700,6 +724,7 @@ The framework includes an autonomous engine that can implement features with min
 | **Crunch** | `ag auto crunch` | Batch mode: reads planned features from FEATURES.md, runs task mode for each |
 | **Epic** | `ag auto epic F-XXXX` | Epic mode: reads child features of an epic, schedules component-scoped workers with non-blocking reviews |
 | **Pipeline** | `ag auto pipeline` | End-to-end: creates epic, promotes features, schedules all children through implement → review → ship |
+| **Verify Epic** | `ag auto verify-epic F-XXXX` | Integration verification gate: runs integration tests between "all children shipped" and "epic shipped" (F-0204) |
 | **Verify Framework** | `ag auto verify-framework` | Framework self-verification: spawns agents to build example projects using `ag` commands, self-heals bugs, delivers fixes as PR. `--project <name>` or `--all` |
 
 #### Tiered Test Execution (v0.44+)
@@ -1394,6 +1419,8 @@ Example: if your profile is `discovery` (which defaults `feature_tracking=no`) b
 | `pre_commit_checks` | fast | **full** |
 | `git_workflow` | direct | **pull_request** |
 | `plan_review_enabled` | no | **yes** |
+| `plan_review_convergence` | manual | **auto** |
+| `review_pr` | skip | **critical_agent** |
 | `state_enforcement` | off | **blocking** |
 | `spec_directory` | no | **yes** |
 | `max_files_per_commit` | 15 | 10 |
@@ -1426,7 +1453,7 @@ bash .agentic/lib/tools/enable-formal.sh
 
 **Agent-interpreted settings** (session start only) — the agent reads STACK.md once at session start:
 
-`acceptance_criteria`, `plan_review_enabled`, `agent_mode`, `development_mode`
+`acceptance_criteria`, `plan_review_enabled`, `plan_review_convergence`, `plan_review_reviewers`, `review_pr`, `pr_fix_max_attempts`, `agent_mode`, `development_mode`
 
 If you change these mid-session, tell the agent: *"I changed X to Y"* or *"Please re-read STACK.md ## Settings"*.
 
@@ -2120,6 +2147,66 @@ Research: performance, browser support, build tooling, team learning curve."
 - `docs/research/webassembly-evaluation-2026-01-03.md`
 - Updates `.agentic/spec/REFERENCES.md`
 - Recommends decision or escalates to `.agentic/HUMAN_NEEDED.md`
+
+### Documentation Lifecycle (F-0207, F-0208)
+
+**Registry and staleness tracking for project docs:**
+
+The framework tracks all documentation in a `## Docs` registry in STACK.md. This is the source of truth for what docs exist, what components they cover, and when they were last updated.
+
+```bash
+ag docs                    # Draft docs from registry
+ag docs --validate         # Check registry health (missing files, unregistered docs)
+ag docs --coverage         # Show documentation coverage gaps
+ag docs --list             # See all registered docs
+```
+
+**Deferred docs mode** (`docs_mode: deferred` in STACK.md): Skip doc updates during fast iteration. Work queues to `.agentic/deferred-docs.json`, then run `ag docs generate` to synthesize content from specs and code later. Useful for discovery-phase work where docs would churn.
+
+**Doc gate** (`docs_gate: off | warning | blocking`): Controls whether `ag done` checks for stale or missing docs. When `blocking`, docs must be current before a feature can ship.
+
+### NFR Management (F-0216–F-0219)
+
+**Non-functional requirements as living, enforced constraints:**
+
+```bash
+ag nfr list                # List NFRs with status and coverage
+ag nfr discover            # Auto-detect applicable NFRs from stack
+ag nfr coverage            # Check test coverage for NFR constraints
+```
+
+NFRs live in `.agentic/spec/NFR.md`. The framework auto-propagates NFR constraints into feature acceptance criteria (`nfr-propagate.sh`), checks test coverage (`nfr-test-check.sh`), and shows NFR health at session start. `ag audit` verifies the full spec → AC → test chain including NFR coverage.
+
+### Feature State Transitions (F-0222)
+
+**Explicit lifecycle management:**
+
+```bash
+ag transition F-XXXX <state>     # Move feature to a new state
+ag transition F-XXXX --status    # Show current state and available transitions
+ag transition --unblocked        # List features ready to advance
+```
+
+The 9-state lifecycle: `planned → specced → criteria_set → tests_written → implementing → verified → documented → committed → shipped`. State machine enforces valid transitions and blocks invalid ones when enforcement mode is `blocking`.
+
+### Spec Quality Audit (F-0215)
+
+**Verify spec-to-code-to-test chain:**
+
+```bash
+ag audit                   # Quick audit
+ag audit --full            # Comprehensive with NFR coverage
+ag audit --status          # Show pending QA items
+ag audit --propagate       # Push findings to QA tracker
+```
+
+### Plan Durability (F-0198)
+
+Plans created in tool-specific directories (`~/.claude/plans/`, `.cursor/plans/`) are session-scoped and will be lost. `ag sync` automatically scans these directories and copies any plans mentioning F-XXXX IDs to `.agentic/journal/plans/` for durable storage.
+
+### Intent Journal & Crash Recovery (F-0200)
+
+Multi-step `ag` operations (implement, done) write to an intent journal before executing. If a session crashes mid-operation, `ag sync` detects orphaned intents and offers recovery options. `ag intent list` shows pending intents, `ag intent clear F-XXXX` discards them.
 
 ### Documentation Verification
 

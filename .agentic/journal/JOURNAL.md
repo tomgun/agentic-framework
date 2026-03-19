@@ -3117,12 +3117,38 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
+### Session: 2026-03-18 22:02 - F-0234 Complete
+
+**Why**: Diverged agent definitions caused inconsistency across tools
+
+**What changed**:
+- Agent definitions reconciled: 6 new roles, 4 deprecated, drift detection enforced in validate_framework.sh
+
+**Next steps**:
+- Next: audit recent PRs for doc update gaps
+
+**Blockers**: None
+
+
 ### Session: 2026-03-18 22:09 - Instruction File Sync
 
 **Why**: 14-day audit found CLAUDE.md missing 9 commands vs other templates
 
 **What changed**:
 - All 8 instruction files now have identical Quick Commands (26 commands). Added audit/nfr/transition triggers to cursor/copilot/codex.
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+
+
+### Session: 2026-03-19 06:16 - Project Documentation Sync
+
+**Why**: 14-day audit found project documentation lagging behind shipped features
+
+**What changed**:
+- CHANGELOG updated with v0.53-v0.64 (13 features). HOW_IT_WORKS updated with 9 missing features, stale counts fixed, mermaid diagram expanded.
 
 **Next steps**:
 - PR review and merge

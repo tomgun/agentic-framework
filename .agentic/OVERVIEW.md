@@ -29,7 +29,7 @@ AI coding agents (Claude Code, Cursor, Copilot, Codex) are powerful but lack per
 - [x] Upgrade path (upgrade.sh) preserving user customizations
 - [x] Settings system with profile-aware defaults
 - [x] DRY state-file config (state-files.conf)
-- [ ] Automated behavioral tests for agent compliance
+- [x] Automated behavioral tests for agent compliance (67 LLM tests in tests/llm/)
 - [ ] Online documentation site
 
 ## In Scope / Out of Scope
