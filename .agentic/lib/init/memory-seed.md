@@ -40,28 +40,26 @@ If they say "implement entire", "full system", "complete", or describe something
 
 Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal/plans/`. Save them regardless of how they arrive:
 
-**After exiting plan mode**: The ExitPlanMode hook auto-saves the plan and outputs review instructions. If you see the hook banner, follow it. If not (hook didn't fire), IMMEDIATELY continue with post-plan-mode steps — do NOT wait for user to say "implement":
+**After exiting plan mode**: Auto-continue immediately — do NOT stop and wait for user input. The ExitPlanMode hook outputs a banner reminder; follow it or these steps:
 1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with status DRAFT (tool plan locations like `~/.claude/plans/` are session-scoped and WILL BE LOST)
-2. Run `ag implement F-XXXX` — it will auto-save plans and enforce the review gate
-3. If `plan_review_enabled: yes`: `ag implement` blocks with `exit 1` and prints review instructions. If `plan_review_convergence: auto` (F-0236): the convergence loop runs automatically — spawns all configured reviewers (Critic + Advocate + optional experts from `plan_review_reviewers`) in parallel, synthesizes, checks convergence, auto-revises if needed, repeats until converged or `plan_review_max_iterations` (enforced, not advisory). In `manual` mode: spawn Critic + Advocate agents in parallel (fresh context), synthesize, present to user. User decides: Proceed (→ APPROVED), Revise, or Reject
-4. After user says "Proceed": update plan status to APPROVED, re-run `ag implement`
-5. If review not enabled: set plan status to APPROVED directly
+2. Spawn Critic + Advocate agents in parallel (fresh context) — do this immediately, no waiting
+3. Synthesize with Revision Guidance
+4. Check `plan_review_convergence` in STACK.md:
+   - `auto`: If converged (no high-confidence concerns, iteration ≥ 2) → set APPROVED, continue to `ag implement`. Only stops if max iterations reached (→ ESCALATED → HUMAN_NEEDED)
+   - `manual`: Present synthesis to user → user decides Proceed/Revise/Reject
+5. After APPROVED → run `ag implement F-XXXX`
+6. If review not enabled: set plan status to APPROVED directly
 
 **Rationalizations that are WRONG (do not use):**
 - "The user created the plan, so it's reviewed" — plan mode = drafting, not reviewing
 - "Plan mode exit = approval" — ExitPlanMode = draft complete, not approved
-- "The user said 'implement'" — `ag implement` will block; it's the gate, not a shortcut
+- "I should stop and wait for the user after plan mode" — auto-continue to review immediately; the decision point is after synthesis (manual) or after convergence (auto), not before review starts
 - "Simple plan, review unnecessary" — review is structural, not discretionary
-- "I have it in context" — save durably, then `ag implement`
+- "I have it in context" — save durably, then review
 - "ag implement told me to review, I'll assess it myself" — spawn Critic + Advocate, don't self-assess
 - "Proceed with refinements during implementation" — if review found refinements, revise the plan first; never defer design decisions to the coder
 
-**When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` BEFORE writing any code. The conversation context will be lost; the plan file persists.
-
-Then:
-1. If `plan_review_enabled: yes`: run dialectical review IMMEDIATELY — save plan as DRAFT. If `plan_review_convergence: auto`: call `python3 .agentic/lib/auto/plan_convergence.py --feature F-XXXX` which handles the full convergence loop (spawns reviewers, synthesizes, auto-revises). If `manual`: spawn Critic + Advocate, present synthesis, wait for user decision. **Do NOT read implementation files, explore code, or make edits before the plan is APPROVED.** The review agents read files themselves with fresh context.
-2. Run `ag implement F-XXXX` (auto-creates WIP lock — prevents work loss on token limits/crashes)
-3. `ag implement` requires an approved plan — if no plan exists, it triggers the planning workflow first (plan → save → review → approve). If plan exists but status is not APPROVED, it triggers review first
+**When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` BEFORE writing any code. Then auto-continue to review immediately (same flow as above: save DRAFT → spawn reviewers → synthesize → convergence check → implement). Do NOT stop and wait for user input before starting the review.
 4. Only proceed to implementation after the plan is APPROVED (or if review is disabled)
 
 ## When the user reports a bug or wants a fix

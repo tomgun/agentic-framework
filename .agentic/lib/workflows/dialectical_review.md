@@ -143,15 +143,21 @@ Beyond Critic + Advocate, teams can configure domain experts via `plan_review_re
 
 ## Iteration Flow
 
-After synthesis, the user chooses:
+After synthesis, the decision depends on `plan_review_convergence` (STACK.md):
 
+**When `convergence: auto`** — agent decides automatically:
+- Converged (no high-confidence concerns, iteration ≥ 2) → APPROVED → continue to `ag implement`
+- Not converged, iterations remain → auto-revise plan, run fresh review
+- Max iterations reached → ESCALATED → add to HUMAN_NEEDED.md
+
+**When `convergence: manual`** — user decides:
 1. **Proceed**: Plan status → APPROVED. Ready for `ag implement F-XXXX`.
-2. **Revise**: User tells Planner what to change (guided by synthesis Revision Guidance). Planner revises plan, increments iteration counter. Fresh Critic + Advocate run on the revised plan.
+2. **Revise**: User tells Planner what to change. Planner revises, fresh review runs.
 3. **Reject**: Abandon plan entirely.
 
-At `plan_review_max_iterations`: suggest human escalation (advisory, not blocking). The user can still continue iterating.
+**Important**: The agent always auto-continues through save → review → synthesis without stopping. The only stopping point is: in `manual` mode, after synthesis is presented, waiting for the user's decision. In `auto` mode, the agent never stops unless it can't converge.
 
-Plan artifact status during iteration: `REVIEWING`. User sets `APPROVED` when proceeding.
+Plan artifact status during iteration: `REVIEWING`. Set to `APPROVED` on convergence/proceed.
 
 ---
 

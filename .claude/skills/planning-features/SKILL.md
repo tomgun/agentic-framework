@@ -75,15 +75,17 @@ Plans in `~/.claude/plans/` are session-scoped and will be lost. Always copy to 
 
 ### Step 5.5: Plan Review — Convergence Loop (F-0236)
 
+**Important**: Auto-continue immediately after plan creation — do NOT stop and wait for user input before starting review.
+
 If `plan_review_convergence: auto` in STACK.md:
-- The convergence loop handles review automatically via `plan_convergence.py`
+- The convergence loop handles review automatically
 - Spawns all configured reviewers (Critic + Advocate + optional experts from `plan_review_reviewers`)
 - Synthesizes outputs, checks convergence criteria, auto-revises if needed
 - Repeats until converged or `plan_review_max_iterations` reached (enforced)
-- In autonomous mode (`ag auto task`): converged plans are auto-approved
-- In interactive mode: converged plan is presented to user for final approval
+- Converged → auto-approve, continue to implementation
+- Max iterations without convergence → ESCALATED → HUMAN_NEEDED
 
-If `plan_review_convergence: manual`: current behavior — spawn Critic + Advocate manually, user decides each iteration.
+If `plan_review_convergence: manual`: spawn Critic + Advocate, synthesize, present to user. User decides each iteration (Proceed/Revise/Reject). This is the only stopping point — after synthesis is presented.
 
 ### Step 6: Hand Off to Implementation
 

@@ -52,7 +52,7 @@ Profiles set default bundles. Override any setting: `ag set <key> <value>` | Vie
 
 **Plans**: Save approved plans to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` (durable, git-tracked). Tool-specific plan locations (`.claude/plans/`) are session-scoped.
 
-**After plan mode exits** (when `plan_review_enabled: yes`): Save plan as DRAFT → run `ag implement F-XXXX` (it blocks with review instructions) → follow instructions (spawn Critic + Advocate) → after user approves, update status to APPROVED → re-run `ag implement`. Do NOT self-assess the plan, read implementation files, or code before the plan is APPROVED. If review identifies refinements, the plan must be revised before approval — never recommend "Proceed with refinements during implementation."
+**After plan mode exits** (when `plan_review_enabled: yes`): Auto-continue immediately — do NOT stop and wait for user input. Save plan as DRAFT → spawn Critic + Advocate (parallel, fresh context) → synthesize → if `plan_review_convergence: auto` and converged, set APPROVED and continue to `ag implement`; if `manual`, present synthesis and wait for user decision. Do NOT self-assess the plan, read implementation files, or code before the plan is APPROVED. If review identifies refinements, the plan must be revised before approval — never recommend "Proceed with refinements during implementation."
 
 ---
 

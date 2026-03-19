@@ -35,11 +35,11 @@ This gate is enforced automatically by `ag implement`. You don't need to check m
   ├─ YES → Is Status: APPROVED?
   │         ├─ YES → Proceed to Gate 1
   │         └─ NO (DRAFT/REVIEWING/REVISION_NEEDED) →
-  │              🛑 STOP. Run dialectical review NOW.
+  │              🛑 STOP. Run dialectical review NOW (auto-continue, don't wait for user).
   │              1. Spawn Critic + Advocate agents (parallel, fresh context)
   │              2. Synthesize with Revision Guidance
-  │              3. Present to user for decision
-  │              4. Wait for APPROVED before proceeding
+  │              3. If convergence: auto → auto-approve if converged; else present to user
+  │              4. Wait for APPROVED before proceeding to Gate 1
   └─ NO  → Is plan_review_enabled: yes?
            ├─ YES → 🛑 STOP. Plan first (use planning-features skill)
            └─ NO  → Proceed to Gate 1 (plan optional)

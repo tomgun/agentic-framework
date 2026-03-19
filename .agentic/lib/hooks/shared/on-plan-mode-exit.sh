@@ -54,12 +54,14 @@ if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/"
     fi
     echo ""
-    echo "⚠️  Plan is NOT approved. Next steps:"
-    echo "  1. Run \`ag implement $FEATURE_ID\` — triggers dialectical review"
-    echo "  2. Follow review instructions (Critic + Advocate agents)"
-    echo "  3. After approval → re-run \`ag implement\`"
+    echo "⚠️  Plan is NOT approved. AUTO-CONTINUE now:"
+    echo "  1. Spawn Critic + Advocate agents (parallel, fresh context)"
+    echo "  2. Synthesize with Revision Guidance"
+    echo "  3. If convergence: auto → auto-approve on convergence"
+    echo "     If convergence: manual → present synthesis, wait for user"
+    echo "  4. After APPROVED → run \`ag implement $FEATURE_ID\`"
     echo ""
-    echo "Do NOT start writing code until plan is APPROVED."
+    echo "Do NOT stop and wait — start the review immediately."
 else
     # No plan found — timing issue or plan not in ephemeral location
     echo "⚠️  Plan mode exited but no plan file found in ephemeral locations."

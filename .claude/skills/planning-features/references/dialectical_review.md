@@ -49,9 +49,13 @@ After both Critic and Advocate return, synthesize using this format:
 5. **Revision Guidance is actionable**: Gives the Planner direction if user chooses to revise
 6. **Refinements → Revise, not "Proceed with caveats"**: If the synthesis contains actionable refinements, recommend "Revise". The plan must be perfected before approval — never defer refinements to implementation.
 
-## User Decision
+## Decision (convergence-aware)
 
-After reading synthesis, user chooses:
+**Important**: Auto-continue through save → review → synthesis without stopping. The only stopping point depends on `plan_review_convergence`:
+
+**When `auto`**: Agent decides — converged (no high-confidence concerns, iteration ≥ 2) → APPROVED, continue; not converged → auto-revise; max iterations → ESCALATED.
+
+**When `manual`**: Present synthesis to user, who chooses:
 - **Proceed**: Set plan status to APPROVED. Ready for `ag implement`. Only when synthesis has no actionable refinements.
 - **Revise**: Tell Planner what to change. Fresh Critic + Advocate run on revised plan. Default when refinements exist.
 - **Reject**: Abandon plan.

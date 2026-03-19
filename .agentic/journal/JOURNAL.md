@@ -3230,3 +3230,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 13:31 - Auto-continue plan review
+
+**Why**: Agent stopped and waited after plan mode despite convergence: auto setting — instructions everywhere said 'wait for user'
+
+**What changed**:
+- Wired ExitPlanMode hook + updated 15 instruction files for convergence-aware auto-continue after plan mode
+
+**Next steps**:
+- F-0216 implementation
+
+**Blockers**: None
+

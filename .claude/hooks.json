@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.agentic/lib/hooks/shared/on-plan-mode-exit.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

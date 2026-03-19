@@ -68,7 +68,7 @@ What would you like to work on?
 | User Request Pattern | Auto-Trigger | What To Do |
 |---------------------|--------------|------------|
 | (first message) | **Proactive Start** | Greet with context + options |
-| "implement F-####" / "build feature" / "create [feature]" | **Feature Pipeline** | Follow Feature Implementation flow (respects backlog order). **After plan mode**: ExitPlanMode hook auto-saves plan + injects review instructions (Claude Code). All tools: save plan as DRAFT → `ag implement` (blocks if not APPROVED) → dialectical review → APPROVED → re-run `ag implement`. Pre-commit gate (Check 21) blocks commits without APPROVED plan. |
+| "implement F-####" / "build feature" / "create [feature]" | **Feature Pipeline** | Follow Feature Implementation flow (respects backlog order). **After plan mode**: auto-continue immediately — save plan as DRAFT → spawn Critic + Advocate → synthesize → if `convergence: auto` and converged, auto-approve; if `manual`, present to user. Then `ag implement`. Pre-commit gate (Check 21) blocks commits without APPROVED plan. |
 | "backlog" / "queue" / "what's next" / "prioritize" / "reorder" | **Backlog Management** | Run `ag backlog` to show queue; `ag backlog add/done/move/list` to manage |
 | "fix I-####" / "fix bug" / "fix issue" | **Issue Pipeline** | Follow Issue Resolution flow |
 | "commit" / "ready to commit" | **Before Commit** | Run `before_commit.md` checklist |

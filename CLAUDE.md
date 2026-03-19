@@ -36,20 +36,23 @@ Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 
 ## After Plan Mode Exits (when `plan_review_enabled: yes`)
 
-Exiting plan mode creates a DRAFT. It does NOT approve the plan.
+Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and wait for user input.
 
-After ExitPlanMode:
+After ExitPlanMode — auto-continue the full sequence:
 1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT`
-2. Run `ag implement F-XXXX` — it will block and print dialectical review instructions
-3. Follow the review instructions (spawn Critic + Advocate agents)
-4. After user says "Proceed" → update `**Status**: APPROVED` → re-run `ag implement`
+2. Spawn Critic + Advocate agents in parallel (fresh context)
+3. Synthesize with Revision Guidance
+4. Check `plan_review_convergence` in STACK.md:
+   - `auto`: If converged (no high-confidence concerns, iteration ≥ 2) → set `**Status**: APPROVED`, continue to `ag implement`
+   - `manual`: Present synthesis to user → user decides Proceed/Revise/Reject
+5. After APPROVED → run `ag implement F-XXXX`
 
 **These rationalizations are WRONG — do not use them:**
 - "The user created the plan, so it's reviewed" — plan mode = drafting, not reviewing
 - "Plan mode exit = approval" — ExitPlanMode = draft complete, not approved
-- "The user said 'implement'" — `ag implement` will block; it's the gate, not a shortcut
+- "I should stop and wait for the user after plan mode" — auto-continue to review immediately; the decision point is after synthesis (manual) or after convergence (auto), not before review starts
 - "Simple plan, review unnecessary" — review is structural, not discretionary
-- "I have it in context" — save durably, then `ag implement`
+- "I have it in context" — save durably, then review
 - "ag implement told me to review, I'll assess it myself" — spawn Critic + Advocate, don't self-assess
 - "Proceed with refinements during implementation" — if review found refinements, the plan gets revised first; never defer design decisions to the coder
 

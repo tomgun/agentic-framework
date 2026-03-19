@@ -156,8 +156,9 @@ Each review round uses the dialectical mechanism described in `dialectical_revie
 2. **Critic** finds flaws, risks, blind spots (no verdicts)
 3. **Advocate** explains trade-off reasoning, defends decisions honestly
 4. **Orchestrator synthesizes** both perspectives with Revision Guidance
-5. **User decides**: Proceed (→ APPROVED), Revise (→ new iteration), or Reject
-6. **If synthesis has actionable refinements**: Default recommendation is "Revise", not "Proceed with caveats". The plan must be perfected before approval — never defer refinements to implementation.
+5. **Decision** (convergence-aware): If `auto` → auto-approve on convergence, auto-revise otherwise; if `manual` → present to user (Proceed/Revise/Reject)
+6. **If synthesis has actionable refinements**: Default is "Revise", not "Proceed with caveats". The plan must be perfected before approval — never defer refinements to implementation.
+7. **Auto-continue**: The agent never stops between save and synthesis. The only stopping point is in `manual` mode after presenting synthesis.
 
 See `.agentic/lib/workflows/dialectical_review.md` for the full mechanism, synthesis format, and cross-tool adaptation.
 
