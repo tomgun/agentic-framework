@@ -207,6 +207,13 @@ if [[ -f ".agentic/lib/tools/generate-skills.sh" ]] && [[ -d ".agentic/lib/agent
 else
   echo -e "  ${YELLOW}⚠${NC} Skipping (no skill sources found)"
 fi
+
+# Copy Claude Code hooks.json if template exists
+if [[ -f ".agentic/lib/claude-hooks/hooks.json" ]]; then
+  mkdir -p .claude
+  cp .agentic/lib/claude-hooks/hooks.json .claude/hooks.json
+  echo -e "  ${GREEN}✓${NC} Installed Claude Code hooks (.claude/hooks.json)"
+fi
 echo ""
 
 # Step 7: Offer to suggest project-specific agents

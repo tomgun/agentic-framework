@@ -298,6 +298,13 @@ else
   echo -e "  ${YELLOW}⚠${NC} generate-skills.sh not found, skipping"
 fi
 
+# Update Claude Code hooks.json from template
+if [[ -f "$TARGET_PROJECT_DIR/.agentic/lib/claude-hooks/hooks.json" ]]; then
+  mkdir -p "$TARGET_PROJECT_DIR/.claude"
+  cp "$TARGET_PROJECT_DIR/.agentic/lib/claude-hooks/hooks.json" "$TARGET_PROJECT_DIR/.claude/hooks.json"
+  echo -e "  ${GREEN}✓${NC} Updated Claude Code hooks (.claude/hooks.json)"
+fi
+
 echo ""
 
 # Step 5c: Regenerate instruction files from updated templates
