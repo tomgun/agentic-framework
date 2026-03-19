@@ -1552,6 +1552,9 @@ cmd_done() {
     local docs_mode_val
     docs_mode_val=$(get_setting "docs_mode" "inline")
 
+    # Freshness result saved here, checked as Gate 4 in done_failures block (after doc lifecycle fires)
+    local docs_freshness_exit=0
+
     if [ "$docs_gate_mode" != "off" ]; then
         echo -e "${BOLD}=== Documentation Drift Check ===${NC}"
         if [ -n "$feature_id" ]; then
@@ -1567,27 +1570,10 @@ cmd_done() {
             bash "$SCRIPT_DIR/docs.sh" --validate 2>/dev/null || validate_exit=$?
         fi
 
-        # In deferred mode, skip the blocking prompt (drift check still runs for awareness)
-        if [ "$docs_mode_val" = "inline" ] && [ "$docs_gate_mode" = "blocking" ]; then
-            if [ "${SKIP_DOCS_GATE:-0}" = "1" ] || [ ! -t 0 ]; then
-                echo -e "${YELLOW}docs_gate: blocking — skipped (non-interactive or SKIP_DOCS_GATE=1)${NC}"
-            else
-                if [ "${validate_exit:-0}" -ne 0 ]; then
-                    echo -e "${YELLOW}⚠ Registry validation found issues (see above)${NC}"
-                fi
-                echo ""
-                echo -e "${YELLOW}docs_gate: blocking — confirm docs are updated before marking complete${NC}"
-                printf "  Continue marking feature complete? [y/N] "
-                local doc_confirm
-                read -r doc_confirm
-                if [[ ! "$doc_confirm" =~ ^[Yy]$ ]]; then
-                    echo -e "${RED}Aborted: Update documentation first, then run ag done again.${NC}"
-                    exit 1
-                fi
-            fi
-        elif [ "$docs_mode_val" = "deferred" ]; then
-            echo -e "${YELLOW}docs_mode: deferred — blocking prompt suppressed. Docs will be logged for later.${NC}"
+        if [ "${validate_exit:-0}" -ne 0 ]; then
+            echo -e "${YELLOW}⚠ Registry validation found issues (see above)${NC}"
         fi
+
         echo ""
     fi
     if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
@@ -1624,6 +1610,26 @@ cmd_done() {
                     fi
                 fi
             fi
+            echo ""
+        fi
+    fi
+
+    # Doc freshness gate: runs AFTER doc lifecycle (agent had chance to update docs)
+    # Result saved in docs_freshness_exit, checked as Gate 4 in done_failures block
+    if [ "$docs_gate_mode" != "off" ] && [[ -f "$SCRIPT_DIR/docs.sh" ]]; then
+        if [ "$docs_mode_val" = "deferred" ]; then
+            # Deferred mode: skip freshness blocking (docs logged for later)
+            # But still check registry health — missing files are always an error
+            local missing_output
+            missing_output=$(bash "$SCRIPT_DIR/docs.sh" --validate 2>/dev/null | grep "registered-but-missing" || true)
+            if [[ -n "$missing_output" ]]; then
+                echo -e "${RED}✗ Registered docs missing from disk (even in deferred mode):${NC}"
+                echo "$missing_output"
+                docs_freshness_exit=1
+            fi
+        else
+            echo -e "${BOLD}=== Doc Freshness Check ===${NC}"
+            bash "$SCRIPT_DIR/docs.sh" --check-freshness --trigger feature_done 2>/dev/null || docs_freshness_exit=$?
             echo ""
         fi
     fi
@@ -1767,6 +1773,19 @@ cmd_done() {
                         echo -e "${YELLOW}WARNING: AC completion below threshold${NC}"
                     fi
                 fi
+            fi
+        fi
+
+        # Gate 4: Doc freshness (checked after doc lifecycle gave agent a chance to update)
+        if [ "$docs_freshness_exit" -ne 0 ]; then
+            if [ "$docs_gate_mode" = "blocking" ]; then
+                echo -e "${RED}BLOCKED: Documentation not up to date${NC}"
+                echo "  Run: bash .agentic/lib/tools/docs.sh --check-freshness to see stale docs"
+                echo "  Update stale docs, then run ag done again."
+                done_failures=$((done_failures + 1))
+            elif [ "$docs_gate_mode" = "warning" ]; then
+                echo -e "${YELLOW}WARNING: Documentation may be stale (docs_gate: warning)${NC}"
+                echo "  Run: bash .agentic/lib/tools/docs.sh --check-freshness to see details"
             fi
         fi
 

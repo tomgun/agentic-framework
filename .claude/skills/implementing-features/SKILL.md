@@ -119,6 +119,7 @@ This ensures MVP is solid before adding enhancements.
 - Tests pass
 - No unrelated files changed
 - Code follows project conventions
+- Registered docs updated: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done`
 
 Then hand off to the `committing-changes` workflow (do NOT commit directly).
 

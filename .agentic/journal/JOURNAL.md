@@ -3360,3 +3360,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 18:39 - F-0220 Structural Doc Gate
+
+**Why**: Doc updates silently skipped in autonomous pipelines — advisory gates had no teeth
+
+**What changed**:
+- Deterministic freshness check in docs.sh, Gate 4 in ag done done_failures, pre-commit Check 19 blocking, skill updates
+
+**Next steps**:
+- PR review, merge
+
+**Blockers**: None
+
