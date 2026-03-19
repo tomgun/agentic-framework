@@ -3308,3 +3308,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 17:13 - F-0218 Implementation
+
+**Why**: Complete NFR propagation pipeline integration
+
+**What changed**:
+- Fixed 3 integration gaps: ag implement advisory now suggests nfr-propagate.sh sync, spec_writing checklist uses tool-based NFR matching, checklist references ### NFR Constraints format
+
+**Next steps**:
+- Create PR
+
+**Blockers**: None
+
