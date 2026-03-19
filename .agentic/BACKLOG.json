@@ -1,21 +1,14 @@
 [
   {
     "type": "feature",
-    "id": "F-0226",
-    "description": "F-0226",
-    "added_at": "2026-03-16T18:56:04Z",
-    "added_by": "agent",
-    "became_current_at": "2026-03-18T20:24:04Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0216",
     "description": "F-0216",
     "added_at": "2026-03-16T18:56:04Z",
     "added_by": "agent",
     "refs": [
       ".agentic/spec/acceptance/F-0216.md"
-    ]
+    ],
+    "became_current_at": "2026-03-18T21:35:38Z"
   },
   {
     "type": "feature",

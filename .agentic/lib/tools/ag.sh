@@ -167,6 +167,7 @@ COMMANDS:
     commit              Run all pre-commit gates
     done                Task complete validation
     flush [opts]        Commit state files to main (no PR). --dry-run, --check, --features
+    dogfood [--brief]   Detect root vs template instruction file drift (framework-dev)
     docs [F-XXXX]       Draft docs from registry (STACK.md ## Docs)
     set [key] [value]   View/change settings (--show, --validate, --migrate)
     hooks <sub>         Manage git hooks (install|status|disable)
@@ -248,6 +249,7 @@ COMMANDS:
     commit              Run all pre-commit gates
     done [F-XXXX]       Feature complete validation
     flush [opts]        Commit state files to main (no PR). --dry-run, --check, --features
+    dogfood [--brief]   Detect root vs template instruction file drift (framework-dev)
     docs [F-XXXX]       Draft docs from registry (STACK.md ## Docs)
     set [key] [value]   View/change settings (--show, --validate, --migrate)
     hooks <sub>         Manage git hooks (install|status|disable)
@@ -1978,6 +1980,13 @@ cmd_done() {
         echo ""
         echo -e "${BOLD}=== Flushing State ===${NC}"
         bash "$SCRIPT_DIR/state-commit.sh" --features || true
+
+        # Post-merge dogfood sync (framework-dev only — F-0226)
+        if [ -f "$ROOT_DIR/FRAMEWORK_DEVELOPMENT.md" ]; then
+            echo ""
+            echo -e "${BOLD}=== Dogfood Sync ===${NC}"
+            bash "$SCRIPT_DIR/dogfood-sync.sh" --brief || true
+        fi
     else
         echo ""
         echo -e "${BLUE}On branch '$current_branch' — run 'ag flush --features' after returning to main.${NC}"
@@ -4213,6 +4222,10 @@ case "${1:-help}" in
     nfr)
         shift
         cmd_nfr "$@"
+        ;;
+    dogfood)
+        shift
+        bash "$SCRIPT_DIR/dogfood-sync.sh" "$@"
         ;;
     flush)
         shift

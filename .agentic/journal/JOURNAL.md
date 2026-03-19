@@ -3104,6 +3104,19 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
+### Session: 2026-03-18 21:35 - F-0226 Complete
+
+**Why**: Root instruction files were silently drifting from templates after PR merges
+
+**What changed**:
+- Framework now auto-detects root vs template instruction file drift after merges via ag dogfood
+
+**Next steps**:
+- Next: F-0216
+
+**Blockers**: None
+
+
 ### Session: 2026-03-18 22:02 - F-0234 Complete
 
 **Why**: Diverged agent definitions caused inconsistency across tools
@@ -3113,6 +3126,19 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Next steps**:
 - Next: audit recent PRs for doc update gaps
+
+**Blockers**: None
+
+
+### Session: 2026-03-18 22:09 - Instruction File Sync
+
+**Why**: 14-day audit found CLAUDE.md missing 9 commands vs other templates
+
+**What changed**:
+- All 8 instruction files now have identical Quick Commands (26 commands). Added audit/nfr/transition triggers to cursor/copilot/codex.
+
+**Next steps**:
+- PR review and merge
 
 **Blockers**: None
 

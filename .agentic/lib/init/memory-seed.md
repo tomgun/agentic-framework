@@ -184,7 +184,7 @@ If the user indicates a feature is complete — in any phrasing (e.g. "done", "c
 
 **Automated verification**: `ag done` runs `ag verify F-XXXX` automatically before shipping — extracts `**Automated**:` commands from the AC file's `## Verification` section and executes them. Blocking for formal profiles (`acceptance_criteria: blocking`), advisory for discovery.
 
-**Post-merge dogfood sync** (framework development only): After merging a framework PR, automatically sync the framework-dev environment — compare root instruction files (CLAUDE.md, .cursorrules, copilot, codex) against templates for new shared content, update memory-seed if workflow rules changed, propagate checklist changes to skill references. This is automatic, not a step the user requests.
+**Post-merge dogfood sync** (framework development only): `ag done` on main automatically runs `ag dogfood --brief` when `FRAMEWORK_DEVELOPMENT.md` exists. This detects drift between root instruction files and templates using sentinel-based checking. Run `ag dogfood` manually for a full report with fix suggestions. Advisory only — doesn't block `ag done`.
 
 ## When work is done (doc lifecycle)
 

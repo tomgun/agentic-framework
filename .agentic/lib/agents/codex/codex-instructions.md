@@ -6,7 +6,7 @@ Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operat
 
 Note: Codex runs commands in a sandbox. Append `|| true` to commands that may fail to prevent non-zero exit codes from halting execution.
 
-Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag verify F-XXXX` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag worktree` | `ag spec` | `ag docs` | `ag todo` | `ag feedback` | `ag intent` | `ag formalize` | `ag kickoff "vision"` | `ag run`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag verify F-XXXX` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag worktree` | `ag spec` | `ag plan` | `ag docs` | `ag todo` | `ag feedback` | `ag intent` | `ag formalize` | `ag kickoff "vision"` | `ag run` | `ag audit` | `ag nfr` | `ag transition` | `ag dogfood`
 Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX` | `ag auto epic F-XXXX --parallel` | `ag auto pipeline` | `ag auto verify-framework`
 Kickoff: `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve` | `ag kickoff --discard`
 Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
@@ -33,6 +33,9 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Verify framework / test the framework / self-test | Suggest `ag auto verify-framework --project <name>` or `--all` (builds example projects, self-heals framework bugs) |
 | Feedback / tested it / tried it / after testing / user reported | STOP -> Run `ag feedback "text"`. Classifies (bug/feature/ac-adjust/unclear), persists to FEEDBACK_LOG.md. `--bug`/`--feature`/`--ac` for direct routing. `ag feedback log` to view. |
 | Formalize / promote to formal / migrate TODOs to features | STOP -> Run `ag formalize` to list promotable items. `ag formalize T-XXXX` promotes specific items. `ag formalize --all` for bulk. |
+| Audit / check quality / spec health / test chain | STOP -> Run `ag audit` for spec verification & QA audit. `ag audit --full` for comprehensive. `ag audit --status` for pending items. |
+| NFR / non-functional / performance constraint / security requirement | STOP -> Run `ag nfr list` to see NFRs. `ag nfr discover` to auto-detect applicable NFRs. `ag nfr coverage` to check test coverage. |
+| Transition / state change / move to next phase / feature status | STOP -> Run `ag transition F-XXXX <state>`. `ag transition F-XXXX --status` to see current. `ag transition --unblocked` for ready features. |
 
 Acceptance criteria: Formal requires .agentic/spec/acceptance/F-####.md before coding | Discovery: define criteria (any form) before coding.
 
