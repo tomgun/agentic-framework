@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **ag.sh Decomposition (F-0221)** — Decomposed the monolithic `ag.sh` (4,325 lines, 58 functions) into a 363-line thin dispatcher that sources 12 command modules from `.agentic/lib/tools/commands/`. All behavior preserved — no user-facing changes. Modules: start, plan, implement, commit, done, kickoff, auto, specs, help, diagnostics, settings, operations.
+
 ## [0.64.0] - 2026-03-18
 
 ### Added

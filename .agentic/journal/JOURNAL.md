@@ -3438,3 +3438,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 21:31 - F-0221 doc updates
+
+**Why**: Docs must reflect ag.sh structural change
+
+**What changed**:
+- Updated HOW_IT_WORKS, INSTRUCTION_ARCHITECTURE, FRAMEWORK_WORKFLOW, CHANGELOG with decomposition details
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
