@@ -3178,3 +3178,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 10:34 - Post-merge dogfood sync
+
+**Why**: Completing post-merge workflow that was skipped
+
+**What changed**:
+- Synced copilot + codex root instruction files with templates (5 missing sentinels). Marked F-0235 + F-0236 shipped.
+
+**Next steps**:
+- Done
+
+**Blockers**: None
+
