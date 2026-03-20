@@ -215,6 +215,41 @@ _ensure_hooks() {
 }
 _ensure_hooks
 
+# ---------------------------------------------------------------------------
+# V2 Engine detection — when state_machine_af.yaml has engine: v2,
+# route state-machine commands to the Python v2 workflow engine.
+# Old commands remain as fallback for non-v2 or non-state-machine commands.
+# ---------------------------------------------------------------------------
+_V2_ENGINE=0
+_AF_CONFIG="$ROOT_DIR/.agentic/state_machine_af.yaml"
+if [ -f "$_AF_CONFIG" ]; then
+    if grep -q '^engine: v2' "$_AF_CONFIG" 2>/dev/null; then
+        _V2_ENGINE=1
+    fi
+fi
+
+_v2_workflow() {
+    # Dispatch to Python v2 workflow engine
+    PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -m auto.v2.workflow "$@"
+}
+
+# V2 commands that are exclusively handled by the new engine
+_v2_dispatch() {
+    local cmd="$1"
+    shift
+    case "$cmd" in
+        v2-start)    _v2_workflow start "$@"; return $? ;;
+        v2-transition) _v2_workflow transition "$@"; return $? ;;
+        v2-check)    _v2_workflow check "$@"; return $? ;;
+        v2-verify)   _v2_workflow verify "$@"; return $? ;;
+        v2-ship)     _v2_workflow ship "$@"; return $? ;;
+        v2-status)   _v2_workflow status "$@"; return $? ;;
+        v2-next)     _v2_workflow next "$@"; return $? ;;
+        v2-info)     _v2_workflow info "$@"; return $? ;;
+        *) return 1 ;;  # Not a v2 command
+    esac
+}
+
 # Main command dispatch
 _AG_CMD="${1:-help}"
 _AG_ARG="${*:2}"
@@ -222,6 +257,13 @@ if type flog &>/dev/null; then
     flog "ag.sh" "$_AG_CMD" "$_AG_ARG" "start"
     trap 'flog "ag.sh" "$_AG_CMD" "$_AG_ARG" "end:$?"' EXIT
 fi
+
+# Try v2 dispatch first (v2-prefixed commands always go to v2 engine)
+if [[ "${1:-}" == v2-* ]]; then
+    _v2_dispatch "$@"
+    exit $?
+fi
+
 case "${1:-help}" in
     start)
         cmd_start
@@ -305,7 +347,11 @@ case "${1:-help}" in
         ;;
     transition)
         shift
-        python3 "$SCRIPT_DIR/../auto/state_machine.py" --project-root "$ROOT_DIR" "$@"
+        if [[ "$_V2_ENGINE" -eq 1 ]]; then
+            _v2_workflow transition "$@"
+        else
+            python3 "$SCRIPT_DIR/../auto/state_machine.py" --project-root "$ROOT_DIR" "$@"
+        fi
         ;;
     review)
         shift
