@@ -198,8 +198,14 @@ class FeatureStateMachine:
                 return None
             item = work_items.load(self.project_root, feature_id)
             config = load_config(self.project_root)
-            # Reverse-map: v2 state → v1 state
-            reverse_map = {v: k for k, v in config.state_mapping.items()}
+            # Reverse-map: v2 state → v1 state (pick most advanced v1 state
+            # when multiple map to the same v2 state, e.g. specced+criteria_set→spec)
+            reverse_map: dict[str, str] = {}
+            for v1, v2 in config.state_mapping.items():
+                if v2 not in reverse_map or STATE_ORDER.index(
+                    FeatureState(v1)
+                ) > STATE_ORDER.index(FeatureState(reverse_map[v2])):
+                    reverse_map[v2] = v1
             v1_name = reverse_map.get(item.status)
             if v1_name:
                 return self.resolve_state(v1_name)
@@ -376,8 +382,10 @@ class FeatureStateMachine:
                     # Map v1 FeatureState to v2 state name
                     v2_state = config.resolve_v1_state(target.value)
                     if v2_state:
+                        # skip_review maps to force_skip in v2 (bypasses gates)
                         result = self._v2.transition(  # type: ignore[union-attr]
                             feature_id, v2_state, by="agent",
+                            force_skip=skip_review,
                         )
                         if result.success:
                             msgs = [f"Transitioned {feature_id}: → {target.value}"]
