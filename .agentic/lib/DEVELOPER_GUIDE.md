@@ -73,6 +73,7 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 | "Process all planned features" | `ag auto crunch` | Batch implementation of planned features |
 | "Run full pipeline" | `ag auto pipeline` | End-to-end: epic → promote → schedule → implement → ship |
 | "Verify the framework" | `ag auto verify-framework` | Self-test: build example projects, detect & fix framework bugs |
+| "What's tested?" | `ag qa` | Generates QA Registry — feature-to-test matrix across 9 categories, gap analysis |
 | "How do I run this?" | `ag run` | Shows dev/build/test commands from STACK.md + auto-detection |
 
 You don't need to memorize these commands. The agent picks the right one.
@@ -88,6 +89,7 @@ ag backlog            # See ordered work queue (what to work on next)
 ag run                # See how to run the project (dev server, build, test)
 ag set <key> <value>  # Change a setting (e.g., ag set feature_tracking no)
 ag audit              # Check spec/code/test quality
+ag qa                 # Generate QA Registry (feature-to-test coverage map)
 ag nfr list           # See non-functional requirements
 ```
 
@@ -874,6 +876,24 @@ bash .agentic/lib/tools/ag.sh trace --json       # Combined JSON output
 - Before completing a feature
 - To find what needs documentation
 - CI/CD integration (with `--json`)
+
+#### `ag qa` - QA Registry (NEW - v0.65.0)
+
+**What it does:**
+- Generates `docs/QA_REGISTRY.md` — a feature-to-test matrix across 9 QA categories
+- Scans validate_framework.sh, pytest files, LLM tests, scenarios, infrastructure tests, pre-commit gates, checklists
+- Identifies features with zero test mappings and test files with no feature annotations
+
+```bash
+ag qa                # Generate/regenerate QA_REGISTRY.md
+ag qa --check        # Exit non-zero if registry is stale
+ag qa --json         # Machine-readable output
+```
+
+**When to run:**
+- After adding new tests or features
+- To find coverage gaps across the test infrastructure
+- CI freshness checking (with `--check`)
 
 #### `feature_graph.sh` - Feature Dependencies
 

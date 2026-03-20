@@ -38,6 +38,7 @@ graph TB
         REPORT[report.sh<br/>feature status]
         VERIFY[verify.sh<br/>comprehensive]
         COVERAGE[coverage.sh<br/>annotations]
+        QAREG[qa_registry.py<br/>test coverage map]
         GRAPH[feature_graph.sh<br/>dependencies]
     end
 

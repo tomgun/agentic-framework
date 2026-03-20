@@ -360,6 +360,7 @@ Not every idea follows the same path in:
 - `ag auto verify` — AC-by-AC verification loop
 - `ag auto verify --visual` — with visual/screenshot verification
 - `ag audit` — spec→AC→test chain verification
+- `ag qa` — QA Registry: feature-to-test matrix across 9 categories, gap analysis
 - `ag nfr check` — NFR compliance check
 
 **Gates**:
