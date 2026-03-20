@@ -5279,6 +5279,66 @@ else
 fi
 
 
+# --- Doc Currency: shipped features must appear in CHANGELOG + living docs ---
+echo "--- Doc Currency: shipped features in CHANGELOG + living docs ---"
+
+# Extract F-IDs from CHANGELOG [Unreleased] section (between first and second ## [ headers)
+CHANGELOG_FILE="$FRAMEWORK_ROOT/CHANGELOG.md"
+if [[ -f "$CHANGELOG_FILE" ]]; then
+  # Get content between [Unreleased] and the next version header
+  UNRELEASED_SECTION=$(sed -n '/^## \[Unreleased\]/,/^## \[/p' "$CHANGELOG_FILE" | head -n -1)
+  CHANGELOG_FIDS=$(echo "$UNRELEASED_SECTION" | grep -oE 'F-[0-9]{4,}' | sort -u || true)
+
+  # Get all shipped features from FEATURES.md
+  FEATURES_FILE="$FRAMEWORK_ROOT/.agentic/spec/FEATURES.md"
+  ALL_SHIPPED_FIDS=$(grep -B3 'Status.*shipped' "$FEATURES_FILE" | grep -oE 'F-[0-9]{4,}' | sort -u || true)
+
+  # Living docs to check
+  LIVING_DOCS=(
+    "$FRAMEWORK_ROOT/docs/HOW_IT_WORKS.md"
+    "$FRAMEWORK_ROOT/.agentic/lib/DEVELOPER_GUIDE.md"
+    "$FRAMEWORK_ROOT/docs/FRAMEWORK_WORKFLOW.md"
+    "$FRAMEWORK_ROOT/docs/INSTRUCTION_ARCHITECTURE.md"
+    "$FRAMEWORK_ROOT/.agentic/OVERVIEW.md"
+  )
+
+  # For each F-ID in CHANGELOG unreleased, verify it appears in at least one living doc
+  CHANGELOG_DOC_PASS=0
+  CHANGELOG_DOC_FAIL=0
+  for fid in $CHANGELOG_FIDS; do
+    found_in_doc=false
+    for doc in "${LIVING_DOCS[@]}"; do
+      if [[ -f "$doc" ]] && grep -q "$fid" "$doc" 2>/dev/null; then
+        found_in_doc=true
+        break
+      fi
+    done
+    if $found_in_doc; then
+      pass "Doc currency: $fid in CHANGELOG and living docs"
+      CHANGELOG_DOC_PASS=$((CHANGELOG_DOC_PASS + 1))
+    else
+      warn "Doc currency: $fid in CHANGELOG but not in any living doc (HOW_IT_WORKS, DEVELOPER_GUIDE, FRAMEWORK_WORKFLOW, INSTRUCTION_ARCHITECTURE, OVERVIEW)"
+      CHANGELOG_DOC_FAIL=$((CHANGELOG_DOC_FAIL + 1))
+    fi
+  done
+
+  # Inverse check: shipped features in latest version that are NOT in CHANGELOG
+  # Only check F-IDs >= F-0200 (recent features — older ones predate CHANGELOG practice)
+  RECENT_SHIPPED=$(echo "$ALL_SHIPPED_FIDS" | awk -F- '$2 >= 200' || true)
+  ALL_CHANGELOG_FIDS=$(grep -oE 'F-[0-9]{4,}' "$CHANGELOG_FILE" | sort -u || true)
+  for fid in $RECENT_SHIPPED; do
+    if ! echo "$ALL_CHANGELOG_FIDS" | grep -q "^${fid}$" 2>/dev/null; then
+      warn "Doc currency: $fid shipped but missing from CHANGELOG.md entirely"
+    fi
+  done
+
+  if [[ $CHANGELOG_DOC_FAIL -eq 0 ]] && [[ $CHANGELOG_DOC_PASS -gt 0 ]]; then
+    pass "Doc currency: all unreleased features documented in living docs ($CHANGELOG_DOC_PASS checked)"
+  fi
+else
+  warn "Doc currency: CHANGELOG.md not found, skipping"
+fi
+
 # Summary
 # ============================================================
 echo ""
