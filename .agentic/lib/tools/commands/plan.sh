@@ -126,7 +126,9 @@ cmd_plan() {
         echo "  - CONTEXT_PACK.md"
         echo ""
         echo "Write plan to: .agentic/journal/plans/$(date +%Y-%m-%d)-${feature_id}-plan.md"
-        echo "Follow format in: .agentic/lib/workflows/plan_review_loop.md"
+        if [[ -f ".agentic/lib/workflows/plan_review_loop.md" ]]; then
+            echo "Follow format in: .agentic/lib/workflows/plan_review_loop.md"
+        fi
         echo "Set status to: APPROVED (no review)"
         return 0
     fi
@@ -147,7 +149,7 @@ cmd_plan() {
     echo "    prompt: \"Create implementation plan for $feature_id."
     echo "            Read: .agentic/spec/acceptance/${feature_id}.md, CONTEXT_PACK.md"
     echo "            Write to: .agentic/journal/plans/$(date +%Y-%m-%d)-${feature_id}-plan.md"
-    echo "            Follow: .agentic/lib/workflows/plan_review_loop.md\""
+    echo "            Follow plan format: title, scope, approach, risks, open questions.\""
     echo ""
     echo -e "${BLUE}STEP 2: CRITIC + ADVOCATE review in parallel (fresh context)${NC}"
     echo "  Spawn TWO agents IN PARALLEL with FRESH CONTEXT:"
@@ -171,7 +173,7 @@ cmd_plan() {
     echo "              Output your structured defense.\""
     echo ""
     echo -e "${BLUE}STEP 3: SYNTHESIZE and present to user${NC}"
-    echo "  Synthesize both perspectives (see .agentic/lib/workflows/dialectical_review.md)"
+    echo "  Synthesize both perspectives into a balanced assessment."
     echo "  Include Revision Guidance section."
     echo "  Present inline. User chooses: Proceed | Revise | Reject"
     echo ""
@@ -185,7 +187,11 @@ cmd_plan() {
     echo -e "${BOLD}═══════════════════════════════════════════════════════════════${NC}"
     echo ""
     echo "Plan artifact: .agentic/journal/plans/YYYY-MM-DD-${feature_id}-plan.md"
-    echo "Review mechanism: .agentic/lib/workflows/dialectical_review.md"
-    echo "Full workflow: .agentic/lib/workflows/plan_review_loop.md"
+    if [[ -f ".agentic/lib/workflows/dialectical_review.md" ]]; then
+        echo "Review mechanism: .agentic/lib/workflows/dialectical_review.md"
+    fi
+    if [[ -f ".agentic/lib/workflows/plan_review_loop.md" ]]; then
+        echo "Full workflow: .agentic/lib/workflows/plan_review_loop.md"
+    fi
     echo ""
 }

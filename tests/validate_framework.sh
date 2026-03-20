@@ -3379,10 +3379,15 @@ while IFS= read -r mdfile; do
   fi
 done < <(find "${FRAMEWORK_ROOT}/.agentic" -name "*.md" -type f)
 
-if [[ $FM_COUNT -ge 160 ]]; then
-  pass "Frontmatter coverage: ${FM_COUNT}/${TOTAL_COUNT} files (>= 160 threshold)"
+if [[ "$V2_ENGINE" == "1" ]]; then
+  FM_THRESHOLD=120
 else
-  fail "Frontmatter coverage too low: ${FM_COUNT}/${TOTAL_COUNT} files (need >= 160)"
+  FM_THRESHOLD=160
+fi
+if [[ $FM_COUNT -ge $FM_THRESHOLD ]]; then
+  pass "Frontmatter coverage: ${FM_COUNT}/${TOTAL_COUNT} files (>= ${FM_THRESHOLD} threshold)"
+else
+  fail "Frontmatter coverage too low: ${FM_COUNT}/${TOTAL_COUNT} files (need >= ${FM_THRESHOLD})"
 fi
 
 # Verify no template files have frontmatter

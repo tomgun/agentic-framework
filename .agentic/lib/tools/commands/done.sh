@@ -640,7 +640,11 @@ cmd_done() {
     echo "  [ ] Smoke tested (actually RUN it)"
     echo "  [ ] JOURNAL.md updated"
     echo ""
-    echo "Full checklist: .agentic/lib/checklists/feature_complete.md"
+    if [[ -f ".agentic/lib/checklists/feature_complete.md" ]]; then
+        echo "Full checklist: .agentic/lib/checklists/feature_complete.md"
+    else
+        echo "Run \`ag check\` for completion guidance"
+    fi
 
     # State transitions (controlled by state_enforcement setting)
     # Reliability (crash recovery) is always active via intent checkpoints above.

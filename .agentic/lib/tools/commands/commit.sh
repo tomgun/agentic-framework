@@ -83,7 +83,11 @@ cmd_commit() {
             echo "  git add <files>"
             echo "  git commit -m \"feat(F-XXXX): description\""
             echo ""
-            echo -e "${BOLD}Checklist:${NC} .agentic/lib/checklists/before_commit.md"
+            if [[ -f ".agentic/lib/checklists/before_commit.md" ]]; then
+                echo -e "${BOLD}Checklist:${NC} .agentic/lib/checklists/before_commit.md"
+            else
+                echo -e "${BOLD}Guidance:${NC} Run \`ag check\` for pre-commit guidance"
+            fi
         else
             echo ""
             echo -e "${RED}Pre-commit gates FAILED - fix issues above${NC}"

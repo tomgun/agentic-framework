@@ -325,5 +325,9 @@ cmd_implement() {
     echo ""
     echo -e "${BOLD}References:${NC}"
     echo "  Playbook: .agentic/lib/agents/shared/auto_orchestration.md"
-    echo "  Checklist: .agentic/lib/checklists/feature_implementation.md"
+    if [[ -f ".agentic/lib/checklists/feature_implementation.md" ]]; then
+        echo "  Checklist: .agentic/lib/checklists/feature_implementation.md"
+    else
+        echo "  Guidance: See role prompts in .agentic/prompts/ or run \`ag check\`"
+    fi
 }
