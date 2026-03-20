@@ -67,18 +67,30 @@ bash .agentic/lib/tools/todo.sh list
 
 Surface any items that should be addressed before moving on.
 
-### Step 5b: Doc Freshness Verification
+### Step 5b: Doc Completeness Verification
 
-Before running `ag done`, verify registered docs are up to date:
+Before running `ag done`, verify all 3 documentation concerns were addressed during implementation:
 
-```bash
-bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done
-```
+1. **Registry docs**: Run `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done` — if any stale, update them now
+2. **Registry maintenance**: If new docs were created, confirm they're registered in STACK.md `## Docs`
+3. **Instruction files** (framework dev only — if `FRAMEWORK_DEVELOPMENT.md` exists):
+   - If a new `ag` command was added: verify Quick Commands include it in all 5 instruction files
+   - If a new trigger word was added: verify trigger tables include it in all 4 files
+   - If agent behavior changed: verify `memory-seed.md` reflects the change
+   - Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift
 
-If any docs are stale:
-1. Update the stale docs with changes from the current feature
-2. Re-run `--check-freshness` to confirm they pass
+If any docs are stale or instruction files are out of sync:
+1. Update the stale items
+2. Re-run the checks to confirm they pass
 3. `ag done` will block if `docs_gate: blocking` and docs are still stale
+
+### Step 5c: Evolve Affected Specs (formal profiles only — skip if `feature_tracking: no`)
+
+Check whether your changes affect previously shipped features:
+
+1. Identify which shipped specs overlap with what you changed (tools, skills, workflows)
+2. If shipped ACs need updating: create a migration (`migration.sh create "description"`) and add new ACs to affected `spec/acceptance/F-XXXX.md` with migration reference
+3. Specs are living documents — they evolve as understanding deepens. Don't resist this.
 
 ### Step 6: Post-Merge Dogfood Sync (Framework Dev Only)
 

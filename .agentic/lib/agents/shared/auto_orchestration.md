@@ -96,6 +96,7 @@ What would you like to work on?
 | "audit" / "spec health" / "quality check" / "ag audit" | **Spec Audit** | Run `ag audit` for spec verification & QA audit. `--full` for comprehensive. `--status` for pending items. |
 | "NFR" / "non-functional" / "quality constraint" / "ag nfr" | **NFR Management** | Run `ag nfr list` to see NFRs. `ag nfr discover` for recommendations. `ag nfr coverage` for test coverage. |
 | "worktree" / "isolated branch" / "ag worktree" | **Worktree Management** | Run `ag worktree create F-XXXX` for isolated feature work. `ag worktree list` to see active worktrees. |
+| "analyze session" / "workflow violations" / "session log" | **Session Analysis** | Run `ag analyze-session <path.jsonl> [--json]`. Parses Claude JSONL logs, detects plan violations (stopped after exit, code before review, skipped planning). |
 
 ### Domain & Design Triggers
 
@@ -214,13 +215,18 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
    ├─ CONTEXT_PACK.md (if architecture changed)
    └─ STATUS.md (next steps)
 
-9. DOC LIFECYCLE (if STACK.md ## Docs has entries)
+9. EVOLVE AFFECTED SPECS (feature_tracking=yes only)
+   ├─ Do your changes affect behavior covered by shipped specs?
+   ├─ If yes: migration.sh create → add new ACs to affected spec/acceptance/F-XXXX.md
+   └─ Specs are living documents — they evolve as understanding deepens
+
+10. DOC LIFECYCLE (if STACK.md ## Docs has entries)
    ├─ `ag docs F-####` or `docs.sh --trigger feature_done`
    ├─ Drafts registered docs (lessons, architecture, changelog, etc.)
    ├─ Formal/autonomous_formal profile: also drafts pr-trigger docs (changelog, readme)
    └─ Human reviews drafts in git diff, removes `<!-- draft: -->` markers
 
-10. BEFORE COMMIT
+11. BEFORE COMMIT
    └─ Run before_commit.md checklist
 ```
 

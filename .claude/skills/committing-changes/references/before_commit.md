@@ -98,38 +98,53 @@ phase: commit
 
 ---
 
-## Documentation Sync (MANDATORY)
+## Documentation Sync (3 concerns — MANDATORY)
 
-### Core Profile
+This is the backstop for ALL commits. If you followed implementing-features Step 6, verify these are done. If you bypassed `ag implement` (direct coding, doc-only changes, hook fixes), do them now.
 
-- [ ] **`.agentic/OVERVIEW.md` reflects reality**
-  - Implemented capabilities marked with [x]
-  - "What works now" is accurate
-  - "Known limitations" is current
+### Concern 1: Project docs via registry
 
-- [ ] **`JOURNAL.md` updated**
-  - Session summary added
-  - What was accomplished
-  - Any important decisions
-  - What's next (if session continuing)
+- [ ] **`feature_done` docs verified or updated**
+  - Run `bash .agentic/lib/tools/docs.sh --list` to see the registry
+  - For each doc with trigger `feature_done`: check if your changes made it stale, update if needed
+  - Common feature_done docs: `docs/HOW_IT_WORKS.md`, `docs/INSTRUCTION_ARCHITECTURE.md`, `.agentic/lib/DEVELOPER_GUIDE.md`, `.agentic/OVERVIEW.md`, `docs/FRAMEWORK_WORKFLOW.md`
 
-- [ ] **`CONTEXT_PACK.md` current** (if architecture changed)
-  - New modules documented?
-  - Entry points still accurate?
-  - Architecture snapshot current?
+- [ ] **`pr`-triggered docs verified or updated** (at commit time, also check these)
+  - `CHANGELOG.md` — entry for this change?
+  - `README.md` — still accurate?
+  - `CONTRIBUTIONS.md` — user design insights captured?
 
-### Project Documentation
-
-- [ ] **Project docs updated with code changes**
-  - Spec + code + tests + docs = done — don't defer artifact updates to a follow-up
-  - Run `bash .agentic/lib/tools/docs.sh --validate` to check registry health (missing files, unregistered docs)
-  - Run `bash .agentic/lib/tools/docs.sh --list` to see the doc registry and which components they cover
+- [ ] **Drift and registry health**
   - Run `bash .agentic/lib/tools/drift.sh --docs` to detect stale docs
-  - If you changed user-facing behavior, update the relevant docs
-  - If your change touches a component with no registered doc, decide whether it needs one — use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold and auto-register
-  - If you created or changed a doc, ensure its `## Docs` entry in STACK.md has correct component/area tags
+  - Run `bash .agentic/lib/tools/docs.sh --validate` for registry health (missing files, unregistered docs)
 
-### Formal Profile (All Core items plus:)
+### Concern 2: Registry maintenance
+
+- [ ] **New docs registered**
+  - If you created a new doc → `docs.sh --create <path> --type <type> --trigger <trigger>`
+  - If your change touches a component with no registered doc → decide whether it needs one
+  - If a registered doc was deleted or moved → update its `## Docs` entry in STACK.md
+
+### Concern 3: Instruction files (framework dev only — skip if `FRAMEWORK_DEVELOPMENT.md` absent)
+
+- [ ] **Quick Commands updated** (if new/changed `ag` command) — 5 files:
+  - `.agentic/lib/agents/claude/CLAUDE.md`, `CLAUDE.md` (root), `.cursorrules`
+  - `.agentic/lib/agents/copilot/copilot-instructions.md`, `.agentic/lib/agents/codex/codex-instructions.md`
+- [ ] **Trigger tables updated** (if new trigger word) — 4 files:
+  - `.cursorrules`, `.agentic/lib/agents/copilot/copilot-instructions.md`
+  - `.agentic/lib/agents/codex/codex-instructions.md`, `.agentic/lib/agents/shared/auto_orchestration.md`
+- [ ] **`help.sh` updated** (if new `ag` command) — both `feature_tracking` on/off sections
+- [ ] **`memory-seed.md` updated** (if changed agent behavior)
+- [ ] Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift
+
+### Core Artifacts (always)
+
+- [ ] **`JOURNAL.md` updated** — session summary, decisions, next steps
+- [ ] **`.agentic/STATUS.md` updated** — current state, completed items, next step, blockers
+- [ ] **`.agentic/OVERVIEW.md` reflects reality** — capabilities, limitations current
+- [ ] **`CONTEXT_PACK.md` current** (if architecture changed) — modules, entry points, snapshot
+
+### Formal Profile (all Core items plus:)
 
 - [ ] **`.agentic/spec/FEATURES.md` reflects reality**
   - Status accurate (9-state lifecycle: planned → specced → criteria_set → tests_written → implementing → verified → documented → committed → shipped)
@@ -139,29 +154,19 @@ phase: commit
   - Tests: Accurate state (`todo` / `partial` / `complete`)
   - Verification: `Accepted: no` (human will accept later)
 
-- [ ] **`.agentic/STATUS.md` updated**
-  - Current session state reflects work done
-  - Completed this session lists accomplishments
-  - Next immediate step is clear
-  - Blockers documented (if any)
-
 - [ ] **`.agentic/spec/acceptance/F-####.md` exists** (if feature work)
   - Acceptance criteria defined
   - Not a placeholder
   - Testable conditions listed
 
+- [ ] **Affected shipped specs evolved** (formal profiles only — skip if `feature_tracking: no`)
+  - Do your changes modify behavior covered by shipped acceptance criteria?
+  - If yes: create a migration (`migration.sh create "description"`), add new ACs to affected `spec/acceptance/F-XXXX.md` with migration reference
+  - Specs are living documents — they evolve as understanding deepens
+
 ---
 
-## Framework Development Only
-
-These checks apply only when working on the agentic framework repo itself:
-
-- [ ] **Instruction files updated** (if `ag` commands/gates/workflows changed)
-  - CLAUDE.md templates, cursorrules.txt, copilot-instructions.md, codex-instructions.md
-  - agent_operating_guidelines.md, auto_orchestration.md
-  - memory-seed.md, DEVELOPER_GUIDE.md, HOW_IT_WORKS.md
-  - Skills/checklists that reference the changed behavior
-  - Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift
+## Framework Development Only — LLM Tests
 
 - [ ] **LLM test required** (if behavioral changes)
   - If this commit adds/changes `ag` commands, trigger words, or agent workflows → MUST add LLM test

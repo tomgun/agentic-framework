@@ -5,7 +5,13 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0221: Defense-in-depth hooks implemented, PR ready for review (Updated: 2026-03-20 06:05 UTC)
+- F-0237+F-0238: Review fixes applied (Updated: 2026-03-20 10:27 UTC)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e473788 (feat(F-0237,F-0238): memory-seed optimization + session analysis tool)
+=======
+>>>>>>> f8da2c1 (fix(F-0237,F-0238): review fixes — duplicate row, allowlist, detection, IDs)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item

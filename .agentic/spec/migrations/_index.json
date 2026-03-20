@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 16,
+  "last_migration": 17,
   "migrations": [
     {
       "id": 1,
@@ -97,6 +97,12 @@
       "file": "016_deprecate_f0033_superseded_by_agentsjson_f0194_and_f0098_superseded_by_f0143_handcrafted_skills.md",
       "date": "2026-03-10",
       "description": "Deprecate F-0033 (superseded by AGENTS.json F-0194) and F-0098 (superseded by F-0143 hand-crafted skills)"
+    },
+    {
+      "id": 17,
+      "file": "017_evolve_doc_specs_concrete_skill_instructions.md",
+      "date": "2026-03-20",
+      "description": "Evolve F-0138/F-0139/F-0207: concrete 3-concern doc decision tree in skill instructions"
     }
   ]
 }

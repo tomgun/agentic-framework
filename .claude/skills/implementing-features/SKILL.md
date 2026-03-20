@@ -113,13 +113,63 @@ When acceptance criteria have priority groups (P1/P2):
 
 This ensures MVP is solid before adding enhancements.
 
-### Step 6: Verify Before Declaring Done
+### Step 6: Documentation (3 concerns)
+
+Before declaring done, update documentation while implementation context is fresh. There are 3 concerns — check each one:
+
+#### Step 6a: Project docs via registry (all projects)
+
+1. Run `bash .agentic/lib/tools/docs.sh --list` to see the docs registry (STACK.md `## Docs`)
+2. For each doc with trigger `feature_done`: read the doc, check if your changes made it stale, update if needed
+   - Common feature_done docs: `docs/HOW_IT_WORKS.md`, `docs/INSTRUCTION_ARCHITECTURE.md`, `.agentic/lib/DEVELOPER_GUIDE.md`, `.agentic/OVERVIEW.md`, `docs/FRAMEWORK_WORKFLOW.md`
+3. For docs with trigger `pr`: note them for commit time (CHANGELOG.md, README.md, CONTRIBUTIONS.md)
+4. Run `bash .agentic/lib/tools/drift.sh --docs` to detect staleness automatically
+5. Run `bash .agentic/lib/tools/docs.sh --validate` for registry health (missing files, unregistered docs)
+
+#### Step 6b: Registry maintenance (all projects)
+
+1. If you created a new doc → add it to the registry: `bash .agentic/lib/tools/docs.sh --create <path> --type <type> --trigger <trigger>`
+2. If your changes touch a component/area that has no registered doc → decide whether it needs one
+3. If a registered doc was deleted or moved → update the registry entry in STACK.md `## Docs`
+
+#### Step 6c: Instruction files (framework dev only — detect via `FRAMEWORK_DEVELOPMENT.md`)
+
+Skip this step if `FRAMEWORK_DEVELOPMENT.md` does not exist at the project root.
+
+1. **New/changed `ag` command?** → Update Quick Commands in 5 files:
+   - `.agentic/lib/agents/claude/CLAUDE.md`
+   - `CLAUDE.md` (root)
+   - `.cursorrules`
+   - `.agentic/lib/agents/copilot/copilot-instructions.md`
+   - `.agentic/lib/agents/codex/codex-instructions.md`
+2. **New trigger word?** → Update trigger tables in 4 files:
+   - `.cursorrules`
+   - `.agentic/lib/agents/copilot/copilot-instructions.md`
+   - `.agentic/lib/agents/codex/codex-instructions.md`
+   - `.agentic/lib/agents/shared/auto_orchestration.md`
+3. **New `ag` command?** → Update `help.sh` (both `feature_tracking` on/off sections)
+4. **Changed agent behavior?** → Update `.agentic/lib/init/memory-seed.md`
+5. Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift
+
+### Step 7: Evolve Affected Specs (formal profiles only — skip if `feature_tracking: no`)
+
+Check whether your changes affect previously shipped features — their specs should evolve to reflect what you've learned:
+
+1. **Identify affected features**: Do your changes modify behavior covered by existing shipped specs? Look at which skills, tools, or workflows you changed and check if they have shipped acceptance criteria.
+2. **Create a migration**: If shipped ACs need new criteria, use `bash .agentic/lib/tools/migration.sh create "description"`. Shipped specs are contracts — migrations document why they evolved.
+3. **Update the acceptance criteria files**: Add new AC groups to the affected `spec/acceptance/F-XXXX.md` files with a migration reference (e.g., `### New Section (Migration NNN, YYYY-MM-DD)`).
+4. **Update tests if needed**: New ACs may need new tests in `validate_framework.sh` or LLM tests.
+
+Skip this step if your changes are purely additive (new feature, no overlap with existing specs).
+
+### Step 8: Verify Before Declaring Done
 
 - All acceptance criteria met (P1 at minimum, P2 if confirmed)
 - Tests pass
 - No unrelated files changed
 - Code follows project conventions
-- Registered docs updated: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done`
+- Step 6 documentation concerns addressed
+- Step 7 affected specs evolved (if applicable)
 
 Then hand off to the `committing-changes` workflow (do NOT commit directly).
 

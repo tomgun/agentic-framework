@@ -936,6 +936,7 @@ Six levels of verification, from narrowest to broadest:
 | 18 | Instruction file sync | full | Advisory | ag.sh changes accompanied by instruction file updates (framework dev) | — |
 | 19 | Doc registry health | full | Advisory | Doc registry entries are valid (respects `docs_gate` setting) | — |
 | 20 | TDD phase ordering | all | BLOCKING | Tests must exist before implementation (when `development_mode: tdd`) | `SKIP_TDD` |
+| 21 | Plan approval | all | BLOCKING | Approved plan required when `plan_review_enabled: yes`. Defense-in-depth (F-0221): ExitPlanMode + UserPromptSubmit + PostToolUse(Write\|Edit\|MultiEdit) provide advisory warnings at 3 earlier points. | — |
 
 **Escape hatch rules**: All `SKIP_*` variables are **blocked on main/master branches**. They only work on feature branches for WIP commits.
 

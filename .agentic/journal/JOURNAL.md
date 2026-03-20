@@ -3475,5 +3475,121 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Next steps**:
 - Merge PR
 
+
+
+### Session: 2026-03-20 06:36 - F-0237+F-0238: Memory-seed optimization + session analysis tool
+
+**Why**: Memory-seed exceeded 100-line ceiling (L-0002); manual session analysis took 30+ min
+
+**What changed**:
+- Memory-seed compressed from 319→134 lines (58% reduction) while preserving all 58 sentinels and passing validation. Session analysis tool (session-analyze.py) parses Claude JSONL logs and detects workflow violations — tested against real d7d00d88 transcript.
+
+**Next steps**:
+- Merge PR, run LLM regression tests for memory-seed
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 07:02 - F-0237+F-0238: Review fixes
+
+**Why**: Code review found bugs and ID mismatch
+
+**What changed**:
+- Fixed review items: duplicate trigger row, overly broad test allowlist, unused import, fragile APPROVED detection, wrong feature IDs in STATUS/JOURNAL
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 07:41 - F-0237+F-0238: Instruction file updates
+
+**Why**: Review found missing instruction file updates — framework rule: instruction files are part of the feature
+
+**What changed**:
+- Added ag analyze-session to all 6 instruction files (CLAUDE.md template, root CLAUDE.md, cursorrules, copilot, codex), trigger tables (cursorrules, copilot, codex, auto_orchestration), help.sh, memory-seed, and CHANGELOG
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 07:46 - F-0221+F-0237+F-0238: Project documentation updates
+
+**Why**: Project docs must reflect shipped features — instruction files are not the same as documentation
+
+**What changed**:
+- Updated HOW_IT_WORKS (defense-in-depth hooks mechanism, memory-seed optimization note, session-analyze in tool inventory, 3rd hidden mechanism), DEVELOPER_GUIDE (ag analyze-session subsection), FRAMEWORK_WORKFLOW (Check 21 in quality gates table)
+
+**Next steps**:
+- Merge PRs
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 08:09 - F-0237 Doc Decision Tree
+
+**Why**: Doc updates kept getting skipped because instructions were too vague — concrete file lists and decision trees are harder to skip
+
+**What changed**:
+- Replaced vague doc checks with concrete 3-concern structure (project docs, registry maintenance, instruction files) in implementing-features Step 6, before_commit.md backstop, and completing-work Step 5b. Added FRAMEWORK_WORKFLOW.md to docs registry.
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 08:27 - F-0237 Spec Evolution
+
+**Why**: Specs are living documents — changes that affect shipped features must evolve those specs via migrations
+
+**What changed**:
+- Added spec evolution as explicit step in implementation (Step 7), commit (backstop), and completion (Step 5c) workflows. Created migration 017 evolving F-0138/F-0139/F-0207 ACs. Updated all 3 shipped acceptance criteria files with new AC groups.
+
+**Next steps**:
+- Fix commit message F-0224→F-0237, push to PR
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 08:40 - F-0237 Spec Evolution in All Instruction Files
+
+**Why**: Spec evolution must be in instruction files to reach agents — same principle as doc decision tree
+
+**What changed**:
+- Added 'specs are contracts AND living documents' to all instruction files: CLAUDE.md (root+template), cursorrules (root+template), copilot, codex, auto_orchestration (Step 9), agent_operating_guidelines, memory-seed. Added spec evolution check to reviewing-code skill (dimension 8). All conditional on formal profiles.
+
+**Next steps**:
+- Commit and push to PR
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 09:17 - F-0237/F-0238 Review Fixes (Round 2)
+
+**Why**: Code review found 7 issues — must fix all before merge
+
+**What changed**:
+- Fixed all review findings: cursorrules.txt template dogfood violation (ag analyze-session), dead implement_seen variable, grouped code_before_review violations, F-0238 AC-002 missing skipped_planning, journal ID references F-0224→F-0237, unit tests for session-analyze.py (7 tests), expanded allowlist for state files.
+
+**Next steps**:
+- Push and merge
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 09:44 - F-0237 CONTRIBUTIONS
+
+**Why**: Every framework PR captures user design insights in CONTRIBUTIONS.md
+
+**What changed**:
+- Updated CONTRIBUTIONS.md with 2 user design insights from PR #171: spec evolution as structural workflow, doc decision tree design principle.
+
+**Next steps**:
+- Merge PR
+
 **Blockers**: None
 

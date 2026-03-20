@@ -4162,3 +4162,29 @@ Proposed restructuring:
 - Tests: `tests/test_plan_convergence.py`, `tests/test_reviewer_catalog.py`
 
 **Acceptance**: See `spec/acceptance/F-0236.md`
+
+---
+
+## F-0237: Memory-Seed Optimization
+
+**Status**: in-progress
+**Category**: Infrastructure
+**Priority**: medium
+**Complexity**: low
+
+**Description**: Compress memory-seed.md from 319→~200 lines using LLM-directive format. Converts 21 verbose trigger sections into a compact trigger-action table. All sentinels preserved, no behavioral regression.
+
+**Acceptance**: See `spec/acceptance/F-0237.md`
+
+---
+
+## F-0238: Session Log Analysis Tool
+
+**Status**: in-progress
+**Category**: Diagnostics
+**Priority**: medium
+**Complexity**: medium
+
+**Description**: Python tool (session-analyze.py) that parses Claude Code JSONL session logs, detects workflow violations (stopped after plan exit, code before review, skipped planning), measures time wasted, and outputs structured reports. Accessible via `ag analyze-session`.
+
+**Acceptance**: See `spec/acceptance/F-0238.md`

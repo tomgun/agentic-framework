@@ -4,7 +4,7 @@ You are working in a repo that uses the agentic development framework (folder: .
 
 Always consult: AGENTS.md (if present), `.agentic/lib/agents/shared/agent_operating_guidelines.md`, CONTEXT_PACK.md, STATUS.md, spec/* and .agentic/spec/adr/* as the source of truth.
 
-Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag verify F-XXXX` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag worktree` | `ag spec` | `ag plan` | `ag docs` | `ag todo` | `ag feedback` | `ag intent` | `ag formalize` | `ag kickoff "vision"` | `ag run` | `ag audit` | `ag nfr` | `ag transition` | `ag dogfood` | `ag test`
+Quick Commands: `ag start` | `ag sync` | `ag implement F-XXXX` | `ag work "desc"` | `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag verify F-XXXX` | `ag flush` | `ag backlog` | `ag review` | `ag decompose F-XXXX` | `ag worktree` | `ag spec` | `ag plan` | `ag docs` | `ag todo` | `ag feedback` | `ag intent` | `ag formalize` | `ag kickoff "vision"` | `ag run` | `ag audit` | `ag nfr` | `ag transition` | `ag dogfood` | `ag test` | `ag analyze-session`
 Autonomous: `ag auto verify` | `ag auto verify --visual` | `ag auto task F-XXXX` | `ag auto crunch` | `ag auto epic F-XXXX` | `ag auto epic F-XXXX --parallel` | `ag auto pipeline` | `ag auto verify-framework`
 Kickoff: `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve` | `ag kickoff --discard`
 Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
@@ -24,6 +24,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Decompose / break down epic / split into children | STOP -> Run `ag decompose F-XXXX`. Analyzes AC, proposes child features scoped to components, routes through review_decomposition checkpoint. |
 | Exited plan mode (plan approved) | STOP -> Save plan as DRAFT. If `plan_review_enabled: yes`: auto-continue — play both Critic and Advocate roles sequentially (self-play), synthesize. If `convergence: auto`, auto-approve on convergence; if `manual`, present to user. Then `ag implement F-XXXX` (creates WIP). |
 | Interrupted / crashed / stuck intent / orphaned work / resume | STOP -> Run `ag intent list` to see pending/orphaned intents. `ag intent clear F-XXXX` to discard. `ag sync` auto-adopts orphans. |
+| Analyze session / workflow violations / session log | STOP -> Run `ag analyze-session <path.jsonl>` to detect plan violations in Claude JSONL logs |
 | Fix all tests / make tests pass / run test loop automatically | Suggest `ag auto verify` (add `--visual` if E2E screenshots configured) |
 | Implement autonomously / auto-implement / hands-off | Suggest `ag auto task F-XXXX` (needs acceptance criteria) |
 | Process all features / batch implement / implement everything | Suggest `ag auto crunch` (processes all planned features) |
@@ -46,7 +47,7 @@ Rules:
 - Interactive sessions: show changes to human before committing. Autonomous/non-interactive sessions (e.g. `ag auto` workflows): commit directly, using `review_commit` setting to determine review level (F-0203).
 - Add/update tests for new/changed logic.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
-- Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
+- Shipped specs are contracts AND living documents: never modify shipped acceptance criteria without a spec migration. But specs must evolve — when changes affect behavior covered by shipped specs, create a migration and add new ACs. (Formal profiles only.)
 - Keep changes small and scoped.
 - Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
 - Multi-agent: check AGENTS.json for active agents before starting work.
