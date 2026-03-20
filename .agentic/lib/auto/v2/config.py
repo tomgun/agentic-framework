@@ -5,7 +5,6 @@ Single source of truth for workflow configuration.
 """
 from __future__ import annotations
 
-import json
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -26,6 +25,47 @@ def _load_yaml(path: Path) -> dict:
         return _basic_yaml_parse(text)
 
 
+def _strip_comment(line: str) -> str:
+    """Strip trailing comment from a YAML line, respecting quoted strings."""
+    in_quote = None
+    for i, ch in enumerate(line):
+        if ch in ('"', "'") and (i == 0 or line[i - 1] != "\\"):
+            if in_quote is None:
+                in_quote = ch
+            elif in_quote == ch:
+                in_quote = None
+        elif ch == "#" and in_quote is None and i > 0 and line[i - 1] == " ":
+            return line[:i].rstrip()
+    # Full-line comment
+    stripped = line.lstrip()
+    if stripped.startswith("#"):
+        return ""
+    return line.rstrip()
+
+
+def _find_key_colon(content: str) -> int:
+    """Find the colon separating a YAML key from its value.
+
+    Returns -1 if no key colon found. Skips colons inside quoted strings
+    and recognizes that YAML keys are unquoted identifiers (alphanumeric + _ + -).
+    """
+    # If the line starts with "- ", it's a list item, not a key:value
+    if content.startswith("- "):
+        return -1
+    in_quote = None
+    for i, ch in enumerate(content):
+        if ch in ('"', "'") and (i == 0 or content[i - 1] != "\\"):
+            if in_quote is None:
+                in_quote = ch
+            elif in_quote == ch:
+                in_quote = None
+        elif ch == ":" and in_quote is None:
+            # Key colon must be followed by space, end-of-string, or newline
+            if i + 1 >= len(content) or content[i + 1] == " ":
+                return i
+    return -1
+
+
 def _basic_yaml_parse(text: str) -> dict:
     """Minimal YAML-subset parser for state_machine_af.yaml.
 
@@ -44,8 +84,8 @@ def _basic_yaml_parse(text: str) -> dict:
         raw = lines[i]
         i += 1
 
-        # Strip comments (but not inside quotes)
-        stripped = raw.split("#")[0].rstrip() if "#" in raw and '"' not in raw.split("#")[0] else raw.rstrip()
+        # Strip comments — only outside quoted strings
+        stripped = _strip_comment(raw)
         if not stripped or stripped.lstrip().startswith("#"):
             continue
 
@@ -81,9 +121,10 @@ def _basic_yaml_parse(text: str) -> dict:
                 target_list.append(_parse_scalar(item_content))
             continue
 
-        # Key: value
-        if ":" in content:
-            colon_pos = content.index(":")
+        # Key: value — find the first colon that's a YAML key separator
+        # (not inside quotes, not part of a URL or timestamp value)
+        colon_pos = _find_key_colon(content)
+        if colon_pos >= 0:
             key = content[:colon_pos].strip()
             value_part = content[colon_pos + 1:].strip()
 

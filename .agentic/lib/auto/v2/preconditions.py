@@ -6,6 +6,8 @@ driven by state_machine_af.yaml configuration.
 """
 from __future__ import annotations
 
+import re
+import shlex
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -14,6 +16,9 @@ from typing import Optional
 
 from .config import WorkflowConfig, ArtifactDef, load_config
 from . import work_items
+
+# Strict pattern: feature IDs must match F-XXXX (4+ digits, no special chars)
+_FEATURE_ID_RE = re.compile(r"^F-\d{4,}$")
 
 
 # ---------------------------------------------------------------------------
@@ -66,11 +71,16 @@ def check_artifact(
     work_dir = work_items.item_dir(project_root, feature_id)
 
     if artifact_def and artifact_def.check:
-        # Run custom check command
+        # Validate feature_id before shell interpolation to prevent injection
+        if not _FEATURE_ID_RE.match(feature_id):
+            return CheckResult.fail(
+                [f"Invalid feature ID format: '{feature_id}' (must match F-XXXX)"]
+            )
+        # Run custom check command with safe interpolation
         cmd = artifact_def.check.format(
-            work_dir=work_dir,
-            feature_id=feature_id,
-            project_root=project_root,
+            work_dir=shlex.quote(str(work_dir)),
+            feature_id=shlex.quote(feature_id),
+            project_root=shlex.quote(str(project_root)),
         )
         try:
             result = subprocess.run(

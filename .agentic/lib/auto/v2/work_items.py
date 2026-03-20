@@ -7,15 +7,15 @@ Each feature gets a directory at .agentic/work/F-XXXX/ containing:
 """
 from __future__ import annotations
 
-import json
 import os
 import sys
+import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-from .config import _load_yaml, _parse_scalar
+from .config import _load_yaml
 
 # ---------------------------------------------------------------------------
 # YAML writing (minimal, for item.yaml)
@@ -35,9 +35,14 @@ def _dump_yaml(data: dict, indent: int = 0) -> str:
         elif isinstance(value, (int, float)):
             lines.append(f"{prefix}{key}: {value}")
         elif isinstance(value, str):
-            # Quote strings that contain special chars
-            if any(c in value for c in ":{}\n[]#,") or value.startswith(("- ", "  ")):
-                lines.append(f'{prefix}{key}: "{value}"')
+            # Quote strings that contain special chars or quotes
+            needs_quoting = (
+                any(c in value for c in ':{}\n[]#,\'"')
+                or value.startswith(("- ", "  "))
+            )
+            if needs_quoting:
+                escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+                lines.append(f'{prefix}{key}: "{escaped}"')
             else:
                 lines.append(f"{prefix}{key}: {value}")
         elif isinstance(value, list):
@@ -51,8 +56,9 @@ def _dump_yaml(data: dict, indent: int = 0) -> str:
                     for k, v in item.items():
                         if isinstance(v, bool):
                             parts.append(f"{k}: {'true' if v else 'false'}")
-                        elif isinstance(v, str) and any(c in v for c in ":{}\n[]#,"):
-                            parts.append(f'{k}: "{v}"')
+                        elif isinstance(v, str) and any(c in v for c in ':{}\n[]#,\'"'):
+                            escaped = v.replace("\\", "\\\\").replace('"', '\\"')
+                            parts.append(f'{k}: "{escaped}"')
                         else:
                             parts.append(f"{k}: {v}")
                     lines.append(f"{prefix}  - {{{', '.join(parts)}}}")
@@ -230,11 +236,34 @@ def load(project_root: Path, feature_id: str) -> WorkItem:
 
 
 def save(project_root: Path, item: WorkItem) -> None:
-    """Save a work item to its item.yaml."""
+    """Save a work item to its item.yaml atomically.
+
+    Uses write-to-temp-then-rename to prevent corruption if the process
+    dies mid-write (e.g., multi-agent race or crash).
+    """
     path = item_yaml_path(project_root, item.id)
     path.parent.mkdir(parents=True, exist_ok=True)
     content = _dump_yaml(item.to_dict())
-    path.write_text(content + "\n")
+
+    # Atomic write: write to temp file in same directory, then rename
+    fd, tmp_path = tempfile.mkstemp(
+        dir=str(path.parent), prefix=".item-", suffix=".yaml.tmp"
+    )
+    closed = False
+    try:
+        os.write(fd, (content + "\n").encode())
+        os.fsync(fd)
+        os.close(fd)
+        closed = True
+        os.rename(tmp_path, str(path))
+    except Exception:
+        if not closed:
+            os.close(fd)
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
 
 
 def list_items(project_root: Path) -> list[WorkItem]:

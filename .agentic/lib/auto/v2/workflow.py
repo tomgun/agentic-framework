@@ -210,19 +210,28 @@ def cmd_check(project_root: Path, args: list[str]) -> int:
         _print_fail(str(e))
         return 1
 
-    target = phase or item.status
+    # Default: check what's needed for the NEXT state (more useful than current)
+    orchestrator = TransitionOrchestrator(project_root, config)
+    if phase:
+        target = phase
+    else:
+        target = orchestrator.next_state(feature_id)
+        if not target:
+            target = item.status  # terminal state — check current
+
     from .preconditions import check_transition_artifacts
     result = check_transition_artifacts(
         project_root, feature_id, target, config, item.mode,
     )
 
+    label = f"→ {target}" if target != item.status else f"at '{target}'"
     if result.passed:
-        _print_ok(f"{feature_id} artifacts valid for state '{target}'")
+        _print_ok(f"{feature_id} ready to advance {label}")
         for w in result.warnings:
             _print_warn(w)
         return 0
     else:
-        _print_fail(f"{feature_id} missing artifacts for state '{target}':")
+        _print_fail(f"{feature_id} not ready {label}:")
         for e in result.errors:
             print(f"  • {e}")
         for w in result.warnings:
