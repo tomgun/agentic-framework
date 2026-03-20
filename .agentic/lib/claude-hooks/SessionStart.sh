@@ -16,6 +16,10 @@ set -euo pipefail
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 cd "$PROJECT_ROOT"
 source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
+source "$PROJECT_ROOT/.agentic/lib/tools/fwlog.sh" 2>/dev/null || true
+# Rotate previous log
+[[ -f "${FRAMEWORK_LOG:-}" ]] && mv "$FRAMEWORK_LOG" "${FRAMEWORK_LOG}.prev" 2>/dev/null || true
+flog "hook:session-start" "fire" "" "start"
 
 # Colors for output
 RED='\033[0;31m'

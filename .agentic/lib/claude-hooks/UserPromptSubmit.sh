@@ -12,6 +12,8 @@ set -euo pipefail
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 cd "$PROJECT_ROOT"
 source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
+source "$PROJECT_ROOT/.agentic/lib/tools/fwlog.sh" 2>/dev/null || true
+flog "hook:user-prompt-submit" "fire" "" "start"
 
 # --- Stale artifact reminder (commit-relative) ---
 # When uncommitted changes exist and JOURNAL/STATUS haven't been updated since

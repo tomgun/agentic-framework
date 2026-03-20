@@ -121,6 +121,7 @@ class AgenticPaths:
         self.verification_state = self._resolve(
             self.agentic_root / "session" / ".verification-state",
             self.project_root / ".agentic-state" / ".verification-state")
+        self.framework_log = self.session_dir / "framework.log"
 
         # Framework lib directories (inside .agentic/lib/)
         self.tools_dir = self._resolve(

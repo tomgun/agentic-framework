@@ -3697,3 +3697,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 16:12 - F-0240 Framework Execution Log
+
+**Why**: Post-hoc debugging for framework failures; foundation for F-0242/F-0243
+
+**What changed**:
+- Structured append-only log at .agentic/session/framework.log — fwlog.sh + ag.sh/pre-commit/hooks instrumentation, 14 tests, all ACs pass
+
+**Next steps**:
+- PR review, then ag done F-0240
+
+**Blockers**: None
+

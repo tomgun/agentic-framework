@@ -121,6 +121,7 @@ WIP_FILE="$(_resolve_path "$AGENTIC_ROOT/session/WIP.md" "$PROJECT_ROOT/.agentic
 AGENTS_ACTIVE_FILE="$(_resolve_path "$AGENTIC_ROOT/session/AGENTS_ACTIVE.md" "$PROJECT_ROOT/.agentic-state/AGENTS_ACTIVE.md")"
 PROPOSALS_DIR="$(_resolve_path "$AGENTIC_ROOT/session/proposals" "$PROJECT_ROOT/.agentic-state/proposals")"
 VERIFICATION_STATE="$(_resolve_path "$AGENTIC_ROOT/session/.verification-state" "$PROJECT_ROOT/.agentic-state/.verification-state")"
+FRAMEWORK_LOG="$(_resolve_path "$AGENTIC_ROOT/session/framework.log" "$PROJECT_ROOT/.agentic-state/framework.log")"
 
 # ---------------------------------------------------------------------------
 # Framework lib directories (inside .agentic/lib/)
