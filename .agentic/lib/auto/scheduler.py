@@ -651,7 +651,7 @@ class AutonomousScheduler:
             if work_items.exists(self.project_root, feature_id):
                 return
             from settings import get_setting
-            mode = get_setting(self.project_root, "profile_type", "formal")
+            mode = get_setting(self.project_root, "mode", "formal")
             profile = get_setting(self.project_root, "profile", "guided")
             work_items.create(
                 self.project_root, feature_id, feature_id,
