@@ -697,10 +697,11 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 | **Taste Review Checkpoint** (F-0183) | `review_taste` piggybacks on code review transitions. When `critical_agent`: spawns adversarial reviewer with `taste_review.md` prompt + style context from STACK.md `## Style & taste` section. When `human`: creates pending review. Taste verdicts use `taste_` filename prefix to coexist with code review verdicts. Omitting style settings silently skips (AC-004). | ACTIVE |
 | **Auto-Commit Review** (F-0203) | `review_commit: human \| critical_agent` controls whether `task.py._commit_ac()` can auto-commit. In interactive sessions: always `human` (stage only, never commit). In autonomous workflows (`ag auto task/epic`): `critical_agent` spawns adversarial reviewer via dedicated `CriticalAgent.review_commit()` (lightweight: staged diff + single AC only, not full feature context). On rejection or error: unstages changes. Profile defaults: discovery=human, formal=human, autonomous_formal=critical_agent. R2 principle amended to be conditional (F-0203). | ACTIVE |
 | **Git Hook Enforcement** (F-0129) | `git config core.hooksPath .agentic/hooks` wired in scaffold.sh + upgrade.sh. Git calls pre-commit dispatcher which routes to pre-commit-check.sh. CI detection skips hooks in automated builds. `pre_commit_hook: fast|full|no` in STACK.md. | ACTIVE - mutation-test proven |
+| **Defense-in-Depth Workflow Hooks** (F-0221) | 4-layer enforcement prevents coding with unapproved plans. L1: ExitPlanMode hook — profile-aware messaging (autonomous_formal shows "stopping is a VIOLATION"). L2: UserPromptSubmit — detects DRAFT plans in `journal/plans/` before every prompt. L3: PostToolUse(Write\|Edit\|MultiEdit) — fires after every code edit with "STOP CODING" warning; path-based allowlist for spec/test/journal. L4: Pre-commit Check 21 — blocks commits without APPROVED plan. Each layer has independent detection (not WIP-dependent). | ACTIVE |
 | **Gate-Based Verification** (F-0091) | `doctor.py` with modes: `--quick` (advisory), `--full` (comprehensive), `--pre-commit` (blocking), `--phase planning|complete` (phase-specific). Single verification command. | ACTIVE |
 | **Phase Detection** (F-0092) | `phase_detect.py` automatically detects dev phase (start, planning, implement, complete, blocked) and runs appropriate gates. | ACTIVE - used by doctor.py |
 | **Three-Layer Architecture** | Layer 1: Instruction files (constitution, <100 lines). Layer 2: Playbooks (just-in-time via `ag` commands). Layer 3: Project state (STACK.md, STATUS.md). Each layer has different persistence and enforcement properties. | ACTIVE - design documented in INSTRUCTION_ARCHITECTURE.md |
-| **Memory Seed** | `.agentic/init/memory-seed.md` — action triggers seeded into persistent memory during init. Reinforces (not originates) structural rules. Fades in long sessions but structural gates still catch violations. `memory-check.sh` validates integrity at session start. | ACTIVE - defense-in-depth |
+| **Memory Seed** (F-0237) | `.agentic/init/memory-seed.md` — action triggers seeded into persistent memory during init. Reinforces (not originates) structural rules. Optimized from 319→134 lines using trigger-action table format. Fades in long sessions but structural gates still catch violations. `memory-check.sh` validates integrity at session start. | ACTIVE - defense-in-depth |
 | **Distributed Enforcement** | No single orchestrator — ag.sh, pre-commit-check.sh, doctor.py, context-for-role.sh each own their phase. Works across Claude/Cursor/Copilot/Codex. | ACTIVE - architectural design |
 | **Specs-Before-Code** (F-0128) | `ag work` hard-blocks in Formal without feature ID. `ag implement` requires approved plan. `doctor.py` checks blocking. Pre-commit detects workflow bypass. Memory seed reinforces. | ACTIVE - 7 enforcement points |
 | **One-Feature-At-A-Time** | WIP.md lock allows only one feature. `ag implement F-XXXX` blocks if different feature in WIP. | ACTIVE - structural |
@@ -710,6 +711,8 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 **Hidden mechanism**: The "killer test" (S06 in mutation tests) simulates an LLM completely ignoring CLAUDE.md instructions → the git hook still catches the violation. This proves the defense-in-depth architecture actually works: behavioral layers can fail, but structural layers still protect.
 
 **Hidden mechanism**: The `pre-commit-check.sh` fast mode (`--mode fast`) skips slow checks (tests, complexity, untracked) for rapid iteration while still catching critical violations (WIP, staleness, branch policy). This is selected via `pre_commit_hook: fast` in STACK.md.
+
+**Hidden mechanism**: Defense-in-depth hooks (F-0221) fire at 4 independent points: plan exit, every user prompt, every code edit, and commit. Even if the LLM rationalizes past one layer, the compounding warnings from subsequent layers make the violation increasingly difficult to sustain — and Pre-commit Check 21 blocks the commit regardless.
 
 ---
 
@@ -996,7 +999,7 @@ These will always rely on behavioral reinforcement:
 `pre-commit-check.sh`, `doctor.py`/`doctor.sh`, `validate_specs.py`, `validate_framework.sh` (tests), `integration_verify.py`
 
 ### Analysis & Traceability
-`coverage.py`, `drift.sh`, `scope_check.sh`, `consistency.py`, `phase_detect.py`, `query_features.py`, `feature_graph.py`, `deps.py`, `whatchanged.py`
+`coverage.py`, `drift.sh`, `scope_check.sh`, `consistency.py`, `phase_detect.py`, `query_features.py`, `feature_graph.py`, `deps.py`, `whatchanged.py`, `session-analyze.py`
 
 ### Discovery & Onboarding
 `discover.py`, `discover.sh`, `render_proposals.py`, `accept.py`/`accept.sh`, `kickoff.sh`/`kickoff.py`

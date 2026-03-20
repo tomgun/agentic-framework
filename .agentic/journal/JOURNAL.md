@@ -3514,3 +3514,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 07:46 - F-0221+F-0237+F-0238: Project documentation updates
+
+**Why**: Project docs must reflect shipped features — instruction files are not the same as documentation
+
+**What changed**:
+- Updated HOW_IT_WORKS (defense-in-depth hooks mechanism, memory-seed optimization note, session-analyze in tool inventory, 3rd hidden mechanism), DEVELOPER_GUIDE (ag analyze-session subsection), FRAMEWORK_WORKFLOW (Check 21 in quality gates table)
+
+**Next steps**:
+- Merge PRs
+
+**Blockers**: None
+

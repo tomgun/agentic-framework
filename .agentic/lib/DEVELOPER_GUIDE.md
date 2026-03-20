@@ -681,6 +681,25 @@ doctor.sh --pre-commit             # Pre-commit gate checks
 - Before deployments
 - Weekly health check
 
+#### `ag analyze-session` — Workflow Violation Detection (F-0238)
+
+Parses Claude Code JSONL session logs and detects workflow violations.
+
+**What it detects:**
+- `stopped_after_plan_exit` — agent stopped instead of auto-continuing after ExitPlanMode
+- `code_before_review` — Write/Edit tool use before plan is APPROVED
+- `skipped_planning` — `ag implement` called without prior plan mode entry
+
+```bash
+ag analyze-session ~/.claude/projects/-workspace/<session-id>.jsonl
+ag analyze-session <path> --json   # Machine-readable output
+```
+
+**When to run:**
+- After sessions where the agent seemed to stall or skip steps
+- To audit autonomous_formal workflow compliance
+- To measure time wasted on workflow violations
+
 #### `report.sh` - Feature Status Summary
 
 **What it shows:**
