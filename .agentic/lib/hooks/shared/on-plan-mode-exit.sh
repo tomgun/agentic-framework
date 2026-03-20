@@ -7,7 +7,8 @@
 # Logic:
 #   1. Check plan_review_enabled in STACK.md
 #   2. If enabled, run plan-scan.sh to save ephemeral plan to durable location
-#   3. Output banner with next-step instructions (review before implementing)
+#   3. Detect profile + convergence mode for profile-aware messaging
+#   4. Output banner with next-step instructions (review before implementing)
 #
 # Exit code: always 0 (advisory — never blocks the agent)
 
@@ -27,6 +28,10 @@ if [[ "$PLAN_REVIEW" != "yes" ]]; then
     # Plan review not enabled — nothing to enforce
     exit 0
 fi
+
+# --- Detect profile + convergence for profile-aware messaging ---
+PROFILE=$(_get_profile 2>/dev/null || echo "discovery")
+CONVERGENCE=$(get_setting "plan_review_convergence" "manual" 2>/dev/null || echo "manual")
 
 # --- Run plan-scan to save ephemeral plan to durable location ---
 SCAN_OUTPUT=""
@@ -54,14 +59,36 @@ if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/"
     fi
     echo ""
-    echo "⚠️  Plan is NOT approved. AUTO-CONTINUE now:"
-    echo "  1. Spawn Critic + Advocate agents (parallel, fresh context)"
-    echo "  2. Synthesize with Revision Guidance"
-    echo "  3. If convergence: auto → auto-approve on convergence"
-    echo "     If convergence: manual → present synthesis, wait for user"
-    echo "  4. After APPROVED → run \`ag implement $FEATURE_ID\`"
-    echo ""
-    echo "Do NOT stop and wait — start the review immediately."
+
+    # Profile-aware messaging: autonomous_formal + auto = NO human needed
+    if [[ "$PROFILE" == "autonomous_formal" && "$CONVERGENCE" == "auto" ]]; then
+        echo "🚀 AUTONOMOUS MODE — NO HUMAN APPROVAL NEEDED"
+        echo ""
+        echo "⚠️  Plan is NOT approved. AUTO-CONTINUE NOW (do NOT stop):"
+        echo "  1. Spawn Critic + Advocate agents (parallel, fresh context)"
+        echo "  2. Synthesize with Revision Guidance"
+        echo "  3. Auto-approve when reviewers converge (no human input needed)"
+        echo "  4. Run \`ag implement $FEATURE_ID\`"
+        echo ""
+        echo "This is autonomous_formal with auto convergence."
+        echo "You MUST continue immediately — stopping here is a VIOLATION."
+    elif [[ "$CONVERGENCE" == "auto" ]]; then
+        echo "⚠️  Plan is NOT approved. AUTO-CONTINUE now:"
+        echo "  1. Spawn Critic + Advocate agents (parallel, fresh context)"
+        echo "  2. Synthesize with Revision Guidance"
+        echo "  3. Auto-approve on convergence (convergence: auto)"
+        echo "  4. After APPROVED → run \`ag implement $FEATURE_ID\`"
+        echo ""
+        echo "Do NOT stop and wait — start the review immediately."
+    else
+        echo "⚠️  Plan is NOT approved. AUTO-CONTINUE now:"
+        echo "  1. Spawn Critic + Advocate agents (parallel, fresh context)"
+        echo "  2. Synthesize with Revision Guidance"
+        echo "  3. Present synthesis to user → user decides (convergence: manual)"
+        echo "  4. After APPROVED → run \`ag implement $FEATURE_ID\`"
+        echo ""
+        echo "Do NOT stop and wait — start the review immediately."
+    fi
 else
     # No plan found — timing issue or plan not in ephemeral location
     echo "⚠️  Plan mode exited but no plan file found in ephemeral locations."

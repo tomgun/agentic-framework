@@ -100,5 +100,31 @@ if [[ -f "$AGENTIC_LIB/tools/agents_helpers.py" ]]; then
   fi
 fi
 
-exit 0
+# --- DRAFT plan detection (Layer 2 enforcement) ---
+# If plan_review_enabled and any DRAFT plan exists in journal/plans/, warn on every prompt.
+# Independent of WIP state — detects "any DRAFT plan" not "active feature."
+if [[ -d ".agentic/journal/plans" ]]; then
+  source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
+  PLAN_REVIEW=$(get_setting "plan_review_enabled" "no" 2>/dev/null || echo "no")
+  if [[ "$PLAN_REVIEW" == "yes" ]]; then
+    DRAFT_PLANS=""
+    for plan_file in .agentic/journal/plans/*-plan.md; do
+      [[ -f "$plan_file" ]] || continue
+      if grep -q '^\*\*Status\*\*.*DRAFT' "$plan_file" 2>/dev/null || \
+         grep -q '^Status:.*DRAFT' "$plan_file" 2>/dev/null; then
+        PLAN_FID=$(basename "$plan_file" | grep -oE 'F-[0-9]{4,}' | head -1)
+        DRAFT_PLANS="${DRAFT_PLANS}${PLAN_FID:-unknown} "
+      fi
+    done
+    if [[ -n "$DRAFT_PLANS" ]]; then
+      echo ""
+      echo "⚠️  DRAFT PLAN EXISTS: ${DRAFT_PLANS}"
+      echo "   Run convergence loop before writing ANY code:"
+      echo "   Spawn Critic + Advocate → synthesize → revise if needed → loop until converged."
+      echo "   Do NOT start implementing until plan status is APPROVED."
+      echo ""
+    fi
+  fi
+fi
 
+exit 0
