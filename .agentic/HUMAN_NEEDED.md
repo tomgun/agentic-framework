@@ -162,6 +162,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0054: PR #174: F-0241 Central QA Registry
+- **Type**: review
+- **Added**: 2026-03-20
+- **Context**: Feature-to-test mapping across 9 QA categories. 24 tests passing. Critical agent review addressed.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics
