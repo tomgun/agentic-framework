@@ -3593,3 +3593,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 10:37 - T-0082 Doc Currency Check
+
+**Why**: Structural backstop for the behavioral 3-concern doc decision tree
+
+**What changed**:
+- Added validate_framework.sh check: shipped features in CHANGELOG must also appear in living docs (HOW_IT_WORKS, DEVELOPER_GUIDE, FRAMEWORK_WORKFLOW, INSTRUCTION_ARCHITECTURE, OVERVIEW). Inverse check: recent shipped features (F-0200+) missing from CHANGELOG entirely. 715 pass, 3 pre-existing failures, 9 new advisory warnings for pre-existing gaps.
+
+**Next steps**:
+- Flush to main
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 10:37 - T-0082 commit
+
+**Why**: Structural backstop
+
+**What changed**:
+- Committing doc currency check to main
+
+**Next steps**:
+- Done
+
+**Blockers**: None
+
