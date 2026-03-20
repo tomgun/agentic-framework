@@ -3580,3 +3580,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 09:44 - F-0237 CONTRIBUTIONS
+
+**Why**: Every framework PR captures user design insights in CONTRIBUTIONS.md
+
+**What changed**:
+- Updated CONTRIBUTIONS.md with 2 user design insights from PR #171: spec evolution as structural workflow, doc decision tree design principle.
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+
