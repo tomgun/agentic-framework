@@ -820,7 +820,7 @@ class ExpectationChecker:
             )
         try:
             log_content = self.agent_log.read_text(errors="ignore")
-            markers = ["CLAUDE.md", "skills/", "auto_orchestration.md",
+            markers = ["CLAUDE.md", "skills/", "memory-seed.md",
                         "implementing-features", "session-start"]
             found = [m for m in markers if m in log_content]
             if len(found) >= 2:

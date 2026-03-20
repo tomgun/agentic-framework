@@ -145,7 +145,7 @@ This project uses the Agentic Framework for AI-assisted development.
 
 ## Full Guidelines
 
-See `.agentic/agents/shared/agent_operating_guidelines.md` for complete instructions.
+Run \`ag start\` to begin a session. The CLI loads role-specific guidance at each phase.
 
 ## Non-Negotiables
 
@@ -200,7 +200,7 @@ This project uses the Agentic Framework for AI-assisted development.
 
 ## Full Guidelines
 
-See `.agentic/agents/shared/agent_operating_guidelines.md` for complete instructions.
+Run \`ag start\` to begin a session. The CLI loads role-specific guidance at each phase.
 
 ## Non-Negotiables
 
@@ -248,7 +248,7 @@ This project uses the Agentic Framework for AI-assisted development.
 
 ## Full Guidelines
 
-See `.agentic/agents/shared/agent_operating_guidelines.md` for complete instructions.
+Run \`ag start\` to begin a session. The CLI loads role-specific guidance at each phase.
 
 ## Non-Negotiables
 
@@ -457,7 +457,7 @@ echo -e "${GREEN}Setup complete!${NC}"
 echo ""
 echo "The auto-loaded file(s) now instruct agents to:"
 echo "  1. Read .agentic/checklists/session_start.md first"
-echo "  2. Follow agent_operating_guidelines.md"
+echo "  2. Follow CLI prompts (\`ag start\`, \`ag implement\`, etc.)"
 echo "  3. Respect AGENTS.md non-negotiables"
 echo ""
 echo "Note: AGENTS.md is a REFERENCE file (not auto-loaded)."

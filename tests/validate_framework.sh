@@ -752,10 +752,11 @@ else
 fi
 
 # ============================================================
-# F-0093: AGENT_QUICK_START.md
+# F-0093: AGENT_QUICK_START.md (v1 only — removed in v2 simplification)
 # ============================================================
 echo "--- F-0093: AGENT_QUICK_START.md ---"
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/AGENT_QUICK_START.md" ]]; then
   pass "AGENT_QUICK_START.md exists"
   LINES=$(wc -l < "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/AGENT_QUICK_START.md" | tr -d ' ')
@@ -772,6 +773,7 @@ if grep -qi "doctor.sh" "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/AGENT_QUIC
   pass "AGENT_QUICK_START references doctor.sh"
 else
   fail "AGENT_QUICK_START missing doctor.sh reference"
+fi
 fi
 
 # ============================================================
@@ -2958,7 +2960,8 @@ else
   fail "F-0139: docs.sh is not executable"
 fi
 
-# doc_types.md exists with all 8 built-in types
+# doc_types.md exists with all 8 built-in types (v1 only — removed in v2 simplification)
+if [[ "$V2_ENGINE" != "1" ]]; then
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/doc_types.md" ]]; then
   pass "F-0139: doc_types.md exists"
   for dtype in changelog readme lessons architecture adr runbook tech-spec custom; do
@@ -2970,6 +2973,7 @@ if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/doc_types.md" ]]; then
   done
 else
   fail "F-0139: doc_types.md missing"
+fi
 fi
 
 # ag.sh has cmd_docs function

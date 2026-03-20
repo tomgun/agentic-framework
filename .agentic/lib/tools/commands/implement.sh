@@ -324,7 +324,7 @@ cmd_implement() {
     echo "Remember: Update FEATURES.md status to 'in_progress'"
     echo ""
     echo -e "${BOLD}References:${NC}"
-    echo "  Playbook: .agentic/lib/agents/shared/auto_orchestration.md"
+    echo "  Run \`ag check ${feature_id}\` for next steps"
     if [[ -f ".agentic/lib/checklists/feature_implementation.md" ]]; then
         echo "  Checklist: .agentic/lib/checklists/feature_implementation.md"
     else

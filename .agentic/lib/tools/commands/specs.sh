@@ -111,7 +111,7 @@ cmd_specs() {
             echo "     f. Mark domain as completed: change '- [ ]' to '- [x]' in plan"
             echo "  5. After all domains: cross-domain review (duplicates, gaps)"
             echo ""
-            echo "Pipeline details: .agentic/lib/agents/shared/auto_orchestration.md"
+            echo "Run \`ag check\` to see next steps for spec generation."
         elif [ "$status" = "DRAFT" ] || [ "$status" = "REVIEWING" ] || [ "$status" = "REVISION_NEEDED" ]; then
             echo -e "${YELLOW}Plan needs review.${NC}"
             echo "  Continue the plan-review loop:"
@@ -163,7 +163,7 @@ for d in domains:
     echo "  3. Use the plan-review loop to validate"
     echo "  4. After APPROVED: run 'ag specs' again to begin execution"
     echo ""
-    echo "Pipeline details: .agentic/lib/agents/shared/auto_orchestration.md"
+    echo "Run \`ag check\` to see pipeline details."
 
     # Token cost suggestion
     local feature_count
