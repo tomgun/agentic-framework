@@ -49,13 +49,15 @@ def sync_to_features_md(
         return None
 
     try:
-        subprocess.run(
+        result = subprocess.run(
             ["bash", str(feature_sh), feature_id, "status", v1_status],
             cwd=str(project_root),
             capture_output=True,
             text=True,
             timeout=10,
         )
+        if result.returncode != 0:
+            return f"feature.sh exited {result.returncode}: {result.stderr.strip()}"
     except subprocess.TimeoutExpired:
         return f"feature.sh timed out syncing {feature_id} → {v1_status}"
     except Exception as e:

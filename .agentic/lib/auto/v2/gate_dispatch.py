@@ -127,7 +127,7 @@ def _handle_plan_review_gate(
     except ImportError:
         # plan_convergence not available — fall back to human
         return GateResult.pending_human("plan_approved")
-    except Exception as e:
+    except Exception:
         # AI review failed — fall back to human
         return GateResult.pending_human("plan_approved")
 
@@ -164,7 +164,7 @@ def _handle_critical_agent_gate(
             return GateResult.rejected("ai", reason="CriticalAgent returned no verdict")
     except ImportError:
         return GateResult.pending_human(gate_name)
-    except Exception as e:
+    except Exception:
         # AI review failed — fall back to human
         return GateResult.pending_human(gate_name)
 
