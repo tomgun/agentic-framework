@@ -4,7 +4,7 @@ You are starting or resuming a work session. Orient yourself before doing anythi
 
 ## Session start
 
-1. Run `ag v2-status` to see active work items.
+1. Run `ag status` to see active work items.
 2. Check for interrupted work (items in mid-transition states).
 3. Review the current item's `journal.md` for context from previous sessions.
 4. Check `handoff.md` if it exists — it has context from the last agent.

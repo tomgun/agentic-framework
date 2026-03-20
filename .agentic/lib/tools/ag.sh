@@ -233,23 +233,6 @@ _v2_workflow() {
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -m auto.v2.workflow "$@"
 }
 
-# V2 commands that are exclusively handled by the new engine
-_v2_dispatch() {
-    local cmd="$1"
-    shift
-    case "$cmd" in
-        v2-start)    _v2_workflow start "$@"; return $? ;;
-        v2-transition) _v2_workflow transition "$@"; return $? ;;
-        v2-check)    _v2_workflow check "$@"; return $? ;;
-        v2-verify)   _v2_workflow verify "$@"; return $? ;;
-        v2-ship)     _v2_workflow ship "$@"; return $? ;;
-        v2-status)   _v2_workflow status "$@"; return $? ;;
-        v2-next)     _v2_workflow next "$@"; return $? ;;
-        v2-info)     _v2_workflow info "$@"; return $? ;;
-        *) return 1 ;;  # Not a v2 command
-    esac
-}
-
 # Main command dispatch
 _AG_CMD="${1:-help}"
 _AG_ARG="${*:2}"
@@ -258,10 +241,17 @@ if type flog &>/dev/null; then
     trap 'flog "ag.sh" "$_AG_CMD" "$_AG_ARG" "end:$?"' EXIT
 fi
 
-# Try v2 dispatch first (v2-prefixed commands always go to v2 engine)
-if [[ "${1:-}" == v2-* ]]; then
-    _v2_dispatch "$@"
-    exit $?
+# When engine: v2 is active, intercept commands that the new engine handles.
+# Falls through to old dispatch for commands without a v2 equivalent.
+if [[ "$_V2_ENGINE" -eq 1 ]]; then
+    case "${1:-}" in
+        start)   shift; _v2_workflow start "$@"; exit $? ;;
+        check)   shift; _v2_workflow check "$@"; exit $? ;;
+        ship)    shift; _v2_workflow ship "$@"; exit $? ;;
+        next)    shift; _v2_workflow next "$@"; exit $? ;;
+        info)    shift; _v2_workflow info "$@"; exit $? ;;
+        # transition, verify, status are handled below with v1 fallback
+    esac
 fi
 
 case "${1:-help}" in
@@ -393,13 +383,21 @@ case "${1:-help}" in
         cmd_sync "${2:-}"
         ;;
     verify)
-        cmd_verify "${2:-}"
+        if [[ "$_V2_ENGINE" -eq 1 ]]; then
+            shift; _v2_workflow verify "$@"
+        else
+            cmd_verify "${2:-}"
+        fi
         ;;
     approve-onboarding)
         cmd_approve_onboarding "${2:-}"
         ;;
     status)
-        cmd_status
+        if [[ "$_V2_ENGINE" -eq 1 ]]; then
+            shift; _v2_workflow status "$@"
+        else
+            cmd_status
+        fi
         ;;
     set)
         shift
