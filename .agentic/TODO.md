@@ -216,6 +216,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0083: LLM test: agent must auto-save plan and run dialectical review loop after exiting plan mode — no stopping, no waiting for user input. Verify full sequence: save DRAFT → spawn Critic+Advocate → synthesize → convergence check → APPROVED → ag implement. Test both auto and manual convergence modes. Background: this session the agent tried to skip plan review entirely until corrected with 'save the plan first, review it'.
 - **Added**: 2026-03-20
 
+### T-0084: LLM test: agent must update all project documentation (HOW_IT_WORKS, DEVELOPER_GUIDE, FRAMEWORK_WORKFLOW, FRAMEWORK_MAP, README, CHANGELOG) BEFORE creating a PR — not post-merge. Step 6 of implementing-features skill. Background: F-0241 shipped with zero doc updates; required a separate fix PR #175 after user caught the gap. docs_gate: blocking should catch this if ag done is used properly.
+- **Added**: 2026-03-20
+
 ## Done
 
 
