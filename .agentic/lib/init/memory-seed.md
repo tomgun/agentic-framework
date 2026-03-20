@@ -89,7 +89,7 @@ Plans saved to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` or they are LO
 | parallel agent coordination | `ag coord start` (HTTP JSON-RPC, port 4185, bearer auth) |
 | review/approve/reject | `ag review` to list, `ag review F-XXXX <state>` to resolve |
 | interrupted/crashed/resume | `ag intent list` for orphans, `ag sync` to auto-adopt |
-| quick ad-hoc work | `ag work "description"` |
+| analyze session/workflow violations | `ag analyze-session <path.jsonl> [--json]` — detects plan violations |
 
 ## State machine enforcement (F-0222)
 

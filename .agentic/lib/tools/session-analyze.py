@@ -17,7 +17,6 @@ import json
 import sys
 import os
 from datetime import datetime, timezone
-from pathlib import Path
 
 
 def parse_jsonl(path: str) -> list[dict]:
@@ -119,9 +118,12 @@ def detect_violations(events: list[dict]) -> list[dict]:
             last_plan_exit_ts = evt["timestamp"]
             last_plan_exit_idx = i
 
-        # Track plan approval (agent text mentioning APPROVED)
-        if evt["type"] == "assistant_text" and "APPROVED" in evt.get("text", ""):
-            plan_approved = True
+        # Track plan approval (agent text with plan status APPROVED)
+        if evt["type"] == "assistant_text":
+            text = evt.get("text", "")
+            if "Status**: APPROVED" in text or "status: APPROVED" in text.lower() or \
+               "plan is APPROVED" in text or "marked APPROVED" in text:
+                plan_approved = True
 
         # Violation 1: Stopped after plan exit
         # ExitPlanMode should be followed by Agent tool (spawning reviewers) within ~3 tool calls
@@ -180,7 +182,8 @@ def detect_violations(events: list[dict]) -> list[dict]:
 def _is_allowlisted(path: str) -> bool:
     """Check if file path is in the allowlist (spec, test, plan, journal)."""
     parts = path.lower()
-    for prefix in ("spec/", "test", "journal/", ".agentic/session/",
+    for prefix in ("spec/", "tests/", "test/", "/tests/", "/test/",
+                    "journal/", ".agentic/session/",
                     "memory/", ".agentic/todo", ".agentic/status",
                     ".agentic/human_needed", ".agentic/contributions"):
         if prefix in parts:

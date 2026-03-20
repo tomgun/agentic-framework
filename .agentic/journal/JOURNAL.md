@@ -3488,3 +3488,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 07:02 - F-0237+F-0238: Review fixes
+
+**Why**: Code review found bugs and ID mismatch
+
+**What changed**:
+- Fixed review items: duplicate trigger row, overly broad test allowlist, unused import, fragile APPROVED detection, wrong feature IDs in STATUS/JOURNAL
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+
