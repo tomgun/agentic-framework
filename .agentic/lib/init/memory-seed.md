@@ -91,6 +91,7 @@ Plans saved to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` or they are LO
 | review/approve/reject | `ag review` to list, `ag review F-XXXX <state>` to resolve |
 | interrupted/crashed/resume | `ag intent list` for orphans, `ag sync` to auto-adopt |
 | analyze session/workflow violations | `ag analyze-session <path.jsonl> [--json]` — detects plan violations |
+| QA coverage map/gap analysis | `ag qa` — generates docs/QA_REGISTRY.md (feature-to-test matrix). `--check` for staleness, `--json` for data |
 
 ## State machine enforcement (F-0222)
 

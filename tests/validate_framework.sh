@@ -5339,6 +5339,27 @@ else
   warn "Doc currency: CHANGELOG.md not found, skipping"
 fi
 
+# F-0241: QA Registry freshness (advisory)
+# ============================================================
+echo "--- F-0241: QA Registry ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/docs/QA_REGISTRY.md" ]]; then
+  pass "QA Registry exists (docs/QA_REGISTRY.md)"
+  # Advisory: check if file is older than 7 days
+  if [[ "$(uname)" == "Darwin" ]]; then
+    file_age=$(( ($(date +%s) - $(stat -f %m "${FRAMEWORK_ROOT}/docs/QA_REGISTRY.md")) / 86400 ))
+  else
+    file_age=$(( ($(date +%s) - $(stat -c %Y "${FRAMEWORK_ROOT}/docs/QA_REGISTRY.md")) / 86400 ))
+  fi
+  if [[ $file_age -gt 7 ]]; then
+    warn "QA Registry is ${file_age} days old — regenerate with: ag qa"
+  else
+    pass "QA Registry is recent (${file_age} days old)"
+  fi
+else
+  warn "QA Registry not found — generate with: ag qa"
+fi
+
 # Summary
 # ============================================================
 echo ""

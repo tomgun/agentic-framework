@@ -30,6 +30,33 @@ cmd_analyze_session() {
     python3 "$SCRIPT_DIR/session-analyze.py" "$arg" $json_flag
 }
 
+# QA Registry — generate or check test coverage map
+cmd_qa() {
+    local arg="${1:-}"
+    case "$arg" in
+        --check)
+            python3 "$ROOT_DIR/tests/qa_registry.py" --check
+            ;;
+        --json)
+            python3 "$ROOT_DIR/tests/qa_registry.py" --json
+            ;;
+        --help|-h)
+            echo "Usage: ag qa [--check|--json]"
+            echo ""
+            echo "Generate or check the QA Registry (docs/QA_REGISTRY.md)."
+            echo "Maps features to tests and identifies coverage gaps."
+            echo ""
+            echo "Options:"
+            echo "  (none)    Generate/regenerate QA_REGISTRY.md"
+            echo "  --check   Exit non-zero if registry is stale"
+            echo "  --json    Output raw data as JSON"
+            ;;
+        *)
+            python3 "$ROOT_DIR/tests/qa_registry.py"
+            ;;
+    esac
+}
+
 # Trace command - spec-code traceability
 cmd_trace() {
     local arg="${1:-}"
