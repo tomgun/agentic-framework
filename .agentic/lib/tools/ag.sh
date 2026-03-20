@@ -265,6 +265,10 @@ case "${1:-help}" in
         shift
         cmd_trace "$@"
         ;;
+    analyze-session)
+        shift
+        cmd_analyze_session "$@"
+        ;;
     test)
         shift
         cmd_test "$@"

@@ -3,6 +3,33 @@
 # Sourced by ag.sh — do NOT execute directly.
 # Depends on: SCRIPT_DIR, ROOT_DIR, PROFILE, color codes, paths.sh, settings.sh
 
+# Analyze session logs for workflow violations
+cmd_analyze_session() {
+    local arg="${1:-}"
+    local json_flag=""
+    if [[ "$arg" == "--json" ]]; then
+        json_flag="--json"
+        shift
+        arg="${1:-}"
+    elif [[ "${2:-}" == "--json" ]]; then
+        json_flag="--json"
+    fi
+
+    if [[ -z "$arg" || "$arg" == "--help" || "$arg" == "-h" ]]; then
+        echo "Usage: ag analyze-session <session-log.jsonl> [--json]"
+        echo ""
+        echo "Analyze Claude Code session logs for workflow violations."
+        echo "Detects: stopped after plan exit, code before review, skipped planning."
+        echo ""
+        echo "Examples:"
+        echo "  ag analyze-session ~/.claude/projects/-workspace/<session-id>.jsonl"
+        echo "  ag analyze-session <path> --json"
+        return 0
+    fi
+
+    python3 "$SCRIPT_DIR/session-analyze.py" "$arg" $json_flag
+}
+
 # Trace command - spec-code traceability
 cmd_trace() {
     local arg="${1:-}"

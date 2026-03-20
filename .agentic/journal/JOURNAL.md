@@ -3475,5 +3475,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Next steps**:
 - Merge PR
 
+
+### Session: 2026-03-20 06:36 - F-0237+F-0238: Memory-seed optimization + session analysis tool
+
+**Why**: Memory-seed exceeded 100-line ceiling (L-0002); manual session analysis took 30+ min
+
+**What changed**:
+- Memory-seed compressed from 319→134 lines (58% reduction) while preserving all 58 sentinels and passing validation. Session analysis tool (session-analyze.py) parses Claude JSONL logs and detects workflow violations — tested against real d7d00d88 transcript.
+
+**Next steps**:
+- Merge PR, run LLM regression tests for memory-seed
+
 **Blockers**: None
 

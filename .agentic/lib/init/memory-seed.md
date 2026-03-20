@@ -1,319 +1,134 @@
 ---
 summary: "Action rules agents write to persistent memory at session start"
-tokens: ~1280
+tokens: ~900
 ---
 
 # Memory Seed — Agentic Framework Action Rules
 
-<!-- memory-seed v0.62.0 -->
+<!-- memory-seed v0.65.0 -->
 <!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks, centralized-ids, review_pr, pr-auto-fix, plan-convergence-loop, reviewer-catalog, expert-reviewers, ag start, ag work, ag spec, ag test, ag transition -->
 
-Write these rules to your persistent memory. They are action triggers — when a condition is met, execute the specified command. Do not treat these as suggestions.
+Write these rules to persistent memory. They are action triggers — execute the specified command when the condition is met.
 
-## When the user wants to build something
-
-If the user's intent is to build, implement, add, create, set up, develop, make, or work on a feature — in any phrasing:
+## Build / implement / create → spec first
 
 **STOP.** Do not write code yet.
+1. Assign F-XXXX in FEATURES.md if none exists
+2. Create `spec/acceptance/F-XXXX.md` with acceptance criteria FIRST
+3. `ag plan F-XXXX` → plan-review convergence loop
+4. `ag implement F-XXXX` after plan is APPROVED
 
-1. If no feature ID exists: assign the next available F-XXXX in .agentic/spec/FEATURES.md
-2. Create .agentic/spec/acceptance/F-XXXX.md with acceptance criteria FIRST
-3. Run `ag plan F-XXXX` (starts the plan-review loop)
-4. Run `ag implement F-XXXX` after the plan is approved
+- A plan is NOT a spec — even with a detailed plan, create formal artifacts before coding
+- AC clarity gate: vague ACs blocked in formal, advisory in discovery. Bypass: `SKIP_CLARITY=1`
+- If `spec_analysis` enabled (default on for formal): `spec-analyze.sh` runs advisory checks
+- `ag implement` auto-creates WIP tracking + worktree (if `worktree_mode: always`)
+- TDD mode (`development_mode: tdd`): enforces RED→GREEN→REFACTOR per AC
+- >10 files scope → **TOO BIG** — break into 3-5 smaller tasks
+- **Profiles**: `discovery` (lightweight) | `formal` (spec-driven) | `autonomous_formal` (formal + delegated reviews). `is_formal_like()` checks formal rigor.
 
-AC clarity gate runs on first `ag implement` — vague ACs blocked in formal, advisory in discovery. Bypass: `SKIP_CLARITY=1`.
+## Plans must be saved and reviewed
 
-**A plan is NOT a spec.** Even when implementing from a detailed plan, create the formal artifacts (FEATURES.md entry + acceptance file) BEFORE writing any code. Plans contain design; specs contain the testable contract.
-5. If `spec_analysis` is enabled (default: on for formal/autonomous_formal, off for discovery), `spec-analyze.sh` runs advisory checks — review findings but proceed regardless
+Plans saved to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` or they are LOST.
 
-**Profiles**: `discovery` (lightweight), `formal` (full spec-driven), `autonomous_formal` (formal rigor but review_code/review_regression delegated to critical_agent — only review_merge stays human). Use `is_formal_like()` to check if a profile has formal rigor (returns true for both formal and autonomous_formal).
+**After ExitPlanMode** — auto-continue immediately, do NOT stop:
+1. Save plan as DRAFT (tool locations like `~/.claude/plans/` are session-scoped)
+2. Spawn Critic + Advocate agents (parallel, fresh context)
+3. Synthesize → revise if refinements needed → re-run reviewers
+4. Loop until convergence OR max iterations (→ ESCALATED → HUMAN_NEEDED)
+5. `plan_review_convergence: auto` → auto-approve on convergence; `manual` → user decides
+6. After APPROVED → `ag implement F-XXXX`
 
-`ag implement` auto-creates WIP tracking. If `worktree_mode: always` in STACK.md, `ag implement` also auto-creates a git worktree for the feature branch. Use `ag worktree` (create|list|remove|path|status) to manage worktrees manually. If bypassing ag: run `bash .agentic/lib/tools/wip.sh start F-XXXX "desc" "files"` before coding.
+**Wrong rationalizations**: "user created it so it's reviewed" / "plan exit = approval" / "I should stop and wait" / "simple plan, skip review" / "proceed with refinements during implementation" — ALL WRONG. See CLAUDE.md for full list.
 
-When `development_mode: tdd` in STACK.md, the implementing-features skill enforces per-AC RED→GREEN→REFACTOR with `wip.sh checkpoint --phase RED|GREEN|REFACTOR "note"`. `wip.sh complete` blocks if no phase checkpoints or ordering violated (GREEN before RED). Pre-commit Check #20 is a safety net. `SKIP_TDD=1` escape hatch on feature branches only.
+**User-provided plans**: Same flow — save as DRAFT → spawn reviewers → convergence loop → APPROVED → implement.
 
-Never write implementation code before acceptance criteria exist. This is a structural rule, not a suggestion.
+## Fix / debug / troubleshoot → failing test first
 
-If they say "implement entire", "full system", "complete", or describe something that would touch >10 files: **STOP — TOO BIG.** Break into 3-5 smaller tasks first.
+**STOP.** Write a failing test that reproduces the bug FIRST. Then fix. Then verify.
 
-## Plans must be saved — ALWAYS
+## Commit / push / ship → pre-commit sequence
 
-Plans are durable artifacts. They WILL BE LOST if not saved to `.agentic/journal/plans/`. Save them regardless of how they arrive:
+**STOP.** Check `wip.sh check` — if WIP exists, BLOCK. Then:
+1. `journal.sh "Topic" "Outcomes" "Next" "Blockers" --why "Why"` (outcomes, not file lists)
+2. `status.sh focus "Current task"`
+3. If shipping: `feature.sh F-#### status shipped`
+4. `ag commit` — runs quality gates, shows diff, waits for human approval
+5. **Spec + code + tests + docs = done** — run `drift.sh --docs` + `docs.sh --validate`, update all artifacts in same commit. Exception: `docs_mode: deferred` skips inline docs.
 
-**After exiting plan mode**: Auto-continue immediately — do NOT stop and wait for user input. The ExitPlanMode hook outputs a banner reminder; follow it or these steps:
-1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with status DRAFT (tool plan locations like `~/.claude/plans/` are session-scoped and WILL BE LOST)
-2. Spawn Critic + Advocate agents in parallel (fresh context) — do this immediately, no waiting
-3. Synthesize with Revision Guidance
-4. Check `plan_review_convergence` in STACK.md:
-   - `auto`: If converged (no high-confidence concerns, iteration ≥ 2) → set APPROVED, continue to `ag implement`. Only stops if max iterations reached (→ ESCALATED → HUMAN_NEEDED)
-   - `manual`: Present synthesis to user → user decides Proceed/Revise/Reject
-5. After APPROVED → run `ag implement F-XXXX`
-6. If review not enabled: set plan status to APPROVED directly
+## Done / complete / finished / merged
 
-**Rationalizations that are WRONG (do not use):**
-- "The user created the plan, so it's reviewed" — plan mode = drafting, not reviewing
-- "Plan mode exit = approval" — ExitPlanMode = draft complete, not approved
-- "I should stop and wait for the user after plan mode" — auto-continue to review immediately; the decision point is after synthesis (manual) or after convergence (auto), not before review starts
-- "Simple plan, review unnecessary" — review is structural, not discretionary
-- "I have it in context" — save durably, then review
-- "ag implement told me to review, I'll assess it myself" — spawn Critic + Advocate, don't self-assess
-- "Proceed with refinements during implementation" — if review found refinements, revise the plan first; never defer design decisions to the coder
+**STOP.** Run `ag done F-XXXX`. P1 ACs must be 100% checked. Before ending: check TaskList, flush to `ag todo`. Review PR for "future work"/"deferred" items → `ag todo` each with **Background** + **Related** fields.
 
-**When the user provides a plan in a message** (e.g., "implement this plan:"): Save the plan content to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` BEFORE writing any code. Then auto-continue to review immediately (same flow as above: save DRAFT → spawn reviewers → synthesize → convergence check → implement). Do NOT stop and wait for user input before starting the review.
-4. Only proceed to implementation after the plan is APPROVED (or if review is disabled)
+- `ag merge <pr#> F-XXXX` chains merge + `ag done` — use instead of `gh pr merge`
+- `ag done` runs `ag verify F-XXXX` automatically (blocking for formal, advisory for discovery)
+- Post-merge dogfood sync (framework dev): `ag done` runs `ag dogfood --brief` automatically
+- Doc lifecycle fires if STACK.md `## Docs` has entries. `docs_mode: deferred` → logs to `deferred-docs.json`
+- Smoke evidence: when enabled, `ag done` checks for `evidence/F-XXXX-smoke.*`
 
-## When the user reports a bug or wants a fix
+## Trigger-action table
 
-If the user's intent is to fix, debug, repair, resolve, investigate, troubleshoot, or address a bug/issue/error — in any phrasing (e.g. "crash", "fails", "regression", "not working", "something's wrong"):
-
-**STOP.** Write a failing test that reproduces the bug FIRST. Then fix it. Then verify the test passes.
+| Trigger | Action |
+|---------|--------|
+| idea/remember/todo/note | `ag todo "description"` |
+| backlog/queue/what's next | `ag backlog` (add/done/move) |
+| formalize/promote TODOs | `ag formalize` or `ag formalize T-XXXX` |
+| "must always/never" / NFR / constraint | `nfr-capture.sh "statement"`. `nfr-propagate.sh derive F-XXXX` for AC derivation |
+| decompose/break down epic | `ag decompose F-XXXX` → `review_decomposition` checkpoint. Source annotation: add `**Source**: <path>` to FEATURES.md when creating from a design doc; `design-trace.sh` tracks completion |
+| execute epic autonomously | `ag auto epic F-XXXX [--parallel]` (requires decomposed children) |
+| full autonomous pipeline | `ag auto pipeline --features-json '...'` (use `ag kickoff` first) |
+| kickoff/vision/generate features | `ag kickoff "vision"` → staging → `--review` → `--approve` |
+| feedback/tested it/bug report | `ag feedback "text"` (classifies: bug/feature/ac-adjust) |
+| run/how to run/dev server | `ag run` (auto-detects stack) |
+| verify epic/integration tests | `ag auto verify-epic F-XXXX` |
+| verify framework/self-test | `ag auto verify-framework --project <name>` |
+| session start/where were we | `ag start` → output dashboard.sh verbatim, no preamble |
+| quick ad-hoc work | `ag work "description"` |
+| write/update spec | `ag spec F-XXXX` (shipped specs are contracts — migration.sh for changes) |
+| run tests | `ag test` or `ag test llm` |
+| feature state/transition | `ag transition F-XXXX <state>` or `--status` or `--unblocked` |
+| parallel agent coordination | `ag coord start` (HTTP JSON-RPC, port 4185, bearer auth) |
+| review/approve/reject | `ag review` to list, `ag review F-XXXX <state>` to resolve |
+| interrupted/crashed/resume | `ag intent list` for orphans, `ag sync` to auto-adopt |
+| quick ad-hoc work | `ag work "description"` |
 
 ## State machine enforcement (F-0222)
 
-Three modes for `state_enforcement` in STACK.md:
-- **off** (Discovery default): Skip state transitions entirely. Crash recovery only.
-- **advisory**: Warn on gate failures but allow transitions.
-- **blocking** (Formal/Autonomous Formal default): Gate failures block transitions. `ag implement` and `ag done` exit non-zero.
-
-SKIP_TRANSITIONS (planned→implementing, planned→shipped, implementing→shipped, implementing→committed) are always valid regardless of enforcement mode. `ag done` also checks for an approved plan when `plan_review_enabled: yes` — this catches retroactive planning (§16 KEY_INSIGHTS). To bypass blocking: set `state_enforcement: advisory` in STACK.md.
-
-## When committing or pushing
-
-If the user wants to commit, push, save, ship, or finalize changes — in any phrasing (e.g. "save changes", "create PR", "ready to go"):
-
-**STOP.** Check AGENTS.json for active WIP (via `bash .agentic/lib/tools/wip.sh check`) — if WIP exists, BLOCK and warn. Otherwise, follow the pre-commit sequence below, then run `ag commit`.
-
-**Spec + code + tests + docs = done.** If your change affects user-visible behavior, run `bash .agentic/lib/tools/drift.sh --docs` to detect stale project docs and `bash .agentic/lib/tools/docs.sh --validate` to check registry health. Update all artifacts in the same commit — don't defer to a follow-up. If you add or substantially change a doc, ensure `## Docs` in STACK.md lists it with correct component/area tags. Use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold a new doc and auto-register it.
-
-**Exception: `docs_mode: deferred`** — when set in STACK.md, skip inline doc updates during implementation. `ag done` will log what docs are needed to `.agentic/deferred-docs.json` instead of triggering immediate drafting. Run `ag docs generate` later to process the deferred queue. Framework instruction file updates (framework dev only) are NOT deferred — always inline.
-
-## When the user mentions an idea, todo, or reminder
-
-If the user says remember, todo, idea, note for later, tasklist, or mentions something to track:
-
-**STOP.** Run `ag todo "description"` to capture it in .agentic/TODO.md (git-tracked, survives context compression).
-
-## When the user asks about work queue, backlog, or what's next
-
-If the user says backlog, queue, next up, what's next, what should I work on, prioritize, reorder, or mentions work assignment:
-
-**STOP.** Run `ag backlog` to see the current work queue. Use `ag backlog add F-XXXX` to add items, `ag backlog done` to advance, `ag backlog move F-XXXX 0` to reprioritize. Position 0 = current work. `ag implement` enforces backlog order.
-
-## When the user wants to formalize TODO items
-
-If the user says formalize, promote to formal, migrate to formal, make TODOs into features, promote items, or wants to convert discovery-mode TODO items into formal spec artifacts:
-
-**STOP.** Run `ag formalize` to list promotable TODO inbox items. Use `ag formalize T-XXXX` to promote specific items, or `ag formalize --all` for bulk promotion. Each promoted item gets a FEATURES.md entry (auto-assigned F-ID) + an acceptance criteria stub. The TODO item is triaged to Done. Does NOT change the profile — content migration only.
-
-## When the user expresses a system invariant or quality constraint
-
-If the user says "it must always...", "never do X", "performance must stay under...", "security requirement", "accessibility", or describes a cross-cutting constraint that applies beyond a single feature:
-
-**STOP.** This is a Non-Functional Requirement. Check `.agentic/spec/NFR.md` — if no matching NFR exists, use `bash .agentic/lib/tools/nfr-capture.sh "statement"` to assign the next NFR-XXXX ID and write it. NFRs are invariants that must hold across all features, not just the one being discussed. Don't let them stay informal in conversation. Use `nfr-propagate.sh derive F-XXXX` to auto-generate NFR Constraints sections for feature ACs. `nfr-applicable.sh F-XXXX` lists applicable NFRs. NFR constraints should be ACs in `### NFR Constraints (P1 — required)` group inside Acceptance Criteria.
-
-## When the user wants to decompose an epic
-
-If the user says decompose, break down, split into children, break apart, subdivide, or wants to turn a large feature into smaller child features:
-
-**STOP.** Run `ag decompose F-XXXX`. This analyzes the epic's acceptance criteria, maps them to components, proposes child features, and routes through the `review_decomposition` checkpoint. Child features get `Parent: F-XXXX` in FEATURES.md. The epic's status is automatically derived from its children's statuses after any child transition.
-
-**Source annotation**: When creating features from a design document (ADR, roadmap, epic plan, kickoff vision), add `**Source**: <path>` to the FEATURES.md entry. This links features to their originating design doc. Run `bash .agentic/lib/tools/design-trace.sh` to see completion % per source document. `ag decompose` propagates the parent's Source to children automatically.
-
-## When the user wants to execute an epic autonomously
-
-If the user says execute epic, implement all children, run epic autonomously, process epic features, or wants to autonomously implement all child features of an epic:
-
-**STOP.** Run `ag auto epic F-XXXX`. This reads the epic's child features, schedules component-scoped workers with non-blocking reviews, and executes each child feature autonomously. Requires the epic to be decomposed first (children must exist in FEATURES.md with acceptance criteria). Add `--parallel` for concurrent execution in separate worktrees (F-0214): `ag auto epic F-XXXX --parallel [--max-parallel N] [--timeout N]`.
-
-## When the user wants to run the full autonomous pipeline
-
-If the user says run full pipeline, vision to shipped, end-to-end autonomous, build everything from this vision, or wants features designed and implemented without intervention:
-
-**STOP.** Run `ag auto pipeline --features-json '...' --epic-name "..."`. This creates an epic, promotes features with parent links, and schedules all children through implementation → review → integration verify → ship. Requires `review_decomposition` set to `critical_agent` or `skip` (not `human`). The `--features-json` input must be pre-structured; use `ag kickoff` first if starting from a raw vision.
-
-## When the user has a product vision to turn into a backlog
-
-If the user says kickoff, vision, draft epic from idea, generate features, turn this idea into a backlog, or wants to convert a product vision into structured spec artifacts:
-
-**STOP.** Run `ag kickoff "vision description"`. This generates OVERVIEW.md, FEATURES.md entries, acceptance criteria stubs, and BACKLOG.json in a staging area (`.agentic/session/kickoff-draft/`). Use `ag kickoff --review` to present staging for review/iteration, `ag kickoff --approve` to promote to real spec files, `ag kickoff --discard` to start over. After approval, suggest `ag auto epic` for autonomous execution.
-
-## When the user gives feedback after testing
-
-If the user says feedback, tested it, tried it, after testing, user reported, found a bug, would be nice if, or provides feedback on working software — in any phrasing:
-
-**STOP.** Run `ag feedback "text"`. This classifies feedback via keyword heuristics (bug/feature/ac-adjust/unclear) and persists to FEEDBACK_LOG.md with a FB-XXXX ID. Use `--bug` or `--feature` to override classification, or `--ac F-XXXX AC-XXX` for acceptance criteria adjustments. Use `ag feedback log` to view entries, `ag feedback route FB-XXXX` to route to ISSUES.md/TODO.md, `ag feedback done FB-XXXX` to resolve.
-
-## When the user wants to know how to run the project
-
-If the user says run, how to run, dev server, start the app, run commands, what commands, or wants to know how to run/start/build/test the project:
-
-**STOP.** Run `ag run`. This detects the stack from STACK.md and auto-detection, then displays dev server, build, and test commands with source attribution (STACK.md vs auto-detected).
-
-## When an epic needs integration verification
-
-If the user says verify epic, integration tests, cross-component tests, or wants to validate that an epic's children work together before the epic ships:
-
-**STOP.** Run `ag auto verify-epic F-XXXX`. This loads integration test commands (epic AC `## Integration tests` > STACK.md `## Integration tests` > skip), runs them via VerifyLoop, and stores a pass/fail artifact. The `review_integration` setting (human/critical_agent/skip) controls whether the critical agent reviews results. If no integration tests are defined, the epic ships immediately. If tests fail, the epic stays at "implementing" until re-run succeeds.
-
-## When the user wants to verify the framework itself
-
-If the user says verify framework, test the framework, self-test, framework verification, or wants to test the framework end-to-end by building real projects:
-
-**STOP.** Run `ag auto verify-framework --project <name>` (single scenario) or `ag auto verify-framework --all` (full matrix). This spawns agents to build example projects from scratch using `ag` commands, detects framework bugs via failure classification, self-heals by spawning fix agents, and delivers accumulated fixes as a single PR. Scenarios: todo-app, api-service, cli-tool, fullstack-monorepo, fullstack-multirepo. Use `--json` for machine-readable output.
-
-## When starting a session
-
-If this is the start of a conversation, the user says "start", "where were we", "what's the status", or returns after being away:
-
-**STOP.** Run `ag start`. This runs `dashboard.sh` — output it verbatim as your first response. No preamble, no reformatting. The dashboard shows current focus, backlog, blockers, and suggested next steps.
-
-## When the user wants to do quick ad-hoc work
-
-If the user says "work on", "quick task", or wants to do something without a feature ID:
-
-**STOP.** Run `ag work "description"`. Creates ad-hoc WIP tracking. For feature-tracked work, use `ag implement F-XXXX` instead.
-
-## When the user wants to write or update a spec
-
-If the user says "write spec", "create spec", "add acceptance criteria", "update spec", "evolve spec", or "spec for F-XXXX":
-
-**STOP.** Run `ag spec F-XXXX`. Follow spec protection levels — shipped specs are contracts (require migration.sh for changes). New specs use nfr-propagate.sh derive for auto-generating NFR Constraints sections.
-
-## When the user wants to run tests
-
-If the user says "run tests", "test", or "ag test":
-
-**STOP.** Run `ag test` to execute the project's test suite (reads test commands from STACK.md `## Testing`). Use `ag test llm` for LLM behavioral tests if the project has them configured (`llm_tests_enabled: yes` in STACK.md).
-
-## When the user asks about feature state or transitions
-
-If the user says "transition", "state change", "move feature to", "what state is F-XXXX", or "feature status":
-
-**STOP.** Run `ag transition F-XXXX <state>` to advance. `ag transition F-XXXX --status` to see current state and available transitions. `ag transition --unblocked` to list features ready to advance. State machine enforces gates — some transitions require review checkpoints.
-
-## When the user wants parallel agent coordination
-
-If the user says start coordination server, parallel agents, remote control, remote review, mobile status, or wants multiple agents working in parallel on different features:
-
-**STOP.** Run `ag coord start` to start the coordination server. This provides an HTTP JSON-RPC API (default 127.0.0.1:4185) with 8 tools: claim_feature, release_feature, transition_state, get_unblocked, poll_changes, report_status, request_review, submit_review. Bearer token auth is generated automatically. Use `ag coord status` to check and `ag coord stop` to shut down.
-
-## When a transition is blocked by a review checkpoint
-
-If a state machine transition is blocked by a review checkpoint, or the user says review, approve, reject, pending review:
-
-**STOP.** Run `ag review` to list all pending reviews. To resolve: `ag review F-XXXX <state>` (approves by default), or `ag review F-XXXX <state> --reject --reason "why"`. Review modes (human/critical_agent/skip) are configurable per transition in STACK.md `### Review checkpoints`. Legacy value "auto" is accepted and mapped to "skip". Taste review (`review_taste`) piggybacks on code review transitions — if style settings are declared in STACK.md `## Style & taste`, the critical agent also validates style consistency.
-
-## When work is done
-
-If the user indicates a feature is complete — in any phrasing (e.g. "done", "complete", "finished", "merged", "PR merged", "shipped", "landed", "wrapped up", "it's in"). Match intent, not exact words.
-
-**STOP.** Run `ag done F-XXXX`. Do not just tell the user it's done — run the command. P1 ACs must be 100% checked for priority-grouped specs. Flat-list specs use 80% threshold. Before ending, check your TaskList for pending items and flush them to .agentic/TODO.md via `ag todo`. Also review the plan and PR description for any "future work", "follow-up", "deferred", or "TODO" items — run `ag todo` for each, then IMMEDIATELY add `- **Background**:` and `- **Related**:` fields to the entry (you have the context now; a one-liner without context is unactionable guesswork later). If on main (not in a worktree), run `ag flush --features` to commit state files directly to main.
-
-**Critical**: When merging a PR, use `ag merge <pr#> F-XXXX` instead of `gh pr merge` directly. This structurally chains the merge with `ag done` — no opportunity to forget. If you already ran `gh pr merge`, IMMEDIATELY run `ag done F-XXXX` as the next step. The post-merge flow (VERSION bump, feature status, backlog advance) is part of the merge — not a separate action the user should have to request.
-
-**Automated verification**: `ag done` runs `ag verify F-XXXX` automatically before shipping — extracts `**Automated**:` commands from the AC file's `## Verification` section and executes them. Blocking for formal profiles (`acceptance_criteria: blocking`), advisory for discovery.
-
-**Post-merge dogfood sync** (framework development only): `ag done` on main automatically runs `ag dogfood --brief` when `FRAMEWORK_DEVELOPMENT.md` exists. This detects drift between root instruction files and templates using sentinel-based checking. Run `ag dogfood` manually for a full report with fix suggestions. Advisory only — doesn't block `ag done`.
-
-## When work is done (doc lifecycle)
-
-After `ag done F-XXXX` completes, if STACK.md has a `## Docs` section with entries:
-the doc lifecycle fires automatically (docs.sh assembles context, you draft the docs).
-You can also run `ag docs F-XXXX` manually to draft registered docs for a feature.
-
-If `docs_mode: deferred` in STACK.md, `ag done` logs deferred items to `.agentic/deferred-docs.json` instead of triggering immediate drafting. Run `ag docs generate` later to process all pending entries, or `ag docs generate F-XXXX` for a single feature.
-
-## Smoke test evidence
-
-When `smoke_test_evidence` is enabled in STACK.md (`recommended` or `required`), `ag done` checks for `.agentic/journal/evidence/F-XXXX-smoke.*` before marking complete. Create evidence manually (any format) or run `ag auto verify --visual --feature F-XXXX` to auto-generate it. Setting `required` blocks `ag done` without evidence (bypass: `SKIP_SMOKE_EVIDENCE=1`). Setting `recommended` warns but proceeds. Requires `feature_tracking: yes` to be effective.
-
-## When work was interrupted or a session crashed
-
-If the user mentions interrupted work, crashed session, stuck intent, orphaned work, resume, or recovery — in any phrasing:
-
-**STOP.** Run `ag intent list` to see pending and orphaned intents. Orphaned intents are from crashed sessions (dead PID). Use `ag intent clear F-XXXX` to discard an intent, or run `ag sync` to auto-adopt orphans into the current session. The intent journal provides crash recovery: `ag implement` and `ag done` write checkpoints so interrupted work can resume.
-
-## Who tests the tests?
-
-When reviewing test quality — whether during implementation, retro, or audit — ask: "Could this test pass with a broken implementation?" If the answer is yes, the test is weak.
-
-Run `ag audit` to verify the spec→AC→test chain. Use `ag audit --propagate NFR-XXXX` to trace NFR changes downstream. Use `ag audit --metrics` for spec evolution data (discovery markers, churn analysis).
-
-## Pre-commit sequence (never skip steps)
-
-Every time before committing, execute these commands in order:
-
-1. `bash .agentic/lib/tools/journal.sh "Topic" "What changed (outcomes, not files)" "Next" "Blockers" --why "Problem being solved"` — update JOURNAL.md (always include --why, describe outcomes not implementation details)
-2. `bash .agentic/lib/tools/status.sh focus "Current task"` — update .agentic/STATUS.md
-3. If shipping a feature (Formal): `bash .agentic/lib/tools/feature.sh F-#### status shipped`
-4. Stage any modified state files: BACKLOG.json, STATUS.md, JOURNAL.md, HUMAN_NEEDED.md
-   Or use `ag flush` to commit state files directly to main (no PR needed).
-5. VERSION is bumped post-merge by `ag done`, not in PRs.
-6. `ag commit` — runs quality gates, shows diff, waits for human approval
-7. Only THEN announce ready — never say "done" before artifacts are updated
-
-## Centralized ID patterns
-
-Feature IDs (F-XXXX) are defined in `.agentic/lib/ids.py` (Python) and `.agentic/lib/ids.sh` (shell). Never hardcode feature ID regex patterns — import from these modules. IDs support 4+ digits (F-0001 through F-99999+). Use `format_feature_id(n)` to format, `is_valid_feature_id(s)` to validate.
-
-## Token-efficient scripts (always use these)
-
-Never read or edit these files directly. Always use the scripts:
-
-| File | Command |
-|------|---------|
-| .agentic/STATUS.md | `bash .agentic/lib/tools/status.sh focus "Task"` |
-| .agentic/journal/JOURNAL.md | `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes" "Next" "Blockers" --why "Why"` |
-| .agentic/HUMAN_NEEDED.md | `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"` |
-| .agentic/spec/FEATURES.md | `bash .agentic/lib/tools/feature.sh F-#### status shipped` |
-| .agentic/TODO.md | `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"` |
-| .agentic/FEEDBACK_LOG.md | `bash .agentic/lib/tools/feedback.sh add "text"` or `ag feedback "text"` |
-| AGENTS.json | Replaces WIP.md and AGENTS_ACTIVE.md for agent/WIP tracking |
+`state_enforcement` in STACK.md: `off` (discovery default) | `advisory` | `blocking` (formal default). SKIP transitions always valid. `ag done` also checks approved plan when `plan_review_enabled: yes`.
 
 ## Session start
 
-When a session begins, issue ONE tool call:
+ONE tool call: `bash .agentic/lib/tools/dashboard.sh 2>/dev/null` — output verbatim, no preamble.
+- Orphaned plans (📝 line): save + review is FIRST action, before anything else
+- NFR suggestion: if 3+ features shipped with no project-specific NFRs → suggest `ag nfr discover`
 
-```bash
-bash .agentic/lib/tools/dashboard.sh 2>/dev/null
-```
+## Token-efficient scripts (always use, never edit files directly)
 
-Output the result **verbatim** as your first text response. No other tool calls, no preamble, no narration, no reformatting. The script renders the final dashboard (with emoji, borders, next steps). Just copy its output.
-
-**At session start with orphaned plans**: If the dashboard shows orphaned plans (📝 line), saving and reviewing them is your FIRST action — not implementation, not exploration. Run `plan-scan.sh` to save, then run dialectical review if `plan_review_enabled: yes`. This takes priority over backlog items, interrupted work, or any other next step.
-
-## NFR proactive suggestion
-
-If NFR.md exists but only has template content (no project-specific NFRs) after 3+ features are shipped, suggest NFR discovery at session start:
-
-> "You've shipped 3+ features but haven't defined project-specific NFRs yet. Quality constraints help catch issues early. Run `ag nfr discover` to review suggestions for your stack."
-
-`ag nfr discover` presents 4-8 pre-selected recommendations (not the full catalog) based on stack detection. User picks which ones matter, then the batch writer handles NFR.md creation: `nfr-generate.sh --machine --limit 8 | nfr-write-batch.sh`. During `ag kickoff`, NFR suggestions are auto-generated and saved to the staging area.
+| File | Command |
+|------|---------|
+| STATUS.md | `status.sh focus "Task"` |
+| JOURNAL.md | `journal.sh "Topic" "Outcomes" "Next" "Blockers" --why "Why"` |
+| HUMAN_NEEDED.md | `blocker.sh add "Title" "type" "Details"` |
+| FEATURES.md | `feature.sh F-#### status shipped` |
+| TODO.md | `todo.sh add "Idea"` or `ag todo "Idea"` |
+| FEEDBACK_LOG.md | `feedback.sh add "text"` or `ag feedback "text"` |
 
 ## Where to log things
 
-- Prioritized work item → `ag backlog add F-XXXX` or `ag backlog add --task "desc"` (.agentic/BACKLOG.json)
-- Development idea or task → `ag todo "description"` (.agentic/TODO.md)
-- Needs human action (PR review, credentials, decision) → `blocker.sh` (.agentic/HUMAN_NEEDED.md)
-- Bug or technical debt → .agentic/spec/ISSUES.md
-- New capability to spec → .agentic/spec/FEATURES.md
-
-**Backlog vs TODO**: Backlog = committed, ordered work queue (what to do next). TODO = unfiltered idea inbox. Flow: idea → `ag todo` → triage → `ag backlog add`.
-
-Do NOT put development tasks in .agentic/HUMAN_NEEDED.md.
+- Prioritized work → `ag backlog add F-XXXX` (BACKLOG.json = ordered queue)
+- Idea/task → `ag todo` (TODO.md = unfiltered inbox). Flow: idea → todo → triage → backlog
+- Human blocker → `blocker.sh` (HUMAN_NEEDED.md). NOT for dev tasks
+- Bug/debt → ISSUES.md | New capability → FEATURES.md
 
 ## Rules that always apply
 
-- **Interactive sessions**: show changes to human before committing. **Autonomous/non-interactive sessions** (e.g. `--print` mode, `ag auto` workflows): commit directly, using `review_commit` setting to determine review level (F-0203).
-- **Post-PR auto-review (F-0235).** When `review_pr: critical_agent`, PRs created by `ag auto task` are automatically reviewed by a review agent against AC + plan. If REQUEST_CHANGES: a fix agent auto-fixes and re-reviews (up to `pr_fix_max_attempts`). If still not approved: HUMAN_NEEDED escalation. `review_pr: human` skips auto-review, creates a review block for human. `review_pr: skip` does nothing. Review fires AFTER `result.success` — implementation correctness and review quality are separate gates.
-- **Never bypass gates.** Do not use `--no-verify` or skip quality checks — except `ag flush` which uses `--no-verify` with its own stricter validation (hardcoded allowlist, branch check, JSON validation). See `state-commit.sh` header comment for the conditions that make this safe.
-- **NEVER `git stash`.** Stash pop does a silent merge — in multi-agent contexts, when another agent modified the same files, it quietly picks one version with no error, causing data loss. Safe alternatives: worktrees, temp branch + cherry-pick, or commit before switching. Also never `git checkout -- .`, `git restore .`, or `git reset --hard` with uncommitted changes.
-- **Multi-session collision guard.** Sessions auto-register in AGENTS.json at start. Before any destructive git op, the framework checks for other active sessions on the same checkout. If others are active, you'll see a COLLISION RISK warning — do NOT proceed with destructive ops. Use a worktree (`ag worktree`) or commit first.
-- **One feature at a time.** Complete current WIP before starting another.
-- **Small batches.** Max 5-10 files per commit. If bigger, break it up.
-- **Keep main in sync with origin.** Push immediately after any direct-to-main commit. Before creating a feature branch, `git pull --rebase origin main` first. Stale local main causes conflicts and content loss during PR rebases.
-- **Smoke test before "done".** Actually run the feature. "Tests pass" does not mean "it works."
-- **Spec + code + tests + docs = done.** If code changes user-facing behavior, update all artifacts in the same commit. Run `docs.sh --validate` to check registry health (missing files, unregistered docs), `docs.sh --list` to see the registry, and `drift.sh --docs` to detect staleness. If your change touches a component with no registered doc, decide whether it needs one — use `docs.sh --create <path> --type <type> --trigger <trigger>` to scaffold and auto-register. Don't defer updates to a follow-up.
-- **Framework dev only — instruction files are part of the feature.** When changing `ag` commands/gates/workflows, also update instruction files (CLAUDE.md templates, cursorrules, copilot, codex, agent_operating_guidelines, auto_orchestration, memory-seed, skills/checklists, DEVELOPER_GUIDE, HOW_IT_WORKS). Run `instruction-sync.sh` to detect drift.
-- **Agent definition parity enforced.** `roles/` (tool-agnostic), `subagents/` (Claude-specific), and `context-manifests/` (YAML) must stay aligned. Every active role needs a corresponding subagent and manifest. `validate_framework.sh` checks parity — add new roles + subagents + manifests together. Deprecated roles have `deprecated: true` in frontmatter and are skipped by `setup_cursor_agents()`.
-- **Framework dev only — LLM test required for behavioral changes.** When committing changes to `ag` commands, trigger words, or agent workflows, you MUST add an LLM test (`tests/llm/tests/` + `test_definitions.json`). The LLM behavioral layer decides whether deterministic code ever gets called — without an LLM test, there's no proof agents will use the feature. Unit tests validate infrastructure; LLM tests validate agents invoke it.
+- Interactive: show changes before committing. Autonomous (`ag auto`): commit directly per `review_commit` setting
+- Post-PR auto-review (F-0235): `review_pr: critical_agent` → auto-review + auto-fix. `human` → review block. `skip` → nothing
+- **Never bypass gates** (`--no-verify`) — exception: `ag flush` has its own validation
+- **NEVER `git stash`** — silent merge causes data loss. Use worktrees or commit first
+- **Never** `checkout .`, `restore .`, `reset --hard` with uncommitted changes
+- Multi-session collision guard: check AGENTS.json before destructive git ops
+- One feature at a time. Small batches (5-10 files/commit). Keep main in sync with origin
+- Smoke test before "done" — "tests pass" ≠ "it works"
+- **Centralized IDs**: Feature IDs in `ids.py`/`ids.sh`. Never hardcode regex. `format_feature_id(n)`, `is_valid_feature_id(s)`
+- **Framework dev only**: instruction files are part of the feature. LLM test required for behavioral changes. Agent definition parity enforced (roles + subagents + manifests together)
+- **Who tests the tests?** "Could this test pass with a broken implementation?" Run `ag audit` for spec→AC→test chain
