@@ -13,6 +13,8 @@ from typing import Optional
 
 from .config import WorkflowConfig, Transition, load_config
 from .preconditions import CheckResult, check_transition_artifacts
+from .features_sync import sync_to_features_md
+from .gate_dispatch import dispatch_gate, GateResult
 from . import work_items
 
 
@@ -201,13 +203,25 @@ class TransitionOrchestrator:
             gate_reviewer = self.config.get_gate_reviewer(
                 item.profile, transition_def.gate
             )
-            if gate_reviewer == "human":
-                # Human gate — we don't block here, the CLI will pause for approval.
-                # The transition is recorded; human reviews asynchronously.
+            gate_result = dispatch_gate(
+                self.project_root, feature_id,
+                transition_def.gate, gate_reviewer,
+            )
+            if not gate_result.passed:
+                return TransitionResult(
+                    success=False,
+                    from_state=current_state,
+                    to_state=target_state,
+                    errors=[gate_result.reason or f"Gate '{transition_def.gate}' rejected"],
+                    gate_reviewer=gate_reviewer,
+                )
+            if gate_result.pending:
                 warnings.append(
                     f"Gate '{transition_def.gate}' requires human review "
                     f"(profile: {item.profile})"
                 )
+            if gate_result.reason and not gate_result.pending:
+                warnings.append(gate_result.reason)
 
         # Step 6: Update item.yaml with transition
         if is_regression and not reason:
@@ -220,6 +234,11 @@ class TransitionOrchestrator:
             skipped=is_skip,
         )
         work_items.save(self.project_root, item)
+
+        # Step 6b: Sync to FEATURES.md (Phase 2 compatibility shim)
+        sync_error = sync_to_features_md(self.project_root, feature_id, target_state)
+        if sync_error:
+            warnings.append(f"FEATURES.md sync: {sync_error}")
 
         # Step 7: Determine role prompt for target state
         prompt = self._get_role_prompt(target_state)

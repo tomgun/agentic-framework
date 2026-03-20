@@ -1,6 +1,6 @@
 # Plan: Framework Simplification & Structural Enforcement
 
-**Status**: IN PROGRESS (Phase 1 complete, Phases 2-4 remaining)
+**Status**: IN PROGRESS (Phase 1 complete, Phase 2 reviewed + revised 2026-03-20, Phases 3-4 remaining)
 **Timeline**: ~6-8 weeks total
 **Branch**: feat/v2-workflow-engine (PR #177)
 
@@ -18,47 +18,199 @@ Built the new v2 workflow engine alongside the old system:
 
 ---
 
-## Phase 2: Auto System Rearchitecture (~2-3 weeks) — NEXT
+## Phase 2: Auto System Rearchitecture (~3-4 weeks) — NEXT
 
-The autonomous execution system (250KB+ Python) is rearchitected to use the new state machine CLI as its backbone.
+**Reviewed**: 2026-03-20 (Critic + Advocate dialectical review, 2 iterations → APPROVED)
+**Review notes**: Iteration 1 found 4 high-confidence concerns (dual-truth, dependency graph, missing execution model, lossy state mapping) + 6 gaps. All resolved in revision. Iteration 2 confirmed convergence with 2 minor fixes (artifact location, missing files in map) applied inline.
 
-### What Changes
+The autonomous execution system (26 Python files, ~13K lines) is rearchitected to use the v2 state machine as its backbone. The refactor proceeds in 4 sub-phases with a compatibility layer ensuring no breakage between steps.
 
-| Component | Current | New |
-|-----------|---------|-----|
-| `engine.py` (24KB) | Orchestrates agents, manages its own state | Delegates state transitions to `TransitionOrchestrator` |
-| `epic.py` (24KB) | Epic decomposition + execution | Creates work items in `.agentic/work/`, uses transitions |
-| `critical_agent.py` (24KB) | Adversarial review as separate system | Becomes a `gate: ai` implementation in transition gates |
-| `kickoff.py` (45KB) | Vision-to-backlog pipeline | Creates work items in new format directly |
-| `plan_convergence.py` (18KB) | Dialectical review system | Becomes the `plan_review` gate (invoked by transition) |
-| `review.py` (27KB) | Review decision routing | Becomes gate dispatch (human/ai/skip per profile) |
-| `scheduler.py` (27KB) | Task scheduling | Uses backlog from state_machine_af.yaml + work item priorities |
+### Architecture: Three Layers
 
-### Key Changes
+```
+┌─────────────────────────────────────────────┐
+│  CLI Commands (ag auto task/epic/crunch/...) │  ← unchanged surface
+├─────────────────────────────────────────────┤
+│  Execution Layer (task.py, verify.py)        │  ← retains AC iteration,
+│  spawn_claude, test-fix loops, PR creation   │     Claude spawning, commits
+├─────────────────────────────────────────────┤
+│  Orchestration Layer (TransitionOrchestrator)│  ← NEW: state transitions,
+│  work items, artifact checks, gate dispatch  │     audit trail, enforcement
+├─────────────────────────────────────────────┤
+│  Compatibility Shim (features_sync.py)       │  ← NEW: writes FEATURES.md
+│  Keeps FEATURES.md in sync during migration  │     on every v2 transition
+└─────────────────────────────────────────────┘
+```
 
-- **Before**: Auto system had its own state tracking (`auto-state.json`, `crunch-state.json`) separate from feature states in FEATURES.md.
-- **After**: Auto system reads/writes feature state exclusively through `TransitionOrchestrator`. No separate state files. The work item's `item.yaml` IS the single source of truth.
-- **Before**: `engine.py` spawned Claude instances with custom prompts assembled from 24 context manifests.
-- **After**: `engine.py` spawns Claude instances with role prompts from `.agentic/prompts/`. Context is the work item directory contents + project context.
+**Key insight**: The execution layer (how Claude implements ACs) is orthogonal to the orchestration layer (what state the feature is in). Phase 2 replaces the orchestration backbone without rewriting the execution logic.
 
-### Files to Refactor
+### Sub-Phase 2A: Compatibility Shim + Gate Dispatch (~3-4 days)
 
-- `engine.py` → Use `TransitionOrchestrator` for state changes
-- `epic.py` → Create `item.yaml` per child feature in `.agentic/work/`
-- `critical_agent.py` → Extract core review logic; wire as `ai` gate implementation
-- `kickoff.py` → Create work items in new format
-- `plan_convergence.py` → Wire as `plan_review` gate
-- `review.py` → Simplify to gate dispatch
-- `scheduler.py` → Read work item priorities from `item.yaml` files
+**Problem**: 11 files read FEATURES.md directly. If v2 transitions only write `item.yaml`, downstream consumers see stale state.
+
+**Solution**: `features_sync.py` — a write-through shim that keeps FEATURES.md in sync whenever `TransitionOrchestrator.transition()` fires.
+
+```python
+# features_sync.py (new, ~80 lines)
+class FeaturesSyncHook:
+    """Post-transition hook: maps v2 state → v1 state, writes FEATURES.md via feature.sh"""
+    def on_transition(self, feature_id, from_state, to_state):
+        v1_state = REVERSE_STATE_MAP[to_state]  # v2→v1 mapping
+        run_feature_sh(feature_id, "status", v1_state)
+```
+
+Wire into `TransitionOrchestrator.transition()` as a post-transition callback. This means ALL existing code that reads FEATURES.md keeps working unchanged. The shim is removed in Phase 3 when FEATURES.md consumers are eliminated.
+
+Also in 2A — **gate dispatch module** (`gate_dispatch.py`, ~150 lines):
+- Receives `(gate_name, profile, feature_id, context)` from TransitionOrchestrator
+- Routes to: `human` (block + log to HUMAN_NEEDED), `ai` (call CriticalAgent), `skip` (audit-log only)
+- Replaces `review.py`'s scattered `get_review_mode()` + manual routing
+- `plan_convergence.py`'s `ConvergenceLoop` wired as the `plan_approved` gate handler (multi-step process behind a single gate interface — gate handlers are NOT limited to synchronous checks)
+
+**Files created**: `features_sync.py`, `gate_dispatch.py`
+**Files modified**: `transitions.py` (add post-transition hook + gate handler dispatch)
+**Tests**: Unit tests for shim (transition → FEATURES.md state matches), gate routing
+
+### Sub-Phase 2B: State Consumers (~4-5 days)
+
+Migrate modules that READ feature state to use v2 work items (with FEATURES.md shim as safety net).
+
+| File | Lines | Change | Complexity |
+|------|-------|--------|------------|
+| `state_machine.py` (606) | State queries | Add `v2_adapter` that delegates to `TransitionOrchestrator` when `engine: v2`. `FeatureStateMachine` becomes a thin wrapper. | Medium |
+| `gates.py` (469) | Precondition checks | Replace ad-hoc gate functions with `preconditions.py` checks. Keep `register_default_gates()` as adapter for v1 callers. | Medium |
+| `review.py` (794) | Review routing | Simplify to: read gate config from profile → delegate to `gate_dispatch.py`. Retain `check_review()` / `resolve_review()` API for callers. | Medium |
+| `critical_agent.py` (650) | AI review | Extract core `review()` into `gate_dispatch.py`'s `ai` handler. `CriticalAgent` class retained but invoked through gate dispatch, not directly. | Low |
+| `plan_convergence.py` (551) | Plan review | `ConvergenceLoop` becomes the handler behind `plan_approved` gate. No internal changes needed — just the invocation path changes. | Low |
+| `coord_tools.py` (266) | Status queries | Replace `FeatureStateMachine` import with `work_items.list_items()`. | Low |
+| `intents.py` (574) | Recovery | Add v2 work item awareness to orphan detection (check `.agentic/work/` for stale items). | Low |
+
+**Preserving fine-grained gates**: v1 distinguishes `specced → criteria_set → tests_written → implementing` with distinct checks. v2 collapses to `spec → implementation`. The enforcement survives as **artifact preconditions**:
+- `spec → implementation` requires: `spec.md` — the artifact check must point to `spec/acceptance/{feature_id}.md` (NOT `{work_dir}/spec.md`). Update `state_machine_af.yaml` artifact location accordingly, or have the spec workflow copy/symlink to the work dir.
+- `implementation → verification` requires: `tests_exist` — this is an EXIT gate from implementation (tests must exist before you can claim verification), not an entry gate. This matches natural workflow: write code, then verify tests exist before moving to verification.
+- The `tests_exist` artifact check is improved from the naive `grep -rl` to: `python3 -c "import sys; sys.exit(0 if any(Path('tests').rglob(f'*{feature_id}*')) else 1)"` — checks for test files named after the feature, not just string mentions
+
+**Tests**: Integration tests: create work item → transition through full lifecycle → verify FEATURES.md stays in sync at every step
+
+### Sub-Phase 2C: Execution Layer Integration (~5-7 days)
+
+The core execution chain (`scheduler → task → engine → verify → spawn_claude`) gets wired to use TransitionOrchestrator for state management while preserving execution logic.
+
+| File | Lines | Change | Complexity |
+|------|-------|--------|------------|
+| `engine.py` (675) | Execution engine | Replace `EngineState._state` tracking with work item status reads. Replace `_save_state()` with `TransitionOrchestrator.transition()`. Retain: `ControlServer` (socket infra), AC iteration loop, `spawn_claude` calls, complexity estimation. | High |
+| `task.py` (609) | Task runner | Replace `engine_state.set_ac_status()` with work item artifact writes (write AC results to `.agentic/work/F-XXXX/ac_results.yaml`). Replace `_commit_ac()` review check with gate dispatch. Retain: branch creation, per-AC Claude spawning, verify loop, PR creation. | High |
+| `scheduler.py` (767) | Scheduling | Replace `FeatureWork` tracking dict with `work_items.list_by_status()`. Replace `_get_actionable()` with `TransitionOrchestrator.can_transition()`. Replace `_is_review_blocked()` with gate status check. Retain: component scoping, parallel dispatch, result aggregation. | High |
+| `verify.py` (931) | Test-fix loop | Mostly unchanged — already stateless. Add: write `verification.json` artifact to work item dir on completion (enables `verification_pass` precondition check). | Low |
+| `crunch.py` (340) | Batch wrapper | Minimal change — delegates to scheduler. Update `SchedulerResult` mapping to use v2 states. | Low |
+| `pipeline.py` (352) | Epic pipeline | Update to create work items via `work_items.create()` after kickoff promotion. | Low |
+| `parallel.py` (427) | Parallel exec | Unchanged — spawns subprocesses that run `ag auto task`, which handles v2 internally. | None |
+
+**Execution model (the critical gap from the original plan)**:
+
+The execution model does NOT change. TransitionOrchestrator manages *what state the feature is in*. The execution chain manages *how work gets done*:
+
+```
+scheduler._get_actionable()
+  → TransitionOrchestrator.can_transition(F-XXXX, "implementation")  # replaces: read FEATURES.md
+  → TaskRunner.run(F-XXXX)
+    → engine._load_acceptance_criteria()  # unchanged: reads spec/acceptance/F-XXXX.md
+    → for ac in criteria:
+        spawn_claude(ac_prompt)           # unchanged: spawns Claude per AC
+        verify_loop.run()                 # unchanged: test-fix cycle
+        write_ac_result(work_item_dir)    # NEW: artifact to work item dir
+    → TransitionOrchestrator.transition(F-XXXX, "verification")  # replaces: feature.sh
+    → verify_loop.run_full()              # unchanged
+    → write_verification_json()           # NEW: artifact to work item dir
+    → TransitionOrchestrator.transition(F-XXXX, "docs")          # replaces: feature.sh
+    → create_pr()                         # unchanged
+```
+
+**Prompt enrichment**: Role prompts (`.agentic/prompts/implementer.md` etc.) provide phase guidance. Per-AC specificity comes from the same source as today: the AC text, feature spec, and project context. The role prompt is PREPENDED to the existing prompt, not a replacement. `engine.py`'s prompt assembly narrows with each AC:
+
+```python
+prompt = role_prompt + "\n\n"              # phase guidance (NEW)
+prompt += f"Feature: {feature_id}\n"       # unchanged
+prompt += f"AC: {ac.text}\n"               # unchanged
+prompt += f"Complexity: {estimate}\n"      # unchanged
+prompt += feedback_section                 # unchanged (from ControlServer)
+prompt += project_context                  # unchanged (from STACK.md/CONTEXT_PACK.md)
+```
+
+**ControlServer** (engine.py:126-255): Retained as-is. It reads/writes `EngineState` for pause/resume/stop — this is *runtime execution state* (is the engine paused?), not *feature lifecycle state* (is the feature in implementation?). These are separate concerns. EngineState keeps `_state` (idle/running/paused/stopping/stopped), `_current_ac`, `_progress`, `_feedback`. Only `_progress` tracking changes — AC results also write to work item dir for durability.
+
+**Tests**: End-to-end test: `ag auto task F-TEST` creates work item, transitions through states, produces artifacts in `.agentic/work/F-TEST/`, and FEATURES.md stays in sync via shim.
+
+### Sub-Phase 2D: Feature Management (~3-4 days)
+
+| File | Lines | Change | Complexity |
+|------|-------|--------|------------|
+| `epic.py` (762) | Epic management | Replace FEATURES.md parsing (13 helper functions) with `work_items` API. `decompose_epic()` creates child work items via `work_items.create(parent=epic_id)`. `_get_children_statuses()` → `work_items.list_items()` filtered by parent. Still writes FEATURES.md via shim. | High |
+| `kickoff.py` (1321) | Vision pipeline | After `promote_staging_with_ids()`, also create work items via `work_items.create()` for each promoted feature. Existing FEATURES.md write path kept (shim ensures sync). | Medium |
+| `framework_verify.py` (2066) | Framework validation | Read-only consumer of FEATURES.md — works unchanged via shim. No refactoring in Phase 2 (defer to Phase 3). | None |
+| `pr_review.py` (428) | PR review | No state deps. Unchanged. | None |
+| `self_heal.py` (237) | Error recovery | No state deps. Unchanged. | None |
+| `reviewer_catalog.py` (137) | Reviewer roles | Consumed by `plan_convergence.py` and `gate_dispatch.py`. Unchanged. | None |
+| `components.py` (328) | Component registry | No state deps. Unchanged. | None |
+| `umbrella.py` (274) | Multi-repo | No state deps. Unchanged. | None |
+| `visual.py` (171) | Rendering | No state deps. Unchanged. | None |
+| `control.py` (192) | Socket control | No state deps. Unchanged. | None |
+| `init.py` (238) | Framework init | No state deps. Unchanged. | None |
+
+### Full Dependency Map (26 files)
+
+**Refactored** (13 files): engine.py, task.py, scheduler.py, epic.py, kickoff.py, review.py, critical_agent.py, plan_convergence.py, state_machine.py, gates.py, verify.py, crunch.py, pipeline.py
+**New** (2 files): features_sync.py, gate_dispatch.py
+**Adapted** (2 files): coord_tools.py, intents.py
+**Unchanged** (13 files): parallel.py, pr_review.py, framework_verify.py, self_heal.py, reviewer_catalog.py, components.py, umbrella.py, visual.py, control.py, init.py, __init__.py (spawn_claude), integration_verify.py (reads feature state but via shim — no changes needed), coord_server.py (HTTP coordination — no state deps)
+
+### Refactoring Order (dependency-safe)
+
+```
+Sub-phase 2A (no deps):
+  features_sync.py (new) → transitions.py (hook)
+  gate_dispatch.py (new) → transitions.py (gate handler)
+
+Sub-phase 2B (state consumers, any order):
+  state_machine.py → gates.py → review.py → critical_agent.py
+  plan_convergence.py (independent)
+  coord_tools.py, intents.py (independent)
+
+Sub-phase 2C (execution chain, bottom-up):
+  verify.py (add artifact write) → task.py → engine.py → scheduler.py
+  crunch.py, pipeline.py (thin wrappers, last)
+
+Sub-phase 2D (feature management):
+  epic.py → kickoff.py (both touch FEATURES.md heavily)
+```
+
+### Testing Strategy
+
+**Unit tests** (per sub-phase):
+- 2A: `test_features_sync.py` — transition → FEATURES.md state correct for all 10 states
+- 2A: `test_gate_dispatch.py` — human/ai/skip routing, convergence loop integration
+- 2B: `test_state_machine_v2_adapter.py` — v2 adapter returns same results as v1 for all queries
+- 2C: `test_task_v2.py` — TaskRunner writes artifacts to work item dir
+- 2D: `test_epic_v2.py` — decompose creates child work items with parent links
+
+**Integration tests** (end-to-end):
+- `test_auto_task_e2e.py` — `ag auto task F-TEST`: work item created → ACs loaded → transitions fire → artifacts written → FEATURES.md in sync
+- `test_auto_epic_e2e.py` — `ag auto epic F-TEST`: decompose → child work items → schedule → all children complete
+- `test_auto_crunch_e2e.py` — `ag auto crunch`: batch scheduling uses work item priorities
+**Validation gate**: `validate_framework.sh` must pass after each sub-phase commit. No sub-phase merges without green validation.
 
 ### Auto Commands Preserved
 
 All `ag auto` commands keep working:
-- `ag auto verify F-XXXX`
-- `ag auto task F-XXXX`
-- `ag auto epic F-XXXX`
-- `ag auto pipeline`
-- `ag auto crunch`
+- `ag auto verify F-XXXX` — unchanged (verify.py is stateless, adds artifact write)
+- `ag auto task F-XXXX` — uses TransitionOrchestrator for state, same execution model
+- `ag auto epic F-XXXX` — creates child work items, schedules via v2
+- `ag auto pipeline` — kickoff → work items → schedule
+- `ag auto crunch` — batch wrapper, delegates to scheduler
+
+### What the `docs_updated` Artifact Check Actually Does
+
+The `|| true` in the YAML check is intentional for `lean` mode (escape hatches allowed). In `formal` mode, the artifact check is: does `.agentic/work/F-XXXX/docs_updated` marker file exist? This file is created by `task.py._check_and_update_docs()` after drift.sh confirms docs are current. The command-based check is a secondary verification, not the primary gate.
 
 ---
 
