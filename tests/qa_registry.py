@@ -64,7 +64,7 @@ def parse_features(root: Path) -> list:
         return []
 
     features = []
-    text = features_file.read_text()
+    text = features_file.read_text(errors="replace")
 
     # Pattern: ## F-XXXX: Title
     header_re = re.compile(r"^## (F-\d{4}):\s*(.+)$", re.MULTILINE)
@@ -95,7 +95,7 @@ def scan_validate_framework(root: Path) -> dict:
         return {}
 
     mapping = {}
-    text = vf.read_text()
+    text = vf.read_text(errors="replace")
 
     # Pattern: # F-XXXX: Description  or  # ============... followed by # F-XXXX:
     section_re = re.compile(r"^# (F-\d{4}):\s*(.+)$", re.MULTILINE)
@@ -119,7 +119,7 @@ def scan_pytest_files(root: Path) -> tuple:
     pattern = re.compile(r"@feature\s+(F-\d{4}(?:\s*,\s*F-\d{4})*)", re.IGNORECASE)
 
     for f in sorted(test_dir.glob("test_*.py")):
-        text = f.read_text()
+        text = f.read_text(errors="replace")
         matches = pattern.findall(text)
         if matches:
             for match in matches:
@@ -142,17 +142,22 @@ def scan_llm_tests(root: Path) -> tuple:
 
     tagged = {}
     untagged = []
+    total = 0
     fid_re = re.compile(r"\bF-(\d{4})\b")
 
     for f in sorted(llm_dir.glob("*.sh")):
-        text = f.read_text()
-        # Skip F-XXXX that appear in test fixture data (inside heredocs creating test content)
-        # Only count references in comments or variable assignments
+        total += 1
+        try:
+            text = f.read_text(errors="replace")
+        except OSError:
+            untagged.append(str(f.relative_to(root)))
+            continue
+        # Only scan comment lines (# prefix) to avoid false positives from
+        # heredoc fixture data that often contains F-XXXX in test content
         fids_found = set()
         for line in text.split("\n"):
             stripped = line.strip()
-            # Only scan comment lines and lines with metadata-like content
-            if stripped.startswith("#") or "feature" in stripped.lower() or "section" in stripped.lower():
+            if stripped.startswith("#"):
                 for m in fid_re.finditer(line):
                     fids_found.add(f"F-{m.group(1)}")
 
@@ -163,7 +168,6 @@ def scan_llm_tests(root: Path) -> tuple:
         else:
             untagged.append(rel)
 
-    total = len(list(llm_dir.glob("*.sh")))
     return tagged, untagged, total
 
 
@@ -190,7 +194,7 @@ def scan_precommit_gates(root: Path) -> list:
         return []
 
     gates = []
-    text = pc.read_text()
+    text = pc.read_text(errors="replace")
     # Pattern: # Check N: Description or # Check Na: Description
     check_re = re.compile(
         r"^#\s+Check\s+(\d+\w?):\s*(.+?)(?:\s*\((BLOCKING|advisory|warning)[^)]*\))?$",
@@ -213,7 +217,7 @@ def scan_checklists(root: Path) -> list:
 
     checklists = []
     for f in sorted(cl_dir.glob("*.md")):
-        text = f.read_text()
+        text = f.read_text(errors="replace")
         item_count = len(re.findall(r"^- \[", text, re.MULTILINE))
         checklists.append(
             {
@@ -421,8 +425,6 @@ def generate_markdown(data: RegistryData, root: Path) -> str:
                  "that's the point of this registry.")
     lines.append("")
 
-    # Category short names for the matrix
-    cat_short = ["static", "pytest", "llm", "scenario", "infra", "gate", "checklist"]
     lines.append("| Feature | Status | Static | Pytest | LLM | Scenario | Infra | Gate | Checklist |")
     lines.append("|---------|--------|--------|--------|-----|----------|-------|------|-----------|")
 
@@ -479,7 +481,9 @@ def generate_markdown(data: RegistryData, root: Path) -> str:
     pytest_annotated = pytest_total - pytest_tagged_count
     lines.append("### Annotation density")
     lines.append("")
-    lines.append(f"- **validate_framework.sh**: {len(scan_validate_framework(root))} features tagged (primary mapping source)")
+    static_cat = next((c for c in data.categories if c.name == "Static Validation"), None)
+    static_tagged = len(static_cat.feature_ids) if static_cat and static_cat.feature_ids else 0
+    lines.append(f"- **validate_framework.sh**: {static_tagged} features tagged (primary mapping source)")
     lines.append(f"- **pytest**: {pytest_annotated}/{pytest_total} files annotated with `@feature`")
 
     llm_untagged_count = len(data.untagged_test_files.get("llm", []))
@@ -568,7 +572,7 @@ def main():
             print("STALE: docs/QA_REGISTRY.md does not exist. Run: python3 tests/qa_registry.py")
             return 1
 
-        existing = registry_path.read_text()
+        existing = registry_path.read_text(errors="replace")
         if content_hash(existing) != content_hash(new_content):
             print("STALE: docs/QA_REGISTRY.md differs from generated content. Run: python3 tests/qa_registry.py")
             return 1

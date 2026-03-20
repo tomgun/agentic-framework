@@ -451,16 +451,19 @@ Test files without `@feature F-XXXX` annotations — their coverage cannot be ma
 - `tests/test_taste_review.py`
 - `tests/test_validate_specs.py`
 
-**llm** (42 untagged):
+**llm** (49 untagged):
 - `tests/llm/tests/001_session_start.sh`
+- `tests/llm/tests/002_wip_blocks_commit.sh`
 - `tests/llm/tests/003_acceptance_first.sh`
 - `tests/llm/tests/004_uses_journal_script.sh`
 - `tests/llm/tests/005_no_auto_commit.sh`
+- `tests/llm/tests/006_wip_recovery.sh`
 - `tests/llm/tests/007_small_batch.sh`
 - `tests/llm/tests/008_reads_context_pack.sh`
 - `tests/llm/tests/009_mentions_checklist.sh`
 - `tests/llm/tests/011_core_proceeds_without_spec.sh`
 - `tests/llm/tests/013_pr_workflow_corepm.sh`
+- `tests/llm/tests/014_multi_agent_awareness.sh`
 - `tests/llm/tests/015_session_end_summary.sh`
 - `tests/llm/tests/016_pr_tracking_human_needed.sh`
 - `tests/llm/tests/017_untracked_files_check.sh`
@@ -476,6 +479,7 @@ Test files without `@feature F-XXXX` annotations — their coverage cannot be ma
 - `tests/llm/tests/030_reads_status_on_start.sh`
 - `tests/llm/tests/031_references_journal_history.sh`
 - `tests/llm/tests/032_knows_architecture_from_context_pack.sh`
+- `tests/llm/tests/033_mentions_agents_active.sh`
 - `tests/llm/tests/034_suggests_worktree_for_parallel.sh`
 - `tests/llm/tests/035_core_is_lightweight.sh`
 - `tests/llm/tests/036_session_end_updates_artifacts.sh`
@@ -494,12 +498,15 @@ Test files without `@feature F-XXXX` annotations — their coverage cannot be ma
 - `tests/llm/tests/080_nfr_test_awareness.sh`
 - `tests/llm/tests/081_nfr_propagation.sh`
 - `tests/llm/tests/082_nfr_health.sh`
+- `tests/llm/tests/084_ag_decomposition.sh`
+- `tests/llm/tests/086_autonomous_plan_exit_continues.sh`
+- `tests/llm/tests/087_autonomous_no_stop_after_ac.sh`
 
 ### Annotation density
 
 - **validate_framework.sh**: 82 features tagged (primary mapping source)
 - **pytest**: 6/40 files annotated with `@feature`
-- **LLM tests**: 28/70 files with feature references
+- **LLM tests**: 21/70 files with feature references
 
 ## 4. Quick Run Guide
 

@@ -169,6 +169,34 @@ class TestScanLlmTests:
         assert any("002_no_tag.sh" in p for p in untagged)
 
 
+class TestScanLlmTestsFalsePositives:
+    def test_heredoc_fixture_data_not_tagged(self, tmp_framework):
+        """F-XXXX in heredoc fixture data should NOT be tagged as coverage."""
+        llm_dir = tmp_framework / "tests" / "llm" / "tests"
+        (llm_dir / "003_heredoc_test.sh").write_text(textwrap.dedent("""\
+            #!/usr/bin/env bash
+            # Description: Test with heredoc fixture data
+            # Section: wip
+
+            cat > "$TEST_PROJECT/.agentic/session/WIP.md" << 'WEOF'
+            **Feature**: F-0099: Fake fixture feature
+            **Status**: in-progress
+            WEOF
+
+            cat > "$TEST_PROJECT/.agentic/session/AGENTS.json" << 'JEOF'
+            [{"feature_id": "F-0100", "status": "active"}]
+            JEOF
+
+            send_prompt "check wip"
+        """))
+
+        tagged, untagged, total = qa_registry.scan_llm_tests(tmp_framework)
+        # F-0099 and F-0100 are in heredoc content, not comments — should NOT be tagged
+        assert "F-0099" not in tagged
+        assert "F-0100" not in tagged
+        assert any("003_heredoc_test.sh" in p for p in untagged)
+
+
 class TestScanPrecommitGates:
     def test_parses_check_catalog(self, tmp_framework):
         gates = qa_registry.scan_precommit_gates(tmp_framework)
@@ -241,19 +269,20 @@ class TestContentHash:
 
 class TestCheckMode:
     def test_stale_when_missing(self, tmp_framework):
-        """--check should report stale when QA_REGISTRY.md doesn't exist."""
-        # Test the logic directly (subprocess can't be patched across process boundaries)
+        """--check should detect missing QA_REGISTRY.md."""
         registry_path = tmp_framework / "docs" / "QA_REGISTRY.md"
         assert not registry_path.exists()
 
+        # Simulate the --check logic inline
         data = qa_registry.build_registry(tmp_framework)
         new_content = qa_registry.generate_markdown(data, tmp_framework)
 
-        # Simulate --check: missing file should be detected
-        assert not registry_path.exists()  # confirms stale
+        # The check logic: file missing → stale
+        is_stale = not registry_path.exists()
+        assert is_stale, "Missing registry should be detected as stale"
 
     def test_fresh_after_generate(self, tmp_framework):
-        """After generating, --check should report OK (content hash matches)."""
+        """After generating, content hash should match (fresh)."""
         data = qa_registry.build_registry(tmp_framework)
         md = qa_registry.generate_markdown(data, tmp_framework)
         (tmp_framework / "docs" / "QA_REGISTRY.md").write_text(md)
@@ -262,6 +291,31 @@ class TestCheckMode:
         data2 = qa_registry.build_registry(tmp_framework)
         md2 = qa_registry.generate_markdown(data2, tmp_framework)
         assert qa_registry.content_hash(md) == qa_registry.content_hash(md2)
+
+    def test_stale_when_content_differs(self, tmp_framework):
+        """--check should detect when registry content is outdated."""
+        # Generate initial registry
+        data = qa_registry.build_registry(tmp_framework)
+        md = qa_registry.generate_markdown(data, tmp_framework)
+        (tmp_framework / "docs" / "QA_REGISTRY.md").write_text(md)
+
+        # Add a new feature to FEATURES.md (changes what would be generated)
+        features_file = tmp_framework / ".agentic" / "spec" / "FEATURES.md"
+        features_file.write_text(features_file.read_text() + textwrap.dedent("""
+            ---
+
+            ## F-0099: New Feature
+
+            **Status**: shipped
+            **Category**: Core
+
+            **Description**: Something new.
+        """))
+
+        # Re-generate and compare — should differ
+        data2 = qa_registry.build_registry(tmp_framework)
+        md2 = qa_registry.generate_markdown(data2, tmp_framework)
+        assert qa_registry.content_hash(md) != qa_registry.content_hash(md2)
 
 
 class TestIntegration:
