@@ -969,6 +969,11 @@ def _promote_staging_impl(
             desc = feature_meta.get("name", real_id)
             backlog_add(project_root, backlog_file, [real_id, "--desc", desc])
 
+    # Create v2 work items for promoted features (best-effort)
+    _create_v2_kickoff_work_items(
+        project_root, features, id_map, parent_id, messages,
+    )
+
     # Copy OVERVIEW.md
     if overview_src.exists():
         content = overview_src.read_text()
@@ -1083,6 +1088,44 @@ def _rebuild_staging_features(staging: Path, metadata: dict) -> None:
         ])
         lines.append("\n".join(section))
     (staging / "FEATURES.md").write_text("\n".join(lines))
+
+
+def _create_v2_kickoff_work_items(
+    project_root: Path,
+    features: list[dict],
+    id_map: dict[str, str],
+    parent_id: str,
+    messages: list[str],
+) -> None:
+    """Create v2 work items for promoted features. Best-effort."""
+    try:
+        from auto.v2.config import is_v2_engine
+        from auto.v2 import work_items
+        if not is_v2_engine(project_root):
+            return
+        from settings import get_setting
+        mode = get_setting(project_root, "mode", "formal")
+        profile = get_setting(project_root, "profile", "guided")
+
+        created = 0
+        for feature_meta in features:
+            placeholder = feature_meta.get("placeholder_id", "")
+            real_id = id_map.get(placeholder)
+            if not real_id:
+                continue
+            if work_items.exists(project_root, real_id):
+                continue
+            name = feature_meta.get("name", real_id)
+            work_items.create(
+                project_root, real_id, name,
+                mode=mode, profile=profile,
+                parent=parent_id or None,
+            )
+            created += 1
+        if created:
+            messages.append(f"Created {created} v2 work items")
+    except Exception:
+        pass  # Best-effort
 
 
 # ---------------------------------------------------------------------------
