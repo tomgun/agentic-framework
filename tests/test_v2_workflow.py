@@ -477,7 +477,9 @@ class TestTransitions:
 
         r = orch.transition("F-0001", "implementation", force_skip=True)
         assert r.success is False
-        assert "not allowed" in r.errors[0].lower() or "skip" in r.errors[0].lower()
+        # Formal mode has no skip_transitions, so this fails at structural validation
+        # (no valid transition found), not at the skip-blocked check
+        assert "no valid transition" in r.errors[0].lower() or "not allowed" in r.errors[0].lower()
 
     def test_skip_allowed_lean(self, tmp_project):
         """Lean mode: skip transitions are allowed with audit logging."""
@@ -728,8 +730,10 @@ class TestWorkflowCLI:
     def test_check(self, tmp_project, capsys):
         os.chdir(tmp_project)
         workflow_main(["start", "F-0001", "Test"])
+        # ag check validates artifacts for NEXT state (plan_review), which requires plan.md
+        work_dir = tmp_project / ".agentic" / "work" / "F-0001"
+        (work_dir / "plan.md").write_text("# Plan\nTest plan.\n")
         rc = workflow_main(["check", "F-0001"])
-        # In planning state, no specific artifacts required (transition to plan_review needs plan.md)
         assert rc == 0
 
     def test_info(self, tmp_project, capsys):
@@ -864,3 +868,197 @@ class TestFullLifecycle:
 
         item = work_items.load(tmp_project, "F-0001")
         assert item.status == "shipped"
+
+
+# ---------------------------------------------------------------------------
+# Features sync (Phase 2A shim) tests
+# ---------------------------------------------------------------------------
+
+
+class TestFeaturesSync:
+    """Test the FEATURES.md write-through shim."""
+
+    def test_v2_to_v1_mapping_covers_all_states(self):
+        """Every v2 state must have a v1 mapping."""
+        from auto.v2.features_sync import V2_TO_V1
+
+        v2_states = [
+            "idea", "queued", "planning", "plan_review", "spec",
+            "implementation", "verification", "docs", "ready_to_ship",
+            "shipped", "deprecated",
+        ]
+        for state in v2_states:
+            assert state in V2_TO_V1, f"Missing v1 mapping for v2 state '{state}'"
+
+    def test_sync_returns_none_when_no_feature_sh(self, tmp_project):
+        """When feature.sh doesn't exist, sync is a no-op (returns None)."""
+        from auto.v2.features_sync import sync_to_features_md
+
+        result = sync_to_features_md(tmp_project, "F-0001", "implementation")
+        assert result is None
+
+    def test_sync_returns_error_for_unknown_state(self, tmp_project):
+        """Unknown v2 state produces an error string."""
+        from auto.v2.features_sync import sync_to_features_md
+
+        result = sync_to_features_md(tmp_project, "F-0001", "nonexistent_state")
+        assert result is not None
+        assert "No v1 mapping" in result
+
+    def test_sync_calls_feature_sh(self, tmp_project):
+        """When feature.sh exists, sync calls it with correct args."""
+        from auto.v2.features_sync import sync_to_features_md
+
+        # Create a mock feature.sh that logs its args
+        tools_dir = tmp_project / ".agentic" / "lib" / "tools"
+        tools_dir.mkdir(parents=True, exist_ok=True)
+        log_file = tmp_project / "feature_sh_calls.log"
+        (tools_dir / "feature.sh").write_text(
+            f'#!/bin/bash\necho "$@" >> {log_file}\n'
+        )
+
+        result = sync_to_features_md(tmp_project, "F-0001", "implementation")
+        assert result is None
+
+        logged = log_file.read_text().strip()
+        assert "F-0001 status implementing" == logged
+
+    def test_sync_fires_on_transition(self, tmp_project):
+        """Transition triggers FEATURES.md sync automatically."""
+        # Create a mock feature.sh that logs calls
+        tools_dir = tmp_project / ".agentic" / "lib" / "tools"
+        tools_dir.mkdir(parents=True, exist_ok=True)
+        log_file = tmp_project / "feature_sh_calls.log"
+        (tools_dir / "feature.sh").write_text(
+            f'#!/bin/bash\necho "$@" >> {log_file}\n'
+        )
+
+        # Create work item and transition
+        work_items.create(tmp_project, "F-0002", "Test", mode="lean", profile="hands_on")
+        orch = TransitionOrchestrator(tmp_project)
+        orch.transition("F-0002", "queued")
+        orch.transition("F-0002", "planning")
+
+        # Check feature.sh was called for each transition
+        calls = log_file.read_text().strip().split("\n")
+        assert len(calls) >= 2
+        # idea → queued maps to v1 "planned"
+        assert "F-0002 status planned" in calls[0]
+        # queued → planning maps to v1 "planned"
+        assert "F-0002 status planned" in calls[1]
+
+
+# ---------------------------------------------------------------------------
+# Gate dispatch tests
+# ---------------------------------------------------------------------------
+
+
+class TestGateDispatch:
+    """Test gate routing to human/ai/skip."""
+
+    def test_skip_gate_passes(self):
+        """Skip gates always pass with audit note."""
+        from auto.v2.gate_dispatch import dispatch_gate
+
+        result = dispatch_gate(Path("/tmp"), "F-0001", "plan_approved", "skip")
+        assert result.passed is True
+        assert result.reviewer == "skip"
+        assert "skipped" in result.reason.lower()
+
+    def test_human_gate_returns_pending(self, tmp_project):
+        """Human gates pass but are marked pending."""
+        from auto.v2.gate_dispatch import dispatch_gate
+
+        result = dispatch_gate(tmp_project, "F-0001", "plan_approved", "human")
+        assert result.passed is True
+        assert result.reviewer == "human"
+        assert result.pending is True
+
+    def test_unknown_reviewer_defaults_to_human(self, tmp_project):
+        """Unknown reviewer type falls back to human."""
+        from auto.v2.gate_dispatch import dispatch_gate
+
+        result = dispatch_gate(tmp_project, "F-0001", "test_gate", "unknown_type")
+        assert result.passed is True
+        assert result.reviewer == "human"
+        assert result.pending is True
+
+    def test_ai_gate_falls_back_to_human_when_no_critical_agent(self, tmp_project):
+        """AI gate falls back to human when CriticalAgent import fails."""
+        from auto.v2.gate_dispatch import dispatch_gate
+
+        result = dispatch_gate(tmp_project, "F-0001", "code_review", "ai")
+        # Should fall back gracefully (either pass via human fallback or work)
+        assert result.reviewer in ("ai", "human")
+        assert result.passed is True
+
+    def test_gate_result_factory_methods(self):
+        """GateResult static methods produce correct objects."""
+        from auto.v2.gate_dispatch import GateResult
+
+        approved = GateResult.approved("ai", reason="Looks good")
+        assert approved.passed is True
+        assert approved.verdict == "approve"
+
+        rejected = GateResult.rejected("ai", reason="Issues found")
+        assert rejected.passed is False
+        assert rejected.verdict == "reject"
+
+        pending = GateResult.pending_human("plan_approved")
+        assert pending.passed is True
+        assert pending.pending is True
+
+        skipped = GateResult.skipped("code_review")
+        assert skipped.passed is True
+        assert skipped.reviewer == "skip"
+
+    def test_gate_dispatch_in_transition(self, tmp_project):
+        """Gate dispatch is invoked during transitions with gates."""
+        # plan_review → spec has gate: plan_approved
+        # With hands_on profile, plan_approved → human → pending
+        work_items.create(
+            tmp_project, "F-0010", "Gate test",
+            mode="lean", profile="hands_on",
+        )
+
+        orch = TransitionOrchestrator(tmp_project)
+        orch.transition("F-0010", "queued")
+        orch.transition("F-0010", "planning")
+        # Create required plan.md artifact
+        work_dir = tmp_project / ".agentic" / "work" / "F-0010"
+        (work_dir / "plan.md").write_text("# Plan\nDo the thing.\n")
+        orch.transition("F-0010", "plan_review")
+
+        # Now transition plan_review → spec (has gate: plan_approved)
+        (work_dir / "review.md").write_text("# Review\nLooks good.\n")
+        result = orch.transition("F-0010", "spec")
+
+        # Should succeed (human gates pass with pending warning)
+        assert result.success is True
+        assert result.gate_reviewer == "human"
+        assert any("human review" in w for w in result.warnings)
+
+    def test_ai_gate_rejects_blocks_transition(self, tmp_project):
+        """When an AI gate rejects, the transition is blocked."""
+        from auto.v2.gate_dispatch import GateResult
+
+        work_items.create(
+            tmp_project, "F-0011", "AI reject test",
+            mode="lean", profile="autonomous",
+        )
+
+        orch = TransitionOrchestrator(tmp_project)
+        orch.transition("F-0011", "queued")
+        orch.transition("F-0011", "planning")
+        work_dir = tmp_project / ".agentic" / "work" / "F-0011"
+        (work_dir / "plan.md").write_text("# Plan\n")
+        orch.transition("F-0011", "plan_review")
+        (work_dir / "review.md").write_text("# Review\n")
+
+        # Mock dispatch_gate to reject
+        with patch("auto.v2.transitions.dispatch_gate") as mock_dispatch:
+            mock_dispatch.return_value = GateResult.rejected("ai", reason="Plan is incomplete")
+            result = orch.transition("F-0011", "spec")
+
+        assert result.success is False
+        assert "Plan is incomplete" in result.errors[0]

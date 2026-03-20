@@ -3723,3 +3723,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: PR #177 on feat/v2-workflow-engine needs merge before Phase 2 starts
 
+
+### Session: 2026-03-20 18:18 - v2 Phase 2A
+
+**Why**: Phase 2 of v2 refactor: auto system must use TransitionOrchestrator as backbone
+
+**What changed**:
+- FEATURES.md sync shim + gate dispatch wired into TransitionOrchestrator. 82/82 tests pass.
+
+**Next steps**:
+- Phase 2B: state consumers (state_machine.py, gates.py, review.py adapters)
+
+**Blockers**: None
+
