@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-framework.dev/schemas/af-item-schema.json",
+  "title": "Agentic Framework Work Item",
+  "description": "Schema for .agentic/work/F-XXXX/item.yaml — per-work-item metadata and transition log",
+  "type": "object",
+  "required": ["id", "title", "status", "mode", "profile", "created"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^F-\\d{4,}$",
+      "description": "Feature ID (e.g., F-0244)"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable title"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["feature", "bugfix", "refactor", "chore", "epic"],
+      "default": "feature"
+    },
+    "status": {
+      "type": "string",
+      "description": "Current workflow state (must be in workflow.states)"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["formal", "lean"],
+      "description": "Workflow mode"
+    },
+    "profile": {
+      "type": "string",
+      "description": "Review profile (must be in profiles)"
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Priority (0 = highest)"
+    },
+    "branch": {
+      "type": "string",
+      "description": "Git branch name"
+    },
+    "parent": {
+      "type": "string",
+      "pattern": "^F-\\d{4,}$",
+      "description": "Parent epic feature ID"
+    },
+    "created": {
+      "type": "string",
+      "format": "date",
+      "description": "Creation date (ISO 8601)"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date",
+      "description": "Last update date (ISO 8601)"
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "at"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "by": {
+            "type": "string",
+            "enum": ["agent", "human", "system"],
+            "default": "agent"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this transition happened (required for skips and regressions)"
+          },
+          "skipped": {
+            "type": "boolean",
+            "default": false,
+            "description": "True if this was a skip transition (lean mode audit log)"
+          }
+        }
+      },
+      "description": "Append-only transition log"
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "exists": { "type": "boolean" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "description": "Cached artifact status (updated on transitions)"
+    }
+  }
+}
