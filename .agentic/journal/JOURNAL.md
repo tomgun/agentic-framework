@@ -3632,3 +3632,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 13:04 - F-0239 Instruction Files
+
+**Why**: Framework dev rule: instruction files are part of the feature
+
+**What changed**:
+- Updated 8 instruction files: INSTRUCTION_ARCHITECTURE (hook table + A11), HOW_IT_WORKS (D2 feature row), CHANGELOG, agent_operating_guidelines (gate row), cursorrules/copilot/codex (trigger tables), auto_orchestration (merge trigger)
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+

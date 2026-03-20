@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Post-Merge Enforcement (F-0239)** — Two-layer hook detection catches bypassed `ag merge`. PostToolUse(Bash) warns when `gh pr merge` is used directly. UserPromptSubmit warns on main when recent commits contain unshipped F-XXXX feature IDs. Both advisory. Codifies enforcement hierarchy in PRINCIPLES.md D2 with "3+ skip promotion rule."
 - **Defense-in-Depth Workflow Enforcement (F-0221)** — 4-layer hook stack prevents agents from coding with unapproved DRAFT plans: ExitPlanMode profile-aware messaging (autonomous_formal warns "stopping is a VIOLATION"), UserPromptSubmit DRAFT plan detection on every prompt, PostToolUse(Write|Edit|MultiEdit) "STOP CODING" warning after code edits with path-based allowlist for spec/test/memory files, Pre-commit Check 21 blocking gate. Each layer has independent detection logic (not WIP-dependent).
 - **Session Log Analysis Tool (F-0238)** — `ag analyze-session <path.jsonl> [--json]` parses Claude Code JSONL session logs and detects workflow violations (stopped after plan exit, code before review, skipped planning). Reports time wasted per violation.
 

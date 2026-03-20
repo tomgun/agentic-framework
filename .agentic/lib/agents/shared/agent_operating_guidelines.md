@@ -35,6 +35,7 @@ tokens: ~952
 | Plan convergence (F-0236) | `plan_review_convergence` | **auto** | manual | auto: loop runs to convergence. manual: user decides each iteration |
 | Plan reviewers (F-0236) | `plan_review_reviewers` | **critic,advocate** | critic,advocate | Configurable roles from `reviewer_roles.json` catalog |
 | Collision guard | — | **on** | **on** | Hook-advisory (SessionStart/UserPromptSubmit warn when other sessions active) |
+| Post-merge enforcement (F-0239) | — | **on** | **on** | Hook-advisory (UserPromptSubmit warns unshipped features on main; PostToolUse warns on `gh pr merge` bypass — use `ag merge` instead) |
 
 Profiles set default bundles. Override any setting: `ag set <key> <value>` | View all: `ag set --show`
 

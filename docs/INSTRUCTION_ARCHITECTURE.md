@@ -305,7 +305,7 @@ The design makes assumptions that should be validated over time. Each has a stat
 | A8 | ~40-50 lines is achievable while keeping trigger table + token scripts + core rules | VALIDATED — template CLAUDE.md at 40 lines, root at 54, all under 100-line ceiling (F-0143) | Achieved via Skills offloading triggers |
 | A9 | Copilot loads copilot-instructions.md into subagent sessions | UNKNOWN — contradictory docs | Empirical test with distinctive instruction |
 | A10 | Git-tracked STATUS.md survives cross-machine workflow | RESOLVED — status.json eliminated; STATUS.md is the sole cross-machine state file | N/A — STATUS.md is already git-tracked and used directly |
-| A11 | Tool-native PostToolUse hooks fire reliably on ExitPlanMode in Claude Code | UNTESTED — implemented in F-0234, awaiting field validation | Manual test: enter/exit plan mode, verify hook output appears in agent context |
+| A11 | Tool-native PostToolUse hooks fire reliably on ExitPlanMode in Claude Code | VALIDATED — F-0234 (ExitPlanMode), F-0239 (Bash) confirmed in field | Manual test: enter/exit plan mode, verify hook output appears in agent context |
 
 **Update this table** when assumptions are validated or invalidated. Failed assumptions trigger design document amendments.
 
@@ -327,6 +327,8 @@ Transition points where tool-native hooks can structurally enforce workflow rule
 | Transition | Hook Trigger | Value | Status |
 |---|---|---|---|
 | Plan mode exit → save + review | PostToolUse(ExitPlanMode) | Block coding without approved plan | **Implemented (F-0234)** |
+| After `gh pr merge` → warn to use `ag merge` | PostToolUse(Bash) + parse cmd | Catch bypassed entry point | **Implemented (F-0239)** |
+| On user prompt → warn unshipped features | UserPromptSubmit + git log parse | Catch merged-but-not-done on main | **Implemented (F-0239)** |
 | Before file edit → verify approved plan | PreToolUse(Write\|Edit) | Block coding without plan | Future |
 | Before destructive git → collision guard | PreToolUse(Bash) + parse cmd | Prevent stash/reset with active agents | Future |
 | After `ag done` → verify completeness | PostToolUse(Bash) + parse cmd | Ensure ACs checked, docs updated | Future |
