@@ -5360,6 +5360,135 @@ else
   warn "QA Registry not found — generate with: ag qa"
 fi
 
+# ============================================================
+# F-0240: Framework Execution Log
+# ============================================================
+echo ""
+echo "--- F-0240: Framework Execution Log ---"
+
+# AC-1: fwlog.sh exists and provides flog()
+if [[ -f ".agentic/lib/tools/fwlog.sh" ]]; then
+  pass "F-0240 AC-1: fwlog.sh exists"
+else
+  fail "F-0240 AC-1: fwlog.sh not found"
+fi
+
+# Functional test: source fwlog.sh and call flog, verify output format
+_f0240_tmplog=$(mktemp)
+(
+  export FRAMEWORK_LOG="$_f0240_tmplog"
+  export SESSION_DIR="$(dirname "$_f0240_tmplog")"
+  source .agentic/lib/tools/fwlog.sh
+  flog "test-script" "test-verb" "test-args" "test-result"
+) 2>/dev/null
+if [[ -f "$_f0240_tmplog" ]]; then
+  _f0240_line=$(cat "$_f0240_tmplog")
+  # AC-6: verify pipe-delimited with 5 fields
+  _f0240_fields=$(echo "$_f0240_line" | awk -F'|' '{print NF}')
+  if [[ "$_f0240_fields" -eq 5 ]]; then
+    pass "F-0240 AC-6: flog output has 5 pipe-delimited fields"
+  else
+    fail "F-0240 AC-6: expected 5 fields, got $_f0240_fields in: $_f0240_line"
+  fi
+  if echo "$_f0240_line" | grep -q "test-script.*test-verb.*test-args.*test-result"; then
+    pass "F-0240 AC-1: flog() appends correct content"
+  else
+    fail "F-0240 AC-1: flog() output unexpected: $_f0240_line"
+  fi
+else
+  fail "F-0240 AC-1: flog() did not create log file"
+fi
+rm -f "$_f0240_tmplog"
+
+# AC-4: Fail-open — unwritable path doesn't crash
+(
+  export FRAMEWORK_LOG="/dev/null/nope/framework.log"
+  export SESSION_DIR="/dev/null/nope"
+  source .agentic/lib/tools/fwlog.sh
+  flog "crash-test" "verb" "args" "result"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "F-0240 AC-4: fail-open — unwritable log path doesn't crash"
+else
+  fail "F-0240 AC-4: flog crashed with unwritable path"
+fi
+
+# AC-2: ag.sh sources fwlog.sh
+if grep_ag 'source.*fwlog\.sh'; then
+  pass "F-0240 AC-2: ag.sh sources fwlog.sh"
+else
+  fail "F-0240 AC-2: ag.sh does not source fwlog.sh"
+fi
+
+# AC-2: ag.sh has EXIT trap for end logging
+if grep_ag 'trap.*flog.*ag\.sh.*end'; then
+  pass "F-0240 AC-2: ag.sh has EXIT trap for end logging"
+else
+  fail "F-0240 AC-2: ag.sh missing EXIT trap for end logging"
+fi
+
+# AC-3: pre-commit sources fwlog.sh
+if grep -q 'source.*fwlog\.sh' .agentic/lib/hooks/pre-commit-check.sh 2>/dev/null; then
+  pass "F-0240 AC-3: pre-commit sources fwlog.sh"
+else
+  fail "F-0240 AC-3: pre-commit does not source fwlog.sh"
+fi
+
+# AC-3: pre-commit has EXIT trap
+if grep -q 'trap.*flog.*pre-commit.*end' .agentic/lib/hooks/pre-commit-check.sh 2>/dev/null; then
+  pass "F-0240 AC-3: pre-commit has EXIT trap for end logging"
+else
+  fail "F-0240 AC-3: pre-commit missing EXIT trap for end logging"
+fi
+
+# AC-5: .gitignore includes framework.log
+if grep -q '.agentic/session/framework\.log$' .gitignore 2>/dev/null; then
+  pass "F-0240 AC-5: framework.log is gitignored"
+else
+  fail "F-0240 AC-5: framework.log not in .gitignore"
+fi
+if grep -q '.agentic/session/framework\.log\.prev$' .gitignore 2>/dev/null; then
+  pass "F-0240 AC-5: framework.log.prev is gitignored"
+else
+  fail "F-0240 AC-5: framework.log.prev not in .gitignore"
+fi
+
+# AC-9: FRAMEWORK_LOG in paths.sh
+if grep -q 'FRAMEWORK_LOG=' .agentic/lib/paths.sh 2>/dev/null; then
+  pass "F-0240 AC-9: FRAMEWORK_LOG defined in paths.sh"
+else
+  fail "F-0240 AC-9: FRAMEWORK_LOG not in paths.sh"
+fi
+
+# AC-9: framework_log in paths.py
+if grep -q 'framework_log' .agentic/lib/paths.py 2>/dev/null; then
+  pass "F-0240 AC-9: framework_log defined in paths.py"
+else
+  fail "F-0240 AC-9: framework_log not in paths.py"
+fi
+
+# AC-7: SessionStart.sh has rotation logic
+if grep -q 'FRAMEWORK_LOG.*prev\|framework\.log.*prev' .agentic/lib/claude-hooks/SessionStart.sh 2>/dev/null; then
+  pass "F-0240 AC-7: SessionStart.sh has log rotation"
+else
+  fail "F-0240 AC-7: SessionStart.sh missing log rotation"
+fi
+
+# AC-8: All 5 Claude hooks source fwlog.sh
+_f0240_hooks_ok=0
+_f0240_hooks_total=0
+for _hook in SessionStart Stop PostToolUse UserPromptSubmit PreCompact; do
+  _f0240_hooks_total=$((_f0240_hooks_total + 1))
+  if grep -q 'fwlog\.sh' ".agentic/lib/claude-hooks/${_hook}.sh" 2>/dev/null; then
+    _f0240_hooks_ok=$((_f0240_hooks_ok + 1))
+  fi
+done
+if [[ $_f0240_hooks_ok -eq $_f0240_hooks_total ]]; then
+  pass "F-0240 AC-8: All 5 Claude hooks source fwlog.sh"
+else
+  fail "F-0240 AC-8: Only $_f0240_hooks_ok/$_f0240_hooks_total Claude hooks source fwlog.sh"
+fi
+
 # Summary
 # ============================================================
 echo ""

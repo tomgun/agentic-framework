@@ -52,6 +52,8 @@ tests/llm/.test-state
 .agentic/session/kickoff-draft/
 .agentic/session/integration-verify/
 .agentic/session/verify-logs/
+.agentic/session/framework.log
+.agentic/session/framework.log.prev
 # Note: .agentic/journal/ IS committed (persistent history: manifests, lessons, plans, JOURNAL.md)
 
 # Local notes (not part of framework)

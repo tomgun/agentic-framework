@@ -48,6 +48,7 @@ cd "${PROJECT_ROOT}"
 # Source shared settings
 source "${PROJECT_ROOT}/.agentic/lib/paths.sh"
 source "${PROJECT_ROOT}/.agentic/lib/settings.sh"
+source "${PROJECT_ROOT}/.agentic/lib/tools/fwlog.sh" 2>/dev/null || true
 
 # === Mode flag ===
 # --mode fast: skip slow/advisory checks (4,5,6,8,9,10,12,13,19,22)
@@ -66,6 +67,10 @@ for _arg in "$@"; do
             ;;
     esac
 done
+
+_PC_MODE="full"; [[ "$_FAST_MODE" -eq 1 ]] && _PC_MODE="fast"
+flog "pre-commit" "run" "$_PC_MODE" "start"
+trap 'flog "pre-commit" "run" "$_PC_MODE" "end:$?"' EXIT
 
 # === Escape Hatches ===
 # For legitimate bypasses (WIP branches, urgent hotfixes)

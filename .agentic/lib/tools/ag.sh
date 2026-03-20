@@ -13,6 +13,7 @@ source "$SCRIPT_DIR/../paths.sh"
 source "$SCRIPT_DIR/../settings.sh"
 source "$SCRIPT_DIR/intent-helpers.sh"
 source "$SCRIPT_DIR/ac-parse.sh"
+source "$SCRIPT_DIR/fwlog.sh"
 
 # Colors (disabled if not TTY)
 if [ -t 1 ]; then
@@ -215,6 +216,10 @@ _ensure_hooks() {
 _ensure_hooks
 
 # Main command dispatch
+_AG_CMD="${1:-help}"
+_AG_ARG="${2:-}"
+flog "ag.sh" "$_AG_CMD" "$_AG_ARG" "start"
+trap 'flog "ag.sh" "$_AG_CMD" "$_AG_ARG" "end:$?"' EXIT
 case "${1:-help}" in
     start)
         cmd_start
