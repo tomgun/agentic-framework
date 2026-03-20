@@ -172,6 +172,14 @@ graph TB
 - **Graceful degradation**: Advisory guidelines may be skipped by some agents; script-enforced rules cannot be. Framework remains functional even with partial guideline compliance.
 - **Fail fast, recover gracefully**: Catch problems early (pre-commit, WIP check) but always provide clear recovery options (Continue | Review | Rollback)
 
+**Enforcement Hierarchy** (most to least reliable):
+1. **Automated chaining**: Action A structurally triggers Action B. Use for multi-step sequences. Example: `ag merge` → `ag done` → dogfood. Reliability: ~100%.
+2. **Blocking gates**: Script exits non-zero. Use for invariants before transitions. Example: pre-commit checks. Reliability: ~100%.
+3. **State-based detection**: Hook warns on bad state. Use for catching bypassed entry points. Example: UserPromptSubmit detects merged-but-not-done features. Reliability: ~95%.
+4. **Behavioral guidance**: Concrete instructions with exact paths. Use for judgment-dependent decisions. Reliability: ~85%.
+
+**Promotion rule**: If a behavioral rule has been skipped 3+ times across sessions, promote it to a higher enforcement level. Repeated failures are evidence of misclassification, not insufficient documentation.
+
 **Enforcement Mechanisms**:
 1. `session_start.md` — first step is `wip.sh check` (detects interrupted work)
 2. `pre-commit-check.sh` — validates before commit allowed (exit 1 blocks)

@@ -39,6 +39,17 @@
         ]
       },
       {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/PostToolUseBash.sh",
+            "timeout": 2000,
+            "description": "Detect gh pr merge bypassing ag merge workflow"
+          }
+        ]
+      },
+      {
         "matcher": "Write|Edit|MultiEdit",
         "hooks": [
           {
