@@ -21,7 +21,7 @@ Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |
 |-------------|--------|
-| Build / implement / add / create | STOP -> `ag start F-XXXX "Title"`, write plan, then `ag transition F-XXXX implementing` |
+| Build / implement / add / create | STOP -> `ag start F-XXXX "Title"`, write plan, then `ag transition F-XXXX implementation` |
 | Build something large (>10 files) | STOP -> TOO BIG. Break into 3-5 smaller tasks. |
 | Fix / debug / repair / troubleshoot | STOP -> Write failing test FIRST |
 | Commit / push / ship / finalize | STOP -> Run `ag commit` |

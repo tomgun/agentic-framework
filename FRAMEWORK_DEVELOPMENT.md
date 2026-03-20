@@ -2,7 +2,7 @@
 
 **🎯 Scope**: Additional guidelines for agents working **ON the Agentic AI Framework itself** (not projects using it).
 
-**For projects using the framework**: See [`agents/shared/agent_operating_guidelines.md`](agents/shared/agent_operating_guidelines.md).
+**For projects using the framework**: See [`.agentic/conventions.md`](.agentic/conventions.md) and role prompts in [`.agentic/prompts/`](.agentic/prompts/).
 
 ---
 
@@ -309,11 +309,9 @@ Different docs serve different readers:
 - `MANUAL_OPERATIONS.md` - Token-free operations
 
 **For agents working in user projects**:
-- `agent_operating_guidelines.md` - Core rules
-- `tdd_mode.md` - TDD workflow
-- `continuous_quality_validation.md` - Quality practices
-- `programming_standards.md` - Code quality
-- `testing_standards.md` - Test quality
+- `.agentic/conventions.md` - Consolidated coding conventions
+- `.agentic/prompts/*.md` - Role-specific guidance (planner, implementer, reviewer, etc.)
+- `.agentic/state_machine_af.yaml` - Workflow states, transitions, gates
 
 **For framework developers** (working ON framework):
 - **This file** (`FRAMEWORK_DEVELOPMENT.md`)

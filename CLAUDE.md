@@ -56,7 +56,7 @@ After ExitPlanMode — auto-continue the full sequence:
 4. Check `plan_review_convergence` in STACK.md:
    - `auto`: If converged → set `**Status**: APPROVED`, continue to implement
    - `manual`: Present synthesis to user → user decides Proceed/Revise/Reject
-5. After APPROVED → run `ag transition F-XXXX implementing`
+5. After APPROVED → run `ag transition F-XXXX implementation`
 
 **These rationalizations are WRONG — do not use them:**
 - "The user created the plan, so it's reviewed" — plan mode = drafting, not reviewing

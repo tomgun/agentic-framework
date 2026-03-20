@@ -12,7 +12,7 @@ You are starting or resuming a work session. Orient yourself before doing anythi
 ## Orphan detection
 
 Check for items stuck in mid-states that indicate interrupted work:
-- Work items in `implementing` state with no recent commits — likely interrupted.
+- Work items in `implementation` state with no recent commits — likely interrupted.
 - Plans in `DRAFT` or `REVIEWING` status that were never approved — need review or abandonment.
 - Items in `verification` state with no `verify.md` — verifier was interrupted.
 

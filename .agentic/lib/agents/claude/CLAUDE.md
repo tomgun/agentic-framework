@@ -32,7 +32,7 @@ Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and
 2. Spawn Critic + Advocate agents in parallel (fresh context)
 3. Synthesize with Revision Guidance
 4. Check `plan_review_convergence` in STACK.md: `auto` → approve on convergence; `manual` → present to user
-5. After APPROVED → run `ag transition F-XXXX implementing`
+5. After APPROVED → run `ag transition F-XXXX implementation`
 
 **Wrong rationalizations:** "User created the plan so it's reviewed" — NO. "Plan mode exit = approval" — NO. "Simple plan, review unnecessary" — NO. Review is structural, not discretionary.
 

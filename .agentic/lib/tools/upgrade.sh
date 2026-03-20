@@ -95,6 +95,7 @@ migrate_v1_to_v2() {
   # Create .agentic/work/ directory for v2 work items
   if [[ ! -d "$project_dir/.agentic/work" ]]; then
     mkdir -p "$project_dir/.agentic/work"
+    touch "$project_dir/.agentic/work/.gitkeep"
     echo -e "  ${GREEN}✓${NC} Created .agentic/work/"
   fi
 

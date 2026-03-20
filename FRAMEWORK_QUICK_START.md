@@ -92,7 +92,7 @@ Ask yourself:
 
 > **Spec Protection**: Once a feature ships, its acceptance criteria become a contract.
 > Pre-commit Checks 14-16 block changes to shipped specs without a migration
-> (`bash .agentic/lib/tools/migration.sh create`). See `.agentic/lib/checklists/spec_writing.md`.
+> (`bash .agentic/lib/tools/migration.sh create`). See `.agentic/conventions.md` and role prompts in `.agentic/prompts/`.
 
 **Note**: Further development may break features. Re-run `validate_framework.sh` regularly.
 
