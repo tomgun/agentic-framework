@@ -1578,7 +1578,7 @@ Each defines a STACK.md structure for its project type. Used by `ag auto verify-
 | — Structural | 13 |
 | NFRs defined | 4 (all met) |
 | ADRs | 2 |
-| CLI gateway (ag.sh) | 4,008 lines |
+| CLI gateway (ag.sh + commands/) | 363 + 12 modules |
 | Git tags (releases) | 70 |
 
 ### Architecture Components
@@ -1634,7 +1634,7 @@ Organized by impact and effort:
 
 5. **Collision-Proof Feature IDs (F-0193)** — Sequential F-XXXX collides in multi-agent/multi-branch. Options: slugs, atomic allocation, UUIDs.
 
-6. **ag.sh Decomposition** — 4,008 lines in one file. Extract commands into individual files for maintainability.
+6. ~~**ag.sh Decomposition**~~ — **DONE (F-0221)**. ag.sh decomposed from 4,325 lines into 363-line dispatcher + 12 sourced modules under `commands/`.
 
 ### Medium Impact, Low Effort (Quick Wins)
 

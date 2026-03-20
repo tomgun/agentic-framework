@@ -48,7 +48,7 @@ graph TB
         SKILLS[Claude Skills<br/>12 hand-crafted]
         AUTO_ORCH[auto_orchestration.md<br/>442 lines]
         CHECKLISTS[9 checklists]
-        AG[ag.sh gateway<br/>25+ commands]
+        AG[ag.sh dispatcher + commands/<br/>37+ commands]
     end
 
     subgraph L3["Layer 3: Project State"]

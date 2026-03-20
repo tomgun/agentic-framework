@@ -122,7 +122,7 @@ graph TB
 
     subgraph MECHANISMS["MECHANISMS (How)"]
         %% Scripts
-        M_AG[ag.sh gateway<br/>37+ commands]
+        M_AG[ag.sh dispatcher + commands/<br/>37+ commands]
         M_AUTO_ENGINE[auto/ engine<br/>socket control + state]
         M_PRECOMMIT[pre-commit-check.sh<br/>17 structural gates + advisories]
         M_WIP_SH[wip.sh<br/>state machine]
@@ -870,7 +870,7 @@ These features exist but don't clearly derive from the 13 principles:
 
 ### The ag.sh Gateway
 
-`ag.sh` is the central entry point. It routes intent to the right mechanism:
+`ag.sh` is the central entry point (~360 lines). It defines shared utilities, sources 12 command modules from `commands/`, and dispatches via case/esac. Command logic lives in `.agentic/lib/tools/commands/*.sh` — each module is sourced (not subshelled), so all functions share global scope and cross-command calls work naturally.
 
 | Command | What It Does | Enforcement |
 |---------|-------------|-------------|

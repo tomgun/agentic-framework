@@ -3438,3 +3438,42 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-19 21:31 - F-0221 doc updates
+
+**Why**: Docs must reflect ag.sh structural change
+
+**What changed**:
+- Updated HOW_IT_WORKS, INSTRUCTION_ARCHITECTURE, FRAMEWORK_WORKFLOW, CHANGELOG with decomposition details
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 06:05 - F-0221: Defense-in-depth for autonomous workflow
+
+**Why**: Session d7d00d88 lost 68 min to 3 autonomous_formal violations — single advisory hook was consistently ignored
+
+**What changed**:
+- 4-layer enforcement stack prevents agents from coding with unapproved plans: ExitPlanMode (profile-aware), UserPromptSubmit (DRAFT detection), PostToolUse Write|Edit|MultiEdit (code-edit warning), Pre-commit Check 21 (blocking). Added 2 LLM tests + 6-case deterministic hook test.
+
+**Next steps**:
+- Merge PR, run ag done, update instruction files (memory-seed, CLAUDE.md template)
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 06:11 - F-0221: Review fixes
+
+**Why**: Code review found production bugs that would silently break hooks
+
+**What changed**:
+- Fixed 3 bugs from code review: grep pipefail crash in UserPromptSubmit, macOS grep -oP portability in on-code-edit, empty file_path fallthrough. Added CHANGELOG entry.
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+

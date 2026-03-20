@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Defense-in-Depth Workflow Enforcement (F-0221)** — 4-layer hook stack prevents agents from coding with unapproved DRAFT plans: ExitPlanMode profile-aware messaging (autonomous_formal warns "stopping is a VIOLATION"), UserPromptSubmit DRAFT plan detection on every prompt, PostToolUse(Write|Edit|MultiEdit) "STOP CODING" warning after code edits with path-based allowlist for spec/test/memory files, Pre-commit Check 21 blocking gate. Each layer has independent detection logic (not WIP-dependent).
+
+### Changed
+- **ag.sh Decomposition (F-0221)** — Decomposed the monolithic `ag.sh` (4,325 lines, 58 functions) into a 363-line thin dispatcher that sources 12 command modules from `.agentic/lib/tools/commands/`. All behavior preserved — no user-facing changes. Modules: start, plan, implement, commit, done, kickoff, auto, specs, help, diagnostics, settings, operations.
+
 ## [0.64.0] - 2026-03-18
 
 ### Added
