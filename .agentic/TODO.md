@@ -213,6 +213,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0078: ag done verification subprocess leaks sourced env (ROOT_DIR, FRAMEWORK_ROOT) into bash -c, causing functional tests to use wrong project root — 5 phantom failures vs direct run
 - **Added**: 2026-03-17
 
+### T-0082: T-NEW: validate_framework.sh check: shipped features must appear in CHANGELOG and at least one living doc (HOW_IT_WORKS, DEVELOPER_GUIDE, or FRAMEWORK_WORKFLOW). Compares FEATURES.md shipped entries against doc mentions. Behavioral layer (concrete 3-concern decision tree in skills) already shipped in F-0237 — this is the structural backstop. Related: F-0138, F-0207, pre-commit-check.sh Check 19, docs.sh
+- **Added**: 2026-03-20
+
 ## Done
 
 
