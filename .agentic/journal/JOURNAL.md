@@ -3762,3 +3762,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 18:58 - v2 Phase 2D
+
+**Why**: Feature management layer must populate v2 work items for unified state tracking across epics
+
+**What changed**:
+- Epic decomposition and kickoff promotion now create v2 work items with parent links. 163 tests pass. Phase 2 complete.
+
+**Next steps**:
+- Phase 3: instruction consolidation + file reduction
+
+**Blockers**: None
+

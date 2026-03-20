@@ -325,10 +325,53 @@ def create_child_features(
         ac_file.write_text(ac_content)
         messages.append(f"Created {child['id']}: {child['name']}")
 
+    # Create v2 work items with parent link (best-effort)
+    _create_v2_child_work_items(project_root, epic_id, children, messages)
+
     messages.append(
         f"Created {len(children)} child features for {epic_id}"
     )
     return True, messages
+
+
+def _create_v2_child_work_items(
+    project_root: Path,
+    epic_id: str,
+    children: list[dict],
+    messages: list[str],
+) -> None:
+    """Create v2 work items for child features with parent link.
+
+    Best-effort: if v2 is not active or fails, v1 path (FEATURES.md) still works.
+    """
+    try:
+        from auto.v2.config import is_v2_engine
+        from auto.v2 import work_items
+        if not is_v2_engine(project_root):
+            return
+        from settings import get_setting
+        mode = get_setting(project_root, "mode", "formal")
+        profile = get_setting(project_root, "profile", "guided")
+
+        # Ensure parent epic has a work item too
+        if not work_items.exists(project_root, epic_id):
+            work_items.create(
+                project_root, epic_id, epic_id,
+                mode=mode, profile=profile, item_type="epic",
+            )
+
+        for child in children:
+            child_id = child["id"]
+            child_name = child.get("name", child_id)
+            if not work_items.exists(project_root, child_id):
+                work_items.create(
+                    project_root, child_id, child_name,
+                    mode=mode, profile=profile,
+                    parent=epic_id,
+                )
+        messages.append(f"Created v2 work items for {len(children)} children")
+    except Exception:
+        pass  # Best-effort
 
 
 # ---------------------------------------------------------------------------
