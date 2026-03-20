@@ -3749,3 +3749,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 18:45 - v2 Phase 2C
+
+**Why**: Execution layer must populate v2 work items and artifacts for unified state management
+
+**What changed**:
+- Execution layer v2 integration: verify.py writes verification.json artifact, scheduler ensures work items exist and advances v2 state after completion, task.py wires verification artifact. 163 tests pass.
+
+**Next steps**:
+- Phase 2D: feature management (epic.py, kickoff.py)
+
+**Blockers**: None
+

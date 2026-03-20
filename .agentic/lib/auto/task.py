@@ -205,6 +205,10 @@ class TaskRunner:
         verify_result = verify_loop.run(max_iterations=5)
         result.verification_passed = verify_result.success
 
+        # Write verification artifact to v2 work item dir (if active)
+        from auto.verify import write_verification_artifact
+        write_verification_artifact(self.project_root, feature_id, verify_result)
+
         # Doc check: run drift.sh --docs --check if docs_gate is enabled
         self._check_and_update_docs(feature_id)
 
