@@ -206,6 +206,7 @@ class TransitionOrchestrator:
             gate_result = dispatch_gate(
                 self.project_root, feature_id,
                 transition_def.gate, gate_reviewer,
+                context={"from_state": current_state, "to_state": target_state},
             )
             if not gate_result.passed:
                 return TransitionResult(

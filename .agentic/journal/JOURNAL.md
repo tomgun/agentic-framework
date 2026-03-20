@@ -3736,3 +3736,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 18:34 - v2 Phase 2B
+
+**Why**: State consumers must read from v2 work items for unified state management
+
+**What changed**:
+- Fixed gate_dispatch API calls (CriticalAgent, ConvergenceLoop). Added v2 adapter to FeatureStateMachine — delegates to TransitionOrchestrator when engine: v2. 163 tests pass.
+
+**Next steps**:
+- Phase 2C: execution layer integration (engine.py, task.py, scheduler.py)
+
+**Blockers**: None
+
