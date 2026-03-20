@@ -84,6 +84,14 @@ If any docs are stale or instruction files are out of sync:
 2. Re-run the checks to confirm they pass
 3. `ag done` will block if `docs_gate: blocking` and docs are still stale
 
+### Step 5c: Evolve Affected Specs
+
+Check whether your changes affect previously shipped features:
+
+1. Identify which shipped specs overlap with what you changed (tools, skills, workflows)
+2. If shipped ACs need updating: create a migration (`migration.sh create "description"`) and add new ACs to affected `spec/acceptance/F-XXXX.md` with migration reference
+3. Specs are living documents — they evolve as understanding deepens. Don't resist this.
+
 ### Step 6: Post-Merge Dogfood Sync (Framework Dev Only)
 
 After merging a framework PR, sync root instruction files with templates:

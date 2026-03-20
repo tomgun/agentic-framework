@@ -151,13 +151,25 @@ Skip this step if `FRAMEWORK_DEVELOPMENT.md` does not exist at the project root.
 4. **Changed agent behavior?** → Update `.agentic/lib/init/memory-seed.md`
 5. Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift
 
-### Step 7: Verify Before Declaring Done
+### Step 7: Evolve Affected Specs
+
+Check whether your changes affect previously shipped features — their specs should evolve to reflect what you've learned:
+
+1. **Identify affected features**: Do your changes modify behavior covered by existing shipped specs? Look at which skills, tools, or workflows you changed and check if they have shipped acceptance criteria.
+2. **Create a migration**: If shipped ACs need new criteria, use `bash .agentic/lib/tools/migration.sh create "description"`. Shipped specs are contracts — migrations document why they evolved.
+3. **Update the acceptance criteria files**: Add new AC groups to the affected `spec/acceptance/F-XXXX.md` files with a migration reference (e.g., `### New Section (Migration NNN, YYYY-MM-DD)`).
+4. **Update tests if needed**: New ACs may need new tests in `validate_framework.sh` or LLM tests.
+
+Skip this step if your changes are purely additive (new feature, no overlap with existing specs).
+
+### Step 8: Verify Before Declaring Done
 
 - All acceptance criteria met (P1 at minimum, P2 if confirmed)
 - Tests pass
 - No unrelated files changed
 - Code follows project conventions
 - Step 6 documentation concerns addressed
+- Step 7 affected specs evolved (if applicable)
 
 Then hand off to the `committing-changes` workflow (do NOT commit directly).
 

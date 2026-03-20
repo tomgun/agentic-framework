@@ -3540,3 +3540,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 08:27 - F-0237 Spec Evolution
+
+**Why**: Specs are living documents — changes that affect shipped features must evolve those specs via migrations
+
+**What changed**:
+- Added spec evolution as explicit step in implementation (Step 7), commit (backstop), and completion (Step 5c) workflows. Created migration 017 evolving F-0138/F-0139/F-0207 ACs. Updated all 3 shipped acceptance criteria files with new AC groups.
+
+**Next steps**:
+- Fix commit message F-0224→F-0237, push to PR
+
+**Blockers**: None
+
