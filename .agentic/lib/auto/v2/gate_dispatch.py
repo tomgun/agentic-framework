@@ -17,6 +17,26 @@ from pathlib import Path
 from typing import Optional
 
 
+def _find_plan_path(project_root: Path, feature_id: str) -> Optional[Path]:
+    """Find the plan file for a feature.
+
+    Checks work item dir first, then journal/plans/ with glob.
+    """
+    # Check work item dir
+    work_plan = project_root / ".agentic" / "work" / feature_id / "plan.md"
+    if work_plan.exists():
+        return work_plan
+
+    # Check journal plans (date-prefixed)
+    plans_dir = project_root / ".agentic" / "journal" / "plans"
+    if plans_dir.exists():
+        matches = list(plans_dir.glob(f"*{feature_id}*plan*.md"))
+        if matches:
+            return matches[0]
+
+    return None
+
+
 @dataclass
 class GateResult:
     """Result of a gate check."""
@@ -116,14 +136,31 @@ def _handle_plan_review_gate(
     Lazy-imports plan_convergence to avoid circular deps.
     """
     try:
-        from auto.plan_convergence import run_convergence  # type: ignore[import]
-        result = run_convergence(project_root, feature_id)
-        if result.get("converged"):
+        from auto.plan_convergence import ConvergenceLoop  # type: ignore[import]
+
+        # Find plan path from work item dir or journal
+        plan_path = _find_plan_path(project_root, feature_id)
+        if not plan_path:
+            return GateResult.rejected("ai", reason=f"No plan.md found for {feature_id}")
+
+        loop = ConvergenceLoop(project_root)
+        result = loop.run(
+            feature_id=feature_id,
+            plan_path=str(plan_path),
+            autonomous=True,
+        )
+        if result.converged or result.plan_status == "APPROVED":
             return GateResult.approved("ai", reason="Plan review converged")
-        elif result.get("escalated"):
-            return GateResult.rejected("ai", reason="Plan review escalated — needs human input")
+        elif result.plan_status == "ESCALATED":
+            return GateResult.rejected(
+                "ai",
+                reason=f"Plan review escalated: {result.escalation_reason}",
+            )
         else:
-            return GateResult.rejected("ai", reason=result.get("reason", "Plan review did not converge"))
+            return GateResult.rejected(
+                "ai",
+                reason=result.escalation_reason or "Plan review did not converge",
+            )
     except ImportError:
         # plan_convergence not available — fall back to human
         return GateResult.pending_human("plan_approved")
@@ -145,23 +182,33 @@ def _handle_critical_agent_gate(
     try:
         from auto.critical_agent import CriticalAgent  # type: ignore[import]
         agent = CriticalAgent(project_root)
-        # Map gate names to review types
-        review_type = {
-            "code_review": "code",
-            "spec_review": "spec",
-            "verification_review": "verification",
-        }.get(gate_name, "general")
+
+        # Map gate names to review settings (matches STACK.md keys)
+        review_setting = {
+            "code_review": "review_code",
+            "spec_review": "review_spec",
+            "verification_review": "review_regression",
+        }.get(gate_name, "review_code")
+
+        # Resolve from/to states from context if available
+        from_state = (context or {}).get("from_state", "unknown")
+        to_state = (context or {}).get("to_state", "unknown")
 
         verdict = agent.review(
             feature_id=feature_id,
-            review_type=review_type,
+            from_state=from_state,
+            to_state=to_state,
+            review_setting=review_setting,
         )
-        if verdict and verdict.get("approved", False):
-            return GateResult.approved("ai", reason=verdict.get("reasoning"))
-        elif verdict:
-            return GateResult.rejected("ai", reason=verdict.get("reasoning", "Review rejected"))
+        if verdict.verdict == "approved":
+            return GateResult.approved("ai", reason=verdict.summary)
+        elif verdict.verdict == "request_changes":
+            return GateResult.rejected("ai", reason=verdict.summary or "Changes requested")
+        elif verdict.verdict == "escalate":
+            # Escalate to human
+            return GateResult.pending_human(gate_name)
         else:
-            return GateResult.rejected("ai", reason="CriticalAgent returned no verdict")
+            return GateResult.rejected("ai", reason=verdict.summary or "Review rejected")
     except ImportError:
         return GateResult.pending_human(gate_name)
     except Exception:

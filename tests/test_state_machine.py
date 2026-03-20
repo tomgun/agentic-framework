@@ -556,3 +556,125 @@ class TestBlockingEnforcement:
         allowed, msgs = sm.can_transition("F-0042", FeatureState.PLANNED)
         assert not allowed
         assert any("Invalid transition" in m for m in msgs)
+
+
+# ---------------------------------------------------------------------------
+# V2 adapter tests
+# ---------------------------------------------------------------------------
+
+
+class TestV2Adapter:
+    """Test FeatureStateMachine's v2 delegation when engine: v2."""
+
+    @pytest.fixture
+    def v2_project(self, project_dir):
+        """Project dir with v2 engine active and a work item."""
+        from auto.v2.config import _CONFIG_CACHE
+        _CONFIG_CACHE.clear()
+
+        # Copy v2 modules to project
+        v2_src = Path(__file__).parent.parent / ".agentic" / "lib" / "auto" / "v2"
+        v2_dst = project_dir / ".agentic" / "lib" / "auto" / "v2"
+        v2_dst.mkdir(parents=True, exist_ok=True)
+        for f in v2_src.iterdir():
+            if f.suffix == ".py":
+                (v2_dst / f.name).write_text(f.read_text())
+
+        # Write state_machine_af.yaml with engine: v2
+        config_path = project_dir / ".agentic" / "state_machine_af.yaml"
+        config_path.write_text("""\
+version: 1
+engine: v2
+
+workflow:
+  states: [idea, queued, planning, plan_review, spec, implementation,
+           verification, docs, ready_to_ship, shipped, deprecated]
+  transitions:
+    - {from: idea, to: queued}
+    - {from: queued, to: planning}
+    - {from: planning, to: plan_review}
+    - {from: plan_review, to: spec}
+    - {from: spec, to: implementation}
+    - {from: implementation, to: verification}
+
+modes:
+  formal:
+    escape_hatches: false
+    skip_transitions: []
+    required_artifacts: {}
+  lean:
+    escape_hatches: true
+    skip_transitions:
+      - {from: queued, to: implementation}
+    required_artifacts: {}
+
+profiles:
+  hands_on:
+    description: "Human reviews everything"
+    gates: {}
+
+verification:
+  commands: []
+
+artifacts: {}
+
+state_mapping:
+  planned: planning
+  specced: spec
+  criteria_set: spec
+  implementing: implementation
+  verified: verification
+  documented: docs
+  committed: ready_to_ship
+  shipped: shipped
+  deprecated: deprecated
+""")
+
+        # Create work dir
+        (project_dir / ".agentic" / "work").mkdir(exist_ok=True)
+
+        yield project_dir
+        _CONFIG_CACHE.clear()
+
+    def test_v2_get_current_state(self, v2_project):
+        """When v2 work item exists, get_current_state reads from it."""
+        from auto.v2 import work_items
+
+        work_items.create(v2_project, "F-0099", "Test v2", mode="lean", profile="hands_on")
+        # Advance to implementation
+        from auto.v2.transitions import TransitionOrchestrator
+        orch = TransitionOrchestrator(v2_project)
+        orch.transition("F-0099", "queued")
+        orch.transition("F-0099", "implementation", force_skip=True)
+
+        # v1 state machine should read from v2 work item
+        sm = FeatureStateMachine(project_root=v2_project, enforce=False)
+        state = sm.get_current_state("F-0099")
+        assert state == FeatureState.IMPLEMENTING
+
+    def test_v2_fallback_to_v1(self, v2_project):
+        """Features without work items fall back to FEATURES.md."""
+        write_features(v2_project, [("F-0042", "Old feature", "shipped")])
+
+        sm = FeatureStateMachine(project_root=v2_project, enforce=False)
+        state = sm.get_current_state("F-0042")
+        assert state == FeatureState.SHIPPED
+
+    def test_v2_transition_delegates(self, v2_project):
+        """When v2 work item exists, transition delegates to TransitionOrchestrator."""
+        from auto.v2 import work_items
+
+        work_items.create(v2_project, "F-0100", "Test transition", mode="lean", profile="hands_on")
+        from auto.v2.transitions import TransitionOrchestrator
+        orch = TransitionOrchestrator(v2_project)
+        orch.transition("F-0100", "queued")
+
+        # Use v1 API to transition
+        sm = FeatureStateMachine(project_root=v2_project, enforce=False)
+        success, msgs = sm.transition("F-0100", FeatureState.PLANNED)  # planning maps to planned
+        # Should succeed via v2 delegation
+        assert success
+
+        # Verify work item was updated
+        item = work_items.load(v2_project, "F-0100")
+        assert item.status == "planning"

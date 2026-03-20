@@ -126,6 +126,22 @@ class FeatureStateMachine:
         self.paths = get_paths(project_root)
         self.enforce = enforce
         self._gates: dict[tuple[FeatureState, FeatureState], Callable] = {}
+        self._v2: object | None = None  # Lazy-init v2 orchestrator
+        self._v2_checked: bool = False
+
+    @property
+    def _use_v2(self) -> bool:
+        """Check if v2 engine is active (cached after first check)."""
+        if not self._v2_checked:
+            self._v2_checked = True
+            try:
+                from auto.v2.config import is_v2_engine
+                if is_v2_engine(self.project_root):
+                    from auto.v2.transitions import TransitionOrchestrator
+                    self._v2 = TransitionOrchestrator(self.project_root)
+            except Exception:
+                pass
+        return self._v2 is not None
 
     # -- Gate registration ---------------------------------------------------
 
@@ -166,7 +182,43 @@ class FeatureStateMachine:
     # -- Reading current state -----------------------------------------------
 
     def get_current_state(self, feature_id: str) -> Optional[FeatureState]:
-        """Read current state from FEATURES.md.
+        """Read current state. Uses v2 work item if available, else FEATURES.md."""
+        if self._use_v2:
+            state = self._get_current_state_v2(feature_id)
+            if state is not None:
+                return state
+        return self._get_current_state_v1(feature_id)
+
+    def _get_current_state_v2(self, feature_id: str) -> Optional[FeatureState]:
+        """Read current state from v2 work item, mapping to v1 FeatureState."""
+        try:
+            from auto.v2 import work_items
+            from auto.v2.config import load_config
+            if not work_items.exists(self.project_root, feature_id):
+                return None
+            item = work_items.load(self.project_root, feature_id)
+            config = load_config(self.project_root)
+            # Reverse-map: v2 state → v1 state (pick most advanced v1 state
+            # when multiple map to the same v2 state, e.g. specced+criteria_set→spec)
+            reverse_map: dict[str, str] = {}
+            for v1, v2 in config.state_mapping.items():
+                if v2 not in reverse_map or STATE_ORDER.index(
+                    FeatureState(v1)
+                ) > STATE_ORDER.index(FeatureState(reverse_map[v2])):
+                    reverse_map[v2] = v1
+            v1_name = reverse_map.get(item.status)
+            if v1_name:
+                return self.resolve_state(v1_name)
+            # Direct match attempt (e.g. "shipped" → "shipped")
+            try:
+                return FeatureState(item.status)
+            except ValueError:
+                return None
+        except Exception:
+            return None
+
+    def _get_current_state_v1(self, feature_id: str) -> Optional[FeatureState]:
+        """Read current state from FEATURES.md (v1 path).
 
         Parses the feature section and extracts the Status field.
         Returns None if the feature is not found.
@@ -316,16 +368,34 @@ class FeatureStateMachine:
     ) -> tuple[bool, list[str]]:
         """Execute a state transition.
 
-        Updates FEATURES.md status field via feature.sh for consistency.
+        When engine: v2 and a work item exists, delegates to TransitionOrchestrator.
+        Otherwise uses v1 path (FEATURES.md via feature.sh).
         Returns (success, messages).
-
-        Args:
-            skip_review: If True, bypass review checkpoints entirely. Used by
-                the coordination server (RPC) to prevent blocking all requests
-                while a critical-agent review runs (60+ seconds under the
-                dispatch lock). Transitions requiring review should go through
-                the CLI/file-based path instead.
         """
+        # v2 delegation: if work item exists, use TransitionOrchestrator
+        if self._use_v2 and not dry_run:
+            try:
+                from auto.v2 import work_items
+                from auto.v2.config import load_config
+                if work_items.exists(self.project_root, feature_id):
+                    config = load_config(self.project_root)
+                    # Map v1 FeatureState to v2 state name
+                    v2_state = config.resolve_v1_state(target.value)
+                    if v2_state:
+                        # skip_review maps to force_skip in v2 (bypasses gates)
+                        result = self._v2.transition(  # type: ignore[union-attr]
+                            feature_id, v2_state, by="agent",
+                            force_skip=skip_review,
+                        )
+                        if result.success:
+                            msgs = [f"Transitioned {feature_id}: → {target.value}"]
+                            msgs.extend(result.warnings)
+                            self._recompute_parent_if_needed(feature_id, msgs)
+                            return True, msgs
+                        return False, result.errors
+            except Exception:
+                pass  # Fall through to v1 path
+
         allowed, messages = self.can_transition(feature_id, target)
         if not allowed:
             return False, messages
