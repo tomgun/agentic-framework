@@ -3814,3 +3814,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 21:56 - Phase 3 Post-Merge
+
+**Why**: Documenting the architectural insight that LLMs are probabilistic and can't be made deterministic via instructions alone
+
+**What changed**:
+- Added CONTRIBUTIONS entry (v2 structural enforcement over behavioral instructions, Phases 1-4) and KEY_INSIGHTS #17 (CLI state machines as endgame for workflow enforcement)
+
+**Next steps**:
+- Phase 4 or QA Observatory
+
+**Blockers**: None
+

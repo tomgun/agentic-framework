@@ -28,6 +28,7 @@
 | 14 | [Cross-Turn Workflows Need Artifact-Embedded Enforcement](#14-cross-turn-workflows-need-artifact-embedded-enforcement) | Instruction files lose effect at turn boundaries — embed enforcement in the artifact itself | Prevents agents from skipping multi-turn workflows |
 | 15 | [Context Provenance Awareness](#15-agents-cannot-distinguish-context-provenance) | Agents can't tell if context came from the user, a prior session, or automation — default to system-provided | Prevents misattributing intent and skipping gates |
 | 16 | [Retroactive Planning Defeats Forward-Looking Gates](#16-retroactive-planning-defeats-forward-looking-gates) | Gates designed for plan→implement flow become dead code when agent implements first, plans after | Gates must check actual state, not assume ordering |
+| 17 | [CLI State Machines — The Endgame for Workflow Enforcement](#17-cli-state-machines--the-endgame-for-workflow-enforcement) | LLMs are probabilistic; no amount of instruction files makes them deterministic. CLI enforcement does. | ~3K lines replaces ~34K — 90% reduction, 100% enforcement |
 
 **Meta-lesson**: structural enforcement > behavioral instructions > hope.
 
@@ -367,6 +368,33 @@ Design your workflow around this reality. Every valuable output must reach a git
 
 ---
 
+## 17. CLI State Machines — The Endgame for Workflow Enforcement
+
+**The problem**: Insights #1–#16 document an escalating arms race: agents skip behavioral rules → add more instruction files → agents still skip → add structural gates → agents route around them → add artifact-embedded enforcement → agents skip the artifacts. By v0.58.0, the framework had accumulated ~130 instruction files (~34K lines) telling agents WHAT to do. Skills, checklists, workflow docs, quality standards, subagent definitions, memory-seed — all attempting to make probabilistic LLMs follow deterministic processes. It wasn't working reliably. The same agent following the same instructions would sometimes skip plan review, sometimes forget doc updates, sometimes commit without quality checks. Not because the instructions were bad — because LLMs are fundamentally probabilistic. They can decide to skip steps regardless of how many files tell them not to.
+
+**The insight**: Stop trying to make instructions detailed enough that LLMs follow them. Instead, make the CLI enforce the workflow so LLMs *cannot* skip steps. A state machine with artifact-based preconditions turns workflow compliance from a probability into a certainty.
+
+**How it works**: A single YAML file (`state_machine_af.yaml`) defines 10 states, valid transitions, required artifacts, and gate reviewers. The CLI (`ag start`, `ag transition`, `ag check`) is the only way to advance a feature through the workflow. Want to move from `planning` to `plan_review`? The CLI checks that `plan.md` exists. Want to move from `implementation` to `verification`? The CLI checks that tests exist. No instruction file needed — the transition simply fails if preconditions aren't met.
+
+**Why this is fundamentally different from all previous approaches**:
+- **Instructions** (insights #1, #5): Tell agents what to do → agents may or may not comply
+- **Scripts** (insight #3): Replace read-modify-write → deterministic for data operations, but agents still have to *call* the scripts
+- **Git hooks** (insight #4): Block bad commits → enforcement at commit time, but agents can do work in the wrong order before committing
+- **Artifact embedding** (insight #14): Embed next steps in artifacts → survives turn boundaries, but agents can ignore the embedded instructions
+- **CLI state machine** (this insight): Agents cannot advance the workflow without meeting preconditions → enforcement at every state transition, not just commit time
+
+The CLI doesn't tell agents what to do — it tells them what they *can't* do. This is a fundamental shift from opt-in compliance to opt-out impossibility.
+
+**The evidence**: 130 instruction files (34K lines) replaced by 7 role prompts (347 lines) + 1 conventions file (78 lines) + CLI enforcement. The role prompts provide quality guidance (what makes a *good* plan, not the process of creating one). The CLI handles process enforcement. Clear separation of concerns: LLMs do what they're good at (judgment, creativity, quality); deterministic code does what it's good at (process, sequencing, validation).
+
+**The deeper lesson**: The entire history of insights #1–#16 is a journey toward this realization. Each insight added a layer of enforcement to compensate for the previous layer's gaps. The state machine doesn't replace those insights — it provides the backbone they were all approximating. Skills (#2) become thin stubs that route to CLI commands. Scripts (#3) still handle state file updates. Gates (#4) still enforce commit-time checks. But the workflow itself — the sequence of plan → review → implement → verify → ship — is no longer a suggestion in an instruction file. It's a state machine that the agent navigates, one validated transition at a time.
+
+**Status**: v2 engine shipped in Phases 1-3 (PRs #177-#182), Phase 4 (tool adapters + MCP) remaining. Early results suggest the approach works — agents follow the workflow because they have no alternative. Comprehensive empirical comparison against v1 instruction-based workflows is planned (QA Observatory, F-0242) to measure the quality and reliability differences at scale.
+
+**See**: `.agentic/state_machine_af.yaml`, `.agentic/lib/auto/v2/`, `.agentic/prompts/`, `CONTRIBUTIONS.md` § "v2 Workflow Engine"
+
+---
+
 ## Summary: The Pattern
 
 These insights form a coherent pattern:
@@ -389,6 +417,7 @@ Tiny instruction file (50 lines)     → agent reads it all, reliably
   + Artifact-embedded enforcement    → cross-turn workflows survive boundaries
   + Context provenance awareness     → don't misattribute automated context to users
   + State-based gates over position  → work regardless of execution order
+  + CLI state machine enforcement    → workflow compliance as certainty, not probability
 ```
 
 The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation.
