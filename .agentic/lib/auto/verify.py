@@ -178,6 +178,29 @@ class VerifyResult:
         return d
 
 
+def write_verification_artifact(
+    project_root: Path, feature_id: str, result: VerifyResult,
+) -> bool:
+    """Write verification.json to v2 work item dir if it exists.
+
+    Returns True if written, False if no work item dir or v2 not active.
+    Called by execution layer after VerifyLoop.run() completes.
+    """
+    try:
+        from auto.v2.config import is_v2_engine
+        from auto.v2 import work_items
+        if not is_v2_engine(project_root):
+            return False
+        if not work_items.exists(project_root, feature_id):
+            return False
+        import json
+        vpath = work_items.artifact_path(project_root, feature_id, "verification.json")
+        vpath.write_text(json.dumps(result.to_dict(), indent=2) + "\n")
+        return True
+    except Exception:
+        return False
+
+
 class VerifyLoop:
     """Test-fix loop engine with tiered execution.
 

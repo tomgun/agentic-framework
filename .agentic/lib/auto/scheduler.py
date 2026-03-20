@@ -174,9 +174,10 @@ class AutonomousScheduler:
             result.stopped_reason = "no features to schedule"
             return result
 
-        # Initialize tracking
+        # Initialize tracking + ensure v2 work items exist
         work_map: dict[str, FeatureWork] = {}
         for fid in feature_ids:
+            self._ensure_v2_work_item(fid)
             fw = FeatureWork(
                 feature_id=fid,
                 component=self._get_feature_component(fid),
@@ -266,6 +267,7 @@ class AutonomousScheduler:
                         else:
                             fw.status = "completed"
                             result.features_completed += 1
+                            self._advance_v2_state(fw.feature_id)
                     else:
                         # Check if blocked on review
                         if self._is_review_blocked(fw.feature_id):
@@ -638,6 +640,52 @@ class AutonomousScheduler:
         return self.engine_state.state == "stopping"
 
     # -- Progress persistence ----------------------------------------------
+
+    def _ensure_v2_work_item(self, feature_id: str) -> None:
+        """Create a v2 work item if v2 is active and item doesn't exist."""
+        try:
+            from auto.v2.config import is_v2_engine
+            from auto.v2 import work_items
+            if not is_v2_engine(self.project_root):
+                return
+            if work_items.exists(self.project_root, feature_id):
+                return
+            from settings import get_setting
+            mode = get_setting(self.project_root, "mode", "formal")
+            profile = get_setting(self.project_root, "profile", "guided")
+            work_items.create(
+                self.project_root, feature_id, feature_id,
+                mode=mode, profile=profile,
+            )
+        except Exception:
+            pass  # Best-effort — v1 path still works
+
+    def _advance_v2_state(self, feature_id: str) -> None:
+        """Advance v2 work item through post-implementation states.
+
+        After TaskRunner completes successfully:
+        implementation → verification → docs → ready_to_ship
+        """
+        try:
+            from auto.v2.config import is_v2_engine
+            from auto.v2 import work_items
+            from auto.v2.transitions import TransitionOrchestrator
+            if not is_v2_engine(self.project_root):
+                return
+            if not work_items.exists(self.project_root, feature_id):
+                return
+            orch = TransitionOrchestrator(self.project_root)
+            item = work_items.load(self.project_root, feature_id)
+            # Advance through each post-implementation state
+            for target in ["verification", "docs", "ready_to_ship"]:
+                if item.status == target:
+                    continue
+                result = orch.transition(feature_id, target, by="scheduler")
+                if not result.success:
+                    break  # Stop at first blocked transition (e.g., missing artifact)
+                item = work_items.load(self.project_root, feature_id)
+        except Exception:
+            pass  # Best-effort — FEATURES.md shim handles v1 consumers
 
     def _save_progress(self, result: SchedulerResult) -> None:
         """Save scheduler progress to session state."""
