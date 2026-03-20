@@ -189,11 +189,17 @@ Details: `.agentic/lib/DEVELOPER_GUIDE.md` (Autonomous Modes section)
 
 ---
 
-## Shipped Spec Protection
+## Shipped Spec Protection & Evolution
 
 Shipped acceptance criteria are contracts — they can only be modified through spec migrations.
 Pre-commit Checks 14-16 enforce this automatically with no bypass. If you need to change a
 shipped spec, run `bash .agentic/lib/tools/migration.sh create` first.
+
+But specs are also living documents (formal profiles with `feature_tracking: yes`): when your
+changes affect behavior covered by shipped specs, you must evolve those specs. Create a migration
+and add new ACs to the affected `spec/acceptance/F-XXXX.md` files. Don't resist this — it keeps
+specs accurate as understanding deepens.
+
 See: `.agentic/lib/checklists/spec_writing.md`, `.claude/skills/writing-specs/references/spec_protection.md`
 
 ---

@@ -85,6 +85,7 @@ Check each dimension:
 5. **Style**: Follows project conventions? Consistent naming?
 6. **Tests**: Are changed paths covered by tests?
 7. **Documentation**: If `.agentic/lib/tools/docs.sh` exists, run `bash .agentic/lib/tools/docs.sh --list` and `bash .agentic/lib/tools/drift.sh --docs` to check for drift. Check CHANGELOG updated for behavior changes. Check if new user-facing artifacts need adding to `## Docs` in STACK.md. Flag missing doc updates as "Must Fix" when `docs_gate: blocking`.
+8. **Spec evolution** (formal profiles only — skip if no `spec/acceptance/` directory): Do these changes modify behavior covered by shipped acceptance criteria? Check `spec/acceptance/` for specs affected by the changed files. If shipped specs should have evolved but didn't, flag as "Should Fix" with: which specs are affected, what new ACs are needed, and that a migration is required.
 
 ### 4. Return Structured Report
 

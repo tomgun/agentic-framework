@@ -3553,3 +3553,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 08:40 - F-0237 Spec Evolution in All Instruction Files
+
+**Why**: Spec evolution must be in instruction files to reach agents — same principle as doc decision tree
+
+**What changed**:
+- Added 'specs are contracts AND living documents' to all instruction files: CLAUDE.md (root+template), cursorrules (root+template), copilot, codex, auto_orchestration (Step 9), agent_operating_guidelines, memory-seed. Added spec evolution check to reviewing-code skill (dimension 8). All conditional on formal profiles.
+
+**Next steps**:
+- Commit and push to PR
+
+**Blockers**: None
+

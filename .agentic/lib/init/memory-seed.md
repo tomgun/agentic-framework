@@ -83,7 +83,7 @@ Plans saved to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` or they are LO
 | verify framework/self-test | `ag auto verify-framework --project <name>` |
 | session start/where were we | `ag start` → output dashboard.sh verbatim, no preamble |
 | quick ad-hoc work | `ag work "description"` |
-| write/update spec | `ag spec F-XXXX` (shipped specs are contracts — migration.sh for changes) |
+| write/update spec | `ag spec F-XXXX` (shipped specs are contracts AND living documents — migration.sh for changes; evolve affected specs when your changes overlap) |
 | run tests | `ag test` or `ag test llm` |
 | feature state/transition | `ag transition F-XXXX <state>` or `--status` or `--unblocked` |
 | parallel agent coordination | `ag coord start` (HTTP JSON-RPC, port 4185, bearer auth) |

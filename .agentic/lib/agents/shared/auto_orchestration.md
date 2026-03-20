@@ -215,13 +215,18 @@ Do NOT proceed to step 4 (IMPLEMENT) without completing step 1 (VERIFY ACCEPTANC
    ├─ CONTEXT_PACK.md (if architecture changed)
    └─ STATUS.md (next steps)
 
-9. DOC LIFECYCLE (if STACK.md ## Docs has entries)
+9. EVOLVE AFFECTED SPECS (feature_tracking=yes only)
+   ├─ Do your changes affect behavior covered by shipped specs?
+   ├─ If yes: migration.sh create → add new ACs to affected spec/acceptance/F-XXXX.md
+   └─ Specs are living documents — they evolve as understanding deepens
+
+10. DOC LIFECYCLE (if STACK.md ## Docs has entries)
    ├─ `ag docs F-####` or `docs.sh --trigger feature_done`
    ├─ Drafts registered docs (lessons, architecture, changelog, etc.)
    ├─ Formal/autonomous_formal profile: also drafts pr-trigger docs (changelog, readme)
    └─ Human reviews drafts in git diff, removes `<!-- draft: -->` markers
 
-10. BEFORE COMMIT
+11. BEFORE COMMIT
    └─ Run before_commit.md checklist
 ```
 

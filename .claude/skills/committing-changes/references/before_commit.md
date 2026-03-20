@@ -159,7 +159,7 @@ This is the backstop for ALL commits. If you followed implementing-features Step
   - Not a placeholder
   - Testable conditions listed
 
-- [ ] **Affected shipped specs evolved** (if changes overlap with existing features)
+- [ ] **Affected shipped specs evolved** (formal profiles only — skip if `feature_tracking: no`)
   - Do your changes modify behavior covered by shipped acceptance criteria?
   - If yes: create a migration (`migration.sh create "description"`), add new ACs to affected `spec/acceptance/F-XXXX.md` with migration reference
   - Specs are living documents — they evolve as understanding deepens

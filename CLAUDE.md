@@ -26,7 +26,7 @@ Coordination: `ag coord start` | `ag coord stop` | `ag coord status`
 - Spec + code + tests + docs = done (update all artifacts together, not later).
 - AC completeness enforced at `ag done`: P1 ACs = 100%, P2/P3 = 80%, flat specs = 80%. AC clarity gate runs on first `ag implement` (formal=blocking, discovery=advisory).
 - Smoke test evidence: if `smoke_test_evidence` != `off` in STACK.md, `ag done` checks for `.agentic/journal/evidence/F-XXXX-smoke.*`. Generate via `ag auto verify --visual --feature F-XXXX` or create manually.
-- Shipped specs are contracts: never modify shipped acceptance criteria without `bash .agentic/lib/tools/migration.sh create`. Pre-commit Checks 14-16 enforce this with no escape hatch.
+- Shipped specs are contracts AND living documents: never modify shipped acceptance criteria without `bash .agentic/lib/tools/migration.sh create`. Pre-commit Checks 14-16 enforce this with no escape hatch. But specs must evolve — when your changes affect behavior covered by shipped specs, create a migration and add new ACs to the affected specs. (Formal profiles only — requires `feature_tracking: yes`.)
 - Keep changes small and scoped (max 5-10 files per commit).
 - Plans are durable: save to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
 - Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.

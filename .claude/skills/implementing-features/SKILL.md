@@ -151,7 +151,7 @@ Skip this step if `FRAMEWORK_DEVELOPMENT.md` does not exist at the project root.
 4. **Changed agent behavior?** → Update `.agentic/lib/init/memory-seed.md`
 5. Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift
 
-### Step 7: Evolve Affected Specs
+### Step 7: Evolve Affected Specs (formal profiles only — skip if `feature_tracking: no`)
 
 Check whether your changes affect previously shipped features — their specs should evolve to reflect what you've learned:
 

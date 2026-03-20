@@ -49,7 +49,7 @@ Rules:
 - Interactive sessions: show changes to human before committing. Autonomous/non-interactive sessions (e.g. `ag auto` workflows): commit directly, using `review_commit` setting to determine review level (F-0203).
 - Add/update tests for new/changed logic.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
-- Shipped specs are contracts: never modify shipped acceptance criteria without a spec migration.
+- Shipped specs are contracts AND living documents: never modify shipped acceptance criteria without a spec migration. But specs must evolve — when changes affect behavior covered by shipped specs, create a migration and add new ACs. (Formal profiles only.)
 - Keep changes small and scoped.
 - Update JOURNAL.md and STATUS.md before every commit (use token-efficient scripts).
 - Multi-agent: check AGENTS.json for active agents before starting work.

@@ -84,7 +84,7 @@ If any docs are stale or instruction files are out of sync:
 2. Re-run the checks to confirm they pass
 3. `ag done` will block if `docs_gate: blocking` and docs are still stale
 
-### Step 5c: Evolve Affected Specs
+### Step 5c: Evolve Affected Specs (formal profiles only — skip if `feature_tracking: no`)
 
 Check whether your changes affect previously shipped features:
 
