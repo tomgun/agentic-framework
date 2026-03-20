@@ -97,7 +97,6 @@ INSTRUCTION_FILES=(
     "$ROOT_DIR/.agentic/lib/agents/cursor/cursorrules.txt|cursorrules.txt template"
     "$ROOT_DIR/.agentic/lib/agents/copilot/copilot-instructions.md|copilot-instructions.md template"
     "$ROOT_DIR/.agentic/lib/agents/codex/codex-instructions.md|codex-instructions.md template"
-    "$ROOT_DIR/.agentic/lib/agents/shared/auto_orchestration.md|auto_orchestration.md"
     "$ROOT_DIR/.agentic/lib/init/memory-seed.md|memory-seed.md"
 )
 

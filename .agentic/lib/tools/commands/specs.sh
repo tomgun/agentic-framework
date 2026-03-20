@@ -25,16 +25,18 @@ cmd_spec() {
         return
     fi
 
-    # Default: print spec-writing checklist for new feature
+    # Default: print spec-writing guidance for new feature
     echo -e "${BLUE}Spec-Writing Checklist${NC}"
     echo ""
     if [[ -f ".agentic/lib/checklists/spec_writing.md" ]]; then
         cat .agentic/lib/checklists/spec_writing.md
     else
-        echo "Checklist not found at .agentic/lib/checklists/spec_writing.md"
+        echo "Run \`ag check\` for spec guidance, or see role prompts in .agentic/prompts/"
     fi
     echo ""
-    echo -e "Full workflow: ${BLUE}.agentic/lib/workflows/spec_writing.md${NC}"
+    if [[ -f ".agentic/lib/workflows/spec_writing.md" ]]; then
+        echo -e "Full workflow: ${BLUE}.agentic/lib/workflows/spec_writing.md${NC}"
+    fi
     echo -e "Usage: ag spec F-XXXX    (check feature)  |  ag spec --check  (check all)"
 }
 
@@ -109,7 +111,7 @@ cmd_specs() {
             echo "     f. Mark domain as completed: change '- [ ]' to '- [x]' in plan"
             echo "  5. After all domains: cross-domain review (duplicates, gaps)"
             echo ""
-            echo "Pipeline details: .agentic/lib/agents/shared/auto_orchestration.md"
+            echo "Run \`ag check\` to see next steps for spec generation."
         elif [ "$status" = "DRAFT" ] || [ "$status" = "REVIEWING" ] || [ "$status" = "REVISION_NEEDED" ]; then
             echo -e "${YELLOW}Plan needs review.${NC}"
             echo "  Continue the plan-review loop:"
@@ -161,7 +163,7 @@ for d in domains:
     echo "  3. Use the plan-review loop to validate"
     echo "  4. After APPROVED: run 'ag specs' again to begin execution"
     echo ""
-    echo "Pipeline details: .agentic/lib/agents/shared/auto_orchestration.md"
+    echo "Run \`ag check\` to see pipeline details."
 
     # Token cost suggestion
     local feature_count

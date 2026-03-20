@@ -180,6 +180,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0056: Phase 3 PR #182 needs review
+- **Type**: pr
+- **Added**: 2026-03-20
+- **Context**: feat/v2-phase3-instruction-consolidation — 185 files, -34K lines instruction consolidation
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics

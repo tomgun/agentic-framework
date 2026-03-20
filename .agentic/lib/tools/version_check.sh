@@ -63,6 +63,6 @@ else
     echo "  3. Review CHANGELOG for breaking changes"
     echo "  4. Update STACK.md version to match"
     echo ""
-    echo "See: .agentic/agents/shared/agent_operating_guidelines.md → 'After Framework Upgrade'"
+    echo "See: STACK.md and run 'ag start' for post-upgrade guidance"
     exit 1
 fi

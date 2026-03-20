@@ -168,15 +168,20 @@ add_minimal_frontmatter "$AGENTIC_DIR/agents/roles/test_agent.md" \
 echo ""
 echo -e "${BLUE}Agent Shared:${NC}"
 
+# Guard: these files may have been removed in v2 simplification
+[[ -f "$AGENTIC_DIR/agents/shared/AGENT_QUICK_START.md" ]] && \
 add_minimal_frontmatter "$AGENTIC_DIR/agents/shared/AGENT_QUICK_START.md" \
     "Concise onboarding for agents: gates, scripts, workflow in ~60 lines"
 
+[[ -f "$AGENTIC_DIR/agents/shared/agent_operating_guidelines.md" ]] && \
 add_minimal_frontmatter "$AGENTIC_DIR/agents/shared/agent_operating_guidelines.md" \
     "Complete operating rules for all AI agents across all tools"
 
+[[ -f "$AGENTIC_DIR/agents/shared/auto_orchestration.md" ]] && \
 add_minimal_frontmatter "$AGENTIC_DIR/agents/shared/auto_orchestration.md" \
     "Workflow trigger rules for Cursor, Copilot, Codex (non-Claude tools)"
 
+[[ -f "$AGENTIC_DIR/agents/shared/doc_types.md" ]] && \
 add_minimal_frontmatter "$AGENTIC_DIR/agents/shared/doc_types.md" \
     "Built-in document type definitions for the doc lifecycle system"
 

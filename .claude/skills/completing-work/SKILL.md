@@ -13,134 +13,19 @@ metadata:
   author: agentic-framework
   version: "0.62.0"
 ---
-
 # Completing Work
 
-Verify acceptance criteria, mark features done, update specs, and cleanup.
+Run `ag done F-XXXX` — it verifies ACs, bumps VERSION, updates FEATURES.md, and flushes state.
 
-## Instructions
+## Before running `ag done`
+1. Verify acceptance criteria in `.agentic/spec/acceptance/F-XXXX.md` (check off each `- [ ]` → `- [x]`)
+2. Complete WIP: `bash .agentic/lib/tools/wip.sh complete`
+3. Update feature status: `bash .agentic/lib/tools/feature.sh F-XXXX status shipped`
+4. Update journal: `bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Capability" "Next" "None" --why "Reason"`
+5. Update status: `bash .agentic/lib/tools/status.sh focus "F-XXXX shipped"`
+6. Check doc freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done`
 
-### Step 1: Verify and Check Off Acceptance Criteria
-
-Read `.agentic/spec/acceptance/F-XXXX.md` and verify each criterion is met:
-
-1. All criteria have passing tests
-2. Documentation is updated
-3. No known regressions
-
-As you verify each criterion, check it off in the file (`- [ ]` → `- [x]`).
-If any criteria are not met, list what remains and ask user how to proceed.
-
-### Step 2: Complete WIP Tracking
-
-```bash
-bash .agentic/lib/tools/wip.sh complete
-```
-
-This clears the active WIP entry from `.agentic/session/AGENTS.json`.
-
-### Step 3: Update Feature Status
-
-```bash
-bash .agentic/lib/tools/feature.sh F-XXXX status shipped
-```
-
-### Step 3b: Bump VERSION and Flush
-
-`ag done` auto-bumps VERSION (patch) and flushes state to main when on main.
-For minor/major bumps, edit VERSION manually before running `ag done`.
-
-### Step 4: Update Artifacts
-
-```bash
-bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Project can now [capability]" "Next: [what's next]" "None" --why "Problem solved"
-bash .agentic/lib/tools/status.sh focus "F-XXXX shipped, ready for next task"
-```
-
-### Step 5: Flush Pending Items
-
-Check for any pending tasks captured during implementation:
-
-```bash
-bash .agentic/lib/tools/todo.sh list
-```
-
-Surface any items that should be addressed before moving on.
-
-### Step 5b: Doc Completeness Verification
-
-Before running `ag done`, verify all 3 documentation concerns were addressed during implementation:
-
-1. **Registry docs**: Run `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done` — if any stale, update them now
-2. **Registry maintenance**: If new docs were created, confirm they're registered in STACK.md `## Docs`
-3. **Instruction files** (framework dev only — if `FRAMEWORK_DEVELOPMENT.md` exists):
-   - If a new `ag` command was added: verify Quick Commands include it in all 5 instruction files
-   - If a new trigger word was added: verify trigger tables include it in all 4 files
-   - If agent behavior changed: verify `memory-seed.md` reflects the change
-   - Run `bash .agentic/lib/tools/instruction-sync.sh 2>/dev/null` to detect drift
-
-If any docs are stale or instruction files are out of sync:
-1. Update the stale items
-2. Re-run the checks to confirm they pass
-3. `ag done` will block if `docs_gate: blocking` and docs are still stale
-
-### Step 5c: Evolve Affected Specs (formal profiles only — skip if `feature_tracking: no`)
-
-Check whether your changes affect previously shipped features:
-
-1. Identify which shipped specs overlap with what you changed (tools, skills, workflows)
-2. If shipped ACs need updating: create a migration (`migration.sh create "description"`) and add new ACs to affected `spec/acceptance/F-XXXX.md` with migration reference
-3. Specs are living documents — they evolve as understanding deepens. Don't resist this.
-
-### Step 6: Post-Merge Dogfood Sync (Framework Dev Only)
-
-After merging a framework PR, sync root instruction files with templates:
-
-```bash
-bash .agentic/lib/tools/ag.sh dogfood
-```
-
-Fix any Phase 2 sentinel drift immediately. Phase 1 command parity drift is advisory.
-
-### Step 7: Retrospective Check
-
-After shipping, check if a retrospective is due:
-
-```bash
-bash .agentic/lib/tools/retro_check.sh 2>/dev/null
-```
-
-If exit code is 1 (due): inform user "Retrospective is due! Run `ag retro` when ready."
-
-## Examples
-
-**Example 1: Completing a feature**
-User says: "I think we're done with F-0125"
-Steps taken:
-1. Read .agentic/spec/acceptance/F-0125.md — 4 criteria, all verified
-2. Run `wip.sh complete` — WIP cleared
-3. Run `feature.sh F-0125 status shipped`
-4. Update journal and status
-5. Check TODO list — 2 follow-up items captured
-Result: "F-0125 marked as shipped. 2 TODO items to address: [list]"
-
-**Example 2: Criteria not fully met**
-User says: "done"
-Steps taken:
-1. Read acceptance criteria — 3 of 4 met, missing: edge case test
-2. Report: "3 of 4 acceptance criteria met. Missing: edge case test for empty input. Should I write that test, or mark as shipped anyway?"
-Result: User decides to add the test first.
-
-## Troubleshooting
-
-**Error: No active WIP found**
-Cause: Work was never formally started or already completed.
-Solution: Proceed with status updates. WIP tracking is a guard, not a blocker for completion.
-
-**Error: Feature ID not found in FEATURES.md**
-Cause: Feature was implemented without a spec entry.
-Solution: Add the feature to .agentic/spec/FEATURES.md retroactively before marking shipped.
-
-## References
-
-- For completion checklist: see `references/feature_complete.md`
+## Rules
+- P1 ACs = 100%, P2/P3 = 80%, flat specs = 80% required.
+- If criteria not met, list what remains and ask user how to proceed.
+- `ag done` auto-bumps VERSION (patch) and flushes state on main.

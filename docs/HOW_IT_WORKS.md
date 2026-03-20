@@ -603,6 +603,93 @@ Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag re
 
 ---
 
+## v2 Workflow Engine (Phase 1-3)
+
+The v2 workflow engine replaces the distributed enforcement model (ag.sh commands + scattered config) with a single state machine definition and per-feature work items.
+
+### State Machine (`state_machine_af.yaml`)
+
+Single source of truth for workflow states, transitions, gates, and modes. Replaces scattered config across STACK.md settings, `profiles.conf`, and hardcoded state lists.
+
+**10 states**: `idea` → `queued` → `planning` → `plan_review` → `spec` → `implementation` → `verification` → `docs` → `ready_to_ship` → `shipped` (+ `deprecated` terminal state reachable from any).
+
+**Transition enforcement**: Each transition declares `requires` (artifact preconditions) and optional `gate` (review gates). Example: `planning → plan_review` requires `plan.md` to exist in the work directory. `plan_review → spec` requires `review.md` and the `plan_approved` gate.
+
+**Two modes**:
+- **formal**: No escape hatches — CLI hard-fails on invalid transitions. All artifacts required.
+- **lean**: Skip transitions allowed (e.g., `queued → implementation` for small tasks) but audit-logged in `item.yaml`.
+
+**Three profiles** (who reviews at each gate):
+- **hands_on**: Human reviews everything
+- **guided**: Human reviews plans and specs, AI reviews code
+- **autonomous**: AI reviews everything except merge
+
+### CLI Commands (8 total)
+
+| Command | What it does |
+|---------|-------------|
+| `ag start F-XXXX "Title"` | Create work item, auto-transition to `planning` |
+| `ag transition F-XXXX <state>` | Enforce transition with preconditions and gates |
+| `ag check F-XXXX` | Validate required artifacts for next transition |
+| `ag verify F-XXXX` | Run verification commands, save `verification.json` |
+| `ag ship F-XXXX` | Check `ready_to_ship`, show merge steps |
+| `ag status [--all]` | Show active work items and states |
+| `ag info F-XXXX` | Detailed info: artifacts, transitions, next steps |
+| `ag next` | Show next queued work item |
+
+Implementation: `.agentic/lib/auto/v2/workflow.py` (CLI entry point), `transitions.py` (orchestrator), `preconditions.py` (artifact checks), `config.py` (YAML parsing), `work_items.py` (CRUD), `gate_dispatch.py` (review dispatch), `features_sync.py` (v1 compat shim).
+
+### Per-Feature Work Items (`.agentic/work/F-XXXX/`)
+
+Each feature gets a directory with co-located artifacts:
+
+```
+.agentic/work/F-XXXX/
+├── item.yaml          # Status, mode, profile, priority, transition history
+├── plan.md            # Implementation plan
+├── review.md          # Adversarial review output
+├── spec.md            # Acceptance criteria / spec
+├── verification.json  # Test/lint results
+├── journal.md         # Per-feature decision log
+├── pr.md              # PR description
+└── handoff.md         # Handoff notes
+```
+
+`item.yaml` tracks state machine metadata: current status, mode (formal/lean), profile (hands_on/guided/autonomous), priority, creation date, and full transition history with timestamps, actors, and skip markers.
+
+### Role Prompts (loaded JIT on transitions)
+
+When a transition succeeds, the CLI emits the role prompt for the target state. 7 prompts in `.agentic/prompts/`:
+
+| Prompt | Loaded for states |
+|--------|------------------|
+| `planner.md` | planning, spec |
+| `reviewer.md` | plan_review |
+| `implementer.md` | implementation, docs |
+| `verifier.md` | verification, ready_to_ship |
+| `debugger.md` | (on demand) |
+| `session.md` | (session start) |
+| `explorer.md` | (on demand) |
+
+### Artifact-Based Preconditions
+
+Transitions are gated by artifact existence in the work directory:
+- `plan.md` must exist before entering `plan_review`
+- `review.md` must exist before entering `spec` (formal mode)
+- `spec.md` must exist before entering `implementation`
+- Tests must reference the feature ID before entering `verification`
+- `verification.json` must show all-pass before entering `docs`
+
+Precondition checks run in `preconditions.py` — each returns a `CheckResult` with pass/fail + specific error messages.
+
+### v1 Compatibility
+
+- `features_sync.py` maintains a shim that syncs work item status to FEATURES.md entries during transitions
+- State mapping: v1 states (planned, specced, criteria_set, etc.) map to v2 states (planning, spec, implementation, etc.)
+- Migration guide: `.agentic/MIGRATION_v2.md`
+
+---
+
 ## Principle-by-Principle Breakdown
 
 ### F1: Developer-Friendly Experience (FOUNDATION)

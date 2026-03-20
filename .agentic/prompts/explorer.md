@@ -8,6 +8,7 @@ You are exploring the codebase to understand it, find code, or research a questi
 2. **Read key files** — Entry points, config files, main modules.
 3. **Trace flows** — Follow function calls to understand how things connect.
 4. **Check tests** — Tests often document expected behavior better than code.
+5. **Check git history** — `git log --oneline <file>` reveals why code is the way it is.
 
 ## Tools to use
 

@@ -3775,3 +3775,42 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 20:04 - Phase 3A+3B
+
+**Why**: Phase 3 instruction consolidation — removing redundant files replaced by v2 CLI enforcement
+
+**What changed**:
+- v2 mode added to validate_framework.sh (703/3/17); enriched 7 role prompts (209→347 lines); created conventions.md (78 lines)
+
+**Next steps**:
+- Phase 3C: simplify skills + templates + tool scripts
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 20:24 - Phase 3C
+
+**Why**: Phase 3C: skills + templates simplified for v2 CLI enforcement
+
+**What changed**:
+- Simplified 25 skill stubs (Tier 1/2), updated 4 templates + 3 root wrappers, fixed 35 v2 validation guards
+
+**Next steps**:
+- Phase 3D: delete archived files in 4 batches
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 21:03 - Phase 3 Complete
+
+**Why**: Phase 3 instruction consolidation removes ~130 files of redundant instructions now enforced by v2 CLI
+
+**What changed**:
+- All 5 sub-phases done: 3A (validate_framework v2 mode), 3B (enriched prompts + conventions.md), 3C (skill stubs + template updates), 3D (4 deletion batches: ~25.6K lines removed), 3E (migration guide + docs)
+
+**Next steps**:
+- Create PR for Phase 3
+
+**Blockers**: None
+

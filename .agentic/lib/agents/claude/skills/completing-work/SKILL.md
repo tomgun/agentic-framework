@@ -13,112 +13,19 @@ metadata:
   author: agentic-framework
   version: "${VERSION}"
 ---
-
 # Completing Work
 
-Verify acceptance criteria, mark features done, update specs, and cleanup.
+Run `ag done F-XXXX` — it verifies ACs, bumps VERSION, updates FEATURES.md, and flushes state.
 
-## Instructions
+## Before running `ag done`
+1. Verify acceptance criteria in `.agentic/spec/acceptance/F-XXXX.md` (check off each `- [ ]` → `- [x]`)
+2. Complete WIP: `bash .agentic/lib/tools/wip.sh complete`
+3. Update feature status: `bash .agentic/lib/tools/feature.sh F-XXXX status shipped`
+4. Update journal: `bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Capability" "Next" "None" --why "Reason"`
+5. Update status: `bash .agentic/lib/tools/status.sh focus "F-XXXX shipped"`
+6. Check doc freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done`
 
-### Step 1: Verify and Check Off Acceptance Criteria
-
-Read `.agentic/spec/acceptance/F-XXXX.md` and verify each criterion is met:
-
-1. All criteria have passing tests
-2. Documentation is updated
-3. No known regressions
-
-As you verify each criterion, check it off in the file (`- [ ]` → `- [x]`).
-If any criteria are not met, list what remains and ask user how to proceed.
-
-### Step 2: Complete WIP Tracking
-
-```bash
-bash .agentic/lib/tools/wip.sh complete
-```
-
-This clears the active WIP entry from `.agentic/session/AGENTS.json`.
-
-### Step 3: Update Feature Status
-
-```bash
-bash .agentic/lib/tools/feature.sh F-XXXX status shipped
-```
-
-### Step 3b: Bump VERSION and Flush
-
-`ag done` auto-bumps VERSION (patch) and flushes state to main when on main.
-For minor/major bumps, edit VERSION manually before running `ag done`.
-
-### Step 4: Update Artifacts
-
-```bash
-bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Project can now [capability]" "Next: [what's next]" "None" --why "Problem solved"
-bash .agentic/lib/tools/status.sh focus "F-XXXX shipped, ready for next task"
-```
-
-### Step 5: Flush Pending Items
-
-Check for any pending tasks captured during implementation:
-
-```bash
-bash .agentic/lib/tools/todo.sh list
-```
-
-Surface any items that should be addressed before moving on.
-
-### Step 5b: Doc Freshness Verification
-
-Before running `ag done`, verify registered docs are up to date:
-
-```bash
-bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done
-```
-
-If any docs are stale:
-1. Update the stale docs with changes from the current feature
-2. Re-run `--check-freshness` to confirm they pass
-3. `ag done` will block if `docs_gate: blocking` and docs are still stale
-
-### Step 6: Retrospective Check
-
-After shipping, check if a retrospective is due:
-
-```bash
-bash .agentic/lib/tools/retro_check.sh 2>/dev/null
-```
-
-If exit code is 1 (due): inform user "Retrospective is due! Run `ag retro` when ready."
-
-## Examples
-
-**Example 1: Completing a feature**
-User says: "I think we're done with F-0125"
-Steps taken:
-1. Read .agentic/spec/acceptance/F-0125.md — 4 criteria, all verified
-2. Run `wip.sh complete` — WIP cleared
-3. Run `feature.sh F-0125 status shipped`
-4. Update journal and status
-5. Check TODO list — 2 follow-up items captured
-Result: "F-0125 marked as shipped. 2 TODO items to address: [list]"
-
-**Example 2: Criteria not fully met**
-User says: "done"
-Steps taken:
-1. Read acceptance criteria — 3 of 4 met, missing: edge case test
-2. Report: "3 of 4 acceptance criteria met. Missing: edge case test for empty input. Should I write that test, or mark as shipped anyway?"
-Result: User decides to add the test first.
-
-## Troubleshooting
-
-**Error: No active WIP found**
-Cause: Work was never formally started or already completed.
-Solution: Proceed with status updates. WIP tracking is a guard, not a blocker for completion.
-
-**Error: Feature ID not found in FEATURES.md**
-Cause: Feature was implemented without a spec entry.
-Solution: Add the feature to .agentic/spec/FEATURES.md retroactively before marking shipped.
-
-## References
-
-- For completion checklist: see `references/feature_complete.md`
+## Rules
+- P1 ACs = 100%, P2/P3 = 80%, flat specs = 80% required.
+- If criteria not met, list what remains and ask user how to proceed.
+- `ag done` auto-bumps VERSION (patch) and flushes state on main.

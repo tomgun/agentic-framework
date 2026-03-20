@@ -359,13 +359,19 @@ def build_registry(root: Path) -> RegistryData:
             run_command="bash .agentic/lib/hooks/pre-commit-check.sh",
             file_count=len(gates),
         ),
-        TestCategory(
-            name="Checklists",
-            description="Manual/agent-verified checklists for workflow phases",
-            directory=".agentic/lib/checklists/",
-            file_pattern="*.md",
-            run_command="(verified during workflow execution)",
-            file_count=len(checklists),
+        *(
+            [
+                TestCategory(
+                    name="Checklists",
+                    description="Manual/agent-verified checklists for workflow phases",
+                    directory=".agentic/lib/checklists/",
+                    file_pattern="*.md",
+                    run_command="(verified during workflow execution)",
+                    file_count=len(checklists),
+                ),
+            ]
+            if checklists
+            else []
         ),
     ]
 

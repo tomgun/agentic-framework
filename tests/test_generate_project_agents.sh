@@ -51,10 +51,11 @@ setup_react_project() {
     # Copy specialization rules
     cp "$FRAMEWORK_ROOT/.agentic/lib/agents/specialization/react.conf" "$TEST_DIR/.agentic/lib/agents/specialization/"
 
-    # Copy generic agents
-    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/implementation-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
-    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/test-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
-    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/review-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
+    # Copy generic agents (if they exist — removed in v2 simplification)
+    for agent_file in implementation-agent.md test-agent.md review-agent.md; do
+      [[ -f "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/$agent_file" ]] && \
+        cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/$agent_file" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
+    done
 
     # Create package.json with React
     cat > "$TEST_DIR/package.json" << 'EOF'
@@ -97,9 +98,11 @@ setup_go_project() {
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/"
     cp "$FRAMEWORK_ROOT/.agentic/lib/agents/specialization/go.conf" "$TEST_DIR/.agentic/lib/agents/specialization/"
-    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/implementation-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
-    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/test-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
-    cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/review-agent.md" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
+    # Copy generic agents (if they exist — removed in v2 simplification)
+    for agent_file in implementation-agent.md test-agent.md review-agent.md; do
+      [[ -f "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/$agent_file" ]] && \
+        cp "$FRAMEWORK_ROOT/.agentic/lib/agents/claude/subagents/$agent_file" "$TEST_DIR/.agentic/lib/agents/claude/subagents/"
+    done
 
     # Go detection: go.mod file
     cat > "$TEST_DIR/go.mod" << 'EOF'
