@@ -1,10 +1,10 @@
 # Key Insights: What Actually Works for AI Agent Control
 
-**Purpose**: Strategic lessons from v0.1.0 through v0.59.0 (~1500 commits) of framework development. Not tactical mistakes (those are in `FRAMEWORK_DEVELOPMENT.md` § Lessons Learned) — these are the **design patterns that make AI agents reliably productive**.
+**Purpose**: Strategic lessons from v0.1.0 through v0.65.0 (~800 commits) of framework development. Not tactical mistakes (those are in `FRAMEWORK_DEVELOPMENT.md` § Lessons Learned) — these are the **design patterns that make AI agents reliably productive**.
 
 **Audience**: Anyone building an agentic coding workflow — whether using this framework or designing their own.
 
-**Contributor**: These insights were discovered by Tomas through hands-on building, testing, breaking, and rebuilding across 53 framework versions and ~1400 commits. Each pattern was earned through real failures — lost plans, ignored rules, corrupted state, skipped workflows — and the stubborn insistence on understanding *why* things failed, not just fixing them.
+**Contributor**: These insights were discovered by Tomas through hands-on building, testing, breaking, and rebuilding across 65+ framework versions and ~800 commits. Each pattern was earned through real failures — lost plans, ignored rules, corrupted state, skipped workflows — and the stubborn insistence on understanding *why* things failed, not just fixing them.
 
 ---
 
@@ -370,7 +370,7 @@ Design your workflow around this reality. Every valuable output must reach a git
 
 ## 17. CLI State Machines — The Endgame for Workflow Enforcement
 
-**The problem**: Insights #1–#16 document an escalating arms race: agents skip behavioral rules → add more instruction files → agents still skip → add structural gates → agents route around them → add artifact-embedded enforcement → agents skip the artifacts. By v0.58.0, the framework had accumulated ~130 instruction files (~34K lines) telling agents WHAT to do. Skills, checklists, workflow docs, quality standards, subagent definitions, memory-seed — all attempting to make probabilistic LLMs follow deterministic processes. It wasn't working reliably. The same agent following the same instructions would sometimes skip plan review, sometimes forget doc updates, sometimes commit without quality checks. Not because the instructions were bad — because LLMs are fundamentally probabilistic. They can decide to skip steps regardless of how many files tell them not to.
+**The problem**: Insights #1–#16 document an escalating arms race: agents skip behavioral rules → add more instruction files → agents still skip → add structural gates → agents route around them → add artifact-embedded enforcement → agents skip the artifacts. By v0.65.0, the framework had accumulated ~130 instruction files (~34K lines) telling agents WHAT to do. Skills, checklists, workflow docs, quality standards, subagent definitions, memory-seed — all attempting to make probabilistic LLMs follow deterministic processes. It wasn't working reliably. The same agent following the same instructions would sometimes skip plan review, sometimes forget doc updates, sometimes commit without quality checks. Not because the instructions were bad — because LLMs are fundamentally probabilistic. They can decide to skip steps regardless of how many files tell them not to.
 
 **The insight**: Stop trying to make instructions detailed enough that LLMs follow them. Instead, make the CLI enforce the workflow so LLMs *cannot* skip steps. A state machine with artifact-based preconditions turns workflow compliance from a probability into a certainty.
 
