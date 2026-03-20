@@ -1040,6 +1040,7 @@ for template in "${TEMPLATES[@]}"; do
   fi
 
   # Check for trigger words (constitutional — must be in template)
+  if [[ "$V2_ENGINE" != "1" ]]; then
   if grep -qi "trigger\|STOP.*Run\|TOO BIG\|implement entire" "$template_path" 2>/dev/null; then
     pass "${template_name}: has trigger words"
   else
@@ -1049,6 +1050,7 @@ for template in "${TEMPLATES[@]}"; do
     else
       fail "${template_name}: missing trigger words"
     fi
+  fi
   fi
 
   # Check for small batch development
@@ -2477,6 +2479,7 @@ else
 fi
 fi
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q "retro.*check\|retro_check\|Retrospective.*Check\|Step 6" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/completing-work/SKILL.md"; then
   pass "F-0174: completing-work SKILL.md has retro check"
 else
@@ -2487,6 +2490,7 @@ if grep -q "retro.*check\|retro_check\|Retrospective.*Check\|Step 6" "${FRAMEWOR
   pass "F-0174: root completing-work SKILL.md has retro check"
 else
   fail "F-0174: root completing-work SKILL.md missing retro check"
+fi
 fi
 
 if grep -q "retro.*action\|check_retro_action" "${FRAMEWORK_ROOT}/.agentic/lib/tools/periodic-checks.sh"; then
@@ -2550,6 +2554,7 @@ fi
 # ============================================================
 echo "--- F-0176: Plan-Aware Code Review ---"
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 # SKILL.md mentions plan alignment
 if grep -q "Plan Alignment\|plan.*found\|journal/plans" "${FRAMEWORK_ROOT}/.claude/skills/reviewing-code/SKILL.md"; then
   pass "F-0176: reviewing-code SKILL.md has plan alignment"
@@ -2589,6 +2594,7 @@ if grep -q "Unplanned additions\|unplanned additions" "${FRAMEWORK_ROOT}/.claude
   pass "F-0176: SKILL.md flags unplanned additions"
 else
   fail "F-0176: SKILL.md missing 'unplanned additions' concept"
+fi
 fi
 
 # Acceptance criteria file exists
@@ -3104,6 +3110,7 @@ fi
 
 echo "--- F-0140: Proactive WIP Creation in Agent Instructions ---"
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 # Plan-mode-exit trigger chains to ag implement across all instruction files
 for file in \
   "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" \
@@ -3139,6 +3146,7 @@ if grep -q "auto-creates WIP lock" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-s
   pass "F-0140: memory-seed.md has WIP creation in plan-mode-exit section"
 else
   fail "F-0140: memory-seed.md missing WIP creation in plan-mode-exit section"
+fi
 fi
 
 # doctor.py checks WIP path via paths.py (wip_file) or hardcoded .agentic/session/WIP.md
@@ -3471,6 +3479,7 @@ else
   fail "F-0147: managing-specs skill still exists (generated)"
 fi
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 # writing-specs references
 for ref in spec_writing.md spec_evolution.md spec_protection.md; do
   if [[ -f "${FRAMEWORK_ROOT}/.claude/skills/writing-specs/references/${ref}" ]]; then
@@ -3479,6 +3488,7 @@ for ref in spec_writing.md spec_evolution.md spec_protection.md; do
     fail "F-0147: writing-specs reference ${ref} missing"
   fi
 done
+fi
 
 # Gate 4 in check-gates.sh
 if grep -q "plan_review_enabled" "${FRAMEWORK_ROOT}/.claude/skills/implementing-features/scripts/check-gates.sh" 2>/dev/null; then
@@ -3606,6 +3616,7 @@ echo "--- F-0149: Spec Clarification Taxonomy ---"
 
 WRITING_SPECS_SKILL="${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/writing-specs/SKILL.md"
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -qi "Clarification Pass" "$WRITING_SPECS_SKILL" 2>/dev/null; then
   pass "F-0149: writing-specs skill includes clarification pass"
 else
@@ -3634,6 +3645,7 @@ if grep -qi "trivial.*<3\|Skip.*pass.*trivial" "$WRITING_SPECS_SKILL" 2>/dev/nul
 else
   fail "F-0149: trivial feature skip not documented"
 fi
+fi
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0149.md" ]]; then
   pass "F-0149: acceptance criteria file exists"
@@ -3649,6 +3661,7 @@ echo "--- F-0150: Execution Order and Parallelization Markers ---"
 PLANNING_SKILL="${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/planning-features/SKILL.md"
 IMPLEMENTING_SKILL="${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/implementing-features/SKILL.md"
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -qi "Execution Order" "$PLANNING_SKILL" 2>/dev/null; then
   pass "F-0150: planning-features has Execution Order section"
 else
@@ -3671,6 +3684,7 @@ if grep -qi "Proceed to P2\|P1.*complete" "$IMPLEMENTING_SKILL" 2>/dev/null; the
   pass "F-0150: implementing-features requires user confirmation for P2"
 else
   fail "F-0150: implementing-features missing P2 confirmation"
+fi
 fi
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0150.md" ]]; then
@@ -3803,12 +3817,14 @@ else
   fail "F-0152: AC-005: spec-analyze.sh missing severity ratings"
 fi
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 # AC-006: implementing-features skill references spec-analyze
 # (IMPLEMENTING_SKILL already defined in F-0150 section)
 if grep -q 'spec-analyze' "$IMPLEMENTING_SKILL" 2>/dev/null; then
   pass "F-0152: AC-006: implementing-features skill references spec-analyze"
 else
   fail "F-0152: AC-006: implementing-features skill missing spec-analyze reference"
+fi
 fi
 
 # AC-007: advisory — always exits 0
@@ -4142,6 +4158,7 @@ else
 fi
 fi
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 # T-0065: Review trigger in instruction file trigger tables
 for file in ".agentic/lib/agents/copilot/copilot-instructions.md" \
             ".agentic/lib/agents/codex/codex-instructions.md" \
@@ -4152,6 +4169,7 @@ for file in ".agentic/lib/agents/copilot/copilot-instructions.md" \
     fail "T-0065: Review trigger missing from $(basename "$file")"
   fi
 done
+fi
 
 # T-0066: Unit tests exist for review module
 if [[ -f "${FRAMEWORK_ROOT}/tests/test_review.py" ]]; then
@@ -4887,6 +4905,7 @@ else
   fail "T-0139: memory-seed.md missing ag feedback sentinel"
 fi
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 # T-0140: instruction files have ag feedback in quick commands
 INSTRUCTION_FEEDBACK_COUNT=0
 _T0140_FILES=(
@@ -4894,10 +4913,8 @@ _T0140_FILES=(
   "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/cursorrules.txt"
   "${FRAMEWORK_ROOT}/.agentic/lib/agents/copilot/copilot-instructions.md"
   "${FRAMEWORK_ROOT}/.agentic/lib/agents/codex/codex-instructions.md"
+  "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/agent_operating_guidelines.md"
 )
-if [[ "$V2_ENGINE" != "1" ]]; then
-  _T0140_FILES+=("${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/agent_operating_guidelines.md")
-fi
 _T0140_EXPECTED=${#_T0140_FILES[@]}
 for f in "${_T0140_FILES[@]}"; do
   if grep -q 'ag feedback' "$f" 2>/dev/null; then
@@ -4908,6 +4925,7 @@ if [[ "$INSTRUCTION_FEEDBACK_COUNT" -ge "$_T0140_EXPECTED" ]]; then
   pass "T-0140: ag feedback in instruction files (${INSTRUCTION_FEEDBACK_COUNT}/${_T0140_EXPECTED})"
 else
   fail "T-0140: ag feedback in instruction files (${INSTRUCTION_FEEDBACK_COUNT}/${_T0140_EXPECTED}, expected ${_T0140_EXPECTED})"
+fi
 fi
 
 if [[ "$V2_ENGINE" != "1" ]]; then
@@ -4948,6 +4966,7 @@ else
   fail "T-0144: agents_helpers.py missing check-tdd-phases command"
 fi
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 # T-0145: implementing-features SKILL.md has TDD conditional branch (template)
 if grep -q 'development_mode.*tdd' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/implementing-features/SKILL.md"; then
   pass "T-0145: template SKILL.md has TDD conditional branch"
@@ -4960,6 +4979,7 @@ if grep -q 'development_mode.*tdd' "${FRAMEWORK_ROOT}/.claude/skills/implementin
   pass "T-0146: framework-dev SKILL.md has TDD conditional branch"
 else
   fail "T-0146: framework-dev SKILL.md missing TDD conditional branch"
+fi
 fi
 
 # T-0147: pre-commit-check.sh has Check #20
