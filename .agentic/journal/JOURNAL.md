@@ -3671,3 +3671,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 13:54 - F-0241: Central QA Registry
+
+**Why**: Test coverage was fragmented across 12+ categories with no central visibility into what's tested and what gaps exist
+
+**What changed**:
+- Framework now has a generated QA map (docs/QA_REGISTRY.md) showing 207 features, 95 with test mappings, and 112 coverage gaps across 9 test categories. ag qa command provides on-demand generation and staleness checks.
+
+**Next steps**:
+- Implement F-0240 (Framework Execution Log) as foundation for simulation testing
+
+**Blockers**: None
+

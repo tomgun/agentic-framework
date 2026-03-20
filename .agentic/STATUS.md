@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item (Updated: 2026-03-20 13:18 UTC)
+- F-0241 QA Registry complete, ready for PR (Updated: 2026-03-20 13:54 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item
@@ -28,3 +28,4 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 ## Release notes (optional)
 - v0.58.0: F-0239 structural enforcement for post-merge workflow
 - See CHANGELOG.md for full history
+- QA: QA: 0/1 verified, 5 pending

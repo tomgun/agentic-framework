@@ -4201,3 +4201,55 @@ Proposed restructuring:
 **Description**: Hook-based detection for bypassed `ag merge`. UserPromptSubmit warns when recent commits contain unshipped F-XXXX IDs on main. PostToolUse Bash hook warns when `gh pr merge` is used directly. Codifies enforcement hierarchy in PRINCIPLES.md D2 with "3+ skip promotion rule."
 
 **Acceptance**: See `spec/acceptance/F-0239.md`
+
+---
+
+## F-0240: Framework Execution Log
+
+**Status**: planned
+**Category**: Infrastructure
+**Priority**: medium
+**Complexity**: low
+
+**Description**: Structured append-only log at `.agentic/session/framework.log` that every script writes to when called. Tool-agnostic execution trace (works with Claude, Cursor, Copilot, Codex). Provides debugging value ("why did my commit fail?") and serves as data source for simulation testing (F-0242) and tier experiments (F-0243). Phase 1 instruments choke points (ag.sh, pre-commit, hooks) for ~80% coverage.
+
+**Acceptance**: See `spec/acceptance/F-0240.md`
+
+---
+
+## F-0241: Central QA Registry
+
+**Status**: implementing
+**Category**: Testing
+**Priority**: high
+**Complexity**: medium
+
+**Description**: Generated document (`docs/QA_REGISTRY.md`) produced by `tests/qa_registry.py` that catalogs every QA method, maps features to tests, and identifies gaps. Scans validate_framework.sh, pytest files, LLM tests, scenarios, pre-commit gates, and checklists. Adds `ag qa` command and advisory freshness check. Independent of other QA Observatory features.
+
+**Acceptance**: See `spec/acceptance/F-0241.md`
+
+---
+
+## F-0242: Simulation Testing (Phase + Sequence)
+
+**Status**: planned
+**Category**: Testing
+**Priority**: medium
+**Complexity**: high
+
+**Description**: Extends scenario YAML format with intermediate state expectations (phase_expectations) and tool-call sequence checks (tool_call_expectations). PhaseChecker uses framework.log for phase detection. Refactors existing detect_violations() to YAML-driven declarations, migrating hard-coded violations in the same PR. Depends on F-0240.
+
+**Acceptance**: See `spec/acceptance/F-0242.md`
+
+---
+
+## F-0243: Complexity Tier Experiments
+
+**Status**: planned
+**Category**: Testing
+**Priority**: medium
+**Complexity**: high
+
+**Description**: Runs the same task across three real configuration profiles (discovery/formal/autonomous_formal) and compares outcomes empirically. Answers "does the complexity actually help?" with universal metrics (app_runs, tests_pass, test_count) and framework-specific metrics reported separately. Depends on F-0240.
+
+**Acceptance**: See `spec/acceptance/F-0243.md`

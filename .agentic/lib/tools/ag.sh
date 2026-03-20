@@ -261,6 +261,10 @@ case "${1:-help}" in
     hooks)
         cmd_hooks "${2:-}" "${3:-}"
         ;;
+    qa)
+        shift
+        cmd_qa "$@"
+        ;;
     trace)
         shift
         cmd_trace "$@"

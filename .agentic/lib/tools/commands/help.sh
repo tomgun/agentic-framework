@@ -38,6 +38,7 @@ COMMANDS:
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     kickoff <sub>       Vision-to-backlog pipeline (prompt|--review|--approve|--discard|--status)
     decompose F-XXXX    Break epic into child features by component
+    qa [--check|--json] QA Registry: feature-to-test map and gap analysis
     audit [options]     Spec verification & QA audit (--full, --status, --propagate, --metrics)
     nfr [sub]           NFR management (list, discover, coverage)
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
@@ -121,6 +122,7 @@ COMMANDS:
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     kickoff <sub>       Vision-to-backlog pipeline (prompt|--review|--approve|--discard|--status)
     decompose F-XXXX    Break epic into child features by component
+    qa [--check|--json] QA Registry: feature-to-test map and gap analysis
     audit [options]     Spec verification & QA audit (--full, --status, --propagate, --metrics)
     nfr [sub]           NFR management (list, discover, coverage)
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
