@@ -3464,3 +3464,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 06:11 - F-0221: Review fixes
+
+**Why**: Code review found production bugs that would silently break hooks
+
+**What changed**:
+- Fixed 3 bugs from code review: grep pipefail crash in UserPromptSubmit, macOS grep -oP portability in on-code-edit, empty file_path fallthrough. Added CHANGELOG entry.
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+

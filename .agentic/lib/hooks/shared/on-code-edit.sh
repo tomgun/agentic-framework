@@ -62,10 +62,13 @@ if [[ -n "$STDIN_DATA" ]]; then
     EDITED_FILE=$(echo "$STDIN_DATA" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
   fi
   if [[ -z "$EDITED_FILE" ]]; then
-    # Grep fallback: look for file_path in JSON
-    EDITED_FILE=$(echo "$STDIN_DATA" | grep -oP '"file_path"\s*:\s*"([^"]+)"' | head -1 | sed 's/.*"file_path"\s*:\s*"\([^"]*\)".*/\1/')
+    # POSIX-compatible fallback (no grep -P, works on macOS BSD grep)
+    EDITED_FILE=$(echo "$STDIN_DATA" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
   fi
 fi
+
+# If we couldn't extract a file path, skip warning (can't confirm it's a code file)
+[[ -n "$EDITED_FILE" ]] || exit 0
 
 # --- Allowlist: skip warning for non-code files ---
 # These are safe to edit even with a DRAFT plan (spec work, test work, memory, etc.)

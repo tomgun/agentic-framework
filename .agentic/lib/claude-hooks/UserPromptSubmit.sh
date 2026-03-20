@@ -112,7 +112,7 @@ if [[ -d ".agentic/journal/plans" ]]; then
       [[ -f "$plan_file" ]] || continue
       if grep -q '^\*\*Status\*\*.*DRAFT' "$plan_file" 2>/dev/null || \
          grep -q '^Status:.*DRAFT' "$plan_file" 2>/dev/null; then
-        PLAN_FID=$(basename "$plan_file" | grep -oE 'F-[0-9]{4,}' | head -1)
+        PLAN_FID=$(basename "$plan_file" | grep -oE 'F-[0-9]{4,}' | head -1) || true
         DRAFT_PLANS="${DRAFT_PLANS}${PLAN_FID:-unknown} "
       fi
     done
