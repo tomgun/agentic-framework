@@ -3801,3 +3801,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 21:03 - Phase 3 Complete
+
+**Why**: Phase 3 instruction consolidation removes ~130 files of redundant instructions now enforced by v2 CLI
+
+**What changed**:
+- All 5 sub-phases done: 3A (validate_framework v2 mode), 3B (enriched prompts + conventions.md), 3C (skill stubs + template updates), 3D (4 deletion batches: ~25.6K lines removed), 3E (migration guide + docs)
+
+**Next steps**:
+- Create PR for Phase 3
+
+**Blockers**: None
+
