@@ -219,7 +219,7 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0084: LLM test: agent must update all project documentation (HOW_IT_WORKS, DEVELOPER_GUIDE, FRAMEWORK_WORKFLOW, FRAMEWORK_MAP, README, CHANGELOG) BEFORE creating a PR — not post-merge. Step 6 of implementing-features skill. Background: F-0241 shipped with zero doc updates; required a separate fix PR #175 after user caught the gap. docs_gate: blocking should catch this if ag done is used properly.
 - **Added**: 2026-03-20
 
-### T-0085: LLM test: agent must update specs/acceptance criteria when implementation changes affect shipped features — Step 7 of implementing-features skill. Create migration via migration.sh, add new ACs with migration reference. Background: this is a recurring skip — agents treat shipped specs as frozen rather than living documents that evolve with implementation. Related: feedback_doc_updates_must_be_structural.md.
+### T-0085: LLM test: agent must update specs/acceptance criteria AND write the migration log when implementation changes affect shipped features — Step 7 of implementing-features skill. Both actions required: (1) create migration via migration.sh documenting why the spec evolved, (2) add new ACs to affected spec/acceptance/F-XXXX.md with migration reference. Background: this is a recurring skip — agents treat shipped specs as frozen rather than living documents that evolve with implementation. Related: feedback_doc_updates_must_be_structural.md.
 - **Added**: 2026-03-20
 
 ## Done
