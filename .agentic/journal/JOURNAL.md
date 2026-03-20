@@ -3476,6 +3476,7 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 - Merge PR
 
 
+
 ### Session: 2026-03-20 06:36 - F-0237+F-0238: Memory-seed optimization + session analysis tool
 
 **Why**: Memory-seed exceeded 100-line ceiling (L-0002); manual session analysis took 30+ min
@@ -3528,7 +3529,7 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
-### Session: 2026-03-20 08:09 - F-0224 Doc Decision Tree
+### Session: 2026-03-20 08:09 - F-0237 Doc Decision Tree
 
 **Why**: Doc updates kept getting skipped because instructions were too vague — concrete file lists and decision trees are harder to skip
 
@@ -3563,6 +3564,19 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Next steps**:
 - Commit and push to PR
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 09:17 - F-0237/F-0238 Review Fixes (Round 2)
+
+**Why**: Code review found 7 issues — must fix all before merge
+
+**What changed**:
+- Fixed all review findings: cursorrules.txt template dogfood violation (ag analyze-session), dead implement_seen variable, grouped code_before_review violations, F-0238 AC-002 missing skipped_planning, journal ID references F-0224→F-0237, unit tests for session-analyze.py (7 tests), expanded allowlist for state files.
+
+**Next steps**:
+- Push and merge
 
 **Blockers**: None
 

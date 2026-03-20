@@ -101,10 +101,10 @@ def detect_violations(events: list[dict]) -> list[dict]:
     violations = []
     plan_mode_exited = False
     plan_approved = False
-    implement_seen = False
     plan_mode_entered = False
     last_plan_exit_ts = None
     last_plan_exit_idx = None
+    code_before_review_files = []  # Group consecutive violations
 
     for i, evt in enumerate(events):
         # Track plan mode entry
@@ -151,30 +151,43 @@ def detect_violations(events: list[dict]) -> list[dict]:
                     })
                     plan_mode_exited = False  # Reset to avoid duplicate detection
 
-        # Violation 2: Code before review
+        # Violation 2: Code before review (grouped — one violation per draft phase, not per file)
         if evt["type"] == "tool_use" and evt["tool_name"] in ("Write", "Edit", "MultiEdit"):
             file_path = evt.get("tool_input", {}).get("file_path", "")
-            # Skip spec/test/plan files
+            # Skip spec/test/plan files and framework state files
             if file_path and not _is_allowlisted(file_path):
                 if plan_mode_exited and not plan_approved:
-                    violations.append({
-                        "type": "code_before_review",
-                        "description": f"Writing code ({file_path}) before plan is APPROVED",
-                        "timestamp": _fmt_ts(evt["timestamp"]),
-                        "file_path": file_path,
-                    })
+                    code_before_review_files.append(file_path)
+
+        # When plan gets approved or new plan mode entered, flush grouped violations
+        if plan_approved and code_before_review_files:
+            violations.append({
+                "type": "code_before_review",
+                "description": f"Writing code before plan APPROVED ({len(code_before_review_files)} files)",
+                "timestamp": _fmt_ts(last_plan_exit_ts),
+                "files": code_before_review_files[:20],  # Cap list
+            })
+            code_before_review_files = []
 
         # Violation 3: Skipped planning
         if evt["type"] == "tool_use" and evt["tool_name"] == "Bash":
             cmd = evt.get("tool_input", {}).get("command", "")
             if "ag implement" in cmd or "ag.sh implement" in cmd:
-                implement_seen = True
                 if not plan_mode_entered:
                     violations.append({
                         "type": "skipped_planning",
                         "description": "ag implement called without prior plan mode entry",
                         "timestamp": _fmt_ts(evt["timestamp"]),
                     })
+
+    # Flush any remaining grouped code_before_review violations
+    if code_before_review_files:
+        violations.append({
+            "type": "code_before_review",
+            "description": f"Writing code before plan APPROVED ({len(code_before_review_files)} files)",
+            "timestamp": _fmt_ts(last_plan_exit_ts),
+            "files": code_before_review_files[:20],
+        })
 
     return violations
 
@@ -185,7 +198,9 @@ def _is_allowlisted(path: str) -> bool:
     for prefix in ("spec/", "tests/", "test/", "/tests/", "/test/",
                     "journal/", ".agentic/session/",
                     "memory/", ".agentic/todo", ".agentic/status",
-                    ".agentic/human_needed", ".agentic/contributions"):
+                    ".agentic/human_needed", ".agentic/contributions",
+                    "backlog.json", "features.md", "issues.md",
+                    "changelog", "stack.md", "overview.md"):
         if prefix in parts:
             return True
     if path.endswith("-plan.md"):
@@ -264,6 +279,10 @@ def print_report(violations: list[dict], timeline: list[dict], path: str):
                 print(f"  User prompt: {v['user_prompt']}")
             if v.get("file_path"):
                 print(f"  File: {v['file_path']}")
+            if v.get("files"):
+                print(f"  Files ({len(v['files'])}): {', '.join(v['files'][:5])}")
+                if len(v['files']) > 5:
+                    print(f"    ... and {len(v['files']) - 5} more")
             print()
 
         print(f"## Summary")
