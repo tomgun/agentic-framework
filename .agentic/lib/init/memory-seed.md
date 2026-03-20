@@ -6,7 +6,7 @@ tokens: ~900
 # Memory Seed — Agentic Framework Action Rules
 
 <!-- memory-seed v0.65.0 -->
-<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks, centralized-ids, review_pr, pr-auto-fix, plan-convergence-loop, reviewer-catalog, expert-reviewers, ag start, ag work, ag spec, ag test, ag transition -->
+<!-- sentinels: pre-commit sequence, token-efficient scripts, ag commit, ag done, ag docs, ag docs generate, ag todo, ag backlog, dialectical review, ag review, ag worktree, ag decompose, AGENTS.json, autonomous_formal, silent session start, collision guard, ag intent, intent journal, ag auto epic, ag auto pipeline, ag coord, docs-with-code, instruction-sync, llm-test-advisory, docs-validate, docs-create, docs-mode-deferred, ag kickoff, vision-to-backlog pipeline, staging area, review_commit, review_integration, verify-epic, ag formalize, ag feedback, feedback capture, tdd-mode, checkpoint-phase, check-tdd-phases, ac-clarity-gate, nfr-applicable, p1-ac-threshold, design-trace, source-annotation, smoke-test-evidence, ExitPlanMode-hook, tool-native-hooks, centralized-ids, review_pr, pr-auto-fix, plan-convergence-loop, reviewer-catalog, expert-reviewers, ag start, ag work, ag spec, ag test, ag transition, merged-but-not-done-hook, enforcement-hierarchy -->
 
 Write these rules to persistent memory. They are action triggers — execute the specified command when the condition is met.
 
@@ -60,6 +60,7 @@ Plans saved to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` or they are LO
 **STOP.** Run `ag done F-XXXX`. P1 ACs must be 100% checked. Before ending: check TaskList, flush to `ag todo`. Review PR for "future work"/"deferred" items → `ag todo` each with **Background** + **Related** fields.
 
 - `ag merge <pr#> F-XXXX` chains merge + `ag done` — use instead of `gh pr merge`
+- **Hook enforcement**: UserPromptSubmit warns if recent commits on main have unshipped features. PostToolUse warns if `gh pr merge` used directly. Both remind to run `ag done`.
 - `ag done` runs `ag verify F-XXXX` automatically (blocking for formal, advisory for discovery)
 - Post-merge dogfood sync (framework dev): `ag done` runs `ag dogfood --brief` automatically
 - Doc lifecycle fires if STACK.md `## Docs` has entries. `docs_mode: deferred` → logs to `deferred-docs.json`

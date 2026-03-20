@@ -113,21 +113,23 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
     if [[ -n "$FEATURES_FILE" ]]; then
       # Extract F-XXXX from last 5 commit messages (catches squash merges)
       RECENT_FIDS=$(git log -5 --format=%s 2>/dev/null | grep -oE 'F-[0-9]{4,}' | sort -u || true)
-      UNSHIPPED=""
-      for fid in $RECENT_FIDS; do
-        # Check if feature exists in FEATURES.md but is NOT shipped
-        if grep -q "$fid" "$FEATURES_FILE" 2>/dev/null; then
-          if ! grep "$fid" "$FEATURES_FILE" 2>/dev/null | grep -qi 'shipped'; then
-            UNSHIPPED="${UNSHIPPED}${fid} "
+      if [[ -n "$RECENT_FIDS" ]]; then
+        UNSHIPPED=""
+        for fid in $RECENT_FIDS; do
+          # Check if feature exists in FEATURES.md but is NOT shipped
+          if grep -q "$fid" "$FEATURES_FILE" 2>/dev/null; then
+            if ! grep "$fid" "$FEATURES_FILE" 2>/dev/null | grep -qi 'shipped'; then
+              UNSHIPPED="${UNSHIPPED}${fid} "
+            fi
           fi
+        done
+        if [[ -n "$UNSHIPPED" ]]; then
+          echo ""
+          echo "⚠️  MERGED BUT NOT DONE: ${UNSHIPPED}"
+          echo "   These features appear in recent commits but aren't marked shipped."
+          echo "   Run: ag done F-XXXX — handles dogfood, VERSION, backlog, flush."
+          echo ""
         fi
-      done
-      if [[ -n "$UNSHIPPED" ]]; then
-        echo ""
-        echo "⚠️  MERGED BUT NOT DONE: ${UNSHIPPED}"
-        echo "   These features appear in recent commits but aren't marked shipped."
-        echo "   Run: ag done F-XXXX — handles dogfood, VERSION, backlog, flush."
-        echo ""
       fi
     fi
   fi

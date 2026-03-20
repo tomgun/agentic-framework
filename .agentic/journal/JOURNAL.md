@@ -3619,3 +3619,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 13:00 - F-0239 Post-Merge Enforcement
+
+**Why**: Behavioral rules for post-merge workflow keep getting skipped; promoting to structural enforcement
+
+**What changed**:
+- Hook-based detection for bypassed ag merge: UserPromptSubmit warns unshipped features, PostToolUse warns gh pr merge. Enforcement hierarchy codified in PRINCIPLES.md D2. FEATURES.md entry + AC file + memory-seed updated.
+
+**Next steps**:
+- PR review, merge
+
+**Blockers**: None
+
