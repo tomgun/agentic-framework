@@ -3527,3 +3527,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 08:09 - F-0224 Doc Decision Tree
+
+**Why**: Doc updates kept getting skipped because instructions were too vague — concrete file lists and decision trees are harder to skip
+
+**What changed**:
+- Replaced vague doc checks with concrete 3-concern structure (project docs, registry maintenance, instruction files) in implementing-features Step 6, before_commit.md backstop, and completing-work Step 5b. Added FRAMEWORK_WORKFLOW.md to docs registry.
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+

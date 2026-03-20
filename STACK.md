@@ -227,6 +227,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - doc: .agentic/lib/DIRECT_EDITING.md | runbook     | manual
 - doc: .agentic/lib/EMERGENCY.md     | runbook      | manual
 - doc: .agentic/lib/MANUAL_OPERATIONS.md | runbook   | manual
+- doc: docs/FRAMEWORK_WORKFLOW.md    | architecture | feature_done
 - doc: .agentic/CONTRIBUTIONS.md    | changelog    | pr
 - doc: spec/adr/                   | adr          | manual
 
