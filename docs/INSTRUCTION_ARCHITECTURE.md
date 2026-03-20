@@ -35,9 +35,12 @@ This design synthesizes two independent research efforts:
 
 ## 2. The Three-Layer Architecture
 
+> **v2 update**: The three-layer model is preserved but the *implementation* of each layer has shifted. v1 used instruction files + playbook docs + STACK.md config. v2 uses CLI enforcement via state machine + role prompts loaded JIT + per-feature work items in `.agentic/work/F-XXXX/`. See the v2 column in each layer below.
+
 ```mermaid
 graph TB
     subgraph L1["Layer 1: Constitution"]
+        SM[state_machine_af.yaml<br/>CLI enforcement]
         CLAUDE[CLAUDE.md<br/>~40 lines]
         CURSOR[.cursorrules<br/>~27 lines]
         COPILOT[copilot-instructions.md]
@@ -45,22 +48,20 @@ graph TB
     end
 
     subgraph L2["Layer 2: Playbooks"]
-        SKILLS[Claude Skills<br/>12 hand-crafted]
-        AUTO_ORCH[auto_orchestration.md<br/>442 lines]
-        CHECKLISTS[9 checklists]
-        AG[ag.sh dispatcher + commands/<br/>37+ commands]
+        ROLE_PROMPTS[Role prompts<br/>7 files in .agentic/prompts/]
+        SKILLS[Claude Skills<br/>13 trigger-word stubs]
+        AG[ag.sh dispatcher + v2 CLI<br/>8 workflow commands]
     end
 
     subgraph L3["Layer 3: Project State"]
         subgraph GIT_TRACKED["Git-tracked"]
+            WORK_ITEMS[.agentic/work/F-XXXX/<br/>item.yaml + artifacts]
             STACK[STACK.md]
             STATUS[STATUS.md]
-            JOURNAL[JOURNAL.md]
-            FEATURES[FEATURES.md]
+            FEATURES[FEATURES.md<br/>v1 compat shim]
         end
         subgraph SESSION["Session-local (gitignored)"]
             AGENTS_JSON[AGENTS.json<br/>agent + WIP tracking]
-            AUTO_STATE[auto-state.json<br/>auto.sock / auto.pid]
         end
     end
 
@@ -70,8 +71,8 @@ graph TB
         TOOL_HOOKS[Tool-Native Hooks<br/>PostToolUse, PreToolUse]
     end
 
-    L1 -->|"agent reads<br/>at session start"| L2
-    L2 -->|"ag commands<br/>load just-in-time"| L3
+    L1 -->|"CLI enforces<br/>transitions"| L2
+    L2 -->|"role prompts<br/>loaded JIT"| L3
     GIT_HOOKS -->|"structural<br/>enforcement"| L3
     TOOL_HOOKS -->|"transition<br/>enforcement"| L2
     MEMORY -.->|"reinforces<br/>(redundant)"| L1
@@ -82,66 +83,51 @@ graph TB
     style DEFENSE fill:#999,color:#fff
 ```
 
-### Layer 1: Constitution (instruction files)
+### Layer 1: Constitution (CLI enforcement + instruction files)
 
-**Files**: CLAUDE.md, .cursorrules, copilot-instructions.md, codex-instructions.md
+| Aspect | v1 | v2 |
+|--------|-----|-----|
+| **Primary enforcement** | Instruction files (<100 lines) | `state_machine_af.yaml` — CLI enforces transitions with artifact preconditions |
+| **Instruction files** | CLAUDE.md, .cursorrules, copilot, codex (38-54 lines) | Same files, same size — behavioral rules that can't be structurally enforced |
+| **What moved** | Gates table, delegation table, session protocols → Layer 2 | Workflow sequencing → state machine YAML; gate logic → preconditions.py |
 
-**Current state**: 38-54 lines across tools (template CLAUDE.md: 40, root CLAUDE.md: 54, cursorrules: 27, copilot: 38, codex: 40). For Claude Code, trigger words have moved to Skills (see Layer 2).
+**Files**: CLAUDE.md, .cursorrules, copilot-instructions.md, codex-instructions.md — still the behavioral constitution. `state_machine_af.yaml` — the structural constitution (10 states, transitions, modes, profiles).
 
-**Research says**: 300-800 tokens, invariant rules only (ChatGPT); under 100 lines for attention quality (L-0002).
+**Design principle**: The state machine enforces workflow ordering structurally (exit 1 on invalid transitions). Instruction files contain ONLY rules that cannot be structurally enforced (anti-hallucination, "ask when uncertain", trigger words).
 
-**Design principle**: Instruction files ARE the constitution. They should contain ONLY rules that cannot be structurally enforced.
+**Research basis**: Same as v1 — 300-800 tokens (ChatGPT), under 100 lines (L-0002). v2 reduces reliance on instruction file compliance by moving more enforcement into the CLI.
 
-**What stays** (cannot be structurally enforced — agent must choose to comply):
-- Trigger table — tested, tests 003/010 pass. **For Claude Code, the trigger table has been moved to Skills (`.claude/skills/*/SKILL.md` descriptions, F-0143). Other tools retain the trigger table in their instruction files.**
-- Token-efficient scripts references — tested, tests 004/019 pass
-- "Never auto-commit" — behavioral rule
-- "Never fabricate APIs" — behavioral rule
-- Core behavioral boundaries (ask when uncertain, etc.)
+### Layer 2: Playbooks (role prompts loaded JIT on transitions)
 
-**What moves to Layer 2** (already structurally enforced):
-- Gates table — informational; pre-commit-check.sh enforces regardless
-- Delegation table — orchestrator implementation detail
-- Session protocol details — structurally handled by `ag start`
+| Aspect | v1 | v2 |
+|--------|-----|-----|
+| **Key files** | auto_orchestration.md (442 lines), 9 checklists, quality standards, workflow docs | 7 role prompts in `.agentic/prompts/` (~350 lines total) + `conventions.md` |
+| **Loading mechanism** | `ag` commands print guidance from playbook files | CLI transition emits the role prompt for the target state |
+| **Skills** | 12 hand-crafted skills with instructions + scripts + references | 13 trigger-word stubs (~370 lines total) that route to `ag` commands |
 
-**Applies to both**: Root CLAUDE.md (framework development) AND template CLAUDE.md (`.agentic/lib/agents/claude/CLAUDE.md`). Different audiences, same constitutional principle.
+**Role prompts** are the v2 playbook mechanism. When a transition succeeds (e.g., `ag transition F-XXXX implementation`), the CLI emits the `implementer.md` role prompt. State-to-prompt mapping: `planning` → `planner.md`, `plan_review` → `reviewer.md`, `spec` → `planner.md`, `implementation` → `implementer.md`, `verification` → `verifier.md`, `docs` → `implementer.md`, `ready_to_ship` → `verifier.md`. Additional prompts: `debugger.md`, `session.md`, `explorer.md`.
 
-### Layer 2: Playbooks (already exist)
+**Skills** in v2 are reduced to trigger-word stubs — they match user intent to the right `ag` command but no longer bundle full playbook content. The role prompts replace skill references + checklists + workflow docs.
 
-**Key files**: auto_orchestration.md (442 lines), agent_operating_guidelines.md (127 lines), 9 checklists, quality standards, workflow docs.
+### Layer 3: Project State (per-feature work items)
 
-**Loading mechanism**: `ag` commands print relevant instructions at the right moment. auto_orchestration.md is NOT referenced in any instruction file — it is accessed indirectly when agents run `ag implement`, `ag commit`, etc., which print task-specific guidance. This is intentional: just-in-time delivery via scripts.
+| Aspect | v1 | v2 |
+|--------|-----|-----|
+| **Feature state** | FEATURES.md entries + STACK.md settings | `.agentic/work/F-XXXX/item.yaml` (status, mode, profile, transitions) |
+| **Artifacts** | Scattered: `spec/acceptance/`, `journal/plans/`, `spec/reviews/` | Co-located: `.agentic/work/F-XXXX/plan.md`, `spec.md`, `review.md`, `verification.json` |
+| **Config** | STACK.md (grep/sed parsing) | `state_machine_af.yaml` (structured YAML) |
+| **Compat** | N/A | FEATURES.md sync shim keeps v1 status in sync during transition |
 
-**Gap**: `ag` commands don't explicitly tell the agent WHICH playbook file to read for deeper details. See Gap 3.
-
-#### Skills (Claude Code-specific playbook delivery)
-
-Skills are Claude Code's native mechanism for delivering playbook-level instructions. They implement the same principle as Layer 2 (just-in-time delivery) via tool-native UI — Claude Code surfaces the right skill based on task description, so agents receive workflow instructions without loading the full auto_orchestration.md playbook.
-
-- **Source**: `.agentic/lib/agents/claude/skills/` (hand-crafted, 12 skills) + `.agentic/local/extensions/skills/` (project-specific, F-0151)
-- **Generated to**: `.claude/skills/` (by `generate-skills.sh`, merges framework + extension skills)
-- **Each skill bundles**: `SKILL.md` (instructions) + `scripts/` (gates/validation) + `references/` (playbook copies)
-- **Progressive disclosure**: YAML frontmatter on 168 of 212 `.agentic/` files enables ~96% discovery savings (~184K tokens saved per full scan)
-- **Context cost**: Only skill descriptions (~900 tokens) are always loaded in the system prompt. `.agentic/` frontmatter is inert — never auto-loaded, zero token cost until explicitly read. Full analysis: `docs/research/2026-03-01-frontmatter-context-impact.md`
-
-Other tools (Cursor, Copilot, Codex) continue using `auto_orchestration.md` + `ag` commands for Layer 2 delivery. Skills are additive — they don't replace the existing Layer 2 mechanism, they provide a tool-native alternative for Claude Code (F-0143).
-
-### Layer 3: Project State
-
-**Git-tracked state** (survives across machines):
-- STACK.md — git-tracked, parseable config file read by ag.sh with grep/sed
-- STATUS.md — holds all runtime state (focus, progress, next, blocker) plus roadmap, risks, decisions. Updated directly by status.sh.
+**Git-tracked state**:
+- `.agentic/work/F-XXXX/item.yaml` — work item state (status, mode, profile, priority, transition history)
+- `.agentic/work/F-XXXX/plan.md`, `spec.md`, `review.md`, `verification.json`, `journal.md` — co-located artifacts
+- STACK.md — still used for project-level config (git workflow, verification commands override)
+- STATUS.md — session snapshot, updated by `status.sh`
 
 **Session-local state** (gitignored):
-- `AGENTS.json` — agent registration + work-in-progress tracking (replaces WIP.md and AGENTS_ACTIVE.md)
-- `.agentic/session/auto.sock` — Unix domain socket for engine control
-- `.agentic/session/auto.pid` — engine PID file
-- `.agentic/session/auto-state.json` — engine progress state
-- `.agentic/session/crunch-state.json` — batch mode progress
+- `AGENTS.json` — agent registration + work-in-progress tracking
 
-**Design property**: State that must survive across machines goes in git-tracked files. State that is session-local goes in gitignored files. This distinction must be preserved.
-
-**Future consideration**: A compact config.json (aggregating STACK.md keys + runtime state) could help subagent context injection. Lower priority than Gaps 1-4 — STACK.md parsing works today.
+**Design property**: All feature state is co-located in `.agentic/work/F-XXXX/`. Artifact preconditions (e.g., "plan.md must exist before plan_review") are checked by the CLI against the work directory. This eliminates the v1 pattern of scattered artifacts validated by complex shell scripts.
 
 ### Defense-in-Depth: Hooks
 

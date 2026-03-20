@@ -87,6 +87,20 @@ Example projects demonstrate best practices and verify workflows actually work.
 2. **Root files extend, not replace** - add only project-specific notes
 3. **Never let root diverge** - if root has features template doesn't, backport immediately
 
+**v2 instruction file set** (reduced from ~11 to ~5):
+- `.agentic/prompts/*.md` — 7 role prompts (planner, reviewer, implementer, verifier, debugger, session, explorer)
+- `.agentic/conventions.md` — consolidated coding conventions
+- `.agentic/state_machine_af.yaml` — workflow states, transitions, modes, profiles
+- Agent instruction files — CLAUDE.md, .cursorrules, copilot-instructions.md, codex-instructions.md (behavioral rules only)
+- `.claude/skills/` — 13 trigger-word stubs (route to `ag` commands)
+
+**Removed in v2** (content absorbed into role prompts + conventions.md + CLI enforcement):
+- Checklists (`.agentic/lib/checklists/`) — gate logic moved to `preconditions.py`
+- Workflow docs (`.agentic/lib/workflows/`) — sequencing moved to state machine
+- Quality standards (`.agentic/quality/`) — merged into `conventions.md`
+- Subagent definitions (`.agentic/lib/agents/roles/`, `subagents/`) — replaced by role prompts
+- Full skill bundles (instructions + scripts + references) — replaced by trigger-word stubs
+
 **When adding new features to CLAUDE.md**:
 1. Add to `.agentic/lib/agents/claude/CLAUDE.md` FIRST
 2. Test that users would benefit from it
@@ -438,12 +452,12 @@ refactor(docs): eliminate documentation duplication
 
 ### 12. **Common Framework Development Patterns**
 
-**Adding a new workflow document**:
-1. Create `.agentic/lib/workflows/new_workflow.md`
-2. Link from `agent_operating_guidelines.md` if agents should follow it
-3. Link from `DEVELOPER_GUIDE.md` if users should know about it
-4. Add example to relevant example project
-5. Update `START_HERE.md` document index if major workflow
+**Adding a new workflow document** (v2):
+1. Determine which role prompt(s) need updating in `.agentic/prompts/`
+2. If adding a new workflow state, update `state_machine_af.yaml` (transitions, preconditions)
+3. If adding cross-cutting conventions, update `.agentic/conventions.md`
+4. Link from `DEVELOPER_GUIDE.md` if users should know about it
+5. Add example to relevant example project
 
 **Adding a new tool script**:
 1. Create `.agentic/lib/tools/new_tool.sh` or `.agentic/lib/tools/new_tool.py`
@@ -679,6 +693,10 @@ When a behavioral rule keeps failing despite being in multiple instruction files
 - The agent acknowledges the rule and then ignores it
 
 The fix is to change the enforcement mechanism, not the enforcement text. Move from textual rules to: (a) script gates that `exit 1`, (b) artifact-embedded instructions that survive turn boundaries, (c) named rationalization rebuttals that make self-deception harder. See the plan-review case study above for the full example.
+
+### Phase 3 instruction consolidation (v2)
+
+Phase 3 removed ~130 files (~25K lines) of workflow docs, checklists, quality standards, subagent definitions, and full skill bundles. Their content was absorbed into 7 role prompts + `conventions.md` + CLI enforcement via `state_machine_af.yaml`. The instruction file checklist dropped from ~11 targets to ~5. When shipping framework features in v2, update: role prompts (`.agentic/prompts/`), conventions.md, state_machine_af.yaml (if new states/transitions), agent instruction files (CLAUDE.md etc.), and skill trigger stubs (`.claude/skills/`). The old checklist targets (checklists/, workflows/, quality/, subagents/, auto_orchestration.md, agent_operating_guidelines.md) no longer exist.
 
 ### Framework skills vs Task tool agents
 

@@ -8,12 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **v2 Workflow Engine — Phase 3: Instruction Consolidation** — Completed the multi-phase v2 refactor. Phase 3 removed ~130 files (~25K lines) of workflow docs, checklists, quality standards, subagent definitions, and full skill bundles. Content absorbed into 7 role prompts + `conventions.md` + CLI enforcement via `state_machine_af.yaml`.
 - **Central QA Registry (F-0241)** — `ag qa` generates `docs/QA_REGISTRY.md` — a feature-to-test matrix across 9 QA categories (static validation, pytest, LLM behavioral, scenarios, infrastructure ×3, pre-commit gates, checklists). Scans existing test annotations to map 207 features to their coverage, identifies 112 unmapped gaps. `--check` for CI staleness detection, `--json` for programmatic access. Advisory freshness check in validate_framework.sh.
 - **Post-Merge Enforcement (F-0239)** — Two-layer hook detection catches bypassed `ag merge`. PostToolUse(Bash) warns when `gh pr merge` is used directly. UserPromptSubmit warns on main when recent commits contain unshipped F-XXXX feature IDs. Both advisory. Codifies enforcement hierarchy in PRINCIPLES.md D2 with "3+ skip promotion rule."
 - **Defense-in-Depth Workflow Enforcement (F-0221)** — 4-layer hook stack prevents agents from coding with unapproved DRAFT plans: ExitPlanMode profile-aware messaging (autonomous_formal warns "stopping is a VIOLATION"), UserPromptSubmit DRAFT plan detection on every prompt, PostToolUse(Write|Edit|MultiEdit) "STOP CODING" warning after code edits with path-based allowlist for spec/test/memory files, Pre-commit Check 21 blocking gate. Each layer has independent detection logic (not WIP-dependent).
 - **Session Log Analysis Tool (F-0238)** — `ag analyze-session <path.jsonl> [--json]` parses Claude Code JSONL session logs and detects workflow violations (stopped after plan exit, code before review, skipped planning). Reports time wasted per violation.
 
+### Removed
+- Workflow docs, checklists, quality standards, subagent definitions, full skill bundles (~130 files, ~25K lines) — content absorbed into 7 role prompts + `conventions.md` + CLI enforcement
+
 ### Changed
+- **Skills reduced to trigger-word stubs** — 13 files, ~370 lines total (down from full bundles with instructions + scripts + references)
+- **Tool templates updated** for v2 workflow commands (`ag start/transition/check/verify/ship/status/info/next`)
+- **memory-seed.md trimmed** to 18 lines (role prompts carry the guidance now)
+- **Role prompts enriched** — 7 prompts, 209 → 347 lines total
+- `.agentic/conventions.md` added — consolidated coding conventions
+- `.agentic/MIGRATION_v2.md` added — v1→v2 migration guide
+- v2 validation mode added to `validate_framework.sh`
 - **ag.sh Decomposition (F-0221)** — Decomposed the monolithic `ag.sh` (4,325 lines, 58 functions) into a 363-line thin dispatcher that sources 12 command modules from `.agentic/lib/tools/commands/`. All behavior preserved — no user-facing changes. Modules: start, plan, implement, commit, done, kickoff, auto, specs, help, diagnostics, settings, operations.
 - **Memory-Seed Optimization (F-0237)** — Compressed memory-seed.md from 319→134 lines (58% reduction). Converted 21 verbose trigger sections into a compact trigger-action table. All 58 sentinel keywords preserved, no behavioral regression.
 

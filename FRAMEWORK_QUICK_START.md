@@ -25,15 +25,17 @@ Every decision must align with these. If conflict, re-read `PRINCIPLES.md` (13 p
 
 ---
 
-## 🏗️ ARCHITECTURE: Three Layers
+## 🏗️ ARCHITECTURE: Three Layers (v2)
 
-| Layer | What | Files | Rule |
-|-------|------|-------|------|
-| **Constitution** | Behavioral rules always loaded | CLAUDE.md, .cursorrules, etc. | <100 lines. Only what can't be structurally enforced. |
-| **Playbooks** | How to execute tasks | auto_orchestration.md, checklists/ | Loaded just-in-time by `ag` commands. Never in instruction files. |
-| **State** | Project truth | STACK.md, STATUS.md, CONTEXT_PACK.md | Git-tracked = cross-machine. Gitignored = session-local. |
+| Layer | What | v2 Files | Rule |
+|-------|------|----------|------|
+| **Constitution** | Structural enforcement + behavioral rules | `state_machine_af.yaml` (CLI enforcement) + CLAUDE.md, .cursorrules, etc. (<100 lines) | CLI enforces transitions; instruction files cover what can't be structurally enforced. |
+| **Playbooks** | Role-specific guidance | 7 role prompts in `.agentic/prompts/` + `conventions.md` | Loaded JIT on state transitions. Role prompt emitted by CLI when transition succeeds. |
+| **State** | Per-feature work items | `.agentic/work/F-XXXX/item.yaml` + co-located artifacts (plan.md, spec.md, review.md, verification.json) | Git-tracked = cross-machine. Gitignored = session-local. |
 
-Enforcement is **distributed** — `ag.sh`, `pre-commit-check.sh`, and `context-for-role.sh` enforce behavior across all AI tools. No single orchestrator required.
+**v2 workflow commands**: `ag start F-XXXX "Title"` | `ag transition F-XXXX <state>` | `ag check F-XXXX` | `ag verify F-XXXX` | `ag ship F-XXXX` | `ag status` | `ag info F-XXXX` | `ag next`
+
+**Work items** live in `.agentic/work/F-XXXX/` — all artifacts co-located. Preconditions (e.g., "plan.md must exist") checked by CLI before transitions.
 
 **Design basis**: [`docs/INSTRUCTION_ARCHITECTURE.md`](docs/INSTRUCTION_ARCHITECTURE.md)
 
