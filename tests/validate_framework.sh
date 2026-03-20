@@ -2217,11 +2217,13 @@ else
   fail "F-0169: init_playbook.md missing NFR Discovery step"
 fi
 
-# Memory seed has NFR proactive suggestion
+# Memory seed has NFR proactive suggestion (v1 only — trimmed in v2)
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q "nfr.*discover\|NFR.*proactive\|ag nfr discover" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
   pass "F-0169: memory-seed.md has NFR proactive suggestion"
 else
   fail "F-0169: memory-seed.md missing NFR proactive suggestion"
+fi
 fi
 
 # ag nfr discover command works
@@ -2528,10 +2530,12 @@ else
   fail "F-0175: migration 009 missing"
 fi
 
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q "who tests the tests\|Who tests the tests" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
   pass "F-0175: memory-seed has 'who tests the tests?' trigger"
 else
   fail "F-0175: memory-seed missing 'who tests the tests?' trigger"
+fi
 fi
 
 if [[ -f "${FRAMEWORK_ROOT}/VERSION" ]]; then
@@ -3140,7 +3144,8 @@ for file in \
   fi
 done
 
-# Memory seed has WIP creation in both sections
+# Memory seed has WIP creation in both sections (v1 only — trimmed in v2)
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q "auto-creates WIP" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
   pass "F-0140: memory-seed.md has WIP creation in build section"
 else
@@ -3150,6 +3155,7 @@ if grep -q "auto-creates WIP lock" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-s
   pass "F-0140: memory-seed.md has WIP creation in plan-mode-exit section"
 else
   fail "F-0140: memory-seed.md missing WIP creation in plan-mode-exit section"
+fi
 fi
 fi
 
@@ -3384,7 +3390,7 @@ while IFS= read -r mdfile; do
 done < <(find "${FRAMEWORK_ROOT}/.agentic" -name "*.md" -type f)
 
 if [[ "$V2_ENGINE" == "1" ]]; then
-  FM_THRESHOLD=120
+  FM_THRESHOLD=80
 else
   FM_THRESHOLD=160
 fi
@@ -4154,10 +4160,12 @@ else
   fail "T-0064a: ag review missing from agent_operating_guidelines"
 fi
 fi
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q "ag review" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
   pass "T-0064b: ag review in memory-seed"
 else
   fail "T-0064b: ag review missing from memory-seed"
+fi
 fi
 if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q "ag review" "${FRAMEWORK_ROOT}/.agentic/lib/agents/shared/auto_orchestration.md"; then
@@ -4392,11 +4400,13 @@ else
   fail "T-0092: codex-instructions.md missing collision rule"
 fi
 
-# T-0093: Collision rule in memory-seed.md
+# T-0093: Collision rule in memory-seed.md (v1 only — trimmed in v2)
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -qi "collision\|count-others\|multi-session" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
   pass "T-0093: memory-seed.md has collision rule"
 else
   fail "T-0093: memory-seed.md missing collision rule"
+fi
 fi
 
 if [[ "$V2_ENGINE" != "1" ]]; then
@@ -4492,11 +4502,13 @@ else
   fail "T-0102: ag flush missing from some instruction files"
 fi
 
-# T-0103: memory-seed has --no-verify exception for ag flush
+# T-0103: memory-seed has --no-verify exception for ag flush (v1 only — trimmed in v2)
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q 'except.*ag flush\|ag flush.*--no-verify' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
   pass "T-0103: memory-seed.md has --no-verify exception for ag flush"
 else
   fail "T-0103: memory-seed.md missing --no-verify exception for ag flush"
+fi
 fi
 
 # T-0104: state-commit.sh validates JSON for BACKLOG.json
@@ -4813,11 +4825,13 @@ else
   fail "T-0128: PRINCIPLES.md missing conditional R2 language"
 fi
 
-# T-0129: memory-seed.md has review_commit sentinel
+# T-0129: memory-seed.md has review_commit sentinel (v1 only — trimmed in v2)
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q 'review_commit' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
   pass "T-0129: memory-seed.md has review_commit sentinel"
 else
   fail "T-0129: memory-seed.md missing review_commit sentinel"
+fi
 fi
 
 # T-0130: task.py has _unstage_or_warn helper
@@ -4907,11 +4921,13 @@ else
   fail "T-0138: engine.py missing _flush_feedback method"
 fi
 
-# T-0139: memory-seed has ag feedback sentinel
+# T-0139: memory-seed has ag feedback sentinel (v1 only — trimmed in v2)
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q 'ag feedback' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
   pass "T-0139: memory-seed.md has ag feedback sentinel"
 else
   fail "T-0139: memory-seed.md missing ag feedback sentinel"
+fi
 fi
 
 if [[ "$V2_ENGINE" != "1" ]]; then
@@ -5005,11 +5021,13 @@ else
   fail "T-0148: SKIP_TDD missing from pre-commit escape hatch guard"
 fi
 
-# T-0149: memory-seed has TDD enforcement sentinel
+# T-0149: memory-seed has TDD enforcement sentinel (v1 only — trimmed in v2)
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q 'checkpoint.*phase' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md"; then
   pass "T-0149: memory-seed.md has TDD enforcement sentinel"
 else
   fail "T-0149: memory-seed.md missing TDD enforcement sentinel"
+fi
 fi
 
 if [[ "$V2_ENGINE" != "1" ]]; then
@@ -5143,11 +5161,13 @@ else
   fail "dashboard.sh missing design trace integration"
 fi
 
-# memory-seed.md mentions source annotation
+# memory-seed.md mentions source annotation (v1 only — trimmed in v2)
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q 'Source annotation' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md" 2>/dev/null; then
   pass "memory-seed.md has Source annotation trigger"
 else
   fail "memory-seed.md missing Source annotation trigger"
+fi
 fi
 
 # F-0224: Smoke Test Evidence Gate
@@ -5215,11 +5235,13 @@ else
   fail "STACK.template.md missing smoke_test_evidence"
 fi
 
-# memory-seed.md has smoke evidence sentinel
+# memory-seed.md has smoke evidence sentinel (v1 only — trimmed in v2)
+if [[ "$V2_ENGINE" != "1" ]]; then
 if grep -q "smoke-test-evidence" "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md" 2>/dev/null; then
   pass "memory-seed.md has smoke-test-evidence sentinel"
 else
   fail "memory-seed.md missing smoke-test-evidence sentinel"
+fi
 fi
 
 if [[ "$V2_ENGINE" != "1" ]]; then
