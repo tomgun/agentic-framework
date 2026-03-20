@@ -3501,3 +3501,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 07:41 - F-0237+F-0238: Instruction file updates
+
+**Why**: Review found missing instruction file updates — framework rule: instruction files are part of the feature
+
+**What changed**:
+- Added ag analyze-session to all 6 instruction files (CLAUDE.md template, root CLAUDE.md, cursorrules, copilot, codex), trigger tables (cursorrules, copilot, codex, auto_orchestration), help.sh, memory-seed, and CHANGELOG
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+

@@ -96,6 +96,7 @@ What would you like to work on?
 | "audit" / "spec health" / "quality check" / "ag audit" | **Spec Audit** | Run `ag audit` for spec verification & QA audit. `--full` for comprehensive. `--status` for pending items. |
 | "NFR" / "non-functional" / "quality constraint" / "ag nfr" | **NFR Management** | Run `ag nfr list` to see NFRs. `ag nfr discover` for recommendations. `ag nfr coverage` for test coverage. |
 | "worktree" / "isolated branch" / "ag worktree" | **Worktree Management** | Run `ag worktree create F-XXXX` for isolated feature work. `ag worktree list` to see active worktrees. |
+| "analyze session" / "workflow violations" / "session log" | **Session Analysis** | Run `ag analyze-session <path.jsonl> [--json]`. Parses Claude JSONL logs, detects plan violations (stopped after exit, code before review, skipped planning). |
 
 ### Domain & Design Triggers
 

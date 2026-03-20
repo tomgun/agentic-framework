@@ -28,6 +28,7 @@ COMMANDS:
     approve-onboarding  Review/approve auto-discovered proposals
     trace [options]     Spec-code traceability (drift + coverage)
     test llm [options]  Run LLM behavioral tests
+    analyze-session <path> [--json]  Detect workflow violations in Claude JSONL logs
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
     backlog <sub>       Ordered work queue (add|list|done|move|remove|clear)
@@ -110,6 +111,7 @@ COMMANDS:
     approve-onboarding  Review/approve auto-discovered proposals
     trace [options]     Spec-code traceability (drift + coverage)
     test llm [options]  Run LLM behavioral tests
+    analyze-session <path> [--json]  Detect workflow violations in Claude JSONL logs
     agents <sub>        Project agent management (generate|list|clean)
     tools               List all available tools by category
     backlog <sub>       Ordered work queue (add|list|done|move|remove|clear)
