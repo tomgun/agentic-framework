@@ -16,7 +16,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Build something large (>10 files, "entire", "full system") | STOP -> TOO BIG. Break into 3-5 smaller tasks. Max 5-10 files. |
 | Fix / debug / repair / troubleshoot a bug or issue | STOP -> Write failing test FIRST |
 | Commit / push / ship / finalize changes | STOP -> Check active WIP (AGENTS.json); if exists BLOCK and warn. Else run `ag commit` |
-| Done / complete / finished / merge / wrapped up | STOP -> Run `ag done F-XXXX`. P1 ACs must be 100% checked (priority-grouped specs), 80% overall (flat specs). Smoke evidence checked if `smoke_test_evidence` enabled. After merging a PR (`gh pr merge`), IMMEDIATELY run `ag done` — it's part of the merge, not a separate step. Before ending, flush pending ideas to TODO.md via `ag todo`. |
+| Done / complete / finished / merge / wrapped up | STOP -> Use `ag merge <pr#> F-XXXX` to merge PRs (chains `ag done` automatically). Never use raw `gh pr merge` — hook will warn. Run `ag done F-XXXX` after merge. P1 ACs must be 100% checked, 80% overall. Before ending, flush pending ideas to TODO.md via `ag todo`. |
 | Idea / remember / todo / tasklist / note for later | STOP -> `ag todo "description"` for persistent capture (git-tracked). |
 | Backlog / queue / what's next / prioritize / reorder work | STOP -> `ag backlog` to see queue. `ag backlog add F-XXXX` to add. Position 0 = current work. |
 | Write spec / create spec / acceptance criteria / evolve spec | STOP -> Run `ag spec F-XXXX`. Follow spec protection levels. |

@@ -100,6 +100,41 @@ if [[ -f "$AGENTIC_LIB/tools/agents_helpers.py" ]]; then
   fi
 fi
 
+# --- Detection #5: Merged but not done (F-0239) ---
+# On main/master, extract F-XXXX IDs from last 5 commits. If any are in FEATURES.md
+# but not shipped, warn. Catches bypassed `ag merge` (e.g. raw `gh pr merge`).
+if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "")
+  if [[ "$CURRENT_BRANCH" == "main" || "$CURRENT_BRANCH" == "master" ]]; then
+    FEATURES_FILE=""
+    if [[ -f ".agentic/spec/FEATURES.md" ]]; then
+      FEATURES_FILE=".agentic/spec/FEATURES.md"
+    fi
+    if [[ -n "$FEATURES_FILE" ]]; then
+      # Extract F-XXXX from last 5 commit messages (catches squash merges)
+      RECENT_FIDS=$(git log -5 --format=%s 2>/dev/null | grep -oE 'F-[0-9]{4,}' | sort -u || true)
+      if [[ -n "$RECENT_FIDS" ]]; then
+        UNSHIPPED=""
+        for fid in $RECENT_FIDS; do
+          # Check if feature exists in FEATURES.md but is NOT shipped
+          if grep -q "$fid" "$FEATURES_FILE" 2>/dev/null; then
+            if ! grep "$fid" "$FEATURES_FILE" 2>/dev/null | grep -qi 'shipped'; then
+              UNSHIPPED="${UNSHIPPED}${fid} "
+            fi
+          fi
+        done
+        if [[ -n "$UNSHIPPED" ]]; then
+          echo ""
+          echo "⚠️  MERGED BUT NOT DONE: ${UNSHIPPED}"
+          echo "   These features appear in recent commits but aren't marked shipped."
+          echo "   Run: ag done F-XXXX — handles dogfood, VERSION, backlog, flush."
+          echo ""
+        fi
+      fi
+    fi
+  fi
+fi
+
 # --- DRAFT plan detection (Layer 2 enforcement) ---
 # If plan_review_enabled and any DRAFT plan exists in journal/plans/, warn on every prompt.
 # Independent of WIP state — detects "any DRAFT plan" not "active feature."

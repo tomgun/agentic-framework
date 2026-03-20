@@ -73,7 +73,7 @@ What would you like to work on?
 | "fix I-####" / "fix bug" / "fix issue" | **Issue Pipeline** | Follow Issue Resolution flow |
 | "commit" / "ready to commit" | **Before Commit** | Run `before_commit.md` checklist |
 | "write spec" / "create spec" / "add acceptance" / "ag spec" | **Spec-Writing Pipeline** | Follow Spec-Writing flow |
-| "done with feature" / "feature complete" / "merge" / "merge PR" | **Feature Complete** | Run `feature_complete.md` checklist. After agent merges a PR (`gh pr merge`), IMMEDIATELY run `ag done F-XXXX` on main — don't wait for user. |
+| "done with feature" / "feature complete" / "merge" / "merge PR" | **Feature Complete** | Run `feature_complete.md` checklist. Use `ag merge <pr#> F-XXXX` (chains `ag done` automatically). Never use raw `gh pr merge` — PostToolUse hook warns (F-0239). |
 | "end session" / "stopping work" | **Session End** | Run `session_end.md` checklist |
 | "review code" / "check this" | **Review** | Claude Code: delegate to review subagent (fresh context) via `reviewing-code` skill. Others: run `review_checklist.md` inline. |
 | "review blocked" / "approve transition" / "pending review" | **Review Checkpoint** | Run `ag review` to list pending. `ag review F-XXXX <state>` to resolve. |

@@ -3619,3 +3619,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 13:00 - F-0239 Post-Merge Enforcement
+
+**Why**: Behavioral rules for post-merge workflow keep getting skipped; promoting to structural enforcement
+
+**What changed**:
+- Hook-based detection for bypassed ag merge: UserPromptSubmit warns unshipped features, PostToolUse warns gh pr merge. Enforcement hierarchy codified in PRINCIPLES.md D2. FEATURES.md entry + AC file + memory-seed updated.
+
+**Next steps**:
+- PR review, merge
+
+**Blockers**: None
+
+
+### Session: 2026-03-20 13:04 - F-0239 Instruction Files
+
+**Why**: Framework dev rule: instruction files are part of the feature
+
+**What changed**:
+- Updated 8 instruction files: INSTRUCTION_ARCHITECTURE (hook table + A11), HOW_IT_WORKS (D2 feature row), CHANGELOG, agent_operating_guidelines (gate row), cursorrules/copilot/codex (trigger tables), auto_orchestration (merge trigger)
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+

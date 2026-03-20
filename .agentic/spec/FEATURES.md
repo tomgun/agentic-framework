@@ -4188,3 +4188,16 @@ Proposed restructuring:
 **Description**: Python tool (session-analyze.py) that parses Claude Code JSONL session logs, detects workflow violations (stopped after plan exit, code before review, skipped planning), measures time wasted, and outputs structured reports. Accessible via `ag analyze-session`.
 
 **Acceptance**: See `spec/acceptance/F-0238.md`
+
+---
+
+## F-0239: Structural Enforcement for Post-Merge Workflow
+
+**Status**: in-progress
+**Category**: Infrastructure
+**Priority**: high
+**Complexity**: low
+
+**Description**: Hook-based detection for bypassed `ag merge`. UserPromptSubmit warns when recent commits contain unshipped F-XXXX IDs on main. PostToolUse Bash hook warns when `gh pr merge` is used directly. Codifies enforcement hierarchy in PRINCIPLES.md D2 with "3+ skip promotion rule."
+
+**Acceptance**: See `spec/acceptance/F-0239.md`
