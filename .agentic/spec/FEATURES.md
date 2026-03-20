@@ -4193,7 +4193,7 @@ Proposed restructuring:
 
 ## F-0239: Structural Enforcement for Post-Merge Workflow
 
-**Status**: in-progress
+**Status**: shipped
 **Category**: Infrastructure
 **Priority**: high
 **Complexity**: low

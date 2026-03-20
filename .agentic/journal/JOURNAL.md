@@ -3645,3 +3645,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 13:10 - F-0239 Shipped
+
+**Why**: Promoting post-merge behavioral rules to structural enforcement
+
+**What changed**:
+- PR #173 merged: structural enforcement for post-merge workflow. Two hook detections + enforcement hierarchy in PRINCIPLES.md + 8 instruction file updates + CONTRIBUTIONS entry
+
+**Next steps**:
+- Post-merge: dogfood, VERSION, flush
+
+**Blockers**: None
+

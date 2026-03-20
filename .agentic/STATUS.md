@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0237+F-0238: Review fixes applied (Updated: 2026-03-20 10:27 UTC)
+- F-0239 shipped, post-merge cleanup (Updated: 2026-03-20 13:10 UTC)
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
