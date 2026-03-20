@@ -888,6 +888,7 @@ These features exist but don't clearly derive from the 13 principles:
 | `ag done F-XXXX` | Run doctor.sh --phase complete, AC completion gate (configurable via `acceptance_criteria` setting), feature.sh status shipped, VERSION bump | Structural (validation) |
 | `ag specs` | Brownfield spec generation with plan-review | Structural (domain-by-domain) |
 | `ag trace F-XXXX` | Show spec-code traceability | Read-only |
+| `ag qa` | Generate QA Registry (docs/QA_REGISTRY.md) — feature-to-test matrix across 9 categories. `--check` for staleness, `--json` for data | Read-only |
 | `ag hooks install\|status\|disable` | Git hook management | Structural |
 | `ag test llm` | Run LLM behavioral tests | Validation |
 | `ag formalize` | Migrate discovery-phase content (TODOs, plans, decisions) into formal spec structure | Advisory (content migration) |
@@ -1012,8 +1013,8 @@ These will always rely on behavioral reinforcement:
 
 `sync.sh`, `drift-check.sh`, `instruction-sync.sh`, `plan-scan.sh`, `sync_docs.py`/`sync_docs.sh`, `docs.sh` (`--validate`, `--create`, `--coverage`, `--list`), `memory-check.sh`, `manifest.sh`, `migration.sh`, `upgrade.sh`, `framework_age.sh`
 
-### Testing
-`tests/llm/harness.sh`, `mutation_test.sh`, `llm-test-status.sh`
+### Testing & QA
+`tests/llm/harness.sh`, `mutation_test.sh`, `llm-test-status.sh`, `tests/qa_registry.py` (`ag qa` — feature-to-test matrix)
 
 ### Utilities
 `quick_feature.sh`, `quick_issue.sh`, `dashboard.sh`, `brief.sh`, `session_log.sh`, `list-tools.sh`, `report.py`/`report.sh`, `check-untracked.sh`, `check-environment.sh`, `doc-check.sh`, `version_check.sh`, `validation-cache.sh`, `organize_features.py`, `feature_stats.py`, `upgrade_spec_format.py`, `validate_formats.py`, `enable-formal.sh`, `generate-skills.sh`, `start.sh`, `task.sh`, `continue_here.py` (deprecated), `retro_check.sh`, `verify.py`/`verify.sh`

@@ -391,6 +391,7 @@ bash .agentic/lib/tools/brief.sh       # Quick project brief
 bash .agentic/lib/tools/dashboard.sh   # Comprehensive dashboard
 bash .agentic/lib/tools/coverage.sh    # Code annotation coverage
 bash .agentic/lib/tools/feature_graph.sh   # Dependency visualization
+ag qa                                  # QA Registry — feature-to-test coverage map
 
 # Autonomous workflow modes
 ag auto verify                    # Test-fix loop until green
