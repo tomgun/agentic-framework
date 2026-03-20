@@ -3775,3 +3775,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 20:04 - Phase 3A+3B
+
+**Why**: Phase 3 instruction consolidation — removing redundant files replaced by v2 CLI enforcement
+
+**What changed**:
+- v2 mode added to validate_framework.sh (703/3/17); enriched 7 role prompts (209→347 lines); created conventions.md (78 lines)
+
+**Next steps**:
+- Phase 3C: simplify skills + templates + tool scripts
+
+**Blockers**: None
+
