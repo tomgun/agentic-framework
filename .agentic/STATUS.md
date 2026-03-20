@@ -5,25 +5,19 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0239 shipped, post-merge cleanup (Updated: 2026-03-20 13:10 UTC)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e473788 (feat(F-0237,F-0238): memory-seed optimization + session analysis tool)
-=======
->>>>>>> f8da2c1 (fix(F-0237,F-0238): review fixes — duplicate row, allowlist, detection, IDs)
+- ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item (Updated: 2026-03-20 13:18 UTC)
 
 ## Current focus
-- ADR-001 roadmap execution: F-0183 (Taste and Style Settings) is current backlog item
-- v0.52.5: Intent-based skill triggers shipped, F-0184 epic decomposition shipped
+- ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item
+- v0.58.0: F-0239 structural enforcement for post-merge workflow shipped
 
 ## In progress
-- F-0183: Taste and Style Settings (current)
+- F-0223: Later State Machine Gates Strengthening (current)
 
 ## Next up
-- F-0180: Review Checkpoint Framework
-- F-0181: Autonomous Formal Profile
-- F-0182: Critical Review Agent
+- F-0220: Protected Main Branch Support
+- F-0193: Collision-Proof Feature IDs
+- F-0210: Configurable Definition of Done per Task Type
 
 ## Known issues / risks
 - Some CHANGELOG.md historical references point to old file locations (acceptable)
@@ -32,8 +26,5 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - None currently
 
 ## Release notes (optional)
-- v0.49.0: F-0190 backlog work assignment, F-0189 doc enforcement, F-0179 component registry, F-0177/F-0178 state machine
-- v0.47.1: Docker sandbox for autonomous Claude Code
-- v0.47.0: Formal state machine for feature lifecycle (ADR-001 Phase 1)
+- v0.58.0: F-0239 structural enforcement for post-merge workflow
 - See CHANGELOG.md for full history
-- QA: QA: 0/1 verified, 5 pending

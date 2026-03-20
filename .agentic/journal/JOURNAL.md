@@ -3658,3 +3658,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 13:20 - State Drift Fix
+
+**Why**: F-0219 state was stale — shipped feature still showing as planned in FEATURES.md and current in backlog
+
+**What changed**:
+- Marked F-0219 shipped (was still planned despite PR #167 merged), advanced backlog to F-0223, cleaned STATUS.md conflict markers
+
+**Next steps**:
+- F-0223 planning
+
+**Blockers**: None
+

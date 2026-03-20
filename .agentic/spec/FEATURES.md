@@ -3778,7 +3778,7 @@ Proposed restructuring:
 
 ## F-0219: NFR Health Dashboard & Scale
 
-**Status**: planned
+**Status**: shipped
 **Category**: Quality
 **Priority**: medium
 **Complexity**: high
