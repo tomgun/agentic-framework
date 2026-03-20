@@ -97,6 +97,7 @@ What would you like to work on?
 | "NFR" / "non-functional" / "quality constraint" / "ag nfr" | **NFR Management** | Run `ag nfr list` to see NFRs. `ag nfr discover` for recommendations. `ag nfr coverage` for test coverage. |
 | "worktree" / "isolated branch" / "ag worktree" | **Worktree Management** | Run `ag worktree create F-XXXX` for isolated feature work. `ag worktree list` to see active worktrees. |
 | "analyze session" / "workflow violations" / "session log" | **Session Analysis** | Run `ag analyze-session <path.jsonl> [--json]`. Parses Claude JSONL logs, detects plan violations (stopped after exit, code before review, skipped planning). |
+| "QA" / "test coverage" / "what's tested" / "coverage map" / "ag qa" | **QA Registry** | Run `ag qa` to generate docs/QA_REGISTRY.md (feature-to-test matrix across 9 categories). `--check` for staleness, `--json` for data. |
 
 ### Domain & Design Triggers
 

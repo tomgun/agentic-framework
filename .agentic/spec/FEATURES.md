@@ -4219,7 +4219,7 @@ Proposed restructuring:
 
 ## F-0241: Central QA Registry
 
-**Status**: implementing
+**Status**: shipped
 **Category**: Testing
 **Priority**: high
 **Complexity**: medium

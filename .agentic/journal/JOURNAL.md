@@ -3684,3 +3684,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 14:28 - F-0241 Shipped
+
+**Why**: Shipped first QA Observatory feature
+
+**What changed**:
+- Central QA Registry now available via ag qa — 207 features mapped across 9 test categories, 95 with test mappings, 112 gaps identified
+
+**Next steps**:
+- Next: F-0240 (Framework Execution Log)
+
+**Blockers**: None
+
