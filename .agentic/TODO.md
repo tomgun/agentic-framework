@@ -213,6 +213,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0078: ag done verification subprocess leaks sourced env (ROOT_DIR, FRAMEWORK_ROOT) into bash -c, causing functional tests to use wrong project root — 5 phantom failures vs direct run
 - **Added**: 2026-03-17
 
+### T-0083: LLM test: agent must auto-save plan and run dialectical review loop after exiting plan mode — no stopping, no waiting for user input. Verify full sequence: save DRAFT → spawn Critic+Advocate → synthesize → convergence check → APPROVED → ag implement. Test both auto and manual convergence modes. Background: this session the agent tried to skip plan review entirely until corrected with 'save the plan first, review it'.
+- **Added**: 2026-03-20
+
 ## Done
 
 
