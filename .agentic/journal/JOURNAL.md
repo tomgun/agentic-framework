@@ -3788,3 +3788,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 20:24 - Phase 3C
+
+**Why**: Phase 3C: skills + templates simplified for v2 CLI enforcement
+
+**What changed**:
+- Simplified 25 skill stubs (Tier 1/2), updated 4 templates + 3 root wrappers, fixed 35 v2 validation guards
+
+**Next steps**:
+- Phase 3D: delete archived files in 4 batches
+
+**Blockers**: None
+
