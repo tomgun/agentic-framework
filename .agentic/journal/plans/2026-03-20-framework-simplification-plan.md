@@ -1,6 +1,6 @@
 # Plan: Framework Simplification & Structural Enforcement
 
-**Status**: IN PROGRESS (Phase 1 complete, Phase 2 reviewed + revised 2026-03-20, Phases 3-4 remaining)
+**Status**: IN PROGRESS (Phase 1 complete, Phase 2 reviewed + revised 2026-03-20, Phase 3 reviewed + revised 2026-03-20, Phase 4 remaining)
 **Timeline**: ~6-8 weeks total
 **Branch**: feat/v2-workflow-engine (PR #177)
 
@@ -214,52 +214,42 @@ The `|| true` in the YAML check is intentional for `lean` mode (escape hatches a
 
 ---
 
-## Phase 3: Instruction Consolidation & File Reduction (~1 week)
+## Phase 3: Instruction Consolidation & File Reduction (~2-3 weeks)
 
-With the CLI enforcing workflows, most instruction files become unnecessary.
+**Reviewed**: 2026-03-20 (review found 3 critical issues, 4 important issues, 4 minor issues — all resolved in revision)
 
-### Eliminate Redundant Instruction Layers
+Phase 2 is complete — the v2 engine structurally enforces workflows via CLI (8 commands). Agents can't skip steps because the CLI blocks invalid transitions and loads role prompts JIT at each state.
 
-**Current instruction surface (what agents must process):**
-- CLAUDE.md (40 lines) × 4 tool variants
-- auto_orchestration.md (442 lines)
-- agent_operating_guidelines.md (127 lines)
-- 12 Skills with SKILL.md + references (thousands of lines)
-- 9 checklists (hundreds of lines)
-- 20+ workflow documents
-- 9 quality standards
-- memory-seed.md (137 lines)
+~131 instruction files (~33K lines) that told agents WHAT to do are now redundant. Phase 3 removes the dead weight.
 
-**Proposed instruction surface:**
-- CLAUDE.md (~30 lines) — points to `ag` CLI commands, nothing else
-- 7 Role Prompts (~50 lines each) — loaded by CLI at the right moment
-- 1 project context file (generated from state_machine_af.yaml + current state)
+**Scope boundary**: Phase 3 is instruction consolidation only. FEATURES.md consumer migration and old command module migration (36 non-v2 commands) are separate future efforts. `features_sync.py` is explicitly KEPT.
 
-### New CLAUDE.md (Template) — already created as CLAUDE.v2.md
+### Sub-Phase 3A: Update `validate_framework.sh` for v2 Mode
+- Add v2 detection (`engine: v2` in state_machine_af.yaml)
+- v2 checks: YAML structure, 7 role prompts, conventions.md, work item dirs, skill stubs, tool templates
+- v1 mode unchanged
 
-### Role Prompts Replace Skills + Checklists + Workflows
+### Sub-Phase 3B: Enrich Role Prompts + Create `conventions.md`
+- Enrich 7 prompts from 209 → ~350 lines (absorb quality guidance CLI can't enforce)
+- Create `.agentic/conventions.md` (~100 lines) from programming_standards + green_coding + small-batch
+- 5 behavioral test scenarios must pass before proceeding
 
-7 role prompts (already created in Phase 1):
-- Phase-based: planner.md, reviewer.md, implementer.md, verifier.md
-- Activity-based: debugger.md, session.md, explorer.md
+### Sub-Phase 3C: Simplify Skills + Templates + Tool Scripts
+- Skills split: Tier 1 (v2-command, 15-25 lines) + Tier 2 (non-v2-command, 30-40 lines)
+- Delete all `references/` subdirectories
+- Update 4 tool templates, 3 root wrappers, ~8 tool scripts (context-for-role.sh etc.)
 
-### Files to Remove/Archive (in batches, not big-bang)
+### Sub-Phase 3D: Delete Files (4 batches, 1 commit each)
+- Batch 1: workflows/ (35 files, ~14K lines)
+- Batch 2: checklists/ (10 files, ~2.9K lines)
+- Batch 3: quality/ + shared guidelines (~15 files, ~5K lines, KEEP reviewer_roles.json)
+- Batch 4: subagents/ (35 files) + memory-seed trim
 
-| Category | Files | Count | Action |
-|----------|-------|-------|--------|
-| Skills | `.claude/skills/*`, `.agentic/lib/agents/claude/skills/*` | ~60 | Archive → replace with 7 role prompts |
-| Checklists | `.agentic/lib/checklists/*` | 10 | Absorb into CLI preconditions + role prompts |
-| Workflow docs | `.agentic/lib/workflows/*` | 20+ | Archive (reference only) |
-| Quality standards | `.agentic/lib/quality/*` | 9 | Consolidate into `conventions.md` |
-| auto_orchestration.md | `.agentic/lib/agents/shared/` | 1 | Remove — CLI replaces workflow instructions |
-| agent_operating_guidelines.md | `.agentic/lib/agents/shared/` | 1 | Remove — CLI replaces behavioral rules |
-| Subagent roles | `.agentic/lib/agents/claude/subagents/*` | 36 | Reduce to 7 role prompts |
-| Context manifests | `.agentic/lib/agents/shared/context-manifests/*` | 24 | Absorb into role prompts |
-| memory-seed.md | `.agentic/lib/init/` | 1 | Reduce to ~10 lines ("use `ag` commands") |
-| Old command modules | `.agentic/lib/tools/commands/*` | 37 | Remove (replaced by Python workflow.py) |
-| Scattered docs | Various README.md, guides | 30+ | Consolidate into 1 DEVELOPER_GUIDE |
+### Sub-Phase 3E: Documentation + Migration Guide
+- MIGRATION_v2.md, upgrade.sh, framework docs, auto-memory cleanup
 
-**Estimated reduction: 554 files → ~80 files (85% reduction)**
+**Dependency**: 3A‖3B → 3C → 3D → 3E
+**Impact**: ~131 files / ~33K lines → ~25 files / ~3K lines
 
 ---
 
