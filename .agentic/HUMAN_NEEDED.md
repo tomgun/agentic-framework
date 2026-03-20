@@ -171,6 +171,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0055: Merge PR #177 (v2 workflow engine)
+- **Type**: review
+- **Added**: 2026-03-20
+- **Context**: feat/v2-workflow-engine branch has Phase 1 of the framework simplification. Must merge before Phase 2 can start. 6 commits, 46+ tests.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics

@@ -3710,3 +3710,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-20 17:38 - v2 Workflow Engine — Phase 1 Complete
+
+**Why**: Framework had 554 files of instructions agents were supposed to remember. Shifting to structural enforcement where CLI refuses to proceed without artifacts.
+
+**What changed**:
+- Built state-machine-driven workflow engine (TransitionOrchestrator) that enforces artifact preconditions at transition time. 10 states, 14 transitions, 2 modes, 3 profiles. Per-work-item dirs in .agentic/work/F-XXXX/. 7 role prompts loaded JIT. ag.sh routes to v2 when engine: v2. 46+ tests, review fixes applied.
+
+**Next steps**:
+- Phase 2: Rearchitect auto system (engine.py, epic.py, critical_agent.py, kickoff.py, plan_convergence.py, review.py, scheduler.py) onto TransitionOrchestrator. Then Phase 3: consolidate 554 files to ~80. Phase 4: tool adapters + MCP.
+
+**Blockers**: PR #177 on feat/v2-workflow-engine needs merge before Phase 2 starts
+

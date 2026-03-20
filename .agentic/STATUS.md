@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0240: Framework Execution Log — PR created, pending review (Updated: 2026-03-20 16:12 UTC)
+- v2 Refactor: Phase 1 DONE (PR #177). Next: Phase 2 — rearchitect auto system onto TransitionOrchestrator. Full plan: .agentic/journal/plans/2026-03-20-framework-simplification-plan.md (Updated: 2026-03-20 17:38 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item
