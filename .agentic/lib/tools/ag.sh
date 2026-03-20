@@ -215,6 +215,24 @@ _ensure_hooks() {
 }
 _ensure_hooks
 
+# ---------------------------------------------------------------------------
+# V2 Engine detection — when state_machine_af.yaml has engine: v2,
+# route state-machine commands to the Python v2 workflow engine.
+# Old commands remain as fallback for non-v2 or non-state-machine commands.
+# ---------------------------------------------------------------------------
+_V2_ENGINE=0
+_AF_CONFIG="$ROOT_DIR/.agentic/state_machine_af.yaml"
+if [ -f "$_AF_CONFIG" ]; then
+    if grep -q '^engine: v2' "$_AF_CONFIG" 2>/dev/null; then
+        _V2_ENGINE=1
+    fi
+fi
+
+_v2_workflow() {
+    # Dispatch to Python v2 workflow engine
+    PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -m auto.v2.workflow "$@"
+}
+
 # Main command dispatch
 _AG_CMD="${1:-help}"
 _AG_ARG="${*:2}"
@@ -222,6 +240,20 @@ if type flog &>/dev/null; then
     flog "ag.sh" "$_AG_CMD" "$_AG_ARG" "start"
     trap 'flog "ag.sh" "$_AG_CMD" "$_AG_ARG" "end:$?"' EXIT
 fi
+
+# When engine: v2 is active, intercept commands that the new engine handles.
+# Falls through to old dispatch for commands without a v2 equivalent.
+if [[ "$_V2_ENGINE" -eq 1 ]]; then
+    case "${1:-}" in
+        start)   shift; _v2_workflow start "$@"; exit $? ;;
+        check)   shift; _v2_workflow check "$@"; exit $? ;;
+        ship)    shift; _v2_workflow ship "$@"; exit $? ;;
+        next)    shift; _v2_workflow next "$@"; exit $? ;;
+        info)    shift; _v2_workflow info "$@"; exit $? ;;
+        # transition, verify, status are handled below with v1 fallback
+    esac
+fi
+
 case "${1:-help}" in
     start)
         cmd_start
@@ -305,7 +337,11 @@ case "${1:-help}" in
         ;;
     transition)
         shift
-        python3 "$SCRIPT_DIR/../auto/state_machine.py" --project-root "$ROOT_DIR" "$@"
+        if [[ "$_V2_ENGINE" -eq 1 ]]; then
+            _v2_workflow transition "$@"
+        else
+            python3 "$SCRIPT_DIR/../auto/state_machine.py" --project-root "$ROOT_DIR" "$@"
+        fi
         ;;
     review)
         shift
@@ -347,13 +383,21 @@ case "${1:-help}" in
         cmd_sync "${2:-}"
         ;;
     verify)
-        cmd_verify "${2:-}"
+        if [[ "$_V2_ENGINE" -eq 1 ]]; then
+            shift; _v2_workflow verify "$@"
+        else
+            cmd_verify "${2:-}"
+        fi
         ;;
     approve-onboarding)
         cmd_approve_onboarding "${2:-}"
         ;;
     status)
-        cmd_status
+        if [[ "$_V2_ENGINE" -eq 1 ]]; then
+            shift; _v2_workflow status "$@"
+        else
+            cmd_status
+        fi
         ;;
     set)
         shift

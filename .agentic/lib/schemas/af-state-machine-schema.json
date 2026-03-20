@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-framework.dev/schemas/af-state-machine-schema.json",
+  "title": "Agentic Framework State Machine Configuration",
+  "description": "Schema for state_machine_af.yaml — the single workflow configuration file",
+  "type": "object",
+  "required": ["version", "engine", "workflow", "modes", "profiles"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Schema version"
+    },
+    "engine": {
+      "type": "string",
+      "enum": ["v1", "v2"],
+      "description": "Which engine to use. v2 activates the new state machine CLI."
+    },
+    "workflow": {
+      "type": "object",
+      "required": ["states", "transitions"],
+      "additionalProperties": false,
+      "properties": {
+        "states": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 2,
+          "description": "Ordered list of workflow states"
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to"],
+            "additionalProperties": false,
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "requires": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Artifact names that must exist before this transition"
+              },
+              "gate": {
+                "type": "string",
+                "description": "Named gate that must pass (resolved via profile)"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["forward", "regression"],
+                "default": "forward"
+              }
+            }
+          }
+        }
+      }
+    },
+    "modes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "escape_hatches": { "type": "boolean" },
+          "skip_transitions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["from", "to"],
+              "properties": {
+                "from": { "type": "string" },
+                "to": { "type": "string" }
+              }
+            }
+          },
+          "required_artifacts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["gates"],
+        "properties": {
+          "description": { "type": "string" },
+          "gates": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "enum": ["human", "ai", "skip"]
+            }
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "run"],
+            "properties": {
+              "name": { "type": "string" },
+              "run": { "type": "string" },
+              "timeout": { "type": "integer", "default": 120 }
+            }
+          }
+        }
+      }
+    },
+    "docs_policy": {
+      "type": "object",
+      "properties": {
+        "require_update_on_code_change": { "type": "boolean" },
+        "docs_paths": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "stale_days": { "type": "integer" }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["description"],
+        "properties": {
+          "description": { "type": "string" },
+          "location": { "type": "string" },
+          "check": { "type": "string" }
+        }
+      }
+    },
+    "state_mapping": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Maps v1 state names to v2 state names for migration"
+    }
+  }
+}

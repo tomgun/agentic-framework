@@ -1,0 +1,169 @@
+# state_machine_af.yaml — Agentic Framework Workflow Engine v2
+# Single source of truth for workflow states, transitions, gates, and modes.
+# Replaces scattered config across STACK.md settings, profiles.conf, and hardcoded states.
+#
+# Activate: set engine: v2 below. Old ag commands remain as fallback when engine != v2.
+
+version: 1
+engine: v2
+
+# ---------------------------------------------------------------------------
+# Workflow: States and Transitions
+# ---------------------------------------------------------------------------
+workflow:
+  states:
+    - idea
+    - queued
+    - planning
+    - plan_review
+    - spec
+    - implementation
+    - verification
+    - docs
+    - ready_to_ship
+    - shipped
+    - deprecated  # terminal state, reachable from any
+
+  transitions:
+    # Forward flow
+    - { from: idea, to: queued }
+    - { from: queued, to: planning }
+    - { from: planning, to: plan_review, requires: [plan.md] }
+    - { from: plan_review, to: spec, requires: [review.md], gate: plan_approved }
+    - { from: spec, to: implementation, requires: [spec.md] }
+    - { from: implementation, to: verification, requires: [tests_exist] }
+    - { from: verification, to: docs, requires: [verification_pass] }
+    - { from: docs, to: ready_to_ship, requires: [docs_updated] }
+    - { from: ready_to_ship, to: shipped, gate: pr_merged }
+
+    # Regressions (backward transitions requiring re-work)
+    - { from: implementation, to: spec, type: regression }
+    - { from: verification, to: implementation, type: regression }
+    - { from: verification, to: spec, type: regression }
+    - { from: ready_to_ship, to: implementation, type: regression }
+    - { from: shipped, to: spec, type: regression }
+
+  # deprecated is always reachable — handled by engine, not listed as transition
+
+# ---------------------------------------------------------------------------
+# Modes: formal vs lean
+# ---------------------------------------------------------------------------
+modes:
+  formal:
+    escape_hatches: false  # No skipping in formal mode — CLI hard-fails
+    skip_transitions: []
+    required_artifacts:
+      planning: []
+      plan_review: [plan.md]
+      spec: [review.md, plan.md]
+      implementation: [spec.md, plan.md]
+      verification: [spec.md]
+      docs: [spec.md]
+      ready_to_ship: [spec.md]
+      shipped: []
+
+  lean:
+    escape_hatches: true  # Skips allowed but audit-logged in item.yaml
+    skip_transitions:
+      - { from: queued, to: implementation }       # Skip planning for small tasks
+      - { from: planning, to: implementation }      # Skip review for lean
+      - { from: planning, to: spec }                # Skip review, go to spec
+      - { from: implementation, to: ready_to_ship } # Skip docs for tiny fixes
+    required_artifacts:
+      implementation: []
+      ready_to_ship: []
+      shipped: []
+
+# ---------------------------------------------------------------------------
+# Profiles: who reviews at each gate
+# ---------------------------------------------------------------------------
+profiles:
+  hands_on:
+    description: "Human reviews everything"
+    gates:
+      plan_approved: human
+      spec_review: human
+      code_review: human
+      verification_review: human
+      merge: human
+
+  guided:
+    description: "Human reviews plans and specs, AI reviews code"
+    gates:
+      plan_approved: human
+      spec_review: human
+      code_review: ai
+      verification_review: ai
+      merge: human
+
+  autonomous:
+    description: "AI reviews everything except merge"
+    gates:
+      plan_approved: ai
+      spec_review: ai
+      code_review: ai
+      verification_review: ai
+      merge: human
+
+# ---------------------------------------------------------------------------
+# Verification commands (project-specific, override in user projects)
+# ---------------------------------------------------------------------------
+verification:
+  commands:
+    - { name: tests, run: "make test", timeout: 300 }
+    - { name: lint, run: "make lint", timeout: 60 }
+
+# ---------------------------------------------------------------------------
+# Documentation policy
+# ---------------------------------------------------------------------------
+docs_policy:
+  require_update_on_code_change: true
+  docs_paths: ["docs/**", "README.md"]
+  stale_days: 30
+
+# ---------------------------------------------------------------------------
+# Artifact definitions: what files constitute each artifact contract
+# ---------------------------------------------------------------------------
+artifacts:
+  plan.md:
+    description: "Implementation plan with scope, approach, and risks"
+    location: "{work_dir}/plan.md"
+
+  review.md:
+    description: "Adversarial review output (Critic + Advocate synthesis)"
+    location: "{work_dir}/review.md"
+
+  spec.md:
+    description: "Acceptance criteria and feature specification"
+    location: "{work_dir}/spec.md"
+
+  tests_exist:
+    description: "At least one test file references this feature"
+    check: "grep -rl '{feature_id}' tests/ 2>/dev/null | head -1"
+
+  verification_pass:
+    description: "All verification commands pass"
+    location: "{work_dir}/verification.json"
+
+  docs_updated:
+    description: "Documentation is not stale for changed files"
+    check: "bash .agentic/lib/tools/drift.sh --docs --quiet 2>/dev/null || true"
+
+  journal.md:
+    description: "Per-feature decision log"
+    location: "{work_dir}/journal.md"
+
+# ---------------------------------------------------------------------------
+# State mapping: v1 (old) → v2 (new) for migration
+# ---------------------------------------------------------------------------
+state_mapping:
+  planned: planning
+  specced: spec
+  criteria_set: spec
+  tests_written: implementation
+  implementing: implementation
+  verified: verification
+  documented: docs
+  committed: ready_to_ship
+  shipped: shipped
+  deprecated: deprecated
