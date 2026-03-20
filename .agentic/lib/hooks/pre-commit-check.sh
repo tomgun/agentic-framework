@@ -69,8 +69,10 @@ for _arg in "$@"; do
 done
 
 _PC_MODE="full"; [[ "$_FAST_MODE" -eq 1 ]] && _PC_MODE="fast"
-flog "pre-commit" "run" "$_PC_MODE" "start"
-trap 'flog "pre-commit" "run" "$_PC_MODE" "end:$?"' EXIT
+if type flog &>/dev/null; then
+    flog "pre-commit" "run" "$_PC_MODE" "start"
+    trap 'flog "pre-commit" "run" "$_PC_MODE" "end:$?"' EXIT
+fi
 
 # === Escape Hatches ===
 # For legitimate bypasses (WIP branches, urgent hotfixes)
