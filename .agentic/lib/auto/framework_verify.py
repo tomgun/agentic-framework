@@ -37,6 +37,21 @@ sys.path.insert(0, str(_LIB_DIR / "tools"))
 
 from auto import SpawnResult, spawn_claude, discover_jsonl  # noqa: E402
 
+# Lazy-loaded module cache for session-analyze.py (hyphenated filename)
+_session_analyze_mod = None
+
+
+def _get_session_analyze():
+    """Load session-analyze.py via importlib (cached)."""
+    global _session_analyze_mod
+    if _session_analyze_mod is None:
+        import importlib.util
+        sa_path = _LIB_DIR / "tools" / "session-analyze.py"
+        spec = importlib.util.spec_from_file_location("session_analyze", str(sa_path))
+        _session_analyze_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_session_analyze_mod)
+    return _session_analyze_mod
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -1716,14 +1731,7 @@ class FrameworkVerifier:
                 if jsonl_path:
                     self._log(f"  Analyzing JSONL session log: {jsonl_path.name}")
                     try:
-                        import importlib.util
-                        _sa_path = _LIB_DIR / "tools" / "session-analyze.py"
-                        _spec = importlib.util.spec_from_file_location(
-                            "session_analyze", str(_sa_path),
-                        )
-                        _sa = importlib.util.module_from_spec(_spec)
-                        _spec.loader.exec_module(_sa)
-
+                        _sa = _get_session_analyze()
                         messages = _sa.parse_jsonl(str(jsonl_path))
                         events = _sa.extract_events(messages)
                         violations = _sa.detect_violations(events)

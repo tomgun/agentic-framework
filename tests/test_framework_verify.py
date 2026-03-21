@@ -1305,3 +1305,64 @@ class TestPhaseExpectations:
         s = load_scenario("cli_tool")
         pe = s.get("phase_expectations", [])
         assert len(pe) >= 2
+
+
+class TestDiscoverJsonl:
+    """Tests for discover_jsonl (F-0242)."""
+
+    def test_returns_none_when_dir_missing(self, tmp_path):
+        from auto import discover_jsonl
+        # Project with no ~/.claude/projects/<hash>/ directory
+        result = discover_jsonl(tmp_path / "nonexistent-project-abc123")
+        assert result is None
+
+    def test_returns_none_when_no_jsonl_files(self, tmp_path, monkeypatch):
+        from auto import discover_jsonl
+        # Create the expected directory but with no .jsonl files
+        project_hash = str(tmp_path.resolve()).replace("/", "-")
+        session_dir = tmp_path / "fake_home" / ".claude" / "projects" / project_hash
+        session_dir.mkdir(parents=True)
+        (session_dir / "some_other_file.txt").write_text("not jsonl")
+
+        monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path / "fake_home")
+        result = discover_jsonl(tmp_path)
+        assert result is None
+
+    def test_returns_most_recent_jsonl(self, tmp_path, monkeypatch):
+        import time
+        from auto import discover_jsonl
+
+        project_hash = str(tmp_path.resolve()).replace("/", "-")
+        session_dir = tmp_path / "fake_home" / ".claude" / "projects" / project_hash
+        session_dir.mkdir(parents=True)
+
+        # Create two JSONL files with different mtimes
+        older = session_dir / "old-session.jsonl"
+        older.write_text('{"type":"user"}\n')
+
+        # Ensure mtime difference is detectable
+        time.sleep(0.05)
+
+        newer = session_dir / "new-session.jsonl"
+        newer.write_text('{"type":"user"}\n')
+
+        monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path / "fake_home")
+        result = discover_jsonl(tmp_path)
+        assert result is not None
+        assert result.name == "new-session.jsonl"
+
+    def test_path_hashing(self, tmp_path, monkeypatch):
+        from auto import discover_jsonl
+
+        # Create project at a specific path and verify the hash convention
+        project_dir = tmp_path / "my" / "project"
+        project_dir.mkdir(parents=True)
+        project_hash = str(project_dir.resolve()).replace("/", "-")
+        session_dir = tmp_path / "fake_home" / ".claude" / "projects" / project_hash
+        session_dir.mkdir(parents=True)
+        (session_dir / "session.jsonl").write_text('{"type":"user"}\n')
+
+        monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path / "fake_home")
+        result = discover_jsonl(project_dir)
+        assert result is not None
+        assert result.name == "session.jsonl"

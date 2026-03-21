@@ -54,15 +54,18 @@ def _build_allowlist_checker(config: dict):
     """Build an allowlist checker function from YAML config.
 
     Returns a callable(path: str) -> bool.
+
+    allowlist_path_segments: matched via substring (not prefix) to handle
+    both relative and absolute paths (e.g. "spec/" matches "/tmp/proj/spec/foo.md").
     """
-    prefixes = tuple(s.lower() for s in config.get("allowlist_prefixes", []))
+    segments = tuple(s.lower() for s in config.get("allowlist_path_segments", []))
     substrings = [s.lower() for s in config.get("allowlist_substrings", [])]
     suffixes = tuple(s.lower() for s in config.get("allowlist_suffixes", []))
 
     def check(path: str) -> bool:
         lp = path.lower()
-        for prefix in prefixes:
-            if prefix in lp:
+        for seg in segments:
+            if seg in lp:
                 return True
         for sub in substrings:
             if sub in lp:
@@ -77,7 +80,7 @@ def _build_allowlist_checker(config: dict):
 
 # Default allowlist (used when no YAML config available — backward compat)
 _DEFAULT_ALLOWLIST_CONFIG = {
-    "allowlist_prefixes": [
+    "allowlist_path_segments": [
         "spec/", "tests/", "test/", "/tests/", "/test/",
         "journal/", ".agentic/session/", "memory/",
     ],

@@ -234,27 +234,57 @@ def test_load_violations_yaml():
         assert "config" in p
 
 
-def test_yaml_violations_match_hardcoded():
-    """YAML-driven detect_violations produces identical output to defaults.
-
-    Tests the stopped_after_plan_exit case with both YAML patterns and
-    fallback (no YAML), ensuring they produce the same violation types.
-    """
+def test_yaml_violations_match_hardcoded_stopped_after_plan():
+    """YAML-driven and fallback produce identical stopped_after_plan_exit violations."""
     messages = [
         _tool("ExitPlanMode", 0),
         _tool("Write", 1, {"file_path": "journal/plan.md"}),
         _user("continue please", 5),
     ]
     events = sa.extract_events(messages)
-
-    # With YAML patterns (default)
     v_yaml = sa.detect_violations(events)
-    # With explicit empty patterns (triggers fallback)
     v_fallback = sa.detect_violations(events, patterns=[])
 
-    # Both should detect the same violation types
-    assert len(v_yaml) == len(v_fallback)
-    assert v_yaml[0]["type"] == v_fallback[0]["type"] == "stopped_after_plan_exit"
+    assert len(v_yaml) == len(v_fallback) == 1
+    # Compare all non-volatile fields
+    for key in ("type", "description"):
+        assert v_yaml[0][key] == v_fallback[0][key], f"mismatch on {key}"
+    assert v_yaml[0]["type"] == "stopped_after_plan_exit"
+
+
+def test_yaml_violations_match_hardcoded_code_before_review():
+    """YAML-driven and fallback produce identical code_before_review violations."""
+    messages = [
+        _tool("EnterPlanMode", 0),
+        _tool("ExitPlanMode", 1),
+        _tool("Edit", 2, {"file_path": "src/main.py"}),
+        _tool("Write", 3, {"file_path": "src/utils.py"}),
+        _text("**Status**: APPROVED", 4),
+    ]
+    events = sa.extract_events(messages)
+    v_yaml = sa.detect_violations(events)
+    v_fallback = sa.detect_violations(events, patterns=[])
+
+    yaml_cbr = [v for v in v_yaml if v["type"] == "code_before_review"]
+    fall_cbr = [v for v in v_fallback if v["type"] == "code_before_review"]
+    assert len(yaml_cbr) == len(fall_cbr) == 1
+    assert yaml_cbr[0]["files"] == fall_cbr[0]["files"]
+    assert yaml_cbr[0]["description"] == fall_cbr[0]["description"]
+
+
+def test_yaml_violations_match_hardcoded_skipped_planning():
+    """YAML-driven and fallback produce identical skipped_planning violations."""
+    messages = [
+        _tool("Bash", 0, {"command": "bash .agentic/lib/tools/ag.sh implement F-0100"}),
+    ]
+    events = sa.extract_events(messages)
+    v_yaml = sa.detect_violations(events)
+    v_fallback = sa.detect_violations(events, patterns=[])
+
+    assert len(v_yaml) == len(v_fallback) == 1
+    for key in ("type", "description"):
+        assert v_yaml[0][key] == v_fallback[0][key], f"mismatch on {key}"
+    assert v_yaml[0]["type"] == "skipped_planning"
 
 
 def test_allowlist_from_yaml_config():
@@ -264,8 +294,8 @@ def test_allowlist_from_yaml_config():
     config = cbr_pattern["config"]
 
     # Verify YAML allowlist contains expected entries
-    assert "spec/" in config["allowlist_prefixes"]
-    assert "tests/" in config["allowlist_prefixes"]
+    assert "spec/" in config["allowlist_path_segments"]
+    assert "tests/" in config["allowlist_path_segments"]
     assert ".claude/plans/" in config["allowlist_substrings"]
     assert "-plan.md" in config["allowlist_suffixes"]
 

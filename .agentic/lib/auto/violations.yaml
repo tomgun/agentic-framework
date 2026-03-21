@@ -20,7 +20,7 @@ violations:
       trigger_tools: [Write, Edit, MultiEdit]
       group_by: draft_phase
       max_files_reported: 20
-      allowlist_prefixes:
+      allowlist_path_segments:
         - "spec/"
         - "tests/"
         - "test/"
