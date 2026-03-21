@@ -532,6 +532,54 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                         f"Code edit blocked — {feature_id} needs spec and acceptance criteria first")
                     return combined
 
+    # --- Defense-in-depth: duplicate git pre-commit checks at edit time ---
+    # These checks mirror pre-commit-check.sh so enforcement works even without
+    # git hooks (git_mode: deferred/none). See gap analysis in F-0250 plan.
+
+    if tool in ("Write", "Edit", "MultiEdit"):
+        file_path = input_data.get("file_path", "")
+        paths = get_paths(project_root)
+
+        # Check 14 mirror: Shipped spec protection — editing shipped AC needs migration
+        if is_formal and re.search(r'spec/acceptance/(F|NFR)-\d+\.md$', file_path):
+            fid_match = re.search(r'((?:F|NFR)-\d+)\.md$', file_path)
+            if fid_match:
+                fid = fid_match.group(1)
+                features_file = paths.features_file
+                if features_file.exists():
+                    content = features_file.read_text()
+                    # Check if this feature is shipped
+                    pattern = rf"## {re.escape(fid)}\b.*?(?=\n## |\Z)"
+                    section = re.search(pattern, content, re.DOTALL)
+                    if section and re.search(r"\*\*Status\*\*:\s*shipped", section.group()):
+                        return GateResult.allow([
+                            f"Editing shipped feature {fid} acceptance criteria. "
+                            f"Create a migration: bash .agentic/lib/tools/migration.sh create 'Update {fid}...'"
+                        ])
+
+        # Check 7 mirror: Code file length limit
+        if is_formal and not re.search(r'\.(md|json|yaml|yml|sh|toml|cfg|ini)$', file_path):
+            max_length = int(get_setting(project_root, "max_code_file_length", "500"))
+            new_content = input_data.get("content", "")
+            if new_content:
+                line_count = new_content.count('\n') + 1
+                if line_count > max_length:
+                    return GateResult.allow([
+                        f"File will be {line_count} lines (limit: {max_length}). "
+                        f"Consider splitting into smaller modules."
+                    ])
+
+        # Check 16 mirror: Shipped status downgrade protection
+        if is_formal and file_path.endswith("FEATURES.md"):
+            old_string = input_data.get("old_string", "")
+            new_string = input_data.get("new_string", "")
+            if old_string and new_string:
+                if "shipped" in old_string.lower() and "shipped" not in new_string.lower():
+                    return GateResult.deny([
+                        "Shipped feature status downgrade blocked. "
+                        "Create a migration first: bash .agentic/lib/tools/migration.sh create 'Deprecate...'"
+                    ])
+
     return GateResult.allow()
 
 

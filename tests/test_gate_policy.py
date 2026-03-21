@@ -624,3 +624,75 @@ class TestFormalSpecLifecycleEnforcement:
             json.dumps({"file_path": "/project/src/main.ts"})
         )
         assert result.decision == "allow"
+
+
+# ---------------------------------------------------------------------------
+# Defense-in-depth: git pre-commit checks mirrored in Claude hooks
+# ---------------------------------------------------------------------------
+
+class TestPreCommitMirrorChecks:
+    """Checks mirrored from pre-commit-check.sh into gate_pretool()."""
+
+    def test_shipped_spec_edit_warns(self, formal_project):
+        """Editing a shipped feature's AC file produces a migration warning."""
+        # Mark F-0042 as shipped
+        (formal_project / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
+
+## F-0042: Test Feature
+
+**Status**: shipped
+**Category**: Test
+""")
+        result = gate_pretool(
+            "F-0042", formal_project, "Edit",
+            json.dumps({"file_path": str(formal_project / ".agentic/spec/acceptance/F-0042.md")})
+        )
+        assert result.decision == "allow"  # warn, not block
+        assert any("migration" in w.lower() for w in result.warnings)
+
+    def test_non_shipped_spec_edit_no_warning(self, formal_project):
+        """Editing a non-shipped feature's AC file produces no warning."""
+        result = gate_pretool(
+            "F-0042", formal_project, "Edit",
+            json.dumps({"file_path": str(formal_project / ".agentic/spec/acceptance/F-0042.md")})
+        )
+        assert result.decision == "allow"
+        assert not any("migration" in w.lower() for w in result.warnings)
+
+    def test_code_file_length_warns(self, formal_project):
+        """Writing a file exceeding max_code_file_length produces warning."""
+        (formal_project / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- max_code_file_length: 10\n"
+        )
+        long_content = "\n".join([f"line {i}" for i in range(20)])
+        result = gate_pretool(
+            "F-0042", formal_project, "Write",
+            json.dumps({"file_path": "/project/src/big.ts", "content": long_content})
+        )
+        assert result.decision == "allow"
+        assert any("lines" in w and "limit" in w for w in result.warnings)
+
+    def test_shipped_status_downgrade_blocked(self, formal_project):
+        """Downgrading a shipped feature's status is blocked."""
+        result = gate_pretool(
+            None, formal_project, "Edit",
+            json.dumps({
+                "file_path": str(formal_project / ".agentic/spec/FEATURES.md"),
+                "old_string": "**Status**: shipped",
+                "new_string": "**Status**: implementing",
+            })
+        )
+        assert result.decision == "deny"
+        assert any("downgrade" in r.lower() for r in result.reasons)
+
+    def test_non_downgrade_status_change_allowed(self, formal_project):
+        """Upgrading status (planned → implementing) is allowed."""
+        result = gate_pretool(
+            None, formal_project, "Edit",
+            json.dumps({
+                "file_path": str(formal_project / ".agentic/spec/FEATURES.md"),
+                "old_string": "**Status**: planned",
+                "new_string": "**Status**: implementing",
+            })
+        )
+        assert result.decision == "allow"
