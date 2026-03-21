@@ -401,7 +401,7 @@ When switching between tools, the handoff is seamless because:
 **Environment-specific tips:**
 
 **Claude Code users:**
-- Hooks run automatically (SessionStart, PostToolUse, PreCompact)
+- Hooks run automatically (PreToolUse, SessionStart, UserPromptSubmit, PostToolUse, PreCompact, Stop)
 - Large context = can read all specs simultaneously
 - Use artifacts for diagrams/documentation drafts
 

@@ -315,7 +315,7 @@ Transition points where tool-native hooks can structurally enforce workflow rule
 | Plan mode exit → save + review | PostToolUse(ExitPlanMode) | Block coding without approved plan | **Implemented (F-0234)** |
 | After `gh pr merge` → warn to use `ag merge` | PostToolUse(Bash) + parse cmd | Catch bypassed entry point | **Implemented (F-0239)** |
 | On user prompt → warn unshipped features | UserPromptSubmit + git log parse | Catch merged-but-not-done on main | **Implemented (F-0239)** |
-| Before file edit → verify approved plan | PreToolUse(Write\|Edit) | Block coding without plan | Future |
+| Before file edit → verify artifacts | PreToolUse(Write\|Edit) | Block coding without required artifacts | **Implemented (Phase 4)** |
 | Before destructive git → collision guard | PreToolUse(Bash) + parse cmd | Prevent stash/reset with active agents | Future |
 | After `ag done` → verify completeness | PostToolUse(Bash) + parse cmd | Ensure ACs checked, docs updated | Future |
 | Before PR creation → pre-submit check | PreToolUse(Bash) + parse `gh pr` | Ensure tests pass | Future |

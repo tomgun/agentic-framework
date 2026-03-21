@@ -19,7 +19,7 @@ tokens: ~1700
 | **Instruction File** | `CLAUDE.md` (root) | `.cursor/rules/*.mdc` or `.cursorrules` | `.github/copilot-instructions.md` |
 | **Context Window** | 200K tokens | Varies by model | ~8K tokens (limited) |
 | **Project Context** | Automatic (all files) | Selective (@ mentions) | Limited (open files) |
-| **Hooks/Lifecycle** | ✅ Yes (SessionStart, PostToolUse, PreCompact, Stop) | ❌ No | ❌ No |
+| **Hooks/Lifecycle** | ✅ Yes (PreToolUse, SessionStart, UserPromptSubmit, PostToolUse, PreCompact, Stop) | ❌ No | ❌ No |
 | **File Operations** | Direct file edits | Direct file edits | Suggestions only (user applies) |
 | **Terminal Access** | ✅ Yes (can run commands) | ✅ Yes (via composer) | ❌ No (chat only) |
 | **Multi-file Edits** | ✅ Yes (batch edits) | ✅ Yes (composer) | ⚠️ Limited (one at a time) |
@@ -41,9 +41,11 @@ tokens: ~1700
 - Artifacts for documentation
 
 **Optimal setup:**
-1. Use hooks for automatic logging:
+1. Use hooks for automatic logging and enforcement:
+   - `PreToolUse.sh` → Block code edits when required artifacts missing (v2)
    - `SessionStart.sh` → Load context
-   - `PostToolUse.sh` → Quick checks
+   - `UserPromptSubmit.sh` → Phase-aware verification
+   - `PostToolUse.sh` → Quick checks + v2 artifact status
    - `PreCompact.sh` → Auto-log before context reset
    - `Stop.sh` → Session end reminder
 

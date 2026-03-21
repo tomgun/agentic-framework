@@ -3840,3 +3840,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 06:47 - Phase 4 hook enforcement
+
+**Why**: Phase 4 plan specified PostToolUse/PreToolUse hook wiring but only UserPromptSubmit was shipped
+
+**What changed**:
+- Added PreToolUse (blocking) + PostToolUse (advisory) ag check enforcement; fixed stale docs claiming no PreToolUse support
+
+**Next steps**:
+- Commit and PR
+
+**Blockers**: None
+
