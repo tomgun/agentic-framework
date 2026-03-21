@@ -9,7 +9,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag verify F-XXXX` — run tests and record results
 - `ag ship F-XXXX` — prepare for shipping
 - `ag status` — see current work items
-- `ag commit` | `ag done` | `ag todo` | `ag backlog`
+- `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init`
 
 ## Rules
 - Follow CLI prompts. It loads role-specific guidance at each phase.

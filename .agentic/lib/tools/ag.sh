@@ -196,6 +196,7 @@ source "$COMMANDS_DIR/help.sh"
 source "$COMMANDS_DIR/diagnostics.sh"
 source "$COMMANDS_DIR/settings.sh"
 source "$COMMANDS_DIR/operations.sh"
+source "$COMMANDS_DIR/git-init.sh"
 
 # Self-healing: ensure pre-commit hooks are installed on every ag invocation
 # Addresses D2 (Deterministic Enforcement) — hooks must survive git config resets
@@ -380,6 +381,12 @@ case "${1:-help}" in
     formalize)
         shift
         bash "$SCRIPT_DIR/formalize.sh" "$@"
+        ;;
+    git-init)
+        cmd_git_init
+        ;;
+    gitignore)
+        bash "$SCRIPT_DIR/gitignore.sh"
         ;;
     help|--help|-h)
         show_help

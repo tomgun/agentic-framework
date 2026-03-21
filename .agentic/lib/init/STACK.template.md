@@ -15,6 +15,8 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- discovery | formal | autonomous_formal -->
 
 ### Workflow
+- git_mode: deferred
+# Git initialization mode. none: no git | deferred: activate later via `ag git-init` | active: git initialized. Profile defaults — Discovery: deferred | Formal: deferred | Autonomous Formal: active
 - feature_tracking: no
 # F-XXXX tracking, acceptance criteria gates. Profile defaults — Discovery: no | Formal: yes
 - acceptance_criteria: recommended

@@ -26,7 +26,7 @@ bash .agentic/lib/init/scaffold.sh
 This creates all expected files/folders with templates/placeholders so you can start development immediately.
 If the project has existing code, scaffold will automatically run discovery and generate proposals.
 
-**Git init**: Scaffold automatically runs `git init` if the project is not yet a git repository. The framework requires git for hooks, branching, and WIP tracking.
+**Git mode (F-0250)**: Git is deferred by default for discovery and formal profiles. The framework works fully without git via Claude hooks + state machine. Autonomous formal defaults to active (git initialized). The user can activate git anytime with `ag git-init`. During init, ask the user about their preference (see Step 1b below).
 
 ## Step 0.5: Review Discovery Results (brownfield projects only)
 
@@ -185,6 +185,33 @@ If large, tell the user:
 - Profile: formal             <!-- if user chose 'b' -->
 - Profile: autonomous_formal  <!-- if user chose 'c' -->
 ```
+
+### Step 1b: Git Configuration (F-0250)
+
+After profile selection, ask the user about git:
+
+> "Would you like to set up git version control now?
+>
+> **a) Yes** — Initialize git repository immediately. Required for: branches, PRs, `ag commit`, `ag auto task/epic`.
+> **b) Later** — Start without git. The framework works fully via Claude hooks and the state machine. Activate anytime with `ag git-init`.
+>
+> Default: `Yes` for Autonomous Formal, `Later` for Discovery and Formal."
+
+Based on the answer, update `STACK.md`:
+```markdown
+- git_mode: active     <!-- if user chose 'a' (Yes) -->
+- git_mode: deferred   <!-- if user chose 'b' (Later) -->
+```
+
+If the user chose `active`, ensure git is initialized:
+```bash
+git init  # if .git/ does not already exist
+git config core.hooksPath .agentic/hooks
+```
+
+If the user chose `deferred`, print:
+> "Git deferred. The framework works without git — Claude hooks enforce your workflow.
+> Run `ag git-init` anytime to enable version control, branches, and PRs."
 
 ### Step 1 (cont.): Greenfield Domain Question (Formal only, new projects)
 
@@ -502,8 +529,9 @@ Please research current best practices for [environment]:
 5. Note any breaking changes in HUMAN_NEEDED.md
 ```
 
-## Step 1c: Git Workflow Preference (Discovery profile only)
+## Step 1c: Git Workflow Preference (Discovery profile only, when git active)
 
+**SKIP this step if `git_mode: deferred`** — the git workflow question is deferred until `ag git-init` is run.
 **SKIP this step for Formal/Autonomous Formal profiles** - both default to `pull_request` (formal tracking implies formal review).
 
 **For Discovery profile, ask the user:**
