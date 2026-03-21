@@ -25,6 +25,8 @@ fi
 # When v2 engine is active, check artifact status after tool use.
 # Uses --quick (file-existence only, no commands) for <500ms execution.
 # Only outputs when artifacts are MISSING — no noise on success.
+# Note: PreToolUse already handles Write/Edit/MultiEdit (blocking), so this
+# advisory check adds value for other tools (Bash, Read, Agent, etc.).
 _AF_CONFIG="$PROJECT_ROOT/.agentic/state_machine_af.yaml"
 if [[ -f "$_AF_CONFIG" ]] && grep -q '^engine: v2' "$_AF_CONFIG" 2>/dev/null; then
   CHECK_OUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m auto.v2.workflow check --quick --active 2>/dev/null || true)
