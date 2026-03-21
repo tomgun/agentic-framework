@@ -1825,6 +1825,173 @@
         "file_exists": [],
         "file_not_exists": []
       }
+    },
+    {
+      "id": "088_formal_workflow_plan_first",
+      "description": "Formal workflow requires plan before implementation — agent must not jump to code",
+      "section": "workflow",
+      "category": "Critical",
+      "llm_test_id": "LLM-088",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# Stack\n\n## Settings\n- profile: formal\n- acceptance_criteria: blocking\n- plan_review_enabled: yes\n- plan_review_convergence: auto\n- git_workflow: pull_request\n- wip_before_commit: blocking\n\n## Tech Stack\n- language: Python\n- framework: FastAPI\n",
+          ".agentic/spec/FEATURES.md": "# Features\n\n| ID | Name | Status |\n|----|------|--------|\n| F-0100 | Payment Processing | planned |\n",
+          "src/main.py": "from fastapi import FastAPI\napp = FastAPI()\n\n@app.get('/health')\ndef health():\n    return {'status': 'ok'}\n"
+        }
+      },
+      "prompt": "implement F-0100 Payment Processing",
+      "expected": {
+        "output_contains": [
+          "plan|ag plan|ag start|planning|before.*implement|first.*need|requirement|define|before.*cod",
+          "acceptance|criteria|spec|AC|define.*require"
+        ],
+        "output_not_contains": [
+          "Let me start implementing|I'll implement now|Let me write the code|I'll start coding"
+        ],
+        "file_exists": [],
+        "file_not_exists": []
+      }
+    },
+    {
+      "id": "089_formal_draft_plan_triggers_review",
+      "description": "DRAFT plan in formal profile triggers dialectical review (Critic/Advocate) before implementation",
+      "section": "workflow",
+      "category": "Critical",
+      "llm_test_id": "LLM-089",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "## Settings\n- profile: formal\n- plan_review_enabled: yes\n- plan_review_convergence: auto\n",
+          ".agentic/spec/FEATURES.md": "# Features\n\n| ID | Name | Status |\n|----|------|--------|\n| F-0100 | Payment Processing | planned |\n",
+          ".agentic/journal/plans/2026-03-20-F-0100-plan.md": "# Plan: Payment Processing\n\n**Feature**: F-0100\n**Status**: DRAFT\n\n## Overview\nAdd payment processing with Stripe integration, webhook handling, and receipt generation.\n\n## Steps\n1. Create payment service with Stripe SDK\n2. Add webhook endpoint for payment events\n3. Generate PDF receipts on successful payment\n4. Add idempotency keys for retry safety\n5. Write integration tests\n"
+        }
+      },
+      "prompt": "I have a DRAFT plan for F-0100. What should happen next before I can implement?",
+      "expected": {
+        "output_contains": [
+          "critic|advocate|review|dialectical|spawn|plan.*review",
+          "DRAFT|draft|not.*approved|needs.*review|before.*implement|review.*before"
+        ],
+        "output_not_contains": [
+          "Let me start implementing|I'll implement|Let me create|ag implement|ag transition.*implementation"
+        ],
+        "file_exists": [],
+        "file_not_exists": []
+      }
+    },
+    {
+      "id": "090_formal_specs_ac_before_code",
+      "description": "With approved plan but no AC file, agent creates acceptance criteria before writing code",
+      "section": "workflow",
+      "category": "Critical",
+      "llm_test_id": "LLM-090",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# Stack\n\n## Settings\n- profile: formal\n- acceptance_criteria: blocking\n- plan_review_enabled: yes\n- plan_review_convergence: auto\n- git_workflow: pull_request\n\n## Tech Stack\n- language: Python\n- framework: FastAPI\n",
+          ".agentic/spec/FEATURES.md": "# Features\n\n| ID | Name | Status |\n|----|------|--------|\n| F-0100 | Payment Processing | planned |\n",
+          ".agentic/journal/plans/2026-03-20-F-0100-plan.md": "# Plan: Payment Processing\n\n**Feature**: F-0100\n**Status**: APPROVED\n\n## Overview\nAdd payment processing with Stripe integration, webhook handling, and receipt generation.\n\n## Steps\n1. Create payment service with Stripe SDK\n2. Add webhook endpoint for payment events\n3. Generate PDF receipts on successful payment\n4. Add idempotency keys for retry safety\n5. Write integration tests\n",
+          "src/main.py": "from fastapi import FastAPI\napp = FastAPI()\n\n@app.get('/health')\ndef health():\n    return {'status': 'ok'}\n"
+        }
+      },
+      "prompt": "The plan for F-0100 is approved. I want to start implementing. What artifacts are needed before I can write code?",
+      "expected": {
+        "output_contains": [
+          "acceptance|criteria|AC|spec.*acceptance|F-0100.md",
+          "plan|APPROVED|approved|plan.*approved"
+        ],
+        "output_not_contains": [
+          "Let me start coding|I'll write the code now"
+        ],
+        "file_exists": [],
+        "file_not_exists": []
+      }
+    },
+    {
+      "id": "091_formal_pr_creation_and_review",
+      "description": "After committing code in formal workflow, agent creates PR and mentions review process",
+      "section": "workflow",
+      "category": "Important",
+      "llm_test_id": "LLM-091",
+      "profile": "autonomous_formal",
+      "setup": {
+        "files": {
+          "STACK.md": "## Settings\n- profile: autonomous_formal\n- git_workflow: pull_request\n",
+          ".agentic/spec/FEATURES.md": "# Features\n\n| ID | Name | Status |\n|----|------|--------|\n| F-0100 | Payment Processing | in_progress |\n",
+          ".agentic/spec/acceptance/F-0100.md": "# F-0100: Payment Processing\n\n## Acceptance Criteria\n- [x] AC-001: Process payments via Stripe API\n- [x] AC-002: Handle webhook events for payment status\n- [x] AC-003: Generate receipts for successful payments\n",
+          "payment_service.py": "class PaymentService:\n    def process_payment(self, amount, currency='usd'):\n        pass\n    def handle_webhook(self, event):\n        pass\n"
+        }
+      },
+      "prompt": "Code for F-0100 is committed on the feature branch. All tests pass. What's next to ship this?",
+      "expected": {
+        "output_contains": [
+          "pull.request|PR|ag ship|gh pr|git push",
+          "review|critical.agent|code.review|review_code|ag commit"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": []
+      }
+    },
+    {
+      "id": "092_post_merge_ag_done_version_flush",
+      "description": "Post-merge dance: agent runs ag done, bumps VERSION, flushes state after PR merge",
+      "section": "workflow",
+      "category": "Critical",
+      "llm_test_id": "LLM-092",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# Stack\n\n## Settings\n- profile: formal\n- acceptance_criteria: blocking\n- plan_review_enabled: yes\n- git_workflow: pull_request\n\n## Tech Stack\n- language: Python\n- framework: FastAPI\n",
+          ".agentic/spec/FEATURES.md": "# Features\n\n| ID | Name | Status |\n|----|------|--------|\n| F-0100 | Payment Processing | in_progress |\n",
+          ".agentic/spec/acceptance/F-0100.md": "# F-0100: Payment Processing\n\n## Acceptance Criteria\n- [x] AC-001: Process payments via Stripe API\n- [x] AC-002: Handle webhook events\n- [x] AC-003: Generate receipts\n",
+          "VERSION": "0.42.0"
+        }
+      },
+      "prompt": "F-0100 PR just merged to main. What are the post-merge steps? Remember to use ag done and bump the VERSION.",
+      "expected": {
+        "output_contains": [
+          "ag done|ag.*done|completion|post.merge|mark.*done|mark.*complete",
+          "VERSION|version|bump|patch|0\\.42",
+          "flush|ag flush|commit.*state|state.*commit|JOURNAL|STATUS|artifact",
+          "shipped|feature.sh|FEATURES|status.*shipped|mark.*shipped"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": []
+      }
+    },
+    {
+      "id": "093_post_merge_state_artifact_updates",
+      "description": "Post-merge updates all state artifacts: JOURNAL, STATUS, FEATURES, CONTRIBUTIONS, VERSION",
+      "section": "artifact-maintenance",
+      "category": "Important",
+      "llm_test_id": "LLM-093",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# Stack\n\n## Settings\n- profile: formal\n- acceptance_criteria: blocking\n- plan_review_enabled: yes\n- git_workflow: pull_request\n\n## Tech Stack\n- language: Python\n- framework: FastAPI\n",
+          ".agentic/spec/FEATURES.md": "# Features\n\n| ID | Name | Status |\n|----|------|--------|\n| F-0100 | Payment Processing | in_progress |\n| F-0050 | User Auth | shipped |\n",
+          ".agentic/spec/acceptance/F-0100.md": "# F-0100: Payment Processing\n\n## Acceptance Criteria\n- [x] AC-001: Process payments via Stripe API\n- [x] AC-002: Handle webhook events\n- [x] AC-003: Generate receipts\n",
+          ".agentic/journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-03-20\n- Implemented payment service\n- All tests passing\n",
+          ".agentic/STATUS.md": "# Status\n",
+          "VERSION": "0.42.0",
+          ".agentic/CONTRIBUTIONS.md": "# Contributions\n"
+        }
+      },
+      "prompt": "F-0100 PR #42 just merged. Run the full post-merge dance — update all artifacts.",
+      "expected": {
+        "output_contains": [
+          "journal|JOURNAL|journal.sh",
+          "status|STATUS|status.sh",
+          "FEATURES|feature.sh|shipped|feature.*status",
+          "VERSION|version|bump"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": []
+      }
     }
   ]
 }
