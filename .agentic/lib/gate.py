@@ -241,6 +241,43 @@ def check_feature_has_tests(feature_id: str, project_root: Path) -> GateResult:
     return GateResult.deny([f"No test files reference {feature_id}"])
 
 
+def check_any_feature_implementing(project_root: Path) -> bool:
+    """Check if at least one feature is in 'implementing' or later state.
+
+    Returns True if any feature has progressed past 'planned'.
+    Used by F-0251 to enforce spec lifecycle in formal modes.
+    """
+    paths = get_paths(project_root)
+    features_file = paths.features_file
+    if not features_file.exists():
+        return True  # No FEATURES.md = no enforcement
+
+    content = features_file.read_text()
+    # States that indicate implementation has started
+    active_states = {
+        "specced", "criteria_set", "tests_written", "implementing",
+        "verified", "documented", "committed", "shipped",
+    }
+    # Find all **Status**: <state> lines
+    for match in re.finditer(r"\*\*Status\*\*:\s*(\w+)", content):
+        status = match.group(1).lower()
+        if status in active_states:
+            return True
+
+    return False
+
+
+def check_feature_has_ac_file(feature_id: str, project_root: Path) -> bool:
+    """Check if an AC file exists for a feature (not just stubs)."""
+    paths = get_paths(project_root)
+    ac_file = paths.acceptance_dir / f"{feature_id}.md"
+    if not ac_file.exists():
+        return False
+    content = ac_file.read_text()
+    ac_pattern = re.compile(r"(- \[[ x]\]\s*\*?\*?AC-|### AC-)", re.IGNORECASE)
+    return bool(ac_pattern.search(content))
+
+
 def check_verification_passes(feature_id: str, project_root: Path) -> GateResult:
     """Run verification commands from the AC file directly.
 
@@ -453,11 +490,11 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                         [f"git push blocked — {feature_id} missing spec or acceptance criteria"]
                     )
 
-    # --- Write/Edit tool checks (formal mode: code must have spec) ---
-    if tool in ("Write", "Edit", "MultiEdit") and is_formal and feature_id:
+    # --- Write/Edit tool checks ---
+    if tool in ("Write", "Edit", "MultiEdit") and is_formal:
         file_path = input_data.get("file_path", "")
 
-        # Allow edits to framework/config/state files
+        # Allow edits to framework/config/state files (always safe)
         safe_patterns = [
             r'\.agentic/',
             r'tests?/',
@@ -468,14 +505,32 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
         is_safe = any(re.search(p, file_path) for p in safe_patterns)
 
         if not is_safe:
-            # Check that spec + AC exist before allowing code edits
-            spec_check = check_feature_has_spec(feature_id, project_root)
-            ac_check = check_feature_has_ac(feature_id, project_root)
-            combined = spec_check.merge(ac_check)
-            if combined.decision == "deny":
-                combined.reasons.insert(0,
-                    f"Code edit blocked — {feature_id} needs spec and acceptance criteria first")
-                return combined
+            # F-0251: Block source code edits when ALL features are still "planned"
+            # In formal modes, at least one feature must be in "implementing" or later
+            # before source code can be written. This enforces the spec lifecycle.
+            if not check_any_feature_implementing(project_root):
+                enforcement = get_setting(project_root, "state_enforcement", "off")
+                msg = (
+                    "Code edit blocked — no feature is in implementation state. "
+                    "All features are still 'planned'. In formal mode, run "
+                    "`ag implement F-XXXX` to start implementing a feature first. "
+                    "This ensures specs and acceptance criteria are created systematically."
+                )
+                if enforcement == "blocking":
+                    return GateResult.deny([msg])
+                else:
+                    # Advisory: warn but allow
+                    return GateResult.allow([msg])
+
+            # Existing check: feature-specific spec + AC enforcement
+            if feature_id:
+                spec_check = check_feature_has_spec(feature_id, project_root)
+                ac_check = check_feature_has_ac(feature_id, project_root)
+                combined = spec_check.merge(ac_check)
+                if combined.decision == "deny":
+                    combined.reasons.insert(0,
+                        f"Code edit blocked — {feature_id} needs spec and acceptance criteria first")
+                    return combined
 
     return GateResult.allow()
 

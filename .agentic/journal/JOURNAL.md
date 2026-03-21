@@ -3944,3 +3944,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 16:41 - Git-Deferred Mode + Spec Enforcement
+
+**Why**: Algebra-rush case study: agent bypassed state machine and git entirely in autonomous_formal — framework needs git-optional mode and spec lifecycle enforcement
+
+**What changed**:
+- F-0250: git_mode (none|deferred|active) setting, ag git-init command, stack-aware .gitignore, gated git-dependent commands. F-0251: PreToolUse blocks source code edits when all features are planned in formal modes (8 tests).
+
+**Next steps**:
+- Review, ship both features, update instruction files checklist
+
+**Blockers**: None
+
