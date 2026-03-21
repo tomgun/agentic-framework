@@ -3866,3 +3866,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 08:23 - Hooks-First Framework (F-0244)
+
+**Why**: v2 engine duplicated what platform hooks now provide natively — 90% of complexity was compensating for LLM unreliability that hooks solve at the platform level
+
+**What changed**:
+- All 5 phases implemented: gate.py policy engine, Stop+PreToolUse enforcement hooks, context hooks v2 removal, v2 engine stripped from 5 auto system files, Cursor cross-tool adapters. 45 new tests, 126 total pass.
+
+**Next steps**:
+- Create PR, self-review, dogfood sync
+
+**Blockers**: None
+

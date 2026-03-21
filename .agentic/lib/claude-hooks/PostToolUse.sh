@@ -21,18 +21,26 @@ if [[ ! -d ".agentic" ]]; then
   exit 0
 fi
 
-# --- v2 artifact enforcement (Phase 4 completion) ---
-# When v2 engine is active, check artifact status after tool use.
-# Uses --quick (file-existence only, no commands) for <500ms execution.
-# Only outputs when artifacts are MISSING — no noise on success.
-# Note: PreToolUse already handles Write/Edit/MultiEdit (blocking), so this
-# advisory check adds value for other tools (Bash, Read, Agent, etc.).
-_AF_CONFIG="$PROJECT_ROOT/.agentic/state_machine_af.yaml"
-if [[ -f "$_AF_CONFIG" ]] && grep -q '^engine: v2' "$_AF_CONFIG" 2>/dev/null; then
-  CHECK_OUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m auto.v2.workflow check --quick --active 2>/dev/null || true)
-  if [[ -n "$CHECK_OUT" ]]; then
-    echo "$CHECK_OUT"
-  fi
+# --- Advisory artifact check (hooks-first: uses gate.py) ---
+# After tool use, check artifact status for active feature. Advisory only.
+# PreToolUse already handles blocking for Write/Edit — this adds awareness
+# for other tools (Bash, Read, Agent, etc.).
+GATE_OUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -c "
+import sys; sys.path.insert(0, '$PROJECT_ROOT/.agentic/lib')
+from gate import resolve_active_feature, check_feature_has_spec, check_feature_has_ac
+from pathlib import Path
+root = Path('$PROJECT_ROOT')
+f = resolve_active_feature(root)
+if f:
+    s = check_feature_has_spec(f, root)
+    a = check_feature_has_ac(f, root)
+    issues = s.reasons + a.reasons
+    if issues:
+        print(f'📋 {f}: ' + '; '.join(issues))
+" 2>/dev/null || true)
+
+if [[ -n "$GATE_OUT" ]]; then
+  echo "$GATE_OUT"
 fi
 
 # Only run linter checks after file writes (not after reads)
