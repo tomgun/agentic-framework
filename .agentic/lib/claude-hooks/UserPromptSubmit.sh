@@ -73,6 +73,7 @@ fi
 
 # --- Batch work detection (F-0300 R3) ---
 # Warn when user prompt contains batch-work triggers that should use ag auto crunch
+# USER_PROMPT is set once here and reused by all subsequent checks
 USER_PROMPT="${CLAUDE_USER_PROMPT:-}"
 if echo "$USER_PROMPT" | grep -qiE '(churn|batch)\s+(all\s+)?(tasks|features)|build everything|implement (all|everything)|do all (features|tasks)|implement everything'; then
   echo ""

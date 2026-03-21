@@ -445,24 +445,11 @@ cmd_hooks() {
             local hooks_source="$ROOT_DIR/.agentic/lib/claude-hooks/hooks.json"
             if [[ -f "$claude_hooks" ]]; then
                 echo -e "  ${GREEN}✓ INSTALLED${NC}: .claude/hooks.json"
-                # List registered hook events
+                # Delegate to init.py --hooks-status for detailed per-hook reporting
                 if command -v python3 >/dev/null 2>&1; then
-                    python3 -c "
-import json, os
-with open('$claude_hooks') as f:
-    data = json.load(f)
-for event, entries in sorted(data.get('hooks', {}).items()):
-    scripts = []
-    for entry in entries:
-        for hook in entry.get('hooks', []):
-            cmd = hook.get('command', '')
-            script = cmd.replace('\${CLAUDE_PROJECT_DIR}', '$ROOT_DIR')
-            exists = os.path.isfile(script)
-            marker = '✓' if exists else '✗'
-            scripts.append(f'{marker} {event}')
-    for s in scripts:
-        print(f'    {s}')
-" 2>/dev/null || echo "    (could not parse hooks.json)"
+                    python3 "$ROOT_DIR/.agentic/lib/auto/init.py" \
+                        --hooks-status --project-root "$ROOT_DIR" 2>/dev/null \
+                        | grep "^  " || true  # Show only the per-hook lines
                 fi
             elif [[ -f "$hooks_source" ]]; then
                 echo -e "  ${RED}✗ NOT INSTALLED${NC}: .claude/hooks.json missing"

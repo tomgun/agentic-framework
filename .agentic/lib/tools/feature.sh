@@ -54,6 +54,7 @@ USAGE
 fi
 
 # --- Add subcommand: create a new feature in heading format (F-0300 R4) ---
+# Note: FEATURES_FILE existence is already checked at line 20 (exits if missing).
 if [[ "${FIELD}" == "add" ]]; then
   FEATURE_NAME="${VALUE}"
   DOMAIN="${4:-general}"
