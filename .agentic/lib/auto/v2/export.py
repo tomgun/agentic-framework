@@ -14,7 +14,6 @@ Usage:
 from __future__ import annotations
 
 import json
-import os
 import shutil
 import sys
 from pathlib import Path
@@ -59,7 +58,7 @@ def _read_project_settings(project_root: Path) -> ProjectSettings:
             settings.verification_commands = [
                 cmd.run for cmd in config.verification_commands
             ]
-    except (FileNotFoundError, Exception):
+    except Exception:
         pass
 
     # Read STACK.md for profile/mode/plan_review settings
@@ -83,7 +82,7 @@ def _read_project_settings(project_root: Path) -> ProjectSettings:
     try:
         from . import work_items
         items = work_items.list_items(project_root)
-        active = [i for i in items if i.status not in ("shipped", "deprecated")]
+        active = [i for i in items if i.status not in ("shipped", "deprecated", "idea")]
         if active:
             settings.mode = active[0].mode
     except Exception:

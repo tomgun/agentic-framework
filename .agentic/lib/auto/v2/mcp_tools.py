@@ -15,7 +15,11 @@ from typing import Any
 
 
 def _capture_stdout(fn, *args, **kwargs) -> tuple[int, str]:
-    """Run a function that prints to stdout and capture the output."""
+    """Run a function that prints to stdout and capture the output.
+
+    Note: swaps sys.stdout/stderr globally — safe for single-threaded MCP stdio
+    transport but not suitable for concurrent use.
+    """
     old_stdout = sys.stdout
     sys.stdout = buf = io.StringIO()
     old_stderr = sys.stderr

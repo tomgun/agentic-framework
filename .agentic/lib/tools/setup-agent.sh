@@ -137,7 +137,7 @@ setup_cursor() {
   if _is_v2_engine; then
     _v2_export cursor
     echo -e "${GREEN}✓ Generated .cursorrules (v2 export)${NC}"
-  else
+  else  # v1: static copy
     # Cursor can use .cursorrules (root) or .cursor/rules/*.mdc
     TARGET="$PROJECT_ROOT/.cursorrules"
     SOURCE="$AGENTIC_DIR/agents/cursor/cursorrules.txt"
@@ -178,8 +178,8 @@ See `AGENTS.md` for non-negotiable rules:
 EOF
     echo -e "${GREEN}✓ Created .cursorrules (minimal)${NC}"
     echo "  Cursor will now auto-load framework instructions."
+    fi
   fi
-  fi  # end v2 else
 
   # Also create .cursor/rules/agentic.mdc if .cursor exists
   if [[ -d "$PROJECT_ROOT/.cursor" ]] || [[ -d "$PROJECT_ROOT/.cursor/rules" ]]; then
