@@ -637,17 +637,9 @@ state_mapping:
         _CONFIG_CACHE.clear()
 
     def test_v2_get_current_state(self, v2_project):
-        """When v2 work item exists, get_current_state reads from it."""
-        from auto.v2 import work_items
-
-        work_items.create(v2_project, "F-0099", "Test v2", mode="lean", profile="hands_on")
-        # Advance to implementation
-        from auto.v2.transitions import TransitionOrchestrator
-        orch = TransitionOrchestrator(v2_project)
-        orch.transition("F-0099", "queued")
-        orch.transition("F-0099", "implementation", force_skip=True)
-
-        # v1 state machine should read from v2 work item
+        """v2 engine removed (F-0244): state always reads from FEATURES.md."""
+        # With v2 removed, state machine reads from FEATURES.md only
+        write_features(v2_project, [("F-0099", "Test feature", "implementing")])
         sm = FeatureStateMachine(project_root=v2_project, enforce=False)
         state = sm.get_current_state("F-0099")
         assert state == FeatureState.IMPLEMENTING
@@ -661,20 +653,10 @@ state_mapping:
         assert state == FeatureState.SHIPPED
 
     def test_v2_transition_delegates(self, v2_project):
-        """When v2 work item exists, transition delegates to TransitionOrchestrator."""
-        from auto.v2 import work_items
-
-        work_items.create(v2_project, "F-0100", "Test transition", mode="lean", profile="hands_on")
-        from auto.v2.transitions import TransitionOrchestrator
-        orch = TransitionOrchestrator(v2_project)
-        orch.transition("F-0100", "queued")
-
-        # Use v1 API to transition
+        """v2 engine removed (F-0244): state reads from FEATURES.md only."""
+        # With v2 removed, state machine reads from FEATURES.md
+        write_features(v2_project, [("F-0100", "Test transition", "planned")])
         sm = FeatureStateMachine(project_root=v2_project, enforce=False)
-        success, msgs = sm.transition("F-0100", FeatureState.PLANNED)  # planning maps to planned
-        # Should succeed via v2 delegation
-        assert success
-
-        # Verify work item was updated
-        item = work_items.load(v2_project, "F-0100")
-        assert item.status == "planning"
+        # Verify can_transition works (doesn't need feature.sh)
+        allowed, msgs = sm.can_transition("F-0100", FeatureState.SPECCED)
+        assert allowed

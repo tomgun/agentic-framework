@@ -21,17 +21,23 @@ if [[ ! -d ".agentic" ]]; then
   exit 0
 fi
 
-# --- v2 artifact enforcement (Phase 4 completion) ---
-# When v2 engine is active, check artifact status after tool use.
-# Uses --quick (file-existence only, no commands) for <500ms execution.
-# Only outputs when artifacts are MISSING — no noise on success.
-# Note: PreToolUse already handles Write/Edit/MultiEdit (blocking), so this
-# advisory check adds value for other tools (Bash, Read, Agent, etc.).
-_AF_CONFIG="$PROJECT_ROOT/.agentic/state_machine_af.yaml"
-if [[ -f "$_AF_CONFIG" ]] && grep -q '^engine: v2' "$_AF_CONFIG" 2>/dev/null; then
-  CHECK_OUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m auto.v2.workflow check --quick --active 2>/dev/null || true)
-  if [[ -n "$CHECK_OUT" ]]; then
-    echo "$CHECK_OUT"
+# --- Advisory artifact check (hooks-first: uses gate.py) ---
+# After tool use, check artifact status for active feature. Advisory only.
+# PreToolUse already handles blocking for Write/Edit — this adds awareness
+# for other tools (Bash, Read, Agent, etc.).
+ARTIFACT_JSON=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate check-artifacts --project-root "$PROJECT_ROOT" 2>/dev/null || true)
+
+if [[ -n "$ARTIFACT_JSON" ]]; then
+  # Parse feature + issues from JSON
+  if command -v jq >/dev/null 2>&1; then
+    FEAT=$(echo "$ARTIFACT_JSON" | jq -r '.feature // ""' 2>/dev/null)
+    ISSUES=$(echo "$ARTIFACT_JSON" | jq -r '.issues // [] | join("; ")' 2>/dev/null)
+  else
+    FEAT=$(echo "$ARTIFACT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('feature',''))" 2>/dev/null || true)
+    ISSUES=$(echo "$ARTIFACT_JSON" | python3 -c "import sys,json; print('; '.join(json.load(sys.stdin).get('issues',[])))" 2>/dev/null || true)
+  fi
+  if [[ -n "$ISSUES" ]]; then
+    echo "📋 ${FEAT}: ${ISSUES}"
   fi
 fi
 

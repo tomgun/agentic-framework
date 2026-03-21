@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Phase 4 hook enforcement shipped (PR #184 merged, v0.66.0) (Updated: 2026-03-21 07:19 UTC)
+- F-0244: Hooks-first framework simplification — PR ready (Updated: 2026-03-21 08:23 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item

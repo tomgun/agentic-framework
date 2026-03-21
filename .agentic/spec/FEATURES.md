@@ -4253,3 +4253,127 @@ Proposed restructuring:
 **Description**: Runs the same task across three real configuration profiles (discovery/formal/autonomous_formal) and compares outcomes empirically. Answers "does the complexity actually help?" with universal metrics (app_runs, tests_pass, test_count) and framework-specific metrics reported separately. Depends on F-0240.
 
 **Acceptance**: See `spec/acceptance/F-0243.md`
+
+---
+
+## F-0244: Hooks-First Framework Simplification
+
+**Status**: planned
+**Category**: Architecture
+**Source**: .agentic/journal/plans/2026-03-21-hooks-first-framework-plan.md
+**Priority**: critical
+**Complexity**: high
+
+**Description**: Major architectural refactor: strip the v2 Python state machine engine and replace with hooks-based enforcement. Hooks are now a cross-tool standard (Claude Code, Cursor, Copilot, Gemini CLI). Same `ag` commands, same UX, dramatically simpler internals. `ag gate` (bash→Python) as single policy engine, enforcement hooks (thin adapters) + context hooks (richer scripts), cross-tool adapters, CI backstop via `ag verify`.
+
+**Children**: F-0245, F-0246, F-0247, F-0248, F-0249
+
+**Implementation**:
+- State: none
+- Code: `.agentic/hooks/`, `gates.py` simplification, `ag gate` command, cross-tool adapters
+- Tests: per-phase verification
+
+**Acceptance**: See `spec/acceptance/F-0244.md`
+
+---
+
+## F-0245: Stop Gate Enforcement
+
+**Status**: planned
+**Category**: Verification & Enforcement
+**Parent**: F-0244
+**Priority**: critical
+**Complexity**: medium
+
+**Description**: Agent cannot stop session until `ag verify` passes. Highest-value hook — directly enforces definition of done. Simplify `gates.py` (extract gate checks, remove v2 imports), write `ag gate stop` entry point, Claude enforcement adapter for Stop hook, wire into hooks.json.
+
+**Implementation**:
+- State: none
+- Code: `ag gate` in ag.sh, simplified `gates.py`, `.agentic/hooks/claude/enforcement.sh`
+- Tests: Stop hook blocks when verification fails, allows when passes
+
+**Acceptance**: See `spec/acceptance/F-0245.md`
+
+---
+
+## F-0246: PreToolUse Gate Enforcement
+
+**Status**: planned
+**Category**: Verification & Enforcement
+**Parent**: F-0244
+**Priority**: high
+**Complexity**: medium
+
+**Description**: `ag gate pretool` blocks git commit/push without checks, destructive git ops, and code edits without spec (formal mode). Active feature resolution via AGENTS.json/STATUS.md/BACKLOG.json. Claude + Cursor enforcement adapters with tool name normalization.
+
+**Dependencies**: F-0245
+
+**Implementation**:
+- State: none
+- Code: `ag gate pretool`, `resolve_active_feature()`, enforcement adapters
+- Tests: PreToolUse blocks across Claude + Cursor
+
+**Acceptance**: See `spec/acceptance/F-0246.md`
+
+---
+
+## F-0247: Context Hooks
+
+**Status**: planned
+**Category**: Session
+**Parent**: F-0244
+**Priority**: high
+**Complexity**: medium
+
+**Description**: Richer hook scripts for SessionStart (inject state, detect interrupted work), UserPromptSubmit (intent routing, collision checks, stale artifact detection), PreCompact (preserve state). Claude + Cursor context adapters. These are 50-150 line scripts, not thin adapters.
+
+**Dependencies**: F-0245
+
+**Implementation**:
+- State: none
+- Code: `.agentic/hooks/claude/context.sh`, `.agentic/hooks/cursor/context.sh`
+- Tests: Context injection verified per hook event
+
+**Acceptance**: See `spec/acceptance/F-0247.md`
+
+---
+
+## F-0248: Strip v2 Engine
+
+**Status**: planned
+**Category**: Architecture
+**Parent**: F-0244
+**Priority**: high
+**Complexity**: high
+
+**Description**: Remove `.agentic/lib/auto/v2/` entirely (~3.2K lines, 14 files). Remove `is_v2_engine()` calls from 5 auto system files (scheduler, epic, kickoff, verify, state_machine) using existing fallback paths. Remove v2 ag commands. Write `upgrade.sh` migration for existing v2 users. Update `validate_framework.sh`.
+
+**Dependencies**: F-0245, F-0246, F-0247
+
+**Implementation**:
+- State: none
+- Code: Remove v2/, update auto system files, upgrade.sh migration
+- Tests: Full auto system smoke test after removal
+
+**Acceptance**: See `spec/acceptance/F-0248.md`
+
+---
+
+## F-0249: Cross-Tool Export and CI Integration
+
+**Status**: planned
+**Category**: Tooling
+**Parent**: F-0244
+**Priority**: medium
+**Complexity**: medium
+
+**Description**: `ag export` generates hook configs per tool: Cursor (.cursor/hooks.json), Copilot (.github/hooks/*.json), Gemini (.gemini/settings.json), Codex (AGENTS.md, degraded/guidance-only). CI integration: document `ag verify` as merge gate. Update framework docs (HOW_IT_WORKS, DEVELOPER_GUIDE, MIGRATION_v2).
+
+**Dependencies**: F-0248
+
+**Implementation**:
+- State: none
+- Code: `ag export` subcommands, per-tool adapter files, CI docs
+- Tests: Export generates valid configs per tool
+
+**Acceptance**: See `spec/acceptance/F-0249.md`

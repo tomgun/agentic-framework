@@ -37,17 +37,9 @@ source "$SCRIPT_DIR/../paths.sh"
 # AGENTIC_LIB, AGENTIC_ROOT, PROJECT_ROOT provided by paths.sh
 AGENTIC_DIR="$AGENTIC_LIB"
 
-# Check if v2 engine is active
-_is_v2_engine() {
-  local yaml_file="$PROJECT_ROOT/.agentic/state_machine_af.yaml"
-  [[ -f "$yaml_file" ]] && grep -q 'engine: v2' "$yaml_file" 2>/dev/null
-}
-
-# Delegate instruction file generation to ag export (v2 only)
-_v2_export() {
-  local tool="$1"
-  PYTHONPATH="$AGENTIC_DIR" python3 -m auto.v2.workflow export "$tool"
-}
+# v2 engine removed (hooks-first simplification F-0244)
+_is_v2_engine() { return 1; }  # Always false
+_v2_export() { return 1; }     # No-op
 
 show_help() {
   echo "Usage: bash .agentic/tools/setup-agent.sh <tool>"

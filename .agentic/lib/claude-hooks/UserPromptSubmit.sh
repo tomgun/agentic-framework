@@ -137,14 +137,25 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   fi
 fi
 
-# --- v2 quick artifact check ---
-# When v2 engine is active, inject artifact status into context on every prompt.
-# Uses --quick (file-existence only, no commands) for <500ms execution.
-_AF_CONFIG="$PROJECT_ROOT/.agentic/state_machine_af.yaml"
-if [[ -f "$_AF_CONFIG" ]] && grep -q '^engine: v2' "$_AF_CONFIG" 2>/dev/null; then
-  CHECK_OUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m auto.v2.workflow check --quick --active 2>/dev/null || true)
-  if [[ -n "$CHECK_OUT" ]]; then
-    echo "$CHECK_OUT"
+# --- Artifact status check (hooks-first: uses gate.py module calls) ---
+# Inject artifact status for active feature into context on every prompt.
+ACTIVE_FEATURE=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate resolve --project-root "$PROJECT_ROOT" 2>/dev/null || true)
+
+if [[ -n "$ACTIVE_FEATURE" ]]; then
+  # Quick check: does feature have spec + AC?
+  ARTIFACT_JSON=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate check-artifacts --feature "$ACTIVE_FEATURE" --project-root "$PROJECT_ROOT" 2>/dev/null || true)
+  if [[ -n "$ARTIFACT_JSON" ]]; then
+    if command -v jq >/dev/null 2>&1; then
+      MISSING=$(echo "$ARTIFACT_JSON" | jq -r '.issues // [] | join("; ")' 2>/dev/null)
+    else
+      MISSING=$(echo "$ARTIFACT_JSON" | python3 -c "import sys,json; print('; '.join(json.load(sys.stdin).get('issues',[])))" 2>/dev/null || true)
+    fi
+    if [[ -n "$MISSING" ]]; then
+      echo ""
+      echo "📋 Active feature $ACTIVE_FEATURE — missing artifacts:"
+      echo "   $MISSING"
+      echo ""
+    fi
   fi
 fi
 
