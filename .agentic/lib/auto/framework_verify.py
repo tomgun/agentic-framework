@@ -35,7 +35,7 @@ _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 sys.path.insert(0, str(_LIB_DIR / "tools"))
 
-from auto import SpawnResult, spawn_claude  # noqa: E402
+from auto import SpawnResult, spawn_claude, discover_jsonl  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -151,6 +151,166 @@ def list_scenarios() -> list[str]:
     return sorted(
         p.stem for p in SCENARIOS_DIR.glob("*.yaml")
     )
+
+
+# ---------------------------------------------------------------------------
+# Phase checking (F-0242) — verify intermediate workflow phases via framework.log
+# ---------------------------------------------------------------------------
+
+class PhaseChecker:
+    """Check intermediate workflow phases via framework.log.
+
+    Parses framework.log (pipe-delimited: TIMESTAMP|SCRIPT|VERB|ARGS|RESULT)
+    and checks that expected phases occurred, optionally verifying filesystem
+    state at each detected phase.
+
+    Matching semantics: "at some point, this phase was attempted."
+    Matches on 'start' entries by default. A phase that was attempted but
+    failed (end:1) still counts as "phase occurred" — the failure is
+    separately detectable via the result field.
+    """
+
+    def __init__(self, project_root: Path):
+        self.root = project_root
+        self.log_path = project_root / ".agentic" / "session" / "framework.log"
+        self._entries: list[dict] | None = None
+
+    def _parse_log(self) -> list[dict]:
+        """Parse framework.log into structured entries.
+
+        Returns empty list if file missing or empty.
+        Handles entries with empty fields gracefully.
+        Format: TIMESTAMP|SCRIPT|VERB|ARGS|RESULT
+        """
+        if self._entries is not None:
+            return self._entries
+
+        self._entries = []
+        if not self.log_path.exists():
+            return self._entries
+
+        try:
+            for line in self.log_path.read_text().splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split("|", maxsplit=4)
+                if len(parts) < 3:
+                    continue  # Malformed — need at least timestamp|script|verb
+                entry = {
+                    "timestamp": parts[0].strip(),
+                    "script": parts[1].strip(),
+                    "verb": parts[2].strip(),
+                    "args": parts[3].strip() if len(parts) > 3 else "",
+                    "result": parts[4].strip() if len(parts) > 4 else "",
+                }
+                self._entries.append(entry)
+        except (OSError, IOError):
+            pass  # Fail-open: unreadable log → no phase evidence
+
+        return self._entries
+
+    def _find_phase(
+        self, detect_via: dict, require_result: str | None = None,
+    ) -> dict | None:
+        """Find a log entry matching the detection criteria.
+
+        detect_via.framework_log format: "script|verb" (matched as substrings).
+        If require_result is set, only match entries with that result.
+        """
+        pattern = detect_via.get("framework_log", "")
+        if not pattern:
+            return None
+
+        parts = pattern.split("|", maxsplit=1)
+        match_script = parts[0].strip().lower() if parts else ""
+        match_verb = parts[1].strip().lower() if len(parts) > 1 else ""
+
+        for entry in self._parse_log():
+            script_ok = match_script in entry["script"].lower() if match_script else True
+            verb_ok = match_verb in entry["verb"].lower() if match_verb else True
+
+            if script_ok and verb_ok:
+                if require_result is not None:
+                    if entry["result"].lower() != require_result.lower():
+                        continue
+                return entry
+
+        return None
+
+    def check_all(self, phase_expectations: list[dict]) -> list[MilestoneResult]:
+        """Check all phase expectations.
+
+        Returns one MilestoneResult per phase.
+        Missing phases produce failing results with descriptive detail.
+        """
+        results: list[MilestoneResult] = []
+
+        for expectation in phase_expectations:
+            phase_name = expectation.get("phase", "unknown")
+            detect_via = expectation.get("detect_via", {})
+            require_result = expectation.get("require_result")
+            state = expectation.get("state", {})
+
+            # Find the phase entry in framework.log
+            entry = self._find_phase(detect_via, require_result)
+            if entry is None:
+                pattern = detect_via.get("framework_log", "?")
+                results.append(MilestoneResult(
+                    f"phase({phase_name})", False,
+                    f"phase not found in framework.log (pattern: {pattern})",
+                ))
+                continue
+
+            # Phase found — check state conditions
+            if state:
+                passed, detail = self._check_state(state)
+                results.append(MilestoneResult(
+                    f"phase({phase_name})", passed,
+                    detail if not passed else f"phase detected, state verified",
+                ))
+            else:
+                results.append(MilestoneResult(
+                    f"phase({phase_name})", True,
+                    f"phase detected at {entry['timestamp']}",
+                ))
+
+        return results
+
+    def _check_state(self, state: dict) -> tuple[bool, str]:
+        """Verify filesystem state conditions.
+
+        - files_exist: glob patterns (at least one match required per pattern)
+        - file_contains: list of {path, pattern} dicts (regex match on file content)
+        """
+        failures: list[str] = []
+
+        for pattern in state.get("files_exist", []):
+            matches = [
+                m for m in self.root.glob(pattern)
+                if m.is_file() and ".git" not in m.parts
+            ]
+            if not matches:
+                failures.append(f"files_exist({pattern}): no match")
+
+        for entry in state.get("file_contains", []):
+            fpath = self.root / entry.get("path", "")
+            regex = entry.get("pattern", "")
+            if not fpath.exists():
+                failures.append(f"file_contains: {entry.get('path', '?')} not found")
+            else:
+                try:
+                    content = fpath.read_text(errors="ignore")
+                    if not re.search(regex, content):
+                        failures.append(
+                            f"file_contains: pattern '{regex}' not in {entry.get('path', '?')}"
+                        )
+                except Exception as e:
+                    failures.append(f"file_contains: error reading {entry.get('path', '?')}: {e}")
+
+        if failures:
+            return False, "; ".join(failures)
+        return True, ""
 
 
 # ---------------------------------------------------------------------------
@@ -1535,6 +1695,66 @@ class FrameworkVerifier:
                     icon = "+" if m.passed else "✗"
                     detail = f" — {m.detail}" if m.detail else ""
                     self._log(f"    {icon} {m.name}{detail}")
+
+                # Phase expectations (F-0242) — check intermediate workflow states
+                if scenario.get("phase_expectations"):
+                    self._log(f"  Running phase expectations...")
+                    phase_checker = PhaseChecker(project_root)
+                    phase_results = phase_checker.check_all(
+                        scenario["phase_expectations"]
+                    )
+                    milestones.extend(phase_results)
+                    run.milestones = milestones
+
+                    for m in phase_results:
+                        icon = "+" if m.passed else "✗"
+                        detail = f" — {m.detail}" if m.detail else ""
+                        self._log(f"    {icon} {m.name}{detail}")
+
+                # JSONL session analysis (F-0242) — detect workflow violations
+                jsonl_path = discover_jsonl(project_root)
+                if jsonl_path:
+                    self._log(f"  Analyzing JSONL session log: {jsonl_path.name}")
+                    try:
+                        import importlib.util
+                        _sa_path = _LIB_DIR / "tools" / "session-analyze.py"
+                        _spec = importlib.util.spec_from_file_location(
+                            "session_analyze", str(_sa_path),
+                        )
+                        _sa = importlib.util.module_from_spec(_spec)
+                        _spec.loader.exec_module(_sa)
+
+                        messages = _sa.parse_jsonl(str(jsonl_path))
+                        events = _sa.extract_events(messages)
+                        violations = _sa.detect_violations(events)
+
+                        if violations:
+                            for v in violations:
+                                m = MilestoneResult(
+                                    f"no_violation({v['type']})", False,
+                                    v.get("description", v["type"]),
+                                )
+                                milestones.append(m)
+                                self._log(
+                                    f"    ✗ no_violation({v['type']}) "
+                                    f"— {v.get('description', '')}"
+                                )
+                        else:
+                            m = MilestoneResult(
+                                "no_violations", True,
+                                f"0 violations in {len(events)} events",
+                            )
+                            milestones.append(m)
+                            self._log(
+                                f"    + no_violations — clean session "
+                                f"({len(events)} events)"
+                            )
+
+                        run.milestones = milestones
+                    except Exception as e:
+                        self._log(f"  ⚠ JSONL analysis failed: {e}")
+                else:
+                    self._log(f"  ⚠ No JSONL session log found for project")
 
                 # Check behavioral expectations
                 # Scenario-level expectations (files_exist, commands_pass, source_contains)

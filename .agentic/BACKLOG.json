@@ -1,18 +1,19 @@
 [
   {
     "type": "feature",
+    "id": "F-0242",
+    "description": "Simulation Testing (Phase + Sequence)",
+    "added_at": "2026-03-20T14:38:36Z",
+    "added_by": "agent",
+    "became_current_at": "2026-03-21T18:13:21Z"
+  },
+  {
+    "type": "feature",
     "id": "F-0240",
     "description": "Framework Execution Log",
     "added_at": "2026-03-20T14:38:31Z",
     "added_by": "agent",
     "became_current_at": "2026-03-20T14:38:31Z"
-  },
-  {
-    "type": "feature",
-    "id": "F-0242",
-    "description": "Simulation Testing (Phase + Sequence)",
-    "added_at": "2026-03-20T14:38:36Z",
-    "added_by": "agent"
   },
   {
     "type": "feature",

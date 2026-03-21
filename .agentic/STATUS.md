@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Post-merge: F-0250 + F-0251 shipped via PR #188 (Updated: 2026-03-21 17:45 UTC)
+- ADR-001 roadmap execution: F-0242 (Simulation Testing (Phase + Sequence)) is current backlog item (Updated: 2026-03-21 18:13 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item

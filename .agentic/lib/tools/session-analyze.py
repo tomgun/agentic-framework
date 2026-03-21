@@ -10,6 +10,9 @@ Detects:
   - "code before review": Write/Edit tool use when DRAFT plan exists (no APPROVED plan)
   - "skipped planning": implement trigger without prior plan mode entry
 
+Violation patterns are declared in violations.yaml (F-0242). Detection logic is in
+Python handler functions; YAML holds metadata, descriptions, and configuration.
+
 Each violation includes: type, timestamp, time wasted (gap to next user prompt).
 """
 
@@ -17,7 +20,92 @@ import json
 import sys
 import os
 from datetime import datetime, timezone
+from pathlib import Path
 
+import yaml
+
+
+# ---------------------------------------------------------------------------
+# YAML violation loading (F-0242)
+# ---------------------------------------------------------------------------
+
+_VIOLATIONS_YAML = Path(__file__).resolve().parent.parent / "auto" / "violations.yaml"
+
+
+def load_violations_yaml(path: str | Path | None = None) -> list[dict]:
+    """Load violation patterns from YAML.
+
+    Returns list of violation dicts, each with: name, description, handler, config.
+    Falls back to bundled violations.yaml if no path given.
+    """
+    p = Path(path) if path else _VIOLATIONS_YAML
+    if not p.exists():
+        return []
+    with open(p) as f:
+        data = yaml.safe_load(f)
+    return data.get("violations", [])
+
+
+# ---------------------------------------------------------------------------
+# Allowlist (config-driven via violations.yaml)
+# ---------------------------------------------------------------------------
+
+def _build_allowlist_checker(config: dict):
+    """Build an allowlist checker function from YAML config.
+
+    Returns a callable(path: str) -> bool.
+    """
+    prefixes = tuple(s.lower() for s in config.get("allowlist_prefixes", []))
+    substrings = [s.lower() for s in config.get("allowlist_substrings", [])]
+    suffixes = tuple(s.lower() for s in config.get("allowlist_suffixes", []))
+
+    def check(path: str) -> bool:
+        lp = path.lower()
+        for prefix in prefixes:
+            if prefix in lp:
+                return True
+        for sub in substrings:
+            if sub in lp:
+                return True
+        for suffix in suffixes:
+            if lp.endswith(suffix):
+                return True
+        return False
+
+    return check
+
+
+# Default allowlist (used when no YAML config available — backward compat)
+_DEFAULT_ALLOWLIST_CONFIG = {
+    "allowlist_prefixes": [
+        "spec/", "tests/", "test/", "/tests/", "/test/",
+        "journal/", ".agentic/session/", "memory/",
+    ],
+    "allowlist_substrings": [
+        ".agentic/todo", ".agentic/status",
+        ".agentic/human_needed", ".agentic/contributions",
+        "backlog.json", "features.md", "issues.md",
+        "changelog", "stack.md", "overview.md",
+        ".claude/plans/", ".cursor/plans/",
+    ],
+    "allowlist_suffixes": ["-plan.md"],
+}
+
+
+def _is_allowlisted(path: str, config: dict | None = None) -> bool:
+    """Check if file path is in the allowlist (spec, test, plan, journal).
+
+    If config is provided (from violations.yaml), uses that.
+    Otherwise falls back to built-in defaults.
+    """
+    cfg = config if config is not None else _DEFAULT_ALLOWLIST_CONFIG
+    checker = _build_allowlist_checker(cfg)
+    return checker(path)
+
+
+# ---------------------------------------------------------------------------
+# JSONL parsing
+# ---------------------------------------------------------------------------
 
 def parse_jsonl(path: str) -> list[dict]:
     """Parse JSONL file, return list of message objects."""
@@ -96,49 +184,36 @@ def extract_events(messages: list[dict]) -> list[dict]:
     return events
 
 
-def detect_violations(events: list[dict]) -> list[dict]:
-    """Detect workflow violations in event stream."""
+# ---------------------------------------------------------------------------
+# Violation detection — handler functions
+# ---------------------------------------------------------------------------
+
+def _detect_stopped_after_plan_exit(events: list[dict], config: dict) -> list[dict]:
+    """Detect: ExitPlanMode not followed by Agent spawn within N tool calls."""
     violations = []
+    expect_within = config.get("expect_tool_within", 3)
+    expect_tool = config.get("expect_tool", "Agent")
+
     plan_mode_exited = False
-    plan_approved = False
-    plan_mode_entered = False
     last_plan_exit_ts = None
     last_plan_exit_idx = None
-    code_before_review_files = []  # Group consecutive violations
 
     for i, evt in enumerate(events):
-        # Track plan mode entry
-        if evt["type"] == "tool_use" and evt["tool_name"] == "EnterPlanMode":
-            plan_mode_entered = True
-
-        # Track plan mode exit
         if evt["type"] == "tool_use" and evt["tool_name"] == "ExitPlanMode":
             plan_mode_exited = True
-            plan_approved = False  # Reset — plan is DRAFT after exit
             last_plan_exit_ts = evt["timestamp"]
             last_plan_exit_idx = i
 
-        # Track plan approval (agent text with plan status APPROVED)
-        if evt["type"] == "assistant_text":
-            text = evt.get("text", "")
-            if "Status**: APPROVED" in text or "status: APPROVED" in text.lower() or \
-               "plan is APPROVED" in text or "marked APPROVED" in text:
-                plan_approved = True
-
-        # Violation 1: Stopped after plan exit
-        # ExitPlanMode should be followed by Agent tool (spawning reviewers) within ~3 tool calls
         if plan_mode_exited and last_plan_exit_idx is not None:
-            # Look at the next few events after plan exit
             if evt["type"] == "user_prompt" and i > last_plan_exit_idx:
-                # User had to prompt again — agent stopped and waited
                 tool_calls_between = [
                     e for e in events[last_plan_exit_idx + 1:i]
                     if e["type"] == "tool_use"
                 ]
                 agent_spawned = any(
-                    e["tool_name"] == "Agent" for e in tool_calls_between
+                    e["tool_name"] == expect_tool for e in tool_calls_between
                 )
-                if not agent_spawned and len(tool_calls_between) < 5:
+                if not agent_spawned and len(tool_calls_between) < (expect_within + 2):
                     time_wasted = None
                     if last_plan_exit_ts and evt["timestamp"]:
                         time_wasted = (evt["timestamp"] - last_plan_exit_ts).total_seconds()
@@ -149,30 +224,80 @@ def detect_violations(events: list[dict]) -> list[dict]:
                         "time_wasted_seconds": time_wasted,
                         "user_prompt": evt.get("text", "")[:100],
                     })
-                    plan_mode_exited = False  # Reset to avoid duplicate detection
+                    plan_mode_exited = False
 
-        # Violation 2: Code before review (grouped — one violation per draft phase, not per file)
-        if evt["type"] == "tool_use" and evt["tool_name"] in ("Write", "Edit", "MultiEdit"):
+    return violations
+
+
+def _detect_code_before_review(events: list[dict], config: dict) -> list[dict]:
+    """Detect: Write/Edit when plan is DRAFT (not APPROVED). Grouped by draft phase."""
+    violations = []
+    trigger_tools = set(config.get("trigger_tools", ["Write", "Edit", "MultiEdit"]))
+    max_files = config.get("max_files_reported", 20)
+
+    plan_mode_exited = False
+    plan_approved = False
+    last_plan_exit_ts = None
+    code_before_review_files = []
+
+    for i, evt in enumerate(events):
+        # Track plan mode exit
+        if evt["type"] == "tool_use" and evt["tool_name"] == "ExitPlanMode":
+            plan_mode_exited = True
+            plan_approved = False
+            last_plan_exit_ts = evt["timestamp"]
+
+        # Track plan approval
+        if evt["type"] == "assistant_text":
+            text = evt.get("text", "")
+            if "Status**: APPROVED" in text or "status: APPROVED" in text.lower() or \
+               "plan is APPROVED" in text or "marked APPROVED" in text:
+                plan_approved = True
+
+        # Check for code writes during draft phase
+        if evt["type"] == "tool_use" and evt["tool_name"] in trigger_tools:
             file_path = evt.get("tool_input", {}).get("file_path", "")
-            # Skip spec/test/plan files and framework state files
-            if file_path and not _is_allowlisted(file_path):
+            if file_path and not _is_allowlisted(file_path, config):
                 if plan_mode_exited and not plan_approved:
                     code_before_review_files.append(file_path)
 
-        # When plan gets approved or new plan mode entered, flush grouped violations
+        # Flush on approval
         if plan_approved and code_before_review_files:
             violations.append({
                 "type": "code_before_review",
                 "description": f"Writing code before plan APPROVED ({len(code_before_review_files)} files)",
                 "timestamp": _fmt_ts(last_plan_exit_ts),
-                "files": code_before_review_files[:20],  # Cap list
+                "files": code_before_review_files[:max_files],
             })
             code_before_review_files = []
 
-        # Violation 3: Skipped planning
+    # Flush remaining
+    if code_before_review_files:
+        violations.append({
+            "type": "code_before_review",
+            "description": f"Writing code before plan APPROVED ({len(code_before_review_files)} files)",
+            "timestamp": _fmt_ts(last_plan_exit_ts),
+            "files": code_before_review_files[:max_files],
+        })
+
+    return violations
+
+
+def _detect_skipped_planning(events: list[dict], config: dict) -> list[dict]:
+    """Detect: ag implement called without prior plan mode entry."""
+    violations = []
+    command_patterns = config.get("command_patterns", ["ag implement", "ag.sh implement"])
+    precondition = config.get("precondition_absent", "EnterPlanMode")
+
+    plan_mode_entered = False
+
+    for i, evt in enumerate(events):
+        if evt["type"] == "tool_use" and evt["tool_name"] == precondition:
+            plan_mode_entered = True
+
         if evt["type"] == "tool_use" and evt["tool_name"] == "Bash":
             cmd = evt.get("tool_input", {}).get("command", "")
-            if "ag implement" in cmd or "ag.sh implement" in cmd:
+            if any(pat in cmd for pat in command_patterns):
                 if not plan_mode_entered:
                     violations.append({
                         "type": "skipped_planning",
@@ -180,34 +305,48 @@ def detect_violations(events: list[dict]) -> list[dict]:
                         "timestamp": _fmt_ts(evt["timestamp"]),
                     })
 
-    # Flush any remaining grouped code_before_review violations
-    if code_before_review_files:
-        violations.append({
-            "type": "code_before_review",
-            "description": f"Writing code before plan APPROVED ({len(code_before_review_files)} files)",
-            "timestamp": _fmt_ts(last_plan_exit_ts),
-            "files": code_before_review_files[:20],
-        })
-
     return violations
 
 
-def _is_allowlisted(path: str) -> bool:
-    """Check if file path is in the allowlist (spec, test, plan, journal)."""
-    parts = path.lower()
-    for prefix in ("spec/", "tests/", "test/", "/tests/", "/test/",
-                    "journal/", ".agentic/session/",
-                    "memory/", ".agentic/todo", ".agentic/status",
-                    ".agentic/human_needed", ".agentic/contributions",
-                    "backlog.json", "features.md", "issues.md",
-                    "changelog", "stack.md", "overview.md"):
-        if prefix in parts:
-            return True
-    if path.endswith("-plan.md"):
-        return True
-    if ".claude/plans/" in path or ".cursor/plans/" in path:
-        return True
-    return False
+# Handler dispatch table
+_VIOLATION_HANDLERS = {
+    "_detect_stopped_after_plan_exit": _detect_stopped_after_plan_exit,
+    "_detect_code_before_review": _detect_code_before_review,
+    "_detect_skipped_planning": _detect_skipped_planning,
+}
+
+
+# ---------------------------------------------------------------------------
+# Main detection entry point
+# ---------------------------------------------------------------------------
+
+def detect_violations(events: list[dict], patterns: list[dict] | None = None) -> list[dict]:
+    """Detect workflow violations in event stream.
+
+    If patterns is None, loads from violations.yaml.
+    Each pattern has a 'handler' key naming a Python function and a 'config' dict.
+    """
+    if patterns is None:
+        patterns = load_violations_yaml()
+
+    # If YAML not available, fall back to running all handlers with default config
+    if not patterns:
+        return (
+            _detect_stopped_after_plan_exit(events, {"expect_tool_within": 3, "expect_tool": "Agent"})
+            + _detect_code_before_review(events, _DEFAULT_ALLOWLIST_CONFIG)
+            + _detect_skipped_planning(events, {"command_patterns": ["ag implement", "ag.sh implement"], "precondition_absent": "EnterPlanMode"})
+        )
+
+    violations = []
+    for pattern in patterns:
+        handler_name = pattern.get("handler", "")
+        handler = _VIOLATION_HANDLERS.get(handler_name)
+        if handler is None:
+            continue
+        config = pattern.get("config", {})
+        violations.extend(handler(events, config))
+
+    return violations
 
 
 def _fmt_ts(ts) -> str:

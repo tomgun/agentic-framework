@@ -264,3 +264,33 @@ def spawn_claude(
     finally:
         if mon:
             mon.stop()
+
+
+def discover_jsonl(project_root: Path) -> Path | None:
+    """Discover Claude Code's JSONL session log for a project.
+
+    Claude Code stores session logs at:
+        ~/.claude/projects/<project-hash>/<uuid>.jsonl
+
+    where project-hash is the absolute project path with '/' replaced by '-'.
+
+    Returns the most recently modified .jsonl file, or None if not found.
+
+    NOTE: This path convention is reverse-engineered from observed behavior,
+    not a stable/documented API. May break across Claude Code versions.
+    """
+    home = Path.home()
+    project_hash = str(project_root.resolve()).replace("/", "-")
+    session_dir = home / ".claude" / "projects" / project_hash
+
+    if not session_dir.exists():
+        return None
+
+    # Find top-level .jsonl files (main session logs)
+    jsonl_files = sorted(
+        session_dir.glob("*.jsonl"),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+
+    return jsonl_files[0] if jsonl_files else None

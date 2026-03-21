@@ -1,0 +1,56 @@
+# Violation patterns for session analysis (F-0242)
+#
+# YAML holds metadata and configuration for each violation.
+# Detection logic stays in Python as named handler functions in session-analyze.py.
+# This is NOT a DSL — it's a declarative catalog.
+
+violations:
+  - name: stopped_after_plan_exit
+    description: "Agent stopped after ExitPlanMode instead of auto-continuing to review"
+    handler: _detect_stopped_after_plan_exit
+    config:
+      trigger_tool: ExitPlanMode
+      expect_tool: Agent
+      expect_tool_within: 3  # tool calls after trigger
+
+  - name: code_before_review
+    description: "Writing code before plan APPROVED"
+    handler: _detect_code_before_review
+    config:
+      trigger_tools: [Write, Edit, MultiEdit]
+      group_by: draft_phase
+      max_files_reported: 20
+      allowlist_prefixes:
+        - "spec/"
+        - "tests/"
+        - "test/"
+        - "/tests/"
+        - "/test/"
+        - "journal/"
+        - ".agentic/session/"
+        - "memory/"
+      allowlist_substrings:
+        - ".agentic/todo"
+        - ".agentic/status"
+        - ".agentic/human_needed"
+        - ".agentic/contributions"
+        - "backlog.json"
+        - "features.md"
+        - "issues.md"
+        - "changelog"
+        - "stack.md"
+        - "overview.md"
+        - ".claude/plans/"
+        - ".cursor/plans/"
+      allowlist_suffixes:
+        - "-plan.md"
+
+  - name: skipped_planning
+    description: "ag implement called without prior plan mode entry"
+    handler: _detect_skipped_planning
+    config:
+      trigger_tool: Bash
+      command_patterns:
+        - "ag implement"
+        - "ag.sh implement"
+      precondition_absent: EnterPlanMode

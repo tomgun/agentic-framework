@@ -1269,3 +1269,39 @@ class TestScenarioRunExtensions:
         s = load_scenario("fullstack_multirepo")
         for settings in s["settings_matrix"]:
             assert settings.get("prompt_tier") == "recipe"
+
+
+# --- F-0242: Phase expectations ---
+
+
+class TestPhaseExpectations:
+    """Test phase_expectations YAML extension (F-0242)."""
+
+    def test_scenarios_phase_expectations_optional(self):
+        """All scenarios load without error, regardless of phase_expectations."""
+        from auto.framework_verify import load_scenario, list_scenarios
+        for slug in list_scenarios():
+            s = load_scenario(slug)
+            assert s is not None
+            # phase_expectations is optional — should not raise
+            _ = s.get("phase_expectations", [])
+
+    def test_todo_app_has_phase_expectations(self):
+        """todo_app.yaml has phase_expectations with expected structure."""
+        from auto.framework_verify import load_scenario
+        s = load_scenario("todo_app")
+        pe = s.get("phase_expectations", [])
+        assert len(pe) >= 2
+        phases = {p["phase"] for p in pe}
+        assert "kickoff" in phases
+        assert "implement" in phases
+        for p in pe:
+            assert "detect_via" in p
+            assert "framework_log" in p["detect_via"]
+
+    def test_cli_tool_has_phase_expectations(self):
+        """cli_tool.yaml has phase_expectations."""
+        from auto.framework_verify import load_scenario
+        s = load_scenario("cli_tool")
+        pe = s.get("phase_expectations", [])
+        assert len(pe) >= 2

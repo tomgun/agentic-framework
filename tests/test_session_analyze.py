@@ -218,3 +218,58 @@ def test_framework_state_files_allowlisted():
     violations = sa.detect_violations(events)
     code_violations = [v for v in violations if v["type"] == "code_before_review"]
     assert len(code_violations) == 0
+
+
+# --- F-0242: YAML-driven violation detection ---
+
+
+def test_load_violations_yaml():
+    """violations.yaml loads and has expected structure."""
+    patterns = sa.load_violations_yaml()
+    assert len(patterns) == 3
+    names = {p["name"] for p in patterns}
+    assert names == {"stopped_after_plan_exit", "code_before_review", "skipped_planning"}
+    for p in patterns:
+        assert "handler" in p
+        assert "config" in p
+
+
+def test_yaml_violations_match_hardcoded():
+    """YAML-driven detect_violations produces identical output to defaults.
+
+    Tests the stopped_after_plan_exit case with both YAML patterns and
+    fallback (no YAML), ensuring they produce the same violation types.
+    """
+    messages = [
+        _tool("ExitPlanMode", 0),
+        _tool("Write", 1, {"file_path": "journal/plan.md"}),
+        _user("continue please", 5),
+    ]
+    events = sa.extract_events(messages)
+
+    # With YAML patterns (default)
+    v_yaml = sa.detect_violations(events)
+    # With explicit empty patterns (triggers fallback)
+    v_fallback = sa.detect_violations(events, patterns=[])
+
+    # Both should detect the same violation types
+    assert len(v_yaml) == len(v_fallback)
+    assert v_yaml[0]["type"] == v_fallback[0]["type"] == "stopped_after_plan_exit"
+
+
+def test_allowlist_from_yaml_config():
+    """Allowlist reads from YAML config, not just hard-coded defaults."""
+    patterns = sa.load_violations_yaml()
+    cbr_pattern = next(p for p in patterns if p["name"] == "code_before_review")
+    config = cbr_pattern["config"]
+
+    # Verify YAML allowlist contains expected entries
+    assert "spec/" in config["allowlist_prefixes"]
+    assert "tests/" in config["allowlist_prefixes"]
+    assert ".claude/plans/" in config["allowlist_substrings"]
+    assert "-plan.md" in config["allowlist_suffixes"]
+
+    # Verify the allowlist checker works with YAML config
+    assert sa._is_allowlisted("spec/acceptance/F-0100.md", config)
+    assert sa._is_allowlisted("tests/test_foo.py", config)
+    assert not sa._is_allowlisted("src/main.py", config)

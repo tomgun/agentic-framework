@@ -5658,6 +5658,57 @@ else
   fail "F-0240 AC-8: Only $_f0240_hooks_ok/$_f0240_hooks_total Claude hooks source fwlog.sh"
 fi
 
+# F-0242: Simulation Testing (Phase + Sequence)
+
+echo ""
+echo "--- F-0242: Simulation Testing ---"
+
+# AC-1: PhaseChecker exists in framework_verify.py
+if grep -q 'class PhaseChecker' .agentic/lib/auto/framework_verify.py 2>/dev/null; then
+  pass "F-0242 AC-1: PhaseChecker class exists"
+else
+  fail "F-0242 AC-1: PhaseChecker class not found"
+fi
+
+# AC-3: violations.yaml exists and has 3 patterns
+if [[ -f .agentic/lib/auto/violations.yaml ]]; then
+  _f242_count=$(python3 -c "import yaml; d=yaml.safe_load(open('.agentic/lib/auto/violations.yaml')); print(len(d.get('violations',[])))" 2>/dev/null || echo 0)
+  if [[ "$_f242_count" -eq 3 ]]; then
+    pass "F-0242 AC-3: violations.yaml has 3 patterns"
+  else
+    fail "F-0242 AC-3: violations.yaml has $_f242_count patterns (expected 3)"
+  fi
+else
+  fail "F-0242 AC-3: violations.yaml not found"
+fi
+
+# AC-3: Each violation has name, handler, config
+_f242_valid=1
+for _name in stopped_after_plan_exit code_before_review skipped_planning; do
+  if ! grep -q "name: $_name" .agentic/lib/auto/violations.yaml 2>/dev/null; then
+    _f242_valid=0
+  fi
+done
+if [[ $_f242_valid -eq 1 ]]; then
+  pass "F-0242 AC-3: all 3 violation names present in violations.yaml"
+else
+  fail "F-0242 AC-3: missing violation names in violations.yaml"
+fi
+
+# AC-5: phase_expectations in run_scenario()
+if grep -q 'phase_expectations' .agentic/lib/auto/framework_verify.py 2>/dev/null; then
+  pass "F-0242 AC-5: phase_expectations integrated in framework_verify.py"
+else
+  fail "F-0242 AC-5: phase_expectations not found in framework_verify.py"
+fi
+
+# AC-7: todo_app.yaml has phase_expectations
+if grep -q 'phase_expectations' .agentic/lib/auto/scenarios/todo_app.yaml 2>/dev/null; then
+  pass "F-0242 AC-7: todo_app.yaml has phase_expectations"
+else
+  fail "F-0242 AC-7: todo_app.yaml missing phase_expectations"
+fi
+
 # ============================================================
 # V2 ENGINE VALIDATION
 # When engine: v2 is active, validate v2-specific structure

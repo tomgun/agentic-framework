@@ -33,6 +33,25 @@ required_milestones:
   - implementation_done
   - verification_green
 
+# F-0242: Intermediate phase verification via framework.log
+phase_expectations:
+  - phase: "kickoff"
+    detect_via:
+      framework_log: "ag.sh|kickoff"
+    state:
+      files_exist:
+        - ".agentic/spec/FEATURES.md"
+      file_contains:
+        - path: ".agentic/spec/FEATURES.md"
+          pattern: "F-\\d{4}"
+
+  - phase: "implement"
+    detect_via:
+      framework_log: "ag.sh|implement"
+    state:
+      files_exist:
+        - ".agentic/spec/acceptance/F-*.md"
+
 expectations:
   files_exist:
     - "**/*.py"
