@@ -144,6 +144,8 @@ Defense-in-Depth: Hooks
 
 **Git hooks** run at commit time — they are the universal backstop. **Tool-native hooks** fire at workflow transition points (e.g., exiting plan mode) and can inject instructions into the agent's context before the next action. Together they provide defense-in-depth: tool hooks catch violations early (at the transition), git hooks catch them late (at commit time).
 
+**⚠ F-0300 finding (v0.69.0)**: Tool-native hooks were shipped as scripts but never *registered* in `.claude/settings.json` during init. The entire tool-hook enforcement layer was inert in every initialized project. Additionally, Claude Code requires a session restart to pick up newly registered hooks — no hot-reload. Both gaps together meant defense-in-depth had only one active layer (git hooks), which is itself bypassed when `git_mode=deferred`. Fix: R0 in F-0300 adds hook registration to scaffold and init. See `docs/KEY_INSIGHTS.md` §18 and A12 in §8.
+
 ### Defense-in-Depth: Memory Seed Layer
 
 The framework includes a **memory-seed** mechanism (`.agentic/lib/init/memory-seed.md`) that seeds key workflow patterns into each tool's persistent memory during init. This coexists with this document's design principle #2 in §5 ("Never rely on memory") [note: this is the doc's own design principle list, not framework principle D2] because memory-seed is **redundant reinforcement, not primary enforcement**.
@@ -292,8 +294,11 @@ The design makes assumptions that should be validated over time. Each has a stat
 | A9 | Copilot loads copilot-instructions.md into subagent sessions | UNKNOWN — contradictory docs | Empirical test with distinctive instruction |
 | A10 | Git-tracked STATUS.md survives cross-machine workflow | RESOLVED — status.json eliminated; STATUS.md is the sole cross-machine state file | N/A — STATUS.md is already git-tracked and used directly |
 | A11 | Tool-native PostToolUse hooks fire reliably on ExitPlanMode in Claude Code | VALIDATED — F-0234 (ExitPlanMode), F-0239 (Bash) confirmed in field | Manual test: enter/exit plan mode, verify hook output appears in agent context |
+| A12 | Enforcement chains are wired end-to-end in fresh projects | **INVALIDATED** — F-0300 (Street Fury). Hook scripts existed, gate.py logic correct, but hooks never registered in settings.json + Claude requires restart for hook activation. Two wiring breaks silenced the entire enforcement layer. | End-to-end test: init fresh project → start Claude session → attempt blocked Write → verify denial fires. Must test full chain, not individual components. |
 
 **Update this table** when assumptions are validated or invalidated. Failed assumptions trigger design document amendments.
+
+**A12 lesson**: Component tests ("does gate.py return deny?") passed while the system was completely unprotected. The enforcement code existed, the hook scripts existed, the registration was missing, and hot-reload isn't supported. Integration tests that exercise the full activation path — init → registration → session start → tool call → hook fires → gate executes → denial returned — are the only way to catch wiring gaps. See `docs/KEY_INSIGHTS.md` §18.
 
 ---
 

@@ -692,6 +692,18 @@ When a behavioral rule keeps failing despite being in multiple instruction files
 
 The fix is to change the enforcement mechanism, not the enforcement text. Move from textual rules to: (a) script gates that `exit 1`, (b) artifact-embedded instructions that survive turn boundaries, (c) named rationalization rebuttals that make self-deception harder. See the plan-review case study above for the full example.
 
+### Init format determines everything downstream
+
+Init is the highest-leverage moment in a project's lifecycle. If the project starts wrong — wrong FEATURES.md format, missing hook registrations, incorrect settings — every downstream workflow fails silently. The Algebra Rush test project created FEATURES.md in table format; `ag backlog add`, the state machine, and crunch all expect heading format (`## F-XXXX:`). The agent had to rewrite it manually. The Street Fury project never got `.claude/settings.json` with hook entries, so the entire tool-level enforcement layer was inert from minute one.
+
+**Lesson**: Over-specify init. Provide exact format templates (not "create a FEATURES.md"). Validate init output immediately. One wrong format choice at minute 0 cascades into hours of silent failures. See F-0300 R4 for the FEATURES.md fix and R0 for hook registration.
+
+### Test configuration combinations, not individual settings
+
+Each configuration axis (profile, git_mode, workflow) may work individually but fail in combination. The Street Fury project combined `autonomous_formal + git_mode=deferred + batch work`. Each setting was individually valid. The combination produced: `ag auto` hard-gated on active git (couldn't use the correct workflow), hooks unregistered (no tool-level enforcement), deferred git (no pre-commit enforcement). Three individually reasonable settings created a configuration where zero enforcement layers were active.
+
+**Lesson**: Test the *product* of your configuration matrix, not just each axis. Especially test edge combinations that deviate from the "default happy path" (active git, interactive, single feature). These edge combinations are where frameworks fail because they're the paths least exercised during development.
+
 ### Phase 3 instruction consolidation (v2)
 
 Phase 3 removed ~130 files (~25K lines) of workflow docs, checklists, quality standards, subagent definitions, and full skill bundles. Their content was absorbed into 7 role prompts + `conventions.md` + CLI enforcement via `state_machine_af.yaml`. The instruction file checklist dropped from ~11 targets to ~5. When shipping framework features in v2, update: role prompts (`.agentic/prompts/`), conventions.md, state_machine_af.yaml (if new states/transitions), agent instruction files (CLAUDE.md etc.), and skill trigger stubs (`.claude/skills/`). The old checklist targets (checklists/, workflows/, quality/, subagents/, auto_orchestration.md, agent_operating_guidelines.md) no longer exist.

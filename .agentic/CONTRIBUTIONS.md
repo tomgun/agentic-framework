@@ -8,6 +8,24 @@
 
 ## Recent Contributions
 
+### Framework Enforcement Gaps — Test Project Evaluation Insights (F-0300, v0.69.0)
+
+**User insight**: Tomas ran two end-to-end test projects — Street Fury (GTA 1/2-style driving game, autonomous_formal + git_mode=deferred) and Algebra Rush (rhythm platformer, autonomous_formal + active git) — specifically to stress-test framework enforcement under realistic conditions. The Street Fury session exposed a catastrophic enforcement collapse: the agent wrote 1,925 LOC across 15 features with zero plans, zero state transitions, zero verification, and 10 of 15 features lacking acceptance criteria. Every synthetic test (unit tests, framework validation, LLM behavioral tests) was passing.
+
+Tomas's analysis yielded seven structural recommendations (R0–R6) and, more importantly, distilled meta-lessons for AI framework developers:
+
+1. **"Enforcement exists ≠ enforcement is active"** — gate_pretool had correct logic, hook scripts existed on disk, but `.claude/settings.json` was never created during init (hooks never registered) AND Claude Code requires a session restart to pick up hooks (no hot-reload). Two wiring breaks silenced the entire tool-level enforcement layer. Tomas identified both the registration gap and the restart requirement as compounding causes.
+
+2. **Configuration matrix testing** — Each setting worked individually (autonomous_formal, git_mode=deferred, batch work). The combination produced complete bypass: `ag auto` hard-gated on active git, hooks unregistered, no trigger caught "churn all tasks." Tomas insisted on testing the *product* of configuration axes, not just individual settings.
+
+3. **Init determines everything downstream** — The Algebra Rush project created FEATURES.md in table format instead of heading format. `ag backlog add`, the state machine, and crunch all broke silently. Tomas observed: init is the highest-leverage moment; one wrong format cascades for hours.
+
+4. **Agents are water, not soldiers** — They flow toward task completion along the path of least resistance. Once the Street Fury agent started direct-writing, it continued for all 15 features without self-correcting. Advisory warnings were noise under task pressure. Tomas's framing: only hard denials (tool-call rejection) create course correction.
+
+5. **6-level testing hierarchy** — Tomas pointed out the framework already has automated verification (`ag auto verify-framework` with self-healing, F-0215) and simulation testing (PhaseChecker + JSONL analysis, F-0242) beyond basic unit/LLM tests, making the testing hierarchy richer than initially documented. Manual test projects remain irreplaceable for discovering *new* failure modes not yet captured in scenario definitions.
+
+These insights were recorded in `docs/KEY_INSIGHTS.md` (#18: End-to-End Enforcement Wiring, #19: Test Projects as System Feedback), `docs/INSTRUCTION_ARCHITECTURE.md` (A12: enforcement wiring assumption INVALIDATED, Defense-in-Depth F-0300 finding), and `FRAMEWORK_DEVELOPMENT.md` (two new Lessons Learned entries).
+
 ### Git-Deferred Mode + Spec Lifecycle Enforcement (F-0250, F-0251, PR #188)
 
 **User insight**: Tomas tested the framework end-to-end by initializing a fresh project with autonomous_formal and asking Claude to "build a geometry dash clone called algebra rush, work autonomously, tell me when playable." The agent delivered a working 1593-line Phaser 3 game in 5-10 minutes — an impressive onboarding experience. But Tomas then systematically analyzed what actually happened: git was initialized but zero commits made, the state machine was completely bypassed (all 6 features stayed "planned"), no backlog was populated, no plans were created, and only 3 of 6 features got AC files. The agent had skipped the entire formal workflow while still producing working software.
