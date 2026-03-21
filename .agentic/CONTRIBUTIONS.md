@@ -12,17 +12,17 @@
 
 **User insight**: Tomas ran two end-to-end test projects — Street Fury (GTA 1/2-style driving game, autonomous_formal + git_mode=deferred) and Algebra Rush (rhythm platformer, autonomous_formal + active git) — specifically to stress-test framework enforcement under realistic conditions. The Street Fury session exposed a catastrophic enforcement collapse: the agent wrote 1,925 LOC across 15 features with zero plans, zero state transitions, zero verification, and 10 of 15 features lacking acceptance criteria. Every synthetic test (unit tests, framework validation, LLM behavioral tests) was passing.
 
-Tomas's analysis yielded seven structural recommendations (R0–R6) and, more importantly, distilled meta-lessons for AI framework developers:
+Tomas's analysis yielded seven structural recommendations (R0–R6) and key observations for framework enforcement design:
 
-1. **"Enforcement exists ≠ enforcement is active"** — gate_pretool had correct logic, hook scripts existed on disk, but `.claude/settings.json` was never created during init (hooks never registered) AND Claude Code requires a session restart to pick up hooks (no hot-reload). Two wiring breaks silenced the entire tool-level enforcement layer. Tomas identified both the registration gap and the restart requirement as compounding causes.
+1. **Wiring gap identification** — Tomas traced the enforcement failure to two compounding causes: `.claude/settings.json` was never created during init (hooks never registered) AND Claude Code requires a session restart to pick up hooks (no hot-reload). Not a logic bug — a wiring bug. The gate code was correct; the activation path was broken.
 
-2. **Configuration matrix testing** — Each setting worked individually (autonomous_formal, git_mode=deferred, batch work). The combination produced complete bypass: `ag auto` hard-gated on active git, hooks unregistered, no trigger caught "churn all tasks." Tomas insisted on testing the *product* of configuration axes, not just individual settings.
+2. **Configuration matrix testing** — Tomas observed that each setting worked individually but the combination (autonomous_formal + deferred git + batch work) produced complete bypass. Insisted on testing the *product* of configuration axes, not just individual settings.
 
-3. **Init determines everything downstream** — The Algebra Rush project created FEATURES.md in table format instead of heading format. `ag backlog add`, the state machine, and crunch all broke silently. Tomas observed: init is the highest-leverage moment; one wrong format cascades for hours.
+3. **Init as highest-leverage moment** — The Algebra Rush project created FEATURES.md in table format; `ag backlog add`, the state machine, and crunch all broke silently. Tomas observed that one wrong format at init cascades for hours downstream.
 
-4. **Agents are water, not soldiers** — They flow toward task completion along the path of least resistance. Once the Street Fury agent started direct-writing, it continued for all 15 features without self-correcting. Advisory warnings were noise under task pressure. Tomas's framing: only hard denials (tool-call rejection) create course correction.
+4. **Advisory warnings ignored under task pressure** — The Street Fury agent had instructions but bypassed them for all 15 features without self-correcting. Tomas's conclusion: only hard denials (tool-call rejection) create course correction; advisory warnings are noise when an agent has momentum.
 
-5. **6-level testing hierarchy** — Tomas pointed out the framework already has automated verification (`ag auto verify-framework` with self-healing, F-0215) and simulation testing (PhaseChecker + JSONL analysis, F-0242) beyond basic unit/LLM tests, making the testing hierarchy richer than initially documented. Manual test projects remain irreplaceable for discovering *new* failure modes not yet captured in scenario definitions.
+5. **6-level testing hierarchy** — Tomas pointed out the framework already has automated verification (`ag auto verify-framework` with self-healing, F-0215) and simulation testing (PhaseChecker + JSONL analysis, F-0242) beyond basic unit/LLM tests, making the testing hierarchy richer than initially documented. Manual test projects remain irreplaceable for discovering *new* failure modes not yet in scenario definitions.
 
 These insights were recorded in `docs/KEY_INSIGHTS.md` (#18: End-to-End Enforcement Wiring, #19: Test Projects as System Feedback), `docs/INSTRUCTION_ARCHITECTURE.md` (A12: enforcement wiring assumption INVALIDATED, Defense-in-Depth F-0300 finding), and `FRAMEWORK_DEVELOPMENT.md` (two new Lessons Learned entries).
 
