@@ -9,25 +9,27 @@ cmd_auto() {
 
     local auto_dir="$SCRIPT_DIR/../auto"
 
-    # Gate: task/epic/crunch/pipeline require git_mode: active (F-0250)
-    # These commands create branches, commits, and PRs — they need git.
+    # Gate: task/epic/crunch/pipeline — warn but don't block when git is deferred (F-0300 R5)
+    # Core pipeline (plan → spec → implement → test → verify) works without git.
+    # Only branches, commits, and PRs require active git.
     case "$subcmd" in
         task|epic|crunch|pipeline)
             local git_mode
             git_mode=$(get_setting "git_mode" "active")
             if [[ "$git_mode" != "active" ]]; then
-                echo -e "${YELLOW}Git not active (git_mode: ${git_mode}).${NC}"
-                echo "  Autonomous workflows require version control for branches, commits, and PRs."
-                echo "  Run: ag git-init    to enable git first"
+                echo -e "${YELLOW}⚠ Git not active (git_mode: ${git_mode}).${NC}"
+                echo "  Running in deferred-git mode: branches, commits, and PRs will be skipped."
+                echo "  Work items, plans, specs, and tests will still be enforced."
+                echo "  To enable git: ag git-init"
                 echo ""
-                return 0
+                # Continue — don't return (F-0300: unlock ag auto for deferred git)
             fi
             ;;
     esac
 
     case "$subcmd" in
         init)
-            # Generate settings.json for auto mode
+            # Generate settings.json for auto mode (also installs hooks — F-0300)
             local tier_flag=""
             local dry_run=""
             while [[ $# -gt 0 ]]; do

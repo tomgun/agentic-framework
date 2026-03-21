@@ -82,7 +82,20 @@ After review, run `ag approve-onboarding` to strip markers from confirmed files.
    > - Remove any (e.g., infrastructure that shouldn't be tracked as a feature)"
 
 6. **Write final output**:
-   - Update FEATURES.md with confirmed/merged features
+   - Update FEATURES.md with confirmed/merged features using **heading format** (NOT table):
+     ```markdown
+     <!-- format: features-v2.0.0 -->
+     <!-- REQUIRED: heading format. Tables break backlog, state machine, and crunch parsing. -->
+
+     ## F-0001: Feature Name
+     **Status**: planned
+     **Category**: domain-name
+     **Priority**: medium
+     **Complexity**: medium
+     **Description**: ...
+     **Acceptance**: See `spec/acceptance/F-0001.md`
+     ```
+     Or use `bash .agentic/lib/tools/feature.sh F-XXXX add "Feature Name" domain` to add programmatically.
    - Write .agentic/spec/acceptance/F-####.md files with criteria
    - Features with user-confirmed criteria get `Accepted: yes`
 

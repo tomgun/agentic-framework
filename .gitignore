@@ -59,3 +59,5 @@ tests/llm/.test-state
 # Local notes (not part of framework)
 *.local.md
 .local/
+
+agentic-tests/

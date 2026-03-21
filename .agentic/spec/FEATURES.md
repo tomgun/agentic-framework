@@ -4409,3 +4409,23 @@ Proposed restructuring:
 - Tests: LLM test verifying agent cannot write source code when all features are "planned"
 
 **Acceptance**: See `spec/acceptance/F-0251.md`
+
+---
+
+## F-0300: Framework Enforcement Gaps
+
+**Status**: planned
+**Category**: Verification & Enforcement
+**Priority**: high
+**Complexity**: high
+
+**Description**: Fix 7 structural enforcement gaps exposed by Street Fury test project evaluation (autonomous_formal + git_mode=deferred). Root cause: Claude Code hooks never installed during init, and `ag auto` commands hard-gate on git_mode=active. Includes: R0 (hook installation during init), R1 (strengthen pre-write gate for deferred git), R2 (autonomous work enforcement in spawned agents), R3 (trigger table for batch work), R4 (consistent FEATURES.md format from init), R5 (unlock ag auto for deferred git), R6 (test quality gate independent of git).
+
+**Dependencies**: F-0250, F-0251
+
+**Implementation**:
+- State: none
+- Code: scaffold.sh, init.py, gate.py, auto.sh, task.py, crunch.py, feature.sh, memory-seed.md, CLAUDE.md, hooks
+- Tests: LLM tests for trigger words, framework validation for gate changes, integration test with autonomous_formal + deferred git
+
+**Acceptance**: See `spec/acceptance/F-0300.md`

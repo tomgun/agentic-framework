@@ -29,9 +29,10 @@ VALUE="${3:-}"
 
 if [[ -z "${FEATURE_ID}" ]] || [[ -z "${FIELD}" ]] || [[ -z "${VALUE}" ]]; then
   cat <<'USAGE'
-Usage: bash feature.sh <feature-id> <field> <value>
+Usage: bash feature.sh <feature-id> <field> <value> [extra]
 
 Fields:
+  add          - Create new feature: feature.sh F-XXXX add "Feature Name" [domain]
   status       - planned | specced | criteria_set | tests_written | implementing | verified | documented | committed | shipped | deprecated
   impl-state   - none | partial | complete
   tests        - todo | partial | complete | n/a
@@ -40,6 +41,7 @@ Fields:
   source       - path to design document (ADR, roadmap, epic plan)
 
 Examples:
+  bash feature.sh F-0003 add "My Feature" infrastructure
   bash feature.sh F-0003 status in_progress
   bash feature.sh F-0003 status shipped
   bash feature.sh F-0003 impl-state complete
@@ -49,6 +51,43 @@ Examples:
   bash feature.sh F-0003 source spec/adr/ADR-001.md
 USAGE
   exit 1
+fi
+
+# --- Add subcommand: create a new feature in heading format (F-0300 R4) ---
+if [[ "${FIELD}" == "add" ]]; then
+  FEATURE_NAME="${VALUE}"
+  DOMAIN="${4:-general}"
+
+  # Check if feature already exists
+  if grep -qE "(^## ${FEATURE_ID}:|^### ${FEATURE_ID}:?|\| ${FEATURE_ID} \|)" "${FEATURES_FILE}" 2>/dev/null; then
+    echo "Error: Feature ${FEATURE_ID} already exists in FEATURES.md"
+    exit 1
+  fi
+
+  # Append new feature in heading format
+  cat >> "${FEATURES_FILE}" << EOF
+
+---
+
+## ${FEATURE_ID}: ${FEATURE_NAME}
+
+**Status**: planned
+**Category**: ${DOMAIN}
+**Priority**: medium
+**Complexity**: medium
+
+**Description**: (TODO: add description)
+
+**Implementation**:
+- State: none
+- Code: (TODO)
+- Tests: (TODO)
+
+**Acceptance**: See \`spec/acceptance/${FEATURE_ID}.md\`
+EOF
+
+  echo "✓ Added ${FEATURE_ID}: ${FEATURE_NAME} (domain: ${DOMAIN}) to FEATURES.md"
+  exit 0
 fi
 
 # Validate feature ID format
