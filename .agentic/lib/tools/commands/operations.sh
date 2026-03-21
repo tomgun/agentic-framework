@@ -244,6 +244,16 @@ cmd_tools() {
 # Ensures post-merge completion always runs. Prevents the §14/§16 failure
 # where the agent merges a PR but forgets to run ag done.
 cmd_merge() {
+    # Gate: git must be active (F-0250)
+    local git_mode
+    git_mode=$(get_setting "git_mode" "active")
+    if [[ "$git_mode" != "active" ]]; then
+        echo -e "${YELLOW}Git not active (git_mode: ${git_mode}).${NC}"
+        echo "  Run: ag git-init    to enable version control"
+        echo ""
+        return 0
+    fi
+
     local pr_number="${1:-}"
     local feature_id="${2:-}"
 

@@ -44,6 +44,8 @@ COMMANDS:
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
     intent [sub]        Manage intent journal (list|clear F-XXXX)
     formalize [T-XXXX...]  Promote TODO items to formal features + AC stubs
+    git-init            Activate git version control (safe: .gitignore first, scaffold commit)
+    gitignore           Generate/update stack-aware .gitignore
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     export <tool|all>   Generate instruction files for AI tools (claude|cursor|copilot|codex)
     verify [--full]     Run doctor verification
@@ -129,6 +131,8 @@ COMMANDS:
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
     intent [sub]        Manage intent journal (list|clear F-XXXX)
     formalize [T-XXXX...]  Promote TODO items to formal features + AC stubs
+    git-init            Activate git version control (safe: .gitignore first, scaffold commit)
+    gitignore           Generate/update stack-aware .gitignore
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     export <tool|all>   Generate instruction files for AI tools (claude|cursor|copilot|codex)
     verify [--full]     Run doctor verification

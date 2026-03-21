@@ -4377,3 +4377,35 @@ Proposed restructuring:
 - Tests: Export generates valid configs per tool
 
 **Acceptance**: See `spec/acceptance/F-0249.md`
+
+## F-0250: Git-Deferred Mode
+
+**Status**: implementing
+**Category**: Init
+**Priority**: high
+**Complexity**: medium
+
+**Description**: Three-mode `git_mode` setting (`none | deferred | active`). `deferred` = default for discovery/formal profiles (no git until user runs `ag git-init`). `active` = default for autonomous_formal. New `ag git-init` command: safe git activation with stack-aware `.gitignore` generation, framework-only initial commit. Claude hooks work without git; git-dependent commands (`ag commit`, `ag merge`, `ag auto task/epic`) gated behind `git_mode: active`. Dashboard shows git status and nudges users in deferred mode.
+
+**Implementation**:
+- State: none
+- Code: scaffold.sh, profiles.conf, STACK.template.md, commands/git-init.sh, gitignore.sh, ag.sh, commit.sh, implement.sh, dashboard.sh, wip.sh, settings.py
+- Tests: Init without git, ag git-init activation, command gating, upgrade path
+
+**Acceptance**: See `spec/acceptance/F-0250.md`
+
+## F-0251: Formal Spec Lifecycle Enforcement
+
+**Status**: implementing
+**Category**: Enforcement
+**Priority**: high
+**Complexity**: medium
+
+**Description**: In formal and autonomous_formal profiles, enforce that features progress through the state machine before code is written. Discovered via algebra-rush case study: agent wrote 1593 lines while all 6 features stayed "planned" — specs were partially created (3/6 ACs) but the state machine was completely bypassed. PreToolUse hook should check that at least one feature is in `implementing` (or later) state before allowing code writes to source directories. ACs must be systematically created for ALL features, not just the ones being actively coded. This preserves the formal workflow's value (spec-driven development) while still allowing the agent to create specs first.
+
+**Implementation**:
+- State: none
+- Code: PreToolUse hook, gate.py enforcement for code writes in formal modes
+- Tests: LLM test verifying agent cannot write source code when all features are "planned"
+
+**Acceptance**: See `spec/acceptance/F-0251.md`

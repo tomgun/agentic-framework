@@ -256,7 +256,14 @@ cmd_implement() {
     # Write intent (advisory — failure does not block)
     intent_write "$feature_id" "implementing" "implement" "$intent_steps" "" || true
 
-    # 5. Worktree creation (when worktree_mode == always)
+    # 5. Worktree creation (when worktree_mode == always AND git active — F-0250)
+    local impl_git_mode
+    impl_git_mode=$(get_setting "git_mode" "active")
+    if [[ "$impl_git_mode" != "active" ]] && [[ "$wt_mode" == "always" ]]; then
+        echo -e "${YELLOW}Worktree mode requires git. Working in-place (git_mode: ${impl_git_mode}).${NC}"
+        echo "  Run: ag git-init    to enable worktrees"
+        wt_mode="off"
+    fi
     if [ "$wt_mode" = "always" ]; then
         echo ""
         echo "Creating worktree for ${feature_id}..."

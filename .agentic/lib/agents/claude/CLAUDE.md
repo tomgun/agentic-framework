@@ -39,7 +39,7 @@ Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and
 ## Core Rules
 
 - Never auto-commit in interactive sessions. Show changes to human first.
-- PR by default: create feature branches and PRs (check `git_workflow` in STACK.md).
+- PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). If `git_mode` is `deferred` or `none`, skip git operations — suggest `ag git-init` when the user wants to commit.
 - Add/update tests for new/changed logic. Write tests alongside code, not after.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
 - Keep changes small and scoped (max 5-10 files per commit).

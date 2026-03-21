@@ -24,6 +24,7 @@ from gate import (
     check_feature_has_spec,
     check_feature_has_ac,
     check_feature_has_tests,
+    check_any_feature_implementing,
     gate_stop,
     gate_pretool,
     gate_verify,
@@ -478,3 +479,220 @@ class TestCLI:
         assert result.returncode == 2  # deny
         output = json.loads(result.stdout)
         assert output["decision"] == "deny"
+
+
+# ---------------------------------------------------------------------------
+# F-0251: Formal spec lifecycle enforcement
+# ---------------------------------------------------------------------------
+
+class TestFormalSpecLifecycleEnforcement:
+    """F-0251: In formal mode, block source code edits when all features are 'planned'."""
+
+    @pytest.fixture
+    def formal_all_planned(self, project_dir):
+        """Formal project with ALL features in 'planned' state."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- state_enforcement: blocking\n"
+        )
+        (project_dir / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
+
+## F-0001: Feature One
+
+**Status**: planned
+**Category**: Test
+
+## F-0002: Feature Two
+
+**Status**: planned
+**Category**: Test
+""")
+        return project_dir
+
+    @pytest.fixture
+    def formal_one_implementing(self, project_dir):
+        """Formal project with one feature implementing."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- state_enforcement: blocking\n"
+        )
+        (project_dir / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
+
+## F-0001: Feature One
+
+**Status**: implementing
+**Category**: Test
+
+## F-0002: Feature Two
+
+**Status**: planned
+**Category**: Test
+""")
+        # AC file for F-0001
+        (project_dir / ".agentic" / "spec" / "acceptance" / "F-0001.md").write_text(
+            "# F-0001\n\n### AC-1: Works\n"
+        )
+        return project_dir
+
+    def test_check_any_feature_implementing_all_planned(self, formal_all_planned):
+        """When all features are planned, returns False."""
+        assert check_any_feature_implementing(formal_all_planned) is False
+
+    def test_check_any_feature_implementing_one_active(self, formal_one_implementing):
+        """When at least one feature is implementing, returns True."""
+        assert check_any_feature_implementing(formal_one_implementing) is True
+
+    def test_blocks_source_edit_when_all_planned_blocking(self, formal_all_planned):
+        """Formal + blocking + all planned → deny source code edits."""
+        result = gate_pretool(
+            None, formal_all_planned, "Write",
+            json.dumps({"file_path": "/project/src/main.ts"})
+        )
+        assert result.decision == "deny"
+        assert "no feature is in implementation state" in result.reasons[0]
+
+    def test_allows_source_edit_when_one_implementing(self, formal_one_implementing):
+        """Formal + one implementing → allow source code edits."""
+        result = gate_pretool(
+            "F-0001", formal_one_implementing, "Write",
+            json.dumps({"file_path": "/project/src/main.ts"})
+        )
+        assert result.decision == "allow"
+
+    def test_allows_safe_file_edits_when_all_planned(self, formal_all_planned):
+        """Framework/config files are always editable, even when all planned."""
+        # .agentic/ files
+        result = gate_pretool(
+            None, formal_all_planned, "Write",
+            json.dumps({"file_path": "/project/.agentic/STATUS.md"})
+        )
+        assert result.decision == "allow"
+
+        # Markdown files
+        result = gate_pretool(
+            None, formal_all_planned, "Edit",
+            json.dumps({"file_path": "/project/README.md"})
+        )
+        assert result.decision == "allow"
+
+        # Test files
+        result = gate_pretool(
+            None, formal_all_planned, "Write",
+            json.dumps({"file_path": "/project/tests/test_main.py"})
+        )
+        assert result.decision == "allow"
+
+    def test_discovery_allows_source_edit_when_all_planned(self, project_dir):
+        """Discovery profile is NOT affected — no enforcement."""
+        (project_dir / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
+
+## F-0001: Feature One
+
+**Status**: planned
+""")
+        result = gate_pretool(
+            None, project_dir, "Write",
+            json.dumps({"file_path": "/project/src/main.ts"})
+        )
+        assert result.decision == "allow"
+
+    def test_advisory_mode_warns_but_allows(self, project_dir):
+        """When state_enforcement=advisory, warn but don't block."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- state_enforcement: advisory\n"
+        )
+        (project_dir / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
+
+## F-0001: Feature One
+
+**Status**: planned
+""")
+        result = gate_pretool(
+            None, project_dir, "Write",
+            json.dumps({"file_path": "/project/src/main.ts"})
+        )
+        assert result.decision == "allow"
+        assert len(result.warnings) > 0
+        assert "no feature is in implementation state" in result.warnings[0]
+
+    def test_no_features_file_allows(self, project_dir):
+        """No FEATURES.md → no enforcement (graceful degradation)."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- state_enforcement: blocking\n"
+        )
+        (project_dir / ".agentic" / "spec" / "FEATURES.md").unlink(missing_ok=True)
+        result = gate_pretool(
+            None, project_dir, "Write",
+            json.dumps({"file_path": "/project/src/main.ts"})
+        )
+        assert result.decision == "allow"
+
+
+# ---------------------------------------------------------------------------
+# Defense-in-depth: git pre-commit checks mirrored in Claude hooks
+# ---------------------------------------------------------------------------
+
+class TestPreCommitMirrorChecks:
+    """Checks mirrored from pre-commit-check.sh into gate_pretool()."""
+
+    def test_shipped_spec_edit_warns(self, formal_project):
+        """Editing a shipped feature's AC file produces a migration warning."""
+        # Mark F-0042 as shipped
+        (formal_project / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
+
+## F-0042: Test Feature
+
+**Status**: shipped
+**Category**: Test
+""")
+        result = gate_pretool(
+            "F-0042", formal_project, "Edit",
+            json.dumps({"file_path": str(formal_project / ".agentic/spec/acceptance/F-0042.md")})
+        )
+        assert result.decision == "allow"  # warn, not block
+        assert any("migration" in w.lower() for w in result.warnings)
+
+    def test_non_shipped_spec_edit_no_warning(self, formal_project):
+        """Editing a non-shipped feature's AC file produces no warning."""
+        result = gate_pretool(
+            "F-0042", formal_project, "Edit",
+            json.dumps({"file_path": str(formal_project / ".agentic/spec/acceptance/F-0042.md")})
+        )
+        assert result.decision == "allow"
+        assert not any("migration" in w.lower() for w in result.warnings)
+
+    def test_code_file_length_warns(self, formal_project):
+        """Writing a file exceeding max_code_file_length produces warning."""
+        (formal_project / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- max_code_file_length: 10\n"
+        )
+        long_content = "\n".join([f"line {i}" for i in range(20)])
+        result = gate_pretool(
+            "F-0042", formal_project, "Write",
+            json.dumps({"file_path": "/project/src/big.ts", "content": long_content})
+        )
+        assert result.decision == "allow"
+        assert any("lines" in w and "limit" in w for w in result.warnings)
+
+    def test_shipped_status_downgrade_blocked(self, formal_project):
+        """Downgrading a shipped feature's status is blocked."""
+        result = gate_pretool(
+            None, formal_project, "Edit",
+            json.dumps({
+                "file_path": str(formal_project / ".agentic/spec/FEATURES.md"),
+                "old_string": "**Status**: shipped",
+                "new_string": "**Status**: implementing",
+            })
+        )
+        assert result.decision == "deny"
+        assert any("downgrade" in r.lower() for r in result.reasons)
+
+    def test_non_downgrade_status_change_allowed(self, formal_project):
+        """Upgrading status (planned → implementing) is allowed."""
+        result = gate_pretool(
+            None, formal_project, "Edit",
+            json.dumps({
+                "file_path": str(formal_project / ".agentic/spec/FEATURES.md"),
+                "old_string": "**Status**: planned",
+                "new_string": "**Status**: implementing",
+            })
+        )
+        assert result.decision == "allow"
