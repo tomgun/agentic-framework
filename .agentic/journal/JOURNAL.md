@@ -3879,3 +3879,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 12:55 - F-0244 Shipped
+
+**Why**: Post-merge completion workflow
+
+**What changed**:
+- Hooks-first framework simplification merged (PR #185). 5 child features shipped: Stop gate, PreToolUse enforcement, context hooks, v2 engine stripped, Cursor adapters.
+
+**Next steps**:
+- Dogfood sync, physical v2/ deletion follow-up
+
+**Blockers**: None
+

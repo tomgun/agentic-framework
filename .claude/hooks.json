@@ -1,5 +1,18 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/PreToolUse.sh",
+            "timeout": 2000,
+            "description": "Enforcement: block destructive git ops, enforce spec-first for code edits and commits"
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": ".*",
@@ -93,10 +106,11 @@
             "type": "command",
             "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/Stop.sh",
             "timeout": 5000,
-            "description": "Workflow integrity check before ending session"
+            "description": "Enforcement: blocks session stop until ag verify passes (exit 2 = deny)"
           }
         ]
       }
     ]
   }
 }
+

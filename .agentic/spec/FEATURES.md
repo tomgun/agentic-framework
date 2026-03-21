@@ -4258,7 +4258,7 @@ Proposed restructuring:
 
 ## F-0244: Hooks-First Framework Simplification
 
-**Status**: planned
+**Status**: shipped
 **Category**: Architecture
 **Source**: .agentic/journal/plans/2026-03-21-hooks-first-framework-plan.md
 **Priority**: critical
@@ -4279,7 +4279,7 @@ Proposed restructuring:
 
 ## F-0245: Stop Gate Enforcement
 
-**Status**: planned
+**Status**: shipped
 **Category**: Verification & Enforcement
 **Parent**: F-0244
 **Priority**: critical
@@ -4298,7 +4298,7 @@ Proposed restructuring:
 
 ## F-0246: PreToolUse Gate Enforcement
 
-**Status**: planned
+**Status**: shipped
 **Category**: Verification & Enforcement
 **Parent**: F-0244
 **Priority**: high
@@ -4319,7 +4319,7 @@ Proposed restructuring:
 
 ## F-0247: Context Hooks
 
-**Status**: planned
+**Status**: shipped
 **Category**: Session
 **Parent**: F-0244
 **Priority**: high
@@ -4340,7 +4340,7 @@ Proposed restructuring:
 
 ## F-0248: Strip v2 Engine
 
-**Status**: planned
+**Status**: shipped
 **Category**: Architecture
 **Parent**: F-0244
 **Priority**: high
@@ -4361,7 +4361,7 @@ Proposed restructuring:
 
 ## F-0249: Cross-Tool Export and CI Integration
 
-**Status**: planned
+**Status**: shipped
 **Category**: Tooling
 **Parent**: F-0244
 **Priority**: medium
