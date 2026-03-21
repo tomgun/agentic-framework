@@ -3957,3 +3957,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 17:45 - F-0250 + F-0251 shipped
+
+**Why**: PR #188 merged — algebra-rush onboarding analysis led to two features shipping
+
+**What changed**:
+- Git-deferred mode (3 modes, ag git-init, stack-aware .gitignore, command gating, dashboard) and formal spec lifecycle enforcement (PreToolUse blocks code when all features planned, defense-in-depth mirrors of 3 pre-commit checks). 62 gate tests pass.
+
+**Next steps**:
+- Dogfood sync, instruction file checklist, next backlog item
+
+**Blockers**: None
+

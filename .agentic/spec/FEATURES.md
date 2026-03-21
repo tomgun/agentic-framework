@@ -4380,7 +4380,7 @@ Proposed restructuring:
 
 ## F-0250: Git-Deferred Mode
 
-**Status**: implementing
+**Status**: shipped
 **Category**: Init
 **Priority**: high
 **Complexity**: medium
@@ -4396,7 +4396,7 @@ Proposed restructuring:
 
 ## F-0251: Formal Spec Lifecycle Enforcement
 
-**Status**: implementing
+**Status**: shipped
 **Category**: Enforcement
 **Priority**: high
 **Complexity**: medium

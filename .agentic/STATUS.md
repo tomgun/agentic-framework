@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0250 + F-0251: git-deferred mode and formal spec enforcement — ready to commit (Updated: 2026-03-21 16:41 UTC)
+- Post-merge: F-0250 + F-0251 shipped via PR #188 (Updated: 2026-03-21 17:45 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item
