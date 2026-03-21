@@ -77,6 +77,8 @@ cmd_auto() {
             echo "    --all                 Run all scenarios × all settings combos"
             echo "    --json                Machine-readable output"
             echo "  pipeline              End-to-end: vision → epic → implement → ship (F-0188)"
+            echo "    --vision \"text\"       Freeform vision — Claude decomposes into features"
+            echo "    --features-json JSON  Pre-structured features (programmatic use)"
             echo "  status                Show engine state"
             echo "  pause                 Pause running engine"
             echo "  resume                Resume paused engine"

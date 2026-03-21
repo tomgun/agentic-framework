@@ -3892,3 +3892,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 13:35 - Pipeline --vision flag
+
+**Why**: Pipeline required pre-structured JSON — the first step of the autonomous chain was manual
+
+**What changed**:
+- Added vision_to_features() and run_pipeline_from_vision() to pipeline.py; ag auto pipeline now accepts --vision for end-to-end autonomous flow from freeform text
+
+**Next steps**:
+- PR review, tests
+
+**Blockers**: None
+

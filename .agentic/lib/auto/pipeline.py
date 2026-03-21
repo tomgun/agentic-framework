@@ -4,19 +4,23 @@ pipeline.py -- End-to-End Autonomous Pipeline orchestrator.
 Implements F-0188 (ADR-001 Phase 7 capstone): wires kickoff, promote,
 epic creation, and scheduler into a single autonomous flow.
 
-The pipeline accepts pre-structured features_data (same format as
-kickoff.generate_to_staging). The LLM vision-to-features step is the
-caller's responsibility (ag.sh/skill layer), keeping this module
-fully testable and agent-agnostic.
+Accepts either:
+- Pre-structured features_data (for programmatic/test use)
+- A freeform vision string (--vision), which spawns Claude to convert
+  it into structured features_data before running the pipeline
 
 @feature F-0188
 
 Usage:
-    # Programmatic
+    # Programmatic (pre-structured)
     from auto.pipeline import run_pipeline, PipelineResult
     result = run_pipeline(project_root, features_data, epic_name="My Epic")
 
+    # Programmatic (from vision)
+    result = run_pipeline_from_vision(project_root, "Build a todo app", epic_name="Todo")
+
     # CLI
+    ag auto pipeline --vision "Build a todo app with auth and notifications"
     ag auto pipeline --features-json '[...]' --epic-name "My Epic"
 """
 from __future__ import annotations
@@ -34,6 +38,7 @@ from paths import get_paths  # noqa: E402
 from settings import get_setting  # noqa: E402
 from auto.kickoff import generate_to_staging, promote_staging_with_ids  # noqa: E402
 from auto.scheduler import AutonomousScheduler  # noqa: E402
+from auto import spawn_claude  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -63,6 +68,216 @@ class PipelineResult:
         if self.scheduler_result and hasattr(self.scheduler_result, "to_dict"):
             d["scheduler_result"] = self.scheduler_result.to_dict()
         return d
+
+
+# ---------------------------------------------------------------------------
+# Vision → features_data conversion
+# ---------------------------------------------------------------------------
+
+_VISION_PROMPT_TEMPLATE = """\
+You are a product architect. Convert the following product vision into a
+structured JSON array of features suitable for an agentic development pipeline.
+
+VISION:
+{vision}
+
+{context_section}
+
+OUTPUT FORMAT — respond with ONLY a JSON object (no markdown fences, no commentary):
+{{
+  "epic_name": "Short epic title (3-6 words)",
+  "overview": "2-3 sentence project overview",
+  "features": [
+    {{
+      "name": "Feature Name",
+      "description": "What this feature does and why",
+      "criteria": [
+        "AC-001: User can ...",
+        "AC-002: System validates ...",
+        "AC-003: Error case ..."
+      ],
+      "dependencies": []
+    }}
+  ]
+}}
+
+RULES:
+- Each feature should be independently implementable (max 5-10 files of change)
+- Order features by dependency (foundations first)
+- Each feature needs 2-5 concrete, testable acceptance criteria
+- Dependencies reference other features by name (empty list if none)
+- Keep features small and focused — split large concerns into multiple features
+- Include error handling and edge cases in criteria, not as separate features
+- If the vision is vague, make reasonable assumptions and note them in descriptions
+"""
+
+
+def vision_to_features(
+    project_root: Path,
+    vision: str,
+    claude_command: str = "claude",
+    timeout: int = 120,
+) -> tuple[bool, list[dict], str, str, list[str]]:
+    """Convert a freeform vision string into structured features_data.
+
+    Spawns Claude to parse the vision into the features_data format
+    expected by generate_to_staging().
+
+    Args:
+        project_root: Project root path.
+        vision: Freeform product vision text.
+        claude_command: Claude CLI command.
+        timeout: Spawn timeout in seconds.
+
+    Returns:
+        (success, features_data, epic_name, overview_text, messages)
+    """
+    messages: list[str] = []
+
+    # Build context section from project files (if they exist)
+    context_parts = []
+    paths = get_paths(project_root)
+
+    stack_file = project_root / "STACK.md"
+    if stack_file.exists():
+        stack_text = stack_file.read_text()[:2000]
+        context_parts.append(f"TECH STACK (from STACK.md):\n{stack_text}")
+
+    context_pack = paths.context_pack
+    if context_pack.exists():
+        cp_text = context_pack.read_text()[:2000]
+        context_parts.append(f"PROJECT CONTEXT:\n{cp_text}")
+
+    nfr_file = paths.spec_dir / "NFR.md"
+    if nfr_file.exists():
+        nfr_text = nfr_file.read_text()[:1000]
+        context_parts.append(f"NON-FUNCTIONAL REQUIREMENTS:\n{nfr_text}")
+
+    context_section = "\n\n".join(context_parts) if context_parts else ""
+
+    prompt = _VISION_PROMPT_TEMPLATE.format(
+        vision=vision,
+        context_section=context_section,
+    )
+
+    result = spawn_claude(
+        claude_command, project_root, prompt,
+        timeout=timeout,
+    )
+
+    if result.returncode != 0:
+        messages.append(f"Claude vision-to-features failed (rc={result.returncode})")
+        return False, [], "", "", messages
+
+    # Parse JSON from output — handle markdown fences if present
+    output = str(result).strip()
+    if output.startswith("```"):
+        lines = output.split("\n")
+        # Strip first and last fence lines
+        lines = [l for l in lines if not l.strip().startswith("```")]
+        output = "\n".join(lines).strip()
+
+    try:
+        parsed = json.loads(output)
+    except json.JSONDecodeError:
+        # Try to extract JSON object from mixed output
+        start = output.find("{")
+        end = output.rfind("}") + 1
+        if start >= 0 and end > start:
+            try:
+                parsed = json.loads(output[start:end])
+            except json.JSONDecodeError as e:
+                messages.append(f"Failed to parse features JSON: {e}")
+                messages.append(f"Raw output: {output[:500]}")
+                return False, [], "", "", messages
+        else:
+            messages.append("No JSON object found in Claude output")
+            messages.append(f"Raw output: {output[:500]}")
+            return False, [], "", "", messages
+
+    # Extract fields
+    if isinstance(parsed, dict):
+        epic_name = parsed.get("epic_name", "Pipeline Epic")
+        overview = parsed.get("overview", "")
+        features = parsed.get("features", [])
+    elif isinstance(parsed, list):
+        # Backward compat: raw features array
+        epic_name = "Pipeline Epic"
+        overview = ""
+        features = parsed
+    else:
+        messages.append(f"Unexpected JSON type: {type(parsed).__name__}")
+        return False, [], "", "", messages
+
+    if not features:
+        messages.append("Claude returned no features")
+        return False, [], "", "", messages
+
+    messages.append(f"Vision decomposed into {len(features)} features: "
+                    f"{', '.join(f['name'] for f in features)}")
+    return True, features, epic_name, overview, messages
+
+
+# ---------------------------------------------------------------------------
+# Vision → Pipeline (full end-to-end from freeform text)
+# ---------------------------------------------------------------------------
+
+def run_pipeline_from_vision(
+    project_root: Path,
+    vision: str,
+    epic_name: str = "",
+    force_overview: bool = False,
+    max_errors: int = 3,
+    skip_pr: bool = False,
+    claude_command: str = "claude",
+    vision_timeout: int = 120,
+) -> PipelineResult:
+    """Run the full pipeline starting from a freeform vision string.
+
+    Spawns Claude to convert vision → features_data, then delegates to
+    run_pipeline() for the rest.
+
+    Args:
+        project_root: Project root path.
+        vision: Freeform product vision text.
+        epic_name: Override epic name (auto-derived from vision if empty).
+        force_overview: Overwrite existing OVERVIEW.md.
+        max_errors: Stop scheduler after N feature failures.
+        skip_pr: Skip PR creation per feature.
+        claude_command: Claude CLI command for worker agents.
+        vision_timeout: Timeout for vision-to-features conversion.
+
+    Returns:
+        PipelineResult with phase tracking.
+    """
+    result = PipelineResult(success=False)
+
+    # -- Phase: vision -------------------------------------------------
+    success, features_data, derived_name, overview, msgs = vision_to_features(
+        project_root, vision,
+        claude_command=claude_command,
+        timeout=vision_timeout,
+    )
+    result.messages.extend(msgs)
+
+    if not success:
+        result.phase = "vision"
+        result.blocked_reason = "; ".join(msgs)
+        return result
+
+    # Use derived epic name if not overridden
+    final_epic_name = epic_name or derived_name or "Pipeline Epic"
+
+    return run_pipeline(
+        project_root=project_root,
+        features_data=features_data,
+        overview_text=overview,
+        epic_name=final_epic_name,
+        force_overview=force_overview,
+        max_errors=max_errors,
+        skip_pr=skip_pr,
+        claude_command=claude_command,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -262,27 +477,34 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
             "End-to-end autonomous pipeline: vision → epic → implement → ship.\n\n"
-            "Accepts pre-structured features_data (JSON). The LLM\n"
-            "vision-to-features step is the caller's responsibility."
+            "Two modes:\n"
+            "  --vision   Freeform text — Claude decomposes into features\n"
+            "  --features-json   Pre-structured JSON (for programmatic use)\n"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument(
+
+    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group.add_argument(
+        "--vision",
+        help="Freeform product vision — Claude converts to features automatically",
+    )
+    input_group.add_argument(
         "--features-json",
-        required=True,
         help=(
             "JSON array of feature dicts. Each dict needs at minimum: "
-            "placeholder_id, name. Example: "
-            "'[{\"placeholder_id\": \"P-1\", \"name\": \"Auth\"}]'"
+            "name, criteria. Example: "
+            "'[{\"name\": \"Auth\", \"description\": \"...\", \"criteria\": [\"AC-001: ...\"]}]'"
         ),
     )
+
     parser.add_argument(
         "--overview", default="",
         help="Overview text for OVERVIEW.md",
     )
     parser.add_argument(
-        "--epic-name", default="Pipeline Epic",
-        help="Name for the pipeline epic (default: 'Pipeline Epic')",
+        "--epic-name", default="",
+        help="Epic name (auto-derived from vision if omitted)",
     )
     parser.add_argument(
         "--project-root", type=Path, default=Path.cwd(),
@@ -301,31 +523,48 @@ def main() -> int:
         help="Skip PR creation per feature",
     )
     parser.add_argument(
+        "--vision-timeout", type=int, default=120,
+        help="Timeout for vision-to-features conversion in seconds (default: 120)",
+    )
+    parser.add_argument(
         "--json", action="store_true",
         help="Output result as JSON",
     )
 
     args = parser.parse_args()
+    project_root = args.project_root.resolve()
 
-    # Parse features JSON
-    try:
-        features_data = json.loads(args.features_json)
-        if not isinstance(features_data, list):
-            print("Error: --features-json must be a JSON array", file=sys.stderr)
+    if args.vision:
+        # Vision mode: Claude decomposes vision → features → pipeline
+        result = run_pipeline_from_vision(
+            project_root=project_root,
+            vision=args.vision,
+            epic_name=args.epic_name,
+            force_overview=args.force_overview,
+            max_errors=args.max_errors,
+            skip_pr=args.skip_pr,
+            vision_timeout=args.vision_timeout,
+        )
+    else:
+        # Pre-structured mode
+        try:
+            features_data = json.loads(args.features_json)
+            if not isinstance(features_data, list):
+                print("Error: --features-json must be a JSON array", file=sys.stderr)
+                return 1
+        except json.JSONDecodeError as e:
+            print(f"Error: Invalid JSON in --features-json: {e}", file=sys.stderr)
             return 1
-    except json.JSONDecodeError as e:
-        print(f"Error: Invalid JSON in --features-json: {e}", file=sys.stderr)
-        return 1
 
-    result = run_pipeline(
-        project_root=args.project_root.resolve(),
-        features_data=features_data,
-        overview_text=args.overview,
-        epic_name=args.epic_name,
-        force_overview=args.force_overview,
-        max_errors=args.max_errors,
-        skip_pr=args.skip_pr,
-    )
+        result = run_pipeline(
+            project_root=project_root,
+            features_data=features_data,
+            overview_text=args.overview,
+            epic_name=args.epic_name or "Pipeline Epic",
+            force_overview=args.force_overview,
+            max_errors=args.max_errors,
+            skip_pr=args.skip_pr,
+        )
 
     if args.json:
         print(json.dumps(result.to_dict(), indent=2))
