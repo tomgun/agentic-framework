@@ -14,6 +14,8 @@ metadata:
 ---
 # Committing Changes
 
+**Git required**: If `git_mode` in STACK.md is `deferred` or `none`, `ag commit` will print a message suggesting `ag git-init`. Guide the user to activate git first.
+
 Run `ag commit` — it handles quality gates, branch checks, and diff review.
 
 ## Before committing

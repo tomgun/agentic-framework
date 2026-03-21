@@ -758,6 +758,34 @@ else
     fi
   fi
 
+  # Add git_mode setting for existing projects (v0.69.0, F-0250)
+  # Existing projects with .git/ get git_mode: active (backwards compat)
+  if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
+    if ! grep -q "^- git_mode:" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null; then
+      if git -C "$TARGET_PROJECT_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+        # Has git — set to active
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+          sed -i '' '/^- profile:/a\
+- git_mode: active\
+# Git initialization mode. none | deferred | active. Activated via ag git-init (F-0250).' "$TARGET_PROJECT_DIR/STACK.md"
+        else
+          sed -i '/^- profile:/a\- git_mode: active\n# Git initialization mode. none | deferred | active. Activated via ag git-init (F-0250).' "$TARGET_PROJECT_DIR/STACK.md"
+        fi
+        echo -e "  ${GREEN}✓${NC} Added git_mode: active (existing git project)"
+      else
+        # No git — set to deferred
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+          sed -i '' '/^- profile:/a\
+- git_mode: deferred\
+# Git initialization mode. none | deferred | active. Activate with: ag git-init (F-0250).' "$TARGET_PROJECT_DIR/STACK.md"
+        else
+          sed -i '/^- profile:/a\- git_mode: deferred\n# Git initialization mode. none | deferred | active. Activate with: ag git-init (F-0250).' "$TARGET_PROJECT_DIR/STACK.md"
+        fi
+        echo -e "  ${GREEN}✓${NC} Added git_mode: deferred (no git detected)"
+      fi
+    fi
+  fi
+
   # Migrate pre_commit_hook: yes → fast in STACK.md
   if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
     if grep -qE "^[- ]*pre_commit_hook:[[:space:]]*yes" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null; then

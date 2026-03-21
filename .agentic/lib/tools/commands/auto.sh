@@ -9,6 +9,22 @@ cmd_auto() {
 
     local auto_dir="$SCRIPT_DIR/../auto"
 
+    # Gate: task/epic/crunch/pipeline require git_mode: active (F-0250)
+    # These commands create branches, commits, and PRs — they need git.
+    case "$subcmd" in
+        task|epic|crunch|pipeline)
+            local git_mode
+            git_mode=$(get_setting "git_mode" "active")
+            if [[ "$git_mode" != "active" ]]; then
+                echo -e "${YELLOW}Git not active (git_mode: ${git_mode}).${NC}"
+                echo "  Autonomous workflows require version control for branches, commits, and PRs."
+                echo "  Run: ag git-init    to enable git first"
+                echo ""
+                return 0
+            fi
+            ;;
+    esac
+
     case "$subcmd" in
         init)
             # Generate settings.json for auto mode

@@ -41,14 +41,26 @@ else
     D_VERSION="unknown"
 fi
 
-# WIP (interrupted work)
+# GIT MODE (F-0250)
+D_GIT_MODE="active"  # Default for backwards compat
+if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/../settings.sh" ]]; then
+    D_GIT_MODE=$(source "$TOOLS_DIR/../settings.sh" 2>/dev/null && get_setting "git_mode" "active" 2>/dev/null || echo "active")
+fi
+# Auto-detect: if no .git directory exists, treat as deferred regardless of setting
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    [[ "$D_GIT_MODE" == "active" ]] && D_GIT_MODE="deferred"
+fi
+
+# WIP (interrupted work) — skip git checks when git not active
 D_WIP="clean"
 D_WIP_FEATURE=""
 D_WIP_CHANGED=0
 if ! bash "$TOOLS_DIR/wip.sh" check >/dev/null 2>&1; then
     D_WIP="interrupted"
     D_WIP_FEATURE=$(_py "$TOOLS_DIR/agents_helpers.py" --project-root "${MAIN_PROJECT_ROOT:-$PROJECT_ROOT}" get-current-feature "$PROJECT_ROOT" 2>/dev/null || echo "")
-    D_WIP_CHANGED=$(git status --short 2>/dev/null | wc -l | tr -d ' ')
+    if [[ "$D_GIT_MODE" == "active" ]]; then
+        D_WIP_CHANGED=$(git status --short 2>/dev/null | wc -l | tr -d ' ')
+    fi
 fi
 
 # STATUS (current focus)
@@ -201,9 +213,9 @@ tips=(
 )
 D_TIP="${tips[$((RANDOM % ${#tips[@]}))]}"
 
-# DIRTY STATE FILES (ag flush)
+# DIRTY STATE FILES (ag flush) — skip when git not active (F-0250)
 D_DIRTY_STATE=0
-if [[ -f "$TOOLS_DIR/state-commit.sh" ]]; then
+if [[ "$D_GIT_MODE" == "active" ]] && [[ -f "$TOOLS_DIR/state-commit.sh" ]]; then
     bash "$TOOLS_DIR/state-commit.sh" --check >/dev/null 2>&1 && D_DIRTY_STATE=1
 fi
 
@@ -345,9 +357,14 @@ if [[ "$D_AGENTS" != "none" ]]; then
     echo "👥 Agents        $D_AGENTS"
 fi
 
-# Conditional: dirty state files
+# Conditional: dirty state files (only when git active)
 if [[ "$D_DIRTY_STATE" -eq 1 ]]; then
     echo "📤 Dirty state    Uncommitted state files. Run: ag flush"
+fi
+
+# Conditional: git deferred mode (F-0250)
+if [[ "$D_GIT_MODE" != "active" ]]; then
+    echo "💡 Git            Deferred — run \`ag git-init\` when ready to track changes"
 fi
 
 # Conditional: stale

@@ -4,6 +4,16 @@
 # Depends on: SCRIPT_DIR, ROOT_DIR, PROFILE, color codes, paths.sh, settings.sh
 
 cmd_commit() {
+    # Gate: git must be active (F-0250)
+    local git_mode
+    git_mode=$(get_setting "git_mode" "active")
+    if [[ "$git_mode" != "active" ]]; then
+        echo -e "${YELLOW}Git not active (git_mode: ${git_mode}).${NC}"
+        echo "  Run: ag git-init    to enable version control"
+        echo ""
+        return 0
+    fi
+
     echo -e "${BOLD}=== Pre-Commit Gates ===${NC}"
     echo ""
 
