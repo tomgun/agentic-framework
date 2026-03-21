@@ -3905,3 +3905,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 13:45 - PR #186 merged — pipeline --vision
+
+**Why**: Post-merge dance for pipeline vision flag
+
+**What changed**:
+- ag auto pipeline now accepts --vision for end-to-end autonomous flow; fence stripping and feature validation hardened per review
+
+**Next steps**:
+- Dogfood sync, VERSION bump
+
+**Blockers**: None
+
