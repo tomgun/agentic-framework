@@ -3,6 +3,7 @@
 #
 # This hook runs after Claude uses any tool (file edits, terminal commands, etc.)
 # It performs fast, non-blocking quality checks to catch issues early.
+# When v2 engine is active, also runs ag check --quick for artifact enforcement.
 #
 # Triggered by: Claude Code PostToolUse hook
 # Timeout: 2 seconds
@@ -20,7 +21,21 @@ if [[ ! -d ".agentic" ]]; then
   exit 0
 fi
 
-# Only run checks after file writes (not after reads)
+# --- v2 artifact enforcement (Phase 4 completion) ---
+# When v2 engine is active, check artifact status after tool use.
+# Uses --quick (file-existence only, no commands) for <500ms execution.
+# Only outputs when artifacts are MISSING — no noise on success.
+# Note: PreToolUse already handles Write/Edit/MultiEdit (blocking), so this
+# advisory check adds value for other tools (Bash, Read, Agent, etc.).
+_AF_CONFIG="$PROJECT_ROOT/.agentic/state_machine_af.yaml"
+if [[ -f "$_AF_CONFIG" ]] && grep -q '^engine: v2' "$_AF_CONFIG" 2>/dev/null; then
+  CHECK_OUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m auto.v2.workflow check --quick --active 2>/dev/null || true)
+  if [[ -n "$CHECK_OUT" ]]; then
+    echo "$CHECK_OUT"
+  fi
+fi
+
+# Only run linter checks after file writes (not after reads)
 # PostToolUse receives JSON on stdin with tool_name, tool_input, tool_response
 # This generic hook matches all tools (matcher: ".*"), so we infer from file modifications
 RECENT_CHANGES=$(find . -type f -mmin -1 -not -path "./.git/*" -not -path "./.agentic/.cache/*" 2>/dev/null | head -5)

@@ -12,9 +12,10 @@ Hooks are scripts that run automatically at specific points in the Claude Code l
 
 | Hook | When It Runs | Purpose |
 |------|--------------|---------|
+| `PreToolUse.sh` | Before Claude writes/edits code files | v2 artifact enforcement — block edits when required artifacts missing |
 | `SessionStart.sh` | When you start a new Claude chat | Validate environment, show project status from STATUS.md |
 | `UserPromptSubmit.sh` | Before Claude processes your first prompt | Phase-aware verification (acceptance criteria check) |
-| `PostToolUse.sh` | After Claude uses any tool (file edit, terminal, etc.) | Run quick linter checks |
+| `PostToolUse.sh` | After Claude uses any tool (file edit, terminal, etc.) | Run quick linter checks + v2 artifact status |
 | `ExitPlanMode.sh` | After Claude exits plan mode (PostToolUse matcher) | Auto-save plan, inject review instructions |
 | `PreCompact.sh` | Before context window gets compacted | Save state to `JOURNAL.md`, preserve WIP |
 | `Stop.sh` | When session ends | Remind about uncommitted changes and documentation |
@@ -139,11 +140,41 @@ Do NOT start writing code until plan is APPROVED.
 
 ---
 
+### `PreToolUse.sh`
+
+**Runs**: Before Claude writes or edits code files (matcher: `Write|Edit|MultiEdit`)
+
+**Actions**:
+- Check if v2 engine is active (`engine: v2` in `state_machine_af.yaml`)
+- If active, run `ag check --quick --active` to verify required artifacts exist
+- If artifacts are missing, return `permissionDecision: "deny"` to **block** the edit
+- Allow edits to framework/config/state files (`.agentic/*`, `tests/*`, `docs/*`, `*.md`, `*.json`, `*.yaml`, `*.sh`, etc.)
+
+**Benefits**:
+- **Structural enforcement**: Prevents coding without required artifacts (plan, spec, acceptance criteria)
+- **Blocking**: Unlike PostToolUse (advisory), this actually prevents the tool from executing
+- **Fast**: Uses `--quick` mode (file-existence only, no commands, <500ms)
+- **Smart allowlist**: Framework, test, doc, and config files are always allowed
+
+**Output when blocked**:
+```json
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "Artifact check failed — required artifacts are missing..."
+  }
+}
+```
+
+---
+
 ### `PostToolUse.sh`
 
 **Runs**: After Claude uses any tool (writes a file, runs a command, etc.)
 
 **Actions**:
+- When v2 engine is active: run `ag check --quick --active` and display missing artifacts (advisory)
 - Detect recent file modifications (last 1 minute)
 - If code files changed, run fast linter:
   - JavaScript/TypeScript: `eslint --quiet`
@@ -153,6 +184,7 @@ Do NOT start writing code until plan is APPROVED.
 
 **Benefits**:
 - **Immediate feedback**: Catch syntax errors right after writing code
+- **Artifact awareness**: Reminds agent of missing artifacts after every tool use
 - **Non-blocking**: Claude continues working, but you see warnings
 - **Fast**: Only runs quick checks (no tests, those are slow)
 

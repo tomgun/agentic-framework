@@ -9,7 +9,7 @@
 
 Session d7d00d88 violated the autonomous_formal workflow 3 times (68 min wasted). Root cause: behavioral instructions failed to prevent the agent from stopping when it should auto-continue after plan mode exit. This has recurred 3+ times.
 
-Key constraint: **Claude Code does NOT support PreToolUse hooks** (confirmed by environment_research.md, F-0195 plan, T-0071 in TODO.md). Available hooks: SessionStart, UserPromptSubmit, PostToolUse, PreCompact, Stop. Enforcement must use these.
+**Update (2026-03-21)**: Claude Code now supports PreToolUse hooks with `permissionDecision: "deny"` to block tool execution. Available hooks: PreToolUse, SessionStart, UserPromptSubmit, PostToolUse, PreCompact, Stop. The original constraint below is obsolete — PreToolUse IS now available (see https://code.claude.com/docs/en/hooks).
 
 ## Scope
 

@@ -97,7 +97,7 @@ if [[ $DAYS_OLD -gt 90 ]]; then
   case "${AI_ENV}" in
     claude)
       echo "Claude Code research areas:"
-      echo "- Hooks (SessionStart, PostToolUse, PreCompact, Stop)"
+      echo "- Hooks (PreToolUse, SessionStart, UserPromptSubmit, PostToolUse, PreCompact, Stop)"
       echo "- Context window improvements"
       echo "- New APIs or capabilities"
       echo "- Projects integration"

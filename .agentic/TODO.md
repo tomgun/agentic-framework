@@ -175,10 +175,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 - **Background**: F-0234 added pre-commit Check 21 (`.agentic/lib/hooks/pre-commit-check.sh` lines 1157-1189) which blocks commits when `plan_review_enabled: yes` and a WIP entry exists in AGENTS.json but no APPROVED plan is found. Unit tests verify the logic, but the actual blocking behavior during a real `git commit` hasn't been validated. Test: create WIP entry without plan, attempt commit, verify it's blocked with clear error message.
 - **Related**: PR #151 test plan, `.agentic/lib/hooks/pre-commit-check.sh` Check 21, `tests/test_plan_review_hooks.sh`
 
-### T-0071: Future hook: PreToolUse(Write|Edit) — block coding without approved plan (from INSTRUCTION_ARCHITECTURE.md transition table)
-- **Added**: 2026-03-17
-- **Background**: `docs/INSTRUCTION_ARCHITECTURE.md` §"Tool-Native Hook Transition Points" (line 330) lists this as a future enforcement point. When an agent tries to write/edit code files without an approved plan existing, the hook would block the action. Currently agents rely on prompt-level instructions to not code without a plan — this would add structural enforcement. Builds on F-0234's hook architecture (shared logic pattern, advisory vs blocking layers).
-- **Related**: `docs/INSTRUCTION_ARCHITECTURE.md` transition table, F-0234 hook architecture, `.agentic/lib/hooks/shared/` pattern
+### ~~T-0071: DONE — PreToolUse(Write|Edit) artifact enforcement implemented (Phase 4 completion, 2026-03-21)~~
+- **Added**: 2026-03-17 · **Completed**: 2026-03-21
+- **Resolution**: Implemented as `.agentic/lib/claude-hooks/PreToolUse.sh` — blocks Write/Edit/MultiEdit when v2 engine is active and required artifacts are missing. Uses `ag check --quick --active` for <500ms checks, returns `permissionDecision: "deny"` to block. Allows edits to framework/config/state files (.agentic/*, tests/*, docs/*, *.md, etc.).
 
 ### T-0072: Future hook: PreToolUse(Bash)+parse cmd — prevent stash/reset with active agents (from INSTRUCTION_ARCHITECTURE.md transition table)
 - **Added**: 2026-03-17
