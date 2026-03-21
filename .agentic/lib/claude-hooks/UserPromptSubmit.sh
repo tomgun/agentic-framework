@@ -137,6 +137,17 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   fi
 fi
 
+# --- v2 quick artifact check ---
+# When v2 engine is active, inject artifact status into context on every prompt.
+# Uses --quick (file-existence only, no commands) for <500ms execution.
+_AF_CONFIG="$PROJECT_ROOT/.agentic/state_machine_af.yaml"
+if [[ -f "$_AF_CONFIG" ]] && grep -q '^engine: v2' "$_AF_CONFIG" 2>/dev/null; then
+  CHECK_OUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m auto.v2.workflow check --quick --active 2>/dev/null || true)
+  if [[ -n "$CHECK_OUT" ]]; then
+    echo "$CHECK_OUT"
+  fi
+fi
+
 # --- DRAFT plan detection (Layer 2 enforcement) ---
 # If plan_review_enabled and any DRAFT plan exists in journal/plans/, warn on every prompt.
 # Independent of WIP state — detects "any DRAFT plan" not "active feature."
