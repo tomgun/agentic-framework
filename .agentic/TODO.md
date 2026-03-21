@@ -221,6 +221,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0085: LLM test: agent must update specs/acceptance criteria AND write the migration log when implementation changes affect shipped features — Step 7 of implementing-features skill. Both actions required: (1) create migration via migration.sh documenting why the spec evolved, (2) add new ACs to affected spec/acceptance/F-XXXX.md with migration reference. Background: this is a recurring skip — agents treat shipped specs as frozen rather than living documents that evolve with implementation. Related: feedback_doc_updates_must_be_structural.md.
 - **Added**: 2026-03-20
 
+### T-0086: Phase 3 spec protection audit: ~9 shipped features have ACs referencing deleted files, 0 spec migrations created for ~100 affected features. Context-for-role.sh silently drops constitutional rules. 4 ag commands degrade. 13 context manifests reference deleted files. See PR #182 (a22475e). Background: Phase 3 deleted ~130 files / 34K lines but validate_framework.sh v2 mode skips v1 checks, hiding the gaps. Affected features: F-0069 (all 7 checklists), F-0011 (programming_standards), F-0012 (test_strategy), F-0013 (smoke_testing), F-0014 (library_selection), F-0074 (green_coding), F-0102 (modular guidelines), F-0055 (anti-hallucination), F-0093 (AGENT_QUICK_START). Functional issues: context-for-role.sh ALWAYS_INJECT references guidelines/core-rules.md (deleted), commit.sh/done.sh/implement.sh/specs.sh degrade to generic guidance when checklists missing. Either evolve shipped specs with migrations mapping old ACs to v2 equivalents, or deprecate features superseded by v2 engine.
+- **Added**: 2026-03-21
+
 ## Done
 
 
