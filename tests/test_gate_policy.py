@@ -290,6 +290,28 @@ class TestGatePreToolUse:
                              '{"command": "git clean -fd"}')
         assert result.decision == "deny"
 
+    def test_blocks_git_push_force(self, project_dir):
+        result = gate_pretool(None, project_dir, "Bash",
+                             '{"command": "git push --force origin main"}')
+        assert result.decision == "deny"
+
+    def test_blocks_git_push_f(self, project_dir):
+        result = gate_pretool(None, project_dir, "Bash",
+                             '{"command": "git push -f origin main"}')
+        assert result.decision == "deny"
+
+    def test_blocks_git_checkout_dash_dash_dir(self, project_dir):
+        """Broader pattern: blocks checkout -- with any path, not just dot."""
+        result = gate_pretool(None, project_dir, "Bash",
+                             '{"command": "git checkout -- src/"}')
+        assert result.decision == "deny"
+
+    def test_allows_git_restore_staged(self, project_dir):
+        """git restore --staged is safe (unstaging, not discarding)."""
+        result = gate_pretool(None, project_dir, "Bash",
+                             '{"command": "git restore --staged file.py"}')
+        assert result.decision == "allow"
+
     def test_allows_safe_bash(self, project_dir):
         result = gate_pretool(None, project_dir, "Bash",
                              '{"command": "ls -la"}')

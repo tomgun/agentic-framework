@@ -320,11 +320,7 @@ case "${1:-help}" in
         ;;
     transition)
         shift
-        if [[ "$_V2_ENGINE" -eq 1 ]]; then
-            _v2_workflow transition "$@"
-        else
-            python3 "$SCRIPT_DIR/../auto/state_machine.py" --project-root "$ROOT_DIR" "$@"
-        fi
+        python3 "$SCRIPT_DIR/../auto/state_machine.py" --project-root "$ROOT_DIR" "$@"
         ;;
     review)
         shift

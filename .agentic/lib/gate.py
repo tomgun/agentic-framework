@@ -132,13 +132,20 @@ def _feature_from_agents_json(paths) -> Optional[str]:
 
 
 def _feature_from_status(paths) -> Optional[str]:
-    """Extract feature ID from STATUS.md focus line."""
+    """Extract feature ID from STATUS.md focus/session-state line."""
     status_file = paths.status_file
     if not status_file.exists():
         return None
     try:
         content = status_file.read_text()
-        # Match "Focus: F-XXXX" or "🎯 Focus F-XXXX" patterns
+        # Search focus/session-state lines first, then fall back to any F-XXXX
+        for line in content.splitlines():
+            lower = line.lower()
+            if 'focus' in lower or 'session state' in lower or 'current' in lower:
+                m = re.search(r'F-\d{4,}', line)
+                if m:
+                    return m.group(0)
+        # Fall back to first F-XXXX anywhere
         m = re.search(r'F-\d{4,}', content)
         if m:
             return m.group(0)
@@ -367,11 +374,9 @@ def gate_stop(feature_id: Optional[str], project_root: Path) -> GateResult:
             result = result.merge(spec_result)
             result = result.merge(ac_result)
             result = result.merge(test_result)
-
-            # Run actual verification commands if AC file exists
-            if ac_result.decision == "allow":
-                verify_result = check_verification_passes(feature_id, project_root)
-                result = result.merge(verify_result)
+            # Note: we do NOT run check_verification_passes() here because
+            # the Stop hook has a 5s timeout — verification commands can take
+            # minutes. Use `ag verify F-XXXX` or `ag gate verify` for full checks.
         else:
             # In discovery mode, add as warnings
             for r in [spec_result, ac_result, test_result]:
@@ -409,10 +414,11 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
         # Block destructive git operations
         destructive_patterns = [
             (r'git\s+reset\s+--hard', "git reset --hard destroys uncommitted work"),
-            (r'git\s+checkout\s+--\s+\.', "git checkout -- . destroys uncommitted changes"),
-            (r'git\s+restore\s+\.', "git restore . destroys uncommitted changes"),
+            (r'git\s+checkout\s+--\s+', "git checkout -- destroys uncommitted changes"),
+            (r'git\s+restore\s+(?!--staged)', "git restore destroys uncommitted changes (use --staged for safe unstaging)"),
             (r'git\s+clean\s+-[fd]', "git clean removes untracked files"),
             (r'git\s+stash\b', "git stash risks data loss in multi-agent contexts"),
+            (r'git\s+push\s+.*(-f|--force)\b', "git push --force can destroy remote history"),
         ]
         for pattern, reason in destructive_patterns:
             if re.search(pattern, command):

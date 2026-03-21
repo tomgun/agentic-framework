@@ -59,8 +59,6 @@ if [[ "$GATE_RC" -eq 2 ]]; then
   # Extract reason from JSON
   REASON="Blocked by ag gate pretool"
   if command -v jq >/dev/null 2>&1 && echo "$GATE_OUTPUT" | jq -e . >/dev/null 2>&1; then
-    REASON=$(echo "$GATE_OUTPUT" | jq -r '([.reasons // []] | .[0] | join("; ")) // "Blocked by policy"' 2>/dev/null || echo "$REASON")
-    # Actually get all reasons joined
     REASON=$(echo "$GATE_OUTPUT" | jq -r '.reasons // [] | join(". ")' 2>/dev/null || echo "$REASON")
   fi
 
