@@ -438,6 +438,48 @@ graph LR
 
 ---
 
+## Context Window Management in Autonomous Sessions
+
+Autonomous sessions face a fundamental constraint: context windows fill monotonically and agents cannot self-clear. As context grows, the system compresses older messages — losing mid-session instructions (skills, playbooks, file reads) while preserving the system prompt (CLAUDE.md, memory). This means behavioral rules loaded just-in-time degrade over time, while structural enforcement (CLI gates, scripts) remains immune.
+
+### How the Framework Mitigates Context Decay
+
+```mermaid
+flowchart TB
+    subgraph PROBLEM["The Problem"]
+        FILL[Context fills<br/>monotonically] --> COMPRESS[System compresses<br/>older messages]
+        COMPRESS --> LOSE[Mid-session instructions<br/>lose fidelity]
+        LOSE --> DRIFT[Agent drifts from<br/>workflow rules]
+    end
+
+    subgraph MITIGATIONS["Framework Mitigations"]
+        FRESH[Fresh subagents<br/>per task/AC] -.->|"bounded<br/>context rot"| FILL
+        STATE[External state files<br/>JOURNAL, STATUS, item.yaml] -.->|"state survives<br/>context loss"| COMPRESS
+        JIT[Just-in-time<br/>playbook loading] -.->|"delays onset<br/>of compression"| FILL
+        CLI[CLI state machine<br/>enforcement] -.->|"immune to<br/>context rot"| DRIFT
+        MEMORY[Memory-seed in<br/>system prompt] -.->|"survives entire<br/>session"| LOSE
+        DASHBOARD[Dashboard<br/>rehydration] -.->|"zero-cost<br/>session restart"| DRIFT
+    end
+
+    style PROBLEM fill:#e74c3c,color:#fff
+    style MITIGATIONS fill:#27ae60,color:#fff
+```
+
+| Mitigation | Mechanism | What it protects |
+|---|---|---|
+| Fresh subagents | `ag auto task` spawns per-AC Claude instances via `context-for-role.sh` | Each AC gets 5–10K focused tokens, not a degraded 100K session |
+| External state | JOURNAL.md, STATUS.md, `item.yaml`, `verification.json` on disk | New subagents read current state from files, not conversation history |
+| JIT playbooks | Skills + role prompts loaded only on trigger | Delays compression by keeping baseline context lean |
+| CLI enforcement | State machine transitions checked by Python, not LLM | `ag transition` works identically at token 1 and token 100K |
+| Memory-seed | Rules in system prompt (never compressed) | Workflow patterns survive entire session |
+| Dashboard | `dashboard.sh` re-derives state from files at session start | `/clear` + new session = full recovery |
+
+**Key limitation**: Agents cannot detect their own degradation. A session with compressed context doesn't know what was lost. This is why the framework favors many short subagent sessions over one long conversation — structural isolation beats behavioral awareness.
+
+**See**: `docs/KEY_INSIGHTS.md` §20 (Context Window Decay), §9 (Deliberate Context Management), `context-for-role.sh`
+
+---
+
 ## Coordination Server (v0.53.0)
 
 The coordination server (F-0185) provides a network-accessible JSON-RPC API for parallel agent coordination, remote review approval, and mobile status monitoring.

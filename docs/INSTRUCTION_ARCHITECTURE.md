@@ -179,6 +179,71 @@ The framework uses a **distributed enforcement model** — this is a conscious d
 - `context-for-role.sh` — assembles role-specific context for subagents
 - `ag auto verify/task/crunch` — autonomous engine with Unix socket control, per-AC Claude instances, three-tier trust model (F-0160–F-0163)
 
+### Context Window Decay in Autonomous Sessions
+
+Context windows fill monotonically — every tool call, file read, and response adds tokens. Agents cannot clear their own context (`/clear` is a user action). As the window fills, the runtime performs **automatic compression**: older messages are summarized to make room. This compression is lossy. Instructions, design decisions, and nuanced rules get reduced to summaries that lose fidelity. The agent cannot detect what was lost.
+
+This is **context rot** — a gradual, invisible degradation of the agent's ability to follow its own rules. It is the single biggest threat to instruction compliance in long-running sessions.
+
+#### What survives compression vs. what doesn't
+
+| Context element | Loaded when | Survives compression? | Implication |
+|---|---|---|---|
+| System prompt (CLAUDE.md, MEMORY.md, skill descriptions) | Session start | **YES** — system prompt is never compressed | Constitutional rules must live here |
+| Skill full instructions | Mid-session (on trigger match) | **NO** — compressed like any user/assistant message | Workflow details loaded JIT degrade over time |
+| File contents from Read tool | Mid-session | **NO** — early reads compressed first (FIFO) | Agents lose file contents they read 30+ messages ago |
+| Tool call results | Mid-session | **NO** — older results summarized | Test output, git status, etc. fade |
+| Agent's own reasoning | Mid-session | **NO** — loses detail progressively | Earlier design decisions become vague |
+| CLI exit codes / script enforcement | Every invocation | **N/A — not in context at all** | Structural enforcement is immune to context state |
+| State files on disk (JOURNAL, STATUS, item.yaml) | Re-readable anytime | **YES** — durable, outside context window | External state is the reliable memory |
+
+**The critical asymmetry**: Instructions in the system prompt survive the entire session. Instructions loaded mid-session via skills, role prompts, or file reads do not. This is the architectural reason the Constitution layer (CLAUDE.md, ~50 lines) is kept small and front-loaded — it's the only instruction delivery mechanism that reliably persists.
+
+#### Why autonomous sessions are especially vulnerable
+
+In interactive mode, humans naturally create context breaks — switching tasks, running `/clear`, starting new sessions. These breaks reset the context window. In autonomous mode (`ag auto task`, `ag auto epic`, `ag auto crunch`), sessions can run for extended periods without human intervention. A long autonomous session accumulates context from dozens of file reads, tool calls, test runs, and commits. By the end, skill instructions loaded early in the session may have been compressed into vague summaries — or compressed away entirely.
+
+The agent does not know this happened. It continues operating with full confidence on a degraded instruction set. This is unlike a human forgetting something — a human has a sense of uncertainty. The agent has none.
+
+#### Architectural mitigations
+
+The framework cannot prevent context decay. It architects around it so that decay doesn't compromise outcomes:
+
+**1. Fresh subagents bound context rot per unit of work.**
+`ag auto task` spawns a fresh Claude instance for each acceptance criterion. Each subagent receives exactly the context it needs via `context-for-role.sh` (5–10K focused tokens). Context rot is bounded to the scope of a single AC — not the entire feature or session. When the subagent completes, its degraded context is discarded. The next AC gets a clean window.
+
+**2. External state files serve as the durable memory.**
+JOURNAL.md, STATUS.md, AGENTS.json, `.agentic/work/F-XXXX/item.yaml`, `verification.json` — these persist on disk, outside any context window. When a fresh subagent starts, it reads current state from files. The files ARE the project's memory; the context window is just a working scratchpad. This is why the framework insists on `journal.sh` and `status.sh` updates before commits — they externalize state that would otherwise be trapped in a decaying context.
+
+**3. Just-in-time playbook loading delays the onset of compression.**
+Skills and role prompts are loaded only when triggered, not all at session start. A session that loads 2 skills uses ~4K of playbook tokens; loading all 13 would use ~26K. The leaner the baseline context, the longer before compression begins eating instructions.
+
+**4. CLI state machine enforcement is immune to context state.**
+The v2 workflow engine enforces transitions via Python exit codes, not LLM judgment. `ag transition F-XXXX implementation` checks whether `spec.md` exists in the work directory — a filesystem operation. It doesn't matter if the agent's context has been compressed to 10% fidelity. Structural enforcement works identically at token 1 and token 100K. This is the strongest argument for the state machine approach (see §5, principle 1: "Never rely on memory").
+
+**5. Memory-seed in the system prompt survives the entire session.**
+Persistent memory rules (trigger words, workflow patterns, anti-patterns) are loaded as part of the system prompt. The system prompt is never compressed. Even when mid-session skill instructions are lost, the memory-seed patterns remain. This is redundant reinforcement by design — the same rules exist in skills (lossy) and memory (persistent).
+
+**6. Dashboard enables zero-cost session restart.**
+`dashboard.sh` re-derives the full project state from files at session start. A new conversation picks up exactly where the previous one left off. This makes `/clear` + new session a recovery mechanism: when context has degraded, the user (or a human checkpoint in an autonomous workflow) can restart with zero state loss.
+
+#### What the framework cannot do
+
+- **Agents cannot self-clear.** There is no tool to reset the context window.
+- **Agents cannot detect degradation.** A session with compressed instructions doesn't know what was lost. It may confidently violate rules it was following 20 messages ago.
+- **Compression is not selective.** The runtime compresses older messages uniformly — it can't preserve "important" skill instructions while discarding "unimportant" file reads.
+- **Single long sessions without subagents will degrade.** If `ag auto` is not used and a human manually drives a 50+ message implementation session, context will rot. The framework mitigates consequences (external state, structural gates) but cannot prevent the degradation itself.
+
+#### Design implications
+
+1. **Any rule that must always apply → structural enforcement (script/CLI gate), not instructions.** Instructions degrade; exit codes don't.
+2. **Any state that must survive → external file, not conversation history.** Context is volatile; disk is durable.
+3. **Any long workflow → decompose into subagent-sized units.** Fresh context beats accumulated context.
+4. **Constitutional content → system prompt (~50 lines).** The only instruction channel that survives the entire session.
+5. **Everything else → just-in-time loading.** Delay compression by not loading what isn't needed yet.
+
+These principles directly inform the three-layer architecture: the Constitution (Layer 1) is kept small because only the system prompt survives compression. Playbooks (Layer 2) are loaded JIT because mid-session instructions are ephemeral. State (Layer 3) lives on disk because the context window is unreliable for persistence.
+
 ---
 
 ## 3. What Already Works (DO NOT CHANGE)

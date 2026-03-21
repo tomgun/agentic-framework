@@ -31,6 +31,7 @@
 | 17 | [CLI State Machines — The Endgame for Workflow Enforcement](#17-cli-state-machines--the-endgame-for-workflow-enforcement) | LLMs are probabilistic; no amount of instruction files makes them deterministic. CLI enforcement does. | ~3K lines replaces ~34K — 90% reduction, 100% enforcement |
 | 18 | [End-to-End Enforcement Wiring](#18-end-to-end-enforcement-wiring--existence--activation) | Enforcement code that exists but isn't wired into the activation path is theater | Zero — the enforcement literally doesn't fire |
 | 19 | [Test Projects Are the Only Honest System Feedback](#19-test-projects-are-the-only-honest-system-feedback) | Synthetic tests verify components; test projects verify the system under real pressure | N/A — validation methodology |
+| 20 | [Context Window Decay in Autonomous Sessions](#20-context-window-decay-in-autonomous-sessions) | Context fills monotonically, instructions degrade, agents can't self-clear — architect around it | 5–10K per subagent vs degraded 100K+ main session |
 
 **Meta-lesson**: structural enforcement > behavioral instructions > hope.
 
@@ -452,6 +453,66 @@ Most framework development stops at level 2 or 3. Levels 4–5 automate what lev
 
 ---
 
+## 20. Context Window Decay in Autonomous Sessions
+
+**The problem**: LLM context windows fill monotonically during a conversation. Every tool call, every file read, every response adds tokens. The agent cannot clear its own context — `/clear` is a user action, not an agent capability. As context fills, the system performs **automatic compression**: older messages are summarized to make room. This compression is lossy. Instructions, skills loaded mid-session, earlier design decisions, and nuanced rules get compressed into summaries that lose fidelity. The agent doesn't know what was lost. This is **context rot** — a gradual degradation of the agent's ability to follow its own rules.
+
+**Why autonomous sessions are especially vulnerable**: In interactive mode, humans naturally create context breaks (switching tasks, `/clear`, new sessions). In autonomous mode (`ag auto task`, `ag auto epic`, `ag auto crunch`), the session can run for extended periods without human intervention. A long autonomous session accumulates context from dozens of file reads, tool calls, test runs, and commits. By the end, the constitutional rules from CLAUDE.md and the workflow instructions from skills may have been compressed into vague summaries — or compressed away entirely.
+
+**What compression loses and what survives**:
+
+| Context element | Loaded when | Survives compression? |
+|---|---|---|
+| System prompt (CLAUDE.md, memory) | Session start | YES — system prompt is never compressed |
+| Skill instructions | Mid-session (on trigger) | NO — compressed like any message |
+| File contents from Read | Mid-session | NO — early reads compressed first |
+| Tool call results | Mid-session | NO — older results summarized |
+| Agent's own reasoning | Mid-session | NO — loses detail progressively |
+| State files on disk | Always available | YES — can be re-read |
+| Git-tracked artifacts | Always available | YES — durable by design |
+
+The critical asymmetry: **instructions loaded at session start (system prompt) survive; instructions loaded mid-session (skills, playbooks, file reads) do not**. This is why the framework's Constitution layer (CLAUDE.md, ~50 lines) is kept small and front-loaded — it's the only instruction delivery mechanism that reliably survives the entire session.
+
+**The framework's architectural mitigations**:
+
+1. **Fresh subagents for each unit of work** (`ag auto task`). Each acceptance criterion gets its own Claude instance with a clean context window. The subagent receives exactly the context it needs via `context-for-role.sh` (5–10K focused tokens), does one job, and returns. Context rot is bounded to the scope of a single AC, not the entire feature.
+
+2. **External state files as persistent memory**. JOURNAL.md, STATUS.md, AGENTS.json, `item.yaml`, `verification.json` — these persist on disk, outside the context window. When a fresh subagent spins up, it reads current state from files, not from conversation history. The files ARE the memory; the context window is just the working scratchpad.
+
+3. **Dashboard as session rehydration**. `dashboard.sh` at session start re-derives the full project state from files. A brand new conversation can pick up where the previous one left off without needing the old context. This makes `/clear` + new session a zero-cost recovery mechanism for humans.
+
+4. **Just-in-time playbook loading** (Skills + role prompts). Instructions aren't all loaded upfront — they're loaded when triggered. This keeps the context leaner for longer, delaying the onset of compression. A session that loads 2 skills uses ~4K of playbook tokens; loading all 13 would use ~26K.
+
+5. **Memory system as redundant reinforcement**. Persistent memory (`MEMORY.md`) is loaded at session start as part of the system prompt. Even if skill instructions from mid-session are compressed away, the memory-seed patterns (trigger words, workflow rules, anti-patterns) remain in the system prompt. Memory reinforces what compression erodes.
+
+6. **CLI state machine as compression-proof enforcement**. The v2 workflow engine (insight #17) enforces workflow transitions via CLI exit codes, not instructions in the context window. It doesn't matter if the agent's context has degraded — `ag transition` either succeeds or fails based on artifact preconditions checked by Python, not by the LLM. Structural enforcement is immune to context rot.
+
+**What the framework CANNOT do**:
+
+- **Agents cannot self-clear**. There is no tool to reset the context window. The agent cannot invoke `/clear`.
+- **Agents cannot detect their own degradation**. An agent with a compressed context doesn't know what was compressed. It may confidently follow a workflow it's partially forgotten.
+- **Automatic compression is not selective**. The system compresses older messages uniformly — it can't preserve "important" skill instructions while compressing "unimportant" file reads.
+- **Single long conversations without subagents will degrade**. If you avoid `ag auto` and manually drive a 50-message implementation session, context will rot. The framework can't prevent this — it can only make the consequences manageable by keeping state on disk.
+
+**Practical guidance for autonomous sessions**:
+
+| Strategy | Why it works |
+|---|---|
+| Use `ag auto epic` / `ag auto crunch`, not manual loops | Each task gets a fresh subagent — context rot is bounded per task |
+| Keep individual tasks small (5–10 files) | Shorter context per task → less compression → better rule compliance |
+| Journal between tasks | External state survives context loss — fresh subagents read the journal |
+| Human checkpoints at natural breaks | `/clear` + new session resets context; `dashboard.sh` rehydrates state |
+| Prefer 3 focused sessions over 1 marathon | Fresh context windows > degraded long sessions |
+| Trust structural enforcement over behavioral | CLI gates work at token 1 and token 100K identically |
+
+**The meta-lesson**: Context windows are a depletable resource, not an infinite buffer. The framework can't prevent depletion, but it's architecturally designed so that each unit of work is short enough that depletion doesn't matter. External state files + fresh subagents + structural enforcement = a system that stays reliable even as individual context windows degrade. The agent's context rots; the project's state doesn't.
+
+**Authoritative design reference**: `docs/INSTRUCTION_ARCHITECTURE.md` §2 (Context Window Decay in Autonomous Sessions) — contains the full architectural analysis including the survival table, mitigation details, design implications, and relationship to the three-layer architecture.
+
+**See also**: Insight #9 (Deliberate Context Management), Insight #17 (CLI State Machines), `context-for-role.sh`, `.agentic/lib/auto/`
+
+---
+
 ## Summary: The Pattern
 
 These insights form a coherent pattern:
@@ -477,6 +538,7 @@ Tiny instruction file (50 lines)     → agent reads it all, reliably
   + CLI state machine enforcement    → workflow compliance as certainty, not probability
   + End-to-end enforcement wiring   → existence ≠ activation; test the full chain
   + Test projects as system feedback → synthetic tests verify components, test projects verify truth
+  + Context window decay           → depletable resource; architect around it with subagents + external state
 ```
 
 The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation. And the meta-meta-lesson from #18–#19: **you don't know if your enforcement works until you test the full system under real conditions**.

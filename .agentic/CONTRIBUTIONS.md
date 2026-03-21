@@ -8,6 +8,12 @@
 
 ## Recent Contributions
 
+### Context Window Decay — Architectural Analysis of Autonomous Session Degradation (v0.69.0)
+
+**User insight**: Tomas asked a fundamental question: "if you work in autonomous mode with the framework, how do you prevent the context rotting and filling too much so you forget the instructions and skills? Is it possible for you to auto-clear?" This forced an honest analysis of a problem the framework mitigates but cannot solve — LLM context windows fill monotonically, agents cannot self-clear, and automatic compression is lossy. Tomas then directed that the analysis be documented as first-class architecture, not just a conversational answer.
+
+Key contribution: Tomas insisted the detailed architectural analysis belong in `docs/INSTRUCTION_ARCHITECTURE.md` (the authoritative design doc), not hidden behind a cross-reference to KEY_INSIGHTS. The reasoning: context decay is a core architectural constraint that directly shapes the three-layer design — it's not just a "lesson learned," it's a design driver. This led to a full section in INSTRUCTION_ARCHITECTURE covering: what survives compression vs. what doesn't (with table), why autonomous sessions are especially vulnerable, 6 architectural mitigations, honest limitations, and 5 design implications that tie context decay directly back to why each layer exists. The analysis also appears as Insight #20 in KEY_INSIGHTS (strategic framing) and as a practical section with mermaid diagram in HOW_IT_WORKS.
+
 ### Framework Enforcement Gaps — Test Project Evaluation Insights (F-0300, v0.69.0)
 
 **User insight**: Tomas ran two end-to-end test projects — Street Fury (GTA 1/2-style driving game, autonomous_formal + git_mode=deferred) and Algebra Rush (rhythm platformer, autonomous_formal + active git) — as deliberate stress tests of framework enforcement under realistic conditions. This is the methodology contribution: using real projects with varied configuration combinations to find gaps that synthetic tests miss.
