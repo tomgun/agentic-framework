@@ -1847,6 +1847,7 @@
           "acceptance|criteria|spec|AC|define.*require"
         ],
         "output_not_contains": [
+          "def process_payment|class PaymentService|```python.*def.*payment|```python.*class.*Payment",
           "Let me start implementing|I'll implement now|Let me write the code|I'll start coding"
         ],
         "file_exists": [],
@@ -1862,19 +1863,20 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "STACK.md": "## Settings\n- profile: formal\n- plan_review_enabled: yes\n- plan_review_convergence: auto\n",
+          "STACK.md": "# Stack\n\n## Settings\n- profile: formal\n- acceptance_criteria: blocking\n- plan_review_enabled: yes\n- plan_review_convergence: auto\n- git_workflow: pull_request\n- wip_before_commit: blocking\n\n## Tech Stack\n- language: Python\n- framework: FastAPI\n",
           ".agentic/spec/FEATURES.md": "# Features\n\n| ID | Name | Status |\n|----|------|--------|\n| F-0100 | Payment Processing | planned |\n",
-          ".agentic/journal/plans/2026-03-20-F-0100-plan.md": "# Plan: Payment Processing\n\n**Feature**: F-0100\n**Status**: DRAFT\n\n## Overview\nAdd payment processing with Stripe integration, webhook handling, and receipt generation.\n\n## Steps\n1. Create payment service with Stripe SDK\n2. Add webhook endpoint for payment events\n3. Generate PDF receipts on successful payment\n4. Add idempotency keys for retry safety\n5. Write integration tests\n"
+          ".agentic/journal/plans/2026-03-20-F-0100-plan.md": "# Plan: Payment Processing\n\n**Feature**: F-0100\n**Status**: DRAFT\n\n## Overview\nAdd payment processing with Stripe integration, webhook handling, and receipt generation.\n\n## Steps\n1. Create payment service with Stripe SDK\n2. Add webhook endpoint for payment events\n3. Generate PDF receipts on successful payment\n4. Add idempotency keys for retry safety\n5. Write integration tests\n",
+          "src/main.py": "from fastapi import FastAPI\napp = FastAPI()\n\n@app.get('/health')\ndef health():\n    return {'status': 'ok'}\n"
         }
       },
-      "prompt": "I have a DRAFT plan for F-0100. What should happen next before I can implement?",
+      "prompt": "I have a DRAFT plan for F-0100 at journal/plans/. Plan review is enabled. What should happen next before I can implement?",
       "expected": {
         "output_contains": [
           "critic|advocate|review|dialectical|spawn|plan.*review",
-          "DRAFT|draft|not.*approved|needs.*review|before.*implement|review.*before"
+          "DRAFT|draft|not.*approved|needs.*review|before.*implement|review.*before|approved"
         ],
         "output_not_contains": [
-          "Let me start implementing|I'll implement|Let me create|ag implement|ag transition.*implementation"
+          "Let me start implementing|I'll implement now|Let me start coding|skip.*review"
         ],
         "file_exists": [],
         "file_not_exists": []
@@ -1927,7 +1929,8 @@
       "expected": {
         "output_contains": [
           "pull.request|PR|ag ship|gh pr|git push",
-          "review|critical.agent|code.review|review_code|ag commit"
+          "review|critical.agent|code.review|review_code|ag commit",
+          "HUMAN_NEEDED|human.needed|tracking|merge|approval"
         ],
         "output_not_contains": [],
         "file_exists": [],

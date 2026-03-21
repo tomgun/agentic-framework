@@ -7,10 +7,22 @@
 # Setup with autonomous_formal profile (review_code: critical_agent)
 setup_test_project "autonomous_formal"
 
-# Ensure git_workflow is PR-based
-grep -q "git_workflow" "$TEST_PROJECT/STACK.md" || {
-    echo "- git_workflow: pull_request" >> "$TEST_PROJECT/STACK.md"
-}
+# Override STACK.md to autonomous_formal with PR workflow
+cat > "$TEST_PROJECT/STACK.md" << 'EOF'
+# Stack
+
+## Settings
+- profile: autonomous_formal
+- acceptance_criteria: blocking
+- plan_review_enabled: yes
+- git_workflow: pull_request
+- review_code: critical_agent
+- review_merge: human
+
+## Tech Stack
+- language: Python
+- framework: FastAPI
+EOF
 
 # Create feature branch with committed code
 mkdir -p "$TEST_PROJECT/.agentic/spec/acceptance"
