@@ -127,11 +127,6 @@ class FeatureStateMachine:
         self.enforce = enforce
         self._gates: dict[tuple[FeatureState, FeatureState], Callable] = {}
 
-    @property
-    def _use_v2(self) -> bool:
-        """v2 engine removed (hooks-first simplification F-0244). Always False."""
-        return False
-
     # -- Gate registration ---------------------------------------------------
 
     def register_gate(

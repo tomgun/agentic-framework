@@ -41,7 +41,11 @@ from settings import get_setting  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
-# GateResult — same structure as gates.py, kept here for independence
+# GateResult — intentional fork from auto/gates.py for independence.
+# auto/gates.py uses GateResult(allowed=bool), this uses decision="allow"|"deny"
+# for direct JSON serialization to hook responses. auto/gates.py is used by
+# the v1 state machine transitions; this module is the hooks-first replacement.
+# Once v2/ is physically deleted, auto/gates.py can be deprecated in favor of this.
 # ---------------------------------------------------------------------------
 
 @dataclass
@@ -524,7 +528,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="ag gate — policy engine")
-    parser.add_argument("check", choices=["stop", "pretool", "verify"],
+    parser.add_argument("check", choices=["stop", "pretool", "verify", "resolve", "check-artifacts"],
                        help="Which gate check to run")
     parser.add_argument("--feature", "-f", help="Feature ID (auto-resolved if omitted)")
     parser.add_argument("--tool", "-t", help="Tool name (for pretool check)")
@@ -534,6 +538,24 @@ def main():
 
     args = parser.parse_args()
     project_root = Path(args.project_root).resolve()
+
+    # "resolve" just prints the active feature ID (no gate check)
+    if args.check == "resolve":
+        feature_id = args.feature or resolve_active_feature(project_root)
+        print(feature_id or "")
+        sys.exit(0)
+
+    # "check-artifacts" prints advisory artifact status for active feature
+    if args.check == "check-artifacts":
+        feature_id = args.feature or resolve_active_feature(project_root)
+        if not feature_id:
+            sys.exit(0)
+        spec = check_feature_has_spec(feature_id, project_root)
+        ac = check_feature_has_ac(feature_id, project_root)
+        issues = spec.reasons + ac.reasons
+        if issues:
+            print(json.dumps({"feature": feature_id, "issues": issues}))
+        sys.exit(0)
 
     # Resolve feature if not provided
     feature_id = args.feature or resolve_active_feature(project_root)

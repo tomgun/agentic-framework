@@ -660,5 +660,3 @@ state_mapping:
         # Verify can_transition works (doesn't need feature.sh)
         allowed, msgs = sm.can_transition("F-0100", FeatureState.SPECCED)
         assert allowed
-        # Verify _use_v2 is always False after F-0244
-        assert not sm._use_v2

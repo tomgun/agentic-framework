@@ -25,22 +25,20 @@ fi
 # After tool use, check artifact status for active feature. Advisory only.
 # PreToolUse already handles blocking for Write/Edit — this adds awareness
 # for other tools (Bash, Read, Agent, etc.).
-GATE_OUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -c "
-import sys; sys.path.insert(0, '$PROJECT_ROOT/.agentic/lib')
-from gate import resolve_active_feature, check_feature_has_spec, check_feature_has_ac
-from pathlib import Path
-root = Path('$PROJECT_ROOT')
-f = resolve_active_feature(root)
-if f:
-    s = check_feature_has_spec(f, root)
-    a = check_feature_has_ac(f, root)
-    issues = s.reasons + a.reasons
-    if issues:
-        print(f'📋 {f}: ' + '; '.join(issues))
-" 2>/dev/null || true)
+ARTIFACT_JSON=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate check-artifacts --project-root "$PROJECT_ROOT" 2>/dev/null || true)
 
-if [[ -n "$GATE_OUT" ]]; then
-  echo "$GATE_OUT"
+if [[ -n "$ARTIFACT_JSON" ]]; then
+  # Parse feature + issues from JSON
+  if command -v jq >/dev/null 2>&1; then
+    FEAT=$(echo "$ARTIFACT_JSON" | jq -r '.feature // ""' 2>/dev/null)
+    ISSUES=$(echo "$ARTIFACT_JSON" | jq -r '.issues // [] | join("; ")' 2>/dev/null)
+  else
+    FEAT=$(echo "$ARTIFACT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('feature',''))" 2>/dev/null || true)
+    ISSUES=$(echo "$ARTIFACT_JSON" | python3 -c "import sys,json; print('; '.join(json.load(sys.stdin).get('issues',[])))" 2>/dev/null || true)
+  fi
+  if [[ -n "$ISSUES" ]]; then
+    echo "📋 ${FEAT}: ${ISSUES}"
+  fi
 fi
 
 # Only run linter checks after file writes (not after reads)

@@ -41,12 +41,7 @@ case "$HOOK_EVENT" in
     fi
 
     # Active feature status via gate
-    ACTIVE=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -c "
-import sys; sys.path.insert(0, '$PROJECT_ROOT/.agentic/lib')
-from gate import resolve_active_feature; from pathlib import Path
-f = resolve_active_feature(Path('$PROJECT_ROOT'))
-print(f or '')
-" 2>/dev/null || true)
+    ACTIVE=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate resolve --project-root "$PROJECT_ROOT" 2>/dev/null || true)
     if [[ -n "$ACTIVE" ]]; then
       echo "🎯 Active feature: $ACTIVE"
     fi

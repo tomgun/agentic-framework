@@ -137,20 +137,19 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   fi
 fi
 
-# --- Artifact status check (hooks-first: uses gate.py directly) ---
+# --- Artifact status check (hooks-first: uses gate.py module calls) ---
 # Inject artifact status for active feature into context on every prompt.
-ACTIVE_FEATURE=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -c "
-import sys; sys.path.insert(0, '$PROJECT_ROOT/.agentic/lib')
-from gate import resolve_active_feature; from pathlib import Path
-f = resolve_active_feature(Path('$PROJECT_ROOT'))
-print(f or '')
-" 2>/dev/null || true)
+ACTIVE_FEATURE=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate resolve --project-root "$PROJECT_ROOT" 2>/dev/null || true)
 
 if [[ -n "$ACTIVE_FEATURE" ]]; then
   # Quick check: does feature have spec + AC?
-  GATE_OUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate verify --feature "$ACTIVE_FEATURE" --project-root "$PROJECT_ROOT" 2>/dev/null || true)
-  if echo "$GATE_OUT" | grep -q '"deny"' 2>/dev/null; then
-    MISSING=$(echo "$GATE_OUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print('; '.join(d.get('reasons',[])))" 2>/dev/null || true)
+  ARTIFACT_JSON=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate check-artifacts --feature "$ACTIVE_FEATURE" --project-root "$PROJECT_ROOT" 2>/dev/null || true)
+  if [[ -n "$ARTIFACT_JSON" ]]; then
+    if command -v jq >/dev/null 2>&1; then
+      MISSING=$(echo "$ARTIFACT_JSON" | jq -r '.issues // [] | join("; ")' 2>/dev/null)
+    else
+      MISSING=$(echo "$ARTIFACT_JSON" | python3 -c "import sys,json; print('; '.join(json.load(sys.stdin).get('issues',[])))" 2>/dev/null || true)
+    fi
     if [[ -n "$MISSING" ]]; then
       echo ""
       echo "📋 Active feature $ACTIVE_FEATURE — missing artifacts:"
