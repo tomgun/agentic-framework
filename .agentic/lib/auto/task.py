@@ -112,24 +112,7 @@ class TaskRunner:
         self.visual = visual
         self.engine = AutoEngine(project_root)
         # F-0300 R5: detect git mode for conditional git operations
-        # Read directly from STACK.md to avoid interference with get_setting mocks in tests
-        self._git_active = self._detect_git_active()
-
-    def _detect_git_active(self) -> bool:
-        """Check if git is active by reading git_mode from STACK.md. F-0300 R5."""
-        stack_file = self.project_root / "STACK.md"
-        if not stack_file.exists():
-            # No STACK.md → assume git active (default)
-            return True
-        try:
-            import re as _re
-            content = stack_file.read_text()
-            match = _re.search(r'git_mode:\s*(\S+)', content, _re.IGNORECASE)
-            if match:
-                return match.group(1).strip().lower() == "active"
-        except OSError:
-            pass
-        return True  # Default: git active
+        self._git_active = get_setting(project_root, "git_mode", "active") == "active"
 
     def run(
         self,

@@ -160,9 +160,12 @@ class TestTaskRunner:
 class TestCommitAcReviewCommit:
     """Tests for _commit_ac() with review_commit setting (F-0203)."""
 
-    @patch("auto.task.get_setting", return_value="human")
+    @patch("auto.task.get_setting")
     def test_human_mode_stages_only(self, mock_setting, project_dir):
         """review_commit: human — stages files but does NOT commit."""
+        mock_setting.side_effect = lambda root, key, default="": {
+            "git_mode": "active", "review_commit": "human",
+        }.get(key, default)
         import subprocess
         # Create a file to stage
         (project_dir / "test.py").write_text("print('hello')")
@@ -176,10 +179,13 @@ class TestCommitAcReviewCommit:
         )
         assert "test.py" in status.stdout
 
-    @patch("auto.task.get_setting", return_value="critical_agent")
+    @patch("auto.task.get_setting")
     @patch("auto.critical_agent.CriticalAgent.review_commit")
     def test_critical_agent_approved(self, mock_review, mock_setting, project_dir):
         """review_commit: critical_agent + approved — commits successfully."""
+        mock_setting.side_effect = lambda root, key, default="": {
+            "git_mode": "active", "review_commit": "critical_agent",
+        }.get(key, default)
         mock_review.return_value = MagicMock(verdict="approved", summary="LGTM")
         # Create a file to commit
         (project_dir / "feature.py").write_text("# new feature")
@@ -188,10 +194,13 @@ class TestCommitAcReviewCommit:
         assert result is True
         mock_review.assert_called_once_with("F-0042", "AC-001", "test criterion")
 
-    @patch("auto.task.get_setting", return_value="critical_agent")
+    @patch("auto.task.get_setting")
     @patch("auto.critical_agent.CriticalAgent.review_commit")
     def test_critical_agent_rejected(self, mock_review, mock_setting, project_dir):
         """review_commit: critical_agent + rejected — unstages, returns False."""
+        mock_setting.side_effect = lambda root, key, default="": {
+            "git_mode": "active", "review_commit": "critical_agent",
+        }.get(key, default)
         mock_review.return_value = MagicMock(
             verdict="request_changes", summary="Issues found"
         )
@@ -200,19 +209,25 @@ class TestCommitAcReviewCommit:
         result = runner._commit_ac("F-0042", "AC-001", "test criterion")
         assert result is False
 
-    @patch("auto.task.get_setting", return_value="critical_agent")
+    @patch("auto.task.get_setting")
     @patch("auto.critical_agent.CriticalAgent.review_commit")
     def test_critical_agent_timeout(self, mock_review, mock_setting, project_dir):
         """review_commit: critical_agent + exception — unstages, returns False."""
+        mock_setting.side_effect = lambda root, key, default="": {
+            "git_mode": "active", "review_commit": "critical_agent",
+        }.get(key, default)
         mock_review.side_effect = RuntimeError("Critical agent timed out")
         (project_dir / "timeout.py").write_text("# code")
         runner = TaskRunner(project_dir)
         result = runner._commit_ac("F-0042", "AC-001", "test criterion")
         assert result is False
 
-    @patch("auto.task.get_setting", return_value="critical_agent")
+    @patch("auto.task.get_setting")
     def test_staging_fails(self, mock_setting, project_dir):
         """Staging failure returns False without calling agent."""
+        mock_setting.side_effect = lambda root, key, default="": {
+            "git_mode": "active", "review_commit": "critical_agent",
+        }.get(key, default)
         import subprocess
         runner = TaskRunner(project_dir)
         with patch("subprocess.run") as mock_run:
@@ -220,9 +235,12 @@ class TestCommitAcReviewCommit:
             result = runner._commit_ac("F-0042", "AC-001", "test criterion")
             assert result is False
 
-    @patch("auto.task.get_setting", return_value="invalid_value")
+    @patch("auto.task.get_setting")
     def test_unrecognized_value_falls_back_to_human(self, mock_setting, project_dir):
         """Unrecognized values for review_commit fall back to human behavior."""
+        mock_setting.side_effect = lambda root, key, default="": {
+            "git_mode": "active", "review_commit": "invalid_value",
+        }.get(key, default)
         (project_dir / "test2.py").write_text("print('test')")
         runner = TaskRunner(project_dir)
         result = runner._commit_ac("F-0042", "AC-001", "test criterion")
@@ -240,6 +258,7 @@ class TestCommitAcReviewCommit:
         """_check_and_update_docs with review_commit: human stages but doesn't commit."""
         # docs_gate must be non-off to reach review_commit logic
         mock_setting.side_effect = lambda root, key, default="": {
+            "git_mode": "active",
             "docs_gate": "blocking",
             "review_commit": "human",
         }.get(key, default)
@@ -259,6 +278,7 @@ class TestCommitAcReviewCommit:
     def test_check_docs_critical_agent_approved(self, mock_setting, mock_review, mock_spawn, project_dir):
         """_check_and_update_docs with critical_agent — commits on approval."""
         mock_setting.side_effect = lambda root, key, default="": {
+            "git_mode": "active",
             "docs_gate": "blocking",
             "review_commit": "critical_agent",
         }.get(key, default)

@@ -237,16 +237,15 @@ def hooks_status(project_root: Path) -> dict:
                 for entry in entries:
                     for hook in entry.get("hooks", []):
                         cmd = hook.get("command", "")
-                        # Check if the script exists
                         cmd_resolved = cmd.replace(
                             "${CLAUDE_PROJECT_DIR}", str(project_root)
                         )
                         script_exists = Path(cmd_resolved).exists()
-                        result["hooks"][event] = {
+                        result["hooks"].setdefault(event, []).append({
                             "registered": True,
                             "script_exists": script_exists,
                             "command": cmd,
-                        }
+                        })
         except (json.JSONDecodeError, KeyError):
             result["parse_error"] = True
 
@@ -293,9 +292,10 @@ def main() -> int:
             print("  Fix: run `ag auto init` or `bash .agentic/lib/tools/setup-agent.sh claude`")
             return 1
         print("✓ Hooks installed (.claude/hooks.json)")
-        for event, info in sorted(status["hooks"].items()):
-            marker = "✓" if info["script_exists"] else "✗"
-            print(f"  {marker} {event}: {info['command']}")
+        for event, entries in sorted(status["hooks"].items()):
+            for info in entries:
+                marker = "✓" if info["script_exists"] else "✗"
+                print(f"  {marker} {event}: {info['command']}")
         return 0
 
     settings = generate_settings(args.project_root, args.tier)
