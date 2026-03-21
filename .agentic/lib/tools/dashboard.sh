@@ -43,8 +43,9 @@ fi
 
 # GIT MODE (F-0250)
 D_GIT_MODE="active"  # Default for backwards compat
-if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/../settings.sh" ]]; then
-    D_GIT_MODE=$(source "$TOOLS_DIR/../settings.sh" 2>/dev/null && get_setting "git_mode" "active" 2>/dev/null || echo "active")
+source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
+if type get_setting &>/dev/null; then
+    D_GIT_MODE=$(get_setting "git_mode" "active" 2>/dev/null || echo "active")
 fi
 # Auto-detect: if no .git directory exists, treat as deferred regardless of setting
 if ! git rev-parse --git-dir >/dev/null 2>&1; then

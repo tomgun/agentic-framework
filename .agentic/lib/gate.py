@@ -267,16 +267,6 @@ def check_any_feature_implementing(project_root: Path) -> bool:
     return False
 
 
-def check_feature_has_ac_file(feature_id: str, project_root: Path) -> bool:
-    """Check if an AC file exists for a feature (not just stubs)."""
-    paths = get_paths(project_root)
-    ac_file = paths.acceptance_dir / f"{feature_id}.md"
-    if not ac_file.exists():
-        return False
-    content = ac_file.read_text()
-    ac_pattern = re.compile(r"(- \[[ x]\]\s*\*?\*?AC-|### AC-)", re.IGNORECASE)
-    return bool(ac_pattern.search(content))
-
 
 def check_verification_passes(feature_id: str, project_root: Path) -> GateResult:
     """Run verification commands from the AC file directly.
@@ -557,7 +547,8 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                             f"Create a migration: bash .agentic/lib/tools/migration.sh create 'Update {fid}...'"
                         ])
 
-        # Check 7 mirror: Code file length limit
+        # Check 7 mirror: Code file length limit (Write tool only — Edit sends
+        # old_string/new_string, not full content; git pre-commit catches at commit time)
         if is_formal and not re.search(r'\.(md|json|yaml|yml|sh|toml|cfg|ini)$', file_path):
             max_length = int(get_setting(project_root, "max_code_file_length", "500"))
             new_content = input_data.get("content", "")
@@ -574,7 +565,9 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
             old_string = input_data.get("old_string", "")
             new_string = input_data.get("new_string", "")
             if old_string and new_string:
-                if "shipped" in old_string.lower() and "shipped" not in new_string.lower():
+                # Match specifically the **Status**: shipped pattern, not incidental "shipped" in text
+                if re.search(r"\*\*Status\*\*:\s*shipped", old_string) and \
+                   not re.search(r"\*\*Status\*\*:\s*shipped", new_string):
                     return GateResult.deny([
                         "Shipped feature status downgrade blocked. "
                         "Create a migration first: bash .agentic/lib/tools/migration.sh create 'Deprecate...'"

@@ -14,7 +14,7 @@
 
 This analysis yielded three key insights: (1) **Git is ceremony for prototyping** — the framework has two enforcement layers (Claude hooks and git hooks), and Claude hooks are the primary one. Git hooks never fired because nothing was committed. This means git can be deferred without losing enforcement, enabling a "prototype then formalize" workflow. Tomas proposed `git_mode: none | deferred | active` with deferred as the default, `ag git-init` for safe activation with stack-aware `.gitignore`, and gating git-dependent commands. (2) **Formal spec enforcement has a real gap** — the PreToolUse hook checked that specs *exist* but not that features had progressed to "implementing" state. An agent could write unlimited source code while all features were still "planned." Tomas insisted this must be enforced in formal modes: "The specs and ACs should be created and updated systematically in any formal mode." (3) **Git hooks should be duplicated in Claude hooks** — since git hooks only fire at commit time and can be bypassed entirely (as algebra-rush proved), every quality check in the git pre-commit hook should also exist in the Claude hook layer for defense-in-depth.
 
-The first two insights shipped in PR #188. The third (hooks duplication) is being designed.
+All three insights shipped in PR #188: git-deferred mode (F-0250), spec lifecycle enforcement (F-0251), and initial defense-in-depth mirroring of 3 git pre-commit checks (shipped spec protection, file length, status downgrade) into the Claude hooks layer.
 
 ### Phase 4 Completion — PreToolUse Blocking Enforcement (PR #184)
 

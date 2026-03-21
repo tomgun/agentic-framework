@@ -41,8 +41,9 @@ cmd_git_init() {
     # Step 2: Generate stack-aware .gitignore (BEFORE any git add)
     echo ""
     echo "Generating .gitignore..."
-    if [[ -f "$SCRIPT_DIR/gitignore.sh" ]]; then
-        bash "$SCRIPT_DIR/gitignore.sh"
+    local gitignore_script="$ROOT_DIR/.agentic/lib/tools/gitignore.sh"
+    if [[ -f "$gitignore_script" ]]; then
+        bash "$gitignore_script"
     else
         # Minimal fallback if gitignore.sh is missing
         if [[ ! -f "$ROOT_DIR/.gitignore" ]]; then
@@ -138,9 +139,9 @@ EOF
             sed -i.bak '/^- profile:/a\- git_mode: active' "$ROOT_DIR/STACK.md"
             rm -f "$ROOT_DIR/STACK.md.bak" 2>/dev/null
         fi
-        # Amend commit with updated STACK.md
+        # Separate commit for STACK.md update (never amend — could hit unrelated commit)
         git add STACK.md 2>/dev/null
-        git commit --amend --no-edit 2>/dev/null
+        git commit -m "chore: activate git_mode in STACK.md" 2>/dev/null
         echo -e "${GREEN}✓${NC} STACK.md updated: git_mode: active"
     fi
 
