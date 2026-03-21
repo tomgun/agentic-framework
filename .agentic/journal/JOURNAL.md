@@ -3931,3 +3931,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 15:01 - PR #187 merged — completing-work skill fix
+
+**Why**: Post-merge dance for completing-work skill fix
+
+**What changed**:
+- Skill now guides post-merge workflow: ag merge, spec/backlog/journal steps, git tag, framework-dev sync
+
+**Next steps**:
+- None
+
+**Blockers**: None
+
