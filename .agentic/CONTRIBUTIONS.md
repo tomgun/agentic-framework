@@ -8,7 +8,11 @@
 
 ## Recent Contributions
 
-### v2 Workflow Engine — Structural Enforcement Over Behavioral Instructions (Phases 1-4, PRs #177-#182+)
+### Phase 4 Completion — PreToolUse Blocking Enforcement (PR #184)
+
+**User insight**: Tomas identified that Phase 4's hook enforcement was incomplete — only UserPromptSubmit was wired to `ag check`, while PostToolUse/PreToolUse were missing. More importantly, the codebase contained multiple claims that "Claude Code does NOT support PreToolUse hooks" (in F-0195 plan, F-0221 plan, environment_research.md), which were outdated. Tomas provided the Claude Code docs URL proving PreToolUse is fully supported with `permissionDecision: "deny"` capability. This unlocked **blocking** enforcement: PreToolUse can actually prevent Write/Edit/MultiEdit before execution (unlike PostToolUse which is advisory-only after the fact). The result is a three-layer enforcement stack: PreToolUse (blocking, before code edits), UserPromptSubmit (advisory, before each prompt), PostToolUse (advisory, after each tool use). The key architectural insight: PreToolUse with deny capability is strictly stronger than PostToolUse advisory — it prevents the violation rather than reporting it after the fact.
+
+### v2 Workflow Engine — Structural Enforcement Over Behavioral Instructions (Phases 1-4, PRs #177-#184)
 
 **User insight**: Tomas initiated the most significant architectural shift in the framework's history, driven by a fundamental observation about LLM reliability: no matter how detailed your workflow instructions are, LLMs are probabilistic — they can decide to skip steps, ignore trigger words, fail to call deterministic scripts, and break the reliability of designed processes. The framework had accumulated ~130 instruction files (~34K lines) trying to tell agents WHAT to do, but compliance remained probabilistic. The same agent following the same instructions would sometimes skip plan review, sometimes forget to update docs, sometimes commit without running quality checks.
 

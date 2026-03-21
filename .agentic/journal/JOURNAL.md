@@ -3853,3 +3853,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 07:19 - Phase 4 hook enforcement merged
+
+**Why**: Phase 4 plan specified hook wiring but only UserPromptSubmit was shipped; PreToolUse support was incorrectly believed to not exist
+
+**What changed**:
+- PreToolUse blocking enforcement + PostToolUse advisory ag check shipped; stale PreToolUse docs fixed across 6 files; review findings addressed (allowlist, bootstrap, injection)
+
+**Next steps**:
+- F-0240 Framework Execution Log
+
+**Blockers**: None
+
