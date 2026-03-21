@@ -358,10 +358,8 @@ class ConvergenceLoop:
         """Spawn a single reviewer agent."""
         # Build context-aware prompt
         ac_path = self.paths.acceptance_dir / f"{feature_id}.md"
-        agent_file = (
-            self.paths.agentic_lib / "agents" / "claude"
-            / "subagents" / role.agent_file
-        )
+        # v2: use role prompt from .agentic/prompts/ (replaces deleted subagent files)
+        reviewer_prompt = self.project_root / ".agentic" / "prompts" / "reviewer.md"
 
         prompt = (
             f"You are a PLAN {role.name.upper().replace('_', ' ')} "
@@ -370,12 +368,12 @@ class ConvergenceLoop:
         )
         if ac_path.exists():
             prompt += f"Read requirements: {ac_path}\n"
-        if agent_file.exists():
-            prompt += f"Follow: {agent_file}\n"
+        if reviewer_prompt.exists():
+            prompt += f"Follow the review method in: {reviewer_prompt}\n"
         prompt += (
             f"\nYour mandate: {role.mandate}\n"
-            f"Output your structured assessment using the format specified "
-            f"in the agent file.\n\n"
+            f"Output your structured assessment with: Critic findings, "
+            f"Advocate defense, and Synthesis (Proceed/Revise/Reject).\n\n"
             f"IMPORTANT: Include a 'Convergence Signal' section at the end:\n"
             f"### Convergence Signal\n"
             f"- [x] Plan is fundamentally sound (no high-severity concerns remaining)\n"
