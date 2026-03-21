@@ -59,6 +59,7 @@ def check_artifact(
     feature_id: str,
     artifact_name: str,
     config: WorkflowConfig,
+    quick: bool = False,
 ) -> CheckResult:
     """Check if a single artifact requirement is satisfied.
 
@@ -66,11 +67,17 @@ def check_artifact(
     1. File existence (location template in config)
     2. Custom command (check template in config)
     3. Default: file in work item directory
+
+    When quick=True, skip artifacts that require command execution
+    (only check file-existence based artifacts). This keeps checks <500ms.
     """
     artifact_def = config.artifacts.get(artifact_name)
     work_dir = work_items.item_dir(project_root, feature_id)
 
     if artifact_def and artifact_def.check:
+        # In quick mode, skip command-based checks entirely
+        if quick:
+            return CheckResult.ok(warnings=[f"Skipped '{artifact_name}' (quick mode)"])
         # Validate feature_id before shell interpolation to prevent injection
         if not _FEATURE_ID_RE.match(feature_id):
             return CheckResult.fail(
@@ -126,12 +133,15 @@ def check_transition_artifacts(
     target_state: str,
     config: WorkflowConfig,
     mode: str,
+    quick: bool = False,
 ) -> CheckResult:
     """Check all artifact requirements for a transition to target_state.
 
     Combines:
     1. Transition-level requires (from workflow.transitions)
     2. Mode-level required_artifacts (from modes.<mode>.required_artifacts)
+
+    When quick=True, only file-existence checks run (no command execution).
     """
     result = CheckResult.ok()
 
@@ -140,7 +150,9 @@ def check_transition_artifacts(
     transition = config.get_transition(item.status, target_state)
     if transition:
         for artifact_name in transition.requires:
-            artifact_result = check_artifact(project_root, feature_id, artifact_name, config)
+            artifact_result = check_artifact(
+                project_root, feature_id, artifact_name, config, quick=quick,
+            )
             result = result.merge(artifact_result)
 
     # 2. Check mode-level required artifacts
@@ -149,7 +161,9 @@ def check_transition_artifacts(
         # Don't double-check if already checked in transition requires
         if transition and artifact_name in transition.requires:
             continue
-        artifact_result = check_artifact(project_root, feature_id, artifact_name, config)
+        artifact_result = check_artifact(
+            project_root, feature_id, artifact_name, config, quick=quick,
+        )
         result = result.merge(artifact_result)
 
     return result

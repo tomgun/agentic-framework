@@ -1062,3 +1062,85 @@ class TestGateDispatch:
 
         assert result.success is False
         assert "Plan is incomplete" in result.errors[0]
+
+
+# ---------------------------------------------------------------------------
+# Quick check tests (Phase 4C)
+# ---------------------------------------------------------------------------
+
+
+class TestQuickCheck:
+    """Test --quick and --active flags for ag check."""
+
+    def test_check_quick_skips_command_artifacts(self, tmp_project):
+        """Quick mode should skip command-based artifact checks and report warnings."""
+        from auto.v2.preconditions import check_artifact
+        config = load_config(tmp_project)
+        work_items.create(tmp_project, "F-0020", "Test Quick", mode="formal")
+        orch = TransitionOrchestrator(tmp_project)
+        orch.transition("F-0020", "queued")
+        orch.transition("F-0020", "planning")
+
+        # tests_exist is command-based: check: "test -f {work_dir}/spec.md"
+        # Full check runs the command
+        result_full = check_artifact(
+            tmp_project, "F-0020", "tests_exist", config, quick=False,
+        )
+        # Command actually runs
+
+        # Quick check skips command entirely and returns ok with warning
+        result_quick = check_artifact(
+            tmp_project, "F-0020", "tests_exist", config, quick=True,
+        )
+        assert result_quick.passed is True
+        skipped_warnings = [w for w in result_quick.warnings if "quick mode" in w.lower()]
+        assert len(skipped_warnings) > 0
+
+    def test_check_quick_still_checks_file_artifacts(self, tmp_project):
+        """Quick mode should still check file-existence artifacts."""
+        config = load_config(tmp_project)
+        work_items.create(tmp_project, "F-0021", "Test Files", mode="formal")
+        orch = TransitionOrchestrator(tmp_project)
+        orch.transition("F-0021", "queued")
+        orch.transition("F-0021", "planning")
+
+        # plan.md doesn't exist yet — quick check should still catch this
+        result = check_transition_artifacts(
+            tmp_project, "F-0021", "plan_review", config, "formal", quick=True,
+        )
+        assert result.passed is False
+        assert any("plan.md" in e for e in result.errors)
+
+    def test_active_flag_single_feature(self, tmp_project):
+        """--active should auto-detect the single active feature."""
+        work_items.create(tmp_project, "F-0022", "Active Feature", mode="formal")
+        orch = TransitionOrchestrator(tmp_project)
+        orch.transition("F-0022", "queued")
+        orch.transition("F-0022", "planning")
+
+        from auto.v2.workflow import _get_active_feature
+        active = _get_active_feature(tmp_project)
+        assert active == "F-0022"
+
+    def test_active_flag_no_features(self, tmp_project):
+        """--active returns None with no active work items."""
+        from auto.v2.workflow import _get_active_feature
+        active = _get_active_feature(tmp_project)
+        assert active is None
+
+    def test_active_flag_multiple_features(self, tmp_project):
+        """--active returns None when multiple features are active."""
+        work_items.create(tmp_project, "F-0023", "Feature A", mode="formal")
+        work_items.create(tmp_project, "F-0024", "Feature B", mode="formal")
+        orch = TransitionOrchestrator(tmp_project)
+        orch.transition("F-0023", "queued")
+        orch.transition("F-0024", "queued")
+
+        from auto.v2.workflow import _get_active_feature
+        active = _get_active_feature(tmp_project)
+        assert active is None
+
+    def test_cmd_check_quick_active_no_feature(self, tmp_project):
+        """CLI with --quick --active should exit 0 silently when no feature."""
+        rc = workflow_main(["check", "--quick", "--active"])
+        assert rc == 0

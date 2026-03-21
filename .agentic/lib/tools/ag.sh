@@ -250,6 +250,7 @@ if [[ "$_V2_ENGINE" -eq 1 ]]; then
         ship)    shift; _v2_workflow ship "$@"; exit $? ;;
         next)    shift; _v2_workflow next "$@"; exit $? ;;
         info)    shift; _v2_workflow info "$@"; exit $? ;;
+        export)  shift; _v2_workflow export "$@"; exit $? ;;
         # transition, verify, status are handled below with v1 fallback
     esac
 fi

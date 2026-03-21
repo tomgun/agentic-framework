@@ -45,6 +45,7 @@ COMMANDS:
     intent [sub]        Manage intent journal (list|clear F-XXXX)
     formalize [T-XXXX...]  Promote TODO items to formal features + AC stubs
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
+    export <tool|all>   Generate instruction files for AI tools (claude|cursor|copilot|codex)
     verify [--full]     Run doctor verification
     run                 Show how to run this project
     status              Show current project status
@@ -129,6 +130,7 @@ COMMANDS:
     intent [sub]        Manage intent journal (list|clear F-XXXX)
     formalize [T-XXXX...]  Promote TODO items to formal features + AC stubs
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
+    export <tool|all>   Generate instruction files for AI tools (claude|cursor|copilot|codex)
     verify [--full]     Run doctor verification
     run                 Show how to run this project
     status              Show current project status

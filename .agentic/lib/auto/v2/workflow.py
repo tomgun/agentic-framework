@@ -182,22 +182,58 @@ def cmd_transition(project_root: Path, args: list[str]) -> int:
     return 0 if result.success else 1
 
 
+def _get_active_feature(project_root: Path) -> Optional[str]:
+    """Auto-detect the single active feature, if any.
+
+    Returns the feature ID if exactly one non-terminal work item exists,
+    otherwise None.
+    """
+    try:
+        items = work_items.list_items(project_root)
+    except (OSError, PermissionError):
+        return None
+    active = [i for i in items if i.status not in ("shipped", "deprecated", "idea")]
+    return active[0].id if len(active) == 1 else None
+
+
 def cmd_check(project_root: Path, args: list[str]) -> int:
     """Validate all required artifacts for a work item.
 
-    Usage: ag check F-XXXX [--phase STATE]
-    """
-    if not args:
-        _print_fail("Usage: ag check <feature-id> [--phase STATE]")
-        return 1
+    Usage: ag check F-XXXX [--phase STATE] [--quick] [--active]
 
-    feature_id = args[0]
+    --quick   File-existence only, no command execution (<500ms)
+    --active  Auto-detect the active feature (no need to specify F-XXXX)
+    """
+    quick = "--quick" in args
+    active_flag = "--active" in args
+    filtered_args = [a for a in args if a not in ("--quick", "--active")]
+
+    # Resolve feature ID
+    feature_id = None
     phase = None
 
-    i = 1
-    while i < len(args):
-        if args[i] == "--phase" and i + 1 < len(args):
-            phase = args[i + 1]
+    if active_flag:
+        feature_id = _get_active_feature(project_root)
+        if not feature_id:
+            # No single active feature — silently exit in quick mode
+            if quick:
+                return 0
+            _print_info("No single active feature found. Specify F-XXXX explicitly.")
+            return 0
+    elif filtered_args and not filtered_args[0].startswith("--"):
+        feature_id = filtered_args[0]
+        filtered_args = filtered_args[1:]
+    else:
+        if quick:
+            return 0  # No feature to check in quick mode — silently pass
+        _print_fail("Usage: ag check <feature-id> [--phase STATE] [--quick] [--active]")
+        return 1
+
+    # Parse remaining flags
+    i = 0
+    while i < len(filtered_args):
+        if filtered_args[i] == "--phase" and i + 1 < len(filtered_args):
+            phase = filtered_args[i + 1]
             i += 2
         else:
             i += 1
@@ -207,6 +243,8 @@ def cmd_check(project_root: Path, args: list[str]) -> int:
     try:
         item = work_items.load(project_root, feature_id)
     except FileNotFoundError as e:
+        if quick:
+            return 0  # Missing work item in quick mode — no output
         _print_fail(str(e))
         return 1
 
@@ -221,14 +259,16 @@ def cmd_check(project_root: Path, args: list[str]) -> int:
 
     from .preconditions import check_transition_artifacts
     result = check_transition_artifacts(
-        project_root, feature_id, target, config, item.mode,
+        project_root, feature_id, target, config, item.mode, quick=quick,
     )
 
     label = f"→ {target}" if target != item.status else f"at '{target}'"
     if result.passed:
-        _print_ok(f"{feature_id} ready to advance {label}")
+        if not quick:
+            _print_ok(f"{feature_id} ready to advance {label}")
         for w in result.warnings:
-            _print_warn(w)
+            if not quick:
+                _print_warn(w)
         return 0
     else:
         _print_fail(f"{feature_id} not ready {label}:")
@@ -477,6 +517,41 @@ def cmd_info(project_root: Path, args: list[str]) -> int:
 # ---------------------------------------------------------------------------
 
 
+def cmd_read_artifact(project_root: Path, args: list[str]) -> int:
+    """Read a specific artifact file from a feature's work directory.
+
+    Usage: ag read-artifact F-XXXX <artifact-name>
+    """
+    if len(args) < 2:
+        _print_fail("Usage: ag read-artifact <feature-id> <artifact-name>")
+        return 1
+
+    feature_id = args[0]
+    artifact_name = args[1]
+
+    # Security: prevent path traversal
+    if "/" in artifact_name or "\\" in artifact_name or ".." in artifact_name:
+        _print_fail("Invalid artifact name")
+        return 1
+
+    artifact_path = work_items.item_dir(project_root, feature_id) / artifact_name
+    if not artifact_path.exists():
+        _print_fail(f"Artifact not found: {artifact_name} for {feature_id}")
+        return 1
+
+    print(artifact_path.read_text())
+    return 0
+
+
+def cmd_export(project_root: Path, args: list[str]) -> int:
+    """Generate tool-specific instruction files.
+
+    Usage: ag export <tool|all> [--diff] [--list] [--mcp]
+    """
+    from .export import cmd_export as _cmd_export
+    return _cmd_export(project_root, args)
+
+
 COMMANDS = {
     "start": cmd_start,
     "transition": cmd_transition,
@@ -486,6 +561,7 @@ COMMANDS = {
     "status": cmd_status,
     "next": cmd_next,
     "info": cmd_info,
+    "export": cmd_export,
 }
 
 
@@ -501,11 +577,13 @@ def main(argv: list[str] | None = None) -> int:
         print("  start F-XXXX \"Title\"     Create work item, start planning")
         print("  transition F-XXXX STATE  Enforce state transition")
         print("  check F-XXXX             Validate required artifacts")
+        print("  check --quick --active   Fast file-existence check for hooks")
         print("  verify F-XXXX            Run verification commands")
         print("  ship F-XXXX              Prepare for shipping")
         print("  status [--all]           Show work items")
         print("  next                     Show next queued item")
         print("  info F-XXXX              Detailed work item info")
+        print("  export <tool|all>        Generate instruction files")
         return 0
 
     # Resolve project root
