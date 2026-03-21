@@ -49,7 +49,7 @@ from auto import spawn_claude  # noqa: E402
 class PipelineResult:
     """Result of a full pipeline run."""
     success: bool
-    phase: str = ""  # gate_check | epic_create | kickoff | promote | schedule | done
+    phase: str = ""  # vision | gate_check | epic_create | kickoff | promote | schedule | done
     epic_id: str = ""
     feature_ids: list[str] = field(default_factory=list)
     scheduler_result: Optional[object] = None  # SchedulerResult when available
@@ -140,17 +140,17 @@ def vision_to_features(
 
     stack_file = project_root / "STACK.md"
     if stack_file.exists():
-        stack_text = stack_file.read_text()[:2000]
+        stack_text = stack_file.read_text()[:2000].rsplit("\n", 1)[0]
         context_parts.append(f"TECH STACK (from STACK.md):\n{stack_text}")
 
     context_pack = paths.context_pack
     if context_pack.exists():
-        cp_text = context_pack.read_text()[:2000]
+        cp_text = context_pack.read_text()[:2000].rsplit("\n", 1)[0]
         context_parts.append(f"PROJECT CONTEXT:\n{cp_text}")
 
     nfr_file = paths.spec_dir / "NFR.md"
     if nfr_file.exists():
-        nfr_text = nfr_file.read_text()[:1000]
+        nfr_text = nfr_file.read_text()[:1000].rsplit("\n", 1)[0]
         context_parts.append(f"NON-FUNCTIONAL REQUIREMENTS:\n{nfr_text}")
 
     context_section = "\n\n".join(context_parts) if context_parts else ""
@@ -173,8 +173,11 @@ def vision_to_features(
     output = str(result).strip()
     if output.startswith("```"):
         lines = output.split("\n")
-        # Strip first and last fence lines
-        lines = [l for l in lines if not l.strip().startswith("```")]
+        # Strip only the opening and closing fence lines
+        if lines[0].strip().startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip().startswith("```"):
+            lines = lines[:-1]
         output = "\n".join(lines).strip()
 
     try:
@@ -212,6 +215,15 @@ def vision_to_features(
     if not features:
         messages.append("Claude returned no features")
         return False, [], "", "", messages
+
+    # Validate feature structure
+    for i, f in enumerate(features):
+        if not isinstance(f, dict):
+            messages.append(f"Feature [{i}] is not a dict: {type(f).__name__}")
+            return False, [], "", "", messages
+        if "name" not in f:
+            messages.append(f"Feature [{i}] missing required 'name' key: {f}")
+            return False, [], "", "", messages
 
     messages.append(f"Vision decomposed into {len(features)} features: "
                     f"{', '.join(f['name'] for f in features)}")
