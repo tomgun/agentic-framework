@@ -10,21 +10,17 @@
 
 ### Framework Enforcement Gaps — Test Project Evaluation Insights (F-0300, v0.69.0)
 
-**User insight**: Tomas ran two end-to-end test projects — Street Fury (GTA 1/2-style driving game, autonomous_formal + git_mode=deferred) and Algebra Rush (rhythm platformer, autonomous_formal + active git) — specifically to stress-test framework enforcement under realistic conditions. The Street Fury session exposed a catastrophic enforcement collapse: the agent wrote 1,925 LOC across 15 features with zero plans, zero state transitions, zero verification, and 10 of 15 features lacking acceptance criteria. Every synthetic test (unit tests, framework validation, LLM behavioral tests) was passing.
+**User insight**: Tomas ran two end-to-end test projects — Street Fury (GTA 1/2-style driving game, autonomous_formal + git_mode=deferred) and Algebra Rush (rhythm platformer, autonomous_formal + active git) — as deliberate stress tests of framework enforcement under realistic conditions. This is the methodology contribution: using real projects with varied configuration combinations to find gaps that synthetic tests miss.
 
-Tomas's analysis yielded seven structural recommendations (R0–R6) and key observations for framework enforcement design:
+Key corrections Tomas made during the post-mortem analysis:
 
-1. **Wiring gap identification** — Tomas traced the enforcement failure to two compounding causes: `.claude/settings.json` was never created during init (hooks never registered) AND Claude Code requires a session restart to pick up hooks (no hot-reload). Not a logic bug — a wiring bug. The gate code was correct; the activation path was broken.
+1. **Restart requirement** — When the initial root cause pointed to "hooks never registered in settings.json," Tomas caught a nuance: hooks and skills may have been installed mid-session but Claude Code requires a restart to pick them up. This compounding factor (registration gap + no hot-reload) significantly changes the diagnosis and the fix.
 
-2. **Configuration matrix testing** — Tomas observed that each setting worked individually but the combination (autonomous_formal + deferred git + batch work) produced complete bypass. Insisted on testing the *product* of configuration axes, not just individual settings.
+2. **Testing hierarchy already richer than documented** — When the analysis listed a 4-level testing hierarchy, Tomas corrected it: the framework already has `ag auto verify-framework` with self-healing (F-0215) and simulation testing with PhaseChecker + JSONL analysis (F-0242). The corrected 6-level hierarchy properly reflects existing capabilities.
 
-3. **Init as highest-leverage moment** — The Algebra Rush project created FEATURES.md in table format; `ag backlog add`, the state machine, and crunch all broke silently. Tomas observed that one wrong format at init cascades for hours downstream.
+3. **Doc-reality drift on `feature.sh add`** — Tomas noticed that `feature.sh add "Title"` was documented in START_HERE.md and MANUAL_OPERATIONS.md but never implemented — a ghost command that exposed how init-time tooling gaps cascade.
 
-4. **Advisory warnings ignored under task pressure** — The Street Fury agent had instructions but bypassed them for all 15 features without self-correcting. Tomas's conclusion: only hard denials (tool-call rejection) create course correction; advisory warnings are noise when an agent has momentum.
-
-5. **6-level testing hierarchy** — Tomas pointed out the framework already has automated verification (`ag auto verify-framework` with self-healing, F-0215) and simulation testing (PhaseChecker + JSONL analysis, F-0242) beyond basic unit/LLM tests, making the testing hierarchy richer than initially documented. Manual test projects remain irreplaceable for discovering *new* failure modes not yet in scenario definitions.
-
-These insights were recorded in `docs/KEY_INSIGHTS.md` (#18: End-to-End Enforcement Wiring, #19: Test Projects as System Feedback), `docs/INSTRUCTION_ARCHITECTURE.md` (A12: enforcement wiring assumption INVALIDATED, Defense-in-Depth F-0300 finding), and `FRAMEWORK_DEVELOPMENT.md` (two new Lessons Learned entries).
+The agent-side analysis (R0–R6 recommendations, "agents are water" framing, enforcement wiring insights) was synthesized from these test project results and recorded in `docs/KEY_INSIGHTS.md` (#18, #19), `docs/INSTRUCTION_ARCHITECTURE.md` (A12), and `FRAMEWORK_DEVELOPMENT.md` (2 new lessons).
 
 ### Git-Deferred Mode + Spec Lifecycle Enforcement (F-0250, F-0251, PR #188)
 
