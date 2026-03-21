@@ -3918,3 +3918,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 13:54 - Completing-work skill fix
+
+**Why**: Agent ignored post-merge dance because skill had no merge-specific guidance
+
+**What changed**:
+- Added merge guidance and post-merge steps to skill — use ag merge not gh pr merge, fallback steps if already merged
+
+**Next steps**:
+- None
+
+**Blockers**: None
+

@@ -11,21 +11,39 @@ compatibility: "Requires Claude Code with shell access and ag commands."
 allowed-tools: [Read, Edit, Bash, Glob, Grep]
 metadata:
   author: agentic-framework
-  version: "0.62.0"
+  version: "0.68.0"
 ---
 # Completing Work
 
-Run `ag done F-XXXX` — it verifies ACs, bumps VERSION, updates FEATURES.md, and flushes state.
+## Merging a PR
+
+Use `ag merge <pr#> [F-XXXX]` — it wraps `gh pr merge` + `ag done` in one command.
+NEVER use `gh pr merge` directly — it skips the post-merge workflow.
+
+If PR was already merged (via `gh pr merge` or GitHub UI):
+1. `git checkout main && git pull --rebase origin main`
+2. Run the post-merge steps below manually
+
+## Post-Merge Steps
+
+After every merge, run these steps (or let `ag done` handle them):
+
+1. **Spec status**: mark feature shipped — `bash .agentic/lib/tools/feature.sh F-XXXX status shipped`
+2. **Backlog**: advance queue — `ag backlog done`
+3. **Journal**: log outcome — `bash .agentic/lib/tools/journal.sh "F-XXXX shipped" "Capability delivered" "Next" "None" --why "Reason"`
+4. **Status**: update focus — `bash .agentic/lib/tools/status.sh focus "F-XXXX shipped"`
+5. **VERSION + flush**: `ag done F-XXXX` bumps VERSION (patch) and commits state files
+6. **Git tag** (if VERSION file exists): `git tag v$(cat VERSION) && git push origin v$(cat VERSION)`
+
+### Framework development only (detected by FRAMEWORK_DEVELOPMENT.md)
+`ag done` auto-runs dogfood sync. Additionally:
+- Sync instruction files (DEVELOPER_GUIDE, HOW_IT_WORKS, cursor rules, etc.) with the merged changes
+- Update memory-seed if workflow rules changed
 
 ## Before running `ag done`
 1. Verify acceptance criteria in `.agentic/spec/acceptance/F-XXXX.md` (check off each `- [ ]` → `- [x]`)
 2. Complete WIP: `bash .agentic/lib/tools/wip.sh complete`
-3. Update feature status: `bash .agentic/lib/tools/feature.sh F-XXXX status shipped`
-4. Update journal: `bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Capability" "Next" "None" --why "Reason"`
-5. Update status: `bash .agentic/lib/tools/status.sh focus "F-XXXX shipped"`
-6. Check doc freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done`
 
 ## Rules
 - P1 ACs = 100%, P2/P3 = 80%, flat specs = 80% required.
 - If criteria not met, list what remains and ask user how to proceed.
-- `ag done` auto-bumps VERSION (patch) and flushes state on main.
