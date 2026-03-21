@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- v2 Refactor: Phase 1 DONE (PR #177). Next: Phase 2 — rearchitect auto system onto TransitionOrchestrator. Full plan: .agentic/journal/plans/2026-03-20-framework-simplification-plan.md (Updated: 2026-03-20 17:38 UTC)
+- Phase 4 PR: tool adapters, MCP, hook enforcement (Updated: 2026-03-21 06:07 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item

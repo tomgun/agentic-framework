@@ -189,6 +189,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0057: PR #183: Phase 4 — tool adapters, MCP, hooks
+- **Type**: pr_review
+- **Added**: 2026-03-21
+- **Context**: feat/v2-phase4-tool-adapters → main. 5 new Python files, 73 tests. Final phase of v2 refactor.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics

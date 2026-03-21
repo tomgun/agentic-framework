@@ -3827,3 +3827,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 06:07 - Phase 4: Tool Adapters & MCP
+
+**Why**: Make the framework universally accessible to any AI coding tool
+
+**What changed**:
+- ag export generates tool-specific instruction files from shared sections; ag check --quick enables <500ms hook enforcement; MCP server wraps 5 tools over stdio JSON-RPC
+
+**Next steps**:
+- PR review, merge, ag done
+
+**Blockers**: None
+
