@@ -224,6 +224,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0086: Phase 3 spec protection audit: ~9 shipped features have ACs referencing deleted files, 0 spec migrations created for ~100 affected features. Context-for-role.sh silently drops constitutional rules. 4 ag commands degrade. 13 context manifests reference deleted files. See PR #182 (a22475e). Background: Phase 3 deleted ~130 files / 34K lines but validate_framework.sh v2 mode skips v1 checks, hiding the gaps. Affected features: F-0069 (all 7 checklists), F-0011 (programming_standards), F-0012 (test_strategy), F-0013 (smoke_testing), F-0014 (library_selection), F-0074 (green_coding), F-0102 (modular guidelines), F-0055 (anti-hallucination), F-0093 (AGENT_QUICK_START). Functional issues: context-for-role.sh ALWAYS_INJECT references guidelines/core-rules.md (deleted), commit.sh/done.sh/implement.sh/specs.sh degrade to generic guidance when checklists missing. Either evolve shipped specs with migrations mapping old ACs to v2 equivalents, or deprecate features superseded by v2 engine.
 - **Added**: 2026-03-21
 
+### T-0087: AC check-off should happen with the code changes, not post-merge. Options: (1) In PR workflow: check off ACs in the PR itself (pre-merge), so reviewers see which ACs are satisfied. (2) In direct-commit mode: check off at commit time. Problem: feature numbering conflicts when multiple features develop simultaneously in PR mode — numbers could clash. But if work is planned well (backlog), numbers are assigned beforehand. Consider: assign F-XXXX at plan time (current behavior), check off ACs in the feature branch (not post-merge), and only bump VERSION post-merge. The post-merge AC check-off we do today is backwards — the evidence should travel with the code.
+- **Added**: 2026-03-22
+
 ## Done
 
 
