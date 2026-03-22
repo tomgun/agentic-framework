@@ -227,6 +227,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0087: AC check-off should happen with the code changes, not post-merge. Options: (1) In PR workflow: check off ACs in the PR itself (pre-merge), so reviewers see which ACs are satisfied. (2) In direct-commit mode: check off at commit time. Problem: feature numbering conflicts when multiple features develop simultaneously in PR mode — numbers could clash. But if work is planned well (backlog), numbers are assigned beforehand. Consider: assign F-XXXX at plan time (current behavior), check off ACs in the feature branch (not post-merge), and only bump VERSION post-merge. The post-merge AC check-off we do today is backwards — the evidence should travel with the code.
 - **Added**: 2026-03-22
 
+### T-0088: Scaffold should copy all Claude tool files (.claude/hooks.json, skills/, subagents/, CLAUDE.md) during scaffolding — BEFORE the agent session starts. Currently setup-agent.sh runs mid-session (called by scaffold.sh), but hooks only take effect on next session start. Fix: scaffold.sh should create .claude/ with hooks.json as part of the directory structure creation (alongside .agentic/), not as a separate setup-agent step. Then when the user starts their first Claude session, hooks are already in place. Remove the 'restart Claude' advisory. The init playbook phase can then remove/customize tool dirs the user doesn't need (e.g. if they only use Cursor, remove .claude/). This inverts the current flow: install everything → prune, instead of install nothing → add on request.
+- **Added**: 2026-03-22
+
 ## Done
 
 
