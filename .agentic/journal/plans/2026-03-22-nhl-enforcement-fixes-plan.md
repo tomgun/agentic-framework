@@ -1,6 +1,6 @@
 **Status**: APPROVED
 
-# F-0301 Plan: Fix Enforcement Gaps Exposed by NHL Hockey Game Test
+# Plan: Fix Enforcement Gaps Exposed by NHL Hockey Game Test
 
 **Date**: 2026-03-22
 **Trigger**: NHL Hockey Game test project (v0.70.0) — complete framework bypass under `autonomous_formal` + `state_enforcement: blocking`

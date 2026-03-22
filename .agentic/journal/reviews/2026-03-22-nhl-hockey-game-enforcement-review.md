@@ -1,4 +1,4 @@
-# F-0301 Analysis: NHL Hockey Game — Full Framework Bypass Under Blocking Enforcement
+# Analysis: NHL Hockey Game — Full Framework Bypass Under Blocking Enforcement
 
 **Date**: 2026-03-22
 **Source**: `agentic-tests/nhl-hockey-game/to_agentic_af/ANALYSIS.md` (547-line incident report by project agent)
