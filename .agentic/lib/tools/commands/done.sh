@@ -479,12 +479,13 @@ cmd_done() {
                 done_failures=$((done_failures + 1))
             else
                 local assertion_count
-                assertion_count=$(python3 -c "
-import sys; sys.path.insert(0, '$AGENTIC_LIB')
+                assertion_count=$(python3 - "$AGENTIC_LIB" "$contract_file" <<'PYEOF'
+import sys; sys.path.insert(0, sys.argv[1])
+from pathlib import Path
 from contracts import load_contract
-c = load_contract(__import__('pathlib').Path('$contract_file'))
-print(len(c.assertions))
-" 2>/dev/null) || assertion_count="?"
+print(len(load_contract(Path(sys.argv[2])).assertions))
+PYEOF
+) || assertion_count="?"
                 echo -e "${GREEN}✓ All structural assertions pass ($assertion_count total)${NC}"
             fi
         elif [ -f "$acc_file" ]; then
@@ -649,17 +650,17 @@ print(len(c.assertions))
 
         # Also update contract lifecycle to shipped
         if [ -f "$contract_file" ]; then
-            python3 -c "
-import sys; sys.path.insert(0, '$AGENTIC_LIB')
-from contracts import load_contract, save_contract
+            python3 - "$AGENTIC_LIB" "$contract_file" <<'PYEOF' 2>/dev/null || true
+import sys; sys.path.insert(0, sys.argv[1])
 from pathlib import Path
-c = load_contract(Path('$contract_file'))
+from contracts import load_contract, save_contract
+c = load_contract(Path(sys.argv[2]))
 if c.lifecycle != 'shipped':
     c.lifecycle = 'shipped'
     c.protection = 'contract'
     save_contract(c)
     print('Contract lifecycle → shipped')
-" 2>/dev/null || true
+PYEOF
         fi
 
         # Remind about STATUS.md

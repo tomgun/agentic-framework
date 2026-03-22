@@ -4228,3 +4228,14 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 21:32 - F-0302 review fixes round 2
+
+**What changed**:
+- Fixed inline Python in done.sh (heredoc with argv), added 4 tests for _build_child_contract, updated 2 epic tests for contracts
+
+**Next steps**:
+- PR merge
+
+**Blockers**: None
+
