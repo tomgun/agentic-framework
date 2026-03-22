@@ -4452,16 +4452,16 @@ Proposed restructuring:
 
 ## F-0302: Spec System Overhaul — YAML Contracts
 
-**Status**: planned
-**Category**: --category
-**Priority**: medium
-**Complexity**: medium
+**Status**: in_progress
+**Category**: Architecture
+**Priority**: critical
+**Complexity**: high
 
-**Description**: (TODO: add description)
+**Description**: Replace markdown acceptance criteria with YAML contract specifications. Consolidate 217 features into ~33 contracts with machine-verifiable assertions, migration-protected shipped contracts, and user_input control interface.
 
 **Implementation**:
-- State: none
-- Code: (TODO)
-- Tests: (TODO)
+- State: partial
+- Code: `.agentic/lib/contracts.py`, `.agentic/lib/tools/commands/contract.sh`, `.agentic/lib/tools/verify-contracts.sh`
+- Tests: `tests/test_contracts.py` (42 tests), `tests/validate_framework.sh` (7 checks)
 
-**Acceptance**: See `spec/acceptance/F-0302.md`
+**Acceptance**: See `spec/contracts/F-0302.yaml`

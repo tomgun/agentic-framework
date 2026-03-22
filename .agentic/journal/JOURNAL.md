@@ -4165,3 +4165,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 13:17 - F-0302 security fixes
+
+**Why**: Code review found shell injection via single-quote in inline Python
+
+**What changed**:
+- Fixed shell injection in contract.sh: all user input passed via env vars, feature ID validation added. Fixed perf: 3→1 python calls per contract in check-all loop. Fixed FEATURES.md entry.
+
+**Next steps**:
+- Push, merge
+
+**Blockers**: None
+

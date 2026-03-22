@@ -133,9 +133,9 @@ print(json.dumps(result))
         fi
 
         local p f s
-        p=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin)['passed'])")
-        f=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin)['failed'])")
-        s=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin)['skipped'])")
+        read p f s <<< $(echo "$result" | python3 -c "
+import sys,json; d=json.load(sys.stdin)
+print(d['passed'], d['failed'], d['skipped'])")
 
         total_pass=$((total_pass + p))
         total_fail=$((total_fail + f))
@@ -325,13 +325,37 @@ _contract_validate() {
             return 1
         fi
         echo -e "${BOLD}Validating: $feature_id${NC}"
-        PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -m contracts validate "$contract_file"
+        PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import sys; sys.path.insert(0, '$ROOT_DIR/.agentic/lib')
+from contracts import validate_contract_file; from pathlib import Path
+errors = validate_contract_file(Path('$contract_file'))
+if errors:
+    for e in errors: print(f'  ERROR: {e}')
+    sys.exit(1)
+else:
+    print(f'  OK: $contract_file')
+"
         return $?
     fi
 
     echo -e "${BOLD}Validating all contracts${NC}"
     echo ""
-    PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -m contracts validate-all "$contracts_dir"
+    PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import sys; sys.path.insert(0, '$ROOT_DIR/.agentic/lib')
+from contracts import validate_contract_file; from pathlib import Path
+contracts_dir = Path('$contracts_dir')
+all_ok = True; count = 0
+for f in sorted(contracts_dir.glob('*.yaml')):
+    count += 1
+    errors = validate_contract_file(f)
+    if errors:
+        all_ok = False; print(f'FAIL: {f.name}')
+        for e in errors: print(f'  {e}')
+    else:
+        print(f'  OK: {f.name}')
+print(f'\n{count} contract(s) checked')
+sys.exit(0 if all_ok else 1)
+"
     return $?
 }
 
@@ -346,6 +370,12 @@ _contract_set() {
         return 1
     fi
 
+    # Validate feature ID format to prevent path traversal
+    if ! echo "$feature_id" | grep -qE '^(F|NFR)-[0-9]+$'; then
+        echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
+        return 1
+    fi
+
     local contracts_dir
     contracts_dir="${CONTRACTS_DIR:-$SPEC_DIR/contracts}"
     local contract_file="$contracts_dir/${feature_id}.yaml"
@@ -355,14 +385,18 @@ _contract_set() {
         return 1
     fi
 
+    # Pass values via env vars to prevent shell injection
+    _AG_CONTRACT_FILE="$contract_file" \
+    _AG_KEY="$key" \
+    _AG_VALUE="$value" \
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
-import sys
+import os, sys
 from pathlib import Path
 from contracts import load_contract, save_contract
 
-contract = load_contract(Path('$contract_file'))
-key = '$key'
-value = '$value'
+contract = load_contract(Path(os.environ['_AG_CONTRACT_FILE']))
+key = os.environ['_AG_KEY']
+value = os.environ['_AG_VALUE']
 
 valid_keys = ['lifecycle', 'protection', 'category', 'profile', 'user_input', 'since', 'notes', 'name', 'description']
 if key not in valid_keys:
@@ -371,7 +405,7 @@ if key not in valid_keys:
     sys.exit(1)
 
 setattr(contract, key, value)
-save_contract(contract, Path('$contract_file'))
+save_contract(contract, Path(os.environ['_AG_CONTRACT_FILE']))
 print(f'Updated {contract.id}.{key} = {value}')
 "
     return $?
@@ -395,6 +429,11 @@ _contract_add_assertion() {
         return 1
     fi
 
+    if ! echo "$feature_id" | grep -qE '^(F|NFR)-[0-9]+$'; then
+        echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
+        return 1
+    fi
+
     local contracts_dir
     contracts_dir="${CONTRACTS_DIR:-$SPEC_DIR/contracts}"
     local contract_file="$contracts_dir/${feature_id}.yaml"
@@ -404,11 +443,17 @@ _contract_add_assertion() {
         return 1
     fi
 
+    _AG_CONTRACT_FILE="$contract_file" \
+    _AG_TEXT="$text" \
+    _AG_TYPE="$atype" \
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import os
 from pathlib import Path
 from contracts import load_contract, save_contract, Assertion
 
-contract = load_contract(Path('$contract_file'))
+contract = load_contract(Path(os.environ['_AG_CONTRACT_FILE']))
+text = os.environ['_AG_TEXT']
+atype = os.environ['_AG_TYPE']
 
 # Determine next AC ID
 existing_nums = []
@@ -421,14 +466,10 @@ for a in contract.assertions:
 next_num = max(existing_nums, default=0) + 1
 ac_id = f'AC-{next_num:03d}'
 
-new_assertion = Assertion(
-    id=ac_id,
-    text='$text',
-    type='$atype',
-)
+new_assertion = Assertion(id=ac_id, text=text, type=atype)
 contract.assertions.append(new_assertion)
-save_contract(contract, Path('$contract_file'))
-print(f'Added {ac_id} to {contract.id}: $text')
+save_contract(contract, Path(os.environ['_AG_CONTRACT_FILE']))
+print(f'Added {ac_id} to {contract.id}: {text}')
 "
     return $?
 }
@@ -453,6 +494,11 @@ _contract_add_migration() {
         return 1
     fi
 
+    if ! echo "$feature_id" | grep -qE '^(F|NFR)-[0-9]+$'; then
+        echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
+        return 1
+    fi
+
     local contracts_dir
     contracts_dir="${CONTRACTS_DIR:-$SPEC_DIR/contracts}"
     local contract_file="$contracts_dir/${feature_id}.yaml"
@@ -462,14 +508,19 @@ _contract_add_migration() {
         return 1
     fi
 
+    _AG_CONTRACT_FILE="$contract_file" \
+    _AG_TRIGGER="$trigger" \
+    _AG_REASON="$reason" \
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
-import sys
+import os
 from pathlib import Path
 from datetime import date
 from contracts import load_contract, save_contract, Migration
 
-contract = load_contract(Path('$contract_file'))
+contract = load_contract(Path(os.environ['_AG_CONTRACT_FILE']))
 today = date.today().isoformat()
+trigger = os.environ['_AG_TRIGGER']
+reason = os.environ['_AG_REASON']
 
 # Determine next migration number for today
 existing_today = [m for m in contract.migrations if m.date == today]
@@ -477,18 +528,14 @@ next_num = len(existing_today) + 1
 mid = f'M-{today}-{next_num:03d}'
 
 migration = Migration(
-    id=mid,
-    date=today,
-    trigger='$trigger',
-    reason=$(python3 -c "import sys; print(repr('$reason'))" 2>/dev/null || echo "'$reason'"),
-    changes=[],
-    approved_by='user',
+    id=mid, date=today, trigger=trigger, reason=reason,
+    changes=[], approved_by='user',
 )
 contract.migrations.append(migration)
-save_contract(contract, Path('$contract_file'))
+save_contract(contract, Path(os.environ['_AG_CONTRACT_FILE']))
 print(f'Added migration {mid} to {contract.id}')
-print(f'  Trigger: $trigger')
-print(f'  Reason: $reason')
+print(f'  Trigger: {trigger}')
+print(f'  Reason: {reason}')
 print(f'  Edit the contract to add specific changes to the migration.')
 "
     return $?
@@ -512,13 +559,17 @@ _contract_migrations() {
     echo -e "${BOLD}Migration History${NC}"
     echo ""
 
+    _AG_CONTRACTS_DIR="$contracts_dir" \
+    _AG_FEATURE_ID="${feature_id:-}" \
+    _AG_TRIGGER_FILTER="${filter_trigger:-}" \
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import os
 from pathlib import Path
-from contracts import load_all_contracts, get_contract_by_id
+from contracts import load_all_contracts
 
-contracts_dir = Path('$contracts_dir')
-feature_id = '$feature_id'
-trigger_filter = '$filter_trigger'
+contracts_dir = Path(os.environ['_AG_CONTRACTS_DIR'])
+feature_id = os.environ.get('_AG_FEATURE_ID', '')
+trigger_filter = os.environ.get('_AG_TRIGGER_FILTER', '')
 
 if feature_id:
     from contracts import load_contract
@@ -561,6 +612,11 @@ _contract_create() {
         return 1
     fi
 
+    if ! echo "$feature_id" | grep -qE '^(F|NFR)-[0-9]+$'; then
+        echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
+        return 1
+    fi
+
     local contracts_dir
     contracts_dir="${CONTRACTS_DIR:-$SPEC_DIR/contracts}"
     mkdir -p "$contracts_dir"
@@ -572,13 +628,21 @@ _contract_create() {
         return 1
     fi
 
+    _AG_CONTRACT_FILE="$contract_file" \
+    _AG_FEATURE_ID="$feature_id" \
+    _AG_NAME="$name" \
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import os
 from pathlib import Path
 from contracts import Contract, Assertion, save_contract
 
+feature_id = os.environ['_AG_FEATURE_ID']
+name = os.environ['_AG_NAME']
+contract_file = os.environ['_AG_CONTRACT_FILE']
+
 contract = Contract(
-    id='$feature_id',
-    name='$name',
+    id=feature_id,
+    name=name,
     lifecycle='exploring',
     description='TODO: Describe what this feature does and why it exists.',
     assertions=[
@@ -591,9 +655,9 @@ contract = Contract(
     ],
     protection='none',
 )
-save_contract(contract, Path('$contract_file'))
-print(f'Created draft contract: $contract_file')
-print(f'  Edit to add assertions, then run: ag contract validate $feature_id')
+save_contract(contract, Path(contract_file))
+print(f'Created draft contract: {contract_file}')
+print(f'  Edit to add assertions, then run: ag contract validate {feature_id}')
 "
     return $?
 }
