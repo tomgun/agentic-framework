@@ -71,9 +71,30 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   fi
 fi
 
+# --- Batch work detection (F-0300 R3) ---
+# Warn when user prompt contains batch-work triggers that should use ag auto crunch
+# USER_PROMPT is set once here and reused by all subsequent checks
+USER_PROMPT="${CLAUDE_USER_PROMPT:-}"
+if echo "$USER_PROMPT" | grep -qiE '(churn|batch)\s+(all\s+)?(tasks|features)|build everything|implement (all|everything)|do all (features|tasks)|implement everything'; then
+  echo ""
+  echo "⚠️  BATCH WORK DETECTED: Use \`ag auto crunch\` to process the backlog."
+  echo "   The ag auto pipeline ensures each feature gets specs, plans, tests, and docs."
+  echo "   NEVER write code for multiple features via direct Write/Edit calls."
+  echo ""
+fi
+
+# --- Autonomous work pattern detection (F-0300 R2) ---
+# Warn when prompt mentions implementing multiple features directly
+MULTI_FEATURE_COUNT=$(echo "$USER_PROMPT" | grep -oE 'F-[0-9]{4,}' | sort -u | wc -l | tr -d ' ')
+if [[ "$MULTI_FEATURE_COUNT" -gt 1 ]] && echo "$USER_PROMPT" | grep -qiE '(implement|build|write|code|create)'; then
+  echo ""
+  echo "⚠️  Multiple features referenced ($MULTI_FEATURE_COUNT). Implement one at a time."
+  echo "   Use \`ag auto crunch\` for batch processing with full enforcement."
+  echo ""
+fi
+
 # --- Phase-aware verification (v0.11.0) ---
 # Check if user prompt contains "implement" trigger and warn if no acceptance
-USER_PROMPT="${CLAUDE_USER_PROMPT:-}"
 if [[ "$USER_PROMPT" =~ [Ii]mplement.*(F-[0-9]{4,}) ]]; then
   FEATURE_ID="${BASH_REMATCH[1]}"
   if [[ ! -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
@@ -133,6 +154,21 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
           echo ""
         fi
       fi
+    fi
+  fi
+fi
+
+# --- Verification reminder (F-0300 R6) ---
+# When user says "done/finished/complete" with a feature reference, check for verification
+if echo "$USER_PROMPT" | grep -qiE '(done|finished|complete|ship)\b'; then
+  # Try to extract feature ID from prompt
+  DONE_FEATURE=$(echo "$USER_PROMPT" | grep -oE 'F-[0-9]{4,}' | head -1) || true
+  if [[ -n "$DONE_FEATURE" ]]; then
+    if [[ ! -f ".agentic/work/$DONE_FEATURE/verification.json" ]]; then
+      echo ""
+      echo "⚠️  No verification record for $DONE_FEATURE."
+      echo "   Run \`ag verify $DONE_FEATURE\` before marking as done."
+      echo ""
     fi
   fi
 fi

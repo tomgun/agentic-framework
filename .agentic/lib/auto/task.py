@@ -111,6 +111,8 @@ class TaskRunner:
         self.on_ac_done = on_ac_done
         self.visual = visual
         self.engine = AutoEngine(project_root)
+        # F-0300 R5: detect git mode for conditional git operations
+        self._git_active = get_setting(project_root, "git_mode", "active") == "active"
 
     def run(
         self,
@@ -141,10 +143,12 @@ class TaskRunner:
             return result
         result.acs_total = len(criteria)
 
-        # Create feature branch
+        # Create feature branch (skipped in deferred-git mode — F-0300 R5)
         branch = f"feat/auto-{feature_id.lower()}"
-        if not skip_branch:
+        if not skip_branch and self._git_active:
             branch = self._create_branch(feature_id)
+        elif not self._git_active:
+            print(f"  [deferred-git] Skipping branch creation")
         result.branch_name = branch
 
         # Process each AC
@@ -212,10 +216,12 @@ class TaskRunner:
         # Doc check: run drift.sh --docs --check if docs_gate is enabled
         self._check_and_update_docs(feature_id)
 
-        # Create PR
-        if not skip_pr and result.acs_passed > 0:
+        # Create PR (skipped in deferred-git mode — F-0300 R5)
+        if not skip_pr and result.acs_passed > 0 and self._git_active:
             pr_url = self._create_pr(feature_id, result)
             result.pr_url = pr_url
+        elif not self._git_active and result.acs_passed > 0:
+            print(f"  [deferred-git] Skipping PR creation")
 
         result.success = (
             result.acs_passed == result.acs_total
@@ -295,6 +301,12 @@ class TaskRunner:
             f"- Implement the minimum code needed to satisfy this criterion\n"
             f"- Ensure tests pass after your changes\n"
             f"- Do NOT modify unrelated code\n"
+            f"\n"
+            f"IMPORTANT enforcement rules (F-0300 R2):\n"
+            f"- You are implementing ONE specific acceptance criterion, not the whole feature\n"
+            f"- Verify acceptance criteria exist at .agentic/spec/acceptance/{feature_id}.md\n"
+            f"- A plan must exist at .agentic/journal/plans/*{feature_id}-plan.md\n"
+            f"- Do NOT write code for features other than {feature_id}\n"
             f"{feedback_text}"
         )
 
@@ -364,6 +376,11 @@ class TaskRunner:
             timeout=120,
         )
 
+        # F-0300 R5: skip git staging/commit in deferred-git mode
+        if not self._git_active:
+            print(f"  [deferred-git] Doc updates applied (not staged — no git)")
+            return
+
         # Stage doc updates (tracked files only — preserves existing git add -u)
         try:
             subprocess.run(
@@ -419,7 +436,13 @@ class TaskRunner:
         Returns True if changes were committed, False otherwise.
         With review_commit: human, stages only (returns False — expected).
         With review_commit: critical_agent, commits after adversarial review.
+        In deferred-git mode: records AC completion without git ops (F-0300 R5).
         """
+        # F-0300 R5: in deferred-git mode, skip all git operations
+        if not self._git_active:
+            print(f"  [deferred-git] AC {ac_id} passed (changes not staged — no git)")
+            return False
+
         review_commit = get_setting(self.project_root, "review_commit", "human")
 
         # Always stage changes

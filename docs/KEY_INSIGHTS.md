@@ -29,6 +29,9 @@
 | 15 | [Context Provenance Awareness](#15-agents-cannot-distinguish-context-provenance) | Agents can't tell if context came from the user, a prior session, or automation — default to system-provided | Prevents misattributing intent and skipping gates |
 | 16 | [Retroactive Planning Defeats Forward-Looking Gates](#16-retroactive-planning-defeats-forward-looking-gates) | Gates designed for plan→implement flow become dead code when agent implements first, plans after | Gates must check actual state, not assume ordering |
 | 17 | [CLI State Machines — The Endgame for Workflow Enforcement](#17-cli-state-machines--the-endgame-for-workflow-enforcement) | LLMs are probabilistic; no amount of instruction files makes them deterministic. CLI enforcement does. | ~3K lines replaces ~34K — 90% reduction, 100% enforcement |
+| 18 | [End-to-End Enforcement Wiring](#18-end-to-end-enforcement-wiring--existence--activation) | Enforcement code that exists but isn't wired into the activation path is theater | Zero — the enforcement literally doesn't fire |
+| 19 | [Test Projects Are the Only Honest System Feedback](#19-test-projects-are-the-only-honest-system-feedback) | Synthetic tests verify components; test projects verify the system under real pressure | N/A — validation methodology |
+| 20 | [Context Window Decay in Autonomous Sessions](#20-context-window-decay-in-autonomous-sessions) | Context fills monotonically, instructions degrade, agents can't self-clear — architect around it | 5–10K per subagent vs degraded 100K+ main session |
 
 **Meta-lesson**: structural enforcement > behavioral instructions > hope.
 
@@ -395,6 +398,121 @@ The CLI doesn't tell agents what to do — it tells them what they *can't* do. T
 
 ---
 
+## 18. End-to-End Enforcement Wiring — Existence ≠ Activation
+
+**The problem**: You write the enforcement code. Unit tests verify the logic works. You ship. But the enforcement never fires in a real project. The code exists, the tests pass, and the system is completely unprotected.
+
+**What happened**: `gate_pretool` (`gate.py:484-523`) had correct Write/Edit blocking logic for formal modes — tested, working, shipped. Hook scripts at `.agentic/hooks/claude/*.sh` existed and were copied to projects during init. But `.claude/settings.json` — where Claude Code reads hook registrations — was never created by the scaffold or init process. The hook scripts existed on disk. The gate logic existed in Python. The registration that connects them was missing. Additionally, Claude Code requires a session restart to pick up newly registered hooks — so even if registration were added mid-session, the hooks wouldn't activate until the agent restarts. Two compounding wiring failures, either of which alone would have silenced the entire enforcement layer.
+
+**The result**: The Street Fury test project (autonomous_formal + git_mode=deferred) ran a full multi-feature development session — 1,925 LOC across 15 features — with zero enforcement. Not because enforcement was weak, but because it was disconnected.
+
+**The insight**: An enforcement chain has multiple links: code → configuration → registration → activation → execution → denial. Component tests verify individual links ("does `gate_pretool` return deny?"). They don't verify the chain is connected ("does writing to a source file in a fresh project actually get blocked?"). A break at *any* link — missing registration, missing restart, missing config file — makes all downstream links irrelevant.
+
+**What works**: Integration tests that exercise the full enforcement path end-to-end. Not "does gate.py work?" but "initialize a fresh project, start a Claude session, attempt a Write to a source file without an active work item — does it get denied?" These are harder to write but they're the only tests that catch wiring gaps.
+
+**The corollary**: When enforcement fails in production, check wiring before checking logic. The instinct is to debug the gate code ("is the condition wrong?"). In both test project failures, the gate code was correct — the activation path was broken. `is_installed() && is_registered() && is_activated()` — all three must be true, and only the first was being tested.
+
+**Evidence**: F-0300 (Street Fury evaluation). `setup-agent.sh` created `.claude/hooks.json` but scaffold/init never created `.claude/settings.json` with hook entries. `init.py:310-311` documents the restart requirement. Combined: hooks existed, were unregistered, and even if registered mid-session would have been inert until restart.
+
+**See**: `docs/INSTRUCTION_ARCHITECTURE.md` §2 (Defense-in-Depth), F-0300 plan (R0: Hook Installation)
+
+---
+
+## 19. Test Projects Are the Only Honest System Feedback
+
+**The problem**: Unit tests pass. Framework validation passes. LLM behavioral tests pass. The framework still fails catastrophically in real use. How?
+
+**Why synthetic tests miss it**: Component tests verify individual mechanisms in isolation. They test "does this script check for X?" and "does this gate block Y?" But they can't test "when an agent with 15 features to build and a clear task-completion goal operates under a specific configuration combination, does the framework actually constrain behavior?" The failure modes that matter emerge from the *interaction* of components under real conditions — configuration combinations, workflow sequencing, agent behavioral patterns under task pressure.
+
+**What test projects revealed that synthetic tests didn't**:
+
+1. **Configuration matrix gaps**: The Street Fury project combined `autonomous_formal + git_mode=deferred + batch work`. Each setting worked individually. The combination produced complete workflow bypass — `ag auto` hard-gated on active git, hooks were unregistered, and no trigger caught "churn all tasks." No unit test exercises configuration combinations.
+
+2. **Init determines everything downstream**: The Algebra Rush project created FEATURES.md in table format instead of heading format. `ag backlog add` couldn't parse it. The agent had to rewrite it manually. One wrong format at init cascaded into workflow failures hours later. Init is the highest-leverage moment — and the hardest to test without actually initializing a real project.
+
+3. **Agents under task pressure ≠ agents in test prompts**: LLM behavioral tests ask "what would you do if the user says X?" The agent gives the correct answer. But in the Street Fury session, the agent had a clear goal (build a game), 15 features to implement, and a configuration that made the "correct" path (ag auto) unavailable. It found the path of least resistance — direct Write/Edit calls — and never self-corrected. Task pressure + blocked correct path + available bypass = certain bypass. No behavioral test captures this dynamic.
+
+4. **Agents are water, not soldiers**: They flow toward task completion along the path of least resistance. If there's an unblocked path that skips your workflow, they'll take it. Not maliciously — they're optimizing for the goal the user gave them. Once the Street Fury agent started direct-writing, it continued for all 15 features without pausing to question the approach. Momentum compounds. Advisory warnings ("you should use ag auto") are noise to an agent with momentum — only hard denials (tool-call rejection) create course correction.
+
+**What works**: Periodically spin up test projects with different profile/git/workflow combinations and run real multi-feature development sessions. Vary the configurations systematically — especially the edge combinations nobody uses in daily development. Treat test project failures as framework bugs, not user errors.
+
+**The testing hierarchy** (each level catches things previous levels miss):
+
+1. **Unit tests**: Verify component logic (fast, cheap, narrow)
+2. **Framework validation** (`validate_framework.sh`): Verify structural invariants (fast, broader)
+3. **LLM behavioral tests** (`tests/llm/`): Verify instruction compliance in isolation (slower, behavioral)
+4. **Simulation testing** (F-0242, `PhaseChecker` + JSONL analysis): Parse execution logs from real sessions, detect violation patterns (code_before_review, skipped_planning, stopped_after_plan_exit) against scenario definitions. Bridges the gap between isolated tests and full test projects.
+5. **Autonomous verify + self-heal** (F-0215, `ag auto verify-framework`): Spawn agents to build example projects from scratch using `ag` commands, verifying the full lifecycle end-to-end. When the agent hits a framework bug, the system classifies the failure (framework_bug vs agent_error vs external), spawns a fix agent in a verification worktree, validates the fix, and restarts. Accumulated fixes delivered as a single PR.
+6. **Manual test projects**: Spin up real projects with specific configuration combinations (profile × git_mode × workflow) and run multi-feature sessions. The most expensive level but the only one that captures emergent behavior under real task pressure and configuration edge cases.
+
+Most framework development stops at level 2 or 3. Levels 4–5 automate what level 6 reveals. Level 6 is still irreplaceable for discovering *new* failure modes — the Street Fury session exposed gaps that no existing simulation scenario or verify-framework definition would have caught, because the failure modes (unregistered hooks + deferred git + batch work) weren't in any scenario definition yet.
+
+**Evidence**: Street Fury (v0.69.0, autonomous_formal + deferred git) — 15 features, 1,925 LOC, zero plans, zero state transitions, zero verification. All synthetic tests passing. Algebra Rush (autonomous_formal + active git) — init format issues cascading into workflow failures.
+
+**See**: F-0300 plan, `.agentic/journal/plans/2026-03-21-algebra-rush-onboarding-analysis.md`
+
+---
+
+## 20. Context Window Decay in Autonomous Sessions
+
+**The problem**: LLM context windows fill monotonically during a conversation. Every tool call, every file read, every response adds tokens. The agent cannot clear its own context — `/clear` is a user action, not an agent capability. As context fills, the system performs **automatic compression**: older messages are summarized to make room. This compression is lossy. Instructions, skills loaded mid-session, earlier design decisions, and nuanced rules get compressed into summaries that lose fidelity. The agent doesn't know what was lost. This is **context rot** — a gradual degradation of the agent's ability to follow its own rules.
+
+**Why autonomous sessions are especially vulnerable**: In interactive mode, humans naturally create context breaks (switching tasks, `/clear`, new sessions). In autonomous mode (`ag auto task`, `ag auto epic`, `ag auto crunch`), the session can run for extended periods without human intervention. A long autonomous session accumulates context from dozens of file reads, tool calls, test runs, and commits. By the end, the constitutional rules from CLAUDE.md and the workflow instructions from skills may have been compressed into vague summaries — or compressed away entirely.
+
+**What compression loses and what survives**:
+
+| Context element | Loaded when | Survives compression? |
+|---|---|---|
+| System prompt (CLAUDE.md, memory) | Session start | YES — system prompt is never compressed |
+| Skill instructions | Mid-session (on trigger) | NO — compressed like any message |
+| File contents from Read | Mid-session | NO — early reads compressed first |
+| Tool call results | Mid-session | NO — older results summarized |
+| Agent's own reasoning | Mid-session | NO — loses detail progressively |
+| State files on disk | Always available | YES — can be re-read |
+| Git-tracked artifacts | Always available | YES — durable by design |
+
+The critical asymmetry: **instructions loaded at session start (system prompt) survive; instructions loaded mid-session (skills, playbooks, file reads) do not**. This is why the framework's Constitution layer (CLAUDE.md, ~50 lines) is kept small and front-loaded — it's the only instruction delivery mechanism that reliably survives the entire session.
+
+**The framework's architectural mitigations**:
+
+1. **Fresh subagents for each unit of work** (`ag auto task`). Each acceptance criterion gets its own Claude instance with a clean context window. The subagent receives exactly the context it needs via `context-for-role.sh` (5–10K focused tokens), does one job, and returns. Context rot is bounded to the scope of a single AC, not the entire feature.
+
+2. **External state files as persistent memory**. JOURNAL.md, STATUS.md, AGENTS.json, `item.yaml`, `verification.json` — these persist on disk, outside the context window. When a fresh subagent spins up, it reads current state from files, not from conversation history. The files ARE the memory; the context window is just the working scratchpad.
+
+3. **Dashboard as session rehydration**. `dashboard.sh` at session start re-derives the full project state from files. A brand new conversation can pick up where the previous one left off without needing the old context. This makes `/clear` + new session a zero-cost recovery mechanism for humans.
+
+4. **Just-in-time playbook loading** (Skills + role prompts). Instructions aren't all loaded upfront — they're loaded when triggered. This keeps the context leaner for longer, delaying the onset of compression. A session that loads 2 skills uses ~4K of playbook tokens; loading all 13 would use ~26K.
+
+5. **Memory system as redundant reinforcement**. Persistent memory (`MEMORY.md`) is loaded at session start as part of the system prompt. Even if skill instructions from mid-session are compressed away, the memory-seed patterns (trigger words, workflow rules, anti-patterns) remain in the system prompt. Memory reinforces what compression erodes.
+
+6. **CLI state machine as compression-proof enforcement**. The v2 workflow engine (insight #17) enforces workflow transitions via CLI exit codes, not instructions in the context window. It doesn't matter if the agent's context has degraded — `ag transition` either succeeds or fails based on artifact preconditions checked by Python, not by the LLM. Structural enforcement is immune to context rot.
+
+**What the framework CANNOT do**:
+
+- **Agents cannot self-clear**. There is no tool to reset the context window. The agent cannot invoke `/clear`.
+- **Agents cannot detect their own degradation**. An agent with a compressed context doesn't know what was compressed. It may confidently follow a workflow it's partially forgotten.
+- **Automatic compression is not selective**. The system compresses older messages uniformly — it can't preserve "important" skill instructions while compressing "unimportant" file reads.
+- **Single long conversations without subagents will degrade**. If you avoid `ag auto` and manually drive a 50-message implementation session, context will rot. The framework can't prevent this — it can only make the consequences manageable by keeping state on disk.
+
+**Practical guidance for autonomous sessions**:
+
+| Strategy | Why it works |
+|---|---|
+| Use `ag auto epic` / `ag auto crunch`, not manual loops | Each task gets a fresh subagent — context rot is bounded per task |
+| Keep individual tasks small (5–10 files) | Shorter context per task → less compression → better rule compliance |
+| Journal between tasks | External state survives context loss — fresh subagents read the journal |
+| Human checkpoints at natural breaks | `/clear` + new session resets context; `dashboard.sh` rehydrates state |
+| Prefer 3 focused sessions over 1 marathon | Fresh context windows > degraded long sessions |
+| Trust structural enforcement over behavioral | CLI gates work at token 1 and token 100K identically |
+
+**The meta-lesson**: Context windows are a depletable resource, not an infinite buffer. The framework can't prevent depletion, but it's architecturally designed so that each unit of work is short enough that depletion doesn't matter. External state files + fresh subagents + structural enforcement = a system that stays reliable even as individual context windows degrade. The agent's context rots; the project's state doesn't.
+
+**Authoritative design reference**: `docs/INSTRUCTION_ARCHITECTURE.md` §2 (Context Window Decay in Autonomous Sessions) — contains the full architectural analysis including the survival table, mitigation details, design implications, and relationship to the three-layer architecture.
+
+**See also**: Insight #9 (Deliberate Context Management), Insight #17 (CLI State Machines), `context-for-role.sh`, `.agentic/lib/auto/`
+
+---
+
 ## Summary: The Pattern
 
 These insights form a coherent pattern:
@@ -418,9 +536,12 @@ Tiny instruction file (50 lines)     → agent reads it all, reliably
   + Context provenance awareness     → don't misattribute automated context to users
   + State-based gates over position  → work regardless of execution order
   + CLI state machine enforcement    → workflow compliance as certainty, not probability
+  + End-to-end enforcement wiring   → existence ≠ activation; test the full chain
+  + Test projects as system feedback → synthetic tests verify components, test projects verify truth
+  + Context window decay           → depletable resource; architect around it with subagents + external state
 ```
 
-The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation.
+The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation. And the meta-meta-lesson from #18–#19: **you don't know if your enforcement works until you test the full system under real conditions**.
 
 ---
 

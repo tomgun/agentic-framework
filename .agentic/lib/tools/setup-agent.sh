@@ -93,6 +93,7 @@ setup_claude() {
     mkdir -p "$PROJECT_ROOT/.claude"
     cp "$HOOKS_SOURCE" "$PROJECT_ROOT/.claude/hooks.json"
     echo -e "${GREEN}✓ Installed hooks (.claude/hooks.json)${NC}"
+    echo -e "${YELLOW}  ⚠ Hooks take effect on next Claude session start. Restart Claude Code to activate.${NC}"
   fi
 
   # 3. Claude Skills (.claude/skills/)

@@ -495,6 +495,22 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
         is_safe = any(re.search(p, file_path) for p in safe_patterns)
 
         if not is_safe:
+            # F-0300 R1: Block code writes when no active work item in deferred-git mode
+            # With git_mode=deferred, pre-commit gates don't fire, so this is the
+            # only enforcement point. Agents must use `ag implement F-XXXX` to track work.
+            git_mode = get_setting(project_root, "git_mode", "active")
+            if not feature_id and git_mode != "active":
+                enforcement = get_setting(project_root, "state_enforcement", "off")
+                msg = (
+                    "Code edit blocked — no active work item. "
+                    "With git_mode=deferred, pre-commit gates are disabled. "
+                    "Use `ag start F-XXXX` or `ag auto task F-XXXX` to begin tracked work."
+                )
+                if enforcement == "blocking":
+                    return GateResult.deny([msg])
+                else:
+                    return GateResult.allow([msg])
+
             # F-0251: Block source code edits when ALL features are still "planned"
             # In formal modes, at least one feature must be in "implementing" or later
             # before source code can be written. This enforces the spec lifecycle.

@@ -31,6 +31,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Idea / remember / todo / note | STOP -> `ag todo "description"` |
 | Decompose / break down epic | STOP -> Run `ag decompose F-XXXX` |
 | Plan created / exited plan mode | STOP -> Save plan, run dialectical review if enabled, then implement |
+| Churn / batch / all tasks / build everything | STOP -> Run `ag auto crunch`. NEVER write code for multiple features outside `ag auto`. |
 
 ## Rules
 
@@ -41,6 +42,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 - Keep changes small and scoped (max 5-10 files per commit).
 - Every merge: bump VERSION via `ag done`. Update CONTRIBUTIONS.md during the PR.
 - Multi-session safety: never run destructive git ops when other sessions may be active.
+- NEVER write code for multiple features outside of `ag auto` commands. Batch work → `ag auto crunch`.
 
 Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`

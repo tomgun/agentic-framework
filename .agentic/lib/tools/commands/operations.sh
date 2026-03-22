@@ -370,45 +370,93 @@ cmd_docs() {
 }
 
 
-# Hooks command - manage git hook configuration
+# Hooks command - manage git and Claude Code hook configuration
 cmd_hooks() {
     local subcmd="${1:-}"
     local flag="${2:-}"
 
     case "$subcmd" in
         install)
-            if ! command -v git >/dev/null 2>&1 || ! git rev-parse --git-dir >/dev/null 2>&1; then
-                echo -e "${RED}Error: Not a git repository${NC}"
+            # Install both git hooks and Claude Code hooks (F-0300)
+            local installed_any=false
+
+            # Git hooks (if git is available)
+            if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+                git config core.hooksPath .agentic/hooks
+                echo -e "${GREEN}✓ Git hooks: core.hooksPath set to .agentic/hooks${NC}"
+                installed_any=true
+            else
+                echo -e "${YELLOW}⚠ Git hooks: skipped (not a git repository)${NC}"
+            fi
+
+            # Claude Code hooks
+            local hooks_source="$ROOT_DIR/.agentic/lib/claude-hooks/hooks.json"
+            local hooks_target="$ROOT_DIR/.claude/hooks.json"
+            if [[ -f "$hooks_source" ]]; then
+                mkdir -p "$ROOT_DIR/.claude"
+                cp "$hooks_source" "$hooks_target"
+                echo -e "${GREEN}✓ Claude hooks: installed (.claude/hooks.json)${NC}"
+                echo -e "${YELLOW}  ⚠ Restart Claude Code to activate hooks.${NC}"
+                installed_any=true
+            else
+                echo -e "${YELLOW}⚠ Claude hooks: source not found (.agentic/lib/claude-hooks/hooks.json)${NC}"
+            fi
+
+            if [[ "$installed_any" == "false" ]]; then
+                echo -e "${RED}✗ No hooks installed${NC}"
                 exit 1
             fi
-            git config core.hooksPath .agentic/hooks
-            echo -e "${GREEN}Hooks installed: core.hooksPath set to .agentic/hooks${NC}"
             ;;
         status)
-            if ! command -v git >/dev/null 2>&1 || ! git rev-parse --git-dir >/dev/null 2>&1; then
-                echo -e "${RED}Error: Not a git repository${NC}"
-                exit 1
-            fi
-            local hooks_path
-            hooks_path=$(git config core.hooksPath 2>/dev/null || echo "")
-            if [ "$hooks_path" = ".agentic/hooks" ]; then
-                echo -e "${GREEN}INSTALLED${NC}: core.hooksPath = .agentic/hooks"
-                # Show current mode
-                local mode="fast"
-                if [ -f "$ROOT_DIR/STACK.md" ]; then
-                    local raw
-                    raw=$(grep -iE "^[- ]*pre_commit_hook:" "$ROOT_DIR/STACK.md" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | tr -d ' ')
-                    case "$raw" in
-                        yes) mode="fast" ;;
-                        no|fast|full) mode="$raw" ;;
-                    esac
+            echo "Hook Status"
+            echo "━━━━━━━━━━━"
+
+            # Git hooks
+            echo ""
+            echo "Git hooks (pre-commit):"
+            if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+                local hooks_path
+                hooks_path=$(git config core.hooksPath 2>/dev/null || echo "")
+                if [ "$hooks_path" = ".agentic/hooks" ]; then
+                    echo -e "  ${GREEN}✓ INSTALLED${NC}: core.hooksPath = .agentic/hooks"
+                    local mode="fast"
+                    if [ -f "$ROOT_DIR/STACK.md" ]; then
+                        local raw
+                        raw=$(grep -iE "^[- ]*pre_commit_hook:" "$ROOT_DIR/STACK.md" 2>/dev/null | head -1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:]]*#.*//' | tr -d ' ')
+                        case "$raw" in
+                            yes) mode="fast" ;;
+                            no|fast|full) mode="$raw" ;;
+                        esac
+                    fi
+                    echo "  Mode: $mode (set pre_commit_hook in STACK.md)"
+                elif [ -n "$hooks_path" ]; then
+                    echo -e "  ${YELLOW}⚠ CUSTOM${NC}: core.hooksPath = $hooks_path"
+                else
+                    echo -e "  ${RED}✗ NOT INSTALLED${NC}: core.hooksPath not configured"
                 fi
-                echo "  Mode: $mode (set pre_commit_hook in STACK.md)"
-            elif [ -n "$hooks_path" ]; then
-                echo -e "${YELLOW}CUSTOM${NC}: core.hooksPath = $hooks_path (not .agentic/hooks)"
             else
-                echo -e "${RED}NOT INSTALLED${NC}: core.hooksPath not configured"
+                echo -e "  ${YELLOW}⚠ N/A${NC} (not a git repository — git_mode may be deferred)"
+            fi
+
+            # Claude Code hooks (F-0300)
+            echo ""
+            echo "Claude Code hooks (enforcement):"
+            local claude_hooks="$ROOT_DIR/.claude/hooks.json"
+            local hooks_source="$ROOT_DIR/.agentic/lib/claude-hooks/hooks.json"
+            if [[ -f "$claude_hooks" ]]; then
+                echo -e "  ${GREEN}✓ INSTALLED${NC}: .claude/hooks.json"
+                # Delegate to init.py --hooks-status for detailed per-hook reporting
+                if command -v python3 >/dev/null 2>&1; then
+                    python3 "$ROOT_DIR/.agentic/lib/auto/init.py" \
+                        --hooks-status --project-root "$ROOT_DIR" 2>/dev/null \
+                        | grep "^  " || true  # Show only the per-hook lines
+                fi
+            elif [[ -f "$hooks_source" ]]; then
+                echo -e "  ${RED}✗ NOT INSTALLED${NC}: .claude/hooks.json missing"
+                echo "  Source exists at .agentic/lib/claude-hooks/hooks.json"
                 echo "  Run: ag hooks install"
+            else
+                echo -e "  ${YELLOW}⚠ N/A${NC}: no hook source found"
             fi
             ;;
         disable)
@@ -434,9 +482,9 @@ cmd_hooks() {
             echo "Usage: ag hooks <install|status|disable>"
             echo ""
             echo "Commands:"
-            echo "  install             Set core.hooksPath to .agentic/hooks"
-            echo "  status              Show current hook configuration"
-            echo "  disable --confirm   Remove core.hooksPath (disables all quality gates)"
+            echo "  install             Install git hooks + Claude Code hooks"
+            echo "  status              Show current hook configuration (git + Claude)"
+            echo "  disable --confirm   Remove core.hooksPath (disables git quality gates)"
             ;;
     esac
 }

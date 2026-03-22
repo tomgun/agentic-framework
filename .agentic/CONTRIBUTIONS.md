@@ -8,6 +8,26 @@
 
 ## Recent Contributions
 
+### Context Window Decay — Architectural Analysis of Autonomous Session Degradation (v0.69.0)
+
+**User insight**: Tomas asked a fundamental question: "if you work in autonomous mode with the framework, how do you prevent the context rotting and filling too much so you forget the instructions and skills? Is it possible for you to auto-clear?" This forced an honest analysis of a problem the framework mitigates but cannot solve — LLM context windows fill monotonically, agents cannot self-clear, and automatic compression is lossy. Tomas then directed that the analysis be documented as first-class architecture, not just a conversational answer.
+
+Key contribution: Tomas insisted the detailed architectural analysis belong in `docs/INSTRUCTION_ARCHITECTURE.md` (the authoritative design doc), not hidden behind a cross-reference to KEY_INSIGHTS. The reasoning: context decay is a core architectural constraint that directly shapes the three-layer design — it's not just a "lesson learned," it's a design driver. This led to a full section in INSTRUCTION_ARCHITECTURE covering: what survives compression vs. what doesn't (with table), why autonomous sessions are especially vulnerable, 6 architectural mitigations, honest limitations, and 5 design implications that tie context decay directly back to why each layer exists. The analysis also appears as Insight #20 in KEY_INSIGHTS (strategic framing) and as a practical section with mermaid diagram in HOW_IT_WORKS.
+
+### Framework Enforcement Gaps — Test Project Evaluation Insights (F-0300, v0.69.0)
+
+**User insight**: Tomas ran two end-to-end test projects — Street Fury (GTA 1/2-style driving game, autonomous_formal + git_mode=deferred) and Algebra Rush (rhythm platformer, autonomous_formal + active git) — as deliberate stress tests of framework enforcement under realistic conditions. This is the methodology contribution: using real projects with varied configuration combinations to find gaps that synthetic tests miss.
+
+Key corrections Tomas made during the post-mortem analysis:
+
+1. **Restart requirement** — When the initial root cause pointed to "hooks never registered in settings.json," Tomas caught a nuance: hooks and skills may have been installed mid-session but Claude Code requires a restart to pick them up. This compounding factor (registration gap + no hot-reload) significantly changes the diagnosis and the fix.
+
+2. **Testing hierarchy already richer than documented** — When the analysis listed a 4-level testing hierarchy, Tomas corrected it: the framework already has `ag auto verify-framework` with self-healing (F-0215) and simulation testing with PhaseChecker + JSONL analysis (F-0242). The corrected 6-level hierarchy properly reflects existing capabilities.
+
+3. **Doc-reality drift on `feature.sh add`** — Tomas noticed that `feature.sh add "Title"` was documented in START_HERE.md and MANUAL_OPERATIONS.md but never implemented — a ghost command that exposed how init-time tooling gaps cascade.
+
+The agent-side analysis (R0–R6 recommendations, "agents are water" framing, enforcement wiring insights) was synthesized from these test project results and recorded in `docs/KEY_INSIGHTS.md` (#18, #19), `docs/INSTRUCTION_ARCHITECTURE.md` (A12), and `FRAMEWORK_DEVELOPMENT.md` (2 new lessons).
+
 ### Git-Deferred Mode + Spec Lifecycle Enforcement (F-0250, F-0251, PR #188)
 
 **User insight**: Tomas tested the framework end-to-end by initializing a fresh project with autonomous_formal and asking Claude to "build a geometry dash clone called algebra rush, work autonomously, tell me when playable." The agent delivered a working 1593-line Phaser 3 game in 5-10 minutes — an impressive onboarding experience. But Tomas then systematically analyzed what actually happened: git was initialized but zero commits made, the state machine was completely bypassed (all 6 features stayed "planned"), no backlog was populated, no plans were created, and only 3 of 6 features got AC files. The agent had skipped the entire formal workflow while still producing working software.

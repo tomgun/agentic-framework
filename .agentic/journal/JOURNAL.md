@@ -3970,3 +3970,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-21 21:29 - F-0300 Enforcement Gaps
+
+**Why**: Street Fury test project exposed that enforcement collapses when git is deferred
+
+**What changed**:
+- 7 structural enforcement fixes: hook install in auto init, deferred-git gates, batch-work triggers across all instruction files, ag auto unlocked for deferred git, verification gate in state machine, spawned agent enforcement rules
+
+**Next steps**:
+- PR review, merge, ag done
+
+**Blockers**: None
+

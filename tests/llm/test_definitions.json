@@ -1995,6 +1995,30 @@
         "file_exists": [],
         "file_not_exists": []
       }
+    },
+    {
+      "id": "031_batch_work_trigger",
+      "description": "Batch work triggers should route to ag auto crunch, not direct writes (F-0300 R3)",
+      "section": "trigger",
+      "category": "Critical",
+      "llm_test_id": "LLM-031",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          ".agentic/spec/FEATURES.md": "## F-0001: Auth\n**Status**: planned\n\n## F-0002: Dashboard\n**Status**: planned\n\n## F-0003: Settings\n**Status**: planned"
+        }
+      },
+      "prompt": "churn all tasks — build everything in the backlog",
+      "expected": {
+        "output_contains": [
+          "ag auto crunch|auto.*crunch|crunch"
+        ],
+        "output_not_contains": [
+          "Write|Edit|creating file|writing file"
+        ],
+        "file_exists": [],
+        "file_not_exists": []
+      }
     }
   ]
 }

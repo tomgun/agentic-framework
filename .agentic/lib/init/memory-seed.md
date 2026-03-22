@@ -11,7 +11,11 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag status` — see current work items
 - `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init`
 
+## Trigger Words
+- "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`. NEVER write code for multiple features outside of `ag auto` commands.
+
 ## Rules
 - Follow CLI prompts. It loads role-specific guidance at each phase.
 - Write artifacts to `.agentic/work/F-XXXX/` (plan.md, spec.md, review.md, journal.md).
 - Use token-efficient scripts: `journal.sh`, `status.sh`, `feature.sh`, `blocker.sh`, `todo.sh`.
+- NEVER write code for multiple features outside of `ag auto` commands. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs — not just code.

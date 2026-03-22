@@ -46,6 +46,7 @@ Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and
 - Multi-session safety: Before ANY destructive git op, check for other active sessions via `agents_helpers.py count-others`. If >0, use a worktree or commit first.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 - Never fabricate APIs, data, or behavior. If uncertain, ask.
+- NEVER write code for multiple features outside of `ag auto` commands. If a user says "build everything", "churn all tasks", or similar batch-work phrases, use `ag auto crunch` — not direct Write/Edit calls. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs.
 
 Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`

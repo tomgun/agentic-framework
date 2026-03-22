@@ -239,7 +239,7 @@ def gate_tests_written_to_implementing(feature_id: str, project_root: Path) -> G
 # ---------------------------------------------------------------------------
 
 def gate_implementing_to_verified(feature_id: str, project_root: Path) -> GateResult:
-    """Test files and AC file must exist.  Advisory: tests cover all ACs."""
+    """Test files and AC file must exist. Tests must pass (F-0300 R6)."""
     paths = get_paths(project_root)
     reasons: list[str] = []
     warnings: list[str] = []
@@ -276,6 +276,19 @@ def gate_implementing_to_verified(feature_id: str, project_root: Path) -> GateRe
         reasons.append(
             f"No test files reference {feature_id}"
         )
+
+    # F-0300 R6: Run verification commands if AC file has a Verification section
+    # This ensures tests actually pass, independent of git hooks
+    if ac_file.exists() and not reasons:
+        try:
+            from gate import check_verification_passes
+            verify_result = check_verification_passes(feature_id, project_root)
+            if verify_result.decision == "deny":
+                reasons.extend(verify_result.reasons)
+            elif verify_result.reasons:
+                warnings.extend(verify_result.reasons)
+        except Exception as e:
+            warnings.append(f"Verification check failed: {e}")
 
     # Advisory: check if tests reference all ACs from the acceptance file
     if ac_file.exists() and found_test:
