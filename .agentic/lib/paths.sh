@@ -110,6 +110,7 @@ NFR_FILE="$(_resolve_path "$AGENTIC_ROOT/spec/NFR.md" "$PROJECT_ROOT/spec/NFR.md
 REFERENCES_FILE="$(_resolve_path "$AGENTIC_ROOT/spec/REFERENCES.md" "$PROJECT_ROOT/spec/REFERENCES.md")"
 LESSONS_FILE="$(_resolve_path "$AGENTIC_ROOT/spec/LESSONS.md" "$PROJECT_ROOT/spec/LESSONS.md")"
 ACCEPTANCE_DIR="$(_resolve_path "$AGENTIC_ROOT/spec/acceptance" "$PROJECT_ROOT/spec/acceptance")"
+CONTRACTS_DIR="$(_resolve_path "$AGENTIC_ROOT/spec/contracts" "$PROJECT_ROOT/spec/contracts")"
 ADR_DIR="$(_resolve_path "$AGENTIC_ROOT/spec/adr" "$PROJECT_ROOT/spec/adr")"
 MIGRATIONS_DIR="$(_resolve_path "$AGENTIC_ROOT/spec/migrations" "$PROJECT_ROOT/spec/migrations")"
 
