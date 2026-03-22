@@ -226,6 +226,18 @@ if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/backlog_helpers.py" ]
     _py "$TOOLS_DIR/backlog_helpers.py" --project-root "$PROJECT_ROOT" check-staleness 7 >/dev/null 2>&1 && D_STALE="yes"
 fi
 
+# COMPLETION GATE (cheap check: is current backlog item still "planned"?)
+# Only reads FEATURES.md — no git subprocess. The expensive git-based commit
+# check runs in ag implement (the hard block), not here (advisory only).
+D_COMPLETION_STALE=""
+if [[ -n "${D_BACKLOG_CUR_ID:-}" ]] && [[ -f "$PROJECT_ROOT/.agentic/spec/FEATURES.md" ]]; then
+    _cg_status=$(grep -A3 "^## ${D_BACKLOG_CUR_ID}:" "$PROJECT_ROOT/.agentic/spec/FEATURES.md" 2>/dev/null \
+        | grep -oP '\*\*Status\*\*:\s*\K\w+' 2>/dev/null) || _cg_status=""
+    if [[ "$_cg_status" == "planned" ]]; then
+        D_COMPLETION_STALE="$D_BACKLOG_CUR_ID"
+    fi
+fi
+
 # ORPHANED PLANS (unsaved session-scoped plans needing review)
 # Note: This is distinct from periodic-checks.sh check_orphaned_plans() which uses
 # fingerprint matching and a 2+ feature ID threshold. dashboard uses plan-scan.sh
@@ -288,6 +300,8 @@ if $RAW_MODE; then
     echo "$D_DIRTY_STATE"
     echo "===STALE==="
     echo "$D_STALE"
+    echo "===COMPLETION_STALE==="
+    echo "$D_COMPLETION_STALE"
     exit 0
 fi
 
@@ -371,6 +385,11 @@ fi
 # Conditional: stale
 if [[ "$D_STALE" == "yes" ]]; then
     echo "⏰ Stale          Current backlog item is >7 days old — review priority"
+fi
+
+# Conditional: completion gate (stale prior feature)
+if [[ -n "$D_COMPLETION_STALE" ]]; then
+    echo "⚠️  Unfinished    $D_COMPLETION_STALE has merged code but isn't shipped — run: ag done $D_COMPLETION_STALE"
 fi
 
 # Conditional: upgrade

@@ -4,13 +4,15 @@
 # Depends on: SCRIPT_DIR, ROOT_DIR, PROFILE, color codes, paths.sh, settings.sh
 
 cmd_implement() {
-    # Parse flags from any position (--skip-clarity can come before or after F-XXXX)
+    # Parse flags from any position (--skip-clarity/--force can come before or after F-XXXX)
     local skip_clarity="${SKIP_CLARITY:-0}"
+    local force=0
     local feature_id=""
     local arg
     for arg in "$@"; do
         case "$arg" in
             --skip-clarity) skip_clarity=1 ;;
+            --force) force=1 ;;
             *) [[ -z "$feature_id" ]] && feature_id="$arg" ;;
         esac
     done
@@ -90,6 +92,29 @@ cmd_implement() {
                 echo "  $line"
             done
             echo ""
+        fi
+    fi
+
+    # 0b2. Completion gate: check if prior backlog items have merged code but aren't shipped
+    if [ "${SKIP_BACKLOG:-}" != "1" ]; then
+        local cg_out
+        cg_out=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" check-completion-gate "$feature_id" 2>/dev/null) || cg_out=""
+        if [ -n "$cg_out" ]; then
+            local cg_blocked cg_stale
+            cg_blocked=$(echo "$cg_out" | python3 -c "import json,sys; print(json.load(sys.stdin).get('blocked',False))" 2>/dev/null) || cg_blocked="False"
+            if [ "$cg_blocked" = "True" ]; then
+                cg_stale=$(echo "$cg_out" | python3 -c "import json,sys; print(json.load(sys.stdin).get('stale_feature',''))" 2>/dev/null) || cg_stale="unknown"
+                if [ "$force" = "1" ]; then
+                    echo -e "${YELLOW}WARNING: $cg_stale has merged code on main but is still marked 'planned'${NC}"
+                    echo "  Consider running: ag done $cg_stale"
+                    echo ""
+                else
+                    echo -e "${RED}BLOCKED: $cg_stale has merged code on main but is still marked 'planned'${NC}"
+                    echo "  Run: ag done $cg_stale"
+                    echo "  Or bypass: ag implement --force $feature_id"
+                    exit 1
+                fi
+            fi
         fi
     fi
 

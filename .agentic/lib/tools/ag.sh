@@ -252,7 +252,7 @@ case "${1:-help}" in
         cmd_plan "${2:-}" "${3:-}"
         ;;
     implement)
-        cmd_implement "${2:-}"
+        shift; cmd_implement "$@"
         ;;
     spec)
         cmd_spec "${2:-}"
