@@ -4,7 +4,7 @@
 
 **Date**: 2026-03-22
 **Trigger**: NHL Hockey Game test project (v0.70.0) — complete framework bypass under `autonomous_formal` + `state_enforcement: blocking`
-**Analysis**: `.agentic/work/F-0301/analysis.md`
+**Analysis**: `.agentic/journal/reviews/2026-03-22-nhl-hockey-game-enforcement-review.md`
 **Evidence**: `agentic-tests/nhl-hockey-game/to_agentic_af/`
 
 ---
@@ -82,7 +82,7 @@ fi
 - **FRAMEWORK_DEVELOPMENT.md**: Lessons Learned entry with enforcement chain diagram, 3 failure modes, 5 design principles
 - **docs/INSTRUCTION_ARCHITECTURE.md**: Design principles #9 (fail-closed enforcement) and #10 (silence is permission)
 - **CONTRIBUTIONS.md**: User's test methodology, evidence package creation, git interview finding
-- **docs/KEY_INSIGHTS.md**: NOT updated (outward-facing, keep concise)
+- **docs/KEY_INSIGHTS.md**: Concise outward-facing entry (§21)
 
 ### 7. (Deferred) Git Interview for autonomous_formal
 

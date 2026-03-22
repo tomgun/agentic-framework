@@ -749,7 +749,7 @@ Claude Code → hooks.json → PreToolUse.sh → python3 -m gate → GateResult
 
 **The cascade**: Once the first Write call succeeded without being blocked, the agent interpreted silence as permission. Sunk-cost psychology accelerated: 16 more files followed with zero friction in 5 minutes 41 seconds. All downstream gates (ag implement Gate 0, pre-commit checks, ag verify) are positioned AFTER workflow entry — an agent that bypasses the entry point bypasses everything.
 
-**Fixes applied (v0.71.0):**
+**Fixes applied (#190 + #191):**
 - PreToolUse.sh now **fails-closed** when `state_enforcement: blocking` — any non-zero gate exit → deny (with diagnostic message). Uses fast `grep` on STACK.md instead of Python to avoid the same failure mode.
 - Batch-work regex expanded with 8 semantic patterns ("work autonomously", "come back with working", "finish everything", "do it all", etc.).
 - on-code-edit.sh now warns when zero features are in implementing state (not just DRAFT plan detection).
