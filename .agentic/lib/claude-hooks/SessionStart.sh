@@ -11,6 +11,9 @@
 # 0 = Success (optional warning messages OK)
 # Non-zero = Hook failed (Claude may show error, but will continue)
 
+# Bootstrap: ensure lib/ is extracted (no-op if already present)
+bash "${CLAUDE_PROJECT_DIR:-.}/.agentic/bootstrap.sh" 2>/dev/null || true
+
 set -euo pipefail
 
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"

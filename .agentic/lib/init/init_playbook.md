@@ -249,57 +249,55 @@ add `- Domain: {type}` metadata to each feature. Map user-provided names to type
 
 **If no**: Skip. Single implicit domain, no `- Domain:` tag needed.
 
-## Step 1a: Set up your AI tool(s)
+## Step 1a: Verify AI tool setup
 
-**Ask the user which AI tool(s) they use:**
+The scaffold pre-installed configuration files for all supported AI tools.
+Now verify which tools the user actually uses and offer to clean up the rest.
 
-> "Which AI coding tool(s) will you use? (can pick multiple)
->
-> **a) Claude Code** - creates CLAUDE.md
-> **b) Cursor** - creates .cursorrules
-> **c) GitHub Copilot** - creates .github/copilot-instructions.md
-> **d) Codex CLI** - creates .codex/instructions.md
-> **e) Windsurf** - creates .windsurfrules
->
-> Type the letters for tools you use (e.g., 'ab' for Claude + Cursor, or just 'b' for Cursor only)"
+**Use AskUserQuestion** to ask which tools the user uses (multi-select):
 
-**Create files for ALL selected tools:**
-
-```bash
-# Examples based on user response:
-# User typed 'a' → 
-bash .agentic/lib/tools/setup-agent.sh claude
-
-# User typed 'ab' → 
-bash .agentic/lib/tools/setup-agent.sh claude
-bash .agentic/lib/tools/setup-agent.sh cursor
-
-# User typed 'abc' → 
-bash .agentic/lib/tools/setup-agent.sh claude
-bash .agentic/lib/tools/setup-agent.sh cursor
-bash .agentic/lib/tools/setup-agent.sh copilot
+```
+AskUserQuestion:
+  question: "Which AI coding tool(s) do you use? (scaffold pre-installed all — we'll clean up unused ones)"
+  header: "AI Tools"
+  multiSelect: true
+  options:
+    - label: "Claude Code"
+      description: "CLAUDE.md + hooks + skills (already active)"
+    - label: "Cursor"
+      description: ".cursorrules (already installed)"
+    - label: "GitHub Copilot"
+      description: ".github/copilot-instructions.md (already installed)"
+    - label: "Codex CLI"
+      description: ".codex/instructions.md (already installed)"
 ```
 
-**To add more tools later:**
+**For selected tools**: Verify files are present. If missing (manual setup without scaffold), run:
 ```bash
 bash .agentic/lib/tools/setup-agent.sh <tool>
 ```
 
-All tool files reference the same common rules (`.agentic/lib/agents/shared/`), so switching is seamless.
-
-### If Claude Code (a):
+**For tools NOT selected** (optional cleanup):
 ```bash
-# Set up Claude (creates CLAUDE.md automatically)
-bash .agentic/lib/tools/setup-agent.sh claude
+# Only remove if user confirms — these are harmless to keep
+# Example: user only uses Claude, offer to remove cursor/copilot/codex
+rm -f .cursorrules                        # Cursor
+rm -f .github/copilot-instructions.md     # Copilot
+rm -rf .codex/                            # Codex
+```
+If user declines cleanup or isn't sure, skip — all configs are harmless to keep.
 
-# Enable Claude hooks (automatic checkpoints!)
-mkdir -p .claude
-cp .agentic/lib/claude-hooks/hooks.json .claude/hooks.json
-
-echo "✓ Claude Code optimized:"
+### If Claude Code selected:
+```bash
+# Verify Claude setup (scaffold already installed these)
+if [[ -f .claude/hooks.json ]]; then
+  echo "✓ Claude Code hooks: active (installed by scaffold)"
+else
+  bash .agentic/lib/tools/setup-agent.sh claude
+fi
 echo "  - CLAUDE.md installed (instructions)"
-echo "  - Hooks enabled (automatic logging at checkpoints)"
-echo "  - Large context leveraged (can read all specs at once)"
+echo "  - Hooks active (enforcement + automatic checkpoints)"
+echo "  - Skills available (.claude/skills/)"
 ```
 
 **Seed persistent memory**: Read `.agentic/lib/init/memory-seed.md` and write its key patterns to Claude's persistent memory (`~/.claude/projects/*/memory/MEMORY.md`). This ensures workflow patterns survive across sessions even when CLAUDE.md gets compressed.
@@ -578,16 +576,81 @@ Please research current best practices for [environment]:
 
 ## Step 2: run init as an agent-guided planning session
 
-Interview the user to understand:
+Use **AskUserQuestion** to batch the interview into 2 efficient calls instead of sequential questions.
 
-1. **What are we building?** (1-2 sentence summary)
-2. **Primary platform?** (web/mobile/desktop/cli/game/audio plugin/etc.)
-3. **Tech stack?** (languages, frameworks, runtimes)
-4. **Key constraints?** (performance, security, compliance, offline-first, etc.)
-5. **Testing approach?** (TDD recommended, what test frameworks?)
-6. **E2E testing?** If the project has a UI (web, mobile, game), ask about E2E tests. Suggest a framework based on stack — see `.agentic/lib/quality/e2e_setup_guide.md` for per-stack recommendations. If they want E2E, help configure `Test commands:` and `E2E screenshots:` in STACK.md.
-7. **Project license?** (See Step 2a below - IMPORTANT!)
-8. **Quality constraints / NFRs?** (See Step 2c below)
+**Call 1 — Project basics** (4 questions):
+```
+AskUserQuestion:
+  questions:
+    - question: "What are we building?"
+      header: "Project"
+      options:
+        - label: "Web app"
+        - label: "Mobile app"
+        - label: "CLI tool"
+        - label: "Game"
+      # User will likely pick "Other" and type their own description
+    - question: "Primary platform?"
+      header: "Platform"
+      options:
+        - label: "Web"
+        - label: "Mobile"
+        - label: "Desktop"
+        - label: "CLI"
+    - question: "What's the tech stack?"
+      header: "Stack"
+      options:
+        - label: "TypeScript + Node"
+        - label: "Python"
+        - label: "Rust"
+        - label: "Go"
+      # User will often pick "Other" for specific frameworks
+    - question: "Project license?"
+      header: "License"
+      options:
+        - label: "MIT (Recommended)"
+          description: "Maximum freedom, most popular"
+        - label: "Apache 2.0"
+          description: "Like MIT + patent protection"
+        - label: "GPL-3.0"
+          description: "Copyleft — improvements must be shared"
+        - label: "Proprietary"
+          description: "All rights reserved"
+```
+
+**Call 2 — Constraints & testing** (up to 3 questions):
+```
+AskUserQuestion:
+  questions:
+    - question: "Key project constraints?"
+      header: "Constraints"
+      multiSelect: true
+      options:
+        - label: "Performance"
+        - label: "Security"
+        - label: "Compliance"
+        - label: "Offline-first"
+    - question: "Testing approach?"
+      header: "Testing"
+      options:
+        - label: "pytest"
+        - label: "jest / vitest"
+        - label: "cargo test"
+        - label: "go test"
+    - question: "E2E testing?"
+      header: "E2E"
+      options:
+        - label: "Playwright (Recommended)"
+          description: "Cross-browser, best DX"
+        - label: "Cypress"
+          description: "Mature, large community"
+        - label: "None"
+          description: "Skip E2E for now"
+```
+
+After collecting answers, proceed with the detailed steps below:
+- **License**: See Step 2a
+- **Quality constraints / NFRs**: See Step 2c
 
 ### Step 2a: Ask about project licensing ⭐
 

@@ -343,12 +343,11 @@ if [[ "${PROFILE}" == "discovery" ]]; then
   echo "  bash .agentic/lib/tools/setup-agent.sh cursor-agents  # Cursor-specific agents"
   echo "To enable Formal profile later: bash .agentic/lib/tools/enable-formal.sh"
   
-  # Note about tool setup (don't auto-create - let init_playbook ask)
   echo ""
   echo "Tool-specific setup:"
-  echo "  The agent will ask which AI tool(s) you use during initialization."
-  echo "  Or run manually: bash .agentic/lib/tools/setup-agent.sh <tool>"
-  echo "  Available: claude, cursor, copilot, codex"
+  echo "  ✓ All AI tool configs pre-installed (claude, cursor, copilot, codex)."
+  echo "  The agent will verify which tools you use and offer to prune unused configs."
+  echo "  To add tools later: bash .agentic/lib/tools/setup-agent.sh <tool>"
   exit 0
 fi
 
@@ -449,11 +448,10 @@ echo "  - Pipeline infrastructure: ✓ Created (AGENTS.json, .agentic/pipeline/)
 echo "  - Agent roles: Available in .agentic/lib/agents/roles/"
 echo "  - To copy roles to Cursor: bash .agentic/lib/tools/setup-agent.sh cursor-agents"
 
-# Note about tool setup (don't auto-create - let init_playbook ask)
 echo ""
 echo "Tool-specific setup:"
-echo "  The agent will ask which AI tool(s) you use during initialization."
-echo "  Or run manually: bash .agentic/lib/tools/setup-agent.sh <tool>"
-echo "  Available: claude, cursor, copilot, codex"
+echo "  ✓ All AI tool configs pre-installed (claude, cursor, copilot, codex)."
+echo "  The agent will verify which tools you use and offer to prune unused configs."
+echo "  To add tools later: bash .agentic/lib/tools/setup-agent.sh <tool>"
 
 

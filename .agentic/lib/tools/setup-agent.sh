@@ -89,11 +89,15 @@ setup_claude() {
 
   # 2. Claude Code hooks (.claude/hooks.json)
   local HOOKS_SOURCE="$AGENTIC_DIR/claude-hooks/hooks.json"
+  local HOOKS_TARGET="$PROJECT_ROOT/.claude/hooks.json"
   if [[ -f "$HOOKS_SOURCE" ]]; then
     mkdir -p "$PROJECT_ROOT/.claude"
-    cp "$HOOKS_SOURCE" "$PROJECT_ROOT/.claude/hooks.json"
-    echo -e "${GREEN}✓ Installed hooks (.claude/hooks.json)${NC}"
-    echo -e "${YELLOW}  ⚠ Hooks take effect on next Claude session start. Restart Claude Code to activate.${NC}"
+    if [[ -f "$HOOKS_TARGET" ]] && diff -q "$HOOKS_SOURCE" "$HOOKS_TARGET" >/dev/null 2>&1; then
+      echo -e "${GREEN}✓ Hooks verified (.claude/hooks.json — already up to date)${NC}"
+    else
+      cp "$HOOKS_SOURCE" "$HOOKS_TARGET"
+      echo -e "${GREEN}✓ Installed hooks (.claude/hooks.json)${NC}"
+    fi
   fi
 
   # 3. Claude Skills (.claude/skills/)

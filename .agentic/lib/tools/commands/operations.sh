@@ -394,9 +394,13 @@ cmd_hooks() {
             local hooks_target="$ROOT_DIR/.claude/hooks.json"
             if [[ -f "$hooks_source" ]]; then
                 mkdir -p "$ROOT_DIR/.claude"
-                cp "$hooks_source" "$hooks_target"
-                echo -e "${GREEN}✓ Claude hooks: installed (.claude/hooks.json)${NC}"
-                echo -e "${YELLOW}  ⚠ Restart Claude Code to activate hooks.${NC}"
+                if [[ -f "$hooks_target" ]] && diff -q "$hooks_source" "$hooks_target" >/dev/null 2>&1; then
+                    echo -e "${GREEN}✓ Claude hooks: verified (.claude/hooks.json — already up to date)${NC}"
+                else
+                    cp "$hooks_source" "$hooks_target"
+                    echo -e "${GREEN}✓ Claude hooks: installed (.claude/hooks.json)${NC}"
+                    echo -e "${YELLOW}  ⚠ Restart Claude Code to activate hooks.${NC}"
+                fi
                 installed_any=true
             else
                 echo -e "${YELLOW}⚠ Claude hooks: source not found (.agentic/lib/claude-hooks/hooks.json)${NC}"

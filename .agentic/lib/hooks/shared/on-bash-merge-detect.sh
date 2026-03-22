@@ -9,6 +9,9 @@
 #
 # Stdin: JSON with tool_name + tool_input (from Claude Code PostToolUse hook)
 
+# Bootstrap: ensure lib/ is extracted (no-op if already present)
+bash "${CLAUDE_PROJECT_DIR:-.}/.agentic/bootstrap.sh" 2>/dev/null || true
+
 set -uo pipefail
 
 # Read stdin once — fast exit if empty or no merge command

@@ -14,6 +14,9 @@
 #
 # Stdin: JSON with tool_name + tool_input (from Claude Code PostToolUse hook)
 
+# Bootstrap: ensure lib/ is extracted (no-op if already present)
+bash "${CLAUDE_PROJECT_DIR:-.}/.agentic/bootstrap.sh" 2>/dev/null || true
+
 set -uo pipefail
 
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-${PROJECT_ROOT:-.}}"
