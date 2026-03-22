@@ -4206,7 +4206,7 @@ Proposed restructuring:
 
 ## F-0240: Framework Execution Log
 
-**Status**: planned
+**Status**: shipped
 **Category**: Infrastructure
 **Priority**: medium
 **Complexity**: low
@@ -4232,7 +4232,7 @@ Proposed restructuring:
 
 ## F-0242: Simulation Testing (Phase + Sequence)
 
-**Status**: planned
+**Status**: shipped
 **Category**: Testing
 **Priority**: medium
 **Complexity**: high
@@ -4429,3 +4429,21 @@ Proposed restructuring:
 - Tests: LLM tests for trigger words, framework validation for gate changes, integration test with autonomous_formal + deferred git
 
 **Acceptance**: See `spec/acceptance/F-0300.md`
+
+---
+
+## F-0301: Completion Gate: Block New Work When Previous Feature Unfinished
+
+**Status**: planned
+**Category**: workflow
+**Priority**: medium
+**Complexity**: medium
+
+**Description**: `ag implement` and `ag start` check if the previous backlog item has implementation commits on main but no "shipped" status in FEATURES.md. If so, block with a clear message: "F-XXXX has merged code but was never marked shipped. Run `ag done F-XXXX` first." Prevents the pattern where agents ship code and move on without completing the ceremony (FEATURES.md update, VERSION bump, backlog cleanup). Direct-to-main commits are the primary gap — PR-based workflow already triggers `ag done` via `ag merge`.
+
+**Implementation**:
+- State: none
+- Code: (TODO)
+- Tests: (TODO)
+
+**Acceptance**: See `spec/acceptance/F-0301.md`

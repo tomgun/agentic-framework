@@ -1,19 +1,14 @@
 [
   {
     "type": "feature",
-    "id": "F-0242",
-    "description": "Simulation Testing (Phase + Sequence)",
-    "added_at": "2026-03-20T14:38:36Z",
+    "id": "F-0301",
+    "description": "Completion Gate: Block New Work When Previous Feature Unfinished",
+    "added_at": "2026-03-22T10:02:45Z",
     "added_by": "agent",
-    "became_current_at": "2026-03-22T07:26:08Z"
-  },
-  {
-    "type": "feature",
-    "id": "F-0240",
-    "description": "Framework Execution Log",
-    "added_at": "2026-03-20T14:38:31Z",
-    "added_by": "agent",
-    "became_current_at": "2026-03-20T14:38:31Z"
+    "refs": [
+      ".agentic/spec/acceptance/F-0301.md"
+    ],
+    "became_current_at": "2026-03-22T10:02:45Z"
   },
   {
     "type": "feature",

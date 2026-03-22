@@ -4035,3 +4035,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 10:08 - Feature status audit
+
+**Why**: 8 features had merged code but stale planned status — agents skipping ag done after direct-to-main commits
+
+**What changed**:
+- Fixed 3 stale features: F-0240+F-0242 marked shipped, F-0194 confirmed still planned (dead worktree code). Created F-0301 completion gate to structurally prevent ag done being skipped.
+
+**Next steps**:
+- Plan and implement F-0301
+
+**Blockers**: None
+
