@@ -1,0 +1,38 @@
+id: F-0118
+name: Documentation Drift & Lifecycle
+lifecycle: shipped
+since: v0.10.0
+profile: formal
+protection: contract
+category: quality
+consolidated_from: [F-0118, F-0119, F-0138, F-0139, F-0144, F-0207]
+
+description: |
+  Documentation drift detection compares code changes against docs.
+  Doc lifecycle system tracks documents from creation through staleness.
+  Feature change manifest generation records what changed for changelog.
+  Documentation impact tracking surfaces which docs need updating.
+  Systematic frontmatter coverage ensures metadata completeness.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "drift.sh or drift detection tool exists"
+    type: structural
+    verify: |
+      test -f .agentic/lib/tools/drift.sh ||
+      test -f .agentic/lib/tools/docs.sh
+    tests:
+      - tests/validate_framework.sh::F-0118
+
+  - id: AC-002
+    text: "Doc registry health check in pre-commit (advisory)"
+    type: structural
+    verify: |
+      grep -q "doc registry\|Doc registry\|docs_gate" .agentic/lib/hooks/pre-commit-check.sh
+    tests:
+      - tests/validate_framework.sh::F-0138
+
+nfr_refs: []
+migrations: []

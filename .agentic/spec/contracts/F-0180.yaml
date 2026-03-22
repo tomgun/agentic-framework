@@ -1,0 +1,26 @@
+id: F-0180
+name: Review Checkpoint Framework
+lifecycle: shipped
+since: v0.30.0
+profile: formal
+protection: advisory
+category: quality
+consolidated_from: [F-0180, F-0203]
+
+description: |
+  Configurable review checkpoints at key workflow stages (plan, code,
+  regression, merge). Modes: human, critical_agent, skip. Auto-commit/merge
+  mode delegates commit decisions to critical agent review.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "review.py handles review delegation"
+    type: structural
+    verify: "test -f .agentic/lib/auto/review.py"
+    tests:
+      - tests/validate_framework.sh::F-0180
+
+nfr_refs: []
+migrations: []

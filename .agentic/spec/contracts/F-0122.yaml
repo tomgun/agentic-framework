@@ -1,0 +1,42 @@
+id: F-0122
+name: Testing Infrastructure
+lifecycle: shipped
+since: v0.10.0
+profile: both
+protection: contract
+category: quality
+consolidated_from: [F-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242]
+
+description: |
+  Multi-tool LLM testing infrastructure validates agent behavior across
+  Claude, Cursor, Copilot. AC-level coverage tracking links tests to
+  specific acceptance criteria. QA tracker state machine manages verification
+  propagation. Central QA registry aggregates test results. Spec verification
+  tool checks completeness. Simulation testing validates phase sequences.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "LLM test directory exists with test scripts"
+    type: structural
+    verify: "test -d tests/llm/tests"
+    tests:
+      - tests/validate_framework.sh::F-0122
+
+  - id: AC-002
+    text: "QA registry tracks test-feature mapping"
+    type: structural
+    verify: "test -f tests/qa_registry.py"
+    tests:
+      - tests/validate_framework.sh::F-0241
+
+  - id: AC-003
+    text: "validate_framework.sh exists with structural assertions"
+    type: structural
+    verify: "test -f tests/validate_framework.sh"
+    tests:
+      - tests/validate_framework.sh::F-0171
+
+nfr_refs: []
+migrations: []
