@@ -4239,3 +4239,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 21:39 - F-0302 Phase 3 shipped
+
+**Why**: Spec system overhaul — contracts replace markdown ACs as source of truth
+
+**What changed**:
+- YAML contracts are now the primary spec system — 217 features consolidated to 33, all commands/scripts/tests updated, PR #195 merged
+
+**Next steps**:
+- Phase 4: Protection & Cleanup
+
+**Blockers**: None
+
+
+### Session: 2026-03-22 21:40 - F-0302 shipped — v0.73.0
+
+**Why**: Post-merge completion
+
+**What changed**:
+- VERSION bump, contract lifecycle shipped, backlog advanced to F-0243
+
+**Next steps**:
+- Phase 4 or next backlog item
+
+**Blockers**: None
+

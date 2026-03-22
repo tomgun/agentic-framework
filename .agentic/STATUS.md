@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0302 Phase 3 complete — switchover to YAML contracts (Updated: 2026-03-22 20:58 UTC)
+- F-0302 Phase 3 shipped — next: F-0243 Complexity Tier Experiments (Updated: 2026-03-22 21:39 UTC)
 
 ## Current focus
 - **F-0302: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
@@ -34,4 +34,4 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 ## Release notes (optional)
 - v0.58.0: F-0239 structural enforcement for post-merge workflow
 - See CHANGELOG.md for full history
-- QA: QA: 0/1 verified, 5 pending
+- QA: QA: 0/1 verified, 6 pending

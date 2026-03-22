@@ -350,7 +350,7 @@ Claude Code hooks for automated enforcement: pre-commit checks, post-tool valida
 
 ## F-0302: Spec System Overhaul — YAML Contracts
 
-**Status**: implementing | **Category**: core-workflow | **Profile**: formal
+**Status**: shipped
 **Contract**: [`spec/contracts/F-0302.yaml`](contracts/F-0302.yaml)
 
 YAML contracts replace markdown acceptance criteria as source of truth. Machine-verifiable assertions, migration-protected shipped contracts, user_input as control interface. Consolidates 217 legacy features into ~33 contracts.
