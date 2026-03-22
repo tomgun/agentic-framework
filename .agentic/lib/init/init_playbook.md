@@ -578,9 +578,9 @@ Please research current best practices for [environment]:
 
 ## Step 2: run init as an agent-guided planning session
 
-Use **AskUserQuestion** to batch the interview into 2 efficient calls instead of sequential questions.
+Use **AskUserQuestion** in 2 calls. Call 2 is **dynamic** — adapt options based on Call 1 answers.
 
-**Call 1 — Project basics** (4 questions, user will often pick "Other" for free-text answers):
+**Call 1 — Project identity** (4 questions, user will often pick "Other" for free-text):
 ```json
 {
   "questions": [
@@ -632,7 +632,21 @@ Use **AskUserQuestion** to batch the interview into 2 efficient calls instead of
 }
 ```
 
-**Call 2 — Constraints & testing** (up to 3 questions):
+**Call 2 — Constraints & testing** (DYNAMIC — build based on Call 1 answers):
+
+Adapt the testing and E2E options to the stack/platform from Call 1:
+
+| Call 1 stack | Testing options | E2E options |
+|---|---|---|
+| TypeScript/Node | jest, vitest, mocha | Playwright, Cypress |
+| Python | pytest, unittest | Playwright, Selenium |
+| Rust | cargo test | skip (no UI) |
+| Go | go test | skip (no UI) |
+| Game (any stack) | framework-specific (e.g. Phaser test utils) | visual regression |
+
+**Only include E2E question if the platform has a UI** (web, mobile, game, desktop). Skip for CLI/API-only projects.
+
+Example for a TypeScript web app:
 ```json
 {
   "questions": [
@@ -648,14 +662,13 @@ Use **AskUserQuestion** to batch the interview into 2 efficient calls instead of
       ]
     },
     {
-      "question": "Testing approach?",
+      "question": "Testing framework?",
       "header": "Testing",
       "multiSelect": false,
       "options": [
-        {"label": "pytest", "description": "Python testing"},
-        {"label": "jest / vitest", "description": "JavaScript/TypeScript testing"},
-        {"label": "cargo test", "description": "Rust testing"},
-        {"label": "go test", "description": "Go testing"}
+        {"label": "vitest (Recommended)", "description": "Fast, Vite-native, ESM-first"},
+        {"label": "jest", "description": "Mature, large ecosystem"},
+        {"label": "mocha + chai", "description": "Flexible, configurable"}
       ]
     },
     {
@@ -666,6 +679,35 @@ Use **AskUserQuestion** to batch the interview into 2 efficient calls instead of
         {"label": "Playwright (Recommended)", "description": "Cross-browser, best DX"},
         {"label": "Cypress", "description": "Mature, large community"},
         {"label": "None", "description": "Skip E2E for now"}
+      ]
+    }
+  ]
+}
+```
+
+Example for a Python CLI tool (no E2E question):
+```json
+{
+  "questions": [
+    {
+      "question": "Key project constraints?",
+      "header": "Constraints",
+      "multiSelect": true,
+      "options": [
+        {"label": "Performance", "description": "Low latency, high throughput"},
+        {"label": "Security", "description": "Auth, encryption, OWASP"},
+        {"label": "Compliance", "description": "GDPR, HIPAA, SOC2"},
+        {"label": "Offline-first", "description": "Works without network"}
+      ]
+    },
+    {
+      "question": "Testing framework?",
+      "header": "Testing",
+      "multiSelect": false,
+      "options": [
+        {"label": "pytest (Recommended)", "description": "De facto Python standard"},
+        {"label": "unittest", "description": "Built-in, no dependencies"},
+        {"label": "hypothesis", "description": "Property-based testing"}
       ]
     }
   ]
