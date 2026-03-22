@@ -4100,3 +4100,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 12:43 - F-0302 state update
+
+**Why**: Ensuring agents see F-0302 as high-priority multi-session work
+
+**What changed**:
+- Renamed F-0302 to clarify scope: full spec system refactoring. Updated STATUS.md, BACKLOG.json, plan files.
+
+**Next steps**:
+- PR creation, then continue Phase 0 in next session
+
+**Blockers**: None
+

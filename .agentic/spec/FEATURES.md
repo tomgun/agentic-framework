@@ -4447,3 +4447,21 @@ Proposed restructuring:
 - Tests: (TODO)
 
 **Acceptance**: See `spec/acceptance/F-0301.md`
+
+---
+
+## F-0302: Spec System Overhaul — YAML Contracts
+
+**Status**: planned
+**Category**: --category
+**Priority**: medium
+**Complexity**: medium
+
+**Description**: (TODO: add description)
+
+**Implementation**:
+- State: none
+- Code: (TODO)
+- Tests: (TODO)
+
+**Acceptance**: See `spec/acceptance/F-0302.md`
