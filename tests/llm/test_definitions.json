@@ -658,7 +658,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "spec/FEATURES.md": "# Features\n\n## F-0001: User Authentication\n- Status: in_progress\n- Priority: high\n- Acceptance: spec/acceptance/F-0001.md\n\n## F-0002: Product Catalog\n- Status: shipped\n- Priority: high",
+          "spec/FEATURES.md": "# Features\n\n## F-0001: User Authentication\n- Status: in_progress\n- Priority: high\n- Acceptance: spec/contracts/F-0001.md\n\n## F-0002: Product Catalog\n- Status: shipped\n- Priority: high",
           "spec/acceptance/F-0001.md": "# F-0001: User Authentication\n\n## Acceptance Criteria\n- [x] Users can register with email/password\n- [x] Users can login and receive JWT\n- [x] Password reset via email\n- [x] Session management with refresh tokens\n\n## Tests\n- All 12 auth tests passing",
           ".agentic/journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-02-04\n- Finished password reset flow\n- All acceptance criteria met\n- 12/12 tests passing",
           "CHANGELOG.md": "# Changelog\n\n## [Unreleased]\n\n## [0.19.0] - 2026-02-01\n- Product catalog shipped"
@@ -795,7 +795,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Dashboard\n- Status: shipped\n- Domain: frontend\n- Acceptance: spec/acceptance/F-0001.md\n\n## F-0002: Products API\n- Status: shipped\n- Domain: backend\n- Acceptance: spec/acceptance/F-0002.md"
+          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Dashboard\n- Status: shipped\n- Domain: frontend\n- Acceptance: spec/contracts/F-0001.md\n\n## F-0002: Products API\n- Status: shipped\n- Domain: backend\n- Acceptance: spec/contracts/F-0002.md"
         }
       },
       "prompt": "Add a new feature F-0003 for a mobile shopping cart screen to FEATURES.md. This is a mobile feature.",
@@ -847,7 +847,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: in_progress\n- Acceptance: spec/acceptance/F-0001.md",
+          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: in_progress\n- Acceptance: spec/contracts/F-0001.md",
           "spec/acceptance/F-0001.md": "# F-0001: User Authentication\n\n## Acceptance Criteria\n- [x] Login form validates email and password\n- [x] JWT tokens issued on successful login\n- [x] Session expires after 30 minutes"
         }
       },
@@ -931,7 +931,7 @@
       "prompt": "Add a tip of the day feature to the session start dashboard",
       "expected": {
         "output_contains": [
-          "acceptance|spec/acceptance|F-[0-9]{4}|feature.*ID|FEATURES.md|criteria"
+          "acceptance|contract|spec/contracts|spec/acceptance|F-[0-9]{4}|feature.*ID|FEATURES.md|criteria"
         ],
         "output_contains_any": [
           "ag plan|ag implement|plan.*review"
@@ -1015,7 +1015,7 @@
       "expected": {
         "output_contains": [],
         "output_contains_any": [
-          "acceptance|criteria|spec/acceptance|before.*implement|need.*acceptance|create.*acceptance"
+          "acceptance|criteria|contract|spec/contracts|spec/acceptance|before.*implement|need.*acceptance|need.*contract|create.*acceptance|create.*contract"
         ],
         "output_not_contains": [
           "```javascript|```html|```css|class.*SearchBar|function.*search"
@@ -1344,14 +1344,14 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "spec/FEATURES.md": "# Features\n\n## F-0010: Search Feature\n\n**Status**: planned\n**Priority**: high\n\n**Description**: Add search functionality.\n\n**Acceptance**: See `spec/acceptance/F-0010.md`",
+          "spec/FEATURES.md": "# Features\n\n## F-0010: Search Feature\n\n**Status**: planned\n**Priority**: high\n\n**Description**: Add search functionality.\n\n**Acceptance**: See `spec/contracts/F-0010.yaml`",
           "spec/acceptance/F-0010.md": "# F-0010: Search Feature\n\n## Tests\n- Search returns matching results\n- Empty search returns all items\n\n## Acceptance Criteria\n- [ ] Search input field on main page\n- [ ] Results update as user types"
         }
       },
       "prompt": "Implement F-0010, the search feature",
       "expected": {
         "output_contains": [
-          "ag implement|acceptance|criteria|plan|WIP|spec.acceptance|F-0010"
+          "ag implement|acceptance|criteria|contract|plan|WIP|spec.acceptance|spec.contract|F-0010"
         ],
         "output_contains_any": [],
         "output_not_contains": [],
@@ -1417,7 +1417,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "spec/FEATURES.md": "# Features\n\n## F-0020: Notification System\n\n**Status**: planned\n**Priority**: high\n\n**Description**: Add user notification system.\n\n**Acceptance**: See `spec/acceptance/F-0020.md`",
+          "spec/FEATURES.md": "# Features\n\n## F-0020: Notification System\n\n**Status**: planned\n**Priority**: high\n\n**Description**: Add user notification system.\n\n**Acceptance**: See `spec/contracts/F-0020.yaml`",
           "spec/acceptance/F-0020.md": "# F-0020: Notification System\n\n## Acceptance Criteria\n\n- **AC-001**: Users receive notifications for new messages\n- **AC-002**: Notification delivery must be fast and responsive\n- **AC-003**: Users can configure notification preferences",
           "STACK.md": "# STACK.md\n\n## Settings\n- profile: formal\n- spec_analysis: on\n\n## Languages & runtimes\n- Language(s): JavaScript"
         }
@@ -1425,7 +1425,7 @@
       "prompt": "Implement F-0020, the notification system",
       "expected": {
         "output_contains": [
-          "acceptance|criteria|plan|ag implement|F-0020"
+          "acceptance|criteria|contract|plan|ag implement|F-0020"
         ],
         "output_contains_any": [
           "spec.analy|ambig|vague|finding|MEDIUM|spec-analyze|advisory|metric"
@@ -1682,7 +1682,7 @@
           "block|BLOCKED|fail|error|exit|non-zero|prevent"
         ],
         "output_contains_any": [
-          "gate|transition|acceptance|criteria|state_enforcement"
+          "gate|transition|acceptance|criteria|contract|state_enforcement"
         ],
         "output_not_contains": [
           "advisory|warning only|proceed anyway|continue regardless"
@@ -1816,7 +1816,7 @@
       "prompt": "implement F-0100",
       "expected": {
         "output_contains": [
-          "acceptance|criteria|AC|spec",
+          "acceptance|criteria|contract|AC|spec",
           "plan|planning|design|ag plan"
         ],
         "output_not_contains": [
@@ -1844,7 +1844,7 @@
       "expected": {
         "output_contains": [
           "plan|ag plan|ag start|planning|before.*implement|first.*need|requirement|define|before.*cod",
-          "acceptance|criteria|spec|AC|define.*require"
+          "acceptance|criteria|contract|spec|AC|define.*require"
         ],
         "output_not_contains": [
           "def process_payment|class PaymentService|```python.*def.*payment|```python.*class.*Payment",
@@ -1900,7 +1900,7 @@
       "prompt": "The plan for F-0100 is approved. I want to start implementing. What artifacts are needed before I can write code?",
       "expected": {
         "output_contains": [
-          "acceptance|criteria|AC|spec.*acceptance|F-0100.md",
+          "acceptance|criteria|contract|AC|spec.*acceptance|spec.*contract|F-0100",
           "plan|APPROVED|approved|plan.*approved"
         ],
         "output_not_contains": [

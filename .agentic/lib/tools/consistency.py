@@ -98,9 +98,11 @@ def check_consistency(features: dict[str, dict], repo_root: Path) -> list[str]:
         
         # Issue: Acceptance file missing for non-deprecated features
         if status not in {"deprecated"} and state not in {"none"}:
-            acc_file = get_paths(repo_root).acceptance_dir / f"{fid}.md"
-            if not acc_file.exists():
-                issues.append(f"{fid}: Missing acceptance file spec/acceptance/{fid}.md")
+            p = get_paths(repo_root)
+            contract_file = p.contracts_dir / f"{fid}.yaml"
+            acc_file = p.acceptance_dir / f"{fid}.md"
+            if not contract_file.exists() and not acc_file.exists():
+                issues.append(f"{fid}: Missing contract spec/contracts/{fid}.yaml (or legacy spec/acceptance/{fid}.md)")
     
     return issues
 

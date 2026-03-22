@@ -52,10 +52,15 @@ check_feature() {
     STATUS=$(grep -A5 "^## ${FID}:" .agentic/spec/FEATURES.md | grep -i "status" | head -1 | sed 's/.*: *//' | tr -d '* ' || echo "unknown")
     echo -e "  ${BLUE}ℹ${NC} Status: $STATUS"
 
-    # 2. Acceptance file exists and has required sections
-    local ACCEPT_FILE=".agentic/spec/acceptance/${FID}.md"
-    if [[ -f "$ACCEPT_FILE" ]]; then
-        echo -e "  ${GREEN}✓${NC} Acceptance file exists"
+    # 2. Contract/acceptance file exists and has required sections
+    local ACCEPT_FILE=""
+    if [[ -f "$CONTRACTS_DIR/${FID}.yaml" ]]; then
+        ACCEPT_FILE="$CONTRACTS_DIR/${FID}.yaml"
+    elif [[ -f "$ACCEPTANCE_DIR/${FID}.md" ]]; then
+        ACCEPT_FILE="$ACCEPTANCE_DIR/${FID}.md"
+    fi
+    if [[ -n "$ACCEPT_FILE" && -f "$ACCEPT_FILE" ]]; then
+        echo -e "  ${GREEN}✓${NC} Contract/acceptance file exists"
 
         # Check required sections
         for section in "## Tests" "## Acceptance Criteria" "## Out of Scope"; do
@@ -109,10 +114,10 @@ check_feature() {
         fi
     else
         if echo "$STATUS" | grep -qi "shipped\|in.progress"; then
-            echo -e "  ${RED}✗${NC} Missing acceptance file (required for $STATUS features)"
+            echo -e "  ${RED}✗${NC} Missing contract/acceptance file (required for $STATUS features)"
             local_errors=$((local_errors + 1))
         else
-            echo -e "  ${YELLOW}⚠${NC} No acceptance file yet (status: $STATUS)"
+            echo -e "  ${YELLOW}⚠${NC} No contract/acceptance file yet (status: $STATUS)"
             local_warnings=$((local_warnings + 1))
         fi
     fi

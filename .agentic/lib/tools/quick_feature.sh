@@ -144,7 +144,7 @@ ${CATEGORY_LINE}**Priority**: $PRIORITY
 - Code: 
 - Tests: 
 
-**Acceptance**: See \`.agentic/spec/acceptance/$FEATURE_ID.md\`
+**Acceptance**: See \`.agentic/spec/contracts/$FEATURE_ID.yaml\`
 "
 
 # Append to FEATURES.md
@@ -162,6 +162,6 @@ echo "Complexity: $COMPLEXITY"
 echo ""
 echo "Next steps:"
 echo "  1. Edit .agentic/spec/FEATURES.md to add description"
-echo "  2. Create .agentic/spec/acceptance/$FEATURE_ID.md with acceptance criteria"
+echo "  2. Create .agentic/spec/contracts/$FEATURE_ID.yaml with acceptance criteria"
 echo "  3. Tell your agent: \"Implement $FEATURE_ID\""
 

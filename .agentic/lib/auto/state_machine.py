@@ -68,9 +68,35 @@ STATUS_ALIASES: dict[str, FeatureState] = {
     "in-progress": FeatureState.IMPLEMENTING,
 }
 
+# Contract lifecycle -> FeatureState mapping (F-0302: YAML contracts)
+LIFECYCLE_TO_STATE: dict[str, FeatureState] = {
+    "exploring": FeatureState.PLANNED,
+    "specifying": FeatureState.CRITERIA_SET,
+    "implementing": FeatureState.IMPLEMENTING,
+    "verifying": FeatureState.VERIFIED,
+    "shipping": FeatureState.COMMITTED,
+    "shipped": FeatureState.SHIPPED,
+    "deprecated": FeatureState.DEPRECATED,
+}
+
+# FeatureState -> contract lifecycle (reverse mapping for writes)
+STATE_TO_LIFECYCLE: dict[FeatureState, str] = {
+    FeatureState.PLANNED: "exploring",
+    FeatureState.SPECCED: "exploring",
+    FeatureState.CRITERIA_SET: "specifying",
+    FeatureState.TESTS_WRITTEN: "specifying",
+    FeatureState.IMPLEMENTING: "implementing",
+    FeatureState.VERIFIED: "verifying",
+    FeatureState.DOCUMENTED: "shipping",
+    FeatureState.COMMITTED: "shipping",
+    FeatureState.SHIPPED: "shipped",
+    FeatureState.DEPRECATED: "deprecated",
+}
+
 # All valid status strings (for validation messages)
 ALL_VALID_STATUSES: set[str] = (
     {s.value for s in FeatureState} | set(STATUS_ALIASES.keys())
+    | set(LIFECYCLE_TO_STATE.keys())
 )
 
 
@@ -148,13 +174,15 @@ class FeatureStateMachine:
 
     @staticmethod
     def resolve_state(status_str: str) -> FeatureState:
-        """Resolve a status string to a FeatureState, handling aliases.
+        """Resolve a status string to a FeatureState, handling aliases and lifecycle values.
 
         Raises ValueError for unknown status strings.
         """
         normalized = status_str.lower().replace("-", "_").strip()
         if normalized in STATUS_ALIASES:
             return STATUS_ALIASES[normalized]
+        if normalized in LIFECYCLE_TO_STATE:
+            return LIFECYCLE_TO_STATE[normalized]
         try:
             return FeatureState(normalized)
         except ValueError:
@@ -166,8 +194,23 @@ class FeatureStateMachine:
     # -- Reading current state -----------------------------------------------
 
     def get_current_state(self, feature_id: str) -> Optional[FeatureState]:
-        """Read current state from FEATURES.md."""
+        """Read current state — tries contract YAML first, falls back to FEATURES.md."""
+        state = self._get_current_state_from_contract(feature_id)
+        if state is not None:
+            return state
         return self._get_current_state_v1(feature_id)
+
+    def _get_current_state_from_contract(self, feature_id: str) -> Optional[FeatureState]:
+        """Read lifecycle from contract YAML and map to FeatureState."""
+        contract_file = self.paths.contracts_dir / f"{feature_id}.yaml"
+        if not contract_file.exists():
+            return None
+        try:
+            from contracts import load_contract
+            contract = load_contract(contract_file)
+            return LIFECYCLE_TO_STATE.get(contract.lifecycle)
+        except Exception:
+            return None
 
     def _get_current_state_v1(self, feature_id: str) -> Optional[FeatureState]:
         """Read current state from FEATURES.md (v1 path).
@@ -279,7 +322,7 @@ class FeatureStateMachine:
         """
         current = self.get_current_state(feature_id)
         if current is None:
-            return False, [f"Feature {feature_id} not found in FEATURES.md"]
+            return False, [f"Feature {feature_id} not found (no contract or FEATURES.md entry)"]
 
         if current == target:
             return True, [
@@ -388,6 +431,22 @@ class FeatureStateMachine:
                 f"{current.value if current else '?'} -> {target.value}",
             )
             return True, messages
+
+        # Update contract YAML lifecycle (primary source of truth)
+        contract_file = self.paths.contracts_dir / f"{feature_id}.yaml"
+        if contract_file.exists():
+            try:
+                from contracts import load_contract, save_contract
+                contract = load_contract(contract_file)
+                new_lifecycle = STATE_TO_LIFECYCLE.get(target, contract.lifecycle)
+                if new_lifecycle != contract.lifecycle:
+                    contract.lifecycle = new_lifecycle
+                    # Update protection for shipped contracts
+                    if new_lifecycle == "shipped":
+                        contract.protection = "contract"
+                    save_contract(contract, contract_file)
+            except Exception as e:
+                messages.append(f"Warning: failed to update contract: {e}")
 
         # Update FEATURES.md via feature.sh for consistency
         feature_sh = self.paths.tools_dir / "feature.sh"

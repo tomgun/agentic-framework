@@ -9,7 +9,7 @@
 setup_test_project "formal"
 
 # Create NFR.md
-mkdir -p .agentic/spec/acceptance
+mkdir -p .agentic/spec/contracts .agentic/spec/acceptance
 cat > .agentic/spec/NFR.md <<'EOF'
 ## NFR-0001: Response time
 - Category: performance

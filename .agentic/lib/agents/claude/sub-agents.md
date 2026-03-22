@@ -75,7 +75,7 @@ Or use Claude's background agent feature:
 
 ```
 In the background, run a test agent for F-0042.
-Write failing tests based on .agentic/spec/acceptance/F-0042.md
+Write failing tests based on .agentic/spec/contracts/F-0042.yaml
 Update .agentic/pipeline/F-0042-pipeline.md when complete.
 ```
 
@@ -111,7 +111,7 @@ Research authentication options for Next.js 15:
 As Planning Agent (see .agentic/lib/agents/roles/planning_agent.md):
 
 Based on the research:
-- Define acceptance criteria in .agentic/spec/acceptance/F-0042.md
+- Define contract assertions in .agentic/spec/contracts/F-0042.yaml
 - Update .agentic/spec/FEATURES.md with F-0042
 - Create ADR-0005 for auth decision
 - Update pipeline with handoff notes
@@ -123,7 +123,7 @@ Based on the research:
 As Test Agent (see .agentic/lib/agents/roles/test_agent.md):
 
 Write failing tests for F-0042:
-- Read .agentic/spec/acceptance/F-0042.md
+- Read .agentic/spec/contracts/F-0042.yaml
 - Create tests/auth.test.ts
 - All tests should FAIL (red phase)
 - Update pipeline with test count
@@ -176,7 +176,7 @@ Each should:
 
 ## Completed Agents
 - [x] Research Agent (10:30) → docs/research/auth-2026-01-02.md
-- [x] Planning Agent (11:30) → .agentic/spec/acceptance/F-0042.md
+- [x] Planning Agent (11:30) → .agentic/spec/contracts/F-0042.yaml
 - [x] Test Agent (13:00) → tests/auth.test.ts (15 tests, all RED)
 - [ ] Implementation Agent (started 14:00)
 
@@ -193,7 +193,7 @@ Each should:
 - See: docs/research/auth-2026-01-02.md
 
 ### Planning → Test
-- 6 acceptance criteria defined
+- 6 contract assertions defined
 - Focus on: login, logout, session persistence
 - Edge cases: expired tokens, concurrent sessions
 

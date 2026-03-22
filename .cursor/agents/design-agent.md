@@ -11,7 +11,7 @@ tokens: ~450
 
 ## Context to Read
 
-- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria (user-facing requirements)
+- `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria (user-facing requirements)
 - `STACK.md` - Frontend framework, component library
 - `CONTEXT_PACK.md [Modules]` - Existing UI components and patterns
 - `docs/DESIGN_SYSTEM.md` - Design system (if exists)
@@ -30,7 +30,7 @@ tokens: ~450
 ## Workflow
 
 ```
-1. Read acceptance criteria to understand user needs
+1. Read contract assertions to understand user needs
 2. Map user flow (steps, decision points, error states)
 3. Create wireframes for each screen/state
 4. Specify components with props, states, variants

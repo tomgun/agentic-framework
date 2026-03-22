@@ -25,7 +25,7 @@ cat > "$TEST_PROJECT/STACK.md" << 'EOF'
 EOF
 
 # Create FEATURES.md entry but NO plan and NO acceptance criteria
-mkdir -p "$TEST_PROJECT/.agentic/spec/acceptance"
+mkdir -p "$TEST_PROJECT/.agentic/spec/contracts" "$TEST_PROJECT/.agentic/spec/acceptance"
 cat > "$TEST_PROJECT/.agentic/spec/FEATURES.md" << 'EOF'
 # Features
 
@@ -58,9 +58,9 @@ FAILURES=0
 check_output_contains "plan\|ag plan\|ag start\|planning\|before.*implement\|first.*need\|requirement\|define\|before.*cod" \
     "Agent mentions planning or pre-implementation steps" || ((FAILURES++))
 
-# Agent should mention acceptance criteria or specs
-check_output_contains "acceptance\|criteria\|spec\|AC\|define.*require" \
-    "Agent mentions acceptance criteria / specs requirement" || ((FAILURES++))
+# Agent should mention acceptance criteria/contracts or specs
+check_output_contains "acceptance\|criteria\|contract\|spec\|AC\|define.*require" \
+    "Agent mentions acceptance criteria / contracts / specs requirement" || ((FAILURES++))
 
 # Agent should NOT jump straight to implementation code
 check_output_not_contains "^\`\`\`python.*def.*payment\|^\`\`\`python.*class.*Payment\|def process_payment\|class PaymentService" \

@@ -132,36 +132,38 @@ def find_broken_links(root: Path) -> list[str]:
 
 
 def check_acceptance_files(root: Path) -> list[str]:
-    """Check that all non-deprecated features have acceptance files."""
+    """Check that all non-deprecated features have contract or acceptance files."""
     issues = []
     p = get_paths(root)
     features_path = p.features_file
-    
+
     if not features_path.exists():
         return []
-    
+
     try:
         content = features_path.read_text(encoding="utf-8")
     except Exception:
         return []
-    
+
     # Find all features
     feature_blocks = re.findall(
         r"^##\s+(F-\d{4,}):\s*(.+?)$.*?^- Status:\s*(\w+)",
         content,
         re.MULTILINE | re.DOTALL
     )
-    
+
+    contracts_dir = p.contracts_dir
     acceptance_dir = p.acceptance_dir
-    
+
     for fid, name, status in feature_blocks:
         if status.strip().lower() in {"deprecated"}:
             continue
-        
+
+        contract_file = contracts_dir / f"{fid}.yaml"
         acc_file = acceptance_dir / f"{fid}.md"
-        if not acc_file.exists():
-            issues.append(f"{fid}: no acceptance file at spec/acceptance/{fid}.md")
-    
+        if not contract_file.exists() and not acc_file.exists():
+            issues.append(f"{fid}: no contract at spec/contracts/{fid}.yaml (or legacy spec/acceptance/{fid}.md)")
+
     return issues
 
 
@@ -227,17 +229,17 @@ def main() -> int:
     
     print()
     
-    # Check acceptance files
-    print("Checking acceptance files...")
+    # Check contract/acceptance files
+    print("Checking contract/acceptance files...")
     acc_issues = check_acceptance_files(root)
     all_issues.extend(acc_issues)
-    
+
     if acc_issues:
-        print(f"Found {len(acc_issues)} missing acceptance file(s)")
+        print(f"Found {len(acc_issues)} missing contract/acceptance file(s)")
         for issue in acc_issues:
             print(f"  - {issue}")
     else:
-        print("  ✓ All features have acceptance files")
+        print("  ✓ All features have contract or acceptance files")
     
     print()
     

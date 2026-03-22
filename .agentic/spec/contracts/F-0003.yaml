@@ -18,10 +18,10 @@ user_input: ""
 
 assertions:
   - id: AC-001
-    text: "Formal profile creates spec/ directory with acceptance/ and FEATURES.md"
+    text: "Formal profile creates spec/ directory with contracts/ and FEATURES.md"
     type: structural
     verify: |
-      test -d .agentic/spec/acceptance && test -f .agentic/spec/FEATURES.md
+      test -d .agentic/spec/contracts && test -f .agentic/spec/FEATURES.md
     tests:
       - tests/validate_framework.sh::F-0003
 
@@ -73,7 +73,14 @@ scenarios:
 
   - name: "Shipped spec protected by migration"
     given: "Shipped feature F-0003 with acceptance criteria"
-    when: "Developer modifies spec/acceptance/F-0003.md and commits"
-    then: "Pre-commit blocks unless spec/migrations/ has matching entry"
+    when: "Developer modifies spec/contracts/F-0003.yaml and commits"
+    then: "Pre-commit blocks unless contract has migration entry"
 
-migrations: []
+migrations:
+  - id: M-2026-03-22-001
+    date: "2026-03-22"
+    trigger: implementation_discovery
+    reason: "F-0302 Phase 3: spec/acceptance archived, contracts are now primary"
+    changes:
+      - "AC-001: verify checks spec/contracts instead of spec/acceptance"
+    approved_by: user

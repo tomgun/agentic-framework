@@ -57,7 +57,7 @@ git push origin feature/F-####
 
 ### 5. Create PR (if configured)
 - Title: `feat(F-####): [Feature Name]`
-- Body: Link to acceptance criteria, list of changes
+- Body: Link to contract, list of changes
 - Request review from appropriate person
 
 ## Commit Message Format

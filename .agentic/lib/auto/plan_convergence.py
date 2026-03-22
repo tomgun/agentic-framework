@@ -357,7 +357,10 @@ class ConvergenceLoop:
     ) -> str:
         """Spawn a single reviewer agent."""
         # Build context-aware prompt
+        # Check contracts first, fall back to acceptance
+        contract_path = self.paths.contracts_dir / f"{feature_id}.yaml"
         ac_path = self.paths.acceptance_dir / f"{feature_id}.md"
+        req_path = contract_path if contract_path.exists() else ac_path
         # v2: use role prompt from .agentic/prompts/ (replaces deleted subagent files)
         reviewer_prompt = self.project_root / ".agentic" / "prompts" / "reviewer.md"
 
@@ -366,8 +369,8 @@ class ConvergenceLoop:
             f"with fresh context (iteration {iteration}).\n\n"
             f"Read plan: {plan_path}\n"
         )
-        if ac_path.exists():
-            prompt += f"Read requirements: {ac_path}\n"
+        if req_path.exists():
+            prompt += f"Read requirements: {req_path}\n"
         if reviewer_prompt.exists():
             prompt += f"Follow the review method in: {reviewer_prompt}\n"
         prompt += (

@@ -558,8 +558,8 @@ COMPLEXITY_EOF
     fi
   fi
 
-  # Add frontmatter to acceptance files missing it
-  if [[ -d "$TARGET_PROJECT_DIR/spec/acceptance" ]]; then
+  # Add frontmatter to acceptance files missing it (legacy format)
+  if [[ -d "$TARGET_PROJECT_DIR/.agentic/spec/acceptance" ]]; then
     UPDATED_ACC=0
     for acc_file in "$TARGET_PROJECT_DIR"/.agentic/spec/acceptance/F-*.md; do
       if [[ -f "$acc_file" ]]; then

@@ -1,9 +1,9 @@
 # Context Manifest: Planning Agent
-# Creates implementation plans and acceptance criteria
+# Creates implementation plans and YAML contracts
 
 role: planning-agent
 token_budget: 4000
-description: Create implementation plans and acceptance criteria
+description: Create implementation plans and YAML contracts
 
 required:
   - CONTEXT_PACK.md                         # Project architecture

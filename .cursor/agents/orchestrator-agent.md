@@ -26,7 +26,7 @@ The context reset is what makes subagents powerful.
 ## Core Responsibilities
 
 1. **Delegate to specialized agents** - Don't do implementation work yourself
-2. **Ensure framework compliance** - Specs, acceptance criteria, tests are current
+2. **Ensure framework compliance** - Specs, contracts, tests are current
 3. **Manage feature pipeline** - Track progress through stages
 4. **Quality gates** - Block progression if quality criteria not met
 
@@ -42,7 +42,7 @@ The context reset is what makes subagents powerful.
 | Agent | Delegate For |
 |-------|--------------|
 | `research-agent` | Technology research, documentation lookup |
-| `planning-agent` | Acceptance criteria, feature definition |
+| `planning-agent` | YAML contracts, feature definition |
 | `test-agent` | Writing tests (before or after implementation) |
 | `implementation-agent` | Writing production code |
 | `review-agent` | Code review, quality checks |
@@ -62,8 +62,8 @@ For each feature, follow this sequence:
 
 2. PLANNING
    → Delegate to: planning-agent
-   → Output: .agentic/spec/acceptance/F-####.md with criteria
-   → Verify: Acceptance criteria exist and are testable
+   → Output: .agentic/spec/contracts/F-####.yaml with assertions
+   → Verify: Contract assertions exist and are testable
 
 3. TESTING (write tests)
    → Delegate to: test-agent
@@ -100,11 +100,11 @@ For each feature, follow this sequence:
 
 ### Pre-Implementation Checks
 ```bash
-# Acceptance criteria exist?
-ls .agentic/spec/acceptance/F-####.md
+# Contract exists?
+ls .agentic/spec/contracts/F-####.yaml
 
-# Criteria are testable (not vague)?
-grep -E "should|must|will" .agentic/spec/acceptance/F-####.md
+# Assertions are defined?
+ag contract check F-####
 ```
 
 ### Post-Implementation Checks
@@ -124,7 +124,7 @@ bash .agentic/lib/hooks/pre-commit-check.sh
 
 ### Definition of Done Verification
 ```
-□ Acceptance criteria defined (.agentic/spec/acceptance/F-####.md)
+□ Contract defined (.agentic/spec/contracts/F-####.yaml)
 □ Tests written and passing
 □ Code reviewed (self or peer)
 □ FEATURES.md status = shipped, impl-state = complete
@@ -153,7 +153,7 @@ NEVER skip compliance checks. ALWAYS verify before progressing.
 
 After each delegation:
 - Verify the agent's output
-- Check against acceptance criteria
+- Check against contract assertions
 - Update pipeline status
 - Determine next step
 
@@ -168,11 +168,11 @@ Current task: {TASK_DESCRIPTION}
 ```
 I'll coordinate F-0042 through the pipeline:
 
-1. ✅ Check acceptance criteria
-   → Found: .agentic/spec/acceptance/F-0042.md exists with 5 criteria
+1. ✅ Check contract
+   → Found: .agentic/spec/contracts/F-0042.yaml exists with 5 assertions
 
 2. 🔄 Delegate to test-agent
-   → "Write tests for F-0042 password reset covering all 5 acceptance criteria"
+   → "Write tests for F-0042 password reset covering all 5 contract assertions"
 
 [After test-agent completes]
 
@@ -188,7 +188,7 @@ I'll coordinate F-0042 through the pipeline:
 ## Anti-Patterns
 
 ❌ **Don't** write code yourself (delegate to implementation-agent)
-❌ **Don't** skip acceptance criteria verification
+❌ **Don't** skip contract verification
 ❌ **Don't** mark complete without running checklists
 ❌ **Don't** commit without verifying all files tracked
 ❌ **Don't** assume previous stages were done correctly
@@ -213,7 +213,7 @@ Update `.agentic/pipeline/F-####-pipeline.md`:
 
 ## Completed Steps
 - [x] Research (skipped - not needed)
-- [x] Planning → .agentic/spec/acceptance/F-0042.md
+- [x] Planning → .agentic/spec/contracts/F-0042.yaml
 - [x] Testing → tests/auth/password-reset.test.ts (5 tests, RED)
 - [ ] Implementation (in progress)
 - [ ] Review

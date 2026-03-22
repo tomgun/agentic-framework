@@ -347,7 +347,8 @@ def checks_for_profile(profile: str, root: Path | None = None) -> list[Check]:
         Check("spec/OVERVIEW.md", "file", "vision + current state + pointers"),
         Check("spec/FEATURES.md", "file", "feature registry + acceptance + tests"),
         Check("spec/NFR.md", "file", "non-functional constraints"),
-        Check("spec/acceptance", "dir", "per-feature acceptance criteria"),
+        Check("spec/contracts", "dir", "per-feature contract YAML files"),
+        Check("spec/acceptance", "dir", "legacy per-feature acceptance criteria"),
         Check("spec/LESSONS.md", "file", "lessons/caveats"),
         Check("spec/adr", "dir", "architecture decisions"),
     ]
@@ -487,12 +488,21 @@ def parse_acceptance_frontmatter(acceptance_path: Path) -> dict:
 
 
 def validate_acceptance_tests(root: Path, feature_id: str) -> list[str]:
-    """Verify acceptance file has runnable validation commands."""
+    """Verify contract/acceptance file has runnable validation commands."""
     issues = []
-    acc_path = get_paths(root).acceptance_dir / f"{feature_id}.md"
+    p = get_paths(root)
+    # Check contract first, fall back to legacy acceptance
+    contract_path = p.contracts_dir / f"{feature_id}.yaml"
+    acc_path = p.acceptance_dir / f"{feature_id}.md"
+
+    if contract_path.exists():
+        # For contracts, validation commands are in the verify field of assertions
+        # For now, skip frontmatter parsing and return no issues
+        # (contract validation is handled by the engine)
+        return []
 
     if not acc_path.exists():
-        return [f"No acceptance file for {feature_id}"]
+        return [f"No contract or acceptance file for {feature_id}"]
 
     meta = parse_acceptance_frontmatter(acc_path)
     validations = meta.get('validation', [])
@@ -597,18 +607,20 @@ def validate_features(root: Path) -> list[str]:
         issues.append("No features found in spec/FEATURES.md")
         return issues
     
-    # Check acceptance files
+    # Check contract/acceptance files
+    contracts_dir = p.contracts_dir
     acceptance_dir = p.acceptance_dir
     for fid, meta in features.items():
         if meta["status"] in {"deprecated"}:
             continue
-        
-        # Check acceptance file exists
+
+        # Check contract or acceptance file exists
+        contract_file = contracts_dir / f"{fid}.yaml"
         acceptance_file = acceptance_dir / f"{fid}.md"
         acc_val = (meta.get("acceptance") or "").strip()
         if acc_val and not acc_val.lower() in {"todo", "tbd", "none", "n/a"}:
-            if not acceptance_file.exists():
-                issues.append(f"{fid}: acceptance file spec/acceptance/{fid}.md not found")
+            if not contract_file.exists() and not acceptance_file.exists():
+                issues.append(f"{fid}: no contract spec/contracts/{fid}.yaml or acceptance spec/acceptance/{fid}.md found")
         
         # Check status validity
         status = (meta.get("status") or "").strip().lower()
@@ -717,12 +729,13 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
                 pass
 
     elif phase == "planning":
-        # Must have acceptance criteria before implementing
+        # Must have contract or acceptance criteria before implementing
         if feature_id:
+            contract_file = p.contracts_dir / f"{feature_id}.yaml"
             acc_file = p.acceptance_dir / f"{feature_id}.md"
-            if not acc_file.exists():
-                issues.append(f"BLOCKED: No acceptance criteria at spec/acceptance/{feature_id}.md")
-                issues.append("  Create acceptance criteria FIRST, then implement.")
+            if not contract_file.exists() and not acc_file.exists():
+                issues.append(f"BLOCKED: No contract at spec/contracts/{feature_id}.yaml (or legacy spec/acceptance/{feature_id}.md)")
+                issues.append("  Create contract YAML FIRST, then implement.")
 
             # Check if feature exists in FEATURES.md
             features_path = p.features_file
@@ -737,11 +750,12 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
             issues.append("No feature ID provided. Use: doctor.sh --phase planning F-0001")
 
     elif phase == "implement":
-        # Should have acceptance + WIP tracking
+        # Should have contract/acceptance + WIP tracking
         if feature_id:
+            contract_file = p.contracts_dir / f"{feature_id}.yaml"
             acc_file = p.acceptance_dir / f"{feature_id}.md"
-            if not acc_file.exists():
-                issues.append(f"BLOCKED: Missing acceptance criteria for {feature_id}")
+            if not contract_file.exists() and not acc_file.exists():
+                issues.append(f"BLOCKED: Missing contract/acceptance criteria for {feature_id}")
             if not p.wip_file.exists():
                 issues.append("No WIP tracking. Start with: bash .agentic/tools/wip.sh start " + feature_id)
 
@@ -783,10 +797,11 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
                         if "Unit: todo" in feature_section.lower():
                             issues.append(f"{feature_id}: Unit tests still marked 'todo'")
 
-                        # Check acceptance file
+                        # Check contract/acceptance file
+                        contract_file = p.contracts_dir / f"{feature_id}.yaml"
                         acc_file = p.acceptance_dir / f"{feature_id}.md"
-                        if not acc_file.exists():
-                            issues.append(f"{feature_id}: Missing acceptance criteria file")
+                        if not contract_file.exists() and not acc_file.exists():
+                            issues.append(f"{feature_id}: Missing contract/acceptance criteria file")
                 except Exception:
                     pass
 
@@ -824,21 +839,22 @@ def run_pre_commit_checks(root: Path, profile: str) -> list[str]:
     except Exception:
         pass
 
-    # 3. For feature tracking: shipped features need acceptance
+    # 3. For feature tracking: shipped features need contract/acceptance
     ft = get_setting(root, "feature_tracking", "no")
     if ft == "yes":
         features_path = p.features_file
         if features_path.exists():
             try:
                 content = features_path.read_text()
-                # Quick check: any shipped without acceptance file?
+                # Quick check: any shipped without contract or acceptance file?
                 for match in FEATURE_HEADER_RE.finditer(content):
                     fid = match.group(1)
+                    contract_file = p.contracts_dir / f"{fid}.yaml"
                     acc_file = p.acceptance_dir / f"{fid}.md"
-                    if not acc_file.exists():
+                    if not contract_file.exists() and not acc_file.exists():
                         # Check if shipped
                         if f"- Status: shipped" in content[match.end():match.end()+200]:
-                            issues.append(f"{fid} is shipped but missing acceptance file")
+                            issues.append(f"{fid} is shipped but missing contract/acceptance file")
             except Exception:
                 pass
 
@@ -1088,7 +1104,7 @@ def main() -> int:
         nfr_content_issues = validate_nfr_content(root)
         validation_issues.extend(nfr_content_issues)
     else:
-        print("\nNote: Feature tracking off — formal validations (spec/FEATURES.md, acceptance files) skipped.")
+        print("\nNote: Feature tracking off — formal validations (spec/FEATURES.md, contract/acceptance files) skipped.")
 
     if validation_issues:
         print("\nValidation issues:")

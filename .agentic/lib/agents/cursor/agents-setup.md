@@ -8,7 +8,7 @@ This guide explains how to use Cursor's agent capabilities with the Agentic Fram
 
 | Gate | Formal | Discovery |
 |------|--------|-----------|
-| Acceptance criteria | **BLOCKS** - `ag implement` requires acceptance | N/A - use `ag work` |
+| Contract | **BLOCKS** - `ag implement` requires contract | N/A - use `ag work` |
 | WIP before commit | **BLOCKS** - must complete WIP first | WARNING only |
 | Pre-commit checks | **BLOCKS** - full validation | Light check, no block |
 
@@ -131,7 +131,7 @@ After each phase completes, start the next:
 Research is complete. Now act as Planning Agent.
 Read .agentic/lib/agents/roles/planning_agent.md
 Read the research from docs/research/auth-[date].md
-Create acceptance criteria in .agentic/spec/acceptance/F-0042.md
+Create contract at .agentic/spec/contracts/F-0042.yaml
 Update the pipeline.
 ```
 
@@ -155,7 +155,7 @@ Cursor can run background agents. Start a task:
 
 ```
 In the background, run the Test Agent for F-0042.
-Read .agentic/spec/acceptance/F-0042.md and write failing tests.
+Read .agentic/spec/contracts/F-0042.yaml and write failing tests.
 Update the pipeline when done.
 I'll continue with other work.
 ```
@@ -172,7 +172,7 @@ If Cursor supports `.cursor/agents/` directory, create files like:
 Use this agent for implementing features after tests are written.
 
 ## Context Files
-- .agentic/spec/acceptance/F-{id}.md
+- .agentic/spec/contracts/F-{id}.yaml
 - tests/**/*.test.ts
 - src/
 
@@ -226,7 +226,7 @@ Read and follow .agentic/lib/agents/roles/[agent].md
 ### Context too large
 Tell agent to focus on specific files:
 ```
-Only read: .agentic/spec/acceptance/F-0042.md and tests/auth.test.ts
+Only read: .agentic/spec/contracts/F-0042.yaml and tests/auth.test.ts
 ```
 
 ### Lost state after session

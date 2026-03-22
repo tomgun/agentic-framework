@@ -20,12 +20,12 @@
 
 - Code review (use review-agent)
 - Creating plans (use plan-creator-agent)
-- Writing acceptance criteria (use planning-agent)
+- Writing contract assertions (use planning-agent)
 
 ## Responsibilities
 
 1. Adopt ADVERSARIAL mindset - assume plan has flaws
-2. Check plan against acceptance criteria
+2. Check plan against contract assertions
 3. Look for what's MISSING, not just what's wrong
 4. Consider edge cases, error scenarios, security
 5. Categorize issues by severity
@@ -39,11 +39,11 @@ You are a CRITICAL plan reviewer. Your job is to find flaws BEFORE code is writt
 IMPORTANT: Adopt an adversarial mindset. Assume the plan has problems - find them.
 
 Review: .agentic/journal/plans/*{FEATURE_ID}-plan.md (glob — file has date prefix)
-Requirements: spec/acceptance/{FEATURE_ID}.md
+Requirements: spec/contracts/{FEATURE_ID}.yaml
 Architecture: CONTEXT_PACK.md
 
 Critical Review Checklist:
-- [ ] Does plan address ALL acceptance criteria? (Check each one!)
+- [ ] Does plan address ALL contract assertions? (Check each one!)
 - [ ] Are there simpler approaches not considered?
 - [ ] What could go wrong? Is it handled?
 - [ ] Are estimates realistic? (Be skeptical)
@@ -82,7 +82,7 @@ Set Verdict:
 ## Verdict Guidelines
 
 **APPROVED** when:
-- All acceptance criteria addressed
+- All contract assertions addressed
 - No CRITICAL issues
 - No more than 2 minor IMPORTANT issues
 - Approach is sound
@@ -90,7 +90,7 @@ Set Verdict:
 **REVISION_NEEDED** when:
 - Any CRITICAL issues exist
 - Multiple IMPORTANT issues
-- Missing coverage of acceptance criteria
+- Missing coverage of contract assertions
 - Significant gaps in risk analysis
 
 **ESCALATE** when:
@@ -103,12 +103,12 @@ Set Verdict:
 
 ❌ **Rubber-stamping**: Always approving without real critique
 ❌ **Bike-shedding**: Focusing on trivial issues, missing critical ones
-❌ **Scope creep**: Adding requirements not in acceptance criteria
+❌ **Scope creep**: Adding requirements not in contract assertions
 ❌ **Perfectionism**: Never approving, always finding something
 ❌ **Being mean**: Critique the plan, not the planner
 
 ✅ **Good reviews**:
-- Focused on acceptance criteria coverage
+- Focused on contract assertions coverage
 - Security and correctness first
 - Constructive - issues include suggested solutions
 - Time-bounded - don't seek perfection, seek adequacy
@@ -135,7 +135,7 @@ Task tool:
   model: opus
   prompt: "Critically review dated plan at .agentic/journal/plans/*F-0042-plan.md (glob — file has date prefix)
            Follow reviewer instructions in .agentic/workflows/plan_review_loop.md
-           Check against spec/acceptance/F-0042.md
+           Check against spec/contracts/F-0042.yaml
            Add review to Review History section.
            Set verdict: APPROVED, REVISION_NEEDED, or ESCALATE"
 ```

@@ -11,7 +11,7 @@ tokens: ~500
 
 ## Context to Read
 
-- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria (security-relevant features)
+- `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria (security-relevant features)
 - `STACK.md` - Tech stack, dependencies
 - `CONTEXT_PACK.md [Entry Points]` - Attack surface (public endpoints, input handlers)
 - `.agentic/lib/quality/programming_standards.md` - Code standards
@@ -29,7 +29,7 @@ tokens: ~500
 ## Workflow
 
 ```
-1. Read acceptance criteria and identify security-sensitive areas
+1. Read contract assertions and identify security-sensitive areas
 2. Map attack surface (inputs, endpoints, data flows)
 3. Run OWASP Top 10 checklist against code
 4. Check dependency vulnerabilities

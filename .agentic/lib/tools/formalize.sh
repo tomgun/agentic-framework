@@ -66,7 +66,7 @@ EXAMPLES:
 
 Each promoted item gets:
   - A FEATURES.md entry (status: planned, auto-assigned F-ID)
-  - An acceptance criteria stub at .agentic/spec/acceptance/F-XXXX.md
+  - A contract stub at .agentic/spec/contracts/F-XXXX.yaml
   - TODO item marked as triaged (moved to Done section)
 EOF
 }
@@ -164,8 +164,8 @@ promote_one() {
         return 1
     fi
 
-    # Create AC stub
-    local ac_file="${ACCEPTANCE_DIR}/${f_id}.md"
+    # Create contract stub (new format in contracts dir)
+    local ac_file="${CONTRACTS_DIR}/${f_id}.yaml"
     local today
     today=$(date +"%Y-%m-%d")
     cat > "$ac_file" <<EOF

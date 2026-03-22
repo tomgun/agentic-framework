@@ -100,10 +100,10 @@ fi
 # Check if user prompt contains "implement" trigger and warn if no acceptance
 if [[ "$USER_PROMPT" =~ [Ii]mplement.*(F-[0-9]{4,}) ]]; then
   FEATURE_ID="${BASH_REMATCH[1]}"
-  if [[ ! -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
+  if [[ ! -f ".agentic/spec/contracts/${FEATURE_ID}.yaml" ]] && [[ ! -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
     echo ""
-    echo "⚠️  GATE WARNING: No acceptance criteria for ${FEATURE_ID}"
-    echo "   Create .agentic/spec/acceptance/${FEATURE_ID}.md before implementing"
+    echo "⚠️  GATE WARNING: No contract/acceptance criteria for ${FEATURE_ID}"
+    echo "   Create .agentic/spec/contracts/${FEATURE_ID}.yaml before implementing"
     echo "   Run: doctor.sh --phase planning ${FEATURE_ID}"
     echo ""
   fi

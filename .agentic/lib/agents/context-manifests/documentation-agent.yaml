@@ -7,7 +7,7 @@ token_budget: 4000
 
 # Files to always load
 required:
-  - spec/acceptance/{feature_id}.md   # What was implemented
+  - spec/contracts/{feature_id}.yaml   # What was implemented
   - CONTEXT_PACK.md                     # Architecture to document
   - README.md                           # May need updates
 

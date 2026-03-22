@@ -8,7 +8,7 @@
 setup_test_project "formal"
 
 # Create acceptance criteria so the agent can proceed
-mkdir -p "$TEST_PROJECT/spec/acceptance"
+mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 ## F-0010: Search Feature
 
@@ -17,7 +17,7 @@ cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 
 **Description**: Add search functionality to the app.
 
-**Acceptance**: See `spec/acceptance/F-0010.md`
+**Acceptance**: See `spec/contracts/F-0010.yaml`
 EOF
 
 cat > "$TEST_PROJECT/spec/acceptance/F-0010.md" << 'EOF'
@@ -41,9 +41,9 @@ send_prompt "Implement F-0010, the search feature"
 # Verify agent follows skill-driven workflow (not just raw coding)
 FAILURES=0
 
-# Agent should reference ag implement, acceptance criteria, or plan — skill workflow behavior
-check_output_contains "ag implement\|acceptance\|criteria\|plan\|WIP\|spec/acceptance\|F-0010" \
-    "Agent references workflow steps (ag implement, acceptance, plan, WIP)" || ((FAILURES++))
+# Agent should reference ag implement, acceptance criteria/contracts, or plan — skill workflow behavior
+check_output_contains "ag implement\|acceptance\|criteria\|contract\|plan\|WIP\|spec/contracts\|spec/acceptance\|F-0010" \
+    "Agent references workflow steps (ag implement, acceptance/contracts, plan, WIP)" || ((FAILURES++))
 
 # Agent should NOT just start writing code without any workflow awareness
 check_output_not_contains "^here.s the implementation\|^I.ll write the code\|^Let me code" \

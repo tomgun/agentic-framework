@@ -304,6 +304,104 @@ def output_json(
     return result
 
 
+def _ac_coverage_from_acs(root: Path, feature_id: str, acs: dict[str, str]) -> dict:
+    """Shared AC→test matching logic used by both contract and legacy paths."""
+    if not acs:
+        return {
+            "feature": feature_id,
+            "total_acs": 0,
+            "covered": 0,
+            "coverage_pct": 0,
+            "acs": [],
+        }
+
+    if "-" not in feature_id:
+        return {
+            "feature": feature_id,
+            "error": f"Invalid feature ID format: {feature_id} (expected F-XXXX)",
+            "total_acs": 0,
+            "covered": 0,
+            "coverage_pct": 0,
+            "acs": [],
+        }
+    fid_num = feature_id.split("-")[1]
+    feature_patterns = [feature_id, f"F_{fid_num}", f"F{fid_num}"]
+
+    test_dirs = []
+    for name in ["tests", "test", "spec", "__tests__"]:
+        test_dir = root / name
+        if test_dir.exists():
+            test_dirs.append(test_dir)
+
+    test_extensions = {".py", ".ts", ".js", ".tsx", ".jsx", ".sh", ".bash"}
+    feature_test_files: list[Path] = []
+    for test_dir in test_dirs:
+        for test_file in test_dir.rglob("*"):
+            if not test_file.is_file() or test_file.suffix not in test_extensions:
+                continue
+            if "__pycache__" in test_file.parts:
+                continue
+            try:
+                file_content = test_file.read_text(encoding="utf-8", errors="ignore")
+                if any(pat in file_content for pat in feature_patterns):
+                    feature_test_files.append(test_file)
+            except Exception:
+                continue
+
+    file_cache: dict[Path, list[str]] = {}
+    for tf in feature_test_files:
+        try:
+            file_cache[tf] = tf.read_text(encoding="utf-8", errors="ignore").splitlines()
+        except Exception:
+            file_cache[tf] = []
+
+    ac_results: list[dict] = []
+    covered_count = 0
+
+    for ac_id in sorted(acs.keys(), key=lambda x: int(x.split("-")[1]) if "-" in x else 0):
+        ac_text = acs[ac_id]
+        ac_num = ac_id.split("-")[1] if "-" in ac_id else ac_id
+        ac_patterns_str = [f"AC-{ac_num}", f"AC_{ac_num}", f"AC{ac_num}", f"ac-{ac_num}", f"ac_{ac_num}"]
+
+        matched_tests: list[str] = []
+        for test_file in feature_test_files:
+            lines = file_cache.get(test_file, [])
+            if not lines:
+                continue
+            rel_path = str(test_file.relative_to(root))
+            best_match: str | None = None
+            feature_line_nums: list[int] = []
+            for line_num, line in enumerate(lines, 1):
+                if any(pat in line for pat in feature_patterns):
+                    feature_line_nums.append(line_num)
+            for line_num, line in enumerate(lines, 1):
+                if any(pat in line for pat in ac_patterns_str):
+                    if any(pat in line for pat in feature_patterns):
+                        best_match = f"{rel_path}:{line_num}"
+                        break
+                    if any(abs(line_num - fl) <= 50 for fl in feature_line_nums):
+                        if best_match is None:
+                            best_match = f"{rel_path}:{line_num}"
+            if best_match:
+                matched_tests.append(best_match)
+
+        if matched_tests:
+            covered_count += 1
+            ac_results.append({"id": ac_id, "status": "covered", "text": ac_text, "tests": matched_tests})
+        else:
+            ac_results.append({"id": ac_id, "status": "not_covered", "text": ac_text})
+
+    total = len(acs)
+    coverage_pct = int(covered_count / total * 100) if total > 0 else 0
+    return {
+        "feature": feature_id,
+        "total_acs": total,
+        "covered": covered_count,
+        "coverage_pct": coverage_pct,
+        "acs": ac_results,
+    }
+
+
 def ac_level_coverage(root: Path, feature_id: str) -> dict:
     """Map individual ACs to tests using naming conventions.
 
@@ -315,13 +413,28 @@ def ac_level_coverage(root: Path, feature_id: str) -> dict:
 
     @feature F-0153
     """
-    accept_path = get_paths(root).acceptance_dir / f"{feature_id}.md"
+    p = get_paths(root)
+    # Prefer contract YAML, fall back to legacy acceptance markdown
+    contract_path = p.contracts_dir / f"{feature_id}.yaml"
+    accept_path = p.acceptance_dir / f"{feature_id}.md"
+
+    # Try loading from contract first
+    if contract_path.exists():
+        try:
+            from contracts import load_contract
+            contract = load_contract(contract_path)
+            if contract.assertions:
+                acs = {a.id: a.text for a in contract.assertions}
+                # Skip to test matching (reuse shared logic below)
+                return _ac_coverage_from_acs(root, feature_id, acs)
+        except Exception:
+            pass  # Fall through to legacy
 
     # Edge case: no acceptance file (AC-010)
     if not accept_path.exists():
         return {
             "feature": feature_id,
-            "error": f"Acceptance file not found: spec/acceptance/{feature_id}.md",
+            "error": f"No contract or acceptance file found: spec/contracts/{feature_id}.yaml or spec/acceptance/{feature_id}.md",
             "total_acs": 0,
             "covered": 0,
             "coverage_pct": 0,

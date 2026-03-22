@@ -12,7 +12,7 @@ required:
 
 optional:
   - spec/PRD.md                             # Product goals (if Formal)
-  - spec/acceptance/{feature_id}.md       # If assigned to specific feature
+  - spec/contracts/{feature_id}.yaml       # If assigned to specific feature
 
 exclude:
   - JOURNAL.md

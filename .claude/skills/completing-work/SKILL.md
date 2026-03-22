@@ -1,7 +1,7 @@
 ---
 name: completing-work
 description: >
-  Feature completion workflow: verify acceptance criteria, mark done, update
+  Feature completion workflow: verify contract assertions, mark done, update
   specs, cleanup WIP. Use when user says "done", "complete", "finished",
   "merged", "PR merged", "shipped", "landed", "wrapped up", "ag done",
   "mark as done", "it's in", or indicates work is finished. Also triggered
@@ -41,9 +41,9 @@ After every merge, run these steps (or let `ag done` handle them):
 - Update memory-seed if workflow rules changed
 
 ## Before running `ag done`
-1. Verify acceptance criteria in `.agentic/spec/acceptance/F-XXXX.md` (check off each `- [ ]` → `- [x]`)
+1. Verify contract assertions: `ag contract check F-XXXX` (all assertions must pass)
 2. Complete WIP: `bash .agentic/lib/tools/wip.sh complete`
 
 ## Rules
-- P1 ACs = 100%, P2/P3 = 80%, flat specs = 80% required.
-- If criteria not met, list what remains and ask user how to proceed.
+- All contract assertions in `spec/contracts/F-XXXX.yaml` must pass before shipping.
+- If assertions not met, list what remains and ask user how to proceed.

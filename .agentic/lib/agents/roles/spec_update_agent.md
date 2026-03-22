@@ -14,14 +14,14 @@ tokens: ~335
 - `.agentic/pipeline/F-####-pipeline.md` - Pipeline state
 - Review Agent's approval
 - `.agentic/spec/FEATURES.md` - Current feature statuses
-- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria
+- `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria
 - Implementation details from handoff notes
 
 ## Responsibilities
 
 1. Update feature status in FEATURES.md
 2. **Verify each AC is covered by tests** (map AC-### to test file)
-3. Mark acceptance criteria as verified with test locations
+3. Mark contract assertions as verified with test locations
 4. Add lessons learned if any
 5. Update dependencies if needed
 6. Update pipeline file when done
@@ -38,7 +38,7 @@ Complexity: M
 Shipped: YYYY-MM-DD
 ```
 
-### Update .agentic/spec/acceptance/F-####.md
+### Update .agentic/spec/contracts/F-####.yaml
 
 Add verification section:
 ```markdown

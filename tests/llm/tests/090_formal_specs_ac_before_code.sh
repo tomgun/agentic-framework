@@ -24,7 +24,7 @@ cat > "$TEST_PROJECT/STACK.md" << 'EOF'
 EOF
 
 # Create FEATURES.md entry
-mkdir -p "$TEST_PROJECT/.agentic/spec/acceptance"
+mkdir -p "$TEST_PROJECT/.agentic/spec/contracts" "$TEST_PROJECT/.agentic/spec/acceptance"
 cat > "$TEST_PROJECT/.agentic/spec/FEATURES.md" << 'EOF'
 # Features
 
@@ -74,9 +74,9 @@ send_prompt "The plan for F-0100 is approved. I want to start implementing. What
 # Verify agent behavior
 FAILURES=0
 
-# Agent should mention acceptance criteria need to be created
-check_output_contains "acceptance\|criteria\|AC\|spec.*acceptance\|F-0100.md" \
-    "Agent mentions acceptance criteria need to be created" || ((FAILURES++))
+# Agent should mention acceptance criteria/contracts need to be created
+check_output_contains "acceptance\|criteria\|contract\|AC\|spec.*acceptance\|spec.*contract\|F-0100" \
+    "Agent mentions acceptance criteria/contracts need to be created" || ((FAILURES++))
 
 # Agent should reference the plan
 check_output_contains "plan\|APPROVED\|approved\|plan.*approved" \

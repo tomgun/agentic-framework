@@ -144,7 +144,7 @@ def generate_to_staging(
             "",
             f"**Description**: {desc}" if desc else "**Description**: _TBD_",
             "",
-            f"**Acceptance**: See `spec/acceptance/{pid}.md`",
+            f"**Acceptance**: See `spec/contracts/{pid}.yaml`",
             "",
             "---",
             "",
@@ -222,7 +222,7 @@ def validate_staging(project_root: Path) -> tuple[bool, list[str]]:
     Checks:
         - Staging directory exists
         - OVERVIEW.md exists and has content
-        - Non-empty acceptance criteria per feature
+        - Non-empty acceptance criteria (contracts) per feature
         - Dependency acyclicity (topological sort)
 
     Note: ID uniqueness vs existing FEATURES.md is checked at promotion
@@ -798,7 +798,7 @@ def promote_staging(
     2. Checks review_decomposition gate (AC-008)
     3. Allocates fresh feature IDs via get_next_feature_id()
     4. Appends features to FEATURES.md
-    5. Creates spec/acceptance/F-XXXX.md files
+    5. Creates spec/contracts/F-XXXX.yaml files (and legacy spec/acceptance/F-XXXX.md)
     6. Adds entries to BACKLOG.json via backlog_helpers.cmd_add()
     7. Copies OVERVIEW.md (fails if exists unless force_overview) (AC-014)
     8. Removes staging directory on success
@@ -914,7 +914,7 @@ def _promote_staging_impl(
             "",
             f"**Description**: {feature.get('description') or feature.get('name', 'TBD')}",
             "",
-            f"**Acceptance**: See `spec/acceptance/{real_id}.md`",
+            f"**Acceptance**: See `spec/contracts/{real_id}.yaml`",
             "",
             "---",
             "",
@@ -926,10 +926,12 @@ def _promote_staging_impl(
         for section in new_sections:
             f.write(section + "\n")
 
-    # Create real AC files
+    # Create real AC files (both contract YAML and legacy acceptance markdown)
     staging_spec = staging / "spec" / "acceptance"
     acceptance_dir = paths.acceptance_dir
     acceptance_dir.mkdir(parents=True, exist_ok=True)
+    contracts_dir = paths.contracts_dir
+    contracts_dir.mkdir(parents=True, exist_ok=True)
 
     for feature in features:
         placeholder = feature["placeholder_id"]
@@ -942,6 +944,7 @@ def _promote_staging_impl(
             content = content.replace(_PROPOSAL_MARKER, "")
             # Replace placeholder ID with real ID
             content = content.replace(placeholder, real_id)
+            # Write legacy acceptance markdown
             dest_ac = acceptance_dir / f"{real_id}.md"
             dest_ac.write_text(content)
 
@@ -1081,7 +1084,7 @@ def _rebuild_staging_features(staging: Path, metadata: dict) -> None:
             "",
             f"**Description**: {desc}" if desc else "**Description**: _TBD_",
             "",
-            f"**Acceptance**: See `spec/acceptance/{pid}.md`",
+            f"**Acceptance**: See `spec/contracts/{pid}.yaml`",
             "",
             "---",
             "",

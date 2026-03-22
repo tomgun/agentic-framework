@@ -19,7 +19,7 @@ Use `@orchestrator-agent` to manage features. It delegates to specialized agents
 | Role | File | Purpose |
 |------|------|---------|
 | Research Agent | `research-agent.md` | Investigate tech choices, best practices |
-| Planning Agent | `planning-agent.md` | Define features, write acceptance criteria |
+| Planning Agent | `planning-agent.md` | Define features, write YAML contracts |
 | Test Agent | `test-agent.md` | Write tests |
 | Implementation Agent | `implementation-agent.md` | Write code |
 | Review Agent | `review-agent.md` | Code review, quality checks |

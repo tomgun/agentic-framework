@@ -13,7 +13,7 @@ tokens: ~344
 
 - Pipeline handoff notes
 - Changed code (what functionality was added)
-- `.agentic/spec/acceptance/F-####.md` - What the feature does
+- `.agentic/spec/contracts/F-####.yaml` - What the feature does
 - Existing docs in `docs/`
 - `README.md`
 - `CONTEXT_PACK.md`

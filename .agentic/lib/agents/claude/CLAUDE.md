@@ -21,6 +21,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag info F-XXXX` — detailed work item info with next steps
 - `ag next` — show what to do next
 - `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`. The CLI tells you what's missing — if a transition is blocked, it shows exactly which artifacts to create.

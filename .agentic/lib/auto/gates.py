@@ -131,29 +131,40 @@ def gate_planned_to_specced(feature_id: str, project_root: Path) -> GateResult:
 # ---------------------------------------------------------------------------
 
 def gate_specced_to_criteria_set(feature_id: str, project_root: Path) -> GateResult:
-    """Acceptance criteria file must exist and contain at least one AC line."""
+    """Contract or acceptance criteria file must exist with at least one AC line."""
     paths = get_paths(project_root)
+    contract_file = paths.contracts_dir / f"{feature_id}.yaml"
     ac_file = paths.acceptance_dir / f"{feature_id}.md"
     reasons: list[str] = []
     warnings: list[str] = []
 
-    if not ac_file.exists():
+    # Check contracts first, then legacy acceptance
+    if contract_file.exists():
+        try:
+            from contracts import load_contract
+            contract = load_contract(contract_file)
+            if not contract.assertions:
+                reasons.append(
+                    f"Contract spec/contracts/{feature_id}.yaml has no assertions"
+                )
+        except Exception as e:
+            reasons.append(f"Failed to load contract spec/contracts/{feature_id}.yaml: {e}")
+    elif ac_file.exists():
+        content = ac_file.read_text()
+        ac_pattern = re.compile(
+            r"(- \[[ x]\]\s*\*?\*?AC-|### AC-)", re.IGNORECASE,
+        )
+        if not ac_pattern.search(content):
+            reasons.append(
+                f"No acceptance criteria found in spec/acceptance/{feature_id}.md "
+                f"(expected lines matching '- [ ] AC-' or '### AC-')"
+            )
+    else:
         reasons.append(
-            f"Acceptance criteria file missing: spec/acceptance/{feature_id}.md"
+            f"No contract or acceptance criteria file: "
+            f"spec/contracts/{feature_id}.yaml or spec/acceptance/{feature_id}.md"
         )
         return GateResult.blocked(reasons)
-
-    content = ac_file.read_text()
-
-    # Look for AC lines in any of the common formats
-    ac_pattern = re.compile(
-        r"(- \[[ x]\]\s*\*?\*?AC-|### AC-)", re.IGNORECASE,
-    )
-    if not ac_pattern.search(content):
-        reasons.append(
-            f"No acceptance criteria found in spec/acceptance/{feature_id}.md "
-            f"(expected lines matching '- [ ] AC-' or '### AC-')"
-        )
 
     if reasons:
         return GateResult.blocked(reasons, warnings)
@@ -244,11 +255,13 @@ def gate_implementing_to_verified(feature_id: str, project_root: Path) -> GateRe
     reasons: list[str] = []
     warnings: list[str] = []
 
-    # Hard: acceptance criteria file must still exist
+    # Hard: contract or acceptance criteria file must still exist
+    contract_file = paths.contracts_dir / f"{feature_id}.yaml"
     ac_file = paths.acceptance_dir / f"{feature_id}.md"
-    if not ac_file.exists():
+    if not contract_file.exists() and not ac_file.exists():
         reasons.append(
-            f"Acceptance criteria file missing: spec/acceptance/{feature_id}.md"
+            f"No contract or acceptance criteria file: "
+            f"spec/contracts/{feature_id}.yaml or spec/acceptance/{feature_id}.md"
         )
 
     # Hard: at least one test file references the feature
@@ -277,9 +290,9 @@ def gate_implementing_to_verified(feature_id: str, project_root: Path) -> GateRe
             f"No test files reference {feature_id}"
         )
 
-    # F-0300 R6: Run verification commands if AC file has a Verification section
+    # F-0300 R6: Run verification commands if contract/AC file has a Verification section
     # This ensures tests actually pass, independent of git hooks
-    if ac_file.exists() and not reasons:
+    if (contract_file.exists() or ac_file.exists()) and not reasons:
         try:
             from gate import check_verification_passes
             verify_result = check_verification_passes(feature_id, project_root)
@@ -290,10 +303,13 @@ def gate_implementing_to_verified(feature_id: str, project_root: Path) -> GateRe
         except Exception as e:
             warnings.append(f"Verification check failed: {e}")
 
-    # Advisory: check if tests reference all ACs from the acceptance file
-    if ac_file.exists() and found_test:
-        ac_content = ac_file.read_text()
+    # Advisory: check if tests reference all ACs from the contract/acceptance file
+    criteria_file = contract_file if contract_file.exists() else ac_file
+    if criteria_file.exists() and found_test:
+        ac_content = criteria_file.read_text()
         ac_ids = re.findall(r"\*?\*?AC-(\d+)\*?\*?", ac_content)
+        # Also match YAML assertion IDs (id: AC-NNN)
+        ac_ids += re.findall(r"id:\s*AC-(\d+)", ac_content)
         if ac_ids:
             warnings.append(
                 f"Advisory: verify that tests cover all {len(set(ac_ids))} "

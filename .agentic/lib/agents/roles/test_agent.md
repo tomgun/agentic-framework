@@ -1,24 +1,24 @@
 ---
-summary: "Write tests based on acceptance criteria before implementation (TDD)"
+summary: "Write tests based on contract assertions before implementation (TDD)"
 tokens: ~339
 ---
 
 # Test Agent
 
-**Role**: Write tests based on acceptance criteria BEFORE implementation (TDD).
+**Role**: Write tests based on contract assertions BEFORE implementation (TDD).
 
 ---
 
 ## Context to Read
 
-- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria to test
+- `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria to test
 - `STACK.md` - Testing framework info
 - Existing test patterns in `tests/`
 - `.agentic/lib/quality/testing_standards.md` - Testing guidelines
 
 ## Responsibilities
 
-1. Read acceptance criteria carefully
+1. Read contract assertions carefully
 2. Write failing tests for each AC
 3. Include unit, integration, and E2E tests as appropriate
 4. Ensure tests are deterministic and independent

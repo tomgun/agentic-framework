@@ -411,7 +411,10 @@ class PRReviewer:
         return ""
 
     def _load_ac(self, feature_id: str) -> str:
-        """Load acceptance criteria file for a feature."""
+        """Load acceptance criteria — contract YAML first, then legacy markdown."""
+        contract_file = self.paths.contracts_dir / f"{feature_id}.yaml"
+        if contract_file.exists():
+            return contract_file.read_text()
         ac_file = self.paths.acceptance_dir / f"{feature_id}.md"
         if ac_file.exists():
             return ac_file.read_text()

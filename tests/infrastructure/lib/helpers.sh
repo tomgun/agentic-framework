@@ -119,7 +119,7 @@ scaffold_test_project() {
 
     # Profile-specific setup
     if [[ "$profile" == "formal" ]]; then
-        mkdir -p spec/acceptance
+        mkdir -p spec/contracts spec/acceptance
         echo "# Features" > spec/FEATURES.md
     fi
 

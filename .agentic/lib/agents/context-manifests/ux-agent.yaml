@@ -8,7 +8,7 @@ token_budget: 4000
 # Files to always load
 required:
   - spec/PRD.md                         # User needs
-  - spec/acceptance/{feature_id}.md     # Feature requirements
+  - spec/contracts/{feature_id}.yaml     # Feature requirements
 
 # Files to load if available and budget permits
 optional:

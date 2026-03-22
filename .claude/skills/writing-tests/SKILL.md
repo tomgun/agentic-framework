@@ -17,7 +17,7 @@ metadata:
 Run `ag verify F-XXXX` to check test coverage and run the test suite.
 
 Steps:
-1. Read acceptance criteria from `.agentic/spec/acceptance/F-XXXX.md`
+1. Read contract assertions from `.agentic/spec/contracts/F-XXXX.yaml`
 2. Check `STACK.md` for test framework and conventions
 3. Design test cases: happy path, edge cases, error cases
 4. Write tests matching project patterns

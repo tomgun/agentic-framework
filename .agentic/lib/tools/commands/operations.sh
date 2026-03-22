@@ -40,7 +40,7 @@ cmd_work() {
         echo ""
         echo "To start:"
         echo "  1. Add feature to .agentic/spec/FEATURES.md (next available F-XXXX)"
-        echo "  2. Create .agentic/spec/acceptance/F-XXXX.md with acceptance criteria"
+        echo "  2. Create .agentic/spec/contracts/F-XXXX.yaml with acceptance criteria"
         echo "  3. Run: ag implement F-XXXX"
         echo ""
         echo "Disable feature_tracking to use ag work without feature IDs."
@@ -552,9 +552,14 @@ cmd_verify() {
     # ag verify F-XXXX — run automated verification commands from AC file
     if is_feature_id "$arg"; then
         local feature_id="$arg"
-        local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
-        if [ ! -f "$acc_file" ]; then
-            echo -e "${RED}No acceptance criteria file: $acc_file${NC}"
+        local acc_file=""
+        if [ -f "$CONTRACTS_DIR/${feature_id}.yaml" ]; then
+            acc_file="$CONTRACTS_DIR/${feature_id}.yaml"
+        elif [ -f "$ACCEPTANCE_DIR/${feature_id}.md" ]; then
+            acc_file="$ACCEPTANCE_DIR/${feature_id}.md"
+        else
+            echo -e "${RED}No contract or acceptance criteria file for ${feature_id}${NC}"
+            echo "  Expected: $CONTRACTS_DIR/${feature_id}.yaml or $ACCEPTANCE_DIR/${feature_id}.md"
             return 1
         fi
 
@@ -636,15 +641,17 @@ cmd_approve_onboarding() {
     if [ -f "$ROOT_DIR/.agentic/spec/FEATURES.md" ] && grep -q '<!-- PROPOSAL' "$ROOT_DIR/.agentic/spec/FEATURES.md" 2>/dev/null; then
         proposal_files+=(".agentic/spec/FEATURES.md")
     fi
-    # Acceptance criteria
-    if [ -d "$ROOT_DIR/spec/acceptance" ]; then
-        while IFS= read -r -d '' f; do
-            if grep -q '<!-- PROPOSAL' "$f" 2>/dev/null; then
-                local rel="${f#$ROOT_DIR/}"
-                proposal_files+=("$rel")
-            fi
-        done < <(find "$ROOT_DIR/spec/acceptance" -name "F-*.md" -print0 2>/dev/null)
-    fi
+    # Acceptance criteria (contracts + legacy acceptance)
+    for spec_dir in "$CONTRACTS_DIR" "$ACCEPTANCE_DIR"; do
+        if [ -d "$spec_dir" ]; then
+            while IFS= read -r -d '' f; do
+                if grep -q '<!-- PROPOSAL' "$f" 2>/dev/null; then
+                    local rel="${f#$ROOT_DIR/}"
+                    proposal_files+=("$rel")
+                fi
+            done < <(find "$spec_dir" -name "F-*" -print0 2>/dev/null)
+        fi
+    done
 
     if [ ${#proposal_files[@]} -eq 0 ]; then
         echo -e "${GREEN}No unapproved proposals found.${NC}"
@@ -921,7 +928,7 @@ cmd_nfr() {
                 echo "2. Write selected NFRs using the batch writer:"
                 echo "   bash $SCRIPT_DIR/nfr-generate.sh --machine --limit 8 | bash $SCRIPT_DIR/nfr-write-batch.sh"
                 echo "   Or for selective write, filter the machine output to desired entries first."
-                echo "3. Create acceptance files: .agentic/spec/acceptance/NFR-XXXX.md"
+                echo "3. Create contract files: .agentic/spec/contracts/NFR-XXXX.yaml"
                 echo "'looks good' or 'all' = pipe all through batch writer with default thresholds."
                 echo "'just 1,3,5' = filter to those entries, then pipe through batch writer."
                 echo "'none' = skip NFR setup."

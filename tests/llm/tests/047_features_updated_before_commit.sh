@@ -8,13 +8,13 @@
 setup_test_project "formal"
 
 # Create a feature in_progress with acceptance criteria done
-mkdir -p "$TEST_PROJECT/spec/acceptance"
+mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # FEATURES.md
 
 ## F-0001: User Authentication
 - Status: in_progress
-- Acceptance: spec/acceptance/F-0001.md
+- Acceptance: spec/contracts/F-0001.yaml
 EOF
 
 cat > "$TEST_PROJECT/spec/acceptance/F-0001.md" << 'EOF'

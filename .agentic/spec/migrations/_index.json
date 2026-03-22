@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 17,
+  "last_migration": 18,
   "migrations": [
     {
       "id": 1,
@@ -103,6 +103,12 @@
       "file": "017_evolve_doc_specs_concrete_skill_instructions.md",
       "date": "2026-03-20",
       "description": "Evolve F-0138/F-0139/F-0207: concrete 3-concern doc decision tree in skill instructions"
+    },
+    {
+      "id": 18,
+      "file": "018_f0302_phase_3_consolidate_217_features_into_33_yaml_contracts_old_features_archived_to_docsarchivefeaturesv072md_see_specconsolidation_mapmd_for_mapping.md",
+      "date": "2026-03-22",
+      "description": "F-0302 Phase 3: Consolidate 217 features into 33 YAML contracts. Old features archived to docs/archive/FEATURES-v0.72.md. See spec/CONSOLIDATION_MAP.md for mapping."
     }
   ]
 }

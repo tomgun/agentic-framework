@@ -7,7 +7,7 @@
 # Setup with Formal profile
 setup_test_project "formal"
 
-mkdir -p "$TEST_PROJECT/spec/acceptance" "$TEST_PROJECT/tests"
+mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance" "$TEST_PROJECT/tests"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # Features
 

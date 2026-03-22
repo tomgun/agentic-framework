@@ -84,7 +84,7 @@ if [[ "${FIELD}" == "add" ]]; then
 - Code: (TODO)
 - Tests: (TODO)
 
-**Acceptance**: See \`spec/acceptance/${FEATURE_ID}.md\`
+**Contract**: See \`spec/contracts/${FEATURE_ID}.yaml\`
 EOF
 
   echo "✓ Added ${FEATURE_ID}: ${FEATURE_NAME} (domain: ${DOMAIN}) to FEATURES.md"

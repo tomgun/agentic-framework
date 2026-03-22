@@ -106,7 +106,7 @@ cmd_specs() {
             echo "     a. Read key source files (1-2 per cluster, max ~10)"
             echo "     b. Generate features with '- Domain:' metadata"
             echo "     c. Generate Given/When/Then acceptance criteria"
-            echo "     d. Write FEATURES.md entries + .agentic/spec/acceptance/F-####.md files"
+            echo "     d. Write FEATURES.md entries + .agentic/spec/contracts/F-####.yaml contract files"
             echo "     e. Ask user: 'Does this look right for [Domain]?'"
             echo "     f. Mark domain as completed: change '- [ ]' to '- [x]' in plan"
             echo "  5. After all domains: cross-domain review (duplicates, gaps)"

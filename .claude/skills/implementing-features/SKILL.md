@@ -1,7 +1,7 @@
 ---
 name: implementing-features
 description: >
-  Implements features using acceptance-driven workflow with structural gates.
+  Implements features using contract-driven workflow with structural gates.
   Use when user says "build", "implement", "add feature", "create [thing]",
   "implement F-XXXX", "ag implement", or describes new functionality to build.
   Do NOT use for: one-line fixes (use fixing-bugs), writing tests only

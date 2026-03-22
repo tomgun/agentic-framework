@@ -4204,3 +4204,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 20:58 - F-0302 Phase 3: The Switchover
+
+**Why**: YAML contracts are now the primary spec system — single atomic switchover
+
+**What changed**:
+- Archived 208 AC files, rewrote FEATURES.md (217→33 entries), updated state machine to read contracts, updated all ag commands/scripts/Python modules/tests/instruction files
+
+**Next steps**:
+- Phase 4: Protection & Cleanup
+
+**Blockers**: None
+

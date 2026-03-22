@@ -28,7 +28,7 @@ cat >> spec/FEATURES.md << 'EOF'
 **Description**: A shipped feature deliberately missing acceptance file.
 EOF
 
-# Do NOT create spec/acceptance/F-0088.md — this should trigger Check 2
+# Do NOT create spec/contracts/F-0088.yaml or spec/acceptance/F-0088.md — this should trigger Check 2
 
 git add -A
 git commit -m "add shipped feature without acceptance" --quiet --no-verify
@@ -61,7 +61,7 @@ cat >> spec/FEATURES.md << 'EOF'
 
 **Description**: A shipped feature with proper acceptance file.
 
-**Acceptance**: See `spec/acceptance/F-0077.md`
+**Acceptance**: See `spec/contracts/F-0077.yaml`
 EOF
 
 cat > spec/acceptance/F-0077.md << 'EOF'

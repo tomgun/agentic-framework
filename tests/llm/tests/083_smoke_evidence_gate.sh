@@ -17,7 +17,7 @@ cat > STACK.md <<'EOF'
 EOF
 
 # Create a feature with acceptance criteria
-mkdir -p .agentic/spec/acceptance
+mkdir -p .agentic/spec/contracts .agentic/spec/acceptance
 cat > .agentic/spec/FEATURES.md <<'EOF'
 ## F-0099: Test Feature
 

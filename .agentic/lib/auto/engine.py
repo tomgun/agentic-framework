@@ -351,10 +351,19 @@ class AutoEngine:
             self._cleanup()
 
     def _load_acceptance_criteria(self, feature_id: str) -> list[tuple[str, str]]:
-        """Load acceptance criteria from spec/acceptance/F-XXXX.md.
+        """Load acceptance criteria from contract YAML or legacy markdown.
+
+        Tries contract first (spec/contracts/F-XXXX.yaml), falls back to
+        legacy markdown (spec/acceptance/F-XXXX.md).
 
         Returns list of (ac_id, ac_text) tuples.
         """
+        # Try contract YAML first
+        contract_file = self.paths.contracts_dir / f"{feature_id}.yaml"
+        if contract_file.exists():
+            return self._load_criteria_from_contract(contract_file)
+
+        # Fall back to legacy markdown
         ac_file = self.paths.acceptance_dir / f"{feature_id}.md"
         if not ac_file.exists():
             return []
@@ -378,6 +387,16 @@ class AutoEngine:
                     ac_text = text
                 criteria.append((ac_id, ac_text))
         return criteria
+
+    def _load_criteria_from_contract(self, contract_file) -> list[tuple[str, str]]:
+        """Load assertions from a YAML contract file."""
+        try:
+            sys.path.insert(0, str(_LIB_DIR))
+            from contracts import load_contract
+            contract = load_contract(contract_file)
+            return [(a.id, a.text) for a in contract.assertions if not a.draft]
+        except Exception:
+            return []
 
     def _estimate_complexity(
         self, ac_id: str, ac_text: str
@@ -438,7 +457,7 @@ class AutoEngine:
             f"Criterion: {ac_text}\n\n"
             f"Complexity estimate: {complexity}\n\n"
             f"Instructions:\n"
-            f"- Read the spec file at .agentic/spec/acceptance/{feature_id}.md for full context\n"
+            f"- Read the contract at .agentic/spec/contracts/{feature_id}.yaml for full context\n"
             f"- Read the existing code to understand the codebase\n"
             f"- Implement the minimum code needed to satisfy this criterion\n"
             f"- Ensure tests pass after your changes\n"

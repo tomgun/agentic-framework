@@ -19,7 +19,7 @@ The orchestrator **delegates** to specialized agents and **verifies** quality ga
 | Role | File | Purpose |
 |------|------|---------|
 | Research Agent | `research_agent.md` | Investigate tech choices, best practices |
-| Planning Agent | `planning_agent.md` | Define features, write acceptance criteria |
+| Planning Agent | `planning_agent.md` | Define features, write YAML contracts |
 | Test Agent | `test_agent.md` | Write failing tests (TDD red phase) |
 | Implementation Agent | `implementation_agent.md` | Write code to pass tests (TDD green phase) |
 | Review Agent | `review_agent.md` | Code review, quality checks |

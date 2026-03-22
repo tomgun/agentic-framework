@@ -191,7 +191,12 @@ check_features_drift() {
 
     # Check pending features for acceptance criteria completion
     for fid in $pending_features; do
-        local criteria_file="$ROOT_DIR/.agentic/spec/acceptance/${fid}.md"
+        local criteria_file=""
+        if [[ -f "$CONTRACTS_DIR/${fid}.yaml" ]]; then
+            criteria_file="$CONTRACTS_DIR/${fid}.yaml"
+        elif [[ -f "$ACCEPTANCE_DIR/${fid}.md" ]]; then
+            criteria_file="$ACCEPTANCE_DIR/${fid}.md"
+        fi
         if [[ -f "$criteria_file" ]]; then
             local total=$(grep -cE "^- \[.\]" "$criteria_file" 2>/dev/null || echo "0")
             local complete=$(grep -cE "^- \[x\]" "$criteria_file" 2>/dev/null || echo "0")
@@ -207,9 +212,14 @@ check_features_drift() {
     done
 
     for fid in $shipped_features; do
-        # Check if acceptance criteria file exists
-        local criteria_file="$ROOT_DIR/.agentic/spec/acceptance/${fid}.md"
-        if [[ -f "$criteria_file" ]]; then
+        # Check if contract/acceptance criteria file exists
+        local criteria_file=""
+        if [[ -f "$CONTRACTS_DIR/${fid}.yaml" ]]; then
+            criteria_file="$CONTRACTS_DIR/${fid}.yaml"
+        elif [[ -f "$ACCEPTANCE_DIR/${fid}.md" ]]; then
+            criteria_file="$ACCEPTANCE_DIR/${fid}.md"
+        fi
+        if [[ -n "$criteria_file" && -f "$criteria_file" ]]; then
             # Check if all criteria are marked complete
             local incomplete=$(grep -E "^- \[ \]" "$criteria_file" 2>/dev/null || true)
             if [[ -n "$incomplete" ]]; then
@@ -416,13 +426,14 @@ check_status_drift() {
 #=============================================================================
 
 check_tests_drift() {
+    local contracts_dir="${CONTRACTS_DIR:-$ROOT_DIR/.agentic/spec/contracts}"
     local acceptance_dir="${ACCEPTANCE_DIR:-$ROOT_DIR/.agentic/spec/acceptance}"
 
-    if [[ ! -d "$acceptance_dir" ]]; then
-        return 0  # No acceptance criteria (Core profile)
+    if [[ ! -d "$contracts_dir" ]] && [[ ! -d "$acceptance_dir" ]]; then
+        return 0  # No contract/acceptance criteria (Core profile)
     fi
 
-    log_check "Acceptance criteria ↔ Tests"
+    log_check "Contract/acceptance criteria ↔ Tests"
 
     # For each acceptance criteria file
     for criteria_file in "$acceptance_dir"/*.md; do

@@ -6,7 +6,7 @@ token_budget: 6000
 description: Review code quality, security, and standards compliance
 
 required:
-  - spec/acceptance/{feature_id}.md         # Original requirements
+  - spec/contracts/{feature_id}.yaml         # Original requirements
   - .agentic/quality/programming_standards.md # Code standards
   - .agentic/agents/shared/guidelines/anti-hallucination.md
   # Changed files passed dynamically from pipeline

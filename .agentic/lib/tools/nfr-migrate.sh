@@ -25,7 +25,14 @@ if [[ -z "$FEATURE_ID" ]]; then
     exit 0
 fi
 
-ACC_FILE=".agentic/spec/acceptance/${FEATURE_ID}.md"
+# Check contracts first, then legacy acceptance
+if [[ -f "$CONTRACTS_DIR/${FEATURE_ID}.yaml" ]]; then
+    ACC_FILE="$CONTRACTS_DIR/${FEATURE_ID}.yaml"
+elif [[ -f "$ACCEPTANCE_DIR/${FEATURE_ID}.md" ]]; then
+    ACC_FILE="$ACCEPTANCE_DIR/${FEATURE_ID}.md"
+else
+    ACC_FILE="$ACCEPTANCE_DIR/${FEATURE_ID}.md"  # default for error message
+fi
 FEATURES_FILE=".agentic/spec/FEATURES.md"
 
 if [[ ! -f "$ACC_FILE" ]]; then

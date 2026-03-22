@@ -109,7 +109,9 @@ ISSUES_FILE="$(_resolve_path "$AGENTIC_ROOT/spec/ISSUES.md" "$PROJECT_ROOT/spec/
 NFR_FILE="$(_resolve_path "$AGENTIC_ROOT/spec/NFR.md" "$PROJECT_ROOT/spec/NFR.md")"
 REFERENCES_FILE="$(_resolve_path "$AGENTIC_ROOT/spec/REFERENCES.md" "$PROJECT_ROOT/spec/REFERENCES.md")"
 LESSONS_FILE="$(_resolve_path "$AGENTIC_ROOT/spec/LESSONS.md" "$PROJECT_ROOT/spec/LESSONS.md")"
+# Legacy acceptance dir — archived in framework repo, may still exist in user projects
 ACCEPTANCE_DIR="$(_resolve_path "$AGENTIC_ROOT/spec/acceptance" "$PROJECT_ROOT/spec/acceptance")"
+ACCEPTANCE_ARCHIVE_DIR="$PROJECT_ROOT/docs/archive/acceptance"
 CONTRACTS_DIR="$(_resolve_path "$AGENTIC_ROOT/spec/contracts" "$PROJECT_ROOT/spec/contracts")"
 ADR_DIR="$(_resolve_path "$AGENTIC_ROOT/spec/adr" "$PROJECT_ROOT/spec/adr")"
 MIGRATIONS_DIR="$(_resolve_path "$AGENTIC_ROOT/spec/migrations" "$PROJECT_ROOT/spec/migrations")"

@@ -56,6 +56,6 @@ Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 
 Validation: `bash tests/validate_framework.sh` must pass before committing.
 Dogfooding: `.agentic/` is the source of truth - develop templates there first, root files extend.
-New features: Add to `.agentic/spec/FEATURES.md` FIRST, create acceptance criteria before coding.
+New features: Add to `.agentic/spec/FEATURES.md` FIRST, create YAML contract at `spec/contracts/F-XXXX.yaml` before coding.
 Breaking changes: Provide upgrade path in `upgrade.sh`.
 Instruction files are part of the feature: new `ag` commands/gates MUST update all instruction files (templates, skills, memory-seed, DEVELOPER_GUIDE, HOW_IT_WORKS).

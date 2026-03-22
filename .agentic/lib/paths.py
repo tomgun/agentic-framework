@@ -88,9 +88,11 @@ class AgenticPaths:
         self.lessons_file = self._resolve(
             self.agentic_root / "spec" / "LESSONS.md",
             self.project_root / "spec" / "LESSONS.md")
+        # Legacy acceptance dir — archived in framework repo, may still exist in user projects
         self.acceptance_dir = self._resolve(
             self.agentic_root / "spec" / "acceptance",
             self.project_root / "spec" / "acceptance")
+        self.acceptance_archive_dir = self.project_root / "docs" / "archive" / "acceptance"
         self.contracts_dir = self._resolve(
             self.agentic_root / "spec" / "contracts",
             self.project_root / "spec" / "contracts")

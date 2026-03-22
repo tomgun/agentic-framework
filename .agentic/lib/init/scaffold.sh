@@ -352,8 +352,8 @@ if [[ "${PROFILE}" == "discovery" ]]; then
 fi
 
 # Profile: formal
-mkdir -p "${ROOT_DIR}/.agentic/spec" "${ROOT_DIR}/.agentic/spec/adr" "${ROOT_DIR}/.agentic/spec/tasks" "${ROOT_DIR}/.agentic/spec/acceptance"
-echo "OK  : ensured directories .agentic/spec/, .agentic/spec/adr, .agentic/spec/tasks, .agentic/spec/acceptance"
+mkdir -p "${ROOT_DIR}/.agentic/spec" "${ROOT_DIR}/.agentic/spec/adr" "${ROOT_DIR}/.agentic/spec/tasks" "${ROOT_DIR}/.agentic/spec/contracts" "${ROOT_DIR}/.agentic/spec/acceptance"
+echo "OK  : ensured directories .agentic/spec/, .agentic/spec/adr, .agentic/spec/tasks, .agentic/spec/contracts, .agentic/spec/acceptance"
 
 # Note: STATUS.md already created above (shared by both profiles)
 

@@ -355,13 +355,17 @@ class MilestoneChecker:
         return MilestoneResult("kickoff_complete", True)
 
     def _check_features_specced(self) -> MilestoneResult:
+        # Check contracts first, then legacy acceptance
+        contracts_dir = self.root / ".agentic" / "spec" / "contracts"
         ac_dir = self.root / ".agentic" / "spec" / "acceptance"
-        if not ac_dir.exists():
-            return MilestoneResult("features_specced", False, "acceptance/ directory not found")
-        ac_files = list(ac_dir.glob("F-*.md"))
-        if not ac_files:
-            return MilestoneResult("features_specced", False, "No F-*.md files in acceptance/")
-        return MilestoneResult("features_specced", True, f"{len(ac_files)} AC files")
+        contract_files = list(contracts_dir.glob("F-*.yaml")) if contracts_dir.exists() else []
+        ac_files = list(ac_dir.glob("F-*.md")) if ac_dir.exists() else []
+        total = len(contract_files) + len(ac_files)
+        if total == 0:
+            if not contracts_dir.exists() and not ac_dir.exists():
+                return MilestoneResult("features_specced", False, "contracts/ and acceptance/ directories not found")
+            return MilestoneResult("features_specced", False, "No contract or AC files found")
+        return MilestoneResult("features_specced", True, f"{total} contract/AC files")
 
     def _check_component_features_scoped(self) -> MilestoneResult:
         features = self.root / ".agentic" / "spec" / "FEATURES.md"
@@ -604,29 +608,47 @@ class ExpectationChecker:
         )
 
     def _wf_acceptance_criteria_checked(self, check: dict) -> MilestoneResult:
-        """At least N AC files have all items checked off [x]."""
+        """At least N contract/AC files have all items checked off [x]."""
         min_count = check.get("min", 1)
+        contracts_dir = self.root / ".agentic" / "spec" / "contracts"
         ac_dir = self.root / ".agentic" / "spec" / "acceptance"
-        if not ac_dir.exists():
+
+        fully_checked = 0
+
+        # Check contract YAML files — no checkbox concept, count as checked
+        # if they exist and have assertions
+        if contracts_dir.exists():
+            for contract_file in contracts_dir.glob("F-*.yaml"):
+                try:
+                    content = contract_file.read_text()
+                    if "assertions:" in content and "- id:" in content:
+                        fully_checked += 1
+                except Exception:
+                    pass
+
+        # Check legacy acceptance markdown files
+        if ac_dir.exists():
+            for ac_file in ac_dir.glob("F-*.md"):
+                content = ac_file.read_text()
+                unchecked = re.findall(r"- \[ \]", content)
+                checked = re.findall(r"- \[x\]", content)
+                if checked and not unchecked:
+                    fully_checked += 1
+
+        if fully_checked == 0 and not (contracts_dir and contracts_dir.exists()) and not (ac_dir and ac_dir.exists()):
             return MilestoneResult(
                 "acceptance_criteria_checked", False,
-                "acceptance/ directory not found",
+                "contracts/ and acceptance/ directories not found",
             )
-        fully_checked = 0
-        for ac_file in ac_dir.glob("F-*.md"):
-            content = ac_file.read_text()
-            unchecked = re.findall(r"- \[ \]", content)
-            checked = re.findall(r"- \[x\]", content)
-            if checked and not unchecked:
-                fully_checked += 1
+
         if fully_checked >= min_count:
             return MilestoneResult(
                 "acceptance_criteria_checked", True,
-                f"{fully_checked} AC file(s) fully checked",
+                f"{fully_checked} contract/AC file(s) fully checked",
             )
         return MilestoneResult(
             "acceptance_criteria_checked", False,
-            f"only {fully_checked} AC file(s) fully checked (need {min_count})",
+            f"only {fully_checked} contract/AC file(s) fully checked (need {min_count})",
         )
 
     def _wf_plans_exist(self, check: dict) -> MilestoneResult:
@@ -769,10 +791,11 @@ class ExpectationChecker:
         counts as passing.
         """
         try:
-            # Find first commit adding an AC file
+            # Find first commit adding a contract or AC file
             ac_result = subprocess.run(
                 ["git", "log", "--reverse", "--format=%H",
-                 "--diff-filter=A", "--", ".agentic/spec/acceptance/*"],
+                 "--diff-filter=A", "--",
+                 ".agentic/spec/contracts/*", ".agentic/spec/acceptance/*"],
                 capture_output=True, text=True, cwd=str(self.root), timeout=10,
             )
             ac_commits = [h for h in ac_result.stdout.strip().split("\n") if h]
@@ -780,7 +803,7 @@ class ExpectationChecker:
             if not ac_commits:
                 return MilestoneResult(
                     "spec_before_code", False,
-                    "no acceptance criteria files found in git history",
+                    "no contract or acceptance criteria files found in git history",
                 )
 
             # Find the scaffold commit to exclude it (it's setup, not agent code)
@@ -1131,12 +1154,16 @@ def _reset_project_state(project_dir: Path) -> None:
     """
     agentic = project_dir / ".agentic"
 
-    # Reset spec files — empty FEATURES.md, remove acceptance criteria
+    # Reset spec files — empty FEATURES.md, remove contracts and acceptance criteria
     spec_dir = agentic / "spec"
     if spec_dir.exists():
         features = spec_dir / "FEATURES.md"
         if features.exists():
             features.write_text("# Features\n\n")
+        contracts_dir = spec_dir / "contracts"
+        if contracts_dir.exists():
+            shutil.rmtree(contracts_dir)
+            contracts_dir.mkdir()
         ac_dir = spec_dir / "acceptance"
         if ac_dir.exists():
             shutil.rmtree(ac_dir)
@@ -1979,7 +2006,7 @@ class FrameworkVerifier:
         if "plans_approved" in name:
             return "Plans should have **Status**: APPROVED. The plan review process must complete."
         if "acceptance_criteria_checked" in name:
-            return "Acceptance criteria files should have all items checked [x]. Run `ag done` to mark features complete."
+            return "Contract/acceptance criteria files should be complete. Run `ag done` to mark features complete."
         if "journal_updated" in name:
             return "JOURNAL.md should have at least one entry. Use `bash .agentic/lib/tools/journal.sh` to add entries."
         if "commits_follow_convention" in name:
@@ -2025,8 +2052,8 @@ class FrameworkVerifier:
                 )
         elif "acceptance_criteria_checked" in name:
             hints.append(
-                "Open .agentic/spec/acceptance/F-*.md files and change "
-                "[ ] to [x] for all completed criteria."
+                "Open .agentic/spec/contracts/F-*.yaml or .agentic/spec/acceptance/F-*.md files "
+                "and mark all completed criteria."
             )
         elif "journal_updated" in name:
             hints.append(

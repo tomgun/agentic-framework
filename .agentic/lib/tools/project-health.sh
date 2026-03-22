@@ -119,7 +119,7 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
   # Check for features without acceptance criteria
   FEATURES=$(grep -E "$FEATURE_HEADER_ERE" .agentic/spec/FEATURES.md | sed 's/## //' | cut -d: -f1 || true)
   for f in $FEATURES; do
-    if [[ ! -f ".agentic/spec/acceptance/$f.md" ]]; then
+    if [[ ! -f "$CONTRACTS_DIR/$f.yaml" ]] && [[ ! -f "$ACCEPTANCE_DIR/$f.md" ]]; then
       info "Missing acceptance criteria: $f"
     fi
   done

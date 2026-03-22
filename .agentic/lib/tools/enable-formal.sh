@@ -119,6 +119,7 @@ echo -e "${BLUE}Creating files...${NC}"
 
 # Create spec directory structure
 if [[ ! -d "spec" ]]; then
+  mkdir -p spec/contracts
   mkdir -p spec/acceptance
   mkdir -p spec/adr
   echo -e "${GREEN}✓ Created spec/ directory structure${NC}"

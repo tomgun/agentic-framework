@@ -9,18 +9,21 @@ FEATURE_ID="${1:-}"
 
 if [[ -z "$FEATURE_ID" ]]; then
     echo "Usage: check-gates.sh <F-XXXX>"
-    echo "Checks: acceptance criteria exist, scope is small, WIP not active"
+    echo "Checks: contract exists, scope is small, WIP not active"
     exit 1
 fi
 
 ERRORS=0
 
-# Gate 1: Acceptance criteria
-if [[ -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
-    echo "✓ Acceptance criteria found: .agentic/spec/acceptance/${FEATURE_ID}.md"
+# Gate 1: Contract (YAML preferred, markdown legacy fallback)
+if [[ -f ".agentic/spec/contracts/${FEATURE_ID}.yaml" ]]; then
+    echo "✓ Contract found: .agentic/spec/contracts/${FEATURE_ID}.yaml"
+elif [[ -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
+    echo "✓ Legacy acceptance criteria found: .agentic/spec/acceptance/${FEATURE_ID}.md"
+    echo "  Consider migrating to YAML contract: spec/contracts/${FEATURE_ID}.yaml"
 else
-    echo "✗ No acceptance criteria at .agentic/spec/acceptance/${FEATURE_ID}.md"
-    echo "  Create criteria FIRST: use .agentic/lib/templates/acceptance.template.md"
+    echo "✗ No contract at .agentic/spec/contracts/${FEATURE_ID}.yaml"
+    echo "  Create contract FIRST: ag spec ${FEATURE_ID}"
     ERRORS=$((ERRORS + 1))
 fi
 

@@ -191,18 +191,22 @@ cmd_implement() {
             fi
         fi
 
-        # 1b. Check acceptance criteria exist
-        local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
-        if [ ! -f "$acc_file" ]; then
-            echo -e "${RED}BLOCKED: No acceptance criteria${NC}"
-            echo "  Missing: .agentic/spec/acceptance/${feature_id}.md"
+        # 1b. Check contract or acceptance criteria exist
+        local contract_file="$CONTRACTS_DIR/${feature_id}.yaml"
+        local acc_file="$ACCEPTANCE_DIR/${feature_id}.md"
+        if [ -f "$contract_file" ]; then
+            echo -e "${GREEN}Contract: EXISTS ($contract_file)${NC}"
+        elif [ -f "$acc_file" ]; then
+            echo -e "${GREEN}Acceptance criteria: EXISTS (legacy format)${NC}"
+        else
+            echo -e "${RED}BLOCKED: No contract or acceptance criteria${NC}"
+            echo "  Missing: .agentic/spec/contracts/${feature_id}.yaml"
             echo ""
-            echo "Create acceptance criteria FIRST, then run this command again."
-            echo "  Template: .agentic/spec/acceptance.template.md"
+            echo "Create a contract FIRST, then run this command again."
+            echo "  Create: ag contract create $feature_id"
             echo "  Or bypass: SKIP_SPEC_CHECK=1 ag implement $feature_id"
             exit 1
         fi
-        echo -e "${GREEN}Acceptance criteria: EXISTS${NC}"
     fi
 
     # 2. AC clarity gate (spec-analyze --gate) — skipped on re-implement
@@ -214,7 +218,14 @@ cmd_implement() {
     elif [[ -n "$current_wip" && "$current_wip" == "$feature_id" ]]; then
         # Re-implement: feature already in progress, skip clarity gate
         true
-    elif [[ -f "$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md" ]]; then
+    elif [[ -f "$CONTRACTS_DIR/${feature_id}.yaml" ]]; then
+        # Contract exists — validate assertions
+        local validate_exit=0
+        python3 "$AGENTIC_LIB/contracts.py" validate "$CONTRACTS_DIR/${feature_id}.yaml" 2>/dev/null || validate_exit=$?
+        if [[ "$validate_exit" -ne 0 ]]; then
+            echo -e "${YELLOW}⚠ Contract validation warnings for $feature_id${NC}"
+        fi
+    elif [[ -f "$ACCEPTANCE_DIR/${feature_id}.md" ]]; then
         local sa_exit=0
         if _is_formal_like; then
             # Formal: CRITICAL findings block
@@ -233,16 +244,23 @@ cmd_implement() {
 
     # 2b. NFR staleness detection (advisory)
     local nfr_file="$ROOT_DIR/.agentic/spec/NFR.md"
-    local acc_file_path="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
-    if [[ -f "$nfr_file" && -f "$acc_file_path" ]]; then
-        # Check if acceptance file references any NFRs
-        if grep -qE 'NFR-[0-9]+' "$acc_file_path" 2>/dev/null; then
-            local nfr_ts acc_ts
+    local contract_path="$CONTRACTS_DIR/${feature_id}.yaml"
+    local acc_file_path="$ACCEPTANCE_DIR/${feature_id}.md"
+    local nfr_ref_file=""
+    if [[ -f "$contract_path" ]]; then
+        nfr_ref_file="$contract_path"
+    elif [[ -f "$acc_file_path" ]]; then
+        nfr_ref_file="$acc_file_path"
+    fi
+    if [[ -f "$nfr_file" && -n "$nfr_ref_file" && -f "$nfr_ref_file" ]]; then
+        # Check if file references any NFRs
+        if grep -qE 'NFR-[0-9]+' "$nfr_ref_file" 2>/dev/null; then
+            local nfr_ts ref_ts
             nfr_ts=$(git log -1 --format=%ct -- "$nfr_file" 2>/dev/null) || nfr_ts=""
-            acc_ts=$(git log -1 --format=%ct -- "$acc_file_path" 2>/dev/null) || acc_ts=""
+            ref_ts=$(git log -1 --format=%ct -- "$nfr_ref_file" 2>/dev/null) || ref_ts=""
             # Only warn if both timestamps exist and NFR.md is newer
-            if [[ -n "$nfr_ts" && -n "$acc_ts" && "$nfr_ts" -gt "$acc_ts" ]]; then
-                echo -e "${YELLOW}⚠ NFR.md has changed since this feature's ACs were written.${NC}"
+            if [[ -n "$nfr_ts" && -n "$ref_ts" && "$nfr_ts" -gt "$ref_ts" ]]; then
+                echo -e "${YELLOW}⚠ NFR.md has changed since this feature's spec was written.${NC}"
                 echo "  Run: bash .agentic/lib/tools/nfr-propagate.sh sync $feature_id"
             fi
         fi
