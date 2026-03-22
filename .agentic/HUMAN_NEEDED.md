@@ -198,6 +198,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0058: PR #193: F-0302 Phase 1 — YAML contract infrastructure
+- **Type**: pr_review
+- **Added**: 2026-03-22
+- **Context**: https://github.com/tomgun/agentic-framework/pull/193 — Phase 1 of multi-session spec overhaul. Merge to unblock Phases 0-5.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics
