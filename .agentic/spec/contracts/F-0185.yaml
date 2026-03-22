@@ -1,0 +1,27 @@
+id: F-0185
+name: Coordination Server
+lifecycle: shipped
+since: v0.35.0
+profile: both
+protection: advisory
+category: multi-agent
+consolidated_from: [F-0185, F-0187]
+
+description: |
+  HTTP JSON-RPC coordination server (port 4185, bearer auth) for multi-agent
+  orchestration. Supports remote status, task assignment, agent registration.
+  Multi-repo umbrella coordinates across repository boundaries.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "ag coord command exists"
+    type: structural
+    verify: |
+      grep -q "coord" .agentic/lib/tools/ag.sh
+    tests:
+      - tests/validate_framework.sh::F-0185
+
+nfr_refs: []
+migrations: []

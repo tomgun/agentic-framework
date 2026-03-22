@@ -1,0 +1,34 @@
+id: F-0184
+name: Feature Hierarchy & Decomposition
+lifecycle: shipped
+since: v0.30.0
+profile: formal
+protection: advisory
+category: core-workflow
+consolidated_from: [F-0184]
+
+description: |
+  Epics decompose into child features via ag decompose. Parent-child
+  relationships tracked in FEATURES.md. Epic completion requires all
+  children shipped.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "ag decompose command exists"
+    type: structural
+    verify: |
+      grep -q "decompose" .agentic/lib/tools/ag.sh
+    tests:
+      - tests/validate_framework.sh::F-0184
+
+  - id: AC-002
+    text: "epic.py handles decomposition logic"
+    type: structural
+    verify: "test -f .agentic/lib/auto/epic.py"
+    tests:
+      - tests/validate_framework.sh::F-0184
+
+nfr_refs: []
+migrations: []

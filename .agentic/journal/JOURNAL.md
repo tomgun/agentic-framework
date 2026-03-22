@@ -4074,3 +4074,107 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 12:40 - F-0302 Phase 1: Contract Infrastructure
+
+**Why**: Spec system has 217 features describing history not state; ACs are markdown checklists checked once and forgotten; shipped behavior can silently disappear during refactoring
+
+**What changed**:
+- Built YAML contract system — schema, parser (contracts.py), ag contract command (12 subcommands), verify-contracts.sh runner, pre-commit protection (Check 23), paths integration, 42 unit tests, 7 validate_framework checks. All passing.
+
+**Next steps**:
+- Phase 0: Consolidate 217→~30-40 features. Phase 2: Write contracts for each. Phase 3: Switchover all ag commands to contracts.
+
+**Blockers**: None
+
+
+### Session: 2026-03-22 12:43 - F-0302 Phase 1 commit 2
+
+**Why**: Splitting Phase 1 into reviewable commits
+
+**What changed**:
+- ag contract command (12 subcommands), verify-contracts.sh, pre-commit Check 23, 42 unit tests, 7 validate_framework assertions
+
+**Next steps**:
+- Create PR, continue Phase 0 triage in next session
+
+**Blockers**: None
+
+
+### Session: 2026-03-22 12:43 - F-0302 state update
+
+**Why**: Ensuring agents see F-0302 as high-priority multi-session work
+
+**What changed**:
+- Renamed F-0302 to clarify scope: full spec system refactoring. Updated STATUS.md, BACKLOG.json, plan files.
+
+**Next steps**:
+- PR creation, then continue Phase 0 in next session
+
+**Blockers**: None
+
+
+### Session: 2026-03-22 12:53 - F-0302 Phase 0+2: Consolidation & contracts
+
+**Why**: Writing contracts for all consolidated features
+
+**What changed**:
+- Consolidated 217 features → 33 contracts + 3 NFR contracts (36 total). All validate OK, 97 structural assertions pass. CONSOLIDATION_MAP.md maps old→new.
+
+**Next steps**:
+- Phase 3: switchover (update ag commands, engine, paths to use contracts)
+
+**Blockers**: None
+
+
+### Session: 2026-03-22 12:54 - F-0302 contracts batch 2
+
+**Why**: Completing contract writing phase
+
+**What changed**:
+- Writing remaining feature + NFR contracts (F-0041 through F-0245, NFR-0001 through NFR-0004)
+
+**Next steps**:
+- Batch 3 commit, then Phase 3 switchover
+
+**Blockers**: None
+
+
+### Session: 2026-03-22 12:55 - F-0302 contracts batch 3a
+
+**Why**: Contract writing phase
+
+**What changed**:
+- Advanced feature contracts: F-0101 through F-0181
+
+**Next steps**:
+- Batch 3b: remaining contracts + NFRs
+
+**Blockers**: None
+
+
+### Session: 2026-03-22 12:55 - F-0302 contracts batch 3b
+
+**Why**: Completing all contract writing
+
+**What changed**:
+- Final contracts: F-0184 through NFR-0004. All 36 contracts written and validated.
+
+**Next steps**:
+- Push PR, continue Phase 3 switchover
+
+**Blockers**: None
+
+
+### Session: 2026-03-22 13:17 - F-0302 security fixes
+
+**Why**: Code review found shell injection via single-quote in inline Python
+
+**What changed**:
+- Fixed shell injection in contract.sh: all user input passed via env vars, feature ID validation added. Fixed perf: 3→1 python calls per contract in check-all loop. Fixed FEATURES.md entry.
+
+**Next steps**:
+- Push, merge
+
+**Blockers**: None
+

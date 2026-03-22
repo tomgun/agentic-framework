@@ -1,0 +1,35 @@
+id: NFR-0001
+name: Instruction File Size Limit
+lifecycle: shipped
+since: v0.10.0
+profile: both
+protection: contract
+category: nfr
+
+description: |
+  Constitution-layer instruction files must be under 100 lines.
+  Based on L-0002 empirical finding that smaller files lead to
+  better agent adherence. Applies to CLAUDE.md, .cursorrules,
+  copilot-instructions.md, codex-instructions.md.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "CLAUDE.md template is under 100 lines"
+    type: structural
+    verify: |
+      [ $(wc -l < .agentic/lib/agents/claude/CLAUDE.md) -le 100 ]
+    tests:
+      - tests/infrastructure/structural/S08_claude_md_under_100_lines.sh
+
+  - id: AC-002
+    text: "Pre-commit checks instruction file sizes"
+    type: structural
+    verify: |
+      grep -q "instruction file\|file size\|Agent instruction" .agentic/lib/hooks/pre-commit-check.sh
+    tests:
+      - tests/validate_framework.sh::NFR-0001
+
+nfr_refs: []
+migrations: []

@@ -29,6 +29,7 @@
 #   20. TDD phase ordering (BLOCKING when development_mode: tdd, safety net)
 #   21. Approved plan required when plan_review_enabled (BLOCKING)
 #   22. Annotation enforcement for newly-shipped features (respects annotation_enforcement setting)
+#   23. YAML contract protection — shipped contracts require migration entry (BLOCKING)
 #
 # Escape hatches (use sparingly, blocked on main/master):
 #   SKIP_TESTS=1      Skip test execution
@@ -1273,6 +1274,48 @@ for issue in data.get('issues', []):
         echo "  ℹ Add @feature annotations before committing"
         echo "    See: .agentic/lib/workflows/code_annotations.md"
       fi
+    fi
+  fi
+fi
+
+# Check 23: YAML contract protection for shipped contracts (BLOCKING)
+# @feature F-0302
+# When a shipped contract (protection: contract) is modified, require a migration entry.
+CONTRACTS_DIR_CHECK="${CONTRACTS_DIR:-${AGENTIC_ROOT}/spec/contracts}"
+if [[ -d "$CONTRACTS_DIR_CHECK" ]] && command -v python3 >/dev/null 2>&1; then
+  # Only check MODIFIED contracts (not newly added ones) — new files don't need migration
+  CONTRACT_STAGED=$(git diff --cached --diff-filter=M --name-only 2>/dev/null | grep -E "^\.agentic/spec/contracts/.*\.yaml$" || true)
+  if [[ -n "$CONTRACT_STAGED" ]]; then
+    echo ""
+    echo "[23] Checking YAML contract protection..."
+    CHECK23_FAIL=0
+    for contract_file in $CONTRACT_STAGED; do
+      [[ -f "$contract_file" ]] || continue
+      # Check if contract is shipped + protected
+      IS_PROTECTED=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import sys
+from pathlib import Path
+from contracts import load_contract
+try:
+    c = load_contract(Path('$contract_file'))
+    print('yes' if c.is_protected else 'no')
+except Exception:
+    print('no')
+" 2>/dev/null || echo "no")
+      if [[ "$IS_PROTECTED" == "yes" ]]; then
+        CID=$(basename "$contract_file" .yaml)
+        # Check for staged migration entry in the contract itself
+        HAS_MIGRATION=$(git diff --cached -- "$contract_file" 2>/dev/null | grep -c "^+.*id: M-" || true)
+        if [[ "$HAS_MIGRATION" -eq 0 ]]; then
+          echo "❌ BLOCKED: Shipped contract $CID modified without migration entry"
+          echo "  Add migration: ag contract add-migration $CID --trigger <type> --reason \"reason\""
+          FAILURES=$((FAILURES + 1))
+          CHECK23_FAIL=1
+        fi
+      fi
+    done
+    if [[ $CHECK23_FAIL -eq 0 ]]; then
+      echo "✓ Contract changes have migration coverage (or are unprotected)"
     fi
   fi
 fi

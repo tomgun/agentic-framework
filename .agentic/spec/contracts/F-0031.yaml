@@ -1,0 +1,65 @@
+id: F-0031
+name: Multi-Agent Coordination
+lifecycle: shipped
+since: v0.5.0
+profile: both
+protection: contract
+category: multi-agent
+consolidated_from: [F-0031, F-0032, F-0034, F-0035, F-0036, F-0037, F-0194, F-0195, F-0214, F-0250]
+
+description: |
+  Multiple AI agents work simultaneously using Git worktrees for isolation.
+  AGENTS.json tracks active agents, their worktrees, and assigned features.
+  Collision prevention checks for other active sessions before destructive
+  git operations. Worktree-by-default: ag implement auto-creates worktrees.
+  Sequential pipeline and parallel epic execution supported. Role definitions
+  scope agent capabilities. Git-deferred mode supports projects not yet
+  using git.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "AGENTS.json schema exists for agent/worktree tracking"
+    type: structural
+    verify: |
+      test -f .agentic/lib/schemas/af-item-schema.json ||
+      grep -q "AGENTS" .agentic/lib/paths.sh
+    tests:
+      - tests/validate_framework.sh::F-0194
+
+  - id: AC-002
+    text: "agents_helpers.py provides agent listing and collision detection"
+    type: structural
+    verify: "test -f .agentic/lib/tools/agents_helpers.py"
+    tests:
+      - tests/validate_framework.sh::F-0195
+
+  - id: AC-003
+    text: "worktree.sh manages git worktree creation and cleanup"
+    type: structural
+    verify: "test -f .agentic/lib/tools/worktree.sh"
+    tests:
+      - tests/validate_framework.sh::F-0032
+
+  - id: AC-004
+    text: "Multi-session collision guard checks before destructive git ops"
+    type: behavioral
+    verify: null
+    tests:
+      - tests/llm/tests/031_multi_agent.sh
+
+  - id: AC-005
+    text: "ag implement auto-creates worktree for feature work"
+    type: behavioral
+    verify: null
+    tests: []
+
+nfr_refs: []
+scenarios:
+  - name: "Two agents work on different features"
+    given: "Agent A on F-0001, Agent B on F-0002"
+    when: "Both registered in AGENTS.json with separate worktrees"
+    then: "Each works independently, collision guard prevents conflicts"
+
+migrations: []

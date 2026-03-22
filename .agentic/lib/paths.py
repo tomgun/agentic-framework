@@ -91,6 +91,9 @@ class AgenticPaths:
         self.acceptance_dir = self._resolve(
             self.agentic_root / "spec" / "acceptance",
             self.project_root / "spec" / "acceptance")
+        self.contracts_dir = self._resolve(
+            self.agentic_root / "spec" / "contracts",
+            self.project_root / "spec" / "contracts")
         self.adr_dir = self._resolve(
             self.agentic_root / "spec" / "adr",
             self.project_root / "spec" / "adr")

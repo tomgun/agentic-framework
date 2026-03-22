@@ -1,0 +1,71 @@
+id: F-0160
+name: Autonomous Execution Engine
+lifecycle: shipped
+since: v0.30.0
+profile: formal
+protection: contract
+category: autonomous
+consolidated_from: [F-0160, F-0161, F-0162, F-0163, F-0164, F-0168, F-0186, F-0204, F-0215]
+
+description: |
+  Python engine for autonomous feature implementation. Modes: ag auto task
+  (single feature), ag auto crunch (backlog batch), ag auto verify (acceptance
+  testing), ag auto epic (parallel children). Engine loads acceptance criteria,
+  estimates complexity, auto-decomposes LARGE ACs. Control plane via Unix
+  socket supports pause/resume/stop/status. Tiered verify loop with
+  progressive assertion checking. Epic integration verification tests
+  cross-component behavior.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "engine.py exists with AutoEngine class"
+    type: structural
+    verify: |
+      test -f .agentic/lib/auto/engine.py &&
+      grep -q "class AutoEngine" .agentic/lib/auto/engine.py
+    tests:
+      - tests/test_auto_engine.py
+
+  - id: AC-002
+    text: "ag auto command dispatches task, crunch, verify, epic subcommands"
+    type: structural
+    verify: |
+      grep -q "auto" .agentic/lib/tools/ag.sh &&
+      test -f .agentic/lib/tools/commands/auto.sh
+    tests:
+      - tests/validate_framework.sh::F-0160
+
+  - id: AC-003
+    text: "Engine loads acceptance criteria from spec/acceptance/F-XXXX.md"
+    type: structural
+    verify: |
+      grep -q "acceptance" .agentic/lib/auto/engine.py
+    tests:
+      - tests/test_auto_engine.py::TestACHandling
+
+  - id: AC-004
+    text: "Control plane socket supports pause/resume/stop/status"
+    type: structural
+    verify: |
+      grep -q "ControlServer\|control.*socket" .agentic/lib/auto/engine.py
+    tests:
+      - tests/test_auto_engine.py::TestControlServer
+
+  - id: AC-005
+    text: "Large AC auto-decomposition into sub-tasks"
+    type: structural
+    verify: |
+      grep -q "decompos" .agentic/lib/auto/engine.py
+    tests:
+      - tests/test_auto_engine.py::TestACHandling
+
+nfr_refs: []
+scenarios:
+  - name: "Autonomous task implementation"
+    given: "Feature F-0099 with 3 acceptance criteria"
+    when: "Run ag auto task F-0099"
+    then: "Engine processes each AC, runs tests, reports results"
+
+migrations: []

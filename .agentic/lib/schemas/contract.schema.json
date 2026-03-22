@@ -1,0 +1,234 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentic-framework.dev/schemas/contract.schema.json",
+  "title": "Contract",
+  "description": "A YAML contract specification with testable assertions and lifecycle protection",
+  "type": "object",
+  "required": ["id", "name", "lifecycle", "description", "assertions"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^(F|NFR)-[0-9]{4,}$",
+      "description": "Feature or NFR identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable contract name"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planned", "in_progress", "shipped", "deprecated"],
+      "description": "Legacy status field (prefer lifecycle)"
+    },
+    "lifecycle": {
+      "type": "string",
+      "enum": ["exploring", "specifying", "implementing", "verifying", "shipping", "shipped", "deprecated"],
+      "description": "Contract lifecycle state"
+    },
+    "since": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Version when this feature first shipped"
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["formal", "discovery", "both"],
+      "default": "both",
+      "description": "Which framework profile this feature applies to"
+    },
+    "protection": {
+      "type": "string",
+      "enum": ["contract", "advisory", "none"],
+      "default": "none",
+      "description": "Protection level — contract requires migration for changes"
+    },
+    "category": {
+      "type": "string",
+      "default": "uncategorized",
+      "description": "Feature grouping for display and filtering"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "description": "What this feature does and why it exists"
+    },
+    "consolidated_from": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^F-[0-9]{4,}$"
+      },
+      "default": [],
+      "description": "Old feature IDs absorbed into this contract"
+    },
+    "user_input": {
+      "type": "string",
+      "default": "",
+      "description": "Human change requests — non-empty triggers agent workflow"
+    },
+    "parent": {
+      "type": ["string", "null"],
+      "pattern": "^(F|E)-[0-9]{4,}$",
+      "default": null,
+      "description": "Parent feature or epic ID"
+    },
+    "children": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^F-[0-9]{4,}$"
+      },
+      "default": [],
+      "description": "Child feature IDs for epics or decomposed features"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      },
+      "default": [],
+      "description": "Flexible tagging for cross-cutting concerns"
+    },
+    "nfr_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^NFR-[0-9]{4,}$"
+      },
+      "default": [],
+      "description": "Non-functional requirements this feature must satisfy"
+    },
+    "assertions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/assertion"
+      },
+      "description": "Testable acceptance criteria"
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/scenario"
+      },
+      "default": [],
+      "description": "BDD scenarios for human readability (not parsed for verification)"
+    },
+    "migrations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/migration"
+      },
+      "default": [],
+      "description": "Tracked changes to shipped contract assertions"
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Open questions, context, or exploration notes"
+    }
+  },
+  "definitions": {
+    "assertion": {
+      "type": "object",
+      "required": ["id", "text", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^AC-[0-9]{3,}$",
+          "description": "Assertion identifier within the contract"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 5,
+          "description": "Human-readable description of what must be true"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["structural", "behavioral"],
+          "description": "structural = machine-verifiable; behavioral = LLM/integration test only"
+        },
+        "verify": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Shell command that exits 0 if assertion holds (structural only)"
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Test file paths that verify this assertion"
+        },
+        "draft": {
+          "type": "boolean",
+          "default": false,
+          "description": "Draft assertions are not enforced (exploring lifecycle)"
+        }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "required": ["name", "given", "when", "then"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Scenario title"
+        },
+        "given": {
+          "type": "string",
+          "description": "Initial context"
+        },
+        "when": {
+          "type": "string",
+          "description": "Action or event"
+        },
+        "then": {
+          "type": "string",
+          "description": "Expected outcome"
+        }
+      }
+    },
+    "migration": {
+      "type": "object",
+      "required": ["id", "date", "trigger", "reason", "changes"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^M-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$",
+          "description": "Migration ID in format M-YYYY-MM-DD-NNN"
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of migration (YYYY-MM-DD)"
+        },
+        "trigger": {
+          "type": "string",
+          "enum": ["external", "implementation_discovery", "user_request"],
+          "description": "What caused this change"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Why this change was needed"
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of assertion changes"
+        },
+        "approved_by": {
+          "type": "string",
+          "enum": ["user", "agent_review", "auto"],
+          "default": "user",
+          "description": "Who approved this migration"
+        }
+      }
+    }
+  }
+}
