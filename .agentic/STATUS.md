@@ -5,19 +5,25 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0301 shipped. Next: F-0243 (Updated: 2026-03-22 10:29 UTC)
+- F-0302 Spec System Overhaul — Phase 1 complete, Phases 0-5 remaining (HIGH PRIORITY) (Updated: 2026-03-22 12:40 UTC)
 
 ## Current focus
-- ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item
-- v0.58.0: F-0239 structural enforcement for post-merge workflow shipped
+- **F-0302: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
+  - Phase 1 DONE: contract infrastructure (parser, ag contract, verify-contracts.sh, pre-commit, tests)
+  - Phase 0 NEXT: Consolidate 217 features → ~30-40 contracts (triage + classification)
+  - Phase 2: Write YAML contracts for each consolidated feature
+  - Phase 3: Switchover all ag commands, engine, paths to use contracts
+  - Phase 4: Protection enforcement, V2 cleanup
+  - Phase 5: User project support (templates, migration tool)
+  - Plan: `.agentic/work/F-0302/plan.md`
 
 ## In progress
-- F-0223: Later State Machine Gates Strengthening (current)
+- F-0302: Spec System Overhaul — Phase 1 complete, 5 phases remaining
 
-## Next up
+## Next up (after F-0302)
+- F-0243: Complexity Tier Experiments
+- F-0223: Later State Machine Gates Strengthening
 - F-0220: Protected Main Branch Support
-- F-0193: Collision-Proof Feature IDs
-- F-0210: Configurable Definition of Done per Task Type
 
 ## Known issues / risks
 - Some CHANGELOG.md historical references point to old file locations (acceptable)
