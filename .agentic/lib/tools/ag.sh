@@ -197,6 +197,7 @@ source "$COMMANDS_DIR/diagnostics.sh"
 source "$COMMANDS_DIR/settings.sh"
 source "$COMMANDS_DIR/operations.sh"
 source "$COMMANDS_DIR/git-init.sh"
+source "$COMMANDS_DIR/contract.sh"
 
 # Self-healing: ensure pre-commit hooks are installed on every ag invocation
 # Addresses D2 (Deterministic Enforcement) — hooks must survive git config resets
@@ -259,6 +260,9 @@ case "${1:-help}" in
         ;;
     specs)
         cmd_specs "${2:-}"
+        ;;
+    contract)
+        shift; cmd_contract "$@"
         ;;
     todo)
         shift

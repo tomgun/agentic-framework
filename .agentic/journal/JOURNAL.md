@@ -4074,3 +4074,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 12:40 - F-0302 Phase 1: Contract Infrastructure
+
+**Why**: Spec system has 217 features describing history not state; ACs are markdown checklists checked once and forgotten; shipped behavior can silently disappear during refactoring
+
+**What changed**:
+- Built YAML contract system — schema, parser (contracts.py), ag contract command (12 subcommands), verify-contracts.sh runner, pre-commit protection (Check 23), paths integration, 42 unit tests, 7 validate_framework checks. All passing.
+
+**Next steps**:
+- Phase 0: Consolidate 217→~30-40 features. Phase 2: Write contracts for each. Phase 3: Switchover all ag commands to contracts.
+
+**Blockers**: None
+
+
+### Session: 2026-03-22 12:43 - F-0302 Phase 1 commit 2
+
+**Why**: Splitting Phase 1 into reviewable commits
+
+**What changed**:
+- ag contract command (12 subcommands), verify-contracts.sh, pre-commit Check 23, 42 unit tests, 7 validate_framework assertions
+
+**Next steps**:
+- Create PR, continue Phase 0 triage in next session
+
+**Blockers**: None
+

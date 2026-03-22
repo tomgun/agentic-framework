@@ -5886,7 +5886,90 @@ done
 
 fi # end V2 ENGINE VALIDATION
 
+# ============================================================
+# F-0302: Spec System Overhaul — YAML Contracts
+# ============================================================
+echo "--- F-0302: Spec System Overhaul — YAML Contracts ---"
+
+# AC-001: Contract schema exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/schemas/contract.schema.json" ]]; then
+  pass "F-0302: contract.schema.json exists"
+else
+  fail "F-0302: contract.schema.json missing"
+fi
+
+# AC-002: Contract parser loads and validates
+if command -v python3 >/dev/null 2>&1; then
+  _contract_parser_test=$(PYTHONPATH="${FRAMEWORK_ROOT}/.agentic/lib" python3 -c "
+from pathlib import Path
+from contracts import Contract, Assertion, validate_contract
+c = Contract(id='F-9999', name='Test Feature', lifecycle='exploring',
+             description='A test contract for validation',
+             assertions=[Assertion(id='AC-001', text='Test assertion text here', type='structural', draft=True)])
+errors = validate_contract(c)
+if errors:
+    print('FAIL: ' + '; '.join(errors))
+else:
+    print('OK')
+" 2>&1)
+  if [[ "$_contract_parser_test" == "OK" ]]; then
+    pass "F-0302: contracts.py parser validates contracts"
+  else
+    fail "F-0302: contracts.py parser validation failed: $_contract_parser_test"
+  fi
+else
+  fail "F-0302: python3 not available"
+fi
+
+# AC-003: ag contract command exists
+if grep_ag "contract" 2>/dev/null; then
+  pass "F-0302: ag contract command wired in ag.sh"
+else
+  fail "F-0302: ag contract command missing from ag.sh"
+fi
+
+# AC-004: verify-contracts.sh exists and is executable
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/verify-contracts.sh" ]]; then
+  pass "F-0302: verify-contracts.sh exists and is executable"
+else
+  fail "F-0302: verify-contracts.sh missing or not executable"
+fi
+
+# AC-005: paths resolve contracts_dir
+if command -v python3 >/dev/null 2>&1; then
+  _paths_test=$(PYTHONPATH="${FRAMEWORK_ROOT}/.agentic/lib" python3 -c "
+from paths import get_paths; from pathlib import Path
+p = get_paths(Path('${FRAMEWORK_ROOT}'))
+if hasattr(p, 'contracts_dir') and 'contracts' in str(p.contracts_dir):
+    print('OK')
+else:
+    print('FAIL')
+" 2>&1)
+  if [[ "$_paths_test" == "OK" ]]; then
+    pass "F-0302: paths.py resolves contracts_dir"
+  else
+    fail "F-0302: paths.py missing contracts_dir"
+  fi
+else
+  fail "F-0302: python3 not available"
+fi
+
+# Check paths.sh has CONTRACTS_DIR
+if grep -q "CONTRACTS_DIR" "${FRAMEWORK_ROOT}/.agentic/lib/paths.sh" 2>/dev/null; then
+  pass "F-0302: paths.sh defines CONTRACTS_DIR"
+else
+  fail "F-0302: paths.sh missing CONTRACTS_DIR"
+fi
+
+# AC-006: Pre-commit has contract protection check
+if grep -q "contract protection" "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commit-check.sh" 2>/dev/null; then
+  pass "F-0302: pre-commit-check.sh has contract protection"
+else
+  fail "F-0302: pre-commit-check.sh missing contract protection"
+fi
+
 # Summary
+
 # ============================================================
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
