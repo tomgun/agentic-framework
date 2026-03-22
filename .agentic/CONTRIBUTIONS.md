@@ -8,6 +8,17 @@
 
 ## Recent Contributions
 
+### Spec System Overhaul — Design Principles (F-0302, v0.71.0)
+
+**User insights** that shaped the YAML contract system:
+
+1. **"Perfection is when you can't remove anything"** — Specs describe what the system IS, not history. Drove consolidation from 217 → 33 features.
+2. **Specs as control interface (`user_input`)** — Users edit specs directly, agent cascades to tests/code/migration.
+3. **YAML over markdown** — Long-term parsing reliability > familiarity.
+4. **"If it is needed, then it is needed"** — 300+ file updates is chore work for AI, not a reason to compromise design.
+5. **Capabilities = features** — No unnecessary abstraction layer.
+6. **Machine-only YAML, human docs on demand** — Contracts are machine-first. Human-readable specs extracted to `/docs` on demand or regularly — not a parallel artifact. Keeps source of truth clean and parseable.
+
 ### Context Window Decay — Architectural Analysis of Autonomous Session Degradation (v0.69.0)
 
 **User insight**: Tomas asked a fundamental question: "if you work in autonomous mode with the framework, how do you prevent the context rotting and filling too much so you forget the instructions and skills? Is it possible for you to auto-clear?" This forced an honest analysis of a problem the framework mitigates but cannot solve — LLM context windows fill monotonically, agents cannot self-clear, and automatic compression is lossy. Tomas then directed that the analysis be documented as first-class architecture, not just a conversational answer.
