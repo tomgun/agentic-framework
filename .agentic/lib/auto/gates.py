@@ -147,7 +147,7 @@ def gate_specced_to_criteria_set(feature_id: str, project_root: Path) -> GateRes
                 reasons.append(
                     f"Contract spec/contracts/{feature_id}.yaml has no assertions"
                 )
-        except Exception as e:
+        except (ImportError, ValueError, OSError) as e:
             reasons.append(f"Failed to load contract spec/contracts/{feature_id}.yaml: {e}")
     elif ac_file.exists():
         content = ac_file.read_text()

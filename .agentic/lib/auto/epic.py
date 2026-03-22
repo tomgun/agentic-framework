@@ -721,33 +721,59 @@ def _build_child_ac(child: dict, epic_id: str) -> str:
 
 
 def _build_child_contract(child: dict, epic_id: str) -> str:
-    """Build a contract YAML file for a child feature."""
+    """Build a valid contract YAML file for a child feature.
+
+    Uses the contracts module to produce correctly structured YAML
+    with proper field names (id, name, lifecycle, assertions, etc.).
+    """
     import re as _re
-    lines = [
-        f"feature: {child['id']}",
-        f'title: "{child["name"]}"',
-        f"parent: {epic_id}",
-    ]
-    if child.get("component"):
-        lines.append(f"component: {child['component']}")
-    lines.append("assertions:")
-    for ac_line in child["ac_lines"]:
+
+    assertions = []
+    for idx, ac_line in enumerate(child.get("ac_lines", [])):
         # Extract AC ID and text from lines like "- [ ] **AC-001**: text"
         m = _re.search(r"\*\*AC-(\d+)\*\*:\s*(.+)", ac_line)
         if m:
             ac_id = f"AC-{m.group(1)}"
             ac_text = m.group(2).strip()
         else:
-            # Plain text line — assign a sequential AC ID
-            ac_id = f"AC-{child['ac_lines'].index(ac_line) + 1:03d}"
+            ac_id = f"AC-{idx + 1:03d}"
             ac_text = ac_line.strip().lstrip("- [ ]").strip()
-        # Escape quotes in YAML
-        ac_text = ac_text.replace('"', '\\"')
-        lines.append(f'  - id: {ac_id}')
-        lines.append(f'    text: "{ac_text}"')
-        lines.append(f'    type: functional')
-    lines.append("")
-    return "\n".join(lines)
+        assertions.append({
+            "id": ac_id,
+            "text": ac_text,
+            "type": "behavioral",
+        })
+
+    contract_data = {
+        "id": child["id"],
+        "name": child["name"],
+        "lifecycle": "exploring",
+        "description": f"Child feature of {epic_id}.",
+        "parent": epic_id,
+        "assertions": assertions,
+    }
+    if child.get("component"):
+        contract_data["tags"] = [child["component"]]
+
+    try:
+        import yaml
+        return yaml.dump(contract_data, default_flow_style=False, sort_keys=False, allow_unicode=True)
+    except ImportError:
+        # Fallback: manual YAML construction
+        lines = [
+            f"id: {child['id']}",
+            f"name: {child['name']}",
+            "lifecycle: exploring",
+            f"description: Child feature of {epic_id}.",
+            f"parent: {epic_id}",
+            "assertions:",
+        ]
+        for a in assertions:
+            lines.append(f"  - id: {a['id']}")
+            text = a['text'].replace('"', '\\"')
+            lines.append(f'    text: "{text}"')
+            lines.append(f"    type: {a['type']}")
+        return "\n".join(lines) + "\n"
 
 
 # ---------------------------------------------------------------------------

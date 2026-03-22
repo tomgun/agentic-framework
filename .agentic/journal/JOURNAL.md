@@ -4217,3 +4217,14 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 21:29 - F-0302 review fixes
+
+**What changed**:
+- Narrowed exception handling, fixed _build_child_contract schema, removed redundant sys.path.insert
+
+**Next steps**:
+- PR review
+
+**Blockers**: None
+

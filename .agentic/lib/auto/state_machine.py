@@ -209,7 +209,7 @@ class FeatureStateMachine:
             from contracts import load_contract
             contract = load_contract(contract_file)
             return LIFECYCLE_TO_STATE.get(contract.lifecycle)
-        except Exception:
+        except (ImportError, ValueError, OSError):
             return None
 
     def _get_current_state_v1(self, feature_id: str) -> Optional[FeatureState]:
@@ -445,7 +445,7 @@ class FeatureStateMachine:
                     if new_lifecycle == "shipped":
                         contract.protection = "contract"
                     save_contract(contract, contract_file)
-            except Exception as e:
+            except (ImportError, ValueError, OSError) as e:
                 messages.append(f"Warning: failed to update contract: {e}")
 
         # Update FEATURES.md via feature.sh for consistency

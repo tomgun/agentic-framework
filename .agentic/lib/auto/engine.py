@@ -391,11 +391,10 @@ class AutoEngine:
     def _load_criteria_from_contract(self, contract_file) -> list[tuple[str, str]]:
         """Load assertions from a YAML contract file."""
         try:
-            sys.path.insert(0, str(_LIB_DIR))
             from contracts import load_contract
             contract = load_contract(contract_file)
             return [(a.id, a.text) for a in contract.assertions if not a.draft]
-        except Exception:
+        except (ImportError, ValueError, OSError):
             return []
 
     def _estimate_complexity(
