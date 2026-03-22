@@ -1,0 +1,28 @@
+id: NFR-0004
+name: Spec-First Development
+lifecycle: shipped
+since: v0.2.0
+profile: formal
+protection: contract
+category: nfr
+
+description: |
+  Acceptance criteria must exist before implementation code is written.
+  ag implement gate checks for acceptance file. Formal profile uses
+  blocking enforcement; Discovery uses advisory.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "ag implement checks for acceptance criteria file"
+    type: structural
+    verify: |
+      grep -rq "acceptance\|ac.*file\|spec.*first" .agentic/lib/tools/commands/implement.sh 2>/dev/null ||
+      grep -rq "check_feature_has_ac" .agentic/lib/gate.py 2>/dev/null
+    tests:
+      - tests/validate_framework.sh::F-0003
+      - tests/llm/tests/003_acceptance_first.sh
+
+nfr_refs: []
+migrations: []

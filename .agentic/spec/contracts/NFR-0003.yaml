@@ -1,0 +1,35 @@
+id: NFR-0003
+name: Small Batch Work
+lifecycle: shipped
+since: v0.1.0
+profile: both
+protection: contract
+category: nfr
+
+description: |
+  Work planned and executed in batches small enough for full reasoning
+  context (~10 files Formal, ~15 Discovery). Enforced at planning time
+  via memory-seed "TOO BIG" rule. Pre-commit file count is a lagging
+  safety net, not the primary enforcement.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "Pre-commit warns on >10 files staged"
+    type: structural
+    verify: |
+      grep -q "files staged\|max.*10\|Batch size" .agentic/lib/hooks/pre-commit-check.sh
+    tests:
+      - tests/validate_framework.sh::F-0007
+
+  - id: AC-002
+    text: "Memory-seed enforces batch size limits"
+    type: structural
+    verify: |
+      grep -qi "10 files\|too big\|batch\|smaller tasks" .agentic/lib/init/memory-seed.md
+    tests:
+      - tests/validate_framework.sh::NFR-0003
+
+nfr_refs: []
+migrations: []
