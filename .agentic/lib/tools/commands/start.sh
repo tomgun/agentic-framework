@@ -161,6 +161,20 @@ if became:
         fi
     fi
 
+    # 5d. Completion gate advisory
+    if [ -n "$bl_id" ] && is_feature_id "$bl_id" 2>/dev/null; then
+        local cg_out
+        cg_out=$(python3 "$SCRIPT_DIR/backlog_helpers.py" --project-root "$ROOT_DIR" check-completion-gate "$bl_id" 2>/dev/null) || cg_out=""
+        if [ -n "$cg_out" ]; then
+            local stale_fid
+            stale_fid=$(echo "$cg_out" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('stale_feature','') if d.get('blocked') else '')" 2>/dev/null) || stale_fid=""
+            if [ -n "$stale_fid" ]; then
+                echo -e "${YELLOW}WARNING: $stale_fid has merged code on main but isn't marked shipped${NC}"
+                echo "  Complete it first: ag done $stale_fid"
+            fi
+        fi
+    fi
+
     # 6. Run doctor quick check
     echo ""
     echo -e "${BOLD}Quick Health Check:${NC}"

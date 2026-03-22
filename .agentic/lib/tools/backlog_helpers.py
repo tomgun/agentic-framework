@@ -6,10 +6,11 @@ Called by backlog.sh. Handles add/remove/move/list/current/done/clear.
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
@@ -222,24 +223,31 @@ def cmd_next(backlog_file: Path) -> int:
     return 0
 
 
-def _is_feature_shipped(project_root: Path, feature_id: str) -> bool:
-    """Check if a feature is marked as shipped in FEATURES.md."""
+def _get_feature_status(project_root: Path, feature_id: str) -> Optional[str]:
+    """Return the status string for a feature from FEATURES.md, or None if not found."""
+    import re
     paths = get_paths(project_root)
     ff = paths.features_file
     if not ff.exists():
-        return True  # no registry = no check
+        return None
     content = ff.read_text()
-    # Find the feature section and check its status
-    import re
     pattern = rf"## {re.escape(feature_id)}:.*?\n(.*?)(?=\n## [A-Z]|\Z)"
     match = re.search(pattern, content, re.DOTALL)
     if not match:
-        return True  # feature not in registry = allow removal
+        return None
     section = match.group(1)
     status_match = re.search(r"\*\*Status\*\*:\s*(\w+)", section)
     if not status_match:
-        return True  # no status field = allow removal
-    return status_match.group(1) == "shipped"
+        return None
+    return status_match.group(1)
+
+
+def _is_feature_shipped(project_root: Path, feature_id: str) -> bool:
+    """Check if a feature is marked as shipped in FEATURES.md."""
+    status = _get_feature_status(project_root, feature_id)
+    if status is None:
+        return True  # not found = allow removal
+    return status == "shipped"
 
 
 def cmd_done(project_root: Path, backlog_file: Path) -> int:
@@ -430,6 +438,85 @@ def cmd_check_deps(backlog_file: Path, feature_id: str) -> int:
     return 0
 
 
+def _has_commits_on_main(project_root: Path, feature_id: str) -> int:
+    """Check if a feature has implementation commits on main (excluding .agentic/ state files).
+    Returns the number of matching commits, or 0 if none."""
+    count = 0
+    # Check commit messages mentioning the feature ID, excluding .agentic/ paths
+    try:
+        result = subprocess.run(
+            ["git", "log", "--oneline", f"--grep={feature_id}", "main",
+             "--", ".", ":!.agentic/"],
+            capture_output=True, text=True, cwd=project_root, timeout=10,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            count += len(result.stdout.strip().splitlines())
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        pass
+    # Also check for merged feature branches (feat/F-XXXX-*)
+    try:
+        result = subprocess.run(
+            ["git", "branch", "--list", f"feat/{feature_id}-*", "--merged", "main"],
+            capture_output=True, text=True, cwd=project_root, timeout=10,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            count += len(result.stdout.strip().splitlines())
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        pass
+    return count
+
+
+def cmd_check_completion_gate(
+    project_root: Path,
+    backlog_file: Path,
+    feature_id: str,
+    has_commits_fn: Optional[Callable[[Path, str], int]] = None,
+) -> int:
+    """Check if any prior backlog item has commits on main but is still 'planned'.
+    Outputs JSON: {"blocked": true/false, "stale_feature": "F-XXXX", ...}"""
+    if has_commits_fn is None:
+        has_commits_fn = _has_commits_on_main
+
+    items = _load(backlog_file)
+    if not items:
+        print(json.dumps({"blocked": False}))
+        return 0
+
+    # Find target feature position
+    target_idx = _find_index(items, feature_id)
+    if target_idx < 0:
+        # Not in backlog — check position 0 only
+        target_idx = 1  # check item at 0
+
+    # Check all items before the target
+    for i in range(target_idx):
+        item = items[i]
+        # Skip task-type items (no feature ID to check)
+        if item.get("type") != "feature":
+            continue
+        item_id = item.get("id", "")
+        if not item_id:
+            continue
+
+        status = _get_feature_status(project_root, item_id)
+        # Only trigger on "planned" — in_progress, implementing, partial, etc. are intentional
+        if status != "planned":
+            continue
+
+        commit_count = has_commits_fn(project_root, item_id)
+        if commit_count > 0:
+            print(json.dumps({
+                "blocked": True,
+                "stale_feature": item_id,
+                "status": status,
+                "commit_count": commit_count,
+            }))
+            return 0
+
+    print(json.dumps({"blocked": False}))
+    return 0
+
+
 def _print_item(item: dict, pos: int, show_current: bool = False) -> None:
     """Format and print a backlog item."""
     itype = item.get("type", "task")
@@ -483,6 +570,7 @@ def main() -> int:
     valid_cmds = {
         "add", "current", "next", "done", "list", "remove", "move", "clear",
         "json-current", "json-all", "check-staleness", "upsert", "check-deps",
+        "check-completion-gate",
     }
     if cmd not in valid_cmds:
         print(f"Unknown command: {cmd}", file=sys.stderr)
@@ -531,6 +619,11 @@ def main() -> int:
             print("Error: feature ID required", file=sys.stderr)
             return 1
         return cmd_check_deps(backlog_file, rest[0])
+    elif cmd == "check-completion-gate":
+        if not rest:
+            print("Error: feature ID required", file=sys.stderr)
+            return 1
+        return cmd_check_completion_gate(project_root, backlog_file, rest[0])
     return 1
 
 

@@ -226,6 +226,19 @@ if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/backlog_helpers.py" ]
     _py "$TOOLS_DIR/backlog_helpers.py" --project-root "$PROJECT_ROOT" check-staleness 7 >/dev/null 2>&1 && D_STALE="yes"
 fi
 
+# COMPLETION GATE (stale current item — has commits but not shipped)
+D_COMPLETION_STALE=""
+if [[ "$D_GIT_MODE" == "active" ]] && [[ -n "${D_BACKLOG_CUR_ID:-}" ]] && command -v python3 >/dev/null 2>&1; then
+    _cg_out=$(_py "$TOOLS_DIR/backlog_helpers.py" --project-root "$PROJECT_ROOT" \
+        check-completion-gate "${D_BACKLOG_CUR_ID}" 2>/dev/null) || _cg_out=""
+    if [[ -n "$_cg_out" ]]; then
+        _cg_blocked=$(echo "$_cg_out" | _py -c "import json,sys; print(json.load(sys.stdin).get('blocked',False))" 2>/dev/null) || _cg_blocked="False"
+        if [[ "$_cg_blocked" == "True" ]]; then
+            D_COMPLETION_STALE=$(echo "$_cg_out" | _py -c "import json,sys; print(json.load(sys.stdin).get('stale_feature',''))" 2>/dev/null) || D_COMPLETION_STALE=""
+        fi
+    fi
+fi
+
 # ORPHANED PLANS (unsaved session-scoped plans needing review)
 # Note: This is distinct from periodic-checks.sh check_orphaned_plans() which uses
 # fingerprint matching and a 2+ feature ID threshold. dashboard uses plan-scan.sh
@@ -288,6 +301,8 @@ if $RAW_MODE; then
     echo "$D_DIRTY_STATE"
     echo "===STALE==="
     echo "$D_STALE"
+    echo "===COMPLETION_STALE==="
+    echo "$D_COMPLETION_STALE"
     exit 0
 fi
 
@@ -371,6 +386,11 @@ fi
 # Conditional: stale
 if [[ "$D_STALE" == "yes" ]]; then
     echo "⏰ Stale          Current backlog item is >7 days old — review priority"
+fi
+
+# Conditional: completion gate (stale prior feature)
+if [[ -n "$D_COMPLETION_STALE" ]]; then
+    echo "⚠️  Unfinished    $D_COMPLETION_STALE has merged code but isn't shipped — run: ag done $D_COMPLETION_STALE"
 fi
 
 # Conditional: upgrade

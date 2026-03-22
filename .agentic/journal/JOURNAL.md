@@ -4048,3 +4048,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 10:22 - F-0301 Completion Gate
+
+**Why**: Agents skipping ag done after direct-to-main commits left 3+ features with stale planned status
+
+**What changed**:
+- Implemented completion gate: ag implement blocks when prior backlog item has merged code but isn't shipped. Dashboard + ag start show advisory warnings. 11 tests pass.
+
+**Next steps**:
+- Merge PR, ag done F-0301
+
+**Blockers**: None
+

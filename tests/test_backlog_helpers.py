@@ -17,6 +17,7 @@ from tools.backlog_helpers import (
     _save,
     _find_index,
     _auto_discover_refs,
+    _get_feature_status,
     cmd_add,
     cmd_current,
     cmd_next,
@@ -28,6 +29,7 @@ from tools.backlog_helpers import (
     cmd_upsert,
     cmd_check_deps,
     cmd_check_staleness,
+    cmd_check_completion_gate,
     cmd_json_current,
     cmd_json_all,
 )
@@ -410,3 +412,143 @@ class TestJsonCommands:
         assert result == 0
         data = json.loads(capsys.readouterr().out)
         assert len(data) == 2
+
+
+# ---------------------------------------------------------------------------
+# _get_feature_status
+# ---------------------------------------------------------------------------
+
+class TestGetFeatureStatus:
+    def test_returns_status(self, project_dir):
+        assert _get_feature_status(project_dir, "F-0200") == "planned"
+        assert _get_feature_status(project_dir, "F-0300") == "shipped"
+
+    def test_returns_none_for_missing(self, project_dir):
+        assert _get_feature_status(project_dir, "F-9999") is None
+
+    def test_returns_none_without_features_file(self, project_dir):
+        (project_dir / ".agentic" / "spec" / "FEATURES.md").unlink()
+        assert _get_feature_status(project_dir, "F-0200") is None
+
+
+# ---------------------------------------------------------------------------
+# cmd_check_completion_gate (F-0301)
+# ---------------------------------------------------------------------------
+
+class TestCheckCompletionGate:
+    """Test the completion gate that blocks ag implement when prior features are stale."""
+
+    @staticmethod
+    def _no_commits(_root, _fid):
+        return 0
+
+    @staticmethod
+    def _has_commits(_root, _fid):
+        return 3
+
+    def _commits_for(self, feature_ids):
+        """Return a has_commits_fn that only returns commits for specific feature IDs."""
+        def fn(_root, fid):
+            return 3 if fid in feature_ids else 0
+        return fn
+
+    def test_empty_backlog_no_block(self, project_dir, backlog_file, capsys):
+        result = cmd_check_completion_gate(
+            project_dir, backlog_file, "F-0200", has_commits_fn=self._has_commits,
+        )
+        assert result == 0
+        data = json.loads(capsys.readouterr().out)
+        assert data["blocked"] is False
+
+    def test_first_item_no_false_positive(self, project_dir, backlog_file, capsys):
+        """Position 0 item checking itself should not block (AC-7)."""
+        cmd_add(project_dir, backlog_file, ["F-0200"])
+        capsys.readouterr()
+        result = cmd_check_completion_gate(
+            project_dir, backlog_file, "F-0200", has_commits_fn=self._has_commits,
+        )
+        assert result == 0
+        data = json.loads(capsys.readouterr().out)
+        assert data["blocked"] is False
+
+    def test_planned_with_no_commits(self, project_dir, backlog_file, capsys):
+        """Planned feature with no commits should not block."""
+        cmd_add(project_dir, backlog_file, ["F-0200"])
+        cmd_add(project_dir, backlog_file, ["F-0201"])
+        capsys.readouterr()
+        result = cmd_check_completion_gate(
+            project_dir, backlog_file, "F-0201", has_commits_fn=self._no_commits,
+        )
+        assert result == 0
+        data = json.loads(capsys.readouterr().out)
+        assert data["blocked"] is False
+
+    def test_planned_with_commits_blocks(self, project_dir, backlog_file, capsys):
+        """Planned feature at position 0 with commits should block position 1 (AC-1)."""
+        cmd_add(project_dir, backlog_file, ["F-0200"])
+        cmd_add(project_dir, backlog_file, ["F-0201"])
+        capsys.readouterr()
+        result = cmd_check_completion_gate(
+            project_dir, backlog_file, "F-0201",
+            has_commits_fn=self._commits_for({"F-0200"}),
+        )
+        assert result == 0
+        data = json.loads(capsys.readouterr().out)
+        assert data["blocked"] is True
+        assert data["stale_feature"] == "F-0200"
+        assert data["commit_count"] == 3
+
+    def test_shipped_does_not_block(self, project_dir, backlog_file, capsys):
+        """Shipped feature should not trigger the gate."""
+        cmd_add(project_dir, backlog_file, ["F-0300"])
+        cmd_add(project_dir, backlog_file, ["F-0201"])
+        capsys.readouterr()
+        result = cmd_check_completion_gate(
+            project_dir, backlog_file, "F-0201", has_commits_fn=self._has_commits,
+        )
+        assert result == 0
+        data = json.loads(capsys.readouterr().out)
+        assert data["blocked"] is False
+
+    def test_in_progress_does_not_block(self, project_dir, backlog_file, capsys):
+        """Features with in_progress status should NOT trigger (AC-6)."""
+        # Override F-0200 status to implementing
+        features_file = project_dir / ".agentic" / "spec" / "FEATURES.md"
+        content = features_file.read_text()
+        features_file.write_text(content.replace(
+            "## F-0200: Phase 1\n\n**Status**: planned",
+            "## F-0200: Phase 1\n\n**Status**: implementing",
+        ))
+        cmd_add(project_dir, backlog_file, ["F-0200"])
+        cmd_add(project_dir, backlog_file, ["F-0201"])
+        capsys.readouterr()
+        result = cmd_check_completion_gate(
+            project_dir, backlog_file, "F-0201", has_commits_fn=self._has_commits,
+        )
+        assert result == 0
+        data = json.loads(capsys.readouterr().out)
+        assert data["blocked"] is False
+
+    def test_stale_feature_named_in_output(self, project_dir, backlog_file, capsys):
+        """Blocked output must name the stale feature (AC-4)."""
+        cmd_add(project_dir, backlog_file, ["F-0200"])
+        cmd_add(project_dir, backlog_file, ["F-0201"])
+        capsys.readouterr()
+        cmd_check_completion_gate(
+            project_dir, backlog_file, "F-0201",
+            has_commits_fn=self._commits_for({"F-0200"}),
+        )
+        data = json.loads(capsys.readouterr().out)
+        assert "F-0200" in data["stale_feature"]
+
+    def test_task_items_skipped(self, project_dir, backlog_file, capsys):
+        """Task-type backlog items (no feature ID) should be skipped."""
+        cmd_add(project_dir, backlog_file, ["--task", "Research something"])
+        cmd_add(project_dir, backlog_file, ["F-0201"])
+        capsys.readouterr()
+        result = cmd_check_completion_gate(
+            project_dir, backlog_file, "F-0201", has_commits_fn=self._has_commits,
+        )
+        assert result == 0
+        data = json.loads(capsys.readouterr().out)
+        assert data["blocked"] is False
