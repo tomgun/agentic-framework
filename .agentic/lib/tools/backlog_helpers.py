@@ -6,6 +6,7 @@ Called by backlog.sh. Handles add/remove/move/list/current/done/clear.
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -225,7 +226,6 @@ def cmd_next(backlog_file: Path) -> int:
 
 def _get_feature_status(project_root: Path, feature_id: str) -> Optional[str]:
     """Return the status string for a feature from FEATURES.md, or None if not found."""
-    import re
     paths = get_paths(project_root)
     ff = paths.features_file
     if not ff.exists():
@@ -446,7 +446,7 @@ def _has_commits_on_main(project_root: Path, feature_id: str) -> int:
     try:
         result = subprocess.run(
             ["git", "log", "--oneline", f"--grep={feature_id}", "main",
-             "--", ".", ":!.agentic/"],
+             "--", ":!.agentic/"],
             capture_output=True, text=True, cwd=project_root, timeout=10,
         )
         if result.returncode == 0 and result.stdout.strip():

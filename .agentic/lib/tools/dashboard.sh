@@ -226,16 +226,15 @@ if command -v python3 >/dev/null 2>&1 && [[ -f "$TOOLS_DIR/backlog_helpers.py" ]
     _py "$TOOLS_DIR/backlog_helpers.py" --project-root "$PROJECT_ROOT" check-staleness 7 >/dev/null 2>&1 && D_STALE="yes"
 fi
 
-# COMPLETION GATE (stale current item — has commits but not shipped)
+# COMPLETION GATE (cheap check: is current backlog item still "planned"?)
+# Only reads FEATURES.md — no git subprocess. The expensive git-based commit
+# check runs in ag implement (the hard block), not here (advisory only).
 D_COMPLETION_STALE=""
-if [[ "$D_GIT_MODE" == "active" ]] && [[ -n "${D_BACKLOG_CUR_ID:-}" ]] && command -v python3 >/dev/null 2>&1; then
-    _cg_out=$(_py "$TOOLS_DIR/backlog_helpers.py" --project-root "$PROJECT_ROOT" \
-        check-completion-gate "${D_BACKLOG_CUR_ID}" 2>/dev/null) || _cg_out=""
-    if [[ -n "$_cg_out" ]]; then
-        _cg_blocked=$(echo "$_cg_out" | _py -c "import json,sys; print(json.load(sys.stdin).get('blocked',False))" 2>/dev/null) || _cg_blocked="False"
-        if [[ "$_cg_blocked" == "True" ]]; then
-            D_COMPLETION_STALE=$(echo "$_cg_out" | _py -c "import json,sys; print(json.load(sys.stdin).get('stale_feature',''))" 2>/dev/null) || D_COMPLETION_STALE=""
-        fi
+if [[ -n "${D_BACKLOG_CUR_ID:-}" ]] && [[ -f "$PROJECT_ROOT/.agentic/spec/FEATURES.md" ]]; then
+    _cg_status=$(grep -A3 "^## ${D_BACKLOG_CUR_ID}:" "$PROJECT_ROOT/.agentic/spec/FEATURES.md" 2>/dev/null \
+        | grep -oP '\*\*Status\*\*:\s*\K\w+' 2>/dev/null) || _cg_status=""
+    if [[ "$_cg_status" == "planned" ]]; then
+        D_COMPLETION_STALE="$D_BACKLOG_CUR_ID"
     fi
 fi
 

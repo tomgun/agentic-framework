@@ -552,3 +552,17 @@ class TestCheckCompletionGate:
         assert result == 0
         data = json.loads(capsys.readouterr().out)
         assert data["blocked"] is False
+
+    def test_not_in_backlog_checks_position_zero(self, project_dir, backlog_file, capsys):
+        """Feature not in backlog should check position 0 for staleness."""
+        cmd_add(project_dir, backlog_file, ["F-0200"])
+        capsys.readouterr()
+        # F-9999 is not in the backlog — gate should check F-0200 at position 0
+        result = cmd_check_completion_gate(
+            project_dir, backlog_file, "F-9999",
+            has_commits_fn=self._commits_for({"F-0200"}),
+        )
+        assert result == 0
+        data = json.loads(capsys.readouterr().out)
+        assert data["blocked"] is True
+        assert data["stale_feature"] == "F-0200"
