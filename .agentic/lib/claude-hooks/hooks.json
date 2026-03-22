@@ -7,7 +7,7 @@
           {
             "type": "command",
             "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/PreToolUse.sh",
-            "timeout": 2000,
+            "timeout": 3000,
             "description": "Enforcement: block destructive git ops, enforce spec-first for code edits and commits"
           }
         ]

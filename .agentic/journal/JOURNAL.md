@@ -4022,3 +4022,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 09:40 - F-0301 NHL Enforcement Analysis
+
+**Why**: Test project exposed that fail-open error handling in hook chain silently defeated state_enforcement=blocking
+
+**What changed**:
+- Analyzed NHL hockey game test incident — complete framework bypass under blocking enforcement. Documented 3 fail-open paths (PreToolUse exit code handling, regex gaps, missing no-WIP check). Code fixes shipped in #190. Added anti-rationalization callouts, expanded trigger words, timeout bump, lessons learned across 4 docs, incident analysis + plan artifacts.
+
+**Next steps**:
+- PR review and merge
+
+**Blockers**: None
+

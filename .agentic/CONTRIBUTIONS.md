@@ -2968,8 +2968,20 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### NHL Hockey Game Enforcement Test (v0.70.0)
+
+**User insight**: Designed a controlled test project (NHL hockey game, `autonomous_formal`, 10 features, 8 NFRs) to stress-test enforcement under realistic conditions. The key contribution was the *test methodology*: setting up a project with `state_enforcement: blocking` and all features at `planned`, then prompting with semantic batch-work language ("work autonomously and come back with the working game") rather than the literal trigger phrases the framework was designed to catch. This exposed that the framework's enforcement was lexically robust but semantically brittle.
+
+**User insight**: Created a complete evidence package (`to_agentic_af/`) with JSONL session logs, tool timelines, hook evidence extraction, and a structured analysis document — proving that the issue was *fail-open error handling* (5-line shell bug), not missing gates. The analysis distinguished 24 individual violations across 5 categories, traced the failure cascade chronologically, and identified that all violations were reducible to a single root cause: PreToolUse.sh treating Python errors as "allow."
+
+**User insight**: Identified that the git initialization interview was silently skipped for `autonomous_formal` profile — scaffold.sh applied `git_mode: active` and ran `git init` before the init playbook's Step 1b ever asked the user.
+
+**Design direction**: Enforcement test projects as a recurring practice. Unlike unit tests (which verify individual gates) or LLM behavioral tests (which verify instruction compliance), test projects verify the *full system under real conditions* — the wiring between gates, the error handling in hook chains, the semantic coverage of trigger detection.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.64.0
+**Current Version**: v0.70.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 67 behavioral test definitions

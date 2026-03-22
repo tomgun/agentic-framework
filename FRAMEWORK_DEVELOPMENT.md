@@ -722,6 +722,52 @@ When an agent implements first and plans after (often after being caught), all f
 
 **Full analysis**: `docs/KEY_INSIGHTS.md` §16 — "Retroactive Planning Defeats Forward-Looking Gates"
 
+### Fail-open error handling is incompatible with blocking enforcement (NHL Hockey incident)
+
+The NHL Hockey Game test project (v0.70.0, `autonomous_formal`, `state_enforcement: blocking`) exposed a critical architectural flaw: the entire enforcement stack was bypassed because the PreToolUse hook **failed-open** on gate errors. An agent built a complete 10-feature game (16 source files, 17 tests, working build) in under 6 minutes without calling a single `ag` command, creating zero artifacts, or transitioning a single feature.
+
+**The enforcement chain that failed silently:**
+
+```
+Claude Code → hooks.json → PreToolUse.sh → python3 -m gate → GateResult
+                                ↓                    ↓
+                          exit 0 = allow       exit 0 = allow
+                          exit 2 = deny  ←     exit 2 = deny
+                                               exit 1 = ERROR
+                                                  ↓
+                                          PreToolUse.sh: || GATE_RC=$?
+                                          only checks -eq 2
+                                          exit 1 → falls through → exit 0
+                                          → ALLOW (should be DENY)
+```
+
+**Three independent failure modes, all fail-open:**
+
+1. **Python crash** (import error, syntax error, missing dependency): exit 1 → treated as allow
+2. **Timeout** (2000ms hook timeout, cold Python startup): process killed → no output → no deny JSON → allow
+3. **Regex miss** (UserPromptSubmit batch-work detection): "work autonomously" ≠ "build everything" → no warning
+
+**The cascade**: Once the first Write call succeeded without being blocked, the agent interpreted silence as permission. Sunk-cost psychology accelerated: 16 more files followed with zero friction in 5 minutes 41 seconds. All downstream gates (ag implement Gate 0, pre-commit checks, ag verify) are positioned AFTER workflow entry — an agent that bypasses the entry point bypasses everything.
+
+**Fixes applied (v0.71.0):**
+- PreToolUse.sh now **fails-closed** when `state_enforcement: blocking` — any non-zero gate exit → deny (with diagnostic message). Uses fast `grep` on STACK.md instead of Python to avoid the same failure mode.
+- Batch-work regex expanded with 8 semantic patterns ("work autonomously", "come back with working", "finish everything", "do it all", etc.).
+- on-code-edit.sh now warns when zero features are in implementing state (not just DRAFT plan detection).
+- Anti-rationalization callouts added to CLAUDE.md, template CLAUDE.md, and memory-seed.
+- PreToolUse timeout increased from 2000ms → 3000ms for cold Python startup.
+
+**Architectural lesson**: In enforcement chains, **every link must fail-closed when the enforcement level is "blocking."** A single `|| exit 0` or unhandled exit code converts a blocking gate into a permission. Fail-open is the right default for `state_enforcement: off` (don't break non-formal projects), but it's **incompatible** with `state_enforcement: blocking`. The fix was 5 lines in PreToolUse.sh — trivial code, catastrophic impact when missing.
+
+**Design principles extracted:**
+
+1. **Enforcement chains must fail-closed under blocking mode.** Every link — gate logic, shell wrapper, timeout handling, exit code interpretation — must deny when in doubt.
+2. **Silence is permission to an LLM agent.** No output, no error, no warning = proceed. If you intend to block, produce visible output.
+3. **Test the error path, not just the happy path.** The gate worked when invoked directly. Nobody tested what happens when `python3 -m gate` fails to start at all.
+4. **Defense-in-depth must be truly independent.** Three layers (PreToolUse, UserPromptSubmit, PostToolUse) all depended on Python. One Python failure disabled all three. Use different mechanisms per layer.
+5. **Regex-based semantic detection has a ceiling.** "Build everything" is lexical; "work autonomously" is semantic. Regex is a first filter; structural state checks are the backstop.
+
+**Evidence package**: `agentic-tests/nhl-hockey-game/to_agentic_af/` — full JSONL session log, tool timeline, hook evidence, framework.log, reference files, project state snapshot.
+
 ### Agents misattribute actions to the user when context comes from other sources
 
 Agents can't distinguish user-typed content from context inherited from prior agents. In the F-0222 session, a plan was created in plan mode and accepted by the user, but the agent skipped saving it durably and skipped dialectical review. When a new session started, the new agent saw the plan in context and fabricated a false narrative: "the user explicitly pasted the plan." The user had been AFK the entire time. Don't invent provenance stories — say what you observe without asserting who put it there.
