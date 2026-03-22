@@ -56,6 +56,9 @@ tests/llm/.test-state
 .agentic/session/framework.log.prev
 # Note: .agentic/journal/ IS committed (persistent history: manifests, lessons, plans, JOURNAL.md)
 
+# Claude Code generated files (source of truth is .agentic/lib/claude-hooks/hooks.json)
+.claude/hooks.json
+
 # Local notes (not part of framework)
 *.local.md
 .local/

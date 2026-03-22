@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/PreToolUse.sh",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/PreToolUse.sh",
             "timeout": 2000,
             "description": "Enforcement: block destructive git ops, enforce spec-first for code edits and commits"
           }
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/SessionStart.sh",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/SessionStart.sh",
             "timeout": 5000,
             "description": "Validate environment and load session context"
           }
@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/UserPromptSubmit.sh",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/UserPromptSubmit.sh",
             "timeout": 3000,
             "description": "Phase-aware verification (acceptance criteria check)"
           }
@@ -45,7 +45,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/ExitPlanMode.sh",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/hooks/shared/on-plan-mode-exit.sh",
             "timeout": 5000,
             "description": "Auto-save plan and inject review instructions after plan mode exit"
           }
@@ -56,7 +56,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/PostToolUseBash.sh",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/hooks/shared/on-bash-merge-detect.sh",
             "timeout": 2000,
             "description": "Detect gh pr merge bypassing ag merge workflow"
           }
@@ -67,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/PostToolUseCodeEdit.sh",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/hooks/shared/on-code-edit.sh",
             "timeout": 2000,
             "description": "Warn if editing code with unapproved DRAFT plan"
           }
@@ -78,7 +78,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/PostToolUse.sh",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/PostToolUse.sh",
             "timeout": 2000,
             "description": "Run quick quality checks after code edits"
           }
@@ -91,7 +91,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/PreCompact.sh",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/PreCompact.sh",
             "timeout": 10000,
             "description": "Preserve critical state before context compaction"
           }
@@ -104,7 +104,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.agentic/hooks/claude/Stop.sh",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/Stop.sh",
             "timeout": 5000,
             "description": "Enforcement: blocks session stop until ag verify passes (exit 2 = deny)"
           }
@@ -113,4 +113,3 @@
     ]
   }
 }
-

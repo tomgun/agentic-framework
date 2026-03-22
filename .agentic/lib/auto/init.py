@@ -174,33 +174,39 @@ def generate_settings(
     }
 
 
-def ensure_hooks(project_root: Path) -> bool:
+def ensure_hooks(project_root: Path) -> str:
     """Ensure Claude Code hooks are installed at .claude/hooks.json.
 
     Copies the canonical hooks.json from .agentic/lib/claude-hooks/ if
-    .claude/hooks.json doesn't already exist.
+    .claude/hooks.json doesn't already exist or is outdated.
 
-    Returns True if hooks were installed (or already present).
+    Returns:
+        "already_present" - hooks existed and are up to date
+        "installed" - hooks were newly installed
+        "updated" - hooks were updated to newer version
+        "source_missing" - no hook source found
     """
     hooks_source = project_root / ".agentic" / "lib" / "claude-hooks" / "hooks.json"
     hooks_target = project_root / ".claude" / "hooks.json"
 
-    if hooks_target.exists():
-        return True
-
     if not hooks_source.exists():
-        return False
+        return "source_missing"
+
+    if hooks_target.exists():
+        if hooks_target.read_text() == hooks_source.read_text():
+            return "already_present"
+        import shutil
+        shutil.copy2(str(hooks_source), str(hooks_target))
+        return "updated"
 
     hooks_target.parent.mkdir(exist_ok=True)
     import shutil
     shutil.copy2(str(hooks_source), str(hooks_target))
-    return True
+    return "installed"
 
 
 def write_settings(project_root: Path, tier: int = 2) -> Path:
     """Generate and write settings.json to .claude/settings.json.
-
-    Also ensures Claude Code hooks are installed alongside permissions.
 
     Returns the path to the written file.
     """
@@ -209,10 +215,6 @@ def write_settings(project_root: Path, tier: int = 2) -> Path:
     output_dir.mkdir(exist_ok=True)
     output_path = output_dir / "settings.json"
     output_path.write_text(json.dumps(settings, indent=2) + "\n")
-
-    # Ensure hooks are installed alongside settings (F-0300 R0)
-    ensure_hooks(project_root)
-
     return output_path
 
 
@@ -305,10 +307,17 @@ def main() -> int:
         return 0
 
     path = write_settings(args.project_root, args.tier)
+    hooks_result = ensure_hooks(args.project_root)
     tier_names = {1: "Sandboxed", 2: "Scoped", 3: "Interactive"}
     print(f"Tier {args.tier} ({tier_names[args.tier]}) settings written to: {path}")
-    print("\n⚠ Hooks and permissions take effect on next Claude session start.")
-    print("  Restart Claude Code to activate enforcement hooks.")
+
+    if hooks_result == "already_present":
+        print("\n✓ Hooks already installed — active since session start.")
+        print("  Permissions (settings.json) take effect on next session start.")
+    elif hooks_result in ("installed", "updated"):
+        print(f"\n⚠ Hooks {hooks_result}. Restart Claude Code to activate.")
+    else:
+        print("\n⚠ Hook source not found. Permissions take effect on next session start.")
 
     if args.tier == 1:
         print("\nFor Tier 1, run Claude inside Docker:")

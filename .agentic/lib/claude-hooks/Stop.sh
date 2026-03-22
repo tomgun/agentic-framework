@@ -8,6 +8,9 @@
 # Triggered by: Claude Code Stop hook
 # Timeout: 5 seconds
 
+# Bootstrap: ensure lib/ is extracted (inline check avoids fork when lib exists)
+[[ -d "${CLAUDE_PROJECT_DIR:-.}/.agentic/lib/tools" ]] || bash "${CLAUDE_PROJECT_DIR:-.}/.agentic/bootstrap.sh" 2>/dev/null || true
+
 set -euo pipefail
 
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"

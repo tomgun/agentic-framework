@@ -3996,3 +3996,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 09:04 - Scaffold-first hooks
+
+**Why**: Hooks were already pre-installed by scaffold but init playbook redundantly reinstalled them with misleading restart warnings
+
+**What changed**:
+- Eliminated 9 Claude hook wrappers — hooks.json points directly to lib/. Fixed false restart advisories in setup-agent, ag hooks install, ag auto init. Rewrote init_playbook Step 1a (verify/prune) and Step 2 (AskUserQuestion interview).
+
+**Next steps**:
+- PR review, merge
+
+**Blockers**: None
+
