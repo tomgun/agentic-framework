@@ -201,7 +201,7 @@ If large, tell the user:
 
 ### Step 1b: Git Configuration (F-0250)
 
-After profile selection, ask the user about git:
+After profile selection, **always ask the user about git** — even for Autonomous Formal. Scaffold defers git initialization to this step so the user confirms before `git init` runs.
 
 > "Would you like to set up git version control now?
 >
@@ -209,6 +209,8 @@ After profile selection, ask the user about git:
 > **b) Later** — Start without git. The framework works fully via Claude hooks and the state machine. Activate anytime with `ag git-init`.
 >
 > Default: `Yes` for Autonomous Formal, `Later` for Discovery and Formal."
+
+**Note**: If `.git/` already exists (e.g., cloned repo), skip this question and set `git_mode: active`.
 
 Based on the answer, update `STACK.md`:
 ```markdown
@@ -256,20 +258,20 @@ Now verify which tools the user actually uses and offer to clean up the rest.
 
 **Use AskUserQuestion** to ask which tools the user uses (multi-select):
 
-```
-AskUserQuestion:
-  question: "Which AI coding tool(s) do you use? (scaffold pre-installed all — we'll clean up unused ones)"
-  header: "AI Tools"
-  multiSelect: true
-  options:
-    - label: "Claude Code"
-      description: "CLAUDE.md + hooks + skills (already active)"
-    - label: "Cursor"
-      description: ".cursorrules (already installed)"
-    - label: "GitHub Copilot"
-      description: ".github/copilot-instructions.md (already installed)"
-    - label: "Codex CLI"
-      description: ".codex/instructions.md (already installed)"
+```json
+{
+  "questions": [{
+    "question": "Which AI coding tool(s) do you use? (scaffold pre-installed all — we'll clean up unused ones)",
+    "header": "AI Tools",
+    "multiSelect": true,
+    "options": [
+      {"label": "Claude Code", "description": "CLAUDE.md + hooks + skills (already active)"},
+      {"label": "Cursor", "description": ".cursorrules (already installed)"},
+      {"label": "GitHub Copilot", "description": ".github/copilot-instructions.md (already installed)"},
+      {"label": "Codex CLI", "description": ".codex/instructions.md (already installed)"}
+    ]
+  }]
+}
 ```
 
 **For selected tools**: Verify files are present. If missing (manual setup without scaffold), run:
@@ -578,74 +580,96 @@ Please research current best practices for [environment]:
 
 Use **AskUserQuestion** to batch the interview into 2 efficient calls instead of sequential questions.
 
-**Call 1 — Project basics** (4 questions):
-```
-AskUserQuestion:
-  questions:
-    - question: "What are we building?"
-      header: "Project"
-      options:
-        - label: "Web app"
-        - label: "Mobile app"
-        - label: "CLI tool"
-        - label: "Game"
-      # User will likely pick "Other" and type their own description
-    - question: "Primary platform?"
-      header: "Platform"
-      options:
-        - label: "Web"
-        - label: "Mobile"
-        - label: "Desktop"
-        - label: "CLI"
-    - question: "What's the tech stack?"
-      header: "Stack"
-      options:
-        - label: "TypeScript + Node"
-        - label: "Python"
-        - label: "Rust"
-        - label: "Go"
-      # User will often pick "Other" for specific frameworks
-    - question: "Project license?"
-      header: "License"
-      options:
-        - label: "MIT (Recommended)"
-          description: "Maximum freedom, most popular"
-        - label: "Apache 2.0"
-          description: "Like MIT + patent protection"
-        - label: "GPL-3.0"
-          description: "Copyleft — improvements must be shared"
-        - label: "Proprietary"
-          description: "All rights reserved"
+**Call 1 — Project basics** (4 questions, user will often pick "Other" for free-text answers):
+```json
+{
+  "questions": [
+    {
+      "question": "What are we building?",
+      "header": "Project",
+      "multiSelect": false,
+      "options": [
+        {"label": "Web app", "description": "Browser-based application"},
+        {"label": "Mobile app", "description": "iOS/Android native or hybrid"},
+        {"label": "CLI tool", "description": "Command-line utility"},
+        {"label": "Game", "description": "Interactive game or simulation"}
+      ]
+    },
+    {
+      "question": "Primary platform?",
+      "header": "Platform",
+      "multiSelect": false,
+      "options": [
+        {"label": "Web", "description": "Browser-based"},
+        {"label": "Mobile", "description": "iOS/Android"},
+        {"label": "Desktop", "description": "Electron, Tauri, native"},
+        {"label": "CLI", "description": "Terminal application"}
+      ]
+    },
+    {
+      "question": "What's the tech stack?",
+      "header": "Stack",
+      "multiSelect": false,
+      "options": [
+        {"label": "TypeScript + Node", "description": "JS ecosystem"},
+        {"label": "Python", "description": "Django, FastAPI, Flask, etc."},
+        {"label": "Rust", "description": "Systems programming"},
+        {"label": "Go", "description": "Cloud-native, microservices"}
+      ]
+    },
+    {
+      "question": "Project license?",
+      "header": "License",
+      "multiSelect": false,
+      "options": [
+        {"label": "MIT (Recommended)", "description": "Maximum freedom, most popular"},
+        {"label": "Apache 2.0", "description": "Like MIT + patent protection"},
+        {"label": "GPL-3.0", "description": "Copyleft — improvements must be shared"},
+        {"label": "Proprietary", "description": "All rights reserved"}
+      ]
+    }
+  ]
+}
 ```
 
 **Call 2 — Constraints & testing** (up to 3 questions):
-```
-AskUserQuestion:
-  questions:
-    - question: "Key project constraints?"
-      header: "Constraints"
-      multiSelect: true
-      options:
-        - label: "Performance"
-        - label: "Security"
-        - label: "Compliance"
-        - label: "Offline-first"
-    - question: "Testing approach?"
-      header: "Testing"
-      options:
-        - label: "pytest"
-        - label: "jest / vitest"
-        - label: "cargo test"
-        - label: "go test"
-    - question: "E2E testing?"
-      header: "E2E"
-      options:
-        - label: "Playwright (Recommended)"
-          description: "Cross-browser, best DX"
-        - label: "Cypress"
-          description: "Mature, large community"
-        - label: "None"
-          description: "Skip E2E for now"
+```json
+{
+  "questions": [
+    {
+      "question": "Key project constraints?",
+      "header": "Constraints",
+      "multiSelect": true,
+      "options": [
+        {"label": "Performance", "description": "Low latency, high throughput"},
+        {"label": "Security", "description": "Auth, encryption, OWASP"},
+        {"label": "Compliance", "description": "GDPR, HIPAA, SOC2"},
+        {"label": "Offline-first", "description": "Works without network"}
+      ]
+    },
+    {
+      "question": "Testing approach?",
+      "header": "Testing",
+      "multiSelect": false,
+      "options": [
+        {"label": "pytest", "description": "Python testing"},
+        {"label": "jest / vitest", "description": "JavaScript/TypeScript testing"},
+        {"label": "cargo test", "description": "Rust testing"},
+        {"label": "go test", "description": "Go testing"}
+      ]
+    },
+    {
+      "question": "E2E testing?",
+      "header": "E2E",
+      "multiSelect": false,
+      "options": [
+        {"label": "Playwright (Recommended)", "description": "Cross-browser, best DX"},
+        {"label": "Cypress", "description": "Mature, large community"},
+        {"label": "None", "description": "Skip E2E for now"}
+      ]
+    }
+  ]
+}
 ```
 
 After collecting answers, proceed with the detailed steps below:

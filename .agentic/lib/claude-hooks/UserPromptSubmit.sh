@@ -7,8 +7,8 @@
 # Triggered by: Claude Code UserPromptSubmit hook
 # Timeout: 3 seconds
 
-# Bootstrap: ensure lib/ is extracted (no-op if already present)
-bash "${CLAUDE_PROJECT_DIR:-.}/.agentic/bootstrap.sh" 2>/dev/null || true
+# Bootstrap: ensure lib/ is extracted (inline check avoids fork when lib exists)
+[[ -d "${CLAUDE_PROJECT_DIR:-.}/.agentic/lib/tools" ]] || bash "${CLAUDE_PROJECT_DIR:-.}/.agentic/bootstrap.sh" 2>/dev/null || true
 
 set -euo pipefail
 
@@ -78,7 +78,7 @@ fi
 # Warn when user prompt contains batch-work triggers that should use ag auto crunch
 # USER_PROMPT is set once here and reused by all subsequent checks
 USER_PROMPT="${CLAUDE_USER_PROMPT:-}"
-if echo "$USER_PROMPT" | grep -qiE '(churn|batch)\s+(all\s+)?(tasks|features)|build everything|implement (all|everything)|do all (features|tasks)|implement everything'; then
+if echo "$USER_PROMPT" | grep -qiE '(churn|batch)\s+(all\s+)?(tasks|features)|build everything|implement (all|everything)|do all (features|tasks)|implement everything|work autonomously.*(game|app|project|system|working)|come back with.*(working|finished|complete|done)|build.*(whole|entire|full)\s+(game|app|project|system)|finish everything|do it all|complete the (project|app|game)|implement the (whole|entire|full)|ship (it all|everything)|create.*(entire|whole|full).*(app|game|project)'; then
   echo ""
   echo "⚠️  BATCH WORK DETECTED: Use \`ag auto crunch\` to process the backlog."
   echo "   The ag auto pipeline ensures each feature gets specs, plans, tests, and docs."

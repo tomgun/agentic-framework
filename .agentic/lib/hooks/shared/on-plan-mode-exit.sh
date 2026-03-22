@@ -12,8 +12,8 @@
 #
 # Exit code: always 0 (advisory — never blocks the agent)
 
-# Bootstrap: ensure lib/ is extracted (no-op if already present)
-bash "${CLAUDE_PROJECT_DIR:-.}/.agentic/bootstrap.sh" 2>/dev/null || true
+# Bootstrap: ensure lib/ is extracted (inline check avoids fork when lib exists)
+[[ -d "${CLAUDE_PROJECT_DIR:-.}/.agentic/lib/tools" ]] || bash "${CLAUDE_PROJECT_DIR:-.}/.agentic/bootstrap.sh" 2>/dev/null || true
 
 set -uo pipefail
 
