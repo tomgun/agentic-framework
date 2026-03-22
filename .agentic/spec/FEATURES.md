@@ -4434,7 +4434,7 @@ Proposed restructuring:
 
 ## F-0301: Completion Gate: Block New Work When Previous Feature Unfinished
 
-**Status**: implementing
+**Status**: shipped
 **Category**: workflow
 **Priority**: medium
 **Complexity**: medium

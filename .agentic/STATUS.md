@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0301 Completion Gate — PR ready for review (Updated: 2026-03-22 10:22 UTC)
+- F-0301 shipped. Next: F-0243 (Updated: 2026-03-22 10:29 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item

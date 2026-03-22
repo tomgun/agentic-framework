@@ -1,17 +1,6 @@
 [
   {
     "type": "feature",
-    "id": "F-0301",
-    "description": "Completion Gate: Block New Work When Previous Feature Unfinished",
-    "added_at": "2026-03-22T10:02:45Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/acceptance/F-0301.md"
-    ],
-    "became_current_at": "2026-03-22T10:02:45Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0243",
     "description": "Complexity Tier Experiments",
     "added_at": "2026-03-20T14:38:37Z",
