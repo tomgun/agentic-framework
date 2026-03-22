@@ -7,7 +7,7 @@ description: Write code to make tests pass (TDD green phase)
 
 # Required context - always loaded
 required:
-  - spec/acceptance/{feature_id}.md        # Acceptance criteria for the feature
+  - spec/contracts/{feature_id}.yaml        # Contract assertions for the feature
   - STACK.md[build_commands,test_commands] # How to build and test
   - CONTEXT_PACK.md[entry_points,modules]  # Where code lives
   - .agentic/agents/shared/guidelines/anti-hallucination.md  # Core rule

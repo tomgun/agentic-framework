@@ -7,7 +7,7 @@ description: Explain trade-offs, defend decisions, acknowledge weaknesses in fin
 
 required:
   - .agentic/journal/plans/{feature_id}-plan.md  # The plan to defend
-  - spec/acceptance/{feature_id}.md               # Acceptance criteria to map
+  - spec/contracts/{feature_id}.yaml               # Contract assertions to map
   - .agentic/agents/shared/guidelines/anti-hallucination.md
 
 optional:

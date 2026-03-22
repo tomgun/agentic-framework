@@ -58,7 +58,7 @@ def main() -> int:
         ensure_file(
             repo_root / "docs" / "features" / f"{fid}.md",
             f"# {fid}: {name}\n\n"
-            f"- Acceptance: spec/acceptance/{fid}.md\n"
+            f"- Acceptance: spec/contracts/{fid}.yaml (or spec/acceptance/{fid}.md)\n"
             f"- Status: see spec/FEATURES.md\n\n"
             f"## Notes\n- \n",
         )

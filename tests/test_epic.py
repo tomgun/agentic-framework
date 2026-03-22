@@ -24,6 +24,7 @@ from auto.epic import (
     recompute_epic_status,
     _parse_ac_groups,
     _derive_child_name,
+    _build_child_contract,
     _get_feature_status,
     _get_feature_parent,
     _get_children_statuses,
@@ -392,8 +393,10 @@ class TestCreateChildFeatures:
         assert "**Parent**: F-0100" in content
         assert "**Component**: api" in content
 
-    def test_creates_ac_files(self, tmp_project):
+    def test_creates_contract_files(self, tmp_project):
         _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
+        contracts_dir = tmp_project / ".agentic" / "spec" / "contracts"
+        contracts_dir.mkdir(parents=True, exist_ok=True)
         children = [{
             "id": "F-0101",
             "name": "Child",
@@ -403,10 +406,10 @@ class TestCreateChildFeatures:
         }]
         create_child_features(tmp_project, "F-0100", children)
 
-        ac_file = tmp_project / ".agentic" / "spec" / "acceptance" / "F-0101.md"
-        assert ac_file.exists()
-        content = ac_file.read_text()
-        assert "**Parent**: F-0100" in content
+        contract_file = contracts_dir / "F-0101.yaml"
+        assert contract_file.exists()
+        content = contract_file.read_text()
+        assert "F-0100" in content  # parent reference
         assert "Test criterion" in content
 
     def test_inherits_parent_category(self, tmp_project):
@@ -427,8 +430,10 @@ class TestCreateChildFeatures:
         content = (tmp_project / ".agentic" / "spec" / "FEATURES.md").read_text()
         assert "**Category**: Quality" in content.split("## F-0101")[1]
 
-    def test_component_scoped_ac(self, tmp_project):
+    def test_component_scoped_contract(self, tmp_project):
         _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
+        contracts_dir = tmp_project / ".agentic" / "spec" / "contracts"
+        contracts_dir.mkdir(parents=True, exist_ok=True)
         children = [{
             "id": "F-0101",
             "name": "API Child",
@@ -438,9 +443,10 @@ class TestCreateChildFeatures:
         }]
         create_child_features(tmp_project, "F-0100", children)
 
-        ac_file = tmp_project / ".agentic" / "spec" / "acceptance" / "F-0101.md"
-        content = ac_file.read_text()
-        assert "**Component**: api" in content
+        contract_file = contracts_dir / "F-0101.yaml"
+        import yaml
+        data = yaml.safe_load(contract_file.read_text())
+        assert "api" in data.get("tags", [])
 
 
 # ---------------------------------------------------------------------------
@@ -606,3 +612,70 @@ class TestParentChildWiring:
         statuses = _get_children_statuses(features_file, "F-0100")
         assert len(statuses) == 2
         assert all(s == "planned" for s in statuses)
+
+
+# ---------------------------------------------------------------------------
+# _build_child_contract tests (F-0302)
+# ---------------------------------------------------------------------------
+
+class TestBuildChildContract:
+    def test_produces_valid_yaml(self):
+        """Contract output should be parseable YAML with correct schema."""
+        import yaml
+        child = {
+            "id": "F-0201",
+            "name": "Auth Subsystem",
+            "ac_lines": [
+                '- [ ] **AC-001**: Users can log in',
+                '- [ ] **AC-002**: Tokens expire after 1h',
+            ],
+        }
+        content = _build_child_contract(child, "F-0200")
+        data = yaml.safe_load(content)
+        assert data["id"] == "F-0201"
+        assert data["name"] == "Auth Subsystem"
+        assert data["lifecycle"] == "exploring"
+        assert data["parent"] == "F-0200"
+        assert len(data["assertions"]) == 2
+
+    def test_assertion_fields(self):
+        """Each assertion should have id, text, and valid type."""
+        import yaml
+        child = {
+            "id": "F-0301",
+            "name": "Test Feature",
+            "ac_lines": ['- [ ] **AC-001**: Something works'],
+        }
+        content = _build_child_contract(child, "F-0300")
+        data = yaml.safe_load(content)
+        a = data["assertions"][0]
+        assert a["id"] == "AC-001"
+        assert a["text"] == "Something works"
+        assert a["type"] in ("structural", "behavioral")
+
+    def test_plain_text_ac_lines(self):
+        """AC lines without **AC-NNN** format get sequential IDs."""
+        import yaml
+        child = {
+            "id": "F-0401",
+            "name": "Plain ACs",
+            "ac_lines": ['- [ ] First thing', '- [ ] Second thing'],
+        }
+        content = _build_child_contract(child, "F-0400")
+        data = yaml.safe_load(content)
+        assert data["assertions"][0]["id"] == "AC-001"
+        assert data["assertions"][1]["id"] == "AC-002"
+
+    def test_component_becomes_tag(self):
+        """Component field should appear as a tag, not a top-level field."""
+        import yaml
+        child = {
+            "id": "F-0501",
+            "name": "API Layer",
+            "component": "api",
+            "ac_lines": ['- [ ] **AC-001**: Endpoint exists'],
+        }
+        content = _build_child_contract(child, "F-0500")
+        data = yaml.safe_load(content)
+        assert "api" in data.get("tags", [])
+        assert "component" not in data  # not a valid contract field

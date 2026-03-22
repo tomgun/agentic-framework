@@ -325,7 +325,7 @@ def _create_epic_entry(
         "",
         f"**Description**: Pipeline epic — {epic_name}.",
         "",
-        f"**Acceptance**: See `spec/acceptance/{epic_id}.md`",
+        f"**Acceptance**: See `spec/contracts/{epic_id}.yaml`",
         "",
         "---",
         "",
@@ -335,21 +335,23 @@ def _create_epic_entry(
     with open(features_file, "a") as f:
         f.write("\n" + section + "\n")
 
-    # Create synthetic AC file
-    acceptance_dir = paths.acceptance_dir
-    acceptance_dir.mkdir(parents=True, exist_ok=True)
-    ac_content = "\n".join([
-        f"# {epic_id}: {epic_name}",
-        "",
-        "**Category**: Epic",
-        "",
-        "## Acceptance Criteria",
-        "",
-        "- [ ] **AC-001**: All child features implemented, reviewed, and shipped",
-        "- [ ] **AC-002**: Integration verification passes across all children",
+    # Create synthetic contract YAML file
+    contracts_dir = paths.contracts_dir
+    contracts_dir.mkdir(parents=True, exist_ok=True)
+    contract_content = "\n".join([
+        f"feature: {epic_id}",
+        f"title: \"{epic_name}\"",
+        "category: Epic",
+        "assertions:",
+        "  - id: AC-001",
+        "    text: All child features implemented, reviewed, and shipped",
+        "    type: functional",
+        "  - id: AC-002",
+        "    text: Integration verification passes across all children",
+        "    type: functional",
         "",
     ])
-    (acceptance_dir / f"{epic_id}.md").write_text(ac_content)
+    (contracts_dir / f"{epic_id}.yaml").write_text(contract_content)
 
     messages.append(f"Created epic {epic_id}: {epic_name}")
     return epic_id, messages

@@ -13,7 +13,7 @@ tokens: ~480
 
 - Implementation Agent's handoff notes
 - Changed files (from pipeline)
-- `.agentic/spec/acceptance/F-####.md` - Original requirements
+- `.agentic/spec/contracts/F-####.yaml` - Original requirements
 - `.agentic/lib/quality/programming_standards.md` - Code standards
 - Test results
 
@@ -43,9 +43,9 @@ tokens: ~480
 - [ ] Auth checks where needed
 - [ ] Sensitive data handled properly
 
-### Tests & Acceptance Criteria
-- [ ] **Each AC has corresponding test(s)** - map AC-001, AC-002 to test files
-- [ ] Tests cover acceptance criteria completely
+### Tests & Contract Assertions
+- [ ] **Each assertion has corresponding test(s)** - map assertions to test files
+- [ ] Tests cover contract assertions completely
 - [ ] Edge cases tested
 - [ ] Tests are deterministic
 - [ ] No flaky tests

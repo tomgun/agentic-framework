@@ -7,7 +7,7 @@
 # Setup with Formal profile
 setup_test_project "formal"
 
-mkdir -p "$TEST_PROJECT/spec/acceptance"
+mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # Features
 
@@ -46,9 +46,9 @@ FAILURES=0
 check_output_contains "NFR-0001\|response.*time\|200ms\|NFR.*compliance\|NFR.*applicable\|NFRs.*none\|Related NFR" \
     "Agent references specific NFRs during spec writing" || ((FAILURES++))
 
-# Agent should create acceptance criteria
-check_output_contains "acceptance\|criteria\|AC-\|spec/acceptance" \
-    "Agent creates acceptance criteria" || ((FAILURES++))
+# Agent should create acceptance criteria / contract
+check_output_contains "acceptance\|criteria\|contract\|AC-\|spec/contracts\|spec/acceptance" \
+    "Agent creates acceptance criteria / contract" || ((FAILURES++))
 
 cleanup_test_project
 

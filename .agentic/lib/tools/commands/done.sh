@@ -246,8 +246,9 @@ cmd_done() {
     # Run automated verification commands from AC file before shipping.
     # Advisory for discovery, blocking for formal profiles.
     if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
-        local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
-        if [ -f "$acc_file" ] && grep -q '\*\*Automated\*\*' "$acc_file"; then
+        local auto_verify_contract="$CONTRACTS_DIR/${feature_id}.yaml"
+        local auto_verify_acc="$ACCEPTANCE_DIR/${feature_id}.md"
+        if [ -f "$auto_verify_contract" ] || { [ -f "$auto_verify_acc" ] && grep -q '\*\*Automated\*\*' "$auto_verify_acc"; }; then
             echo -e "${BOLD}=== Running Automated Verification ===${NC}"
             if cmd_verify "$feature_id"; then
                 echo ""
@@ -441,11 +442,15 @@ cmd_done() {
         # Blocking gates (Formal)
         local done_failures=0
 
-        # Gate 1: Acceptance file must exist
-        local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
-        if [ ! -f "$acc_file" ]; then
-            echo -e "${RED}BLOCKED: Missing acceptance criteria${NC}"
-            echo "  Expected: .agentic/spec/acceptance/${feature_id}.md"
+        # Gate 1: Contract or acceptance file must exist
+        local contract_file="$CONTRACTS_DIR/${feature_id}.yaml"
+        local acc_file="$ACCEPTANCE_DIR/${feature_id}.md"
+        local has_contract=false
+        if [ -f "$contract_file" ]; then
+            has_contract=true
+        elif [ ! -f "$acc_file" ]; then
+            echo -e "${RED}BLOCKED: Missing contract or acceptance criteria${NC}"
+            echo "  Expected: .agentic/spec/contracts/${feature_id}.yaml"
             done_failures=$((done_failures + 1))
         fi
 
@@ -460,8 +465,30 @@ cmd_done() {
             fi
         fi
 
-        # Gate 3: AC completion check (F-0197, enhanced with shared parser)
-        if [ -f "$acc_file" ]; then
+        # Gate 3: AC completion check — contract assertions or legacy markdown
+        if [ "$has_contract" = true ]; then
+            # Contract-based: run structural assertions via verify-contracts.sh
+            echo ""
+            echo -e "${BOLD}Contract Assertion Check:${NC}"
+            local verify_exit=0
+            local verify_output
+            verify_output=$(bash "$SCRIPT_DIR/verify-contracts.sh" --feature "$feature_id" 2>/dev/null) || verify_exit=$?
+            if [ "$verify_exit" -ne 0 ]; then
+                echo -e "${RED}BLOCKED: Contract assertions failed${NC}"
+                echo "$verify_output" | head -20
+                done_failures=$((done_failures + 1))
+            else
+                local assertion_count
+                assertion_count=$(python3 - "$AGENTIC_LIB" "$contract_file" <<'PYEOF'
+import sys; sys.path.insert(0, sys.argv[1])
+from pathlib import Path
+from contracts import load_contract
+print(len(load_contract(Path(sys.argv[2])).assertions))
+PYEOF
+) || assertion_count="?"
+                echo -e "${GREEN}✓ All structural assertions pass ($assertion_count total)${NC}"
+            fi
+        elif [ -f "$acc_file" ]; then
             local total_acs=0 checked_acs=0 ac_pct=100
             total_acs=$(ac_count_total "$acc_file")
             checked_acs=$(ac_count_checked "$acc_file")
@@ -523,7 +550,7 @@ cmd_done() {
                 if [ "$ac_failed" -eq 1 ]; then
                     if [ "$ac_setting" = "blocking" ]; then
                         echo -e "${RED}BLOCKED: AC completion below threshold${NC}"
-                        echo "  Check off passing ACs in .agentic/spec/acceptance/${feature_id}.md"
+                        echo "  Fix failing assertions in .agentic/spec/contracts/${feature_id}.yaml"
                         done_failures=$((done_failures + 1))
                     else
                         echo -e "${YELLOW}WARNING: AC completion below threshold${NC}"
@@ -564,15 +591,20 @@ cmd_done() {
             echo -e "${GREEN}✓${NC} No untracked feature files"
         fi
 
-        # Check if acceptance criteria file exists and has untracked state
-        local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
-        if [ -f "$acc_file" ]; then
-            if git status --porcelain "$acc_file" 2>/dev/null | grep -q '^??'; then
-                echo -e "${YELLOW}⚠ Acceptance criteria file is untracked:${NC}"
-                echo "   .agentic/spec/acceptance/${feature_id}.md"
-                echo "   Consider: git add .agentic/spec/acceptance/${feature_id}.md"
+        # Check if contract/acceptance file has untracked state
+        if [ -f "$contract_file" ]; then
+            if git status --porcelain "$contract_file" 2>/dev/null | grep -q '^??'; then
+                echo -e "${YELLOW}⚠ Contract file is untracked:${NC}"
+                echo "   .agentic/spec/contracts/${feature_id}.yaml"
+                echo "   Consider: git add .agentic/spec/contracts/${feature_id}.yaml"
             fi
-
+            echo ""
+            echo -e "${BOLD}📝 Review contract before marking accepted:${NC}"
+            echo "   cat .agentic/spec/contracts/${feature_id}.yaml"
+        elif [ -f "$acc_file" ]; then
+            if git status --porcelain "$acc_file" 2>/dev/null | grep -q '^??'; then
+                echo -e "${YELLOW}⚠ Acceptance criteria file is untracked (legacy format)${NC}"
+            fi
             # Surface [Discovered] markers
             local discovered_count
             discovered_count=$(grep -c '\[Discovered\]' "$acc_file" 2>/dev/null || echo "0")
@@ -580,9 +612,6 @@ cmd_done() {
                 echo ""
                 echo -e "${YELLOW}📋 Spec evolved: $discovered_count requirements discovered during implementation${NC}"
             fi
-            echo ""
-            echo -e "${BOLD}📝 Review acceptance criteria before marking accepted:${NC}"
-            echo "   cat .agentic/spec/acceptance/${feature_id}.md"
         fi
 
         # Check FEATURES.md shipped status (heading AND table format)
@@ -617,6 +646,21 @@ cmd_done() {
                     echo "  Manual update: bash .agentic/lib/tools/feature.sh $feature_id status shipped"
                 fi
             fi
+        fi
+
+        # Also update contract lifecycle to shipped
+        if [ -f "$contract_file" ]; then
+            python3 - "$AGENTIC_LIB" "$contract_file" <<'PYEOF' 2>/dev/null || true
+import sys; sys.path.insert(0, sys.argv[1])
+from pathlib import Path
+from contracts import load_contract, save_contract
+c = load_contract(Path(sys.argv[2]))
+if c.lifecycle != 'shipped':
+    c.lifecycle = 'shipped'
+    c.protection = 'contract'
+    save_contract(c)
+    print('Contract lifecycle → shipped')
+PYEOF
         fi
 
         # Remind about STATUS.md

@@ -10,7 +10,7 @@ required:
   - STACK.md[tech_stack]                   # Languages, frameworks
 
 optional:
-  - spec/acceptance/{feature_id}.md        # If exploring for a specific feature
+  - spec/contracts/{feature_id}.yaml        # If exploring for a specific feature
 
 exclude:
   - JOURNAL.md

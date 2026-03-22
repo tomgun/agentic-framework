@@ -326,18 +326,25 @@ if ! is_feature_id "$FEATURE_ID"; then
     exit 0  # Advisory — don't fail
 fi
 
-ACCEPT_FILE=".agentic/spec/acceptance/${FEATURE_ID}.md"
+# Check contracts first, then legacy acceptance
+if [[ -f "$CONTRACTS_DIR/${FEATURE_ID}.yaml" ]]; then
+    ACCEPT_FILE="$CONTRACTS_DIR/${FEATURE_ID}.yaml"
+elif [[ -f "$ACCEPTANCE_DIR/${FEATURE_ID}.md" ]]; then
+    ACCEPT_FILE="$ACCEPTANCE_DIR/${FEATURE_ID}.md"
+else
+    ACCEPT_FILE=""
+fi
 
 echo ""
 echo -e "${BLUE}=== Spec Analysis: ${FEATURE_ID} ===${NC}"
 echo ""
 
 # Edge case: missing or empty acceptance file (AC-012)
-if [[ ! -f "$ACCEPT_FILE" ]]; then
-    echo -e "  ${RED}[ERROR]${NC} Acceptance file not found: $ACCEPT_FILE"
-    echo -e "  → Create acceptance criteria before running analysis"
+if [[ -z "$ACCEPT_FILE" || ! -f "$ACCEPT_FILE" ]]; then
+    echo -e "  ${RED}[ERROR]${NC} Contract/acceptance file not found for ${FEATURE_ID}"
+    echo -e "  → Create $CONTRACTS_DIR/${FEATURE_ID}.yaml before running analysis"
     echo ""
-    echo "Summary: No analysis possible — acceptance file missing"
+    echo "Summary: No analysis possible — contract/acceptance file missing"
     exit 0
 fi
 

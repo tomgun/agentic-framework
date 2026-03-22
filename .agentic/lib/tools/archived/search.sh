@@ -8,7 +8,7 @@ Usage: bash .agentic/tools/search.sh <keyword>
 
 Searches across all project documentation for a keyword:
   - Features (FEATURES.md)
-  - Acceptance criteria (.agentic/spec/acceptance/)
+  - Contracts (.agentic/spec/contracts/) and acceptance criteria (.agentic/spec/acceptance/)
   - ADRs (.agentic/spec/adr/)
   - Status and Journal
   - Lessons learned
@@ -35,18 +35,22 @@ else
 fi
 echo ""
 
-# Search acceptance criteria
-echo "▶ Acceptance Criteria (.agentic/spec/acceptance/)"
-if [[ -d spec/acceptance ]]; then
-  grep -i -r -n "$KEYWORD" .agentic/spec/acceptance/ 2>/dev/null | head -5 || echo "  (none found)"
-else
-  echo "  (.agentic/spec/acceptance/ not found)"
+# Search contracts and acceptance criteria
+echo "▶ Contracts & Acceptance Criteria"
+if [[ -d .agentic/spec/contracts ]]; then
+  grep -i -r -n "$KEYWORD" .agentic/spec/contracts/ 2>/dev/null | head -5 || true
+fi
+if [[ -d .agentic/spec/acceptance ]]; then
+  grep -i -r -n "$KEYWORD" .agentic/spec/acceptance/ 2>/dev/null | head -5 || true
+fi
+if [[ ! -d .agentic/spec/contracts ]] && [[ ! -d .agentic/spec/acceptance ]]; then
+  echo "  (no contracts or acceptance directory found)"
 fi
 echo ""
 
 # Search ADRs
 echo "▶ Architecture Decisions (.agentic/spec/adr/)"
-if [[ -d spec/adr ]]; then
+if [[ -d .agentic/spec/adr ]]; then
   grep -i -r -n "$KEYWORD" .agentic/spec/adr/ 2>/dev/null | head -5 || echo "  (none found)"
 else
   echo "  (.agentic/spec/adr/ not found)"

@@ -9,7 +9,7 @@ You are working in a repo that uses the `.agentic/` agentic development framewor
 - `spec/OVERVIEW.md`
 - `spec/FEATURES.md`
 - `spec/NFR.md` (if constraints apply)
-- Relevant `/spec/*` sections, including `spec/acceptance/F-####.md` for the feature you are changing
+- Relevant `/spec/*` sections, including `spec/contracts/F-####.yaml` for the feature you are changing
 
 ## Agent Mode (model selection)
 Check `agent_mode` in STACK.md: `premium` | `balanced` (default) | `economy`

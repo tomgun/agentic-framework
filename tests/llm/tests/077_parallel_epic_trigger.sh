@@ -9,7 +9,7 @@
 setup_test_project "autonomous_formal"
 
 # Create a decomposed epic so context is realistic
-mkdir -p "$TEST_PROJECT/.agentic/spec/acceptance"
+mkdir -p "$TEST_PROJECT/.agentic/spec/contracts" "$TEST_PROJECT/.agentic/spec/acceptance"
 cat >> "$TEST_PROJECT/.agentic/spec/FEATURES.md" << 'EOF'
 
 ## F-0100: Payment System Epic

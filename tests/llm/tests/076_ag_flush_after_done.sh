@@ -7,7 +7,7 @@
 # Setup with Formal profile
 setup_test_project "formal"
 
-mkdir -p "$TEST_PROJECT/.agentic/spec/acceptance"
+mkdir -p "$TEST_PROJECT/.agentic/spec/contracts" "$TEST_PROJECT/.agentic/spec/acceptance"
 cat >> "$TEST_PROJECT/.agentic/spec/FEATURES.md" << 'EOF'
 
 ### F-0100: Cache Layer

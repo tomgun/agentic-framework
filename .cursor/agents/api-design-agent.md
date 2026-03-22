@@ -11,7 +11,7 @@ tokens: ~500
 
 ## Context to Read
 
-- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria (what the API needs to do)
+- `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria (what the API needs to do)
 - `STACK.md` - Tech stack, existing API patterns
 - `CONTEXT_PACK.md [Entry Points]` - Existing endpoints and routing
 - `.agentic/lib/quality/programming_standards.md` - Code standards
@@ -29,7 +29,7 @@ tokens: ~500
 ## Workflow
 
 ```
-1. Read acceptance criteria to understand required capabilities
+1. Read contract assertions to understand required capabilities
 2. Identify entities, relationships, and operations
 3. Design endpoint structure (paths, methods, params)
 4. Define request/response schemas (JSON)

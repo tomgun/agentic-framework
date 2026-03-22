@@ -1,11 +1,11 @@
 ---
-summary: "Define features, write acceptance criteria, create ADRs"
+summary: "Define features, write YAML contracts, create ADRs"
 tokens: ~411
 ---
 
 # Planning Agent
 
-**Role**: Define features, write and update acceptance criteria, create ADRs for decisions.
+**Role**: Define features, write and update YAML contracts, create ADRs for decisions.
 
 ---
 
@@ -13,7 +13,7 @@ tokens: ~411
 
 1. **Read `.agentic/OVERVIEW.md`** - understand the product vision and goals
 2. **Read `.agentic/STATUS.md`** - understand current state
-3. **Read relevant acceptance criteria** - existing feature specs
+3. **Read relevant contracts** - existing feature specs at `spec/contracts/`
 
 ## Context to Read
 
@@ -27,8 +27,8 @@ tokens: ~411
 ## Responsibilities
 
 1. Define feature scope based on research/requirements
-2. Write clear acceptance criteria (initial)
-3. **Update acceptance criteria when discoveries are made during implementation**
+2. Write YAML contract with assertions at `spec/contracts/F-####.yaml`
+3. **Update contract assertions when discoveries are made during implementation**
 4. Create ADR for significant decisions
 5. Identify dependencies on other features
 6. Estimate complexity
@@ -42,22 +42,24 @@ The Planning Agent can be called again during a feature pipeline if:
 - Requirements change or are clarified
 - Scope needs adjustment
 
-In re-planning mode, update existing `.agentic/spec/acceptance/F-####.md` rather than creating new.
+In re-planning mode, update existing `.agentic/spec/contracts/F-####.yaml` rather than creating new.
 
 ## Output
 
-### Acceptance Criteria File
-Create: `.agentic/spec/acceptance/F-####.md`
-```markdown
-# F-####: [Feature Name] - Acceptance Criteria
-
-## AC-001: [Scenario]
-**Given** [context]
-**When** [action]
-**Then** [expected outcome]
-
-## AC-002: [Scenario]
-...
+### Contract File
+Create: `.agentic/spec/contracts/F-####.yaml`
+```yaml
+feature: F-####
+title: "[Feature Name]"
+assertions:
+  - id: A-001
+    description: "[Expected behavior]"
+    verify: "[command or manual check]"
+    test: "[test file path]"
+  - id: A-002
+    description: "[Expected behavior]"
+    verify: "[command or manual check]"
+    test: "[test file path]"
 ```
 
 ### ADR (if significant decision)
@@ -83,11 +85,11 @@ Dependencies: F-#### (if any)
 
 When done, update `.agentic/pipeline/F-{id}-pipeline.md`:
 ```markdown
-- [x] Planning Agent (HH:MM) → .agentic/spec/acceptance/F-####.md
+- [x] Planning Agent (HH:MM) → spec/contracts/F-####.yaml
 ```
 
 Add handoff notes for Test Agent:
-- List of acceptance criteria
+- List of contract assertions
 - Key test scenarios
 - Any edge cases to consider
 

@@ -288,7 +288,7 @@ def render_features_md(report: dict) -> str:
             if domain_type:
                 lines.append(f"- Domain: {domain_type}")
             lines.extend([
-                f"- Acceptance: spec/acceptance/{fid}.md",
+                f"- Acceptance: spec/contracts/{fid}.yaml",
                 f"- State: complete",
                 f"- Accepted: no  <!-- Needs human verification -->",
                 f"- Type: {cluster.get('type_hint', 'user-facing')}",
@@ -312,7 +312,7 @@ def render_features_md(report: dict) -> str:
             if default_domain:
                 lines.append(f"- Domain: {default_domain}")
             lines.extend([
-                f"- Acceptance: spec/acceptance/{fid}.md",
+                f"- Acceptance: spec/contracts/{fid}.yaml",
                 f"- State: complete",
                 f"- Accepted: no  <!-- Needs human verification -->",
                 f"- Evidence: {feat.get('evidence', feat.get('description', ''))}",

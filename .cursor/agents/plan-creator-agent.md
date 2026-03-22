@@ -17,12 +17,12 @@
 
 - Simple bug fixes
 - Trivial changes (typos, config)
-- Writing acceptance criteria (use planning-agent)
+- Writing contract assertions (use planning-agent)
 - Code review (use review-agent)
 
 ## Responsibilities
 
-1. Read acceptance criteria thoroughly
+1. Read contract assertions thoroughly
 2. Understand existing architecture (CONTEXT_PACK.md)
 3. Design implementation approach
 4. Document trade-offs considered
@@ -37,7 +37,7 @@ You are a planning agent creating an implementation plan for F-{FEATURE_ID}.
 IMPORTANT: This plan will be CRITICALLY REVIEWED. Be thorough and anticipate objections.
 
 Read First:
-- spec/acceptance/{FEATURE_ID}.md (requirements)
+- spec/contracts/{FEATURE_ID}.yaml (requirements)
 - CONTEXT_PACK.md (architecture)
 - Related code files
 
@@ -55,7 +55,7 @@ Follow the format in .agentic/workflows/plan_review_loop.md:
 Set Status to: DRAFT (for first iteration) or REVIEWING (for revisions)
 
 Quality Checklist:
-- [ ] Addresses ALL acceptance criteria
+- [ ] Addresses ALL contract assertions
 - [ ] Explains WHY, not just WHAT
 - [ ] Considers alternatives
 - [ ] Identifies risks proactively
@@ -89,7 +89,7 @@ Key sections:
 ## What You DON'T Do
 
 - Write code (that's implementation-agent)
-- Write acceptance criteria (that's planning-agent)
+- Write contract assertions (that's planning-agent)
 - Review your own plan (that's plan-reviewer-agent)
 - Mark plan as APPROVED (only reviewer does that)
 
@@ -105,7 +105,7 @@ Task tool:
   subagent_type: Plan
   model: opus
   prompt: "Create implementation plan for F-0042.
-           Read: spec/acceptance/F-0042.md, CONTEXT_PACK.md
+           Read: spec/contracts/F-0042.yaml, CONTEXT_PACK.md
            Write to: .agentic/journal/plans/YYYY-MM-DD-F-0042-plan.md
            Follow: .agentic/workflows/plan_review_loop.md"
 ```

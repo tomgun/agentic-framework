@@ -8,7 +8,7 @@
 setup_test_project "formal"
 
 # Create a feature with acceptance criteria that has a vague term (triggers ambiguity finding)
-mkdir -p "$TEST_PROJECT/spec/acceptance"
+mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # Features
 
@@ -19,7 +19,7 @@ cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 
 **Description**: Add user notification system.
 
-**Acceptance**: See `spec/acceptance/F-0020.md`
+**Acceptance**: See `spec/contracts/F-0020.yaml`
 EOF
 
 cat > "$TEST_PROJECT/spec/acceptance/F-0020.md" << 'EOF'
@@ -51,8 +51,8 @@ FAILURES=0
 check_output_contains "spec.analy\|ambig\|vague\|finding\|MEDIUM\|spec-analyze\|advisory\|metric" \
     "Agent mentions spec analysis or findings before implementation" || ((FAILURES++))
 
-# Agent should still reference the normal workflow too (acceptance criteria, plan)
-check_output_contains "acceptance\|criteria\|plan\|ag implement\|F-0020" \
+# Agent should still reference the normal workflow too (acceptance criteria/contracts, plan)
+check_output_contains "acceptance\|criteria\|contract\|plan\|ag implement\|F-0020" \
     "Agent also references standard implementation workflow" || ((FAILURES++))
 
 # Cleanup

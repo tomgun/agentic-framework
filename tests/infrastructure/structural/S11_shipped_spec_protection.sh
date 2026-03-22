@@ -29,10 +29,10 @@ cat >> spec/FEATURES.md << 'EOF'
 
 **Description**: A test feature for validation.
 
-**Acceptance**: See `spec/acceptance/F-0099.md`
+**Acceptance**: See `spec/contracts/F-0099.yaml`
 EOF
 
-mkdir -p spec/acceptance spec/migrations tests
+mkdir -p spec/contracts spec/acceptance spec/migrations tests
 cat > spec/acceptance/F-0099.md << 'EOF'
 # F-0099: Test Feature
 

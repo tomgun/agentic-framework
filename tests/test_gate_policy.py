@@ -42,7 +42,7 @@ def project_dir():
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         (root / ".agentic" / "lib").mkdir(parents=True)
-        (root / ".agentic" / "spec" / "acceptance").mkdir(parents=True)
+        (root / ".agentic" / "spec" / "contracts").mkdir(parents=True)
         (root / ".agentic" / "session").mkdir(parents=True)
         (root / ".agentic" / "journal" / "plans").mkdir(parents=True)
         (root / "tests").mkdir(parents=True)
@@ -68,18 +68,20 @@ def project_dir():
 **Description**: A test feature for gate testing.
 """)
 
-        # AC file for F-0042
-        (root / ".agentic" / "spec" / "acceptance" / "F-0042.md").write_text("""# F-0042 Acceptance Criteria
-
-## Criteria
-
-- [ ] **AC-001**: Feature works correctly
-- [ ] **AC-002**: Tests pass
-
-## Verification
-
-- **Automated**: `echo "test passed"`
-""")
+        # Contract YAML for F-0042
+        (root / ".agentic" / "spec" / "contracts" / "F-0042.yaml").write_text(
+            "id: F-0042\n"
+            "name: Test Feature\n"
+            "lifecycle: implementing\n"
+            "description: A test feature for gate testing.\n"
+            "assertions:\n"
+            "  - id: AC-001\n"
+            "    text: Feature works correctly\n"
+            "    type: behavioral\n"
+            "  - id: AC-002\n"
+            "    text: Tests pass\n"
+            "    type: behavioral\n"
+        )
 
         # Test file referencing F-0042
         (root / "tests" / "test_f0042.py").write_text(
@@ -198,9 +200,9 @@ class TestCheckFeatureHasAC:
         assert "acceptance criteria" in result.reasons[0].lower()
 
     def test_ac_empty(self, project_dir):
-        """AC file exists but has no AC lines."""
-        (project_dir / ".agentic" / "spec" / "acceptance" / "F-9998.md").write_text(
-            "# F-9998\n\nNo criteria here\n"
+        """Contract file exists but has no assertions."""
+        (project_dir / ".agentic" / "spec" / "contracts" / "F-9998.yaml").write_text(
+            "id: F-9998\nname: Empty\nlifecycle: planned\ndescription: Empty test.\nassertions: []\n"
         )
         result = check_feature_has_ac("F-9998", project_dir)
         assert result.decision == "deny"
@@ -526,9 +528,9 @@ class TestFormalSpecLifecycleEnforcement:
 **Status**: planned
 **Category**: Test
 """)
-        # AC file for F-0001
-        (project_dir / ".agentic" / "spec" / "acceptance" / "F-0001.md").write_text(
-            "# F-0001\n\n### AC-1: Works\n"
+        # Contract for F-0001
+        (project_dir / ".agentic" / "spec" / "contracts" / "F-0001.yaml").write_text(
+            "id: F-0001\nname: Feature One\nlifecycle: implementing\ndescription: Test feature.\nassertions:\n  - id: AC-1\n    text: Works\n    type: behavioral\n"
         )
         return project_dir
 
@@ -634,7 +636,7 @@ class TestPreCommitMirrorChecks:
     """Checks mirrored from pre-commit-check.sh into gate_pretool()."""
 
     def test_shipped_spec_edit_warns(self, formal_project):
-        """Editing a shipped feature's AC file produces a migration warning."""
+        """Editing a shipped feature's contract file produces a migration warning."""
         # Mark F-0042 as shipped
         (formal_project / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
 
@@ -645,16 +647,16 @@ class TestPreCommitMirrorChecks:
 """)
         result = gate_pretool(
             "F-0042", formal_project, "Edit",
-            json.dumps({"file_path": str(formal_project / ".agentic/spec/acceptance/F-0042.md")})
+            json.dumps({"file_path": str(formal_project / ".agentic/spec/contracts/F-0042.yaml")})
         )
         assert result.decision == "allow"  # warn, not block
         assert any("migration" in w.lower() for w in result.warnings)
 
     def test_non_shipped_spec_edit_no_warning(self, formal_project):
-        """Editing a non-shipped feature's AC file produces no warning."""
+        """Editing a non-shipped feature's contract file produces no warning."""
         result = gate_pretool(
             "F-0042", formal_project, "Edit",
-            json.dumps({"file_path": str(formal_project / ".agentic/spec/acceptance/F-0042.md")})
+            json.dumps({"file_path": str(formal_project / ".agentic/spec/contracts/F-0042.yaml")})
         )
         assert result.decision == "allow"
         assert not any("migration" in w.lower() for w in result.warnings)

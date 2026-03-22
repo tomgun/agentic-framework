@@ -13,7 +13,7 @@ source "$SCRIPT_DIR/../paths.sh"
 
 NFR_FILE="${PROJECT_ROOT}/.agentic/spec/NFR.md"
 FEATURES_FILE="${PROJECT_ROOT}/.agentic/spec/FEATURES.md"
-ACCEPTANCE_DIR="${PROJECT_ROOT}/.agentic/spec/acceptance"
+# CONTRACTS_DIR and ACCEPTANCE_DIR come from paths.sh
 
 # Colors
 if [ -t 1 ]; then
@@ -72,8 +72,13 @@ get_referencing_features() {
 check_acceptance_nfr() {
     local fid="$1"
     local nfr_id="$2"
-    local ac_file="$ACCEPTANCE_DIR/${fid}.md"
-    if [[ -f "$ac_file" ]]; then
+    local ac_file=""
+    if [[ -f "$CONTRACTS_DIR/${fid}.yaml" ]]; then
+        ac_file="$CONTRACTS_DIR/${fid}.yaml"
+    elif [[ -f "$ACCEPTANCE_DIR/${fid}.md" ]]; then
+        ac_file="$ACCEPTANCE_DIR/${fid}.md"
+    fi
+    if [[ -n "$ac_file" && -f "$ac_file" ]]; then
         if grep -q "$nfr_id\|NFR Compliance" "$ac_file" 2>/dev/null; then
             echo "has-compliance"
         else

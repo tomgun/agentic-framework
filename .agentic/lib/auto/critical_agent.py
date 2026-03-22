@@ -248,9 +248,10 @@ class CriticalAgent:
             if feature_section:
                 sections.append(f"## Feature Spec\n{feature_section}")
 
-        # Acceptance criteria
+        # Acceptance criteria (contract YAML first, then legacy markdown)
+        contract_file = self._paths.contracts_dir / f"{feature_id}.yaml"
         ac_file = self._paths.acceptance_dir / f"{feature_id}.md"
-        ac_content = self._read_file(ac_file)
+        ac_content = self._read_file(contract_file) or self._read_file(ac_file)
         if ac_content:
             sections.append(f"## Acceptance Criteria\n{ac_content}")
 

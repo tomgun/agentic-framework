@@ -8,7 +8,7 @@
 setup_test_project "formal"
 
 # Create FEATURES.md with domain-tagged features (as brownfield discovery would produce)
-mkdir -p "$TEST_PROJECT/spec/acceptance"
+mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # FEATURES.md
 
@@ -17,13 +17,13 @@ cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 ## F-0001: User Dashboard
 - Status: shipped
 - Domain: frontend
-- Acceptance: spec/acceptance/F-0001.md
+- Acceptance: spec/contracts/F-0001.md
 - State: complete
 
 ## F-0002: Products API
 - Status: shipped
 - Domain: backend
-- Acceptance: spec/acceptance/F-0002.md
+- Acceptance: spec/contracts/F-0002.md
 - State: complete
 EOF
 

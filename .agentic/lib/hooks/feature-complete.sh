@@ -58,23 +58,31 @@ echo "✓ Feature found"
 # Check 2: Acceptance criteria exists (CRITICAL GATE)
 echo ""
 echo "[2/6] Checking acceptance criteria file exists (CRITICAL)..."
-if [[ ! -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
-  echo "❌ BLOCKED: .agentic/spec/acceptance/${FEATURE_ID}.md not found"
-  echo "   Acceptance criteria are MANDATORY for feature completion."
-  echo "   Create acceptance criteria before marking feature complete"
-  FAILURES=$((FAILURES + 1))
+# Check contracts first (new format), then acceptance (legacy)
+if [[ -f "$CONTRACTS_DIR/${FEATURE_ID}.yaml" ]]; then
+  echo "✓ Contract file exists (YAML)"
+  AC_FILE="$CONTRACTS_DIR/${FEATURE_ID}.yaml"
+elif [[ -f "$ACCEPTANCE_DIR/${FEATURE_ID}.md" ]]; then
+  echo "✓ Acceptance criteria file exists (legacy)"
+  AC_FILE="$ACCEPTANCE_DIR/${FEATURE_ID}.md"
 else
-  echo "✓ Acceptance criteria file exists"
-  
+  echo "❌ BLOCKED: No contract or acceptance file found for ${FEATURE_ID}"
+  echo "   Create: $CONTRACTS_DIR/${FEATURE_ID}.yaml (or legacy $ACCEPTANCE_DIR/${FEATURE_ID}.md)"
+  echo "   Acceptance criteria are MANDATORY for feature completion."
+  FAILURES=$((FAILURES + 1))
+  AC_FILE=""
+fi
+
+if [[ -n "$AC_FILE" ]]; then
   # Check that acceptance criteria has testable items
-  CRITERIA_COUNT=$(grep -c "^- \[" ".agentic/spec/acceptance/${FEATURE_ID}.md" 2>/dev/null || echo "0")
+  CRITERIA_COUNT=$(grep -c "^- \[" "$AC_FILE" 2>/dev/null || echo "0")
   if [[ "$CRITERIA_COUNT" == "0" ]]; then
     echo "⚠️  WARNING: Acceptance criteria has no testable items (- [ ] ...)"
     echo "   Add testable criteria: - [ ] User can do X"
   else
     echo "✓ ${CRITERIA_COUNT} testable criteria found"
   fi
-fi
+fi  # end AC_FILE check
 
 # Check 3: Tests exist (check for @feature annotation in test files)
 echo ""
@@ -94,9 +102,9 @@ done
 
 if [[ $TEST_FILES_FOUND -eq 1 ]]; then
   echo "✓ Tests found with @feature ${FEATURE_ID} annotation"
-elif [[ -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
+elif [[ -n "${AC_FILE:-}" ]] && [[ -f "$AC_FILE" ]]; then
   # Check if acceptance criteria mentions tests
-  if grep -qi "test" ".agentic/spec/acceptance/${FEATURE_ID}.md"; then
+  if grep -qi "test" "$AC_FILE"; then
     echo "✓ Tests mentioned in acceptance criteria"
   else
     echo "⚠️  WARNING: No tests found with @feature annotation"
@@ -193,7 +201,7 @@ else
   echo "Fix the issues above before marking feature as shipped."
   echo ""
   echo "Definition of done checklist:"
-  echo "- [ ] Acceptance criteria exists (.agentic/spec/acceptance/${FEATURE_ID}.md)"
+  echo "- [ ] Contract/acceptance criteria exists ($CONTRACTS_DIR/${FEATURE_ID}.yaml or $ACCEPTANCE_DIR/${FEATURE_ID}.md)"
   echo "- [ ] Tests exist with @feature ${FEATURE_ID} annotation"
   echo "- [ ] All tests pass"
   echo "- [ ] Code committed (no uncommitted changes)"

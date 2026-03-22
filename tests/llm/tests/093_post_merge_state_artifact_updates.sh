@@ -23,7 +23,7 @@ cat > "$TEST_PROJECT/STACK.md" << 'EOF'
 EOF
 
 # Create completed feature with all artifacts
-mkdir -p "$TEST_PROJECT/.agentic/spec/acceptance"
+mkdir -p "$TEST_PROJECT/.agentic/spec/contracts" "$TEST_PROJECT/.agentic/spec/acceptance"
 mkdir -p "$TEST_PROJECT/.agentic/journal"
 cat > "$TEST_PROJECT/.agentic/spec/FEATURES.md" << 'EOF'
 # Features

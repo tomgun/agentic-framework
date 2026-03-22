@@ -107,7 +107,12 @@ def load_integration_commands(
     _validate_feature_id(epic_id)
     paths = get_paths(project_root)
 
-    # 1. Epic AC file override
+    # 1. Epic contract/AC file override (contracts first, then legacy)
+    contract_file = paths.contracts_dir / f"{epic_id}.yaml"
+    if contract_file.exists():
+        commands = _parse_integration_section(contract_file.read_text())
+        if commands:
+            return commands
     ac_file = paths.acceptance_dir / f"{epic_id}.md"
     if ac_file.exists():
         commands = _parse_integration_section(ac_file.read_text())

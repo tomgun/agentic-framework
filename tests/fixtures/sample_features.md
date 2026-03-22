@@ -17,7 +17,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/acceptance/F-0001.md
+- Acceptance: spec/contracts/F-0001.md
 - Verification:
   - Accepted: yes
   - Accepted at: 2026-01-01
@@ -48,7 +48,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/acceptance/F-0002.md
+- Acceptance: spec/contracts/F-0002.md
 - Verification:
   - Accepted: no
   - Accepted at:
@@ -78,7 +78,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/acceptance/F-0003.md
+- Acceptance: spec/contracts/F-0003.md
 - Verification:
   - Accepted: no
   - Accepted at:
@@ -109,7 +109,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/acceptance/F-0004.md
+- Acceptance: spec/contracts/F-0004.md
 - Verification:
   - Accepted: no
   - Accepted at:
@@ -139,7 +139,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/acceptance/F-0005.md
+- Acceptance: spec/contracts/F-0005.md
 - Verification:
   - Accepted: no
   - Accepted at:
@@ -169,7 +169,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/acceptance/F-0006.md
+- Acceptance: spec/contracts/F-0006.md
 - Verification:
   - Accepted: yes
   - Accepted at: 2026-01-05
@@ -199,7 +199,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/acceptance/F-0007.md
+- Acceptance: spec/contracts/F-0007.md
 - Verification:
   - Accepted: no
   - Accepted at:

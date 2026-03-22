@@ -55,6 +55,6 @@ Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 ## Framework Development
 
 Validation: `bash tests/validate_framework.sh` must pass before committing.
-New features: Add to `.agentic/spec/FEATURES.md` FIRST, create acceptance criteria before coding.
+New features: Add to `.agentic/spec/FEATURES.md` FIRST, create YAML contract at `spec/contracts/F-XXXX.yaml` before coding.
 Breaking changes: Provide upgrade path in `upgrade.sh`.
 Instruction files are part of the feature: new `ag` commands/gates MUST update all instruction files (templates, skills, memory-seed, DEVELOPER_GUIDE, HOW_IT_WORKS).

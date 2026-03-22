@@ -14,7 +14,7 @@ tokens: ~271
 - `CONTEXT_PACK.md` - Understand project architecture
 - `STACK.md` - Know current tech stack
 - `spec/PRD.md` - Understand product goals
-- Feature-specific acceptance criteria (if assigned to feature)
+- Feature-specific contract (if assigned to feature)
 
 ## Responsibilities
 

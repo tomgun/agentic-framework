@@ -37,7 +37,7 @@ fi
 
 FEATURES_FILE="$ROOT_DIR/.agentic/spec/FEATURES.md"
 NFR_FILE="$ROOT_DIR/.agentic/spec/NFR.md"
-ACCEPTANCE_DIR="$ROOT_DIR/.agentic/spec/acceptance"
+# CONTRACTS_DIR and ACCEPTANCE_DIR come from paths.sh
 TRACKER_FILE="$ROOT_DIR/.agentic/session/.qa-tracker.json"
 
 # --- Helpers ---
@@ -48,10 +48,14 @@ get_shipped_features() {
         | grep -oE "$FEATURE_ID_ERE" | sort -u
 }
 
-# Get acceptance file for a feature
+# Get acceptance file for a feature (contracts first, then legacy acceptance)
 get_acceptance_file() {
     local fid="$1"
-    echo "$ACCEPTANCE_DIR/${fid}.md"
+    if [[ -f "$CONTRACTS_DIR/${fid}.yaml" ]]; then
+        echo "$CONTRACTS_DIR/${fid}.yaml"
+    else
+        echo "$ACCEPTANCE_DIR/${fid}.md"
+    fi
 }
 
 # Check if feature has tests section
@@ -337,9 +341,9 @@ except: pass
         return
     fi
 
-    # Find features whose acceptance files changed since last audit
+    # Find features whose contract/acceptance files changed since last audit
     local changed_features
-    changed_features=$(git diff --name-only "$last_commit" HEAD -- ".agentic/spec/acceptance/" 2>/dev/null \
+    changed_features=$(git diff --name-only "$last_commit" HEAD -- ".agentic/spec/contracts/" ".agentic/spec/acceptance/" 2>/dev/null \
         | grep -oE "$FEATURE_ID_ERE" | sort -u)
 
     if [ -z "$changed_features" ]; then
@@ -618,7 +622,7 @@ case "${1:-}" in
         if [[ -f "$FEATURES_FILE" ]] && [[ -f "$NFR_FILE" ]]; then
             shipped_fids=$(grep -E "^## F-[0-9]+:" "$FEATURES_FILE" -A5 | awk '/^## F-/{fid=$2; sub(/:$/,"",fid)} /[Ss]tatus.*shipped/{print fid}')
             for fid in $shipped_fids; do
-                ac_file="$ACCEPTANCE_DIR/${fid}.md"
+                ac_file=$(get_acceptance_file "$fid")
                 [[ -f "$ac_file" ]] || continue
                 # Check if this feature has any NFR references
                 if grep -qE 'NFR-[0-9]+' "$ac_file" 2>/dev/null; then

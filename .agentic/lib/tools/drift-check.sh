@@ -11,7 +11,8 @@ source "$SCRIPT_DIR/paths.sh" 2>/dev/null || true
 
 ROOT_DIR="${ROOT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 FEATURES_FILE="$ROOT_DIR/.agentic/spec/FEATURES.md"
-ACCEPTANCE_DIR="$ROOT_DIR/.agentic/spec/acceptance"
+CONTRACTS_DIR="${CONTRACTS_DIR:-$ROOT_DIR/.agentic/spec/contracts}"
+ACCEPTANCE_DIR="${ACCEPTANCE_DIR:-$ROOT_DIR/.agentic/spec/acceptance}"
 
 QUIET=false
 [ "${1:-}" = "--quiet" ] && QUIET=true
@@ -51,8 +52,13 @@ check_shipped_ac_drift() {
         | grep -oE 'F-[0-9]+' || true)
 
     for fid in $shipped_features; do
-        local acc_file="$ACCEPTANCE_DIR/${fid}.md"
-        [ ! -f "$acc_file" ] && continue
+        local acc_file=""
+        if [ -f "$CONTRACTS_DIR/${fid}.yaml" ]; then
+            acc_file="$CONTRACTS_DIR/${fid}.yaml"
+        elif [ -f "$ACCEPTANCE_DIR/${fid}.md" ]; then
+            acc_file="$ACCEPTANCE_DIR/${fid}.md"
+        fi
+        [ -z "$acc_file" ] && continue
 
         local counts
         counts=$(count_acs "$acc_file")

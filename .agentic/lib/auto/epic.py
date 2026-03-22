@@ -226,13 +226,27 @@ def propose_decomposition(
     _validate_feature_id(epic_id)
     paths = get_paths(project_root)
 
-    # Read AC file
+    # Read AC file (contract YAML first, then legacy markdown)
+    contract_file = paths.contracts_dir / f"{epic_id}.yaml"
     ac_file = paths.acceptance_dir / f"{epic_id}.md"
-    if not ac_file.exists():
+    if contract_file.exists():
+        try:
+            from contracts import load_contract
+            contract = load_contract(contract_file)
+            # Convert contract assertions to AC-format text for parsing
+            ac_lines = []
+            for a in contract.assertions:
+                ac_lines.append(f"- [ ] **{a.id}**: {a.text}")
+            ac_content = "\n".join(ac_lines)
+        except Exception:
+            ac_content = contract_file.read_text()
+    elif ac_file.exists():
+        ac_content = ac_file.read_text()
+    else:
         raise FileNotFoundError(
-            f"No acceptance criteria file: {ac_file}"
+            f"No contract or acceptance criteria file: "
+            f"{contract_file} or {ac_file}"
         )
-    ac_content = ac_file.read_text()
 
     # Parse AC groups
     ac_groups = _parse_ac_groups(ac_content)
@@ -315,14 +329,14 @@ def create_child_features(
         for section in new_sections:
             f.write(section)
 
-    # Create AC files
-    acceptance_dir = paths.acceptance_dir
-    acceptance_dir.mkdir(parents=True, exist_ok=True)
+    # Create contract YAML files for child features
+    contracts_dir = paths.contracts_dir
+    contracts_dir.mkdir(parents=True, exist_ok=True)
 
     for child in children:
-        ac_file = acceptance_dir / f"{child['id']}.md"
-        ac_content = _build_child_ac(child, epic_id)
-        ac_file.write_text(ac_content)
+        contract_file = contracts_dir / f"{child['id']}.yaml"
+        contract_content = _build_child_contract(child, epic_id)
+        contract_file.write_text(contract_content)
         messages.append(f"Created {child['id']}: {child['name']}")
 
     # Create v2 work items with parent link (best-effort)
@@ -388,12 +402,13 @@ def decompose(
             f"Decomposition requires 'planned' or 'specced'."
         ]
 
-    # AC file must exist
+    # Contract or AC file must exist
+    contract_file = paths.contracts_dir / f"{epic_id}.yaml"
     ac_file = paths.acceptance_dir / f"{epic_id}.md"
-    if not ac_file.exists():
+    if not contract_file.exists() and not ac_file.exists():
         return False, [
-            f"No acceptance criteria file for {epic_id}. "
-            f"Create {ac_file} first."
+            f"No contract or acceptance criteria file for {epic_id}. "
+            f"Create spec/contracts/{epic_id}.yaml first."
         ]
 
     # Idempotency check
@@ -673,7 +688,7 @@ def _build_feature_section(
         "",
         f"**Description**: Child feature of {child['parent']} ({epic_name}).",
         "",
-        f"**Acceptance**: See `spec/acceptance/{child['id']}.md`",
+        f"**Acceptance**: See `spec/contracts/{child['id']}.yaml`",
         "",
         "---",
         "",
@@ -682,7 +697,7 @@ def _build_feature_section(
 
 
 def _build_child_ac(child: dict, epic_id: str) -> str:
-    """Build a component-scoped AC file for a child feature."""
+    """Build a component-scoped AC file for a child feature (legacy markdown)."""
     lines = [
         f"# {child['id']}: {child['name']}",
         "",
@@ -703,6 +718,62 @@ def _build_child_ac(child: dict, epic_id: str) -> str:
             lines.append(f"- [ ] {ac_line}")
     lines.append("")
     return "\n".join(lines)
+
+
+def _build_child_contract(child: dict, epic_id: str) -> str:
+    """Build a valid contract YAML file for a child feature.
+
+    Uses the contracts module to produce correctly structured YAML
+    with proper field names (id, name, lifecycle, assertions, etc.).
+    """
+    import re as _re
+
+    assertions = []
+    for idx, ac_line in enumerate(child.get("ac_lines", [])):
+        # Extract AC ID and text from lines like "- [ ] **AC-001**: text"
+        m = _re.search(r"\*\*AC-(\d+)\*\*:\s*(.+)", ac_line)
+        if m:
+            ac_id = f"AC-{m.group(1)}"
+            ac_text = m.group(2).strip()
+        else:
+            ac_id = f"AC-{idx + 1:03d}"
+            ac_text = ac_line.strip().lstrip("- [ ]").strip()
+        assertions.append({
+            "id": ac_id,
+            "text": ac_text,
+            "type": "behavioral",
+        })
+
+    contract_data = {
+        "id": child["id"],
+        "name": child["name"],
+        "lifecycle": "exploring",
+        "description": f"Child feature of {epic_id}.",
+        "parent": epic_id,
+        "assertions": assertions,
+    }
+    if child.get("component"):
+        contract_data["tags"] = [child["component"]]
+
+    try:
+        import yaml
+        return yaml.dump(contract_data, default_flow_style=False, sort_keys=False, allow_unicode=True)
+    except ImportError:
+        # Fallback: manual YAML construction
+        lines = [
+            f"id: {child['id']}",
+            f"name: {child['name']}",
+            "lifecycle: exploring",
+            f"description: Child feature of {epic_id}.",
+            f"parent: {epic_id}",
+            "assertions:",
+        ]
+        for a in assertions:
+            lines.append(f"  - id: {a['id']}")
+            text = a['text'].replace('"', '\\"')
+            lines.append(f'    text: "{text}"')
+            lines.append(f"    type: {a['type']}")
+        return "\n".join(lines) + "\n"
 
 
 # ---------------------------------------------------------------------------

@@ -79,15 +79,18 @@ cmd_plan() {
         fi
     fi
 
-    # 1. Check acceptance criteria (advisory for plan, blocking for implement)
-    local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
-    if [ ! -f "$acc_file" ]; then
-        echo -e "${YELLOW}Note: No acceptance criteria yet (.agentic/spec/acceptance/${feature_id}.md)${NC}"
-        echo "  The plan-review loop can help define what to build."
-        echo "  Acceptance criteria will be required before 'ag implement'."
-        echo ""
+    # 1. Check contract or acceptance criteria (advisory for plan, blocking for implement)
+    local contract_file="$CONTRACTS_DIR/${feature_id}.yaml"
+    local acc_file="$ACCEPTANCE_DIR/${feature_id}.md"
+    if [ -f "$contract_file" ]; then
+        echo -e "${GREEN}Contract: EXISTS${NC}"
+    elif [ -f "$acc_file" ]; then
+        echo -e "${GREEN}Acceptance criteria: EXISTS (legacy format)${NC}"
     else
-        echo -e "${GREEN}Acceptance criteria: EXISTS${NC}"
+        echo -e "${YELLOW}Note: No contract yet (.agentic/spec/contracts/${feature_id}.yaml)${NC}"
+        echo "  The plan-review loop can help define what to build."
+        echo "  A contract will be required before 'ag implement'."
+        echo ""
     fi
 
     # 2. Check for existing plan
@@ -122,7 +125,7 @@ cmd_plan() {
         echo "Create implementation plan for $feature_id."
         echo ""
         echo "Read:"
-        echo "  - .agentic/spec/acceptance/${feature_id}.md"
+        echo "  - .agentic/spec/contracts/${feature_id}.yaml (or legacy: spec/acceptance/${feature_id}.md)"
         echo "  - CONTEXT_PACK.md"
         echo ""
         echo "Write plan to: .agentic/journal/plans/$(date +%Y-%m-%d)-${feature_id}-plan.md"
@@ -147,7 +150,7 @@ cmd_plan() {
     echo "  Agent tool:"
     echo "    subagent_type: Plan"
     echo "    prompt: \"Create implementation plan for $feature_id."
-    echo "            Read: .agentic/spec/acceptance/${feature_id}.md, CONTEXT_PACK.md"
+    echo "            Read: .agentic/spec/contracts/${feature_id}.yaml (or legacy: spec/acceptance/${feature_id}.md), CONTEXT_PACK.md"
     echo "            Write to: .agentic/journal/plans/$(date +%Y-%m-%d)-${feature_id}-plan.md"
     echo "            Follow plan format: title, scope, approach, risks, open questions.\""
     echo ""
@@ -159,7 +162,7 @@ cmd_plan() {
     echo "      subagent_type: general-purpose"
     echo "      prompt: \"You are a PLAN CRITIC with fresh context."
     echo "              Read plan: .agentic/journal/plans/*${feature_id}-plan.md (glob — file has date prefix)"
-    echo "              Read requirements: .agentic/spec/acceptance/${feature_id}.md"
+    echo "              Read requirements: .agentic/spec/contracts/${feature_id}.yaml (or legacy: spec/acceptance/${feature_id}.md)"
     echo "              Role: Find flaws, missing edge cases, risks, over-engineering."
     echo "              Output your structured critique.\""
     echo ""
@@ -168,7 +171,7 @@ cmd_plan() {
     echo "      subagent_type: general-purpose"
     echo "      prompt: \"You are a PLAN ADVOCATE with fresh context."
     echo "              Read plan: .agentic/journal/plans/*${feature_id}-plan.md (glob — file has date prefix)"
-    echo "              Read requirements: .agentic/spec/acceptance/${feature_id}.md"
+    echo "              Read requirements: .agentic/spec/contracts/${feature_id}.yaml (or legacy: spec/acceptance/${feature_id}.md)"
     echo "              Role: Defend design decisions, explain trade-offs, rebut potential criticisms."
     echo "              Output your structured defense.\""
     echo ""

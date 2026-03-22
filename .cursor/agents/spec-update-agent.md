@@ -14,14 +14,14 @@ tokens: ~335
 - `.agentic/pipeline/F-####-pipeline.md` - Pipeline state
 - Review Agent's approval
 - `.agentic/spec/FEATURES.md` - Current feature statuses
-- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria
+- `.agentic/spec/contracts/F-####.yaml` - YAML contract (assertions, verify commands, test links)
 - Implementation details from handoff notes
 
 ## Responsibilities
 
 1. Update feature status in FEATURES.md
-2. **Verify each AC is covered by tests** (map AC-### to test file)
-3. Mark acceptance criteria as verified with test locations
+2. **Verify each contract assertion is covered by tests** (map assertions to test files)
+3. Run `ag contract check F-####` to verify all assertions pass
 4. Add lessons learned if any
 5. Update dependencies if needed
 6. Update pipeline file when done
@@ -38,19 +38,9 @@ Complexity: M
 Shipped: YYYY-MM-DD
 ```
 
-### Update .agentic/spec/acceptance/F-####.md
+### Verify contract assertions
 
-Add verification section:
-```markdown
-## Verification
-
-- [x] AC-001: Verified in tests/unit/feature.test.*
-- [x] AC-002: Verified in tests/unit/feature.test.*
-- [x] AC-003: Verified in tests/e2e/feature.spec.*
-
-Verified by: Review Agent
-Date: YYYY-MM-DD
-```
+Run `ag contract check F-####` and confirm all assertions pass. Contract files live at `.agentic/spec/contracts/F-####.yaml`.
 
 ### Update .agentic/spec/LESSONS.md (if applicable)
 

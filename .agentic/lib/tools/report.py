@@ -190,7 +190,7 @@ def main() -> int:
     if missing_acceptance:
         print("\nMissing Acceptance link:")
         for fid in missing_acceptance:
-            print(f"- {fid} (expected: spec/acceptance/{fid}.md)")
+            print(f"- {fid} (expected: spec/contracts/{fid}.yaml or spec/acceptance/{fid}.md)")
 
     if pending_acceptance:
         print("\nNeeds acceptance (verify feature works + update spec/FEATURES.md -> Accepted: yes/no):")

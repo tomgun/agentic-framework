@@ -11,7 +11,7 @@ tokens: ~450
 
 ## Context to Read
 
-- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria (what behavior must be preserved)
+- `.agentic/spec/contracts/F-####.yaml` - Contract assertions (what behavior must be preserved)
 - `STACK.md` - Tech stack, test commands
 - `CONTEXT_PACK.md [Modules]` - Code architecture
 - `.agentic/lib/quality/programming_standards.md` - Code standards

@@ -1,12 +1,12 @@
 # Context Manifest: Test Agent
-# Writes tests based on acceptance criteria BEFORE implementation (TDD)
+# Writes tests based on contract assertions BEFORE implementation (TDD)
 
 role: test-agent
 token_budget: 4000
-description: Write failing tests for acceptance criteria (TDD red phase)
+description: Write failing tests for contract assertions (TDD red phase)
 
 required:
-  - spec/acceptance/{feature_id}.md       # What to test
+  - spec/contracts/{feature_id}.yaml       # What to test
   - STACK.md[test_framework,test_commands]  # How to test
   - .agentic/quality/test_strategy.md       # Testing guidelines
   - .agentic/agents/shared/guidelines/anti-hallucination.md

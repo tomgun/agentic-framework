@@ -65,9 +65,10 @@ def detect_phase(root: Path) -> str:
 
     feature_id = feature_match.group(1)
 
-    # Check if acceptance exists
+    # Check if acceptance exists (contract YAML or legacy markdown)
+    contract = p.contracts_dir / f"{feature_id}.yaml"
     acceptance = p.acceptance_dir / f"{feature_id}.md"
-    if not acceptance.exists():
+    if not contract.exists() and not acceptance.exists():
         return "planning"
 
     # Check if feature is shipped (would be in complete phase)

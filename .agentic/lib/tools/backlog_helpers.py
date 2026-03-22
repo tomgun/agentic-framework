@@ -54,8 +54,12 @@ def _auto_discover_refs(project_root: Path, feature_id: str) -> list[str]:
     plan = paths.plans_dir / f"{feature_id}-plan.md"
     if plan.exists():
         refs.append(str(plan.relative_to(project_root)))
+    # Prefer contract YAML, fall back to legacy acceptance markdown
+    contract = paths.contracts_dir / f"{feature_id}.yaml"
     ac = paths.acceptance_dir / f"{feature_id}.md"
-    if ac.exists():
+    if contract.exists():
+        refs.append(str(contract.relative_to(project_root)))
+    elif ac.exists():
         refs.append(str(ac.relative_to(project_root)))
     return refs
 

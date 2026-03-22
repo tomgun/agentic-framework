@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# validate_framework.sh - Validate framework acceptance criteria
+# validate_framework.sh - Validate framework contracts
 #
-# Runs automated checks against the framework's own acceptance criteria.
+# Runs automated checks against the framework's own contracts (YAML).
 # Used to verify a framework release meets all defined capabilities.
 #
 # Usage:
@@ -1009,11 +1009,11 @@ else
   fail "STACK.template.md missing BLOCK documentation"
 fi
 
-# Acceptance criteria file exists
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0115.md" ]]; then
-  pass "F-0115 acceptance criteria file exists"
+# Contract or archived acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0115.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0115.md" ]]; then
+  pass "F-0115 contract/acceptance criteria exists"
 else
-  fail "F-0115 acceptance criteria file missing"
+  fail "F-0115 contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -1167,11 +1167,11 @@ else
   fail "harness.sh missing CURSOR_CMD export"
 fi
 
-# Acceptance criteria exists
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0122.md" ]]; then
-  pass "F-0122 acceptance criteria exists"
+# Contract or archived acceptance criteria exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0122.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0122.md" ]]; then
+  pass "F-0122 contract/acceptance criteria exists"
 else
-  fail "F-0122 acceptance criteria missing"
+  fail "F-0122 contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -1284,10 +1284,10 @@ else
   fail "Formal: .agentic/spec/TECH_SPEC.md missing"
 fi
 
-if [[ -d ".agentic/spec/acceptance" ]]; then
-  pass "Formal: .agentic/spec/acceptance/ directory exists"
+if [[ -d ".agentic/spec/contracts" ]]; then
+  pass "Formal: .agentic/spec/contracts/ directory exists"
 else
-  fail "Formal: .agentic/spec/acceptance/ directory missing"
+  fail "Formal: .agentic/spec/contracts/ directory missing"
 fi
 
 # ============================================================
@@ -1622,11 +1622,11 @@ else
 fi
 fi
 
-# Acceptance criteria exists
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0130.md" ]]; then
-  pass "F-0130: acceptance criteria file exists"
+# Contract or archived acceptance criteria exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0130.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0130.md" ]]; then
+  pass "F-0130: contract/acceptance criteria exists"
 else
-  fail "F-0130: acceptance criteria file missing"
+  fail "F-0130: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -1744,11 +1744,11 @@ else
   fail "F-0160: test_auto_engine.py missing"
 fi
 
-# Acceptance criteria file
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0160.md" ]]; then
-  pass "F-0160: acceptance criteria file exists"
+# Contract or archived acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0160.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0160.md" ]]; then
+  pass "F-0160: contract/acceptance criteria exists"
 else
-  fail "F-0160: acceptance criteria file missing"
+  fail "F-0160: contract/acceptance criteria missing"
 fi
 
 # Planned features registered
@@ -1822,11 +1822,11 @@ else
   fail "F-0161: test_auto_verify.py missing"
 fi
 
-# acceptance criteria file
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0161.md" ]]; then
-  pass "F-0161: acceptance criteria file exists"
+# contract or archived acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0161.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0161.md" ]]; then
+  pass "F-0161: contract/acceptance criteria exists"
 else
-  fail "F-0161: acceptance criteria file missing"
+  fail "F-0161: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -1898,11 +1898,11 @@ else
   fail "F-0162: test_auto_task.py missing"
 fi
 
-# acceptance criteria file
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0162.md" ]]; then
-  pass "F-0162: acceptance criteria file exists"
+# contract or archived acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0162.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0162.md" ]]; then
+  pass "F-0162: contract/acceptance criteria exists"
 else
-  fail "F-0162: acceptance criteria file missing"
+  fail "F-0162: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -1975,11 +1975,11 @@ else
   fail "F-0163: test_auto_crunch.py missing"
 fi
 
-# acceptance criteria file
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0163.md" ]]; then
-  pass "F-0163: acceptance criteria file exists"
+# contract or archived acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0163.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0163.md" ]]; then
+  pass "F-0163: contract/acceptance criteria exists"
 else
-  fail "F-0163: acceptance criteria file missing"
+  fail "F-0163: contract/acceptance criteria missing"
 fi
 
 # crunch-state.json gitignored
@@ -2292,10 +2292,10 @@ else
 fi
 
 for nfr in NFR-0003 NFR-0004; do
-  if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/${nfr}.md" ]]; then
-    pass "F-0170: ${nfr} acceptance criteria exists"
+  if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/${nfr}.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/${nfr}.md" ]]; then
+    pass "F-0170: ${nfr} contract/acceptance criteria exists"
   else
-    fail "F-0170: ${nfr} acceptance criteria missing"
+    fail "F-0170: ${nfr} contract/acceptance criteria missing"
   fi
 done
 
@@ -2517,10 +2517,10 @@ for fid in F-0169 F-0170 F-0171 F-0172 F-0173 F-0174 F-0175; do
 done
 
 for fid in F-0169 F-0170 F-0171 F-0172 F-0173 F-0174 F-0175; do
-  if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/${fid}.md" ]]; then
-    pass "F-0175: ${fid} acceptance criteria exists"
+  if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/${fid}.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/${fid}.md" ]]; then
+    pass "F-0175: ${fid} contract/acceptance criteria exists"
   else
-    fail "F-0175: ${fid} acceptance criteria missing"
+    fail "F-0175: ${fid} contract/acceptance criteria missing"
   fi
 done
 
@@ -2603,11 +2603,11 @@ else
 fi
 fi
 
-# Acceptance criteria file exists
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0176.md" ]]; then
-  pass "F-0176: acceptance criteria file exists"
+# Contract or archived acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0176.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0176.md" ]]; then
+  pass "F-0176: contract/acceptance criteria exists"
 else
-  fail "F-0176: acceptance criteria file missing"
+  fail "F-0176: contract/acceptance criteria missing"
 fi
 
 # Feature registered in FEATURES.md
@@ -2722,10 +2722,10 @@ else
   fail "Gate: ag plan should block when F-XXXX not in FEATURES.md"
 fi
 
-# Test: ag implement blocks when no acceptance criteria file
+# Test: ag implement blocks when no contract/acceptance criteria file
 (
   GATE_TEST_DIR=$(mktemp -d)
-  mkdir -p "$GATE_TEST_DIR/.agentic/spec/acceptance"
+  mkdir -p "$GATE_TEST_DIR/.agentic/spec/contracts"
   cat > "$GATE_TEST_DIR/STACK.md" <<'TESTEOF'
 ## Settings
 - profile: formal
@@ -2736,15 +2736,15 @@ TESTEOF
 ## F-0001: Test Feature
 **Status**: planned
 TESTEOF
-  # F-0001 IS in FEATURES.md but no acceptance file — should block
+  # F-0001 IS in FEATURES.md but no contract/acceptance file — should block
   OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" implement F-0001 2>&1) || true
   rm -rf "$GATE_TEST_DIR"
-  echo "$OUTPUT" | grep -q "BLOCKED.*No acceptance criteria"
+  echo "$OUTPUT" | grep -q "BLOCKED.*No acceptance criteria\|BLOCKED.*No contract"
 ) 2>/dev/null
 if [[ $? -eq 0 ]]; then
-  pass "Gate: ag implement blocks when no acceptance criteria"
+  pass "Gate: ag implement blocks when no contract/acceptance criteria"
 else
-  fail "Gate: ag implement should block when no acceptance criteria"
+  fail "Gate: ag implement should block when no contract/acceptance criteria"
 fi
 
 # Test: gate inactive when feature_tracking=no
@@ -2872,7 +2872,7 @@ fi
 # docs_gate=off skips doc check (behavioral test via ag done mock)
 (
   GATE_TEST_DIR=$(mktemp -d)
-  mkdir -p "$GATE_TEST_DIR/.agentic/spec/acceptance"
+  mkdir -p "$GATE_TEST_DIR/.agentic/spec/contracts"
   mkdir -p "$GATE_TEST_DIR/.agentic/journal/manifests"
   cat > "$GATE_TEST_DIR/STACK.md" <<'TESTEOF'
 ## Settings
@@ -2884,7 +2884,16 @@ TESTEOF
 ## F-0001: Test Feature
 **Status**: in_progress
 TESTEOF
-  touch "$GATE_TEST_DIR/.agentic/spec/acceptance/F-0001.md"
+  cat > "$GATE_TEST_DIR/.agentic/spec/contracts/F-0001.yaml" <<'YAMLEOF'
+id: F-0001
+name: Test Feature
+lifecycle: implementing
+description: Test feature.
+assertions:
+  - id: AC-001
+    text: Works
+    type: behavioral
+YAMLEOF
   OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" done F-0001 2>&1) || true
   rm -rf "$GATE_TEST_DIR"
   # docs_gate=off means no "Documentation Drift Check" section
@@ -2899,7 +2908,7 @@ fi
 # docs_gate=warning runs drift but doesn't prompt
 (
   GATE_TEST_DIR=$(mktemp -d)
-  mkdir -p "$GATE_TEST_DIR/.agentic/spec/acceptance"
+  mkdir -p "$GATE_TEST_DIR/.agentic/spec/contracts"
   mkdir -p "$GATE_TEST_DIR/.agentic/journal/manifests"
   cat > "$GATE_TEST_DIR/STACK.md" <<'TESTEOF'
 ## Settings
@@ -2911,7 +2920,16 @@ TESTEOF
 ## F-0001: Test Feature
 **Status**: in_progress
 TESTEOF
-  touch "$GATE_TEST_DIR/.agentic/spec/acceptance/F-0001.md"
+  cat > "$GATE_TEST_DIR/.agentic/spec/contracts/F-0001.yaml" <<'YAMLEOF'
+id: F-0001
+name: Test Feature
+lifecycle: implementing
+description: Test feature.
+assertions:
+  - id: AC-001
+    text: Works
+    type: behavioral
+YAMLEOF
   OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" done F-0001 2>&1) || true
   rm -rf "$GATE_TEST_DIR"
   # warning mode shows "Documentation Drift Check" but no blocking prompt
@@ -2940,11 +2958,11 @@ else
   fail "F-0138: ag set should reject invalid docs_gate value"
 fi
 
-# Acceptance criteria file exists
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0138.md" ]]; then
-  pass "F-0138: acceptance criteria file exists"
+# Contract or archived acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0138.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0138.md" ]]; then
+  pass "F-0138: contract/acceptance criteria exists"
 else
-  fail "F-0138: acceptance criteria file missing"
+  fail "F-0138: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3105,11 +3123,11 @@ else
   fail "F-0139: ag help missing docs command"
 fi
 
-# Acceptance criteria file exists
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0139.md" ]]; then
-  pass "F-0139: acceptance criteria file exists"
+# Contract or archived acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0139.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0139.md" ]]; then
+  pass "F-0139: contract/acceptance criteria exists"
 else
-  fail "F-0139: acceptance criteria file missing"
+  fail "F-0139: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3181,11 +3199,11 @@ else
 fi
 fi
 
-# Acceptance criteria file exists
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0140.md" ]]; then
-  pass "F-0140: acceptance criteria file exists"
+# Contract or archived acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0140.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0140.md" ]]; then
+  pass "F-0140: contract/acceptance criteria exists"
 else
-  fail "F-0140: acceptance criteria file missing"
+  fail "F-0140: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3361,11 +3379,11 @@ fi
 # Cleanup scratch dirs
 rm -rf "$F0141_SCRATCH" "$F0141_SCRATCH2" 2>/dev/null || true
 
-# Acceptance criteria file exists
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0141.md" ]]; then
-  pass "F-0141: acceptance criteria file exists"
+# Contract or archived acceptance criteria file exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0141.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0141.md" ]]; then
+  pass "F-0141: contract/acceptance criteria exists"
 else
-  fail "F-0141: acceptance criteria file missing"
+  fail "F-0141: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3427,10 +3445,10 @@ for keyfile in "${_FRONTMATTER_KEY_FILES[@]}"; do
   fi
 done
 
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0144.md" ]]; then
-  pass "F-0144: acceptance criteria file exists"
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0144.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0144.md" ]]; then
+  pass "F-0144: contract/acceptance criteria exists"
 else
-  fail "F-0144: acceptance criteria file missing"
+  fail "F-0144: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3443,7 +3461,7 @@ _F0147_FILES=(
   ".agentic/lib/tools/check-spec-health.sh"
   ".agentic/lib/agents/claude/skills/writing-specs/SKILL.md"
   ".claude/skills/writing-specs/SKILL.md"
-  ".agentic/spec/acceptance/F-0147.md"
+  "docs/archive/acceptance/F-0147.md"
 )
 if [[ "$V2_ENGINE" != "1" ]]; then
   _F0147_FILES+=(
@@ -3596,7 +3614,7 @@ else
 fi
 
 # AC-005: existing specs NOT modified (F-0001 should keep old format)
-if ! grep -q "^## Behavior" "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0001.md" 2>/dev/null; then
+if ! grep -q "^## Behavior" "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0001.md" 2>/dev/null; then
   pass "F-0148: existing F-0001 maintains old format (backward compatible)"
 else
   warn "F-0148: F-0001 has new format (not required, just noting)"
@@ -3618,10 +3636,10 @@ else
   fail "F-0148: acceptance README.template.md not updated"
 fi
 
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0148.md" ]]; then
-  pass "F-0148: acceptance criteria file exists"
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0148.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0148.md" ]]; then
+  pass "F-0148: contract/acceptance criteria exists"
 else
-  fail "F-0148: acceptance criteria file missing"
+  fail "F-0148: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3662,10 +3680,10 @@ else
 fi
 fi
 
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0149.md" ]]; then
-  pass "F-0149: acceptance criteria file exists"
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0149.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0149.md" ]]; then
+  pass "F-0149: contract/acceptance criteria exists"
 else
-  fail "F-0149: acceptance criteria file missing"
+  fail "F-0149: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3702,10 +3720,10 @@ else
 fi
 fi
 
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0150.md" ]]; then
-  pass "F-0150: acceptance criteria file exists"
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0150.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0150.md" ]]; then
+  pass "F-0150: contract/acceptance criteria exists"
 else
-  fail "F-0150: acceptance criteria file missing"
+  fail "F-0150: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3777,10 +3795,10 @@ else
   fail "F-0151: START_HERE.md missing extension directory mention"
 fi
 
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0151.md" ]]; then
-  pass "F-0151: acceptance criteria file exists"
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0151.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0151.md" ]]; then
+  pass "F-0151: contract/acceptance criteria exists"
 else
-  fail "F-0151: acceptance criteria file missing"
+  fail "F-0151: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3872,11 +3890,11 @@ else
   fail "F-0152: AC-013: spec-analyze.sh missing AC section parsing"
 fi
 
-# Acceptance criteria file
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0152.md" ]]; then
-  pass "F-0152: acceptance criteria file exists"
+# Contract or archived acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0152.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0152.md" ]]; then
+  pass "F-0152: contract/acceptance criteria exists"
 else
-  fail "F-0152: acceptance criteria file missing"
+  fail "F-0152: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3951,11 +3969,11 @@ else
   fail "F-0153: AC-010: missing acceptance file doesn't produce clear error"
 fi
 
-# Acceptance criteria file
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/acceptance/F-0153.md" ]]; then
-  pass "F-0153: acceptance criteria file exists"
+# Contract or archived acceptance criteria file
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0153.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0153.md" ]]; then
+  pass "F-0153: contract/acceptance criteria exists"
 else
-  fail "F-0153: acceptance criteria file missing"
+  fail "F-0153: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -4962,11 +4980,11 @@ else
 fi
 fi
 
-# T-0142: acceptance criteria file exists
-if [[ -f "$FRAMEWORK_ROOT/.agentic/spec/acceptance/F-0206.md" ]]; then
-  pass "T-0142: F-0206 acceptance criteria file exists"
+# T-0142: contract or archived acceptance criteria file exists
+if [[ -f "$FRAMEWORK_ROOT/.agentic/spec/contracts/F-0206.yaml" ]] || [[ -f "$FRAMEWORK_ROOT/docs/archive/acceptance/F-0206.md" ]]; then
+  pass "T-0142: F-0206 contract/acceptance criteria exists"
 else
-  fail "T-0142: F-0206 acceptance criteria file missing"
+  fail "T-0142: F-0206 contract/acceptance criteria missing"
 fi
 
 echo ""
@@ -5046,11 +5064,11 @@ else
   fail "T-0151: wip.sh complete missing TDD gate"
 fi
 
-# T-0152: F-0209 acceptance criteria file exists
-if [[ -f "$FRAMEWORK_ROOT/.agentic/spec/acceptance/F-0209.md" ]]; then
-  pass "T-0152: F-0209 acceptance criteria file exists"
+# T-0152: F-0209 contract or archived acceptance criteria file exists
+if [[ -f "$FRAMEWORK_ROOT/.agentic/spec/contracts/F-0209.yaml" ]] || [[ -f "$FRAMEWORK_ROOT/docs/archive/acceptance/F-0209.md" ]]; then
+  pass "T-0152: F-0209 contract/acceptance criteria exists"
 else
-  fail "T-0152: F-0209 acceptance criteria file missing"
+  fail "T-0152: F-0209 contract/acceptance criteria missing"
 fi
 
 echo ""

@@ -160,11 +160,17 @@ fi
 
 # AC DRIFT (F-0197)
 D_AC_DRIFT_COUNT=0
-if [[ -d "$PROJECT_ROOT/.agentic/spec/acceptance" ]] && [[ -f "$PROJECT_ROOT/.agentic/spec/FEATURES.md" ]]; then
+if { [[ -d "$CONTRACTS_DIR" ]] || [[ -d "$ACCEPTANCE_DIR" ]]; } && [[ -f "$PROJECT_ROOT/.agentic/spec/FEATURES.md" ]]; then
     while IFS= read -r fid; do
         [[ -z "$fid" ]] && continue
-        acc_file="$PROJECT_ROOT/.agentic/spec/acceptance/${fid}.md"
-        [[ ! -f "$acc_file" ]] && continue
+        # Check contracts first, then legacy acceptance
+        acc_file=""
+        if [[ -f "$CONTRACTS_DIR/${fid}.yaml" ]]; then
+            acc_file="$CONTRACTS_DIR/${fid}.yaml"
+        elif [[ -f "$ACCEPTANCE_DIR/${fid}.md" ]]; then
+            acc_file="$ACCEPTANCE_DIR/${fid}.md"
+        fi
+        [[ -z "$acc_file" || ! -f "$acc_file" ]] && continue
         total=0; checked=0
         while IFS= read -r line; do
             if echo "$line" | grep -qE '^[[:space:]]*- \[[ x]\][[:space:]]*\*?\*?AC-'; then

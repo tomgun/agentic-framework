@@ -308,7 +308,7 @@ setup_test_project() {
 
     # Create minimal project structure based on profile
     if [[ "$profile" == "formal" || "$profile" == "autonomous_formal" ]]; then
-        mkdir -p spec/acceptance
+        mkdir -p spec/contracts spec/acceptance
         echo "# Features" > spec/FEATURES.md
         echo "# Status" > STATUS.md
     fi

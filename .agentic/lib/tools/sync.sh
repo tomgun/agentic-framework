@@ -429,12 +429,12 @@ phase_features() {
 
     # Check in_progress features have acceptance criteria
     for fid in $in_progress_features; do
-        if [ ! -f "$ROOT_DIR/.agentic/spec/acceptance/${fid}.md" ]; then
+        if [ ! -f "$CONTRACTS_DIR/${fid}.yaml" ] && [ ! -f "$ACCEPTANCE_DIR/${fid}.md" ]; then
             record_issue "$fid no-acceptance"
             ((feature_issues++))
             if [ "$MODE" != "quiet" ]; then
-                echo -e "            $fid: in_progress but no acceptance criteria"
-                echo -e "            Create: .agentic/spec/acceptance/${fid}.md (even rough 2-3 bullet points)"
+                echo -e "            $fid: in_progress but no contract/acceptance criteria"
+                echo -e "            Create: $CONTRACTS_DIR/${fid}.yaml (even rough 2-3 bullet points)"
             fi
         fi
     done
@@ -460,24 +460,26 @@ phase_features() {
         fi
     done
 
-    # Check for acceptance files without FEATURES.md entries
-    if [ -d "$ROOT_DIR/spec/acceptance" ]; then
-        for criteria_file in "$ROOT_DIR/spec/acceptance"/F-*.md; do
+    # Check for contract/acceptance files without FEATURES.md entries
+    for _sync_dir in "$CONTRACTS_DIR" "$ACCEPTANCE_DIR"; do
+    if [ -d "$_sync_dir" ]; then
+        for criteria_file in "$_sync_dir"/F-*; do
             [ -f "$criteria_file" ] || continue
             local fid
-            fid=$(basename "$criteria_file" .md)
+            fid=$(basename "$criteria_file" | sed 's/\.\(md\|yaml\)$//')
             if ! grep -q "$fid" "$features_file" 2>/dev/null; then
-                record_issue "$fid orphaned acceptance"
+                record_issue "$fid orphaned contract/acceptance"
                 ((feature_issues++))
                 if [ "$MODE" != "quiet" ]; then
                     if [ "$feature_issues" -eq 1 ]; then
                         echo -e "Features:   ${YELLOW}issues found${NC}"
                     fi
-                    echo -e "            $fid: has acceptance file but no FEATURES.md entry"
+                    echo -e "            $fid: has contract/acceptance file but no FEATURES.md entry"
                 fi
             fi
         done
     fi
+    done  # end _sync_dir loop
 
     if [ "$feature_issues" -eq 0 ]; then
         record_ok

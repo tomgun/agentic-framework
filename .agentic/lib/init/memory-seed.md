@@ -9,7 +9,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag verify F-XXXX` — run tests and record results
 - `ag ship F-XXXX` — prepare for shipping
 - `ag status` — see current work items
-- `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init`
+- `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract`
 
 ## Trigger Words
 - "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`.

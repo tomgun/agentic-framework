@@ -196,13 +196,30 @@ def check_feature_has_spec(feature_id: str, project_root: Path) -> GateResult:
 
 
 def check_feature_has_ac(feature_id: str, project_root: Path) -> GateResult:
-    """Acceptance criteria file must exist with at least one AC line."""
+    """Contract or acceptance criteria file must exist with at least one AC line."""
     paths = get_paths(project_root)
+    contract_file = paths.contracts_dir / f"{feature_id}.yaml"
     ac_file = paths.acceptance_dir / f"{feature_id}.md"
 
+    # Check contract YAML first
+    if contract_file.exists():
+        try:
+            from contracts import load_contract
+            contract = load_contract(contract_file)
+            if contract.assertions:
+                return GateResult.allow()
+            return GateResult.deny(
+                [f"Contract spec/contracts/{feature_id}.yaml has no assertions"]
+            )
+        except Exception as e:
+            return GateResult.deny(
+                [f"Failed to load contract spec/contracts/{feature_id}.yaml: {e}"]
+            )
+
+    # Fall back to legacy acceptance markdown
     if not ac_file.exists():
         return GateResult.deny(
-            [f"No acceptance criteria: spec/acceptance/{feature_id}.md"]
+            [f"No contract or acceptance criteria: spec/contracts/{feature_id}.yaml or spec/acceptance/{feature_id}.md"]
         )
 
     content = ac_file.read_text()
@@ -269,21 +286,29 @@ def check_any_feature_implementing(project_root: Path) -> bool:
 
 
 def check_verification_passes(feature_id: str, project_root: Path) -> GateResult:
-    """Run verification commands from the AC file directly.
+    """Run verification commands from the contract/AC file directly.
 
-    Reads ## Verification section from spec/acceptance/F-XXXX.md and
-    executes any **Automated** commands found there.
+    Reads ## Verification section from contract YAML or spec/acceptance/F-XXXX.md
+    and executes any **Automated** commands found there.
     """
     paths = get_paths(project_root)
+    contract_file = paths.contracts_dir / f"{feature_id}.yaml"
     ac_file = paths.acceptance_dir / f"{feature_id}.md"
 
-    if not ac_file.exists():
-        return GateResult.allow([f"No AC file for {feature_id} — skipping verification"])
+    # Determine which file to read verification commands from
+    verify_file = None
+    if contract_file.exists():
+        verify_file = contract_file
+    elif ac_file.exists():
+        verify_file = ac_file
+
+    if verify_file is None:
+        return GateResult.allow([f"No contract/AC file for {feature_id} — skipping verification"])
 
     try:
-        content = ac_file.read_text()
+        content = verify_file.read_text()
     except OSError:
-        return GateResult.allow([f"Could not read AC file for {feature_id}"])
+        return GateResult.allow([f"Could not read contract/AC file for {feature_id}"])
 
     # Extract automated verification commands from ## Verification section
     commands = []
@@ -546,9 +571,10 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
         file_path = input_data.get("file_path", "")
         paths = get_paths(project_root)
 
-        # Check 14 mirror: Shipped spec protection — editing shipped AC needs migration
-        if is_formal and re.search(r'spec/acceptance/(F|NFR)-\d+\.md$', file_path):
-            fid_match = re.search(r'((?:F|NFR)-\d+)\.md$', file_path)
+        # Check 14 mirror: Shipped spec protection — editing shipped AC/contract needs migration
+        if is_formal and (re.search(r'spec/acceptance/(F|NFR)-\d+\.md$', file_path)
+                          or re.search(r'spec/contracts/(F|NFR)-\d+\.yaml$', file_path)):
+            fid_match = re.search(r'((?:F|NFR)-\d+)\.(?:md|yaml)$', file_path)
             if fid_match:
                 fid = fid_match.group(1)
                 features_file = paths.features_file

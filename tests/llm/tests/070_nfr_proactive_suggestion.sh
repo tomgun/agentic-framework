@@ -8,7 +8,7 @@
 setup_test_project "formal"
 
 # Create 4 shipped features but empty NFR.md (template-only)
-mkdir -p "$TEST_PROJECT/spec/acceptance"
+mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # Features
 

@@ -11,7 +11,7 @@ tokens: ~500
 
 ## Context to Read
 
-- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria (data requirements)
+- `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria (data requirements)
 - `STACK.md` - Database type, ORM, migration tools
 - `CONTEXT_PACK.md [Modules]` - Existing data models and schema
 - `.agentic/lib/quality/programming_standards.md` - Code standards
@@ -29,7 +29,7 @@ tokens: ~500
 ## Workflow
 
 ```
-1. Read acceptance criteria to understand data requirements
+1. Read contract assertions to understand data requirements
 2. Identify entities and relationships
 3. Design schema (tables, columns, constraints, keys)
 4. Plan indexes based on expected query patterns

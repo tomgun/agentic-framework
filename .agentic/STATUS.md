@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0302 Spec System Overhaul — Phase 1 complete, Phases 0-5 remaining (HIGH PRIORITY) (Updated: 2026-03-22 12:40 UTC)
+- F-0302 Phase 3 complete — switchover to YAML contracts (Updated: 2026-03-22 20:58 UTC)
 
 ## Current focus
 - **F-0302: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

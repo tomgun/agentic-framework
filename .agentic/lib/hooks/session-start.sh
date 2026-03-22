@@ -134,7 +134,7 @@ if [[ "$FT" == "yes" ]]; then
   echo "📖 FEATURE TRACKING - ADDITIONAL READS:"
   echo ""
   echo "- .agentic/spec/FEATURES.md - Overview of all features (scan, don't read all)"
-  echo "- .agentic/spec/acceptance/F-####.md - If working on specific feature"
+  echo "- .agentic/spec/contracts/F-####.yaml (or legacy .agentic/spec/acceptance/F-####.md) - If working on specific feature"
   echo "- .agentic/workflows/definition_of_done.md - Quality gates"
   echo ""
 fi

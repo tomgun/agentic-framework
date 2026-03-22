@@ -12,7 +12,7 @@ tokens: ~479
 ## Context to Read
 
 - Test Agent's tests (your goal: make them pass)
-- `.agentic/spec/acceptance/F-####.md` - Acceptance criteria
+- `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria
 - `STACK.md` - Tech stack, build commands
 - `src/` - Existing code patterns
 - `.agentic/lib/quality/programming_standards.md` - Code standards
@@ -61,7 +61,7 @@ Before marking complete:
 ## Discoveries During Implementation
 
 If you discover:
-- Edge cases not covered by acceptance criteria
+- Edge cases not covered by contract assertions
 - Missing scenarios that should be tested
 - Requirements that are unclear or need adjustment
 - Scope that should be reduced or expanded

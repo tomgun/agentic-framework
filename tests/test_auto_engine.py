@@ -36,6 +36,7 @@ def project_dir():
         (root / ".agentic").mkdir()
         (root / ".agentic" / "lib").mkdir()
         (root / ".agentic" / "session").mkdir()
+        (root / ".agentic" / "spec" / "contracts").mkdir(parents=True)
         (root / ".agentic" / "spec" / "acceptance").mkdir(parents=True)
         (root / "STACK.md").write_text(
             "## Settings\n- profile: formal\n\n"

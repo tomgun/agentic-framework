@@ -175,7 +175,7 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
   if [[ -n "$SHIPPED_FEATURES" ]]; then
     MISSING_ACCEPTANCE=""
     while IFS= read -r FEATURE_ID; do
-      if [[ ! -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
+      if [[ ! -f "$CONTRACTS_DIR/${FEATURE_ID}.yaml" ]] && [[ ! -f "$ACCEPTANCE_DIR/${FEATURE_ID}.md" ]]; then
         MISSING_ACCEPTANCE="${MISSING_ACCEPTANCE}${FEATURE_ID}, "
       fi
     done <<< "$SHIPPED_FEATURES"
@@ -299,7 +299,7 @@ if [[ -f "STATUS.md" ]]; then
 fi
 
 # Check 3c: FEATURES.md updated when feature spec files changed (Formal, BLOCKING)
-FEATURE_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep "^spec/" | grep -v "^spec/NFR\.md$" | grep -v "^.agentic/spec/acceptance/NFR-" | grep -v "^$" || true)
+FEATURE_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep "^spec/" | grep -v "^spec/NFR\.md$" | grep -v "^.agentic/spec/acceptance/NFR-" | grep -v "^.agentic/spec/contracts/NFR-" | grep -v "^$" || true)
 if [[ -n "$FEATURE_SPEC_STAGED" ]] && [[ -f ".agentic/spec/FEATURES.md" ]]; then
   echo ""
   echo "[3c/16] Checking FEATURES.md freshness (feature spec files staged)..."
@@ -905,7 +905,7 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
   echo ""
   echo "[14/16] Checking shipped spec protection..."
 
-  SHIPPED_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^.agentic/spec/acceptance/(F|NFR)-[0-9]+\.md$" || true)
+  SHIPPED_SPEC_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^.agentic/spec/(acceptance/(F|NFR)-[0-9]+\.md|contracts/(F|NFR)-[0-9]+\.yaml)$" || true)
   CHECK14_FAIL=0
   if [[ -n "$SHIPPED_SPEC_STAGED" ]]; then
     # Pre-fetch migration diff once (avoids pipefail+SIGPIPE bug with grep -q)
@@ -944,7 +944,7 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
   CHECK15_FAIL=0
   if [[ -n "$DELETED_TEST_FILES" ]]; then
     for test_file in $DELETED_TEST_FILES; do
-      REFERENCING_SPECS=$(grep -rl "$test_file" .agentic/spec/acceptance/ 2>/dev/null || true)
+      REFERENCING_SPECS=$(grep -rl "$test_file" "$CONTRACTS_DIR/" "$ACCEPTANCE_DIR/" 2>/dev/null || true)
       for spec in $REFERENCING_SPECS; do
         FID=$(basename "$spec" .md)
         IS_SHIPPED=$(grep -A5 "^## ${FID}:" .agentic/spec/FEATURES.md 2>/dev/null | grep -i "status.*shipped" || true)
@@ -1120,7 +1120,12 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
   if [[ -n "$IN_PROGRESS_FEATURES" ]]; then
     AC_WARNINGS=""
     while IFS= read -r fid; do
-      AC_FILE=".agentic/spec/acceptance/${fid}.md"
+      AC_FILE=""
+      if [[ -f "$CONTRACTS_DIR/${fid}.yaml" ]]; then
+        AC_FILE="$CONTRACTS_DIR/${fid}.yaml"
+      elif [[ -f "$ACCEPTANCE_DIR/${fid}.md" ]]; then
+        AC_FILE="$ACCEPTANCE_DIR/${fid}.md"
+      fi
       if [[ -f "$AC_FILE" ]]; then
         TOTAL=$(grep -cE '^\s*- \[ \]' "$AC_FILE") || TOTAL=0
         if [[ "$TOTAL" -gt 0 ]]; then

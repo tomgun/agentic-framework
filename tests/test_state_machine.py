@@ -47,7 +47,7 @@ def project_dir():
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         (root / ".agentic" / "lib").mkdir(parents=True)
-        (root / ".agentic" / "spec" / "acceptance").mkdir(parents=True)
+        (root / ".agentic" / "spec" / "contracts").mkdir(parents=True)
         (root / ".agentic" / "session").mkdir(parents=True)
         lib_src = Path(__file__).parent.parent / ".agentic" / "lib"
         for f in ["paths.py", "settings.py"]:
@@ -515,14 +515,14 @@ class TestBlockingEnforcement:
         def blocking_gate(fid, root):
             return GateResult(
                 allowed=False,
-                reasons=["Acceptance criteria file not found"],
-                warnings=["Consider creating spec/acceptance/F-0042.md"],
+                reasons=["Contract file not found"],
+                warnings=["Consider creating spec/contracts/F-0042.yaml"],
             )
 
         sm.register_gate(FeatureState.PLANNED, FeatureState.SPECCED, blocking_gate)
         allowed, msgs = sm.can_transition("F-0042", FeatureState.SPECCED)
         assert not allowed
-        assert any("Acceptance criteria file not found" in m for m in msgs)
+        assert any("Contract file not found" in m for m in msgs)
 
     def test_existing_feature_not_retroactively_broken(self, project_dir):
         """AC7: Feature already at implementing with no AC file is not broken.

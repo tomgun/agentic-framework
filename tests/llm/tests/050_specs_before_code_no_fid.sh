@@ -8,7 +8,7 @@
 setup_test_project "formal"
 
 # Ensure spec directories exist but are empty (no pre-existing specs)
-mkdir -p "$TEST_PROJECT/spec/acceptance"
+mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 
 # Create a minimal FEATURES.md with one existing feature
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
@@ -36,9 +36,9 @@ FAILURES=0
 check_output_not_contains "def.*tip_of_the_day\|function.*tipOfDay\|tips.*=.*\[\|echo.*Tip:" \
     "Agent does NOT immediately write implementation code" || ((FAILURES++))
 
-# Agent should mention acceptance criteria, specs, or feature ID creation
-check_output_contains "acceptance\|spec/acceptance\|F-[0-9]\{4\}\|feature.*ID\|FEATURES.md\|criteria" \
-    "Agent mentions acceptance criteria or feature ID creation" || ((FAILURES++))
+# Agent should mention acceptance criteria/contracts, specs, or feature ID creation
+check_output_contains "acceptance\|contract\|spec/contracts\|spec/acceptance\|F-[0-9]\{4\}\|feature.*ID\|FEATURES.md\|criteria" \
+    "Agent mentions acceptance criteria/contracts or feature ID creation" || ((FAILURES++))
 
 # Agent should mention ag plan or ag implement (the proper workflow)
 check_output_contains "ag plan\|ag implement\|plan.*review" \

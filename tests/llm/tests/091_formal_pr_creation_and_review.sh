@@ -25,7 +25,7 @@ cat > "$TEST_PROJECT/STACK.md" << 'EOF'
 EOF
 
 # Create feature branch with committed code
-mkdir -p "$TEST_PROJECT/.agentic/spec/acceptance"
+mkdir -p "$TEST_PROJECT/.agentic/spec/contracts" "$TEST_PROJECT/.agentic/spec/acceptance"
 cat > "$TEST_PROJECT/.agentic/spec/FEATURES.md" << 'EOF'
 # Features
 

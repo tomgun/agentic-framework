@@ -27,7 +27,7 @@ You are reading this plan with **fresh context**. You haven't seen the planning 
 
 ## Review Checklist
 
-- [ ] Does the plan address ALL acceptance criteria?
+- [ ] Does the plan address ALL contract assertions?
 - [ ] Are there simpler approaches not considered?
 - [ ] What could go wrong? Is it handled?
 - [ ] Are estimates realistic?
@@ -71,6 +71,6 @@ In Cursor, the orchestrator dispatches this agent after a plan is finalized:
 ```
 You are a PLAN CRITIC with fresh context.
 Read plan: .agentic/journal/plans/*F-XXXX-plan.md (glob — file has date prefix)
-Read requirements: spec/acceptance/F-XXXX.md
+Read requirements: spec/contracts/F-XXXX.yaml
 Output your structured critique using the format above.
 ```

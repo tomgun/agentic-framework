@@ -14,7 +14,7 @@ grep -q "plan_review_enabled" "$TEST_PROJECT/STACK.md" || {
 }
 
 # Create acceptance criteria for a complex feature
-mkdir -p "$TEST_PROJECT/spec/acceptance"
+mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 cat > "$TEST_PROJECT/spec/acceptance/F-0042.md" << 'EOF'
 # F-0042: User Authentication - Acceptance Criteria
 

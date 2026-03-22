@@ -9,14 +9,14 @@
 setup_test_project "formal"
 
 # Create FEATURES.md with F-0001 in_progress
-mkdir -p "$TEST_PROJECT/spec/acceptance"
+mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # Features
 
 ## F-0001: User Authentication
 - Status: in_progress
 - Priority: high
-- Acceptance: spec/acceptance/F-0001.md
+- Acceptance: spec/contracts/F-0001.yaml
 
 ## F-0002: Product Catalog
 - Status: shipped

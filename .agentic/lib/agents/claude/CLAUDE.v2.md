@@ -16,7 +16,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 
 Write artifacts to `.agentic/work/F-XXXX/`:
 - `plan.md` — implementation plan (required before coding)
-- `spec.md` — acceptance criteria and feature spec
+- `spec.md` — contract assertions and feature spec
 - `review.md` — adversarial review output
 - `journal.md` — decisions, changes, and session handoffs
 - `verification.json` — test results (created by `ag verify`)

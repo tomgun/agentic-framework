@@ -1,7 +1,7 @@
 ---
 name: completing-work
 description: >
-  Feature completion workflow: verify acceptance criteria, mark done, update
+  Feature completion workflow: verify contract assertions, mark done, update
   specs, cleanup WIP. Use when user says "done", "complete", "finished",
   "merged", "PR merged", "shipped", "landed", "wrapped up", "ag done",
   "mark as done", "it's in", or indicates work is finished. Also triggered
@@ -15,10 +15,10 @@ metadata:
 ---
 # Completing Work
 
-Run `ag done F-XXXX` — it verifies ACs, bumps VERSION, updates FEATURES.md, and flushes state.
+Run `ag done F-XXXX` — it verifies contracts, bumps VERSION, updates FEATURES.md, and flushes state.
 
 ## Before running `ag done`
-1. Verify acceptance criteria in `.agentic/spec/acceptance/F-XXXX.md` (check off each `- [ ]` → `- [x]`)
+1. Verify contract assertions: `ag contract check F-XXXX` (all assertions must pass)
 2. Complete WIP: `bash .agentic/lib/tools/wip.sh complete`
 3. Update feature status: `bash .agentic/lib/tools/feature.sh F-XXXX status shipped`
 4. Update journal: `bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Capability" "Next" "None" --why "Reason"`
@@ -26,6 +26,6 @@ Run `ag done F-XXXX` — it verifies ACs, bumps VERSION, updates FEATURES.md, an
 6. Check doc freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done`
 
 ## Rules
-- P1 ACs = 100%, P2/P3 = 80%, flat specs = 80% required.
-- If criteria not met, list what remains and ask user how to proceed.
+- All contract assertions in `spec/contracts/F-XXXX.yaml` must pass before shipping.
+- If assertions not met, list what remains and ask user how to proceed.
 - `ag done` auto-bumps VERSION (patch) and flushes state on main.

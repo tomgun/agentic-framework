@@ -259,6 +259,7 @@ find_unregistered() {
             -not -path './.agentic/session/*' \
             -not -path './.agentic/journal/*' \
             -not -path './.agentic/spec/acceptance/*' \
+            -not -path './.agentic/spec/contracts/*' \
             -not -path './.agentic/spec/migrations/*' \
             -not -path './.claude/*' -not -path './.cursor/*' \
             -not -path './.codex/*' -not -path './.github/*' \
@@ -593,14 +594,19 @@ assemble_context() {
             echo "--- End manifest ---"
         fi
 
-        # Acceptance criteria
-        local acc_file="$ROOT_DIR/.agentic/spec/acceptance/${feature_id}.md"
-        if [[ -f "$acc_file" ]]; then
+        # Contract/acceptance criteria (check contracts first, then legacy)
+        local acc_file=""
+        if [[ -f "$CONTRACTS_DIR/${feature_id}.yaml" ]]; then
+            acc_file="$CONTRACTS_DIR/${feature_id}.yaml"
+        elif [[ -f "$ACCEPTANCE_DIR/${feature_id}.md" ]]; then
+            acc_file="$ACCEPTANCE_DIR/${feature_id}.md"
+        fi
+        if [[ -n "$acc_file" && -f "$acc_file" ]]; then
             echo ""
-            echo "--- Acceptance criteria ---"
+            echo "--- Contract/acceptance criteria ---"
             cat "$acc_file"
             echo ""
-            echo "--- End acceptance ---"
+            echo "--- End contract/acceptance ---"
         fi
     fi
 

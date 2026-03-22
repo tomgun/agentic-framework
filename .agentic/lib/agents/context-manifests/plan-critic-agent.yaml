@@ -7,7 +7,7 @@ description: Find flaws, risks, and blind spots in finalized plans
 
 required:
   - .agentic/journal/plans/{feature_id}-plan.md  # The plan to critique
-  - spec/acceptance/{feature_id}.md               # Acceptance criteria to check against
+  - spec/contracts/{feature_id}.yaml               # Contract assertions to check against
   - .agentic/agents/shared/guidelines/anti-hallucination.md
 
 optional:
