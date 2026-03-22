@@ -1,19 +1,11 @@
 [
   {
     "type": "feature",
-    "id": "F-0300",
-    "description": "Framework Enforcement Gaps",
-    "added_at": "2026-03-21T20:54:21Z",
-    "added_by": "agent",
-    "became_current_at": "2026-03-21T20:54:24Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0242",
     "description": "Simulation Testing (Phase + Sequence)",
     "added_at": "2026-03-20T14:38:36Z",
     "added_by": "agent",
-    "became_current_at": "2026-03-21T18:13:21Z"
+    "became_current_at": "2026-03-22T07:26:08Z"
   },
   {
     "type": "feature",

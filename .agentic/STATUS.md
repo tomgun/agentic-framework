@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0300: Framework Enforcement Gaps — PR ready (Updated: 2026-03-21 21:29 UTC)
+- F-0300 shipped. Next: F-0242 (Simulation Testing) (Updated: 2026-03-22 07:26 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item

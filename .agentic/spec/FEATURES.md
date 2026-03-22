@@ -4414,7 +4414,7 @@ Proposed restructuring:
 
 ## F-0300: Framework Enforcement Gaps
 
-**Status**: planned
+**Status**: shipped
 **Category**: Verification & Enforcement
 **Priority**: high
 **Complexity**: high

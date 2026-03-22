@@ -3983,3 +3983,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 07:26 - F-0300 shipped
+
+**Why**: Street Fury evaluation exposed that enforcement collapses in deferred-git mode
+
+**What changed**:
+- 7 enforcement gaps fixed: hook install in auto init, deferred-git pre-write gate, batch-work triggers in all instruction files, ag auto unlocked for deferred git, verification gate in state machine, spawned agent enforcement rules
+
+**Next steps**:
+- Next backlog item (F-0242)
+
+**Blockers**: None
+
