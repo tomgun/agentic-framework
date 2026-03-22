@@ -513,6 +513,26 @@ The critical asymmetry: **instructions loaded at session start (system prompt) s
 
 ---
 
+## 21. Fail-Open Error Handling Defeats Blocking Enforcement
+
+**The problem**: An enforcement gate can be correctly coded and still be inert if the shell wrapper that invokes it treats "gate crashed" the same as "gate allowed." A Python error, import failure, or timeout silently converts a blocking gate into a permission.
+
+**How it plays out**: A PreToolUse hook calls a Python gate that returns exit 2 for "deny." The shell only checks for exit 2 — when the gate errors with exit 1, the shell falls through to `exit 0` (allow). In a test project under the strictest enforcement mode (`state_enforcement: blocking`), an agent built 10 features simultaneously with zero gates firing.
+
+**Why LLM agents are especially vulnerable**: When an agent expects resistance and gets silence, it interprets absence of friction as permission. One unblocked Write call triggers sunk-cost escalation — 15 more files follow in minutes. Silence is permission.
+
+**The fix pattern**: Fail-closed when enforcement is blocking. Check the enforcement level with a mechanism that doesn't share the gate's failure mode (e.g., `grep` on a config file instead of another Python call).
+
+**Design principles**:
+1. **Enforcement chains must fail-closed under blocking mode.** Fail-open is fine for casual projects; it's catastrophic for strict enforcement.
+2. **Test the error path, not just the happy path.** Gate logic was tested; the shell's handling of a gate that *can't run* was not.
+3. **Defense-in-depth layers must be truly independent.** If three layers all depend on Python, one Python failure disables all three.
+4. **Regex-based intent detection has a ceiling.** Lexical matching ("build everything") misses semantic equivalents ("work autonomously and come back with the working game"). Structural state checks are the backstop.
+
+**See also**: Insight #18 (End-to-End Enforcement Wiring), Insight #19 (Test Projects). Full analysis: `FRAMEWORK_DEVELOPMENT.md` § "Fail-open error handling is incompatible with blocking enforcement"
+
+---
+
 ## Summary: The Pattern
 
 These insights form a coherent pattern:
@@ -539,9 +559,10 @@ Tiny instruction file (50 lines)     → agent reads it all, reliably
   + End-to-end enforcement wiring   → existence ≠ activation; test the full chain
   + Test projects as system feedback → synthetic tests verify components, test projects verify truth
   + Context window decay           → depletable resource; architect around it with subagents + external state
+  + Fail-closed error handling     → enforcement chains must deny on error, not silently allow
 ```
 
-The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation. And the meta-meta-lesson from #18–#19: **you don't know if your enforcement works until you test the full system under real conditions**.
+The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation. And the meta-meta-lesson from #18–#19: **you don't know if your enforcement works until you test the full system under real conditions**. And from #21: **you don't know if your enforcement survives failure until you test the error path**.
 
 ---
 

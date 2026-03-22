@@ -12,7 +12,10 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init`
 
 ## Trigger Words
-- "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`. NEVER write code for multiple features outside of `ag auto` commands.
+- "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`.
+- "work autonomously/come back with working/finish everything/do it all" → STOP. Run `ag auto crunch`.
+- NEVER write code for multiple features outside of `ag auto` commands.
+- **Wrong rationalizations:** "I can do it directly faster" — NO. "User said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
 
 ## Rules
 - Follow CLI prompts. It loads role-specific guidance at each phase.
