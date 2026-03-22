@@ -1,0 +1,35 @@
+id: F-0056
+name: Framework Upgrade & Versioning
+lifecycle: shipped
+since: v0.5.0
+profile: both
+protection: contract
+category: tooling
+consolidated_from: [F-0056, F-0068, F-0094]
+
+description: |
+  Framework versioning via VERSION file. Upgrade path provided through
+  upgrade.sh. Version-aware features detect framework version and adapt
+  behavior. Each merge bumps VERSION via ag done.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "VERSION file exists with semantic version"
+    type: structural
+    verify: |
+      test -f .agentic/lib/VERSION &&
+      grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' .agentic/lib/VERSION
+    tests:
+      - tests/validate_framework.sh::F-0056
+
+  - id: AC-002
+    text: "upgrade.sh exists for framework updates"
+    type: structural
+    verify: "test -f .agentic/lib/tools/upgrade.sh || test -f upgrade.sh"
+    tests:
+      - tests/validate_framework.sh::F-0056
+
+nfr_refs: []
+migrations: []

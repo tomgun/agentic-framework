@@ -1,0 +1,27 @@
+id: F-0077
+name: Emergency Quick Reference
+lifecycle: shipped
+since: v0.6.0
+profile: both
+protection: advisory
+category: developer-experience
+consolidated_from: [F-0077]
+
+description: |
+  Quick reference documentation for emergency situations — recovery
+  from broken state, manual operations, escape hatches.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "Emergency/manual operations documentation exists"
+    type: structural
+    verify: |
+      test -f .agentic/lib/workflows/recovery.md ||
+      test -f .agentic/lib/DEVELOPER_GUIDE.md
+    tests:
+      - tests/validate_framework.sh::F-0077
+
+nfr_refs: []
+migrations: []

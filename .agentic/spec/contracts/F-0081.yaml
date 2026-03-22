@@ -1,0 +1,70 @@
+id: F-0081
+name: Agent System & Instructions
+lifecycle: shipped
+since: v0.6.0
+profile: both
+protection: contract
+category: agent-system
+consolidated_from: [F-0081, F-0082, F-0083, F-0084, F-0093, F-0111, F-0113, F-0121, F-0135, F-0143, F-0146, F-0234]
+
+description: |
+  Agents are defined through instruction files (CLAUDE.md, .cursorrules,
+  copilot-instructions, codex instructions) with role-specific scoping.
+  Three-tier boundaries: Constitution (<100 lines), Playbooks (skills,
+  workflows), State (artifacts). Skills-primary architecture for Claude Code.
+  Memory-seed provides defense-in-depth reinforcement. Agent definition
+  reconciliation detects drift between instruction file variants. Tier-based
+  model selection optimizes cost. Untracked files protection prevents
+  accidental exposure.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "CLAUDE.md template exists under 100 lines (constitution layer)"
+    type: structural
+    verify: |
+      test -f .agentic/lib/agents/claude/CLAUDE.md &&
+      [ $(wc -l < .agentic/lib/agents/claude/CLAUDE.md) -le 100 ]
+    tests:
+      - tests/infrastructure/structural/S08_claude_md_under_100_lines.sh
+
+  - id: AC-002
+    text: "Skills directory exists with implementing-features, writing-specs, etc."
+    type: structural
+    verify: |
+      test -d .agentic/lib/agents/claude/skills/implementing-features &&
+      test -d .agentic/lib/agents/claude/skills/writing-specs
+    tests:
+      - tests/validate_framework.sh::F-0143
+
+  - id: AC-003
+    text: "memory-seed.md exists for defense-in-depth rule reinforcement"
+    type: structural
+    verify: "test -f .agentic/lib/init/memory-seed.md"
+    tests:
+      - tests/validate_framework.sh::F-0135
+
+  - id: AC-004
+    text: "Multi-tool instruction files exist (copilot, codex)"
+    type: structural
+    verify: |
+      test -f .agentic/lib/agents/copilot/copilot-instructions.md
+    tests:
+      - tests/validate_framework.sh::F-0121
+
+  - id: AC-005
+    text: "context-for-role.sh provides scoped context for subagents"
+    type: structural
+    verify: "test -f .agentic/lib/tools/context-for-role.sh"
+    tests:
+      - tests/validate_framework.sh::F-0081
+
+nfr_refs: [NFR-0001]
+scenarios:
+  - name: "Instruction files stay under size limits"
+    given: "Framework with all instruction files"
+    when: "Check constitution-layer files"
+    then: "All under 100 lines per NFR-0001"
+
+migrations: []
