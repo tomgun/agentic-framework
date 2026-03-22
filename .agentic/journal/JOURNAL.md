@@ -4113,3 +4113,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-22 12:53 - F-0302 Phase 0+2: Consolidation & contracts
+
+**Why**: Writing contracts for all consolidated features
+
+**What changed**:
+- Consolidated 217 features → 33 contracts + 3 NFR contracts (36 total). All validate OK, 97 structural assertions pass. CONSOLIDATION_MAP.md maps old→new.
+
+**Next steps**:
+- Phase 3: switchover (update ag commands, engine, paths to use contracts)
+
+**Blockers**: None
+

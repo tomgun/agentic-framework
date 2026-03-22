@@ -1283,7 +1283,8 @@ fi
 # When a shipped contract (protection: contract) is modified, require a migration entry.
 CONTRACTS_DIR_CHECK="${CONTRACTS_DIR:-${AGENTIC_ROOT}/spec/contracts}"
 if [[ -d "$CONTRACTS_DIR_CHECK" ]] && command -v python3 >/dev/null 2>&1; then
-  CONTRACT_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -E "^\.agentic/spec/contracts/.*\.yaml$" || true)
+  # Only check MODIFIED contracts (not newly added ones) — new files don't need migration
+  CONTRACT_STAGED=$(git diff --cached --diff-filter=M --name-only 2>/dev/null | grep -E "^\.agentic/spec/contracts/.*\.yaml$" || true)
   if [[ -n "$CONTRACT_STAGED" ]]; then
     echo ""
     echo "[23] Checking YAML contract protection..."
