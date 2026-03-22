@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Scaffold-first hooks — PR ready (Updated: 2026-03-22 09:04 UTC)
+- Scaffold-first hooks shipped. Next: F-0242 (Updated: 2026-03-22 09:25 UTC)
 
 ## Current focus
 - ADR-001 roadmap execution: F-0223 (Later State Machine Gates Strengthening) is current backlog item
