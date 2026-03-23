@@ -10,21 +10,21 @@
 
 ## Feature Categories
 
-| Category | Count | Shipped | In Progress |
-|----------|-------|---------|-------------|
-| **Core Workflow** | 7 | 6 | 1 |
-| **Quality** | 7 | 7 | 0 |
-| **Design Principles** | 1 | 1 | 0 |
-| **Session** | 1 | 1 | 0 |
-| **Multi-Agent** | 2 | 2 | 0 |
-| **Tooling** | 2 | 2 | 0 |
-| **Recovery** | 1 | 1 | 0 |
-| **Developer Experience** | 3 | 3 | 0 |
-| **Agent System** | 2 | 2 | 0 |
-| **Architecture** | 3 | 3 | 0 |
-| **Git Workflow** | 1 | 1 | 0 |
-| **Autonomous** | 2 | 2 | 0 |
-| **Total** | **33** | **32** | **1** |
+| Category | Count | Shipped | In Progress | Planned |
+|----------|-------|---------|-------------|---------|
+| **Core Workflow** | 9 | 6 | 1 | 2 |
+| **Quality** | 7 | 7 | 0 | 0 |
+| **Design Principles** | 1 | 1 | 0 | 0 |
+| **Session** | 1 | 1 | 0 | 0 |
+| **Multi-Agent** | 4 | 2 | 0 | 2 |
+| **Tooling** | 2 | 2 | 0 | 0 |
+| **Recovery** | 1 | 1 | 0 | 0 |
+| **Developer Experience** | 5 | 3 | 0 | 2 |
+| **Agent System** | 2 | 2 | 0 | 0 |
+| **Architecture** | 4 | 3 | 0 | 1 |
+| **Git Workflow** | 2 | 1 | 0 | 1 |
+| **Autonomous** | 3 | 2 | 0 | 1 |
+| **Total** | **42** | **32** | **1** | **9** |
 
 ---
 
@@ -354,6 +354,78 @@ Claude Code hooks for automated enforcement: pre-commit checks, post-tool valida
 **Contract**: [`spec/contracts/F-0302.yaml`](contracts/F-0302.yaml)
 
 YAML contracts replace markdown acceptance criteria as source of truth. Machine-verifiable assertions, migration-protected shipped contracts, user_input as control interface. Consolidates 217 legacy features into ~33 contracts.
+
+---
+
+## F-0193: Collision-Proof Feature IDs
+
+**Status**: planned | **Category**: core-workflow | **Profile**: both
+
+Hash-based feature IDs that eliminate collision risk when multiple agents create features concurrently.
+
+---
+
+## F-0211: Project-Specific Customization Layer
+
+**Status**: planned | **Category**: developer-experience | **Profile**: both
+
+Allow projects to define custom workflow steps, validation rules, and enforcement policies beyond STACK.md settings.
+
+---
+
+## F-0212: Project Customization Auto-Sync
+
+**Status**: planned | **Category**: developer-experience | **Profile**: both
+
+Automatically sync project-specific customizations when framework upgrades, preserving user overrides.
+
+---
+
+## F-0220: Protected Main Branch Support
+
+**Status**: planned | **Category**: git-workflow | **Profile**: both
+
+Support workflows where main branch is protected (no direct push). Adapt commit, done, and flush commands for PR-only merging.
+
+---
+
+## F-0228: Workflow Definition File
+
+**Status**: planned | **Category**: architecture | **Profile**: formal
+
+Declarative workflow.yaml defining state machine transitions, gates, and review checkpoints as data instead of code.
+
+---
+
+## F-0230: MCP Coordination Server
+
+**Status**: planned | **Category**: multi-agent | **Profile**: both
+
+MCP-protocol coordination server for multi-agent orchestration. Extends beyond HTTP JSON-RPC (F-0185) with tool-native integration.
+
+---
+
+## F-0231: Multi-Repo Umbrella
+
+**Status**: planned | **Category**: multi-agent | **Profile**: both
+
+Coordinate work across multiple repositories with shared backlog, cross-repo dependencies, and unified status tracking.
+
+---
+
+## F-0232: Full Autonomous Scheduling
+
+**Status**: planned | **Category**: autonomous | **Profile**: formal
+
+Autonomous scheduling engine that assigns work to agents based on priority, dependencies, and capacity. ADR-001 wave 5.
+
+---
+
+## F-0243: Complexity Tier Experiments
+
+**Status**: planned | **Category**: core-workflow | **Profile**: formal
+
+Complexity tiers (simple/standard/complex) that auto-select appropriate ceremony level. ADR-001 roadmap item.
 
 ---
 

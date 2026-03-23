@@ -29,6 +29,11 @@ def _load(backlog_file: Path) -> list[dict]:
         data = json.loads(backlog_file.read_text())
         if not isinstance(data, list):
             return []
+        # Normalize depends_on: accept string or list, always return list
+        for item in data:
+            deps = item.get("depends_on")
+            if isinstance(deps, str):
+                item["depends_on"] = [deps] if deps else []
         return data
     except (json.JSONDecodeError, OSError):
         return []
