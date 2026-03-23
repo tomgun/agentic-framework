@@ -2991,8 +2991,20 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+---
+
+### Hook Enforcement — Advisory → Blocking (v0.71.1)
+
+**User insight**: Identified that all three post-session automations (plan review loop, merge-without-done detection, feature-branch-without-PR detection) were advisory-only because hooks always exit 0. The enforcement chain had no teeth — agents could read the warnings and choose to ignore them. The fix was to move enforcement *downstream* into `gate_stop()` so it fires regardless of whether the agent read the hook output.
+
+**User insight**: Identified that instruction file drift (templates vs. root files diverging after each feature ship) is a systemic problem, not a one-time cleanup. The path bug (`work/plan.md` vs `journal/plans/`) was silently misdirecting agents for multiple sessions before being caught by diffing the files side-by-side.
+
+**Design direction**: Mechanical state injection (e.g. `**Status**: DRAFT` written by a shell hook, not by the agent) is more reliable than behavioral instructions. When you need a state transition to happen reliably, write it into the file system — don't rely on the agent choosing to do it.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.70.0
+**Current Version**: v0.71.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 67 behavioral test definitions
