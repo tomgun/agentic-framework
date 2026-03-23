@@ -66,7 +66,7 @@ cmd_start() {
 from pathlib import Path; from contracts import get_pending_user_input
 p = get_pending_user_input(Path('${CONTRACTS_DIR}'))
 print(len(p))
-for c in p[:5]: print(f'  {c.id}: {c.user_input.strip().split(chr(10))[0][:60]}')
+for c in p[:5]: print(f'  {c.id}: {c.user_input.strip().splitlines()[0][:60]}')
 " 2>/dev/null) || ui_count=""
         if [[ -n "$ui_count" ]]; then
             local count; count=$(echo "$ui_count" | head -1)

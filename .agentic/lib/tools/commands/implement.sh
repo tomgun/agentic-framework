@@ -181,8 +181,8 @@ cmd_implement() {
 from pathlib import Path; from contracts import load_contract
 c = load_contract(Path('$CONTRACTS_DIR/${feature_id}.yaml'))
 if c.has_pending_input:
-    l = c.user_input.strip().split(chr(10))[0][:80]
-    print(l + (' ...' if chr(10) in c.user_input.strip() else ''))
+    lines = c.user_input.strip().splitlines()
+    print(lines[0][:80] + (' ...' if len(lines) > 1 else ''))
 " 2>/dev/null) || ui_preview=""
         if [[ -n "$ui_preview" ]]; then
             echo -e "${BOLD}📥 Pending user input:${NC}"

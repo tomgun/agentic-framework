@@ -4278,3 +4278,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-23 08:14 - F-0302 review fixes
+
+**Why**: Code review on PR #196 identified injection risk, inconsistency, and missing coverage
+
+**What changed**:
+- Fixed 5 code review issues: shell injection via env var, removed spurious 2>/dev/null, replaced chr(10) with splitlines(), added empty-features guard, added trigger word to Claude template
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+

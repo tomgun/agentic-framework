@@ -422,8 +422,8 @@ if [[ "$D_UPGRADE" == "pending" ]]; then
     echo "🔄 Upgrade        Pending — read \`.agentic/.upgrade_pending\`"
 fi
 
-if [[ "$D_USER_INPUT_COUNT" -gt 0 ]] 2>/dev/null; then
-    echo "📥 User input     $D_USER_INPUT_COUNT pending — $D_USER_INPUT_FEATURES"
+if [[ "$D_USER_INPUT_COUNT" -gt 0 ]]; then
+    echo "📥 User input     $D_USER_INPUT_COUNT pending${D_USER_INPUT_FEATURES:+ — $D_USER_INPUT_FEATURES}"
 fi
 if [[ "$D_AC_DRIFT_COUNT" -gt 0 ]]; then
     echo "⚠️  AC Drift       $D_AC_DRIFT_COUNT shipped feature(s) with <50% ACs checked"
@@ -475,7 +475,7 @@ if [[ "$D_BLOCKERS" -gt 0 ]]; then
     echo "   $step. Address $D_BLOCKERS blocker(s) in HUMAN_NEEDED.md"
     step=$((step + 1))
 fi
-if [[ "$D_USER_INPUT_COUNT" -gt 0 ]] 2>/dev/null; then
+if [[ "$D_USER_INPUT_COUNT" -gt 0 ]]; then
     echo "   $step. Process pending user input — \`ag contract pending\`"
     step=$((step + 1))
 fi

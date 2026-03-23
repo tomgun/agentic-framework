@@ -1310,10 +1310,11 @@ except Exception:
       if [[ "$IS_PROTECTED" == "yes" ]]; then
         CID=$(basename "$contract_file" .yaml)
         # Exempt user_input-only changes from migration requirement
-        ONLY_UI=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
-import yaml, subprocess
-s = yaml.safe_load(subprocess.run(['git', 'show', ':$contract_file'], capture_output=True, text=True).stdout or '{}')
-h = yaml.safe_load(subprocess.run(['git', 'show', 'HEAD:$contract_file'], capture_output=True, text=True).stdout or '{}')
+        ONLY_UI=$(CONTRACT_PATH="$contract_file" PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import yaml, subprocess, os
+cf = os.environ['CONTRACT_PATH']
+s = yaml.safe_load(subprocess.run(['git', 'show', ':' + cf], capture_output=True, text=True).stdout or '{}')
+h = yaml.safe_load(subprocess.run(['git', 'show', 'HEAD:' + cf], capture_output=True, text=True).stdout or '{}')
 s.pop('user_input', None); h.pop('user_input', None)
 print('yes' if s == h else 'no')
 " 2>/dev/null || echo "no")
