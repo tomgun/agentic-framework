@@ -54,21 +54,30 @@
 | F-0107 | (if exists) — check status |
 | F-0108 | (if exists) — check status |
 
-## Planned Features (evaluate for backlog vs drop)
+## Planned Features (post-consolidation cleanup, 2026-03-23)
 
-| Feature | Decision |
-|---------|----------|
-| F-0193 | Collision-Proof Feature IDs — keep in backlog |
-| F-0210 | Configurable Definition of Done — keep in backlog |
-| F-0211 | Project-Specific Customization Layer — keep in backlog |
-| F-0212 | Project Customization Auto-Sync — keep in backlog |
-| F-0213 | Unified Work Queue Redesign — merge into F-0302 scope |
-| F-0220 | Protected Main Branch — keep in backlog |
-| F-0223 | Later State Machine Gates — keep in backlog |
-| F-0227 | E2E Workflow Integration Test — keep in backlog |
-| F-0228 | Workflow Definition File — keep in backlog |
-| F-0230 | MCP Coordination Server — keep in backlog |
-| F-0231 | Multi-Repo Umbrella — keep in backlog |
-| F-0232 | Full Autonomous Scheduling — keep in backlog |
-| F-0233 | Design Phase Formalization — keep in backlog |
-| F-0243 | Complexity Tier Experiments — keep in backlog |
+### Kept as Features (9) — added to FEATURES.md as planned
+| Feature | Status |
+|---------|--------|
+| F-0193 | Collision-Proof Feature IDs — in backlog, plan APPROVED |
+| F-0211 | Project-Specific Customization Layer — in backlog |
+| F-0212 | Project Customization Auto-Sync — in backlog (depends F-0211) |
+| F-0220 | Protected Main Branch Support — in backlog, needs fresh plan |
+| F-0228 | Workflow Definition File — in backlog |
+| F-0230 | MCP Coordination Server — in backlog (ADR-001 wave 5) |
+| F-0231 | Multi-Repo Umbrella — in backlog (ADR-001 wave 5) |
+| F-0232 | Full Autonomous Scheduling — in backlog (ADR-001 wave 5) |
+| F-0243 | Complexity Tier Experiments — in backlog (ADR-001 roadmap) |
+
+### Converted to Tasks (4) — improvements to existing shipped features
+| Original ID | Task Description | Owner Feature |
+|-------------|-----------------|---------------|
+| F-0223 | Strengthen later state machine gates (advisory→blocking) | F-0004 |
+| F-0210 | Configurable Definition of Done per task type | F-0003 |
+| F-0227 | E2E workflow integration test (full lifecycle) | F-0122 |
+| F-0233 | Design phase formalization | F-0120 |
+
+### Dropped (1)
+| Feature | Reason |
+|---------|--------|
+| F-0213 | Unified Work Queue Redesign — subsumed by F-0302 (shipped). Explicitly marked "merge into F-0302 scope" above. |
