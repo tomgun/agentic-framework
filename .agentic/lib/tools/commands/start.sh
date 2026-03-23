@@ -59,6 +59,26 @@ cmd_start() {
         fi
     fi
 
+    # 5a. Check pending user_input on contracts
+    if [[ -d "${CONTRACTS_DIR:-}" ]] && command -v python3 >/dev/null 2>&1; then
+        local ui_count
+        ui_count=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+from pathlib import Path; from contracts import get_pending_user_input
+p = get_pending_user_input(Path('${CONTRACTS_DIR}'))
+print(len(p))
+for c in p[:5]: print(f'  {c.id}: {c.user_input.strip().split(chr(10))[0][:60]}')
+" 2>/dev/null) || ui_count=""
+        if [[ -n "$ui_count" ]]; then
+            local count; count=$(echo "$ui_count" | head -1)
+            if [[ "$count" -gt 0 ]]; then
+                echo -e "${YELLOW}Pending user input: $count contract(s)${NC}"
+                echo "$ui_count" | tail -n +2
+                echo "  Run: ag contract pending"
+                echo ""
+            fi
+        fi
+    fi
+
     # 5b. Check TODO.md inbox
     if [ -f "$ROOT_DIR/TODO.md" ]; then
         local todo_count

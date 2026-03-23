@@ -4265,3 +4265,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-23 07:21 - F-0302 Phase 4 Step 4.2
+
+**Why**: Pending user_input on contracts had no agent-facing surface — agents couldn't discover or process change requests
+
+**What changed**:
+- User input automation wired into dashboard, ag start, ag implement, pre-commit exemption, new handling-contract-input skill, trigger words in 7 instruction files
+
+**Next steps**:
+- Verification testing, ship Phase 4
+
+**Blockers**: None
+

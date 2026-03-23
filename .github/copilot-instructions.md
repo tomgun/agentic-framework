@@ -30,6 +30,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Done / complete / finished / merge | STOP -> Run `ag done F-XXXX`. Flush ideas via `ag todo`. |
 | Idea / remember / todo / note | STOP -> `ag todo "description"` |
 | Decompose / break down epic | STOP -> Run `ag decompose F-XXXX` |
+| Pending user input / contract input | STOP -> Run `ag contract pending`. Process each pending contract. |
 | Plan created / exited plan mode | STOP -> Save plan, run dialectical review if enabled, then implement |
 | Churn / batch / all tasks / build everything | STOP -> Run `ag auto crunch`. NEVER write code for multiple features outside `ag auto`. |
 

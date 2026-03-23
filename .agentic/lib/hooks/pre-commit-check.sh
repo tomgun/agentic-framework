@@ -1309,6 +1309,18 @@ except Exception:
 " 2>/dev/null || echo "no")
       if [[ "$IS_PROTECTED" == "yes" ]]; then
         CID=$(basename "$contract_file" .yaml)
+        # Exempt user_input-only changes from migration requirement
+        ONLY_UI=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import yaml, subprocess
+s = yaml.safe_load(subprocess.run(['git', 'show', ':$contract_file'], capture_output=True, text=True).stdout or '{}')
+h = yaml.safe_load(subprocess.run(['git', 'show', 'HEAD:$contract_file'], capture_output=True, text=True).stdout or '{}')
+s.pop('user_input', None); h.pop('user_input', None)
+print('yes' if s == h else 'no')
+" 2>/dev/null || echo "no")
+        if [[ "$ONLY_UI" == "yes" ]]; then
+          echo "  ℹ $CID: only user_input changed (exempt from migration)"
+          continue
+        fi
         # Check for staged migration entry in the contract itself
         HAS_MIGRATION=$(git diff --cached -- "$contract_file" 2>/dev/null | grep -c "^+.*id: M-" || true)
         if [[ "$HAS_MIGRATION" -eq 0 ]]; then
