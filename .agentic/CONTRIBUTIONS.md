@@ -8,6 +8,46 @@
 
 ## Recent Contributions
 
+### F-0302 Phase 4 — User Input as Agent Control Surface (PR #196, v0.73.0)
+
+**User insight**: The `user_input` field in contracts (a key design principle: specs as control interface) is only useful if agents can *discover* it — a field buried in a YAML file nobody reads is not a control surface. The discovery pipeline was missing entirely: agents had no way to know pending input existed.
+
+**Design direction**: Surface user_input at every agent entry point. Dashboard shows "📥 N pending", `ag start` shows previews, `ag implement` shows INFO guidance. New skill `handling-contract-input` defines the 7-step response workflow (discover → read → test → implement → migrate → clear → verify). Trigger words added to all 7 instruction files so agents route to the skill automatically.
+
+**Why it matters**: Specs as a control interface only works if the control surface is visible. Discoverability is not a UX polish — it's what makes the design principle real.
+
+---
+
+### Scaffold-First Hook Architecture (PR #190, v0.71.0)
+
+**User insight**: Scaffold already pre-installs hooks to `lib/` — the wrapper layer in `.agentic/hooks/claude/` was redundant. The init playbook was reinstalling them mid-session, causing misleading "Claude Code restart required" warnings that confused users.
+
+**Design direction**: Eliminate 9 wrapper scripts. `hooks.json` points directly to `lib/claude-hooks/` — hooks auto-update with framework upgrades instead of requiring manual wrapper sync. Init playbook Step 1a rewritten from "install" to "verify/prune." Init interview uses `AskUserQuestion` for batched questions rather than 7 sequential prompts.
+
+**Why it matters**: Redundant wrappers created a maintenance burden and a UX failure mode (spurious restart warnings). Removing the layer makes hook lifecycle simpler and upgrades automatic.
+
+---
+
+### F-0301 — Feature Status Audit + Completion Gate (PR #191+192, v0.71.0)
+
+**User insight**: Conducted systematic feature status audit and found 3 features (F-0240, F-0242, F-0194) with merged code on main but still marked "planned" — agents had committed directly to main bypassing `ag done`. Expanded scan found 8 total features in this state.
+
+**Design direction**: `ag implement` should structurally block when any prior backlog item has merged code but isn't shipped — passive detection on dashboard plus advisory on `ag start`. Completion gate enforces that shipped code matches spec status before new work begins.
+
+**Why it matters**: Status drift is silent. Without a structural gate, agents bypass `ag done` and the entire spec/status lifecycle silently decouples from the code.
+
+---
+
+### F-0224 — Smoke Test Evidence Gate (PR #150, v0.57.0)
+
+**User insight**: "`ag done` checked ACs and docs but not whether smoke testing actually happened — `tests pass` ≠ `it works`." The framework had no gate that verified a human or agent had actually run the feature end-to-end before marking it done.
+
+**Design decision**: Deliberate naming choice: `off/recommended/required` rather than the existing docs_gate pattern of `off/warning/blocking`. "Recommended" communicates a framework suggestion rather than a project rule; "required" is clearer than "blocking" to new users reading STACK.md for the first time.
+
+**Why it matters**: Quality gates are only as strong as their last step. A smoke test gate closes the gap between "passing tests" and "working software."
+
+---
+
 ### Spec System Overhaul — Design Principles (F-0302, v0.71.0)
 
 **User insights** that shaped the YAML contract system:
