@@ -132,6 +132,7 @@ COMMANDS:
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
     intent [sub]        Manage intent journal (list|clear F-XXXX)
     formalize [T-XXXX...]  Promote TODO items to formal features + AC stubs
+    migrate-specs [opts]   Convert markdown ACs to YAML contracts (--dry-run, --archive)
     git-init            Activate git version control (safe: .gitignore first, scaffold commit)
     gitignore           Generate/update stack-aware .gitignore
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
@@ -159,6 +160,8 @@ EXAMPLES:
     ag spec --check             # Run spec health check on all features
     ag specs                    # Start/resume brownfield spec generation
     ag specs --status           # Show domain progress
+    ag migrate-specs --dry-run  # Preview markdown AC to YAML migration
+    ag migrate-specs --archive  # Migrate and archive old files
     ag todo "Try new library"   # Capture idea to TODO.md
     ag todo list                # Show inbox items
     ag todo done T-0001 "done"  # Resolve item
@@ -201,7 +204,7 @@ EXAMPLES:
     ag sync --check             # Dry run: detect only
     ag verify --full            # Full verification
 
-Feature tracking with acceptance criteria.
+Feature tracking with YAML contracts. Migrate from markdown: ag migrate-specs
 EOF
     fi
 }

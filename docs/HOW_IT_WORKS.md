@@ -359,7 +359,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    START[ag auto task F-XXXX] --> LOAD[Load acceptance criteria]
+    START[ag auto task F-XXXX] --> LOAD[Load contract assertions]
     LOAD --> BRANCH[Create feature branch]
     BRANCH --> AC_LOOP
 
@@ -583,18 +583,23 @@ planned → specced → criteria_set → tests_written → implementing
 → verified → documented → committed → shipped   (+ deprecated)
 ```
 
-- **Forward transitions**: sequential, one step at a time (8 transitions)
-- **Regression transitions**: going backward (e.g. verified → implementing) with cascade invalidation of intermediate states
-- **Skip transitions**: legacy shortcuts (planned → implementing, planned → shipped) for backward compatibility
+**Contract lifecycle** (YAML contracts use a parallel lifecycle):
+```
+exploring → specifying → implementing → verifying → shipping → shipped (+ deprecated)
+```
+
+- **Forward transitions**: sequential, one step at a time
+- **Regression transitions**: going backward with cascade invalidation
+- **Skip transitions**: legacy shortcuts for backward compatibility
 - **Advisory mode** (default): invalid transitions log warnings but proceed
 - **Enforce mode**: invalid transitions are blocked
 
 Each forward transition has a **gate function** checking filesystem preconditions:
 - `planned → specced`: Feature exists in FEATURES.md with Description
-- `specced → criteria_set`: Acceptance criteria file exists with AC lines
+- `specced → criteria_set`: Contract file exists with assertions (or legacy AC file)
 - `criteria_set → tests_written`: Test files reference the feature ID
 - `tests_written → implementing`: Advisory TDD reminder
-- `implementing → verified`: AC file + test files exist
+- `implementing → verified`: Contract assertions + test files exist
 - `verified → documented`: Advisory changelog/docs reminder
 - `documented → committed`: Advisory pre-commit reminder
 - `committed → shipped`: Advisory push/PR/VERSION reminder
@@ -766,7 +771,7 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 | **Multi-Environment Support** (F-0054) | Documented workflow for switching between Claude/Cursor/Copilot when tokens run out. Durable artifacts ensure state survives tool switches. | PASSIVE - documented workflow, no enforcement |
 | **Upgrade System** (F-0056, F-0094) | `upgrade.sh` with FEATURE_REGISTRY. Version-aware: only shows features new since user's previous version. `.upgrade_pending` marker. | ACTIVE - structural |
 | **Quality Standards** (F-0015) | 7 quality documents in `.agentic/quality/`. Programming standards, test strategy, review checklist, library selection, green coding, integration testing, design for testability. | ACTIVE - wired via context manifests |
-| **Spec-Driven Development** (F-0003-0006) | Features defined in spec, acceptance criteria before code, tests verify criteria. Agents can't silently regress features when criteria-based tests exist. | ACTIVE - structural gate (Formal) |
+| **Spec-Driven Development** (F-0003-0006) | Features defined via YAML contracts (`spec/contracts/F-####.yaml`) with machine-verifiable assertions. Each assertion has a `verify` command and linked tests. Shipped contracts are protected — changes require migration entries. `user_input` field enables spec-as-control-interface (user writes change request, agent processes it). `ag contract check` runs all structural assertions. `ag migrate-specs` converts legacy markdown ACs to YAML contracts. | ACTIVE - structural gate (Formal) |
 
 **Hidden mechanism**: The staleness check in `pre-commit-check.sh` (Check 3) compares JOURNAL.md modification time against last git commit. This forces agents to update project state before every commit, ensuring long-term projects never go stale.
 

@@ -221,15 +221,44 @@ The agent runs verification, updates JOURNAL.md, and prepares the commit for you
 
 When the agent says a feature is complete:
 
-1. **Test it yourself** — try the feature, check acceptance criteria from `.agentic/spec/acceptance/F-####.md`
+1. **Test it yourself** — try the feature, check the contract at `spec/contracts/F-####.yaml`
 2. **If it works**, tell the agent: *"F-#### looks good, mark it as accepted"*
-3. Agent updates `.agentic/spec/FEATURES.md` (Accepted: yes, date), `.agentic/STATUS.md`, and `JOURNAL.md`
+3. Agent updates FEATURES.md, STATUS.md, and JOURNAL.md
 
 **Automated acceptance** (if tests exist):
 ```bash
-bash .agentic/lib/tools/accept.sh F-####
+ag contract check F-####    # Verify all structural assertions pass
 ```
-This marks the feature as accepted if all tests pass.
+
+### Working with YAML Contracts
+
+Features are specified using YAML contracts in `spec/contracts/`. Each contract has machine-verifiable assertions:
+
+```yaml
+id: F-0042
+name: CSV Export
+lifecycle: shipped
+assertions:
+  - id: AC-001
+    text: "Export button produces valid CSV file"
+    type: structural
+    verify: "python3 tests/test_export.py"
+    tests: [tests/test_export.py]
+```
+
+**Key commands**:
+```bash
+ag contract create F-0042 "CSV Export"   # Create draft contract
+ag contract check F-0042                 # Verify assertions
+ag contract set F-0042 lifecycle shipped # Update lifecycle
+ag contract add-assertion F-0042 "text"  # Add assertion
+ag contract list                         # List all contracts
+ag contract pending                      # Show features with pending user_input
+```
+
+**The `user_input` field** — write change requests directly into a contract's `user_input` field. The agent detects it, updates tests, implements changes, adds a migration entry, and clears the field.
+
+**Migrating from markdown ACs**: If your project uses older markdown acceptance criteria, run `ag migrate-specs` to convert them to YAML contracts.
 
 ### Working Manually (Without Agent)
 

@@ -34,7 +34,7 @@ phases:
   tasks: []
 - id: '5'
   title: User Project Support
-  status: pending
+  status: complete
   sessions_estimate: 1-2 sessions
-  completed_at: null
+  completed_at: '2026-03-23'
   tasks: []

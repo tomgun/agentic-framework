@@ -1,70 +1,25 @@
-# Acceptance criteria & acceptance tests
+# Acceptance Criteria
 
-Purpose: keep acceptance criteria for each feature in a consistent location, and document how to validate it.
+## Current Format: YAML Contracts (v0.73+)
 
-## Convention
-- One file per feature: `.agentic/spec/acceptance/F-0001.md`
-- Link from `.agentic/spec/FEATURES.md` to the acceptance file.
+The primary specification format is **YAML contracts** in `spec/contracts/F-####.yaml`.
 
-## What belongs here
-- Acceptance criteria written in plain language
-- Example scenarios / edge cases
-- **A Tests section specifying what tests verify each criterion** (required — see template)
-
-## Template format (v0.38.0+)
-
-The current template (`.agentic/spec/acceptance.template.md`) uses this structure:
-
-```markdown
-# F-####: [Feature Name] - Acceptance Criteria
-
-**Feature**: [One-sentence description]
-
-## Behavior (what the user needs — technology-agnostic)
-[Why this feature matters. User-facing, no implementation details.]
-
-## Acceptance Criteria
-
-### [Core Behavior] (P1 — MVP)
-**Verify independently**: [how to test this group alone]
-- [ ] **AC-001**: [Criterion]
-
-### [Enhanced Experience] (P2 — better but optional)
-**Verify independently**: [how to test this group alone]
-- [ ] **AC-002**: [Criterion]
-
-### [Edge Cases]
-- [ ] **AC-003**: [Criterion]
-
-## Verification
-
-### Tests
-#### Unit Tests
-- [ ] `tests/test_auth.py` — verifies login rejects bad passwords
-
-#### Integration Tests (if applicable)
-- [ ] `tests/integration/test_login_flow.py` — verifies full login → session flow
-
-#### Behavioral / LLM Tests (if feature changes agent decision-making)
-- [ ] **LLM-0NN**: agent asked to implement auth → creates acceptance criteria first
-
-## NFR Compliance
-- [ ] NFR-XXXX: Description
-
-## Out of Scope
-- [Not included]
+```bash
+ag contract create F-0001 "Feature Name"   # Create new contract
+ag contract check F-0001                    # Verify assertions
+ag contract list                            # List all contracts
+ag migrate-specs                            # Convert markdown ACs to contracts
 ```
 
-**Key sections:**
-- **Behavior**: Technology-agnostic user goal (the "WHAT", not "HOW")
-- **Priority tags** (P1/P2): Enables incremental delivery — P1 is MVP, P2 is enhancement
-- **Verify independently**: How to test each AC group in isolation
-- **Verification > Tests**: Planned before coding (required)
+See `.agentic/lib/templates/contract.template.yaml` for the contract template.
 
-## Backward compatibility
+## Legacy Format: Markdown Acceptance Criteria
 
-Older acceptance files using `## Tests` as a top-level section are still accepted.
-The framework checks for both `## Tests` and `## Verification > ### Tests`.
-New features should use the current template format.
+Older projects may have markdown files (`F-####.md`) in this directory with sections for Behavior, Acceptance Criteria, and Verification. These are still recognized by framework tools but new features should use YAML contracts.
 
-**Template**: `.agentic/spec/acceptance.template.md`
+To migrate existing markdown ACs to contracts: `ag migrate-specs`
+
+## Convention
+- One contract per feature: `spec/contracts/F-####.yaml`
+- Link from `spec/FEATURES.md` to the contract file
+- Each contract has machine-verifiable assertions with test links

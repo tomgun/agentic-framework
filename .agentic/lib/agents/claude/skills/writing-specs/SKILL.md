@@ -21,8 +21,9 @@ metadata:
 Run `ag spec` or `ag contract` to manage feature specifications and YAML contracts.
 
 ## Key operations
-- **New feature**: Find next F-XXXX in FEATURES.md, create contract at `spec/contracts/F-XXXX.yaml`
+- **New feature**: `bash .agentic/lib/tools/feature.sh F-XXXX add "Name"` (auto-creates FEATURES.md entry + draft contract)
 - **Contract management**: `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list`
+- **Migrate from markdown**: `ag migrate-specs` (converts `spec/acceptance/*.md` to `spec/contracts/*.yaml`)
 - **Status update**: `bash .agentic/lib/tools/feature.sh F-XXXX status shipped`
 - **Evolve shipped spec**: Additive-only changes, markers required, migration mandatory, human approval
 - **Audit**: `bash .agentic/lib/tools/check-spec-health.sh F-XXXX` (or `--all`)

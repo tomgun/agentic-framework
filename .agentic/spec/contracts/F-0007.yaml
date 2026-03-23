@@ -19,7 +19,7 @@ user_input: ""
 
 assertions:
   - id: AC-001
-    text: "Batch size limit enforced in pre-commit (max 10 files)"
+    text: "Batch size advisory in pre-commit (warns on >10 files)"
     type: structural
     verify: |
       grep -q "max.*10\|Batch size\|files staged" .agentic/lib/hooks/pre-commit-check.sh
@@ -43,5 +43,11 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-0209
 
-nfr_refs: []
-migrations: []
+migrations:
+  - id: M-2026-03-23-001
+    date: "2026-03-23"
+    trigger: user_request
+    reason: "Batch size changed from blocking to advisory — PRs get squash-merged so commit granularity does not matter; what matters is agents work in small batches"
+    changes:
+      - "AC-001: changed from 'enforced' to 'advisory' — blocking removed, warning retained"
+    approved_by: user

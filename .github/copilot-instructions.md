@@ -31,6 +31,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Idea / remember / todo / note | STOP -> `ag todo "description"` |
 | Decompose / break down epic | STOP -> Run `ag decompose F-XXXX` |
 | Pending user input / contract input | STOP -> Run `ag contract pending`. Process each pending contract. |
+| Migrate specs / convert acceptance | STOP -> Run `ag migrate-specs` (converts markdown ACs to YAML contracts). |
 | Plan created / exited plan mode | STOP -> Save plan, run dialectical review if enabled, then implement |
 | Churn / batch / all tasks / build everything | STOP -> Run `ag auto crunch`. NEVER write code for multiple features outside `ag auto`. |
 

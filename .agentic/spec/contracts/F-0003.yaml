@@ -64,7 +64,15 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-0117
 
+  - id: AC-007
+    text: "After making code changes, grep spec/contracts/ for assertions related to the changed behavior. If any are affected, STOP — present the affected assertions to the user and wait for approval before modifying any contract or test. Contracts protect shipped behavior; silently updating them to match new code defeats that protection."
+    type: behavioral
+    verify: null
+    tests:
+      - tests/llm/tests/095_contract_impact_check_before_spec_changes.sh
+
 nfr_refs: [NFR-0004]
+
 scenarios:
   - name: "Spec-first gate blocks implementation"
     given: "Formal project, F-0099 in FEATURES.md with no AC file"
@@ -83,4 +91,12 @@ migrations:
     reason: "F-0302 Phase 3: spec/acceptance archived, contracts are now primary"
     changes:
       - "AC-001: verify checks spec/contracts instead of spec/acceptance"
+    approved_by: user
+
+  - id: M-2026-03-23-001
+    date: "2026-03-23"
+    trigger: user_request
+    reason: "Agent must check contract assertions after code changes and get user approval before modifying shipped specs"
+    changes:
+      - "AC-007: new behavioral assertion — contract impact check before modifying shipped specs"
     approved_by: user
