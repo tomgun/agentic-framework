@@ -232,7 +232,7 @@ def parse_features(features_path: Path) -> dict[str, dict]:
         if m:
             current_id = m.group(1)
             # Extract name from header line (group(2) from FEATURE_HEADER_RE)
-            name = m.group(2).strip() if m.lastindex and m.lastindex >= 2 else ""
+            name = m.group(2).strip()
             features[current_id] = {"status": None, "state": None, "name": name}
             continue
 
