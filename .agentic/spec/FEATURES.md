@@ -365,7 +365,7 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 
 ## F-0303: Plan-Derived Work Items
 
-**Status**: implementing
+**Status**: shipped
 **Category**: general
 **Priority**: medium
 **Complexity**: medium

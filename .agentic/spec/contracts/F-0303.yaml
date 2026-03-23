@@ -1,16 +1,17 @@
 id: F-0303
 name: Plan-Derived Work Items (Multi-Session Phase Tracking)
-lifecycle: active
-protection: none
+lifecycle: shipped
+profile: both
+protection: contract
 category: core-workflow
-description: >
-  Approved multi-phase plans produce a trackable work structure (tasks.yaml)
+description: 'Approved multi-phase plans produce a trackable work structure (tasks.yaml)
   that surfaces progress in the dashboard and gates feature completion.
+
+  '
 user_input: ''
 assertions:
 - id: AC-001
-  text: Plans with ## Phase N headers produce tasks.yaml on approval
-  type: structural
+  text: Plans with
   type: structural
   verify: test -f .agentic/lib/auto/phases.py
 - id: AC-002

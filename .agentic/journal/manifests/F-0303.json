@@ -1,0 +1,26 @@
+{
+  "feature": "F-0303",
+  "mode": "feature",
+  "generated": "2026-03-23T13:28:05Z",
+  "commits": [
+    {"hash": "1d2e4e3", "date": "2026-03-23", "message": "chore(F-0303): add contract and approve plan status", "additions": 27, "deletions": 0},
+    {"hash": "93448bb", "date": "2026-03-23", "message": "chore(state): flush state files after F-0303 merge", "additions": 70, "deletions": 10},
+    {"hash": "596af88", "date": "2026-03-23", "message": "feat(F-0303): multi-session plan phase tracking (#197)", "additions": 1442, "deletions": 11},
+    {"hash": "8c8c157", "date": "2026-03-23", "message": "fix(F-0303): review fixes — eliminate shell injection, portability", "additions": 48, "deletions": 21},
+    {"hash": "11e3cb8", "date": "2026-03-23", "message": "feat(F-0303): instruction file updates + no-feature-inflation rule", "additions": 35, "deletions": 6},
+    {"hash": "f033739", "date": "2026-03-23", "message": "feat(F-0303): integrate phase tracking into ag workflow", "additions": 173, "deletions": 1},
+    {"hash": "0c0e4c1", "date": "2026-03-23", "message": "feat(F-0303): phases.py core logic, phase.sh CLI, and tests", "additions": 1203, "deletions": 0}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/lib/auto/phases.py"}, {"file": ".agentic/lib/auto/plan_convergence.py"}, {"file": ".agentic/lib/tools/ag.sh"}, {"file": ".agentic/lib/tools/commands/done.sh"}, {"file": ".agentic/lib/tools/commands/help.sh"}, {"file": ".agentic/lib/tools/commands/implement.sh"}, {"file": ".agentic/lib/tools/commands/phase.sh"}, {"file": ".agentic/lib/tools/dashboard.sh"}, {"file": ".agentic/lib/tools/sync.sh"}],
+    "tests": [{"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/contracts/F-0303.yaml"}, {"file": "tests/test_phases.py"}],
+    "docs": [{"file": ".agentic/HUMAN_NEEDED.md"}, {"file": ".agentic/STATUS.md"}, {"file": ".agentic/TODO.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/journal/plans/2026-03-23-F-0303-plan.md"}, {"file": ".agentic/lib/DEVELOPER_GUIDE.md"}, {"file": ".agentic/lib/agents/claude/CLAUDE.md"}, {"file": ".agentic/lib/agents/claude/skills/completing-work/SKILL.md"}, {"file": ".agentic/lib/agents/codex/codex-instructions.md"}, {"file": ".agentic/lib/agents/copilot/copilot-instructions.md"}, {"file": ".agentic/lib/agents/cursor/cursorrules.txt"}, {"file": ".agentic/lib/init/memory-seed.md"}, {"file": ".agentic/spec/FEATURES.md"}, {"file": "CLAUDE.md"}, {"file": "FRAMEWORK_DEVELOPMENT.md"}, {"file": "docs/HOW_IT_WORKS.md"}],
+    "config": [{"file": ".agentic/BACKLOG.json"}, {"file": ".agentic/journal/manifests/F-0001.json"}, {"file": ".agentic/spec/contracts/F-0303.yaml"}]
+  },
+  "stats": {
+    "total_commits": 7,
+    "total_files": 30,
+    "additions": 2998,
+    "deletions": 49
+  }
+}
