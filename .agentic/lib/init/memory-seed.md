@@ -25,5 +25,6 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - Follow CLI prompts. It loads role-specific guidance at each phase.
 - Write artifacts to `.agentic/work/F-XXXX/` (plan.md, spec.md, review.md, journal.md).
 - Use token-efficient scripts: `journal.sh`, `status.sh`, `feature.sh`, `blocker.sh`, `todo.sh`.
+- After code changes, grep `spec/contracts/` for affected assertions. If any, STOP and present to user before modifying contracts or tests. Contracts protect shipped behavior; silently updating them defeats that protection.
 - NEVER write code for multiple features outside of `ag auto` commands. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs — not just code.
 - **No feature inflation**: Improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX. Ask "which existing feature owns this?" before proposing a new ID.

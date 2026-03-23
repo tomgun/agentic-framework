@@ -30,3 +30,6 @@ Key commands:
 - Feature must have a YAML contract at `spec/contracts/F-XXXX.yaml` with assertions
 - Contract lifecycle must be `specifying` or later (not `exploring`)
 - If pending `user_input` exists on the contract, process it first (write tests → implement → migrate → clear)
+
+## Contract & test impact check
+After making code changes, grep `spec/contracts/` for assertions related to the changed behavior. If any are affected, **STOP** — present the affected assertions to the user and wait for approval before modifying any contract or test. Contracts protect shipped behavior; silently updating them to match new code defeats that protection.

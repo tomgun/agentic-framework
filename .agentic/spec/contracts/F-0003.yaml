@@ -5,82 +5,108 @@ since: v0.1.0
 profile: formal
 protection: contract
 category: core-workflow
-consolidated_from: [F-0003, F-0005, F-0006, F-0010, F-0043, F-0117, F-0128, F-0132, F-0147, F-0148, F-0149, F-0152, F-0251]
+consolidated_from:
+- F-0003
+- F-0005
+- F-0006
+- F-0010
+- F-0043
+- F-0117
+- F-0128
+- F-0132
+- F-0147
+- F-0148
+- F-0149
+- F-0152
+- F-0251
+description: 'Formal-profile projects manage features through specifications with
+  testable
 
-description: |
-  Formal-profile projects manage features through specifications with testable
   acceptance criteria. Features have lifecycle states, enforcement gates, and
+
   migration-protected shipped specs. Spec evolution supports delta tracking,
+
   format versioning, and semantic consistency analysis. The spec-first gate
+
   blocks implementation without acceptance criteria.
 
-user_input: ""
-
+  '
+user_input: ''
 assertions:
-  - id: AC-001
-    text: "Formal profile creates spec/ directory with contracts/ and FEATURES.md"
-    type: structural
-    verify: |
-      test -d .agentic/spec/contracts && test -f .agentic/spec/FEATURES.md
-    tests:
-      - tests/validate_framework.sh::F-0003
+- id: AC-001
+  text: Formal profile creates spec/ directory with contracts/ and FEATURES.md
+  type: structural
+  verify: 'test -d .agentic/spec/contracts && test -f .agentic/spec/FEATURES.md
 
-  - id: AC-002
-    text: "ag implement blocks when feature has no acceptance criteria file"
-    type: behavioral
-    verify: null
-    tests:
-      - tests/llm/tests/003_acceptance_first.sh
-      - tests/llm/tests/010_feature_needs_spec.sh
+    '
+  tests:
+  - tests/validate_framework.sh::F-0003
+- id: AC-002
+  text: ag implement blocks when feature has no acceptance criteria file
+  type: behavioral
+  tests:
+  - tests/llm/tests/003_acceptance_first.sh
+  - tests/llm/tests/010_feature_needs_spec.sh
+- id: AC-003
+  text: Shipped spec changes require migration entry in spec/migrations/
+  type: structural
+  verify: 'grep -q "Shipped spec changes require migration" .agentic/lib/hooks/pre-commit-check.sh
 
-  - id: AC-003
-    text: "Shipped spec changes require migration entry in spec/migrations/"
-    type: structural
-    verify: |
-      grep -q "Shipped spec changes require migration" .agentic/lib/hooks/pre-commit-check.sh
-    tests:
-      - tests/validate_framework.sh::F-0117
+    '
+  tests:
+  - tests/validate_framework.sh::F-0117
+- id: AC-004
+  text: spec-writing skill exists for guided spec creation
+  type: structural
+  verify: test -f .claude/skills/writing-specs/SKILL.md
+  tests:
+  - tests/validate_framework.sh::F-0003
+- id: AC-005
+  text: Spec validation tool checks FEATURES.md format and cross-references
+  type: structural
+  verify: 'test -f .agentic/lib/tools/validate_specs.py
 
-  - id: AC-004
-    text: "spec-writing skill exists for guided spec creation"
-    type: structural
-    verify: "test -f .claude/skills/writing-specs/SKILL.md"
-    tests:
-      - tests/validate_framework.sh::F-0003
+    '
+  tests:
+  - tests/validate_framework.sh::F-0043
+- id: AC-006
+  text: Spec evolution supports delta tracking via migrations directory
+  type: structural
+  verify: 'test -d .agentic/spec/migrations
 
-  - id: AC-005
-    text: "Spec validation tool checks FEATURES.md format and cross-references"
-    type: structural
-    verify: |
-      test -f .agentic/lib/tools/validate_specs.py
-    tests:
-      - tests/validate_framework.sh::F-0043
-
-  - id: AC-006
-    text: "Spec evolution supports delta tracking via migrations directory"
-    type: structural
-    verify: |
-      test -d .agentic/spec/migrations
-    tests:
-      - tests/validate_framework.sh::F-0117
-
-nfr_refs: [NFR-0004]
+    '
+  tests:
+  - tests/validate_framework.sh::F-0117
+- id: AC-007
+  text: After making code changes, grep spec/contracts/ for assertions related to
+    the changed behavior. If any are affected, STOP — present the affected assertions
+    to the user and wait for approval before modifying any contract or test. Contracts
+    protect shipped behavior; silently updating them to match new code defeats that
+    protection.
+  type: behavioral
+nfr_refs:
+- NFR-0004
 scenarios:
-  - name: "Spec-first gate blocks implementation"
-    given: "Formal project, F-0099 in FEATURES.md with no AC file"
-    when: "Agent runs ag implement F-0099"
-    then: "Command exits with BLOCKED, message references missing acceptance criteria"
-
-  - name: "Shipped spec protected by migration"
-    given: "Shipped feature F-0003 with acceptance criteria"
-    when: "Developer modifies spec/contracts/F-0003.yaml and commits"
-    then: "Pre-commit blocks unless contract has migration entry"
-
+- name: Spec-first gate blocks implementation
+  given: Formal project, F-0099 in FEATURES.md with no AC file
+  when: Agent runs ag implement F-0099
+  then: Command exits with BLOCKED, message references missing acceptance criteria
+- name: Shipped spec protected by migration
+  given: Shipped feature F-0003 with acceptance criteria
+  when: Developer modifies spec/contracts/F-0003.yaml and commits
+  then: Pre-commit blocks unless contract has migration entry
 migrations:
-  - id: M-2026-03-22-001
-    date: "2026-03-22"
-    trigger: implementation_discovery
-    reason: "F-0302 Phase 3: spec/acceptance archived, contracts are now primary"
-    changes:
-      - "AC-001: verify checks spec/contracts instead of spec/acceptance"
-    approved_by: user
+- id: M-2026-03-22-001
+  date: '2026-03-22'
+  trigger: implementation_discovery
+  reason: 'F-0302 Phase 3: spec/acceptance archived, contracts are now primary'
+  changes:
+  - 'AC-001: verify checks spec/contracts instead of spec/acceptance'
+  approved_by: user
+- id: M-2026-03-23-001
+  date: '2026-03-23'
+  trigger: user_request
+  reason: Agent must check contract assertions after code changes and get user approval
+    before modifying shipped specs
+  changes: []
+  approved_by: user
