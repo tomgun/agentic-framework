@@ -1,6 +1,14 @@
 [
   {
     "type": "feature",
+    "id": "F-0303",
+    "description": "Plan-Derived Work Items",
+    "added_at": "2026-03-23T09:57:58Z",
+    "added_by": "agent",
+    "became_current_at": "2026-03-23T09:57:58Z"
+  },
+  {
+    "type": "feature",
     "id": "F-0243",
     "description": "Complexity Tier Experiments",
     "added_at": "2026-03-20T14:38:37Z",

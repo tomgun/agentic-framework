@@ -360,3 +360,21 @@ YAML contracts replace markdown acceptance criteria as source of truth. Machine-
 ## Legacy Feature Archive
 
 The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEATURES-v0.72.md`](../../docs/archive/FEATURES-v0.72.md). Old acceptance criteria files are at [`docs/archive/acceptance/`](../../docs/archive/acceptance/). The consolidation mapping is at [`spec/CONSOLIDATION_MAP.md`](CONSOLIDATION_MAP.md).
+
+---
+
+## F-0303: Plan-Derived Work Items
+
+**Status**: implementing
+**Category**: general
+**Priority**: medium
+**Complexity**: medium
+
+**Description**: (TODO: add description)
+
+**Implementation**:
+- State: none
+- Code: (TODO)
+- Tests: (TODO)
+
+**Contract**: See `spec/contracts/F-0303.yaml`

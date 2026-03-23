@@ -230,6 +230,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0088: Scaffold should copy all Claude tool files (.claude/hooks.json, skills/, subagents/, CLAUDE.md) during scaffolding — BEFORE the agent session starts. Currently setup-agent.sh runs mid-session (called by scaffold.sh), but hooks only take effect on next session start. Fix: scaffold.sh should create .claude/ with hooks.json as part of the directory structure creation (alongside .agentic/), not as a separate setup-agent step. Then when the user starts their first Claude session, hooks are already in place. Remove the 'restart Claude' advisory. The init playbook phase can then remove/customize tool dirs the user doesn't need (e.g. if they only use Cursor, remove .claude/). This inverts the current flow: install everything → prune, instead of install nothing → add on request.
 - **Added**: 2026-03-22
 
+### T-0089: Investigate: custom feature prefixes and subproduct grouping. Can users define own prefixes (e.g., AUTH-001, PAY-002) or group features by subproduct within the same repo? Currently F-XXXX is hardcoded in ids.sh regex. Consider: prefix registry in STACK.md, multi-prefix support in is_feature_id(), FEATURES.md sections per subproduct, backlog filtering by prefix. Related: monorepo/multi-component support (F-0179 components).
+- **Added**: 2026-03-23
+
 ## Done
 
 

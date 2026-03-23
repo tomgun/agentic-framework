@@ -216,7 +216,23 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+
+
+### HN-0061: PR #197: F-0303 Multi-Session Plan Phase Tracking
+- **Type**: pr_review
+- **Added**: 2026-03-23
+- **Context**: feat/F-0303-phase-tracking — ag phase CLI, done.sh gate, dashboard progress, sync drift detection
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
+
+### HN-0060: Review: F-0303 → implementing
+- **Resolved**: 2026-03-23
+- **Outcome**: Review approved: resolved
+
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics
 - **Resolved**: 2026-03-17

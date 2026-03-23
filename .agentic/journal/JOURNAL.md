@@ -4291,3 +4291,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-23 13:07 - F-0303 Phase Tracking
+
+**Why**: Plans with multiple phases had no trackable work structure — ag done shipped features with incomplete phases
+
+**What changed**:
+- Multi-session plan phase tracking: phases.py core, ag phase CLI, workflow integrations (done/implement/dashboard/sync gates), instruction file updates, no-feature-inflation rule
+
+**Next steps**:
+- PR review, ship F-0303
+
+**Blockers**: None
+

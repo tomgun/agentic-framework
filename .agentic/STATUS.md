@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0302 Phase 3 shipped — next: F-0243 Complexity Tier Experiments (Updated: 2026-03-22 21:39 UTC)
+- ADR-001 roadmap execution: F-0303 (Plan-Derived Work Items) is current backlog item (Updated: 2026-03-23 09:57 UTC)
 
 ## Current focus
 - **F-0302: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
