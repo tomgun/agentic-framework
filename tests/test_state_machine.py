@@ -563,100 +563,26 @@ class TestBlockingEnforcement:
 # ---------------------------------------------------------------------------
 
 
-class TestV2Adapter:
-    """Test FeatureStateMachine's v2 delegation when engine: v2."""
+class TestStateMachineFeaturesMd:
+    """Test FeatureStateMachine reads state from FEATURES.md."""
 
-    @pytest.fixture
-    def v2_project(self, project_dir):
-        """Project dir with v2 engine active and a work item."""
-        from auto.v2.config import _CONFIG_CACHE
-        _CONFIG_CACHE.clear()
-
-        # Copy v2 modules to project
-        v2_src = Path(__file__).parent.parent / ".agentic" / "lib" / "auto" / "v2"
-        v2_dst = project_dir / ".agentic" / "lib" / "auto" / "v2"
-        v2_dst.mkdir(parents=True, exist_ok=True)
-        for f in v2_src.iterdir():
-            if f.suffix == ".py":
-                (v2_dst / f.name).write_text(f.read_text())
-
-        # Write state_machine_af.yaml with engine: v2
-        config_path = project_dir / ".agentic" / "state_machine_af.yaml"
-        config_path.write_text("""\
-version: 1
-engine: v2
-
-workflow:
-  states: [idea, queued, planning, plan_review, spec, implementation,
-           verification, docs, ready_to_ship, shipped, deprecated]
-  transitions:
-    - {from: idea, to: queued}
-    - {from: queued, to: planning}
-    - {from: planning, to: plan_review}
-    - {from: plan_review, to: spec}
-    - {from: spec, to: implementation}
-    - {from: implementation, to: verification}
-
-modes:
-  formal:
-    escape_hatches: false
-    skip_transitions: []
-    required_artifacts: {}
-  lean:
-    escape_hatches: true
-    skip_transitions:
-      - {from: queued, to: implementation}
-    required_artifacts: {}
-
-profiles:
-  hands_on:
-    description: "Human reviews everything"
-    gates: {}
-
-verification:
-  commands: []
-
-artifacts: {}
-
-state_mapping:
-  planned: planning
-  specced: spec
-  criteria_set: spec
-  implementing: implementation
-  verified: verification
-  documented: docs
-  committed: ready_to_ship
-  shipped: shipped
-  deprecated: deprecated
-""")
-
-        # Create work dir
-        (project_dir / ".agentic" / "work").mkdir(exist_ok=True)
-
-        yield project_dir
-        _CONFIG_CACHE.clear()
-
-    def test_v2_get_current_state(self, v2_project):
-        """v2 engine removed (F-0244): state always reads from FEATURES.md."""
-        # With v2 removed, state machine reads from FEATURES.md only
-        write_features(v2_project, [("F-0099", "Test feature", "implementing")])
-        sm = FeatureStateMachine(project_root=v2_project, enforce=False)
+    def test_get_current_state(self, project_dir):
+        """State reads from FEATURES.md."""
+        write_features(project_dir, [("F-0099", "Test feature", "implementing")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=False)
         state = sm.get_current_state("F-0099")
         assert state == FeatureState.IMPLEMENTING
 
-    def test_v2_fallback_to_v1(self, v2_project):
-        """Features without work items fall back to FEATURES.md."""
-        write_features(v2_project, [("F-0042", "Old feature", "shipped")])
-
-        sm = FeatureStateMachine(project_root=v2_project, enforce=False)
+    def test_shipped_feature(self, project_dir):
+        """Shipped features read correctly from FEATURES.md."""
+        write_features(project_dir, [("F-0042", "Old feature", "shipped")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=False)
         state = sm.get_current_state("F-0042")
         assert state == FeatureState.SHIPPED
 
-    def test_v2_transition_delegates(self, v2_project):
-        """v2 engine removed (F-0244): state reads from FEATURES.md only."""
-        # With v2 removed, state machine reads from FEATURES.md
-        write_features(v2_project, [("F-0100", "Test transition", "planned")])
-        sm = FeatureStateMachine(project_root=v2_project, enforce=False)
-        # Verify can_transition works (doesn't need feature.sh)
+    def test_transition_from_planned(self, project_dir):
+        """Can transition from planned to specced."""
+        write_features(project_dir, [("F-0100", "Test transition", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=False)
         allowed, msgs = sm.can_transition("F-0100", FeatureState.SPECCED)
         assert allowed

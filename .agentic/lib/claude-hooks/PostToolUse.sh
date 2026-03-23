@@ -3,7 +3,6 @@
 #
 # This hook runs after Claude uses any tool (file edits, terminal commands, etc.)
 # It performs fast, non-blocking quality checks to catch issues early.
-# When v2 engine is active, also runs ag check --quick for artifact enforcement.
 #
 # Triggered by: Claude Code PostToolUse hook
 # Timeout: 2 seconds

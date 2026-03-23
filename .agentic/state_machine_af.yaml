@@ -1,11 +1,8 @@
-# state_machine_af.yaml — Agentic Framework Workflow Engine v2
+# state_machine_af.yaml — Agentic Framework Workflow Definition
 # Single source of truth for workflow states, transitions, gates, and modes.
 # Replaces scattered config across STACK.md settings, profiles.conf, and hardcoded states.
-#
-# Activate: set engine: v2 below. Old ag commands remain as fallback when engine != v2.
 
 version: 1
-engine: v2
 
 # ---------------------------------------------------------------------------
 # Workflow: States and Transitions

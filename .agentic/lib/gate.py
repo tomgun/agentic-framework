@@ -41,11 +41,9 @@ from settings import get_setting  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
-# GateResult — intentional fork from auto/gates.py for independence.
-# auto/gates.py uses GateResult(allowed=bool), this uses decision="allow"|"deny"
-# for direct JSON serialization to hook responses. auto/gates.py is used by
-# the v1 state machine transitions; this module is the hooks-first replacement.
-# Once v2/ is physically deleted, auto/gates.py can be deprecated in favor of this.
+# GateResult — hooks-first gate policy engine.
+# Uses decision="allow"|"deny" for direct JSON serialization to hook responses.
+# auto/gates.py (state machine transitions) uses GateResult(allowed=bool).
 # ---------------------------------------------------------------------------
 
 @dataclass

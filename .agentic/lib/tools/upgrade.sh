@@ -372,21 +372,8 @@ fi
 
 echo ""
 
-# Step 5d: v2 migration (clean up removed v1 artifacts)
-# Detect engine: v2 in state_machine_af.yaml
-V2_ENGINE="no"
-if [[ -f "$TARGET_PROJECT_DIR/.agentic/state_machine_af.yaml" ]]; then
-  if grep -qE '^engine:[[:space:]]*v2' "$TARGET_PROJECT_DIR/.agentic/state_machine_af.yaml" 2>/dev/null; then
-    V2_ENGINE="yes"
-  fi
-fi
-
-if [[ "$V2_ENGINE" == "yes" ]]; then
-  migrate_v1_to_v2 "$TARGET_PROJECT_DIR" "$DRY_RUN"
-else
-  echo -e "${BLUE}[v2] Skipping v2 migration (engine != v2)${NC}"
-  echo ""
-fi
+# Step 5d: v2 migration removed (v2 engine deleted in F-0302 Phase 4)
+echo ""
 
 # Step 6: Migrate STATUS.md for Core profile
 echo -e "${BLUE}[6/7] Checking STATUS.md migration${NC}"

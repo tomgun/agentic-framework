@@ -37,9 +37,7 @@ source "$SCRIPT_DIR/../paths.sh"
 # AGENTIC_LIB, AGENTIC_ROOT, PROJECT_ROOT provided by paths.sh
 AGENTIC_DIR="$AGENTIC_LIB"
 
-# v2 engine removed (hooks-first simplification F-0244)
-_is_v2_engine() { return 1; }  # Always false
-_v2_export() { return 1; }     # No-op
+# v2 engine deleted (F-0302 Phase 4)
 
 show_help() {
   echo "Usage: bash .agentic/tools/setup-agent.sh <tool>"
@@ -66,25 +64,20 @@ setup_claude() {
   echo -e "${BLUE}Setting up Claude Code...${NC}"
 
   # 1. CLAUDE.md (auto-loaded instruction file)
-  if _is_v2_engine; then
-    _v2_export claude
-    echo -e "${GREEN}✓ Generated CLAUDE.md (v2 export)${NC}"
+  TARGET="$PROJECT_ROOT/CLAUDE.md"
+  SOURCE="$AGENTIC_DIR/agents/claude/CLAUDE.md"
+
+  if [[ -f "$TARGET" ]]; then
+    echo -e "${YELLOW}⚠ CLAUDE.md already exists. Backing up to CLAUDE.md.bak${NC}"
+    cp "$TARGET" "$TARGET.bak"
+  fi
+
+  if [[ -f "$SOURCE" ]]; then
+    cp "$SOURCE" "$TARGET"
+    echo -e "${GREEN}✓ Created CLAUDE.md${NC}"
   else
-    TARGET="$PROJECT_ROOT/CLAUDE.md"
-    SOURCE="$AGENTIC_DIR/agents/claude/CLAUDE.md"
-
-    if [[ -f "$TARGET" ]]; then
-      echo -e "${YELLOW}⚠ CLAUDE.md already exists. Backing up to CLAUDE.md.bak${NC}"
-      cp "$TARGET" "$TARGET.bak"
-    fi
-
-    if [[ -f "$SOURCE" ]]; then
-      cp "$SOURCE" "$TARGET"
-      echo -e "${GREEN}✓ Created CLAUDE.md${NC}"
-    else
-      echo -e "${RED}✗ Source file not found: $SOURCE${NC}"
-      return 1
-    fi
+    echo -e "${RED}✗ Source file not found: $SOURCE${NC}"
+    return 1
   fi
 
   # 2. Claude Code hooks (.claude/hooks.json)
@@ -131,24 +124,20 @@ setup_claude() {
 setup_cursor() {
   echo -e "${BLUE}Setting up Cursor...${NC}"
 
-  if _is_v2_engine; then
-    _v2_export cursor
-    echo -e "${GREEN}✓ Generated .cursorrules (v2 export)${NC}"
-  else  # v1: static copy
-    # Cursor can use .cursorrules (root) or .cursor/rules/*.mdc
-    TARGET="$PROJECT_ROOT/.cursorrules"
-    SOURCE="$AGENTIC_DIR/agents/cursor/cursorrules.txt"
+  # Cursor can use .cursorrules (root) or .cursor/rules/*.mdc
+  TARGET="$PROJECT_ROOT/.cursorrules"
+  SOURCE="$AGENTIC_DIR/agents/cursor/cursorrules.txt"
 
-    if [[ -f "$TARGET" ]]; then
-      echo -e "${YELLOW}⚠ .cursorrules already exists. Backing up to .cursorrules.bak${NC}"
-      cp "$TARGET" "$TARGET.bak"
-    fi
+  if [[ -f "$TARGET" ]]; then
+    echo -e "${YELLOW}⚠ .cursorrules already exists. Backing up to .cursorrules.bak${NC}"
+    cp "$TARGET" "$TARGET.bak"
+  fi
 
-    if [[ -f "$SOURCE" ]]; then
-      cp "$SOURCE" "$TARGET"
-      echo -e "${GREEN}✓ Created .cursorrules${NC}"
-      echo "  Cursor will now auto-load framework instructions."
-    else
+  if [[ -f "$SOURCE" ]]; then
+    cp "$SOURCE" "$TARGET"
+    echo -e "${GREEN}✓ Created .cursorrules${NC}"
+    echo "  Cursor will now auto-load framework instructions."
+  else
     # Create minimal .cursorrules pointing to framework
     cat > "$TARGET" << 'EOF'
 # Cursor Rules - Agentic Framework
@@ -175,7 +164,6 @@ See `AGENTS.md` for non-negotiable rules:
 EOF
     echo -e "${GREEN}✓ Created .cursorrules (minimal)${NC}"
     echo "  Cursor will now auto-load framework instructions."
-    fi
   fi
 
   # Also create .cursor/rules/agentic.mdc if .cursor exists
@@ -190,12 +178,6 @@ EOF
 
 setup_codex() {
   echo -e "${BLUE}Setting up OpenAI Codex CLI...${NC}"
-
-  if _is_v2_engine; then
-    _v2_export codex
-    echo -e "${GREEN}✓ Generated AGENTS.md (v2 export)${NC}"
-    return 0
-  fi
 
   mkdir -p "$PROJECT_ROOT/.codex"
   TARGET="$PROJECT_ROOT/.codex/instructions.md"
@@ -244,12 +226,6 @@ EOF
 
 setup_copilot() {
   echo -e "${BLUE}Setting up GitHub Copilot...${NC}"
-
-  if _is_v2_engine; then
-    _v2_export copilot
-    echo -e "${GREEN}✓ Generated .github/copilot-instructions.md (v2 export)${NC}"
-    return 0
-  fi
 
   mkdir -p "$PROJECT_ROOT/.github"
   TARGET="$PROJECT_ROOT/.github/copilot-instructions.md"

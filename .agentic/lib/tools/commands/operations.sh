@@ -566,7 +566,13 @@ cmd_verify() {
         echo -e "${BOLD}=== Verify: $feature_id ===${NC}"
         echo ""
 
-        # Extract automated verification commands from ## Verification section
+        # YAML contracts: delegate to verify-contracts.sh
+        if [[ "$acc_file" == *.yaml ]]; then
+            bash "$SCRIPT_DIR/verify-contracts.sh" --feature "$feature_id" --dir "$CONTRACTS_DIR"
+            return $?
+        fi
+
+        # Legacy markdown ACs: extract automated verification commands
         local in_verification=false
         local commands=()
         while IFS= read -r line; do
