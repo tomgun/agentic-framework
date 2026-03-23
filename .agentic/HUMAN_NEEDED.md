@@ -236,6 +236,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0063: PR #201: fix(hooks) gate_stop + instruction file sync
+- **Type**: pr_review
+- **Added**: 2026-03-23
+- **Context**: https://github.com/tomgun/agentic-framework/pull/201
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0060: Review: F-0303 → implementing
