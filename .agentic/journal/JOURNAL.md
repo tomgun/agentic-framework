@@ -4304,3 +4304,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-23 14:41 - F-0302 Phase 4: V2 Dead Code Cleanup
+
+**Why**: v2 engine was a wrapper around the state machine that was removed in earlier phases — this cleans up all remaining dead code references
+
+**What changed**:
+- Removed v2 wrapper engine (14 files, ~3217 lines), 3 dead test files, V2_ENGINE variable + ~70 dead conditional blocks from validate_framework.sh, cleaned setup-agent.sh/upgrade.sh/ag.sh stubs, wired ag verify to verify-contracts.sh
+
+**Next steps**:
+- Merge PR, ag phase done F-0302 4, begin Phase 5
+
+**Blockers**: None
+

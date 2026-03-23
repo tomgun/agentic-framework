@@ -219,12 +219,6 @@ _ensure_hooks() {
 _ensure_hooks
 
 # ---------------------------------------------------------------------------
-# V2 Engine removed (hooks-first simplification F-0244).
-# Gate checks now use ag gate (Python gate.py module).
-# All state management via FEATURES.md + feature.sh.
-# ---------------------------------------------------------------------------
-_V2_ENGINE=0
-
 # Main command dispatch
 _AG_CMD="${1:-help}"
 _AG_ARG="${*:2}"

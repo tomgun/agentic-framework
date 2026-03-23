@@ -26,87 +26,6 @@ NEW_FRAMEWORK_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 BACKUP_DIR="agentic-backup-$(date +%Y%m%d-%H%M%S)"
 DRY_RUN="${DRY_RUN:-no}"
 
-# ---------------------------------------------------------------------------
-# v2 migration: clean up files removed by the v2 workflow engine
-# ---------------------------------------------------------------------------
-migrate_v1_to_v2() {
-  local project_dir="$1"
-  local dry_run="${2:-no}"
-  local removed_count=0
-
-  echo -e "${BLUE}[v2] Migrating to v2 workflow engine${NC}"
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-  # Directories removed wholesale in v2
-  local v2_remove_dirs=(
-    ".agentic/lib/workflows"
-    ".agentic/lib/checklists"
-    ".agentic/lib/quality"
-    ".agentic/lib/agents/shared/guidelines"
-    ".agentic/lib/agents/claude/subagents"
-  )
-
-  # Individual files removed in v2
-  local v2_remove_files=(
-    ".agentic/lib/agents/shared/auto_orchestration.md"
-    ".agentic/lib/agents/shared/agent_operating_guidelines.md"
-    ".agentic/lib/agents/shared/AGENT_QUICK_START.md"
-    ".agentic/lib/agents/shared/doc_types.md"
-  )
-
-  if [[ "$dry_run" == "yes" ]]; then
-    echo "  [DRY RUN] Would remove v1 directories and files superseded by v2"
-    return 0
-  fi
-
-  # Remove v1 directories
-  for dir in "${v2_remove_dirs[@]}"; do
-    if [[ -d "$project_dir/$dir" ]]; then
-      rm -rf "$project_dir/$dir"
-      echo -e "  ${GREEN}✓${NC} Removed $dir/"
-      removed_count=$((removed_count + 1))
-    fi
-  done
-
-  # Remove v1 files
-  for file in "${v2_remove_files[@]}"; do
-    if [[ -f "$project_dir/$file" ]]; then
-      rm -f "$project_dir/$file"
-      echo -e "  ${GREEN}✓${NC} Removed $file"
-      removed_count=$((removed_count + 1))
-    fi
-  done
-
-  # Remove skill references/ and scripts/ subdirectories
-  if [[ -d "$project_dir/.claude/skills" ]]; then
-    for skill_dir in "$project_dir"/.claude/skills/*/; do
-      [[ -d "$skill_dir" ]] || continue
-      for sub in references scripts; do
-        if [[ -d "$skill_dir$sub" ]]; then
-          rm -rf "$skill_dir$sub"
-          local rel="${skill_dir#$project_dir/}"
-          echo -e "  ${GREEN}✓${NC} Removed ${rel}${sub}/"
-          removed_count=$((removed_count + 1))
-        fi
-      done
-    done
-  fi
-
-  # Create .agentic/work/ directory for v2 work items
-  if [[ ! -d "$project_dir/.agentic/work" ]]; then
-    mkdir -p "$project_dir/.agentic/work"
-    touch "$project_dir/.agentic/work/.gitkeep"
-    echo -e "  ${GREEN}✓${NC} Created .agentic/work/"
-  fi
-
-  if [[ $removed_count -eq 0 ]]; then
-    echo -e "  ${GREEN}✓${NC} Already clean — no v1 artifacts to remove"
-  else
-    echo -e "  ${GREEN}✓${NC} v2 migration: removed $removed_count v1 artifact(s)"
-  fi
-  echo ""
-}
-
 echo "╔════════════════════════════════════════════════════════════════╗"
 echo "║          AGENTIC AI FRAMEWORK UPGRADE TOOL                     ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
@@ -372,21 +291,8 @@ fi
 
 echo ""
 
-# Step 5d: v2 migration (clean up removed v1 artifacts)
-# Detect engine: v2 in state_machine_af.yaml
-V2_ENGINE="no"
-if [[ -f "$TARGET_PROJECT_DIR/.agentic/state_machine_af.yaml" ]]; then
-  if grep -qE '^engine:[[:space:]]*v2' "$TARGET_PROJECT_DIR/.agentic/state_machine_af.yaml" 2>/dev/null; then
-    V2_ENGINE="yes"
-  fi
-fi
-
-if [[ "$V2_ENGINE" == "yes" ]]; then
-  migrate_v1_to_v2 "$TARGET_PROJECT_DIR" "$DRY_RUN"
-else
-  echo -e "${BLUE}[v2] Skipping v2 migration (engine != v2)${NC}"
-  echo ""
-fi
+# Step 5d: v2 migration removed (v2 engine deleted in F-0302 Phase 4)
+echo ""
 
 # Step 6: Migrate STATUS.md for Core profile
 echo -e "${BLUE}[6/7] Checking STATUS.md migration${NC}"
