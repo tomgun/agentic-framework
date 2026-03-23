@@ -4357,6 +4357,7 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
+
 ### Session: 2026-03-23 18:58 - F-0193 Centralized IDs
 
 **Why**: AC-003/AC-004 required all files use centralized imports — 10+ files still had inline patterns after prior refactoring wave
