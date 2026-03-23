@@ -397,15 +397,8 @@ if c.has_pending_input:
             # Fallback: extract phases from approved plan if tasks.yaml missing
             if [ -n "$_impl_plan" ] && [ -f "$_impl_plan" ]; then
                 local _impl_phases
-                _impl_phases=$(PYTHONPATH="$AGENTIC_LIB" python3 -c "
-import sys; sys.path.insert(0, '$AGENTIC_LIB')
-from pathlib import Path
-from auto.phases import extract_phases_from_plan, create_tasks_file
-phases = extract_phases_from_plan(Path('$_impl_plan'))
-if phases:
-    create_tasks_file(Path('$ROOT_DIR'), '$feature_id', phases, '$_impl_plan')
-    print(f'{len(phases)} phases extracted')
-" 2>/dev/null) || _impl_phases=""
+                _impl_phases=$(PYTHONPATH="$AGENTIC_LIB" python3 "$AGENTIC_LIB/auto/phases.py" \
+                    --project-root "$ROOT_DIR" create-from-plan "$feature_id" "$_impl_plan" 2>/dev/null) || _impl_phases=""
                 if [ -n "$_impl_phases" ]; then
                     echo -e "${GREEN}Phase tracking: $_impl_phases → tasks.yaml${NC}"
                 fi

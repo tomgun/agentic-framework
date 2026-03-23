@@ -920,8 +920,11 @@ phase_plan_phase_drift() {
         fid=$(basename "$(dirname "$tasks_file")")
 
         # Find corresponding plan (most recently modified match with feature ID)
+        # Uses stat for mtime — portable across GNU/macOS (find -printf is GNU-only)
         local plan_file=""
-        plan_file=$(find "$plans_dir" -name "*${fid}*" -type f -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+        plan_file=$(find "$plans_dir" -name "*${fid}*" -type f 2>/dev/null | while read -r f; do
+            echo "$(stat -c '%Y' "$f" 2>/dev/null || stat -f '%m' "$f" 2>/dev/null) $f"
+        done | sort -rn | head -1 | cut -d' ' -f2-)
         [ -n "$plan_file" ] && [ -f "$plan_file" ] || continue
 
         # Check if plan is newer than tasks.yaml

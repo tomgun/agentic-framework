@@ -344,6 +344,15 @@ def main() -> int:
     p_check = sub.add_parser("check", help="Check if all phases complete")
     p_check.add_argument("feature_id")
 
+    # create-from-plan (for implement.sh fallback — avoids inline Python)
+    p_create = sub.add_parser("create-from-plan", help="Extract phases from plan, create tasks.yaml")
+    p_create.add_argument("feature_id")
+    p_create.add_argument("plan_path")
+
+    # next-phase (for dashboard — outputs single line)
+    p_next = sub.add_parser("next-phase", help="Show next actionable phase")
+    p_next.add_argument("feature_id")
+
     args = parser.parse_args()
     root = args.project_root.resolve()
 
@@ -362,6 +371,10 @@ def main() -> int:
         return 1
     elif args.command == "check":
         return _cmd_check(root, args.feature_id)
+    elif args.command == "create-from-plan":
+        return _cmd_create_from_plan(root, args.feature_id, args.plan_path)
+    elif args.command == "next-phase":
+        return _cmd_next_phase(root, args.feature_id)
     else:
         parser.print_help()
         return 1
@@ -470,6 +483,29 @@ def _cmd_check(root: Path, feature_id: str) -> int:
     if msg:
         print(msg)
     return 0
+
+
+def _cmd_create_from_plan(root: Path, feature_id: str, plan_path_str: str) -> int:
+    """Extract phases from a plan file and create tasks.yaml."""
+    plan_path = Path(plan_path_str)
+    if not plan_path.exists():
+        print(f"Plan file not found: {plan_path}", file=sys.stderr)
+        return 1
+    phases = extract_phases_from_plan(plan_path)
+    if not phases:
+        return 0  # No phases found — not an error
+    create_tasks_file(root, feature_id, phases, plan_path_str)
+    print(f"{len(phases)} phases extracted")
+    return 0
+
+
+def _cmd_next_phase(root: Path, feature_id: str) -> int:
+    """Print the next actionable phase as a single line."""
+    nxt = get_next_phase(root, feature_id)
+    if nxt:
+        print(f"Phase {nxt['id']}: {nxt['title']} {nxt['status']}")
+        return 0
+    return 1
 
 
 if __name__ == "__main__":

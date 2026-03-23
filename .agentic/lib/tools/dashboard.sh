@@ -456,13 +456,8 @@ if [[ "$D_BACKLOG_TOTAL" -gt 0 ]]; then
         _phase_progress=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" _py "$ROOT_DIR/.agentic/lib/auto/phases.py" \
             --project-root "$PROJECT_ROOT" progress "$D_BACKLOG_CUR_ID" 2>/dev/null) || _phase_progress=""
         if [[ -n "$_phase_progress" ]]; then
-            _phase_next=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" _py -c "
-import sys; sys.path.insert(0, '$ROOT_DIR/.agentic/lib')
-from pathlib import Path
-from auto.phases import get_next_phase
-p = get_next_phase(Path('$PROJECT_ROOT'), '$D_BACKLOG_CUR_ID')
-if p: print(f\"Phase {p['id']}: {p['title']} {p['status']}\")
-" 2>/dev/null) || _phase_next=""
+            _phase_next=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" _py "$ROOT_DIR/.agentic/lib/auto/phases.py" \
+                --project-root "$PROJECT_ROOT" next-phase "$D_BACKLOG_CUR_ID" 2>/dev/null) || _phase_next=""
             _phase_line="   Progress  $_phase_progress"
             [[ -n "$_phase_next" ]] && _phase_line="$_phase_line — $_phase_next next"
             echo "$_phase_line"
