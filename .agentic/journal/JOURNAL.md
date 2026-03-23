@@ -4317,3 +4317,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-23 15:33 - F-0302 Phase 5
+
+**Why**: New projects need contract-first scaffolding; existing projects need migration path from markdown ACs
+
+**What changed**:
+- User project support: contract templates for scaffold, ag migrate-specs command, documentation updates across 20 files
+
+**Next steps**:
+- Phase 6 or mark F-0302 done
+
+**Blockers**: None
+

@@ -14,6 +14,8 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 ## Trigger Words
 - "phase done/mark phase/phase progress/which phase" → STOP. Run `ag phase list F-XXXX` to see phases, `ag phase done F-XXXX <id>` to mark complete.
 - "pending user input/contract input" → STOP. Run `ag contract pending`. Process each pending contract.
+- "contract/assertion/verify contract/check contract" → Run `ag contract check` or `ag contract list`. Contracts are in `spec/contracts/F-XXXX.yaml`.
+- "migrate specs/convert acceptance/markdown to yaml" → STOP. Run `ag migrate-specs` (add `--dry-run` to preview, `--archive` to move old files).
 - "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`.
 - "work autonomously/come back with working/finish everything/do it all" → STOP. Run `ag auto crunch`.
 - NEVER write code for multiple features outside of `ag auto` commands.

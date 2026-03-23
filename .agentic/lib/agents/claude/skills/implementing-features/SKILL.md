@@ -24,3 +24,9 @@ Key commands:
 - `ag check F-XXXX` — see what's missing
 - `ag verify F-XXXX` — run tests
 - `ag ship F-XXXX` — prepare to ship
+- `ag contract check F-XXXX` — verify contract assertions pass
+
+## Preconditions
+- Feature must have a YAML contract at `spec/contracts/F-XXXX.yaml` with assertions
+- Contract lifecycle must be `specifying` or later (not `exploring`)
+- If pending `user_input` exists on the contract, process it first (write tests → implement → migrate → clear)
