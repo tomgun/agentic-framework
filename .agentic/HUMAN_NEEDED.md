@@ -207,6 +207,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0059: PR #196: F-0302 Phase 4 Step 4.2 — user input automation
+- **Type**: pr_review
+- **Added**: 2026-03-23
+- **Context**: feat/f-0302-phase4-user-input-automation — 12 files, 124 lines added
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics
