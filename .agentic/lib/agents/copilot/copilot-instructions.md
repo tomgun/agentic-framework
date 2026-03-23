@@ -16,6 +16,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag status` — see current work items
 - `ag info F-XXXX` — detailed info with next steps
 - `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`. The CLI tells you what's missing.
@@ -32,6 +33,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Backlog / what's next / prioritize | STOP -> `ag backlog` to see queue |
 | Write spec / contract / acceptance criteria | STOP -> Run `ag spec F-XXXX` or `ag contract check F-XXXX` |
 | Decompose / break down epic | STOP -> Run `ag decompose F-XXXX` |
+| Phase done / mark phase / phase progress / which phase | STOP -> Run `ag phase list F-XXXX` to see phases. `ag phase done F-XXXX <id>` to mark complete. |
 | Pending user input / contract input | STOP -> Run `ag contract pending`. Process each pending contract. |
 | Plan created / exited plan mode | STOP -> Save plan, run dialectical review if `plan_review_enabled: yes`, then implement |
 | Churn / batch / all tasks / build everything | STOP -> Run `ag auto crunch`. NEVER write code for multiple features outside `ag auto`. |
@@ -45,6 +47,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 - Keep changes small and scoped (max 5-10 files per commit).
 - Multi-session safety: never run destructive git ops when other sessions may be active.
 - NEVER write code for multiple features outside of `ag auto` commands. Batch work → `ag auto crunch`.
+- No feature inflation: improvements/enforcement/hardening of existing features are deliverables on those features, not new F-XXXX.
 
 Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`

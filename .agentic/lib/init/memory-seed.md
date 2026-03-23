@@ -9,9 +9,10 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag verify F-XXXX` — run tests and record results
 - `ag ship F-XXXX` — prepare for shipping
 - `ag status` — see current work items
-- `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract`
+- `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract` | `ag phase`
 
 ## Trigger Words
+- "phase done/mark phase/phase progress/which phase" → STOP. Run `ag phase list F-XXXX` to see phases, `ag phase done F-XXXX <id>` to mark complete.
 - "pending user input/contract input" → STOP. Run `ag contract pending`. Process each pending contract.
 - "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`.
 - "work autonomously/come back with working/finish everything/do it all" → STOP. Run `ag auto crunch`.
@@ -23,3 +24,4 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - Write artifacts to `.agentic/work/F-XXXX/` (plan.md, spec.md, review.md, journal.md).
 - Use token-efficient scripts: `journal.sh`, `status.sh`, `feature.sh`, `blocker.sh`, `todo.sh`.
 - NEVER write code for multiple features outside of `ag auto` commands. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs — not just code.
+- **No feature inflation**: Improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX. Ask "which existing feature owns this?" before proposing a new ID.

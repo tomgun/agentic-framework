@@ -966,7 +966,7 @@ These features exist but don't clearly derive from the 13 principles:
 │  git core.hooksPath → .agentic/hooks/                   │
 │  ag implement → requires acceptance criteria             │
 │  ag work → blocks without feature ID (Formal)          │
-│  ag done → runs doctor.sh --phase complete + AC gate    │
+│  ag done → phase gate + doctor.sh --phase complete + AC  │
 │  wip.sh → one-feature-at-a-time lock                    │
 │  complexity limits → max files/lines/length              │
 │  branch policy → blocks commits to main (PR workflow)    │
@@ -1014,7 +1014,8 @@ These features exist but don't clearly derive from the 13 principles:
 | `ag plan F-XXXX` | Create plan with optional review loop | Structural (must have acceptance) |
 | `ag implement F-XXXX` | Check acceptance, check approved plan, create WIP, print guidance | Structural (multiple gates) |
 | `ag commit` | Run pre-commit-check.sh, show diff, wait for approval | Structural (exit codes) |
-| `ag done F-XXXX` | Run doctor.sh --phase complete, AC completion gate (configurable via `acceptance_criteria` setting), feature.sh status shipped, VERSION bump | Structural (validation) |
+| `ag done F-XXXX` | Run doctor.sh --phase complete, phase completion gate (blocks if incomplete phases in tasks.yaml), AC completion gate (configurable via `acceptance_criteria` setting), feature.sh status shipped, VERSION bump. `--force-phases` bypasses phase gate. | Structural (validation) |
+| `ag phase list\|done\|active\|drop\|sync F-XXXX` | Multi-session plan phase tracking. Phases extracted from approved plans into `.agentic/work/F-XXXX/tasks.yaml`. Dashboard shows progress. | Structural (tracking) |
 | `ag specs` | Brownfield spec generation with plan-review | Structural (domain-by-domain) |
 | `ag trace F-XXXX` | Show spec-code traceability | Read-only |
 | `ag qa` | Generate QA Registry (docs/QA_REGISTRY.md) — feature-to-test matrix across 9 categories. `--check` for staleness, `--json` for data | Read-only |

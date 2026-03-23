@@ -14,6 +14,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag transition F-XXXX <state>` — advance the workflow (checks artifacts)
 - `ag check F-XXXX` | `ag verify F-XXXX` | `ag ship F-XXXX` | `ag status` | `ag info F-XXXX`
 - `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`.
@@ -28,6 +29,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Done / complete / finished / merge | STOP -> Run `ag done F-XXXX`. Flush ideas via `ag todo`. |
 | Idea / remember / todo / note | STOP -> `ag todo "description"` |
 | Decompose / break down epic | STOP -> Run `ag decompose F-XXXX` |
+| Phase done / mark phase / phase progress / which phase | STOP -> Run `ag phase list F-XXXX` to see phases. `ag phase done F-XXXX <id>` to mark complete. |
 | Pending user input / contract input | STOP -> Run `ag contract pending`. Process each pending contract. |
 | Plan created / exited plan mode | STOP -> Save plan, run dialectical review if enabled, then implement |
 
@@ -40,6 +42,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 - Keep changes small and scoped (max 5-10 files per commit).
 - Every merge: bump VERSION via `ag done`. Update CONTRIBUTIONS.md during the PR.
 - Worktree: Use `git worktree` on feature branches when another agent may be working on main.
+- No feature inflation: improvements/enforcement/hardening of existing features are deliverables on those features, not new F-XXXX.
 
 Verify: `bash tests/validate_framework.sh`
 Instruction files are part of the feature: new `ag` commands/gates MUST update all instruction files (templates, skills, memory-seed, DEVELOPER_GUIDE, HOW_IT_WORKS).

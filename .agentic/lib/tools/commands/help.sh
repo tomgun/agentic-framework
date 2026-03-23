@@ -124,6 +124,7 @@ COMMANDS:
     transition F-XXXX <state>  Manage feature state transitions (--status, --next, --dry-run, --unblocked)
     review [F-XXXX] [state]    Review checkpoint management (--approve, --reject, --reason)
     kickoff <sub>       Vision-to-backlog pipeline (prompt|--review|--approve|--discard|--status)
+    phase <sub>          Multi-session plan phase tracking (list|done|active|drop|sync)
     decompose F-XXXX    Break epic into child features by component
     qa [--check|--json] QA Registry: feature-to-test map and gap analysis
     audit [options]     Spec verification & QA audit (--full, --status, --propagate, --metrics)
@@ -151,6 +152,8 @@ EXAMPLES:
     ag plan F-0042              # Create plan with iterative review
     ag plan F-0042 --no-review  # Create plan without review loop
     ag implement F-0042         # Start working on feature F-0042
+    ag phase list F-0042        # Show plan phases and progress
+    ag phase done F-0042 2      # Mark phase 2 complete
     ag spec                     # Print spec-writing checklist for new feature
     ag spec F-0042              # Show spec status for F-0042
     ag spec --check             # Run spec health check on all features

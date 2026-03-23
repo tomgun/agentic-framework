@@ -451,6 +451,18 @@ echo ""
 echo "📌 Backlog"
 if [[ "$D_BACKLOG_TOTAL" -gt 0 ]]; then
     echo "   Current → $D_BACKLOG_CUR_ID  $D_BACKLOG_CUR_DESC"
+    # Phase progress (F-0303)
+    if [[ -n "$D_BACKLOG_CUR_ID" ]] && command -v python3 >/dev/null 2>&1; then
+        _phase_progress=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" _py "$ROOT_DIR/.agentic/lib/auto/phases.py" \
+            --project-root "$PROJECT_ROOT" progress "$D_BACKLOG_CUR_ID" 2>/dev/null) || _phase_progress=""
+        if [[ -n "$_phase_progress" ]]; then
+            _phase_next=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" _py "$ROOT_DIR/.agentic/lib/auto/phases.py" \
+                --project-root "$PROJECT_ROOT" next-phase "$D_BACKLOG_CUR_ID" 2>/dev/null) || _phase_next=""
+            _phase_line="   Progress  $_phase_progress"
+            [[ -n "$_phase_next" ]] && _phase_line="$_phase_line — $_phase_next next"
+            echo "$_phase_line"
+        fi
+    fi
     if [[ -n "$D_BACKLOG_NEXT_ID" ]]; then
         echo "   Next    → $D_BACKLOG_NEXT_ID  $D_BACKLOG_NEXT_DESC"
     fi

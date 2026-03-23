@@ -388,6 +388,41 @@ if c.has_pending_input:
     # Clear intent — all steps complete
     intent_clear "$feature_id" || true
 
+    # 8b. Phase tracking (F-0303): fallback extraction, auto-sync, progress display
+    if command -v python3 >/dev/null 2>&1; then
+        local tasks_yaml="$ROOT_DIR/.agentic/work/${feature_id}/tasks.yaml"
+        local _impl_plan
+        _impl_plan=$(_find_plan_file "$feature_id" || echo "")
+        if [ ! -f "$tasks_yaml" ]; then
+            # Fallback: extract phases from approved plan if tasks.yaml missing
+            if [ -n "$_impl_plan" ] && [ -f "$_impl_plan" ]; then
+                local _impl_phases
+                _impl_phases=$(PYTHONPATH="$AGENTIC_LIB" python3 "$AGENTIC_LIB/auto/phases.py" \
+                    --project-root "$ROOT_DIR" create-from-plan "$feature_id" "$_impl_plan" 2>/dev/null) || _impl_phases=""
+                if [ -n "$_impl_phases" ]; then
+                    echo -e "${GREEN}Phase tracking: $_impl_phases → tasks.yaml${NC}"
+                fi
+            fi
+        elif [ -n "$_impl_plan" ] && [ -f "$_impl_plan" ] && [ "$_impl_plan" -nt "$tasks_yaml" ]; then
+            # Auto-sync: plan was revised after tasks.yaml was created
+            local _sync_out
+            _sync_out=$(PYTHONPATH="$AGENTIC_LIB" python3 "$AGENTIC_LIB/auto/phases.py" \
+                --project-root "$ROOT_DIR" sync "$feature_id" 2>/dev/null) || _sync_out=""
+            if [ -n "$_sync_out" ] && [ "$_sync_out" != "No changes" ]; then
+                echo -e "${YELLOW}Phase auto-sync (plan revised): ${_sync_out}${NC}"
+            fi
+        fi
+        # Show phase progress if tasks.yaml exists
+        local _phase_summary
+        _phase_summary=$(PYTHONPATH="$AGENTIC_LIB" python3 "$AGENTIC_LIB/auto/phases.py" \
+            --project-root "$ROOT_DIR" progress "$feature_id" 2>/dev/null) || _phase_summary=""
+        if [ -n "$_phase_summary" ]; then
+            echo ""
+            echo -e "${BOLD}Phase progress:${NC} $_phase_summary"
+            echo "  Run: ag phase list $feature_id"
+        fi
+    fi
+
     echo ""
     echo -e "${GREEN}Ready to implement ${feature_id}${NC}"
     echo "Remember: Update FEATURES.md status to 'in_progress'"

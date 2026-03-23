@@ -181,7 +181,16 @@ _docs_generate() {
 
 # Done command - feature/task complete validation
 cmd_done() {
-    local feature_id="${1:-}"
+    # Parse args: feature ID + optional flags
+    local feature_id=""
+    local force_phases=0
+    local arg
+    for arg in "$@"; do
+        case "$arg" in
+            --force-phases) force_phases=1 ;;
+            *) [[ -z "$feature_id" ]] && feature_id="$arg" ;;
+        esac
+    done
 
     local ft
     ft=$(get_setting "feature_tracking" "no")
@@ -239,6 +248,34 @@ cmd_done() {
                 echo -e "${YELLOW}To bypass: set plan_review_enabled: no in STACK.md${NC}"
                 exit 1
             fi
+        fi
+    fi
+
+    # --- Phase completion gate (F-0303) ---
+    # If tasks.yaml exists with incomplete phases, block shipping.
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
+        local _phase_check_exit=0
+        local _phase_msg=""
+        _phase_msg=$(PYTHONPATH="$AGENTIC_LIB" python3 "$AGENTIC_LIB/auto/phases.py" \
+            --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" check "$feature_id" 2>/dev/null) || _phase_check_exit=$?
+        if [ "$_phase_check_exit" -eq 1 ]; then
+            if [ "$force_phases" -eq 1 ]; then
+                echo -e "${YELLOW}⚠ Phase gate bypassed (--force-phases): $_phase_msg${NC}"
+                bash "$SCRIPT_DIR/journal.sh" "Phase gate bypassed" \
+                    "$feature_id: --force-phases used. $_phase_msg" "" "" \
+                    --why "Incomplete phases overridden at shipping time" 2>/dev/null || true
+            else
+                echo -e "${RED}BLOCKED: $_phase_msg${NC}"
+                echo "  Options:"
+                echo "    ag phase done $feature_id <phase_id>    Mark a phase complete"
+                echo "    ag phase drop $feature_id <phase_id>    Drop a phase"
+                echo "    ag done $feature_id --force-phases       Bypass this gate"
+                echo ""
+                echo "  Run: ag phase list $feature_id   to see all phases"
+                exit 1
+            fi
+        elif [ -n "$_phase_msg" ]; then
+            echo -e "${GREEN}✓ $_phase_msg${NC}"
         fi
     fi
 
@@ -753,6 +790,15 @@ PYEOF
     fi
     if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         intent_checkpoint "$feature_id" "complete_wip" || true
+    fi
+
+    # Phase tracking cleanup (F-0303): remove tasks.yaml after feature ships
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
+        local _tasks_yaml="$ROOT_DIR/.agentic/work/${feature_id}/tasks.yaml"
+        if [ -f "$_tasks_yaml" ]; then
+            rm -f "$_tasks_yaml"
+            echo -e "${GREEN}✓ Phase tracking cleaned up (tasks.yaml removed)${NC}"
+        fi
     fi
 
     # Suggest drift detection

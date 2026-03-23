@@ -26,6 +26,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag info F-XXXX` — detailed work item info with next steps
 - `ag next` — show what to do next
 - `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 - `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve`
 - `ag coord start` | `ag coord stop` | `ag coord status`
@@ -45,6 +46,7 @@ Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `
 - Log user's design insights to .agentic/CONTRIBUTIONS.md. Every merge: bump VERSION via `ag done` (not in the PR).
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 - NEVER write code for multiple features outside of `ag auto` commands. If a user says "build everything", "churn all tasks", or similar batch-work phrases, use `ag auto crunch` — not direct Write/Edit calls. **Wrong rationalizations:** "I can implement it directly faster" — NO. "ag auto crunch spawns subprocesses, I have full context" — NO. "The user said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
+- No feature inflation: improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX. Ask "which existing feature owns this?" before proposing a new capability ID.
 
 ## After Plan Mode Exits (when `plan_review_enabled: yes`)
 

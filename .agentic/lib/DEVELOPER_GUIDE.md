@@ -63,7 +63,8 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 | "What's next?" | `ag backlog` | Shows ordered work queue — position 0 = current work |
 | "Plan this first" | `ag plan` | Creates reviewable plan, saves to journal |
 | "Commit this" | `ag commit` | Runs all quality gates, blocks if issues |
-| "We're done" | `ag done` | Checks docs, tests, AC completeness (blocks if <80% checked in formal mode); auto-advances backlog |
+| "We're done" | `ag done` | Checks docs, tests, AC completeness, phase completion (blocks if incomplete phases); auto-advances backlog |
+| "Phase progress?" | `ag phase list F-XXXX` | Shows plan phases and completion status; `ag phase done F-XXXX <id>` marks a phase complete |
 | "Flush state" / after `ag done` | `ag flush` | Commits state files (STATUS.md, BACKLOG.json, etc.) directly to main — no PR |
 | "Approve this" | `ag review` | Lists/resolves pending review checkpoints |
 | "Here's my product vision" | `ag kickoff "vision"` | Generates features, ACs, backlog from a vision prompt — staging → review → approve |
