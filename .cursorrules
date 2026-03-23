@@ -28,6 +28,9 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Commit / push / ship / finalize | STOP -> Run `ag commit` |
 | Done / complete / finished / merge | STOP -> Run `ag done F-XXXX`. Flush ideas via `ag todo`. |
 | Idea / remember / todo / note | STOP -> `ag todo "description"` |
+| Backlog / what's next / prioritize | STOP -> `ag backlog` to see queue |
+| Write spec / contract / acceptance criteria | STOP -> Run `ag spec F-XXXX` or `ag contract check F-XXXX` |
+| Churn / batch / all tasks / build everything | STOP -> Run `ag auto crunch`. NEVER write code for multiple features outside `ag auto`. |
 | Decompose / break down epic | STOP -> Run `ag decompose F-XXXX` |
 | Phase done / mark phase / phase progress / which phase | STOP -> Run `ag phase list F-XXXX` to see phases. `ag phase done F-XXXX <id>` to mark complete. |
 | Pending user input / contract input | STOP -> Run `ag contract pending`. Process each pending contract. |
@@ -43,7 +46,14 @@ STOP! Trigger Words (match on intent, not just exact words):
 - Keep changes small and scoped (max 5-10 files per commit).
 - Every merge: bump VERSION via `ag done`. Update CONTRIBUTIONS.md during the PR.
 - Worktree: Use `git worktree` on feature branches when another agent may be working on main.
+- NEVER write code for multiple features outside of `ag auto` commands. Batch work → `ag auto crunch`.
 - No feature inflation: improvements/enforcement/hardening of existing features are deliverables on those features, not new F-XXXX.
+
+Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
+- STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
+- JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes" "Next" "Blockers" --why "Problem"`
+- HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
+- TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`
 
 Verify: `bash tests/validate_framework.sh`
 Instruction files are part of the feature: new `ag` commands/gates MUST update all instruction files (templates, skills, memory-seed, DEVELOPER_GUIDE, HOW_IT_WORKS).

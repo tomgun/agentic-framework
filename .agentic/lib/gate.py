@@ -351,6 +351,153 @@ def check_verification_passes(feature_id: str, project_root: Path) -> GateResult
     return GateResult.allow()
 
 
+def check_pending_plan_review(project_root: Path) -> GateResult:
+    """Block if any saved plan file has **Status**: DRAFT (pending dialectical review).
+
+    Applies when plan_review_enabled: yes. DRAFT is injected mechanically by
+    on-plan-mode-exit.sh — so DRAFT always means review is pending. Plans must be
+    set to APPROVED (by the Critic+Advocate review process) before stopping.
+    """
+    plan_review_enabled = get_setting(project_root, "plan_review_enabled", "no")
+    if plan_review_enabled != "yes":
+        return GateResult.allow()
+
+    plans_dir = project_root / ".agentic" / "journal" / "plans"
+    if not plans_dir.exists():
+        return GateResult.allow()
+
+    draft_plans = []
+    for plan_file in sorted(plans_dir.glob("*-plan.md")):
+        try:
+            content = plan_file.read_text()
+            # DRAFT status = pending review
+            if re.search(r'\*\*Status\*\*:\s*DRAFT', content):
+                draft_plans.append(plan_file.name)
+            # No status line at all = also pending (pre-injection or manual save)
+            elif not re.search(r'\*\*Status\*\*:\s*\w+', content):
+                draft_plans.append(plan_file.name)
+        except OSError:
+            continue
+
+    if draft_plans:
+        return GateResult.deny([
+            f"REQUIRED: plan review pending ({', '.join(draft_plans)}) — "
+            "run Critic + Advocate review, set **Status**: APPROVED before stopping. "
+            "If this plan is abandoned, mark it **Status**: REJECTED instead."
+        ])
+    return GateResult.allow()
+
+
+def check_merge_without_done(project_root: Path) -> GateResult:
+    """Block if a recent feature branch merge has not been marked shipped.
+
+    Detects the case where `gh pr merge` was used directly (bypassing `ag merge`)
+    and the completing-work workflow was never run. Only runs when FEATURES.md exists.
+    """
+    paths = get_paths(project_root)
+    features_file = paths.features_file
+    if not features_file.exists():
+        return GateResult.allow()  # No FEATURES.md = not a structured project
+
+    try:
+        # Look for recent merge commits referencing feature branches.
+        # --format=%s %D gives subject + ref names for merge commits.
+        proc = subprocess.run(
+            ["git", "log", "--merges", "--oneline", "-10",
+             "--format=%s %D"],
+            cwd=str(project_root),
+            capture_output=True, text=True, timeout=10,
+        )
+        if proc.returncode != 0:
+            return GateResult.allow()
+
+        features_content = features_file.read_text()
+        for line in proc.stdout.strip().splitlines():
+            m = FEATURE_ID_RE.search(line)
+            if not m:
+                continue
+            feature_id = m.group(0)
+
+            # Check if feature exists in FEATURES.md and its status
+            pattern = rf"## {re.escape(feature_id)}\b.*?(?=\n## |\Z)"
+            section = re.search(pattern, features_content, re.DOTALL)
+            if not section:
+                continue  # Not in FEATURES.md — consolidated or removed, skip
+            if re.search(r'\*\*Status\*\*:\s*shipped', section.group()):
+                continue  # Already marked shipped — fine
+
+            # Feature IS in FEATURES.md but not marked shipped after merge
+            return GateResult.deny([
+                f"REQUIRED: run `ag done {feature_id}` — "
+                f"feature branch merged but {feature_id} not marked shipped in FEATURES.md"
+            ])
+
+        return GateResult.allow()
+    except (subprocess.TimeoutExpired, OSError):
+        return GateResult.allow()
+
+
+def check_feature_branch_without_pr(project_root: Path) -> GateResult:
+    """Block if on a feature branch with commits ahead of origin and no open PR.
+
+    Catches the case where work was committed to a feature branch but a PR was
+    never created. Requires `gh` CLI to be installed and authenticated.
+    """
+    try:
+        # Get current branch name
+        proc = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=str(project_root),
+            capture_output=True, text=True, timeout=10,
+        )
+        if proc.returncode != 0:
+            return GateResult.allow()
+        branch = proc.stdout.strip()
+
+        # Only check on non-trunk branches
+        if branch in ("main", "master", "develop", "HEAD"):
+            return GateResult.allow()
+
+        # Check if branch has commits ahead of its origin counterpart
+        proc = subprocess.run(
+            ["git", "rev-list", f"origin/{branch}..HEAD", "--count"],
+            cwd=str(project_root),
+            capture_output=True, text=True, timeout=10,
+        )
+        if proc.returncode != 0:
+            return GateResult.allow()  # origin branch may not exist yet (pre-push)
+
+        ahead_count = int(proc.stdout.strip() or "0")
+        if ahead_count == 0:
+            return GateResult.allow()  # Already pushed or in sync
+
+        # Check for an open PR using gh CLI
+        proc = subprocess.run(
+            ["gh", "pr", "list", "--head", branch, "--state", "open",
+             "--json", "number"],
+            cwd=str(project_root),
+            capture_output=True, text=True, timeout=15,
+        )
+        if proc.returncode != 0:
+            return GateResult.allow()  # gh not available or not authenticated
+
+        try:
+            prs = json.loads(proc.stdout)
+        except json.JSONDecodeError:
+            return GateResult.allow()
+
+        if not prs:
+            return GateResult.deny([
+                f"REQUIRED: create PR before stopping — branch '{branch}' has "
+                f"{ahead_count} commit(s) pushed to origin with no open PR. "
+                "Run: gh pr create"
+            ])
+
+        return GateResult.allow()
+    except (subprocess.TimeoutExpired, OSError):
+        return GateResult.allow()
+
+
 def check_uncommitted_changes(project_root: Path) -> GateResult:
     """Check for uncommitted changes (advisory)."""
     warnings = []
@@ -416,6 +563,18 @@ def gate_stop(feature_id: Optional[str], project_root: Path) -> GateResult:
     result = result.merge(check_uncommitted_changes(project_root))
     result = result.merge(check_journal_updated(project_root))
     result = result.merge(check_status_exists(project_root))
+
+    # A1: Block if any saved plan is still DRAFT (pending dialectical review).
+    # Applies whenever plan_review_enabled: yes, regardless of profile.
+    result = result.merge(check_pending_plan_review(project_root))
+
+    # A2: Block if a feature branch was merged but ag done was never run.
+    # Only runs when FEATURES.md exists (structured projects).
+    result = result.merge(check_merge_without_done(project_root))
+
+    # A3: Block if on a feature branch with commits ahead of origin but no PR.
+    # Requires gh CLI; gracefully skips if not available.
+    result = result.merge(check_feature_branch_without_pr(project_root))
 
     # Feature-specific checks
     if feature_id:

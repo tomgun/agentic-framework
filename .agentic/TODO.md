@@ -233,6 +233,12 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0089: Investigate: custom feature prefixes and subproduct grouping. Can users define own prefixes (e.g., AUTH-001, PAY-002) or group features by subproduct within the same repo? Currently F-XXXX is hardcoded in ids.sh regex. Consider: prefix registry in STACK.md, multi-prefix support in is_feature_id(), FEATURES.md sections per subproduct, backlog filtering by prefix. Related: monorepo/multi-component support (F-0179 components).
 - **Added**: 2026-03-23
 
+### T-0090: Remove plan.md from work/ artifact instructions — /work/plan.md is never read by CLI, state machine, or gate system; only tasks.yaml in work/ is functional. Remove plan.md from 'Write artifacts to .agentic/work/F-XXXX/' line in all instruction files (CLAUDE.md template+root, cursorrules, copilot, codex, memory-seed). Background: investigated during F-0193 drift fix session, F-0302 has orphaned work/plan.md. Related: spec.md/review.md/journal.md in work/ may be similarly unused — verify.
+- **Added**: 2026-03-23
+
+### T-0091: Investigate deadweight artifacts: work/plan.md (and possibly work/spec.md, work/review.md) are written by agents per instruction but never read by state machine/CLI. Clarify: should these be removed from instructions, or should CLI gain awareness of them? Related: what other work/ artifacts are similarly orphaned?
+- **Added**: 2026-03-23
+
 ## Done
 
 

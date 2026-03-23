@@ -35,9 +35,14 @@ fi
 # Confirm it's actually gh pr merge (not just mentioned in output/comments)
 if [[ -n "$COMMAND" ]] && echo "$COMMAND" | grep -qE 'gh\s+pr\s+merge'; then
   echo ""
-  echo "⚠️  USE ag merge INSTEAD OF gh pr merge"
+  echo "⚠️  MERGE DETECTED WITHOUT ag merge"
   echo "   ag merge chains ag done automatically: dogfood, VERSION, backlog, flush."
-  echo "   Since you already ran gh pr merge, run: ag done F-XXXX"
+  echo ""
+  echo "REQUIRED NEXT ACTION:"
+  echo "   Run: ag done F-XXXX"
+  echo "   (Marks feature shipped, bumps VERSION, syncs instruction files, updates backlog)"
+  echo ""
+  echo "   If you don't know the feature ID, run: ag status"
   echo ""
 fi
 

@@ -4370,3 +4370,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-23 20:00 - Fix Hook Automation Gaps + Instruction File Drift
+
+**Why**: Hooks exited 0 and agents ignored advisory warnings; templates and root files had significant drift after F-0193
+
+**What changed**:
+- gate_stop() now blocks on DRAFT plans, unshipped merges, and unpushed feature branches without PRs; on-plan-mode-exit.sh injects Status: DRAFT mechanically; on-bash-merge-detect.sh shows structured REQUIRED NEXT ACTION block; SKILL.md warns agents to use ag implement CLI; 5 instruction files synced with missing trigger rows and rules
+
+**Next steps**:
+- Review and commit
+
+**Blockers**: None
+
+
+### Session: 2026-03-23 20:36 - Fix Hook Automation Gaps + Instruction File Drift
+
+**Why**: Hooks exited 0 (advisory only) so agents could ignore them; templates had significant drift after F-0193
+
+**What changed**:
+- gate_stop() now blocks on DRAFT plans, unshipped merges, and unpushed feature branches; on-plan-mode-exit.sh mechanically injects Status: DRAFT; on-bash-merge-detect.sh shows structured REQUIRED NEXT ACTION block; SKILL.md warns agents to use ag implement CLI; 5 instruction files synced; root CLAUDE.md path bug fixed (work/ → journal/plans/)
+
+**Next steps**:
+- Review + commit
+
+**Blockers**: None
+
