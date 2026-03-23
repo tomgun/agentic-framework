@@ -1,0 +1,39 @@
+# YAML Contract — machine-verifiable feature specification
+# Docs: see DEVELOPER_GUIDE.md "Working with Contracts"
+# Commands: ag contract check | ag contract set | ag contract add-assertion
+#
+# Lifecycle: exploring → specifying → implementing → shipped
+# Protection: none (draft) → advisory (specifying) → contract (shipped)
+
+id: F-0001
+name: First Feature
+lifecycle: exploring
+description: |
+  TODO: Describe what this feature does and why it exists.
+  Write from the user's perspective — what changes for them?
+
+# Human writes change requests here. Agent detects non-empty field,
+# updates tests → code → migration → spec → clears field.
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "TODO: First acceptance criterion — specific, testable, unambiguous"
+    type: structural
+    verify: null
+    tests: []
+    draft: true
+
+# Optional fields (uncomment as needed):
+# since: v0.1.0
+# profile: both           # formal | discovery | both
+# protection: none        # none | advisory | contract
+# category: uncategorized
+# consolidated_from: []
+# parent: null
+# children: []
+# tags: []
+# nfr_refs: []
+# migrations: []
+# scenarios: []
+# notes: ""

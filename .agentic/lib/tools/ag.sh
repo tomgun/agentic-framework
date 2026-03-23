@@ -381,6 +381,10 @@ case "${1:-help}" in
     run)
         bash "$SCRIPT_DIR/run.sh"
         ;;
+    migrate-specs)
+        shift
+        python3 "$SCRIPT_DIR/migrate-specs.py" --project-root "$ROOT_DIR" "$@"
+        ;;
     formalize)
         shift
         bash "$SCRIPT_DIR/formalize.sh" "$@"

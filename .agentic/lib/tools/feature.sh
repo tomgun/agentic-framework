@@ -88,6 +88,37 @@ if [[ "${FIELD}" == "add" ]]; then
 EOF
 
   echo "✓ Added ${FEATURE_ID}: ${FEATURE_NAME} (domain: ${DOMAIN}) to FEATURES.md"
+
+  # Auto-create draft contract if contracts dir exists and contract doesn't
+  CONTRACTS_DIR="${SPEC_DIR}/contracts"
+  CONTRACT_FILE="${CONTRACTS_DIR}/${FEATURE_ID}.yaml"
+  if [[ -d "${CONTRACTS_DIR}" ]] && [[ ! -f "${CONTRACT_FILE}" ]]; then
+    if command -v python3 >/dev/null 2>&1; then
+      _AG_CONTRACT_FILE="$CONTRACT_FILE" \
+      _AG_FEATURE_ID="$FEATURE_ID" \
+      _AG_NAME="$FEATURE_NAME" \
+      PYTHONPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../" python3 -c "
+import os
+from pathlib import Path
+from contracts import Contract, Assertion, save_contract
+
+contract = Contract(
+    id=os.environ['_AG_FEATURE_ID'],
+    name=os.environ['_AG_NAME'],
+    lifecycle='exploring',
+    description='TODO: Describe what this feature does and why it exists.',
+    assertions=[
+        Assertion(id='AC-001', text='TODO: First acceptance criterion', type='structural', draft=True),
+    ],
+    protection='none',
+    category='${DOMAIN}',
+)
+save_contract(contract, Path(os.environ['_AG_CONTRACT_FILE']))
+print(f\"  + Created draft contract: {os.environ['_AG_CONTRACT_FILE']}\")
+" 2>/dev/null || true
+    fi
+  fi
+
   exit 0
 fi
 
