@@ -22,6 +22,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag next` — show what to do next
 - `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
 - `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list`
+- `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`. The CLI tells you what's missing — if a transition is blocked, it shows exactly which artifacts to create.
@@ -49,6 +50,7 @@ Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and
 - Pending user input: "pending user input/contract input" → run `ag contract pending`. Process each pending contract.
 - Never fabricate APIs, data, or behavior. If uncertain, ask.
 - NEVER write code for multiple features outside of `ag auto` commands. If a user says "build everything", "churn all tasks", or similar batch-work phrases, use `ag auto crunch` — not direct Write/Edit calls. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs. **Wrong rationalizations:** "I can implement it directly faster" — NO. "ag auto crunch spawns subprocesses, I have full context" — NO. "The user said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
+- No feature inflation: improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX. Ask "which existing feature owns this?" before proposing a new capability ID.
 
 Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`

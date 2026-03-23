@@ -18,8 +18,9 @@ metadata:
 Run `ag done F-XXXX` — it verifies contracts, bumps VERSION, updates FEATURES.md, and flushes state.
 
 ## Before running `ag done`
-1. Verify contract assertions: `ag contract check F-XXXX` (all assertions must pass)
-2. Complete WIP: `bash .agentic/lib/tools/wip.sh complete`
+1. Check phase completion: `ag phase list F-XXXX` — if phases exist, all must be complete/dropped (or use `--force-phases`)
+2. Verify contract assertions: `ag contract check F-XXXX` (all assertions must pass)
+3. Complete WIP: `bash .agentic/lib/tools/wip.sh complete`
 3. Update feature status: `bash .agentic/lib/tools/feature.sh F-XXXX status shipped`
 4. Update journal: `bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Capability" "Next" "None" --why "Reason"`
 5. Update status: `bash .agentic/lib/tools/status.sh focus "F-XXXX shipped"`
