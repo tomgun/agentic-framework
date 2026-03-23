@@ -88,7 +88,7 @@ fi
 
 # --- Autonomous work pattern detection (F-0300 R2) ---
 # Warn when prompt mentions implementing multiple features directly
-MULTI_FEATURE_COUNT=$(echo "$USER_PROMPT" | grep -oE 'F-[0-9]{4,}' | sort -u | wc -l | tr -d ' ')
+MULTI_FEATURE_COUNT=$(echo "$USER_PROMPT" | grep -oE "$FEATURE_ID_ERE" | sort -u | wc -l | tr -d ' ')
 if [[ "$MULTI_FEATURE_COUNT" -gt 1 ]] && echo "$USER_PROMPT" | grep -qiE '(implement|build|write|code|create)'; then
   echo ""
   echo "⚠️  Multiple features referenced ($MULTI_FEATURE_COUNT). Implement one at a time."
@@ -98,7 +98,7 @@ fi
 
 # --- Phase-aware verification (v0.11.0) ---
 # Check if user prompt contains "implement" trigger and warn if no acceptance
-if [[ "$USER_PROMPT" =~ [Ii]mplement.*(F-[0-9]{4,}) ]]; then
+if [[ "$USER_PROMPT" =~ [Ii]mplement.*($FEATURE_ID_ERE) ]]; then
   FEATURE_ID="${BASH_REMATCH[1]}"
   if [[ ! -f ".agentic/spec/contracts/${FEATURE_ID}.yaml" ]] && [[ ! -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
     echo ""
@@ -138,7 +138,7 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
     fi
     if [[ -n "$FEATURES_FILE" ]]; then
       # Extract F-XXXX from last 5 commit messages (catches squash merges)
-      RECENT_FIDS=$(git log -5 --format=%s 2>/dev/null | grep -oE 'F-[0-9]{4,}' | sort -u || true)
+      RECENT_FIDS=$(git log -5 --format=%s 2>/dev/null | grep -oE "$FEATURE_ID_ERE" | sort -u || true)
       if [[ -n "$RECENT_FIDS" ]]; then
         UNSHIPPED=""
         for fid in $RECENT_FIDS; do
@@ -165,7 +165,7 @@ fi
 # When user says "done/finished/complete" with a feature reference, check for verification
 if echo "$USER_PROMPT" | grep -qiE '(done|finished|complete|ship)\b'; then
   # Try to extract feature ID from prompt
-  DONE_FEATURE=$(echo "$USER_PROMPT" | grep -oE 'F-[0-9]{4,}' | head -1) || true
+  DONE_FEATURE=$(echo "$USER_PROMPT" | grep -oE "$FEATURE_ID_ERE" | head -1) || true
   if [[ -n "$DONE_FEATURE" ]]; then
     if [[ ! -f ".agentic/work/$DONE_FEATURE/verification.json" ]]; then
       echo ""
@@ -210,7 +210,7 @@ if [[ -d ".agentic/journal/plans" ]]; then
       [[ -f "$plan_file" ]] || continue
       if grep -q '^\*\*Status\*\*.*DRAFT' "$plan_file" 2>/dev/null || \
          grep -q '^Status:.*DRAFT' "$plan_file" 2>/dev/null; then
-        PLAN_FID=$(basename "$plan_file" | grep -oE 'F-[0-9]{4,}' | head -1) || true
+        PLAN_FID=$(basename "$plan_file" | grep -oE "$FEATURE_ID_ERE" | head -1) || true
         DRAFT_PLANS="${DRAFT_PLANS}${PLAN_FID:-unknown} "
       fi
     done

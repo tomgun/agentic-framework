@@ -23,6 +23,7 @@ from typing import Optional
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
+from ids import FEATURE_HEADER_RE  # noqa: E402
 
 from auto.engine import EngineState  # noqa: E402
 from auto.task import TaskRunner  # noqa: E402 — used by scheduler, kept for traceability
@@ -238,7 +239,7 @@ class CrunchRunner:
         # Match heading format: ## F-XXXX: Name followed by **Status**: value
         current_fid = None
         for line in content.splitlines():
-            header = re.match(r"^## (F-\d{4,}):", line)
+            header = FEATURE_HEADER_RE.match(line)
             if header:
                 current_fid = header.group(1)
                 continue

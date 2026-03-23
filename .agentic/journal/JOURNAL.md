@@ -4343,3 +4343,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-23 16:51 - Backlog cleanup
+
+**Why**: Post-consolidation backlog had 14 orphaned F-XXXX IDs not in FEATURES.md — agents would be blocked by ag implement
+
+**What changed**:
+- Dropped F-0213, converted 4 items to tasks, added 9 planned features to FEATURES.md, reordered backlog with F-0193 current, fixed depends_on display bug
+
+**Next steps**:
+- F-0193 implementation
+
+**Blockers**: None
+
+
+### Session: 2026-03-23 18:58 - F-0193 Centralized IDs
+
+**Why**: AC-003/AC-004 required all files use centralized imports — 10+ files still had inline patterns after prior refactoring wave
+
+**What changed**:
+- Replaced all inline feature ID patterns (14 Python, 4 shell) with centralized imports from ids.py/ids.sh. Zero remaining inline patterns outside source modules.
+
+**Next steps**:
+- Ship F-0193: advance lifecycle states
+
+**Blockers**: None
+

@@ -35,6 +35,7 @@ from typing import Callable, Optional
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
+from ids import FEATURE_HEADER_RE  # noqa: E402
 
 from auto.gates import GateResult, register_default_gates  # noqa: E402
 
@@ -235,7 +236,7 @@ class FeatureStateMachine:
         # Extract the section (up to the next feature header or end of file)
         section_start = match.end()
         section = content[section_start:]
-        next_header = re.search(r"^## F-\d{4,}:", section, re.MULTILINE)
+        next_header = FEATURE_HEADER_RE.search(section)
         if next_header:
             section = section[:next_header.start()]
 
@@ -519,7 +520,7 @@ class FeatureStateMachine:
         results: list[tuple[str, FeatureState, list[FeatureState]]] = []
         content = features_file.read_text()
 
-        for match in re.finditer(r"^## (F-\d{4,}):", content, re.MULTILINE):
+        for match in FEATURE_HEADER_RE.finditer(content):
             fid = match.group(1)
             current = self.get_current_state(fid)
             if current is None:

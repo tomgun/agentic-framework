@@ -1,19 +1,25 @@
 [
   {
     "type": "feature",
-    "id": "F-0243",
-    "description": "Complexity Tier Experiments",
-    "added_at": "2026-03-20T14:38:37Z",
+    "id": "F-0193",
+    "description": "Collision-Proof Feature IDs",
+    "added_at": "2026-03-16T18:56:13Z",
     "added_by": "agent",
     "became_current_at": "2026-03-23T16:10:58Z"
   },
   {
     "type": "feature",
-    "id": "F-0223",
-    "description": "Later State Machine Gates Strengthening",
-    "added_at": "2026-03-16T18:56:12Z",
+    "id": "F-0243",
+    "description": "Complexity Tier Experiments",
+    "added_at": "2026-03-20T14:38:37Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "Strengthen later state machine gates (advisory→blocking)",
+    "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
-    "became_current_at": "2026-03-20T13:18:28Z"
+    "notes": "Originally F-0223. Improvement to F-0004 (Feature Tracking & Lifecycle)"
   },
   {
     "type": "feature",
@@ -23,25 +29,11 @@
     "added_by": "agent"
   },
   {
-    "type": "feature",
-    "id": "F-0193",
-    "description": "Collision-Proof Feature IDs",
-    "added_at": "2026-03-16T18:56:13Z",
-    "added_by": "agent"
-  },
-  {
-    "type": "feature",
-    "id": "F-0210",
-    "description": "Configurable Definition of Done per Task Type",
-    "added_at": "2026-03-16T18:56:13Z",
-    "added_by": "agent"
-  },
-  {
-    "type": "feature",
-    "id": "F-0213",
-    "description": "Unified Work Queue & Feature Registry Redesign",
-    "added_at": "2026-03-16T18:56:14Z",
-    "added_by": "agent"
+    "type": "task",
+    "description": "Configurable Definition of Done per task type",
+    "added_at": "2026-03-23T17:00:00Z",
+    "added_by": "agent",
+    "notes": "Originally F-0210. Improvement to F-0003 (Spec-Driven Development)"
   },
   {
     "type": "feature",
@@ -49,6 +41,13 @@
     "description": "Workflow Definition File",
     "added_at": "2026-03-16T18:56:15Z",
     "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "E2E workflow integration test (full lifecycle)",
+    "added_at": "2026-03-23T17:00:00Z",
+    "added_by": "agent",
+    "notes": "Originally F-0227. Improvement to F-0122 (Testing Infrastructure)"
   },
   {
     "type": "feature",
@@ -62,21 +61,15 @@
     "id": "F-0212",
     "description": "Project Customization Auto-Sync",
     "added_at": "2026-03-16T18:56:15Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "depends_on": "F-0211"
   },
   {
-    "type": "feature",
-    "id": "F-0227",
-    "description": "End-to-End Workflow Integration Test",
-    "added_at": "2026-03-16T18:56:15Z",
-    "added_by": "agent"
-  },
-  {
-    "type": "feature",
-    "id": "F-0233",
-    "description": "Design Phase Formalization",
-    "added_at": "2026-03-16T18:56:16Z",
-    "added_by": "agent"
+    "type": "task",
+    "description": "Design phase formalization",
+    "added_at": "2026-03-23T17:00:00Z",
+    "added_by": "agent",
+    "notes": "Originally F-0233. Improvement to F-0120 (Plan & Design Review)"
   },
   {
     "type": "feature",
@@ -90,13 +83,15 @@
     "id": "F-0231",
     "description": "Multi-Repo Umbrella",
     "added_at": "2026-03-16T18:56:16Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "depends_on": "F-0230"
   },
   {
     "type": "feature",
     "id": "F-0232",
     "description": "Full Autonomous Scheduling",
     "added_at": "2026-03-16T18:56:16Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "depends_on": "F-0230"
   }
 ]

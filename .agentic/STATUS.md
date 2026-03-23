@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- ADR-001 roadmap execution: F-0243 (Complexity Tier Experiments) is current backlog item (Updated: 2026-03-23 16:10 UTC)
+- Backlog cleanup complete. Next: F-0193 (Collision-Proof Feature IDs) — approved plan ready for implementation (Updated: 2026-03-23 16:42 UTC)
 
 ## Current focus
 - **F-0302: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

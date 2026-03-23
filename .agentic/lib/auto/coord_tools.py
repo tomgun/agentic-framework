@@ -17,6 +17,7 @@ from pathlib import Path
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
+from ids import FEATURE_HEADER_RE  # noqa: E402
 
 
 def _iso_now() -> str:
@@ -165,7 +166,7 @@ def _parse_feature_statuses(features_file: Path) -> list[dict]:
     content = features_file.read_text()
     current_id = None
     for line in content.splitlines():
-        m = re.match(r'^## (F-\d{4,}):', line)
+        m = FEATURE_HEADER_RE.match(line)
         if m:
             current_id = m.group(1)
             continue

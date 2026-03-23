@@ -40,6 +40,7 @@ from typing import Optional
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
+from ids import FEATURE_ID_RE  # noqa: E402
 
 
 def _now_iso() -> str:
@@ -537,12 +538,12 @@ def cmd_migrate_wip(agents_file: Path, wip_path: str) -> int:
         if line.startswith("- **Feature**:"):
             rest = line.split(":", 1)[1].strip() if ":" in line else ""
             # Try to extract F-XXXX
-            m = re.search(r'F-\d{4,}', rest)
+            m = FEATURE_ID_RE.search(rest)
             if m:
                 feature_id = m.group(0)
             # Description is after the feature ID
             desc_part = re.sub(r'^\*\*Feature\*\*:\s*', '', line.lstrip('- '))
-            desc_part = re.sub(r'F-\d{4,}:\s*', '', desc_part)
+            desc_part = FEATURE_ID_RE.sub('', desc_part).lstrip(': ')
             if desc_part:
                 description = desc_part
         elif line.startswith("- **Agent**:"):
