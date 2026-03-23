@@ -29,7 +29,10 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Commit / push / ship / finalize | STOP -> Run `ag commit` |
 | Done / complete / finished / merge | STOP -> Run `ag done F-XXXX`. Flush ideas via `ag todo`. |
 | Idea / remember / todo / note | STOP -> `ag todo "description"` |
+| Backlog / what's next / prioritize | STOP -> `ag backlog` to see queue |
+| Write spec / contract / acceptance criteria | STOP -> Run `ag spec F-XXXX` or `ag contract check F-XXXX` |
 | Decompose / break down epic | STOP -> Run `ag decompose F-XXXX` |
+| Phase done / mark phase / phase progress / which phase | STOP -> Run `ag phase list F-XXXX` to see phases. `ag phase done F-XXXX <id>` to mark complete. |
 | Pending user input / contract input | STOP -> Run `ag contract pending`. Process each pending contract. |
 | Migrate specs / convert acceptance | STOP -> Run `ag migrate-specs` (converts markdown ACs to YAML contracts). |
 | Plan created / exited plan mode | STOP -> Save plan, run dialectical review if enabled, then implement |
@@ -45,10 +48,11 @@ STOP! Trigger Words (match on intent, not just exact words):
 - Every merge: bump VERSION via `ag done`. Update CONTRIBUTIONS.md during the PR.
 - Multi-session safety: never run destructive git ops when other sessions may be active.
 - NEVER write code for multiple features outside of `ag auto` commands. Batch work → `ag auto crunch`.
+- No feature inflation: improvements/enforcement/hardening of existing features are deliverables on those features, not new F-XXXX.
 
 Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
-- JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"`
+- JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes" "Next" "Blockers" --why "Problem"`
 - HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
 - TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`
 

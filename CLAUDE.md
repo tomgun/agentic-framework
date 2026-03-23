@@ -26,6 +26,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag info F-XXXX` — detailed work item info with next steps
 - `ag next` — show what to do next
 - `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list`
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 - `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve`
@@ -36,16 +37,19 @@ Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `
 ## Core Rules
 
 - Interactive sessions: show changes to human before committing. Autonomous/non-interactive sessions: commit directly, using `review_commit` setting.
-- PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking.
-- Add/update tests for new/changed logic. Write tests alongside code.
+- PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). If `git_mode` is `deferred` or `none`, skip git operations — suggest `ag git-init` when the user wants to commit. After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking.
+- Add/update tests for new/changed logic. Write tests alongside code, not after.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
 - Keep changes small and scoped (max 5-10 files per commit).
-- Plans are durable: save to `.agentic/work/F-XXXX/plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
+- Plans are durable: save to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
 - Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.
 - Multi-session safety: Before ANY destructive git op, run `python3 .agentic/lib/tools/agents_helpers.py --project-root . count-others "$(pwd)" --pid $PPID`. If >0, DO NOT PROCEED — use a worktree or commit first.
 - Log user's design insights to .agentic/CONTRIBUTIONS.md. Every merge: bump VERSION via `ag done` (not in the PR).
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
-- NEVER write code for multiple features outside of `ag auto` commands. If a user says "build everything", "churn all tasks", or similar batch-work phrases, use `ag auto crunch` — not direct Write/Edit calls. **Wrong rationalizations:** "I can implement it directly faster" — NO. "ag auto crunch spawns subprocesses, I have full context" — NO. "The user said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
+- Pending user input: "pending user input/contract input" → run `ag contract pending`. Process each pending contract.
+- Migrate specs: "migrate specs/convert acceptance" → run `ag migrate-specs` (converts markdown ACs to YAML contracts).
+- Never fabricate APIs, data, or behavior. If uncertain, ask.
+- NEVER write code for multiple features outside of `ag auto` commands. If a user says "build everything", "churn all tasks", or similar batch-work phrases, use `ag auto crunch` — not direct Write/Edit calls. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs. **Wrong rationalizations:** "I can implement it directly faster" — NO. "ag auto crunch spawns subprocesses, I have full context" — NO. "The user said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
 - No feature inflation: improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX. Ask "which existing feature owns this?" before proposing a new capability ID.
 - Behavioral corrections belong in instruction files: When a correction applies to this project, update CLAUDE.md or the relevant skill file — don't write a memory as a substitute.
 
@@ -54,7 +58,7 @@ Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `
 Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and wait for user input.
 
 After ExitPlanMode — auto-continue the full sequence:
-1. Save plan to `.agentic/work/F-XXXX/plan.md` with `**Status**: DRAFT`
+1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT`
 2. Spawn Critic + Advocate agents in parallel (fresh context)
 3. Synthesize with Revision Guidance
 4. Check `plan_review_convergence` in STACK.md:

@@ -26,6 +26,12 @@ Key commands:
 - `ag ship F-XXXX` — prepare to ship
 - `ag contract check F-XXXX` — verify contract assertions pass
 
+## REQUIRED: Use the CLI
+
+> **Always call `ag implement F-XXXX` as a CLI command — do NOT start coding directly.**
+> `ag implement` enforces plan-approval gates (Step 0.5), spec checks, and sets up the
+> worktree. Bypassing it breaks the enforcement chain and allows DRAFT plans to reach code.
+
 ## Preconditions
 - Feature must have a YAML contract at `spec/contracts/F-XXXX.yaml` with assertions
 - Contract lifecycle must be `specifying` or later (not `exploring`)

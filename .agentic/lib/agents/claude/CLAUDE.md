@@ -24,28 +24,32 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list`
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
+- `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve`
+- `ag coord start` | `ag coord stop` | `ag coord status`
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`. The CLI tells you what's missing — if a transition is blocked, it shows exactly which artifacts to create.
 
 ## After Plan Mode Exits (when `plan_review_enabled: yes`)
 
 Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and wait for user input.
-1. Save plan to `.agentic/work/F-XXXX/plan.md` with `**Status**: DRAFT`
+1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT`
 2. Spawn Critic + Advocate agents in parallel (fresh context)
 3. Synthesize with Revision Guidance
 4. Check `plan_review_convergence` in STACK.md: `auto` → approve on convergence; `manual` → present to user
 5. After APPROVED → run `ag transition F-XXXX implementation`
 
-**Wrong rationalizations:** "User created the plan so it's reviewed" — NO. "Plan mode exit = approval" — NO. "Simple plan, review unnecessary" — NO. Review is structural, not discretionary.
+**Wrong rationalizations:** "User created the plan so it's reviewed" — NO. "Plan mode exit = approval" — NO. "Simple plan, review unnecessary" — NO. "Proceed with refinements during implementation" — NO. Review is structural, not discretionary.
 
 ## Core Rules
 
-- Never auto-commit in interactive sessions. Show changes to human first.
-- PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). If `git_mode` is `deferred` or `none`, skip git operations — suggest `ag git-init` when the user wants to commit.
+- Interactive sessions: show changes to human before committing. Autonomous/non-interactive sessions: commit directly, using `review_commit` setting.
+- PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). If `git_mode` is `deferred` or `none`, skip git operations — suggest `ag git-init` when the user wants to commit. After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking.
 - Add/update tests for new/changed logic. Write tests alongside code, not after.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
 - Keep changes small and scoped (max 5-10 files per commit).
 - Multi-session safety: Before ANY destructive git op, check for other active sessions via `agents_helpers.py count-others`. If >0, use a worktree or commit first.
+- Plans are durable: save to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
+- Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 - Pending user input: "pending user input/contract input" → run `ag contract pending`. Process each pending contract.
 - Migrate specs: "migrate specs/convert acceptance" → run `ag migrate-specs` (converts markdown ACs to YAML contracts).
@@ -60,3 +64,11 @@ Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
 - FEATURES.md: `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 - TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`
+
+## Skills & Workflows
+
+Workflow triggers are handled by Skills in `.claude/skills/`. Each skill has instructions, scripts, and references for its workflow.
+
+Subagent context: `bash .agentic/lib/tools/context-for-role.sh <role> <feature-id>`. Subagents do NOT inherit CLAUDE.md.
+
+Memory seed: At session start, check persistent memory for framework patterns. If stale, read `.agentic/lib/init/memory-seed.md` and write rules to memory.

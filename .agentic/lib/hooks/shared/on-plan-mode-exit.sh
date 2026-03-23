@@ -53,6 +53,14 @@ if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
     LATEST_PLAN=$(ls -t "$PROJECT_ROOT/.agentic/journal/plans/"*-plan.md 2>/dev/null | head -1)
     FEATURE_ID="F-XXXX"
     if [[ -n "$LATEST_PLAN" ]]; then
+        # A1: Inject **Status**: DRAFT mechanically if no status line exists yet.
+        # This fires on every ExitPlanMode — no agent cooperation needed.
+        # gate_stop() checks for DRAFT to block premature stops until APPROVED.
+        if ! grep -q '^\*\*Status\*\*:' "$LATEST_PLAN" 2>/dev/null; then
+            TMP=$(mktemp)
+            { echo "**Status**: DRAFT"; echo ""; cat "$LATEST_PLAN"; } > "$TMP"
+            mv "$TMP" "$LATEST_PLAN"
+        fi
         PLAN_BASENAME=$(basename "$LATEST_PLAN")
         # Extract F-XXXX from filename like 2026-03-17-F-0234-plan.md
         PARSED_FID=$(echo "$PLAN_BASENAME" | grep -oE "$FEATURE_ID_ERE" | head -1)
