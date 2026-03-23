@@ -29,3 +29,4 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - NEVER write code for multiple features outside of `ag auto` commands. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs — not just code.
 - **No feature inflation**: Improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX. Ask "which existing feature owns this?" before proposing a new ID.
 - **Behavioral corrections belong in instruction files**: When a correction applies to this project, update CLAUDE.md or the relevant skill file — don't write a memory as a substitute.
+- **Feature ID patterns are centralized**: `ids.py` (Python) and `ids.sh` (shell) are the single source of truth for feature ID regexes. Import `FEATURE_ID_RE`, `FEATURE_HEADER_RE`, etc. — never inline `F-\d{4,}` or `F-[0-9]{4,}` patterns in code.

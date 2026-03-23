@@ -36,6 +36,7 @@ sys.path.insert(0, str(_LIB_DIR))
 sys.path.insert(0, str(_LIB_DIR / "tools"))
 
 from auto import SpawnResult, spawn_claude, discover_jsonl  # noqa: E402
+from ids import FEATURE_ID_RE, FEATURE_HEADER_RE  # noqa: E402
 
 # Lazy-loaded module cache for session-analyze.py (hyphenated filename)
 _session_analyze_mod = None
@@ -350,7 +351,7 @@ class MilestoneChecker:
         if not features.exists():
             return MilestoneResult("kickoff_complete", False, "FEATURES.md not found")
         content = features.read_text()
-        if not re.search(r"F-\d{4,}", content):
+        if not FEATURE_ID_RE.search(content):
             return MilestoneResult("kickoff_complete", False, "No F-XXXX entries in FEATURES.md")
         return MilestoneResult("kickoff_complete", True)
 
@@ -879,7 +880,7 @@ class ExpectationChecker:
                 )
             content = features_path.read_text()
             # Evidence of ag kickoff: F-XXXX entries with Status fields
-            has_feature_ids = re.search(r"## F-\d{4,}:", content)
+            has_feature_ids = FEATURE_HEADER_RE.search(content)
             has_status_fields = re.search(r"\*\*Status\*\*:", content)
             if has_feature_ids and has_status_fields:
                 return MilestoneResult(

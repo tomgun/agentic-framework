@@ -359,9 +359,9 @@ YAML contracts replace markdown acceptance criteria as source of truth. Machine-
 
 ## F-0193: Collision-Proof Feature IDs
 
-**Status**: planned | **Category**: core-workflow | **Profile**: both
+**Status**: implementing | **Category**: core-workflow | **Profile**: both
 
-Hash-based feature IDs that eliminate collision risk when multiple agents create features concurrently.
+Centralized feature ID patterns via `ids.py` (Python) and `ids.sh` (shell). All feature ID regexes (`FEATURE_ID_RE`, `FEATURE_HEADER_RE`, `FEATURE_ID_ERE`, etc.) are defined once and imported everywhere — no inline patterns in consuming code. JSON schemas widened to `{4,}` digits for future-proofing.
 
 ---
 

@@ -24,8 +24,9 @@ cd "$PROJECT_ROOT" 2>/dev/null || exit 0
 # Fast path: skip if not an agentic project
 [[ -d ".agentic" ]] || exit 0
 
-# Source framework settings
+# Source framework settings and ID patterns
 source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || exit 0
+source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
 
 # --- Read stdin ONCE (consumed on read, shared by all checks) ---
 STDIN_DATA=""
@@ -100,7 +101,7 @@ for plan_file in .agentic/journal/plans/*-plan.md; do
   [[ -f "$plan_file" ]] || continue
   if grep -q '^\*\*Status\*\*.*DRAFT' "$plan_file" 2>/dev/null || \
      grep -q '^Status:.*DRAFT' "$plan_file" 2>/dev/null; then
-    PLAN_FID=$(basename "$plan_file" | grep -oE 'F-[0-9]{4,}' | head -1)
+    PLAN_FID=$(basename "$plan_file" | grep -oE "$FEATURE_ID_ERE" | head -1)
     DRAFT_PLANS="${DRAFT_PLANS}${PLAN_FID:-unknown} "
     DRAFT_FILES="${DRAFT_FILES}${plan_file} "
   fi

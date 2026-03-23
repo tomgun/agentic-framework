@@ -40,7 +40,7 @@ from auto.components import Component, load_registry  # noqa: E402
 # ---------------------------------------------------------------------------
 
 from ids import FEATURE_ID_STRICT_RE as _FEATURE_ID_RE  # noqa: E402
-from ids import FEATURE_HEADER_RE, is_valid_feature_id, format_feature_id  # noqa: E402
+from ids import FEATURE_ID_RE, FEATURE_HEADER_RE, is_valid_feature_id, format_feature_id  # noqa: E402
 from ids import get_next_feature_id  # noqa: E402
 
 
@@ -536,7 +536,7 @@ def _get_feature_parent(features_file: Path, feature_id: str) -> Optional[str]:
 
     section = _extract_section(content, match.end())
     parent_match = re.search(
-        r"(?:\*\*Parent\*\*|- Parent):\s*(F-\d{4,})", section
+        r"(?:\*\*Parent\*\*|- Parent):\s*" + FEATURE_ID_RE.pattern, section
     )
     return parent_match.group(1) if parent_match else None
 

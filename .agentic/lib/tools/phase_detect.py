@@ -13,6 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from settings import get_setting
 from paths import get_paths
+from ids import FEATURE_ID_RE
 
 
 def detect_phase(root: Path) -> str:
@@ -55,10 +56,10 @@ def detect_phase(root: Path) -> str:
         return "start"
 
     # Match WIP.md format: **Feature**: F-0001
-    feature_match = re.search(r"\*\*Feature\*\*:\s*(F-\d{4,})", wip_content)
+    feature_match = re.search(r"\*\*Feature\*\*:\s*" + FEATURE_ID_RE.pattern, wip_content)
     if not feature_match:
         # Also try simpler format: Feature: F-0001
-        feature_match = re.search(r"Feature:\s*(F-\d{4,})", wip_content)
+        feature_match = re.search(r"Feature:\s*" + FEATURE_ID_RE.pattern, wip_content)
 
     if not feature_match:
         return "start"

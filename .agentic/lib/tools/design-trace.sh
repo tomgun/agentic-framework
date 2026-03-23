@@ -74,7 +74,7 @@ SOURCE_COUNT=0
 CURRENT_FID=""
 while IFS= read -r line; do
     # Feature header: ## F-XXXX: Name
-    if [[ "$line" =~ ^##[[:space:]]+(F-[0-9]{4,}): ]]; then
+    if [[ "$line" =~ ^##[[:space:]]+($FEATURE_ID_ERE): ]]; then
         CURRENT_FID="${BASH_REMATCH[1]}"
         continue
     fi

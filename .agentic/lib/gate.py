@@ -38,6 +38,7 @@ _LIB_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
 from settings import get_setting  # noqa: E402
+from ids import FEATURE_ID_RE, is_valid_feature_id  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -144,11 +145,11 @@ def _feature_from_status(paths) -> Optional[str]:
         for line in content.splitlines():
             lower = line.lower()
             if 'focus' in lower or 'session state' in lower or 'current' in lower:
-                m = re.search(r'F-\d{4,}', line)
+                m = FEATURE_ID_RE.search(line)
                 if m:
                     return m.group(0)
         # Fall back to first F-XXXX anywhere
-        m = re.search(r'F-\d{4,}', content)
+        m = FEATURE_ID_RE.search(content)
         if m:
             return m.group(0)
     except OSError:
@@ -167,7 +168,7 @@ def _feature_from_backlog(paths) -> Optional[str]:
         if items:
             first = items[0]
             fid = first.get("id") or first.get("feature_id") or ""
-            if re.match(r'F-\d{4,}', fid):
+            if is_valid_feature_id(fid):
                 return fid
     except (json.JSONDecodeError, OSError):
         pass

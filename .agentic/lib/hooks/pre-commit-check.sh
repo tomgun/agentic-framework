@@ -1218,7 +1218,7 @@ if [[ $_FAST_MODE -eq 0 ]]; then
       CURRENT_FEATURE=""
       while IFS= read -r line; do
         # Track feature headers (both added and context lines)
-        if [[ "$line" =~ ^[\ +]##\ (F-[0-9]{4,}): ]]; then
+        if [[ "$line" =~ ^[\ +]##\ ($FEATURE_ID_ERE): ]]; then
           CURRENT_FEATURE="${BASH_REMATCH[1]}"
         fi
         # Detect newly-added shipped status (lines starting with +)

@@ -31,6 +31,7 @@ _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 sys.path.insert(0, str(_LIB_DIR / "tools"))
 from paths import get_paths  # noqa: E402
+from ids import FEATURE_HEADER_RE  # noqa: E402
 
 from auto.engine import EngineState  # noqa: E402
 from auto.task import TaskRunner, TaskResult  # noqa: E402
@@ -581,7 +582,7 @@ class AutonomousScheduler:
 
         # Extract section
         section = content[match.end():]
-        next_header = re.search(r"^## F-\d{4,}:", section, re.MULTILINE)
+        next_header = FEATURE_HEADER_RE.search(section)
         if next_header:
             section = section[:next_header.start()]
 
