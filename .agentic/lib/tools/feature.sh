@@ -97,6 +97,7 @@ EOF
       _AG_CONTRACT_FILE="$CONTRACT_FILE" \
       _AG_FEATURE_ID="$FEATURE_ID" \
       _AG_NAME="$FEATURE_NAME" \
+      _AG_DOMAIN="$DOMAIN" \
       PYTHONPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../" python3 -c "
 import os
 from pathlib import Path
@@ -111,7 +112,7 @@ contract = Contract(
         Assertion(id='AC-001', text='TODO: First acceptance criterion', type='structural', draft=True),
     ],
     protection='none',
-    category='${DOMAIN}',
+    category=os.environ.get('_AG_DOMAIN', 'uncategorized'),
 )
 save_contract(contract, Path(os.environ['_AG_CONTRACT_FILE']))
 print(f\"  + Created draft contract: {os.environ['_AG_CONTRACT_FILE']}\")

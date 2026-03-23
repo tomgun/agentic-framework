@@ -26,10 +26,10 @@ Run `ag commit` — it handles quality gates, branch checks, and diff review.
 ## Rules
 - Never auto-commit in interactive sessions. Show diff to human first.
 - Never bypass hooks (`--no-verify`). Fix the underlying issue.
-- Keep commits small: max 5-10 files per commit.
 - PR by default. After creating PR, add to HUMAN_NEEDED.md.
 - Stage specific files (`git add <files>`), not `git add .`
 - Include JOURNAL.md, STATUS.md in commits. Exclude VERSION, BACKLOG.json.
+- Before committing, grep `spec/contracts/` for assertions related to changed behavior. If any are affected, **STOP** — present them to the user and wait for approval before modifying any contract or test. Contracts protect shipped behavior; silently updating them to match new code defeats that protection.
 
 ## Post-merge
 When merging a PR, immediately run `ag done F-XXXX` on main.

@@ -199,6 +199,11 @@ def migrate_one(
     lifecycle = status_to_lifecycle(status)
     protection = status_to_protection(lifecycle)
 
+    # Attach extracted test references to assertions
+    if parsed["tests"]:
+        for assertion in parsed["assertions"]:
+            assertion.tests = list(parsed["tests"])
+
     contract = Contract(
         id=parsed["id"],
         name=parsed["name"],

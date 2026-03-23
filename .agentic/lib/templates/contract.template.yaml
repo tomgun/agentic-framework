@@ -5,8 +5,8 @@
 # Lifecycle: exploring → specifying → implementing → shipped
 # Protection: none (draft) → advisory (specifying) → contract (shipped)
 
-id: F-0001
-name: First Feature
+id: F-XXXX
+name: Feature Name
 lifecycle: exploring
 description: |
   TODO: Describe what this feature does and why it exists.
