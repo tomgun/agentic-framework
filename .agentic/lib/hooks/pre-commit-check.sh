@@ -579,29 +579,20 @@ else
 
   if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
     # Count staged files (excluding deletions)
+    # Advisory only — PRs get squash-merged so commit size doesn't matter.
+    # What matters is that agents WORK in small batches, not commit in small batches.
     STAGED_COUNT=$(git diff --cached --name-only --diff-filter=d 2>/dev/null | wc -l | tr -d ' ')
     if [[ $STAGED_COUNT -gt $MAX_FILES ]]; then
-      if [[ $BATCH_ADVISORY -eq 1 ]]; then
-        echo "  ⚠ Advisory: $STAGED_COUNT files staged (guideline: $MAX_FILES) — OK on feature branch, PR is the review unit"
-      else
-        echo "  ❌ BLOCKED: $STAGED_COUNT files staged (max: $MAX_FILES)"
-        echo "     Split into smaller commits for easier review and safer rollback"
-        COMPLEXITY_FAILURES=$((COMPLEXITY_FAILURES + 1))
-      fi
+      echo "  ⚠ Advisory: $STAGED_COUNT files staged (guideline: $MAX_FILES)"
     else
       echo "  ✓ File count: $STAGED_COUNT/$MAX_FILES"
     fi
 
     # Count ADDED lines only (not total file size, not deletions)
+    # Advisory only — same rationale as file count above.
     ADDED_LINES=$(git diff --cached --numstat 2>/dev/null | awk '{sum += $1} END {print sum+0}')
     if [[ $ADDED_LINES -gt $MAX_ADDED_LINES ]]; then
-      if [[ $BATCH_ADVISORY -eq 1 ]]; then
-        echo "  ⚠ Advisory: $ADDED_LINES lines added (guideline: $MAX_ADDED_LINES) — OK on feature branch, PR is the review unit"
-      else
-        echo "  ❌ BLOCKED: $ADDED_LINES lines added (max: $MAX_ADDED_LINES)"
-        echo "     Split into smaller commits"
-        COMPLEXITY_FAILURES=$((COMPLEXITY_FAILURES + 1))
-      fi
+      echo "  ⚠ Advisory: $ADDED_LINES lines added (guideline: $MAX_ADDED_LINES)"
     else
       echo "  ✓ Added lines: $ADDED_LINES/$MAX_ADDED_LINES"
     fi
