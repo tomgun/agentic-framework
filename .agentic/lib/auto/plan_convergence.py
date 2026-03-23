@@ -245,6 +245,7 @@ class ConvergenceLoop:
         if plan_review != "yes":
             result.plan_status = "APPROVED"
             result.converged = True
+            self._extract_and_create_phases(feature_id, plan_path)
             return result
 
         # Guard: convergence mode
@@ -314,6 +315,7 @@ class ConvergenceLoop:
                 if autonomous:
                     result.plan_status = "APPROVED"
                     self._update_plan_status(plan_path, "APPROVED")
+                    self._extract_and_create_phases(feature_id, plan_path)
                 else:
                     result.plan_status = "CONVERGED"
                 print(
@@ -345,6 +347,30 @@ class ConvergenceLoop:
                 )
 
         return result
+
+    # -- Phase extraction (F-0303) -----------------------------------------
+
+    def _extract_and_create_phases(
+        self, feature_id: str, plan_path: str,
+    ) -> None:
+        """Extract phases from approved plan and create tasks.yaml."""
+        try:
+            from auto.phases import extract_phases_from_plan, create_tasks_file
+            phases = extract_phases_from_plan(Path(plan_path))
+            if phases:
+                create_tasks_file(
+                    self.project_root, feature_id, phases, plan_path,
+                )
+                print(
+                    f"  Phase tracking: {len(phases)} phases extracted → tasks.yaml",
+                    file=sys.stderr,
+                )
+        except Exception as e:
+            # Non-fatal: phase tracking is advisory
+            print(
+                f"  Warning: phase extraction failed: {e}",
+                file=sys.stderr,
+            )
 
     # -- Reviewer spawning --------------------------------------------------
 

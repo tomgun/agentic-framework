@@ -17,6 +17,7 @@
 #   7. Periodic checks (orphaned plans, retro, agent freshness)
 #   8. PR cleanup (auto-resolve merged/closed PRs in HUMAN_NEEDED.md)
 #   9. Plan durability (scan ephemeral plan dirs, copy unsaved plans)
+#  9b. Plan-to-phases drift (plan revised after tasks.yaml created)
 #  10. Intent reconciliation (adopt orphans, resume pending)
 #
 # Exit code: always 0 (advisory tool).
@@ -902,6 +903,41 @@ phase_plan_scan() {
 }
 
 # ============================================================================
+# Phase 9b: Plan-to-phases drift (F-0303)
+# Detect when a plan file has been revised after its tasks.yaml was created
+# ============================================================================
+phase_plan_phase_drift() {
+    local work_dir="$ROOT_DIR/.agentic/work"
+    [ -d "$work_dir" ] || return 0
+
+    local plans_dir="$ROOT_DIR/.agentic/journal/plans"
+    [ -d "$plans_dir" ] || return 0
+
+    local drifted=0
+    for tasks_file in "$work_dir"/*/tasks.yaml; do
+        [ -f "$tasks_file" ] || continue
+        local fid
+        fid=$(basename "$(dirname "$tasks_file")")
+
+        # Find corresponding plan (most recently modified match with feature ID)
+        local plan_file=""
+        plan_file=$(find "$plans_dir" -name "*${fid}*" -type f -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+        [ -n "$plan_file" ] && [ -f "$plan_file" ] || continue
+
+        # Check if plan is newer than tasks.yaml
+        if [ "$plan_file" -nt "$tasks_file" ]; then
+            drifted=$((drifted + 1))
+            echo -e "  ${YELLOW}⚠ $fid: plan revised after tasks.yaml — run: ag phase sync $fid${NC}"
+            record_issue "plan-phase-drift"
+        fi
+    done
+
+    if [ "$drifted" -eq 0 ]; then
+        record_ok
+    fi
+}
+
+# ============================================================================
 # Phase 10: Intent reconciliation (adopt orphans, resume pending)
 # ============================================================================
 phase_intents() {
@@ -1038,6 +1074,7 @@ main() {
         phase_periodic
         phase_pr_cleanup
         phase_plan_scan
+        phase_plan_phase_drift
         phase_intents
 
         # Output one-line summary only if issues exist
@@ -1072,6 +1109,7 @@ main() {
     phase_periodic
     phase_pr_cleanup
     phase_plan_scan
+    phase_plan_phase_drift
     phase_intents
 
     # Summary
