@@ -198,6 +198,7 @@ source "$COMMANDS_DIR/settings.sh"
 source "$COMMANDS_DIR/operations.sh"
 source "$COMMANDS_DIR/git-init.sh"
 source "$COMMANDS_DIR/contract.sh"
+source "$COMMANDS_DIR/phase.sh"
 
 # Self-healing: ensure pre-commit hooks are installed on every ag invocation
 # Addresses D2 (Deterministic Enforcement) — hooks must survive git config resets
@@ -322,6 +323,10 @@ case "${1:-help}" in
     backlog)
         shift
         cmd_backlog "$@"
+        ;;
+    phase)
+        shift
+        cmd_phase "$@"
         ;;
     transition)
         shift
