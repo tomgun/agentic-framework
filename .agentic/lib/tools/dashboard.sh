@@ -188,6 +188,21 @@ if { [[ -d "$CONTRACTS_DIR" ]] || [[ -d "$ACCEPTANCE_DIR" ]]; } && [[ -f "$PROJE
         | grep -oE 'F-[0-9]+' || true)
 fi
 
+# USER INPUT (pending contract user_input)
+D_USER_INPUT_COUNT=0
+D_USER_INPUT_FEATURES=""
+if [[ -d "$CONTRACTS_DIR" ]] && command -v python3 >/dev/null 2>&1; then
+    _ui_out=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+from pathlib import Path; from contracts import get_pending_user_input
+p = get_pending_user_input(Path('$CONTRACTS_DIR'))
+print(len(p)); print(','.join(c.id for c in p[:5]))
+" 2>/dev/null) || _ui_out=""
+    if [[ -n "$_ui_out" ]]; then
+        D_USER_INPUT_COUNT=$(echo "$_ui_out" | head -1)
+        D_USER_INPUT_FEATURES=$(echo "$_ui_out" | tail -1)
+    fi
+fi
+
 # SPEC METRICS (F-0225)
 D_SPEC_METRICS=""
 if [[ -f "$TOOLS_DIR/spec-metrics.sh" ]]; then
@@ -299,6 +314,9 @@ if $RAW_MODE; then
     echo "$D_SPEC_METRICS"
     echo "===DESIGN_TRACE==="
     echo "$D_DESIGN_TRACE"
+    echo "===USER_INPUT==="
+    echo "$D_USER_INPUT_COUNT"
+    echo "$D_USER_INPUT_FEATURES"
     echo "===ORPHAN_PLANS==="
     echo "$D_ORPHAN_PLANS"
     echo "===TIP==="
@@ -404,6 +422,9 @@ if [[ "$D_UPGRADE" == "pending" ]]; then
     echo "🔄 Upgrade        Pending — read \`.agentic/.upgrade_pending\`"
 fi
 
+if [[ "$D_USER_INPUT_COUNT" -gt 0 ]]; then
+    echo "📥 User input     $D_USER_INPUT_COUNT pending${D_USER_INPUT_FEATURES:+ — $D_USER_INPUT_FEATURES}"
+fi
 if [[ "$D_AC_DRIFT_COUNT" -gt 0 ]]; then
     echo "⚠️  AC Drift       $D_AC_DRIFT_COUNT shipped feature(s) with <50% ACs checked"
 fi
@@ -452,6 +473,10 @@ if [[ "$D_WIP" == "interrupted" ]]; then
 fi
 if [[ "$D_BLOCKERS" -gt 0 ]]; then
     echo "   $step. Address $D_BLOCKERS blocker(s) in HUMAN_NEEDED.md"
+    step=$((step + 1))
+fi
+if [[ "$D_USER_INPUT_COUNT" -gt 0 ]]; then
+    echo "   $step. Process pending user input — \`ag contract pending\`"
     step=$((step + 1))
 fi
 if [[ "$D_BACKLOG_TOTAL" -gt 0 ]] && [[ "$D_WIP" == "clean" ]]; then

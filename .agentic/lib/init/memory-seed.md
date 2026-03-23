@@ -12,6 +12,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract`
 
 ## Trigger Words
+- "pending user input/contract input" → STOP. Run `ag contract pending`. Process each pending contract.
 - "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`.
 - "work autonomously/come back with working/finish everything/do it all" → STOP. Run `ag auto crunch`.
 - NEVER write code for multiple features outside of `ag auto` commands.

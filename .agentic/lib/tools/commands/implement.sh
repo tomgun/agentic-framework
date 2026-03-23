@@ -174,6 +174,25 @@ cmd_implement() {
         fi
     fi
 
+    # 0e. User input guidance (INFO, not blocking)
+    if [[ -f "$CONTRACTS_DIR/${feature_id}.yaml" ]] && command -v python3 >/dev/null 2>&1; then
+        local ui_preview
+        ui_preview=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+from pathlib import Path; from contracts import load_contract
+c = load_contract(Path('$CONTRACTS_DIR/${feature_id}.yaml'))
+if c.has_pending_input:
+    lines = c.user_input.strip().splitlines()
+    print(lines[0][:80] + (' ...' if len(lines) > 1 else ''))
+" 2>/dev/null) || ui_preview=""
+        if [[ -n "$ui_preview" ]]; then
+            echo -e "${BOLD}📥 Pending user input:${NC}"
+            echo "  > $ui_preview"
+            echo "  Workflow: read input -> write tests -> implement -> add migration -> clear field"
+            echo "  Details: ag contract pending"
+            echo ""
+        fi
+    fi
+
     # 1. Spec-first gate (BLOCKING unless SKIP_SPEC_CHECK=1)
     if [ "${SKIP_SPEC_CHECK:-}" = "1" ]; then
         echo -e "${YELLOW}⚠ SKIP_SPEC_CHECK: Bypassing spec-first gate${NC}"

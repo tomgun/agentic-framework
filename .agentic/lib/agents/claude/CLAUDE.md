@@ -46,6 +46,7 @@ Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and
 - Keep changes small and scoped (max 5-10 files per commit).
 - Multi-session safety: Before ANY destructive git op, check for other active sessions via `agents_helpers.py count-others`. If >0, use a worktree or commit first.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
+- Pending user input: "pending user input/contract input" → run `ag contract pending`. Process each pending contract.
 - Never fabricate APIs, data, or behavior. If uncertain, ask.
 - NEVER write code for multiple features outside of `ag auto` commands. If a user says "build everything", "churn all tasks", or similar batch-work phrases, use `ag auto crunch` — not direct Write/Edit calls. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs. **Wrong rationalizations:** "I can implement it directly faster" — NO. "ag auto crunch spawns subprocesses, I have full context" — NO. "The user said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
 
