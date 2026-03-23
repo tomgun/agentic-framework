@@ -1,6 +1,17 @@
 [
   {
     "type": "feature",
+    "id": "F-0302",
+    "description": "Spec System Overhaul \u2014 YAML Contracts",
+    "added_at": "2026-03-23T13:33:10Z",
+    "added_by": "agent",
+    "refs": [
+      ".agentic/spec/contracts/F-0302.yaml"
+    ],
+    "became_current_at": "2026-03-23T13:33:10Z"
+  },
+  {
+    "type": "feature",
     "id": "F-0243",
     "description": "Complexity Tier Experiments",
     "added_at": "2026-03-20T14:38:37Z",
