@@ -28,9 +28,9 @@ phases:
   tasks: []
 - id: '4'
   title: Protection & V2 Cleanup
-  status: active
+  status: complete
   sessions_estimate: 2 sessions
-  completed_at: null
+  completed_at: '2026-03-23'
   tasks: []
 - id: '5'
   title: User Project Support

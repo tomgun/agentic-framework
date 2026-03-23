@@ -227,6 +227,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0062: PR #198: F-0302 Phase 4 — v2 dead code removal
+- **Type**: pr_review
+- **Added**: 2026-03-23
+- **Context**: Review and merge feat/F-0302-phase4-cleanup. After merge: ag phase done F-0302 4
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0060: Review: F-0303 → implementing
