@@ -224,13 +224,17 @@ def collect_metrics(
     except Exception:
         pass
 
-    # spec_created
+    # spec_created — check for files created by the agent during this run.
+    # The scaffolded project inherits existing contracts from project_root, so we
+    # must only count files newer than run_start_time to avoid false positives.
     try:
         ac_dir = project_root / ".agentic" / "spec" / "acceptance"
         contracts_dir = project_root / ".agentic" / "spec" / "contracts"
-        m.spec_created = (
-            (ac_dir.exists() and any(ac_dir.glob("*.md"))) or
-            (contracts_dir.exists() and any(contracts_dir.glob("*.yaml")))
+        m.spec_created = any(
+            f.stat().st_mtime > run_start_time
+            for glob_path, pattern in [(ac_dir, "*.md"), (contracts_dir, "*.yaml")]
+            if glob_path.exists()
+            for f in glob_path.glob(pattern)
         )
     except Exception:
         pass
@@ -339,12 +343,31 @@ def _collect_test_metrics(m: TierMetrics, project_root: Path, test_command: str)
     else:
         pip_ok = True  # No requirements file — treat as OK
 
-    m.app_runs = pip_ok
-
     if not pip_ok:
-        return  # Can't run tests if pip failed
+        return  # deps failed — app_runs and tests_pass stay False
 
-    # Step 2: derive pytest command from test_command (strip pip install part)
+    # Step 2: app_runs — probe the entrypoint to verify a runnable app was produced.
+    # Try standard entrypoint candidates with --help; accept any exit code that isn't
+    # a Python traceback (import errors produce "Traceback" on stderr regardless of exit code).
+    _entrypoints = ["app.py", "main.py", "src/app.py", "src/main.py"]
+    entrypoint_found = False
+    for candidate in _entrypoints:
+        candidate_path = project_root / candidate
+        if candidate_path.exists():
+            entrypoint_found = True
+            r2 = subprocess.run(
+                [sys.executable, str(candidate_path), "--help"],
+                capture_output=True, text=True,
+                cwd=str(project_root), timeout=15,
+            )
+            # app_runs = False only if there's a traceback (import or runtime error)
+            m.app_runs = "Traceback" not in r2.stderr
+            break
+    if not entrypoint_found:
+        # No standard entrypoint found — pip install success is the best proxy
+        m.app_runs = pip_ok
+
+    # Step 3: derive pytest command from test_command (strip pip install part)
     pytest_cmd = test_command
     if "&&" in pytest_cmd:
         # Take the part after the last && (the actual test runner)
@@ -397,17 +420,6 @@ def _pre_flight(project_root: Path, claude_command: str) -> list[str]:
         )
     except (FileNotFoundError, subprocess.TimeoutExpired):
         errors.append(f"Claude CLI not found: {claude_command}")
-
-    # Warn about concurrent tier-exp runs (non-blocking — experiments don't share state)
-    existing = subprocess.run(
-        ["git", "branch", "--list", "tier-exp/run-*"],
-        capture_output=True, text=True, cwd=str(project_root),
-    ).stdout.strip()
-    if existing:
-        errors.append(
-            f"Existing tier-exp branch(es) found: {existing}. "
-            "A previous run may be in progress. Clean up: git branch -D <branch>"
-        )
 
     return errors
 
@@ -468,7 +480,8 @@ def _print_comparison(result: ExperimentResult) -> None:
     print()
 
     tier_names = list(by_tier.keys())
-    col_w = 24
+    # Column width: enough for the widest tier name + a typical value like "avg=1234.5 [1234,1235,1236]"
+    col_w = max(28, max(len(n) for n in tier_names) + 16)
 
     # Universal metrics table
     universal_metrics = [

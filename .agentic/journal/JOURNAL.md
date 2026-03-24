@@ -4474,3 +4474,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: none
 
+
+### Session: 2026-03-24 08:16 - Review fixes — tier_experiment.py + DEV-0001
+
+**Why**: Code review identified correctness and UX issues before running experiments
+
+**What changed**:
+- Fixed 6 review issues: removed dead pre-flight branch check, app_runs probes entrypoint with --help instead of proxying pip install, spec_created uses mtime > run_start_time to exclude scaffolded files, column width computed dynamically, DEV-0001 contract adds protection: advisory
+
+**Next steps**:
+- Push to PR
+
+**Blockers**: none
+

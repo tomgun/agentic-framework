@@ -2,6 +2,7 @@ id: DEV-0001
 name: Framework Development Infrastructure
 lifecycle: ongoing
 profile: both
+protection: advisory
 category: dev-infrastructure
 tags: [meta, internal]
 children:
