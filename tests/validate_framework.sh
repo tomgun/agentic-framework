@@ -4498,11 +4498,11 @@ CHANGELOG_FILE="$FRAMEWORK_ROOT/CHANGELOG.md"
 if [[ -f "$CHANGELOG_FILE" ]]; then
   # Get content between [Unreleased] and the next version header
   UNRELEASED_SECTION=$(sed -n '/^## \[Unreleased\]/,/^## \[/p' "$CHANGELOG_FILE" | head -n -1)
-  CHANGELOG_FIDS=$(echo "$UNRELEASED_SECTION" | grep -oE 'F-[0-9]{4,}' | sort -u || true)
+  CHANGELOG_FIDS=$(echo "$UNRELEASED_SECTION" | grep -oE "$FEATURE_ID_ERE" | sort -u || true)
 
   # Get all shipped features from FEATURES.md
   FEATURES_FILE="$FRAMEWORK_ROOT/.agentic/spec/FEATURES.md"
-  ALL_SHIPPED_FIDS=$(grep -B3 'Status.*shipped' "$FEATURES_FILE" | grep -oE 'F-[0-9]{4,}' | sort -u || true)
+  ALL_SHIPPED_FIDS=$(grep -B3 'Status.*shipped' "$FEATURES_FILE" | grep -oE "$FEATURE_ID_ERE" | sort -u || true)
 
   # Living docs to check
   LIVING_DOCS=(
@@ -4536,7 +4536,7 @@ if [[ -f "$CHANGELOG_FILE" ]]; then
   # Inverse check: shipped features in latest version that are NOT in CHANGELOG
   # Only check F-IDs >= F-0200 (recent features — older ones predate CHANGELOG practice)
   RECENT_SHIPPED=$(echo "$ALL_SHIPPED_FIDS" | awk -F- '$2 >= 200' || true)
-  ALL_CHANGELOG_FIDS=$(grep -oE 'F-[0-9]{4,}' "$CHANGELOG_FILE" | sort -u || true)
+  ALL_CHANGELOG_FIDS=$(grep -oE "$FEATURE_ID_ERE" "$CHANGELOG_FILE" | sort -u || true)
   for fid in $RECENT_SHIPPED; do
     if ! echo "$ALL_CHANGELOG_FIDS" | grep -q "^${fid}$" 2>/dev/null; then
       warn "Doc currency: $fid shipped but missing from CHANGELOG.md entirely"

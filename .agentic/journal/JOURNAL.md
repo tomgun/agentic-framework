@@ -4500,3 +4500,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-24 20:41 - F-0184 Phase 1a: Hierarchical ID System
+
+**Why**: Enable feature hierarchy and clean renumber — foundational schema change
+
+**What changed**:
+- Schema + core code for dotted feature IDs (F-003.1), component metadata, shell audit of hardcoded patterns, 60 tests
+
+**Next steps**:
+- Phase 1b: epic.py decomposition with dotted IDs, new ag commands
+
+**Blockers**: None
+

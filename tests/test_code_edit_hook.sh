@@ -42,8 +42,8 @@ EOF
 #!/usr/bin/env bash
 [[ -n "${_AGENTIC_PATHS_LOADED:-}" ]] && return 0
 _AGENTIC_PATHS_LOADED=1
-FEATURE_ID_ERE='F-[0-9]{4,}'
-EPIC_ID_ERE='E-[0-9]{4,}'
+FEATURE_ID_ERE='(F|DEV|E)-[0-9]{3,}(\.[1-9][0-9]*)*'
+EPIC_ID_ERE='E-[0-9]{3,}'
 PATHSEOF
     echo "$dir"
 }

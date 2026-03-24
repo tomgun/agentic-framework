@@ -133,7 +133,7 @@ run_check22() {
   if [[ -n "$STAGED_DIFF" ]]; then
     local CURRENT_FEATURE=""
     while IFS= read -r line; do
-      if [[ "$line" =~ ^[\ +]##\ (F-[0-9]{4,}): ]]; then
+      if [[ "$line" =~ ^[\ +]##\ ((F|DEV|E)-[0-9]{3,}(\.[1-9][0-9]*)*): ]]; then
         CURRENT_FEATURE="${BASH_REMATCH[1]}"
       fi
       if [[ "$line" =~ ^\+\*\*Status\*\*:\ *shipped ]] && [[ -n "$CURRENT_FEATURE" ]]; then

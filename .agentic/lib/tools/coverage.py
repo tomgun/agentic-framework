@@ -27,7 +27,7 @@ from paths import get_paths
 from ids import FEATURE_ID_RE, FEATURE_HEADER_RE
 FEATURE_ANNOTATION_RE = re.compile(r"@feature\s+" + FEATURE_ID_RE.pattern)
 # Test file naming pattern: test_F0003_*.py or test_F-0003_*.py
-TEST_FEATURE_RE = re.compile(r"test[_-]?F[-_]?(\d{4,})", re.IGNORECASE)
+TEST_FEATURE_RE = re.compile(r"test[_-]?F[-_]?(\d{3,})", re.IGNORECASE)
 # AC ID pattern in acceptance files: **AC-001**: description
 AC_ID_RE = re.compile(r"\*\*AC-(\d{3,4})\*\*:?\s*(.*)")
 # AC ID references in test files: AC-001, AC_001, ac001 (various conventions)
