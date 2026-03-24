@@ -4396,3 +4396,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-24 06:09 - F-0193 shipped
+
+**Why**: IDs were hardcoded in 100+ locations across 50 files; centralization future-proofs ID format changes
+
+**What changed**:
+- Centralized feature ID patterns into ids.py + ids.sh; widened F-\d{4} to F-\d{4,} across all Python and shell files; removed 4-digit ceiling
+
+**Next steps**:
+- Start F-0243 Complexity Tier Experiments
+
+**Blockers**: None
+

@@ -359,7 +359,7 @@ YAML contracts replace markdown acceptance criteria as source of truth. Machine-
 
 ## F-0193: Collision-Proof Feature IDs
 
-**Status**: implementing | **Category**: core-workflow | **Profile**: both
+**Status**: shipped
 
 Centralized feature ID patterns via `ids.py` (Python) and `ids.sh` (shell). All feature ID regexes (`FEATURE_ID_RE`, `FEATURE_HEADER_RE`, `FEATURE_ID_ERE`, etc.) are defined once and imported everywhere — no inline patterns in consuming code. JSON schemas widened to `{4,}` digits for future-proofing.
 

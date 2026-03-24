@@ -1,22 +1,15 @@
 [
   {
     "type": "feature",
-    "id": "F-0193",
-    "description": "Collision-Proof Feature IDs",
-    "added_at": "2026-03-16T18:56:13Z",
-    "added_by": "agent",
-    "became_current_at": "2026-03-23T16:10:58Z"
-  },
-  {
-    "type": "feature",
     "id": "F-0243",
     "description": "Complexity Tier Experiments",
     "added_at": "2026-03-20T14:38:37Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "became_current_at": "2026-03-24T06:09:26Z"
   },
   {
     "type": "task",
-    "description": "Strengthen later state machine gates (advisory→blocking)",
+    "description": "Strengthen later state machine gates (advisory\u2192blocking)",
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
     "notes": "Originally F-0223. Improvement to F-0004 (Feature Tracking & Lifecycle)"
@@ -62,7 +55,9 @@
     "description": "Project Customization Auto-Sync",
     "added_at": "2026-03-16T18:56:15Z",
     "added_by": "agent",
-    "depends_on": "F-0211"
+    "depends_on": [
+      "F-0211"
+    ]
   },
   {
     "type": "task",
@@ -84,7 +79,9 @@
     "description": "Multi-Repo Umbrella",
     "added_at": "2026-03-16T18:56:16Z",
     "added_by": "agent",
-    "depends_on": "F-0230"
+    "depends_on": [
+      "F-0230"
+    ]
   },
   {
     "type": "feature",
@@ -92,6 +89,8 @@
     "description": "Full Autonomous Scheduling",
     "added_at": "2026-03-16T18:56:16Z",
     "added_by": "agent",
-    "depends_on": "F-0230"
+    "depends_on": [
+      "F-0230"
+    ]
   }
 ]

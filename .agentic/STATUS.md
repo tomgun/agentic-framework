@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Ready to commit: Fix Hook Automation Gaps + Instruction File Drift (Updated: 2026-03-23 20:36 UTC)
+- F-0193 shipped — starting F-0243 Complexity Tier Experiments (Updated: 2026-03-24 06:09 UTC)
 
 ## Current focus
 - **F-0302: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
