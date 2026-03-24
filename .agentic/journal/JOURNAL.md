@@ -4487,3 +4487,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: none
 
+
+### Session: 2026-03-24 19:39 - PR #202 review fixes
+
+**Why**: PR review found critical blocker: ag workflow rejected DEV- IDs
+
+**What changed**:
+- Fixed 8 review issues: DEV-XXXX ID support in ids.py/ids.sh/contracts.py, tier_experiment cleanup (unused import, dead vars, venv isolation, spec snapshot, per-tier counts), migration 018 restored
+
+**Next steps**:
+- Push to PR, merge
+
+**Blockers**: None
+

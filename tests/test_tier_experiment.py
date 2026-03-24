@@ -23,6 +23,7 @@ from auto.tier_experiment import (  # noqa: E402
     _print_dry_run,
     collect_metrics,
     load_experiment_config,
+    snapshot_spec_files,
 )
 from auto import SpawnResult  # noqa: E402
 
@@ -165,10 +166,13 @@ class TestCollectMetrics:
         )
         assert m.test_count == 0
 
-    def test_spec_created_true_with_acceptance_file(self, tmp_path):
+    def test_spec_created_true_with_new_acceptance_file(self, tmp_path):
         p = self._make_project(tmp_path)
         ac_dir = p / ".agentic" / "spec" / "acceptance"
         ac_dir.mkdir(parents=True)
+        # Snapshot before the "agent" creates anything
+        pre_specs = snapshot_spec_files(p)
+        # Simulate agent creating a spec file
         (ac_dir / "F-0001.md").write_text("# AC")
         m = collect_metrics(
             project_root=p,
@@ -178,11 +182,13 @@ class TestCollectMetrics:
             scenario_name="todo_app",
             run_number=1,
             spawn_result=_make_spawn_result(),
+            _pre_run_specs=pre_specs,
         )
         assert m.spec_created is True
 
     def test_spec_created_false_when_empty(self, tmp_path):
         p = self._make_project(tmp_path)
+        pre_specs = snapshot_spec_files(p)
         m = collect_metrics(
             project_root=p,
             run_start_time=time.time() - 1,
@@ -191,14 +197,18 @@ class TestCollectMetrics:
             scenario_name="todo_app",
             run_number=1,
             spawn_result=_make_spawn_result(),
+            _pre_run_specs=pre_specs,
         )
         assert m.spec_created is False
 
-    def test_spec_created_true_with_contract_file(self, tmp_path):
+    def test_spec_created_false_when_inherited(self, tmp_path):
+        """Pre-existing specs from setup_project should not count as created."""
         p = self._make_project(tmp_path)
         contracts_dir = p / ".agentic" / "spec" / "contracts"
         contracts_dir.mkdir(parents=True)
         (contracts_dir / "F-0001.yaml").write_text("id: F-0001")
+        # Snapshot AFTER inherited files exist (simulates setup_project)
+        pre_specs = snapshot_spec_files(p)
         m = collect_metrics(
             project_root=p,
             run_start_time=time.time() - 1,
@@ -207,6 +217,28 @@ class TestCollectMetrics:
             scenario_name="todo_app",
             run_number=1,
             spawn_result=_make_spawn_result(),
+            _pre_run_specs=pre_specs,
+        )
+        assert m.spec_created is False
+
+    def test_spec_created_true_with_new_contract_file(self, tmp_path):
+        p = self._make_project(tmp_path)
+        contracts_dir = p / ".agentic" / "spec" / "contracts"
+        contracts_dir.mkdir(parents=True)
+        (contracts_dir / "F-0001.yaml").write_text("id: F-0001")
+        # Snapshot with F-0001 already there
+        pre_specs = snapshot_spec_files(p)
+        # Simulate agent creating a new contract
+        (contracts_dir / "F-0002.yaml").write_text("id: F-0002")
+        m = collect_metrics(
+            project_root=p,
+            run_start_time=time.time() - 1,
+            jsonl_log_path=None,
+            tier_name="formal",
+            scenario_name="todo_app",
+            run_number=1,
+            spawn_result=_make_spawn_result(),
+            _pre_run_specs=pre_specs,
         )
         assert m.spec_created is True
 
@@ -530,7 +562,7 @@ class TestPrintComparison:
         result = self._make_result()
         _print_comparison(result)
         captured = capsys.readouterr()
-        assert "directional" in captured.out or "n=" in captured.out
+        assert "directional" in captured.out
 
     def test_handles_empty_runs_gracefully(self, capsys):
         result = ExperimentResult(experiment_name="empty")

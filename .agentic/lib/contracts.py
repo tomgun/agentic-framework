@@ -312,10 +312,10 @@ def save_contract(contract: Contract, path: Optional[Path] = None) -> Path:
 # Validation
 # ---------------------------------------------------------------------------
 
-_ID_PATTERN = re.compile(r"^(F|NFR)-\d{4,}$")
+_ID_PATTERN = re.compile(r"^(F|DEV|E|NFR)-\d{4,}$")
 _AC_PATTERN = re.compile(r"^AC-\d{3,}$")
 _MIGRATION_PATTERN = re.compile(r"^M-\d{4}-\d{2}-\d{2}-\d{3}$")
-_VALID_LIFECYCLES = {"exploring", "specifying", "implementing", "verifying", "shipping", "shipped", "deprecated"}
+_VALID_LIFECYCLES = {"exploring", "specifying", "implementing", "verifying", "shipping", "shipped", "deprecated", "ongoing"}
 _VALID_PROTECTIONS = {"contract", "advisory", "none"}
 _VALID_PROFILES = {"formal", "discovery", "both"}
 _VALID_ASSERTION_TYPES = {"structural", "behavioral"}
@@ -330,7 +330,7 @@ def validate_contract(contract: Contract) -> list[str]:
     if not contract.id:
         errors.append("Missing required field: id")
     elif not _ID_PATTERN.match(contract.id):
-        errors.append(f"Invalid id format: {contract.id} (expected F-XXXX or NFR-XXXX)")
+        errors.append(f"Invalid id format: {contract.id} (expected F-XXXX, DEV-XXXX, E-XXXX, or NFR-XXXX)")
 
     if not contract.name or len(contract.name) < 3:
         errors.append(f"Name too short or missing: '{contract.name}'")

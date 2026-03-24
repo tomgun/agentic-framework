@@ -26,7 +26,6 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
 import re
 import shutil
 import subprocess
@@ -150,6 +149,17 @@ class ExperimentResult:
 # Metric collection
 # ---------------------------------------------------------------------------
 
+def snapshot_spec_files(project_root: Path) -> set[str]:
+    """Capture spec filenames before an experiment run for later diffing."""
+    specs: set[str] = set()
+    ac_dir = project_root / ".agentic" / "spec" / "acceptance"
+    contracts_dir = project_root / ".agentic" / "spec" / "contracts"
+    for glob_path, pattern in [(ac_dir, "*.md"), (contracts_dir, "*.yaml")]:
+        if glob_path.exists():
+            specs.update(f.name for f in glob_path.glob(pattern))
+    return specs
+
+
 def collect_metrics(
     project_root: Path,
     run_start_time: float,
@@ -159,11 +169,15 @@ def collect_metrics(
     run_number: int,
     spawn_result: "SpawnResult",
     test_command: Optional[str] = None,
+    _pre_run_specs: Optional[set[str]] = None,
 ) -> TierMetrics:
     """Collect structured metrics from a completed experiment project.
 
     All collectors are best-effort: missing tools/logs → default values, not errors.
     """
+    if _pre_run_specs is None:
+        _pre_run_specs = set()
+
     m = TierMetrics(
         tier=tier_name,
         scenario=scenario_name,
@@ -225,17 +239,17 @@ def collect_metrics(
         pass
 
     # spec_created — check for files created by the agent during this run.
-    # The scaffolded project inherits existing contracts from project_root, so we
-    # must only count files newer than run_start_time to avoid false positives.
+    # Compare current filenames against the pre-run snapshot (passed in).
+    # Using filenames instead of mtime avoids false positives from shutil.copytree
+    # which may or may not preserve mtime depending on platform.
     try:
         ac_dir = project_root / ".agentic" / "spec" / "acceptance"
         contracts_dir = project_root / ".agentic" / "spec" / "contracts"
-        m.spec_created = any(
-            f.stat().st_mtime > run_start_time
-            for glob_path, pattern in [(ac_dir, "*.md"), (contracts_dir, "*.yaml")]
-            if glob_path.exists()
-            for f in glob_path.glob(pattern)
-        )
+        current_specs: set[str] = set()
+        for glob_path, pattern in [(ac_dir, "*.md"), (contracts_dir, "*.yaml")]:
+            if glob_path.exists():
+                current_specs.update(f.name for f in glob_path.glob(pattern))
+        m.spec_created = len(current_specs - _pre_run_specs) > 0
     except Exception:
         pass
 
@@ -330,13 +344,25 @@ def collect_metrics(
 
 
 def _collect_test_metrics(m: TierMetrics, project_root: Path, test_command: str) -> None:
-    """Run pip install and tests separately to distinguish pip vs test failures."""
-    # Step 1: pip install
+    """Run pip install (in a venv) and tests separately to distinguish pip vs test failures."""
+    import venv as _venv_mod
+
+    # Step 1: create isolated venv to avoid polluting the host environment
+    venv_dir = project_root / ".venv"
     pip_ok = False
+    python_exe = sys.executable  # fallback
+
+    try:
+        _venv_mod.create(str(venv_dir), with_pip=True)
+        # Use the venv's python for pip and entrypoint probing
+        python_exe = str(venv_dir / "bin" / "python")
+    except Exception:
+        pass  # venv creation failed — fall through to host python
+
     req_file = project_root / "requirements.txt"
     if req_file.exists():
         r = subprocess.run(
-            [sys.executable, "-m", "pip", "install", "-q", "-r", str(req_file)],
+            [python_exe, "-m", "pip", "install", "-q", "-r", str(req_file)],
             capture_output=True, text=True, cwd=str(project_root), timeout=120,
         )
         pip_ok = r.returncode == 0
@@ -356,7 +382,7 @@ def _collect_test_metrics(m: TierMetrics, project_root: Path, test_command: str)
         if candidate_path.exists():
             entrypoint_found = True
             r2 = subprocess.run(
-                [sys.executable, str(candidate_path), "--help"],
+                [python_exe, str(candidate_path), "--help"],
                 capture_output=True, text=True,
                 cwd=str(project_root), timeout=15,
             )
@@ -373,9 +399,12 @@ def _collect_test_metrics(m: TierMetrics, project_root: Path, test_command: str)
         # Take the part after the last && (the actual test runner)
         pytest_cmd = pytest_cmd.split("&&")[-1].strip()
 
+    # Activate the venv for the test subprocess
+    env_path = str(venv_dir / "bin") + ":" + subprocess.os.environ.get("PATH", "")
     r = subprocess.run(
         ["bash", "-c", pytest_cmd],
         capture_output=True, text=True, cwd=str(project_root), timeout=300,
+        env={**subprocess.os.environ, "PATH": env_path, "VIRTUAL_ENV": str(venv_dir)},
     )
     m.tests_pass = r.returncode == 0
 
@@ -469,12 +498,13 @@ def _print_comparison(result: ExperimentResult) -> None:
         print(f"Experiment '{result.experiment_name}': no runs recorded.")
         return
 
-    sample_n = len(next(iter(by_tier.values())))
+    tier_counts = {t: len(runs) for t, runs in by_tier.items()}
+    counts_str = ", ".join(f"{t}={n}" for t, n in tier_counts.items())
 
     print(f"\n{'='*60}")
     print(f"Experiment: {result.experiment_name}")
-    print(f"Total runs: {len(result.runs)}")
-    print(f"Note: n={sample_n} provides directional signal only; "
+    print(f"Total runs: {len(result.runs)} ({counts_str})")
+    print(f"Note: small sample sizes provide directional signal only; "
           f"per-run values shown alongside averages.")
     print(f"  total_commits excludes the init scaffold commit.")
     print()
@@ -503,7 +533,6 @@ def _print_comparison(result: ExperimentResult) -> None:
                 summary = f"{sum(1 for v in values if v)}/{len(values)} pass"
             elif values and all(isinstance(v, (int, float)) for v in values):
                 avg = sum(values) / len(values)
-                mn, mx = min(values), max(values)
                 per_run = ",".join(f"{v:.0f}" if isinstance(v, float) else str(v) for v in values)
                 summary = f"avg={avg:.1f} [{per_run}]"
             else:
@@ -597,6 +626,9 @@ def run_experiment(
                     # Set up project — pass project_root as vw_path (source for .agentic/ copy)
                     setup_project(scenario, project_root, project_dir, settings)
 
+                    # Snapshot spec files before agent runs (for spec_created detection)
+                    pre_specs = snapshot_spec_files(project_dir)
+
                     # Build prompt and spawn agent
                     prompt = build_prompt(scenario, settings)
                     spawn_result = spawn_claude(
@@ -625,6 +657,7 @@ def run_experiment(
                         run_number=rep,
                         spawn_result=spawn_result,
                         test_command=test_cmd,
+                        _pre_run_specs=pre_specs,
                     )
                     result.runs.append(metrics)
 

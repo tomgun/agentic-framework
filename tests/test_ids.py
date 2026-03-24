@@ -43,6 +43,13 @@ class TestFormatFeatureId:
     def test_large_id(self):
         assert format_feature_id(99999) == "F-99999"
 
+    def test_dev_prefix(self):
+        assert format_feature_id(1, prefix="DEV") == "DEV-0001"
+        assert format_feature_id(243, prefix="DEV") == "DEV-0243"
+
+    def test_epic_prefix(self):
+        assert format_feature_id(1, prefix="E") == "E-0001"
+
 
 # ---------------------------------------------------------------------------
 # is_valid_feature_id
@@ -58,10 +65,20 @@ class TestIsValidFeatureId:
         assert is_valid_feature_id("F-10000")
         assert is_valid_feature_id("F-99999")
 
+    def test_dev_prefix(self):
+        assert is_valid_feature_id("DEV-0001")
+        assert is_valid_feature_id("DEV-0243")
+        assert is_valid_feature_id("DEV-10000")
+
+    def test_epic_prefix(self):
+        assert is_valid_feature_id("E-0001")
+        assert is_valid_feature_id("E-9999")
+
     def test_too_short(self):
         assert not is_valid_feature_id("F-01")
         assert not is_valid_feature_id("F-1")
         assert not is_valid_feature_id("F-123")
+        assert not is_valid_feature_id("DEV-01")
 
     def test_not_numeric(self):
         assert not is_valid_feature_id("F-abcd")
@@ -93,6 +110,18 @@ class TestFeatureIdRe:
         matches = FEATURE_ID_RE.findall("See F-10000 for details")
         assert matches == ["F-10000"]
 
+    def test_dev_inline_match(self):
+        matches = FEATURE_ID_RE.findall("See DEV-0001 and DEV-0243 for infra")
+        assert matches == ["DEV-0001", "DEV-0243"]
+
+    def test_epic_inline_match(self):
+        matches = FEATURE_ID_RE.findall("Epic E-0001 tracks this")
+        assert matches == ["E-0001"]
+
+    def test_mixed_prefixes(self):
+        matches = FEATURE_ID_RE.findall("F-0042 depends on DEV-0122 and E-0001")
+        assert matches == ["F-0042", "DEV-0122", "E-0001"]
+
     def test_no_partial_match(self):
         # Should not match F-01 (too short)
         matches = FEATURE_ID_RE.findall("Not F-01 or F-12")
@@ -115,6 +144,17 @@ class TestFeatureHeaderRe:
         assert m is not None
         assert m.group(1) == "F-10000"
         assert m.group(2) == "Future Feature"
+
+    def test_dev_header(self):
+        m = FEATURE_HEADER_RE.match("## DEV-0001: Framework Dev Infrastructure")
+        assert m is not None
+        assert m.group(1) == "DEV-0001"
+        assert m.group(2) == "Framework Dev Infrastructure"
+
+    def test_epic_header(self):
+        m = FEATURE_HEADER_RE.match("## E-0001: Some Epic")
+        assert m is not None
+        assert m.group(1) == "E-0001"
 
     def test_no_match_wrong_level(self):
         # Must be ## (h2), not # or ###
@@ -177,11 +217,11 @@ class TestPatternsMatchLegacy:
 
         import re
         content = features_file.read_text()
-        # Extract IDs using the old 4-digit pattern
-        legacy_ids = re.findall(r"\bF-\d{4}\b", content)
-        assert len(legacy_ids) > 0, "Expected some feature IDs in FEATURES.md"
+        # Extract all IDs (F-XXXX and DEV-XXXX)
+        all_ids = re.findall(r"\b(?:F|DEV|E)-\d{4,}\b", content)
+        assert len(all_ids) > 0, "Expected some feature IDs in FEATURES.md"
 
         # Verify each matches the new pattern
-        for fid in legacy_ids:
+        for fid in all_ids:
             assert is_valid_feature_id(fid), f"{fid} should be valid"
             assert FEATURE_ID_RE.search(fid), f"{fid} should match inline pattern"
