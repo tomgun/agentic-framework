@@ -1,18 +1,22 @@
 [
   {
     "type": "feature",
-    "id": "DEV-0243",
-    "description": "Complexity Tier Experiments",
-    "added_at": "2026-03-20T14:38:37Z",
+    "id": "F-0184",
+    "description": "Feature Hierarchy & Decomposition",
+    "added_at": "2026-03-24T19:52:35Z",
     "added_by": "agent",
-    "became_current_at": "2026-03-24T06:09:26Z"
+    "refs": [
+      ".agentic/spec/contracts/F-0184.yaml"
+    ],
+    "became_current_at": "2026-03-24T20:14:36Z"
   },
   {
     "type": "task",
     "description": "Strengthen later state machine gates (advisory\u2192blocking)",
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
-    "notes": "Originally F-0223. Improvement to F-0004 (Feature Tracking & Lifecycle)"
+    "notes": "Originally F-0223. Improvement to F-0004 (Feature Tracking & Lifecycle)",
+    "became_current_at": "2026-03-24T20:12:19Z"
   },
   {
     "type": "feature",
@@ -91,16 +95,6 @@
     "added_by": "agent",
     "depends_on": [
       "F-0230"
-    ]
-  },
-  {
-    "type": "feature",
-    "id": "F-0184",
-    "description": "Feature Hierarchy & Decomposition",
-    "added_at": "2026-03-24T19:52:35Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/contracts/F-0184.yaml"
     ]
   }
 ]
