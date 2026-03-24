@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
@@ -293,7 +294,7 @@ def load_all_contracts(contracts_dir: Path) -> list[Contract]:
         try:
             contracts.append(load_contract(yaml_file))
         except Exception as e:
-            print(f"Warning: failed to load {yaml_file.name}: {e}")
+            print(f"Warning: failed to load {yaml_file.name}: {e}", file=sys.stderr)
     return contracts
 
 
