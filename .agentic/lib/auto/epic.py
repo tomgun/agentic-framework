@@ -41,7 +41,7 @@ from auto.components import Component, load_registry  # noqa: E402
 
 from ids import FEATURE_ID_STRICT_RE as _FEATURE_ID_RE  # noqa: E402
 from ids import FEATURE_ID_RE, FEATURE_HEADER_RE, is_valid_feature_id, format_feature_id  # noqa: E402
-from ids import get_next_feature_id  # noqa: E402
+from ids import get_next_feature_id, get_depth, get_next_child_id, MAX_DEPTH  # noqa: E402
 
 
 def _validate_feature_id(feature_id: str) -> None:
@@ -260,13 +260,16 @@ def propose_decomposition(
     registry = load_registry(project_root)
     components = registry.list_all()
 
-    # Get next available feature ID
-    next_id = get_next_feature_id(paths.features_file)
+    # Collect existing children for dotted ID allocation
+    from query_features import parse_features, get_children
+    features_content = paths.features_file.read_text() if paths.features_file.exists() else ""
+    features = parse_features(features_content)
+    existing_children_ids = [c["id"] for c in get_children(features, epic_id)]
 
-    # Build child proposals
+    # Build child proposals with dotted IDs
     children: list[dict] = []
     for i, (ac_id, ac_text, ac_lines) in enumerate(ac_groups):
-        child_id = format_feature_id(next_id + i)
+        child_id = get_next_child_id(epic_id, existing_children_ids + [c["id"] for c in children])
         name = _derive_child_name(ac_id, ac_text, epic_id)
         component = _match_component(ac_text, ac_lines, components)
 
@@ -348,6 +351,131 @@ def create_child_features(
     return True, messages
 
 
+def extract_subfeature(
+    project_root: Path,
+    parent_id: str,
+    ac_ids: list[str],
+    child_name: str | None = None,
+) -> tuple[bool, list[str]]:
+    """Extract selected ACs from a parent contract into a new child feature.
+
+    Moves specified assertions from the parent contract to a new child contract
+    with an auto-assigned dotted ID (e.g., F-0100.1). Updates the parent's
+    children list.
+
+    Args:
+        project_root: Project root path.
+        parent_id: The parent feature ID.
+        ac_ids: List of assertion IDs to extract (e.g., ["AC-001", "AC-003"]).
+        child_name: Optional name for the child feature.
+
+    Returns:
+        (success, messages)
+    """
+    _validate_feature_id(parent_id)
+    paths = get_paths(project_root)
+    messages: list[str] = []
+
+    # Depth guard
+    depth = get_depth(parent_id)
+    if depth >= MAX_DEPTH:
+        return False, [
+            f"Cannot extract subfeature from {parent_id}: depth {depth} "
+            f"is at the maximum nesting level ({MAX_DEPTH})."
+        ]
+
+    # Load parent contract
+    contract_file = paths.contracts_dir / f"{parent_id}.yaml"
+    if not contract_file.exists():
+        return False, [f"Contract not found: {contract_file}"]
+
+    try:
+        from contracts import load_contract, save_contract, Contract, Assertion
+    except ImportError:
+        return False, ["contracts module not available"]
+
+    parent_contract = load_contract(contract_file)
+
+    # Find the specified assertions
+    ac_id_set = set(ac_ids)
+    extracted: list[Assertion] = []
+    remaining: list[Assertion] = []
+    for a in parent_contract.assertions:
+        if a.id in ac_id_set:
+            extracted.append(a)
+            ac_id_set.discard(a.id)
+        else:
+            remaining.append(a)
+
+    if ac_id_set:
+        return False, [
+            f"Assertions not found in {parent_id}: {', '.join(sorted(ac_id_set))}"
+        ]
+
+    if not extracted:
+        return False, ["No assertions to extract"]
+
+    # Determine child ID
+    from query_features import parse_features, get_children
+    features_content = paths.features_file.read_text() if paths.features_file.exists() else ""
+    features = parse_features(features_content)
+    existing_children_ids = [c["id"] for c in get_children(features, parent_id)]
+    child_id = get_next_child_id(parent_id, existing_children_ids)
+
+    # Derive child name from extracted ACs if not provided
+    if not child_name:
+        child_name = _derive_child_name(
+            extracted[0].id, extracted[0].text, parent_id
+        )
+
+    # Build child contract data
+    child_assertions = []
+    for idx, a in enumerate(extracted):
+        child_assertions.append({
+            "id": a.id,
+            "text": a.text,
+            "type": a.type or "behavioral",
+        })
+
+    child_data = {
+        "id": child_id,
+        "name": child_name,
+        "parent": parent_id,
+        "component": getattr(parent_contract, "component", None),
+        "ac_lines": [f'- [ ] **{a.id}**: {a.text}' for a in extracted],
+    }
+
+    # Write child contract
+    contracts_dir = paths.contracts_dir
+    contracts_dir.mkdir(parents=True, exist_ok=True)
+    child_contract_content = _build_child_contract(child_data, parent_id)
+    (contracts_dir / f"{child_id}.yaml").write_text(child_contract_content)
+
+    # Update parent: remove extracted ACs, add child to children list
+    parent_contract.assertions = remaining
+    if not hasattr(parent_contract, "children") or parent_contract.children is None:
+        parent_contract.children = []
+    if child_id not in parent_contract.children:
+        parent_contract.children.append(child_id)
+    save_contract(parent_contract, contract_file)
+
+    # Add child to FEATURES.md
+    epic_name = _get_feature_name(paths.features_file, parent_id) or parent_id
+    epic_category = _get_feature_category(paths.features_file, parent_id)
+    epic_source = _get_feature_source(paths.features_file, parent_id)
+    section = _build_feature_section(
+        child_data, epic_name, epic_category, epic_source,
+    )
+    with open(paths.features_file, "a") as f:
+        f.write("\n" + section)
+
+    messages.append(f"Extracted {len(extracted)} ACs from {parent_id} → {child_id}: {child_name}")
+    messages.append(f"  Moved: {', '.join(a.id for a in extracted)}")
+    messages.append(f"  Parent retains {len(remaining)} ACs")
+
+    return True, messages
+
+
 def _create_v2_child_work_items(
     project_root: Path,
     epic_id: str,
@@ -389,6 +517,15 @@ def decompose(
     messages: list[str] = []
 
     # --- Precondition checks ---
+
+    # Depth guard: cannot decompose beyond MAX_DEPTH
+    depth = get_depth(epic_id)
+    if depth >= MAX_DEPTH:
+        return False, [
+            f"Cannot decompose {epic_id}: depth {depth} is at the maximum "
+            f"nesting level ({MAX_DEPTH}). Only root features (depth 0) and "
+            f"children (depth 1) can be decomposed."
+        ]
 
     # Feature must exist
     status = _get_feature_status(paths.features_file, epic_id)
@@ -753,7 +890,7 @@ def _build_child_contract(child: dict, epic_id: str) -> str:
         "assertions": assertions,
     }
     if child.get("component"):
-        contract_data["tags"] = [child["component"]]
+        contract_data["component"] = child["component"]
 
     try:
         import yaml
@@ -766,8 +903,10 @@ def _build_child_contract(child: dict, epic_id: str) -> str:
             "lifecycle: exploring",
             f"description: Child feature of {epic_id}.",
             f"parent: {epic_id}",
-            "assertions:",
         ]
+        if child.get("component"):
+            lines.append(f"component: {child['component']}")
+        lines.append("assertions:")
         for a in assertions:
             lines.append(f"  - id: {a['id']}")
             text = a['text'].replace('"', '\\"')
@@ -803,6 +942,14 @@ def main() -> int:
         help="Confirm proposal after human review",
     )
     decompose_parser.add_argument(
+        "--extract", type=str, default=None,
+        help="Extract specific ACs as a child (comma-separated: AC-001,AC-002)",
+    )
+    decompose_parser.add_argument(
+        "--name", type=str, default=None,
+        help="Name for the extracted child feature (used with --extract)",
+    )
+    decompose_parser.add_argument(
         "--project-root", type=Path, default=Path.cwd(),
     )
 
@@ -824,10 +971,18 @@ def main() -> int:
     project_root = args.project_root.resolve()
 
     if args.command == "decompose":
-        success, messages = decompose(
-            project_root, args.feature_id,
-            force=args.force, confirm=args.confirm,
-        )
+        if args.extract:
+            # Extract mode: move specific ACs to a child
+            ac_ids = [ac.strip() for ac in args.extract.split(",")]
+            success, messages = extract_subfeature(
+                project_root, args.feature_id,
+                ac_ids=ac_ids, child_name=args.name,
+            )
+        else:
+            success, messages = decompose(
+                project_root, args.feature_id,
+                force=args.force, confirm=args.confirm,
+            )
         for msg in messages:
             print(msg)
         return 0 if success else 1

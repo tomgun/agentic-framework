@@ -21,6 +21,7 @@ from auto.epic import (
     propose_decomposition,
     create_child_features,
     decompose,
+    extract_subfeature,
     recompute_epic_status,
     _parse_ac_groups,
     _derive_child_name,
@@ -30,6 +31,7 @@ from auto.epic import (
     _get_children_statuses,
     get_next_feature_id,
 )
+from ids import get_depth, get_next_child_id, MAX_DEPTH
 
 
 # ---------------------------------------------------------------------------
@@ -307,9 +309,10 @@ class TestProposeDecomposition:
         children = propose_decomposition(tmp_project, "F-0100")
         assert len(children) == 3
         assert children[0]["parent"] == "F-0100"
-        assert children[0]["id"] == "F-0101"
-        assert children[1]["id"] == "F-0102"
-        assert children[2]["id"] == "F-0103"
+        # Children now get dotted IDs: F-0100.1, F-0100.2, F-0100.3
+        assert children[0]["id"] == "F-0100.1"
+        assert children[1]["id"] == "F-0100.2"
+        assert children[2]["id"] == "F-0100.3"
 
     def test_no_ac_file_raises(self, tmp_project):
         _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
@@ -435,7 +438,7 @@ class TestCreateChildFeatures:
         contracts_dir = tmp_project / ".agentic" / "spec" / "contracts"
         contracts_dir.mkdir(parents=True, exist_ok=True)
         children = [{
-            "id": "F-0101",
+            "id": "F-0100.1",
             "name": "API Child",
             "parent": "F-0100",
             "component": "api",
@@ -443,10 +446,10 @@ class TestCreateChildFeatures:
         }]
         create_child_features(tmp_project, "F-0100", children)
 
-        contract_file = contracts_dir / "F-0101.yaml"
+        contract_file = contracts_dir / "F-0100.1.yaml"
         import yaml
         data = yaml.safe_load(contract_file.read_text())
-        assert "api" in data.get("tags", [])
+        assert data.get("component") == "api"
 
 
 # ---------------------------------------------------------------------------
@@ -523,7 +526,7 @@ class TestDecompose:
         assert any("--confirm" in m for m in msgs)
         # Children should NOT be created
         features = (tmp_project / ".agentic" / "spec" / "FEATURES.md").read_text()
-        assert "F-0101" not in features
+        assert "F-0100.1" not in features
 
     def test_human_review_confirm_creates(self, tmp_project):
         """With --confirm, children are created even in human review mode."""
@@ -597,10 +600,11 @@ class TestParentChildWiring:
         decompose(tmp_project, "F-0100")
 
         features_file = tmp_project / ".agentic" / "spec" / "FEATURES.md"
-        parent_101 = _get_feature_parent(features_file, "F-0101")
-        parent_102 = _get_feature_parent(features_file, "F-0102")
-        assert parent_101 == "F-0100"
-        assert parent_102 == "F-0100"
+        # Children now get dotted IDs
+        parent_1 = _get_feature_parent(features_file, "F-0100.1")
+        parent_2 = _get_feature_parent(features_file, "F-0100.2")
+        assert parent_1 == "F-0100"
+        assert parent_2 == "F-0100"
 
     def test_query_children_works(self, tmp_project):
         """get_children finds created children."""
@@ -666,8 +670,8 @@ class TestBuildChildContract:
         assert data["assertions"][0]["id"] == "AC-001"
         assert data["assertions"][1]["id"] == "AC-002"
 
-    def test_component_becomes_tag(self):
-        """Component field should appear as a tag, not a top-level field."""
+    def test_component_field_in_contract(self):
+        """Component should appear as a top-level field, not tags."""
         import yaml
         child = {
             "id": "F-0501",
@@ -677,5 +681,331 @@ class TestBuildChildContract:
         }
         content = _build_child_contract(child, "F-0500")
         data = yaml.safe_load(content)
-        assert "api" in data.get("tags", [])
-        assert "component" not in data  # not a valid contract field
+        assert data.get("component") == "api"
+        assert "tags" not in data  # component replaced tags pattern
+
+    def test_no_component_omits_field(self):
+        """Without component, neither component nor tags should appear."""
+        import yaml
+        child = {
+            "id": "F-0601",
+            "name": "Generic Feature",
+            "ac_lines": ['- [ ] **AC-001**: Works'],
+        }
+        content = _build_child_contract(child, "F-0600")
+        data = yaml.safe_load(content)
+        assert "component" not in data
+        assert "tags" not in data
+
+
+# ---------------------------------------------------------------------------
+# Dotted ID decomposition tests (Phase 1b)
+# ---------------------------------------------------------------------------
+
+class TestDottedIdDecomposition:
+    """Verify decomposition produces dotted child IDs (F-XXX.1, F-XXX.2)."""
+
+    def test_children_get_dotted_ids(self, tmp_project):
+        """Decompose creates children with dotted IDs under parent."""
+        _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
+        _write_ac(tmp_project, "F-0100", textwrap.dedent("""\
+            - [ ] **AC-001**: Handle auth
+            - [ ] **AC-002**: Handle payments
+        """))
+        children = propose_decomposition(tmp_project, "F-0100")
+        assert children[0]["id"] == "F-0100.1"
+        assert children[1]["id"] == "F-0100.2"
+        assert all(c["parent"] == "F-0100" for c in children)
+
+    def test_existing_children_skipped(self, tmp_project):
+        """When parent already has children, new ones get the next number."""
+        _write_features(tmp_project, textwrap.dedent("""\
+            ## F-0100: Epic
+            **Status**: planned
+
+            ## F-0100.1: Existing Child
+            **Status**: implementing
+            **Parent**: F-0100
+        """))
+        _write_ac(tmp_project, "F-0100", textwrap.dedent("""\
+            - [ ] **AC-001**: New thing A
+            - [ ] **AC-002**: New thing B
+        """))
+        children = propose_decomposition(tmp_project, "F-0100")
+        # Should start at .2 since .1 already exists
+        assert children[0]["id"] == "F-0100.2"
+        assert children[1]["id"] == "F-0100.3"
+
+    def test_decompose_child_creates_grandchildren(self, tmp_project):
+        """Decomposing a child (depth 1) creates grandchildren (depth 2)."""
+        _write_features(tmp_project, textwrap.dedent("""\
+            ## F-0100: Epic
+            **Status**: planned
+
+            ## F-0100.1: Child Feature
+            **Status**: planned
+            **Parent**: F-0100
+        """))
+        _write_ac(tmp_project, "F-0100.1", textwrap.dedent("""\
+            - [ ] **AC-001**: Sub-thing A
+            - [ ] **AC-002**: Sub-thing B
+        """))
+        children = propose_decomposition(tmp_project, "F-0100.1")
+        assert children[0]["id"] == "F-0100.1.1"
+        assert children[1]["id"] == "F-0100.1.2"
+        assert all(c["parent"] == "F-0100.1" for c in children)
+
+    def test_contract_files_use_dotted_names(self, tmp_project):
+        """Contract YAML files are named with dotted IDs (F-0100.1.yaml)."""
+        _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
+        contracts_dir = tmp_project / ".agentic" / "spec" / "contracts"
+        contracts_dir.mkdir(parents=True, exist_ok=True)
+        _write_ac(tmp_project, "F-0100", "- [ ] **AC-001**: Thing\n")
+        decompose(tmp_project, "F-0100")
+
+        assert (contracts_dir / "F-0100.1.yaml").exists()
+
+
+# ---------------------------------------------------------------------------
+# Depth guard tests (Phase 1b)
+# ---------------------------------------------------------------------------
+
+class TestDepthGuard:
+    """Verify decomposition respects MAX_DEPTH limit."""
+
+    def test_cannot_decompose_at_max_depth(self, tmp_project):
+        """Features at MAX_DEPTH cannot be decomposed further."""
+        # F-0100.1.2 is depth 2 (= MAX_DEPTH)
+        _write_features(tmp_project, textwrap.dedent("""\
+            ## F-0100: Root
+            **Status**: planned
+
+            ## F-0100.1: Child
+            **Status**: planned
+            **Parent**: F-0100
+
+            ## F-0100.1.2: Grandchild
+            **Status**: planned
+            **Parent**: F-0100.1
+        """))
+        _write_ac(tmp_project, "F-0100.1.2", "- [ ] **AC-001**: Deep thing\n")
+        success, msgs = decompose(tmp_project, "F-0100.1.2")
+        assert not success
+        assert any("depth" in m.lower() for m in msgs)
+
+    def test_can_decompose_at_depth_1(self, tmp_project):
+        """Children (depth 1) can still be decomposed into grandchildren."""
+        _write_features(tmp_project, textwrap.dedent("""\
+            ## F-0100: Root
+            **Status**: planned
+
+            ## F-0100.1: Child
+            **Status**: planned
+            **Parent**: F-0100
+        """))
+        _write_ac(tmp_project, "F-0100.1", "- [ ] **AC-001**: Sub-thing\n")
+        success, msgs = decompose(tmp_project, "F-0100.1")
+        assert success
+
+    def test_root_can_decompose(self, tmp_project):
+        """Root features (depth 0) can be decomposed."""
+        _write_features(tmp_project, "## F-0100: Root\n**Status**: planned\n")
+        _write_ac(tmp_project, "F-0100", "- [ ] **AC-001**: Thing\n")
+        success, msgs = decompose(tmp_project, "F-0100")
+        assert success
+
+
+# ---------------------------------------------------------------------------
+# extract_subfeature tests (Phase 1b)
+# ---------------------------------------------------------------------------
+
+def _write_contract(tmp_project, feature_id, content):
+    """Write a contract YAML file."""
+    contracts_dir = tmp_project / ".agentic" / "spec" / "contracts"
+    contracts_dir.mkdir(parents=True, exist_ok=True)
+    contract_file = contracts_dir / f"{feature_id}.yaml"
+    contract_file.write_text(content)
+    return contract_file
+
+
+class TestExtractSubfeature:
+    """Tests for extracting specific ACs from parent into a new child."""
+
+    def test_basic_extraction(self, tmp_project):
+        """Extract ACs from parent → creates child with dotted ID."""
+        _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
+        _write_contract(tmp_project, "F-0100", textwrap.dedent("""\
+            id: F-0100
+            name: Test Epic
+            lifecycle: planned
+            description: An epic feature.
+            assertions:
+              - id: AC-001
+                text: Handle registration
+                type: behavioral
+              - id: AC-002
+                text: Handle login
+                type: behavioral
+              - id: AC-003
+                text: Handle password reset
+                type: behavioral
+        """))
+
+        success, msgs = extract_subfeature(
+            tmp_project, "F-0100", ["AC-001", "AC-002"],
+            child_name="Auth Subsystem",
+        )
+        assert success
+        assert any("F-0100.1" in m for m in msgs)
+        assert any("2 ACs" in m for m in msgs)
+
+        # Child contract should exist
+        import yaml
+        child_file = tmp_project / ".agentic" / "spec" / "contracts" / "F-0100.1.yaml"
+        assert child_file.exists()
+        child_data = yaml.safe_load(child_file.read_text())
+        assert child_data["parent"] == "F-0100"
+        assert len(child_data["assertions"]) == 2
+
+        # Parent should retain only AC-003
+        parent_data = yaml.safe_load(
+            (tmp_project / ".agentic" / "spec" / "contracts" / "F-0100.yaml").read_text()
+        )
+        assert len(parent_data["assertions"]) == 1
+        assert parent_data["assertions"][0]["id"] == "AC-003"
+
+    def test_parent_children_list_updated(self, tmp_project):
+        """Parent's children field is updated after extraction."""
+        _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
+        _write_contract(tmp_project, "F-0100", textwrap.dedent("""\
+            id: F-0100
+            name: Test Epic
+            lifecycle: planned
+            description: An epic feature.
+            assertions:
+              - id: AC-001
+                text: Thing A
+                type: behavioral
+              - id: AC-002
+                text: Thing B
+                type: behavioral
+        """))
+
+        extract_subfeature(tmp_project, "F-0100", ["AC-001"])
+
+        import yaml
+        parent_data = yaml.safe_load(
+            (tmp_project / ".agentic" / "spec" / "contracts" / "F-0100.yaml").read_text()
+        )
+        assert "F-0100.1" in parent_data.get("children", [])
+
+    def test_missing_ac_fails(self, tmp_project):
+        """Requesting a non-existent AC ID fails."""
+        _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
+        _write_contract(tmp_project, "F-0100", textwrap.dedent("""\
+            id: F-0100
+            name: Test Epic
+            lifecycle: planned
+            description: An epic.
+            assertions:
+              - id: AC-001
+                text: Only assertion
+                type: behavioral
+        """))
+
+        success, msgs = extract_subfeature(
+            tmp_project, "F-0100", ["AC-001", "AC-999"],
+        )
+        assert not success
+        assert any("AC-999" in m for m in msgs)
+
+    def test_depth_guard_blocks_extraction(self, tmp_project):
+        """Cannot extract from a grandchild (depth 2)."""
+        _write_features(tmp_project, textwrap.dedent("""\
+            ## F-0100: Root
+            **Status**: planned
+
+            ## F-0100.1.2: Grandchild
+            **Status**: planned
+            **Parent**: F-0100.1
+        """))
+        _write_contract(tmp_project, "F-0100.1.2", textwrap.dedent("""\
+            id: F-0100.1.2
+            name: Grandchild
+            lifecycle: planned
+            description: Deep feature.
+            parent: F-0100.1
+            assertions:
+              - id: AC-001
+                text: Deep thing
+                type: behavioral
+        """))
+
+        success, msgs = extract_subfeature(
+            tmp_project, "F-0100.1.2", ["AC-001"],
+        )
+        assert not success
+        assert any("depth" in m.lower() for m in msgs)
+
+    def test_auto_derives_name(self, tmp_project):
+        """Without explicit name, derives from first extracted AC."""
+        _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
+        _write_contract(tmp_project, "F-0100", textwrap.dedent("""\
+            id: F-0100
+            name: Test Epic
+            lifecycle: planned
+            description: Epic.
+            assertions:
+              - id: AC-001
+                text: Handle user authentication
+                type: behavioral
+              - id: AC-002
+                text: Something else
+                type: behavioral
+        """))
+
+        success, msgs = extract_subfeature(tmp_project, "F-0100", ["AC-001"])
+        assert success
+
+        import yaml
+        child_data = yaml.safe_load(
+            (tmp_project / ".agentic" / "spec" / "contracts" / "F-0100.1.yaml").read_text()
+        )
+        assert "authentication" in child_data["name"].lower() or "Handle" in child_data["name"]
+
+    def test_sequential_extractions(self, tmp_project):
+        """Multiple extractions get sequential dotted IDs."""
+        _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
+        _write_contract(tmp_project, "F-0100", textwrap.dedent("""\
+            id: F-0100
+            name: Test Epic
+            lifecycle: planned
+            description: Epic.
+            assertions:
+              - id: AC-001
+                text: Thing A
+                type: behavioral
+              - id: AC-002
+                text: Thing B
+                type: behavioral
+              - id: AC-003
+                text: Thing C
+                type: behavioral
+        """))
+
+        # First extraction
+        success1, _ = extract_subfeature(
+            tmp_project, "F-0100", ["AC-001"], child_name="First Child",
+        )
+        assert success1
+
+        # Second extraction
+        success2, msgs2 = extract_subfeature(
+            tmp_project, "F-0100", ["AC-002"], child_name="Second Child",
+        )
+        assert success2
+        assert any("F-0100.2" in m for m in msgs2)
+
+        contracts_dir = tmp_project / ".agentic" / "spec" / "contracts"
+        assert (contracts_dir / "F-0100.1.yaml").exists()
+        assert (contracts_dir / "F-0100.2.yaml").exists()

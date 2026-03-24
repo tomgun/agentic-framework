@@ -306,7 +306,7 @@ autonomous_formal profile: formal rigor with review_code and review_regression d
 
 ## F-0184: Feature Hierarchy & Decomposition
 
-**Status**: shipped | **Category**: core-workflow | **Since**: v0.30.0 | **Profile**: formal
+**Status**: implementing
 **Contract**: [`spec/contracts/F-0184.yaml`](contracts/F-0184.yaml)
 **Consolidates**: F-0184
 
