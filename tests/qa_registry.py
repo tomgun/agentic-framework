@@ -67,7 +67,7 @@ def parse_features(root: Path) -> list:
     text = features_file.read_text(errors="replace")
 
     # Pattern: ## F-XXXX: Title
-    header_re = re.compile(r"^## (F-\d{4}):\s*(.+)$", re.MULTILINE)
+    header_re = re.compile(r"^## ((?:F|DEV|E)-\d{3,}(?:\.[1-9]\d*)*):\s*(.+)$", re.MULTILINE)
     status_re = re.compile(r"^\*\*Status\*\*:\s*(\S+)", re.MULTILINE)
 
     headers = list(header_re.finditer(text))
@@ -98,7 +98,7 @@ def scan_validate_framework(root: Path) -> dict:
     text = vf.read_text(errors="replace")
 
     # Pattern: # F-XXXX: Description  or  # ============... followed by # F-XXXX:
-    section_re = re.compile(r"^# (F-\d{4}):\s*(.+)$", re.MULTILINE)
+    section_re = re.compile(r"^# ((?:F|DEV|E)-\d{3,}(?:\.[1-9]\d*)*):\s*(.+)$", re.MULTILINE)
     for m in section_re.finditer(text):
         fid = m.group(1)
         desc = m.group(2).strip()
@@ -116,14 +116,14 @@ def scan_pytest_files(root: Path) -> tuple:
     tagged = {}
     untagged = []
 
-    pattern = re.compile(r"@feature\s+(F-\d{4}(?:\s*,\s*F-\d{4})*)", re.IGNORECASE)
+    pattern = re.compile(r"@feature\s+((?:F|DEV|E)-\d{3,}(?:\.[1-9]\d*)*(?:\s*,\s*(?:F|DEV|E)-\d{3,}(?:\.[1-9]\d*)*)*)", re.IGNORECASE)
 
     for f in sorted(test_dir.glob("test_*.py")):
         text = f.read_text(errors="replace")
         matches = pattern.findall(text)
         if matches:
             for match in matches:
-                for fid in re.findall(r"F-\d{4}", match):
+                for fid in re.findall(r"(?:F|DEV|E)-\d{3,}(?:\.[1-9]\d*)*", match):
                     tagged.setdefault(fid, []).append(str(f.relative_to(root)))
         else:
             untagged.append(str(f.relative_to(root)))
@@ -143,7 +143,7 @@ def scan_llm_tests(root: Path) -> tuple:
     tagged = {}
     untagged = []
     total = 0
-    fid_re = re.compile(r"\bF-(\d{4})\b")
+    fid_re = re.compile(r"\b((?:F|DEV|E)-\d{3,}(?:\.[1-9]\d*)*)\b")
 
     for f in sorted(llm_dir.glob("*.sh")):
         total += 1
@@ -159,7 +159,7 @@ def scan_llm_tests(root: Path) -> tuple:
             stripped = line.strip()
             if stripped.startswith("#"):
                 for m in fid_re.finditer(line):
-                    fids_found.add(f"F-{m.group(1)}")
+                    fids_found.add(m.group(1))
 
         rel = str(f.relative_to(root))
         if fids_found:

@@ -146,6 +146,7 @@ class Contract:
     profile: str = "both"
     protection: str = "none"
     category: str = "uncategorized"
+    component: Optional[str] = None
     consolidated_from: list[str] = field(default_factory=list)
     user_input: str = ""
     parent: Optional[str] = None
@@ -173,6 +174,7 @@ class Contract:
             profile=d.get("profile", "both"),
             protection=d.get("protection", "none"),
             category=d.get("category", "uncategorized"),
+            component=d.get("component"),
             consolidated_from=d.get("consolidated_from", []),
             user_input=d.get("user_input", ""),
             parent=d.get("parent"),
@@ -199,6 +201,8 @@ class Contract:
         d["protection"] = self.protection
         if self.category != "uncategorized":
             d["category"] = self.category
+        if self.component is not None:
+            d["component"] = self.component
         if self.consolidated_from:
             d["consolidated_from"] = self.consolidated_from
         d["description"] = self.description
@@ -312,7 +316,7 @@ def save_contract(contract: Contract, path: Optional[Path] = None) -> Path:
 # Validation
 # ---------------------------------------------------------------------------
 
-_ID_PATTERN = re.compile(r"^(F|DEV|E|NFR)-\d{4,}$")
+_ID_PATTERN = re.compile(r"^(F|DEV|E|NFR)-\d{3,}(\.[1-9]\d*)*$")
 _AC_PATTERN = re.compile(r"^AC-\d{3,}$")
 _MIGRATION_PATTERN = re.compile(r"^M-\d{4}-\d{2}-\d{2}-\d{3}$")
 _VALID_LIFECYCLES = {"exploring", "specifying", "implementing", "verifying", "shipping", "shipped", "deprecated", "ongoing"}
@@ -330,7 +334,12 @@ def validate_contract(contract: Contract) -> list[str]:
     if not contract.id:
         errors.append("Missing required field: id")
     elif not _ID_PATTERN.match(contract.id):
-        errors.append(f"Invalid id format: {contract.id} (expected F-XXXX, DEV-XXXX, E-XXXX, or NFR-XXXX)")
+        errors.append(f"Invalid id format: {contract.id} (expected F-XXX[.N], DEV-XXX[.N], E-XXX[.N], or NFR-XXX)")
+    else:
+        from ids import get_depth
+        depth = get_depth(contract.id)
+        if depth > 2:
+            errors.append(f"Feature ID too deeply nested: {contract.id} (depth={depth}, max=2)")
 
     if not contract.name or len(contract.name) < 3:
         errors.append(f"Name too short or missing: '{contract.name}'")
@@ -552,6 +561,42 @@ def coverage_report(contracts_dir: Path) -> dict[str, Any]:
         "gaps": gaps,
         "coverage_pct": round(with_tests / total_assertions * 100, 1) if total_assertions else 0,
     }
+
+
+# ---------------------------------------------------------------------------
+# Hierarchy queries
+# ---------------------------------------------------------------------------
+
+def get_effective_assertions(
+    feature_id: str, contracts_dir: Path
+) -> dict[str, list[Assertion]]:
+    """Get own + all descendants' assertions, grouped by contract ID.
+
+    Returns {feature_id: [assertions], child_id: [assertions], ...}.
+    "Effective ACs" = own + children's, computed at query time.
+    """
+    result: dict[str, list[Assertion]] = {}
+    contract = get_contract_by_id(contracts_dir, feature_id)
+    if contract is None:
+        return result
+
+    result[contract.id] = list(contract.assertions)
+
+    for child_id in contract.children:
+        child_result = get_effective_assertions(child_id, contracts_dir)
+        result.update(child_result)
+
+    return result
+
+
+def get_contracts_by_component(
+    contracts_dir: Path, component: str
+) -> list[Contract]:
+    """Return contracts matching a specific component."""
+    return [
+        c for c in load_all_contracts(contracts_dir)
+        if c.component == component
+    ]
 
 
 # ---------------------------------------------------------------------------

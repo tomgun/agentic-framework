@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- ADR-001 roadmap execution: F-0184 (Feature Hierarchy & Decomposition) is current backlog item (Updated: 2026-03-24 20:14 UTC)
+- F-0184 Phase 1a complete — dotted IDs, component field, shell audit. Next: Phase 1b (epic.py + commands) (Updated: 2026-03-24 20:41 UTC)
 
 ## Current focus
 - **F-0302: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

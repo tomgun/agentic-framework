@@ -8,8 +8,8 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^(F|DEV|NFR)-[0-9]{4,}$",
-      "description": "Feature, dev-infrastructure, or NFR identifier"
+      "pattern": "^(F|DEV|E|NFR)-[0-9]{3,}(\\.[1-9][0-9]*)*$",
+      "description": "Feature, dev-infrastructure, epic, or NFR identifier. Supports dotted hierarchy (F-003.1)."
     },
     "name": {
       "type": "string",
@@ -49,6 +49,11 @@
       "default": "uncategorized",
       "description": "Feature grouping for display and filtering"
     },
+    "component": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Project component (backend, frontend, infra). Distinct from category."
+    },
     "description": {
       "type": "string",
       "minLength": 10,
@@ -70,7 +75,7 @@
     },
     "parent": {
       "type": ["string", "null"],
-      "pattern": "^(F|DEV|E)-[0-9]{4,}$",
+      "pattern": "^(F|DEV|E)-[0-9]{3,}(\\.[1-9][0-9]*)*$",
       "default": null,
       "description": "Parent feature, dev-infrastructure, or epic ID"
     },
@@ -78,7 +83,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^(F|DEV)-[0-9]{4,}$"
+        "pattern": "^(F|DEV|E)-[0-9]{3,}(\\.[1-9][0-9]*)*$"
       },
       "default": [],
       "description": "Child feature IDs for epics or decomposed features"
