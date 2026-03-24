@@ -271,7 +271,7 @@ case "${1:-help}" in
         cmd_commit
         ;;
     done)
-        cmd_done "${2:-}"
+        shift; cmd_done "$@"
         ;;
     merge)
         cmd_merge "${2:-}" "${3:-}"

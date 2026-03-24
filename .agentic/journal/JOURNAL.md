@@ -4409,3 +4409,42 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-24 06:19 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-0193: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-03-24 06:20 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-0193: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-03-24 06:20 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-0193: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
