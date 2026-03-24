@@ -245,7 +245,30 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+
+
+
+
+### HN-0066: PR #202: DEV-0243 + DEV-0001 taxonomy
+- **Type**: pr_review
+- **Added**: 2026-03-24
+- **Context**: Review and merge: tier experiments harness + DEV-XXXX namespace for dev infrastructure
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
+
+### HN-0065: Review: DEV-0243 → implementing
+- **Resolved**: 2026-03-24
+- **Outcome**: Review approved: resolved
+
+
+### HN-0064: Review: DEV-0243 → specced
+- **Resolved**: 2026-03-24
+- **Outcome**: Review approved: resolved
+
 
 ### HN-0060: Review: F-0303 → implementing
 - **Resolved**: 2026-03-23

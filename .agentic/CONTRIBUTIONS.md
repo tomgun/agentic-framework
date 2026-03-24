@@ -8,6 +8,46 @@
 
 ## Recent Contributions
 
+### F-0302 Phase 4 — User Input as Agent Control Surface (PR #196, v0.73.0)
+
+**User insight**: The `user_input` field in contracts (a key design principle: specs as control interface) is only useful if agents can *discover* it — a field buried in a YAML file nobody reads is not a control surface. The discovery pipeline was missing entirely: agents had no way to know pending input existed.
+
+**Design direction**: Surface user_input at every agent entry point. Dashboard shows "📥 N pending", `ag start` shows previews, `ag implement` shows INFO guidance. New skill `handling-contract-input` defines the 7-step response workflow (discover → read → test → implement → migrate → clear → verify). Trigger words added to all 7 instruction files so agents route to the skill automatically.
+
+**Why it matters**: Specs as a control interface only works if the control surface is visible. Discoverability is not a UX polish — it's what makes the design principle real.
+
+---
+
+### Scaffold-First Hook Architecture (PR #190, v0.71.0)
+
+**User insight**: Scaffold already pre-installs hooks to `lib/` — the wrapper layer in `.agentic/hooks/claude/` was redundant. The init playbook was reinstalling them mid-session, causing misleading "Claude Code restart required" warnings that confused users.
+
+**Design direction**: Eliminate 9 wrapper scripts. `hooks.json` points directly to `lib/claude-hooks/` — hooks auto-update with framework upgrades instead of requiring manual wrapper sync. Init playbook Step 1a rewritten from "install" to "verify/prune." Init interview uses `AskUserQuestion` for batched questions rather than 7 sequential prompts.
+
+**Why it matters**: Redundant wrappers created a maintenance burden and a UX failure mode (spurious restart warnings). Removing the layer makes hook lifecycle simpler and upgrades automatic.
+
+---
+
+### F-0301 — Feature Status Audit + Completion Gate (PR #191+192, v0.71.0)
+
+**User insight**: Conducted systematic feature status audit and found 3 features (F-0240, F-0242, F-0194) with merged code on main but still marked "planned" — agents had committed directly to main bypassing `ag done`. Expanded scan found 8 total features in this state.
+
+**Design direction**: `ag implement` should structurally block when any prior backlog item has merged code but isn't shipped — passive detection on dashboard plus advisory on `ag start`. Completion gate enforces that shipped code matches spec status before new work begins.
+
+**Why it matters**: Status drift is silent. Without a structural gate, agents bypass `ag done` and the entire spec/status lifecycle silently decouples from the code.
+
+---
+
+### F-0224 — Smoke Test Evidence Gate (PR #150, v0.57.0)
+
+**User insight**: "`ag done` checked ACs and docs but not whether smoke testing actually happened — `tests pass` ≠ `it works`." The framework had no gate that verified a human or agent had actually run the feature end-to-end before marking it done.
+
+**Design decision**: Deliberate naming choice: `off/recommended/required` rather than the existing docs_gate pattern of `off/warning/blocking`. "Recommended" communicates a framework suggestion rather than a project rule; "required" is clearer than "blocking" to new users reading STACK.md for the first time.
+
+**Why it matters**: Quality gates are only as strong as their last step. A smoke test gate closes the gap between "passing tests" and "working software."
+
+---
+
 ### Spec System Overhaul — Design Principles (F-0302, v0.71.0)
 
 **User insights** that shaped the YAML contract system:
@@ -61,7 +101,7 @@ The v2 engine design has three layers: (1) `state_machine_af.yaml` — a single 
 
 The net result: 130 files / 34K lines removed, replaced by ~25 files / ~3K lines. The instruction surface agents must process dropped by ~90%. But the critical insight isn't the line count reduction — it's that the remaining 3K lines are structurally enforced by the CLI rather than probabilistically followed by the LLM. The framework moved from "tell agents what to do and hope they do it" to "agents literally cannot proceed without doing it."
 
-### QA Observatory — Empirical Complexity Validation (F-0240–F-0243, PR #174+)
+### QA Observatory — Empirical Complexity Validation (F-0240–DEV-0243, PR #174+)
 
 **User insight**: Tomas designed the QA Observatory initiative around three concerns and provided several key architectural ideas in the original prompt: (1) **framework.log as tool-agnostic execution trace** — a structured append-only log at `.agentic/session/framework.log` that every script writes to, complementing Claude's JSONL (which is tool-specific) with a trace that works across Claude, Cursor, Copilot, and Codex. The specific format (pipe-delimited with timestamp, script, action, result) and phased instrumentation strategy (choke points first for ~80% coverage) came from the prompt. (2) **Generated registry over hand-written** — the rationale "156 features × 12 categories, manual maintenance would drift instantly" and the design of qa_registry.py scanning multiple sources (validate_framework.sh F-XXXX headers, pytest @feature decorators, LLM test references, scenario YAMLs, pre-commit gate catalog, checklists). (3) **Complexity tier experiments** — the core question "does the complexity actually help?" with the three-tier comparison, the separation of universal metrics (app works, tests pass) from framework-specific metrics (specs created, plans reviewed), and the insight that cross-tier comparisons must use universal metrics only to avoid circular reasoning. (4) **Simulation testing via phase expectations** — extending scenario YAML with intermediate state checks (files_exist/file_contains/files_not_exist at each workflow phase) and tool-call sequence expectations (spec before code, plan before review) with ordering constraints. The dialectical review then refined several of these: replacing Tier A ("CLAUDE.md only") with discovery profile (a real configuration), resolving the SequenceChecker duplication by refactoring existing detect_violations() rather than creating a parallel system, and correcting the dependency graph from "parallel" to honest sequential ordering.
 
@@ -1929,7 +1969,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Cross-session learning captured; all AI tools enforce same quality gates.
 
-### Multi-Tool LLM Testing Infrastructure (F-0122)
+### Multi-Tool LLM Testing Infrastructure (DEV-0122)
 
 **User request**:
 > "So the behavioral LLM tests are ESSENTIAL. And they should be run using Cursor when in cursor."
@@ -3040,6 +3080,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 **User insight**: Identified that instruction file drift (templates vs. root files diverging after each feature ship) is a systemic problem, not a one-time cleanup. The path bug (`work/plan.md` vs `journal/plans/`) was silently misdirecting agents for multiple sessions before being caught by diffing the files side-by-side.
 
 **Design direction**: Mechanical state injection (e.g. `**Status**: DRAFT` written by a shell hook, not by the agent) is more reliable than behavioral instructions. When you need a state transition to happen reliably, write it into the file system — don't rely on the agent choosing to do it.
+
+---
+
+### Feature Taxonomy — Capabilities vs. Dev Infrastructure (v0.72.x)
+
+**User insight**: Raised the philosophical question of whether internal framework tooling (testing infrastructure, instruction file integrity, tier experiments) truly belongs in FEATURES.md alongside user-facing capabilities. "This sounds like it is like tooling for the frameworks development, and the framework itself has other capabilities when used?" This led to the distinction between `capability` (user-facing, default) and `infrastructure`/`research` (internal dev tooling) feature types.
+
+**User insight**: Identified that grouping internal items under one parent category preserves workflow rigor (same `ag` ceremony for all work) while making the distinction visible. "We can utilise the workflow of the framework to develop these tooling/QA things, that is even what I wish. But should we group them under one main category of features / capabilities?" — yes, with a parent container (DEV-0001).
+
+**User insight**: Introduced the `DEV-XXXX` namespace for development infrastructure items, distinct from `F-XXXX` (user capabilities) and `NFR-XXXX` (non-functional requirements). "Maybe the 'F' could be another letter for the internal 'features' if it describes a completely different category of things." Chose `DEV-` (over `D-`, `I-`, `INT-`, `QA-`) as unambiguous, self-documenting, and consistent with the existing multi-char `NFR-` prefix.
+
+**Design direction**: The `lifecycle: ongoing` value for meta/container items that never complete — organizations need to track permanent infrastructure without forcing it through shipped/deprecated states designed for time-bounded features.
 
 ---
 

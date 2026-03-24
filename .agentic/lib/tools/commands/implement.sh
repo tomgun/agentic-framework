@@ -362,7 +362,7 @@ if c.has_pending_input:
         transition_out=$(python3 "$SCRIPT_DIR/../auto/state_machine.py" \
             --project-root "${MAIN_PROJECT_ROOT:-$ROOT_DIR}" \
             $_enforce_flag \
-            transition "$feature_id" implementing 2>&1) || transition_rc=$?
+            "$feature_id" implementing 2>&1) || transition_rc=$?
         if [ "$transition_rc" -eq 0 ] || echo "$transition_out" | grep -q "no-op"; then
             echo -e "${GREEN}State: implementing${NC}"
             intent_checkpoint "$feature_id" "transition_state" || true

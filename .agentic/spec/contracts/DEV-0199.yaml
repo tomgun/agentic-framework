@@ -1,11 +1,13 @@
-id: F-0199
+id: DEV-0199
 name: Instruction File Integrity
 lifecycle: shipped
 since: v0.45.0
 profile: both
 protection: contract
-category: agent-system
-consolidated_from: [F-0199, F-0226]
+category: dev-infrastructure
+parent: DEV-0001
+tags: [infrastructure, internal]
+consolidated_from: [DEV-0199, F-0226]
 
 description: |
   Instruction file sync detection catches drift between agent instruction

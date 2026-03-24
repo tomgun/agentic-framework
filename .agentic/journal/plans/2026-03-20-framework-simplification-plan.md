@@ -283,7 +283,7 @@ Wire PostToolUse/PreToolUse hooks to `ag check` for enforcement at the tool leve
 F-0223, F-0228, F-0233, F-0213, F-0210, F-0211, F-0212
 
 ### Features that REMAIN (orthogonal)
-F-0220, F-0193, F-0242, F-0243, F-0227
+F-0220, F-0193, F-0242, DEV-0243, F-0227
 
 ### Features that become LATER PHASES
 F-0230 (MCP), F-0231 (Multi-Repo), F-0232 (Full Scheduling)

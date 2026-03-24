@@ -5,14 +5,15 @@ since: v0.1.0
 profile: formal
 protection: contract
 category: core-workflow
-consolidated_from: [F-0004, F-0042, F-0078, F-0109, F-0110, F-0177, F-0178, F-0197]
+consolidated_from: [F-0004, F-0042, F-0078, F-0109, F-0110, F-0177, F-0178, F-0193, F-0197]
 
 description: |
   Features have a formal lifecycle tracked in FEATURES.md with states from
   planned through shipped. A state machine enforces valid transitions and
   gate checks. feature.sh provides token-efficient updates. Feature hierarchy
   supports parent-child relationships for epics. Registry integrity checks
-  validate FEATURES.md consistency.
+  validate FEATURES.md consistency. Feature ID patterns are centralized in
+  ids.py/ids.sh — all parsing and validation imports from there.
 
 user_input: ""
 
@@ -58,6 +59,15 @@ assertions:
       grep -q "status.*downgrade" .agentic/lib/hooks/pre-commit-check.sh
     tests:
       - tests/validate_framework.sh::F-0178
+
+  - id: AC-006
+    text: "Feature ID patterns centralized in ids.py/ids.sh — no hardcoded patterns in consuming code"
+    type: structural
+    verify: |
+      test -f .agentic/lib/ids.py && test -f .agentic/lib/ids.sh
+    tests:
+      - tests/validate_framework.sh::F-0004
+      - tests/test_ids.py
 
 nfr_refs: []
 scenarios:

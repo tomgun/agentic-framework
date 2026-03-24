@@ -1961,7 +1961,7 @@ agent_mode: balanced  # premium | balanced | economy
 
 ---
 
-## F-0122: Multi-Tool LLM Testing Infrastructure
+## DEV-0122: Multi-Tool LLM Testing Infrastructure
 
 **Status**: shipped
 **Category**: Quality
@@ -1976,9 +1976,9 @@ agent_mode: balanced  # premium | balanced | economy
 **Implementation**:
 - State: complete
 - Code: `tests/llm/test_definitions.json`, `tests/llm/interactive_runner.py`, `.agentic/tools/ag.sh` (test command), `tests/llm/harness.sh`
-- Tests: `tests/validate_framework.sh` (F-0122 section), `tests/VERIFICATION_REPORT.md`
+- Tests: `tests/validate_framework.sh` (DEV-0122 section), `tests/VERIFICATION_REPORT.md`
 
-**Acceptance**: See `spec/acceptance/F-0122.md`
+**Acceptance**: See `spec/acceptance/DEV-0122.md`
 
 ---
 
@@ -3368,7 +3368,7 @@ Scan tool-specific plan directories (~/.claude/plans/, .cursor/plans/) for files
 
 **Acceptance**: spec/acceptance/F-0198.md
 
-## F-0199: Instruction File Sync Detection
+## DEV-0199: Instruction File Sync Detection
 
 **Status**: shipped
 **Category**: Reliability
@@ -3384,7 +3384,7 @@ Detect when ag.sh commands are added but instruction files (CLAUDE.md, cursorrul
 - Code: .agentic/lib/tools/instruction-sync.sh
 - Tests: validate_framework.sh, pre-commit-check.sh
 
-**Acceptance**: spec/acceptance/F-0199.md
+**Acceptance**: spec/acceptance/DEV-0199.md
 
 ## F-0200: Intent Journal + Reconciliation
 
@@ -4211,7 +4211,7 @@ Proposed restructuring:
 **Priority**: medium
 **Complexity**: low
 
-**Description**: Structured append-only log at `.agentic/session/framework.log` that every script writes to when called. Tool-agnostic execution trace (works with Claude, Cursor, Copilot, Codex). Provides debugging value ("why did my commit fail?") and serves as data source for simulation testing (F-0242) and tier experiments (F-0243). Phase 1 instruments choke points (ag.sh, pre-commit, hooks) for ~80% coverage.
+**Description**: Structured append-only log at `.agentic/session/framework.log` that every script writes to when called. Tool-agnostic execution trace (works with Claude, Cursor, Copilot, Codex). Provides debugging value ("why did my commit fail?") and serves as data source for simulation testing (F-0242) and tier experiments (DEV-0243). Phase 1 instruments choke points (ag.sh, pre-commit, hooks) for ~80% coverage.
 
 **Acceptance**: See `spec/acceptance/F-0240.md`
 
@@ -4243,7 +4243,7 @@ Proposed restructuring:
 
 ---
 
-## F-0243: Complexity Tier Experiments
+## DEV-0243: Complexity Tier Experiments
 
 **Status**: planned
 **Category**: Testing
@@ -4252,7 +4252,7 @@ Proposed restructuring:
 
 **Description**: Runs the same task across three real configuration profiles (discovery/formal/autonomous_formal) and compares outcomes empirically. Answers "does the complexity actually help?" with universal metrics (app_runs, tests_pass, test_count) and framework-specific metrics reported separately. Depends on F-0240.
 
-**Acceptance**: See `spec/acceptance/F-0243.md`
+**Acceptance**: See `spec/acceptance/DEV-0243.md`
 
 ---
 

@@ -12,19 +12,24 @@
 
 | Category | Count | Shipped | In Progress | Planned |
 |----------|-------|---------|-------------|---------|
-| **Core Workflow** | 9 | 6 | 1 | 2 |
-| **Quality** | 7 | 7 | 0 | 0 |
+| **Core Workflow** | 8 | 5 | 1 | 2 |
+| **Quality** | 6 | 6 | 0 | 0 |
 | **Design Principles** | 1 | 1 | 0 | 0 |
 | **Session** | 1 | 1 | 0 | 0 |
 | **Multi-Agent** | 4 | 2 | 0 | 2 |
 | **Tooling** | 2 | 2 | 0 | 0 |
 | **Recovery** | 1 | 1 | 0 | 0 |
 | **Developer Experience** | 5 | 3 | 0 | 2 |
-| **Agent System** | 2 | 2 | 0 | 0 |
+| **Agent System** | 1 | 1 | 0 | 0 |
 | **Architecture** | 4 | 3 | 0 | 1 |
 | **Git Workflow** | 2 | 1 | 0 | 1 |
 | **Autonomous** | 3 | 2 | 0 | 1 |
-| **Total** | **42** | **32** | **1** | **9** |
+| **Dev Infrastructure** | 4 | 3 | 1 | 0 |
+| **Total** | **41** | **30** | **2** | **9** |
+
+> **Feature types** (shown where relevant): `capability` — user-facing (default, unlabeled) · `infrastructure` — permanent dev tooling · `research` — time-bounded experiment · `meta` — organizational container
+>
+> Development infrastructure items (`DEV-XXXX`) use the full `ag` workflow but are not user-facing capabilities.
 
 ---
 
@@ -52,9 +57,9 @@ Formal-profile projects manage features through YAML contract specifications wit
 
 **Status**: shipped | **Category**: core-workflow | **Since**: v0.1.0 | **Profile**: formal
 **Contract**: [`spec/contracts/F-0004.yaml`](contracts/F-0004.yaml)
-**Consolidates**: F-0004, F-0042, F-0078, F-0109, F-0110, F-0177, F-0178, F-0197
+**Consolidates**: F-0004, F-0042, F-0078, F-0109, F-0110, F-0177, F-0178, F-0193, F-0197
 
-State machine manages feature lifecycle from planned through shipped. Transitions are gated, with forward/regression/skip rules. Feature categories, priorities, and complexity tracked in FEATURES.md.
+State machine manages feature lifecycle from planned through shipped. Transitions are gated, with forward/regression/skip rules. Feature categories, priorities, and complexity tracked in FEATURES.md. Feature ID patterns centralized in ids.py/ids.sh.
 
 ---
 
@@ -228,11 +233,12 @@ Dialectical plan review: Critic + Advocate agents evaluate plans in fresh contex
 
 ---
 
-## F-0122: Testing Infrastructure
+## DEV-0122: Testing Infrastructure
 
-**Status**: shipped | **Category**: quality | **Since**: v0.10.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0122.yaml`](contracts/F-0122.yaml)
-**Consolidates**: F-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242
+**Status**: shipped | **Category**: dev-infrastructure | **Since**: v0.10.0 | **Profile**: both
+**Type**: infrastructure | **Parent**: DEV-0001
+**Contract**: [`spec/contracts/DEV-0122.yaml`](contracts/DEV-0122.yaml)
+**Consolidates**: DEV-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242
 
 validate_framework.sh (structural tests), LLM behavioral tests, QA registry mapping features to tests, spec-code traceability. Framework verification at multiple layers.
 
@@ -328,11 +334,12 @@ Ordered work queue in BACKLOG.json. `ag backlog add/list/done/move/remove`. Posi
 
 ---
 
-## F-0199: Instruction File Integrity
+## DEV-0199: Instruction File Integrity
 
-**Status**: shipped | **Category**: agent-system | **Since**: v0.45.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0199.yaml`](contracts/F-0199.yaml)
-**Consolidates**: F-0199, F-0226
+**Status**: shipped | **Category**: dev-infrastructure | **Since**: v0.45.0 | **Profile**: both
+**Type**: infrastructure | **Parent**: DEV-0001
+**Contract**: [`spec/contracts/DEV-0199.yaml`](contracts/DEV-0199.yaml)
+**Consolidates**: DEV-0199, F-0226
 
 Instruction files are part of the feature. 11 locations must be updated when shipping framework features. `ag dogfood` detects template vs root drift.
 
@@ -354,14 +361,6 @@ Claude Code hooks for automated enforcement: pre-commit checks, post-tool valida
 **Contract**: [`spec/contracts/F-0302.yaml`](contracts/F-0302.yaml)
 
 YAML contracts replace markdown acceptance criteria as source of truth. Machine-verifiable assertions, migration-protected shipped contracts, user_input as control interface. Consolidates 217 legacy features into ~33 contracts.
-
----
-
-## F-0193: Collision-Proof Feature IDs
-
-**Status**: implementing | **Category**: core-workflow | **Profile**: both
-
-Centralized feature ID patterns via `ids.py` (Python) and `ids.sh` (shell). All feature ID regexes (`FEATURE_ID_RE`, `FEATURE_HEADER_RE`, `FEATURE_ID_ERE`, etc.) are defined once and imported everywhere — no inline patterns in consuming code. JSON schemas widened to `{4,}` digits for future-proofing.
 
 ---
 
@@ -421,11 +420,36 @@ Autonomous scheduling engine that assigns work to agents based on priority, depe
 
 ---
 
-## F-0243: Complexity Tier Experiments
+## DEV-0243: Complexity Tier Experiments
 
-**Status**: planned | **Category**: core-workflow | **Profile**: formal
+**Status**: shipped | **Category**: dev-infrastructure
+**Type**: research | **Parent**: DEV-0001
+**Contract**: [`spec/contracts/DEV-0243.yaml`](contracts/DEV-0243.yaml)
 
-Complexity tiers (simple/standard/complex) that auto-select appropriate ceremony level. ADR-001 roadmap item.
+Empirically compare framework outcomes across three real configuration profiles (discovery, formal, autonomous_formal) by running the same build task N times per tier and collecting structured metrics. Produces a comparison report showing what each tier costs (time, token spend, ceremony) and what it buys (spec coverage, test count, commit quality, violation rate). ADR-001 roadmap item.
+
+---
+
+## Development Infrastructure
+
+Work tracked here uses the same `ag` workflow as capabilities — specs, plans,
+ACs, shipping ceremony. These are how the framework is built and validated.
+Not user-facing.
+
+| Type | Meaning |
+|------|---------|
+| `infrastructure` | Permanent internal tooling (maintained indefinitely) |
+| `research` | Time-bounded experiment (concludes when question is answered) |
+| `meta` | Organizational container |
+
+### DEV-0001: Framework Development Infrastructure
+
+**Status**: ongoing | **Type**: meta
+
+Organizational parent for all framework development tooling and research.
+
+**Children**: DEV-0122, DEV-0199, DEV-0243
+**Contract**: [`spec/contracts/DEV-0001.yaml`](contracts/DEV-0001.yaml)
 
 ---
 

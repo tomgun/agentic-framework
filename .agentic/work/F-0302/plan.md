@@ -322,7 +322,7 @@ Produce the consolidated feature list (~30-40 entries). Each entry has:
 ### Step 0.3: Planned Feature Pruning
 
 Review each planned/unimplemented feature with user:
-- F-0193, F-0210-F-0213, F-0220, F-0223, F-0227-F-0228, F-0230-F-0233, F-0243
+- F-0193, F-0210-F-0213, F-0220, F-0223, F-0227-F-0228, F-0230-F-0233, DEV-0243
 - Decision per feature: keep in backlog, drop, or merge into existing
 
 **Output**: `spec/CONSOLIDATION_MAP.md` — table of old → new feature mapping

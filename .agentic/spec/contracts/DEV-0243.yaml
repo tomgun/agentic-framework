@@ -1,0 +1,31 @@
+id: DEV-0243
+name: Complexity Tier Experiments
+lifecycle: shipped
+profile: both
+category: dev-infrastructure
+parent: DEV-0001
+tags: [research, internal]
+description: |
+  Empirical comparison harness for discovery/formal/autonomous_formal profiles.
+  Runs the same build scenario N times per tier, collects structured metrics
+  (spec coverage, test count, commit quality, wall time, violation rate), and
+  produces a comparison report. Research item: concludes when profile comparison
+  is documented.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "tier_experiment.py exists with TierMetrics dataclass"
+    type: structural
+    verify: "grep -q 'class TierMetrics' .agentic/lib/auto/tier_experiment.py"
+
+  - id: AC-002
+    text: "complexity_tiers.yaml has 3 tiers with review_plan override"
+    type: structural
+    verify: "grep -q 'review_plan: critical_agent' .agentic/lib/auto/experiments/complexity_tiers.yaml"
+
+  - id: AC-003
+    text: "ag auto tier-experiment is wired in auto.sh"
+    type: structural
+    verify: "grep -q 'tier-experiment' .agentic/lib/tools/commands/auto.sh"

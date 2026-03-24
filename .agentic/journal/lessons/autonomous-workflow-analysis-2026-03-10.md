@@ -74,7 +74,7 @@ If any of these are lost/broken, autonomous workflow degrades:
 
 3. **`pre-commit-check.sh` pipefail+SIGPIPE fix** — the fix (pre-fetching diff into variable) is strictly more correct. If edge cases with very large diffs, `|| true` fallback handles it.
 
-4. **`validate_framework.sh` F-0197/F-0198/F-0199 test sections** — additive (no existing tests modified), so risk is low.
+4. **`validate_framework.sh` F-0197/F-0198/DEV-0199 test sections** — additive (no existing tests modified), so risk is low.
 
 ## Merge conflict resolution strategy used
 

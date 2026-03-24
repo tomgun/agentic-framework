@@ -1634,7 +1634,7 @@ Organized by impact and effort:
 
 4. **Protected Main Branch Support (T-0066)** — Framework assumes direct-to-main for state files (`ag done`, `ag flush`). With branch protection rules, these break. Needs architectural solution.
 
-5. **Collision-Proof Feature IDs (F-0193)** — Sequential F-XXXX collides in multi-agent/multi-branch. Options: slugs, atomic allocation, UUIDs.
+5. **Collision-Proof Feature IDs (F-0193 → F-0004)** — Sequential F-XXXX collides in multi-agent/multi-branch. Options: slugs, atomic allocation, UUIDs. ID pattern centralization shipped; collision prevention remains open.
 
 6. ~~**ag.sh Decomposition**~~ — **DONE (F-0221)**. ag.sh decomposed from 4,325 lines into 363-line dispatcher + 12 sourced modules under `commands/`.
 
