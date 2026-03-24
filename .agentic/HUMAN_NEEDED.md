@@ -249,6 +249,15 @@ _No active items_
 
 
 
+
+### HN-0066: PR #202: F-0243 + DEV-0001 taxonomy
+- **Type**: pr_review
+- **Added**: 2026-03-24
+- **Context**: Review and merge: tier experiments harness + DEV-XXXX namespace for dev infrastructure
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0065: Review: F-0243 → implementing
