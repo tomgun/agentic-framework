@@ -3095,8 +3095,26 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### Feature = Capability, Not Addition (v0.72.x)
+
+**User insight**: Tomas established a foundational principle for how the framework thinks about features: a feature ID represents a *capability*, not an individual addition or improvement. When the agent proposed new F-XXXX IDs for things like "enforce plan review" or "harden state machine gates," Tomas pushed back: these are improvements to existing capabilities (F-0120 Plan & Design Review, F-0004 Feature Tracking), not new features. "Improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX." This became the no-feature-inflation rule, preventing the feature namespace from bloating with implementation-detail IDs that obscure the actual capability surface.
+
+**Design direction**: The test is "which existing feature owns this?" — if an existing capability covers the concern, the work belongs there. New F-XXXX IDs are reserved for genuinely new capabilities that users would recognize as distinct functionality.
+
+---
+
+### Hierarchical Feature Naming & Clean Renumber (F-0184, v0.73.x)
+
+**User insight**: Tomas designed the hierarchical feature ID system from scratch, establishing the dotted notation (F-003.1, F-003.1.2) for parent-child feature decomposition. The key design decisions were all user-driven: universal IDs with dotted children instead of separate namespace prefixes; component as metadata (not baked into the ID) because cross-cutting features prove component coupling would create artificial constraints; 4-level max depth; children starting at .1 (never .0); parent ACs independent of children with "effective ACs" computed at query time.
+
+**User insight**: Initiated the clean renumber — recognizing that post-consolidation (35 features down from 217) was the right moment to replace the chronologically-assigned 4-digit IDs (F-0001, F-0004, F-0081...) with sequential 3-digit category-grouped IDs (F-001 through F-039). "The framework's feature tracking has grown to 30+ consolidated features with flat, chronologically-assigned IDs" — the cognitive overhead of memorizing which random 4-digit number maps to which capability was unnecessary now that the feature space was stable.
+
+**Design direction**: The renumber mapping groups features by domain (Core Workflow F-001–006, Quality F-007–014, etc.) making the feature space scannable without consulting a legend. Historical dead IDs in `consolidated_from` are explicitly excluded from renaming — they're tombstones, not live references.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
-**Current Version**: v0.71.1
+**Current Version**: v0.73.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
 **Status**: Production-ready, battle-tested, actively maintained, formally specified, self-dogfooding
 **LLM Tests**: 67 behavioral test definitions
