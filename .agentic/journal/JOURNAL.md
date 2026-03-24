@@ -4448,3 +4448,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-24 06:45 - F-0243 Complexity Tier Experiments
+
+**Why**: Provide empirical evidence for which framework profile produces best outcomes
+
+**What changed**:
+- Implemented empirical tier comparison harness: tier_experiment.py module with TierMetrics, collect_metrics, ExperimentResult; complexity_tiers.yaml experiment config with discovery/formal/autonomous_formal tiers; ag auto tier-experiment command; test_tier_experiment.py unit tests; LLM test 096; validate_framework.sh gates
+
+**Next steps**:
+- Commit and ship F-0243
+
+**Blockers**: None
+
+
+### Session: 2026-03-24 08:00 - F-0243 + DEV-0001 taxonomy
+
+**Why**: F-0243 implements empirical tier comparison harness. DEV-0001 reorganizes internal tooling to be visually distinct from user-facing capabilities
+
+**What changed**:
+- F-0243 Complexity Tier Experiments shipped (tier_experiment.py, complexity_tiers.yaml, LLM test, 35 unit tests). DEV-0001 Framework Development Infrastructure taxonomy created: DEV-XXXX namespace, parent container, Type annotations on F-0122/F-0199/F-0243, lifecycle:ongoing for meta items, contract schema updated
+
+**Next steps**:
+- Ship and push
+
+**Blockers**: none
+

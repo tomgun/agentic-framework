@@ -4,7 +4,9 @@ lifecycle: shipped
 since: v0.10.0
 profile: both
 protection: contract
-category: quality
+category: dev-infrastructure
+parent: DEV-0001
+tags: [infrastructure, internal]
 consolidated_from: [F-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242]
 
 description: |

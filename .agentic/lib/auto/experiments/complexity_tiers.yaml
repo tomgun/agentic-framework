@@ -1,0 +1,33 @@
+name: "Complexity Tier Comparison"
+description: "Empirical comparison of discovery vs formal vs autonomous_formal profiles"
+scenarios:
+  - todo_app
+repetitions: 3
+# Note: all tiers use the 'discovery' prompt template (agent discovers workflow from STACK.md).
+# This is intentional — we test real user experience with each profile, not artificially
+# instructed behavior. Only STACK.md settings differ between tiers.
+
+tiers:
+  - name: discovery
+    settings:
+      profile: discovery
+      git_workflow: direct
+      docs_mode: deferred
+    timeout: 3600
+
+  - name: formal
+    settings:
+      profile: formal
+      git_workflow: pull_request
+      review_merge: skip          # formal default is 'human' — skip for autonomous completion
+      review_plan: critical_agent # formal default is 'human' — deadlocks in experiments
+      review_commit: critical_agent  # same — override for autonomous completion
+    timeout: 7200
+
+  - name: autonomous_formal
+    settings:
+      profile: autonomous_formal
+      git_workflow: pull_request
+      review_merge: skip
+      # review_plan and review_commit default to 'critical_agent' for autonomous_formal — no override needed
+    timeout: 7200

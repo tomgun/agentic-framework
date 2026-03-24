@@ -4752,6 +4752,71 @@ else
 fi
 
 # ============================================================
+# F-0243: Complexity Tier Experiments
+# ============================================================
+echo ""
+echo "--- F-0243: Complexity Tier Experiments ---"
+
+_tier_exp="${FRAMEWORK_ROOT}/.agentic/lib/auto/tier_experiment.py"
+if [ -f "$_tier_exp" ]; then
+  pass "F-0243 AC1: tier_experiment.py exists"
+else
+  fail "F-0243 AC1: tier_experiment.py not found"
+fi
+
+_tier_yaml="${FRAMEWORK_ROOT}/.agentic/lib/auto/experiments/complexity_tiers.yaml"
+if [ -f "$_tier_yaml" ]; then
+  pass "F-0243 AC6: complexity_tiers.yaml exists"
+  # Check all 3 tiers
+  _has_discovery=$(grep -c "name: discovery" "$_tier_yaml" || true)
+  _has_formal=$(grep -c "name: formal" "$_tier_yaml" || true)
+  _has_auto_formal=$(grep -c "name: autonomous_formal" "$_tier_yaml" || true)
+  if [ "$_has_discovery" -ge 1 ] && [ "$_has_formal" -ge 1 ] && [ "$_has_auto_formal" -ge 1 ]; then
+    pass "F-0243 AC6: complexity_tiers.yaml has all 3 tiers"
+  else
+    fail "F-0243 AC6: complexity_tiers.yaml missing tiers (discovery=$_has_discovery formal=$_has_formal autonomous_formal=$_has_auto_formal)"
+  fi
+  # Check formal tier has review_plan override (prevents deadlock)
+  if grep -q "review_plan: critical_agent" "$_tier_yaml"; then
+    pass "F-0243 AC6: formal tier has review_plan override (prevents deadlock)"
+  else
+    fail "F-0243 AC6: formal tier missing review_plan override — will deadlock"
+  fi
+else
+  fail "F-0243 AC6: complexity_tiers.yaml not found"
+fi
+
+if grep -q "tier-experiment" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/auto.sh"; then
+  pass "F-0243 AC4: ag auto tier-experiment wired in auto.sh"
+else
+  fail "F-0243 AC4: ag auto tier-experiment not wired in auto.sh"
+fi
+
+if grep -q "class TierMetrics" "$_tier_exp" 2>/dev/null; then
+  pass "F-0243 AC9: TierMetrics dataclass defined"
+else
+  fail "F-0243 AC9: TierMetrics class not found"
+fi
+
+if grep -q "class ExperimentResult" "$_tier_exp" 2>/dev/null; then
+  pass "F-0243 AC9: ExperimentResult dataclass defined"
+else
+  fail "F-0243 AC9: ExperimentResult class not found"
+fi
+
+if [ -f "${FRAMEWORK_ROOT}/tests/llm/tests/096_tier_experiment_trigger.sh" ]; then
+  pass "F-0243 AC8: LLM test 096_tier_experiment_trigger.sh exists"
+else
+  fail "F-0243 AC8: LLM test not found"
+fi
+
+if [ -f "${FRAMEWORK_ROOT}/tests/test_tier_experiment.py" ]; then
+  pass "F-0243 AC2: test_tier_experiment.py exists"
+else
+  fail "F-0243 AC2: test_tier_experiment.py not found"
+fi
+
+# ============================================================
 # STATE MACHINE VALIDATION
 # ============================================================
 echo ""
@@ -5005,6 +5070,33 @@ if grep -q "contract protection" "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commi
   pass "F-0302: pre-commit-check.sh has contract protection"
 else
   fail "F-0302: pre-commit-check.sh missing contract protection"
+fi
+
+# DEV-0001: Framework Development Infrastructure
+echo "--- DEV-0001: Framework Development Infrastructure ---"
+
+if grep -q "DEV-0001" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md" 2>/dev/null; then
+  pass "DEV-0001: dev-infrastructure section exists in FEATURES.md"
+else
+  fail "DEV-0001: dev-infrastructure section missing from FEATURES.md"
+fi
+
+if grep -q "Type.*infrastructure\|Type.*research" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md" 2>/dev/null; then
+  pass "DEV-0001: Type annotations present on internal features"
+else
+  fail "DEV-0001: Type annotations missing from internal features"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/DEV-0001.yaml" ]]; then
+  pass "DEV-0001: contract exists"
+else
+  fail "DEV-0001: DEV-0001.yaml contract missing"
+fi
+
+if grep -q "DEV" "${FRAMEWORK_ROOT}/.agentic/lib/schemas/contract.schema.json" 2>/dev/null; then
+  pass "DEV-0001: DEV-XXXX pattern supported in contract schema"
+else
+  fail "DEV-0001: DEV-XXXX pattern missing from contract schema"
 fi
 
 # Summary

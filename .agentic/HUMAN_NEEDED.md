@@ -245,7 +245,21 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+
+
+
 ## Resolved
+
+### HN-0065: Review: F-0243 → implementing
+- **Resolved**: 2026-03-24
+- **Outcome**: Review approved: resolved
+
+
+### HN-0064: Review: F-0243 → specced
+- **Resolved**: 2026-03-24
+- **Outcome**: Review approved: resolved
+
 
 ### HN-0060: Review: F-0303 → implementing
 - **Resolved**: 2026-03-23

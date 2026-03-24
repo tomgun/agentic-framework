@@ -72,6 +72,10 @@ cmd_auto() {
             # Framework self-verification loop (F-0215)
             python3 "$auto_dir/framework_verify.py" --project-root "$ROOT_DIR" "$@"
             ;;
+        tier-experiment)
+            # Complexity tier experiments — compare discovery/formal/autonomous_formal (F-0243)
+            python3 "$auto_dir/tier_experiment.py" --project-root "$ROOT_DIR" "$@"
+            ;;
         feedback)
             python3 "$auto_dir/control.py" feedback "$@" --project-root "$ROOT_DIR"
             ;;
@@ -93,6 +97,11 @@ cmd_auto() {
             echo "  verify-framework      Framework self-verification loop (F-0215)"
             echo "    --project <name>      Run single scenario (todo-app, api-service, etc.)"
             echo "    --all                 Run all scenarios × all settings combos"
+            echo "    --json                Machine-readable output"
+            echo "  tier-experiment       Compare outcomes across discovery/formal/autonomous_formal (F-0243)"
+            echo "    --experiment <name>   Experiment config (e.g. complexity_tiers)"
+            echo "    --dry-run             Print planned runs without spawning agents"
+            echo "    --single-run          1 rep per tier (development mode)"
             echo "    --json                Machine-readable output"
             echo "  pipeline              End-to-end: vision → epic → implement → ship (F-0188)"
             echo "    --vision \"text\"       Freeform vision — Claude decomposes into features"

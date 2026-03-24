@@ -1,0 +1,32 @@
+id: DEV-0001
+name: Framework Development Infrastructure
+lifecycle: ongoing
+profile: both
+category: dev-infrastructure
+tags: [meta, internal]
+children:
+  - F-0122
+  - F-0199
+  - F-0243
+description: |
+  Organizational parent for framework development tooling, QA infrastructure,
+  and research experiments. Not a user-facing capability. Children use the full
+  ag workflow for rigor while being clearly distinguished from capabilities.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "DEV-0001 section exists in FEATURES.md"
+    type: structural
+    verify: "grep -q 'DEV-0001' .agentic/spec/FEATURES.md"
+
+  - id: AC-002
+    text: "Internal features have Type annotations in FEATURES.md"
+    type: structural
+    verify: "grep -q 'Type.*infrastructure\\|Type.*research' .agentic/spec/FEATURES.md"
+
+  - id: AC-003
+    text: "DEV-XXXX pattern is supported in contract schema"
+    type: structural
+    verify: "grep -q 'DEV' .agentic/lib/schemas/contract.schema.json"

@@ -3083,6 +3083,18 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### Feature Taxonomy — Capabilities vs. Dev Infrastructure (v0.72.x)
+
+**User insight**: Raised the philosophical question of whether internal framework tooling (testing infrastructure, instruction file integrity, tier experiments) truly belongs in FEATURES.md alongside user-facing capabilities. "This sounds like it is like tooling for the frameworks development, and the framework itself has other capabilities when used?" This led to the distinction between `capability` (user-facing, default) and `infrastructure`/`research` (internal dev tooling) feature types.
+
+**User insight**: Identified that grouping internal items under one parent category preserves workflow rigor (same `ag` ceremony for all work) while making the distinction visible. "We can utilise the workflow of the framework to develop these tooling/QA things, that is even what I wish. But should we group them under one main category of features / capabilities?" — yes, with a parent container (DEV-0001).
+
+**User insight**: Introduced the `DEV-XXXX` namespace for development infrastructure items, distinct from `F-XXXX` (user capabilities) and `NFR-XXXX` (non-functional requirements). "Maybe the 'F' could be another letter for the internal 'features' if it describes a completely different category of things." Chose `DEV-` (over `D-`, `I-`, `INT-`, `QA-`) as unambiguous, self-documenting, and consistent with the existing multi-char `NFR-` prefix.
+
+**Design direction**: The `lifecycle: ongoing` value for meta/container items that never complete — organizations need to track permanent infrastructure without forcing it through shipped/deprecated states designed for time-bounded features.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.71.1
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

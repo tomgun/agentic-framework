@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0193 shipped — starting F-0243 Complexity Tier Experiments (Updated: 2026-03-24 06:09 UTC)
+- F-0243 shipped; DEV-0001 taxonomy complete (Updated: 2026-03-24 08:00 UTC)
 
 ## Current focus
 - **F-0302: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

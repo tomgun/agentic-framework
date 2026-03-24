@@ -4,7 +4,9 @@ lifecycle: shipped
 since: v0.45.0
 profile: both
 protection: contract
-category: agent-system
+category: dev-infrastructure
+parent: DEV-0001
+tags: [infrastructure, internal]
 consolidated_from: [F-0199, F-0226]
 
 description: |

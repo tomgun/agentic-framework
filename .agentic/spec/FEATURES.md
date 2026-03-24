@@ -12,19 +12,24 @@
 
 | Category | Count | Shipped | In Progress | Planned |
 |----------|-------|---------|-------------|---------|
-| **Core Workflow** | 9 | 6 | 1 | 2 |
-| **Quality** | 7 | 7 | 0 | 0 |
+| **Core Workflow** | 8 | 5 | 1 | 2 |
+| **Quality** | 6 | 6 | 0 | 0 |
 | **Design Principles** | 1 | 1 | 0 | 0 |
 | **Session** | 1 | 1 | 0 | 0 |
 | **Multi-Agent** | 4 | 2 | 0 | 2 |
 | **Tooling** | 2 | 2 | 0 | 0 |
 | **Recovery** | 1 | 1 | 0 | 0 |
 | **Developer Experience** | 5 | 3 | 0 | 2 |
-| **Agent System** | 2 | 2 | 0 | 0 |
+| **Agent System** | 1 | 1 | 0 | 0 |
 | **Architecture** | 4 | 3 | 0 | 1 |
 | **Git Workflow** | 2 | 1 | 0 | 1 |
 | **Autonomous** | 3 | 2 | 0 | 1 |
-| **Total** | **42** | **32** | **1** | **9** |
+| **Dev Infrastructure** | 4 | 3 | 1 | 0 |
+| **Total** | **42** | **31** | **2** | **9** |
+
+> **Feature types** (shown where relevant): `capability` — user-facing (default, unlabeled) · `infrastructure` — permanent dev tooling · `research` — time-bounded experiment · `meta` — organizational container
+>
+> Development infrastructure items (`DEV-XXXX`) use the full `ag` workflow but are not user-facing capabilities.
 
 ---
 
@@ -230,7 +235,8 @@ Dialectical plan review: Critic + Advocate agents evaluate plans in fresh contex
 
 ## F-0122: Testing Infrastructure
 
-**Status**: shipped | **Category**: quality | **Since**: v0.10.0 | **Profile**: both
+**Status**: shipped | **Category**: dev-infrastructure | **Since**: v0.10.0 | **Profile**: both
+**Type**: infrastructure | **Parent**: DEV-0001
 **Contract**: [`spec/contracts/F-0122.yaml`](contracts/F-0122.yaml)
 **Consolidates**: F-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242
 
@@ -330,7 +336,8 @@ Ordered work queue in BACKLOG.json. `ag backlog add/list/done/move/remove`. Posi
 
 ## F-0199: Instruction File Integrity
 
-**Status**: shipped | **Category**: agent-system | **Since**: v0.45.0 | **Profile**: both
+**Status**: shipped | **Category**: dev-infrastructure | **Since**: v0.45.0 | **Profile**: both
+**Type**: infrastructure | **Parent**: DEV-0001
 **Contract**: [`spec/contracts/F-0199.yaml`](contracts/F-0199.yaml)
 **Consolidates**: F-0199, F-0226
 
@@ -423,9 +430,34 @@ Autonomous scheduling engine that assigns work to agents based on priority, depe
 
 ## F-0243: Complexity Tier Experiments
 
-**Status**: planned | **Category**: core-workflow | **Profile**: formal
+**Status**: shipped | **Category**: dev-infrastructure
+**Type**: research | **Parent**: DEV-0001
+**Contract**: [`spec/contracts/F-0243.yaml`](contracts/F-0243.yaml)
 
-Complexity tiers (simple/standard/complex) that auto-select appropriate ceremony level. ADR-001 roadmap item.
+Empirically compare framework outcomes across three real configuration profiles (discovery, formal, autonomous_formal) by running the same build task N times per tier and collecting structured metrics. Produces a comparison report showing what each tier costs (time, token spend, ceremony) and what it buys (spec coverage, test count, commit quality, violation rate). ADR-001 roadmap item.
+
+---
+
+## Development Infrastructure
+
+Work tracked here uses the same `ag` workflow as capabilities — specs, plans,
+ACs, shipping ceremony. These are how the framework is built and validated.
+Not user-facing.
+
+| Type | Meaning |
+|------|---------|
+| `infrastructure` | Permanent internal tooling (maintained indefinitely) |
+| `research` | Time-bounded experiment (concludes when question is answered) |
+| `meta` | Organizational container |
+
+### DEV-0001: Framework Development Infrastructure
+
+**Status**: ongoing | **Type**: meta
+
+Organizational parent for all framework development tooling and research.
+
+**Children**: F-0122, F-0199, F-0243
+**Contract**: [`spec/contracts/DEV-0001.yaml`](contracts/DEV-0001.yaml)
 
 ---
 

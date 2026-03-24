@@ -8,8 +8,8 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^(F|NFR)-[0-9]{4,}$",
-      "description": "Feature or NFR identifier"
+      "pattern": "^(F|DEV|NFR)-[0-9]{4,}$",
+      "description": "Feature, dev-infrastructure, or NFR identifier"
     },
     "name": {
       "type": "string",
@@ -24,8 +24,8 @@
     },
     "lifecycle": {
       "type": "string",
-      "enum": ["exploring", "specifying", "implementing", "verifying", "shipping", "shipped", "deprecated"],
-      "description": "Contract lifecycle state"
+      "enum": ["exploring", "specifying", "implementing", "verifying", "shipping", "shipped", "deprecated", "ongoing"],
+      "description": "Contract lifecycle state (ongoing = permanent meta/container item)"
     },
     "since": {
       "type": "string",
@@ -70,15 +70,15 @@
     },
     "parent": {
       "type": ["string", "null"],
-      "pattern": "^(F|E)-[0-9]{4,}$",
+      "pattern": "^(F|DEV|E)-[0-9]{4,}$",
       "default": null,
-      "description": "Parent feature or epic ID"
+      "description": "Parent feature, dev-infrastructure, or epic ID"
     },
     "children": {
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^F-[0-9]{4,}$"
+        "pattern": "^(F|DEV)-[0-9]{4,}$"
       },
       "default": [],
       "description": "Child feature IDs for epics or decomposed features"
