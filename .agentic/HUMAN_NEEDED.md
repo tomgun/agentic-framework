@@ -258,6 +258,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0067: PR #203: F-0184 Phase 1a — hierarchical dotted IDs
+- **Type**: pr_review
+- **Added**: 2026-03-24
+- **Context**: Phase 1a of hierarchy system: dotted IDs, component metadata, shell audit. Review at https://github.com/tomgun/agentic-framework/pull/203
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0065: Review: DEV-0243 → implementing
