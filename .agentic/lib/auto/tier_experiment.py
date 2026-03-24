@@ -1,5 +1,5 @@
 """
-tier_experiment.py — Complexity Tier Experiments (F-0243).
+tier_experiment.py — Complexity Tier Experiments (DEV-0243).
 
 Runs the same scenario across three real configuration profiles
 (discovery / formal / autonomous_formal) N times each and compares outcomes.
@@ -19,7 +19,7 @@ VW worktree: NOT used. setup_project only needs project_root to copy .agentic/ f
 Passing project_root directly avoids AG_TRUNK_BRANCH env pollution that would confuse
 spawned agents in temp project repos.
 
-@feature F-0243
+@feature DEV-0243
 """
 from __future__ import annotations
 
@@ -679,7 +679,7 @@ def _extract_test_command(scenario: dict[str, Any]) -> Optional[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="F-0243: Complexity Tier Experiments — compare discovery/formal/autonomous_formal"
+        description="DEV-0243: Complexity Tier Experiments — compare discovery/formal/autonomous_formal"
     )
     parser.add_argument(
         "--project-root", default=".", type=Path,

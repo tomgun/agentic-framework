@@ -1,4 +1,4 @@
-"""Tests for tier_experiment.py (F-0243) — Complexity Tier Experiments."""
+"""Tests for tier_experiment.py (DEV-0243) — Complexity Tier Experiments."""
 from __future__ import annotations
 
 import io

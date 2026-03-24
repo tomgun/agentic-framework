@@ -73,7 +73,7 @@ cmd_auto() {
             python3 "$auto_dir/framework_verify.py" --project-root "$ROOT_DIR" "$@"
             ;;
         tier-experiment)
-            # Complexity tier experiments — compare discovery/formal/autonomous_formal (F-0243)
+            # Complexity tier experiments — compare discovery/formal/autonomous_formal (DEV-0243)
             python3 "$auto_dir/tier_experiment.py" --project-root "$ROOT_DIR" "$@"
             ;;
         feedback)
@@ -98,7 +98,7 @@ cmd_auto() {
             echo "    --project <name>      Run single scenario (todo-app, api-service, etc.)"
             echo "    --all                 Run all scenarios × all settings combos"
             echo "    --json                Machine-readable output"
-            echo "  tier-experiment       Compare outcomes across discovery/formal/autonomous_formal (F-0243)"
+            echo "  tier-experiment       Compare outcomes across discovery/formal/autonomous_formal (DEV-0243)"
             echo "    --experiment <name>   Experiment config (e.g. complexity_tiers)"
             echo "    --dry-run             Print planned runs without spawning agents"
             echo "    --single-run          1 rep per tier (development mode)"

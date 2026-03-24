@@ -2,7 +2,7 @@
 """
 Tests for ids.py — centralized ID patterns and formatting.
 
-@feature F-0193
+@feature F-0004 (consolidated from F-0193)
 """
 import sys
 import textwrap

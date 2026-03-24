@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0243 shipped; DEV-0001 taxonomy complete (Updated: 2026-03-24 08:00 UTC)
+- ADR-001 roadmap execution: DEV-0243 (Complexity Tier Experiments) is current backlog item (Updated: 2026-03-24 19:13 UTC)
 
 ## Current focus
 - **F-0302: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
@@ -21,7 +21,7 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 - F-0302: Spec System Overhaul — Phase 1 complete, 5 phases remaining
 
 ## Next up (after F-0302)
-- F-0243: Complexity Tier Experiments
+- DEV-0243: Complexity Tier Experiments
 - F-0223: Later State Machine Gates Strengthening
 - F-0220: Protected Main Branch Support
 
@@ -34,4 +34,4 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 ## Release notes (optional)
 - v0.58.0: F-0239 structural enforcement for post-merge workflow
 - See CHANGELOG.md for full history
-- QA: QA: 0/1 verified, 6 pending
+- QA: QA: 0/1 verified, 9 pending

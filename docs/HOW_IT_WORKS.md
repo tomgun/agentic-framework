@@ -86,7 +86,7 @@ graph TB
         F_BROWNFIELD[Brownfield Specs<br/>ag specs]
 
         %% Testing
-        F_LLM_TESTS[LLM Behavioral Tests<br/>F-0122]
+        F_LLM_TESTS[LLM Behavioral Tests<br/>DEV-0122]
         F_MUTATION[Mutation Tests<br/>infrastructure validation]
         F_FRAMEWORK_TESTS[Framework Validation<br/>validate_framework.sh]
 

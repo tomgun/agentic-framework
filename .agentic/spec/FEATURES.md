@@ -25,7 +25,7 @@
 | **Git Workflow** | 2 | 1 | 0 | 1 |
 | **Autonomous** | 3 | 2 | 0 | 1 |
 | **Dev Infrastructure** | 4 | 3 | 1 | 0 |
-| **Total** | **42** | **31** | **2** | **9** |
+| **Total** | **41** | **30** | **2** | **9** |
 
 > **Feature types** (shown where relevant): `capability` — user-facing (default, unlabeled) · `infrastructure` — permanent dev tooling · `research` — time-bounded experiment · `meta` — organizational container
 >
@@ -57,9 +57,9 @@ Formal-profile projects manage features through YAML contract specifications wit
 
 **Status**: shipped | **Category**: core-workflow | **Since**: v0.1.0 | **Profile**: formal
 **Contract**: [`spec/contracts/F-0004.yaml`](contracts/F-0004.yaml)
-**Consolidates**: F-0004, F-0042, F-0078, F-0109, F-0110, F-0177, F-0178, F-0197
+**Consolidates**: F-0004, F-0042, F-0078, F-0109, F-0110, F-0177, F-0178, F-0193, F-0197
 
-State machine manages feature lifecycle from planned through shipped. Transitions are gated, with forward/regression/skip rules. Feature categories, priorities, and complexity tracked in FEATURES.md.
+State machine manages feature lifecycle from planned through shipped. Transitions are gated, with forward/regression/skip rules. Feature categories, priorities, and complexity tracked in FEATURES.md. Feature ID patterns centralized in ids.py/ids.sh.
 
 ---
 
@@ -233,12 +233,12 @@ Dialectical plan review: Critic + Advocate agents evaluate plans in fresh contex
 
 ---
 
-## F-0122: Testing Infrastructure
+## DEV-0122: Testing Infrastructure
 
 **Status**: shipped | **Category**: dev-infrastructure | **Since**: v0.10.0 | **Profile**: both
 **Type**: infrastructure | **Parent**: DEV-0001
-**Contract**: [`spec/contracts/F-0122.yaml`](contracts/F-0122.yaml)
-**Consolidates**: F-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242
+**Contract**: [`spec/contracts/DEV-0122.yaml`](contracts/DEV-0122.yaml)
+**Consolidates**: DEV-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242
 
 validate_framework.sh (structural tests), LLM behavioral tests, QA registry mapping features to tests, spec-code traceability. Framework verification at multiple layers.
 
@@ -334,12 +334,12 @@ Ordered work queue in BACKLOG.json. `ag backlog add/list/done/move/remove`. Posi
 
 ---
 
-## F-0199: Instruction File Integrity
+## DEV-0199: Instruction File Integrity
 
 **Status**: shipped | **Category**: dev-infrastructure | **Since**: v0.45.0 | **Profile**: both
 **Type**: infrastructure | **Parent**: DEV-0001
-**Contract**: [`spec/contracts/F-0199.yaml`](contracts/F-0199.yaml)
-**Consolidates**: F-0199, F-0226
+**Contract**: [`spec/contracts/DEV-0199.yaml`](contracts/DEV-0199.yaml)
+**Consolidates**: DEV-0199, F-0226
 
 Instruction files are part of the feature. 11 locations must be updated when shipping framework features. `ag dogfood` detects template vs root drift.
 
@@ -361,14 +361,6 @@ Claude Code hooks for automated enforcement: pre-commit checks, post-tool valida
 **Contract**: [`spec/contracts/F-0302.yaml`](contracts/F-0302.yaml)
 
 YAML contracts replace markdown acceptance criteria as source of truth. Machine-verifiable assertions, migration-protected shipped contracts, user_input as control interface. Consolidates 217 legacy features into ~33 contracts.
-
----
-
-## F-0193: Collision-Proof Feature IDs
-
-**Status**: shipped
-
-Centralized feature ID patterns via `ids.py` (Python) and `ids.sh` (shell). All feature ID regexes (`FEATURE_ID_RE`, `FEATURE_HEADER_RE`, `FEATURE_ID_ERE`, etc.) are defined once and imported everywhere — no inline patterns in consuming code. JSON schemas widened to `{4,}` digits for future-proofing.
 
 ---
 
@@ -428,11 +420,11 @@ Autonomous scheduling engine that assigns work to agents based on priority, depe
 
 ---
 
-## F-0243: Complexity Tier Experiments
+## DEV-0243: Complexity Tier Experiments
 
 **Status**: shipped | **Category**: dev-infrastructure
 **Type**: research | **Parent**: DEV-0001
-**Contract**: [`spec/contracts/F-0243.yaml`](contracts/F-0243.yaml)
+**Contract**: [`spec/contracts/DEV-0243.yaml`](contracts/DEV-0243.yaml)
 
 Empirically compare framework outcomes across three real configuration profiles (discovery, formal, autonomous_formal) by running the same build task N times per tier and collecting structured metrics. Produces a comparison report showing what each tier costs (time, token spend, ceremony) and what it buys (spec coverage, test count, commit quality, violation rate). ADR-001 roadmap item.
 
@@ -456,7 +448,7 @@ Not user-facing.
 
 Organizational parent for all framework development tooling and research.
 
-**Children**: F-0122, F-0199, F-0243
+**Children**: DEV-0122, DEV-0199, DEV-0243
 **Contract**: [`spec/contracts/DEV-0001.yaml`](contracts/DEV-0001.yaml)
 
 ---

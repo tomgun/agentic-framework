@@ -8,14 +8,14 @@ The fix has two parts:
 1. **New ID namespace**: `DEV-XXXX` for all development infrastructure and research items
 2. **Organizational grouping**: a parent container `DEV-0001` under which all internal items are grouped
 
-Existing internal features (F-0122, F-0199, F-0243) keep their `F-` IDs — renaming would be disruptive. But they get marked with `Type:` + `Parent: DEV-0001` to make their nature visible. New internal items going forward get `DEV-XXXX` IDs.
+Existing internal features (DEV-0122, DEV-0199, DEV-0243) keep their `F-` IDs — renaming would be disruptive. But they get marked with `Type:` + `Parent: DEV-0001` to make their nature visible. New internal items going forward get `DEV-XXXX` IDs.
 
 > **Note on T-0089**: T-0089 (TODO) tracks user-defined custom prefixes (teams defining `AUTH-`, `PAY-`, etc. in their own projects). `DEV-` is distinct — it's a first-party framework namespace, like `NFR-`. T-0089 remains open and unaffected by this change.
 
 **The three internal features being categorized:**
-- **F-0122** Testing Infrastructure (validate_framework.sh, LLM tests, QA registry, simulation testing) — permanent infrastructure, parent: DEV-0001
-- **F-0199** Instruction File Integrity (template/root file drift detection, `ag dogfood`) — permanent infrastructure, parent: DEV-0001
-- **F-0243** Complexity Tier Experiments — time-bounded research, parent: DEV-0001
+- **DEV-0122** Testing Infrastructure (validate_framework.sh, LLM tests, QA registry, simulation testing) — permanent infrastructure, parent: DEV-0001
+- **DEV-0199** Instruction File Integrity (template/root file drift detection, `ag dogfood`) — permanent infrastructure, parent: DEV-0001
+- **DEV-0243** Complexity Tier Experiments — time-bounded research, parent: DEV-0001
 
 ---
 
@@ -57,7 +57,7 @@ Not user-facing.
 
 Organizational parent for all framework development tooling and research.
 
-**Children**: F-0122, F-0199, F-0243
+**Children**: DEV-0122, DEV-0199, DEV-0243
 **Contract**: `spec/contracts/DEV-0001.yaml`
 ```
 
@@ -71,9 +71,9 @@ profile: both
 category: dev-infrastructure
 tags: [meta, internal]
 children:
-  - F-0122
-  - F-0199
-  - F-0243
+  - DEV-0122
+  - DEV-0199
+  - DEV-0243
 description: |
   Organizational parent for framework development tooling, QA infrastructure,
   and research experiments. Not a user-facing capability. Children use the full
@@ -97,21 +97,21 @@ assertions:
 
 In each entry, add `**Type**:` and `**Parent**:` to the metadata line:
 
-**F-0122 Testing Infrastructure**
+**DEV-0122 Testing Infrastructure**
 - Change `**Category**: quality` → `**Category**: dev-infrastructure`
 - Add: `**Type**: infrastructure | **Parent**: DEV-0001`
 
-**F-0199 Instruction File Integrity**
+**DEV-0199 Instruction File Integrity**
 - Change `**Category**: agent-system` → `**Category**: dev-infrastructure`
 - Add: `**Type**: infrastructure | **Parent**: DEV-0001`
 
-**F-0243 Complexity Tier Experiments**
+**DEV-0243 Complexity Tier Experiments**
 - Change `**Category**: core-workflow` → `**Category**: dev-infrastructure`
 - Add: `**Type**: research | **Parent**: DEV-0001`
 
 ### 4. Update the category table at top of FEATURES.md
 
-Add `Dev Infrastructure` row (3 children + DEV-0001). Adjust counts: remove F-0122 from `Quality`, F-0199 from `Agent System`, F-0243 from `Core Workflow`.
+Add `Dev Infrastructure` row (3 children + DEV-0001). Adjust counts: remove DEV-0122 from `Quality`, DEV-0199 from `Agent System`, DEV-0243 from `Core Workflow`.
 
 Add brief note after table:
 ```markdown
@@ -125,23 +125,23 @@ Add brief note after table:
 
 ### 5. Update existing contracts for the 3 internal features
 
-**`F-0122.yaml`** — add:
+**`DEV-0122.yaml`** — add:
 ```yaml
 parent: DEV-0001
 tags: [infrastructure, internal]
 category: dev-infrastructure
 ```
 
-**`F-0199.yaml`** — add:
+**`DEV-0199.yaml`** — add:
 ```yaml
 parent: DEV-0001
 tags: [infrastructure, internal]
 category: dev-infrastructure
 ```
 
-**`F-0243.yaml`** — create (no contract exists yet):
+**`DEV-0243.yaml`** — create (no contract exists yet):
 ```yaml
-id: F-0243
+id: DEV-0243
 name: Complexity Tier Experiments
 lifecycle: shipped
 parent: DEV-0001
@@ -204,16 +204,16 @@ fi
 ## What Does NOT Change
 
 - `ag` tooling — no new commands, no behavior changes
-- BACKLOG.json — F-0243 stays as current work item, unchanged
-- Existing `F-0122`, `F-0199`, `F-0243` IDs — kept as-is (renaming is too disruptive)
+- BACKLOG.json — DEV-0243 stays as current work item, unchanged
+- Existing `DEV-0122`, `DEV-0199`, `DEV-0243` IDs — kept as-is (renaming is too disruptive)
 - The `ag` workflow for dev infrastructure — identical to capabilities
 
 ---
 
 ## Order of Operations
 
-1. Commit F-0243 implementation (already done, tests pass) — clears current work item
-2. This reorganization as a separate commit — or bundled with F-0243 if preferred
+1. Commit DEV-0243 implementation (already done, tests pass) — clears current work item
+2. This reorganization as a separate commit — or bundled with DEV-0243 if preferred
 
 ---
 
@@ -222,11 +222,11 @@ fi
 | File | Change |
 |------|--------|
 | `.agentic/lib/schemas/contract.schema.json` | Add `DEV` to id/parent patterns; add `ongoing` to lifecycle enum |
-| `.agentic/spec/FEATURES.md` | Add DEV-0001 section; update F-0122, F-0199, F-0243 metadata; update category table |
+| `.agentic/spec/FEATURES.md` | Add DEV-0001 section; update DEV-0122, DEV-0199, DEV-0243 metadata; update category table |
 | `.agentic/spec/contracts/DEV-0001.yaml` | Create new |
-| `.agentic/spec/contracts/F-0122.yaml` | Add parent, tags, category |
-| `.agentic/spec/contracts/F-0199.yaml` | Add parent, tags, category |
-| `.agentic/spec/contracts/F-0243.yaml` | Create new |
+| `.agentic/spec/contracts/DEV-0122.yaml` | Add parent, tags, category |
+| `.agentic/spec/contracts/DEV-0199.yaml` | Add parent, tags, category |
+| `.agentic/spec/contracts/DEV-0243.yaml` | Create new |
 | `tests/validate_framework.sh` | Add DEV-0001 structural gates |
 
 ---
@@ -240,7 +240,7 @@ bash tests/validate_framework.sh
 # ✓ DEV-0001: contract exists
 
 grep "Type.*\(infrastructure\|research\|meta\)" .agentic/spec/FEATURES.md
-# Shows F-0122, F-0199, F-0243, DEV-0001
+# Shows DEV-0122, DEV-0199, DEV-0243, DEV-0001
 
 python3 .agentic/lib/tools/contracts.py validate .agentic/spec/contracts/DEV-0001.yaml
 # Validates clean against updated schema

@@ -65,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Plan Durability Scanning (F-0198)** — `ag sync` now scans tool-specific plan directories (`~/.claude/plans/`, `.cursor/plans/`) for files mentioning F-XXXX IDs. Auto-copies to `.agentic/journal/plans/` if not already saved, preventing plan loss from session-scoped storage.
-- **Instruction File Sync Detection (F-0199)** — New `instruction-sync.sh` detects when `ag.sh` commands are added but instruction files (CLAUDE.md, cursorrules, copilot, codex, auto_orchestration, memory-seed) are not updated. Wired into `validate_framework.sh` as a warning.
+- **Instruction File Sync Detection (DEV-0199)** — New `instruction-sync.sh` detects when `ag.sh` commands are added but instruction files (CLAUDE.md, cursorrules, copilot, codex, auto_orchestration, memory-seed) are not updated. Wired into `validate_framework.sh` as a warning.
 - **Intent Journal + Crash Recovery (F-0200)** — Write-ahead log for multi-step `ag.sh` operations (implement, done) with crash recovery via reconciliation in `ag sync`. Three enforcement modes (off/advisory/blocking) via STACK.md. Includes `intents.py` module, `intent-helpers.sh`, reconciler with adopt-orphan recovery, and `ag intent` commands.
 
 ## [0.52.3] - 2026-03-09
@@ -616,7 +616,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Validation tests ensure gate parity across all 4 tools
   - `/CODEX.md` now extends template properly (not a stub)
 
-- **Multi-Tool LLM Testing Infrastructure (F-0122)** - Cross-tool behavioral testing
+- **Multi-Tool LLM Testing Infrastructure (DEV-0122)** - Cross-tool behavioral testing
   - `ag test llm` - Environment-aware test command
   - `ag test llm --list` - List available tests
   - `ag test llm --critical` - Run/show critical tests only

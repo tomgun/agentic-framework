@@ -23,9 +23,9 @@ This is an **epic** with 4 features (Part 0-3), each with its own spec and ACs. 
 | F-0240 | 0 | Framework Execution Log | Foundation (standalone debugging value) |
 | F-0241 | 1 | Central QA Registry | **YES** — fully independent |
 | F-0242 | 2 | Simulation Testing (Phase + Sequence) | Depends on F-0240 |
-| F-0243 | 3 | Complexity Tier Experiments | Depends on F-0240, benefits from F-0242 |
+| DEV-0243 | 3 | Complexity Tier Experiments | Depends on F-0240, benefits from F-0242 |
 
-**Honest ordering**: F-0241 can ship independently at any time. F-0240→F-0242→F-0243 is sequential. Don't claim parallel execution for dependent work.
+**Honest ordering**: F-0241 can ship independently at any time. F-0240→F-0242→DEV-0243 is sequential. Don't claim parallel execution for dependent work.
 
 ---
 
@@ -198,7 +198,7 @@ if scenario.get("tool_call_expectations") and log_file:
 
 ---
 
-## Part 3: Complexity Tier Experiments (F-0243) — Depends on F-0240
+## Part 3: Complexity Tier Experiments (DEV-0243) — Depends on F-0240
 
 ### What
 Run the **same task** across three **real configuration profiles** and compare outcomes empirically.
@@ -286,10 +286,10 @@ timeout_per_run: 3600
 
 ```
 F-0241 (QA Registry) ─────────────────────────── independent, ship anytime
-F-0240 (Framework Log) ─→ F-0242 (Simulation) ─→ F-0243 (Tier Experiments)
+F-0240 (Framework Log) ─→ F-0242 (Simulation) ─→ DEV-0243 (Tier Experiments)
 ```
 
-**Recommended start**: F-0241 (QA Registry) first — it's independent, immediately useful, and smallest scope. Then F-0240 → F-0242 → F-0243.
+**Recommended start**: F-0241 (QA Registry) first — it's independent, immediately useful, and smallest scope. Then F-0240 → F-0242 → DEV-0243.
 
 ## Risks
 
@@ -307,4 +307,4 @@ F-0240 (Framework Log) ─→ F-0242 (Simulation) ─→ F-0243 (Tier Experiment
 - **F-0240**: Run any `ag` command → `.agentic/session/framework.log` has structured entries
 - **F-0241**: `python3 tests/qa_registry.py && cat docs/QA_REGISTRY.md` shows registry with feature matrix
 - **F-0242**: `pytest tests/test_phase_checker.py tests/test_session_analyze.py -v` passes; scenario YAML extensions work
-- **F-0243**: `ag auto tier-experiment --scenario todo_app --json` produces comparison report
+- **DEV-0243**: `ag auto tier-experiment --scenario todo_app --json` produces comparison report

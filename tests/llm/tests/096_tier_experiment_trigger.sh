@@ -2,7 +2,7 @@
 # Description: Agent routes complexity tier experiment requests to ag auto tier-experiment
 # Section: trigger
 # Category: Important
-# Tests: LLM-096, F-0243
+# Tests: LLM-096, DEV-0243
 
 setup_test_project "formal"
 

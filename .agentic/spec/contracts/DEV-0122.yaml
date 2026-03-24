@@ -1,4 +1,4 @@
-id: F-0122
+id: DEV-0122
 name: Testing Infrastructure
 lifecycle: shipped
 since: v0.10.0
@@ -7,7 +7,7 @@ protection: contract
 category: dev-infrastructure
 parent: DEV-0001
 tags: [infrastructure, internal]
-consolidated_from: [F-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242]
+consolidated_from: [DEV-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242]
 
 description: |
   Multi-tool LLM testing infrastructure validates agent behavior across
@@ -24,7 +24,7 @@ assertions:
     type: structural
     verify: "test -d tests/llm/tests"
     tests:
-      - tests/validate_framework.sh::F-0122
+      - tests/validate_framework.sh::DEV-0122
 
   - id: AC-002
     text: "QA registry tracks test-feature mapping"

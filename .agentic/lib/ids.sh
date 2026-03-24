@@ -5,7 +5,7 @@
 #   - ERE patterns for grep -E
 #   - Shell function for validation
 #
-# @feature F-0193
+# @feature F-0004 (consolidated from F-0193)
 
 # Guard against double-sourcing
 [[ -n "${_AGENTIC_IDS_LOADED:-}" ]] && return 0

@@ -186,7 +186,7 @@ Coverage mapping for each feature. Sparse entries indicate gaps — that's the p
 | F-0119 | shipped |  |  |  |  |  |  |  |
 | F-0120 | shipped |  |  | x |  |  |  |  |
 | F-0121 | in_progress | x |  |  |  |  |  |  |
-| F-0122 | shipped | x |  |  |  |  |  |  |
+| DEV-0122 | shipped | x |  |  |  |  |  |  |
 | F-0123 | shipped | x |  |  |  |  |  |  |
 | F-0124 | shipped |  |  |  |  |  |  |  |
 | F-0125 | shipped |  |  |  |  |  |  |  |
@@ -251,13 +251,13 @@ Coverage mapping for each feature. Sparse entries indicate gaps — that's the p
 | F-0190 | shipped | x |  |  |  |  |  |  |
 | F-0191 | in_progress |  |  |  |  |  |  |  |
 | F-0192 | implementing |  |  |  |  |  |  |  |
-| F-0193 | shipped | x | x |  |  |  |  |  |
+| F-0193 | → F-0004 |  |  |  |  |  |  | consolidated into F-0004 |
 | F-0194 | planned | x |  |  |  |  |  |  |
 | F-0195 | shipped |  |  |  |  |  |  |  |
 | F-0196 | in_progress |  |  |  |  |  |  |  |
 | F-0197 | shipped | x |  |  |  |  |  |  |
 | F-0198 | shipped | x |  |  |  |  |  |  |
-| F-0199 | shipped | x |  |  |  |  |  |  |
+| DEV-0199 | shipped | x |  |  |  |  |  |  |
 | F-0200 | shipped |  |  |  |  |  |  |  |
 | F-0201 | shipped |  |  |  |  |  |  |  |
 | F-0202 | shipped | x |  |  |  |  |  |  |
@@ -301,7 +301,7 @@ Coverage mapping for each feature. Sparse entries indicate gaps — that's the p
 | F-0240 | planned | x |  |  |  |  |  |  |
 | F-0241 | shipped | x | x |  |  |  |  |  |
 | F-0242 | planned | x |  |  |  |  |  |  |
-| F-0243 | planned |  |  |  |  |  |  |  |
+| DEV-0243 | planned |  |  |  |  |  |  |  |
 | F-0244 | shipped |  |  |  |  |  |  |  |
 | F-0245 | shipped |  |  |  |  |  |  |  |
 | F-0246 | shipped |  |  |  |  |  |  |  |

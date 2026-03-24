@@ -4,7 +4,7 @@ Single source of truth for feature ID validation, formatting, and allocation.
 All Python consumers should import from this module rather than defining
 their own patterns.
 
-@feature F-0193
+@feature F-0004 (consolidated from F-0193)
 """
 from __future__ import annotations
 

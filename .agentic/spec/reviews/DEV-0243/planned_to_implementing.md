@@ -1,8 +1,8 @@
-# Review: F-0243 planned → specced
+# Review: DEV-0243 planned → implementing
 - **Verdict**: approved
 - **Reviewer**: human
 - **Date**: 2026-03-24
-- **Setting**: review_spec (mode: human)
+- **Setting**: review_plan (mode: human)
 
 ## Reasoning
 No reasoning provided.

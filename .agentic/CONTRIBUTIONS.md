@@ -101,7 +101,7 @@ The v2 engine design has three layers: (1) `state_machine_af.yaml` — a single 
 
 The net result: 130 files / 34K lines removed, replaced by ~25 files / ~3K lines. The instruction surface agents must process dropped by ~90%. But the critical insight isn't the line count reduction — it's that the remaining 3K lines are structurally enforced by the CLI rather than probabilistically followed by the LLM. The framework moved from "tell agents what to do and hope they do it" to "agents literally cannot proceed without doing it."
 
-### QA Observatory — Empirical Complexity Validation (F-0240–F-0243, PR #174+)
+### QA Observatory — Empirical Complexity Validation (F-0240–DEV-0243, PR #174+)
 
 **User insight**: Tomas designed the QA Observatory initiative around three concerns and provided several key architectural ideas in the original prompt: (1) **framework.log as tool-agnostic execution trace** — a structured append-only log at `.agentic/session/framework.log` that every script writes to, complementing Claude's JSONL (which is tool-specific) with a trace that works across Claude, Cursor, Copilot, and Codex. The specific format (pipe-delimited with timestamp, script, action, result) and phased instrumentation strategy (choke points first for ~80% coverage) came from the prompt. (2) **Generated registry over hand-written** — the rationale "156 features × 12 categories, manual maintenance would drift instantly" and the design of qa_registry.py scanning multiple sources (validate_framework.sh F-XXXX headers, pytest @feature decorators, LLM test references, scenario YAMLs, pre-commit gate catalog, checklists). (3) **Complexity tier experiments** — the core question "does the complexity actually help?" with the three-tier comparison, the separation of universal metrics (app works, tests pass) from framework-specific metrics (specs created, plans reviewed), and the insight that cross-tier comparisons must use universal metrics only to avoid circular reasoning. (4) **Simulation testing via phase expectations** — extending scenario YAML with intermediate state checks (files_exist/file_contains/files_not_exist at each workflow phase) and tool-call sequence expectations (spec before code, plan before review) with ordering constraints. The dialectical review then refined several of these: replacing Tier A ("CLAUDE.md only") with discovery profile (a real configuration), resolving the SequenceChecker duplication by refactoring existing detect_violations() rather than creating a parallel system, and correcting the dependency graph from "parallel" to honest sequential ordering.
 
@@ -1969,7 +1969,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Cross-session learning captured; all AI tools enforce same quality gates.
 
-### Multi-Tool LLM Testing Infrastructure (F-0122)
+### Multi-Tool LLM Testing Infrastructure (DEV-0122)
 
 **User request**:
 > "So the behavioral LLM tests are ESSENTIAL. And they should be run using Cursor when in cursor."

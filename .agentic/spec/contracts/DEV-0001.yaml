@@ -6,9 +6,9 @@ protection: advisory
 category: dev-infrastructure
 tags: [meta, internal]
 children:
-  - F-0122
-  - F-0199
-  - F-0243
+  - DEV-0122
+  - DEV-0199
+  - DEV-0243
 description: |
   Organizational parent for framework development tooling, QA infrastructure,
   and research experiments. Not a user-facing capability. Children use the full

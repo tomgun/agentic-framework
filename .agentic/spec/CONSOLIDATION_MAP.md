@@ -25,7 +25,7 @@
 | 16 | F-0101 | Architecture Decision Records | F-0101 | 1 |
 | 17 | F-0118 | Documentation Drift & Lifecycle | F-0118, F-0119, F-0138, F-0139, F-0144, F-0207 | 6 |
 | 18 | F-0120 | Plan & Design Review | F-0120, F-0133, F-0150, F-0191, F-0236 | 5 |
-| 19 | F-0122 | Testing Infrastructure | F-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242 | 9 |
+| 19 | DEV-0122 | Testing Infrastructure | DEV-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242 | 9 |
 | 20 | F-0151 | User Extensions & Customization | F-0151, F-0179, F-0183 | 3 |
 | 21 | F-0157 | Framework Architecture & Paths | F-0157, F-0158, F-0159, F-0198, F-0221 | 5 |
 | 22 | F-0160 | Autonomous Execution Engine | F-0160, F-0161, F-0162, F-0163, F-0164, F-0168, F-0186, F-0204, F-0215 | 9 |
@@ -34,7 +34,7 @@
 | 25 | F-0184 | Feature Hierarchy & Decomposition | F-0184 | 1 |
 | 26 | F-0185 | Coordination Server | F-0185, F-0187 | 2 |
 | 27 | F-0190 | Backlog & Work Queue | F-0190, F-0201, F-0202, F-0205 | 4 |
-| 28 | F-0199 | Instruction File Integrity | F-0199, F-0226 | 2 |
+| 28 | DEV-0199 | Instruction File Integrity | DEV-0199, F-0226 | 2 |
 | 29 | F-0245 | Hook-Based Enforcement | F-0245, F-0246, F-0247, F-0248, F-0249 | 5 |
 | 30 | F-0302 | Spec System Overhaul — YAML Contracts | F-0302 | 1 |
 | 31 | F-0095 | Cross-Platform Compatibility | F-0095 | 1 |
@@ -59,7 +59,7 @@
 ### Kept as Features (9) — added to FEATURES.md as planned
 | Feature | Status |
 |---------|--------|
-| F-0193 | Collision-Proof Feature IDs — in backlog, plan APPROVED |
+| F-0193 | Collision-Proof Feature IDs — consolidated into F-0004 (Feature Tracking & Lifecycle) |
 | F-0211 | Project-Specific Customization Layer — in backlog |
 | F-0212 | Project Customization Auto-Sync — in backlog (depends F-0211) |
 | F-0220 | Protected Main Branch Support — in backlog, needs fresh plan |
@@ -67,14 +67,14 @@
 | F-0230 | MCP Coordination Server — in backlog (ADR-001 wave 5) |
 | F-0231 | Multi-Repo Umbrella — in backlog (ADR-001 wave 5) |
 | F-0232 | Full Autonomous Scheduling — in backlog (ADR-001 wave 5) |
-| F-0243 | Complexity Tier Experiments — in backlog (ADR-001 roadmap) |
+| DEV-0243 | Complexity Tier Experiments — in backlog (ADR-001 roadmap) |
 
 ### Converted to Tasks (4) — improvements to existing shipped features
 | Original ID | Task Description | Owner Feature |
 |-------------|-----------------|---------------|
 | F-0223 | Strengthen later state machine gates (advisory→blocking) | F-0004 |
 | F-0210 | Configurable Definition of Done per task type | F-0003 |
-| F-0227 | E2E workflow integration test (full lifecycle) | F-0122 |
+| F-0227 | E2E workflow integration test (full lifecycle) | DEV-0122 |
 | F-0233 | Design phase formalization | F-0120 |
 
 ### Dropped (1)

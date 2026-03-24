@@ -114,19 +114,19 @@
       "id": 19,
       "file": "019_recategorize_f0122_to_devinfrastructure_under_dev0001_parent.md",
       "date": "2026-03-24",
-      "description": "Re-categorize F-0122 to dev-infrastructure under DEV-0001 parent"
+      "description": "Re-categorize DEV-0122 to dev-infrastructure under DEV-0001 parent"
     },
     {
       "id": 20,
       "file": "020_recategorize_f0199_to_devinfrastructure_under_dev0001_parent.md",
       "date": "2026-03-24",
-      "description": "Re-categorize F-0199 to dev-infrastructure under DEV-0001 parent"
+      "description": "Re-categorize DEV-0199 to dev-infrastructure under DEV-0001 parent"
     },
     {
       "id": 21,
       "file": "021_ship_f0243_complexity_tier_experiments_contract.md",
       "date": "2026-03-24",
-      "description": "Ship F-0243 Complexity Tier Experiments contract"
+      "description": "Ship DEV-0243 Complexity Tier Experiments contract"
     }
   ]
 }

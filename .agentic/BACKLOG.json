@@ -1,7 +1,7 @@
 [
   {
     "type": "feature",
-    "id": "F-0243",
+    "id": "DEV-0243",
     "description": "Complexity Tier Experiments",
     "added_at": "2026-03-20T14:38:37Z",
     "added_by": "agent",
@@ -40,7 +40,7 @@
     "description": "E2E workflow integration test (full lifecycle)",
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
-    "notes": "Originally F-0227. Improvement to F-0122 (Testing Infrastructure)"
+    "notes": "Originally F-0227. Improvement to DEV-0122 (Testing Infrastructure)"
   },
   {
     "type": "feature",

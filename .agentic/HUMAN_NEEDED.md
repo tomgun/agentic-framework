@@ -250,7 +250,7 @@ _No active items_
 
 
 
-### HN-0066: PR #202: F-0243 + DEV-0001 taxonomy
+### HN-0066: PR #202: DEV-0243 + DEV-0001 taxonomy
 - **Type**: pr_review
 - **Added**: 2026-03-24
 - **Context**: Review and merge: tier experiments harness + DEV-XXXX namespace for dev infrastructure
@@ -260,12 +260,12 @@ _No active items_
 
 ## Resolved
 
-### HN-0065: Review: F-0243 → implementing
+### HN-0065: Review: DEV-0243 → implementing
 - **Resolved**: 2026-03-24
 - **Outcome**: Review approved: resolved
 
 
-### HN-0064: Review: F-0243 → specced
+### HN-0064: Review: DEV-0243 → specced
 - **Resolved**: 2026-03-24
 - **Outcome**: Review approved: resolved
 
