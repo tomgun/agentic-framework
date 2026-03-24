@@ -15,6 +15,9 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+# Maximum nesting depth for dotted IDs (root=0, child=1, grandchild=2)
+MAX_DEPTH = 2
+
 # ---------------------------------------------------------------------------
 # Feature IDs — matches F-0001, DEV-0001, E-0001 (3-digit+ with optional dotted children)
 # Dotted children: F-003.1, F-003.1.2 (never .0 — children start at 1)

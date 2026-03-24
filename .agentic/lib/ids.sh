@@ -66,12 +66,12 @@ get_parent_id() {
 # Get nesting depth: F-003 → 0, F-003.1 → 1, F-003.1.2 → 2
 get_depth() {
     local id="$1"
-    local suffix="${id#*-}"
-    suffix="${suffix#[0-9]*}"
-    if [[ -z "$suffix" ]]; then
+    local base="${id%%.*}"   # F-003 (strip everything from first dot)
+    local rest="${id#"$base"}"  # .1.2 or empty
+    if [[ -z "$rest" ]]; then
         echo 0
     else
-        local dots="${suffix//[^.]/}"
+        local dots="${rest//[^.]/}"
         echo "${#dots}"
     fi
 }

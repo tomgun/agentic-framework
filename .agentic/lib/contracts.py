@@ -21,6 +21,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 
+from ids import get_depth, MAX_DEPTH
+
 
 # ---------------------------------------------------------------------------
 # YAML loading — requires PyYAML
@@ -336,10 +338,9 @@ def validate_contract(contract: Contract) -> list[str]:
     elif not _ID_PATTERN.match(contract.id):
         errors.append(f"Invalid id format: {contract.id} (expected F-XXX[.N], DEV-XXX[.N], E-XXX[.N], or NFR-XXX)")
     else:
-        from ids import get_depth
         depth = get_depth(contract.id)
-        if depth > 2:
-            errors.append(f"Feature ID too deeply nested: {contract.id} (depth={depth}, max=2)")
+        if depth > MAX_DEPTH:
+            errors.append(f"Feature ID too deeply nested: {contract.id} (depth={depth}, max={MAX_DEPTH})")
 
     if not contract.name or len(contract.name) < 3:
         errors.append(f"Name too short or missing: '{contract.name}'")
@@ -568,13 +569,21 @@ def coverage_report(contracts_dir: Path) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def get_effective_assertions(
-    feature_id: str, contracts_dir: Path
+    feature_id: str, contracts_dir: Path, _seen: set[str] | None = None
 ) -> dict[str, list[Assertion]]:
     """Get own + all descendants' assertions, grouped by contract ID.
 
     Returns {feature_id: [assertions], child_id: [assertions], ...}.
     "Effective ACs" = own + children's, computed at query time.
+    Cycle-safe: tracks visited IDs to prevent infinite recursion.
     """
+    if _seen is None:
+        _seen = set()
+
+    if feature_id in _seen:
+        return {}
+    _seen.add(feature_id)
+
     result: dict[str, list[Assertion]] = {}
     contract = get_contract_by_id(contracts_dir, feature_id)
     if contract is None:
@@ -583,7 +592,7 @@ def get_effective_assertions(
     result[contract.id] = list(contract.assertions)
 
     for child_id in contract.children:
-        child_result = get_effective_assertions(child_id, contracts_dir)
+        child_result = get_effective_assertions(child_id, contracts_dir, _seen)
         result.update(child_result)
 
     return result

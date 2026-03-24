@@ -18,6 +18,7 @@ from ids import (
     FEATURE_ID_RE,
     FEATURE_HEADER_RE,
     FEATURE_ID_STRICT_RE,
+    MAX_DEPTH,
     is_valid_feature_id,
     format_feature_id,
     get_next_feature_id,
@@ -397,3 +398,61 @@ class TestPatternsMatchLegacy:
         for fid in all_ids:
             assert is_valid_feature_id(fid), f"{fid} should be valid"
             assert FEATURE_ID_RE.search(fid), f"{fid} should match inline pattern"
+
+
+# ---------------------------------------------------------------------------
+# MAX_DEPTH constant
+# ---------------------------------------------------------------------------
+
+class TestMaxDepth:
+    def test_constant_value(self):
+        assert MAX_DEPTH == 2
+
+    def test_depth_within_max(self):
+        assert get_depth("F-003") <= MAX_DEPTH
+        assert get_depth("F-003.1") <= MAX_DEPTH
+        assert get_depth("F-003.1.2") <= MAX_DEPTH
+
+    def test_depth_exceeds_max(self):
+        # F-003.1.2.3 would be depth 3, exceeding MAX_DEPTH
+        assert get_depth("F-003.1.2.3") > MAX_DEPTH
+
+
+# ---------------------------------------------------------------------------
+# Shell get_depth — verify bash implementation matches Python
+# ---------------------------------------------------------------------------
+
+class TestShellGetDepth:
+    """Verify the ids.sh get_depth function produces correct results."""
+
+    @pytest.fixture
+    def ids_sh_path(self):
+        return Path(__file__).parent.parent / ".agentic" / "lib" / "ids.sh"
+
+    def _shell_get_depth(self, ids_sh_path, feature_id):
+        import subprocess
+        result = subprocess.run(
+            ["bash", "-c", f'source "{ids_sh_path}" && get_depth "{feature_id}"'],
+            capture_output=True, text=True, timeout=5,
+        )
+        return int(result.stdout.strip())
+
+    def test_root_depth(self, ids_sh_path):
+        assert self._shell_get_depth(ids_sh_path, "F-003") == 0
+        assert self._shell_get_depth(ids_sh_path, "F-0001") == 0
+        assert self._shell_get_depth(ids_sh_path, "DEV-001") == 0
+
+    def test_child_depth(self, ids_sh_path):
+        assert self._shell_get_depth(ids_sh_path, "F-003.1") == 1
+        assert self._shell_get_depth(ids_sh_path, "F-003.12") == 1
+
+    def test_grandchild_depth(self, ids_sh_path):
+        assert self._shell_get_depth(ids_sh_path, "F-003.1.2") == 2
+
+    def test_matches_python(self, ids_sh_path):
+        """Shell and Python implementations must agree."""
+        test_ids = ["F-003", "F-0001", "F-003.1", "F-003.12", "F-003.1.2", "DEV-001.3"]
+        for fid in test_ids:
+            shell_depth = self._shell_get_depth(ids_sh_path, fid)
+            python_depth = get_depth(fid)
+            assert shell_depth == python_depth, f"Mismatch for {fid}: shell={shell_depth}, python={python_depth}"
