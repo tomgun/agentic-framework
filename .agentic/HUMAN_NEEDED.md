@@ -267,6 +267,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0068: Review: F-0184 → shipped
+- **Type**: decision
+- **Added**: 2026-03-25
+- **Context**: Review checkpoint (review_merge, mode: human). Resolve with: ag review F-0184 shipped
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0065: Review: DEV-0243 → implementing
