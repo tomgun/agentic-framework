@@ -4513,3 +4513,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-24 21:57 - F-0184 Phase 1b
+
+**Why**: Enable hierarchical feature decomposition with dotted child IDs
+
+**What changed**:
+- Dotted ID allocation in decompose, extract_subfeature(), depth guards, component field (replaces tags), --recursive contract check, --parent contract create, 70 tests passing
+
+**Next steps**:
+- Phase 2: renumber script + mapping
+
+**Blockers**: None
+
+
+### Session: 2026-03-25 07:23 - F-0184 review fixes
+
+**Why**: Address code review findings
+
+**What changed**:
+- Dead code removal, state guards, O(n) recursive check, env var security, criteria_set allowed
+
+**Next steps**:
+- Push PR
+
+**Blockers**: None
+

@@ -1,34 +1,81 @@
 id: F-0184
 name: Feature Hierarchy & Decomposition
-lifecycle: shipped
+lifecycle: implementing
 since: v0.30.0
 profile: formal
 protection: advisory
 category: core-workflow
-consolidated_from: [F-0184]
+consolidated_from:
+- F-0184
+description: 'Epics decompose into child features via ag decompose. Parent-child
 
-description: |
-  Epics decompose into child features via ag decompose. Parent-child
   relationships tracked in FEATURES.md. Epic completion requires all
-  children shipped.
 
-user_input: ""
+  children shipped. Supports dotted hierarchical IDs (F-003.1),
 
+  depth guards, AC extraction, and component metadata.
+
+  '
+user_input: ''
 assertions:
-  - id: AC-001
-    text: "ag decompose command exists"
-    type: structural
-    verify: |
-      grep -q "decompose" .agentic/lib/tools/ag.sh
-    tests:
-      - tests/validate_framework.sh::F-0184
+- id: AC-001
+  text: ag decompose command exists and supports --extract flag
+  type: structural
+  verify: 'grep -q "decompose" .agentic/lib/tools/ag.sh && grep -q "extract" .agentic/lib/auto/epic.py
 
-  - id: AC-002
-    text: "epic.py handles decomposition logic"
-    type: structural
-    verify: "test -f .agentic/lib/auto/epic.py"
-    tests:
-      - tests/validate_framework.sh::F-0184
+    '
+  tests:
+  - tests/validate_framework.sh::F-0184
+  - tests/test_epic.py::TestExtractSubfeature
+- id: AC-002
+  text: epic.py handles decomposition with dotted child IDs and depth guards
+  type: structural
+  verify: 'grep -q "get_next_child_id" .agentic/lib/auto/epic.py && grep -q "get_depth"
+    .agentic/lib/auto/epic.py
 
-nfr_refs: []
-migrations: []
+    '
+  tests:
+  - tests/test_epic.py::TestDottedIdDecomposition
+  - tests/test_epic.py::TestDepthGuard
+- id: AC-003
+  text: ag contract check --recursive verifies parent + children assertions
+  type: structural
+  verify: 'grep -q "recursive" .agentic/lib/tools/commands/contract.sh
+
+    '
+- id: AC-004
+  text: ag contract create --parent auto-assigns dotted child ID
+  type: structural
+  verify: 'grep -q "parent" .agentic/lib/tools/commands/contract.sh && grep -q "get_next_child_id"
+    .agentic/lib/tools/commands/contract.sh
+
+    '
+- id: AC-005
+  text: Child contracts use component field instead of tags
+  type: structural
+  verify: 'python3 -c "
+
+    import sys; sys.path.insert(0, ''.agentic/lib''); sys.path.insert(0, ''.agentic/lib/tools'')
+
+    from auto.epic import _build_child_contract
+
+    c = _build_child_contract({''id'':''F-001.1'',''name'':''T'',''component'':''api'',''ac_lines'':[''-
+    [ ] **AC-001**: X'']},''F-001'')
+
+    assert ''component: api'' in c, ''component field missing''
+
+    assert ''tags:'' not in c, ''tags should not be used''
+
+    "
+
+    '
+  tests:
+  - tests/test_epic.py::TestBuildChildContract::test_component_field_in_contract
+migrations:
+- id: M-2026-03-24-001
+  date: '2026-03-24'
+  trigger: implementation_discovery
+  reason: 'Phase 1b implementation: reopen for dotted ID decomposition, extract_subfeature,
+    recursive check'
+  changes: []
+  approved_by: user

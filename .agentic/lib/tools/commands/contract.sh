@@ -31,13 +31,13 @@ cmd_contract() {
 _contract_help() {
     echo -e "${BOLD}ag contract${NC} — YAML contract management"
     echo ""
-    echo "  check [F-XXXX]      Run structural assertions (all or one feature)"
+    echo "  check [F-XXXX] [--recursive]  Run structural assertions (all or one feature)"
     echo "  coverage             Show assertions with/without tests"
     echo "  pending              Show features with non-empty user_input"
     echo "  list [--category X]  List all contracts with status"
     echo "  tree                 Show contract hierarchy"
     echo "  validate [F-XXXX]   Validate contract YAML (all or one)"
-    echo "  create F-XXXX       Create a new draft contract"
+    echo "  create F-XXXX [--parent F-XXXX]  Create a new draft contract (--parent auto-assigns dotted child ID)"
     echo "  set F-XXXX KEY VAL  Set a contract field"
     echo "  add-assertion F-XXXX TEXT [--type structural|behavioral]"
     echo "  add-migration F-XXXX --trigger TYPE --reason TEXT"
@@ -51,9 +51,19 @@ _contract_help() {
 # ---------------------------------------------------------------------------
 
 _contract_check() {
-    local feature_id="${1:-}"
+    local feature_id=""
+    local recursive=0
     local contracts_dir
     contracts_dir="${CONTRACTS_DIR:-$SPEC_DIR/contracts}"
+
+    # Parse args
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --recursive|-r) recursive=1; shift ;;
+            -*) shift ;;
+            *) [[ -z "$feature_id" ]] && feature_id="$1"; shift ;;
+        esac
+    done
 
     if [[ ! -d "$contracts_dir" ]]; then
         echo -e "${YELLOW}No contracts directory: $contracts_dir${NC}"
@@ -67,6 +77,67 @@ _contract_check() {
             echo -e "${RED}Contract not found: $contract_file${NC}"
             return 1
         fi
+
+        if [[ "$recursive" -eq 1 ]]; then
+            echo -e "${BOLD}Verifying contract (recursive): $feature_id${NC}"
+            echo ""
+            _AG_CONTRACTS_DIR="$contracts_dir" \
+            _AG_FEATURE_ID="$feature_id" \
+            _AG_ROOT_DIR="$ROOT_DIR" \
+            PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import os, sys, json
+from pathlib import Path
+from contracts import load_contract, load_all_contracts, verify_contract
+
+contracts_dir = Path(os.environ['_AG_CONTRACTS_DIR'])
+feature_id = os.environ['_AG_FEATURE_ID']
+root_dir = Path(os.environ['_AG_ROOT_DIR'])
+
+# Load all contracts to find children
+all_contracts = load_all_contracts(contracts_dir)
+by_id = {c.id: c for c in all_contracts}
+
+# Build parent→children map (O(n) instead of O(n^2))
+children_map = {}
+for c in all_contracts:
+    if c.parent:
+        children_map.setdefault(c.parent, []).append(c.id)
+
+def collect_ids(fid):
+    ids = [fid]
+    for child_id in children_map.get(fid, []):
+        ids.extend(collect_ids(child_id))
+    return ids
+
+check_ids = collect_ids(feature_id)
+total_pass, total_fail, total_skip = 0, 0, 0
+
+for cid in check_ids:
+    if cid not in by_id:
+        continue
+    contract = by_id[cid]
+    result = verify_contract(contract, root_dir)
+    p, f, s = result['passed'], result['failed'], result['skipped']
+    total_pass += p; total_fail += f; total_skip += s
+
+    status = '✓' if f == 0 else '✗'
+    indent = '  ' if cid != feature_id else ''
+    print(f'{indent}{status} {cid}: {p} passed, {f} failed, {s} skipped')
+
+    for r in result['results']:
+        if not r['passed'] and not r['skipped']:
+            print(f'    ✗ {r[\"id\"]}')
+            if r['output']:
+                for line in r['output'].split(chr(10))[:2]:
+                    print(f'      {line}')
+
+print()
+print(f'Total: {total_pass} passed, {total_fail} failed, {total_skip} skipped ({len(check_ids)} contracts)')
+sys.exit(1 if total_fail > 0 else 0)
+"
+            return $?
+        fi
+
         echo -e "${BOLD}Verifying contract: $feature_id${NC}"
         echo ""
         PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
@@ -371,7 +442,7 @@ _contract_set() {
     fi
 
     # Validate feature ID format to prevent path traversal
-    if ! echo "$feature_id" | grep -qE '^(F|NFR)-[0-9]+$'; then
+    if ! echo "$feature_id" | grep -qE '^(F|NFR|DEV|E)-[0-9]{3,}(\.[1-9][0-9]*)*$'; then
         echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
         return 1
     fi
@@ -429,7 +500,7 @@ _contract_add_assertion() {
         return 1
     fi
 
-    if ! echo "$feature_id" | grep -qE '^(F|NFR)-[0-9]+$'; then
+    if ! echo "$feature_id" | grep -qE '^(F|NFR|DEV|E)-[0-9]{3,}(\.[1-9][0-9]*)*$'; then
         echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
         return 1
     fi
@@ -494,7 +565,7 @@ _contract_add_migration() {
         return 1
     fi
 
-    if ! echo "$feature_id" | grep -qE '^(F|NFR)-[0-9]+$'; then
+    if ! echo "$feature_id" | grep -qE '^(F|NFR|DEV|E)-[0-9]{3,}(\.[1-9][0-9]*)*$'; then
         echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
         return 1
     fi
@@ -604,22 +675,119 @@ else:
 }
 
 _contract_create() {
-    local feature_id="${1:-}"
-    local name="${2:-New Feature}"
+    local feature_id=""
+    local name="New Feature"
+    local parent_id=""
 
-    if [[ -z "$feature_id" ]]; then
-        echo -e "${RED}Usage: ag contract create F-XXXX [\"Feature Name\"]${NC}"
-        return 1
-    fi
-
-    if ! echo "$feature_id" | grep -qE '^(F|NFR)-[0-9]+$'; then
-        echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
-        return 1
-    fi
+    # Parse args
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --parent) parent_id="$2"; shift 2 ;;
+            --name) name="$2"; shift 2 ;;
+            -*) shift ;;
+            *)
+                if [[ -z "$feature_id" ]]; then
+                    feature_id="$1"
+                elif [[ "$name" == "New Feature" ]]; then
+                    name="$1"
+                fi
+                shift
+                ;;
+        esac
+    done
 
     local contracts_dir
     contracts_dir="${CONTRACTS_DIR:-$SPEC_DIR/contracts}"
     mkdir -p "$contracts_dir"
+
+    # If --parent provided, auto-assign dotted child ID
+    if [[ -n "$parent_id" ]]; then
+        # Validate parent ID
+        source "$ROOT_DIR/.agentic/lib/ids.sh" 2>/dev/null || true
+        if ! echo "$parent_id" | grep -qE "^(F|DEV|E)-[0-9]{3,}(\.[1-9][0-9]*)*$"; then
+            echo -e "${RED}Invalid parent ID format: $parent_id${NC}"
+            return 1
+        fi
+
+        local parent_contract="$contracts_dir/${parent_id}.yaml"
+        if [[ ! -f "$parent_contract" ]]; then
+            echo -e "${RED}Parent contract not found: $parent_contract${NC}"
+            return 1
+        fi
+
+        # Auto-assign child ID via Python
+        _AG_PARENT_ID="$parent_id" \
+        _AG_NAME="$name" \
+        _AG_CONTRACTS_DIR="$contracts_dir" \
+        PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import os, sys
+from pathlib import Path
+from contracts import Contract, Assertion, save_contract, load_contract, load_all_contracts
+from ids import get_next_child_id, get_depth, MAX_DEPTH
+
+parent_id = os.environ['_AG_PARENT_ID']
+name = os.environ['_AG_NAME']
+contracts_dir = Path(os.environ['_AG_CONTRACTS_DIR'])
+
+# Depth guard
+depth = get_depth(parent_id)
+if depth >= MAX_DEPTH:
+    print(f'Cannot create child of {parent_id}: depth {depth} is at maximum ({MAX_DEPTH})')
+    sys.exit(1)
+
+# Find existing children
+all_contracts = load_all_contracts(contracts_dir)
+existing_children = [c.id for c in all_contracts if c.parent == parent_id]
+child_id = get_next_child_id(parent_id, existing_children)
+
+contract_file = contracts_dir / f'{child_id}.yaml'
+if contract_file.exists():
+    print(f'Contract already exists: {contract_file}')
+    sys.exit(1)
+
+contract = Contract(
+    id=child_id,
+    name=name,
+    lifecycle='exploring',
+    description=f'Child feature of {parent_id}.',
+    parent=parent_id,
+    assertions=[
+        Assertion(
+            id='AC-001',
+            text='TODO: First acceptance criterion',
+            type='structural',
+            draft=True,
+        ),
+    ],
+    protection='none',
+)
+save_contract(contract, contract_file)
+
+# Update parent's children list
+parent_contract = load_contract(contracts_dir / f'{parent_id}.yaml')
+if parent_contract.children is None:
+    parent_contract.children = []
+if child_id not in parent_contract.children:
+    parent_contract.children.append(child_id)
+    save_contract(parent_contract, contracts_dir / f'{parent_id}.yaml')
+
+print(f'Created child contract: {child_id} (parent: {parent_id})')
+print(f'  File: {contract_file}')
+print(f'  Edit to add assertions, then run: ag contract validate {child_id}')
+"
+        return $?
+    fi
+
+    if [[ -z "$feature_id" ]]; then
+        echo -e "${RED}Usage: ag contract create F-XXXX [\"Feature Name\"] [--parent F-XXXX]${NC}"
+        return 1
+    fi
+
+    # Validate feature ID (supports dotted IDs)
+    if ! echo "$feature_id" | grep -qE '^(F|NFR|DEV|E)-[0-9]{3,}(\.[1-9][0-9]*)*$'; then
+        echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
+        return 1
+    fi
 
     local contract_file="$contracts_dir/${feature_id}.yaml"
 
