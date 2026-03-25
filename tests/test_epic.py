@@ -485,6 +485,13 @@ class TestDecompose:
         assert not success
         assert any("implementing" in m for m in msgs)
 
+    def test_criteria_set_state_allowed(self, tmp_project):
+        """Features in criteria_set state can be decomposed."""
+        _write_features(tmp_project, "## F-0100: Epic\n**Status**: criteria_set\n")
+        _write_ac(tmp_project, "F-0100", "- [ ] **AC-001**: Thing\n")
+        success, msgs = decompose(tmp_project, "F-0100")
+        assert success
+
     def test_missing_feature_blocks(self, tmp_project):
         _write_features(tmp_project, "## F-0001: Other\n**Status**: planned\n")
         success, msgs = decompose(tmp_project, "F-9999")
@@ -918,6 +925,24 @@ class TestExtractSubfeature:
         )
         assert not success
         assert any("AC-999" in m for m in msgs)
+
+    def test_shipped_state_blocks_extraction(self, tmp_project):
+        """Cannot extract ACs from a shipped feature."""
+        _write_features(tmp_project, "## F-0100: Epic\n**Status**: shipped\n")
+        _write_contract(tmp_project, "F-0100", textwrap.dedent("""\
+            id: F-0100
+            name: Test Epic
+            lifecycle: shipped
+            description: Shipped epic.
+            assertions:
+              - id: AC-001
+                text: Something
+                type: behavioral
+        """))
+
+        success, msgs = extract_subfeature(tmp_project, "F-0100", ["AC-001"])
+        assert not success
+        assert any("shipped" in m for m in msgs)
 
     def test_depth_guard_blocks_extraction(self, tmp_project):
         """Cannot extract from a grandchild (depth 2)."""

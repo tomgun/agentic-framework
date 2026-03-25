@@ -384,6 +384,14 @@ def extract_subfeature(
             f"is at the maximum nesting level ({MAX_DEPTH})."
         ]
 
+    # State check: don't extract from shipped/deprecated features
+    status = _get_feature_status(paths.features_file, parent_id)
+    if status in ("shipped", "deprecated"):
+        return False, [
+            f"Cannot extract from {parent_id}: feature is '{status}'. "
+            f"Extraction requires a pre-shipped state."
+        ]
+
     # Load parent contract
     contract_file = paths.contracts_dir / f"{parent_id}.yaml"
     if not contract_file.exists():
@@ -428,15 +436,6 @@ def extract_subfeature(
             extracted[0].id, extracted[0].text, parent_id
         )
 
-    # Build child contract data
-    child_assertions = []
-    for idx, a in enumerate(extracted):
-        child_assertions.append({
-            "id": a.id,
-            "text": a.text,
-            "type": a.type or "behavioral",
-        })
-
     child_data = {
         "id": child_id,
         "name": child_name,
@@ -453,7 +452,7 @@ def extract_subfeature(
 
     # Update parent: remove extracted ACs, add child to children list
     parent_contract.assertions = remaining
-    if not hasattr(parent_contract, "children") or parent_contract.children is None:
+    if parent_contract.children is None:
         parent_contract.children = []
     if child_id not in parent_contract.children:
         parent_contract.children.append(child_id)
@@ -532,11 +531,11 @@ def decompose(
     if status is None:
         return False, [f"Feature {epic_id} not found in FEATURES.md"]
 
-    # Must be in planned or specced state
-    if status not in ("planned", "specced"):
+    # Must be in a pre-implementation state
+    if status not in ("planned", "specced", "criteria_set"):
         return False, [
             f"Feature {epic_id} is in '{status}' state. "
-            f"Decomposition requires 'planned' or 'specced'."
+            f"Decomposition requires 'planned', 'specced', or 'criteria_set'."
         ]
 
     # Contract or AC file must exist

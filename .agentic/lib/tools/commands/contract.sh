@@ -83,6 +83,7 @@ _contract_check() {
             echo ""
             _AG_CONTRACTS_DIR="$contracts_dir" \
             _AG_FEATURE_ID="$feature_id" \
+            _AG_ROOT_DIR="$ROOT_DIR" \
             PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
 import os, sys, json
 from pathlib import Path
@@ -90,17 +91,22 @@ from contracts import load_contract, load_all_contracts, verify_contract
 
 contracts_dir = Path(os.environ['_AG_CONTRACTS_DIR'])
 feature_id = os.environ['_AG_FEATURE_ID']
+root_dir = Path(os.environ['_AG_ROOT_DIR'])
 
 # Load all contracts to find children
 all_contracts = load_all_contracts(contracts_dir)
 by_id = {c.id: c for c in all_contracts}
 
-# Collect parent + descendants
+# Build parent→children map (O(n) instead of O(n^2))
+children_map = {}
+for c in all_contracts:
+    if c.parent:
+        children_map.setdefault(c.parent, []).append(c.id)
+
 def collect_ids(fid):
     ids = [fid]
-    for c in all_contracts:
-        if c.parent == fid:
-            ids.extend(collect_ids(c.id))
+    for child_id in children_map.get(fid, []):
+        ids.extend(collect_ids(child_id))
     return ids
 
 check_ids = collect_ids(feature_id)
@@ -110,7 +116,7 @@ for cid in check_ids:
     if cid not in by_id:
         continue
     contract = by_id[cid]
-    result = verify_contract(contract, Path('$ROOT_DIR'))
+    result = verify_contract(contract, root_dir)
     p, f, s = result['passed'], result['failed'], result['skipped']
     total_pass += p; total_fail += f; total_skip += s
 
@@ -759,7 +765,7 @@ save_contract(contract, contract_file)
 
 # Update parent's children list
 parent_contract = load_contract(contracts_dir / f'{parent_id}.yaml')
-if not hasattr(parent_contract, 'children') or parent_contract.children is None:
+if parent_contract.children is None:
     parent_contract.children = []
 if child_id not in parent_contract.children:
     parent_contract.children.append(child_id)
