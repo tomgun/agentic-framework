@@ -7,7 +7,7 @@ monitors them with rolling slot management, and collects results.
 Usage:
     from auto.parallel import ParallelDispatcher
     dispatcher = ParallelDispatcher(project_root=Path("."), claude_command="claude")
-    result = dispatcher.run(["F-0101", "F-0102", "F-0103"])
+    result = dispatcher.run(["F-011", "F-0102", "F-0103"])
 """
 from __future__ import annotations
 

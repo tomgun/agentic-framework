@@ -3,7 +3,7 @@
 <!-- author: Tomas -->
 <!-- type: feature -->
 
-# Migration 009: QA Suite (F-0169–F-0175)
+# Migration 009: QA Suite (F-013–F-0175)
 
 ## Context & Why
 
@@ -13,7 +13,7 @@ LLMs produce code and tests that look correct but may be subtly wrong — tests 
 
 ### Features Added
 
-- F-0169: NFR Discovery & Catalog — type-specific NFR suggestions during init
+- F-013: NFR Discovery & Catalog — type-specific NFR suggestions during init
 - F-0170: NFR Enforcement in Spec Writing — active matching, promotion detection
 - F-0171: Spec Verification Tool — multi-layer audit (structural, coverage, heuristics, LLM review)
 - F-0172: Change Propagation Pipeline — trace NFR/migration changes downstream
@@ -45,7 +45,7 @@ LLMs produce code and tests that look correct but may be subtly wrong — tests 
 - `.agentic/lib/tools/spec-audit.sh` — Verification + propagation tool
 - `.agentic/lib/tools/qa-tracker.sh` — QA state machine
 - `.agentic/lib/tools/test-review-prompt.md` — LLM test review template
-- `.agentic/spec/acceptance/F-0169.md` through `F-0175.md`
+- `.agentic/spec/acceptance/F-013.md` through `F-0175.md`
 - `.agentic/spec/acceptance/NFR-0003.md`, `NFR-0004.md`
 
 ## Modified Files
@@ -68,7 +68,7 @@ LLMs produce code and tests that look correct but may be subtly wrong — tests 
 - `.agentic/lib/agents/claude/skills/completing-work/SKILL.md` — Step 6 retro check
 - `.claude/skills/completing-work/SKILL.md` — Step 6 retro check
 - `.agentic/spec/NFR.md` — NFR-0003, NFR-0004
-- `.agentic/spec/FEATURES.md` — F-0169 through F-0175
+- `.agentic/spec/FEATURES.md` — F-013 through F-0175
 
 ## Rollback Plan
 

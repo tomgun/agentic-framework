@@ -28,7 +28,7 @@ AC_PATTERNS = [
     re.compile(r"^AC-?(\d+):?\s*(.+)", re.MULTILINE),
 ]
 
-# Extract feature name from heading: # F-0004: Feature Name
+# Extract feature name from heading: # F-003: Feature Name
 TITLE_RE = re.compile(r"^#\s*F-\d+:\s*(.+?)(?:\s*-\s*Acceptance Criteria)?$", re.MULTILINE)
 
 # Extract behavior/description section
@@ -46,7 +46,7 @@ TEST_RE = re.compile(r"`([^`]+(?:\.py|\.sh|\.ts|\.js)[^`]*)`")
 def parse_acceptance_md(path: Path) -> dict:
     """Parse a markdown acceptance criteria file into structured data."""
     text = path.read_text(encoding="utf-8")
-    feature_id = path.stem  # e.g. "F-0004"
+    feature_id = path.stem  # e.g. "F-003"
 
     # Extract name
     m = TITLE_RE.search(text)
@@ -139,13 +139,13 @@ def get_features_status(project_root: Path) -> dict[str, str]:
     statuses = {}
     text = features_file.read_text(encoding="utf-8")
 
-    # Heading format: ## F-0004: Name \n **Status**: shipped
+    # Heading format: ## F-003: Name \n **Status**: shipped
     for m in re.finditer(
         r"##\s+(F-\d+):.*?\n.*?\*\*Status\*\*:\s*(\w+)", text, re.DOTALL
     ):
         statuses[m.group(1)] = m.group(2)
 
-    # Table format: | F-0004 | Name | shipped |
+    # Table format: | F-003 | Name | shipped |
     for m in re.finditer(r"\|\s*(F-\d+)\s*\|[^|]*\|\s*(\w+)\s*\|", text):
         if m.group(1) not in statuses:
             statuses[m.group(1)] = m.group(2)
@@ -228,7 +228,7 @@ def main():
     parser.add_argument("--project-root", required=True, help="Project root directory")
     parser.add_argument("--dry-run", action="store_true", help="Preview without writing files")
     parser.add_argument("--archive", action="store_true", help="Move markdown files to docs/archive/acceptance/")
-    parser.add_argument("--feature", help="Migrate a single feature (e.g. F-0004)")
+    parser.add_argument("--feature", help="Migrate a single feature (e.g. F-003)")
     args = parser.parse_args()
 
     root = Path(args.project_root).resolve()

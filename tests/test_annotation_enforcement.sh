@@ -52,7 +52,7 @@ PATHS_EOF
   cat > "$TMPDIR/.agentic/spec/FEATURES.md" << 'FEATURES_EOF'
 # Features
 
-## F-0001: Already Shipped Feature
+## F-001: Already Shipped Feature
 
 **Status**: shipped
 **Category**: Core

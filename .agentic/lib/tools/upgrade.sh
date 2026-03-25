@@ -291,7 +291,7 @@ fi
 
 echo ""
 
-# Step 5d: v2 migration removed (v2 engine deleted in F-0302 Phase 4)
+# Step 5d: v2 migration removed (v2 engine deleted in F-031 Phase 4)
 echo ""
 
 # Step 6: Migrate STATUS.md for Core profile
@@ -882,7 +882,7 @@ declare -a FEATURE_REGISTRY=(
   "0.33.0:Instruction file auto-refresh:Automatic:CLAUDE.md, .cursorrules, copilot, codex regenerated on upgrade"
   "0.33.0:DRY state file config:See .agentic/init/state-files.conf:Single source of truth for required state files"
   "0.39.0:Spec format evolution:See .agentic/spec/acceptance.template.md:Priority tiers (P1/P2), Behavior section, Verification heading (F-0148)"
-  "0.39.0:User extensions:.agentic/local/extensions/:Custom skills, gates, hooks, rules that survive upgrades (F-0151)"
+  "0.39.0:User extensions:.agentic/local/extensions/:Custom skills, gates, hooks, rules that survive upgrades (F-028)"
   "0.39.0:Semantic spec analysis:bash .agentic/tools/spec-analyze.sh F-XXXX:Advisory checks before implementation — ambiguity, NFR, coverage gaps (F-0152)"
   "0.39.0:AC-level test coverage:python3 .agentic/lib/tools/coverage.py --ac-coverage F-XXXX:Per-acceptance-criterion test mapping (F-0153)"
   "0.53.0:Intent journal + crash recovery:ag intent list:Write-ahead log for ag implement/done with reconciliation via ag sync (F-0200)"

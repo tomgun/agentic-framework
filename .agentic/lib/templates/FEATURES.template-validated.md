@@ -4,7 +4,7 @@
 # IMPORTANT: Keep synchronized with Markdown below
 
 features:
-  - id: F-0001
+  - id: F-001
     name: Example feature name
     status: planned  # planned | specced | criteria_set | tests_written | implementing | verified | documented | committed | shipped | deprecated
     parent: null  # null or F-#### for hierarchy
@@ -13,7 +13,7 @@ features:
     prd: spec/PRD.md#requirements
     requirements: [R-0001]
     nfrs: []  # List of NFR-#### if feature has specific constraints
-    acceptance: .agentic/spec/acceptance/F-0001.md
+    acceptance: .agentic/spec/acceptance/F-001.md
     verification:
       accepted: false  # true | false
       accepted_at: null  # YYYY-MM-DD or null
@@ -83,27 +83,27 @@ Benefits:
 - `planned` | `specced` | `criteria_set` | `tests_written` | `implementing` | `verified` | `documented` | `committed` | `shipped` | `deprecated`
 
 ## How to reference
-- Feature IDs: `F-0001`, `F-0002`, …
+- Feature IDs: `F-001`, `F-0002`, …
 - Requirement IDs (optional, from PRD): `R-0001`, …
 - NFR IDs (optional): `NFR-0001`, …
 - Task IDs (optional): `T-0001`, …
 
 ## Feature index (optional)
-- F-0001: Example feature name
+- F-001: Example feature name
 - F-0002:
 
 ---
 
-## F-0001: Example feature name
+## F-001: Example feature name
 - Parent: none  <!-- or F-0000 for hierarchy -->
-- Dependencies: none  <!-- F-0002 (complete), F-0003 (partial) -->
+- Dependencies: none  <!-- F-0002 (complete), F-002 (partial) -->
 - Complexity: M <!-- S | M | L | XL -->
 - Technical debt: <!-- links to LESSONS.md or notes -->
 - Status: planned
 - PRD: spec/PRD.md#requirements
 - Requirements: R-0001
 - NFRs: none  <!-- or NFR-#### list -->
-- Acceptance: .agentic/spec/acceptance/F-0001.md
+- Acceptance: .agentic/spec/acceptance/F-001.md
 - Verification:
   - Accepted: no       <!-- no | yes -->
   - Accepted at:       <!-- YYYY-MM-DD -->

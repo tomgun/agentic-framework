@@ -12,13 +12,13 @@ mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # FEATURES.md
 
-## F-0001: User Authentication
+## F-001: User Authentication
 - Status: in_progress
-- Acceptance: spec/contracts/F-0001.yaml
+- Acceptance: spec/contracts/F-001.yaml
 EOF
 
-cat > "$TEST_PROJECT/spec/acceptance/F-0001.md" << 'EOF'
-# F-0001: User Authentication
+cat > "$TEST_PROJECT/spec/acceptance/F-001.md" << 'EOF'
+# F-001: User Authentication
 
 ## Acceptance Criteria
 - [x] Login form validates email and password
@@ -30,7 +30,7 @@ git -C "$TEST_PROJECT" add spec/
 git -C "$TEST_PROJECT" commit -m "Add feature spec" --quiet
 
 # Ask about committing completed feature work
-send_prompt "F-0001 is complete and all tests pass. I want to commit the changes. What needs updating first?"
+send_prompt "F-001 is complete and all tests pass. I want to commit the changes. What needs updating first?"
 
 # Verify agent behavior
 FAILURES=0

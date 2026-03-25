@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests for the review checkpoint framework (F-0180, ADR-001 Phase 3).
+Tests for the review checkpoint framework (F-014, ADR-001 Phase 3).
 
 Covers:
 - ReviewMode enum
@@ -123,7 +123,7 @@ def write_features(root: Path, features: list[tuple[str, str, str]]) -> None:
 class TestFeatureIdValidation:
     def test_valid_feature_id(self):
         _validate_feature_id("F-0042")
-        _validate_feature_id("F-0001")
+        _validate_feature_id("F-001")
         _validate_feature_id("F-99999")  # 5+ digits ok
 
     def test_path_traversal_rejected(self):

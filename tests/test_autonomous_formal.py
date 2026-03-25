@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests for the autonomous_formal profile (F-0181, ADR-001 Phase 3).
+Tests for the autonomous_formal profile (F-029, ADR-001 Phase 3).
 
 Covers:
 - Profile loads all 30 settings from profiles.conf

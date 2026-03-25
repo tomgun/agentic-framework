@@ -17,7 +17,7 @@ def test_parse_features():
     features = load_features_flat(fixtures_dir / "sample_features.md")
 
     assert len(features) == 7, f"Expected 7 features, got {len(features)}"
-    assert features[0]["id"] == "F-0001"
+    assert features[0]["id"] == "F-001"
     assert features[0]["name"] == "User Authentication"
     assert features[0]["status"] == "shipped"
 
@@ -155,12 +155,12 @@ def test_query_children_returns_direct_children():
     fixtures_dir = Path(__file__).parent / "fixtures"
     features = load_features_flat(fixtures_dir / "sample_features.md")
 
-    children = get_children(features, "F-0001", recursive=False)
+    children = get_children(features, "F-001", recursive=False)
 
-    # F-0001 has F-0002 and F-0003 as direct children
+    # F-001 has F-0002 and F-002 as direct children
     assert len(children) == 2, f"Expected 2 direct children, got {len(children)}"
     child_ids = {c["id"] for c in children}
-    assert child_ids == {"F-0002", "F-0003"}
+    assert child_ids == {"F-0002", "F-002"}
 
 
 def test_query_children_shows_status_summary():
@@ -168,12 +168,12 @@ def test_query_children_shows_status_summary():
     fixtures_dir = Path(__file__).parent / "fixtures"
     features = load_features_flat(fixtures_dir / "sample_features.md")
 
-    children = get_children(features, "F-0001", recursive=False)
+    children = get_children(features, "F-001", recursive=False)
 
     # Verify we can count statuses
     statuses = [c.get("status") for c in children]
     assert "in_progress" in statuses  # F-0002
-    assert "planned" in statuses  # F-0003
+    assert "planned" in statuses  # F-002
 
 
 def test_query_children_empty_when_no_children():
@@ -181,8 +181,8 @@ def test_query_children_empty_when_no_children():
     fixtures_dir = Path(__file__).parent / "fixtures"
     features = load_features_flat(fixtures_dir / "sample_features.md")
 
-    # F-0004 has no children
-    children = get_children(features, "F-0004", recursive=False)
+    # F-003 has no children
+    children = get_children(features, "F-003", recursive=False)
     assert len(children) == 0, f"Expected 0 children, got {len(children)}"
 
 
@@ -201,11 +201,11 @@ def test_query_children_combined_with_status_filter():
     fixtures_dir = Path(__file__).parent / "fixtures"
     features = load_features_flat(fixtures_dir / "sample_features.md")
 
-    # Get only planned children of F-0001
-    children = get_children(features, "F-0001", recursive=False, status_filter="planned")
+    # Get only planned children of F-001
+    children = get_children(features, "F-001", recursive=False, status_filter="planned")
 
     assert len(children) == 1, f"Expected 1 planned child, got {len(children)}"
-    assert children[0]["id"] == "F-0003"
+    assert children[0]["id"] == "F-002"
 
 
 def test_query_children_recursive_returns_all_descendants():
@@ -213,13 +213,13 @@ def test_query_children_recursive_returns_all_descendants():
     fixtures_dir = Path(__file__).parent / "fixtures"
     features = load_features_flat(fixtures_dir / "sample_features.md")
 
-    # F-0001 -> F-0002 -> F-0006, F-0007
-    # F-0001 -> F-0003
-    descendants = get_children(features, "F-0001", recursive=True)
+    # F-001 -> F-0002 -> F-0006, F-007
+    # F-001 -> F-002
+    descendants = get_children(features, "F-001", recursive=True)
 
     assert len(descendants) == 4, f"Expected 4 descendants, got {len(descendants)}"
     desc_ids = {d["id"] for d in descendants}
-    assert desc_ids == {"F-0002", "F-0003", "F-0006", "F-0007"}
+    assert desc_ids == {"F-0002", "F-002", "F-0006", "F-007"}
 
 
 def test_query_children_recursive_shows_indented_tree():
@@ -227,14 +227,14 @@ def test_query_children_recursive_shows_indented_tree():
     fixtures_dir = Path(__file__).parent / "fixtures"
     features = load_features_flat(fixtures_dir / "sample_features.md")
 
-    descendants = get_children(features, "F-0001", recursive=True)
+    descendants = get_children(features, "F-001", recursive=True)
 
     # Check depths
     depth_map = {d["id"]: d["depth"] for d in descendants}
     assert depth_map["F-0002"] == 0  # Direct child
-    assert depth_map["F-0003"] == 0  # Direct child
+    assert depth_map["F-002"] == 0  # Direct child
     assert depth_map["F-0006"] == 1  # Child of F-0002
-    assert depth_map["F-0007"] == 1  # Child of F-0002
+    assert depth_map["F-007"] == 1  # Child of F-0002
 
 
 def test_query_children_recursive_with_status_filter():
@@ -243,15 +243,15 @@ def test_query_children_recursive_with_status_filter():
     features = load_features_flat(fixtures_dir / "sample_features.md")
 
     # Get only planned descendants
-    descendants = get_children(features, "F-0001", recursive=True, status_filter="planned")
+    descendants = get_children(features, "F-001", recursive=True, status_filter="planned")
 
-    # Should include F-0003 (depth 0) and F-0007 (depth 1, under F-0002)
+    # Should include F-002 (depth 0) and F-007 (depth 1, under F-0002)
     assert len(descendants) == 2, f"Expected 2 planned descendants, got {len(descendants)}"
     desc_ids = {d["id"] for d in descendants}
-    assert desc_ids == {"F-0003", "F-0007"}
+    assert desc_ids == {"F-002", "F-007"}
 
-    # F-0007 should still have depth 1 (under filtered-out F-0002)
-    f0007 = next(d for d in descendants if d["id"] == "F-0007")
+    # F-007 should still have depth 1 (under filtered-out F-0002)
+    f0007 = next(d for d in descendants if d["id"] == "F-007")
     assert f0007["depth"] == 1
 
 

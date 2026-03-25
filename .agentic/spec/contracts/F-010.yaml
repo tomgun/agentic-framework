@@ -1,0 +1,26 @@
+id: F-010
+name: Issue & Feedback Tracking
+lifecycle: shipped
+since: v0.6.0
+profile: formal
+protection: advisory
+category: quality
+consolidated_from: [F-0079, F-0206]
+
+description: |
+  ISSUES.md tracks bugs and tech debt. Feedback capture system records
+  user corrections and confirmations for agent behavior improvement.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "ISSUES.md path resolved in framework"
+    type: structural
+    verify: |
+      grep -q "ISSUES" .agentic/lib/paths.py || grep -q "ISSUES" .agentic/lib/paths.sh
+    tests:
+      - tests/validate_framework.sh::F-010
+
+nfr_refs: []
+migrations: []

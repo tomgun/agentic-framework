@@ -65,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Plan Durability Scanning (F-0198)** — `ag sync` now scans tool-specific plan directories (`~/.claude/plans/`, `.cursor/plans/`) for files mentioning F-XXXX IDs. Auto-copies to `.agentic/journal/plans/` if not already saved, preventing plan loss from session-scoped storage.
-- **Instruction File Sync Detection (DEV-0199)** — New `instruction-sync.sh` detects when `ag.sh` commands are added but instruction files (CLAUDE.md, cursorrules, copilot, codex, auto_orchestration, memory-seed) are not updated. Wired into `validate_framework.sh` as a warning.
+- **Instruction File Sync Detection (DEV-003)** — New `instruction-sync.sh` detects when `ag.sh` commands are added but instruction files (CLAUDE.md, cursorrules, copilot, codex, auto_orchestration, memory-seed) are not updated. Wired into `validate_framework.sh` as a warning.
 - **Intent Journal + Crash Recovery (F-0200)** — Write-ahead log for multi-step `ag.sh` operations (implement, done) with crash recovery via reconciliation in `ag sync`. Three enforcement modes (off/advisory/blocking) via STACK.md. Includes `intents.py` module, `intent-helpers.sh`, reconciler with adopt-orphan recovery, and `ag intent` commands.
 
 ## [0.52.3] - 2026-03-09
@@ -104,7 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.49.0] - 2026-03-08
 
 ### Added
-- **Backlog / Structural Work Assignment (F-0190)** — Git-tracked ordered work queue (`BACKLOG.json`) that tells any agent on any machine what to work on next. Position 0 = current work. `backlog_helpers.py` with 13 commands (add, current, next, done, list, remove, move, clear, upsert, check-deps, check-staleness, json-current, json-all). `backlog.sh` shell wrapper. `ag backlog` top-level command. Structural gates: `ag implement` hard-blocks wrong item, auto-upserts if not in backlog; `ag work` blocks when feature queue exists; `ag done` auto-advances. Advisory warnings on `ag plan`/`ag spec`. Backlog display at `ag start`. Staleness detection (7-day threshold). Dependency tracking (`depends_on` with unmet dep warnings). Lifecycle cross-check (shipped/deprecated features blocked). `SKIP_BACKLOG=1` escape hatch. `crunch.py` reads backlog order for autonomous mode. 44 pytest tests, 10 validation tests.
+- **Backlog / Structural Work Assignment (F-006)** — Git-tracked ordered work queue (`BACKLOG.json`) that tells any agent on any machine what to work on next. Position 0 = current work. `backlog_helpers.py` with 13 commands (add, current, next, done, list, remove, move, clear, upsert, check-deps, check-staleness, json-current, json-all). `backlog.sh` shell wrapper. `ag backlog` top-level command. Structural gates: `ag implement` hard-blocks wrong item, auto-upserts if not in backlog; `ag work` blocks when feature queue exists; `ag done` auto-advances. Advisory warnings on `ag plan`/`ag spec`. Backlog display at `ag start`. Staleness detection (7-day threshold). Dependency tracking (`depends_on` with unmet dep warnings). Lifecycle cross-check (shipped/deprecated features blocked). `SKIP_BACKLOG=1` escape hatch. `crunch.py` reads backlog order for autonomous mode. 44 pytest tests, 10 validation tests.
 
 ## [0.48.0] - 2026-03-08
 
@@ -141,12 +141,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Tiered Verify Loop (F-0164)** — Multi-tier test execution (unit → integration → e2e) with per-tier fix loops, timeouts, and continue-on-failure settings. Parsed from STACK.md `Test commands:` section.
-- **Autonomous Workflow Engine (F-0160–F-0163)** — `ag auto verify`, `ag auto task F-XXXX`, `ag auto crunch` modes with control socket, tiered permissions, and complexity estimation.
+- **Autonomous Workflow Engine (F-030–F-0163)** — `ag auto verify`, `ag auto task F-XXXX`, `ag auto crunch` modes with control socket, tiered permissions, and complexity estimation.
 
 ## [0.43.0] - 2026-03-06
 
 ### Added
-- **Autonomous Engine Foundation (F-0160)** — Control plane with Unix domain socket for bidirectional commands (pause/resume/stop/feedback/status), thread-safe engine state with `threading.Lock`, settings.json generation from STACK.md (three-tier trust model: Docker sandbox, scoped permissions, interactive), AC loading/decomposition with complexity estimation, atomic JSON state persistence, signal handling (SIGTERM/SIGINT) and atexit cleanup.
+- **Autonomous Engine Foundation (F-030)** — Control plane with Unix domain socket for bidirectional commands (pause/resume/stop/feedback/status), thread-safe engine state with `threading.Lock`, settings.json generation from STACK.md (three-tier trust model: Docker sandbox, scoped permissions, interactive), AC loading/decomposition with complexity estimation, atomic JSON state persistence, signal handling (SIGTERM/SIGINT) and atexit cleanup.
 - **Autonomous Verify Mode (F-0161)** — Test-fix loop (`ag auto verify`). Detects test runner from STACK.md or project files (pytest, Jest, Go, Cargo), spawns fresh Claude instances to fix failures, re-runs until green or max iterations. Configurable `--max-iterations`, `--test-command`, `--json` output.
 - **Autonomous Task Mode (F-0162)** — Single-feature implementation (`ag auto task F-XXXX`). Reads acceptance criteria, creates feature branch, spawns Claude per AC, runs tests, commits passing work, runs full verify loop, creates PR for human review. User feedback via `ag auto feedback` incorporated into next Claude instance.
 - **Autonomous Crunch Mode (F-0163)** — Multi-feature batch (`ag auto crunch`). Reads planned/in-progress features from FEATURES.md, processes each via task mode, stops on max errors threshold or human `ag auto stop`, saves progress to dashboard state file.
@@ -172,7 +172,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Spec Format Evolution (F-0148)** — Acceptance template gains `## Behavior` section, priority tags (`<!-- P1 -->` / `<!-- P2 -->`), `## Verification` heading. `verify-independently` marker for reviewable ACs.
 - **Spec Clarification Taxonomy (F-0149)** — Writing-specs skill includes 6-category structured clarification (functional scope, data model, edge cases, NFRs, integrations, completion signals). Max 5 targeted questions per spec.
 - **Execution Order & Checkpoints (F-0150)** — Plan template includes `## Execution Order` with `[P]` parallel markers. Implementing-features skill gains scope-check + checkpoint validation at P1/P2 boundaries.
-- **User-Extension Directory (F-0151)** — `.agentic-local/extensions/` for custom skills, gates, hooks, and rules that survive framework upgrades. Integrated with `scaffold.sh`, `generate-skills.sh`, `pre-commit-check.sh`, and `upgrade.sh`.
+- **User-Extension Directory (F-028)** — `.agentic-local/extensions/` for custom skills, gates, hooks, and rules that survive framework upgrades. Integrated with `scaffold.sh`, `generate-skills.sh`, `pre-commit-check.sh`, and `upgrade.sh`.
 - **Semantic Consistency Analysis (F-0152)** — `spec-analyze.sh` runs 3 deterministic checks: ambiguity detection (vague adjectives without metrics), AC↔test coverage gaps (via coverage.py), NFR measurability audit. Advisory only (exit 0 always). New `spec_analysis` setting (on for formal, off for discovery).
 - **AC-Level Coverage Tracking (F-0153)** — `coverage.py --ac-coverage F-XXXX` maps individual ACs to tests via naming conventions with proximity-based matching. Human-readable + JSON output. Standalone or integrated with spec-analyze.sh.
 - **LLM-069** — New behavioral test: spec analysis advisory before implementation.
@@ -591,7 +591,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.18.0] - 2026-02-05
 
 ### Added
-- **Plan-Review Loop (F-0120)** - Iterative planning with critical review
+- **Plan-Review Loop (F-004)** - Iterative planning with critical review
   - `ag plan F-XXXX` - Create plan with iterative review loop
   - `ag plan F-XXXX --no-review` - Skip review for simple cases
   - Planner creates plan, reviewer critiques, loop until approved
@@ -616,7 +616,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Validation tests ensure gate parity across all 4 tools
   - `/CODEX.md` now extends template properly (not a stub)
 
-- **Multi-Tool LLM Testing Infrastructure (DEV-0122)** - Cross-tool behavioral testing
+- **Multi-Tool LLM Testing Infrastructure (DEV-002)** - Cross-tool behavioral testing
   - `ag test llm` - Environment-aware test command
   - `ag test llm --list` - List available tests
   - `ag test llm --critical` - Run/show critical tests only
@@ -662,7 +662,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Parses Features Added/Modified/Deprecated sections
   - Detects shipped status from acceptance criteria
 
-- **Documentation Drift Detection (F-0118)** - Manifest-based doc staleness detection
+- **Documentation Drift Detection (F-012)** - Manifest-based doc staleness detection
   - `drift.sh --docs` - Detects when docs may be out of sync with code changes
   - `drift.sh --docs --manifest F-XXXX` - Checks against specific feature manifest
   - Advisory only (never blocks)
@@ -738,7 +738,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `ag trace --json` - Combined JSON output for CI/tooling
 
 - **Test→Feature Inference Conventions** - No annotations required
-  - Explicit naming: `test_F0001_*.py` → F-0001 (high confidence)
+  - Explicit naming: `test_F0001_*.py` → F-001 (high confidence)
   - Import tracing: test imports file with `@feature` → inferred (medium confidence)
   - Documented in `.agentic/workflows/code_annotations.md`
 
@@ -854,7 +854,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.12.0] - 2026-01-20
 
 ### Added
-- **F-0101: Framework Architecture Decision Records (ADRs)** - Document WHY decisions were made
+- **F-011: Framework Architecture Decision Records (ADRs)** - Document WHY decisions were made
   - `docs/adr/` directory for framework-level decision documentation
   - ADR-001: CLAUDE.md must be self-contained (bootstrap reliability)
   - Prevents future contributors from undoing intentional decisions
@@ -923,7 +923,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.11.3] - 2026-01-15
 
 ### Added
-- **F-0096: PR-Based Workflow Default** - PR workflow is now default for Core+PM profile
+- **F-024: PR-Based Workflow Default** - PR workflow is now default for Core+PM profile
   - Profile-aware defaults: Core+PM → `pull_request`, Core → `direct`
   - Updated agent guidelines, CLAUDE.md, STACK.template.md
 - **F-0097: Worktree Management Tool** - `worktree.sh` for parallel agent development
@@ -1149,7 +1149,7 @@ Manager/puppeteer agent that coordinates specialized agents:
 - Ensures framework compliance
 - Created for Claude Code (`.agentic/agents/claude/subagents/orchestrator-agent.md`)
 - Created for Cursor (`.cursor/agents/orchestrator-agent.md`)
-- Formal spec F-0081 with acceptance criteria
+- Formal spec F-025 with acceptance criteria
 
 ### NEW: Complete Agent Parity Across Environments
 
@@ -1176,7 +1176,7 @@ All 10 agents now available in Claude Code subagents:
 
 ### NEW: Formal Specs for Agent System
 
-- F-0081: Orchestrator Agent
+- F-025: Orchestrator Agent
 - F-0082: Tier-Based Model Selection
 - F-0083: Agent Token Savings Documentation
 - F-0084: Untracked Files Protection
@@ -1537,7 +1537,7 @@ COPY THIS PROMPT TO YOUR AGENT:
 **`quick_feature.sh`**:
 ```bash
 bash .agentic/tools/quick_feature.sh "Dark mode support"
-# Creates F-0001: Dark mode support in spec/FEATURES.md
+# Creates F-001: Dark mode support in spec/FEATURES.md
 ```
 
 **`quick_issue.sh`**:
@@ -1573,7 +1573,7 @@ Both scripts:
 **Critical insight**: Framework wasn't using its own methodology for new features!
 
 **Fixed**:
-- Added F-0077 to F-0080 to `spec/FEATURES.md` (now 59 features)
+- Added F-027 to F-0080 to `spec/FEATURES.md` (now 59 features)
 - Created acceptance criteria files for all new features
 - Updated `tests/validate_framework.sh` (59 checks, all passing)
 - Updated `FRAMEWORK_DEVELOPMENT.md` release checklist
@@ -1625,27 +1625,27 @@ At each version, you can now know exactly what the framework reliably does:
 #### New: spec/ Directory
 
 **`spec/FEATURES.md`** - Complete feature catalog:
-- F-0001 to F-0010: Core (initialization, profiles, spec-driven dev)
-- F-0011 to F-0020: Quality (standards, gates, smoke testing)
-- F-0021 to F-0030: Session (session management, journaling, context)
-- F-0031 to F-0040: Multi-Agent (worktrees, coordination)
-- F-0041 to F-0050: Tooling (scripts, automation, token efficiency)
-- F-0051 to F-0060: Recovery (WIP tracking, error recovery)
-- F-0061 to F-0070: Developer Experience (docs, onboarding, usability)
+- F-001 to F-0010: Core (initialization, profiles, spec-driven dev)
+- F-008 to F-0020: Quality (standards, gates, smoke testing)
+- F-015 to F-0030: Session (session management, journaling, context)
+- F-017 to F-0040: Multi-Agent (worktrees, coordination)
+- F-019 to F-0050: Tooling (scripts, automation, token efficiency)
+- F-016 to F-0060: Recovery (WIP tracking, error recovery)
+- F-026 to F-0070: Developer Experience (docs, onboarding, usability)
 - F-0071 to F-0080: Design Principles (token economics, green coding, etc.)
 
 **`spec/acceptance/`** - Acceptance criteria for 17 features:
-- F-0001: Project Initialization
+- F-001: Project Initialization
 - F-0006: Acceptance-Driven Development
-- F-0007: Small Batch Development
+- F-007: Small Batch Development
 - F-0013: Smoke Testing
-- F-0016: Pre-Commit Quality Gates
-- F-0021: Session Start Protocol
-- F-0031: Multi-Agent Coordination
-- F-0041: Token-Efficient Scripts
-- F-0051: WIP Tracking
+- F-009: Pre-Commit Quality Gates
+- F-015: Session Start Protocol
+- F-017: Multi-Agent Coordination
+- F-019: Token-Efficient Scripts
+- F-016: WIP Tracking
 - F-0055: Anti-Hallucination Rules
-- F-0061: DEVELOPER_GUIDE.md
+- F-026: DEVELOPER_GUIDE.md
 - F-0064: Script Help Messages
 - F-0066: Template Quality
 - F-0069: Checklist-Driven Workflows
@@ -2697,7 +2697,7 @@ For capturing project vision before initialization:
   - **Validates**: Query tool works for 200+ feature projects
   
 - `tests/test_validate_specs.py` (7 tests, optional dependencies)
-  - Detect circular dependencies (F-0001 → F-0002 → F-0001)
+  - Detect circular dependencies (F-001 → F-0002 → F-001)
   - Detect self-dependencies
   - Detect invalid parent references
   - Detect invalid dependency references
@@ -2869,7 +2869,7 @@ New Tools:
   - `--hierarchy-only` mode for parent-child relationships
   - Prevents massive unreadable diagrams
 - Enhanced `validate_specs.py`: Circular dependency detection
-  - DFS-based cycle detection (catches F-0001 → F-0002 → F-0001)
+  - DFS-based cycle detection (catches F-001 → F-0002 → F-001)
   - Cross-reference validation (parent/dependencies exist)
 - `hooks/pre-commit`: Pre-commit hook for spec validation
   - Auto-installed by `scaffold.sh` (Core+PM mode)
@@ -3177,7 +3177,7 @@ This release addresses issues found in real-world usage:
 - `report.py` and `accept.py` degrade gracefully if PM features disabled
 
 ### Fixed
-- PM templates no longer contain concrete example IDs (F-0001, NFR-0001) that caused verify failures
+- PM templates no longer contain concrete example IDs (F-001, NFR-0001) that caused verify failures
 - Core mode agents now work efficiently (don't try to read non-existent STATUS.md/spec/)
 - `enable-product-management.sh` detects OVERVIEW.md and provides conversion guidance
 

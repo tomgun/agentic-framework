@@ -17,7 +17,7 @@ This is the **schema** for the spec system. Do not deviate from this without upd
 
 | Type | Format | Example | Used In |
 |------|--------|---------|---------|
-| **Feature** | `F-####` | `F-0001` | FEATURES.md, acceptance files |
+| **Feature** | `F-####` | `F-001` | FEATURES.md, acceptance files |
 | **Requirement** | `R-####` | `R-0015` | PRD.md |
 | **Non-Functional Req** | `NFR-####` | `NFR-0003` | NFR.md |
 | **Architecture Decision** | `ADR-####` | `ADR-0007` | adr/*.md filenames |
@@ -30,10 +30,10 @@ This is the **schema** for the spec system. Do not deviate from this without upd
 
 ```markdown
 <!-- Link to feature -->
-F-0001
+F-001
 
 <!-- Link to feature with status in dependencies -->
-F-0001 (complete), F-0002 (in_progress)
+F-001 (complete), F-0002 (in_progress)
 
 <!-- Link to requirement -->
 R-0015, R-0020
@@ -45,7 +45,7 @@ NFR-0003
 ADR-0007
 
 <!-- File path reference -->
-.agentic/spec/acceptance/F-0001.md
+.agentic/spec/acceptance/F-001.md
 ```
 
 ---

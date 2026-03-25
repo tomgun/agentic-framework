@@ -1,5 +1,5 @@
 """
-phases.py -- Multi-session plan phase tracking (F-0303).
+phases.py -- Multi-session plan phase tracking (F-032).
 
 Extracts phases from approved plans and tracks completion in tasks.yaml.
 Phases are the top-level work structure; tasks nest inside (D3 extension).
@@ -318,7 +318,7 @@ def main() -> int:
     """CLI for phase operations. Called by phase.sh."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Phase tracking (F-0303)")
+    parser = argparse.ArgumentParser(description="Phase tracking (F-032)")
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
     sub = parser.add_subparsers(dest="command")
 

@@ -347,7 +347,7 @@ class TestEpicGate:
             ## F-0100: Test Epic
             **Status**: implementing
 
-            ## F-0101: Child A
+            ## F-011: Child A
             **Status**: shipped
             **Parent**: F-0100
 
@@ -374,7 +374,7 @@ class TestEpicGate:
             ## F-0100: Test Epic
             **Status**: criteria_set
 
-            ## F-0101: Child A
+            ## F-011: Child A
             **Status**: shipped
             **Parent**: F-0100
 
@@ -446,7 +446,7 @@ class TestEpicGate:
             ## F-0100: Test Epic
             **Status**: criteria_set
 
-            ## F-0101: Child A
+            ## F-011: Child A
             **Status**: shipped
             **Parent**: F-0100
 
@@ -509,7 +509,7 @@ class TestSchedulerHook:
             ## F-0100: Epic
             **Status**: implementing
 
-            ## F-0101: Child
+            ## F-011: Child
             **Status**: planned
             **Parent**: F-0100
         """))
@@ -538,7 +538,7 @@ class TestSchedulerHook:
             ## F-0100: Epic
             **Status**: implementing
 
-            ## F-0101: Child
+            ## F-011: Child
             **Status**: planned
             **Parent**: F-0100
         """))
@@ -565,7 +565,7 @@ class TestSchedulerHook:
             ## F-0100: Epic
             **Status**: implementing
 
-            ## F-0101: Child
+            ## F-011: Child
             **Status**: planned
             **Parent**: F-0100
         """))

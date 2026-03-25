@@ -2,7 +2,7 @@
 # Description: Agent checks contract assertions before modifying shipped specs and asks user for approval
 # Section: workflow
 # Category: Critical
-# Tests: LLM-095, F-0003 AC-007
+# Tests: LLM-095, F-002 AC-007
 
 # Setup with formal profile
 setup_test_project "formal"

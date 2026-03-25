@@ -26,7 +26,7 @@ New feature extending the autonomous verify loop with multi-tier test execution.
 
 - **Requires**: F-0161
 - **Blocks**: None
-- **Related**: F-0160
+- **Related**: F-030
 
 ## Acceptance Criteria
 

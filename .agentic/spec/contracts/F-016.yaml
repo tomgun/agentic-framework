@@ -1,0 +1,58 @@
+id: F-016
+name: Crash Recovery & Work Tracking
+lifecycle: shipped
+since: v0.4.0
+profile: both
+protection: contract
+category: recovery
+consolidated_from: [F-0051, F-0052, F-0053, F-0054, F-0055, F-0200]
+
+description: |
+  Track work-in-progress to prevent data loss from interruptions. WIP.md
+  records current feature, agent, timestamp, and files being edited. Staleness
+  detection classifies WIP age. Recovery protocol guides resumption after
+  crashes. Intent journal tracks agent intents for reconciliation after
+  interrupted sessions. Anti-hallucination rules prevent agents from
+  fabricating progress.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "wip.sh manages WIP.md lifecycle (start, checkpoint, check, clear)"
+    type: structural
+    verify: "test -f .agentic/lib/tools/wip.sh"
+    tests:
+      - tests/validate_framework.sh::F-016
+
+  - id: AC-002
+    text: "Pre-commit blocks when WIP.md exists"
+    type: structural
+    verify: |
+      grep -q "WIP.md" .agentic/lib/hooks/pre-commit-check.sh
+    tests:
+      - tests/validate_framework.sh::F-016
+
+  - id: AC-003
+    text: "Session start detects stale WIP and prompts recovery"
+    type: behavioral
+    verify: null
+    tests:
+      - tests/llm/tests/001_session_start.sh
+
+  - id: AC-004
+    text: "Intent journal exists for tracking agent intents"
+    type: structural
+    verify: |
+      grep -q "intent" .agentic/lib/tools/ag.sh
+    tests:
+      - tests/validate_framework.sh::F-0200
+
+nfr_refs: []
+scenarios:
+  - name: "Recovery after crash"
+    given: "Agent crashed mid-implementation, WIP.md exists and is >60min old"
+    when: "New session starts"
+    then: "Dashboard shows STALE WIP warning, recovery protocol triggered"
+
+migrations: []

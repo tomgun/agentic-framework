@@ -446,7 +446,7 @@ def parse_acceptance_frontmatter(acceptance_path: Path) -> dict:
 
     Expected format:
     ---
-    feature: F-0120
+    feature: F-004
     status: shipped
     validation:
       - command: "pytest tests/test_feature.py -v"
@@ -747,7 +747,7 @@ def run_phase_checks(root: Path, profile: str, phase: str, feature_id: str = Non
                 except Exception:
                     pass
         else:
-            issues.append("No feature ID provided. Use: doctor.sh --phase planning F-0001")
+            issues.append("No feature ID provided. Use: doctor.sh --phase planning F-001")
 
     elif phase == "implement":
         # Should have contract/acceptance + WIP tracking
@@ -935,7 +935,7 @@ def main() -> int:
     parser.add_argument('--pre-commit', action='store_true', help='Run pre-commit checks')
     parser.add_argument('--quick', action='store_true', help='Quick health check (default)')
     parser.add_argument('--summary', action='store_true', help='One-line summary for session greeting')
-    parser.add_argument('feature_id', nargs='?', help='Feature ID (e.g., F-0001) for phase checks')
+    parser.add_argument('feature_id', nargs='?', help='Feature ID (e.g., F-001) for phase checks')
     args = parser.parse_args()
 
     root = Path.cwd()

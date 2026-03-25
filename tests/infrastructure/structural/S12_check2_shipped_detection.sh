@@ -53,7 +53,7 @@ cat >> spec/FEATURES.md << 'EOF'
 
 ---
 
-## F-0077: Shipped With Acceptance
+## F-027: Shipped With Acceptance
 
 **Status**: shipped
 **Priority**: high
@@ -61,11 +61,11 @@ cat >> spec/FEATURES.md << 'EOF'
 
 **Description**: A shipped feature with proper acceptance file.
 
-**Acceptance**: See `spec/contracts/F-0077.yaml`
+**Acceptance**: See `spec/contracts/F-027.yaml`
 EOF
 
-cat > spec/acceptance/F-0077.md << 'EOF'
-# F-0077
+cat > spec/acceptance/F-027.md << 'EOF'
+# F-027
 
 ## Acceptance Criteria
 - [x] Feature works

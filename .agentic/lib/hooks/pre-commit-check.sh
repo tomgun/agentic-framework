@@ -1275,7 +1275,7 @@ for issue in data.get('issues', []):
 fi
 
 # Check 23: YAML contract protection for shipped contracts (BLOCKING)
-# @feature F-0302
+# @feature F-031
 # When a shipped contract (protection: contract) is modified, require a migration entry.
 CONTRACTS_DIR_CHECK="${CONTRACTS_DIR:-${AGENTIC_ROOT}/spec/contracts}"
 if [[ -d "$CONTRACTS_DIR_CHECK" ]] && command -v python3 >/dev/null 2>&1; then

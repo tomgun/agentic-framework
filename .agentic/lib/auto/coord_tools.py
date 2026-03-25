@@ -1,5 +1,5 @@
 """
-coord_tools.py -- 8 tool handlers for the Coordination Server (F-0185).
+coord_tools.py -- 8 tool handlers for the Coordination Server (F-018).
 
 Each handler takes a project_root Path and params dict, returns a result dict.
 Files are read on every request (no in-memory cache). Delegates to existing

@@ -6,7 +6,7 @@ The framework's spec system has 217 features that describe how it was built, not
 
 **Core principle**: "Perfection is when you can't remove anything." The end state is ~30-40 features with comprehensive, machine-verifiable, automatically-protected contracts.
 
-**Actual scope**: 217 feature entries (F-0001 through F-0301 with gaps), but the category summary table only accounts for 126 — 91 features are untracked in the header table. Plus 4 NFRs, 208 AC files (9 features missing ACs), 14 backlog items, and an unknown number of behaviors not tracked as features at all. The spec system isn't even maintaining its own integrity.
+**Actual scope**: 217 feature entries (F-001 through F-0301 with gaps), but the category summary table only accounts for 126 — 91 features are untracked in the header table. Plus 4 NFRs, 208 AC files (9 features missing ACs), 14 backlog items, and an unknown number of behaviors not tracked as features at all. The spec system isn't even maintaining its own integrity.
 
 ---
 
@@ -27,8 +27,8 @@ The framework's spec system has 217 features that describe how it was built, not
 ## The Contract Format
 
 ```yaml
-# .agentic/spec/contracts/F-0003.yaml
-id: F-0003
+# .agentic/spec/contracts/F-002.yaml
+id: F-002
 name: Spec-Driven Development
 status: shipped
 since: v0.1.0
@@ -53,7 +53,7 @@ assertions:
       test -d "$PROJECT/.agentic/spec/contracts" &&
       test -f "$PROJECT/.agentic/spec/FEATURES.md"
     tests:
-      - tests/validate_framework.sh::F-0003
+      - tests/validate_framework.sh::F-002
       - tests/test_validate_specs.py::test_formal_scaffold
 
   - id: AC-002
@@ -74,7 +74,7 @@ assertions:
   - id: AC-004
     text: "Contract YAML is parseable by standard YAML parser"
     type: structural
-    verify: "python3 -c 'import yaml; yaml.safe_load(open(\"spec/contracts/F-0003.yaml\"))'"
+    verify: "python3 -c 'import yaml; yaml.safe_load(open(\"spec/contracts/F-002.yaml\"))'"
     tests:
       - tests/test_validate_specs.py::test_contract_yaml_valid
 
@@ -186,7 +186,7 @@ At project start or after a milestone, `ag kickoff "vision"` (or a milestone rev
 **Level 2: Epic Decomposition**
 
 An epic (large feature) decomposes into child features via `ag decompose F-XXXX`:
-- Parent contract has `children: [F-0010, F-0011, F-0012]`
+- Parent contract has `children: [F-0010, F-008, F-0012]`
 - Each child gets its own contract
 - Epic's assertions may reference children: "All child features shipped"
 
@@ -224,9 +224,9 @@ The backlog operates at the TASK level within the current feature:
 **Backlog structure evolves**:
 ```json
 [
-  {"type": "task", "feature": "F-0003", "task": "T-002", "description": "Implement gate..."},
-  {"type": "task", "feature": "F-0003", "task": "T-003", "description": "Add migration..."},
-  {"type": "feature", "id": "F-0010", "description": "Next feature after F-0003"}
+  {"type": "task", "feature": "F-002", "task": "T-002", "description": "Implement gate..."},
+  {"type": "task", "feature": "F-002", "task": "T-003", "description": "Add migration..."},
+  {"type": "feature", "id": "F-0010", "description": "Next feature after F-002"}
 ]
 ```
 
@@ -247,7 +247,7 @@ The contract format captures the output of planning at every level — from high
 The format supports categories, epics, and parent-child relationships:
 
 ```yaml
-id: F-0003
+id: F-002
 category: core-workflow        # Grouping for display and filtering
 parent: null                   # Epic ID (e.g., E-0001) or parent feature ID
 children: []                   # Child feature IDs for epics/decomposed features
@@ -292,7 +292,7 @@ migrations:
 
 **Enforcement**: Pre-commit checks that any modification to a shipped contract's assertions has a corresponding migration entry with the same date. No silent changes.
 
-**Audit trail**: `ag contract migrations F-0003` shows the full change history. `ag contract migrations --trigger external` shows all externally-forced changes across the project.
+**Audit trail**: `ag contract migrations F-002` shows the full change history. `ag contract migrations --trigger external` shows all externally-forced changes across the project.
 
 The existing `spec/migrations/` directory (17 dated files) continues to serve as the project-level migration log. The per-contract `migrations` block adds feature-level granularity.
 
@@ -306,9 +306,9 @@ Walk through all 217 features grouped by ~30-40 proposed consolidated features. 
 
 - **Core** → absorbed into the consolidated feature's assertions
 - **Enforcement** → its ACs become assertions in the consolidated feature
-- **Implementation Detail** → archived (F-0157 Directory Restructure, F-0221 ag.sh Decomposition, etc.)
+- **Implementation Detail** → archived (F-022 Directory Restructure, F-0221 ag.sh Decomposition, etc.)
 - **Deprecated** → archived (F-0028, F-0033, F-0098, F-0106, F-0107, F-0108)
-- **Design Constraint** → becomes NFR or cross-cutting assertion (F-0007, F-0071-F-0079)
+- **Design Constraint** → becomes NFR or cross-cutting assertion (F-007, F-0071-F-010)
 - **Planned/Stale** → evaluate: still relevant? drop or keep in backlog
 
 ### Step 0.2: Finalize Feature List
@@ -322,7 +322,7 @@ Produce the consolidated feature list (~30-40 entries). Each entry has:
 ### Step 0.3: Planned Feature Pruning
 
 Review each planned/unimplemented feature with user:
-- F-0193, F-0210-F-0213, F-0220, F-0223, F-0227-F-0228, F-0230-F-0233, DEV-0243
+- F-0193, F-0210-F-0213, F-035, F-0223, F-0227-F-036, F-037-F-0233, DEV-004
 - Decision per feature: keep in backlog, drop, or merge into existing
 
 **Output**: `spec/CONSOLIDATION_MAP.md` — table of old → new feature mapping
@@ -343,7 +343,7 @@ Create `spec/contract_parser.py`:
 
 ```bash
 ag contract check              # Run all structural verify commands, report pass/fail
-ag contract check F-0003       # Run one feature's assertions
+ag contract check F-002       # Run one feature's assertions
 ag contract coverage           # Show assertions with/without tests
 ag contract pending            # Show features with non-empty user_input
 ag contract list               # Show all contracts with status
@@ -375,7 +375,7 @@ Add to `pre-commit-check.sh`:
 
 For each of the ~30-40 features:
 1. Review all old AC files from constituent features
-2. Identify valid vs. stale criteria (e.g., F-0003 references deleted PRD.md)
+2. Identify valid vs. stale criteria (e.g., F-002 references deleted PRD.md)
 3. Write YAML contract with assertions, verify commands, test links, scenarios
 4. Ensure every shipped feature has `protection: contract`
 
@@ -592,9 +592,9 @@ Key design insights from the user that shaped this plan:
 The contract format is **primarily for machines**. Names and descriptions provide human readability, but the structure is optimized for reliable parsing and automated verification. Agents don't write YAML directly — **scripts update contracts**, following the same pattern as the existing token-efficient scripts (journal.sh, status.sh, feature.sh):
 
 ```bash
-ag contract set F-0003 lifecycle implementing
-ag contract add-assertion F-0003 "ag implement blocks without AC" --type behavioral
-ag contract add-migration F-0003 --trigger external --reason "API changed"
+ag contract set F-002 lifecycle implementing
+ag contract add-assertion F-002 "ag implement blocks without AC" --type behavioral
+ag contract add-migration F-002 --trigger external --reason "API changed"
 ```
 
 This solves the "YAML is hard for LLMs" problem — agents call scripts, scripts write valid YAML. Same pattern that already works for FEATURES.md and JOURNAL.md.
@@ -623,7 +623,7 @@ Tasks live in the **plan file** (`.agentic/work/F-XXXX/plan.md`) but are **track
 
 ```yaml
 # .agentic/work/F-XXXX/tasks.yaml (separate from contract)
-feature: F-0003
+feature: F-002
 tasks:
   - id: T-001
     description: "Set up spec/ directory scaffolding"
@@ -643,7 +643,7 @@ tasks:
 - `ag next` reads tasks.yaml to show what's next within the current feature.
 - Autonomous engine reads tasks.yaml to know which task to work on.
 - Each task maps to assertions it satisfies → completion is verifiable.
-- Scripts manage tasks: `ag task add F-0003 "description" --assertions AC-001,AC-004`
+- Scripts manage tasks: `ag task add F-002 "description" --assertions AC-001,AC-004`
 
 ### D4: One-Go Migration, Small Verifiable Phases
 No dual systems. Each phase is a complete, self-contained change that can be verified before moving to the next. The key insight: **each phase produces a working system**, just incrementally closer to the target.
@@ -663,7 +663,7 @@ NFRs get their own contract type: `spec/contracts/NFR-0001.yaml`. Structure simi
 id: NFR-0001
 name: Instruction File Size Limit
 type: nfr
-applies_to: all  # or [F-0003, F-0005, ...] for scoped NFRs
+applies_to: all  # or [F-002, F-0005, ...] for scoped NFRs
 
 assertions:
   - id: NFR-001-A01

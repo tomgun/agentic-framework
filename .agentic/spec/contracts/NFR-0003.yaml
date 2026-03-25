@@ -21,7 +21,7 @@ assertions:
     verify: |
       grep -q "files staged\|max.*10\|Batch size" .agentic/lib/hooks/pre-commit-check.sh
     tests:
-      - tests/validate_framework.sh::F-0007
+      - tests/validate_framework.sh::F-007
 
   - id: AC-002
     text: "Memory-seed enforces batch size limits"
@@ -32,4 +32,11 @@ assertions:
       - tests/validate_framework.sh::NFR-0003
 
 nfr_refs: []
-migrations: []
+migrations:
+  - id: M-2026-03-25-001
+    date: "2026-03-25"
+    trigger: implementation_discovery
+    reason: "F-0184 Phase 2 renumber: test reference updated from F-0007 to F-007"
+    changes:
+      - "AC-001 tests path updated to match renamed validate_framework.sh section"
+    approved_by: user

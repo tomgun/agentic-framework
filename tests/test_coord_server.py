@@ -1,5 +1,5 @@
 """
-Tests for F-0185: Coordination Server.
+Tests for F-018: Coordination Server.
 
 Test strategy:
 - Pure function tests for all 8 tool handlers (happy + sad paths)
@@ -70,7 +70,7 @@ def project_dir(tmp_path):
 
 ---
 
-## F-0001: Test Feature
+## F-001: Test Feature
 
 **Status**: planned
 **Category**: Test
@@ -94,7 +94,7 @@ def project_dir(tmp_path):
 
 ---
 
-## F-0003: Shipped Feature
+## F-002: Shipped Feature
 
 **Status**: shipped
 **Category**: Test
@@ -106,9 +106,9 @@ def project_dir(tmp_path):
 """
     (spec / "FEATURES.md").write_text(features_content)
 
-    # Acceptance criteria for F-0001
-    (acceptance / "F-0001.md").write_text(
-        "# F-0001\n\n- [ ] **AC-001**: Test criterion\n"
+    # Acceptance criteria for F-001
+    (acceptance / "F-001.md").write_text(
+        "# F-001\n\n- [ ] **AC-001**: Test criterion\n"
     )
 
     # Minimal git directory so paths.py resolves
@@ -147,29 +147,29 @@ class TestClaimFeature:
     def test_claim_writes_to_agents_json(self, project_dir):
         """Claiming a feature must actually persist an entry to disk."""
         result = claim_feature(project_dir, {
-            "feature_id": "F-0001",
+            "feature_id": "F-001",
             "agent": "worker-1",
-            "description": "Implementing F-0001",
+            "description": "Implementing F-001",
         })
         assert result["claimed"] is True
-        assert result["feature_id"] == "F-0001"
+        assert result["feature_id"] == "F-001"
 
         # Verify the file was actually written
         agents = _load_agents(project_dir)
-        active = [e for e in agents if e["feature_id"] == "F-0001"
+        active = [e for e in agents if e["feature_id"] == "F-001"
                   and e["status"] == "active"]
         assert len(active) == 1
         assert active[0]["agent"] == "worker-1"
-        assert active[0]["description"] == "Implementing F-0001"
+        assert active[0]["description"] == "Implementing F-001"
         assert "claim_pid" in active[0]
 
     def test_claim_rejects_duplicate_with_specific_error(self, project_dir):
         """Second claim for same feature is rejected with informative error."""
         claim_feature(project_dir, {
-            "feature_id": "F-0001", "agent": "agent-1",
+            "feature_id": "F-001", "agent": "agent-1",
         })
         result = claim_feature(project_dir, {
-            "feature_id": "F-0001", "agent": "agent-2",
+            "feature_id": "F-001", "agent": "agent-2",
         })
         assert result["claimed"] is False
         assert "already claimed" in result["error"]
@@ -177,7 +177,7 @@ class TestClaimFeature:
     def test_claim_different_features_same_agent(self, project_dir):
         """One agent can claim multiple features (no per-agent limit)."""
         r1 = claim_feature(project_dir, {
-            "feature_id": "F-0001", "agent": "worker-1",
+            "feature_id": "F-001", "agent": "worker-1",
         })
         r2 = claim_feature(project_dir, {
             "feature_id": "F-0002", "agent": "worker-1",
@@ -196,20 +196,20 @@ class TestClaimFeature:
     def test_claim_with_explicit_pid(self, project_dir):
         """Claim stores the provided PID (for remote agents)."""
         result = claim_feature(project_dir, {
-            "feature_id": "F-0001",
+            "feature_id": "F-001",
             "agent": "remote-agent",
             "pid": 12345,
         })
         assert result["claimed"] is True
         agents = _load_agents(project_dir)
-        entry = [e for e in agents if e["feature_id"] == "F-0001"][0]
+        entry = [e for e in agents if e["feature_id"] == "F-001"][0]
         assert entry["claim_pid"] == 12345
 
     def test_stale_pid_auto_cleanup(self, project_dir):
         """A claim with a dead PID is automatically cleaned up."""
         agents_file = project_dir / ".agentic" / "session" / "AGENTS.json"
         stale_entry = [{
-            "feature_id": "F-0001",
+            "feature_id": "F-001",
             "description": "stale work",
             "worktree": "", "branch": "",
             "agent": "dead-agent",
@@ -222,7 +222,7 @@ class TestClaimFeature:
         agents_file.write_text(json.dumps(stale_entry))
 
         result = claim_feature(project_dir, {
-            "feature_id": "F-0001", "agent": "new-agent",
+            "feature_id": "F-001", "agent": "new-agent",
         })
         assert result["claimed"] is True
 
@@ -235,7 +235,7 @@ class TestClaimFeature:
         """Entries without claim_pid are NOT cleaned by stale detection."""
         agents_file = project_dir / ".agentic" / "session" / "AGENTS.json"
         entry = [{
-            "feature_id": "F-0001",
+            "feature_id": "F-001",
             "description": "legacy entry",
             "worktree": "", "branch": "",
             "agent": "old-agent",
@@ -248,17 +248,17 @@ class TestClaimFeature:
         agents_file.write_text(json.dumps(entry))
 
         result = claim_feature(project_dir, {
-            "feature_id": "F-0001", "agent": "new-agent",
+            "feature_id": "F-001", "agent": "new-agent",
         })
         # Should be rejected — legacy entry is still "active" with no PID to check
         assert result["claimed"] is False
 
     def test_claim_after_release_succeeds(self, project_dir):
         """A released feature can be claimed again."""
-        claim_feature(project_dir, {"feature_id": "F-0001", "agent": "a"})
-        release_feature(project_dir, {"feature_id": "F-0001"})
+        claim_feature(project_dir, {"feature_id": "F-001", "agent": "a"})
+        release_feature(project_dir, {"feature_id": "F-001"})
         result = claim_feature(project_dir, {
-            "feature_id": "F-0001", "agent": "b",
+            "feature_id": "F-001", "agent": "b",
         })
         assert result["claimed"] is True
 
@@ -269,12 +269,12 @@ class TestClaimFeature:
 class TestReleaseFeature:
     def test_release_removes_entry(self, project_dir):
         """Release must remove the entry from AGENTS.json entirely."""
-        claim_feature(project_dir, {"feature_id": "F-0001", "agent": "a"})
-        result = release_feature(project_dir, {"feature_id": "F-0001"})
+        claim_feature(project_dir, {"feature_id": "F-001", "agent": "a"})
+        result = release_feature(project_dir, {"feature_id": "F-001"})
         assert result["released"] is True
 
         agents = _load_agents(project_dir)
-        assert not any(e["feature_id"] == "F-0001" for e in agents)
+        assert not any(e["feature_id"] == "F-001" for e in agents)
 
     def test_release_nonexistent_feature(self, project_dir):
         result = release_feature(project_dir, {"feature_id": "F-9999"})
@@ -288,19 +288,19 @@ class TestReleaseFeature:
     def test_release_by_different_pid_warns_but_succeeds(self, project_dir):
         """Manual cleanup: releasing from a different PID is allowed."""
         claim_feature(project_dir, {
-            "feature_id": "F-0001", "agent": "a", "pid": 11111,
+            "feature_id": "F-001", "agent": "a", "pid": 11111,
         })
         # Release with a different PID — should succeed with warning
         result = release_feature(project_dir, {
-            "feature_id": "F-0001", "pid": 22222,
+            "feature_id": "F-001", "pid": 22222,
         })
         assert result["released"] is True
 
     def test_double_release_fails(self, project_dir):
         """Releasing an already-released feature returns an error."""
-        claim_feature(project_dir, {"feature_id": "F-0001", "agent": "a"})
-        release_feature(project_dir, {"feature_id": "F-0001"})
-        result = release_feature(project_dir, {"feature_id": "F-0001"})
+        claim_feature(project_dir, {"feature_id": "F-001", "agent": "a"})
+        release_feature(project_dir, {"feature_id": "F-001"})
+        result = release_feature(project_dir, {"feature_id": "F-001"})
         assert result["released"] is False
 
 
@@ -313,7 +313,7 @@ class TestGetUnblocked:
         result = get_unblocked(project_dir, {})
         assert "features" in result
         assert isinstance(result["features"], list)
-        # F-0001 (planned) should have forward transitions
+        # F-001 (planned) should have forward transitions
         for f in result["features"]:
             assert "feature_id" in f
             assert "current_state" in f
@@ -324,7 +324,7 @@ class TestGetUnblocked:
         """Shipped features should not appear in unblocked list."""
         result = get_unblocked(project_dir, {})
         feature_ids = [f["feature_id"] for f in result["features"]]
-        assert "F-0003" not in feature_ids  # F-0003 is shipped
+        assert "F-002" not in feature_ids  # F-002 is shipped
 
 
 # ---------------------------------------------------------------------------
@@ -337,7 +337,7 @@ class TestTransitionState:
 
     def test_invalid_state_returns_valid_options(self, project_dir):
         result = transition_state(project_dir, {
-            "feature_id": "F-0001", "target": "bogus_state",
+            "feature_id": "F-001", "target": "bogus_state",
         })
         assert "invalid target state" in result["error"]
         assert "valid_states" in result
@@ -347,9 +347,9 @@ class TestTransitionState:
     def test_transition_planned_to_specced(self, project_dir):
         """Happy path: transition a planned feature forward."""
         result = transition_state(project_dir, {
-            "feature_id": "F-0001", "target": "specced",
+            "feature_id": "F-001", "target": "specced",
         })
-        assert result["feature_id"] == "F-0001"
+        assert result["feature_id"] == "F-001"
         assert result["target"] == "specced"
         # Either succeeds or returns specific transition error
         assert "success" in result
@@ -359,7 +359,7 @@ class TestTransitionState:
         features_file = project_dir / ".agentic" / "spec" / "FEATURES.md"
         original = features_file.read_text()
         transition_state(project_dir, {
-            "feature_id": "F-0001", "target": "specced", "dry_run": True,
+            "feature_id": "F-001", "target": "specced", "dry_run": True,
         })
         assert features_file.read_text() == original
 
@@ -377,7 +377,7 @@ class TestPollChanges:
         # Verify features structure
         assert "features" in result
         feature_ids = {f["feature_id"] for f in result["features"]}
-        assert "F-0001" in feature_ids
+        assert "F-001" in feature_ids
         assert "F-0002" in feature_ids
         for f in result["features"]:
             assert "status" in f
@@ -401,7 +401,7 @@ class TestPollChanges:
 
         # Modify AGENTS.json
         time.sleep(0.05)  # Ensure mtime changes
-        claim_feature(project_dir, {"feature_id": "F-0001", "agent": "a"})
+        claim_feature(project_dir, {"feature_id": "F-001", "agent": "a"})
 
         result = poll_changes(project_dir, {"since": since})
         assert result["changed"] is True
@@ -439,25 +439,25 @@ class TestPollChanges:
 class TestReportStatus:
     def test_report_persists_progress_note(self, project_dir):
         """Progress note must be written to AGENTS.json."""
-        claim_feature(project_dir, {"feature_id": "F-0001", "agent": "a"})
+        claim_feature(project_dir, {"feature_id": "F-001", "agent": "a"})
         result = report_status(project_dir, {
-            "feature_id": "F-0001",
+            "feature_id": "F-001",
             "note": "Implemented 3/5 ACs",
         })
         assert result["reported"] is True
 
         agents = _load_agents(project_dir)
-        entry = [e for e in agents if e["feature_id"] == "F-0001"][0]
+        entry = [e for e in agents if e["feature_id"] == "F-001"][0]
         assert "Implemented 3/5 ACs" in entry["progress"]
 
     def test_report_updates_checkpoint_timestamp(self, project_dir):
-        claim_feature(project_dir, {"feature_id": "F-0001", "agent": "a"})
+        claim_feature(project_dir, {"feature_id": "F-001", "agent": "a"})
         agents_before = _load_agents(project_dir)
         ts_before = agents_before[0]["last_checkpoint"]
 
         time.sleep(0.05)
         report_status(project_dir, {
-            "feature_id": "F-0001", "note": "progress",
+            "feature_id": "F-001", "note": "progress",
         })
 
         agents_after = _load_agents(project_dir)
@@ -472,7 +472,7 @@ class TestReportStatus:
         assert "not found" in result.get("error", "")
 
     def test_report_requires_both_params(self, project_dir):
-        r1 = report_status(project_dir, {"feature_id": "F-0001"})
+        r1 = report_status(project_dir, {"feature_id": "F-001"})
         assert "note" in r1["error"] or "required" in r1["error"]
         r2 = report_status(project_dir, {"note": "test"})
         assert "feature_id" in r2["error"] or "required" in r2["error"]
@@ -487,13 +487,13 @@ class TestRequestReview:
         assert "required" in result["error"]
 
     def test_requires_from_and_to_state(self, project_dir):
-        result = request_review(project_dir, {"feature_id": "F-0001"})
+        result = request_review(project_dir, {"feature_id": "F-001"})
         assert "required" in result["error"]
 
     def test_request_creates_pending_review(self, project_dir):
         """Happy path: creates a pending review and returns review ID."""
         result = request_review(project_dir, {
-            "feature_id": "F-0001",
+            "feature_id": "F-001",
             "from_state": "planned",
             "to_state": "specced",
             "review_mode": "human",
@@ -512,7 +512,7 @@ class TestSubmitReview:
 
     def test_invalid_verdict_rejected(self, project_dir):
         result = submit_review(project_dir, {
-            "feature_id": "F-0001",
+            "feature_id": "F-001",
             "target_state": "specced",
             "verdict": "maybe",
         })
@@ -521,14 +521,14 @@ class TestSubmitReview:
     def test_submit_with_valid_verdict(self, project_dir):
         """submit_review with valid params returns structured result."""
         result = submit_review(project_dir, {
-            "feature_id": "F-0001",
+            "feature_id": "F-001",
             "target_state": "specced",
             "verdict": "approved",
             "reasoning": "Looks good",
         })
         assert "success" in result
         assert result["verdict"] == "approved"
-        assert result["feature_id"] == "F-0001"
+        assert result["feature_id"] == "F-001"
 
 
 # ---------------------------------------------------------------------------
@@ -539,10 +539,10 @@ class TestParseFeatureStatuses:
         features_file = project_dir / ".agentic" / "spec" / "FEATURES.md"
         statuses = _parse_feature_statuses(features_file)
         ids = {f["feature_id"] for f in statuses}
-        assert ids == {"F-0001", "F-0002", "F-0003"}
-        planned = [f for f in statuses if f["feature_id"] == "F-0001"][0]
+        assert ids == {"F-001", "F-0002", "F-002"}
+        planned = [f for f in statuses if f["feature_id"] == "F-001"][0]
         assert planned["status"] == "planned"
-        shipped = [f for f in statuses if f["feature_id"] == "F-0003"][0]
+        shipped = [f for f in statuses if f["feature_id"] == "F-002"][0]
         assert shipped["status"] == "shipped"
 
     def test_handles_empty_features_file(self, tmp_path):
@@ -596,7 +596,7 @@ class TestConcurrency:
         def _claim(agent_name):
             barrier.wait()  # Synchronize start
             r = claim_feature(project_dir, {
-                "feature_id": "F-0001",
+                "feature_id": "F-001",
                 "agent": agent_name,
             })
             results.append(r)
@@ -625,19 +625,19 @@ class TestConcurrency:
             })
             results[feature_id] = r
 
-        t1 = threading.Thread(target=_claim, args=("F-0001", "agent-1"))
+        t1 = threading.Thread(target=_claim, args=("F-001", "agent-1"))
         t2 = threading.Thread(target=_claim, args=("F-0002", "agent-2"))
         t1.start()
         t2.start()
         t1.join(timeout=5)
         t2.join(timeout=5)
 
-        assert results["F-0001"]["claimed"] is True
+        assert results["F-001"]["claimed"] is True
         assert results["F-0002"]["claimed"] is True
 
     def test_concurrent_report_status(self, project_dir):
         """Multiple agents reporting status concurrently don't corrupt the file."""
-        claim_feature(project_dir, {"feature_id": "F-0001", "agent": "a"})
+        claim_feature(project_dir, {"feature_id": "F-001", "agent": "a"})
         claim_feature(project_dir, {"feature_id": "F-0002", "agent": "b"})
 
         barrier = threading.Barrier(2)
@@ -646,7 +646,7 @@ class TestConcurrency:
             barrier.wait()
             report_status(project_dir, {"feature_id": fid, "note": note})
 
-        t1 = threading.Thread(target=_report, args=("F-0001", "progress-1"))
+        t1 = threading.Thread(target=_report, args=("F-001", "progress-1"))
         t2 = threading.Thread(target=_report, args=("F-0002", "progress-2"))
         t1.start()
         t2.start()
@@ -655,7 +655,7 @@ class TestConcurrency:
 
         # Verify both notes were persisted and file is valid JSON
         agents = _load_agents(project_dir)
-        e1 = [e for e in agents if e["feature_id"] == "F-0001"][0]
+        e1 = [e for e in agents if e["feature_id"] == "F-001"][0]
         e2 = [e for e in agents if e["feature_id"] == "F-0002"][0]
         assert "progress-1" in e1["progress"]
         assert "progress-2" in e2["progress"]
@@ -670,7 +670,7 @@ class TestConcurrency:
         def _claim(agent_name):
             barrier.wait()
             r = claim_feature(project_dir, {
-                "feature_id": "F-0001", "agent": agent_name,
+                "feature_id": "F-001", "agent": agent_name,
             })
             with lock:
                 results.append(r)
@@ -842,23 +842,23 @@ class TestHTTPTransport:
         """Complete workflow: claim → report status → release."""
         # Claim
         r1 = self._rpc("claim_feature", {
-            "feature_id": "F-0001", "agent": "rpc-agent",
+            "feature_id": "F-001", "agent": "rpc-agent",
         })
         assert r1["result"]["claimed"] is True
 
         # Report progress
         r2 = self._rpc("report_status", {
-            "feature_id": "F-0001", "note": "50% done via RPC",
+            "feature_id": "F-001", "note": "50% done via RPC",
         })
         assert r2["result"]["reported"] is True
 
         # Verify progress persisted
         agents = _load_agents(self.project_dir)
-        entry = [e for e in agents if e["feature_id"] == "F-0001"][0]
+        entry = [e for e in agents if e["feature_id"] == "F-001"][0]
         assert "50% done via RPC" in entry["progress"]
 
         # Release
-        r3 = self._rpc("release_feature", {"feature_id": "F-0001"})
+        r3 = self._rpc("release_feature", {"feature_id": "F-001"})
         assert r3["result"]["released"] is True
 
     def test_rpc_get_unblocked_structure(self):
@@ -887,7 +887,7 @@ class TestHTTPTransport:
         def _claim_via_rpc(agent_name):
             barrier.wait()
             r = self._rpc("claim_feature", {
-                "feature_id": "F-0001", "agent": agent_name,
+                "feature_id": "F-001", "agent": agent_name,
             })
             results.append(r["result"])
 

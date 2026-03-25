@@ -576,7 +576,7 @@ Users already past X.Y.Z will NOT see it (prevents repeated prompts).
 
 ### ❌ Don't Create New Features for Improvements to Existing Ones
 
-**Why wrong**: Feature IDs (F-XXXX) represent user-facing capabilities. When enforcement, propagation, wiring, or hardening is missing from an existing feature, creating a new F-XXXX fragments ownership, inflates the backlog, and obscures what "done" means for the original feature. Example: "plan changes don't propagate to ACs" is not a new capability — it's incomplete spec system (F-0302).
+**Why wrong**: Feature IDs (F-XXXX) represent user-facing capabilities. When enforcement, propagation, wiring, or hardening is missing from an existing feature, creating a new F-XXXX fragments ownership, inflates the backlog, and obscures what "done" means for the original feature. Example: "plan changes don't propagate to ACs" is not a new capability — it's incomplete spec system (F-031).
 
 **Correct**: Ask "which existing feature owns this?" Add it as a deliverable (D-level) on that feature. Only create a new F-XXXX when the gap is a genuinely new capability that no existing feature covers.
 

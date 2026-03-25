@@ -69,7 +69,7 @@ STATUS_ALIASES: dict[str, FeatureState] = {
     "in-progress": FeatureState.IMPLEMENTING,
 }
 
-# Contract lifecycle -> FeatureState mapping (F-0302: YAML contracts)
+# Contract lifecycle -> FeatureState mapping (F-031: YAML contracts)
 LIFECYCLE_TO_STATE: dict[str, FeatureState] = {
     "exploring": FeatureState.PLANNED,
     "specifying": FeatureState.CRITERIA_SET,
@@ -468,7 +468,7 @@ class FeatureStateMachine:
             f"{current.value if current else '?'} -> {target.value}",
         )
 
-        # Post-transition hook: recompute parent epic status (F-0184)
+        # Post-transition hook: recompute parent epic status (F-005)
         self._recompute_parent_if_needed(feature_id, messages)
 
         return True, messages

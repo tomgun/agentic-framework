@@ -54,7 +54,7 @@ cmd_create() {
 
     if [[ -z "$feature_id" ]]; then
         echo -e "${RED}Usage: worktree.sh create <feature-id> \"<description>\"${NC}"
-        echo "Example: worktree.sh create F-0001 \"User authentication\""
+        echo "Example: worktree.sh create F-001 \"User authentication\""
         exit 1
     fi
 
@@ -134,7 +134,7 @@ cmd_remove() {
 
     if [[ -z "$feature_id" ]]; then
         echo -e "${RED}Usage: worktree.sh remove <feature-id>${NC}"
-        echo "Example: worktree.sh remove F-0001"
+        echo "Example: worktree.sh remove F-001"
         exit 1
     fi
 
@@ -275,23 +275,23 @@ COMMANDS:
     help                   Show this help
 
 EXAMPLES:
-    # Create worktree for feature F-0001
-    worktree.sh create F-0001 "User authentication"
+    # Create worktree for feature F-001
+    worktree.sh create F-001 "User authentication"
 
-    # Creates: ../project-f-0001/ on branch feature/F-0001
+    # Creates: ../project-f-0001/ on branch feature/F-001
     # Registers in AGENTS.json
 
     # List all worktrees
     worktree.sh list
 
     # Get path for a feature
-    worktree.sh path F-0001
+    worktree.sh path F-001
 
     # Remove when done (will prompt about uncommitted changes)
-    worktree.sh remove F-0001
+    worktree.sh remove F-001
 
     # Auto-remove (non-interactive, used by ag done)
-    worktree.sh auto-remove F-0001
+    worktree.sh auto-remove F-001
 
 EOF
 }

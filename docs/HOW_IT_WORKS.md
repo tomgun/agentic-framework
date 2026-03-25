@@ -35,32 +35,32 @@ graph TB
 
     subgraph FEATURES["FEATURES (What)"]
         %% Developer Experience
-        F_SESSION[Session Continuity<br/>F-0021..F-0027]
+        F_SESSION[Session Continuity<br/>F-015..F-0027]
         F_MANUAL_OPS[Manual Operations<br/>F-0067]
         F_DISCOVERY[Intelligent Onboarding<br/>F-0123, F-0124]
         F_TIP[Tip of the Day<br/>F-0127]
         F_REMIND[Discoverability Reminders<br/>F-0126]
 
         %% Sustainable Quality
-        F_WIP[WIP Recovery<br/>F-0051..F-0053]
+        F_WIP[WIP Recovery<br/>F-016..F-0053]
         F_MULTI_ENV[Multi-Environment<br/>F-0054]
         F_QUALITY[Quality Standards<br/>F-0015, 7 documents]
-        F_SPECS[Spec-Driven Dev<br/>F-0003..F-0006]
-        F_PLAN_REVIEW[Plan-Review Loop<br/>F-0120]
+        F_SPECS[Spec-Driven Dev<br/>F-002..F-0006]
+        F_PLAN_REVIEW[Plan-Review Loop<br/>F-004]
 
         %% Human-Agent Partnership
         F_HUMAN_NEEDED[Human Escalation<br/>F-0026]
-        F_PR_WORKFLOW[PR Workflow<br/>F-0096]
+        F_PR_WORKFLOW[PR Workflow<br/>F-024]
 
         %% Token & Context Optimization
-        F_TOKEN_SCRIPTS[Token-Efficient Scripts<br/>F-0041]
+        F_TOKEN_SCRIPTS[Token-Efficient Scripts<br/>F-019]
         F_AGENT_ROLES[Agent Roles + Manifests<br/>F-0035, F-0036]
-        F_ORCHESTRATOR[Orchestrator Agent<br/>F-0081]
+        F_ORCHESTRATOR[Orchestrator Agent<br/>F-025]
         F_AGENT_MODE[Agent Mode Selection<br/>F-0103]
         F_CONTEXT_MANIFESTS[Context Manifests<br/>24 YAML files]
 
         %% Deterministic Enforcement
-        F_PRE_COMMIT[Pre-Commit Gates<br/>F-0016, F-0116]
+        F_PRE_COMMIT[Pre-Commit Gates<br/>F-009, F-0116]
         F_GIT_HOOKS[Git Hook Enforcement<br/>F-0129]
         F_DOCTOR[Gate-Based Verification<br/>F-0091]
         F_PHASE[Phase Detection<br/>F-0092]
@@ -71,27 +71,27 @@ graph TB
         F_STATUS[STATUS.md<br/>F-0024]
         F_JOURNAL[JOURNAL.md<br/>F-0023]
         F_CONTEXT_PACK[CONTEXT_PACK.md<br/>F-0025]
-        F_FEATURES_MD[FEATURES.md<br/>F-0003, F-0004]
+        F_FEATURES_MD[FEATURES.md<br/>F-002, F-003]
 
         %% Small Batch
-        F_SMALL_BATCH[Small Batch Dev<br/>F-0007]
+        F_SMALL_BATCH[Small Batch Dev<br/>F-007]
 
         %% Multi-Agent
-        F_MULTI_AGENT[Multi-Agent Coordination<br/>F-0031..F-0033]
+        F_MULTI_AGENT[Multi-Agent Coordination<br/>F-017..F-0033]
         F_WORKTREE[Git Worktrees<br/>F-0032, F-0097]
         F_SEQ_PIPELINE[Sequential Pipeline<br/>F-0034]
 
         %% Onboarding
-        F_INIT[Project Init<br/>F-0001]
+        F_INIT[Project Init<br/>F-001]
         F_BROWNFIELD[Brownfield Specs<br/>ag specs]
 
         %% Testing
-        F_LLM_TESTS[LLM Behavioral Tests<br/>DEV-0122]
+        F_LLM_TESTS[LLM Behavioral Tests<br/>DEV-002]
         F_MUTATION[Mutation Tests<br/>infrastructure validation]
         F_FRAMEWORK_TESTS[Framework Validation<br/>validate_framework.sh]
 
         %% Autonomous Workflow (v0.43.0)
-        F_AUTO_ENGINE[Autonomous Engine<br/>F-0160]
+        F_AUTO_ENGINE[Autonomous Engine<br/>F-030]
         F_AUTO_VERIFY[Auto Verify Mode<br/>F-0161]
         F_AUTO_TASK[Auto Task Mode<br/>F-0162]
         F_AUTO_CRUNCH[Auto Crunch Mode<br/>F-0163]
@@ -100,7 +100,7 @@ graph TB
         F_STATE_MACHINE[Feature State Machine<br/>F-0177, F-0178]
 
         %% Backlog/Roadmap (v0.49.0)
-        F_BACKLOG[Backlog Work Queue<br/>F-0190]
+        F_BACKLOG[Backlog Work Queue<br/>F-006]
 
         %% Intent Journal (v0.53.0)
         F_INTENT[Intent Journal + Reconciliation<br/>F-0200]
@@ -115,7 +115,7 @@ graph TB
         F_SPEC_FORMAT[Spec Format Evolution<br/>F-0148]
         F_CLARIFICATION[Clarification Taxonomy<br/>F-0149]
         F_CHECKPOINTS[Checkpoints & Execution Order<br/>F-0150]
-        F_EXTENSIONS[User Extensions<br/>F-0151]
+        F_EXTENSIONS[User Extensions<br/>F-028]
         F_SPEC_ANALYZE[Semantic Spec Analysis<br/>F-0152]
         F_AC_COVERAGE[AC-Level Coverage<br/>F-0153]
     end
@@ -482,7 +482,7 @@ flowchart TB
 
 ## Coordination Server (v0.53.0)
 
-The coordination server (F-0185) provides a network-accessible JSON-RPC API for parallel agent coordination, remote review approval, and mobile status monitoring.
+The coordination server (F-018) provides a network-accessible JSON-RPC API for parallel agent coordination, remote review approval, and mobile status monitoring.
 
 ### Architecture
 
@@ -614,7 +614,7 @@ Each forward transition has a **gate function** checking filesystem precondition
 CLI: `ag transition F-XXXX <state>`, `ag transition F-XXXX --status`, `ag transition --unblocked`
 Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag review F-XXXX <state> --reject`
 
-**Epic decomposition** (F-0184): Large features (epics) can be broken into child features scoped to components:
+**Epic decomposition** (F-005): Large features (epics) can be broken into child features scoped to components:
 - `ag decompose F-XXXX` analyzes the epic's acceptance criteria, maps them to registered components, and proposes child features
 - Routes through the `review_decomposition` checkpoint (configurable: human/critical_agent/skip)
 - Created children get `Parent: F-XXXX` in FEATURES.md, queryable via `query_features.py --children F-XXXX`
@@ -745,7 +745,7 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
-| **Session Start Protocol** (F-0021) | `ag start` silently reads STATUS.md, JOURNAL.md, HUMAN_NEEDED.md, checks WIP.md. Dashboard is the first text output — no preamble narration. | ACTIVE - proven by LLM test 001 |
+| **Session Start Protocol** (F-015) | `ag start` silently reads STATUS.md, JOURNAL.md, HUMAN_NEEDED.md, checks WIP.md. Dashboard is the first text output — no preamble narration. | ACTIVE - proven by LLM test 001 |
 | **STATUS.md Current State** (F-0024) | `status.sh focus "Task"` updates STATUS without full-file rewrite. Zero-token human readability. | ACTIVE - staleness gate enforced |
 | **Manual Operations** (F-0067) | `MANUAL_OPERATIONS.md` documents all queries humans can run without agent (zero tokens). `cat STATUS.md`, `grep` patterns for feature status. | ACTIVE - documentation |
 | **HUMAN_NEEDED.md Escalation** (F-0026) | `blocker.sh add "Title" "type" "Details"` creates entries. Agents read at session start. Humans can `cat HUMAN_NEEDED.md` for zero-token check. | ACTIVE |
@@ -763,15 +763,15 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
-| **Session Start Protocol** (F-0021) | `ag start` silently reads STATUS.md, JOURNAL.md, HUMAN_NEEDED.md, checks WIP.md. Dashboard is the first text output — no preamble narration. | ACTIVE - proven by LLM test 001 |
+| **Session Start Protocol** (F-015) | `ag start` silently reads STATUS.md, JOURNAL.md, HUMAN_NEEDED.md, checks WIP.md. Dashboard is the first text output — no preamble narration. | ACTIVE - proven by LLM test 001 |
 | **Session End Protocol** (F-0022) | `session_end.md` checklist: update JOURNAL, document blockers, clean up WIP. | ACTIVE - behavioral |
 | **JOURNAL.md Tracking** (F-0023) | `journal.sh` appends entries without reading the file (token-efficient). Append-only log of session progress. | ACTIVE - structurally enforced (staleness gate in pre-commit) |
 | **STATUS.md Current State** (F-0024) | `status.sh focus "Task"` updates STATUS without full-file rewrite. Zero-token human readability. | ACTIVE - staleness gate enforced |
-| **WIP Recovery** (F-0051-0053) | `wip.sh start/checkpoint/complete` creates `.agentic/session/WIP.md` lock. Pre-commit blocks if WIP exists. Session start warns of interrupted work. 5-step recovery protocol. | ACTIVE - structural gate |
+| **WIP Recovery** (F-016-0053) | `wip.sh start/checkpoint/complete` creates `.agentic/session/WIP.md` lock. Pre-commit blocks if WIP exists. Session start warns of interrupted work. 5-step recovery protocol. | ACTIVE - structural gate |
 | **Multi-Environment Support** (F-0054) | Documented workflow for switching between Claude/Cursor/Copilot when tokens run out. Durable artifacts ensure state survives tool switches. | PASSIVE - documented workflow, no enforcement |
-| **Upgrade System** (F-0056, F-0094) | `upgrade.sh` with FEATURE_REGISTRY. Version-aware: only shows features new since user's previous version. `.upgrade_pending` marker. | ACTIVE - structural |
+| **Upgrade System** (F-020, F-0094) | `upgrade.sh` with FEATURE_REGISTRY. Version-aware: only shows features new since user's previous version. `.upgrade_pending` marker. | ACTIVE - structural |
 | **Quality Standards** (F-0015) | 7 quality documents in `.agentic/quality/`. Programming standards, test strategy, review checklist, library selection, green coding, integration testing, design for testability. | ACTIVE - wired via context manifests |
-| **Spec-Driven Development** (F-0003-0006) | Features defined via YAML contracts (`spec/contracts/F-####.yaml`) with machine-verifiable assertions. Each assertion has a `verify` command and linked tests. Shipped contracts are protected — changes require migration entries. `user_input` field enables spec-as-control-interface (user writes change request, agent processes it). `ag contract check` runs all structural assertions. `ag migrate-specs` converts legacy markdown ACs to YAML contracts. | ACTIVE - structural gate (Formal) |
+| **Spec-Driven Development** (F-002-0006) | Features defined via YAML contracts (`spec/contracts/F-####.yaml`) with machine-verifiable assertions. Each assertion has a `verify` command and linked tests. Shipped contracts are protected — changes require migration entries. `user_input` field enables spec-as-control-interface (user writes change request, agent processes it). `ag contract check` runs all structural assertions. `ag migrate-specs` converts legacy markdown ACs to YAML contracts. | ACTIVE - structural gate (Formal) |
 
 **Hidden mechanism**: The staleness check in `pre-commit-check.sh` (Check 3) compares JOURNAL.md modification time against last git commit. This forces agents to update project state before every commit, ensuring long-term projects never go stale.
 
@@ -785,11 +785,11 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
-| **Token-Efficient Scripts** (F-0041) | `status.sh`, `journal.sh`, `feature.sh`, `blocker.sh` — surgical updates without reading entire files. ~40x more efficient than read-modify-write. | ACTIVE - core mechanism |
+| **Token-Efficient Scripts** (F-019) | `status.sh`, `journal.sh`, `feature.sh`, `blocker.sh` — surgical updates without reading entire files. ~40x more efficient than read-modify-write. | ACTIVE - core mechanism |
 | **State File Flush** (F-0196) | `ag flush` commits state-only files (STATUS.md, BACKLOG.json, JOURNAL.md, etc.) directly to main without a PR. Hardcoded allowlist + prefix patterns (manifests/) enforce security boundary — code files cannot bypass PR review. Uses `--no-verify` with self-contained validation stricter than the pre-commit hook. `--features` flag allows FEATURES.md status-line-only changes. | ACTIVE |
 | **Subagent Context Assembly** (F-0036) | `context-for-role.sh` + 27 YAML manifests. Each agent gets 2-6K tokens of role-specific context instead of loading everything. `ALWAYS_INJECT` array ensures core-rules.md (~300 tokens) always present. Supports section extraction (e.g., `STACK.md[## Build]`). | AVAILABLE but UNDERUTILIZED in practice |
 | **Sequential Agent Pipeline** (F-0034) | 8 specialist agents work in sequence: Research → Plan → Test → Implement → Review → Spec Update → Documentation → Git. Each loads only role-relevant context (<50K vs 150-200K for general agent). | DOCUMENTED but RARELY USED in practice |
-| **Orchestrator Agent** (F-0081) | Coordinates pipeline, delegates to specialists. Never implements itself. Ensures framework compliance across handoffs. | DOCUMENTED but RARELY INVOKED manually |
+| **Orchestrator Agent** (F-025) | Coordinates pipeline, delegates to specialists. Never implements itself. Ensures framework compliance across handoffs. | DOCUMENTED but RARELY INVOKED manually |
 | **Agent Mode Selection** (F-0103) | `agent_mode: premium|balanced|economy` in STACK.md. Controls model selection per task type. Planning always gets best model (bad specs waste more tokens than saved). | IN PROGRESS - config exists, enforcement partial |
 | **Modular Guidelines** (F-0102) | Guidelines split into lazy-loaded modules (anti-hallucination.md, token-efficiency.md, etc.). Agents load only relevant modules per task. ~84% token reduction vs monolithic file. | AVAILABLE but loading is agent-discretionary |
 | **Instruction File Size Limits** | L-0002 empirical finding: compliance degrades past ~100 lines. All templates slimmed to 38-53 lines. Pre-commit Check 10 warns if instruction files exceed limits. | ACTIVE - structural + empirically validated |
@@ -811,8 +811,8 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 |---------|-------------|--------|
 | **HUMAN_NEEDED.md Escalation** (F-0026) | `blocker.sh add "Title" "type" "Details"` creates entries. Agents read at session start. Humans can `cat HUMAN_NEEDED.md` for zero-token check. | ACTIVE |
 | **Manual Operations** (F-0067) | `MANUAL_OPERATIONS.md` documents all queries humans can run without agent (zero tokens). `cat STATUS.md`, `grep` patterns for feature status. | ACTIVE - documentation |
-| **PR Workflow** (F-0096) | Default for Formal. `pre-commit-check.sh` Check 11 blocks commits to main when `git_workflow: pull_request`. Forces feature branches + human review via PRs. | ACTIVE - structural gate |
-| **Plan-Review Loop** (F-0120, F-0191, F-0236) | Planner creates plan → configurable reviewers (Critic + Advocate + optional experts) review in parallel (fresh context) → synthesis with Revision Guidance → convergence check. In `auto` mode (F-0236): loop auto-revises until converged or max iterations (enforced), then auto-approves (autonomous) or presents to user (interactive). Expert roles from `reviewer_roles.json` catalog. | ACTIVE |
+| **PR Workflow** (F-024) | Default for Formal. `pre-commit-check.sh` Check 11 blocks commits to main when `git_workflow: pull_request`. Forces feature branches + human review via PRs. | ACTIVE - structural gate |
+| **Plan-Review Loop** (F-004, F-0191, F-0236) | Planner creates plan → configurable reviewers (Critic + Advocate + optional experts) review in parallel (fresh context) → synthesis with Revision Guidance → convergence check. In `auto` mode (F-0236): loop auto-revises until converged or max iterations (enforced), then auto-approves (autonomous) or presents to user (interactive). Expert roles from `reviewer_roles.json` catalog. | ACTIVE |
 | **No Auto-Commits** (R2, amended by F-0203) | Interactive sessions: always human review before commit. Autonomous workflows (`ag auto task/epic`): `review_commit: critical_agent` enables adversarial diff review and auto-commit. LLM test 005 validates interactive compliance. Profile defaults: discovery/formal=human, autonomous_formal=critical_agent. | ACTIVE - behavioral + structural |
 | **Scope Drift Warning** (F-0114) | `scope_check.sh` compares changed files against WIP declared scope. Pre-commit warns on drift. Human judges whether drift is acceptable. | ACTIVE - advisory warning |
 | **CONTRIBUTIONS.md** | Logs human design insights and direction. Agent tracks human ideas vs agent implementation work. | ACTIVE - behavioral |
@@ -827,7 +827,7 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
-| **Pre-Commit Gates** (F-0016, F-0116, T-0051, F-0207) | `pre-commit-check.sh` — 19 structural checks + advisories. Exit code 1 blocks commit. Checks: WIP lock, acceptance criteria, JOURNAL staleness, FEATURES.md staleness, batch size, test execution, complexity limits, untracked files, instruction file size, branch policy, shipped spec protection (migration required), test file deletion protection, status downgrade protection, custom extension gates. Advisories: QA propagation, AC check-off (T-0051 — warns when in_progress features have unchecked ACs), doc registry health (check 19 — `docs.sh --validate` detects registered-but-missing files and unregistered docs when `docs_gate != off`). | ACTIVE - proven by mutation tests |
+| **Pre-Commit Gates** (F-009, F-0116, T-0051, F-0207) | `pre-commit-check.sh` — 19 structural checks + advisories. Exit code 1 blocks commit. Checks: WIP lock, acceptance criteria, JOURNAL staleness, FEATURES.md staleness, batch size, test execution, complexity limits, untracked files, instruction file size, branch policy, shipped spec protection (migration required), test file deletion protection, status downgrade protection, custom extension gates. Advisories: QA propagation, AC check-off (T-0051 — warns when in_progress features have unchecked ACs), doc registry health (check 19 — `docs.sh --validate` detects registered-but-missing files and unregistered docs when `docs_gate != off`). | ACTIVE - proven by mutation tests |
 | **Taste Review Checkpoint** (F-0183) | `review_taste` piggybacks on code review transitions. When `critical_agent`: spawns adversarial reviewer with `taste_review.md` prompt + style context from STACK.md `## Style & taste` section. When `human`: creates pending review. Taste verdicts use `taste_` filename prefix to coexist with code review verdicts. Omitting style settings silently skips (AC-004). | ACTIVE |
 | **Auto-Commit Review** (F-0203) | `review_commit: human \| critical_agent` controls whether `task.py._commit_ac()` can auto-commit. In interactive sessions: always `human` (stage only, never commit). In autonomous workflows (`ag auto task/epic`): `critical_agent` spawns adversarial reviewer via dedicated `CriticalAgent.review_commit()` (lightweight: staged diff + single AC only, not full feature context). On rejection or error: unstages changes. Profile defaults: discovery=human, formal=human, autonomous_formal=critical_agent. R2 principle amended to be conditional (F-0203). | ACTIVE |
 | **Git Hook Enforcement** (F-0129) | `git config core.hooksPath .agentic/hooks` wired in scaffold.sh + upgrade.sh. Git calls pre-commit dispatcher which routes to pre-commit-check.sh. CI detection skips hooks in automated builds. `pre_commit_hook: fast|full|no` in STACK.md. | ACTIVE - mutation-test proven |
@@ -860,7 +860,7 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 | **CONTEXT_PACK.md** (F-0025) | Architecture snapshot: modules, entry points, key files, data flow. Read FIRST at session start. Template with code style examples section. | ACTIVE - manually maintained |
 | **STATUS.md** (F-0024) | Current focus, progress, next steps, blockers. Updated via `status.sh` (token-efficient). Staleness enforced by pre-commit. | ACTIVE - structurally enforced |
 | **JOURNAL.md** (F-0023) | Append-only session log via `journal.sh`. Staleness enforced. `--why` flag documents reasoning. | ACTIVE - structurally enforced |
-| **FEATURES.md** (F-0003, F-0004) | Feature tracking with lifecycle (planned → in_progress → shipped). Machine-readable YAML frontmatter. Updated via `feature.sh`. Staleness enforced when spec files change. | ACTIVE - Formal only |
+| **FEATURES.md** (F-002, F-003) | Feature tracking with lifecycle (planned → in_progress → shipped). Machine-readable YAML frontmatter. Updated via `feature.sh`. Staleness enforced when spec files change. | ACTIVE - Formal only |
 | **HUMAN_NEEDED.md** (F-0026) | Blockers requiring human action. Updated via `blocker.sh`. | ACTIVE |
 | **Acceptance Criteria** (F-0005) | `spec/acceptance/F-####.md` per feature. Pre-commit blocks if shipped feature has no acceptance file. | ACTIVE - structural gate |
 | **STACK.md** | Machine-readable project config. Parsed by ag.sh (grep/sed), doctor.py (YAML). Profile (discovery/formal/autonomous_formal), git workflow, agent mode, plan-review settings, complexity limits. | ACTIVE - core config |
@@ -875,9 +875,9 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 
 | Feature | How It Works | Status |
 |---------|-------------|--------|
-| **Small Batch Enforcement** (F-0007) | Pre-commit Check 7: blocks >10 files staged, >500 lines added, >500-line code files. Configurable in STACK.md. | ACTIVE - structural gate |
+| **Small Batch Enforcement** (F-007) | Pre-commit Check 7: blocks >10 files staged, >500 lines added, >500-line code files. Configurable in STACK.md. | ACTIVE - structural gate |
 | **Acceptance-Driven Flow** (F-0006) | Define criteria → implement → test → update specs → commit. `ag implement` requires `spec/acceptance/F-####.md` to exist. AC clarity gate (`spec-analyze.sh --gate`) blocks vague ACs in formal mode. | ACTIVE - structural gate (Formal) |
-| **Plan-Review Loop** (F-0120) | Planner + Reviewer agents iterate on plans before implementation. Max 3 iterations before human escalation. Configurable: `plan_review_enabled`, `plan_review_max_iterations` in STACK.md. | ACTIVE but invocation is inconsistent |
+| **Plan-Review Loop** (F-004) | Planner + Reviewer agents iterate on plans before implementation. Max 3 iterations before human escalation. Configurable: `plan_review_enabled`, `plan_review_max_iterations` in STACK.md. | ACTIVE but invocation is inconsistent |
 | **Feature Completion Validator** (F-0017) | `feature-complete.sh` validates all criteria met before marking shipped. `ag done` triggers this. AC completeness enforcement (F-0197) blocks when <80% ACs checked in formal mode (advisory in discovery) — configurable via `acceptance_criteria: blocking|advisory` in STACK.md. | ACTIVE |
 | **Spec Evolution** (F-0010) | Specs evolve during implementation. Discoveries get documented. Not rigid waterfall. | ACTIVE - workflow |
 
@@ -889,11 +889,11 @@ Some features serve multiple principles. Key cross-cutting features:
 
 | Feature | Principles Served |
 |---------|-------------------|
-| **Session Start Protocol** (F-0021) | F1 (Developer UX), F2 (Sustainability) |
+| **Session Start Protocol** (F-015) | F1 (Developer UX), F2 (Sustainability) |
 | **STATUS.md** (F-0024) | F1 (Developer UX), F2 (Sustainability), D3 (Durable Artifacts) |
 | **HUMAN_NEEDED.md** (F-0026) | F1 (Developer UX), D1 (Partnership) |
 | **Quality Standards** (F-0015) | F2 (Quality), D2 (Enforcement), D4 (Acceptance-Driven) |
-| **Token-Efficient Scripts** (F-0041) | F3 (Token & Context Optimization), D6 (Green Coding) |
+| **Token-Efficient Scripts** (F-019) | F3 (Token & Context Optimization), D6 (Green Coding) |
 
 ---
 
@@ -904,11 +904,11 @@ These features exist but don't clearly derive from the 13 principles:
 | Feature | What It Does | Possible Principle |
 |---------|-------------|-------------------|
 | **Framework Age Check** (F-0044) | Warns if framework >1 month old | F2 (Sustainability) + F1 (Developer UX) |
-| **Emergency Quick Reference** (F-0077) | EMERGENCY.md for when tokens run out | F3 (Token & Context Optimization) + D1 (Partnership) |
-| **Issue/Bug Tracking** (F-0079) | Formal I-#### tracking parallel to F-#### | D4 (Small Batch) |
-| **ADRs** (F-0101) | Architecture Decision Records | D5 (Living Docs) |
+| **Emergency Quick Reference** (F-027) | EMERGENCY.md for when tokens run out | F3 (Token & Context Optimization) + D1 (Partnership) |
+| **Issue/Bug Tracking** (F-010) | Formal I-#### tracking parallel to F-#### | D4 (Small Batch) |
+| **ADRs** (F-011) | Architecture Decision Records | D5 (Living Docs) |
 | **Spec Migration System** (F-0117) | Track how specs evolved over time | D5 (Living Docs) |
-| **Documentation Drift Detection** (F-0118) | Detect stale docs | D5 (Living Docs) |
+| **Documentation Drift Detection** (F-012) | Detect stale docs | D5 (Living Docs) |
 | **Doc Lifecycle** (F-0207) | Full artifact lifecycle: doc registry in STACK.md `## Docs` as source of truth, `docs.sh --validate` for registry health, `docs.sh --coverage` for gap detection, trigger-based update prompts at feature_done/PR/session. Pre-commit check 19 enforces registry health when `docs_gate != off`. | D5 (Living Docs) + D2 (Enforcement) |
 | **Deferred Docs Mode** (F-0208) | `docs_mode: inline | deferred` in STACK.md. Inline (default) updates docs with code in the same commit. Deferred skips doc updates during fast iteration, queuing them to `.agentic/deferred-docs.json`; `ag docs generate` synthesizes content from specs and code later. `docs_gate: blocking` + deferred means docs must be generated before `ag done` but not during each commit. | D5 (Living Docs) + F3 (Token Optimization) |
 | **Feature Change Manifests** (F-0119) | Git history per feature. Generated at `ag done`, regenerable without noise (commits deduped by message+date survive rebases). Idempotent — unchanged content skips write. Flushed via `ag flush`. | D3 (Durable Artifacts) |
@@ -924,11 +924,11 @@ These features exist but don't clearly derive from the 13 principles:
 | Feature | Status | Why Dormant | Revival Potential |
 |---------|--------|-------------|-------------------|
 | **Sequential Agent Pipeline** (F-0034) | Documented, rarely used | Most development happens with single agent + Task tool subagents. The full 8-agent pipeline is overkill for typical tasks. No tooling to auto-trigger the sequence. | HIGH — Claude Code's Task tool could orchestrate this. The 27 context manifests and 15 active role definitions are ready. Missing: an `ag pipeline F-XXXX` command that spawns agents sequentially. |
-| **Orchestrator Agent** (F-0081) | Documented, rarely invoked | Users don't manually invoke orchestrator. The `ag` gateway handles most coordination. Cursor's agent mode could use orchestrator-agent.md but it's not wired. | MEDIUM — Would shine in Cursor agent mode. Need clearer "when to invoke" signals. |
+| **Orchestrator Agent** (F-025) | Documented, rarely invoked | Users don't manually invoke orchestrator. The `ag` gateway handles most coordination. Cursor's agent mode could use orchestrator-agent.md but it's not wired. | MEDIUM — Would shine in Cursor agent mode. Need clearer "when to invoke" signals. |
 | **Context Manifests** (27 YAML files) | Available, rarely loaded explicitly | Agents don't invoke `context-for-role.sh` unless explicitly instructed. The mechanism works but there's no auto-trigger from `ag implement` → context-for-role.sh. Parity with roles/ and subagents/ now enforced by `validate_framework.sh` (F-0234). | HIGH — Could wire into `ag implement` and `ag plan` to auto-assemble context for subagents. |
-| **Multi-Agent / Git Worktrees** (F-0031-0033, F-0097, F-0194) | Active infrastructure | `worktree.sh` wired into `ag implement` (when `worktree_mode: always`). Single AGENTS.json registry replaces WIP.md + AGENTS_ACTIVE.md. `ag worktree` command for manual management. Auto-cleanup via `ag done`. | HIGH — Infrastructure complete (F-0194). Ready for real multi-agent scenarios. |
+| **Multi-Agent / Git Worktrees** (F-017-0033, F-0097, F-0194) | Active infrastructure | `worktree.sh` wired into `ag implement` (when `worktree_mode: always`). Single AGENTS.json registry replaces WIP.md + AGENTS_ACTIVE.md. `ag worktree` command for manual management. Auto-cleanup via `ag done`. | HIGH — Infrastructure complete (F-0194). Ready for real multi-agent scenarios. |
 | **Multi-Session Collision Prevention** (F-0195) | Active | Three-layer defense: (1) sessions auto-register in AGENTS.json via `$PPID`, (2) UserPromptSubmit injects advisory collision warning when other sessions detected, (3) instruction hardening in all agent templates. `cleanup-stale` handles crash recovery (PID dead OR heartbeat >30min). | ACTIVE — hooks enforce for Claude Code; behavioral rules cover other agents. |
-| **Plan-Review Loop** (F-0120, F-0191) | Partially active | `ag plan` exists with dialectical review (Critic + Advocate, fresh context). But agents sometimes skip to implementation without going through the loop. `ag implement` has a plan-review gate but it's not consistently triggered. | HIGH — The dialectical mechanism is complete and merged. Need stronger behavioral enforcement or a structural gate that blocks `ag implement` without an APPROVED plan artifact. |
+| **Plan-Review Loop** (F-004, F-0191) | Partially active | `ag plan` exists with dialectical review (Critic + Advocate, fresh context). But agents sometimes skip to implementation without going through the loop. `ag implement` has a plan-review gate but it's not consistently triggered. | HIGH — The dialectical mechanism is complete and merged. Need stronger behavioral enforcement or a structural gate that blocks `ag implement` without an APPROVED plan artifact. |
 | **TDD Mode** (F-0008) | Documented | `development_mode: tdd` in STACK.md. Pipeline aware (Test Agent before Implementation Agent). But no structural enforcement — agent can ignore TDD mode. | LOW — Behavioral only, and most users prefer acceptance-driven over strict TDD. |
 | **Automatic Journaling** (F-0027) | Partially active | Two-tier logging (SESSION_LOG.md for checkpoints, JOURNAL.md for milestones) was designed. `session_log.sh` exists. But in practice, only JOURNAL.md is used via `journal.sh`. SESSION_LOG.md is effectively unused. | LOW — JOURNAL.md + git history provides sufficient logging. The two-tier system adds complexity without clear benefit. |
 | **Feature Graph / Dependency Visualization** (F-0075) | Tools exist, rarely used | `feature_graph.py`, `deps.py`, `coverage.py` exist. Feature annotations (`@feature F-####`) supported. But agents rarely add annotations to code, and graph tools are never auto-invoked. | MEDIUM — Could be valuable for large projects. Need to make annotation checking structural. |
@@ -1170,7 +1170,7 @@ The 27 YAML manifests and `context-for-role.sh` are the framework's most sophist
 **Update (v0.50.0)**: Plan review now uses dialectical mechanism (F-0191) — Critic + Advocate agents replace the single reviewer. The mechanism is complete; the enforcement gap (hard-blocking `ag implement` without APPROVED plan) remains a separate issue.
 
 ### Priority 3: Real-World Multi-Agent Test
-Set up a two-agent worktree scenario on a real project. This would validate F-0031-0033, F-0097, and expose gaps in the coordination protocol before documenting it as "working."
+Set up a two-agent worktree scenario on a real project. This would validate F-017-0033, F-0097, and expose gaps in the coordination protocol before documenting it as "working."
 
 ### Priority 4: Brownfield Validation
 Run `ag specs` on a real existing project. The discovery engine (detect_infra_patterns, detect_domains, feature clustering) has 75 tests but zero real-world validation.

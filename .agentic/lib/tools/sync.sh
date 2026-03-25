@@ -903,7 +903,7 @@ phase_plan_scan() {
 }
 
 # ============================================================================
-# Phase 9b: Plan-to-phases drift (F-0303)
+# Phase 9b: Plan-to-phases drift (F-032)
 # Detect when a plan file has been revised after its tasks.yaml was created
 # ============================================================================
 phase_plan_phase_drift() {

@@ -18,8 +18,8 @@ module.exports = { login };
 EOF
 
 # Create acceptance criteria
-cat > "$TEST_PROJECT/spec/acceptance/F-0001.md" << 'EOF'
-# F-0001: User Authentication
+cat > "$TEST_PROJECT/spec/acceptance/F-001.md" << 'EOF'
+# F-001: User Authentication
 
 ## Acceptance Criteria
 - [ ] AC-001: User can log in with valid credentials
@@ -35,7 +35,7 @@ EOF
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # Features
 
-## F-0001: User Authentication
+## F-001: User Authentication
 - Status: in_progress
 - Priority: high
 EOF
@@ -44,7 +44,7 @@ git -C "$TEST_PROJECT" add -A
 git -C "$TEST_PROJECT" commit -m "Add auth feature" --quiet
 
 # Ask if feature is done
-send_prompt "Is F-0001 done? Can we mark it as shipped?"
+send_prompt "Is F-001 done? Can we mark it as shipped?"
 
 # Verify agent behavior
 FAILURES=0

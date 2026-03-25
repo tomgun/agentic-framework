@@ -7,8 +7,8 @@ their own patterns.
 Supported prefixes: F- (features), DEV- (dev infrastructure), E- (epics).
 Supports dotted hierarchical IDs: F-003.1, F-003.1.2 (children start at .1).
 
-@feature F-0004 (consolidated from F-0193)
-@feature F-0184
+@feature F-003 (consolidated from F-0193)
+@feature F-005
 """
 from __future__ import annotations
 
@@ -19,9 +19,9 @@ from pathlib import Path
 MAX_DEPTH = 2
 
 # ---------------------------------------------------------------------------
-# Feature IDs — matches F-0001, DEV-0001, E-0001 (3-digit+ with optional dotted children)
+# Feature IDs — matches F-001, DEV-001, E-0001 (3-digit+ with optional dotted children)
 # Dotted children: F-003.1, F-003.1.2 (never .0 — children start at 1)
-# During transition: both 3-digit (F-003) and 4-digit (F-0003) accepted.
+# During transition: both 3-digit (F-003) and 4-digit (F-002) accepted.
 # ---------------------------------------------------------------------------
 
 # Inline reference: captures F-XXXX / DEV-XXXX / E-XXXX anywhere in text
@@ -37,7 +37,7 @@ FEATURE_ID_STRICT_RE = re.compile(r"^(?:F|DEV|E)-\d{3,}(?:\.[1-9]\d*)*$")
 
 
 def is_valid_feature_id(s: str) -> bool:
-    """Check if a string is a valid feature ID (F-0001, DEV-0001, F-003.1, etc.)."""
+    """Check if a string is a valid feature ID (F-001, DEV-001, F-003.1, etc.)."""
     return bool(FEATURE_ID_STRICT_RE.match(s))
 
 
@@ -98,7 +98,7 @@ def format_feature_id(n: int, prefix: str = "F", width: int = 4) -> str:
     """Format an integer as a feature ID with zero-padding.
 
     Default width=4 for backward compatibility during transition.
-    F-0001 through F-9999 use zero-padding for sort stability.
+    F-001 through F-9999 use zero-padding for sort stability.
     F-10000+ use natural width. Prefix can be F, DEV, or E.
     """
     limit = 10 ** width

@@ -2,7 +2,7 @@
 # Description: Agent should use plan-review loop for complex features (Formal)
 # Section: planning
 # Category: Important
-# Tests: LLM-023 (F-0120)
+# Tests: LLM-023 (F-004)
 
 # Setup with Formal profile (plan_review_enabled by default)
 setup_test_project "formal"

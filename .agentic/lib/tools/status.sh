@@ -2,7 +2,7 @@
 # status.sh - Update specific sections of STATUS.md (token-efficient)
 #
 # Usage:
-#   bash .agentic/tools/status.sh focus "Working on F-0003"
+#   bash .agentic/tools/status.sh focus "Working on F-002"
 #   bash .agentic/tools/status.sh progress "60% complete"
 #   bash .agentic/tools/status.sh next "Deploy to staging"
 #   bash .agentic/tools/status.sh blocker "Waiting for API key"
@@ -311,7 +311,7 @@ Commands:
               Add --apply to auto-update STATUS.md
 
 Examples:
-  bash status.sh focus "Implementing F-0003: User login"
+  bash status.sh focus "Implementing F-002: User login"
   bash status.sh progress "70% - 3 of 5 criteria complete"
   bash status.sh next "Add email verification"
   bash status.sh blocker "Waiting for design mockups"

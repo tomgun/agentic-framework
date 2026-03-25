@@ -40,17 +40,17 @@ Features use sequential IDs (`F-XXXX`). Category is metadata on each feature ent
 
 | File | Feature | Status |
 |------|---------|--------|
-| F-0001.md | Project Initialization | Complete |
+| F-001.md | Project Initialization | Complete |
 | F-0006.md | Acceptance-Driven Development | Complete |
-| F-0007.md | Small Batch Development | Complete |
+| F-007.md | Small Batch Development | Complete |
 | F-0013.md | Smoke Testing Checklist | Complete |
-| F-0016.md | Pre-Commit Quality Gates | Complete |
-| F-0021.md | Session Start Protocol | Complete |
-| F-0031.md | Multi-Agent Coordination | Complete |
-| F-0041.md | Token-Efficient Scripts | Complete |
-| F-0051.md | WIP Tracking | Complete |
+| F-009.md | Pre-Commit Quality Gates | Complete |
+| F-015.md | Session Start Protocol | Complete |
+| F-017.md | Multi-Agent Coordination | Complete |
+| F-019.md | Token-Efficient Scripts | Complete |
+| F-016.md | WIP Tracking | Complete |
 | F-0055.md | Anti-Hallucination Rules | Complete |
-| F-0061.md | DEVELOPER_GUIDE.md | Complete |
+| F-026.md | DEVELOPER_GUIDE.md | Complete |
 | F-0064.md | Script Help Messages | Complete |
 | F-0066.md | Template Quality | Complete |
 | F-0069.md | Checklist-Driven Workflows | Complete |
@@ -65,7 +65,7 @@ Features use sequential IDs (`F-XXXX`). Category is metadata on each feature ent
 bash tests/run_tests.sh
 
 # Check specific feature
-bash tests/validate_feature.sh F-0001
+bash tests/validate_feature.sh F-001
 
 # Generate coverage report
 python .agentic/tools/validate_specs.py spec/

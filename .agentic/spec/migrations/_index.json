@@ -6,7 +6,7 @@
       "id": 1,
       "file": "001_add_f0101_framework_adrs_and_f0102_modular_guidelines.md",
       "date": "2026-01-27",
-      "description": "Add F-0101 Framework ADRs and F-0102 Modular Guidelines"
+      "description": "Add F-011 Framework ADRs and F-0102 Modular Guidelines"
     },
     {
       "id": 2,
@@ -18,13 +18,13 @@
       "id": 3,
       "file": "003_initial_spec_creation_for_f0157_f0158_f0159.md",
       "date": "2026-03-06",
-      "description": "Initial spec creation for F-0157, F-0158, F-0159"
+      "description": "Initial spec creation for F-022, F-0158, F-0159"
     },
     {
       "id": 4,
       "file": "004_add_f0160_autonomous_engine_foundation_acceptance_criteria.md",
       "date": "2026-03-06",
-      "description": "Add F-0160 autonomous engine foundation acceptance criteria"
+      "description": "Add F-030 autonomous engine foundation acceptance criteria"
     },
     {
       "id": 5,
@@ -54,7 +54,7 @@
       "id": 9,
       "file": "009_add_qa_suite_f0169f0175_nfr_catalog_spec_verification_propagation_qa_tracker_retro_enforcement.md",
       "date": "2026-03-07",
-      "description": "Add QA Suite: F-0169–F-0175 (NFR catalog, spec verification, propagation, QA tracker, retro enforcement)"
+      "description": "Add QA Suite: F-013–F-0175 (NFR catalog, spec verification, propagation, QA tracker, retro enforcement)"
     },
     {
       "id": 10,
@@ -90,7 +90,7 @@
       "id": 15,
       "file": "015_check_off_all_28_verified_acs_for_f0190.md",
       "date": "2026-03-10",
-      "description": "Check off all 28 verified ACs for F-0190"
+      "description": "Check off all 28 verified ACs for F-006"
     },
     {
       "id": 16,
@@ -108,31 +108,31 @@
       "id": 18,
       "file": "018_f0302_phase_3_consolidate_217_features_into_33_yaml_contracts_old_features_archived_to_docsarchivefeaturesv072md_see_specconsolidation_mapmd_for_mapping.md",
       "date": "2026-03-22",
-      "description": "F-0302 Phase 3: Consolidate 217 features into 33 YAML contracts. Old features archived to docs/archive/FEATURES-v0.72.md. See spec/CONSOLIDATION_MAP.md for mapping."
+      "description": "F-031 Phase 3: Consolidate 217 features into 33 YAML contracts. Old features archived to docs/archive/FEATURES-v0.72.md. See spec/CONSOLIDATION_MAP.md for mapping."
     },
     {
       "id": 19,
       "file": "019_recategorize_f0122_to_devinfrastructure_under_dev0001_parent.md",
       "date": "2026-03-24",
-      "description": "Re-categorize DEV-0122 to dev-infrastructure under DEV-0001 parent"
+      "description": "Re-categorize DEV-002 to dev-infrastructure under DEV-001 parent"
     },
     {
       "id": 20,
       "file": "020_recategorize_f0199_to_devinfrastructure_under_dev0001_parent.md",
       "date": "2026-03-24",
-      "description": "Re-categorize DEV-0199 to dev-infrastructure under DEV-0001 parent"
+      "description": "Re-categorize DEV-003 to dev-infrastructure under DEV-001 parent"
     },
     {
       "id": 21,
       "file": "021_ship_f0243_complexity_tier_experiments_contract.md",
       "date": "2026-03-24",
-      "description": "Ship DEV-0243 Complexity Tier Experiments contract"
+      "description": "Ship DEV-004 Complexity Tier Experiments contract"
     },
     {
       "id": 22,
       "file": "022_reopen_f0184_for_phase_1b_dotted_id_decomposition_extract_subfeature_recursive_check.md",
       "date": "2026-03-24",
-      "description": "Reopen F-0184 for Phase 1b: dotted ID decomposition, extract_subfeature, recursive check"
+      "description": "Reopen F-005 for Phase 1b: dotted ID decomposition, extract_subfeature, recursive check"
     }
   ]
 }

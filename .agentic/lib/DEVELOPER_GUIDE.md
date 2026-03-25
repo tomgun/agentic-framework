@@ -525,7 +525,7 @@ When multiple Claude sessions share a checkout, destructive git ops (`stash`, `c
 **Edit `.agentic/spec/FEATURES.md`:**
 ```markdown
 ## Feature index
-- F-0001: API Client
+- F-001: API Client
 - F-0002: Caching
 - F-0010: CSV Export  <!-- ADD THIS -->
 
@@ -533,7 +533,7 @@ When multiple Claude sessions share a checkout, destructive git ops (`stash`, `c
 
 ## F-0010: CSV Export
 - Parent: none
-- Dependencies: F-0001
+- Dependencies: F-001
 - Complexity: S
 - Status: planned
 - Acceptance: .agentic/spec/acceptance/F-0010.md
@@ -607,7 +607,7 @@ See: `.agentic/lib/workflows/spec_migrations.md` for details.
 - F-0010: CSV Export (HIGH PRIORITY - customer request)
 
 ## Next up
-- F-0011: PDF reports
+- F-008: PDF reports
 - F-0012: Email notifications
 ```
 
@@ -631,7 +631,7 @@ Feature IDs (`F-XXXX`) are managed through centralized modules — **never hardc
 | `.agentic/lib/ids.py` | Python | `FEATURE_ID_RE`, `FEATURE_HEADER_RE`, `FEATURE_ID_STRICT_RE`, `is_valid_feature_id()`, `format_feature_id()`, `get_next_feature_id()` |
 | `.agentic/lib/ids.sh` | Shell | `$FEATURE_ID_ERE`, `$FEATURE_ID_ERE_ANCHORED`, `$FEATURE_HEADER_ERE`, `is_feature_id()`, `format_feature_id()` |
 
-IDs support 4+ digits: `F-0001` through `F-9999` use zero-padding; `F-10000`+ use natural width. `ids.sh` is auto-sourced via `paths.sh`. Python files use `from ids import ...`.
+IDs support 4+ digits: `F-001` through `F-9999` use zero-padding; `F-10000`+ use natural width. `ids.sh` is auto-sourced via `paths.sh`. Python files use `from ids import ...`.
 
 ## Automation & Scripts
 
@@ -704,7 +704,7 @@ bash .agentic/lib/tools/doctor.sh --full
 
 **Other modes:**
 ```bash
-doctor.sh --phase planning F-0001  # Phase-specific checks
+doctor.sh --phase planning F-001  # Phase-specific checks
 doctor.sh --pre-commit             # Pre-commit gate checks
 ```
 
@@ -753,7 +753,7 @@ Features by status:
   In progress: 2
   Planned: 8
 
-Missing acceptance criteria: F-0007, F-0010
+Missing acceptance criteria: F-007, F-0010
 
 Needs acceptance validation:
   F-0005 (shipped but not accepted)
@@ -895,7 +895,7 @@ python3 .agentic/lib/tools/coverage.py --ac-coverage F-0148 --json # JSON output
 
 ```bash
 bash .agentic/lib/tools/ag.sh trace              # Full report
-bash .agentic/lib/tools/ag.sh trace F-0001       # Files implementing F-0001
+bash .agentic/lib/tools/ag.sh trace F-001       # Files implementing F-001
 bash .agentic/lib/tools/ag.sh trace src/auth.py  # Features in this file
 bash .agentic/lib/tools/ag.sh trace --gaps       # Missing implementations only
 bash .agentic/lib/tools/ag.sh trace --orphans    # Orphaned code/annotations
@@ -951,8 +951,8 @@ bash .agentic/lib/tools/feature_graph.sh --save
 
 ```bash
 # Create worktree for parallel work
-bash .agentic/lib/tools/worktree.sh create F-0001 "User auth"
-# → ../project-f-0001/ on branch feature/F-0001
+bash .agentic/lib/tools/worktree.sh create F-001 "User auth"
+# → ../project-f-0001/ on branch feature/F-001
 
 # List active worktrees and agents
 bash .agentic/lib/tools/worktree.sh list
@@ -961,7 +961,7 @@ bash .agentic/lib/tools/worktree.sh list
 bash .agentic/lib/tools/worktree.sh status
 
 # Cleanup when done
-bash .agentic/lib/tools/worktree.sh remove F-0001
+bash .agentic/lib/tools/worktree.sh remove F-001
 ```
 
 **When to run:**
@@ -1016,13 +1016,13 @@ python .agentic/lib/tools/query_features.py --owner=alice@example.com
 python .agentic/lib/tools/query_features.py --layer=presentation --domain=auth --tags=ui
 
 # List direct children of a feature
-python .agentic/lib/tools/query_features.py --children=F-0001
+python .agentic/lib/tools/query_features.py --children=F-001
 
 # List all descendants (recursive) with tree format
-python .agentic/lib/tools/query_features.py --children=F-0001 --recursive
+python .agentic/lib/tools/query_features.py --children=F-001 --recursive
 
 # Filter children by status
-python .agentic/lib/tools/query_features.py --children=F-0001 --status=shipped
+python .agentic/lib/tools/query_features.py --children=F-001 --status=shipped
 ```
 
 **Example output:**
@@ -1036,7 +1036,7 @@ Total: 3 features
 
 **Example --children output:**
 ```
-F-0101: Login UI [shipped]
+F-011: Login UI [shipped]
   F-0110: Login Form [shipped]
   F-0111: Login Button [shipped]
 F-0102: OAuth Integration [planned]
@@ -1103,7 +1103,7 @@ python .agentic/lib/tools/validate_specs.py
 ```
 
 **What it checks:**
-- Circular dependencies (F-0001 → F-0002 → F-0001)
+- Circular dependencies (F-001 → F-0002 → F-001)
 - Invalid feature references (parent/dependencies don't exist)
 - Schema validation (if using YAML frontmatter)
 
@@ -1117,7 +1117,7 @@ Validating .agentic/spec/FEATURES.md...
   Checking cross-references...
   ❌ 2 cross-reference error(s):
      - F-0005: Parent F-0099 does not exist
-     - F-0007: Dependency F-0088 does not exist
+     - F-007: Dependency F-0088 does not exist
 
 ❌ Total errors: 2
 Fix errors in spec files and run again.
@@ -1593,7 +1593,7 @@ When enabled, `ag done` checks for `.agentic/journal/evidence/F-XXXX-smoke.*` be
 
 ```yaml
 # Use worktree.sh tool for parallel agents:
-# bash .agentic/lib/tools/worktree.sh create F-0001 "Feature name"
+# bash .agentic/lib/tools/worktree.sh create F-001 "Feature name"
 # See: .agentic/lib/workflows/multi_agent_coordination.md
 ```
 

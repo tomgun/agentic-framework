@@ -157,12 +157,12 @@ check_features_drift() {
     # Parse shipped features (support both formats)
     local shipped_features=""
     if [[ "$format" == "table" ]]; then
-        # Table format: | F-0003 | Name | shipped | ... |
+        # Table format: | F-002 | Name | shipped | ... |
         shipped_features=$(grep -E "^\|[[:space:]]*F-[0-9]+" "$features_file" | \
             grep -i "shipped" | \
             grep -oE "F-[0-9]+" || true)
     else
-        # Heading format: ## F-0003: Name with - Status: shipped
+        # Heading format: ## F-002: Name with - Status: shipped
         shipped_features=$(grep -E "^## F-[0-9]+" "$features_file" | while read line; do
             local fid=$(echo "$line" | grep -oE "F-[0-9]+")
             # Check if status is shipped

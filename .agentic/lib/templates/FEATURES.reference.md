@@ -22,9 +22,9 @@
 
 ## Feature index (optional)
 You can add an index at the top for quick navigation:
-- F-0001: User Authentication
+- F-001: User Authentication
 - F-0002: Data Persistence
-- F-0003: Real-time Sync
+- F-002: Real-time Sync
 
 ---
 
@@ -93,11 +93,11 @@ For simpler projects, you can use a minimal version:
 
 **F-####: FeatureName**
 - Stable ID (never changes, even if feature is renamed)
-- Format: F-0001, F-0002, etc.
+- Format: F-001, F-0002, etc.
 - Name should be descriptive and concise
 
 **Parent**
-- Use for hierarchical features (e.g., F-0002 is child of F-0001)
+- Use for hierarchical features (e.g., F-0002 is child of F-001)
 - `none` if top-level feature
 
 **Dependencies**
@@ -158,7 +158,7 @@ For simpler projects, you can use a minimal version:
 ## Example Feature
 
 ```markdown
-## F-0001: User Login with Email/Password
+## F-001: User Login with Email/Password
 - Parent: none
 - Dependencies: none
 - Complexity: M
@@ -167,7 +167,7 @@ For simpler projects, you can use a minimal version:
 - Domain: auth
 - Priority: critical
 - Status: shipped
-- Acceptance: .agentic/spec/acceptance/F-0001.md
+- Acceptance: .agentic/spec/acceptance/F-001.md
 - Verification:
   - Accepted: yes
   - Accepted at: 2025-01-15
@@ -193,7 +193,7 @@ For simpler projects, you can use a minimal version:
 
 ### When to create features
 - Shippable capabilities that add value
-- Technical foundations (e.g., F-0001: Database Schema)
+- Technical foundations (e.g., F-001: Database Schema)
 - User-facing features (e.g., F-0012: Export to PDF)
 - Non-functional improvements (e.g., F-0045: Performance Optimization)
 

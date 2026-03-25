@@ -80,7 +80,7 @@ class TestParallelDispatcherRun:
         # Mock spawn to return None (failed) so we exit quickly
         mock_spawn.return_value = None
         d = ParallelDispatcher(Path("/tmp/test"), max_parallel=3)
-        result = d.run(["F-0001", "F-0002", "F-0003"])
+        result = d.run(["F-001", "F-0002", "F-002"])
 
         assert mock_spawn.call_count == 3
         assert result.features_failed == 3
@@ -93,7 +93,7 @@ class TestParallelDispatcherRun:
         # First 2 calls return None (fill initial slots), rest also None
         mock_spawn.return_value = None
         d = ParallelDispatcher(Path("/tmp/test"), max_parallel=2)
-        result = d.run(["F-0001", "F-0002", "F-0003"])
+        result = d.run(["F-001", "F-0002", "F-002"])
 
         # With max_parallel=2 and all spawns failing, should try all 3
         # (2 initial + 1 when slots are immediately freed due to failure)
@@ -106,7 +106,7 @@ class TestParallelDispatcherRun:
         """AC-008: SchedulerResult has same shape."""
         mock_spawn.return_value = None
         d = ParallelDispatcher(Path("/tmp/test"))
-        result = d.run(["F-0001"])
+        result = d.run(["F-001"])
 
         # Verify SchedulerResult fields exist
         assert hasattr(result, "success")
@@ -129,18 +129,18 @@ class TestBuildPrompt:
 
     def test_prompt_includes_skip_branch(self, mock_get_paths):
         d = ParallelDispatcher(Path("/tmp/test"))
-        prompt = d._build_prompt("F-0001")
+        prompt = d._build_prompt("F-001")
         assert "--skip-branch" in prompt
-        assert "F-0001" in prompt
+        assert "F-001" in prompt
 
     def test_prompt_includes_skip_pr_when_set(self, mock_get_paths):
         d = ParallelDispatcher(Path("/tmp/test"), skip_pr=True)
-        prompt = d._build_prompt("F-0001")
+        prompt = d._build_prompt("F-001")
         assert "--skip-pr" in prompt
 
     def test_prompt_no_skip_pr_by_default(self, mock_get_paths):
         d = ParallelDispatcher(Path("/tmp/test"))
-        prompt = d._build_prompt("F-0001")
+        prompt = d._build_prompt("F-001")
         assert "--skip-pr" not in prompt
 
 
@@ -152,9 +152,9 @@ class TestProcessManagement:
         mock_proc = MagicMock()
         mock_proc.wait.return_value = None
         agent = AgentProcess(
-            feature_id="F-0001",
+            feature_id="F-001",
             worktree_path="/tmp/wt",
-            branch_name="feature/F-0001",
+            branch_name="feature/F-001",
             process=mock_proc,
             start_time=time.time(),
             log_path=Path("/tmp/log"),
@@ -172,9 +172,9 @@ class TestProcessManagement:
             None,  # second wait (kill)
         ]
         agent = AgentProcess(
-            feature_id="F-0001",
+            feature_id="F-001",
             worktree_path="/tmp/wt",
-            branch_name="feature/F-0001",
+            branch_name="feature/F-001",
             process=mock_proc,
             start_time=time.time(),
             log_path=Path("/tmp/log"),
@@ -227,11 +227,11 @@ class TestSchedulerParallelFlag:
             max_parallel=5,
             timeout=900,
         )
-        result = s.run(["F-0001", "F-0002"])
+        result = s.run(["F-001", "F-0002"])
 
         MockDispatcher.assert_called_once()
         MockDispatcher.return_value.run.assert_called_once_with(
-            ["F-0001", "F-0002"],
+            ["F-001", "F-0002"],
         )
         assert result.success is True
 
@@ -243,9 +243,9 @@ class TestCloseLog:
         mock_file = MagicMock()
         mock_file.closed = False
         agent = AgentProcess(
-            feature_id="F-0001",
+            feature_id="F-001",
             worktree_path="/tmp/wt",
-            branch_name="feature/F-0001",
+            branch_name="feature/F-001",
             process=MagicMock(),
             start_time=time.time(),
             log_path=Path("/tmp/log"),
@@ -259,9 +259,9 @@ class TestCloseLog:
         mock_file = MagicMock()
         mock_file.closed = True
         agent = AgentProcess(
-            feature_id="F-0001",
+            feature_id="F-001",
             worktree_path="/tmp/wt",
-            branch_name="feature/F-0001",
+            branch_name="feature/F-001",
             process=MagicMock(),
             start_time=time.time(),
             log_path=Path("/tmp/log"),
@@ -273,9 +273,9 @@ class TestCloseLog:
 
     def test_close_log_handles_no_file(self, mock_get_paths):
         agent = AgentProcess(
-            feature_id="F-0001",
+            feature_id="F-001",
             worktree_path="/tmp/wt",
-            branch_name="feature/F-0001",
+            branch_name="feature/F-001",
             process=MagicMock(),
             start_time=time.time(),
             log_path=Path("/tmp/log"),

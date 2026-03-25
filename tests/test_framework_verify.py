@@ -129,7 +129,7 @@ class TestMilestoneChecker:
         from auto.framework_verify import MilestoneChecker
         spec_dir = tmp_path / ".agentic" / "spec"
         spec_dir.mkdir(parents=True)
-        (spec_dir / "FEATURES.md").write_text("## F-0001: Test\n**Status**: planned\n")
+        (spec_dir / "FEATURES.md").write_text("## F-001: Test\n**Status**: planned\n")
         result = SpawnResult("ok", returncode=0)
         checker = MilestoneChecker(tmp_path, result)
         m = checker.check("kickoff_complete")
@@ -159,7 +159,7 @@ class TestMilestoneChecker:
         from auto.framework_verify import MilestoneChecker
         ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
         ac_dir.mkdir(parents=True)
-        (ac_dir / "F-0001.md").write_text("# AC\n")
+        (ac_dir / "F-001.md").write_text("# AC\n")
         result = SpawnResult("ok", returncode=0)
         checker = MilestoneChecker(tmp_path, result)
         m = checker.check("features_specced")
@@ -171,7 +171,7 @@ class TestMilestoneChecker:
         spec_dir = tmp_path / ".agentic" / "spec"
         spec_dir.mkdir(parents=True)
         (spec_dir / "FEATURES.md").write_text(
-            "## F-0001: API\n**Component**: api\n"
+            "## F-001: API\n**Component**: api\n"
         )
         result = SpawnResult("ok", returncode=0)
         checker = MilestoneChecker(tmp_path, result)
@@ -589,7 +589,7 @@ class TestWorkflowExpectations:
         spec_dir = tmp_path / ".agentic" / "spec"
         spec_dir.mkdir(parents=True)
         (spec_dir / "FEATURES.md").write_text(
-            "## F-0001: Todo CRUD\n**Status**: shipped\n"
+            "## F-001: Todo CRUD\n**Status**: shipped\n"
         )
         checker = ExpectationChecker(tmp_path)
         results = checker.check_all({
@@ -603,7 +603,7 @@ class TestWorkflowExpectations:
         spec_dir = tmp_path / ".agentic" / "spec"
         spec_dir.mkdir(parents=True)
         (spec_dir / "FEATURES.md").write_text(
-            "## F-0001: Todo CRUD\n**Status**: planned\n"
+            "## F-001: Todo CRUD\n**Status**: planned\n"
         )
         checker = ExpectationChecker(tmp_path)
         results = checker.check_all({
@@ -616,7 +616,7 @@ class TestWorkflowExpectations:
         from auto.framework_verify import ExpectationChecker
         plans = tmp_path / ".agentic" / "journal" / "plans"
         plans.mkdir(parents=True)
-        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
+        (plans / "F-001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
         checker = ExpectationChecker(tmp_path)
         results = checker.check_all({
             "workflow": [{"type": "plans_exist", "min": 1}],
@@ -627,7 +627,7 @@ class TestWorkflowExpectations:
         from auto.framework_verify import ExpectationChecker
         plans = tmp_path / ".agentic" / "journal" / "plans"
         plans.mkdir(parents=True)
-        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
+        (plans / "F-001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
         checker = ExpectationChecker(tmp_path)
         results = checker.check_all({
             "workflow": [{"type": "plans_approved", "min": 1}],
@@ -638,7 +638,7 @@ class TestWorkflowExpectations:
         from auto.framework_verify import ExpectationChecker
         plans = tmp_path / ".agentic" / "journal" / "plans"
         plans.mkdir(parents=True)
-        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: DRAFT\n")
+        (plans / "F-001-plan.md").write_text("# Plan\n**Status**: DRAFT\n")
         checker = ExpectationChecker(tmp_path)
         results = checker.check_all({
             "workflow": [{"type": "plans_approved", "min": 1}],
@@ -649,7 +649,7 @@ class TestWorkflowExpectations:
         from auto.framework_verify import ExpectationChecker
         ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
         ac_dir.mkdir(parents=True)
-        (ac_dir / "F-0001.md").write_text("- [x] API returns todos\n- [x] Tests pass\n")
+        (ac_dir / "F-001.md").write_text("- [x] API returns todos\n- [x] Tests pass\n")
         checker = ExpectationChecker(tmp_path)
         results = checker.check_all({
             "workflow": [{"type": "acceptance_criteria_checked", "min": 1}],
@@ -660,7 +660,7 @@ class TestWorkflowExpectations:
         from auto.framework_verify import ExpectationChecker
         ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
         ac_dir.mkdir(parents=True)
-        (ac_dir / "F-0001.md").write_text("- [x] API returns todos\n- [ ] Tests pass\n")
+        (ac_dir / "F-001.md").write_text("- [x] API returns todos\n- [ ] Tests pass\n")
         checker = ExpectationChecker(tmp_path)
         results = checker.check_all({
             "workflow": [{"type": "acceptance_criteria_checked", "min": 1}],
@@ -709,7 +709,7 @@ class TestWorkflowExpectations:
         (tmp_path / "f2.txt").write_text("code")
         subprocess.run(["git", "add", "."], cwd=str(tmp_path),
                        check=True, capture_output=True)
-        subprocess.run(["git", "commit", "-m", "feat(F-0001): add todo API"],
+        subprocess.run(["git", "commit", "-m", "feat(F-001): add todo API"],
                        cwd=str(tmp_path), check=True, capture_output=True)
         checker = ExpectationChecker(tmp_path)
         results = checker.check_all({
@@ -941,7 +941,7 @@ class TestBehavioralExpectations:
         # Commit 1: AC file
         ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
         ac_dir.mkdir(parents=True)
-        (ac_dir / "F-0001.md").write_text("- [ ] API works\n")
+        (ac_dir / "F-001.md").write_text("- [ ] API works\n")
         subprocess.run(["git", "add", "."], cwd=str(tmp_path),
                        check=True, capture_output=True)
         subprocess.run(["git", "commit", "-m", "spec: add AC"],
@@ -973,7 +973,7 @@ class TestBehavioralExpectations:
         # Commit 2: AC after code
         ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
         ac_dir.mkdir(parents=True)
-        (ac_dir / "F-0001.md").write_text("- [ ] API works\n")
+        (ac_dir / "F-001.md").write_text("- [ ] API works\n")
         subprocess.run(["git", "add", "."], cwd=str(tmp_path),
                        check=True, capture_output=True)
         subprocess.run(["git", "commit", "-m", "spec: add AC"],
@@ -990,7 +990,7 @@ class TestBehavioralExpectations:
                        check=True, capture_output=True)
         ac_dir = tmp_path / ".agentic" / "spec" / "acceptance"
         ac_dir.mkdir(parents=True)
-        (ac_dir / "F-0001.md").write_text("- [ ] API works\n")
+        (ac_dir / "F-001.md").write_text("- [ ] API works\n")
         (tmp_path / "app").mkdir()
         (tmp_path / "app" / "main.py").write_text("print('hello')")
         subprocess.run(["git", "add", "."], cwd=str(tmp_path),
@@ -1008,7 +1008,7 @@ class TestBehavioralExpectations:
         spec_dir = tmp_path / ".agentic" / "spec"
         spec_dir.mkdir(parents=True)
         (spec_dir / "FEATURES.md").write_text(
-            "## F-0001: Todo CRUD\n**Status**: planned\n**Description**: CRUD ops\n"
+            "## F-001: Todo CRUD\n**Status**: planned\n**Description**: CRUD ops\n"
         )
         checker = ExpectationChecker(tmp_path)
         result = checker._wf_workflow_commands_used({
@@ -1022,7 +1022,7 @@ class TestBehavioralExpectations:
         spec_dir = tmp_path / ".agentic" / "spec"
         spec_dir.mkdir(parents=True)
         (spec_dir / "FEATURES.md").write_text(
-            "## F-0001: Todo CRUD\n\n**Status**: shipped\n\n**Description**: CRUD ops\n"
+            "## F-001: Todo CRUD\n\n**Status**: shipped\n\n**Description**: CRUD ops\n"
         )
         checker = ExpectationChecker(tmp_path)
         result = checker._wf_workflow_commands_used({
@@ -1064,7 +1064,7 @@ class TestBehavioralExpectations:
         from auto.framework_verify import ExpectationChecker
         (tmp_path / ".agentic").mkdir()
         (tmp_path / ".agentic" / "STATUS.md").write_text(
-            "# Current Focus\n\nImplementing F-0001: Todo CRUD API\n\n## Context\nBuilding the app"
+            "# Current Focus\n\nImplementing F-001: Todo CRUD API\n\n## Context\nBuilding the app"
         )
         checker = ExpectationChecker(tmp_path)
         result = checker._wf_session_start_ran({})
@@ -1082,7 +1082,7 @@ class TestBehavioralExpectations:
         from auto.framework_verify import ExpectationChecker
         plans = tmp_path / ".agentic" / "journal" / "plans"
         plans.mkdir(parents=True)
-        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
+        (plans / "F-001-plan.md").write_text("# Plan\n**Status**: APPROVED\n")
         checker = ExpectationChecker(tmp_path)
         result = checker._wf_plans_reviewed({})
         assert result.passed
@@ -1092,7 +1092,7 @@ class TestBehavioralExpectations:
         from auto.framework_verify import ExpectationChecker
         plans = tmp_path / ".agentic" / "journal" / "plans"
         plans.mkdir(parents=True)
-        (plans / "F-0001-plan.md").write_text("# Plan\n**Status**: DRAFT\n")
+        (plans / "F-001-plan.md").write_text("# Plan\n**Status**: DRAFT\n")
         checker = ExpectationChecker(tmp_path)
         result = checker._wf_plans_reviewed({})
         assert not result.passed

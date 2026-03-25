@@ -113,8 +113,8 @@ run_metrics() {
 
 echo "=== Test: Discovery counting ==="
 setup_tmpdir
-create_features_file "$TMPDIR" "F-0001" "F-0002"
-create_ac_file "$TMPDIR" "F-0001" "# F-0001
+create_features_file "$TMPDIR" "F-001" "F-0002"
+create_ac_file "$TMPDIR" "F-001" "# F-001
 ## Acceptance Criteria
 - [ ] **AC-001**: Basic feature
 - [ ] **AC-002**: [Discovered] New requirement found
@@ -124,13 +124,13 @@ create_ac_file "$TMPDIR" "F-0002" "# F-0002
 - [ ] **AC-001**: No discoveries here"
 
 out=$(run_metrics --discovery)
-assert_contains "Shows F-0001 with discoveries" "F-0001: 2 discovered" "$out"
+assert_contains "Shows F-001 with discoveries" "F-001: 2 discovered" "$out"
 assert_contains "Summary shows 1/2 features" "1/2 features have discoveries" "$out"
 assert_contains "Summary shows 2 total" "2 total markers" "$out"
 
 # Single feature mode
-out=$(run_metrics --discovery F-0001)
-assert_contains "Single feature shows discoveries" "F-0001: 2 discovered" "$out"
+out=$(run_metrics --discovery F-001)
+assert_contains "Single feature shows discoveries" "F-001: 2 discovered" "$out"
 cleanup_tmpdir
 
 echo ""
@@ -207,10 +207,10 @@ cleanup_tmpdir
 echo ""
 echo "=== Test: Summary line ==="
 setup_tmpdir
-create_features_file "$TMPDIR" "F-0050" "F-0051"
+create_features_file "$TMPDIR" "F-0050" "F-016"
 create_ac_file "$TMPDIR" "F-0050" "# F-0050
 - [ ] **AC-001**: [Discovered] Something"
-create_ac_file "$TMPDIR" "F-0051" "# F-0051
+create_ac_file "$TMPDIR" "F-016" "# F-016
 - [ ] **AC-001**: Normal"
 
 out=$(run_metrics --summary-line)

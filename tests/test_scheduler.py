@@ -60,14 +60,14 @@ def project_root(tmp_path):
 
         ---
 
-        ## F-0101: Child Feature A
+        ## F-011: Child Feature A
 
         **Status**: planned
         **Category**: Test
         **Parent**: F-0100
         **Component**: api
 
-        **Acceptance**: See `spec/acceptance/F-0101.md`
+        **Acceptance**: See `spec/acceptance/F-011.md`
 
         ---
 
@@ -94,7 +94,7 @@ def project_root(tmp_path):
     """))
 
     # AC files
-    for fid in ["F-0100", "F-0101", "F-0102", "F-0103"]:
+    for fid in ["F-0100", "F-011", "F-0102", "F-0103"]:
         (acceptance / f"{fid}.md").write_text(
             f"# {fid}\n\n- [ ] **AC-001**: Test criterion\n"
         )
@@ -131,13 +131,13 @@ class TestSchedulingLoop:
 
         mock_runner = MagicMock()
         mock_runner.run.return_value = TaskResult(
-            feature_id="F-0101", success=True,
+            feature_id="F-011", success=True,
             acs_total=1, acs_passed=1,
         )
         mock_runner_cls.return_value = mock_runner
 
         scheduler = AutonomousScheduler(project_root=project_root)
-        result = scheduler.run(feature_ids=["F-0101"])
+        result = scheduler.run(feature_ids=["F-011"])
 
         assert result.features_total == 1
         assert result.features_completed == 1
@@ -153,13 +153,13 @@ class TestSchedulingLoop:
 
         mock_runner = MagicMock()
         mock_runner.run.return_value = TaskResult(
-            feature_id="F-0101", success=False,
+            feature_id="F-011", success=False,
             acs_total=1, acs_passed=0, acs_failed=1,
         )
         mock_runner_cls.return_value = mock_runner
 
         scheduler = AutonomousScheduler(project_root=project_root)
-        result = scheduler.run(feature_ids=["F-0101", "F-0102"], max_errors=1)
+        result = scheduler.run(feature_ids=["F-011", "F-0102"], max_errors=1)
 
         assert not result.success
         assert result.features_failed >= 1
@@ -186,17 +186,17 @@ class TestNonBlockingReviews:
         )
         mock_runner_cls.return_value = mock_runner
 
-        # Create a pending review for F-0101
+        # Create a pending review for F-011
         pending_dir = project_root / ".agentic" / "session" / "reviews"
         pending_dir.mkdir(parents=True, exist_ok=True)
         review_data = {
-            "feature_id": "F-0101",
+            "feature_id": "F-011",
             "from_state": "documented",
             "to_state": "committed",
             "review_setting": "review_code",
             "review_mode": "human",
         }
-        (pending_dir / "F-0101_committed.json").write_text(
+        (pending_dir / "F-011_committed.json").write_text(
             json.dumps(review_data)
         )
 
@@ -205,11 +205,11 @@ class TestNonBlockingReviews:
             poll_interval=0.05,
             max_poll_cycles=1,
         )
-        result = scheduler.run(feature_ids=["F-0101", "F-0102"])
+        result = scheduler.run(feature_ids=["F-011", "F-0102"])
 
-        # F-0101 should be review_blocked, F-0102 should complete
+        # F-011 should be review_blocked, F-0102 should complete
         statuses = {fw.feature_id: fw.status for fw in result.feature_work}
-        assert statuses["F-0101"] == "review_blocked"
+        assert statuses["F-011"] == "review_blocked"
         assert statuses["F-0102"] == "completed"
 
 
@@ -224,7 +224,7 @@ class TestComponentScoping:
         from auto.scheduler import AutonomousScheduler
 
         scheduler = AutonomousScheduler(project_root=project_root)
-        assert scheduler._get_feature_component("F-0101") == "api"
+        assert scheduler._get_feature_component("F-011") == "api"
         assert scheduler._get_feature_component("F-0102") == "web"
         assert scheduler._get_feature_component("F-0100") is None
 
@@ -236,13 +236,13 @@ class TestComponentScoping:
 
         mock_runner = MagicMock()
         mock_runner.run.return_value = TaskResult(
-            feature_id="F-0101", success=True,
+            feature_id="F-011", success=True,
             acs_total=1, acs_passed=1,
         )
         mock_runner_cls.return_value = mock_runner
 
         scheduler = AutonomousScheduler(project_root=project_root)
-        result = scheduler.run(feature_ids=["F-0101"])
+        result = scheduler.run(feature_ids=["F-011"])
 
         assert result.feature_work[0].component == "api"
 
@@ -262,18 +262,18 @@ class TestCrunchEvolution:
 
         mock_runner = MagicMock()
         mock_runner.run.return_value = TaskResult(
-            feature_id="F-0101", success=True,
+            feature_id="F-011", success=True,
             acs_total=1, acs_passed=1,
         )
         mock_runner_cls.return_value = mock_runner
 
         runner = CrunchRunner(project_root=project_root)
-        result = runner.run(feature_ids=["F-0101"])
+        result = runner.run(feature_ids=["F-011"])
 
         assert result.success
         assert result.features_completed == 1
         assert len(result.feature_results) == 1
-        assert result.feature_results[0].feature_id == "F-0101"
+        assert result.feature_results[0].feature_id == "F-011"
         assert result.feature_results[0].status == "completed"
 
     def test_crunch_result_format_preserved(self, project_root):
@@ -285,13 +285,13 @@ class TestCrunchEvolution:
             features_total=1,
             features_completed=1,
             feature_results=[FeatureBatchResult(
-                feature_id="F-0101", status="completed",
+                feature_id="F-011", status="completed",
                 acs_passed=1, acs_total=1,
             )],
         )
         d = cr.to_dict()
         assert "feature_results" in d
-        assert d["feature_results"][0]["feature_id"] == "F-0101"
+        assert d["feature_results"][0]["feature_id"] == "F-011"
 
 
 # ---------------------------------------------------------------------------
@@ -309,7 +309,7 @@ class TestEpicExecution:
         children = scheduler._get_epic_children("F-0100")
 
         # F-0103 is shipped, should be excluded
-        assert "F-0101" in children
+        assert "F-011" in children
         assert "F-0102" in children
         assert "F-0103" not in children
 
@@ -336,9 +336,9 @@ class TestEpicExecution:
         scheduler = AutonomousScheduler(project_root=project_root)
         result = scheduler.run_epic("F-0100")
 
-        # Should schedule F-0101, F-0102 (not F-0103 which is shipped)
+        # Should schedule F-011, F-0102 (not F-0103 which is shipped)
         scheduled_ids = [fw.feature_id for fw in result.feature_work]
-        assert "F-0101" in scheduled_ids
+        assert "F-011" in scheduled_ids
         assert "F-0102" in scheduled_ids
         assert "F-0103" not in scheduled_ids
 
@@ -370,7 +370,7 @@ class TestEscalationHandling:
 
         scheduler = AutonomousScheduler(project_root=project_root)
         # Should not raise
-        scheduler._handle_escalation("F-0101", "Tests failing consistently")
+        scheduler._handle_escalation("F-011", "Tests failing consistently")
 
     @patch("auto.scheduler.TaskRunner")
     def test_scheduler_continues_after_exception(self, mock_runner_cls, project_root):
@@ -396,7 +396,7 @@ class TestEscalationHandling:
 
         scheduler = AutonomousScheduler(project_root=project_root)
         result = scheduler.run(
-            feature_ids=["F-0101", "F-0102"],
+            feature_ids=["F-011", "F-0102"],
             max_errors=3,
         )
 
@@ -421,7 +421,7 @@ class TestAllBlockedReporting:
         # Create pending reviews for both features
         pending_dir = project_root / ".agentic" / "session" / "reviews"
         pending_dir.mkdir(parents=True, exist_ok=True)
-        for fid, state in [("F-0101", "committed"), ("F-0102", "committed")]:
+        for fid, state in [("F-011", "committed"), ("F-0102", "committed")]:
             review_data = {
                 "feature_id": fid,
                 "from_state": "documented",
@@ -438,7 +438,7 @@ class TestAllBlockedReporting:
             poll_interval=0.1,
             max_poll_cycles=1,  # Don't actually wait long
         )
-        result = scheduler.run(feature_ids=["F-0101", "F-0102"])
+        result = scheduler.run(feature_ids=["F-011", "F-0102"])
 
         assert not result.success
         assert "blocked on human review" in result.stopped_reason
@@ -460,16 +460,16 @@ class TestReviewResolution:
 
         mock_runner = MagicMock()
         mock_runner.run.return_value = TaskResult(
-            feature_id="F-0101", success=True,
+            feature_id="F-011", success=True,
             acs_total=1, acs_passed=1,
         )
         mock_runner_cls.return_value = mock_runner
 
         # Start with a pending review
         pending_dir = project_root / ".agentic" / "session" / "reviews"
-        review_file = pending_dir / "F-0101_committed.json"
+        review_file = pending_dir / "F-011_committed.json"
         review_file.write_text(json.dumps({
-            "feature_id": "F-0101",
+            "feature_id": "F-011",
             "from_state": "documented",
             "to_state": "committed",
             "review_setting": "review_code",
@@ -494,12 +494,12 @@ class TestReviewResolution:
         thread = threading.Thread(target=resolve_review)
         thread.start()
 
-        result = scheduler.run(feature_ids=["F-0101"])
+        result = scheduler.run(feature_ids=["F-011"])
         thread.join(timeout=2)
 
         # Feature should have been picked up after resolution
         fw = result.feature_work[0]
-        assert fw.feature_id == "F-0101"
+        assert fw.feature_id == "F-011"
         # Should have been processed (completed or at least attempted)
         assert fw.status in ("completed", "failed", "pending")
 
@@ -522,7 +522,7 @@ class TestResultSerialization:
             features_review_blocked=1,
             feature_work=[
                 FeatureWork(
-                    feature_id="F-0101",
+                    feature_id="F-011",
                     component="api",
                     status="completed",
                     duration_seconds=12.345,
@@ -546,7 +546,7 @@ class TestResultSerialization:
     def test_feature_work_defaults(self):
         from auto.scheduler import FeatureWork
 
-        fw = FeatureWork(feature_id="F-0101")
+        fw = FeatureWork(feature_id="F-011")
         assert fw.status == "pending"
         assert fw.component is None
         assert fw.review_blocked_at == ""
@@ -591,13 +591,13 @@ class TestResultSerialization:
         mock_runner = MagicMock()
         from auto.task import TaskResult
         mock_runner.run.return_value = TaskResult(
-            feature_id="F-0101", success=True,
+            feature_id="F-011", success=True,
             acs_total=1, acs_passed=1,
         )
         mock_runner_cls.return_value = mock_runner
 
         scheduler = AutonomousScheduler(project_root=project_root)
-        fw = FeatureWork(feature_id="F-0101", component="api")
+        fw = FeatureWork(feature_id="F-011", component="api")
         scheduler._run_feature(fw)
 
         # TaskRunner should have been created with the component path
@@ -632,12 +632,12 @@ class TestResultSerialization:
         from auto.scheduler import AutonomousScheduler
         from auto.task import TaskResult
 
-        # Create a pending review for F-0101 that will appear AFTER task failure
+        # Create a pending review for F-011 that will appear AFTER task failure
         pending_dir = project_root / ".agentic" / "session" / "reviews"
 
         mock_runner = MagicMock()
         mock_runner.run.return_value = TaskResult(
-            feature_id="F-0101", success=False,
+            feature_id="F-011", success=False,
             acs_total=1, acs_passed=0,
         )
         mock_runner_cls.return_value = mock_runner
@@ -663,9 +663,9 @@ class TestResultSerialization:
         scheduler._is_review_blocked = mock_is_blocked
 
         with patch.object(scheduler, '_handle_escalation') as mock_escalation:
-            result = scheduler.run(feature_ids=["F-0101"])
+            result = scheduler.run(feature_ids=["F-011"])
             mock_escalation.assert_called_once()
-            assert "F-0101" in mock_escalation.call_args[0]
+            assert "F-011" in mock_escalation.call_args[0]
 
     def test_progress_saved_to_disk(self, project_root):
         """Scheduler should save progress to session state."""
@@ -676,10 +676,10 @@ class TestResultSerialization:
         with patch("auto.scheduler.TaskRunner") as mock_cls:
             from auto.task import TaskResult
             mock_cls.return_value.run.return_value = TaskResult(
-                feature_id="F-0101", success=True,
+                feature_id="F-011", success=True,
                 acs_total=1, acs_passed=1,
             )
-            scheduler.run(feature_ids=["F-0101"])
+            scheduler.run(feature_ids=["F-011"])
 
         state_file = project_root / ".agentic" / "session" / "scheduler-state.json"
         assert state_file.exists()

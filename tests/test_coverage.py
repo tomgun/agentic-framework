@@ -76,7 +76,7 @@ class TestCoverageReverse:
 
         result = run_coverage("--reverse", "src/notes.py", cwd=EXAMPLE_DIR)
         assert result.returncode == 0
-        assert "F-0001" in result.stdout or "F-0002" in result.stdout
+        assert "F-001" in result.stdout or "F-0002" in result.stdout
 
     def test_reverse_json_output(self):
         """Reverse lookup with --json should return valid JSON."""
@@ -105,9 +105,9 @@ class TestCoverageTestMapping:
         # Should have test_mapping in output
         assert "test_mapping" in data
 
-        # F-0001 should be detected via explicit naming
-        if "F-0001" in data["test_mapping"]:
-            tests = data["test_mapping"]["F-0001"]
+        # F-001 should be detected via explicit naming
+        if "F-001" in data["test_mapping"]:
+            tests = data["test_mapping"]["F-001"]
             explicit_tests = [t for t in tests if t.get("method") == "explicit_naming"]
             assert len(explicit_tests) > 0, "Should find test_F0001_*.py"
 

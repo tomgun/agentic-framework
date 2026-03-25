@@ -26,7 +26,7 @@ from paths import get_paths
 
 from ids import FEATURE_ID_RE, FEATURE_HEADER_RE
 FEATURE_ANNOTATION_RE = re.compile(r"@feature\s+" + FEATURE_ID_RE.pattern)
-# Test file naming pattern: test_F0003_*.py or test_F-0003_*.py
+# Test file naming pattern: test_F0003_*.py or test_F-002_*.py
 TEST_FEATURE_RE = re.compile(r"test[_-]?F[-_]?(\d{3,})", re.IGNORECASE)
 # AC ID pattern in acceptance files: **AC-001**: description
 AC_ID_RE = re.compile(r"\*\*AC-(\d{3,4})\*\*:?\s*(.*)")
@@ -126,7 +126,7 @@ def scan_test_feature_mapping(root: Path, annotations: dict[str, list[str]]) -> 
     """Infer test→feature mapping using conventions.
 
     Methods (in priority order):
-    1. Explicit naming: test_F0003_*.py → F-0003
+    1. Explicit naming: test_F0003_*.py → F-002
     2. Import tracing: test imports file that has @feature annotation
     3. Name heuristics: feature mentions "login", test file mentions "login" (low confidence)
 

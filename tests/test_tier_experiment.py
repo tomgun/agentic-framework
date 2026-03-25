@@ -1,4 +1,4 @@
-"""Tests for tier_experiment.py (DEV-0243) — Complexity Tier Experiments."""
+"""Tests for tier_experiment.py (DEV-004) — Complexity Tier Experiments."""
 from __future__ import annotations
 
 import io
@@ -173,7 +173,7 @@ class TestCollectMetrics:
         # Snapshot before the "agent" creates anything
         pre_specs = snapshot_spec_files(p)
         # Simulate agent creating a spec file
-        (ac_dir / "F-0001.md").write_text("# AC")
+        (ac_dir / "F-001.md").write_text("# AC")
         m = collect_metrics(
             project_root=p,
             run_start_time=time.time() - 1,
@@ -206,7 +206,7 @@ class TestCollectMetrics:
         p = self._make_project(tmp_path)
         contracts_dir = p / ".agentic" / "spec" / "contracts"
         contracts_dir.mkdir(parents=True)
-        (contracts_dir / "F-0001.yaml").write_text("id: F-0001")
+        (contracts_dir / "F-001.yaml").write_text("id: F-001")
         # Snapshot AFTER inherited files exist (simulates setup_project)
         pre_specs = snapshot_spec_files(p)
         m = collect_metrics(
@@ -225,8 +225,8 @@ class TestCollectMetrics:
         p = self._make_project(tmp_path)
         contracts_dir = p / ".agentic" / "spec" / "contracts"
         contracts_dir.mkdir(parents=True)
-        (contracts_dir / "F-0001.yaml").write_text("id: F-0001")
-        # Snapshot with F-0001 already there
+        (contracts_dir / "F-001.yaml").write_text("id: F-001")
+        # Snapshot with F-001 already there
         pre_specs = snapshot_spec_files(p)
         # Simulate agent creating a new contract
         (contracts_dir / "F-0002.yaml").write_text("id: F-0002")
@@ -246,7 +246,7 @@ class TestCollectMetrics:
         p = self._make_project(tmp_path)
         plans_dir = p / ".agentic" / "journal" / "plans"
         plans_dir.mkdir(parents=True)
-        plan_file = plans_dir / "2026-01-01-F-0001-plan.md"
+        plan_file = plans_dir / "2026-01-01-F-001-plan.md"
         plan_file.write_text("**Status**: APPROVED\n\n# Plan\nSome content")
         m = collect_metrics(
             project_root=p,
@@ -264,7 +264,7 @@ class TestCollectMetrics:
         p = self._make_project(tmp_path)
         plans_dir = p / ".agentic" / "journal" / "plans"
         plans_dir.mkdir(parents=True)
-        (plans_dir / "2026-01-01-F-0001-plan.md").write_text("**Status**: DRAFT")
+        (plans_dir / "2026-01-01-F-001-plan.md").write_text("**Status**: DRAFT")
         m = collect_metrics(
             project_root=p,
             run_start_time=time.time() - 1,
@@ -311,9 +311,9 @@ class TestCollectMetrics:
         p = self._make_project(tmp_path)
         features_md = p / ".agentic" / "spec" / "FEATURES.md"
         features_md.write_text(
-            "## F-0001\n**Status**: shipped\n\n"
+            "## F-001\n**Status**: shipped\n\n"
             "## F-0002\n**Status**: shipped\n\n"
-            "## F-0003\n**Status**: planned\n\n"
+            "## F-002\n**Status**: planned\n\n"
         )
         m = collect_metrics(
             project_root=p,
@@ -331,7 +331,7 @@ class TestCollectMetrics:
         log = p / ".agentic" / "session" / "framework.log"
         log.write_text(
             "2026-01-01T00:00:01Z|ag.sh|kickoff|todo-app|start\n"
-            "2026-01-01T00:00:02Z|ag.sh|implement|F-0001|start\n"
+            "2026-01-01T00:00:02Z|ag.sh|implement|F-001|start\n"
             "2026-01-01T00:00:03Z|pre-commit|check|6|pass\n"
             "malformed line without pipes\n"
             "a|b\n"  # only 2 fields — not counted

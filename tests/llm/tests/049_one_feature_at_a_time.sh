@@ -12,7 +12,7 @@ mkdir -p "$TEST_PROJECT/.agentic-state"
 cat > "$TEST_PROJECT/.agentic/session/WIP.md" << 'EOF'
 # Work In Progress
 
-- **Feature**: F-0001: User Authentication
+- **Feature**: F-001: User Authentication
 - **Started**: 2026-02-08
 - **Phase**: Implementation
 - **Branch**: feat/auth
@@ -23,7 +23,7 @@ mkdir -p "$TEST_PROJECT/spec"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # FEATURES.md
 
-## F-0001: User Authentication
+## F-001: User Authentication
 - Status: in_progress
 
 ## F-0002: Product Catalog
@@ -40,7 +40,7 @@ send_prompt "Let's implement F-0002 Product Catalog"
 FAILURES=0
 
 # Agent should warn about the active WIP / in-progress feature
-check_output_contains "F-0001\|WIP\|in.progress\|already.*working\|current.*feature\|complete.*first\|one.*feature\|active.*work" \
+check_output_contains "F-001\|WIP\|in.progress\|already.*working\|current.*feature\|complete.*first\|one.*feature\|active.*work" \
     "Agent warns about active WIP or in-progress feature" || ((FAILURES++))
 
 # Agent should NOT just proceed with F-0002 implementation

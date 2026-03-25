@@ -388,7 +388,7 @@ if c.has_pending_input:
     # Clear intent — all steps complete
     intent_clear "$feature_id" || true
 
-    # 8b. Phase tracking (F-0303): fallback extraction, auto-sync, progress display
+    # 8b. Phase tracking (F-032): fallback extraction, auto-sync, progress display
     if command -v python3 >/dev/null 2>&1; then
         local tasks_yaml="$ROOT_DIR/.agentic/work/${feature_id}/tasks.yaml"
         local _impl_plan

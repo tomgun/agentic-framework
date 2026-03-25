@@ -177,7 +177,7 @@ The framework uses a **distributed enforcement model** — this is a conscious d
 - `pre-commit-check.sh` — runs 21 structural checks
 - `ag done` — runs `doctor.sh --phase complete` (but `|| true` in `cmd_done()` currently suppresses failures — see Gap 4)
 - `context-for-role.sh` — assembles role-specific context for subagents
-- `ag auto verify/task/crunch` — autonomous engine with Unix socket control, per-AC Claude instances, three-tier trust model (F-0160–F-0163)
+- `ag auto verify/task/crunch` — autonomous engine with Unix socket control, per-AC Claude instances, three-tier trust model (F-030–F-0163)
 
 ### Context Window Decay in Autonomous Sessions
 

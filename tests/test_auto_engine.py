@@ -418,14 +418,14 @@ class TestACHandling:
 
     def test_large_ac_routed_to_decomposition(self, project_dir):
         """ACs estimated LARGE go through _implement_large_ac path."""
-        ac_file = project_dir / ".agentic" / "spec" / "acceptance" / "F-0077.md"
+        ac_file = project_dir / ".agentic" / "spec" / "acceptance" / "F-027.md"
         ac_file.write_text(
             "## Acceptance Criteria\n"
             "- [ ] AC-001: Implement full authentication system with database schema and JWT\n"
         )
         engine = AutoEngine(project_dir)
         # Verify estimation
-        criteria = engine._load_acceptance_criteria("F-0077")
+        criteria = engine._load_acceptance_criteria("F-027")
         assert len(criteria) == 1
         complexity = engine._estimate_complexity(criteria[0][0], criteria[0][1])
         assert complexity == "LARGE"

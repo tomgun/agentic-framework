@@ -10,8 +10,8 @@ Usage:
     python query_features.py --layer=presentation --priority=critical
     python query_features.py --owner=alice@example.com
     python query_features.py --count  # Show counts by category
-    python query_features.py --children=F-0001  # List direct children
-    python query_features.py --children=F-0001 --recursive  # All descendants
+    python query_features.py --children=F-001  # List direct children
+    python query_features.py --children=F-001 --recursive  # All descendants
 """
 
 import re
@@ -172,7 +172,7 @@ def get_children(features: List[Dict], parent_id: str, recursive: bool = False,
 
     Args:
         features: List of all features
-        parent_id: The parent feature ID (e.g., "F-0001")
+        parent_id: The parent feature ID (e.g., "F-001")
         recursive: If True, get all descendants; if False, only direct children
         status_filter: Optional status to filter by
 
@@ -367,9 +367,9 @@ Examples:
   %(prog)s --owner=alice@example.com
   %(prog)s --count  # Show counts by category
   %(prog)s --tags=auth --count
-  %(prog)s --children=F-0001  # List direct children of F-0001
-  %(prog)s --children=F-0001 --recursive  # All descendants with tree format
-  %(prog)s --children=F-0001 --status=shipped  # Only shipped children
+  %(prog)s --children=F-001  # List direct children of F-001
+  %(prog)s --children=F-001 --recursive  # All descendants with tree format
+  %(prog)s --children=F-001 --status=shipped  # Only shipped children
 """
     )
 
@@ -384,7 +384,7 @@ Examples:
     parser.add_argument("--category", help="Filter by category (e.g., Core, Quality, Tooling)")
     parser.add_argument("--component", help="Filter by component name (from STACK.md ## Components)")
     parser.add_argument("--source", help="Filter by source design document path")
-    parser.add_argument("--children", metavar="F-ID", help="List children of a feature (e.g., --children=F-0001)")
+    parser.add_argument("--children", metavar="F-ID", help="List children of a feature (e.g., --children=F-001)")
     parser.add_argument("--recursive", action="store_true", help="With --children: show all descendants in tree format")
     parser.add_argument("--count", action="store_true", help="Show counts by category instead of listing features")
     parser.add_argument("--simple", action="store_true", help="Simple output (no details)")
@@ -424,7 +424,7 @@ Examples:
         # Validate feature ID format
         if not is_valid_feature_id(args.children):
             print(f"Error: Invalid feature ID format: {args.children}", file=sys.stderr)
-            print("Expected format: F-XXXX (e.g., F-0001)", file=sys.stderr)
+            print("Expected format: F-XXXX (e.g., F-001)", file=sys.stderr)
             sys.exit(1)
 
         # Check if parent exists

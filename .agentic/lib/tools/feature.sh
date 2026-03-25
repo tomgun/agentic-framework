@@ -2,12 +2,12 @@
 # feature.sh - Update feature fields in .agentic/spec/FEATURES.md (token-efficient)
 #
 # Usage:
-#   bash .agentic/tools/feature.sh F-0003 status in_progress
-#   bash .agentic/tools/feature.sh F-0003 status shipped
-#   bash .agentic/tools/feature.sh F-0003 impl-state partial
-#   bash .agentic/tools/feature.sh F-0003 impl-state complete
-#   bash .agentic/tools/feature.sh F-0003 tests complete
-#   bash .agentic/tools/feature.sh F-0003 accepted yes
+#   bash .agentic/tools/feature.sh F-002 status in_progress
+#   bash .agentic/tools/feature.sh F-002 status shipped
+#   bash .agentic/tools/feature.sh F-002 impl-state partial
+#   bash .agentic/tools/feature.sh F-002 impl-state complete
+#   bash .agentic/tools/feature.sh F-002 tests complete
+#   bash .agentic/tools/feature.sh F-002 accepted yes
 #
 # Token efficiency: Updates single field for single feature (no full file read)
 #
@@ -41,14 +41,14 @@ Fields:
   source       - path to design document (ADR, roadmap, epic plan)
 
 Examples:
-  bash feature.sh F-0003 add "My Feature" infrastructure
-  bash feature.sh F-0003 status in_progress
-  bash feature.sh F-0003 status shipped
-  bash feature.sh F-0003 impl-state complete
-  bash feature.sh F-0003 tests complete
-  bash feature.sh F-0003 accepted yes
-  bash feature.sh F-0003 parent F-0001
-  bash feature.sh F-0003 source spec/adr/ADR-001.md
+  bash feature.sh F-002 add "My Feature" infrastructure
+  bash feature.sh F-002 status in_progress
+  bash feature.sh F-002 status shipped
+  bash feature.sh F-002 impl-state complete
+  bash feature.sh F-002 tests complete
+  bash feature.sh F-002 accepted yes
+  bash feature.sh F-002 parent F-001
+  bash feature.sh F-002 source spec/adr/ADR-001.md
 USAGE
   exit 1
 fi
@@ -150,7 +150,7 @@ TEMP_FILE=$(mktemp)
 
 # Process the file based on format
 if [[ "${FORMAT}" == "table" ]]; then
-  # Table format: | F-0003 | Name | Status | Impl | Tests | Accepted |
+  # Table format: | F-002 | Name | Status | Impl | Tests | Accepted |
   # Column mapping: 1=ID, 2=Name, 3=Status, 4=Impl, 5=Tests, 6=Accepted
   case "${FIELD}" in
     status)     COL=3 ;;
@@ -181,7 +181,7 @@ if [[ "${FORMAT}" == "table" ]]; then
   { print }
   ' "${FEATURES_FILE}" > "${TEMP_FILE}"
 else
-  # Heading format: ## F-0003: Name with - Status: lines
+  # Heading format: ## F-002: Name with - Status: lines
   awk -v fid="${FEATURE_ID}" -v field="${FIELD}" -v value="${VALUE}" -v ts="${TIMESTAMP}" '
   BEGIN { SOURCE_DONE = 0 }
   /^##[#]? F-[0-9][0-9][0-9][0-9]+:/ {

@@ -1,6 +1,6 @@
-"""Tests for F-0303: Multi-Session Plan Phase Tracking.
+"""Tests for F-032: Multi-Session Plan Phase Tracking.
 
-@feature F-0303
+@feature F-032
 """
 import sys
 import textwrap
@@ -29,7 +29,7 @@ from auto.phases import (
 # ---------------------------------------------------------------------------
 
 PLAN_WITH_PHASES = textwrap.dedent("""\
-    # F-0302: Spec System Overhaul
+    # F-031: Spec System Overhaul
 
     **Status**: APPROVED
 
@@ -65,7 +65,7 @@ PLAN_WITHOUT_PHASES = textwrap.dedent("""\
 """)
 
 PLAN_WITH_SUBPHASES = textwrap.dedent("""\
-    # F-0169: QA Suite
+    # F-013: QA Suite
 
     ## Phase 3A: Spec Verification Tool (F-XXXX)
 
@@ -77,7 +77,7 @@ PLAN_WITH_SUBPHASES = textwrap.dedent("""\
 """)
 
 PLAN_WITH_STATUS_MARKERS = textwrap.dedent("""\
-    # F-0302: Test
+    # F-031: Test
 
     ## Phase 0: Done Phase ✅ COMPLETE
 

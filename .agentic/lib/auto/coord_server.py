@@ -1,5 +1,5 @@
 """
-coord_server.py -- HTTP JSON-RPC Coordination Server (F-0185).
+coord_server.py -- HTTP JSON-RPC Coordination Server (F-018).
 
 Provides network-accessible coordination for parallel agents, remote review,
 and mobile status monitoring. Delegates all mutations to file-based tools.
@@ -370,7 +370,7 @@ def cmd_status(project_root: Path) -> int:
 # ---------------------------------------------------------------------------
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Coordination Server (F-0185)")
+        description="Coordination Server (F-018)")
     parser.add_argument("command", choices=["start", "stop", "status"],
                         help="Server command")
     parser.add_argument("--project-root", type=Path, default=None,

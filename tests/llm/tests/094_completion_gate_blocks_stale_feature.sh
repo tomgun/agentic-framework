@@ -17,7 +17,7 @@ cat > "$TEST_PROJECT/STACK.md" << 'EOF'
 - git_workflow: pull_request
 EOF
 
-# Create two features: F-0100 is "planned" but has commits, F-0101 is next
+# Create two features: F-0100 is "planned" but has commits, F-011 is next
 mkdir -p "$TEST_PROJECT/.agentic/spec/contracts" "$TEST_PROJECT/.agentic/spec/acceptance"
 cat > "$TEST_PROJECT/.agentic/spec/FEATURES.md" << 'EOF'
 # Features
@@ -28,18 +28,18 @@ cat > "$TEST_PROJECT/.agentic/spec/FEATURES.md" << 'EOF'
 
 ---
 
-## F-0101: User Dashboard
+## F-011: User Dashboard
 
 **Status**: planned
 
 ---
 EOF
 
-# Create backlog with F-0100 at position 0, F-0101 at position 1
+# Create backlog with F-0100 at position 0, F-011 at position 1
 cat > "$TEST_PROJECT/.agentic/BACKLOG.json" << 'EOF'
 [
   {"type": "feature", "id": "F-0100", "description": "Auth Middleware"},
-  {"type": "feature", "id": "F-0101", "description": "User Dashboard"}
+  {"type": "feature", "id": "F-011", "description": "User Dashboard"}
 ]
 EOF
 
@@ -47,8 +47,8 @@ EOF
 git -C "$TEST_PROJECT" add -A
 git -C "$TEST_PROJECT" commit -m "feat: auth middleware implementation (F-0100)" --quiet
 
-# Ask agent to implement F-0101 — should recognize the stale F-0100 blocks it
-send_prompt "I want to implement F-0101 (User Dashboard). F-0100 has merged code on main but is still marked planned. What should I do?"
+# Ask agent to implement F-011 — should recognize the stale F-0100 blocks it
+send_prompt "I want to implement F-011 (User Dashboard). F-0100 has merged code on main but is still marked planned. What should I do?"
 
 # Verify agent behavior
 FAILURES=0

@@ -87,13 +87,13 @@ After review, run `ag approve-onboarding` to strip markers from confirmed files.
      <!-- format: features-v2.0.0 -->
      <!-- REQUIRED: heading format. Tables break backlog, state machine, and crunch parsing. -->
 
-     ## F-0001: Feature Name
+     ## F-001: Feature Name
      **Status**: planned
      **Category**: domain-name
      **Priority**: medium
      **Complexity**: medium
      **Description**: ...
-     **Acceptance**: See `spec/acceptance/F-0001.md`
+     **Acceptance**: See `spec/acceptance/F-001.md`
      ```
      Or use `bash .agentic/lib/tools/feature.sh F-XXXX add "Feature Name" domain` to add programmatically.
    - Write .agentic/spec/acceptance/F-####.md files with criteria
@@ -915,7 +915,7 @@ Type a/b/c/d:"
 
 ### For Formal profile additionally:
 - **`spec/TECH_SPEC.md`**: How we're building it, architecture, data models
-- **`.agentic/spec/FEATURES.md`**: Seed with 2-3 initial features (F-0001, F-0002, etc.)
+- **`.agentic/spec/FEATURES.md`**: Seed with 2-3 initial features (F-001, F-0002, etc.)
 
 ## Step 4: Set up quality validation
 

@@ -103,7 +103,7 @@ echo "class Baz:" > src_c.py
 mkdir -p lib
 echo "def helper():" > lib/helper.py
 git add -A
-git commit -q -m "feat: add user auth (F-0001)"
+git commit -q -m "feat: add user auth (F-001)"
 output=$(bash .agentic/lib/tools/sync.sh --quiet 2>&1)
 if echo "$output" | grep -q "unregistered"; then
     fail "F-#### commit was incorrectly flagged"
