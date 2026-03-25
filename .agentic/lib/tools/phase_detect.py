@@ -45,7 +45,7 @@ def detect_phase(root: Path) -> str:
         except Exception:
             pass
 
-    # Check WIP.md for active feature (format: **Feature**: F-0001: description)
+    # Check WIP.md for active feature (format: **Feature**: F-001: description)
     wip = p.wip_file
     if not wip.exists():
         return "start"
@@ -55,10 +55,10 @@ def detect_phase(root: Path) -> str:
     except Exception:
         return "start"
 
-    # Match WIP.md format: **Feature**: F-0001
+    # Match WIP.md format: **Feature**: F-001
     feature_match = re.search(r"\*\*Feature\*\*:\s*" + FEATURE_ID_RE.pattern, wip_content)
     if not feature_match:
-        # Also try simpler format: Feature: F-0001
+        # Also try simpler format: Feature: F-001
         feature_match = re.search(r"Feature:\s*" + FEATURE_ID_RE.pattern, wip_content)
 
     if not feature_match:

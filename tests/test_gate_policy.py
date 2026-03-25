@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests for the hooks-first policy engine (gate.py) — F-0244, F-0245, F-0246.
+Tests for the hooks-first policy engine (gate.py) — F-0244, F-023, F-0246.
 
 Covers:
 - Active feature resolution (AGENTS.json, STATUS.md, BACKLOG.json)
@@ -153,12 +153,12 @@ class TestResolveActiveFeature:
 
     def test_from_backlog(self, project_dir):
         """Resolves feature from BACKLOG.json position 0."""
-        backlog = [{"id": "F-0077", "name": "Next feature"}]
+        backlog = [{"id": "F-027", "name": "Next feature"}]
         (project_dir / ".agentic" / "BACKLOG.json").write_text(
             json.dumps(backlog)
         )
         result = resolve_active_feature(project_dir)
-        assert result == "F-0077"
+        assert result == "F-027"
 
     def test_agents_json_takes_priority(self, project_dir):
         """AGENTS.json is checked before STATUS.md."""
@@ -175,7 +175,7 @@ class TestResolveActiveFeature:
 
 
 # ---------------------------------------------------------------------------
-# Individual gate checks — F-0245
+# Individual gate checks — F-023
 # ---------------------------------------------------------------------------
 
 class TestCheckFeatureHasSpec:
@@ -220,7 +220,7 @@ class TestCheckFeatureHasTests:
 
 
 # ---------------------------------------------------------------------------
-# Stop gate — F-0245
+# Stop gate — F-023
 # ---------------------------------------------------------------------------
 
 class TestGateStop:
@@ -379,7 +379,7 @@ class TestGatePreToolUse:
 
 
 # ---------------------------------------------------------------------------
-# Verify gate — F-0245
+# Verify gate — F-023
 # ---------------------------------------------------------------------------
 
 class TestGateVerify:
@@ -434,7 +434,7 @@ class TestGateResult:
 
 
 # ---------------------------------------------------------------------------
-# CLI smoke test — F-0245
+# CLI smoke test — F-023
 # ---------------------------------------------------------------------------
 
 class TestCLI:
@@ -498,7 +498,7 @@ class TestFormalSpecLifecycleEnforcement:
         )
         (project_dir / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
 
-## F-0001: Feature One
+## F-001: Feature One
 
 **Status**: planned
 **Category**: Test
@@ -518,7 +518,7 @@ class TestFormalSpecLifecycleEnforcement:
         )
         (project_dir / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
 
-## F-0001: Feature One
+## F-001: Feature One
 
 **Status**: implementing
 **Category**: Test
@@ -528,9 +528,9 @@ class TestFormalSpecLifecycleEnforcement:
 **Status**: planned
 **Category**: Test
 """)
-        # Contract for F-0001
-        (project_dir / ".agentic" / "spec" / "contracts" / "F-0001.yaml").write_text(
-            "id: F-0001\nname: Feature One\nlifecycle: implementing\ndescription: Test feature.\nassertions:\n  - id: AC-1\n    text: Works\n    type: behavioral\n"
+        # Contract for F-001
+        (project_dir / ".agentic" / "spec" / "contracts" / "F-001.yaml").write_text(
+            "id: F-001\nname: Feature One\nlifecycle: implementing\ndescription: Test feature.\nassertions:\n  - id: AC-1\n    text: Works\n    type: behavioral\n"
         )
         return project_dir
 
@@ -554,7 +554,7 @@ class TestFormalSpecLifecycleEnforcement:
     def test_allows_source_edit_when_one_implementing(self, formal_one_implementing):
         """Formal + one implementing → allow source code edits."""
         result = gate_pretool(
-            "F-0001", formal_one_implementing, "Write",
+            "F-001", formal_one_implementing, "Write",
             json.dumps({"file_path": "/project/src/main.ts"})
         )
         assert result.decision == "allow"
@@ -586,7 +586,7 @@ class TestFormalSpecLifecycleEnforcement:
         """Discovery profile is NOT affected — no enforcement."""
         (project_dir / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
 
-## F-0001: Feature One
+## F-001: Feature One
 
 **Status**: planned
 """)
@@ -603,7 +603,7 @@ class TestFormalSpecLifecycleEnforcement:
         )
         (project_dir / ".agentic" / "spec" / "FEATURES.md").write_text("""# Features
 
-## F-0001: Feature One
+## F-001: Feature One
 
 **Status**: planned
 """)

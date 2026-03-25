@@ -3,17 +3,17 @@
 <!-- author: Tomas Günther -->
 <!-- type: feature -->
 
-# Migration 022: Reopen F-0184 for Phase 1b
+# Migration 022: Reopen F-005 for Phase 1b
 
 ## Context & Why
 
-F-0184 was marked shipped after Phase 1a (schema + core code). Phase 1b (epic.py + commands) is the next planned PR per the approved plan. Reopening to implementing to continue the work.
+F-005 was marked shipped after Phase 1a (schema + core code). Phase 1b (epic.py + commands) is the next planned PR per the approved plan. Reopening to implementing to continue the work.
 
 ## Changes
 
 ### Features Modified
 
-- F-0184: Reopened from shipped → implementing for Phase 1b
+- F-005: Reopened from shipped → implementing for Phase 1b
   - Dotted ID allocation in decompose (F-XXX.1, F-XXX.2)
   - extract_subfeature() for AC extraction
   - Depth guards (MAX_DEPTH=2)
@@ -25,7 +25,7 @@ F-0184 was marked shipped after Phase 1a (schema + core code). Phase 1b (epic.py
 
 - **Requires**: Phase 1a (shipped in PR #203)
 - **Blocks**: Phase 2 (renumber)
-- **Related**: F-0004 (Feature Tracking)
+- **Related**: F-003 (Feature Tracking)
 
 ## Acceptance Criteria
 
@@ -38,4 +38,4 @@ F-0184 was marked shipped after Phase 1a (schema + core code). Phase 1b (epic.py
 ## Rollback Plan
 
 1. Revert this commit
-2. Mark F-0184 as shipped in FEATURES.md
+2. Mark F-005 as shipped in FEATURES.md

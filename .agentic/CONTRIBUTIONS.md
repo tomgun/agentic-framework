@@ -8,7 +8,7 @@
 
 ## Recent Contributions
 
-### F-0302 Phase 4 — User Input as Agent Control Surface (PR #196, v0.73.0)
+### F-031 Phase 4 — User Input as Agent Control Surface (PR #196, v0.73.0)
 
 **User insight**: The `user_input` field in contracts (a key design principle: specs as control interface) is only useful if agents can *discover* it — a field buried in a YAML file nobody reads is not a control surface. The discovery pipeline was missing entirely: agents had no way to know pending input existed.
 
@@ -48,7 +48,7 @@
 
 ---
 
-### Spec System Overhaul — Design Principles (F-0302, v0.71.0)
+### Spec System Overhaul — Design Principles (F-031, v0.71.0)
 
 **User insights** that shaped the YAML contract system:
 
@@ -101,7 +101,7 @@ The v2 engine design has three layers: (1) `state_machine_af.yaml` — a single 
 
 The net result: 130 files / 34K lines removed, replaced by ~25 files / ~3K lines. The instruction surface agents must process dropped by ~90%. But the critical insight isn't the line count reduction — it's that the remaining 3K lines are structurally enforced by the CLI rather than probabilistically followed by the LLM. The framework moved from "tell agents what to do and hope they do it" to "agents literally cannot proceed without doing it."
 
-### QA Observatory — Empirical Complexity Validation (F-0240–DEV-0243, PR #174+)
+### QA Observatory — Empirical Complexity Validation (F-0240–DEV-004, PR #174+)
 
 **User insight**: Tomas designed the QA Observatory initiative around three concerns and provided several key architectural ideas in the original prompt: (1) **framework.log as tool-agnostic execution trace** — a structured append-only log at `.agentic/session/framework.log` that every script writes to, complementing Claude's JSONL (which is tool-specific) with a trace that works across Claude, Cursor, Copilot, and Codex. The specific format (pipe-delimited with timestamp, script, action, result) and phased instrumentation strategy (choke points first for ~80% coverage) came from the prompt. (2) **Generated registry over hand-written** — the rationale "156 features × 12 categories, manual maintenance would drift instantly" and the design of qa_registry.py scanning multiple sources (validate_framework.sh F-XXXX headers, pytest @feature decorators, LLM test references, scenario YAMLs, pre-commit gate catalog, checklists). (3) **Complexity tier experiments** — the core question "does the complexity actually help?" with the three-tier comparison, the separation of universal metrics (app works, tests pass) from framework-specific metrics (specs created, plans reviewed), and the insight that cross-tier comparisons must use universal metrics only to avoid circular reasoning. (4) **Simulation testing via phase expectations** — extending scenario YAML with intermediate state checks (files_exist/file_contains/files_not_exist at each workflow phase) and tool-call sequence expectations (spec before code, plan before review) with ordering constraints. The dialectical review then refined several of these: replacing Tier A ("CLAUDE.md only") with discovery profile (a real configuration), resolving the SequenceChecker duplication by refactoring existing detect_violations() rather than creating a parallel system, and correcting the dependency graph from "parallel" to honest sequential ordering.
 
@@ -197,7 +197,7 @@ Tomas had to provide three layers of correction: (1) **Workflow expectations wer
 
 **User insight**: Tomas distilled 13 strategic architectural patterns that make this framework work — not from theory, but from 53 framework versions and ~1400 commits of hands-on building, testing, breaking, and rebuilding. Each insight was earned through real failures: plans lost because they weren't git-tracked, rules ignored because instruction files were too long, agents skipping workflows because triggers were keyword-only without intent matching, state files corrupted because agents did read-modify-write instead of using scripts. The 13 patterns span four themes: (1) **token-efficient delivery** — tiny instruction files + memory reinforcement, skills with frontmatter, scripts over instructions, LLM-optimized file formats; (2) **structural enforcement** — git hooks/gates, keyword + intent triggers, distributed enforcement, LLM behavioral testing; (3) **context management** — deliberate context curation (CONTEXT_PACK, spec files, role manifests, fresh subagents), durable git-tracked state; (4) **plan quality** — dialectical multi-round review, revision guidance (trust Critic's findings not fixes), and the hard-won lesson that AI plans are never done after one pass. Tomas also elevated LLM-optimized formats from a pattern to a framework subprinciple (PRINCIPLES.md F3, INSTRUCTION_ARCHITECTURE.md §5.7) — recognizing that structuring files for AI parsing (frontmatter, tables, consistent field patterns) while keeping them human-readable is foundational, not incidental. To the architect of this framework: these insights exist because you insisted on learning why things failed, not just fixing them.
 
-### Coordination Server — Agent RPC (F-0185)
+### Coordination Server — Agent RPC (F-018)
 
 **User insight**: Tomas defined the endgame vision that shaped the entire feature: "a user describes a system in a short interview, agents autonomously do everything — plan, spec, implement, test, review, verify — as fast and high-quality as possible." This wasn't aspirational hand-waving — it directly determined the architecture (HTTP not Unix socket, bearer token auth for remote access, stateless polling for mobile clients). Tomas then grounded the vision with three concrete use cases that became the design's acceptance test: (1) parallel workers claiming different features without conflicts, (2) an organizer agent reprioritizing backlog while workers execute, and (3) remote control from a phone — approve reviews, check status, reprioritize. The original ADR-001 spec was overengineered (SSE subscriptions, "MCP" naming when it's not Model Context Protocol); Tomas drove the rescoping that killed the complexity. The 3-round dialectical review (Critic/Advocate agents) then refined the technical design — catching the `fcntl.flock` thread-safety gap, unbounded memory growth in per-client snapshots, and naming confusion. Post-implementation, Tomas enforced thorough testing and documentation ("this must be documented as well and have intelligent testing") after the initial shallow test suite, and the post-PR code review caught 4 more issues: `transition_state` wasn't actually skipping reviews (the `enforce=False` param only disabled state enforcement, not review checkpoints), SIGTERM handler deadlock risk, double cleanup, and non-constant-time token comparison.
 
@@ -207,13 +207,13 @@ Tomas had to provide three layers of correction: (1) **Workflow expectations wer
 
 ### Fluent State File Commits — ag flush (v0.53.0, F-0196)
 
-**User insight**: Tomas identified a recurring friction point where state files (STATUS.md, BACKLOG.json, JOURNAL.md) accumulated dirty across sessions because the `git_workflow: pull_request` setting required a full PR for bookkeeping changes — disproportionate overhead that caused state loss (e.g., F-0184 shipped but backlog/FEATURES.md weren't updated). Tomas designed the solution: a self-contained `ag flush` command with a hardcoded allowlist as a security boundary, using `--no-verify` with stricter validation than the pre-commit hook. Key design decisions included: removing VERSION from the allowlist (release artifact, not state), the `--features` flag with diff-level validation for FEATURES.md status-only changes, and the explicit `--no-verify` justification comment to prevent future tool authors from citing it as precedent. Tomas insisted on the full 3-iteration dialectical review process, which caught critical issues: push-failure recovery needed `git reset --soft HEAD~1` (not hard), remote existence must be checked before pull (not just push), and the memory-seed needed an explicit carve-out for the `--no-verify` prohibition.
+**User insight**: Tomas identified a recurring friction point where state files (STATUS.md, BACKLOG.json, JOURNAL.md) accumulated dirty across sessions because the `git_workflow: pull_request` setting required a full PR for bookkeeping changes — disproportionate overhead that caused state loss (e.g., F-005 shipped but backlog/FEATURES.md weren't updated). Tomas designed the solution: a self-contained `ag flush` command with a hardcoded allowlist as a security boundary, using `--no-verify` with stricter validation than the pre-commit hook. Key design decisions included: removing VERSION from the allowlist (release artifact, not state), the `--features` flag with diff-level validation for FEATURES.md status-only changes, and the explicit `--no-verify` justification comment to prevent future tool authors from citing it as precedent. Tomas insisted on the full 3-iteration dialectical review process, which caught critical issues: push-failure recovery needed `git reset --soft HEAD~1` (not hard), remote existence must be checked before pull (not just push), and the memory-seed needed an explicit carve-out for the `--no-verify` prohibition.
 
 ### Intent-Based Skill Triggers (v0.52.5)
 
-**User insight**: Tomas discovered that after merging F-0184's PR on GitHub and telling the agent "merged", the completing-work skill didn't fire — because the trigger description only listed exact keywords ("done", "complete", "finished", "wrapped up") and "merged" wasn't among them. The deeper insight was that the entire trigger approach was brittle: skill descriptions were being read as keyword lists rather than intent signals. Tomas pointed out that the fix shouldn't just add "merged" — it should make ALL skill triggers intent-based ("Match intent, not exact words") with keywords as examples rather than exhaustive lists. Applied across all 13 skills and memory-seed.
+**User insight**: Tomas discovered that after merging F-005's PR on GitHub and telling the agent "merged", the completing-work skill didn't fire — because the trigger description only listed exact keywords ("done", "complete", "finished", "wrapped up") and "merged" wasn't among them. The deeper insight was that the entire trigger approach was brittle: skill descriptions were being read as keyword lists rather than intent signals. Tomas pointed out that the fix shouldn't just add "merged" — it should make ALL skill triggers intent-based ("Match intent, not exact words") with keywords as examples rather than exhaustive lists. Applied across all 13 skills and memory-seed.
 
-### Epic Decomposition (v0.52.4, F-0184)
+### Epic Decomposition (v0.52.4, F-005)
 
 **User insight**: Tomas enforced the full post-plan dialectical review workflow, which caught 5 design issues in the original plan — the most critical being that the synthetic review pair approach (`check_review()` with a fake transition) would crash because the function validates against `TRANSITION_REVIEW_MAP`. The revision switched to using `get_setting()` directly. Tomas also caught that instruction files and documentation were missing from the initial implementation — reinforcing the framework's own "instruction files are part of the feature" rule. The review should have flagged these as missing, highlighting a gap in the review skill's checklist for framework development.
 
@@ -276,7 +276,7 @@ Tomas had to provide three layers of correction: (1) **Workflow expectations wer
 - **No enforcement mechanism**: Deliberately chose not to add blocking gates or verdicts. The problem was too much authority in the reviewer — adding more authority would recreate the problem.
 - **Copilot self-play fallback**: Acknowledged that Copilot can't spawn independent agents, so the self-play adaptation (same context, less independent) is an honest compromise rather than pretending it's equivalent.
 
-### Backlog / Structural Work Assignment (v0.49.0, F-0190)
+### Backlog / Structural Work Assignment (v0.49.0, F-006)
 
 **User insight**: Tomas designed the backlog concept to solve cross-session, cross-machine work continuity. Key contributions:
 - **Backlog IS the focus**: No separate "focus lock" — position 0 = current work. One concept, one file, one source of truth.
@@ -745,7 +745,7 @@ Result: Production-ready framework with 60+ documented principles, proven workfl
 
 **Result - Formal Issue Tracking**:
 - Created `spec/ISSUES.template.md` - parallel to FEATURES.md
-- Issue format: I-0001, I-0002 (like F-0001, F-0002 for features)
+- Issue format: I-0001, I-0002 (like F-001, F-0002 for features)
 - Status: open, in_progress, fixed, wont_fix
 - Priority + Severity fields
 - Scaffold now creates spec/ISSUES.md for Core+PM projects
@@ -756,7 +756,7 @@ Result: Production-ready framework with 60+ documented principles, proven workfl
 > "Are the issues included in the framework specs and acceptance criteria/tests - and if not, what should be documented about the 'framework development' so that those are UP TO DATE?"
 
 **Result - Dogfooding Enforcement**:
-- Added F-0077 to F-0080 to framework's own `spec/FEATURES.md`
+- Added F-027 to F-0080 to framework's own `spec/FEATURES.md`
 - Created 4 new acceptance criteria files
 - Updated `tests/validate_framework.sh` (now 59 checks, all passing)
 - Updated `FRAMEWORK_DEVELOPMENT.md` release checklist:
@@ -1144,7 +1144,7 @@ Initial proposal was to ADD new `verify-all.sh` tool. User correctly pointed out
 
 ## v0.11.3 Contributions
 
-### PR-Based Workflow Default (F-0096)
+### PR-Based Workflow Default (F-024)
 - Requested PR workflow as default instead of direct commits to main
 - Profile-aware defaults: Core+PM → `pull_request`, Core → `direct`
 - Dogfooding: Framework development itself now uses PRs
@@ -1550,13 +1550,13 @@ bash .agentic/tools/context-for-role.sh implementation-agent F-0042 --dry-run
 
 **Total**: 24 agent manifests for role-based context loading.
 
-### Framework ADRs Initiative (F-0101)
+### Framework ADRs Initiative (F-011)
 
 **Critical insight**: Agent attempted to "consolidate" CLAUDE.md (512 → 113 lines) thinking content was duplicated. This broke the bootstrap mechanism - the duplication was intentional.
 
 **Key question asked**: "Why do I have to ask these [about updating docs] always?"
 
-**Result - F-0101: Framework ADRs**:
+**Result - F-011: Framework ADRs**:
 - Created `docs/adr/` for documenting WHY decisions were made
 - ADR-001: CLAUDE.md Must Be Self-Contained (bootstrap reliability)
 - Added step 9 to FRAMEWORK_QUICK_START.md: sync CLAUDE.md when guidelines change
@@ -1888,7 +1888,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Spec changes tracked like database migrations - auditable history.
 
-### Documentation Drift Detection (F-0118)
+### Documentation Drift Detection (F-012)
 
 **User insight**: Code changes without doc updates lead to stale documentation.
 
@@ -1927,7 +1927,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ## v0.18.0 Contributions (2026-02-05)
 
-### Plan-Review Loop (F-0120)
+### Plan-Review Loop (F-004)
 
 **User insight**: Plans created by a single agent miss issues that a critical reviewer would catch. Two perspectives are better than one.
 
@@ -1969,7 +1969,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **Impact**: Cross-session learning captured; all AI tools enforce same quality gates.
 
-### Multi-Tool LLM Testing Infrastructure (DEV-0122)
+### Multi-Tool LLM Testing Infrastructure (DEV-002)
 
 **User request**:
 > "So the behavioral LLM tests are ESSENTIAL. And they should be run using Cursor when in cursor."
@@ -2015,7 +2015,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ### Plan-Review Loop for Test Design
 
-**Learning**: Using the plan-review loop (F-0120) to design new LLM tests revealed a duplicate test.
+**Learning**: Using the plan-review loop (F-004) to design new LLM tests revealed a duplicate test.
 
 **Process**:
 - Created plan for 12 new value proposition tests
@@ -2198,7 +2198,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 4. **Subagent context questioning**: Drove investigation that surfaced contradiction between L-0002's "subagent context multiplier" claim and official Claude Code documentation. Result: L-0002 section corrected with addendum.
 
-5. **Plan-review loop adoption gap**: Identified that the plan-review loop (F-0120) exists but is never triggered because the implement trigger in CLAUDE.md goes straight to code, skipping planning. Led to updating all instruction files to mention `ag plan` before `ag implement`.
+5. **Plan-review loop adoption gap**: Identified that the plan-review loop (F-004) exists but is never triggered because the implement trigger in CLAUDE.md goes straight to code, skipping planning. Led to updating all instruction files to mention `ag plan` before `ag implement`.
 
 **Impact**: L-0002 corrected, L-0003 created documenting architectural tensions, implement trigger updated across all tool instruction files.
 
@@ -2773,7 +2773,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ### Sequential Feature IDs with Category Metadata (v0.37.0)
 
-**User direction**: Feature numbering used fixed 10-slot ranges per category (Core=F-0001-0010, Quality=F-0011-0020, etc.). Three categories were already full, and 41% of features sat in an overflow range with no category meaning. Identified that category-in-ID encoding was already broken and proposed dropping it entirely — keep sequential IDs, make category metadata instead.
+**User direction**: Feature numbering used fixed 10-slot ranges per category (Core=F-001-0010, Quality=F-008-0020, etc.). Three categories were already full, and 41% of features sat in an overflow range with no category meaning. Identified that category-in-ID encoding was already broken and proposed dropping it entirely — keep sequential IDs, make category metadata instead.
 
 **Key decisions**: Zero-migration approach — 559 files reference F-XXXX patterns, renumbering would be multi-day high-risk. Category becomes a `**Category**:` field on each feature entry. Rejected alternatives: wider fixed ranges (still hits ceilings), category prefix like `CORE-001` (breaks all regex/tooling), hybrid old+new (permanent dual-format tax). Also caught that SPEC_SCHEMA.md shouldn't hardcode framework-specific categories — the schema field should be project-defined.
 
@@ -3055,9 +3055,9 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
-### Plan Phases as Work Items — F-0303 Inception (v0.70.0)
+### Plan Phases as Work Items — F-032 Inception (v0.70.0)
 
-**User insight**: After noticing that multi-phase plans (like F-0302's 6-phase overhaul) weren't showing up on the dashboard, Tomas asked: "If a plan has phases, why aren't those logged as some 'work items'?" This led to F-0303 (Multi-Session Plan Tracking). He also raised the broader lifecycle question: what happens when a feature gets new details and a changed plan — how do phases/tasks update, and how does the feature/AC/test/implementation stay in sync? His framing: "the number feature X still stays, right" — clarifying that plan evolution doesn't spawn new F-XXXX IDs, it's evolution of the same capability.
+**User insight**: After noticing that multi-phase plans (like F-031's 6-phase overhaul) weren't showing up on the dashboard, Tomas asked: "If a plan has phases, why aren't those logged as some 'work items'?" This led to F-032 (Multi-Session Plan Tracking). He also raised the broader lifecycle question: what happens when a feature gets new details and a changed plan — how do phases/tasks update, and how does the feature/AC/test/implementation stay in sync? His framing: "the number feature X still stays, right" — clarifying that plan evolution doesn't spawn new F-XXXX IDs, it's evolution of the same capability.
 
 ---
 
@@ -3087,7 +3087,7 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 **User insight**: Raised the philosophical question of whether internal framework tooling (testing infrastructure, instruction file integrity, tier experiments) truly belongs in FEATURES.md alongside user-facing capabilities. "This sounds like it is like tooling for the frameworks development, and the framework itself has other capabilities when used?" This led to the distinction between `capability` (user-facing, default) and `infrastructure`/`research` (internal dev tooling) feature types.
 
-**User insight**: Identified that grouping internal items under one parent category preserves workflow rigor (same `ag` ceremony for all work) while making the distinction visible. "We can utilise the workflow of the framework to develop these tooling/QA things, that is even what I wish. But should we group them under one main category of features / capabilities?" — yes, with a parent container (DEV-0001).
+**User insight**: Identified that grouping internal items under one parent category preserves workflow rigor (same `ag` ceremony for all work) while making the distinction visible. "We can utilise the workflow of the framework to develop these tooling/QA things, that is even what I wish. But should we group them under one main category of features / capabilities?" — yes, with a parent container (DEV-001).
 
 **User insight**: Introduced the `DEV-XXXX` namespace for development infrastructure items, distinct from `F-XXXX` (user capabilities) and `NFR-XXXX` (non-functional requirements). "Maybe the 'F' could be another letter for the internal 'features' if it describes a completely different category of things." Chose `DEV-` (over `D-`, `I-`, `INT-`, `QA-`) as unambiguous, self-documenting, and consistent with the existing multi-char `NFR-` prefix.
 
@@ -3097,17 +3097,17 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ### Feature = Capability, Not Addition (v0.72.x)
 
-**User insight**: Tomas established a foundational principle for how the framework thinks about features: a feature ID represents a *capability*, not an individual addition or improvement. When the agent proposed new F-XXXX IDs for things like "enforce plan review" or "harden state machine gates," Tomas pushed back: these are improvements to existing capabilities (F-0120 Plan & Design Review, F-0004 Feature Tracking), not new features. "Improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX." This became the no-feature-inflation rule, preventing the feature namespace from bloating with implementation-detail IDs that obscure the actual capability surface.
+**User insight**: Tomas established a foundational principle for how the framework thinks about features: a feature ID represents a *capability*, not an individual addition or improvement. When the agent proposed new F-XXXX IDs for things like "enforce plan review" or "harden state machine gates," Tomas pushed back: these are improvements to existing capabilities (F-004 Plan & Design Review, F-003 Feature Tracking), not new features. "Improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX." This became the no-feature-inflation rule, preventing the feature namespace from bloating with implementation-detail IDs that obscure the actual capability surface.
 
 **Design direction**: The test is "which existing feature owns this?" — if an existing capability covers the concern, the work belongs there. New F-XXXX IDs are reserved for genuinely new capabilities that users would recognize as distinct functionality.
 
 ---
 
-### Hierarchical Feature Naming & Clean Renumber (F-0184, v0.73.x)
+### Hierarchical Feature Naming & Clean Renumber (F-005, v0.73.x)
 
 **User insight**: Tomas designed the hierarchical feature ID system from scratch, establishing the dotted notation (F-003.1, F-003.1.2) for parent-child feature decomposition. The key design decisions were all user-driven: universal IDs with dotted children instead of separate namespace prefixes; component as metadata (not baked into the ID) because cross-cutting features prove component coupling would create artificial constraints; 4-level max depth; children starting at .1 (never .0); parent ACs independent of children with "effective ACs" computed at query time.
 
-**User insight**: Initiated the clean renumber — recognizing that post-consolidation (35 features down from 217) was the right moment to replace the chronologically-assigned 4-digit IDs (F-0001, F-0004, F-0081...) with sequential 3-digit category-grouped IDs (F-001 through F-039). "The framework's feature tracking has grown to 30+ consolidated features with flat, chronologically-assigned IDs" — the cognitive overhead of memorizing which random 4-digit number maps to which capability was unnecessary now that the feature space was stable.
+**User insight**: Initiated the clean renumber — recognizing that post-consolidation (35 features down from 217) was the right moment to replace the chronologically-assigned 4-digit IDs (F-001, F-003, F-025...) with sequential 3-digit category-grouped IDs (F-001 through F-039). "The framework's feature tracking has grown to 30+ consolidated features with flat, chronologically-assigned IDs" — the cognitive overhead of memorizing which random 4-digit number maps to which capability was unnecessary now that the feature space was stable.
 
 **Design direction**: The renumber mapping groups features by domain (Core Workflow F-001–006, Quality F-007–014, etc.) making the feature space scannable without consulting a legend. Historical dead IDs in `consolidated_from` are explicitly excluded from renaming — they're tombstones, not live references.
 

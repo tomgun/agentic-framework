@@ -81,7 +81,7 @@ These files provide maximum context per token:
 Don't read files. Instead:
 
 1. **Use search tools**
-   - `grep @feature F-0001` to find implementation
+   - `grep @feature F-001` to find implementation
    - Search for function/class names
    - Use file search for imports
 
@@ -177,7 +177,7 @@ Instead of reading a 1000-line file repeatedly:
   - Entry: `UserService` class
   - Key functions: create, authenticate, updateProfile
   - Tests: `lib/user.test.ts`
-  - Features: F-0001, F-0003
+  - Features: F-001, F-002
 ```
 
 ### Architecture summaries

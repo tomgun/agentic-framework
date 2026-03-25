@@ -1,0 +1,36 @@
+id: F-013
+name: Non-Functional Requirements
+lifecycle: shipped
+since: v0.25.0
+profile: formal
+protection: contract
+category: quality
+consolidated_from: [F-0169, F-0170, F-0216, F-0217, F-0218, F-0219]
+
+description: |
+  NFR discovery catalogs performance, security, UX, reliability constraints.
+  NFRs are enforced during spec writing and test creation. Auto-generation
+  at lifecycle moments suggests new NFRs. NFR-aware test writing ensures
+  coverage. Propagation pipeline cascades NFR changes. Health dashboard
+  tracks NFR status at scale.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "NFR.md exists with structured NFR definitions"
+    type: structural
+    verify: "test -f .agentic/spec/NFR.md"
+    tests:
+      - tests/validate_framework.sh::F-013
+
+  - id: AC-002
+    text: "ag nfr command exists"
+    type: structural
+    verify: |
+      grep -q "nfr" .agentic/lib/tools/ag.sh
+    tests:
+      - tests/validate_framework.sh::F-013
+
+nfr_refs: []
+migrations: []

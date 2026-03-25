@@ -19,7 +19,7 @@ cat >> "$TEST_PROJECT/.agentic/spec/FEATURES.md" << 'EOF'
 
 **Description**: Complete payment processing system
 
-## F-0101: Payment Gateway Integration
+## F-011: Payment Gateway Integration
 
 **Status**: criteria_set
 **Category**: Core
@@ -38,8 +38,8 @@ cat >> "$TEST_PROJECT/.agentic/spec/FEATURES.md" << 'EOF'
 **Parent**: F-0100
 EOF
 
-cat > "$TEST_PROJECT/.agentic/spec/acceptance/F-0101.md" << 'EOF'
-# F-0101: Payment Gateway Integration
+cat > "$TEST_PROJECT/.agentic/spec/acceptance/F-011.md" << 'EOF'
+# F-011: Payment Gateway Integration
 ## AC-001: Process credit card payments via Stripe API
 EOF
 

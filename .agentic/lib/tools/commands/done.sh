@@ -251,7 +251,7 @@ cmd_done() {
         fi
     fi
 
-    # --- Phase completion gate (F-0303) ---
+    # --- Phase completion gate (F-032) ---
     # If tasks.yaml exists with incomplete phases, block shipping.
     if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         local _phase_check_exit=0
@@ -792,7 +792,7 @@ PYEOF
         intent_checkpoint "$feature_id" "complete_wip" || true
     fi
 
-    # Phase tracking cleanup (F-0303): remove tasks.yaml after feature ships
+    # Phase tracking cleanup (F-032): remove tasks.yaml after feature ships
     if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         local _tasks_yaml="$ROOT_DIR/.agentic/work/${feature_id}/tasks.yaml"
         if [ -f "$_tasks_yaml" ]; then

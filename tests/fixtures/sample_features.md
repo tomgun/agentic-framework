@@ -3,7 +3,7 @@
 
 This is a test fixture with sample features for testing framework tools.
 
-## F-0001: User Authentication
+## F-001: User Authentication
 - Parent: none
 - Dependencies: none
 - Category: Core
@@ -17,7 +17,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/contracts/F-0001.md
+- Acceptance: spec/contracts/F-001.md
 - Verification:
   - Accepted: yes
   - Accepted at: 2026-01-01
@@ -35,8 +35,8 @@ This is a test fixture with sample features for testing framework tools.
 - Notes: Core authentication system
 
 ## F-0002: Login UI
-- Parent: F-0001
-- Dependencies: F-0001 (complete)
+- Parent: F-001
+- Dependencies: F-001 (complete)
 - Category: Core
 - Complexity: S
 - Tags: [auth, ui, frontend]
@@ -65,9 +65,9 @@ This is a test fixture with sample features for testing framework tools.
 - Lessons/caveats: none
 - Notes: none
 
-## F-0003: Password Reset
-- Parent: F-0001
-- Dependencies: F-0001 (complete)
+## F-002: Password Reset
+- Parent: F-001
+- Dependencies: F-001 (complete)
 - Complexity: M
 - Tags: [auth, backend]
 - Layer: business-logic
@@ -78,7 +78,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/contracts/F-0003.md
+- Acceptance: spec/contracts/F-002.md
 - Verification:
   - Accepted: no
   - Accepted at:
@@ -95,7 +95,7 @@ This is a test fixture with sample features for testing framework tools.
 - Lessons/caveats: none
 - Notes: none
 
-## F-0004: API Rate Limiting
+## F-003: API Rate Limiting
 - Parent: none
 - Dependencies: none
 - Category: Tooling
@@ -109,7 +109,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/contracts/F-0004.md
+- Acceptance: spec/contracts/F-003.md
 - Verification:
   - Accepted: no
   - Accepted at:
@@ -186,7 +186,7 @@ This is a test fixture with sample features for testing framework tools.
 - Lessons/caveats: none
 - Notes: Child of Login UI for testing hierarchy
 
-## F-0007: Login Button
+## F-007: Login Button
 - Parent: F-0002
 - Dependencies: F-0006
 - Complexity: S
@@ -199,7 +199,7 @@ This is a test fixture with sample features for testing framework tools.
 - PRD: none
 - Requirements: none
 - NFRs: none
-- Acceptance: spec/contracts/F-0007.md
+- Acceptance: spec/contracts/F-007.md
 - Verification:
   - Accepted: no
   - Accepted at:

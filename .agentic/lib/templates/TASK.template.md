@@ -7,7 +7,7 @@ Purpose: smallest implementable, testable unit of work. Optimize for small diffs
 
 ## Context
 - Spec link(s): <!-- /spec/PRD.md section, /spec/TECH_SPEC.md section -->
-- Feature ID(s): <!-- F-0001 -->
+- Feature ID(s): <!-- F-001 -->
 - Requirement ID(s) (optional): <!-- R-0001 -->
 - Why now:
 

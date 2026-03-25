@@ -257,21 +257,21 @@ stateDiagram-v2
 ```mermaid
 graph LR
     subgraph specification [Specification]
-        F[F-0001 in<br/>FEATURES.md]
-        A[F-0001.md<br/>acceptance criteria]
+        F[F-001 in<br/>FEATURES.md]
+        A[F-001.md<br/>acceptance criteria]
         N[NFR-0001 in<br/>NFR.md]
     end
     
     subgraph implementation [Implementation]
-        C1[Component A<br/>@feature F-0001<br/>@nfr NFR-0001]
-        C2[Component B<br/>@feature F-0001]
+        C1[Component A<br/>@feature F-001<br/>@nfr NFR-0001]
+        C2[Component B<br/>@feature F-001]
     end
     
     subgraph testing [Testing]
         U1[Unit tests<br/>component A]
         U2[Unit tests<br/>component B]
-        I[Integration tests<br/>F-0001]
-        E[E2E test<br/>F-0001 acceptance]
+        I[Integration tests<br/>F-001]
+        E[E2E test<br/>F-001 acceptance]
     end
     
     F --> A

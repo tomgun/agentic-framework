@@ -109,17 +109,17 @@ class TestFullLifecycle:
     def test_cancel_lifecycle(self, project_dir):
         """Write intent -> partial progress -> cancel."""
         write_intent(
-            project_dir, "F-0101", "implementing", "implement",
+            project_dir, "F-011", "implementing", "implement",
             ["step1", "step2", "step3"],
             session_id="cancel-session", pid=os.getpid(),
             previous_state="planned",
         )
 
         # Complete one step
-        checkpoint_step(project_dir, "F-0101", "step1")
+        checkpoint_step(project_dir, "F-011", "step1")
 
         # Cancel the intent
-        ok = cancel_intent(project_dir, "F-0101")
+        ok = cancel_intent(project_dir, "F-011")
         assert ok
 
         # Verify it's no longer pending (status changed to cancelled)

@@ -28,7 +28,7 @@ setup_project() {
 
     # Create FEATURES.md with a test feature
     cat > "$TEST_TMPDIR/.agentic/spec/FEATURES.md" <<'FEAT'
-## F-0001: Test Feature
+## F-001: Test Feature
 **Status**: shipped
 **Description**: A test feature for NFR checking
 FEAT
@@ -40,7 +40,7 @@ echo ""
 # --- Test 1: No NFR.md → exit 0 ---
 echo "Test: No NFR.md"
 setup_project
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-001 2>&1)
 rc=$?
 if [[ $rc -eq 0 ]]; then
     pass "No NFR.md exits 0"
@@ -63,7 +63,7 @@ cat > "$TEST_TMPDIR/.agentic/spec/NFR.md" <<'NFR'
   - CI: none
 - Current status: met
 NFR
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-001 2>&1)
 rc=$?
 if [[ $rc -eq 0 ]]; then
     pass "No acceptance file exits 0"
@@ -86,13 +86,13 @@ cat > "$TEST_TMPDIR/.agentic/spec/NFR.md" <<'NFR'
   - CI: none
 - Current status: met
 NFR
-cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-0001.md" <<'AC'
+cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-001.md" <<'AC'
 ## Acceptance Criteria
 - [ ] **AC-001**: Feature works correctly
 - [ ] **AC-010**: Files stay under 100 lines (NFR-0001)
 ## Out of Scope
 AC
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-001 2>&1)
 rc=$?
 if [[ $rc -eq 0 ]] && echo "$output" | grep -q "✓"; then
     pass "Referenced NFR shows as covered"
@@ -115,12 +115,12 @@ cat > "$TEST_TMPDIR/.agentic/spec/NFR.md" <<'NFR'
   - CI: none
 - Current status: met
 NFR
-cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-0001.md" <<'AC'
+cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-001.md" <<'AC'
 ## Acceptance Criteria
 - [ ] **AC-001**: Feature works correctly
 ## Out of Scope
 AC
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-001 2>&1)
 rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "✗"; then
     pass "Missing NFR shows as gap (exit 1)"
@@ -143,14 +143,14 @@ cat > "$TEST_TMPDIR/.agentic/spec/NFR.md" <<'NFR'
   - CI: none
 - Current status: met
 NFR
-cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-0001.md" <<'AC'
+cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-001.md" <<'AC'
 ## Acceptance Criteria
 - [ ] **AC-001**: Feature works correctly
 ## NFR Compliance
 - NFR-0001: Files under 100 lines — verified
 ## Out of Scope
 AC
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-001 2>&1)
 rc=$?
 if [[ $rc -eq 0 ]] && echo "$output" | grep -q "✓"; then
     pass "Legacy NFR Compliance format recognized"
@@ -173,12 +173,12 @@ cat > "$TEST_TMPDIR/.agentic/spec/NFR.md" <<'NFR'
   - CI: none
 - Current status: met
 NFR
-cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-0001.md" <<'AC'
+cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-001.md" <<'AC'
 ## Acceptance Criteria
 - [ ] **AC-001**: Feature works (NFR-0001)
 ## Out of Scope
 AC
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-test-check.sh F-001 2>&1)
 if echo "$output" | grep -q "Summary"; then
     pass "Summary line present"
 else

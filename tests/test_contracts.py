@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests for the YAML contract parser and validator (F-0302).
+Tests for the YAML contract parser and validator (F-031).
 """
 import json
 import sys
@@ -84,7 +84,7 @@ def draft_contract():
 def contract_with_input():
     """A contract with pending user input."""
     return Contract(
-        id="F-0101",
+        id="F-011",
         name="Feature With Input",
         lifecycle="shipped",
         description="A shipped feature where user wants a change",
@@ -104,14 +104,14 @@ def contract_with_input():
 class TestContractCreation:
     def test_from_dict_minimal(self):
         d = {
-            "id": "F-0001",
+            "id": "F-001",
             "name": "Minimal",
             "lifecycle": "exploring",
             "description": "A minimal test contract",
             "assertions": [{"id": "AC-001", "text": "It works", "type": "structural"}],
         }
         c = Contract.from_dict(d)
-        assert c.id == "F-0001"
+        assert c.id == "F-001"
         assert c.lifecycle == "exploring"
         assert c.protection == "none"
         assert c.profile == "both"
@@ -119,7 +119,7 @@ class TestContractCreation:
 
     def test_from_dict_full(self):
         d = {
-            "id": "F-0003",
+            "id": "F-002",
             "name": "Spec-Driven Development",
             "lifecycle": "shipped",
             "since": "v0.1.0",
@@ -148,7 +148,7 @@ class TestContractCreation:
             "children": [],
         }
         c = Contract.from_dict(d)
-        assert c.id == "F-0003"
+        assert c.id == "F-002"
         assert c.protection == "contract"
         assert len(c.assertions) == 2
         assert len(c.scenarios) == 1
@@ -194,20 +194,20 @@ class TestValidation:
         assert any("id" in e.lower() or "format" in e.lower() for e in errors)
 
     def test_invalid_lifecycle(self):
-        c = Contract(id="F-0001", name="Test", lifecycle="bogus",
+        c = Contract(id="F-001", name="Test", lifecycle="bogus",
                      description="Test description here",
                      assertions=[Assertion(id="AC-001", text="Test assertion", type="structural", draft=True)])
         errors = validate_contract(c)
         assert any("lifecycle" in e.lower() for e in errors)
 
     def test_no_assertions(self):
-        c = Contract(id="F-0001", name="Test", lifecycle="exploring",
+        c = Contract(id="F-001", name="Test", lifecycle="exploring",
                      description="Test description here", assertions=[])
         errors = validate_contract(c)
         assert any("assertion" in e.lower() for e in errors)
 
     def test_duplicate_assertion_ids(self):
-        c = Contract(id="F-0001", name="Test", lifecycle="exploring",
+        c = Contract(id="F-001", name="Test", lifecycle="exploring",
                      description="Test description here",
                      assertions=[
                          Assertion(id="AC-001", text="First assertion", type="structural", draft=True),
@@ -217,7 +217,7 @@ class TestValidation:
         assert any("duplicate" in e.lower() for e in errors)
 
     def test_structural_without_verify_not_draft(self):
-        c = Contract(id="F-0001", name="Test", lifecycle="exploring",
+        c = Contract(id="F-001", name="Test", lifecycle="exploring",
                      description="Test description here",
                      assertions=[
                          Assertion(id="AC-001", text="Missing verify command", type="structural"),
@@ -226,7 +226,7 @@ class TestValidation:
         assert any("verify" in e.lower() for e in errors)
 
     def test_contract_protection_requires_shipped(self):
-        c = Contract(id="F-0001", name="Test", lifecycle="implementing",
+        c = Contract(id="F-001", name="Test", lifecycle="implementing",
                      description="Test description here",
                      protection="contract",
                      assertions=[Assertion(id="AC-001", text="Test assertion", type="structural", draft=True)])
@@ -234,7 +234,7 @@ class TestValidation:
         assert any("shipped" in e.lower() or "protection" in e.lower() for e in errors)
 
     def test_short_description(self):
-        c = Contract(id="F-0001", name="Test", lifecycle="exploring",
+        c = Contract(id="F-001", name="Test", lifecycle="exploring",
                      description="Short",
                      assertions=[Assertion(id="AC-001", text="Test assertion", type="structural", draft=True)])
         errors = validate_contract(c)
@@ -319,11 +319,11 @@ class TestSaveLoad:
 class TestQueries:
     def test_get_pending_user_input(self, contracts_dir, sample_contract, contract_with_input):
         save_contract(sample_contract, contracts_dir / "F-0099.yaml")
-        save_contract(contract_with_input, contracts_dir / "F-0101.yaml")
+        save_contract(contract_with_input, contracts_dir / "F-011.yaml")
 
         pending = get_pending_user_input(contracts_dir)
         assert len(pending) == 1
-        assert pending[0].id == "F-0101"
+        assert pending[0].id == "F-011"
 
     def test_get_by_lifecycle(self, contracts_dir, sample_contract, draft_contract):
         save_contract(sample_contract, contracts_dir / "F-0099.yaml")

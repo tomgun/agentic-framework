@@ -66,23 +66,23 @@ else
     fail "expected exit 1 and usage text"
 fi
 
-test_case "check-spec-health.sh F-0001 (shipped feature)"
+test_case "check-spec-health.sh F-001 (shipped feature)"
 cd "$FRAMEWORK_ROOT"
-output=$(bash "$HEALTH_SCRIPT" F-0001 2>&1) && exit_code=0 || exit_code=$?
+output=$(bash "$HEALTH_SCRIPT" F-001 2>&1) && exit_code=0 || exit_code=$?
 if [[ $exit_code -eq 0 ]] && echo "$output" | grep -q "Found in FEATURES.md"; then
     pass
 else
     fail "expected exit 0 and feature found (got exit $exit_code)"
 fi
 
-test_case "check-spec-health.sh F-0001 shows status"
+test_case "check-spec-health.sh F-001 shows status"
 if echo "$output" | grep -qi "status.*shipped"; then
     pass
 else
     fail "expected status output"
 fi
 
-test_case "check-spec-health.sh F-0001 finds acceptance file"
+test_case "check-spec-health.sh F-001 finds acceptance file"
 if echo "$output" | grep -q "Acceptance file exists"; then
     pass
 else
@@ -139,12 +139,12 @@ else
     fail "expected reference to spec_writing.md"
 fi
 
-test_case "ag spec F-0001 runs health check"
-output=$(bash "$AG_SCRIPT" spec F-0001 2>&1) && exit_code=0 || exit_code=$?
-if echo "$output" | grep -q "Spec Health Check.*F-0001\|Found in FEATURES.md"; then
+test_case "ag spec F-001 runs health check"
+output=$(bash "$AG_SCRIPT" spec F-001 2>&1) && exit_code=0 || exit_code=$?
+if echo "$output" | grep -q "Spec Health Check.*F-001\|Found in FEATURES.md"; then
     pass
 else
-    fail "expected health check output for F-0001"
+    fail "expected health check output for F-001"
 fi
 
 test_case "ag spec --check runs health check on all"

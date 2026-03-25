@@ -48,7 +48,7 @@ def project_dir(tmp_path):
     features = spec / "FEATURES.md"
     features.write_text(
         "# Features\n\n"
-        "## F-0001: Existing Feature\n\n"
+        "## F-001: Existing Feature\n\n"
         "**Status**: shipped\n"
         "**Category**: Core\n\n"
         "---\n\n"
@@ -151,7 +151,7 @@ class TestPipeline:
             mock_promote.return_value = (
                 True,
                 ["Promoted 2 features"],
-                {"P-1": "F-0003", "P-2": "F-0004"},
+                {"P-1": "F-002", "P-2": "F-003"},
             )
 
             # Scheduler: all features succeed
@@ -168,7 +168,7 @@ class TestPipeline:
         assert result.success is True
         assert result.phase == "done"
         assert result.epic_id.startswith("F-")
-        assert result.feature_ids == ["F-0003", "F-0004"]
+        assert result.feature_ids == ["F-002", "F-003"]
         assert result.scheduler_result is sched_result
 
     def test_gate_check_blocks_human(self, project_dir):
@@ -288,7 +288,7 @@ class TestPipeline:
              patch("auto.pipeline.AutonomousScheduler") as mock_sched_cls:
 
             mock_kickoff.return_value = (True, ["OK"])
-            mock_promote.return_value = (True, ["OK"], {"P-1": "F-0003"})
+            mock_promote.return_value = (True, ["OK"], {"P-1": "F-002"})
 
             mock_sched = MagicMock()
             mock_sched.run_epic.return_value = sched_result
@@ -310,14 +310,14 @@ class TestPipeline:
             success=True,
             phase="done",
             epic_id="F-0010",
-            feature_ids=["F-0011", "F-0012"],
+            feature_ids=["F-008", "F-0012"],
             messages=["All done"],
         )
         d = r.to_dict()
         assert d["success"] is True
         assert d["phase"] == "done"
         assert d["epic_id"] == "F-0010"
-        assert d["feature_ids"] == ["F-0011", "F-0012"]
+        assert d["feature_ids"] == ["F-008", "F-0012"]
         assert "messages" in d
 
 
@@ -333,7 +333,7 @@ class TestPipelineIntegration:
              patch("auto.pipeline.AutonomousScheduler") as mock_sched_cls:
 
             mock_kickoff.return_value = (True, ["OK"])
-            mock_promote.return_value = (True, ["OK"], {"P-1": "F-0003"})
+            mock_promote.return_value = (True, ["OK"], {"P-1": "F-002"})
 
             mock_sched = MagicMock()
             mock_sched.run_epic.return_value = SchedulerResult(
@@ -367,7 +367,7 @@ class TestPipelineIntegration:
              patch("auto.pipeline.AutonomousScheduler") as mock_sched_cls:
 
             mock_kickoff.return_value = (True, ["OK"])
-            mock_promote.return_value = (True, ["OK"], {"P-1": "F-0003"})
+            mock_promote.return_value = (True, ["OK"], {"P-1": "F-002"})
 
             mock_sched = MagicMock()
             mock_sched.run_epic.return_value = sched_result
@@ -391,9 +391,9 @@ class TestPipelineIntegration:
             features_review_blocked=1,
             stopped_reason="all features blocked on human review",
             feature_work=[
-                FeatureWork(feature_id="F-0003", status="completed"),
+                FeatureWork(feature_id="F-002", status="completed"),
                 FeatureWork(
-                    feature_id="F-0004",
+                    feature_id="F-003",
                     status="review_blocked",
                     review_blocked_at="committed_to_shipped",
                 ),
@@ -407,7 +407,7 @@ class TestPipelineIntegration:
             mock_kickoff.return_value = (True, ["OK"])
             mock_promote.return_value = (
                 True, ["OK"],
-                {"P-1": "F-0003", "P-2": "F-0004"},
+                {"P-1": "F-002", "P-2": "F-003"},
             )
 
             mock_sched = MagicMock()
@@ -441,7 +441,7 @@ class TestPipelineIntegration:
             mock_kickoff.return_value = (True, ["Staging created"])
             mock_promote.return_value = (
                 True, ["OK"],
-                {"P-1": "F-0003", "P-2": "F-0004", "P-3": "F-0005"},
+                {"P-1": "F-002", "P-2": "F-003", "P-3": "F-0005"},
             )
 
             mock_sched = MagicMock()

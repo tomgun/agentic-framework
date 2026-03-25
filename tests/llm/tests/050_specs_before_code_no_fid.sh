@@ -14,7 +14,7 @@ mkdir -p "$TEST_PROJECT/spec/contracts" "$TEST_PROJECT/spec/acceptance"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # FEATURES.md
 
-## F-0001: User Authentication
+## F-001: User Authentication
 - Status: shipped
 
 ## Summary

@@ -47,7 +47,7 @@ This audit verifies that each claim in `FRAMEWORK_VALUE_PROPOSITION.md` is backe
 - 40x claim documented in multiple places:
   - `README.md`: "40x cheaper than file reads"
   - `CLAUDE.md`: "Scripts append/update fields without reading whole file = 40x cheaper tokens"
-  - `spec/acceptance/F-0041.md`: "Using script: ~50 tokens. Reading file: ~2000 tokens. 40x savings."
+  - `spec/acceptance/F-019.md`: "Using script: ~50 tokens. Reading file: ~2000 tokens. 40x savings."
 
 ---
 

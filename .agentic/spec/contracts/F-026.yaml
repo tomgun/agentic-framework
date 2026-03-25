@@ -1,0 +1,35 @@
+id: F-026
+name: Developer Documentation
+lifecycle: shipped
+since: v0.5.0
+profile: both
+protection: contract
+category: developer-experience
+consolidated_from: [F-0061, F-0062, F-0063, F-0064, F-0065, F-0066, F-0067, F-0134]
+
+description: |
+  User-facing documentation: DEVELOPER_GUIDE.md (user-first framing),
+  script help messages, error message quality standards, template quality.
+  START_HERE.md provides first-time guidance. MANUAL_OPERATIONS.md documents
+  escape hatches. README quality standards for generated projects.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "DEVELOPER_GUIDE.md exists"
+    type: structural
+    verify: "test -f .agentic/lib/DEVELOPER_GUIDE.md"
+    tests:
+      - tests/validate_framework.sh::F-026
+
+  - id: AC-002
+    text: "Framework help command exists"
+    type: structural
+    verify: |
+      grep -q "help" .agentic/lib/tools/ag.sh
+    tests:
+      - tests/validate_framework.sh::F-0064
+
+nfr_refs: []
+migrations: []

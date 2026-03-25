@@ -113,10 +113,10 @@ For `.agentic/spec/NFR.md`:
 ## Feature tracking
 
 Map ML capabilities to features:
-- F-0001: Data ingestion pipeline
+- F-001: Data ingestion pipeline
 - F-0002: Feature engineering (PCA, normalization, etc.)
-- F-0003: Model training (algorithm X)
-- F-0004: Model evaluation (metrics Y, Z)
+- F-002: Model training (algorithm X)
+- F-003: Model evaluation (metrics Y, Z)
 - F-0005: Model deployment (API or batch)
 
 ## Common gotchas

@@ -1,11 +1,11 @@
 """
 epic.py -- Epic decomposition and parent-child status derivation.
 
-Implements F-0184: `ag decompose F-XXXX` analyzes an epic's acceptance criteria,
+Implements F-005: `ag decompose F-XXXX` analyzes an epic's acceptance criteria,
 proposes child features scoped to components, routes through review_decomposition
 checkpoint, and manages parent-child status cascade.
 
-@feature F-0184
+@feature F-005
 
 Usage:
     # Decompose an epic into child features

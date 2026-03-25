@@ -4539,3 +4539,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-25 13:40 - F-0184 Phase 2: Clean Renumber
+
+**Why**: Feature IDs were chronological and hard to navigate — sequential grouping by category makes the feature registry human-friendly
+
+**What changed**:
+- Renumbered 36 F-/DEV- features from 4-digit to 3-digit sequential IDs grouped by category. Built renumber.py script with YAML-aware processing. Zero new test failures.
+
+**Next steps**:
+- Phase 2c: add migration entries to protected contracts
+
+**Blockers**: None
+

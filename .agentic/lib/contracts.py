@@ -7,7 +7,7 @@ Usage:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from contracts import load_contract, load_all_contracts, validate_contract
 
-    contract = load_contract(Path("spec/contracts/F-0003.yaml"))
+    contract = load_contract(Path("spec/contracts/F-002.yaml"))
     all_contracts = load_all_contracts(Path("spec/contracts"))
     errors = validate_contract(contract)
 """

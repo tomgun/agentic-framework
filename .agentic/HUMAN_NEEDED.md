@@ -154,7 +154,7 @@ _No active items_
 
 
 
-### HN-0053: PR #168: Structural doc freshness gate (F-0220)
+### HN-0053: PR #168: Structural doc freshness gate (F-035)
 - **Type**: pr_review
 - **Added**: 2026-03-19
 - **Context**: https://github.com/tomgun/agentic-framework/pull/168 — replaces advisory doc prompt with blocking freshness gate in ag done
@@ -199,7 +199,7 @@ _No active items_
 
 
 
-### HN-0058: PR #193: F-0302 Phase 1 — YAML contract infrastructure
+### HN-0058: PR #193: F-031 Phase 1 — YAML contract infrastructure
 - **Type**: pr_review
 - **Added**: 2026-03-22
 - **Context**: https://github.com/tomgun/agentic-framework/pull/193 — Phase 1 of multi-session spec overhaul. Merge to unblock Phases 0-5.
@@ -208,7 +208,7 @@ _No active items_
 
 
 
-### HN-0059: PR #196: F-0302 Phase 4 Step 4.2 — user input automation
+### HN-0059: PR #196: F-031 Phase 4 Step 4.2 — user input automation
 - **Type**: pr_review
 - **Added**: 2026-03-23
 - **Context**: feat/f-0302-phase4-user-input-automation — 12 files, 124 lines added
@@ -219,19 +219,19 @@ _No active items_
 
 
 
-### HN-0061: PR #197: F-0303 Multi-Session Plan Phase Tracking
+### HN-0061: PR #197: F-032 Multi-Session Plan Phase Tracking
 - **Type**: pr_review
 - **Added**: 2026-03-23
-- **Context**: feat/F-0303-phase-tracking — ag phase CLI, done.sh gate, dashboard progress, sync drift detection
+- **Context**: feat/F-032-phase-tracking — ag phase CLI, done.sh gate, dashboard progress, sync drift detection
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
 
 
-### HN-0062: PR #198: F-0302 Phase 4 — v2 dead code removal
+### HN-0062: PR #198: F-031 Phase 4 — v2 dead code removal
 - **Type**: pr_review
 - **Added**: 2026-03-23
-- **Context**: Review and merge feat/F-0302-phase4-cleanup. After merge: ag phase done F-0302 4
+- **Context**: Review and merge feat/F-031-phase4-cleanup. After merge: ag phase done F-031 4
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
@@ -250,7 +250,7 @@ _No active items_
 
 
 
-### HN-0066: PR #202: DEV-0243 + DEV-0001 taxonomy
+### HN-0066: PR #202: DEV-004 + DEV-001 taxonomy
 - **Type**: pr_review
 - **Added**: 2026-03-24
 - **Context**: Review and merge: tier experiments harness + DEV-XXXX namespace for dev infrastructure
@@ -259,7 +259,7 @@ _No active items_
 
 
 
-### HN-0067: PR #203: F-0184 Phase 1a — hierarchical dotted IDs
+### HN-0067: PR #203: F-005 Phase 1a — hierarchical dotted IDs
 - **Type**: pr_review
 - **Added**: 2026-03-24
 - **Context**: Phase 1a of hierarchy system: dotted IDs, component metadata, shell audit. Review at https://github.com/tomgun/agentic-framework/pull/203
@@ -268,27 +268,36 @@ _No active items_
 
 
 
-### HN-0068: Review: F-0184 → shipped
+### HN-0068: Review: F-005 → shipped
 - **Type**: decision
 - **Added**: 2026-03-25
-- **Context**: Review checkpoint (review_merge, mode: human). Resolve with: ag review F-0184 shipped
+- **Context**: Review checkpoint (review_merge, mode: human). Resolve with: ag review F-005 shipped
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
+
+### HN-0069: PR #205: F-005 Phase 2 renumber
+- **Type**: pr_review
+- **Added**: 2026-03-25
+- **Context**: Clean renumber 36 features to 3-digit IDs. Review FEATURES.md, CONSOLIDATION_MAP.md, BACKLOG.json
 - **Why human needed**: Requires human action/decision
 - **Impact**: Blocking: [specify what's blocked]
 
 
 ## Resolved
 
-### HN-0065: Review: DEV-0243 → implementing
+### HN-0065: Review: DEV-004 → implementing
 - **Resolved**: 2026-03-24
 - **Outcome**: Review approved: resolved
 
 
-### HN-0064: Review: DEV-0243 → specced
+### HN-0064: Review: DEV-004 → specced
 - **Resolved**: 2026-03-24
 - **Outcome**: Review approved: resolved
 
 
-### HN-0060: Review: F-0303 → implementing
+### HN-0060: Review: F-032 → implementing
 - **Resolved**: 2026-03-23
 - **Outcome**: Review approved: resolved
 
@@ -343,7 +352,7 @@ _No active items_
 - **Resolved**: 2026-03-08
 - **Outcome**: PR #81 merged
 
-### HN-0024: PR #78: Backlog/roadmap structural work assignment (F-0190, v0.49.0)
+### HN-0024: PR #78: Backlog/roadmap structural work assignment (F-006, v0.49.0)
 - **Resolved**: 2026-03-08
 - **Outcome**: PR #78 merged
 
@@ -351,7 +360,7 @@ _No active items_
 - **Resolved**: 2026-03-08
 - **Outcome**: PR #67 merged
 
-### HN-0026: PR #79: F-0180 Review Checkpoint Framework
+### HN-0026: PR #79: F-014 Review Checkpoint Framework
 - **Resolved**: 2026-03-08
 - **Outcome**: PR #79 merged
 
@@ -367,7 +376,7 @@ _No active items_
 - **Resolved**: 2026-03-06
 - **Outcome**: PR #64 merged
 
-### HN-0019: PR #63: Autonomous workflow engine (F-0160–F-0163)
+### HN-0019: PR #63: Autonomous workflow engine (F-030–F-0163)
 - **Resolved**: 2026-03-06
 - **Outcome**: PR #63 merged
 

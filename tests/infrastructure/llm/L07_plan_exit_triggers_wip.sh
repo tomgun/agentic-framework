@@ -11,7 +11,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 setup_test_project "formal"
 
-send_prompt "My plan for F-0001 has been approved and I've exited plan mode. What should I do next?"
+send_prompt "My plan for F-001 has been approved and I've exited plan mode. What should I do next?"
 
 FAILURES=0
 check_output_contains "ag implement\|WIP\|wip" \

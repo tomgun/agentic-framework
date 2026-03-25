@@ -143,5 +143,5 @@ graph LR
 ## Related Resources
 - Technical spec: `spec/TECH_SPEC.md#architecture`
 - ADRs: ADR-0001, ADR-0003
-- Features: F-0001, F-0005
+- Features: F-001, F-0005
 

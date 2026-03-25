@@ -214,7 +214,7 @@ check_orphaned_plans() {
             matches=true
         elif [ -n "$feature_ids" ]; then
             # Feature ID matching: only use if plan has >=2 matching IDs (reduces false positives
-            # from common IDs like F-0001 appearing in unrelated projects)
+            # from common IDs like F-001 appearing in unrelated projects)
             local match_count
             match_count=$(grep -oE "$FEATURE_ID_ERE" "$plan_file" 2>/dev/null | grep -cE "^($feature_ids)$" 2>/dev/null || echo "0")
             if [ "$match_count" -ge 2 ]; then

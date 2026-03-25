@@ -1149,9 +1149,9 @@ def _reset_project_state(project_dir: Path) -> None:
     """Reset state and spec files so the test project starts fresh.
 
     After copying .agentic/ from the framework VW, the test project inherits
-    all framework features (F-0001 through F-02XX), backlog entries, journal,
+    all framework features (F-001 through F-02XX), backlog entries, journal,
     etc. This resets those files so the agent starts with a clean slate and
-    feature numbering begins from F-0001.
+    feature numbering begins from F-001.
     """
     agentic = project_dir / ".agentic"
 

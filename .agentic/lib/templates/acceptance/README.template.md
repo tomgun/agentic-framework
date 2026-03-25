@@ -5,8 +5,8 @@
 The primary specification format is **YAML contracts** in `spec/contracts/F-####.yaml`.
 
 ```bash
-ag contract create F-0001 "Feature Name"   # Create new contract
-ag contract check F-0001                    # Verify assertions
+ag contract create F-001 "Feature Name"   # Create new contract
+ag contract check F-001                    # Verify assertions
 ag contract list                            # List all contracts
 ag migrate-specs                            # Convert markdown ACs to contracts
 ```

@@ -1,0 +1,26 @@
+id: F-011
+name: Architecture Decision Records
+lifecycle: shipped
+since: v0.8.0
+profile: formal
+protection: advisory
+category: quality
+consolidated_from: [F-0101]
+
+description: |
+  ADR directory (spec/adr/) stores architecture decision records.
+  Each ADR documents context, decision, consequences, and status.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "ADR directory path resolved"
+    type: structural
+    verify: |
+      grep -q "adr" .agentic/lib/paths.py || grep -q "ADR" .agentic/lib/paths.sh
+    tests:
+      - tests/validate_framework.sh::F-011
+
+nfr_refs: []
+migrations: []

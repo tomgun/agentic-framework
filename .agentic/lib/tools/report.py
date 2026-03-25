@@ -152,7 +152,7 @@ def main() -> int:
     features = parse_features(md)
 
     if not features:
-        print("No features found. Add sections like: '## F-0001: Name' in spec/FEATURES.md")
+        print("No features found. Add sections like: '## F-001: Name' in spec/FEATURES.md")
         return 0
 
     counts = {}

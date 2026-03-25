@@ -2,7 +2,7 @@
 """
 Tests for epic.py — epic decomposition and parent-child status derivation.
 
-@feature F-0184
+@feature F-005
 """
 import os
 import sys
@@ -223,7 +223,7 @@ class TestDeriveChildName:
 class TestGetNextFeatureId:
     def test_with_existing_features(self, tmp_project):
         features_file = _write_features(tmp_project, textwrap.dedent("""\
-            ## F-0001: First
+            ## F-001: First
             **Status**: shipped
 
             ## F-0005: Fifth
@@ -248,16 +248,16 @@ class TestFeatureHelpers:
         assert _get_feature_status(features_file, "F-0100") == "planned"
 
     def test_get_status_not_found(self, tmp_project):
-        features_file = _write_features(tmp_project, "## F-0001: Other\n**Status**: shipped\n")
+        features_file = _write_features(tmp_project, "## F-001: Other\n**Status**: shipped\n")
         assert _get_feature_status(features_file, "F-9999") is None
 
     def test_get_parent(self, tmp_project):
         features_file = _write_features(tmp_project, textwrap.dedent("""\
             ## F-0010: Child
             **Status**: planned
-            **Parent**: F-0001
+            **Parent**: F-001
         """))
-        assert _get_feature_parent(features_file, "F-0010") == "F-0001"
+        assert _get_feature_parent(features_file, "F-0010") == "F-001"
 
     def test_get_parent_none(self, tmp_project):
         features_file = _write_features(tmp_project, textwrap.dedent("""\
@@ -271,7 +271,7 @@ class TestFeatureHelpers:
             ## F-0100: Epic
             **Status**: planned
 
-            ## F-0101: Child A
+            ## F-011: Child A
             **Status**: implementing
             **Parent**: F-0100
 
@@ -373,7 +373,7 @@ class TestCreateChildFeatures:
         """))
         children = [
             {
-                "id": "F-0101",
+                "id": "F-011",
                 "name": "Child A",
                 "parent": "F-0100",
                 "component": None,
@@ -391,7 +391,7 @@ class TestCreateChildFeatures:
         assert success
 
         content = features_file.read_text()
-        assert "## F-0101: Child A" in content
+        assert "## F-011: Child A" in content
         assert "## F-0102: Child B" in content
         assert "**Parent**: F-0100" in content
         assert "**Component**: api" in content
@@ -401,7 +401,7 @@ class TestCreateChildFeatures:
         contracts_dir = tmp_project / ".agentic" / "spec" / "contracts"
         contracts_dir.mkdir(parents=True, exist_ok=True)
         children = [{
-            "id": "F-0101",
+            "id": "F-011",
             "name": "Child",
             "parent": "F-0100",
             "component": None,
@@ -409,7 +409,7 @@ class TestCreateChildFeatures:
         }]
         create_child_features(tmp_project, "F-0100", children)
 
-        contract_file = contracts_dir / "F-0101.yaml"
+        contract_file = contracts_dir / "F-011.yaml"
         assert contract_file.exists()
         content = contract_file.read_text()
         assert "F-0100" in content  # parent reference
@@ -422,7 +422,7 @@ class TestCreateChildFeatures:
             **Category**: Quality
         """))
         children = [{
-            "id": "F-0101",
+            "id": "F-011",
             "name": "Child",
             "parent": "F-0100",
             "component": None,
@@ -431,7 +431,7 @@ class TestCreateChildFeatures:
         create_child_features(tmp_project, "F-0100", children)
 
         content = (tmp_project / ".agentic" / "spec" / "FEATURES.md").read_text()
-        assert "**Category**: Quality" in content.split("## F-0101")[1]
+        assert "**Category**: Quality" in content.split("## F-011")[1]
 
     def test_component_scoped_contract(self, tmp_project):
         _write_features(tmp_project, "## F-0100: Epic\n**Status**: planned\n")
@@ -493,7 +493,7 @@ class TestDecompose:
         assert success
 
     def test_missing_feature_blocks(self, tmp_project):
-        _write_features(tmp_project, "## F-0001: Other\n**Status**: planned\n")
+        _write_features(tmp_project, "## F-001: Other\n**Status**: planned\n")
         success, msgs = decompose(tmp_project, "F-9999")
         assert not success
         assert any("not found" in m for m in msgs)
@@ -570,7 +570,7 @@ class TestRecomputeEpicStatus:
             ## F-0100: Epic
             **Status**: planned
 
-            ## F-0101: Child A
+            ## F-011: Child A
             **Status**: shipped
             **Parent**: F-0100
 
@@ -587,7 +587,7 @@ class TestRecomputeEpicStatus:
             ## F-0100: Epic
             **Status**: implementing
 
-            ## F-0101: Child A
+            ## F-011: Child A
             **Status**: implementing
             **Parent**: F-0100
         """))
@@ -626,7 +626,7 @@ class TestParentChildWiring:
 
 
 # ---------------------------------------------------------------------------
-# _build_child_contract tests (F-0302)
+# _build_child_contract tests (F-031)
 # ---------------------------------------------------------------------------
 
 class TestBuildChildContract:

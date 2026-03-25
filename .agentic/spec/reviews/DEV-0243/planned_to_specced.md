@@ -1,4 +1,4 @@
-# Review: DEV-0243 planned → specced
+# Review: DEV-004 planned → specced
 - **Verdict**: approved
 - **Reviewer**: human
 - **Date**: 2026-03-24

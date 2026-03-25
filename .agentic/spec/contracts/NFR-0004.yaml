@@ -21,8 +21,15 @@ assertions:
       grep -rq "acceptance\|ac.*file\|spec.*first" .agentic/lib/tools/commands/implement.sh 2>/dev/null ||
       grep -rq "check_feature_has_ac" .agentic/lib/gate.py 2>/dev/null
     tests:
-      - tests/validate_framework.sh::F-0003
+      - tests/validate_framework.sh::F-002
       - tests/llm/tests/003_acceptance_first.sh
 
 nfr_refs: []
-migrations: []
+migrations:
+  - id: M-2026-03-25-001
+    date: "2026-03-25"
+    trigger: implementation_discovery
+    reason: "F-0184 Phase 2 renumber: test reference updated from F-0003 to F-002"
+    changes:
+      - "AC-001 tests path updated to match renamed validate_framework.sh section"
+    approved_by: user

@@ -28,7 +28,7 @@ bash tests/run_tests.sh
 **Validates**: Query tool works as advertised for 200+ feature projects
 
 ### 2. validate_specs.py (Core Claims: Validation)
-- ✅ Detect circular dependencies (F-0001 → F-0002 → F-0001)
+- ✅ Detect circular dependencies (F-001 → F-0002 → F-001)
 - ✅ Detect self-dependencies
 - ✅ Detect invalid parent references
 - ✅ Detect invalid dependency references

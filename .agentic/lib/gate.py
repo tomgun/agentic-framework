@@ -15,10 +15,10 @@ Exit codes:
 
 Usage:
   python3 -m gate stop                    # Can session stop?
-  python3 -m gate stop --feature F-0001   # Explicit feature
+  python3 -m gate stop --feature F-001   # Explicit feature
   python3 -m gate pretool --tool Bash --input '{"command":"git commit"}'
   python3 -m gate verify                  # Full verification (all checks)
-  python3 -m gate verify --feature F-0001
+  python3 -m gate verify --feature F-001
 """
 from __future__ import annotations
 

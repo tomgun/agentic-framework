@@ -1,12 +1,12 @@
 [
   {
     "type": "feature",
-    "id": "F-0184",
+    "id": "F-005",
     "description": "Feature Hierarchy & Decomposition",
     "added_at": "2026-03-24T19:52:35Z",
     "added_by": "agent",
     "refs": [
-      ".agentic/spec/contracts/F-0184.yaml"
+      ".agentic/spec/contracts/F-005.yaml"
     ],
     "became_current_at": "2026-03-24T20:14:36Z"
   },
@@ -15,12 +15,12 @@
     "description": "Strengthen later state machine gates (advisory\u2192blocking)",
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
-    "notes": "Originally F-0223. Improvement to F-0004 (Feature Tracking & Lifecycle)",
+    "notes": "Originally F-0223. Improvement to F-003 (Feature Tracking & Lifecycle)",
     "became_current_at": "2026-03-24T20:12:19Z"
   },
   {
     "type": "feature",
-    "id": "F-0220",
+    "id": "F-035",
     "description": "Protected Main Branch Support",
     "added_at": "2026-03-16T18:56:12Z",
     "added_by": "agent"
@@ -30,11 +30,11 @@
     "description": "Configurable Definition of Done per task type",
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
-    "notes": "Originally F-0210. Improvement to F-0003 (Spec-Driven Development)"
+    "notes": "Originally F-0210. Improvement to F-002 (Spec-Driven Development)"
   },
   {
     "type": "feature",
-    "id": "F-0228",
+    "id": "F-036",
     "description": "Workflow Definition File",
     "added_at": "2026-03-16T18:56:15Z",
     "added_by": "agent"
@@ -44,23 +44,23 @@
     "description": "E2E workflow integration test (full lifecycle)",
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
-    "notes": "Originally F-0227. Improvement to DEV-0122 (Testing Infrastructure)"
+    "notes": "Originally F-0227. Improvement to DEV-002 (Testing Infrastructure)"
   },
   {
     "type": "feature",
-    "id": "F-0211",
+    "id": "F-033",
     "description": "Project-Specific Customization Layer",
     "added_at": "2026-03-16T18:56:15Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
-    "id": "F-0212",
+    "id": "F-034",
     "description": "Project Customization Auto-Sync",
     "added_at": "2026-03-16T18:56:15Z",
     "added_by": "agent",
     "depends_on": [
-      "F-0211"
+      "F-033"
     ]
   },
   {
@@ -68,33 +68,33 @@
     "description": "Design phase formalization",
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
-    "notes": "Originally F-0233. Improvement to F-0120 (Plan & Design Review)"
+    "notes": "Originally F-0233. Improvement to F-004 (Plan & Design Review)"
   },
   {
     "type": "feature",
-    "id": "F-0230",
+    "id": "F-037",
     "description": "MCP Coordination Server",
     "added_at": "2026-03-16T18:56:16Z",
     "added_by": "agent"
   },
   {
     "type": "feature",
-    "id": "F-0231",
+    "id": "F-038",
     "description": "Multi-Repo Umbrella",
     "added_at": "2026-03-16T18:56:16Z",
     "added_by": "agent",
     "depends_on": [
-      "F-0230"
+      "F-037"
     ]
   },
   {
     "type": "feature",
-    "id": "F-0232",
+    "id": "F-039",
     "description": "Full Autonomous Scheduling",
     "added_at": "2026-03-16T18:56:16Z",
     "added_by": "agent",
     "depends_on": [
-      "F-0230"
+      "F-037"
     ]
   }
 ]

@@ -1628,13 +1628,13 @@ Organized by impact and effort:
 
 2. **Configurable DoD per Task Type (F-0210)** — Spikes shouldn't require "tests passing"; docs tasks shouldn't require "code quality check". Task-type-aware completion checklists would reduce friction for non-standard work items.
 
-3. **Customization Layer (F-0211/F-0212)** — `.agentic/project/` for user-editable config that survives framework upgrades. Custom DoD, coding conventions, workflow overrides.
+3. **Customization Layer (F-033/F-034)** — `.agentic/project/` for user-editable config that survives framework upgrades. Custom DoD, coding conventions, workflow overrides.
 
 ### High Impact, High Effort
 
 4. **Protected Main Branch Support (T-0066)** — Framework assumes direct-to-main for state files (`ag done`, `ag flush`). With branch protection rules, these break. Needs architectural solution.
 
-5. **Collision-Proof Feature IDs (F-0193 → F-0004)** — Sequential F-XXXX collides in multi-agent/multi-branch. Options: slugs, atomic allocation, UUIDs. ID pattern centralization shipped; collision prevention remains open.
+5. **Collision-Proof Feature IDs (F-0193 → F-003)** — Sequential F-XXXX collides in multi-agent/multi-branch. Options: slugs, atomic allocation, UUIDs. ID pattern centralization shipped; collision prevention remains open.
 
 6. ~~**ag.sh Decomposition**~~ — **DONE (F-0221)**. ag.sh decomposed from 4,325 lines into 363-line dispatcher + 12 sourced modules under `commands/`.
 

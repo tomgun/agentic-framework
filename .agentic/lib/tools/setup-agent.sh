@@ -37,7 +37,7 @@ source "$SCRIPT_DIR/../paths.sh"
 # AGENTIC_LIB, AGENTIC_ROOT, PROJECT_ROOT provided by paths.sh
 AGENTIC_DIR="$AGENTIC_LIB"
 
-# v2 engine deleted (F-0302 Phase 4)
+# v2 engine deleted (F-031 Phase 4)
 
 show_help() {
   echo "Usage: bash .agentic/tools/setup-agent.sh <tool>"

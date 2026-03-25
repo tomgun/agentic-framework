@@ -53,7 +53,7 @@ But it does NOT verify:
 
 | Test ID | Description | Steps | Expected |
 |---------|-------------|-------|----------|
-| TOOL-01 | quick_feature.sh | `bash quick_feature.sh "Test feature"` | F-0001 added to FEATURES.md |
+| TOOL-01 | quick_feature.sh | `bash quick_feature.sh "Test feature"` | F-001 added to FEATURES.md |
 | TOOL-02 | quick_issue.sh | `bash quick_issue.sh "Test bug"` | I-0001 added to ISSUES.md |
 | TOOL-03 | journal.sh | `bash journal.sh "Test entry"` | Entry in JOURNAL.md |
 | TOOL-04 | status.sh | `bash status.sh focus "Working on X"` | STATUS.md updated |

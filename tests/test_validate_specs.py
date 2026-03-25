@@ -30,9 +30,9 @@ def test_parse_features():
     fixtures_dir = Path(__file__).parent / "fixtures"
     features = parse_markdown_features(fixtures_dir / "sample_features.md")
     
-    assert len(features) == 7  # F-0001 through F-0007
-    assert features[0]["id"] == "F-0001"
-    assert features[1]["parent"] == "F-0001"
+    assert len(features) == 7  # F-001 through F-007
+    assert features[0]["id"] == "F-001"
+    assert features[1]["parent"] == "F-001"
 
 
 def test_no_circular_dependencies():
@@ -46,22 +46,22 @@ def test_no_circular_dependencies():
 
 def test_circular_dependencies_detected():
     """Test that circular dependencies ARE detected."""
-    # Create features with circular dep: F-0001 -> F-0002 -> F-0001
+    # Create features with circular dep: F-001 -> F-0002 -> F-001
     features = [
-        {"id": "F-0001", "dependencies": ["F-0002"], "parent": None},
-        {"id": "F-0002", "dependencies": ["F-0001"], "parent": None},
+        {"id": "F-001", "dependencies": ["F-0002"], "parent": None},
+        {"id": "F-0002", "dependencies": ["F-001"], "parent": None},
     ]
     
     errors = detect_circular_dependencies(features)
     assert len(errors) == 1, f"Should detect 1 cycle, got {len(errors)}"
-    assert "F-0001" in errors[0]
+    assert "F-001" in errors[0]
     assert "F-0002" in errors[0]
 
 
 def test_self_dependency_detected():
     """Test that self-dependency is detected."""
     features = [
-        {"id": "F-0001", "dependencies": ["F-0001"], "parent": None},
+        {"id": "F-001", "dependencies": ["F-001"], "parent": None},
     ]
     
     errors = detect_circular_dependencies(features)
@@ -80,7 +80,7 @@ def test_valid_cross_references():
 def test_invalid_parent_detected():
     """Test that invalid parent reference is detected."""
     features = [
-        {"id": "F-0001", "dependencies": [], "parent": None},
+        {"id": "F-001", "dependencies": [], "parent": None},
         {"id": "F-0002", "dependencies": [], "parent": "F-9999"},  # Invalid parent
     ]
     
@@ -93,12 +93,12 @@ def test_invalid_parent_detected():
 def test_invalid_dependency_detected():
     """Test that invalid dependency reference is detected."""
     features = [
-        {"id": "F-0001", "dependencies": ["F-9999"], "parent": None},  # Invalid dep
+        {"id": "F-001", "dependencies": ["F-9999"], "parent": None},  # Invalid dep
     ]
     
     errors = validate_cross_references(features)
     assert len(errors) == 1, "Should detect 1 invalid dependency"
-    assert "F-0001" in errors[0]
+    assert "F-001" in errors[0]
     assert "F-9999" in errors[0]
 
 

@@ -90,11 +90,11 @@ Purpose: a single source of truth for "how we build and run software here".
 - review_regression: critical_agent
 # Any regression transition. Discovery: critical_agent | Formal: human | Autonomous Formal: critical_agent
 - review_taste: skip
-# Style/taste consistency review (F-0183). Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
+# Style/taste consistency review (F-028). Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
 - review_commit: human
 # Auto-commit in automated execution (`ag auto task/epic`). human: stage only, human reviews (default) | critical_agent: adversarial review then auto-commit. Discovery: human | Formal: human | Autonomous Formal: critical_agent
 - review_integration: skip
-# Epic integration verification (F-0204). Reviews integration test results before epic ships. Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
+# Epic integration verification (F-030). Reviews integration test results before epic ships. Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
 
 - kickoff_confirm: skip
 # Kickoff confirmation checkpoints. Discovery: skip | Formal: ask | Autonomous Formal: skip
@@ -103,19 +103,19 @@ Purpose: a single source of truth for "how we build and run software here".
 # How feedback is handled after testing. pr_review: agent logs, human classifies | working_software: agent auto-classifies, human confirms | automated: route immediately. Discovery: pr_review | Formal: pr_review | Autonomous Formal: working_software
 
 - annotation_enforcement: off
-# Pre-commit annotation check for newly-shipped features (F-0229). off: skip | advisory: warn | blocking: block commit. Discovery: off | Formal: advisory | Autonomous Formal: blocking
+# Pre-commit annotation check for newly-shipped features (F-009). off: skip | advisory: warn | blocking: block commit. Discovery: off | Formal: advisory | Autonomous Formal: blocking
 
 - review_pr: skip
-# Auto-review PRs after creation (F-0235). skip: no auto-review | critical_agent: AI reviews PR diff | human: block for human review. Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
+# Auto-review PRs after creation (F-024). skip: no auto-review | critical_agent: AI reviews PR diff | human: block for human review. Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
 - pr_fix_max_attempts: 0
-# Max auto-fix cycles for PR review findings (F-0235). 0 = no auto-fix. Discovery: 0 | Formal: 2 | Autonomous Formal: 2
+# Max auto-fix cycles for PR review findings (F-024). 0 = no auto-fix. Discovery: 0 | Formal: 2 | Autonomous Formal: 2
 - plan_review_convergence: manual
-# Plan review convergence mode (F-0236). auto: loop runs to convergence without human per iteration | manual: user decides each iteration. Discovery: manual | Formal: auto | Autonomous Formal: auto
+# Plan review convergence mode (F-004). auto: loop runs to convergence without human per iteration | manual: user decides each iteration. Discovery: manual | Formal: auto | Autonomous Formal: auto
 - plan_review_reviewers: critic,advocate
-# Reviewer roles for plan review (F-0236). Comma-separated from reviewer_roles.json catalog. Required: critic, advocate. Optional: security_expert, architect, qa_expert, ux_designer, ops_expert, db_expert
+# Reviewer roles for plan review (F-004). Comma-separated from reviewer_roles.json catalog. Required: critic, advocate. Optional: security_expert, architect, qa_expert, ux_designer, ops_expert, db_expert
 
 - max_parallel_agents: 3
-# Maximum concurrent Claude processes for parallel epic execution (F-0214). Range: 1-10. Discovery: 3 | Formal: 3 | Autonomous Formal: 3
+# Maximum concurrent Claude processes for parallel epic execution (F-017). Range: 1-10. Discovery: 3 | Formal: 3 | Autonomous Formal: 3
 
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
@@ -180,7 +180,7 @@ Purpose: a single source of truth for "how we build and run software here".
   <!-- - E2E screenshots: test-results/ -->
 
 ## Integration tests (optional, for epics)
-<!-- Cross-component integration tests run when all epic children ship (F-0204). -->
+<!-- Cross-component integration tests run when all epic children ship (F-030). -->
 <!-- Override per-epic in epic AC file's ## Integration tests section. -->
 <!-- - `pytest tests/integration/` -->
 <!-- - `npm run test:integration` -->
@@ -224,15 +224,15 @@ Purpose: a single source of truth for "how we build and run software here".
   <!-- planning: Runs for ag plan commands -->
   <!-- implement: Also runs before ag implement if no approved plan exists -->
   <!-- both: Always runs for both commands -->
-- plan_review_convergence: auto  <!-- auto | manual (F-0236) -->
+- plan_review_convergence: auto  <!-- auto | manual (F-004) -->
   <!-- auto: Loop runs to convergence without human per iteration -->
   <!-- manual: User decides each iteration -->
-- plan_review_reviewers: [critic, advocate]  <!-- Reviewer roles from catalog (F-0236) -->
+- plan_review_reviewers: [critic, advocate]  <!-- Reviewer roles from catalog (F-004) -->
   <!-- Optional experts: security_expert, architect, qa_expert, ux_designer, ops_expert, db_expert -->
 <!-- - plan_review_reviewer_model: same  # same | opus | sonnet (use same model as planner) -->
 
 ## PR Review
-<!-- Auto-review PRs after creation in autonomous workflows (F-0235) -->
+<!-- Auto-review PRs after creation in autonomous workflows (F-024) -->
 <!-- Note: review_pr is in ## Settings (profile-aware) -->
 - pr_fix_max_attempts: 2  <!-- Max auto-fix cycles before escalating to human. 0 = no auto-fix -->
 
@@ -283,7 +283,7 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ## Coordination server (optional)
 <!-- Network-accessible coordination API for parallel agents, remote review, and mobile monitoring. -->
-<!-- See: F-0185 — `ag coord start|stop|status` -->
+<!-- See: F-018 — `ag coord start|stop|status` -->
 - coord_enabled: no
 # Enable coordination server (yes|no)
 - coord_port: 4185
@@ -361,7 +361,7 @@ Purpose: a single source of truth for "how we build and run software here".
 ## Style & taste (optional)
 <!-- Declare project style preferences so the critical agent can review for consistency. -->
 <!-- These settings are loaded into taste-sensitive reviews when review_taste != skip. -->
-<!-- See: F-0183, ADR-002 §2.2 -->
+<!-- See: F-028, ADR-002 §2.2 -->
 <!-- - style_guide: https://example.com/style-guide  # URL or path to style guide -->
 <!-- - design_system: material-design-3  # Design system name/version -->
 <!-- - api_style: rest-jsonapi  # API style: rest-jsonapi | graphql | grpc | rpc -->

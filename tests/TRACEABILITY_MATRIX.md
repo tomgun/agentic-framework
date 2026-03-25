@@ -15,7 +15,7 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 
 | Aspect | Spec | Test | Status |
 |--------|------|------|--------|
-| Session start dashboard | F-0021 | 001_session_start | ✅ |
+| Session start dashboard | F-015 | 001_session_start | ✅ |
 | Observable progress (STATUS.md) | F-0024 | 030_reads_status_on_start | ✅ |
 | Manual operations (zero tokens) | F-0067 | — | Structural (MANUAL_OPERATIONS.md) |
 | Human escalation (HUMAN_NEEDED.md) | F-0026 | 016_pr_tracking_human_needed | ✅ |
@@ -29,17 +29,17 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 | Durable artifacts survive resets | F-0025 | 008_reads_context_pack, 030_reads_status_on_start, 031_references_journal_history, 032_knows_architecture | ✅ |
 | Session continuity via JOURNAL | F-0023 | 004_uses_journal_script, 024_mentions_script_for_journal | ✅ |
 | Observable progress (STATUS.md) | F-0024 | 030_reads_status_on_start | ✅ |
-| Session start protocol | F-0021 | 001_session_start | ✅ |
+| Session start protocol | F-015 | 001_session_start | ✅ |
 | Session end handoff | F-0022 | 015_session_end_summary | ✅ |
-| WIP recovery | F-0051 | 006_wip_recovery | ✅ |
+| WIP recovery | F-016 | 006_wip_recovery | ✅ |
 | Quality standards wired to agents | F-0015 | — | Structural (context manifests) |
-| Spec-driven development | F-0003-0006 | 003_acceptance_first, 010_feature_needs_spec | ✅ |
+| Spec-driven development | F-002-0006 | 003_acceptance_first, 010_feature_needs_spec | ✅ |
 
 ### F3: Token & Context Optimization (FOUNDATION)
 
 | Aspect | Spec | Test | Status |
 |--------|------|------|--------|
-| Token-efficient scripts (40x savings) | F-0041 | 004_uses_journal_script, 018-020_uses_scripts, 024_mentions_script | ✅ |
+| Token-efficient scripts (40x savings) | F-019 | 004_uses_journal_script, 018-020_uses_scripts, 024_mentions_script | ✅ |
 | Structured reading protocols | F-0071 | 025_targeted_context_reading, 026_avoids_unnecessary_reads | ✅ |
 | Agent delegation (fresh context) | F-0083 | — | Structural (docs) |
 | Sequential agents | F-0034 | — | Structural (pipeline) |
@@ -53,15 +53,15 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 | Humans can edit specs directly | F-0073 | — | Structural |
 | Human escalation (HUMAN_NEEDED.md) | F-0026 | 016_pr_tracking_human_needed | ✅ |
 | Make human review efficient | F-0114 | — | Structural (scope_check.sh) |
-| Proactive greeting with context | F-0021 | 001_session_start | ✅ |
+| Proactive greeting with context | F-015 | 001_session_start | ✅ |
 
 ### D2: Deterministic Enforcement (DESIGN PRINCIPLE)
 
 | Aspect | Spec | Test | Status |
 |--------|------|------|--------|
-| WIP blocks commit | F-0051 | 002_wip_blocks_commit | ✅ |
-| Pre-commit quality gates | F-0016 | 009_mentions_checklist | ✅ |
-| Feature status enforcement | F-0004 | 020_uses_feature_script | ✅ |
+| WIP blocks commit | F-016 | 002_wip_blocks_commit | ✅ |
+| Pre-commit quality gates | F-009 | 009_mentions_checklist | ✅ |
+| Feature status enforcement | F-003 | 020_uses_feature_script | ✅ |
 | Branch policy enforcement | F-0115 | — | Structural (pre-commit-check.sh) |
 | Gate-based verification (doctor.sh) | F-0091 | — | Structural |
 | Warnings for soft signals | F-0114 | — | Structural (scope_check.sh) |
@@ -79,7 +79,7 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 
 | Aspect | Spec | Test | Status |
 |--------|------|------|--------|
-| Small batch enforcement | F-0007 | 007_small_batch | ✅ |
+| Small batch enforcement | F-007 | 007_small_batch | ✅ |
 | Acceptance criteria before code | F-0006 | 003_acceptance_first | ✅ |
 | Formal requires specs | F-0006 | 010_feature_needs_spec | ✅ |
 | Discovery proceeds without specs | — | 011_core_proceeds_without_spec | ✅ |
@@ -124,7 +124,7 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 | Aspect | Spec | Test | Status |
 |--------|------|------|--------|
 | Human approval required | AGENTS.md | 005_no_auto_commit | ✅ |
-| PR workflow for Formal | F-0096 | 013_pr_workflow_formal | ✅ |
+| PR workflow for Formal | F-024 | 013_pr_workflow_formal | ✅ |
 
 ### R3: Check Before Creating (OPERATIONAL RULE)
 

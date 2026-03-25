@@ -24,7 +24,7 @@ def tmp_framework(tmp_path):
     (spec_dir / "FEATURES.md").write_text(textwrap.dedent("""\
         # Features
 
-        ## F-0001: Project Init
+        ## F-001: Project Init
 
         **Status**: shipped
         **Category**: Core
@@ -42,7 +42,7 @@ def tmp_framework(tmp_path):
 
         ---
 
-        ## F-0003: Deprecated Thing
+        ## F-002: Deprecated Thing
 
         **Status**: deprecated
         **Category**: Legacy
@@ -55,8 +55,8 @@ def tmp_framework(tmp_path):
     tests_dir.mkdir()
     (tests_dir / "validate_framework.sh").write_text(textwrap.dedent("""\
         #!/usr/bin/env bash
-        # F-0001: Project Init
-        echo "--- F-0001: Project Init ---"
+        # F-001: Project Init
+        echo "--- F-001: Project Init ---"
         pass "install.sh exists"
 
         # F-0002: Auth System
@@ -82,7 +82,7 @@ def tmp_framework(tmp_path):
         #!/usr/bin/env bash
         # Description: Agent session start
         # Section: session
-        # Feature: F-0001
+        # Feature: F-001
         send_prompt "hi"
     """))
     (llm_dir / "002_no_tag.sh").write_text(textwrap.dedent("""\
@@ -125,7 +125,7 @@ class TestParseFeatures:
     def test_extracts_features(self, tmp_framework):
         features = qa_registry.parse_features(tmp_framework)
         assert len(features) == 3
-        assert features[0].fid == "F-0001"
+        assert features[0].fid == "F-001"
         assert features[0].title == "Project Init"
         assert features[0].status == "shipped"
 
@@ -138,7 +138,7 @@ class TestParseFeatures:
 class TestScanValidateFramework:
     def test_finds_feature_sections(self, tmp_framework):
         mapping = qa_registry.scan_validate_framework(tmp_framework)
-        assert "F-0001" in mapping
+        assert "F-001" in mapping
         assert "F-0002" in mapping
         assert len(mapping) == 2
 
@@ -160,7 +160,7 @@ class TestScanPytestFiles:
 class TestScanLlmTests:
     def test_finds_tagged_tests(self, tmp_framework):
         tagged, untagged, total = qa_registry.scan_llm_tests(tmp_framework)
-        assert "F-0001" in tagged
+        assert "F-001" in tagged
         assert total == 2
 
     def test_finds_untagged_tests(self, tmp_framework):
@@ -219,15 +219,15 @@ class TestBuildRegistry:
         data = qa_registry.build_registry(tmp_framework)
         assert len(data.features) == 3
         assert len(data.categories) > 0
-        # F-0001 should have both static and llm coverage
-        f1_tests = data.feature_to_tests.get("F-0001", {})
+        # F-001 should have both static and llm coverage
+        f1_tests = data.feature_to_tests.get("F-001", {})
         assert "static" in f1_tests
         assert "llm" in f1_tests
 
     def test_gap_detection(self, tmp_framework):
         data = qa_registry.build_registry(tmp_framework)
-        # F-0003 (deprecated) should have no tests but be excluded from gap
-        f3_tests = data.feature_to_tests.get("F-0003", {})
+        # F-002 (deprecated) should have no tests but be excluded from gap
+        f3_tests = data.feature_to_tests.get("F-002", {})
         assert len(f3_tests) == 0
 
 
@@ -245,9 +245,9 @@ class TestGenerateMarkdown:
     def test_feature_matrix_has_all_features(self, tmp_framework):
         data = qa_registry.build_registry(tmp_framework)
         md = qa_registry.generate_markdown(data, tmp_framework)
-        assert "F-0001" in md
+        assert "F-001" in md
         assert "F-0002" in md
-        assert "F-0003" in md
+        assert "F-002" in md
 
     def test_untagged_files_listed(self, tmp_framework):
         data = qa_registry.build_registry(tmp_framework)

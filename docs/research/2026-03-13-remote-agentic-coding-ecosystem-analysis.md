@@ -55,7 +55,7 @@
 Claude will support native remote controlling soon (already in test).
 
 **Impact on our framework**:
-- Our coordination server (F-0185) becomes **more valuable, not less** — it's the orchestration layer *above* whatever transport Claude provides
+- Our coordination server (F-018) becomes **more valuable, not less** — it's the orchestration layer *above* whatever transport Claude provides
 - Native remote control replaces the tmux+tailscale hack for session access, but doesn't replace structured workflow (specs, plans, state machine, review gates)
 - Our `ag coord` HTTP API is already positioned as the "control plane" — native Claude remote control would be a new *transport* that could call into it
 

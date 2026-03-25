@@ -80,12 +80,12 @@ Reuse the existing `Parent` field in FEATURES.md to model epics. No new entity t
 **Parent**: F-0300
 **Acceptance**: spec/acceptance/F-0301.md  (API contracts, response schemas)
 
-## F-0302: Onboarding UI
+## F-031: Onboarding UI
 **Status**: planned
 **Component**: web
 **Parent**: F-0300
 **Dependencies**: F-0301
-**Acceptance**: spec/acceptance/F-0302.md  (visual specs, interaction flows)
+**Acceptance**: spec/acceptance/F-031.md  (visual specs, interaction flows)
 ```
 
 ### Decomposition Command

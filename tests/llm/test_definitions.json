@@ -39,7 +39,7 @@
       "profile": "discovery",
       "setup": {
         "files": {
-          ".agentic/session/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2025-01-18\n**Status**: In progress\n\n## Current Focus\nWorking on test feature\n\n## Next Steps\n- Complete implementation"
+          ".agentic/session/WIP.md": "**Feature**: F-001: Test feature\n**Started**: 2025-01-18\n**Status**: In progress\n\n## Current Focus\nWorking on test feature\n\n## Next Steps\n- Complete implementation"
         }
       },
       "prompt": "please commit my changes",
@@ -215,7 +215,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "spec/FEATURES.md": "# Features\n\n## F-0001: Basic Setup\n**Status**: shipped\n**Description**: Initial project setup"
+          "spec/FEATURES.md": "# Features\n\n## F-001: Basic Setup\n**Status**: shipped\n**Description**: Initial project setup"
         }
       },
       "prompt": "Add a dark mode toggle to the settings page",
@@ -658,16 +658,16 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "spec/FEATURES.md": "# Features\n\n## F-0001: User Authentication\n- Status: in_progress\n- Priority: high\n- Acceptance: spec/contracts/F-0001.md\n\n## F-0002: Product Catalog\n- Status: shipped\n- Priority: high",
-          "spec/acceptance/F-0001.md": "# F-0001: User Authentication\n\n## Acceptance Criteria\n- [x] Users can register with email/password\n- [x] Users can login and receive JWT\n- [x] Password reset via email\n- [x] Session management with refresh tokens\n\n## Tests\n- All 12 auth tests passing",
+          "spec/FEATURES.md": "# Features\n\n## F-001: User Authentication\n- Status: in_progress\n- Priority: high\n- Acceptance: spec/contracts/F-001.md\n\n## F-0002: Product Catalog\n- Status: shipped\n- Priority: high",
+          "spec/acceptance/F-001.md": "# F-001: User Authentication\n\n## Acceptance Criteria\n- [x] Users can register with email/password\n- [x] Users can login and receive JWT\n- [x] Password reset via email\n- [x] Session management with refresh tokens\n\n## Tests\n- All 12 auth tests passing",
           ".agentic/journal/JOURNAL.md": "# Development Journal\n\n### Session: 2026-02-04\n- Finished password reset flow\n- All acceptance criteria met\n- 12/12 tests passing",
           "CHANGELOG.md": "# Changelog\n\n## [Unreleased]\n\n## [0.19.0] - 2026-02-01\n- Product catalog shipped"
         }
       },
-      "prompt": "F-0001 User Authentication is complete - all acceptance criteria pass and all tests are green. Please mark it as shipped.",
+      "prompt": "F-001 User Authentication is complete - all acceptance criteria pass and all tests are green. Please mark it as shipped.",
       "expected": {
         "output_contains": [
-          "F-0001|feature|status|shipped"
+          "F-001|feature|status|shipped"
         ],
         "output_contains_any": [
           "FEATURES|feature.sh|CHANGELOG|changelog|journal|JOURNAL"
@@ -795,16 +795,16 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Dashboard\n- Status: shipped\n- Domain: frontend\n- Acceptance: spec/contracts/F-0001.md\n\n## F-0002: Products API\n- Status: shipped\n- Domain: backend\n- Acceptance: spec/contracts/F-0002.md"
+          "spec/FEATURES.md": "# FEATURES.md\n\n## F-001: User Dashboard\n- Status: shipped\n- Domain: frontend\n- Acceptance: spec/contracts/F-001.md\n\n## F-0002: Products API\n- Status: shipped\n- Domain: backend\n- Acceptance: spec/contracts/F-0002.md"
         }
       },
-      "prompt": "Add a new feature F-0003 for a mobile shopping cart screen to FEATURES.md. This is a mobile feature.",
+      "prompt": "Add a new feature F-002 for a mobile shopping cart screen to FEATURES.md. This is a mobile feature.",
       "expected": {
         "output_contains": [
           "Domain.*mobile|domain.*mobile|- Domain:"
         ],
         "output_contains_any": [
-          "F-0003|F.0003"
+          "F-002|F.0003"
         ],
         "output_not_contains": [],
         "file_exists": [],
@@ -847,11 +847,11 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: in_progress\n- Acceptance: spec/contracts/F-0001.md",
-          "spec/acceptance/F-0001.md": "# F-0001: User Authentication\n\n## Acceptance Criteria\n- [x] Login form validates email and password\n- [x] JWT tokens issued on successful login\n- [x] Session expires after 30 minutes"
+          "spec/FEATURES.md": "# FEATURES.md\n\n## F-001: User Authentication\n- Status: in_progress\n- Acceptance: spec/contracts/F-001.md",
+          "spec/acceptance/F-001.md": "# F-001: User Authentication\n\n## Acceptance Criteria\n- [x] Login form validates email and password\n- [x] JWT tokens issued on successful login\n- [x] Session expires after 30 minutes"
         }
       },
-      "prompt": "F-0001 is complete and all tests pass. I want to commit the changes. What needs updating first?",
+      "prompt": "F-001 is complete and all tests pass. I want to commit the changes. What needs updating first?",
       "expected": {
         "output_contains": [
           "FEATURES.md|feature.sh|status.*shipped|mark.*shipped|update.*feature.*status"
@@ -898,17 +898,17 @@
       "profile": "formal",
       "setup": {
         "files": {
-          ".agentic/session/WIP.md": "# Work In Progress\n\n- **Feature**: F-0001: User Authentication\n- **Started**: 2026-02-08\n- **Phase**: Implementation\n- **Branch**: feat/auth",
-          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: in_progress\n\n## F-0002: Product Catalog\n- Status: planned"
+          ".agentic/session/WIP.md": "# Work In Progress\n\n- **Feature**: F-001: User Authentication\n- **Started**: 2026-02-08\n- **Phase**: Implementation\n- **Branch**: feat/auth",
+          "spec/FEATURES.md": "# FEATURES.md\n\n## F-001: User Authentication\n- Status: in_progress\n\n## F-0002: Product Catalog\n- Status: planned"
         }
       },
       "prompt": "Let's implement F-0002 Product Catalog",
       "expected": {
         "output_contains": [
-          "F-0001|WIP|in.progress|already.*working|current.*feature|complete.*first|one.*feature|active.*work"
+          "F-001|WIP|in.progress|already.*working|current.*feature|complete.*first|one.*feature|active.*work"
         ],
         "output_contains_any": [
-          "ag done|complete|finish|F-0001"
+          "ag done|complete|finish|F-001"
         ],
         "output_not_contains": [],
         "file_exists": [],
@@ -925,7 +925,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          "spec/FEATURES.md": "# FEATURES.md\n\n## F-0001: User Authentication\n- Status: shipped\n\n## Summary\n| Category | Shipped | Total |\n|----------|---------|-------|\n| Total    | 1       | 1     |"
+          "spec/FEATURES.md": "# FEATURES.md\n\n## F-001: User Authentication\n- Status: shipped\n\n## Summary\n| Category | Shipped | Total |\n|----------|---------|-------|\n| Total    | 1       | 1     |"
         }
       },
       "prompt": "Add a tip of the day feature to the session start dashboard",
@@ -954,7 +954,7 @@
       "setup": {
         "files": {
           "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: discovery\n- feature_tracking: yes\n- acceptance_criteria: blocking\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
-          "spec/FEATURES.md": "# Features\n\n## F-0001: Basic Setup\n- Status: shipped"
+          "spec/FEATURES.md": "# Features\n\n## F-001: Basic Setup\n- Status: shipped"
         }
       },
       "prompt": "Add a notification feature to the app",
@@ -1008,7 +1008,7 @@
       "setup": {
         "files": {
           "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: discovery\n- feature_tracking: yes\n- acceptance_criteria: blocking\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
-          "spec/FEATURES.md": "# Features\n\n## F-0001: Basic Setup\n- Status: shipped"
+          "spec/FEATURES.md": "# Features\n\n## F-001: Basic Setup\n- Status: shipped"
         }
       },
       "prompt": "Implement F-0002: add a search bar to the homepage",
@@ -1062,7 +1062,7 @@
       "setup": {
         "files": {
           "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: discovery\n- wip_before_commit: blocking\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
-          ".agentic/session/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2026-02-15\n**Status**: In progress\n\n## Current Focus\nWorking on test feature",
+          ".agentic/session/WIP.md": "**Feature**: F-001: Test feature\n**Started**: 2026-02-15\n**Status**: In progress\n\n## Current Focus\nWorking on test feature",
           "index.js": "console.log('hello');"
         }
       },
@@ -1090,7 +1090,7 @@
       "setup": {
         "files": {
           "STACK.md": "# STACK.md\n\n## Agentic framework\n- Version: 0.27.0\n\n## Settings\n- profile: formal\n- wip_before_commit: warning\n\n## Languages & runtimes\n- Language(s): JavaScript\n\n## Testing\n- Unit test framework: jest\n- Test commands:\n  - Unit: `npm test`",
-          ".agentic/session/WIP.md": "**Feature**: F-0001: Test feature\n**Started**: 2026-02-15\n**Status**: In progress\n\n## Current Focus\nWorking on test feature",
+          ".agentic/session/WIP.md": "**Feature**: F-001: Test feature\n**Started**: 2026-02-15\n**Status**: In progress\n\n## Current Focus\nWorking on test feature",
           "index.js": "console.log('hello');"
         }
       },
@@ -2005,7 +2005,7 @@
       "profile": "formal",
       "setup": {
         "files": {
-          ".agentic/spec/FEATURES.md": "## F-0001: Auth\n**Status**: planned\n\n## F-0002: Dashboard\n**Status**: planned\n\n## F-0003: Settings\n**Status**: planned"
+          ".agentic/spec/FEATURES.md": "## F-001: Auth\n**Status**: planned\n\n## F-0002: Dashboard\n**Status**: planned\n\n## F-002: Settings\n**Status**: planned"
         }
       },
       "prompt": "churn all tasks — build everything in the backlog",

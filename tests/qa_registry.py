@@ -23,7 +23,7 @@ from typing import Optional
 
 @dataclass
 class Feature:
-    fid: str  # e.g. "F-0001"
+    fid: str  # e.g. "F-001"
     title: str
     status: str  # planned, implementing, shipped, etc.
 

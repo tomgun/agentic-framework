@@ -1,0 +1,27 @@
+id: F-028
+name: User Extensions & Customization
+lifecycle: shipped
+since: v0.15.0
+profile: both
+protection: advisory
+category: developer-experience
+consolidated_from: [F-0151, F-0179, F-0183]
+
+description: |
+  User-extension directory (.agentic/local/) for project-specific rules
+  and overrides. Component registry for scoped context loading. Taste
+  and style settings for code aesthetics preferences.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "Local extensions directory path resolved"
+    type: structural
+    verify: |
+      grep -q "local" .agentic/lib/paths.py || grep -q "LOCAL" .agentic/lib/paths.sh
+    tests:
+      - tests/validate_framework.sh::F-028
+
+nfr_refs: []
+migrations: []

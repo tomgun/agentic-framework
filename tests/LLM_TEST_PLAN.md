@@ -55,7 +55,7 @@
 
 #### LLM-001: Session Start - Proactive Greeting
 
-**Features Tested**: F-0021 (Session Start Protocol)
+**Features Tested**: F-015 (Session Start Protocol)
 
 **Prompt**: (Start fresh session, say nothing or just "hi")
 
@@ -74,7 +74,7 @@
 
 #### LLM-002: Session Start - WIP Recovery
 
-**Features Tested**: F-0021, F-0051, F-0053
+**Features Tested**: F-015, F-016, F-0053
 
 **Setup**: Create `.agentic/WIP.md` with interrupted work
 
@@ -133,7 +133,7 @@
 
 #### LLM-011: Feature Implementation - Small Batch
 
-**Features Tested**: F-0007 (Small Batch Development)
+**Features Tested**: F-007 (Small Batch Development)
 
 **Prompt**: "Implement the entire authentication system"
 
@@ -233,7 +233,7 @@
 
 #### LLM-030: Pre-Commit Gates
 
-**Features Tested**: F-0016 (Pre-Commit Quality Gates)
+**Features Tested**: F-009 (Pre-Commit Quality Gates)
 
 **Setup**: Create .agentic/WIP.md (incomplete work)
 
@@ -274,7 +274,7 @@
 
 #### LLM-040: Bug Report - Issue First
 
-**Features Tested**: F-0079 (Issue/Bug Tracking)
+**Features Tested**: F-010 (Issue/Bug Tracking)
 
 **Prompt**: "There's a bug where the login button doesn't work"
 
@@ -294,7 +294,7 @@
 
 #### LLM-050: Multi-Agent Awareness
 
-**Features Tested**: F-0031, F-0033
+**Features Tested**: F-017, F-0033
 
 **Setup**: Create .agentic/session/AGENTS.json showing another agent working
 
@@ -332,7 +332,7 @@
 
 #### LLM-060: Token Limit Recovery
 
-**Features Tested**: F-0051, F-0053
+**Features Tested**: F-016, F-0053
 
 **Setup**: Work until context compaction happens (or simulate)
 
@@ -370,7 +370,7 @@
 
 #### LLM-070: Token-Efficient Scripts
 
-**Features Tested**: F-0041, F-0071
+**Features Tested**: F-019, F-0071
 
 **Prompt**: "Update the journal with today's progress"
 
@@ -404,7 +404,7 @@
 
 #### LLM-080: PR-Based Workflow (Formal)
 
-**Features Tested**: F-0096
+**Features Tested**: F-024
 
 **Setup**: Formal project
 
@@ -424,7 +424,7 @@
 
 #### LLM-081: Direct Workflow (Discovery)
 
-**Features Tested**: F-0096
+**Features Tested**: F-024
 
 **Setup**: Discovery project (no spec/)
 
@@ -590,7 +590,7 @@ However, full automation is limited because:
 - Agent validates P1 completion before proceeding to P2 work
 - Reports checkpoint status to user
 
-**LLM-073: Extension Discovery** (F-0151)
+**LLM-073: Extension Discovery** (F-028)
 - Agent discovers custom skills from `.agentic/local/extensions/skills/`
 - Custom gates run during pre-commit
 

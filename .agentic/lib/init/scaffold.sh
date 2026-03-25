@@ -9,7 +9,7 @@ if [[ ! -d "${ROOT_DIR}/.agentic/lib/init" ]]; then
   exit 1
 fi
 
-# Git initialization is now deferred by default (F-0250).
+# Git initialization is now deferred by default (F-017).
 # For profiles that default to git_mode: active (autonomous_formal), git is initialized here.
 # Other profiles defer git until the user runs `ag git-init`.
 # The profile-specific git_mode is resolved after the profile variable is set (see below).
@@ -65,7 +65,7 @@ case "${PROFILE}" in
     ;;
 esac
 
-# Resolve git_mode from profile defaults (F-0250)
+# Resolve git_mode from profile defaults (F-017)
 # autonomous_formal defaults to active (git initialized immediately)
 # discovery and formal default to deferred (git activated later via `ag git-init`)
 GIT_MODE="deferred"
@@ -398,7 +398,7 @@ if [[ "$DISCOVERY_RAN" == "yes" && -f "${ROOT_DIR}/.agentic/session/proposals/FE
   copy_or_propose "${ROOT_DIR}/.agentic/session/proposals/FEATURES.md" "${ROOT_DIR}/.agentic/.agentic/spec/FEATURES.md"
 fi
 
-# Configure git hooks via core.hooksPath (only when git_mode is active — F-0250)
+# Configure git hooks via core.hooksPath (only when git_mode is active — F-017)
 if [[ "${GIT_MODE}" == "active" ]] && command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
   CURRENT_HOOKS_PATH=$(git config core.hooksPath 2>/dev/null || echo "")
   if [[ "$CURRENT_HOOKS_PATH" == ".agentic/hooks" ]]; then

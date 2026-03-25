@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# commands/phase.sh — Multi-session plan phase tracking (F-0303)
+# commands/phase.sh — Multi-session plan phase tracking (F-032)
 # Sourced by ag.sh — do NOT execute directly.
 # Depends on: SCRIPT_DIR, ROOT_DIR, AGENTIC_LIB, color codes, paths.sh, settings.sh
 

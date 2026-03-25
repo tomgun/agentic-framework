@@ -7,7 +7,7 @@
 
 ## Context & Why
 
-Implements the three autonomous execution modes that build on the F-0160 engine foundation:
+Implements the three autonomous execution modes that build on the F-030 engine foundation:
 - F-0161: Verify mode (test-fix loop)
 - F-0162: Task mode (single-feature implementation)
 - F-0163: Crunch mode (multi-feature batch)

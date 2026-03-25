@@ -7,10 +7,10 @@
 #
 # Supported prefixes: F- (features), DEV- (dev infrastructure), E- (epics).
 # Supports dotted hierarchical IDs: F-003.1, F-003.1.2 (children start at .1).
-# During transition: both 3-digit (F-003) and 4-digit (F-0003) accepted.
+# During transition: both 3-digit (F-003) and 4-digit (F-002) accepted.
 #
-# @feature F-0004 (consolidated from F-0193)
-# @feature F-0184
+# @feature F-003 (consolidated from F-0193)
+# @feature F-005
 
 # Guard against double-sourcing
 [[ -n "${_AGENTIC_IDS_LOADED:-}" ]] && return 0
@@ -22,7 +22,7 @@ _AGENTIC_IDS_LOADED=1
 # Children start at .1 (never .0)
 # ---------------------------------------------------------------------------
 
-# Unanchored: matches F-0001, DEV-0001, E-0001, F-003.1.2 anywhere in text
+# Unanchored: matches F-001, DEV-001, E-0001, F-003.1.2 anywhere in text
 FEATURE_ID_ERE='(F|DEV|E)-[0-9]{3,}(\.[1-9][0-9]*)*'
 
 # Anchored: entire string must be a feature/dev/epic ID

@@ -33,338 +33,338 @@
 
 ---
 
-## F-0001: Project Initialization & Profiles
+## F-001: Project Initialization & Profiles
 
 **Status**: shipped | **Category**: core-workflow | **Since**: v0.1.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0001.yaml`](contracts/F-0001.yaml)
-**Consolidates**: F-0001, F-0002, F-0009, F-0123, F-0124, F-0131, F-0141
+**Contract**: [`spec/contracts/F-001.yaml`](contracts/F-001.yaml)
+**Consolidates**: F-001, F-0002, F-0009, F-0123, F-0124, F-0131, F-0141
 
 Initialize new projects with Discovery or Formal profiles. Settings in STACK.md control behavior — profiles are preset bundles. Existing projects get intelligent onboarding with domain discovery.
 
 ---
 
-## F-0003: Spec-Driven Development
+## F-002: Spec-Driven Development
 
 **Status**: shipped | **Category**: core-workflow | **Since**: v0.1.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0003.yaml`](contracts/F-0003.yaml)
-**Consolidates**: F-0003, F-0005, F-0006, F-0010, F-0043, F-0117, F-0128, F-0132, F-0147, F-0148, F-0149, F-0152, F-0251
+**Contract**: [`spec/contracts/F-002.yaml`](contracts/F-002.yaml)
+**Consolidates**: F-002, F-0005, F-0006, F-0010, F-0043, F-0117, F-0128, F-0132, F-0147, F-0148, F-0149, F-0152, F-0251
 
 Formal-profile projects manage features through YAML contract specifications with testable acceptance criteria. Features have lifecycle states, enforcement gates, and migration-protected shipped contracts.
 
 ---
 
-## F-0004: Feature Tracking & Lifecycle
+## F-003: Feature Tracking & Lifecycle
 
 **Status**: shipped | **Category**: core-workflow | **Since**: v0.1.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0004.yaml`](contracts/F-0004.yaml)
-**Consolidates**: F-0004, F-0042, F-0078, F-0109, F-0110, F-0177, F-0178, F-0193, F-0197
+**Contract**: [`spec/contracts/F-003.yaml`](contracts/F-003.yaml)
+**Consolidates**: F-003, F-0042, F-0078, F-0109, F-0110, F-0177, F-0178, F-0193, F-0197
 
 State machine manages feature lifecycle from planned through shipped. Transitions are gated, with forward/regression/skip rules. Feature categories, priorities, and complexity tracked in FEATURES.md. Feature ID patterns centralized in ids.py/ids.sh.
 
 ---
 
-## F-0007: Development Constraints & Principles
+## F-007: Development Constraints & Principles
 
 **Status**: shipped | **Category**: design-principles | **Since**: v0.1.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0007.yaml`](contracts/F-0007.yaml)
-**Consolidates**: F-0007, F-0008, F-0069, F-0070, F-0072, F-0073, F-0074, F-0076, F-0209
+**Contract**: [`spec/contracts/F-007.yaml`](contracts/F-007.yaml)
+**Consolidates**: F-007, F-0008, F-0069, F-0070, F-0072, F-0073, F-0074, F-0076, F-0209
 
 Enforced development principles: small batches, one feature at a time, spec before code, tests alongside code. Structural tests verify principle adherence.
 
 ---
 
-## F-0011: Code Quality Standards
+## F-008: Code Quality Standards
 
 **Status**: shipped | **Category**: quality | **Since**: v0.2.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0011.yaml`](contracts/F-0011.yaml)
-**Consolidates**: F-0011, F-0012, F-0013, F-0014, F-0015, F-0116
+**Contract**: [`spec/contracts/F-008.yaml`](contracts/F-008.yaml)
+**Consolidates**: F-008, F-0012, F-0013, F-0014, F-0015, F-0116
 
 Consistent code quality across shell and Python: ShellCheck, error handling patterns, naming conventions, function documentation. Structural tests verify standards.
 
 ---
 
-## F-0016: Pre-Commit Quality Gates
+## F-009: Pre-Commit Quality Gates
 
 **Status**: shipped | **Category**: quality | **Since**: v0.2.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0016.yaml`](contracts/F-0016.yaml)
-**Consolidates**: F-0016, F-0017, F-0091, F-0092, F-0114, F-0115, F-0154, F-0155, F-0229, F-0301
+**Contract**: [`spec/contracts/F-009.yaml`](contracts/F-009.yaml)
+**Consolidates**: F-009, F-0017, F-0091, F-0092, F-0114, F-0115, F-0154, F-0155, F-0229, F-0301
 
 Pre-commit hooks enforce quality: ShellCheck, spec consistency, file size limits, state file freshness. Git hooks installed automatically during init.
 
 ---
 
-## F-0021: Session Management
+## F-015: Session Management
 
 **Status**: shipped | **Category**: session | **Since**: v0.3.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0021.yaml`](contracts/F-0021.yaml)
-**Consolidates**: F-0021, F-0022, F-0023, F-0024, F-0025, F-0026, F-0027, F-0125, F-0126, F-0127, F-0136, F-0145, F-0156, F-0240
+**Contract**: [`spec/contracts/F-015.yaml`](contracts/F-015.yaml)
+**Consolidates**: F-015, F-0022, F-0023, F-0024, F-0025, F-0026, F-0027, F-0125, F-0126, F-0127, F-0136, F-0145, F-0156, F-0240
 
 Session start shows dashboard with status, focus, health, and next steps. Context packs provide efficient handoff between sessions. TODO capture, journal entries, and status tracking persist across sessions.
 
 ---
 
-## F-0031: Multi-Agent Coordination
+## F-017: Multi-Agent Coordination
 
 **Status**: shipped | **Category**: multi-agent | **Since**: v0.5.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0031.yaml`](contracts/F-0031.yaml)
-**Consolidates**: F-0031, F-0032, F-0034, F-0035, F-0036, F-0037, F-0194, F-0195, F-0214, F-0250
+**Contract**: [`spec/contracts/F-017.yaml`](contracts/F-017.yaml)
+**Consolidates**: F-017, F-0032, F-0034, F-0035, F-0036, F-0037, F-0194, F-0195, F-0214, F-0250
 
 Multiple agents work on same project safely via AGENTS.json tracking, git worktrees for isolation, collision detection before destructive operations, and lock-free coordination protocols.
 
 ---
 
-## F-0041: Token & Resource Efficiency
+## F-019: Token & Resource Efficiency
 
 **Status**: shipped | **Category**: tooling | **Since**: v0.4.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0041.yaml`](contracts/F-0041.yaml)
-**Consolidates**: F-0041, F-0071, F-0102, F-0103, F-0112, F-0237, F-0238, F-0244
+**Contract**: [`spec/contracts/F-019.yaml`](contracts/F-019.yaml)
+**Consolidates**: F-019, F-0071, F-0102, F-0103, F-0112, F-0237, F-0238, F-0244
 
 Token-efficient scripts for state file updates (journal.sh, status.sh, feature.sh, etc.) — agents call scripts instead of editing files directly. Subagent context packs minimize token waste.
 
 ---
 
-## F-0051: Crash Recovery & Work Tracking
+## F-016: Crash Recovery & Work Tracking
 
 **Status**: shipped | **Category**: recovery | **Since**: v0.4.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0051.yaml`](contracts/F-0051.yaml)
-**Consolidates**: F-0051, F-0052, F-0053, F-0054, F-0055, F-0200
+**Contract**: [`spec/contracts/F-016.yaml`](contracts/F-016.yaml)
+**Consolidates**: F-016, F-0052, F-0053, F-0054, F-0055, F-0200
 
 Session start detects interrupted work via AGENTS.json. Recovery shows what was in progress, uncommitted changes, and resume path. Intent journal tracks orphaned operations.
 
 ---
 
-## F-0056: Framework Upgrade & Versioning
+## F-020: Framework Upgrade & Versioning
 
 **Status**: shipped | **Category**: tooling | **Since**: v0.5.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0056.yaml`](contracts/F-0056.yaml)
-**Consolidates**: F-0056, F-0068, F-0094
+**Contract**: [`spec/contracts/F-020.yaml`](contracts/F-020.yaml)
+**Consolidates**: F-020, F-0068, F-0094
 
 VERSION file tracks framework version. upgrade.sh handles version bumps with backward compatibility. Semantic versioning with changelog.
 
 ---
 
-## F-0061: Developer Documentation
+## F-026: Developer Documentation
 
 **Status**: shipped | **Category**: developer-experience | **Since**: v0.5.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0061.yaml`](contracts/F-0061.yaml)
-**Consolidates**: F-0061, F-0062, F-0063, F-0064, F-0065, F-0066, F-0067, F-0134
+**Contract**: [`spec/contracts/F-026.yaml`](contracts/F-026.yaml)
+**Consolidates**: F-026, F-0062, F-0063, F-0064, F-0065, F-0066, F-0067, F-0134
 
 DEVELOPER_GUIDE.md, HOW_IT_WORKS.md, FRAMEWORK_DEVELOPMENT.md, and other docs explain the framework for users and contributors. Documentation is code — updated alongside features.
 
 ---
 
-## F-0077: Emergency Quick Reference
+## F-027: Emergency Quick Reference
 
 **Status**: shipped | **Category**: developer-experience | **Since**: v0.6.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0077.yaml`](contracts/F-0077.yaml)
-**Consolidates**: F-0077
+**Contract**: [`spec/contracts/F-027.yaml`](contracts/F-027.yaml)
+**Consolidates**: F-027
 
 EMERGENCY.md provides quick-reference for common recovery scenarios (stuck builds, merge conflicts, agent crashes).
 
 ---
 
-## F-0079: Issue & Feedback Tracking
+## F-010: Issue & Feedback Tracking
 
 **Status**: shipped | **Category**: quality | **Since**: v0.6.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0079.yaml`](contracts/F-0079.yaml)
-**Consolidates**: F-0079, F-0206
+**Contract**: [`spec/contracts/F-010.yaml`](contracts/F-010.yaml)
+**Consolidates**: F-010, F-0206
 
 ISSUES.md tracks bugs and tech debt. FEEDBACK_LOG.md captures user feedback. Both integrated into session start awareness.
 
 ---
 
-## F-0081: Agent System & Instructions
+## F-025: Agent System & Instructions
 
 **Status**: shipped | **Category**: agent-system | **Since**: v0.6.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0081.yaml`](contracts/F-0081.yaml)
-**Consolidates**: F-0081, F-0082, F-0083, F-0084, F-0093, F-0111, F-0113, F-0121, F-0135, F-0143, F-0146, F-0234
+**Contract**: [`spec/contracts/F-025.yaml`](contracts/F-025.yaml)
+**Consolidates**: F-025, F-0082, F-0083, F-0084, F-0093, F-0111, F-0113, F-0121, F-0135, F-0143, F-0146, F-0234
 
 Three-layer instruction architecture (Constitution → Playbooks → State). Multi-tool agent support (Claude, Cursor, Copilot, Codex). Skills provide just-in-time guidance. Memory seed bootstraps agent knowledge.
 
 ---
 
-## F-0095: Cross-Platform Compatibility
+## F-021: Cross-Platform Compatibility
 
 **Status**: shipped | **Category**: architecture | **Since**: v0.8.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0095.yaml`](contracts/F-0095.yaml)
-**Consolidates**: F-0095
+**Contract**: [`spec/contracts/F-021.yaml`](contracts/F-021.yaml)
+**Consolidates**: F-021
 
 Framework works on macOS and Linux. Shell scripts use portable constructs. Path resolution handles both platforms.
 
 ---
 
-## F-0096: Git Workflow & PR Management
+## F-024: Git Workflow & PR Management
 
 **Status**: shipped | **Category**: git-workflow | **Since**: v0.8.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0096.yaml`](contracts/F-0096.yaml)
-**Consolidates**: F-0096, F-0097, F-0182, F-0192, F-0196, F-0235, F-0239
+**Contract**: [`spec/contracts/F-024.yaml`](contracts/F-024.yaml)
+**Consolidates**: F-024, F-0097, F-0182, F-0192, F-0196, F-0235, F-0239
 
 Feature branches, PR creation, commit gates, and merge workflow. HUMAN_NEEDED.md tracks PRs awaiting review. Worktree-based isolation for parallel work.
 
 ---
 
-## F-0101: Architecture Decision Records
+## F-011: Architecture Decision Records
 
 **Status**: shipped | **Category**: quality | **Since**: v0.8.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0101.yaml`](contracts/F-0101.yaml)
-**Consolidates**: F-0101
+**Contract**: [`spec/contracts/F-011.yaml`](contracts/F-011.yaml)
+**Consolidates**: F-011
 
 ADR directory tracks architectural decisions with status, context, and consequences.
 
 ---
 
-## F-0118: Documentation Drift & Lifecycle
+## F-012: Documentation Drift & Lifecycle
 
 **Status**: shipped | **Category**: quality | **Since**: v0.10.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0118.yaml`](contracts/F-0118.yaml)
-**Consolidates**: F-0118, F-0119, F-0138, F-0139, F-0144, F-0207
+**Contract**: [`spec/contracts/F-012.yaml`](contracts/F-012.yaml)
+**Consolidates**: F-012, F-0119, F-0138, F-0139, F-0144, F-0207
 
 drift.sh detects stale documentation. docs.sh manages doc registry in STACK.md. Doc lifecycle integrated into feature shipping: spec + code + tests + docs = done.
 
 ---
 
-## F-0120: Plan & Design Review
+## F-004: Plan & Design Review
 
 **Status**: shipped | **Category**: core-workflow | **Since**: v0.10.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0120.yaml`](contracts/F-0120.yaml)
-**Consolidates**: F-0120, F-0133, F-0150, F-0191, F-0236
+**Contract**: [`spec/contracts/F-004.yaml`](contracts/F-004.yaml)
+**Consolidates**: F-004, F-0133, F-0150, F-0191, F-0236
 
 Dialectical plan review: Critic + Advocate agents evaluate plans in fresh context. Plans saved to journal/plans/ with DRAFT/APPROVED/REJECTED status. Convergence modes: auto or manual.
 
 ---
 
-## DEV-0122: Testing Infrastructure
+## DEV-002: Testing Infrastructure
 
 **Status**: shipped | **Category**: dev-infrastructure | **Since**: v0.10.0 | **Profile**: both
-**Type**: infrastructure | **Parent**: DEV-0001
-**Contract**: [`spec/contracts/DEV-0122.yaml`](contracts/DEV-0122.yaml)
-**Consolidates**: DEV-0122, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242
+**Type**: infrastructure | **Parent**: DEV-001
+**Contract**: [`spec/contracts/DEV-002.yaml`](contracts/DEV-002.yaml)
+**Consolidates**: DEV-002, F-0153, F-0171, F-0172, F-0173, F-0174, F-0175, F-0241, F-0242
 
 validate_framework.sh (structural tests), LLM behavioral tests, QA registry mapping features to tests, spec-code traceability. Framework verification at multiple layers.
 
 ---
 
-## F-0151: User Extensions & Customization
+## F-028: User Extensions & Customization
 
 **Status**: shipped | **Category**: developer-experience | **Since**: v0.15.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0151.yaml`](contracts/F-0151.yaml)
-**Consolidates**: F-0151, F-0179, F-0183
+**Contract**: [`spec/contracts/F-028.yaml`](contracts/F-028.yaml)
+**Consolidates**: F-028, F-0179, F-0183
 
 Component registry, user-defined extensions, project-specific customizations via STACK.md settings.
 
 ---
 
-## F-0157: Framework Architecture & Paths
+## F-022: Framework Architecture & Paths
 
 **Status**: shipped | **Category**: architecture | **Since**: v0.20.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0157.yaml`](contracts/F-0157.yaml)
-**Consolidates**: F-0157, F-0158, F-0159, F-0198, F-0221
+**Contract**: [`spec/contracts/F-022.yaml`](contracts/F-022.yaml)
+**Consolidates**: F-022, F-0158, F-0159, F-0198, F-0221
 
 Central path resolver (paths.py/paths.sh) with backward-compatible dual-location support. Directory structure: .agentic/lib/ (code), .agentic/spec/ (specs), .agentic/session/ (ephemeral), .agentic/journal/ (history).
 
 ---
 
-## F-0160: Autonomous Execution Engine
+## F-030: Autonomous Execution Engine
 
 **Status**: shipped | **Category**: autonomous | **Since**: v0.30.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0160.yaml`](contracts/F-0160.yaml)
-**Consolidates**: F-0160, F-0161, F-0162, F-0163, F-0164, F-0168, F-0186, F-0204, F-0215
+**Contract**: [`spec/contracts/F-030.yaml`](contracts/F-030.yaml)
+**Consolidates**: F-030, F-0161, F-0162, F-0163, F-0164, F-0168, F-0186, F-0204, F-0215
 
 VerifyLoop engine executes acceptance criteria autonomously: load ACs → implement → verify → repeat. Supports task-level and epic-level autonomous execution. Feedback mechanism for mid-flight corrections.
 
 ---
 
-## F-0169: Non-Functional Requirements
+## F-013: Non-Functional Requirements
 
 **Status**: shipped | **Category**: quality | **Since**: v0.25.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0169.yaml`](contracts/F-0169.yaml)
-**Consolidates**: F-0169, F-0170, F-0216, F-0217, F-0218, F-0219
+**Contract**: [`spec/contracts/F-013.yaml`](contracts/F-013.yaml)
+**Consolidates**: F-013, F-0170, F-0216, F-0217, F-0218, F-0219
 
 NFR.md tracks cross-cutting quality requirements. NFR assertions verified structurally. `ag nfr discover` suggests NFRs from project patterns. NFR coverage tracked per feature.
 
 ---
 
-## F-0180: Review Checkpoint Framework
+## F-014: Review Checkpoint Framework
 
 **Status**: shipped | **Category**: quality | **Since**: v0.30.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0180.yaml`](contracts/F-0180.yaml)
-**Consolidates**: F-0180, F-0203
+**Contract**: [`spec/contracts/F-014.yaml`](contracts/F-014.yaml)
+**Consolidates**: F-014, F-0203
 
 Configurable review checkpoints: human, critical_agent, or skip. Controls for plan review, code review, regression review, merge review, commit review. Critical agent provides automated review for autonomous workflows.
 
 ---
 
-## F-0181: Autonomous Formal Profile
+## F-029: Autonomous Formal Profile
 
 **Status**: shipped | **Category**: autonomous | **Since**: v0.30.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0181.yaml`](contracts/F-0181.yaml)
-**Consolidates**: F-0181
+**Contract**: [`spec/contracts/F-029.yaml`](contracts/F-029.yaml)
+**Consolidates**: F-029
 
 autonomous_formal profile: formal rigor with review_code and review_regression delegated to critical_agent. Only review_merge stays human. Enables autonomous execution with quality guarantees.
 
 ---
 
-## F-0184: Feature Hierarchy & Decomposition
+## F-005: Feature Hierarchy & Decomposition
 
 **Status**: implementing
-**Contract**: [`spec/contracts/F-0184.yaml`](contracts/F-0184.yaml)
-**Consolidates**: F-0184
+**Contract**: [`spec/contracts/F-005.yaml`](contracts/F-005.yaml)
+**Consolidates**: F-005
 
 `ag decompose` breaks epics into child features by component. Parent-child relationships tracked. review_decomposition checkpoint validates decomposition quality.
 
 ---
 
-## F-0185: Coordination Server
+## F-018: Coordination Server
 
 **Status**: shipped | **Category**: multi-agent | **Since**: v0.35.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0185.yaml`](contracts/F-0185.yaml)
-**Consolidates**: F-0185, F-0187
+**Contract**: [`spec/contracts/F-018.yaml`](contracts/F-018.yaml)
+**Consolidates**: F-018, F-0187
 
 HTTP JSON-RPC coordination server (port 4185) for multi-agent orchestration. Bearer token auth. Start/stop/status via `ag coord`.
 
 ---
 
-## F-0190: Backlog & Work Queue
+## F-006: Backlog & Work Queue
 
 **Status**: shipped | **Category**: core-workflow | **Since**: v0.40.0 | **Profile**: formal
-**Contract**: [`spec/contracts/F-0190.yaml`](contracts/F-0190.yaml)
-**Consolidates**: F-0190, F-0201, F-0202, F-0205
+**Contract**: [`spec/contracts/F-006.yaml`](contracts/F-006.yaml)
+**Consolidates**: F-006, F-0201, F-0202, F-0205
 
 Ordered work queue in BACKLOG.json. `ag backlog add/list/done/move/remove`. Position 0 = current work. Enforced order: `ag implement` checks backlog position. Feature formalization promotes TODOs to features.
 
 ---
 
-## DEV-0199: Instruction File Integrity
+## DEV-003: Instruction File Integrity
 
 **Status**: shipped | **Category**: dev-infrastructure | **Since**: v0.45.0 | **Profile**: both
-**Type**: infrastructure | **Parent**: DEV-0001
-**Contract**: [`spec/contracts/DEV-0199.yaml`](contracts/DEV-0199.yaml)
-**Consolidates**: DEV-0199, F-0226
+**Type**: infrastructure | **Parent**: DEV-001
+**Contract**: [`spec/contracts/DEV-003.yaml`](contracts/DEV-003.yaml)
+**Consolidates**: DEV-003, F-0226
 
 Instruction files are part of the feature. 11 locations must be updated when shipping framework features. `ag dogfood` detects template vs root drift.
 
 ---
 
-## F-0245: Hook-Based Enforcement
+## F-023: Hook-Based Enforcement
 
 **Status**: shipped | **Category**: architecture | **Since**: v0.65.0 | **Profile**: both
-**Contract**: [`spec/contracts/F-0245.yaml`](contracts/F-0245.yaml)
-**Consolidates**: F-0245, F-0246, F-0247, F-0248, F-0249
+**Contract**: [`spec/contracts/F-023.yaml`](contracts/F-023.yaml)
+**Consolidates**: F-023, F-0246, F-0247, F-0248, F-0249
 
 Claude Code hooks for automated enforcement: pre-commit checks, post-tool validation, workflow triggers. Hook installation via `ag hooks install`.
 
 ---
 
-## F-0302: Spec System Overhaul — YAML Contracts
+## F-031: Spec System Overhaul — YAML Contracts
 
 **Status**: shipped
-**Contract**: [`spec/contracts/F-0302.yaml`](contracts/F-0302.yaml)
+**Contract**: [`spec/contracts/F-031.yaml`](contracts/F-031.yaml)
 
 YAML contracts replace markdown acceptance criteria as source of truth. Machine-verifiable assertions, migration-protected shipped contracts, user_input as control interface. Consolidates 217 legacy features into ~33 contracts.
 
 ---
 
-## F-0211: Project-Specific Customization Layer
+## F-033: Project-Specific Customization Layer
 
 **Status**: planned | **Category**: developer-experience | **Profile**: both
 
@@ -372,7 +372,7 @@ Allow projects to define custom workflow steps, validation rules, and enforcemen
 
 ---
 
-## F-0212: Project Customization Auto-Sync
+## F-034: Project Customization Auto-Sync
 
 **Status**: planned | **Category**: developer-experience | **Profile**: both
 
@@ -380,7 +380,7 @@ Automatically sync project-specific customizations when framework upgrades, pres
 
 ---
 
-## F-0220: Protected Main Branch Support
+## F-035: Protected Main Branch Support
 
 **Status**: planned | **Category**: git-workflow | **Profile**: both
 
@@ -388,7 +388,7 @@ Support workflows where main branch is protected (no direct push). Adapt commit,
 
 ---
 
-## F-0228: Workflow Definition File
+## F-036: Workflow Definition File
 
 **Status**: planned | **Category**: architecture | **Profile**: formal
 
@@ -396,15 +396,15 @@ Declarative workflow.yaml defining state machine transitions, gates, and review 
 
 ---
 
-## F-0230: MCP Coordination Server
+## F-037: MCP Coordination Server
 
 **Status**: planned | **Category**: multi-agent | **Profile**: both
 
-MCP-protocol coordination server for multi-agent orchestration. Extends beyond HTTP JSON-RPC (F-0185) with tool-native integration.
+MCP-protocol coordination server for multi-agent orchestration. Extends beyond HTTP JSON-RPC (F-018) with tool-native integration.
 
 ---
 
-## F-0231: Multi-Repo Umbrella
+## F-038: Multi-Repo Umbrella
 
 **Status**: planned | **Category**: multi-agent | **Profile**: both
 
@@ -412,7 +412,7 @@ Coordinate work across multiple repositories with shared backlog, cross-repo dep
 
 ---
 
-## F-0232: Full Autonomous Scheduling
+## F-039: Full Autonomous Scheduling
 
 **Status**: planned | **Category**: autonomous | **Profile**: formal
 
@@ -420,11 +420,11 @@ Autonomous scheduling engine that assigns work to agents based on priority, depe
 
 ---
 
-## DEV-0243: Complexity Tier Experiments
+## DEV-004: Complexity Tier Experiments
 
 **Status**: shipped | **Category**: dev-infrastructure
-**Type**: research | **Parent**: DEV-0001
-**Contract**: [`spec/contracts/DEV-0243.yaml`](contracts/DEV-0243.yaml)
+**Type**: research | **Parent**: DEV-001
+**Contract**: [`spec/contracts/DEV-004.yaml`](contracts/DEV-004.yaml)
 
 Empirically compare framework outcomes across three real configuration profiles (discovery, formal, autonomous_formal) by running the same build task N times per tier and collecting structured metrics. Produces a comparison report showing what each tier costs (time, token spend, ceremony) and what it buys (spec coverage, test count, commit quality, violation rate). ADR-001 roadmap item.
 
@@ -442,14 +442,14 @@ Not user-facing.
 | `research` | Time-bounded experiment (concludes when question is answered) |
 | `meta` | Organizational container |
 
-### DEV-0001: Framework Development Infrastructure
+### DEV-001: Framework Development Infrastructure
 
 **Status**: ongoing | **Type**: meta
 
 Organizational parent for all framework development tooling and research.
 
-**Children**: DEV-0122, DEV-0199, DEV-0243
-**Contract**: [`spec/contracts/DEV-0001.yaml`](contracts/DEV-0001.yaml)
+**Children**: DEV-002, DEV-003, DEV-004
+**Contract**: [`spec/contracts/DEV-001.yaml`](contracts/DEV-001.yaml)
 
 ---
 
@@ -459,7 +459,7 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 
 ---
 
-## F-0303: Plan-Derived Work Items
+## F-032: Plan-Derived Work Items
 
 **Status**: shipped
 **Category**: general
@@ -473,4 +473,4 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 - Code: (TODO)
 - Tests: (TODO)
 
-**Contract**: See `spec/contracts/F-0303.yaml`
+**Contract**: See `spec/contracts/F-032.yaml`

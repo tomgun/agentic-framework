@@ -11,7 +11,7 @@ setup_test_project "formal"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # Features
 
-## F-0001: Basic Setup
+## F-001: Basic Setup
 **Status**: shipped
 **Description**: Initial project setup
 EOF

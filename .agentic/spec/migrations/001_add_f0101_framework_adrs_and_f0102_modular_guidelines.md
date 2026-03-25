@@ -3,7 +3,7 @@
 <!-- author: Claude (Opus) -->
 <!-- type: feature -->
 
-# Migration 001: Add F-0101 Framework ADRs and F-0102 Modular Guidelines
+# Migration 001: Add F-011 Framework ADRs and F-0102 Modular Guidelines
 
 ## Context & Why
 
@@ -18,7 +18,7 @@ Example: CLAUDE.md had content that appeared duplicated with agent_operating_gui
 
 ### Features Added
 
-- F-0101: Framework Architecture Decision Records (ADRs)
+- F-011: Framework Architecture Decision Records (ADRs)
   - Created `docs/adr/` directory
   - Created ADR-001: CLAUDE.md Must Be Self-Contained
   - Updated CONTEXT_PACK.md to reference ADRs
@@ -66,12 +66,12 @@ None
 2. Remove `.agentic/agents/shared/guidelines/` directory (keep README.md)
 3. Remove step 9 from FRAMEWORK_QUICK_START.md
 4. Update CONTEXT_PACK.md to remove ADR reference
-5. Revert spec/FEATURES.md (remove F-0101, F-0102)
+5. Revert spec/FEATURES.md (remove F-011, F-0102)
 
 ## Related Files
 
-- `spec/FEATURES.md` - Added F-0101, F-0102
-- `spec/acceptance/F-0101.md` - Created
+- `spec/FEATURES.md` - Added F-011, F-0102
+- `spec/acceptance/F-011.md` - Created
 - `spec/acceptance/F-0102.md` - Created
 - `docs/adr/README.md` - Created
 - `docs/adr/001-claude-md-self-contained.md` - Created

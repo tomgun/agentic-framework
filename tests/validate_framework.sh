@@ -70,9 +70,9 @@ echo "Version: $(cat ${FRAMEWORK_ROOT}/VERSION)"
 echo ""
 
 # ============================================================
-# F-0001: Project Initialization
+# F-001: Project Initialization
 # ============================================================
-echo "--- F-0001: Project Initialization ---"
+echo "--- F-001: Project Initialization ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/install.sh" ]]; then
   pass "install.sh exists"
@@ -133,9 +133,9 @@ else
 fi
 
 # ============================================================
-# F-0007: Small Batch Development
+# F-007: Small Batch Development
 # ============================================================
-echo "--- F-0007: Small Batch Development ---"
+echo "--- F-007: Small Batch Development ---"
 
 if grep -q "Small Batch" "${FRAMEWORK_ROOT}/.agentic/lib/PRINCIPLES.md" 2>/dev/null; then
   pass "Small Batch Development in PRINCIPLES.md"
@@ -155,9 +155,9 @@ fi
 echo "--- F-0013: Smoke Testing ---"
 
 # ============================================================
-# F-0016: Pre-Commit Quality Gates
+# F-009: Pre-Commit Quality Gates
 # ============================================================
-echo "--- F-0016: Pre-Commit Quality Gates ---"
+echo "--- F-009: Pre-Commit Quality Gates ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commit-check.sh" ]]; then
   pass "pre-commit-check.sh exists"
@@ -178,9 +178,9 @@ else
 fi
 
 # ============================================================
-# F-0021: Session Start Protocol
+# F-015: Session Start Protocol
 # ============================================================
-echo "--- F-0021: Session Start Protocol ---"
+echo "--- F-015: Session Start Protocol ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/hooks/session-start.sh" ]]; then
   pass "session-start.sh hook exists"
@@ -189,9 +189,9 @@ else
 fi
 
 # ============================================================
-# F-0031: Multi-Agent Coordination
+# F-017: Multi-Agent Coordination
 # ============================================================
-echo "--- F-0031: Multi-Agent Coordination ---"
+echo "--- F-017: Multi-Agent Coordination ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/agents_helpers.py" ]]; then
   pass "AGENTS.json registry helper exists (agents_helpers.py)"
@@ -216,9 +216,9 @@ else
 fi
 
 # ============================================================
-# F-0041: Token-Efficient Scripts
+# F-019: Token-Efficient Scripts
 # ============================================================
-echo "--- F-0041: Token-Efficient Scripts ---"
+echo "--- F-019: Token-Efficient Scripts ---"
 
 for script in journal.sh status.sh feature.sh blocker.sh; do
   if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/${script}" ]]; then
@@ -229,9 +229,9 @@ for script in journal.sh status.sh feature.sh blocker.sh; do
 done
 
 # ============================================================
-# F-0051: WIP Tracking
+# F-016: WIP Tracking
 # ============================================================
-echo "--- F-0051: WIP Tracking ---"
+echo "--- F-016: WIP Tracking ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/wip.sh" ]]; then
   pass "wip.sh exists"
@@ -251,9 +251,9 @@ fi
 echo "--- F-0055: Anti-Hallucination Rules ---"
 
 # ============================================================
-# F-0061: DEVELOPER_GUIDE.md
+# F-026: DEVELOPER_GUIDE.md
 # ============================================================
-echo "--- F-0061: DEVELOPER_GUIDE.md ---"
+echo "--- F-026: DEVELOPER_GUIDE.md ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/DEVELOPER_GUIDE.md" ]]; then
   pass "DEVELOPER_GUIDE.md exists"
@@ -333,9 +333,9 @@ else
 fi
 
 # ============================================================
-# F-0077: Emergency Quick Reference
+# F-027: Emergency Quick Reference
 # ============================================================
-echo "--- F-0077: Emergency Quick Reference ---"
+echo "--- F-027: Emergency Quick Reference ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/EMERGENCY.md" ]]; then
   pass "EMERGENCY.md exists"
@@ -373,9 +373,9 @@ else
 fi
 
 # ============================================================
-# F-0079: Issue/Bug Tracking
+# F-010: Issue/Bug Tracking
 # ============================================================
-echo "--- F-0079: Issue/Bug Tracking ---"
+echo "--- F-010: Issue/Bug Tracking ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/templates/ISSUES.template.md" ]]; then
   pass "ISSUES.template.md exists"
@@ -533,9 +533,9 @@ else
 fi
 
 # ============================================================
-# F-0095: Cross-Platform Tool Compatibility
+# F-021: Cross-Platform Tool Compatibility
 # ============================================================
-echo "--- F-0095: Cross-Platform Tool Compatibility ---"
+echo "--- F-021: Cross-Platform Tool Compatibility ---"
 
 if grep -q "awk" "${FRAMEWORK_ROOT}/.agentic/lib/tools/status.sh" 2>/dev/null; then
   pass "status.sh uses awk for cross-platform compatibility"
@@ -551,9 +551,9 @@ else
 fi
 
 # ============================================================
-# F-0096: PR-Based Workflow Default
+# F-024: PR-Based Workflow Default
 # ============================================================
-echo "--- F-0096: PR-Based Workflow Default ---"
+echo "--- F-024: PR-Based Workflow Default ---"
 
 # AC-001: STACK.template.md has git_workflow setting (explicit, discovery default = direct)
 if grep -q "^- git_workflow:" "${FRAMEWORK_ROOT}/.agentic/lib/init/STACK.template.md" 2>/dev/null; then
@@ -765,9 +765,9 @@ else
 fi
 
 # ============================================================
-# DEV-0122: Multi-Tool LLM Testing Infrastructure
+# DEV-002: Multi-Tool LLM Testing Infrastructure
 # ============================================================
-echo "--- DEV-0122: Multi-Tool LLM Testing Infrastructure ---"
+echo "--- DEV-002: Multi-Tool LLM Testing Infrastructure ---"
 
 # Test definitions JSON exists
 if [[ -f "${FRAMEWORK_ROOT}/tests/llm/test_definitions.json" ]]; then
@@ -831,10 +831,10 @@ else
 fi
 
 # Contract or archived acceptance criteria exists
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/DEV-0122.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/DEV-0122.md" ]]; then
-  pass "DEV-0122 contract/acceptance criteria exists"
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/DEV-002.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/DEV-002.md" ]]; then
+  pass "DEV-002 contract/acceptance criteria exists"
 else
-  fail "DEV-0122 contract/acceptance criteria missing"
+  fail "DEV-002 contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -1284,133 +1284,133 @@ else
 fi
 
 # ============================================================
-# F-0160: Autonomous Engine Foundation
+# F-030: Autonomous Engine Foundation
 # ============================================================
 echo ""
-echo "--- F-0160: Autonomous Engine Foundation ---"
+echo "--- F-030: Autonomous Engine Foundation ---"
 
 # AC-001/002: Engine core files exist
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py" ]]; then
-  pass "F-0160: engine.py exists"
+  pass "F-030: engine.py exists"
 else
-  fail "F-0160: engine.py missing"
+  fail "F-030: engine.py missing"
 fi
 
 # Control client
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/control.py" ]]; then
-  pass "F-0160: control.py exists"
+  pass "F-030: control.py exists"
 else
-  fail "F-0160: control.py missing"
+  fail "F-030: control.py missing"
 fi
 
 # AC-012: init.py for settings generation
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/init.py" ]]; then
-  pass "F-0160: init.py exists"
+  pass "F-030: init.py exists"
 else
-  fail "F-0160: init.py missing"
+  fail "F-030: init.py missing"
 fi
 
 # AC-019: Settings template
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/settings-template.json" ]]; then
-  pass "F-0160: settings-template.json exists"
+  pass "F-030: settings-template.json exists"
 else
-  fail "F-0160: settings-template.json missing"
+  fail "F-030: settings-template.json missing"
 fi
 
 # AC-015: Settings template denies dangerous ops
 if grep -q "rm -rf" "${FRAMEWORK_ROOT}/.agentic/lib/auto/settings-template.json"; then
-  pass "F-0160: settings template denies rm -rf"
+  pass "F-030: settings template denies rm -rf"
 else
-  fail "F-0160: settings template missing rm -rf deny"
+  fail "F-030: settings template missing rm -rf deny"
 fi
 if grep -q "sudo" "${FRAMEWORK_ROOT}/.agentic/lib/auto/settings-template.json"; then
-  pass "F-0160: settings template denies sudo"
+  pass "F-030: settings template denies sudo"
 else
-  fail "F-0160: settings template missing sudo deny"
+  fail "F-030: settings template missing sudo deny"
 fi
 
 # Prompt templates
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/prompts/estimate-complexity.md" ]]; then
-  pass "F-0160: estimate-complexity prompt exists"
+  pass "F-030: estimate-complexity prompt exists"
 else
-  fail "F-0160: estimate-complexity prompt missing"
+  fail "F-030: estimate-complexity prompt missing"
 fi
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/prompts/decompose-ac.md" ]]; then
-  pass "F-0160: decompose-ac prompt exists"
+  pass "F-030: decompose-ac prompt exists"
 else
-  fail "F-0160: decompose-ac prompt missing"
+  fail "F-030: decompose-ac prompt missing"
 fi
 
 # AC-033: Gitignored session files
 if grep -q "auto.sock" "${FRAMEWORK_ROOT}/.gitignore"; then
-  pass "F-0160: auto.sock gitignored"
+  pass "F-030: auto.sock gitignored"
 else
-  fail "F-0160: auto.sock not gitignored"
+  fail "F-030: auto.sock not gitignored"
 fi
 if grep -q "auto.pid" "${FRAMEWORK_ROOT}/.gitignore"; then
-  pass "F-0160: auto.pid gitignored"
+  pass "F-030: auto.pid gitignored"
 else
-  fail "F-0160: auto.pid not gitignored"
+  fail "F-030: auto.pid not gitignored"
 fi
 if grep -q "auto-state.json" "${FRAMEWORK_ROOT}/.gitignore"; then
-  pass "F-0160: auto-state.json gitignored"
+  pass "F-030: auto-state.json gitignored"
 else
-  fail "F-0160: auto-state.json not gitignored"
+  fail "F-030: auto-state.json not gitignored"
 fi
 
 # AC-034/035: ag auto in help text
 if grep_ag "auto"; then
-  pass "F-0160: ag auto command exists in ag.sh"
+  pass "F-030: ag auto command exists in ag.sh"
 else
-  fail "F-0160: ag auto command missing from ag.sh"
+  fail "F-030: ag auto command missing from ag.sh"
 fi
 
 # AC-030: Thread safety (EngineState uses threading.Lock)
 if grep -q "threading.Lock" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
-  pass "F-0160: engine uses threading.Lock for thread safety"
+  pass "F-030: engine uses threading.Lock for thread safety"
 else
-  fail "F-0160: engine missing threading.Lock"
+  fail "F-030: engine missing threading.Lock"
 fi
 
 # AC-008: Cleanup handlers registered
 if grep -q "atexit.register" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
-  pass "F-0160: atexit cleanup registered"
+  pass "F-030: atexit cleanup registered"
 else
-  fail "F-0160: atexit cleanup missing"
+  fail "F-030: atexit cleanup missing"
 fi
 if grep -q "signal.SIGTERM" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
-  pass "F-0160: SIGTERM handler registered"
+  pass "F-030: SIGTERM handler registered"
 else
-  fail "F-0160: SIGTERM handler missing"
+  fail "F-030: SIGTERM handler missing"
 fi
 
 # AC-025: Decomposition support
 if grep -q "_decompose_ac" "${FRAMEWORK_ROOT}/.agentic/lib/auto/engine.py"; then
-  pass "F-0160: AC decomposition method exists"
+  pass "F-030: AC decomposition method exists"
 else
-  fail "F-0160: AC decomposition method missing"
+  fail "F-030: AC decomposition method missing"
 fi
 
 # Tests exist
 if [[ -f "${FRAMEWORK_ROOT}/tests/test_auto_engine.py" ]]; then
-  pass "F-0160: test_auto_engine.py exists"
+  pass "F-030: test_auto_engine.py exists"
 else
-  fail "F-0160: test_auto_engine.py missing"
+  fail "F-030: test_auto_engine.py missing"
 fi
 
 # Contract or archived acceptance criteria file
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0160.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0160.md" ]]; then
-  pass "F-0160: contract/acceptance criteria exists"
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-030.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-030.md" ]]; then
+  pass "F-030: contract/acceptance criteria exists"
 else
-  fail "F-0160: contract/acceptance criteria missing"
+  fail "F-030: contract/acceptance criteria missing"
 fi
 
 # Planned features registered
 for fid in F-0161 F-0162 F-0163; do
   if grep -q "## ${fid}:" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md"; then
-    pass "F-0160: ${fid} registered in FEATURES.md"
+    pass "F-030: ${fid} registered in FEATURES.md"
   else
-    fail "F-0160: ${fid} missing from FEATURES.md"
+    fail "F-030: ${fid} missing from FEATURES.md"
   fi
 done
 
@@ -1845,47 +1845,47 @@ else
 fi
 
 # ============================================================
-# F-0169: NFR Discovery & Catalog
+# F-013: NFR Discovery & Catalog
 # ============================================================
-echo "--- F-0169: NFR Discovery & Catalog ---"
+echo "--- F-013: NFR Discovery & Catalog ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/init/nfr-catalog.md" ]]; then
-  pass "F-0169: nfr-catalog.md exists"
+  pass "F-013: nfr-catalog.md exists"
 else
-  fail "F-0169: nfr-catalog.md missing"
+  fail "F-013: nfr-catalog.md missing"
 fi
 
 # Catalog has type-specific sections
 for section in "Universal" "Web App" "API" "Game" "Mobile" "CLI" "Desktop" "Framework Promises"; do
   if grep -qi "$section" "${FRAMEWORK_ROOT}/.agentic/lib/init/nfr-catalog.md"; then
-    pass "F-0169: catalog has ${section} section"
+    pass "F-013: catalog has ${section} section"
   else
-    fail "F-0169: catalog missing ${section} section"
+    fail "F-013: catalog missing ${section} section"
   fi
 done
 
 # Init playbook has Step 2c NFR Discovery
 if grep -q "Step 2c\|NFR Discovery" "${FRAMEWORK_ROOT}/.agentic/lib/init/init_playbook.md"; then
-  pass "F-0169: init_playbook.md has NFR Discovery step"
+  pass "F-013: init_playbook.md has NFR Discovery step"
 else
-  fail "F-0169: init_playbook.md missing NFR Discovery step"
+  fail "F-013: init_playbook.md missing NFR Discovery step"
 fi
 
 # Memory seed has NFR proactive suggestion (v1 only — trimmed in v2)
 # ag nfr discover command works
 _NFR_DISCOVER_OUT=$(ROOT_DIR="${FRAMEWORK_ROOT}" bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" nfr discover 2>&1 || true)
 if echo "$_NFR_DISCOVER_OUT" | grep -qi "catalog\|NFR\|suggestion"; then
-  pass "F-0169: ag nfr discover produces output"
+  pass "F-013: ag nfr discover produces output"
 else
-  fail "F-0169: ag nfr discover produces no output"
+  fail "F-013: ag nfr discover produces no output"
 fi
 
 # ag nfr list command works
 _NFR_LIST_OUT=$(ROOT_DIR="${FRAMEWORK_ROOT}" bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" nfr list 2>&1 || true)
 if echo "$_NFR_LIST_OUT" | grep -q "NFR-0001"; then
-  pass "F-0169: ag nfr list shows NFR-0001"
+  pass "F-013: ag nfr list shows NFR-0001"
 else
-  fail "F-0169: ag nfr list missing NFR-0001"
+  fail "F-013: ag nfr list missing NFR-0001"
 fi
 
 # ============================================================
@@ -2074,7 +2074,7 @@ fi
 # ============================================================
 echo "--- F-0175: QA Suite Glue & Documentation ---"
 
-for fid in F-0169 F-0170 F-0171 F-0172 F-0173 F-0174 F-0175; do
+for fid in F-013 F-0170 F-0171 F-0172 F-0173 F-0174 F-0175; do
   if grep -q "$fid" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md"; then
     pass "F-0175: ${fid} registered in FEATURES.md"
   else
@@ -2082,7 +2082,7 @@ for fid in F-0169 F-0170 F-0171 F-0172 F-0173 F-0174 F-0175; do
   fi
 done
 
-for fid in F-0169 F-0170 F-0171 F-0172 F-0173 F-0174 F-0175; do
+for fid in F-013 F-0170 F-0171 F-0172 F-0173 F-0174 F-0175; do
   if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/${fid}.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/${fid}.md" ]]; then
     pass "F-0175: ${fid} contract/acceptance criteria exists"
   else
@@ -2107,7 +2107,7 @@ else
   fail "F-0175: VERSION file missing"
 fi
 
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/journal/plans/2026-03-07-F-0169-qa-suite-plan.md" ]]; then
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/journal/plans/2026-03-07-F-013-qa-suite-plan.md" ]]; then
   pass "F-0175: QA suite plan saved to journal/plans/"
 else
   fail "F-0175: QA suite plan not saved to journal/plans/"
@@ -2222,7 +2222,7 @@ fi
 - feature_tracking: yes
 TESTEOF
   cat > "$GATE_TEST_DIR/.agentic/spec/FEATURES.md" <<'TESTEOF'
-## F-0001: Existing Feature
+## F-001: Existing Feature
 **Status**: planned
 TESTEOF
   # F-9999 is NOT in FEATURES.md — should block
@@ -2248,11 +2248,11 @@ fi
 - plan_review_enabled: no
 TESTEOF
   cat > "$GATE_TEST_DIR/.agentic/spec/FEATURES.md" <<'TESTEOF'
-## F-0001: Test Feature
+## F-001: Test Feature
 **Status**: planned
 TESTEOF
-  # F-0001 IS in FEATURES.md but no contract/acceptance file — should block
-  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" implement F-0001 2>&1) || true
+  # F-001 IS in FEATURES.md but no contract/acceptance file — should block
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" implement F-001 2>&1) || true
   rm -rf "$GATE_TEST_DIR"
   echo "$OUTPUT" | grep -q "BLOCKED.*No acceptance criteria\|BLOCKED.*No contract"
 ) 2>/dev/null
@@ -2366,11 +2366,11 @@ fi
 - docs_gate: off
 TESTEOF
   cat > "$GATE_TEST_DIR/.agentic/spec/FEATURES.md" <<'TESTEOF'
-## F-0001: Test Feature
+## F-001: Test Feature
 **Status**: in_progress
 TESTEOF
-  cat > "$GATE_TEST_DIR/.agentic/spec/contracts/F-0001.yaml" <<'YAMLEOF'
-id: F-0001
+  cat > "$GATE_TEST_DIR/.agentic/spec/contracts/F-001.yaml" <<'YAMLEOF'
+id: F-001
 name: Test Feature
 lifecycle: implementing
 description: Test feature.
@@ -2379,7 +2379,7 @@ assertions:
     text: Works
     type: behavioral
 YAMLEOF
-  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" done F-0001 2>&1) || true
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" done F-001 2>&1) || true
   rm -rf "$GATE_TEST_DIR"
   # docs_gate=off means no "Documentation Drift Check" section
   ! echo "$OUTPUT" | grep -q "Documentation Drift Check"
@@ -2402,11 +2402,11 @@ fi
 - docs_gate: warning
 TESTEOF
   cat > "$GATE_TEST_DIR/.agentic/spec/FEATURES.md" <<'TESTEOF'
-## F-0001: Test Feature
+## F-001: Test Feature
 **Status**: in_progress
 TESTEOF
-  cat > "$GATE_TEST_DIR/.agentic/spec/contracts/F-0001.yaml" <<'YAMLEOF'
-id: F-0001
+  cat > "$GATE_TEST_DIR/.agentic/spec/contracts/F-001.yaml" <<'YAMLEOF'
+id: F-001
 name: Test Feature
 lifecycle: implementing
 description: Test feature.
@@ -2415,7 +2415,7 @@ assertions:
     text: Works
     type: behavioral
 YAMLEOF
-  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" done F-0001 2>&1) || true
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" done F-001 2>&1) || true
   rm -rf "$GATE_TEST_DIR"
   # warning mode shows "Documentation Drift Check" but no blocking prompt
   echo "$OUTPUT" | grep -q "Documentation Drift Check" && ! echo "$OUTPUT" | grep -q "confirm docs are updated"
@@ -2977,11 +2977,11 @@ else
   fail "F-0148: acceptance.template.md missing Verification section"
 fi
 
-# AC-005: existing specs NOT modified (F-0001 should keep old format)
-if ! grep -q "^## Behavior" "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0001.md" 2>/dev/null; then
-  pass "F-0148: existing F-0001 maintains old format (backward compatible)"
+# AC-005: existing specs NOT modified (F-001 should keep old format)
+if ! grep -q "^## Behavior" "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-001.md" 2>/dev/null; then
+  pass "F-0148: existing F-001 maintains old format (backward compatible)"
 else
-  warn "F-0148: F-0001 has new format (not required, just noting)"
+  warn "F-0148: F-001 has new format (not required, just noting)"
 fi
 
 # AC-007: README.template.md documents new format
@@ -3025,56 +3025,56 @@ else
 fi
 
 # ============================================================
-# F-0151: User-Extension Directory
+# F-028: User-Extension Directory
 # ============================================================
-echo "--- F-0151: User-Extension Directory ---"
+echo "--- F-028: User-Extension Directory ---"
 
 # AC-001/002: scaffold creates extension dirs
 if grep -q "agentic/local/extensions\|agentic-local/extensions" "${FRAMEWORK_ROOT}/.agentic/lib/init/scaffold.sh" 2>/dev/null; then
-  pass "F-0151: scaffold.sh creates .agentic/local/extensions/"
+  pass "F-028: scaffold.sh creates .agentic/local/extensions/"
 else
-  fail "F-0151: scaffold.sh missing .agentic/local/extensions/ creation"
+  fail "F-028: scaffold.sh missing .agentic/local/extensions/ creation"
 fi
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/init/extensions-readme.md" ]]; then
-  pass "F-0151: extensions-readme.md template exists"
+  pass "F-028: extensions-readme.md template exists"
 else
-  fail "F-0151: extensions-readme.md template missing"
+  fail "F-028: extensions-readme.md template missing"
 fi
 
 # AC-003: generate-skills.sh scans extension skills
 if grep -q "agentic/local/extensions/skills\|agentic-local/extensions/skills" "${FRAMEWORK_ROOT}/.agentic/lib/tools/generate-skills.sh" 2>/dev/null; then
-  pass "F-0151: generate-skills.sh scans extension skills"
+  pass "F-028: generate-skills.sh scans extension skills"
 else
-  fail "F-0151: generate-skills.sh missing extension skills scanning"
+  fail "F-028: generate-skills.sh missing extension skills scanning"
 fi
 
 # AC-004: pre-commit-check.sh runs custom gates
 if grep -q "agentic/local/extensions/gates\|agentic-local/extensions/gates" "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commit-check.sh" 2>/dev/null; then
-  pass "F-0151: pre-commit-check.sh runs custom gates"
+  pass "F-028: pre-commit-check.sh runs custom gates"
 else
-  fail "F-0151: pre-commit-check.sh missing custom gates integration"
+  fail "F-028: pre-commit-check.sh missing custom gates integration"
 fi
 
 # AC-005: upgrade.sh explicitly preserves .agentic/local/
 if grep -q "agentic/local\|agentic-local" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh" 2>/dev/null; then
-  pass "F-0151: upgrade.sh references .agentic/local/ preservation"
+  pass "F-028: upgrade.sh references .agentic/local/ preservation"
 else
-  fail "F-0151: upgrade.sh missing .agentic/local/ preservation"
+  fail "F-028: upgrade.sh missing .agentic/local/ preservation"
 fi
 
 # AC-006: subagents-project/ mechanism still works
 if grep -q "subagents-project" "${FRAMEWORK_ROOT}/.agentic/lib/tools/generate-skills.sh" 2>/dev/null; then
-  pass "F-0151: generate-skills.sh retains subagents-project/ support"
+  pass "F-028: generate-skills.sh retains subagents-project/ support"
 else
-  fail "F-0151: generate-skills.sh missing subagents-project/ backward compat"
+  fail "F-028: generate-skills.sh missing subagents-project/ backward compat"
 fi
 
 # AC-007: generate-skills --validate passes
 if bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/generate-skills.sh" --validate >/dev/null 2>&1; then
-  pass "F-0151: generate-skills --validate passes"
+  pass "F-028: generate-skills --validate passes"
 else
-  fail "F-0151: generate-skills --validate fails"
+  fail "F-028: generate-skills --validate fails"
 fi
 
 # AC-008: empty .agentic/local/extensions/ dirs don't cause errors
@@ -3082,21 +3082,21 @@ fi
 
 # Documentation
 if grep -q "agentic/local\|agentic-local" "${FRAMEWORK_ROOT}/.agentic/lib/DEVELOPER_GUIDE.md" 2>/dev/null; then
-  pass "F-0151: DEVELOPER_GUIDE.md documents extension directory"
+  pass "F-028: DEVELOPER_GUIDE.md documents extension directory"
 else
-  fail "F-0151: DEVELOPER_GUIDE.md missing extension directory docs"
+  fail "F-028: DEVELOPER_GUIDE.md missing extension directory docs"
 fi
 
 if grep -q "agentic/local\|agentic-local" "${FRAMEWORK_ROOT}/.agentic/lib/START_HERE.md" 2>/dev/null; then
-  pass "F-0151: START_HERE.md mentions extension directory"
+  pass "F-028: START_HERE.md mentions extension directory"
 else
-  fail "F-0151: START_HERE.md missing extension directory mention"
+  fail "F-028: START_HERE.md missing extension directory mention"
 fi
 
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-0151.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-0151.md" ]]; then
-  pass "F-0151: contract/acceptance criteria exists"
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/F-028.yaml" ]] || [[ -f "${FRAMEWORK_ROOT}/docs/archive/acceptance/F-028.md" ]]; then
+  pass "F-028: contract/acceptance criteria exists"
 else
-  fail "F-0151: contract/acceptance criteria missing"
+  fail "F-028: contract/acceptance criteria missing"
 fi
 
 # ============================================================
@@ -3300,7 +3300,7 @@ fi
   pass "T-0037: session_start.md check skipped (v2 engine)"
 
 # ============================================================
-# F-0190: Backlog / Structural Work Assignment
+# F-006: Backlog / Structural Work Assignment
 # ============================================================
 
 # T-0045: BACKLOG_FILE defined in paths.sh
@@ -3381,9 +3381,9 @@ else
 fi
 
 # ============================================================
-# F-0180: Review Checkpoint Framework
+# F-014: Review Checkpoint Framework
 # ============================================================
-echo "--- F-0180: Review Checkpoint Framework ---"
+echo "--- F-014: Review Checkpoint Framework ---"
 
 # T-0055: review.py module exists
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/review.py" ]]; then
@@ -3826,53 +3826,53 @@ else
 fi
 
 # ============================================================
-# DEV-0199: Instruction File Sync Detection
+# DEV-003: Instruction File Sync Detection
 # ============================================================
 echo ""
-echo "--- DEV-0199: Instruction File Sync Detection ---"
+echo "--- DEV-003: Instruction File Sync Detection ---"
 
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh" ]]; then
-  pass "DEV-0199 AC-001: instruction-sync.sh exists"
+  pass "DEV-003 AC-001: instruction-sync.sh exists"
 else
-  fail "DEV-0199 AC-001: instruction-sync.sh missing"
+  fail "DEV-003 AC-001: instruction-sync.sh missing"
 fi
 
 if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh" ]]; then
-  pass "DEV-0199 AC-001: instruction-sync.sh is executable"
+  pass "DEV-003 AC-001: instruction-sync.sh is executable"
 else
-  fail "DEV-0199 AC-001: instruction-sync.sh is not executable"
+  fail "DEV-003 AC-001: instruction-sync.sh is not executable"
 fi
 
 # AC-002: Parses ag.sh case statement to discover subcommands
 if grep -q 'Main command dispatch' "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh"; then
-  pass "DEV-0199 AC-002: instruction-sync.sh parses ag.sh main dispatch"
+  pass "DEV-003 AC-002: instruction-sync.sh parses ag.sh main dispatch"
 else
-  fail "DEV-0199 AC-002: instruction-sync.sh does not parse ag.sh dispatch"
+  fail "DEV-003 AC-002: instruction-sync.sh does not parse ag.sh dispatch"
 fi
 
 # AC-003 through AC-008: Checks instruction files
 _F0199_CHECK_FILES=("CLAUDE.md" "cursorrules.txt" "copilot-instructions.md" "codex-instructions.md" "memory-seed.md")
 for check_file in "${_F0199_CHECK_FILES[@]}"; do
   if grep -q "$check_file" "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh"; then
-    pass "DEV-0199: instruction-sync.sh checks $check_file"
+    pass "DEV-003: instruction-sync.sh checks $check_file"
   else
-    fail "DEV-0199: instruction-sync.sh does not check $check_file"
+    fail "DEV-003: instruction-sync.sh does not check $check_file"
   fi
 done
 
 # AC-009: Reports missing commands per file with clear output
 if grep -q 'missing commands' "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh"; then
-  pass "DEV-0199 AC-009: instruction-sync.sh reports missing commands per file"
+  pass "DEV-003 AC-009: instruction-sync.sh reports missing commands per file"
 else
-  fail "DEV-0199 AC-009: instruction-sync.sh does not report missing commands"
+  fail "DEV-003 AC-009: instruction-sync.sh does not report missing commands"
 fi
 
 # AC-010: Wired into validate_framework.sh (this very check runs it in warning mode)
 # Run it and report as warning (not blocking)
 if bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/instruction-sync.sh" --quiet 2>/dev/null; then
-  pass "DEV-0199 AC-010: instruction-sync check passes (all commands in sync)"
+  pass "DEV-003 AC-010: instruction-sync check passes (all commands in sync)"
 else
-  warn "DEV-0199 AC-010: instruction-sync detected drift (advisory — run instruction-sync.sh for details)"
+  warn "DEV-003 AC-010: instruction-sync detected drift (advisory — run instruction-sync.sh for details)"
 fi
 
 # F-0198: Plan Durability Scanning
@@ -4381,71 +4381,71 @@ else
 fi
 
 # memory-seed.md has smoke evidence sentinel (v1 only — trimmed in v2)
-# F-0004: Centralized Feature IDs (consolidated from F-0193)
+# F-003: Centralized Feature IDs (consolidated from F-0193)
 # ============================================================
 
 # ids.py exists and exports required symbols
 if [ -f "${FRAMEWORK_ROOT}/.agentic/lib/ids.py" ]; then
-  pass "F-0004: ids.py exists"
+  pass "F-003: ids.py exists"
 else
-  fail "F-0004: ids.py not found"
+  fail "F-003: ids.py not found"
 fi
 
 # ids.sh exists and exports required symbols
 if [ -f "${FRAMEWORK_ROOT}/.agentic/lib/ids.sh" ]; then
-  pass "F-0004: ids.sh exists"
+  pass "F-003: ids.sh exists"
 else
-  fail "F-0004: ids.sh not found"
+  fail "F-003: ids.sh not found"
 fi
 
 # is_feature_id function works
 source "${FRAMEWORK_ROOT}/.agentic/lib/ids.sh"
-if is_feature_id "F-0001"; then
-  pass "F-0004: is_feature_id accepts F-0001"
+if is_feature_id "F-001"; then
+  pass "F-003: is_feature_id accepts F-001"
 else
-  fail "F-0004: is_feature_id rejects F-0001"
+  fail "F-003: is_feature_id rejects F-001"
 fi
 
 if is_feature_id "F-10000"; then
-  pass "F-0004: is_feature_id accepts F-10000"
+  pass "F-003: is_feature_id accepts F-10000"
 else
-  fail "F-0004: is_feature_id rejects F-10000"
+  fail "F-003: is_feature_id rejects F-10000"
 fi
 
 if ! is_feature_id "F-01"; then
-  pass "F-0004: is_feature_id rejects F-01"
+  pass "F-003: is_feature_id rejects F-01"
 else
-  fail "F-0004: is_feature_id accepts F-01 (should reject)"
+  fail "F-003: is_feature_id accepts F-01 (should reject)"
 fi
 
 # No hardcoded 4-digit-only patterns in .agentic/lib/ Python files
 hardcoded_py=$(grep -rn 'F-\\d{4}[^,}]' "${FRAMEWORK_ROOT}/.agentic/lib/" --include='*.py' 2>/dev/null | grep -v 'ids.py' | grep -v '__pycache__' || true)
 if [ -z "$hardcoded_py" ]; then
-  pass "F-0004: No hardcoded 4-digit-only Python patterns"
+  pass "F-003: No hardcoded 4-digit-only Python patterns"
 else
-  fail "F-0004: Hardcoded 4-digit patterns found in Python: $hardcoded_py"
+  fail "F-003: Hardcoded 4-digit patterns found in Python: $hardcoded_py"
 fi
 
 # No hardcoded 4-digit-only patterns in .agentic/lib/ shell files
 hardcoded_sh=$(grep -rn "F-\[0-9\]{4}[^,}]" "${FRAMEWORK_ROOT}/.agentic/lib/" --include='*.sh' 2>/dev/null | grep -v 'ids.sh' || true)
 if [ -z "$hardcoded_sh" ]; then
-  pass "F-0004: No hardcoded 4-digit-only shell patterns"
+  pass "F-003: No hardcoded 4-digit-only shell patterns"
 else
-  fail "F-0004: Hardcoded 4-digit patterns found in shell: $hardcoded_sh"
+  fail "F-003: Hardcoded 4-digit patterns found in shell: $hardcoded_sh"
 fi
 
 # paths.sh sources ids.sh
 if grep -q "ids.sh" "${FRAMEWORK_ROOT}/.agentic/lib/paths.sh"; then
-  pass "F-0004: paths.sh sources ids.sh"
+  pass "F-003: paths.sh sources ids.sh"
 else
-  fail "F-0004: paths.sh does not source ids.sh"
+  fail "F-003: paths.sh does not source ids.sh"
 fi
 
 # JSON schemas use widened pattern
 if grep -q 'F-\[0-9\]{4,}' "${FRAMEWORK_ROOT}/.agentic/lib/schemas/feature.schema.json"; then
-  pass "F-0004: feature.schema.json uses widened pattern"
+  pass "F-003: feature.schema.json uses widened pattern"
 else
-  fail "F-0004: feature.schema.json still uses 4-digit-only pattern"
+  fail "F-003: feature.schema.json still uses 4-digit-only pattern"
 fi
 
 
@@ -4752,68 +4752,68 @@ else
 fi
 
 # ============================================================
-# DEV-0243: Complexity Tier Experiments
+# DEV-004: Complexity Tier Experiments
 # ============================================================
 echo ""
-echo "--- DEV-0243: Complexity Tier Experiments ---"
+echo "--- DEV-004: Complexity Tier Experiments ---"
 
 _tier_exp="${FRAMEWORK_ROOT}/.agentic/lib/auto/tier_experiment.py"
 if [ -f "$_tier_exp" ]; then
-  pass "DEV-0243 AC1: tier_experiment.py exists"
+  pass "DEV-004 AC1: tier_experiment.py exists"
 else
-  fail "DEV-0243 AC1: tier_experiment.py not found"
+  fail "DEV-004 AC1: tier_experiment.py not found"
 fi
 
 _tier_yaml="${FRAMEWORK_ROOT}/.agentic/lib/auto/experiments/complexity_tiers.yaml"
 if [ -f "$_tier_yaml" ]; then
-  pass "DEV-0243 AC6: complexity_tiers.yaml exists"
+  pass "DEV-004 AC6: complexity_tiers.yaml exists"
   # Check all 3 tiers
   _has_discovery=$(grep -c "name: discovery" "$_tier_yaml" || true)
   _has_formal=$(grep -c "name: formal" "$_tier_yaml" || true)
   _has_auto_formal=$(grep -c "name: autonomous_formal" "$_tier_yaml" || true)
   if [ "$_has_discovery" -ge 1 ] && [ "$_has_formal" -ge 1 ] && [ "$_has_auto_formal" -ge 1 ]; then
-    pass "DEV-0243 AC6: complexity_tiers.yaml has all 3 tiers"
+    pass "DEV-004 AC6: complexity_tiers.yaml has all 3 tiers"
   else
-    fail "DEV-0243 AC6: complexity_tiers.yaml missing tiers (discovery=$_has_discovery formal=$_has_formal autonomous_formal=$_has_auto_formal)"
+    fail "DEV-004 AC6: complexity_tiers.yaml missing tiers (discovery=$_has_discovery formal=$_has_formal autonomous_formal=$_has_auto_formal)"
   fi
   # Check formal tier has review_plan override (prevents deadlock)
   if grep -q "review_plan: critical_agent" "$_tier_yaml"; then
-    pass "DEV-0243 AC6: formal tier has review_plan override (prevents deadlock)"
+    pass "DEV-004 AC6: formal tier has review_plan override (prevents deadlock)"
   else
-    fail "DEV-0243 AC6: formal tier missing review_plan override — will deadlock"
+    fail "DEV-004 AC6: formal tier missing review_plan override — will deadlock"
   fi
 else
-  fail "DEV-0243 AC6: complexity_tiers.yaml not found"
+  fail "DEV-004 AC6: complexity_tiers.yaml not found"
 fi
 
 if grep -q "tier-experiment" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/auto.sh"; then
-  pass "DEV-0243 AC4: ag auto tier-experiment wired in auto.sh"
+  pass "DEV-004 AC4: ag auto tier-experiment wired in auto.sh"
 else
-  fail "DEV-0243 AC4: ag auto tier-experiment not wired in auto.sh"
+  fail "DEV-004 AC4: ag auto tier-experiment not wired in auto.sh"
 fi
 
 if grep -q "class TierMetrics" "$_tier_exp" 2>/dev/null; then
-  pass "DEV-0243 AC9: TierMetrics dataclass defined"
+  pass "DEV-004 AC9: TierMetrics dataclass defined"
 else
-  fail "DEV-0243 AC9: TierMetrics class not found"
+  fail "DEV-004 AC9: TierMetrics class not found"
 fi
 
 if grep -q "class ExperimentResult" "$_tier_exp" 2>/dev/null; then
-  pass "DEV-0243 AC9: ExperimentResult dataclass defined"
+  pass "DEV-004 AC9: ExperimentResult dataclass defined"
 else
-  fail "DEV-0243 AC9: ExperimentResult class not found"
+  fail "DEV-004 AC9: ExperimentResult class not found"
 fi
 
 if [ -f "${FRAMEWORK_ROOT}/tests/llm/tests/096_tier_experiment_trigger.sh" ]; then
-  pass "DEV-0243 AC8: LLM test 096_tier_experiment_trigger.sh exists"
+  pass "DEV-004 AC8: LLM test 096_tier_experiment_trigger.sh exists"
 else
-  fail "DEV-0243 AC8: LLM test not found"
+  fail "DEV-004 AC8: LLM test not found"
 fi
 
 if [ -f "${FRAMEWORK_ROOT}/tests/test_tier_experiment.py" ]; then
-  pass "DEV-0243 AC2: test_tier_experiment.py exists"
+  pass "DEV-004 AC2: test_tier_experiment.py exists"
 else
-  fail "DEV-0243 AC2: test_tier_experiment.py not found"
+  fail "DEV-004 AC2: test_tier_experiment.py not found"
 fi
 
 # ============================================================
@@ -4991,15 +4991,15 @@ done
 
 
 # ============================================================
-# F-0302: Spec System Overhaul — YAML Contracts
+# F-031: Spec System Overhaul — YAML Contracts
 # ============================================================
-echo "--- F-0302: Spec System Overhaul — YAML Contracts ---"
+echo "--- F-031: Spec System Overhaul — YAML Contracts ---"
 
 # AC-001: Contract schema exists
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/schemas/contract.schema.json" ]]; then
-  pass "F-0302: contract.schema.json exists"
+  pass "F-031: contract.schema.json exists"
 else
-  fail "F-0302: contract.schema.json missing"
+  fail "F-031: contract.schema.json missing"
 fi
 
 # AC-002: Contract parser loads and validates
@@ -5017,26 +5017,26 @@ else:
     print('OK')
 " 2>&1)
   if [[ "$_contract_parser_test" == "OK" ]]; then
-    pass "F-0302: contracts.py parser validates contracts"
+    pass "F-031: contracts.py parser validates contracts"
   else
-    fail "F-0302: contracts.py parser validation failed: $_contract_parser_test"
+    fail "F-031: contracts.py parser validation failed: $_contract_parser_test"
   fi
 else
-  fail "F-0302: python3 not available"
+  fail "F-031: python3 not available"
 fi
 
 # AC-003: ag contract command exists
 if grep_ag "contract" 2>/dev/null; then
-  pass "F-0302: ag contract command wired in ag.sh"
+  pass "F-031: ag contract command wired in ag.sh"
 else
-  fail "F-0302: ag contract command missing from ag.sh"
+  fail "F-031: ag contract command missing from ag.sh"
 fi
 
 # AC-004: verify-contracts.sh exists and is executable
 if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/tools/verify-contracts.sh" ]]; then
-  pass "F-0302: verify-contracts.sh exists and is executable"
+  pass "F-031: verify-contracts.sh exists and is executable"
 else
-  fail "F-0302: verify-contracts.sh missing or not executable"
+  fail "F-031: verify-contracts.sh missing or not executable"
 fi
 
 # AC-005: paths resolve contracts_dir
@@ -5050,53 +5050,53 @@ else:
     print('FAIL')
 " 2>&1)
   if [[ "$_paths_test" == "OK" ]]; then
-    pass "F-0302: paths.py resolves contracts_dir"
+    pass "F-031: paths.py resolves contracts_dir"
   else
-    fail "F-0302: paths.py missing contracts_dir"
+    fail "F-031: paths.py missing contracts_dir"
   fi
 else
-  fail "F-0302: python3 not available"
+  fail "F-031: python3 not available"
 fi
 
 # Check paths.sh has CONTRACTS_DIR
 if grep -q "CONTRACTS_DIR" "${FRAMEWORK_ROOT}/.agentic/lib/paths.sh" 2>/dev/null; then
-  pass "F-0302: paths.sh defines CONTRACTS_DIR"
+  pass "F-031: paths.sh defines CONTRACTS_DIR"
 else
-  fail "F-0302: paths.sh missing CONTRACTS_DIR"
+  fail "F-031: paths.sh missing CONTRACTS_DIR"
 fi
 
 # AC-006: Pre-commit has contract protection check
 if grep -q "contract protection" "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commit-check.sh" 2>/dev/null; then
-  pass "F-0302: pre-commit-check.sh has contract protection"
+  pass "F-031: pre-commit-check.sh has contract protection"
 else
-  fail "F-0302: pre-commit-check.sh missing contract protection"
+  fail "F-031: pre-commit-check.sh missing contract protection"
 fi
 
-# DEV-0001: Framework Development Infrastructure
-echo "--- DEV-0001: Framework Development Infrastructure ---"
+# DEV-001: Framework Development Infrastructure
+echo "--- DEV-001: Framework Development Infrastructure ---"
 
-if grep -q "DEV-0001" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md" 2>/dev/null; then
-  pass "DEV-0001: dev-infrastructure section exists in FEATURES.md"
+if grep -q "DEV-001" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md" 2>/dev/null; then
+  pass "DEV-001: dev-infrastructure section exists in FEATURES.md"
 else
-  fail "DEV-0001: dev-infrastructure section missing from FEATURES.md"
+  fail "DEV-001: dev-infrastructure section missing from FEATURES.md"
 fi
 
 if grep -q "Type.*infrastructure\|Type.*research" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md" 2>/dev/null; then
-  pass "DEV-0001: Type annotations present on internal features"
+  pass "DEV-001: Type annotations present on internal features"
 else
-  fail "DEV-0001: Type annotations missing from internal features"
+  fail "DEV-001: Type annotations missing from internal features"
 fi
 
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/DEV-0001.yaml" ]]; then
-  pass "DEV-0001: contract exists"
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/spec/contracts/DEV-001.yaml" ]]; then
+  pass "DEV-001: contract exists"
 else
-  fail "DEV-0001: DEV-0001.yaml contract missing"
+  fail "DEV-001: DEV-001.yaml contract missing"
 fi
 
 if grep -q "DEV" "${FRAMEWORK_ROOT}/.agentic/lib/schemas/contract.schema.json" 2>/dev/null; then
-  pass "DEV-0001: DEV-XXXX pattern supported in contract schema"
+  pass "DEV-001: DEV-XXXX pattern supported in contract schema"
 else
-  fail "DEV-0001: DEV-XXXX pattern missing from contract schema"
+  fail "DEV-001: DEV-XXXX pattern missing from contract schema"
 fi
 
 # Summary

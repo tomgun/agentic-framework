@@ -1,4 +1,4 @@
-# Review: F-0303 planned → implementing
+# Review: F-032 planned → implementing
 - **Verdict**: approved
 - **Reviewer**: human
 - **Date**: 2026-03-23

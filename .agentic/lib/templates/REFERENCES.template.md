@@ -10,12 +10,12 @@ Purpose: track external resources (papers, docs, examples, repos) that informed 
 
 ---
 
-## REF-0001: Example reference title
+## REF-001: Example reference title
 - Type: paper | docs | example | repo | article
 - URL: https://...
 - Date accessed: YYYY-MM-DD
 - Related to:
-  - Feature: F-0001
+  - Feature: F-001
   - ADR: ADR-0001
 - Key insights:
   - <!-- 3-5 bullets: what matters from this source -->
@@ -29,7 +29,7 @@ Purpose: track external resources (papers, docs, examples, repos) that informed 
 - URL: https://developer.example.com/api/...
 - Date accessed: 2025-12-30
 - Related to:
-  - Feature: F-0003
+  - Feature: F-002
   - NFR: NFR-0002
 - Key insights:
   - API rate limit is 100 req/min per token

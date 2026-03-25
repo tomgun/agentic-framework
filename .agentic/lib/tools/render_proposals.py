@@ -320,9 +320,9 @@ def render_features_md(report: dict) -> str:
             ])
     else:
         lines.extend([
-            "## F-0001: <!-- First Feature -->",
+            "## F-001: <!-- First Feature -->",
             "- Status: planned",
-            "- Acceptance: spec/acceptance/F-0001.md",
+            "- Acceptance: spec/acceptance/F-001.md",
             "",
         ])
 

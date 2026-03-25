@@ -40,7 +40,7 @@ Copy the template from the top of the file and fill in:
 ```markdown
 ## F-0015: User profile editing
 - Parent: none
-- Dependencies: F-0001 (complete)  # If depends on other features
+- Dependencies: F-001 (complete)  # If depends on other features
 - Complexity: M
 - Status: planned
 - PRD: spec/PRD.md#user-profiles
@@ -127,7 +127,7 @@ For items needing more thought before implementation:
   - Option A: Email only (simple, might miss urgent items)
   - Option B: In-app + email (better UX, more complex)
   - Option C: Add push notifications (best UX, most work)
-- **Impact**: Blocks F-0020, F-0021
+- **Impact**: Blocks F-0020, F-015
 ```
 
 Or create a task:

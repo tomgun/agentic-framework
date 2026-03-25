@@ -10,7 +10,7 @@ Purpose: track external resources (papers, docs, examples, repos) that informed 
 
 ---
 
-## REF-0001: Instruction Architecture Design
+## REF-001: Instruction Architecture Design
 - Type: internal design doc
 - URL: docs/INSTRUCTION_ARCHITECTURE.md
 - Date accessed: 2026-02-08

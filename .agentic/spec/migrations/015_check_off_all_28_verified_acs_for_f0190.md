@@ -3,7 +3,7 @@
 <!-- author: Claude -->
 <!-- type: feature -->
 
-# Migration 015: Check off all 28 verified ACs for F-0190
+# Migration 015: Check off all 28 verified ACs for F-006
 
 ## Context & Why
 

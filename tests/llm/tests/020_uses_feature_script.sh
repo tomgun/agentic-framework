@@ -11,7 +11,7 @@ setup_test_project "formal"
 cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 # Features
 
-## F-0001: User Authentication
+## F-001: User Authentication
 - Status: in_progress
 - Priority: high
 - Implementation: partial
@@ -22,7 +22,7 @@ git -C "$TEST_PROJECT" add -A
 git -C "$TEST_PROJECT" commit -m "Add feature" --quiet
 
 # Ask to update feature status (natural language)
-send_prompt "Feature F-0001 is complete and shipped - please update its status"
+send_prompt "Feature F-001 is complete and shipped - please update its status"
 
 # Verify agent behavior
 FAILURES=0
@@ -35,7 +35,7 @@ else
 fi
 
 # Critical: Agent understands the update
-check_output_contains "F-0001\|status\|shipped\|complete\|update" "Agent understands feature update" || ((FAILURES++))
+check_output_contains "F-001\|status\|shipped\|complete\|update" "Agent understands feature update" || ((FAILURES++))
 
 # Cleanup
 cleanup_test_project

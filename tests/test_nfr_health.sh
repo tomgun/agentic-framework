@@ -24,7 +24,7 @@ setup_project() {
     cp "$TOOL" "$TEST_TMPDIR/.agentic/lib/tools/nfr-health.sh"
 
     cat > "$TEST_TMPDIR/.agentic/spec/FEATURES.md" <<'FEAT'
-## F-0001: Test Feature
+## F-001: Test Feature
 **Status**: shipped
 FEAT
 

@@ -494,7 +494,7 @@ cmd_hooks() {
 }
 
 
-# Coordination server command (F-0185)
+# Coordination server command (F-018)
 cmd_coord() {
     local subcmd="${1:-}"
     shift 2>/dev/null || true

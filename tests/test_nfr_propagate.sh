@@ -24,7 +24,7 @@ setup_project() {
     cp "$TOOL" "$TEST_TMPDIR/.agentic/lib/tools/nfr-propagate.sh"
 
     cat > "$TEST_TMPDIR/.agentic/spec/FEATURES.md" <<'FEAT'
-## F-0001: Test Feature
+## F-001: Test Feature
 **Status**: shipped
 **Description**: A test feature for propagation testing
 FEAT
@@ -48,7 +48,7 @@ echo ""
 # --- Test 1: derive produces ### NFR Constraints section ---
 echo "Test: derive output format"
 setup_project
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-propagate.sh derive F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-propagate.sh derive F-001 2>&1)
 if echo "$output" | grep -q "### NFR Constraints"; then
     pass "Derive produces ### NFR Constraints header"
 else
@@ -67,7 +67,7 @@ setup_project
 # Make NFR scoped to something that doesn't match
 sed -i 's/all features (global)/component:audio/' "$TEST_TMPDIR/.agentic/spec/NFR.md" 2>/dev/null || \
     sed -i '' 's/all features (global)/component:audio/' "$TEST_TMPDIR/.agentic/spec/NFR.md"
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-propagate.sh derive F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-propagate.sh derive F-001 2>&1)
 if echo "$output" | grep -q "none applicable"; then
     pass "Derive shows none applicable when no match"
 else
@@ -78,7 +78,7 @@ fi
 echo ""
 echo "Test: check detects staleness"
 setup_project
-cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-0001.md" <<'AC'
+cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-001.md" <<'AC'
 ## Acceptance Criteria
 - [ ] **AC-010**: Files under 100 lines (NFR-0001)
 ## Out of Scope
@@ -98,12 +98,12 @@ fi
 echo ""
 echo "Test: sync detects missing NFR"
 setup_project
-cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-0001.md" <<'AC'
+cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-001.md" <<'AC'
 ## Acceptance Criteria
 - [ ] **AC-001**: Feature works correctly
 ## Out of Scope
 AC
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-propagate.sh sync F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-propagate.sh sync F-001 2>&1)
 rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "MISSING"; then
     pass "Sync detects missing NFR (exit 1)"
@@ -115,14 +115,14 @@ fi
 echo ""
 echo "Test: sync detects legacy format"
 setup_project
-cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-0001.md" <<'AC'
+cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-001.md" <<'AC'
 ## Acceptance Criteria
 - [ ] **AC-001**: Feature works
 ## NFR Compliance
 - NFR-0001: Files under 100 lines
 ## Out of Scope
 AC
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-propagate.sh sync F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-propagate.sh sync F-001 2>&1)
 if echo "$output" | grep -q "LEGACY\|nfr-migrate"; then
     pass "Sync detects legacy format and suggests migration"
 else
@@ -133,14 +133,14 @@ fi
 echo ""
 echo "Test: sync reports clean"
 setup_project
-cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-0001.md" <<'AC'
+cat > "$TEST_TMPDIR/.agentic/spec/acceptance/F-001.md" <<'AC'
 ## Acceptance Criteria
 - [ ] **AC-001**: Feature works
 ### NFR Constraints (P1 — required)
 - [ ] **AC-010**: Files under 100 lines (NFR-0001)
 ## Out of Scope
 AC
-output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-propagate.sh sync F-0001 2>&1)
+output=$(cd "$TEST_TMPDIR" && bash .agentic/lib/tools/nfr-propagate.sh sync F-001 2>&1)
 rc=$?
 if [[ $rc -eq 0 ]] && echo "$output" | grep -q "in sync"; then
     pass "Sync reports clean when in sync"

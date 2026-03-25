@@ -14,10 +14,10 @@ cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 
 <!-- format: features-v0.1.0 -->
 
-## F-0001: User Dashboard
+## F-001: User Dashboard
 - Status: shipped
 - Domain: frontend
-- Acceptance: spec/contracts/F-0001.md
+- Acceptance: spec/contracts/F-001.md
 - State: complete
 
 ## F-0002: Products API
@@ -27,8 +27,8 @@ cat > "$TEST_PROJECT/spec/FEATURES.md" << 'EOF'
 - State: complete
 EOF
 
-cat > "$TEST_PROJECT/spec/acceptance/F-0001.md" << 'EOF'
-# F-0001: User Dashboard - Acceptance Criteria
+cat > "$TEST_PROJECT/spec/acceptance/F-001.md" << 'EOF'
+# F-001: User Dashboard - Acceptance Criteria
 - [x] Dashboard displays user data
 EOF
 
@@ -41,7 +41,7 @@ git -C "$TEST_PROJECT" add spec/
 git -C "$TEST_PROJECT" commit -m "Add domain-tagged features" --quiet
 
 # Ask to add a new feature — agent should include Domain metadata
-send_prompt "Add a new feature F-0003 for a mobile shopping cart screen to FEATURES.md. This is a mobile feature."
+send_prompt "Add a new feature F-002 for a mobile shopping cart screen to FEATURES.md. This is a mobile feature."
 
 # Verify agent behavior
 FAILURES=0
@@ -50,8 +50,8 @@ FAILURES=0
 check_output_contains "Domain.*mobile\|domain.*mobile\|- Domain:" \
     "Agent includes Domain metadata" || ((FAILURES++))
 
-# Agent should use the correct F-0003 ID format
-check_output_contains "F-0003\|F.0003" \
+# Agent should use the correct F-002 ID format
+check_output_contains "F-002\|F.0003" \
     "Agent uses correct feature ID" || ((FAILURES++))
 
 # Cleanup

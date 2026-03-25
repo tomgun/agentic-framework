@@ -348,7 +348,7 @@ class ConvergenceLoop:
 
         return result
 
-    # -- Phase extraction (F-0303) -----------------------------------------
+    # -- Phase extraction (F-032) -----------------------------------------
 
     def _extract_and_create_phases(
         self, feature_id: str, plan_path: str,

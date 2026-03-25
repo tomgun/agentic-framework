@@ -30,7 +30,7 @@ FEATURE_ID="$1"
 
 # Validate feature ID format
 if ! is_feature_id "$FEATURE_ID"; then
-  echo "❌ Invalid feature ID format. Expected F-#### (e.g., F-0001)"
+  echo "❌ Invalid feature ID format. Expected F-#### (e.g., F-001)"
   exit 1
 fi
 
