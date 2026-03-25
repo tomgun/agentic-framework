@@ -210,7 +210,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
      Types (built-in): changelog | readme | adr | lessons | architecture | runbook | tech-spec | custom -->
 - doc: CHANGELOG.md                | changelog    | pr
 - doc: README.md                   | readme       | pr
-- doc: spec/LESSONS.md             | lessons      | feature_done
+- doc: .agentic/spec/LESSONS.md     | lessons      | feature_done
 - doc: docs/INSTRUCTION_ARCHITECTURE.md | architecture | feature_done
 - doc: docs/HOW_IT_WORKS.md         | architecture | feature_done
 - doc: docs/KEY_INSIGHTS.md         | lessons      | manual
