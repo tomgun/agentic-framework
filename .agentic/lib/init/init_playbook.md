@@ -26,7 +26,7 @@ bash .agentic/lib/init/scaffold.sh
 This creates all expected files/folders with templates/placeholders so you can start development immediately.
 If the project has existing code, scaffold will automatically run discovery and generate proposals.
 
-**Git mode (F-0250)**: Git is deferred by default for discovery and formal profiles. The framework works fully without git via Claude hooks + state machine. Autonomous formal defaults to active (git initialized). The user can activate git anytime with `ag git-init`. During init, ask the user about their preference (see Step 1b below).
+**Git mode (F-017)**: Git is deferred by default for discovery and formal profiles. The framework works fully without git via Claude hooks + state machine. Autonomous formal defaults to active (git initialized). The user can activate git anytime with `ag git-init`. During init, ask the user about their preference (see Step 1b below).
 
 ## Step 0.5: Review Discovery Results (brownfield projects only)
 
@@ -186,7 +186,7 @@ If large, tell the user:
 - ✅ Everything in Formal, with review delegation:
 - ✅ `review_code` and `review_regression` → `critical_agent` (instead of human)
 - ✅ Only `review_merge` stays human (final merge always needs human approval)
-- ✅ `critical_agent` spawns adversarial AI reviewer for automated review (F-0182)
+- ✅ `critical_agent` spawns adversarial AI reviewer for automated review (F-024)
 - **Good for**:
   - Autonomous agent workflows (ag auto task, ag auto crunch)
   - CI/CD pipelines with minimal human intervention
@@ -199,7 +199,7 @@ If large, tell the user:
 - Profile: autonomous_formal  <!-- if user chose 'c' -->
 ```
 
-### Step 1b: Git Configuration (F-0250)
+### Step 1b: Git Configuration (F-017)
 
 After profile selection, **always ask the user about git** — even for Autonomous Formal. Scaffold defers git initialization to this step so the user confirms before `git init` runs.
 
@@ -915,7 +915,7 @@ Type a/b/c/d:"
 
 ### For Formal profile additionally:
 - **`spec/TECH_SPEC.md`**: How we're building it, architecture, data models
-- **`.agentic/spec/FEATURES.md`**: Seed with 2-3 initial features (F-001, F-0002, etc.)
+- **`.agentic/spec/FEATURES.md`**: Seed with 2-3 initial features (F-001, F-002, etc.)
 
 ## Step 4: Set up quality validation
 

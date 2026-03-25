@@ -2,6 +2,7 @@
   "description": "F-0184 Phase 2: Clean renumber mapping. Old 4-digit IDs → new 3-digit sequential IDs.",
   "date": "2026-03-25",
   "feature": "F-0184",
+  "exclude_dirs": ["tmp", "examples"],
   "notes": {
     "nfr_ids_unchanged": "NFR-0001, NFR-0003, NFR-0004 keep current IDs",
     "consolidated_from_unchanged": "Dead IDs in consolidated_from arrays are never renamed",

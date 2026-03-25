@@ -276,6 +276,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0069: PR #205: F-005 Phase 2 renumber
+- **Type**: pr_review
+- **Added**: 2026-03-25
+- **Context**: Clean renumber 36 features to 3-digit IDs. Review FEATURES.md, CONSOLIDATION_MAP.md, BACKLOG.json
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0065: Review: DEV-004 → implementing

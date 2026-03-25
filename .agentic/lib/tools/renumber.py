@@ -23,7 +23,7 @@ Exclusions:
   - This script itself and the mapping file
 
 Usage:
-  python3 renumber.py [--dry-run] [--verbose] [--project-root PATH]
+  python3 renumber.py [--dry-run] [--verbose] [--verify] [--project-root PATH]
 """
 
 import argparse
@@ -35,11 +35,12 @@ import sys
 from pathlib import Path
 
 
-def load_mapping(mapping_path: Path) -> dict[str, str]:
-    """Load and return the old→new ID mapping."""
+def load_mapping(mapping_path: Path) -> tuple[dict[str, str], list[str]]:
+    """Load the old→new ID mapping and optional exclude_dirs list."""
     with open(mapping_path) as f:
         data = json.load(f)
-    return data["mapping"]
+    exclude_dirs = data.get("exclude_dirs", [])
+    return data["mapping"], exclude_dirs
 
 
 def sort_replacements(mapping: dict[str, str]) -> list[tuple[str, str]]:
@@ -64,19 +65,18 @@ def build_regex(old_ids: list[str]) -> re.Pattern:
 
 # --- YAML-aware contract processing ---
 
-# Lines in contract YAML that contain live IDs we SHOULD rename
-_YAML_LIVE_FIELDS = re.compile(
-    r"^(id|parent|children|tags)\s*:"
-    r"|^\s*-\s*(F|DEV|E)-"  # list items under children/tags
-)
-
-# Lines we must NOT rename (dead IDs, NFR refs)
+# Lines we must NOT rename (dead IDs, NFR refs, migration metadata)
 _YAML_SKIP_FIELDS = re.compile(
     r"^(consolidated_from|nfr_refs)\s*:"
 )
 
+# Lines in YAML that are migration metadata (reason/description referencing old IDs)
+_YAML_MIGRATION_TEXT = re.compile(
+    r"^\s*(reason|description)\s*:"
+)
 
-def process_contract_yaml(content: str, replacements: list[tuple[str, str]],
+
+def process_contract_yaml(content: str, mapping_dict: dict[str, str],
                           regex: re.Pattern) -> str:
     """Process a contract YAML file with field-aware replacement.
 
@@ -107,7 +107,7 @@ def process_contract_yaml(content: str, replacements: list[tuple[str, str]],
                 continue
 
         # Safe line — apply replacements
-        result.append(regex.sub(lambda m: dict(replacements)[m.group(0)], line))
+        result.append(regex.sub(lambda m: mapping_dict[m.group(0)], line))
 
     return "\n".join(result)
 
@@ -115,13 +115,12 @@ def process_contract_yaml(content: str, replacements: list[tuple[str, str]],
 _NORENUMBER = "norenumber"
 
 
-def process_text_file(content: str, replacements: list[tuple[str, str]],
+def process_text_file(content: str, mapping_dict: dict[str, str],
                       regex: re.Pattern) -> str:
     """Process a generic text file with word-boundary regex replacement.
 
     Lines containing '# norenumber' or '// norenumber' are skipped.
     """
-    mapping_dict = dict(replacements)
     lines = content.split("\n")
     result = []
     for line in lines:
@@ -130,6 +129,17 @@ def process_text_file(content: str, replacements: list[tuple[str, str]],
         else:
             result.append(regex.sub(lambda m: mapping_dict[m.group(0)], line))
     return "\n".join(result)
+
+
+def count_replacements(old_content: str, new_content: str) -> int:
+    """Count actual replacements by diffing line-by-line."""
+    old_lines = old_content.split("\n")
+    new_lines = new_content.split("\n")
+    count = 0
+    for old_line, new_line in zip(old_lines, new_lines):
+        if old_line != new_line:
+            count += 1
+    return count
 
 
 # --- File discovery ---
@@ -150,16 +160,6 @@ SKIP_DIRS = {
     ".venv",
     ".agentic/lib/tools/renumber.py",  # This script
     ".agentic/lib/tools/renumber_mapping.json",  # The mapping
-}
-
-# Top-level directories that are separate projects (not part of the framework)
-SKIP_TOP_DIRS = {
-    "algebra-rush",
-    "gta-driving-game",
-    "nhl-hockey-game",
-    "agentic-tests",
-    "tmp",
-    "examples",
 }
 
 # File patterns to skip
@@ -210,18 +210,40 @@ def is_contract_yaml(path: Path, project_root: Path) -> bool:
     return rel.startswith(".agentic/spec/contracts/") and path.suffix in (".yaml", ".yml")
 
 
-def find_files(project_root: Path) -> list[Path]:
+def _detect_exclude_dirs(project_root: Path) -> set[str]:
+    """Auto-detect top-level directories that are separate projects.
+
+    A directory is excluded if it contains its own package.json, .agentic/,
+    or is itself a git submodule.
+    """
+    exclude = set()
+    for entry in project_root.iterdir():
+        if not entry.is_dir() or entry.name.startswith("."):
+            continue
+        # Has its own package.json or .agentic/ → separate project
+        if (entry / "package.json").exists() or (entry / ".agentic").exists():
+            exclude.add(entry.name)
+        # Contains sub-projects (like agentic-tests/)
+        if any((entry / child / "package.json").exists() for child in entry.iterdir()
+               if child.is_dir()):
+            exclude.add(entry.name)
+    return exclude
+
+
+def find_files(project_root: Path, extra_exclude_dirs: set[str] | None = None) -> list[Path]:
     """Find all text files to process."""
+    auto_exclude = _detect_exclude_dirs(project_root)
+    skip_top = auto_exclude | (extra_exclude_dirs or set())
+
     files = []
     for root, dirs, filenames in os.walk(project_root):
         root_path = Path(root)
-        rel_root = root_path.relative_to(project_root)
 
         # Prune directories
         dirs[:] = [
             d for d in dirs
             if not should_skip(root_path / d, project_root)
-            and not (root_path == project_root and d in SKIP_TOP_DIRS)
+            and not (root_path == project_root and d in skip_top)
         ]
 
         for fname in filenames:
@@ -249,19 +271,83 @@ def git_mv(old_path: Path, new_path: Path, project_root: Path, dry_run: bool) ->
     )
 
 
+# --- Verify mode ---
+
+def run_verify(project_root: Path, mapping: dict[str, str],
+               extra_exclude_dirs: set[str] | None = None,
+               verbose: bool = False) -> bool:
+    """Verify no old IDs remain in the codebase (post-renumber check).
+
+    Uses the same file discovery and exclusion rules as run_renumber.
+    """
+    old_ids = list(mapping.keys())
+    regex = build_regex(old_ids)
+    files = find_files(project_root, extra_exclude_dirs)
+    stale = []
+
+    for fpath in files:
+        try:
+            content = fpath.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, PermissionError):
+            continue
+
+        # For contract YAML, skip consolidated_from/nfr_refs blocks and migration text
+        if is_contract_yaml(fpath, project_root):
+            in_skip = False
+            for lineno, line in enumerate(content.split("\n"), 1):
+                stripped = line.lstrip()
+                if _YAML_SKIP_FIELDS.match(stripped):
+                    in_skip = True
+                    continue
+                if in_skip:
+                    if stripped and not stripped.startswith("-") and not stripped.startswith("#"):
+                        in_skip = False
+                    else:
+                        continue
+                # Skip migration reason/description lines (legitimately reference old IDs)
+                if _YAML_MIGRATION_TEXT.match(stripped):
+                    continue
+                matches = regex.findall(line)
+                if matches:
+                    rel = fpath.relative_to(project_root)
+                    stale.append((rel, lineno, matches, line.strip()))
+        else:
+            for lineno, line in enumerate(content.split("\n"), 1):
+                if _NORENUMBER in line:
+                    continue
+                matches = regex.findall(line)
+                if matches:
+                    rel = fpath.relative_to(project_root)
+                    stale.append((rel, lineno, matches, line.strip()))
+
+    if stale:
+        print(f"VERIFY FAILED: {len(stale)} stale old ID reference(s) found:\n")
+        for rel, lineno, matches, line_text in stale:
+            print(f"  {rel}:{lineno}: {matches}")
+            if verbose:
+                print(f"    {line_text}")
+        return False
+    else:
+        print(f"VERIFY OK: No stale old IDs found ({len(files)} files checked)")
+        return True
+
+
 # --- Main ---
 
-def run_renumber(project_root: Path, dry_run: bool = False, verbose: bool = False) -> dict:
+def run_renumber(project_root: Path, extra_exclude_dirs: set[str] | None = None,
+                 dry_run: bool = False, verbose: bool = False) -> dict:
     """Execute the renumber operation. Returns stats dict."""
     mapping_path = project_root / ".agentic" / "lib" / "tools" / "renumber_mapping.json"
     if not mapping_path.exists():
         print(f"ERROR: Mapping file not found: {mapping_path}")
         sys.exit(1)
 
-    mapping = load_mapping(mapping_path)
+    mapping, cfg_exclude = load_mapping(mapping_path)
+    all_exclude = (extra_exclude_dirs or set()) | set(cfg_exclude)
     replacements = sort_replacements(mapping)
     old_ids = [r[0] for r in replacements]
     regex = build_regex(old_ids)
+    mapping_dict = dict(replacements)
 
     stats = {
         "files_scanned": 0,
@@ -273,14 +359,13 @@ def run_renumber(project_root: Path, dry_run: bool = False, verbose: bool = Fals
     }
 
     # Phase 1: Find all files
-    files = find_files(project_root)
+    files = find_files(project_root, all_exclude)
     stats["files_scanned"] = len(files)
 
     if verbose:
         print(f"Found {len(files)} text files to process")
 
     # Phase 2: Process each file
-    mapping_dict = dict(replacements)
     for fpath in files:
         try:
             content = fpath.read_text(encoding="utf-8")
@@ -293,23 +378,21 @@ def run_renumber(project_root: Path, dry_run: bool = False, verbose: bool = Fals
         if not regex.search(content):
             continue
 
-        # Count replacements before applying
-        matches_before = len(regex.findall(content))
-
         # Apply appropriate processing
         if is_contract_yaml(fpath, project_root):
-            new_content = process_contract_yaml(content, replacements, regex)
+            new_content = process_contract_yaml(content, mapping_dict, regex)
         else:
-            new_content = process_text_file(content, replacements, regex)
+            new_content = process_text_file(content, mapping_dict, regex)
 
         if new_content != content:
+            actual_changes = count_replacements(content, new_content)
             stats["files_modified"] += 1
-            stats["total_replacements"] += matches_before
+            stats["total_replacements"] += actual_changes
             rel = str(fpath.relative_to(project_root))
             stats["modified_files"].append(rel)
 
             if verbose:
-                print(f"  MODIFY ({matches_before} replacements): {rel}")
+                print(f"  MODIFY ({actual_changes} lines changed): {rel}")
 
             if not dry_run:
                 fpath.write_text(new_content, encoding="utf-8")
@@ -336,7 +419,7 @@ def print_summary(stats: dict, dry_run: bool) -> None:
     print(f"  Files scanned:         {stats['files_scanned']}")
     print(f"  Files modified:        {stats['files_modified']}")
     print(f"  Contract files renamed: {stats['contract_files_renamed']}")
-    print(f"  Total replacements:    {stats['total_replacements']}")
+    print(f"  Lines changed:         {stats['total_replacements']}")
 
     if stats["errors"]:
         print(f"\n  Errors ({len(stats['errors'])}):")
@@ -357,6 +440,10 @@ def main():
         help="Print detailed output for each file"
     )
     parser.add_argument(
+        "--verify", action="store_true",
+        help="Check that no old IDs remain (post-renumber validation)"
+    )
+    parser.add_argument(
         "--project-root", type=Path, default=None,
         help="Project root directory (default: auto-detect from git)"
     )
@@ -372,6 +459,14 @@ def main():
         )
         project_root = Path(result.stdout.strip())
 
+    mapping_path = project_root / ".agentic" / "lib" / "tools" / "renumber_mapping.json"
+    mapping, cfg_exclude = load_mapping(mapping_path)
+    all_exclude = set(cfg_exclude)
+
+    if args.verify:
+        ok = run_verify(project_root, mapping, all_exclude, verbose=args.verbose)
+        sys.exit(0 if ok else 1)
+
     print(f"Project root: {project_root}")
     print(f"Mode: {'DRY RUN' if args.dry_run else 'LIVE'}")
 
@@ -381,8 +476,9 @@ def main():
     if not args.dry_run and stats["files_modified"] > 0:
         print("\nNext steps:")
         print("  1. Review changes: git diff")
-        print("  2. Run validation: bash tests/validate_framework.sh")
-        print("  3. Run tests: python3 -m pytest tests/ -x")
+        print("  2. Verify: python3 renumber.py --verify")
+        print("  3. Run validation: bash tests/validate_framework.sh")
+        print("  4. Run tests: python3 -m pytest tests/ -x")
 
 
 if __name__ == "__main__":
