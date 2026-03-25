@@ -4552,3 +4552,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-25 17:07 - F-005 shipped
+
+**Why**: Ship F-005 after all phases (decomposition + dotted IDs + renumber) completed
+
+**What changed**:
+- Feature Hierarchy & Decomposition complete: epic decomposition, dotted IDs, 3-digit renumbering
+
+**Next steps**:
+- Next backlog item
+
+**Blockers**: None
+

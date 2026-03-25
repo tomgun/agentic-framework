@@ -306,7 +306,7 @@ autonomous_formal profile: formal rigor with review_code and review_regression d
 
 ## F-005: Feature Hierarchy & Decomposition
 
-**Status**: implementing
+**Status**: shipped
 **Contract**: [`spec/contracts/F-005.yaml`](contracts/F-005.yaml)
 **Consolidates**: F-005
 

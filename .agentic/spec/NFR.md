@@ -1,6 +1,6 @@
 # NFR (Non-Functional Requirements)
 
-<!-- format: nfr-v0.1.0 | reviewed: 2026-03-25 -->
+<!-- format: nfr-v0.1.0 -->
 
 Purpose: capture cross-cutting constraints that apply across many features (performance, security, realtime safety, reliability, etc.) in a stable, referenceable way.
 

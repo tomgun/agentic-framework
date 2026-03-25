@@ -1,6 +1,5 @@
 # Lessons & Caveats
 
-<!-- reviewed: 2026-03-25 -->
 Purpose: prevent repeating mistakes and capture "sharp edges" for future work (humans + agents).
 
 ## Format

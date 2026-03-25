@@ -1,6 +1,6 @@
 # Issues & Bugs
 
-<!-- format: issues-v0.1.0 | reviewed: 2026-03-25 -->
+<!-- format: issues-v0.1.0 -->
 
 **Purpose**: Track bugs, issues, and technical debt found during development.
 

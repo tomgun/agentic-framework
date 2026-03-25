@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-005 Phase 1b complete — epic.py + commands. Next: Phase 2 (renumber) (Updated: 2026-03-24 21:57 UTC)
+- ADR-001 roadmap execution: Strengthen later state machine gates (advisory→blocking) (Strengthen later state machine gates (advisory→blocking)) is current backlog item (Updated: 2026-03-25 17:08 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
@@ -34,4 +34,4 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 ## Release notes (optional)
 - v0.58.0: F-0239 structural enforcement for post-merge workflow
 - See CHANGELOG.md for full history
-- QA: QA: 0/1 verified, 9 pending
+- QA: QA: 0/1 verified, 10 pending

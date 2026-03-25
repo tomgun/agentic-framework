@@ -1,22 +1,11 @@
 [
   {
-    "type": "feature",
-    "id": "F-005",
-    "description": "Feature Hierarchy & Decomposition",
-    "added_at": "2026-03-24T19:52:35Z",
-    "added_by": "agent",
-    "refs": [
-      ".agentic/spec/contracts/F-005.yaml"
-    ],
-    "became_current_at": "2026-03-24T20:14:36Z"
-  },
-  {
     "type": "task",
     "description": "Strengthen later state machine gates (advisory\u2192blocking)",
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
     "notes": "Originally F-0223. Improvement to F-003 (Feature Tracking & Lifecycle)",
-    "became_current_at": "2026-03-24T20:12:19Z"
+    "became_current_at": "2026-03-25T17:08:06Z"
   },
   {
     "type": "feature",
