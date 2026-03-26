@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- ADR-001 roadmap execution: Strengthen later state machine gates (advisory→blocking) (Strengthen later state machine gates (advisory→blocking)) is current backlog item (Updated: 2026-03-25 17:08 UTC)
+- Gates 6-8 strengthened (advisory→blocking) — PR ready (Updated: 2026-03-26 22:05 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

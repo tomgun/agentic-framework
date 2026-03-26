@@ -362,7 +362,7 @@ The design makes assumptions that should be validated over time. Each has a stat
 | A8 | ~40-50 lines is achievable while keeping trigger table + token scripts + core rules | VALIDATED — template CLAUDE.md at 40 lines, root at 54, all under 100-line ceiling (F-0143) | Achieved via Skills offloading triggers |
 | A9 | Copilot loads copilot-instructions.md into subagent sessions | UNKNOWN — contradictory docs | Empirical test with distinctive instruction |
 | A10 | Git-tracked STATUS.md survives cross-machine workflow | RESOLVED — status.json eliminated; STATUS.md is the sole cross-machine state file | N/A — STATUS.md is already git-tracked and used directly |
-| A11 | Tool-native PostToolUse hooks fire reliably on ExitPlanMode in Claude Code | VALIDATED — F-0234 (ExitPlanMode), F-0239 (Bash) confirmed in field | Manual test: enter/exit plan mode, verify hook output appears in agent context |
+| A11 | Tool-native PostToolUse hooks fire reliably on ExitPlanMode in Claude Code | **INVALIDATED (2026-03-26)** — JSONL analysis of session `f85780c3` shows NO `PostToolUse:ExitPlanMode` progress entry after ExitPlanMode tool call. Other PostToolUse hooks (Write, Grep, Read) fired normally in the same session. ExitPlanMode may be a built-in tool that doesn't trigger PostToolUse hooks. The agent followed the correct sequence anyway (from CLAUDE.md + memory instructions), but the hook was NOT the trigger. | Platform investigation needed: does Claude Code emit PostToolUse events for built-in tools (ExitPlanMode, EnterPlanMode) or only for user-defined tools? If confirmed, the on-plan-mode-exit.sh hook has NEVER fired in production — all plan-save + review behavior came from textual instructions alone. |
 | A12 | Enforcement chains are wired end-to-end in fresh projects | **INVALIDATED** — F-0300 (Street Fury). Hook scripts existed, gate.py logic correct, but hooks never registered in settings.json + Claude requires restart for hook activation. Two wiring breaks silenced the entire enforcement layer. | End-to-end test: init fresh project → start Claude session → attempt blocked Write → verify denial fires. Must test full chain, not individual components. |
 
 **Update this table** when assumptions are validated or invalidated. Failed assumptions trigger design document amendments.
@@ -386,7 +386,7 @@ Transition points where tool-native hooks can structurally enforce workflow rule
 
 | Transition | Hook Trigger | Value | Status |
 |---|---|---|---|
-| Plan mode exit → save + review | PostToolUse(ExitPlanMode) | Block coding without approved plan | **Implemented (F-0234)** |
+| Plan mode exit → save + review | PostToolUse(ExitPlanMode) | Block coding without approved plan | **Implemented (F-0234)** — but **A11 INVALIDATED**: hook may not fire for built-in tools. Actual enforcement comes from `ag implement` gate 0d (pull) + CLAUDE.md instructions (text). |
 | After `gh pr merge` → warn to use `ag merge` | PostToolUse(Bash) + parse cmd | Catch bypassed entry point | **Implemented (F-0239)** |
 | On user prompt → warn unshipped features | UserPromptSubmit + git log parse | Catch merged-but-not-done on main | **Implemented (F-0239)** |
 | Before file edit → verify artifacts | PreToolUse(Write\|Edit) | Block coding without required artifacts | **Implemented (Phase 4)** |

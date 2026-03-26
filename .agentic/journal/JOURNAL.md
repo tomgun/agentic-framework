@@ -4578,3 +4578,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-26 21:47 - ExitPlanMode hook JSONL analysis
+
+**Why**: ExitPlanMode hook was assumed VALIDATED (A11) but JSONL proves it never fired — all plan-review enforcement may rest on textual instructions alone, contradicting the documented principle that textual instructions are unreliable for cross-turn workflows
+
+**What changed**:
+- Proved via JSONL (session f85780c3) that PostToolUse:ExitPlanMode hook never fired — zero progress entries while other PostToolUse hooks (Write,Grep,Read) fired normally. Updated INSTRUCTION_ARCHITECTURE.md A11 from VALIDATED to INVALIDATED. Updated FRAMEWORK_DEVELOPMENT.md plan-review case study with 3 remaining gaps: (1) explore-before-review, (2) ExitPlanMode hook inert, (3) no review-evidence check in implement gate. Correct agent behavior in this session came from CLAUDE.md + memory text, NOT from the hook.
+
+**Next steps**:
+- Investigate whether Claude Code emits PostToolUse for built-in tools; if not, redesign enforcement to rely on pull mechanisms (ag implement gate, SessionStart orphan detection) and consider adding review-evidence check to gate 0d
+
+**Blockers**: Need platform confirmation on built-in tool hook behavior
+
+
+### Session: 2026-03-26 22:05 - Gates 6-8 strengthened
+
+**Why**: Later state machine gates were advisory-only — agents could skip documentation, commit, and ship checks entirely
+
+**What changed**:
+- Gate 6: CHANGELOG blocks in docs_gate=blocking, journal freshness advisory, early-return bug fixed. Gate 7: blocks dirty tree + missing feature commits. Gate 8: blocks no merged PR (pull_request mode) or unpushed commits (direct), graceful gh degradation. state_machine.py auto-resolves enforce from settings.
+
+**Next steps**:
+- Merge PR, ag done, advance backlog
+
+**Blockers**: None
+
