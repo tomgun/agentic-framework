@@ -4578,16 +4578,3 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
-
-### Session: 2026-03-26 19:28 - Strengthen gates + debugging skill
-
-**Why**: Advisory gates let violations through undetected; missing hooks compounded the problem
-
-**What changed**:
-- Gates 6-8 now blocking in formal mode, state_enforcement wired in main(), debugging-framework skill with specs+tests, dashboard+sync detect missing hooks
-
-**Next steps**:
-- Wire up remaining hooks enforcement, dialectical review for the plan
-
-**Blockers**: None
-

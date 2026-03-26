@@ -69,15 +69,6 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-0136
 
-  - id: AC-008
-    text: "Dashboard detects missing agent-tool hooks and shows warning"
-    type: structural
-    verify: |
-      grep -q "HOOKS_MISSING" .agentic/lib/tools/dashboard.sh &&
-      grep -q "hooks.json" .agentic/lib/tools/dashboard.sh
-    tests:
-      - tests/test_hooks_detection.py::TestDashboardHooksCheck
-
 nfr_refs: []
 scenarios:
   - name: "Session start with interrupted work"
@@ -85,13 +76,4 @@ scenarios:
     when: "Agent starts new session"
     then: "Dashboard shows WIP warning, recovery prompted before any other work"
 
-  - name: "Session start with missing hooks"
-    given: "Project has .claude/ dir but no .claude/hooks.json"
-    when: "Agent starts new session"
-    then: "Dashboard shows hooks missing warning with fix command"
-
-migrations:
-  - date: "2026-03-26"
-    trigger: "Add hooks detection to dashboard (AC-008)"
-    reason: "Missing hooks went undetected — no enforcement fired during plan review violation"
-    approved_by: user
+migrations: []

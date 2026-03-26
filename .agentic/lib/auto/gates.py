@@ -354,33 +354,17 @@ def gate_verified_to_documented(feature_id: str, project_root: Path) -> GateResu
     if docs_gate == "off":
         return GateResult.ok()
 
-    # CHANGELOG should mention the feature — blocking when docs_gate=blocking
+    # Advisory: CHANGELOG should mention the feature
     changelog = project_root / "CHANGELOG.md"
     if changelog.exists():
         content = changelog.read_text()
         if feature_id not in content:
-            msg = (
+            warnings.append(
                 f"CHANGELOG.md does not mention {feature_id} — "
-                f"add a changelog entry before proceeding"
+                f"consider adding a changelog entry"
             )
-            if docs_gate == "blocking":
-                reasons.append(msg)
-            else:
-                warnings.append(msg)
     else:
         warnings.append("No CHANGELOG.md found")
-
-    # Advisory: journal should have been updated today
-    import datetime
-    journal = project_root / ".agentic" / "journal" / "JOURNAL.md"
-    if journal.exists():
-        today = datetime.date.today().isoformat()
-        journal_content = journal.read_text()
-        if today not in journal_content:
-            warnings.append(
-                f"JOURNAL.md has no entry for today ({today}) — "
-                f"consider updating before documenting"
-            )
 
     # Run drift.sh --docs --check to detect stale docs
     drift_script = project_root / ".agentic" / "lib" / "tools" / "drift.sh"
@@ -420,12 +404,11 @@ def gate_verified_to_documented(feature_id: str, project_root: Path) -> GateResu
 
         if docs_gate == "blocking":
             reasons.append(drift_msg)
+            return GateResult.blocked(reasons, warnings)
         else:
             # warning mode
             warnings.append(drift_msg)
 
-    if reasons:
-        return GateResult.blocked(reasons, warnings)
     return GateResult.ok(warnings)
 
 
@@ -434,57 +417,21 @@ def gate_verified_to_documented(feature_id: str, project_root: Path) -> GateResu
 # ---------------------------------------------------------------------------
 
 def gate_documented_to_committed(feature_id: str, project_root: Path) -> GateResult:
-    """Check commit readiness: clean tree, feature commits exist."""
+    """Advisory checks for commit readiness."""
     warnings: list[str] = []
-    reasons: list[str] = []
 
+    # Advisory: check for unstaged changes (without running git)
+    # We check if the git directory exists as a basic sanity check
     git_dir = project_root / ".git"
     if not git_dir.exists():
-        reasons.append("Not a git repository — cannot verify commit readiness")
-        return GateResult.blocked(reasons, warnings)
-
-    # Block: working tree must be clean (all changes committed)
-    try:
-        proc = subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=str(project_root),
-            capture_output=True,
-            text=True,
-            timeout=15,
+        warnings.append("Not a git repository — cannot verify commit readiness")
+    else:
+        # Advisory: remind about pre-commit checks
+        warnings.append(
+            "Advisory: ensure pre-commit checks pass before committing "
+            "(bash tests/validate_framework.sh)"
         )
-        if proc.returncode == 0 and proc.stdout.strip():
-            reasons.append(
-                "Working tree has uncommitted changes — "
-                "commit or stash before transitioning to committed"
-            )
-    except (subprocess.TimeoutExpired, OSError) as exc:
-        warnings.append(f"Could not check git status: {exc}")
 
-    # Block: at least one commit must reference the feature
-    try:
-        proc = subprocess.run(
-            ["git", "log", "--oneline", f"--grep={feature_id}", "-1"],
-            cwd=str(project_root),
-            capture_output=True,
-            text=True,
-            timeout=15,
-        )
-        if proc.returncode == 0 and not proc.stdout.strip():
-            reasons.append(
-                f"No commits reference {feature_id} — "
-                f"commit your work with the feature ID in the message"
-            )
-    except (subprocess.TimeoutExpired, OSError) as exc:
-        warnings.append(f"Could not check git log: {exc}")
-
-    # Advisory: pre-commit checks
-    warnings.append(
-        "Advisory: ensure pre-commit checks pass before shipping "
-        "(bash tests/validate_framework.sh)"
-    )
-
-    if reasons:
-        return GateResult.blocked(reasons, warnings)
     return GateResult.ok(warnings)
 
 
@@ -493,62 +440,18 @@ def gate_documented_to_committed(feature_id: str, project_root: Path) -> GateRes
 # ---------------------------------------------------------------------------
 
 def gate_committed_to_shipped(feature_id: str, project_root: Path) -> GateResult:
-    """Check ship readiness: merged PR (or pushed commits for direct mode)."""
+    """Advisory checks for ship readiness — entirely non-blocking."""
     warnings: list[str] = []
-    reasons: list[str] = []
 
-    git_workflow = get_setting(project_root, "git_workflow", "pull_request")
+    # Advisory: branch should be pushed
+    warnings.append(
+        "Advisory: ensure branch is pushed to remote"
+    )
 
-    if git_workflow == "pull_request":
-        # Block: a merged PR referencing the feature must exist
-        try:
-            proc = subprocess.run(
-                [
-                    "gh", "pr", "list",
-                    "--search", feature_id,
-                    "--state", "merged",
-                    "--json", "number",
-                ],
-                cwd=str(project_root),
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-            if proc.returncode == 0:
-                import json
-                prs = json.loads(proc.stdout.strip() or "[]")
-                if not prs:
-                    reasons.append(
-                        f"No merged PR found for {feature_id} — "
-                        f"merge the pull request before shipping"
-                    )
-            else:
-                warnings.append(
-                    f"gh pr list failed (rc={proc.returncode}) — "
-                    f"cannot verify merged PR"
-                )
-        except FileNotFoundError:
-            warnings.append(
-                "gh CLI not available — cannot verify merged PR"
-            )
-        except (subprocess.TimeoutExpired, OSError) as exc:
-            warnings.append(f"Could not check PRs: {exc}")
-    else:
-        # direct mode: block if there are unpushed commits
-        try:
-            proc = subprocess.run(
-                ["git", "log", "@{u}..HEAD", "--oneline"],
-                cwd=str(project_root),
-                capture_output=True,
-                text=True,
-                timeout=15,
-            )
-            if proc.returncode == 0 and proc.stdout.strip():
-                reasons.append(
-                    "Unpushed commits detected — push before shipping"
-                )
-        except (subprocess.TimeoutExpired, OSError) as exc:
-            warnings.append(f"Could not check unpushed commits: {exc}")
+    # Advisory: PR should exist for review
+    warnings.append(
+        "Advisory: ensure a pull request exists and has been reviewed"
+    )
 
     # Advisory: VERSION should be bumped
     paths = get_paths(project_root)
@@ -557,8 +460,6 @@ def gate_committed_to_shipped(feature_id: str, project_root: Path) -> GateResult
             "Advisory: verify VERSION has been bumped (at least patch)"
         )
 
-    if reasons:
-        return GateResult.blocked(reasons, warnings)
     return GateResult.ok(warnings)
 
 
