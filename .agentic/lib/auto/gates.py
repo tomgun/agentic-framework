@@ -17,6 +17,8 @@ Usage:
 """
 from __future__ import annotations
 
+import datetime
+import json
 import re
 import subprocess
 import sys
@@ -371,7 +373,6 @@ def gate_verified_to_documented(feature_id: str, project_root: Path) -> GateResu
         warnings.append("No CHANGELOG.md found")
 
     # Advisory: journal should have been updated today
-    import datetime
     journal = project_root / ".agentic" / "journal" / "JOURNAL.md"
     if journal.exists():
         today = datetime.date.today().isoformat()
@@ -455,7 +456,7 @@ def gate_documented_to_committed(feature_id: str, project_root: Path) -> GateRes
         if proc.returncode == 0 and proc.stdout.strip():
             reasons.append(
                 "Working tree has uncommitted changes — "
-                "commit or stash before transitioning to committed"
+                "commit all changes before transitioning to committed"
             )
     except (subprocess.TimeoutExpired, OSError) as exc:
         warnings.append(f"Could not check git status: {exc}")
@@ -515,7 +516,6 @@ def gate_committed_to_shipped(feature_id: str, project_root: Path) -> GateResult
                 timeout=30,
             )
             if proc.returncode == 0:
-                import json
                 prs = json.loads(proc.stdout.strip() or "[]")
                 if not prs:
                     reasons.append(

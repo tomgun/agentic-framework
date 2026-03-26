@@ -395,13 +395,27 @@ class TestGateDocumentedToCommitted:
 
 class TestGateCommittedToShipped:
     def test_graceful_when_gh_unavailable(self, project_dir):
-        """Should warn (not crash) when gh CLI is not installed."""
+        """Should warn (not crash) when gh CLI is not available."""
         (project_dir / "STACK.md").write_text(
             "## Settings\n- profile: formal\n- git_workflow: pull_request\n"
         )
-        r = gate_committed_to_shipped("F-0042", project_dir)
-        # gh not available in test env → warning, not block
-        assert r.allowed or any("gh" in w.lower() for w in r.warnings)
+        import os
+        env = os.environ.copy()
+        env["PATH"] = ""  # ensure gh is not found
+        # Monkey-patch subprocess.run to use empty PATH
+        import subprocess as sp
+        orig_run = sp.run
+        def patched_run(cmd, **kwargs):
+            if cmd[0] == "gh":
+                raise FileNotFoundError("gh")
+            return orig_run(cmd, **kwargs)
+        sp.run = patched_run
+        try:
+            r = gate_committed_to_shipped("F-0042", project_dir)
+        finally:
+            sp.run = orig_run
+        assert r.allowed
+        assert any("gh" in w.lower() for w in r.warnings)
 
     def test_direct_mode_passes_without_remote(self, project_dir):
         """Direct mode should warn (not crash) when no upstream exists."""
