@@ -142,6 +142,16 @@ extract_primary_id() {
         return
     fi
 
+    # Pattern 4: Any F-XXXX in the first 10 lines (broad fallback)
+    # Intentionally last — safety net for plans where F-ID appears only in body text
+    # (e.g., "**Task**: ... F-003"). The known-features check at line 165 still
+    # prevents cross-project pollution.
+    fid=$(echo "$header" | grep -oE "$FEATURE_ID_ERE" | head -1 || true)
+    if [[ -n "$fid" ]]; then
+        echo "$fid"
+        return
+    fi
+
     # No primary ID found
     echo ""
 }

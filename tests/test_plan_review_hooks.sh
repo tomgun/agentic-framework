@@ -41,9 +41,11 @@ setup_test_env() {
     mkdir -p "$TEST_DIR/.agentic/journal/plans"
     mkdir -p "$TEST_DIR/.agentic/session"
     mkdir -p "$TEST_DIR/.agentic/spec"
+    mkdir -p "$TEST_DIR/.agentic/lib/claude-hooks"
 
     # Copy required framework files
     cp "$FRAMEWORK_ROOT/.agentic/lib/paths.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
+    cp "$FRAMEWORK_ROOT/.agentic/lib/ids.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/settings.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/presets/profiles.conf" "$TEST_DIR/.agentic/lib/presets/" 2>/dev/null || true
     cp "$FRAMEWORK_ROOT/.agentic/lib/hooks/shared/on-plan-mode-exit.sh" "$TEST_DIR/.agentic/lib/hooks/shared/" 2>/dev/null || true
@@ -104,7 +106,7 @@ else
 fi
 cleanup_test_env
 
-test_case "on-plan-mode-exit: shows fallback when no ephemeral plans exist"
+test_case "on-plan-mode-exit: shows fallback with AUTO-CONTINUE when no ephemeral plans exist"
 setup_test_env
 cat > "$TEST_DIR/STACK.md" << 'EOF'
 # Stack
@@ -112,10 +114,10 @@ cat > "$TEST_DIR/STACK.md" << 'EOF'
 EOF
 # Override HOME to isolate from real ~/.claude/plans/
 output=$(HOME="$TEST_DIR" CLAUDE_PROJECT_DIR="$TEST_DIR" bash "$TEST_DIR/.agentic/lib/hooks/shared/on-plan-mode-exit.sh" 2>&1)
-if echo "$output" | grep -q "no plan file found"; then
+if echo "$output" | grep -q "plan-scan did not find"; then
     pass
 else
-    fail "Expected fallback message about no plan found, got: $output"
+    fail "Expected fallback message about plan-scan, got: $output"
 fi
 cleanup_test_env
 
@@ -279,6 +281,155 @@ if [[ "$HAS_APPROVED_PLAN" == false ]]; then
     pass
 else
     fail "Should NOT have found any plan"
+fi
+cleanup_test_env
+
+#=============================================================================
+# plan-scan Pattern 4 Tests (F-003: fallback F-ID extraction)
+#=============================================================================
+
+test_case "plan-scan: extracts F-ID from body text via Pattern 4 fallback"
+setup_test_env
+# Create FEATURES.md with known feature
+cat > "$TEST_DIR/.agentic/spec/FEATURES.md" << 'EOF'
+# Features
+## F-003 Feature Tracking & Lifecycle
+EOF
+# Create ephemeral plan with F-ID only in body text (not heading, not metadata)
+mkdir -p "$TEST_DIR/.claude/plans"
+cat > "$TEST_DIR/.claude/plans/test-plan.md" << 'EOF'
+# Plan: Fix Post-Plan-Mode-Exit Behavior
+
+**Task**: F-003 (Feature Tracking & Lifecycle)
+
+## Context
+Some context here.
+EOF
+# Run plan-scan with isolated HOME pointing to test dir
+output=$(HOME="$TEST_DIR" bash "$TEST_DIR/.agentic/lib/tools/plan-scan.sh" 2>&1) || true
+if echo "$output" | grep -q "F-003"; then
+    # Verify it was actually copied
+    if ls "$TEST_DIR/.agentic/journal/plans/"*F-003* >/dev/null 2>&1; then
+        pass
+    else
+        fail "Plan-scan reported F-003 but file not copied"
+    fi
+else
+    fail "Expected plan-scan to find F-003 from body text, got: $output"
+fi
+cleanup_test_env
+
+test_case "plan-scan: returns empty when no F-ID anywhere in plan"
+setup_test_env
+cat > "$TEST_DIR/.agentic/spec/FEATURES.md" << 'EOF'
+# Features
+## F-003 Feature Tracking & Lifecycle
+EOF
+# Create ephemeral plan with NO feature ID at all
+mkdir -p "$TEST_DIR/.claude/plans"
+cat > "$TEST_DIR/.claude/plans/generic-plan.md" << 'EOF'
+# Plan: Do Something Generic
+
+## Context
+No feature ID mentioned here at all.
+Just generic planning text with no references.
+EOF
+output=$(HOME="$TEST_DIR" bash "$TEST_DIR/.agentic/lib/tools/plan-scan.sh" 2>&1) || true
+# Should NOT have copied anything
+if ls "$TEST_DIR/.agentic/journal/plans/"*plan* >/dev/null 2>&1; then
+    fail "Should not have copied plan without F-ID, but found files"
+else
+    pass
+fi
+cleanup_test_env
+
+#=============================================================================
+# on-plan-mode-exit Failure Path Tests (F-003: auto-continue on failure)
+#=============================================================================
+
+test_case "on-plan-mode-exit: failure path contains AUTO-CONTINUE, not 'Save your plan manually'"
+setup_test_env
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+# Stack
+- plan_review_enabled: yes
+EOF
+# Override HOME to ensure no ephemeral plans found → triggers failure path
+output=$(HOME="$TEST_DIR" CLAUDE_PROJECT_DIR="$TEST_DIR" bash "$TEST_DIR/.agentic/lib/hooks/shared/on-plan-mode-exit.sh" 2>&1)
+if echo "$output" | grep -q "AUTO-CONTINUE"; then
+    if echo "$output" | grep -q "Save your plan manually"; then
+        fail "Old 'Save your plan manually' text still present"
+    else
+        pass
+    fi
+else
+    fail "Expected 'AUTO-CONTINUE' in failure path, got: $output"
+fi
+cleanup_test_env
+
+test_case "on-plan-mode-exit: failure path includes profile-aware messaging for autonomous_formal"
+setup_test_env
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+# Stack
+- plan_review_enabled: yes
+- Profile: autonomous_formal
+- plan_review_convergence: auto
+EOF
+output=$(HOME="$TEST_DIR" CLAUDE_PROJECT_DIR="$TEST_DIR" bash "$TEST_DIR/.agentic/lib/hooks/shared/on-plan-mode-exit.sh" 2>&1)
+if echo "$output" | grep -q "AUTONOMOUS MODE"; then
+    pass
+else
+    fail "Expected 'AUTONOMOUS MODE' for autonomous_formal profile, got: $output"
+fi
+cleanup_test_env
+
+#=============================================================================
+# SessionStart Orphan Plan Detection Tests (F-003: pull mechanism)
+#=============================================================================
+
+test_case "SessionStart: warns when orphan plans exist"
+setup_test_env
+cp "$FRAMEWORK_ROOT/.agentic/lib/ids.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
+cp "$FRAMEWORK_ROOT/.agentic/lib/claude-hooks/SessionStart.sh" "$TEST_DIR/.agentic/lib/claude-hooks/" 2>/dev/null || true
+cp "$FRAMEWORK_ROOT/.agentic/lib/tools/fwlog.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+# Stack
+- framework_version: 0.73.1
+EOF
+# Create FEATURES.md so plan-scan can verify ownership
+cat > "$TEST_DIR/.agentic/spec/FEATURES.md" << 'EOF'
+# Features
+## F-003 Feature Tracking & Lifecycle
+EOF
+# Create an unsaved ephemeral plan
+mkdir -p "$TEST_DIR/.claude/plans"
+cat > "$TEST_DIR/.claude/plans/orphan-plan.md" << 'EOF'
+# Plan: Fix F-003
+**Feature**: F-003
+EOF
+# Run SessionStart with isolated HOME
+output=$(HOME="$TEST_DIR" CLAUDE_PROJECT_DIR="$TEST_DIR" bash "$TEST_DIR/.agentic/lib/claude-hooks/SessionStart.sh" 2>&1) || true
+if echo "$output" | grep -q "unsaved plan"; then
+    pass
+else
+    fail "Expected orphan plan warning, got: $output"
+fi
+cleanup_test_env
+
+test_case "SessionStart: no warning when no orphan plans"
+setup_test_env
+cp "$FRAMEWORK_ROOT/.agentic/lib/ids.sh" "$TEST_DIR/.agentic/lib/" 2>/dev/null || true
+cp "$FRAMEWORK_ROOT/.agentic/lib/claude-hooks/SessionStart.sh" "$TEST_DIR/.agentic/lib/claude-hooks/" 2>/dev/null || true
+cp "$FRAMEWORK_ROOT/.agentic/lib/tools/fwlog.sh" "$TEST_DIR/.agentic/lib/tools/" 2>/dev/null || true
+cat > "$TEST_DIR/STACK.md" << 'EOF'
+# Stack
+- framework_version: 0.73.1
+EOF
+# No ephemeral plans directory — should be clean
+output=$(HOME="$TEST_DIR" CLAUDE_PROJECT_DIR="$TEST_DIR" bash "$TEST_DIR/.agentic/lib/claude-hooks/SessionStart.sh" 2>&1) || true
+if echo "$output" | grep -q "unsaved plan"; then
+    fail "Should not warn when no orphan plans exist, got: $output"
+else
+    pass
 fi
 cleanup_test_env
 

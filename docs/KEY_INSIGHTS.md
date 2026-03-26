@@ -32,6 +32,8 @@
 | 18 | [End-to-End Enforcement Wiring](#18-end-to-end-enforcement-wiring--existence--activation) | Enforcement code that exists but isn't wired into the activation path is theater | Zero — the enforcement literally doesn't fire |
 | 19 | [Test Projects Are the Only Honest System Feedback](#19-test-projects-are-the-only-honest-system-feedback) | Synthetic tests verify components; test projects verify the system under real pressure | N/A — validation methodology |
 | 20 | [Context Window Decay in Autonomous Sessions](#20-context-window-decay-in-autonomous-sessions) | Context fills monotonically, instructions degrade, agents can't self-clear — architect around it | 5–10K per subagent vs degraded 100K+ main session |
+| 21 | [Fail-Open Error Handling Defeats Blocking Enforcement](#21-fail-open-error-handling-defeats-blocking-enforcement) | Silence is permission — fail-open error handling defeats enforcement | Zero — the enforcement literally doesn't fire |
+| 22 | [Push Mechanisms Need Pull Safety Nets](#22-push-mechanisms-need-pull-safety-nets) | Event-time hooks are single points of failure — pair with periodic sweep at session start | Cheap: ~50 tokens per session start check |
 
 **Meta-lesson**: structural enforcement > behavioral instructions > hope.
 
@@ -533,6 +535,30 @@ The critical asymmetry: **instructions loaded at session start (system prompt) s
 
 ---
 
+## 22. Push Mechanisms Need Pull Safety Nets
+
+**The problem**: Event-driven hooks (PostToolUse, SessionStart, pre-commit) are "push" mechanisms — they try to inject instructions or enforce constraints at a specific moment. But any push mechanism has a single point of failure: if it doesn't fire (session ends, extraction bug, hook misconfigured), there's no recovery. The state it was supposed to create never exists, and no subsequent system checks for the gap.
+
+**Observed case (F-003)**: The ExitPlanMode hook is a push mechanism — it fires `on-plan-mode-exit.sh` → `plan-scan.sh` to save the plan durably → prints auto-continue instructions. But `plan-scan.sh` had a bug where `extract_primary_id()` couldn't extract F-IDs that appeared only in body text (e.g., `**Task**: F-003`). The plan was silently skipped, the hook's failure path gave wrong instructions ("save manually" instead of auto-continue), and the next session start had no mechanism to detect the unsaved plan. Three failures compounded because all relied on the same push moment succeeding.
+
+**The fix pattern**: Pair every push mechanism with a "pull" safety net that runs at a well-known periodic checkpoint (typically session start). The pull mechanism independently checks for the state the push was supposed to create, and warns when it's missing.
+
+For plan saving:
+- **Push**: ExitPlanMode hook saves plan via plan-scan.sh (fires at the moment of exit)
+- **Pull**: SessionStart hook runs `plan-scan.sh --check` (fires at every new session, catches anything the push missed)
+
+**Why this matters for LLM agents specifically**: Human developers notice when a hook fails — they see the error and compensate. LLM agents don't notice absence. If the ExitPlanMode hook silently fails, the agent proceeds as if everything worked. It doesn't think "hmm, I didn't see a confirmation — let me check." Absence of signal is interpreted as success. The pull mechanism converts absence into an explicit warning the agent can act on.
+
+**Design principles**:
+1. **Every event-time enforcement needs a sweep-time backup.** Event hooks (push) are first line; periodic sweeps (pull) are the safety net. Neither alone is sufficient.
+2. **Pull mechanisms should be cheap and idempotent.** `plan-scan.sh --check` is a dry run — it reads, reports, doesn't modify. Safe to run at every session start with no side effects.
+3. **Session start is the natural pull checkpoint.** Every new session runs SessionStart hooks. This is the framework's best-known periodic boundary for catching state that should exist but doesn't.
+4. **Failure paths should give the same behavioral guidance as success paths.** When the push mechanism fails, the agent still needs to know what to do next. Different instructions on success vs failure creates a behavioral fork that's harder to test and easier to get wrong.
+
+**See also**: Insight #4 (Structural Gates), Insight #14 (Cross-Turn Workflows), Insight #18 (End-to-End Wiring). `FRAMEWORK_DEVELOPMENT.md` § "Push mechanisms need pull safety nets"
+
+---
+
 ## Summary: The Pattern
 
 These insights form a coherent pattern:
@@ -560,6 +586,7 @@ Tiny instruction file (50 lines)     → agent reads it all, reliably
   + Test projects as system feedback → synthetic tests verify components, test projects verify truth
   + Context window decay           → depletable resource; architect around it with subagents + external state
   + Fail-closed error handling     → enforcement chains must deny on error, not silently allow
+  + Push + pull safety nets       → event hooks need periodic sweep backup at session start
 ```
 
 The meta-lesson: **structural enforcement > behavioral instructions > hope**. Anything important enough to be a rule is important enough to be enforced by code, not by documentation. And the meta-meta-lesson from #18–#19: **you don't know if your enforcement works until you test the full system under real conditions**. And from #21: **you don't know if your enforcement survives failure until you test the error path**.

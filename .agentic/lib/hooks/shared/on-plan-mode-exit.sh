@@ -101,13 +101,45 @@ if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
         echo "Do NOT stop and wait — start the review immediately."
     fi
 else
-    # No plan found — timing issue or plan not in ephemeral location
-    echo "⚠️  Plan mode exited but no plan file found in ephemeral locations."
+    # Plan-scan didn't find/save a plan — timing issue, extraction bug, or plan
+    # not in ephemeral location. Give the SAME auto-continue instructions as the
+    # success path so the agent proceeds with review regardless.
+    echo "⚠️  Plan mode exited but plan-scan did not find a plan to save."
+    echo "   (Plan may need manual save to .agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md)"
     echo ""
-    echo "Save your plan manually:"
-    echo "  cp ~/.claude/plans/<plan-file> .agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md"
-    echo ""
-    echo "Then run \`ag implement F-XXXX\` for dialectical review."
+
+    # Profile-aware auto-continue messaging (matches success path)
+    if [[ "$PROFILE" == "autonomous_formal" && "$CONVERGENCE" == "auto" ]]; then
+        echo "🚀 AUTONOMOUS MODE — NO HUMAN APPROVAL NEEDED"
+        echo ""
+        echo "⚠️  Plan is NOT approved. AUTO-CONTINUE NOW (do NOT stop):"
+        echo "  1. Save the plan manually from ~/.claude/plans/ to .agentic/journal/plans/"
+        echo "  2. Spawn Critic + Advocate agents (parallel, fresh context)"
+        echo "  3. Synthesize with Revision Guidance"
+        echo "  4. Auto-approve when reviewers converge (no human input needed)"
+        echo "  5. Run \`ag implement F-XXXX\`"
+        echo ""
+        echo "This is autonomous_formal with auto convergence."
+        echo "You MUST continue immediately — stopping here is a VIOLATION."
+    elif [[ "$CONVERGENCE" == "auto" ]]; then
+        echo "⚠️  Plan is NOT approved. AUTO-CONTINUE now:"
+        echo "  1. Save the plan manually from ~/.claude/plans/ to .agentic/journal/plans/"
+        echo "  2. Spawn Critic + Advocate agents (parallel, fresh context)"
+        echo "  3. Synthesize with Revision Guidance"
+        echo "  4. Auto-approve on convergence (convergence: auto)"
+        echo "  5. After APPROVED → run \`ag implement F-XXXX\`"
+        echo ""
+        echo "Do NOT stop and wait — start the review immediately."
+    else
+        echo "⚠️  Plan is NOT approved. AUTO-CONTINUE now:"
+        echo "  1. Save the plan manually from ~/.claude/plans/ to .agentic/journal/plans/"
+        echo "  2. Spawn Critic + Advocate agents (parallel, fresh context)"
+        echo "  3. Synthesize with Revision Guidance"
+        echo "  4. Present synthesis to user → user decides (convergence: manual)"
+        echo "  5. After APPROVED → run \`ag implement F-XXXX\`"
+        echo ""
+        echo "Do NOT stop and wait — start the review immediately."
+    fi
 fi
 
 echo "═══════════════════════════════════════════════════════"

@@ -91,6 +91,18 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
   echo -e "🔗 Last commit: ${LAST_COMMIT}"
 fi
 
+# 6.5. Orphan plan detection (session-boundary safety net)
+# "Pull" mechanism: every new session checks for plans that were never saved
+# durably. Even if the ExitPlanMode hook failed, the next session catches it.
+if [[ -x ".agentic/lib/tools/plan-scan.sh" ]]; then
+    ORPHAN_COUNT=$(bash .agentic/lib/tools/plan-scan.sh --check 2>/dev/null | grep -oE '[0-9]+ unsaved' | grep -oE '[0-9]+' || echo "0")
+    if [[ "$ORPHAN_COUNT" -gt 0 ]]; then
+        echo -e "${YELLOW}📝 $ORPHAN_COUNT unsaved plan(s) found in ephemeral locations${NC}"
+        echo "  FIRST ACTION: run plan-scan to save, then review before implementing"
+        echo "  bash .agentic/lib/tools/plan-scan.sh"
+    fi
+fi
+
 # 7. Multi-session collision prevention (F-0195)
 # Register this session and warn if others are active on the same checkout.
 # $PPID is stable across hook invocations (wrappers use exec bash).

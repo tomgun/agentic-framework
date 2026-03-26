@@ -691,6 +691,10 @@ When a workflow spans turn boundaries (user message, skill re-matching, context 
 
 **Remaining gap:** Even with all fixes, the agent may still read implementation files or explore the codebase before running the review (as observed in v0.59.0). The gate blocks implementation, and the review does happen, but the "don't explore before review" anti-pattern is still only a textual instruction — it has no hard enforcement. A future fix could make `ag implement` the ONLY path forward (removing the agent's ability to take other actions), but that requires tool-level constraints that instruction files alone cannot provide.
 
+### Push mechanisms need pull safety nets
+
+The ExitPlanMode hook is a "push" mechanism — it tries to inject instructions at the moment of exit. If it fails (session ends, plan-scan bug, hook doesn't fire), there's no recovery. Push-only enforcement is fragile because it depends on a single moment succeeding. The fix is to pair every push mechanism with a "pull" safety net that runs at a well-known checkpoint (e.g., session start). The SessionStart hook now checks for orphan plans that the ExitPlanMode hook failed to save. Even if the push failed, the next session catches the gap. This pattern applies beyond plan review: any workflow that injects state at event time should have a periodic sweep that detects missed injections.
+
 ### Instruction file edits alone cannot fix cross-turn behavioral failures
 
 When a behavioral rule keeps failing despite being in multiple instruction files, adding it to yet another file is the wrong response. The instinct is editorial ("add more emphasis", "add an anti-pattern warning", "capitalize MUST") but the failure mode is architectural: the instruction isn't active when the agent makes the decision. Symptoms of this pattern:

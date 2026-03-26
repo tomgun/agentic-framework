@@ -144,6 +144,8 @@ Defense-in-Depth: Hooks
 
 **Git hooks** run at commit time — they are the universal backstop. **Tool-native hooks** fire at workflow transition points (e.g., exiting plan mode) and can inject instructions into the agent's context before the next action. Together they provide defense-in-depth: tool hooks catch violations early (at the transition), git hooks catch them late (at commit time).
 
+**Push vs pull enforcement**: Tool-native hooks are "push" mechanisms — they fire at a specific event and inject state or instructions at that moment. If the push fails (session ends, extraction bug, hook misconfigured), the state it was supposed to create never exists. The framework pairs push mechanisms with "pull" safety nets at session boundaries: SessionStart checks for orphan plans that ExitPlanMode failed to save, and `dashboard.sh` re-derives project state from durable files. This push+pull pattern ensures that even if an event-time hook fails silently, the next session start catches the gap. See `docs/KEY_INSIGHTS.md` §22.
+
 **⚠ F-0300 finding (v0.69.0)**: Tool-native hooks were shipped as scripts but never *registered* in `.claude/settings.json` during init. The entire tool-hook enforcement layer was inert in every initialized project. Additionally, Claude Code requires a session restart to pick up newly registered hooks — no hot-reload. Both gaps together meant defense-in-depth had only one active layer (git hooks), which is itself bypassed when `git_mode=deferred`. Fix: R0 in F-0300 adds hook registration to scaffold and init. See `docs/KEY_INSIGHTS.md` §18 and A12 in §8.
 
 ### Defense-in-Depth: Memory Seed Layer
