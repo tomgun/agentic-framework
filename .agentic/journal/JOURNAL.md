@@ -4591,3 +4591,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: Need platform confirmation on built-in tool hook behavior
 
+
+### Session: 2026-03-26 22:05 - Gates 6-8 strengthened
+
+**Why**: Later state machine gates were advisory-only — agents could skip documentation, commit, and ship checks entirely
+
+**What changed**:
+- Gate 6: CHANGELOG blocks in docs_gate=blocking, journal freshness advisory, early-return bug fixed. Gate 7: blocks dirty tree + missing feature commits. Gate 8: blocks no merged PR (pull_request mode) or unpushed commits (direct), graceful gh degradation. state_machine.py auto-resolves enforce from settings.
+
+**Next steps**:
+- Merge PR, ag done, advance backlog
+
+**Blockers**: None
+

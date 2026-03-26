@@ -147,7 +147,7 @@ class TestGateSpeccedToCriteriaSet:
     def test_fails_without_ac_file(self, project_dir):
         r = gate_specced_to_criteria_set("F-0042", project_dir)
         assert not r.allowed
-        assert any("missing" in reason.lower() for reason in r.reasons)
+        assert any("no contract" in reason.lower() for reason in r.reasons)
 
     def test_fails_with_empty_ac_file(self, project_dir):
         (project_dir / ".agentic" / "spec" / "acceptance" / "F-0042.md").write_text(
@@ -243,23 +243,25 @@ class TestGateVerifiedToDocumented:
         assert r.allowed
         assert any("CHANGELOG" in w for w in r.warnings)
 
-    def test_docs_gate_blocking_warns_changelog_without_drift_script(self, project_dir):
-        """docs_gate=blocking without drift.sh still warns about CHANGELOG."""
+    def test_docs_gate_blocking_blocks_changelog_missing_feature(self, project_dir):
+        """docs_gate=blocking should BLOCK when CHANGELOG doesn't mention feature."""
         (project_dir / "STACK.md").write_text(
             "## Settings\n- profile: formal\n- docs_gate: blocking\n"
         )
         (project_dir / "CHANGELOG.md").write_text("# Changelog\n\n## v0.1.0\n- stuff\n")
-        # drift.sh won't exist in temp dir, so drift check is skipped
-        # but CHANGELOG check still fires
         r = gate_verified_to_documented("F-0042", project_dir)
-        assert any("CHANGELOG" in w for w in r.warnings)
+        assert not r.allowed
+        assert any("CHANGELOG" in reason for reason in r.reasons)
 
     def test_docs_gate_blocking_blocks_when_drift_found(self, project_dir):
         """docs_gate=blocking with a drift.sh that exits non-zero should block."""
         (project_dir / "STACK.md").write_text(
             "## Settings\n- profile: formal\n- docs_gate: blocking\n"
         )
-        # Create a fake drift.sh that always reports drift (exit 1)
+        # CHANGELOG mentions feature so only drift triggers the block
+        (project_dir / "CHANGELOG.md").write_text(
+            "# Changelog\n\n## v0.1.0\n- F-0042: stuff\n"
+        )
         tools_dir = project_dir / ".agentic" / "lib" / "tools"
         tools_dir.mkdir(parents=True, exist_ok=True)
         (tools_dir / "drift.sh").write_text(
@@ -269,6 +271,22 @@ class TestGateVerifiedToDocumented:
         r = gate_verified_to_documented("F-0042", project_dir)
         assert not r.allowed
         assert any("drift" in reason.lower() for reason in r.reasons)
+
+    def test_docs_gate_blocking_collects_both_changelog_and_drift(self, project_dir):
+        """docs_gate=blocking should collect BOTH changelog and drift reasons."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: blocking\n"
+        )
+        (project_dir / "CHANGELOG.md").write_text("# Changelog\n\n## v0.1.0\n- stuff\n")
+        tools_dir = project_dir / ".agentic" / "lib" / "tools"
+        tools_dir.mkdir(parents=True, exist_ok=True)
+        (tools_dir / "drift.sh").write_text(
+            '#!/usr/bin/env bash\necho "stale docs found"\nexit 1\n'
+        )
+        (tools_dir / "drift.sh").chmod(0o755)
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert not r.allowed
+        assert len(r.reasons) >= 2  # both CHANGELOG and drift
 
     def test_docs_gate_default_off(self, project_dir):
         """Default docs_gate should be 'off' (discovery profile default)."""
@@ -300,15 +318,75 @@ class TestGateVerifiedToDocumented:
         assert r.allowed
         assert not any("CHANGELOG" in w for w in r.warnings)
 
+    def test_journal_freshness_advisory(self, project_dir):
+        """Should warn when journal has no entry for today."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- docs_gate: warning\n"
+        )
+        journal_dir = project_dir / ".agentic" / "journal"
+        journal_dir.mkdir(parents=True, exist_ok=True)
+        (journal_dir / "JOURNAL.md").write_text("# Journal\n\n## 2020-01-01\n- old entry\n")
+        r = gate_verified_to_documented("F-0042", project_dir)
+        assert r.allowed
+        assert any("JOURNAL" in w for w in r.warnings)
+
 
 # ---------------------------------------------------------------------------
 # Gate 7: documented -> committed
 # ---------------------------------------------------------------------------
 
 class TestGateDocumentedToCommitted:
-    def test_advisory_only(self, project_dir):
+    def test_blocks_without_git(self, project_dir):
+        """Should block when .git directory doesn't exist."""
+        r = gate_documented_to_committed("F-0042", project_dir)
+        assert not r.allowed
+        assert any("git" in reason.lower() for reason in r.reasons)
+
+    def test_passes_with_clean_tree_and_feature_commit(self, project_dir):
+        """Should pass when tree is clean and a commit references the feature."""
+        import subprocess
+        subprocess.run(["git", "init"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(["git", "add", "-A"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(
+            ["git", "commit", "-m", "feat(F-0042): initial"],
+            cwd=str(project_dir), capture_output=True,
+        )
         r = gate_documented_to_committed("F-0042", project_dir)
         assert r.allowed
+
+    def test_blocks_dirty_tree(self, project_dir):
+        """Should block when working tree has uncommitted changes."""
+        import subprocess
+        subprocess.run(["git", "init"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(["git", "add", "-A"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(
+            ["git", "commit", "-m", "feat(F-0042): initial"],
+            cwd=str(project_dir), capture_output=True,
+        )
+        # Create dirty file
+        (project_dir / "dirty.txt").write_text("uncommitted")
+        r = gate_documented_to_committed("F-0042", project_dir)
+        assert not r.allowed
+        assert any("uncommitted" in reason.lower() for reason in r.reasons)
+
+    def test_blocks_no_feature_commits(self, project_dir):
+        """Should block when no commits reference the feature ID."""
+        import subprocess
+        subprocess.run(["git", "init"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(["git", "add", "-A"], cwd=str(project_dir), capture_output=True)
+        subprocess.run(
+            ["git", "commit", "-m", "unrelated commit"],
+            cwd=str(project_dir), capture_output=True,
+        )
+        r = gate_documented_to_committed("F-0042", project_dir)
+        assert not r.allowed
+        assert any("No commits reference" in reason for reason in r.reasons)
 
 
 # ---------------------------------------------------------------------------
@@ -316,10 +394,34 @@ class TestGateDocumentedToCommitted:
 # ---------------------------------------------------------------------------
 
 class TestGateCommittedToShipped:
-    def test_advisory_only(self, project_dir):
+    def test_graceful_when_gh_unavailable(self, project_dir):
+        """Should warn (not crash) when gh CLI is not installed."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- git_workflow: pull_request\n"
+        )
         r = gate_committed_to_shipped("F-0042", project_dir)
-        assert r.allowed
-        assert len(r.warnings) > 0
+        # gh not available in test env → warning, not block
+        assert r.allowed or any("gh" in w.lower() for w in r.warnings)
+
+    def test_direct_mode_passes_without_remote(self, project_dir):
+        """Direct mode should warn (not crash) when no upstream exists."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- git_workflow: direct\n"
+        )
+        # Create VERSION so we get at least one warning
+        (project_dir / ".agentic" / "lib" / "VERSION").write_text("0.1.0\n")
+        r = gate_committed_to_shipped("F-0042", project_dir)
+        # No git repo or upstream → graceful degradation (warning, not crash)
+        assert r.allowed or any("unpushed" in w.lower() for w in r.warnings)
+
+    def test_version_advisory(self, project_dir):
+        """Should advise about VERSION bump when VERSION file exists."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- git_workflow: direct\n"
+        )
+        (project_dir / ".agentic" / "lib" / "VERSION").write_text("0.1.0\n")
+        r = gate_committed_to_shipped("F-0042", project_dir)
+        assert any("VERSION" in w for w in r.warnings)
 
 
 # ---------------------------------------------------------------------------
