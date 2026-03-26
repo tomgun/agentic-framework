@@ -589,8 +589,22 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    # Auto-resolve enforce flag from state_enforcement setting when not
+    # explicitly passed via --enforce.  The CLI flag is an explicit override;
+    # profiles.conf already defines state_enforcement per profile (off for
+    # discovery, blocking for formal/autonomous_formal).
+    enforce = args.enforce
+    if not enforce:
+        _lib = Path(__file__).resolve().parent.parent
+        sys.path.insert(0, str(_lib))
+        from settings import get_setting
+        enforce = (
+            get_setting(args.project_root, "state_enforcement", "off")
+            == "blocking"
+        )
+
     sm = FeatureStateMachine(
-        project_root=args.project_root, enforce=args.enforce
+        project_root=args.project_root, enforce=enforce
     )
 
     # Wire up default gate functions (pass FeatureState to avoid __main__ dual-import)

@@ -60,6 +60,42 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-025
 
+  - id: AC-006
+    text: "debugging-framework skill exists with investigation methodology"
+    type: structural
+    verify: |
+      test -f .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "Session logs" .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "Hook configuration" .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "State files" .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "Build the event timeline" .claude/skills/debugging-framework/SKILL.md
+    tests:
+      - tests/validate_framework.sh::F-025-AC-006
+      - tests/test_debugging_skill.py
+
+  - id: AC-007
+    text: "debugging-framework skill covers all evidence sources"
+    type: structural
+    verify: |
+      grep -q "\.jsonl" .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "settings.json" .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "AGENTS.json" .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "journal/plans" .claude/skills/debugging-framework/SKILL.md
+    tests:
+      - tests/test_debugging_skill.py::TestDebuggingSkillContent::test_covers_all_evidence_sources
+
+  - id: AC-008
+    text: "debugging-framework skill categorizes root causes structurally"
+    type: structural
+    verify: |
+      grep -q "Not wired" .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "Not triggered" .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "Advisory only" .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "Agent ignored" .claude/skills/debugging-framework/SKILL.md &&
+      grep -q "Missing enforcement" .claude/skills/debugging-framework/SKILL.md
+    tests:
+      - tests/test_debugging_skill.py::TestDebuggingSkillContent::test_root_cause_categories
+
 nfr_refs: [NFR-0001]
 scenarios:
   - name: "Instruction files stay under size limits"
@@ -67,4 +103,13 @@ scenarios:
     when: "Check constitution-layer files"
     then: "All under 100 lines per NFR-0001"
 
-migrations: []
+  - name: "Framework behavior investigation"
+    given: "A workflow violation occurred (e.g., skipped plan review)"
+    when: "Agent invokes debugging-framework skill"
+    then: "Agent traces session logs, hook config, state files, builds factual timeline, categorizes root causes"
+
+migrations:
+  - date: "2026-03-26"
+    trigger: "Add debugging-framework skill (AC-006, AC-007, AC-008)"
+    reason: "Investigation skill for tracing framework behavior failures across sessions, hooks, and state"
+    approved_by: user

@@ -235,6 +235,17 @@ tips=(
 )
 D_TIP="${tips[$((RANDOM % ${#tips[@]}))]}"
 
+# HOOKS INSTALLED — check per detected agent tool
+D_HOOKS_MISSING=""
+_hooks_source="$PROJECT_ROOT/.agentic/lib/claude-hooks/hooks.json"
+if [[ -f "$_hooks_source" ]]; then
+    # Claude Code: .claude/hooks.json must exist
+    if [[ -d "$PROJECT_ROOT/.claude" ]] && [[ ! -f "$PROJECT_ROOT/.claude/hooks.json" ]]; then
+        D_HOOKS_MISSING="${D_HOOKS_MISSING:+$D_HOOKS_MISSING, }Claude Code"
+    fi
+    # Future: add checks for other tools (Cursor, Copilot) when they support hooks
+fi
+
 # DIRTY STATE FILES (ag flush) — skip when git not active (F-0250)
 D_DIRTY_STATE=0
 if [[ "$D_GIT_MODE" == "active" ]] && [[ -f "$TOOLS_DIR/state-commit.sh" ]]; then
@@ -323,6 +334,8 @@ if $RAW_MODE; then
     echo "$D_TIP"
     echo "===DIRTY_STATE==="
     echo "$D_DIRTY_STATE"
+    echo "===HOOKS_MISSING==="
+    echo "$D_HOOKS_MISSING"
     echo "===STALE==="
     echo "$D_STALE"
     echo "===COMPLETION_STALE==="
@@ -443,6 +456,9 @@ if [[ -n "$D_SPEC_METRICS" ]]; then
 fi
 if [[ -n "$D_DESIGN_TRACE" ]]; then
     echo "📐 Design trace   $D_DESIGN_TRACE — run: design-trace.sh"
+fi
+if [[ -n "$D_HOOKS_MISSING" ]]; then
+    echo "🔗 Hooks missing  $D_HOOKS_MISSING — run: ag hooks install"
 fi
 echo "✅ Health         $health_line"
 echo ""

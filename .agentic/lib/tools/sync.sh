@@ -744,6 +744,30 @@ phase_hooks() {
             echo -e "            Fix: ag hooks install"
         fi
     fi
+
+    # Agent-tool hooks: check per detected tool
+    local hooks_source="$ROOT_DIR/.agentic/lib/claude-hooks/hooks.json"
+    if [ -f "$hooks_source" ]; then
+        # Claude Code
+        if [ -d "$ROOT_DIR/.claude" ]; then
+            if [ -f "$ROOT_DIR/.claude/hooks.json" ]; then
+                record_ok
+                if [ "$MODE" != "quiet" ]; then
+                    echo -e "Claude hooks: ${GREEN}OK (.claude/hooks.json installed)${NC}"
+                fi
+            elif [ "$MODE" = "full" ]; then
+                cp "$hooks_source" "$ROOT_DIR/.claude/hooks.json"
+                record_fixed
+                echo -e "Claude hooks: ${GREEN}FIXED (copied hooks.json to .claude/)${NC}"
+            else
+                record_issue "Claude Code hooks not installed"
+                if [ "$MODE" != "quiet" ]; then
+                    echo -e "Claude hooks: ${YELLOW}NOT INSTALLED${NC}"
+                    echo -e "              Fix: ag hooks install"
+                fi
+            fi
+        fi
+    fi
 }
 
 # ============================================================================

@@ -5099,6 +5099,68 @@ else
   fail "DEV-001: DEV-XXXX pattern missing from contract schema"
 fi
 
+# --- F-025-AC-006: Debugging Framework Skill ---
+echo "--- F-025-AC-006: Debugging Framework Skill ---"
+
+DEBUGGING_SKILL="${FRAMEWORK_ROOT}/.claude/skills/debugging-framework/SKILL.md"
+
+if [[ -f "$DEBUGGING_SKILL" ]]; then
+  pass "F-025-AC-006: debugging-framework SKILL.md exists"
+else
+  fail "F-025-AC-006: debugging-framework SKILL.md missing"
+fi
+
+if [[ -f "$DEBUGGING_SKILL" ]] && \
+   grep -q "Session logs" "$DEBUGGING_SKILL" && \
+   grep -q "Hook configuration" "$DEBUGGING_SKILL" && \
+   grep -q "State files" "$DEBUGGING_SKILL" && \
+   grep -q "Build the event timeline" "$DEBUGGING_SKILL"; then
+  pass "F-025-AC-006: debugging skill has investigation methodology"
+else
+  fail "F-025-AC-006: debugging skill missing investigation methodology sections"
+fi
+
+if [[ -f "$DEBUGGING_SKILL" ]] && \
+   grep -q "\.jsonl" "$DEBUGGING_SKILL" && \
+   grep -q "settings.json" "$DEBUGGING_SKILL" && \
+   grep -q "AGENTS.json" "$DEBUGGING_SKILL" && \
+   grep -q "journal/plans" "$DEBUGGING_SKILL"; then
+  pass "F-025-AC-007: debugging skill covers all evidence sources"
+else
+  fail "F-025-AC-007: debugging skill missing evidence source coverage"
+fi
+
+if [[ -f "$DEBUGGING_SKILL" ]] && \
+   grep -q "Not wired" "$DEBUGGING_SKILL" && \
+   grep -q "Not triggered" "$DEBUGGING_SKILL" && \
+   grep -q "Advisory only" "$DEBUGGING_SKILL" && \
+   grep -q "Agent ignored" "$DEBUGGING_SKILL" && \
+   grep -q "Missing enforcement" "$DEBUGGING_SKILL"; then
+  pass "F-025-AC-008: debugging skill has root cause categories"
+else
+  fail "F-025-AC-008: debugging skill missing root cause categories"
+fi
+
+# --- F-015-AC-008: Dashboard hooks detection ---
+echo "--- F-015-AC-008: Dashboard Hooks Detection ---"
+
+if grep -q "HOOKS_MISSING" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh" && \
+   grep -q "hooks.json" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "F-015-AC-008: dashboard detects missing agent-tool hooks"
+else
+  fail "F-015-AC-008: dashboard missing hooks detection"
+fi
+
+# --- DEV-003-AC-003: Sync hooks detection ---
+echo "--- DEV-003-AC-003: Sync Hooks Detection ---"
+
+if grep -qi "claude.*hook\|Claude.*hook" "${FRAMEWORK_ROOT}/.agentic/lib/tools/sync.sh" && \
+   grep -q "hooks.json" "${FRAMEWORK_ROOT}/.agentic/lib/tools/sync.sh"; then
+  pass "DEV-003-AC-003: ag sync detects missing Claude Code hooks"
+else
+  fail "DEV-003-AC-003: ag sync missing Claude hooks detection"
+fi
+
 # Summary
 
 # ============================================================

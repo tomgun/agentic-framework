@@ -44,6 +44,10 @@ from auto.state_machine import (
 @pytest.fixture
 def project_dir():
     """Temporary project directory with paths.py and settings.py."""
+    # Clear settings module cache to avoid stale data across tests
+    from settings import _cache
+    _cache.clear()
+
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         (root / ".agentic" / "lib").mkdir(parents=True)
@@ -586,3 +590,46 @@ class TestStateMachineFeaturesMd:
         sm = FeatureStateMachine(project_root=project_dir, enforce=False)
         allowed, msgs = sm.can_transition("F-0100", FeatureState.SPECCED)
         assert allowed
+
+
+# ---------------------------------------------------------------------------
+# Enforcement wiring in main() (F-003 gate strengthening)
+# ---------------------------------------------------------------------------
+
+class TestMainEnforcementWiring:
+    """Tests that main() reads state_enforcement from settings."""
+
+    def test_main_reads_state_enforcement_setting(self, project_dir):
+        """main() should use state_enforcement=blocking from settings."""
+        write_features(project_dir, [("F-0042", "Test", "shipped")])
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- state_enforcement: blocking\n"
+        )
+
+        with patch("sys.argv", [
+            "state_machine.py",
+            "F-0042", "planned",
+            "--project-root", str(project_dir),
+        ]):
+            from auto.state_machine import main
+            rc = main()
+        # shipped->planned is invalid; with blocking enforcement, should fail (rc=1)
+        assert rc == 1
+
+    def test_main_cli_enforce_overrides_setting(self, project_dir):
+        """--enforce flag overrides state_enforcement setting."""
+        write_features(project_dir, [("F-0042", "Test", "shipped")])
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: discovery\n- state_enforcement: off\n"
+        )
+
+        with patch("sys.argv", [
+            "state_machine.py",
+            "F-0042", "planned",
+            "--project-root", str(project_dir),
+            "--enforce",
+        ]):
+            from auto.state_machine import main
+            rc = main()
+        # --enforce should make invalid transition fail even with setting=off
+        assert rc == 1

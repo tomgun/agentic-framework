@@ -32,5 +32,18 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-0226
 
+  - id: AC-003
+    text: "ag sync detects and auto-fixes missing Claude Code hooks"
+    type: structural
+    verify: |
+      grep -q "claude.*hook\|Claude.*hook" .agentic/lib/tools/sync.sh &&
+      grep -q "hooks.json" .agentic/lib/tools/sync.sh
+    tests:
+      - tests/test_hooks_detection.py::TestSyncHooksCheck
+
 nfr_refs: []
-migrations: []
+migrations:
+  - date: "2026-03-26"
+    trigger: "Add Claude Code hooks detection to ag sync (AC-003)"
+    reason: "Hooks were not installed in framework repo — dogfooding gap went undetected"
+    approved_by: user
