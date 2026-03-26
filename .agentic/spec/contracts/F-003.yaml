@@ -69,6 +69,31 @@ assertions:
       - tests/validate_framework.sh::F-003
       - tests/test_ids.py
 
+  - id: AC-007
+    text: "plan-scan extracts F-IDs from body text when heading/metadata patterns miss (Pattern 4 fallback)"
+    type: structural
+    verify: |
+      grep -q "Pattern 4" .agentic/lib/tools/plan-scan.sh
+    tests:
+      - tests/test_plan_review_hooks.sh::plan-scan-pattern-4
+
+  - id: AC-008
+    text: "Hook failure path gives auto-continue instructions, not 'save manually'"
+    type: behavioral
+    verify: |
+      ! grep -q "Save your plan manually" .agentic/lib/hooks/shared/on-plan-mode-exit.sh
+    tests:
+      - tests/test_plan_review_hooks.sh::failure-path-auto-continue
+
+  - id: AC-009
+    text: "SessionStart hook detects orphan plans in ephemeral locations (pull safety net)"
+    type: structural
+    verify: |
+      grep -q "plan-scan" .agentic/lib/claude-hooks/SessionStart.sh &&
+      grep -q "unsaved plan" .agentic/lib/claude-hooks/SessionStart.sh
+    tests:
+      - tests/test_plan_review_hooks.sh::session-start-orphan-detection
+
 nfr_refs: []
 scenarios:
   - name: "Feature lifecycle from planned to shipped"
