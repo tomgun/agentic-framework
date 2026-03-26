@@ -15,302 +15,143 @@ _No active items_
 
 ---
 
-
-### HN-0036: PR #129: ag formalize — F-0205
-- **Type**: review
-- **Added**: 2026-03-13
-- **Context**: Discovery-to-formal migration command
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0037: PR #130: F-0206 Feedback Capture System (ag feedback)
-- **Type**: review
-- **Added**: 2026-03-13
-- **Context**: Adds ag feedback command with keyword classification, routing to ISSUES.md/TODO.md, persistent FEEDBACK_LOG.md. 12 new validation tests.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0038: PR #132: F-0187 Multi-Repo Umbrella
-- **Type**: review
-- **Added**: 2026-03-14
-- **Context**: https://github.com/tomgun/agentic-framework/pull/132 — multi-repo umbrella support (repo column, umbrella resolution, contract checking, input collection). 62 tests pass.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0039: PR #133: F-0188 E2E Autonomous Pipeline
-- **Type**: review
-- **Added**: 2026-03-14
-- **Context**: End-to-end pipeline wiring kickoff→promote→epic→schedule. 14 tests, all instruction files updated.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0040: PR #134: fix docs.sh --validate aborting ag done
-- **Type**: review
-- **Added**: 2026-03-14
-- **Context**: One-line fix: unguarded exit code killed ag done via set -e before flush
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0041: PR #137: F-0214 Parallel Epic Execution
-- **Type**: pr_review
-- **Added**: 2026-03-14
-- **Context**: https://github.com/tomgun/agentic-framework/pull/137
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-### HN-0042: PR #138: F-0215 Framework Verification Loop
-- **Type**: review
-- **Added**: 2026-03-14
-- **Context**: ag auto verify-framework — self-test + self-heal loop
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-
-
-### HN-0044: PR #142: NFR Lifecycle Excellence
-- **Type**: pr
-- **Added**: 2026-03-16
-- **Context**: F-0216 through F-0219 — NFR auto-generation, test gates, propagation pipeline, health dashboard. 6 commits, 5 new tools, 36 unit tests, 4 LLM tests.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0045: PR #148: F-0222 State Machine Enforcement = Blocking
-- **Type**: pr_review
-- **Added**: 2026-03-16
-- **Context**: https://github.com/tomgun/agentic-framework/pull/148 — needs review and merge
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0046: PR #153: Dogfood sync + deferred item capture
-- **Type**: pr_review
-- **Added**: 2026-03-17
-- **Context**: Instruction file sync, deferred capture workflow, post-merge dogfood step, 8 TODOs with context
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0047: PR #154: F-0224 smoke test evidence + plan-scan dedup fix
-- **Type**: review
-- **Added**: 2026-03-17
-- **Context**: Completes F-0224 AC10, fixes plan-scan duplicate detection for epic plans
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-
-
-### HN-0049: PR #156: F-0229 annotation enforcement gate
-- **Type**: review
-- **Added**: 2026-03-18
-- **Context**: Adds Check 22 — annotation enforcement for newly-shipped features. Three modes: off/advisory/blocking.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0050: PR #157: Skill version bumps to 0.62.0
-- **Type**: pr_review
-- **Added**: 2026-03-18
-- **Context**: https://github.com/tomgun/agentic-framework/pull/157
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0051: PR #158: Post-merge dogfood sync (F-0226)
-- **Type**: pr_review
-- **Added**: 2026-03-18
-- **Context**: https://github.com/tomgun/agentic-framework/pull/158
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0052: PR #160: Instruction file doc sync (14-day audit)
-- **Type**: pr
-- **Added**: 2026-03-18
-- **Context**: https://github.com/tomgun/agentic-framework/pull/160 — sync Quick Commands + trigger words across all 8 templates
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0053: PR #168: Structural doc freshness gate (F-035)
-- **Type**: pr_review
-- **Added**: 2026-03-19
-- **Context**: https://github.com/tomgun/agentic-framework/pull/168 — replaces advisory doc prompt with blocking freshness gate in ag done
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0054: PR #174: F-0241 Central QA Registry
-- **Type**: review
-- **Added**: 2026-03-20
-- **Context**: Feature-to-test mapping across 9 QA categories. 24 tests passing. Critical agent review addressed.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0055: Merge PR #177 (v2 workflow engine)
-- **Type**: review
-- **Added**: 2026-03-20
-- **Context**: feat/v2-workflow-engine branch has Phase 1 of the framework simplification. Must merge before Phase 2 can start. 6 commits, 46+ tests.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0056: Phase 3 PR #182 needs review
-- **Type**: pr
-- **Added**: 2026-03-20
-- **Context**: feat/v2-phase3-instruction-consolidation — 185 files, -34K lines instruction consolidation
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0057: PR #183: Phase 4 — tool adapters, MCP, hooks
-- **Type**: pr_review
-- **Added**: 2026-03-21
-- **Context**: feat/v2-phase4-tool-adapters → main. 5 new Python files, 73 tests. Final phase of v2 refactor.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0058: PR #193: F-031 Phase 1 — YAML contract infrastructure
-- **Type**: pr_review
-- **Added**: 2026-03-22
-- **Context**: https://github.com/tomgun/agentic-framework/pull/193 — Phase 1 of multi-session spec overhaul. Merge to unblock Phases 0-5.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0059: PR #196: F-031 Phase 4 Step 4.2 — user input automation
-- **Type**: pr_review
-- **Added**: 2026-03-23
-- **Context**: feat/f-0302-phase4-user-input-automation — 12 files, 124 lines added
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-
-
-### HN-0061: PR #197: F-032 Multi-Session Plan Phase Tracking
-- **Type**: pr_review
-- **Added**: 2026-03-23
-- **Context**: feat/F-032-phase-tracking — ag phase CLI, done.sh gate, dashboard progress, sync drift detection
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0062: PR #198: F-031 Phase 4 — v2 dead code removal
-- **Type**: pr_review
-- **Added**: 2026-03-23
-- **Context**: Review and merge feat/F-031-phase4-cleanup. After merge: ag phase done F-031 4
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0063: PR #201: fix(hooks) gate_stop + instruction file sync
-- **Type**: pr_review
-- **Added**: 2026-03-23
-- **Context**: https://github.com/tomgun/agentic-framework/pull/201
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-
-
-
-
-### HN-0066: PR #202: DEV-004 + DEV-001 taxonomy
-- **Type**: pr_review
-- **Added**: 2026-03-24
-- **Context**: Review and merge: tier experiments harness + DEV-XXXX namespace for dev infrastructure
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0067: PR #203: F-005 Phase 1a — hierarchical dotted IDs
-- **Type**: pr_review
-- **Added**: 2026-03-24
-- **Context**: Phase 1a of hierarchy system: dotted IDs, component metadata, shell audit. Review at https://github.com/tomgun/agentic-framework/pull/203
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
-
-### HN-0068: Review: F-005 → shipped
-- **Type**: decision
-- **Added**: 2026-03-25
-- **Context**: Review checkpoint (review_merge, mode: human). Resolve with: ag review F-005 shipped
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
+## Resolved
 
 ### HN-0069: PR #205: F-005 Phase 2 renumber
-- **Type**: pr_review
-- **Added**: 2026-03-25
-- **Context**: Clean renumber 36 features to 3-digit IDs. Review FEATURES.md, CONSOLIDATION_MAP.md, BACKLOG.json
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
 
+### HN-0068: Review: F-005 → shipped
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
 
-## Resolved
+### HN-0067: PR #203: F-005 Phase 1a — hierarchical dotted IDs
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0066: PR #202: DEV-004 + DEV-001 taxonomy
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
 
 ### HN-0065: Review: DEV-004 → implementing
 - **Resolved**: 2026-03-24
 - **Outcome**: Review approved: resolved
 
-
 ### HN-0064: Review: DEV-004 → specced
 - **Resolved**: 2026-03-24
 - **Outcome**: Review approved: resolved
 
+### HN-0063: PR #201: fix(hooks) gate_stop + instruction file sync
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0062: PR #198: F-031 Phase 4 — v2 dead code removal
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0061: PR #197: F-032 Multi-Session Plan Phase Tracking
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0059: PR #196: F-031 Phase 4 Step 4.2 — user input automation
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0058: PR #193: F-031 Phase 1 — YAML contract infrastructure
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0057: PR #183: Phase 4 — tool adapters, MCP, hooks
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0056: Phase 3 PR #182 needs review
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0055: Merge PR #177 (v2 workflow engine)
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0054: PR #174: F-0241 Central QA Registry
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0053: PR #168: Structural doc freshness gate (F-035)
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0052: PR #160: Instruction file doc sync (14-day audit)
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0051: PR #158: Post-merge dogfood sync (F-0226)
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0050: PR #157: Skill version bumps to 0.62.0
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0049: PR #156: F-0229 annotation enforcement gate
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0047: PR #154: F-0224 smoke test evidence + plan-scan dedup fix
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0046: PR #153: Dogfood sync + deferred item capture
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0045: PR #148: F-0222 State Machine Enforcement = Blocking
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0044: PR #142: NFR Lifecycle Excellence
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0042: PR #138: F-0215 Framework Verification Loop
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0041: PR #137: F-0214 Parallel Epic Execution
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0040: PR #134: fix docs.sh --validate aborting ag done
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0039: PR #133: F-0188 E2E Autonomous Pipeline
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0038: PR #132: F-0187 Multi-Repo Umbrella
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0037: PR #130: F-0206 Feedback Capture System (ag feedback)
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
+
+### HN-0036: PR #129: ag formalize — F-0205
+- **Resolved**: 2026-03-25
+- **Outcome**: PR merged, 2026-03-25
 
 ### HN-0060: Review: F-032 → implementing
 - **Resolved**: 2026-03-23
 - **Outcome**: Review approved: resolved
 
-
 ### HN-0048: PR #155: F-0225 Spec Evolution Metrics
 - **Resolved**: 2026-03-17
-- **Outcome**: 
-
+- **Outcome**:
 
 ### HN-0043: PR #141: Systematic quality improvement
 - **Resolved**: 2026-03-15
-- **Outcome**: 
-
+- **Outcome**:
 
 ### HN-0035: PR #126: Orphaned plan detection at session start
 - **Resolved**: 2026-03-13

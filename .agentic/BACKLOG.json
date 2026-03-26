@@ -12,21 +12,15 @@
     "id": "F-035",
     "description": "Protected Main Branch Support",
     "added_at": "2026-03-16T18:56:12Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "notes": "From T-0066. Design alternatives: (1) long-lived state branch auto-synced via rebase, (2) auto-PR for state flushes with auto-merge label, (3) bot-exempt bypass token for state-only commits, (4) state files live outside git. Must audit all direct-to-main paths: ag done, ag flush, state-commit.sh. Consider: state divergence while PR waits, merge conflict risk with parallel agents."
   },
   {
     "type": "task",
-    "description": "Configurable Definition of Done per task type",
-    "added_at": "2026-03-23T17:00:00Z",
+    "description": "Doc freshness gate scoping fix \u2014 scope to docs whose tracked files overlap with the feature's manifest",
+    "added_at": "2026-03-26T00:00:00Z",
     "added_by": "agent",
-    "notes": "Originally F-0210. Improvement to F-002 (Spec-Driven Development)"
-  },
-  {
-    "type": "feature",
-    "id": "F-036",
-    "description": "Workflow Definition File",
-    "added_at": "2026-03-16T18:56:15Z",
-    "added_by": "agent"
+    "notes": "Promoted from T-0093. Active bug: ag done flags ALL feature_done docs regardless of relevance, forces fake reviewed markers. Improvement to F-012 (Documentation Drift & Lifecycle)"
   },
   {
     "type": "task",
@@ -34,6 +28,13 @@
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
     "notes": "Originally F-0227. Improvement to DEV-002 (Testing Infrastructure)"
+  },
+  {
+    "type": "feature",
+    "id": "F-036",
+    "description": "Workflow Definition File",
+    "added_at": "2026-03-16T18:56:15Z",
+    "added_by": "agent"
   },
   {
     "type": "feature",
@@ -51,6 +52,13 @@
     "depends_on": [
       "F-033"
     ]
+  },
+  {
+    "type": "task",
+    "description": "Configurable Definition of Done per task type",
+    "added_at": "2026-03-23T17:00:00Z",
+    "added_by": "agent",
+    "notes": "Originally F-0210. Improvement to F-002 (Spec-Driven Development). Check docs/archive/FEATURES-v0.72.md for details."
   },
   {
     "type": "task",

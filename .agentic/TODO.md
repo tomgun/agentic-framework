@@ -20,30 +20,6 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 - **Added**: 2026-02-18
 - **Context**: Migrated from STATUS.md Backlog
 
-### ~~T-0007: Batch-verify ~50 shipped features with unchecked ACs~~ **OBSOLETE**: Legacy v0.1–v0.12 era features. T-0051 now warns on in_progress features going forward. Retroactive verification has diminishing returns.
-- **Added**: 2026-02-24 · **Closed**: 2026-03-11
-
-### ~~T-0010: Implement multi-agent helper scripts (F-0108)~~ **OBSOLETE**: Fully superseded by AGENTS.json (F-0194) and agents_helpers.py. F-0108 marked deprecated in FEATURES.md.
-- **Added**: 2026-02-24 · **Closed**: 2026-03-10
-
-### ~~T-0013: Close or formally assess F-0103 (Agent Mode Selection)~~ **DONE**: F-0103 marked shipped. Heading-format ACs (pre-checkbox convention) verified manually.
-- **Added**: 2026-02-28 · **Closed**: 2026-03-11
-
-### T-0014: Verify shipped acceptance criteria for F-0131, F-0132, F-0133, F-0134, F-0135 — check boxes that are actually done, identify genuinely incomplete items
-- **Added**: 2026-02-28
-
-### ~~T-0015: Structural enforcement for durable plan saving~~ **DONE**: Core covered by F-0198 (plan-scan.sh in ag sync auto-copies plans) + ag implement already checks plan file existence. The `plan_persistence` setting is a nice-to-have, not urgent.
-- **Added**: 2026-02-28 · **Closed**: 2026-03-11
-
-### ~~T-0016: Worktree auto-detection~~ **OBSOLETE**: Duplicate of T-0046; core shipped in F-0194 (ag implement auto-creates worktree, worktree_mode setting).
-- **Added**: 2026-02-28 · **Closed**: 2026-03-10
-
-### ~~T-0017: AGENTS_ACTIVE.md is never written~~ **CLOSED** (F-0197): Superseded by AGENTS.json (F-0194). F-0033 deprecated.
-- **Added**: 2026-02-28 · **Closed**: 2026-03-10
-
-### ~~T-0018: Remove legacy .agentic-journal/manifests/~~ **DONE**: Moved F-018.json and F-0186.json to canonical .agentic/journal/manifests/. Removed legacy .agentic/.agentic-journal/ directory.
-- **Added**: 2026-02-28 · **Closed**: 2026-03-11
-
 ### T-0021: Clarify subagents vs skills distinction in framework docs. Subagents (.agentic/agents/claude/subagents/) = role context for Task tool spawning, tool-agnostic. Skills (.agentic/agents/claude/skills/) = Claude Code workflow delivery bundles. Naming overlap (review, test, etc.) causes confusion. Need clear explanation in DEVELOPER_GUIDE, INSTRUCTION_ARCHITECTURE, and possibly a dedicated ADR.
 - **Added**: 2026-03-01
 
@@ -56,28 +32,13 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0025: F-idea: NFRs as live invariants — NFR.md should be the source of truth that propagates to features, not a dead reference. Key changes: (1) Acceptance criteria should have a separate 'Invariants (from NFR.md)' section auto-derived from NFR scoping, distinct from feature-specific criteria. (2) Test-writing workflow should check applicable NFRs before writing feature tests. (3) check-spec-health.sh should cross-reference NFR modification dates vs feature spec dates — if NFR changed after spec was written and feature references it, flag for review. (4) NFR capture trigger: when a developer or agent expresses an invariant quality for the system ("it must always...", "never do X", performance/security/reliability constraints), recognize it and write it to spec/NFR.md — don't let invariants stay informal. (5) Important distinction: framework NFR.md has 2 structural NFRs; projects using the framework may have dozens (performance, security, accessibility, compliance, etc.) — the workflow/tooling must scale to a longer list with mixed types (structural, behavioral, design invariants).
 - **Added**: 2026-03-01
 
-### ~~T-0028: Migrate .agentic-journal/ and .agentic-state/ into .agentic-local/ umbrella~~ **OBSOLETE**: Both directories already migrated — .agentic-journal/ → .agentic/journal/ (T-0018), .agentic-state/ → .agentic/session/ (F-0194). Backward-compat fallbacks in paths.sh. No .agentic-local/ umbrella needed.
-- **Added**: 2026-03-02 · **Closed**: 2026-03-11
-
 ### T-0029: F-idea: Spec clarification taxonomy — resurface + enhance structured clarification in writing-specs skill. 6-category ambiguity taxonomy (functional, data model, edge cases, NFRs, integrations, completion signals), max 5 multiple-choice questions per spec, records [Clarified] markers. ~2K tokens/spec. Pre-existing framework idea resurfaced via SDD toolkit analysis (R1). Contributor: Tomas
 - **Added**: 2026-03-02
 - **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §3.1, §3.3, R1
 
-### ~~T-0030: Verification loop~~ **DONE**: Shipped as F-0161 (Tiered Test Execution) + F-0164 (Verify Loop). Bounded test→fix→retest with tiered execution, escalation on exhaustion, diagnostic context. 100% complete.
-- **Added**: 2026-03-02 · **Closed**: 2026-03-10
-
-### ~~T-0031: Auto-dev loop~~ **DONE**: Shipped as F-030–F-0163 (Autonomous Workflow Engine) + F-0186 (Autonomous Scheduler). Full spec→feature chain exists (TaskRunner reads spec → loops ACs → verify → PR). Deliberately not self-activated in framework dev (by design). ~90% complete, closed.
-- **Added**: 2026-03-02 · **Closed**: 2026-03-10
-
 ### T-0032: F-0152 P2: Cross-feature semantic checks — three deferred checks for spec-analyze.sh: (AC-009) cross-feature terminology consistency (detects naming drift across spec files), (AC-010) AC contradiction detection (finds conflicting ACs within or across features), (AC-011) constitution alignment (checks ACs against PRINCIPLES.md). Requires LLM analysis — not deterministic. New insight from SDD toolkit analysis (their /analyze command's 6-pass approach). Contributor: Tomas
 - **Added**: 2026-03-02
 - **Background**: `.agentic-journal/plans/2026-03-02-sdd-toolkit-analysis-plan.md` §3.2, R2
-
-### ~~T-0033: Task IDs and execution prioritization~~ **OBSOLETE**: Superseded by T-0043 (AC scheduling phase) which covers the same ground more concretely with AC-level dependency graphs and parallel execution.
-- **Added**: 2026-03-02 · **Closed**: 2026-03-10
-
-### ~~T-0034: Cursor agent leaves work uncommitted~~ **DONE**: Added commit nudge in ag.sh cmd_done(), completing-work skill Step 0, and cursorrules.txt "done" trigger.
-- **Added**: 2026-03-03 · **Closed**: 2026-03-11
 
 ### T-0038: PR2: Visual verification for tiered verify loop — screenshot collection, AI review in autonomous mode (F-0168, see plan in session transcript)
 - **Added**: 2026-03-06
@@ -91,32 +52,14 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0041: F-idea: Auto-versioning and tagging — structural enforcement for VERSION bump + git tag after PR merge. Currently behavioral-only (instruction in committing-changes skill). Needs a hook or GitHub Action to make it impossible to forget. Options: post-merge git hook, GitHub Action on PR close, or pre-commit check that VERSION was bumped when on a feature branch.
 - **Added**: 2026-03-06
 
-### ~~T-0042: Multi-tool auto modes~~ **OBSOLETE**: Overly broad. Per-tool support should be scoped individually when needed, not as a single abstraction task.
-- **Added**: 2026-03-06 · **Closed**: 2026-03-11
-
 ### T-0043: F-idea: AC scheduling phase in auto engine — before executing ACs, analyze dependencies and priorities to build an execution graph. Independent ACs run in parallel (git worktree per stream), dependent ACs chain sequentially. Connects plan-level [P] markers (F-0148) to runtime execution. Resource-aware: premium mode enables parallelism, economy forces sequential. Supersedes T-0033 (which was investigation-only). See CONTRIBUTIONS.md 'Task Scheduling & Parallel Execution' and SDD analysis §9.
 - **Added**: 2026-03-07
-
-### T-0044: F-NEW: Post-merge dogfooding workflow — after framework PR merge, systematically verify: (1) ag commands work with new code, (2) root entry points sync with template changes, (3) state files valid, (4) session-start loads correctly. Currently dogfooding is a principle but has no enforcement after merge. User insight from F-0177 PR session.
-- **Added**: 2026-03-08
 
 ### T-0045: F-0193: Collision-proof feature IDs — current sequential F-XXXX IDs collide when multiple agents/branches assign independently. Research slug-based IDs, atomic allocation, or other approaches. See conversation notes on options.
 - **Added**: 2026-03-08
 
-### ~~T-0046: Worktree-by-default for feature branches~~ **DONE**: Shipped as F-0194. `worktree_mode: always` in STACK.md, `ag implement` auto-creates worktrees, `ag done` auto-cleans.
-- **Added**: 2026-03-08 · **Closed**: 2026-03-11
-
-### ~~T-0048: Plan file advisory in ag review~~ **DONE**: Added _check_plan_file() in review.py resolve path. Advisory prints when no durable plan found. Complements T-0047 (ag implement gate).
-- **Added**: 2026-03-09 · **Closed**: 2026-03-11
-
-### ~~T-0049: Dashboard after ag done~~ **DONE**: Added dashboard.sh call at end of cmd_done(), conditional on interactive terminal ([ -t 1 ]), non-blocking.
-- **Added**: 2026-03-09 · **Closed**: 2026-03-11
-
 ### T-0050: Spec/backlog status drift: FEATURES.md status (planned/shipped) and BACKLOG.json can diverge. When discrepancy found, don't assume either is truth — check JOURNAL.md, CHANGELOG.md, and git history to determine actual state. Consider adding a drift-check tool.
 - **Added**: 2026-03-09
-
-### ~~T-0051: AC check-offs must be part of the implementation PR~~ **DONE**: Shipped as advisory pre-commit check. Warns when in_progress features have unchecked ACs. 10 bash tests.
-- **Added**: 2026-03-10 · **Closed**: 2026-03-11
 
 ### T-0052: F-idea: Systematic LLM-optimized format pass — convert remaining unstructured files to LLM-friendly formats (YAML frontmatter, structured markdown, consistent field patterns). Priority targets: acceptance criteria files (free-form → structured AC blocks), STATUS.md/JOURNAL.md (markdown → more parseable), STACK.md settings (grep-parsed → schema-validated YAML/TOML). Constraint: must remain human-readable — optimized for both audiences. See PRINCIPLES.md F3, KEY_INSIGHTS.md §12
 - **Added**: 2026-03-11
@@ -124,16 +67,7 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0053: F-idea: Migrate STACK.md to structured config format (YAML/TOML) with schema validation. Current grep/sed parsing is fragile and settings lack discoverability. New format should: (1) support inline comments documenting valid options for each setting (e.g. git_workflow: pull_request # options: pull_request | direct), (2) enable tab-completion or validation of setting values, (3) remain human-editable in any text editor, (4) preserve the single-file simplicity (no splitting into multiple configs). Related: T-0052 (LLM-optimized format pass), PRINCIPLES.md F3.
 - **Added**: 2026-03-11
 
-### ~~T-0055: manifest.sh hardcodes legacy .agentic-journal path~~ **DONE**: Replaced hardcoded `$PROJECT_ROOT/.agentic-journal` with `$MANIFESTS_DIR` from paths.sh.
-- **Added**: 2026-03-11 · **Closed**: 2026-03-11
-
-### T-0056: T-0056: Plan file naming regression — saved plans missing YYYY-MM-DD date prefix (should be YYYY-MM-DD-F-XXXX-...-plan.md)
-- **Added**: 2026-03-11
-
 ### T-0058: Investigation: F-0209 TDD Mode — can red-green-refactor loop be reliably enforced through skills/workflows, or is it too behavioral? Current tdd_mode.md exists but isn't wired. Need to test if agents actually follow test-first ordering when instructed.
-- **Added**: 2026-03-11
-
-### T-0059: Investigation: F-0210 Configurable DoD per task type — feasibility study. Can agents reliably switch between different 'done' checklists based on task type (implementation vs design vs spike vs bugfix)? Risk: behavioral branching is hard to enforce structurally.
 - **Added**: 2026-03-11
 
 ### T-0060: F-0207 enhancement: --validate should read file content to determine if .md file is a project doc needing upkeep vs internal/config. LLM-assisted classification.
@@ -154,9 +88,6 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0065: Discovery profile documentation — ensure discovery profile is clearly documented as the rapid Idea-to-Ship pipeline for users wanting lighter workflow ceremony
 - **Added**: 2026-03-13
 
-### T-0066: Support for protected main branch: ag done/flush currently commit state files (BACKLOG.json, STATUS.md, FEATURES.md, VERSION) directly to main. With branch protection rules (no direct push, require PR review), this breaks. Design alternatives: (1) long-lived state branch auto-synced via rebase, (2) auto-PR for state flushes with auto-merge label, (3) bot-exempt bypass token for state-only commits, (4) state files live outside git (e.g. GitHub API, external store). Must audit all direct-to-main paths: ag done, ag flush, state-commit.sh. Consider: what if state diverges while PR waits? Merge conflict risk with parallel agents.
-- **Added**: 2026-03-13
-
 ### T-0067: NFR lifecycle: auto-generate project-appropriate NFRs at init and retrospectives. Categories: testability, performance, security, usability, reportability, scalability, portability, visual impressiveness, immersivity, small deployment size, etc. Pre-filled templates for common project types (web, API, games, music software, mobile, CLI). NFRs may vary per component. Guide user to refine NFRs before they flow into ACs — user may add/change constraints. Trigger points: ag kickoff, ag init, retrospectives, and other natural stops. This ensures NFR→AC→implementation pipeline starts with good NFRs, not afterthoughts.
 - **Added**: 2026-03-15
 
@@ -174,10 +105,6 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 - **Added**: 2026-03-17
 - **Background**: F-0234 added pre-commit Check 21 (`.agentic/lib/hooks/pre-commit-check.sh` lines 1157-1189) which blocks commits when `plan_review_enabled: yes` and a WIP entry exists in AGENTS.json but no APPROVED plan is found. Unit tests verify the logic, but the actual blocking behavior during a real `git commit` hasn't been validated. Test: create WIP entry without plan, attempt commit, verify it's blocked with clear error message.
 - **Related**: PR #151 test plan, `.agentic/lib/hooks/pre-commit-check.sh` Check 21, `tests/test_plan_review_hooks.sh`
-
-### ~~T-0071: DONE — PreToolUse(Write|Edit) artifact enforcement implemented (Phase 4 completion, 2026-03-21)~~
-- **Added**: 2026-03-17 · **Completed**: 2026-03-21
-- **Resolution**: Implemented as `.agentic/lib/claude-hooks/PreToolUse.sh` — blocks Write/Edit/MultiEdit when v2 engine is active and required artifacts are missing. Uses `ag check --quick --active` for <500ms checks, returns `permissionDecision: "deny"` to block. Allows edits to framework/config/state files (.agentic/*, tests/*, docs/*, *.md, etc.).
 
 ### T-0072: Future hook: PreToolUse(Bash)+parse cmd — prevent stash/reset with active agents (from INSTRUCTION_ARCHITECTURE.md transition table)
 - **Added**: 2026-03-17
@@ -233,10 +160,7 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0089: Investigate: custom feature prefixes and subproduct grouping. Can users define own prefixes (e.g., AUTH-001, PAY-002) or group features by subproduct within the same repo? Currently F-XXXX is hardcoded in ids.sh regex. Consider: prefix registry in STACK.md, multi-prefix support in is_feature_id(), FEATURES.md sections per subproduct, backlog filtering by prefix. Related: monorepo/multi-component support (F-0179 components).
 - **Added**: 2026-03-23
 
-### T-0090: Remove plan.md from work/ artifact instructions — /work/plan.md is never read by CLI, state machine, or gate system; only tasks.yaml in work/ is functional. Remove plan.md from 'Write artifacts to .agentic/work/F-XXXX/' line in all instruction files (CLAUDE.md template+root, cursorrules, copilot, codex, memory-seed). Background: investigated during F-0193 drift fix session, F-031 has orphaned work/plan.md. Related: spec.md/review.md/journal.md in work/ may be similarly unused — verify.
-- **Added**: 2026-03-23
-
-### T-0091: Investigate deadweight artifacts: work/plan.md (and possibly work/spec.md, work/review.md) are written by agents per instruction but never read by state machine/CLI. Clarify: should these be removed from instructions, or should CLI gain awareness of them? Related: what other work/ artifacts are similarly orphaned?
+### T-0090: Remove deadweight artifacts from work/ instructions — plan.md (and possibly spec.md, review.md, journal.md) in work/ are never read by CLI, state machine, or gate system; only tasks.yaml is functional. Remove from 'Write artifacts to .agentic/work/F-XXXX/' line in all instruction files (CLAUDE.md template+root, cursorrules, copilot, codex, memory-seed). Verify which work/ artifacts CLI actually reads vs which are purely behavioral. Background: investigated during F-0193 drift fix session. (Merged with T-0091)
 - **Added**: 2026-03-23
 
 ### T-0092: Investigate autogenerated project-specific subagent roles for plan creation and review. Idea: based on STACK.md / project type, scaffold role personas (e.g. game project → game designer, graphics programmer, engine programmer; web app → UX expert, accessibility lead, backend architect). These roles would participate in plan dialectical review (alongside generic Critic/Advocate) and potentially review implementation PRs. Key questions: (1) how to derive roles from project context automatically, (2) whether roles are defined in STACK.md or inferred, (3) integration with existing Critic+Advocate review loop vs. replacing/extending it, (4) role-specific context loading via context-for-role.sh. Related: F-0246 (plan review), ag auto epic, coord start.
@@ -245,83 +169,148 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0093: Doc freshness gate in ag done is too broad — flags ALL feature_done docs regardless of whether the feature's changes affect them. Should scope to docs whose tracked files overlap with the feature's manifest. Current behavior forces fake reviewed markers.
 - **Added**: 2026-03-25
 
-## Done
+---
 
+## Closed
 
-### T-0082: T-NEW: validate_framework.sh check: shipped features must appear in CHANGELOG and at least one living doc (HOW_IT_WORKS, DEVELOPER_GUIDE, or FRAMEWORK_WORKFLOW). Compares FEATURES.md shipped entries against doc mentions. Behavioral layer (concrete 3-concern decision tree in skills) already shipped in F-0237 — this is the structural backstop. Related: F-0138, F-0207, pre-commit-check.sh Check 19, docs.sh
-- **Resolved**: 2026-03-20 — resolved
+### ~~T-0007: Batch-verify ~50 shipped features with unchecked ACs~~ **OBSOLETE**: Legacy v0.1–v0.12 era features. T-0051 now warns on in_progress features going forward. Retroactive verification has diminishing returns.
+- **Added**: 2026-02-24 · **Closed**: 2026-03-11
+
+### ~~T-0010: Implement multi-agent helper scripts (F-0108)~~ **OBSOLETE**: Fully superseded by AGENTS.json (F-0194) and agents_helpers.py. F-0108 marked deprecated in FEATURES.md.
+- **Added**: 2026-02-24 · **Closed**: 2026-03-10
+
+### ~~T-0013: Close or formally assess F-0103 (Agent Mode Selection)~~ **DONE**: F-0103 marked shipped. Heading-format ACs (pre-checkbox convention) verified manually.
+- **Added**: 2026-02-28 · **Closed**: 2026-03-11
+
+### ~~T-0014: Verify shipped acceptance criteria for F-0131, F-0132, F-0133, F-0134, F-0135~~ **OBSOLETE**: Legacy IDs consolidated into F-001/F-002/F-004/F-025/F-026 during F-005 renumber. ACs now YAML contracts.
+- **Added**: 2026-02-28 · **Closed**: 2026-03-26
+
+### ~~T-0015: Structural enforcement for durable plan saving~~ **DONE**: Core covered by F-0198 (plan-scan.sh in ag sync auto-copies plans) + ag implement already checks plan file existence. The `plan_persistence` setting is a nice-to-have, not urgent.
+- **Added**: 2026-02-28 · **Closed**: 2026-03-11
+
+### ~~T-0016: Worktree auto-detection~~ **OBSOLETE**: Duplicate of T-0046; core shipped in F-0194 (ag implement auto-creates worktree, worktree_mode setting).
+- **Added**: 2026-02-28 · **Closed**: 2026-03-10
+
+### ~~T-0017: AGENTS_ACTIVE.md is never written~~ **CLOSED** (F-0197): Superseded by AGENTS.json (F-0194). F-0033 deprecated.
+- **Added**: 2026-02-28 · **Closed**: 2026-03-10
+
+### ~~T-0018: Remove legacy .agentic-journal/manifests/~~ **DONE**: Moved F-018.json and F-0186.json to canonical .agentic/journal/manifests/. Removed legacy .agentic/.agentic-journal/ directory.
+- **Added**: 2026-02-28 · **Closed**: 2026-03-11
+
+### ~~T-0028: Migrate .agentic-journal/ and .agentic-state/ into .agentic-local/ umbrella~~ **OBSOLETE**: Both directories already migrated — .agentic-journal/ → .agentic/journal/ (T-0018), .agentic-state/ → .agentic/session/ (F-0194). Backward-compat fallbacks in paths.sh. No .agentic-local/ umbrella needed.
+- **Added**: 2026-03-02 · **Closed**: 2026-03-11
+
+### ~~T-0030: Verification loop~~ **DONE**: Shipped as F-0161 (Tiered Test Execution) + F-0164 (Verify Loop). Bounded test→fix→retest with tiered execution, escalation on exhaustion, diagnostic context. 100% complete.
+- **Added**: 2026-03-02 · **Closed**: 2026-03-10
+
+### ~~T-0031: Auto-dev loop~~ **DONE**: Shipped as F-030–F-0163 (Autonomous Workflow Engine) + F-0186 (Autonomous Scheduler). Full spec→feature chain exists (TaskRunner reads spec → loops ACs → verify → PR). Deliberately not self-activated in framework dev (by design). ~90% complete, closed.
+- **Added**: 2026-03-02 · **Closed**: 2026-03-10
+
+### ~~T-0033: Task IDs and execution prioritization~~ **OBSOLETE**: Superseded by T-0043 (AC scheduling phase) which covers the same ground more concretely with AC-level dependency graphs and parallel execution.
+- **Added**: 2026-03-02 · **Closed**: 2026-03-10
+
+### ~~T-0034: Cursor agent leaves work uncommitted~~ **DONE**: Added commit nudge in ag.sh cmd_done(), completing-work skill Step 0, and cursorrules.txt "done" trigger.
+- **Added**: 2026-03-03 · **Closed**: 2026-03-11
+
+### ~~T-0042: Multi-tool auto modes~~ **OBSOLETE**: Overly broad. Per-tool support should be scoped individually when needed, not as a single abstraction task.
+- **Added**: 2026-03-06 · **Closed**: 2026-03-11
+
+### ~~T-0044: Post-merge dogfooding workflow~~ **DONE**: Shipped as F-0226, consolidated into DEV-003 during F-005 renumber.
+- **Added**: 2026-03-08 · **Closed**: 2026-03-26
+
+### ~~T-0046: Worktree-by-default for feature branches~~ **DONE**: Shipped as F-0194. `worktree_mode: always` in STACK.md, `ag implement` auto-creates worktrees, `ag done` auto-cleans.
+- **Added**: 2026-03-08 · **Closed**: 2026-03-11
+
+### ~~T-0048: Plan file advisory in ag review~~ **DONE**: Added _check_plan_file() in review.py resolve path. Advisory prints when no durable plan found. Complements T-0047 (ag implement gate).
+- **Added**: 2026-03-09 · **Closed**: 2026-03-11
+
+### ~~T-0049: Dashboard after ag done~~ **DONE**: Added dashboard.sh call at end of cmd_done(), conditional on interactive terminal ([ -t 1 ]), non-blocking.
+- **Added**: 2026-03-09 · **Closed**: 2026-03-11
+
+### ~~T-0051: AC check-offs must be part of the implementation PR~~ **DONE**: Shipped as advisory pre-commit check. Warns when in_progress features have unchecked ACs. 10 bash tests.
+- **Added**: 2026-03-10 · **Closed**: 2026-03-11
+
+### ~~T-0055: manifest.sh hardcodes legacy .agentic-journal path~~ **DONE**: Replaced hardcoded `$PROJECT_ROOT/.agentic-journal` with `$MANIFESTS_DIR` from paths.sh.
+- **Added**: 2026-03-11 · **Closed**: 2026-03-11
+
+### ~~T-0056: Plan file naming regression~~ **DONE**: Fixed. `plan-scan.sh` line 218 now uses `$(date +%Y-%m-%d)-${primary_id}-plan.md`.
+- **Added**: 2026-03-11 · **Closed**: 2026-03-26
+
+### ~~T-0059: Configurable DoD per task type~~ **DUPLICATE**: Duplicate of backlog item "Configurable Definition of Done per task type" (task on F-002).
+- **Added**: 2026-03-11 · **Closed**: 2026-03-26
+
+### ~~T-0066: Support for protected main branch~~ **PROMOTED**: Design notes moved to backlog F-035.
+- **Added**: 2026-03-13 · **Closed**: 2026-03-26
+
+### ~~T-0071: DONE — PreToolUse(Write|Edit) artifact enforcement implemented (Phase 4 completion, 2026-03-21)~~
+- **Added**: 2026-03-17 · **Completed**: 2026-03-21
+- **Resolution**: Implemented as `.agentic/lib/claude-hooks/PreToolUse.sh` — blocks Write/Edit/MultiEdit when v2 engine is active and required artifacts are missing. Uses `ag check --quick --active` for <500ms checks, returns `permissionDecision: "deny"` to block. Allows edits to framework/config/state files (.agentic/*, tests/*, docs/*, *.md, etc.).
+
+### ~~T-0091: Investigate deadweight artifacts in work/~~ **MERGED**: Merged into T-0090.
+- **Added**: 2026-03-23 · **Closed**: 2026-03-26
+
+### T-0082: validate_framework.sh check: shipped features must appear in CHANGELOG and at least one living doc
+- **Resolved**: 2026-03-20
 
 ### T-0079: Structural gate for project-wide documentation currency at feature completion
-- **Resolved**: 2026-03-20 — resolved
+- **Resolved**: 2026-03-20
 
-### T-0081: Build session log analysis tool (session-analyze.py). Background: Manual analysis of session d7d00d88 (3 autonomous_formal violations, 68 min wasted) required hand-parsing Claude JSONL transcripts to build a timeline. This tool should: (1) Parse Claude Code JSONL session logs from ~/.claude/projects/, (2) Detect workflow violations by matching tool calls against expected sequences (e.g., ExitPlanMode should be followed by Agent spawns, not Write/Edit), (3) Calculate time gaps between user prompts to measure wasted wait time, (4) Output structured report with violation type, timestamp, time wasted, and agent rationalization text. Related: tests/llm/harness.sh (similar JSONL parsing), session_analysis_d7d00d88.md (manual analysis as reference), .agentic/lib/auto/ (Python orchestration patterns)
-- **Resolved**: 2026-03-20 — resolved
+### T-0081: Build session log analysis tool (session-analyze.py)
+- **Resolved**: 2026-03-20
 
-### T-0080: Optimize memory-seed.md from 320→~200 lines using LLM-directive format. Background: memory-seed.md at 320 lines exceeds the 100-line validated ceiling from L-0002 (INSTRUCTION_ARCHITECTURE.md). Dialectical review confirmed this needs empirical validation — run LLM tests 043/057/058/084 before+after to check for behavioral regression. The optimization approach: replace narrative paragraphs with directive bullet points, merge duplicated workflow patterns, remove examples that duplicate CLAUDE.md content. Related: docs/INSTRUCTION_ARCHITECTURE.md, .agentic/lib/init/memory-seed.md, tests/llm/harness.sh
-- **Resolved**: 2026-03-20 — resolved
+### T-0080: Optimize memory-seed.md from 320→~200 lines using LLM-directive format
+- **Resolved**: 2026-03-20
 
-### T-0057: T-0057: manifest.sh regenerates on every dashboard/status call, creating dirty working tree noise. Also duplicates commits after rebase (dedup by message not just hash). Should either: (1) only regenerate when explicitly asked, or (2) gitignore manifests, or (3) dedup properly.
-- **Resolved**: 2026-03-11 — resolved
+### T-0057: manifest.sh regenerates on every dashboard/status call, creating dirty working tree noise
+- **Resolved**: 2026-03-11
 
-### T-0054: Agent forgets doc updates and LLM test checks during feature implementation. Root cause: implementing-features and committing-changes skills don't have explicit gates for (1) checking if project docs (HOW_IT_WORKS, DEVELOPER_GUIDE, CHANGELOG, instruction files) need updating, and (2) checking if new LLM tests should be added. The doc check in implementing-features Step 6 only runs drift.sh and checks the doc registry — it doesn't check framework instruction files. Fix: add framework-dev doc gate to implementing-features Step 6 (when in framework repo, check all instruction files per CLAUDE.md § Framework Development), and add LLM test advisory to committing-changes (when new ag commands or behavioral rules are added, suggest LLM test). This is a recurring issue — user has had to remind multiple times.
-- **Resolved**: 2026-03-11 — resolved
-### T-0047: ag implement: gate on durable plan file (.agentic/journal/plans/F-XXXX-*-plan.md). Plans keep getting lost in ~/.claude/plans/.
-- **Resolved**: 2026-03-10 — Implemented as F-0198: plan-scan.sh in ag sync scans ephemeral plan dirs and auto-copies to .agentic/journal/plans/
+### T-0054: Agent forgets doc updates and LLM test checks during feature implementation
+- **Resolved**: 2026-03-11
 
-### T-0024: Consider relaxing max_staged_files for PR workflow — commits get squashed on merge, making per-commit file limits unnecessary friction for multi-phase features
-- **Resolved**: 2026-03-06 — Batch-size limits (max_files_per_commit, max_added_lines) downgraded to advisory warnings on feature branches in PR workflow
+### T-0047: ag implement: gate on durable plan file
+- **Resolved**: 2026-03-10
 
-### T-0027: Revisit D4: phased checkpoints vs file-count limits as small-batch proxy (L493 insight from SDD toolkit analysis)
-- **Resolved**: 2026-03-06 — Batch-size limits downgraded to advisory on feature branches; phased checkpoints (F-0150) are the primary small-batch mechanism now
+### T-0024: Consider relaxing max_staged_files for PR workflow
+- **Resolved**: 2026-03-06
 
-### T-0037: Session start: add 'untracked shipped features?' check — surface spec drift proactively every session, not just when ag sync is manually run (dogfooding: Cursor never ran ag sync, spec drift accumulated silently)
-- **Resolved**: 2026-03-03 — Implemented as F-0156 — falls out of F-0155 quiet mode
+### T-0027: Revisit D4: phased checkpoints vs file-count limits as small-batch proxy
+- **Resolved**: 2026-03-06
 
-### T-0036: SKIP_COMPLEXITY expiry/escalation — track bypass count per file in .agentic-state/, escalate after 3+ bypasses on same file: 'Either fix the file or create a refactor feature entry' (dogfooding: Cursor bypassed MainScene.ts complexity gate on every commit instead of fixing it)
-- **Resolved**: 2026-03-03 — Implemented as F-0154 — per-file warnings in pre-commit-check.sh
+### T-0037: Session start: add 'untracked shipped features?' check
+- **Resolved**: 2026-03-03
 
-### T-0035: Unregistered shipped code detector — ag sync should heuristically compare recently modified source files against FEATURES.md and flag new capabilities with no F-#### entry (dogfooding: Cursor shipped F-008–F-0014 without feature entries, hooks had nothing to check)
-- **Resolved**: 2026-03-03 — Implemented as F-0155 — phase_unregistered_code in sync.sh
+### T-0036: SKIP_COMPLEXITY expiry/escalation
+- **Resolved**: 2026-03-03
 
-### T-0026: Auto-resolve HUMAN_NEEDED PR entries: ag sync should check if PR entries are still open (gh pr view if available, else prompt human) and auto-clear merged ones. Keeps HUMAN_NEEDED clean without losing the write-on-create signaling pattern.
-- **Resolved**: 2026-03-01 — resolved
+### T-0035: Unregistered shipped code detector
+- **Resolved**: 2026-03-03
 
-### T-0012: Update FEATURES.md status: F-0136, F-0139, F-0140, F-0141 are shipped (PRs merged) but still marked in_progress
-- **Resolved**: 2026-03-01 — Marked F-0136, F-0139, F-0140, F-0141 as shipped
+### T-0026: Auto-resolve HUMAN_NEEDED PR entries
+- **Resolved**: 2026-03-01
 
-### T-0020: LLM tests for F-0143 Skills: (1) Skill activation — does 'implement feature X' trigger implementing-features skill instructions (ag implement, acceptance criteria check)? (2) Trigger regression — do tests 003/010 still pass with 40-line CLAUDE.md where triggers are in Skills not instruction file? (3) Skill routing — does 'fix a bug' activate fixing-bugs skill (test-first behavior)? Skills are installed via install.sh in harness and visible to Claude Code via --print.
-- **Resolved**: 2026-03-01 — resolved
+### T-0012: Update FEATURES.md status: F-0136, F-0139, F-0140, F-0141
+- **Resolved**: 2026-03-01
 
-### T-0019: LLM test gap: verify trigger compliance still holds with 40-line CLAUDE.md template (post-F-0143). Run existing tests 003/010 against thinned template to confirm no regression from moving triggers to Skills.
-- **Resolved**: 2026-03-01 — resolved
-<!-- Resolved/triaged items move here with outcome -->
+### T-0020: LLM tests for F-0143 Skills
+- **Resolved**: 2026-03-01
+
+### T-0019: LLM test gap: verify trigger compliance with 40-line CLAUDE.md template
+- **Resolved**: 2026-03-01
 
 ### T-0005: Migrate Python tools from read_profile() to get_setting()
-- **Added**: 2026-02-24
 - **Resolved**: 2026-02-24
-- **Outcome**: Removed read_profile() wrappers from doctor.py and verify.py; both now call get_setting() directly. phase_detect.py, discover.py, render_proposals.py, continue_here.py already used get_setting().
 
 ### T-0011: Automatic git tag after PR merge
-- **Added**: 2026-02-24
 - **Resolved**: 2026-02-24
-- **Outcome**: Added `git tag v$(cat VERSION) && git push origin v$(cat VERSION)` instruction to all 4 framework-dev instruction files.
 
 ### T-0004: Fix blocker.sh double-write bug in add command
-- **Added**: 2026-02-18
 - **Resolved**: 2026-02-24
-- **Outcome**: Removed duplicate `>>` append; kept `sed` insert before `## Resolved`
 
 ### T-0006: Clean up HUMAN_NEEDED.md resolved items
-- **Added**: 2026-02-24
 - **Resolved**: 2026-02-24
-- **Outcome**: Added Resolved dates and Outcomes to HN-0002 through HN-0011. All PRs confirmed merged.
 
 ### T-0008: Remove Cursor prompt stubs referencing nonexistent upgrade_profile.sh
-- **Added**: 2026-02-24
 - **Resolved**: 2026-02-24
-- **Outcome**: Replaced with `ag set profile formal` (exists since F-0141)
 
 ### T-0009: Fix README.md:512 template placeholder
-- **Added**: 2026-02-24
 - **Resolved**: 2026-02-24
-- **Outcome**: Replaced `[Your issue tracker]` with GitHub Issues link

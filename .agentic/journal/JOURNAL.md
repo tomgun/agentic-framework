@@ -4565,3 +4565,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-26 16:53 - State file triage
+
+**Why**: Post-refactor housekeeping: tracking files accumulated stale entries after F-005 + F-031 shipped
+
+**What changed**:
+- Cleared 31 merged-PR entries from HUMAN_NEEDED, closed 6 TODOs, reorganized TODO with open/closed separation, reordered backlog with T-0093 promoted to position 2
+
+**Next steps**:
+- Continue with backlog item 0 (state machine gates)
+
+**Blockers**: None
+
