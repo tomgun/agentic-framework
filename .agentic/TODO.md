@@ -169,6 +169,27 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0093: Doc freshness gate in ag done is too broad — flags ALL feature_done docs regardless of whether the feature's changes affect them. Should scope to docs whose tracked files overlap with the feature's manifest. Current behavior forces fake reviewed markers.
 - **Added**: 2026-03-25
 
+### T-0094: Investigate whether Claude Code emits PostToolUse events for built-in tools (ExitPlanMode, EnterPlanMode)
+JSONL analysis of session `f85780c3` (2026-03-26) showed zero `PostToolUse:ExitPlanMode` progress entries after an ExitPlanMode tool call, while other PostToolUse hooks (Write, Grep, Read, Bash) fired normally in the same session. This means `on-plan-mode-exit.sh` — the hook designed to auto-save plans and inject review instructions — may have **never fired in production**. All correct plan-save + review behavior observed in sessions came from CLAUDE.md + memory textual instructions alone.
+- **Background**: The hook is registered in `.claude/hooks.json` with `"matcher": "ExitPlanMode"` (line 44). The script at `.agentic/lib/hooks/shared/on-plan-mode-exit.sh` runs plan-scan, injects DRAFT status, and outputs a profile-aware banner with auto-continue instructions. All unit tests pass (`test_plan_review_hooks.sh`) but they test the script directly, not through Claude Code's hook dispatch.
+- **Related**: INSTRUCTION_ARCHITECTURE.md assumption A11 (now INVALIDATED), FRAMEWORK_DEVELOPMENT.md "Push mechanisms need pull safety nets" section, F-004 (Plan & Design Review), F-0234 (plan review hooks)
+- **Impact**: If confirmed, the entire "push" enforcement layer for plan review is inert. Only "pull" mechanisms work: `ag implement` gate 0d, SessionStart orphan detection, pre-commit Check 21.
+- **Added**: 2026-03-26
+
+### T-0095: Add review-evidence check to `ag implement` gate 0d
+Currently `implement.sh` gate 0d checks only `**Status**: APPROVED` in the plan file. An agent can flip DRAFT→APPROVED without actually running the Critic/Advocate dialectical review. Approved plans that went through proper review contain structural evidence: `## Dialectical Review Findings`, `## Revision N Changes (from dialectical review)`, reviewer names, convergence signals. The gate should verify presence of at least one review-evidence section, not just the status line.
+- **Background**: The three documented failure modes for plan review (FRAMEWORK_DEVELOPMENT.md:665-681) include "treat plan as pre-approved" — agent rationalizes "user approved in plan mode" and skips review. Named rationalizations in CLAUDE.md help but are textual. A structural check in the gate would make this bypass mechanically impossible.
+- **Related**: F-004 (Plan & Design Review), `implement.sh` gate 0d (lines 143-175), `plan_convergence.py` (sets status + writes review sections), FRAMEWORK_DEVELOPMENT.md remaining gap #3
+- **Files**: `.agentic/lib/tools/commands/implement.sh`, possibly `.agentic/lib/auto/plan_convergence.py` (to verify what sections it writes)
+- **Added**: 2026-03-26
+
+### T-0096: Add approved-plan-required check to PreToolUse gate for code edits
+The PreToolUse gate (`gate.py` `gate_pretool`) blocks code edits without spec (F-0251) but does NOT check for plan approval. An agent can bypass `ag implement` entirely and start writing code directly — whether there's a DRAFT plan, or no plan at all. The PostToolUse `on-code-edit.sh` warns about DRAFT plans but is advisory (exit 0). Pre-commit Check 21 blocks commits with DRAFT plans but fires too late (code already written). Adding an approved-plan check to PreToolUse would create a hard block at the Write/Edit level — the agent literally cannot edit source files unless an APPROVED plan exists.
+- **Background**: Discovered during 2026-03-26 analysis of plan-review enforcement chain. The ExitPlanMode hook may never fire (T-0094), `ag implement` gate 0d is the only hard block, but nothing forces agents to call `ag implement`. The enforcement chain has a gap between "plan mode exit" and "code written" that only advisory warnings cover. The check must be "APPROVED plan exists" not "DRAFT plan exists" — because no plan at all is equally invalid.
+- **Related**: F-004 (Plan & Design Review), F-0251 (spec-first gate), `gate.py` `gate_pretool()` lines 666-720, `on-code-edit.sh` (advisory counterpart), FRAMEWORK_DEVELOPMENT.md remaining gap #4
+- **Implementation**: In `gate_pretool()`, after the F-0251 check (line 697), add: if `plan_review_enabled=yes` AND `state_enforcement=blocking` AND NO plan has `**Status**: APPROVED` → deny with message directing agent to save plan + run review. Invert the logic of `check_pending_plan_review()` (gate.py:354): instead of "block if DRAFT exists", check "block unless APPROVED exists".
+- **Added**: 2026-03-26
+
 ---
 
 ## Closed
