@@ -4604,3 +4604,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-26 22:18 - Gates 6-8 shipped
+
+**Why**: Later gates were advisory-only, agents could skip documentation, commit, and ship checks
+
+**What changed**:
+- State machine gates 6-8 strengthened from advisory to blocking — CHANGELOG/drift blocks, dirty-tree/missing-commit blocks, merged-PR/unpushed-commit blocks. PR #206 squash-merged.
+
+**Next steps**:
+- F-035 Protected Main Branch Support (next backlog item)
+
+**Blockers**: None
+

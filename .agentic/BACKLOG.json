@@ -1,19 +1,12 @@
 [
   {
-    "type": "task",
-    "description": "Strengthen later state machine gates (advisory\u2192blocking)",
-    "added_at": "2026-03-23T17:00:00Z",
-    "added_by": "agent",
-    "notes": "Originally F-0223. Improvement to F-003 (Feature Tracking & Lifecycle)",
-    "became_current_at": "2026-03-25T17:08:06Z"
-  },
-  {
     "type": "feature",
     "id": "F-035",
     "description": "Protected Main Branch Support",
     "added_at": "2026-03-16T18:56:12Z",
     "added_by": "agent",
-    "notes": "From T-0066. Design alternatives: (1) long-lived state branch auto-synced via rebase, (2) auto-PR for state flushes with auto-merge label, (3) bot-exempt bypass token for state-only commits, (4) state files live outside git. Must audit all direct-to-main paths: ag done, ag flush, state-commit.sh. Consider: state divergence while PR waits, merge conflict risk with parallel agents."
+    "notes": "From T-0066. Design alternatives: (1) long-lived state branch auto-synced via rebase, (2) auto-PR for state flushes with auto-merge label, (3) bot-exempt bypass token for state-only commits, (4) state files live outside git. Must audit all direct-to-main paths: ag done, ag flush, state-commit.sh. Consider: state divergence while PR waits, merge conflict risk with parallel agents.",
+    "became_current_at": "2026-03-26T22:17:48Z"
   },
   {
     "type": "task",

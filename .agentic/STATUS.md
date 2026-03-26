@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Gates 6-8 strengthened (advisory→blocking) — PR ready (Updated: 2026-03-26 22:05 UTC)
+- Gates 6-8 shipped (PR #206 merged). Next: F-035 Protected Main Branch Support (Updated: 2026-03-26 22:17 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
