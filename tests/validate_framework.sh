@@ -5183,6 +5183,27 @@ else
   fail "F-035: done.sh ordering wrong — dogfood-sync must run before state-commit.sh"
 fi
 
+# VERSION file sync (framework-dev)
+echo "--- VERSION file sync ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/FRAMEWORK_DEVELOPMENT.md" ]]; then
+  _root_ver=$(cat "${FRAMEWORK_ROOT}/VERSION" 2>/dev/null | tr -d '[:space:]')
+  _lib_ver=$(cat "${FRAMEWORK_ROOT}/.agentic/lib/VERSION" 2>/dev/null | tr -d '[:space:]')
+  if [[ -n "$_root_ver" && "$_root_ver" == "$_lib_ver" ]]; then
+    pass "VERSION files in sync (root=$_root_ver, lib=$_lib_ver)"
+  else
+    fail "VERSION files out of sync (root=$_root_ver, lib=$_lib_ver)"
+  fi
+else
+  pass "VERSION sync check skipped (not framework-dev)"
+fi
+
+if grep -A25 'ALLOWLIST=(' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" | grep -qF '.agentic/lib/VERSION'; then
+  pass ".agentic/lib/VERSION in state-commit.sh allowlist"
+else
+  fail ".agentic/lib/VERSION not in state-commit.sh allowlist"
+fi
+
 # Summary
 
 # ============================================================

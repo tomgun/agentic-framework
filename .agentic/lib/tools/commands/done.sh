@@ -840,6 +840,10 @@ PYEOF
                 echo "  $current_ver → $new_ver"
                 echo "$new_ver" > "$ROOT_DIR/VERSION"
                 echo -e "${GREEN}✓ VERSION bumped to $new_ver${NC}"
+                # Framework-dev: sync .agentic/lib/VERSION (dashboard reads this)
+                if [ -f "$ROOT_DIR/FRAMEWORK_DEVELOPMENT.md" ] && [ -f "${VERSION_FILE:-}" ]; then
+                    echo "$new_ver" > "$VERSION_FILE"
+                fi
             else
                 echo -e "${YELLOW}⚠ VERSION file format unexpected: $current_ver (skipping auto-bump)${NC}"
             fi
