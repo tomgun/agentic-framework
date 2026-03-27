@@ -40,6 +40,7 @@ ALLOWLIST=(
     ".agentic/journal/JOURNAL.md"
     ".agentic/CONTRIBUTIONS.md"
     "VERSION"
+    ".agentic/lib/VERSION"
 )
 # Prefix patterns — files under these dirs are also allowed
 ALLOWLIST_PREFIXES=(

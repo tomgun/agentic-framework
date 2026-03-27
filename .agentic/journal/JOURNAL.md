@@ -4669,3 +4669,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-27 19:28 - VERSION file sync fix
+
+**Why**: VERSION files drifted apart on every ag done cycle in framework-dev mode
+
+**What changed**:
+- Fixed split where done.sh bumps ./VERSION but dashboard reads .agentic/lib/VERSION. Added framework-dev-only sync, allowlist entry, and structural tests.
+
+**Next steps**:
+- Merge fix
+
+**Blockers**: None
+
