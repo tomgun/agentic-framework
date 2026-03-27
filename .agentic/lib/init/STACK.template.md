@@ -345,14 +345,18 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- Doc registry — declare what docs this project maintains.
      This section lives in STACK.md (project root) and survives .agentic/ upgrades.
      To add a doc: add a line here. No .agentic/ files need editing.
+     Format: - doc: <path> | <type> | <trigger> [| <tracks>]
      Triggers: feature_done | pr | session | manual
+     Tracks (optional 4th field): comma-separated path prefixes this doc covers.
+       When a feature is completed, only docs whose tracked paths overlap the
+       feature's manifest are flagged for freshness. Docs without tracks are always checked.
      Note: pr-trigger docs only fire in formal profile (formal uses PRs).
      To fire on multiple triggers, add two entries with the same path.
      Types (built-in): changelog | readme | adr | lessons | architecture | runbook | tech-spec | custom -->
 - doc: CHANGELOG.md          | changelog    | pr
 - doc: README.md             | readme       | pr
 <!-- - doc: docs/lessons.md       | lessons      | feature_done -->
-<!-- - doc: docs/architecture.md  | architecture | feature_done -->
+<!-- - doc: docs/architecture.md  | architecture | feature_done | src/ -->
 <!-- - doc: docs/adr/             | adr          | manual       -->
 
 ## Constraints & non-negotiables

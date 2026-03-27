@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-035 shipped (PR #207 merged). Post-merge cleanup in progress. (Updated: 2026-03-27 18:45 UTC)
+- Doc freshness gate scoping fix — PR ready (Updated: 2026-03-27 20:01 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

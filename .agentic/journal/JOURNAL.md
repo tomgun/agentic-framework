@@ -4682,3 +4682,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-27 20:01 - Doc freshness gate scoping fix
+
+**Why**: ag done was flagging ALL feature_done docs as stale regardless of feature relevance, forcing fake reviewed markers
+
+**What changed**:
+- check_freshness() now accepts manifest ID and scopes to docs whose tracked paths overlap feature's changed files; parse_registry supports optional tracks field; done.sh passes manifest to freshness check; STACK.md entries annotated with tracks
+
+**Next steps**:
+- Merge PR, ag done, advance backlog
+
+**Blockers**: None
+
