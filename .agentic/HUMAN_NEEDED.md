@@ -24,6 +24,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0071: PR #209: Doc freshness gate scoping fix
+- **Type**: pr_review
+- **Added**: 2026-03-27
+- **Context**: fix(F-012): scope doc freshness gate to feature-relevant docs — needs review
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0069: PR #205: F-005 Phase 2 renumber
