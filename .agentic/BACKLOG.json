@@ -1,19 +1,11 @@
 [
   {
-    "type": "feature",
-    "id": "F-035",
-    "description": "Protected Main Branch Support",
-    "added_at": "2026-03-16T18:56:12Z",
-    "added_by": "agent",
-    "notes": "From T-0066. Design alternatives: (1) long-lived state branch auto-synced via rebase, (2) auto-PR for state flushes with auto-merge label, (3) bot-exempt bypass token for state-only commits, (4) state files live outside git. Must audit all direct-to-main paths: ag done, ag flush, state-commit.sh. Consider: state divergence while PR waits, merge conflict risk with parallel agents.",
-    "became_current_at": "2026-03-26T22:17:48Z"
-  },
-  {
     "type": "task",
     "description": "Doc freshness gate scoping fix \u2014 scope to docs whose tracked files overlap with the feature's manifest",
     "added_at": "2026-03-26T00:00:00Z",
     "added_by": "agent",
-    "notes": "Promoted from T-0093. Active bug: ag done flags ALL feature_done docs regardless of relevance, forces fake reviewed markers. Improvement to F-012 (Documentation Drift & Lifecycle)"
+    "notes": "Promoted from T-0093. Active bug: ag done flags ALL feature_done docs regardless of relevance, forces fake reviewed markers. Improvement to F-012 (Documentation Drift & Lifecycle)",
+    "became_current_at": "2026-03-27T18:45:52Z"
   },
   {
     "type": "task",

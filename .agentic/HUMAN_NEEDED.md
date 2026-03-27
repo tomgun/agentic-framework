@@ -15,6 +15,15 @@ _No active items_
 
 ---
 
+
+### HN-0070: Review PR #207: F-035 Protected Main Branch Support
+- **Type**: pr-review
+- **Added**: 2026-03-27
+- **Context**: https://github.com/tomgun/agentic-framework/pull/207 — ag flush via PR for protected branches. 17 files, 12 structural tests.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0069: PR #205: F-005 Phase 2 renumber

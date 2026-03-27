@@ -1,0 +1,21 @@
+{
+  "feature": "F-035",
+  "mode": "feature",
+  "generated": "2026-03-27T18:46:57Z",
+  "commits": [
+    {"hash": "7004a87", "date": "2026-03-27", "message": "feat(F-035): protected main branch support — ag flush via PR (#207)", "additions": 765, "deletions": 70},
+    {"hash": "4314996", "date": "2026-03-27", "message": "fix(F-035): address code review findings (7 items)", "additions": 22, "deletions": 7}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/lib/settings.sh"}, {"file": ".agentic/lib/tools/commands/done.sh"}, {"file": ".agentic/lib/tools/commands/help.sh"}, {"file": ".agentic/lib/tools/commands/settings.sh"}, {"file": ".agentic/lib/tools/dashboard.sh"}, {"file": ".agentic/lib/tools/feedback.sh"}, {"file": ".agentic/lib/tools/state-commit.sh"}, {"file": ".agentic/lib/tools/todo.sh"}],
+    "tests": [{"file": ".agentic/spec/contracts/F-035.yaml"}, {"file": "tests/validate_framework.sh"}],
+    "docs": [{"file": ".agentic/STATUS.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/journal/plans/2026-03-26-F-035-plan.md"}, {"file": ".agentic/lib/DEVELOPER_GUIDE.md"}, {"file": ".agentic/lib/agents/claude/CLAUDE.md"}, {"file": ".agentic/lib/init/STACK.template.md"}, {"file": ".agentic/lib/init/memory-seed.md"}, {"file": "docs/HOW_IT_WORKS.md"}],
+    "config": [{"file": ".agentic/spec/contracts/F-035.yaml"}]
+  },
+  "stats": {
+    "total_commits": 3,
+    "total_files": 19,
+    "additions": 787,
+    "deletions": 77
+  }
+}

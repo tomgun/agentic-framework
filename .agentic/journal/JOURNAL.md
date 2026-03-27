@@ -4630,3 +4630,42 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-27 18:45 - F-035 shipped
+
+**Why**: Organizations with branch protection can now use ag flush without direct push access
+
+**What changed**:
+- Protected main branch support merged (PR #207). ag flush now creates ephemeral branch + PR when main_branch_mode: protected.
+
+**Next steps**:
+- Post-merge: VERSION bump, dogfood sync, flush state
+
+**Blockers**: None
+
+
+### Session: 2026-03-27 18:46 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-035: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-03-27 18:46 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-035: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+

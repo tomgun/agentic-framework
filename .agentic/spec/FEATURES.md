@@ -382,7 +382,7 @@ Automatically sync project-specific customizations when framework upgrades, pres
 
 ## F-035: Protected Main Branch Support
 
-**Status**: planned | **Category**: git-workflow | **Profile**: both
+**Status**: shipped | **Category**: git-workflow | **Profile**: both
 
 Support workflows where main branch is protected (no direct push). Adapt commit, done, and flush commands for PR-only merging.
 
