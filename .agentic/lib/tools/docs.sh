@@ -715,17 +715,9 @@ check_freshness() {
     if [[ -n "$manifest_id" ]]; then
         local manifest_path="$ROOT_DIR/.agentic/journal/manifests/${manifest_id}.json"
         if [[ -f "$manifest_path" ]]; then
-            # Extract all file paths from manifest JSON (all categories)
-            manifest_files=$(python3 -c "
-import json, sys
-with open('$manifest_path') as f:
-    m = json.load(f)
-files = m.get('files', {})
-for cat in ('code', 'tests', 'docs', 'config'):
-    for entry in files.get(cat, []):
-        f = entry.get('file', '') if isinstance(entry, dict) else str(entry)
-        if f: print(f)
-" 2>/dev/null || true)
+            # Extract "file" values from manifest JSON using grep+sed (no python/jq dependency)
+            manifest_files=$(grep -o '"file"[[:space:]]*:[[:space:]]*"[^"]*"' "$manifest_path" \
+                | sed 's/"file"[[:space:]]*:[[:space:]]*"//;s/"$//' || true)
         fi
     fi
 
@@ -769,11 +761,12 @@ for cat in ('code', 'tests', 'docs', 'config'):
             # Split tracks on comma
             IFS=',' read -ra track_prefixes <<< "$tracks"
             for prefix in "${track_prefixes[@]}"; do
-                # Trim whitespace
-                prefix=$(echo "$prefix" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+                # Trim whitespace (parameter expansion, no subprocess)
+                prefix="${prefix#"${prefix%%[![:space:]]*}"}"
+                prefix="${prefix%"${prefix##*[![:space:]]}"}"
                 [[ -z "$prefix" ]] && continue
-                # Check if any manifest file starts with this prefix
-                if echo "$manifest_files" | grep -q "^${prefix}"; then
+                # Check if any manifest file starts with this prefix (literal match, not regex)
+                if echo "$manifest_files" | grep -qF "$prefix"; then
                     has_overlap=true
                     break
                 fi
@@ -834,11 +827,24 @@ case "$MODE" in
         fi
         echo -e "${BOLD}Doc Registry (from STACK.md ## Docs)${NC}"
         echo ""
-        printf "  %-30s %-15s %s\n" "PATH" "TYPE" "TRIGGER"
-        printf "  %-30s %-15s %s\n" "----" "----" "-------"
-        while IFS='|' read -r path type trigger _tracks; do
-            printf "  %-30s %-15s %s\n" "$path" "$type" "$trigger"
-        done <<< "$entries"
+        # Check if any entry has tracks configured
+        local has_any_tracks=false
+        if echo "$entries" | grep -q '|[^|]*|[^|]*|[^|]'; then
+            has_any_tracks=true
+        fi
+        if $has_any_tracks; then
+            printf "  %-35s %-15s %-14s %s\n" "PATH" "TYPE" "TRIGGER" "TRACKS"
+            printf "  %-35s %-15s %-14s %s\n" "----" "----" "-------" "------"
+            while IFS='|' read -r path type trigger tracks; do
+                printf "  %-35s %-15s %-14s %s\n" "$path" "$type" "$trigger" "$tracks"
+            done <<< "$entries"
+        else
+            printf "  %-30s %-15s %s\n" "PATH" "TYPE" "TRIGGER"
+            printf "  %-30s %-15s %s\n" "----" "----" "-------"
+            while IFS='|' read -r path type trigger _tracks; do
+                printf "  %-30s %-15s %s\n" "$path" "$type" "$trigger"
+            done <<< "$entries"
+        fi
         ;;
 
     trigger)

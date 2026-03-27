@@ -2570,6 +2570,91 @@ else
   fail "F-0139: --trigger filtering incorrect"
 fi
 
+# docs.sh --check-freshness with manifest+tracks scopes to relevant docs
+(
+  DOCS_TEST_DIR=$(mktemp -d)
+  mkdir -p "$DOCS_TEST_DIR/.agentic/journal/manifests"
+  # Registry: 3 docs with feature_done trigger, 2 have tracks, 1 catch-all
+  cat > "$DOCS_TEST_DIR/STACK.md" <<'TESTEOF'
+## Docs
+- doc: docs/api.md | architecture | feature_done | src/api/
+- doc: docs/auth.md | architecture | feature_done | src/auth/
+- doc: docs/lessons.md | lessons | feature_done
+## End
+TESTEOF
+  # Manifest: only src/api/ files changed
+  cat > "$DOCS_TEST_DIR/.agentic/journal/manifests/F-TEST.json" <<'TESTEOF'
+{"feature":"F-TEST","files":{"code":[{"file":"src/api/handler.ts"}],"tests":[],"docs":[],"config":[]}}
+TESTEOF
+  # Create the docs so they aren't flagged as "missing"
+  mkdir -p "$DOCS_TEST_DIR/docs"
+  touch "$DOCS_TEST_DIR/docs/api.md" "$DOCS_TEST_DIR/docs/auth.md" "$DOCS_TEST_DIR/docs/lessons.md"
+  # Initialize git so check_freshness can run git commands
+  git -C "$DOCS_TEST_DIR" init -q 2>/dev/null
+  git -C "$DOCS_TEST_DIR" add -A 2>/dev/null && git -C "$DOCS_TEST_DIR" commit -q -m "init" 2>/dev/null
+  OUTPUT=$(ROOT_DIR="$DOCS_TEST_DIR" bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/docs.sh" --check-freshness --trigger feature_done --manifest F-TEST 2>&1)
+  rm -rf "$DOCS_TEST_DIR"
+  # auth.md should be skipped (tracks src/auth/, manifest has src/api/)
+  # api.md + lessons.md should be checked (api overlaps, lessons has no tracks)
+  echo "$OUTPUT" | grep -q "skipped" && ! echo "$OUTPUT" | grep -q "auth.md"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "F-012: check_freshness with manifest+tracks skips non-overlapping docs"
+else
+  fail "F-012: check_freshness with manifest+tracks should skip non-overlapping docs"
+fi
+
+# docs.sh --check-freshness without manifest checks all docs (backward compat)
+(
+  DOCS_TEST_DIR=$(mktemp -d)
+  cat > "$DOCS_TEST_DIR/STACK.md" <<'TESTEOF'
+## Docs
+- doc: docs/api.md | architecture | feature_done | src/api/
+- doc: docs/auth.md | architecture | feature_done | src/auth/
+## End
+TESTEOF
+  mkdir -p "$DOCS_TEST_DIR/docs"
+  touch "$DOCS_TEST_DIR/docs/api.md" "$DOCS_TEST_DIR/docs/auth.md"
+  git -C "$DOCS_TEST_DIR" init -q 2>/dev/null
+  git -C "$DOCS_TEST_DIR" add -A 2>/dev/null && git -C "$DOCS_TEST_DIR" commit -q -m "init" 2>/dev/null
+  OUTPUT=$(ROOT_DIR="$DOCS_TEST_DIR" bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/docs.sh" --check-freshness --trigger feature_done 2>&1)
+  rm -rf "$DOCS_TEST_DIR"
+  # Without manifest, both should be checked (no skipping)
+  ! echo "$OUTPUT" | grep -q "skipped"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "F-012: check_freshness without manifest checks all docs (backward compat)"
+else
+  fail "F-012: check_freshness without manifest should check all docs"
+fi
+
+# docs.sh parse_registry handles tracks field in 4th column
+(
+  DOCS_TEST_DIR=$(mktemp -d)
+  cat > "$DOCS_TEST_DIR/STACK.md" <<'TESTEOF'
+## Docs
+- doc: docs/api.md | architecture | feature_done | src/api/,src/shared/
+- doc: docs/plain.md | readme | pr
+## End
+TESTEOF
+  OUTPUT=$(ROOT_DIR="$DOCS_TEST_DIR" bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/docs.sh" --list 2>&1)
+  rm -rf "$DOCS_TEST_DIR"
+  # Should show TRACKS column when tracks are present
+  echo "$OUTPUT" | grep -q "TRACKS" && echo "$OUTPUT" | grep -q "src/api/"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "F-012: docs.sh --list shows TRACKS column when tracks configured"
+else
+  fail "F-012: docs.sh --list should show TRACKS column when tracks configured"
+fi
+
+# done.sh passes --manifest to freshness check
+if grep -q 'check-freshness.*--manifest.*feature_id' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/done.sh" 2>/dev/null; then
+  pass "F-012: done.sh passes --manifest to freshness check"
+else
+  fail "F-012: done.sh should pass --manifest to freshness check"
+fi
+
 # ag help shows docs command
 if bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" help 2>&1 | grep -q "docs"; then
   pass "F-0139: ag help includes docs command"
