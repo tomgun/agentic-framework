@@ -296,6 +296,13 @@ COMMIT_MSG="chore(state): update $(IFS=', '; echo "${SHORT_NAMES[*]}")"
 # ---------------------------------------------------------------------------
 # Branch on mode: direct vs protected (F-035)
 # ---------------------------------------------------------------------------
+if [[ "$BRANCH_MODE" == "protected" ]] && ! $HAS_REMOTE; then
+    echo "Error: main_branch_mode is 'protected' but no remote 'origin' found."
+    echo "Protected mode requires a remote to push branches and create PRs."
+    echo "Add a remote: git remote add origin <url>"
+    exit 1
+fi
+
 if [[ "$BRANCH_MODE" == "protected" ]] && $HAS_REMOTE; then
     # ===================================================================
     # PROTECTED MODE: ephemeral branch + PR
@@ -330,7 +337,7 @@ if [[ "$BRANCH_MODE" == "protected" ]] && $HAS_REMOTE; then
     fi
 
     # Set ERR trap for cleanup (scoped — cleared before return)
-    trap '_cleanup_ephemeral' ERR
+    trap '_cleanup_ephemeral; exit 1' ERR
 
     # Commit on ephemeral branch
     git commit --no-verify -m "$COMMIT_MSG"
@@ -339,8 +346,7 @@ if [[ "$BRANCH_MODE" == "protected" ]] && $HAS_REMOTE; then
     if ! git push -u origin "$EPHEMERAL_BRANCH" 2>/dev/null; then
         echo "Error: Could not push branch '$EPHEMERAL_BRANCH' to origin."
         echo "Your changes are committed locally on '$EPHEMERAL_BRANCH'."
-        # Return to trunk before exiting
-        git checkout "$BRANCH" 2>/dev/null || true
+        _cleanup_ephemeral
         trap - ERR
         exit 1
     fi
@@ -349,18 +355,19 @@ if [[ "$BRANCH_MODE" == "protected" ]] && $HAS_REMOTE; then
     PR_URL=""
     FILE_LIST=""
     for f in "${DIRTY_STATE[@]}"; do
-        FILE_LIST="${FILE_LIST}- ${f}\n"
+        FILE_LIST="${FILE_LIST}- ${f}"$'\n'
     done
 
     if command -v gh >/dev/null 2>&1; then
-        # Attempt to create state-only label (best-effort, once)
+        # Best-effort label creation — idempotent, errors suppressed (already exists = OK)
         gh label create "state-only" --description "Automated state-only flush" --color "ededed" 2>/dev/null || true
 
+        PR_BODY="Auto-generated state-only flush."$'\n\n'"Files:"$'\n'"${FILE_LIST}"
         PR_URL=$(gh pr create \
             --base "$BRANCH" \
             --head "$EPHEMERAL_BRANCH" \
             --title "$COMMIT_MSG" \
-            --body "$(printf "Auto-generated state-only flush.\n\nFiles:\n${FILE_LIST}")" \
+            --body "$PR_BODY" \
             --label "state-only" 2>/dev/null || echo "")
 
         if [[ -n "$PR_URL" ]]; then

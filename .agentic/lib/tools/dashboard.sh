@@ -22,6 +22,7 @@ cd "$PROJECT_ROOT"
 
 # Source framework paths (provides all *_FILE variables)
 source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
+source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
 
 TOOLS_DIR="${TOOLS_DIR:-$PROJECT_ROOT/.agentic/lib/tools}"
 
@@ -399,7 +400,7 @@ fi
 
 # Conditional: dirty state files (only when git active)
 if [[ "$D_DIRTY_STATE" -eq 1 ]]; then
-    _flush_mode=$(grep -E '^\s*-?\s*main_branch_mode:' "$PROJECT_ROOT/STACK.md" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d ' ' || echo "direct")
+    _flush_mode=$(get_setting "main_branch_mode" "direct" 2>/dev/null || echo "direct")
     if [[ "$_flush_mode" == "protected" ]]; then
         echo "📤 Dirty state    Uncommitted state files. Run: ag flush (creates PR)"
     else

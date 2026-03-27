@@ -863,6 +863,13 @@ PYEOF
         echo ""
         echo -e "${BOLD}=== Flushing State ===${NC}"
         bash "$SCRIPT_DIR/state-commit.sh" --features || true
+
+        # Protected-mode guidance (F-035)
+        local _done_branch_mode
+        _done_branch_mode=$(get_setting "main_branch_mode" "direct" 2>/dev/null || echo "direct")
+        if [[ "$_done_branch_mode" == "protected" ]]; then
+            echo -e "  ${BLUE}Note: State changes sent as PR. Merge it to complete the version bump.${NC}"
+        fi
     else
         echo ""
         echo -e "${BLUE}On branch '$current_branch' — run 'ag flush --features' after returning to main.${NC}"
