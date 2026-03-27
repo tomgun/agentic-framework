@@ -23,7 +23,7 @@ source "$SCRIPT_DIR/../paths.sh"
 # Auto-flush: commit state to main after mutating operations.
 _try_flush() {
     if [[ -f "$SCRIPT_DIR/state-commit.sh" ]]; then
-        bash "$SCRIPT_DIR/state-commit.sh" 2>/dev/null || true
+        bash "$SCRIPT_DIR/state-commit.sh" --auto-flush 2>/dev/null || true
     fi
 }
 

@@ -65,7 +65,7 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 | "Commit this" | `ag commit` | Runs all quality gates, blocks if issues |
 | "We're done" | `ag done` | Checks docs, tests, AC completeness, phase completion (blocks if incomplete phases); auto-advances backlog |
 | "Phase progress?" | `ag phase list F-XXXX` | Shows plan phases and completion status; `ag phase done F-XXXX <id>` marks a phase complete |
-| "Flush state" / after `ag done` | `ag flush` | Commits state files (STATUS.md, BACKLOG.json, etc.) directly to main — no PR |
+| "Flush state" / after `ag done` | `ag flush` | Commits state files (STATUS.md, BACKLOG.json, etc.) to main. When `main_branch_mode: protected`, creates a branch + PR instead of direct push |
 | "Approve this" | `ag review` | Lists/resolves pending review checkpoints |
 | "Here's my product vision" | `ag kickoff "vision"` | Generates features, ACs, backlog from a vision prompt — staging → review → approve |
 | "Break this into children" | `ag decompose F-XXXX` | Analyzes epic AC, proposes child features by component, review checkpoint |

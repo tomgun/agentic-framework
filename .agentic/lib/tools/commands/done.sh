@@ -845,15 +845,10 @@ PYEOF
             fi
         fi
 
-        # Flush state files to main
-        echo ""
-        echo -e "${BOLD}=== Flushing State ===${NC}"
-        bash "$SCRIPT_DIR/state-commit.sh" --features || true
-
-        # Post-merge dogfood sync (framework-dev only — F-0226)
-        # --auto-fix: automatically copies missing sentinel content from
-        # template to root instruction files (Rules, Token-efficient scripts).
-        # This prevents drift from accumulating between merges.
+        # Post-merge dogfood sync BEFORE flush (framework-dev only — F-0226)
+        # Runs before flush so all changes (VERSION + dogfood drift) go in
+        # a single flush — important for protected mode (F-035) where each
+        # flush creates a PR.
         if [ -f "$ROOT_DIR/FRAMEWORK_DEVELOPMENT.md" ]; then
             echo ""
             echo -e "${BOLD}=== Dogfood Sync ===${NC}"
@@ -863,6 +858,11 @@ PYEOF
                 echo -e "  ${YELLOW}⚠${NC} Drift detected — auto-fix attempted. Review changes."
             fi
         fi
+
+        # Flush state files to main (or create PR in protected mode)
+        echo ""
+        echo -e "${BOLD}=== Flushing State ===${NC}"
+        bash "$SCRIPT_DIR/state-commit.sh" --features || true
     else
         echo ""
         echo -e "${BLUE}On branch '$current_branch' — run 'ag flush --features' after returning to main.${NC}"

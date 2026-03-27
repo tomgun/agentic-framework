@@ -43,7 +43,7 @@ Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and
 ## Core Rules
 
 - Interactive sessions: show changes to human before committing. Autonomous/non-interactive sessions: commit directly, using `review_commit` setting.
-- PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). If `git_mode` is `deferred` or `none`, skip git operations — suggest `ag git-init` when the user wants to commit. After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking.
+- PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). If `git_mode` is `deferred` or `none`, skip git operations — suggest `ag git-init` when the user wants to commit. After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking. If `main_branch_mode: protected`, `ag flush` creates a branch + PR instead of pushing directly to main.
 - Add/update tests for new/changed logic. Write tests alongside code, not after.
 - Spec + code + tests + docs = done (update all artifacts together, not later).
 - Keep changes small and scoped (max 5-10 files per commit).

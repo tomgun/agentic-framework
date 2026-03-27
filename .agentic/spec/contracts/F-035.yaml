@@ -1,0 +1,135 @@
+id: F-035
+name: Protected Main Branch Support
+lifecycle: implementing
+since: v0.73.3
+profile: both
+protection: none
+category: git-workflow
+description: 'Support workflows where main branch is protected (no direct push).
+
+  Adapt flush, done, and commit commands for PR-only merging. When
+
+  main_branch_mode is ''protected'', ag flush creates an ephemeral
+
+  state/flush-<timestamp> branch, commits state-only files, pushes,
+
+  and auto-creates a PR via gh CLI. Graceful fallback when gh is
+
+  unavailable. Auto-flush callers (_try_flush) skip protected mode
+
+  to avoid surprise PRs.
+
+  '
+user_input: ''
+assertions:
+- id: AC-001
+  text: 'ag flush creates state/flush-{timestamp}-{pid} branch when main_branch_mode:
+    protected'
+  type: structural
+  verify: 'grep -q "state/flush-" .agentic/lib/tools/state-commit.sh
+
+    '
+- id: AC-002
+  text: 'PR auto-created with title chore(state): update <filenames> when gh available'
+  type: structural
+  verify: 'grep -q "gh pr create" .agentic/lib/tools/state-commit.sh
+
+    '
+- id: AC-003
+  text: ag done VERSION bump + dogfood-sync included in single state PR (dogfood-sync
+    runs before flush)
+  type: structural
+  verify: '# In done.sh, dogfood-sync must appear BEFORE state-commit.sh call
+
+    python3 -c "
+
+    import re
+
+    content = open(''.agentic/lib/tools/commands/done.sh'').read()
+
+    dsync = content.find(''dogfood-sync'')
+
+    flush = content.find(''state-commit.sh'', dsync if dsync > 0 else 0)
+
+    assert dsync > 0 and flush > dsync, ''dogfood-sync must run before state-commit.sh''
+
+    "
+
+    '
+- id: AC-004
+  text: Graceful fallback when gh unavailable (branch pushed, manual PR instructions
+    printed)
+  type: structural
+  verify: 'grep -q "command -v gh" .agentic/lib/tools/state-commit.sh ||
+
+    grep -q "which gh" .agentic/lib/tools/state-commit.sh
+
+    '
+- id: AC-005
+  text: state-commit.sh allowlist enforcement unchanged in protected mode
+  type: structural
+  verify: 'grep -q "ALLOWLIST=" .agentic/lib/tools/state-commit.sh
+
+    '
+- id: AC-006
+  text: ag flush --dry-run and --check work identically in both modes
+  type: behavioral
+  verify: 'grep -q "DRY_RUN" .agentic/lib/tools/state-commit.sh &&
+
+    grep -q "CHECK_ONLY" .agentic/lib/tools/state-commit.sh
+
+    '
+- id: AC-007
+  text: Default is direct for all profiles (zero-impact upgrade)
+  type: structural
+  verify: 'grep -c "main_branch_mode=direct" .agentic/lib/presets/profiles.conf |
+    grep -q "3"
+
+    '
+- id: AC-008
+  text: ag set main_branch_mode protected validates input correctly
+  type: structural
+  verify: 'grep -q "main_branch_mode" .agentic/lib/tools/commands/settings.sh
+
+    '
+- id: AC-009
+  text: _try_flush() callers skip protected mode via --auto-flush flag
+  type: structural
+  verify: 'grep -q "\-\-auto-flush" .agentic/lib/tools/state-commit.sh
+
+    '
+- id: AC-010
+  text: Local state files reset to main version after PR creation (no duplicate flushes)
+  type: structural
+  verify: 'grep -q "git checkout.*BRANCH.*--" .agentic/lib/tools/state-commit.sh ||
+
+    grep -q "git rm" .agentic/lib/tools/state-commit.sh
+
+    '
+- id: AC-011
+  text: Error recovery cleans up ephemeral branch on failure
+  type: structural
+  verify: 'grep -q "cleanup_ephemeral\|_cleanup_ephemeral" .agentic/lib/tools/state-commit.sh
+
+    '
+- id: AC-012
+  text: Merged state/flush-* branches cleaned up on next flush
+  type: structural
+  verify: 'grep -q "state/flush-" .agentic/lib/tools/state-commit.sh &&
+
+    grep -q "push origin --delete" .agentic/lib/tools/state-commit.sh
+
+    '
+scenarios:
+- name: Flush with protected main
+  given: 'main_branch_mode: protected in STACK.md, dirty state files on main'
+  when: User runs ag flush
+  then: Ephemeral branch created, state files committed, PR opened, local files reset
+- name: Flush without gh CLI
+  given: 'main_branch_mode: protected, gh not installed'
+  when: User runs ag flush
+  then: Branch pushed, manual PR instructions printed (no error)
+- name: Auto-flush skips protected mode
+  given: 'main_branch_mode: protected, ag todo called with dirty state'
+  when: _try_flush() invokes state-commit.sh --auto-flush
+  then: Protected mode skipped, message printed to stderr, exit 0

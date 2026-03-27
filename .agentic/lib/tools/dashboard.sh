@@ -399,7 +399,12 @@ fi
 
 # Conditional: dirty state files (only when git active)
 if [[ "$D_DIRTY_STATE" -eq 1 ]]; then
-    echo "📤 Dirty state    Uncommitted state files. Run: ag flush"
+    _flush_mode=$(grep -E '^\s*-?\s*main_branch_mode:' "$PROJECT_ROOT/STACK.md" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d ' ' || echo "direct")
+    if [[ "$_flush_mode" == "protected" ]]; then
+        echo "📤 Dirty state    Uncommitted state files. Run: ag flush (creates PR)"
+    else
+        echo "📤 Dirty state    Uncommitted state files. Run: ag flush"
+    fi
 fi
 
 # Conditional: git deferred mode (F-0250)

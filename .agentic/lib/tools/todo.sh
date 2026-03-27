@@ -20,7 +20,7 @@ source "$SCRIPT_DIR/../paths.sh"
 # Best-effort — only runs when on main (feature branches flush on return to main).
 _try_flush() {
     if [[ -f "$SCRIPT_DIR/state-commit.sh" ]]; then
-        bash "$SCRIPT_DIR/state-commit.sh" 2>/dev/null || true
+        bash "$SCRIPT_DIR/state-commit.sh" --auto-flush 2>/dev/null || true
     fi
 }
 

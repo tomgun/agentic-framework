@@ -4617,3 +4617,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-27 18:16 - F-035 Protected Main Branch Support
+
+**Why**: Organizations with GitHub branch protection cannot push directly to main — ag flush needs a PR-based alternative
+
+**What changed**:
+- Implemented dual-path ag flush: direct mode (unchanged) vs protected mode (ephemeral branch + PR via gh). Added --auto-flush guard, done.sh reordering, stale branch cleanup, error recovery, settings/validation, instruction file updates, 12 structural tests.
+
+**Next steps**:
+- PR review, merge, VERSION bump via ag done
+
+**Blockers**: None
+
