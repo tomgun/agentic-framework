@@ -353,6 +353,7 @@ show_all_settings() {
         "plan_review_max_iterations"
         "pipeline_enabled"
         "worktree_mode"
+        "main_branch_mode"
     )
 
     printf "%-28s %-20s %s\n" "SETTING" "VALUE" "SOURCE"

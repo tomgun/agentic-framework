@@ -129,6 +129,12 @@ _settings_set_value() {
                 exit 1
             fi
             ;;
+        main_branch_mode)
+            if [[ ! "$value" =~ ^(direct|protected)$ ]]; then
+                echo -e "${RED}Error: main_branch_mode must be 'direct' or 'protected', got '$value'${NC}"
+                exit 1
+            fi
+            ;;
         max_files_per_commit|max_added_lines|max_code_file_length)
             if [[ ! "$value" =~ ^[0-9]+$ ]]; then
                 echo -e "${RED}Error: $key must be a positive integer, got '$value'${NC}"

@@ -29,6 +29,8 @@ Purpose: a single source of truth for "how we build and run software here".
 # Git hook dispatch mode. Profile defaults — Discovery: fast | Formal: fast
 - git_workflow: direct
 # Commit policy for main branch. Profile defaults — Discovery: direct | Formal: pull_request
+- main_branch_mode: direct
+# How ag flush commits state files. direct: push to main | protected: create branch + PR. All profiles default to direct.
 - plan_review_enabled: no
 # Review plan before implementation (uses dialectical critic+advocate). Profile defaults — Discovery: no | Formal: yes
 - spec_directory: no

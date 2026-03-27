@@ -5099,6 +5099,90 @@ else
   fail "DEV-001: DEV-XXXX pattern missing from contract schema"
 fi
 
+# F-035: Protected Main Branch Support
+echo "--- F-035: Protected Main Branch Support ---"
+
+# AC-007: Default is direct for all profiles
+if [[ $(grep -c "main_branch_mode=direct" "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" 2>/dev/null) -eq 3 ]]; then
+  pass "F-035: main_branch_mode=direct in all 3 profiles"
+else
+  fail "F-035: main_branch_mode=direct not present in all 3 profiles"
+fi
+
+# AC-008: Settings validation
+if grep -q "main_branch_mode" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/settings.sh" 2>/dev/null; then
+  pass "F-035: main_branch_mode validation in settings.sh"
+else
+  fail "F-035: main_branch_mode validation missing from settings.sh"
+fi
+
+# AC-001: state-commit.sh has ephemeral branch creation
+if grep -q "state/flush-" "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" 2>/dev/null; then
+  pass "F-035: state-commit.sh has ephemeral branch (state/flush-) creation"
+else
+  fail "F-035: state-commit.sh missing ephemeral branch creation"
+fi
+
+# AC-002: state-commit.sh has gh pr create
+if grep -q "gh pr create" "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" 2>/dev/null; then
+  pass "F-035: state-commit.sh has gh pr create for protected mode"
+else
+  fail "F-035: state-commit.sh missing gh pr create"
+fi
+
+# AC-004: state-commit.sh checks gh availability
+if grep -q "command -v gh" "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" 2>/dev/null; then
+  pass "F-035: state-commit.sh checks gh CLI availability"
+else
+  fail "F-035: state-commit.sh missing gh CLI availability check"
+fi
+
+# AC-009: --auto-flush flag in state-commit.sh
+if grep -q "\-\-auto-flush" "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" 2>/dev/null; then
+  pass "F-035: state-commit.sh supports --auto-flush flag"
+else
+  fail "F-035: state-commit.sh missing --auto-flush flag"
+fi
+
+# AC-009: _try_flush callers pass --auto-flush
+if grep -q "\-\-auto-flush" "${FRAMEWORK_ROOT}/.agentic/lib/tools/todo.sh" 2>/dev/null && \
+   grep -q "\-\-auto-flush" "${FRAMEWORK_ROOT}/.agentic/lib/tools/feedback.sh" 2>/dev/null; then
+  pass "F-035: _try_flush callers (todo.sh, feedback.sh) pass --auto-flush"
+else
+  fail "F-035: _try_flush callers missing --auto-flush flag"
+fi
+
+# AC-011: Error recovery cleanup
+if grep -q "_cleanup_ephemeral" "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" 2>/dev/null; then
+  pass "F-035: state-commit.sh has _cleanup_ephemeral error recovery"
+else
+  fail "F-035: state-commit.sh missing _cleanup_ephemeral error recovery"
+fi
+
+# AC-012: Stale branch cleanup
+if grep -q "push origin --delete" "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" 2>/dev/null; then
+  pass "F-035: state-commit.sh has stale branch cleanup"
+else
+  fail "F-035: state-commit.sh missing stale branch cleanup"
+fi
+
+# AC-010: Local state reset after PR
+if grep -q 'git checkout.*BRANCH.*--\|git rm' "${FRAMEWORK_ROOT}/.agentic/lib/tools/state-commit.sh" 2>/dev/null; then
+  pass "F-035: state-commit.sh resets local state after PR creation"
+else
+  fail "F-035: state-commit.sh missing local state reset"
+fi
+
+# AC-003: done.sh runs dogfood-sync before state-commit.sh
+# Verify ordering: dogfood-sync line number < state-commit.sh line number
+_dsync_line=$(grep -n "dogfood-sync" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/done.sh" 2>/dev/null | head -1 | cut -d: -f1)
+_flush_line=$(grep -n "state-commit.sh" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/done.sh" 2>/dev/null | head -1 | cut -d: -f1)
+if [[ -n "$_dsync_line" && -n "$_flush_line" && "$_dsync_line" -lt "$_flush_line" ]]; then
+  pass "F-035: done.sh runs dogfood-sync before state-commit.sh flush"
+else
+  fail "F-035: done.sh ordering wrong — dogfood-sync must run before state-commit.sh"
+fi
+
 # Summary
 
 # ============================================================

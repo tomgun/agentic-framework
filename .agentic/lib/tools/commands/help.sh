@@ -63,7 +63,7 @@ EXAMPLES:
     ag todo "Try new library"   # Capture idea to TODO.md
     ag todo list                # Show inbox items
     ag todo done T-0001 "done"  # Resolve item
-    ag flush                    # Commit state files to main
+    ag flush                    # Commit state files to main (PR if protected)
     ag flush --dry-run          # Preview what would be flushed
     ag docs                     # Draft docs for current work
     ag docs --list              # Show doc registry
@@ -165,7 +165,7 @@ EXAMPLES:
     ag todo "Try new library"   # Capture idea to TODO.md
     ag todo list                # Show inbox items
     ag todo done T-0001 "done"  # Resolve item
-    ag flush                    # Commit state files to main
+    ag flush                    # Commit state files to main (PR if protected)
     ag flush --dry-run          # Preview what would be flushed
     ag flush --features         # Include FEATURES.md status changes
     ag commit                   # Verify ready to commit
