@@ -36,6 +36,15 @@ _No active items_
 
 
 
+
+### HN-0074: PR #212: F-033 Project-Specific Customization Layer
+- **Type**: pr_review
+- **Added**: 2026-03-28
+- **Context**: feat/F-033-project-customization-layer — 6 customization dimensions, 7 ACs pass
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0073: PR #211: F-036 Workflow Definition File
