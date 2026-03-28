@@ -77,7 +77,12 @@ Purpose: A compact, durable starting point for agents/humans working on the Agen
     - `generate-skills.sh` - Assemble Claude Skills from hand-crafted sources
     - `spec-analyze.sh` - Semantic spec analysis: ambiguity detection, AC↔test gaps, NFR measurability (advisory)
     - `coverage.py --ac-coverage` - Per-AC test coverage mapping via naming conventions
-  - User customization: `.agentic/local/extensions/` (custom skills, gates, hooks, rules — survives upgrades)
+  - User customization: `.agentic/local/` — upgrade-safe project customizations:
+    - `extensions/skills/` custom skills, `gates/` quality gates, `rules/` skill rule injection
+    - `extensions/hooks/` lifecycle hooks (before-plan, after-implement/commit/done)
+    - `extensions/done-checks/` custom feature completion checks (blocking)
+    - `extensions/policies/` declarative YAML enforcement policies (pre-commit)
+    - `conventions.md` project coding conventions, `workflow-directions.md` phase-specific instructions
 - Data flow: Framework installed → Project initialized → Agents follow guidelines → Quality gates enforced
 - External dependencies: None (pure bash/Python, no npm/pip packages)
 

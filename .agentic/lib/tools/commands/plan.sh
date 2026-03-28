@@ -111,6 +111,27 @@ cmd_plan() {
         echo ""
     fi
 
+    # 2b. Run before-plan lifecycle hook if present
+    local _hook="${ROOT_DIR}/.agentic/local/extensions/hooks/before-plan.sh"
+    if [[ -f "$_hook" ]]; then
+        echo ""
+        echo -e "${BOLD}Running before-plan hook...${NC}"
+        (set +e; timeout 10 bash "$_hook" "$feature_id" 2>&1) || echo "  ⚠️  before-plan hook failed (non-blocking)"
+        echo ""
+    fi
+
+    # Print project-specific workflow directions if available
+    local _directions_file="${ROOT_DIR}/.agentic/local/workflow-directions.md"
+    if [[ -f "$_directions_file" ]]; then
+        local _plan_directions
+        _plan_directions=$(awk '/^## Planning$/,/^## [A-Z]/' "$_directions_file" | sed '1d;$d' | grep -v '^<!--' | grep -v '^\-\->' | sed '/^$/d')
+        if [[ -n "$_plan_directions" ]]; then
+            echo -e "${BOLD}Project directions (planning):${NC}"
+            echo "$_plan_directions" | sed 's/^/  /'
+            echo ""
+        fi
+    fi
+
     # 3. Get config
     local enabled max_iterations
     enabled=$(get_plan_review_config "plan_review_enabled" "yes")

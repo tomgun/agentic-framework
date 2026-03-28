@@ -76,3 +76,7 @@ Check `STACK.md` for project-specific settings that override these defaults:
 - Language-specific linting and formatting rules
 - Additional security requirements or NFRs
 - Custom file organization patterns
+
+**Project-specific conventions**: If `.agentic/local/conventions.md` exists, it contains
+additional project-specific coding conventions that supplement and may override the defaults
+above. Always check that file for project-level rules before implementing.

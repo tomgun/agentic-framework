@@ -1,0 +1,30 @@
+id: F-036
+name: Workflow Definition File
+lifecycle: shipped
+since: v0.74.0
+profile: formal
+protection: contract
+category: architecture
+
+description: |
+  Declarative workflow.yaml defining state machine transitions, gates, and
+  review checkpoints as data instead of code. YAML loader with consistency
+  validation.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "Workflow YAML loader exists with typed dataclasses"
+    type: structural
+    verify: |
+      test -f .agentic/lib/workflow.py && grep -q "dataclass" .agentic/lib/workflow.py
+
+  - id: AC-002
+    text: "Consistency validation checks YAML against state machine"
+    type: structural
+    verify: |
+      grep -q "validate" .agentic/lib/workflow.py
+
+nfr_refs: []
+migrations: []

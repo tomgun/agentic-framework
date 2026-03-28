@@ -883,6 +883,14 @@ PYEOF
         echo -e "${BLUE}On branch '$current_branch' — run 'ag flush --features' after returning to main.${NC}"
     fi
 
+    # Run after-done lifecycle hook if present
+    local _hook="${ROOT_DIR}/.agentic/local/extensions/hooks/after-done.sh"
+    if [[ -f "$_hook" ]]; then
+        echo ""
+        echo -e "${BOLD}Running after-done hook...${NC}"
+        (set +e; timeout 10 bash "$_hook" "$feature_id" 2>&1) || echo "  ⚠️  after-done hook failed (non-blocking)"
+    fi
+
     # Clear intent — all steps complete
     if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
         intent_clear "$feature_id" || true
