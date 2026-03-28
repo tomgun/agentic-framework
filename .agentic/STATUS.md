@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Doc freshness gate scoping fix — PR ready (Updated: 2026-03-27 20:01 UTC)
+- ADR-001 roadmap execution: E2E workflow integration test (full lifecycle) (E2E workflow integration test (full lifecycle)) is current backlog item (Updated: 2026-03-28 07:49 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

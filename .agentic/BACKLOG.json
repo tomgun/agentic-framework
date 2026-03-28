@@ -1,18 +1,11 @@
 [
   {
     "type": "task",
-    "description": "Doc freshness gate scoping fix \u2014 scope to docs whose tracked files overlap with the feature's manifest",
-    "added_at": "2026-03-26T00:00:00Z",
-    "added_by": "agent",
-    "notes": "Promoted from T-0093. Active bug: ag done flags ALL feature_done docs regardless of relevance, forces fake reviewed markers. Improvement to F-012 (Documentation Drift & Lifecycle)",
-    "became_current_at": "2026-03-27T18:45:52Z"
-  },
-  {
-    "type": "task",
     "description": "E2E workflow integration test (full lifecycle)",
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
-    "notes": "Originally F-0227. Improvement to DEV-002 (Testing Infrastructure)"
+    "notes": "Originally F-0227. Improvement to DEV-002 (Testing Infrastructure)",
+    "became_current_at": "2026-03-28T07:49:46Z"
   },
   {
     "type": "feature",
