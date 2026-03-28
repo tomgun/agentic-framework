@@ -343,6 +343,12 @@ class WorkflowDefinition:
 
         # Direction 2: every v2 forward transition should have at least one v1 match
         v2_states = set(self.workflow.states)
+        # Precompute v1 forward transition strings once (avoid O(n²) rebuild)
+        v1_forward_strs: set[tuple[str, str]] = {
+            (a.value if hasattr(a, "value") else str(a),
+             b.value if hasattr(b, "value") else str(b))
+            for a, b in v1_forward
+        }
         for from_v2, to_v2 in yaml_forward:
             if from_v2 not in v2_states:
                 errors.append(
@@ -359,12 +365,7 @@ class WorkflowDefinition:
                 # v2 states with no v1 equivalent (e.g., idea, queued) — expected
                 continue
             has_v1_match = any(
-                (f, t) in {
-                    (a, b)
-                    for a_enum, b_enum in v1_forward
-                    for a in [a_enum.value if hasattr(a_enum, "value") else str(a_enum)]
-                    for b in [b_enum.value if hasattr(b_enum, "value") else str(b_enum)]
-                }
+                (f, t) in v1_forward_strs
                 for f in from_v1_set
                 for t in to_v1_set
             )
