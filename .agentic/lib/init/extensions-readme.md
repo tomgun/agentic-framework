@@ -46,11 +46,12 @@ Use `## Project-Specific Rules` heading — content is appended to matching skil
 Bash scripts executed at specific `ag` command lifecycle points. Hooks are non-blocking —
 if a hook fails, a warning is printed but the command continues.
 
-| Hook file | Runs after | Arguments |
-|-----------|-----------|-----------|
-| `after-implement.sh` | `ag implement` completes | `$1` = feature_id |
-| `after-commit.sh` | `ag commit` succeeds | (none) |
-| `after-done.sh` | `ag done` completes | `$1` = feature_id |
+| Hook file | Runs | Arguments |
+|-----------|------|-----------|
+| `before-plan.sh` | Before `ag plan` emits instructions | `$1` = feature_id |
+| `after-implement.sh` | After `ag implement` completes | `$1` = feature_id |
+| `after-commit.sh` | After `ag commit` succeeds | (none) |
+| `after-done.sh` | After `ag done` completes | `$1` = feature_id |
 
 Hooks have a 10-second timeout. Example: `hooks/after-implement.sh`
 ```bash

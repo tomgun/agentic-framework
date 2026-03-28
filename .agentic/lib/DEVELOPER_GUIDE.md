@@ -1710,19 +1710,33 @@ Created automatically by `scaffold.sh`. Structure:
 
 ```
 .agentic/local/
+├── conventions.md          # Project-specific coding conventions
+├── workflow-directions.md  # Custom instructions per workflow phase
 └── extensions/
-    ├── README.md      # Explains extension points and formats
-    ├── skills/        # Custom Claude Code skills (same SKILL.md format)
-    ├── gates/         # Custom quality gates (bash, exit 1 = block commit)
-    ├── hooks/         # Lifecycle hooks (future: after-implement, after-commit)
-    └── rules/         # Rule injection into framework skills
+    ├── README.md           # Explains extension points and formats
+    ├── skills/             # Custom Claude Code skills (same SKILL.md format)
+    ├── gates/              # Custom quality gates (bash, exit 1 = block commit)
+    ├── hooks/              # Lifecycle hooks (before-plan, after-implement, after-commit, after-done)
+    ├── rules/              # Rule injection into framework skills
+    ├── done-checks/        # Custom feature completion checks (blocking)
+    └── policies/           # Declarative YAML enforcement policies
 ```
 
 **Custom skills**: Place a skill folder in `extensions/skills/my-skill/SKILL.md` using the same frontmatter format as framework skills. Run `bash .agentic/lib/tools/generate-skills.sh` to pick them up.
 
-**Custom gates**: Place `.sh` scripts in `extensions/gates/`. They run during pre-commit — exit 0 to pass, exit 1 to block.
+**Custom gates**: Place `.sh` scripts in `extensions/gates/`. They run during pre-commit (Check 17) — exit 0 to pass, exit 1 to block.
 
 **Custom rules**: Place rule files in `extensions/rules/`. Content from `## Project-Specific Rules` sections is injected into matching framework skills during generation.
+
+**Custom lifecycle hooks**: Place scripts in `extensions/hooks/`. Supported: `before-plan.sh`, `after-implement.sh`, `after-commit.sh`, `after-done.sh`. Non-blocking with 10s timeout.
+
+**Custom done-checks**: Place `NNN-description.sh` scripts in `extensions/done-checks/`. Run during `ag done` — blocking, with 3s timeout. Receive feature ID as `$1`.
+
+**Custom enforcement policies**: Place YAML files in `extensions/policies/` with `name`, `check`, `severity` (blocking/warning), `message` fields. Evaluated during pre-commit (Check 18).
+
+**Project conventions**: Edit `.agentic/local/conventions.md` to add project-specific coding standards that supplement the framework defaults.
+
+**Workflow directions**: Edit `.agentic/local/workflow-directions.md` to inject instructions at specific phases (Planning, Implementation, Verification, Review).
 
 See `.agentic/local/extensions/README.md` for detailed examples.
 

@@ -1056,7 +1056,7 @@ fi
 # Check 18: Custom enforcement policies from .agentic/local/extensions/policies/
 EXT_POLICIES_DIR="${PROJECT_ROOT}/.agentic/local/extensions/policies"
 if [[ -d "$EXT_POLICIES_DIR" ]]; then
-  POLICY_FILES=$(find "$EXT_POLICIES_DIR" -name '*.yaml' -o -name '*.yml' -type f 2>/dev/null | sort)
+  POLICY_FILES=$(find "$EXT_POLICIES_DIR" \( -name '*.yaml' -o -name '*.yml' \) -type f 2>/dev/null | sort)
   if [[ -n "$POLICY_FILES" ]]; then
     echo ""
     echo "[18] Evaluating custom enforcement policies..."
@@ -1076,7 +1076,7 @@ if [[ -d "$EXT_POLICIES_DIR" ]]; then
       fi
 
       # Execute the check command with a 3-second timeout
-      policy_output=$(timeout 3 bash -c "$p_check" 2>&1) || true
+      policy_output=$(timeout 3 bash -c "$p_check" 2>&1)
       policy_exit=$?
 
       if [[ $policy_exit -eq 0 ]]; then

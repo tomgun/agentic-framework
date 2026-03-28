@@ -189,7 +189,7 @@ if [[ -d "$DONE_CHECKS_DIR" ]]; then
       [[ -f "$check_script" ]] || continue
       check_name=$(basename "$check_script")
       # Timeout each custom script at 3 seconds
-      check_output=$(timeout 3 bash "$check_script" "$FEATURE_ID" 2>&1) || true
+      check_output=$(timeout 3 bash "$check_script" "$FEATURE_ID" 2>&1)
       check_exit=$?
       if [[ $check_exit -eq 0 ]]; then
         echo "  ✓ $check_name passed"
