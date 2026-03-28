@@ -28,6 +28,8 @@ Update documentation in the same commit when your changes:
 - Modify error messages or user-facing output
 
 See `conventions.md` in the project root for code quality standards.
+If `.agentic/local/conventions.md` exists, also read it for project-specific conventions.
+If `.agentic/local/workflow-directions.md` exists, read the `## Implementation` section for project-specific directions.
 
 ## What NOT to do
 

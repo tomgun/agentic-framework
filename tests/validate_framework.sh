@@ -5331,6 +5331,67 @@ else
   fail ".agentic/lib/VERSION not in state-commit.sh allowlist"
 fi
 
+# ============================================================
+# F-033: Project-Specific Customization Layer
+# ============================================================
+echo "--- F-033: Project-Specific Customization Layer ---"
+
+# AC-001: conventions-local template exists and scaffold references it
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/init/conventions-local.template.md" ]] && \
+   grep -q "conventions-local" "${FRAMEWORK_ROOT}/.agentic/lib/init/scaffold.sh"; then
+  pass "F-033 AC-001: conventions-local template exists and scaffold creates it"
+else
+  fail "F-033 AC-001: conventions-local template or scaffold integration missing"
+fi
+
+# AC-002: conventions.md references local/conventions.md
+if grep -q "local/conventions" "${FRAMEWORK_ROOT}/.agentic/conventions.md"; then
+  pass "F-033 AC-002: conventions.md references local/conventions.md"
+else
+  fail "F-033 AC-002: conventions.md missing local/conventions.md reference"
+fi
+
+# AC-003: done-checks directory scaffolded and feature-complete.sh executes them
+if grep -q "done-checks" "${FRAMEWORK_ROOT}/.agentic/lib/init/scaffold.sh" && \
+   grep -q "done-checks" "${FRAMEWORK_ROOT}/.agentic/lib/hooks/feature-complete.sh"; then
+  pass "F-033 AC-003: custom done-checks scaffolded and integrated in feature-complete.sh"
+else
+  fail "F-033 AC-003: done-checks scaffold or feature-complete.sh integration missing"
+fi
+
+# AC-004: lifecycle hooks wired in operations commands
+if grep -q "extensions/hooks" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/implement.sh" || \
+   grep -q "extensions/hooks" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/done.sh" || \
+   grep -q "extensions/hooks" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/commit.sh"; then
+  pass "F-033 AC-004: lifecycle hooks wired in ag commands"
+else
+  fail "F-033 AC-004: lifecycle hooks not found in operations commands"
+fi
+
+# AC-005: workflow-directions template exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/init/workflow-directions.template.md" ]]; then
+  pass "F-033 AC-005: workflow-directions template exists"
+else
+  fail "F-033 AC-005: workflow-directions template missing"
+fi
+
+# AC-006: policies directory scaffolded and pre-commit-check.sh evaluates them
+if grep -q "policies" "${FRAMEWORK_ROOT}/.agentic/lib/init/scaffold.sh" && \
+   grep -q "policies" "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commit-check.sh"; then
+  pass "F-033 AC-006: custom policies scaffolded and integrated in pre-commit-check.sh"
+else
+  fail "F-033 AC-006: policies scaffold or pre-commit-check.sh integration missing"
+fi
+
+# AC-007: extensions-readme documents all new extension points
+if grep -q "done-checks" "${FRAMEWORK_ROOT}/.agentic/lib/init/extensions-readme.md" && \
+   grep -q "policies" "${FRAMEWORK_ROOT}/.agentic/lib/init/extensions-readme.md" && \
+   grep -q "workflow-directions" "${FRAMEWORK_ROOT}/.agentic/lib/init/extensions-readme.md"; then
+  pass "F-033 AC-007: extensions-readme documents all extension points"
+else
+  fail "F-033 AC-007: extensions-readme missing documentation for new extension points"
+fi
+
 # Summary
 
 # ============================================================

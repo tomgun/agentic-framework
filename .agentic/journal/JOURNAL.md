@@ -4734,3 +4734,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-28 20:21 - F-033 Implementation
+
+**Why**: Projects need upgrade-safe customization beyond STACK.md settings
+
+**What changed**:
+- All 6 phases: custom conventions, done-checks, lifecycle hooks, workflow directions, enforcement policies, docs+validation. 7 contract assertions pass. 2 new files, 10 modified, +260 lines.
+
+**Next steps**:
+- PR review, then ag done F-033
+
+**Blockers**: None
+

@@ -1,0 +1,72 @@
+id: F-033
+name: Project-Specific Customization Layer
+lifecycle: planned
+profile: both
+protection: contract
+category: developer-experience
+depends_on: [F-028]
+
+description: |
+  Structured project-specific customization files in .agentic/local/ that allow
+  projects to define custom coding conventions, Definition of Done checks,
+  lifecycle hooks, workflow phase directions, and enforcement policies beyond
+  what STACK.md settings can express. Consumed by framework scripts at defined
+  integration points.
+
+  Boundary with F-028: F-028 delivered the extension mechanism (upgrade-safe
+  directories, custom skills/gates/rules). F-033 delivers the policy layer:
+  project conventions, DoD customization, workflow directions, declarative
+  enforcement policies, and wiring up F-028's scaffolded-but-inert hooks.
+
+  Boundary with F-034: F-033 = manual integration. F-034 = auto-sync engine
+  that detects customization changes and regenerates framework artifacts.
+
+user_input: ""
+
+assertions:
+  - id: AC-001
+    text: "conventions-local template exists and scaffold creates it"
+    type: structural
+    verify: |
+      test -f .agentic/lib/init/conventions-local.template.md && grep -q "conventions-local" .agentic/lib/init/scaffold.sh
+    tests:
+      - tests/validate_framework.sh::F-033
+
+  - id: AC-002
+    text: "conventions.md references local/conventions.md for project-specific overrides"
+    type: structural
+    verify: |
+      grep -q "local/conventions" .agentic/conventions.md
+
+  - id: AC-003
+    text: "Custom done-checks directory scaffolded and feature-complete.sh executes scripts from it"
+    type: structural
+    verify: |
+      grep -q "done-checks" .agentic/lib/init/scaffold.sh && grep -q "done-checks" .agentic/lib/hooks/feature-complete.sh
+
+  - id: AC-004
+    text: "Lifecycle hooks wired: operations commands execute scripts from extensions/hooks/"
+    type: structural
+    verify: |
+      grep -q "extensions/hooks" .agentic/lib/tools/commands/implement.sh || grep -q "extensions/hooks" .agentic/lib/tools/commands/done.sh || grep -q "extensions/hooks" .agentic/lib/tools/commands/commit.sh
+
+  - id: AC-005
+    text: "workflow-directions template exists and ag commands print project directions"
+    type: structural
+    verify: |
+      test -f .agentic/lib/init/workflow-directions.template.md
+
+  - id: AC-006
+    text: "Custom enforcement policies directory scaffolded and pre-commit-check.sh evaluates YAML policies"
+    type: structural
+    verify: |
+      grep -q "policies" .agentic/lib/init/scaffold.sh && grep -q "policies" .agentic/lib/hooks/pre-commit-check.sh
+
+  - id: AC-007
+    text: "extensions-readme.md documents all extension points including new ones"
+    type: structural
+    verify: |
+      grep -q "done-checks" .agentic/lib/init/extensions-readme.md && grep -q "policies" .agentic/lib/init/extensions-readme.md && grep -q "workflow-directions" .agentic/lib/init/extensions-readme.md
+
+nfr_refs: []
+migrations: []

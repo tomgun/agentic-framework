@@ -98,6 +98,14 @@ cmd_commit() {
             else
                 echo -e "${BOLD}Guidance:${NC} Run \`ag check\` for pre-commit guidance"
             fi
+
+            # Run after-commit lifecycle hook if present
+            local _hook="${ROOT_DIR}/.agentic/local/extensions/hooks/after-commit.sh"
+            if [[ -f "$_hook" ]]; then
+                echo ""
+                echo -e "${BOLD}Running after-commit hook...${NC}"
+                (set +e; timeout 10 bash "$_hook" 2>&1) || echo "  ⚠️  after-commit hook failed (non-blocking)"
+            fi
         else
             echo ""
             echo -e "${RED}Pre-commit gates FAILED - fix issues above${NC}"

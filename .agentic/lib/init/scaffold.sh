@@ -225,8 +225,17 @@ if [[ ! -d "${ROOT_DIR}/.agentic/local/extensions" ]]; then
   mkdir -p "${ROOT_DIR}/.agentic/local/extensions/gates"
   mkdir -p "${ROOT_DIR}/.agentic/local/extensions/hooks"
   mkdir -p "${ROOT_DIR}/.agentic/local/extensions/rules"
+  mkdir -p "${ROOT_DIR}/.agentic/local/extensions/done-checks"
+  mkdir -p "${ROOT_DIR}/.agentic/local/extensions/policies"
   if [[ -f "${ROOT_DIR}/.agentic/lib/init/extensions-readme.md" ]]; then
     cp "${ROOT_DIR}/.agentic/lib/init/extensions-readme.md" "${ROOT_DIR}/.agentic/local/extensions/README.md"
+  fi
+  # Copy customization templates if they don't exist yet
+  if [[ ! -f "${ROOT_DIR}/.agentic/local/conventions.md" && -f "${ROOT_DIR}/.agentic/lib/init/conventions-local.template.md" ]]; then
+    cp "${ROOT_DIR}/.agentic/lib/init/conventions-local.template.md" "${ROOT_DIR}/.agentic/local/conventions.md"
+  fi
+  if [[ ! -f "${ROOT_DIR}/.agentic/local/workflow-directions.md" && -f "${ROOT_DIR}/.agentic/lib/init/workflow-directions.template.md" ]]; then
+    cp "${ROOT_DIR}/.agentic/lib/init/workflow-directions.template.md" "${ROOT_DIR}/.agentic/local/workflow-directions.md"
   fi
   echo "NEW : .agentic/local/extensions/ (project-specific customizations)"
 else

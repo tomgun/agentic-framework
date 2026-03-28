@@ -1053,6 +1053,51 @@ if [[ -d "$EXT_GATES_DIR" ]]; then
   fi
 fi
 
+# Check 18: Custom enforcement policies from .agentic/local/extensions/policies/
+EXT_POLICIES_DIR="${PROJECT_ROOT}/.agentic/local/extensions/policies"
+if [[ -d "$EXT_POLICIES_DIR" ]]; then
+  POLICY_FILES=$(find "$EXT_POLICIES_DIR" -name '*.yaml' -o -name '*.yml' -type f 2>/dev/null | sort)
+  if [[ -n "$POLICY_FILES" ]]; then
+    echo ""
+    echo "[18] Evaluating custom enforcement policies..."
+    while IFS= read -r policy_file; do
+      [[ -f "$policy_file" ]] || continue
+      policy_name=$(basename "$policy_file")
+      # Parse YAML fields (lightweight — no external deps)
+      p_name=$(grep '^name:' "$policy_file" 2>/dev/null | head -1 | sed 's/^name:[[:space:]]*//' | sed 's/^"//' | sed 's/"$//')
+      p_check=$(grep '^check:' "$policy_file" 2>/dev/null | head -1 | sed 's/^check:[[:space:]]*//' | sed 's/^"//' | sed 's/"$//')
+      p_severity=$(grep '^severity:' "$policy_file" 2>/dev/null | head -1 | sed 's/^severity:[[:space:]]*//' | sed 's/^"//' | sed 's/"$//')
+      p_message=$(grep '^message:' "$policy_file" 2>/dev/null | head -1 | sed 's/^message:[[:space:]]*//' | sed 's/^"//' | sed 's/"$//')
+      p_display="${p_name:-$policy_name}"
+
+      if [[ -z "$p_check" ]]; then
+        echo "  ⚠️  $p_display: no 'check' field — skipping"
+        continue
+      fi
+
+      # Execute the check command with a 3-second timeout
+      policy_output=$(timeout 3 bash -c "$p_check" 2>&1) || true
+      policy_exit=$?
+
+      if [[ $policy_exit -eq 0 ]]; then
+        echo "  ✓ $p_display"
+      elif [[ $policy_exit -eq 124 ]]; then
+        echo "  ⚠️  $p_display: timed out (3s limit) — skipping"
+      else
+        if [[ "$p_severity" == "blocking" ]]; then
+          echo "  ❌ BLOCKED: $p_display"
+          [[ -n "$p_message" ]] && echo "     $p_message"
+          [[ -n "$policy_output" ]] && echo "$policy_output" | head -5 | sed 's/^/     /'
+          FAILURES=$((FAILURES + 1))
+        else
+          echo "  ⚠️  $p_display (warning)"
+          [[ -n "$p_message" ]] && echo "     $p_message"
+        fi
+      fi
+    done <<< "$POLICY_FILES"
+  fi
+fi
+
 # Check 19: Doc registry health (respects docs_gate: off/warning/blocking)
 if [[ $_FAST_MODE -eq 0 ]]; then
   DOCS_GATE=$(get_setting "docs_gate" "off" 2>/dev/null || echo "off")

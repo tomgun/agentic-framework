@@ -178,6 +178,32 @@ if [[ "$TEST_STATE" != "complete" ]]; then
   echo "   Update: bash .agentic/lib/tools/feature.sh ${FEATURE_ID} tests complete"
 fi
 
+# Check 7: Custom done-checks from .agentic/local/extensions/done-checks/
+DONE_CHECKS_DIR="${ROOT_DIR}/.agentic/local/extensions/done-checks"
+if [[ -d "$DONE_CHECKS_DIR" ]]; then
+  DONE_CHECK_FILES=$(find "$DONE_CHECKS_DIR" -name '*.sh' -type f 2>/dev/null | sort)
+  if [[ -n "$DONE_CHECK_FILES" ]]; then
+    echo ""
+    echo "[7] Running custom done-checks..."
+    while IFS= read -r check_script; do
+      [[ -f "$check_script" ]] || continue
+      check_name=$(basename "$check_script")
+      # Timeout each custom script at 3 seconds
+      check_output=$(timeout 3 bash "$check_script" "$FEATURE_ID" 2>&1) || true
+      check_exit=$?
+      if [[ $check_exit -eq 0 ]]; then
+        echo "  ✓ $check_name passed"
+      elif [[ $check_exit -eq 124 ]]; then
+        echo "  ⚠️  $check_name timed out (3s limit) — skipping"
+      else
+        echo "  ❌ FAILED: $check_name"
+        echo "$check_output" | sed 's/^/    /'
+        FAILURES=$((FAILURES + 1))
+      fi
+    done <<< "$DONE_CHECK_FILES"
+  fi
+fi
+
 # Summary
 echo ""
 echo "═══════════════════════════════════════════════════════"

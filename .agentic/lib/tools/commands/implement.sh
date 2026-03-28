@@ -423,6 +423,18 @@ if c.has_pending_input:
         fi
     fi
 
+    # Print project-specific workflow directions if available
+    local _directions_file="${ROOT_DIR}/.agentic/local/workflow-directions.md"
+    if [[ -f "$_directions_file" ]]; then
+        local _impl_directions
+        _impl_directions=$(awk '/^## Implementation$/,/^## [A-Z]/' "$_directions_file" | sed '1d;$d' | grep -v '^<!--' | grep -v '^\-\->' | sed '/^$/d')
+        if [[ -n "$_impl_directions" ]]; then
+            echo ""
+            echo -e "${BOLD}Project directions (implementation):${NC}"
+            echo "$_impl_directions" | sed 's/^/  /'
+        fi
+    fi
+
     echo ""
     echo -e "${GREEN}Ready to implement ${feature_id}${NC}"
     echo "Remember: Update FEATURES.md status to 'in_progress'"
@@ -433,5 +445,13 @@ if c.has_pending_input:
         echo "  Checklist: .agentic/lib/checklists/feature_implementation.md"
     else
         echo "  Guidance: See role prompts in .agentic/prompts/ or run \`ag check\`"
+    fi
+
+    # Run after-implement lifecycle hook if present
+    local _hook="${ROOT_DIR}/.agentic/local/extensions/hooks/after-implement.sh"
+    if [[ -f "$_hook" ]]; then
+        echo ""
+        echo -e "${BOLD}Running after-implement hook...${NC}"
+        (set +e; timeout 10 bash "$_hook" "$feature_id" 2>&1) || echo "  ⚠️  after-implement hook failed (non-blocking)"
     fi
 }
