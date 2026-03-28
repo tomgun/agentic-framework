@@ -1,6 +1,6 @@
 id: F-033
 name: Project-Specific Customization Layer
-lifecycle: planned
+lifecycle: in-progress
 profile: both
 protection: contract
 category: developer-experience
@@ -18,8 +18,10 @@ description: |
   project conventions, DoD customization, workflow directions, declarative
   enforcement policies, and wiring up F-028's scaffolded-but-inert hooks.
 
-  Boundary with F-034: F-033 = manual integration. F-034 = auto-sync engine
-  that detects customization changes and regenerates framework artifacts.
+  Auto-sync scope (formerly F-034): upgrade.sh detects whether local files
+  are unmodified templates or user-customized, replaces unmodified ones with
+  updated templates, and preserves customized files (writing .new for review).
+  Also ensures new extension subdirectories are created for existing projects.
 
 user_input: ""
 
@@ -67,6 +69,24 @@ assertions:
     type: structural
     verify: |
       grep -q "done-checks" .agentic/lib/init/extensions-readme.md && grep -q "policies" .agentic/lib/init/extensions-readme.md && grep -q "workflow-directions" .agentic/lib/init/extensions-readme.md
+
+  - id: AC-008
+    text: "upgrade.sh contains local customization sync step that detects template-derived files"
+    type: structural
+    verify: |
+      grep -q "Syncing local customizations" .agentic/lib/tools/upgrade.sh && grep -q "LOCAL_SYNC_MAP" .agentic/lib/tools/upgrade.sh
+
+  - id: AC-009
+    text: "upgrade.sh creates missing extension subdirectories during upgrade"
+    type: structural
+    verify: |
+      grep -q "mkdir.*extensions/" .agentic/lib/tools/upgrade.sh
+
+  - id: AC-010
+    text: "upgrade.sh preserves customized local files and writes .new for review"
+    type: structural
+    verify: |
+      grep -q "\.new" .agentic/lib/tools/upgrade.sh && grep -q "customized" .agentic/lib/tools/upgrade.sh
 
 nfr_refs: []
 migrations: []

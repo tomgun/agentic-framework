@@ -366,17 +366,9 @@ YAML contracts replace markdown acceptance criteria as source of truth. Machine-
 
 ## F-033: Project-Specific Customization Layer
 
-**Status**: shipped | **Category**: developer-experience | **Profile**: both
+**Status**: in-progress | **Category**: developer-experience | **Profile**: both
 
-Allow projects to define custom workflow steps, validation rules, and enforcement policies beyond STACK.md settings.
-
----
-
-## F-034: Project Customization Auto-Sync
-
-**Status**: planned | **Category**: developer-experience | **Profile**: both
-
-Automatically sync project-specific customizations when framework upgrades, preserving user overrides.
+Allow projects to define custom workflow steps, validation rules, and enforcement policies beyond STACK.md settings. Includes auto-sync engine that preserves user overrides during framework upgrades.
 
 ---
 
