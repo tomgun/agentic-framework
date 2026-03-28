@@ -36,15 +36,11 @@ _No active items_
 
 
 
-### HN-0073: PR #211: F-036 Workflow Definition File
-- **Type**: pr_review
-- **Added**: 2026-03-28
-- **Context**: feat(F-036): workflow definition YAML loader and consistency validation — https://github.com/tomgun/agentic-framework/pull/211
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
-
 ## Resolved
+
+### HN-0073: PR #211: F-036 Workflow Definition File
+- **Resolved**: 2026-03-28
+- **Outcome**: PR #211 merged
 
 ### HN-0072: PR #210: E2E lifecycle test
 - **Resolved**: 2026-03-28

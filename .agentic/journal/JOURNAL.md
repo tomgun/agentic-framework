@@ -4721,3 +4721,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-28 18:26 - F-036 shipped
+
+**Why**: Transformed dead config into validated source of truth for modes, profiles, artifacts
+
+**What changed**:
+- Workflow definition YAML loader and consistency validation merged. state_machine_af.yaml now loadable as typed Python objects with CI-enforced consistency.
+
+**Next steps**:
+- F-033 Project-Specific Customization Layer
+
+**Blockers**: None
+

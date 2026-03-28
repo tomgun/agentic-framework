@@ -1,18 +1,11 @@
 [
   {
     "type": "feature",
-    "id": "F-036",
-    "description": "Workflow Definition File",
-    "added_at": "2026-03-16T18:56:15Z",
-    "added_by": "agent",
-    "became_current_at": "2026-03-28T13:57:29Z"
-  },
-  {
-    "type": "feature",
     "id": "F-033",
     "description": "Project-Specific Customization Layer",
     "added_at": "2026-03-16T18:56:15Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "became_current_at": "2026-03-28T18:26:24Z"
   },
   {
     "type": "feature",

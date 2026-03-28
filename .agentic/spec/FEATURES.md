@@ -390,7 +390,7 @@ Support workflows where main branch is protected (no direct push). Adapt commit,
 
 ## F-036: Workflow Definition File
 
-**Status**: planned | **Category**: architecture | **Profile**: formal
+**Status**: shipped | **Category**: architecture | **Profile**: formal
 
 Declarative workflow.yaml defining state machine transitions, gates, and review checkpoints as data instead of code.
 

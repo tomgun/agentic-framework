@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-036 Workflow Definition File: implementation complete, ready for commit/PR (Updated: 2026-03-28 14:50 UTC)
+- F-036 shipped. Next: F-033 Project-Specific Customization Layer (Updated: 2026-03-28 18:26 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
