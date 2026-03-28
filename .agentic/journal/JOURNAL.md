@@ -4695,3 +4695,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-28 08:13 - E2E lifecycle test
+
+**Why**: No integrated test existed for the full ag CLI lifecycle — regression risk on framework changes
+
+**What changed**:
+- S12_e2e_lifecycle.sh: 23 assertions covering scaffold→implement→commit→done lifecycle; added AC-004 to DEV-002 contract
+
+**Next steps**:
+- Mark backlog task done, commit
+
+**Blockers**: None
+
