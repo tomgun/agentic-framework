@@ -423,7 +423,11 @@ cmd_done() {
             fi
         else
             echo -e "${BOLD}=== Doc Freshness Check ===${NC}"
-            bash "$SCRIPT_DIR/docs.sh" --check-freshness --trigger feature_done 2>/dev/null || docs_freshness_exit=$?
+            if [ -n "$feature_id" ]; then
+                bash "$SCRIPT_DIR/docs.sh" --check-freshness --trigger feature_done --manifest "$feature_id" 2>/dev/null || docs_freshness_exit=$?
+            else
+                bash "$SCRIPT_DIR/docs.sh" --check-freshness --trigger feature_done 2>/dev/null || docs_freshness_exit=$?
+            fi
             echo ""
         fi
     fi

@@ -148,7 +148,9 @@ done
 
 # ─── Parse registry from STACK.md ## Docs ──────────────────────────
 
-# Returns lines of: path|type|trigger (whitespace-trimmed)
+# Returns lines of: path|type|trigger|tracks (whitespace-trimmed)
+# tracks is an optional 4th field: comma-separated path prefixes the doc covers.
+# When present, freshness checks scope to features whose manifest overlaps these paths.
 parse_registry() {
     if [[ ! -f "$STACK_FILE" ]]; then
         return
@@ -165,16 +167,17 @@ parse_registry() {
         if $in_docs_section && [[ "$line" =~ ^##[[:space:]] ]]; then
             break
         fi
-        # Parse doc entries: - doc: <path> | <type> | <trigger>
+        # Parse doc entries: - doc: <path> | <type> | <trigger> [| <tracks>]
         if $in_docs_section && [[ "$line" =~ ^-[[:space:]]*doc:[[:space:]]* ]]; then
             # Strip "- doc: " prefix, then split on |
             local entry="${line#*doc:}"
-            local path type trigger
+            local path type trigger tracks
             path=$(echo "$entry" | awk -F'|' '{gsub(/^[[:space:]]+|[[:space:]]+$/,"",$1); print $1}')
             type=$(echo "$entry" | awk -F'|' '{gsub(/^[[:space:]]+|[[:space:]]+$/,"",$2); print $2}')
             trigger=$(echo "$entry" | awk -F'|' '{gsub(/^[[:space:]]+|[[:space:]]+$/,"",$3); print $3}')
+            tracks=$(echo "$entry" | awk -F'|' '{gsub(/^[[:space:]]+|[[:space:]]+$/,"",$4); print $4}')
             if [[ -n "$path" && -n "$type" && -n "$trigger" ]]; then
-                echo "${path}|${type}|${trigger}"
+                echo "${path}|${type}|${trigger}|${tracks}"
             fi
         fi
     done < "$STACK_FILE"
@@ -190,7 +193,7 @@ check_registered_exist() {
     [[ -z "$entries" ]] && return 0
 
     local issues=0
-    while IFS='|' read -r path type trigger; do
+    while IFS='|' read -r path type trigger _tracks; do
         local full_path="$ROOT_DIR/$path"
         if [[ -d "$full_path" ]]; then
             # Directory entry (e.g., docs/adr/) — exists, fine
@@ -215,7 +218,7 @@ find_unregistered() {
     # Build set of registered paths (normalized, no leading ./)
     local -A registered_paths
     if [[ -n "$entries" ]]; then
-        while IFS='|' read -r path type trigger; do
+        while IFS='|' read -r path type trigger _tracks; do
             registered_paths["$path"]=1
             # If directory entry, mark it so we skip files inside
             if [[ "$path" == */ ]]; then
@@ -418,7 +421,7 @@ create_doc() {
     local entries
     entries=$(parse_registry)
     if [[ -n "$entries" ]]; then
-        while IFS='|' read -r path type trigger; do
+        while IFS='|' read -r path type trigger _tracks; do
             if [[ "$path" == "$doc_path" ]]; then
                 echo -e "${YELLOW}Already registered: ${doc_path} (type: ${type}, trigger: ${trigger})${NC}"
                 return 0
@@ -506,7 +509,7 @@ show_coverage() {
     # Collect types and their docs
     local -A type_docs
     local -A type_counts
-    while IFS='|' read -r path type trigger; do
+    while IFS='|' read -r path type trigger _tracks; do
         type_counts["$type"]=$(( ${type_counts["$type"]:-0} + 1 ))
         if [[ -n "${type_docs[$type]:-}" ]]; then
             type_docs["$type"]="${type_docs[$type]}"$'\n'"    ${path}"
@@ -642,7 +645,7 @@ check_staleness() {
     local now
     now=$(date +%s)
 
-    while IFS='|' read -r path type trigger; do
+    while IFS='|' read -r path type trigger _tracks; do
         local full_path="$ROOT_DIR/$path"
         if [[ -f "$full_path" ]]; then
             local mod_time
@@ -696,13 +699,27 @@ detect_base_branch() {
 
 # Check freshness of registered docs.
 # Returns 0 if all fresh, 1 if any stale. Prints stale list to stdout.
-# Usage: check_freshness [trigger_filter]
+# Usage: check_freshness [trigger_filter] [manifest_id]
 #   trigger_filter: only check docs with this trigger (default: feature_done)
+#   manifest_id: feature ID (e.g. F-035) — when provided with tracks field,
+#                only docs whose tracked paths overlap the manifest are checked
 check_freshness() {
     local trigger_filter="${1:-feature_done}"
+    local manifest_id="${2:-}"
     local entries
     entries=$(parse_registry)
     [[ -z "$entries" ]] && return 0
+
+    # Load manifest files if available (all categories: code, tests, docs, config)
+    local manifest_files=""
+    if [[ -n "$manifest_id" ]]; then
+        local manifest_path="$ROOT_DIR/.agentic/journal/manifests/${manifest_id}.json"
+        if [[ -f "$manifest_path" ]]; then
+            # Extract "file" values from manifest JSON using grep+sed (no python/jq dependency)
+            manifest_files=$(grep -o '"file"[[:space:]]*:[[:space:]]*"[^"]*"' "$manifest_path" \
+                | sed 's/"file"[[:space:]]*:[[:space:]]*"//;s/"$//' || true)
+        fi
+    fi
 
     local base_branch
     base_branch=$(detect_base_branch)
@@ -723,8 +740,9 @@ check_freshness() {
     recent_files=$(git -C "$ROOT_DIR" log -5 --diff-filter=AMCR --name-only --pretty=format: HEAD 2>/dev/null | sort -u || true)
 
     local stale_count=0
+    local skipped_count=0
 
-    while IFS='|' read -r path type trigger; do
+    while IFS='|' read -r path type trigger tracks; do
         # Filter by trigger
         [[ "$trigger" != "$trigger_filter" ]] && continue
 
@@ -735,11 +753,34 @@ check_freshness() {
             continue
         fi
 
+        # Scope filtering: if manifest provided AND doc has tracks, skip docs
+        # whose tracked paths don't overlap with the feature's changed files.
+        # tracks is a comma-separated list of path prefixes (e.g. ".agentic/lib/,src/api/")
+        if [[ -n "$manifest_files" && -n "$tracks" ]]; then
+            local has_overlap=false
+            # Split tracks on comma
+            IFS=',' read -ra track_prefixes <<< "$tracks"
+            for prefix in "${track_prefixes[@]}"; do
+                # Trim whitespace (parameter expansion, no subprocess)
+                prefix="${prefix#"${prefix%%[![:space:]]*}"}"
+                prefix="${prefix%"${prefix##*[![:space:]]}"}"
+                [[ -z "$prefix" ]] && continue
+                # Check if any manifest file starts with this prefix (literal match, not regex)
+                if echo "$manifest_files" | grep -qF "$prefix"; then
+                    has_overlap=true
+                    break
+                fi
+            done
+            if [[ "$has_overlap" == "false" ]]; then
+                skipped_count=$((skipped_count + 1))
+                continue
+            fi
+        fi
+
         # File doesn't exist → STALE
         if [[ ! -f "$full_path" ]]; then
             echo -e "${RED}✗ stale (missing): ${path}${NC}"
             stale_count=$((stale_count + 1))
-
             continue
         fi
 
@@ -756,15 +797,21 @@ check_freshness() {
         # Otherwise → STALE
         echo -e "${YELLOW}✗ stale: ${path}${NC}"
         stale_count=$((stale_count + 1))
-        stale_list="${stale_list}${path}\n"
     done <<< "$entries"
 
     if [[ "$stale_count" -eq 0 ]]; then
-        echo -e "${GREEN}All ${trigger_filter} docs are fresh${NC}"
+        local msg="All ${trigger_filter} docs are fresh"
+        if [[ "$skipped_count" -gt 0 ]]; then
+            msg="${msg} (${skipped_count} skipped — not relevant to feature)"
+        fi
+        echo -e "${GREEN}${msg}${NC}"
         return 0
     else
         echo ""
         echo -e "${RED}${stale_count} doc(s) need updating (trigger: ${trigger_filter})${NC}"
+        if [[ "$skipped_count" -gt 0 ]]; then
+            echo -e "${DIM}(${skipped_count} doc(s) skipped — tracked paths don't overlap feature manifest)${NC}"
+        fi
         return 1
     fi
 }
@@ -780,11 +827,24 @@ case "$MODE" in
         fi
         echo -e "${BOLD}Doc Registry (from STACK.md ## Docs)${NC}"
         echo ""
-        printf "  %-30s %-15s %s\n" "PATH" "TYPE" "TRIGGER"
-        printf "  %-30s %-15s %s\n" "----" "----" "-------"
-        while IFS='|' read -r path type trigger; do
-            printf "  %-30s %-15s %s\n" "$path" "$type" "$trigger"
-        done <<< "$entries"
+        # Check if any entry has tracks configured
+        local has_any_tracks=false
+        if echo "$entries" | grep -q '|[^|]*|[^|]*|[^|]'; then
+            has_any_tracks=true
+        fi
+        if $has_any_tracks; then
+            printf "  %-35s %-15s %-14s %s\n" "PATH" "TYPE" "TRIGGER" "TRACKS"
+            printf "  %-35s %-15s %-14s %s\n" "----" "----" "-------" "------"
+            while IFS='|' read -r path type trigger tracks; do
+                printf "  %-35s %-15s %-14s %s\n" "$path" "$type" "$trigger" "$tracks"
+            done <<< "$entries"
+        else
+            printf "  %-30s %-15s %s\n" "PATH" "TYPE" "TRIGGER"
+            printf "  %-30s %-15s %s\n" "----" "----" "-------"
+            while IFS='|' read -r path type trigger _tracks; do
+                printf "  %-30s %-15s %s\n" "$path" "$type" "$trigger"
+            done <<< "$entries"
+        fi
         ;;
 
     trigger)
@@ -806,7 +866,7 @@ case "$MODE" in
 
         # Filter by trigger
         matched=()
-        while IFS='|' read -r path type trigger; do
+        while IFS='|' read -r path type trigger _tracks; do
             if [[ "$trigger" == "$TRIGGER" ]]; then
                 matched+=("${path}|${type}|${trigger}")
             fi
@@ -821,7 +881,7 @@ case "$MODE" in
         echo ""
 
         for entry in "${matched[@]}"; do
-            IFS='|' read -r path type trigger <<< "$entry"
+            IFS='|' read -r path type trigger _tracks <<< "$entry"
             local_path="$ROOT_DIR/$path"
 
             # Check for existing draft marker
@@ -876,7 +936,8 @@ case "$MODE" in
 
     check-freshness)
         # Use TRIGGER if provided via --trigger, otherwise default to feature_done
-        check_freshness "${TRIGGER:-feature_done}"
+        # Pass MANIFEST to scope freshness check to relevant docs
+        check_freshness "${TRIGGER:-feature_done}" "$MANIFEST"
         ;;
 
     create)
@@ -910,8 +971,14 @@ case "$MODE" in
         echo "  --create <path> --type <type> --trigger <trigger>  Scaffold doc + register"
         echo ""
         echo "Options:"
-        echo "  --manifest F-####              Feature ID for context"
+        echo "  --manifest F-####              Feature ID for context (scopes freshness to relevant docs)"
         echo "  --trigger <trigger>             Filter for --check-freshness (default: feature_done)"
+        echo ""
+        echo "Registry format (STACK.md ## Docs):"
+        echo "  - doc: <path> | <type> | <trigger> [| <tracks>]"
+        echo "  tracks: comma-separated path prefixes the doc covers (optional)"
+        echo "  When --manifest is provided, docs with tracks are only checked if"
+        echo "  the feature's changed files overlap their tracked paths."
         echo "  --force                         Allow --create to register existing files"
         exit 0
         ;;

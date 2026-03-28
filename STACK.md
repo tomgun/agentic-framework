@@ -204,30 +204,34 @@ Purpose: Configuration for developing the Agentic Framework itself.
 <!-- Doc registry — declare what docs this project maintains.
      This section lives in STACK.md (project root) and survives .agentic/ upgrades.
      To add a doc: add a line here. No .agentic/ files need editing.
+     Format: - doc: <path> | <type> | <trigger> [| <tracks>]
      Triggers: feature_done | pr | session | manual
+     Tracks (optional 4th field): comma-separated path prefixes this doc covers.
+       When a feature is completed, only docs whose tracked paths overlap the
+       feature's manifest are flagged for freshness. Docs without tracks are always checked.
      Note: pr-trigger docs only fire in formal profile (formal uses PRs).
      To fire on multiple triggers, add two entries with the same path.
      Types (built-in): changelog | readme | adr | lessons | architecture | runbook | tech-spec | custom -->
 - doc: CHANGELOG.md                | changelog    | pr
 - doc: README.md                   | readme       | pr
 - doc: .agentic/spec/LESSONS.md     | lessons      | feature_done
-- doc: docs/INSTRUCTION_ARCHITECTURE.md | architecture | feature_done
-- doc: docs/HOW_IT_WORKS.md         | architecture | feature_done
+- doc: docs/INSTRUCTION_ARCHITECTURE.md | architecture | feature_done | .agentic/lib/agents/,.claude/
+- doc: docs/HOW_IT_WORKS.md         | architecture | feature_done | .agentic/lib/
 - doc: docs/KEY_INSIGHTS.md         | lessons      | manual
 - doc: docs/FRAMEWORK_VALUE_PROPOSITION.md | tech-spec | manual
 - doc: .agentic/lib/README.md       | readme       | pr
-- doc: .agentic/lib/DEVELOPER_GUIDE.md | architecture | feature_done
-- doc: .agentic/spec/NFR.md         | tech-spec    | feature_done
+- doc: .agentic/lib/DEVELOPER_GUIDE.md | architecture | feature_done | .agentic/lib/
+- doc: .agentic/spec/NFR.md         | tech-spec    | feature_done | .agentic/spec/
 - doc: .agentic/spec/ISSUES.md      | custom       | feature_done
 - doc: .agentic/spec/REFERENCES.md  | custom       | manual
-- doc: .agentic/OVERVIEW.md          | architecture | feature_done
-- doc: .agentic/lib/START_HERE.md    | readme       | feature_done
-- doc: .agentic/lib/PRINCIPLES.md   | architecture | feature_done
-- doc: .agentic/lib/FRAMEWORK_MAP.md | architecture | feature_done
+- doc: .agentic/OVERVIEW.md          | architecture | feature_done | .agentic/
+- doc: .agentic/lib/START_HERE.md    | readme       | feature_done | .agentic/lib/
+- doc: .agentic/lib/PRINCIPLES.md   | architecture | feature_done | .agentic/lib/
+- doc: .agentic/lib/FRAMEWORK_MAP.md | architecture | feature_done | .agentic/lib/
 - doc: .agentic/lib/DIRECT_EDITING.md | runbook     | manual
 - doc: .agentic/lib/EMERGENCY.md     | runbook      | manual
 - doc: .agentic/lib/MANUAL_OPERATIONS.md | runbook   | manual
-- doc: docs/FRAMEWORK_WORKFLOW.md    | architecture | feature_done
+- doc: docs/FRAMEWORK_WORKFLOW.md    | architecture | feature_done | .agentic/lib/tools/
 - doc: .agentic/CONTRIBUTIONS.md    | changelog    | pr
 - doc: spec/adr/                   | adr          | manual
 
