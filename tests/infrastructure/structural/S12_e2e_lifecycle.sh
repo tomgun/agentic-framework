@@ -18,10 +18,9 @@ cd "$PROJECT"
 # (scaffold_test_project "formal" creates spec/ dirs but doesn't set STACK.md settings)
 if [[ -f STACK.md ]]; then
     # Enable feature tracking and formal gates
+    # acceptance_criteria + plan_review_enabled left at defaults (recommended/no)
+    # so contract parse failures (no PyYAML) don't block ag done
     sed -i 's/- feature_tracking: no/- feature_tracking: yes/' STACK.md
-    # Keep acceptance_criteria as recommended so contract parse failures (no PyYAML) don't block
-    sed -i 's/- acceptance_criteria: recommended/- acceptance_criteria: recommended/' STACK.md
-    sed -i 's/- plan_review_enabled: no/- plan_review_enabled: no/' STACK.md
     sed -i 's/- state_enforcement: off/- state_enforcement: advisory/' STACK.md
     sed -i 's/- git_mode: deferred/- git_mode: active/' STACK.md
     sed -i 's/- profile: discovery/- profile: formal/' STACK.md
@@ -114,21 +113,18 @@ assert_output_contains "$IMPL_OUTPUT" "Ready to implement" \
 # Check WIP was started (either AGENTS.json or WIP.md)
 if [[ -f ".agentic/session/AGENTS.json" ]] && python3 -c "
 import json, sys
+fid = sys.argv[1]
 with open('.agentic/session/AGENTS.json') as f:
     data = json.load(f)
 agents = data if isinstance(data, list) else data.get('agents', [])
-sys.exit(0 if any(a.get('feature') == '$FEATURE_ID' or a.get('feature_id') == '$FEATURE_ID' for a in agents) else 1)
-" 2>/dev/null; then
+sys.exit(0 if any(a.get('feature') == fid or a.get('feature_id') == fid for a in agents) else 1)
+" "$FEATURE_ID" 2>/dev/null; then
     pass_test "WIP registered in AGENTS.json for $FEATURE_ID"
 elif [[ -f ".agentic/session/WIP.md" ]] && grep -q "$FEATURE_ID" ".agentic/session/WIP.md" 2>/dev/null; then
     pass_test "WIP registered in WIP.md for $FEATURE_ID"
 else
-    # WIP tracking may use different mechanisms — check if implement succeeded
-    if echo "$IMPL_OUTPUT" | grep -q "Ready to implement"; then
-        pass_test "ag implement succeeded (WIP tracking mechanism varies)"
-    else
-        fail_test "WIP tracking active for $FEATURE_ID"
-    fi
+    fail_test "WIP tracking active for $FEATURE_ID" \
+        "neither AGENTS.json nor WIP.md contains $FEATURE_ID"
 fi
 
 # ─── Phase 4: Simulate implementation (create artifact that satisfies AC) ───
@@ -176,12 +172,8 @@ assert_output_contains "$DONE_OUTPUT" "Feature Complete Check" \
     "ag done shows Feature Complete Check header"
 
 # Verify contract assertion check ran
-if echo "$DONE_OUTPUT" | grep -qi "Contract Assertion\|assertion"; then
-    pass_test "ag done runs contract assertion check"
-else
-    # May show different wording depending on version
-    pass_test "ag done completion check ran (assertion check format varies)"
-fi
+assert_output_contains "$DONE_OUTPUT" "Contract Assertion" \
+    "ag done runs contract assertion check"
 
 # ─── Phase 7: Verify the AC-001 structural assertion ───
 
