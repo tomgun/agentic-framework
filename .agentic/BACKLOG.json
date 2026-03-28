@@ -1,18 +1,11 @@
 [
   {
-    "type": "task",
-    "description": "E2E workflow integration test (full lifecycle)",
-    "added_at": "2026-03-23T17:00:00Z",
-    "added_by": "agent",
-    "notes": "Originally F-0227. Improvement to DEV-002 (Testing Infrastructure)",
-    "became_current_at": "2026-03-28T07:49:46Z"
-  },
-  {
     "type": "feature",
     "id": "F-036",
     "description": "Workflow Definition File",
     "added_at": "2026-03-16T18:56:15Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "became_current_at": "2026-03-28T13:57:29Z"
   },
   {
     "type": "feature",
