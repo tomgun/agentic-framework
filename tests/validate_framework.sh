@@ -4960,6 +4960,48 @@ for profile in hands_on guided autonomous; do
   fi
 done
 
+# --- F-036: Workflow Definition File ---
+echo "--- F-036: Workflow Definition File ---"
+
+# Check workflow.py YAML loader exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/workflow.py" ]]; then
+  pass "F-036: workflow.py YAML loader exists"
+else
+  fail "F-036: workflow.py YAML loader missing"
+fi
+
+# Check engine field present in YAML
+if grep -q "^engine:" "$SM_FILE" 2>/dev/null; then
+  pass "F-036: engine field present in state_machine_af.yaml"
+else
+  fail "F-036: engine field missing from state_machine_af.yaml"
+fi
+
+# Run Python-based workflow validation (loads YAML, checks consistency)
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/workflow.py" ]]; then
+  WORKFLOW_VALIDATE_OUTPUT=$(python3 -c "
+import sys
+sys.path.insert(0, '${FRAMEWORK_ROOT}/.agentic/lib')
+sys.path.insert(0, '${FRAMEWORK_ROOT}/.agentic/lib/auto')
+from auto.workflow import get_workflow, clear_cache
+from auto.state_machine import FORWARD_TRANSITIONS, REGRESSION_TRANSITIONS
+from pathlib import Path
+clear_cache()
+wf = get_workflow(Path('${FRAMEWORK_ROOT}'))
+errors = wf.validate_consistency(FORWARD_TRANSITIONS, REGRESSION_TRANSITIONS)
+if errors:
+    for e in errors:
+        print(e, file=sys.stderr)
+    sys.exit(1)
+print('ok')
+" 2>&1)
+  if [[ $? -eq 0 ]]; then
+    pass "F-036: YAML-Python consistency validation passes"
+  else
+    fail "F-036: YAML-Python consistency validation failed: ${WORKFLOW_VALIDATE_OUTPUT}"
+  fi
+fi
+
 # --- V2-002: Role prompts ---
 echo "--- V2-002: Role Prompts ---"
 

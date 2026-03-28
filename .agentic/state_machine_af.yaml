@@ -3,6 +3,7 @@
 # Replaces scattered config across STACK.md settings, profiles.conf, and hardcoded states.
 
 version: 1
+engine: v1  # v1 = Python hardcoded states; v2 = YAML-driven (future)
 
 # ---------------------------------------------------------------------------
 # Workflow: States and Transitions

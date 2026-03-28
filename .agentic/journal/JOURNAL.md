@@ -4708,3 +4708,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-28 14:50 - F-036 Workflow Definition File
+
+**Why**: state_machine_af.yaml was dead config — no code read it. Now it's loadable, testable, and validated
+
+**What changed**:
+- YAML loader (workflow.py) with typed dataclasses for modes/profiles/artifacts/verification/docs_policy; consistency validation between YAML transitions and Python tables; state_machine.py integration with graceful degradation; 77 tests passing; validate_framework.sh F-036 checks
+
+**Next steps**:
+- Create contract/spec for F-036, create PR, ship
+
+**Blockers**: None
+
