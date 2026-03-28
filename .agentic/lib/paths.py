@@ -164,6 +164,9 @@ class AgenticPaths:
         self.version_file = self._resolve(
             self.agentic_lib / "VERSION", self.agentic_root / "VERSION")
 
+        # Workflow definition (F-036)
+        self.workflow_file = self.agentic_root / "state_machine_af.yaml"
+
         # User extensions (.agentic/local/)
         self.local_dir = self._resolve(
             self.agentic_root / "local", self.project_root / ".agentic-local")

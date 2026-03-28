@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- E2E lifecycle test merged. Next: F-036 Workflow Definition File (Updated: 2026-03-28 13:57 UTC)
+- F-036 Workflow Definition File: implementation complete, ready for commit/PR (Updated: 2026-03-28 14:50 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

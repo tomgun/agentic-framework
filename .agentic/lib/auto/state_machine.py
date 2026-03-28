@@ -153,6 +153,30 @@ class FeatureStateMachine:
         self.paths = get_paths(project_root)
         self.enforce = enforce
         self._gates: dict[tuple[FeatureState, FeatureState], Callable] = {}
+        # F-036: Load workflow definition for modes/profiles/artifacts
+        self._workflow = None
+        try:
+            from auto.workflow import get_workflow
+            self._workflow = get_workflow(project_root)
+        except Exception:
+            pass  # Graceful degradation: YAML missing/broken = use hardcoded
+
+    @property
+    def workflow(self) -> Optional[object]:
+        """The loaded WorkflowDefinition, or None if unavailable."""
+        return self._workflow
+
+    def validate_yaml_consistency(self) -> list[str]:
+        """Cross-check YAML transitions against hardcoded Python tables.
+
+        Returns list of discrepancy messages (empty = consistent).
+        Returns ["state_machine_af.yaml not loaded"] if YAML unavailable.
+        """
+        if self._workflow is None:
+            return ["state_machine_af.yaml not loaded"]
+        return self._workflow.validate_consistency(
+            FORWARD_TRANSITIONS, REGRESSION_TRANSITIONS
+        )
 
     # -- Gate registration ---------------------------------------------------
 
