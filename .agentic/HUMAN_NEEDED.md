@@ -33,6 +33,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0072: PR #210: E2E lifecycle test
+- **Type**: pr_review
+- **Added**: 2026-03-28
+- **Context**: test/e2e-lifecycle-s12 → main. 23 assertions, S12_e2e_lifecycle.sh
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0069: PR #205: F-005 Phase 2 renumber
