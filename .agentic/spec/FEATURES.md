@@ -366,7 +366,7 @@ YAML contracts replace markdown acceptance criteria as source of truth. Machine-
 
 ## F-033: Project-Specific Customization Layer
 
-**Status**: planned | **Category**: developer-experience | **Profile**: both
+**Status**: shipped | **Category**: developer-experience | **Profile**: both
 
 Allow projects to define custom workflow steps, validation rules, and enforcement policies beyond STACK.md settings.
 

@@ -4747,3 +4747,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-28 20:58 - F-033 shipped
+
+**Why**: Projects need upgrade-safe customization beyond STACK.md settings
+
+**What changed**:
+- Project-specific customization layer: 6 extension points in .agentic/local/ — conventions, done-checks, lifecycle hooks, workflow directions, enforcement policies, comprehensive docs
+
+**Next steps**:
+- F-034 Project Customization Auto-Sync
+
+**Blockers**: None
+

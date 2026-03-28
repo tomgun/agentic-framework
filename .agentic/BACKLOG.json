@@ -1,21 +1,14 @@
 [
   {
     "type": "feature",
-    "id": "F-033",
-    "description": "Project-Specific Customization Layer",
-    "added_at": "2026-03-16T18:56:15Z",
-    "added_by": "agent",
-    "became_current_at": "2026-03-28T18:26:24Z"
-  },
-  {
-    "type": "feature",
     "id": "F-034",
     "description": "Project Customization Auto-Sync",
     "added_at": "2026-03-16T18:56:15Z",
     "added_by": "agent",
     "depends_on": [
       "F-033"
-    ]
+    ],
+    "became_current_at": "2026-03-28T20:58:11Z"
   },
   {
     "type": "task",
