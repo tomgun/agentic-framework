@@ -40,5 +40,12 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-0171
 
+  - id: AC-004
+    text: "E2E lifecycle test exercises full ag workflow (implement → commit → done)"
+    type: structural
+    verify: "test -f tests/infrastructure/structural/S12_e2e_lifecycle.sh"
+    tests:
+      - tests/infrastructure/structural/S12_e2e_lifecycle.sh
+
 nfr_refs: []
 migrations: []
