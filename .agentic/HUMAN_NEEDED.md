@@ -47,6 +47,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0076: PR #214: Configurable DoD per task type
+- **Type**: pr_review
+- **Added**: 2026-03-29
+- **Context**: feat(F-0210): task-type-aware Definition of Done. 4 types, gate skipping for spike/docs, backward compatible.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0074: PR #212: F-033 Project-Specific Customization Layer
