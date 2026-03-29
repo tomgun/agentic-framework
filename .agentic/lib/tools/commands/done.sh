@@ -184,10 +184,19 @@ cmd_done() {
     # Parse args: feature ID + optional flags
     local feature_id=""
     local force_phases=0
+    local explicit_type=""
+    local _skip_next=0
     local arg
     for arg in "$@"; do
+        if [ "$_skip_next" -eq 1 ]; then
+            explicit_type="$arg"
+            _skip_next=0
+            continue
+        fi
         case "$arg" in
             --force-phases) force_phases=1 ;;
+            --type) _skip_next=1 ;;
+            --type=*) explicit_type="${arg#--type=}" ;;
             *) [[ -z "$feature_id" ]] && feature_id="$arg" ;;
         esac
     done
@@ -197,11 +206,22 @@ cmd_done() {
     if [ "$ft" = "no" ]; then
         echo -e "${BOLD}=== Task Complete Check ===${NC}"
         echo ""
-        echo -e "${BOLD}Definition of Done:${NC}"
-        echo "  [ ] Task completed as described"
-        echo "  [ ] Tests written and passing (if applicable)"
-        echo "  [ ] STATUS.md updated"
-        echo "  [ ] JOURNAL.md updated"
+        # Resolve task type (discovery mode supports --type too)
+        local _disc_type="implementation"
+        _disc_type=$(python3 "$AGENTIC_LIB/dod.py" resolve-type "" \
+            ${explicit_type:+--type "$explicit_type"} --project-root "$ROOT_DIR" 2>/dev/null) || _disc_type="implementation"
+        echo -e "${BOLD}Definition of Done (${_disc_type}):${NC}"
+        local _disc_checklist
+        _disc_checklist=$(python3 "$AGENTIC_LIB/dod.py" checklist --type "$_disc_type" \
+            --project-root "$ROOT_DIR" 2>/dev/null) || _disc_checklist=""
+        if [ -n "$_disc_checklist" ]; then
+            echo "$_disc_checklist"
+        else
+            echo "  [ ] Task completed as described"
+            echo "  [ ] Tests written and passing (if applicable)"
+            echo "  [ ] STATUS.md updated"
+            echo "  [ ] JOURNAL.md updated"
+        fi
         echo ""
         # Quick health check (warning only — Discovery mode)
         if bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null; then
@@ -714,16 +734,30 @@ PYEOF
         fi
     fi
 
-    # Show definition of done checklist
+    # Show definition of done checklist (task-type-aware via dod.py)
+    local resolved_type="implementation"
+    resolved_type=$(python3 "$AGENTIC_LIB/dod.py" resolve-type "${feature_id:-}" \
+        ${explicit_type:+--type "$explicit_type"} --project-root "$ROOT_DIR" 2>/dev/null) || resolved_type="implementation"
+
     echo ""
-    echo -e "${BOLD}Definition of Done Checklist:${NC}"
-    echo "  [ ] All acceptance criteria met"
-    echo "  [ ] Tests written and passing"
-    echo "  [ ] .agentic/spec/FEATURES.md updated (status: shipped)"
-    echo "  [ ] Docs updated (if behavior changed)"
-    echo "  [ ] Code reviewed (self-review at minimum)"
-    echo "  [ ] Smoke tested (actually RUN it)"
-    echo "  [ ] JOURNAL.md updated"
+    echo -e "${BOLD}Definition of Done (${resolved_type}):${NC}"
+
+    local checklist_output
+    checklist_output=$(python3 "$AGENTIC_LIB/dod.py" checklist --type "$resolved_type" \
+        --project-root "$ROOT_DIR" 2>/dev/null) || checklist_output=""
+
+    if [ -n "$checklist_output" ]; then
+        echo "$checklist_output"
+    else
+        # Fallback: exact legacy hardcoded list
+        echo "  [ ] All acceptance criteria met"
+        echo "  [ ] Tests written and passing"
+        echo "  [ ] .agentic/spec/FEATURES.md updated (status: shipped)"
+        echo "  [ ] Docs updated (if behavior changed)"
+        echo "  [ ] Code reviewed (self-review at minimum)"
+        echo "  [ ] Smoke tested (actually RUN it)"
+        echo "  [ ] JOURNAL.md updated"
+    fi
     echo ""
     if [[ -f ".agentic/lib/checklists/feature_complete.md" ]]; then
         echo "Full checklist: .agentic/lib/checklists/feature_complete.md"

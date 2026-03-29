@@ -4773,3 +4773,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-29 10:20 - F-0210: Configurable DoD per task type
+
+**Why**: Spikes and docs features were blocked by test/doc gates that don't apply to their task type
+
+**What changed**:
+- Implemented task-type-aware Definition of Done: dod.conf with 4 types, dod.py resolution cascade, gates 3/5/6 skip for spike/docs, done.sh dynamic checklist, contract task_type field
+
+**Next steps**:
+- Instruction file updates, LLM tests
+
+**Blockers**: None
+

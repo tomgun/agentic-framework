@@ -40,6 +40,14 @@ echo "FEATURE COMPLETION VALIDATION: ${FEATURE_ID}"
 echo "═══════════════════════════════════════════════════════"
 echo ""
 
+# Resolve task type for type-aware checks (F-0210)
+AGENTIC_LIB="${PROJECT_ROOT}/.agentic/lib"
+TASK_TYPE=$(python3 "$AGENTIC_LIB/dod.py" resolve-type "$FEATURE_ID" --project-root "$PROJECT_ROOT" 2>/dev/null) || TASK_TYPE="implementation"
+if [[ "$TASK_TYPE" != "implementation" ]]; then
+  echo "Task type: ${TASK_TYPE}"
+  echo ""
+fi
+
 FAILURES=0
 
 # Check 1: Feature exists in FEATURES.md
@@ -88,57 +96,67 @@ fi  # end AC_FILE check
 echo ""
 echo "[3/6] Checking tests exist for feature..."
 
-TEST_FILES_FOUND=0
-
-# Common test file patterns
-for PATTERN in "test/*.test.*" "tests/*.test.*" "spec/*.spec.*" "**/*.test.*" "**/*.spec.*"; do
-  if compgen -G "$PATTERN" > /dev/null 2>&1; then
-    if grep -r "@feature ${FEATURE_ID}" $PATTERN 2>/dev/null | head -1 > /dev/null; then
-      TEST_FILES_FOUND=1
-      break
-    fi
-  fi
-done
-
-if [[ $TEST_FILES_FOUND -eq 1 ]]; then
-  echo "✓ Tests found with @feature ${FEATURE_ID} annotation"
-elif [[ -n "${AC_FILE:-}" ]] && [[ -f "$AC_FILE" ]]; then
-  # Check if acceptance criteria mentions tests
-  if grep -qi "test" "$AC_FILE"; then
-    echo "✓ Tests mentioned in acceptance criteria"
-  else
-    echo "⚠️  WARNING: No tests found with @feature annotation"
-    echo "   Tests may exist but are not annotated"
-    echo "   Add @feature ${FEATURE_ID} comments to test files"
-  fi
+# Task-type-aware: skip test checks for spike/docs types (F-0210)
+if [[ "$TASK_TYPE" == "spike" || "$TASK_TYPE" == "docs" ]]; then
+  echo "✓ Tests check skipped for task type '${TASK_TYPE}'"
 else
-  echo "❌ No tests found for feature"
-  FAILURES=$((FAILURES + 1))
+  TEST_FILES_FOUND=0
+
+  # Common test file patterns
+  for PATTERN in "test/*.test.*" "tests/*.test.*" "spec/*.spec.*" "**/*.test.*" "**/*.spec.*"; do
+    if compgen -G "$PATTERN" > /dev/null 2>&1; then
+      if grep -r "@feature ${FEATURE_ID}" $PATTERN 2>/dev/null | head -1 > /dev/null; then
+        TEST_FILES_FOUND=1
+        break
+      fi
+    fi
+  done
+
+  if [[ $TEST_FILES_FOUND -eq 1 ]]; then
+    echo "✓ Tests found with @feature ${FEATURE_ID} annotation"
+  elif [[ -n "${AC_FILE:-}" ]] && [[ -f "$AC_FILE" ]]; then
+    # Check if acceptance criteria mentions tests
+    if grep -qi "test" "$AC_FILE"; then
+      echo "✓ Tests mentioned in acceptance criteria"
+    else
+      echo "⚠️  WARNING: No tests found with @feature annotation"
+      echo "   Tests may exist but are not annotated"
+      echo "   Add @feature ${FEATURE_ID} comments to test files"
+    fi
+  else
+    echo "❌ No tests found for feature"
+    FAILURES=$((FAILURES + 1))
+  fi
 fi
 
 # Check 4: All tests pass
 echo ""
 echo "[4/6] Verifying all tests pass..."
 
-# Try common test commands
-TEST_COMMAND=""
-if [[ -f "package.json" ]] && grep -q "\"test\"" package.json; then
-  TEST_COMMAND="npm test"
-elif [[ -f "pyproject.toml" ]] || [[ -f "pytest.ini" ]]; then
-  TEST_COMMAND="pytest"
-elif [[ -f "Cargo.toml" ]]; then
-  TEST_COMMAND="cargo test"
-elif [[ -f "go.mod" ]]; then
-  TEST_COMMAND="go test ./..."
-fi
-
-if [[ -n "$TEST_COMMAND" ]]; then
-  echo "   Detected test command: ${TEST_COMMAND}"
-  echo "   ⚠️  Run tests manually to verify they pass"
-  echo "   Command: ${TEST_COMMAND}"
+# Task-type-aware: skip test pass check for spike/docs types (F-0210)
+if [[ "$TASK_TYPE" == "spike" || "$TASK_TYPE" == "docs" ]]; then
+  echo "✓ Test pass check skipped for task type '${TASK_TYPE}'"
 else
-  echo "   ⚠️  No standard test command detected"
-  echo "   Verify tests manually before marking complete"
+  # Try common test commands
+  TEST_COMMAND=""
+  if [[ -f "package.json" ]] && grep -q "\"test\"" package.json; then
+    TEST_COMMAND="npm test"
+  elif [[ -f "pyproject.toml" ]] || [[ -f "pytest.ini" ]]; then
+    TEST_COMMAND="pytest"
+  elif [[ -f "Cargo.toml" ]]; then
+    TEST_COMMAND="cargo test"
+  elif [[ -f "go.mod" ]]; then
+    TEST_COMMAND="go test ./..."
+  fi
+
+  if [[ -n "$TEST_COMMAND" ]]; then
+    echo "   Detected test command: ${TEST_COMMAND}"
+    echo "   ⚠️  Run tests manually to verify they pass"
+    echo "   Command: ${TEST_COMMAND}"
+  else
+    echo "   ⚠️  No standard test command detected"
+    echo "   Verify tests manually before marking complete"
+  fi
 fi
 
 # Check 5: Code committed (no uncommitted changes for this feature's files)
