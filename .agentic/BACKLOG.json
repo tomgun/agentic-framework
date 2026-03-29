@@ -1,18 +1,11 @@
 [
   {
     "type": "task",
-    "description": "Configurable Definition of Done per task type",
-    "added_at": "2026-03-23T17:00:00Z",
-    "added_by": "agent",
-    "notes": "Originally F-0210. Improvement to F-002 (Spec-Driven Development). Check docs/archive/FEATURES-v0.72.md for details.",
-    "became_current_at": "2026-03-29T08:21:46Z"
-  },
-  {
-    "type": "task",
     "description": "Design phase formalization",
     "added_at": "2026-03-23T17:00:00Z",
     "added_by": "agent",
-    "notes": "Originally F-0233. Improvement to F-004 (Plan & Design Review)"
+    "notes": "Originally F-0233. Improvement to F-004 (Plan & Design Review)",
+    "became_current_at": "2026-03-29T11:27:53Z"
   },
   {
     "type": "feature",

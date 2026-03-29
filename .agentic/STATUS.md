@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-0210: Configurable DoD per task type — core implementation complete, PR pending (Updated: 2026-03-29 10:20 UTC)
+- Configurable DoD shipped (#214). Next: Design phase formalization (Updated: 2026-03-29 11:27 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

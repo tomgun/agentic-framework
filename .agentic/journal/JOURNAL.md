@@ -4786,3 +4786,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-29 11:27 - F-0210 shipped
+
+**Why**: Post-merge completion
+
+**What changed**:
+- Configurable DoD per task type merged via PR #214. 4 types, gate skipping, backward compatible.
+
+**Next steps**:
+- Design phase formalization (next backlog item)
+
+**Blockers**: None
+
