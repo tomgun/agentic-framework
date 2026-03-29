@@ -5392,6 +5392,30 @@ else
   fail "F-033 AC-007: extensions-readme missing documentation for new extension points"
 fi
 
+# AC-008: upgrade.sh contains local customization sync step
+if grep -q "Syncing local customizations" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh" && \
+   grep -q "LOCAL_SYNC_MAP" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh"; then
+  pass "F-033 AC-008: upgrade.sh contains local customization sync step"
+else
+  fail "F-033 AC-008: upgrade.sh missing local customization sync step"
+fi
+
+# AC-009: upgrade.sh creates missing extension subdirectories (in Step 5a sync)
+if grep -q "Step 5a" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh" && \
+   grep -q "mkdir.*extensions/" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh"; then
+  pass "F-033 AC-009: upgrade.sh creates missing extension subdirectories"
+else
+  fail "F-033 AC-009: upgrade.sh missing extension subdirectory creation"
+fi
+
+# AC-010: upgrade.sh preserves customized files and writes .new
+if grep -q "\.new" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh" && \
+   grep -q "customized" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh"; then
+  pass "F-033 AC-010: upgrade.sh preserves customized files with .new"
+else
+  fail "F-033 AC-010: upgrade.sh missing customized file preservation"
+fi
+
 # Summary
 
 # ============================================================

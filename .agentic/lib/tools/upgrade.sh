@@ -257,6 +257,96 @@ fi
 
 echo ""
 
+# Step 5a: Sync local customization files with updated templates
+echo -e "${BLUE}[5a/11] Syncing local customizations${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+if [[ "$DRY_RUN" == "yes" ]]; then
+  echo "  [DRY RUN] Would sync local customization files"
+else
+  LOCAL_DIR="$TARGET_PROJECT_DIR/.agentic/local"
+
+  # Helper: check if file still looks like an unedited template
+  _file_looks_like_template() {
+    local file="$1"
+    [[ ! -f "$file" ]] && return 1
+    local first_lines
+    first_lines=$(head -3 "$file" | tr '[:upper:]' '[:lower:]')
+    if echo "$first_lines" | grep -qi "(template)"; then
+      return 0
+    fi
+    # Check if most content is still placeholder comments/blanks
+    local filled_lines
+    filled_lines=$(grep -cvE '^\s*$|^\s*<!--.*-->$|^#' "$file" 2>/dev/null || echo "0")
+    if [[ "$filled_lines" -lt 3 ]]; then
+      return 0
+    fi
+    return 1
+  }
+
+  # Template-derived files to sync: local_path|template_path
+  declare -a LOCAL_SYNC_MAP=(
+    "conventions.md|lib/init/conventions-local.template.md"
+    "workflow-directions.md|lib/init/workflow-directions.template.md"
+    "extensions/README.md|lib/init/extensions-readme.md"
+  )
+
+  SYNC_UPDATED=0
+  SYNC_KEPT=0
+  SYNC_NEW_FILES=()
+
+  for entry in "${LOCAL_SYNC_MAP[@]}"; do
+    local_rel="${entry%%|*}"
+    template_rel="${entry##*|}"
+    local_file="$LOCAL_DIR/$local_rel"
+    new_template="$TARGET_PROJECT_DIR/.agentic/$template_rel"
+
+    # Skip if new template doesn't exist
+    [[ ! -f "$new_template" ]] && continue
+
+    if [[ ! -f "$local_file" ]]; then
+      # Local file missing — create from template
+      mkdir -p "$(dirname "$local_file")"
+      cp "$new_template" "$local_file"
+      echo -e "  ${GREEN}✓${NC} Created $local_rel (from template)"
+      SYNC_UPDATED=$((SYNC_UPDATED + 1))
+    elif _file_looks_like_template "$local_file"; then
+      # Unmodified template — safe to replace
+      cp "$new_template" "$local_file"
+      echo -e "  ${GREEN}✓${NC} Updated $local_rel (was unmodified template)"
+      SYNC_UPDATED=$((SYNC_UPDATED + 1))
+    else
+      # Customized by user — don't touch, write .new for review
+      if ! diff -q "$local_file" "$new_template" >/dev/null 2>&1; then
+        cp "$new_template" "${local_file}.new"
+        SYNC_NEW_FILES+=("$local_rel")
+        SYNC_KEPT=$((SYNC_KEPT + 1))
+      fi
+    fi
+  done
+
+  # Ensure all expected extension subdirectories exist
+  for subdir in skills gates hooks rules done-checks policies; do
+    mkdir -p "$LOCAL_DIR/extensions/$subdir"
+  done
+
+  if [[ $SYNC_UPDATED -gt 0 ]]; then
+    echo -e "  ${GREEN}✓${NC} Synced $SYNC_UPDATED local file(s)"
+  fi
+  if [[ $SYNC_KEPT -gt 0 ]]; then
+    echo -e "  ${YELLOW}⚠${NC} $SYNC_KEPT customized file(s) preserved — review .new versions:"
+    for f in "${SYNC_NEW_FILES[@]}"; do
+      echo "    .agentic/local/${f}.new"
+    done
+  fi
+  if [[ $SYNC_UPDATED -eq 0 && $SYNC_KEPT -eq 0 ]]; then
+    echo -e "  ${GREEN}✓${NC} Local customizations up to date"
+  fi
+  echo -e "  ${GREEN}✓${NC} Extension subdirectories verified"
+fi
+
+echo ""
+
 # Step 5b: Regenerate Claude Code artifacts (skills, hooks, subagents)
 echo -e "${BLUE}[5b/8] Regenerating Claude Code artifacts${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -886,6 +976,7 @@ declare -a FEATURE_REGISTRY=(
   "0.39.0:Semantic spec analysis:bash .agentic/tools/spec-analyze.sh F-XXXX:Advisory checks before implementation — ambiguity, NFR, coverage gaps (F-0152)"
   "0.39.0:AC-level test coverage:python3 .agentic/lib/tools/coverage.py --ac-coverage F-XXXX:Per-acceptance-criterion test mapping (F-0153)"
   "0.53.0:Intent journal + crash recovery:ag intent list:Write-ahead log for ag implement/done with reconciliation via ag sync (F-0200)"
+  "0.76.0:Local customization auto-sync:Automatic:Unmodified templates updated on upgrade, customized files preserved with .new (F-033)"
 )
 
 # Filter features based on version range

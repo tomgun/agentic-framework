@@ -4760,3 +4760,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-28 21:38 - F-033 Auto-Sync
+
+**Why**: Customization layer needs to survive upgrades — unmodified templates should get updates, customized files should be preserved
+
+**What changed**:
+- Added upgrade.sh Step 5a: local customization sync that detects unmodified vs customized files, replaces or writes .new; folded F-034 into F-033; added 3 new contract assertions
+
+**Next steps**:
+- Ship F-033, merge PR
+
+**Blockers**: None
+

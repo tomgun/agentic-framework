@@ -120,6 +120,17 @@ Referenced by agents during implementation via `conventions.md` pointer.
 Custom instructions injected at workflow phases (Planning, Implementation, Verification, Review).
 Printed by `ag implement` and referenced in role prompts. Use markdown sections (`## Planning`, etc.).
 
+## Upgrade Behavior
+
+During `upgrade.sh`, local customization files are automatically synced:
+
+- **Unmodified templates** are replaced with the updated version from the new framework
+- **Customized files** are preserved — a `.new` file is written alongside for manual review
+- **New extension subdirectories** are created automatically if added in newer framework versions
+
+This applies to template-derived files: `conventions.md`, `workflow-directions.md`, and `extensions/README.md`.
+User-authored scripts in `extensions/` subdirectories are never touched.
+
 ## Format
 
 All extensions use existing framework formats — no new concepts to learn.
