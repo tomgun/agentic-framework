@@ -356,7 +356,7 @@ def checks_for_profile(profile: str, root: Path | None = None) -> list[Check]:
 from ids import FEATURE_HEADER_RE, FEATURE_ID_RE
 NFR_ID_RE = re.compile(r"\b(NFR-\d{4})\b")
 STATUS_VALUES = {
-    "planned", "specced", "criteria_set", "tests_written",
+    "planned", "designed", "specced", "criteria_set", "tests_written",
     "implementing", "verified", "documented", "committed",
     "shipped", "deprecated",
     "in_progress",  # backward-compat alias for implementing

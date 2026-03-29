@@ -249,7 +249,7 @@ class CrunchRunner:
                 )
                 if status_match:
                     status = status_match.group(1).lower().replace("-", "_")
-                    if status in ("planned", "specced", "criteria_set",
+                    if status in ("planned", "designed", "specced", "criteria_set",
                                   "tests_written", "implementing", "in_progress"):
                         features.append(current_fid)
                     current_fid = None

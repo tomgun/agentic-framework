@@ -133,11 +133,39 @@ def _resolve_feature_type(feature_id: str, project_root: Path) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Gate 1: planned -> specced
+# Gate 1a: planned -> designed
+# ---------------------------------------------------------------------------
+
+def gate_planned_to_designed(feature_id: str, project_root: Path) -> GateResult:
+    """Blocks when design_phase is off. Otherwise checks feature exists in FEATURES.md."""
+    design_phase = get_setting(project_root, "design_phase", "off")
+    if design_phase == "off":
+        return GateResult.blocked(
+            ["design_phase is off — the designed state is not available. "
+             "Set design_phase to 'optional' or 'required' in STACK.md to enable it."]
+        )
+
+    block = _read_feature_block(feature_id, project_root)
+    if block is None:
+        return GateResult.blocked([f"{feature_id} not found in FEATURES.md"])
+    return GateResult.ok()
+
+
+# ---------------------------------------------------------------------------
+# Gate 1b: planned -> specced
 # ---------------------------------------------------------------------------
 
 def gate_planned_to_specced(feature_id: str, project_root: Path) -> GateResult:
-    """Feature must exist in FEATURES.md with a non-empty Description."""
+    """Feature must exist in FEATURES.md with a non-empty Description.
+
+    Blocks when design_phase is 'required' — must go through designed first.
+    """
+    design_phase = get_setting(project_root, "design_phase", "off")
+    if design_phase == "required":
+        return GateResult.blocked(
+            ["design_phase is required — transition to 'designed' first"]
+        )
+
     block = _read_feature_block(feature_id, project_root)
     reasons: list[str] = []
     warnings: list[str] = []
@@ -158,6 +186,49 @@ def gate_planned_to_specced(feature_id: str, project_root: Path) -> GateResult:
     if reasons:
         return GateResult.blocked(reasons, warnings)
     return GateResult.ok(warnings)
+
+
+# ---------------------------------------------------------------------------
+# Gate 1c: designed -> specced
+# ---------------------------------------------------------------------------
+
+def gate_designed_to_specced(feature_id: str, project_root: Path) -> GateResult:
+    """Design artifacts must exist — either an ADR referencing the feature or a design.md."""
+    paths = get_paths(project_root)
+    reasons: list[str] = []
+
+    # Check for ADR referencing this feature
+    adr_dir = paths.adr_dir
+    adr_found = False
+    if adr_dir.exists():
+        for adr_file in adr_dir.glob("*.md"):
+            try:
+                content = adr_file.read_text()
+                if feature_id in content:
+                    adr_found = True
+                    break
+            except OSError:
+                continue
+
+    # Check for design.md in work directory
+    design_doc = paths.agentic_root / "work" / feature_id / "design.md"
+    design_found = design_doc.exists()
+
+    if not adr_found and not design_found:
+        try:
+            adr_path = str(adr_dir.relative_to(project_root))
+            doc_path = str(design_doc.relative_to(project_root))
+        except ValueError:
+            adr_path = str(adr_dir)
+            doc_path = str(design_doc)
+        reasons.append(
+            f"No design artifact found for {feature_id}. "
+            f"Create either an ADR in {adr_path} "
+            f"referencing {feature_id}, or a design doc at {doc_path}"
+        )
+        return GateResult.blocked(reasons)
+
+    return GateResult.ok()
 
 
 # ---------------------------------------------------------------------------
@@ -622,7 +693,9 @@ def gate_committed_to_shipped(feature_id: str, project_root: Path) -> GateResult
 
 # Default gate list for bulk registration
 DEFAULT_GATES: list[tuple[str, str, GateFunc]] = [
+    ("planned", "designed", gate_planned_to_designed),
     ("planned", "specced", gate_planned_to_specced),
+    ("designed", "specced", gate_designed_to_specced),
     ("specced", "criteria_set", gate_specced_to_criteria_set),
     ("criteria_set", "tests_written", gate_criteria_set_to_tests_written),
     ("tests_written", "implementing", gate_tests_written_to_implementing),

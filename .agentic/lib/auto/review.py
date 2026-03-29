@@ -88,13 +88,16 @@ _LEGACY_MODE_ALIASES: dict[str, str] = {
 # state_machine source of truth at import time.
 TRANSITION_REVIEW_MAP: dict[tuple[str, str], str] = {
     # Forward transitions
+    ("planned", "designed"): "review_design",
     ("planned", "specced"): "review_spec",
+    ("designed", "specced"): "review_spec",
     ("specced", "criteria_set"): "review_criteria",
     ("tests_written", "implementing"): "review_plan",
     ("documented", "committed"): "review_code",
     ("committed", "shipped"): "review_merge",
 
     # Skip transitions → most restrictive skipped review
+    ("designed", "implementing"): "review_design",
     ("planned", "implementing"): "review_plan",
     ("planned", "shipped"): "review_merge",
     ("implementing", "shipped"): "review_merge",

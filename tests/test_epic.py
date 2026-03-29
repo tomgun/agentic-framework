@@ -130,6 +130,11 @@ class TestDeriveEpicStatus:
     def test_all_early_states(self):
         assert derive_epic_status(["planned", "specced", "criteria_set"]) == "criteria_set"
 
+    def test_designed_is_early_state(self):
+        """designed is in the early_states set, so all-designed returns criteria_set."""
+        assert derive_epic_status(["planned", "designed"]) == "criteria_set"
+        assert derive_epic_status(["designed", "specced"]) == "criteria_set"
+
     def test_all_planned(self):
         assert derive_epic_status(["planned", "planned"]) == "criteria_set"
 
@@ -488,6 +493,13 @@ class TestDecompose:
     def test_criteria_set_state_allowed(self, tmp_project):
         """Features in criteria_set state can be decomposed."""
         _write_features(tmp_project, "## F-0100: Epic\n**Status**: criteria_set\n")
+        _write_ac(tmp_project, "F-0100", "- [ ] **AC-001**: Thing\n")
+        success, msgs = decompose(tmp_project, "F-0100")
+        assert success
+
+    def test_designed_state_allowed(self, tmp_project):
+        """Features in designed state can be decomposed."""
+        _write_features(tmp_project, "## F-0100: Epic\n**Status**: designed\n")
         _write_ac(tmp_project, "F-0100", "- [ ] **AC-001**: Thing\n")
         success, msgs = decompose(tmp_project, "F-0100")
         assert success

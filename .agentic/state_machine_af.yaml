@@ -13,6 +13,7 @@ workflow:
     - idea
     - queued
     - planning
+    - designing       # Optional design phase (design_phase setting)
     - plan_review
     - spec
     - implementation
@@ -26,7 +27,9 @@ workflow:
     # Forward flow
     - { from: idea, to: queued }
     - { from: queued, to: planning }
+    - { from: planning, to: designing, requires: [plan.md] }       # Optional design phase
     - { from: planning, to: plan_review, requires: [plan.md] }
+    - { from: designing, to: spec, requires: [design.md] }        # Design → spec
     - { from: plan_review, to: spec, requires: [review.md], gate: plan_approved }
     - { from: spec, to: implementation, requires: [spec.md] }
     - { from: implementation, to: verification, requires: [tests_exist] }
@@ -143,6 +146,10 @@ artifacts:
     description: "All verification commands pass"
     location: "{work_dir}/verification.json"
 
+  design.md:
+    description: "Design document or ADR for the feature"
+    location: "{work_dir}/design.md"
+
   docs_updated:
     description: "Documentation is not stale for changed files"
     check: "bash .agentic/lib/tools/drift.sh --docs --quiet 2>/dev/null || true"
@@ -156,6 +163,7 @@ artifacts:
 # ---------------------------------------------------------------------------
 state_mapping:
   planned: planning
+  designed: designing
   specced: spec
   criteria_set: spec
   tests_written: implementation
