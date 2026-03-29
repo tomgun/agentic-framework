@@ -101,6 +101,38 @@ def _read_feature_component(feature_id: str, project_root: Path) -> str | None:
 
 
 # ---------------------------------------------------------------------------
+# Task type resolution for gate skipping (F-0210)
+# ---------------------------------------------------------------------------
+
+_type_cache: dict[str, str] = {}
+
+
+def clear_type_cache() -> None:
+    """Clear the task type cache. Use in tests or after contract changes."""
+    _type_cache.clear()
+
+
+def _resolve_feature_type(feature_id: str, project_root: Path) -> str:
+    """Resolve task type from contract or FEATURES.md. Default: implementation.
+
+    Uses cached results to avoid redundant I/O across multiple gate calls.
+    """
+    cache_key = f"{feature_id}:{project_root}"
+    if cache_key in _type_cache:
+        return _type_cache[cache_key]
+
+    result = "implementation"
+    try:
+        from dod import resolve_task_type
+        result = resolve_task_type(feature_id, project_root)
+    except Exception:
+        pass
+
+    _type_cache[cache_key] = result
+    return result
+
+
+# ---------------------------------------------------------------------------
 # Gate 1: planned -> specced
 # ---------------------------------------------------------------------------
 
@@ -179,6 +211,13 @@ def gate_specced_to_criteria_set(feature_id: str, project_root: Path) -> GateRes
 
 def gate_criteria_set_to_tests_written(feature_id: str, project_root: Path) -> GateResult:
     """At least one test file must reference the feature ID."""
+    # Task-type-aware: skip test requirement for spike/docs types (F-0210)
+    task_type = _resolve_feature_type(feature_id, project_root)
+    if task_type in ("spike", "docs"):
+        return GateResult.ok(
+            warnings=[f"Tests gate skipped for task type '{task_type}'"]
+        )
+
     reasons: list[str] = []
     warnings: list[str] = []
 
@@ -253,6 +292,13 @@ def gate_tests_written_to_implementing(feature_id: str, project_root: Path) -> G
 
 def gate_implementing_to_verified(feature_id: str, project_root: Path) -> GateResult:
     """Test files and AC file must exist. Tests must pass (F-0300 R6)."""
+    # Task-type-aware: skip test verification for spike/docs types (F-0210)
+    task_type = _resolve_feature_type(feature_id, project_root)
+    if task_type in ("spike", "docs"):
+        return GateResult.ok(
+            warnings=[f"Verification gate skipped for task type '{task_type}'"]
+        )
+
     paths = get_paths(project_root)
     reasons: list[str] = []
     warnings: list[str] = []
@@ -349,6 +395,14 @@ def gate_verified_to_documented(feature_id: str, project_root: Path) -> GateResu
     - docs_gate=warning: run drift.sh --docs --check, warn if drift found
     - docs_gate=blocking: run drift.sh --docs --check, block if drift found
     """
+    # Task-type-aware: skip doc checks for spike type only (F-0210).
+    # "docs" type intentionally NOT skipped — docs features should have docs.
+    task_type = _resolve_feature_type(feature_id, project_root)
+    if task_type == "spike":
+        return GateResult.ok(
+            warnings=[f"Documentation gate skipped for task type '{task_type}'"]
+        )
+
     docs_gate = get_setting(project_root, "docs_gate", "off")
     warnings: list[str] = []
     reasons: list[str] = []

@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- ADR-001 roadmap execution: Configurable Definition of Done per task type (Configurable Definition of Done per task type) is current backlog item (Updated: 2026-03-29 08:21 UTC)
+- F-0210: Configurable DoD per task type — core implementation complete, PR pending (Updated: 2026-03-29 10:20 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

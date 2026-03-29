@@ -158,6 +158,7 @@ class Contract:
     scenarios: list[Scenario] = field(default_factory=list)
     migrations: list[Migration] = field(default_factory=list)
     notes: Optional[str] = None
+    task_type: Optional[str] = None  # implementation | spike | bugfix | docs
     source_path: Optional[Path] = None
 
     @classmethod
@@ -186,6 +187,7 @@ class Contract:
             scenarios=scenarios,
             migrations=migrations,
             notes=d.get("notes"),
+            task_type=d.get("task_type"),
             source_path=source_path,
         )
 
@@ -224,6 +226,8 @@ class Contract:
             d["migrations"] = [m.to_dict() for m in self.migrations]
         if self.notes:
             d["notes"] = self.notes
+        if self.task_type:
+            d["task_type"] = self.task_type
         return d
 
     @property

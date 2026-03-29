@@ -1686,6 +1686,23 @@ else
   fail "Settings: constraints.conf missing"
 fi
 
+# dod.conf exists with required types (F-0210)
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/presets/dod.conf" ]]; then
+  pass "Settings: dod.conf exists"
+  if grep -q "^implementation\." "${FRAMEWORK_ROOT}/.agentic/lib/presets/dod.conf"; then
+    pass "Settings: dod.conf has implementation type"
+  else
+    fail "Settings: dod.conf missing implementation type"
+  fi
+  if grep -q "^spike\." "${FRAMEWORK_ROOT}/.agentic/lib/presets/dod.conf"; then
+    pass "Settings: dod.conf has spike type"
+  else
+    fail "Settings: dod.conf missing spike type"
+  fi
+else
+  fail "Settings: dod.conf missing"
+fi
+
 # settings.sh has get_setting function
 if grep -q "^get_setting()" "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh" 2>/dev/null; then
   pass "Settings: settings.sh has get_setting()"

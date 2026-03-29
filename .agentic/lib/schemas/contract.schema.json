@@ -88,6 +88,11 @@
       "default": [],
       "description": "Child feature IDs for epics or decomposed features"
     },
+    "task_type": {
+      "type": "string",
+      "enum": ["implementation", "spike", "bugfix", "docs"],
+      "description": "Task type determines which Definition of Done checks apply. Default: implementation (all checks required)."
+    },
     "tags": {
       "type": "array",
       "items": {
