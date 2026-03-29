@@ -49,6 +49,15 @@ _No active items_
 
 
 
+
+### HN-0077: PR #215: Design phase formalization (F-004)
+- **Type**: pr_review
+- **Added**: 2026-03-29
+- **Context**: feat(F-004): optional designed state between planned and specced. 18 files, 587 lines added. https://github.com/tomgun/agentic-framework/pull/215
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0076: PR #214: Configurable DoD per task type
