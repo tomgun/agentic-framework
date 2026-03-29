@@ -864,7 +864,7 @@ flowchart TB
 | `crunch.py` | Multi-feature batch processing |
 | `pipeline.py` | Sequential specialized agent pipeline |
 | `critical_agent.py` | Adversarial AI reviewer |
-| `state_machine.py` | 9-state feature lifecycle |
+| `state_machine.py` | 10-state feature lifecycle |
 | `gates.py` | Transition gate functions |
 | `review.py` | Configurable review checkpoints |
 | `components.py` | Component registry and scoped testing |

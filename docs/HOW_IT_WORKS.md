@@ -144,7 +144,7 @@ graph TB
         %% Testing
         M_HARNESS[harness.sh<br/>LLM test runner]
         M_MUTATION_SH[mutation_test.sh<br/>infrastructure proofs]
-        M_STATE_MACHINE[state_machine.py + gates.py<br/>9-state lifecycle]
+        M_STATE_MACHINE[state_machine.py + gates.py<br/>10-state lifecycle]
         M_VALIDATE[validate_framework.sh<br/>500+ acceptance tests]
         M_SPEC_ANALYZE[spec-analyze.sh<br/>semantic consistency]
         M_AC_COV[coverage.py --ac-coverage<br/>per-AC test mapping]
@@ -576,16 +576,18 @@ The server is optional. Without it, the framework uses file-based coordination (
 
 ## Formal Feature State Machine (v0.47.0)
 
-Features follow a 9-state lifecycle enforced by `state_machine.py` + `gates.py`:
+Features follow a 10-state lifecycle enforced by `state_machine.py` + `gates.py`:
 
 ```
-planned → specced → criteria_set → tests_written → implementing
+planned → [designed] → specced → criteria_set → tests_written → implementing
 → verified → documented → committed → shipped   (+ deprecated)
 ```
 
+The `designed` state is optional, controlled by the `design_phase` setting (`off|optional|required`, default: `off`).
+
 **Contract lifecycle** (YAML contracts use a parallel lifecycle):
 ```
-exploring → specifying → implementing → verifying → shipping → shipped (+ deprecated)
+exploring → [designing] → specifying → implementing → verifying → shipping → shipped (+ deprecated)
 ```
 
 - **Forward transitions**: sequential, one step at a time
