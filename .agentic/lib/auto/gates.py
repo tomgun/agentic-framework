@@ -107,6 +107,11 @@ def _read_feature_component(feature_id: str, project_root: Path) -> str | None:
 _type_cache: dict[str, str] = {}
 
 
+def clear_type_cache() -> None:
+    """Clear the task type cache. Use in tests or after contract changes."""
+    _type_cache.clear()
+
+
 def _resolve_feature_type(feature_id: str, project_root: Path) -> str:
     """Resolve task type from contract or FEATURES.md. Default: implementation.
 
@@ -390,7 +395,8 @@ def gate_verified_to_documented(feature_id: str, project_root: Path) -> GateResu
     - docs_gate=warning: run drift.sh --docs --check, warn if drift found
     - docs_gate=blocking: run drift.sh --docs --check, block if drift found
     """
-    # Task-type-aware: skip doc checks for spike type (F-0210)
+    # Task-type-aware: skip doc checks for spike type only (F-0210).
+    # "docs" type intentionally NOT skipped — docs features should have docs.
     task_type = _resolve_feature_type(feature_id, project_root)
     if task_type == "spike":
         return GateResult.ok(

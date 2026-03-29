@@ -354,7 +354,6 @@ show_all_settings() {
         "pipeline_enabled"
         "worktree_mode"
         "main_branch_mode"
-        "dod_type"
     )
 
     printf "%-28s %-20s %s\n" "SETTING" "VALUE" "SOURCE"

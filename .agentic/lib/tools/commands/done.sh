@@ -206,22 +206,11 @@ cmd_done() {
     if [ "$ft" = "no" ]; then
         echo -e "${BOLD}=== Task Complete Check ===${NC}"
         echo ""
-        # Resolve task type (discovery mode supports --type too)
-        local _disc_type="implementation"
-        _disc_type=$(python3 "$AGENTIC_LIB/dod.py" resolve-type "" \
-            ${explicit_type:+--type "$explicit_type"} --project-root "$ROOT_DIR" 2>/dev/null) || _disc_type="implementation"
-        echo -e "${BOLD}Definition of Done (${_disc_type}):${NC}"
-        local _disc_checklist
-        _disc_checklist=$(python3 "$AGENTIC_LIB/dod.py" checklist --type "$_disc_type" \
-            --project-root "$ROOT_DIR" 2>/dev/null) || _disc_checklist=""
-        if [ -n "$_disc_checklist" ]; then
-            echo "$_disc_checklist"
-        else
-            echo "  [ ] Task completed as described"
-            echo "  [ ] Tests written and passing (if applicable)"
-            echo "  [ ] STATUS.md updated"
-            echo "  [ ] JOURNAL.md updated"
-        fi
+        echo -e "${BOLD}Definition of Done:${NC}"
+        echo "  [ ] Task completed as described"
+        echo "  [ ] Tests written and passing (if applicable)"
+        echo "  [ ] STATUS.md updated"
+        echo "  [ ] JOURNAL.md updated"
         echo ""
         # Quick health check (warning only — Discovery mode)
         if bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null; then
@@ -749,9 +738,10 @@ PYEOF
     if [ -n "$checklist_output" ]; then
         echo "$checklist_output"
     else
-        # Fallback: exact legacy hardcoded list
+        # Fallback: legacy hardcoded list
         echo "  [ ] All acceptance criteria met"
-        echo "  [ ] Tests written and passing"
+        echo "  [ ] Tests written for feature"
+        echo "  [ ] All tests passing"
         echo "  [ ] .agentic/spec/FEATURES.md updated (status: shipped)"
         echo "  [ ] Docs updated (if behavior changed)"
         echo "  [ ] Code reviewed (self-review at minimum)"

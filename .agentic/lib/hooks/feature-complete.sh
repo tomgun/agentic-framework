@@ -41,7 +41,7 @@ echo "════════════════════════�
 echo ""
 
 # Resolve task type for type-aware checks (F-0210)
-AGENTIC_LIB="${PROJECT_ROOT}/.agentic/lib"
+# AGENTIC_LIB is already set by paths.sh (sourced above)
 TASK_TYPE=$(python3 "$AGENTIC_LIB/dod.py" resolve-type "$FEATURE_ID" --project-root "$PROJECT_ROOT" 2>/dev/null) || TASK_TYPE="implementation"
 if [[ "$TASK_TYPE" != "implementation" ]]; then
   echo "Task type: ${TASK_TYPE}"

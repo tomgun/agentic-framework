@@ -34,8 +34,8 @@ TYPE_ALIASES: dict[str, str] = {
 # Human-readable labels for each check key
 CHECK_LABELS: dict[str, str] = {
     "ac_met": "All acceptance criteria met",
-    "tests_exist": "Tests written and passing",
-    "tests_pass": "Tests written and passing",
+    "tests_exist": "Tests written for feature",
+    "tests_pass": "All tests passing",
     "docs_updated": "Docs updated (if behavior changed)",
     "code_reviewed": "Code reviewed (self-review at minimum)",
     "smoke_tested": "Smoke tested (actually RUN it)",
@@ -43,10 +43,11 @@ CHECK_LABELS: dict[str, str] = {
     "features_updated": ".agentic/spec/FEATURES.md updated (status: shipped)",
 }
 
-# Checklist display order (some checks share a label in the display)
+# Checklist display order
 CHECKLIST_ORDER = [
     "ac_met",
     "tests_exist",
+    "tests_pass",
     "features_updated",
     "docs_updated",
     "code_reviewed",
@@ -66,6 +67,11 @@ CHECK_TO_GATES: dict[str, list[str]] = {
 # ---------------------------------------------------------------------------
 
 _conf_cache: dict[str, dict[str, dict[str, str]]] = {}
+
+
+def clear_cache() -> None:
+    """Clear all module-level caches. Use in tests or after config changes."""
+    _conf_cache.clear()
 
 
 # ---------------------------------------------------------------------------
@@ -135,7 +141,7 @@ def resolve_task_type(
             if contract_file.exists():
                 from contracts import load_contract
                 c = load_contract(contract_file)
-                if hasattr(c, "task_type") and c.task_type:
+                if c.task_type:
                     return _normalize(c.task_type)
         except Exception:
             pass

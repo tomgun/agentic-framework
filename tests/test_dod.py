@@ -10,6 +10,7 @@ sys.path.insert(0, str(_LIB))
 
 from dod import (
     TYPE_ALIASES,
+    clear_cache,
     format_checklist,
     get_dod_items,
     get_skipped_gates,
