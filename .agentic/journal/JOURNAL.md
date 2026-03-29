@@ -4812,3 +4812,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-29 20:46 - Design phase formalization shipped
+
+**Why**: Post-merge completion for F-004 improvement
+
+**What changed**:
+- Optional designed state merged via PR #215. 10-state lifecycle, 3 design_phase modes, gate enforcement, contract round-trip fidelity, 17 new tests, docs updated.
+
+**Next steps**:
+- F-037 MCP Coordination Server (next backlog item)
+
+**Blockers**: None
+

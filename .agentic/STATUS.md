@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Design phase formalization (F-004 improvement) — PR ready (Updated: 2026-03-29 20:33 UTC)
+- Design phase formalization shipped (#215). Next: F-037 MCP Coordination Server (Updated: 2026-03-29 20:46 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

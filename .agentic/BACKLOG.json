@@ -1,18 +1,11 @@
 [
   {
-    "type": "task",
-    "description": "Design phase formalization",
-    "added_at": "2026-03-23T17:00:00Z",
-    "added_by": "agent",
-    "notes": "Originally F-0233. Improvement to F-004 (Plan & Design Review)",
-    "became_current_at": "2026-03-29T11:27:53Z"
-  },
-  {
     "type": "feature",
     "id": "F-037",
     "description": "MCP Coordination Server",
     "added_at": "2026-03-16T18:56:16Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "became_current_at": "2026-03-29T20:46:46Z"
   },
   {
     "type": "feature",
