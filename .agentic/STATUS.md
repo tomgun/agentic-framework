@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-033 auto-sync: upgrade.sh preserves local customizations (Updated: 2026-03-28 21:38 UTC)
+- ADR-001 roadmap execution: Configurable Definition of Done per task type (Configurable Definition of Done per task type) is current backlog item (Updated: 2026-03-29 08:21 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
@@ -34,4 +34,4 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 ## Release notes (optional)
 - v0.58.0: F-0239 structural enforcement for post-merge workflow
 - See CHANGELOG.md for full history
-- QA: QA: 0/1 verified, 10 pending
+- QA: QA: 0/1 verified, 12 pending

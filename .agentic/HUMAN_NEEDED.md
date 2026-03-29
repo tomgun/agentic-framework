@@ -38,6 +38,15 @@ _No active items_
 
 
 
+
+### HN-0075: PR #213: F-033 auto-sync
+- **Type**: pr_review
+- **Added**: 2026-03-28
+- **Context**: feat/F-033-auto-sync — auto-sync local customizations during upgrade
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0074: PR #212: F-033 Project-Specific Customization Layer

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_migration": 22,
+  "last_migration": 23,
   "migrations": [
     {
       "id": 1,
@@ -133,6 +133,12 @@
       "file": "022_reopen_f0184_for_phase_1b_dotted_id_decomposition_extract_subfeature_recursive_check.md",
       "date": "2026-03-24",
       "description": "Reopen F-005 for Phase 1b: dotted ID decomposition, extract_subfeature, recursive check"
+    },
+    {
+      "id": 23,
+      "file": "023_reopen_f033_to_add_autosync_scope_formerly_f034.md",
+      "date": "2026-03-28",
+      "description": "Reopen F-033 to add auto-sync scope (formerly F-034)"
     }
   ]
 }

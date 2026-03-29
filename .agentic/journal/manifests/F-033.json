@@ -1,22 +1,25 @@
 {
   "feature": "F-033",
   "mode": "feature",
-  "generated": "2026-03-28T20:57:19Z",
+  "generated": "2026-03-29T08:21:05Z",
   "commits": [
+    {"hash": "b1d74856", "date": "2026-03-29", "message": "feat(F-033): local customization auto-sync during upgrade (#213)", "additions": 270, "deletions": 166},
+    {"hash": "ae9fd59d", "date": "2026-03-29", "message": "fix(F-033): address review feedback on auto-sync PR", "additions": 38, "deletions": 57},
+    {"hash": "d87b54f2", "date": "2026-03-28", "message": "feat(F-033): add auto-sync for local customizations during upgrade", "additions": 285, "deletions": 162},
     {"hash": "059d7fde", "date": "2026-03-28", "message": "feat(F-033): project-specific customization layer (#212)", "additions": 685, "deletions": 11},
     {"hash": "27442b22", "date": "2026-03-28", "message": "fix(F-033): review fixes — bugs, missing hook, docs", "additions": 66, "deletions": 15},
     {"hash": "412ed278", "date": "2026-03-28", "message": "feat(F-033): project-specific customization layer (#F-033)", "additions": 627, "deletions": 4}
   ],
   "files": {
-    "code": [{"file": ".agentic/lib/hooks/feature-complete.sh"}, {"file": ".agentic/lib/hooks/pre-commit-check.sh"}, {"file": ".agentic/lib/init/scaffold.sh"}, {"file": ".agentic/lib/tools/commands/commit.sh"}, {"file": ".agentic/lib/tools/commands/done.sh"}, {"file": ".agentic/lib/tools/commands/implement.sh"}, {"file": ".agentic/lib/tools/commands/plan.sh"}],
-    "tests": [{"file": ".agentic/spec/contracts/F-033.yaml"}, {"file": ".agentic/spec/contracts/F-036.yaml"}, {"file": "tests/validate_framework.sh"}],
-    "docs": [{"file": ".agentic/STATUS.md"}, {"file": ".agentic/conventions.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/journal/plans/2026-03-28-F-033-plan.md"}, {"file": ".agentic/lib/DEVELOPER_GUIDE.md"}, {"file": ".agentic/lib/init/conventions-local.template.md"}, {"file": ".agentic/lib/init/extensions-readme.md"}, {"file": ".agentic/lib/init/workflow-directions.template.md"}, {"file": ".agentic/prompts/implementer.md"}, {"file": "CONTEXT_PACK.md"}],
-    "config": [{"file": ".agentic/spec/contracts/F-033.yaml"}, {"file": ".agentic/spec/contracts/F-036.yaml"}]
+    "code": [{"file": ".agentic/lib/hooks/feature-complete.sh"}, {"file": ".agentic/lib/hooks/pre-commit-check.sh"}, {"file": ".agentic/lib/init/scaffold.sh"}, {"file": ".agentic/lib/tools/commands/commit.sh"}, {"file": ".agentic/lib/tools/commands/done.sh"}, {"file": ".agentic/lib/tools/commands/implement.sh"}, {"file": ".agentic/lib/tools/commands/plan.sh"}, {"file": ".agentic/lib/tools/upgrade.sh"}],
+    "tests": [{"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/contracts/F-033.yaml"}, {"file": ".agentic/spec/contracts/F-036.yaml"}, {"file": ".agentic/spec/migrations/023_reopen_f033_to_add_autosync_scope_formerly_f034.md"}, {"file": "tests/validate_framework.sh"}],
+    "docs": [{"file": ".agentic/STATUS.md"}, {"file": ".agentic/conventions.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/journal/plans/2026-03-28-F-033-plan.md"}, {"file": ".agentic/lib/DEVELOPER_GUIDE.md"}, {"file": ".agentic/lib/init/conventions-local.template.md"}, {"file": ".agentic/lib/init/extensions-readme.md"}, {"file": ".agentic/lib/init/workflow-directions.template.md"}, {"file": ".agentic/prompts/implementer.md"}, {"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/migrations/023_reopen_f033_to_add_autosync_scope_formerly_f034.md"}, {"file": "CONTEXT_PACK.md"}],
+    "config": [{"file": ".agentic/BACKLOG.json"}, {"file": ".agentic/spec/contracts/F-033.yaml"}, {"file": ".agentic/spec/contracts/F-036.yaml"}]
   },
   "stats": {
-    "total_commits": 3,
-    "total_files": 20,
-    "additions": 1378,
-    "deletions": 30
+    "total_commits": 6,
+    "total_files": 24,
+    "additions": 1971,
+    "deletions": 415
   }
 }
