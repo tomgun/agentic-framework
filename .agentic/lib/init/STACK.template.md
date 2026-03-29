@@ -45,6 +45,8 @@ Purpose: a single source of truth for "how we build and run software here".
 # Advisory spec analysis before implementation. Profile defaults — Discovery: off | Formal: on
 - worktree_mode: off
 # Auto-create worktrees for feature branches. Options: off | always. Profile defaults — Discovery: off | Formal: off
+- design_phase: off
+# Optional design phase between planned and specced. off: designed state unavailable. optional: both planned→designed and planned→specced available. required: must go through designed. Profile defaults — Discovery: off | Formal: off | Autonomous: off
 - state_enforcement: off
 # Intent journal state enforcement. off: crash recovery only (skip transitions). advisory: warn on gate failures. blocking: block on gate failures. Profile defaults — Discovery: off | Formal: blocking | Autonomous: blocking
 
@@ -77,6 +79,8 @@ Purpose: a single source of truth for "how we build and run software here".
 ### Review checkpoints
 <!-- Who reviews each transition. Options: human | critical_agent | skip -->
 <!-- critical_agent spawns adversarial AI reviewer -->
+- review_design: skip
+# planned → designed (when design_phase enabled). Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
 - review_spec: skip
 # planned → specced. Discovery: skip | Formal: critical_agent | Autonomous Formal: critical_agent
 - review_criteria: skip

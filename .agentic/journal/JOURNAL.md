@@ -4799,3 +4799,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-03-29 20:33 - Design phase formalization
+
+**Why**: Teams with complex architecture need a formal design step (ADRs, design docs) between planning and specification — no gate enforced it before
+
+**What changed**:
+- Optional DESIGNED state added between planned and specced. 15 files updated: state machine, gates, review map, profiles, downstream state lists, YAML workflow, contract, STACK template, tests. All 3 design_phase modes (off/optional/required) with gate enforcement and get_next_states filtering. Contract round-trip fidelity via new 'designing' lifecycle value.
+
+**Next steps**:
+- Review and merge PR. Run ag done after merge.
+
+**Blockers**: None
+

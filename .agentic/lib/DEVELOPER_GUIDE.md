@@ -2277,7 +2277,7 @@ ag transition F-XXXX --status    # Show current state and available transitions
 ag transition --unblocked        # List features ready to advance
 ```
 
-The 9-state lifecycle: `planned → specced → criteria_set → tests_written → implementing → verified → documented → committed → shipped`. State machine enforces valid transitions and blocks invalid ones when enforcement mode is `blocking`.
+The 10-state lifecycle: `planned → [designed] → specced → criteria_set → tests_written → implementing → verified → documented → committed → shipped`. The `designed` state is optional (`design_phase: off|optional|required`, default: off). State machine enforces valid transitions and blocks invalid ones when enforcement mode is `blocking`.
 
 ### Spec Quality Audit (F-0215)
 

@@ -46,9 +46,9 @@ def validate_features_md(path: Path) -> List[str]:
                 if status_match:
                     status = status_match.group(1)
                     valid_statuses = {
-                        "planned", "specced", "criteria_set", "tests_written",
-                        "implementing", "verified", "documented", "committed",
-                        "shipped", "deprecated",
+                        "planned", "designed", "specced", "criteria_set",
+                        "tests_written", "implementing", "verified",
+                        "documented", "committed", "shipped", "deprecated",
                         "in_progress",  # backward-compat alias for implementing
                     }
                     if status not in valid_statuses:

@@ -58,7 +58,7 @@ def _validate_feature_id(feature_id: str) -> None:
 # ---------------------------------------------------------------------------
 
 _STATE_ORDER = [
-    "planned", "specced", "criteria_set", "tests_written",
+    "planned", "designed", "specced", "criteria_set", "tests_written",
     "implementing", "verified", "documented", "committed", "shipped",
 ]
 
@@ -106,7 +106,7 @@ def derive_epic_status(children_statuses: list[str]) -> Optional[str]:
         return "implementing"
 
     # All criteria_set or earlier
-    early_states = {"planned", "specced", "criteria_set"}
+    early_states = {"planned", "designed", "specced", "criteria_set"}
     if all(s in early_states for s in non_deprecated):
         return "criteria_set"
 
@@ -532,10 +532,10 @@ def decompose(
         return False, [f"Feature {epic_id} not found in FEATURES.md"]
 
     # Must be in a pre-implementation state
-    if status not in ("planned", "specced", "criteria_set"):
+    if status not in ("planned", "designed", "specced", "criteria_set"):
         return False, [
             f"Feature {epic_id} is in '{status}' state. "
-            f"Decomposition requires 'planned', 'specced', or 'criteria_set'."
+            f"Decomposition requires 'planned', 'designed', 'specced', or 'criteria_set'."
         ]
 
     # Contract or AC file must exist

@@ -119,7 +119,7 @@ def print_dashboard(features: List[Dict], period_days: int = None):
     print("-" * 70)
     status_counts = Counter(f.get("status", "unknown") for f in features)
     status_order = [
-        "planned", "specced", "criteria_set", "tests_written",
+        "planned", "designed", "specced", "criteria_set", "tests_written",
         "implementing", "verified", "documented", "committed",
         "shipped", "deprecated", "unknown",
     ]

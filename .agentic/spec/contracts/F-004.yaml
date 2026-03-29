@@ -12,7 +12,9 @@ description: |
   agents in fresh context). Plans are durable artifacts saved to journal/plans/.
   Execution order and parallelization markers guide implementation. Autonomous
   convergence loop with expert reviewers auto-resolves when possible. Manual
-  convergence presents synthesis to user for decision.
+  convergence presents synthesis to user for decision. Optional design phase
+  (designed state) between planned and specced, controlled by design_phase
+  setting (off|optional|required).
 
 user_input: ""
 
@@ -40,6 +42,54 @@ assertions:
       grep -q "plan.*required\|Approved plan" .agentic/lib/hooks/pre-commit-check.sh
     tests:
       - tests/validate_framework.sh::F-0191
+
+  - id: AC-004
+    text: "DESIGNED state exists in FeatureState enum between PLANNED and SPECCED"
+    type: structural
+    verify: |
+      python3 -c "
+      import sys; sys.path.insert(0, '.agentic/lib'); sys.path.insert(0, '.agentic/lib/auto')
+      from state_machine import FeatureState, STATE_ORDER
+      assert hasattr(FeatureState, 'DESIGNED')
+      idx_d = STATE_ORDER.index(FeatureState.DESIGNED)
+      idx_p = STATE_ORDER.index(FeatureState.PLANNED)
+      idx_s = STATE_ORDER.index(FeatureState.SPECCED)
+      assert idx_p < idx_d < idx_s, f'Order wrong: P={idx_p} D={idx_d} S={idx_s}'
+      "
+    tests:
+      - tests/test_state_machine.py::TestDesignedState::test_designed_in_state_order
+
+  - id: AC-005
+    text: "design_phase setting controls transition availability (off/optional/required)"
+    type: structural
+    verify: |
+      grep -q "design_phase" .agentic/lib/presets/profiles.conf &&
+      grep -q "design_phase" .agentic/lib/auto/gates.py
+    tests:
+      - tests/test_state_machine.py::TestDesignedState::test_planned_to_designed_blocked_when_off
+      - tests/test_state_machine.py::TestDesignedState::test_planned_to_specced_blocked_when_required
+
+  - id: AC-006
+    text: "Gate checks for design artifacts (ADR or design.md)"
+    type: structural
+    verify: |
+      grep -q "gate_designed_to_specced" .agentic/lib/auto/gates.py
+    tests:
+      - tests/test_state_machine.py::TestDesignedState::test_design_gate_checks_artifacts
+      - tests/test_state_machine.py::TestDesignedState::test_design_gate_blocks_without_artifacts
+
+  - id: AC-007
+    text: "Contract round-trip fidelity — designed state survives write/read"
+    type: structural
+    verify: |
+      python3 -c "
+      import sys; sys.path.insert(0, '.agentic/lib'); sys.path.insert(0, '.agentic/lib/auto')
+      from state_machine import LIFECYCLE_TO_STATE, STATE_TO_LIFECYCLE, FeatureState
+      assert STATE_TO_LIFECYCLE[FeatureState.DESIGNED] == 'designing'
+      assert LIFECYCLE_TO_STATE['designing'] == FeatureState.DESIGNED
+      "
+    tests:
+      - tests/test_state_machine.py::TestDesignedState::test_contract_roundtrip_designed
 
 nfr_refs: []
 migrations: []

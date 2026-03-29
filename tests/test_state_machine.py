@@ -89,10 +89,10 @@ def write_features(root: Path, features: list[tuple[str, str, str]]) -> None:
 # ---------------------------------------------------------------------------
 
 class TestFeatureState:
-    def test_all_nine_states_plus_deprecated(self):
-        assert len(FeatureState) == 10
+    def test_all_ten_states_plus_deprecated(self):
+        assert len(FeatureState) == 11
         expected = {
-            "planned", "specced", "criteria_set", "tests_written",
+            "planned", "designed", "specced", "criteria_set", "tests_written",
             "implementing", "verified", "documented", "committed",
             "shipped", "deprecated",
         }
@@ -100,7 +100,7 @@ class TestFeatureState:
 
     def test_state_order_excludes_deprecated(self):
         assert FeatureState.DEPRECATED not in STATE_ORDER
-        assert len(STATE_ORDER) == 9
+        assert len(STATE_ORDER) == 10
         assert STATE_ORDER[0] == FeatureState.PLANNED
         assert STATE_ORDER[-1] == FeatureState.SHIPPED
 
@@ -121,10 +121,13 @@ class TestFeatureState:
 
 class TestTransitionTables:
     def test_forward_transitions_are_sequential(self):
-        """Each forward transition goes to the next state in order."""
-        assert len(FORWARD_TRANSITIONS) == 8
+        """Each sequential pair in STATE_ORDER is a forward transition."""
+        # 9 sequential pairs + 1 non-sequential (planned -> specced) = 10
+        assert len(FORWARD_TRANSITIONS) == 10
         for i in range(len(STATE_ORDER) - 1):
             assert (STATE_ORDER[i], STATE_ORDER[i + 1]) in FORWARD_TRANSITIONS
+        # Also: planned -> specced (non-sequential, gate-controlled)
+        assert (FeatureState.PLANNED, FeatureState.SPECCED) in FORWARD_TRANSITIONS
 
     def test_regression_transitions_go_backward(self):
         for from_state, to_state in REGRESSION_TRANSITIONS:
@@ -136,7 +139,9 @@ class TestTransitionTables:
             )
 
     def test_skip_transitions_exist(self):
-        assert len(SKIP_TRANSITIONS) >= 4
+        assert len(SKIP_TRANSITIONS) >= 5
+        # designed -> implementing (lean workflow)
+        assert (FeatureState.DESIGNED, FeatureState.IMPLEMENTING) in SKIP_TRANSITIONS
         # planned -> implementing (legacy flow)
         assert (FeatureState.PLANNED, FeatureState.IMPLEMENTING) in SKIP_TRANSITIONS
         # planned -> shipped (retroactive tracking)
@@ -586,3 +591,182 @@ class TestStateMachineFeaturesMd:
         sm = FeatureStateMachine(project_root=project_dir, enforce=False)
         allowed, msgs = sm.can_transition("F-0100", FeatureState.SPECCED)
         assert allowed
+
+
+# ---------------------------------------------------------------------------
+# Designed state (F-004 improvement: design phase formalization)
+# ---------------------------------------------------------------------------
+
+def _set_design_phase(root: Path, value: str) -> None:
+    """Override design_phase setting in STACK.md."""
+    stack = root / "STACK.md"
+    stack.write_text(f"## Settings\n- profile: formal\n- design_phase: {value}\n")
+
+
+class TestDesignedState:
+    """Tests for the optional designed state between planned and specced."""
+
+    def test_designed_in_state_order(self):
+        """DESIGNED is between PLANNED and SPECCED in STATE_ORDER."""
+        idx_p = STATE_ORDER.index(FeatureState.PLANNED)
+        idx_d = STATE_ORDER.index(FeatureState.DESIGNED)
+        idx_s = STATE_ORDER.index(FeatureState.SPECCED)
+        assert idx_p < idx_d < idx_s
+
+    def test_planned_to_designed_valid(self):
+        """planned -> designed is a valid forward transition."""
+        assert (FeatureState.PLANNED, FeatureState.DESIGNED) in FORWARD_TRANSITIONS
+
+    def test_designed_to_specced_valid(self):
+        """designed -> specced is a valid forward transition."""
+        assert (FeatureState.DESIGNED, FeatureState.SPECCED) in FORWARD_TRANSITIONS
+
+    def test_planned_to_specced_still_valid_when_off(self, project_dir):
+        """planned -> specced still works when design_phase is off (default)."""
+        write_features(project_dir, [("F-0050", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        from auto.gates import register_default_gates
+        register_default_gates(sm, FeatureState)
+        allowed, msgs = sm.can_transition("F-0050", FeatureState.SPECCED)
+        assert allowed, f"Expected allowed but got: {msgs}"
+
+    def test_planned_to_specced_blocked_when_required(self, project_dir):
+        """planned -> specced blocked when design_phase is required."""
+        _set_design_phase(project_dir, "required")
+        write_features(project_dir, [("F-0050", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        from auto.gates import register_default_gates
+        register_default_gates(sm, FeatureState)
+        allowed, msgs = sm.can_transition("F-0050", FeatureState.SPECCED)
+        assert not allowed
+        assert any("design_phase is required" in m for m in msgs)
+
+    def test_planned_to_designed_blocked_when_off(self, project_dir):
+        """planned -> designed blocked when design_phase is off."""
+        write_features(project_dir, [("F-0050", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        from auto.gates import register_default_gates
+        register_default_gates(sm, FeatureState)
+        allowed, msgs = sm.can_transition("F-0050", FeatureState.DESIGNED)
+        assert not allowed
+        assert any("design_phase is off" in m for m in msgs)
+
+    def test_planned_to_designed_allowed_when_optional(self, project_dir):
+        """planned -> designed allowed when design_phase is optional."""
+        _set_design_phase(project_dir, "optional")
+        write_features(project_dir, [("F-0050", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        from auto.gates import register_default_gates
+        register_default_gates(sm, FeatureState)
+        allowed, msgs = sm.can_transition("F-0050", FeatureState.DESIGNED)
+        assert allowed, f"Expected allowed but got: {msgs}"
+
+    def test_planned_to_designed_allowed_when_required(self, project_dir):
+        """planned -> designed allowed when design_phase is required."""
+        _set_design_phase(project_dir, "required")
+        write_features(project_dir, [("F-0050", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        from auto.gates import register_default_gates
+        register_default_gates(sm, FeatureState)
+        allowed, msgs = sm.can_transition("F-0050", FeatureState.DESIGNED)
+        assert allowed, f"Expected allowed but got: {msgs}"
+
+    def test_design_gate_checks_artifacts(self, project_dir):
+        """designed -> specced passes with a design.md artifact."""
+        _set_design_phase(project_dir, "required")
+        write_features(project_dir, [("F-0050", "Test", "designed")])
+        # Create design artifact
+        work_dir = project_dir / ".agentic" / "work" / "F-0050"
+        work_dir.mkdir(parents=True)
+        (work_dir / "design.md").write_text("# Design for F-0050\n")
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        from auto.gates import register_default_gates
+        register_default_gates(sm, FeatureState)
+        allowed, msgs = sm.can_transition("F-0050", FeatureState.SPECCED)
+        assert allowed, f"Expected allowed but got: {msgs}"
+
+    def test_design_gate_checks_adr_artifact(self, project_dir):
+        """designed -> specced passes with an ADR referencing the feature."""
+        _set_design_phase(project_dir, "required")
+        write_features(project_dir, [("F-0050", "Test", "designed")])
+        # Create ADR artifact
+        adr_dir = project_dir / ".agentic" / "spec" / "adr"
+        adr_dir.mkdir(parents=True)
+        (adr_dir / "ADR-001.md").write_text("# ADR-001\nRelates to F-0050\n")
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        from auto.gates import register_default_gates
+        register_default_gates(sm, FeatureState)
+        allowed, msgs = sm.can_transition("F-0050", FeatureState.SPECCED)
+        assert allowed, f"Expected allowed but got: {msgs}"
+
+    def test_design_gate_blocks_without_artifacts(self, project_dir):
+        """designed -> specced blocked without design artifacts."""
+        _set_design_phase(project_dir, "required")
+        write_features(project_dir, [("F-0050", "Test", "designed")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        from auto.gates import register_default_gates
+        register_default_gates(sm, FeatureState)
+        allowed, msgs = sm.can_transition("F-0050", FeatureState.SPECCED)
+        assert not allowed
+        assert any("No design artifact" in m for m in msgs)
+
+    def test_regression_specced_to_designed(self):
+        """specced -> designed is a valid regression."""
+        assert (FeatureState.SPECCED, FeatureState.DESIGNED) in REGRESSION_TRANSITIONS
+
+    def test_regression_implementing_to_designed(self):
+        """implementing -> designed is a valid regression."""
+        assert (FeatureState.IMPLEMENTING, FeatureState.DESIGNED) in REGRESSION_TRANSITIONS
+
+    def test_skip_designed_to_implementing(self):
+        """designed -> implementing is a valid skip transition."""
+        assert (FeatureState.DESIGNED, FeatureState.IMPLEMENTING) in SKIP_TRANSITIONS
+
+    def test_get_next_states_off_hides_designed(self, project_dir):
+        """get_next_states excludes designed when design_phase is off."""
+        write_features(project_dir, [("F-0050", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=False)
+        next_states = sm.get_next_states("F-0050")
+        assert FeatureState.DESIGNED not in next_states
+        assert FeatureState.SPECCED in next_states
+
+    def test_get_next_states_optional_shows_both(self, project_dir):
+        """get_next_states shows both designed and specced when optional."""
+        _set_design_phase(project_dir, "optional")
+        write_features(project_dir, [("F-0050", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=False)
+        next_states = sm.get_next_states("F-0050")
+        assert FeatureState.DESIGNED in next_states
+        assert FeatureState.SPECCED in next_states
+
+    def test_get_next_states_required_hides_specced(self, project_dir):
+        """get_next_states hides specced from planned when required."""
+        _set_design_phase(project_dir, "required")
+        write_features(project_dir, [("F-0050", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=False)
+        next_states = sm.get_next_states("F-0050")
+        assert FeatureState.DESIGNED in next_states
+        assert FeatureState.SPECCED not in next_states
+
+    def test_contract_roundtrip_designed(self, project_dir):
+        """Designed state survives contract lifecycle round-trip."""
+        from auto.state_machine import LIFECYCLE_TO_STATE, STATE_TO_LIFECYCLE
+        # designed -> "designing" lifecycle
+        assert STATE_TO_LIFECYCLE[FeatureState.DESIGNED] == "designing"
+        # "designing" lifecycle -> DESIGNED state
+        assert LIFECYCLE_TO_STATE["designing"] == FeatureState.DESIGNED
+
+    def test_cascade_implementing_to_specced_excludes_designed(self):
+        """Regression implementing->specced does NOT invalidate designed.
+
+        designed is at index 1 (before specced at index 2), so it is outside
+        the invalidation range between source and target.
+        """
+        sm = FeatureStateMachine(project_root=Path("."), enforce=False)
+        invalidated = sm.cascade_invalidations(
+            FeatureState.IMPLEMENTING, FeatureState.SPECCED
+        )
+        assert FeatureState.DESIGNED not in invalidated
+        # But criteria_set and tests_written should be invalidated
+        assert FeatureState.CRITERIA_SET in invalidated
+        assert FeatureState.TESTS_WRITTEN in invalidated

@@ -1,13 +1,16 @@
 """
 state_machine.py -- Formal state machine for the Agentic Framework's feature lifecycle.
 
-Implements ADR-001 Section 5: a 9-state feature lifecycle with forward transitions,
+Implements ADR-001 Section 5: a 10-state feature lifecycle with forward transitions,
 regression transitions, cascade rules, and advisory mode.
 
 States:
-    planned -> specced -> criteria_set -> tests_written -> implementing ->
-    verified -> documented -> committed -> shipped
+    planned -> [designed] -> specced -> criteria_set -> tests_written ->
+    implementing -> verified -> documented -> committed -> shipped
     (+ deprecated as terminal state reachable from any state)
+
+The designed state is optional, controlled by the design_phase setting
+(off|optional|required, default: off).
 
 Usage:
     from auto.state_machine import FeatureStateMachine, FeatureState
@@ -50,8 +53,9 @@ from auto.gates import GateResult, register_default_gates  # noqa: E402
 # ---------------------------------------------------------------------------
 
 class FeatureState(Enum):
-    """9-state feature lifecycle + deprecated terminal state."""
+    """10-state feature lifecycle + deprecated terminal state."""
     PLANNED = "planned"
+    DESIGNED = "designed"
     SPECCED = "specced"
     CRITERIA_SET = "criteria_set"
     TESTS_WRITTEN = "tests_written"
@@ -77,6 +81,7 @@ STATUS_ALIASES: dict[str, FeatureState] = {
 # Contract lifecycle -> FeatureState mapping (F-031: YAML contracts)
 LIFECYCLE_TO_STATE: dict[str, FeatureState] = {
     "exploring": FeatureState.PLANNED,
+    "designing": FeatureState.DESIGNED,
     "specifying": FeatureState.CRITERIA_SET,
     "implementing": FeatureState.IMPLEMENTING,
     "verifying": FeatureState.VERIFIED,
@@ -88,6 +93,7 @@ LIFECYCLE_TO_STATE: dict[str, FeatureState] = {
 # FeatureState -> contract lifecycle (reverse mapping for writes)
 STATE_TO_LIFECYCLE: dict[FeatureState, str] = {
     FeatureState.PLANNED: "exploring",
+    FeatureState.DESIGNED: "designing",
     FeatureState.SPECCED: "exploring",
     FeatureState.CRITERIA_SET: "specifying",
     FeatureState.TESTS_WRITTEN: "specifying",
@@ -111,7 +117,9 @@ ALL_VALID_STATUSES: set[str] = (
 # ---------------------------------------------------------------------------
 
 FORWARD_TRANSITIONS: set[tuple[FeatureState, FeatureState]] = {
+    (FeatureState.PLANNED, FeatureState.DESIGNED),
     (FeatureState.PLANNED, FeatureState.SPECCED),
+    (FeatureState.DESIGNED, FeatureState.SPECCED),
     (FeatureState.SPECCED, FeatureState.CRITERIA_SET),
     (FeatureState.CRITERIA_SET, FeatureState.TESTS_WRITTEN),
     (FeatureState.TESTS_WRITTEN, FeatureState.IMPLEMENTING),
@@ -122,6 +130,8 @@ FORWARD_TRANSITIONS: set[tuple[FeatureState, FeatureState]] = {
 }
 
 REGRESSION_TRANSITIONS: set[tuple[FeatureState, FeatureState]] = {
+    (FeatureState.SPECCED, FeatureState.DESIGNED),
+    (FeatureState.IMPLEMENTING, FeatureState.DESIGNED),
     (FeatureState.IMPLEMENTING, FeatureState.SPECCED),
     (FeatureState.IMPLEMENTING, FeatureState.CRITERIA_SET),
     (FeatureState.VERIFIED, FeatureState.IMPLEMENTING),
@@ -131,6 +141,8 @@ REGRESSION_TRANSITIONS: set[tuple[FeatureState, FeatureState]] = {
 }
 
 SKIP_TRANSITIONS: set[tuple[FeatureState, FeatureState]] = {
+    # Allow jumping from designed directly to implementing (lean workflow)
+    (FeatureState.DESIGNED, FeatureState.IMPLEMENTING),
     # Allow jumping from planned directly to implementing (legacy flow)
     (FeatureState.PLANNED, FeatureState.IMPLEMENTING),
     # Allow planned -> shipped for retroactive tracking
@@ -525,15 +537,29 @@ class FeatureStateMachine:
     # -- Query helpers -------------------------------------------------------
 
     def get_next_states(self, feature_id: str) -> list[FeatureState]:
-        """Get valid forward transitions for a feature's current state."""
+        """Get valid forward transitions for a feature's current state.
+
+        Filters based on design_phase setting:
+        - off: hides DESIGNED from results
+        - optional: shows both DESIGNED and SPECCED from planned
+        - required: hides SPECCED from planned's results
+        """
         current = self.get_current_state(feature_id)
         if current is None:
             return []
-        return [
+        from settings import get_setting
+        design_phase = get_setting(self.project_root, "design_phase", "off")
+        results = [
             to_state
             for from_state, to_state in FORWARD_TRANSITIONS
             if from_state == current
         ]
+        if current == FeatureState.PLANNED:
+            if design_phase == "off":
+                results = [s for s in results if s != FeatureState.DESIGNED]
+            elif design_phase == "required":
+                results = [s for s in results if s != FeatureState.SPECCED]
+        return results
 
     def get_unblocked(
         self,
