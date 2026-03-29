@@ -5400,8 +5400,9 @@ else
   fail "F-033 AC-008: upgrade.sh missing local customization sync step"
 fi
 
-# AC-009: upgrade.sh creates missing extension subdirectories
-if grep -q "mkdir.*extensions/" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh"; then
+# AC-009: upgrade.sh creates missing extension subdirectories (in Step 5a sync)
+if grep -q "Step 5a" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh" && \
+   grep -q "mkdir.*extensions/" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh"; then
   pass "F-033 AC-009: upgrade.sh creates missing extension subdirectories"
 else
   fail "F-033 AC-009: upgrade.sh missing extension subdirectory creation"

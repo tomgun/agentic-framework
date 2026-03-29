@@ -275,10 +275,10 @@ else
     if echo "$first_lines" | grep -qi "(template)"; then
       return 0
     fi
-    local total_lines filled_lines
-    total_lines=$(wc -l < "$file" | tr -d ' ')
+    # Check if most content is still placeholder comments/blanks
+    local filled_lines
     filled_lines=$(grep -cvE '^\s*$|^\s*<!--.*-->$|^#' "$file" 2>/dev/null || echo "0")
-    if [[ "$total_lines" -gt 5 && "$filled_lines" -lt 3 ]]; then
+    if [[ "$filled_lines" -lt 3 ]]; then
       return 0
     fi
     return 1
@@ -976,6 +976,7 @@ declare -a FEATURE_REGISTRY=(
   "0.39.0:Semantic spec analysis:bash .agentic/tools/spec-analyze.sh F-XXXX:Advisory checks before implementation — ambiguity, NFR, coverage gaps (F-0152)"
   "0.39.0:AC-level test coverage:python3 .agentic/lib/tools/coverage.py --ac-coverage F-XXXX:Per-acceptance-criterion test mapping (F-0153)"
   "0.53.0:Intent journal + crash recovery:ag intent list:Write-ahead log for ag implement/done with reconciliation via ag sync (F-0200)"
+  "0.76.0:Local customization auto-sync:Automatic:Unmodified templates updated on upgrade, customized files preserved with .new (F-033)"
 )
 
 # Filter features based on version range

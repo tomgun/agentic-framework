@@ -80,7 +80,7 @@ assertions:
     text: "upgrade.sh creates missing extension subdirectories during upgrade"
     type: structural
     verify: |
-      grep -q "mkdir.*extensions/" .agentic/lib/tools/upgrade.sh
+      grep -q "Step 5a" .agentic/lib/tools/upgrade.sh && grep -q "mkdir.*extensions/" .agentic/lib/tools/upgrade.sh
 
   - id: AC-010
     text: "upgrade.sh preserves customized local files and writes .new for review"
