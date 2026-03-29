@@ -661,6 +661,16 @@ class TestDesignedState:
         allowed, msgs = sm.can_transition("F-0050", FeatureState.DESIGNED)
         assert allowed, f"Expected allowed but got: {msgs}"
 
+    def test_planned_to_designed_allowed_when_required(self, project_dir):
+        """planned -> designed allowed when design_phase is required."""
+        _set_design_phase(project_dir, "required")
+        write_features(project_dir, [("F-0050", "Test", "planned")])
+        sm = FeatureStateMachine(project_root=project_dir, enforce=True)
+        from auto.gates import register_default_gates
+        register_default_gates(sm, FeatureState)
+        allowed, msgs = sm.can_transition("F-0050", FeatureState.DESIGNED)
+        assert allowed, f"Expected allowed but got: {msgs}"
+
     def test_design_gate_checks_artifacts(self, project_dir):
         """designed -> specced passes with a design.md artifact."""
         _set_design_phase(project_dir, "required")

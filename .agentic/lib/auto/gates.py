@@ -197,11 +197,16 @@ def gate_designed_to_specced(feature_id: str, project_root: Path) -> GateResult:
     paths = get_paths(project_root)
     reasons: list[str] = []
 
-    # Check for ADR referencing this feature
+    # Check for ADR referencing this feature (filename first, then content)
     adr_dir = paths.adr_dir
     adr_found = False
     if adr_dir.exists():
         for adr_file in adr_dir.glob("*.md"):
+            # Fast path: check if feature ID is in filename
+            if feature_id in adr_file.name:
+                adr_found = True
+                break
+            # Slow path: scan content
             try:
                 content = adr_file.read_text()
                 if feature_id in content:
