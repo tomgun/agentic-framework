@@ -8,6 +8,16 @@
 
 ## Recent Contributions
 
+### Enforcement-Chain Testing — Tests Must Break the Workflow, Not Just Check Files (v0.77.0)
+
+**User insight**: The framework's 693 tests were all structural — "does this file exist?", "does this string appear?" — but none tested whether agents could actually skip steps. Real failures (skipping plan review, shipping without docs) went undetected because no test exercised the enforcement chain end-to-end. The user's direction: "you need harder tests... tests should reveal cases where the plan is not automatically review-looped, or docs are not automatically updated."
+
+**Design direction**: Three layers of harder tests. (1) Enforcement-chain tests that verify each behavioral rule exists across ALL layers simultaneously — CLAUDE.md template, skill files, memory-seed, hooks, gates, violations.yaml — because agents skip rules when even one layer is missing. (2) A workflow-breaker integration test that sets up real project structures and systematically tries to bypass every gate in the pipeline from idea → shipped. (3) LLM behavioral tests targeting specific failure modes: stopping after plan exit, creating PRs without updating docs, accepting "it's simple, skip review" rationalizations.
+
+**Why it matters**: Defense-in-depth only works if you test the depth. A structural test that checks "does CLAUDE.md mention auto-continue?" passes even when the planning skill, memory-seed, and hook all omit the rule — and the agent sees whichever layer is loaded, not all of them. Testing the full chain caught two real gaps (memory-seed and planning skill were both silent on auto-review) plus a WIP detection bug.
+
+---
+
 ### F-031 Phase 4 — User Input as Agent Control Surface (PR #196, v0.73.0)
 
 **User insight**: The `user_input` field in contracts (a key design principle: specs as control interface) is only useful if agents can *discover* it — a field buried in a YAML file nobody reads is not a control surface. The discovery pipeline was missing entirely: agents had no way to know pending input existed.

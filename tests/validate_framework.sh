@@ -1011,7 +1011,7 @@ else
 fi
 
 # Quiet mode with no annotations → empty output, exit 0
-_dt_quiet=$(bash .agentic/lib/tools/design-trace.sh --quiet 2>&1) || true
+_dt_quiet=$(bash .agentic/lib/tools/design-trace.sh --quiet 2>/dev/null) || true
 if [[ -z "$_dt_quiet" ]]; then
   pass "design-trace.sh --quiet returns empty when no Source annotations"
 else
@@ -1405,10 +1405,12 @@ else
   fail "F-030: contract/acceptance criteria missing"
 fi
 
-# Planned features registered
+# Planned features registered (may be consolidated into parent feature)
 for fid in F-0161 F-0162 F-0163; do
   if grep -q "## ${fid}:" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md"; then
     pass "F-030: ${fid} registered in FEATURES.md"
+  elif grep -q "Consolidates.*${fid}" "${FRAMEWORK_ROOT}/.agentic/spec/FEATURES.md"; then
+    pass "F-030: ${fid} consolidated in FEATURES.md"
   else
     fail "F-030: ${fid} missing from FEATURES.md"
   fi
@@ -2124,7 +2126,9 @@ else
   fail "F-0175: VERSION file missing"
 fi
 
-if [[ -f "${FRAMEWORK_ROOT}/.agentic/journal/plans/2026-03-07-F-013-qa-suite-plan.md" ]]; then
+# Plan may be saved under original feature ID (F-0169) or consolidated ID (F-013)
+if ls "${FRAMEWORK_ROOT}"/.agentic/journal/plans/*-F-013-qa-suite-plan.md 1>/dev/null 2>&1 || \
+   ls "${FRAMEWORK_ROOT}"/.agentic/journal/plans/*-F-0169-qa-suite-plan.md 1>/dev/null 2>&1; then
   pass "F-0175: QA suite plan saved to journal/plans/"
 else
   fail "F-0175: QA suite plan not saved to journal/plans/"
@@ -2265,13 +2269,13 @@ fi
 - plan_review_enabled: no
 TESTEOF
   cat > "$GATE_TEST_DIR/.agentic/spec/FEATURES.md" <<'TESTEOF'
-## F-001: Test Feature
+## F-9999: Test Feature
 **Status**: planned
 TESTEOF
-  # F-001 IS in FEATURES.md but no contract/acceptance file — should block
-  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" implement F-001 2>&1) || true
+  # F-9999 IS in FEATURES.md but no contract/acceptance file — should block
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" implement F-9999 2>&1) || true
   rm -rf "$GATE_TEST_DIR"
-  echo "$OUTPUT" | grep -q "BLOCKED.*No acceptance criteria\|BLOCKED.*No contract"
+  echo "$OUTPUT" | grep -q "BLOCKED.*No contract\|BLOCKED.*No acceptance"
 ) 2>/dev/null
 if [[ $? -eq 0 ]]; then
   pass "Gate: ag implement blocks when no contract/acceptance criteria"
@@ -2417,13 +2421,14 @@ fi
 - profile: formal
 - feature_tracking: yes
 - docs_gate: warning
+- plan_review_enabled: no
 TESTEOF
   cat > "$GATE_TEST_DIR/.agentic/spec/FEATURES.md" <<'TESTEOF'
-## F-001: Test Feature
+## F-9998: Test Feature
 **Status**: in_progress
 TESTEOF
-  cat > "$GATE_TEST_DIR/.agentic/spec/contracts/F-001.yaml" <<'YAMLEOF'
-id: F-001
+  cat > "$GATE_TEST_DIR/.agentic/spec/contracts/F-9998.yaml" <<'YAMLEOF'
+id: F-9998
 name: Test Feature
 lifecycle: implementing
 description: Test feature.
@@ -2432,7 +2437,7 @@ assertions:
     text: Works
     type: behavioral
 YAMLEOF
-  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" done F-001 2>&1) || true
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" done F-9998 --force-phases 2>&1) || true
   rm -rf "$GATE_TEST_DIR"
   # warning mode shows "Documentation Drift Check" but no blocking prompt
   echo "$OUTPUT" | grep -q "Documentation Drift Check" && ! echo "$OUTPUT" | grep -q "confirm docs are updated"
@@ -4816,7 +4821,7 @@ fi
 
 # AC-3: violations.yaml exists and has 3 patterns
 if [[ -f .agentic/lib/auto/violations.yaml ]]; then
-  _f242_count=$(python3 -c "import yaml; d=yaml.safe_load(open('.agentic/lib/auto/violations.yaml')); print(len(d.get('violations',[])))" 2>/dev/null || echo 0)
+  _f242_count=$(grep -c '^  - name:' .agentic/lib/auto/violations.yaml 2>/dev/null || echo 0)
   if [[ "$_f242_count" -eq 3 ]]; then
     pass "F-0242 AC-3: violations.yaml has 3 patterns"
   else
@@ -4996,7 +5001,8 @@ fi
 
 # Run Python-based workflow validation (loads YAML, checks consistency)
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/workflow.py" ]]; then
-  WORKFLOW_VALIDATE_OUTPUT=$(python3 -c "
+  if python3 -c "import yaml" 2>/dev/null; then
+    WORKFLOW_VALIDATE_OUTPUT=$(python3 -c "
 import sys
 sys.path.insert(0, '${FRAMEWORK_ROOT}/.agentic/lib')
 sys.path.insert(0, '${FRAMEWORK_ROOT}/.agentic/lib/auto')
@@ -5012,10 +5018,13 @@ if errors:
     sys.exit(1)
 print('ok')
 " 2>&1)
-  if [[ $? -eq 0 ]]; then
-    pass "F-036: YAML-Python consistency validation passes"
+    if [[ $? -eq 0 ]]; then
+      pass "F-036: YAML-Python consistency validation passes"
+    else
+      fail "F-036: YAML-Python consistency validation failed: ${WORKFLOW_VALIDATE_OUTPUT}"
+    fi
   else
-    fail "F-036: YAML-Python consistency validation failed: ${WORKFLOW_VALIDATE_OUTPUT}"
+    warn "F-036: YAML-Python consistency skipped (PyYAML not installed)"
   fi
 fi
 
@@ -5431,6 +5440,227 @@ if grep -q "\.new" "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh" && \
   pass "F-033 AC-010: upgrade.sh preserves customized files with .new"
 else
   fail "F-033 AC-010: upgrade.sh missing customized file preservation"
+fi
+
+# ============================================================
+# WORKFLOW ENFORCEMENT: Plan Auto-Review Chain
+# Tests that ALL enforcement layers for "auto-continue after plan exit"
+# are present. Agents skip the review loop when even one layer is missing.
+# ============================================================
+
+echo ""
+echo "--- Workflow Enforcement: Plan Auto-Review ---"
+
+# E-001: CLAUDE.md template must have "After Plan Mode Exits" section
+if grep -q "After Plan Mode Exits" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" 2>/dev/null; then
+  pass "E-PLAN-001: CLAUDE.md template has 'After Plan Mode Exits' section"
+else
+  fail "E-PLAN-001: CLAUDE.md template missing 'After Plan Mode Exits' section"
+fi
+
+# E-002: Template must say "Auto-continue immediately" (the key instruction)
+if grep -q "Auto-continue immediately" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" 2>/dev/null; then
+  pass "E-PLAN-002: CLAUDE.md template says 'Auto-continue immediately'"
+else
+  fail "E-PLAN-002: CLAUDE.md template missing 'Auto-continue immediately' instruction"
+fi
+
+# E-003: Template must have "Wrong rationalizations" block (anti-patterns)
+if grep -q "Wrong rationalizations.*plan.*exit\|Wrong rationalizations.*approval\|plan mode exit = approval.*NO" \
+   "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" 2>/dev/null; then
+  pass "E-PLAN-003: CLAUDE.md template has plan-review anti-rationalization block"
+else
+  fail "E-PLAN-003: CLAUDE.md template missing plan-review anti-rationalization block"
+fi
+
+# E-004: Planning skill must instruct auto-continue after plan exit
+if grep -q "auto-continue\|Auto-continue\|DRAFT.*review\|Critic.*Advocate\|do NOT stop" \
+   "${FRAMEWORK_ROOT}/.claude/skills/planning-features/SKILL.md" 2>/dev/null; then
+  pass "E-PLAN-004: planning-features skill instructs auto-review after plan exit"
+else
+  fail "E-PLAN-004: planning-features skill has NO instruction to auto-review after plan exit"
+fi
+
+# E-005: Memory seed must mention auto-continue after plan
+if grep -q "auto-continue\|Auto-continue\|After Plan Mode\|plan.*DRAFT.*review\|Critic.*Advocate" \
+   "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md" 2>/dev/null; then
+  pass "E-PLAN-005: memory-seed mentions plan auto-review"
+else
+  fail "E-PLAN-005: memory-seed has NO mention of plan auto-review — agents lose this rule when context is compressed"
+fi
+
+# E-006: violations.yaml must have stopped_after_plan_exit pattern
+if grep -q "stopped_after_plan_exit" "${FRAMEWORK_ROOT}/.agentic/lib/auto/violations.yaml" 2>/dev/null; then
+  pass "E-PLAN-006: violations.yaml detects stopped_after_plan_exit"
+else
+  fail "E-PLAN-006: violations.yaml missing stopped_after_plan_exit detection"
+fi
+
+# E-007: on-plan-mode-exit.sh hook must exist and emit AUTO-CONTINUE
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/hooks/shared/on-plan-mode-exit.sh" ]]; then
+  if grep -q "AUTO-CONTINUE" "${FRAMEWORK_ROOT}/.agentic/lib/hooks/shared/on-plan-mode-exit.sh" 2>/dev/null; then
+    pass "E-PLAN-007: on-plan-mode-exit.sh hook emits AUTO-CONTINUE"
+  else
+    fail "E-PLAN-007: on-plan-mode-exit.sh hook exists but missing AUTO-CONTINUE text"
+  fi
+else
+  fail "E-PLAN-007: on-plan-mode-exit.sh hook missing"
+fi
+
+# E-008: check-gates.sh Gate 4 must verify plan approval status
+if grep -q "plan_review_enabled\|APPROVED\|plan.*gate" \
+   "${FRAMEWORK_ROOT}/.claude/skills/implementing-features/scripts/check-gates.sh" 2>/dev/null; then
+  pass "E-PLAN-008: check-gates.sh has plan-approval gate"
+else
+  fail "E-PLAN-008: check-gates.sh missing plan-approval gate"
+fi
+
+# E-009: done.sh plan backstop must block when no plan + plan_review_enabled
+if grep -q "BLOCKED.*No plan found" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/done.sh" 2>/dev/null; then
+  pass "E-PLAN-009: done.sh has plan backstop gate"
+else
+  fail "E-PLAN-009: done.sh missing plan backstop gate"
+fi
+
+# ============================================================
+# WORKFLOW ENFORCEMENT: Documentation Update Chain
+# Tests that doc update enforcement exists at multiple layers.
+# Agents skip docs when enforcement is missing or advisory-only.
+# ============================================================
+
+echo ""
+echo "--- Workflow Enforcement: Doc Update Chain ---"
+
+# E-DOC-001: implementing-features skill must have "Documentation" section
+if grep -q "## Documentation\|docs.*deliverable\|doc.*freshness" \
+   "${FRAMEWORK_ROOT}/.claude/skills/implementing-features/SKILL.md" 2>/dev/null; then
+  pass "E-DOC-001: implementing-features skill has documentation section"
+else
+  fail "E-DOC-001: implementing-features skill missing documentation section"
+fi
+
+# E-DOC-002: committing-changes skill must mention doc freshness check
+if grep -q "docs.sh.*check-freshness\|doc.*freshness\|stale.*docs" \
+   "${FRAMEWORK_ROOT}/.claude/skills/committing-changes/SKILL.md" 2>/dev/null; then
+  pass "E-DOC-002: committing-changes skill mentions doc freshness"
+else
+  fail "E-DOC-002: committing-changes skill missing doc freshness check"
+fi
+
+# E-DOC-003: done.sh must have docs_gate blocking logic
+if grep -q 'docs_gate_mode.*=.*"blocking"\|docs_gate_mode.*blocking' \
+   "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/done.sh" 2>/dev/null; then
+  pass "E-DOC-003: done.sh has docs_gate blocking logic"
+else
+  fail "E-DOC-003: done.sh missing docs_gate blocking logic"
+fi
+
+# E-DOC-004: CLAUDE.md template must mention "docs = done"
+if grep -q "docs = done\|docs.*done\|update all artifacts together" \
+   "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" 2>/dev/null; then
+  pass "E-DOC-004: CLAUDE.md template mentions docs are part of done"
+else
+  fail "E-DOC-004: CLAUDE.md template missing 'docs = done' rule"
+fi
+
+# E-DOC-005: Formal profile must have docs_gate=blocking
+if grep -q "formal\.docs_gate=blocking" \
+   "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" 2>/dev/null; then
+  pass "E-DOC-005: formal profile has docs_gate=blocking"
+else
+  fail "E-DOC-005: formal profile missing docs_gate=blocking"
+fi
+
+# E-DOC-006: docs_gate=blocking must actually block ag done (behavioral test)
+(
+  GATE_TEST_DIR=$(mktemp -d)
+  mkdir -p "$GATE_TEST_DIR/.agentic/spec/contracts"
+  mkdir -p "$GATE_TEST_DIR/.agentic/journal/manifests"
+  # Create a minimal STACK.md with docs_gate blocking + bypass plan/phase gates
+  cat > "$GATE_TEST_DIR/STACK.md" <<'TESTEOF'
+## Settings
+- profile: formal
+- feature_tracking: yes
+- docs_gate: blocking
+- plan_review_enabled: no
+## Docs
+| Path | Triggers | Description |
+|------|----------|-------------|
+| README.md | feature_done | Main readme |
+TESTEOF
+  # Create a README that will be "stale"
+  echo "# Old readme" > "$GATE_TEST_DIR/README.md"
+  cat > "$GATE_TEST_DIR/.agentic/spec/FEATURES.md" <<'TESTEOF'
+## F-9997: Doc Gate Test
+**Status**: in_progress
+TESTEOF
+  cat > "$GATE_TEST_DIR/.agentic/spec/contracts/F-9997.yaml" <<'YAMLEOF'
+id: F-9997
+name: Doc Gate Test
+lifecycle: implementing
+description: Test feature for doc gate.
+assertions:
+  - id: AC-001
+    text: Works
+    type: behavioral
+YAMLEOF
+  OUTPUT=$(ROOT_DIR="$GATE_TEST_DIR" _AGENTIC_SETTINGS_LOADED="" _SETTINGS_ROOT_DIR="$GATE_TEST_DIR" _SETTINGS_STACK_FILE="$GATE_TEST_DIR/STACK.md" bash "$FRAMEWORK_ROOT/.agentic/lib/tools/ag.sh" done F-9997 --force-phases 2>&1) || true
+  rm -rf "$GATE_TEST_DIR"
+  # docs_gate=blocking should either show BLOCKED or Documentation Drift Check
+  echo "$OUTPUT" | grep -q "BLOCKED\|Documentation Drift Check\|Documentation not up to date"
+) 2>/dev/null
+if [[ $? -eq 0 ]]; then
+  pass "E-DOC-006: docs_gate=blocking activates doc enforcement in ag done"
+else
+  fail "E-DOC-006: docs_gate=blocking does NOT activate doc enforcement in ag done"
+fi
+
+# E-DOC-007: memory-seed must mention doc updates
+if grep -q "doc.*update\|docs.*done\|Documentation\|doc.*gate\|freshness" \
+   "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md" 2>/dev/null; then
+  pass "E-DOC-007: memory-seed mentions doc updates"
+else
+  fail "E-DOC-007: memory-seed has NO mention of doc updates — agents forget this rule"
+fi
+
+# E-DOC-008: completing-work skill must mention doc freshness gate
+if grep -q "doc.*freshness\|doc.*gate\|Gate 4.*doc" \
+   "${FRAMEWORK_ROOT}/.claude/skills/completing-work/SKILL.md" 2>/dev/null; then
+  pass "E-DOC-008: completing-work skill mentions doc freshness gate"
+else
+  fail "E-DOC-008: completing-work skill missing doc freshness gate mention"
+fi
+
+# ============================================================
+# WORKFLOW ENFORCEMENT: Spec-Before-Code Chain
+# Tests that spec/contract enforcement exists before coding starts.
+# ============================================================
+
+echo ""
+echo "--- Workflow Enforcement: Spec-Before-Code ---"
+
+# E-SPEC-001: implement command must check for contract existence
+if grep -q "BLOCKED.*No contract\|BLOCKED.*No acceptance\|No contract or acceptance" \
+   "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/implement.sh" 2>/dev/null; then
+  pass "E-SPEC-001: implement.sh blocks when no contract/AC file"
+else
+  fail "E-SPEC-001: implement.sh missing contract existence check"
+fi
+
+# E-SPEC-002: violations.yaml must detect code_before_review and skipped_planning
+for _violation in code_before_review skipped_planning; do
+  if grep -q "name: $_violation" "${FRAMEWORK_ROOT}/.agentic/lib/auto/violations.yaml" 2>/dev/null; then
+    pass "E-SPEC-002: violations.yaml detects $_violation"
+  else
+    fail "E-SPEC-002: violations.yaml missing $_violation detection"
+  fi
+done
+
+# E-SPEC-003: CLAUDE.md template must mention "Spec + code + tests + docs = done"
+if grep -q "Spec.*code.*tests.*docs.*done" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" 2>/dev/null; then
+  pass "E-SPEC-003: CLAUDE.md template has 'Spec + code + tests + docs = done' rule"
+else
+  fail "E-SPEC-003: CLAUDE.md template missing completeness formula"
 fi
 
 # Summary

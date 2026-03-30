@@ -4410,45 +4410,6 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
-### Session: 2026-03-24 06:19 - Phase gate bypassed
-
-**Why**: Incomplete phases overridden at shipping time
-
-**What changed**:
-- F-0193: --force-phases used. 
-
-**Next steps**:
-- TBD
-
-**Blockers**: None
-
-
-### Session: 2026-03-24 06:20 - Phase gate bypassed
-
-**Why**: Incomplete phases overridden at shipping time
-
-**What changed**:
-- F-0193: --force-phases used. 
-
-**Next steps**:
-- TBD
-
-**Blockers**: None
-
-
-### Session: 2026-03-24 06:20 - Phase gate bypassed
-
-**Why**: Incomplete phases overridden at shipping time
-
-**What changed**:
-- F-0193: --force-phases used. 
-
-**Next steps**:
-- TBD
-
-**Blockers**: None
-
-
 ### Session: 2026-03-24 06:45 - DEV-0243 Complexity Tier Experiments
 
 **Why**: Provide empirical evidence for which framework profile produces best outcomes
@@ -4644,32 +4605,6 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: None
 
 
-### Session: 2026-03-27 18:46 - Phase gate bypassed
-
-**Why**: Incomplete phases overridden at shipping time
-
-**What changed**:
-- F-035: --force-phases used. 
-
-**Next steps**:
-- TBD
-
-**Blockers**: None
-
-
-### Session: 2026-03-27 18:46 - Phase gate bypassed
-
-**Why**: Incomplete phases overridden at shipping time
-
-**What changed**:
-- F-035: --force-phases used. 
-
-**Next steps**:
-- TBD
-
-**Blockers**: None
-
-
 ### Session: 2026-03-27 19:28 - VERSION file sync fix
 
 **Why**: VERSION files drifted apart on every ag done cycle in framework-dev mode
@@ -4825,3 +4760,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+
+### Session: 2026-03-30 18:24 - Framework QA: workflow enforcement hardening
+
+**Why**: Agent workflow violations (skipping plan review, shipping without docs) were not caught by existing tests — only structural file-existence checks, no enforcement-chain or behavioral coverage
+
+**What changed**:
+- Fixed 10 validate_framework.sh test bugs (env leaks, consolidation-unaware checks, missing PyYAML). Added 21 structural enforcement-chain tests that verify plan-review and doc-update instructions exist across ALL layers (CLAUDE.md, skills, memory-seed, hooks, gates). Fixed 2 real enforcement gaps: memory-seed missing plan auto-review rule, planning skill missing auto-continue instructions. Built test_workflow_breaker.sh (23 tests) exercising every gate from idea→shipped. Found 1 real gap: WIP detection via agents_helpers.py fails when PROJECT_ROOT differs from script path. Added 4 Critical LLM behavioral tests (098-101) for plan-exit auto-continue, docs-before-PR, wrong-rationalization rejection. Cleaned 5 garbage journal entries from prior test pollution.
+
+**Next steps**:
+- Run LLM behavioral tests 098-101 against Claude. Investigate WIP detection gap (agents_helpers.py PROJECT_ROOT resolution).
+
+**Blockers**: None
