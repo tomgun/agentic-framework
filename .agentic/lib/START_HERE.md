@@ -149,6 +149,14 @@ Instead of agents re-reading the entire codebase every session, maintain:
 - **JOURNAL.md**: "What happened recently?"
 - **spec/**: "What should the software do and how?"
 
+### Feature lifecycle (10 states)
+
+Features progress through a declarative state machine (`state_machine_af.yaml`):
+
+`idea → queued → planning → designing (optional) → plan_review → spec → implementation → verification → docs → ready_to_ship → shipped`
+
+Key transitions are gated by artifact preconditions (plan.md, spec.md, tests, docs). The `designing` state (F-004) is optional — controlled by `design_phase` setting (off/optional/required). Use `ag transition F-XXXX <state>` to advance.
+
 ### Key artifacts (the "truth" files)
 
 **Project state:**

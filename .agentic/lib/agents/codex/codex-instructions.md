@@ -14,7 +14,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag transition F-XXXX <state>` — advance the workflow (checks artifacts before proceeding)
 - `ag check F-XXXX` — validate artifacts
 - `ag verify F-XXXX` — run tests and record results
-- `ag ship F-XXXX` — prepare for shipping
+- `ag done F-XXXX` — post-merge: doc gate, VERSION bump, state flush
 - `ag status` — see current work items
 - `ag info F-XXXX` — detailed info with next steps
 - `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`

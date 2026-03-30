@@ -43,3 +43,17 @@ Purpose: prevent repeating mistakes and capture "sharp edges" for future work (h
 - What to do next time: For autonomous workflows, prefer fresh instances per logical unit. Context isolation > context continuity for implementation tasks
 - Links: Autonomous mode research, ADR in journal/plans/
 
+## L-0006: Behavioral instructions alone don't enforce doc updates
+- Related: F-012 (Documentation Drift & Lifecycle)
+- What happened: 13 features shipped over 14 days without updating any project-wide docs. CLAUDE.md line 42 ("spec + code + tests + docs = done"), implementer.md, and memory-seed all had the rule — agents still skipped it.
+- Why it happened: The `docs_updated` artifact check in state_machine_af.yaml had `|| true`, making the structural gate a rubber stamp. Skills (implementing-features, committing-changes) never mentioned docs. Without structural enforcement AND skill-level reinforcement, behavioral rules decay under context pressure.
+- What to do next time: For rules that must always apply, enforce at multiple layers: structural gate (state machine/pre-commit) + skill instructions (specific commands) + constitution (CLAUDE.md). One layer is not enough.
+- Links: PR #215 discussion, feedback_doc_updates_must_be_structural.md
+
+## L-0007: Dead command references propagate across all instruction files
+- Related: DEV-003 (Instruction File Integrity)
+- What happened: `ag ship` was referenced in 9 instruction files (CLAUDE.md templates, cursorrules, copilot, codex, memory-seed, implementing-features skill) but the command never existed — there is no `ship.sh`.
+- Why it happened: The command was added to instruction files during an early version but never implemented. No validation test checked for dead command references.
+- What to do next time: When adding command references to instruction files, verify the command exists. Consider adding a structural test that greps instruction files for `ag <cmd>` patterns and validates each against the actual command list.
+- Links: F-012 doc enforcement fix
+

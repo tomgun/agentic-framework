@@ -22,6 +22,8 @@ Run `ag commit` — it handles quality gates, branch checks, and diff review.
 1. Update journal: `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"`
 2. Update status: `bash .agentic/lib/tools/status.sh focus "Current task"`
 3. If shipping feature: `bash .agentic/lib/tools/feature.sh F-#### status shipped`
+4. Check doc freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done --manifest F-XXXX`
+   Docs ship with code — update stale docs before creating the PR.
 
 ## Rules
 - Never auto-commit in interactive sessions. Show diff to human first.
@@ -32,4 +34,4 @@ Run `ag commit` — it handles quality gates, branch checks, and diff review.
 - Before committing, grep `spec/contracts/` for assertions related to changed behavior. If any are affected, **STOP** — present them to the user and wait for approval before modifying any contract or test. Contracts protect shipped behavior; silently updating them to match new code defeats that protection.
 
 ## Post-merge
-When merging a PR, immediately run `ag done F-XXXX` on main.
+ALWAYS run `ag done F-XXXX` on main after merge. Never skip it — it runs doc freshness gates (Gate 4), contract checks, VERSION bump, and state flush.

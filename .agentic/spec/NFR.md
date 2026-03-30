@@ -62,3 +62,15 @@ Purpose: capture cross-cutting constraints that apply across many features (perf
 - Current status: met
 - Acceptance: spec/acceptance/NFR-0004.md
 - Notes: Discovery profile uses `acceptance_criteria: recommended` (advisory). Formal uses `blocking`.
+
+## NFR-0005: Documentation freshness at ship time
+- Category: process
+- Statement: Registered docs (STACK.md `## Docs` section) relevant to the feature's changed files must not be stale when shipping
+- Applies to: all features in Formal profile; advisory in Discovery
+- How to measure: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done --manifest F-XXXX` returns 0
+- Where enforced:
+  - Structural: `state_machine_af.yaml` — `docs_updated` artifact check (drift.sh --docs)
+  - Gate: `done.sh` Gate 4 — doc freshness check (blocking when `docs_gate: blocking`)
+  - Behavioral: implementing-features skill (check before PR), committing-changes skill (check before commit)
+- Current status: met (fixed 2026-03-30 — previously broken due to `|| true` in artifact check)
+- Notes: Docs scoped by `tracks` field in registry — only docs whose tracked paths overlap the feature's manifest are checked. Docs without tracks are always checked.

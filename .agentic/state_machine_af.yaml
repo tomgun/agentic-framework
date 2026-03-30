@@ -152,7 +152,7 @@ artifacts:
 
   docs_updated:
     description: "Documentation is not stale for changed files"
-    check: "bash .agentic/lib/tools/drift.sh --docs --quiet 2>/dev/null || true"
+    check: "bash .agentic/lib/tools/drift.sh --docs --quiet 2>/dev/null"
 
   journal.md:
     description: "Per-feature decision log"

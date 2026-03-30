@@ -26,14 +26,12 @@ If PR was already merged (via `gh pr merge` or GitHub UI):
 
 ## Post-Merge Steps
 
-After every merge, run these steps (or let `ag done` handle them):
-
-1. **Spec status**: mark feature shipped — `bash .agentic/lib/tools/feature.sh F-XXXX status shipped`
-2. **Backlog**: advance queue — `ag backlog done`
-3. **Journal**: log outcome — `bash .agentic/lib/tools/journal.sh "F-XXXX shipped" "Capability delivered" "Next" "None" --why "Reason"`
-4. **Status**: update focus — `bash .agentic/lib/tools/status.sh focus "F-XXXX shipped"`
-5. **VERSION + flush**: `ag done F-XXXX` bumps VERSION (patch) and commits state files
-6. **Git tag** (if VERSION file exists): `git tag v$(cat VERSION) && git push origin v$(cat VERSION)`
+Run `ag done F-XXXX` on main — this is the single required post-merge action. It handles:
+- Spec status (mark shipped), backlog advancement, journal, status updates
+- VERSION bump (patch) and state file flush
+- **Gate 4: doc freshness safety net** — if docs were updated in the PR (as they should be), this passes automatically. If it blocks, go back and update stale docs.
+- Contract assertion verification
+- Git tag: `git tag v$(cat VERSION) && git push origin v$(cat VERSION)`
 
 ### Framework development only (detected by FRAMEWORK_DEVELOPMENT.md)
 `ag done` auto-runs dogfood sync. Additionally:
@@ -43,7 +41,9 @@ After every merge, run these steps (or let `ag done` handle them):
 ## Before running `ag done`
 1. Verify contract assertions: `ag contract check F-XXXX` (all assertions must pass)
 2. Complete WIP: `bash .agentic/lib/tools/wip.sh complete`
+3. Verify doc freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done --manifest F-XXXX`
 
 ## Rules
+- NEVER skip `ag done`. It runs doc freshness gates, contract checks, and VERSION bump.
 - All contract assertions in `spec/contracts/F-XXXX.yaml` must pass before shipping.
 - If assertions not met, list what remains and ask user how to proceed.

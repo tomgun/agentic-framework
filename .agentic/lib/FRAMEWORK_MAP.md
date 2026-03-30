@@ -101,10 +101,13 @@ flowchart TD
     ReadContext --> PickWork[Pick work from STATUS.md]
     PickWork --> ReadAcc[Read acceptance criteria]
     ReadAcc --> Plan[Plan small change]
-    Plan --> Implement[Implement + annotate]
+    Plan --> Design{Design phase?}
+    Design -->|Optional| DesignReview[Design review<br/>Critic + Advocate]
+    Design -->|Skip| Implement
+    DesignReview --> Implement[Implement + annotate]
     Implement --> Test[Add/update tests]
     Test --> Review[Self-review]
-    Review --> UpdateDocs[Update STATUS.md<br/>JOURNAL.md<br/>FEATURES.md]
+    Review --> UpdateDocs[Update docs<br/>+ STATUS.md<br/>+ JOURNAL.md]
     UpdateDocs --> Done{More work?}
     Done -->|Yes| PickWork
     Done -->|No| End([Session complete])

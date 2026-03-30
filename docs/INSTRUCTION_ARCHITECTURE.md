@@ -91,7 +91,7 @@ graph TB
 | **Instruction files** | CLAUDE.md, .cursorrules, copilot, codex (38-54 lines) | Same files, same size — behavioral rules that can't be structurally enforced |
 | **What moved** | Gates table, delegation table, session protocols → Layer 2 | Workflow sequencing → state machine YAML; gate logic → preconditions.py |
 
-**Files**: CLAUDE.md, .cursorrules, copilot-instructions.md, codex-instructions.md — still the behavioral constitution. `state_machine_af.yaml` — the structural constitution (10 states, transitions, modes, profiles).
+**Files**: CLAUDE.md, .cursorrules, copilot-instructions.md, codex-instructions.md — still the behavioral constitution. `state_machine_af.yaml` — the structural constitution (10 states including optional `designing` phase from F-004, transitions, modes, profiles). `workflow.yaml` (F-036) provides a declarative loader and consistency validation for the state machine definition.
 
 **Design principle**: The state machine enforces workflow ordering structurally (exit 1 on invalid transitions). Instruction files contain ONLY rules that cannot be structurally enforced (anti-hallucination, "ask when uncertain", trigger words).
 
@@ -105,7 +105,7 @@ graph TB
 | **Loading mechanism** | `ag` commands print guidance from playbook files | CLI transition emits the role prompt for the target state |
 | **Skills** | 12 hand-crafted skills with instructions + scripts + references | 13 trigger-word stubs (~370 lines total) that route to `ag` commands |
 
-**Role prompts** are the v2 playbook mechanism. When a transition succeeds (e.g., `ag transition F-XXXX implementation`), the CLI emits the `implementer.md` role prompt. State-to-prompt mapping: `planning` → `planner.md`, `plan_review` → `reviewer.md`, `spec` → `planner.md`, `implementation` → `implementer.md`, `verification` → `verifier.md`, `docs` → `implementer.md`, `ready_to_ship` → `verifier.md`. Additional prompts: `debugger.md`, `session.md`, `explorer.md`.
+**Role prompts** are the v2 playbook mechanism. When a transition succeeds (e.g., `ag transition F-XXXX implementation`), the CLI emits the role prompt for that state. State-to-prompt mapping: `planning` → `planner.md`, `designing` → `planner.md` (F-004: optional design phase), `plan_review` → `reviewer.md`, `spec` → `planner.md`, `implementation` → `implementer.md`, `verification` → `verifier.md`, `docs` → `implementer.md`, `ready_to_ship` → `verifier.md`. Additional prompts: `debugger.md`, `session.md`, `explorer.md`.
 
 **Skills** in v2 are reduced to trigger-word stubs — they match user intent to the right `ag` command but no longer bundle full playbook content. The role prompts replace skill references + checklists + workflow docs.
 

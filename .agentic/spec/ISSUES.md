@@ -12,9 +12,9 @@
 
 | Status | Count |
 |--------|-------|
-| Open | 4 |
+| Open | 3 |
 | In Progress | 0 |
-| Fixed | 3 |
+| Fixed | 4 |
 | Won't Fix | 0 |
 | **Total** | 5 |
 
@@ -244,6 +244,29 @@ The `show_all_settings()` function in `settings.sh` has a hardcoded list of know
 - Feature: F-0131 (Settings-Over-Profiles Architecture)
 
 ---
+
+## I-0006: docs_updated artifact gate was a rubber stamp (|| true)
+
+**Status**: fixed
+**Priority**: high
+**Severity**: major
+**Found**: 2026-03-30
+**Fixed**: 2026-03-30
+
+**Description**:
+The `docs_updated` artifact check in `state_machine_af.yaml` (line 155) had `|| true` appended, making the `docs → ready_to_ship` transition always pass regardless of doc freshness. Combined with skills that never mentioned docs, this allowed 13+ features to ship without documentation updates.
+
+**Root Cause**:
+The `|| true` was likely added to prevent the gate from blocking during early development when docs infrastructure wasn't complete. It was never removed once `docs.sh` and `drift.sh` were functional.
+
+**Fix**:
+- Removed `|| true` from `state_machine_af.yaml` line 155
+- Added doc freshness checks to implementing-features, committing-changes, and completing-work skills
+- Added `tracks` to LESSONS.md and ISSUES.md in STACK.md doc registry
+
+**Related**:
+- Feature: F-012 (Documentation Drift & Lifecycle)
+- Lesson: L-0006
 
 <!-- Add new issues here -->
 

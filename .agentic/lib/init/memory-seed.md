@@ -7,7 +7,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag transition F-XXXX <state>` — advance workflow (checks artifacts first)
 - `ag check F-XXXX` — see what's missing for next transition
 - `ag verify F-XXXX` — run tests and record results
-- `ag ship F-XXXX` — prepare for shipping
+- `ag done F-XXXX` — post-merge: doc gate, VERSION bump, state flush
 - `ag status` — see current work items
 - `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract` | `ag phase`
 

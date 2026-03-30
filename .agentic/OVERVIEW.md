@@ -26,8 +26,13 @@ AI coding agents (Claude Code, Cursor, Copilot, Codex) are powerful but lack per
 - [x] Pre-commit quality gates (complexity limits, staleness checks, branch policy)
 - [x] Token-efficient scripts for state management (journal.sh, status.sh, etc.)
 - [x] Feature tracking with acceptance criteria gates
+- [x] YAML contract specifications with machine-verifiable assertions
+- [x] Declarative workflow definition (state_machine_af.yaml) with 10-state lifecycle
+- [x] Optional design phase with dialectical plan review (Critic/Advocate agents)
 - [x] Upgrade path (upgrade.sh) preserving user customizations
+- [x] Project-specific customization layer (.agentic/local/) with auto-sync during upgrades
 - [x] Settings system with profile-aware defaults
+- [x] Configurable Definition of Done per task type (implementation/spike/bugfix/docs)
 - [x] DRY state-file config (state-files.conf)
 - [x] Automated behavioral tests for agent compliance (67 LLM tests in tests/llm/)
 - [ ] Online documentation site

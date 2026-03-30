@@ -36,7 +36,7 @@ The v2 workflow engine replaces instruction-file-based workflows with CLI-enforc
 - `ag transition F-XXXX <state>` — advance the workflow
 - `ag check F-XXXX` — validate artifacts
 - `ag verify F-XXXX` — run tests
-- `ag ship F-XXXX` — prepare for shipping
+- `ag done F-XXXX` — post-merge: doc gate, VERSION bump, state flush
 - `ag status` / `ag info` / `ag next` — view state
 
 ## Rollback

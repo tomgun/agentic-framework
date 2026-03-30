@@ -23,7 +23,7 @@ Key commands:
 - `ag transition F-XXXX <state>` — advance when artifacts ready
 - `ag check F-XXXX` — see what's missing
 - `ag verify F-XXXX` — run tests
-- `ag ship F-XXXX` — prepare to ship
+- `ag done F-XXXX` — post-merge: doc gate, VERSION bump, state flush
 - `ag contract check F-XXXX` — verify contract assertions pass
 
 ## Preconditions
@@ -33,3 +33,10 @@ Key commands:
 
 ## Contract & test impact check
 After making code changes, grep `spec/contracts/` for assertions related to the changed behavior. If any are affected, **STOP** — present the affected assertions to the user and wait for approval before modifying any contract or test. Contracts protect shipped behavior; silently updating them to match new code defeats that protection.
+
+## Documentation (before creating PR)
+Docs are part of the deliverable — update them alongside code, not after merge.
+1. Check freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done --manifest F-XXXX`
+2. Update each stale doc relevant to your feature
+3. Include doc changes in the same PR as code
+4. For complex doc work, use the `updating-documentation` skill

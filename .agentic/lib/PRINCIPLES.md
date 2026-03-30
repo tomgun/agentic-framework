@@ -167,8 +167,9 @@ graph TB
 **Key Practices**:
 - **Scripts > Documentation**: `wip.sh check` returns exit code, doesn't just advise
 - **Hard gates for hard rules**: Pre-commit hooks block if AGENTS.json has active WIP or acceptance files missing
+- **Declarative workflow**: `state_machine_af.yaml` defines transitions and artifact preconditions as data; `workflow.yaml` (F-036) provides a loader with consistency validation
 - **Soft warnings for soft signals**: Scope drift, change size — WARN, don't block (human judges)
-- **Machine-readable specs**: YAML frontmatter enables automated validation (not just human reading)
+- **Machine-readable specs**: YAML contracts with assertions enable automated validation (not just human reading)
 - **Graceful degradation**: Advisory guidelines may be skipped by some agents; script-enforced rules cannot be. Framework remains functional even with partial guideline compliance.
 - **Fail fast, recover gracefully**: Catch problems early (pre-commit, WIP check) but always provide clear recovery options (Continue | Review | Rollback)
 

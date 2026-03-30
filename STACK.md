@@ -214,7 +214,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
      Types (built-in): changelog | readme | adr | lessons | architecture | runbook | tech-spec | custom -->
 - doc: CHANGELOG.md                | changelog    | pr
 - doc: README.md                   | readme       | pr
-- doc: .agentic/spec/LESSONS.md     | lessons      | feature_done
+- doc: .agentic/spec/LESSONS.md     | lessons      | feature_done | .agentic/lib/,.agentic/spec/
 - doc: docs/INSTRUCTION_ARCHITECTURE.md | architecture | feature_done | .agentic/lib/agents/,.claude/
 - doc: docs/HOW_IT_WORKS.md         | architecture | feature_done | .agentic/lib/
 - doc: docs/KEY_INSIGHTS.md         | lessons      | manual
@@ -222,7 +222,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - doc: .agentic/lib/README.md       | readme       | pr
 - doc: .agentic/lib/DEVELOPER_GUIDE.md | architecture | feature_done | .agentic/lib/
 - doc: .agentic/spec/NFR.md         | tech-spec    | feature_done | .agentic/spec/
-- doc: .agentic/spec/ISSUES.md      | custom       | feature_done
+- doc: .agentic/spec/ISSUES.md      | custom       | feature_done | .agentic/lib/,.agentic/spec/
 - doc: .agentic/spec/REFERENCES.md  | custom       | manual
 - doc: .agentic/OVERVIEW.md          | architecture | feature_done | .agentic/
 - doc: .agentic/lib/START_HERE.md    | readme       | feature_done | .agentic/lib/
