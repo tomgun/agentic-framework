@@ -288,7 +288,7 @@ NFR.md tracks cross-cutting quality requirements. NFR assertions verified struct
 
 **Status**: shipped | **Category**: quality | **Since**: v0.30.0 | **Profile**: formal
 **Contract**: [`spec/contracts/F-014.yaml`](contracts/F-014.yaml)
-**Consolidates**: F-014, F-0203
+**Consolidates**: F-014, F-0176, F-0203
 
 Configurable review checkpoints: human, critical_agent, or skip. Controls for plan review, code review, regression review, merge review, commit review. Critical agent provides automated review for autonomous workflows.
 

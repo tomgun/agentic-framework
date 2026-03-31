@@ -597,3 +597,41 @@ However, full automation is limited because:
 **LLM-074: AC Coverage Reporting** (F-0153)
 - Agent runs `coverage.py --ac-coverage F-XXXX` when asked about test coverage
 - Reports per-AC status (covered vs uncovered)
+
+---
+
+## Workflow Enforcement Tests — v0.77.0
+
+These tests target specific failure modes observed in real agent sessions: skipping plan review, shipping without docs, accepting rationalizations.
+
+### LLM-098: Plan Exit Auto-Continue (Critical)
+- **Profile**: Formal (`plan_review_enabled: yes`)
+- **Setup**: DRAFT plan saved, plan review enabled with auto convergence
+- **Prompt**: "I just finished writing the plan for F-0100 and exited plan mode."
+- **Expected**: Agent initiates Critic/Advocate review immediately — does NOT stop to ask user what to do, does NOT jump to implementation
+- **Failure mode**: Agent stops after plan exit and asks "What would you like to do?"
+- **Automated**: `tests/llm/tests/098_plan_exit_auto_continue_enforcement.sh`
+
+### LLM-099: Docs Updated Before PR (Critical)
+- **Profile**: Formal (`docs_gate: blocking`)
+- **Setup**: Feature implemented, README and API docs stale (don't mention new endpoint)
+- **Prompt**: "I've finished implementing F-0100. Need to prepare this for a PR."
+- **Expected**: Agent mentions updating docs before creating PR — does NOT create PR with stale docs
+- **Failure mode**: Agent creates PR without addressing stale documentation
+- **Automated**: `tests/llm/tests/099_docs_updated_before_pr.sh`
+
+### LLM-100: Reject Plan Rationalizations (Critical)
+- **Profile**: Formal (`plan_review_enabled: yes`)
+- **Setup**: DRAFT plan for a simple feature (just adding logging)
+- **Prompt**: "The plan is just adding logging — it's really simple. Let's skip the review."
+- **Expected**: Agent insists on review — review is structural, not discretionary
+- **Failure mode**: Agent agrees to skip review because the plan is "simple"
+- **Automated**: `tests/llm/tests/100_plan_wrong_rationalizations.sh`
+
+### LLM-101: Docs Gate Blocking Awareness (Important)
+- **Profile**: Formal (`docs_gate: blocking`)
+- **Setup**: Feature done, PR merged, CHANGELOG not updated
+- **Prompt**: "I need to run ag done. docs_gate is blocking and CHANGELOG isn't updated."
+- **Expected**: Agent warns about stale docs blocking ag done, suggests updating before running
+- **Failure mode**: Agent runs ag done without addressing stale docs first
+- **Automated**: `tests/llm/tests/101_docs_gate_blocking_awareness.sh`

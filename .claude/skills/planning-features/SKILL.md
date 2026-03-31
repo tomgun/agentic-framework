@@ -24,3 +24,13 @@ Key commands:
 
 Plans are saved to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md`.
 Plans in `~/.claude/plans/` are session-scoped — always copy to the durable location.
+
+## After plan mode exits — auto-continue (do NOT stop)
+
+Exiting plan mode creates a DRAFT. Auto-continue immediately:
+1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT`
+2. Spawn Critic + Advocate agents in parallel (fresh context) for dialectical review
+3. Synthesize feedback — if converged, set `**Status**: APPROVED`; if not, revise
+4. After APPROVED → run `ag transition F-XXXX implementation`
+
+**Do NOT stop and wait for user input between plan and review.** Review is structural, not discretionary.

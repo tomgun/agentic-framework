@@ -2,8 +2,8 @@
 
 **Purpose**: Map principles → specs → tests → results for complete coverage visibility.
 
-**Last Updated**: 2026-02-14
-**Framework Version**: 0.25.7
+**Last Updated**: 2026-03-31
+**Framework Version**: 0.77.0
 
 ---
 
@@ -62,6 +62,9 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 | WIP blocks commit | F-016 | 002_wip_blocks_commit | ✅ |
 | Pre-commit quality gates | F-009 | 009_mentions_checklist | ✅ |
 | Feature status enforcement | F-003 | 020_uses_feature_script | ✅ |
+| Plan auto-review enforcement chain | F-004, F-014 | E-PLAN-001–009, 098, 100 | ✅ Structural + LLM pending |
+| Spec-before-code enforcement chain | F-002 | E-SPEC-001–003, IMPL-01 | ✅ |
+| Workflow gate breaker (all stages) | F-014 | test_workflow_breaker.sh (23 tests) | ✅ (22/23) |
 | Branch policy enforcement | F-0115 | — | Structural (pre-commit-check.sh) |
 | Gate-based verification (doctor.sh) | F-0091 | — | Structural |
 | Warnings for soft signals | F-0114 | — | Structural (scope_check.sh) |
@@ -90,7 +93,9 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 
 | Aspect | Spec | Test | Status |
 |--------|------|------|--------|
-| Docs updated in same commit | F-0072 | — | Enforced in guidelines |
+| Docs updated before PR | F-0072 | 099_docs_updated_before_pr, E-DOC-001–002 | ✅ Structural + LLM pending |
+| Doc gate blocks stale docs | F-012 | 101_docs_gate_blocking_awareness, E-DOC-003–006 | ✅ Structural + LLM pending |
+| Doc enforcement chain (all layers) | F-012 | E-DOC-001–008 | ✅ (8 tests) |
 | Single source of truth | — | — | Structural (doc hierarchy) |
 | Explicit over implicit | — | — | Structural (protocols) |
 
@@ -143,16 +148,16 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 | F2: Sustainable Quality | 8 | 7 | 1 | 100% |
 | F3: Token & Context Optimization | 6 | 4 | 2 | 100% |
 | D1: Human-Agent Partnership | 4 | 2 | 2 | 100% |
-| D2: Deterministic Enforcement | 6 | 3 | 3 | 100% |
+| D2: Deterministic Enforcement | 9 | 5 | 35 | 100% |
 | D3: Durable Artifacts | 4 | 4 | 0 | 100% |
 | D4: Small Batch + ADD | 6 | 6 | 0 | 100% |
-| D5: Living Documentation | 3 | 0 | 3 | Structural only |
+| D5: Living Documentation | 5 | 2 | 11 | ✅ LLM + Enforcement + Structural |
 | D6: Green Coding | 2 | 1 | 1 | 100% |
 | D7: Multi-Env Portability | 4 | 0 | 4 | Structural only |
 | R1: Anti-Hallucination | 4 | 3 | 1 | 100% |
 | R2: No Auto-Commits | 2 | 2 | 0 | 100% |
 | R3: Check Before Creating | 2 | 1 | 1 | 100% |
-| **Total** | **57** | **36** | **21** | **100%** |
+| **Total** | **63** | **40** | **67** | **100%** |
 
 ---
 
@@ -212,7 +217,8 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 
 | Priority | Aspect | Spec | Notes |
 |----------|--------|------|-------|
-| Medium | Living documentation sync | F-0072 | Agent updates docs in same commit |
+| High | Run LLM tests 098-101 | D2, D5 | Plan auto-continue + docs enforcement — defined, not yet run |
+| Medium | WIP detection in isolated contexts | D2 | agents_helpers.py PROJECT_ROOT resolution gap |
 | Medium | Branch policy enforcement | F-0115 | Block direct push to main |
 | Low | Worktree coordination | F-0097 | Multi-agent file isolation |
 | Low | Doctor command usage | F-0091 | Agent uses doctor.sh for verification |
@@ -222,15 +228,15 @@ The framework has 13 principles (see `.agentic/PRINCIPLES.md`): 3 FOUNDATION + 7
 ## Running Tests
 
 ```bash
-# Acceptance criteria validation (171 tests)
+# Acceptance criteria (723 tests)
 bash tests/validate_framework.sh
+
+# Integration: workflow gate breaker (23 tests)
+bash tests/test_workflow_breaker.sh
 
 # Unit tests
 bash tests/run_tests.sh
 
-# LLM behavioral tests (CLI mode)
+# LLM behavioral tests (81 tests)
 bash tests/llm/harness.sh
-
-# LLM behavioral tests (IDE interactive mode)
-python3 tests/llm/interactive_runner.py
 ```

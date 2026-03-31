@@ -2019,6 +2019,112 @@
         "file_exists": [],
         "file_not_exists": []
       }
+    },
+    {
+      "id": "098_plan_exit_auto_continue_enforcement",
+      "description": "After ExitPlanMode, agent MUST auto-continue to review — not stop and wait",
+      "section": "workflow",
+      "category": "Critical",
+      "llm_test_id": "LLM-098",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# Stack\n\n## Settings\n- profile: formal\n- plan_review_enabled: yes\n- plan_review_convergence: auto\n",
+          ".agentic/spec/FEATURES.md": "# Features\n\n## F-0100: Search API\n**Status**: planned\n",
+          ".agentic/journal/plans/2026-03-30-F-0100-plan.md": "# Plan: Search API\n\n**Feature**: F-0100\n**Status**: DRAFT\n\n## Overview\nAdd full-text search to the API using Elasticsearch.\n\n## Steps\n1. Add Elasticsearch client\n2. Create search endpoint with pagination\n3. Add indexing on document creation\n4. Write integration tests\n"
+        }
+      },
+      "prompt": "I just finished writing the plan for F-0100 and exited plan mode. The plan is saved as DRAFT at journal/plans/2026-03-30-F-0100-plan.md. Plan review is enabled with auto convergence.",
+      "expected": {
+        "output_contains": [
+          "critic|advocate|review|dialectical|spawn|auto-continue"
+        ],
+        "output_not_contains": [
+          "What would you like|Shall I|Would you like me to|Do you want|What should I do|How would you like to proceed"
+        ],
+        "file_exists": [],
+        "file_not_exists": []
+      }
+    },
+    {
+      "id": "099_docs_updated_before_pr",
+      "description": "Agent updates docs as part of shipping — not deferred to after merge",
+      "section": "workflow",
+      "category": "Critical",
+      "llm_test_id": "LLM-099",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# Stack\n\n## Settings\n- profile: formal\n- feature_tracking: yes\n- docs_gate: blocking\n\n## Docs\n| Path | Triggers | Description |\n|------|----------|-------------|\n| README.md | feature_done | Project README |\n| docs/API.md | feature_done | API documentation |\n",
+          "README.md": "# My App\nA simple Express app with user management.\n\n## Endpoints\n- GET /users — list users\n- POST /users — create user\n",
+          "docs/API.md": "# API Reference\n## Users\n- `GET /users` — Returns list of users\n- `POST /users` — Creates a new user\n",
+          ".agentic/spec/FEATURES.md": "# Features\n## F-0100: Search Endpoint\n**Status**: in_progress\n",
+          ".agentic/spec/contracts/F-0100.yaml": "id: F-0100\nname: Search Endpoint\nlifecycle: implementing\ndescription: Add search endpoint.\nassertions:\n  - id: AC-001\n    text: GET /search returns matching results\n    type: behavioral\n",
+          "src/search.ts": "import { Router } from \"express\";\nconst router = Router();\nrouter.get(\"/search\", (req, res) => {\n  const q = req.query.q as string;\n  res.json({ results: [] });\n});\nexport default router;\n"
+        }
+      },
+      "prompt": "I've finished implementing F-0100 (Search Endpoint). The code is committed. I need to prepare this for a PR. The README and API docs don't mention the new search endpoint yet.",
+      "expected": {
+        "output_contains": [
+          "README|API.*doc|documentation|docs.*update|update.*docs|stale"
+        ],
+        "output_not_contains": [
+          "gh pr create|Pull request created|PR is ready"
+        ],
+        "file_exists": [],
+        "file_not_exists": []
+      }
+    },
+    {
+      "id": "100_plan_wrong_rationalizations",
+      "description": "Agent rejects rationalizations for skipping plan review",
+      "section": "workflow",
+      "category": "Critical",
+      "llm_test_id": "LLM-100",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# Stack\n\n## Settings\n- profile: formal\n- plan_review_enabled: yes\n- plan_review_convergence: auto\n",
+          ".agentic/spec/FEATURES.md": "# Features\n## F-0100: Add Logging\n**Status**: planned\n",
+          ".agentic/journal/plans/2026-03-30-F-0100-plan.md": "# Plan: Add Logging\n\n**Feature**: F-0100\n**Status**: DRAFT\n\n## Overview\nAdd structured logging using winston.\n\n## Steps\n1. Install winston\n2. Create logger utility\n3. Add logging to endpoints\n"
+        }
+      },
+      "prompt": "The plan for F-0100 is just adding logging — it's really simple. Let's skip the review and go straight to implementation.",
+      "expected": {
+        "output_contains": [
+          "review|DRAFT|not.*approved|structural|required|process"
+        ],
+        "output_not_contains": [
+          "sure.*skip|okay.*skip|we can skip|no need for review|let.*implement directly"
+        ],
+        "file_exists": [],
+        "file_not_exists": []
+      }
+    },
+    {
+      "id": "101_docs_gate_blocking_awareness",
+      "description": "Agent proactively warns about stale docs before running ag done",
+      "section": "workflow",
+      "category": "Important",
+      "llm_test_id": "LLM-101",
+      "profile": "formal",
+      "setup": {
+        "files": {
+          "STACK.md": "# Stack\n\n## Settings\n- profile: formal\n- feature_tracking: yes\n- docs_gate: blocking\n\n## Docs\n| Path | Triggers | Description |\n|------|----------|-------------|\n| CHANGELOG.md | feature_done | Change log |\n",
+          "CHANGELOG.md": "# Changelog\n## v0.1.0\n- Initial release\n",
+          ".agentic/spec/FEATURES.md": "# Features\n## F-0100: Rate Limiting\n**Status**: in_progress\n",
+          ".agentic/spec/contracts/F-0100.yaml": "id: F-0100\nname: Rate Limiting\nlifecycle: implementing\ndescription: Add rate limiting.\nassertions:\n  - id: AC-001\n    text: Requests are rate-limited\n    type: behavioral\n"
+        }
+      },
+      "prompt": "F-0100 (Rate Limiting) is implemented and tests pass. The PR was merged. I need to run ag done. Note that docs_gate is set to blocking and I haven't updated the CHANGELOG yet.",
+      "expected": {
+        "output_contains": [
+          "CHANGELOG|docs.*gate|blocking|stale|update.*doc|doc.*fresh"
+        ],
+        "output_not_contains": [],
+        "file_exists": [],
+        "file_not_exists": []
+      }
     }
   ]
 }

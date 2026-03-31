@@ -1,152 +1,164 @@
-# Framework Tests
+# QA Dashboard
 
-**Purpose**: Minimal test suite validating core claims without overengineering.
+**Framework Version**: 0.77.0 | **Last verified**: 2026-03-31
 
-**Philosophy**: Framework is in POC/discovery phase - keep tests focused on what we claim the tools do.
+## Current Status
 
----
+| Suite | Command | Tests | Status |
+|-------|---------|-------|--------|
+| **Acceptance criteria** | `bash tests/validate_framework.sh` | 723 | 723 pass, 0 fail |
+| **Workflow gate breaker** | `bash tests/test_workflow_breaker.sh` | 23 | 22 pass, 1 known gap |
+| **Unit tests** | `bash tests/run_tests.sh` | 21 | 21 pass |
+| **LLM behavioral** | `bash tests/llm/harness.sh` | 81 defined | 42/42 last run (Sonnet) |
+| **Total** | | **848** | |
 
 ## Quick Start
 
 ```bash
-# Run all tests
-bash tests/run_tests.sh
+# Run everything deterministic (< 3 min)
+bash tests/validate_framework.sh && bash tests/test_workflow_breaker.sh && bash tests/run_tests.sh
+
+# Run LLM behavioral tests (requires Claude CLI, costs API calls)
+bash tests/llm/harness.sh              # all 81 tests
+bash tests/llm/harness.sh --critical   # critical only (fast)
 ```
 
 ---
 
-## What We Test
+## What Each Suite Tests
 
-### 1. query_features.py (Core Claim: Fast Filtering)
-- ✅ Parse features from markdown
-- ✅ Filter by status
-- ✅ Filter by tags
-- ✅ Filter by layer
-- ✅ Combine multiple filters
-- ✅ Filter by owner
+### validate_framework.sh — Acceptance Criteria (723 tests)
 
-**Validates**: Query tool works as advertised for 200+ feature projects
+Verifies every shipped feature's acceptance criteria structurally. Runs in ~60s, no API calls.
 
-### 2. validate_specs.py (Core Claims: Validation)
-- ✅ Detect circular dependencies (F-001 → F-0002 → F-001)
-- ✅ Detect self-dependencies
-- ✅ Detect invalid parent references
-- ✅ Detect invalid dependency references
+| Category | Tests | What it catches |
+|----------|-------|----------------|
+| Feature ACs (F-001 through F-036) | ~550 | Feature contracts not met |
+| Enforcement chains (E-PLAN, E-DOC, E-SPEC) | 21 | Rule missing from any instruction layer |
+| Profile presets + settings | ~30 | Setting defaults, enum validation |
+| Pre-commit gates | ~20 | Shipped spec protection, staleness |
+| V2 state machine + roles | ~40 | Role prompts, transitions, conventions |
+| Structural (file/dir existence) | ~60 | Missing scripts, templates, configs |
 
-**Validates**: Pre-commit validation catches errors before they enter codebase
+**Key insight**: Enforcement-chain tests (E-PLAN-001–009, E-DOC-001–008, E-SPEC-001–003) verify that each behavioral rule exists across ALL instruction layers simultaneously — CLAUDE.md template, skills, memory-seed, hooks, gates, violations.yaml. A rule missing from one layer means agents can skip it.
+
+### test_workflow_breaker.sh — Integration (23 tests)
+
+Systematically tries to **break the autonomous workflow** at every stage. Sets up real project structures and attempts to bypass gates.
+
+| Stage | Tests | What it tries to break |
+|-------|-------|----------------------|
+| Planning | 2 | Can you plan an unregistered feature? |
+| Implementation | 4 | Skip contract? Skip plan review? Use DRAFT plan? |
+| Backlog | 2 | Implement out of order? |
+| WIP conflict | 1 | Start second feature while one is active? |
+| Completion (ag done) | 3 | Ship without plan? Without docs? |
+| Bypass escapes | 2 | Does SKIP_SPEC_CHECK actually bypass? |
+| State machine + gates | 7 | Skip states? Gates block without artifacts? |
+| Settings control | 2 | Does toggling settings enable/disable gates? |
+
+**Known gap**: WIP detection fails when `PROJECT_ROOT` differs from script path (agents_helpers.py resolution issue).
+
+### run_tests.sh — Unit Tests (21 tests)
+
+Fast Python unit tests. No external dependencies needed.
+
+| Module | Tests | What it validates |
+|--------|-------|-------------------|
+| query_features.py | 15 | Feature filtering, hierarchy, status queries |
+| validate_specs.py | 6 | Circular deps, invalid refs, self-deps |
+
+### LLM Behavioral Tests — Agent Compliance (81 tests)
+
+Sends prompts to a real LLM and verifies agent behavior. Requires Claude CLI.
+
+| Section | Tests | What it validates |
+|---------|-------|-------------------|
+| Session management | 8 | Greeting, WIP recovery, session end, staleness |
+| Trigger word routing | 23 | "build", "fix", "commit" route to correct workflow |
+| Workflow compliance | 13 | Plan-before-code, spec-first, auto-continue, docs-before-PR |
+| Artifact maintenance | 8 | Journal, status, features updated at checkpoints |
+| Token efficiency | 3 | Uses scripts, avoids full file reads |
+| Anti-hallucination | 3 | No fabricated methods, config, schema |
+| Commit gates | 5 | WIP blocks, no auto-commit, untracked files |
+| Other (NFR, multi-agent, profiles, brownfield) | 18 | Specialized scenarios |
 
 ---
 
-## Test Structure
+## Test Files
 
 ```
 tests/
-  fixtures/
-    sample_features.md       # Test data (5 features)
-  test_query_features.py     # Query tool tests (no deps)
-  test_validate_specs.py     # Validation tests (needs yaml)
-  run_tests.sh               # Simple runner
-  README.md                  # This file
+  validate_framework.sh          # Acceptance criteria (723 tests)
+  test_workflow_breaker.sh        # Workflow gate breaker (23 tests)
+  run_tests.sh                    # Unit test runner
+  test_*.py                       # Python unit tests (~70 files)
+  test_*.sh                       # Shell tests (~15 files)
+  llm/
+    harness.sh                    # LLM test runner
+    test_definitions.json         # Test registry (81 tests)
+    tests/                        # Test scripts (84 files)
+    results/                      # Historical run results
+    QA_GUIDE.md                   # How to run + interpret LLM tests
+    README.md                     # LLM harness documentation
+  VERIFICATION_REPORT.md          # Single source of truth for results
+  TRACEABILITY_MATRIX.md          # Principles -> features -> tests map
+  LLM_TEST_PLAN.md                # Full LLM test scenarios
 ```
-
----
-
-## Dependencies
-
-**query_features tests**: None (pure Python stdlib)
-
-**validate_specs tests**: Requires:
-- `pyyaml`
-- `python-frontmatter`
-- `jsonschema`
-
-Install if needed:
-```bash
-pip install pyyaml python-frontmatter jsonschema
-```
-
-**Note**: Tests skip gracefully if dependencies not available.
-
----
-
-## What We DON'T Test
-
-To avoid overengineering in POC phase:
-- ❌ Full pytest suite
-- ❌ Coverage metrics
-- ❌ Integration tests
-- ❌ End-to-end tests
-- ❌ Performance benchmarks
-- ❌ All edge cases
-
-**Why**: Framework is still evolving. Test core claims only.
 
 ---
 
 ## Adding Tests
 
-When adding new tools, add tests that validate **core claims**:
-
-1. Create `test_<tool_name>.py`
-2. Write 3-5 focused tests
-3. Test what you claim the tool does
-4. Keep it simple (no pytest needed)
-
-**Example**:
-```python
-#!/usr/bin/env python3
-"""Tests for new_tool.py - validates core claim."""
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent / ".agentic" / "tools"))
-from new_tool import some_function
-
-def test_core_claim():
-    result = some_function("input")
-    assert result == "expected", "Core claim failed"
-    print("✓ test_core_claim")
-
-if __name__ == "__main__":
-    print("Running new_tool tests...")
-    test_core_claim()
-    print("\n✅ All new_tool tests passed!")
-```
-
----
-
-## Running Individual Tests
-
+**New feature?** Add acceptance criteria to `validate_framework.sh`:
 ```bash
-# Query features only
-python3 tests/test_query_features.py
+if grep -q "expected_pattern" "$FILE"; then
+  pass "F-XXX AC-N: description"
+else
+  fail "F-XXX AC-N: description"
+fi
+```
 
-# Validation only
-python3 tests/test_validate_specs.py
+**New enforcement rule?** Add chain test verifying it exists in ALL layers:
+```bash
+# E-XXX-001: Rule must exist in CLAUDE.md template
+if grep -q "rule text" .agentic/lib/agents/claude/CLAUDE.md; then
+  pass "E-XXX-001: CLAUDE.md template has rule"
+else
+  fail "E-XXX-001: CLAUDE.md template missing rule"
+fi
+# Repeat for: skill file, memory-seed, hooks, gates
+```
+
+**New workflow gate?** Add to `test_workflow_breaker.sh`:
+```bash
+TEST_DIR=$(create_test_project formal)
+# Set up scenario that should be blocked
+OUTPUT=$(run_ag "$TEST_DIR" <command>)
+if echo "$OUTPUT" | grep -qi "BLOCKED"; then
+  pass "GATE-XX: description"
+else
+  fail "GATE-XX: description"
+fi
+cleanup
+```
+
+**New agent behavior?** Add LLM test in `tests/llm/tests/NNN_name.sh`:
+```bash
+setup_test_project "formal"
+send_prompt "your prompt"
+FAILURES=0
+check_output_contains "expected" "description" || ((FAILURES++))
+cleanup_test_project
+[[ $FAILURES -eq 0 ]]
 ```
 
 ---
 
-## Future (When Framework Matures)
+## Known Gaps
 
-If/when framework moves beyond POC:
-- Consider full pytest suite
-- Add coverage metrics
-- Add performance benchmarks
-- Add more edge case tests
-- Add CI/CD integration
-
-**For now**: Keep it minimal, test core claims only.
-
----
-
-## Success Criteria
-
-✅ Core claims validated by tests
-✅ Tests run in <5 seconds
-✅ No external dependencies for basic tests
-✅ Easy to add new tests
-✅ Tests catch regressions
-
-**The cobbler's children now have shoes (at least sandals!)** 👞
-
+| Gap | Priority | Notes |
+|-----|----------|-------|
+| LLM tests 098-101 not yet run | High | Defined but need Claude CLI execution |
+| WIP detection in isolated contexts | Medium | agents_helpers.py PROJECT_ROOT |
+| tests/README.md not in doc registry | Medium | QA docs not covered by docs_gate |

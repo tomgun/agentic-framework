@@ -22,6 +22,21 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - NEVER write code for multiple features outside of `ag auto` commands.
 - **Wrong rationalizations:** "I can do it directly faster" — NO. "User said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
 
+## After Plan Mode Exits — Auto-Continue (do NOT stop)
+Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and wait for user input.
+1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT`
+2. Spawn Critic + Advocate agents in parallel (fresh context) for dialectical review
+3. If converged → set `**Status**: APPROVED`; if not → revise plan
+4. After APPROVED → run `ag transition F-XXXX implementation`
+**Wrong rationalizations:** "The user created the plan" — NO. "Plan mode exit = approval" — NO. Review is structural, not discretionary.
+
+## Documentation — Part of the Deliverable
+Docs ship with code, not after merge. Before creating a PR:
+1. Check freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done --manifest F-XXXX`
+2. Update each stale doc relevant to the feature
+3. Include doc changes in the same PR as code
+`ag done` enforces `docs_gate` (blocking in formal profiles) — but that's the safety net, not the trigger.
+
 ## Rules
 - Follow CLI prompts. It loads role-specific guidance at each phase.
 - Write artifacts to `.agentic/work/F-XXXX/` (plan.md, spec.md, review.md, journal.md).
