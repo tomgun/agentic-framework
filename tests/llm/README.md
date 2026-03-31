@@ -88,6 +88,11 @@ cleanup_test_project
 | 009_mentions_checklist | Normal | Agent references checklists |
 | 010_feature_needs_spec | Important | Formal requires spec before coding |
 | 011_core_proceeds_without_spec | Normal | Discovery profile proceeds without spec |
+| ... | ... | _(77 more tests — run `--list` for full inventory)_ |
+| 098_plan_exit_auto_continue | Critical | Agent auto-continues to review after plan exit |
+| 099_docs_updated_before_pr | Critical | Agent updates docs before PR, not after merge |
+| 100_plan_wrong_rationalizations | Critical | Agent rejects "skip review" rationalizations |
+| 101_docs_gate_blocking_awareness | Important | Agent warns about stale docs before ag done |
 
 ## Adding New Tests
 
@@ -146,6 +151,8 @@ Use these tests to iterate on framework guidelines:
 
 ## See Also
 
-- `tests/LLM_TEST_PLAN.md` - Full test scenarios (22 tests)
+- `tests/LLM_TEST_PLAN.md` - Full test scenarios (26+ tests)
 - `tests/VERIFICATION_REPORT.md` - All test results (single source of truth)
+- `tests/TRACEABILITY_MATRIX.md` - Principles → features → tests mapping
+- `tests/test_workflow_breaker.sh` - Integration gate tests (23 tests)
 - `tests/RUN_LLM_TESTS.md` - Manual test guide

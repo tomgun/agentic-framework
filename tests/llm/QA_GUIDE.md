@@ -183,9 +183,11 @@ Passes sometimes, fails sometimes. This indicates:
 
 | Category | Tests | Priority |
 |----------|-------|----------|
-| **Critical** | 001, 002, 003, 005 | Must pass |
-| **Important** | 004 | Should pass |
-| **Coverage** | Future tests | Nice to have |
+| **Critical — Session** | 001, 002, 003, 005 | Must pass |
+| **Critical — Workflow** | 098, 099, 100 | Must pass — plan review + doc enforcement |
+| **Important — Workflow** | 101 | Should pass — docs_gate awareness |
+| **Important** | 004, 006-012 | Should pass |
+| **Coverage** | Other tests | Nice to have |
 
 **Critical tests must pass** before releasing a framework version.
 
@@ -265,6 +267,8 @@ This is **TDD for agent behavior**. Short feedback loops = rapid framework impro
 
 - `tests/llm/README.md` - Harness documentation
 - `tests/llm/harness.sh` - Test runner source
-- `tests/LLM_TEST_PLAN.md` - Full test scenarios (22 tests)
+- `tests/LLM_TEST_PLAN.md` - Full test scenarios (26+ tests)
 - `tests/VERIFICATION_REPORT.md` - All test results (single source of truth)
+- `tests/TRACEABILITY_MATRIX.md` - Principles → features → tests mapping
 - `tests/RUN_LLM_TESTS.md` - Manual test quick start
+- `tests/test_workflow_breaker.sh` - Integration tests for gate enforcement

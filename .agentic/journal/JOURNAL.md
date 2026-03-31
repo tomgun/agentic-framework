@@ -4773,3 +4773,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 - Run LLM behavioral tests 098-101 against Claude. Investigate WIP detection gap (agents_helpers.py PROJECT_ROOT resolution).
 
 **Blockers**: None
+
+### Session: 2026-03-31 08:20 - QA doc refresh
+
+**Why**: QA docs were stale — test counts, principle mappings, and test inventories didn't reflect the new enforcement + integration tests
+
+**What changed**:
+- Updated all 5 QA docs (VERIFICATION_REPORT, TRACEABILITY_MATRIX, LLM_TEST_PLAN, QA_GUIDE, llm/README) to reflect new enforcement-chain tests, workflow breaker suite, and LLM tests 098-101
+
+**Next steps**:
+- Run LLM tests 098-101 against Claude Code
+
+**Blockers**: None
+

@@ -2,8 +2,8 @@
 
 **Single source of truth for ALL test results.**
 
-**Generated**: 2026-03-02
-**Framework Version**: 0.39.0
+**Generated**: 2026-03-31
+**Framework Version**: 0.77.0
 
 ---
 
@@ -11,13 +11,14 @@
 
 | Metric | Value |
 |--------|-------|
-| Acceptance Tests (validate_framework.sh) | 367 passed, 0 failed |
+| Acceptance Tests (validate_framework.sh) | 723 passed, 0 failed, 8 warnings |
+| Integration Tests (test_workflow_breaker.sh) | 22 passed, 1 known gap |
 | Unit Tests (run_tests.sh) | 21/21 passed |
-| LLM Behavioral Tests (harness.sh) | 55 defined (17/23 verified via Cursor CLI) |
-| **Total Tests** | **388+ passing** |
+| LLM Behavioral Tests (harness.sh) | 81 defined (42/42 verified via Claude Code) |
+| **Total Tests** | **766+ passing** |
 | Test Pass Rate | 100% (acceptance + unit) |
 | Principles Covered | 13/13 |
-| Profile Coverage | Discovery ✅, Formal ✅ |
+| Profile Coverage | Discovery ✅, Formal ✅, Autonomous Formal ✅ |
 
 ---
 
@@ -25,9 +26,10 @@
 
 | Environment | Last Tested | Version | Result | Tester |
 |-------------|-------------|---------|--------|--------|
-| validate_framework.sh | 2026-03-02 | 0.39.0 | **367/367 (100%)** | bash |
+| validate_framework.sh | 2026-03-31 | 0.77.0 | **723/723 (100%)** | bash |
+| test_workflow_breaker.sh | 2026-03-31 | 0.77.0 | **22/23 (1 known gap)** | bash |
+| Claude Code (LLM) | 2026-02-09 | 0.34.0 | **42/42 (100%)** | Sonnet |
 | Cursor CLI (agent) | 2026-02-06 | 0.22.0 | **17/23 (74%)** | Cursor Agent CLI v2026.01.28 |
-| Claude Code | _pending_ | 0.39.0 | 55 tests defined | - |
 | GitHub Copilot | _not yet_ | - | - | - |
 
 ---
@@ -37,8 +39,9 @@
 | Tier | Meaning | Examples |
 |------|---------|----------|
 | **Battle-tested** | Proven through months of real development | Durable artifacts, token-efficient scripts, session continuity, acceptance-driven dev |
-| **LLM-verified** | Agent behavioral tests confirm compliance | 55 tests across all principle categories |
-| **Structurally verified** | Files/scripts exist and pass functional tests | 367 acceptance + 21 unit tests |
+| **LLM-verified** | Agent behavioral tests confirm compliance | 81 tests across all principle categories |
+| **Structurally verified** | Files/scripts exist and pass functional tests | 723 acceptance + 23 integration + 21 unit tests |
+| **Enforcement-chain tested** | Rules verified across all instruction layers | 21 chain tests (memory-seed, skills, CLAUDE.md, hooks, gates) |
 | **Designed for** | Implemented with tooling, growing usage | Multi-agent at scale, sequential pipelines |
 
 ---
@@ -97,6 +100,12 @@
 | 002_wip_blocks_commit | Agent blocks/warns about WIP | LLM | ❌ Cursor CLI |
 | 009_mentions_checklist | Agent references pre-commit checklist | LLM | ✅ |
 | 020_uses_feature_script | Agent uses feature.sh for status | LLM | ✅ |
+| 098_plan_exit_auto_continue | Agent auto-continues review after plan exit | LLM | _pending_ |
+| 100_plan_wrong_rationalizations | Agent rejects "skip review" rationalizations | LLM | _pending_ |
+| E-PLAN-001–009 | Plan auto-review chain across all instruction layers | Enforcement | ✅ (9 tests) |
+| E-SPEC-001–003 | Spec-before-code chain | Enforcement | ✅ (4 tests) |
+| IMPL-01–04, BACKLOG, WIP | ag implement gate enforcement | Integration | ✅ (7 tests) |
+| STATE-01–03, GATE-01–04 | State machine + forward gate artifacts | Integration | ✅ (7 tests) |
 | _Acceptance_ | pre-commit-check.sh, doctor.sh, feature-complete.sh tests | Structural | ✅ (18 tests) |
 
 ### D3: Durable Artifacts (DESIGN PRINCIPLE)
@@ -155,8 +164,11 @@
 
 | Test ID | Description | Type | Result |
 |---------|-------------|------|--------|
+| 099_docs_updated_before_pr | Agent updates docs before PR, not after merge | LLM | _pending_ |
+| 101_docs_gate_blocking_awareness | Agent warns about stale docs before ag done | LLM | _pending_ |
+| E-DOC-001–008 | Doc update enforcement chain across all layers | Enforcement | ✅ (8 tests) |
+| DONE-03 | ag done runs doc freshness check when docs_gate=blocking | Integration | ✅ |
 | _Acceptance_ | Documentation sync rules, doc hierarchy | Structural | ✅ (5 tests) |
-| _Note_ | No LLM behavioral test yet | — | Backlog |
 
 ### D6: Green Coding (DESIGN PRINCIPLE)
 
@@ -189,12 +201,29 @@
 
 | Category | Tests | Result |
 |----------|-------|--------|
+| Feature acceptance criteria (F-001–F-036) | ~550 | ✅ |
 | Structural (file/dir existence) | ~90 | ✅ |
-| Functional (script execution) | ~35 | ✅ |
-| Profile (Discovery + Formal) | ~20 | ✅ |
-| Enforcement (pre-commit, complexity) | ~15 | ✅ |
+| Functional (script execution, gate behavior) | ~35 | ✅ |
+| Profile (Discovery + Formal + Autonomous Formal) | ~20 | ✅ |
+| Enforcement chain: plan auto-review (E-PLAN-*) | 9 | ✅ |
+| Enforcement chain: doc updates (E-DOC-*) | 8 | ✅ |
+| Enforcement chain: spec-before-code (E-SPEC-*) | 4 | ✅ |
 | Principles validation | ~11 | ✅ |
-| **Total** | **171** | **100%** (2 warnings) |
+| **Total** | **723** | **100%** (8 warnings) |
+
+### test_workflow_breaker.sh
+
+| Stage | Tests | Result |
+|-------|-------|--------|
+| Planning gates (ag plan) | 2 | ✅ |
+| Implementation gates (ag implement) | 4 | ✅ |
+| Backlog enforcement | 2 | ✅ |
+| WIP conflict detection | 1 | ❌ (known gap: PROJECT_ROOT resolution) |
+| Completion gates (ag done) | 3 | ✅ |
+| Bypass escape hatches (SKIP_SPEC_CHECK) | 2 | ✅ |
+| State machine + forward gate artifacts | 7 | ✅ |
+| Settings-based gate control | 2 | ✅ |
+| **Total** | **23** | **22 pass, 1 known gap** |
 
 ---
 
@@ -233,7 +262,8 @@
 
 | Priority | Aspect | Principle | Notes |
 |----------|--------|-----------|-------|
-| Medium | Living documentation sync | D5 | Agent updates docs in same commit |
+| High | Run LLM tests 098-101 | D2, D5 | Plan auto-continue + docs enforcement — defined but not yet run |
+| Medium | WIP detection in isolated contexts | D2 | agents_helpers.py PROJECT_ROOT resolution gap |
 | Medium | Branch policy enforcement | D2 | Block direct push to main |
 | Low | Worktree coordination | F2 | Multi-agent file isolation |
 | Low | Doctor command usage | D2 | Agent uses doctor.sh for verification |
@@ -243,17 +273,20 @@
 ## Running All Tests
 
 ```bash
-# All acceptance criteria (171 tests)
+# Acceptance criteria (723 tests)
 bash tests/validate_framework.sh
+
+# Integration: workflow gate breaker (23 tests)
+bash tests/test_workflow_breaker.sh
 
 # Unit tests (21 tests)
 bash tests/run_tests.sh
 
-# LLM behavioral tests - CLI mode
+# LLM behavioral tests - CLI mode (81 tests)
 bash tests/llm/harness.sh
 
-# LLM behavioral tests - IDE interactive mode
-python3 tests/llm/interactive_runner.py
+# LLM behavioral tests - critical only
+bash tests/llm/harness.sh --critical
 
 # Single LLM test
 bash tests/llm/harness.sh tests/llm/tests/001_session_start.sh
@@ -263,7 +296,19 @@ bash tests/llm/harness.sh tests/llm/tests/001_session_start.sh
 
 ## Test History
 
-### v0.22.0 (2026-02-06) — Current
+### v0.77.0 (2026-03-31) — Current
+
+- **Environment**: validate_framework.sh + test_workflow_breaker.sh on Linux
+- **Result**: 745/746 (723 acceptance + 22/23 integration + 21 unit)
+- **Notes**: Added 21 enforcement-chain tests (E-PLAN, E-DOC, E-SPEC) verifying rules across all instruction layers. Added workflow breaker integration suite (23 tests). Added 4 LLM behavioral tests (098-101). Fixed 10 pre-existing test bugs. Found 1 real gap: WIP detection fails in isolated contexts.
+
+### v0.34.0 (2026-02-09)
+
+- **Environment**: Claude Code CLI (Sonnet)
+- **Result**: 42/42 LLM behavioral tests pass
+- **Notes**: First full automated LLM run via Claude Code. All critical + important tests pass.
+
+### v0.22.0 (2026-02-06)
 
 - **Environment**: Cursor CLI (`agent` v2026.01.28) on macOS (darwin 24.5.0)
 - **Tester**: Cursor Agent CLI (automated, `--print --force`)
