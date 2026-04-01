@@ -1,0 +1,108 @@
+id: F-040
+name: App Store Publishing
+lifecycle: implementing
+profile: formal
+protection: assertions
+category: deployment
+description: 'Provider-based mobile app publishing via `ag publish` commands. Supports
+  iOS and
+
+  Android with Fastlane and custom script backends. Features platform auto-detection,
+
+  preflight validation (including OS check), phased execution with state tracking,
+
+  credential management (env vars only), screenshot generation, and metadata validation.
+
+
+  Configuration: minimal STACK.md footprint (3 settings) + dedicated publish.yaml.
+
+  State: resumable publish-state.json with phase-level tracking.
+
+  '
+user_input: ''
+assertions:
+- id: AC-001
+  text: Platform detection identifies iOS, Android, React Native, and Flutter projects
+  type: structural
+  verify: 'test -f .agentic/lib/tools/publish/detect.sh && grep -q "xcodeproj\|xcworkspace"
+    .agentic/lib/tools/publish/detect.sh && grep -q "react-native" .agentic/lib/tools/publish/detect.sh
+    && grep -q "flutter" .agentic/lib/tools/publish/detect.sh
+
+    '
+- id: AC-002
+  text: Preflight validates provider, signing credentials, and host OS for iOS
+  type: structural
+  verify: 'test -f .agentic/lib/tools/publish/preflight.sh && grep -q "darwin\|macOS\|uname"
+    .agentic/lib/tools/publish/preflight.sh && grep -q "APP_STORE_CONNECT\|GOOGLE_PLAY"
+    .agentic/lib/tools/publish/preflight.sh
+
+    '
+- id: AC-003
+  text: ag publish command dispatch exists and routes subcommands
+  type: structural
+  verify: 'test -f .agentic/lib/tools/commands/publish.sh && grep -q "publish" .agentic/lib/tools/ag.sh
+
+    '
+- id: AC-004
+  text: Fastlane provider implements provider interface functions
+  type: structural
+  verify: 'test -f .agentic/lib/tools/publish/providers/fastlane.sh && grep -q "provider_capabilities"
+    .agentic/lib/tools/publish/providers/fastlane.sh && grep -q "provider_preflight"
+    .agentic/lib/tools/publish/providers/fastlane.sh
+
+    '
+- id: AC-005
+  text: Custom provider implements provider interface and delegates to user scripts
+  type: structural
+  verify: 'test -f .agentic/lib/tools/publish/providers/custom.sh && grep -q "provider_capabilities"
+    .agentic/lib/tools/publish/providers/custom.sh
+
+    '
+- id: AC-006
+  text: Python orchestrator manages phased execution and state persistence
+  type: structural
+  verify: 'test -f .agentic/lib/auto/publish.py && grep -q "publish-state.json\|publish_state"
+    .agentic/lib/auto/publish.py && grep -q "phases\|phase" .agentic/lib/auto/publish.py
+
+    '
+- id: AC-007
+  text: publish.yaml template exists for ag publish init scaffolding
+  type: structural
+  verify: 'test -f .agentic/lib/init/publish.template.yaml && grep -q "bundle_id\|package_name"
+    .agentic/lib/init/publish.template.yaml
+
+    '
+- id: AC-008
+  text: STACK.md template includes Publishing section with provider and platform settings
+  type: structural
+  verify: 'grep -q "publish_provider" .agentic/STACK.template.md && grep -q "mobile_platform"
+    .agentic/STACK.template.md
+
+    '
+- id: AC-009
+  text: No hardcoded secrets in publish files — credentials via env vars only
+  type: structural
+  verify: '! grep -r "BEGIN.*PRIVATE\|password.*=.*[''\"]" .agentic/lib/tools/publish/
+    .agentic/lib/auto/publish.py 2>/dev/null
+
+    '
+- id: AC-010
+  text: Status display shows phase progress from publish-state.json
+  type: structural
+  verify: 'test -f .agentic/lib/tools/publish/status.sh && grep -q "publish-state"
+    .agentic/lib/tools/publish/status.sh
+
+    '
+- id: AC-011
+  text: dry-run flag supported in publish commands
+  type: structural
+  verify: 'grep -q "dry.run\|dry_run" .agentic/lib/tools/commands/publish.sh || grep
+    -q "dry.run\|dry_run" .agentic/lib/auto/publish.py
+
+    '
+- id: AC-012
+  text: validate_framework.sh includes F-040 structural tests
+  type: structural
+  verify: 'grep -q "F-040" tests/validate_framework.sh
+
+    '

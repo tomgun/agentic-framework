@@ -48,6 +48,7 @@ COMMANDS:
     gitignore           Generate/update stack-aware .gitignore
     sync [--check|--quiet] Detect drift across all artifacts, auto-fix safe errors
     export <tool|all>   Generate instruction files for AI tools (claude|cursor|copilot|codex)
+    publish <sub>        App store publishing (init|preflight|ios|android|screenshots|metadata|status)
     verify [--full]     Run doctor verification
     run                 Show how to run this project
     status              Show current project status
@@ -132,6 +133,7 @@ COMMANDS:
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
     intent [sub]        Manage intent journal (list|clear F-XXXX)
     formalize [T-XXXX...]  Promote TODO items to formal features + AC stubs
+    publish <sub>        App store publishing (init|preflight|ios|android|screenshots|metadata|status)
     migrate-specs [opts]   Convert markdown ACs to YAML contracts (--dry-run, --archive)
     git-init            Activate git version control (safe: .gitignore first, scaffold commit)
     gitignore           Generate/update stack-aware .gitignore

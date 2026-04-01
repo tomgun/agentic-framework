@@ -412,6 +412,14 @@ Autonomous scheduling engine that assigns work to agents based on priority, depe
 
 ---
 
+## F-040: App Store Publishing
+
+**Status**: planned | **Category**: deployment | **Profile**: formal
+
+Provider-based mobile app publishing (`ag publish`) with platform auto-detection, preflight validation, phased execution with state tracking, and automated screenshot generation. Supports Fastlane and custom script backends for iOS and Android.
+
+---
+
 ## DEV-004: Complexity Tier Experiments
 
 **Status**: shipped | **Category**: dev-infrastructure

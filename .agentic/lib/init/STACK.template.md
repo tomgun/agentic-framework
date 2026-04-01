@@ -335,6 +335,12 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- | user-api | contracts/user-api.yaml | openapi | api | web, mobile | -->
 <!-- | events | contracts/events.proto | protobuf | api | analytics | -->
 
+## Publishing (optional, for mobile apps)
+<!-- App store publishing via `ag publish`. See F-040. -->
+<!-- - publish_provider: fastlane  # fastlane | custom -->
+<!-- - mobile_platform: auto       # auto | ios | android | react_native | flutter -->
+<!-- - publish_config: .agentic/publish.yaml -->
+
 ## Data & integrations
 - Primary datastore: <!-- postgres/sqlite/mongo/redis/etc -->
 - Messaging/queues (if any): <!-- kafka/sqs/rabbitmq/etc -->

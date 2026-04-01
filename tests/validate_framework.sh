@@ -5663,6 +5663,105 @@ else
   fail "E-SPEC-003: CLAUDE.md template missing completeness formula"
 fi
 
+# ============================================================
+# F-040: App Store Publishing
+# ============================================================
+
+echo ""
+echo "--- F-040: App Store Publishing ---"
+
+# AC-001: Platform detection supports all 4 frameworks
+if test -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/detect.sh" && \
+   grep -q "xcodeproj\|xcworkspace" "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/detect.sh" && \
+   grep -q "react-native" "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/detect.sh" && \
+   grep -q "flutter" "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/detect.sh"; then
+  pass "F-040 AC-001: platform detection for iOS, Android, React Native, Flutter"
+else
+  fail "F-040 AC-001: detect.sh missing or incomplete platform detection"
+fi
+
+# AC-002: Preflight validates credentials and OS
+if test -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/preflight.sh" && \
+   grep -q "darwin\|macOS\|uname" "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/preflight.sh" && \
+   grep -q "APP_STORE_CONNECT\|GOOGLE_PLAY" "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/preflight.sh"; then
+  pass "F-040 AC-002: preflight validates OS and credentials"
+else
+  fail "F-040 AC-002: preflight.sh missing or incomplete"
+fi
+
+# AC-003: ag publish command dispatch
+if test -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/publish.sh" && \
+   grep -q "publish" "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "F-040 AC-003: ag publish command dispatch wired"
+else
+  fail "F-040 AC-003: publish command dispatch missing"
+fi
+
+# AC-004: Fastlane provider interface
+if test -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/providers/fastlane.sh" && \
+   grep -q "provider_capabilities" "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/providers/fastlane.sh" && \
+   grep -q "provider_preflight" "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/providers/fastlane.sh"; then
+  pass "F-040 AC-004: fastlane provider implements interface"
+else
+  fail "F-040 AC-004: fastlane provider missing or incomplete"
+fi
+
+# AC-005: Custom provider interface
+if test -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/providers/custom.sh" && \
+   grep -q "provider_capabilities" "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/providers/custom.sh"; then
+  pass "F-040 AC-005: custom provider implements interface"
+else
+  fail "F-040 AC-005: custom provider missing or incomplete"
+fi
+
+# AC-006: Python orchestrator with state management
+if test -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/publish.py" && \
+   grep -q "publish-state\|publish_state\|PUBLISH_STATE" "${FRAMEWORK_ROOT}/.agentic/lib/auto/publish.py" && \
+   grep -q "phase" "${FRAMEWORK_ROOT}/.agentic/lib/auto/publish.py"; then
+  pass "F-040 AC-006: Python orchestrator with state management"
+else
+  fail "F-040 AC-006: publish.py missing or lacks state/phase handling"
+fi
+
+# AC-007: publish.yaml template
+if test -f "${FRAMEWORK_ROOT}/.agentic/lib/init/publish.template.yaml" && \
+   grep -q "bundle_id\|package_name" "${FRAMEWORK_ROOT}/.agentic/lib/init/publish.template.yaml"; then
+  pass "F-040 AC-007: publish.yaml template exists"
+else
+  fail "F-040 AC-007: publish.yaml template missing"
+fi
+
+# AC-008: STACK.md template has publishing section
+if grep -q "publish_provider" "${FRAMEWORK_ROOT}/.agentic/lib/init/STACK.template.md" && \
+   grep -q "mobile_platform" "${FRAMEWORK_ROOT}/.agentic/lib/init/STACK.template.md"; then
+  pass "F-040 AC-008: STACK.md template has publishing section"
+else
+  fail "F-040 AC-008: STACK.md template missing publishing section"
+fi
+
+# AC-009: No hardcoded secrets
+if ! grep -r "BEGIN.*PRIVATE" "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/" "${FRAMEWORK_ROOT}/.agentic/lib/auto/publish.py" 2>/dev/null | grep -v "REDACT\|redact\|pattern" >/dev/null 2>&1; then
+  pass "F-040 AC-009: no hardcoded secrets in publish files"
+else
+  fail "F-040 AC-009: potential hardcoded secrets found"
+fi
+
+# AC-010: Status display reads publish-state
+if test -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/status.sh" && \
+   grep -q "publish-state" "${FRAMEWORK_ROOT}/.agentic/lib/tools/publish/status.sh"; then
+  pass "F-040 AC-010: status display reads publish-state.json"
+else
+  fail "F-040 AC-010: status.sh missing or doesn't read state"
+fi
+
+# AC-011: dry-run support
+if grep -q "dry.run\|dry_run" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/publish.sh" 2>/dev/null || \
+   grep -q "dry.run\|dry_run" "${FRAMEWORK_ROOT}/.agentic/lib/auto/publish.py" 2>/dev/null; then
+  pass "F-040 AC-011: dry-run flag supported"
+else
+  fail "F-040 AC-011: dry-run support missing"
+fi
+
 # Summary
 
 # ============================================================

@@ -4786,3 +4786,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-01 08:03 - F-040 App Store Publishing
+
+**Why**: Mobile app publishing is error-prone and repetitive — framework orchestration brings it under ag workflow
+
+**What changed**:
+- Implemented full ag publish pipeline: detect, preflight, providers (fastlane+custom), Python orchestrator with state, screenshots, metadata, status display, skill, 11 structural tests passing
+
+**Next steps**:
+- PR review and merge, then ag done F-040
+
+**Blockers**: None
+
