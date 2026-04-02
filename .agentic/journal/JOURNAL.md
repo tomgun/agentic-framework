@@ -4968,3 +4968,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 21:05 - F-041 shipped
+
+**Why**: Post-merge completion
+
+**What changed**:
+- Intelligence Engine Phases 1-4 complete and shipped as v0.77.1
+
+**Next steps**:
+- F-037 MCP Coordination Server
+
+**Blockers**: None
+

@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-041 Phase 4: phase-aware queries + skill integration complete, all tests pass (Updated: 2026-04-02 20:18 UTC)
+- F-041 shipped (v0.77.1), backlog: F-037 MCP Coordination Server (Updated: 2026-04-02 21:05 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
