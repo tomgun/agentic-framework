@@ -186,10 +186,10 @@ Not every idea follows the same path in:
 |---|-------|-------------|-------------|-------------|
 | 1 | **Session Start** | Dashboard loads, WIP recovery, orphan plan scan, context hydration | `ag start` / `ag sync` | STATUS.md, AGENTS.json |
 | 2 | **Intent & Routing** | Trigger words route to workflows: "build" → spec-first, "fix" → test-first, "done" → completion | Trigger words / skills | Skill activation |
-| 3 | **Planning** | `ag plan` drafts approach, dialectical review (Critic + Advocate) validates, plan saved durably | `ag plan F-XXXX` | `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` |
-| 4 | **Specification** | Acceptance criteria written, NFRs integrated, clarity gate validates testability | `ag spec` | `spec/acceptance/F-XXXX.md`, `spec/FEATURES.md` |
-| 5 | **Implementation** | TDD (test-first) or standard flow. WIP tracked. Checkpoints at scope boundaries | `ag implement F-XXXX` | Source code, WIP entry in AGENTS.json |
-| 6 | **Verification** | Tests run, NFR coverage checked, AC completion verified, smoke test | `ag auto verify` | Test results, verification record |
+| 3 | **Planning** | `ag intel architecture` gathers ADRs/NFRs, `ag plan` drafts approach, dialectical review validates, plan saved | `ag plan F-XXXX` | `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` |
+| 4 | **Specification** | `ag intel spec F-XXXX` checks feature overlap, ACs written, NFRs integrated, clarity gate validates | `ag spec` | `spec/contracts/F-XXXX.yaml`, `spec/FEATURES.md` |
+| 5 | **Implementation** | `ag intel implement F-XXXX` surfaces conventions/patterns, TDD or standard flow, WIP tracked | `ag implement F-XXXX` | Source code, WIP entry in AGENTS.json |
+| 6 | **Verification** | `ag intel test F-XXXX` surfaces test strategy, tests run, NFR coverage checked, AC verified | `ag auto verify` | Test results, verification record |
 | 7 | **Documentation** | Journal entry, status update, doc drift detection, registry maintenance | `journal.sh`, `status.sh` | JOURNAL.md, STATUS.md |
 | 8 | **Commit** | 17+ pre-commit checks run. Scope validated, specs protected, complexity limited | `ag commit` | Git commit |
 | 9 | **Completion** | Feature marked shipped, VERSION bumped, backlog advanced, retro trigger | `ag done F-XXXX` | VERSION, FEATURES.md, BACKLOG.json |

@@ -173,6 +173,13 @@ Key transitions are gated by artifact preconditions (plan.md, spec.md, tests, do
 - [`.agentic/spec/acceptance/F-####.md`](../../../.agentic/spec/acceptance/): Per-feature acceptance criteria
 - [`.agentic/spec/adr/`](../../../.agentic/spec/adr/): Architecture decision records
 
+**Intelligence** (`.agentic/intel/`):
+- `patterns.yaml` — enforced anti-patterns checked at write-time
+- `cerebrum.yaml` — project knowledge from user corrections
+- `quality-checklist.yaml` — 5 quality dimensions × 4 workflow phases
+- `test-strategy.yaml` — test levels with framework-specific patterns
+- Phase queries: `ag intel architecture|spec|implement|test [F-XXXX]`
+
 **Quality:**
 - Test strategy: [`.agentic/lib/quality/test_strategy.md`](quality/test_strategy.md)
 - Code review: [`.agentic/lib/quality/review_checklist.md`](quality/review_checklist.md)

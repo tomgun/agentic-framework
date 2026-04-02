@@ -1,12 +1,28 @@
 # Project Contributions Report
 
 **Project**: Agentic AI Framework
-**Period**: Initial Development (v0.1.0 → v0.55.0)
-**Date**: 2026-03-13
+**Period**: Initial Development (v0.1.0 → v0.77.0)
+**Date**: 2026-04-02
 
 ---
 
 ## Recent Contributions
+
+### F-041 Intelligence Engine — Smarter Than Vanilla Claude (v0.77.0)
+
+**User insight 1 — Intelligence is core value, not a nice-to-have**: "Token optimization, domain-specific quality intelligence, and spec adherence are CORE parts of the framework's value to users — not optional enhancements. These are the things that make the framework worth using compared to vanilla Claude." The user insisted intelligence must work in Discovery mode too, not just Formal — because intelligence doesn't depend on heavy spec artifacts.
+
+**User insight 2 — Phase-aware quality guidance**: "Can we use the intelligence hooks also to improve the quality of decisions when designing architecture, features/user stories, tests and implementing code? That would be something I would like to be strengthened by our framework out of the box compared to vanilla Claude." This directly shaped Phase 4: four commands (`architecture`, `spec`, `implement`, `test`) that surface relevant intelligence at each workflow phase.
+
+**User insight 3 — Project knowledge from corrections**: "Does this new intelligence engine also make notes / learnings about the user's preferences that are expressed while working on a product when using this framework?" This shaped the Cerebrum subsystem (Phase 1b) — `ag intel remember` auto-captures user corrections as project-scoped knowledge (preferences, learnings, decisions).
+
+**User insight 4 — Cross-tool portability with Claude-first pragmatism**: "It's ok if these enhancements will be Claude only, but it would be good to include cursor/codex/gemini/opencode at least theoretically or 'cannot do in anyway' in the planning." This shaped the architecture: CLI commands work everywhere, hooks are Claude Code-specific but the intelligence files (.agentic/intel/) are agent-agnostic.
+
+**User insight 5 — Quality dimensions span all levels**: The user specified intelligence must cover usability, architecture, code quality, testability, AND spec adherence — not just code. This directly shaped the quality-checklist.yaml structure: 5 dimensions × 4 workflow phases.
+
+**Why it matters**: The intelligence engine transforms the framework from "structured workflow with gates" to "structured workflow with domain-specific guidance." Gates prevent bad outcomes; intelligence actively produces better outcomes. Without intelligence, the framework is just overhead compared to vanilla Claude.
+
+---
 
 ### Enforcement-Chain Testing — Tests Must Break the Workflow, Not Just Check Files (v0.77.0)
 

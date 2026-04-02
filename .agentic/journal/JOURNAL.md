@@ -4929,3 +4929,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 20:49 - F-041 Phase 4 — remaining docs + contributions
+
+**Why**: Complete doc coverage for intelligence engine feature
+
+**What changed**:
+- Updated PRINCIPLES, INSTRUCTION_ARCHITECTURE, FRAMEWORK_WORKFLOW, START_HERE, README, CONTRIBUTIONS with intelligence engine content
+
+**Next steps**:
+- Merge PR #221
+
+**Blockers**: None
+

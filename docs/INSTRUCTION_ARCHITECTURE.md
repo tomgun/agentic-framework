@@ -137,9 +137,13 @@ The framework uses two categories of hooks for structural enforcement:
 Defense-in-Depth: Hooks
 ├── Git Hooks (agent-agnostic)
 │   └── pre-commit-check.sh — 21 structural gates
-└── Tool-Native Hooks (per-tool, structural enforcement at transition points)
-    ├── Claude Code: PostToolUse(ExitPlanMode), SessionStart, Stop, etc.
-    └── [Other tools: future — Gemini, Codex, Copilot, Cursor]
+├── Tool-Native Hooks (per-tool, structural enforcement at transition points)
+│   ├── Claude Code: PostToolUse(ExitPlanMode), SessionStart, Stop, etc.
+│   └── [Other tools: future — Gemini, Codex, Copilot, Cursor]
+└── Intelligence Hooks (F-041)
+    ├── PreToolUse:Write/Edit — pattern enforcement (<50ms, pure bash)
+    ├── PostToolUse:Read/Write/Edit — token tracking (session ledger)
+    └── Stop — session metrics aggregation (lifetime summary)
 ```
 
 **Git hooks** run at commit time — they are the universal backstop. **Tool-native hooks** fire at workflow transition points (e.g., exiting plan mode) and can inject instructions into the agent's context before the next action. Together they provide defense-in-depth: tool hooks catch violations early (at the transition), git hooks catch them late (at commit time).
