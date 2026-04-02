@@ -28,6 +28,7 @@ Run `ag spec` or `ag contract` to manage feature specifications and YAML contrac
 - **Audit**: `bash .agentic/lib/tools/check-spec-health.sh F-XXXX` (or `--all`)
 
 ## Rules
+- When the user corrects your approach: `ag intel remember "what they said" --context "what you were doing"`
 - Shipped specs are contracts — never delete existing assertions
 - Contracts are YAML files at `spec/contracts/F-XXXX.yaml` with assertions, verify commands, and test links
 - Use markers: `[Discovered]`, `[Revised in M-NNN: was "X" now "Y"]`

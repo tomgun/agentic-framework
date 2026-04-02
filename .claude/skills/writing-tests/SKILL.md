@@ -23,5 +23,6 @@ Steps:
 4. Write tests matching project patterns
 5. Run tests and verify all pass with no regressions
 
-Key command:
+Key rules:
 - `ag verify F-XXXX` — run tests and check AC coverage
+- When the user corrects your approach: `ag intel remember "what they said" --context "what you were doing"`

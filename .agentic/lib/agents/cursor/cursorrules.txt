@@ -36,6 +36,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Migrate specs / convert acceptance | STOP -> Run `ag migrate-specs` (converts markdown ACs to YAML contracts). |
 | Plan created / exited plan mode | STOP -> Save plan, run dialectical review if `plan_review_enabled: yes`, then implement |
 | Churn / batch / all tasks / build everything | STOP -> Run `ag auto crunch`. NEVER write code for multiple features outside `ag auto`. |
+| User correction / "no" / "don't" / "always" / "never" / "I prefer" | STOP -> `ag intel remember "what they said" --context "what you were doing"` |
 
 ## Rules
 

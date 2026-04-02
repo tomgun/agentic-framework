@@ -46,11 +46,36 @@ assertions:
   - id: AC-006
     text: >
       `ag intel` dispatched correctly from ag.sh with subcommands: check, learn,
-      patterns, and help
+      remove, patterns, remember, cerebrum, forget, and help
     type: structural
 
   - id: AC-007
     text: >
       upgrade.sh creates .agentic/intel/ directory for existing projects that
       lack it
+    type: structural
+
+  # --- Phase 1b: Cerebrum — project-scoped learning ---
+  - id: AC-008
+    text: >
+      `ag intel remember "text" --type preference|learning|decision --context "..."`
+      appends entry to cerebrum.yaml with auto-incremented C-XXXX ID and date
+    type: behavioral
+
+  - id: AC-009
+    text: >
+      `ag intel cerebrum` lists all entries; `ag intel cerebrum --type TYPE`
+      filters by type (preference|learning|decision)
+    type: behavioral
+
+  - id: AC-010
+    text: >
+      `ag intel forget C-XXXX` removes a cerebrum entry by ID
+    type: behavioral
+
+  - id: AC-011
+    text: >
+      Instruction files (CLAUDE.md template, cursorrules, copilot, codex,
+      memory-seed, 4 skills) contain trigger for auto-capturing user corrections
+      via ag intel remember
     type: structural

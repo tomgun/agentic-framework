@@ -4864,3 +4864,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 17:26 - F-041 Cerebrum: project-scoped learning
+
+**Why**: OpenWolf analysis revealed gap: no project-scoped capture of user preferences and learnings
+
+**What changed**:
+- cerebrum.yaml + remember/cerebrum/forget commands, correction triggers in 10 instruction files (CLAUDE.md, cursorrules, copilot, codex, memory-seed, 4 skills), 36/36 tests
+
+**Next steps**:
+- Phase 2: Anatomy + Token Ledger
+
+**Blockers**: None
+

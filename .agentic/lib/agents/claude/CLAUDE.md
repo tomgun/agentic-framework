@@ -51,6 +51,7 @@ Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and
 - Plans are durable: save to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
 - Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
+- User correction: "no/don't/stop/always/never/I prefer" → capture with `ag intel remember "what they said" --context "what you were doing"`. Preferences, learnings, and decisions are project-scoped (cerebrum.yaml), not personal memory.
 - Pending user input: "pending user input/contract input" → run `ag contract pending`. Process each pending contract.
 - Migrate specs: "migrate specs/convert acceptance" → run `ag migrate-specs` (converts markdown ACs to YAML contracts).
 - Never fabricate APIs, data, or behavior. If uncertain, ask.

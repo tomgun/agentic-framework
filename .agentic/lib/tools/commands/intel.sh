@@ -5,8 +5,10 @@
 
 INTEL_DIR="${ROOT_DIR}/.agentic/intel"
 PATTERNS_FILE="${INTEL_DIR}/patterns.yaml"
+CEREBRUM_FILE="${INTEL_DIR}/cerebrum.yaml"
 
 _INTEL_VALID_SEVERITIES="error warning info"
+_INTEL_VALID_CEREBRUM_TYPES="preference learning decision"
 
 cmd_intel() {
     local subcmd="${1:-help}"
@@ -17,6 +19,9 @@ cmd_intel() {
         learn)    _intel_learn "$@" ;;
         remove)   _intel_remove "$@" ;;
         patterns) _intel_patterns "$@" ;;
+        remember) _intel_remember "$@" ;;
+        cerebrum) _intel_cerebrum "$@" ;;
+        forget)   _intel_forget "$@" ;;
         help|--help|-h) _intel_help ;;
         *)
             echo -e "${RED}Unknown intel subcommand: $subcmd${NC}"
@@ -29,13 +34,18 @@ cmd_intel() {
 _intel_help() {
     echo -e "${BOLD}ag intel${NC} — Intelligence engine"
     echo ""
-    echo "  ${BOLD}Phase 1: Patterns${NC}"
+    echo "  ${BOLD}Patterns${NC} (enforced at write-time)"
     echo "  check PATH [--json]       Show patterns matching a file path"
     echo "  learn \"text\" --reason \"why\" --scope \"glob\"  Add an enforced pattern"
     echo "  remove P-XXXX             Remove a pattern by ID"
     echo "  patterns [--scope PATH]   List all patterns (optionally filtered by scope)"
     echo ""
-    echo "Patterns file: ${PATTERNS_FILE}"
+    echo "  ${BOLD}Cerebrum${NC} (project knowledge from corrections & discoveries)"
+    echo "  remember \"text\" [--type preference|learning|decision] [--context \"...\"]"
+    echo "  cerebrum [--type TYPE]    List cerebrum entries"
+    echo "  forget C-XXXX             Remove a cerebrum entry"
+    echo ""
+    echo "Files: ${PATTERNS_FILE} | ${CEREBRUM_FILE}"
 }
 
 # ---------------------------------------------------------------------------
@@ -385,4 +395,222 @@ _intel_patterns() {
     echo -e "${DIM}${_INTEL_LIST_COUNT} pattern(s) shown${NC}"
 
     unset _INTEL_LIST_FILTER _INTEL_LIST_COUNT
+}
+
+# ===========================================================================
+# Cerebrum — project-scoped learning from user corrections & discoveries
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# remember — capture a preference, learning, or decision
+# ---------------------------------------------------------------------------
+_intel_remember() {
+    local text="" entry_type="preference" context=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --type)    shift; entry_type="${1:-}" ;;
+            --context) shift; context="${1:-}" ;;
+            *)
+                if [[ -z "$text" ]]; then
+                    text="$1"
+                else
+                    echo -e "${RED}Error: unexpected argument: $1${NC}"
+                    return 1
+                fi
+                ;;
+        esac
+        shift
+    done
+
+    if [[ -z "$text" ]]; then
+        echo -e "${RED}Error: text required${NC}"
+        echo "Usage: ag intel remember \"text\" [--type preference|learning|decision] [--context \"...\"]"
+        return 1
+    fi
+
+    if [[ ! " $_INTEL_VALID_CEREBRUM_TYPES " =~ " $entry_type " ]]; then
+        echo -e "${RED}Error: invalid type '$entry_type'. Must be one of: $_INTEL_VALID_CEREBRUM_TYPES${NC}"
+        return 1
+    fi
+
+    mkdir -p "$INTEL_DIR"
+    if [[ ! -f "$CEREBRUM_FILE" ]]; then
+        cat > "$CEREBRUM_FILE" <<'INIT'
+version: 1
+description: >
+  Project-scoped intelligence from user corrections and discoveries.
+entries:
+INIT
+    fi
+
+    # Find next cerebrum ID
+    local max_id=0
+    while IFS= read -r line; do
+        if [[ "$line" =~ "- id: C-"([0-9]+) ]]; then
+            local num="${BASH_REMATCH[1]}"
+            num=$((10#$num))
+            (( num > max_id )) && max_id=$num
+        fi
+    done < "$CEREBRUM_FILE"
+    local next_id
+    next_id=$(printf "C-%04d" $((max_id + 1)))
+
+    local today
+    today=$(date +%Y-%m-%d)
+
+    # Escape quotes for YAML
+    text="${text//\"/\\\"}"
+    context="${context//\"/\\\"}"
+
+    # Replace empty entries array if this is the first entry
+    if grep -q "^entries: \[\]" "$CEREBRUM_FILE" 2>/dev/null; then
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' 's/^entries: \[\]/entries:/' "$CEREBRUM_FILE"
+        else
+            sed -i 's/^entries: \[\]/entries:/' "$CEREBRUM_FILE"
+        fi
+    fi
+
+    # Append entry
+    {
+        echo ""
+        echo "  - id: ${next_id}"
+        echo "    type: ${entry_type}"
+        echo "    text: \"${text}\""
+        [[ -n "$context" ]] && echo "    context: \"${context}\""
+        echo "    date: ${today}"
+    } >> "$CEREBRUM_FILE"
+
+    local type_icon="💡"
+    case "$entry_type" in
+        preference) type_icon="🎯" ;;
+        learning)   type_icon="📚" ;;
+        decision)   type_icon="⚖️" ;;
+    esac
+
+    echo -e "${GREEN}✓ Remembered ${next_id} [${entry_type}]: ${text}${NC}"
+    echo -e "  ${type_icon} Stored in cerebrum.yaml"
+}
+
+# ---------------------------------------------------------------------------
+# cerebrum — list cerebrum entries
+# ---------------------------------------------------------------------------
+_intel_cerebrum() {
+    local type_filter=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --type) shift; type_filter="${1:-}" ;;
+            *) type_filter="$1" ;;
+        esac
+        shift
+    done
+
+    if [[ ! -f "$CEREBRUM_FILE" ]]; then
+        echo -e "${YELLOW}No cerebrum file found at ${CEREBRUM_FILE}${NC}"
+        echo "Run: ag intel remember \"text\" to create one"
+        return 0
+    fi
+
+    echo -e "${BOLD}Cerebrum${NC} (${CEREBRUM_FILE})"
+    echo ""
+
+    local count=0
+    local _id="" _type="" _text="" _context="" _date=""
+
+    _cerebrum_print() {
+        [[ -z "$_id" ]] && return
+
+        if [[ -n "$type_filter" && "$_type" != "$type_filter" ]]; then
+            return
+        fi
+
+        local icon="💡"
+        case "$_type" in
+            preference) icon="🎯" ;;
+            learning)   icon="📚" ;;
+            decision)   icon="⚖️" ;;
+        esac
+
+        echo -e "  ${icon} ${BOLD}${_id}${NC} [${_type}] ${_text}"
+        [[ -n "$_context" ]] && echo -e "    ${DIM}Context: ${_context}${NC}"
+        [[ -n "$_date" ]] && echo -e "    ${DIM}Date: ${_date}${NC}"
+        count=$((count + 1))
+    }
+
+    while IFS= read -r line; do
+        case "$line" in
+            *"- id: "*)
+                _cerebrum_print
+                _id="${line#*"- id: "}"; _id="${_id//\"/}"; _id="${_id## }"
+                _type="" _text="" _context="" _date=""
+                ;;
+            *"type: "*)    _type="${line#*"type: "}"; _type="${_type//\"/}" ;;
+            *"context: "*) _context="${line#*"context: "}"; _context="${_context//\"/}" ;;
+            *"date: "*)    _date="${line#*"date: "}"; _date="${_date//\"/}" ;;
+            *"text: "*)    _text="${line#*"text: "}"; _text="${_text//\"/}" ;;
+        esac
+    done < "$CEREBRUM_FILE"
+    _cerebrum_print  # last entry
+
+    echo ""
+    echo -e "${DIM}${count} entry/entries shown${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# forget — remove a cerebrum entry by ID
+# ---------------------------------------------------------------------------
+_intel_forget() {
+    local entry_id="${1:-}"
+
+    if [[ -z "$entry_id" ]]; then
+        echo -e "${RED}Error: cerebrum entry ID required${NC}"
+        echo "Usage: ag intel forget C-XXXX"
+        return 1
+    fi
+
+    if [[ ! -f "$CEREBRUM_FILE" ]]; then
+        echo -e "${RED}Error: no cerebrum file found${NC}"
+        return 1
+    fi
+
+    if ! grep -q "id: ${entry_id}" "$CEREBRUM_FILE" 2>/dev/null; then
+        echo -e "${RED}Error: entry ${entry_id} not found${NC}"
+        return 1
+    fi
+
+    local tmp_file
+    tmp_file=$(mktemp)
+    local skip=false removed=false blank_buffer=""
+
+    while IFS= read -r line; do
+        if [[ "$line" == *"- id: ${entry_id}"* ]]; then
+            skip=true; removed=true; blank_buffer=""; continue
+        fi
+        if $skip; then
+            if [[ "$line" == *"- id: "* ]]; then
+                skip=false
+                echo "$line" >> "$tmp_file"
+            fi
+            continue
+        fi
+        if [[ -z "$line" ]]; then
+            blank_buffer="${blank_buffer}
+"
+        else
+            [[ -n "$blank_buffer" ]] && printf "%s" "$blank_buffer" >> "$tmp_file"
+            blank_buffer=""
+            echo "$line" >> "$tmp_file"
+        fi
+    done < "$CEREBRUM_FILE"
+
+    if $removed; then
+        mv "$tmp_file" "$CEREBRUM_FILE"
+        echo -e "${GREEN}✓ Forgot ${entry_id}${NC}"
+    else
+        rm -f "$tmp_file"
+        echo -e "${RED}Error: entry ${entry_id} not found${NC}"
+        return 1
+    fi
 }

@@ -483,6 +483,134 @@ else
     fail "rejected valid severity" "$OUTPUT"
 fi
 
+# ===========================================================================
+# Cerebrum Tests
+# ===========================================================================
+
+# Helper to run intel commands in test project
+run_intel() {
+    ROOT_DIR="$PROJECT_DIR" \
+    _AGENTIC_SETTINGS_LOADED="" _AGENTIC_PATHS_LOADED="" \
+    _SETTINGS_ROOT_DIR="$PROJECT_DIR" _SETTINGS_STACK_FILE="$PROJECT_DIR/STACK.md" \
+    bash -c '
+        source "'"$REPO_ROOT"'/.agentic/lib/paths.sh" 2>/dev/null || true
+        source "'"$REPO_ROOT"'/.agentic/lib/settings.sh" 2>/dev/null || true
+        RED="\033[0;31m" GREEN="\033[0;32m" YELLOW="\033[1;33m" BLUE="\033[0;34m" BOLD="\033[1m" DIM="\033[2m" NC="\033[0m"
+        ROOT_DIR="'"$PROJECT_DIR"'"
+        source "'"$PROJECT_DIR"'/.agentic/lib/tools/commands/intel.sh"
+        '"$1"'
+    ' 2>&1
+}
+
+# --- Test 14: ag intel remember creates cerebrum entry ---
+echo ""
+echo "Test 14: ag intel remember"
+
+# Create empty cerebrum
+cat > "$PROJECT_DIR/.agentic/intel/cerebrum.yaml" << 'EOF'
+version: 1
+entries: []
+EOF
+
+OUTPUT=$(run_intel '_intel_remember "Prefers small functions" --context "Corrected 60-line func"')
+
+if echo "$OUTPUT" | grep -q "Remembered C-0001"; then
+    pass "remember creates C-0001"
+else
+    fail "remember failed" "$OUTPUT"
+fi
+
+if grep -q "C-0001" "$PROJECT_DIR/.agentic/intel/cerebrum.yaml" && \
+   grep -q "preference" "$PROJECT_DIR/.agentic/intel/cerebrum.yaml"; then
+    pass "entry written with default type=preference"
+else
+    fail "entry not in file" ""
+fi
+
+# --- Test 15: ag intel remember with --type ---
+echo ""
+echo "Test 15: remember with --type learning"
+OUTPUT=$(run_intel '_intel_remember "Auth uses JWT cookies" --type learning')
+
+if echo "$OUTPUT" | grep -q "C-0002.*learning"; then
+    pass "learning type accepted"
+else
+    fail "learning type failed" "$OUTPUT"
+fi
+
+# --- Test 16: ag intel remember validates type ---
+echo ""
+echo "Test 16: remember validates type"
+OUTPUT=$(run_intel '_intel_remember "test" --type bogus')
+
+if echo "$OUTPUT" | grep -q "invalid type"; then
+    pass "rejects invalid type"
+else
+    fail "accepted invalid type" "$OUTPUT"
+fi
+
+# --- Test 17: ag intel cerebrum lists entries ---
+echo ""
+echo "Test 17: cerebrum list"
+OUTPUT=$(run_intel '_intel_cerebrum')
+
+if echo "$OUTPUT" | grep -q "C-0001" && echo "$OUTPUT" | grep -q "C-0002"; then
+    pass "lists both entries"
+else
+    fail "missing entries" "$OUTPUT"
+fi
+
+if echo "$OUTPUT" | grep -q "2 entry"; then
+    pass "correct count"
+else
+    fail "wrong count" "$OUTPUT"
+fi
+
+# --- Test 18: ag intel cerebrum --type filters ---
+echo ""
+echo "Test 18: cerebrum type filter"
+OUTPUT=$(run_intel '_intel_cerebrum --type learning')
+
+if echo "$OUTPUT" | grep -q "C-0002" && ! echo "$OUTPUT" | grep -q "C-0001"; then
+    pass "filters to learning only"
+else
+    fail "filter not working" "$OUTPUT"
+fi
+
+# --- Test 19: ag intel forget removes entry ---
+echo ""
+echo "Test 19: forget"
+OUTPUT=$(run_intel '_intel_forget C-0001')
+
+if echo "$OUTPUT" | grep -q "Forgot C-0001"; then
+    pass "forget reports success"
+else
+    fail "forget failed" "$OUTPUT"
+fi
+
+if ! grep -q "C-0001" "$PROJECT_DIR/.agentic/intel/cerebrum.yaml"; then
+    pass "C-0001 removed from file"
+else
+    fail "C-0001 still in file" ""
+fi
+
+if grep -q "C-0002" "$PROJECT_DIR/.agentic/intel/cerebrum.yaml"; then
+    pass "C-0002 preserved"
+else
+    fail "C-0002 lost" ""
+fi
+
+# --- Test 20: forget non-existent entry ---
+echo ""
+echo "Test 20: forget non-existent"
+OUTPUT=$(run_intel '_intel_forget C-9999')
+
+if echo "$OUTPUT" | grep -q "not found"; then
+    pass "forget errors on missing ID"
+else
+    fail "no error" "$OUTPUT"
+fi
+
 # --- Summary ---
 echo ""
 echo "═══════════════════════════════════════════"
