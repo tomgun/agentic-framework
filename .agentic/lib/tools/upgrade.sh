@@ -742,6 +742,12 @@ else
   # Ensure .agentic/session/ exists for intent journal
   mkdir -p "$TARGET_PROJECT_DIR/.agentic/session" 2>/dev/null
 
+  # Ensure .agentic/intel/ exists for intelligence engine (v0.78.0, F-041)
+  if [[ ! -d "$TARGET_PROJECT_DIR/.agentic/intel" ]]; then
+    mkdir -p "$TARGET_PROJECT_DIR/.agentic/intel" 2>/dev/null
+    echo -e "  ${GREEN}✓${NC} Created .agentic/intel/ directory (intelligence engine)"
+  fi
+
   # Migrate review_*: auto → skip in STACK.md (v0.51.0: "auto" renamed to "skip")
   if [[ -f "$TARGET_PROJECT_DIR/STACK.md" ]]; then
     if grep -qE "^[- ]*review_[a-z_]+:[[:space:]]*auto" "$TARGET_PROJECT_DIR/STACK.md" 2>/dev/null; then

@@ -4825,3 +4825,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 16:51 - F-041 Intelligence Engine
+
+**Why**: Intelligence is core framework value — domain-specific quality, token efficiency, enforced learning
+
+**What changed**:
+- Feature registered, plan approved (F-041), backlog updated, branch created
+
+**Next steps**:
+- Phase 1: Patterns + Write Hook implementation
+
+**Blockers**: None
+
+
+### Session: 2026-04-02 17:02 - F-041 Phase 1: Patterns + Write Hook
+
+**Why**: Intelligence engine Phase 1 delivers enforced pattern learning at write-time
+
+**What changed**:
+- patterns.yaml seeded with 7 entries from LESSONS.md, ag intel command (check/learn/patterns), PreToolUse pattern warnings for Write/Edit, upgrade.sh migration, 16/16 tests passing
+
+**Next steps**:
+- Phase 2: Anatomy + Token Ledger
+
+**Blockers**: None
+

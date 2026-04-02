@@ -96,5 +96,104 @@ if [[ "$GATE_RC" -ne 0 ]]; then
   fi
 fi
 
+# --- Intelligence: Pattern check for Write/Edit ---
+# Advisory only — warns on matching patterns, never blocks.
+# Pure bash, no Python, targets <50ms.
+if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "MultiEdit" ]]; then
+  PATTERNS_FILE="$PROJECT_ROOT/.agentic/intel/patterns.yaml"
+  if [[ -f "$PATTERNS_FILE" ]]; then
+    # Extract file path from tool input (pure bash — avoid Python for speed)
+    FILE_PATH=""
+    case "$TOOL_INPUT" in
+      *'"file_path"'*)
+        # Extract value after "file_path": "..."
+        FILE_PATH="${TOOL_INPUT#*\"file_path\"}"
+        FILE_PATH="${FILE_PATH#*:}"
+        FILE_PATH="${FILE_PATH#*\"}"
+        FILE_PATH="${FILE_PATH%%\"*}"
+        ;;
+    esac
+
+    if [[ -n "$FILE_PATH" ]]; then
+      # Get just the filename for simple glob matching
+      _FILENAME="${FILE_PATH##*/}"
+      # Normalize: strip leading ./ or /
+      _REL="${FILE_PATH#./}"
+      _REL="${_REL#/}"
+
+      _PATTERN_WARNINGS=""
+      _p_id="" _p_text="" _p_scope="" _p_severity=""
+
+      while IFS= read -r _line; do
+        case "$_line" in
+          *"- id: "*)
+            # Check previous entry if exists
+            if [[ -n "$_p_id" && -n "$_p_scope" ]]; then
+              _matched=false
+              # shellcheck disable=SC2254
+              case "$FILE_PATH" in $_p_scope) _matched=true ;; esac
+              if ! $_matched; then
+                # shellcheck disable=SC2254
+                case "$_FILENAME" in $_p_scope) _matched=true ;; esac
+              fi
+              if ! $_matched; then
+                # shellcheck disable=SC2254
+                case "$_REL" in $_p_scope) _matched=true ;; esac
+              fi
+              if $_matched; then
+                local_icon="⚠️"
+                case "$_p_severity" in error) local_icon="🚨" ;; info) local_icon="ℹ️" ;; esac
+                _PATTERN_WARNINGS="${_PATTERN_WARNINGS}${local_icon} ${_p_id}: ${_p_text}\n"
+              fi
+            fi
+            _p_id="${_line#*"- id: "}"
+            _p_id="${_p_id//\"/}"
+            _p_id="${_p_id## }"
+            _p_text="" _p_scope="" _p_severity=""
+            ;;
+          *"text: "*)
+            _p_text="${_line#*"text: "}"
+            _p_text="${_p_text//\"/}"
+            ;;
+          *"scope: "*)
+            _p_scope="${_line#*"scope: "}"
+            _p_scope="${_p_scope//\"/}"
+            ;;
+          *"severity: "*)
+            _p_severity="${_line#*"severity: "}"
+            _p_severity="${_p_severity//\"/}"
+            ;;
+        esac
+      done < "$PATTERNS_FILE"
+
+      # Check last entry
+      if [[ -n "$_p_id" && -n "$_p_scope" ]]; then
+        _matched=false
+        # shellcheck disable=SC2254
+        case "$FILE_PATH" in $_p_scope) _matched=true ;; esac
+        if ! $_matched; then
+          # shellcheck disable=SC2254
+          case "$_FILENAME" in $_p_scope) _matched=true ;; esac
+        fi
+        if ! $_matched; then
+          # shellcheck disable=SC2254
+          case "$_REL" in $_p_scope) _matched=true ;; esac
+        fi
+        if $_matched; then
+          local_icon="⚠️"
+          case "$_p_severity" in error) local_icon="🚨" ;; info) local_icon="ℹ️" ;; esac
+          _PATTERN_WARNINGS="${_PATTERN_WARNINGS}${local_icon} ${_p_id}: ${_p_text}\n"
+        fi
+      fi
+
+      # Output warnings to stderr (visible to agent, doesn't break JSON stdout)
+      if [[ -n "$_PATTERN_WARNINGS" ]]; then
+        echo -e "📋 Pattern warnings for ${FILE_PATH##*/}:" >&2
+        echo -e "$_PATTERN_WARNINGS" >&2
+      fi
+    fi
+  fi
+fi
+
 # Allow — no output needed
 exit 0

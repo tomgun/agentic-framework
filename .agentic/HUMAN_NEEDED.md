@@ -58,7 +58,14 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+
 ## Resolved
+
+### HN-0078: Review: F-041 → implementing
+- **Resolved**: 2026-04-02
+- **Outcome**: Review approved: resolved
+
 
 ### HN-0076: PR #214: Configurable DoD per task type
 - **Resolved**: 2026-03-29
