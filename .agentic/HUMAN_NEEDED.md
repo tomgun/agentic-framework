@@ -71,6 +71,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0081: PR #221: F-041 Phase 4 — phase-aware queries
+- **Type**: pr_review
+- **Added**: 2026-04-02
+- **Context**: Intelligence engine Phase 4: 4 phase-aware query commands + skill integration + docs
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0079: PR #219: F-041 Phase 2 — Anatomy + Token Ledger

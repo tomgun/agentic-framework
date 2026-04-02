@@ -24,11 +24,10 @@
 
 **User insight 7 — Framework serves user projects**: "The architect here. We are not building this framework to build this framework. We are building this framework to use it when building other software with the framework." (Mar 11) — Shaped F-041's constraint that intelligence must work with any tech stack via bootstrap-generated domain knowledge, not hardcoded rules.
 
-**User insight 8 — Incremental delivery**: "I mean we can wait for phase 4. I think let's merge now and continue with phase 2." (Apr 2) — Drove the 4-phase ship-as-you-go strategy (PRs #218, #219, #220, #221).
 
-**User insight 9 — Hard-won lessons as structural enforcement**: "All the LLM tests etc that the framework has is because it has been very volatile in reliability and we have not known the correct ways to implement, but have found out the hard way solutions." (Mar 20) — Informed patterns.yaml design: Do-Not-Repeat entries so hard-won lessons are structurally enforced, not just documented.
+**User insight 8 — Hard-won lessons as structural enforcement**: "All the LLM tests etc that the framework has is because it has been very volatile in reliability and we have not known the correct ways to implement, but have found out the hard way solutions." (Mar 20) — Informed patterns.yaml design: Do-Not-Repeat entries so hard-won lessons are structurally enforced, not just documented.
 
-**User insight 10 — Competitive analysis as design catalyst**: User initiated comparison with OpenWolf framework (Apr 2), which led to identifying the hook-based intelligence approach for injecting domain knowledge at file read/write time.
+**User insight 9 — Competitive analysis as design catalyst**: User initiated comparison with OW framework (Apr 2), which led to identifying the hook-based intelligence approach for injecting domain knowledge at file read/write time.
 
 **Why it matters**: The intelligence engine transforms the framework from "structured workflow with gates" to "structured workflow with domain-specific guidance." Gates prevent bad outcomes; intelligence actively produces better outcomes. Without intelligence, the framework is just overhead compared to vanilla Claude.
 
