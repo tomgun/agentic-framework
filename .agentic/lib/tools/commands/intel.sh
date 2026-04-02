@@ -1100,7 +1100,7 @@ _intel_bootstrap() {
             grep -iE "^-\s*$1" "$STACK_FILE" 2>/dev/null | head -1 | sed 's/^[^:]*: *//' | sed 's/#.*//' | sed 's/[[:space:]]*$//' || true
         }
         stack_lang=$(_stack_get "Language")
-        stack_framework=$(_stack_get "(App framework|app_framework|Framework)")
+        stack_framework=$(_stack_get "(App framework|app_framework|App Framework)")
         stack_domain=$(_stack_get "Domain")
         stack_db=$(_stack_get "Database")
         stack_deploy=$(_stack_get "(Deploy|Hosting)")
@@ -1151,9 +1151,11 @@ _intel_bootstrap() {
 
     if [[ -f "${ROOT_DIR}/requirements.txt" || -f "${ROOT_DIR}/pyproject.toml" || -f "${ROOT_DIR}/setup.py" || -f "${ROOT_DIR}/Pipfile" ]]; then
         detected_langs="${detected_langs}python, "
-        detected_pkg="${detected_pkg:-pip}"
-        [[ -f "${ROOT_DIR}/Pipfile" ]] && detected_pkg="pipenv"
-        [[ -f "${ROOT_DIR}/poetry.lock" ]] && detected_pkg="poetry"
+        if [[ -z "$detected_pkg" ]]; then
+            detected_pkg="pip"
+            [[ -f "${ROOT_DIR}/Pipfile" ]] && detected_pkg="pipenv"
+            [[ -f "${ROOT_DIR}/poetry.lock" ]] && detected_pkg="poetry"
+        fi
 
         # Detect frameworks from requirements/pyproject
         local py_deps=""
@@ -1261,10 +1263,9 @@ _intel_bootstrap() {
     fi
 
     # --- 5. Check existing intel files ---
-    local has_quality=false has_strategy=false has_patterns=false
+    local has_quality=false has_strategy=false
     [[ -f "$QUALITY_CHECKLIST" ]] && has_quality=true
     [[ -f "$TEST_STRATEGY" ]] && has_strategy=true
-    [[ -f "$PATTERNS_FILE" ]] && has_patterns=true
 
     if $has_quality || $has_strategy; then
         echo -e "${YELLOW}⚠ Existing intelligence files detected:${NC}"
@@ -1387,6 +1388,8 @@ TEMPLATE_TS
     echo "4. Review generated content with the user before finalizing"
     echo ""
     echo -e "${DIM}Tip: Run \`ag intel retro\` after using the project for a while to discover additional patterns from real issues.${NC}"
+
+    unset -f _stack_get _has_dep
 }
 
 # ---------------------------------------------------------------------------
