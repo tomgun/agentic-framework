@@ -742,13 +742,13 @@ else
   # Ensure .agentic/session/ exists for intent journal
   mkdir -p "$TARGET_PROJECT_DIR/.agentic/session" 2>/dev/null
 
-  # Ensure .agentic/intel/ exists for intelligence engine (v0.78.0, F-041)
+  # Ensure .agentic/intel/ exists for intelligence engine (v0.77.0, F-041)
   if [[ ! -d "$TARGET_PROJECT_DIR/.agentic/intel" ]]; then
     mkdir -p "$TARGET_PROJECT_DIR/.agentic/intel" 2>/dev/null
     echo -e "  ${GREEN}✓${NC} Created .agentic/intel/ directory (intelligence engine)"
   fi
 
-  # Ensure cerebrum.yaml exists for project-scoped learning (v0.78.0, F-041)
+  # Ensure cerebrum.yaml exists for project-scoped learning (v0.77.0, F-041)
   if [[ ! -f "$TARGET_PROJECT_DIR/.agentic/intel/cerebrum.yaml" ]]; then
     cat > "$TARGET_PROJECT_DIR/.agentic/intel/cerebrum.yaml" <<'CEREBRUM_INIT'
 version: 1
