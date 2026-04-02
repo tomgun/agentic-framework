@@ -1,0 +1,55 @@
+version: 1
+description: >
+  Machine-matchable patterns enforced at write-time via hooks.
+  Do-Not-Repeat (mistakes to avoid), conventions (patterns to follow),
+  and positive patterns (approaches that worked).
+  Managed by: ag intel learn, ag intel retro, ag intel bootstrap
+patterns:
+  - id: P-0001
+    text: "Hook stdout is JSON only — no debug prints, echo, or printf to stdout"
+    reason: "Claude Code hooks parse stdout as JSON. Any non-JSON output breaks the hook protocol."
+    scope: ".agentic/lib/claude-hooks/*.sh"
+    severity: error
+    source: manual
+
+  - id: P-0002
+    text: "Use head/tail for cross-platform line insertion, not sed -i append"
+    reason: "BSD sed (macOS) a\\ command behaves differently from GNU sed — concatenates instead of inserting newlines."
+    scope: "*.sh"
+    severity: warning
+    source: L-0001
+
+  - id: P-0003
+    text: "Use [[:space:]] not \\s, [+] not \\+ in sed -E patterns"
+    reason: "BSD sed ERE treats \\s and \\+ differently than GNU sed."
+    scope: "*.sh"
+    severity: warning
+    source: L-0001
+
+  - id: P-0004
+    text: "Never pass framework dir as both source and target to upgrade.sh"
+    reason: "Step 5 deletes .agentic/ then copies from source — if same dir, source is already deleted."
+    scope: "*upgrade*"
+    severity: error
+    source: L-0002
+
+  - id: P-0005
+    text: "Catch OSError broadly when detecting stale Unix domain sockets"
+    reason: "Non-socket files, permission errors, and broken symlinks produce different errno values — not just ConnectionRefusedError."
+    scope: "*.py"
+    severity: warning
+    source: L-0004
+
+  - id: P-0006
+    text: "Verify ag command references exist before adding to instruction files"
+    reason: "ag ship was referenced in 9 instruction files but never implemented — dead references confuse agents."
+    scope: "*.md"
+    severity: warning
+    source: L-0007
+
+  - id: P-0007
+    text: "Enforce rules at multiple layers: structural gate + skill instructions + constitution"
+    reason: "Behavioral rules alone decay under context pressure. 13 features shipped without doc updates despite 3 instruction layers."
+    scope: "*.md"
+    severity: info
+    source: L-0006

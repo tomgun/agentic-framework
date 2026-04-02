@@ -26,4 +26,5 @@ Steps:
 
 Key rules:
 - Do NOT jump to fixing code before reproducing the bug.
+- When the user corrects your approach: `ag intel remember "what they said" --context "what you were doing"`
 - After fixing, grep `spec/contracts/` for assertions related to the changed behavior. If any are affected, **STOP** — present them to the user and wait for approval before modifying any contract or test. Contracts protect shipped behavior; silently updating them to match new code defeats that protection.

@@ -474,3 +474,21 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 - Tests: (TODO)
 
 **Contract**: See `spec/contracts/F-032.yaml`
+
+---
+
+## F-041: Intelligence Engine
+
+**Status**: in_progress
+**Category**: Core intelligence system: file anatomy, enforced patterns, quality checklists, test strategy, token ledger. Makes framework smarter than vanilla Claude through domain-specific, stack-aware guidance at every workflow phase.
+**Priority**: medium
+**Complexity**: medium
+
+**Description**: (TODO: add description)
+
+**Implementation**:
+- State: none
+- Code: (TODO)
+- Tests: (TODO)
+
+**Contract**: See `spec/contracts/F-041.yaml`

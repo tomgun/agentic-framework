@@ -1,0 +1,8 @@
+version: 1
+description: >
+  Project-scoped intelligence captured from user corrections, preferences,
+  and discoveries during work sessions. Surfaced in phase queries (ag intel
+  implement/test/spec/architecture), not enforced at write-time.
+  For write-time enforcement, see patterns.yaml.
+  Managed by: ag intel remember, ag intel forget, ag intel retro
+entries: []

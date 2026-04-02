@@ -96,5 +96,72 @@ if [[ "$GATE_RC" -ne 0 ]]; then
   fi
 fi
 
+# --- Intelligence: Pattern check for Write/Edit ---
+# Advisory only — warns on matching patterns, never blocks.
+# Pure bash, no Python, targets <50ms.
+if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "MultiEdit" ]]; then
+  _PTN_FILE="$PROJECT_ROOT/.agentic/intel/patterns.yaml"
+  if [[ -f "$_PTN_FILE" ]]; then
+    # Extract file_path from tool_input JSON using pure bash for speed.
+    # Assumption: TOOL_INPUT comes from Claude Code's structured hook protocol,
+    # so "file_path" always appears as a top-level JSON key (not inside content).
+    _PTN_PATH=""
+    case "$TOOL_INPUT" in
+      *'"file_path"'*)
+        _PTN_PATH="${TOOL_INPUT#*\"file_path\"}"
+        _PTN_PATH="${_PTN_PATH#*:}"
+        _PTN_PATH="${_PTN_PATH#*\"}"
+        _PTN_PATH="${_PTN_PATH%%\"*}"
+        ;;
+    esac
+
+    if [[ -n "$_PTN_PATH" ]]; then
+      _PTN_FNAME="${_PTN_PATH##*/}"
+      _PTN_REL="${_PTN_PATH#./}"; _PTN_REL="${_PTN_REL#/}"
+      _PTN_WARNS=""
+
+      # Inline glob matcher (same logic as _intel_glob_match in intel.sh)
+      _ptn_match() {
+        local _p="$1"
+        # shellcheck disable=SC2254
+        case "$_PTN_PATH"  in $_p) return 0 ;; esac
+        # shellcheck disable=SC2254
+        case "$_PTN_FNAME" in $_p) return 0 ;; esac
+        # shellcheck disable=SC2254
+        case "$_PTN_REL"   in $_p) return 0 ;; esac
+        # shellcheck disable=SC2254
+        case "./$_PTN_REL" in $_p) return 0 ;; esac
+        return 1
+      }
+
+      # Single-pass parser with flush function — no duplicated "last entry" block
+      _p_id="" _p_text="" _p_scope="" _p_sev=""
+      _ptn_flush() {
+        if [[ -n "$_p_id" && -n "$_p_scope" ]] && _ptn_match "$_p_scope"; then
+          local _icon="⚠️"
+          case "$_p_sev" in error) _icon="🚨" ;; info) _icon="ℹ️" ;; esac
+          _PTN_WARNS="${_PTN_WARNS}${_icon} ${_p_id}: ${_p_text}\n"
+        fi
+      }
+
+      while IFS= read -r _line; do
+        case "$_line" in
+          *"- id: "*)    _ptn_flush; _p_id="${_line#*"- id: "}"; _p_id="${_p_id//\"/}"; _p_id="${_p_id## }"; _p_text="" _p_scope="" _p_sev="" ;;
+          *"text: "*)    _p_text="${_line#*"text: "}"; _p_text="${_p_text//\"/}" ;;
+          *"scope: "*)   _p_scope="${_line#*"scope: "}"; _p_scope="${_p_scope//\"/}" ;;
+          *"severity: "*) _p_sev="${_line#*"severity: "}"; _p_sev="${_p_sev//\"/}" ;;
+        esac
+      done < "$_PTN_FILE"
+      _ptn_flush  # last entry
+
+      # Output warnings to stderr (visible to agent, doesn't break JSON stdout)
+      if [[ -n "$_PTN_WARNS" ]]; then
+        echo -e "📋 Pattern warnings for ${_PTN_FNAME}:" >&2
+        echo -e "$_PTN_WARNS" >&2
+      fi
+    fi
+  fi
+fi
+
 # Allow — no output needed
 exit 0

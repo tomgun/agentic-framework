@@ -1,0 +1,81 @@
+id: F-041
+name: Intelligence Engine
+lifecycle: implementing
+profile: both
+protection: none
+category: intelligence
+description: >
+  Core intelligence system that makes the framework smarter than vanilla Claude.
+  Phase 1: Enforced patterns with write-time hook checking.
+  Machine-matchable rules with scope globs — do-not-repeat mistakes, conventions,
+  and positive patterns surfaced before every code write.
+user_input: ''
+assertions:
+  # --- Phase 1: Patterns + Write Hook ---
+  - id: AC-001
+    text: >
+      patterns.yaml exists at .agentic/intel/patterns.yaml with version, patterns[]
+      array where each entry has id, text, reason, scope (glob), and severity
+      (error|warning|info)
+    type: structural
+
+  - id: AC-002
+    text: >
+      `ag intel learn "text" --reason "why" --scope "glob"` appends a new pattern
+      entry to patterns.yaml with auto-incremented ID (P-XXXX format)
+    type: behavioral
+
+  - id: AC-003
+    text: >
+      `ag intel check PATH` returns all patterns whose scope glob matches PATH,
+      exits 0 with matches printed to stdout, exits 0 with no output if no matches
+    type: behavioral
+
+  - id: AC-004
+    text: >
+      `ag intel patterns` lists all patterns; `ag intel patterns --scope PATH`
+      filters to patterns matching the given path's scope
+    type: behavioral
+
+  - id: AC-005
+    text: >
+      PreToolUse.sh injects matching pattern warnings into hook output before
+      Write/Edit operations, using pure bash glob matching in <50ms
+    type: behavioral
+
+  - id: AC-006
+    text: >
+      `ag intel` dispatched correctly from ag.sh with subcommands: check, learn,
+      remove, patterns, remember, cerebrum, forget, and help
+    type: structural
+
+  - id: AC-007
+    text: >
+      upgrade.sh creates .agentic/intel/ directory for existing projects that
+      lack it
+    type: structural
+
+  # --- Phase 1b: Cerebrum — project-scoped learning ---
+  - id: AC-008
+    text: >
+      `ag intel remember "text" --type preference|learning|decision --context "..."`
+      appends entry to cerebrum.yaml with auto-incremented C-XXXX ID and date
+    type: behavioral
+
+  - id: AC-009
+    text: >
+      `ag intel cerebrum` lists all entries; `ag intel cerebrum --type TYPE`
+      filters by type (preference|learning|decision)
+    type: behavioral
+
+  - id: AC-010
+    text: >
+      `ag intel forget C-XXXX` removes a cerebrum entry by ID
+    type: behavioral
+
+  - id: AC-011
+    text: >
+      Instruction files (CLAUDE.md template, cursorrules, copilot, codex,
+      memory-seed, 4 skills) contain trigger for auto-capturing user corrections
+      via ag intel remember
+    type: structural
