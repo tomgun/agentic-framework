@@ -6,6 +6,8 @@
 INTEL_DIR="${ROOT_DIR}/.agentic/intel"
 PATTERNS_FILE="${INTEL_DIR}/patterns.yaml"
 
+_INTEL_VALID_SEVERITIES="error warning info"
+
 cmd_intel() {
     local subcmd="${1:-help}"
     shift 2>/dev/null || true
@@ -13,6 +15,7 @@ cmd_intel() {
     case "$subcmd" in
         check)    _intel_check "$@" ;;
         learn)    _intel_learn "$@" ;;
+        remove)   _intel_remove "$@" ;;
         patterns) _intel_patterns "$@" ;;
         help|--help|-h) _intel_help ;;
         *)
@@ -27,139 +30,155 @@ _intel_help() {
     echo -e "${BOLD}ag intel${NC} — Intelligence engine"
     echo ""
     echo "  ${BOLD}Phase 1: Patterns${NC}"
-    echo "  check PATH               Show patterns matching a file path"
+    echo "  check PATH [--json]       Show patterns matching a file path"
     echo "  learn \"text\" --reason \"why\" --scope \"glob\"  Add an enforced pattern"
+    echo "  remove P-XXXX             Remove a pattern by ID"
     echo "  patterns [--scope PATH]   List all patterns (optionally filtered by scope)"
     echo ""
     echo "Patterns file: ${PATTERNS_FILE}"
 }
 
 # ---------------------------------------------------------------------------
-# check — find patterns matching a file path
+# Shared YAML parser — iterates patterns.yaml, calls a callback per entry.
+# Usage: _intel_each_pattern <callback> [extra_args...]
+# Callback signature: callback id text reason scope severity source [extra_args...]
+# The parser handles the "last entry" flush internally — no duplication needed.
 # ---------------------------------------------------------------------------
-_intel_check() {
-    local target_path="${1:-}"
+_intel_each_pattern() {
+    local callback="$1"
+    shift
+    local extra_args=("$@")
 
-    if [[ -z "$target_path" ]]; then
-        echo -e "${RED}Error: PATH required${NC}"
-        echo "Usage: ag intel check PATH"
-        return 1
-    fi
+    [[ ! -f "$PATTERNS_FILE" ]] && return 0
 
-    if [[ ! -f "$PATTERNS_FILE" ]]; then
-        return 0  # No patterns file = no matches
-    fi
+    local _id="" _text="" _reason="" _scope="" _severity="" _source=""
 
-    local match_count=0
-    local current_id="" current_text="" current_reason="" current_scope="" current_severity=""
+    _intel_flush_entry() {
+        if [[ -n "$_id" ]]; then
+            "$callback" "$_id" "$_text" "$_reason" "$_scope" "$_severity" "$_source" "${extra_args[@]}"
+        fi
+    }
 
-    while IFS= read -r line; do
-        # Parse YAML entries (simple line-by-line parser for flat structure)
-        case "$line" in
+    while IFS= read -r _line; do
+        case "$_line" in
             *"- id: "*)
-                # If we have a pending entry, check it
-                if [[ -n "$current_id" ]]; then
-                    _intel_check_match "$target_path" "$current_id" "$current_text" "$current_reason" "$current_scope" "$current_severity" && match_count=$((match_count + 1))
-                fi
-                current_id="${line#*"- id: "}"
-                current_id="${current_id//\"/}"
-                current_id="${current_id## }"
-                current_text="" current_reason="" current_scope="" current_severity=""
+                _intel_flush_entry
+                _id="${_line#*"- id: "}"
+                _id="${_id//\"/}"
+                _id="${_id## }"
+                _text="" _reason="" _scope="" _severity="" _source=""
                 ;;
             *"text: "*)
-                current_text="${line#*"text: "}"
-                current_text="${current_text//\"/}"
+                _text="${_line#*"text: "}"
+                _text="${_text//\"/}"
                 ;;
             *"reason: "*)
-                current_reason="${line#*"reason: "}"
-                current_reason="${current_reason//\"/}"
+                _reason="${_line#*"reason: "}"
+                _reason="${_reason//\"/}"
                 ;;
             *"scope: "*)
-                current_scope="${line#*"scope: "}"
-                current_scope="${current_scope//\"/}"
+                _scope="${_line#*"scope: "}"
+                _scope="${_scope//\"/}"
                 ;;
             *"severity: "*)
-                current_severity="${line#*"severity: "}"
-                current_severity="${current_severity//\"/}"
+                _severity="${_line#*"severity: "}"
+                _severity="${_severity//\"/}"
+                ;;
+            *"source: "*)
+                _source="${_line#*"source: "}"
+                _source="${_source//\"/}"
                 ;;
         esac
     done < "$PATTERNS_FILE"
 
-    # Check last entry
-    if [[ -n "$current_id" ]]; then
-        _intel_check_match "$target_path" "$current_id" "$current_text" "$current_reason" "$current_scope" "$current_severity" && match_count=$((match_count + 1))
-    fi
-
-    if [[ $match_count -eq 0 ]]; then
-        return 0  # No matches, clean exit
-    fi
+    # Flush last entry
+    _intel_flush_entry
+    unset -f _intel_flush_entry
 }
 
-# Check if a pattern's scope matches a target path using bash glob
-_intel_check_match() {
-    local target="$1" id="$2" text="$3" reason="$4" scope="$5" severity="$6"
-
-    # Default severity
-    severity="${severity:-warning}"
-
-    if _intel_glob_match "$target" "$scope"; then
-        local color="$YELLOW"
-        local icon="⚠️"
-        case "$severity" in
-            error) color="$RED"; icon="🚨" ;;
-            info)  color="$BLUE"; icon="ℹ️" ;;
-        esac
-        echo -e "${color}${icon} ${id}: ${text}${NC}"
-        if [[ -n "$reason" ]]; then
-            echo -e "  ${DIM}Reason: ${reason}${NC}"
-        fi
-        return 0
-    fi
-    return 1
-}
-
-# Glob match: check if path matches a scope pattern
+# ---------------------------------------------------------------------------
+# Glob match: check if path matches a scope pattern.
 # Supports: *.sh, .agentic/lib/claude-hooks/*.sh, *.py, etc.
+# Limitation: bash case globs don't support **/ recursive matching.
+#   Patterns like "src/**/*.py" won't work. Use "*.py" or "src/*.py" instead.
+# ---------------------------------------------------------------------------
 _intel_glob_match() {
     local path="$1" pattern="$2"
 
     [[ -z "$pattern" ]] && return 1
 
-    # Get just the filename for simple globs like *.sh
     local filename="${path##*/}"
 
-    # Try matching the full path first
     # shellcheck disable=SC2254
-    case "$path" in
-        $pattern) return 0 ;;
-    esac
+    case "$path" in $pattern) return 0 ;; esac
 
-    # Try matching just the filename against the pattern
     # shellcheck disable=SC2254
-    case "$filename" in
-        $pattern) return 0 ;;
-    esac
+    case "$filename" in $pattern) return 0 ;; esac
 
-    # For directory-qualified patterns like .agentic/lib/claude-hooks/*.sh
-    # try matching against relative path variants
-    local rel_path="$path"
-    # Strip leading ./ if present
-    rel_path="${rel_path#./}"
-    # Strip leading / if absolute
+    # For directory-qualified patterns, try relative path variants
+    local rel_path="${path#./}"
     rel_path="${rel_path#/}"
 
     # shellcheck disable=SC2254
-    case "$rel_path" in
-        $pattern) return 0 ;;
-    esac
-
-    # Try with leading ./
+    case "$rel_path" in $pattern) return 0 ;; esac
     # shellcheck disable=SC2254
-    case "./$rel_path" in
-        $pattern) return 0 ;;
-    esac
+    case "./$rel_path" in $pattern) return 0 ;; esac
 
     return 1
+}
+
+# ---------------------------------------------------------------------------
+# check — find patterns matching a file path
+# ---------------------------------------------------------------------------
+_intel_check() {
+    local target_path="" json_mode=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --json) json_mode=true ;;
+            *) [[ -z "$target_path" ]] && target_path="$1" ;;
+        esac
+        shift
+    done
+
+    if [[ -z "$target_path" ]]; then
+        echo -e "${RED}Error: PATH required${NC}"
+        echo "Usage: ag intel check PATH [--json]"
+        return 1
+    fi
+
+    [[ ! -f "$PATTERNS_FILE" ]] && { $json_mode && echo "[]"; return 0; }
+
+    # Collect matches
+    _INTEL_CHECK_MATCHES=()
+    _INTEL_CHECK_TARGET="$target_path"
+    _INTEL_CHECK_JSON="$json_mode"
+
+    _intel_check_callback() {
+        local id="$1" text="$2" reason="$3" scope="$4" severity="${5:-warning}" source="$6"
+        if _intel_glob_match "$_INTEL_CHECK_TARGET" "$scope"; then
+            if [[ "$_INTEL_CHECK_JSON" == "true" ]]; then
+                _INTEL_CHECK_MATCHES+=("{\"id\":\"$id\",\"text\":\"$text\",\"scope\":\"$scope\",\"severity\":\"$severity\"}")
+            else
+                local color="$YELLOW" icon="⚠️"
+                case "$severity" in
+                    error) color="$RED"; icon="🚨" ;;
+                    info)  color="$BLUE"; icon="ℹ️" ;;
+                esac
+                echo -e "${color}${icon} ${id}: ${text}${NC}"
+                [[ -n "$reason" ]] && echo -e "  ${DIM}Reason: ${reason}${NC}"
+            fi
+        fi
+    }
+
+    _intel_each_pattern _intel_check_callback
+
+    if [[ "$json_mode" == "true" ]]; then
+        local IFS=","
+        echo "[${_INTEL_CHECK_MATCHES[*]:-}]"
+    fi
+
+    unset _INTEL_CHECK_MATCHES _INTEL_CHECK_TARGET _INTEL_CHECK_JSON
 }
 
 # ---------------------------------------------------------------------------
@@ -168,7 +187,6 @@ _intel_glob_match() {
 _intel_learn() {
     local text="" reason="" scope="" severity="warning"
 
-    # Parse args: first positional = text, then --flags
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --reason)  shift; reason="${1:-}" ;;
@@ -198,6 +216,12 @@ _intel_learn() {
         return 1
     fi
 
+    # Validate severity
+    if [[ ! " $_INTEL_VALID_SEVERITIES " =~ " $severity " ]]; then
+        echo -e "${RED}Error: invalid severity '$severity'. Must be one of: $_INTEL_VALID_SEVERITIES${NC}"
+        return 1
+    fi
+
     # Ensure intel directory and patterns file exist
     mkdir -p "$INTEL_DIR"
     if [[ ! -f "$PATTERNS_FILE" ]]; then
@@ -214,7 +238,6 @@ INIT
     while IFS= read -r line; do
         if [[ "$line" =~ "- id: P-"([0-9]+) ]]; then
             local num="${BASH_REMATCH[1]}"
-            # Strip leading zeros for arithmetic
             num=$((10#$num))
             if (( num > max_id )); then
                 max_id=$num
@@ -228,7 +251,6 @@ INIT
     text="${text//\"/\\\"}"
     reason="${reason//\"/\\\"}"
 
-    # Append new pattern
     cat >> "$PATTERNS_FILE" <<EOF
 
   - id: ${next_id}
@@ -241,6 +263,74 @@ EOF
 
     echo -e "${GREEN}✓ Added pattern ${next_id}: ${text}${NC}"
     echo -e "  Scope: ${scope} | Severity: ${severity}"
+}
+
+# ---------------------------------------------------------------------------
+# remove — remove a pattern by ID
+# ---------------------------------------------------------------------------
+_intel_remove() {
+    local pattern_id="${1:-}"
+
+    if [[ -z "$pattern_id" ]]; then
+        echo -e "${RED}Error: pattern ID required${NC}"
+        echo "Usage: ag intel remove P-XXXX"
+        return 1
+    fi
+
+    if [[ ! -f "$PATTERNS_FILE" ]]; then
+        echo -e "${RED}Error: no patterns file found${NC}"
+        return 1
+    fi
+
+    # Check pattern exists
+    if ! grep -q "id: ${pattern_id}$" "$PATTERNS_FILE" 2>/dev/null && \
+       ! grep -q "id: \"${pattern_id}\"" "$PATTERNS_FILE" 2>/dev/null; then
+        echo -e "${RED}Error: pattern ${pattern_id} not found${NC}"
+        return 1
+    fi
+
+    # Remove the pattern block: from "  - id: P-XXXX" to the next "  - id:" or EOF
+    local tmp_file
+    tmp_file=$(mktemp)
+    local skip=false
+    local removed=false
+    local blank_buffer=""
+
+    while IFS= read -r line; do
+        if [[ "$line" == *"- id: ${pattern_id}"* ]]; then
+            skip=true
+            removed=true
+            blank_buffer=""
+            continue
+        fi
+        if $skip; then
+            if [[ "$line" == *"- id: "* ]]; then
+                # Next entry — stop skipping, emit this line
+                skip=false
+                echo "$line" >> "$tmp_file"
+            fi
+            # Skip lines belonging to the removed entry (and trailing blanks)
+            continue
+        fi
+        # Buffer blank lines so we don't leave extra gaps
+        if [[ -z "$line" ]]; then
+            blank_buffer="${blank_buffer}
+"
+        else
+            [[ -n "$blank_buffer" ]] && printf "%s" "$blank_buffer" >> "$tmp_file"
+            blank_buffer=""
+            echo "$line" >> "$tmp_file"
+        fi
+    done < "$PATTERNS_FILE"
+
+    if $removed; then
+        mv "$tmp_file" "$PATTERNS_FILE"
+        echo -e "${GREEN}✓ Removed pattern ${pattern_id}${NC}"
+    else
+        rm -f "$tmp_file"
+        echo -e "${RED}Error: pattern ${pattern_id} not found${NC}"
+        return 1
+    fi
 }
 
 # ---------------------------------------------------------------------------
@@ -264,72 +354,35 @@ _intel_patterns() {
     fi
 
     local count=0
-    local current_id="" current_text="" current_reason="" current_scope="" current_severity="" current_source=""
 
     echo -e "${BOLD}Patterns${NC} (${PATTERNS_FILE})"
     echo ""
 
-    while IFS= read -r line; do
-        case "$line" in
-            *"- id: "*)
-                if [[ -n "$current_id" ]]; then
-                    _intel_print_pattern "$scope_filter" "$current_id" "$current_text" "$current_reason" "$current_scope" "$current_severity" "$current_source" && count=$((count + 1))
-                fi
-                current_id="${line#*"- id: "}"
-                current_id="${current_id//\"/}"
-                current_id="${current_id## }"
-                current_text="" current_reason="" current_scope="" current_severity="" current_source=""
-                ;;
-            *"text: "*)
-                current_text="${line#*"text: "}"
-                current_text="${current_text//\"/}"
-                ;;
-            *"reason: "*)
-                current_reason="${line#*"reason: "}"
-                current_reason="${current_reason//\"/}"
-                ;;
-            *"scope: "*)
-                current_scope="${line#*"scope: "}"
-                current_scope="${current_scope//\"/}"
-                ;;
-            *"severity: "*)
-                current_severity="${line#*"severity: "}"
-                current_severity="${current_severity//\"/}"
-                ;;
-            *"source: "*)
-                current_source="${line#*"source: "}"
-                current_source="${current_source//\"/}"
-                ;;
-        esac
-    done < "$PATTERNS_FILE"
+    _INTEL_LIST_FILTER="$scope_filter"
+    _INTEL_LIST_COUNT=0
 
-    # Print last entry
-    if [[ -n "$current_id" ]]; then
-        _intel_print_pattern "$scope_filter" "$current_id" "$current_text" "$current_reason" "$current_scope" "$current_severity" "$current_source" && count=$((count + 1))
-    fi
+    _intel_list_callback() {
+        local id="$1" text="$2" reason="$3" scope="$4" severity="$5" source="$6"
+
+        if [[ -n "$_INTEL_LIST_FILTER" ]]; then
+            _intel_glob_match "$_INTEL_LIST_FILTER" "$scope" || return 0
+        fi
+
+        local sev_color="$YELLOW"
+        case "$severity" in
+            error) sev_color="$RED" ;;
+            info)  sev_color="$BLUE" ;;
+        esac
+
+        echo -e "  ${sev_color}${id}${NC} [${severity:-warning}] ${text}"
+        echo -e "    ${DIM}Scope: ${scope}  Source: ${source:-unknown}${NC}"
+        _INTEL_LIST_COUNT=$((_INTEL_LIST_COUNT + 1))
+    }
+
+    _intel_each_pattern _intel_list_callback
 
     echo ""
-    echo -e "${DIM}${count} pattern(s) shown${NC}"
-}
+    echo -e "${DIM}${_INTEL_LIST_COUNT} pattern(s) shown${NC}"
 
-_intel_print_pattern() {
-    local scope_filter="$1" id="$2" text="$3" reason="$4" scope="$5" severity="$6" source="$7"
-
-    # If scope filter given, check match
-    if [[ -n "$scope_filter" ]]; then
-        if ! _intel_glob_match "$scope_filter" "$scope"; then
-            return 1
-        fi
-    fi
-
-    local sev_color="$YELLOW"
-    case "$severity" in
-        error) sev_color="$RED" ;;
-        info)  sev_color="$BLUE" ;;
-    esac
-
-    echo -e "  ${sev_color}${id}${NC} [${severity:-warning}] ${text}"
-    echo -e "    ${DIM}Scope: ${scope}  Source: ${source:-unknown}${NC}"
-
-    return 0
+    unset _INTEL_LIST_FILTER _INTEL_LIST_COUNT
 }

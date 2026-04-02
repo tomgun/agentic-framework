@@ -340,6 +340,149 @@ fi
 
 mv "$PROJECT_DIR/.agentic/intel/patterns.yaml.bak" "$PROJECT_DIR/.agentic/intel/patterns.yaml"
 
+# --- Test 11: ag intel check --json returns JSON array ---
+echo ""
+echo "Test 11: ag intel check --json"
+OUTPUT=$(ROOT_DIR="$PROJECT_DIR" \
+    _AGENTIC_SETTINGS_LOADED="" _AGENTIC_PATHS_LOADED="" \
+    _SETTINGS_ROOT_DIR="$PROJECT_DIR" _SETTINGS_STACK_FILE="$PROJECT_DIR/STACK.md" \
+    bash -c '
+        source "'"$REPO_ROOT"'/.agentic/lib/paths.sh" 2>/dev/null || true
+        source "'"$REPO_ROOT"'/.agentic/lib/settings.sh" 2>/dev/null || true
+        RED="\033[0;31m" GREEN="\033[0;32m" YELLOW="\033[1;33m" BLUE="\033[0;34m" BOLD="\033[1m" DIM="\033[2m" NC="\033[0m"
+        ROOT_DIR="'"$PROJECT_DIR"'"
+        source "'"$PROJECT_DIR"'/.agentic/lib/tools/commands/intel.sh"
+        _intel_check "deploy.sh" --json
+    ' 2>&1)
+
+if echo "$OUTPUT" | grep -q '"id":"P-0002"'; then
+    pass "--json includes matching pattern"
+else
+    fail "--json missing match" "$OUTPUT"
+fi
+
+if echo "$OUTPUT" | grep -qE '^\['; then
+    pass "--json output is array"
+else
+    fail "--json not array format" "$OUTPUT"
+fi
+
+# --json with no matches returns empty array
+OUTPUT_EMPTY=$(ROOT_DIR="$PROJECT_DIR" \
+    _AGENTIC_SETTINGS_LOADED="" _AGENTIC_PATHS_LOADED="" \
+    _SETTINGS_ROOT_DIR="$PROJECT_DIR" _SETTINGS_STACK_FILE="$PROJECT_DIR/STACK.md" \
+    bash -c '
+        source "'"$REPO_ROOT"'/.agentic/lib/paths.sh" 2>/dev/null || true
+        source "'"$REPO_ROOT"'/.agentic/lib/settings.sh" 2>/dev/null || true
+        RED="\033[0;31m" GREEN="\033[0;32m" YELLOW="\033[1;33m" BLUE="\033[0;34m" BOLD="\033[1m" DIM="\033[2m" NC="\033[0m"
+        ROOT_DIR="'"$PROJECT_DIR"'"
+        source "'"$PROJECT_DIR"'/.agentic/lib/tools/commands/intel.sh"
+        _intel_check "image.png" --json
+    ' 2>&1)
+
+OUTPUT_EMPTY=$(echo "$OUTPUT_EMPTY" | grep -v "^bash: warning: setlocale" || true)
+if [[ "$OUTPUT_EMPTY" == "[]" ]]; then
+    pass "--json returns [] for no matches"
+else
+    fail "--json empty not []" "$OUTPUT_EMPTY"
+fi
+
+# --- Test 12: ag intel remove removes a pattern ---
+echo ""
+echo "Test 12: ag intel remove"
+
+# Add a pattern we'll remove
+OUTPUT=$(ROOT_DIR="$PROJECT_DIR" \
+    _AGENTIC_SETTINGS_LOADED="" _AGENTIC_PATHS_LOADED="" \
+    _SETTINGS_ROOT_DIR="$PROJECT_DIR" _SETTINGS_STACK_FILE="$PROJECT_DIR/STACK.md" \
+    bash -c '
+        source "'"$REPO_ROOT"'/.agentic/lib/paths.sh" 2>/dev/null || true
+        source "'"$REPO_ROOT"'/.agentic/lib/settings.sh" 2>/dev/null || true
+        RED="\033[0;31m" GREEN="\033[0;32m" YELLOW="\033[1;33m" BLUE="\033[0;34m" BOLD="\033[1m" DIM="\033[2m" NC="\033[0m"
+        ROOT_DIR="'"$PROJECT_DIR"'"
+        source "'"$PROJECT_DIR"'/.agentic/lib/tools/commands/intel.sh"
+        _intel_remove "P-0002"
+    ' 2>&1)
+
+if echo "$OUTPUT" | grep -q "Removed pattern P-0002"; then
+    pass "remove reports success"
+else
+    fail "remove failed" "$OUTPUT"
+fi
+
+if ! grep -q "P-0002" "$PROJECT_DIR/.agentic/intel/patterns.yaml"; then
+    pass "P-0002 no longer in file"
+else
+    fail "P-0002 still in file" ""
+fi
+
+# Verify P-0001 and P-0003 still exist
+if grep -q "P-0001" "$PROJECT_DIR/.agentic/intel/patterns.yaml" && grep -q "P-0003" "$PROJECT_DIR/.agentic/intel/patterns.yaml"; then
+    pass "other patterns preserved"
+else
+    fail "other patterns lost" ""
+fi
+
+# Try removing non-existent pattern
+OUTPUT=$(ROOT_DIR="$PROJECT_DIR" \
+    _AGENTIC_SETTINGS_LOADED="" _AGENTIC_PATHS_LOADED="" \
+    _SETTINGS_ROOT_DIR="$PROJECT_DIR" _SETTINGS_STACK_FILE="$PROJECT_DIR/STACK.md" \
+    bash -c '
+        source "'"$REPO_ROOT"'/.agentic/lib/paths.sh" 2>/dev/null || true
+        source "'"$REPO_ROOT"'/.agentic/lib/settings.sh" 2>/dev/null || true
+        RED="\033[0;31m" GREEN="\033[0;32m" YELLOW="\033[1;33m" BLUE="\033[0;34m" BOLD="\033[1m" DIM="\033[2m" NC="\033[0m"
+        ROOT_DIR="'"$PROJECT_DIR"'"
+        source "'"$PROJECT_DIR"'/.agentic/lib/tools/commands/intel.sh"
+        _intel_remove "P-9999"
+    ' 2>&1)
+
+if echo "$OUTPUT" | grep -q "not found"; then
+    pass "remove non-existent pattern errors"
+else
+    fail "no error for non-existent" "$OUTPUT"
+fi
+
+# --- Test 13: ag intel learn validates severity ---
+echo ""
+echo "Test 13: severity validation"
+OUTPUT=$(ROOT_DIR="$PROJECT_DIR" \
+    _AGENTIC_SETTINGS_LOADED="" _AGENTIC_PATHS_LOADED="" \
+    _SETTINGS_ROOT_DIR="$PROJECT_DIR" _SETTINGS_STACK_FILE="$PROJECT_DIR/STACK.md" \
+    bash -c '
+        source "'"$REPO_ROOT"'/.agentic/lib/paths.sh" 2>/dev/null || true
+        source "'"$REPO_ROOT"'/.agentic/lib/settings.sh" 2>/dev/null || true
+        RED="\033[0;31m" GREEN="\033[0;32m" YELLOW="\033[1;33m" BLUE="\033[0;34m" BOLD="\033[1m" DIM="\033[2m" NC="\033[0m"
+        ROOT_DIR="'"$PROJECT_DIR"'"
+        source "'"$PROJECT_DIR"'/.agentic/lib/tools/commands/intel.sh"
+        _intel_learn "test" --reason "test" --scope "*.sh" --severity "critical"
+    ' 2>&1)
+RC=$?
+
+if echo "$OUTPUT" | grep -q "invalid severity"; then
+    pass "rejects invalid severity"
+else
+    fail "accepted invalid severity" "$OUTPUT"
+fi
+
+# Valid severity should work
+OUTPUT=$(ROOT_DIR="$PROJECT_DIR" \
+    _AGENTIC_SETTINGS_LOADED="" _AGENTIC_PATHS_LOADED="" \
+    _SETTINGS_ROOT_DIR="$PROJECT_DIR" _SETTINGS_STACK_FILE="$PROJECT_DIR/STACK.md" \
+    bash -c '
+        source "'"$REPO_ROOT"'/.agentic/lib/paths.sh" 2>/dev/null || true
+        source "'"$REPO_ROOT"'/.agentic/lib/settings.sh" 2>/dev/null || true
+        RED="\033[0;31m" GREEN="\033[0;32m" YELLOW="\033[1;33m" BLUE="\033[0;34m" BOLD="\033[1m" DIM="\033[2m" NC="\033[0m"
+        ROOT_DIR="'"$PROJECT_DIR"'"
+        source "'"$PROJECT_DIR"'/.agentic/lib/tools/commands/intel.sh"
+        _intel_learn "valid test" --reason "test" --scope "*.sh" --severity "error"
+    ' 2>&1)
+
+if echo "$OUTPUT" | grep -q "Added pattern"; then
+    pass "accepts valid severity 'error'"
+else
+    fail "rejected valid severity" "$OUTPUT"
+fi
+
 # --- Summary ---
 echo ""
 echo "═══════════════════════════════════════════"

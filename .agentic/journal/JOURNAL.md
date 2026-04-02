@@ -4851,3 +4851,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 17:10 - F-041 review fixes
+
+**Why**: PR #218 review feedback
+
+**What changed**:
+- All 9 review items fixed: shared parser, deduplication, --json, remove, severity validation, plan cleanup, FEATURES status
+
+**Next steps**:
+- Push updated PR
+
+**Blockers**: None
+
