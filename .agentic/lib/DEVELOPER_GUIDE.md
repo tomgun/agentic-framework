@@ -92,6 +92,9 @@ ag set <key> <value>  # Change a setting (e.g., ag set feature_tracking no)
 ag audit              # Check spec/code/test quality
 ag qa                 # Generate QA Registry (feature-to-test coverage map)
 ag nfr list           # See non-functional requirements
+ag intel bootstrap    # Generate stack-specific quality intelligence
+ag intel stats        # See token usage metrics
+ag intel patterns     # See enforced anti-patterns
 ```
 
 ### Why 70+ Scripts Exist in a Chat-First Framework
@@ -192,6 +195,23 @@ Tell the agent what you want to build. It picks the right workflow based on your
 
 **"I have a vision for a new product — generate the initial backlog"**
 - Agent runs `ag kickoff` to convert vision into OVERVIEW, FEATURES, ACs, and BACKLOG
+
+### Intelligence Engine: Teaching the Framework Your Project
+
+The framework learns from your project via the intelligence engine (`ag intel`):
+
+```
+"Set up quality intelligence for this project" → ag intel bootstrap (generates quality-checklist, test-strategy, patterns)
+"We should never use eval in bash"             → ag intel learn "Never use eval" --reason "injection risk" --scope "*.sh"
+"Remember: we prefer composition over inheritance" → ag intel remember "prefer composition" --type preference
+"Show me the project knowledge"                → ag intel cerebrum / ag intel patterns
+```
+
+Once bootstrapped, intelligence is surfaced automatically at each workflow phase:
+- **Planning**: `ag intel architecture` — ADRs, NFRs, quality checks
+- **Specs**: `ag intel spec F-XXXX` — feature overlap, contract patterns
+- **Implementation**: `ag intel implement F-XXXX` — conventions, patterns, lessons
+- **Testing**: `ag intel test F-XXXX` — test strategy, known issues
 
 ### After Testing: Capture Feedback
 

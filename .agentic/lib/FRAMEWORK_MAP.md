@@ -42,6 +42,14 @@ graph TB
         GRAPH[feature_graph.sh<br/>dependencies]
     end
 
+    subgraph intel [.agentic/intel/ - Intelligence]
+        PATTERNS[patterns.yaml<br/>enforced rules]
+        CEREBRUM[cerebrum.yaml<br/>project knowledge]
+        ANATOMY[anatomy.yaml<br/>file intelligence]
+        QC[quality-checklist.yaml<br/>5 dims × 4 phases]
+        TSTRAT[test-strategy.yaml<br/>per test level]
+    end
+
     subgraph extensions [.agentic/local/extensions/]
         EXT_SKILLS[skills/<br/>custom skills]
         EXT_GATES[gates/<br/>custom quality gates]
@@ -169,6 +177,7 @@ graph TD
         GRAPH[feature_graph.sh]
         ANALYZE[spec-analyze.sh]
         ACCOV[coverage.py<br/>--ac-coverage]
+        INTEL[intel.sh<br/>patterns/anatomy/queries]
     end
 
     subgraph outputs [Outputs/Checks]

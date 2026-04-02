@@ -16,6 +16,8 @@ metadata:
 
 Run `ag verify F-XXXX` to check test coverage and run the test suite.
 
+**Before writing tests**: Run `ag intel test F-XXXX` to gather test strategy, infrastructure, known issues, and quality checks.
+
 Steps:
 1. Read contract assertions from `.agentic/spec/contracts/F-XXXX.yaml`
 2. Check `STACK.md` for test framework and conventions

@@ -126,6 +126,7 @@ graph TB
 - **Sequential agents**: Specialized agents load only role-specific context (Research Agent doesn't load implementation code)
 - **Manual operations**: Humans read STATUS.md and JOURNAL.md directly (zero tokens) instead of asking agents
 - **Token-efficient scripts**: `journal.sh`, `status.sh`, `feature.sh` — 40x more efficient than read-modify-write
+- **Intelligence engine**: Domain-specific quality checklists, enforced patterns, and test strategies generated from stack analysis — surfaced at each workflow phase so agents apply project knowledge, not generic advice. File anatomy (token estimates, summaries) enables smarter context loading. Session/lifetime token metrics provide factual usage data.
 - **LLM-optimized file formats**: Structure all files for efficient AI parsing while keeping them human-readable. YAML frontmatter for discovery (summary + token count lets agents skip irrelevant files). Structured markdown with consistent field patterns for parsing (`**Status**: shipped`). Tables for lookup, prose only where natural language is genuinely needed. Every file an LLM reads should be designed for LLM consumption — not just human or machine consumption.
 - Token efficiency IS green coding for framework operations — every token saved reduces compute energy
 
@@ -408,8 +409,8 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 
 ---
 
-**Last Updated**: 2026-02-14
-**Framework Version**: 0.25.7
+**Last Updated**: 2026-04-02
+**Framework Version**: 0.77.0
 
 **Note**: Principles evolve, but slowly. Major changes require strong justification.
 

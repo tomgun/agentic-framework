@@ -1,6 +1,17 @@
 [
   {
     "type": "feature",
+    "id": "F-041",
+    "description": "Intelligence Engine",
+    "added_at": "2026-04-02T20:05:24Z",
+    "added_by": "auto",
+    "became_current_at": "2026-04-02T20:05:24Z",
+    "refs": [
+      ".agentic/spec/contracts/F-041.yaml"
+    ]
+  },
+  {
+    "type": "feature",
     "id": "F-037",
     "description": "MCP Coordination Server",
     "added_at": "2026-03-16T18:56:16Z",

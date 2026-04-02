@@ -4903,3 +4903,68 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 20:18 - F-041 Phase 4
+
+**Why**: Make intelligence accessible at each workflow phase
+
+**What changed**:
+- Phase-aware intel queries (architecture, spec, implement, test) integrated into 4 skills + 5 instruction files + dashboard
+
+**Next steps**:
+- PR creation, then Phase 5 (read hook)
+
+**Blockers**: None
+
+
+### Session: 2026-04-02 20:30 - F-041 Phase 4 docs
+
+**Why**: Intelligence engine docs were missing from framework documentation
+
+**What changed**:
+- Updated 4 framework docs with intelligence engine content (OVERVIEW, FRAMEWORK_MAP, HOW_IT_WORKS, DEVELOPER_GUIDE)
+
+**Next steps**:
+- Create PR
+
+**Blockers**: None
+
+
+### Session: 2026-04-02 20:49 - F-041 Phase 4 — remaining docs + contributions
+
+**Why**: Complete doc coverage for intelligence engine feature
+
+**What changed**:
+- Updated PRINCIPLES, INSTRUCTION_ARCHITECTURE, FRAMEWORK_WORKFLOW, START_HERE, README, CONTRIBUTIONS with intelligence engine content
+
+**Next steps**:
+- Merge PR #221
+
+**Blockers**: None
+
+
+### Session: 2026-04-02 20:51 - F-041 CONTRIBUTIONS
+
+**Why**: Capture user design decisions accurately
+
+**What changed**:
+- Expanded to 10 user insights from JSONL logs (Mar 11 - Apr 2)
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+
+
+### Session: 2026-04-02 21:00 - F-041 review fixes
+
+**Why**: Code review findings
+
+**What changed**:
+- Fixed 6 code issues from review: prev_dimension scope leak, error pattern callback, contract loop O(n), AC-033 verify, NFR parsing, missing-file tests
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+

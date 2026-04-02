@@ -39,6 +39,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 | Plan created / exited plan mode | STOP -> Save plan, run dialectical review if `plan_review_enabled: yes`, then implement |
 | Churn / batch / all tasks / build everything | STOP -> Run `ag auto crunch`. NEVER write code for multiple features outside `ag auto`. |
 | User correction / "no" / "don't" / "always" / "never" / "I prefer" | STOP -> `ag intel remember "what they said" --context "what you were doing"` |
+| Before planning / spec / implementing / testing | Run `ag intel architecture\|spec\|implement\|test [F-XXXX]` for phase-aware quality guidance |
 
 ## Rules
 

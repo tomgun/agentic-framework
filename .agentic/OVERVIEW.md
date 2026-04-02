@@ -34,7 +34,8 @@ AI coding agents (Claude Code, Cursor, Copilot, Codex) are powerful but lack per
 - [x] Settings system with profile-aware defaults
 - [x] Configurable Definition of Done per task type (implementation/spike/bugfix/docs)
 - [x] DRY state-file config (state-files.conf)
-- [x] Automated behavioral tests for agent compliance (67 LLM tests in tests/llm/)
+- [x] Automated behavioral tests for agent compliance (107 LLM tests in tests/llm/)
+- [x] Intelligence engine: enforced patterns, project knowledge (cerebrum), file anatomy, quality checklists, test strategies, and phase-aware queries that surface relevant intelligence at each workflow phase
 - [ ] Online documentation site
 
 ## In Scope / Out of Scope
@@ -63,3 +64,4 @@ Developers can install the framework into any repo and immediately get structure
 - **Dogfooding**: The framework develops itself using its own methodology
 - **Small batches**: Max 10 files per commit, break large tasks into pieces
 - **Durable state**: If a session crashes, JOURNAL.md is the recovery point
+- **Intelligence as core value**: Domain-specific knowledge (patterns, quality checklists, test strategies) surfaced at the right moment, not generic advice

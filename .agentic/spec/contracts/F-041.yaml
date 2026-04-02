@@ -200,3 +200,74 @@ assertions:
       falling back to codebase detection only; partial STACK.md (missing
       fields) is handled gracefully with available information
     type: behavioral
+
+  # --- Phase 4: Phase-Aware Queries + Skill Integration ---
+  - id: AC-029
+    text: >
+      `ag intel architecture` outputs ADR summaries, NFR constraints,
+      CONTEXT_PACK overview, and quality-checklist planning-phase items;
+      works with zero args in all profiles
+    type: behavioral
+    verify: bash -c 'output=$(bash .agentic/lib/tools/ag.sh intel architecture 2>&1 | sed "s/\x1b\[[0-9;]*m//g") && echo "$output" | grep -q "Architecture Decision Records" && echo "$output" | grep -q "Non-Functional Requirements" && echo "$output" | grep -q "Quality Checks"'
+
+  - id: AC-030
+    text: >
+      `ag intel spec [F-XXXX]` outputs feature landscape, contract patterns,
+      NFR constraints, and quality-checklist spec-phase items; F-XXXX
+      parameter is optional in Discovery mode, recommended in formal
+    type: behavioral
+    verify: bash -c 'output=$(bash .agentic/lib/tools/ag.sh intel spec F-041 2>&1 | sed "s/\x1b\[[0-9;]*m//g") && echo "$output" | grep -q "Feature Landscape" && echo "$output" | grep -q "Contract Patterns" && echo "$output" | grep -q "Active Spec: F-041"'
+
+  - id: AC-031
+    text: >
+      `ag intel implement [F-XXXX]` outputs code conventions, enforced
+      patterns, lessons learned, cerebrum knowledge, and quality-checklist
+      implementation-phase items; F-XXXX parameter is optional in Discovery
+    type: behavioral
+    verify: bash -c 'output=$(bash .agentic/lib/tools/ag.sh intel implement F-041 2>&1 | sed "s/\x1b\[[0-9;]*m//g") && echo "$output" | grep -q "Code Conventions" && echo "$output" | grep -q "Enforced Patterns" && echo "$output" | grep -q "Active Spec: F-041"'
+
+  - id: AC-032
+    text: >
+      `ag intel test [F-XXXX]` outputs test strategy, test infrastructure,
+      known issues, and quality-checklist testing-phase items; F-XXXX
+      parameter is optional in Discovery mode
+    type: behavioral
+    verify: bash -c 'output=$(bash .agentic/lib/tools/ag.sh intel test F-041 2>&1 | sed "s/\x1b\[[0-9;]*m//g") && echo "$output" | grep -q "Test Strategy" && echo "$output" | grep -q "Test Infrastructure" && echo "$output" | grep -q "Active Spec: F-041"'
+
+  - id: AC-033
+    text: >
+      All four phase-aware commands (architecture, spec, implement, test)
+      filter [formal] tagged quality-checklist items in Discovery mode
+      and rename spec_adherence dimension to intent_adherence
+    type: behavioral
+    verify: bash -c 'grep -q "\\[formal\\]" .agentic/lib/tools/commands/intel.sh && grep -q "intent_adherence" .agentic/lib/tools/commands/intel.sh'
+
+  - id: AC-034
+    text: >
+      `ag intel help` lists all Phase 4 subcommands (architecture, spec,
+      implement, test) under a "Phase-Aware Queries" section
+    type: structural
+    verify: bash -c 'bash .agentic/lib/tools/ag.sh intel help 2>&1 | grep -q "Phase-Aware Queries"'
+
+  - id: AC-035
+    text: >
+      Four workflow skills (planning-features, writing-specs,
+      implementing-features, writing-tests) reference the corresponding
+      ag intel phase command in their SKILL.md instructions
+    type: structural
+    verify: bash -c 'grep -q "ag intel architecture" .claude/skills/planning-features/SKILL.md && grep -q "ag intel spec" .claude/skills/writing-specs/SKILL.md && grep -q "ag intel implement" .claude/skills/implementing-features/SKILL.md && grep -q "ag intel test" .claude/skills/writing-tests/SKILL.md'
+
+  - id: AC-036
+    text: >
+      Four instruction file templates (CLAUDE.md, cursorrules, copilot,
+      codex) and memory-seed include phase intelligence trigger words
+      referencing ag intel architecture|spec|implement|test
+    type: structural
+    verify: bash -c 'grep -q "ag intel architecture" .agentic/lib/agents/claude/CLAUDE.md && grep -q "ag intel architecture" .agentic/lib/agents/cursor/cursorrules.txt && grep -q "ag intel architecture" .agentic/lib/agents/copilot/copilot-instructions.md && grep -q "ag intel architecture" .agentic/lib/agents/codex/codex-instructions.md && grep -q "ag intel architecture" .agentic/lib/init/memory-seed.md'
+
+  - id: AC-037
+    text: >
+      dashboard.sh displays lifetime token metrics (sessions, reads, writes)
+      when token-summary.json exists at .agentic/intel/token-summary.json
+    type: behavioral
+    verify: bash -c 'grep -q "TOKEN_METRICS" .agentic/lib/tools/dashboard.sh && grep -q "token-summary.json" .agentic/lib/tools/dashboard.sh'

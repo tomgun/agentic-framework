@@ -21,6 +21,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - "work autonomously/come back with working/finish everything/do it all" → STOP. Run `ag auto crunch`.
 - User correction: "no/don't/stop/always/never/I prefer" → STOP. Capture with `ag intel remember "what they said" --context "what you were doing"`. Preferences and learnings are project-scoped (cerebrum.yaml).
 - "intelligence/patterns/quality checks" → Run `ag intel` subcommands (check, learn, remember, patterns, cerebrum).
+- Before workflow phases: run `ag intel architecture` (planning), `ag intel spec F-XXXX` (specs), `ag intel implement F-XXXX` (coding), `ag intel test F-XXXX` (testing) for phase-aware quality guidance.
 - NEVER write code for multiple features outside of `ag auto` commands.
 - **Wrong rationalizations:** "I can do it directly faster" — NO. "User said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
 

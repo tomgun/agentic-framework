@@ -44,7 +44,7 @@ A custom rules file is a great start. This framework builds on the same idea but
 - Multi-agent coordination at scale, sequential agent pipelines, automated retrospectives
 - Autonomous workflow modes: test-fix loops, per-AC feature implementation, multi-feature batch processing
 
-**How we know it works**: 700+ acceptance tests + 67 LLM behavioral tests verify that agents actually follow the rules. See [TRACEABILITY_MATRIX.md](tests/TRACEABILITY_MATRIX.md) for principle → feature → test mapping.
+**How we know it works**: 750+ acceptance tests + 107 LLM behavioral tests verify that agents actually follow the rules. See [TRACEABILITY_MATRIX.md](tests/TRACEABILITY_MATRIX.md) for principle → feature → test mapping.
 
 **📖 Detailed problem analysis**: [FRAMEWORK_VALUE_PROPOSITION.md](docs/FRAMEWORK_VALUE_PROPOSITION.md)
 
@@ -71,8 +71,16 @@ A custom rules file is a great start. This framework builds on the same idea but
   - Component registry for monorepos (`## Components` in STACK.md — scoped context, test commands, feature tracking)
   - User-extension directory (`.agentic/local/extensions/` for custom skills and gates)
 
-**🔄 Multi-Environment Support:**
-Work seamlessly across Claude Code, Cursor, and GitHub Copilot in the same project. Switch between tools as tokens run out or use the best tool for each task. All environments share the same project state for perfect continuity. [Learn more](.agentic/lib/workflows/environment_switching.md)
+- **Intelligence Engine** (both profiles):
+  - Enforced anti-patterns checked at write-time (`ag intel learn/check`)
+  - Project knowledge from user corrections (`ag intel remember` → cerebrum.yaml)
+  - Stack-specific quality checklists and test strategies (`ag intel bootstrap`)
+  - Phase-aware queries surface relevant intelligence at each workflow phase (`ag intel architecture|spec|implement|test`)
+  - File anatomy with token estimates for smarter context loading (`ag intel scan/file`)
+  - Session + lifetime token metrics for usage awareness (`ag intel stats`)
+
+**🔄 Multi-Tool Support:**
+Works best with Claude Code (full hook integration, skills, intelligence engine). Instruction files also generated for Cursor, Copilot, and Codex — CLI commands and state files work in any tool. Intelligence files (`.agentic/intel/`) are agent-agnostic.
 
 ## Installation
 

@@ -31,8 +31,12 @@ cmd_intel() {
         scan)      _intel_scan "$@" ;;
         file)      _intel_file "$@" ;;
         stats)     _intel_stats "$@" ;;
-        bootstrap) _intel_bootstrap "$@" ;;
-        retro)     _intel_retro "$@" ;;
+        bootstrap)     _intel_bootstrap "$@" ;;
+        retro)         _intel_retro "$@" ;;
+        architecture)  _intel_architecture "$@" ;;
+        spec)          _intel_spec "$@" ;;
+        implement)     _intel_implement "$@" ;;
+        test)          _intel_test "$@" ;;
         help|--help|-h) _intel_help ;;
         *)
             echo -e "${RED}Unknown intel subcommand: $subcmd${NC}"
@@ -63,6 +67,12 @@ _intel_help() {
     echo "  ${BOLD}Knowledge Generation${NC}"
     echo "  bootstrap                 Generate domain intelligence from stack + codebase"
     echo "  retro                     Analyze issues/lessons → suggest new patterns"
+    echo ""
+    echo "  ${BOLD}Phase-Aware Queries${NC} (intelligence for workflow phases)"
+    echo "  architecture              Planning context: ADRs, NFRs, quality checks"
+    echo "  spec [F-XXXX]             Spec context: features, contracts, quality checks"
+    echo "  implement [F-XXXX]        Implementation context: conventions, patterns, quality checks"
+    echo "  test [F-XXXX]             Testing context: strategy, infra, quality checks"
     echo ""
     echo "  ${BOLD}Metrics${NC}"
     echo "  stats [--session]         Show token metrics (session + lifetime)"
@@ -1558,4 +1568,597 @@ _intel_retro() {
     fi
 
     echo -e "${DIM}Tip: Run retro periodically after shipping features to keep intelligence current.${NC}"
+}
+
+# ===========================================================================
+# Phase 4: Phase-Aware Queries + Skill Integration
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# _intel_is_discovery — returns 0 if profile is discovery (not formal-like)
+# ---------------------------------------------------------------------------
+_intel_is_discovery() {
+    [[ "$PROFILE" != "formal" && "$PROFILE" != "autonomous_formal" ]]
+}
+
+# ---------------------------------------------------------------------------
+# _intel_quality_for_phase — extract quality-checklist items for a workflow phase
+# Usage: _intel_quality_for_phase <phase>  (planning|spec|implementation|testing)
+# Outputs items grouped by dimension. Filters [formal] in Discovery mode.
+# ---------------------------------------------------------------------------
+_intel_quality_for_phase() {
+    local phase="$1"
+
+    if [[ ! -f "$QUALITY_CHECKLIST" ]]; then
+        echo -e "  ${DIM}No quality-checklist.yaml — run \`ag intel bootstrap\` to generate${NC}"
+        return 0
+    fi
+
+    local current_dimension="" prev_dimension="" in_phase=false in_dimensions=false
+    local item_count=0
+
+    while IFS= read -r line; do
+        # Detect the dimensions: top-level key
+        if [[ "$line" =~ ^dimensions:[[:space:]]*$ ]]; then
+            in_dimensions=true
+            continue
+        fi
+        # Detect dimension headers (exactly 2-space indent under dimensions:)
+        if $in_dimensions && [[ "$line" =~ ^[[:space:]][[:space:]][a-z_]+:[[:space:]]*$ ]] && [[ ! "$line" =~ ^[[:space:]][[:space:]][[:space:]] ]]; then
+            local dim="${line%%:*}"
+            dim="${dim#"${dim%%[![:space:]]*}"}"  # trim leading spaces
+            # Rename spec_adherence → intent_adherence in Discovery
+            if _intel_is_discovery && [[ "$dim" == "spec_adherence" ]]; then
+                dim="intent_adherence"
+            fi
+            current_dimension="$dim"
+            in_phase=false
+        fi
+        # Detect phase sub-key (4+ spaces)
+        if [[ "$line" =~ ^[[:space:]]{4,8}${phase}:[[:space:]]*$ ]] || [[ "$line" =~ ^[[:space:]]{4,8}${phase}:[[:space:]]*\[ ]]; then
+            in_phase=true
+            continue
+        fi
+        # Detect next phase sub-key (exit current phase)
+        if $in_phase && [[ "$line" =~ ^[[:space:]]{4,8}[a-z]+: ]]; then
+            in_phase=false
+        fi
+        # Extract items within the active phase
+        if $in_phase && [[ "$line" =~ ^[[:space:]]*-[[:space:]] ]]; then
+            local item="${line#*- }"
+            item="${item//\"/}"
+            # Filter [formal] items in Discovery mode
+            if _intel_is_discovery && [[ "$item" == *"[formal]"* ]]; then
+                continue
+            fi
+            if [[ $item_count -eq 0 || "$prev_dimension" != "$current_dimension" ]]; then
+                echo -e "  ${BOLD}${current_dimension}${NC}"
+                prev_dimension="$current_dimension"
+            fi
+            echo -e "    • ${item}"
+            item_count=$((item_count + 1))
+        fi
+    done < "$QUALITY_CHECKLIST"
+
+    if [[ $item_count -eq 0 ]]; then
+        echo -e "  ${DIM}No items found for phase: ${phase}${NC}"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# _intel_fmt_error_pattern — callback for _intel_each_pattern, prints error-severity patterns
+# ---------------------------------------------------------------------------
+_intel_fmt_error_pattern() {
+    local _id="$1" _text="$2" _reason="$3" _scope="$4" _severity="$5"
+    if [[ "$_severity" == "error" ]]; then
+        echo -e "  ${RED}⛔${NC} ${_text} ${DIM}[${_scope}]${NC}"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# _intel_show_spec — show active spec summary for a feature
+# ---------------------------------------------------------------------------
+_intel_show_spec() {
+    local feature_id="$1"
+    local contract_file="${ROOT_DIR}/.agentic/spec/contracts/${feature_id}.yaml"
+
+    if [[ -f "$contract_file" ]]; then
+        local ac_count
+        ac_count=$(grep -c "^  - id:" "$contract_file" 2>/dev/null || echo 0)
+        local lifecycle
+        lifecycle=$(grep "^lifecycle:" "$contract_file" 2>/dev/null | head -1 | sed 's/lifecycle: *//' || echo "unknown")
+        echo -e "  Contract: ${contract_file##*/} (${ac_count} assertions, lifecycle: ${lifecycle})"
+    else
+        echo -e "  ${DIM}No contract found for ${feature_id}${NC}"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# architecture — pre-planning intelligence query
+# Reads: ADRs, NFRs, CONTEXT_PACK, quality-checklist[planning]
+# ---------------------------------------------------------------------------
+_intel_architecture() {
+    local ADR_DIR="${ROOT_DIR}/.agentic/spec/adr"
+    local NFR_FILE="${ROOT_DIR}/.agentic/spec/NFR.md"
+    local CONTEXT_FILE="${ROOT_DIR}/CONTEXT_PACK.md"
+
+    echo -e "${BOLD}Intelligence — Architecture (Planning Phase)${NC}"
+    _intel_is_discovery && echo -e "${DIM}Profile: discovery${NC}" || echo -e "${DIM}Profile: ${PROFILE}${NC}"
+    echo ""
+
+    # --- 1. ADRs ---
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Architecture Decision Records${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -d "$ADR_DIR" ]]; then
+        local adr_count=0
+        for adr_file in "$ADR_DIR"/*.md; do
+            [[ ! -f "$adr_file" ]] && continue
+            adr_count=$((adr_count + 1))
+            local adr_name
+            adr_name=$(basename "$adr_file" .md)
+            # Extract title from first heading
+            local adr_title
+            adr_title=$(grep -m1 "^#" "$adr_file" 2>/dev/null | sed 's/^#* *//' || echo "$adr_name")
+            echo -e "  📋 ${BOLD}${adr_name}${NC}: ${adr_title}"
+            # Extract status and decision summary
+            local adr_status
+            adr_status=$(grep -i "^status:" "$adr_file" 2>/dev/null | head -1 | sed 's/[Ss]tatus: *//' || true)
+            [[ -n "$adr_status" ]] && echo -e "     Status: ${adr_status}"
+            # Show first line of Decision section
+            local adr_decision
+            adr_decision=$(sed -n '/^## Decision/,/^##/{/^## Decision/d;/^##/d;/^$/d;p;}' "$adr_file" 2>/dev/null | head -2 || true)
+            [[ -n "$adr_decision" ]] && echo -e "     ${DIM}${adr_decision}${NC}"
+            echo ""
+        done
+        [[ $adr_count -eq 0 ]] && echo -e "  ${DIM}No ADR files found${NC}"
+    else
+        echo -e "  ${DIM}No ADR directory (.agentic/spec/adr/)${NC}"
+    fi
+
+    # --- 2. NFRs ---
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Non-Functional Requirements${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$NFR_FILE" ]]; then
+        # Show NFR entries (heading + first content line only)
+        local nfr_count=0 nfr_showed_content=false
+        while IFS= read -r line; do
+            if [[ "$line" =~ ^##[[:space:]] ]]; then
+                nfr_count=$((nfr_count + 1))
+                nfr_showed_content=false
+                echo -e "  ${BOLD}${line#\#\# }${NC}"
+            elif ! $nfr_showed_content && [[ $nfr_count -gt 0 && -n "$line" && "$line" != "---" && ! "$line" =~ ^# && ! "$line" =~ ^- ]]; then
+                echo -e "  ${DIM}${line}${NC}"
+                nfr_showed_content=true
+                echo ""
+            fi
+        done < "$NFR_FILE"
+        [[ $nfr_count -eq 0 ]] && echo -e "  ${DIM}No NFRs defined${NC}"
+    else
+        echo -e "  ${DIM}No NFR.md found — run \`ag nfr discover\` to generate${NC}"
+    fi
+
+    # --- 3. CONTEXT_PACK ---
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Context Pack Summary${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$CONTEXT_FILE" ]]; then
+        # Show section headings to give overview
+        grep "^##" "$CONTEXT_FILE" 2>/dev/null | while IFS= read -r heading; do
+            echo -e "  ${heading}"
+        done
+        echo ""
+        echo -e "  ${DIM}Full context: CONTEXT_PACK.md${NC}"
+    else
+        echo -e "  ${DIM}No CONTEXT_PACK.md found${NC}"
+    fi
+
+    # --- 4. Quality Checklist — Planning Phase ---
+    echo ""
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Quality Checks — Planning Phase${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    _intel_quality_for_phase "planning"
+
+    echo ""
+    echo -e "${DIM}Use this intelligence to inform architectural decisions during planning.${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# spec — pre-spec-writing intelligence query
+# Reads: FEATURES.md, contracts, NFRs, quality-checklist[spec]
+# ---------------------------------------------------------------------------
+_intel_spec() {
+    local feature_id="${1:-}"
+    local FEATURES_FILE="${ROOT_DIR}/.agentic/spec/FEATURES.md"
+    local NFR_FILE="${ROOT_DIR}/.agentic/spec/NFR.md"
+    local CONTRACTS_DIR="${ROOT_DIR}/.agentic/spec/contracts"
+
+    # In formal profiles, F-XXXX is expected (warn if missing)
+    if [[ -z "$feature_id" ]] && ! _intel_is_discovery; then
+        echo -e "${YELLOW}⚠ Feature ID recommended in ${PROFILE} profile: ag intel spec F-XXXX${NC}"
+        echo ""
+    fi
+
+    echo -e "${BOLD}Intelligence — Spec (Spec-Writing Phase)${NC}"
+    _intel_is_discovery && echo -e "${DIM}Profile: discovery${NC}" || echo -e "${DIM}Profile: ${PROFILE}${NC}"
+    echo ""
+
+    # --- 1. Active spec for this feature ---
+    if [[ -n "$feature_id" ]]; then
+        echo "═══════════════════════════════════════════════════════"
+        echo -e "${BOLD}Active Spec: ${feature_id}${NC}"
+        echo "═══════════════════════════════════════════════════════"
+        echo ""
+        _intel_show_spec "$feature_id"
+        echo ""
+    fi
+
+    # --- 2. Related / overlapping features ---
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Feature Landscape${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$FEATURES_FILE" ]]; then
+        # Extract summary from category table if present
+        local summary_line
+        summary_line=$(grep -E "^\| \*\*Total\*\*" "$FEATURES_FILE" 2>/dev/null | head -1 || true)
+        if [[ -n "$summary_line" ]]; then
+            echo -e "  ${summary_line}"
+        else
+            local total
+            total=$(grep -cE "^## F-" "$FEATURES_FILE" 2>/dev/null || echo 0)
+            echo -e "  ${total} features defined"
+        fi
+        echo ""
+
+        # Show current feature if feature_id given
+        if [[ -n "$feature_id" ]]; then
+            local feature_heading
+            feature_heading=$(grep -m1 "^## ${feature_id}:" "$FEATURES_FILE" 2>/dev/null || true)
+            if [[ -n "$feature_heading" ]]; then
+                echo -e "  ${BOLD}Current:${NC} ${feature_heading#\#\# }"
+                echo ""
+            fi
+        fi
+
+        # Show recently shipped features (check for overlap)
+        echo -e "  ${BOLD}Recently shipped (check for overlap):${NC}"
+        grep -B2 "shipped" "$FEATURES_FILE" 2>/dev/null | grep "^## F-" | tail -8 | while IFS= read -r line; do
+            echo -e "  ${DIM}${line#\#\# }${NC}"
+        done
+        echo ""
+    else
+        echo -e "  ${DIM}No FEATURES.md found${NC}"
+    fi
+
+    # --- 3. Existing contracts (AC patterns) ---
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Contract Patterns${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -d "$CONTRACTS_DIR" ]]; then
+        local contract_count=0 total_behavioral=0 total_structural=0
+        contract_count=$(ls "$CONTRACTS_DIR"/*.yaml 2>/dev/null | wc -l)
+        contract_count="${contract_count## }"
+        total_behavioral=$(grep -rl "type: behavioral" "$CONTRACTS_DIR"/*.yaml 2>/dev/null | wc -l)
+        total_behavioral="${total_behavioral## }"
+        total_structural=$(grep -rl "type: structural" "$CONTRACTS_DIR"/*.yaml 2>/dev/null | wc -l)
+        total_structural="${total_structural## }"
+        echo -e "  ${contract_count} contracts, ${total_behavioral} with behavioral + ${total_structural} with structural assertions"
+        echo -e "  ${DIM}Tip: Review existing contracts for AC style consistency${NC}"
+    else
+        echo -e "  ${DIM}No contracts directory${NC}"
+    fi
+
+    # --- 4. NFRs that constrain spec ---
+    echo ""
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}NFR Constraints${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$NFR_FILE" ]]; then
+        local nfr_count
+        nfr_count=$(grep -cE "^## " "$NFR_FILE" 2>/dev/null || echo 0)
+        echo -e "  ${nfr_count} NFR(s) defined — incorporate into acceptance criteria"
+        grep "^## " "$NFR_FILE" 2>/dev/null | while IFS= read -r line; do
+            echo -e "  • ${line#\#\# }"
+        done
+    else
+        echo -e "  ${DIM}No NFR.md — consider \`ag nfr discover\`${NC}"
+    fi
+
+    # --- 5. Quality Checklist — Spec Phase ---
+    echo ""
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Quality Checks — Spec Phase${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    _intel_quality_for_phase "spec"
+
+    echo ""
+    echo -e "${DIM}Use this intelligence to write thorough, non-overlapping acceptance criteria.${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# implement — pre-implementation intelligence query
+# Reads: conventions.md, LESSONS.md, patterns, quality-checklist[implementation], active spec
+# ---------------------------------------------------------------------------
+_intel_implement() {
+    local feature_id="${1:-}"
+    local CONVENTIONS_FILE="${ROOT_DIR}/.agentic/conventions.md"
+    local LESSONS_FILE="${ROOT_DIR}/.agentic/LESSONS.md"
+
+    # In formal profiles, F-XXXX is expected
+    if [[ -z "$feature_id" ]] && ! _intel_is_discovery; then
+        echo -e "${YELLOW}⚠ Feature ID recommended in ${PROFILE} profile: ag intel implement F-XXXX${NC}"
+        echo ""
+    fi
+
+    echo -e "${BOLD}Intelligence — Implementation Phase${NC}"
+    _intel_is_discovery && echo -e "${DIM}Profile: discovery${NC}" || echo -e "${DIM}Profile: ${PROFILE}${NC}"
+    echo ""
+
+    # --- 1. Active spec ---
+    if [[ -n "$feature_id" ]]; then
+        echo "═══════════════════════════════════════════════════════"
+        echo -e "${BOLD}Active Spec: ${feature_id}${NC}"
+        echo "═══════════════════════════════════════════════════════"
+        echo ""
+        _intel_show_spec "$feature_id"
+        echo ""
+    fi
+
+    # --- 2. Code Conventions ---
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Code Conventions${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$CONVENTIONS_FILE" ]]; then
+        # Show convention headings + first line of content
+        local in_section=false
+        while IFS= read -r line; do
+            if [[ "$line" =~ ^## ]]; then
+                echo -e "  ${BOLD}${line#\#\# }${NC}"
+                in_section=true
+            elif $in_section && [[ -n "$line" && ! "$line" =~ ^# ]]; then
+                echo -e "  ${DIM}${line}${NC}"
+                in_section=false
+                echo ""
+            fi
+        done < "$CONVENTIONS_FILE"
+        echo -e "  ${DIM}Full conventions: .agentic/conventions.md${NC}"
+    else
+        echo -e "  ${DIM}No conventions.md found${NC}"
+    fi
+
+    # --- 3. Enforced Patterns ---
+    echo ""
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Enforced Patterns${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$PATTERNS_FILE" ]]; then
+        local pattern_count
+        pattern_count=$(grep -c "^  - id:" "$PATTERNS_FILE" 2>/dev/null || echo 0)
+        echo -e "  ${pattern_count} active patterns (checked at write-time by hook)"
+        echo ""
+        # Show error-severity patterns as most critical
+        local error_lines
+        error_lines=$(_intel_each_pattern _intel_fmt_error_pattern)
+        if [[ -n "$error_lines" ]]; then
+            echo "$error_lines"
+        else
+            echo -e "  ${DIM}No error-severity patterns${NC}"
+        fi
+        echo ""
+        echo -e "  ${DIM}Run \`ag intel patterns\` for full list${NC}"
+    else
+        echo -e "  ${DIM}No patterns.yaml — run \`ag intel bootstrap\`${NC}"
+    fi
+
+    # --- 4. Lessons Learned ---
+    echo ""
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Lessons Learned${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$LESSONS_FILE" ]]; then
+        local lesson_count
+        lesson_count=$(grep -cE "^##\s|^- L-" "$LESSONS_FILE" 2>/dev/null || echo 0)
+        echo -e "  ${lesson_count} lesson(s) recorded"
+        # Show most recent lessons
+        grep -E "^##\s|^- L-" "$LESSONS_FILE" 2>/dev/null | tail -5 | while IFS= read -r line; do
+            echo -e "  ${DIM}${line}${NC}"
+        done
+        echo ""
+        echo -e "  ${DIM}Full lessons: .agentic/LESSONS.md${NC}"
+    else
+        echo -e "  ${DIM}No LESSONS.md — lessons accumulate as issues are resolved${NC}"
+    fi
+
+    # --- 5. Cerebrum (project knowledge) ---
+    echo ""
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Project Knowledge (Cerebrum)${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$CEREBRUM_FILE" ]]; then
+        local cerebrum_count
+        cerebrum_count=$(grep -c "^  - id:" "$CEREBRUM_FILE" 2>/dev/null || echo 0)
+        echo -e "  ${cerebrum_count} knowledge entries (preferences, learnings, decisions)"
+        echo -e "  ${DIM}Run \`ag intel cerebrum\` for full list${NC}"
+    else
+        echo -e "  ${DIM}No cerebrum.yaml yet${NC}"
+    fi
+
+    # --- 6. Quality Checklist — Implementation Phase ---
+    echo ""
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Quality Checks — Implementation Phase${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    _intel_quality_for_phase "implementation"
+
+    echo ""
+    echo -e "${DIM}Use this intelligence to write code that follows project conventions and avoids known pitfalls.${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# test — pre-testing intelligence query
+# Reads: STACK.md, ISSUES.md, test-strategy.yaml, quality-checklist[testing]
+# ---------------------------------------------------------------------------
+_intel_test() {
+    local feature_id="${1:-}"
+    local STACK_FILE="${ROOT_DIR}/STACK.md"
+    local ISSUES_FILE="${ROOT_DIR}/.agentic/ISSUES.md"
+
+    # In formal profiles, F-XXXX is expected
+    if [[ -z "$feature_id" ]] && ! _intel_is_discovery; then
+        echo -e "${YELLOW}⚠ Feature ID recommended in ${PROFILE} profile: ag intel test F-XXXX${NC}"
+        echo ""
+    fi
+
+    echo -e "${BOLD}Intelligence — Testing Phase${NC}"
+    _intel_is_discovery && echo -e "${DIM}Profile: discovery${NC}" || echo -e "${DIM}Profile: ${PROFILE}${NC}"
+    echo ""
+
+    # --- 1. Active spec ---
+    if [[ -n "$feature_id" ]]; then
+        echo "═══════════════════════════════════════════════════════"
+        echo -e "${BOLD}Active Spec: ${feature_id}${NC}"
+        echo "═══════════════════════════════════════════════════════"
+        echo ""
+        _intel_show_spec "$feature_id"
+        echo ""
+    fi
+
+    # --- 2. Test Strategy ---
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Test Strategy${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$TEST_STRATEGY" ]]; then
+        # Parse and display test levels
+        local current_level="" in_patterns=false in_antipatterns=false
+        while IFS= read -r line; do
+            # Detect level headers
+            if [[ "$line" =~ ^[[:space:]]{2,4}(unit|component|integration|e2e): ]]; then
+                local level="${line%%:*}"
+                level="${level#"${level%%[![:space:]]*}"}"
+                echo -e "  ${BOLD}${level}${NC}"
+                current_level="$level"
+                in_patterns=false; in_antipatterns=false
+            elif [[ "$line" =~ ^[[:space:]]*focus: ]]; then
+                local focus="${line#*focus: }"
+                focus="${focus//\"/}"
+                echo -e "    Focus: ${focus}"
+            elif [[ "$line" =~ ^[[:space:]]*framework: ]]; then
+                local fw="${line#*framework: }"
+                fw="${fw//\"/}"
+                echo -e "    Framework: ${fw}"
+            elif [[ "$line" =~ ^[[:space:]]*patterns: ]]; then
+                in_patterns=true; in_antipatterns=false
+                echo -e "    ${GREEN}Patterns:${NC}"
+            elif [[ "$line" =~ ^[[:space:]]*antipatterns: ]]; then
+                in_antipatterns=true; in_patterns=false
+                echo -e "    ${RED}Antipatterns:${NC}"
+            elif [[ "$line" =~ ^[[:space:]]*-[[:space:]] ]]; then
+                local item="${line#*- }"
+                item="${item//\"/}"
+                if $in_patterns; then
+                    echo -e "      ${GREEN}✓${NC} ${item}"
+                elif $in_antipatterns; then
+                    echo -e "      ${RED}✗${NC} ${item}"
+                fi
+            elif [[ "$line" =~ ^[[:space:]]*[a-z]+: && ! "$line" =~ ^[[:space:]]*(focus|framework|colocate|patterns|antipatterns): ]]; then
+                in_patterns=false; in_antipatterns=false
+            fi
+        done < "$TEST_STRATEGY"
+        echo ""
+    else
+        echo -e "  ${DIM}No test-strategy.yaml — run \`ag intel bootstrap\` to generate${NC}"
+        echo ""
+    fi
+
+    # --- 3. Test Infrastructure (from STACK.md) ---
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Test Infrastructure${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$STACK_FILE" ]]; then
+        local test_fw
+        test_fw=$(grep -iE "^-\s*(Testing|Test framework|test_framework)" "$STACK_FILE" 2>/dev/null | head -1 | sed 's/^[^:]*: *//' || true)
+        if [[ -n "$test_fw" ]]; then
+            echo -e "  Test framework: ${test_fw}"
+        fi
+    fi
+
+    # Detect test directories
+    local test_dirs=""
+    for d in tests test spec __tests__ e2e cypress; do
+        [[ -d "${ROOT_DIR}/${d}" ]] && test_dirs="${test_dirs}${d}/, "
+    done
+    test_dirs="${test_dirs%, }"
+    if [[ -n "$test_dirs" ]]; then
+        echo -e "  Test directories: ${test_dirs}"
+    fi
+
+    # Count existing tests
+    local test_count=0
+    if git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        test_count=$(cd "$ROOT_DIR" && git ls-files --cached --others --exclude-standard 2>/dev/null \
+            | grep -cE "(test_|_test\.|\.test\.|\.spec\.|tests/|test/|__tests__/)" || echo 0)
+    fi
+    echo -e "  Test files: ~${test_count}"
+    echo ""
+
+    # --- 4. Known Bugs / Issues ---
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Known Issues${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    if [[ -f "$ISSUES_FILE" ]]; then
+        local issue_count
+        issue_count=$(grep -cE "^##\s" "$ISSUES_FILE" 2>/dev/null || echo 0)
+        echo -e "  ${issue_count} known issue(s) — check for test coverage gaps"
+        grep "^## " "$ISSUES_FILE" 2>/dev/null | head -8 | while IFS= read -r line; do
+            echo -e "  ${DIM}${line#\#\# }${NC}"
+        done
+    else
+        echo -e "  ${DIM}No ISSUES.md${NC}"
+    fi
+
+    # --- 5. Quality Checklist — Testing Phase ---
+    echo ""
+    echo "═══════════════════════════════════════════════════════"
+    echo -e "${BOLD}Quality Checks — Testing Phase${NC}"
+    echo "═══════════════════════════════════════════════════════"
+    echo ""
+
+    _intel_quality_for_phase "testing"
+
+    echo ""
+    echo -e "${DIM}Use this intelligence to write thorough tests covering known gaps and quality dimensions.${NC}"
 }
