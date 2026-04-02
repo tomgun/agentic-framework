@@ -1,8 +1,11 @@
 {
   "feature": "F-041",
   "mode": "feature",
-  "generated": "2026-04-02T18:21:49Z",
+  "generated": "2026-04-02T19:58:19Z",
   "commits": [
+    {"hash": "b8d995fb", "date": "2026-04-02", "message": "feat(F-041): intelligence engine Phase 3 — bootstrap + quality intelligence (#220)", "additions": 964, "deletions": 11},
+    {"hash": "6f362a43", "date": "2026-04-02", "message": "fix(F-041): address review findings in bootstrap/retro", "additions": 9, "deletions": 6},
+    {"hash": "09ead898", "date": "2026-04-02", "message": "chore(state): update STATUS.md,HUMAN_NEEDED.md,F-041.json", "additions": 31, "deletions": 8},
     {"hash": "af16a816", "date": "2026-04-02", "message": "feat(F-041): intelligence engine Phase 2 — anatomy + token ledger (#219)", "additions": 1340, "deletions": 2},
     {"hash": "67fb4b28", "date": "2026-04-02", "message": "fix(F-041): address review feedback — all 5 issues + nits", "additions": 113, "deletions": 20},
     {"hash": "a4db7bfb", "date": "2026-04-02", "message": "feat(F-041): intelligence engine Phase 1 — patterns, write hook, cerebrum (#218)", "additions": 2196, "deletions": 2},
@@ -12,14 +15,14 @@
   ],
   "files": {
     "code": [{"file": ".agentic/lib/claude-hooks/PostToolUse.sh"}, {"file": ".agentic/lib/claude-hooks/PreToolUse.sh"}, {"file": ".agentic/lib/claude-hooks/Stop.sh"}, {"file": ".agentic/lib/tools/ag.sh"}, {"file": ".agentic/lib/tools/commands/intel.sh"}, {"file": ".agentic/lib/tools/upgrade.sh"}],
-    "tests": [{"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/contracts/F-041.yaml"}, {"file": ".agentic/spec/reviews/F-041/planned_to_implementing.md"}, {"file": ".claude/skills/writing-tests/SKILL.md"}, {"file": "tests/test_intel_anatomy.sh"}, {"file": "tests/test_intel_patterns.sh"}, {"file": "tests/validate_framework.sh"}],
+    "tests": [{"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/contracts/F-041.yaml"}, {"file": ".agentic/spec/reviews/F-041/planned_to_implementing.md"}, {"file": ".claude/skills/writing-tests/SKILL.md"}, {"file": "tests/test_intel_anatomy.sh"}, {"file": "tests/test_intel_bootstrap.sh"}, {"file": "tests/test_intel_patterns.sh"}, {"file": "tests/validate_framework.sh"}],
     "docs": [{"file": ".agentic/HUMAN_NEEDED.md"}, {"file": ".agentic/STATUS.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/journal/plans/2026-04-02-F-041-plan.md"}, {"file": ".agentic/journal/plans/2026-04-02-intelligence-engine-plan.md"}, {"file": ".agentic/journal/plans/2026-04-02-intelligence-engine-plan_original.md"}, {"file": ".agentic/lib/agents/claude/CLAUDE.md"}, {"file": ".agentic/lib/agents/codex/codex-instructions.md"}, {"file": ".agentic/lib/agents/copilot/copilot-instructions.md"}, {"file": ".agentic/lib/agents/cursor/cursorrules.txt"}, {"file": ".agentic/lib/init/memory-seed.md"}, {"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/reviews/F-041/planned_to_implementing.md"}, {"file": ".claude/skills/fixing-bugs/SKILL.md"}, {"file": ".claude/skills/implementing-features/SKILL.md"}, {"file": ".claude/skills/writing-specs/SKILL.md"}],
-    "config": [{"file": ".agentic/intel/cerebrum.yaml"}, {"file": ".agentic/intel/patterns.yaml"}, {"file": ".agentic/spec/contracts/F-041.yaml"}]
+    "config": [{"file": ".agentic/intel/cerebrum.yaml"}, {"file": ".agentic/intel/patterns.yaml"}, {"file": ".agentic/journal/manifests/F-041.json"}, {"file": ".agentic/spec/contracts/F-041.yaml"}]
   },
   "stats": {
-    "total_commits": 7,
-    "total_files": 30,
-    "additions": 7289,
-    "deletions": 1470
+    "total_commits": 11,
+    "total_files": 32,
+    "additions": 8293,
+    "deletions": 1495
   }
 }
