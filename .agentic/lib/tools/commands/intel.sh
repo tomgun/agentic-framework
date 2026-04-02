@@ -699,7 +699,7 @@ EOF
             *.zip|*.tar|*.gz|*.bz2|*.xz|*.7z|*.rar) continue ;;
             *.pyc|*.pyo|*.so|*.dylib|*.o|*.a|*.class) continue ;;
             *.exe|*.dll|*.bin|*.dat) continue ;;
-            *.lock) continue ;;
+            package-lock.json|yarn.lock|pnpm-lock.yaml|Gemfile.lock|Cargo.lock|poetry.lock|composer.lock) continue ;;
         esac
 
         # Skip files > 500KB (likely generated)
@@ -762,16 +762,28 @@ _intel_scan_check() {
         return 1
     fi
 
-    # Check if any tracked files are newer than anatomy.yaml
+    # Check if any tracked files are newer than anatomy.yaml.
+    # Prefer git ls-files to avoid false positives from build artifacts.
     local stale_files
-    stale_files=$(find "$ROOT_DIR" -type f \
-        -newer "$ANATOMY_FILE" \
-        -not -path "*/.git/*" \
-        -not -path "*/node_modules/*" \
-        -not -path "*/__pycache__/*" \
-        -not -path "*/.agentic/session/*" \
-        -not -path "*/.agentic/.cache/*" \
-        2>/dev/null | head -1)
+    if git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        stale_files=$(cd "$ROOT_DIR" && git ls-files --cached --others --exclude-standard 2>/dev/null \
+            | while IFS= read -r f; do
+                [[ -f "$f" && "$f" -nt "$ANATOMY_FILE" ]] && echo "$f" && break
+              done)
+    else
+        stale_files=$(find "$ROOT_DIR" -type f \
+            -newer "$ANATOMY_FILE" \
+            -not -path "*/.git/*" \
+            -not -path "*/node_modules/*" \
+            -not -path "*/__pycache__/*" \
+            -not -path "*/.agentic/session/*" \
+            -not -path "*/.agentic/.cache/*" \
+            -not -path "*/build/*" \
+            -not -path "*/dist/*" \
+            -not -path "*/.next/*" \
+            -not -path "*/target/*" \
+            2>/dev/null | head -1)
+    fi
 
     if [[ -n "$stale_files" ]]; then
         echo -e "${YELLOW}anatomy.yaml is stale (files changed since last scan)${NC}"
@@ -815,7 +827,9 @@ _intel_detect_language() {
         cfg|ini|conf)   echo "config" ;;
         html|htm)       echo "html" ;;
         css)            echo "css" ;;
-        scss|sass|less)  echo "css" ;;
+        scss)           echo "scss" ;;
+        sass)           echo "sass" ;;
+        less)           echo "less" ;;
         sql)            echo "sql" ;;
         *)
             case "$basename" in
@@ -840,7 +854,7 @@ _intel_extract_summary() {
             # Hash-comment languages: first comment line (skip shebang)
             line=$(head -10 "$filepath" 2>/dev/null | grep -m1 '^[[:space:]]*#[^!]' | sed 's/^[[:space:]]*#[[:space:]]*//')
             ;;
-        javascript|typescript|tsx|jsx|go|rust|java|kotlin|swift|c|cpp|csharp|css)
+        javascript|typescript|tsx|jsx|go|rust|java|kotlin|swift|c|cpp|csharp|css|scss|sass|less)
             # C-style comment languages
             line=$(head -20 "$filepath" 2>/dev/null | grep -m1 -E '^[[:space:]]*(//|/\*)' | sed 's|^[[:space:]]*/[/*][[:space:]]*||' | sed 's|\*/.*||')
             ;;
@@ -1044,10 +1058,11 @@ _intel_show_lifetime_stats() {
 # ---------------------------------------------------------------------------
 _intel_json_int() {
     local file="$1" key="$2"
-    grep -o "\"${key}\"[[:space:]]*:[[:space:]]*[0-9]*" "$file" 2>/dev/null | grep -o '[0-9]*$' || echo 0
+    # Anchored match: requires key followed by ": <digits>" — head -1 prevents substring collisions
+    grep -o "\"${key}\"[[:space:]]*:[[:space:]]*[0-9]*" "$file" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0
 }
 
 _intel_json_str() {
     local file="$1" key="$2"
-    grep -o "\"${key}\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" "$file" 2>/dev/null | sed "s/.*\"${key}\"[[:space:]]*:[[:space:]]*\"//;s/\"//" || echo ""
+    grep -o "\"${key}\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" "$file" 2>/dev/null | head -1 | sed "s/.*\"${key}\"[[:space:]]*:[[:space:]]*\"//;s/\"//" || echo ""
 }

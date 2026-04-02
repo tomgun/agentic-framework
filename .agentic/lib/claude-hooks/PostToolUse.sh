@@ -26,6 +26,7 @@ fi
 # --- Token tracking (Phase 2: F-041 Intelligence Engine) ---
 # Read tool info from stdin, log events for session metrics.
 # Pure bash extraction — no Python fork. Appends one line per event (<1ms).
+# NOTE: This consumes stdin. All downstream code in this script must not read stdin.
 _POST_STDIN=$(cat 2>/dev/null || true)
 _POST_TOOL=""
 _POST_FILE=""

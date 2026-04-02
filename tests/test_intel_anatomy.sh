@@ -16,6 +16,9 @@
 #  12. Token events format — R/W pipe-delimited lines
 #  13. Stop.sh token finalization — compiles ledger + merges summary
 #  14. Index rebuild — regenerate from anatomy.yaml
+#  15. PostToolUse.sh integration — stdin JSON → token event
+#  16. Edge case — files with special characters in summary
+#  17. Edge case — empty file produces 0 tokens
 
 set -uo pipefail
 
@@ -42,7 +45,9 @@ create_project() {
     cp -r "$REPO_ROOT/.agentic/lib/presets" "$dir/.agentic/lib/" 2>/dev/null || true
     cp "$REPO_ROOT/.agentic/lib/paths.sh" "$dir/.agentic/lib/" 2>/dev/null || true
     cp "$REPO_ROOT/.agentic/lib/tools/commands/intel.sh" "$dir/.agentic/lib/tools/commands/"
-    cp "$REPO_ROOT/.agentic/lib/claude-hooks/stop.sh" "$dir/.agentic/lib/claude-hooks/"
+    cp "$REPO_ROOT/.agentic/lib/tools/fwlog.sh" "$dir/.agentic/lib/tools/" 2>/dev/null || true
+    cp "$REPO_ROOT/.agentic/lib/claude-hooks/Stop.sh" "$dir/.agentic/lib/claude-hooks/"
+    cp "$REPO_ROOT/.agentic/lib/claude-hooks/PostToolUse.sh" "$dir/.agentic/lib/claude-hooks/"
 
     # Minimal STACK.md
     cat > "$dir/STACK.md" << 'EOF'
@@ -442,6 +447,76 @@ if [[ -f "$PROJECT/.agentic/intel/anatomy.index" ]] && \
     pass "14. Index rebuilt from anatomy.yaml on file lookup"
 else
     fail "14. Index rebuild" "$OUTPUT"
+fi
+
+# --- Test 15: PostToolUse.sh integration — stdin JSON → token event ---
+echo "--- PostToolUse Integration ---"
+rm -f "$PROJECT/.agentic/session/token-events.log"
+
+# Simulate Read tool hook call with JSON stdin
+HOOK_JSON='{"tool_name":"Read","tool_input":{"file_path":"'"$PROJECT/src/main.py"'"}}'
+(
+    cd "$PROJECT"
+    export CLAUDE_PROJECT_DIR="$PROJECT"
+    echo "$HOOK_JSON" | bash "$PROJECT/.agentic/lib/claude-hooks/PostToolUse.sh" 2>/dev/null || true
+)
+
+if [[ -f "$PROJECT/.agentic/session/token-events.log" ]] && \
+   grep -q "^R|" "$PROJECT/.agentic/session/token-events.log"; then
+    pass "15a. PostToolUse.sh creates Read event from stdin JSON"
+else
+    fail "15a. PostToolUse.sh Read event" "$(cat "$PROJECT/.agentic/session/token-events.log" 2>/dev/null)"
+fi
+
+# Simulate Write tool hook call
+HOOK_JSON='{"tool_name":"Write","tool_input":{"file_path":"'"$PROJECT/src/main.py"'"}}'
+(
+    cd "$PROJECT"
+    export CLAUDE_PROJECT_DIR="$PROJECT"
+    echo "$HOOK_JSON" | bash "$PROJECT/.agentic/lib/claude-hooks/PostToolUse.sh" 2>/dev/null || true
+)
+
+if grep -q "^W|" "$PROJECT/.agentic/session/token-events.log" 2>/dev/null; then
+    pass "15b. PostToolUse.sh creates Write event from stdin JSON"
+else
+    fail "15b. PostToolUse.sh Write event" "$(cat "$PROJECT/.agentic/session/token-events.log" 2>/dev/null)"
+fi
+
+# --- Test 16: Edge case — files with special characters in summary ---
+echo "--- Edge Cases ---"
+cat > "$PROJECT/src/special.py" << 'PYEOF'
+# Config parser: handles "key=value" pairs & <xml> tags
+import re
+PYEOF
+
+(cd "$PROJECT" && git add -A && git commit -q -m "add special" 2>/dev/null) || true
+run_intel "$PROJECT" scan >/dev/null 2>&1
+
+OUTPUT=$(run_intel "$PROJECT" file src/special.py 2>&1)
+if echo "$OUTPUT" | grep -q "special.py" && \
+   echo "$OUTPUT" | grep -q "python"; then
+    pass "16a. File with quotes in summary handled"
+else
+    fail "16a. Special char summary" "$OUTPUT"
+fi
+
+# Verify anatomy.yaml is still valid (no broken YAML from escaping)
+if grep -q 'path: "src/special.py"' "$PROJECT/.agentic/intel/anatomy.yaml"; then
+    pass "16b. anatomy.yaml valid after special chars"
+else
+    fail "16b. anatomy.yaml integrity" "$(grep special "$PROJECT/.agentic/intel/anatomy.yaml")"
+fi
+
+# --- Test 17: Empty file produces 0 tokens ---
+touch "$PROJECT/src/empty.txt"
+(cd "$PROJECT" && git add -A && git commit -q -m "add empty" 2>/dev/null) || true
+run_intel "$PROJECT" scan >/dev/null 2>&1
+
+OUTPUT=$(run_intel "$PROJECT" file src/empty.txt 2>&1)
+if echo "$OUTPUT" | grep -q "~0 tokens"; then
+    pass "17. Empty file reports 0 tokens"
+else
+    fail "17. Empty file tokens" "$OUTPUT"
 fi
 
 # Cleanup

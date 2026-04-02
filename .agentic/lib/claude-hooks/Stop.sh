@@ -72,13 +72,15 @@ if [[ -f "$_TK_EVENTS" ]]; then
 TKEOF
 
   # Merge into lifetime summary
+  # NOTE: JSON parsing duplicated from intel.sh _intel_json_int — Stop.sh can't source intel.sh
+  # (different execution context). Keep both in sync if schema changes.
   _TK_P_SESS=0 _TK_P_RD=0 _TK_P_WR=0 _TK_P_REP=0 _TK_P_COST=0
   if [[ -f "$_TK_SUMMARY" ]]; then
-    _TK_P_SESS=$(grep -o '"total_sessions"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | grep -o '[0-9]*$' || echo 0)
-    _TK_P_RD=$(grep -o '"total_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | grep -o '[0-9]*$' || echo 0)
-    _TK_P_WR=$(grep -o '"total_writes"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | grep -o '[0-9]*$' || echo 0)
-    _TK_P_REP=$(grep -o '"total_repeated_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | grep -o '[0-9]*$' || echo 0)
-    _TK_P_COST=$(grep -o '"total_estimated_cost"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | grep -o '[0-9]*$' || echo 0)
+    _TK_P_SESS=$(grep -o '"total_sessions"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _TK_P_RD=$(grep -o '"total_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _TK_P_WR=$(grep -o '"total_writes"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _TK_P_REP=$(grep -o '"total_repeated_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _TK_P_COST=$(grep -o '"total_estimated_cost"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
   fi
 
   mkdir -p ".agentic/intel" 2>/dev/null || true
