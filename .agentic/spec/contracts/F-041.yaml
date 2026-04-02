@@ -144,3 +144,59 @@ assertions:
       .gitignore includes .agentic/intel/anatomy.index; .agentic/session/
       already covers token-ledger.json
     type: structural
+
+  # --- Phase 3: Bootstrap + Quality Intelligence ---
+  - id: AC-022
+    text: >
+      `ag intel bootstrap` reads STACK.md for stack details (language, framework,
+      domain, database) and scans the codebase (package files, imports, directory
+      structure), then outputs structured context enabling the agent to generate
+      domain-specific intelligence
+    type: behavioral
+
+  - id: AC-023
+    text: >
+      `ag intel bootstrap` output includes generation instructions for three
+      artifacts: patterns (stack-specific anti-patterns for patterns.yaml),
+      quality-checklist.yaml (5 dimensions × 4 phases), and test-strategy.yaml
+      (per test level with framework, focus, patterns, antipatterns)
+    type: behavioral
+
+  - id: AC-024
+    text: >
+      quality-checklist.yaml has version, source, stack, and dimensions map
+      where each dimension (usability, architecture, code_quality, testability,
+      spec_adherence) contains phase arrays (planning, spec, implementation,
+      testing) with actionable check items; items marked [formal] are filtered
+      in Discovery mode
+    type: structural
+
+  - id: AC-025
+    text: >
+      test-strategy.yaml has version, source, stack, and levels map where each
+      level (unit, component, integration, e2e) contains focus, framework,
+      colocate (boolean), patterns[], and antipatterns[] fields
+    type: structural
+
+  - id: AC-026
+    text: >
+      `ag intel retro` reads ISSUES.md, LESSONS.md, and existing patterns.yaml,
+      then outputs analysis context identifying recurring themes, unextracted
+      lessons, and quality gaps for agent to suggest new patterns and checklist
+      updates
+    type: behavioral
+
+  - id: AC-027
+    text: >
+      Bootstrap codebase scan detects: package manager files (package.json,
+      requirements.txt, pyproject.toml, Cargo.toml, go.mod), test directories
+      and frameworks, directory structure (src/, lib/, tests/), and key imports
+      from entry files
+    type: behavioral
+
+  - id: AC-028
+    text: >
+      `ag intel bootstrap` and `ag intel retro` work without STACK.md by
+      falling back to codebase detection only; partial STACK.md (missing
+      fields) is handled gracefully with available information
+    type: behavioral
