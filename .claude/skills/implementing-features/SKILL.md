@@ -32,6 +32,9 @@ Key commands:
 > `ag implement` enforces plan-approval gates (Step 0.5), spec checks, and sets up the
 > worktree. Bypassing it breaks the enforcement chain and allows DRAFT plans to reach code.
 
+## Before coding
+Run `ag intel implement F-XXXX` to gather conventions, enforced patterns, and quality checks for the implementation phase.
+
 ## Preconditions
 - Feature must have a YAML contract at `spec/contracts/F-XXXX.yaml` with assertions
 - Contract lifecycle must be `specifying` or later (not `exploring`)

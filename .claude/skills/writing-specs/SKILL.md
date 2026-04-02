@@ -20,6 +20,8 @@ metadata:
 
 Run `ag spec` or `ag contract` to manage feature specifications and YAML contracts.
 
+**Before writing specs**: Run `ag intel spec F-XXXX` to check for overlapping features, AC patterns, and quality checks.
+
 ## Key operations
 - **New feature**: Find next F-XXXX in FEATURES.md, create contract at `spec/contracts/F-XXXX.yaml`
 - **Contract management**: `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list`

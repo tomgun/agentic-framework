@@ -4903,3 +4903,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 20:18 - F-041 Phase 4
+
+**Why**: Make intelligence accessible at each workflow phase
+
+**What changed**:
+- Phase-aware intel queries (architecture, spec, implement, test) integrated into 4 skills + 5 instruction files + dashboard
+
+**Next steps**:
+- PR creation, then Phase 5 (read hook)
+
+**Blockers**: None
+

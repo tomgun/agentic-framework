@@ -52,6 +52,7 @@ Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and
 - Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
 - User correction: "no/don't/stop/always/never/I prefer" → capture with `ag intel remember "what they said" --context "what you were doing"`. Preferences, learnings, and decisions are project-scoped (cerebrum.yaml), not personal memory.
+- Phase intelligence: before each workflow phase, run `ag intel architecture|spec|implement|test [F-XXXX]` for context-aware guidance (ADRs, patterns, quality checks). Skills reference these commands.
 - Pending user input: "pending user input/contract input" → run `ag contract pending`. Process each pending contract.
 - Migrate specs: "migrate specs/convert acceptance" → run `ag migrate-specs` (converts markdown ACs to YAML contracts).
 - Never fabricate APIs, data, or behavior. If uncertain, ask.

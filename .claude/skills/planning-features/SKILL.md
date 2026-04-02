@@ -17,6 +17,8 @@ metadata:
 Run `ag start F-XXXX "Title"` to begin — the CLI starts in the planning state.
 Explore the codebase, draft a plan, and save it durably.
 
+**Before planning**: Run `ag intel architecture` to gather ADRs, NFRs, and quality checks for the planning phase.
+
 Key commands:
 - `ag start F-XXXX "Title"` — create work item (starts in planning)
 - `ag transition F-XXXX plan_review` — submit plan for review

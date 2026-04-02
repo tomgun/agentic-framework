@@ -210,6 +210,16 @@ if [[ -f "$TOOLS_DIR/spec-metrics.sh" ]]; then
     D_SPEC_METRICS=$(bash "$TOOLS_DIR/spec-metrics.sh" --summary-line 2>/dev/null) || D_SPEC_METRICS=""
 fi
 
+# TOKEN METRICS (F-041 Phase 4)
+D_TOKEN_METRICS=""
+TOKEN_SUMMARY="$PROJECT_ROOT/.agentic/intel/token-summary.json"
+if [[ -f "$TOKEN_SUMMARY" ]]; then
+    _ts_sessions=$(grep -o '"total_sessions"[[:space:]]*:[[:space:]]*[0-9]*' "$TOKEN_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _ts_reads=$(grep -o '"total_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$TOKEN_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _ts_writes=$(grep -o '"total_writes"[[:space:]]*:[[:space:]]*[0-9]*' "$TOKEN_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    D_TOKEN_METRICS="${_ts_sessions} sessions, ${_ts_reads} reads, ${_ts_writes} writes"
+fi
+
 # DESIGN TRACE (pending source docs)
 D_DESIGN_TRACE=""
 if [[ -f "$TOOLS_DIR/design-trace.sh" ]]; then
@@ -315,6 +325,8 @@ if $RAW_MODE; then
     echo "$D_SPEC_METRICS"
     echo "===DESIGN_TRACE==="
     echo "$D_DESIGN_TRACE"
+    echo "===TOKEN_METRICS==="
+    echo "$D_TOKEN_METRICS"
     echo "===USER_INPUT==="
     echo "$D_USER_INPUT_COUNT"
     echo "$D_USER_INPUT_FEATURES"
@@ -446,6 +458,9 @@ if [[ -f "$ROOT_DIR/.agentic/spec/NFR.md" ]] && grep -qE '^## NFR-[0-9]+' "$ROOT
 fi
 if [[ -n "$D_SPEC_METRICS" ]]; then
     echo "📊 Spec evolution  $D_SPEC_METRICS"
+fi
+if [[ -n "$D_TOKEN_METRICS" ]]; then
+    echo "📊 Token usage     $D_TOKEN_METRICS"
 fi
 if [[ -n "$D_DESIGN_TRACE" ]]; then
     echo "📐 Design trace   $D_DESIGN_TRACE — run: design-trace.sh"
