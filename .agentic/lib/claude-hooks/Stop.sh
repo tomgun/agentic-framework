@@ -44,6 +44,63 @@ else
   WARNINGS=""
 fi
 
+# --- Finalize token ledger (Phase 2: F-041 Intelligence Engine) ---
+_TK_EVENTS=".agentic/session/token-events.log"
+_TK_SUMMARY=".agentic/intel/token-summary.json"
+_TK_LEDGER=".agentic/session/token-ledger.json"
+
+if [[ -f "$_TK_EVENTS" ]]; then
+  _TK_READS=$(grep -c '^R|' "$_TK_EVENTS" 2>/dev/null || echo 0)
+  _TK_WRITES=$(grep -c '^W|' "$_TK_EVENTS" 2>/dev/null || echo 0)
+  _TK_UNIQUE=$(grep '^R|' "$_TK_EVENTS" 2>/dev/null | cut -d'|' -f2 | sort -u | wc -l 2>/dev/null || echo 0)
+  _TK_UNIQUE="${_TK_UNIQUE## }"
+  _TK_REPEATED=$(( _TK_READS - _TK_UNIQUE ))
+  [[ $_TK_REPEATED -lt 0 ]] && _TK_REPEATED=0
+  _TK_COST=$(awk -F'|' '{sum += $3} END {print sum+0}' "$_TK_EVENTS" 2>/dev/null || echo 0)
+  _TK_NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+  # Write session ledger JSON
+  cat > "$_TK_LEDGER" <<TKEOF
+{
+  "finalized": "$_TK_NOW",
+  "reads": $_TK_READS,
+  "writes": $_TK_WRITES,
+  "unique_files_read": $_TK_UNIQUE,
+  "repeated_reads": $_TK_REPEATED,
+  "estimated_context_cost": $_TK_COST
+}
+TKEOF
+
+  # Merge into lifetime summary
+  # NOTE: JSON parsing duplicated from intel.sh _intel_json_int — Stop.sh can't source intel.sh
+  # (different execution context). Keep both in sync if schema changes.
+  _TK_P_SESS=0 _TK_P_RD=0 _TK_P_WR=0 _TK_P_REP=0 _TK_P_COST=0
+  if [[ -f "$_TK_SUMMARY" ]]; then
+    _TK_P_SESS=$(grep -o '"total_sessions"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _TK_P_RD=$(grep -o '"total_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _TK_P_WR=$(grep -o '"total_writes"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _TK_P_REP=$(grep -o '"total_repeated_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _TK_P_COST=$(grep -o '"total_estimated_cost"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+  fi
+
+  mkdir -p ".agentic/intel" 2>/dev/null || true
+  cat > "$_TK_SUMMARY" <<TKEOF
+{
+  "total_sessions": $(( _TK_P_SESS + 1 )),
+  "total_reads": $(( _TK_P_RD + _TK_READS )),
+  "total_writes": $(( _TK_P_WR + _TK_WRITES )),
+  "total_repeated_reads": $(( _TK_P_REP + _TK_REPEATED )),
+  "total_estimated_cost": $(( _TK_P_COST + _TK_COST )),
+  "last_updated": "$_TK_NOW"
+}
+TKEOF
+
+  echo "📊 Session: ${_TK_READS} reads (${_TK_REPEATED} repeated), ${_TK_WRITES} writes, ~${_TK_COST} est. tokens" >&2
+
+  # Clean up events log
+  rm -f "$_TK_EVENTS"
+fi
+
 # --- Deregister session (F-0195: multi-session collision prevention) ---
 AGENTIC_LIB="$PROJECT_ROOT/.agentic/lib"
 if [[ -f "$AGENTIC_LIB/tools/agents_helpers.py" ]]; then

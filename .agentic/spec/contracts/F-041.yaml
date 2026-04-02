@@ -79,3 +79,68 @@ assertions:
       memory-seed, 4 skills) contain trigger for auto-capturing user corrections
       via ag intel remember
     type: structural
+
+  # --- Phase 2: Anatomy + Token Ledger ---
+  - id: AC-012
+    text: >
+      `ag intel scan` walks project files, estimates token count via char-count
+      ratio, extracts one-line summaries, and writes anatomy.yaml (git-tracked)
+      plus anatomy.index (gitignored flat key-value for fast hook lookup)
+    type: behavioral
+
+  - id: AC-013
+    text: >
+      anatomy.yaml at .agentic/intel/anatomy.yaml has version, generated timestamp,
+      and files[] array where each entry has path, summary, tokens (estimated),
+      language, and related[] array
+    type: structural
+
+  - id: AC-014
+    text: >
+      `ag intel scan --check` exits 1 if anatomy.yaml is stale (project files
+      changed since last scan timestamp) or missing, exits 0 if fresh
+    type: behavioral
+
+  - id: AC-015
+    text: >
+      `ag intel file PATH` returns file summary, estimated tokens, language,
+      and related files from anatomy.index in <50ms via pure bash grep
+    type: behavioral
+
+  - id: AC-016
+    text: >
+      token-ledger.json at .agentic/session/token-ledger.json (gitignored)
+      tracks per-session read count, write count, unique files, repeated reads,
+      and estimated context cost
+    type: structural
+
+  - id: AC-017
+    text: >
+      token-summary.json at .agentic/intel/token-summary.json (git-tracked)
+      aggregates lifetime stats: total sessions, total reads, total writes,
+      repeated reads prevented, and last updated timestamp
+    type: structural
+
+  - id: AC-018
+    text: >
+      `ag intel stats` displays session metrics (if token-ledger.json exists)
+      and lifetime aggregated metrics (from token-summary.json)
+    type: behavioral
+
+  - id: AC-019
+    text: >
+      PostToolUse.sh increments read/write counters in token-ledger.json after
+      Read, Write, Edit, and MultiEdit tool operations using pure bash
+    type: behavioral
+
+  - id: AC-020
+    text: >
+      Stop.sh finalizes session token-ledger.json and merges counts into
+      token-summary.json aggregated lifetime stats
+    type: behavioral
+
+  - id: AC-021
+    text: >
+      .gitignore includes .agentic/intel/anatomy.index; .agentic/session/
+      already covers token-ledger.json
+    type: structural

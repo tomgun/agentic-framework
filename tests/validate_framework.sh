@@ -5762,6 +5762,183 @@ else
   fail "F-040 AC-011: dry-run support missing"
 fi
 
+# F-041: Intelligence Engine
+# Phase 1: Patterns + Cerebrum (AC-001 through AC-011)
+# Phase 2: Anatomy + Token Ledger (AC-012 through AC-021)
+
+echo ""
+echo "--- F-041: Intelligence Engine ---"
+
+# Phase 1 structural checks
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/intel/patterns.yaml" ]] && \
+   grep -q "^version: 1" "${FRAMEWORK_ROOT}/.agentic/intel/patterns.yaml" && \
+   grep -q "^patterns:" "${FRAMEWORK_ROOT}/.agentic/intel/patterns.yaml" && \
+   grep -q "id:" "${FRAMEWORK_ROOT}/.agentic/intel/patterns.yaml" && \
+   grep -q "text:" "${FRAMEWORK_ROOT}/.agentic/intel/patterns.yaml" && \
+   grep -q "scope:" "${FRAMEWORK_ROOT}/.agentic/intel/patterns.yaml" && \
+   grep -q "severity:" "${FRAMEWORK_ROOT}/.agentic/intel/patterns.yaml"; then
+  pass "F-041 AC-001: patterns.yaml structure (version, patterns[], id, text, scope, severity)"
+else
+  fail "F-041 AC-001: patterns.yaml missing or invalid structure"
+fi
+
+if grep -q '_intel_learn' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'learn)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-002: ag intel learn command implemented"
+else
+  fail "F-041 AC-002: ag intel learn missing"
+fi
+
+if grep -q '_intel_check' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'check)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-003: ag intel check command implemented"
+else
+  fail "F-041 AC-003: ag intel check missing"
+fi
+
+if grep -q '_intel_patterns' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'patterns)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-004: ag intel patterns command implemented"
+else
+  fail "F-041 AC-004: ag intel patterns missing"
+fi
+
+if grep -q 'patterns.yaml' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh" && \
+   grep -q '_ptn_match\|_PTN_WARNS' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then
+  pass "F-041 AC-005: PreToolUse.sh pattern check for Write/Edit"
+else
+  fail "F-041 AC-005: PreToolUse.sh pattern check missing"
+fi
+
+if grep -q 'intel)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" && \
+   grep -q 'cmd_intel' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "F-041 AC-006: intel command dispatched from ag.sh"
+else
+  fail "F-041 AC-006: intel dispatch missing from ag.sh"
+fi
+
+if grep -q 'intel' "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh" 2>/dev/null || \
+   grep -q '.agentic/intel' "${FRAMEWORK_ROOT}/.agentic/lib/tools/upgrade.sh" 2>/dev/null; then
+  pass "F-041 AC-007: upgrade.sh creates .agentic/intel/"
+else
+  warn "F-041 AC-007: upgrade.sh intel directory creation not found"
+fi
+
+if grep -q '_intel_remember' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'remember)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-008: ag intel remember command implemented"
+else
+  fail "F-041 AC-008: ag intel remember missing"
+fi
+
+if grep -q '_intel_cerebrum' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'cerebrum)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-009: ag intel cerebrum command implemented"
+else
+  fail "F-041 AC-009: ag intel cerebrum missing"
+fi
+
+if grep -q '_intel_forget' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'forget)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-010: ag intel forget command implemented"
+else
+  fail "F-041 AC-010: ag intel forget missing"
+fi
+
+# AC-011: Instruction files contain ag intel remember trigger
+_INTEL_TRIGGER_COUNT=0
+grep -q 'ag intel remember\|intel remember' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" 2>/dev/null && ((_INTEL_TRIGGER_COUNT++)) || true
+grep -q 'ag intel remember\|intel remember' "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/cursorrules.txt" 2>/dev/null && ((_INTEL_TRIGGER_COUNT++)) || true
+grep -q 'ag intel remember\|intel remember' "${FRAMEWORK_ROOT}/.agentic/lib/init/memory-seed.md" 2>/dev/null && ((_INTEL_TRIGGER_COUNT++)) || true
+if [[ $_INTEL_TRIGGER_COUNT -ge 2 ]]; then
+  pass "F-041 AC-011: ag intel remember trigger in ${_INTEL_TRIGGER_COUNT} instruction files"
+else
+  warn "F-041 AC-011: ag intel remember trigger only in ${_INTEL_TRIGGER_COUNT} instruction files (need ≥2)"
+fi
+
+# Phase 2: Anatomy + Token Ledger
+echo ""
+echo "  --- Phase 2: Anatomy + Token Ledger ---"
+
+if grep -q '_intel_scan' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'scan)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'anatomy.yaml' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'anatomy.index' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-012: ag intel scan generates anatomy.yaml + anatomy.index"
+else
+  fail "F-041 AC-012: ag intel scan missing"
+fi
+
+if grep -q 'ANATOMY_FILE' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'file_count' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q '_intel_detect_language' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q '_intel_extract_summary' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-013: anatomy.yaml structure (version, generated, file_count, files[])"
+else
+  fail "F-041 AC-013: anatomy.yaml structure incomplete"
+fi
+
+if grep -q '_intel_scan_check' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q '\-\-check' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'stale\|fresh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-014: ag intel scan --check freshness detection"
+else
+  fail "F-041 AC-014: scan --check missing"
+fi
+
+if grep -q '_intel_file' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'file)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'ANATOMY_INDEX' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-015: ag intel file PATH lookup from anatomy.index"
+else
+  fail "F-041 AC-015: ag intel file missing"
+fi
+
+if grep -q 'token-ledger.json' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'TOKEN_LEDGER\|TOKEN_EVENTS' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-016: token-ledger tracking defined"
+else
+  fail "F-041 AC-016: token-ledger tracking missing"
+fi
+
+if grep -q 'token-summary.json' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'TOKEN_SUMMARY' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-017: token-summary.json aggregation defined"
+else
+  fail "F-041 AC-017: token-summary.json missing"
+fi
+
+if grep -q '_intel_stats' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'stats)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q '_intel_show_session_stats' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q '_intel_show_lifetime_stats' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-018: ag intel stats displays session + lifetime metrics"
+else
+  fail "F-041 AC-018: ag intel stats missing"
+fi
+
+if grep -q 'token-events.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh" && \
+   grep -q '_POST_TOOL\|_TK_EVENTS' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh"; then
+  pass "F-041 AC-019: PostToolUse.sh tracks read/write events"
+else
+  fail "F-041 AC-019: PostToolUse.sh token tracking missing"
+fi
+
+if grep -q 'token-events.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/stop.sh" && \
+   grep -q 'token-summary.json' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/stop.sh" && \
+   grep -q 'token-ledger.json' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/stop.sh"; then
+  pass "F-041 AC-020: Stop.sh finalizes ledger + merges summary"
+else
+  fail "F-041 AC-020: Stop.sh token finalization missing"
+fi
+
+if grep -q 'anatomy.index' "${FRAMEWORK_ROOT}/.gitignore" && \
+   grep -q 'token-ledger.json\|\.agentic/session/' "${FRAMEWORK_ROOT}/.gitignore"; then
+  pass "F-041 AC-021: .gitignore includes anatomy.index + session entries"
+else
+  fail "F-041 AC-021: .gitignore missing anatomy.index or session entries"
+fi
+
 # Summary
 
 # ============================================================

@@ -4877,3 +4877,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 18:05 - F-041 Phase 2: Anatomy + Token Ledger
+
+**Why**: File intelligence and session metrics — agents can now check file summaries/tokens before reading, and sessions track context cost
+
+**What changed**:
+- ag intel scan/file/stats commands, PostToolUse token tracking, Stop.sh finalization, 18 tests + 21 ACs
+
+**Next steps**:
+- Phase 3: Bootstrap + Quality Intelligence
+
+**Blockers**: None
+
