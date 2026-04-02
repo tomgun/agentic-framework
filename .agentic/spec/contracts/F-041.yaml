@@ -240,6 +240,7 @@ assertions:
       filter [formal] tagged quality-checklist items in Discovery mode
       and rename spec_adherence dimension to intent_adherence
     type: behavioral
+    verify: bash -c 'grep -q "\\[formal\\]" .agentic/lib/tools/commands/intel.sh && grep -q "intent_adherence" .agentic/lib/tools/commands/intel.sh'
 
   - id: AC-034
     text: >

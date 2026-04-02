@@ -1594,7 +1594,7 @@ _intel_quality_for_phase() {
         return 0
     fi
 
-    local current_dimension="" in_phase=false in_dimensions=false
+    local current_dimension="" prev_dimension="" in_phase=false in_dimensions=false
     local item_count=0
 
     while IFS= read -r line; do
@@ -1642,6 +1642,16 @@ _intel_quality_for_phase() {
 
     if [[ $item_count -eq 0 ]]; then
         echo -e "  ${DIM}No items found for phase: ${phase}${NC}"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# _intel_fmt_error_pattern — callback for _intel_each_pattern, prints error-severity patterns
+# ---------------------------------------------------------------------------
+_intel_fmt_error_pattern() {
+    local _id="$1" _text="$2" _reason="$3" _scope="$4" _severity="$5"
+    if [[ "$_severity" == "error" ]]; then
+        echo -e "  ${RED}⛔${NC} ${_text} ${DIM}[${_scope}]${NC}"
     fi
 }
 
@@ -1715,14 +1725,16 @@ _intel_architecture() {
     echo ""
 
     if [[ -f "$NFR_FILE" ]]; then
-        # Show NFR entries (headings + first line)
-        local nfr_count=0
+        # Show NFR entries (heading + first content line only)
+        local nfr_count=0 nfr_showed_content=false
         while IFS= read -r line; do
             if [[ "$line" =~ ^##[[:space:]] ]]; then
                 nfr_count=$((nfr_count + 1))
+                nfr_showed_content=false
                 echo -e "  ${BOLD}${line#\#\# }${NC}"
-            elif [[ $nfr_count -gt 0 && -n "$line" && "$line" != "---" && ! "$line" =~ ^# ]]; then
+            elif ! $nfr_showed_content && [[ $nfr_count -gt 0 && -n "$line" && "$line" != "---" && ! "$line" =~ ^# && ! "$line" =~ ^- ]]; then
                 echo -e "  ${DIM}${line}${NC}"
+                nfr_showed_content=true
                 echo ""
             fi
         done < "$NFR_FILE"
@@ -1838,16 +1850,13 @@ _intel_spec() {
 
     if [[ -d "$CONTRACTS_DIR" ]]; then
         local contract_count=0 total_behavioral=0 total_structural=0
-        for cf in "$CONTRACTS_DIR"/*.yaml; do
-            [[ ! -f "$cf" ]] && continue
-            contract_count=$((contract_count + 1))
-            local b s
-            b=$(grep -c "type: behavioral" "$cf" 2>/dev/null || echo 0)
-            s=$(grep -c "type: structural" "$cf" 2>/dev/null || echo 0)
-            total_behavioral=$((total_behavioral + b))
-            total_structural=$((total_structural + s))
-        done
-        echo -e "  ${contract_count} contracts, ${total_behavioral} behavioral + ${total_structural} structural assertions"
+        contract_count=$(ls "$CONTRACTS_DIR"/*.yaml 2>/dev/null | wc -l)
+        contract_count="${contract_count## }"
+        total_behavioral=$(grep -rl "type: behavioral" "$CONTRACTS_DIR"/*.yaml 2>/dev/null | wc -l)
+        total_behavioral="${total_behavioral## }"
+        total_structural=$(grep -rl "type: structural" "$CONTRACTS_DIR"/*.yaml 2>/dev/null | wc -l)
+        total_structural="${total_structural## }"
+        echo -e "  ${contract_count} contracts, ${total_behavioral} with behavioral + ${total_structural} with structural assertions"
         echo -e "  ${DIM}Tip: Review existing contracts for AC style consistency${NC}"
     else
         echo -e "  ${DIM}No contracts directory${NC}"
@@ -1950,16 +1959,13 @@ _intel_implement() {
         echo -e "  ${pattern_count} active patterns (checked at write-time by hook)"
         echo ""
         # Show error-severity patterns as most critical
-        local errors=0
-        _show_error_pattern() {
-            local _id="$1" _text="$2" _reason="$3" _scope="$4" _severity="$5"
-            if [[ "$_severity" == "error" ]]; then
-                echo -e "  ${RED}⛔${NC} ${_text} ${DIM}[${_scope}]${NC}"
-                errors=$((errors + 1))
-            fi
-        }
-        _intel_each_pattern _show_error_pattern
-        [[ $errors -eq 0 ]] && echo -e "  ${DIM}No error-severity patterns${NC}"
+        local error_lines
+        error_lines=$(_intel_each_pattern _intel_fmt_error_pattern)
+        if [[ -n "$error_lines" ]]; then
+            echo "$error_lines"
+        else
+            echo -e "  ${DIM}No error-severity patterns${NC}"
+        fi
         echo ""
         echo -e "  ${DIM}Run \`ag intel patterns\` for full list${NC}"
     else

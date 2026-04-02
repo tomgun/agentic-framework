@@ -371,6 +371,25 @@ echo "$output" | grep -qv "Formal spec review process" && pass "filters [formal]
 # Check intent_adherence rename
 echo "$output" | grep -q "intent_adherence" && pass "renames spec_adherence to intent_adherence" || fail "missing intent_adherence rename" ""
 
+# --- Test 9: Graceful degradation with missing files ---
+echo ""
+echo "Test 9: Missing files handled gracefully"
+
+# Remove FEATURES.md and NFR.md
+mv "$TMP_DIR/.agentic/spec/FEATURES.md" "$TMP_DIR/.agentic/spec/FEATURES.md.bak"
+mv "$TMP_DIR/.agentic/spec/NFR.md" "$TMP_DIR/.agentic/spec/NFR.md.bak"
+
+output=$(run_intel "$TMP_DIR" "_intel_spec" "F-099")
+echo "$output" | grep -q "No FEATURES.md found" && pass "spec: graceful without FEATURES.md" || fail "spec: no graceful msg for missing FEATURES.md" ""
+echo "$output" | grep -q "No NFR.md" && pass "spec: graceful without NFR.md" || fail "spec: no graceful msg for missing NFR.md" ""
+
+output=$(run_intel "$TMP_DIR" "_intel_architecture")
+echo "$output" | grep -q "No NFR.md found" && pass "architecture: graceful without NFR.md" || fail "architecture: no graceful msg" ""
+
+# Restore
+mv "$TMP_DIR/.agentic/spec/FEATURES.md.bak" "$TMP_DIR/.agentic/spec/FEATURES.md"
+mv "$TMP_DIR/.agentic/spec/NFR.md.bak" "$TMP_DIR/.agentic/spec/NFR.md"
+
 # --- Summary ---
 echo ""
 echo "======================================="

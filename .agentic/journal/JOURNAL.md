@@ -4955,3 +4955,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 21:00 - F-041 review fixes
+
+**Why**: Code review findings
+
+**What changed**:
+- Fixed 6 code issues from review: prev_dimension scope leak, error pattern callback, contract loop O(n), AC-033 verify, NFR parsing, missing-file tests
+
+**Next steps**:
+- Merge PR
+
+**Blockers**: None
+
