@@ -4916,3 +4916,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 20:30 - F-041 Phase 4 docs
+
+**Why**: Intelligence engine docs were missing from framework documentation
+
+**What changed**:
+- Updated 4 framework docs with intelligence engine content (OVERVIEW, FRAMEWORK_MAP, HOW_IT_WORKS, DEVELOPER_GUIDE)
+
+**Next steps**:
+- Create PR
+
+**Blockers**: None
+

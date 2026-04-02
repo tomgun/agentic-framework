@@ -480,6 +480,39 @@ flowchart TB
 
 ---
 
+## Intelligence Engine (v0.77.0)
+
+The intelligence engine (F-041) makes the framework smarter than vanilla Claude by providing domain-specific, stack-aware guidance at every workflow phase. It stores project intelligence in `.agentic/intel/` and surfaces it through `ag intel` subcommands.
+
+### What it stores
+
+| File | Purpose | How populated |
+|---|---|---|
+| `patterns.yaml` | Machine-matchable anti-patterns with scope globs | `ag intel learn` or `ag intel bootstrap` |
+| `cerebrum.yaml` | Project-scoped preferences, learnings, decisions | `ag intel remember` (auto-captured from user corrections) |
+| `anatomy.yaml` | File summaries, token estimates, language detection | `ag intel scan` |
+| `quality-checklist.yaml` | 5 quality dimensions × 4 workflow phases | `ag intel bootstrap` |
+| `test-strategy.yaml` | Test levels with framework, patterns, antipatterns | `ag intel bootstrap` |
+| `token-summary.json` | Lifetime token usage metrics | Auto-aggregated by hooks |
+
+### How it integrates
+
+**Write-time enforcement**: PreToolUse hooks check `patterns.yaml` before every Write/Edit, warning agents about matching anti-patterns. Pure bash, <50ms.
+
+**Token tracking**: PostToolUse hooks track read/write counts; Stop hooks aggregate to lifetime metrics.
+
+**Phase-aware queries**: Four commands surface relevant intelligence at each workflow phase:
+- `ag intel architecture` — ADRs, NFRs, quality-checklist[planning] (used by planning-features skill)
+- `ag intel spec [F-XXXX]` — feature overlap, contract patterns, quality-checklist[spec] (used by writing-specs skill)
+- `ag intel implement [F-XXXX]` — conventions, patterns, lessons, quality-checklist[implementation] (used by implementing-features skill)
+- `ag intel test [F-XXXX]` — test strategy, infrastructure, quality-checklist[testing] (used by writing-tests skill)
+
+**Discovery mode**: All commands work with zero arguments. Items tagged `[formal]` are filtered. `spec_adherence` is renamed to `intent_adherence`.
+
+**Bootstrap + Retro**: `ag intel bootstrap` reads STACK.md + scans the codebase to generate stack-specific intelligence. `ag intel retro` analyzes ISSUES.md + LESSONS.md to suggest new patterns from project history.
+
+---
+
 ## Coordination Server (v0.53.0)
 
 The coordination server (F-018) provides a network-accessible JSON-RPC API for parallel agent coordination, remote review approval, and mobile status monitoring.
@@ -1136,6 +1169,9 @@ These will always rely on behavioral reinforcement:
 
 ### Quality Gates
 `pre-commit-check.sh`, `doctor.py`/`doctor.sh`, `validate_specs.py`, `validate_framework.sh` (tests), `integration_verify.py`
+
+### Intelligence Engine
+`intel.sh` (patterns, cerebrum, anatomy, bootstrap, retro, architecture, spec, implement, test, stats)
 
 ### Analysis & Traceability
 `coverage.py`, `drift.sh`, `scope_check.sh`, `consistency.py`, `phase_detect.py`, `query_features.py`, `feature_graph.py`, `deps.py`, `whatchanged.py`, `session-analyze.py`
