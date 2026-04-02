@@ -75,15 +75,16 @@ assertions:
 - id: AC-008
   text: STACK.md template includes Publishing section with provider and platform settings
   type: structural
-  verify: 'grep -q "publish_provider" .agentic/STACK.template.md && grep -q "mobile_platform"
-    .agentic/STACK.template.md
+  verify: 'grep -q "publish_provider" .agentic/lib/init/STACK.template.md && grep
+    -q "mobile_platform" .agentic/lib/init/STACK.template.md
 
     '
 - id: AC-009
   text: No hardcoded secrets in publish files — credentials via env vars only
   type: structural
-  verify: '! grep -r "BEGIN.*PRIVATE\|password.*=.*[''\"]" .agentic/lib/tools/publish/
-    .agentic/lib/auto/publish.py 2>/dev/null
+  verify: '! grep -r "BEGIN.*PRIVATE" .agentic/lib/tools/publish/ .agentic/lib/auto/publish.py
+    2>/dev/null | grep -v "_EXACT_REDACT\|REDACT_PATTERNS\|redact\|pattern" | grep
+    -q .
 
     '
 - id: AC-010

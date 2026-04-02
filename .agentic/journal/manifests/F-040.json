@@ -1,0 +1,22 @@
+{
+  "feature": "F-040",
+  "mode": "feature",
+  "generated": "2026-04-02T13:23:33Z",
+  "commits": [
+    {"hash": "1d2ad22f", "date": "2026-04-02", "message": "feat(F-040): app store publishing pipeline (#217)", "additions": 2055, "deletions": 1},
+    {"hash": "5128a28a", "date": "2026-04-02", "message": "fix(F-040): address code review findings", "additions": 61, "deletions": 64},
+    {"hash": "3fa3c36c", "date": "2026-04-01", "message": "feat(F-040): add app store publishing pipeline", "additions": 2058, "deletions": 1}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/lib/auto/publish.py"}, {"file": ".agentic/lib/tools/ag.sh"}, {"file": ".agentic/lib/tools/commands/help.sh"}, {"file": ".agentic/lib/tools/commands/publish.sh"}, {"file": ".agentic/lib/tools/publish/_common.sh"}, {"file": ".agentic/lib/tools/publish/detect.sh"}, {"file": ".agentic/lib/tools/publish/init-publish.sh"}, {"file": ".agentic/lib/tools/publish/metadata.sh"}, {"file": ".agentic/lib/tools/publish/preflight.sh"}, {"file": ".agentic/lib/tools/publish/providers/custom.sh"}, {"file": ".agentic/lib/tools/publish/providers/fastlane.sh"}, {"file": ".agentic/lib/tools/publish/screenshots.sh"}, {"file": ".agentic/lib/tools/publish/status.sh"}],
+    "tests": [{"file": ".agentic/spec/FEATURES.md"}, {"file": ".agentic/spec/contracts/F-040.yaml"}, {"file": "tests/validate_framework.sh"}],
+    "docs": [{"file": ".agentic/STATUS.md"}, {"file": ".agentic/journal/JOURNAL.md"}, {"file": ".agentic/journal/plans/2026-03-31-F-040-plan.md"}, {"file": ".agentic/lib/init/STACK.template.md"}, {"file": ".agentic/spec/FEATURES.md"}, {"file": ".claude/skills/publishing-app/SKILL.md"}],
+    "config": [{"file": ".agentic/lib/init/publish.template.yaml"}, {"file": ".agentic/spec/contracts/F-040.yaml"}]
+  },
+  "stats": {
+    "total_commits": 3,
+    "total_files": 22,
+    "additions": 4174,
+    "deletions": 66
+  }
+}

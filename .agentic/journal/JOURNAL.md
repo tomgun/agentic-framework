@@ -4799,3 +4799,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-02 13:23 - F-040 shipped
+
+**Why**: Post-merge completion ceremony
+
+**What changed**:
+- PR #217 merged, F-040 App Store Publishing shipped. 12/12 contract assertions pass.
+
+**Next steps**:
+- Next backlog item: F-037 MCP Coordination Server
+
+**Blockers**: None
+
+
+### Session: 2026-04-02 13:24 - F-040 state flush
+
+**Why**: Post-merge state flush
+
+**What changed**:
+- Post-merge: F-040 shipped, contract fixes, VERSION bump
+
+**Next steps**:
+- F-037 MCP Coordination Server
+
+**Blockers**: None
+

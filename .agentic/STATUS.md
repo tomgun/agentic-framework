@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-040: App Store Publishing — PR ready (Updated: 2026-04-01 08:03 UTC)
+- F-040 shipped. Next: F-037 MCP Coordination Server (Updated: 2026-04-02 13:23 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

@@ -1,0 +1,22 @@
+{
+  "feature": "F-0100",
+  "mode": "feature",
+  "generated": "2026-03-31T16:36:56Z",
+  "commits": [
+    {"hash": "0fd53d0a", "date": "2026-01-27", "message": "Merge pull request #11 from tomgun/feat/deferred-optimizations", "additions": 0, "deletions": 0},
+    {"hash": "b3fa8873", "date": "2026-01-27", "message": "fix: Renumber F-0099/F-0100 to F-0101/F-0102 to avoid ID conflict", "additions": 59, "deletions": 58},
+    {"hash": "7be559bb", "date": "2026-01-27", "message": "feat(framework): Add F-0099 ADRs and F-0100 Modular Guidelines", "additions": 1088, "deletions": 115}
+  ],
+  "files": {
+    "code": [{"file": ".agentic/tools/status.sh"}],
+    "tests": [{"file": "spec/FEATURES.md"}, {"file": "spec/acceptance/F-0099.md"}, {"file": "spec/acceptance/F-0100.md"}, {"file": "spec/acceptance/F-0101.md"}, {"file": "spec/acceptance/F-0102.md"}, {"file": "spec/migrations/001_add_f0099_framework_adrs_and_f0100_modular_guidelines.md"}, {"file": "spec/migrations/001_add_f0101_framework_adrs_and_f0102_modular_guidelines.md"}, {"file": "spec/migrations/_index.json"}],
+    "docs": [{"file": ".agentic/FRAMEWORK_QUICK_START.md"}, {"file": ".agentic/agents/shared/guidelines/README.md"}, {"file": ".agentic/agents/shared/guidelines/multi-agent.md"}, {"file": ".agentic/agents/shared/guidelines/small-batch.md"}, {"file": ".agentic/agents/shared/guidelines/token-efficiency.md"}, {"file": ".agentic/agents/shared/guidelines/wip-tracking.md"}, {"file": "CHANGELOG.md"}, {"file": "CONTEXT_PACK.md"}, {"file": "CONTRIBUTIONS.md"}, {"file": "JOURNAL.md"}, {"file": "STATUS.md"}, {"file": "docs/adr/001-claude-md-self-contained.md"}, {"file": "docs/adr/README.md"}, {"file": "spec/FEATURES.md"}, {"file": "spec/acceptance/F-0099.md"}, {"file": "spec/acceptance/F-0100.md"}, {"file": "spec/acceptance/F-0101.md"}, {"file": "spec/acceptance/F-0102.md"}, {"file": "spec/migrations/001_add_f0099_framework_adrs_and_f0100_modular_guidelines.md"}, {"file": "spec/migrations/001_add_f0101_framework_adrs_and_f0102_modular_guidelines.md"}],
+    "config": [{"file": "spec/migrations/_index.json"}]
+  },
+  "stats": {
+    "total_commits": 6,
+    "total_files": 23,
+    "additions": 1147,
+    "deletions": 173
+  }
+}
