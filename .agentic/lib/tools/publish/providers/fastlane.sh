@@ -4,7 +4,9 @@
 # Sourced by the orchestrator — functions, not a standalone script.
 
 provider_capabilities() {
-    echo "build screenshots metadata submit status"
+    # Note: 'status' omitted — fastlane has no programmatic review-status API.
+    # Users check App Store Connect / Play Console directly.
+    echo "build screenshots metadata submit"
 }
 
 provider_preflight() {

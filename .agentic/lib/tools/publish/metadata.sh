@@ -6,9 +6,11 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="${PROJECT_ROOT:-$(cd "$SCRIPT_DIR/../../.." && pwd)}"
+
+# Shared helpers (get_provider, PUBLISH_ROOT_DIR, PUBLISH_STACK_FILE)
+source "$SCRIPT_DIR/_common.sh"
+ROOT_DIR="$PUBLISH_ROOT_DIR"
 PUBLISH_CONFIG="$ROOT_DIR/.agentic/publish.yaml"
-STACK_FILE="$ROOT_DIR/STACK.md"
 
 # Colors
 RED='\033[0;31m'
@@ -22,14 +24,6 @@ WARNINGS=0
 pass() { echo -e "  ${GREEN}✓${NC} $1"; }
 warn() { echo -e "  ${YELLOW}⚠${NC} $1"; WARNINGS=$((WARNINGS + 1)); }
 fail() { echo -e "  ${RED}✗${NC} $1"; ERRORS=$((ERRORS + 1)); }
-
-get_provider() {
-    local provider=""
-    if [[ -f "$STACK_FILE" ]]; then
-        provider=$(grep -E '^\s*-\s*publish_provider:' "$STACK_FILE" | head -1 | sed 's/.*publish_provider:\s*//' | sed 's/#.*//' | tr -d '[:space:]')
-    fi
-    echo "${provider:-fastlane}"
-}
 
 validate_ios_metadata() {
     echo "iOS metadata checks:"

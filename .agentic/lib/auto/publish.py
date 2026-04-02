@@ -14,7 +14,6 @@ import json
 import os
 import subprocess
 import sys
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -32,24 +31,26 @@ PUBLISH_STATE_FILENAME = "publish-state.json"
 PHASES = ["preflight", "build", "screenshots", "metadata", "submit", "monitor"]
 PHASE_STATUS = ("pending", "running", "passed", "failed", "skipped")
 
-# Credential patterns to redact from provider output
-REDACT_PATTERNS = [
-    "-----BEGIN",
-    "-----END",
-    "PRIVATE KEY",
-    "api_key",
-    "password",
-    "secret",
-    "token",
-]
+# Credential patterns to redact from provider output.
+# Uses exact substrings for structured markers (PEM boundaries, key IDs) and
+# key=value / key: value patterns for generic terms to avoid false positives
+# on lines like "Generating auth token..." or "Checking password requirements".
+_EXACT_REDACT = ["-----BEGIN", "-----END", "PRIVATE KEY"]
+_KV_REDACT_KEYS = ["api_key", "password", "secret", "token", "credential"]
+import re
+_KV_PATTERN = re.compile(
+    r"(?:^|[&?])\s*(?:" + "|".join(re.escape(k) for k in _KV_REDACT_KEYS) + r")\s*[:=]",
+    re.IGNORECASE,
+)
 
 
 def _redact_line(line: str) -> str:
     """Redact lines that match credential patterns."""
-    lower = line.lower()
-    for pattern in REDACT_PATTERNS:
-        if pattern.lower() in lower:
+    for exact in _EXACT_REDACT:
+        if exact in line:
             return "[REDACTED]"
+    if _KV_PATTERN.search(line):
+        return "[REDACTED]"
     return line
 
 

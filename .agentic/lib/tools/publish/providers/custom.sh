@@ -87,6 +87,8 @@ _run_custom() {
     fi
 
     echo "Running $label: $cmd"
+    # Trust boundary: $cmd comes from the project's own publish.yaml, which is
+    # committed to the repo and controlled by the project owner — not external input.
     (cd "$CUSTOM_ROOT" && bash -c "$cmd")
 }
 

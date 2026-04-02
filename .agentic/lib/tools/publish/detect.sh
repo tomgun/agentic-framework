@@ -50,10 +50,8 @@ detect_from_files() {
     fi
 
     # Native iOS
-    local has_ios=false
     if compgen -G "$ROOT_DIR/*.xcodeproj" >/dev/null 2>&1 || \
        compgen -G "$ROOT_DIR/*.xcworkspace" >/dev/null 2>&1; then
-        has_ios=true
         platforms+=("ios")
     fi
 
@@ -79,19 +77,19 @@ main() {
         detect)
             local platforms
             if platforms=$(detect_from_stack); then
-                echo -e "${GREEN}Platform (from STACK.md):${NC} $platforms"
+                echo -e "${GREEN}Platform (from STACK.md):${NC} $platforms" >&2
                 echo "$platforms"
                 exit 0
             fi
 
             if platforms=$(detect_from_files); then
-                echo -e "${GREEN}Platform (auto-detected):${NC} $platforms"
+                echo -e "${GREEN}Platform (auto-detected):${NC} $platforms" >&2
                 echo "$platforms"
                 exit 0
             fi
 
-            echo -e "${RED}No mobile platform detected.${NC}"
-            echo "Set mobile_platform in STACK.md or ensure project files are present."
+            echo -e "${RED}No mobile platform detected.${NC}" >&2
+            echo "Set mobile_platform in STACK.md or ensure project files are present." >&2
             exit 1
             ;;
         --quiet|-q)

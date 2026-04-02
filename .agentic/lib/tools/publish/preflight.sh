@@ -7,8 +7,11 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="${PROJECT_ROOT:-$(cd "$SCRIPT_DIR/../../.." && pwd)}"
-STACK_FILE="$ROOT_DIR/STACK.md"
+
+# Shared helpers (get_provider, PUBLISH_ROOT_DIR, PUBLISH_STACK_FILE)
+source "$SCRIPT_DIR/_common.sh"
+ROOT_DIR="$PUBLISH_ROOT_DIR"
+STACK_FILE="$PUBLISH_STACK_FILE"
 
 # Colors
 RED='\033[0;31m'
@@ -45,14 +48,6 @@ check_env_file() {
     else
         fail "$label not set (export $var)"
     fi
-}
-
-get_provider() {
-    local provider="${PUBLISH_PROVIDER:-}"
-    if [[ -z "$provider" && -f "$STACK_FILE" ]]; then
-        provider=$(grep -E '^\s*-\s*publish_provider:' "$STACK_FILE" | head -1 | sed 's/.*publish_provider:\s*//' | sed 's/#.*//' | tr -d '[:space:]')
-    fi
-    echo "${provider:-fastlane}"
 }
 
 check_os() {

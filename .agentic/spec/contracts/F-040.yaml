@@ -101,8 +101,8 @@ assertions:
 
     '
 - id: AC-012
-  text: validate_framework.sh includes F-040 structural tests
+  text: validate_framework.sh includes at least 10 F-040 structural tests
   type: structural
-  verify: 'grep -q "F-040" tests/validate_framework.sh
+  verify: 'test "$(grep -c "F-040 AC-" tests/validate_framework.sh)" -ge 10
 
     '
