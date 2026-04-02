@@ -60,6 +60,15 @@ _No active items_
 
 
 
+
+### HN-0079: PR #219: F-041 Phase 2 — Anatomy + Token Ledger
+- **Type**: pr
+- **Added**: 2026-04-02
+- **Context**: Review and merge: https://github.com/tomgun/agentic-framework/pull/219
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0078: Review: F-041 → implementing
