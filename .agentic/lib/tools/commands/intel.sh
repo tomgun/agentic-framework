@@ -6,6 +6,12 @@
 INTEL_DIR="${ROOT_DIR}/.agentic/intel"
 PATTERNS_FILE="${INTEL_DIR}/patterns.yaml"
 CEREBRUM_FILE="${INTEL_DIR}/cerebrum.yaml"
+ANATOMY_FILE="${INTEL_DIR}/anatomy.yaml"
+ANATOMY_INDEX="${INTEL_DIR}/anatomy.index"
+TOKEN_SUMMARY="${INTEL_DIR}/token-summary.json"
+SESSION_DIR="${ROOT_DIR}/.agentic/session"
+TOKEN_EVENTS="${SESSION_DIR}/token-events.log"
+TOKEN_LEDGER="${SESSION_DIR}/token-ledger.json"
 
 _INTEL_VALID_SEVERITIES="error warning info"
 _INTEL_VALID_CEREBRUM_TYPES="preference learning decision"
@@ -22,6 +28,9 @@ cmd_intel() {
         remember) _intel_remember "$@" ;;
         cerebrum) _intel_cerebrum "$@" ;;
         forget)   _intel_forget "$@" ;;
+        scan)     _intel_scan "$@" ;;
+        file)     _intel_file "$@" ;;
+        stats)    _intel_stats "$@" ;;
         help|--help|-h) _intel_help ;;
         *)
             echo -e "${RED}Unknown intel subcommand: $subcmd${NC}"
@@ -45,7 +54,12 @@ _intel_help() {
     echo "  cerebrum [--type TYPE]    List cerebrum entries"
     echo "  forget C-XXXX             Remove a cerebrum entry"
     echo ""
-    echo "Files: ${PATTERNS_FILE} | ${CEREBRUM_FILE}"
+    echo "  ${BOLD}Anatomy${NC} (file intelligence)"
+    echo "  scan [--check]            Scan project files → anatomy.yaml + index"
+    echo "  file PATH                 Lookup file: summary, tokens, language"
+    echo ""
+    echo "  ${BOLD}Metrics${NC}"
+    echo "  stats [--session]         Show token metrics (session + lifetime)"
 }
 
 # ---------------------------------------------------------------------------
@@ -613,4 +627,427 @@ _intel_forget() {
         echo -e "${RED}Error: entry ${entry_id} not found${NC}"
         return 1
     fi
+}
+
+# ===========================================================================
+# Phase 2: Anatomy — File Intelligence
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# scan — generate anatomy.yaml + anatomy.index from project files
+# ---------------------------------------------------------------------------
+_intel_scan() {
+    local check_mode=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --check) check_mode=true ;;
+        esac
+        shift
+    done
+
+    if $check_mode; then
+        _intel_scan_check
+        return $?
+    fi
+
+    mkdir -p "$INTEL_DIR"
+
+    echo -e "${BOLD}Scanning project files...${NC}"
+
+    # Get file list (prefer git ls-files for .gitignore respect)
+    local file_list
+    if git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        file_list=$(cd "$ROOT_DIR" && git ls-files --cached --others --exclude-standard 2>/dev/null)
+    else
+        file_list=$(find "$ROOT_DIR" -type f \
+            -not -path "*/.git/*" \
+            -not -path "*/node_modules/*" \
+            -not -path "*/__pycache__/*" \
+            -not -path "*/.agentic/.cache/*" \
+            -not -path "*/.agentic/session/*" \
+            2>/dev/null | sed "s|^${ROOT_DIR}/||")
+    fi
+
+    local total_files=0 total_tokens=0
+    local timestamp
+    timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+    # Build in temp files, then move atomically
+    local tmp_yaml tmp_index
+    tmp_yaml=$(mktemp)
+    tmp_index=$(mktemp)
+
+    # Write YAML header (placeholder for file_count/total_tokens — updated at end)
+    cat > "$tmp_yaml" <<EOF
+version: 1
+generated: "$timestamp"
+file_count: 0
+total_tokens: 0
+files:
+EOF
+
+    while IFS= read -r filepath; do
+        [[ -z "$filepath" ]] && continue
+        [[ ! -f "${ROOT_DIR}/${filepath}" ]] && continue
+
+        # Skip binary / non-text files by extension
+        case "$filepath" in
+            *.png|*.jpg|*.jpeg|*.gif|*.ico|*.bmp|*.webp|*.svg) continue ;;
+            *.woff|*.woff2|*.ttf|*.eot|*.otf) continue ;;
+            *.mp3|*.mp4|*.avi|*.mov|*.wav|*.ogg) continue ;;
+            *.zip|*.tar|*.gz|*.bz2|*.xz|*.7z|*.rar) continue ;;
+            *.pyc|*.pyo|*.so|*.dylib|*.o|*.a|*.class) continue ;;
+            *.exe|*.dll|*.bin|*.dat) continue ;;
+            *.lock) continue ;;
+        esac
+
+        # Skip files > 500KB (likely generated)
+        local file_size
+        file_size=$(wc -c < "${ROOT_DIR}/${filepath}" 2>/dev/null || echo 0)
+        file_size="${file_size## }"
+        (( file_size > 512000 )) && continue
+
+        local lang summary tokens
+
+        # Language detection
+        lang=$(_intel_detect_language "$filepath")
+
+        # Token estimate: ~4 chars per token
+        tokens=$(( file_size / 4 ))
+
+        # Summary extraction
+        summary=$(_intel_extract_summary "${ROOT_DIR}/${filepath}" "$lang")
+        # Escape double quotes and backslashes for YAML
+        summary="${summary//\\/\\\\}"
+        summary="${summary//\"/\\\"}"
+
+        # Append to YAML
+        cat >> "$tmp_yaml" <<EOF
+  - path: "$filepath"
+    summary: "$summary"
+    tokens: $tokens
+    language: $lang
+    related: []
+EOF
+
+        # Append to index (tab-separated: path, summary, tokens, language)
+        printf '%s\t%s\t%d\t%s\n' "$filepath" "$summary" "$tokens" "$lang" >> "$tmp_index"
+
+        total_files=$((total_files + 1))
+        total_tokens=$((total_tokens + tokens))
+    done <<< "$file_list"
+
+    # Update counts in YAML header
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' "s/^file_count: 0/file_count: $total_files/" "$tmp_yaml"
+        sed -i '' "s/^total_tokens: 0/total_tokens: $total_tokens/" "$tmp_yaml"
+    else
+        sed -i "s/^file_count: 0/file_count: $total_files/" "$tmp_yaml"
+        sed -i "s/^total_tokens: 0/total_tokens: $total_tokens/" "$tmp_yaml"
+    fi
+
+    # Atomic move
+    mv "$tmp_yaml" "$ANATOMY_FILE"
+    mv "$tmp_index" "$ANATOMY_INDEX"
+
+    echo -e "${GREEN}✓ Scanned ${total_files} files (~${total_tokens} estimated tokens)${NC}"
+    echo -e "  ${DIM}${ANATOMY_FILE}${NC}"
+    echo -e "  ${DIM}${ANATOMY_INDEX} (gitignored, for fast lookup)${NC}"
+}
+
+_intel_scan_check() {
+    if [[ ! -f "$ANATOMY_FILE" ]]; then
+        echo -e "${RED}anatomy.yaml missing. Run: ag intel scan${NC}"
+        return 1
+    fi
+
+    # Check if any tracked files are newer than anatomy.yaml
+    local stale_files
+    stale_files=$(find "$ROOT_DIR" -type f \
+        -newer "$ANATOMY_FILE" \
+        -not -path "*/.git/*" \
+        -not -path "*/node_modules/*" \
+        -not -path "*/__pycache__/*" \
+        -not -path "*/.agentic/session/*" \
+        -not -path "*/.agentic/.cache/*" \
+        2>/dev/null | head -1)
+
+    if [[ -n "$stale_files" ]]; then
+        echo -e "${YELLOW}anatomy.yaml is stale (files changed since last scan)${NC}"
+        echo "Run: ag intel scan"
+        return 1
+    fi
+
+    echo -e "${GREEN}✓ anatomy.yaml is fresh${NC}"
+    return 0
+}
+
+# ---------------------------------------------------------------------------
+# Language detection from file extension
+# ---------------------------------------------------------------------------
+_intel_detect_language() {
+    local filepath="$1"
+    local ext="${filepath##*.}"
+    local basename="${filepath##*/}"
+
+    case "$ext" in
+        py)             echo "python" ;;
+        sh|bash|zsh)    echo "shell" ;;
+        js|mjs|cjs)     echo "javascript" ;;
+        ts|mts|cts)     echo "typescript" ;;
+        tsx)            echo "tsx" ;;
+        jsx)            echo "jsx" ;;
+        rb)             echo "ruby" ;;
+        go)             echo "go" ;;
+        rs)             echo "rust" ;;
+        java)           echo "java" ;;
+        kt|kts)         echo "kotlin" ;;
+        swift)          echo "swift" ;;
+        c|h)            echo "c" ;;
+        cpp|cc|cxx|hpp) echo "cpp" ;;
+        cs)             echo "csharp" ;;
+        yaml|yml)       echo "yaml" ;;
+        json)           echo "json" ;;
+        md)             echo "markdown" ;;
+        txt)            echo "text" ;;
+        toml)           echo "toml" ;;
+        cfg|ini|conf)   echo "config" ;;
+        html|htm)       echo "html" ;;
+        css)            echo "css" ;;
+        scss|sass|less)  echo "css" ;;
+        sql)            echo "sql" ;;
+        *)
+            case "$basename" in
+                Makefile|makefile|GNUmakefile) echo "makefile" ;;
+                Dockerfile*)                   echo "dockerfile" ;;
+                .gitignore|.gitattributes)     echo "config" ;;
+                *)                             echo "unknown" ;;
+            esac
+            ;;
+    esac
+}
+
+# ---------------------------------------------------------------------------
+# Extract a one-line summary from a file's first few lines
+# ---------------------------------------------------------------------------
+_intel_extract_summary() {
+    local filepath="$1" lang="$2"
+    local line=""
+
+    case "$lang" in
+        python|shell|yaml|config|toml|ruby|makefile)
+            # Hash-comment languages: first comment line (skip shebang)
+            line=$(head -10 "$filepath" 2>/dev/null | grep -m1 '^[[:space:]]*#[^!]' | sed 's/^[[:space:]]*#[[:space:]]*//')
+            ;;
+        javascript|typescript|tsx|jsx|go|rust|java|kotlin|swift|c|cpp|csharp|css)
+            # C-style comment languages
+            line=$(head -20 "$filepath" 2>/dev/null | grep -m1 -E '^[[:space:]]*(//|/\*)' | sed 's|^[[:space:]]*/[/*][[:space:]]*||' | sed 's|\*/.*||')
+            ;;
+        markdown)
+            # First heading
+            line=$(head -5 "$filepath" 2>/dev/null | grep -m1 '^#' | sed 's/^#*[[:space:]]*//')
+            ;;
+        json)
+            # No comments — use filename
+            line=""
+            ;;
+        *)
+            line=$(head -3 "$filepath" 2>/dev/null | grep -m1 -v '^[[:space:]]*$')
+            ;;
+    esac
+
+    # Truncate to 80 chars, fallback to filename
+    line="${line:0:80}"
+    # Trim trailing whitespace
+    line="${line%"${line##*[![:space:]]}"}"
+
+    if [[ -z "$line" ]]; then
+        line="${filepath##*/}"
+    fi
+
+    echo "$line"
+}
+
+# ---------------------------------------------------------------------------
+# Rebuild anatomy.index from anatomy.yaml (for when YAML is pulled from git)
+# ---------------------------------------------------------------------------
+_intel_rebuild_index() {
+    [[ ! -f "$ANATOMY_FILE" ]] && return 1
+
+    local tmp_index
+    tmp_index=$(mktemp)
+    local _path="" _summary="" _tokens="" _lang=""
+
+    _anat_flush() {
+        if [[ -n "$_path" ]]; then
+            printf '%s\t%s\t%s\t%s\n' "$_path" "$_summary" "${_tokens:-0}" "${_lang:-unknown}" >> "$tmp_index"
+        fi
+    }
+
+    while IFS= read -r line; do
+        case "$line" in
+            *"- path: "*)
+                _anat_flush
+                _path="${line#*\"}" ; _path="${_path%%\"*}"
+                _summary="" _tokens="" _lang=""
+                ;;
+            *"summary: "*)
+                _summary="${line#*\"}" ; _summary="${_summary%%\"*}"
+                ;;
+            *"tokens: "*)
+                _tokens="${line#*"tokens: "}" ; _tokens="${_tokens%% *}"
+                ;;
+            *"language: "*)
+                _lang="${line#*"language: "}" ; _lang="${_lang%% *}"
+                ;;
+        esac
+    done < "$ANATOMY_FILE"
+    _anat_flush
+    unset -f _anat_flush
+
+    mv "$tmp_index" "$ANATOMY_INDEX"
+}
+
+# ---------------------------------------------------------------------------
+# file — lookup a file's intelligence from anatomy.index
+# ---------------------------------------------------------------------------
+_intel_file() {
+    local target_path="${1:-}"
+
+    if [[ -z "$target_path" ]]; then
+        echo -e "${RED}Error: PATH required${NC}"
+        echo "Usage: ag intel file PATH"
+        return 1
+    fi
+
+    # Normalize: strip leading ./ or /
+    target_path="${target_path#./}"
+    target_path="${target_path#"${ROOT_DIR}/"}"
+
+    # Rebuild index from YAML if index is missing but YAML exists
+    if [[ ! -f "$ANATOMY_INDEX" && -f "$ANATOMY_FILE" ]]; then
+        _intel_rebuild_index
+    fi
+
+    # Try anatomy.index (fast grep)
+    if [[ -f "$ANATOMY_INDEX" ]]; then
+        local result
+        result=$(grep "^${target_path}	" "$ANATOMY_INDEX" 2>/dev/null | head -1)
+
+        if [[ -n "$result" ]]; then
+            local summary tokens lang
+            IFS=$'\t' read -r _ summary tokens lang <<< "$result"
+
+            echo -e "${BOLD}${target_path}${NC}"
+            echo -e "  ~${tokens} tokens | ${lang}"
+            echo -e "  ${DIM}${summary}${NC}"
+            return 0
+        fi
+    fi
+
+    # Fallback: compute on-the-fly if file exists
+    local abs_path="${ROOT_DIR}/${target_path}"
+    if [[ -f "$abs_path" ]]; then
+        local lang char_count tokens summary
+        lang=$(_intel_detect_language "$target_path")
+        char_count=$(wc -c < "$abs_path" 2>/dev/null || echo 0)
+        char_count="${char_count## }"
+        tokens=$(( char_count / 4 ))
+        summary=$(_intel_extract_summary "$abs_path" "$lang")
+
+        echo -e "${BOLD}${target_path}${NC} ${DIM}(not in index)${NC}"
+        echo -e "  ~${tokens} tokens | ${lang}"
+        echo -e "  ${DIM}${summary}${NC}"
+        echo -e ""
+        echo -e "${YELLOW}Run 'ag intel scan' to update the index${NC}"
+        return 0
+    fi
+
+    echo -e "${RED}File not found: ${target_path}${NC}"
+    return 1
+}
+
+# ===========================================================================
+# Phase 2: Token Ledger — Measurement & Metrics
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# stats — display token metrics (session + lifetime)
+# ---------------------------------------------------------------------------
+_intel_stats() {
+    local session_only=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --session) session_only=true ;;
+        esac
+        shift
+    done
+
+    echo -e "${BOLD}Intelligence Engine — Token Metrics${NC}"
+    echo ""
+
+    _intel_show_session_stats
+
+    if ! $session_only; then
+        echo ""
+        _intel_show_lifetime_stats
+    fi
+}
+
+_intel_show_session_stats() {
+    if [[ ! -f "$TOKEN_EVENTS" ]]; then
+        echo -e "  ${DIM}No session data yet (tracking starts after first tool use)${NC}"
+        return 0
+    fi
+
+    local reads writes unique_reads repeated_reads estimated_cost
+    reads=$(grep -c '^R|' "$TOKEN_EVENTS" 2>/dev/null || echo 0)
+    writes=$(grep -c '^W|' "$TOKEN_EVENTS" 2>/dev/null || echo 0)
+    unique_reads=$(grep '^R|' "$TOKEN_EVENTS" 2>/dev/null | cut -d'|' -f2 | sort -u | wc -l 2>/dev/null || echo 0)
+    unique_reads="${unique_reads## }"
+    repeated_reads=$((reads - unique_reads))
+    if [[ $repeated_reads -lt 0 ]]; then repeated_reads=0; fi
+    estimated_cost=$(awk -F'|' '{sum += $3} END {print sum+0}' "$TOKEN_EVENTS" 2>/dev/null || echo 0)
+
+    echo -e "${BOLD}📊 Current Session${NC}"
+    echo -e "  Reads:        ${reads} total, ${unique_reads} unique, ${repeated_reads} repeated"
+    echo -e "  Writes:       ${writes}"
+    echo -e "  Est. context: ~${estimated_cost} tokens"
+}
+
+_intel_show_lifetime_stats() {
+    if [[ ! -f "$TOKEN_SUMMARY" ]]; then
+        echo -e "  ${DIM}No lifetime data yet (aggregated after first session ends)${NC}"
+        return 0
+    fi
+
+    local sessions reads writes repeated cost updated
+    sessions=$(_intel_json_int "$TOKEN_SUMMARY" "total_sessions")
+    reads=$(_intel_json_int "$TOKEN_SUMMARY" "total_reads")
+    writes=$(_intel_json_int "$TOKEN_SUMMARY" "total_writes")
+    repeated=$(_intel_json_int "$TOKEN_SUMMARY" "total_repeated_reads")
+    cost=$(_intel_json_int "$TOKEN_SUMMARY" "total_estimated_cost")
+    updated=$(_intel_json_str "$TOKEN_SUMMARY" "last_updated")
+
+    echo -e "${BOLD}📈 Lifetime Aggregate${NC}"
+    echo -e "  Sessions:     ${sessions}"
+    echo -e "  Total reads:  ${reads} (${repeated} repeated)"
+    echo -e "  Total writes: ${writes}"
+    echo -e "  Est. context: ~${cost} tokens"
+    [[ -n "$updated" ]] && echo -e "  ${DIM}Last updated: ${updated}${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# JSON helpers — extract values from simple flat JSON without jq
+# ---------------------------------------------------------------------------
+_intel_json_int() {
+    local file="$1" key="$2"
+    grep -o "\"${key}\"[[:space:]]*:[[:space:]]*[0-9]*" "$file" 2>/dev/null | grep -o '[0-9]*$' || echo 0
+}
+
+_intel_json_str() {
+    local file="$1" key="$2"
+    grep -o "\"${key}\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" "$file" 2>/dev/null | sed "s/.*\"${key}\"[[:space:]]*:[[:space:]]*\"//;s/\"//" || echo ""
 }

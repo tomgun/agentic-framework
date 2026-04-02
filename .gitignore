@@ -54,6 +54,11 @@ tests/llm/.test-state
 .agentic/session/verify-logs/
 .agentic/session/framework.log
 .agentic/session/framework.log.prev
+.agentic/session/token-ledger.json
+
+# Intel engine (generated/session-scoped files)
+.agentic/intel/anatomy.index
+
 # Note: .agentic/journal/ IS committed (persistent history: manifests, lessons, plans, JOURNAL.md)
 
 # Claude Code generated files (source of truth is .agentic/lib/claude-hooks/hooks.json)

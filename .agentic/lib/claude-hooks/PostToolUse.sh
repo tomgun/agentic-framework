@@ -23,6 +23,45 @@ if [[ ! -d ".agentic" ]]; then
   exit 0
 fi
 
+# --- Token tracking (Phase 2: F-041 Intelligence Engine) ---
+# Read tool info from stdin, log events for session metrics.
+# Pure bash extraction — no Python fork. Appends one line per event (<1ms).
+_POST_STDIN=$(cat 2>/dev/null || true)
+_POST_TOOL=""
+_POST_FILE=""
+if [[ -n "$_POST_STDIN" ]]; then
+  if [[ "$_POST_STDIN" =~ \"tool_name\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
+    _POST_TOOL="${BASH_REMATCH[1]}"
+  fi
+  if [[ "$_POST_STDIN" =~ \"file_path\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
+    _POST_FILE="${BASH_REMATCH[1]}"
+  fi
+fi
+
+if [[ -n "$_POST_TOOL" ]]; then
+  _TK_EVENTS=".agentic/session/token-events.log"
+  case "$_POST_TOOL" in
+    Read)
+      _TK_EST=0
+      if [[ -n "$_POST_FILE" && -f "$_POST_FILE" ]]; then
+        _TK_SZ=$(wc -c < "$_POST_FILE" 2>/dev/null || echo 0)
+        _TK_SZ="${_TK_SZ## }"
+        _TK_EST=$(( _TK_SZ / 4 ))
+      fi
+      echo "R|${_POST_FILE:-unknown}|${_TK_EST}" >> "$_TK_EVENTS" 2>/dev/null || true
+      ;;
+    Write|Edit|MultiEdit)
+      _TK_EST=0
+      if [[ -n "$_POST_FILE" && -f "$_POST_FILE" ]]; then
+        _TK_SZ=$(wc -c < "$_POST_FILE" 2>/dev/null || echo 0)
+        _TK_SZ="${_TK_SZ## }"
+        _TK_EST=$(( _TK_SZ / 4 ))
+      fi
+      echo "W|${_POST_FILE:-unknown}|${_TK_EST}" >> "$_TK_EVENTS" 2>/dev/null || true
+      ;;
+  esac
+fi
+
 # --- Advisory artifact check (hooks-first: uses gate.py) ---
 # After tool use, check artifact status for active feature. Advisory only.
 # PreToolUse already handles blocking for Write/Edit — this adds awareness
