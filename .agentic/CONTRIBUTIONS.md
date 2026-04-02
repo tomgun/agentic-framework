@@ -10,15 +10,25 @@
 
 ### F-041 Intelligence Engine — Smarter Than Vanilla Claude (v0.77.0)
 
-**User insight 1 — Intelligence is core value, not a nice-to-have**: "Token optimization, domain-specific quality intelligence, and spec adherence are CORE parts of the framework's value to users — not optional enhancements. These are the things that make the framework worth using compared to vanilla Claude." The user insisted intelligence must work in Discovery mode too, not just Formal — because intelligence doesn't depend on heavy spec artifacts.
+**User insight 1 — Intelligence is core framework value**: "The most important features I think is that the framework writes specs/ac (incl. NFR) and code and test based on those... all token optimization things and the user experience for the developer; high quality code also in discovery and automatic modes." (Mar 22) — Established that token optimization and quality intelligence are core value, not optional extras.
 
-**User insight 2 — Phase-aware quality guidance**: "Can we use the intelligence hooks also to improve the quality of decisions when designing architecture, features/user stories, tests and implementing code? That would be something I would like to be strengthened by our framework out of the box compared to vanilla Claude." This directly shaped Phase 4: four commands (`architecture`, `spec`, `implement`, `test`) that surface relevant intelligence at each workflow phase.
+**User insight 2 — Phase-aware quality guidance across ALL phases**: "Can we use the intelligence hooks also to improve the quality of decisions when designing architecture, features/user stories, tests and implementing code? That would be something I would like to be strengthened by our framework out of the box compared to vanilla Claude." (Apr 2) — Directly shaped Phase 4: quality-checklist with 5 dimensions × 4 workflow phases, and the four `ag intel` query commands.
 
-**User insight 3 — Project knowledge from corrections**: "Does this new intelligence engine also make notes / learnings about the user's preferences that are expressed while working on a product when using this framework?" This shaped the Cerebrum subsystem (Phase 1b) — `ag intel remember` auto-captures user corrections as project-scoped knowledge (preferences, learnings, decisions).
+**User insight 3 — User preference capture from working sessions**: "Does this new intelligence engine also make notes / learnings about the user's preferences that are expressed while working on a product when using this framework?" (Apr 2) — Surfaced a gap in the original plan. Became the Cerebrum subsystem: `ag intel remember` auto-captures corrections as project-scoped knowledge.
 
-**User insight 4 — Cross-tool portability with Claude-first pragmatism**: "It's ok if these enhancements will be Claude only, but it would be good to include cursor/codex/gemini/opencode at least theoretically or 'cannot do in anyway' in the planning." This shaped the architecture: CLI commands work everywhere, hooks are Claude Code-specific but the intelligence files (.agentic/intel/) are agent-agnostic.
+**User insight 4 — Claude-first with cross-tool pragmatism**: "It's ok if these enhancements will be Claude only, but it would be good to include cursor/codex/gemini/opencode at least theoretically or 'cannot do in anyway' in the planning." (Apr 2) — Shaped the architecture: hooks are Claude-specific, CLI commands and intelligence files work everywhere.
 
-**User insight 5 — Quality dimensions span all levels**: The user specified intelligence must cover usability, architecture, code quality, testability, AND spec adherence — not just code. This directly shaped the quality-checklist.yaml structure: 5 dimensions × 4 workflow phases.
+**User insight 5 — Anatomy tracking questioned**: "Why is anatomy git ignored?" (Apr 2) — Led to the split design: anatomy.yaml git-tracked (curated), anatomy.index gitignored (regenerated for fast lookup).
+
+**User insight 6 — Simplicity over complexity**: "What I'm especially interested is, how the core workflows could be done AS SIMPLE AS POSSIBLE. Maybe only in Claude, if that is the best tool, and then support some features in other tools without guarantees." (Mar 20) — Established the design principle: enhance Claude natively (hooks), CLI fallback for others.
+
+**User insight 7 — Framework serves user projects**: "The architect here. We are not building this framework to build this framework. We are building this framework to use it when building other software with the framework." (Mar 11) — Shaped F-041's constraint that intelligence must work with any tech stack via bootstrap-generated domain knowledge, not hardcoded rules.
+
+**User insight 8 — Incremental delivery**: "I mean we can wait for phase 4. I think let's merge now and continue with phase 2." (Apr 2) — Drove the 4-phase ship-as-you-go strategy (PRs #218, #219, #220, #221).
+
+**User insight 9 — Hard-won lessons as structural enforcement**: "All the LLM tests etc that the framework has is because it has been very volatile in reliability and we have not known the correct ways to implement, but have found out the hard way solutions." (Mar 20) — Informed patterns.yaml design: Do-Not-Repeat entries so hard-won lessons are structurally enforced, not just documented.
+
+**User insight 10 — Competitive analysis as design catalyst**: User initiated comparison with OpenWolf framework (Apr 2), which led to identifying the hook-based intelligence approach for injecting domain knowledge at file read/write time.
 
 **Why it matters**: The intelligence engine transforms the framework from "structured workflow with gates" to "structured workflow with domain-specific guidance." Gates prevent bad outcomes; intelligence actively produces better outcomes. Without intelligence, the framework is just overhead compared to vanilla Claude.
 
