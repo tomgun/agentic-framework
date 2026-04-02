@@ -378,6 +378,10 @@ case "${1:-help}" in
         shift
         cmd_set "$@"
         ;;
+    publish)
+        shift
+        bash "$SCRIPT_DIR/commands/publish.sh" "$@"
+        ;;
     run)
         bash "$SCRIPT_DIR/run.sh"
         ;;
