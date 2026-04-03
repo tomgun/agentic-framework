@@ -234,7 +234,8 @@ fi
 D_CAP_METRICS=""
 FEATURES_FILE_DASH="$PROJECT_ROOT/.agentic/spec/FEATURES.md"
 if [[ -f "$FEATURES_FILE_DASH" ]]; then
-    # Count by status — handles both discovery (built/in_progress/planned) and formal (shipped/implementing/planned)
+    # Count by the three universal status values (same for all profiles)
+    # Also match legacy formal statuses for backward compat with existing projects
     _cap_built=$(grep -ciE '^\*\*Status\*\*:\s*(built|shipped)' "$FEATURES_FILE_DASH" 2>/dev/null || echo 0)
     _cap_built="${_cap_built## }"
     _cap_progress=$(grep -ciE '^\*\*Status\*\*:\s*(in_progress|implementing)' "$FEATURES_FILE_DASH" 2>/dev/null || echo 0)

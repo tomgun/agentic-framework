@@ -1,16 +1,12 @@
 # Capabilities
 
-<!-- spec-format: features-v0.5.0 -->
+<!-- spec-format: capabilities-v1.0 -->
 
-**Purpose**: A human + machine readable registry of what this product can do — built, in progress, and planned.
+What this product can do — built, in progress, and planned.
 
-This file is the **capability catalog**. Every significant capability should be registered here.
+**Status values**: `built` | `in_progress` | `planned`
 
----
-
-## Entry Formats
-
-### Discovery (lightweight — no formal IDs)
+**Entry format** (same for all profiles):
 
 ```markdown
 ## Search
@@ -19,26 +15,10 @@ Full-text product search with filters across name, category, price range.
 Decisions: Used Elasticsearch over Postgres FTS for scale.
 ```
 
-**Status values**: `built` | `in_progress` | `planned`
+In formal/autonomous_formal profiles, capabilities may also have contracts in `spec/contracts/` with acceptance criteria and verification commands. The catalog entry stays the same — contracts are a separate layer.
 
-### Formal (full ceremony — F-XXXX IDs + contracts)
-
-```markdown
-## F-####: Search
-**Status**: shipped | **Category**: domain
-**Contract**: [`spec/contracts/F-####.yaml`](contracts/F-####.yaml)
-Description of what this feature does.
-```
-
-**Status values**: `planned` | `specced` | `criteria_set` | `tests_written` | `implementing` | `verified` | `documented` | `committed` | `shipped` | `deprecated`
-- Backward-compat alias: `in_progress` is accepted as equivalent to `implementing`
-
-**Specifications**: Each feature has a YAML contract in `spec/contracts/F-####.yaml` with machine-verifiable assertions.
-- Create: `ag contract create F-####` or `ag spec F-####`
-- Check: `ag contract check F-####`
+Register capabilities: `bash .agentic/lib/tools/feature.sh cap add "Name" "Description" --decisions "Why"`
 
 ---
-
-## Capabilities
 
 <!-- Add capability entries below, most recent first -->

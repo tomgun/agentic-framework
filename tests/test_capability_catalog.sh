@@ -81,19 +81,19 @@ else
     fail "AC-001: FEATURES.md not set to all" "$(grep FEATURES "$REPO_ROOT/.agentic/lib/init/state-files.conf")"
 fi
 
-echo "Test 2: AC-002 — template has dual-format preamble"
+echo "Test 2: AC-002 — template has single entry format (not dual)"
 TMPL="$REPO_ROOT/.agentic/lib/templates/FEATURES.template.md"
-if grep -q "Discovery" "$TMPL" && grep -q "Formal" "$TMPL" && grep -q "built" "$TMPL"; then
-    pass "AC-002: template has discovery + formal formats"
+if grep -q "Entry format" "$TMPL" && grep -q "built" "$TMPL" && ! grep -q "### Discovery" "$TMPL"; then
+    pass "AC-002: single entry format, no dual format"
 else
-    fail "AC-002: template missing dual format" ""
+    fail "AC-002: template still has dual format" ""
 fi
 
-echo "Test 3: AC-003 — discovery status values: built, in_progress, planned"
+echo "Test 3: AC-003 — three universal status values: built, in_progress, planned"
 if grep -q '`built`' "$TMPL" && grep -q '`in_progress`' "$TMPL" && grep -q '`planned`' "$TMPL"; then
-    pass "AC-003: discovery status values documented"
+    pass "AC-003: universal status values documented"
 else
-    fail "AC-003: missing discovery status values" ""
+    fail "AC-003: missing status values" ""
 fi
 
 # ═══════════════════════════════════════════════════════

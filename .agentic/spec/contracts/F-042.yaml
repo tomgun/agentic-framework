@@ -21,15 +21,18 @@ assertions:
 
   - id: AC-002
     text: >
-      FEATURES.template.md includes a dual-format preamble explaining both
-      discovery entries (name + status + description + decisions, no F-XXXX)
-      and formal entries (F-XXXX + contracts + full lifecycle)
+      FEATURES.template.md defines a single entry format for all profiles:
+      heading (## Name), status (built|in_progress|planned), description,
+      and optional Decisions line; no dual format, no F-XXXX IDs in the
+      catalog itself
     type: structural
 
   - id: AC-003
     text: >
-      Discovery capability entries in FEATURES.md use three status values
-      only: `built`, `in_progress`, `planned`; no F-XXXX IDs required
+      All capability entries in FEATURES.md use the same three status
+      values: `built`, `in_progress`, `planned` — regardless of profile;
+      formal lifecycle states (specced, criteria_set, etc.) live in
+      contract YAML, not the catalog
     type: structural
 
   - id: AC-004

@@ -4994,3 +4994,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-03 09:06 - F-042 single format
+
+**Why**: User feedback: dual format is confusing, discovery should be lightweight but still track what matters
+
+**What changed**:
+- Removed dual format from capability catalog — one format for all profiles
+
+**Next steps**:
+- Push PR, merge after review
+
+**Blockers**: None
+
