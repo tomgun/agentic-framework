@@ -225,4 +225,26 @@ if [[ -d ".agentic/journal/plans" ]]; then
   fi
 fi
 
+# --- Capability catalog nudge (F-042: Universal Capability Catalog) ---
+# One-time reminder after 5+ writes to implementation files without updating the design doc.
+# FEATURES.md when feature_tracking=yes; OVERVIEW.md otherwise.
+# Pure bash, fast (<10ms). Only fires once per session.
+if [[ ! -f ".agentic/session/.cap_nudged" && ! -f ".agentic/session/.cap_updated" ]]; then
+  _TK_EVENTS=".agentic/session/token-events.log"
+  if [[ -f "$_TK_EVENTS" ]]; then
+    _IMPL_WRITES=$(grep '^W|' "$_TK_EVENTS" 2>/dev/null \
+      | grep -cE '\|(src/|lib/|app/|cmd/|\.agentic/lib/tools/|\.agentic/lib/auto/)' 2>/dev/null || echo 0)
+    _IMPL_WRITES="${_IMPL_WRITES## }"
+    if [[ "${_IMPL_WRITES:-0}" -ge 5 ]]; then
+      _CAP_DOC="OVERVIEW.md"
+      [[ -f ".agentic/spec/FEATURES.md" ]] && _CAP_DOC=".agentic/spec/FEATURES.md"
+      echo ""
+      echo "📦 You've written ${_IMPL_WRITES} implementation files but haven't updated ${_CAP_DOC}."
+      echo "   Register what you're building before the session ends."
+      echo ""
+      touch ".agentic/session/.cap_nudged" 2>/dev/null || true
+    fi
+  fi
+fi
+
 exit 0

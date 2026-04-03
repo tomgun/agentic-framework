@@ -12,9 +12,36 @@ TOKEN_SUMMARY="${INTEL_DIR}/token-summary.json"
 SESSION_DIR="${ROOT_DIR}/.agentic/session"
 TOKEN_EVENTS="${SESSION_DIR}/token-events.log"
 TOKEN_LEDGER="${SESSION_DIR}/token-ledger.json"
+INTEL_EVENTS="${SESSION_DIR}/intel-events.log"
+INTEL_SUMMARY="${INTEL_DIR}/intel-summary.json"
 
 _INTEL_VALID_SEVERITIES="error warning info"
 _INTEL_VALID_CEREBRUM_TYPES="preference learning decision"
+
+# ---------------------------------------------------------------------------
+# Intel event logger — records when framework intelligence is sourced vs. not
+# Format: TIMESTAMP|EVENT|DETAIL|ITEMS
+#   EVENT: query|enforce|mutate|scan
+#   DETAIL: subcommand or source description
+#   ITEMS: count of intelligence items surfaced (0 = nothing found)
+# Consumers: Stop.sh (session summary), ag intel stats, audit
+# ---------------------------------------------------------------------------
+_intel_log() {
+    local event="${1:-}" detail="${2:-}" items="${3:-0}"
+    local ts
+    ts="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "unknown")"
+    mkdir -p "$SESSION_DIR" 2>/dev/null || true
+    printf '%s|%s|%s|%s\n' "$ts" "$event" "$detail" "$items" \
+        >> "$INTEL_EVENTS" 2>/dev/null || true
+}
+
+# Safe grep count — strips whitespace from grep -c output for arithmetic
+_intel_count() {
+    local val
+    val=$(grep -c "$@" 2>/dev/null || echo 0)
+    val="${val## }"; val="${val%% }"; val="${val%%[!0-9]*}"
+    echo "${val:-0}"
+}
 
 cmd_intel() {
     local subcmd="${1:-help}"
@@ -303,6 +330,7 @@ EOF
 
     echo -e "${GREEN}✓ Added pattern ${next_id}: ${text}${NC}"
     echo -e "  Scope: ${scope} | Severity: ${severity}"
+    _intel_log "mutate" "learn:${next_id}" "1"
 }
 
 # ---------------------------------------------------------------------------
@@ -366,6 +394,7 @@ _intel_remove() {
     if $removed; then
         mv "$tmp_file" "$PATTERNS_FILE"
         echo -e "${GREEN}✓ Removed pattern ${pattern_id}${NC}"
+        _intel_log "mutate" "remove:${pattern_id}" "1"
     else
         rm -f "$tmp_file"
         echo -e "${RED}Error: pattern ${pattern_id} not found${NC}"
@@ -521,6 +550,7 @@ INIT
 
     echo -e "${GREEN}✓ Remembered ${next_id} [${entry_type}]: ${text}${NC}"
     echo -e "  ${type_icon} Stored in cerebrum.yaml"
+    _intel_log "mutate" "remember:${next_id}:${entry_type}" "1"
 }
 
 # ---------------------------------------------------------------------------
@@ -638,6 +668,7 @@ _intel_forget() {
     if $removed; then
         mv "$tmp_file" "$CEREBRUM_FILE"
         echo -e "${GREEN}✓ Forgot ${entry_id}${NC}"
+        _intel_log "mutate" "forget:${entry_id}" "1"
     else
         rm -f "$tmp_file"
         echo -e "${RED}Error: entry ${entry_id} not found${NC}"
@@ -770,6 +801,7 @@ EOF
     echo -e "${GREEN}✓ Scanned ${total_files} files (~${total_tokens} estimated tokens)${NC}"
     echo -e "  ${DIM}${ANATOMY_FILE}${NC}"
     echo -e "  ${DIM}${ANATOMY_INDEX} (gitignored, for fast lookup)${NC}"
+    _intel_log "scan" "anatomy" "$total_files"
 }
 
 _intel_scan_check() {
@@ -784,6 +816,8 @@ _intel_scan_check() {
     if git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         stale_files=$(cd "$ROOT_DIR" && git ls-files --cached --others --exclude-standard 2>/dev/null \
             | while IFS= read -r f; do
+                # Skip session/cache files — they change every tool use and aren't project code
+                case "$f" in .agentic/session/*|.agentic/.cache/*) continue ;; esac
                 [[ -f "$f" && "$f" -nt "$ANATOMY_FILE" ]] && echo "$f" && break
               done)
     else
@@ -1015,14 +1049,18 @@ _intel_stats() {
         shift
     done
 
-    echo -e "${BOLD}Intelligence Engine — Token Metrics${NC}"
+    echo -e "${BOLD}Intelligence Engine — Metrics${NC}"
     echo ""
 
     _intel_show_session_stats
+    echo ""
+    _intel_show_session_intel_stats
 
     if ! $session_only; then
         echo ""
         _intel_show_lifetime_stats
+        echo ""
+        _intel_show_lifetime_intel_stats
     fi
 }
 
@@ -1066,6 +1104,55 @@ _intel_show_lifetime_stats() {
     echo -e "  Total reads:  ${reads} (${repeated} repeated)"
     echo -e "  Total writes: ${writes}"
     echo -e "  Est. context: ~${cost} tokens"
+    [[ -n "$updated" ]] && echo -e "  ${DIM}Last updated: ${updated}${NC}"
+}
+
+_intel_show_session_intel_stats() {
+    if [[ ! -f "$INTEL_EVENTS" ]]; then
+        echo -e "  ${DIM}No intel sourcing events yet${NC}"
+        return 0
+    fi
+
+    local queries enforces mutates scans total_items
+    queries=$(grep -c '^.*|query|' "$INTEL_EVENTS" 2>/dev/null || echo 0)
+    enforces=$(grep -c '^.*|enforce|' "$INTEL_EVENTS" 2>/dev/null || echo 0)
+    mutates=$(grep -c '^.*|mutate|' "$INTEL_EVENTS" 2>/dev/null || echo 0)
+    scans=$(grep -c '^.*|scan|' "$INTEL_EVENTS" 2>/dev/null || echo 0)
+    total_items=$(awk -F'|' '{sum += $4} END {print sum+0}' "$INTEL_EVENTS" 2>/dev/null || echo 0)
+
+    echo -e "${BOLD}🧠 Intelligence Sourcing (Session)${NC}"
+    echo -e "  Queries:       ${queries} (ag intel architecture|spec|implement|test)"
+    echo -e "  Enforcements:  ${enforces} (pattern warnings at write-time)"
+    echo -e "  Mutations:     ${mutates} (learn, remember, forget, remove)"
+    echo -e "  Scans:         ${scans} (anatomy, bootstrap, retro)"
+    echo -e "  Items sourced: ${total_items}"
+    if [[ $queries -eq 0 && $enforces -eq 0 ]]; then
+        echo -e "  ${YELLOW}⚠ No intelligence queried — agent may be improvising${NC}"
+    fi
+}
+
+_intel_show_lifetime_intel_stats() {
+    if [[ ! -f "$INTEL_SUMMARY" ]]; then
+        echo -e "  ${DIM}No lifetime intel data yet${NC}"
+        return 0
+    fi
+
+    local sessions queries enforces mutates scans items updated
+    sessions=$(_intel_json_int "$INTEL_SUMMARY" "total_sessions")
+    queries=$(_intel_json_int "$INTEL_SUMMARY" "total_queries")
+    enforces=$(_intel_json_int "$INTEL_SUMMARY" "total_enforcements")
+    mutates=$(_intel_json_int "$INTEL_SUMMARY" "total_mutations")
+    scans=$(_intel_json_int "$INTEL_SUMMARY" "total_scans")
+    items=$(_intel_json_int "$INTEL_SUMMARY" "total_items_surfaced")
+    updated=$(_intel_json_str "$INTEL_SUMMARY" "last_updated")
+
+    echo -e "${BOLD}🧠 Intelligence Sourcing (Lifetime)${NC}"
+    echo -e "  Sessions:      ${sessions}"
+    echo -e "  Queries:       ${queries}"
+    echo -e "  Enforcements:  ${enforces}"
+    echo -e "  Mutations:     ${mutates}"
+    echo -e "  Scans:         ${scans}"
+    echo -e "  Items sourced: ${items}"
     [[ -n "$updated" ]] && echo -e "  ${DIM}Last updated: ${updated}${NC}"
 }
 
@@ -1400,6 +1487,14 @@ TEMPLATE_TS
     echo -e "${DIM}Tip: Run \`ag intel retro\` after using the project for a while to discover additional patterns from real issues.${NC}"
 
     unset -f _stack_get _has_dep
+
+    # Log: count detected sources (STACK.md + each package file found)
+    local _il_items=0
+    [[ -f "$STACK_FILE" ]] && _il_items=$(( _il_items + 1 ))
+    [[ -n "$detected_langs" ]] && _il_items=$(( _il_items + 1 ))
+    [[ -n "$detected_frameworks" ]] && _il_items=$(( _il_items + 1 ))
+    [[ -n "$detected_test_frameworks" ]] && _il_items=$(( _il_items + 1 ))
+    _intel_log "scan" "bootstrap" "$_il_items"
 }
 
 # ---------------------------------------------------------------------------
@@ -1421,7 +1516,7 @@ _intel_retro() {
     if [[ -f "$PATTERNS_FILE" ]]; then
         existing_patterns=$(grep "text:" "$PATTERNS_FILE" 2>/dev/null | sed 's/.*text: *//' | sed 's/"//g' || true)
         local pattern_count
-        pattern_count=$(grep -c "^  - id:" "$PATTERNS_FILE" 2>/dev/null || echo 0)
+        pattern_count=$(_intel_count "^  - id:" "$PATTERNS_FILE")
         echo -e "${GREEN}✓ ${pattern_count} existing patterns loaded${NC}"
     else
         echo -e "${YELLOW}⚠ No patterns.yaml — retro will suggest initial patterns${NC}"
@@ -1568,6 +1663,13 @@ _intel_retro() {
     fi
 
     echo -e "${DIM}Tip: Run retro periodically after shipping features to keep intelligence current.${NC}"
+
+    # Log: count data sources analyzed
+    local _il_items=0
+    [[ -f "$PATTERNS_FILE" ]] && _il_items=$(( _il_items + $(_intel_count "^  - id:" "$PATTERNS_FILE") ))
+    [[ -f "${ROOT_DIR}/.agentic/ISSUES.md" ]] && _il_items=$(( _il_items + $(_intel_count -E "^##\s" "${ROOT_DIR}/.agentic/ISSUES.md") ))
+    [[ -f "${ROOT_DIR}/.agentic/LESSONS.md" ]] && _il_items=$(( _il_items + $(_intel_count -E "^##\s|^- L-" "${ROOT_DIR}/.agentic/LESSONS.md") ))
+    _intel_log "scan" "retro" "$_il_items"
 }
 
 # ===========================================================================
@@ -1678,6 +1780,7 @@ _intel_show_spec() {
 # Reads: ADRs, NFRs, CONTEXT_PACK, quality-checklist[planning]
 # ---------------------------------------------------------------------------
 _intel_architecture() {
+    local _il_items=0  # track intelligence items surfaced
     local ADR_DIR="${ROOT_DIR}/.agentic/spec/adr"
     local NFR_FILE="${ROOT_DIR}/.agentic/spec/NFR.md"
     local CONTEXT_FILE="${ROOT_DIR}/CONTEXT_PACK.md"
@@ -1771,6 +1874,14 @@ _intel_architecture() {
 
     echo ""
     echo -e "${DIM}Use this intelligence to inform architectural decisions during planning.${NC}"
+
+    # Log intelligence sourcing
+    _il_items=0
+    [[ -d "$ADR_DIR" ]] && { local _c; _c=$(ls "$ADR_DIR"/*.md 2>/dev/null | wc -l); _c="${_c## }"; _il_items=$(( _il_items + _c )); }
+    [[ -f "$NFR_FILE" ]] && _il_items=$(( _il_items + $(_intel_count -E "^##\s" "$NFR_FILE") ))
+    [[ -f "$CONTEXT_FILE" ]] && _il_items=$(( _il_items + 1 ))
+    [[ -f "$QUALITY_CHECKLIST" ]] && _il_items=$(( _il_items + 1 ))
+    _intel_log "query" "architecture" "$_il_items"
 }
 
 # ---------------------------------------------------------------------------
@@ -1891,6 +2002,14 @@ _intel_spec() {
 
     echo ""
     echo -e "${DIM}Use this intelligence to write thorough, non-overlapping acceptance criteria.${NC}"
+
+    # Log intelligence sourcing
+    local _il_items=0
+    [[ -f "${ROOT_DIR}/.agentic/spec/FEATURES.md" ]] && _il_items=$(( _il_items + $(_intel_count -E "^##\s" "${ROOT_DIR}/.agentic/spec/FEATURES.md") ))
+    [[ -d "${ROOT_DIR}/.agentic/spec/contracts" ]] && { local _c; _c=$(ls "${ROOT_DIR}/.agentic/spec/contracts/"*.yaml 2>/dev/null | wc -l); _c="${_c## }"; _il_items=$(( _il_items + _c )); }
+    [[ -f "${ROOT_DIR}/.agentic/spec/NFR.md" ]] && _il_items=$(( _il_items + 1 ))
+    [[ -f "$QUALITY_CHECKLIST" ]] && _il_items=$(( _il_items + 1 ))
+    _intel_log "query" "spec${feature_id:+:$feature_id}" "$_il_items"
 }
 
 # ---------------------------------------------------------------------------
@@ -1955,7 +2074,7 @@ _intel_implement() {
 
     if [[ -f "$PATTERNS_FILE" ]]; then
         local pattern_count
-        pattern_count=$(grep -c "^  - id:" "$PATTERNS_FILE" 2>/dev/null || echo 0)
+        pattern_count=$(_intel_count "^  - id:" "$PATTERNS_FILE")
         echo -e "  ${pattern_count} active patterns (checked at write-time by hook)"
         echo ""
         # Show error-severity patterns as most critical
@@ -2002,7 +2121,7 @@ _intel_implement() {
 
     if [[ -f "$CEREBRUM_FILE" ]]; then
         local cerebrum_count
-        cerebrum_count=$(grep -c "^  - id:" "$CEREBRUM_FILE" 2>/dev/null || echo 0)
+        cerebrum_count=$(_intel_count "^  - id:" "$CEREBRUM_FILE")
         echo -e "  ${cerebrum_count} knowledge entries (preferences, learnings, decisions)"
         echo -e "  ${DIM}Run \`ag intel cerebrum\` for full list${NC}"
     else
@@ -2020,6 +2139,15 @@ _intel_implement() {
 
     echo ""
     echo -e "${DIM}Use this intelligence to write code that follows project conventions and avoids known pitfalls.${NC}"
+
+    # Log intelligence sourcing
+    local _il_items=0
+    [[ -f "${ROOT_DIR}/.agentic/conventions.md" ]] && _il_items=$(( _il_items + 1 ))
+    [[ -f "$PATTERNS_FILE" ]] && _il_items=$(( _il_items + $(_intel_count "^  - id:" "$PATTERNS_FILE") ))
+    [[ -f "${ROOT_DIR}/.agentic/LESSONS.md" ]] && _il_items=$(( _il_items + $(_intel_count -E "^##\s|^- L-" "${ROOT_DIR}/.agentic/LESSONS.md") ))
+    [[ -f "$CEREBRUM_FILE" ]] && _il_items=$(( _il_items + $(_intel_count "^  - id:" "$CEREBRUM_FILE") ))
+    [[ -f "$QUALITY_CHECKLIST" ]] && _il_items=$(( _il_items + 1 ))
+    _intel_log "query" "implement${feature_id:+:$feature_id}" "$_il_items"
 }
 
 # ---------------------------------------------------------------------------
@@ -2161,4 +2289,11 @@ _intel_test() {
 
     echo ""
     echo -e "${DIM}Use this intelligence to write thorough tests covering known gaps and quality dimensions.${NC}"
+
+    # Log intelligence sourcing
+    local _il_items=0
+    [[ -f "$TEST_STRATEGY" ]] && _il_items=$(( _il_items + 1 ))
+    [[ -f "${ROOT_DIR}/.agentic/ISSUES.md" ]] && _il_items=$(( _il_items + $(_intel_count -E "^##\s" "${ROOT_DIR}/.agentic/ISSUES.md") ))
+    [[ -f "$QUALITY_CHECKLIST" ]] && _il_items=$(( _il_items + 1 ))
+    _intel_log "query" "test${feature_id:+:$feature_id}" "$_il_items"
 }

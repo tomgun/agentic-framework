@@ -158,6 +158,14 @@ if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "Mult
       if [[ -n "$_PTN_WARNS" ]]; then
         echo -e "📋 Pattern warnings for ${_PTN_FNAME}:" >&2
         echo -e "$_PTN_WARNS" >&2
+        # Log enforcement event to intel-events.log
+        _warn_count=$(echo -e "$_PTN_WARNS" | grep -c "P-" 2>/dev/null || echo 0)
+        _warn_count="${_warn_count## }"; _warn_count="${_warn_count%% }"; _warn_count="${_warn_count%%[!0-9]*}"
+        _warn_count="${_warn_count:-0}"
+        _il_ts="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "unknown")"
+        mkdir -p "$PROJECT_ROOT/.agentic/session" 2>/dev/null || true
+        printf '%s|%s|%s|%s\n' "$_il_ts" "enforce" "pattern:${_PTN_FNAME}" "$_warn_count" \
+            >> "$PROJECT_ROOT/.agentic/session/intel-events.log" 2>/dev/null || true
       fi
     fi
   fi

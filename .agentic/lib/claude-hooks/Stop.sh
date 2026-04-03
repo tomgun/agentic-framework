@@ -44,6 +44,25 @@ else
   WARNINGS=""
 fi
 
+# --- Capability catalog check (F-042: Universal Capability Catalog) ---
+# Advisory: warn if implementation code was written but design doc not updated.
+# FEATURES.md when feature_tracking=yes; OVERVIEW.md otherwise.
+# Must run BEFORE token finalizer cleans up token-events.log.
+if [[ ! -f ".agentic/session/.cap_updated" && -f ".agentic/session/token-events.log" ]]; then
+  _CAP_IMPL_WRITES=$(grep '^W|' ".agentic/session/token-events.log" 2>/dev/null \
+    | grep -cE '\|(src/|lib/|app/|cmd/|\.agentic/lib/tools/|\.agentic/lib/auto/)' 2>/dev/null || echo 0)
+  _CAP_IMPL_WRITES="${_CAP_IMPL_WRITES## }"
+  if [[ "${_CAP_IMPL_WRITES:-0}" -ge 3 ]]; then
+    # Determine which doc to suggest based on settings
+    _CAP_DOC="OVERVIEW.md"
+    if [[ -f ".agentic/spec/FEATURES.md" ]]; then
+      _CAP_DOC=".agentic/spec/FEATURES.md"
+    fi
+    echo "📦 Design doc not updated: ${_CAP_IMPL_WRITES} impl files written but ${_CAP_DOC} not touched." >&2
+    echo "   Next session: update ${_CAP_DOC} with what you built." >&2
+  fi
+fi
+
 # --- Finalize token ledger (Phase 2: F-041 Intelligence Engine) ---
 _TK_EVENTS=".agentic/session/token-events.log"
 _TK_SUMMARY=".agentic/intel/token-summary.json"
@@ -99,6 +118,52 @@ TKEOF
 
   # Clean up events log
   rm -f "$_TK_EVENTS"
+fi
+
+# --- Finalize intel event log (F-041: Intelligence sourcing audit) ---
+_IL_EVENTS=".agentic/session/intel-events.log"
+_IL_SUMMARY=".agentic/intel/intel-summary.json"
+
+# Safe integer extraction — strips whitespace and non-digit prefixes from grep/awk output
+_il_int() { local v; v=$("$@" 2>/dev/null || echo 0); v="${v##*[!0-9]}"; v="${v## }"; v="${v%% }"; v="${v%%[!0-9]*}"; echo "${v:-0}"; }
+
+if [[ -f "$_IL_EVENTS" ]]; then
+  _IL_QUERIES=$(_il_int grep -c '|query|' "$_IL_EVENTS")
+  _IL_ENFORCES=$(_il_int grep -c '|enforce|' "$_IL_EVENTS")
+  _IL_MUTATES=$(_il_int grep -c '|mutate|' "$_IL_EVENTS")
+  _IL_SCANS=$(_il_int grep -c '|scan|' "$_IL_EVENTS")
+  _IL_TOTAL_ITEMS=$(awk -F'|' '{sum += $4} END {print sum+0}' "$_IL_EVENTS" 2>/dev/null || echo 0)
+  _IL_TOTAL_ITEMS="${_IL_TOTAL_ITEMS## }"; _IL_TOTAL_ITEMS="${_IL_TOTAL_ITEMS%% }"
+  _IL_NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+  # Merge into lifetime summary
+  _IL_P_SESS=0 _IL_P_Q=0 _IL_P_E=0 _IL_P_M=0 _IL_P_S=0 _IL_P_I=0
+  if [[ -f "$_IL_SUMMARY" ]]; then
+    _IL_P_SESS=$(grep -o '"total_sessions"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _IL_P_Q=$(grep -o '"total_queries"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _IL_P_E=$(grep -o '"total_enforcements"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _IL_P_M=$(grep -o '"total_mutations"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _IL_P_S=$(grep -o '"total_scans"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _IL_P_I=$(grep -o '"total_items_surfaced"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+  fi
+
+  mkdir -p ".agentic/intel" 2>/dev/null || true
+  cat > "$_IL_SUMMARY" <<ILEOF
+{
+  "total_sessions": $(( _IL_P_SESS + 1 )),
+  "total_queries": $(( _IL_P_Q + _IL_QUERIES )),
+  "total_enforcements": $(( _IL_P_E + _IL_ENFORCES )),
+  "total_mutations": $(( _IL_P_M + _IL_MUTATES )),
+  "total_scans": $(( _IL_P_S + _IL_SCANS )),
+  "total_items_surfaced": $(( _IL_P_I + _IL_TOTAL_ITEMS )),
+  "last_updated": "$_IL_NOW"
+}
+ILEOF
+
+  echo "🧠 Intel: ${_IL_QUERIES} queries, ${_IL_ENFORCES} enforcements, ${_IL_MUTATES} mutations, ${_IL_SCANS} scans (${_IL_TOTAL_ITEMS} items sourced)" >&2
+
+  # Clean up events log
+  rm -f "$_IL_EVENTS"
 fi
 
 # --- Deregister session (F-0195: multi-session collision prevention) ---

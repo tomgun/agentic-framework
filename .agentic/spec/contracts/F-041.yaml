@@ -1,6 +1,6 @@
 id: F-041
 name: Intelligence Engine
-lifecycle: implementing
+lifecycle: shipped
 profile: both
 protection: none
 category: intelligence
@@ -150,8 +150,9 @@ assertions:
     text: >
       `ag intel bootstrap` reads STACK.md for stack details (language, framework,
       domain, database) and scans the codebase (package files, imports, directory
-      structure), then outputs structured context enabling the agent to generate
-      domain-specific intelligence
+      structure), then outputs a Stack Analysis section listing detected language,
+      framework, domain, package manager, test framework, and directory structure,
+      followed by Generation Instructions for three artifacts
     type: behavioral
 
   - id: AC-023
@@ -198,7 +199,9 @@ assertions:
     text: >
       `ag intel bootstrap` and `ag intel retro` work without STACK.md by
       falling back to codebase detection only; partial STACK.md (missing
-      fields) is handled gracefully with available information
+      fields) populates only the fields that are present, with remaining
+      fields showing "not specified" or "none detected"; neither command
+      crashes or returns a non-zero exit code
     type: behavioral
 
   # --- Phase 4: Phase-Aware Queries + Skill Integration ---
@@ -271,3 +274,114 @@ assertions:
       when token-summary.json exists at .agentic/intel/token-summary.json
     type: behavioral
     verify: "bash -c 'grep -q TOKEN_METRICS .agentic/lib/tools/dashboard.sh'"
+
+  # --- Error Recovery & Resilience ---
+  - id: AC-038
+    text: >
+      Corrupted or empty patterns.yaml, cerebrum.yaml, and anatomy.yaml
+      do not crash any ag intel subcommand; commands exit 0 or 1 and
+      never produce a Python traceback or shell error on stdout
+    type: behavioral
+
+  - id: AC-039
+    text: >
+      PreToolUse.sh and PostToolUse.sh handle malformed JSON input
+      (non-JSON strings, empty stdin) without crashing; PreToolUse
+      exits 0 (allow), PostToolUse exits 0 (no-op)
+    type: behavioral
+
+  - id: AC-040
+    text: >
+      `ag intel learn` creates patterns.yaml from scratch when the file
+      does not exist, initializing with version: 1 and a patterns array
+      containing the new entry with auto-incremented ID P-0001
+    type: behavioral
+
+  - id: AC-041
+    text: >
+      Stop.sh finalizes gracefully when token-events.log is missing or
+      empty — does not crash or produce errors, writes no ledger when
+      there are no events to finalize
+    type: behavioral
+
+  - id: AC-042
+    text: >
+      Phase-aware queries (architecture, spec, implement, test) handle
+      non-existent feature IDs without crashing — show available data
+      and skip sections that require the feature to exist
+    type: behavioral
+
+  # --- Intelligence Sourcing Audit Log ---
+  - id: AC-043
+    text: >
+      intel-events.log at .agentic/session/intel-events.log (session-scoped,
+      gitignored) records one line per intelligence event in pipe-delimited
+      format: TIMESTAMP|EVENT|DETAIL|ITEMS where EVENT is one of query,
+      enforce, mutate, scan; DETAIL identifies the subcommand or source;
+      ITEMS is the count of intelligence items surfaced
+    type: structural
+
+  - id: AC-044
+    text: >
+      Each phase-aware query (architecture, spec, implement, test) appends
+      a query event to intel-events.log with the subcommand name and
+      the count of intelligence items found (ADRs, NFRs, patterns,
+      lessons, checklist presence, etc.); spec/implement/test include
+      the feature ID in the detail field when provided
+    type: behavioral
+    verify: "bash -c 'grep -q _intel_log .agentic/lib/tools/commands/intel.sh'"
+
+  - id: AC-045
+    text: >
+      PreToolUse.sh appends an enforce event to intel-events.log when
+      pattern warnings are surfaced for a Write/Edit operation, recording
+      the target filename and the number of matching patterns; no event
+      is logged when no patterns match or for Read operations
+    type: behavioral
+
+  - id: AC-046
+    text: >
+      Mutation commands (learn, remove, remember, forget) each append
+      a mutate event to intel-events.log with the entry ID and operation
+      type in the detail field
+    type: behavioral
+
+  - id: AC-047
+    text: >
+      Scan commands (scan/anatomy, bootstrap, retro) each append a scan
+      event to intel-events.log with the scan type and the count of
+      items analyzed (files scanned, sources detected, patterns+issues
+      reviewed)
+    type: behavioral
+
+  - id: AC-048
+    text: >
+      intel-summary.json at .agentic/intel/intel-summary.json (git-tracked)
+      aggregates lifetime intel usage: total_sessions, total_queries,
+      total_enforcements, total_mutations, total_scans,
+      total_items_surfaced, and last_updated timestamp
+    type: structural
+    verify: "bash -c 'grep -q intel-summary.json .agentic/lib/claude-hooks/Stop.sh'"
+
+  - id: AC-049
+    text: >
+      Stop.sh finalizes intel-events.log by counting events per type,
+      merging into intel-summary.json lifetime aggregates, printing a
+      summary line to stderr, and removing the session events file;
+      gracefully no-ops when intel-events.log is missing or empty
+    type: behavioral
+
+  - id: AC-050
+    text: >
+      `ag intel stats` displays session intel sourcing metrics (queries,
+      enforcements, mutations, scans, items sourced) from intel-events.log
+      and lifetime metrics from intel-summary.json; warns "agent may be
+      improvising" when session has zero queries and zero enforcements
+    type: behavioral
+
+  - id: AC-051
+    text: >
+      dashboard.sh displays lifetime intel sourcing metrics (queries,
+      enforcements, items sourced) when intel-summary.json exists
+    type: behavioral
+    verify: "bash -c 'grep -q INTEL_METRICS .agentic/lib/tools/dashboard.sh'"

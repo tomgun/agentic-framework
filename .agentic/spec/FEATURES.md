@@ -479,16 +479,34 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 
 ## F-041: Intelligence Engine
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Core intelligence system: file anatomy, enforced patterns, quality checklists, test strategy, token ledger. Makes framework smarter than vanilla Claude through domain-specific, stack-aware guidance at every workflow phase.
 **Priority**: medium
 **Complexity**: medium
 
-**Description**: (TODO: add description)
+**Description**: Core intelligence system with 5 phases: (1) Enforced patterns with write-time hook checking, (2) File anatomy scanning with token estimation, (3) Bootstrap and quality intelligence generation, (4) Phase-aware queries for architecture/spec/implement/test workflows, (5) Token ledger for session and lifetime metrics. Includes cerebrum for project-scoped learning from user corrections.
 
 **Implementation**:
-- State: none
-- Code: (TODO)
-- Tests: (TODO)
+- State: shipped (v0.77.0-v0.77.1)
+- Code: `.agentic/lib/tools/commands/intel.sh`, hooks (PreToolUse/PostToolUse/Stop), `.agentic/intel/`
+- Tests: `tests/test_intel_patterns.sh` (36), `test_intel_anatomy.sh` (23), `test_intel_bootstrap.sh` (16), `test_intel_phase_queries.sh` (41), `test_intel_gaps.sh` (50), `test_intel_integration.sh` (42), `test_intel_logging.sh` (27) — 235 tests
 
 **Contract**: See `spec/contracts/F-041.yaml`
+
+---
+
+## F-042: Universal Capability Catalog
+
+**Status**: shipped
+**Category**: core
+**Priority**: medium
+**Complexity**: medium
+
+**Description**: Ensures every project tracks what it builds. When feature_tracking=yes, FEATURES.md is the formal catalog. When feature_tracking=no, OVERVIEW.md (Core Capabilities section) is the lightweight design doc. Claude hooks (PostToolUse, UserPromptSubmit, Stop.sh) enforce updates in real-time. `ag done` checks catalog and journal freshness. Dashboard shows capability counts. Profiles are presets for settings, not modes — code branches on settings, not profile names.
+
+**Implementation**:
+- State: shipped (v0.78.0)
+- Code: `feature.sh` (cap add/status), `PostToolUse.sh`, `UserPromptSubmit.sh`, `Stop.sh`, `done.sh`, `dashboard.sh`, `profiles.conf`, `FEATURES.template.md`
+- Tests: `tests/test_capability_catalog.sh` (23 tests)
+
+**Contract**: See `spec/contracts/F-042.yaml`

@@ -1,0 +1,121 @@
+id: F-042
+name: Universal Capability Catalog
+lifecycle: shipped
+profile: both
+protection: none
+category: core
+description: >
+  Ensures every project tracks what it builds. When feature_tracking=yes,
+  FEATURES.md is the formal catalog. When feature_tracking=no, OVERVIEW.md
+  (Core Capabilities section) is the lightweight design doc. Claude hooks
+  enforce updates in real-time. Profiles are presets for settings, not modes.
+user_input: ''
+assertions:
+
+  # --- A. Universal Catalog ---
+  - id: AC-001
+    text: >
+      state-files.conf lists FEATURES.md with profile `formal` and
+      OVERVIEW.md with profile `all`; every project gets OVERVIEW.md,
+      only feature_tracking=yes projects get FEATURES.md
+    type: structural
+
+  - id: AC-002
+    text: >
+      FEATURES.template.md defines a single entry format: heading (## Name),
+      status (built|in_progress|planned), description, and optional Decisions
+      line; no dual format, no F-XXXX IDs in the catalog itself
+    type: structural
+
+  - id: AC-003
+    text: >
+      All capability entries use the same three status values: `built`,
+      `in_progress`, `planned`; extended lifecycle states (specced,
+      criteria_set, etc.) live in contract YAML, not the catalog
+    type: structural
+
+  - id: AC-004
+    text: >
+      `feature.sh cap add "Name" "description"` appends a catalog entry
+      to FEATURES.md with status `planned` and the given description;
+      when feature_tracking=yes, also auto-assigns next F-XXXX ID for
+      the contract system
+    type: behavioral
+
+  - id: AC-005
+    text: >
+      `feature.sh cap status "Name" built` updates the status of a
+      catalog entry by matching the capability name heading
+    type: behavioral
+
+  - id: AC-006
+    text: >
+      `feature.sh cap add` accepts optional `--decisions "..."` flag;
+      stores the decisions text as a `Decisions:` line in the FEATURES.md
+      entry, capturing design rationale at registration time
+    type: behavioral
+
+  # --- B. Claude Hook Enforcement ---
+  - id: AC-007
+    text: >
+      PostToolUse.sh sets session flag .agentic/session/.cap_updated when
+      a Write/Edit tool targets a file path ending in FEATURES.md or
+      OVERVIEW.md
+    type: behavioral
+
+  - id: AC-008
+    text: >
+      Stop.sh checks at session end: if token-events.log has W| entries
+      in implementation directories AND .cap_updated flag does not exist,
+      outputs advisory warning suggesting the agent update FEATURES.md
+      (when it exists) or OVERVIEW.md (otherwise)
+    type: behavioral
+
+  - id: AC-009
+    text: >
+      UserPromptSubmit.sh injects a one-time nudge after 5+ writes to
+      implementation files if .cap_updated flag does not exist; sets
+      .agentic/session/.cap_nudged flag to prevent repeating
+    type: behavioral
+
+  - id: AC-010
+    text: >
+      catalog_enforcement setting exists in profiles.conf with preset
+      defaults: discovery=advisory, formal=advisory, autonomous_formal=blocking;
+      users override via STACK.md like any other setting
+    type: structural
+
+  # --- C. ag done catalog gate ---
+  - id: AC-011
+    text: >
+      `ag done` checks .cap_updated flag and shows advisory nudge if
+      the design doc was not updated; when feature_tracking=no, nudges
+      to update OVERVIEW.md Core Capabilities section
+    type: behavioral
+
+  - id: AC-012
+    text: >
+      `ag done` checks if JOURNAL.md was modified since session start
+      when feature_tracking=no; warns if no journal entry was written
+    type: behavioral
+
+  # --- D. Dashboard visibility ---
+  - id: AC-013
+    text: >
+      dashboard.sh displays capability count line showing built, in_progress,
+      and planned counts when FEATURES.md exists
+    type: behavioral
+
+  # --- E. Enforcement hierarchy in instruction files ---
+  - id: AC-014
+    text: >
+      CLAUDE.md template, cursorrules, copilot instructions, codex
+      instructions, and memory-seed all document the enforcement hierarchy:
+      Claude hooks > Skills > ag commands > pre-commit > instruction files
+    type: structural
+
+  - id: AC-015
+    text: >
+      FRAMEWORK_DEVELOPMENT.md has an "Enforcement Architecture" section
+      documenting when to use Claude hooks vs pre-commit vs instruction files
+    type: structural

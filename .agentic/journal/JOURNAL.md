@@ -4981,3 +4981,42 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-03 09:02 - F-041 Intel Tests + F-042 Universal Capability Catalog
+
+**Why**: Intelligence engine needed comprehensive test coverage; capability catalog was formal-only leaving discovery projects with no tracking; enforcement needed to use Claude hooks not pre-commit
+
+**What changed**:
+- Built 119 new intel tests (gaps, integration, logging), added intel event logging for sourcing audit, implemented universal capability catalog with Claude hook enforcement across all profiles
+
+**Next steps**:
+- Instruction file updates for enforcement hierarchy, PR review, ag done on main after merge
+
+**Blockers**: None
+
+
+### Session: 2026-04-03 09:06 - F-042 single format
+
+**Why**: User feedback: dual format is confusing, discovery should be lightweight but still track what matters
+
+**What changed**:
+- Removed dual format from capability catalog — one format for all profiles
+
+**Next steps**:
+- Push PR, merge after review
+
+**Blockers**: None
+
+
+### Session: 2026-04-03 09:26 - PR #222 review fixes
+
+**Why**: Code review found stale metadata and minor bugs before merge
+
+**What changed**:
+- Fixed 6 review issues: duplicate comment, stale F-042 metadata, test count correction, _il_int robustness
+
+**Next steps**:
+- Merge PR, ag done on main
+
+**Blockers**: None
+

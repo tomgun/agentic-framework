@@ -211,12 +211,34 @@ cmd_done() {
         echo "  [ ] Tests written and passing (if applicable)"
         echo "  [ ] STATUS.md updated"
         echo "  [ ] JOURNAL.md updated"
+        echo "  [ ] OVERVIEW.md updated (capabilities, decisions)"
         echo ""
-        # Quick health check (warning only — Discovery mode)
+        # Quick health check (warning only)
         if bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null; then
             echo -e "${GREEN}✓${NC} Quick health check passed"
         else
             echo -e "${YELLOW}⚠ Quick health check found issues (non-blocking)${NC}"
+        fi
+        echo ""
+        # Design doc check (F-042)
+        if [ -f "${ROOT_DIR}/.agentic/session/.cap_updated" ]; then
+            echo -e "${GREEN}✓${NC} Design doc updated this session"
+        else
+            echo -e "${YELLOW}⚠ OVERVIEW.md not updated. Register what you built:${NC}"
+            echo "  Update the Core Capabilities and Guiding Principles sections in .agentic/OVERVIEW.md"
+        fi
+        # Journal freshness check (F-042)
+        local _journal_path="${ROOT_DIR}/.agentic/journal/JOURNAL.md"
+        if [ -f "$_journal_path" ] && [ -d "${ROOT_DIR}/.agentic/session" ]; then
+            local _sess_start _journal_mtime
+            _sess_start=$(stat -c %Y "${ROOT_DIR}/.agentic/session" 2>/dev/null || stat -f %m "${ROOT_DIR}/.agentic/session" 2>/dev/null || echo 0)
+            _journal_mtime=$(stat -c %Y "$_journal_path" 2>/dev/null || stat -f %m "$_journal_path" 2>/dev/null || echo 0)
+            if [ "$_journal_mtime" -le "$_sess_start" ] 2>/dev/null; then
+                echo -e "${YELLOW}⚠ No journal entry this session. Record what you did:${NC}"
+                echo "  bash .agentic/lib/tools/journal.sh \"Topic\" \"What changed\" \"Next\" \"Blockers\" --why \"Motivation\""
+            else
+                echo -e "${GREEN}✓${NC} Journal updated this session"
+            fi
         fi
         echo ""
         # Check if WIP is complete

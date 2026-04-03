@@ -54,4 +54,13 @@ Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
 - JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes" "Next" "Blockers" --why "Problem"`
 - HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
+- FEATURES.md: `bash .agentic/lib/tools/feature.sh cap add "Name" "Description"` or `feature.sh cap status "Name" built`
 - TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`
+
+## Enforcement Hierarchy
+
+1. **Claude hooks** (real-time) — PreToolUse, PostToolUse, Stop.sh, UserPromptSubmit. Primary enforcement.
+2. **Skills** (just-in-time) — loaded at workflow triggers
+3. **`ag` commands** (workflow gates) — validate preconditions
+4. **Pre-commit hooks** (git-level) — safety net for non-Claude tools only
+5. **Instruction files** (behavioral) — guidance, no structural enforcement
