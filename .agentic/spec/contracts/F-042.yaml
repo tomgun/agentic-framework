@@ -5,47 +5,47 @@ profile: both
 protection: none
 category: core
 description: >
-  Makes FEATURES.md (the capability catalog) universal across all profiles.
-  Discovery projects get lightweight entries (name + status + description + decisions).
-  Formal projects keep full F-XXXX ceremony. Claude hooks enforce catalog updates
-  in real-time during sessions via PostToolUse, UserPromptSubmit, and Stop hooks.
+  Makes FEATURES.md (the capability catalog) universal — scaffolded for all
+  setting combinations, not just when feature_tracking=yes. Single entry
+  format (name + status + description + decisions). Claude hooks enforce
+  catalog updates in real-time during sessions. Profiles are presets for
+  settings, not separate modes.
 user_input: ''
 assertions:
 
   # --- A. Universal Catalog ---
   - id: AC-001
     text: >
-      state-files.conf lists FEATURES.md with profile `all` (not `formal`),
-      causing scaffold/upgrade to create FEATURES.md for discovery projects
+      state-files.conf lists FEATURES.md with profile `all`,
+      causing scaffold/upgrade to create FEATURES.md for all projects
     type: structural
 
   - id: AC-002
     text: >
-      FEATURES.template.md defines a single entry format for all profiles:
-      heading (## Name), status (built|in_progress|planned), description,
-      and optional Decisions line; no dual format, no F-XXXX IDs in the
-      catalog itself
+      FEATURES.template.md defines a single entry format: heading (## Name),
+      status (built|in_progress|planned), description, and optional Decisions
+      line; no dual format, no F-XXXX IDs in the catalog itself
     type: structural
 
   - id: AC-003
     text: >
-      All capability entries in FEATURES.md use the same three status
-      values: `built`, `in_progress`, `planned` — regardless of profile;
-      formal lifecycle states (specced, criteria_set, etc.) live in
-      contract YAML, not the catalog
+      All capability entries use the same three status values: `built`,
+      `in_progress`, `planned`; extended lifecycle states (specced,
+      criteria_set, etc.) live in contract YAML, not the catalog
     type: structural
 
   - id: AC-004
     text: >
-      `feature.sh cap add "Name" "description"` appends a discovery-format
-      entry to FEATURES.md with status `planned` and the given description;
-      when feature_tracking=yes, auto-assigns next F-XXXX ID instead
+      `feature.sh cap add "Name" "description"` appends a catalog entry
+      to FEATURES.md with status `planned` and the given description;
+      when feature_tracking=yes, also auto-assigns next F-XXXX ID for
+      the contract system
     type: behavioral
 
   - id: AC-005
     text: >
       `feature.sh cap status "Name" built` updates the status of a
-      discovery-format entry by matching the capability name heading
+      catalog entry by matching the capability name heading
     type: behavioral
 
   - id: AC-006
@@ -79,29 +79,30 @@ assertions:
 
   - id: AC-010
     text: >
-      catalog_enforcement setting exists in profiles.conf with defaults:
-      discovery=advisory, formal=advisory, autonomous_formal=blocking
+      catalog_enforcement setting exists in profiles.conf with preset
+      defaults: discovery=advisory, formal=advisory, autonomous_formal=blocking;
+      users override via STACK.md like any other setting
     type: structural
 
   # --- C. ag done catalog gate ---
   - id: AC-011
     text: >
-      `ag done` (both discovery and formal paths) checks .cap_updated flag
-      or FEATURES.md modification and shows advisory nudge if capability
-      catalog was not updated during the session
+      `ag done` checks .cap_updated flag or FEATURES.md modification
+      (regardless of feature_tracking setting) and shows advisory nudge
+      if capability catalog was not updated during the session
     type: behavioral
 
   - id: AC-012
     text: >
-      `ag done` discovery path checks if JOURNAL.md was modified since
-      session start; warns if no journal entry was written this session
+      `ag done` checks if JOURNAL.md was modified since session start
+      when feature_tracking=no; warns if no journal entry was written
     type: behavioral
 
   # --- D. Dashboard visibility ---
   - id: AC-013
     text: >
       dashboard.sh displays capability count line showing built, in_progress,
-      and planned counts when FEATURES.md exists, for all profiles
+      and planned counts when FEATURES.md exists
     type: behavioral
 
   # --- E. Enforcement hierarchy in instruction files ---

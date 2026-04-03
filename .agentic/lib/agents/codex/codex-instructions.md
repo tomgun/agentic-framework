@@ -58,7 +58,7 @@ Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
 - JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes" "Next" "Blockers" --why "Problem"`
 - HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
-- FEATURES.md: `bash .agentic/lib/tools/feature.sh cap add "Name" "Description"` (discovery) or `feature.sh F-#### status shipped` (formal)
+- FEATURES.md: `bash .agentic/lib/tools/feature.sh cap add "Name" "Description"` or `feature.sh cap status "Name" built`
 - TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`
 
 Enforcement hierarchy: Claude hooks (real-time) > Skills (just-in-time) > ag commands (gates) > pre-commit (safety net for non-Claude tools) > instruction files (behavioral).
