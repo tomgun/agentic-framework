@@ -852,6 +852,31 @@ When adding new gates, enforcement, or behavioral nudges to the framework, use t
 
 ---
 
+## Discovery → Formal Transition (Profile Graduation)
+
+Profiles (discovery, formal, autonomous_formal) are **presets for settings**, not separate products. A project can run in discovery settings indefinitely and still get real value from the framework — intelligence engine, quality patterns, journal, OVERVIEW.md design doc, Claude hook enforcement.
+
+**The key design principle**: discovery settings still log enough information to make a transition to formal specs as fluent as possible. Every artifact discovery produces is raw material for formal specs:
+
+| Discovery artifact | Formal equivalent | Transition path |
+|---|---|---|
+| OVERVIEW.md Core Capabilities (checkboxes) | FEATURES.md with F-XXXX entries | Each checked capability → a feature entry. `ag specs` can generate these from OVERVIEW.md. |
+| OVERVIEW.md Guiding Principles | NFR.md non-functional requirements | Each principle → an NFR with measurable criteria. |
+| JOURNAL.md entries (with `--why`) | ADRs in `spec/adr/` | Key decisions from journal → formal Architecture Decision Records. |
+| Cerebrum entries (`ag intel remember`) | Enforced patterns in `patterns.yaml` | Preferences/learnings → `ag intel learn` patterns with scope globs. |
+| Code + tests (as they exist) | YAML contracts with acceptance criteria | Code behavior → extracted ACs. Tests → verification commands in contracts. `ag specs` analyzes codebase to suggest ACs. |
+| ISSUES.md + LESSONS.md | Patterns + quality checklist items | `ag intel retro` already does this — converts lessons to enforceable patterns. |
+
+**When a user decides to graduate**: They change `feature_tracking: yes` and `spec_directory: yes` in STACK.md (or switch to `profile: formal`). Then run `ag specs` which reads OVERVIEW.md capabilities, existing code, and tests to generate FEATURES.md entries and draft contract YAMLs. The journal and cerebrum provide decision context that helps write more accurate ACs.
+
+**What this means for framework development**:
+1. **Discovery artifacts must be machine-readable** — OVERVIEW.md checkboxes, structured journal entries, typed cerebrum entries. If an artifact can't be parsed during transition, it has no transition value.
+2. **Don't gate discovery features behind formal settings** — if a feature helps track what was built or why, it should work when `feature_tracking=no`. The data it produces will be useful later.
+3. **`ag specs` is the bridge command** — it reads everything discovery produced and generates formal specs. When improving discovery tracking, ask: "will `ag specs` be able to use this during graduation?"
+4. **Journal `--why` is critical** — the motivation behind decisions is what transforms a capability checkbox into a well-specified AC. Without "why", graduation produces specs that describe what exists but not what matters.
+
+---
+
 ## Getting Help
 
 **Unsure about a change?**

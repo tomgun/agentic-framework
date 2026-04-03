@@ -76,6 +76,10 @@ Framework enforcement uses multiple layers. When adding new gates or enforcement
 4. **Pre-commit hooks** (git-level safety net) — for non-Claude tools and defense-in-depth only
 5. **Instruction files** (behavioral) — guide agent behavior but no structural enforcement
 
+## Design Tracking
+
+Profiles are presets for settings — not separate products. Even without formal feature tracking, keep OVERVIEW.md current (Core Capabilities, Guiding Principles). Journal entries should use `--why` to capture decision motivation. These artifacts are raw material for formal specs if the project later enables `feature_tracking: yes` — OVERVIEW.md capabilities become FEATURES.md entries, journal decisions become ADRs, cerebrum learnings become enforced patterns.
+
 ## Skills & Workflows
 
 Workflow triggers are handled by Skills in `.claude/skills/`. Each skill has instructions, scripts, and references for its workflow.
