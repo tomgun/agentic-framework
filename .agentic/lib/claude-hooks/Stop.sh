@@ -124,8 +124,8 @@ fi
 _IL_EVENTS=".agentic/session/intel-events.log"
 _IL_SUMMARY=".agentic/intel/intel-summary.json"
 
-# Safe integer extraction — strips whitespace from grep/awk output
-_il_int() { local v; v=$("$@" 2>/dev/null || echo 0); v="${v## }"; v="${v%% }"; v="${v%%[!0-9]*}"; echo "${v:-0}"; }
+# Safe integer extraction — strips whitespace and non-digit prefixes from grep/awk output
+_il_int() { local v; v=$("$@" 2>/dev/null || echo 0); v="${v##*[!0-9]}"; v="${v## }"; v="${v%% }"; v="${v%%[!0-9]*}"; echo "${v:-0}"; }
 
 if [[ -f "$_IL_EVENTS" ]]; then
   _IL_QUERIES=$(_il_int grep -c '|query|' "$_IL_EVENTS")

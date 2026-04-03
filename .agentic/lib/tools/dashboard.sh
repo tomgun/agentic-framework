@@ -231,7 +231,6 @@ if [[ -f "$INTEL_SUMMARY" ]]; then
 fi
 
 # CAPABILITY CATALOG (F-042: Universal Capability Catalog)
-# CAPABILITY CATALOG (F-042: Universal Capability Catalog)
 # FEATURES.md for formal feature tracking; OVERVIEW.md checkboxes for lightweight tracking
 D_CAP_METRICS=""
 FEATURES_FILE_DASH="$PROJECT_ROOT/.agentic/spec/FEATURES.md"

@@ -489,7 +489,7 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 **Implementation**:
 - State: shipped (v0.77.0-v0.77.1)
 - Code: `.agentic/lib/tools/commands/intel.sh`, hooks (PreToolUse/PostToolUse/Stop), `.agentic/intel/`
-- Tests: `tests/test_intel_patterns.sh`, `test_intel_anatomy.sh`, `test_intel_bootstrap.sh`, `test_intel_phase_queries.sh`, `test_intel_gaps.sh`, `test_intel_integration.sh` (208 tests)
+- Tests: `tests/test_intel_patterns.sh` (36), `test_intel_anatomy.sh` (23), `test_intel_bootstrap.sh` (16), `test_intel_phase_queries.sh` (41), `test_intel_gaps.sh` (50), `test_intel_integration.sh` (42), `test_intel_logging.sh` (27) — 235 tests
 
 **Contract**: See `spec/contracts/F-041.yaml`
 
@@ -497,16 +497,16 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 
 ## F-042: Universal Capability Catalog
 
-**Status**: planned
+**Status**: shipped
 **Category**: core
 **Priority**: medium
 **Complexity**: medium
 
-**Description**: (TODO: add description)
+**Description**: Ensures every project tracks what it builds. When feature_tracking=yes, FEATURES.md is the formal catalog. When feature_tracking=no, OVERVIEW.md (Core Capabilities section) is the lightweight design doc. Claude hooks (PostToolUse, UserPromptSubmit, Stop.sh) enforce updates in real-time. `ag done` checks catalog and journal freshness. Dashboard shows capability counts. Profiles are presets for settings, not modes — code branches on settings, not profile names.
 
 **Implementation**:
-- State: none
-- Code: (TODO)
-- Tests: (TODO)
+- State: shipped (v0.78.0)
+- Code: `feature.sh` (cap add/status), `PostToolUse.sh`, `UserPromptSubmit.sh`, `Stop.sh`, `done.sh`, `dashboard.sh`, `profiles.conf`, `FEATURES.template.md`
+- Tests: `tests/test_capability_catalog.sh` (23 tests)
 
 **Contract**: See `spec/contracts/F-042.yaml`

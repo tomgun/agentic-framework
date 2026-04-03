@@ -5007,3 +5007,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-03 09:26 - PR #222 review fixes
+
+**Why**: Code review found stale metadata and minor bugs before merge
+
+**What changed**:
+- Fixed 6 review issues: duplicate comment, stale F-042 metadata, test count correction, _il_int robustness
+
+**Next steps**:
+- Merge PR, ag done on main
+
+**Blockers**: None
+
