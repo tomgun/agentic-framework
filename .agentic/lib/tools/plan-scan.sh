@@ -15,16 +15,16 @@
 #   1. Epic ID (E-XXXX) from "Epic ID:" metadata or "# Epic Plan:" heading
 #   2. Feature ID (F-XXXX) from heading, title, or "Feature:" metadata
 #   - Verify the ID belongs to this project (FEATURES.md for F-*, feature refs for E-*)
-#   - Plans without a clear primary ID are skipped
+#   - Plans without a clear primary ID are saved with a title-based slug
 #
 # Dedup strategy:
 #   1. Filename match: checks for *{ID}*plan* in durable plans directory
 #   2. Content hash: catches duplicates saved under different names (e.g., E-0001 vs F-0219)
 #
-# Naming convention (rigid):
-#   - Feature plans: YYYY-MM-DD-F-XXXX-plan.md
-#   - Epic plans: YYYY-MM-DD-E-XXXX-plan.md
-#   - Generic plans: YYYY-MM-DD-<slug>-plan.md (future)
+# Naming convention:
+#   - Feature plans: YYYY-MM-DD-F-XXXX-<slug>-plan.md
+#   - Epic plans: YYYY-MM-DD-E-XXXX-<slug>-plan.md
+#   - Generic plans: YYYY-MM-DD-<slug>-plan.md (no ID, title-derived slug)
 #
 # Exit code: always 0 (advisory tool).
 
@@ -142,18 +142,26 @@ extract_primary_id() {
         return
     fi
 
-    # Pattern 4: Any F-XXXX in the first 10 lines (broad fallback)
-    # Intentionally last — safety net for plans where F-ID appears only in body text
-    # (e.g., "**Task**: ... F-003"). The known-features check at line 165 still
-    # prevents cross-project pollution.
-    fid=$(echo "$header" | grep -oE "$FEATURE_ID_ERE" | head -1 || true)
-    if [[ -n "$fid" ]]; then
-        echo "$fid"
-        return
-    fi
-
-    # No primary ID found
+    # No primary ID found — plan may not have a feature assigned yet
     echo ""
+}
+
+# --- Helper: generate a slug from the plan's first heading ---
+# Extracts first markdown heading, lowercases, strips non-alnum, truncates.
+# Returns empty string if no heading found.
+extract_slug() {
+    local file="$1"
+    local heading
+    heading=$(head -5 "$file" 2>/dev/null | grep -E '^#' | head -1 | sed 's/^#\+ *//' || true)
+    [[ -z "$heading" ]] && return
+
+    # Lowercase, replace non-alphanumeric with hyphens, collapse, trim
+    echo "$heading" \
+        | tr '[:upper:]' '[:lower:]' \
+        | sed 's/[^a-z0-9]/-/g' \
+        | sed 's/--*/-/g' \
+        | sed 's/^-//;s/-$//' \
+        | cut -c1-60
 }
 
 # --- Scan for unsaved plans ---
@@ -168,32 +176,57 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
 
         # Extract primary ID (E-XXXX for epics, F-XXXX for features)
         primary_id=$(extract_primary_id "$plan_file")
-        [[ -z "$primary_id" ]] && continue
 
-        # Verify this ID belongs to THIS project
-        # For feature IDs: check FEATURES.md. For epic IDs: accept if any feature ref matches.
-        if [[ "$primary_id" == F-* && -n "$_known_features" ]]; then
-            if ! echo "$_known_features" | grep -qF "$primary_id"; then
+        # Determine how to name/dedup this plan
+        slug=""
+        if [[ -n "$primary_id" ]]; then
+            # Verify this ID belongs to THIS project
+            # For feature IDs: check FEATURES.md. For epic IDs: accept if any feature ref matches.
+            if [[ "$primary_id" == F-* && -n "$_known_features" ]]; then
+                if ! echo "$_known_features" | grep -qF "$primary_id"; then
+                    continue
+                fi
+            elif [[ "$primary_id" == E-* && -n "$_known_features" ]]; then
+                # Epic: check if the plan references any known feature
+                plan_fids=$(grep -oE "$FEATURE_ID_ERE" "$plan_file" 2>/dev/null | sort -u || true)
+                has_match=false
+                for pfid in $plan_fids; do
+                    if echo "$_known_features" | grep -qF "$pfid"; then
+                        has_match=true
+                        break
+                    fi
+                done
+                [[ "$has_match" == false ]] && continue
+            fi
+        else
+            # No feature/epic ID — check if plan references ANY known feature
+            # (belongs to this project even without a primary ID)
+            if [[ -n "$_known_features" ]]; then
+                plan_fids=$(grep -oE "$FEATURE_ID_ERE" "$plan_file" 2>/dev/null | sort -u || true)
+                has_match=false
+                for pfid in $plan_fids; do
+                    if echo "$_known_features" | grep -qF "$pfid"; then
+                        has_match=true
+                        break
+                    fi
+                done
+                [[ "$has_match" == false ]] && continue
+            else
+                # No known features at all — can't verify ownership, skip
                 continue
             fi
-        elif [[ "$primary_id" == E-* && -n "$_known_features" ]]; then
-            # Epic: check if the plan references any known feature
-            plan_fids=$(grep -oE "$FEATURE_ID_ERE" "$plan_file" 2>/dev/null | sort -u || true)
-            has_match=false
-            for pfid in $plan_fids; do
-                if echo "$_known_features" | grep -qF "$pfid"; then
-                    has_match=true
-                    break
-                fi
-            done
-            [[ "$has_match" == false ]] && continue
+
+            # Generate slug from title for naming
+            slug=$(extract_slug "$plan_file")
+            [[ -z "$slug" ]] && continue
         fi
 
         ((FOUND_COUNT++))
 
-        # Check 1: filename match — any file with the primary ID in PLANS_DIR
+        # Check 1: filename match — any file with the primary ID or slug in PLANS_DIR
         local_plan_exists=false
-        for existing in "$PLANS_DIR"/*"${primary_id}"*plan*; do
+        match_pattern="${primary_id:-$slug}"
+        for existing in "$PLANS_DIR"/*"${match_pattern}"*plan*; do
             if [[ -f "$existing" ]]; then
                 local_plan_exists=true
                 break
@@ -224,14 +257,26 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
             continue
         fi
 
-        # No durable plan exists — copy it with rigid naming: YYYY-MM-DD-{ID}-plan.md
-        dest_name="$(date +%Y-%m-%d)-${primary_id}-plan.md"
+        # No durable plan exists — copy with naming:
+        #   With ID:    YYYY-MM-DD-F-XXXX-<slug>-plan.md
+        #   Without ID: YYYY-MM-DD-<slug>-plan.md
+        [[ -z "$slug" ]] && slug=$(extract_slug "$plan_file")
+        label=""
+        if [[ -n "$primary_id" && -n "$slug" ]]; then
+            label="${primary_id}-${slug}"
+        elif [[ -n "$primary_id" ]]; then
+            label="${primary_id}"
+        else
+            label="${slug}"
+        fi
+        file_date=$(date -r "$plan_file" +%Y-%m-%d 2>/dev/null || date +%Y-%m-%d)
+        dest_name="${file_date}-${label}-plan.md"
         if [[ "$CHECK_ONLY" == true ]]; then
-            COPIED_PLANS+=("$primary_id (from $(basename "$scan_dir")/$(basename "$plan_file"))")
+            COPIED_PLANS+=("$label (from $(basename "$scan_dir")/$(basename "$plan_file"))")
             ((COPIED_COUNT++))
         else
             cp "$plan_file" "$PLANS_DIR/$dest_name"
-            COPIED_PLANS+=("$primary_id (from $(basename "$scan_dir")/$(basename "$plan_file"))")
+            COPIED_PLANS+=("$label (from $(basename "$scan_dir")/$(basename "$plan_file"))")
             ((COPIED_COUNT++))
         fi
     done
