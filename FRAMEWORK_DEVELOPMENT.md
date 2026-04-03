@@ -870,10 +870,10 @@ Profiles (discovery, formal, autonomous_formal) are **presets for settings**, no
 **When a user decides to graduate**: They change `feature_tracking: yes` and `spec_directory: yes` in STACK.md (or switch to `profile: formal`). Then run `ag specs` which reads OVERVIEW.md capabilities, existing code, and tests to generate FEATURES.md entries and draft contract YAMLs. The journal and cerebrum provide decision context that helps write more accurate ACs.
 
 **What this means for framework development**:
-1. **Discovery artifacts must be machine-readable** — OVERVIEW.md checkboxes, structured journal entries, typed cerebrum entries. If an artifact can't be parsed during transition, it has no transition value.
-2. **Don't gate discovery features behind formal settings** — if a feature helps track what was built or why, it should work when `feature_tracking=no`. The data it produces will be useful later.
-3. **`ag specs` is the bridge command** — it reads everything discovery produced and generates formal specs. When improving discovery tracking, ask: "will `ag specs` be able to use this during graduation?"
-4. **Journal `--why` is critical** — the motivation behind decisions is what transforms a capability checkbox into a well-specified AC. Without "why", graduation produces specs that describe what exists but not what matters.
+1. **Discovery artifacts must be understandable months later** — OVERVIEW.md checkboxes, structured journal entries with `--why`, typed cerebrum entries. If someone comes back in 6 months, they should be able to understand what was built and why from these artifacts alone.
+2. **Don't gate discovery features behind formal settings** — if a feature helps track what was built or why, it should work when `feature_tracking=no`. The data it produces is valuable on its own AND makes graduation easier.
+3. **Structure enables transition** — machine-readable formats (checkboxes, YAML cerebrum entries, journal with fields) naturally lend themselves to generating formal specs later. This is a side benefit of good structure, not the primary goal.
+4. **Journal `--why` is critical** — the motivation behind decisions is what gives artifacts lasting value. A checkbox says "we built search." A journal entry with `--why` says "we built search because users couldn't find products by category, and we chose Elasticsearch over Postgres FTS because we expect 10M+ products." That context is useful whether or not you ever go formal.
 
 ---
 

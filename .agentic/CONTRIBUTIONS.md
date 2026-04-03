@@ -33,6 +33,28 @@
 
 ---
 
+### F-042 Universal Capability Catalog — Intelligence Sourcing Audit + Design Tracking (v0.78.0)
+
+**User insight 1 — Log intelligence sourcing vs improvisation**: "Can we somehow log when we are using intelligence from the framework memories vs Claude just improvising on its own?" (Apr 2) — Created the intel event log: every query, enforcement, mutation, and scan is tracked. Stop.sh shows "🧠 Intel: 4 queries, 2 enforcements" at session end. Makes it visible when the agent consulted framework knowledge vs winging it.
+
+**User insight 2 — Claude hooks as primary enforcement, not pre-commit**: "I think we should use the hooks in Claude heavily... not pre-commit hooks only... the pre-commit hooks are more for non-advanced tools." (Apr 2) — Fundamental architectural decision. Claude hooks (PreToolUse, PostToolUse, Stop, UserPromptSubmit) run in real-time during the session — they can nudge the agent while it's still working. Pre-commit fires at commit time, too late. Established the enforcement hierarchy: Claude hooks > Skills > ag commands > pre-commit > instruction files.
+
+**User insight 3 — Specs/ACs must come before code, structurally**: "Would it make sense to have the AC first and then just implement the tests/code?" (Apr 2) — Called out that the agent built the intel logging feature (code + tests) and only wrote specs when asked. The correct order is ACs → tests → code. The enforcement should be structural (hooks detect code-before-specs), not just behavioral (instruction files say "spec first").
+
+**User insight 4 — Features == Capabilities, catalog must be updated**: "Remember that our FEATURES == CAPABILITIES. So if we add new capabilities to the product, the catalog of capabilities needs to be updated (migration)!" (Apr 2) — The capability catalog is not optional metadata. When you build something new, the catalog must reflect it. This is a core framework invariant, enforced by Claude hooks.
+
+**User insight 5 — Discovery still needs tracking, just less ceremony**: "If we are in discovery profile, then we don't have formal specs/ac, but still we should have some central design doc of what we have built, a reliable decision log and what we plan to build." (Apr 2) — Discovery isn't "no tracking" — it's "track what matters without the ceremony that slows you down when pivoting." OVERVIEW.md is the lightweight design doc. Journal with `--why` is the decision log.
+
+**User insight 6 — Profiles are presets, not modes**: "Remember that discovery/formal are like presets/profiles for our settings — not their own settings." (Apr 3) — Corrected a framing error where code branched on profile name instead of individual settings. The profile sets defaults for `feature_tracking`, `acceptance_criteria`, etc. Code should check those settings, not `if discovery`.
+
+**User insight 7 — No dual format, use existing OVERVIEW.md**: "Why can't there be a separate general design doc that is updated when we don't have formal features? Maybe we even already have one." (Apr 3) — OVERVIEW.md already existed for all projects with a Core Capabilities section. Instead of forcing FEATURES.md on non-formal projects or inventing a dual format, use what's already there. FEATURES.md stays formal. OVERVIEW.md is the lightweight design doc.
+
+**User insight 8 — Discovery→formal graduation must be fluent**: "The point is also that with discovery settings, we still log enough information to make a transition to formal specs as fluent as possible." (Apr 3) — Every discovery artifact is raw material for formal specs: OVERVIEW.md checkboxes → FEATURES.md entries, journal `--why` → ADRs, cerebrum learnings → enforced patterns, code+tests → contract ACs. Discovery artifacts have value on their own AND make graduation easier when needed.
+
+**Why it matters**: The framework now tracks intelligence sourcing (are agents using what we built or improvising?), enforces design doc updates via Claude hooks (not just behavioral rules), and provides a clear graduation path from discovery → formal. Discovery is no longer "formal minus ceremony" — it's a first-class tracking approach that accumulates transition-ready artifacts.
+
+---
+
 ### Enforcement-Chain Testing — Tests Must Break the Workflow, Not Just Check Files (v0.77.0)
 
 **User insight**: The framework's 693 tests were all structural — "does this file exist?", "does this string appear?" — but none tested whether agents could actually skip steps. Real failures (skipping plan review, shipping without docs) went undetected because no test exercised the enforcement chain end-to-end. The user's direction: "you need harder tests... tests should reveal cases where the plan is not automatically review-looped, or docs are not automatically updated."
