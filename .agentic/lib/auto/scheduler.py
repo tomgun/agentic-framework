@@ -51,6 +51,7 @@ class FeatureWork:
     task_result: Optional[TaskResult] = None
     error: str = ""
     duration_seconds: float = 0.0
+    attempts: int = 0  # Change 9: retry count (0 = first attempt, 1 = retry)
 
 
 @dataclass
@@ -282,15 +283,34 @@ class AutonomousScheduler:
                                 f"blocked at {fw.review_blocked_at}",
                             )
                         else:
-                            fw.status = "failed"
-                            result.features_failed += 1
-                            error_count += 1
+                            # Change 9: Retry once with fresh context before marking failed
+                            if fw.attempts < 2:
+                                fw.status = "pending"  # Re-queue for next iteration
+                                fw.attempts += 1
+                                logger.info(
+                                    "Feature %s failed (attempt %d) — retrying with fresh context",
+                                    fw.feature_id, fw.attempts,
+                                )
+                            else:
+                                fw.status = "failed"
+                                result.features_failed += 1
+                                error_count += 1
                 except Exception as e:
                     fw.duration_seconds += time.time() - start
-                    fw.status = "failed"
-                    fw.error = str(e)
-                    result.features_failed += 1
-                    error_count += 1
+                    # Change 9: Retry on exception too
+                    if fw.attempts < 2:
+                        fw.status = "pending"
+                        fw.attempts += 1
+                        fw.error = str(e)
+                        logger.warning(
+                            "Feature %s exception (attempt %d): %s — retrying",
+                            fw.feature_id, fw.attempts, e,
+                        )
+                    else:
+                        fw.status = "failed"
+                        fw.error = str(e)
+                        result.features_failed += 1
+                        error_count += 1
 
                 if self.on_feature_done:
                     self.on_feature_done(fw)

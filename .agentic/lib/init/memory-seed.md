@@ -26,12 +26,13 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - **Wrong rationalizations:** "I can do it directly faster" — NO. "User said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
 
 ## After Plan Mode Exits — Auto-Continue (do NOT stop)
-Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and wait for user input.
-1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT`
+Exiting plan mode creates a DRAFT. The framework BLOCKS code edits and session stop until resolved. Auto-continue immediately:
+1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT` (injected automatically)
 2. Spawn Critic + Advocate agents in parallel (fresh context) for dialectical review
-3. If converged → set `**Status**: APPROVED`; if not → revise plan
-4. After APPROVED → run `ag transition F-XXXX implementation`
-**Wrong rationalizations:** "The user created the plan" — NO. "Plan mode exit = approval" — NO. Review is structural, not discretionary.
+3. Save review to `.agentic/work/F-XXXX/review.md` (required — framework checks for evidence)
+4. If converged → set `**Status**: APPROVED`; if not → revise plan
+5. After APPROVED → run `ag transition F-XXXX implementation`
+**Enforcement**: PreToolUse denies code edits when DRAFT plan exists. Stop.sh denies session end. Review evidence (review.md) required for APPROVED status in autonomous_formal.
 
 ## Documentation — Part of the Deliverable
 Docs ship with code, not after merge. Before creating a PR:
@@ -51,3 +52,15 @@ Docs ship with code, not after merge. Before creating a PR:
 - **Feature ID patterns are centralized**: `ids.py` (Python) and `ids.sh` (shell) are the single source of truth for feature ID regexes. Import `FEATURE_ID_RE`, `FEATURE_HEADER_RE`, etc. — never inline `F-\d{4,}` or `F-[0-9]{4,}` patterns in code.
 - **Track what you build**: When `feature_tracking=yes`, update FEATURES.md. Otherwise, update OVERVIEW.md (Core Capabilities section). Claude hooks (Stop.sh, UserPromptSubmit) nudge if you write implementation code but forget to update the design doc.
 - **Enforcement hierarchy**: Claude hooks (real-time) > Skills (just-in-time) > ag commands (gates) > pre-commit (non-Claude tools only) > instruction files (behavioral). New gates go in Claude hooks, not pre-commit.
+
+## What the Framework Enforces Structurally (you can't bypass these)
+- **Spec-first**: PreToolUse denies code edits without spec+AC (formal)
+- **DRAFT plan blocks code**: PreToolUse denies code edits when DRAFT plan exists (formal)
+- **Shipped spec protection**: PreToolUse denies editing shipped contracts without migration (formal)
+- **Destructive git blocked**: PreToolUse denies reset --hard, stash, checkout --, force push
+- **Session stop gates**: Stop.sh denies with DRAFT plans, unshipped merges, branches without PR
+- **Review evidence**: Plan can't be APPROVED without review.md evidence (autonomous_formal)
+- **Intelligence push**: Framework auto-pushes conventions, patterns, TDD nudges at decision points (all profiles)
+- **Token awareness**: PostToolUse warns on repeated reads and budget overruns
+- **Doc freshness**: UserPromptSubmit nudges after 3+ impl writes with 0 doc writes
+- **Batch work blocked**: UserPromptSubmit detects batch patterns, suggests ag auto crunch

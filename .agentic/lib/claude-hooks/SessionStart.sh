@@ -121,6 +121,43 @@ if [[ -f "$AGENTIC_LIB/tools/agents_helpers.py" ]]; then
   fi
 fi
 
+# 8. Intelligence bootstrap nudge (Change 7: auto-bootstrap)
+# If features exist but quality intelligence hasn't been created, suggest bootstrap.
+# Intelligence is a CORE VALUE for ALL profiles — not restricted to formal.
+if [[ -f ".agentic/spec/FEATURES.md" && ! -f ".agentic/intel/quality-checklist.yaml" ]]; then
+  _FEAT_COUNT=$(grep -c "^## F-" ".agentic/spec/FEATURES.md" 2>/dev/null || echo 0)
+  _FEAT_COUNT="${_FEAT_COUNT## }"
+  if [[ "${_FEAT_COUNT:-0}" -gt 0 ]]; then
+    echo -e "${BLUE}🧠 Quality intelligence not yet created (${_FEAT_COUNT} features exist).${NC}"
+    echo "   Run: ag intel bootstrap — generates quality checklist + test strategy for your stack"
+  fi
+fi
+
+# 8b. Orphaned intent detection (Change 14: crash recovery surfacing)
+if [[ -f ".agentic/session/intents.json" ]]; then
+  _ORPHAN_INTENTS=$(python3 -c "
+import json, sys
+try:
+    data = json.load(open(sys.argv[1]))
+    intents = data if isinstance(data, list) else data.get('intents', [])
+    orphans = [i for i in intents if i.get('status') == 'active']
+    print(len(orphans))
+except: print(0)
+" ".agentic/session/intents.json" 2>/dev/null || echo 0)
+  _ORPHAN_INTENTS="${_ORPHAN_INTENTS## }"
+  if [[ "${_ORPHAN_INTENTS:-0}" -gt 0 ]]; then
+    echo -e "${YELLOW}⚠️  ${_ORPHAN_INTENTS} orphaned intent(s) detected (previous session crash?)${NC}"
+    echo "   Run: ag intent list — to see and adopt/clear them"
+    echo "   Run: ag sync — to auto-reconcile"
+  fi
+fi
+
+# 8c. Kickoff staging detection (Change 13: surfacing)
+if [[ -d ".agentic/staging" ]]; then
+  echo -e "${BLUE}📋 Pending kickoff staging exists.${NC}"
+  echo "   Run: ag kickoff --review — to review generated features"
+fi
+
 echo ""
 echo -e "${GREEN}✓ Session ready${NC}"
 echo ""

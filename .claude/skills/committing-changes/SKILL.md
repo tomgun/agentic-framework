@@ -18,12 +18,21 @@ metadata:
 
 Run `ag commit` — it handles quality gates, branch checks, and diff review.
 
+## What's Enforced Automatically (hooks — you can't bypass these)
+- **Destructive git ops blocked** → PreToolUse denies reset --hard, stash, checkout --, force push
+- **Shipped spec protection** → PreToolUse denies editing shipped contracts without migration (formal)
+- **DRAFT plan blocks commit** → PreToolUse denies git commit when DRAFT plan exists (formal)
+- **Stale journal/status reminder** → UserPromptSubmit warns per-prompt when uncommitted changes exist
+- **Doc freshness nudge** → UserPromptSubmit warns after 3+ impl writes with 0 doc writes
+- **Progress nudge** → UserPromptSubmit suggests committing after 15+ edits
+- **Pre-commit gates** → 23 checks including spec consistency, test execution, shipped spec protection
+- **Session stop blocked** → Can't end session with unshipped merges or branches without PRs
+
 ## Before committing
 1. Update journal: `bash .agentic/lib/tools/journal.sh "Topic" "Done" "Next" "Blockers" --why "Reason"`
 2. Update status: `bash .agentic/lib/tools/status.sh focus "Current task"`
 3. If shipping feature: `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 4. Check doc freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done --manifest F-XXXX`
-   Docs ship with code — update stale docs before creating the PR.
 
 ## Rules
 - Never auto-commit in interactive sessions. Show diff to human first.
@@ -31,7 +40,7 @@ Run `ag commit` — it handles quality gates, branch checks, and diff review.
 - PR by default. After creating PR, add to HUMAN_NEEDED.md.
 - Stage specific files (`git add <files>`), not `git add .`
 - Include JOURNAL.md, STATUS.md in commits. Exclude VERSION, BACKLOG.json.
-- Before committing, grep `spec/contracts/` for assertions related to changed behavior. If any are affected, **STOP** — present them to the user and wait for approval before modifying any contract or test. Contracts protect shipped behavior; silently updating them to match new code defeats that protection.
+- Before committing, grep `spec/contracts/` for assertions related to changed behavior. If any are affected, **STOP** — present them to the user. Contracts protect shipped behavior.
 
 ## Post-merge
 ALWAYS run `ag done F-XXXX` on main after merge. Never skip it — it runs doc freshness gates (Gate 4), contract checks, VERSION bump, and state flush.

@@ -66,6 +66,44 @@ if [[ -n "$_POST_TOOL" ]]; then
       esac
       ;;
   esac
+
+  # --- Token budget awareness (Change 6b) ---
+  # Every 5th Read event, check for repeated reads and total token cost.
+  # Pushes one-time warning when thresholds exceeded.
+  if [[ "$_POST_TOOL" == "Read" && -f "$_TK_EVENTS" && ! -f ".agentic/session/.token_budget_warned" ]]; then
+    _TK_READ_COUNT=$(grep -c '^R|' "$_TK_EVENTS" 2>/dev/null || echo 0)
+    _TK_READ_COUNT="${_TK_READ_COUNT## }"
+    if [[ $(( _TK_READ_COUNT % 5 )) -eq 0 && "${_TK_READ_COUNT:-0}" -ge 5 ]]; then
+      # Check for repeated reads (same file 3+ times)
+      _TK_TOP_REPEAT=""
+      _TK_TOP_COUNT=0
+      if command -v sort >/dev/null 2>&1; then
+        _TK_TOP_LINE=$(grep '^R|' "$_TK_EVENTS" 2>/dev/null | cut -d'|' -f2 | sort | uniq -c | sort -rn | head -1)
+        _TK_TOP_COUNT=$(echo "$_TK_TOP_LINE" | awk '{print $1}')
+        _TK_TOP_COUNT="${_TK_TOP_COUNT## }"; _TK_TOP_COUNT="${_TK_TOP_COUNT%% }"
+        _TK_TOP_REPEAT=$(echo "$_TK_TOP_LINE" | awk '{print $2}')
+      fi
+      if [[ "${_TK_TOP_COUNT:-0}" -ge 3 ]]; then
+        _TK_TOP_BASENAME="${_TK_TOP_REPEAT##*/}"
+        echo "" >&2
+        echo "📊 TOKEN: ${_TK_TOP_BASENAME} read ${_TK_TOP_COUNT} times. Consider keeping notes to avoid re-reading." >&2
+        echo "" >&2
+        touch ".agentic/session/.token_budget_warned" 2>/dev/null || true
+      fi
+      # Check total estimated tokens
+      if [[ ! -f ".agentic/session/.token_budget_warned" ]]; then
+        _TK_TOTAL=$(awk -F'|' '{sum += $3} END {print sum+0}' "$_TK_EVENTS" 2>/dev/null || echo 0)
+        _TK_TOTAL="${_TK_TOTAL## }"
+        if [[ "${_TK_TOTAL:-0}" -ge 500000 ]]; then
+          echo "" >&2
+          echo "📊 TOKEN BUDGET: ~${_TK_TOTAL} estimated context tokens used this session." >&2
+          echo "   Consider compacting context or wrapping up current task." >&2
+          echo "" >&2
+          touch ".agentic/session/.token_budget_warned" 2>/dev/null || true
+        fi
+      fi
+    fi
+  fi
 fi
 
 # --- Advisory artifact check (hooks-first: uses gate.py) ---
@@ -154,6 +192,14 @@ if [[ $((COUNT % 10)) -eq 0 ]] && [[ -x ".agentic/lib/tools/session_log.sh" ]]; 
     "Checkpoint (${COUNT} actions)" \
     "Automatic checkpoint after ${COUNT} tool uses." \
     "checkpoint=auto,actions=${COUNT}" 2>/dev/null || true
+fi
+
+# Change 11: Suggest ag sync periodically (every 50 tool uses, max once)
+if [[ $((COUNT % 50)) -eq 0 && ! -f ".agentic/session/.sync_suggested" ]]; then
+  echo "" >&2
+  echo "🔄 50+ tool uses — consider running \`ag sync\` to check artifact consistency." >&2
+  echo "" >&2
+  touch ".agentic/session/.sync_suggested" 2>/dev/null || true
 fi
 
 exit 0  # Always exit 0 (advisory only, don't block Claude)

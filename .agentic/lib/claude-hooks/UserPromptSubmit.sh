@@ -86,6 +86,33 @@ if echo "$USER_PROMPT" | grep -qiE '(churn|batch)\s+(all\s+)?(tasks|features)|bu
   echo ""
 fi
 
+# --- Idea/todo capture nudge (Change 10) ---
+# When user prompt contains idea/todo keywords, suggest ag todo for capture.
+if echo "$USER_PROMPT" | grep -qiE '^(idea|remember|todo|note|we should|later we|maybe we)\b'; then
+  echo ""
+  _SAFE_PROMPT=$(printf '%s' "${USER_PROMPT:0:60}" | tr '`$"' "...")
+  echo "💡 Quick capture: \`ag todo \"${_SAFE_PROMPT}...\"\`"
+  echo ""
+fi
+
+# --- Kickoff suggestion for whole-project requests (Change 13) ---
+# When user wants to build an entire app/system AND no features exist yet
+if echo "$USER_PROMPT" | grep -qiE '(build|create|make).*(entire|whole|full|complete)\s+(app|game|project|system|platform)'; then
+  if [[ -f ".agentic/spec/FEATURES.md" ]]; then
+    _FEAT_EXISTS=$(grep -c "^## F-" ".agentic/spec/FEATURES.md" 2>/dev/null || echo 0)
+    _FEAT_EXISTS="${_FEAT_EXISTS## }"
+  else
+    _FEAT_EXISTS=0
+  fi
+  if [[ "${_FEAT_EXISTS:-0}" -eq 0 ]]; then
+    echo ""
+    _SAFE_VISION=$(printf '%s' "${USER_PROMPT:0:50}" | tr '`$"' "...")
+    echo "🚀 NEW PROJECT: Use \`ag kickoff \"${_SAFE_VISION}...\"\` to generate"
+    echo "   features, specs, and backlog from your vision. Then \`ag auto crunch\` to build."
+    echo ""
+  fi
+fi
+
 # --- Autonomous work pattern detection (F-0300 R2) ---
 # Warn when prompt mentions implementing multiple features directly
 MULTI_FEATURE_COUNT=$(echo "$USER_PROMPT" | grep -oE "$FEATURE_ID_ERE" | sort -u | wc -l | tr -d ' ')
@@ -176,25 +203,41 @@ if echo "$USER_PROMPT" | grep -qiE '(done|finished|complete|ship)\b'; then
   fi
 fi
 
-# --- Artifact status check (hooks-first: uses gate.py module calls) ---
-# Inject artifact status for active feature into context on every prompt.
-ACTIVE_FEATURE=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate resolve --project-root "$PROJECT_ROOT" 2>/dev/null || true)
+# --- Consolidated prompt context (Change 3: single Python call) ---
+# Replaces separate gate resolve + check-artifacts calls. Saves ~600ms of Python cold starts.
+# Returns JSON: {"feature": "F-XXXX", "issues": [...], "cerebrum": [...]}
+PROMPT_CTX=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate prompt-context --project-root "$PROJECT_ROOT" 2>/dev/null || true)
 
-if [[ -n "$ACTIVE_FEATURE" ]]; then
-  # Quick check: does feature have spec + AC?
-  ARTIFACT_JSON=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate check-artifacts --feature "$ACTIVE_FEATURE" --project-root "$PROJECT_ROOT" 2>/dev/null || true)
-  if [[ -n "$ARTIFACT_JSON" ]]; then
-    if command -v jq >/dev/null 2>&1; then
-      MISSING=$(echo "$ARTIFACT_JSON" | jq -r '.issues // [] | join("; ")' 2>/dev/null)
-    else
-      MISSING=$(echo "$ARTIFACT_JSON" | python3 -c "import sys,json; print('; '.join(json.load(sys.stdin).get('issues',[])))" 2>/dev/null || true)
-    fi
-    if [[ -n "$MISSING" ]]; then
-      echo ""
-      echo "📋 Active feature $ACTIVE_FEATURE — missing artifacts:"
-      echo "   $MISSING"
-      echo ""
-    fi
+ACTIVE_FEATURE=""
+if [[ -n "$PROMPT_CTX" ]]; then
+  if command -v jq >/dev/null 2>&1; then
+    ACTIVE_FEATURE=$(echo "$PROMPT_CTX" | jq -r '.feature // ""' 2>/dev/null)
+    MISSING=$(echo "$PROMPT_CTX" | jq -r '.issues // [] | join("; ")' 2>/dev/null)
+  else
+    ACTIVE_FEATURE=$(echo "$PROMPT_CTX" | python3 -c "import sys,json; print(json.load(sys.stdin).get('feature',''))" 2>/dev/null || true)
+    MISSING=$(echo "$PROMPT_CTX" | python3 -c "import sys,json; print('; '.join(json.load(sys.stdin).get('issues',[])))" 2>/dev/null || true)
+  fi
+  if [[ -n "$MISSING" && -n "$ACTIVE_FEATURE" ]]; then
+    echo ""
+    echo "📋 Active feature $ACTIVE_FEATURE — missing artifacts:"
+    echo "   $MISSING"
+    echo ""
+  fi
+fi
+
+# --- Change 12: Review checkpoint visibility ---
+# When active feature has been in implementing state for a while, nudge about
+# committing progress. One-time nudge tracked via token-events write count.
+if [[ -n "$ACTIVE_FEATURE" && -f ".agentic/session/token-events.log" ]]; then
+  _IMPL_WRITE_COUNT=$(grep -c '^W|' ".agentic/session/token-events.log" 2>/dev/null || echo 0)
+  _IMPL_WRITE_COUNT="${_IMPL_WRITE_COUNT%%[!0-9]*}"; _IMPL_WRITE_COUNT="${_IMPL_WRITE_COUNT:-0}"
+  if [[ "$_IMPL_WRITE_COUNT" -ge 15 && ! -f ".agentic/session/.commit_nudge_fired" ]]; then
+    echo ""
+    echo "💾 You've made ${_IMPL_WRITE_COUNT}+ edits. Consider saving progress:"
+    echo "   \`ag commit\` — pre-commit gates, diff review, PR creation"
+    echo "   \`ag verify $ACTIVE_FEATURE\` — run contract assertions"
+    echo ""
+    touch ".agentic/session/.commit_nudge_fired" 2>/dev/null || true
   fi
 fi
 
@@ -225,22 +268,25 @@ if [[ -d ".agentic/journal/plans" ]]; then
   fi
 fi
 
-# --- Capability catalog nudge (F-042: Universal Capability Catalog) ---
-# One-time reminder after 5+ writes to implementation files without updating the design doc.
-# FEATURES.md when feature_tracking=yes; OVERVIEW.md otherwise.
-# Pure bash, fast (<10ms). Only fires once per session.
+# --- Doc freshness nudge (enhanced from F-042 capability catalog) ---
+# Broader check: tracks impl writes vs doc writes. Fires once at 3+ impl writes.
+# Mentions ALL relevant docs (not just FEATURES.md/OVERVIEW.md).
 if [[ ! -f ".agentic/session/.cap_nudged" && ! -f ".agentic/session/.cap_updated" ]]; then
   _TK_EVENTS=".agentic/session/token-events.log"
   if [[ -f "$_TK_EVENTS" ]]; then
     _IMPL_WRITES=$(grep '^W|' "$_TK_EVENTS" 2>/dev/null \
       | grep -cE '\|(src/|lib/|app/|cmd/|\.agentic/lib/tools/|\.agentic/lib/auto/)' 2>/dev/null || echo 0)
     _IMPL_WRITES="${_IMPL_WRITES## }"
-    if [[ "${_IMPL_WRITES:-0}" -ge 5 ]]; then
+    _DOC_WRITES=$(grep '^W|' "$_TK_EVENTS" 2>/dev/null \
+      | grep -cE '\|.*\.(md|rst)' 2>/dev/null || echo 0)
+    _DOC_WRITES="${_DOC_WRITES## }"
+    if [[ "${_IMPL_WRITES:-0}" -ge 3 && "${_DOC_WRITES:-0}" -eq 0 ]]; then
       _CAP_DOC="OVERVIEW.md"
       [[ -f ".agentic/spec/FEATURES.md" ]] && _CAP_DOC=".agentic/spec/FEATURES.md"
       echo ""
-      echo "📦 You've written ${_IMPL_WRITES} implementation files but haven't updated ${_CAP_DOC}."
-      echo "   Register what you're building before the session ends."
+      echo "📦 DOC FRESHNESS: ${_IMPL_WRITES} implementation files written, 0 docs updated."
+      echo "   Update relevant docs (${_CAP_DOC}, README, API docs) before committing."
+      echo "   Run: bash .agentic/lib/tools/docs.sh --check-freshness"
       echo ""
       touch ".agentic/session/.cap_nudged" 2>/dev/null || true
     fi

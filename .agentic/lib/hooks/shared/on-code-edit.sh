@@ -107,27 +107,84 @@ for plan_file in .agentic/journal/plans/*-plan.md; do
   fi
 done
 
-# Fast path: no DRAFT plans
-[[ -n "$DRAFT_PLANS" ]] || exit 0
+# Output DRAFT warning if applicable (defense-in-depth — PreToolUse now blocks in formal)
+if [[ -n "$DRAFT_PLANS" ]]; then
+  echo ""
+  echo "🚨🚨🚨 UNAPPROVED PLAN — STOP CODING 🚨🚨🚨"
+  echo ""
+  echo "DRAFT plan(s) exist: ${DRAFT_PLANS}"
+  echo "Run convergence loop (Critic + Advocate), set APPROVED, then \`ag implement\`."
+  echo "PreToolUse gate now blocks code edits with DRAFT plans (formal mode)."
+  echo "🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨"
+  echo ""
+fi
 
-# --- Output loud warning ---
-echo ""
-echo "🚨🚨🚨 UNAPPROVED PLAN — STOP CODING 🚨🚨🚨"
-echo ""
-echo "You are editing code with an unapproved plan!"
-echo "DRAFT plan(s) exist: ${DRAFT_PLANS}"
-echo "Plan file(s): ${DRAFT_FILES}"
-echo ""
-echo "STOP writing code. Run the convergence loop:"
-echo "  1. Spawn Critic + Advocate agents (parallel, fresh context)"
-echo "  2. Synthesize findings into Revision Guidance"
-echo "  3. If refinements needed → revise plan → re-run reviewers"
-echo "  4. Loop until reviewers converge OR max iterations hit"
-echo "  5. Mark plan APPROVED only after convergence"
-echo "  6. THEN write code via \`ag implement\`"
-echo ""
-echo "Pre-commit Check 21 will BLOCK your commit anyway."
-echo "🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨"
-echo ""
+# =========================================================================
+# CHECK 3: Push implementation intelligence (first code edit after ag implement)
+# =========================================================================
+# Fires once per session. Pre-computed by ag implement → .impl-brief.md
+if [[ -f ".agentic/session/.phase_implementing" && ! -f ".agentic/session/.impl_intel_pushed" ]]; then
+  IMPL_BRIEF=".agentic/session/.impl-brief.md"
+  if [[ -f "$IMPL_BRIEF" ]]; then
+    echo ""
+    echo "🧠 IMPLEMENTATION INTELLIGENCE:"
+    cat "$IMPL_BRIEF" | grep "^-" | head -8
+    echo ""
+    touch ".agentic/session/.impl_intel_pushed" 2>/dev/null || true
+  fi
+fi
+
+# =========================================================================
+# CHECK 4: Spec drift detection (contract surface matching)
+# =========================================================================
+# If edited file matches patterns extracted from contract verify commands.
+# Uses path-component matching (not substring) to reduce false positives:
+# pattern "src/auth" matches "src/auth.py" and "src/auth/login.py"
+# but NOT "src/oauth/token.py" (different path component).
+if [[ -f ".agentic/session/.contract-surface.txt" ]]; then
+  SURFACE_FILE=".agentic/session/.contract-surface.txt"
+  # Normalize: strip project root prefix, ensure no leading ./
+  EDIT_REL="${EDITED_FILE#./}"; EDIT_REL="${EDIT_REL#$PROJECT_ROOT/}"
+  _SURFACE_HIT=""
+  while IFS= read -r pattern; do
+    [[ -z "$pattern" ]] && continue
+    # Path-component match: pattern must appear at a / boundary or be the full path
+    # e.g., pattern "src/auth" matches "src/auth.py" (starts with src/auth)
+    # but not "src/oauth/x.py" (oauth != auth at component level)
+    case "$EDIT_REL" in
+      "${pattern}"*|*"/${pattern}"*) _SURFACE_HIT="$pattern"; break ;;
+    esac
+  done < "$SURFACE_FILE"
+  if [[ -n "$_SURFACE_HIT" ]]; then
+    PHASE_FID=""
+    [[ -f ".agentic/session/.phase_implementing" ]] && PHASE_FID=$(cat ".agentic/session/.phase_implementing" 2>/dev/null)
+    echo ""
+    echo "📋 CONTRACT CHECK: $EDIT_REL may affect contract assertions${PHASE_FID:+ for $PHASE_FID}."
+    echo "   Matched surface: $_SURFACE_HIT"
+    echo "   Run: ag contract check ${PHASE_FID:-F-XXXX}"
+    echo ""
+  fi
+fi
+
+# =========================================================================
+# CHECK 5: TDD nudge (non-test source edit without prior test writes)
+# =========================================================================
+# Fires once per session when source files edited before any test files
+if [[ ! -f ".agentic/session/.tdd_nudge_fired" && -f ".agentic/session/token-events.log" ]]; then
+  # Check if any test files have been written this session
+  TEST_WRITES=$(grep '^W|' ".agentic/session/token-events.log" 2>/dev/null \
+    | grep -cE '\|(tests?/|_test\.|\.test\.|\.spec\.|test_)' 2>/dev/null || echo 0)
+  TEST_WRITES="${TEST_WRITES%%[!0-9]*}"; TEST_WRITES="${TEST_WRITES:-0}"
+  SRC_WRITES=$(grep '^W|' ".agentic/session/token-events.log" 2>/dev/null \
+    | grep -cE '\|(src/|lib/|app/|cmd/)' 2>/dev/null || echo 0)
+  SRC_WRITES="${SRC_WRITES%%[!0-9]*}"; SRC_WRITES="${SRC_WRITES:-0}"
+  if [[ "$TEST_WRITES" -eq 0 && "$SRC_WRITES" -ge 2 ]]; then
+    echo ""
+    echo "🧪 TDD REMINDER: ${SRC_WRITES} source files written, 0 test files."
+    echo "   Write tests alongside code — the framework checks test existence at verify time."
+    echo ""
+    touch ".agentic/session/.tdd_nudge_fired" 2>/dev/null || true
+  fi
+fi
 
 exit 0

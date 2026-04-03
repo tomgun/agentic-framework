@@ -25,6 +25,7 @@ from gate import (
     check_feature_has_ac,
     check_feature_has_tests,
     check_any_feature_implementing,
+    check_plan_review_evidence,
     gate_stop,
     gate_pretool,
     gate_verify,
@@ -697,4 +698,85 @@ class TestPreCommitMirrorChecks:
                 "new_string": "**Status**: implementing",
             })
         )
+        assert result.decision == "allow"
+
+
+# ---------------------------------------------------------------------------
+# Plan review evidence tests (Change 4)
+# ---------------------------------------------------------------------------
+
+class TestPlanReviewEvidence:
+    """Tests for check_plan_review_evidence() — prevents fake plan approval."""
+
+    def test_no_sentinels_allows(self, project_dir):
+        """No review-pending sentinels → allow (nothing to check)."""
+        # Enable plan review
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- plan_review_enabled: yes\n"
+        )
+        result = check_plan_review_evidence(project_dir)
+        assert result.decision == "allow"
+
+    def test_sentinel_without_evidence_denies(self, project_dir):
+        """Sentinel exists but no review.md → deny."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- plan_review_enabled: yes\n"
+        )
+        # Create sentinel
+        (project_dir / ".agentic" / "session" / "review-pending-F-0042").touch()
+        result = check_plan_review_evidence(project_dir)
+        assert result.decision == "deny"
+        assert "F-0042" in result.reasons[0]
+
+    def test_sentinel_with_evidence_allows(self, project_dir):
+        """Sentinel exists AND review.md with markers → allow (sentinel auto-removed)."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- plan_review_enabled: yes\n"
+        )
+        sentinel = project_dir / ".agentic" / "session" / "review-pending-F-0042"
+        sentinel.touch()
+        # Create review evidence with structural markers
+        work_dir = project_dir / ".agentic" / "work" / "F-0042"
+        work_dir.mkdir(parents=True, exist_ok=True)
+        (work_dir / "review.md").write_text(
+            "## Critic Analysis\nFindings here.\n\n"
+            "## Advocate Analysis\nSupport here.\n\n"
+            "## Synthesis\nConverged.\n"
+        )
+        result = check_plan_review_evidence(project_dir)
+        assert result.decision == "allow"
+        # Sentinel should be auto-removed
+        assert not sentinel.exists()
+
+    def test_evidence_needs_minimum_markers(self, project_dir):
+        """review.md exists but with insufficient markers → deny."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- plan_review_enabled: yes\n"
+        )
+        (project_dir / ".agentic" / "session" / "review-pending-F-0042").touch()
+        work_dir = project_dir / ".agentic" / "work" / "F-0042"
+        work_dir.mkdir(parents=True, exist_ok=True)
+        # Only 1 marker — need at least 2
+        (work_dir / "review.md").write_text("Some random text without markers.\n")
+        result = check_plan_review_evidence(project_dir)
+        assert result.decision == "deny"
+
+    def test_plan_review_disabled_skips(self, project_dir):
+        """With plan_review_enabled=no, evidence check is skipped."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: discovery\n- plan_review_enabled: no\n"
+        )
+        # Even with sentinel, should allow
+        (project_dir / ".agentic" / "session" / "review-pending-F-0042").touch()
+        result = check_plan_review_evidence(project_dir)
+        assert result.decision == "allow"
+
+    def test_invalid_feature_id_in_sentinel_ignored(self, project_dir):
+        """Sentinel with invalid feature ID is ignored."""
+        (project_dir / "STACK.md").write_text(
+            "## Settings\n- profile: formal\n- plan_review_enabled: yes\n"
+        )
+        # Invalid: not a valid feature ID
+        (project_dir / ".agentic" / "session" / "review-pending-INVALID").touch()
+        result = check_plan_review_evidence(project_dir)
         assert result.decision == "allow"
