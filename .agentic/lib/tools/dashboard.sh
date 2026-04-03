@@ -220,6 +220,32 @@ if [[ -f "$TOKEN_SUMMARY" ]]; then
     D_TOKEN_METRICS="${_ts_sessions} sessions, ${_ts_reads} reads, ${_ts_writes} writes"
 fi
 
+# INTEL METRICS (F-041: intelligence sourcing audit)
+D_INTEL_METRICS=""
+INTEL_SUMMARY="$PROJECT_ROOT/.agentic/intel/intel-summary.json"
+if [[ -f "$INTEL_SUMMARY" ]]; then
+    _il_queries=$(grep -o '"total_queries"[[:space:]]*:[[:space:]]*[0-9]*' "$INTEL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _il_enforces=$(grep -o '"total_enforcements"[[:space:]]*:[[:space:]]*[0-9]*' "$INTEL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _il_items=$(grep -o '"total_items_surfaced"[[:space:]]*:[[:space:]]*[0-9]*' "$INTEL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    D_INTEL_METRICS="${_il_queries} queries, ${_il_enforces} enforcements, ${_il_items} items sourced"
+fi
+
+# CAPABILITY CATALOG (F-042: Universal Capability Catalog)
+D_CAP_METRICS=""
+FEATURES_FILE_DASH="$PROJECT_ROOT/.agentic/spec/FEATURES.md"
+if [[ -f "$FEATURES_FILE_DASH" ]]; then
+    # Count by status — handles both discovery (built/in_progress/planned) and formal (shipped/implementing/planned)
+    _cap_built=$(grep -ciE '^\*\*Status\*\*:\s*(built|shipped)' "$FEATURES_FILE_DASH" 2>/dev/null || echo 0)
+    _cap_built="${_cap_built## }"
+    _cap_progress=$(grep -ciE '^\*\*Status\*\*:\s*(in_progress|implementing)' "$FEATURES_FILE_DASH" 2>/dev/null || echo 0)
+    _cap_progress="${_cap_progress## }"
+    _cap_planned=$(grep -ciE '^\*\*Status\*\*:\s*(planned|specced|criteria_set)' "$FEATURES_FILE_DASH" 2>/dev/null || echo 0)
+    _cap_planned="${_cap_planned## }"
+    if [[ $(( _cap_built + _cap_progress + _cap_planned )) -gt 0 ]]; then
+        D_CAP_METRICS="${_cap_built} built, ${_cap_progress} in progress, ${_cap_planned} planned"
+    fi
+fi
+
 # DESIGN TRACE (pending source docs)
 D_DESIGN_TRACE=""
 if [[ -f "$TOOLS_DIR/design-trace.sh" ]]; then
@@ -327,6 +353,10 @@ if $RAW_MODE; then
     echo "$D_DESIGN_TRACE"
     echo "===TOKEN_METRICS==="
     echo "$D_TOKEN_METRICS"
+    echo "===INTEL_METRICS==="
+    echo "$D_INTEL_METRICS"
+    echo "===CAP_METRICS==="
+    echo "$D_CAP_METRICS"
     echo "===USER_INPUT==="
     echo "$D_USER_INPUT_COUNT"
     echo "$D_USER_INPUT_FEATURES"
@@ -461,6 +491,12 @@ if [[ -n "$D_SPEC_METRICS" ]]; then
 fi
 if [[ -n "$D_TOKEN_METRICS" ]]; then
     echo "📊 Token usage     $D_TOKEN_METRICS"
+fi
+if [[ -n "$D_INTEL_METRICS" ]]; then
+    echo "🧠 Intel sourcing  $D_INTEL_METRICS"
+fi
+if [[ -n "$D_CAP_METRICS" ]]; then
+    echo "📦 Capabilities    $D_CAP_METRICS"
 fi
 if [[ -n "$D_DESIGN_TRACE" ]]; then
     echo "📐 Design trace   $D_DESIGN_TRACE — run: design-trace.sh"

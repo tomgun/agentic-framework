@@ -211,12 +211,34 @@ cmd_done() {
         echo "  [ ] Tests written and passing (if applicable)"
         echo "  [ ] STATUS.md updated"
         echo "  [ ] JOURNAL.md updated"
+        echo "  [ ] Capability catalog updated (FEATURES.md)"
         echo ""
         # Quick health check (warning only — Discovery mode)
         if bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null; then
             echo -e "${GREEN}✓${NC} Quick health check passed"
         else
             echo -e "${YELLOW}⚠ Quick health check found issues (non-blocking)${NC}"
+        fi
+        echo ""
+        # Capability catalog check (F-042)
+        if [ -f "${ROOT_DIR}/.agentic/session/.cap_updated" ]; then
+            echo -e "${GREEN}✓${NC} Capability catalog updated this session"
+        elif [ -f "${ROOT_DIR}/.agentic/spec/FEATURES.md" ]; then
+            echo -e "${YELLOW}⚠ Capability catalog not updated. Register what you built:${NC}"
+            echo "  Edit .agentic/spec/FEATURES.md or run: bash .agentic/lib/tools/feature.sh cap add \"Name\" \"Description\""
+        fi
+        # Journal freshness check (F-042)
+        local _journal_path="${ROOT_DIR}/.agentic/journal/JOURNAL.md"
+        if [ -f "$_journal_path" ] && [ -d "${ROOT_DIR}/.agentic/session" ]; then
+            local _sess_start _journal_mtime
+            _sess_start=$(stat -c %Y "${ROOT_DIR}/.agentic/session" 2>/dev/null || stat -f %m "${ROOT_DIR}/.agentic/session" 2>/dev/null || echo 0)
+            _journal_mtime=$(stat -c %Y "$_journal_path" 2>/dev/null || stat -f %m "$_journal_path" 2>/dev/null || echo 0)
+            if [ "$_journal_mtime" -le "$_sess_start" ] 2>/dev/null; then
+                echo -e "${YELLOW}⚠ No journal entry this session. Record what you did:${NC}"
+                echo "  bash .agentic/lib/tools/journal.sh \"Topic\" \"What changed\" \"Next\" \"Blockers\" --why \"Motivation\""
+            else
+                echo -e "${GREEN}✓${NC} Journal updated this session"
+            fi
         fi
         echo ""
         # Check if WIP is complete

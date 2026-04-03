@@ -479,8 +479,26 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 
 ## F-041: Intelligence Engine
 
-**Status**: in_progress
+**Status**: shipped
 **Category**: Core intelligence system: file anatomy, enforced patterns, quality checklists, test strategy, token ledger. Makes framework smarter than vanilla Claude through domain-specific, stack-aware guidance at every workflow phase.
+**Priority**: medium
+**Complexity**: medium
+
+**Description**: Core intelligence system with 5 phases: (1) Enforced patterns with write-time hook checking, (2) File anatomy scanning with token estimation, (3) Bootstrap and quality intelligence generation, (4) Phase-aware queries for architecture/spec/implement/test workflows, (5) Token ledger for session and lifetime metrics. Includes cerebrum for project-scoped learning from user corrections.
+
+**Implementation**:
+- State: shipped (v0.77.0-v0.77.1)
+- Code: `.agentic/lib/tools/commands/intel.sh`, hooks (PreToolUse/PostToolUse/Stop), `.agentic/intel/`
+- Tests: `tests/test_intel_patterns.sh`, `test_intel_anatomy.sh`, `test_intel_bootstrap.sh`, `test_intel_phase_queries.sh`, `test_intel_gaps.sh`, `test_intel_integration.sh` (208 tests)
+
+**Contract**: See `spec/contracts/F-041.yaml`
+
+---
+
+## F-042: Universal Capability Catalog
+
+**Status**: planned
+**Category**: core
 **Priority**: medium
 **Complexity**: medium
 
@@ -491,4 +509,4 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 - Code: (TODO)
 - Tests: (TODO)
 
-**Contract**: See `spec/contracts/F-041.yaml`
+**Contract**: See `spec/contracts/F-042.yaml`

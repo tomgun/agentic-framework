@@ -18,7 +18,7 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../paths.sh"
 
 # Check if FEATURES.md exists
 if [[ ! -f "${FEATURES_FILE}" ]]; then
-  echo "Error: .agentic/spec/FEATURES.md not found. This project may not use Formal mode."
+  echo "Error: .agentic/spec/FEATURES.md not found. Run project scaffold or create manually."
   exit 1
 fi
 
@@ -50,6 +50,104 @@ Examples:
   bash feature.sh F-002 parent F-001
   bash feature.sh F-002 source spec/adr/ADR-001.md
 USAGE
+  exit 1
+fi
+
+# --- Cap subcommand: discovery-format capability entries (F-042) ---
+# Must be checked BEFORE the add handler (which also matches FIELD=add when FEATURE_ID=cap)
+if [[ "${FEATURE_ID}" == "cap" ]]; then
+  # Inline the cap handler here — source is below after formal add
+  _CAP_ACTION="${FIELD}"
+  _CAP_NAME="${VALUE}"
+
+  if [[ -z "$_CAP_ACTION" || -z "$_CAP_NAME" ]]; then
+    cat <<'CAP_USAGE'
+Usage: bash feature.sh cap <action> "Name" [args]
+
+Actions:
+  add "Name" "Description" [--decisions "..."]   Add a capability entry
+  status "Name" built|in_progress|planned         Update capability status
+
+Examples:
+  bash feature.sh cap add "Search" "Full-text product search"
+  bash feature.sh cap add "Search" "Full-text search" --decisions "Used ES over Postgres FTS"
+  bash feature.sh cap status "Search" built
+CAP_USAGE
+    exit 1
+  fi
+
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../settings.sh" 2>/dev/null || true
+  _ft=$(get_setting "feature_tracking" "no" 2>/dev/null || echo "no")
+
+  if [[ "$_CAP_ACTION" == "add" ]]; then
+    _CAP_DESC=""
+    _CAP_DECISIONS=""
+    _cap_skip=0
+    for _cap_arg in "${@:4}"; do
+      if [[ $_cap_skip -eq 1 ]]; then
+        _CAP_DECISIONS="$_cap_arg"
+        _cap_skip=0
+        continue
+      fi
+      case "$_cap_arg" in
+        --decisions) _cap_skip=1 ;;
+        --decisions=*) _CAP_DECISIONS="${_cap_arg#--decisions=}" ;;
+        *) [[ -z "$_CAP_DESC" ]] && _CAP_DESC="$_cap_arg" ;;
+      esac
+    done
+
+    if grep -qF "## ${_CAP_NAME}" "${FEATURES_FILE}" 2>/dev/null; then
+      echo "Error: Capability '${_CAP_NAME}' already exists in FEATURES.md"
+      exit 1
+    fi
+
+    if [[ "$_ft" == "yes" ]]; then
+      NEXT_ID=$(grep -oE 'F-[0-9]+' "${FEATURES_FILE}" 2>/dev/null | sed 's/F-//' | sort -n | tail -1)
+      NEXT_ID=${NEXT_ID:-0}
+      NEXT_ID=$(printf "F-%03d" $((10#$NEXT_ID + 1)))
+      bash "${BASH_SOURCE[0]}" "$NEXT_ID" add "$_CAP_NAME" "general"
+      exit $?
+    fi
+
+    {
+      echo ""
+      echo "---"
+      echo ""
+      echo "## ${_CAP_NAME}"
+      echo "**Status**: planned"
+      [[ -n "$_CAP_DESC" ]] && echo "$_CAP_DESC"
+      [[ -n "$_CAP_DECISIONS" ]] && echo "Decisions: $_CAP_DECISIONS"
+    } >> "${FEATURES_FILE}"
+    echo "✓ Added capability: ${_CAP_NAME}"
+    exit 0
+  fi
+
+  if [[ "$_CAP_ACTION" == "status" ]]; then
+    _NEW_STATUS="${4:-}"
+    if [[ -z "$_NEW_STATUS" ]]; then
+      echo "Error: Status value required (built, in_progress, planned)"
+      exit 1
+    fi
+    case "$_NEW_STATUS" in
+      built|in_progress|planned) ;;
+      shipped) _NEW_STATUS="built" ;;
+      *) echo "Error: Invalid discovery status '$_NEW_STATUS'. Use: built, in_progress, planned"; exit 1 ;;
+    esac
+    if grep -qF "## ${_CAP_NAME}" "${FEATURES_FILE}" 2>/dev/null; then
+      awk -v name="## ${_CAP_NAME}" -v status="$_NEW_STATUS" '
+        index($0, name) == 1 { found=1 }
+        found && /^\*\*Status\*\*:/ { sub(/\*\*Status\*\*: *[a-z_]+/, "**Status**: " status); found=0 }
+        { print }
+      ' "${FEATURES_FILE}" > "${FEATURES_FILE}.tmp" && mv "${FEATURES_FILE}.tmp" "${FEATURES_FILE}"
+      echo "✓ ${_CAP_NAME} → ${_NEW_STATUS}"
+    else
+      echo "Error: Capability '${_CAP_NAME}' not found in FEATURES.md"
+      exit 1
+    fi
+    exit 0
+  fi
+
+  echo "Error: Unknown cap action '$_CAP_ACTION'. Use: add, status"
   exit 1
 fi
 

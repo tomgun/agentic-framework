@@ -64,8 +64,17 @@ Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
 - JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes" "Next" "Blockers" --why "Problem"`
 - HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
-- FEATURES.md: `bash .agentic/lib/tools/feature.sh F-#### status shipped`
+- FEATURES.md: `bash .agentic/lib/tools/feature.sh F-#### status shipped` (formal) or `bash .agentic/lib/tools/feature.sh cap add "Name" "Description"` (discovery)
 - TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`
+
+## Enforcement Hierarchy
+
+Framework enforcement uses multiple layers. When adding new gates or enforcement, prefer higher layers:
+1. **Claude hooks** (real-time, during session) — PreToolUse blocks/warns before action, PostToolUse tracks after, Stop.sh validates at session end, UserPromptSubmit nudges per-prompt. Primary enforcement layer.
+2. **Skills** (just-in-time guidance) — loaded at workflow trigger points via `.claude/skills/`
+3. **`ag` commands** (workflow gates) — `ag done`, `ag implement`, `ag commit` validate preconditions
+4. **Pre-commit hooks** (git-level safety net) — for non-Claude tools and defense-in-depth only
+5. **Instruction files** (behavioral) — guide agent behavior but no structural enforcement
 
 ## Skills & Workflows
 
