@@ -107,6 +107,62 @@ def render_timeline(trace_file: str, hook_filter: str = "", decision_filter: str
         )
 
 
+def render_decisions(trace_file: str, deny_only: bool = False) -> None:
+    """Render only gate allow/deny decisions."""
+    path = Path(trace_file)
+    if not path.exists():
+        print(f"{RED}File not found: {trace_file}{NC}", file=sys.stderr)
+        sys.exit(1)
+
+    events = []
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                events.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+
+    total = allows = denials = 0
+    print(f"{BOLD}Gate Decisions{NC}")
+    print()
+
+    for event in events:
+        data = event.get("data", {})
+        decision = data.get("decision", "")
+        if not decision:
+            continue
+
+        total += 1
+        if decision == "deny":
+            denials += 1
+        else:
+            allows += 1
+            if deny_only:
+                continue
+
+        ts = event.get("ts", "?")
+        hook = event.get("hook", "?")
+        time_part = ts.split("T")[1].rstrip("Z") if "T" in ts else ts
+
+        # Extract reason from either singular or array form
+        reason = data.get("reason", "")
+        if not reason:
+            reasons = data.get("reasons", [])
+            if reasons:
+                reason = "; ".join(str(r) for r in reasons[:3])
+
+        if decision == "deny":
+            print(f"  {RED}[{time_part}] {hook:<15s} DENY{NC}  {reason}")
+        else:
+            print(f"  {GREEN}[{time_part}] {hook:<15s} ALLOW{NC}")
+
+    print()
+    print(f"Total: {total} decisions ({allows} allow, {denials} deny)")
+
+
 def main() -> None:
     if len(sys.argv) < 2 or sys.argv[1] in ("--help", "-h"):
         print(__doc__)
@@ -115,6 +171,8 @@ def main() -> None:
     trace_file = sys.argv[1]
     hook_filter = ""
     decision_filter = ""
+    decisions_mode = False
+    deny_only = False
 
     i = 2
     while i < len(sys.argv):
@@ -124,10 +182,20 @@ def main() -> None:
         elif sys.argv[i] == "--decision" and i + 1 < len(sys.argv):
             decision_filter = sys.argv[i + 1]
             i += 2
+        elif sys.argv[i] == "--decisions":
+            decisions_mode = True
+            i += 1
+        elif sys.argv[i] == "--deny-only":
+            deny_only = True
+            decisions_mode = True
+            i += 1
         else:
             i += 1
 
-    render_timeline(trace_file, hook_filter, decision_filter)
+    if decisions_mode:
+        render_decisions(trace_file, deny_only)
+    else:
+        render_timeline(trace_file, hook_filter, decision_filter)
 
 
 if __name__ == "__main__":

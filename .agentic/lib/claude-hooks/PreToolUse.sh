@@ -57,12 +57,13 @@ btrace "PreToolUse" "enter" "{\"tool\":\"${TOOL_NAME}\",\"input_summary\":$(pyth
 # Call ag gate pretool
 GATE_OUTPUT=""
 GATE_RC=0
-_BT_GATE_START=$SECONDS
+_BT_GATE_NS=$(date +%s%N 2>/dev/null || echo 0)
 GATE_OUTPUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate pretool \
   --tool "${TOOL_NAME}" \
   --input "${TOOL_INPUT}" \
   --project-root "$PROJECT_ROOT" 2>&1) || GATE_RC=$?
-_BT_GATE_MS=$(( (SECONDS - _BT_GATE_START) * 1000 ))
+_BT_GATE_END=$(date +%s%N 2>/dev/null || echo 0)
+_BT_GATE_MS=$(( (_BT_GATE_END - _BT_GATE_NS) / 1000000 ))
 
 # Helper: emit Claude deny JSON and exit
 _deny() {
@@ -164,8 +165,8 @@ if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "Mult
 
       # btrace: log pattern matches
       if [[ -n "$_PTN_WARNS" ]]; then
-        _bt_ptn_count=$(echo -e "$_PTN_WARNS" | grep -c "P-" 2>/dev/null || echo 0)
-        _bt_ptn_count="${_bt_ptn_count## }"; _bt_ptn_count="${_bt_ptn_count%% }"
+        _bt_ptn_count=$(echo -e "$_PTN_WARNS" | grep -c "P-" 2>/dev/null || true)
+        _bt_ptn_count="${_bt_ptn_count## }"; _bt_ptn_count="${_bt_ptn_count%%[!0-9]*}"; _bt_ptn_count="${_bt_ptn_count:-0}"
         btrace "PreToolUse" "pattern_match" "{\"file\":$(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$_PTN_FNAME" 2>/dev/null || echo '""'),\"matches\":${_bt_ptn_count:-0}}" 2>/dev/null || true
       fi
 

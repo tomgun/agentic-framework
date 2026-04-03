@@ -15,12 +15,13 @@ from pathlib import Path
 _level: str = ""
 _seq: int = 0
 _log_path: Path | None = None
-_resolved: bool = False
+_resolved_for: str = ""  # project_root str — re-resolve if project changes
 
 
 def _resolve(project_root: Path) -> None:
-    global _level, _log_path, _resolved
-    if _resolved:
+    global _level, _log_path, _resolved_for
+    root_key = str(project_root)
+    if _resolved_for == root_key:
         return
 
     # Env var takes precedence
@@ -56,7 +57,7 @@ def _resolve(project_root: Path) -> None:
         except OSError:
             pass
 
-    _resolved = True
+    _resolved_for = root_key
 
 
 def enabled(project_root: Path) -> bool:

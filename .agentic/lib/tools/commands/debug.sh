@@ -166,39 +166,9 @@ _debug_show() {
         return 0
     fi
 
-    # Render timeline
+    # Render timeline via Python (single process, no per-line forks)
     python3 "$SCRIPT_DIR/btrace-show.py" "$trace_file" \
-        ${hook_filter:+--hook "$hook_filter"} 2>/dev/null || {
-        # Fallback: simple rendering if Python script not available
-        echo -e "${BOLD}Behavioral Trace${NC} ($trace_file)"
-        echo ""
-        while IFS= read -r line; do
-            local ts hook phase
-            ts=$(echo "$line" | python3 -c "import sys,json; print(json.load(sys.stdin).get('ts','?'))" 2>/dev/null || echo "?")
-            hook=$(echo "$line" | python3 -c "import sys,json; print(json.load(sys.stdin).get('hook','?'))" 2>/dev/null || echo "?")
-            phase=$(echo "$line" | python3 -c "import sys,json; print(json.load(sys.stdin).get('phase','?'))" 2>/dev/null || echo "?")
-
-            if [[ -n "$hook_filter" && "$hook" != "$hook_filter" ]]; then
-                continue
-            fi
-
-            local decision=""
-            decision=$(echo "$line" | python3 -c "import sys,json; d=json.load(sys.stdin).get('data',{}); print(d.get('decision',''))" 2>/dev/null || true)
-
-            local color="$NC"
-            local marker=""
-            if [[ "$decision" == "deny" ]]; then
-                color="$RED"
-                marker=" *** DENY ***"
-            elif [[ "$decision" == "allow" ]]; then
-                color="$GREEN"
-            fi
-
-            local time_part="${ts##*T}"
-            time_part="${time_part%%Z*}"
-            printf "  ${DIM}[%s]${NC} ${color}%-25s %-20s${NC}%s\n" "$time_part" "$hook" "$phase" "$marker"
-        done < "$trace_file"
-    }
+        ${hook_filter:+--hook "$hook_filter"}
 }
 
 _debug_decisions() {
@@ -214,51 +184,10 @@ _debug_decisions() {
     local trace_file
     trace_file=$(_resolve_trace "$session_id") || return 1
 
-    echo -e "${BOLD}Gate Decisions${NC}"
-    echo ""
-
-    local total=0 denials=0 allows=0
-    while IFS= read -r line; do
-        local decision=""
-        decision=$(echo "$line" | python3 -c "import sys,json; d=json.load(sys.stdin).get('data',{}); print(d.get('decision',''))" 2>/dev/null || true)
-
-        [[ -z "$decision" ]] && continue
-
-        total=$((total + 1))
-
-        if [[ "$decision" == "deny" ]]; then
-            denials=$((denials + 1))
-        else
-            allows=$((allows + 1))
-            $deny_only && continue
-        fi
-
-        local ts hook reason tool_info
-        ts=$(echo "$line" | python3 -c "import sys,json; print(json.load(sys.stdin).get('ts','?'))" 2>/dev/null || echo "?")
-        hook=$(echo "$line" | python3 -c "import sys,json; print(json.load(sys.stdin).get('hook','?'))" 2>/dev/null || echo "?")
-        reason=$(echo "$line" | python3 -c "
-import sys,json
-d=json.load(sys.stdin).get('data',{})
-r = d.get('reason','')
-if not r:
-    reasons = d.get('reasons',[])
-    if reasons:
-        r = '; '.join(str(x) for x in reasons[:3])
-print(r)
-" 2>/dev/null || true)
-
-        local time_part="${ts##*T}"
-        time_part="${time_part%%Z*}"
-
-        if [[ "$decision" == "deny" ]]; then
-            printf "  ${RED}[%s] %-15s DENY${NC}  %s\n" "$time_part" "$hook" "$reason"
-        else
-            printf "  ${GREEN}[%s] %-15s ALLOW${NC}\n" "$time_part" "$hook"
-        fi
-    done < "$trace_file"
-
-    echo ""
-    echo "Total: $total decisions ($allows allow, $denials deny)"
+    # Single Python process — no per-line forks
+    local flags="--decisions"
+    $deny_only && flags="--deny-only"
+    python3 "$SCRIPT_DIR/btrace-show.py" "$trace_file" $flags
 }
 
 _debug_bundle() {

@@ -57,6 +57,7 @@ ENTRIES=()
 ENTRIES+=(
     "# Agentic framework (session state)"
     ".agentic/session/"
+    ".agentic/debug/"
     ".agentic/pipeline/"
     ".agentic/local/"
     ".agentic/lib/"

@@ -31,9 +31,10 @@ btrace "Stop" "enter" "{}" 2>/dev/null || true
 # --- Enforcement: call ag gate stop ---
 GATE_OUTPUT=""
 GATE_RC=0
-_BT_STOP_START=$SECONDS
+_BT_STOP_NS=$(date +%s%N 2>/dev/null || echo 0)
 GATE_OUTPUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate stop --project-root "$PROJECT_ROOT" 2>&1) || GATE_RC=$?
-_BT_STOP_MS=$(( (SECONDS - _BT_STOP_START) * 1000 ))
+_BT_STOP_END=$(date +%s%N 2>/dev/null || echo 0)
+_BT_STOP_MS=$(( (_BT_STOP_END - _BT_STOP_NS) / 1000000 ))
 
 # Parse JSON response
 DECISION="allow"
