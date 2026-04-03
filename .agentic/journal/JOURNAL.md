@@ -5020,3 +5020,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-03 09:28 - Post-merge: dogfood sync + VERSION bump
+
+**Why**: Post-merge dogfooding sync — templates had new content root files lacked
+
+**What changed**:
+- Synced enforcement hierarchy and design tracking sections to root CLAUDE.md and .cursorrules, added cap add references, bumped VERSION 0.77.1→0.78.1
+
+**Next steps**:
+- Tag v0.78.1, push
+
+**Blockers**: None
+
