@@ -59,9 +59,10 @@ if [[ -n "$_POST_TOOL" ]]; then
         _TK_EST=$(( _TK_SZ / 4 ))
       fi
       echo "W|${_POST_FILE:-unknown}|${_TK_EST}" >> "$_TK_EVENTS" 2>/dev/null || true
-      # Track FEATURES.md writes for catalog enforcement (F-042)
+      # Track design doc writes for catalog enforcement (F-042)
+      # FEATURES.md = formal feature tracking; OVERVIEW.md = lightweight design doc
       case "${_POST_FILE:-}" in
-        *FEATURES.md) touch ".agentic/session/.cap_updated" 2>/dev/null || true ;;
+        *FEATURES.md|*OVERVIEW.md) touch ".agentic/session/.cap_updated" 2>/dev/null || true ;;
       esac
       ;;
   esac

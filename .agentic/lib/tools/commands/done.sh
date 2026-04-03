@@ -211,21 +211,21 @@ cmd_done() {
         echo "  [ ] Tests written and passing (if applicable)"
         echo "  [ ] STATUS.md updated"
         echo "  [ ] JOURNAL.md updated"
-        echo "  [ ] Capability catalog updated (FEATURES.md)"
+        echo "  [ ] OVERVIEW.md updated (capabilities, decisions)"
         echo ""
-        # Quick health check (warning only — Discovery mode)
+        # Quick health check (warning only)
         if bash "$SCRIPT_DIR/doctor.sh" --quick 2>/dev/null; then
             echo -e "${GREEN}✓${NC} Quick health check passed"
         else
             echo -e "${YELLOW}⚠ Quick health check found issues (non-blocking)${NC}"
         fi
         echo ""
-        # Capability catalog check (F-042)
+        # Design doc check (F-042)
         if [ -f "${ROOT_DIR}/.agentic/session/.cap_updated" ]; then
-            echo -e "${GREEN}✓${NC} Capability catalog updated this session"
-        elif [ -f "${ROOT_DIR}/.agentic/spec/FEATURES.md" ]; then
-            echo -e "${YELLOW}⚠ Capability catalog not updated. Register what you built:${NC}"
-            echo "  Edit .agentic/spec/FEATURES.md or run: bash .agentic/lib/tools/feature.sh cap add \"Name\" \"Description\""
+            echo -e "${GREEN}✓${NC} Design doc updated this session"
+        else
+            echo -e "${YELLOW}⚠ OVERVIEW.md not updated. Register what you built:${NC}"
+            echo "  Update the Core Capabilities and Guiding Principles sections in .agentic/OVERVIEW.md"
         fi
         # Journal freshness check (F-042)
         local _journal_path="${ROOT_DIR}/.agentic/journal/JOURNAL.md"

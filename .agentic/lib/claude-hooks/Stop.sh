@@ -45,15 +45,21 @@ else
 fi
 
 # --- Capability catalog check (F-042: Universal Capability Catalog) ---
-# Advisory: warn if implementation code was written but FEATURES.md not updated.
+# Advisory: warn if implementation code was written but design doc not updated.
+# FEATURES.md when feature_tracking=yes; OVERVIEW.md otherwise.
 # Must run BEFORE token finalizer cleans up token-events.log.
 if [[ ! -f ".agentic/session/.cap_updated" && -f ".agentic/session/token-events.log" ]]; then
   _CAP_IMPL_WRITES=$(grep '^W|' ".agentic/session/token-events.log" 2>/dev/null \
     | grep -cE '\|(src/|lib/|app/|cmd/|\.agentic/lib/tools/|\.agentic/lib/auto/)' 2>/dev/null || echo 0)
   _CAP_IMPL_WRITES="${_CAP_IMPL_WRITES## }"
   if [[ "${_CAP_IMPL_WRITES:-0}" -ge 3 ]]; then
-    echo "📦 Capability catalog not updated: ${_CAP_IMPL_WRITES} impl files written but FEATURES.md not touched." >&2
-    echo "   Next session: update .agentic/spec/FEATURES.md with what you built." >&2
+    # Determine which doc to suggest based on settings
+    _CAP_DOC="OVERVIEW.md"
+    if [[ -f ".agentic/spec/FEATURES.md" ]]; then
+      _CAP_DOC=".agentic/spec/FEATURES.md"
+    fi
+    echo "📦 Design doc not updated: ${_CAP_IMPL_WRITES} impl files written but ${_CAP_DOC} not touched." >&2
+    echo "   Next session: update ${_CAP_DOC} with what you built." >&2
   fi
 fi
 

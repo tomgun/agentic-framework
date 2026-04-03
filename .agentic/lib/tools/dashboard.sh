@@ -231,11 +231,13 @@ if [[ -f "$INTEL_SUMMARY" ]]; then
 fi
 
 # CAPABILITY CATALOG (F-042: Universal Capability Catalog)
+# CAPABILITY CATALOG (F-042: Universal Capability Catalog)
+# FEATURES.md for formal feature tracking; OVERVIEW.md checkboxes for lightweight tracking
 D_CAP_METRICS=""
 FEATURES_FILE_DASH="$PROJECT_ROOT/.agentic/spec/FEATURES.md"
+OVERVIEW_FILE_DASH="$PROJECT_ROOT/.agentic/OVERVIEW.md"
 if [[ -f "$FEATURES_FILE_DASH" ]]; then
-    # Count by the three universal status values (same for all profiles)
-    # Also match legacy formal statuses for backward compat with existing projects
+    # Formal: count by status values in FEATURES.md
     _cap_built=$(grep -ciE '^\*\*Status\*\*:\s*(built|shipped)' "$FEATURES_FILE_DASH" 2>/dev/null || echo 0)
     _cap_built="${_cap_built## }"
     _cap_progress=$(grep -ciE '^\*\*Status\*\*:\s*(in_progress|implementing)' "$FEATURES_FILE_DASH" 2>/dev/null || echo 0)
@@ -244,6 +246,15 @@ if [[ -f "$FEATURES_FILE_DASH" ]]; then
     _cap_planned="${_cap_planned## }"
     if [[ $(( _cap_built + _cap_progress + _cap_planned )) -gt 0 ]]; then
         D_CAP_METRICS="${_cap_built} built, ${_cap_progress} in progress, ${_cap_planned} planned"
+    fi
+elif [[ -f "$OVERVIEW_FILE_DASH" ]]; then
+    # Lightweight: count checkboxes in OVERVIEW.md Core Capabilities section
+    _cap_done=$(sed -n '/^## Core Capabilities/,/^## /p' "$OVERVIEW_FILE_DASH" 2>/dev/null | grep -c '^\- \[x\]' 2>/dev/null || echo 0)
+    _cap_done="${_cap_done## }"
+    _cap_todo=$(sed -n '/^## Core Capabilities/,/^## /p' "$OVERVIEW_FILE_DASH" 2>/dev/null | grep -c '^\- \[ \]' 2>/dev/null || echo 0)
+    _cap_todo="${_cap_todo## }"
+    if [[ $(( _cap_done + _cap_todo )) -gt 0 ]]; then
+        D_CAP_METRICS="${_cap_done} done, ${_cap_todo} planned"
     fi
 fi
 

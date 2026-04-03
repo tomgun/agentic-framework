@@ -74,11 +74,12 @@ echo ""
 echo "Section 1: Universal Catalog Foundation"
 echo "────────────────────────────────────────"
 
-echo "Test 1: AC-001 — state-files.conf lists FEATURES.md as 'all' profile"
-if grep -q 'FEATURES.md.*:all' "$REPO_ROOT/.agentic/lib/init/state-files.conf"; then
-    pass "AC-001: FEATURES.md is profile:all in state-files.conf"
+echo "Test 1: AC-001 — state-files.conf: FEATURES.md=formal, OVERVIEW.md=all"
+if grep -q 'FEATURES.md.*:formal' "$REPO_ROOT/.agentic/lib/init/state-files.conf" && \
+   grep -q 'OVERVIEW.md.*:all' "$REPO_ROOT/.agentic/lib/init/state-files.conf"; then
+    pass "AC-001: FEATURES.md=formal, OVERVIEW.md=all"
 else
-    fail "AC-001: FEATURES.md not set to all" "$(grep FEATURES "$REPO_ROOT/.agentic/lib/init/state-files.conf")"
+    fail "AC-001: wrong profile settings" "$(grep -E 'FEATURES|OVERVIEW' "$REPO_ROOT/.agentic/lib/init/state-files.conf")"
 fi
 
 echo "Test 2: AC-002 — template has single entry format (not dual)"
@@ -179,6 +180,16 @@ else
     fail "AC-007: .cap_updated not set" ""
 fi
 
+echo "Test 11b: AC-007 — PostToolUse also sets flag for OVERVIEW.md writes"
+rm -f "$PROJECT/.agentic/session/.cap_updated"
+echo '{"tool_name": "Write", "tool_input": {"file_path": ".agentic/OVERVIEW.md"}}' | \
+    CLAUDE_PROJECT_DIR="$PROJECT" bash "$PROJECT/.agentic/lib/claude-hooks/PostToolUse.sh" 2>/dev/null || true
+if [[ -f "$PROJECT/.agentic/session/.cap_updated" ]]; then
+    pass "AC-007: .cap_updated flag set on OVERVIEW.md write"
+else
+    fail "AC-007: .cap_updated not set for OVERVIEW.md" ""
+fi
+
 echo "Test 12: PostToolUse does NOT set flag for other files"
 rm -f "$PROJECT/.agentic/session/.cap_updated"
 echo '{"tool_name": "Write", "tool_input": {"file_path": "src/main.ts"}}' | \
@@ -206,8 +217,8 @@ W|src/pages/checkout.tsx|800
 W|lib/utils/helpers.ts|200
 EOF
 OUTPUT=$(echo '{}' | CLAUDE_PROJECT_DIR="$PROJECT" bash "$PROJECT/.agentic/lib/claude-hooks/Stop.sh" 2>&1) || true
-if echo "$OUTPUT" | grep -q "📦.*Capability catalog not updated\|catalog not updated"; then
-    pass "AC-008: Stop.sh warns about missing catalog update"
+if echo "$OUTPUT" | grep -q "📦.*not updated\|Design doc not updated"; then
+    pass "AC-008: Stop.sh warns about missing design doc update"
 else
     fail "AC-008: no catalog warning" "$(echo "$OUTPUT" | grep -i "cap\|catalog\|FEATURES")"
 fi
@@ -324,7 +335,7 @@ echo "Test 19: AC-013 — dashboard shows capability counts"
 # The project has 2 built + 0 in_progress + 0 planned capabilities
 DASH_DIR=$(mktemp -d)
 TEMP_DIRS+=("$DASH_DIR")
-mkdir -p "$DASH_DIR/.agentic/spec" "$DASH_DIR/.agentic/lib/tools" "$DASH_DIR/.agentic/lib/presets" "$DASH_DIR/.agentic/session"
+mkdir -p "$DASH_DIR/.agentic/lib/tools" "$DASH_DIR/.agentic/lib/presets" "$DASH_DIR/.agentic/session"
 cp "$REPO_ROOT/.agentic/lib/settings.sh" "$DASH_DIR/.agentic/lib/"
 cp "$REPO_ROOT/.agentic/lib/paths.sh" "$DASH_DIR/.agentic/lib/"
 cp -r "$REPO_ROOT/.agentic/lib/presets" "$DASH_DIR/.agentic/lib/" 2>/dev/null || true
@@ -337,29 +348,26 @@ cat > "$DASH_DIR/STACK.md" << 'EOF'
 ## Settings
 - profile: discovery
 EOF
-cat > "$DASH_DIR/.agentic/spec/FEATURES.md" << 'EOF'
-# Capabilities
+# Lightweight tracking via OVERVIEW.md checkboxes (no FEATURES.md)
+cat > "$DASH_DIR/.agentic/OVERVIEW.md" << 'EOF'
+# OVERVIEW.md
 
-## Search
-**Status**: built
-Full-text product search.
+## What We're Building
+An e-commerce platform.
 
-## Shopping Cart
-**Status**: built
-Cart management.
+## Core Capabilities
+- [x] Search — full-text product search
+- [x] Shopping Cart — add/remove items
+- [ ] Checkout — multi-step payment flow
+- [ ] Order History — past orders view
 
-## Checkout
-**Status**: in_progress
-Multi-step checkout.
-
-## Order History
-**Status**: planned
-Past orders view.
+## Guiding Principles
+- Mobile-first design
 EOF
 (cd "$DASH_DIR" && git init -q && git add -A && git commit -q -m "init" 2>/dev/null) || true
 OUTPUT=$(CLAUDE_PROJECT_DIR="$DASH_DIR" bash "$DASH_DIR/.agentic/lib/tools/dashboard.sh" 2>&1) || true
-if echo "$OUTPUT" | grep -q "📦.*Capabilities\|2 built.*1 in progress.*1 planned"; then
-    pass "AC-013: dashboard shows capability counts"
+if echo "$OUTPUT" | grep -q "📦.*Capabilities\|2 done.*2 planned"; then
+    pass "AC-013: dashboard shows capability counts from OVERVIEW.md"
 else
     fail "AC-013: no capability line" "$(echo "$OUTPUT" | grep -i "cap\|Capabil")"
 fi

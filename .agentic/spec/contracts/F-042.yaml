@@ -5,19 +5,19 @@ profile: both
 protection: none
 category: core
 description: >
-  Makes FEATURES.md (the capability catalog) universal — scaffolded for all
-  setting combinations, not just when feature_tracking=yes. Single entry
-  format (name + status + description + decisions). Claude hooks enforce
-  catalog updates in real-time during sessions. Profiles are presets for
-  settings, not separate modes.
+  Ensures every project tracks what it builds. When feature_tracking=yes,
+  FEATURES.md is the formal catalog. When feature_tracking=no, OVERVIEW.md
+  (Core Capabilities section) is the lightweight design doc. Claude hooks
+  enforce updates in real-time. Profiles are presets for settings, not modes.
 user_input: ''
 assertions:
 
   # --- A. Universal Catalog ---
   - id: AC-001
     text: >
-      state-files.conf lists FEATURES.md with profile `all`,
-      causing scaffold/upgrade to create FEATURES.md for all projects
+      state-files.conf lists FEATURES.md with profile `formal` and
+      OVERVIEW.md with profile `all`; every project gets OVERVIEW.md,
+      only feature_tracking=yes projects get FEATURES.md
     type: structural
 
   - id: AC-002
@@ -59,15 +59,16 @@ assertions:
   - id: AC-007
     text: >
       PostToolUse.sh sets session flag .agentic/session/.cap_updated when
-      a Write/Edit tool targets a file path ending in FEATURES.md
+      a Write/Edit tool targets a file path ending in FEATURES.md or
+      OVERVIEW.md
     type: behavioral
 
   - id: AC-008
     text: >
       Stop.sh checks at session end: if token-events.log has W| entries
-      in implementation directories (src/, lib/, app/, cmd/, .agentic/lib/tools/)
-      AND .cap_updated flag does not exist, outputs advisory warning to stderr
-      suggesting the agent update FEATURES.md
+      in implementation directories AND .cap_updated flag does not exist,
+      outputs advisory warning suggesting the agent update FEATURES.md
+      (when it exists) or OVERVIEW.md (otherwise)
     type: behavioral
 
   - id: AC-009
@@ -87,9 +88,9 @@ assertions:
   # --- C. ag done catalog gate ---
   - id: AC-011
     text: >
-      `ag done` checks .cap_updated flag or FEATURES.md modification
-      (regardless of feature_tracking setting) and shows advisory nudge
-      if capability catalog was not updated during the session
+      `ag done` checks .cap_updated flag and shows advisory nudge if
+      the design doc was not updated; when feature_tracking=no, nudges
+      to update OVERVIEW.md Core Capabilities section
     type: behavioral
 
   - id: AC-012
