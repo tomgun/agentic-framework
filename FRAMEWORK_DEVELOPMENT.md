@@ -858,21 +858,21 @@ Profiles (discovery, formal, autonomous_formal) are **presets for settings**, no
 
 **The key design principle**: discovery settings still log enough information to make a transition to formal specs as fluent as possible. Every artifact discovery produces is raw material for formal specs:
 
-| Discovery artifact | Formal equivalent | Transition path |
+| Discovery artifact | Formal equivalent | How it helps |
 |---|---|---|
-| OVERVIEW.md Core Capabilities (checkboxes) | FEATURES.md with F-XXXX entries | Each checked capability → a feature entry. `ag specs` can generate these from OVERVIEW.md. |
+| OVERVIEW.md Core Capabilities (checkboxes) | FEATURES.md with F-XXXX entries | Each checked capability → a feature entry. Agent uses these as starting points. |
 | OVERVIEW.md Guiding Principles | NFR.md non-functional requirements | Each principle → an NFR with measurable criteria. |
 | JOURNAL.md entries (with `--why`) | ADRs in `spec/adr/` | Key decisions from journal → formal Architecture Decision Records. |
 | Cerebrum entries (`ag intel remember`) | Enforced patterns in `patterns.yaml` | Preferences/learnings → `ag intel learn` patterns with scope globs. |
 | Code + tests (as they exist) | YAML contracts with acceptance criteria | Code behavior → extracted ACs. Tests → verification commands in contracts. `ag specs` analyzes codebase to suggest ACs. |
 | ISSUES.md + LESSONS.md | Patterns + quality checklist items | `ag intel retro` already does this — converts lessons to enforceable patterns. |
 
-**When a user decides to graduate**: They change `feature_tracking: yes` and `spec_directory: yes` in STACK.md (or switch to `profile: formal`). Then run `ag specs` which reads OVERVIEW.md capabilities, existing code, and tests to generate FEATURES.md entries and draft contract YAMLs. The journal and cerebrum provide decision context that helps write more accurate ACs.
+**When a user decides to graduate**: They change `feature_tracking: yes` and `spec_directory: yes` in STACK.md (or switch to `profile: formal`). The agent then helps create FEATURES.md entries and draft contracts by reading OVERVIEW.md capabilities, journal decisions, cerebrum entries, and the existing codebase. This is agent-assisted, not automated — the user reviews and refines the specs. The discovery artifacts give the agent rich context to work from rather than starting from scratch.
 
 **What this means for framework development**:
 1. **Discovery artifacts must be understandable months later** — OVERVIEW.md checkboxes, structured journal entries with `--why`, typed cerebrum entries. If someone comes back in 6 months, they should be able to understand what was built and why from these artifacts alone.
 2. **Don't gate discovery features behind formal settings** — if a feature helps track what was built or why, it should work when `feature_tracking=no`. The data it produces is valuable on its own AND makes graduation easier.
-3. **Structure enables transition** — machine-readable formats (checkboxes, YAML cerebrum entries, journal with fields) naturally lend themselves to generating formal specs later. This is a side benefit of good structure, not the primary goal.
+3. **Structure enables transition** — machine-readable formats (checkboxes, YAML cerebrum entries, journal with fields) give an agent rich context when the user asks to create formal specs. No script auto-generates specs — the agent helps the user write them, using discovery artifacts as context. This is a side benefit of good structure, not the primary goal.
 4. **Journal `--why` is critical** — the motivation behind decisions is what gives artifacts lasting value. A checkbox says "we built search." A journal entry with `--why` says "we built search because users couldn't find products by category, and we chose Elasticsearch over Postgres FTS because we expect 10M+ products." That context is useful whether or not you ever go formal.
 
 ---
