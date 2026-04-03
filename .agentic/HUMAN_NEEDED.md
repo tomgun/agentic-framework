@@ -80,6 +80,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0082: PR #224: AC-level status tracking + consolidate F-037/038/039
+- **Type**: pr_review
+- **Added**: 2026-04-03
+- **Context**: Review planned ACs on F-018/F-030, migration entries, and schema evolution
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0079: PR #219: F-041 Phase 2 — Anatomy + Token Ledger
