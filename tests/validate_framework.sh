@@ -5939,6 +5939,74 @@ else
   fail "F-041 AC-021: .gitignore missing anatomy.index or session entries"
 fi
 
+# ============================================================
+# Behavioral Trace (btrace) — Debug Mode
+# ============================================================
+
+# btrace.sh exists and has required functions
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/btrace.sh" ]] && \
+   grep -q 'btrace_enabled()' "${FRAMEWORK_ROOT}/.agentic/lib/tools/btrace.sh" && \
+   grep -q 'btrace()' "${FRAMEWORK_ROOT}/.agentic/lib/tools/btrace.sh"; then
+  pass "btrace: bash emitter library exists with required functions"
+else
+  fail "btrace: bash emitter library missing or incomplete"
+fi
+
+# btrace.py exists and has required functions
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/btrace.py" ]] && \
+   grep -q 'def enabled' "${FRAMEWORK_ROOT}/.agentic/lib/btrace.py" && \
+   grep -q 'def emit' "${FRAMEWORK_ROOT}/.agentic/lib/btrace.py"; then
+  pass "btrace: python emitter library exists with required functions"
+else
+  fail "btrace: python emitter library missing or incomplete"
+fi
+
+# btrace default in all profiles
+if grep -q 'discovery.btrace=' "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" && \
+   grep -q 'formal.btrace=' "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" && \
+   grep -q 'autonomous_formal.btrace=' "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf"; then
+  pass "btrace: setting defined in all profile presets"
+else
+  fail "btrace: setting missing from profile presets"
+fi
+
+# ag debug command registered
+if grep -q 'debug)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" && \
+   grep -q 'cmd_debug' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh"; then
+  pass "btrace: ag debug command registered in ag.sh"
+else
+  fail "btrace: ag debug command not registered in ag.sh"
+fi
+
+# commands/debug.sh exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/debug.sh" ]] && \
+   grep -q 'cmd_debug' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/debug.sh"; then
+  pass "btrace: commands/debug.sh exists with cmd_debug function"
+else
+  fail "btrace: commands/debug.sh missing or incomplete"
+fi
+
+# Hooks source btrace.sh
+_BT_HOOKS_OK=true
+for hook in PreToolUse PostToolUse UserPromptSubmit Stop SessionStart; do
+  if ! grep -q 'btrace.sh' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/${hook}.sh" 2>/dev/null; then
+    _BT_HOOKS_OK=false
+    break
+  fi
+done
+if $_BT_HOOKS_OK; then
+  pass "btrace: all major hooks source btrace.sh"
+else
+  fail "btrace: not all hooks source btrace.sh (missing: $hook)"
+fi
+
+# gate.py imports btrace
+if grep -q 'import btrace' "${FRAMEWORK_ROOT}/.agentic/lib/gate.py"; then
+  pass "btrace: gate.py imports btrace for Python-side emission"
+else
+  fail "btrace: gate.py missing btrace import"
+fi
+
 # Summary
 
 # ============================================================

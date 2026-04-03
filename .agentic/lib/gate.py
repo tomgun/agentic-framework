@@ -38,6 +38,7 @@ _LIB_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
 from settings import get_setting  # noqa: E402
+import btrace  # noqa: E402
 from ids import FEATURE_ID_RE, is_valid_feature_id  # noqa: E402
 
 
@@ -619,6 +620,11 @@ def gate_stop(feature_id: Optional[str], project_root: Path) -> GateResult:
     profile = get_setting(project_root, "profile", "discovery")
     is_formal = profile in ("formal", "autonomous_formal")
 
+    btrace.emit(project_root, "gate", "stop_enter", {
+        "feature": feature_id or "",
+        "profile": profile,
+    })
+
     result = GateResult.allow()
 
     # Advisory checks (all profiles)
@@ -663,6 +669,12 @@ def gate_stop(feature_id: Optional[str], project_root: Path) -> GateResult:
                 if r.decision == "deny":
                     result.warnings.extend(r.reasons)
 
+    btrace.emit(project_root, "gate", "stop_result", {
+        "decision": result.decision,
+        "reasons": result.reasons[:3],
+        "warnings_count": len(result.warnings),
+    })
+
     return result
 
 
@@ -686,6 +698,14 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
             input_data = json.loads(tool_input)
         except json.JSONDecodeError:
             pass
+
+    file_path_summary = input_data.get("file_path", input_data.get("command", ""))[:80]
+    btrace.emit(project_root, "gate", "pretool_enter", {
+        "tool": tool,
+        "profile": profile,
+        "feature": feature_id or "",
+        "input_summary": file_path_summary,
+    })
 
     # --- Bash/Shell tool checks ---
     if tool == "Bash":
@@ -866,6 +886,10 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                         "Create a migration first: bash .agentic/lib/tools/migration.sh create 'Deprecate...'"
                     ])
 
+    btrace.emit(project_root, "gate", "pretool_result", {
+        "decision": "allow",
+        "tool": tool,
+    })
     return GateResult.allow()
 
 

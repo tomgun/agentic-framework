@@ -123,6 +123,13 @@ Purpose: a single source of truth for "how we build and run software here".
 - max_parallel_agents: 3
 # Maximum concurrent Claude processes for parallel epic execution (F-017). Range: 1-10. Discovery: 3 | Formal: 3 | Autonomous Formal: 3
 
+- catalog_enforcement: advisory
+# Capability catalog enforcement level (F-042). advisory: warn if design docs outdated | blocking: block session stop. Discovery: advisory | Formal: advisory | Autonomous Formal: blocking
+
+### Debug
+- btrace: off
+# Behavioral trace for debugging framework decisions. off: no tracing (zero overhead) | on: trace hook I/O, gate decisions, pattern matches | verbose: on + sub-check detail + settings resolution. All profiles default to off. Override per-session: AGENTIC_BTRACE=on
+
 ## Summary
 - What are we building: <!-- 1–2 sentences -->
 - Primary platform: <!-- web/service/mobile/desktop/cli -->

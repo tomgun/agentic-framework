@@ -23,6 +23,7 @@ cd "$PROJECT_ROOT" 2>/dev/null || exit 0
 # Source framework settings
 source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || exit 0
 source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || exit 0
+source "$PROJECT_ROOT/.agentic/lib/tools/btrace.sh" 2>/dev/null || true
 
 # --- Check if plan review is enabled ---
 PLAN_REVIEW=$(get_setting "plan_review_enabled" "no" 2>/dev/null || echo "no")
@@ -72,6 +73,7 @@ if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
             mkdir -p "$PROJECT_ROOT/.agentic/session" 2>/dev/null || true
             touch "$PROJECT_ROOT/.agentic/session/review-pending-${FEATURE_ID}" 2>/dev/null || true
         fi
+        btrace "PostToolUse:on-plan-mode-exit" "plan_save" "{\"plan_file\":\"$PLAN_BASENAME\",\"feature\":\"$FEATURE_ID\",\"status\":\"DRAFT\"}" 2>/dev/null || true
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/$PLAN_BASENAME"
     else
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/"

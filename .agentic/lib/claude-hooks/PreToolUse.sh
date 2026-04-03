@@ -21,6 +21,7 @@ set -euo pipefail
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 cd "$PROJECT_ROOT"
 source "$PROJECT_ROOT/.agentic/lib/tools/fwlog.sh" 2>/dev/null || true
+source "$PROJECT_ROOT/.agentic/lib/tools/btrace.sh" 2>/dev/null || true
 flog "hook:pre-tool-use" "fire" "" "start" 2>/dev/null || true
 
 # Skip if not an agentic project
@@ -49,13 +50,19 @@ try:
 except: print('{}')
 " 2>/dev/null || true)
 
+# btrace: log tool input (truncated, no file contents)
+_BT_INPUT_SUMMARY="${TOOL_INPUT:0:120}"
+btrace "PreToolUse" "enter" "{\"tool\":\"${TOOL_NAME}\",\"input_summary\":$(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$_BT_INPUT_SUMMARY" 2>/dev/null || echo '""')}" 2>/dev/null || true
+
 # Call ag gate pretool
 GATE_OUTPUT=""
 GATE_RC=0
+_BT_GATE_START=$SECONDS
 GATE_OUTPUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate pretool \
   --tool "${TOOL_NAME}" \
   --input "${TOOL_INPUT}" \
   --project-root "$PROJECT_ROOT" 2>&1) || GATE_RC=$?
+_BT_GATE_MS=$(( (SECONDS - _BT_GATE_START) * 1000 ))
 
 # Helper: emit Claude deny JSON and exit
 _deny() {
@@ -80,6 +87,7 @@ if [[ "$GATE_RC" -eq 2 ]]; then
   if command -v jq >/dev/null 2>&1 && echo "$GATE_OUTPUT" | jq -e . >/dev/null 2>&1; then
     REASON=$(echo "$GATE_OUTPUT" | jq -r '.reasons // [] | join(". ")' 2>/dev/null || echo "$REASON")
   fi
+  btrace "PreToolUse" "gate_result" "{\"decision\":\"deny\",\"exit_code\":$GATE_RC,\"duration_ms\":$_BT_GATE_MS,\"reason\":$(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$REASON" 2>/dev/null || echo '""')}" 2>/dev/null || true
   _deny "$REASON"
 fi
 
@@ -154,6 +162,13 @@ if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "Mult
       done < "$_PTN_FILE"
       _ptn_flush  # last entry
 
+      # btrace: log pattern matches
+      if [[ -n "$_PTN_WARNS" ]]; then
+        _bt_ptn_count=$(echo -e "$_PTN_WARNS" | grep -c "P-" 2>/dev/null || echo 0)
+        _bt_ptn_count="${_bt_ptn_count## }"; _bt_ptn_count="${_bt_ptn_count%% }"
+        btrace "PreToolUse" "pattern_match" "{\"file\":$(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$_PTN_FNAME" 2>/dev/null || echo '""'),\"matches\":${_bt_ptn_count:-0}}" 2>/dev/null || true
+      fi
+
       # Output warnings to stderr (visible to agent, doesn't break JSON stdout)
       if [[ -n "$_PTN_WARNS" ]]; then
         echo -e "📋 Pattern warnings for ${_PTN_FNAME}:" >&2
@@ -175,6 +190,9 @@ if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "Mult
     fi
   fi
 fi
+
+# btrace: log allow
+btrace "PreToolUse" "gate_result" "{\"decision\":\"allow\",\"exit_code\":$GATE_RC,\"duration_ms\":${_BT_GATE_MS:-0}}" 2>/dev/null || true
 
 # Allow — no output needed
 exit 0

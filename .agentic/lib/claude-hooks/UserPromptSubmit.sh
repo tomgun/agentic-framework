@@ -16,6 +16,7 @@ PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 cd "$PROJECT_ROOT"
 source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
 source "$PROJECT_ROOT/.agentic/lib/tools/fwlog.sh" 2>/dev/null || true
+source "$PROJECT_ROOT/.agentic/lib/tools/btrace.sh" 2>/dev/null || true
 flog "hook:user-prompt-submit" "fire" "" "start"
 
 # --- Stale artifact reminder (commit-relative) ---
@@ -59,6 +60,7 @@ if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; th
       fi
 
       if [[ -n "$STALE_ARTIFACTS" ]]; then
+        btrace "UserPromptSubmit" "stale_artifacts" "{\"stale\":\"${STALE_ARTIFACTS}\"}" 2>/dev/null || true
         echo ""
         echo "📋 REMINDER: You have uncommitted changes but ${STALE_ARTIFACTS}not updated since last commit."
         echo "   Update before your next commit:"
@@ -78,7 +80,11 @@ fi
 # Warn when user prompt contains batch-work triggers that should use ag auto crunch
 # USER_PROMPT is set once here and reused by all subsequent checks
 USER_PROMPT="${CLAUDE_USER_PROMPT:-}"
+_BT_PROMPT_LEN=${#USER_PROMPT}
+btrace "UserPromptSubmit" "enter" "{\"prompt_length\":$_BT_PROMPT_LEN}" 2>/dev/null || true
+
 if echo "$USER_PROMPT" | grep -qiE '(churn|batch)\s+(all\s+)?(tasks|features)|build everything|implement (all|everything)|do all (features|tasks)|implement everything|work autonomously.*(game|app|project|system|working)|come back with.*(working|finished|complete|done)|build.*(whole|entire|full)\s+(game|app|project|system)|finish everything|do it all|complete the (project|app|game)|implement the (whole|entire|full)|ship (it all|everything)|create.*(entire|whole|full).*(app|game|project)'; then
+  btrace "UserPromptSubmit" "batch_detect" "{\"trigger\":\"batch_work\"}" 2>/dev/null || true
   echo ""
   echo "⚠️  BATCH WORK DETECTED: Use \`ag auto crunch\` to process the backlog."
   echo "   The ag auto pipeline ensures each feature gets specs, plans, tests, and docs."
@@ -127,7 +133,9 @@ fi
 # Check if user prompt contains "implement" trigger and warn if no acceptance
 if [[ "$USER_PROMPT" =~ [Ii]mplement.*($FEATURE_ID_ERE) ]]; then
   FEATURE_ID="${BASH_REMATCH[1]}"
+  btrace "UserPromptSubmit" "implement_trigger" "{\"feature\":\"${FEATURE_ID}\"}" 2>/dev/null || true
   if [[ ! -f ".agentic/spec/contracts/${FEATURE_ID}.yaml" ]] && [[ ! -f ".agentic/spec/acceptance/${FEATURE_ID}.md" ]]; then
+    btrace "UserPromptSubmit" "missing_ac" "{\"feature\":\"${FEATURE_ID}\"}" 2>/dev/null || true
     echo ""
     echo "⚠️  GATE WARNING: No contract/acceptance criteria for ${FEATURE_ID}"
     echo "   Create .agentic/spec/contracts/${FEATURE_ID}.yaml before implementing"

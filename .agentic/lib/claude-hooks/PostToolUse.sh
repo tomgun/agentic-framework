@@ -16,6 +16,7 @@ PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 cd "$PROJECT_ROOT"
 source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
 source "$PROJECT_ROOT/.agentic/lib/tools/fwlog.sh" 2>/dev/null || true
+source "$PROJECT_ROOT/.agentic/lib/tools/btrace.sh" 2>/dev/null || true
 flog "hook:post-tool-use" "fire" "" "start"
 
 # Skip if not an agentic project
@@ -38,6 +39,8 @@ if [[ -n "$_POST_STDIN" ]]; then
     _POST_FILE="${BASH_REMATCH[1]}"
   fi
 fi
+
+btrace "PostToolUse" "enter" "{\"tool\":\"${_POST_TOOL:-unknown}\",\"file\":\"${_POST_FILE:-}\"}" 2>/dev/null || true
 
 if [[ -n "$_POST_TOOL" ]]; then
   _TK_EVENTS=".agentic/session/token-events.log"

@@ -20,6 +20,7 @@ PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 cd "$PROJECT_ROOT"
 source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
 source "$PROJECT_ROOT/.agentic/lib/tools/fwlog.sh" 2>/dev/null || true
+source "$PROJECT_ROOT/.agentic/lib/tools/btrace.sh" 2>/dev/null || true
 # Rotate previous log
 [[ -f "${FRAMEWORK_LOG:-}" ]] && mv "$FRAMEWORK_LOG" "${FRAMEWORK_LOG}.prev" 2>/dev/null || true
 flog "hook:session-start" "fire" "" "start"
@@ -46,6 +47,11 @@ if [[ -f ".agentic/STACK.md" ]]; then
   FRAMEWORK_VERSION=$(grep -E "framework_version:" .agentic/STACK.md | head -1 | awk '{print $2}' || echo "unknown")
   echo -e "📦 Framework version: ${GREEN}${FRAMEWORK_VERSION}${NC}"
 fi
+
+# btrace: session start event
+_BT_PROFILE=$(grep -E '^\s*-\s*profile:' "$PROJECT_ROOT/STACK.md" 2>/dev/null | head -1 | sed 's/.*:\s*//' | tr -d '[:space:]' || echo "unknown")
+_BT_SID=$(cat "$PROJECT_ROOT/.agentic/session/.current-session-id" 2>/dev/null | tr -d '[:space:]' || echo "unknown")
+btrace "SessionStart" "enter" "{\"profile\":\"${_BT_PROFILE}\",\"version\":\"${FRAMEWORK_VERSION:-unknown}\",\"session_id\":\"${_BT_SID}\",\"btrace_level\":\"${_BTRACE_LEVEL:-off}\"}" 2>/dev/null || true
 
 # 3. Check for STATUS.md (primary session context)
 if [[ -f "STATUS.md" ]]; then

@@ -17,6 +17,7 @@ PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 cd "$PROJECT_ROOT"
 source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
 source "$PROJECT_ROOT/.agentic/lib/tools/fwlog.sh" 2>/dev/null || true
+source "$PROJECT_ROOT/.agentic/lib/tools/btrace.sh" 2>/dev/null || true
 flog "hook:stop" "fire" "" "start" 2>/dev/null || true
 
 # Skip if not an agentic project
@@ -24,10 +25,15 @@ if [[ ! -d ".agentic" ]]; then
   exit 0
 fi
 
+# btrace: enter
+btrace "Stop" "enter" "{}" 2>/dev/null || true
+
 # --- Enforcement: call ag gate stop ---
 GATE_OUTPUT=""
 GATE_RC=0
+_BT_STOP_START=$SECONDS
 GATE_OUTPUT=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate stop --project-root "$PROJECT_ROOT" 2>&1) || GATE_RC=$?
+_BT_STOP_MS=$(( (SECONDS - _BT_STOP_START) * 1000 ))
 
 # Parse JSON response
 DECISION="allow"
@@ -43,6 +49,9 @@ else
   REASONS=$(echo "$GATE_OUTPUT" | grep -o '"reasons":\s*\[.*\]' | head -1 || echo "")
   WARNINGS=""
 fi
+
+# btrace: gate result
+btrace "Stop" "gate_result" "{\"decision\":\"${DECISION}\",\"exit_code\":${GATE_RC},\"duration_ms\":${_BT_STOP_MS:-0}}" 2>/dev/null || true
 
 # --- Capability catalog check (F-042: Universal Capability Catalog) ---
 # Advisory: warn if implementation code was written but design doc not updated.
@@ -114,6 +123,7 @@ TKEOF
 }
 TKEOF
 
+  btrace "Stop" "token_finalize" "{\"reads\":$_TK_READS,\"writes\":$_TK_WRITES,\"repeated\":$_TK_REPEATED,\"est_cost\":$_TK_COST}" 2>/dev/null || true
   echo "📊 Session: ${_TK_READS} reads (${_TK_REPEATED} repeated), ${_TK_WRITES} writes, ~${_TK_COST} est. tokens" >&2
 
   # Clean up events log
@@ -185,6 +195,7 @@ fi
 
 # --- Output and exit ---
 if [[ "$DECISION" == "deny" ]]; then
+  btrace "Stop" "exit" "{\"decision\":\"deny\",\"exit_code\":2}" 2>/dev/null || true
   echo ""
   echo "🚫 Session stop BLOCKED — verification not passed"
   echo ""
@@ -213,6 +224,8 @@ rm -f .agentic/session/.phase_implementing 2>/dev/null || true
 rm -f .agentic/session/.impl-brief.md 2>/dev/null || true
 rm -f .agentic/session/.contract-surface.txt 2>/dev/null || true
 rm -f .agentic/session/.nfr-brief.txt 2>/dev/null || true
+
+btrace "Stop" "exit" "{\"decision\":\"allow\",\"exit_code\":0}" 2>/dev/null || true
 
 echo ""
 echo "✓ All checks passed. Session ending."

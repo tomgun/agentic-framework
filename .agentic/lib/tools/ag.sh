@@ -200,6 +200,7 @@ source "$COMMANDS_DIR/git-init.sh"
 source "$COMMANDS_DIR/contract.sh"
 source "$COMMANDS_DIR/phase.sh"
 source "$COMMANDS_DIR/intel.sh"
+source "$COMMANDS_DIR/debug.sh"
 
 # Self-healing: ensure pre-commit hooks are installed on every ag invocation
 # Addresses D2 (Deterministic Enforcement) — hooks must survive git config resets
@@ -298,6 +299,10 @@ case "${1:-help}" in
     analyze-session)
         shift
         cmd_analyze_session "$@"
+        ;;
+    debug)
+        shift
+        cmd_debug "$@"
         ;;
     test)
         shift

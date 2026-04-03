@@ -27,6 +27,7 @@ cd "$PROJECT_ROOT" 2>/dev/null || exit 0
 # Source framework settings and ID patterns
 source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || exit 0
 source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
+source "$PROJECT_ROOT/.agentic/lib/tools/btrace.sh" 2>/dev/null || true
 
 # --- Read stdin ONCE (consumed on read, shared by all checks) ---
 STDIN_DATA=""
@@ -77,6 +78,7 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
 fi
 if [[ -n "$FEATURES_FILE" ]]; then
   if ! grep -qiE 'status:\s*(implementing|in.review|testing)' "$FEATURES_FILE" 2>/dev/null; then
+    btrace "PostToolUse:on-code-edit" "wip_check" "{\"features_implementing\":0,\"file\":\"${EDITED_FILE}\"}" 2>/dev/null || true
     echo ""
     echo "🚨 NO ACTIVE WORK ITEM — code edit without any feature in 'implementing' state."
     echo "   All features are still planned. Run \`ag start F-XXXX\` then \`ag implement F-XXXX\`."
@@ -109,6 +111,7 @@ done
 
 # Output DRAFT warning if applicable (defense-in-depth — PreToolUse now blocks in formal)
 if [[ -n "$DRAFT_PLANS" ]]; then
+  btrace "PostToolUse:on-code-edit" "draft_check" "{\"draft_plans\":\"${DRAFT_PLANS}\",\"file\":\"${EDITED_FILE}\"}" 2>/dev/null || true
   echo ""
   echo "🚨🚨🚨 UNAPPROVED PLAN — STOP CODING 🚨🚨🚨"
   echo ""
