@@ -131,8 +131,12 @@ for cid in check_ids:
                 for line in r['output'].split(chr(10))[:2]:
                     print(f'      {line}')
 
+total_planned = sum(len(by_id[cid].unshipped_assertions) for cid in check_ids if cid in by_id)
 print()
-print(f'Total: {total_pass} passed, {total_fail} failed, {total_skip} skipped ({len(check_ids)} contracts)')
+summary = f'Total: {total_pass} passed, {total_fail} failed, {total_skip} skipped ({len(check_ids)} contracts)'
+if total_planned:
+    summary += f', {total_planned} planned'
+print(summary)
 sys.exit(1 if total_fail > 0 else 0)
 "
             return $?
@@ -162,8 +166,12 @@ for r in result['results']:
             for line in r['output'].split(chr(10))[:3]:
                 print(f'    {line}')
 
+planned = len(contract.unshipped_assertions)
 print()
-print(f'{passed} passed, {failed} failed, {skipped} skipped')
+summary = f'{passed} passed, {failed} failed, {skipped} skipped'
+if planned:
+    summary += f', {planned} planned (not yet implemented)'
+print(summary)
 sys.exit(1 if failed > 0 else 0)
 "
         return $?

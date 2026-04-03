@@ -1,41 +1,8 @@
 [
   {
-    "type": "feature",
-    "id": "F-041",
-    "description": "Intelligence Engine",
-    "added_at": "2026-04-02T20:05:24Z",
-    "added_by": "auto",
-    "became_current_at": "2026-04-02T20:05:24Z",
-    "refs": [
-      ".agentic/spec/contracts/F-041.yaml"
-    ]
-  },
-  {
-    "type": "feature",
-    "id": "F-037",
-    "description": "MCP Coordination Server",
-    "added_at": "2026-03-16T18:56:16Z",
-    "added_by": "agent",
-    "became_current_at": "2026-03-29T20:46:46Z"
-  },
-  {
-    "type": "feature",
-    "id": "F-038",
-    "description": "Multi-Repo Umbrella",
-    "added_at": "2026-03-16T18:56:16Z",
-    "added_by": "agent",
-    "depends_on": [
-      "F-037"
-    ]
-  },
-  {
-    "type": "feature",
-    "id": "F-039",
-    "description": "Full Autonomous Scheduling",
-    "added_at": "2026-03-16T18:56:16Z",
-    "added_by": "agent",
-    "depends_on": [
-      "F-037"
-    ]
+    "type": "task",
+    "description": "T-0097: ExitPlanMode migration gate",
+    "added_at": "2026-04-03T18:58:53Z",
+    "added_by": "agent"
   }
 ]

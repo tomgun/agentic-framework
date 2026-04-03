@@ -218,6 +218,12 @@
           "type": ["string", "null"],
           "default": null,
           "description": "Links assertion to persona capability (format: persona-id:capability-slug)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["planned", "specced", "implementing", "verified", "shipped"],
+          "default": "shipped",
+          "description": "AC lifecycle status. Defaults to shipped for backward compatibility."
         }
       }
     },

@@ -61,6 +61,28 @@ assertions:
     tests:
       - tests/test_auto_engine.py::TestACHandling
 
+  # --- Scheduling Enhancements (consolidated from F-039) ---
+  - id: AC-006
+    text: >
+      Scheduler reads Priority field from FEATURES.md and orders features
+      accordingly instead of FIFO
+    type: behavioral
+    status: planned
+
+  - id: AC-007
+    text: >
+      Dynamic capacity sensing adjusts parallelism based on system load
+      rather than static max_parallel cap
+    type: behavioral
+    status: planned
+
+  - id: AC-008
+    text: >
+      Independent ACs within a feature run in parallel worktrees for
+      faster single-feature implementation
+    type: behavioral
+    status: planned
+
 nfr_refs: []
 scenarios:
   - name: "Autonomous task implementation"
@@ -68,4 +90,14 @@ scenarios:
     when: "Run ag auto task F-0099"
     then: "Engine processes each AC, runs tests, reports results"
 
-migrations: []
+migrations:
+  - id: M-001
+    date: "2026-04-03"
+    trigger: consolidation
+    reason: >
+      F-039 (Full Autonomous Scheduling) consolidated into F-030. Scheduling
+      enhancements are improvements to the shipped autonomous execution engine,
+      not a new capability.
+    changes:
+      - "Added AC-006..AC-008 (scheduling enhancements, from F-039) with status: planned"
+    approved_by: user

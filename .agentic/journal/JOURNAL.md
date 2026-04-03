@@ -5072,18 +5072,6 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
-### Session: 2026-04-06 13:03 - Test
-
-**Decision**: X over Y
-
-**What changed**:
-- Outcome
-
-**Next steps**:
-- Next
-
-**Blockers**: None
-
 
 ### Session: 2026-04-06 13:31 - PR #225 merged — v0.79.0
 
@@ -5094,6 +5082,19 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Next steps**:
 - ag backlog list for next work item
+
+**Blockers**: None
+
+
+### Session: 2026-04-03 18:30 - Backlog reassessment: consolidate F-037/038/039
+
+**Why**: Framework shipped equivalent infrastructure under F-018/F-030; standalone features violated no-feature-inflation rule
+
+**What changed**:
+- Deprecated F-037/038/039 as standalone features. Added planned ACs to F-018 (MCP transport + multi-repo) and F-030 (scheduling enhancements). Added AC-level status field to contract schema for incremental delivery on shipped features.
+
+**Next steps**:
+- Backlog is empty — decide next priorities
 
 **Blockers**: None
 
