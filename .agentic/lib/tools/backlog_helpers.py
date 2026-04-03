@@ -319,6 +319,18 @@ def cmd_list(backlog_file: Path) -> int:
     for i, item in enumerate(items):
         _print_item(item, i, show_current=(i == 0))
     print(f"\n{len(items)} item(s) total")
+
+    # Change 10: Triage nudge — if TODO.md has untriaged items, suggest triage
+    todo_file = backlog_file.parent / "TODO.md"
+    if todo_file.exists():
+        try:
+            content = todo_file.read_text()
+            inbox_count = content.count("\n- T-")
+            if inbox_count >= 5:
+                print(f"\n💡 {inbox_count} untriaged items in TODO.md — run `ag todo triage` to promote or dismiss")
+        except OSError:
+            pass
+
     return 0
 
 

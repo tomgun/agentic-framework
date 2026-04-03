@@ -537,7 +537,33 @@ if [[ "$D_BACKLOG_TOTAL" -gt 0 ]]; then
     echo "   Queue     $D_BACKLOG_REMAINING remaining"
 else
     echo "   Empty — no queued work items"
+    # Change 10: Warn if features exist but backlog is empty
+    if [[ -f "$ROOT_DIR/.agentic/spec/FEATURES.md" ]]; then
+        _planned=$(grep -c '^\*\*Status\*\*:\s*planned' "$ROOT_DIR/.agentic/spec/FEATURES.md" 2>/dev/null || echo 0)
+        _planned="${_planned## }"
+        if [[ "${_planned:-0}" -gt 0 ]]; then
+            echo "   ⚠️  ${_planned} planned feature(s) — run \`ag backlog add F-XXXX\` to queue work"
+        fi
+    fi
 fi
+
+# Change 14: Show orphaned intent count if any
+_INTENTS_FILE="$ROOT_DIR/.agentic/session/intents.json"
+if [[ -f "$_INTENTS_FILE" ]]; then
+    _intent_count=$(_py -c "
+import json, sys
+try:
+    data = json.load(open(sys.argv[1]))
+    intents = data if isinstance(data, list) else data.get('intents', [])
+    print(sum(1 for i in intents if i.get('status') == 'active'))
+except: print(0)
+" "$_INTENTS_FILE" 2>/dev/null || echo 0)
+    _intent_count="${_intent_count## }"
+    if [[ "${_intent_count:-0}" -gt 0 ]]; then
+        echo "⚠️  Intents   ${_intent_count} orphaned — run \`ag intent list\` or \`ag sync\`"
+    fi
+fi
+
 echo ""
 
 # Next steps

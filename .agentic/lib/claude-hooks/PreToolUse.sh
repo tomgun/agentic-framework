@@ -158,6 +158,11 @@ if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "Mult
       if [[ -n "$_PTN_WARNS" ]]; then
         echo -e "📋 Pattern warnings for ${_PTN_FNAME}:" >&2
         echo -e "$_PTN_WARNS" >&2
+        # Change 6c: One-time correction persistence hint
+        if [[ ! -f "$PROJECT_ROOT/.agentic/session/.correction_hint_shown" ]]; then
+          echo -e "   💡 If this edit is a deliberate override: \`ag intel remember \"reason\" --context \"editing ${_PTN_FNAME}\"\`" >&2
+          touch "$PROJECT_ROOT/.agentic/session/.correction_hint_shown" 2>/dev/null || true
+        fi
         # Log enforcement event to intel-events.log
         _warn_count=$(echo -e "$_PTN_WARNS" | grep -c "P-" 2>/dev/null || echo 0)
         _warn_count="${_warn_count## }"; _warn_count="${_warn_count%% }"; _warn_count="${_warn_count%%[!0-9]*}"

@@ -1011,21 +1011,28 @@ if [[ -f ".agentic/spec/FEATURES.md" ]]; then
 fi
 
 # Check 18: Instruction sync advisory (framework-dev only)
-# Warns if ag.sh changed but instruction files weren't modified in the same commit
-if [[ $_FAST_MODE -eq 0 ]] && [[ -f ".agentic/lib/tools/instruction-sync.sh" ]]; then
-  AG_SH_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -c "ag\.sh" || true)
-  if [[ "$AG_SH_STAGED" -gt 0 ]]; then
+# Warns if enforcement code changed but instruction files weren't updated.
+# Covers: ag.sh, gate.py, hooks, and skill files.
+if [[ $_FAST_MODE -eq 0 ]] && [[ -f "FRAMEWORK_DEVELOPMENT.md" ]]; then
+  _CACHED_FILES=$(git diff --cached --name-only 2>/dev/null || true)
+  # Check if enforcement code was modified
+  ENFORCEMENT_STAGED=$(echo "$_CACHED_FILES" | grep -cE "(ag\.sh|gate\.py|claude-hooks/|hooks/shared/)" || true)
+  if [[ "$ENFORCEMENT_STAGED" -gt 0 ]]; then
     echo ""
-    echo "[18/18] Checking instruction file sync (ag.sh staged)..."
-    INSTR_FILES_STAGED=$(git diff --cached --name-only 2>/dev/null | grep -cE "(CLAUDE\.md|cursorrules|copilot-instructions|codex-instructions|auto_orchestration|memory-seed)" || true)
+    echo "[18] Checking instruction file sync (enforcement code staged)..."
+    INSTR_FILES_STAGED=$(echo "$_CACHED_FILES" | grep -cE "(CLAUDE\.md|\.claude/skills/|cursorrules|copilot-instructions|codex-instructions|memory-seed)" || true)
     if [[ "$INSTR_FILES_STAGED" -eq 0 ]]; then
-      echo "⚠️  WARNING: ag.sh modified but no instruction files updated"
-      echo "   If you added/changed ag commands, update instruction files too."
-      echo "   Run: bash .agentic/lib/tools/instruction-sync.sh"
+      echo "⚠️  WARNING: Enforcement code modified but no instruction/skill files updated"
+      echo "   Changed: gate.py/hooks (structural enforcement)"
+      echo "   Missing: skills, CLAUDE.md template, or memory-seed update"
+      echo "   Skills should reference what hooks enforce (\"What's Enforced Automatically\")"
       echo ""
-      echo "   (This is advisory, not blocking commit)"
+      echo "   (Advisory — bypass with SKIP_INSTRUCT_SYNC=1 on feature branch)"
+      if [[ "${SKIP_INSTRUCT_SYNC:-}" == "1" ]]; then
+        echo "   ✓ SKIP_INSTRUCT_SYNC=1 set, skipping"
+      fi
     else
-      echo "✓ ag.sh and instruction files both staged"
+      echo "✓ Enforcement code and instruction files both staged"
     fi
   fi
 fi

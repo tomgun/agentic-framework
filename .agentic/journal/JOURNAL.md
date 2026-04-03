@@ -5033,3 +5033,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-03 12:45 - Hooks & Skills Enforcement Optimization
+
+**Why**: Framework features had ~20-60% behavioral reliability; hooks+skills optimization raises most to ~75-95% structural enforcement
+
+**What changed**:
+- 18 changes across 4 phases: structural gates (DRAFT plan PreToolUse deny, shipped spec blocking, review evidence), intelligence push model (all profiles), workflow reliability (scheduler retry, backlog nudges, live sync), doc cleanup (enforcement tables in skills, memory-seed update). 7 review issues fixed. 6 new unit tests.
+
+**Next steps**:
+- Phase 4 remaining: enforcement map generation, full instruction file dedup audit
+
+**Blockers**: None
+

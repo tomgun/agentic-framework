@@ -388,6 +388,66 @@ if c.has_pending_input:
     # Clear intent — all steps complete
     intent_clear "$feature_id" || true
 
+    # 8c. Pre-compute intelligence for push model (Changes 5-6).
+    # Generate session-scoped briefs so hooks can push intelligence at decision
+    # points without needing real-time analysis. Pure bash, <50ms.
+    mkdir -p "$ROOT_DIR/.agentic/session" 2>/dev/null || true
+    echo "$feature_id" > "$ROOT_DIR/.agentic/session/.phase_implementing" 2>/dev/null || true
+
+    # Build implementation brief from existing intel files
+    {
+      echo "# Implementation Intelligence for $feature_id"
+      echo ""
+      # Pattern count
+      local _ptn_file="$ROOT_DIR/.agentic/intel/patterns.yaml"
+      if [[ -f "$_ptn_file" ]]; then
+        local _ptn_count
+        _ptn_count=$(grep -c "^  - id:" "$_ptn_file" 2>/dev/null || echo 0)
+        _ptn_count="${_ptn_count## }"
+        local _ptn_err
+        _ptn_err=$(grep -c "severity: error" "$_ptn_file" 2>/dev/null || echo 0)
+        _ptn_err="${_ptn_err## }"
+        echo "- **Patterns**: ${_ptn_count} enforced (${_ptn_err} error-level) — checked at write-time"
+      fi
+      # Cerebrum entries
+      local _cer_file="$ROOT_DIR/.agentic/intel/cerebrum.yaml"
+      if [[ -f "$_cer_file" ]]; then
+        local _cer_count
+        _cer_count=$(grep -c "^  - id:" "$_cer_file" 2>/dev/null || echo 0)
+        _cer_count="${_cer_count## }"
+        if [[ "${_cer_count:-0}" -gt 0 ]]; then
+          echo "- **Cerebrum**: ${_cer_count} project learnings — run \`ag intel cerebrum\` for details"
+        fi
+      fi
+      # Conventions
+      if [[ -f "$ROOT_DIR/.agentic/conventions.md" ]]; then
+        echo "- **Conventions**: .agentic/conventions.md exists — review before coding"
+      fi
+      # Quality checklist
+      if [[ -f "$ROOT_DIR/.agentic/intel/quality-checklist.yaml" ]]; then
+        echo "- **Quality checklist**: implementation-phase items available"
+      fi
+      # NFRs relevant to this feature
+      local _nfr_file="$ROOT_DIR/.agentic/spec/NFR.md"
+      if [[ -f "$_nfr_file" ]]; then
+        local _nfr_count
+        _nfr_count=$(grep -c "^## NFR-" "$_nfr_file" 2>/dev/null || echo 0)
+        _nfr_count="${_nfr_count## }"
+        if [[ "${_nfr_count:-0}" -gt 0 ]]; then
+          echo "- **NFRs**: ${_nfr_count} non-functional requirements — check \`ag nfr list\`"
+        fi
+      fi
+      echo ""
+      echo "Full details: \`ag intel implement $feature_id\`"
+    } > "$ROOT_DIR/.agentic/session/.impl-brief.md" 2>/dev/null || true
+
+    # Extract contract surface patterns for spec drift detection
+    local _contract="$ROOT_DIR/.agentic/spec/contracts/${feature_id}.yaml"
+    if [[ -f "$_contract" ]]; then
+      grep -oE '(src|lib|app|cmd)/[^ "]+' "$_contract" 2>/dev/null | sort -u \
+        > "$ROOT_DIR/.agentic/session/.contract-surface.txt" 2>/dev/null || true
+    fi
+
     # 8b. Phase tracking (F-032): fallback extraction, auto-sync, progress display
     if command -v python3 >/dev/null 2>&1; then
         local tasks_yaml="$ROOT_DIR/.agentic/work/${feature_id}/tasks.yaml"

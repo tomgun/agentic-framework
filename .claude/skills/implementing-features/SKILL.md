@@ -32,8 +32,18 @@ Key commands:
 > `ag implement` enforces plan-approval gates (Step 0.5), spec checks, and sets up the
 > worktree. Bypassing it breaks the enforcement chain and allows DRAFT plans to reach code.
 
+## What's Enforced Automatically (hooks — you can't bypass these)
+- **Spec+AC required** → PreToolUse blocks code edits without spec (formal)
+- **DRAFT plan blocks code** → PreToolUse denies edits when unapproved plan exists (formal)
+- **Shipped spec protection** → PreToolUse denies editing shipped contracts without migration (formal)
+- **Pattern warnings** → PreToolUse shows matching patterns at write-time (all profiles)
+- **Intelligence push** → First code edit pushes conventions, patterns, quality checks automatically
+- **TDD nudge** → Warns if source edits occur before test writes
+- **Spec drift** → Warns if edited file matches contract assertion surface
+- **Session stop blocked** → Can't end session with DRAFT plans or unshipped merges
+
 ## Before coding
-Run `ag intel implement F-XXXX` to gather conventions, enforced patterns, and quality checks for the implementation phase.
+Run `ag intel implement F-XXXX` for full conventions and quality checks (or wait — the framework auto-pushes a brief on your first code edit).
 
 ## Preconditions
 - Feature must have a YAML contract at `spec/contracts/F-XXXX.yaml` with assertions

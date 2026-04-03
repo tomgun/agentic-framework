@@ -370,11 +370,11 @@ def check_pending_plan_review(project_root: Path) -> GateResult:
     for plan_file in sorted(plans_dir.glob("*-plan.md")):
         try:
             content = plan_file.read_text()
-            # DRAFT status = pending review
+            # Only explicit **Status**: DRAFT triggers blocking.
+            # Legacy plans (no status line) are treated as implicitly approved —
+            # they predate the mechanism. on-plan-mode-exit.sh mechanically injects
+            # DRAFT into all new plans, so this only misses truly manual saves.
             if re.search(r'\*\*Status\*\*:\s*DRAFT', content):
-                draft_plans.append(plan_file.name)
-            # No status line at all = also pending (pre-injection or manual save)
-            elif not re.search(r'\*\*Status\*\*:\s*\w+', content):
                 draft_plans.append(plan_file.name)
         except OSError:
             continue
@@ -384,6 +384,68 @@ def check_pending_plan_review(project_root: Path) -> GateResult:
             f"REQUIRED: plan review pending ({', '.join(draft_plans)}) — "
             "run Critic + Advocate review, set **Status**: APPROVED before stopping. "
             "If this plan is abandoned, mark it **Status**: REJECTED instead."
+        ])
+    return GateResult.allow()
+
+
+def check_plan_review_evidence(project_root: Path) -> GateResult:
+    """Block if a plan is marked APPROVED but no review evidence exists.
+
+    Prevents agents from fake-approving plans by editing DRAFT→APPROVED
+    without actually spawning Critic+Advocate reviewers. Evidence is
+    a review.md file in .agentic/work/{FID}/ with structural markers.
+
+    Applies when plan_review_enabled: yes. Returns allow if no plans
+    are APPROVED (nothing to validate) or if evidence exists.
+    """
+    plan_review_enabled = get_setting(project_root, "plan_review_enabled", "no")
+    if plan_review_enabled != "yes":
+        return GateResult.allow()
+
+    plans_dir = project_root / ".agentic" / "journal" / "plans"
+    if not plans_dir.exists():
+        return GateResult.allow()
+
+    # Check if any review-pending sentinel exists (created by on-plan-mode-exit.sh)
+    session_dir = project_root / ".agentic" / "session"
+    pending_sentinels = list(session_dir.glob("review-pending-*")) if session_dir.exists() else []
+    if not pending_sentinels:
+        return GateResult.allow()
+
+    # For each pending review, check if evidence now exists
+    missing_evidence = []
+    for sentinel in pending_sentinels:
+        fid = sentinel.name.replace("review-pending-", "")
+        if not fid or not is_valid_feature_id(fid):
+            continue
+
+        # Check for review evidence in work directory
+        work_dir = project_root / ".agentic" / "work" / fid
+        review_file = work_dir / "review.md"
+        if review_file.exists():
+            try:
+                content = review_file.read_text()
+                # Look for structural markers that indicate a real review
+                markers = ["Critic", "Advocate", "Synthesis", "Convergence",
+                           "Analysis", "Findings", "Recommendation"]
+                found = sum(1 for m in markers if m.lower() in content.lower())
+                if found >= 2:
+                    # Evidence found — remove sentinel
+                    try:
+                        sentinel.unlink()
+                    except OSError:
+                        pass
+                    continue
+            except OSError:
+                pass
+
+        missing_evidence.append(fid)
+
+    if missing_evidence:
+        return GateResult.deny([
+            f"Plan review evidence missing for {', '.join(missing_evidence)}. "
+            "Spawn Critic + Advocate agents to review the plan, save findings "
+            "to .agentic/work/{FID}/review.md, then set plan **Status**: APPROVED."
         ])
     return GateResult.allow()
 
@@ -568,6 +630,10 @@ def gate_stop(feature_id: Optional[str], project_root: Path) -> GateResult:
     # Applies whenever plan_review_enabled: yes, regardless of profile.
     result = result.merge(check_pending_plan_review(project_root))
 
+    # A1b: Block if plan marked APPROVED without review evidence.
+    # Prevents fake-approval by editing DRAFT→APPROVED without reviewers.
+    result = result.merge(check_plan_review_evidence(project_root))
+
     # A2: Block if a feature branch was merged but ag done was never run.
     # Only runs when FEATURES.md exists (structured projects).
     result = result.merge(check_merge_without_done(project_root))
@@ -678,6 +744,26 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
         is_safe = any(re.search(p, file_path) for p in safe_patterns)
 
         if not is_safe:
+            # Change 1: Block code edits when DRAFT plan exists (pre-edit enforcement).
+            # Previously only detected AFTER the edit via on-code-edit.sh PostToolUse.
+            # Now denied BEFORE the edit — agent cannot write code with unapproved plan.
+            draft_check = check_pending_plan_review(project_root)
+            if draft_check.decision == "deny":
+                draft_check.reasons.insert(0,
+                    "Code edit blocked — unapproved DRAFT plan exists. "
+                    "Run the convergence loop (Critic + Advocate) and set plan "
+                    "status to APPROVED before writing code.")
+                return draft_check
+
+            # Change 4: Block code edits when plan is APPROVED without review evidence.
+            # Prevents fake-approval. Advisory in formal, blocking in autonomous_formal.
+            evidence_check = check_plan_review_evidence(project_root)
+            if evidence_check.decision == "deny":
+                if profile == "autonomous_formal":
+                    return evidence_check
+                # Formal mode: advisory (warn but allow)
+                return GateResult.allow(evidence_check.reasons)
+
             # F-0300 R1: Block code writes when no active work item in deferred-git mode
             # With git_mode=deferred, pre-commit gates don't fire, so this is the
             # only enforcement point. Agents must use `ag implement F-XXXX` to track work.
@@ -742,10 +828,17 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                     pattern = rf"## {re.escape(fid)}\b.*?(?=\n## |\Z)"
                     section = re.search(pattern, content, re.DOTALL)
                     if section and re.search(r"\*\*Status\*\*:\s*shipped", section.group()):
-                        return GateResult.allow([
-                            f"Editing shipped feature {fid} acceptance criteria. "
-                            f"Create a migration: bash .agentic/lib/tools/migration.sh create 'Update {fid}...'"
-                        ])
+                        # Change 2: Escalate shipped-spec editing to blocking in formal mode.
+                        # Previously advisory (allowed with warning). Now respects state_enforcement.
+                        msg = (
+                            f"Editing shipped feature {fid} acceptance criteria blocked. "
+                            f"Create a migration first: "
+                            f"bash .agentic/lib/tools/migration.sh create 'Update {fid}...'"
+                        )
+                        enforcement = get_setting(project_root, "state_enforcement", "off")
+                        if enforcement == "blocking":
+                            return GateResult.deny([msg])
+                        return GateResult.allow([msg])
 
         # Check 7 mirror: Code file length limit (Write tool only — Edit sends
         # old_string/new_string, not full content; git pre-commit catches at commit time)
@@ -824,7 +917,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="ag gate — policy engine")
-    parser.add_argument("check", choices=["stop", "pretool", "verify", "resolve", "check-artifacts"],
+    parser.add_argument("check", choices=["stop", "pretool", "verify", "resolve", "check-artifacts", "prompt-context"],
                        help="Which gate check to run")
     parser.add_argument("--feature", "-f", help="Feature ID (auto-resolved if omitted)")
     parser.add_argument("--tool", "-t", help="Tool name (for pretool check)")
@@ -851,6 +944,47 @@ def main():
         issues = spec.reasons + ac.reasons
         if issues:
             print(json.dumps({"feature": feature_id, "issues": issues}))
+        sys.exit(0)
+
+    # "prompt-context" combines resolve + check-artifacts + cerebrum in one call.
+    # Replaces 3 separate Python invocations in UserPromptSubmit.sh, saving ~600-800ms.
+    if args.check == "prompt-context":
+        feature_id = args.feature or resolve_active_feature(project_root)
+        ctx: dict = {"feature": feature_id or "", "issues": [], "cerebrum": []}
+        if feature_id:
+            spec = check_feature_has_spec(feature_id, project_root)
+            ac = check_feature_has_ac(feature_id, project_root)
+            ctx["issues"] = spec.reasons + ac.reasons
+            # Load relevant cerebrum entries (project-scoped intelligence).
+            # Uses regex extraction — robust to indentation and quoting variations.
+            cerebrum_file = project_root / ".agentic" / "intel" / "cerebrum.yaml"
+            if cerebrum_file.exists():
+                try:
+                    content = cerebrum_file.read_text()
+                    entries = []
+                    # Split on entry boundaries (lines starting with "- id:" at any indent)
+                    for block in re.split(r'(?m)^[ \t]*- id:', content):
+                        if not block.strip():
+                            continue
+                        entry: dict = {}
+                        # ID is the first line of the block
+                        first_line = block.split('\n', 1)[0].strip().strip('"').strip("'")
+                        if first_line:
+                            entry["id"] = first_line
+                        # Extract text and type with regex (handles quotes, indentation)
+                        m_text = re.search(r'text:\s*["\']?(.+?)["\']?\s*$', block, re.MULTILINE)
+                        if m_text:
+                            entry["text"] = m_text.group(1).strip()
+                        m_type = re.search(r'type:\s*["\']?(\w+)', block, re.MULTILINE)
+                        if m_type:
+                            entry["type"] = m_type.group(1)
+                        if entry.get("text"):
+                            entries.append(entry)
+                    # Return last 5 entries (most recent are most relevant)
+                    ctx["cerebrum"] = entries[-5:]
+                except OSError:
+                    pass
+        print(json.dumps(ctx))
         sys.exit(0)
 
     # Resolve feature if not provided

@@ -166,6 +166,16 @@ ILEOF
   rm -f "$_IL_EVENTS"
 fi
 
+# --- Clean up advisory nudge sentinels (safe on deny — they're just dedup flags) ---
+rm -f .agentic/session/.impl_intel_pushed 2>/dev/null || true
+rm -f .agentic/session/.token_budget_warned 2>/dev/null || true
+rm -f .agentic/session/.tdd_nudge_fired 2>/dev/null || true
+rm -f .agentic/session/.correction_hint_shown 2>/dev/null || true
+rm -f .agentic/session/.commit_nudge_fired 2>/dev/null || true
+rm -f .agentic/session/.sync_suggested 2>/dev/null || true
+# NOTE: Enforcement sentinels (review-pending-*, .phase_implementing, .impl-brief.md,
+# .contract-surface.txt, .nfr-brief.txt) are cleaned up ONLY on allow — see below.
+
 # --- Deregister session (F-0195: multi-session collision prevention) ---
 AGENTIC_LIB="$PROJECT_ROOT/.agentic/lib"
 if [[ -f "$AGENTIC_LIB/tools/agents_helpers.py" ]]; then
@@ -196,6 +206,13 @@ if [[ -n "${WARNINGS:-}" && "$WARNINGS" != "" ]]; then
   echo "  $WARNINGS"
   echo ""
 fi
+
+# --- Clean up enforcement sentinels (ONLY on allow — must persist across denied stops) ---
+rm -f .agentic/session/review-pending-* 2>/dev/null || true
+rm -f .agentic/session/.phase_implementing 2>/dev/null || true
+rm -f .agentic/session/.impl-brief.md 2>/dev/null || true
+rm -f .agentic/session/.contract-surface.txt 2>/dev/null || true
+rm -f .agentic/session/.nfr-brief.txt 2>/dev/null || true
 
 echo ""
 echo "✓ All checks passed. Session ending."

@@ -17,8 +17,14 @@ metadata:
 
 Run `ag start` with a debug workflow — write a failing test first, then fix.
 
+## What's Enforced Automatically
+- **TDD nudge** → on-code-edit warns if source files edited before test files this session
+- **Test existence gate** → PreToolUse warns/blocks source edits without tests (formal, after first edit)
+- **Spec-first** → PreToolUse blocks code edits without spec (formal)
+- **Contract protection** → Warns if fix affects shipped contract assertions
+
 Steps:
-1. **Write a failing test FIRST** — reproduce the bug before touching code
+1. **Write a failing test FIRST** — reproduce the bug before touching code (the framework nudges you if you skip this)
 2. **Localize** — trace the code path with Grep/Read, observe actual behavior
 3. **Fix the root cause** — minimal, scoped change (not the symptom)
 4. **Verify** — failing test now passes, full suite has no regressions

@@ -24,6 +24,13 @@ If PR was already merged (via `gh pr merge` or GitHub UI):
 1. `git checkout main && git pull --rebase origin main`
 2. Run the post-merge steps below manually
 
+## What's Enforced Automatically (hooks — you can't bypass these)
+- **Merge without done blocks stop** → Stop.sh denies session end when feature merged but not shipped
+- **Feature branch without PR blocks stop** → Stop.sh denies when commits exist but no PR
+- **Merge bypass detection** → PostToolUse warns if `gh pr merge` used directly (use `ag merge` instead)
+- **Doc freshness gate (Gate 4)** → `ag done` blocks if docs stale (formal, docs_gate: blocking)
+- **Contract assertion verification** → `ag done` verifies all assertions pass
+
 ## Post-Merge Steps
 
 Run `ag done F-XXXX` on main — this is the single required post-merge action. It handles:

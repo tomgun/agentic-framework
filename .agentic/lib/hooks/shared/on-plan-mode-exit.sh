@@ -65,6 +65,13 @@ if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
         # Extract F-XXXX from filename like 2026-03-17-F-0234-plan.md
         PARSED_FID=$(echo "$PLAN_BASENAME" | grep -oE "$FEATURE_ID_ERE" | head -1)
         [[ -n "$PARSED_FID" ]] && FEATURE_ID="$PARSED_FID"
+        # Change 4: Create review-pending sentinel for evidence check.
+        # check_plan_review_evidence() in gate.py blocks code edits until
+        # review.md with structural markers is created for this feature.
+        if [[ "$FEATURE_ID" != "F-XXXX" ]]; then
+            mkdir -p "$PROJECT_ROOT/.agentic/session" 2>/dev/null || true
+            touch "$PROJECT_ROOT/.agentic/session/review-pending-${FEATURE_ID}" 2>/dev/null || true
+        fi
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/$PLAN_BASENAME"
     else
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/"
