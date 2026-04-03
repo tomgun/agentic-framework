@@ -80,6 +80,9 @@ def render_timeline(trace_file: str, hook_filter: str = "", decision_filter: str
             details.append(f"tool={data['tool']}")
         if "reason" in data and data["reason"]:
             details.append(f'reason="{data["reason"]}"')
+        elif "reasons" in data and data["reasons"]:
+            reasons_str = "; ".join(str(r) for r in data["reasons"][:2])
+            details.append(f'reasons="{reasons_str}"')
         if "duration_ms" in data:
             details.append(f"{data['duration_ms']}ms")
         if "matches" in data:
@@ -90,7 +93,7 @@ def render_timeline(trace_file: str, hook_filter: str = "", decision_filter: str
             details.append(f"writes={data['writes']}")
         if "profile" in data:
             details.append(f"profile={data['profile']}")
-        if "version" in data:
+        if "version" in data and data["version"] != "unknown":
             details.append(f"v{data['version']}")
         if "btrace_level" in data:
             details.append(f"btrace={data['btrace_level']}")

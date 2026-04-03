@@ -236,7 +236,16 @@ _debug_decisions() {
         local ts hook reason tool_info
         ts=$(echo "$line" | python3 -c "import sys,json; print(json.load(sys.stdin).get('ts','?'))" 2>/dev/null || echo "?")
         hook=$(echo "$line" | python3 -c "import sys,json; print(json.load(sys.stdin).get('hook','?'))" 2>/dev/null || echo "?")
-        reason=$(echo "$line" | python3 -c "import sys,json; d=json.load(sys.stdin).get('data',{}); print(d.get('reason',''))" 2>/dev/null || true)
+        reason=$(echo "$line" | python3 -c "
+import sys,json
+d=json.load(sys.stdin).get('data',{})
+r = d.get('reason','')
+if not r:
+    reasons = d.get('reasons',[])
+    if reasons:
+        r = '; '.join(str(x) for x in reasons[:3])
+print(r)
+" 2>/dev/null || true)
 
         local time_part="${ts##*T}"
         time_part="${time_part%%Z*}"

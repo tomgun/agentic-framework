@@ -59,8 +59,8 @@ btrace "Stop" "gate_result" "{\"decision\":\"${DECISION}\",\"exit_code\":${GATE_
 # Must run BEFORE token finalizer cleans up token-events.log.
 if [[ ! -f ".agentic/session/.cap_updated" && -f ".agentic/session/token-events.log" ]]; then
   _CAP_IMPL_WRITES=$(grep '^W|' ".agentic/session/token-events.log" 2>/dev/null \
-    | grep -cE '\|(src/|lib/|app/|cmd/|\.agentic/lib/tools/|\.agentic/lib/auto/)' 2>/dev/null || echo 0)
-  _CAP_IMPL_WRITES="${_CAP_IMPL_WRITES## }"
+    | grep -cE '\|(src/|lib/|app/|cmd/|\.agentic/lib/tools/|\.agentic/lib/auto/)' 2>/dev/null || true)
+  _CAP_IMPL_WRITES="${_CAP_IMPL_WRITES## }"; _CAP_IMPL_WRITES="${_CAP_IMPL_WRITES%%[!0-9]*}"; _CAP_IMPL_WRITES="${_CAP_IMPL_WRITES:-0}"
   if [[ "${_CAP_IMPL_WRITES:-0}" -ge 3 ]]; then
     # Determine which doc to suggest based on settings
     _CAP_DOC="OVERVIEW.md"
@@ -78,10 +78,12 @@ _TK_SUMMARY=".agentic/intel/token-summary.json"
 _TK_LEDGER=".agentic/session/token-ledger.json"
 
 if [[ -f "$_TK_EVENTS" ]]; then
-  _TK_READS=$(grep -c '^R|' "$_TK_EVENTS" 2>/dev/null || echo 0)
-  _TK_WRITES=$(grep -c '^W|' "$_TK_EVENTS" 2>/dev/null || echo 0)
-  _TK_UNIQUE=$(grep '^R|' "$_TK_EVENTS" 2>/dev/null | cut -d'|' -f2 | sort -u | wc -l 2>/dev/null || echo 0)
-  _TK_UNIQUE="${_TK_UNIQUE## }"
+  _TK_READS=$(grep -c '^R|' "$_TK_EVENTS" 2>/dev/null || true)
+  _TK_READS="${_TK_READS## }"; _TK_READS="${_TK_READS%%[!0-9]*}"; _TK_READS="${_TK_READS:-0}"
+  _TK_WRITES=$(grep -c '^W|' "$_TK_EVENTS" 2>/dev/null || true)
+  _TK_WRITES="${_TK_WRITES## }"; _TK_WRITES="${_TK_WRITES%%[!0-9]*}"; _TK_WRITES="${_TK_WRITES:-0}"
+  _TK_UNIQUE=$(grep '^R|' "$_TK_EVENTS" 2>/dev/null | cut -d'|' -f2 | sort -u | wc -l 2>/dev/null || true)
+  _TK_UNIQUE="${_TK_UNIQUE## }"; _TK_UNIQUE="${_TK_UNIQUE%%[!0-9]*}"; _TK_UNIQUE="${_TK_UNIQUE:-0}"
   _TK_REPEATED=$(( _TK_READS - _TK_UNIQUE ))
   [[ $_TK_REPEATED -lt 0 ]] && _TK_REPEATED=0
   _TK_COST=$(awk -F'|' '{sum += $3} END {print sum+0}' "$_TK_EVENTS" 2>/dev/null || echo 0)
@@ -102,13 +104,15 @@ TKEOF
   # Merge into lifetime summary
   # NOTE: JSON parsing duplicated from intel.sh _intel_json_int — Stop.sh can't source intel.sh
   # (different execution context). Keep both in sync if schema changes.
+  # Safe integer extraction: strip non-digits to prevent "0\n0" arithmetic errors
+  _tk_safe_int() { local v; v=$("$@" 2>/dev/null || true); v="${v##*[!0-9]}"; v="${v## }"; v="${v%% }"; v="${v%%[!0-9]*}"; echo "${v:-0}"; }
   _TK_P_SESS=0 _TK_P_RD=0 _TK_P_WR=0 _TK_P_REP=0 _TK_P_COST=0
   if [[ -f "$_TK_SUMMARY" ]]; then
-    _TK_P_SESS=$(grep -o '"total_sessions"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
-    _TK_P_RD=$(grep -o '"total_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
-    _TK_P_WR=$(grep -o '"total_writes"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
-    _TK_P_REP=$(grep -o '"total_repeated_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
-    _TK_P_COST=$(grep -o '"total_estimated_cost"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _TK_P_SESS=$(_tk_safe_int grep -o '"total_sessions"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY")
+    _TK_P_RD=$(_tk_safe_int grep -o '"total_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY")
+    _TK_P_WR=$(_tk_safe_int grep -o '"total_writes"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY")
+    _TK_P_REP=$(_tk_safe_int grep -o '"total_repeated_reads"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY")
+    _TK_P_COST=$(_tk_safe_int grep -o '"total_estimated_cost"[[:space:]]*:[[:space:]]*[0-9]*' "$_TK_SUMMARY")
   fi
 
   mkdir -p ".agentic/intel" 2>/dev/null || true
@@ -149,12 +153,12 @@ if [[ -f "$_IL_EVENTS" ]]; then
   # Merge into lifetime summary
   _IL_P_SESS=0 _IL_P_Q=0 _IL_P_E=0 _IL_P_M=0 _IL_P_S=0 _IL_P_I=0
   if [[ -f "$_IL_SUMMARY" ]]; then
-    _IL_P_SESS=$(grep -o '"total_sessions"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
-    _IL_P_Q=$(grep -o '"total_queries"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
-    _IL_P_E=$(grep -o '"total_enforcements"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
-    _IL_P_M=$(grep -o '"total_mutations"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
-    _IL_P_S=$(grep -o '"total_scans"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
-    _IL_P_I=$(grep -o '"total_items_surfaced"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY" 2>/dev/null | head -1 | grep -o '[0-9]*$' || echo 0)
+    _IL_P_SESS=$(_il_int grep -o '"total_sessions"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY")
+    _IL_P_Q=$(_il_int grep -o '"total_queries"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY")
+    _IL_P_E=$(_il_int grep -o '"total_enforcements"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY")
+    _IL_P_M=$(_il_int grep -o '"total_mutations"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY")
+    _IL_P_S=$(_il_int grep -o '"total_scans"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY")
+    _IL_P_I=$(_il_int grep -o '"total_items_surfaced"[[:space:]]*:[[:space:]]*[0-9]*' "$_IL_SUMMARY")
   fi
 
   mkdir -p ".agentic/intel" 2>/dev/null || true

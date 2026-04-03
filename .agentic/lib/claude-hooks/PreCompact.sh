@@ -16,12 +16,15 @@ PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 cd "$PROJECT_ROOT"
 source "$PROJECT_ROOT/.agentic/lib/paths.sh" 2>/dev/null || true
 source "$PROJECT_ROOT/.agentic/lib/tools/fwlog.sh" 2>/dev/null || true
+source "$PROJECT_ROOT/.agentic/lib/tools/btrace.sh" 2>/dev/null || true
 flog "hook:pre-compact" "fire" "" "start"
 
 # Skip if not an agentic project
 if [[ ! -d ".agentic" ]]; then
   exit 0
 fi
+
+btrace "PreCompact" "enter" "{}" 2>/dev/null || true
 
 echo ""
 echo "💾 Context compaction detected - preserving state..."

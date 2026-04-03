@@ -77,9 +77,14 @@ def emit(project_root: Path, hook: str, phase: str, data: dict) -> None:
     global _seq
     _seq += 1
 
+    # Sub-second timestamps for cross-process ordering
+    now = time.time()
+    ts = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(now))
+    ms = int((now % 1) * 1000)
     event = {
-        "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "ts": f"{ts}.{ms:03d}Z",
         "seq": _seq,
+        "pid": os.getpid(),
         "hook": hook,
         "phase": phase,
         "data": data,

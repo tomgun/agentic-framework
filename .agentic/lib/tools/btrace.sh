@@ -66,9 +66,10 @@ btrace() {
     local hook="${1:-}" phase="${2:-}" data="$3"
     [[ -z "$data" ]] && data='{}'
     local ts
-    ts="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "unknown")"
+    # Use nanosecond timestamps for sub-second ordering across processes
+    ts="$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ 2>/dev/null || date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "unknown")"
     _BTRACE_SEQ=$(( _BTRACE_SEQ + 1 ))
-    printf '{"ts":"%s","seq":%d,"hook":"%s","phase":"%s","data":%s}\n' \
-        "$ts" "$_BTRACE_SEQ" "$hook" "$phase" "$data" \
+    printf '{"ts":"%s","seq":%d,"pid":%d,"hook":"%s","phase":"%s","data":%s}\n' \
+        "$ts" "$_BTRACE_SEQ" "$$" "$hook" "$phase" "$data" \
         >> "$BTRACE_LOG" 2>/dev/null || true
 }

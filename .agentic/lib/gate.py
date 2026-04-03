@@ -707,6 +707,15 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
         "input_summary": file_path_summary,
     })
 
+    def _pretool_deny(result: GateResult) -> GateResult:
+        """Emit btrace event before returning a deny result."""
+        btrace.emit(project_root, "gate", "pretool_result", {
+            "decision": "deny",
+            "tool": tool,
+            "reasons": result.reasons[:3],
+        })
+        return result
+
     # --- Bash/Shell tool checks ---
     if tool == "Bash":
         command = input_data.get("command", "")
@@ -722,10 +731,10 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
         ]
         for pattern, reason in destructive_patterns:
             if re.search(pattern, command):
-                return GateResult.deny(
+                return _pretool_deny(GateResult.deny(
                     [f"Destructive git operation blocked: {reason}"],
                     ["Use worktrees or commit before switching branches"]
-                )
+                ))
 
         # Block git commit without verification (formal mode)
         if is_formal and re.search(r'git\s+commit\b', command):
@@ -737,7 +746,7 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                 if combined.decision == "deny":
                     combined.reasons.insert(0,
                         f"git commit blocked — {feature_id} missing required artifacts")
-                    return combined
+                    return _pretool_deny(combined)
 
         # Block git push without verification (formal mode)
         if is_formal and re.search(r'git\s+push\b', command):
@@ -745,9 +754,9 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                 spec_check = check_feature_has_spec(feature_id, project_root)
                 ac_check = check_feature_has_ac(feature_id, project_root)
                 if spec_check.decision == "deny" or ac_check.decision == "deny":
-                    return GateResult.deny(
+                    return _pretool_deny(GateResult.deny(
                         [f"git push blocked — {feature_id} missing spec or acceptance criteria"]
-                    )
+                    ))
 
     # --- Write/Edit tool checks ---
     if tool in ("Write", "Edit", "MultiEdit") and is_formal:
@@ -773,14 +782,14 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                     "Code edit blocked — unapproved DRAFT plan exists. "
                     "Run the convergence loop (Critic + Advocate) and set plan "
                     "status to APPROVED before writing code.")
-                return draft_check
+                return _pretool_deny(draft_check)
 
             # Change 4: Block code edits when plan is APPROVED without review evidence.
             # Prevents fake-approval. Advisory in formal, blocking in autonomous_formal.
             evidence_check = check_plan_review_evidence(project_root)
             if evidence_check.decision == "deny":
                 if profile == "autonomous_formal":
-                    return evidence_check
+                    return _pretool_deny(evidence_check)
                 # Formal mode: advisory (warn but allow)
                 return GateResult.allow(evidence_check.reasons)
 
@@ -796,7 +805,7 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                     "Use `ag start F-XXXX` or `ag auto task F-XXXX` to begin tracked work."
                 )
                 if enforcement == "blocking":
-                    return GateResult.deny([msg])
+                    return _pretool_deny(GateResult.deny([msg]))
                 else:
                     return GateResult.allow([msg])
 
@@ -812,7 +821,7 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                     "This ensures specs and acceptance criteria are created systematically."
                 )
                 if enforcement == "blocking":
-                    return GateResult.deny([msg])
+                    return _pretool_deny(GateResult.deny([msg]))
                 else:
                     # Advisory: warn but allow
                     return GateResult.allow([msg])
@@ -825,7 +834,7 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                 if combined.decision == "deny":
                     combined.reasons.insert(0,
                         f"Code edit blocked — {feature_id} needs spec and acceptance criteria first")
-                    return combined
+                    return _pretool_deny(combined)
 
     # --- Defense-in-depth: duplicate git pre-commit checks at edit time ---
     # These checks mirror pre-commit-check.sh so enforcement works even without
@@ -857,7 +866,7 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                         )
                         enforcement = get_setting(project_root, "state_enforcement", "off")
                         if enforcement == "blocking":
-                            return GateResult.deny([msg])
+                            return _pretool_deny(GateResult.deny([msg]))
                         return GateResult.allow([msg])
 
         # Check 7 mirror: Code file length limit (Write tool only — Edit sends
@@ -881,10 +890,10 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                 # Match specifically the **Status**: shipped pattern, not incidental "shipped" in text
                 if re.search(r"\*\*Status\*\*:\s*shipped", old_string) and \
                    not re.search(r"\*\*Status\*\*:\s*shipped", new_string):
-                    return GateResult.deny([
+                    return _pretool_deny(GateResult.deny([
                         "Shipped feature status downgrade blocked. "
                         "Create a migration first: bash .agentic/lib/tools/migration.sh create 'Deprecate...'"
-                    ])
+                    ]))
 
     btrace.emit(project_root, "gate", "pretool_result", {
         "decision": "allow",

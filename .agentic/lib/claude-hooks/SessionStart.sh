@@ -48,10 +48,13 @@ if [[ -f ".agentic/STACK.md" ]]; then
   echo -e "📦 Framework version: ${GREEN}${FRAMEWORK_VERSION}${NC}"
 fi
 
-# btrace: session start event
+# btrace: session start event (resolve version from VERSION file, falling back to STACK.md)
 _BT_PROFILE=$(grep -E '^\s*-\s*profile:' "$PROJECT_ROOT/STACK.md" 2>/dev/null | head -1 | sed 's/.*:\s*//' | tr -d '[:space:]' || echo "unknown")
 _BT_SID=$(cat "$PROJECT_ROOT/.agentic/session/.current-session-id" 2>/dev/null | tr -d '[:space:]' || echo "unknown")
-btrace "SessionStart" "enter" "{\"profile\":\"${_BT_PROFILE}\",\"version\":\"${FRAMEWORK_VERSION:-unknown}\",\"session_id\":\"${_BT_SID}\",\"btrace_level\":\"${_BTRACE_LEVEL:-off}\"}" 2>/dev/null || true
+_BT_VERSION="${FRAMEWORK_VERSION:-unknown}"
+[[ "$_BT_VERSION" == "unknown" && -f "$PROJECT_ROOT/.agentic/lib/VERSION" ]] && _BT_VERSION=$(cat "$PROJECT_ROOT/.agentic/lib/VERSION" 2>/dev/null | tr -d '[:space:]') || true
+[[ "$_BT_VERSION" == "unknown" && -f "$PROJECT_ROOT/VERSION" ]] && _BT_VERSION=$(cat "$PROJECT_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]') || true
+btrace "SessionStart" "enter" "{\"profile\":\"${_BT_PROFILE}\",\"version\":\"${_BT_VERSION}\",\"session_id\":\"${_BT_SID}\",\"btrace_level\":\"${_BTRACE_LEVEL:-off}\"}" 2>/dev/null || true
 
 # 3. Check for STATUS.md (primary session context)
 if [[ -f "STATUS.md" ]]; then
