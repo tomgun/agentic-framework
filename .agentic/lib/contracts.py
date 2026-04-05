@@ -732,21 +732,33 @@ class PersonasFile:
         d: dict[str, Any] = {"protection": self.protection}
         if self.version:
             d["version"] = self.version
-        d["personas"] = [
-            {k: v for k, v in {
-                "id": p.id, "name": p.name, "description": p.description or None,
-                "goals": p.goals or None, "pain_points": p.pain_points or None,
-                "capabilities": p.capabilities or None, "platforms": p.platforms or None,
-            }.items() if v}
-            for p in self.personas
-        ]
+        d["personas"] = [self._persona_to_dict(p) for p in self.personas]
         if self.platforms:
-            d["platforms"] = [
-                {k: v for k, v in {"id": p.id, "name": p.name, "description": p.description or None}.items() if v}
-                for p in self.platforms
-            ]
+            d["platforms"] = [self._platform_to_dict(p) for p in self.platforms]
         if self.migrations:
             d["migrations"] = [m.to_dict() for m in self.migrations]
+        return d
+
+    @staticmethod
+    def _persona_to_dict(p: PersonaDef) -> dict[str, Any]:
+        d: dict[str, Any] = {"id": p.id, "name": p.name}
+        if p.description:
+            d["description"] = p.description
+        if p.goals:
+            d["goals"] = p.goals
+        if p.pain_points:
+            d["pain_points"] = p.pain_points
+        if p.capabilities:
+            d["capabilities"] = p.capabilities
+        if p.platforms:
+            d["platforms"] = p.platforms
+        return d
+
+    @staticmethod
+    def _platform_to_dict(p: PlatformDef) -> dict[str, Any]:
+        d: dict[str, Any] = {"id": p.id, "name": p.name}
+        if p.description:
+            d["description"] = p.description
         return d
 
     def get_persona(self, persona_id: str) -> Optional[PersonaDef]:
@@ -863,17 +875,27 @@ def persona_coverage_report(contracts_dir: Path, spec_dir: Path) -> dict[str, An
     contracts = load_all_contracts(contracts_dir)
     report: dict[str, Any] = {"personas": {}, "platforms": {}}
 
+    # Pre-compute: collect all non-draft assertions with their coverage status
+    # and build a capability_ref index — avoids repeated iteration over contracts
+    all_assertions: list[tuple[str, Assertion]] = []  # (contract_id, assertion)
+    cap_ref_index: dict[str, list[str]] = {}  # slug -> [contract_id:ac_id, ...]
+    for c in contracts:
+        for a in c.assertions:
+            if not a.draft:
+                all_assertions.append((c.id, a))
+            if a.capability_ref:
+                cap_ref_index.setdefault(a.capability_ref, []).append(f"{c.id}:{a.id}")
+
     # Per-persona coverage
     for persona in personas_file.personas:
         total = 0
         covered = 0
-        for c in contracts:
-            for a in get_assertions_for_persona(c, persona.id):
-                if a.draft:
-                    continue
-                total += 1
-                if a.tests or a.verify:
-                    covered += 1
+        for _cid, a in all_assertions:
+            if a.personas and persona.id not in a.personas:
+                continue
+            total += 1
+            if a.tests or a.verify:
+                covered += 1
         report["personas"][persona.id] = {
             "name": persona.name,
             "total": total,
@@ -885,13 +907,12 @@ def persona_coverage_report(contracts_dir: Path, spec_dir: Path) -> dict[str, An
     for platform in personas_file.platforms:
         total = 0
         covered = 0
-        for c in contracts:
-            for a in get_assertions_for_platform(c, platform.id):
-                if a.draft:
-                    continue
-                total += 1
-                if a.tests or a.verify:
-                    covered += 1
+        for _cid, a in all_assertions:
+            if a.platforms and platform.id not in a.platforms:
+                continue
+            total += 1
+            if a.tests or a.verify:
+                covered += 1
         report["platforms"][platform.id] = {
             "name": platform.name,
             "total": total,
@@ -899,21 +920,17 @@ def persona_coverage_report(contracts_dir: Path, spec_dir: Path) -> dict[str, An
             "pct": round(covered / total * 100, 1) if total else 0,
         }
 
-    # Per-capability coverage
+    # Per-capability coverage (O(1) lookup via index)
     capability_coverage: dict[str, dict[str, Any]] = {}
     for persona in personas_file.personas:
         for cap in persona.capabilities:
             slug = persona.capability_slug(cap)
-            matching_assertions: list[str] = []
-            for c in contracts:
-                for a in c.assertions:
-                    if a.capability_ref == slug:
-                        matching_assertions.append(f"{c.id}:{a.id}")
+            matching = cap_ref_index.get(slug, [])
             capability_coverage[slug] = {
                 "persona": persona.id,
                 "capability": cap,
-                "assertions": matching_assertions,
-                "covered": len(matching_assertions) > 0,
+                "assertions": matching,
+                "covered": len(matching) > 0,
             }
     report["capabilities"] = capability_coverage
 

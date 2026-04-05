@@ -53,11 +53,13 @@ _persona_list() {
     echo -e "${BOLD}Personas${NC}"
     echo ""
 
+    _AG_SPEC_DIR="$spec_dir" \
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import os
 from pathlib import Path
 from contracts import load_personas
 
-pf = load_personas(Path('$spec_dir'))
+pf = load_personas(Path(os.environ['_AG_SPEC_DIR']))
 if not pf:
     print('  No personas found')
     exit(0)
@@ -110,13 +112,15 @@ _persona_check() {
     echo -e "${BOLD}Persona Reference Check${NC}"
     echo ""
 
+    _AG_SPEC_DIR="$spec_dir" \
+    _AG_CONTRACTS_DIR="$contracts_dir" \
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
-import sys
+import os, sys
 from pathlib import Path
 from contracts import load_personas, load_all_contracts, validate_persona_refs
 
-spec_dir = Path('$spec_dir')
-contracts_dir = Path('$contracts_dir')
+spec_dir = Path(os.environ['_AG_SPEC_DIR'])
+contracts_dir = Path(os.environ['_AG_CONTRACTS_DIR'])
 
 pf = load_personas(spec_dir)
 if not pf:
@@ -126,9 +130,10 @@ if not pf:
 contracts = load_all_contracts(contracts_dir)
 total_errors = 0
 
+# Validate all contracts that reference personas/platforms/capability_refs
 for c in contracts:
-    # Only check contracts that reference personas/platforms
-    if not c.personas and not c.platforms and not any(a.personas or a.platforms or a.capability_ref for a in c.assertions):
+    has_refs = c.personas or c.platforms or any(a.personas or a.platforms or a.capability_ref for a in c.assertions)
+    if not has_refs:
         continue
     errors = validate_persona_refs(c, pf)
     if errors:
@@ -137,25 +142,6 @@ for c in contracts:
         for e in errors:
             print(f'    ✗ {e}')
         print()
-
-# Check for orphaned capability_refs (capability removed from persona)
-all_slugs = set()
-for p in pf.personas:
-    for cap in p.capabilities:
-        all_slugs.add(p.capability_slug(cap))
-
-orphaned = []
-for c in contracts:
-    for a in c.assertions:
-        if a.capability_ref and a.capability_ref not in all_slugs:
-            orphaned.append(f'{c.id}:{a.id} → {a.capability_ref}')
-
-if orphaned:
-    print('  Orphaned capability_refs:')
-    for o in orphaned:
-        print(f'    ✗ {o}')
-    total_errors += len(orphaned)
-    print()
 
 # Platform consistency: assertion platforms should be subset of persona platforms
 for c in contracts:
@@ -190,13 +176,15 @@ _persona_migrate() {
 
     # This is primarily a reporting tool — actual migration is done by the agent
     # after reviewing the report
+    _AG_SPEC_DIR="$spec_dir" \
+    _AG_CONTRACTS_DIR="$contracts_dir" \
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
-import sys
+import os, sys
 from pathlib import Path
 from contracts import load_personas, load_all_contracts
 
-spec_dir = Path('$spec_dir')
-contracts_dir = Path('$contracts_dir')
+spec_dir = Path(os.environ['_AG_SPEC_DIR'])
+contracts_dir = Path(os.environ['_AG_CONTRACTS_DIR'])
 
 pf = load_personas(spec_dir)
 if not pf:
@@ -271,18 +259,21 @@ _persona_coverage() {
     echo -e "${BOLD}Persona Coverage Report${NC}"
     echo ""
 
+    _AG_SPEC_DIR="$spec_dir" \
+    _AG_CONTRACTS_DIR="$contracts_dir" \
+    _AG_MODE="$mode" \
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
-import json
+import os, json
 from pathlib import Path
 from contracts import persona_coverage_report
 
-report = persona_coverage_report(Path('$contracts_dir'), Path('$spec_dir'))
+report = persona_coverage_report(Path(os.environ['_AG_CONTRACTS_DIR']), Path(os.environ['_AG_SPEC_DIR']))
 
 if 'error' in report:
     print(f'  {report[\"error\"]}')
     exit(1)
 
-mode = '$mode'
+mode = os.environ['_AG_MODE']
 
 if mode in ('all', 'persona'):
     print('  By Persona:')

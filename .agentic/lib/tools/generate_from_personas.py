@@ -11,7 +11,6 @@ Outputs new or updated contract YAML files with draft: true assertions.
 from __future__ import annotations
 
 import argparse
-import re
 import sys
 from pathlib import Path
 
@@ -20,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from contracts import (
     Contract, Assertion, PersonaDef, PersonasFile,
-    load_personas, load_all_contracts, load_contract, save_contract,
+    load_personas, load_all_contracts, save_contract,
     get_contract_by_id,
 )
 
@@ -32,12 +31,11 @@ def capability_to_assertion_text(persona: PersonaDef, capability: str) -> str:
 
 def capability_to_ac_id(existing_ids: set[str], start: int = 1) -> str:
     """Generate the next available AC-XXX id."""
-    n = start
-    while True:
+    for n in range(start, 10000):
         ac_id = f"AC-{n:03d}"
         if ac_id not in existing_ids:
             return ac_id
-        n += 1
+    raise ValueError("Cannot generate AC id: all AC-001 through AC-9999 are taken")
 
 
 def generate_assertions_for_persona(
@@ -74,19 +72,6 @@ def generate_assertions_for_persona(
         new_assertions.append((slug, assertion))
 
     return new_assertions
-
-
-def group_by_feature_category(
-    assertions: list[tuple[str, Assertion]],
-) -> dict[str, list[tuple[str, Assertion]]]:
-    """Group assertions by rough feature category based on capability text.
-
-    Simple heuristic — groups by the main verb/noun in the capability.
-    In practice, users will want to reorganize these into proper feature contracts.
-    """
-    # For now, put all in an 'uncategorized' bucket
-    # The user/agent should distribute these into actual feature contracts
-    return {"generated": assertions}
 
 
 def apply_to_contract(
