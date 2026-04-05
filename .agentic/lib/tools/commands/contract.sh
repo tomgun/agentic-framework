@@ -34,7 +34,7 @@ _contract_help() {
     echo "  check [F-XXXX] [--recursive]  Run structural assertions (all or one feature)"
     echo "  coverage             Show assertions with/without tests"
     echo "  pending              Show features with non-empty user_input"
-    echo "  list [--category X]  List all contracts with status"
+    echo "  list [--category X] [--persona X] [--platform X]  List contracts (with filters)"
     echo "  tree                 Show contract hierarchy"
     echo "  validate [F-XXXX]   Validate contract YAML (all or one)"
     echo "  create F-XXXX [--parent F-XXXX]  Create a new draft contract (--parent auto-assigns dotted child ID)"
@@ -298,12 +298,16 @@ else:
 _contract_list() {
     local filter_category=""
     local filter_lifecycle=""
+    local filter_persona=""
+    local filter_platform=""
     local flat=0
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --category) filter_category="$2"; shift 2 ;;
             --lifecycle) filter_lifecycle="$2"; shift 2 ;;
+            --persona) filter_persona="$2"; shift 2 ;;
+            --platform) filter_platform="$2"; shift 2 ;;
             --flat) flat=1; shift ;;
             *) shift ;;
         esac
@@ -322,11 +326,17 @@ from contracts import load_all_contracts
 contracts = load_all_contracts(Path('$contracts_dir'))
 category_filter = '$filter_category'
 lifecycle_filter = '$filter_lifecycle'
+persona_filter = '$filter_persona'
+platform_filter = '$filter_platform'
 
 if category_filter:
     contracts = [c for c in contracts if c.category == category_filter]
 if lifecycle_filter:
     contracts = [c for c in contracts if c.lifecycle == lifecycle_filter]
+if persona_filter:
+    contracts = [c for c in contracts if persona_filter in c.personas]
+if platform_filter:
+    contracts = [c for c in contracts if platform_filter in c.platforms]
 
 if not contracts:
     print('  No contracts found')
@@ -341,7 +351,8 @@ else:
         for c in by_cat[cat]:
             prot = ' 🔒' if c.protection == 'contract' else ''
             ac = len(c.assertions)
-            print(f'    {c.id}  {c.lifecycle:<14} {c.name} ({ac} ACs){prot}')
+            personas_str = f' [{", ".join(c.personas)}]' if c.personas else ''
+            print(f'    {c.id}  {c.lifecycle:<14} {c.name} ({ac} ACs){prot}{personas_str}')
         print()
 
     print(f'{len(contracts)} contract(s)')

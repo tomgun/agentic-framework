@@ -1,0 +1,35 @@
+# Persona & Platform Definitions
+# Docs: see DEVELOPER_GUIDE.md "Working with Personas"
+# Commands: ag persona check | ag persona migrate | ag contract generate-from-personas
+#
+# Protection: none (draft) → advisory (specifying) → contract (shipped)
+# Capabilities are spec seeds — run `ag contract generate-from-personas` to scaffold draft assertions.
+
+protection: none
+version: "YYYY-MM-DD"
+
+personas:
+  - id: example-user
+    name: Example User
+    description: TODO — who is this persona and what do they do?
+    goals:
+      - "TODO: What does this persona want to achieve?"
+    pain_points:
+      - "TODO: What frustrates this persona?"
+    capabilities:
+      - "TODO: What can this persona do in the system?"
+    platforms: []
+
+platforms:
+  - id: web
+    name: Web Browser
+    description: Desktop/mobile web experience
+
+# Migrations tracked here when protection is 'contract':
+# migrations:
+#   - id: PM-YYYY-MM-DD-001
+#     date: "YYYY-MM-DD"
+#     reason: "Why this change was needed"
+#     changes:
+#       - "persona-id: description of change"
+#     approved_by: user

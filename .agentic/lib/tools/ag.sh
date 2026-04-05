@@ -198,6 +198,7 @@ source "$COMMANDS_DIR/settings.sh"
 source "$COMMANDS_DIR/operations.sh"
 source "$COMMANDS_DIR/git-init.sh"
 source "$COMMANDS_DIR/contract.sh"
+source "$COMMANDS_DIR/persona.sh"
 source "$COMMANDS_DIR/phase.sh"
 source "$COMMANDS_DIR/intel.sh"
 source "$COMMANDS_DIR/debug.sh"
@@ -260,6 +261,9 @@ case "${1:-help}" in
         ;;
     contract)
         shift; cmd_contract "$@"
+        ;;
+    persona)
+        shift; cmd_persona "$@"
         ;;
     intel)
         shift; cmd_intel "$@"

@@ -29,6 +29,16 @@ Run `ag spec` or `ag contract` to manage feature specifications and YAML contrac
 - **Evolve shipped spec**: Additive-only changes, markers required, migration mandatory, human approval
 - **Audit**: `bash .agentic/lib/tools/check-spec-health.sh F-XXXX` (or `--all`)
 
+## Persona-Aware Specs
+- If `spec/personas.yaml` exists, scope contracts to personas and platforms
+- Add `personas: [consumer, company]` and `platforms: [pwa, web]` to contracts
+- Scope assertions: `personas: [consumer]` (empty = all contract personas)
+- Scope scenarios: `persona: consumer` (singular — one actor per scenario)
+- Link to capabilities: `capability_ref: "consumer:set-price-thresholds"` on assertions
+- Generate draft assertions: `ag persona generate --persona consumer --dry-run`
+- Check coverage: `ag persona coverage --by-persona` | `--by-capability`
+- Protected personas.yaml: capability changes require migration entries (same as contracts)
+
 ## Rules
 - When the user corrects your approach: `ag intel remember "what they said" --context "what you were doing"`
 - Shipped specs are contracts — never delete existing assertions
@@ -36,3 +46,4 @@ Run `ag spec` or `ag contract` to manage feature specifications and YAML contrac
 - Use markers: `[Discovered]`, `[Revised in M-NNN: was "X" now "Y"]`
 - Always create migration for shipped spec changes: `bash .agentic/lib/tools/migration.sh create "reason"`
 - Check NFRs: `bash .agentic/lib/tools/nfr-applicable.sh F-XXXX`
+- Check persona refs: `ag persona check` (validates persona/platform/capability_ref consistency)

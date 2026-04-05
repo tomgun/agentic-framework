@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentic-framework.dev/schemas/personas.schema.json",
+  "title": "Personas",
+  "description": "Persona and platform definitions for multi-actor product contracts",
+  "type": "object",
+  "required": ["personas"],
+  "properties": {
+    "protection": {
+      "type": "string",
+      "enum": ["contract", "advisory", "none"],
+      "default": "none",
+      "description": "Protection level — contract requires migration for changes to capabilities"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "Last-modified date for change tracking (YYYY-MM-DD)"
+    },
+    "personas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/persona"
+      },
+      "description": "Persona definitions"
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/platform"
+      },
+      "default": [],
+      "description": "Platform definitions"
+    },
+    "migrations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/migration"
+      },
+      "default": [],
+      "description": "Tracked changes to persona capabilities"
+    }
+  },
+  "definitions": {
+    "persona": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Unique persona identifier (kebab-case)"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Human-readable persona name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Who this persona is and what they do"
+        },
+        "goals": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "What this persona wants to achieve — guides assertion generation"
+        },
+        "pain_points": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Frustrations to address — guides defensive scenario generation"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "What this persona can do — preliminary spec seed for draft assertions"
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "default": [],
+          "description": "Platform IDs this persona uses"
+        }
+      }
+    },
+    "platform": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Unique platform identifier (kebab-case)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable platform name"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this platform is"
+        }
+      }
+    },
+    "migration": {
+      "type": "object",
+      "required": ["id", "date", "reason", "changes"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^PM-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$",
+          "description": "Persona migration ID (PM-YYYY-MM-DD-NNN)"
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of migration (YYYY-MM-DD)"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Why this change was needed"
+        },
+        "changes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of capability/persona changes"
+        },
+        "approved_by": {
+          "type": "string",
+          "enum": ["user", "agent_review", "auto"],
+          "default": "user",
+          "description": "Who approved this migration"
+        }
+      }
+    }
+  }
+}
