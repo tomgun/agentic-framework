@@ -20,6 +20,11 @@ Output the result **verbatim** as your first text response.
 No preamble, no narration, no reformatting.
 
 After outputting the dashboard, note any critical flags:
+- **Enforcement disconnected** (highest priority — offer to fix immediately):
+  - Git hooks missing: run `git config core.hooksPath .agentic/hooks`
+  - Claude hooks missing: run `cp .agentic/lib/claude-hooks/hooks.json .claude/` (if source exists)
+  - Tell the user: "Enforcement is disconnected — quality gates won't fire. Want me to fix it now?"
+  - If user agrees, run the fix commands and re-run the dashboard to confirm
 - Upgrade pending (needs handling before new work)
 - Interrupted work (focus on recovery)
 - Memory stale (action item)
