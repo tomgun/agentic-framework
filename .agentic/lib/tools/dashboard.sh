@@ -556,15 +556,15 @@ if [[ -n "$D_DESIGN_TRACE" ]]; then
 fi
 # Enforcement wiring — loud warning if disconnected
 if [[ -n "$D_ENFORCE_ISSUES" ]]; then
-    echo "🚨 ENFORCEMENT    DISCONNECTED — quality gates are not active!"
+    echo "🚨 ENFORCEMENT DISCONNECTED — all quality gates silently bypassed. OFFER TO FIX before other work."
     if [[ "$D_ENFORCE_GIT" != "ok" ]]; then
-        echo "                  Git hooks: core.hooksPath not set — run: git config core.hooksPath .agentic/hooks"
+        echo "   FIX: git config core.hooksPath .agentic/hooks"
     fi
     if [[ "$D_ENFORCE_CLAUDE" != "ok" ]]; then
-        echo "                  Claude hooks: no hooks in settings — run: cp .agentic/lib/claude-hooks/hooks.json .claude/"
+        echo "   FIX: cp .agentic/lib/claude-hooks/hooks.json .claude/"
     fi
 else
-    echo "✅ Enforcement    Git hooks + Claude hooks active"
+    echo "✅ Enforcement    Active"
 fi
 echo "✅ Health         $health_line"
 echo ""

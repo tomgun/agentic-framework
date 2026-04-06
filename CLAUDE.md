@@ -11,7 +11,7 @@ Architecture: `docs/INSTRUCTION_ARCHITECTURE.md` (three-layer design: Constituti
 
 Run `bash .agentic/lib/tools/dashboard.sh 2>/dev/null` — ONE tool call, no others. Output the result verbatim as your first text response. No preamble, no narration, no reformatting.
 
-If the dashboard shows `🚨 ENFORCEMENT DISCONNECTED`, offer to fix it immediately before any other work. This means quality gates (spec-first, test coverage, doc freshness) are silently bypassed — nothing will block bad commits. Fix commands: `git config core.hooksPath .agentic/hooks` (git hooks) and copy claude-hooks if available.
+Dashboard shows `🚨 ENFORCEMENT DISCONNECTED` → offer to run the `FIX:` commands shown. Do this BEFORE any other work. Without enforcement, spec-first/test/doc gates are dead.
 
 Always consult: AGENTS.md (if present), CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
