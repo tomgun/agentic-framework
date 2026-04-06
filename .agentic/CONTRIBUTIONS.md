@@ -28,6 +28,14 @@
 
 **User insight 8 — "Make those LLM-optimized"**: User insisted on trigger→action format instead of explanatory prose. Dashboard output, CLAUDE.md, and skill all tightened to single-line rules the LLM can parse and act on directly.
 
+### Remediation & Taxonomy Insights (2026-04-06)
+
+**User insight 9 — Framework disconnection is not a standalone feature**: User identified that framework wiring detection is an internal health check, not a user-facing capability. It belongs under F-015 (Session Management) since it's part of what the dashboard does at session start. Principle: distinguish between internal quality mechanisms and user-facing capabilities.
+
+**User insight 10 — Personas extend the spec system, not stand alone**: User clarified that personas are connected to the planning/speccing workflow — they extend F-031 (YAML contracts) and feed into F-002 (Spec-Driven Development). The feature is standalone (own schema, CLI, template, pre-commit check) but taxonomically belongs to the spec system family.
+
+**User insight 11 — Personas should work in discovery mode too**: User envisioned personas.yaml as a universal design document working in both modes: discovery (preliminary specs, technical plans, phases, vision — updated along development) and formal (scoped contract assertions, coverage analysis). This would make personas the structured complement to OVERVIEW.md's narrative, possibly with Claude interview flow to populate it and auto-generated overview output. Captured as planned ACs (AC-017 through AC-020) on F-043.
+
 **User insight 9 — "Hooks aren't just gates — they're the framework"**: User pointed out that hooks serve intelligence injection (planning, design, implementation guidance) and workflow automation, not just quality gates. Without them the agent is vanilla Claude. Reframed from "enforcement disconnected" to "framework disconnected" — three checks: gates (git hooks), intelligence (Claude hooks), skills (workflow automation).
 
 ### F-041 Intelligence Engine — Smarter Than Vanilla Claude (v0.77.0)

@@ -1,0 +1,228 @@
+id: F-043
+name: Persona & Platform Dimensions for Contract Specs
+lifecycle: shipped
+profile: formal
+protection: none
+category: core-workflow
+tags: [specs, contracts, planning]
+description: >
+  Extends the YAML contract system (F-031) with multi-actor, multi-platform
+  dimensions. Personas define who uses a feature (with goals, pain_points,
+  capabilities as spec seeds). Platforms define where it runs. Assertions can
+  be scoped by persona and platform. CLI via ag persona for listing,
+  validation, coverage analysis, and draft assertion generation from persona
+  capabilities. Personas feed into spec writing (F-002) by providing
+  structured user context and capability-driven assertion generation.
+user_input: ''
+assertions:
+
+  # --- A. Schema & Data Model ---
+  - id: AC-001
+    text: >
+      personas.schema.json exists at .agentic/lib/schemas/ and defines
+      required fields: personas array with id+name required per entry,
+      optional goals, pain_points, capabilities, platforms arrays per persona,
+      top-level platforms array, protection enum, version date, migrations
+    type: structural
+    verify: >
+      test -f .agentic/lib/schemas/personas.schema.json &&
+      python3 -c "import json; s=json.load(open('.agentic/lib/schemas/personas.schema.json')); assert 'personas' in s['required']; assert 'persona' in s['definitions']"
+
+  - id: AC-002
+    text: >
+      contract.schema.json includes personas (array of strings),
+      platforms (array of strings), and capability_ref (string) as
+      optional fields on assertion objects
+    type: structural
+    verify: >
+      python3 -c "
+      import json; s=json.load(open('.agentic/lib/schemas/contract.schema.json'))
+      a=s['definitions']['assertion']['properties']
+      assert 'personas' in a and 'platforms' in a and 'capability_ref' in a
+      "
+
+  - id: AC-003
+    text: >
+      contracts.py defines PersonaDef dataclass with fields: id, name,
+      description, goals, pain_points, capabilities, platforms; and a
+      capability_slug method that generates persona-id:slugified-capability
+    type: structural
+    verify: >
+      python3 -c "
+      import sys; sys.path.insert(0,'.agentic/lib')
+      from contracts import PersonaDef
+      p = PersonaDef(id='dev', name='Developer', capabilities=['View dashboard'])
+      assert p.capability_slug('View dashboard') == 'dev:view-dashboard'
+      "
+
+  - id: AC-004
+    text: >
+      contracts.py defines PlatformDef dataclass with id, name, description
+      fields and PersonasFile dataclass aggregating personas, platforms,
+      protection, version, and migrations
+    type: structural
+    verify: >
+      python3 -c "
+      import sys; sys.path.insert(0,'.agentic/lib')
+      from contracts import PlatformDef, PersonasFile
+      pf = PersonasFile.from_dict({'personas': [{'id':'u1','name':'User'}], 'platforms': [{'id':'web','name':'Web'}]})
+      assert pf.get_persona('u1') is not None
+      assert pf.get_platform('web') is not None
+      "
+
+  - id: AC-005
+    text: >
+      Assertion dataclass includes optional personas (list[str]),
+      platforms (list[str]), and capability_ref (Optional[str]) fields;
+      Contract dataclass includes optional personas and platforms lists
+    type: structural
+    verify: >
+      python3 -c "
+      import sys; sys.path.insert(0,'.agentic/lib')
+      from contracts import Assertion, Contract
+      a = Assertion(id='AC-001', text='test', type='structural', personas=['dev'], platforms=['cli'], capability_ref='dev:test')
+      assert a.personas == ['dev']
+      c = Contract(id='F-999', name='Test', lifecycle='exploring', description='Test contract', assertions=[a], personas=['dev'], platforms=['cli'])
+      assert c.personas == ['dev']
+      "
+
+  # --- B. Parser & Loading ---
+  - id: AC-006
+    text: >
+      load_personas(spec_dir) loads personas.yaml from the given directory
+      and returns a PersonasFile instance; returns None if file not found
+    type: structural
+    verify: >
+      python3 -c "
+      import sys; sys.path.insert(0,'.agentic/lib')
+      from contracts import load_personas
+      from pathlib import Path
+      result = load_personas(Path('/tmp/nonexistent'))
+      assert result is None
+      "
+
+  - id: AC-007
+    text: >
+      validate_persona_refs(contract, personas_file) returns errors for:
+      unknown persona IDs in contract.personas, unknown platform IDs in
+      contract.platforms, unknown persona/platform in assertion-level refs,
+      invalid capability_ref format, capability_ref not matching any
+      capability of the referenced persona
+    type: structural
+    verify: >
+      python3 -c "
+      import sys; sys.path.insert(0,'.agentic/lib')
+      from contracts import validate_persona_refs, Contract, Assertion, PersonasFile
+      pf = PersonasFile.from_dict({'personas':[{'id':'dev','name':'Dev','capabilities':['Code']}]})
+      a = Assertion(id='AC-001', text='t', type='structural', personas=['unknown'])
+      c = Contract(id='F-999', name='T', lifecycle='exploring', description='Test', assertions=[a], personas=['bad-ref'])
+      errors = validate_persona_refs(c, pf)
+      assert any('unknown' in e or 'bad-ref' in e for e in errors), f'Expected ref errors, got: {errors}'
+      "
+
+  - id: AC-008
+    text: >
+      persona_coverage_report(contracts_dir, spec_dir) returns a dict with
+      per-persona, per-platform, and per-capability coverage breakdowns
+    type: behavioral
+
+  # --- C. CLI Commands ---
+  - id: AC-009
+    text: >
+      ag persona help displays subcommands: list, check, migrate,
+      coverage, generate with descriptions
+    type: structural
+    verify: >
+      bash .agentic/lib/tools/ag.sh persona help 2>&1 | grep -q "list.*check.*migrate\|list\|check\|migrate\|coverage\|generate" ||
+      bash .agentic/lib/tools/ag.sh persona help 2>&1 | grep -c "list\|check\|migrate\|coverage\|generate" | grep -q "[3-5]"
+
+  - id: AC-010
+    text: >
+      ag persona list reads personas.yaml and displays persona IDs, names,
+      and capability counts
+    type: behavioral
+
+  - id: AC-011
+    text: >
+      ag persona check validates personas.yaml schema and cross-references
+      persona/platform refs in all contracts
+    type: behavioral
+
+  - id: AC-012
+    text: >
+      ag persona coverage reports coverage by persona, platform, and
+      capability with percentage breakdowns
+    type: behavioral
+
+  # --- D. Generation ---
+  - id: AC-013
+    text: >
+      generate_from_personas.py exists and generates draft assertions
+      from persona capabilities; output includes capability_ref fields
+    type: structural
+    verify: >
+      test -f .agentic/lib/tools/generate_from_personas.py &&
+      head -20 .agentic/lib/tools/generate_from_personas.py | grep -q "capability_ref\|persona"
+
+  # --- E. Template & Migration Protection ---
+  - id: AC-014
+    text: >
+      personas.template.yaml exists in .agentic/lib/templates/ with
+      example persona and platform definitions
+    type: structural
+    verify: >
+      test -f .agentic/lib/templates/personas.template.yaml &&
+      grep -q "personas:" .agentic/lib/templates/personas.template.yaml
+
+  - id: AC-015
+    text: >
+      contract.template.yaml includes personas and platforms as optional
+      fields in the template
+    type: structural
+    verify: >
+      grep -q "personas\|platforms" .agentic/lib/templates/contract.template.yaml
+
+  - id: AC-016
+    text: >
+      pre-commit-check.sh Check 24 validates personas.yaml migration
+      protection: when protection is contract and capabilities are modified,
+      a migration entry is required
+    type: structural
+    verify: >
+      grep -q "Check 24" .agentic/lib/hooks/pre-commit-check.sh &&
+      grep -q "personas" .agentic/lib/hooks/pre-commit-check.sh
+
+  # --- F. Discovery Mode Personas (planned) ---
+  - id: AC-017
+    text: >
+      ag persona commands work in discovery mode (feature_tracking=no):
+      list, check, and coverage operate on personas.yaml without requiring
+      YAML contracts; capabilities serve as preliminary specs
+    type: behavioral
+    draft: true
+
+  - id: AC-018
+    text: >
+      personas.yaml supports optional fields for discovery-mode design
+      context: phases (planned technical phases like "PWA first, then
+      native apps"), vision (freeform project vision text), and nfrs
+      (known non-functional requirements)
+    type: structural
+    draft: true
+
+  - id: AC-019
+    text: >
+      ag persona overview generates or updates a structured design
+      summary from personas.yaml — actors, capabilities, platforms,
+      phases, NFRs — suitable as a quick project overview that evolves
+      alongside development
+    type: behavioral
+    draft: true
+
+  - id: AC-020
+    text: >
+      ag kickoff or Claude interview flow can populate personas.yaml
+      from a conversational discovery session, capturing who uses the
+      system, what they need, and where it runs
+    type: behavioral
+    draft: true

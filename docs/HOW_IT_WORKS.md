@@ -649,6 +649,8 @@ Each forward transition has a **gate function** checking filesystem precondition
 CLI: `ag transition F-XXXX <state>`, `ag transition F-XXXX --status`, `ag transition --unblocked`
 Review: `ag review` (list pending), `ag review F-XXXX <state>` (approve), `ag review F-XXXX <state> --reject`
 
+**Persona & platform dimensions** (F-043): Define who uses a feature and where it runs. In **discovery mode**, OVERVIEW.md's "Who Uses This" section provides structured persona context (goals, capabilities, platforms) that agents read during planning — no YAML or CLI needed. In **formal mode**, `personas.yaml` adds queryable persona data: assertions scoped to specific personas/platforms via `personas:` and `platforms:` arrays, `capability_ref` links to persona capabilities. CLI: `ag persona list|check|coverage|generate|migrate`. Migration protection (pre-commit Check 24) guards capability changes when `protection: contract` is set. Discovery personas in OVERVIEW.md become the basis for formal `personas.yaml` when the project graduates.
+
 **Epic decomposition** (F-005): Large features (epics) can be broken into child features scoped to components:
 - `ag decompose F-XXXX` analyzes the epic's acceptance criteria, maps them to registered components, and proposes child features
 - Routes through the `review_decomposition` checkpoint (configurable: human/critical_agent/skip)
@@ -894,7 +896,7 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 |---------|-------------|--------|
 | **CONTEXT_PACK.md** (F-0025) | Architecture snapshot: modules, entry points, key files, data flow. Read FIRST at session start. Template with code style examples section. | ACTIVE - manually maintained |
 | **STATUS.md** (F-0024) | Current focus, progress, next steps, blockers. Updated via `status.sh` (token-efficient). Staleness enforced by pre-commit. | ACTIVE - structurally enforced |
-| **JOURNAL.md** (F-0023) | Append-only session log via `journal.sh`. Staleness enforced. `--why` flag documents reasoning. | ACTIVE - structurally enforced |
+| **JOURNAL.md** (F-0023) | Append-only session log via `journal.sh`. Staleness enforced. `--why` flag documents reasoning. `--decision` flag marks decision entries (grep-able). Decision routing: current state → OVERVIEW.md, decision history → JOURNAL.md, tradeoffs → ADR (formal), preferences → cerebrum.yaml. | ACTIVE - structurally enforced |
 | **FEATURES.md** (F-002, F-003) | Feature tracking with lifecycle (planned → in_progress → shipped). Machine-readable YAML frontmatter. Updated via `feature.sh`. Staleness enforced when spec files change. | ACTIVE - Formal only |
 | **HUMAN_NEEDED.md** (F-0026) | Blockers requiring human action. Updated via `blocker.sh`. | ACTIVE |
 | **Acceptance Criteria** (F-0005) | `spec/acceptance/F-####.md` per feature. Pre-commit blocks if shipped feature has no acceptance file. | ACTIVE - structural gate |

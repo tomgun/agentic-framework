@@ -293,8 +293,8 @@ if [[ ! -f ".agentic/session/.cap_nudged" && ! -f ".agentic/session/.cap_updated
       [[ -f ".agentic/spec/FEATURES.md" ]] && _CAP_DOC=".agentic/spec/FEATURES.md"
       echo ""
       echo "📦 DOC FRESHNESS: ${_IMPL_WRITES} implementation files written, 0 docs updated."
-      echo "   Update relevant docs (${_CAP_DOC}, README, API docs) before committing."
-      echo "   Run: bash .agentic/lib/tools/docs.sh --check-freshness"
+      echo "   ACTION: Read ${_CAP_DOC} and update any sections that no longer reflect reality."
+      echo "   Check: capabilities, personas/actors, tech stack, decisions, phases, scope, quality constraints."
       echo ""
       touch ".agentic/session/.cap_nudged" 2>/dev/null || true
     fi

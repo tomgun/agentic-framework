@@ -886,7 +886,8 @@ def persona_coverage_report(contracts_dir: Path, spec_dir: Path) -> dict[str, An
             if a.capability_ref:
                 cap_ref_index.setdefault(a.capability_ref, []).append(f"{c.id}:{a.id}")
 
-    # Per-persona coverage
+    # Per-persona coverage — O(personas * assertions). Acceptable at typical scale
+    # (<20 personas, <500 assertions). Optimize with index if needed.
     for persona in personas_file.personas:
         total = 0
         covered = 0

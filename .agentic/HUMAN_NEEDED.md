@@ -89,6 +89,14 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0083: PR #225: Persona dimensions + framework disconnection detection
+- **Type**: pr_review
+- **Added**: 2026-04-06
+- **Context**: feat/persona-platform-specs — F-043 persona & platform dimensions for contracts, F-015 framework wiring detection at session start. Remediation artifacts added.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
 ## Resolved
 
 ### HN-0079: PR #219: F-041 Phase 2 — Anatomy + Token Ledger

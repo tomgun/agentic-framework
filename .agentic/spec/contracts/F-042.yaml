@@ -119,3 +119,99 @@ assertions:
       FRAMEWORK_DEVELOPMENT.md has an "Enforcement Architecture" section
       documenting when to use Claude hooks vs pre-commit vs instruction files
     type: structural
+
+  # --- F. Decision Routing & Rich Work Logging ---
+  - id: AC-016
+    text: >
+      journal.sh supports --decision flag that adds a grep-able
+      **Decision**: line to the journal entry between Why and What changed
+    type: structural
+    verify: >
+      grep -q "\-\-decision" .agentic/lib/tools/journal.sh &&
+      grep -q "DECISION" .agentic/lib/tools/journal.sh
+
+  - id: AC-017
+    text: >
+      CLAUDE.md template Design Tracking section contains decision routing
+      table and instructs agents to log reasoning, alternatives, and
+      assumptions in journal entries — not just outcomes
+    type: structural
+    verify: >
+      grep -q "Decision routing" .agentic/lib/agents/claude/CLAUDE.md &&
+      grep -q "reasoning" .agentic/lib/agents/claude/CLAUDE.md
+
+  - id: AC-018
+    text: >
+      DEVELOPER_GUIDE routing table includes rows for decisions (product,
+      technical, process) pointing to OVERVIEW.md + JOURNAL.md --decision,
+      and user preferences pointing to cerebrum.yaml
+    type: structural
+    verify: >
+      grep -q "Decision made\|Design decision\|decision" .agentic/lib/DEVELOPER_GUIDE.md &&
+      grep -q "cerebrum" .agentic/lib/DEVELOPER_GUIDE.md
+
+  - id: AC-019
+    text: >
+      Stop.sh and UserPromptSubmit.sh doc-freshness messages include
+      "decisions" in the list of sections to check
+    type: structural
+    verify: >
+      grep -q "decisions" .agentic/lib/claude-hooks/Stop.sh &&
+      grep -q "decisions" .agentic/lib/claude-hooks/UserPromptSubmit.sh
+
+  - id: AC-020
+    text: >
+      OVERVIEW.md template includes sections for personas (Who Uses This),
+      tech stack, phases, quality constraints, and guiding principles —
+      providing structured design context that agents read during planning
+    type: structural
+    verify: >
+      grep -q "Who Uses This" .agentic/lib/init/OVERVIEW.template.md &&
+      grep -q "Tech Stack" .agentic/lib/init/OVERVIEW.template.md &&
+      grep -q "Phases" .agentic/lib/init/OVERVIEW.template.md
+
+  - id: AC-021
+    text: >
+      completing-work skill instructs agents to update OVERVIEW.md and
+      log decisions with journal.sh --decision before running ag done
+    type: structural
+    verify: >
+      grep -q "decision" .claude/skills/completing-work/SKILL.md
+
+  - id: AC-022
+    text: >
+      When a design choice is made during implementation, the agent logs
+      it with reasoning and alternatives in JOURNAL.md (using --decision
+      flag) and updates OVERVIEW.md to reflect the current state
+    type: behavioral
+    tests:
+      - tests/llm/tests/108_decision_logging_with_reasoning.sh
+      - tests/llm/tests/109_overview_updated_after_decision.sh
+
+  - id: AC-023
+    text: >
+      Decision routing is documented in all agent instruction files
+      (cursorrules, copilot, codex, memory-seed) pointing to OVERVIEW.md
+      for current state and JOURNAL.md --decision for history
+    type: structural
+    verify: >
+      grep -q "Decision routing" .agentic/lib/agents/cursor/cursorrules.txt &&
+      grep -q "Decision routing" .agentic/lib/agents/copilot/copilot-instructions.md &&
+      grep -q "Decision routing" .agentic/lib/agents/codex/codex-instructions.md
+
+migrations:
+  - id: M-2026-04-06-001
+    date: '2026-04-06'
+    trigger: implementation_discovery
+    reason: >
+      Decision routing and rich work logging: agents had no clear guidance
+      on where to record decisions or how to log reasoning. Added journal.sh
+      --decision flag, routing table to instruction files, OVERVIEW.md
+      template enrichment (personas, tech stack, phases), and decision
+      capture to completing-work skill.
+    changes:
+      - "Added AC-016 through AC-023 for decision routing and work logging"
+      - "OVERVIEW.md template: added Who Uses This, Tech Stack, Phases, Quality sections"
+      - "journal.sh: added --decision flag for grep-able decision entries"
+      - "All instruction files: added decision routing one-liner"
+    approved_by: user

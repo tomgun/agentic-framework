@@ -285,6 +285,8 @@ if [[ "$D_GIT_MODE" == "active" ]] && command -v git >/dev/null 2>&1 && git rev-
 fi
 
 # Check 2: Claude hooks — .claude/hooks.json must exist with framework hook types
+# Detection: checks that hooks dict has at least one known event type key.
+# If hooks.json format changes, update fw_types set below.
 _claude_hooks_found=false
 _hooks_file="$PROJECT_ROOT/.claude/hooks.json"
 if [[ -f "$_hooks_file" ]] && command -v python3 >/dev/null 2>&1; then

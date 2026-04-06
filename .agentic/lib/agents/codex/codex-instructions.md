@@ -20,8 +20,11 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
+- `ag persona list` | `ag persona check` | `ag persona coverage` | `ag persona generate` | `ag persona migrate`
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`. The CLI tells you what's missing.
+
+Decision routing: current state → OVERVIEW.md, work log with reasoning → JOURNAL.md (use `--decision` to mark choices), ADR for significant tradeoffs (formal), user preferences → `ag intel remember`.
 
 STOP! Trigger Words (match on intent, not just exact words):
 | User intent | Action |
