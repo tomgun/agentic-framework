@@ -6007,6 +6007,56 @@ else
   fail "btrace: gate.py missing btrace import"
 fi
 
+# ============================================================
+# Framework Disconnection Detection & Remediation
+# ============================================================
+
+# Dashboard detects hooks from .claude/hooks.json (not settings.json)
+if grep -q '\.claude/hooks\.json' "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "Dashboard checks .claude/hooks.json for framework hook detection"
+else
+  fail "Dashboard should check .claude/hooks.json, not settings.json"
+fi
+
+# Dashboard checks for framework hook event types in hooks.json
+if grep -q "PreToolUse.*PostToolUse\|fw_types" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "Dashboard validates framework hook event types (PreToolUse, PostToolUse, etc.)"
+else
+  fail "Dashboard missing framework hook type validation"
+fi
+
+# Dashboard shows restart advice when disconnected
+if grep -q 'RESTART.*Claude Code\|restart.*Claude' "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "Dashboard advises restart after fixing disconnected hooks"
+else
+  fail "Dashboard missing restart advice after hook fix"
+fi
+
+# CLAUDE.md templates mention restart after fixing disconnected hooks
+_restart_in_templates=true
+for _tpl in "${FRAMEWORK_ROOT}/CLAUDE.md" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md"; do
+  if [[ -f "$_tpl" ]] && ! grep -q 'restart.*Claude Code\|RESTART' "$_tpl"; then
+    _restart_in_templates=false
+  fi
+done
+if $_restart_in_templates; then
+  pass "CLAUDE.md templates include restart advice for disconnected hooks"
+else
+  fail "CLAUDE.md templates missing restart advice for disconnected hooks"
+fi
+
+# Functional: dashboard reports connected when hooks.json exists with correct structure
+if [[ -f "${FRAMEWORK_ROOT}/.claude/hooks.json" ]]; then
+  _dash_output=$(bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh" 2>/dev/null)
+  if echo "$_dash_output" | grep -q "Hooks + skills active"; then
+    pass "Dashboard reports connected when .claude/hooks.json exists"
+  else
+    fail "Dashboard reports disconnected despite .claude/hooks.json existing"
+  fi
+else
+  warn "Skipping functional test: .claude/hooks.json not present"
+fi
+
 # Summary
 
 # ============================================================

@@ -5046,3 +5046,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-06 10:54 - Fix framework disconnection detection
+
+**Why**: False-positive FRAMEWORK DISCONNECTED every session because detection checked wrong file
+
+**What changed**:
+- Dashboard now checks .claude/hooks.json instead of settings.json; added restart advice; AC-003 to AC-007 on F-023
+
+**Next steps**:
+- None
+
+**Blockers**: None
+

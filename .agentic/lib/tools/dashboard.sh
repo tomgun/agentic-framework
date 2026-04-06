@@ -284,27 +284,25 @@ if [[ "$D_GIT_MODE" == "active" ]] && command -v git >/dev/null 2>&1 && git rev-
     fi
 fi
 
-# Check 2: Claude hooks — settings must define framework hooks (PreToolUse, PostToolUse, etc.)
+# Check 2: Claude hooks — .claude/hooks.json must exist with framework hook types
 _claude_hooks_found=false
-for _sf in "$PROJECT_ROOT/.claude/settings.json" "$PROJECT_ROOT/.claude/settings.local.json"; do
-    if [[ -f "$_sf" ]] && command -v python3 >/dev/null 2>&1; then
-        _has_hooks=$(_AG_SETTINGS_FILE="$_sf" _py -c "
+_hooks_file="$PROJECT_ROOT/.claude/hooks.json"
+if [[ -f "$_hooks_file" ]] && command -v python3 >/dev/null 2>&1; then
+    _has_hooks=$(_AG_HOOKS_FILE="$_hooks_file" _py -c "
 import json, os
 try:
-    d = json.load(open(os.environ['_AG_SETTINGS_FILE']))
-    hooks = d.get('hooks', [])
-    if not hooks:
-        print('no')
-    else:
-        # Check for framework hook types, not just any hooks
+    d = json.load(open(os.environ['_AG_HOOKS_FILE']))
+    # hooks.json uses dict format: {'hooks': {'PreToolUse': [...], ...}}
+    hooks = d.get('hooks', {})
+    if isinstance(hooks, dict):
         fw_types = {'PreToolUse', 'PostToolUse', 'UserPromptSubmit', 'Stop', 'PreCompact', 'SessionStart'}
-        found = any(h.get('type','') in fw_types or h.get('matcher','') in fw_types for h in hooks if isinstance(h, dict))
-        print('yes' if found else 'no')
+        print('yes' if fw_types & set(hooks.keys()) else 'no')
+    else:
+        print('no')
 except: print('no')
 " 2>/dev/null) || _has_hooks="no"
-        [[ "$_has_hooks" == "yes" ]] && _claude_hooks_found=true && break
-    fi
-done
+    [[ "$_has_hooks" == "yes" ]] && _claude_hooks_found=true
+fi
 if ! $_claude_hooks_found; then
     D_FW_CLAUDE="disconnected"
     D_FW_ISSUES="${D_FW_ISSUES}claude-hooks "
@@ -589,6 +587,7 @@ if [[ -n "$D_FW_ISSUES" ]]; then
     if [[ "$D_FW_SKILLS" != "ok" ]]; then
         echo "   FIX (skills):       ag export claude"
     fi
+    echo "   ⚠ After fixing: RESTART Claude Code for hooks to take effect."
 else
     echo "✅ Framework      Hooks + skills active"
 fi
