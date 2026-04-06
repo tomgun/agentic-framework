@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-042 Universal Capability Catalog shipped, F-041 intel logging + 119 new tests (Updated: 2026-04-03 09:02 UTC)
+- F-043 + F-015 + F-042 shipped (v0.79.0) (Updated: 2026-04-06 13:30 EEST)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

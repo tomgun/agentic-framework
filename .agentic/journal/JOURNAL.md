@@ -5084,3 +5084,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-06 13:31 - PR #225 merged — v0.79.0
+
+**Why**: Remediated two features that bypassed workflow, plus evolved OVERVIEW.md and decision logging from design discussion
+
+**What changed**:
+- F-043 persona dimensions shipped, F-015 framework detection ACs added, F-042 decision routing + OVERVIEW enrichment + journal --decision flag. 42 files, 35 structural tests + 2 LLM tests. All instruction files synced.
+
+**Next steps**:
+- ag backlog list for next work item
+
+**Blockers**: None
+
