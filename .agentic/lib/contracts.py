@@ -69,6 +69,7 @@ class Assertion:
     personas: list[str] = field(default_factory=list)
     platforms: list[str] = field(default_factory=list)
     capability_ref: Optional[str] = None
+    status: str = "shipped"  # planned | specced | implementing | verified | shipped
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "Assertion":
@@ -82,6 +83,7 @@ class Assertion:
             personas=d.get("personas", []),
             platforms=d.get("platforms", []),
             capability_ref=d.get("capability_ref"),
+            status=d.get("status", "shipped"),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -98,6 +100,8 @@ class Assertion:
             d["platforms"] = self.platforms
         if self.capability_ref is not None:
             d["capability_ref"] = self.capability_ref
+        if self.status != "shipped":
+            d["status"] = self.status
         return d
 
 
@@ -274,15 +278,23 @@ class Contract:
 
     @property
     def structural_assertions(self) -> list[Assertion]:
-        return [a for a in self.assertions if a.type == "structural" and not a.draft]
+        return [a for a in self.assertions if a.type == "structural" and not a.draft and a.status == "shipped"]
 
     @property
     def behavioral_assertions(self) -> list[Assertion]:
-        return [a for a in self.assertions if a.type == "behavioral" and not a.draft]
+        return [a for a in self.assertions if a.type == "behavioral" and not a.draft and a.status == "shipped"]
 
     @property
     def draft_assertions(self) -> list[Assertion]:
         return [a for a in self.assertions if a.draft]
+
+    @property
+    def planned_assertions(self) -> list[Assertion]:
+        return [a for a in self.assertions if a.status == "planned"]
+
+    @property
+    def unshipped_assertions(self) -> list[Assertion]:
+        return [a for a in self.assertions if a.status != "shipped"]
 
 
 # ---------------------------------------------------------------------------
@@ -477,15 +489,20 @@ class VerificationResult:
 
 def verify_assertion(assertion: Assertion, project_root: Path) -> VerificationResult:
     """Run a structural assertion's verify command."""
-    if assertion.type != "structural":
-        return VerificationResult(
-            assertion_id=assertion.id, passed=True, skipped=True,
-            reason="behavioral assertion — not machine-verifiable"
-        )
     if assertion.draft:
         return VerificationResult(
             assertion_id=assertion.id, passed=True, skipped=True,
             reason="draft assertion — not enforced"
+        )
+    if assertion.status != "shipped":
+        return VerificationResult(
+            assertion_id=assertion.id, passed=True, skipped=True,
+            reason=f"{assertion.status} assertion — not yet implemented"
+        )
+    if assertion.type != "structural":
+        return VerificationResult(
+            assertion_id=assertion.id, passed=True, skipped=True,
+            reason="behavioral assertion — not machine-verifiable"
         )
     if not assertion.verify:
         return VerificationResult(

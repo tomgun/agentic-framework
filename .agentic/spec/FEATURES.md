@@ -390,25 +390,31 @@ Declarative workflow.yaml defining state machine transitions, gates, and review 
 
 ## F-037: MCP Coordination Server
 
-**Status**: planned | **Category**: multi-agent | **Profile**: both
+**Status**: deprecated | **Category**: multi-agent | **Profile**: both
 
 MCP-protocol coordination server for multi-agent orchestration. Extends beyond HTTP JSON-RPC (F-018) with tool-native integration.
+
+**Deprecated**: Consolidated into F-018 (AC-002..AC-004). MCP transport is an enhancement to the shipped coordination server.
 
 ---
 
 ## F-038: Multi-Repo Umbrella
 
-**Status**: planned | **Category**: multi-agent | **Profile**: both
+**Status**: deprecated | **Category**: multi-agent | **Profile**: both
 
 Coordinate work across multiple repositories with shared backlog, cross-repo dependencies, and unified status tracking.
+
+**Deprecated**: Consolidated into F-018 (AC-005..AC-007). Multi-repo orchestration is an enhancement to the shipped coordination server.
 
 ---
 
 ## F-039: Full Autonomous Scheduling
 
-**Status**: planned | **Category**: autonomous | **Profile**: formal
+**Status**: deprecated | **Category**: autonomous | **Profile**: formal
 
 Autonomous scheduling engine that assigns work to agents based on priority, dependencies, and capacity. ADR-001 wave 5.
+
+**Deprecated**: Consolidated into F-030 (AC-006..AC-008). Scheduling enhancements are improvements to the shipped autonomous execution engine.
 
 ---
 

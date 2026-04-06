@@ -23,5 +23,57 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-018
 
+  # --- MCP Transport (consolidated from F-037) ---
+  - id: AC-002
+    text: >
+      MCP protocol server wraps existing coord tools for tool-native agent
+      integration via Model Context Protocol
+    type: structural
+    status: planned
+
+  - id: AC-003
+    text: >
+      ag mcp start/stop/status lifecycle commands for MCP server management
+    type: structural
+    status: planned
+
+  - id: AC-004
+    text: >
+      Graceful degradation — framework operates normally without MCP server
+      running, falling back to HTTP or file-based coordination
+    type: behavioral
+    status: planned
+
+  # --- Multi-Repo Orchestration (consolidated from F-038) ---
+  - id: AC-005
+    text: >
+      Cross-repo shared backlog queries via umbrella resolution allow
+      scheduling work across component repositories
+    type: behavioral
+    status: planned
+
+  - id: AC-006
+    text: >
+      ag status --umbrella shows unified status across component repos
+    type: structural
+    status: planned
+
+  - id: AC-007
+    text: >
+      Umbrella auto-syncs component repos before orchestration begins
+    type: behavioral
+    status: planned
+
 nfr_refs: []
-migrations: []
+migrations:
+  - id: M-001
+    date: "2026-04-03"
+    trigger: consolidation
+    reason: >
+      F-037 (MCP Coordination Server) and F-038 (Multi-Repo Umbrella)
+      consolidated into F-018. These describe enhancements to shipped
+      coordination infrastructure, not new capabilities.
+    changes:
+      - "Added AC-002..AC-004 (MCP transport, from F-037) with status: planned"
+      - "Added AC-005..AC-007 (multi-repo orchestration, from F-038) with status: planned"
+    approved_by: user

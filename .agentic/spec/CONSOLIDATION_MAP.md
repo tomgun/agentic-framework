@@ -64,9 +64,9 @@
 | F-034 | Project Customization Auto-Sync — in backlog (depends F-033) |
 | F-035 | Protected Main Branch Support — in backlog, needs fresh plan |
 | F-036 | Workflow Definition File — in backlog |
-| F-037 | MCP Coordination Server — in backlog (ADR-001 wave 5) |
-| F-038 | Multi-Repo Umbrella — in backlog (ADR-001 wave 5) |
-| F-039 | Full Autonomous Scheduling — in backlog (ADR-001 wave 5) |
+| F-037 | MCP Coordination Server — **deprecated**, consolidated into F-018 (AC-002..AC-004) |
+| F-038 | Multi-Repo Umbrella — **deprecated**, consolidated into F-018 (AC-005..AC-007) |
+| F-039 | Full Autonomous Scheduling — **deprecated**, consolidated into F-030 (AC-006..AC-008) |
 | DEV-004 | Complexity Tier Experiments — in backlog (ADR-001 roadmap) |
 
 ### Converted to Tasks (4) — improvements to existing shipped features
