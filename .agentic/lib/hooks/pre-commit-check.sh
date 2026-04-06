@@ -1381,6 +1381,60 @@ print('yes' if s == h else 'no')
   fi
 fi
 
+# Check 24: Personas.yaml migration protection (BLOCKING)
+# When personas.yaml has protection: contract and capabilities are modified, require migration entry.
+PERSONAS_FILE="${AGENTIC_ROOT}/spec/personas.yaml"
+if [[ -f "$PERSONAS_FILE" ]] && command -v python3 >/dev/null 2>&1; then
+  PERSONAS_STAGED=$(git diff --cached --diff-filter=M --name-only 2>/dev/null | grep -E "^\.agentic/spec/personas\.yaml$" || true)
+  if [[ -n "$PERSONAS_STAGED" ]]; then
+    echo ""
+    echo "[24] Checking personas.yaml migration protection..."
+    IS_PROTECTED=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import sys
+from pathlib import Path
+from contracts import load_personas
+try:
+    pf = load_personas(Path('${AGENTIC_ROOT}/spec'))
+    print('yes' if pf and pf.protection == 'contract' else 'no')
+except Exception:
+    print('no')
+" 2>/dev/null || echo "no")
+    if [[ "$IS_PROTECTED" == "yes" ]]; then
+      # Check if capabilities changed (not just goals/pain_points/description)
+      CAPS_CHANGED=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import yaml, subprocess
+staged = yaml.safe_load(subprocess.run(['git', 'show', ':${PERSONAS_STAGED}'], capture_output=True, text=True).stdout or '{}')
+head = yaml.safe_load(subprocess.run(['git', 'show', 'HEAD:${PERSONAS_STAGED}'], capture_output=True, text=True).stdout or '{}')
+# Compare capabilities and persona IDs
+s_caps = {p.get('id',''): sorted(p.get('capabilities', [])) for p in staged.get('personas', [])}
+h_caps = {p.get('id',''): sorted(p.get('capabilities', [])) for p in head.get('personas', [])}
+s_ids = set(p.get('id','') for p in staged.get('personas', []))
+h_ids = set(p.get('id','') for p in head.get('personas', []))
+s_plats = {p.get('id',''): sorted(p.get('platforms', [])) for p in staged.get('personas', [])}
+h_plats = {p.get('id',''): sorted(p.get('platforms', [])) for p in head.get('personas', [])}
+if s_caps != h_caps or s_ids != h_ids or s_plats != h_plats:
+    print('yes')
+else:
+    print('no')
+" 2>/dev/null || echo "no")
+      if [[ "$CAPS_CHANGED" == "yes" ]]; then
+        HAS_MIGRATION=$(git diff --cached -- "$PERSONAS_FILE" 2>/dev/null | grep -c "^+.*id: PM-" || true)
+        if [[ "$HAS_MIGRATION" -eq 0 ]]; then
+          echo "❌ BLOCKED: personas.yaml capabilities/personas/platforms modified without migration entry"
+          echo "  Add a migration entry to personas.yaml under 'migrations:'"
+          FAILURES=$((FAILURES + 1))
+        else
+          echo "✓ Persona changes have migration coverage"
+        fi
+      else
+        echo "✓ Persona changes are non-structural (goals/descriptions only)"
+      fi
+    else
+      echo "✓ personas.yaml not contract-protected"
+    fi
+  fi
+fi
+
 # Summary
 echo ""
 echo "═══════════════════════════════════════════════════════"

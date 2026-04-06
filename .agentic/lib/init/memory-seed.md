@@ -9,7 +9,9 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag verify F-XXXX` — run tests and record results
 - `ag done F-XXXX` — post-merge: doc gate, VERSION bump, state flush
 - `ag status` — see current work items
-- `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract` | `ag phase`
+- `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract` | `ag phase` | `ag persona`
+
+Decision routing: current state → OVERVIEW.md, work log with reasoning → JOURNAL.md (use `--decision` to mark choices), ADR for significant tradeoffs (formal), user preferences → `ag intel remember`.
 
 ## Trigger Words
 - "phase done/mark phase/phase progress/which phase" → STOP. Run `ag phase list F-XXXX` to see phases, `ag phase done F-XXXX <id>` to mark complete.

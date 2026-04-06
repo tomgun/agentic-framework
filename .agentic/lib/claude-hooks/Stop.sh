@@ -69,7 +69,8 @@ if [[ ! -f ".agentic/session/.cap_updated" && -f ".agentic/session/token-events.
       _CAP_DOC=".agentic/spec/FEATURES.md"
     fi
     echo "📦 Design doc not updated: ${_CAP_IMPL_WRITES} impl files written but ${_CAP_DOC} not touched." >&2
-    echo "   Next session: update ${_CAP_DOC} with what you built." >&2
+    echo "   ACTION: Read ${_CAP_DOC}, compare against this session's changes, update any stale sections." >&2
+    echo "   Sections to check: capabilities, personas/actors, tech stack, decisions, phases, scope, quality constraints." >&2
   fi
 fi
 

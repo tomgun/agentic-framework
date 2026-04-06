@@ -25,6 +25,7 @@ Run `ag done F-XXXX` — it verifies contracts, bumps VERSION, updates FEATURES.
 5. Update journal: `bash .agentic/lib/tools/journal.sh "F-XXXX Complete" "Capability" "Next" "None" --why "Reason"`
 6. Update status: `bash .agentic/lib/tools/status.sh focus "F-XXXX shipped"`
 7. Check doc freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done`
+8. If design choices were made, update OVERVIEW.md (current state) and log with `journal.sh --decision` (include reasoning and alternatives in the outcome text)
 
 ## Rules
 - All contract assertions in `spec/contracts/F-XXXX.yaml` must pass before shipping.

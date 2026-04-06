@@ -66,6 +66,9 @@ class Assertion:
     verify: Optional[str] = None
     tests: list[str] = field(default_factory=list)
     draft: bool = False
+    personas: list[str] = field(default_factory=list)
+    platforms: list[str] = field(default_factory=list)
+    capability_ref: Optional[str] = None
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "Assertion":
@@ -76,6 +79,9 @@ class Assertion:
             verify=d.get("verify"),
             tests=d.get("tests", []),
             draft=d.get("draft", False),
+            personas=d.get("personas", []),
+            platforms=d.get("platforms", []),
+            capability_ref=d.get("capability_ref"),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -86,6 +92,12 @@ class Assertion:
             d["tests"] = self.tests
         if self.draft:
             d["draft"] = self.draft
+        if self.personas:
+            d["personas"] = self.personas
+        if self.platforms:
+            d["platforms"] = self.platforms
+        if self.capability_ref is not None:
+            d["capability_ref"] = self.capability_ref
         return d
 
 
@@ -126,13 +138,23 @@ class Scenario:
     given: str
     when: str
     then: str
+    persona: Optional[str] = None
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "Scenario":
-        return cls(name=d["name"], given=d["given"], when=d["when"], then=d["then"])
+        return cls(
+            name=d["name"], given=d["given"], when=d["when"], then=d["then"],
+            persona=d.get("persona"),
+        )
 
     def to_dict(self) -> dict[str, Any]:
-        return {"name": self.name, "given": self.given, "when": self.when, "then": self.then}
+        d: dict[str, Any] = {"name": self.name}
+        if self.persona is not None:
+            d["persona"] = self.persona
+        d["given"] = self.given
+        d["when"] = self.when
+        d["then"] = self.then
+        return d
 
 
 @dataclass
@@ -153,6 +175,8 @@ class Contract:
     user_input: str = ""
     parent: Optional[str] = None
     children: list[str] = field(default_factory=list)
+    personas: list[str] = field(default_factory=list)
+    platforms: list[str] = field(default_factory=list)
     tags: list[str] = field(default_factory=list)
     nfr_refs: list[str] = field(default_factory=list)
     scenarios: list[Scenario] = field(default_factory=list)
@@ -182,6 +206,8 @@ class Contract:
             user_input=d.get("user_input", ""),
             parent=d.get("parent"),
             children=d.get("children", []),
+            personas=d.get("personas", []),
+            platforms=d.get("platforms", []),
             tags=d.get("tags", []),
             nfr_refs=d.get("nfr_refs", []),
             scenarios=scenarios,
@@ -216,6 +242,10 @@ class Contract:
             d["parent"] = self.parent
         if self.children:
             d["children"] = self.children
+        if self.personas:
+            d["personas"] = self.personas
+        if self.platforms:
+            d["platforms"] = self.platforms
         if self.tags:
             d["tags"] = self.tags
         if self.nfr_refs:
@@ -610,6 +640,311 @@ def get_contracts_by_component(
         c for c in load_all_contracts(contracts_dir)
         if c.component == component
     ]
+
+
+# ---------------------------------------------------------------------------
+# Persona definitions
+# ---------------------------------------------------------------------------
+
+@dataclass
+class PersonaDef:
+    id: str
+    name: str
+    description: str = ""
+    goals: list[str] = field(default_factory=list)
+    pain_points: list[str] = field(default_factory=list)
+    capabilities: list[str] = field(default_factory=list)
+    platforms: list[str] = field(default_factory=list)
+
+    @classmethod
+    def from_dict(cls, d: dict[str, Any]) -> "PersonaDef":
+        return cls(
+            id=d["id"],
+            name=d["name"],
+            description=d.get("description", ""),
+            goals=d.get("goals", []),
+            pain_points=d.get("pain_points", []),
+            capabilities=d.get("capabilities", []),
+            platforms=d.get("platforms", []),
+        )
+
+    def capability_slug(self, capability: str) -> str:
+        """Generate a slug for a capability string."""
+        slug = re.sub(r"[^a-z0-9]+", "-", capability.lower()).strip("-")
+        return f"{self.id}:{slug}"
+
+
+@dataclass
+class PlatformDef:
+    id: str
+    name: str
+    description: str = ""
+
+    @classmethod
+    def from_dict(cls, d: dict[str, Any]) -> "PlatformDef":
+        return cls(id=d["id"], name=d["name"], description=d.get("description", ""))
+
+
+@dataclass
+class PersonaMigration:
+    id: str
+    date: str
+    reason: str
+    changes: list[str]
+    approved_by: str = "user"
+
+    @classmethod
+    def from_dict(cls, d: dict[str, Any]) -> "PersonaMigration":
+        return cls(
+            id=d["id"],
+            date=str(d["date"]),
+            reason=d["reason"],
+            changes=d.get("changes", []),
+            approved_by=d.get("approved_by", "user"),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id, "date": self.date, "reason": self.reason,
+            "changes": self.changes, "approved_by": self.approved_by,
+        }
+
+
+@dataclass
+class PersonasFile:
+    personas: list[PersonaDef]
+    platforms: list[PlatformDef] = field(default_factory=list)
+    protection: str = "none"
+    version: Optional[str] = None
+    migrations: list[PersonaMigration] = field(default_factory=list)
+
+    @classmethod
+    def from_dict(cls, d: dict[str, Any]) -> "PersonasFile":
+        return cls(
+            personas=[PersonaDef.from_dict(p) for p in d.get("personas", [])],
+            platforms=[PlatformDef.from_dict(p) for p in d.get("platforms", [])],
+            protection=d.get("protection", "none"),
+            version=d.get("version"),
+            migrations=[PersonaMigration.from_dict(m) for m in d.get("migrations", [])],
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        d: dict[str, Any] = {"protection": self.protection}
+        if self.version:
+            d["version"] = self.version
+        d["personas"] = [self._persona_to_dict(p) for p in self.personas]
+        if self.platforms:
+            d["platforms"] = [self._platform_to_dict(p) for p in self.platforms]
+        if self.migrations:
+            d["migrations"] = [m.to_dict() for m in self.migrations]
+        return d
+
+    @staticmethod
+    def _persona_to_dict(p: PersonaDef) -> dict[str, Any]:
+        d: dict[str, Any] = {"id": p.id, "name": p.name}
+        if p.description:
+            d["description"] = p.description
+        if p.goals:
+            d["goals"] = p.goals
+        if p.pain_points:
+            d["pain_points"] = p.pain_points
+        if p.capabilities:
+            d["capabilities"] = p.capabilities
+        if p.platforms:
+            d["platforms"] = p.platforms
+        return d
+
+    @staticmethod
+    def _platform_to_dict(p: PlatformDef) -> dict[str, Any]:
+        d: dict[str, Any] = {"id": p.id, "name": p.name}
+        if p.description:
+            d["description"] = p.description
+        return d
+
+    def get_persona(self, persona_id: str) -> Optional[PersonaDef]:
+        for p in self.personas:
+            if p.id == persona_id:
+                return p
+        return None
+
+    def get_platform(self, platform_id: str) -> Optional[PlatformDef]:
+        for p in self.platforms:
+            if p.id == platform_id:
+                return p
+        return None
+
+    @property
+    def persona_ids(self) -> set[str]:
+        return {p.id for p in self.personas}
+
+    @property
+    def platform_ids(self) -> set[str]:
+        return {p.id for p in self.platforms}
+
+
+def load_personas(spec_dir: Path) -> Optional[PersonasFile]:
+    """Load personas.yaml from a spec directory. Returns None if not found."""
+    personas_path = spec_dir / "personas.yaml"
+    if not personas_path.exists():
+        return None
+    data = _load_yaml(personas_path)
+    return PersonasFile.from_dict(data)
+
+
+def save_personas(personas_file: PersonasFile, spec_dir: Path) -> Path:
+    """Save personas to spec/personas.yaml."""
+    target = spec_dir / "personas.yaml"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    _dump_yaml(personas_file.to_dict(), target)
+    return target
+
+
+# ---------------------------------------------------------------------------
+# Persona-aware queries
+# ---------------------------------------------------------------------------
+
+def get_contracts_by_persona(contracts_dir: Path, persona_id: str) -> list[Contract]:
+    """Return contracts where personas list includes persona_id."""
+    return [c for c in load_all_contracts(contracts_dir) if persona_id in c.personas]
+
+
+def get_contracts_by_platform(contracts_dir: Path, platform_id: str) -> list[Contract]:
+    """Return contracts where platforms list includes platform_id."""
+    return [c for c in load_all_contracts(contracts_dir) if platform_id in c.platforms]
+
+
+def get_assertions_for_persona(contract: Contract, persona_id: str) -> list[Assertion]:
+    """Return assertions scoped to a persona (or unscoped = all personas)."""
+    return [a for a in contract.assertions if not a.personas or persona_id in a.personas]
+
+
+def get_assertions_for_platform(contract: Contract, platform_id: str) -> list[Assertion]:
+    """Return assertions scoped to a platform (or unscoped = all platforms)."""
+    return [a for a in contract.assertions if not a.platforms or platform_id in a.platforms]
+
+
+def validate_persona_refs(contract: Contract, personas_file: PersonasFile) -> list[str]:
+    """Validate persona/platform/capability_ref references in a contract against personas.yaml."""
+    errors: list[str] = []
+    known_personas = personas_file.persona_ids
+    known_platforms = personas_file.platform_ids
+
+    for pid in contract.personas:
+        if pid not in known_personas:
+            errors.append(f"Unknown persona '{pid}' (not in personas.yaml)")
+
+    for plid in contract.platforms:
+        if known_platforms and plid not in known_platforms:
+            errors.append(f"Unknown platform '{plid}' (not in personas.yaml)")
+
+    for a in contract.assertions:
+        for pid in a.personas:
+            if pid not in known_personas:
+                errors.append(f"{a.id}: unknown persona '{pid}'")
+        for plid in a.platforms:
+            if known_platforms and plid not in known_platforms:
+                errors.append(f"{a.id}: unknown platform '{plid}'")
+        if a.capability_ref:
+            parts = a.capability_ref.split(":", 1)
+            if len(parts) != 2:
+                errors.append(f"{a.id}: invalid capability_ref format '{a.capability_ref}' (expected persona-id:capability-slug)")
+            else:
+                ref_persona = parts[0]
+                if ref_persona not in known_personas:
+                    errors.append(f"{a.id}: capability_ref references unknown persona '{ref_persona}'")
+                else:
+                    persona_def = personas_file.get_persona(ref_persona)
+                    if persona_def:
+                        valid_slugs = {persona_def.capability_slug(c) for c in persona_def.capabilities}
+                        if a.capability_ref not in valid_slugs:
+                            errors.append(f"{a.id}: capability_ref '{a.capability_ref}' does not match any capability of persona '{ref_persona}'")
+
+    for s in contract.scenarios:
+        if s.persona and s.persona not in known_personas:
+            errors.append(f"Scenario '{s.name}': unknown persona '{s.persona}'")
+
+    return errors
+
+
+def persona_coverage_report(contracts_dir: Path, spec_dir: Path) -> dict[str, Any]:
+    """Coverage analysis broken down by persona and capability."""
+    personas_file = load_personas(spec_dir)
+    if not personas_file:
+        return {"error": "No personas.yaml found"}
+
+    contracts = load_all_contracts(contracts_dir)
+    report: dict[str, Any] = {"personas": {}, "platforms": {}}
+
+    # Pre-compute: collect all non-draft assertions with their coverage status
+    # and build a capability_ref index — avoids repeated iteration over contracts
+    all_assertions: list[tuple[str, Assertion]] = []  # (contract_id, assertion)
+    cap_ref_index: dict[str, list[str]] = {}  # slug -> [contract_id:ac_id, ...]
+    for c in contracts:
+        for a in c.assertions:
+            if not a.draft:
+                all_assertions.append((c.id, a))
+            if a.capability_ref:
+                cap_ref_index.setdefault(a.capability_ref, []).append(f"{c.id}:{a.id}")
+
+    # Per-persona coverage — O(personas * assertions). Acceptable at typical scale
+    # (<20 personas, <500 assertions). Optimize with index if needed.
+    for persona in personas_file.personas:
+        total = 0
+        covered = 0
+        for _cid, a in all_assertions:
+            if a.personas and persona.id not in a.personas:
+                continue
+            total += 1
+            if a.tests or a.verify:
+                covered += 1
+        report["personas"][persona.id] = {
+            "name": persona.name,
+            "total": total,
+            "covered": covered,
+            "pct": round(covered / total * 100, 1) if total else 0,
+        }
+
+    # Per-platform coverage
+    for platform in personas_file.platforms:
+        total = 0
+        covered = 0
+        for _cid, a in all_assertions:
+            if a.platforms and platform.id not in a.platforms:
+                continue
+            total += 1
+            if a.tests or a.verify:
+                covered += 1
+        report["platforms"][platform.id] = {
+            "name": platform.name,
+            "total": total,
+            "covered": covered,
+            "pct": round(covered / total * 100, 1) if total else 0,
+        }
+
+    # Per-capability coverage (O(1) lookup via index)
+    capability_coverage: dict[str, dict[str, Any]] = {}
+    for persona in personas_file.personas:
+        for cap in persona.capabilities:
+            slug = persona.capability_slug(cap)
+            matching = cap_ref_index.get(slug, [])
+            capability_coverage[slug] = {
+                "persona": persona.id,
+                "capability": cap,
+                "assertions": matching,
+                "covered": len(matching) > 0,
+            }
+    report["capabilities"] = capability_coverage
+
+    # Summary
+    total_caps = len(capability_coverage)
+    covered_caps = sum(1 for c in capability_coverage.values() if c["covered"])
+    report["capability_summary"] = {
+        "total": total_caps,
+        "covered": covered_caps,
+        "pct": round(covered_caps / total_caps * 100, 1) if total_caps else 0,
+    }
+
+    return report
 
 
 # ---------------------------------------------------------------------------

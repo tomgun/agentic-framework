@@ -8,6 +8,36 @@
 
 ## Recent Contributions
 
+### Persona & Platform Dimensions for Contract Specs (2026-04-06)
+
+**User insight 1 — Multi-sided products need structured perspectives**: User planned a price alert web service with five distinct personas (consumer, consumer-offer-content-maker, company, internal-reporting, internal-maintenance) across three platforms (PWA, React Native, web). The existing spec system had no structured way to express who a feature serves or where it runs — actors were implicit in scenario text, not queryable. This gap applies to any marketplace, SaaS-with-roles, or B2B2C product.
+
+**User insight 2 — "Persona" over "actor"**: Initial design used UML term "actor". User consulted Gemini and challenged the terminology. "Persona" was chosen as more product-native and aligned with modern product development practices. The term affects schema field names, CLI commands, and documentation — worth getting right early.
+
+**User insight 3 — Capabilities as preliminary spec seeds**: User requested that persona capabilities not be excluded (as initially planned to avoid sync drift with assertions), but instead serve as a preliminary spec list. This shaped the `ag persona generate` command: capabilities → draft assertions with `capability_ref` linking back to the source. Capabilities are the high-level checklist; assertions become the detailed, testable version.
+
+**User insight 4 — Capabilities evolve and need migration protection**: User noted that projects evolve and specs need migration when they change — this applies to capabilities too. Led to `personas.yaml` getting its own `protection: contract` + `migrations:` system with pre-commit enforcement (Check 24), matching the contract migration pattern.
+
+### Framework Disconnection Detection at Session Start (2026-04-06)
+
+**User insight 5 — "Why don't the hooks prevent this?"**: After the persona feature was committed without specs, tests, or docs, user asked why the enforcement hooks didn't catch it. Investigation revealed all three layers (git hooks, ag commit CLI, Claude hooks) were disconnected — the rules existed but the wiring was missing. Led to dashboard framework wiring check.
+
+**User insight 6 — "Don't we have a way to check at startup?"**: User identified that the dashboard (the one mandatory entry point) was blind to the most critical failure mode. Led to adding framework wiring checks to `dashboard.sh`.
+
+**User insight 7 — "The agent should offer to fix it"**: User pushed beyond passive reporting to active remediation. Dashboard now includes `OFFER TO FIX` directive and `FIX` commands labeled by what they restore (gates, intelligence, skills). CLAUDE.md and session-start skill instruct the agent to offer immediate fixes before any other work.
+
+**User insight 8 — "Make those LLM-optimized"**: User insisted on trigger→action format instead of explanatory prose. Dashboard output, CLAUDE.md, and skill all tightened to single-line rules the LLM can parse and act on directly.
+
+### Remediation & Taxonomy Insights (2026-04-06)
+
+**User insight 9 — Framework disconnection is not a standalone feature**: User identified that framework wiring detection is an internal health check, not a user-facing capability. It belongs under F-015 (Session Management) since it's part of what the dashboard does at session start. Principle: distinguish between internal quality mechanisms and user-facing capabilities.
+
+**User insight 10 — Personas extend the spec system, not stand alone**: User clarified that personas are connected to the planning/speccing workflow — they extend F-031 (YAML contracts) and feed into F-002 (Spec-Driven Development). The feature is standalone (own schema, CLI, template, pre-commit check) but taxonomically belongs to the spec system family.
+
+**User insight 11 — Personas should work in discovery mode too**: User envisioned personas.yaml as a universal design document working in both modes: discovery (preliminary specs, technical plans, phases, vision — updated along development) and formal (scoped contract assertions, coverage analysis). This would make personas the structured complement to OVERVIEW.md's narrative, possibly with Claude interview flow to populate it and auto-generated overview output. Captured as planned ACs (AC-017 through AC-020) on F-043.
+
+**User insight 9 — "Hooks aren't just gates — they're the framework"**: User pointed out that hooks serve intelligence injection (planning, design, implementation guidance) and workflow automation, not just quality gates. Without them the agent is vanilla Claude. Reframed from "enforcement disconnected" to "framework disconnected" — three checks: gates (git hooks), intelligence (Claude hooks), skills (workflow automation).
+
 ### F-041 Intelligence Engine — Smarter Than Vanilla Claude (v0.77.0)
 
 **User insight 1 — Intelligence is core framework value**: "The most important features I think is that the framework writes specs/ac (incl. NFR) and code and test based on those... all token optimization things and the user experience for the developer; high quality code also in discovery and automatic modes." (Mar 22) — Established that token optimization and quality intelligence are core value, not optional extras.

@@ -41,6 +41,7 @@ COMMANDS:
     qa [--check|--json] QA Registry: feature-to-test map and gap analysis
     audit [options]     Spec verification & QA audit (--full, --status, --propagate, --metrics)
     nfr [sub]           NFR management (list, discover, coverage)
+    persona <sub>       Persona management (list|check|migrate|coverage|generate)
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
     intent [sub]        Manage intent journal (list|clear F-XXXX)
     formalize [T-XXXX...]  Promote TODO items to formal features + AC stubs
@@ -130,6 +131,7 @@ COMMANDS:
     qa [--check|--json] QA Registry: feature-to-test map and gap analysis
     audit [options]     Spec verification & QA audit (--full, --status, --propagate, --metrics)
     nfr [sub]           NFR management (list, discover, coverage)
+    persona <sub>       Persona management (list|check|migrate|coverage|generate)
     worktree <sub>      Manage git worktrees (create|list|remove|path|status)
     intent [sub]        Manage intent journal (list|clear F-XXXX)
     formalize [T-XXXX...]  Promote TODO items to formal features + AC stubs

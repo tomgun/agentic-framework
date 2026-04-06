@@ -49,6 +49,7 @@ Run `ag done F-XXXX` on main — this is the single required post-merge action. 
 1. Verify contract assertions: `ag contract check F-XXXX` (all assertions must pass)
 2. Complete WIP: `bash .agentic/lib/tools/wip.sh complete`
 3. Verify doc freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done --manifest F-XXXX`
+4. If design choices were made, update OVERVIEW.md (current state) and log with `journal.sh --decision` (include reasoning and alternatives in the outcome text)
 
 ## Rules
 - NEVER skip `ag done`. It runs doc freshness gates, contract checks, and VERSION bump.

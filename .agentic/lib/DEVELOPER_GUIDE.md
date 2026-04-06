@@ -280,6 +280,66 @@ ag contract pending                      # Show features with pending user_input
 
 **Migrating from markdown ACs**: If your project uses older markdown acceptance criteria, run `ag migrate-specs` to convert them to YAML contracts.
 
+### Working with Personas & Platforms
+
+Personas define **who** uses a feature (with goals, pain points, and capabilities). Platforms define **where** it runs. Works in both profiles:
+
+**Discovery mode** (no formal contracts): Use the structured sections in OVERVIEW.md — "Who Uses This" lists personas with goals, capabilities, and platforms. No YAML, no CLI, no ceremony. Agents read OVERVIEW.md during planning and use the personas as context. When the project graduates to formal, these become the basis for `personas.yaml`.
+
+```markdown
+## Who Uses This
+### Consumer
+- **Goals**: Find best prices, get alerts
+- **Pain points**: Too many tabs, misses deals
+- **Capabilities**: Browse offers, set price alerts, view history
+- **Platform**: PWA, React Native app
+```
+
+**Formal mode** (with YAML contracts): Create `spec/personas.yaml` for structured, queryable persona data with CLI tooling:
+```bash
+cp .agentic/lib/templates/personas.template.yaml .agentic/spec/personas.yaml
+```
+
+**Persona structure**:
+```yaml
+protection: none          # or 'contract' to require migration entries for changes
+personas:
+  - id: developer
+    name: Framework Developer
+    goals: ["Ship features quickly", "Maintain quality"]
+    pain_points: ["Context loss between sessions"]
+    capabilities: ["Write specs", "Run tests", "Review code"]
+    platforms: [cli, ide]
+platforms:
+  - id: cli
+    name: Command Line
+  - id: ide
+    name: IDE Extension
+```
+
+**Using personas in contracts**: Assertions can be scoped to specific personas and platforms:
+```yaml
+assertions:
+  - id: AC-001
+    text: "Dashboard shows status on session start"
+    type: structural
+    personas: [developer]         # Only applies to this persona
+    platforms: [cli]              # Only on CLI
+    capability_ref: developer:write-specs  # Links to persona capability
+```
+
+**CLI commands**:
+```bash
+ag persona list                  # List personas and their capabilities
+ag persona check                 # Validate personas.yaml + contract refs
+ag persona coverage              # Coverage by persona, platform, capability
+ag persona coverage --by-persona # Breakdown by persona
+ag persona generate --dry-run    # Preview draft assertions from capabilities
+ag persona migrate               # Check for capability changes needing migration
+```
+
+**Migration protection**: When `protection: contract` is set in personas.yaml, modifying capabilities requires a migration entry (enforced by pre-commit Check 24).
+
 ### Working Manually (Without Agent)
 
 If you prefer direct control or the agent isn't available:
@@ -2087,6 +2147,9 @@ The framework provides multiple tracking files. Use this decision table to route
 | Human blocker (PR review, credentials, decision needed) | `.agentic/HUMAN_NEEDED.md` | `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"` |
 | Bug or technical debt | `ISSUES.md` | `bash .agentic/lib/tools/quick_issue.sh "Title" "Details"` |
 | New capability to spec | `FEATURES.md` | `bash .agentic/lib/tools/feature.sh add "Title"` |
+| Decision made (product, technical, process) | `OVERVIEW.md` (current state) + `JOURNAL.md` (history) | Update relevant section; `journal.sh "Topic" "Outcome + reasoning + alternatives" "Next" "" --why "Motivation" --decision "Choice"` |
+| Significant architecture decision (formal) | ADR + `JOURNAL.md` | Copy `ADR.template.md` to `spec/adr/`; also log with `--decision` |
+| User preference/correction | `cerebrum.yaml` | `ag intel remember "text" --context "context"` |
 
 **Do NOT** put development tasks in HUMAN_NEEDED.md — that file is reserved for items that genuinely require human action (approvals, credentials, external decisions). If an agent can act on it, it belongs in TODO.md.
 

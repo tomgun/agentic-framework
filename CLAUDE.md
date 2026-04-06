@@ -11,6 +11,8 @@ Architecture: `docs/INSTRUCTION_ARCHITECTURE.md` (three-layer design: Constituti
 
 Run `bash .agentic/lib/tools/dashboard.sh 2>/dev/null` — ONE tool call, no others. Output the result verbatim as your first text response. No preamble, no narration, no reformatting.
 
+Dashboard shows `🚨 FRAMEWORK DISCONNECTED` → offer to run the `FIX` commands shown. Do this BEFORE any other work. Without hooks: no quality gates, no intelligence injection, no workflow automation. After fixing, advise the user to restart Claude Code — hooks only load at session start.
+
 Always consult: AGENTS.md (if present), CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* and .agentic/spec/adr/* as the source of truth.
 
 ## Workflow
@@ -30,6 +32,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 - `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve`
+- `ag persona list` | `ag persona check` | `ag persona coverage` | `ag persona generate` | `ag persona migrate`
 - `ag coord start` | `ag coord stop` | `ag coord status`
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`. The CLI tells you what's missing.
@@ -74,7 +77,7 @@ After ExitPlanMode — auto-continue the full sequence:
 
 Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - .agentic/STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
-- .agentic/journal/JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes (not files)" "Next" "Blockers" --why "Problem being solved"`
+- .agentic/journal/JOURNAL.md: `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes with reasoning" "Next" "Blockers" --why "Problem" --decision "Choice made"`
 - .agentic/HUMAN_NEEDED.md: `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"`
 - .agentic/spec/FEATURES.md: `bash .agentic/lib/tools/feature.sh cap add "Name" "Description"` or `feature.sh cap status "Name" built`
 - .agentic/TODO.md: `bash .agentic/lib/tools/todo.sh add "Idea"` or `ag todo "Idea"`
@@ -90,7 +93,17 @@ Framework enforcement uses multiple layers. When adding new gates or enforcement
 
 ## Design Tracking
 
-Profiles are presets for settings — not separate products. Even without formal feature tracking, keep OVERVIEW.md current (Core Capabilities, Guiding Principles). Journal entries should use `--why` to capture decision motivation. These artifacts are raw material for formal specs if the project later enables `feature_tracking: yes` — OVERVIEW.md capabilities become FEATURES.md entries, journal decisions become ADRs, cerebrum learnings become enforced patterns.
+Profiles are presets for settings — not separate products. OVERVIEW.md is the living design document — keep it current. When implementation changes something, read OVERVIEW.md and update any section that no longer reflects reality. Don't update mechanically — compare what you built against what the doc says and fix the delta.
+
+Journal entries are the project's memory. Log with enough context to reconstruct why things are the way they are: what was discussed, what alternatives were considered, what assumptions were made — not just what changed. Use `--decision` flag when a specific choice was made. These entries are raw material for formal specs if the project later graduates to formal profile.
+
+Decision routing:
+- **Current state** → OVERVIEW.md sections (personas, capabilities, tech stack, phases, scope, principles)
+- **Work log with reasoning** → JOURNAL.md (context, alternatives, assumptions in the outcome text)
+- **Decision marker** → JOURNAL.md `--decision` flag (grep-able: `grep "Decision:" JOURNAL.md`)
+- **Full ADR** → spec/adr/ (formal profile, architecturally significant only)
+- **Ways of working** → STACK.md settings + CONTEXT_PACK.md conventions
+- **User preferences** → cerebrum.yaml via `ag intel remember`
 
 ## Skills & Workflows
 

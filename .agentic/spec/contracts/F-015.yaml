@@ -69,6 +69,77 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-0136
 
+  # --- Framework Wiring Detection (added v0.78.1) ---
+  - id: AC-008
+    text: >
+      dashboard.sh checks git core.hooksPath and sets D_FW_GIT to
+      disconnected when not configured, or broken when the pre-commit
+      file is missing at the configured path
+    type: structural
+    verify: >
+      grep -q "D_FW_GIT" .agentic/lib/tools/dashboard.sh &&
+      grep -q 'core.hooksPath' .agentic/lib/tools/dashboard.sh
+    tests:
+      - tests/validate_framework.sh::F-044-AC-001
+
+  - id: AC-009
+    text: >
+      dashboard.sh checks for Claude hooks by looking for hooks.json
+      in the .claude/ directory with required event types; sets
+      D_FW_CLAUDE to disconnected when not found
+    type: structural
+    verify: >
+      grep -q "D_FW_CLAUDE" .agentic/lib/tools/dashboard.sh &&
+      grep -q 'hooks.json' .agentic/lib/tools/dashboard.sh
+    tests:
+      - tests/validate_framework.sh::F-044-AC-002
+
+  - id: AC-010
+    text: >
+      dashboard.sh checks for skills directory at .claude/skills/ with
+      at least one skill subdirectory; sets D_FW_SKILLS to missing or
+      empty when not found
+    type: structural
+    verify: >
+      grep -q "D_FW_SKILLS" .agentic/lib/tools/dashboard.sh &&
+      grep -q '.claude/skills' .agentic/lib/tools/dashboard.sh
+    tests:
+      - tests/validate_framework.sh::F-044-AC-003
+
+  - id: AC-011
+    text: >
+      When any D_FW_* check fails, dashboard outputs a FRAMEWORK
+      DISCONNECTED warning with specific FIX commands for each
+      disconnected component
+    type: structural
+    verify: >
+      grep -q "FRAMEWORK DISCONNECTED" .agentic/lib/tools/dashboard.sh
+    tests:
+      - tests/validate_framework.sh::F-044-AC-004
+
+  - id: AC-012
+    text: >
+      CLAUDE.md templates contain trigger-action rule: dashboard shows
+      FRAMEWORK DISCONNECTED leads to offer fixes before other work;
+      advises restart since hooks only load at session start
+    type: structural
+    verify: >
+      grep -q "FRAMEWORK DISCONNECTED" CLAUDE.md &&
+      grep -q "FRAMEWORK DISCONNECTED" .agentic/lib/agents/claude/CLAUDE.md
+    tests:
+      - tests/validate_framework.sh::F-044-AC-006
+      - tests/validate_framework.sh::F-044-AC-007
+
+  - id: AC-013
+    text: >
+      session-start skill includes framework disconnection as a
+      priority-ordered critical flag to handle before other work
+    type: structural
+    verify: >
+      grep -q "DISCONNECTED\|disconnected" .claude/skills/session-start/SKILL.md
+    tests:
+      - tests/validate_framework.sh::F-044-AC-008
+
 nfr_refs: []
 scenarios:
   - name: "Session start with interrupted work"
@@ -76,4 +147,19 @@ scenarios:
     when: "Agent starts new session"
     then: "Dashboard shows WIP warning, recovery prompted before any other work"
 
-migrations: []
+  - name: "Session start with disconnected framework"
+    given: "Missing .claude/hooks.json or git core.hooksPath not set"
+    when: "Agent starts new session"
+    then: "Dashboard shows FRAMEWORK DISCONNECTED warning with fix commands"
+
+migrations:
+  - id: M-2026-04-06-001
+    date: '2026-04-06'
+    trigger: implementation_discovery
+    reason: >
+      Framework disconnection detection added to dashboard — checks git hooks,
+      Claude hooks, and skills wiring at session start with fix commands
+    changes:
+      - "Added AC-008 through AC-013 for framework wiring detection"
+      - "Added scenario for disconnected framework"
+    approved_by: user

@@ -12,7 +12,7 @@
 
 | Category | Count | Shipped | In Progress | Planned |
 |----------|-------|---------|-------------|---------|
-| **Core Workflow** | 8 | 5 | 1 | 2 |
+| **Core Workflow** | 9 | 6 | 1 | 2 |
 | **Quality** | 6 | 6 | 0 | 0 |
 | **Design Principles** | 1 | 1 | 0 | 0 |
 | **Session** | 1 | 1 | 0 | 0 |
@@ -25,7 +25,7 @@
 | **Git Workflow** | 2 | 1 | 0 | 1 |
 | **Autonomous** | 3 | 2 | 0 | 1 |
 | **Dev Infrastructure** | 4 | 3 | 1 | 0 |
-| **Total** | **41** | **30** | **2** | **9** |
+| **Total** | **42** | **31** | **2** | **9** |
 
 > **Feature types** (shown where relevant): `capability` — user-facing (default, unlabeled) · `infrastructure` — permanent dev tooling · `research` — time-bounded experiment · `meta` — organizational container
 >
@@ -99,7 +99,7 @@ Pre-commit hooks enforce quality: ShellCheck, spec consistency, file size limits
 **Contract**: [`spec/contracts/F-015.yaml`](contracts/F-015.yaml)
 **Consolidates**: F-015, F-0022, F-0023, F-0024, F-0025, F-0026, F-0027, F-0125, F-0126, F-0127, F-0136, F-0145, F-0156, F-0240
 
-Session start shows dashboard with status, focus, health, and next steps. Context packs provide efficient handoff between sessions. TODO capture, journal entries, and status tracking persist across sessions.
+Session start shows dashboard with status, focus, health, and next steps. Context packs provide efficient handoff between sessions. TODO capture, journal entries, and status tracking persist across sessions. Framework wiring detection checks git hooks, Claude hooks, and skills at session start — shows FRAMEWORK DISCONNECTED warning with fix commands when wiring is missing.
 
 ---
 
@@ -427,6 +427,15 @@ Provider-based mobile app publishing (`ag publish`) with platform auto-detection
 **Contract**: [`spec/contracts/DEV-004.yaml`](contracts/DEV-004.yaml)
 
 Empirically compare framework outcomes across three real configuration profiles (discovery, formal, autonomous_formal) by running the same build task N times per tier and collecting structured metrics. Produces a comparison report showing what each tier costs (time, token spend, ceremony) and what it buys (spec coverage, test count, commit quality, violation rate). ADR-001 roadmap item.
+
+---
+
+## F-043: Persona & Platform Dimensions for Contract Specs
+
+**Status**: shipped | **Category**: core-workflow | **Since**: v0.78.1 | **Profile**: formal
+**Contract**: [`spec/contracts/F-043.yaml`](contracts/F-043.yaml)
+
+Extends the YAML contract system (F-031) with multi-actor, multi-platform dimensions. Personas define who uses a feature (with goals, pain_points, capabilities as spec seeds). Platforms define where it runs. Assertions scoped by persona/platform. CLI via `ag persona` for listing, validation, coverage analysis, and draft assertion generation. Feeds into spec writing (F-002) by providing structured user context.
 
 ---
 

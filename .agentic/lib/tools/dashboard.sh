@@ -263,6 +263,66 @@ if [[ -f "$TOOLS_DIR/design-trace.sh" ]]; then
     D_DESIGN_TRACE=$(bash "$TOOLS_DIR/design-trace.sh" --quiet 2>/dev/null) || D_DESIGN_TRACE=""
 fi
 
+# FRAMEWORK WIRING (are hooks installed? without them the framework is inert)
+# Git hooks: quality gates on commit (spec-first, test coverage, doc freshness)
+# Claude hooks: intelligence injection (planning guidance, pattern enforcement, quality checklists)
+# Skills: workflow automation (loaded on-demand from .claude/skills/ — checked separately)
+D_FW_GIT="ok"
+D_FW_CLAUDE="ok"
+D_FW_SKILLS="ok"
+D_FW_ISSUES=""
+
+# Check 1: Git pre-commit hooks — core.hooksPath must point to .agentic/hooks
+if [[ "$D_GIT_MODE" == "active" ]] && command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+    _hooks_path=$(git config core.hooksPath 2>/dev/null || echo "")
+    if [[ -z "$_hooks_path" ]]; then
+        D_FW_GIT="disconnected"
+        D_FW_ISSUES="${D_FW_ISSUES}git-hooks "
+    elif [[ ! -f "$PROJECT_ROOT/$_hooks_path/pre-commit" ]] && [[ ! -f "$_hooks_path/pre-commit" ]]; then
+        D_FW_GIT="broken"
+        D_FW_ISSUES="${D_FW_ISSUES}git-hooks "
+    fi
+fi
+
+# Check 2: Claude hooks — .claude/hooks.json must exist with framework hook types
+# Detection: checks that hooks dict has at least one known event type key.
+# If hooks.json format changes, update fw_types set below.
+_claude_hooks_found=false
+_hooks_file="$PROJECT_ROOT/.claude/hooks.json"
+if [[ -f "$_hooks_file" ]] && command -v python3 >/dev/null 2>&1; then
+    _has_hooks=$(_AG_HOOKS_FILE="$_hooks_file" _py -c "
+import json, os
+try:
+    d = json.load(open(os.environ['_AG_HOOKS_FILE']))
+    # hooks.json uses dict format: {'hooks': {'PreToolUse': [...], ...}}
+    hooks = d.get('hooks', {})
+    if isinstance(hooks, dict):
+        fw_types = {'PreToolUse', 'PostToolUse', 'UserPromptSubmit', 'Stop', 'PreCompact', 'SessionStart'}
+        print('yes' if fw_types & set(hooks.keys()) else 'no')
+    else:
+        print('no')
+except: print('no')
+" 2>/dev/null) || _has_hooks="no"
+    [[ "$_has_hooks" == "yes" ]] && _claude_hooks_found=true
+fi
+if ! $_claude_hooks_found; then
+    D_FW_CLAUDE="disconnected"
+    D_FW_ISSUES="${D_FW_ISSUES}claude-hooks "
+fi
+
+# Check 3: Skills — .claude/skills/ should have workflow skills installed
+_skills_dir="$PROJECT_ROOT/.claude/skills"
+if [[ ! -d "$_skills_dir" ]]; then
+    D_FW_SKILLS="missing"
+    D_FW_ISSUES="${D_FW_ISSUES}skills "
+else
+    _skill_count=$(ls -d "$_skills_dir"/*/ 2>/dev/null | wc -l | tr -d ' ')
+    if [[ "$_skill_count" -eq 0 ]]; then
+        D_FW_SKILLS="empty"
+        D_FW_ISSUES="${D_FW_ISSUES}skills "
+    fi
+fi
+
 # UPGRADE
 D_UPGRADE="none"
 [[ -f "$PROJECT_ROOT/.agentic/.upgrade_pending" ]] && D_UPGRADE="pending"
@@ -381,6 +441,11 @@ if $RAW_MODE; then
     echo "$D_STALE"
     echo "===COMPLETION_STALE==="
     echo "$D_COMPLETION_STALE"
+    echo "===FRAMEWORK==="
+    echo "git=$D_FW_GIT"
+    echo "claude=$D_FW_CLAUDE"
+    echo "skills=$D_FW_SKILLS"
+    echo "issues=$D_FW_ISSUES"
     exit 0
 fi
 
@@ -511,6 +576,22 @@ if [[ -n "$D_CAP_METRICS" ]]; then
 fi
 if [[ -n "$D_DESIGN_TRACE" ]]; then
     echo "📐 Design trace   $D_DESIGN_TRACE — run: design-trace.sh"
+fi
+# Framework wiring — loud warning if disconnected
+if [[ -n "$D_FW_ISSUES" ]]; then
+    echo "🚨 FRAMEWORK DISCONNECTED — running as vanilla Claude. OFFER TO FIX before other work."
+    if [[ "$D_FW_GIT" != "ok" ]]; then
+        echo "   FIX (gates):        git config core.hooksPath .agentic/hooks"
+    fi
+    if [[ "$D_FW_CLAUDE" != "ok" ]]; then
+        echo "   FIX (intelligence): cp .agentic/lib/claude-hooks/hooks.json .claude/"
+    fi
+    if [[ "$D_FW_SKILLS" != "ok" ]]; then
+        echo "   FIX (skills):       ag export claude"
+    fi
+    echo "   ⚠ After fixing: RESTART Claude Code for hooks to take effect."
+else
+    echo "✅ Framework      Hooks + skills active"
 fi
 echo "✅ Health         $health_line"
 echo ""

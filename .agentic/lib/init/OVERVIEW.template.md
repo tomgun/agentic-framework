@@ -20,12 +20,59 @@ Document separation:
 <!-- Problem we're solving, who it's for, what pain point we address -->
 
 
+## Who Uses This
+
+<!-- Group capabilities by persona/actor. Remove or rename sections as needed. -->
+
+### End User
+- **Goals**: ...
+- **Pain points**: ...
+- **Capabilities**: ...
+- **Platform**: web | mobile | CLI | API
+
+<!-- Add more personas as needed:
+### Admin
+- **Goals**: ...
+- **Capabilities**: ...
+- **Platform**: web
+-->
+
 ## Core Capabilities
 
 <!-- Use checkboxes for high-level capability tracking -->
 - [ ] User can ...
 - [ ] System handles ...
 - [ ] App provides ...
+
+## Tech Stack & Architecture
+
+<!-- Key technology choices and why -->
+- **Frontend**: ...
+- **Backend**: ...
+- **Database**: ...
+- **Hosting**: ...
+
+<!-- Architecture notes, patterns, or constraints worth knowing -->
+
+## Phases
+
+<!-- Rough delivery plan. Update as things evolve. -->
+
+### Phase 1 — MVP
+- ...
+
+### Phase 2
+- ...
+
+<!-- ### Phase 3
+- ...
+-->
+
+## Quality & Constraints
+
+<!-- Known non-functional requirements, SLAs, compliance needs -->
+<!-- Examples: "Must load in <2s", "GDPR compliant", "99.9% uptime" -->
+-
 
 ## In Scope / Out of Scope
 
@@ -42,6 +89,7 @@ Document separation:
 
 ## Guiding Principles
 
-<!-- Key decisions/constraints that shape implementation -->
+<!-- Cross-cutting constraints that shape implementation -->
+<!-- Full reasoning and decision history tracked in JOURNAL.md (use --decision flag) -->
 <!-- Examples: "Mobile-first", "No external dependencies", "Privacy by default" -->
 -

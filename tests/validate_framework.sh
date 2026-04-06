@@ -6007,6 +6007,332 @@ else
   fail "btrace: gate.py missing btrace import"
 fi
 
+# ============================================================
+# F-043: Persona & Platform Dimensions for Contract Specs
+# ============================================================
+echo "--- F-043: Persona & Platform Dimensions ---"
+
+# AC-001: personas.schema.json exists with required structure
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/schemas/personas.schema.json" ]]; then
+  pass "F-043 AC-001: personas.schema.json exists"
+  if python3 -c "
+import json
+s = json.load(open('${FRAMEWORK_ROOT}/.agentic/lib/schemas/personas.schema.json'))
+assert 'personas' in s.get('required', []), 'personas not required'
+assert 'persona' in s.get('definitions', {}), 'persona definition missing'
+" 2>/dev/null; then
+    pass "F-043 AC-001: personas.schema.json has required structure (personas array, persona definition)"
+  else
+    fail "F-043 AC-001: personas.schema.json missing required structure"
+  fi
+else
+  fail "F-043 AC-001: personas.schema.json not found"
+fi
+
+# AC-002: contract.schema.json includes persona/platform fields on assertions
+if python3 -c "
+import json
+s = json.load(open('${FRAMEWORK_ROOT}/.agentic/lib/schemas/contract.schema.json'))
+a = s['definitions']['assertion']['properties']
+assert 'personas' in a, 'personas missing from assertion'
+assert 'platforms' in a, 'platforms missing from assertion'
+assert 'capability_ref' in a, 'capability_ref missing from assertion'
+" 2>/dev/null; then
+  pass "F-043 AC-002: contract.schema.json has personas/platforms/capability_ref on assertions"
+else
+  fail "F-043 AC-002: contract.schema.json missing persona/platform fields on assertions"
+fi
+
+# AC-003: PersonaDef with capability_slug
+if python3 -c "
+import sys; sys.path.insert(0, '${FRAMEWORK_ROOT}/.agentic/lib')
+from contracts import PersonaDef
+p = PersonaDef(id='dev', name='Developer', capabilities=['View dashboard'])
+slug = p.capability_slug('View dashboard')
+assert slug == 'dev:view-dashboard', f'Expected dev:view-dashboard, got {slug}'
+" 2>/dev/null; then
+  pass "F-043 AC-003: PersonaDef.capability_slug generates correct slugs"
+else
+  fail "F-043 AC-003: PersonaDef.capability_slug broken"
+fi
+
+# AC-004: PlatformDef and PersonasFile
+if python3 -c "
+import sys; sys.path.insert(0, '${FRAMEWORK_ROOT}/.agentic/lib')
+from contracts import PlatformDef, PersonasFile
+pf = PersonasFile.from_dict({
+    'personas': [{'id': 'u1', 'name': 'User'}],
+    'platforms': [{'id': 'web', 'name': 'Web'}]
+})
+assert pf.get_persona('u1') is not None, 'get_persona failed'
+assert pf.get_platform('web') is not None, 'get_platform failed'
+assert 'u1' in pf.persona_ids
+assert 'web' in pf.platform_ids
+" 2>/dev/null; then
+  pass "F-043 AC-004: PlatformDef and PersonasFile load and query correctly"
+else
+  fail "F-043 AC-004: PlatformDef/PersonasFile broken"
+fi
+
+# AC-005: Assertion and Contract dataclasses include persona/platform fields
+if python3 -c "
+import sys; sys.path.insert(0, '${FRAMEWORK_ROOT}/.agentic/lib')
+from contracts import Assertion, Contract
+a = Assertion(id='AC-001', text='test', type='structural', personas=['dev'], platforms=['cli'], capability_ref='dev:test')
+assert a.personas == ['dev'], 'Assertion.personas missing'
+assert a.platforms == ['cli'], 'Assertion.platforms missing'
+assert a.capability_ref == 'dev:test', 'Assertion.capability_ref missing'
+c = Contract(id='F-999', name='T', lifecycle='exploring', description='Test contract', assertions=[a], personas=['dev'], platforms=['cli'])
+assert c.personas == ['dev'], 'Contract.personas missing'
+" 2>/dev/null; then
+  pass "F-043 AC-005: Assertion and Contract include personas/platforms/capability_ref fields"
+else
+  fail "F-043 AC-005: Assertion/Contract missing persona/platform fields"
+fi
+
+# AC-006: load_personas returns None for missing file
+if python3 -c "
+import sys; sys.path.insert(0, '${FRAMEWORK_ROOT}/.agentic/lib')
+from contracts import load_personas
+from pathlib import Path
+assert load_personas(Path('/tmp/nonexistent-dir-xyz')) is None
+" 2>/dev/null; then
+  pass "F-043 AC-006: load_personas returns None when personas.yaml not found"
+else
+  fail "F-043 AC-006: load_personas doesn't handle missing file"
+fi
+
+# AC-007: validate_persona_refs catches bad references
+if python3 -c "
+import sys; sys.path.insert(0, '${FRAMEWORK_ROOT}/.agentic/lib')
+from contracts import validate_persona_refs, Contract, Assertion, PersonasFile
+pf = PersonasFile.from_dict({'personas': [{'id': 'dev', 'name': 'Dev', 'capabilities': ['Code']}]})
+a = Assertion(id='AC-001', text='t', type='structural', personas=['unknown'])
+c = Contract(id='F-999', name='T', lifecycle='exploring', description='Test', assertions=[a], personas=['bad-ref'])
+errors = validate_persona_refs(c, pf)
+assert len(errors) >= 2, f'Expected >=2 errors, got {len(errors)}: {errors}'
+" 2>/dev/null; then
+  pass "F-043 AC-007: validate_persona_refs catches bad persona/platform refs"
+else
+  fail "F-043 AC-007: validate_persona_refs not detecting bad refs"
+fi
+
+# AC-009: persona.sh defines cmd_persona with help subcommand
+if grep -q "cmd_persona" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/persona.sh" && \
+   grep -q "list\|check\|migrate\|coverage\|generate" "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/persona.sh"; then
+  pass "F-043 AC-009: persona.sh defines cmd_persona with list/check/migrate/coverage/generate subcommands"
+else
+  fail "F-043 AC-009: persona.sh missing cmd_persona or subcommands"
+fi
+
+# AC-013: generate_from_personas.py exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/generate_from_personas.py" ]]; then
+  if grep -q "capability_ref\|persona" "${FRAMEWORK_ROOT}/.agentic/lib/tools/generate_from_personas.py"; then
+    pass "F-043 AC-013: generate_from_personas.py exists with persona/capability_ref support"
+  else
+    fail "F-043 AC-013: generate_from_personas.py missing persona references"
+  fi
+else
+  fail "F-043 AC-013: generate_from_personas.py not found"
+fi
+
+# AC-014: personas.template.yaml exists
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/templates/personas.template.yaml" ]]; then
+  if grep -q "personas:" "${FRAMEWORK_ROOT}/.agentic/lib/templates/personas.template.yaml"; then
+    pass "F-043 AC-014: personas.template.yaml exists with personas definition"
+  else
+    fail "F-043 AC-014: personas.template.yaml missing personas key"
+  fi
+else
+  fail "F-043 AC-014: personas.template.yaml not found"
+fi
+
+# AC-015: contract.template.yaml includes personas/platforms
+if grep -q "personas\|platforms" "${FRAMEWORK_ROOT}/.agentic/lib/templates/contract.template.yaml"; then
+  pass "F-043 AC-015: contract.template.yaml includes personas/platforms fields"
+else
+  fail "F-043 AC-015: contract.template.yaml missing personas/platforms"
+fi
+
+# AC-016: pre-commit Check 24 for persona migration protection
+if grep -q "Check 24" "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commit-check.sh" && \
+   grep -q "personas" "${FRAMEWORK_ROOT}/.agentic/lib/hooks/pre-commit-check.sh"; then
+  pass "F-043 AC-016: pre-commit Check 24 enforces personas.yaml migration protection"
+else
+  fail "F-043 AC-016: pre-commit missing persona migration protection check"
+fi
+
+# ============================================================
+# F-042: Decision Routing & Rich Work Logging (AC-016..019)
+# ============================================================
+echo "--- F-042: Decision Routing ---"
+
+# AC-016: journal.sh supports --decision flag (structural)
+if grep -q "\-\-decision" "${FRAMEWORK_ROOT}/.agentic/lib/tools/journal.sh" && \
+   grep -q "DECISION" "${FRAMEWORK_ROOT}/.agentic/lib/tools/journal.sh"; then
+  pass "F-042 AC-016: journal.sh supports --decision flag"
+else
+  fail "F-042 AC-016: journal.sh missing --decision flag"
+fi
+
+# AC-016 functional: journal.sh output template includes Decision block when flag is set
+# Verify by checking the script writes **Decision**: between **Why**: and **What changed**:
+if awk '/DECISION/{found=1} found && /Decision/{print; exit}' "${FRAMEWORK_ROOT}/.agentic/lib/tools/journal.sh" | grep -q "Decision"; then
+  pass "F-042 AC-016: journal.sh writes **Decision**: line when --decision flag provided"
+else
+  fail "F-042 AC-016: journal.sh missing **Decision**: output block"
+fi
+
+# AC-017: CLAUDE.md template has decision routing with reasoning guidance
+if grep -q "Decision routing" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" && \
+   grep -q "reasoning" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md"; then
+  pass "F-042 AC-017: CLAUDE.md template has decision routing with reasoning guidance"
+else
+  fail "F-042 AC-017: CLAUDE.md template missing decision routing"
+fi
+
+# AC-018: DEVELOPER_GUIDE routing table includes decision rows
+if grep -q "decision" "${FRAMEWORK_ROOT}/.agentic/lib/DEVELOPER_GUIDE.md" && \
+   grep -q "cerebrum" "${FRAMEWORK_ROOT}/.agentic/lib/DEVELOPER_GUIDE.md"; then
+  pass "F-042 AC-018: DEVELOPER_GUIDE routing table includes decision rows"
+else
+  fail "F-042 AC-018: DEVELOPER_GUIDE routing table missing decision rows"
+fi
+
+# AC-019: Hook messages include "decisions" in section checklist
+if grep -q "decisions" "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh" && \
+   grep -q "decisions" "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
+  pass "F-042 AC-019: Hook messages include 'decisions' in section checklist"
+else
+  fail "F-042 AC-019: Hook messages missing 'decisions' in section checklist"
+fi
+
+# AC-020: OVERVIEW template has structured design sections
+if grep -q "Who Uses This" "${FRAMEWORK_ROOT}/.agentic/lib/init/OVERVIEW.template.md" && \
+   grep -q "Tech Stack" "${FRAMEWORK_ROOT}/.agentic/lib/init/OVERVIEW.template.md" && \
+   grep -q "Phases" "${FRAMEWORK_ROOT}/.agentic/lib/init/OVERVIEW.template.md"; then
+  pass "F-042 AC-020: OVERVIEW template has personas, tech stack, phases sections"
+else
+  fail "F-042 AC-020: OVERVIEW template missing structured design sections"
+fi
+
+# AC-021: completing-work skill mentions decision capture
+if grep -q "decision" "${FRAMEWORK_ROOT}/.claude/skills/completing-work/SKILL.md"; then
+  pass "F-042 AC-021: completing-work skill includes decision capture step"
+else
+  fail "F-042 AC-021: completing-work skill missing decision capture"
+fi
+
+# AC-023: Decision routing in all agent instruction files
+_dr_ok=true
+for _f in \
+  "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/cursorrules.txt" \
+  "${FRAMEWORK_ROOT}/.agentic/lib/agents/copilot/copilot-instructions.md" \
+  "${FRAMEWORK_ROOT}/.agentic/lib/agents/codex/codex-instructions.md"; do
+  if ! grep -q "Decision routing" "$_f" 2>/dev/null; then
+    _dr_ok=false
+    break
+  fi
+done
+if $_dr_ok; then
+  pass "F-042 AC-023: Decision routing documented in all agent instruction files"
+else
+  fail "F-042 AC-023: Decision routing missing from some instruction files"
+fi
+
+# ============================================================
+# F-015: Framework Disconnection Detection (AC-008..013)
+# ============================================================
+echo "--- F-015: Framework Disconnection Detection ---"
+
+# AC-001: Dashboard checks git core.hooksPath
+if grep -q "D_FW_GIT" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh" && \
+   grep -q "core.hooksPath" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "F-015 AC-008: Dashboard checks git core.hooksPath for D_FW_GIT"
+else
+  fail "F-015 AC-008: Dashboard missing git hook path detection"
+fi
+
+# AC-002: Dashboard checks Claude hooks via hooks.json
+if grep -q '\.claude/hooks\.json' "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "F-015 AC-009: Dashboard checks .claude/hooks.json for Claude hook detection"
+else
+  fail "F-015 AC-009: Dashboard should check .claude/hooks.json"
+fi
+
+if grep -q "PreToolUse.*PostToolUse\|fw_types" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "F-015 AC-009: Dashboard validates framework hook event types (PreToolUse, PostToolUse)"
+else
+  fail "F-015 AC-009: Dashboard missing framework hook type validation"
+fi
+
+# AC-003: Dashboard checks skills directory
+if grep -q "D_FW_SKILLS" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh" && \
+   grep -q '.claude/skills' "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "F-015 AC-010: Dashboard checks .claude/skills/ directory"
+else
+  fail "F-015 AC-010: Dashboard missing skills directory check"
+fi
+
+# AC-004: FRAMEWORK DISCONNECTED warning with fix commands
+if grep -q "FRAMEWORK DISCONNECTED" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh" && \
+   grep -q "core.hooksPath" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh" && \
+   grep -q "hooks.json" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh" && \
+   grep -q "ag export claude" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "F-015 AC-011: Dashboard shows FRAMEWORK DISCONNECTED with fix commands"
+else
+  fail "F-015 AC-011: Dashboard missing FRAMEWORK DISCONNECTED or fix commands"
+fi
+
+# AC-005: Raw mode outputs structured framework status
+if grep -q "===FRAMEWORK===" "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "F-015 AC-011b: Dashboard raw mode outputs ===FRAMEWORK=== section"
+else
+  fail "F-015 AC-011b: Dashboard raw mode missing ===FRAMEWORK=== section"
+fi
+
+# AC-006: Root CLAUDE.md has FRAMEWORK DISCONNECTED rule
+if grep -q "FRAMEWORK DISCONNECTED" "${FRAMEWORK_ROOT}/CLAUDE.md" && \
+   grep -q 'restart.*Claude Code\|RESTART' "${FRAMEWORK_ROOT}/CLAUDE.md"; then
+  pass "F-015 AC-012: Root CLAUDE.md has FRAMEWORK DISCONNECTED trigger-action rule"
+else
+  fail "F-015 AC-012: Root CLAUDE.md missing FRAMEWORK DISCONNECTED rule"
+fi
+
+# AC-007: Template CLAUDE.md has same rule
+if grep -q "FRAMEWORK DISCONNECTED" "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md" && \
+   grep -q 'restart.*Claude Code\|RESTART' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/CLAUDE.md"; then
+  pass "F-015 AC-012b: Template CLAUDE.md has FRAMEWORK DISCONNECTED rule"
+else
+  fail "F-015 AC-012b: Template CLAUDE.md missing FRAMEWORK DISCONNECTED rule"
+fi
+
+# AC-008: Session-start skill mentions disconnection
+if grep -q "FRAMEWORK DISCONNECTED\|DISCONNECTED\|disconnected" "${FRAMEWORK_ROOT}/.claude/skills/session-start/SKILL.md" 2>/dev/null; then
+  pass "F-015 AC-013: session-start skill includes disconnection handling"
+else
+  fail "F-015 AC-013: session-start skill missing disconnection handling"
+fi
+
+# AC-009: Functional — dashboard reports connected when hooks.json exists
+if [[ -f "${FRAMEWORK_ROOT}/.claude/hooks.json" ]]; then
+  _dash_output=$(bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh" 2>/dev/null)
+  if echo "$_dash_output" | grep -q "Hooks + skills active"; then
+    pass "F-015 AC-011c: Dashboard reports connected when .claude/hooks.json exists"
+  else
+    fail "F-015 AC-011c: Dashboard reports disconnected despite .claude/hooks.json existing"
+  fi
+else
+  warn "F-015 AC-011c: Skipping functional test — .claude/hooks.json not present"
+fi
+
+# AC-010: Dashboard advises restart after fixing
+if grep -q 'RESTART.*Claude Code\|restart.*Claude' "${FRAMEWORK_ROOT}/.agentic/lib/tools/dashboard.sh"; then
+  pass "F-015 AC-012c: Dashboard advises restart after fixing disconnected hooks"
+else
+  fail "F-015 AC-012c: Dashboard missing restart advice"
+fi
+
 # Summary
 
 # ============================================================

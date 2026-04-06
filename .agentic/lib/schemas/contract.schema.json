@@ -93,6 +93,24 @@
       "enum": ["implementation", "spike", "bugfix", "docs"],
       "description": "Task type determines which Definition of Done checks apply. Default: implementation (all checks required)."
     },
+    "personas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      },
+      "default": [],
+      "description": "Persona IDs this feature serves (defined in personas.yaml)"
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      },
+      "default": [],
+      "description": "Platform IDs this feature targets (defined in personas.yaml)"
+    },
     "tags": {
       "type": "array",
       "items": {
@@ -177,6 +195,29 @@
           "type": "boolean",
           "default": false,
           "description": "Draft assertions are not enforced (exploring lifecycle)"
+        },
+        "personas": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "default": [],
+          "description": "Persona IDs this assertion applies to (empty = all contract personas)"
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "default": [],
+          "description": "Platform IDs this assertion applies to (empty = all contract platforms)"
+        },
+        "capability_ref": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Links assertion to persona capability (format: persona-id:capability-slug)"
         }
       }
     },
@@ -187,6 +228,12 @@
         "name": {
           "type": "string",
           "description": "Scenario title"
+        },
+        "persona": {
+          "type": ["string", "null"],
+          "pattern": "^[a-z0-9-]+$",
+          "default": null,
+          "description": "Persona performing this scenario"
         },
         "given": {
           "type": "string",

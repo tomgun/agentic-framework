@@ -34,5 +34,56 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-023
 
+  - id: AC-003
+    text: "Dashboard detects hooks from .claude/hooks.json"
+    type: structural
+    verify: |
+      grep -q '\.claude/hooks\.json' .agentic/lib/tools/dashboard.sh
+    tests:
+      - tests/validate_framework.sh::dashboard-hooks-detection
+
+  - id: AC-004
+    text: "Dashboard validates framework hook event types in hooks.json"
+    type: structural
+    verify: |
+      grep -q 'fw_types' .agentic/lib/tools/dashboard.sh
+    tests:
+      - tests/validate_framework.sh::dashboard-hooks-event-types
+
+  - id: AC-005
+    text: "Dashboard advises restart after fixing disconnected hooks"
+    type: structural
+    verify: |
+      grep -q 'RESTART.*Claude Code' .agentic/lib/tools/dashboard.sh
+    tests:
+      - tests/validate_framework.sh::dashboard-restart-advice
+
+  - id: AC-006
+    text: "CLAUDE.md templates include restart advice for disconnected hooks"
+    type: structural
+    verify: |
+      grep -q 'restart.*Claude Code' CLAUDE.md &&
+      grep -q 'restart.*Claude Code' .agentic/lib/agents/claude/CLAUDE.md
+    tests:
+      - tests/validate_framework.sh::template-restart-advice
+
+  - id: AC-007
+    text: "Dashboard reports connected when .claude/hooks.json has framework hooks"
+    type: functional
+    verify: |
+      bash .agentic/lib/tools/dashboard.sh 2>/dev/null | grep -q 'Hooks + skills active'
+    tests:
+      - tests/validate_framework.sh::dashboard-functional-connected
+
 nfr_refs: []
-migrations: []
+migrations:
+  - id: M-001
+    date: "2026-04-06"
+    trigger: additive
+    reason: "Add AC-003 to AC-007 for disconnection detection and remediation"
+    changes:
+      - "Added AC-003: Dashboard detects hooks from .claude/hooks.json"
+      - "Added AC-004: Dashboard validates framework hook event types"
+      - "Added AC-005: Dashboard advises restart after fixing"
+      - "Added AC-006: CLAUDE.md templates include restart advice"
+      - "Added AC-007: Functional test for connected state"

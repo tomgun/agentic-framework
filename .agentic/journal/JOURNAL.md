@@ -5046,3 +5046,41 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-06 10:54 - Fix framework disconnection detection
+
+**Why**: False-positive FRAMEWORK DISCONNECTED every session because detection checked wrong file
+
+**What changed**:
+- Dashboard now checks .claude/hooks.json instead of settings.json; added restart advice; AC-003 to AC-007 on F-023
+
+**Next steps**:
+- None
+
+**Blockers**: None
+
+
+### Session: 2026-04-06 11:07 - Artifact remediation for PR #225
+
+**Why**: Two features were implemented without framework workflow — specs, contracts, tests, docs, and instruction file sync were all missing
+
+**What changed**:
+- F-043 contract (16 ACs for persona/platform dimensions), F-015 migration (6 new ACs for framework disconnection detection), FEATURES.md entries, 30+ structural tests in validate_framework.sh, DEVELOPER_GUIDE personas section, HOW_IT_WORKS persona paragraph, ag persona in 6 instruction files (CLAUDE.md x2, cursorrules, copilot, codex, memory-seed), HUMAN_NEEDED PR tracking, writing-specs skill already had persona guidance
+
+**Next steps**:
+- Run full test suite, push to PR #225 branch
+
+**Blockers**: None
+
+### Session: 2026-04-06 13:03 - Test
+
+**Decision**: X over Y
+
+**What changed**:
+- Outcome
+
+**Next steps**:
+- Next
+
+**Blockers**: None
+

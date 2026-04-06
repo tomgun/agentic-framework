@@ -4,12 +4,17 @@
 # Usage:
 #   bash .agentic/tools/journal.sh "Topic" "What changed" "Next steps" "Blockers"
 #   bash .agentic/tools/journal.sh "Topic" "What changed" "Next steps" "Blockers" \
-#       --why "Problem being solved" --feature F-0116 --files 12 --commits abc123
+#       --why "Problem being solved" --decision "Choice made" \
+#       --feature F-0116 --files 12 --commits abc123
 #
 # The --why flag explains the motivation. It prints FIRST — lead with "why", not "what".
-# "What changed" should describe the OUTCOME for the project, not list files or technical details.
-# Good: "Projects can now declare multiple test tiers in STACK.md"
-# Bad:  "Implemented multi-tier test execution in verify.py, 40 new tests"
+# The --decision flag marks an entry as a decision (grep-able via **Decision**:).
+#
+# "What changed" should describe OUTCOMES WITH REASONING — not just what, but why,
+# what alternatives were considered, and what assumptions were made.
+# Good: "Chose PostgreSQL over SQLite — need JSONB for flexible per-persona attributes.
+#        Considered MongoDB but adds ops complexity. Assumes <1M products initially."
+# Bad:  "Updated database config"
 #
 # "Next steps": reference the backlog, don't duplicate the queue.
 # Good: "See backlog (ag backlog list)" or "Next per backlog: F-0201"
@@ -33,10 +38,12 @@ FEATURE=""
 FILES_COUNT=""
 COMMITS=""
 WHY=""
+DECISION=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --why) WHY="$2"; shift 2 ;;
+        --decision) DECISION="$2"; shift 2 ;;
         --feature) FEATURE="$2"; shift 2 ;;
         --files) FILES_COUNT="$2"; shift 2 ;;
         --commits) COMMITS="$2"; shift 2 ;;
@@ -71,6 +78,10 @@ fi
   echo ""
   if [[ -n "$WHY" ]]; then
     echo "**Why**: ${WHY}"
+    echo ""
+  fi
+  if [[ -n "$DECISION" ]]; then
+    echo "**Decision**: ${DECISION}"
     echo ""
   fi
   echo "**What changed**:"

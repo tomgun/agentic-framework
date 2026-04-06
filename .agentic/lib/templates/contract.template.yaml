@@ -29,6 +29,8 @@ assertions:
 # profile: both           # formal | discovery | both
 # protection: none        # none | advisory | contract
 # category: uncategorized
+# personas: []            # Persona IDs from spec/personas.yaml (e.g., [consumer, company])
+# platforms: []           # Platform IDs from spec/personas.yaml (e.g., [pwa, web])
 # consolidated_from: []
 # parent: null
 # children: []
