@@ -161,7 +161,43 @@ cmd_implement() {
                 echo "  Do NOT assess the plan yourself — the review agents do this with fresh context."
                 exit 1
             else
-                echo -e "${GREEN}Approved plan: EXISTS${NC}"
+                # T-0097: Review evidence gate — verify APPROVED was earned, not faked.
+                # Check for review-pending sentinel AND review.md with structural markers.
+                # Keep in sync with gate.py check_plan_review_evidence() — same markers + threshold.
+                local review_sentinel="$ROOT_DIR/.agentic/session/review-pending-${feature_id}"
+                local review_file="$ROOT_DIR/.agentic/work/${feature_id}/review.md"
+                if [ -f "$review_sentinel" ]; then
+                    # Sentinel exists — check if review evidence was created
+                    if [ -f "$review_file" ]; then
+                        local marker_count=0
+                        for marker in Critic Advocate Synthesis Convergence Analysis Findings Recommendation; do
+                            grep -qi "$marker" "$review_file" 2>/dev/null && marker_count=$((marker_count + 1))
+                        done
+                        if [ "$marker_count" -ge 2 ]; then
+                            # Evidence verified — remove sentinel so gate_pretool
+                            # (which also checks this sentinel) won't re-block code edits.
+                            rm -f "$review_sentinel" 2>/dev/null || true
+                            echo -e "${GREEN}Approved plan: EXISTS (review evidence verified)${NC}"
+                        else
+                            echo -e "${RED}BLOCKED: Plan is APPROVED but review evidence is incomplete${NC}"
+                            echo ""
+                            echo "  review.md exists but lacks structural markers (found $marker_count/2 required)."
+                            echo "  Expected markers: Critic, Advocate, Synthesis, Convergence, etc."
+                            echo "  Re-run dialectical review with Critic + Advocate agents."
+                            exit 1
+                        fi
+                    else
+                        echo -e "${RED}BLOCKED: Plan is APPROVED but no review evidence found${NC}"
+                        echo ""
+                        echo "  A review-pending sentinel exists but .agentic/work/${feature_id}/review.md is missing."
+                        echo "  The plan may have been fake-approved (DRAFT→APPROVED without reviewers)."
+                        echo "  REQUIRED: Run dialectical review (Critic + Advocate agents),"
+                        echo "  save findings to .agentic/work/${feature_id}/review.md, then retry."
+                        exit 1
+                    fi
+                else
+                    echo -e "${GREEN}Approved plan: EXISTS${NC}"
+                fi
             fi
         else
             echo -e "${RED}BLOCKED: No approved plan found (plan_review_enabled: yes)${NC}"

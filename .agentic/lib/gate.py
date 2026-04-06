@@ -426,7 +426,8 @@ def check_plan_review_evidence(project_root: Path) -> GateResult:
         if review_file.exists():
             try:
                 content = review_file.read_text()
-                # Look for structural markers that indicate a real review
+                # Look for structural markers that indicate a real review.
+                # Keep in sync with implement.sh T-0097 evidence gate — same markers + threshold.
                 markers = ["Critic", "Advocate", "Synthesis", "Convergence",
                            "Analysis", "Findings", "Recommendation"]
                 found = sum(1 for m in markers if m.lower() in content.lower())
@@ -784,14 +785,11 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                     "status to APPROVED before writing code.")
                 return _pretool_deny(draft_check)
 
-            # Change 4: Block code edits when plan is APPROVED without review evidence.
-            # Prevents fake-approval. Advisory in formal, blocking in autonomous_formal.
+            # Change 4 + T-0097: Block code edits when plan is APPROVED without review evidence.
+            # Prevents fake-approval. Blocking for ALL profiles when plan_review_enabled: yes.
             evidence_check = check_plan_review_evidence(project_root)
             if evidence_check.decision == "deny":
-                if profile == "autonomous_formal":
-                    return _pretool_deny(evidence_check)
-                # Formal mode: advisory (warn but allow)
-                return GateResult.allow(evidence_check.reasons)
+                return _pretool_deny(evidence_check)
 
             # F-0300 R1: Block code writes when no active work item in deferred-git mode
             # With git_mode=deferred, pre-commit gates don't fire, so this is the
