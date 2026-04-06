@@ -8,6 +8,26 @@
 
 ## Recent Contributions
 
+### Persona & Platform Dimensions for Contract Specs (2026-04-06)
+
+**User insight 1 — Multi-sided products need structured perspectives**: User planned a price alert web service with five distinct personas (consumer, consumer-offer-content-maker, company, internal-reporting, internal-maintenance) across three platforms (PWA, React Native, web). The existing spec system had no structured way to express who a feature serves or where it runs — actors were implicit in scenario text, not queryable. This gap applies to any marketplace, SaaS-with-roles, or B2B2C product.
+
+**User insight 2 — "Persona" over "actor"**: Initial design used UML term "actor". User consulted Gemini and challenged the terminology. "Persona" was chosen as more product-native and aligned with modern product development practices. The term affects schema field names, CLI commands, and documentation — worth getting right early.
+
+**User insight 3 — Capabilities as preliminary spec seeds**: User requested that persona capabilities not be excluded (as initially planned to avoid sync drift with assertions), but instead serve as a preliminary spec list. This shaped the `ag persona generate` command: capabilities → draft assertions with `capability_ref` linking back to the source. Capabilities are the high-level checklist; assertions become the detailed, testable version.
+
+**User insight 4 — Capabilities evolve and need migration protection**: User noted that projects evolve and specs need migration when they change — this applies to capabilities too. Led to `personas.yaml` getting its own `protection: contract` + `migrations:` system with pre-commit enforcement (Check 24), matching the contract migration pattern.
+
+### Enforcement Wiring Detection at Session Start (2026-04-06)
+
+**User insight 5 — "Why don't the hooks prevent this?"**: After the persona feature was committed without specs, tests, or docs, user asked why the enforcement hooks didn't catch it. Investigation revealed all three enforcement layers (git hooks, ag commit CLI, Claude hooks) were disconnected — the rules existed but the wiring was missing. Led to dashboard enforcement check.
+
+**User insight 6 — "Don't we have a way to check at startup?"**: User identified that the dashboard (the one mandatory entry point) was blind to the most critical failure mode. Led to adding enforcement wiring checks to `dashboard.sh` with `🚨 ENFORCEMENT DISCONNECTED` warning.
+
+**User insight 7 — "The agent should offer to fix it"**: User pushed beyond passive reporting to active remediation. Dashboard now includes `OFFER TO FIX` directive and `FIX:` prefix commands. CLAUDE.md and session-start skill instruct the agent to offer immediate fixes before any other work.
+
+**User insight 8 — "Make those LLM-optimized"**: User insisted on trigger→action format instead of explanatory prose. Dashboard output, CLAUDE.md, and skill all tightened to single-line rules the LLM can parse and act on directly.
+
 ### F-041 Intelligence Engine — Smarter Than Vanilla Claude (v0.77.0)
 
 **User insight 1 — Intelligence is core framework value**: "The most important features I think is that the framework writes specs/ac (incl. NFR) and code and test based on those... all token optimization things and the user experience for the developer; high quality code also in discovery and automatic modes." (Mar 22) — Established that token optimization and quality intelligence are core value, not optional extras.
