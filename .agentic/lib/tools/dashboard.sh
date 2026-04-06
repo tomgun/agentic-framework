@@ -263,6 +263,44 @@ if [[ -f "$TOOLS_DIR/design-trace.sh" ]]; then
     D_DESIGN_TRACE=$(bash "$TOOLS_DIR/design-trace.sh" --quiet 2>/dev/null) || D_DESIGN_TRACE=""
 fi
 
+# ENFORCEMENT WIRING (are hooks actually connected?)
+D_ENFORCE_GIT="ok"
+D_ENFORCE_CLAUDE="ok"
+D_ENFORCE_ISSUES=""
+
+# Check 1: Git pre-commit hooks — core.hooksPath must point to .agentic/hooks
+if [[ "$D_GIT_MODE" == "active" ]] && command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+    _hooks_path=$(git config core.hooksPath 2>/dev/null || echo "")
+    if [[ -z "$_hooks_path" ]]; then
+        D_ENFORCE_GIT="disconnected"
+        D_ENFORCE_ISSUES="${D_ENFORCE_ISSUES}git-hooks "
+    elif [[ ! -f "$PROJECT_ROOT/$_hooks_path/pre-commit" ]] && [[ ! -f "$_hooks_path/pre-commit" ]]; then
+        D_ENFORCE_GIT="broken"
+        D_ENFORCE_ISSUES="${D_ENFORCE_ISSUES}git-hooks "
+    fi
+fi
+
+# Check 2: Claude hooks — settings.json or settings.local.json must define hooks
+_claude_hooks_found=false
+for _sf in "$PROJECT_ROOT/.claude/settings.json" "$PROJECT_ROOT/.claude/settings.local.json"; do
+    if [[ -f "$_sf" ]] && command -v python3 >/dev/null 2>&1; then
+        _has_hooks=$(_py -c "
+import json, sys
+try:
+    d = json.load(open('$_sf'))
+    hooks = d.get('hooks', [])
+    # hooks can be a list of hook definitions
+    print('yes' if hooks else 'no')
+except: print('no')
+" 2>/dev/null) || _has_hooks="no"
+        [[ "$_has_hooks" == "yes" ]] && _claude_hooks_found=true && break
+    fi
+done
+if ! $_claude_hooks_found; then
+    D_ENFORCE_CLAUDE="disconnected"
+    D_ENFORCE_ISSUES="${D_ENFORCE_ISSUES}claude-hooks "
+fi
+
 # UPGRADE
 D_UPGRADE="none"
 [[ -f "$PROJECT_ROOT/.agentic/.upgrade_pending" ]] && D_UPGRADE="pending"
@@ -381,6 +419,10 @@ if $RAW_MODE; then
     echo "$D_STALE"
     echo "===COMPLETION_STALE==="
     echo "$D_COMPLETION_STALE"
+    echo "===ENFORCEMENT==="
+    echo "git=$D_ENFORCE_GIT"
+    echo "claude=$D_ENFORCE_CLAUDE"
+    echo "issues=$D_ENFORCE_ISSUES"
     exit 0
 fi
 
@@ -511,6 +553,18 @@ if [[ -n "$D_CAP_METRICS" ]]; then
 fi
 if [[ -n "$D_DESIGN_TRACE" ]]; then
     echo "📐 Design trace   $D_DESIGN_TRACE — run: design-trace.sh"
+fi
+# Enforcement wiring — loud warning if disconnected
+if [[ -n "$D_ENFORCE_ISSUES" ]]; then
+    echo "🚨 ENFORCEMENT    DISCONNECTED — quality gates are not active!"
+    if [[ "$D_ENFORCE_GIT" != "ok" ]]; then
+        echo "                  Git hooks: core.hooksPath not set — run: git config core.hooksPath .agentic/hooks"
+    fi
+    if [[ "$D_ENFORCE_CLAUDE" != "ok" ]]; then
+        echo "                  Claude hooks: no hooks in settings — run: cp .agentic/lib/claude-hooks/hooks.json .claude/"
+    fi
+else
+    echo "✅ Enforcement    Git hooks + Claude hooks active"
 fi
 echo "✅ Health         $health_line"
 echo ""
