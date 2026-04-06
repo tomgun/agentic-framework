@@ -163,6 +163,7 @@ cmd_implement() {
             else
                 # T-0097: Review evidence gate — verify APPROVED was earned, not faked.
                 # Check for review-pending sentinel AND review.md with structural markers.
+                # Keep in sync with gate.py check_plan_review_evidence() — same markers + threshold.
                 local review_sentinel="$ROOT_DIR/.agentic/session/review-pending-${feature_id}"
                 local review_file="$ROOT_DIR/.agentic/work/${feature_id}/review.md"
                 if [ -f "$review_sentinel" ]; then
@@ -173,7 +174,8 @@ cmd_implement() {
                             grep -qi "$marker" "$review_file" 2>/dev/null && marker_count=$((marker_count + 1))
                         done
                         if [ "$marker_count" -ge 2 ]; then
-                            # Evidence verified — remove sentinel
+                            # Evidence verified — remove sentinel so gate_pretool
+                            # (which also checks this sentinel) won't re-block code edits.
                             rm -f "$review_sentinel" 2>/dev/null || true
                             echo -e "${GREEN}Approved plan: EXISTS (review evidence verified)${NC}"
                         else

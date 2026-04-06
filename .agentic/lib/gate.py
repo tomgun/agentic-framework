@@ -426,7 +426,8 @@ def check_plan_review_evidence(project_root: Path) -> GateResult:
         if review_file.exists():
             try:
                 content = review_file.read_text()
-                # Look for structural markers that indicate a real review
+                # Look for structural markers that indicate a real review.
+                # Keep in sync with implement.sh T-0097 evidence gate — same markers + threshold.
                 markers = ["Critic", "Advocate", "Synthesis", "Convergence",
                            "Analysis", "Findings", "Recommendation"]
                 found = sum(1 for m in markers if m.lower() in content.lower())
