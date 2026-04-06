@@ -5098,3 +5098,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-06 14:55 - T-0097 ExitPlanMode migration gate
+
+**Decision**: Block all profiles equally — advisory fallback for formal profile was a security gap
+
+**What changed**:
+- Made review evidence check blocking for all profiles in gate.py, added evidence gate to ag implement (checks review-pending sentinel + review.md markers), fixed bash 3.2 case syntax in intel.sh, added E-PLAN-010/011 regression tests
+
+**Next steps**:
+- Commit and create PR
+
+**Blockers**: None
+

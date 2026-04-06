@@ -5522,6 +5522,24 @@ else
   fail "E-PLAN-009: done.sh missing plan backstop gate"
 fi
 
+# E-PLAN-010: gate.py evidence check blocks ALL profiles (T-0097 migration gate)
+# Previously only blocked autonomous_formal; formal got advisory-only (warn but allow).
+# With T-0097, fake-approval is blocked for all profiles when plan_review_enabled: yes.
+if grep -q "check_plan_review_evidence" "${FRAMEWORK_ROOT}/.agentic/lib/gate.py" && \
+   ! grep -q "advisory.*warn but allow" "${FRAMEWORK_ROOT}/.agentic/lib/gate.py"; then
+  pass "E-PLAN-010: gate.py evidence check blocks all profiles (no advisory fallback)"
+else
+  fail "E-PLAN-010: gate.py evidence check still has advisory fallback — fake-approval possible"
+fi
+
+# E-PLAN-011: implement.sh checks review evidence, not just plan status
+if grep -q "review-pending\|review.md\|review_sentinel\|review evidence" \
+   "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/implement.sh" 2>/dev/null; then
+  pass "E-PLAN-011: implement.sh has review evidence gate"
+else
+  fail "E-PLAN-011: implement.sh missing review evidence gate — agent can fake-approve and implement"
+fi
+
 # ============================================================
 # WORKFLOW ENFORCEMENT: Documentation Update Chain
 # Tests that doc update enforcement exists at multiple layers.

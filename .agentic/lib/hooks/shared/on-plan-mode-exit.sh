@@ -10,7 +10,9 @@
 #   3. Detect profile + convergence mode for profile-aware messaging
 #   4. Output banner with next-step instructions (review before implementing)
 #
-# Exit code: always 0 (advisory — never blocks the agent)
+# Exit code: always 0 (hook is advisory but downstream gates in gate.py
+# and implement.sh structurally block code edits/implementation without
+# review evidence — see T-0097 migration gate).
 
 # Bootstrap: ensure lib/ is extracted (inline check avoids fork when lib exists)
 [[ -d "${CLAUDE_PROJECT_DIR:-.}/.agentic/lib/tools" ]] || bash "${CLAUDE_PROJECT_DIR:-.}/.agentic/bootstrap.sh" 2>/dev/null || true

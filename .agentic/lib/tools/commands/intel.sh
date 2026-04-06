@@ -817,7 +817,7 @@ _intel_scan_check() {
         stale_files=$(cd "$ROOT_DIR" && git ls-files --cached --others --exclude-standard 2>/dev/null \
             | while IFS= read -r f; do
                 # Skip session/cache files — they change every tool use and aren't project code
-                case "$f" in .agentic/session/*|.agentic/.cache/*) continue ;; esac
+                if [[ "$f" == .agentic/session/* || "$f" == .agentic/.cache/* ]]; then continue; fi
                 [[ -f "$f" && "$f" -nt "$ANATOMY_FILE" ]] && echo "$f" && break
               done)
     else
