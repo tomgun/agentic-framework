@@ -82,19 +82,14 @@ _No active items_
 
 
 ### HN-0082: PR #224: AC-level status tracking + consolidate F-037/038/039
-- **Type**: pr_review
-- **Added**: 2026-04-03
-- **Context**: Review planned ACs on F-018/F-030, migration entries, and schema evolution
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
+- **Resolved**: 2026-04-06
+- **Outcome**: PR #224 merged
 
 
 
 ### HN-0083: PR #225: Persona dimensions + framework disconnection detection
-- **Type**: pr_review
-- **Added**: 2026-04-06
-- **Context**: feat/persona-platform-specs — F-043 persona & platform dimensions for contracts, F-015 framework wiring detection at session start. Remediation artifacts added.
-- **Why human needed**: Requires human action/decision
+- **Resolved**: 2026-04-06
+- **Outcome**: PR #225 merged
 - **Impact**: Blocking: [specify what's blocked]
 
 ## Resolved
