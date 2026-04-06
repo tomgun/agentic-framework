@@ -284,16 +284,22 @@ if [[ "$D_GIT_MODE" == "active" ]] && command -v git >/dev/null 2>&1 && git rev-
     fi
 fi
 
-# Check 2: Claude hooks — settings.json or settings.local.json must define hooks
+# Check 2: Claude hooks — settings must define framework hooks (PreToolUse, PostToolUse, etc.)
 _claude_hooks_found=false
 for _sf in "$PROJECT_ROOT/.claude/settings.json" "$PROJECT_ROOT/.claude/settings.local.json"; do
     if [[ -f "$_sf" ]] && command -v python3 >/dev/null 2>&1; then
-        _has_hooks=$(_py -c "
-import json, sys
+        _has_hooks=$(_AG_SETTINGS_FILE="$_sf" _py -c "
+import json, os
 try:
-    d = json.load(open('$_sf'))
+    d = json.load(open(os.environ['_AG_SETTINGS_FILE']))
     hooks = d.get('hooks', [])
-    print('yes' if hooks else 'no')
+    if not hooks:
+        print('no')
+    else:
+        # Check for framework hook types, not just any hooks
+        fw_types = {'PreToolUse', 'PostToolUse', 'UserPromptSubmit', 'Stop', 'PreCompact', 'SessionStart'}
+        found = any(h.get('type','') in fw_types or h.get('matcher','') in fw_types for h in hooks if isinstance(h, dict))
+        print('yes' if found else 'no')
 except: print('no')
 " 2>/dev/null) || _has_hooks="no"
         [[ "$_has_hooks" == "yes" ]] && _claude_hooks_found=true && break
@@ -310,7 +316,7 @@ if [[ ! -d "$_skills_dir" ]]; then
     D_FW_SKILLS="missing"
     D_FW_ISSUES="${D_FW_ISSUES}skills "
 else
-    _skill_count=$(find "$_skills_dir" -maxdepth 1 -type d 2>/dev/null | tail -n +2 | wc -l | tr -d ' ')
+    _skill_count=$(ls -d "$_skills_dir"/*/ 2>/dev/null | wc -l | tr -d ' ')
     if [[ "$_skill_count" -eq 0 ]]; then
         D_FW_SKILLS="empty"
         D_FW_ISSUES="${D_FW_ISSUES}skills "

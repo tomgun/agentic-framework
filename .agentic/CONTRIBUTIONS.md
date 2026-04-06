@@ -18,15 +18,17 @@
 
 **User insight 4 — Capabilities evolve and need migration protection**: User noted that projects evolve and specs need migration when they change — this applies to capabilities too. Led to `personas.yaml` getting its own `protection: contract` + `migrations:` system with pre-commit enforcement (Check 24), matching the contract migration pattern.
 
-### Enforcement Wiring Detection at Session Start (2026-04-06)
+### Framework Disconnection Detection at Session Start (2026-04-06)
 
-**User insight 5 — "Why don't the hooks prevent this?"**: After the persona feature was committed without specs, tests, or docs, user asked why the enforcement hooks didn't catch it. Investigation revealed all three enforcement layers (git hooks, ag commit CLI, Claude hooks) were disconnected — the rules existed but the wiring was missing. Led to dashboard enforcement check.
+**User insight 5 — "Why don't the hooks prevent this?"**: After the persona feature was committed without specs, tests, or docs, user asked why the enforcement hooks didn't catch it. Investigation revealed all three layers (git hooks, ag commit CLI, Claude hooks) were disconnected — the rules existed but the wiring was missing. Led to dashboard framework wiring check.
 
-**User insight 6 — "Don't we have a way to check at startup?"**: User identified that the dashboard (the one mandatory entry point) was blind to the most critical failure mode. Led to adding enforcement wiring checks to `dashboard.sh` with `🚨 ENFORCEMENT DISCONNECTED` warning.
+**User insight 6 — "Don't we have a way to check at startup?"**: User identified that the dashboard (the one mandatory entry point) was blind to the most critical failure mode. Led to adding framework wiring checks to `dashboard.sh`.
 
-**User insight 7 — "The agent should offer to fix it"**: User pushed beyond passive reporting to active remediation. Dashboard now includes `OFFER TO FIX` directive and `FIX:` prefix commands. CLAUDE.md and session-start skill instruct the agent to offer immediate fixes before any other work.
+**User insight 7 — "The agent should offer to fix it"**: User pushed beyond passive reporting to active remediation. Dashboard now includes `OFFER TO FIX` directive and `FIX` commands labeled by what they restore (gates, intelligence, skills). CLAUDE.md and session-start skill instruct the agent to offer immediate fixes before any other work.
 
 **User insight 8 — "Make those LLM-optimized"**: User insisted on trigger→action format instead of explanatory prose. Dashboard output, CLAUDE.md, and skill all tightened to single-line rules the LLM can parse and act on directly.
+
+**User insight 9 — "Hooks aren't just gates — they're the framework"**: User pointed out that hooks serve intelligence injection (planning, design, implementation guidance) and workflow automation, not just quality gates. Without them the agent is vanilla Claude. Reframed from "enforcement disconnected" to "framework disconnected" — three checks: gates (git hooks), intelligence (Claude hooks), skills (workflow automation).
 
 ### F-041 Intelligence Engine — Smarter Than Vanilla Claude (v0.77.0)
 
