@@ -20,7 +20,7 @@ Output the result **verbatim** as your first text response.
 No preamble, no narration, no reformatting.
 
 After outputting, act on critical flags (priority order):
-1. `🚨 ENFORCEMENT DISCONNECTED` → offer to run the `FIX:` commands shown, then re-run dashboard to confirm
+1. `🚨 FRAMEWORK DISCONNECTED` → offer to run the `FIX` commands shown, then re-run dashboard to confirm
 2. Upgrade pending → handle before new work
 3. Interrupted work → focus on recovery
 4. Memory stale → refresh
