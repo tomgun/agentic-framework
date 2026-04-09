@@ -5416,3 +5416,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 20:55 - Fix Cursor Stop hook missing .correction_hint_shown cleanup
+
+**Why**: Sentinel was gitignored but not cleared at session end by Cursor hook, so it could persist across sessions and suppress the correction hint permanently.
+
+**What changed**:
+- Added rm -f for .correction_hint_shown in Cursor enforcement.sh Stop handler — parity with Claude Stop.sh which already clears it.
+
+**Next steps**:
+- Done
+
+**Blockers**: None
+

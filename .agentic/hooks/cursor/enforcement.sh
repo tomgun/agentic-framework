@@ -135,6 +135,7 @@ case "$HOOK_EVENT" in
     rm -f .agentic/session/.plan-advisory-shown 2>/dev/null || true
     rm -f .agentic/session/.spec-first-checked 2>/dev/null || true
     rm -f .agentic/session/.spec-first-skipped 2>/dev/null || true
+    rm -f .agentic/session/.correction_hint_shown 2>/dev/null || true
     rm -f .agentic/session/decision-buffer.log 2>/dev/null || true
     rm -f .agentic/session/pending-decision.txt 2>/dev/null || true
     ;;
