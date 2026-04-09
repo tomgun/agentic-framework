@@ -1,0 +1,53 @@
+---
+description: "Core agentic framework workflow — ag commands, trigger words, rules"
+alwaysApply: true
+---
+
+# Agentic Framework
+
+This repo uses the `.agentic/` development framework. Read first: AGENTS.md (if present), CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/*
+
+## Workflow
+
+All work is managed by `ag` commands. Never skip steps.
+
+- `ag start F-XXXX "Title"` — begin feature | `ag status` — current work | `ag info F-XXXX` — details
+- `ag transition F-XXXX <state>` | `ag check F-XXXX` | `ag verify F-XXXX` | `ag done F-XXXX`
+- `ag commit` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag auto task|epic|verify|crunch`
+- `ag intel remember "..." --context "..."` | `ag intel architecture|spec|implement|test [F-XXXX]`
+
+Artifacts go to `.agentic/work/F-XXXX/`: plan.md, spec.md, review.md, journal.md, verification.json.
+
+## Trigger Words
+
+| User intent | Action |
+|-------------|--------|
+| Build / implement / add / create | `ag start F-XXXX "Title"`, plan, then implement |
+| Large (>10 files) | TOO BIG. Break into 3-5 smaller tasks |
+| Fix / debug / troubleshoot | Write failing test FIRST |
+| Commit / push / ship | `ag commit` |
+| Done / complete / merged | `ag done F-XXXX` |
+| Idea / remember / todo | `ag todo "description"` |
+| Backlog / what's next | `ag backlog` |
+| Spec / contract / AC | `ag spec F-XXXX` or `ag contract check F-XXXX` |
+| Decompose / break down | `ag decompose F-XXXX` |
+| Batch / churn / all tasks | `ag auto crunch` (NEVER multi-feature code outside ag auto) |
+| User correction / preference | `ag intel remember "..." --context "..."` |
+
+## Rules
+
+- Never auto-commit in interactive sessions. Show changes to human first.
+- PR by default (check `git_workflow` in STACK.md).
+- Add/update tests for new/changed logic. Write tests alongside code.
+- Spec + code + tests + docs = done.
+- Keep changes small (max 5-10 files per commit).
+- No feature inflation: improvements to existing features stay on those features.
+
+## Token-Efficient Scripts (use these, never edit state files directly)
+
+- `bash .agentic/lib/tools/status.sh focus "Task"` → STATUS.md
+- `bash .agentic/lib/tools/journal.sh "Topic" "Outcomes" "Next" "Blockers" --why "Problem"` → JOURNAL.md
+- `bash .agentic/lib/tools/blocker.sh add "Title" "type" "Details"` → HUMAN_NEEDED.md
+- `bash .agentic/lib/tools/feature.sh cap add "Name" "Description"` → FEATURES.md
+- `ag todo "Idea"` → TODO.md

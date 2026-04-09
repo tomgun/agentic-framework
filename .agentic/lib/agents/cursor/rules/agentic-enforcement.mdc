@@ -1,0 +1,39 @@
+---
+description: "Enforcement hierarchy, gates, and hook details — load when discussing hooks, gates, quality enforcement, or workflow automation"
+alwaysApply: false
+---
+
+# Enforcement Hierarchy
+
+1. **Cursor hooks** (real-time) — `.cursor/hooks.json` wires PreToolUse, PostToolUse, Stop, UserPromptSubmit, SessionStart
+2. **Skills** (just-in-time) — `.cursor/skills/` loaded when relevant to current task
+3. **`ag` commands** (workflow gates) — validate preconditions before state transitions
+4. **Pre-commit hooks** (git-level) — safety net, catches violations from any tool
+5. **Instruction files** (behavioral) — `.cursor/rules/*.mdc` guide behavior, no structural enforcement
+
+## Hook Events
+
+- **PreToolUse**: Blocks destructive shell ops, enforces plan approval gate (code edits blocked without approved plan when `plan_review_enabled=yes`), spec-before-code ordering in formal profiles
+- **PostToolUse**: Detects plan review evidence (Critic/Advocate markers), validates plan content (ACs + tests mentioned), resolves pending decisions
+- **UserPromptSubmit**: Injects project context, detects decision/instruction/correction signals for auto-capture to project-memory.yaml, plan advisory
+- **Stop**: Verification gate, decision buffer audit (warns about uncaptured decisions), sentinel cleanup
+- **SessionStart**: Displays framework version, current focus, active feature, uncommitted changes
+
+## Sentinels (session-scoped files in `.agentic/session/`)
+
+- `.plan-approved` — created when review evidence found, allows code edits
+- `.plan-review-skipped` — created by `ag plan skip`, bypasses plan gate
+- `.spec-first-skipped` — created by `ag plan skip`, bypasses spec-before-code
+- `.spec-first-checked` — one-time sentinel after first spec-before-code check
+- `.plan-advisory-shown` — one-time plan review reminder
+
+## Key Gates
+
+- `ag implement F-XXXX` — requires approved plan + spec artifacts
+- `ag commit` — runs quality checks, shows diff, waits for human
+- `ag done F-XXXX` — doc gate, VERSION bump, state flush
+- `ag transition F-XXXX <state>` — validates artifacts exist for target state
+
+## Decision Auto-Capture
+
+User instructions ("always use X", "never push Y"), decisions ("let's go with"), corrections ("no, don't"), and confirmations are auto-detected and written to `project-memory.yaml`. Use `ag intel memory` to view, `ag intel decisions` for decision history.

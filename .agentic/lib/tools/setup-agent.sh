@@ -44,13 +44,14 @@ show_help() {
   echo ""
   echo "Auto-Loaded Files:"
   echo "  claude         Create CLAUDE.md + .claude/ (hooks, skills, subagents)"
-  echo "  cursor         Create .cursorrules for Cursor"
+  echo "  cursor         Create .cursorrules + .cursor/ (rules, hooks, skills)"
   echo "  copilot        Create .github/copilot-instructions.md for GitHub Copilot"
   echo "  codex          Create .codex/instructions.md for OpenAI Codex CLI"
   echo "  all            Create files for all tools"
   echo ""
   echo "Multi-Agent Setup:"
   echo "  cursor-agents  Create .cursor/agents/ with specialized role definitions"
+  echo "  cursor-mcp     Create .cursor/mcp.json template for MCP servers"
   echo "  pipeline       Create pipeline infrastructure (AGENTS_ACTIVE.md, etc.)"
   echo ""
   echo "Examples:"
@@ -166,12 +167,45 @@ EOF
     echo "  Cursor will now auto-load framework instructions."
   fi
 
-  # Also create .cursor/rules/agentic.mdc if .cursor exists
-  if [[ -d "$PROJECT_ROOT/.cursor" ]] || [[ -d "$PROJECT_ROOT/.cursor/rules" ]]; then
-    mkdir -p "$PROJECT_ROOT/.cursor/rules"
-    if [[ -f "$AGENTIC_DIR/agents/cursor/agentic-framework.mdc" ]]; then
-      cp "$AGENTIC_DIR/agents/cursor/agentic-framework.mdc" "$PROJECT_ROOT/.cursor/rules/"
-      echo -e "${GREEN}✓ Also created .cursor/rules/agentic-framework.mdc${NC}"
+  # Create .cursor/hooks.json (wires enforcement + context hooks)
+  local hooks_src="$AGENTIC_DIR/agents/cursor/hooks.json"
+  if [[ -f "$hooks_src" ]]; then
+    mkdir -p "$PROJECT_ROOT/.cursor"
+    if [[ -f "$PROJECT_ROOT/.cursor/hooks.json" ]]; then
+      echo -e "${YELLOW}⚠ .cursor/hooks.json already exists. Backing up to hooks.json.bak${NC}"
+      cp "$PROJECT_ROOT/.cursor/hooks.json" "$PROJECT_ROOT/.cursor/hooks.json.bak"
+    fi
+    cp "$hooks_src" "$PROJECT_ROOT/.cursor/hooks.json"
+    echo -e "${GREEN}✓ Created .cursor/hooks.json (enforcement + context hooks)${NC}"
+  fi
+
+  # Create .cursor/rules/ with all .mdc templates (Cursor v0.47+ standard)
+  mkdir -p "$PROJECT_ROOT/.cursor/rules"
+  local mdc_count=0
+  local mdc_dir="$AGENTIC_DIR/agents/cursor/rules"
+  if [[ -d "$mdc_dir" ]]; then
+    for mdc_file in "$mdc_dir"/*.mdc; do
+      [[ -f "$mdc_file" ]] || continue
+      cp "$mdc_file" "$PROJECT_ROOT/.cursor/rules/"
+      mdc_count=$((mdc_count + 1))
+    done
+  fi
+  # Also copy legacy agentic-framework.mdc if it exists and wasn't in rules/
+  if [[ -f "$AGENTIC_DIR/agents/cursor/agentic-framework.mdc" && ! -f "$PROJECT_ROOT/.cursor/rules/agentic-framework.mdc" ]]; then
+    cp "$AGENTIC_DIR/agents/cursor/agentic-framework.mdc" "$PROJECT_ROOT/.cursor/rules/"
+    mdc_count=$((mdc_count + 1))
+  fi
+  if [[ "$mdc_count" -gt 0 ]]; then
+    echo -e "${GREEN}✓ Created ${mdc_count} rules in .cursor/rules/ (Cursor v0.47+ format)${NC}"
+  fi
+
+  # Generate .cursor/skills/ from Claude skill templates
+  local skills_gen="$SCRIPT_DIR/generate-cursor-skills.sh"
+  if [[ -f "$skills_gen" ]]; then
+    local skills_output
+    skills_output=$(bash "$skills_gen" "$PROJECT_ROOT/.cursor/skills" 2>&1) || true
+    if [[ "$skills_output" =~ ([0-9]+)\ skills ]]; then
+      echo -e "${GREEN}✓ Generated ${BASH_REMATCH[1]} skills in .cursor/skills/${NC}"
     fi
   fi
 }
@@ -273,17 +307,20 @@ EOF
 
 setup_cursor_agents() {
   echo -e "${BLUE}Setting up Cursor specialized agents...${NC}"
-  
+
   mkdir -p "$PROJECT_ROOT/.cursor/agents"
-  
+
   ROLES_DIR="$AGENTIC_DIR/agents/roles"
-  
+
   if [[ ! -d "$ROLES_DIR" ]]; then
     echo -e "${RED}✗ Role definitions not found at $ROLES_DIR${NC}"
     return 1
   fi
-  
-  # Copy each role as a Cursor agent file (skip README and deprecated roles)
+
+  # Read-only agents (no code edits, only exploration/review)
+  local readonly_agents="explore-agent research-agent review-agent plan-critic-agent plan-advocate-agent plan-reviewer-agent"
+
+  # Copy each role as a Cursor agent with Cursor-compatible frontmatter
   local copied=0
   local skipped=0
   for role_file in "$ROLES_DIR"/*.md; do
@@ -298,12 +335,37 @@ setup_cursor_agents() {
       fi
       # Convert snake_case to kebab-case for Cursor
       agent_name=$(echo "$filename" | sed 's/_/-/g')
-      cp "$role_file" "$PROJECT_ROOT/.cursor/agents/$agent_name"
-      echo -e "${GREEN}  ✓${NC} Created .cursor/agents/$agent_name"
+      local agent_basename="${agent_name%.md}"
+
+      # Extract summary from original frontmatter
+      local summary=""
+      summary=$(sed -n 's/^summary: *"\(.*\)"/\1/p' "$role_file" | head -1)
+
+      # Determine if readonly
+      local is_readonly="false"
+      if echo "$readonly_agents" | grep -qw "$agent_basename"; then
+        is_readonly="true"
+      fi
+
+      # Write Cursor-compatible frontmatter + original body (skip old frontmatter)
+      local target="$PROJECT_ROOT/.cursor/agents/$agent_name"
+      {
+        echo "---"
+        echo "model: auto"
+        echo 'tools: ["parent:*"]'
+        echo "readonly: $is_readonly"
+        echo "---"
+        [[ -n "$summary" ]] && echo "<!-- summary: $summary -->"
+        echo ""
+        # Strip original YAML frontmatter (between --- delimiters) and output body
+        sed '1{/^---$/!b};/^---$/,/^---$/d' "$role_file"
+      } > "$target"
+
+      echo -e "${GREEN}  ✓${NC} Created .cursor/agents/$agent_name (readonly=$is_readonly)"
       copied=$((copied + 1))
     fi
   done
-  
+
   echo -e "${GREEN}✓ Created ${copied} Cursor agents in .cursor/agents/ (${skipped} deprecated skipped)${NC}"
   echo "  Reference these agents in Cursor with @agent-name"
   echo "  See: .agentic/agents/cursor/agents-setup.md for usage"
@@ -433,6 +495,20 @@ case "$TOOL" in
     ;;
   cursor-agents)
     setup_cursor_agents
+    ;;
+  cursor-mcp)
+    echo -e "${BLUE}Setting up Cursor MCP...${NC}"
+    mkdir -p "$PROJECT_ROOT/.cursor"
+    local mcp_src="$AGENTIC_DIR/agents/cursor/mcp.json"
+    if [[ -f "$mcp_src" ]]; then
+      if [[ -f "$PROJECT_ROOT/.cursor/mcp.json" ]]; then
+        echo -e "${YELLOW}⚠ .cursor/mcp.json already exists. Skipping.${NC}"
+      else
+        cp "$mcp_src" "$PROJECT_ROOT/.cursor/mcp.json"
+        echo -e "${GREEN}✓ Created .cursor/mcp.json template${NC}"
+        echo "  Add MCP servers to mcpServers object. See: https://cursor.com/docs/mcp"
+      fi
+    fi
     ;;
   pipeline)
     setup_pipeline

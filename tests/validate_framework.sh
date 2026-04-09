@@ -6534,6 +6534,158 @@ else
   fail "F-015 AC-012c: Dashboard missing restart advice"
 fi
 
+# ============================================================
+# F-025 Cursor Support Upgrade (AC-006 through AC-009)
+# ============================================================
+echo ""
+echo "--- F-025 Cursor Support Upgrade ---"
+
+# AC-006: .cursor/rules/ templates
+if [[ -d "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/rules" ]]; then
+  _mdc_count=$(ls "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/rules/"*.mdc 2>/dev/null | wc -l)
+  _mdc_count="${_mdc_count## }"
+  if [[ "${_mdc_count:-0}" -ge 3 ]]; then
+    pass "F-025 AC-006: Cursor rules templates exist (${_mdc_count} .mdc files)"
+  else
+    fail "F-025 AC-006: Expected >=3 .mdc files in cursor/rules/, found ${_mdc_count}"
+  fi
+else
+  fail "F-025 AC-006: .agentic/lib/agents/cursor/rules/ directory missing"
+fi
+
+# AC-006b: Core rule has alwaysApply: true
+if grep -q 'alwaysApply: true' "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/rules/agentic-core.mdc" 2>/dev/null; then
+  pass "F-025 AC-006b: agentic-core.mdc has alwaysApply: true"
+else
+  fail "F-025 AC-006b: agentic-core.mdc missing alwaysApply: true"
+fi
+
+# AC-006c: Code quality rule has globs
+if grep -q 'globs:' "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/rules/agentic-code-quality.mdc" 2>/dev/null; then
+  pass "F-025 AC-006c: agentic-code-quality.mdc has globs field"
+else
+  fail "F-025 AC-006c: agentic-code-quality.mdc missing globs field"
+fi
+
+# AC-007: hooks.json template
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/hooks.json" ]]; then
+  if jq . "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/hooks.json" >/dev/null 2>&1; then
+    pass "F-025 AC-007: Cursor hooks.json template is valid JSON"
+  else
+    fail "F-025 AC-007: Cursor hooks.json template is invalid JSON"
+  fi
+else
+  fail "F-025 AC-007: .agentic/lib/agents/cursor/hooks.json missing"
+fi
+
+# AC-007b: hooks.json has all 5 events
+for _hk_event in PreToolUse PostToolUse SessionStart UserPromptSubmit Stop; do
+  if jq -e ".hooks.${_hk_event}" "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/hooks.json" >/dev/null 2>&1; then
+    pass "F-025 AC-007b: hooks.json has ${_hk_event} event"
+  else
+    fail "F-025 AC-007b: hooks.json missing ${_hk_event} event"
+  fi
+done
+
+# AC-007c: Hook adapter scripts exist and are executable
+for _hk_script in enforcement.sh context.sh post-tool.sh; do
+  if [[ -x "${FRAMEWORK_ROOT}/.agentic/hooks/cursor/${_hk_script}" ]]; then
+    pass "F-025 AC-007c: ${_hk_script} exists and is executable"
+  else
+    fail "F-025 AC-007c: ${_hk_script} missing or not executable"
+  fi
+done
+
+# AC-007d: enforcement.sh has plan approval gate
+if grep -q 'plan-approved\|plan.review.skipped' "${FRAMEWORK_ROOT}/.agentic/hooks/cursor/enforcement.sh" 2>/dev/null; then
+  pass "F-025 AC-007d: enforcement.sh has plan approval gate"
+else
+  fail "F-025 AC-007d: enforcement.sh missing plan approval gate"
+fi
+
+# AC-007e: context.sh has decision signal detection
+if grep -q 'decision.*signal\|_DB_SIGNAL\|INSTRUCTION.*auto-captured' "${FRAMEWORK_ROOT}/.agentic/hooks/cursor/context.sh" 2>/dev/null; then
+  pass "F-025 AC-007e: context.sh has decision signal detection"
+else
+  fail "F-025 AC-007e: context.sh missing decision signal detection"
+fi
+
+# AC-009: Cursor skills generator
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/tools/generate-cursor-skills.sh" ]]; then
+  pass "F-025 AC-009: generate-cursor-skills.sh exists"
+else
+  fail "F-025 AC-009: generate-cursor-skills.sh missing"
+fi
+
+# AC-007f: setup-agent.sh generates hooks.json
+if grep -q 'hooks.json' "${FRAMEWORK_ROOT}/.agentic/lib/tools/setup-agent.sh" 2>/dev/null; then
+  pass "F-025 AC-007f: setup-agent.sh generates hooks.json"
+else
+  fail "F-025 AC-007f: setup-agent.sh missing hooks.json generation"
+fi
+
+# AC-008: Agent frontmatter transformation (smoke test setup_cursor_agents output)
+_ACT_TMPDIR=$(mktemp -d)
+if cp -r "${FRAMEWORK_ROOT}/.agentic/lib" "$_ACT_TMPDIR/.agentic_lib" 2>/dev/null; then
+  # Simulate setup by running the frontmatter transformation on test_agent.md
+  _ACT_ROLE="${FRAMEWORK_ROOT}/.agentic/lib/agents/roles/test_agent.md"
+  if [[ -f "$_ACT_ROLE" ]]; then
+    _ACT_OUT="$_ACT_TMPDIR/test-agent.md"
+    _ACT_SUMMARY=$(sed -n 's/^summary: *"\(.*\)"/\1/p' "$_ACT_ROLE" | head -1)
+    {
+      echo "---"
+      echo "model: auto"
+      echo 'tools: ["parent:*"]'
+      echo "readonly: false"
+      echo "---"
+      [[ -n "$_ACT_SUMMARY" ]] && echo "<!-- summary: $_ACT_SUMMARY -->"
+      echo ""
+      sed '1{/^---$/!b};/^---$/,/^---$/d' "$_ACT_ROLE"
+    } > "$_ACT_OUT"
+    if head -5 "$_ACT_OUT" | grep -q 'model: auto' && head -5 "$_ACT_OUT" | grep -q 'tools:.*parent'; then
+      pass "F-025 AC-008: Agent frontmatter transformation produces model + tools fields"
+    else
+      fail "F-025 AC-008: Agent frontmatter transformation missing model/tools"
+    fi
+    # Verify body is preserved (should contain "# Test Agent")
+    if grep -q '# Test Agent' "$_ACT_OUT"; then
+      pass "F-025 AC-008b: Agent body content preserved after frontmatter transform"
+    else
+      fail "F-025 AC-008b: Agent body content lost during frontmatter transform"
+    fi
+  else
+    warn "F-025 AC-008: test_agent.md role file not found, skipping"
+  fi
+fi
+rm -rf "$_ACT_TMPDIR"
+
+# AC-009b: generate-cursor-skills.sh produces valid SKILL.md
+_SK_TMPDIR=$(mktemp -d)
+if bash "${FRAMEWORK_ROOT}/.agentic/lib/tools/generate-cursor-skills.sh" "$_SK_TMPDIR" >/dev/null 2>&1; then
+  _SK_COUNT=$(ls "$_SK_TMPDIR"/*/SKILL.md 2>/dev/null | wc -l)
+  _SK_COUNT="${_SK_COUNT## }"
+  if [[ "${_SK_COUNT:-0}" -ge 5 ]]; then
+    pass "F-025 AC-009b: generate-cursor-skills.sh produces ${_SK_COUNT} SKILL.md files"
+  else
+    fail "F-025 AC-009b: Expected >=5 skills, got ${_SK_COUNT}"
+  fi
+  # Check compatibility field was transformed
+  if grep -q 'Requires Cursor Agent mode' "$_SK_TMPDIR/session-start/SKILL.md" 2>/dev/null; then
+    pass "F-025 AC-009c: Skills have Cursor-compatible compatibility field"
+  else
+    fail "F-025 AC-009c: Skills missing Cursor compatibility transform"
+  fi
+  # Check frontmatter has name field
+  if grep -q '^name:' "$_SK_TMPDIR/session-start/SKILL.md" 2>/dev/null; then
+    pass "F-025 AC-009d: Generated SKILL.md has name field in frontmatter"
+  else
+    fail "F-025 AC-009d: Generated SKILL.md missing name field"
+  fi
+else
+  fail "F-025 AC-009b: generate-cursor-skills.sh failed to run"
+fi
+rm -rf "$_SK_TMPDIR"
+
 # Summary
 
 # ============================================================

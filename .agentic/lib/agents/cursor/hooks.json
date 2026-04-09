@@ -1,0 +1,64 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Shell|file_edit|multi_edit|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".agentic/hooks/cursor/enforcement.sh",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "file_edit|multi_edit|Write|Edit|Shell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".agentic/hooks/cursor/post-tool.sh",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".agentic/hooks/cursor/context.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".agentic/hooks/cursor/context.sh",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".agentic/hooks/cursor/enforcement.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  }
+}
