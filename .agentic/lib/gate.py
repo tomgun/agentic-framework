@@ -417,7 +417,13 @@ def check_plan_review_evidence(project_root: Path) -> GateResult:
     missing_evidence = []
     for sentinel in pending_sentinels:
         fid = sentinel.name.replace("review-pending-", "")
-        if not fid or not is_valid_feature_id(fid):
+        if not fid:
+            continue
+
+        # Ad-hoc plans (no feature ID) still get enforcement — the sentinel
+        # blocks code edits until `ag plan skip` or review evidence is found.
+        if not is_valid_feature_id(fid):
+            missing_evidence.append(fid or "adhoc")
             continue
 
         # Check for review evidence in work directory

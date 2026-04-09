@@ -8,6 +8,18 @@
 
 ## Recent Contributions
 
+### PLANNED ASSERTIONS INVISIBLE + ENFORCEMENT HIERARCHY GAPS (2026-04-09)
+
+**User insight 1 — "acs not updated" problem identification**: User identified that `status: planned` assertions in YAML contracts were permanently invisible to the workflow. No gate, no sync check, no verify output ever surfaced them. The `planned_assertions` property existed in contracts.py but was never called from any workflow gate. Concrete evidence: F-025 AC-006 through AC-009 stayed `planned` through an entire PR + follow-up session.
+
+**User insight 2 — "also update our enforcement hierarchy to include also cursor hooks and skills (not only claude)"**: User noticed that the enforcement hierarchy across all instruction files said "Claude hooks" everywhere — even in Cursor, Copilot, and Codex files. Led to agent-agnostic language: each agent's files name their own hooks, shared files say "Agent hooks."
+
+**User insight 3 — "you skipped plan review again?" + "also the plan is not saved" + "no specs updated"**: User caught THREE process violations in a single implementation: (a) post-ExitPlanMode dialectical review skipped, (b) plan not saved to durable location, (c) specs/contracts not updated. This exposed the root cause: ad-hoc plans (no F-XXXX in filename) silently bypass ALL enforcement because the on-plan-mode-exit.sh hook only created sentinels for recognized feature IDs.
+
+**User insight 4 — "why can the agents not automatically update the specs?"**: User identified the structural gap: no gate anywhere in the workflow (hooks, pre-commit, ag commands) verifies that code changes have corresponding spec updates. Specs are behavioral guidance only — no enforcement mechanism exists to catch missing spec updates before commit.
+
+**User insight 5 — "also check have the documentation been updated" + "update contributions for MY messages"**: User caught that HOW_IT_WORKS.md was not updated for the new `ag contract promote` command, Phase 4b sync, or `ag done` Gate 4. Also caught that CONTRIBUTIONS.md was missing entries for the user's design insights — the agent was attributing work to itself rather than crediting the user's direction.
+
 ### EVIDENCE-BASED PLAN APPROVAL — User Redesigned the Entire Gate Model (2026-04-09)
 
 **User insight 1 — "Why are we scanning for DRAFT? Why not scan for Approved + reviewed state to move forward?"**: User identified that the plan review gate logic was INVERTED. The initial implementation scanned for DRAFT plans to block — but if the agent never writes DRAFT, there's nothing to find. The correct model: **block by default, require evidence of approval to proceed**. This is safe-by-default: no sentinel = no code edits. The agent must EARN the right to edit code by producing verifiable review evidence, not just avoid having a DRAFT label.

@@ -33,6 +33,12 @@ case "$HOOK_EVENT" in
   SessionStart|session_start)
     # Clear session-scoped sentinels from previous session (safety net for crashes)
     # Stop handler clears these normally; this catches cases where Stop didn't run.
+    if [[ -f .agentic/session/.plan-review-skipped ]]; then
+        echo "⚠ Clearing stale .plan-review-skipped from previous session"
+        echo "  $(cat .agentic/session/.plan-review-skipped 2>/dev/null)"
+        echo "  Plan review enforcement is now active again."
+        echo ""
+    fi
     rm -f .agentic/session/.plan-approved 2>/dev/null || true
     rm -f .agentic/session/.plan-review-skipped 2>/dev/null || true
     rm -f .agentic/session/.plan-advisory-shown 2>/dev/null || true

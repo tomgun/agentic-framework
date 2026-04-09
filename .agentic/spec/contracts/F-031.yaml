@@ -99,6 +99,32 @@ assertions:
     \n"
   tests:
   - tests/test_contracts.py::test_create_contract
+  - id: AC-008
+    text: ag contract promote F-XXXX [AC-ID] promotes unshipped assertions to shipped
+    type: structural
+    verify: 'bash .agentic/lib/tools/ag.sh contract help 2>&1 | grep -q "promote"
+
+      '
+  - id: AC-009
+    text: verify-contracts.sh surfaces unshipped assertion counts after summary output
+    type: structural
+    verify: 'grep -q "unshipped_details" .agentic/lib/tools/verify-contracts.sh
+
+      '
+  - id: AC-010
+    text: ag done warns (advisory) when shipped/shipping/ongoing contracts have unshipped
+      assertions
+    type: structural
+    verify: 'grep -q "Gate 4.*Planned assertion advisory" .agentic/lib/tools/commands/done.sh
+
+      '
+  - id: AC-011
+    text: ag sync detects assertion status drift on shipped contracts with unshipped
+      assertions
+    type: structural
+    verify: 'grep -q "phase_assertion_status" .agentic/lib/tools/sync.sh
+
+      '
 scenarios:
 - name: Create and validate a contract
   given: A formal-profile project with spec/contracts/ directory
@@ -112,10 +138,26 @@ scenarios:
   given: A contract with non-empty user_input field
   when: Run ag contract pending
   then: Contract listed with input preview
+- name: Promote planned assertions after implementation
+  given: A shipped contract with planned assertions that have been implemented
+  when: Run ag contract promote F-XXXX
+  then: All unshipped assertions promoted to shipped, contract saved
 migrations:
 - id: M-2026-03-22-001
   date: '2026-03-22'
   trigger: user_request
   reason: 'Feature shipped: Phase 3 merged via PR #195, lifecycle → shipped'
   changes: []
+  approved_by: user
+- id: M-2026-04-09-001
+  date: '2026-04-09'
+  trigger: implementation_discovery
+  reason: 'Planned assertions were permanently invisible — no gate or workflow surfaced
+    them. Added promote command, verify summary, ag done advisory, ag sync drift detection.'
+  changes:
+  - 'Added AC-008: ag contract promote command'
+  - 'Added AC-009: verify-contracts.sh unshipped summary'
+  - 'Added AC-010: ag done Gate 4 planned assertion advisory'
+  - 'Added AC-011: ag sync Phase 4b assertion status drift'
+  - 'Added scenario: Promote planned assertions after implementation'
   approved_by: user

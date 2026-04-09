@@ -54,7 +54,7 @@ echo "════════════════════════�
 if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
     # Plan was saved successfully — extract feature ID from plan filename
     LATEST_PLAN=$(ls -t "$PROJECT_ROOT/.agentic/journal/plans/"*-plan.md 2>/dev/null | head -1)
-    FEATURE_ID="F-XXXX"
+    FEATURE_ID=""
     if [[ -n "$LATEST_PLAN" ]]; then
         # A1: Inject **Status**: DRAFT mechanically if no status line exists yet.
         # This fires on every ExitPlanMode — no agent cooperation needed.
@@ -71,10 +71,10 @@ if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
         # Change 4: Create review-pending sentinel for evidence check.
         # check_plan_review_evidence() in gate.py blocks code edits until
         # review.md with structural markers is created for this feature.
-        if [[ "$FEATURE_ID" != "F-XXXX" ]]; then
-            mkdir -p "$PROJECT_ROOT/.agentic/session" 2>/dev/null || true
-            touch "$PROJECT_ROOT/.agentic/session/review-pending-${FEATURE_ID}" 2>/dev/null || true
-        fi
+        # Use "adhoc" as feature ID for plans without a recognized F-XXXX
+        # so ad-hoc plans still get enforcement (not silently skipped).
+        mkdir -p "$PROJECT_ROOT/.agentic/session" 2>/dev/null || true
+        touch "$PROJECT_ROOT/.agentic/session/review-pending-${FEATURE_ID:-adhoc}" 2>/dev/null || true
         btrace "PostToolUse:on-plan-mode-exit" "plan_save" "{\"plan_file\":\"$PLAN_BASENAME\",\"feature\":\"$FEATURE_ID\",\"status\":\"DRAFT\"}" 2>/dev/null || true
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/$PLAN_BASENAME"
     else

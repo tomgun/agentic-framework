@@ -19,6 +19,7 @@ cmd_contract() {
         migrations)       _contract_migrations "$@" ;;
         validate)         _contract_validate "$@" ;;
         create)           _contract_create "$@" ;;
+        promote)          _contract_promote "$@" ;;
         help|--help|-h)   _contract_help ;;
         *)
             echo -e "${RED}Unknown contract subcommand: $subcmd${NC}"
@@ -38,6 +39,7 @@ _contract_help() {
     echo "  tree                 Show contract hierarchy"
     echo "  validate [F-XXXX]   Validate contract YAML (all or one)"
     echo "  create F-XXXX [--parent F-XXXX]  Create a new draft contract (--parent auto-assigns dotted child ID)"
+    echo "  promote F-XXXX [AC-ID]  Promote planned/unshipped assertions to shipped"
     echo "  set F-XXXX KEY VAL  Set a contract field"
     echo "  add-assertion F-XXXX TEXT [--type structural|behavioral]"
     echo "  add-migration F-XXXX --trigger TYPE --reason TEXT"
@@ -845,6 +847,71 @@ contract = Contract(
 save_contract(contract, Path(contract_file))
 print(f'Created draft contract: {contract_file}')
 print(f'  Edit to add assertions, then run: ag contract validate {feature_id}')
+"
+    return $?
+}
+
+_contract_promote() {
+    local feature_id="${1:-}"
+    local ac_id="${2:-}"
+
+    if [[ -z "$feature_id" ]]; then
+        echo -e "${RED}Usage: ag contract promote F-XXXX [AC-ID]${NC}"
+        echo "  Promotes planned/unshipped assertions to shipped."
+        echo "  Without AC-ID: promotes all unshipped assertions."
+        return 1
+    fi
+
+    if ! echo "$feature_id" | grep -qE '^(F|NFR|DEV|E)-[0-9]{3,}(\.[1-9][0-9]*)*$'; then
+        echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
+        return 1
+    fi
+
+    local contracts_dir
+    contracts_dir="${CONTRACTS_DIR:-$SPEC_DIR/contracts}"
+    local contract_file="$contracts_dir/${feature_id}.yaml"
+
+    if [[ ! -f "$contract_file" ]]; then
+        echo -e "${RED}Contract not found: $contract_file${NC}"
+        return 1
+    fi
+
+    _AG_CONTRACT_FILE="$contract_file" \
+    _AG_AC_ID="${ac_id:-}" \
+    PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import os, sys
+from pathlib import Path
+from contracts import load_contract, save_contract
+
+contract = load_contract(Path(os.environ['_AG_CONTRACT_FILE']))
+target_ac = os.environ.get('_AG_AC_ID', '')
+
+unshipped = [a for a in contract.assertions if a.status != 'shipped']
+
+if not unshipped:
+    print('All assertions are already shipped.')
+    sys.exit(0)
+
+if target_ac:
+    found = [a for a in unshipped if a.id == target_ac]
+    if not found:
+        print(f'{target_ac} not found or already shipped.')
+        ids = ', '.join(a.id for a in unshipped)
+        print(f'Unshipped: {ids}')
+        sys.exit(1)
+    promoted = found
+else:
+    promoted = unshipped
+
+# Capture old statuses before mutating
+old_statuses = {a.id: a.status for a in promoted}
+for a in promoted:
+    a.status = 'shipped'
+    print(f'  ✓ {a.id}: {old_statuses[a.id]} → shipped')
+
+save_contract(contract)
+print(f'\nPromoted {len(promoted)} assertion(s) in {contract.id}')
+print(f'Run: ag contract check {contract.id}  to verify')
 "
     return $?
 }

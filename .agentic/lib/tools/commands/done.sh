@@ -340,6 +340,48 @@ cmd_done() {
         fi
     fi
 
+    # --- Gate 4: Planned assertion advisory ---
+    # If a shipped/shipping/ongoing contract has unshipped assertions, warn.
+    # Advisory only — legitimate to ship with deferred ACs.
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
+        local _pa_contract="$CONTRACTS_DIR/${feature_id}.yaml"
+        if [ -f "$_pa_contract" ]; then
+            local _pa_info
+            # Best-effort advisory: stderr suppressed because PyYAML may be
+            # absent in minimal environments; gate silently skips in that case.
+            _pa_info=$(_AG_CONTRACT="$_pa_contract" \
+                PYTHONPATH="$AGENTIC_LIB" python3 -c "
+import os
+from pathlib import Path
+from contracts import load_contract
+
+c = load_contract(Path(os.environ['_AG_CONTRACT']))
+if c.lifecycle not in ('shipped', 'shipping', 'ongoing'):
+    exit(0)
+unshipped = c.unshipped_assertions
+if not unshipped:
+    exit(0)
+by_status = {}
+for a in unshipped:
+    by_status.setdefault(a.status, []).append(a.id)
+parts = []
+for status, ids in sorted(by_status.items()):
+    id_list = ', '.join(ids)
+    parts.append(f'{status} ({len(ids)}): {id_list}')
+detail = '  '.join(parts)
+print(f'{len(unshipped)}|{detail}')
+" 2>/dev/null)
+            if [ -n "$_pa_info" ]; then
+                local _pa_count="${_pa_info%%|*}"
+                local _pa_detail="${_pa_info#*|}"
+                echo -e "${YELLOW}⚠ $feature_id has $_pa_count unshipped assertion(s):${NC}"
+                echo -e "  ${YELLOW}$_pa_detail${NC}"
+                echo "  Promote when ready: ag contract promote $feature_id"
+                echo ""
+            fi
+        fi
+    fi
+
     # --- Intent-driven execution (F-0200) ---
     # Write intent before any mutable work. Each step is checkpointed.
     # If the process dies mid-sequence, ag sync can resume from last checkpoint.

@@ -37,6 +37,12 @@ echo ""
 
 # 0. Clear session-scoped sentinels from previous session (safety net for crashes)
 # Stop.sh clears these normally; this catches cases where Stop.sh didn't run.
+if [[ -f .agentic/session/.plan-review-skipped ]]; then
+    echo -e "${YELLOW}⚠ Clearing stale .plan-review-skipped from previous session${NC}"
+    echo -e "  $(cat .agentic/session/.plan-review-skipped 2>/dev/null)"
+    echo -e "  Plan review enforcement is now active again.${NC}"
+    echo ""
+fi
 rm -f .agentic/session/.plan-approved 2>/dev/null || true
 rm -f .agentic/session/.plan-review-skipped 2>/dev/null || true
 rm -f .agentic/session/.plan-advisory-shown 2>/dev/null || true

@@ -94,11 +94,30 @@ assertions:
     tests:
       - tests/test_plan_review_hooks.sh::session-start-orphan-detection
 
+  - id: AC-010
+    text: "on-plan-mode-exit.sh creates review-pending sentinel even for ad-hoc plans without feature ID"
+    type: structural
+    verify: |
+      grep -q 'review-pending-.*FEATURE_ID' .agentic/lib/hooks/shared/on-plan-mode-exit.sh &&
+      ! grep -q 'if.*FEATURE_ID.*!=.*F-XXXX.*then' .agentic/lib/hooks/shared/on-plan-mode-exit.sh
+
 nfr_refs: []
 scenarios:
   - name: "Feature lifecycle from planned to shipped"
     given: "F-0099 in FEATURES.md with status: planned"
     when: "Work progresses through plan → implement → verify → ship"
     then: "Status advances through each state; gates block invalid skips"
+  - name: "Ad-hoc plan triggers enforcement"
+    given: "Plan mode exited with a plan that has no F-XXXX in filename"
+    when: "on-plan-mode-exit.sh runs"
+    then: "review-pending sentinel is created; code edits blocked until review or ag plan skip"
 
-migrations: []
+migrations:
+- id: M-2026-04-09-001
+  date: '2026-04-09'
+  trigger: implementation_discovery
+  reason: 'Ad-hoc plans (no feature ID) silently bypassed all enforcement — no sentinel created, no PreToolUse block.'
+  changes:
+  - 'Added AC-010: on-plan-mode-exit.sh creates sentinel for ad-hoc plans'
+  - 'Added scenario: Ad-hoc plan triggers enforcement'
+  approved_by: user

@@ -110,14 +110,16 @@ assertions:
   - id: AC-014
     text: >
       CLAUDE.md template, cursorrules, copilot instructions, codex
-      instructions, and memory-seed all document the enforcement hierarchy:
-      Claude hooks > Skills > ag commands > pre-commit > instruction files
+      instructions, and memory-seed all document the enforcement hierarchy
+      using agent-appropriate language: Claude files say "Claude hooks",
+      Cursor files say "Cursor hooks", agent-agnostic files say "Agent hooks"
     type: structural
 
   - id: AC-015
     text: >
       FRAMEWORK_DEVELOPMENT.md has an "Enforcement Architecture" section
-      documenting when to use Claude hooks vs pre-commit vs instruction files
+      documenting when to use agent hooks vs pre-commit vs instruction files,
+      with examples for both Claude and Cursor hook systems
     type: structural
 
   # --- F. Decision Routing & Rich Work Logging ---
