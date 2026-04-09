@@ -55,9 +55,15 @@ tests/llm/.test-state
 .agentic/session/framework.log
 .agentic/session/framework.log.prev
 .agentic/session/token-ledger.json
+.agentic/session/intel-events.log
+.agentic/session/token-events.log
+.agentic/session/.correction_hint_shown
+.agentic/session/.plan-review-skipped
+.agentic/session/.spec-first-skipped
 
 # Intel engine (generated/session-scoped files)
 .agentic/intel/anatomy.index
+.agentic/intel/token-summary.json
 
 # Note: .agentic/journal/ IS committed (persistent history: manifests, lessons, plans, JOURNAL.md)
 

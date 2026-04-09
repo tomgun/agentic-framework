@@ -5403,3 +5403,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 20:54 - gitignore: session sentinels and intel/token-summary
+
+**Why**: These files kept appearing as untracked in git status — they are pure runtime artifacts with no commit value.
+
+**What changed**:
+- Added missing gitignore entries for transient runtime files: session event logs, sentinel flags, and intel/token-summary.json (derived cache). Updated gitignore.sh template so new user projects also ignore intel derived files.
+
+**Next steps**:
+- Done
+
+**Blockers**: None
+

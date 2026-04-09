@@ -61,6 +61,9 @@ ENTRIES+=(
     ".agentic/pipeline/"
     ".agentic/local/"
     ".agentic/lib/"
+    "# Intel engine (derived/session-scoped)"
+    ".agentic/intel/anatomy.index"
+    ".agentic/intel/token-summary.json"
     ""
 )
 
