@@ -260,6 +260,9 @@ rm -f .agentic/session/.nfr-brief.txt 2>/dev/null || true
 # Decision pipeline ephemeral files
 rm -f .agentic/session/decision-buffer.log 2>/dev/null || true
 rm -f .agentic/session/pending-decision.txt 2>/dev/null || true
+# Plan review sentinels
+rm -f .agentic/session/.plan-needs-review 2>/dev/null || true
+rm -f .agentic/session/.plan-review-skipped 2>/dev/null || true
 
 btrace "Stop" "exit" "{\"decision\":\"allow\",\"exit_code\":0}" 2>/dev/null || true
 

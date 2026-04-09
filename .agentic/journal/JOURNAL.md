@@ -5111,3 +5111,224 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 15:29 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9998: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:29 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9997: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:40 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9998: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:41 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9997: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:41 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9998: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:41 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9997: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:41 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9998: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:41 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9997: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:42 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9998: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:42 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9997: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:43 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9998: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:43 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9997: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:56 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9998: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:56 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9997: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:59 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9998: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 15:59 - Phase gate bypassed
+
+**Why**: Incomplete phases overridden at shipping time
+
+**What changed**:
+- F-9997: --force-phases used. 
+
+**Next steps**:
+- TBD
+
+**Blockers**: None
+
+
+### Session: 2026-04-09 16:05 - Decision auto-capture + plan review enforcement
+
+**Why**: User identified costly UserPromptSubmit scanning and journal spam from test runs
+
+**What changed**:
+- Sentinel-based plan gate (O(1) check), journal spam fix (test isolation), ag plan skip command
+
+**Next steps**:
+- PR review
+
+**Blockers**: None
+
