@@ -218,8 +218,9 @@ _DB_FILE=".agentic/session/decision-buffer.log"
 _DB_SIGNAL=""
 _DB_SAFE_PROMPT=$(printf '%s' "${USER_PROMPT:0:200}" | tr '|' '/' | tr '\n' ' ')
 
-# Signal A: Instructions — "always X", "never Y", "from now on", "don't ever", "make sure to"
-if echo "$USER_PROMPT" | grep -qiE '(^|\b)(always|never|don.t ever|from now on|going forward|make sure to|I want you to|rule:|convention:)\b'; then
+# Signal A: Instructions — "always use X", "never push Y", "from now on", "don't ever", "make sure to"
+# "always/never" require a verb follow-up to avoid matching questions like "is it always like this?"
+if echo "$USER_PROMPT" | grep -qiE '(^|\b)(always (use|do|run|add|include|check|write|keep|put|make|ensure|require)|never (push|commit|use|do|run|delete|remove|skip|merge|deploy|write)|don.t ever|from now on|going forward|make sure to|I want you to|rule:|convention:)\b'; then
   _DB_SIGNAL="instruction"
   btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"instruction\"}" 2>/dev/null || true
   echo ""
@@ -237,8 +238,9 @@ if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '(^|\b)(let.s (go|u
   echo ""
 fi
 
-# Signal C: Corrections — "no,", "stop,", "wrong", "that's not", "actually,"
-if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '^(no[,. ]|stop[,. ]|wrong|that.s not|I said|actually[,. ]|not like that|I meant)\b'; then
+# Signal C: Corrections — "no, don't/that's wrong/I said/not like that/I meant"
+# Requires correction-like follow-up to avoid false positives on casual "no" usage
+if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '^(no[,. ]+.+(don.t|stop|instead|should|wrong|not)|stop[,. ]+.+(doing|that|this)|wrong|that.s not|I said|actually[,. ]+.+(should|use|do|want)|not like that|I meant)\b'; then
   _DB_SIGNAL="correction"
   btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"correction\"}" 2>/dev/null || true
   echo ""
@@ -255,9 +257,10 @@ if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '^\s*(yes|yeah|yep|
       _DB_SIGNAL="confirmation"
       _DB_SAFE_PROMPT=$(printf '%s' "$_PD_TEXT" | tr '|' '/' | tr '\n' ' ')
       btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"confirmation\"}" 2>/dev/null || true
+      _PD_DISPLAY=$(printf '%s' "${_PD_TEXT:0:120}" | tr '`$"' "...")
       echo ""
-      echo "📝 DECISION CONFIRMED: \"${_PD_TEXT}\""
-      echo "   Capture: \`ag intel remember \"${_PD_TEXT}\" --type decision --context \"confirmed recommendation\"\`"
+      printf '📝 DECISION CONFIRMED: "%s"\n' "$_PD_DISPLAY"
+      printf '   Capture: `ag intel remember "%s" --type decision --context "confirmed recommendation"`\n' "$_PD_DISPLAY"
       echo ""
       rm -f "$_PD_FILE" 2>/dev/null || true
     fi

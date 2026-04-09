@@ -624,7 +624,7 @@ _intel_batch_remember() {
 # decisions — list all decisions with provenance
 # ---------------------------------------------------------------------------
 _intel_decisions() {
-    echo -e "${BOLD}=== Cerebrum Decisions ===${NC}"
+    echo -e "${BOLD}=== Decisions ===${NC}"
     _intel_memory --type decision
 
     # Also show recent journal decisions
