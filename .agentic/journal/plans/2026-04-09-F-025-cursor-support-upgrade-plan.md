@@ -1,8 +1,10 @@
 # Plan: Improve Cursor IDE Support
 
+**Status**: APPROVED
+
 ## Context
 
-**Baseline**: PR #229 merged (`862b7b81`) — `cerebrum.yaml` → `project-memory.yaml`, new commands `ag intel remember`/`ag intel memory`/`ag intel decisions`. All new Cursor content must use these names.
+**Baseline**: PR #229 merged (`862b7b81`) — `project-memory.yaml`, new commands `ag intel remember`/`ag intel memory`/`ag intel decisions`. All new Cursor content must use these names.
 
 **Claude hooks now have 6 enforcement features with NO Cursor equivalent** (must port in Phase 2):
 - Plan approval gate (PreToolUse) — blocks code edits without `.plan-approved` or `.plan-review-skipped`

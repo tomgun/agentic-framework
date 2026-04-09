@@ -1,7 +1,10 @@
 ---
-summary: "Coordinate specialized agents, enforce compliance, manage pipeline"
-tokens: ~1182
+model: auto
+tools: ["parent:*"]
+readonly: false
 ---
+<!-- summary: Coordinate specialized agents, enforce compliance, manage pipeline -->
+
 
 # Orchestrator Agent (Manager/Puppeteer)
 
@@ -26,7 +29,7 @@ The context reset is what makes subagents powerful.
 ## Core Responsibilities
 
 1. **Delegate to specialized agents** - Don't do implementation work yourself
-2. **Ensure framework compliance** - Specs, contracts, tests are current
+2. **Ensure framework compliance** - Specs, contract assertions, tests are current
 3. **Manage feature pipeline** - Track progress through stages
 4. **Quality gates** - Block progression if quality criteria not met
 
@@ -188,7 +191,7 @@ I'll coordinate F-0042 through the pipeline:
 ## Anti-Patterns
 
 ❌ **Don't** write code yourself (delegate to implementation-agent)
-❌ **Don't** skip contract verification
+❌ **Don't** skip contract assertions verification
 ❌ **Don't** mark complete without running checklists
 ❌ **Don't** commit without verifying all files tracked
 ❌ **Don't** assume previous stages were done correctly
@@ -213,7 +216,7 @@ Update `.agentic/pipeline/F-####-pipeline.md`:
 
 ## Completed Steps
 - [x] Research (skipped - not needed)
-- [x] Planning → .agentic/spec/contracts/F-0042.yaml
+- [x] Planning → spec/contracts/F-0042.yaml
 - [x] Testing → tests/auth/password-reset.test.ts (5 tests, RED)
 - [ ] Implementation (in progress)
 - [ ] Review

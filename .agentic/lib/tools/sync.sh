@@ -682,6 +682,21 @@ phase_tool_parity() {
             fi
         done
 
+        # Check Cursor v0.47+ artifacts (.cursor/rules/, hooks.json, skills/) if Cursor is set up
+        if [[ -f "$ROOT_DIR/.cursorrules" ]]; then
+            local cursor_artifacts_missing=0
+            [[ ! -d "$ROOT_DIR/.cursor/rules" ]] && ((cursor_artifacts_missing++))
+            [[ ! -f "$ROOT_DIR/.cursor/hooks.json" ]] && ((cursor_artifacts_missing++))
+            [[ ! -d "$ROOT_DIR/.cursor/skills" ]] && ((cursor_artifacts_missing++))
+            if [[ $cursor_artifacts_missing -gt 0 ]]; then
+                ((trigger_missing++))
+                if [ "$MODE" != "quiet" ]; then
+                    echo -e "            ${YELLOW}.cursor/ artifacts incomplete (rules/hooks/skills missing)${NC}"
+                    echo -e "            Fix: bash .agentic/tools/setup-agent.sh cursor"
+                fi
+            fi
+        fi
+
         if [ "$trigger_missing" -gt 0 ]; then
             record_issue "$trigger_missing tool files missing trigger tables"
         else

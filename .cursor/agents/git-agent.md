@@ -1,7 +1,10 @@
 ---
-summary: "Handle version control operations: commits, branches, PRs"
-tokens: ~387
+model: auto
+tools: ["parent:*"]
+readonly: false
 ---
+<!-- summary: Handle version control operations: commits, branches, PRs -->
+
 
 # Git Agent
 

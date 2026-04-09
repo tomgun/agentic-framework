@@ -1,7 +1,10 @@
 ---
-summary: "Quick codebase exploration, finding files, understanding structure"
-tokens: ~350
+model: auto
+tools: ["parent:*"]
+readonly: true
 ---
+<!-- summary: Quick codebase exploration, finding files, understanding structure -->
+
 
 # Explore Agent
 

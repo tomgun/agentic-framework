@@ -33,6 +33,9 @@ if [[ "$LIST_MODE" == true ]]; then
   echo "Tool files in project:"
   [[ -f "$PROJECT_ROOT/CLAUDE.md" ]] && echo "  ✓ CLAUDE.md (Claude Code)"
   [[ -f "$PROJECT_ROOT/.cursorrules" ]] && echo "  ✓ .cursorrules (Cursor)"
+  [[ -d "$PROJECT_ROOT/.cursor/rules" ]] && echo "  ✓ .cursor/rules/ (Cursor v0.47+ rules)"
+  [[ -f "$PROJECT_ROOT/.cursor/hooks.json" ]] && echo "  ✓ .cursor/hooks.json (Cursor hooks)"
+  [[ -d "$PROJECT_ROOT/.cursor/skills" ]] && echo "  ✓ .cursor/skills/ (Cursor skills)"
   [[ -f "$PROJECT_ROOT/.github/copilot-instructions.md" ]] && echo "  ✓ .github/copilot-instructions.md (Copilot)"
   [[ -f "$PROJECT_ROOT/.codex/instructions.md" ]] && echo "  ✓ .codex/instructions.md (Codex CLI)"
   [[ -f "$PROJECT_ROOT/AGENTS.md" ]] && echo "  ✓ AGENTS.md (general)"
@@ -73,10 +76,25 @@ if [[ -n "$CURSOR_SESSION" ]] || [[ -d "$HOME/.cursor" ]] || pgrep -f "Cursor" >
     MISSING+=("cursor")
   else
     echo -e "${GREEN}✓ Cursor: .cursorrules exists${NC}"
+    # Check for v0.47+ artifacts (.cursor/rules/, hooks.json, skills/)
+    cursor_missing=0
+    [[ ! -d "$PROJECT_ROOT/.cursor/rules" ]] && ((cursor_missing++))
+    [[ ! -f "$PROJECT_ROOT/.cursor/hooks.json" ]] && ((cursor_missing++))
+    [[ ! -d "$PROJECT_ROOT/.cursor/skills" ]] && ((cursor_missing++))
+    if [[ $cursor_missing -gt 0 ]]; then
+      echo -e "${YELLOW}⚠ Cursor: .cursor/ artifacts incomplete (rules/hooks/skills missing) — run: bash .agentic/tools/setup-agent.sh cursor${NC}"
+      MISSING+=("cursor")
+    else
+      echo -e "${GREEN}✓ Cursor: .cursor/rules, hooks.json, skills/ all present${NC}"
+    fi
   fi
 else
   if [[ -f "$PROJECT_ROOT/.cursorrules" ]]; then
     echo -e "${GREEN}✓ .cursorrules exists (Cursor ready)${NC}"
+    # Check v0.47+ extras even if Cursor not currently detected
+    if [[ ! -d "$PROJECT_ROOT/.cursor/rules" ]] || [[ ! -f "$PROJECT_ROOT/.cursor/hooks.json" ]] || [[ ! -d "$PROJECT_ROOT/.cursor/skills" ]]; then
+      echo -e "${YELLOW}  ⚠ .cursor/ artifacts incomplete — run: bash .agentic/tools/setup-agent.sh cursor${NC}"
+    fi
   fi
 fi
 

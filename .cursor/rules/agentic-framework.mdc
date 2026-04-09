@@ -1,0 +1,45 @@
+# Agentic framework (Cursor rules)
+
+You are working in a repo that uses the `.agentic/` agentic development framework.
+
+## Always read first
+- `AGENTS.md` (if present)
+- `CONTEXT_PACK.md`
+- `STATUS.md`
+- `spec/OVERVIEW.md`
+- `spec/FEATURES.md`
+- `spec/NFR.md` (if constraints apply)
+- Relevant `/spec/*` sections, including `spec/contracts/F-####.yaml` for the feature you are changing
+
+## Agent Mode (model selection)
+Check `agent_mode` in STACK.md: `premium` | `balanced` (default) | `economy`
+Custom models: check `models:` section. Full docs: `.agentic/workflows/agent_mode.md`
+
+## Must-follow behavior
+- Follow `.agentic/agents/shared/agent_operating_guidelines.md`.
+- **Follow programming standards**: `.agentic/quality/programming_standards.md`
+  - Security first (validate input, parameterized queries, no hardcoded secrets)
+  - Clear naming (descriptive, not cryptic)
+  - Small functions (<50 lines)
+  - Explicit error handling
+- **Follow testing standards**: `.agentic/quality/test_strategy.md`
+  - Test happy path, edge cases, invalid input
+  - Test time-based behavior with mock clocks
+  - Use descriptive test names
+- Keep changes small; prefer incremental diffs.
+- Add/update tests for new/changed logic.
+- Update `STATUS.md` after progress and keep specs truthful.
+
+## Developer UX
+- Always end with: what changed, what's next, and what you need from the user.
+
+## Autonomous modes
+- `ag auto verify` — test-fix loop until green (add `--visual` for AI screenshot review)
+- `ag auto task F-XXXX` — implements feature from ACs, creates PR
+- `ag auto crunch` — batch processes all planned features
+- `ag auto epic F-XXXX` — schedules epic's children with non-blocking reviews
+- `ag auto pipeline --vision "text"` — end-to-end: vision → features → epic → implement → ship
+- `ag auto verify-framework` — self-test: build example projects, detect & fix framework bugs
+
+Workflows, gates, delegation: run `ag` commands or see `.agentic/agents/shared/auto_orchestration.md`
+

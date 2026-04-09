@@ -366,6 +366,25 @@ fi
 
 echo ""
 
+# Step 5b-cursor: Regenerate Cursor artifacts (rules, hooks, skills)
+echo -e "${BLUE}[5b-cursor] Regenerating Cursor artifacts${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+if [[ "$DRY_RUN" == "yes" ]]; then
+  echo "  [DRY RUN] Would regenerate Cursor artifacts"
+elif [[ -f "$TARGET_PROJECT_DIR/.cursorrules" ]] || [[ -d "$TARGET_PROJECT_DIR/.cursor" ]]; then
+  # User has Cursor set up — regenerate all Cursor artifacts via setup_cursor()
+  # This handles: .cursorrules, .cursor/hooks.json, .cursor/rules/*.mdc, .cursor/skills/
+  if [[ -x "$TARGET_PROJECT_DIR/.agentic/lib/tools/setup-agent.sh" ]]; then
+    bash "$TARGET_PROJECT_DIR/.agentic/lib/tools/setup-agent.sh" cursor 2>/dev/null || true
+  fi
+else
+  echo -e "  ${YELLOW}⚠${NC} No .cursorrules or .cursor/ — Cursor not configured. Skipping."
+  echo "  Run 'bash .agentic/tools/setup-agent.sh cursor' to set up Cursor."
+fi
+
+echo ""
+
 # Step 5c: Regenerate instruction files from updated templates
 echo -e "${BLUE}[5c/11] Regenerating instruction files${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

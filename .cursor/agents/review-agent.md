@@ -1,7 +1,10 @@
 ---
-summary: "Review code quality, security, and adherence to standards"
-tokens: ~480
+model: auto
+tools: ["parent:*"]
+readonly: true
 ---
+<!-- summary: Review code quality, security, and adherence to standards -->
+
 
 # Review Agent
 
@@ -43,8 +46,8 @@ tokens: ~480
 - [ ] Auth checks where needed
 - [ ] Sensitive data handled properly
 
-### Tests & Contract Assertions
-- [ ] **Each assertion has corresponding test(s)** - map assertions to test files
+### Tests & Acceptance Criteria
+- [ ] **Each AC has corresponding test(s)** - map AC-001, AC-002 to test files
 - [ ] Tests cover contract assertions completely
 - [ ] Edge cases tested
 - [ ] Tests are deterministic

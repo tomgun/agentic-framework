@@ -1,7 +1,10 @@
 ---
-summary: "Security audits, vulnerability scanning, secure code review"
-tokens: ~500
+model: auto
+tools: ["parent:*"]
+readonly: false
 ---
+<!-- summary: Security audits, vulnerability scanning, secure code review -->
+
 
 # Security Agent
 

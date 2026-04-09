@@ -6567,9 +6567,25 @@ else
   fail "F-025 AC-006c: agentic-code-quality.mdc missing globs field"
 fi
 
-# AC-007: hooks.json template
+# AC-007: hooks.json template (use jq if available, else python3)
+_jq_or_python_valid() {
+  local file="$1"
+  if command -v jq >/dev/null 2>&1; then
+    jq . "$file" >/dev/null 2>&1
+  else
+    python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$file" >/dev/null 2>&1
+  fi
+}
+_jq_or_python_key() {
+  local file="$1" key="$2"
+  if command -v jq >/dev/null 2>&1; then
+    jq -e ".hooks.${key}" "$file" >/dev/null 2>&1
+  else
+    python3 -c "import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if sys.argv[2] in d.get('hooks',{}) else 1)" "$file" "$key" >/dev/null 2>&1
+  fi
+}
 if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/hooks.json" ]]; then
-  if jq . "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/hooks.json" >/dev/null 2>&1; then
+  if _jq_or_python_valid "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/hooks.json"; then
     pass "F-025 AC-007: Cursor hooks.json template is valid JSON"
   else
     fail "F-025 AC-007: Cursor hooks.json template is invalid JSON"
@@ -6580,7 +6596,7 @@ fi
 
 # AC-007b: hooks.json has all 5 events
 for _hk_event in PreToolUse PostToolUse SessionStart UserPromptSubmit Stop; do
-  if jq -e ".hooks.${_hk_event}" "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/hooks.json" >/dev/null 2>&1; then
+  if _jq_or_python_key "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/hooks.json" "$_hk_event"; then
     pass "F-025 AC-007b: hooks.json has ${_hk_event} event"
   else
     fail "F-025 AC-007b: hooks.json missing ${_hk_event} event"
@@ -6640,7 +6656,7 @@ if cp -r "${FRAMEWORK_ROOT}/.agentic/lib" "$_ACT_TMPDIR/.agentic_lib" 2>/dev/nul
       echo "---"
       [[ -n "$_ACT_SUMMARY" ]] && echo "<!-- summary: $_ACT_SUMMARY -->"
       echo ""
-      sed '1{/^---$/!b};/^---$/,/^---$/d' "$_ACT_ROLE"
+      awk 'BEGIN{fm=0;done=0} /^---$/{if(fm==0){fm=1;next}else if(fm==1&&done==0){done=1;next}} done{print}' "$_ACT_ROLE"
     } > "$_ACT_OUT"
     if head -5 "$_ACT_OUT" | grep -q 'model: auto' && head -5 "$_ACT_OUT" | grep -q 'tools:.*parent'; then
       pass "F-025 AC-008: Agent frontmatter transformation produces model + tools fields"

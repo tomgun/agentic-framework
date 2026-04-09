@@ -1,7 +1,10 @@
 ---
-summary: "Investigate technology choices, best practices, external dependencies"
-tokens: ~271
+model: auto
+tools: ["parent:*"]
+readonly: true
 ---
+<!-- summary: Investigate technology choices, best practices, external dependencies -->
+
 
 # Research Agent
 

@@ -1,7 +1,10 @@
 ---
-summary: "Update user-facing and developer documentation after changes"
-tokens: ~344
+model: auto
+tools: ["parent:*"]
+readonly: false
 ---
+<!-- summary: Update user-facing and developer documentation after changes -->
+
 
 # Documentation Agent
 
@@ -13,7 +16,7 @@ tokens: ~344
 
 - Pipeline handoff notes
 - Changed code (what functionality was added)
-- `.agentic/spec/contracts/F-####.yaml` - Contract (what the feature does)
+- `.agentic/spec/contracts/F-####.yaml` - What the feature does
 - Existing docs in `docs/`
 - `README.md`
 - `CONTEXT_PACK.md`

@@ -5390,3 +5390,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 20:51 - F-025 Cursor sync/upgrade integration
+
+**Why**: New .cursor/ artifacts were not wired into upgrade/sync/init paths — users upgrading would get .cursorrules regenerated but not the new rules/hooks/skills.
+
+**What changed**:
+- Fixed BSD sed bug in setup_cursor_agents (awk replaces sed for frontmatter strip). Fixed jq-not-found false failures in validate_framework.sh (python3 fallback). Added upgrade.sh step 5b-cursor to regenerate .cursor/ on upgrade. Extended check-environment.sh and sync.sh to detect missing .cursor/rules, hooks.json, skills. Regenerated .cursor/agents with correct Cursor frontmatter.
+
+**Next steps**:
+- Commit and push
+
+**Blockers**: None
+

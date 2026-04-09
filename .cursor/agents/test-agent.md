@@ -1,7 +1,10 @@
 ---
-summary: "Write tests based on contract assertions before implementation (TDD)"
-tokens: ~339
+model: auto
+tools: ["parent:*"]
+readonly: false
 ---
+<!-- summary: Write tests based on contract assertions before implementation (TDD) -->
+
 
 # Test Agent
 

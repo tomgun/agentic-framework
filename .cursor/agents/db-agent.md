@@ -1,7 +1,10 @@
 ---
-summary: "Database design, query optimization, migrations"
-tokens: ~500
+model: auto
+tools: ["parent:*"]
+readonly: false
 ---
+<!-- summary: Database design, query optimization, migrations -->
+
 
 # Database Agent
 

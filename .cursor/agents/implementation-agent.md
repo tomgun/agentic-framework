@@ -1,7 +1,10 @@
 ---
-summary: "Write code to make failing tests pass (TDD green phase)"
-tokens: ~479
+model: auto
+tools: ["parent:*"]
+readonly: false
 ---
+<!-- summary: Write code to make failing tests pass (TDD green phase) -->
+
 
 # Implementation Agent
 
@@ -12,7 +15,7 @@ tokens: ~479
 ## Context to Read
 
 - Test Agent's tests (your goal: make them pass)
-- `.agentic/spec/contracts/F-####.yaml` - YAML contract (assertions, verify commands, test links)
+- `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria
 - `STACK.md` - Tech stack, build commands
 - `src/` - Existing code patterns
 - `.agentic/lib/quality/programming_standards.md` - Code standards

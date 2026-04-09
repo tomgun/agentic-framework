@@ -1,7 +1,10 @@
 ---
-summary: "Design RESTful APIs, GraphQL schemas, API contracts"
-tokens: ~500
+model: auto
+tools: ["parent:*"]
+readonly: false
 ---
+<!-- summary: Design RESTful APIs, GraphQL schemas, API contracts -->
+
 
 # API Design Agent
 

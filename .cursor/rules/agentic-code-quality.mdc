@@ -1,0 +1,30 @@
+---
+description: "Programming and testing standards for source files"
+globs: ["src/**/*", "lib/**/*", "*.ts", "*.tsx", "*.js", "*.jsx", "*.py", "*.go", "*.rs", "*.java", "*.rb", "*.swift", "*.kt"]
+---
+
+# Code Quality Standards
+
+Follow `.agentic/quality/programming_standards.md` and `.agentic/quality/test_strategy.md`.
+
+## Programming Standards
+
+- Security first: validate input, parameterized queries, no hardcoded secrets
+- Clear naming: descriptive, not cryptic
+- Small functions (<50 lines)
+- Explicit error handling
+- Keep changes incremental — prefer small diffs
+
+## Testing Standards
+
+- Test happy path, edge cases, invalid input
+- Test time-based behavior with mock clocks
+- Use descriptive test names with F-#### and AC-### identifiers
+- Tests must be deterministic and independent
+- Run `ag intel test [F-XXXX]` before writing tests for quality guidance
+
+## Before Writing Code
+
+- Check `ag intel implement [F-XXXX]` for patterns, prior art, and quality guidance
+- Read existing code before modifying — understand conventions
+- Check STACK.md for project-specific tooling and frameworks

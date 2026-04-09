@@ -1,7 +1,10 @@
 ---
-summary: "Define features, write YAML contracts, create ADRs"
-tokens: ~411
+model: auto
+tools: ["parent:*"]
+readonly: false
 ---
+<!-- summary: Define features, write YAML contracts, create ADRs -->
+
 
 # Planning Agent
 
@@ -13,7 +16,7 @@ tokens: ~411
 
 1. **Read `.agentic/OVERVIEW.md`** - understand the product vision and goals
 2. **Read `.agentic/STATUS.md`** - understand current state
-3. **Read relevant contracts** - existing feature specs at `spec/contracts/`
+3. **Read relevant YAML contracts** - existing feature specs
 
 ## Context to Read
 
@@ -27,8 +30,8 @@ tokens: ~411
 ## Responsibilities
 
 1. Define feature scope based on research/requirements
-2. Write YAML contract with assertions at `spec/contracts/F-####.yaml`
-3. **Update contract assertions when discoveries are made during implementation**
+2. Write clear YAML contracts (initial)
+3. **Update YAML contracts when discoveries are made during implementation**
 4. Create ADR for significant decisions
 5. Identify dependencies on other features
 6. Estimate complexity
@@ -85,11 +88,11 @@ Dependencies: F-#### (if any)
 
 When done, update `.agentic/pipeline/F-{id}-pipeline.md`:
 ```markdown
-- [x] Planning Agent (HH:MM) → spec/contracts/F-####.yaml
+- [x] Planning Agent (HH:MM) → .agentic/spec/contracts/F-####.yaml
 ```
 
 Add handoff notes for Test Agent:
-- List of contract assertions
+- List of YAML contracts
 - Key test scenarios
 - Any edge cases to consider
 

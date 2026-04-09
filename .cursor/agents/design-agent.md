@@ -1,7 +1,10 @@
 ---
-summary: "UI/UX design, wireframes, design system components"
-tokens: ~450
+model: auto
+tools: ["parent:*"]
+readonly: false
 ---
+<!-- summary: UI/UX design, wireframes, design system components -->
+
 
 # Design Agent
 

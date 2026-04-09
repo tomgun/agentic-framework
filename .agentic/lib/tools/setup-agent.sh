@@ -358,7 +358,7 @@ setup_cursor_agents() {
         [[ -n "$summary" ]] && echo "<!-- summary: $summary -->"
         echo ""
         # Strip original YAML frontmatter (between --- delimiters) and output body
-        sed '1{/^---$/!b};/^---$/,/^---$/d' "$role_file"
+        awk 'BEGIN{fm=0;done=0} /^---$/{if(fm==0){fm=1;next}else if(fm==1&&done==0){done=1;next}} done{print}' "$role_file"
       } > "$target"
 
       echo -e "${GREEN}  ✓${NC} Created .cursor/agents/$agent_name (readonly=$is_readonly)"
