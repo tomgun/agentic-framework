@@ -82,6 +82,7 @@ Purpose: Configuration for developing the Agentic Framework itself.
 - docs_mode: inline
 # inline: update docs with code (default). deferred: log what's needed, generate later via `ag docs generate`.
 
+- btrace: on
 ## Summary
 - What are we building: AI-assisted development framework with spec-driven methodology
 - Primary platform: CLI tools / documentation
