@@ -52,9 +52,9 @@ _find_plan_file() {
     local fid="$1"
     local plans_dir="$ROOT_DIR/.agentic/journal/plans"
     [ -d "$plans_dir" ] || return 1
-    # Glob matches: YYYY-MM-DD-F-XXXX-plan.md or F-XXXX-plan.md
+    # Glob matches: YYYY-MM-DD-F-XXXX-plan.md, F-XXXX-plan-foo.md, or F-XXXX-description-plan.md
     local match
-    match=$(find "$plans_dir" \( -name "*${fid}-plan.md" -o -name "*${fid}-plan-*.md" \) -type f 2>/dev/null | sort -r | head -1)
+    match=$(find "$plans_dir" \( -name "*${fid}-plan.md" -o -name "*${fid}-plan-*.md" -o -name "*${fid}-*-plan.md" \) -type f 2>/dev/null | sort -r | head -1)
     [ -n "$match" ] && echo "$match" && return 0
     return 1
 }
