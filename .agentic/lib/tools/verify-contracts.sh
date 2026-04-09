@@ -91,6 +91,15 @@ for contract in contracts:
     total_skip += result['skipped']
 
 # Output
+total_unshipped = 0
+unshipped_details = []
+for contract in contracts:
+    us = contract.unshipped_assertions
+    if us:
+        total_unshipped += len(us)
+        ids = ', '.join(a.id for a in us)
+        unshipped_details.append((contract.id, ids))
+
 if output_json:
     output = {
         'contracts': results,
@@ -99,6 +108,7 @@ if output_json:
             'passed': total_pass,
             'failed': total_fail,
             'skipped': total_skip,
+            'unshipped': total_unshipped,
         }
     }
     print(json.dumps(output, indent=2))
@@ -126,6 +136,12 @@ else:
     print()
     print(f'Summary: {total_pass} passed, {total_fail} failed, {total_skip} skipped')
     print(f'Contracts: {len(contracts)}')
+
+    if unshipped_details:
+        print(f'\n⚠ {total_unshipped} unshipped assertion(s):')
+        for cid, ids in unshipped_details:
+            print(f'  {cid}: {ids}')
+        print('  Run: ag contract promote <feature-id>')
 
 sys.exit(1 if total_fail > 0 else 0)
 "

@@ -65,8 +65,8 @@ Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 
 ## Enforcement Hierarchy
 
-1. **Claude hooks** (real-time) — PreToolUse, PostToolUse, Stop.sh, UserPromptSubmit. Primary enforcement.
+1. **Cursor hooks** (real-time) — PreToolUse, PostToolUse, Stop, UserPromptSubmit via `.cursor/hooks.json`. Primary enforcement.
 2. **Skills** (just-in-time) — loaded at workflow triggers
 3. **`ag` commands** (workflow gates) — validate preconditions
-4. **Pre-commit hooks** (git-level) — safety net for non-Claude tools only
+4. **Pre-commit hooks** (git-level) — safety net for non-Cursor tools only
 5. **Instruction files** (behavioral) — guidance, no structural enforcement

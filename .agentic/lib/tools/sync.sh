@@ -635,6 +635,55 @@ phase_spec_drift() {
 }
 
 # ============================================================================
+# Phase 4b: Assertion status drift (unshipped assertions in shipped contracts)
+# ============================================================================
+phase_assertion_status() {
+    local contracts_dir
+    contracts_dir="${CONTRACTS_DIR:-$SPEC_DIR/contracts}"
+
+    if [[ ! -d "$contracts_dir" ]]; then
+        return 0
+    fi
+
+    local _assertion_drift
+    _assertion_drift=$(_AG_CONTRACTS_DIR="$contracts_dir" \
+        PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
+import os
+from pathlib import Path
+from contracts import load_all_contracts
+
+contracts_dir = Path(os.environ['_AG_CONTRACTS_DIR'])
+contracts = load_all_contracts(contracts_dir)
+
+for c in contracts:
+    if c.lifecycle not in ('shipped', 'shipping', 'ongoing'):
+        continue
+    unshipped = c.unshipped_assertions
+    if unshipped:
+        ids = ', '.join(a.id for a in unshipped)
+        print(f'{c.id}: {len(unshipped)} unshipped ({ids})')
+" 2>/dev/null || echo "")
+
+    if [ -n "$_assertion_drift" ]; then
+        local drift_count
+        drift_count=$(echo "$_assertion_drift" | wc -l | tr -d ' ')
+        record_issue "assertion status drift ($drift_count contracts)"
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "AC status:  ${YELLOW}$drift_count contract(s) have unshipped assertions${NC}"
+            echo "$_assertion_drift" | while IFS= read -r line; do
+                echo -e "            ${YELLOW}$line${NC}"
+            done
+            echo -e "            Run: ${BOLD}ag contract promote <feature-id>${NC}"
+        fi
+    else
+        record_ok
+        if [ "$MODE" != "quiet" ]; then
+            echo -e "AC status:  ${GREEN}OK${NC}"
+        fi
+    fi
+}
+
+# ============================================================================
 # Phase 5: Tool parity (instruction files + trigger tables)
 # ============================================================================
 phase_tool_parity() {
@@ -1085,7 +1134,8 @@ main() {
         phase_state_freshness
         phase_features
         phase_unregistered_code
-        # Skip phase 4 (slow)
+        # Skip phase 4 (slow) but run 4b (fast)
+        phase_assertion_status
         phase_tool_parity
         phase_instruction_sync
         phase_hooks
@@ -1121,6 +1171,7 @@ main() {
     phase_drift_check
     phase_unregistered_code
     phase_spec_drift
+    phase_assertion_status
     phase_tool_parity
     phase_instruction_sync
     phase_hooks

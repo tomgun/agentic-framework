@@ -54,7 +54,7 @@ Docs ship with code, not after merge. Before creating a PR:
 - **Behavioral corrections belong in instruction files**: When a correction applies to this project, update CLAUDE.md or the relevant skill file — don't write a memory as a substitute.
 - **Feature ID patterns are centralized**: `ids.py` (Python) and `ids.sh` (shell) are the single source of truth for feature ID regexes. Import `FEATURE_ID_RE`, `FEATURE_HEADER_RE`, etc. — never inline `F-\d{4,}` or `F-[0-9]{4,}` patterns in code.
 - **Track what you build**: When `feature_tracking=yes`, update FEATURES.md. Otherwise, update OVERVIEW.md (Core Capabilities section). Claude hooks (Stop.sh, UserPromptSubmit) nudge if you write implementation code but forget to update the design doc.
-- **Enforcement hierarchy**: Claude hooks (real-time) > Skills (just-in-time) > ag commands (gates) > pre-commit (non-Claude tools only) > instruction files (behavioral). New gates go in Claude hooks, not pre-commit.
+- **Enforcement hierarchy**: Agent hooks (real-time, where supported: Claude hooks, Cursor hooks) > Skills (just-in-time) > ag commands (gates) > pre-commit (safety net) > instruction files (behavioral). New gates go in agent hooks, not pre-commit.
 
 ## What the Framework Enforces Structurally (you can't bypass these)
 - **Spec-first**: PreToolUse denies code edits without spec+AC (formal)

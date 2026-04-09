@@ -5470,3 +5470,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 20:00 - Surface planned assertions + agent-agnostic enforcement
+
+**Why**: Planned assertions were permanently invisible — no gate or workflow checked for them after initial write
+
+**Decision**: Advisory not blocking for ag done gate — legitimate to ship with deferred ACs
+
+**What changed**:
+- Added 4 mechanisms to surface unshipped assertions: ag contract promote command, verify-contracts.sh summary, ag done Gate 4 advisory, ag sync Phase 4b drift detection. Made enforcement hierarchy agent-agnostic across 6 instruction files.
+
+**Next steps**:
+- Test with PyYAML-enabled environment, consider adding LLM test for promote command
+
+**Blockers**: None
+
