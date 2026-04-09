@@ -808,7 +808,7 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 | **Multi-Environment Support** (F-0054) | Documented workflow for switching between Claude/Cursor/Copilot when tokens run out. Durable artifacts ensure state survives tool switches. | PASSIVE - documented workflow, no enforcement |
 | **Upgrade System** (F-020, F-0094) | `upgrade.sh` with FEATURE_REGISTRY. Version-aware: only shows features new since user's previous version. `.upgrade_pending` marker. | ACTIVE - structural |
 | **Quality Standards** (F-0015) | 7 quality documents in `.agentic/quality/`. Programming standards, test strategy, review checklist, library selection, green coding, integration testing, design for testability. | ACTIVE - wired via context manifests |
-| **Spec-Driven Development** (F-002-0006) | Features defined via YAML contracts (`spec/contracts/F-####.yaml`) with machine-verifiable assertions. Each assertion has a `verify` command and linked tests. Shipped contracts are protected — changes require migration entries. `user_input` field enables spec-as-control-interface (user writes change request, agent processes it). `ag contract check` runs all structural assertions. `ag migrate-specs` converts legacy markdown ACs to YAML contracts. | ACTIVE - structural gate (Formal) |
+| **Spec-Driven Development** (F-002-0006) | Features defined via YAML contracts (`spec/contracts/F-####.yaml`) with machine-verifiable assertions. Each assertion has a `verify` command and linked tests. Shipped contracts are protected — changes require migration entries. `user_input` field enables spec-as-control-interface (user writes change request, agent processes it). `ag contract check` runs all structural assertions. `ag contract promote` promotes planned assertions to shipped after implementation. `ag migrate-specs` converts legacy markdown ACs to YAML contracts. Unshipped assertions in shipped contracts are surfaced by `ag done` (advisory), `ag sync` (Phase 4b drift), and `verify-contracts.sh` (summary). | ACTIVE - structural gate (Formal) |
 
 **Hidden mechanism**: The staleness check in `pre-commit-check.sh` (Check 3) compares JOURNAL.md modification time against last git commit. This forces agents to update project state before every commit, ensuring long-term projects never go stale.
 
@@ -1051,12 +1051,12 @@ These features exist but don't clearly derive from the 13 principles:
 |---------|-------------|-------------|
 | `ag start` | Read state, check WIP, memory integrity, display dashboard | Advisory (soft start) |
 
-| `ag sync` | 11-phase drift detection + auto-fix (includes AC/backlog drift check via `drift-check.sh`) | Advisory (user-initiated) |
+| `ag sync` | 12-phase drift detection + auto-fix (includes AC/backlog drift check via `drift-check.sh`, assertion status drift via Phase 4b) | Advisory (user-initiated) |
 | `ag work "desc"` | Create WIP, start task. Formal: BLOCKS without feature ID. | Structural (Formal) |
 | `ag plan F-XXXX` | Create plan with optional review loop | Structural (must have acceptance) |
 | `ag implement F-XXXX` | Check acceptance, check approved plan, create WIP, print guidance | Structural (multiple gates) |
 | `ag commit` | Run pre-commit-check.sh, show diff, wait for approval | Structural (exit codes) |
-| `ag done F-XXXX` | Run doctor.sh --phase complete, phase completion gate (blocks if incomplete phases in tasks.yaml), AC completion gate (configurable via `acceptance_criteria` setting), feature.sh status shipped, VERSION bump. `--force-phases` bypasses phase gate. | Structural (validation) |
+| `ag done F-XXXX` | Run doctor.sh --phase complete, phase completion gate (blocks if incomplete phases in tasks.yaml), AC completion gate (configurable via `acceptance_criteria` setting), planned assertion advisory (warns about unshipped ACs), feature.sh status shipped, VERSION bump. `--force-phases` bypasses phase gate. | Structural (validation) |
 | `ag phase list\|done\|active\|drop\|sync F-XXXX` | Multi-session plan phase tracking. Phases extracted from approved plans into `.agentic/work/F-XXXX/tasks.yaml`. Dashboard shows progress. | Structural (tracking) |
 | `ag specs` | Brownfield spec generation with plan-review | Structural (domain-by-domain) |
 | `ag trace F-XXXX` | Show spec-code traceability | Read-only |
@@ -1070,7 +1070,7 @@ These features exist but don't clearly derive from the 13 principles:
 
 #### ag sync Phases
 
-`ag sync` runs 10 drift-detection phases in order. Phases 1-5 run in `--quiet` mode; all phases run in full mode:
+`ag sync` runs 11 drift-detection phases in order. Phases 1-5 run in `--quiet` mode (including 4b); all phases run in full mode:
 
 | Phase | Name | What It Detects |
 |-------|------|-----------------|
@@ -1079,6 +1079,7 @@ These features exist but don't clearly derive from the 13 principles:
 | 3 | Feature reconciliation | Feature status inconsistencies (formal profiles only) |
 | 3b | Unregistered code | Shipped code not registered in FEATURES.md |
 | 4 | Spec/doc drift | Spec files out of sync with code (skipped in `--quiet`) |
+| 4b | Assertion status | Shipped contracts with unshipped (planned/specced/implementing) assertions |
 | 5 | Tool parity | ag commands missing from instruction file trigger tables |
 | 5b | Instruction sync | ag commands missing from instruction file templates (framework-dev only, via `instruction-sync.sh`) |
 | 6 | Git hooks | Hook configuration drift (`core.hooksPath` not set) |
