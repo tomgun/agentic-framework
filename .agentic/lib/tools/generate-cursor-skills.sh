@@ -4,7 +4,6 @@
 # Cursor supports the same SKILL.md open standard as Claude Code.
 # This script copies Claude skill templates with minor adaptations:
 #   - compatibility field updated for Cursor
-#   - allowed-tools mapped to Cursor tool names
 #
 # Usage:
 #   bash .agentic/lib/tools/generate-cursor-skills.sh [--output-dir <dir>]
@@ -23,20 +22,6 @@ if [[ ! -d "$CLAUDE_SKILLS_DIR" ]]; then
 fi
 
 mkdir -p "$OUTPUT_DIR"
-
-# Map Claude tool names to Cursor equivalents
-# Cursor tools: Shell, file_edit, multi_edit, read_file, list_dir, search_files, etc.
-# But SKILL.md allowed-tools may also use generic names — keep both for compatibility.
-map_tools() {
-  local tools="$1"
-  echo "$tools" \
-    | sed 's/Bash/Shell/g' \
-    | sed 's/\bEdit\b/file_edit/g' \
-    | sed 's/\bWrite\b/file_edit/g' \
-    | sed 's/\bGlob\b/list_dir/g' \
-    | sed 's/\bGrep\b/search_files/g' \
-    | sed 's/\bAgent\b/subagent/g'
-}
 
 _count=0
 for skill_dir in "$CLAUDE_SKILLS_DIR"/*/; do
