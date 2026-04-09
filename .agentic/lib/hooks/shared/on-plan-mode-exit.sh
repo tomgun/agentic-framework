@@ -74,7 +74,7 @@ if [[ -n "$SCAN_OUTPUT" ]] && echo "$SCAN_OUTPUT" | grep -q "saved"; then
         # Use "adhoc" as feature ID for plans without a recognized F-XXXX
         # so ad-hoc plans still get enforcement (not silently skipped).
         mkdir -p "$PROJECT_ROOT/.agentic/session" 2>/dev/null || true
-        touch "$PROJECT_ROOT/.agentic/session/review-pending-${FEATURE_ID}" 2>/dev/null || true
+        touch "$PROJECT_ROOT/.agentic/session/review-pending-${FEATURE_ID:-adhoc}" 2>/dev/null || true
         btrace "PostToolUse:on-plan-mode-exit" "plan_save" "{\"plan_file\":\"$PLAN_BASENAME\",\"feature\":\"$FEATURE_ID\",\"status\":\"DRAFT\"}" 2>/dev/null || true
         echo "✅ Plan saved as DRAFT → .agentic/journal/plans/$PLAN_BASENAME"
     else

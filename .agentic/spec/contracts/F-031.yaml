@@ -99,32 +99,32 @@ assertions:
     \n"
   tests:
   - tests/test_contracts.py::test_create_contract
-- id: AC-008
-  text: ag contract promote F-XXXX [AC-ID] promotes unshipped assertions to shipped
-  type: structural
-  verify: 'bash .agentic/lib/tools/ag.sh contract help 2>&1 | grep -q "promote"
+  - id: AC-008
+    text: ag contract promote F-XXXX [AC-ID] promotes unshipped assertions to shipped
+    type: structural
+    verify: 'bash .agentic/lib/tools/ag.sh contract help 2>&1 | grep -q "promote"
 
-    '
-- id: AC-009
-  text: verify-contracts.sh surfaces unshipped assertion counts after summary output
-  type: structural
-  verify: 'grep -q "unshipped_details" .agentic/lib/tools/verify-contracts.sh
+      '
+  - id: AC-009
+    text: verify-contracts.sh surfaces unshipped assertion counts after summary output
+    type: structural
+    verify: 'grep -q "unshipped_details" .agentic/lib/tools/verify-contracts.sh
 
-    '
-- id: AC-010
-  text: ag done warns (advisory) when shipped/shipping/ongoing contracts have unshipped
-    assertions
-  type: structural
-  verify: 'grep -q "Gate 4.*Planned assertion advisory" .agentic/lib/tools/commands/done.sh
+      '
+  - id: AC-010
+    text: ag done warns (advisory) when shipped/shipping/ongoing contracts have unshipped
+      assertions
+    type: structural
+    verify: 'grep -q "Gate 4.*Planned assertion advisory" .agentic/lib/tools/commands/done.sh
 
-    '
-- id: AC-011
-  text: ag sync detects assertion status drift on shipped contracts with unshipped
-    assertions
-  type: structural
-  verify: 'grep -q "phase_assertion_status" .agentic/lib/tools/sync.sh
+      '
+  - id: AC-011
+    text: ag sync detects assertion status drift on shipped contracts with unshipped
+      assertions
+    type: structural
+    verify: 'grep -q "phase_assertion_status" .agentic/lib/tools/sync.sh
 
-    '
+      '
 scenarios:
 - name: Create and validate a contract
   given: A formal-profile project with spec/contracts/ directory
