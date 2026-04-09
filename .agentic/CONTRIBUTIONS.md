@@ -3248,6 +3248,24 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### Cursor Support Upgrade to Parity + Sentinel Lifecycle Hardening (v0.79.x → v0.80.x)
+
+**User insight 1 — "We have upgraded the cursor support. You should install all the new rules, hooks, skills."**: Triggered the full Cursor upgrade installation — `.cursor/rules/*.mdc`, `.cursor/hooks.json`, `.cursor/skills/`, `.cursor/agents/` with Cursor-compatible frontmatter. Also surfaced a BSD `sed` incompatibility on macOS in `setup_cursor_agents()` that silently failed for all macOS users. The fix (replacing GNU-only `sed` with `awk`) was a latent portability bug that would have broken every user running `setup-agent.sh cursor-agents` on macOS.
+
+**User insight 2 — "Can you check that they would be installed / synced with the init/upgrade/sync processes"**: User identified that the new `.cursor/` artifacts (rules, hooks, skills) were generated correctly but not wired into the upgrade/sync/init paths. `upgrade.sh` only had a step for Claude artifacts (step 5b); `sync.sh` and `check-environment.sh` only checked `.cursorrules` staleness, not `.cursor/rules/`, `.cursor/hooks.json`, or `.cursor/skills/`. The fix added step 5b-cursor to upgrade, extended sync drift detection, and updated the environment check. **The principle: artifacts that aren't in the upgrade path will drift and rot — every generated file needs a regeneration owner.**
+
+**User insight 3 — "Should the current changed files in /session /intel be .gitignored?"**: User noticed session event logs (`intel-events.log`, `token-events.log`), sentinel flags (`.correction_hint_shown`, `.plan-review-skipped`, `.spec-first-skipped`), and `intel/token-summary.json` were untracked but not gitignored. These are pure runtime artifacts — the sentinel flags have single-session lifetime, the logs are ephemeral, and `token-summary.json` is a derived cache. Updated `.gitignore` and `gitignore.sh` template.
+
+**User insight 4 — "Those sentinel files probably should be cleared after session?"**: User identified that sentinel files needed explicit cleanup. Investigation showed Claude's `Stop.sh` already cleared most — but the Cursor `enforcement.sh` Stop handler was missing `.correction_hint_shown`. Fixed the parity gap. **General principle: hooks that port Claude behavior to Cursor must be compared line-by-line against the original to catch omissions.**
+
+**User insight 5 — "Or at session start too"**: User extended the cleanup model to session start — if Stop never ran (crash, force-quit), sentinels from the previous session persist and suppress gates/hints for the entire next session. Added cleanup to both `SessionStart.sh` (Claude) and `context.sh` SessionStart (Cursor). **The invariant: session-scoped state must be cleared by at least two mechanisms — Stop (normal path) and SessionStart (crash recovery path). Neither alone is sufficient.**
+
+**Why it matters**: Cursor support now has the same lifecycle rigour as Claude Code support: artifacts regenerate on upgrade, drift is detected by sync, hooks have parity, and session state is properly bounded. The sentinel cleanup hardening applies to both tools and closes a class of "ghost state" bugs where previous-session decisions silently carry over.
+
+**Design direction**: Every generated artifact needs a regeneration owner in the upgrade path. Session-scoped sentinels must be cleared at both session end (Stop) and session start (crash recovery). Cross-tool hook ports must be audited for parity gaps, not just structural completeness.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.73.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
