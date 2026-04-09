@@ -31,6 +31,15 @@ fi
 
 case "$HOOK_EVENT" in
   SessionStart|session_start)
+    # Clear session-scoped sentinels from previous session (safety net for crashes)
+    # Stop handler clears these normally; this catches cases where Stop didn't run.
+    rm -f .agentic/session/.plan-approved 2>/dev/null || true
+    rm -f .agentic/session/.plan-review-skipped 2>/dev/null || true
+    rm -f .agentic/session/.plan-advisory-shown 2>/dev/null || true
+    rm -f .agentic/session/.spec-first-checked 2>/dev/null || true
+    rm -f .agentic/session/.spec-first-skipped 2>/dev/null || true
+    rm -f .agentic/session/.correction_hint_shown 2>/dev/null || true
+
     echo "🚀 Agentic Framework Session"
 
     # Framework version

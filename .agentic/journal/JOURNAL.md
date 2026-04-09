@@ -5429,3 +5429,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 20:57 - Clear session sentinels at session start
+
+**Why**: Sentinels could persist across sessions if Stop hook didn't run (crash/force-quit), suppressing gates and hints that should fire fresh each session.
+
+**What changed**:
+- Added sentinel cleanup to SessionStart.sh (Claude) and context.sh SessionStart (Cursor). Covers crash recovery — Stop hook normally clears these but won't fire if session is force-quit.
+
+**Next steps**:
+- Done
+
+**Blockers**: None
+

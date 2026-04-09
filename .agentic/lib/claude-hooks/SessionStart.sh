@@ -35,6 +35,15 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}🚀 Agentic AF Session Start${NC}"
 echo ""
 
+# 0. Clear session-scoped sentinels from previous session (safety net for crashes)
+# Stop.sh clears these normally; this catches cases where Stop.sh didn't run.
+rm -f .agentic/session/.plan-approved 2>/dev/null || true
+rm -f .agentic/session/.plan-review-skipped 2>/dev/null || true
+rm -f .agentic/session/.plan-advisory-shown 2>/dev/null || true
+rm -f .agentic/session/.spec-first-checked 2>/dev/null || true
+rm -f .agentic/session/.spec-first-skipped 2>/dev/null || true
+rm -f .agentic/session/.correction_hint_shown 2>/dev/null || true
+
 # 1. Check if this is an agentic project
 if [[ ! -d ".agentic" ]]; then
   echo -e "${YELLOW}⚠ Not an Agentic AF project (no .agentic/ folder)${NC}"
