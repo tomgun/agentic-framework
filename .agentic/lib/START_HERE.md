@@ -175,7 +175,7 @@ Key transitions are gated by artifact preconditions (plan.md, spec.md, tests, do
 
 **Intelligence** (`.agentic/intel/`):
 - `patterns.yaml` — enforced anti-patterns checked at write-time
-- `cerebrum.yaml` — project knowledge from user corrections
+- `project-memory.yaml` — project knowledge from user decisions, preferences, corrections
 - `quality-checklist.yaml` — 5 quality dimensions × 4 workflow phases
 - `test-strategy.yaml` — test levels with framework-specific patterns
 - Phase queries: `ag intel architecture|spec|implement|test [F-XXXX]`

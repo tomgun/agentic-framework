@@ -211,9 +211,68 @@ if echo "$USER_PROMPT" | grep -qiE '(done|finished|complete|ship)\b'; then
   fi
 fi
 
+# --- Decision/instruction signal detection (F-041: Auto-capture pipeline) ---
+# Detects user decisions, instructions, corrections, and confirmations.
+# Writes signals to session decision buffer and nudges agent to capture.
+_DB_FILE=".agentic/session/decision-buffer.log"
+_DB_SIGNAL=""
+_DB_SAFE_PROMPT=$(printf '%s' "${USER_PROMPT:0:200}" | tr '|' '/' | tr '\n' ' ')
+
+# Signal A: Instructions — "always X", "never Y", "from now on", "don't ever", "make sure to"
+if echo "$USER_PROMPT" | grep -qiE '(^|\b)(always|never|don.t ever|from now on|going forward|make sure to|I want you to|rule:|convention:)\b'; then
+  _DB_SIGNAL="instruction"
+  btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"instruction\"}" 2>/dev/null || true
+  echo ""
+  echo "📝 INSTRUCTION DETECTED — Capture with: \`ag intel remember \"...\" --type preference\`"
+  echo "   Or enforce: \`ag intel learn \"...\" --reason \"user instruction\" --scope \"*\"\`"
+  echo ""
+fi
+
+# Signal B: Decisions — "let's go with", "I decide", "use X instead of Y", "I prefer"
+if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '(^|\b)(let.s (go|use|stick) with|I decide|we.ll use|I prefer|use .* instead of|go with|decision:)\b'; then
+  _DB_SIGNAL="decision"
+  btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"decision\"}" 2>/dev/null || true
+  echo ""
+  echo "📝 DECISION DETECTED — Capture with: \`ag intel remember \"...\" --type decision\`"
+  echo ""
+fi
+
+# Signal C: Corrections — "no,", "stop,", "wrong", "that's not", "actually,"
+if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '^(no[,. ]|stop[,. ]|wrong|that.s not|I said|actually[,. ]|not like that|I meant)\b'; then
+  _DB_SIGNAL="correction"
+  btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"correction\"}" 2>/dev/null || true
+  echo ""
+  echo "📝 CORRECTION DETECTED — Capture learning: \`ag intel remember \"...\" --type learning\`"
+  echo ""
+fi
+
+# Signal D: Confirmations — "yes", "ok", "go ahead" (only if pending decision exists)
+if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '^\s*(yes|yeah|yep|ok|okay|sure|approved?|go ahead|do it|sounds good|lgtm|confirmed?|proceed|ship it|that works)\s*[.!]?\s*$'; then
+  _PD_FILE=".agentic/session/pending-decision.txt"
+  if [[ -f "$_PD_FILE" ]]; then
+    _PD_TEXT=$(head -1 "$_PD_FILE" 2>/dev/null || true)
+    if [[ -n "$_PD_TEXT" ]]; then
+      _DB_SIGNAL="confirmation"
+      _DB_SAFE_PROMPT=$(printf '%s' "$_PD_TEXT" | tr '|' '/' | tr '\n' ' ')
+      btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"confirmation\"}" 2>/dev/null || true
+      echo ""
+      echo "📝 DECISION CONFIRMED: \"${_PD_TEXT}\""
+      echo "   Capture: \`ag intel remember \"${_PD_TEXT}\" --type decision --context \"confirmed recommendation\"\`"
+      echo ""
+      rm -f "$_PD_FILE" 2>/dev/null || true
+    fi
+  fi
+fi
+
+# Write to decision buffer (append-only, cleaned at session end by Stop.sh)
+if [[ -n "$_DB_SIGNAL" ]]; then
+  mkdir -p ".agentic/session" 2>/dev/null || true
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)|${_DB_SIGNAL}|${_DB_SAFE_PROMPT}" >> "$_DB_FILE"
+fi
+
 # --- Consolidated prompt context (Change 3: single Python call) ---
 # Replaces separate gate resolve + check-artifacts calls. Saves ~600ms of Python cold starts.
-# Returns JSON: {"feature": "F-XXXX", "issues": [...], "cerebrum": [...]}
+# Returns JSON: {"feature": "F-XXXX", "issues": [...], "cerebrum": [...]} (key kept as "cerebrum" for compat)
 PROMPT_CTX=$(PYTHONPATH="$PROJECT_ROOT/.agentic/lib" python3 -m gate prompt-context --project-root "$PROJECT_ROOT" 2>/dev/null || true)
 
 ACTIVE_FEATURE=""

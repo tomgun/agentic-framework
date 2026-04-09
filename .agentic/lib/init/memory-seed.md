@@ -21,8 +21,11 @@ Decision routing: current state → OVERVIEW.md, work log with reasoning → JOU
 - "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`.
 - "protected branch/can't push to main/push rejected" → Check `main_branch_mode` in STACK.md. If not set, suggest `ag set main_branch_mode protected`. When protected, `ag flush` creates a branch + PR instead of direct push.
 - "work autonomously/come back with working/finish everything/do it all" → STOP. Run `ag auto crunch`.
-- User correction: "no/don't/stop/always/never/I prefer" → STOP. Capture with `ag intel remember "what they said" --context "what you were doing"`. Preferences and learnings are project-scoped (cerebrum.yaml).
-- "intelligence/patterns/quality checks" → Run `ag intel` subcommands (check, learn, remember, patterns, cerebrum).
+- User correction: "no/don't/stop/always/never/I prefer" → STOP. Capture with `ag intel remember "what they said" --type learning --context "what you were doing"`. Preferences and learnings are project-scoped (project-memory.yaml), NOT Claude's local MEMORY.md.
+- User instruction: "always/never/from now on/make sure to/rule:" → Capture with `ag intel remember "..." --type preference`. If it should be enforced at write-time: `ag intel learn "..." --reason "user instruction" --scope "*"`.
+- User decision: "let's go with/I decide/I prefer/use X instead of Y" → Capture with `ag intel remember "..." --type decision`.
+- Proposing a choice: Before presenting a recommendation or asking the user to confirm, write: `echo "Use Redis for caching" > .agentic/session/pending-decision.txt`. The framework auto-detects "yes/ok" responses and logs the full decision.
+- "intelligence/patterns/quality checks" → Run `ag intel` subcommands (check, learn, remember, patterns, memory, decisions, batch-remember).
 - Before workflow phases: run `ag intel architecture` (planning), `ag intel spec F-XXXX` (specs), `ag intel implement F-XXXX` (coding), `ag intel test F-XXXX` (testing) for phase-aware quality guidance.
 - NEVER write code for multiple features outside of `ag auto` commands.
 - **Wrong rationalizations:** "I can do it directly faster" — NO. "User said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.

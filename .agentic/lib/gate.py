@@ -1024,7 +1024,7 @@ def main():
             print(json.dumps({"feature": feature_id, "issues": issues}))
         sys.exit(0)
 
-    # "prompt-context" combines resolve + check-artifacts + cerebrum in one call.
+    # "prompt-context" combines resolve + check-artifacts + project memory in one call.
     # Replaces 3 separate Python invocations in UserPromptSubmit.sh, saving ~600-800ms.
     if args.check == "prompt-context":
         feature_id = args.feature or resolve_active_feature(project_root)
@@ -1033,12 +1033,15 @@ def main():
             spec = check_feature_has_spec(feature_id, project_root)
             ac = check_feature_has_ac(feature_id, project_root)
             ctx["issues"] = spec.reasons + ac.reasons
-            # Load relevant cerebrum entries (project-scoped intelligence).
+            # Load relevant project memory entries (project-scoped intelligence).
             # Uses regex extraction — robust to indentation and quoting variations.
-            cerebrum_file = project_root / ".agentic" / "intel" / "cerebrum.yaml"
-            if cerebrum_file.exists():
+            memory_file = project_root / ".agentic" / "intel" / "project-memory.yaml"
+            if not memory_file.exists():
+                # Backward compat: check old name
+                memory_file = project_root / ".agentic" / "intel" / "cerebrum.yaml"
+            if memory_file.exists():
                 try:
-                    content = cerebrum_file.read_text()
+                    content = memory_file.read_text()
                     entries = []
                     # Split on entry boundaries (lines starting with "- id:" at any indent)
                     for block in re.split(r'(?m)^[ \t]*- id:', content):

@@ -46,7 +46,7 @@ assertions:
   - id: AC-006
     text: >
       `ag intel` dispatched correctly from ag.sh with subcommands: check, learn,
-      remove, patterns, remember, cerebrum, forget, and help
+      remove, patterns, remember, memory (alias: cerebrum), forget, and help
     type: structural
 
   - id: AC-007
@@ -59,18 +59,18 @@ assertions:
   - id: AC-008
     text: >
       `ag intel remember "text" --type preference|learning|decision --context "..."`
-      appends entry to cerebrum.yaml with auto-incremented C-XXXX ID and date
+      appends entry to project-memory.yaml with auto-incremented C-XXXX ID and date
     type: behavioral
 
   - id: AC-009
     text: >
-      `ag intel cerebrum` lists all entries; `ag intel cerebrum --type TYPE`
+      `ag intel memory` lists all entries; `ag intel memory --type TYPE`
       filters by type (preference|learning|decision)
     type: behavioral
 
   - id: AC-010
     text: >
-      `ag intel forget C-XXXX` removes a cerebrum entry by ID
+      `ag intel forget C-XXXX` removes a project memory entry by ID
     type: behavioral
 
   - id: AC-011
@@ -224,7 +224,7 @@ assertions:
   - id: AC-031
     text: >
       `ag intel implement [F-XXXX]` outputs code conventions, enforced
-      patterns, lessons learned, cerebrum knowledge, and quality-checklist
+      patterns, lessons learned, project memory knowledge, and quality-checklist
       implementation-phase items; F-XXXX parameter is optional in Discovery
     type: behavioral
     verify: "bash -c 'bash .agentic/lib/tools/ag.sh intel implement F-041 2>&1 | grep -aq \"Code Conventions\"'"
@@ -278,7 +278,7 @@ assertions:
   # --- Error Recovery & Resilience ---
   - id: AC-038
     text: >
-      Corrupted or empty patterns.yaml, cerebrum.yaml, and anatomy.yaml
+      Corrupted or empty patterns.yaml, project-memory.yaml, and anatomy.yaml
       do not crash any ag intel subcommand; commands exit 0 or 1 and
       never produce a Python traceback or shell error on stdout
     type: behavioral

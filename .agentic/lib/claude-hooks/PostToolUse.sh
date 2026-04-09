@@ -70,6 +70,26 @@ if [[ -n "$_POST_TOOL" ]]; then
       ;;
   esac
 
+  # --- Pending-decision resolution (F-041: Auto-capture pipeline) ---
+  # When agent acts (Write/Edit/Bash) after a pending-decision exists, the decision
+  # was implicitly confirmed by action. Log it and clean up.
+  _PD_FILE=".agentic/session/pending-decision.txt"
+  if [[ -f "$_PD_FILE" ]]; then
+    case "$_POST_TOOL" in
+      Write|Edit|MultiEdit|Bash)
+        _PD_TEXT=$(head -1 "$_PD_FILE" 2>/dev/null || true)
+        if [[ -n "$_PD_TEXT" ]]; then
+          _PD_SAFE=$(printf '%s' "$_PD_TEXT" | tr '|' '/' | tr '\n' ' ')
+          mkdir -p ".agentic/session" 2>/dev/null || true
+          echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)|action_confirmed|${_PD_SAFE}" >> ".agentic/session/decision-buffer.log" 2>/dev/null || true
+          btrace "PostToolUse" "decision_enacted" "{\"tool\":\"${_POST_TOOL}\"}" 2>/dev/null || true
+          echo "📝 Decision enacted: \"${_PD_TEXT:0:80}\". Logged to decision buffer." >&2
+          rm -f "$_PD_FILE" 2>/dev/null || true
+        fi
+        ;;
+    esac
+  fi
+
   # --- Token budget awareness (Change 6b) ---
   # Every 5th Read event, check for repeated reads and total token cost.
   # Pushes one-time warning when thresholds exceeded.

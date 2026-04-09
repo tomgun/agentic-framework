@@ -144,11 +144,11 @@ assertions:
     text: >
       DEVELOPER_GUIDE routing table includes rows for decisions (product,
       technical, process) pointing to OVERVIEW.md + JOURNAL.md --decision,
-      and user preferences pointing to cerebrum.yaml
+      and user preferences pointing to project-memory.yaml
     type: structural
     verify: >
       grep -q "Decision made\|Design decision\|decision" .agentic/lib/DEVELOPER_GUIDE.md &&
-      grep -q "cerebrum" .agentic/lib/DEVELOPER_GUIDE.md
+      grep -q "project-memory\|cerebrum" .agentic/lib/DEVELOPER_GUIDE.md
 
   - id: AC-019
     text: >

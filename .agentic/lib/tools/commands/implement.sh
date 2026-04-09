@@ -445,14 +445,15 @@ if c.has_pending_input:
         _ptn_err="${_ptn_err## }"
         echo "- **Patterns**: ${_ptn_count} enforced (${_ptn_err} error-level) — checked at write-time"
       fi
-      # Cerebrum entries
-      local _cer_file="$ROOT_DIR/.agentic/intel/cerebrum.yaml"
+      # Project memory entries
+      local _cer_file="$ROOT_DIR/.agentic/intel/project-memory.yaml"
+      [[ ! -f "$_cer_file" ]] && _cer_file="$ROOT_DIR/.agentic/intel/cerebrum.yaml"
       if [[ -f "$_cer_file" ]]; then
         local _cer_count
         _cer_count=$(grep -c "^  - id:" "$_cer_file" 2>/dev/null || echo 0)
         _cer_count="${_cer_count## }"
         if [[ "${_cer_count:-0}" -gt 0 ]]; then
-          echo "- **Cerebrum**: ${_cer_count} project learnings — run \`ag intel cerebrum\` for details"
+          echo "- **Project Memory**: ${_cer_count} project learnings — run \`ag intel memory\` for details"
         fi
       fi
       # Conventions

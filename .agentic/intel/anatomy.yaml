@@ -88,8 +88,8 @@ files:
     tokens: 428
     language: unknown
     related: []
-  - path: ".agentic/intel/cerebrum.yaml"
-    summary: "cerebrum.yaml"
+  - path: ".agentic/intel/project-memory.yaml"
+    summary: "project-memory.yaml"
     tokens: 92
     language: yaml
     related: []
@@ -8714,7 +8714,7 @@ files:
     language: markdown
     related: []
   - path: "examples/archived/old/inited_project/reports/dashboard.txt"
-    summary: "╔═════════════════════════�"
+    summary: "╔═════════════════════════�"
     tokens: 749
     language: text
     related: []
@@ -9424,7 +9424,7 @@ files:
     language: markdown
     related: []
   - path: "examples/archived/old/nextjs_evolved/reports/dashboard.txt"
-    summary: "╔═════════════════════════�"
+    summary: "╔═════════════════════════�"
     tokens: 774
     language: text
     related: []

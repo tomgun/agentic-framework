@@ -44,7 +44,7 @@ graph TB
 
     subgraph intel [.agentic/intel/ - Intelligence]
         PATTERNS[patterns.yaml<br/>enforced rules]
-        CEREBRUM[cerebrum.yaml<br/>project knowledge]
+        CEREBRUM[project-memory.yaml<br/>project knowledge]
         ANATOMY[anatomy.yaml<br/>file intelligence]
         QC[quality-checklist.yaml<br/>5 dims × 4 phases]
         TSTRAT[test-strategy.yaml<br/>per test level]

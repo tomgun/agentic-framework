@@ -54,7 +54,10 @@ Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and
 - Plans are durable: save to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` after approval. If `plan_review_enabled: yes`: plan review uses dialectical mechanism (Critic + Advocate agents, fresh context).
 - Multi-agent: check AGENTS.json (via `agents_helpers.py list`) before starting work.
 - Quick capture: "remember/todo/idea" → run `ag todo "description"` for persistent capture.
-- User correction: "no/don't/stop/always/never/I prefer" → capture with `ag intel remember "what they said" --context "what you were doing"`. Preferences, learnings, and decisions are project-scoped (cerebrum.yaml), not personal memory.
+- User correction: "no/don't/stop/always/never" → capture with `ag intel remember "what they said" --type learning --context "what you were doing"`. Stored in project-memory.yaml, NOT personal memory.
+- User instruction: "always/never/from now on/make sure to" → capture with `ag intel remember "..." --type preference`. For write-time enforcement: `ag intel learn "..." --reason "user instruction" --scope "*"`.
+- User decision: "let's go with/I decide/I prefer" → capture with `ag intel remember "..." --type decision`.
+- Proposing a choice: before asking user to confirm, write: `echo "decision summary" > .agentic/session/pending-decision.txt`. The framework auto-detects "yes/ok" and logs the decision.
 - Phase intelligence: before each workflow phase, run `ag intel architecture|spec|implement|test [F-XXXX]` for context-aware guidance (ADRs, patterns, quality checks). Skills reference these commands.
 - Pending user input: "pending user input/contract input" → run `ag contract pending`. Process each pending contract.
 - Migrate specs: "migrate specs/convert acceptance" → run `ag migrate-specs` (converts markdown ACs to YAML contracts).
@@ -91,7 +94,9 @@ Decision routing:
 - **Decision marker** → JOURNAL.md `--decision` flag (grep-able: `grep "Decision:" JOURNAL.md`)
 - **Full ADR** → spec/adr/ (formal profile, architecturally significant only)
 - **Ways of working** → STACK.md settings + CONTEXT_PACK.md conventions
-- **User preferences** → cerebrum.yaml via `ag intel remember`
+- **User preferences** → project-memory.yaml via `ag intel remember` (auto-detected by hooks, `ag intel decisions` to review)
+- **User instructions** → project-memory.yaml (preference) or patterns.yaml (enforced) via `ag intel learn`
+- **Settings changes** → auto-logged to project-memory.yaml when mode-affecting settings change via `ag set`
 
 ## Skills & Workflows
 

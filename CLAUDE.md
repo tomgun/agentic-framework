@@ -103,7 +103,7 @@ Decision routing:
 - **Decision marker** → JOURNAL.md `--decision` flag (grep-able: `grep "Decision:" JOURNAL.md`)
 - **Full ADR** → spec/adr/ (formal profile, architecturally significant only)
 - **Ways of working** → STACK.md settings + CONTEXT_PACK.md conventions
-- **User preferences** → cerebrum.yaml via `ag intel remember`
+- **User preferences** → project-memory.yaml via `ag intel remember`
 
 ## Skills & Workflows
 

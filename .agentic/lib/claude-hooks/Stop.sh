@@ -182,6 +182,33 @@ ILEOF
   rm -f "$_IL_EVENTS"
 fi
 
+# --- Decision buffer audit (F-041: Auto-capture pipeline) ---
+# Sweep decision buffer for uncaptured signals. Warn if decisions were detected but not stored.
+_DB_FILE=".agentic/session/decision-buffer.log"
+if [[ -f "$_DB_FILE" ]]; then
+  _DB_COUNT=$(wc -l < "$_DB_FILE" 2>/dev/null || echo 0)
+  _DB_COUNT="${_DB_COUNT## }"; _DB_COUNT="${_DB_COUNT%% }"; _DB_COUNT="${_DB_COUNT%%[!0-9]*}"; _DB_COUNT="${_DB_COUNT:-0}"
+
+  # Count project memory mutations this session (from intel-events if it was processed, else from file)
+  _DB_CAPTURES=0
+  if [[ -n "${_IL_MUTATES:-}" ]]; then
+    _DB_CAPTURES="${_IL_MUTATES:-0}"
+  fi
+
+  if [[ "${_DB_COUNT:-0}" -gt 0 && "${_DB_CAPTURES:-0}" -lt "${_DB_COUNT:-0}" ]]; then
+    _DB_UNCAPTURED=$(( _DB_COUNT - _DB_CAPTURES ))
+    [[ $_DB_UNCAPTURED -lt 0 ]] && _DB_UNCAPTURED=0
+    if [[ "$_DB_UNCAPTURED" -gt 0 ]]; then
+      echo "⚠️  ${_DB_COUNT} decision signal(s) detected this session, ~${_DB_CAPTURES} captured to project memory." >&2
+      echo "   ${_DB_UNCAPTURED} may be uncaptured. Review: \`cat .agentic/session/decision-buffer.log\`" >&2
+      echo "   Batch capture: \`ag intel batch-remember --from-buffer\`" >&2
+    fi
+  fi
+
+  btrace "Stop" "decision_audit" "{\"signals\":${_DB_COUNT},\"captures\":${_DB_CAPTURES}}" 2>/dev/null || true
+  # Buffer cleaned below with other sentinels
+fi
+
 # --- Clean up advisory nudge sentinels (safe on deny — they're just dedup flags) ---
 rm -f .agentic/session/.impl_intel_pushed 2>/dev/null || true
 rm -f .agentic/session/.token_budget_warned 2>/dev/null || true
@@ -230,6 +257,9 @@ rm -f .agentic/session/.phase_implementing 2>/dev/null || true
 rm -f .agentic/session/.impl-brief.md 2>/dev/null || true
 rm -f .agentic/session/.contract-surface.txt 2>/dev/null || true
 rm -f .agentic/session/.nfr-brief.txt 2>/dev/null || true
+# Decision pipeline ephemeral files
+rm -f .agentic/session/decision-buffer.log 2>/dev/null || true
+rm -f .agentic/session/pending-decision.txt 2>/dev/null || true
 
 btrace "Stop" "exit" "{\"decision\":\"allow\",\"exit_code\":0}" 2>/dev/null || true
 

@@ -489,7 +489,7 @@ The intelligence engine (F-041) makes the framework smarter than vanilla Claude 
 | File | Purpose | How populated |
 |---|---|---|
 | `patterns.yaml` | Machine-matchable anti-patterns with scope globs | `ag intel learn` or `ag intel bootstrap` |
-| `cerebrum.yaml` | Project-scoped preferences, learnings, decisions | `ag intel remember` (auto-captured from user corrections) |
+| `project-memory.yaml` | Project-scoped preferences, learnings, decisions | `ag intel remember` (auto-captured from user decisions/corrections) |
 | `anatomy.yaml` | File summaries, token estimates, language detection | `ag intel scan` |
 | `quality-checklist.yaml` | 5 quality dimensions × 4 workflow phases | `ag intel bootstrap` |
 | `test-strategy.yaml` | Test levels with framework, patterns, antipatterns | `ag intel bootstrap` |
@@ -896,7 +896,7 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 |---------|-------------|--------|
 | **CONTEXT_PACK.md** (F-0025) | Architecture snapshot: modules, entry points, key files, data flow. Read FIRST at session start. Template with code style examples section. | ACTIVE - manually maintained |
 | **STATUS.md** (F-0024) | Current focus, progress, next steps, blockers. Updated via `status.sh` (token-efficient). Staleness enforced by pre-commit. | ACTIVE - structurally enforced |
-| **JOURNAL.md** (F-0023) | Append-only session log via `journal.sh`. Staleness enforced. `--why` flag documents reasoning. `--decision` flag marks decision entries (grep-able). Decision routing: current state → OVERVIEW.md, decision history → JOURNAL.md, tradeoffs → ADR (formal), preferences → cerebrum.yaml. | ACTIVE - structurally enforced |
+| **JOURNAL.md** (F-0023) | Append-only session log via `journal.sh`. Staleness enforced. `--why` flag documents reasoning. `--decision` flag marks decision entries (grep-able). Decision routing: current state → OVERVIEW.md, decision history → JOURNAL.md, tradeoffs → ADR (formal), preferences → project-memory.yaml. | ACTIVE - structurally enforced |
 | **FEATURES.md** (F-002, F-003) | Feature tracking with lifecycle (planned → in_progress → shipped). Machine-readable YAML frontmatter. Updated via `feature.sh`. Staleness enforced when spec files change. | ACTIVE - Formal only |
 | **HUMAN_NEEDED.md** (F-0026) | Blockers requiring human action. Updated via `blocker.sh`. | ACTIVE |
 | **Acceptance Criteria** (F-0005) | `spec/acceptance/F-####.md` per feature. Pre-commit blocks if shipped feature has no acceptance file. | ACTIVE - structural gate |
@@ -1173,7 +1173,7 @@ These will always rely on behavioral reinforcement:
 `pre-commit-check.sh`, `doctor.py`/`doctor.sh`, `validate_specs.py`, `validate_framework.sh` (tests), `integration_verify.py`
 
 ### Intelligence Engine
-`intel.sh` (patterns, cerebrum, anatomy, bootstrap, retro, architecture, spec, implement, test, stats)
+`intel.sh` (patterns, memory, anatomy, bootstrap, retro, architecture, spec, implement, test, stats)
 
 ### Analysis & Traceability
 `coverage.py`, `drift.sh`, `scope_check.sh`, `consistency.py`, `phase_detect.py`, `query_features.py`, `feature_graph.py`, `deps.py`, `whatchanged.py`, `session-analyze.py`

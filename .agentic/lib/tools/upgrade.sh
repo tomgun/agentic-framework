@@ -748,15 +748,21 @@ else
     echo -e "  ${GREEN}✓${NC} Created .agentic/intel/ directory (intelligence engine)"
   fi
 
-  # Ensure cerebrum.yaml exists for project-scoped learning (v0.77.0, F-041)
-  if [[ ! -f "$TARGET_PROJECT_DIR/.agentic/intel/cerebrum.yaml" ]]; then
-    cat > "$TARGET_PROJECT_DIR/.agentic/intel/cerebrum.yaml" <<'CEREBRUM_INIT'
+  # Ensure project-memory.yaml exists for project-scoped learning (v0.77.0, F-041)
+  if [[ ! -f "$TARGET_PROJECT_DIR/.agentic/intel/project-memory.yaml" ]]; then
+    # Migrate from old name if it exists
+    if [[ -f "$TARGET_PROJECT_DIR/.agentic/intel/cerebrum.yaml" ]]; then
+      mv "$TARGET_PROJECT_DIR/.agentic/intel/cerebrum.yaml" "$TARGET_PROJECT_DIR/.agentic/intel/project-memory.yaml"
+      echo -e "  ${GREEN}✓${NC} Renamed cerebrum.yaml → project-memory.yaml"
+    else
+      cat > "$TARGET_PROJECT_DIR/.agentic/intel/project-memory.yaml" <<'PM_INIT'
 version: 1
 description: >
-  Project-scoped intelligence from user corrections and discoveries.
+  Project-scoped intelligence from user decisions, preferences, and discoveries.
 entries: []
-CEREBRUM_INIT
-    echo -e "  ${GREEN}✓${NC} Created cerebrum.yaml (project learning)"
+PM_INIT
+      echo -e "  ${GREEN}✓${NC} Created project-memory.yaml (project learning)"
+    fi
   fi
 
   # Migrate review_*: auto → skip in STACK.md (v0.51.0: "auto" renamed to "skip")

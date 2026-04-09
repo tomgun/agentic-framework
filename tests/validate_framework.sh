@@ -5851,11 +5851,11 @@ else
   fail "F-041 AC-008: ag intel remember missing"
 fi
 
-if grep -q '_intel_cerebrum' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
-   grep -q 'cerebrum)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
-  pass "F-041 AC-009: ag intel cerebrum command implemented"
+if grep -q '_intel_memory' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'memory' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-009: ag intel memory command implemented"
 else
-  fail "F-041 AC-009: ag intel cerebrum missing"
+  fail "F-041 AC-009: ag intel memory missing"
 fi
 
 if grep -q '_intel_forget' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
@@ -6268,7 +6268,7 @@ fi
 
 # AC-018: DEVELOPER_GUIDE routing table includes decision rows
 if grep -q "decision" "${FRAMEWORK_ROOT}/.agentic/lib/DEVELOPER_GUIDE.md" && \
-   grep -q "cerebrum" "${FRAMEWORK_ROOT}/.agentic/lib/DEVELOPER_GUIDE.md"; then
+   grep -q "project.memory\|cerebrum" "${FRAMEWORK_ROOT}/.agentic/lib/DEVELOPER_GUIDE.md"; then
   pass "F-042 AC-018: DEVELOPER_GUIDE routing table includes decision rows"
 else
   fail "F-042 AC-018: DEVELOPER_GUIDE routing table missing decision rows"
