@@ -105,6 +105,56 @@ if [[ "$GATE_RC" -ne 0 ]]; then
   fi
 fi
 
+# --- DRAFT plan gate: block code edits until plan review completes ---
+# When plan_review_enabled=yes and a DRAFT plan exists, block Write/Edit on
+# implementation files. Plans in ~/.claude/plans/ (session-scoped) or
+# .agentic/journal/plans/ (durable) are both checked.
+# Allows edits to plan files themselves and non-code files (docs, configs).
+if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "MultiEdit" ]]; then
+  source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
+  _PLAN_REVIEW=$(get_setting "plan_review_enabled" "no" 2>/dev/null || echo "no")
+  if [[ "$_PLAN_REVIEW" == "yes" ]]; then
+    _DRAFT_FOUND=""
+    # Check durable plans
+    for _pf in .agentic/journal/plans/*-plan.md; do
+      [[ -f "$_pf" ]] || continue
+      if grep -q '^\*\*Status\*\*.*DRAFT\|^Status:.*DRAFT' "$_pf" 2>/dev/null; then
+        _DRAFT_FOUND="$_pf"; break
+      fi
+    done
+    # Check session-scoped plans (Claude Code's ~/.claude/plans/)
+    if [[ -z "$_DRAFT_FOUND" && -d "$HOME/.claude/plans" ]]; then
+      for _pf in "$HOME"/.claude/plans/*.md; do
+        [[ -f "$_pf" ]] || continue
+        if grep -q '^\*\*Status\*\*.*DRAFT\|^Status:.*DRAFT' "$_pf" 2>/dev/null; then
+          _DRAFT_FOUND="$_pf"; break
+        fi
+      done
+    fi
+    if [[ -n "$_DRAFT_FOUND" ]]; then
+      # Extract file path from tool input to check if it's a code file
+      _DP_PATH=""
+      case "$TOOL_INPUT" in
+        *'"file_path"'*)
+          _DP_PATH="${TOOL_INPUT#*\"file_path\"}"
+          _DP_PATH="${_DP_PATH#*:}"
+          _DP_PATH="${_DP_PATH#*\"}"
+          _DP_PATH="${_DP_PATH%%\"*}"
+          ;;
+      esac
+      # Allow edits to plans, docs, configs — block edits to code/implementation files
+      case "$_DP_PATH" in
+        *plan*.md|*CLAUDE.md|*memory-seed*|*JOURNAL*|*STATUS*|*HUMAN_NEEDED*|*TODO*|*CONTRIBUTIONS*|*OVERVIEW*|*FEATURES*|*STACK*|*CONTEXT_PACK*|"")
+          ;; # Allow — these are plan/doc/config files
+        *)
+          btrace "PreToolUse" "draft_plan_block" "{\"file\":\"${_DP_PATH:0:80}\",\"plan\":\"$(basename "$_DRAFT_FOUND")\"}" 2>/dev/null || true
+          _deny "DRAFT plan exists ($(basename "$_DRAFT_FOUND")). Complete dialectical review (Critic + Advocate → synthesize → approve) before writing code. Plan review is mandatory when plan_review_enabled=yes."
+          ;;
+      esac
+    fi
+  fi
+fi
+
 # --- Intelligence: Pattern check for Write/Edit ---
 # Advisory only — warns on matching patterns, never blocks.
 # Pure bash, no Python, targets <50ms.
