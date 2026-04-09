@@ -6028,6 +6028,61 @@ else
 fi
 
 # ============================================================
+# TDD Mode — PreToolUse gate enforcement (F-0008)
+# ============================================================
+
+# TDD gate exists in gate.py
+if grep -q 'development_mode.*tdd' "${FRAMEWORK_ROOT}/.agentic/lib/gate.py" && \
+   grep -q 'tdd_safe' "${FRAMEWORK_ROOT}/.agentic/lib/gate.py" && \
+   grep -q 'RED:' "${FRAMEWORK_ROOT}/.agentic/lib/gate.py"; then
+  pass "TDD: PreToolUse gate in gate.py checks for RED phase checkpoint"
+else
+  fail "TDD: PreToolUse gate missing from gate.py"
+fi
+
+# TDD gate emits btrace events
+if grep -q 'tdd_block' "${FRAMEWORK_ROOT}/.agentic/lib/gate.py"; then
+  pass "TDD: gate.py emits btrace event on TDD block"
+else
+  fail "TDD: gate.py missing btrace event for TDD block"
+fi
+
+# Skills reference --phase checkpoints
+if grep -q 'checkpoint --phase RED' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/implementing-features/SKILL.md" && \
+   grep -q 'checkpoint --phase GREEN' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/implementing-features/SKILL.md"; then
+  pass "TDD: implementing-features skill has RED/GREEN phase checkpoint commands"
+else
+  fail "TDD: implementing-features skill missing phase checkpoint commands"
+fi
+
+if grep -q 'checkpoint --phase RED' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/fixing-bugs/SKILL.md"; then
+  pass "TDD: fixing-bugs skill has RED phase checkpoint command"
+else
+  fail "TDD: fixing-bugs skill missing phase checkpoint command"
+fi
+
+if grep -q 'checkpoint --phase RED' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/writing-tests/SKILL.md"; then
+  pass "TDD: writing-tests skill has RED phase checkpoint command"
+else
+  fail "TDD: writing-tests skill missing phase checkpoint command"
+fi
+
+# btrace bug fixes: debug.sh uses || true instead of || echo 0 for grep -c
+if grep -q 'grep -c.*|| true' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/debug.sh" && \
+   ! grep -q 'grep -c.*|| echo 0' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/debug.sh"; then
+  pass "btrace: debug.sh uses safe grep -c pattern (|| true, not || echo 0)"
+else
+  fail "btrace: debug.sh still has unsafe grep -c || echo 0 pattern"
+fi
+
+# btrace bug fix: debug on/off uses first-match sed
+if grep -q '0,/' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/debug.sh"; then
+  pass "btrace: debug on/off uses first-match sed (0,/pattern/)"
+else
+  fail "btrace: debug on/off missing first-match sed — may modify all btrace entries"
+fi
+
+# ============================================================
 # F-043: Persona & Platform Dimensions for Contract Specs
 # ============================================================
 echo "--- F-043: Persona & Platform Dimensions ---"

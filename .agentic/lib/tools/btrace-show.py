@@ -39,28 +39,34 @@ def render_timeline(trace_file: str, hook_filter: str = "", decision_filter: str
         print("No events in trace file.")
         return
 
+    # Apply filters before computing header stats
+    filtered = events
+    if hook_filter:
+        filtered = [e for e in filtered if e.get("hook") == hook_filter]
+    if decision_filter:
+        filtered = [e for e in filtered if e.get("data", {}).get("decision") == decision_filter]
+
+    if not filtered:
+        print("No events match the given filters.")
+        return
+
     # Header
-    first_ts = events[0].get("ts", "?")
-    last_ts = events[-1].get("ts", "?")
+    first_ts = filtered[0].get("ts", "?")
+    last_ts = filtered[-1].get("ts", "?")
     total_denials = sum(
-        1 for e in events if e.get("data", {}).get("decision") == "deny"
+        1 for e in filtered if e.get("data", {}).get("decision") == "deny"
     )
-    print(f"{BOLD}=== Behavioral Trace ({len(events)} events, {total_denials} denials) ==={NC}")
+    print(f"{BOLD}=== Behavioral Trace ({len(filtered)} events, {total_denials} denials) ==={NC}")
     print(f"{DIM}    {first_ts} → {last_ts}{NC}")
     print()
 
-    for event in events:
+    for event in filtered:
         hook = event.get("hook", "?")
         phase = event.get("phase", "?")
         ts = event.get("ts", "?")
         data = event.get("data", {})
 
-        # Apply filters
-        if hook_filter and hook != hook_filter:
-            continue
         decision = data.get("decision", "")
-        if decision_filter and decision != decision_filter:
-            continue
 
         # Format time
         time_part = ts.split("T")[1].rstrip("Z") if "T" in ts else ts

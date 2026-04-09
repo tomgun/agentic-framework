@@ -76,13 +76,14 @@ _debug_status() {
 }
 
 _debug_on() {
-    # Add btrace setting to STACK.md
+    # Add btrace setting to STACK.md (only first occurrence — avoids clobbering profile presets)
     if grep -q '^\s*-\s*btrace:' "$ROOT_DIR/STACK.md" 2>/dev/null; then
-        sed -i 's/^\(\s*-\s*btrace:\s*\).*/\1on/' "$ROOT_DIR/STACK.md"
+        sed -i '0,/^\(\s*-\s*btrace:\s*\).*/{s/^\(\s*-\s*btrace:\s*\).*/\1on/}' "$ROOT_DIR/STACK.md"
     else
         # Append after ## Settings header
         if grep -q '## Settings' "$ROOT_DIR/STACK.md" 2>/dev/null; then
-            sed -i '/## Settings/a - btrace: on' "$ROOT_DIR/STACK.md"
+            sed -i '0,/## Settings/{/## Settings/a - btrace: on
+}' "$ROOT_DIR/STACK.md"
         else
             echo -e "\n## Settings\n- btrace: on" >> "$ROOT_DIR/STACK.md"
         fi
@@ -94,7 +95,7 @@ _debug_on() {
 
 _debug_off() {
     if grep -q '^\s*-\s*btrace:' "$ROOT_DIR/STACK.md" 2>/dev/null; then
-        sed -i 's/^\(\s*-\s*btrace:\s*\).*/\1off/' "$ROOT_DIR/STACK.md"
+        sed -i '0,/^\(\s*-\s*btrace:\s*\).*/{s/^\(\s*-\s*btrace:\s*\).*/\1off/}' "$ROOT_DIR/STACK.md"
     fi
     echo -e "${GREEN}✓${NC} Behavioral tracing disabled (btrace: off)"
 }
@@ -127,8 +128,8 @@ _debug_list() {
         events=$(wc -l < "$trace_file" 2>/dev/null || echo 0)
         events="${events## }"
         local denials
-        denials=$(grep -c '"decision":"deny"' "$trace_file" 2>/dev/null || echo 0)
-        denials="${denials## }"
+        denials=$(grep -c '"decision":"deny"' "$trace_file" 2>/dev/null || true)
+        denials="${denials:-0}"; denials="${denials## }"
         local mod_date
         mod_date=$(date -r "$trace_file" +%Y-%m-%d 2>/dev/null || stat -c %y "$trace_file" 2>/dev/null | cut -d' ' -f1 || echo "unknown")
 
@@ -237,7 +238,7 @@ _debug_bundle() {
         ec=$(wc -l < "$f" 2>/dev/null || echo 0); ec="${ec## }"
         total_events=$((total_events + ec))
         local dc
-        dc=$(grep -c '"decision":"deny"' "$f" 2>/dev/null || echo 0); dc="${dc## }"
+        dc=$(grep -c '"decision":"deny"' "$f" 2>/dev/null || true); dc="${dc:-0}"; dc="${dc## }"
         total_denials=$((total_denials + dc))
     done
 

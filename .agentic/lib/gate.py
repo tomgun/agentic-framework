@@ -834,6 +834,53 @@ def gate_pretool(feature_id: Optional[str], project_root: Path,
                         f"Code edit blocked — {feature_id} needs spec and acceptance criteria first")
                     return _pretool_deny(combined)
 
+    # --- TDD enforcement: block source edits without RED phase checkpoint ---
+    # When development_mode: tdd, agents must write a failing test (RED) before
+    # editing source code. Checks AGENTS.json for active feature progress entries.
+    if tool in ("Write", "Edit", "MultiEdit"):
+        dev_mode = get_setting(project_root, "development_mode", "standard")
+        if dev_mode == "tdd":
+            file_path = input_data.get("file_path", "")
+            # Only gate source files — tests, docs, config, framework are always allowed
+            tdd_safe = [
+                r'tests?/', r'_test\.', r'\.test\.', r'\.spec\.', r'test_',
+                r'\.agentic/', r'docs?/', r'\.claude/',
+                r'\.md$', r'\.json$', r'\.yaml$', r'\.yml$',
+                r'\.sh$', r'\.toml$', r'\.cfg$', r'\.ini$', r'\.lock$',
+                r'Makefile$', r'Dockerfile', r'\.gitignore$',
+            ]
+            is_tdd_safe = any(re.search(p, file_path) for p in tdd_safe)
+            if not is_tdd_safe:
+                # Check AGENTS.json for RED phase checkpoint
+                paths = get_paths(project_root)
+                has_red = False
+                try:
+                    if paths.agents_json.exists():
+                        import json as _json
+                        items = _json.loads(paths.agents_json.read_text())
+                        for item in items:
+                            if (item.get("type") != "session"
+                                    and item.get("status") in ("active", "created")):
+                                for entry in item.get("progress", []):
+                                    if isinstance(entry, str) and entry.startswith("RED:"):
+                                        has_red = True
+                                        break
+                            if has_red:
+                                break
+                except Exception:
+                    has_red = True  # fail-open on read errors
+                if not has_red:
+                    msg = (
+                        "TDD mode: write a failing test FIRST. "
+                        "Source code edits are blocked until a RED phase checkpoint exists. "
+                        "Write your test, then run: "
+                        "bash .agentic/lib/tools/wip.sh checkpoint --phase RED \"test for [behavior] fails\""
+                    )
+                    btrace.emit(project_root, "gate", "tdd_block", {
+                        "file": file_path[:80], "reason": "no_red_phase",
+                    })
+                    return _pretool_deny(GateResult.deny([msg]))
+
     # --- Defense-in-depth: duplicate git pre-commit checks at edit time ---
     # These checks mirror pre-commit-check.sh so enforcement works even without
     # git hooks (git_mode: deferred/none). See gap analysis in F-0250 plan.
