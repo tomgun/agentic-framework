@@ -91,5 +91,18 @@ assertions:
     tests:
       - tests/test_state_machine.py::TestDesignedState::test_contract_roundtrip_designed
 
+  - id: AC-008
+    text: "gate.py check_plan_review_evidence blocks code edits for ad-hoc plans (non-feature-ID sentinels)"
+    type: structural
+    verify: |
+      grep -q 'missing_evidence.append.*adhoc' .agentic/lib/gate.py
+
 nfr_refs: []
-migrations: []
+migrations:
+- id: M-2026-04-09-001
+  date: '2026-04-09'
+  trigger: implementation_discovery
+  reason: 'Ad-hoc plans with non-feature-ID sentinels were silently skipped by check_plan_review_evidence.'
+  changes:
+  - 'Added AC-008: gate.py blocks code edits for ad-hoc plan sentinels'
+  approved_by: user
