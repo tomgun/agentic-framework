@@ -17,6 +17,7 @@ Decision routing: current state → OVERVIEW.md, work log with reasoning → JOU
 - "phase done/mark phase/phase progress/which phase" → STOP. Run `ag phase list F-XXXX` to see phases, `ag phase done F-XXXX <id>` to mark complete.
 - "pending user input/contract input" → STOP. Run `ag contract pending`. Process each pending contract.
 - "contract/assertion/verify contract/check contract" → Run `ag contract check` or `ag contract list`. Contracts are in `spec/contracts/F-XXXX.yaml`.
+- "promote/unshipped/planned assertions" → Run `ag contract promote F-XXXX` to promote planned assertions to shipped.
 - "migrate specs/convert acceptance/markdown to yaml" → STOP. Run `ag migrate-specs` (add `--dry-run` to preview, `--archive` to move old files).
 - "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`.
 - "protected branch/can't push to main/push rejected" → Check `main_branch_mode` in STACK.md. If not set, suggest `ag set main_branch_mode protected`. When protected, `ag flush` creates a branch + PR instead of direct push.
