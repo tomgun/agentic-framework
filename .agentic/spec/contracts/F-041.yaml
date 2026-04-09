@@ -397,54 +397,52 @@ assertions:
 
   - id: AC-053
     text: >
-      UserPromptSubmit.sh detects four signal types in user prompts:
-      instructions (always/never + verb), decisions (let's go with/I prefer),
-      corrections (no + correction context), and confirmations (yes/ok with
-      pending-decision.txt); writes detected signals to session decision buffer
+      UserPromptSubmit.sh buffers user prompts to prompt-buffer.log and
+      optionally nudges the LLM for preference capture; controlled by
+      intel_capture setting (retro: buffer only, realtime: per-prompt nudge,
+      off: disabled); LLM does semantic classification, not regex
     type: structural
-    verify: "bash -c 'grep -q decision_signal .agentic/lib/claude-hooks/UserPromptSubmit.sh && grep -q decision-buffer.log .agentic/lib/claude-hooks/UserPromptSubmit.sh'"
+    verify: "bash -c 'grep -q prompt-buffer.log .agentic/lib/claude-hooks/UserPromptSubmit.sh && grep -q intel_capture .agentic/lib/claude-hooks/UserPromptSubmit.sh'"
 
   - id: AC-054
     text: >
-      Decision buffer at .agentic/session/decision-buffer.log uses pipe-delimited
-      format TIMESTAMP|SIGNAL_TYPE|PROMPT_TEXT (append-only, session-scoped);
+      Prompt buffer at .agentic/session/prompt-buffer.log uses pipe-delimited
+      format TIMESTAMP|PROMPT_TEXT (append-only, session-scoped);
       cleaned up by Stop.sh at session end
     type: structural
-    verify: "bash -c 'grep -q decision-buffer.log .agentic/lib/claude-hooks/Stop.sh'"
+    verify: "bash -c 'grep -q prompt-buffer.log .agentic/lib/claude-hooks/Stop.sh'"
 
   - id: AC-055
     text: >
       Pending-decision protocol: UserPromptSubmit resolves .agentic/session/pending-decision.txt
       when user confirms (yes/ok/approved); PostToolUse resolves it when agent
-      acts (Write/Edit/Bash) after a pending decision exists; both write to
-      decision buffer and clean up the pending file
+      acts (Write/Edit/Bash) after a pending decision exists; both advise
+      the LLM to capture via ag intel remember and clean up the pending file
     type: structural
     verify: "bash -c 'grep -q pending-decision.txt .agentic/lib/claude-hooks/UserPromptSubmit.sh && grep -q pending-decision.txt .agentic/lib/claude-hooks/PostToolUse.sh'"
 
   - id: AC-056
     text: >
-      `ag set` auto-logs mode-affecting settings changes (profile, acceptance_criteria,
-      plan_review_enabled, git_workflow, docs_gate, etc.) to project-memory.yaml
-      with type=decision and source=settings_change
+      REMOVED: Settings changes are tracked in STACK.md git history.
+      Auto-logging to project-memory.yaml was removed as noise.
     type: structural
-    verify: "bash -c 'grep -q settings_change .agentic/lib/tools/commands/settings.sh'"
+    verify: "bash -c '! grep -q \"intel remember\" .agentic/lib/tools/commands/settings.sh'"
 
   - id: AC-057
     text: >
-      Stop.sh audits the decision buffer at session end: compares signal count
-      to cerebrum mutation count and warns when decisions were detected but
-      not captured; suggests `ag intel batch-remember --from-buffer`
+      Stop.sh nudges preference review at session end when intel_capture
+      is retro or realtime and prompt buffer has entries; suggests
+      ag intel review-session for LLM-driven review
     type: structural
-    verify: "bash -c 'grep -q batch-remember .agentic/lib/claude-hooks/Stop.sh'"
+    verify: "bash -c 'grep -q review-session .agentic/lib/claude-hooks/Stop.sh'"
 
   - id: AC-058
     text: >
-      `ag intel batch-remember --from-buffer` reads decision-buffer.log and
-      creates project memory entries for each signal; maps signal types to
-      entry types (instruction→preference, decision/confirmation→decision,
-      correction→learning)
+      `ag intel review-session` displays the session prompt buffer for
+      LLM-driven preference review; the LLM decides what to capture
+      via ag intel remember. Legacy batch-remember kept as deprecated alias.
     type: structural
-    verify: "bash -c 'grep -q _intel_batch_remember .agentic/lib/tools/commands/intel.sh'"
+    verify: "bash -c 'grep -q _intel_review_session .agentic/lib/tools/commands/intel.sh'"
 
   - id: AC-059
     text: >
@@ -456,11 +454,10 @@ assertions:
 
   - id: AC-060
     text: >
-      Decision entries of type=decision auto-dual-write to JOURNAL.md via
-      journal.sh --decision flag, creating grep-able **Decision**: lines
-      for chronological traceability alongside structured project-memory.yaml
+      REMOVED: Journal entries are written explicitly by agents for meaningful
+      project milestones. Auto-dual-write from project-memory was noise.
     type: structural
-    verify: "bash -c 'grep -q \"journal_tool.*journal.sh\" .agentic/lib/tools/commands/intel.sh'"
+    verify: "bash -c '! grep -q \"journal_tool.*journal.sh\" .agentic/lib/tools/commands/intel.sh'"
 
   # --- Plan Review Gate (PreToolUse enforcement) ---
   - id: AC-061
@@ -474,9 +471,9 @@ assertions:
 
   - id: AC-062
     text: >
-      `ag plan skip` creates .agentic/session/.plan-review-skipped sentinel
-      and logs the decision to project memory; PreToolUse respects the skip
-      sentinel as an explicit user choice to work without formal review
+      `ag plan skip` creates .agentic/session/.plan-review-skipped sentinel;
+      PreToolUse respects the skip sentinel as an explicit user choice to
+      work without formal review. Session-scoped only, not persisted.
     type: structural
     verify: "bash -c 'grep -q plan-review-skipped .agentic/lib/tools/commands/plan.sh && grep -q plan-review-skipped .agentic/lib/claude-hooks/PreToolUse.sh'"
 
@@ -489,16 +486,15 @@ assertions:
     type: structural
     verify: "bash -c 'grep -q plan-approved .agentic/lib/claude-hooks/PostToolUse.sh && grep -q Critic .agentic/lib/claude-hooks/PostToolUse.sh'"
 
-  # --- Structural auto-capture + spec-before-code ordering ---
+  # --- LLM-driven capture + spec-before-code ordering ---
   - id: AC-064
     text: >
-      UserPromptSubmit.sh auto-captures detected signals directly to
-      project-memory.yaml (structural, no agent involvement); the hook
-      calls _auto_capture_to_memory or equivalent inline bash that appends
-      an entry with the signal type and prompt text; agent is notified
-      of the capture, not asked to do it
+      UserPromptSubmit.sh buffers prompts to prompt-buffer.log and nudges the
+      LLM for preference capture (realtime mode) or defers to session-end
+      review (retro mode); capture is LLM-driven via ag intel remember,
+      not structural auto-capture
     type: structural
-    verify: "bash -c 'grep -q project-memory.yaml .agentic/lib/claude-hooks/UserPromptSubmit.sh'"
+    verify: "bash -c 'grep -q prompt-buffer.log .agentic/lib/claude-hooks/UserPromptSubmit.sh'"
 
   - id: AC-065
     text: >
@@ -517,3 +513,11 @@ assertions:
       block (plans are iterative) but ensures the gap is visible
     type: structural
     verify: "bash -c 'grep -q acceptance.*criteria\\|plan.*content\\|plan_content .agentic/lib/claude-hooks/PostToolUse.sh'"
+
+  - id: AC-067
+    text: >
+      intel_capture setting (retro|realtime|off) controls preference capture
+      mode; defaults to retro in all profiles via profiles.conf; registered
+      in settings.sh show_all_settings; documented in STACK.template.md
+    type: structural
+    verify: "bash -c 'grep -q intel_capture .agentic/lib/presets/profiles.conf && grep -q intel_capture .agentic/lib/settings.sh'"
