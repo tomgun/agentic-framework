@@ -903,15 +903,11 @@ if target_ac:
 else:
     promoted = unshipped
 
-# Group by old status for display
-by_status = {}
+# Capture old statuses before mutating
+old_statuses = {a.id: a.status for a in promoted}
 for a in promoted:
-    by_status.setdefault(a.status, []).append(a.id)
-
-for a in promoted:
-    old = a.status
     a.status = 'shipped'
-    print(f'  ✓ {a.id}: {old} → shipped')
+    print(f'  ✓ {a.id}: {old_statuses[a.id]} → shipped')
 
 save_contract(contract)
 print(f'\nPromoted {len(promoted)} assertion(s) in {contract.id}')

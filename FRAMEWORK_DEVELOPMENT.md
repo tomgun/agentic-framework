@@ -834,7 +834,7 @@ When adding new gates, enforcement, or behavioral nudges to the framework, use t
 | **Agent hooks** | Real-time, during session | Claude: PreToolUse.sh, PostToolUse.sh, Stop.sh, UserPromptSubmit.sh; Cursor: hooks.json | Primary enforcement. Pattern warnings, catalog tracking, session summaries, mid-session nudges. |
 | **Skills** | On workflow trigger | `.claude/skills/implementing-features/` | Just-in-time guidance. Step-by-step workflow instructions loaded when agent recognizes trigger words. |
 | **`ag` commands** | When agent calls them | `ag done`, `ag implement`, `ag commit` | Workflow gates. Validate preconditions before proceeding. |
-| **Pre-commit hooks** | At git commit time | `pre-commit-check.sh` | Safety net for non-Claude tools (Cursor, Copilot, Codex, manual git). Defense-in-depth. |
+| **Pre-commit hooks** | At git commit time | `pre-commit-check.sh` | Safety net for tools without hook support (manual git, CI). Defense-in-depth. |
 | **Instruction files** | Always loaded | CLAUDE.md, cursorrules, memory-seed | Behavioral guidance. No structural enforcement — agent can choose to ignore. |
 
 **Key principle**: Agent hooks are the primary enforcement layer because they run automatically — the agent doesn't choose to run them. Skills and instruction files are behavioral — they guide the agent but can be ignored. Pre-commit hooks fire too late (at commit time, when the agent has moved on).

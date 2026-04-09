@@ -646,6 +646,7 @@ phase_assertion_status() {
     fi
 
     local _assertion_drift
+    # stderr suppressed: PyYAML may be absent; phase silently skips.
     _assertion_drift=$(_AG_CONTRACTS_DIR="$contracts_dir" \
         PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
 import os
@@ -662,7 +663,7 @@ for c in contracts:
     if unshipped:
         ids = ', '.join(a.id for a in unshipped)
         print(f'{c.id}: {len(unshipped)} unshipped ({ids})')
-" 2>/dev/null || echo "")
+" 2>/dev/null)
 
     if [ -n "$_assertion_drift" ]; then
         local drift_count

@@ -347,6 +347,8 @@ cmd_done() {
         local _pa_contract="$CONTRACTS_DIR/${feature_id}.yaml"
         if [ -f "$_pa_contract" ]; then
             local _pa_info
+            # Best-effort advisory: stderr suppressed because PyYAML may be
+            # absent in minimal environments; gate silently skips in that case.
             _pa_info=$(_AG_CONTRACT="$_pa_contract" \
                 PYTHONPATH="$AGENTIC_LIB" python3 -c "
 import os
@@ -368,7 +370,7 @@ for status, ids in sorted(by_status.items()):
     parts.append(f'{status} ({len(ids)}): {id_list}')
 detail = '  '.join(parts)
 print(f'{len(unshipped)}|{detail}')
-" 2>/dev/null || echo "")
+" 2>/dev/null)
             if [ -n "$_pa_info" ]; then
                 local _pa_count="${_pa_info%%|*}"
                 local _pa_detail="${_pa_info#*|}"
