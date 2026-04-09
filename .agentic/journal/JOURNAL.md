@@ -5455,3 +5455,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: AC-001 (CLAUDE.md 107 lines) is pre-existing, unrelated to this work.
 
+
+### Session: 2026-04-09 19:24 - F-041 LLM-Driven Preference Capture
+
+**Why**: Regex-based auto-capture was too narrow, too noisy, and misattributed agent actions as user decisions
+
+**Decision**: LLM does semantic classification, hooks do plumbing only
+
+**What changed**:
+- Replaced regex auto-capture with LLM-driven semantic classification. Added intel_capture setting (retro/realtime/off). Removed misattribution bugs, journal dual-write noise, and auto-capture from ag plan skip and ag set. User designed the approach after discovering agent was logging 'user decisions' the user never made.
+
+**Next steps**:
+- Monitor capture rate in retro mode; future: project-memory as state document
+
+**Blockers**: None
+
