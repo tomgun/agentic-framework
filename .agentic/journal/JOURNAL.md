@@ -5332,3 +5332,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 16:16 - Evidence-based plan approval gate
+
+**Why**: User identified inverted gate logic, self-reported status vulnerability, and missing specs
+
+**Decision**: Plan gates require evidence of independent review, not agent-written status
+
+**What changed**:
+- Redesigned plan review enforcement: safe-by-default (block unless approved), evidence-based approval (review.md with Critic/Advocate markers, not self-reported status), PostToolUse creates sentinel on verified review evidence, 12 new ACs (AC-052..063)
+
+**Next steps**:
+- PR review
+
+**Blockers**: None
+

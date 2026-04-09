@@ -67,6 +67,27 @@ if [[ -n "$_POST_TOOL" ]]; then
       case "${_POST_FILE:-}" in
         *FEATURES.md|*OVERVIEW.md) touch ".agentic/session/.cap_updated" 2>/dev/null || true ;;
       esac
+      # --- Plan approval detection (evidence-based) ---
+      # When a review.md is written with structural markers from Critic/Advocate agents,
+      # create the .plan-approved sentinel. This is evidence-based — the review file
+      # must contain markers from independent reviewers, not just a status change.
+      if [[ ! -f ".agentic/session/.plan-approved" ]]; then
+        case "${_POST_FILE:-}" in
+          *review.md|*review*.md)
+            if [[ -f "$_POST_FILE" ]]; then
+              _REV_MARKERS=0
+              grep -qi 'Critic' "$_POST_FILE" 2>/dev/null && ((_REV_MARKERS++)) || true
+              grep -qi 'Advocate' "$_POST_FILE" 2>/dev/null && ((_REV_MARKERS++)) || true
+              grep -qi 'Synthesis\|Convergence\|Recommendation' "$_POST_FILE" 2>/dev/null && ((_REV_MARKERS++)) || true
+              if [[ "$_REV_MARKERS" -ge 2 ]]; then
+                mkdir -p ".agentic/session" 2>/dev/null || true
+                echo "Review evidence verified at $(date -u +%Y-%m-%dT%H:%M:%SZ) from ${_POST_FILE}" > ".agentic/session/.plan-approved"
+                btrace "PostToolUse" "plan_approved" "{\"review_file\":\"${_POST_FILE##*/}\",\"markers\":$_REV_MARKERS}" 2>/dev/null || true
+              fi
+            fi
+            ;;
+        esac
+      fi
       ;;
   esac
 

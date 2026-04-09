@@ -311,42 +311,22 @@ if [[ -n "$ACTIVE_FEATURE" && -f ".agentic/session/token-events.log" ]]; then
   fi
 fi
 
-# --- DRAFT plan detection (Layer 2 enforcement) ---
-# Scans for DRAFT plans ONCE per session (creates sentinel). PreToolUse uses the sentinel
-# for O(1) blocking. Checks both durable (.agentic/journal/plans/) and session (~/.claude/plans/).
-# Sentinel cleared when plan is APPROVED or user runs `ag plan skip`.
-if [[ ! -f ".agentic/session/.plan-needs-review" && ! -f ".agentic/session/.plan-review-skipped" ]]; then
+# --- Plan approval advisory (Layer 2: UserPromptSubmit) ---
+# When plan_review_enabled=yes and no .plan-approved or .plan-review-skipped sentinel
+# exists, remind the agent. One-time nudge (avoids per-prompt cost).
+# Actual enforcement is in PreToolUse (blocks code edits) — this is advisory only.
+if [[ ! -f ".agentic/session/.plan-approved" && ! -f ".agentic/session/.plan-review-skipped" \
+      && ! -f ".agentic/session/.plan-advisory-shown" ]]; then
   source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
   PLAN_REVIEW=$(get_setting "plan_review_enabled" "no" 2>/dev/null || echo "no")
   if [[ "$PLAN_REVIEW" == "yes" ]]; then
-    DRAFT_PLANS=""
-    # Check durable plans
-    for plan_file in .agentic/journal/plans/*-plan.md; do
-      [[ -f "$plan_file" ]] || continue
-      if grep -q '^\*\*Status\*\*.*DRAFT\|^Status:.*DRAFT' "$plan_file" 2>/dev/null; then
-        PLAN_FID=$(basename "$plan_file" | grep -oE "$FEATURE_ID_ERE" | head -1) || true
-        DRAFT_PLANS="${DRAFT_PLANS}${PLAN_FID:-$(basename "$plan_file")} "
-      fi
-    done
-    # Check session-scoped plans (Claude Code's ~/.claude/plans/)
-    if [[ -z "$DRAFT_PLANS" && -d "$HOME/.claude/plans" ]]; then
-      for plan_file in "$HOME"/.claude/plans/*.md; do
-        [[ -f "$plan_file" ]] || continue
-        if grep -q '^\*\*Status\*\*.*DRAFT\|^Status:.*DRAFT' "$plan_file" 2>/dev/null; then
-          DRAFT_PLANS="${DRAFT_PLANS}$(basename "$plan_file") "
-        fi
-      done
-    fi
-    if [[ -n "$DRAFT_PLANS" ]]; then
-      # Write sentinel — PreToolUse uses this for O(1) blocking
-      mkdir -p ".agentic/session" 2>/dev/null || true
-      echo "${DRAFT_PLANS}" > ".agentic/session/.plan-needs-review"
-      echo ""
-      echo "⚠️  DRAFT PLAN EXISTS: ${DRAFT_PLANS}"
-      echo "   Complete dialectical review before writing ANY code."
-      echo "   To skip review: \`ag plan skip\`"
-      echo ""
-    fi
+    echo ""
+    echo "📋 Plan review required (plan_review_enabled=yes)."
+    echo "   Code edits blocked until review evidence exists."
+    echo "   Complete Critic + Advocate review → save to .agentic/work/F-XXXX/review.md"
+    echo "   Or skip: \`ag plan skip\`"
+    echo ""
+    touch ".agentic/session/.plan-advisory-shown" 2>/dev/null || true
   fi
 fi
 

@@ -8,6 +8,22 @@
 
 ## Recent Contributions
 
+### EVIDENCE-BASED PLAN APPROVAL — User Redesigned the Entire Gate Model (2026-04-09)
+
+**User insight 1 — "Why are we scanning for DRAFT? Why not scan for Approved + reviewed state to move forward?"**: User identified that the plan review gate logic was INVERTED. The initial implementation scanned for DRAFT plans to block — but if the agent never writes DRAFT, there's nothing to find. The correct model: **block by default, require evidence of approval to proceed**. This is safe-by-default: no sentinel = no code edits. The agent must EARN the right to edit code by producing verifiable review evidence, not just avoid having a DRAFT label.
+
+**User insight 2 — "ag implement doesn't get called always"**: User caught that tying the approval sentinel to `ag implement` was fragile — agents don't always use the formal workflow command. The approval must be detected from EVIDENCE (review.md with Critic/Advocate structural markers), not from a specific command being called.
+
+**User insight 3 — "that is a problem as well" (re: PostToolUse detecting Status: APPROVED)**: User caught that detecting `**Status**: APPROVED` text in a plan file is self-reported — the agent writes the status, so it's trusting the agent not to bypass itself. The fix: check for **independent evidence** (review.md containing Critic + Advocate markers from spawned subagents), not agent-written status text.
+
+**User insight 4 — "are the specs/ac/tests updated too (and if not, wtf)"**: User caught that 7 new capabilities were shipped with ZERO acceptance criteria and ZERO tests. The framework's own spec-first rule was violated. Led to 12 new ACs (AC-052..AC-063) and structural tests.
+
+**User insight 5 — "are you not taking the specs into account when making the plan?"**: User identified that the plan itself should have started with "what ACs need to exist" — specs should drive the plan, not be an afterthought.
+
+**Why these matter**: These five insights fundamentally improved the plan review system from "scan for problems to block" to "require evidence of approval to proceed." This is the difference between a gate that can be accidentally bypassed and one that is safe by default. The evidence-based model means an agent cannot approve its own plan — it must produce verifiable artifacts from independent reviewer agents.
+
+**Design direction**: Safe-by-default approval gates across the framework. PreToolUse blocks code edits unless `.plan-approved` (evidence-based, from review.md with structural markers) OR `.plan-review-skipped` (explicit user choice) exists. No scanning, no DRAFT detection, no self-reported status.
+
 ### Btrace Debug System QA + TDD Structural Enforcement (2026-04-09)
 
 **User insight 1 — "Has that been tested?"**: User asked whether the btrace debug trace system had been behavior-tested, not just structurally validated. Investigation revealed `validate_framework.sh` only checks that files exist and contain expected function names — zero tests exercising the actual emission, viewing, or bundling. Led to a full manual test suite that uncovered three bugs.

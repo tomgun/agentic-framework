@@ -6161,11 +6161,13 @@ else
   fail "F-041 AC-060: decision auto-journal missing"
 fi
 
-# AC-061: PreToolUse plan-needs-review sentinel gate
-if grep -q 'plan-needs-review' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then
-  pass "F-041 AC-061: PreToolUse blocks code edits when plan-needs-review sentinel exists"
+# AC-061: PreToolUse safe-by-default plan gate
+if grep -q 'plan-approved' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh" && \
+   grep -q 'plan-review-skipped' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh" && \
+   grep -q 'plan_review_enabled' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then
+  pass "F-041 AC-061: PreToolUse blocks code edits unless plan-approved or plan-review-skipped"
 else
-  fail "F-041 AC-061: PreToolUse missing plan review gate"
+  fail "F-041 AC-061: PreToolUse missing safe-by-default plan gate"
 fi
 
 # AC-062: ag plan skip command
@@ -6174,6 +6176,15 @@ if grep -q 'plan-review-skipped' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/
   pass "F-041 AC-062: ag plan skip creates sentinel and PreToolUse respects it"
 else
   fail "F-041 AC-062: ag plan skip or PreToolUse skip-sentinel missing"
+fi
+
+# AC-063: Evidence-based plan approval in PostToolUse
+if grep -q 'plan-approved' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh" && \
+   grep -q 'Critic' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh" && \
+   grep -q 'Advocate' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh"; then
+  pass "F-041 AC-063: PostToolUse creates plan-approved sentinel from review evidence"
+else
+  fail "F-041 AC-063: PostToolUse missing evidence-based plan approval"
 fi
 
 # ============================================================

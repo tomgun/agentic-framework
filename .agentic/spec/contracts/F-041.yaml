@@ -466,16 +466,25 @@ assertions:
   - id: AC-061
     text: >
       PreToolUse.sh blocks Write/Edit on implementation files when
-      .agentic/session/.plan-needs-review sentinel exists; allows edits
-      to plan, doc, config, and review files; sentinel created by
-      UserPromptSubmit DRAFT plan detection
+      plan_review_enabled=yes and no .plan-approved or .plan-review-skipped
+      sentinel exists; allows edits to plan, doc, config, spec, and review
+      files; safe-by-default (no sentinel = blocked)
     type: structural
-    verify: "bash -c 'grep -q plan-needs-review .agentic/lib/claude-hooks/PreToolUse.sh'"
+    verify: "bash -c 'grep -q plan-approved .agentic/lib/claude-hooks/PreToolUse.sh && grep -q plan-review-skipped .agentic/lib/claude-hooks/PreToolUse.sh'"
 
   - id: AC-062
     text: >
-      `ag plan skip` creates .agentic/session/.plan-review-skipped sentinel,
-      removes .plan-needs-review, logs the decision to project memory with
-      source=agent_capture; PreToolUse respects the skip sentinel
+      `ag plan skip` creates .agentic/session/.plan-review-skipped sentinel
+      and logs the decision to project memory; PreToolUse respects the skip
+      sentinel as an explicit user choice to work without formal review
     type: structural
     verify: "bash -c 'grep -q plan-review-skipped .agentic/lib/tools/commands/plan.sh && grep -q plan-review-skipped .agentic/lib/claude-hooks/PreToolUse.sh'"
+
+  - id: AC-063
+    text: >
+      PostToolUse.sh creates .agentic/session/.plan-approved sentinel when
+      a review.md file is written containing structural markers from Critic
+      and Advocate agents (evidence-based, not self-reported status); requires
+      at least 2 of: Critic, Advocate, Synthesis/Convergence/Recommendation
+    type: structural
+    verify: "bash -c 'grep -q plan-approved .agentic/lib/claude-hooks/PostToolUse.sh && grep -q Critic .agentic/lib/claude-hooks/PostToolUse.sh'"

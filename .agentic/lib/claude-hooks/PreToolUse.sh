@@ -105,33 +105,37 @@ if [[ "$GATE_RC" -ne 0 ]]; then
   fi
 fi
 
-# --- DRAFT plan gate: block code edits until plan is approved or user skips ---
-# Uses sentinel file .agentic/session/.plan-needs-review (created by UserPromptSubmit
-# on DRAFT detection, or by ExitPlanMode flow). O(1) file check — no scanning.
-# Cleared when plan is marked APPROVED or user runs `ag plan skip`.
-# .agentic/session/.plan-review-skipped = user explicitly allowed working without review.
+# --- Plan approval gate: block code edits unless plan is approved or user skipped ---
+# When plan_review_enabled=yes, code edits require EITHER:
+#   .agentic/session/.plan-approved  (created by `ag implement` after verifying approved plan)
+#   .agentic/session/.plan-review-skipped  (created by `ag plan skip`)
+# Default = blocked. This is safe-by-default: no sentinel = no code edits.
+# O(1) check — two file existence tests, no scanning.
 if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "MultiEdit" ]]; then
-  if [[ -f ".agentic/session/.plan-needs-review" && ! -f ".agentic/session/.plan-review-skipped" ]]; then
-    # Extract file path from tool input
-    _DP_PATH=""
-    case "$TOOL_INPUT" in
-      *'"file_path"'*)
-        _DP_PATH="${TOOL_INPUT#*\"file_path\"}"
-        _DP_PATH="${_DP_PATH#*:}"
-        _DP_PATH="${_DP_PATH#*\"}"
-        _DP_PATH="${_DP_PATH%%\"*}"
-        ;;
-    esac
-    # Allow edits to plans, docs, configs — block edits to code/implementation files
-    case "$_DP_PATH" in
-      *plan*.md|*CLAUDE.md|*memory-seed*|*JOURNAL*|*STATUS*|*HUMAN_NEEDED*|*TODO*|*CONTRIBUTIONS*|*OVERVIEW*|*FEATURES*|*STACK*|*CONTEXT_PACK*|*review*|"")
-        ;; # Allow — these are plan/doc/config/review files
-      *)
-        _DP_PLAN=$(cat ".agentic/session/.plan-needs-review" 2>/dev/null || echo "unknown")
-        btrace "PreToolUse" "draft_plan_block" "{\"file\":\"${_DP_PATH:0:80}\",\"plan\":\"${_DP_PLAN:0:60}\"}" 2>/dev/null || true
-        _deny "Plan needs review before code edits. Complete dialectical review (Critic + Advocate → synthesize → approve) or skip: \`ag plan skip\`. Plan: ${_DP_PLAN}"
-        ;;
-    esac
+  if [[ ! -f ".agentic/session/.plan-approved" && ! -f ".agentic/session/.plan-review-skipped" ]]; then
+    source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
+    _PLAN_REVIEW=$(get_setting "plan_review_enabled" "no" 2>/dev/null || echo "no")
+    if [[ "$_PLAN_REVIEW" == "yes" ]]; then
+      # Extract file path from tool input
+      _DP_PATH=""
+      case "$TOOL_INPUT" in
+        *'"file_path"'*)
+          _DP_PATH="${TOOL_INPUT#*\"file_path\"}"
+          _DP_PATH="${_DP_PATH#*:}"
+          _DP_PATH="${_DP_PATH#*\"}"
+          _DP_PATH="${_DP_PATH%%\"*}"
+          ;;
+      esac
+      # Allow edits to plans, docs, configs, reviews — block implementation files
+      case "$_DP_PATH" in
+        *plan*.md|*CLAUDE.md|*memory-seed*|*JOURNAL*|*STATUS*|*HUMAN_NEEDED*|*TODO*|*CONTRIBUTIONS*|*OVERVIEW*|*FEATURES*|*STACK*|*CONTEXT_PACK*|*review*|*spec/*|*contracts/*|"")
+          ;; # Allow — plan/doc/config/spec/review files
+        *)
+          btrace "PreToolUse" "plan_gate_block" "{\"file\":\"${_DP_PATH:0:80}\"}" 2>/dev/null || true
+          _deny "No approved plan for this session. Run \`ag implement F-XXXX\` (validates plan + review) or \`ag plan skip\` to work without a plan. plan_review_enabled=yes requires approval before code edits."
+          ;;
+      esac
+    fi
   fi
 fi
 

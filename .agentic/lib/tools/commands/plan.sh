@@ -11,7 +11,6 @@ cmd_plan() {
     if [ "$feature_id" = "skip" ]; then
         mkdir -p "$ROOT_DIR/.agentic/session" 2>/dev/null || true
         echo "User explicitly skipped plan review at $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$ROOT_DIR/.agentic/session/.plan-review-skipped"
-        rm -f "$ROOT_DIR/.agentic/session/.plan-needs-review" 2>/dev/null || true
         echo -e "${GREEN}✓ Plan review skipped. Code edits are now unblocked.${NC}"
         echo "  Note: This is a conscious choice, not a bypass. The decision is logged."
         # Log to project memory
