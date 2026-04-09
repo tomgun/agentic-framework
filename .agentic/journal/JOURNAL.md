@@ -5362,3 +5362,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 16:34 - PR #229 merged
+
+**Why**: User requested decision/instruction capture with framework-level storage and structural enforcement
+
+**Decision**: Evidence-based plan approval (review.md markers), safe-by-default gates, auto-capture at hook level
+
+**What changed**:
+- Auto-capture pipeline, evidence-based plan gate, cerebrum→project-memory rename, spec-before-code enforcement, plan content validation. 15 new ACs (AC-052..066), 817 tests. User designed the evidence-based approval model.
+
+**Next steps**:
+- Post-merge: VERSION bump, dogfood sync, memory-seed update
+
+**Blockers**: None
+
