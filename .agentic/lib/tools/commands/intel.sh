@@ -5,7 +5,7 @@
 
 INTEL_DIR="${ROOT_DIR}/.agentic/intel"
 PATTERNS_FILE="${INTEL_DIR}/patterns.yaml"
-CEREBRUM_FILE="${INTEL_DIR}/cerebrum.yaml"
+PROJECT_MEMORY_FILE="${INTEL_DIR}/project-memory.yaml"
 ANATOMY_FILE="${INTEL_DIR}/anatomy.yaml"
 ANATOMY_INDEX="${INTEL_DIR}/anatomy.index"
 TOKEN_SUMMARY="${INTEL_DIR}/token-summary.json"
@@ -52,9 +52,11 @@ cmd_intel() {
         learn)     _intel_learn "$@" ;;
         remove)    _intel_remove "$@" ;;
         patterns)  _intel_patterns "$@" ;;
-        remember)  _intel_remember "$@" ;;
-        cerebrum)  _intel_cerebrum "$@" ;;
-        forget)    _intel_forget "$@" ;;
+        remember)        _intel_remember "$@" ;;
+        batch-remember)  _intel_batch_remember "$@" ;;
+        memory|cerebrum)  _intel_memory "$@" ;;
+        decisions)       _intel_decisions "$@" ;;
+        forget)          _intel_forget "$@" ;;
         scan)      _intel_scan "$@" ;;
         file)      _intel_file "$@" ;;
         stats)     _intel_stats "$@" ;;
@@ -84,8 +86,8 @@ _intel_help() {
     echo ""
     echo "  ${BOLD}Cerebrum${NC} (project knowledge from corrections & discoveries)"
     echo "  remember \"text\" [--type preference|learning|decision] [--context \"...\"]"
-    echo "  cerebrum [--type TYPE]    List cerebrum entries"
-    echo "  forget C-XXXX             Remove a cerebrum entry"
+    echo "  memory [--type TYPE]      List project memory entries"
+    echo "  forget C-XXXX             Remove a project memory entry"
     echo ""
     echo "  ${BOLD}Anatomy${NC} (file intelligence)"
     echo "  scan [--check]            Scan project files → anatomy.yaml + index"
@@ -464,12 +466,14 @@ _intel_patterns() {
 # remember — capture a preference, learning, or decision
 # ---------------------------------------------------------------------------
 _intel_remember() {
-    local text="" entry_type="preference" context=""
+    local text="" entry_type="preference" context="" source="manual" session_id=""
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --type)    shift; entry_type="${1:-}" ;;
             --context) shift; context="${1:-}" ;;
+            --source)  shift; source="${1:-manual}" ;;
+            --session) shift; session_id="${1:-}" ;;
             *)
                 if [[ -z "$text" ]]; then
                     text="$1"
@@ -484,8 +488,13 @@ _intel_remember() {
 
     if [[ -z "$text" ]]; then
         echo -e "${RED}Error: text required${NC}"
-        echo "Usage: ag intel remember \"text\" [--type preference|learning|decision] [--context \"...\"]"
+        echo "Usage: ag intel remember \"text\" [--type preference|learning|decision] [--context \"...\"] [--source manual|agent_capture|settings_change|session_audit] [--session ID]"
         return 1
+    fi
+
+    # Auto-read session ID if not provided
+    if [[ -z "$session_id" && -f "$PROJECT_ROOT/.agentic/session/.current-session-id" ]]; then
+        session_id=$(cat "$PROJECT_ROOT/.agentic/session/.current-session-id" 2>/dev/null || true)
     fi
 
     if [[ ! " $_INTEL_VALID_CEREBRUM_TYPES " =~ " $entry_type " ]]; then
@@ -494,8 +503,8 @@ _intel_remember() {
     fi
 
     mkdir -p "$INTEL_DIR"
-    if [[ ! -f "$CEREBRUM_FILE" ]]; then
-        cat > "$CEREBRUM_FILE" <<'INIT'
+    if [[ ! -f "$PROJECT_MEMORY_FILE" ]]; then
+        cat > "$PROJECT_MEMORY_FILE" <<'INIT'
 version: 1
 description: >
   Project-scoped intelligence from user corrections and discoveries.
@@ -503,7 +512,7 @@ entries:
 INIT
     fi
 
-    # Find next cerebrum ID
+    # Find next project memory ID
     local max_id=0
     while IFS= read -r line; do
         if [[ "$line" =~ "- id: C-"([0-9]+) ]]; then
@@ -511,7 +520,7 @@ INIT
             num=$((10#$num))
             (( num > max_id )) && max_id=$num
         fi
-    done < "$CEREBRUM_FILE"
+    done < "$PROJECT_MEMORY_FILE"
     local next_id
     next_id=$(printf "C-%04d" $((max_id + 1)))
 
@@ -523,11 +532,11 @@ INIT
     context="${context//\"/\\\"}"
 
     # Replace empty entries array if this is the first entry
-    if grep -q "^entries: \[\]" "$CEREBRUM_FILE" 2>/dev/null; then
+    if grep -q "^entries: \[\]" "$PROJECT_MEMORY_FILE" 2>/dev/null; then
         if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' 's/^entries: \[\]/entries:/' "$CEREBRUM_FILE"
+            sed -i '' 's/^entries: \[\]/entries:/' "$PROJECT_MEMORY_FILE"
         else
-            sed -i 's/^entries: \[\]/entries:/' "$CEREBRUM_FILE"
+            sed -i 's/^entries: \[\]/entries:/' "$PROJECT_MEMORY_FILE"
         fi
     fi
 
@@ -538,8 +547,10 @@ INIT
         echo "    type: ${entry_type}"
         echo "    text: \"${text}\""
         [[ -n "$context" ]] && echo "    context: \"${context}\""
+        [[ -n "$source" && "$source" != "manual" ]] && echo "    source: ${source}"
+        [[ -n "$session_id" ]] && echo "    session: ${session_id}"
         echo "    date: ${today}"
-    } >> "$CEREBRUM_FILE"
+    } >> "$PROJECT_MEMORY_FILE"
 
     local type_icon="💡"
     case "$entry_type" in
@@ -549,14 +560,96 @@ INIT
     esac
 
     echo -e "${GREEN}✓ Remembered ${next_id} [${entry_type}]: ${text}${NC}"
-    echo -e "  ${type_icon} Stored in cerebrum.yaml"
-    _intel_log "mutate" "remember:${next_id}:${entry_type}" "1"
+    echo -e "  ${type_icon} Stored in project-memory.yaml"
+    _intel_log "mutate" "remember:${next_id}:${entry_type}:${source}" "1"
+
+    # Auto-journal decisions for dual-write (structured + chronological)
+    if [[ "$entry_type" == "decision" ]]; then
+        local journal_tool="$PROJECT_ROOT/.agentic/lib/tools/journal.sh"
+        if [[ -f "$journal_tool" ]]; then
+            bash "$journal_tool" \
+                "Decision Captured" "${text}" "Stored as ${next_id}" "None" \
+                --decision "${text}" 2>/dev/null || true
+        fi
+    fi
 }
 
 # ---------------------------------------------------------------------------
-# cerebrum — list cerebrum entries
+# batch-remember — bulk-capture from decision buffer
 # ---------------------------------------------------------------------------
-_intel_cerebrum() {
+_intel_batch_remember() {
+    local buffer_file="$PROJECT_ROOT/.agentic/session/decision-buffer.log"
+    local from_buffer=0
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --from-buffer) from_buffer=1 ;;
+            *) buffer_file="$1" ;;
+        esac
+        shift
+    done
+
+    if [[ "$from_buffer" -eq 1 ]]; then
+        buffer_file="$PROJECT_ROOT/.agentic/session/decision-buffer.log"
+    fi
+
+    if [[ ! -f "$buffer_file" ]]; then
+        echo -e "${YELLOW}No decision buffer found at $buffer_file${NC}"
+        return 0
+    fi
+
+    local count=0
+    while IFS='|' read -r timestamp signal_type prompt_text; do
+        [[ -z "$prompt_text" ]] && continue
+        local ctype="preference"
+        case "$signal_type" in
+            instruction)       ctype="preference" ;;
+            decision|confirmation|action_confirmed) ctype="decision" ;;
+            correction)        ctype="learning" ;;
+        esac
+        _intel_remember "$prompt_text" --type "$ctype" \
+            --context "auto-captured from $signal_type signal" \
+            --source session_audit
+        ((count++)) || true
+    done < "$buffer_file"
+
+    if [[ "$count" -gt 0 ]]; then
+        echo -e "\n${GREEN}✓ Batch-captured $count entries from decision buffer${NC}"
+    else
+        echo -e "${YELLOW}Decision buffer was empty${NC}"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# decisions — list all decisions with provenance
+# ---------------------------------------------------------------------------
+_intel_decisions() {
+    echo -e "${BOLD}=== Decisions ===${NC}"
+    _intel_memory --type decision
+
+    # Also show recent journal decisions
+    local journal_file=""
+    if [[ -f "$PROJECT_ROOT/.agentic/journal/JOURNAL.md" ]]; then
+        journal_file="$PROJECT_ROOT/.agentic/journal/JOURNAL.md"
+    elif [[ -f "$PROJECT_ROOT/JOURNAL.md" ]]; then
+        journal_file="$PROJECT_ROOT/JOURNAL.md"
+    fi
+
+    if [[ -n "$journal_file" ]]; then
+        local journal_decisions
+        journal_decisions=$(grep "Decision:" "$journal_file" 2>/dev/null | tail -10 || true)
+        if [[ -n "$journal_decisions" ]]; then
+            echo ""
+            echo -e "${BOLD}--- Journal decisions (last 10) ---${NC}"
+            echo "$journal_decisions"
+        fi
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# memory — list project memory entries (preferences, learnings, decisions)
+# ---------------------------------------------------------------------------
+_intel_memory() {
     local type_filter=""
 
     while [[ $# -gt 0 ]]; do
@@ -567,19 +660,19 @@ _intel_cerebrum() {
         shift
     done
 
-    if [[ ! -f "$CEREBRUM_FILE" ]]; then
-        echo -e "${YELLOW}No cerebrum file found at ${CEREBRUM_FILE}${NC}"
+    if [[ ! -f "$PROJECT_MEMORY_FILE" ]]; then
+        echo -e "${YELLOW}No project memory file found at ${PROJECT_MEMORY_FILE}${NC}"
         echo "Run: ag intel remember \"text\" to create one"
         return 0
     fi
 
-    echo -e "${BOLD}Cerebrum${NC} (${CEREBRUM_FILE})"
+    echo -e "${BOLD}Cerebrum${NC} (${PROJECT_MEMORY_FILE})"
     echo ""
 
     local count=0
     local _id="" _type="" _text="" _context="" _date=""
 
-    _cerebrum_print() {
+    _memory_print() {
         [[ -z "$_id" ]] && return
 
         if [[ -n "$type_filter" && "$_type" != "$type_filter" ]]; then
@@ -602,7 +695,7 @@ _intel_cerebrum() {
     while IFS= read -r line; do
         case "$line" in
             *"- id: "*)
-                _cerebrum_print
+                _memory_print
                 _id="${line#*"- id: "}"; _id="${_id//\"/}"; _id="${_id## }"
                 _type="" _text="" _context="" _date=""
                 ;;
@@ -611,31 +704,31 @@ _intel_cerebrum() {
             *"date: "*)    _date="${line#*"date: "}"; _date="${_date//\"/}" ;;
             *"text: "*)    _text="${line#*"text: "}"; _text="${_text//\"/}" ;;
         esac
-    done < "$CEREBRUM_FILE"
-    _cerebrum_print  # last entry
+    done < "$PROJECT_MEMORY_FILE"
+    _memory_print  # last entry
 
     echo ""
     echo -e "${DIM}${count} entry/entries shown${NC}"
 }
 
 # ---------------------------------------------------------------------------
-# forget — remove a cerebrum entry by ID
+# forget — remove a project memory entry by ID
 # ---------------------------------------------------------------------------
 _intel_forget() {
     local entry_id="${1:-}"
 
     if [[ -z "$entry_id" ]]; then
-        echo -e "${RED}Error: cerebrum entry ID required${NC}"
+        echo -e "${RED}Error: project memory entry ID required${NC}"
         echo "Usage: ag intel forget C-XXXX"
         return 1
     fi
 
-    if [[ ! -f "$CEREBRUM_FILE" ]]; then
-        echo -e "${RED}Error: no cerebrum file found${NC}"
+    if [[ ! -f "$PROJECT_MEMORY_FILE" ]]; then
+        echo -e "${RED}Error: no project memory file found${NC}"
         return 1
     fi
 
-    if ! grep -q "id: ${entry_id}" "$CEREBRUM_FILE" 2>/dev/null; then
+    if ! grep -q "id: ${entry_id}" "$PROJECT_MEMORY_FILE" 2>/dev/null; then
         echo -e "${RED}Error: entry ${entry_id} not found${NC}"
         return 1
     fi
@@ -663,10 +756,10 @@ _intel_forget() {
             blank_buffer=""
             echo "$line" >> "$tmp_file"
         fi
-    done < "$CEREBRUM_FILE"
+    done < "$PROJECT_MEMORY_FILE"
 
     if $removed; then
-        mv "$tmp_file" "$CEREBRUM_FILE"
+        mv "$tmp_file" "$PROJECT_MEMORY_FILE"
         echo -e "${GREEN}✓ Forgot ${entry_id}${NC}"
         _intel_log "mutate" "forget:${entry_id}" "1"
     else
@@ -2119,13 +2212,13 @@ _intel_implement() {
     echo "═══════════════════════════════════════════════════════"
     echo ""
 
-    if [[ -f "$CEREBRUM_FILE" ]]; then
-        local cerebrum_count
-        cerebrum_count=$(_intel_count "^  - id:" "$CEREBRUM_FILE")
-        echo -e "  ${cerebrum_count} knowledge entries (preferences, learnings, decisions)"
-        echo -e "  ${DIM}Run \`ag intel cerebrum\` for full list${NC}"
+    if [[ -f "$PROJECT_MEMORY_FILE" ]]; then
+        local memory_count
+        memory_count=$(_intel_count "^  - id:" "$PROJECT_MEMORY_FILE")
+        echo -e "  ${memory_count} knowledge entries (preferences, learnings, decisions)"
+        echo -e "  ${DIM}Run \`ag intel memory\` for full list${NC}"
     else
-        echo -e "  ${DIM}No cerebrum.yaml yet${NC}"
+        echo -e "  ${DIM}No project-memory.yaml yet${NC}"
     fi
 
     # --- 6. Quality Checklist — Implementation Phase ---
@@ -2145,7 +2238,7 @@ _intel_implement() {
     [[ -f "${ROOT_DIR}/.agentic/conventions.md" ]] && _il_items=$(( _il_items + 1 ))
     [[ -f "$PATTERNS_FILE" ]] && _il_items=$(( _il_items + $(_intel_count "^  - id:" "$PATTERNS_FILE") ))
     [[ -f "${ROOT_DIR}/.agentic/LESSONS.md" ]] && _il_items=$(( _il_items + $(_intel_count -E "^##\s|^- L-" "${ROOT_DIR}/.agentic/LESSONS.md") ))
-    [[ -f "$CEREBRUM_FILE" ]] && _il_items=$(( _il_items + $(_intel_count "^  - id:" "$CEREBRUM_FILE") ))
+    [[ -f "$PROJECT_MEMORY_FILE" ]] && _il_items=$(( _il_items + $(_intel_count "^  - id:" "$PROJECT_MEMORY_FILE") ))
     [[ -f "$QUALITY_CHECKLIST" ]] && _il_items=$(( _il_items + 1 ))
     _intel_log "query" "implement${feature_id:+:$feature_id}" "$_il_items"
 }

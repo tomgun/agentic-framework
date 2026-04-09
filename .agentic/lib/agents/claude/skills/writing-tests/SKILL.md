@@ -21,7 +21,10 @@ Steps:
 2. Check `STACK.md` for test framework and conventions
 3. Design test cases: happy path, edge cases, error cases
 4. Write tests matching project patterns
-5. Run tests and verify all pass with no regressions
+5. Run tests — in TDD mode, confirm they **fail** (RED phase)
+   If `development_mode: tdd`: `bash .agentic/lib/tools/wip.sh checkpoint --phase RED "tests for [AC] fail as expected"`
+6. After implementation makes tests pass:
+   If `development_mode: tdd`: `bash .agentic/lib/tools/wip.sh checkpoint --phase GREEN "[AC] tests pass"`
 
 Key command:
 - `ag verify F-XXXX` — run tests and check AC coverage

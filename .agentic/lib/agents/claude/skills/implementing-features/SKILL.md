@@ -26,6 +26,19 @@ Key commands:
 - `ag done F-XXXX` — post-merge: doc gate, VERSION bump, state flush
 - `ag contract check F-XXXX` — verify contract assertions pass
 
+## TDD mode (`development_mode: tdd` in STACK.md)
+
+When TDD mode is active, the PreToolUse hook **blocks source code edits** until a RED phase checkpoint exists. Follow the RED→GREEN→REFACTOR cycle per acceptance criterion:
+
+1. **RED** — Write a failing test for the AC, run it, confirm it fails
+   `bash .agentic/lib/tools/wip.sh checkpoint --phase RED "test for [AC description] fails"`
+2. **GREEN** — Write minimal code to make the test pass
+   `bash .agentic/lib/tools/wip.sh checkpoint --phase GREEN "[AC description] passes"`
+3. **REFACTOR** — Clean up without changing behavior
+   `bash .agentic/lib/tools/wip.sh checkpoint --phase REFACTOR "extracted [helper/pattern]"`
+
+Repeat for each AC. The hook allows test file edits at any time — only source files require a RED checkpoint first.
+
 ## Preconditions
 - Feature must have a YAML contract at `spec/contracts/F-XXXX.yaml` with assertions
 - Contract lifecycle must be `specifying` or later (not `exploring`)

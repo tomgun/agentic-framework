@@ -73,7 +73,7 @@ A custom rules file is a great start. This framework builds on the same idea but
 
 - **Intelligence Engine** (both profiles):
   - Enforced anti-patterns checked at write-time (`ag intel learn/check`)
-  - Project knowledge from user corrections (`ag intel remember` → cerebrum.yaml)
+  - Project knowledge from user decisions and corrections (`ag intel remember` → project-memory.yaml)
   - Stack-specific quality checklists and test strategies (`ag intel bootstrap`)
   - Phase-aware queries surface relevant intelligence at each workflow phase (`ag intel architecture|spec|implement|test`)
   - File anatomy with token estimates for smarter context loading (`ag intel scan/file`)

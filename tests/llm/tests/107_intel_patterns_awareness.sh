@@ -16,7 +16,7 @@ send_prompt "What intelligence and quality checks are available in this project?
 FAILURES=0
 
 # Agent should reference ag intel subcommands
-check_output_contains "ag intel\|patterns\|cerebrum\|bootstrap\|quality.check\|intel check\|intel learn" \
+check_output_contains "ag intel\|patterns\|project.memory\|bootstrap\|quality.check\|intel check\|intel learn" \
     "Agent references ag intel commands" || ((FAILURES++))
 
 cleanup_test_project

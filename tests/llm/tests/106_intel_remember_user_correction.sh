@@ -16,7 +16,7 @@ send_prompt "Don't use global variables in this project, always pass as function
 FAILURES=0
 
 # Agent should reference ag intel remember to capture the correction
-check_output_contains "ag intel remember\|intel remember\|cerebrum\|capture.*preference\|remember.*correction" \
+check_output_contains "ag intel remember\|intel remember\|project.memory\|capture.*preference\|remember.*correction" \
     "Agent references ag intel remember for user correction" || ((FAILURES++))
 
 cleanup_test_project

@@ -80,7 +80,7 @@ patterns:
     source: manual
 EOF
 
-    cat > "$dir/.agentic/intel/cerebrum.yaml" << 'EOF'
+    cat > "$dir/.agentic/intel/project-memory.yaml" << 'EOF'
 version: 1
 description: Project-scoped intelligence
 entries: []

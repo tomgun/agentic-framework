@@ -499,7 +499,7 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 **Priority**: medium
 **Complexity**: medium
 
-**Description**: Core intelligence system with 5 phases: (1) Enforced patterns with write-time hook checking, (2) File anatomy scanning with token estimation, (3) Bootstrap and quality intelligence generation, (4) Phase-aware queries for architecture/spec/implement/test workflows, (5) Token ledger for session and lifetime metrics. Includes cerebrum for project-scoped learning from user corrections.
+**Description**: Core intelligence system with 5 phases: (1) Enforced patterns with write-time hook checking, (2) File anatomy scanning with token estimation, (3) Bootstrap and quality intelligence generation, (4) Phase-aware queries for architecture/spec/implement/test workflows, (5) Token ledger for session and lifetime metrics. Includes project memory for project-scoped learning from user decisions and corrections.
 
 **Implementation**:
 - State: shipped (v0.77.0-v0.77.1)

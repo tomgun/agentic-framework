@@ -489,7 +489,7 @@ The intelligence engine (F-041) makes the framework smarter than vanilla Claude 
 | File | Purpose | How populated |
 |---|---|---|
 | `patterns.yaml` | Machine-matchable anti-patterns with scope globs | `ag intel learn` or `ag intel bootstrap` |
-| `cerebrum.yaml` | Project-scoped preferences, learnings, decisions | `ag intel remember` (auto-captured from user corrections) |
+| `project-memory.yaml` | Project-scoped preferences, learnings, decisions | `ag intel remember` (auto-captured from user decisions/corrections) |
 | `anatomy.yaml` | File summaries, token estimates, language detection | `ag intel scan` |
 | `quality-checklist.yaml` | 5 quality dimensions × 4 workflow phases | `ag intel bootstrap` |
 | `test-strategy.yaml` | Test levels with framework, patterns, antipatterns | `ag intel bootstrap` |
@@ -896,7 +896,7 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 |---------|-------------|--------|
 | **CONTEXT_PACK.md** (F-0025) | Architecture snapshot: modules, entry points, key files, data flow. Read FIRST at session start. Template with code style examples section. | ACTIVE - manually maintained |
 | **STATUS.md** (F-0024) | Current focus, progress, next steps, blockers. Updated via `status.sh` (token-efficient). Staleness enforced by pre-commit. | ACTIVE - structurally enforced |
-| **JOURNAL.md** (F-0023) | Append-only session log via `journal.sh`. Staleness enforced. `--why` flag documents reasoning. `--decision` flag marks decision entries (grep-able). Decision routing: current state → OVERVIEW.md, decision history → JOURNAL.md, tradeoffs → ADR (formal), preferences → cerebrum.yaml. | ACTIVE - structurally enforced |
+| **JOURNAL.md** (F-0023) | Append-only session log via `journal.sh`. Staleness enforced. `--why` flag documents reasoning. `--decision` flag marks decision entries (grep-able). Decision routing: current state → OVERVIEW.md, decision history → JOURNAL.md, tradeoffs → ADR (formal), preferences → project-memory.yaml. | ACTIVE - structurally enforced |
 | **FEATURES.md** (F-002, F-003) | Feature tracking with lifecycle (planned → in_progress → shipped). Machine-readable YAML frontmatter. Updated via `feature.sh`. Staleness enforced when spec files change. | ACTIVE - Formal only |
 | **HUMAN_NEEDED.md** (F-0026) | Blockers requiring human action. Updated via `blocker.sh`. | ACTIVE |
 | **Acceptance Criteria** (F-0005) | `spec/acceptance/F-####.md` per feature. Pre-commit blocks if shipped feature has no acceptance file. | ACTIVE - structural gate |
@@ -966,7 +966,7 @@ These features exist but don't clearly derive from the 13 principles:
 | **Multi-Agent / Git Worktrees** (F-017-0033, F-0097, F-0194) | Active infrastructure | `worktree.sh` wired into `ag implement` (when `worktree_mode: always`). Single AGENTS.json registry replaces WIP.md + AGENTS_ACTIVE.md. `ag worktree` command for manual management. Auto-cleanup via `ag done`. | HIGH — Infrastructure complete (F-0194). Ready for real multi-agent scenarios. |
 | **Multi-Session Collision Prevention** (F-0195) | Active | Three-layer defense: (1) sessions auto-register in AGENTS.json via `$PPID`, (2) UserPromptSubmit injects advisory collision warning when other sessions detected, (3) instruction hardening in all agent templates. `cleanup-stale` handles crash recovery (PID dead OR heartbeat >30min). | ACTIVE — hooks enforce for Claude Code; behavioral rules cover other agents. |
 | **Plan-Review Loop** (F-004, F-0191) | Partially active | `ag plan` exists with dialectical review (Critic + Advocate, fresh context). But agents sometimes skip to implementation without going through the loop. `ag implement` has a plan-review gate but it's not consistently triggered. | HIGH — The dialectical mechanism is complete and merged. Need stronger behavioral enforcement or a structural gate that blocks `ag implement` without an APPROVED plan artifact. |
-| **TDD Mode** (F-0008) | Documented | `development_mode: tdd` in STACK.md. Pipeline aware (Test Agent before Implementation Agent). But no structural enforcement — agent can ignore TDD mode. | LOW — Behavioral only, and most users prefer acceptance-driven over strict TDD. |
+| **TDD Mode** (F-0008) | Active | `development_mode: tdd` in STACK.md. PreToolUse gate (gate.py) blocks source code edits until a RED phase checkpoint exists in AGENTS.json. Agents must write a failing test and run `wip.sh checkpoint --phase RED` before editing source files. `wip.sh complete` validates RED→GREEN ordering. Pre-commit check 20 is the safety net. Skills (implementing-features, fixing-bugs, writing-tests) include `--phase` workflow. | MEDIUM — Structural enforcement via hooks + skills + CLI gates. Opt-in via STACK.md setting. |
 | **Automatic Journaling** (F-0027) | Partially active | Two-tier logging (SESSION_LOG.md for checkpoints, JOURNAL.md for milestones) was designed. `session_log.sh` exists. But in practice, only JOURNAL.md is used via `journal.sh`. SESSION_LOG.md is effectively unused. | LOW — JOURNAL.md + git history provides sufficient logging. The two-tier system adds complexity without clear benefit. |
 | **Feature Graph / Dependency Visualization** (F-0075) | Tools exist, rarely used | `feature_graph.py`, `deps.py`, `coverage.py` exist. Feature annotations (`@feature F-####`) supported. But agents rarely add annotations to code, and graph tools are never auto-invoked. | MEDIUM — Could be valuable for large projects. Need to make annotation checking structural. |
 | **Brownfield Spec Pipeline** (F-0124) | Complete, never used on real project | `ag specs` command, domain detection, plan-resume, multi-session support — all built. Never tested on a real brownfield project. | HIGH — This is a showcase feature waiting for real-world validation. |
@@ -1173,7 +1173,7 @@ These will always rely on behavioral reinforcement:
 `pre-commit-check.sh`, `doctor.py`/`doctor.sh`, `validate_specs.py`, `validate_framework.sh` (tests), `integration_verify.py`
 
 ### Intelligence Engine
-`intel.sh` (patterns, cerebrum, anatomy, bootstrap, retro, architecture, spec, implement, test, stats)
+`intel.sh` (patterns, memory, anatomy, bootstrap, retro, architecture, spec, implement, test, stats)
 
 ### Analysis & Traceability
 `coverage.py`, `drift.sh`, `scope_check.sh`, `consistency.py`, `phase_detect.py`, `query_features.py`, `feature_graph.py`, `deps.py`, `whatchanged.py`, `session-analyze.py`

@@ -5851,11 +5851,11 @@ else
   fail "F-041 AC-008: ag intel remember missing"
 fi
 
-if grep -q '_intel_cerebrum' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
-   grep -q 'cerebrum)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
-  pass "F-041 AC-009: ag intel cerebrum command implemented"
+if grep -q '_intel_memory' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'memory' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-009: ag intel memory command implemented"
 else
-  fail "F-041 AC-009: ag intel cerebrum missing"
+  fail "F-041 AC-009: ag intel memory missing"
 fi
 
 if grep -q '_intel_forget' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
@@ -6025,6 +6025,187 @@ if grep -q 'import btrace' "${FRAMEWORK_ROOT}/.agentic/lib/gate.py"; then
   pass "btrace: gate.py imports btrace for Python-side emission"
 else
   fail "btrace: gate.py missing btrace import"
+fi
+
+# ============================================================
+# TDD Mode — PreToolUse gate enforcement (F-0008)
+# ============================================================
+
+# TDD gate exists in gate.py
+if grep -q 'development_mode.*tdd' "${FRAMEWORK_ROOT}/.agentic/lib/gate.py" && \
+   grep -q 'tdd_safe' "${FRAMEWORK_ROOT}/.agentic/lib/gate.py" && \
+   grep -q 'RED:' "${FRAMEWORK_ROOT}/.agentic/lib/gate.py"; then
+  pass "TDD: PreToolUse gate in gate.py checks for RED phase checkpoint"
+else
+  fail "TDD: PreToolUse gate missing from gate.py"
+fi
+
+# TDD gate emits btrace events
+if grep -q 'tdd_block' "${FRAMEWORK_ROOT}/.agentic/lib/gate.py"; then
+  pass "TDD: gate.py emits btrace event on TDD block"
+else
+  fail "TDD: gate.py missing btrace event for TDD block"
+fi
+
+# Skills reference --phase checkpoints
+if grep -q 'checkpoint --phase RED' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/implementing-features/SKILL.md" && \
+   grep -q 'checkpoint --phase GREEN' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/implementing-features/SKILL.md"; then
+  pass "TDD: implementing-features skill has RED/GREEN phase checkpoint commands"
+else
+  fail "TDD: implementing-features skill missing phase checkpoint commands"
+fi
+
+if grep -q 'checkpoint --phase RED' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/fixing-bugs/SKILL.md"; then
+  pass "TDD: fixing-bugs skill has RED phase checkpoint command"
+else
+  fail "TDD: fixing-bugs skill missing phase checkpoint command"
+fi
+
+if grep -q 'checkpoint --phase RED' "${FRAMEWORK_ROOT}/.agentic/lib/agents/claude/skills/writing-tests/SKILL.md"; then
+  pass "TDD: writing-tests skill has RED phase checkpoint command"
+else
+  fail "TDD: writing-tests skill missing phase checkpoint command"
+fi
+
+# btrace bug fixes: debug.sh uses || true instead of || echo 0 for grep -c
+if grep -q 'grep -c.*|| true' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/debug.sh" && \
+   ! grep -q 'grep -c.*|| echo 0' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/debug.sh"; then
+  pass "btrace: debug.sh uses safe grep -c pattern (|| true, not || echo 0)"
+else
+  fail "btrace: debug.sh still has unsafe grep -c || echo 0 pattern"
+fi
+
+# btrace bug fix: debug on/off uses first-match sed
+if grep -q '0,/' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/debug.sh"; then
+  pass "btrace: debug on/off uses first-match sed (0,/pattern/)"
+else
+  fail "btrace: debug on/off missing first-match sed — may modify all btrace entries"
+fi
+
+# --- F-041 Phase 6: Auto-Capture Pipeline ---
+echo ""
+echo "  --- Phase 6: Auto-Capture Pipeline ---"
+
+# AC-052: ag intel remember --source and --session flags
+if grep -q '\-\-source' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q '\-\-session' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'source:' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-052: ag intel remember accepts --source and --session flags"
+else
+  fail "F-041 AC-052: ag intel remember missing --source/--session provenance flags"
+fi
+
+# AC-053: UserPromptSubmit 4 signal detectors
+if grep -q 'instruction' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'decision' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'correction' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'confirmation' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'decision-buffer.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
+  pass "F-041 AC-053: UserPromptSubmit detects 4 signal types with decision buffer"
+else
+  fail "F-041 AC-053: UserPromptSubmit missing signal detection"
+fi
+
+# AC-054: Decision buffer format and cleanup
+if grep -q 'decision-buffer.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh"; then
+  pass "F-041 AC-054: decision buffer cleaned up by Stop.sh"
+else
+  fail "F-041 AC-054: decision buffer cleanup missing from Stop.sh"
+fi
+
+# AC-055: Pending-decision protocol in both hooks
+if grep -q 'pending-decision.txt' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'pending-decision.txt' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh"; then
+  pass "F-041 AC-055: pending-decision protocol in UserPromptSubmit and PostToolUse"
+else
+  fail "F-041 AC-055: pending-decision protocol missing from hooks"
+fi
+
+# AC-056: Settings change auto-logging
+if grep -q 'settings_change' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/settings.sh" && \
+   grep -q 'intel remember' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/settings.sh"; then
+  pass "F-041 AC-056: ag set auto-logs mode-affecting changes to project memory"
+else
+  fail "F-041 AC-056: settings change auto-logging missing"
+fi
+
+# AC-057: Stop.sh decision buffer audit
+if grep -q 'batch-remember' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh" && \
+   grep -q 'decision_audit' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh"; then
+  pass "F-041 AC-057: Stop.sh audits decision buffer and suggests batch-remember"
+else
+  fail "F-041 AC-057: Stop.sh missing decision buffer audit"
+fi
+
+# AC-058: ag intel batch-remember command
+if grep -q '_intel_batch_remember' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'batch-remember)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-058: ag intel batch-remember command implemented"
+else
+  fail "F-041 AC-058: ag intel batch-remember missing"
+fi
+
+# AC-059: ag intel decisions command
+if grep -q '_intel_decisions' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'decisions)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-059: ag intel decisions command implemented"
+else
+  fail "F-041 AC-059: ag intel decisions missing"
+fi
+
+# AC-060: Decisions auto-dual-write to journal
+if grep -q 'journal_tool.*journal.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q '\-\-decision' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-060: decision entries auto-dual-write to JOURNAL.md"
+else
+  fail "F-041 AC-060: decision auto-journal missing"
+fi
+
+# AC-061: PreToolUse safe-by-default plan gate
+if grep -q 'plan-approved' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh" && \
+   grep -q 'plan-review-skipped' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh" && \
+   grep -q 'plan_review_enabled' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then
+  pass "F-041 AC-061: PreToolUse blocks code edits unless plan-approved or plan-review-skipped"
+else
+  fail "F-041 AC-061: PreToolUse missing safe-by-default plan gate"
+fi
+
+# AC-062: ag plan skip command
+if grep -q 'plan-review-skipped' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/plan.sh" && \
+   grep -q 'plan-review-skipped' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then
+  pass "F-041 AC-062: ag plan skip creates sentinel and PreToolUse respects it"
+else
+  fail "F-041 AC-062: ag plan skip or PreToolUse skip-sentinel missing"
+fi
+
+# AC-063: Evidence-based plan approval in PostToolUse
+if grep -q 'plan-approved' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh" && \
+   grep -q 'Critic' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh" && \
+   grep -q 'Advocate' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh"; then
+  pass "F-041 AC-063: PostToolUse creates plan-approved sentinel from review evidence"
+else
+  fail "F-041 AC-063: PostToolUse missing evidence-based plan approval"
+fi
+
+# AC-064: Structural auto-capture to project-memory.yaml
+if grep -q 'project-memory.yaml' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
+  pass "F-041 AC-064: UserPromptSubmit auto-captures signals to project-memory.yaml"
+else
+  fail "F-041 AC-064: UserPromptSubmit missing structural auto-capture to project-memory.yaml"
+fi
+
+# AC-065: Spec-before-code ordering enforcement
+if grep -q 'spec.*before\|spec_first\|token-events.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then
+  pass "F-041 AC-065: PreToolUse enforces spec-before-code ordering"
+else
+  fail "F-041 AC-065: PreToolUse missing spec-before-code ordering check"
+fi
+
+# AC-066: Plan content validation
+if grep -q 'acceptance.*criteria\|plan.*content\|plan_content' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh"; then
+  pass "F-041 AC-066: PostToolUse validates plan content (AC/tests/verification)"
+else
+  fail "F-041 AC-066: PostToolUse missing plan content validation"
 fi
 
 # ============================================================
@@ -6213,7 +6394,7 @@ fi
 
 # AC-018: DEVELOPER_GUIDE routing table includes decision rows
 if grep -q "decision" "${FRAMEWORK_ROOT}/.agentic/lib/DEVELOPER_GUIDE.md" && \
-   grep -q "cerebrum" "${FRAMEWORK_ROOT}/.agentic/lib/DEVELOPER_GUIDE.md"; then
+   grep -q "project.memory\|cerebrum" "${FRAMEWORK_ROOT}/.agentic/lib/DEVELOPER_GUIDE.md"; then
   pass "F-042 AC-018: DEVELOPER_GUIDE routing table includes decision rows"
 else
   fail "F-042 AC-018: DEVELOPER_GUIDE routing table missing decision rows"

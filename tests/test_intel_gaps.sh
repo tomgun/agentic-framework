@@ -71,8 +71,8 @@ patterns:
     source: L-0001
 EOF
 
-    # Seed cerebrum
-    cat > "$dir/.agentic/intel/cerebrum.yaml" << 'EOF'
+    # Seed project memory
+    cat > "$dir/.agentic/intel/project-memory.yaml" << 'EOF'
 version: 1
 description: Project-scoped intelligence
 entries: []
@@ -307,16 +307,16 @@ else
     fail "empty patterns.yaml caused crash" "exit $RC"
 fi
 
-echo "Test 22: cerebrum — corrupted YAML doesn't crash ag intel cerebrum"
-cp "$PROJECT_DIR/.agentic/intel/cerebrum.yaml" "$PROJECT_DIR/.agentic/intel/cerebrum.yaml.bak"
-echo "broken yaml {{{{" > "$PROJECT_DIR/.agentic/intel/cerebrum.yaml"
-OUTPUT=$(run_intel "$PROJECT_DIR" "_intel_cerebrum" 2>&1) || true
+echo "Test 22: project memory — corrupted YAML doesn't crash ag intel memory"
+cp "$PROJECT_DIR/.agentic/intel/project-memory.yaml" "$PROJECT_DIR/.agentic/intel/project-memory.yaml.bak"
+echo "broken yaml {{{{" > "$PROJECT_DIR/.agentic/intel/project-memory.yaml"
+OUTPUT=$(run_intel "$PROJECT_DIR" "_intel_memory" 2>&1) || true
 RC=$?
-cp "$PROJECT_DIR/.agentic/intel/cerebrum.yaml.bak" "$PROJECT_DIR/.agentic/intel/cerebrum.yaml"
+cp "$PROJECT_DIR/.agentic/intel/project-memory.yaml.bak" "$PROJECT_DIR/.agentic/intel/project-memory.yaml"
 if [[ $RC -le 1 ]]; then
-    pass "corrupted cerebrum.yaml doesn't crash (exit $RC)"
+    pass "corrupted project-memory.yaml doesn't crash (exit $RC)"
 else
-    fail "corrupted cerebrum.yaml caused crash" "exit $RC"
+    fail "corrupted project-memory.yaml caused crash" "exit $RC"
 fi
 
 echo "Test 23: check — missing patterns file returns no matches"
@@ -406,11 +406,11 @@ else
     fail "AC-007: upgrade.sh missing intel directory creation" ""
 fi
 
-echo "Test 28: AC-007 — upgrade.sh creates cerebrum.yaml for projects without it"
-if grep -q 'cerebrum.yaml' "$REPO_ROOT/.agentic/lib/tools/upgrade.sh"; then
-    pass "AC-007: upgrade.sh creates cerebrum.yaml"
+echo "Test 28: AC-007 — upgrade.sh creates project-memory.yaml for projects without it"
+if grep -q 'project-memory.yaml\|cerebrum.yaml' "$REPO_ROOT/.agentic/lib/tools/upgrade.sh"; then
+    pass "AC-007: upgrade.sh creates project-memory.yaml"
 else
-    fail "AC-007: upgrade.sh missing cerebrum.yaml creation" ""
+    fail "AC-007: upgrade.sh missing project-memory.yaml creation" ""
 fi
 
 echo "Test 29: AC-007 — upgrade.sh patterns.yaml note (created on first learn, not upgrade)"

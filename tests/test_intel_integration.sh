@@ -61,8 +61,8 @@ create_domain_project() {
     cp "$REPO_ROOT/.agentic/lib/claude-hooks/Stop.sh" "$dir/.agentic/lib/claude-hooks/" 2>/dev/null || true
     cp "$REPO_ROOT/.agentic/lib/tools/fwlog.sh" "$dir/.agentic/lib/tools/" 2>/dev/null || true
 
-    # Empty cerebrum
-    cat > "$dir/.agentic/intel/cerebrum.yaml" << 'EOF'
+    # Empty project memory
+    cat > "$dir/.agentic/intel/project-memory.yaml" << 'EOF'
 version: 1
 description: Project-scoped intelligence
 entries: []
@@ -757,34 +757,34 @@ fi
 # Section 5: Cerebrum Knowledge Persists and Surfaces
 # ═══════════════════════════════════════════════════════════════════
 echo ""
-echo "Section 5: Cerebrum — Project Knowledge in Practice"
-echo "────────────────────────────────────────────────────"
+echo "Section 5: Project Memory — Project Knowledge in Practice"
+echo "──────────────────────────────────────────────────────────"
 
 echo ""
 echo "Test 26: Remember a user preference, then implement query surfaces it"
 run_intel "$REACT_DIR" '_intel_remember "Always use server components by default in Next.js 14" --type preference' >/dev/null 2>&1 || true
-OUTPUT=$(run_intel "$REACT_DIR" "_intel_cerebrum" 2>&1) || true
+OUTPUT=$(run_intel "$REACT_DIR" "_intel_memory" 2>&1) || true
 if echo "$OUTPUT" | grep -q "server components\|C-0001"; then
-    pass "cerebrum stores and lists user preference"
+    pass "project memory stores and lists user preference"
 else
-    fail "cerebrum didn't persist preference" "$OUTPUT"
+    fail "project memory didn't persist preference" "$OUTPUT"
 fi
 
-echo "Test 27: Implement query shows cerebrum knowledge count"
+echo "Test 27: Implement query shows project memory knowledge count"
 OUTPUT=$(run_intel "$REACT_DIR" "_intel_implement" 2>&1) || true
-if echo "$OUTPUT" | grep -q "1 knowledge entries\|cerebrum"; then
-    pass "implement query references cerebrum with 1 entry"
+if echo "$OUTPUT" | grep -q "1 knowledge entries\|project.memory"; then
+    pass "implement query references project memory with 1 entry"
 else
-    fail "implement query missed cerebrum" "$(echo "$OUTPUT" | grep -i "cerebrum\|knowledge")"
+    fail "implement query missed project memory" "$(echo "$OUTPUT" | grep -i "project.memory\|knowledge")"
 fi
 
 echo "Test 28: Remember a learning with context"
 run_intel "$REACT_DIR" '_intel_remember "Next.js App Router caches aggressively — use revalidatePath after mutations" --type learning --context "Discovered during checkout flow implementation"' >/dev/null 2>&1 || true
-OUTPUT=$(run_intel "$REACT_DIR" '_intel_cerebrum --type learning' 2>&1) || true
+OUTPUT=$(run_intel "$REACT_DIR" '_intel_memory --type learning' 2>&1) || true
 if echo "$OUTPUT" | grep -q "revalidatePath\|C-0002"; then
-    pass "cerebrum stores learning with context and filters by type"
+    pass "project memory stores learning with context and filters by type"
 else
-    fail "cerebrum filter by type failed" "$OUTPUT"
+    fail "project memory filter by type failed" "$OUTPUT"
 fi
 
 # ═══════════════════════════════════════════════════════════════════

@@ -293,9 +293,13 @@ cmd_done() {
         if [ "$_phase_check_exit" -eq 1 ]; then
             if [ "$force_phases" -eq 1 ]; then
                 echo -e "${YELLOW}⚠ Phase gate bypassed (--force-phases): $_phase_msg${NC}"
-                bash "$SCRIPT_DIR/journal.sh" "Phase gate bypassed" \
-                    "$feature_id: --force-phases used. $_phase_msg" "" "" \
-                    --why "Incomplete phases overridden at shipping time" 2>/dev/null || true
+                # Only journal if ROOT_DIR matches real project (skip in test contexts
+                # where ROOT_DIR points to a temp dir but journal.sh resolves to real JOURNAL.md)
+                if [[ "${ROOT_DIR:-}" == "$(cd "$SCRIPT_DIR/../.." && pwd)" || -z "${ROOT_DIR:-}" ]]; then
+                    bash "$SCRIPT_DIR/journal.sh" "Phase gate bypassed" \
+                        "$feature_id: --force-phases used. $_phase_msg" "" "" \
+                        --why "Incomplete phases overridden at shipping time" 2>/dev/null || true
+                fi
             else
                 echo -e "${RED}BLOCKED: $_phase_msg${NC}"
                 echo "  Options:"

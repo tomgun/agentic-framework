@@ -204,7 +204,7 @@ The framework learns from your project via the intelligence engine (`ag intel`):
 "Set up quality intelligence for this project" → ag intel bootstrap (generates quality-checklist, test-strategy, patterns)
 "We should never use eval in bash"             → ag intel learn "Never use eval" --reason "injection risk" --scope "*.sh"
 "Remember: we prefer composition over inheritance" → ag intel remember "prefer composition" --type preference
-"Show me the project knowledge"                → ag intel cerebrum / ag intel patterns
+"Show me the project knowledge"                → ag intel memory / ag intel patterns
 ```
 
 Once bootstrapped, intelligence is surfaced automatically at each workflow phase:
@@ -2149,7 +2149,7 @@ The framework provides multiple tracking files. Use this decision table to route
 | New capability to spec | `FEATURES.md` | `bash .agentic/lib/tools/feature.sh add "Title"` |
 | Decision made (product, technical, process) | `OVERVIEW.md` (current state) + `JOURNAL.md` (history) | Update relevant section; `journal.sh "Topic" "Outcome + reasoning + alternatives" "Next" "" --why "Motivation" --decision "Choice"` |
 | Significant architecture decision (formal) | ADR + `JOURNAL.md` | Copy `ADR.template.md` to `spec/adr/`; also log with `--decision` |
-| User preference/correction | `cerebrum.yaml` | `ag intel remember "text" --context "context"` |
+| User preference/correction | `project-memory.yaml` | `ag intel remember "text" --context "context"` |
 
 **Do NOT** put development tasks in HUMAN_NEEDED.md — that file is reserved for items that genuinely require human action (approvals, credentials, external decisions). If an agent can act on it, it belongs in TODO.md.
 

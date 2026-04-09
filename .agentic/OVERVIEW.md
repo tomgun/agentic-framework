@@ -35,7 +35,7 @@ AI coding agents (Claude Code, Cursor, Copilot, Codex) are powerful but lack per
 - [x] Configurable Definition of Done per task type (implementation/spike/bugfix/docs)
 - [x] DRY state-file config (state-files.conf)
 - [x] Automated behavioral tests for agent compliance (107 LLM tests in tests/llm/)
-- [x] Intelligence engine: enforced patterns, project knowledge (cerebrum), file anatomy, quality checklists, test strategies, and phase-aware queries that surface relevant intelligence at each workflow phase
+- [x] Intelligence engine: enforced patterns, project memory, file anatomy, quality checklists, test strategies, and phase-aware queries that surface relevant intelligence at each workflow phase
 - [ ] Online documentation site
 
 ## In Scope / Out of Scope

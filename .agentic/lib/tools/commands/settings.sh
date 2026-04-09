@@ -61,6 +61,10 @@ _settings_set_value() {
     local value="$2"
     local stack_file="$ROOT_DIR/STACK.md"
 
+    # Capture old value before write (used for audit trail)
+    local _old_value=""
+    _old_value=$(get_setting "$key" "" 2>/dev/null || echo "")
+
     # Validate key format (prevent regex injection)
     if [[ ! "$key" =~ ^[a-z_][a-z0-9_]*$ ]]; then
         echo -e "${RED}Error: Invalid setting key '$key' (must be lowercase letters, digits, underscores)${NC}"
@@ -211,6 +215,32 @@ _settings_set_value() {
     _SETTINGS_PROFILE_CACHE=""
 
     echo -e "${GREEN}Set ${key} = ${value}${NC}"
+
+    # --- Settings change audit trail (F-041: Auto-capture pipeline) ---
+    # Auto-log mode-affecting settings changes to project memory for traceability.
+    case "$key" in
+        profile|acceptance_criteria|wip_before_commit|docs_gate|git_workflow|main_branch_mode|plan_review_enabled|docs_mode|pre_commit_checks|smoke_test_evidence)
+            local _ag_tool="$ROOT_DIR/.agentic/lib/tools/ag.sh"
+            if [[ -f "$_ag_tool" ]]; then
+                bash "$_ag_tool" intel remember \
+                    "Changed $key from '${_old_value:-unset}' to '$value'" \
+                    --type decision \
+                    --context "ag set $key $value" \
+                    --source settings_change 2>/dev/null || true
+            fi
+            ;;
+    esac
+
+    # Auto-journal for profile changes (significant workflow shifts)
+    if [[ "$key" == "profile" ]]; then
+        local _journal_tool="$ROOT_DIR/.agentic/lib/tools/journal.sh"
+        if [[ -f "$_journal_tool" ]]; then
+            bash "$_journal_tool" \
+                "Profile Change" "Switched from ${_old_value:-discovery} to $value" \
+                "Settings cascade applied" "None" \
+                --decision "Changed project profile to $value" 2>/dev/null || true
+        fi
+    fi
 
     # Smart profile cascade: update all settings to new profile defaults,
     # but preserve any settings the user has customized away from the old profile

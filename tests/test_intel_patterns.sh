@@ -484,7 +484,7 @@ else
 fi
 
 # ===========================================================================
-# Cerebrum Tests
+# Project Memory Tests
 # ===========================================================================
 
 # Helper to run intel commands in test project
@@ -502,12 +502,12 @@ run_intel() {
     ' 2>&1
 }
 
-# --- Test 14: ag intel remember creates cerebrum entry ---
+# --- Test 14: ag intel remember creates project memory entry ---
 echo ""
 echo "Test 14: ag intel remember"
 
-# Create empty cerebrum
-cat > "$PROJECT_DIR/.agentic/intel/cerebrum.yaml" << 'EOF'
+# Create empty project memory
+cat > "$PROJECT_DIR/.agentic/intel/project-memory.yaml" << 'EOF'
 version: 1
 entries: []
 EOF
@@ -520,8 +520,8 @@ else
     fail "remember failed" "$OUTPUT"
 fi
 
-if grep -q "C-0001" "$PROJECT_DIR/.agentic/intel/cerebrum.yaml" && \
-   grep -q "preference" "$PROJECT_DIR/.agentic/intel/cerebrum.yaml"; then
+if grep -q "C-0001" "$PROJECT_DIR/.agentic/intel/project-memory.yaml" && \
+   grep -q "preference" "$PROJECT_DIR/.agentic/intel/project-memory.yaml"; then
     pass "entry written with default type=preference"
 else
     fail "entry not in file" ""
@@ -549,10 +549,10 @@ else
     fail "accepted invalid type" "$OUTPUT"
 fi
 
-# --- Test 17: ag intel cerebrum lists entries ---
+# --- Test 17: ag intel memory lists entries ---
 echo ""
-echo "Test 17: cerebrum list"
-OUTPUT=$(run_intel '_intel_cerebrum')
+echo "Test 17: project memory list"
+OUTPUT=$(run_intel '_intel_memory')
 
 if echo "$OUTPUT" | grep -q "C-0001" && echo "$OUTPUT" | grep -q "C-0002"; then
     pass "lists both entries"
@@ -566,10 +566,10 @@ else
     fail "wrong count" "$OUTPUT"
 fi
 
-# --- Test 18: ag intel cerebrum --type filters ---
+# --- Test 18: project memory --type filters ---
 echo ""
-echo "Test 18: cerebrum type filter"
-OUTPUT=$(run_intel '_intel_cerebrum --type learning')
+echo "Test 18: project memory type filter"
+OUTPUT=$(run_intel '_intel_memory --type learning')
 
 if echo "$OUTPUT" | grep -q "C-0002" && ! echo "$OUTPUT" | grep -q "C-0001"; then
     pass "filters to learning only"
@@ -588,13 +588,13 @@ else
     fail "forget failed" "$OUTPUT"
 fi
 
-if ! grep -q "C-0001" "$PROJECT_DIR/.agentic/intel/cerebrum.yaml"; then
+if ! grep -q "C-0001" "$PROJECT_DIR/.agentic/intel/project-memory.yaml"; then
     pass "C-0001 removed from file"
 else
     fail "C-0001 still in file" ""
 fi
 
-if grep -q "C-0002" "$PROJECT_DIR/.agentic/intel/cerebrum.yaml"; then
+if grep -q "C-0002" "$PROJECT_DIR/.agentic/intel/project-memory.yaml"; then
     pass "C-0002 preserved"
 else
     fail "C-0002 lost" ""

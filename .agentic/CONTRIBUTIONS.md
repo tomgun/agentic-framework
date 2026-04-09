@@ -8,6 +8,38 @@
 
 ## Recent Contributions
 
+### EVIDENCE-BASED PLAN APPROVAL — User Redesigned the Entire Gate Model (2026-04-09)
+
+**User insight 1 — "Why are we scanning for DRAFT? Why not scan for Approved + reviewed state to move forward?"**: User identified that the plan review gate logic was INVERTED. The initial implementation scanned for DRAFT plans to block — but if the agent never writes DRAFT, there's nothing to find. The correct model: **block by default, require evidence of approval to proceed**. This is safe-by-default: no sentinel = no code edits. The agent must EARN the right to edit code by producing verifiable review evidence, not just avoid having a DRAFT label.
+
+**User insight 2 — "ag implement doesn't get called always"**: User caught that tying the approval sentinel to `ag implement` was fragile — agents don't always use the formal workflow command. The approval must be detected from EVIDENCE (review.md with Critic/Advocate structural markers), not from a specific command being called.
+
+**User insight 3 — "that is a problem as well" (re: PostToolUse detecting Status: APPROVED)**: User caught that detecting `**Status**: APPROVED` text in a plan file is self-reported — the agent writes the status, so it's trusting the agent not to bypass itself. The fix: check for **independent evidence** (review.md containing Critic + Advocate markers from spawned subagents), not agent-written status text.
+
+**User insight 4 — "are the specs/ac/tests updated too (and if not, wtf)"**: User caught that 7 new capabilities were shipped with ZERO acceptance criteria and ZERO tests. The framework's own spec-first rule was violated. Led to 12 new ACs (AC-052..AC-063) and structural tests.
+
+**User insight 5 — "are you not taking the specs into account when making the plan?"**: User identified that the plan itself should have started with "what ACs need to exist" — specs should drive the plan, not be an afterthought.
+
+**Why these matter**: These five insights fundamentally improved the plan review system from "scan for problems to block" to "require evidence of approval to proceed." This is the difference between a gate that can be accidentally bypassed and one that is safe by default. The evidence-based model means an agent cannot approve its own plan — it must produce verifiable artifacts from independent reviewer agents.
+
+**Design direction**: Safe-by-default approval gates across the framework. PreToolUse blocks code edits unless `.plan-approved` (evidence-based, from review.md with structural markers) OR `.plan-review-skipped` (explicit user choice) exists. No scanning, no DRAFT detection, no self-reported status.
+
+### Btrace Debug System QA + TDD Structural Enforcement (2026-04-09)
+
+**User insight 1 — "Has that been tested?"**: User asked whether the btrace debug trace system had been behavior-tested, not just structurally validated. Investigation revealed `validate_framework.sh` only checks that files exist and contain expected function names — zero tests exercising the actual emission, viewing, or bundling. Led to a full manual test suite that uncovered three bugs.
+
+**User insight 2 — "Can you run some tests?"**: User pushed for real execution, not just code review. Running `ag debug list`, `ag debug show`, `ag debug bundle`, and the bash/Python emitters end-to-end exposed: (1) `grep -c` zero-count bug crashing `ag debug bundle` and corrupting `ag debug list` formatting, (2) `ag debug on/off` clobbering all `btrace:` lines in STACK.md instead of just the first, (3) `btrace-show.py` header counts ignoring `--hook` filter.
+
+**User insight 3 — "Shouldn't TDD mode be enforced with Claude hooks and skills?"**: User identified that TDD enforcement was at layers 3-4 (ag commands, pre-commit) but missing from layer 1 (Claude hooks) and layer 2 (skills) — violating the framework's own enforcement hierarchy which says Claude hooks should be the primary layer. The `on-code-edit.sh` nudge was advisory and fired once. HOW_IT_WORKS.md explicitly said "no structural enforcement." User directed: fix the gaps.
+
+**User insight 4 — "That doc was probably cleaned away — don't know if it is really needed"**: When the analysis identified a missing `tdd_mode.md` workflow document (referenced from STACK.template.md but never created), user pragmatically dismissed standalone documentation in favor of structural enforcement. The principle: enforcement beats documentation. A PreToolUse gate that blocks source edits is more effective than a workflow guide agents may not read.
+
+**User insight 5 — Discovery profile must capture enough for later specs**: User asked to verify that discovery mode logs enough information (journal, OVERVIEW, STATUS, CONTEXT_PACK) for constructing formal specs later. Testing confirmed all state-tracking tools (journal.sh, status.sh, todo.sh, blocker.sh) have zero profile gates — they work identically in discovery and formal. Only the formal spec tools (ag specs, ag contract) are gated behind `feature_tracking=yes`.
+
+**Why it matters**: This session established that the framework's testing had a structural blind spot — subsystems were existence-tested but not behavior-tested. The btrace bugs would have persisted indefinitely without execution. The TDD enforcement gap demonstrated that even the framework itself wasn't following its own enforcement hierarchy. The fix (PreToolUse gate in gate.py) is the first real-time TDD enforcement in the framework — agents cannot write source code without first recording a failing test.
+
+---
+
 ### Persona & Platform Dimensions for Contract Specs (2026-04-06)
 
 **User insight 1 — Multi-sided products need structured perspectives**: User planned a price alert web service with five distinct personas (consumer, consumer-offer-content-maker, company, internal-reporting, internal-maintenance) across three platforms (PWA, React Native, web). The existing spec system had no structured way to express who a feature serves or where it runs — actors were implicit in scenario text, not queryable. This gap applies to any marketplace, SaaS-with-roles, or B2B2C product.
