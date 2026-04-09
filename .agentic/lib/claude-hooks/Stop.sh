@@ -189,9 +189,13 @@ if [[ -f "$_DB_FILE" ]]; then
   _DB_COUNT=$(wc -l < "$_DB_FILE" 2>/dev/null || echo 0)
   _DB_COUNT="${_DB_COUNT## }"; _DB_COUNT="${_DB_COUNT%% }"; _DB_COUNT="${_DB_COUNT%%[!0-9]*}"; _DB_COUNT="${_DB_COUNT:-0}"
 
-  # Count project memory mutations this session (from intel-events if it was processed, else from file)
+  # Count auto-capture remember mutations specifically (not forget/learn/retro)
+  # Filter intel-events for "mutate|remember:" entries only — these are the actual captures
   _DB_CAPTURES=0
-  if [[ -n "${_IL_MUTATES:-}" ]]; then
+  if [[ -f ".agentic/session/intel-events.log" ]]; then
+    _DB_CAPTURES=$(grep -c '|mutate|remember:' ".agentic/session/intel-events.log" 2>/dev/null || echo 0)
+    _DB_CAPTURES="${_DB_CAPTURES## }"; _DB_CAPTURES="${_DB_CAPTURES%%[!0-9]*}"; _DB_CAPTURES="${_DB_CAPTURES:-0}"
+  elif [[ -n "${_IL_MUTATES:-}" ]]; then
     _DB_CAPTURES="${_IL_MUTATES:-0}"
   fi
 
@@ -265,6 +269,7 @@ rm -f .agentic/session/.plan-approved 2>/dev/null || true
 rm -f .agentic/session/.plan-review-skipped 2>/dev/null || true
 rm -f .agentic/session/.plan-advisory-shown 2>/dev/null || true
 rm -f .agentic/session/.spec-first-checked 2>/dev/null || true
+rm -f .agentic/session/.spec-first-skipped 2>/dev/null || true
 
 btrace "Stop" "exit" "{\"decision\":\"allow\",\"exit_code\":0}" 2>/dev/null || true
 

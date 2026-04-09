@@ -105,84 +105,69 @@ if [[ "$GATE_RC" -ne 0 ]]; then
   fi
 fi
 
+# --- Shared: Extract file_path once for all Write/Edit gates ---
+# Used by plan gate, spec-before-code, and pattern check below.
+_EDIT_FILE_PATH=""
+if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "MultiEdit" ]]; then
+  case "$TOOL_INPUT" in
+    *'"file_path"'*)
+      _EDIT_FILE_PATH="${TOOL_INPUT#*\"file_path\"}"
+      _EDIT_FILE_PATH="${_EDIT_FILE_PATH#*:}"
+      _EDIT_FILE_PATH="${_EDIT_FILE_PATH#*\"}"
+      _EDIT_FILE_PATH="${_EDIT_FILE_PATH%%\"*}"
+      ;;
+  esac
+
+  # Classify: is this a doc/config/spec file (allowed) or implementation (gated)?
+  _IS_DOC_FILE=0
+  case "$_EDIT_FILE_PATH" in
+    *plan*.md|*CLAUDE.md|*memory-seed*|*JOURNAL*|*STATUS*|*HUMAN_NEEDED*|*TODO*|*CONTRIBUTIONS*|*OVERVIEW*|*FEATURES*|*STACK*|*CONTEXT_PACK*|*review*|*spec/*|*contracts/*|"")
+      _IS_DOC_FILE=1 ;;
+  esac
+
+  # Source settings once for all gates
+  source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
+fi
+
 # --- Plan approval gate: block code edits unless plan is approved or user skipped ---
 # When plan_review_enabled=yes, code edits require EITHER:
-#   .agentic/session/.plan-approved  (created by `ag implement` after verifying approved plan)
+#   .agentic/session/.plan-approved  (created by PostToolUse on review evidence)
 #   .agentic/session/.plan-review-skipped  (created by `ag plan skip`)
 # Default = blocked. This is safe-by-default: no sentinel = no code edits.
-# O(1) check — two file existence tests, no scanning.
 if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "MultiEdit" ]]; then
-  if [[ ! -f ".agentic/session/.plan-approved" && ! -f ".agentic/session/.plan-review-skipped" ]]; then
-    source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
+  if [[ "$_IS_DOC_FILE" -eq 0 && ! -f ".agentic/session/.plan-approved" && ! -f ".agentic/session/.plan-review-skipped" ]]; then
     _PLAN_REVIEW=$(get_setting "plan_review_enabled" "no" 2>/dev/null || echo "no")
     if [[ "$_PLAN_REVIEW" == "yes" ]]; then
-      # Extract file path from tool input
-      _DP_PATH=""
-      case "$TOOL_INPUT" in
-        *'"file_path"'*)
-          _DP_PATH="${TOOL_INPUT#*\"file_path\"}"
-          _DP_PATH="${_DP_PATH#*:}"
-          _DP_PATH="${_DP_PATH#*\"}"
-          _DP_PATH="${_DP_PATH%%\"*}"
-          ;;
-      esac
-      # Allow edits to plans, docs, configs, reviews — block implementation files
-      case "$_DP_PATH" in
-        *plan*.md|*CLAUDE.md|*memory-seed*|*JOURNAL*|*STATUS*|*HUMAN_NEEDED*|*TODO*|*CONTRIBUTIONS*|*OVERVIEW*|*FEATURES*|*STACK*|*CONTEXT_PACK*|*review*|*spec/*|*contracts/*|"")
-          ;; # Allow — plan/doc/config/spec/review files
-        *)
-          btrace "PreToolUse" "plan_gate_block" "{\"file\":\"${_DP_PATH:0:80}\"}" 2>/dev/null || true
-          _deny "No approved plan for this session. Run \`ag implement F-XXXX\` (validates plan + review) or \`ag plan skip\` to work without a plan. plan_review_enabled=yes requires approval before code edits."
-          ;;
-      esac
+      btrace "PreToolUse" "plan_gate_block" "{\"file\":\"${_EDIT_FILE_PATH:0:80}\"}" 2>/dev/null || true
+      _deny "No approved plan for this session. Run \`ag implement F-XXXX\` (validates plan + review) or \`ag plan skip\` to work without a plan. plan_review_enabled=yes requires approval before code edits."
     fi
   fi
 fi
 
-# --- Spec-before-code ordering (formal profiles only) ---
+# --- Spec-before-code ordering ---
 # On the first Write/Edit to an implementation file, check token-events.log for
-# prior writes to spec/contract files. Blocks if code is written before any spec.
-# Only enforced when feature_tracking=yes (formal/autonomous_formal profiles).
-# One-time check: creates .spec-first-checked sentinel after first pass.
+# prior writes to spec/contract files. Formal = block, discovery = advisory nudge.
+# One-time check per session (sentinel after first pass). Separate from plan skip.
 if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "MultiEdit" ]]; then
-  if [[ ! -f ".agentic/session/.spec-first-checked" && ! -f ".agentic/session/.plan-review-skipped" ]]; then
-    _SF_PATH=""
-    case "$TOOL_INPUT" in
-      *'"file_path"'*)
-        _SF_PATH="${TOOL_INPUT#*\"file_path\"}"
-        _SF_PATH="${_SF_PATH#*:}"
-        _SF_PATH="${_SF_PATH#*\"}"
-        _SF_PATH="${_SF_PATH%%\"*}"
-        ;;
-    esac
-    # Only check for implementation file writes (not docs/specs/configs)
-    case "$_SF_PATH" in
-      *spec/*|*contracts/*|*plan*.md|*CLAUDE.md|*JOURNAL*|*STATUS*|*FEATURES*|*OVERVIEW*|*STACK*|*review*|*TODO*|*HUMAN_NEEDED*|*CONTRIBUTIONS*|*CONTEXT_PACK*|*memory-seed*|"")
-        ;; # Not an implementation file — skip check
-      *)
-        source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
-        _SF_FT=$(get_setting "feature_tracking" "no" 2>/dev/null || echo "no")
-        _TK_EVENTS=".agentic/session/token-events.log"
-        _SF_HAS_SPEC=0
-        if [[ -f "$_TK_EVENTS" ]]; then
-          grep -q '^W|.*spec/\|^W|.*contracts/' "$_TK_EVENTS" 2>/dev/null && _SF_HAS_SPEC=1
-        fi
-        if [[ "$_SF_HAS_SPEC" -eq 0 ]]; then
-          btrace "PreToolUse" "spec_before_code" "{\"file\":\"${_SF_PATH:0:80}\",\"spec_written\":false,\"mode\":\"${_SF_FT}\"}" 2>/dev/null || true
-          if [[ "$_SF_FT" == "yes" ]]; then
-            # Formal: block
-            _deny "Spec-before-code: writing implementation file before any spec/contract file this session. Write or update specs first (.agentic/spec/contracts/), then code. Or skip: \`ag plan skip\`"
-          else
-            # Discovery: advisory nudge (once)
-            echo "💡 Consider writing specs before code — even lightweight ones help." >&2
-            echo "   \`ag intel remember\` captures decisions; \`ag spec F-XXXX\` creates formal specs." >&2
-            touch ".agentic/session/.spec-first-checked" 2>/dev/null || true
-          fi
-        else
-          touch ".agentic/session/.spec-first-checked" 2>/dev/null || true
-        fi
-        ;;
-    esac
+  if [[ "$_IS_DOC_FILE" -eq 0 && ! -f ".agentic/session/.spec-first-checked" && ! -f ".agentic/session/.spec-first-skipped" ]]; then
+    _SF_FT=$(get_setting "feature_tracking" "no" 2>/dev/null || echo "no")
+    _TK_EVENTS=".agentic/session/token-events.log"
+    _SF_HAS_SPEC=0
+    if [[ -f "$_TK_EVENTS" ]]; then
+      grep -q '^W|.*spec/\|^W|.*contracts/' "$_TK_EVENTS" 2>/dev/null && _SF_HAS_SPEC=1
+    fi
+    if [[ "$_SF_HAS_SPEC" -eq 0 ]]; then
+      btrace "PreToolUse" "spec_before_code" "{\"file\":\"${_EDIT_FILE_PATH:0:80}\",\"spec_written\":false,\"mode\":\"${_SF_FT}\"}" 2>/dev/null || true
+      if [[ "$_SF_FT" == "yes" ]]; then
+        _deny "Spec-before-code: writing implementation file before any spec/contract file this session. Write or update specs first (.agentic/spec/contracts/), then code. Or skip: \`ag plan skip\`"
+      else
+        echo "💡 Consider writing specs before code — even lightweight ones help." >&2
+        echo "   \`ag intel remember\` captures decisions; \`ag spec F-XXXX\` creates formal specs." >&2
+        touch ".agentic/session/.spec-first-checked" 2>/dev/null || true
+      fi
+    else
+      touch ".agentic/session/.spec-first-checked" 2>/dev/null || true
+    fi
   fi
 fi
 
@@ -192,18 +177,8 @@ fi
 if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "MultiEdit" ]]; then
   _PTN_FILE="$PROJECT_ROOT/.agentic/intel/patterns.yaml"
   if [[ -f "$_PTN_FILE" ]]; then
-    # Extract file_path from tool_input JSON using pure bash for speed.
-    # Assumption: TOOL_INPUT comes from Claude Code's structured hook protocol,
-    # so "file_path" always appears as a top-level JSON key (not inside content).
-    _PTN_PATH=""
-    case "$TOOL_INPUT" in
-      *'"file_path"'*)
-        _PTN_PATH="${TOOL_INPUT#*\"file_path\"}"
-        _PTN_PATH="${_PTN_PATH#*:}"
-        _PTN_PATH="${_PTN_PATH#*\"}"
-        _PTN_PATH="${_PTN_PATH%%\"*}"
-        ;;
-    esac
+    # Reuse _EDIT_FILE_PATH extracted once above (shared extraction)
+    _PTN_PATH="$_EDIT_FILE_PATH"
 
     if [[ -n "$_PTN_PATH" ]]; then
       _PTN_FNAME="${_PTN_PATH##*/}"

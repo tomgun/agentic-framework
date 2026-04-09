@@ -224,8 +224,8 @@ if echo "$USER_PROMPT" | grep -qiE '(^|\b)(always (use|do|run|add|include|check|
   _DB_SIGNAL="instruction"
   btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"instruction\"}" 2>/dev/null || true
   echo ""
-  echo "📝 INSTRUCTION DETECTED — Capture with: \`ag intel remember \"...\" --type preference\`"
-  echo "   Or enforce: \`ag intel learn \"...\" --reason \"user instruction\" --scope \"*\"\`"
+  echo "📝 INSTRUCTION auto-captured. To also enforce at write-time:"
+  echo "   \`ag intel learn \"...\" --reason \"user instruction\" --scope \"*\"\`"
   echo ""
 fi
 
@@ -234,7 +234,7 @@ if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '(^|\b)(let.s (go|u
   _DB_SIGNAL="decision"
   btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"decision\"}" 2>/dev/null || true
   echo ""
-  echo "📝 DECISION DETECTED — Capture with: \`ag intel remember \"...\" --type decision\`"
+  echo "📝 DECISION auto-captured to project memory."
   echo ""
 fi
 
@@ -244,7 +244,7 @@ if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '^(no[,. ]+.+(don.t
   _DB_SIGNAL="correction"
   btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"correction\"}" 2>/dev/null || true
   echo ""
-  echo "📝 CORRECTION DETECTED — Capture learning: \`ag intel remember \"...\" --type learning\`"
+  echo "📝 CORRECTION auto-captured as learning."
   echo ""
 fi
 
@@ -272,37 +272,19 @@ if [[ -n "$_DB_SIGNAL" ]]; then
   mkdir -p ".agentic/session" 2>/dev/null || true
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)|${_DB_SIGNAL}|${_DB_SAFE_PROMPT}" >> "$_DB_FILE"
 
-  # --- Structural auto-capture: write directly to project-memory.yaml ---
-  _PM_FILE=".agentic/intel/project-memory.yaml"
-  if [[ -f "$_PM_FILE" ]]; then
-    # Map signal type to entry type
-    _PM_TYPE="preference"
-    case "$_DB_SIGNAL" in
-      instruction) _PM_TYPE="preference" ;;
-      decision|confirmation) _PM_TYPE="decision" ;;
-      correction) _PM_TYPE="learning" ;;
-    esac
-    # Find next C-XXXX ID (fast — just count existing entries)
-    _PM_MAX=$(grep -c "^  - id: C-" "$_PM_FILE" 2>/dev/null || echo 0)
-    _PM_MAX="${_PM_MAX## }"; _PM_MAX="${_PM_MAX%%[!0-9]*}"; _PM_MAX="${_PM_MAX:-0}"
-    _PM_NEXT=$(printf "C-%04d" $((_PM_MAX + 1)))
-    _PM_DATE=$(date +%Y-%m-%d)
-    _PM_SESSION=""
-    [[ -f ".agentic/session/.current-session-id" ]] && _PM_SESSION=$(cat ".agentic/session/.current-session-id" 2>/dev/null || true)
-    # Escape quotes for YAML
-    _PM_TEXT="${_DB_SAFE_PROMPT//\"/\\\"}"
-    # Append entry
-    {
-      echo ""
-      echo "  - id: ${_PM_NEXT}"
-      echo "    type: ${_PM_TYPE}"
-      echo "    text: \"${_PM_TEXT}\""
-      echo "    context: \"auto-captured from ${_DB_SIGNAL} signal\""
-      echo "    source: hook_auto_capture"
-      [[ -n "$_PM_SESSION" ]] && echo "    session: ${_PM_SESSION}"
-      echo "    date: ${_PM_DATE}"
-    } >> "$_PM_FILE"
-    echo "✅ Auto-captured to project-memory.yaml as ${_PM_NEXT} [${_PM_TYPE}]"
+  # --- Structural auto-capture via ag intel remember (single source of ID logic) ---
+  _PM_TYPE="preference"
+  case "$_DB_SIGNAL" in
+    instruction) _PM_TYPE="preference" ;;
+    decision|confirmation) _PM_TYPE="decision" ;;
+    correction) _PM_TYPE="learning" ;;
+  esac
+  _AG_TOOL="$PROJECT_ROOT/.agentic/lib/tools/ag.sh"
+  if [[ -f "$_AG_TOOL" ]]; then
+    bash "$_AG_TOOL" intel remember "$_DB_SAFE_PROMPT" \
+      --type "$_PM_TYPE" \
+      --context "auto-captured from ${_DB_SIGNAL} signal" \
+      --source hook_auto_capture 2>/dev/null || true
   fi
 fi
 

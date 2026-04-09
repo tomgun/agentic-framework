@@ -95,8 +95,8 @@ if [[ -n "$_POST_TOOL" ]]; then
         *plan*.md|*-plan.md)
           if [[ -f "$_POST_FILE" ]]; then
             _PC_MISSING=""
-            grep -qi 'acceptance.criter\|contract\|spec.*assert\|\bAC\b' "$_POST_FILE" 2>/dev/null || _PC_MISSING="${_PC_MISSING}acceptance criteria, "
-            grep -qi 'test\|verif' "$_POST_FILE" 2>/dev/null || _PC_MISSING="${_PC_MISSING}tests/verification, "
+            grep -qiE 'acceptance.criter|contract|spec.*assert|\bAC[-_ ]' "$_POST_FILE" 2>/dev/null || _PC_MISSING="${_PC_MISSING}acceptance criteria, "
+            grep -qiE '\btests?\b|testing|verification|validate' "$_POST_FILE" 2>/dev/null || _PC_MISSING="${_PC_MISSING}tests/verification, "
             if [[ -n "$_PC_MISSING" ]]; then
               _PC_MISSING="${_PC_MISSING%, }"
               echo "📋 Plan content gap: missing ${_PC_MISSING}." >&2
