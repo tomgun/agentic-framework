@@ -5442,3 +5442,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 20:59 - F-025 ACs updated for Cursor upgrade completion
+
+**Why**: Contract must reflect built state of shipped features — planned ACs are now implemented.
+
+**What changed**:
+- Updated contract F-025.yaml: promoted AC-006 through AC-009 from planned to built with verify commands + test refs. Added AC-010 (upgrade.sh cursor step), AC-011 (sync/check-env .cursor/ detection), AC-012 (Cursor Stop sentinel parity), AC-013 (SessionStart crash recovery). Added migration M-002.
+
+**Next steps**:
+- Done
+
+**Blockers**: AC-001 (CLAUDE.md 107 lines) is pre-existing, unrelated to this work.
+
