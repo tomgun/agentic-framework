@@ -216,20 +216,9 @@ _settings_set_value() {
 
     echo -e "${GREEN}Set ${key} = ${value}${NC}"
 
-    # --- Settings change audit trail (F-041: Auto-capture pipeline) ---
-    # Auto-log mode-affecting settings changes to project memory for traceability.
-    case "$key" in
-        profile|acceptance_criteria|wip_before_commit|docs_gate|git_workflow|main_branch_mode|plan_review_enabled|docs_mode|pre_commit_checks|smoke_test_evidence)
-            local _ag_tool="$ROOT_DIR/.agentic/lib/tools/ag.sh"
-            if [[ -f "$_ag_tool" ]]; then
-                bash "$_ag_tool" intel remember \
-                    "Changed $key from '${_old_value:-unset}' to '$value'" \
-                    --type decision \
-                    --context "ag set $key $value" \
-                    --source settings_change 2>/dev/null || true
-            fi
-            ;;
-    esac
+    # Settings changes are reflected in STACK.md itself — no need to
+    # duplicate into project-memory.yaml. The git history of STACK.md
+    # provides the audit trail.
 
     # Auto-journal for profile changes (significant workflow shifts)
     if [[ "$key" == "profile" ]]; then

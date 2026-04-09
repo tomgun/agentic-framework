@@ -563,15 +563,8 @@ INIT
     echo -e "  ${type_icon} Stored in project-memory.yaml"
     _intel_log "mutate" "remember:${next_id}:${entry_type}:${source}" "1"
 
-    # Auto-journal decisions for dual-write (structured + chronological)
-    if [[ "$entry_type" == "decision" ]]; then
-        local journal_tool="$PROJECT_ROOT/.agentic/lib/tools/journal.sh"
-        if [[ -f "$journal_tool" ]]; then
-            bash "$journal_tool" \
-                "Decision Captured" "${text}" "Stored as ${next_id}" "None" \
-                --decision "${text}" 2>/dev/null || true
-        fi
-    fi
+    # Decisions are stored in project-memory.yaml — no auto-journal.
+    # If a decision is journal-worthy, the caller should log it explicitly.
 }
 
 # ---------------------------------------------------------------------------

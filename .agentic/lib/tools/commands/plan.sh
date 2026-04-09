@@ -14,15 +14,6 @@ cmd_plan() {
         # Also skip spec-first gate (separate concern but user intent is "let me work freely")
         echo "Skipped via ag plan skip" > "$ROOT_DIR/.agentic/session/.spec-first-skipped"
         echo -e "${GREEN}✓ Plan review skipped. Code edits are now unblocked.${NC}"
-        echo "  Note: This is a conscious choice, not a bypass. The decision is logged."
-        # Log to project memory
-        local _ag_tool="$ROOT_DIR/.agentic/lib/tools/ag.sh"
-        if [[ -f "$_ag_tool" ]]; then
-            bash "$_ag_tool" intel remember \
-                "Skipped plan review — user chose to work without formal review" \
-                --type decision --context "ag plan skip" \
-                --source agent_capture 2>/dev/null || true
-        fi
         return 0
     fi
 
