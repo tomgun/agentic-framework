@@ -385,3 +385,97 @@ assertions:
       enforcements, items sourced) when intel-summary.json exists
     type: behavioral
     verify: "bash -c 'grep -q INTEL_METRICS .agentic/lib/tools/dashboard.sh'"
+
+  # --- Auto-Capture Pipeline (decision/instruction/correction/confirmation detection) ---
+  - id: AC-052
+    text: >
+      `ag intel remember` accepts --source flag (manual|agent_capture|settings_change|session_audit)
+      and --session flag; entries in project-memory.yaml include source and session fields
+      when provided; defaults to source=manual when omitted
+    type: structural
+    verify: "bash -c 'grep -q \"\\-\\-source\" .agentic/lib/tools/commands/intel.sh && grep -q \"\\-\\-session\" .agentic/lib/tools/commands/intel.sh'"
+
+  - id: AC-053
+    text: >
+      UserPromptSubmit.sh detects four signal types in user prompts:
+      instructions (always/never + verb), decisions (let's go with/I prefer),
+      corrections (no + correction context), and confirmations (yes/ok with
+      pending-decision.txt); writes detected signals to session decision buffer
+    type: structural
+    verify: "bash -c 'grep -q decision_signal .agentic/lib/claude-hooks/UserPromptSubmit.sh && grep -q decision-buffer.log .agentic/lib/claude-hooks/UserPromptSubmit.sh'"
+
+  - id: AC-054
+    text: >
+      Decision buffer at .agentic/session/decision-buffer.log uses pipe-delimited
+      format TIMESTAMP|SIGNAL_TYPE|PROMPT_TEXT (append-only, session-scoped);
+      cleaned up by Stop.sh at session end
+    type: structural
+    verify: "bash -c 'grep -q decision-buffer.log .agentic/lib/claude-hooks/Stop.sh'"
+
+  - id: AC-055
+    text: >
+      Pending-decision protocol: UserPromptSubmit resolves .agentic/session/pending-decision.txt
+      when user confirms (yes/ok/approved); PostToolUse resolves it when agent
+      acts (Write/Edit/Bash) after a pending decision exists; both write to
+      decision buffer and clean up the pending file
+    type: structural
+    verify: "bash -c 'grep -q pending-decision.txt .agentic/lib/claude-hooks/UserPromptSubmit.sh && grep -q pending-decision.txt .agentic/lib/claude-hooks/PostToolUse.sh'"
+
+  - id: AC-056
+    text: >
+      `ag set` auto-logs mode-affecting settings changes (profile, acceptance_criteria,
+      plan_review_enabled, git_workflow, docs_gate, etc.) to project-memory.yaml
+      with type=decision and source=settings_change
+    type: structural
+    verify: "bash -c 'grep -q settings_change .agentic/lib/tools/commands/settings.sh'"
+
+  - id: AC-057
+    text: >
+      Stop.sh audits the decision buffer at session end: compares signal count
+      to cerebrum mutation count and warns when decisions were detected but
+      not captured; suggests `ag intel batch-remember --from-buffer`
+    type: structural
+    verify: "bash -c 'grep -q batch-remember .agentic/lib/claude-hooks/Stop.sh'"
+
+  - id: AC-058
+    text: >
+      `ag intel batch-remember --from-buffer` reads decision-buffer.log and
+      creates project memory entries for each signal; maps signal types to
+      entry types (instruction→preference, decision/confirmation→decision,
+      correction→learning)
+    type: structural
+    verify: "bash -c 'grep -q _intel_batch_remember .agentic/lib/tools/commands/intel.sh'"
+
+  - id: AC-059
+    text: >
+      `ag intel decisions` lists all project memory entries of type=decision
+      plus recent journal --decision entries; provides unified view of all
+      decisions with provenance
+    type: structural
+    verify: "bash -c 'grep -q _intel_decisions .agentic/lib/tools/commands/intel.sh'"
+
+  - id: AC-060
+    text: >
+      Decision entries of type=decision auto-dual-write to JOURNAL.md via
+      journal.sh --decision flag, creating grep-able **Decision**: lines
+      for chronological traceability alongside structured project-memory.yaml
+    type: structural
+    verify: "bash -c 'grep -q \"journal_tool.*journal.sh\" .agentic/lib/tools/commands/intel.sh'"
+
+  # --- Plan Review Gate (PreToolUse enforcement) ---
+  - id: AC-061
+    text: >
+      PreToolUse.sh blocks Write/Edit on implementation files when
+      .agentic/session/.plan-needs-review sentinel exists; allows edits
+      to plan, doc, config, and review files; sentinel created by
+      UserPromptSubmit DRAFT plan detection
+    type: structural
+    verify: "bash -c 'grep -q plan-needs-review .agentic/lib/claude-hooks/PreToolUse.sh'"
+
+  - id: AC-062
+    text: >
+      `ag plan skip` creates .agentic/session/.plan-review-skipped sentinel,
+      removes .plan-needs-review, logs the decision to project memory with
+      source=agent_capture; PreToolUse respects the skip sentinel
+    type: structural
+    verify: "bash -c 'grep -q plan-review-skipped .agentic/lib/tools/commands/plan.sh && grep -q plan-review-skipped .agentic/lib/claude-hooks/PreToolUse.sh'"

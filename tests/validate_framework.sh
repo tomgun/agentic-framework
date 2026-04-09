@@ -6082,6 +6082,100 @@ else
   fail "btrace: debug on/off missing first-match sed — may modify all btrace entries"
 fi
 
+# --- F-041 Phase 6: Auto-Capture Pipeline ---
+echo ""
+echo "  --- Phase 6: Auto-Capture Pipeline ---"
+
+# AC-052: ag intel remember --source and --session flags
+if grep -q '\-\-source' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q '\-\-session' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'source:' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-052: ag intel remember accepts --source and --session flags"
+else
+  fail "F-041 AC-052: ag intel remember missing --source/--session provenance flags"
+fi
+
+# AC-053: UserPromptSubmit 4 signal detectors
+if grep -q 'instruction' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'decision' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'correction' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'confirmation' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'decision-buffer.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
+  pass "F-041 AC-053: UserPromptSubmit detects 4 signal types with decision buffer"
+else
+  fail "F-041 AC-053: UserPromptSubmit missing signal detection"
+fi
+
+# AC-054: Decision buffer format and cleanup
+if grep -q 'decision-buffer.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh"; then
+  pass "F-041 AC-054: decision buffer cleaned up by Stop.sh"
+else
+  fail "F-041 AC-054: decision buffer cleanup missing from Stop.sh"
+fi
+
+# AC-055: Pending-decision protocol in both hooks
+if grep -q 'pending-decision.txt' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'pending-decision.txt' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh"; then
+  pass "F-041 AC-055: pending-decision protocol in UserPromptSubmit and PostToolUse"
+else
+  fail "F-041 AC-055: pending-decision protocol missing from hooks"
+fi
+
+# AC-056: Settings change auto-logging
+if grep -q 'settings_change' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/settings.sh" && \
+   grep -q 'intel remember' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/settings.sh"; then
+  pass "F-041 AC-056: ag set auto-logs mode-affecting changes to project memory"
+else
+  fail "F-041 AC-056: settings change auto-logging missing"
+fi
+
+# AC-057: Stop.sh decision buffer audit
+if grep -q 'batch-remember' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh" && \
+   grep -q 'decision_audit' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh"; then
+  pass "F-041 AC-057: Stop.sh audits decision buffer and suggests batch-remember"
+else
+  fail "F-041 AC-057: Stop.sh missing decision buffer audit"
+fi
+
+# AC-058: ag intel batch-remember command
+if grep -q '_intel_batch_remember' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'batch-remember)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-058: ag intel batch-remember command implemented"
+else
+  fail "F-041 AC-058: ag intel batch-remember missing"
+fi
+
+# AC-059: ag intel decisions command
+if grep -q '_intel_decisions' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'decisions)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-059: ag intel decisions command implemented"
+else
+  fail "F-041 AC-059: ag intel decisions missing"
+fi
+
+# AC-060: Decisions auto-dual-write to journal
+if grep -q 'journal_tool.*journal.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q '\-\-decision' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-060: decision entries auto-dual-write to JOURNAL.md"
+else
+  fail "F-041 AC-060: decision auto-journal missing"
+fi
+
+# AC-061: PreToolUse plan-needs-review sentinel gate
+if grep -q 'plan-needs-review' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then
+  pass "F-041 AC-061: PreToolUse blocks code edits when plan-needs-review sentinel exists"
+else
+  fail "F-041 AC-061: PreToolUse missing plan review gate"
+fi
+
+# AC-062: ag plan skip command
+if grep -q 'plan-review-skipped' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/plan.sh" && \
+   grep -q 'plan-review-skipped' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then
+  pass "F-041 AC-062: ag plan skip creates sentinel and PreToolUse respects it"
+else
+  fail "F-041 AC-062: ag plan skip or PreToolUse skip-sentinel missing"
+fi
+
 # ============================================================
 # F-043: Persona & Platform Dimensions for Contract Specs
 # ============================================================
