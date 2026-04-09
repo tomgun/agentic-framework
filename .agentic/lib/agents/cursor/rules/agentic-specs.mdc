@@ -1,0 +1,41 @@
+---
+description: "Spec-first workflow and contract format for feature work"
+globs: [".agentic/spec/**/*", ".agentic/work/**/*", "*.yaml"]
+---
+
+# Spec & Contract Rules
+
+## Spec-First Workflow
+
+1. Create FEATURES.md entry BEFORE coding
+2. Write acceptance criteria in `.agentic/spec/contracts/F-XXXX.yaml`
+3. Write failing tests from ACs
+4. Implement to make tests pass
+5. Update specs to reflect what was built
+
+## Contract Format
+
+```yaml
+id: F-XXXX
+name: Feature Name
+lifecycle: planned|implementing|shipped
+assertions:
+  - id: AC-001
+    text: "Testable behavior description"
+    type: structural|behavioral
+    verify: "shell command that returns 0 on pass"
+```
+
+## Commands
+
+- `ag spec F-XXXX` — create/update spec
+- `ag contract check F-XXXX` — verify assertions pass
+- `ag contract coverage` — see test coverage across contracts
+- `ag contract pending` — find contracts needing user input
+- `ag migrate-specs` — convert markdown ACs to YAML contracts
+
+## Rules
+
+- Shipped contracts are protected — use migrations to add new ACs
+- NFR constraints belong in testable ACs, not separate sections
+- Run `ag intel spec [F-XXXX]` before writing specs for quality guidance

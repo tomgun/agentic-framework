@@ -5377,3 +5377,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 16:52 - F-025 Cursor Support Upgrade
+
+**Why**: Cursor features evolved: .cursorrules deprecated, subagent frontmatter changed, native hooks/skills/MCP added
+
+**What changed**:
+- Upgraded Cursor IDE support to parity with Claude Code: .cursor/rules/*.mdc (4 templates), hooks.json (5 events with plan gate + decision capture), Cursor-compatible agent frontmatter, 12 skills, MCP template. 18 new tests, 832 total pass.
+
+**Next steps**:
+- Merge PR, run ag done F-025
+
+**Blockers**: None
+

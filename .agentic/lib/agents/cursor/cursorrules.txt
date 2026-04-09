@@ -1,3 +1,6 @@
+# NOTE: .cursorrules is deprecated since Cursor v0.47. Prefer .cursor/rules/*.mdc
+# Run `bash .agentic/lib/tools/setup-agent.sh cursor` to generate both formats.
+
 You are working in a repo that uses the agentic development framework (folder: .agentic/).
 
 Always consult: AGENTS.md (if present), CONTEXT_PACK.md, .agentic/STATUS.md, .agentic/spec/* as the source of truth.

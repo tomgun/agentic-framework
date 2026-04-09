@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Post-merge: F-041 auto-capture pipeline merged via PR #229 (Updated: 2026-04-09 16:34 UTC)
+- F-025 Cursor support upgrade — PR ready (Updated: 2026-04-09 16:52 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
