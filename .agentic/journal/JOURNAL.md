@@ -5347,3 +5347,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-09 16:25 - Three structural enforcement improvements
+
+**Why**: All three improvements from self-review — moving from advisory to structural
+
+**Decision**: Discovery gets advisory nudges, formal gets blocking gates — same enforcement, different intensity
+
+**What changed**:
+- Auto-capture to project-memory.yaml from hooks (no agent involvement), spec-before-code ordering (formal=block, discovery=nudge), plan content validation (advisory check for AC/tests mentions)
+
+**Next steps**:
+- PR review
+
+**Blockers**: None
+

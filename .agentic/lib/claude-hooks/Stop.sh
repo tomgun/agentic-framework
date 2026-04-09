@@ -264,6 +264,7 @@ rm -f .agentic/session/pending-decision.txt 2>/dev/null || true
 rm -f .agentic/session/.plan-approved 2>/dev/null || true
 rm -f .agentic/session/.plan-review-skipped 2>/dev/null || true
 rm -f .agentic/session/.plan-advisory-shown 2>/dev/null || true
+rm -f .agentic/session/.spec-first-checked 2>/dev/null || true
 
 btrace "Stop" "exit" "{\"decision\":\"allow\",\"exit_code\":0}" 2>/dev/null || true
 

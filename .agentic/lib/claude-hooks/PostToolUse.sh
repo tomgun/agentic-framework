@@ -88,6 +88,24 @@ if [[ -n "$_POST_TOOL" ]]; then
             ;;
         esac
       fi
+      # --- Plan content validation (advisory) ---
+      # When a plan file is written, check it mentions acceptance criteria, tests,
+      # and verification. Advisory only — plans are iterative, but gaps should be visible.
+      case "${_POST_FILE:-}" in
+        *plan*.md|*-plan.md)
+          if [[ -f "$_POST_FILE" ]]; then
+            _PC_MISSING=""
+            grep -qi 'acceptance.criter\|contract\|spec.*assert\|\bAC\b' "$_POST_FILE" 2>/dev/null || _PC_MISSING="${_PC_MISSING}acceptance criteria, "
+            grep -qi 'test\|verif' "$_POST_FILE" 2>/dev/null || _PC_MISSING="${_PC_MISSING}tests/verification, "
+            if [[ -n "$_PC_MISSING" ]]; then
+              _PC_MISSING="${_PC_MISSING%, }"
+              echo "📋 Plan content gap: missing ${_PC_MISSING}." >&2
+              echo "   Plans should cover specs, code, tests, and docs together." >&2
+              btrace "PostToolUse" "plan_content_gap" "{\"missing\":\"${_PC_MISSING}\"}" 2>/dev/null || true
+            fi
+          fi
+          ;;
+      esac
       ;;
   esac
 

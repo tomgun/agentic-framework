@@ -139,6 +139,53 @@ if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "Mult
   fi
 fi
 
+# --- Spec-before-code ordering (formal profiles only) ---
+# On the first Write/Edit to an implementation file, check token-events.log for
+# prior writes to spec/contract files. Blocks if code is written before any spec.
+# Only enforced when feature_tracking=yes (formal/autonomous_formal profiles).
+# One-time check: creates .spec-first-checked sentinel after first pass.
+if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "MultiEdit" ]]; then
+  if [[ ! -f ".agentic/session/.spec-first-checked" && ! -f ".agentic/session/.plan-review-skipped" ]]; then
+    _SF_PATH=""
+    case "$TOOL_INPUT" in
+      *'"file_path"'*)
+        _SF_PATH="${TOOL_INPUT#*\"file_path\"}"
+        _SF_PATH="${_SF_PATH#*:}"
+        _SF_PATH="${_SF_PATH#*\"}"
+        _SF_PATH="${_SF_PATH%%\"*}"
+        ;;
+    esac
+    # Only check for implementation file writes (not docs/specs/configs)
+    case "$_SF_PATH" in
+      *spec/*|*contracts/*|*plan*.md|*CLAUDE.md|*JOURNAL*|*STATUS*|*FEATURES*|*OVERVIEW*|*STACK*|*review*|*TODO*|*HUMAN_NEEDED*|*CONTRIBUTIONS*|*CONTEXT_PACK*|*memory-seed*|"")
+        ;; # Not an implementation file — skip check
+      *)
+        source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
+        _SF_FT=$(get_setting "feature_tracking" "no" 2>/dev/null || echo "no")
+        _TK_EVENTS=".agentic/session/token-events.log"
+        _SF_HAS_SPEC=0
+        if [[ -f "$_TK_EVENTS" ]]; then
+          grep -q '^W|.*spec/\|^W|.*contracts/' "$_TK_EVENTS" 2>/dev/null && _SF_HAS_SPEC=1
+        fi
+        if [[ "$_SF_HAS_SPEC" -eq 0 ]]; then
+          btrace "PreToolUse" "spec_before_code" "{\"file\":\"${_SF_PATH:0:80}\",\"spec_written\":false,\"mode\":\"${_SF_FT}\"}" 2>/dev/null || true
+          if [[ "$_SF_FT" == "yes" ]]; then
+            # Formal: block
+            _deny "Spec-before-code: writing implementation file before any spec/contract file this session. Write or update specs first (.agentic/spec/contracts/), then code. Or skip: \`ag plan skip\`"
+          else
+            # Discovery: advisory nudge (once)
+            echo "💡 Consider writing specs before code — even lightweight ones help." >&2
+            echo "   \`ag intel remember\` captures decisions; \`ag spec F-XXXX\` creates formal specs." >&2
+            touch ".agentic/session/.spec-first-checked" 2>/dev/null || true
+          fi
+        else
+          touch ".agentic/session/.spec-first-checked" 2>/dev/null || true
+        fi
+        ;;
+    esac
+  fi
+fi
+
 # --- Intelligence: Pattern check for Write/Edit ---
 # Advisory only — warns on matching patterns, never blocks.
 # Pure bash, no Python, targets <50ms.

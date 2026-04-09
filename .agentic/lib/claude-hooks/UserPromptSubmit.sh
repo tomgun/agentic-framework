@@ -267,10 +267,43 @@ if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '^\s*(yes|yeah|yep|
   fi
 fi
 
-# Write to decision buffer (append-only, cleaned at session end by Stop.sh)
+# Write to decision buffer AND auto-capture to project-memory.yaml (structural — no agent involvement)
 if [[ -n "$_DB_SIGNAL" ]]; then
   mkdir -p ".agentic/session" 2>/dev/null || true
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)|${_DB_SIGNAL}|${_DB_SAFE_PROMPT}" >> "$_DB_FILE"
+
+  # --- Structural auto-capture: write directly to project-memory.yaml ---
+  _PM_FILE=".agentic/intel/project-memory.yaml"
+  if [[ -f "$_PM_FILE" ]]; then
+    # Map signal type to entry type
+    _PM_TYPE="preference"
+    case "$_DB_SIGNAL" in
+      instruction) _PM_TYPE="preference" ;;
+      decision|confirmation) _PM_TYPE="decision" ;;
+      correction) _PM_TYPE="learning" ;;
+    esac
+    # Find next C-XXXX ID (fast — just count existing entries)
+    _PM_MAX=$(grep -c "^  - id: C-" "$_PM_FILE" 2>/dev/null || echo 0)
+    _PM_MAX="${_PM_MAX## }"; _PM_MAX="${_PM_MAX%%[!0-9]*}"; _PM_MAX="${_PM_MAX:-0}"
+    _PM_NEXT=$(printf "C-%04d" $((_PM_MAX + 1)))
+    _PM_DATE=$(date +%Y-%m-%d)
+    _PM_SESSION=""
+    [[ -f ".agentic/session/.current-session-id" ]] && _PM_SESSION=$(cat ".agentic/session/.current-session-id" 2>/dev/null || true)
+    # Escape quotes for YAML
+    _PM_TEXT="${_DB_SAFE_PROMPT//\"/\\\"}"
+    # Append entry
+    {
+      echo ""
+      echo "  - id: ${_PM_NEXT}"
+      echo "    type: ${_PM_TYPE}"
+      echo "    text: \"${_PM_TEXT}\""
+      echo "    context: \"auto-captured from ${_DB_SIGNAL} signal\""
+      echo "    source: hook_auto_capture"
+      [[ -n "$_PM_SESSION" ]] && echo "    session: ${_PM_SESSION}"
+      echo "    date: ${_PM_DATE}"
+    } >> "$_PM_FILE"
+    echo "✅ Auto-captured to project-memory.yaml as ${_PM_NEXT} [${_PM_TYPE}]"
+  fi
 fi
 
 # --- Consolidated prompt context (Change 3: single Python call) ---

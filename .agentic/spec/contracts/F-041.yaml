@@ -488,3 +488,32 @@ assertions:
       at least 2 of: Critic, Advocate, Synthesis/Convergence/Recommendation
     type: structural
     verify: "bash -c 'grep -q plan-approved .agentic/lib/claude-hooks/PostToolUse.sh && grep -q Critic .agentic/lib/claude-hooks/PostToolUse.sh'"
+
+  # --- Structural auto-capture + spec-before-code ordering ---
+  - id: AC-064
+    text: >
+      UserPromptSubmit.sh auto-captures detected signals directly to
+      project-memory.yaml (structural, no agent involvement); the hook
+      calls _auto_capture_to_memory or equivalent inline bash that appends
+      an entry with the signal type and prompt text; agent is notified
+      of the capture, not asked to do it
+    type: structural
+    verify: "bash -c 'grep -q project-memory.yaml .agentic/lib/claude-hooks/UserPromptSubmit.sh'"
+
+  - id: AC-065
+    text: >
+      PreToolUse.sh enforces spec-before-code ordering when plan_review_enabled=yes:
+      on the first Write/Edit to an implementation file, checks token-events.log
+      for prior writes to spec/contract files; blocks if code is written before
+      any spec file in the session; allows if spec was written first or gate skipped
+    type: structural
+    verify: "bash -c 'grep -q spec.*before.*code\\|spec_before_code\\|token-events.log .agentic/lib/claude-hooks/PreToolUse.sh'"
+
+  - id: AC-066
+    text: >
+      PostToolUse.sh validates plan content when a plan file is written:
+      checks that the plan mentions acceptance criteria, tests, and
+      verification; emits advisory warning if any are missing; does not
+      block (plans are iterative) but ensures the gap is visible
+    type: structural
+    verify: "bash -c 'grep -q acceptance.*criteria\\|plan.*content\\|plan_content .agentic/lib/claude-hooks/PostToolUse.sh'"

@@ -6187,6 +6187,27 @@ else
   fail "F-041 AC-063: PostToolUse missing evidence-based plan approval"
 fi
 
+# AC-064: Structural auto-capture to project-memory.yaml
+if grep -q 'project-memory.yaml' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
+  pass "F-041 AC-064: UserPromptSubmit auto-captures signals to project-memory.yaml"
+else
+  fail "F-041 AC-064: UserPromptSubmit missing structural auto-capture to project-memory.yaml"
+fi
+
+# AC-065: Spec-before-code ordering enforcement
+if grep -q 'spec.*before\|spec_first\|token-events.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then
+  pass "F-041 AC-065: PreToolUse enforces spec-before-code ordering"
+else
+  fail "F-041 AC-065: PreToolUse missing spec-before-code ordering check"
+fi
+
+# AC-066: Plan content validation
+if grep -q 'acceptance.*criteria\|plan.*content\|plan_content' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PostToolUse.sh"; then
+  pass "F-041 AC-066: PostToolUse validates plan content (AC/tests/verification)"
+else
+  fail "F-041 AC-066: PostToolUse missing plan content validation"
+fi
+
 # ============================================================
 # F-043: Persona & Platform Dimensions for Contract Specs
 # ============================================================
