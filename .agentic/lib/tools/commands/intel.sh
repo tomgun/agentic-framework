@@ -53,6 +53,7 @@ cmd_intel() {
         remove)    _intel_remove "$@" ;;
         patterns)  _intel_patterns "$@" ;;
         remember)        _intel_remember "$@" ;;
+        review-session)  _intel_review_session "$@" ;;
         batch-remember)  _intel_batch_remember "$@" ;;
         memory|cerebrum)  _intel_memory "$@" ;;
         decisions)       _intel_decisions "$@" ;;
@@ -84,10 +85,12 @@ _intel_help() {
     echo "  remove P-XXXX             Remove a pattern by ID"
     echo "  patterns [--scope PATH]   List all patterns (optionally filtered by scope)"
     echo ""
-    echo "  ${BOLD}Cerebrum${NC} (project knowledge from corrections & discoveries)"
+    echo "  ${BOLD}Project Memory${NC} (preferences, learnings, decisions)"
     echo "  remember \"text\" [--type preference|learning|decision] [--context \"...\"]"
     echo "  memory [--type TYPE]      List project memory entries"
     echo "  forget C-XXXX             Remove a project memory entry"
+    echo "  review-session            Display session prompts for preference review"
+    echo "  decisions                 List all decisions with provenance"
     echo ""
     echo "  ${BOLD}Anatomy${NC} (file intelligence)"
     echo "  scan [--check]            Scan project files → anatomy.yaml + index"
@@ -568,7 +571,35 @@ INIT
 }
 
 # ---------------------------------------------------------------------------
-# batch-remember — bulk-capture from decision buffer
+# review-session — display prompt buffer for LLM-driven preference review
+# ---------------------------------------------------------------------------
+_intel_review_session() {
+    local buffer_file="$PROJECT_ROOT/.agentic/session/prompt-buffer.log"
+
+    if [[ ! -f "$buffer_file" ]]; then
+        echo -e "${YELLOW}No prompt buffer found for this session.${NC}"
+        return 0
+    fi
+
+    local count=0
+    echo -e "${BOLD}Session Prompt Buffer${NC}"
+    echo -e "${DIM}Review these prompts for preferences, decisions, or corrections worth capturing:${NC}"
+    echo ""
+
+    while IFS='|' read -r timestamp prompt_text; do
+        [[ -z "$prompt_text" ]] && continue
+        count=$((count + 1))
+        echo -e "  ${DIM}${timestamp}${NC}  ${prompt_text}"
+    done < "$buffer_file"
+
+    echo ""
+    echo -e "${DIM}${count} prompt(s) in buffer${NC}"
+    echo ""
+    echo -e "To capture: ${BOLD}ag intel remember \"...\" --type preference|learning|decision --context \"...\"${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# batch-remember — DEPRECATED: use review-session instead
 # ---------------------------------------------------------------------------
 _intel_batch_remember() {
     local buffer_file="$PROJECT_ROOT/.agentic/session/decision-buffer.log"

@@ -6095,22 +6095,19 @@ else
   fail "F-041 AC-052: ag intel remember missing --source/--session provenance flags"
 fi
 
-# AC-053: UserPromptSubmit 4 signal detectors
-if grep -q 'instruction' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
-   grep -q 'decision' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
-   grep -q 'correction' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
-   grep -q 'confirmation' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
-   grep -q 'decision-buffer.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
-  pass "F-041 AC-053: UserPromptSubmit detects 4 signal types with decision buffer"
+# AC-053: UserPromptSubmit prompt buffer + intel_capture setting
+if grep -q 'prompt-buffer.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh" && \
+   grep -q 'intel_capture' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
+  pass "F-041 AC-053: UserPromptSubmit buffers prompts with intel_capture modes"
 else
-  fail "F-041 AC-053: UserPromptSubmit missing signal detection"
+  fail "F-041 AC-053: UserPromptSubmit missing prompt buffer or intel_capture"
 fi
 
-# AC-054: Decision buffer format and cleanup
-if grep -q 'decision-buffer.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh"; then
-  pass "F-041 AC-054: decision buffer cleaned up by Stop.sh"
+# AC-054: Prompt buffer cleanup by Stop.sh
+if grep -q 'prompt-buffer.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh"; then
+  pass "F-041 AC-054: prompt buffer cleaned up by Stop.sh"
 else
-  fail "F-041 AC-054: decision buffer cleanup missing from Stop.sh"
+  fail "F-041 AC-054: prompt buffer cleanup missing from Stop.sh"
 fi
 
 # AC-055: Pending-decision protocol in both hooks
@@ -6121,28 +6118,26 @@ else
   fail "F-041 AC-055: pending-decision protocol missing from hooks"
 fi
 
-# AC-056: Settings change auto-logging
-if grep -q 'settings_change' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/settings.sh" && \
-   grep -q 'intel remember' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/settings.sh"; then
-  pass "F-041 AC-056: ag set auto-logs mode-affecting changes to project memory"
+# AC-056: Settings change auto-logging REMOVED (STACK.md git history suffices)
+if ! grep -q 'intel remember' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/settings.sh"; then
+  pass "F-041 AC-056: settings auto-logging correctly removed (git history suffices)"
 else
-  fail "F-041 AC-056: settings change auto-logging missing"
+  fail "F-041 AC-056: settings auto-logging should be removed"
 fi
 
-# AC-057: Stop.sh decision buffer audit
-if grep -q 'batch-remember' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh" && \
-   grep -q 'decision_audit' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh"; then
-  pass "F-041 AC-057: Stop.sh audits decision buffer and suggests batch-remember"
+# AC-057: Stop.sh session-end preference review
+if grep -q 'review-session' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/Stop.sh"; then
+  pass "F-041 AC-057: Stop.sh nudges session-end preference review"
 else
-  fail "F-041 AC-057: Stop.sh missing decision buffer audit"
+  fail "F-041 AC-057: Stop.sh missing preference review nudge"
 fi
 
-# AC-058: ag intel batch-remember command
-if grep -q '_intel_batch_remember' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
-   grep -q 'batch-remember)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
-  pass "F-041 AC-058: ag intel batch-remember command implemented"
+# AC-058: ag intel review-session command
+if grep -q '_intel_review_session' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
+   grep -q 'review-session)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-058: ag intel review-session command implemented"
 else
-  fail "F-041 AC-058: ag intel batch-remember missing"
+  fail "F-041 AC-058: ag intel review-session missing"
 fi
 
 # AC-059: ag intel decisions command
@@ -6153,12 +6148,11 @@ else
   fail "F-041 AC-059: ag intel decisions missing"
 fi
 
-# AC-060: Decisions auto-dual-write to journal
-if grep -q 'journal_tool.*journal.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh" && \
-   grep -q '\-\-decision' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
-  pass "F-041 AC-060: decision entries auto-dual-write to JOURNAL.md"
+# AC-060: Journal dual-write REMOVED (journal entries are explicit)
+if ! grep -q 'journal_tool.*journal.sh' "${FRAMEWORK_ROOT}/.agentic/lib/tools/commands/intel.sh"; then
+  pass "F-041 AC-060: journal auto-dual-write correctly removed"
 else
-  fail "F-041 AC-060: decision auto-journal missing"
+  fail "F-041 AC-060: journal dual-write should be removed"
 fi
 
 # AC-061: PreToolUse safe-by-default plan gate
@@ -6187,12 +6181,7 @@ else
   fail "F-041 AC-063: PostToolUse missing evidence-based plan approval"
 fi
 
-# AC-064: Structural auto-capture to project-memory.yaml
-if grep -q 'project-memory.yaml' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
-  pass "F-041 AC-064: UserPromptSubmit auto-captures signals to project-memory.yaml"
-else
-  fail "F-041 AC-064: UserPromptSubmit missing structural auto-capture to project-memory.yaml"
-fi
+# AC-064: MERGED into AC-053 (duplicate prompt-buffer.log check)
 
 # AC-065: Spec-before-code ordering enforcement
 if grep -q 'spec.*before\|spec_first\|token-events.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then
@@ -6206,6 +6195,14 @@ if grep -q 'acceptance.*criteria\|plan.*content\|plan_content' "${FRAMEWORK_ROOT
   pass "F-041 AC-066: PostToolUse validates plan content (AC/tests/verification)"
 else
   fail "F-041 AC-066: PostToolUse missing plan content validation"
+fi
+
+# AC-067: intel_capture setting in profiles and settings
+if grep -q 'intel_capture' "${FRAMEWORK_ROOT}/.agentic/lib/presets/profiles.conf" && \
+   grep -q 'intel_capture' "${FRAMEWORK_ROOT}/.agentic/lib/settings.sh"; then
+  pass "F-041 AC-067: intel_capture setting in profiles.conf and settings.sh"
+else
+  fail "F-041 AC-067: intel_capture setting missing from profiles or settings"
 fi
 
 # ============================================================

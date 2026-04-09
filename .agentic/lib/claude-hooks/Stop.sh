@@ -182,35 +182,20 @@ ILEOF
   rm -f "$_IL_EVENTS"
 fi
 
-# --- Decision buffer audit (F-041: Auto-capture pipeline) ---
-# Sweep decision buffer for uncaptured signals. Warn if decisions were detected but not stored.
-_DB_FILE=".agentic/session/decision-buffer.log"
-if [[ -f "$_DB_FILE" ]]; then
-  _DB_COUNT=$(wc -l < "$_DB_FILE" 2>/dev/null || echo 0)
-  _DB_COUNT="${_DB_COUNT## }"; _DB_COUNT="${_DB_COUNT%% }"; _DB_COUNT="${_DB_COUNT%%[!0-9]*}"; _DB_COUNT="${_DB_COUNT:-0}"
-
-  # Count auto-capture remember mutations specifically (not forget/learn/retro)
-  # Filter intel-events for "mutate|remember:" entries only — these are the actual captures
-  _DB_CAPTURES=0
-  if [[ -f ".agentic/session/intel-events.log" ]]; then
-    _DB_CAPTURES=$(grep -c '|mutate|remember:' ".agentic/session/intel-events.log" 2>/dev/null || echo 0)
-    _DB_CAPTURES="${_DB_CAPTURES## }"; _DB_CAPTURES="${_DB_CAPTURES%%[!0-9]*}"; _DB_CAPTURES="${_DB_CAPTURES:-0}"
-  elif [[ -n "${_IL_MUTATES:-}" ]]; then
-    _DB_CAPTURES="${_IL_MUTATES:-0}"
+# --- Session-end preference review (F-041: LLM-driven capture pipeline) ---
+source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
+_IC_MODE=$(get_setting "intel_capture" "retro" 2>/dev/null || echo "retro")
+_PB_FILE=".agentic/session/prompt-buffer.log"
+if [[ "$_IC_MODE" != "off" && -f "$_PB_FILE" ]]; then
+  _PB_COUNT=$(wc -l < "$_PB_FILE" 2>/dev/null || echo 0)
+  _PB_COUNT="${_PB_COUNT## }"; _PB_COUNT="${_PB_COUNT%% }"; _PB_COUNT="${_PB_COUNT%%[!0-9]*}"; _PB_COUNT="${_PB_COUNT:-0}"
+  if [[ "$_PB_COUNT" -gt 2 ]]; then
+    echo "" >&2
+    echo "🧠 Session had ${_PB_COUNT} prompts. Any preferences worth capturing?" >&2
+    echo "   \`ag intel review-session\` to review prompt buffer" >&2
+    echo "" >&2
   fi
-
-  if [[ "${_DB_COUNT:-0}" -gt 0 && "${_DB_CAPTURES:-0}" -lt "${_DB_COUNT:-0}" ]]; then
-    _DB_UNCAPTURED=$(( _DB_COUNT - _DB_CAPTURES ))
-    [[ $_DB_UNCAPTURED -lt 0 ]] && _DB_UNCAPTURED=0
-    if [[ "$_DB_UNCAPTURED" -gt 0 ]]; then
-      echo "⚠️  ${_DB_COUNT} decision signal(s) detected this session, ~${_DB_CAPTURES} captured to project memory." >&2
-      echo "   ${_DB_UNCAPTURED} may be uncaptured. Review: \`cat .agentic/session/decision-buffer.log\`" >&2
-      echo "   Batch capture: \`ag intel batch-remember --from-buffer\`" >&2
-    fi
-  fi
-
-  btrace "Stop" "decision_audit" "{\"signals\":${_DB_COUNT},\"captures\":${_DB_CAPTURES}}" 2>/dev/null || true
-  # Buffer cleaned below with other sentinels
+  btrace "Stop" "preference_review" "{\"prompts\":${_PB_COUNT}}" 2>/dev/null || true
 fi
 
 # --- Clean up advisory nudge sentinels (safe on deny — they're just dedup flags) ---
@@ -261,7 +246,8 @@ rm -f .agentic/session/.phase_implementing 2>/dev/null || true
 rm -f .agentic/session/.impl-brief.md 2>/dev/null || true
 rm -f .agentic/session/.contract-surface.txt 2>/dev/null || true
 rm -f .agentic/session/.nfr-brief.txt 2>/dev/null || true
-# Decision pipeline ephemeral files
+# Preference capture ephemeral files
+rm -f .agentic/session/prompt-buffer.log 2>/dev/null || true
 rm -f .agentic/session/decision-buffer.log 2>/dev/null || true
 rm -f .agentic/session/pending-decision.txt 2>/dev/null || true
 # Plan review sentinels

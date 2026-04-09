@@ -211,80 +211,39 @@ if echo "$USER_PROMPT" | grep -qiE '(done|finished|complete|ship)\b'; then
   fi
 fi
 
-# --- Decision/instruction signal detection (F-041: Auto-capture pipeline) ---
-# Detects user decisions, instructions, corrections, and confirmations.
-# Writes signals to session decision buffer and nudges agent to capture.
-_DB_FILE=".agentic/session/decision-buffer.log"
-_DB_SIGNAL=""
-_DB_SAFE_PROMPT=$(printf '%s' "${USER_PROMPT:0:200}" | tr '|' '/' | tr '\n' ' ')
+# --- Preference capture pipeline (F-041: LLM-driven, not regex) ---
+# The LLM classifies preferences semantically — hooks just buffer and nudge.
+# Modes: retro (default, session-end review), realtime (per-prompt nudge), off.
+source "$PROJECT_ROOT/.agentic/lib/settings.sh" 2>/dev/null || true
+_IC_MODE=$(get_setting "intel_capture" "retro" 2>/dev/null || echo "retro")
 
-# Signal A: Instructions — "always use X", "never push Y", "from now on", "don't ever", "make sure to"
-# "always/never" require a verb follow-up to avoid matching questions like "is it always like this?"
-if echo "$USER_PROMPT" | grep -qiE '(^|\b)(always (use|do|run|add|include|check|write|keep|put|make|ensure|require)|never (push|commit|use|do|run|delete|remove|skip|merge|deploy|write)|don.t ever|from now on|going forward|make sure to|I want you to|rule:|convention:)\b'; then
-  _DB_SIGNAL="instruction"
-  btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"instruction\"}" 2>/dev/null || true
-  echo ""
-  echo "📝 INSTRUCTION auto-captured. To also enforce at write-time:"
-  echo "   \`ag intel learn \"...\" --reason \"user instruction\" --scope \"*\"\`"
-  echo ""
-fi
+if [[ "$_IC_MODE" != "off" ]]; then
+  # Lightweight prompt buffer (always active, used by retro review and review-session)
+  mkdir -p ".agentic/session" 2>/dev/null || true
+  _IC_SAFE=$(printf '%s' "${USER_PROMPT:0:300}" | tr '|' '/' | tr '\n' ' ')
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)|${_IC_SAFE}" >> ".agentic/session/prompt-buffer.log"
 
-# Signal B: Decisions — "let's go with", "I decide", "use X instead of Y", "I prefer"
-if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '(^|\b)(let.s (go|use|stick) with|I decide|we.ll use|I prefer|use .* instead of|go with|decision:)\b'; then
-  _DB_SIGNAL="decision"
-  btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"decision\"}" 2>/dev/null || true
-  echo ""
-  echo "📝 DECISION auto-captured to project memory."
-  echo ""
-fi
-
-# Signal C: Corrections — "no, don't/that's wrong/I said/not like that/I meant"
-# Requires correction-like follow-up to avoid false positives on casual "no" usage
-if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '^(no[,. ]+.+(don.t|stop|instead|should|wrong|not)|stop[,. ]+.+(doing|that|this)|wrong|that.s not|I said|actually[,. ]+.+(should|use|do|want)|not like that|I meant)\b'; then
-  _DB_SIGNAL="correction"
-  btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"correction\"}" 2>/dev/null || true
-  echo ""
-  echo "📝 CORRECTION auto-captured as learning."
-  echo ""
-fi
-
-# Signal D: Confirmations — "yes", "ok", "go ahead" (only if pending decision exists)
-if [[ -z "$_DB_SIGNAL" ]] && echo "$USER_PROMPT" | grep -qiE '^\s*(yes|yeah|yep|ok|okay|sure|approved?|go ahead|do it|sounds good|lgtm|confirmed?|proceed|ship it|that works)\s*[.!]?\s*$'; then
-  _PD_FILE=".agentic/session/pending-decision.txt"
-  if [[ -f "$_PD_FILE" ]]; then
-    _PD_TEXT=$(head -1 "$_PD_FILE" 2>/dev/null || true)
-    if [[ -n "$_PD_TEXT" ]]; then
-      _DB_SIGNAL="confirmation"
-      _DB_SAFE_PROMPT=$(printf '%s' "$_PD_TEXT" | tr '|' '/' | tr '\n' ' ')
-      btrace "UserPromptSubmit" "decision_signal" "{\"type\":\"confirmation\"}" 2>/dev/null || true
-      _PD_DISPLAY=$(printf '%s' "${_PD_TEXT:0:120}" | tr '`$"' "...")
-      echo ""
-      printf '📝 DECISION CONFIRMED: "%s"\n' "$_PD_DISPLAY"
-      printf '   Capture: `ag intel remember "%s" --type decision --context "confirmed recommendation"`\n' "$_PD_DISPLAY"
-      echo ""
-      rm -f "$_PD_FILE" 2>/dev/null || true
-    fi
+  if [[ "$_IC_MODE" == "realtime" ]]; then
+    echo ""
+    echo "🧠 Consider: does this prompt express a preference, decision, or correction worth remembering?"
+    echo "   If yes: \`ag intel remember \"...\" --type preference|learning|decision\`"
+    echo ""
   fi
 fi
 
-# Write to decision buffer AND auto-capture to project-memory.yaml (structural — no agent involvement)
-if [[ -n "$_DB_SIGNAL" ]]; then
-  mkdir -p ".agentic/session" 2>/dev/null || true
-  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)|${_DB_SIGNAL}|${_DB_SAFE_PROMPT}" >> "$_DB_FILE"
-
-  # --- Structural auto-capture via ag intel remember (single source of ID logic) ---
-  _PM_TYPE="preference"
-  case "$_DB_SIGNAL" in
-    instruction) _PM_TYPE="preference" ;;
-    decision|confirmation) _PM_TYPE="decision" ;;
-    correction) _PM_TYPE="learning" ;;
-  esac
-  _AG_TOOL="$PROJECT_ROOT/.agentic/lib/tools/ag.sh"
-  if [[ -f "$_AG_TOOL" ]]; then
-    bash "$_AG_TOOL" intel remember "$_DB_SAFE_PROMPT" \
-      --type "$_PM_TYPE" \
-      --context "auto-captured from ${_DB_SIGNAL} signal" \
-      --source hook_auto_capture 2>/dev/null || true
+# Pending-decision confirmation: stateful protocol the LLM can't detect on its own.
+# Only fires when pending-decision.txt exists AND user gives simple affirmative.
+_PD_FILE=".agentic/session/pending-decision.txt"
+if [[ -f "$_PD_FILE" ]] && echo "$USER_PROMPT" | grep -qiE '^\s*(yes|yeah|yep|ok|okay|sure|approved?|go ahead|do it|sounds good|lgtm|confirmed?|proceed|ship it|that works)\s*[.!]?\s*$'; then
+  _PD_TEXT=$(head -1 "$_PD_FILE" 2>/dev/null || true)
+  if [[ -n "$_PD_TEXT" ]]; then
+    btrace "UserPromptSubmit" "decision_confirmed" "{\"type\":\"confirmation\"}" 2>/dev/null || true
+    _PD_DISPLAY=$(printf '%s' "${_PD_TEXT:0:120}" | tr '`$"' "...")
+    echo ""
+    printf '✅ Pending decision confirmed: "%s"\n' "$_PD_DISPLAY"
+    printf '   Capture it: `ag intel remember "%s" --type decision --context "confirmed recommendation"`\n' "$_PD_DISPLAY"
+    echo ""
+    rm -f "$_PD_FILE" 2>/dev/null || true
   fi
 fi
 

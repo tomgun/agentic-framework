@@ -126,6 +126,10 @@ Purpose: a single source of truth for "how we build and run software here".
 - catalog_enforcement: advisory
 # Capability catalog enforcement level (F-042). advisory: warn if design docs outdated | blocking: block session stop. Discovery: advisory | Formal: advisory | Autonomous Formal: blocking
 
+### Intelligence
+- intel_capture: retro
+# How user preferences/decisions are captured. retro: session-end review (saves tokens) | realtime: per-prompt LLM nudge | off: disabled. All profiles default to retro.
+
 ### Debug
 - btrace: off
 # Behavioral trace for debugging framework decisions. off: no tracing (zero overhead) | on: trace hook I/O, gate decisions, pattern matches | verbose: on + sub-check detail + settings resolution. All profiles default to off. Override per-session: AGENTIC_BTRACE=on

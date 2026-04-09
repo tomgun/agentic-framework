@@ -15,8 +15,8 @@ alwaysApply: false
 
 - **PreToolUse**: Blocks destructive shell ops, enforces plan approval gate (code edits blocked without approved plan when `plan_review_enabled=yes`), spec-before-code ordering in formal profiles
 - **PostToolUse**: Detects plan review evidence (Critic/Advocate markers), validates plan content (ACs + tests mentioned), resolves pending decisions
-- **UserPromptSubmit**: Injects project context, detects decision/instruction/correction signals for auto-capture to project-memory.yaml, plan advisory
-- **Stop**: Verification gate, decision buffer audit (warns about uncaptured decisions), sentinel cleanup
+- **UserPromptSubmit**: Injects project context, buffers prompts for preference capture (retro/realtime modes via `intel_capture` setting), plan advisory
+- **Stop**: Verification gate, session-end preference review nudge, sentinel cleanup
 - **SessionStart**: Displays framework version, current focus, active feature, uncommitted changes
 
 ## Sentinels (session-scoped files in `.agentic/session/`)
