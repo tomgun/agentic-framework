@@ -6181,12 +6181,7 @@ else
   fail "F-041 AC-063: PostToolUse missing evidence-based plan approval"
 fi
 
-# AC-064: LLM-driven capture via prompt buffer
-if grep -q 'prompt-buffer.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/UserPromptSubmit.sh"; then
-  pass "F-041 AC-064: UserPromptSubmit buffers prompts for LLM-driven capture"
-else
-  fail "F-041 AC-064: UserPromptSubmit missing prompt buffer"
-fi
+# AC-064: MERGED into AC-053 (duplicate prompt-buffer.log check)
 
 # AC-065: Spec-before-code ordering enforcement
 if grep -q 'spec.*before\|spec_first\|token-events.log' "${FRAMEWORK_ROOT}/.agentic/lib/claude-hooks/PreToolUse.sh"; then

@@ -487,14 +487,7 @@ assertions:
     verify: "bash -c 'grep -q plan-approved .agentic/lib/claude-hooks/PostToolUse.sh && grep -q Critic .agentic/lib/claude-hooks/PostToolUse.sh'"
 
   # --- LLM-driven capture + spec-before-code ordering ---
-  - id: AC-064
-    text: >
-      UserPromptSubmit.sh buffers prompts to prompt-buffer.log and nudges the
-      LLM for preference capture (realtime mode) or defers to session-end
-      review (retro mode); capture is LLM-driven via ag intel remember,
-      not structural auto-capture
-    type: structural
-    verify: "bash -c 'grep -q prompt-buffer.log .agentic/lib/claude-hooks/UserPromptSubmit.sh'"
+  # AC-064: MERGED into AC-053 (both tested prompt-buffer.log in UserPromptSubmit)
 
   - id: AC-065
     text: >
