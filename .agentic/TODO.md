@@ -190,6 +190,9 @@ The PreToolUse gate (`gate.py` `gate_pretool`) blocks code edits without spec (F
 ### T-0097: Spec auto-update enforcement gap — no gate checks that new code has corresponding contract updates. When code changes ship, nothing verifies that affected YAML contracts were updated. Background: commit 7e39ddb5 noted the gap during PR #232 (planned assertions surfacing). Related: ag contract check validates existing assertions but doesn't detect missing updates for changed code.
 - **Added**: 2026-04-10
 
+### T-0098: Test final round-trip
+- **Added**: 2026-04-10
+
 ## Closed
 
 ### ~~T-0007: Batch-verify ~50 shipped features with unchecked ACs~~ **OBSOLETE**: Legacy v0.1–v0.12 era features. T-0051 now warns on in_progress features going forward. Retroactive verification has diminishing returns.
