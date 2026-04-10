@@ -230,6 +230,13 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
 
         ((FOUND_COUNT++))
 
+        # Check 0: origin tag — saved plans have the original filename appended.
+        # Fastest check: grep for the orphan's random filename across all saved plans.
+        origin_basename=$(basename "$plan_file")
+        if grep -rlq "<!-- origin: ${origin_basename} -->" "$PLANS_DIR" 2>/dev/null; then
+            local_plan_exists=true
+        fi
+
         # Check 1: filename match — any file with the primary ID or slug in PLANS_DIR
         local_plan_exists=false
         match_pattern="${primary_id:-$slug}"
@@ -240,7 +247,7 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
             fi
         done
 
-        # Check 2: content hash — catch duplicates saved under different names
+        # Check 2: content hash — catch exact duplicates saved under different names
         # Normalizes content before hashing: strips Status markers, blank lines,
         # and leading whitespace so minor edits (status changes, reformatting)
         # don't defeat the hash match.
@@ -254,6 +261,41 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
                 fi
                 existing_hash=$(grep -vE '^\*\*Status\*\*:|^[[:space:]]*$' "$existing" 2>/dev/null | sed 's/^[[:space:]]*//' | md5sum | cut -d' ' -f1 || true)
                 if [[ "$plan_hash" == "$existing_hash" ]]; then
+                    local_plan_exists=true
+                    break
+                fi
+            done
+        fi
+
+        # Check 3: LLM duplicate detection — for near-duplicates that differ
+        # in metadata, formatting, or minor edits. Compares the orphan's title
+        # and opening against candidate existing plans.
+        # Uses haiku for speed/cost. Fails open (saves plan if LLM unavailable).
+        if [[ "$local_plan_exists" == false ]] && command -v claude >/dev/null 2>&1; then
+            orphan_head=$(head -15 "$plan_file" 2>/dev/null || true)
+            for existing in "$PLANS_DIR"/*plan*; do
+                [[ -f "$existing" ]] || continue
+                existing_head=$(head -15 "$existing" 2>/dev/null || true)
+                # Quick pre-filter: skip if titles share no words (4+ chars)
+                orphan_title=$(echo "$orphan_head" | grep -E '^#' | head -1 || true)
+                existing_title=$(echo "$existing_head" | grep -E '^#' | head -1 || true)
+                [[ -z "$orphan_title" || -z "$existing_title" ]] && continue
+                _shared_words=0
+                for _w in $(echo "$orphan_title" | tr -cs '[:alnum:]' '\n' | awk 'length>=4'); do
+                    echo "$existing_title" | grep -qiw "$_w" && ((_shared_words++)) || true
+                done
+                [[ "$_shared_words" -lt 1 ]] && continue
+
+                # Candidate found — ask LLM
+                llm_answer=$(claude --print --model haiku -p "Are these two plan documents the same plan (possibly different drafts or versions of each other)? Answer ONLY 'DUPLICATE' or 'DIFFERENT'.
+
+Plan A title and opening:
+${orphan_head}
+
+Plan B title and opening (from $(basename "$existing")):
+${existing_head}" 2>/dev/null | tr -d '[:space:]' || true)
+
+                if [[ "$llm_answer" == "DUPLICATE" ]]; then
                     local_plan_exists=true
                     break
                 fi
@@ -284,6 +326,8 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
             ((COPIED_COUNT++))
         else
             cp "$plan_file" "$PLANS_DIR/$dest_name"
+            # Append origin tag so future scans can match by original filename
+            printf '\n<!-- origin: %s -->\n' "$origin_basename" >> "$PLANS_DIR/$dest_name"
             COPIED_PLANS+=("$label (from $(basename "$scan_dir")/$(basename "$plan_file"))")
             ((COPIED_COUNT++))
         fi
