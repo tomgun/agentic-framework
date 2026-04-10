@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-018 MCP transport merged, post-merge tasks (Updated: 2026-04-10 06:34 UTC)
+- MCP task delegation — PR #234 ready for merge (Updated: 2026-04-10 10:33 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

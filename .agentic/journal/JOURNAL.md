@@ -5498,3 +5498,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-10 10:33 - MCP Task Delegation
+
+**Why**: Context exhaustion in long sessions — users needed external CLI loops for fresh context
+
+**Decision**: Parent-only MCP access, always-delegate for 2+ ACs, MCP as state bridge not just coordination
+
+**What changed**:
+- Added 5 MCP tools (list_acs, get_task_brief, save_progress, get_next_action, get_delegation_prompt) for context-optimized subagent spawning. MCP server as state bridge across context boundaries. 123 tests pass (101 unit + 22 E2E). All review findings fixed (path traversal, last-entry-wins, lstrip corruption). Instruction files, CHANGELOG, HOW_IT_WORKS, DEVELOPER_GUIDE, contract updated.
+
+**Next steps**:
+- Merge PR #234, run ag done
+
+**Blockers**: None
+

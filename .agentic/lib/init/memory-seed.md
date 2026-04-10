@@ -20,6 +20,7 @@ Decision routing: current state → OVERVIEW.md, work log with reasoning → JOU
 - "promote/unshipped/planned assertions" → Run `ag contract promote F-XXXX` to promote planned assertions to shipped.
 - "migrate specs/convert acceptance/markdown to yaml" → STOP. Run `ag migrate-specs` (add `--dry-run` to preview, `--archive` to move old files).
 - "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`.
+- "delegate/fresh context/context optimization/subagent" → MCP task delegation via `ag mcp start`. Use `list_acs` → `get_delegation_prompt` → Agent tool → `save_progress` → `get_next_action` loop.
 - "protected branch/can't push to main/push rejected" → Check `main_branch_mode` in STACK.md. If not set, suggest `ag set main_branch_mode protected`. When protected, `ag flush` creates a branch + PR instead of direct push.
 - "work autonomously/come back with working/finish everything/do it all" → STOP. Run `ag auto crunch`.
 - User preferences/corrections/decisions: When the user expresses a preference, corrects your approach, or makes a decision, capture with `ag intel remember "..." --type preference|learning|decision --context "..."`. Recognize these semantically — don't wait for keywords. Project-scoped (project-memory.yaml), NOT Claude's local MEMORY.md. For write-time enforcement: `ag intel learn "..." --reason "user instruction" --scope "*"`.

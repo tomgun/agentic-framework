@@ -858,6 +858,18 @@ The framework includes an autonomous engine that can implement features with min
 | **Verify Epic** | `ag auto verify-epic F-XXXX` | Integration verification gate: runs integration tests between "all children shipped" and "epic shipped" (F-0204) |
 | **Verify Framework** | `ag auto verify-framework` | Framework self-verification: spawns agents to build example projects using `ag` commands, self-heals bugs, delivers fixes as PR. `--project <name>` or `--all` |
 
+#### MCP Task Delegation (Interactive Context Optimization)
+
+For features with 2+ ACs, Claude Code sessions can delegate each AC to a fresh-context subagent via the MCP coordination server — no external CLI runner loop needed:
+
+1. `list_acs(feature_id)` — get ACs and completion status
+2. `get_delegation_prompt(feature_id, ac_id)` — assembled prompt for subagent
+3. Spawn via Claude Code's Agent tool → subagent implements in fresh context
+4. `save_progress(feature_id, ac_id, status, note)` — persist results
+5. `get_next_action(feature_id)` — state-machine routing to next step
+
+Register the MCP server: `ag auto init` (adds `agentic-coord` to `mcpServers` in settings). The implementing-features skill auto-delegates when MCP tools are available.
+
 #### Tiered Test Execution (v0.44+)
 
 STACK.md's `Test commands:` section defines ordered tiers. Each tier has its own fix loop:

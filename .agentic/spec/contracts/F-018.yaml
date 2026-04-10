@@ -78,6 +78,49 @@ assertions:
     type: behavioral
     status: planned
 
+  # --- Task Delegation (context-optimized subagent spawning) ---
+  - id: AC-008
+    text: >
+      5 task delegation MCP tools (list_acs, get_task_brief, save_progress,
+      get_next_action, get_delegation_prompt) enable context-optimized
+      subagent spawning via Claude Code's native Agent tool
+    type: structural
+    verify: |
+      python3 -c "
+      import sys; sys.path.insert(0, '.agentic/lib')
+      from auto.coord_tools import TOOLS
+      expected = {'list_acs','get_task_brief','save_progress','get_next_action','get_delegation_prompt'}
+      assert expected.issubset(set(TOOLS.keys())), f'Missing: {expected - set(TOOLS.keys())}'
+      "
+    tests:
+      - tests/test_coord_server.py
+      - tests/test_mcp_server.py
+      - tests/test_mcp_e2e.py
+
+  - id: AC-009
+    text: >
+      MCP server auto-registered in settings-template.json so ag auto init
+      wires it into Claude Code sessions
+    type: structural
+    verify: |
+      python3 -c "
+      import json
+      d = json.load(open('.agentic/lib/auto/settings-template.json'))
+      assert 'mcpServers' in d
+      assert 'agentic-coord' in d['mcpServers']
+      "
+
+  - id: AC-010
+    text: >
+      Feature ID validation (is_valid_feature_id) prevents path traversal
+      in all 5 delegation tools
+    type: structural
+    verify: |
+      grep -c '_validate_feature_id' .agentic/lib/auto/coord_tools.py | grep -q '[5-9]'
+    tests:
+      - tests/test_coord_server.py::TestGetNextAction::test_invalid_feature_id_rejected
+      - tests/test_mcp_e2e.py::TestRegressionAndEdgeCases::test_invalid_feature_id_rejected
+
 nfr_refs: []
 migrations:
   - id: M-001

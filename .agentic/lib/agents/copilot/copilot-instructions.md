@@ -19,6 +19,8 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 - `ag persona list` | `ag persona check` | `ag persona coverage` | `ag persona generate` | `ag persona migrate`
+- `ag coord start` | `ag coord stop` | `ag coord status`
+- `ag mcp start` | `ag mcp status` — MCP coordination server (task delegation + multi-agent)
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`. The CLI tells you what's missing.
 

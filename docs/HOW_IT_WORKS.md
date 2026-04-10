@@ -544,7 +544,9 @@ flowchart TB
     style FS fill:#27ae60,color:#fff
 ```
 
-### 8 Coordination Tools
+### 13 Coordination Tools
+
+**Multi-agent coordination (8 tools):**
 
 | Tool | Delegates To | Purpose |
 |------|-------------|---------|
@@ -556,6 +558,18 @@ flowchart TB
 | `report_status` | `agents_helpers.cmd_checkpoint()` | Agent progress update |
 | `request_review` | `review.create_pending_review()` | Submit feature for review |
 | `submit_review` | `review.resolve_review()` | Approve or reject a pending review |
+
+**Task delegation (5 tools) — context-optimized subagent spawning:**
+
+| Tool | Purpose |
+|------|---------|
+| `list_acs` | List acceptance criteria with completion status from progress tracking |
+| `get_task_brief` | Assemble focused context (~5-10K tokens) for a subagent via `context-for-role.sh` |
+| `save_progress` | Persist subagent results — survives across context boundaries (atomic file writes) |
+| `get_next_action` | State-machine-driven routing: returns `implement_ac` / `verify` / `create_pr` / `done` |
+| `get_delegation_prompt` | Build a complete prompt ready to pass to Claude Code's Agent tool |
+
+The delegation tools enable Claude Code sessions to delegate each AC to a fresh-context subagent via the native Agent tool — eliminating external CLI runner loops. The MCP server acts as a state bridge: progress persists across subagent boundaries and context compactions. The orchestrating session stays lean (coordination only), while subagents get focused context per AC.
 
 ### Key Design Principles
 
