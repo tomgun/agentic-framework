@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """
 Tests for the autonomous crunch mode (F-0163): multi-feature batch.
+
+CrunchRunner delegates to AutonomousScheduler (F-0186). Tests mock at
+the scheduler's TaskRunner (auto.scheduler.TaskRunner) and set up a
+git-initialized project with FEATURES.md so the state machine can
+resolve feature states.
 """
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -22,7 +28,7 @@ from auto.engine import EngineState
 
 @pytest.fixture
 def project_dir():
-    """Project dir with FEATURES.md listing planned features."""
+    """Project dir with git init + FEATURES.md for state machine."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         (root / ".agentic" / "lib").mkdir(parents=True)
@@ -34,6 +40,13 @@ def project_dir():
             if src.exists():
                 (root / ".agentic" / "lib" / f).write_text(src.read_text())
         (root / "STACK.md").write_text("## Settings\n- profile: formal\n")
+        # Git init required by FeatureStateMachine
+        os.system(
+            f"cd {root} && git init -q"
+            f" && git config user.email test@test.com"
+            f" && git config user.name Test"
+            f" && git add -A && git commit -q -m init"
+        )
         yield root
 
 
@@ -98,15 +111,26 @@ class TestReadPlannedFeatures:
 
 
 class TestCrunchRunner:
-    @patch("auto.crunch.TaskRunner")
+    """CrunchRunner delegates to AutonomousScheduler.
+
+    Mock at auto.scheduler.TaskRunner (the scheduler's execution layer)
+    and write FEATURES.md entries so the state machine marks features
+    as actionable.
+    """
+
+    @patch("auto.scheduler.TaskRunner")
     def test_all_features_complete(self, MockTaskRunner, project_dir):
+        from auto.task import TaskResult
+
+        write_features_md(project_dir, [
+            ("F-0042", "planned"), ("F-0043", "planned"),
+        ])
         mock_runner = MagicMock()
-        mock_result = MagicMock()
-        mock_result.success = True
-        mock_result.acs_passed = 3
-        mock_result.acs_total = 3
-        mock_result.pr_url = "https://github.com/test/pr/1"
-        mock_runner.run.return_value = mock_result
+        mock_runner.run.return_value = TaskResult(
+            feature_id="test", success=True,
+            acs_passed=3, acs_total=3,
+            pr_url="https://github.com/test/pr/1",
+        )
         MockTaskRunner.return_value = mock_runner
 
         runner = CrunchRunner(project_dir)
@@ -115,15 +139,19 @@ class TestCrunchRunner:
         assert result.features_failed == 0
         assert result.success is True
 
-    @patch("auto.crunch.TaskRunner")
+    @patch("auto.scheduler.TaskRunner")
     def test_stops_on_max_errors(self, MockTaskRunner, project_dir):
+        from auto.task import TaskResult
+
+        write_features_md(project_dir, [
+            ("F-0042", "planned"), ("F-0043", "planned"),
+            ("F-0044", "planned"), ("F-0045", "planned"),
+        ])
         mock_runner = MagicMock()
-        mock_result = MagicMock()
-        mock_result.success = False
-        mock_result.acs_passed = 0
-        mock_result.acs_total = 3
-        mock_result.pr_url = ""
-        mock_runner.run.return_value = mock_result
+        mock_runner.run.return_value = TaskResult(
+            feature_id="test", success=False,
+            acs_passed=0, acs_total=3,
+        )
         MockTaskRunner.return_value = mock_runner
 
         runner = CrunchRunner(project_dir)
@@ -132,22 +160,28 @@ class TestCrunchRunner:
             max_errors=2,
             skip_pr=True,
         )
+        # With retry (attempts < 2), each feature fails after 2 attempts.
+        # max_errors=2 stops after 2 features fully fail.
         assert result.features_failed == 2
         assert "max errors" in result.stopped_reason
         assert result.features_skipped == 2
 
-    @patch("auto.crunch.TaskRunner")
+    @patch("auto.scheduler.TaskRunner")
     def test_stops_on_user_command(self, MockTaskRunner, project_dir):
+        from auto.task import TaskResult
+
+        write_features_md(project_dir, [
+            ("F-0042", "planned"), ("F-0043", "planned"),
+            ("F-0044", "planned"),
+        ])
         engine_state = EngineState()
 
-        def stop_after_first(*args, **kwargs):
+        def stop_after_first(**kwargs):
             engine_state.state = "stopping"
-            result = MagicMock()
-            result.success = True
-            result.acs_passed = 1
-            result.acs_total = 1
-            result.pr_url = ""
-            return result
+            return TaskResult(
+                feature_id="test", success=True,
+                acs_passed=1, acs_total=1,
+            )
 
         mock_runner = MagicMock()
         mock_runner.run.side_effect = stop_after_first
@@ -161,15 +195,18 @@ class TestCrunchRunner:
         assert result.features_completed == 1
         assert "stopped by user" in result.stopped_reason
 
-    @patch("auto.crunch.TaskRunner")
+    @patch("auto.scheduler.TaskRunner")
     def test_callback_per_feature(self, MockTaskRunner, project_dir):
+        from auto.task import TaskResult
+
+        write_features_md(project_dir, [
+            ("F-0042", "planned"), ("F-0043", "planned"),
+        ])
         mock_runner = MagicMock()
-        mock_result = MagicMock()
-        mock_result.success = True
-        mock_result.acs_passed = 2
-        mock_result.acs_total = 2
-        mock_result.pr_url = ""
-        mock_runner.run.return_value = mock_result
+        mock_runner.run.return_value = TaskResult(
+            feature_id="test", success=True,
+            acs_passed=2, acs_total=2,
+        )
         MockTaskRunner.return_value = mock_runner
 
         callbacks = []
@@ -180,20 +217,22 @@ class TestCrunchRunner:
         runner.run(feature_ids=["F-0042", "F-0043"], skip_pr=True)
         assert len(callbacks) == 2
 
-    @patch("auto.crunch.TaskRunner")
+    @patch("auto.scheduler.TaskRunner")
     def test_saves_progress(self, MockTaskRunner, project_dir):
+        from auto.task import TaskResult
+
+        write_features_md(project_dir, [("F-0042", "planned")])
         mock_runner = MagicMock()
-        mock_result = MagicMock()
-        mock_result.success = True
-        mock_result.acs_passed = 1
-        mock_result.acs_total = 1
-        mock_result.pr_url = ""
-        mock_runner.run.return_value = mock_result
+        mock_runner.run.return_value = TaskResult(
+            feature_id="test", success=True,
+            acs_passed=1, acs_total=1,
+        )
         MockTaskRunner.return_value = mock_runner
 
         runner = CrunchRunner(project_dir)
         runner.run(feature_ids=["F-0042"], skip_pr=True)
-        state_file = project_dir / ".agentic" / "session" / "crunch-state.json"
+        # Scheduler saves to scheduler-state.json (not crunch-state.json)
+        state_file = project_dir / ".agentic" / "session" / "scheduler-state.json"
         assert state_file.exists()
         import json
         state = json.loads(state_file.read_text())
@@ -205,8 +244,9 @@ class TestCrunchRunner:
         assert result.success is False
         assert "no planned features" in result.stopped_reason
 
-    @patch("auto.crunch.TaskRunner")
+    @patch("auto.scheduler.TaskRunner")
     def test_exception_counts_as_failure(self, MockTaskRunner, project_dir):
+        write_features_md(project_dir, [("F-0042", "planned")])
         mock_runner = MagicMock()
         mock_runner.run.side_effect = RuntimeError("something broke")
         MockTaskRunner.return_value = mock_runner

@@ -374,16 +374,18 @@ class TestEscalationHandling:
 
     @patch("auto.scheduler.TaskRunner")
     def test_scheduler_continues_after_exception(self, mock_runner_cls, project_root):
-        """If one feature throws, scheduler should continue to next."""
+        """If one feature throws, scheduler should continue to next.
+
+        The scheduler retries once (Change 9: attempts < 2), so the
+        exception must persist across both attempts for the feature to
+        be marked failed.
+        """
         from auto.scheduler import AutonomousScheduler
         from auto.task import TaskResult
 
-        call_count = 0
-
         def side_effect(**kwargs):
-            nonlocal call_count
-            call_count += 1
-            if call_count == 1:
+            fid = kwargs.get("feature_id", "")
+            if fid == "F-011":
                 raise RuntimeError("simulated escalation")
             return TaskResult(
                 feature_id="F-0102", success=True,

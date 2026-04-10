@@ -5498,3 +5498,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-10 07:33 - Fix scheduler logger + test updates
+
+**Why**: Crunch tests were failing because CrunchRunner now delegates to AutonomousScheduler but tests still mocked at crunch layer
+
+**What changed**:
+- Fixed missing logger in scheduler.py causing NameError on retry; updated test_auto_crunch.py to mock at scheduler layer; fixed test_scheduler.py retry test
+
+**Next steps**:
+- None
+
+**Blockers**: None
+
