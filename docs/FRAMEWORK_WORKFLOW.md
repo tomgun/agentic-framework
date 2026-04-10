@@ -1205,7 +1205,7 @@ When writing tests, the skill at `.claude/skills/writing-tests/SKILL.md` follows
 
 **Layer 3: The `test_strategy.md` Reference**
 
-The canonical test strategy at `.agentic/lib/quality/test_strategy.md` defines:
+The canonical test strategy at `.agentic/lib/quality_knowledge/testing.knowledge.md` defines:
 
 - **Test pyramid**: Unit (most, fast, deterministic) → Integration (boundaries: DB, network, filesystem) → E2E (critical user flows, smallest count)
 - **What makes a test "unit"**: Component with **controlled dependencies** (mocked/faked). If it touches real network, DB, or filesystem → integration, not unit.
@@ -1229,7 +1229,7 @@ When the autonomous engine spawns a test-writing agent, it receives context from
 |---------------|------------------|
 | `spec/acceptance/{feature_id}.md` | The ACs to write tests for |
 | `STACK.md[test_framework,test_commands]` | Test runner, framework, tier commands |
-| `.agentic/quality/test_strategy.md` | Test pyramid, 7 categories, edge case guidance |
+| `.agentic/lib/quality_knowledge/testing.knowledge.md` | Test pyramid, London/Classical methodology, edge case guidance |
 | `anti-hallucination.md` | Prevent fabricating test expectations |
 
 ### STACK.md Test Tier Configuration
@@ -1490,8 +1490,8 @@ description: Write failing tests for acceptance criteria (TDD red phase)
 required:
   - spec/acceptance/{feature_id}.md
   - STACK.md[test_framework,test_commands]    # Section extraction
-  - .agentic/quality/test_strategy.md
-  - .agentic/agents/shared/guidelines/anti-hallucination.md
+  - .agentic/lib/quality_knowledge/testing.knowledge.md
+  - .agentic/lib/quality_knowledge/anti_hallucination.knowledge.md
 
 optional:
   - tests/
@@ -1537,7 +1537,7 @@ Before planning begins, two skills handle investigation:
 
 **Research-agent context manifest**: Loads architecture + stack only (3,000 token budget), **excludes all code and tests** — this forces research-only behavior by ensuring the agent can't accidentally start implementing.
 
-**Research mode** (`.agentic/lib/workflows/research_mode.md`) defines a five-phase protocol for deeper investigation: Define (5 min) → Gather (15-45 min) → Analyze (10-20 min) → Recommend (5-10 min) → Document (5-10 min). Output feeds into planning as understanding of existing patterns, technology constraints, and integration points.
+**Research mode** (`.claude/skills/researching-topics/SKILL.md`) defines a structured protocol for deeper investigation. Output feeds into planning as understanding of existing patterns, technology constraints, and integration points.
 
 ### Scenario Templates for Framework Verification
 
@@ -1570,7 +1570,7 @@ Each defines a STACK.md structure for its project type. Used by `ag auto verify-
 | — Deprecated | 4 |
 | Shell tools (`.agentic/lib/tools/*.sh`) | 81 (+ 5 archived) |
 | Autonomous engine modules (`.agentic/lib/auto/*.py`) | 24 |
-| Workflows (`.agentic/lib/workflows/*.md`) | 35 |
+| Quality knowledge (`.agentic/lib/quality_knowledge/`) | 21 |
 | Checklists (`.agentic/lib/checklists/*.md`) | 10 |
 | Skills (`.claude/skills/`) | 13 |
 | Tests (total) | 152 |
@@ -1588,7 +1588,7 @@ Each defines a STACK.md structure for its project type. Used by `ag auto verify-
 | Layer | Components | Purpose |
 |-------|-----------|---------|
 | **Constitution** | CLAUDE.md, .cursorrules, copilot-instructions.md, codex-instructions.md | <100-line instruction files loaded at session start |
-| **Playbooks** | 13 skills, 35 workflows, 10 checklists | Just-in-time guidance loaded by `ag` commands |
+| **Playbooks** | 13 skills, 21 quality knowledge files, 10 checklists | Just-in-time guidance loaded by `ag` commands and context manifests |
 | **State** | STACK.md, STATUS.md, FEATURES.md, JOURNAL.md, BACKLOG.json, AGENTS.json | Durable artifacts tracking project state |
 | **Engine** | 24 auto modules, 81 shell tools (+ 5 archived), ag.sh gateway | Execution infrastructure |
 | **Verification** | 152 tests, validate_framework.sh, drift checks | Quality assurance |

@@ -2,7 +2,7 @@
 
 > **DEPRECATED**: This agent is superseded by the dialectical review mechanism (F-0191).
 > Plan review now uses **plan-critic-agent.md** (adversarial) + **plan-advocate-agent.md** (defensive)
-> running in parallel with fresh context. See `.agentic/lib/workflows/dialectical_review.md`.
+> running in parallel with fresh context. See `.claude/skills/planning-features/SKILL.md`.
 
 **Purpose**: Critically review implementation plans before coding begins. Find flaws early.
 
@@ -134,7 +134,7 @@ Task tool:
   subagent_type: general-purpose
   model: opus
   prompt: "Critically review dated plan at .agentic/journal/plans/*F-0042-plan.md (glob — file has date prefix)
-           Follow reviewer instructions in .agentic/workflows/plan_review_loop.md
+           Follow reviewer instructions in .claude/skills/planning-features/SKILL.md
            Check against spec/contracts/F-0042.yaml
            Add review to Review History section.
            Set verdict: APPROVED, REVISION_NEEDED, or ESCALATE"

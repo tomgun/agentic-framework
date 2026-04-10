@@ -185,7 +185,7 @@ No stale placeholders. DRY (cross-reference, don't duplicate). Explicit over imp
 
 ### D6. Green Coding
 **Efficient software reduces energy consumption and cost.**
-Token efficiency IS green for framework ops. For project code: algorithms, caching, event-driven patterns. See [green_coding.md](.agentic/lib/quality/green_coding.md) for comprehensive guidelines.
+Token efficiency IS green for framework ops. For project code: algorithms, caching, event-driven patterns. See [green_coding.knowledge.md](.agentic/lib/quality_knowledge/green_coding.knowledge.md) for comprehensive guidelines.
 
 ### D7. Multi-Environment Portability
 **Work seamlessly across Claude Code, Cursor, Copilot, and Codex.**
@@ -213,7 +213,7 @@ The framework uses a **three-layer architecture** that respects context limits w
 Instruction files (`CLAUDE.md`, `.cursorrules`, `copilot-instructions.md`) — kept under **100 lines**. Only behavioral rules that *cannot* be enforced structurally. These are the only files that compete for the agent's attention budget.
 
 ### Layer 2: Playbooks (Just-in-Time)
-Workflows, checklists, and orchestration rules (`auto_orchestration.md`, `checklists/`, `workflows/`) — loaded by `ag` commands when needed, never pinned in the instruction file. This keeps the constitution small while providing deep guidance for specific tasks.
+Skills, checklists, and quality knowledge (`skills/`, `checklists/`, `quality_knowledge/`) — loaded by `ag` commands when needed, never pinned in the instruction file. This keeps the constitution small while providing deep guidance for specific tasks.
 
 ### Layer 3: State (Durable Artifacts)
 Project truth that survives context resets (`STACK.md`, `STATUS.md`, `CONTEXT_PACK.md`, `JOURNAL.md`). Git-tracked files work cross-machine; gitignored files (`.agentic/session/`) are session-local. Agents read these first; humans can `cat STATUS.md` for instant awareness at zero token cost.
@@ -317,7 +317,6 @@ During `init_playbook.md`, choose **"a) Multiple (RECOMMENDED)"** and the framew
 - Set up token-efficient scripts
 
 **Learn more:**
-- [Environment Switching Workflow](.agentic/lib/workflows/environment_switching.md) - Complete handoff guide
 - [Environment Research](.agentic/support/environment_research.md) - Capabilities & optimizations
 
 ### Best Tool for Each Task

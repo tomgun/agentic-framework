@@ -17,7 +17,7 @@ readonly: false
 - `.agentic/spec/contracts/F-####.yaml` - Contract assertions (what behavior must be preserved)
 - `STACK.md` - Tech stack, test commands
 - `CONTEXT_PACK.md [Modules]` - Code architecture
-- `.agentic/lib/quality/programming_standards.md` - Code standards
+- `.agentic/lib/quality_knowledge/code_quality.knowledge.md, security.knowledge.md - Code quality & security
 
 ## Responsibilities
 

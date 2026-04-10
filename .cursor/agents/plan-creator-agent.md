@@ -4,7 +4,7 @@
 
 **Recommended Model Tier**: High-tier (e.g., `opus`, `gpt-4`) - planning sets direction, worth quality investment
 
-**Context**: Used in plan-review loop. See `.agentic/workflows/plan_review_loop.md`
+**Context**: Used in plan-review loop. See `.claude/skills/planning-features/SKILL.md`
 
 ## When to Use
 
@@ -44,7 +44,7 @@ Read First:
 Create Plan:
 Write to: .agentic/journal/plans/YYYY-MM-DD-{FEATURE_ID}-plan.md
 
-Follow the format in .agentic/workflows/plan_review_loop.md:
+Follow the format in .claude/skills/planning-features/SKILL.md:
 - Context: What problem, constraints, dependencies
 - Approach: Strategy, key decisions, trade-offs considered
 - Implementation Steps: Numbered, specific files per step
@@ -76,7 +76,7 @@ When revising after review:
 
 ## Output Format
 
-See `.agentic/workflows/plan_review_loop.md` for full template.
+See `.claude/skills/planning-features/SKILL.md` for full template.
 
 Key sections:
 - **Status**: DRAFT | REVIEWING | REVISION_NEEDED | APPROVED
@@ -107,5 +107,5 @@ Task tool:
   prompt: "Create implementation plan for F-0042.
            Read: spec/contracts/F-0042.yaml, CONTEXT_PACK.md
            Write to: .agentic/journal/plans/YYYY-MM-DD-F-0042-plan.md
-           Follow: .agentic/workflows/plan_review_loop.md"
+           Follow: .claude/skills/planning-features/SKILL.md"
 ```

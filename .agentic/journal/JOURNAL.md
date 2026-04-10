@@ -5601,3 +5601,14 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-10 21:30 - F-008 doc freshness
+
+**What changed**:
+- Updated 5 stale docs flagged by ag done: FRAMEWORK_WORKFLOW.md, FRAMEWORK_MAP.md, INSTRUCTION_ARCHITECTURE.md, README.md, .cursor/ agents+rules. Fixed remaining broken refs to deleted v2 files.
+
+**Next steps**:
+- ag done F-008 should now pass doc gate
+
+**Blockers**: None
+

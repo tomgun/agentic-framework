@@ -18,7 +18,7 @@ readonly: false
 - `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria
 - `STACK.md` - Tech stack, build commands
 - `src/` - Existing code patterns
-- `.agentic/lib/quality/programming_standards.md` - Code standards
+- `.agentic/lib/quality_knowledge/code_quality.knowledge.md, security.knowledge.md - Code quality & security
 
 ## Responsibilities
 
