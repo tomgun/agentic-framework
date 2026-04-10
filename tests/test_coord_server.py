@@ -31,10 +31,15 @@ from auto.coord_tools import (
     _parse_feature_statuses,
     claim_feature,
     get_unblocked,
+    get_next_action,
+    get_task_brief,
+    get_delegation_prompt,
+    list_acs,
     poll_changes,
     release_feature,
     report_status,
     request_review,
+    save_progress,
     submit_review,
     transition_state,
 )
@@ -55,10 +60,12 @@ def project_dir(tmp_path):
     session = agentic / "session"
     spec = agentic / "spec"
     acceptance = spec / "acceptance"
+    contracts = spec / "contracts"
     reviews_dir = spec / "reviews"
     pending = session / "reviews"
+    progress = session / "progress"
 
-    for d in [session, spec, acceptance, reviews_dir, pending]:
+    for d in [session, spec, acceptance, contracts, reviews_dir, pending, progress]:
         d.mkdir(parents=True)
 
     # AGENTS.json — starts empty
@@ -106,9 +113,28 @@ def project_dir(tmp_path):
 """
     (spec / "FEATURES.md").write_text(features_content)
 
-    # Acceptance criteria for F-001
+    # Acceptance criteria for F-001 (legacy markdown)
     (acceptance / "F-001.md").write_text(
         "# F-001\n\n- [ ] **AC-001**: Test criterion\n"
+    )
+
+    # Contract YAML for F-003 (modern format)
+    (contracts / "F-003.yaml").write_text(
+        "id: F-003\n"
+        "name: Test Delegation Feature\n"
+        "lifecycle: specifying\n"
+        "description: Feature for testing task delegation tools\n"
+        "assertions:\n"
+        "  - id: AC-001\n"
+        "    text: First acceptance criterion for testing\n"
+        "    type: behavioral\n"
+        "  - id: AC-002\n"
+        "    text: Second acceptance criterion for testing\n"
+        "    type: structural\n"
+        "  - id: AC-003\n"
+        "    text: Third criterion that is a draft\n"
+        "    type: behavioral\n"
+        "    draft: true\n"
     )
 
     # Minimal git directory so paths.py resolves
@@ -127,11 +153,14 @@ def _load_agents(project_dir: Path) -> list[dict]:
 # Tool dispatch map
 # ---------------------------------------------------------------------------
 class TestToolsMap:
-    def test_all_8_tools_registered(self):
+    def test_all_13_tools_registered(self):
         expected = {
             "claim_feature", "release_feature", "transition_state",
             "get_unblocked", "poll_changes", "report_status",
             "request_review", "submit_review",
+            # Task delegation tools
+            "list_acs", "get_task_brief", "save_progress",
+            "get_next_action", "get_delegation_prompt",
         }
         assert set(TOOLS.keys()) == expected
 
@@ -902,3 +931,223 @@ class TestHTTPTransport:
         rejected = [r for r in results if r.get("claimed") is False]
         assert len(claimed) == 1
         assert len(rejected) == 1
+
+
+# ===========================================================================
+# Task Delegation Tools (list_acs, get_task_brief, save_progress,
+#                        get_next_action, get_delegation_prompt)
+# ===========================================================================
+
+class TestListAcs:
+    def test_missing_feature_id(self, project_dir):
+        result = list_acs(project_dir, {})
+        assert "error" in result
+
+    def test_no_contract_returns_error(self, project_dir):
+        result = list_acs(project_dir, {"feature_id": "F-999"})
+        assert result["total"] == 0
+        assert "error" in result
+
+    def test_contract_yaml_loads_non_draft_acs(self, project_dir):
+        result = list_acs(project_dir, {"feature_id": "F-003"})
+        assert result["total"] == 2  # AC-003 is draft, excluded
+        assert result["completed"] == 0
+        assert result["pending"] == 2
+        ids = [ac["ac_id"] for ac in result["criteria"]]
+        assert "AC-001" in ids
+        assert "AC-002" in ids
+        assert "AC-003" not in ids  # draft
+
+    def test_legacy_markdown_loads_acs(self, project_dir):
+        result = list_acs(project_dir, {"feature_id": "F-001"})
+        assert result["total"] == 1
+        assert result["criteria"][0]["ac_id"] == "AC-001"
+
+    def test_progress_reflects_in_status(self, project_dir):
+        # Save some progress first
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "passed", "note": "Done",
+        })
+        result = list_acs(project_dir, {"feature_id": "F-003"})
+        assert result["completed"] == 1
+        assert result["pending"] == 1
+        ac1 = [ac for ac in result["criteria"] if ac["ac_id"] == "AC-001"][0]
+        assert ac1["status"] == "passed"
+
+
+class TestSaveProgress:
+    def test_missing_feature_id(self, project_dir):
+        result = save_progress(project_dir, {})
+        assert "error" in result
+
+    def test_invalid_status(self, project_dir):
+        result = save_progress(project_dir, {
+            "feature_id": "F-003", "status": "invalid",
+        })
+        assert "error" in result
+
+    def test_save_and_count(self, project_dir):
+        result = save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "passed", "note": "Implemented auth",
+        })
+        assert result["recorded"] is True
+        assert result["acs_completed"] == 1
+        assert result["acs_remaining"] == 1  # F-003 has 2 non-draft ACs
+
+    def test_save_multiple_entries(self, project_dir):
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "passed", "note": "First",
+        })
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-002",
+            "status": "passed", "note": "Second",
+        })
+        result = save_progress(project_dir, {
+            "feature_id": "F-003", "status": "note",
+            "note": "All done",
+        })
+        assert result["acs_completed"] == 2
+        assert result["acs_remaining"] == 0
+
+    def test_progress_persisted_to_file(self, project_dir):
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "partial", "note": "WIP",
+            "files_changed": ["src/foo.py"],
+        })
+        progress_file = project_dir / ".agentic" / "session" / "progress" / "F-003.json"
+        assert progress_file.exists()
+        data = json.loads(progress_file.read_text())
+        assert len(data) == 1
+        assert data[0]["ac_id"] == "AC-001"
+        assert data[0]["status"] == "partial"
+        assert data[0]["files_changed"] == ["src/foo.py"]
+        assert "timestamp" in data[0]
+
+
+class TestGetNextAction:
+    def test_missing_feature_id(self, project_dir):
+        result = get_next_action(project_dir, {})
+        assert "error" in result
+
+    def test_no_criteria_returns_blocked(self, project_dir):
+        result = get_next_action(project_dir, {"feature_id": "F-999"})
+        assert result["action"] == "blocked"
+
+    def test_first_ac_suggested(self, project_dir):
+        result = get_next_action(project_dir, {"feature_id": "F-003"})
+        assert result["action"] == "implement_ac"
+        assert result["details"]["ac_id"] == "AC-001"
+        assert result["acs_remaining"] == 2
+
+    def test_after_first_ac_suggests_second(self, project_dir):
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "passed", "note": "Done",
+        })
+        result = get_next_action(project_dir, {"feature_id": "F-003"})
+        assert result["action"] == "implement_ac"
+        assert result["details"]["ac_id"] == "AC-002"
+        assert result["acs_remaining"] == 1
+
+    def test_all_acs_done_suggests_verify(self, project_dir):
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "passed", "note": "Done",
+        })
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-002",
+            "status": "passed", "note": "Done",
+        })
+        result = get_next_action(project_dir, {"feature_id": "F-003"})
+        assert result["action"] == "verify"
+        assert result["acs_remaining"] == 0
+
+    def test_after_verify_suggests_pr(self, project_dir):
+        for ac_id in ("AC-001", "AC-002"):
+            save_progress(project_dir, {
+                "feature_id": "F-003", "ac_id": ac_id,
+                "status": "passed", "note": "Done",
+            })
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "__verify__",
+            "status": "passed", "note": "Tests pass",
+        })
+        result = get_next_action(project_dir, {"feature_id": "F-003"})
+        assert result["action"] == "create_pr"
+
+    def test_after_pr_suggests_done(self, project_dir):
+        for ac_id in ("AC-001", "AC-002", "__verify__", "__pr__"):
+            save_progress(project_dir, {
+                "feature_id": "F-003", "ac_id": ac_id,
+                "status": "passed", "note": "Done",
+            })
+        result = get_next_action(project_dir, {"feature_id": "F-003"})
+        assert result["action"] == "done"
+
+    def test_attempt_counter_increments(self, project_dir):
+        # Fail AC-001 twice, then check attempt count
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "failed", "note": "First try",
+        })
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "failed", "note": "Second try",
+        })
+        result = get_next_action(project_dir, {"feature_id": "F-003"})
+        assert result["action"] == "implement_ac"
+        assert result["details"]["ac_id"] == "AC-001"
+        assert result["details"]["attempt"] == 3  # Two failed + next attempt
+
+
+class TestGetTaskBrief:
+    def test_missing_feature_id(self, project_dir):
+        result = get_task_brief(project_dir, {})
+        assert "error" in result
+
+    def test_returns_ac_text(self, project_dir):
+        result = get_task_brief(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+        })
+        assert "First acceptance criterion" in result["ac_text"]
+        assert isinstance(result["token_estimate"], int)
+        assert isinstance(result["files_hint"], list)
+        assert isinstance(result["prior_notes"], list)
+
+    def test_prior_notes_included(self, project_dir):
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "failed", "note": "Import error in foo.py",
+        })
+        result = get_task_brief(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+        })
+        assert any("Import error" in n for n in result["prior_notes"])
+
+
+class TestGetDelegationPrompt:
+    def test_missing_params(self, project_dir):
+        result = get_delegation_prompt(project_dir, {"feature_id": "F-003"})
+        assert "error" in result
+
+    def test_returns_complete_prompt(self, project_dir):
+        result = get_delegation_prompt(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+        })
+        assert "prompt" in result
+        assert "model_hint" in result
+        assert "use_worktree" in result
+        assert "AC-001" in result["prompt"]
+        assert "First acceptance criterion" in result["prompt"]
+        assert result["model_hint"] in ("sonnet", "opus", "haiku")
+
+    def test_prompt_includes_instructions(self, project_dir):
+        result = get_delegation_prompt(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-002",
+        })
+        assert "Instructions" in result["prompt"]
+        assert "tests" in result["prompt"].lower()

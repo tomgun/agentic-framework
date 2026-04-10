@@ -66,3 +66,28 @@ Docs are part of the deliverable — update them alongside code, not after merge
 
 For framework development: also update instruction files (CLAUDE.md template, memory-seed,
 DEVELOPER_GUIDE, HOW_IT_WORKS, etc.) — see DEV-003.
+
+## Context-Optimized Delegation (MCP + Agent tool)
+
+When the `agentic-coord` MCP server is available and the feature has **2+ acceptance criteria**,
+delegate each AC to a fresh-context subagent instead of implementing directly. This keeps the
+orchestrating session lean and avoids context exhaustion on large features.
+
+**Delegation workflow:**
+1. Call MCP `list_acs(feature_id)` to get criteria and completion status
+2. For each pending AC:
+   a. Call MCP `get_delegation_prompt(feature_id, ac_id)` → returns `{prompt, model_hint, use_worktree}`
+   b. Spawn: `Agent(prompt=result.prompt, model=result.model_hint)` — subagent implements in fresh context
+   c. After return: call MCP `save_progress(feature_id, ac_id, status, note)` with the result
+   d. Call MCP `get_next_action(feature_id)` to determine the next step
+3. After all ACs: `get_next_action` returns `"verify"` — delegate verification to another subagent
+4. After verify: create PR from the orchestrator (needs user interaction)
+
+**When to use:**
+- Feature has 2+ ACs → always delegate
+- Feature has 1 AC → implement directly (delegation overhead not worth it)
+- MCP tools not available → implement directly (fallback, no breakage)
+
+**Retry on failure:** If a subagent fails an AC, `get_next_action` will return it again with
+an incremented attempt counter. Prior failure notes are included in the next `get_delegation_prompt`.
+After 3 attempts, report the failure to the user.

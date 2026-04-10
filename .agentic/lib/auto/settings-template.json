@@ -32,5 +32,11 @@
       "Bash(curl * | bash*)",
       "Bash(wget * | bash*)"
     ]
+  },
+  "mcpServers": {
+    "agentic-coord": {
+      "command": "bash",
+      "args": [".agentic/lib/auto/mcp_start.sh"]
+    }
   }
 }

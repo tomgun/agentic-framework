@@ -164,7 +164,16 @@ def generate_settings(
         if lang in LANGUAGE_RULES:
             allow_set.update(LANGUAGE_RULES[lang])
 
-    return {
+    # MCP server configuration (available for all tiers)
+    mcp_servers = {}
+    mcp_start = project_root / ".agentic" / "lib" / "auto" / "mcp_start.sh"
+    if mcp_start.exists():
+        mcp_servers["agentic-coord"] = {
+            "command": "bash",
+            "args": [".agentic/lib/auto/mcp_start.sh"],
+        }
+
+    result: dict = {
         "_comment": f"Tier 2: Scoped permissions. Generated from STACK.md (pm={pm}).",
         "_tier": 2,
         "permissions": {
@@ -172,6 +181,9 @@ def generate_settings(
             "deny": sorted(deny_set),
         },
     }
+    if mcp_servers:
+        result["mcpServers"] = mcp_servers
+    return result
 
 
 def ensure_hooks(project_root: Path) -> str:
