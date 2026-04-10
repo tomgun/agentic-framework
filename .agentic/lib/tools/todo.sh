@@ -43,7 +43,7 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 
 _No items_
 
-## Done
+## Closed
 
 <!-- Resolved/triaged items move here with outcome -->
 HEADER
@@ -62,10 +62,10 @@ Actions:
       Add new item to TODO.md inbox
 
   done <T-ID> [resolution]
-      Mark item as resolved, move to Done section
+      Mark item as resolved, move to Closed section
 
   drop <T-ID> [reason]
-      Drop item with reason, move to Done section
+      Drop item with reason, move to Closed section
 
   triage <T-ID> feature|issue [notes]
       Record item as promoted to FEATURES.md or ISSUES.md
@@ -114,13 +114,14 @@ case "${ACTION}" in
       rm -f "${TODO_FILE}.bak"
     fi
 
-    # Single-write: insert before ## Done using awk (portable across macOS/Linux)
+    # Single-write: insert before --- separator or ## Closed (whichever comes first)
     awk -v id="${NEXT_ID}" -v desc="${DESCRIPTION}" -v ts="${TIMESTAMP}" -v ctx="${CONTEXT}" '
-      /^## Done/ {
+      !inserted && (/^---$/ || /^## (Done|Closed)/) {
         print "### " id ": " desc
         print "- **Added**: " ts
         if (ctx != "") print "- **Context**: " ctx
         print ""
+        inserted=1
       }
       { print }
     ' "${TODO_FILE}" > "${TODO_FILE}.tmp"
@@ -146,14 +147,14 @@ case "${ACTION}" in
       exit 1
     fi
 
-    # Check if item exists in Inbox (between ## Inbox and ## Done)
-    if ! awk '/^## Inbox/,/^## Done/' "${TODO_FILE}" | grep -q "^### ${TODO_ID}:"; then
+    # Check if item exists in Inbox (between ## Inbox and ## Closed)
+    if ! awk '/^## Inbox/,/^## (Done|Closed)/' "${TODO_FILE}" | grep -q "^### ${TODO_ID}:"; then
       echo "Error: ${TODO_ID} not found in Inbox"
       exit 1
     fi
 
-    # Extract item block (from ### T-#### to next ### or ## Done)
-    ITEM_TITLE=$(awk '/^## Inbox/,/^## Done/' "${TODO_FILE}" | grep "^### ${TODO_ID}:" | head -1)
+    # Extract item block (from ### T-#### to next ### or ## Closed)
+    ITEM_TITLE=$(awk '/^## Inbox/,/^## (Done|Closed)/' "${TODO_FILE}" | grep "^### ${TODO_ID}:" | head -1)
 
     # Remove item from Inbox section
     # Use awk to delete the block: from ### T-#### line to next ### or ## line
@@ -167,9 +168,15 @@ case "${ACTION}" in
     ' "${TODO_FILE}" > "${TODO_FILE}.tmp"
     mv "${TODO_FILE}.tmp" "${TODO_FILE}"
 
-    # Append to Done section (awk for macOS portability)
+    # Append to Closed section — insert new item right after header
     awk -v title="${ITEM_TITLE}" -v ts="${TIMESTAMP}" -v res="${RESOLUTION}" '
-      /^## Done/ { print; getline; print; print ""; print title; print "- **Resolved**: " ts " — " res; next }
+      /^## (Done|Closed)/ {
+        print
+        print ""
+        print title
+        print "- **Resolved**: " ts " — " res
+        next
+      }
       { print }
     ' "${TODO_FILE}" > "${TODO_FILE}.tmp"
     mv "${TODO_FILE}.tmp" "${TODO_FILE}"
@@ -193,12 +200,12 @@ case "${ACTION}" in
       exit 1
     fi
 
-    if ! awk '/^## Inbox/,/^## Done/' "${TODO_FILE}" | grep -q "^### ${TODO_ID}:"; then
+    if ! awk '/^## Inbox/,/^## (Done|Closed)/' "${TODO_FILE}" | grep -q "^### ${TODO_ID}:"; then
       echo "Error: ${TODO_ID} not found in Inbox"
       exit 1
     fi
 
-    ITEM_TITLE=$(awk '/^## Inbox/,/^## Done/' "${TODO_FILE}" | grep "^### ${TODO_ID}:" | head -1)
+    ITEM_TITLE=$(awk '/^## Inbox/,/^## (Done|Closed)/' "${TODO_FILE}" | grep "^### ${TODO_ID}:" | head -1)
 
     # Remove from Inbox
     awk -v id="### ${TODO_ID}:" '
@@ -211,9 +218,15 @@ case "${ACTION}" in
     ' "${TODO_FILE}" > "${TODO_FILE}.tmp"
     mv "${TODO_FILE}.tmp" "${TODO_FILE}"
 
-    # Append to Done (awk for macOS portability)
+    # Append to Closed — insert new item right after header
     awk -v title="${ITEM_TITLE}" -v ts="${TIMESTAMP}" -v reason="${REASON}" '
-      /^## Done/ { print; getline; print; print ""; print title; print "- **Dropped**: " ts " — " reason; next }
+      /^## (Done|Closed)/ {
+        print
+        print ""
+        print title
+        print "- **Dropped**: " ts " — " reason
+        next
+      }
       { print }
     ' "${TODO_FILE}" > "${TODO_FILE}.tmp"
     mv "${TODO_FILE}.tmp" "${TODO_FILE}"
@@ -243,12 +256,12 @@ case "${ACTION}" in
       exit 1
     fi
 
-    if ! awk '/^## Inbox/,/^## Done/' "${TODO_FILE}" | grep -q "^### ${TODO_ID}:"; then
+    if ! awk '/^## Inbox/,/^## (Done|Closed)/' "${TODO_FILE}" | grep -q "^### ${TODO_ID}:"; then
       echo "Error: ${TODO_ID} not found in Inbox"
       exit 1
     fi
 
-    ITEM_TITLE=$(awk '/^## Inbox/,/^## Done/' "${TODO_FILE}" | grep "^### ${TODO_ID}:" | head -1)
+    ITEM_TITLE=$(awk '/^## Inbox/,/^## (Done|Closed)/' "${TODO_FILE}" | grep "^### ${TODO_ID}:" | head -1)
 
     # Remove from Inbox
     awk -v id="### ${TODO_ID}:" '
@@ -271,9 +284,15 @@ case "${ACTION}" in
       RESOLUTION="${RESOLUTION} — ${NOTES}"
     fi
 
-    # Append to Done (awk for macOS portability)
+    # Append to Closed — insert new item right after header
     awk -v title="${ITEM_TITLE}" -v ts="${TIMESTAMP}" -v res="${RESOLUTION}" '
-      /^## Done/ { print; getline; print; print ""; print title; print "- **Triaged**: " ts " — " res; next }
+      /^## (Done|Closed)/ {
+        print
+        print ""
+        print title
+        print "- **Triaged**: " ts " — " res
+        next
+      }
       { print }
     ' "${TODO_FILE}" > "${TODO_FILE}.tmp"
     mv "${TODO_FILE}.tmp" "${TODO_FILE}"
@@ -284,8 +303,8 @@ case "${ACTION}" in
     ;;
 
   list)
-    # Section-aware: count only items between ## Inbox and ## Done
-    ITEMS=$(awk '/^## Inbox/,/^## Done/' "${TODO_FILE}" | grep "^### T-" || true)
+    # Section-aware: count only items between ## Inbox and ## Closed
+    ITEMS=$(awk '/^## Inbox/,/^## (Done|Closed)/' "${TODO_FILE}" | grep "^### T-" || true)
 
     if [[ -z "${ITEMS}" ]]; then
       echo "TODO inbox: 0 items"

@@ -432,15 +432,22 @@ else
 
     # Step 11: Rebase onto remote (reconcile if remote moved)
     if $HAS_REMOTE; then
-        if ! git pull --rebase origin "$BRANCH" 2>/dev/null; then
+        # --autostash: git pull --rebase refuses to run with unstaged changes
+        # (e.g., non-state files being edited). --autostash handles this safely
+        # by auto-stashing and restoring dirty files around the rebase.
+        # Log stderr to framework.log instead of discarding — aids debugging.
+        _rebase_log="${SESSION_DIR:-/tmp}/state-commit-rebase.log"
+        if ! git pull --rebase --autostash origin "$BRANCH" 2>"$_rebase_log"; then
             # Rebase conflict — undo our commit, restore working tree
             git rebase --abort 2>/dev/null || true
             git reset --soft HEAD~1 2>/dev/null || true
             git reset HEAD -- "${DIRTY_STATE[@]}" 2>/dev/null || true
             echo "Error: State conflict during rebase onto remote. Resolve manually, then re-run: ag flush"
+            [[ -s "$_rebase_log" ]] && echo "Detail: $(cat "$_rebase_log")"
             echo "Hint: git pull --rebase origin $BRANCH, resolve conflicts, git rebase --continue"
             exit 1
         fi
+        rm -f "$_rebase_log"
     fi
 
     # Step 12: Push (if remote exists)
