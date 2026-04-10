@@ -382,6 +382,43 @@ print(f'{len(unshipped)}|{detail}')
         fi
     fi
 
+    # --- Gate 4b: Contract not modified advisory (T-0097) ---
+    # If code was changed for a feature but its contract wasn't touched, warn.
+    # Advisory only — catches forgotten contract updates before completion.
+    # Uses the manifest (generated in Step 1 below) when available,
+    # falls back to merge commit diff.
+    if [ -n "$feature_id" ] && is_feature_id "$feature_id"; then
+        local _cm_contract="$CONTRACTS_DIR/${feature_id}.yaml"
+        if [ -f "$_cm_contract" ]; then
+            local _cm_contract_rel="${_cm_contract#$PROJECT_ROOT/}"
+            local _cm_manifest="$ROOT_DIR/.agentic/journal/manifests/${feature_id}.manifest.md"
+            local _cm_changed_files=""
+            if [ -f "$_cm_manifest" ]; then
+                _cm_changed_files=$(sed -n 's/^- `\([^`]*\)`.*/\1/p' "$_cm_manifest" 2>/dev/null || true)
+            else
+                # Fallback: check merge commit (ag done runs after merge)
+                _cm_changed_files=$(git diff --name-only HEAD~1 2>/dev/null || true)
+            fi
+            if [ -n "$_cm_changed_files" ]; then
+                local _cm_has_code=false
+                local _cm_has_contract=false
+                # Check for source code changes (exclude framework, docs, config)
+                if echo "$_cm_changed_files" | grep -qvE '^\.(agentic|claude|cursor)/|\.md$|\.yaml$|\.json$'; then
+                    _cm_has_code=true
+                fi
+                if echo "$_cm_changed_files" | grep -qF "$_cm_contract_rel"; then
+                    _cm_has_contract=true
+                fi
+                if [ "$_cm_has_code" = true ] && [ "$_cm_has_contract" = false ]; then
+                    echo -e "${YELLOW}⚠ Code changed for $feature_id but contract not updated${NC}"
+                    echo "  Contract: $_cm_contract_rel"
+                    echo "  Review: ag contract check $feature_id"
+                    echo ""
+                fi
+            fi
+        fi
+    fi
+
     # --- Intent-driven execution (F-0200) ---
     # Write intent before any mutable work. Each step is checkpointed.
     # If the process dies mid-sequence, ag sync can resume from last checkpoint.

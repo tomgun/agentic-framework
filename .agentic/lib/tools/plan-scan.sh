@@ -101,7 +101,7 @@ fi
 extract_primary_id() {
     local file="$1"
     local header
-    header=$(head -10 "$file" 2>/dev/null || true)
+    header=$(head -30 "$file" 2>/dev/null || true)
 
     # Pattern 0: Epic ID — "Epic ID: E-XXXX" or "**Epic ID**: E-XXXX"
     local eid
@@ -137,6 +137,13 @@ extract_primary_id() {
 
     # Pattern 3: "**Feature**: F-XXXX" or "Feature: F-XXXX" in metadata
     fid=$(echo "$header" | grep -iE "(feature|feature.id)[:\*]*\s*$FEATURE_ID_ERE" | grep -oE "$FEATURE_ID_ERE" | head -1 || true)
+    if [[ -n "$fid" ]]; then
+        echo "$fid"
+        return
+    fi
+
+    # Pattern 4: most-referenced F-XXXX in full content (3+ mentions = likely primary)
+    fid=$(grep -oE "$FEATURE_ID_ERE" "$file" 2>/dev/null | sort | uniq -c | sort -rn | head -1 | awk '$1 >= 3 { print $2 }' || true)
     if [[ -n "$fid" ]]; then
         echo "$fid"
         return
@@ -250,6 +257,30 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
                     break
                 fi
             done
+        fi
+
+        # Check 3: title word overlap — catches near-duplicates with different slugs/IDs
+        # e.g., "plan-improve-cursor-ide-support" vs "F-025-cursor-support-upgrade-plan"
+        if [[ "$local_plan_exists" == false ]]; then
+            orphan_slug=$(extract_slug "$plan_file")
+            if [[ -n "$orphan_slug" ]]; then
+                # Split slug into words (4+ chars, excluding 'plan')
+                orphan_words=$(echo "$orphan_slug" | tr '-' '\n' | awk 'length >= 4 && $0 != "plan"')
+                for existing in "$PLANS_DIR"/*plan*; do
+                    [[ -f "$existing" ]] || continue
+                    existing_base=$(basename "$existing" .md | tr '-' '\n')
+                    match_count=0
+                    for word in $orphan_words; do
+                        if echo "$existing_base" | grep -qiw "$word"; then
+                            ((match_count++))
+                        fi
+                    done
+                    if [[ "$match_count" -ge 2 ]]; then
+                        local_plan_exists=true
+                        break
+                    fi
+                done
+            fi
         fi
 
         if [[ "$local_plan_exists" == true ]]; then
