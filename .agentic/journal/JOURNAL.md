@@ -5523,3 +5523,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-10 13:06 - MCP Context Optimization Plan
+
+**Why**: Long-running sessions exhaust context; external CLI loops are a workaround that only works in CLI mode
+
+**What changed**:
+- Saved draft plan for MCP-driven context optimization — eliminates CLI runner loops by combining Agent tool + MCP coordination server
+
+**Next steps**:
+- Dialectical review if plan_review_enabled, then implementation
+
+**Blockers**: None
+
