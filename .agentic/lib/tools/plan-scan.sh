@@ -241,46 +241,23 @@ for scan_dir in "${SCAN_DIRS[@]}"; do
         done
 
         # Check 2: content hash — catch duplicates saved under different names
+        # Normalizes content before hashing: strips Status markers, blank lines,
+        # and leading whitespace so minor edits (status changes, reformatting)
+        # don't defeat the hash match.
         if [[ "$local_plan_exists" == false ]]; then
-            plan_size=$(wc -c < "$plan_file" 2>/dev/null || echo 0)
             plan_hash=""
             for existing in "$PLANS_DIR"/*plan*; do
                 [[ -f "$existing" ]] || continue
-                # Short-circuit: skip hash if file sizes differ
-                existing_size=$(wc -c < "$existing" 2>/dev/null || echo 0)
-                [[ "$plan_size" != "$existing_size" ]] && continue
-                # Sizes match — compare hashes
-                [[ -z "$plan_hash" ]] && plan_hash=$(md5sum "$plan_file" 2>/dev/null | cut -d' ' -f1 || true)
-                existing_hash=$(md5sum "$existing" 2>/dev/null | cut -d' ' -f1 || true)
+                # Lazy-compute: normalize orphan on first comparison
+                if [[ -z "$plan_hash" ]]; then
+                    plan_hash=$(grep -vE '^\*\*Status\*\*:|^[[:space:]]*$' "$plan_file" 2>/dev/null | sed 's/^[[:space:]]*//' | md5sum | cut -d' ' -f1 || true)
+                fi
+                existing_hash=$(grep -vE '^\*\*Status\*\*:|^[[:space:]]*$' "$existing" 2>/dev/null | sed 's/^[[:space:]]*//' | md5sum | cut -d' ' -f1 || true)
                 if [[ "$plan_hash" == "$existing_hash" ]]; then
                     local_plan_exists=true
                     break
                 fi
             done
-        fi
-
-        # Check 3: title word overlap — catches near-duplicates with different slugs/IDs
-        # e.g., "plan-improve-cursor-ide-support" vs "F-025-cursor-support-upgrade-plan"
-        if [[ "$local_plan_exists" == false ]]; then
-            orphan_slug=$(extract_slug "$plan_file")
-            if [[ -n "$orphan_slug" ]]; then
-                # Split slug into words (4+ chars, excluding 'plan')
-                orphan_words=$(echo "$orphan_slug" | tr '-' '\n' | awk 'length >= 4 && $0 != "plan"')
-                for existing in "$PLANS_DIR"/*plan*; do
-                    [[ -f "$existing" ]] || continue
-                    existing_base=$(basename "$existing" .md | tr '-' '\n')
-                    match_count=0
-                    for word in $orphan_words; do
-                        if echo "$existing_base" | grep -qiw "$word"; then
-                            ((match_count++))
-                        fi
-                    done
-                    if [[ "$match_count" -ge 2 ]]; then
-                        local_plan_exists=true
-                        break
-                    fi
-                done
-            fi
         fi
 
         if [[ "$local_plan_exists" == true ]]; then
