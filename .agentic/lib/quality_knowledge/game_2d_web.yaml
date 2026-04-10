@@ -4,7 +4,7 @@ display_name: "2D Web Game (Phaser, PixiJS)"
 matches:
   frameworks: ["Phaser", "PixiJS", "Pixi", "Phaser 3", "Phaser3"]
   languages: ["TypeScript", "JavaScript"]
-  config_files: ["package.json"]
+  config_files: []
   markers: ["phaser", "pixi.js", "PIXI", "Phaser.Scene", "Phaser.Game"]
 
 failure_modes:
@@ -30,7 +30,7 @@ quality_checks:
       command: "npm run lint --if-present"
       required: true
     - name: "Unit tests"
-      command: "npm test -- --watchAll=false 2>/dev/null || npx vitest run --reporter=dot 2>/dev/null || true"
+      command: "npm test -- --watchAll=false 2>/dev/null || npx vitest run --reporter=dot"
       required: true
     - name: "Build check"
       command: "npm run build --if-present"

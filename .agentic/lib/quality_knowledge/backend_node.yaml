@@ -4,7 +4,7 @@ display_name: "Node.js Backend (Express, Fastify, Hono)"
 matches:
   frameworks: ["Express", "Fastify", "Hono", "Koa", "NestJS", "Nest"]
   languages: ["TypeScript", "JavaScript"]
-  config_files: ["tsconfig.json", "package.json"]
+  config_files: []
   markers: ["express", "fastify", "hono", "@nestjs/core", "app.listen"]
 
 failure_modes:

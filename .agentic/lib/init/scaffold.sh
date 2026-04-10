@@ -318,7 +318,7 @@ if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
   fi
 fi
 
-# Generate stack-specific quality profile if discovery detected a stack (F-302)
+# Generate stack-specific quality profile if discovery detected a stack (F-008)
 if [[ "$DISCOVERY_RAN" == "yes" && -f "${ROOT_DIR}/STACK.md" ]]; then
   QUALITY_GEN="${ROOT_DIR}/.agentic/lib/tools/generate-quality-profile.sh"
   if [[ -f "$QUALITY_GEN" ]]; then

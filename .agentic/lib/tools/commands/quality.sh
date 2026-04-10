@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# commands/quality.sh — Stack-specific quality profile management (F-302)
+# commands/quality.sh — Stack-specific quality profile management (F-008)
 # Sourced by ag.sh — do NOT execute directly.
 # Depends on: SCRIPT_DIR, ROOT_DIR, PROFILE, color codes, paths.sh, settings.sh
 

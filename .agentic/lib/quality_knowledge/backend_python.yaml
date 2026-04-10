@@ -31,8 +31,9 @@ quality_checks:
       required: false
       condition: "[[ -f mypy.ini || -f pyrightconfig.json || -f pyproject.toml ]]"
     - name: "Lint (ruff)"
-      command: "ruff check . 2>/dev/null || python -m flake8 . 2>/dev/null || true"
+      command: "ruff check . 2>/dev/null || python -m flake8 ."
       required: true
+      condition: "command -v ruff &>/dev/null || command -v flake8 &>/dev/null"
     - name: "Unit tests"
       command: "python -m pytest tests/ -x -q --tb=short 2>/dev/null || python -m pytest -x -q --tb=short"
       required: true

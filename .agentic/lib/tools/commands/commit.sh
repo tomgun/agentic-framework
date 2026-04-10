@@ -48,7 +48,7 @@ cmd_commit() {
         echo -e "${GREEN}Untracked check: PASS${NC}"
     fi
 
-    # 3. Stack-specific quality checks (F-302)
+    # 3. Stack-specific quality checks (F-008)
     local qc_script="${ROOT_DIR}/quality_checks.sh"
     if [[ -f "$qc_script" ]]; then
         local qc_mode

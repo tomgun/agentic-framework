@@ -614,7 +614,7 @@ def check_status_exists(project_root: Path) -> GateResult:
 
 
 def check_quality_profile(project_root: Path, mode: str = "--full") -> GateResult:
-    """Run quality_checks.sh if it exists (F-302).
+    """Run quality_checks.sh if it exists (F-008).
 
     Project-wide check, not feature-scoped. Controlled by quality_checks
     setting in STACK.md: blocking | advisory | off.
@@ -998,6 +998,9 @@ def gate_verify(feature_id: Optional[str], project_root: Path) -> GateResult:
     # Only run verification commands if AC file exists
     if result.decision == "allow":
         result = result.merge(check_verification_passes(feature_id, project_root))
+
+    # Project-wide quality check (F-008) — runs regardless of feature
+    result = result.merge(check_quality_profile(project_root))
 
     return result
 

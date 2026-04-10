@@ -411,7 +411,7 @@ def validate_quality_setup(root: Path) -> list[str]:
     # Check for quality_checks.sh
     quality_script = root / "quality_checks.sh"
     if not quality_script.exists():
-        # Check if we can auto-generate from knowledge files (F-302)
+        # Check if we can auto-generate from knowledge files (F-008)
         knowledge_dir = root / ".agentic" / "lib" / "quality_knowledge"
         if knowledge_dir.exists() and list(knowledge_dir.glob("*.yaml")):
             suggestions.append(

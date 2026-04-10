@@ -101,6 +101,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0085: PR #235: F-008 quality knowledge system
+- **Type**: review
+- **Added**: 2026-04-10
+- **Context**: feat/F-008-quality-knowledge-system — 111 files, quality knowledge + generator + enforcement + broken ref fixes
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0079: PR #219: F-041 Phase 2 — Anatomy + Token Ledger

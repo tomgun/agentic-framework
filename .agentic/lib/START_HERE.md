@@ -183,7 +183,7 @@ Key transitions are gated by artifact preconditions (plan.md, spec.md, tests, do
 **Quality:**
 - Test strategy: [`.agentic/lib/quality_knowledge/testing.knowledge.md`](quality_knowledge/testing.knowledge.md)
 - Code review: [`.agentic/lib/quality_knowledge/review_checklist.knowledge.md`](quality_knowledge/review_checklist.knowledge.md)
-- Definition of done: [`.claude/skills/completing-work/SKILL.md + `ag done``](.claude/skills/completing-work/SKILL.md)
+- Definition of done: `.claude/skills/completing-work/SKILL.md` + `ag done`
 - Spec analysis: `bash .agentic/lib/tools/spec-analyze.sh F-####` (ambiguity, NFR, AC↔test gaps — advisory)
 - AC coverage: `python3 .agentic/lib/tools/coverage.py --ac-coverage F-####` (per-AC test mapping)
 
@@ -339,13 +339,13 @@ Survives framework upgrades — `.agentic/` gets replaced, `.agentic/local/` doe
 - **Autonomous implementation**: `ag auto task F-####` (hands-off, creates PR)
 - **Autonomous test-fix**: `ag auto verify` (loop until green)
 - **Batch implementation**: `ag auto crunch` (all planned features)
-- Git workflow: `.claude/skills/committing-changes/SKILL.md
+- Git workflow: `.claude/skills/committing-changes/SKILL.md`
 
 **Work with a team / multiple agents:**
 - Multi-agent coordination: `AGENTS.json + `ag implement` (auto-worktree)
 - Git worktrees: `AGENTS.json + `ag implement` (auto-worktree)
 - Agent coordination file: `AGENTS.json`
-- PR workflow: `.claude/skills/committing-changes/SKILL.md
+- PR workflow: `.claude/skills/committing-changes/SKILL.md`
 
 **Write tests:**
 - Test strategy: `.agentic/lib/quality_knowledge/testing.knowledge.md`
@@ -372,7 +372,7 @@ Survives framework upgrades — `.agentic/` gets replaced, `.agentic/local/` doe
 
 **Check quality:**
 - Review checklist: `.agentic/lib/quality_knowledge/review_checklist.knowledge.md`
-- Definition of done: `.claude/skills/completing-work/SKILL.md + `ag done``
+- Definition of done: `.claude/skills/completing-work/SKILL.md` + `ag done`
 - Continuous quality validation: `ag quality setup` (generate stack-specific checks from STACK.md), `ag quality run` (execute checks), `ag quality status` (show profile). Knowledge in `.agentic/lib/quality_knowledge/`. See DEVELOPER_GUIDE §Continuous Quality Validation.
 - Run verification: `bash .agentic/lib/tools/verify.sh`
 - **Autonomous test-fix loop**: `ag auto verify` (auto-fixes failing tests)

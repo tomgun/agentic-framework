@@ -106,7 +106,8 @@ def match_knowledge_files(stack_info: dict[str, str]) -> list[tuple[int, str, Pa
         return []
 
     matches: list[tuple[int, str, Path]] = []
-    stack_text = " ".join(stack_info.values()).lower()
+    # Exclude internal keys (prefixed with _) from matching text
+    stack_text = " ".join(v for k, v in stack_info.items() if not k.startswith("_")).lower()
 
     for yf in sorted(knowledge_dir.glob("*.yaml")):
         if yf.name.startswith("_"):
@@ -190,7 +191,8 @@ def fallback_legacy_profile(stack_info: dict[str, str], root: Path) -> Optional[
     if not profiles_dir.exists():
         return None
 
-    stack_text = " ".join(stack_info.values()).lower()
+    # Exclude internal keys (prefixed with _) from matching text
+    stack_text = " ".join(v for k, v in stack_info.items() if not k.startswith("_")).lower()
     for keyword, filename in _LEGACY_PROFILE_MAP.items():
         if keyword in stack_text:
             profile = profiles_dir / filename
@@ -266,10 +268,10 @@ def generate_quality_checks_sh(
 
             if required:
                 section += f'{indent}  echo "  ❌ {name} FAILED"\n'
-                section += f'{indent}  ((ERRORS++))\n'
+                section += f'{indent}  ERRORS=$((ERRORS + 1))\n'
             else:
                 section += f'{indent}  echo "  ⚠️  {name} failed (non-blocking)"\n'
-                section += f'{indent}  ((WARNINGS++))\n'
+                section += f'{indent}  WARNINGS=$((WARNINGS + 1))\n'
 
             section += f'{indent}fi\n'
 
@@ -299,10 +301,10 @@ def generate_quality_checks_sh(
 
                 if required:
                     section += f'{indent}  echo "  ❌ {name} FAILED"\n'
-                    section += f'{indent}  ((ERRORS++))\n'
+                    section += f'{indent}  ERRORS=$((ERRORS + 1))\n'
                 else:
                     section += f'{indent}  echo "  ⚠️  {name} failed (non-blocking)"\n'
-                    section += f'{indent}  ((WARNINGS++))\n'
+                    section += f'{indent}  WARNINGS=$((WARNINGS + 1))\n'
 
                 section += f'{indent}fi\n'
 

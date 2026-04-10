@@ -460,7 +460,7 @@ if c.has_pending_input:
       if [[ -f "$ROOT_DIR/.agentic/conventions.md" ]]; then
         echo "- **Conventions**: .agentic/conventions.md exists — review before coding"
       fi
-      # Stack-specific conventions (F-302)
+      # Stack-specific conventions (F-008)
       if [[ -f "$ROOT_DIR/.agentic/local/conventions-stack.md" ]]; then
         echo "- **Stack conventions**: .agentic/local/conventions-stack.md (stack-specific rules)"
       fi
