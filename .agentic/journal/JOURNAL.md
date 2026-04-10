@@ -5579,3 +5579,14 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-10 20:11 - F-008 post-merge
+
+**What changed**:
+- Merged PR #235. Fixing migration YAML schema (missing id field). Doc freshness gate shows 6 stale docs (pre-existing, not F-008 related).
+
+**Next steps**:
+- Bump VERSION
+
+**Blockers**: None
+
