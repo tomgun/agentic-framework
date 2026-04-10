@@ -155,7 +155,11 @@ class MCPClient:
     def close(self):
         if self.proc.stdin:
             self.proc.stdin.close()
-        self.proc.wait(timeout=5)
+        try:
+            self.proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            self.proc.kill()
+            self.proc.wait()
 
     def _request(self, method: str, params: dict) -> dict:
         self._req_id += 1
@@ -283,7 +287,7 @@ class TestDelegationWorkflow:
         assert "AC-001" in prompt
         assert "widget parser" in prompt
         assert "Instructions" in prompt
-        assert result["model_hint"] in ("sonnet", "opus", "haiku")
+        assert result["model_hint"] in ("sonnet", "opus")
         assert isinstance(result["use_worktree"], bool)
 
     def test_full_orchestration_loop(self, mcp, project):

@@ -1162,7 +1162,7 @@ class TestGetDelegationPrompt:
         assert "use_worktree" in result
         assert "AC-001" in result["prompt"]
         assert "First acceptance criterion" in result["prompt"]
-        assert result["model_hint"] in ("sonnet", "opus", "haiku")
+        assert result["model_hint"] in ("sonnet", "opus")
 
     def test_prompt_includes_instructions(self, project_dir):
         result = get_delegation_prompt(project_dir, {

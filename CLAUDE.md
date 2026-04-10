@@ -34,6 +34,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve`
 - `ag persona list` | `ag persona check` | `ag persona coverage` | `ag persona generate` | `ag persona migrate`
 - `ag coord start` | `ag coord stop` | `ag coord status`
+- `ag mcp start` | `ag mcp status` — MCP coordination server (tool-native agent integration)
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`. The CLI tells you what's missing.
 
