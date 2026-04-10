@@ -25,7 +25,7 @@ The CLI tells you what's missing. If a transition is blocked, it shows exactly w
 
 ## Rules
 
-- Never auto-commit in interactive sessions. Show changes to human first.
+- Never auto-commit in interactive sessions. Show changes to human first. After every commit/push, state the short hash, branch, and one-line summary.
 - Never fabricate APIs, data, or behavior. If uncertain, ask.
 - Use token-efficient scripts for state files: `journal.sh`, `status.sh`, `todo.sh`
 - Keep commits small: max 5-10 files per commit.

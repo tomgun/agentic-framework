@@ -40,7 +40,7 @@ Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `
 
 ## Core Rules
 
-- Interactive sessions: show changes to human before committing. Autonomous/non-interactive sessions: commit directly, using `review_commit` setting.
+- Interactive sessions: show changes to human before committing. Autonomous/non-interactive sessions: commit directly, using `review_commit` setting. After every commit or push, state explicitly: the short commit hash, the branch, and a one-line summary of what was included (e.g., "`a1b2c3d` on `main` — fix plan-scan dedup + todo.sh entry loss").
 - PR by default: create feature branches and PRs (check `git_workflow` in STACK.md). If `git_mode` is `deferred` or `none`, skip git operations — suggest `ag git-init` when the user wants to commit. After creating a PR, add entry to .agentic/HUMAN_NEEDED.md for review tracking.
 - Add/update tests for new/changed logic. Write tests alongside code, not after.
 - Spec + code + tests + docs = done (update all artifacts together, not later).

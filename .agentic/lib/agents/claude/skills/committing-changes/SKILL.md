@@ -22,7 +22,7 @@ Run `ag commit` — it handles quality gates, branch checks, and diff review.
 3. If shipping feature: `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 
 ## Rules
-- Never auto-commit in interactive sessions. Show diff to human first.
+- Never auto-commit in interactive sessions. Show diff to human first. After every commit/push, state the short hash, branch, and one-line summary.
 - Never bypass hooks (`--no-verify`). Fix the underlying issue.
 - PR by default. After creating PR, add to HUMAN_NEEDED.md.
 - Stage specific files (`git add <files>`), not `git add .`

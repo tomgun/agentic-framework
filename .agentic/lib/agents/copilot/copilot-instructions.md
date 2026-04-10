@@ -48,7 +48,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 
 ## Rules
 
-- Never auto-commit in interactive sessions. Show changes to human first.
+- Never auto-commit in interactive sessions. Show changes to human first. After every commit/push, state the short hash, branch, and one-line summary.
 - PR by default: create feature branches and PRs (check `git_workflow` in STACK.md).
 - Add/update tests for new/changed logic. Write tests alongside code.
 - Spec + code + tests + docs = done (update all artifacts together).
