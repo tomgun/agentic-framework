@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Surface planned assertions + agent-agnostic enforcement hierarchy (Updated: 2026-04-09 20:01 UTC)
+- F-018 MCP transport merged, post-merge tasks (Updated: 2026-04-10 06:34 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

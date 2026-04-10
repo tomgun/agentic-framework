@@ -92,6 +92,15 @@ _No active items_
 - **Outcome**: PR #225 merged
 - **Impact**: Blocking: [specify what's blocked]
 
+
+### HN-0084: PR #233: MCP stdio transport for coordination server
+- **Type**: pr_review
+- **Added**: 2026-04-10
+- **Context**: feat/F-018-mcp-coordination-transport — F-018 AC-002/003/004. Manual test: Cursor MCP integration.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0079: PR #219: F-041 Phase 2 — Anatomy + Token Ledger

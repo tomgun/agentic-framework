@@ -5485,3 +5485,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-10 06:34 - F-018 MCP Transport
+
+**Why**: F-018 AC-002/003/004 fulfilled
+
+**What changed**:
+- MCP stdio transport for coordination server merged (PR #233). 8 coord tools exposed via MCP protocol. Stdout capture, isError pattern, signal handlers, tests.
+
+**Next steps**:
+- ag done F-018, VERSION bump
+
+**Blockers**: None
+
