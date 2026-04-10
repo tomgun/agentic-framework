@@ -187,6 +187,9 @@ The PreToolUse gate (`gate.py` `gate_pretool`) blocks code edits without spec (F
 - **Implementation**: In `gate_pretool()`, after the F-0251 check (line 697), add: if `plan_review_enabled=yes` AND `state_enforcement=blocking` AND NO plan has `**Status**: APPROVED` → deny with message directing agent to save plan + run review. Invert the logic of `check_pending_plan_review()` (gate.py:354): instead of "block if DRAFT exists", check "block unless APPROVED exists".
 - **Added**: 2026-03-26
 
+### T-0099: Test round-trip
+- **Added**: 2026-04-10
+
 ---
 
 ### T-0097: Spec auto-update enforcement gap — no gate checks that new code has corresponding contract updates. When code changes ship, nothing verifies that affected YAML contracts were updated. Background: commit 7e39ddb5 noted the gap during PR #232 (planned assertions surfacing). Related: ag contract check validates existing assertions but doesn't detect missing updates for changed code.
