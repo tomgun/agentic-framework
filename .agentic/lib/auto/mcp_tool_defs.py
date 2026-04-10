@@ -1,7 +1,7 @@
 """
 mcp_tool_defs.py — MCP inputSchema definitions for coordination tools.
 
-Maps the 8 tool handlers in coord_tools.TOOLS to MCP-formatted tool
+Maps the 13 tool handlers in coord_tools.TOOLS to MCP-formatted tool
 definitions with JSON Schema input specifications. Kept separate from
 coord_tools.py so the shared handler layer stays transport-agnostic.
 
@@ -167,6 +167,121 @@ MCP_TOOL_DEFS: dict[str, dict[str, Any]] = {
                 },
             },
             "required": ["feature_id", "target_state", "verdict"],
+        },
+    },
+    # -----------------------------------------------------------------
+    # Task delegation tools (context-optimized subagent spawning)
+    # -----------------------------------------------------------------
+    "list_acs": {
+        "description": "List acceptance criteria for a feature with completion status from progress tracking.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "feature_id": {
+                    "type": "string",
+                    "description": "Feature ID (e.g., F-0042)",
+                },
+            },
+            "required": ["feature_id"],
+        },
+    },
+    "get_task_brief": {
+        "description": (
+            "Assemble focused context for a subagent about to work on a feature or AC. "
+            "Returns role-specific context, AC text, plan summary, and prior progress notes."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "feature_id": {
+                    "type": "string",
+                    "description": "Feature ID (e.g., F-0042)",
+                },
+                "ac_id": {
+                    "type": "string",
+                    "description": "Specific acceptance criterion ID (e.g., AC-001)",
+                },
+                "role": {
+                    "type": "string",
+                    "description": "Agent role for context assembly (default: implementation-agent)",
+                },
+                "component": {
+                    "type": "string",
+                    "description": "Scope context to a specific component",
+                },
+            },
+            "required": ["feature_id"],
+        },
+    },
+    "save_progress": {
+        "description": "Persist subagent results for a feature/AC. Survives across subagent boundaries and context compactions.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "feature_id": {
+                    "type": "string",
+                    "description": "Feature ID (e.g., F-0042)",
+                },
+                "ac_id": {
+                    "type": "string",
+                    "description": "Acceptance criterion ID (e.g., AC-001)",
+                },
+                "status": {
+                    "type": "string",
+                    "enum": ["passed", "failed", "partial", "note"],
+                    "description": "Result status",
+                },
+                "note": {
+                    "type": "string",
+                    "description": "Progress note describing what was done",
+                },
+                "files_changed": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of files modified",
+                },
+            },
+            "required": ["feature_id"],
+        },
+    },
+    "get_next_action": {
+        "description": (
+            "Determine the next action for a feature based on state machine and progress. "
+            "Returns: implement_ac, verify, create_pr, done, or blocked."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "feature_id": {
+                    "type": "string",
+                    "description": "Feature ID (e.g., F-0042)",
+                },
+            },
+            "required": ["feature_id"],
+        },
+    },
+    "get_delegation_prompt": {
+        "description": (
+            "Build a complete, self-contained prompt for delegating an AC to a subagent via the Agent tool. "
+            "Returns the prompt text, recommended model, and worktree preference."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "feature_id": {
+                    "type": "string",
+                    "description": "Feature ID (e.g., F-0042)",
+                },
+                "ac_id": {
+                    "type": "string",
+                    "description": "Acceptance criterion ID to implement (e.g., AC-001)",
+                },
+                "role": {
+                    "type": "string",
+                    "description": "Agent role for context assembly (default: implementation-agent)",
+                },
+            },
+            "required": ["feature_id", "ac_id"],
         },
     },
 }

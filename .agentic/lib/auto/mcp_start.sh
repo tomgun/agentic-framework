@@ -38,4 +38,7 @@ fi
 export PYTHONPATH="$PROJECT_ROOT/.agentic/lib${PYTHONPATH:+:$PYTHONPATH}"
 export AG_PROJECT_ROOT="$PROJECT_ROOT"
 
+# Ensure progress directory exists for task delegation tools
+mkdir -p "$PROJECT_ROOT/.agentic/session/progress"
+
 exec "$PYTHON" "$PROJECT_ROOT/.agentic/lib/auto/mcp_server.py"

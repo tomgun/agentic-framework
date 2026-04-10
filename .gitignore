@@ -60,6 +60,8 @@ tests/llm/.test-state
 .agentic/session/.correction_hint_shown
 .agentic/session/.plan-review-skipped
 .agentic/session/.spec-first-skipped
+.agentic/session/progress/
+.agentic/session/parallel-logs/
 
 # Intel engine (generated/session-scoped files)
 .agentic/intel/anatomy.index

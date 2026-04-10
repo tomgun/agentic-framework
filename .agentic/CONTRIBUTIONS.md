@@ -3276,6 +3276,22 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### MCP Task Delegation — Context-Optimized Subagent Spawning (v0.81.x)
+
+**User insight 1 — "Can we utilize this MCP server somehow to optimize the context size when working on tasks?"**: Tomas recognized that the just-shipped MCP coordination server (F-018) could serve a second, higher-value purpose beyond multi-agent coordination: as a **state bridge for context optimization**. The existing 8 coordination tools handle claims/transitions between agents — but the context exhaustion problem affects every session, not just multi-agent ones. The MCP server, because it persists state outside the context window, is the natural place to track progress across fresh-context subagent boundaries.
+
+**User insight 2 — "Many people are using CLI loops to start new Claude CLI instances for tasks. Could we do this automatically with no CLI runner loop?"**: The key architectural insight: Claude Code's native Agent tool already spawns fresh-context subagents — the capability exists but the framework was bypassing it in favor of external `spawn_claude()` subprocess calls via Python orchestrators. Tomas identified the gap: users without `ag auto` (or in desktop/web/IDE modes where CLI spawning isn't possible) had no way to get fresh context per unit of work. The solution isn't another external tool — it's wiring the existing MCP server to the existing Agent tool.
+
+**User insight 3 — Scope: "Both" (interactive + autonomous)**: When asked whether to optimize for interactive sessions or the autonomous pipeline, Tomas chose both — recognizing that context assembly logic shouldn't be duplicated between the two paths. The MCP tools become the shared substrate: interactive sessions call them via native MCP, autonomous pipelines call them for context assembly before `spawn_claude()`. Same tools, two transports.
+
+**User insight 4 — Access model: "Parent only"**: Tomas chose parent-only MCP access over bidirectional (where subagents also call MCP tools). This was a simplicity-over-capability trade: it sidesteps the open question of whether Agent tool subagents inherit MCP server access, keeps subagent prompts focused on implementation (no coordination protocol to learn), and means the orchestrator has a complete view of all progress without race conditions from concurrent subagent writes.
+
+**Why it matters**: The insight is that context optimization isn't a separate system — it's a new use case for existing infrastructure (MCP server + Agent tool) connected by a thin layer of task-aware tools (`list_acs`, `get_delegation_prompt`, `save_progress`, `get_next_action`). No new server, no new protocol, no new process model.
+
+**Design direction**: MCP server = state bridge across context boundaries. Agent tool = native subagent spawning (no CLI loop). Parent-only coordination keeps the orchestrator lean and subagents focused.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.73.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

@@ -65,10 +65,16 @@ class TestMCPProtocol:
         resp = server.handle_message(msg)
         assert "result" in resp
         tools = resp["result"]["tools"]
-        assert len(tools) == 8
+        assert len(tools) == 13
         names = {t["name"] for t in tools}
         assert "claim_feature" in names
         assert "get_unblocked" in names
+        # Task delegation tools
+        assert "list_acs" in names
+        assert "get_task_brief" in names
+        assert "save_progress" in names
+        assert "get_next_action" in names
+        assert "get_delegation_prompt" in names
 
     def test_tools_list_has_input_schemas(self, server):
         msg = {"jsonrpc": "2.0", "id": 4, "method": "tools/list", "params": {}}
