@@ -5551,3 +5551,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-10 14:31 - MCP backlog churn tests
+
+**Why**: No test coverage existed for the MCP-driven backlog churn orchestration loop
+
+**What changed**:
+- Added 26 e2e tests exercising MCP coordinator for multi-feature backlog churning — covers claim/release lifecycle, cross-feature isolation, error/retry routing, CrunchRunner backlog integration, scaling to 5 features. All 149 MCP tests pass.
+
+**Next steps**:
+- Commit and merge
+
+**Blockers**: None
+
