@@ -103,9 +103,15 @@ assertions:
 
 nfr_refs: []
 migrations:
-  - date: "2026-04-10"
+  - id: M-001
+    date: "2026-04-10"
     trigger: expansion
     reason: >
       Expanded F-008 with quality knowledge system: 21 files (7 universal +
       14 stack-specific), Python generator, ag quality CLI, enforcement wiring.
       Added AC-004 through AC-008. Fixed 111 broken references to deleted v2 files.
+    changes:
+      - "Added AC-004 through AC-008"
+      - "Created .agentic/lib/quality_knowledge/ (21 files)"
+      - "Created quality_profile_generator.py + ag quality CLI"
+      - "Wired enforcement into ag commit, gate.py, scaffold.sh"
