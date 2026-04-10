@@ -192,9 +192,6 @@ The PreToolUse gate (`gate.py` `gate_pretool`) blocks code edits without spec (F
 
 ## Closed
 
-### T-0098: Test final round-trip
-- **Dropped**: 2026-04-10 — test entry
-
 ### ~~T-0007: Batch-verify ~50 shipped features with unchecked ACs~~ **OBSOLETE**: Legacy v0.1–v0.12 era features. T-0051 now warns on in_progress features going forward. Retroactive verification has diminishing returns.
 - **Added**: 2026-02-24 · **Closed**: 2026-03-11
 
