@@ -6699,6 +6699,47 @@ else
 fi
 rm -rf "$_SK_TMPDIR"
 
+# ============================================================
+# F-018 AC-002/003/004: MCP Coordination Transport
+# ============================================================
+echo "--- F-018: MCP Coordination Transport ---"
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/mcp_server.py" ]]; then
+  pass "F-018-MCP-001: mcp_server.py exists"
+else
+  fail "F-018-MCP-001: mcp_server.py missing"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/mcp_tool_defs.py" ]]; then
+  pass "F-018-MCP-002: mcp_tool_defs.py exists"
+else
+  fail "F-018-MCP-002: mcp_tool_defs.py missing"
+fi
+
+if [[ -f "${FRAMEWORK_ROOT}/.agentic/lib/auto/mcp_start.sh" ]]; then
+  pass "F-018-MCP-003: mcp_start.sh exists"
+else
+  fail "F-018-MCP-003: mcp_start.sh missing"
+fi
+
+if [[ -x "${FRAMEWORK_ROOT}/.agentic/lib/auto/mcp_start.sh" ]]; then
+  pass "F-018-MCP-004: mcp_start.sh is executable"
+else
+  fail "F-018-MCP-004: mcp_start.sh is not executable"
+fi
+
+if grep -q 'mcp)' "${FRAMEWORK_ROOT}/.agentic/lib/tools/ag.sh" 2>/dev/null; then
+  pass "F-018-MCP-005: ag.sh dispatches mcp command"
+else
+  fail "F-018-MCP-005: ag.sh does not dispatch mcp command"
+fi
+
+if grep -q 'mcp_start.sh' "${FRAMEWORK_ROOT}/.agentic/lib/agents/cursor/mcp.json" 2>/dev/null; then
+  pass "F-018-MCP-006: mcp.json template references mcp_start.sh"
+else
+  fail "F-018-MCP-006: mcp.json template does not reference mcp_start.sh"
+fi
+
 # Summary
 
 # ============================================================

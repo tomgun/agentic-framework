@@ -497,7 +497,7 @@ case "$TOOL" in
     setup_cursor_agents
     ;;
   cursor-mcp)
-    echo -e "${BLUE}Setting up Cursor MCP...${NC}"
+    echo -e "${BLUE}Setting up Cursor MCP coordination server...${NC}"
     mkdir -p "$PROJECT_ROOT/.cursor"
     local mcp_src="$AGENTIC_DIR/agents/cursor/mcp.json"
     if [[ -f "$mcp_src" ]]; then
@@ -505,10 +505,20 @@ case "$TOOL" in
         echo -e "${YELLOW}⚠ .cursor/mcp.json already exists. Skipping.${NC}"
       else
         cp "$mcp_src" "$PROJECT_ROOT/.cursor/mcp.json"
-        echo -e "${GREEN}✓ Created .cursor/mcp.json template${NC}"
-        echo "  Add MCP servers to mcpServers object. See: https://cursor.com/docs/mcp"
+        echo -e "${GREEN}✓ Created .cursor/mcp.json with agentic-coord server${NC}"
       fi
     fi
+    # Check Python availability
+    if ! command -v python3 &>/dev/null; then
+      echo -e "${YELLOW}⚠ Python3 not found. MCP server requires Python 3 to run.${NC}"
+    fi
+    echo ""
+    echo "  MCP coordination tools available to Cursor agents:"
+    echo "    claim_feature, release_feature, transition_state,"
+    echo "    get_unblocked, poll_changes, report_status,"
+    echo "    request_review, submit_review"
+    echo ""
+    echo "  Test: ag mcp status"
     ;;
   pipeline)
     setup_pipeline

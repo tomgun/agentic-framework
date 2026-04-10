@@ -327,6 +327,10 @@ case "${1:-help}" in
         shift
         cmd_coord "$@"
         ;;
+    mcp)
+        shift
+        cmd_mcp "$@"
+        ;;
     backlog)
         shift
         cmd_backlog "$@"

@@ -527,6 +527,58 @@ cmd_coord() {
 }
 
 
+# MCP coordination server command (F-018 AC-002/003)
+cmd_mcp() {
+    local subcmd="${1:-}"
+    shift 2>/dev/null || true
+
+    local auto_dir="$SCRIPT_DIR/../auto"
+
+    case "$subcmd" in
+        start)
+            # Run MCP server in foreground on stdio (for testing / headless use)
+            export PYTHONPATH="$ROOT_DIR/.agentic/lib${PYTHONPATH:+:$PYTHONPATH}"
+            export AG_PROJECT_ROOT="$ROOT_DIR"
+            python3 "$auto_dir/mcp_server.py" "$@"
+            ;;
+        status)
+            # Capability check: verify components exist and Python is available
+            if [[ ! -f "$auto_dir/mcp_server.py" ]]; then
+                echo -e "${RED}MCP server not found${NC}"
+                exit 1
+            fi
+            if ! command -v python3 &>/dev/null; then
+                echo -e "${YELLOW}MCP server: available but Python3 not found${NC}"
+                exit 1
+            fi
+            local tool_count
+            tool_count=$(PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c \
+                "from auto.mcp_tool_defs import MCP_TOOL_DEFS; print(len(MCP_TOOL_DEFS))" 2>/dev/null || echo "?")
+            echo "MCP server: available (stdio transport)"
+            echo "  Entry point: .agentic/lib/auto/mcp_start.sh"
+            echo "  Tools: $tool_count coordination tools"
+            ;;
+        ""|--help)
+            echo "ag mcp - MCP transport for coordination tools (F-018)"
+            echo ""
+            echo "COMMANDS:"
+            echo "  start       Run MCP server on stdio (foreground)"
+            echo "  status      Check MCP server availability"
+            echo ""
+            echo "IDE SETUP:"
+            echo "  Cursor:  bash .agentic/lib/tools/setup-agent.sh cursor-mcp"
+            echo "  Generic: Add to mcp.json:"
+            echo "    {\"mcpServers\":{\"agentic-coord\":{\"command\":\"bash\",\"args\":[\".agentic/lib/auto/mcp_start.sh\"]}}}"
+            ;;
+        *)
+            echo -e "${RED}Unknown mcp command: $subcmd${NC}"
+            echo "Run 'ag mcp --help' for usage."
+            exit 1
+            ;;
+    esac
+}
+
+
 # Sync command - unified drift detection + auto-fix
 cmd_sync() {
     local flag="${1:-}"

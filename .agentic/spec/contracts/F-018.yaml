@@ -29,20 +29,34 @@ assertions:
       MCP protocol server wraps existing coord tools for tool-native agent
       integration via Model Context Protocol
     type: structural
-    status: planned
+    verify: |
+      test -f .agentic/lib/auto/mcp_server.py &&
+      test -f .agentic/lib/auto/mcp_tool_defs.py &&
+      test -f .agentic/lib/auto/mcp_start.sh
+    tests:
+      - tests/validate_framework.sh::F-018-MCP-001
+      - tests/validate_framework.sh::F-018-MCP-002
+      - tests/validate_framework.sh::F-018-MCP-003
+      - tests/test_mcp_server.py
 
   - id: AC-003
     text: >
-      ag mcp start/stop/status lifecycle commands for MCP server management
+      ag mcp start/status lifecycle commands for MCP server management
+      (stop is N/A for stdio transport — IDE manages process lifecycle)
     type: structural
-    status: planned
+    verify: |
+      grep -q 'mcp)' .agentic/lib/tools/ag.sh &&
+      grep -q 'cmd_mcp' .agentic/lib/tools/commands/operations.sh
+    tests:
+      - tests/validate_framework.sh::F-018-MCP-005
 
   - id: AC-004
     text: >
       Graceful degradation — framework operates normally without MCP server
       running, falling back to HTTP or file-based coordination
     type: behavioral
-    status: planned
+    verify: |
+      bash .agentic/lib/tools/ag.sh status 2>/dev/null; test $? -le 1
 
   # --- Multi-Repo Orchestration (consolidated from F-038) ---
   - id: AC-005
