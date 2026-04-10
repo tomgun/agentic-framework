@@ -10,6 +10,7 @@ Tools 9-13: Task delegation for context-optimized subagent spawning.
 """
 from __future__ import annotations
 
+import fcntl
 import json
 import os
 import re
@@ -21,7 +22,15 @@ from pathlib import Path
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
 from paths import get_paths  # noqa: E402
-from ids import FEATURE_HEADER_RE  # noqa: E402
+from ids import FEATURE_HEADER_RE, is_valid_feature_id  # noqa: E402
+
+
+def _validate_feature_id(feature_id: str) -> dict | None:
+    """Return error dict if feature_id is invalid, None if OK."""
+    if not feature_id:
+        return {"error": "feature_id is required"}
+    if not is_valid_feature_id(feature_id):
+        return {"error": f"invalid feature_id format: {feature_id}"}
 
 
 def _iso_now() -> str:
@@ -278,7 +287,6 @@ def _save_progress_entry(session_dir: Path, feature_id: str, entry: dict) -> Non
     progress_dir.mkdir(parents=True, exist_ok=True)
     progress_file = progress_dir / f"{feature_id}.json"
 
-    import fcntl
     lock_file = progress_dir / f".{feature_id}.lock"
     with open(lock_file, "w") as lf:
         fcntl.flock(lf, fcntl.LOCK_EX)
@@ -293,6 +301,16 @@ def _save_progress_entry(session_dir: Path, feature_id: str, entry: dict) -> Non
             progress_file.write_text(json.dumps(entries, indent=2))
         finally:
             fcntl.flock(lf, fcntl.LOCK_UN)
+
+
+def _passed_acs_from_progress(progress: list[dict]) -> set[str]:
+    """Determine which ACs are currently passed using last-entry-wins semantics."""
+    last_status: dict[str, str] = {}
+    for entry in progress:
+        ac_id = entry.get("ac_id", "")
+        if ac_id:
+            last_status[ac_id] = entry.get("status", "pending")
+    return {ac_id for ac_id, st in last_status.items() if st == "passed"}
 
 
 def _load_criteria(project_root: Path, feature_id: str) -> list[dict]:
@@ -323,7 +341,7 @@ def _load_criteria(project_root: Path, feature_id: str) -> list[dict]:
         stripped = line.strip()
         if stripped.startswith("- [ ]") or stripped.startswith("- [x]"):
             counter += 1
-            text = stripped.lstrip("- [ ]").lstrip("- [x]").strip()
+            text = stripped[5:].strip()  # Remove "- [ ]" or "- [x]" prefix
             ac_id = f"AC-{counter:03d}"
             if text.startswith("AC-"):
                 parts = text.split(":", 1)
@@ -339,8 +357,8 @@ def _load_criteria(project_root: Path, feature_id: str) -> list[dict]:
 def list_acs(project_root: Path, params: dict) -> dict:
     """List acceptance criteria for a feature with completion status."""
     feature_id = params.get("feature_id", "")
-    if not feature_id:
-        return {"error": "feature_id is required"}
+    if err := _validate_feature_id(feature_id):
+        return err
 
     criteria = _load_criteria(project_root, feature_id)
     if not criteria:
@@ -390,8 +408,8 @@ def get_task_brief(project_root: Path, params: dict) -> dict:
     ac_id = params.get("ac_id", "")
     role = params.get("role", "implementation-agent")
     component = params.get("component", "")
-    if not feature_id:
-        return {"error": "feature_id is required"}
+    if err := _validate_feature_id(feature_id):
+        return err
 
     paths = get_paths(project_root)
 
@@ -429,9 +447,9 @@ def get_task_brief(project_root: Path, params: dict) -> dict:
                 content = plan_file.read_text()
                 # Take first 50 lines as summary
                 plan_summary = "\n".join(content.splitlines()[:50])
+                break  # Use first successfully read plan
             except OSError:
-                pass
-            break
+                continue
 
     # Get file hints from contract
     files_hint: list[str] = []
@@ -476,8 +494,8 @@ def get_task_brief(project_root: Path, params: dict) -> dict:
 def save_progress(project_root: Path, params: dict) -> dict:
     """Persist subagent results for a feature/AC."""
     feature_id = params.get("feature_id", "")
-    if not feature_id:
-        return {"error": "feature_id is required"}
+    if err := _validate_feature_id(feature_id):
+        return err
 
     ac_id = params.get("ac_id", "")
     status = params.get("status", "note")
@@ -499,7 +517,7 @@ def save_progress(project_root: Path, params: dict) -> dict:
 
     # Count completed ACs
     progress = _load_progress(paths.session_dir, feature_id)
-    passed_acs = {e["ac_id"] for e in progress if e.get("status") == "passed" and e.get("ac_id")}
+    passed_acs = _passed_acs_from_progress(progress)
     criteria = _load_criteria(project_root, feature_id)
     total = len(criteria)
 
@@ -516,15 +534,15 @@ def save_progress(project_root: Path, params: dict) -> dict:
 def get_next_action(project_root: Path, params: dict) -> dict:
     """Determine the next action for a feature based on state + progress."""
     feature_id = params.get("feature_id", "")
-    if not feature_id:
-        return {"error": "feature_id is required"}
+    if err := _validate_feature_id(feature_id):
+        return err
 
     paths = get_paths(project_root)
 
     # Load criteria and progress
     criteria = _load_criteria(project_root, feature_id)
     progress = _load_progress(paths.session_dir, feature_id)
-    passed_acs = {e["ac_id"] for e in progress if e.get("status") == "passed" and e.get("ac_id")}
+    passed_acs = _passed_acs_from_progress(progress)
 
     # Find next unfinished AC
     for ac in criteria:
@@ -599,8 +617,10 @@ def get_delegation_prompt(project_root: Path, params: dict) -> dict:
     feature_id = params.get("feature_id", "")
     ac_id = params.get("ac_id", "")
     role = params.get("role", "implementation-agent")
-    if not feature_id or not ac_id:
-        return {"error": "feature_id and ac_id are required"}
+    if err := _validate_feature_id(feature_id):
+        return err
+    if not ac_id:
+        return {"error": "ac_id is required"}
 
     # Get task brief (reuse existing tool)
     brief_result = get_task_brief(project_root, {
@@ -663,8 +683,6 @@ def get_delegation_prompt(project_root: Path, params: dict) -> dict:
                       "database schema", "migration", "authentication system"]
     if any(kw in text_lower for kw in large_keywords):
         model_hint = "opus"
-    elif len(ac_text) > 200:
-        model_hint = "sonnet"
     else:
         model_hint = "sonnet"
 

@@ -164,7 +164,7 @@ def generate_settings(
         if lang in LANGUAGE_RULES:
             allow_set.update(LANGUAGE_RULES[lang])
 
-    # MCP server configuration (available for all tiers)
+    # MCP server configuration (Tier 2 — Tier 1/3 don't use settings file)
     mcp_servers = {}
     mcp_start = project_root / ".agentic" / "lib" / "auto" / "mcp_start.sh"
     if mcp_start.exists():

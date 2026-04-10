@@ -1103,6 +1103,25 @@ class TestGetNextAction:
         assert result["details"]["ac_id"] == "AC-001"
         assert result["details"]["attempt"] == 3  # Two failed + next attempt
 
+    def test_regression_passed_then_failed(self, project_dir):
+        """AC that passed then regressed should be retried (last-entry-wins)."""
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "passed", "note": "First pass",
+        })
+        save_progress(project_dir, {
+            "feature_id": "F-003", "ac_id": "AC-001",
+            "status": "failed", "note": "Regression found",
+        })
+        result = get_next_action(project_dir, {"feature_id": "F-003"})
+        assert result["action"] == "implement_ac"
+        assert result["details"]["ac_id"] == "AC-001"
+
+    def test_invalid_feature_id_rejected(self, project_dir):
+        result = get_next_action(project_dir, {"feature_id": "../../etc/passwd"})
+        assert "error" in result
+        assert "invalid" in result["error"]
+
 
 class TestGetTaskBrief:
     def test_missing_feature_id(self, project_dir):
