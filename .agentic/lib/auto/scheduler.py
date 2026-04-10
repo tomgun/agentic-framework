@@ -19,6 +19,7 @@ CLI:
 from __future__ import annotations
 
 import json
+import logging
 import re
 import subprocess
 import sys
@@ -26,6 +27,8 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 _LIB_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_LIB_DIR))
