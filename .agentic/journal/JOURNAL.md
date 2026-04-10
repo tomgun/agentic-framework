@@ -5536,3 +5536,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-10 13:31 - TODO Triage (2026-04-10)
+
+**Why**: Backlog was empty, TODO inbox had 47 items accumulated over 2 months of v0.54→v0.81 development. Many referenced pre-v2 artifacts.
+
+**Decision**: Closed 14 as obsolete/done based on codebase verification (not assumptions). Ordered backlog: bugs→investigation→cleanup→enforcement→tests→incremental.
+
+**What changed**:
+- Triaged all 47 open TODOs against v0.81.0 state. Closed 14 (shipped/obsolete: T-0002 Context7, T-0022 .conf, T-0025 NFRs, T-0045 IDs, T-0050 drift, T-0058 TDD, T-0065 discovery docs, T-0067 NFR lifecycle, T-0068 ExitPlanMode wrappers, T-0069 field-validate, T-0070 Check 21, T-0086 Phase 3 audit, T-0095 gate 0d evidence, T-0096 PreToolUse plan gate). Promoted 13 to backlog ordered by impact: bugs first (T-0078 env leak, T-0023 worktree), investigation (T-0094 PostToolUse), cleanup (T-0090 work/ artifacts), UX (T-0088 scaffold), enforcement (T-0072 git safety, T-0041 versioning), LLM tests (T-0083/84/85), CI (T-0003), incremental (T-0075 IDs, T-0087 AC timing). 20 ideas remain in inbox grouped by theme with parent feature annotations.
+
+**Next steps**:
+- Pick up T-0078 (backlog position 0) — ag done env leak fix
+
+**Blockers**: None
+

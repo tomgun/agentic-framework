@@ -1,1 +1,80 @@
-[]
+[
+  {
+    "type": "task",
+    "description": "T-0078: Fix ag done subprocess env leak \u2014 unset ROOT_DIR/FRAMEWORK_ROOT before verification subprocesses (F-003)",
+    "added_at": "2026-04-10T13:26:02Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0094: Investigate ExitPlanMode PostToolUse \u2014 does Claude Code emit PostToolUse for built-in tools? (F-004/F-023)",
+    "added_at": "2026-04-10T13:26:03Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0023: Fix memory-seed sync worktree bug \u2014 resolve main repo path, generate structured diffs (F-022)",
+    "added_at": "2026-04-10T13:26:03Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0090: Remove deadweight work/ artifacts from instruction files \u2014 only review.md + tasks.yaml consumed (DEV-003)",
+    "added_at": "2026-04-10T13:26:03Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0088: Scaffold copies .claude/ files at init \u2014 hooks work on first session, no restart (F-001)",
+    "added_at": "2026-04-10T13:26:03Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0072: PreToolUse gate for destructive git ops \u2014 structural enforcement of never-stash/never-reset rules (F-023)",
+    "added_at": "2026-04-10T13:26:04Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0041: Auto-versioning structural enforcement \u2014 ag done checks/auto-bumps VERSION + git tag (DEV-003)",
+    "added_at": "2026-04-10T13:26:04Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0083: LLM test \u2014 plan auto-save + dialectical review sequence (DEV-002)",
+    "added_at": "2026-04-10T13:26:12Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0084: LLM test \u2014 doc updates before PR, not post-merge (DEV-002)",
+    "added_at": "2026-04-10T13:26:13Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0085: LLM test \u2014 spec/AC updates when implementation changes shipped features (DEV-002)",
+    "added_at": "2026-04-10T13:26:13Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0003: CI pipeline for LLM tests \u2014 GitHub Actions on instruction file changes (DEV-002)",
+    "added_at": "2026-04-10T13:26:13Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0075: ID centralization for T-XXXX, NFR-XXXX, I-XXXX, HN-XXXX in ids.py/ids.sh (F-003)",
+    "added_at": "2026-04-10T13:26:13Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "T-0087: AC check-off timing \u2014 verify in feature branch pre-merge, not post-merge (F-002)",
+    "added_at": "2026-04-10T13:26:14Z",
+    "added_by": "agent"
+  }
+]
