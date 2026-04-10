@@ -318,6 +318,17 @@ if [[ -f "${ROOT_DIR}/STACK.md" ]]; then
   fi
 fi
 
+# Generate stack-specific quality profile if discovery detected a stack (F-008)
+if [[ "$DISCOVERY_RAN" == "yes" && -f "${ROOT_DIR}/STACK.md" ]]; then
+  QUALITY_GEN="${ROOT_DIR}/.agentic/lib/tools/generate-quality-profile.sh"
+  if [[ -f "$QUALITY_GEN" ]]; then
+    echo ""
+    echo "Setting up stack-specific quality checks..."
+    bash "$QUALITY_GEN" --root "$ROOT_DIR" 2>&1 || echo "WARN: Quality profile generation failed (continuing)"
+    echo ""
+  fi
+fi
+
 # AGENTS.md is now created by the config loop above (from .agentic/lib/init/AGENTS.template.md)
 
 if [[ "${PROFILE}" == "discovery" ]]; then

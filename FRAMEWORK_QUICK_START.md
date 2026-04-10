@@ -47,7 +47,7 @@ Framework features apply to different profiles:
 
 | Profile | What Users Get | Key Files |
 |---------|---------------|-----------|
-| **Discovery** | Token efficiency, developer UX, workflows, quality gates | STATUS.md, CONTEXT_PACK.md, JOURNAL.md, .agentic/session/WIP.md |
+| **Discovery** | Token efficiency, developer UX, workflows, quality gates, stack-specific quality checks (`quality_checks: blocking` by default) | STATUS.md, CONTEXT_PACK.md, JOURNAL.md, quality_checks.sh |
 | **Formal** | Discovery + formal specs, feature tracking, acceptance criteria | + .agentic/spec/FEATURES.md, .agentic/spec/acceptance/ |
 
 **When adding framework features, know which profile it affects:**

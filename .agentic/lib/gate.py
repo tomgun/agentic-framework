@@ -613,6 +613,38 @@ def check_status_exists(project_root: Path) -> GateResult:
     return GateResult.allow()
 
 
+def check_quality_profile(project_root: Path, mode: str = "--full") -> GateResult:
+    """Run quality_checks.sh if it exists (F-008).
+
+    Project-wide check, not feature-scoped. Controlled by quality_checks
+    setting in STACK.md: blocking | advisory | off.
+    """
+    qc_setting = get_setting(project_root, "quality_checks", "blocking")
+    if qc_setting == "off":
+        return GateResult.allow()
+
+    script = project_root / "quality_checks.sh"
+    if not script.exists():
+        return GateResult.allow(["No quality_checks.sh — skipping stack checks"])
+
+    try:
+        proc = subprocess.run(
+            ["bash", str(script), mode],
+            cwd=str(project_root),
+            capture_output=True, text=True, timeout=300,
+        )
+        if proc.returncode != 0:
+            output = (proc.stdout.strip() or proc.stderr.strip())[-200:]
+            if qc_setting == "blocking":
+                return GateResult.deny([f"quality_checks.sh {mode} failed: {output}"])
+            else:
+                return GateResult.allow([f"quality_checks.sh {mode} failed (advisory): {output}"])
+    except subprocess.TimeoutExpired:
+        return GateResult.allow([f"quality_checks.sh {mode} timed out (300s) — skipping"])
+
+    return GateResult.allow()
+
+
 # ---------------------------------------------------------------------------
 # Composite gate checks
 # ---------------------------------------------------------------------------
@@ -966,6 +998,9 @@ def gate_verify(feature_id: Optional[str], project_root: Path) -> GateResult:
     # Only run verification commands if AC file exists
     if result.decision == "allow":
         result = result.merge(check_verification_passes(feature_id, project_root))
+
+    # Project-wide quality check (F-008) — runs regardless of feature
+    result = result.merge(check_quality_profile(project_root))
 
     return result
 

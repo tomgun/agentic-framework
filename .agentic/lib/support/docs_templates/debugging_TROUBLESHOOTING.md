@@ -12,6 +12,6 @@ tokens: ~28
   - Fix:
 
 ## Debugging approach
-See `.agentic/lib/workflows/debugging_playbook.md`.
+See `.claude/skills/fixing-bugs/SKILL.md`.
 
 

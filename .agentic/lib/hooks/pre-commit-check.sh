@@ -1317,10 +1317,8 @@ for issue in data.get('issues', []):
         echo "  ✓ All newly-shipped features have annotations"
       elif [[ "$ANNOTATION_ENFORCEMENT" == "advisory" ]]; then
         echo "  ℹ Add @feature annotations to key implementation files"
-        echo "    See: .agentic/lib/workflows/code_annotations.md"
       elif [[ "$ANNOTATION_ENFORCEMENT" == "blocking" ]]; then
         echo "  ℹ Add @feature annotations before committing"
-        echo "    See: .agentic/lib/workflows/code_annotations.md"
       fi
     fi
   fi

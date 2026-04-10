@@ -5564,3 +5564,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-10 19:31 - F-008: Quality Knowledge System
+
+**Why**: v2 refactoring deleted ~17K lines of quality/workflow docs, replaced by 83-line conventions.md. Stack-specific domain knowledge (failure modes, testing strategies, library selection) was lost. 119 broken references across 52 files pointed to deleted content, including 2 functional breakages.
+
+**Decision**: Quality knowledge lives in hybrid YAML+markdown format. YAML for machine-actionable data (generator compiles to quality_checks.sh), markdown companions for deep domain expertise (agents read during implementation). Blocking enforcement by default via STACK.md setting.
+
+**What changed**:
+- Rebuilt quality assurance knowledge lost in v2 refactor. 21 quality knowledge files (7 universal + 14 stack-specific), Python generator with ag quality CLI, enforcement wired into ag commit + pre-commit + gate.py. Fixed 111 broken references to deleted files across 52 source files. Updated 7 documentation files.
+
+**Next steps**:
+- Commit and create PR. Consider adding more stack types (Go, Rust, Flutter) in future.
+
+**Blockers**: None
+

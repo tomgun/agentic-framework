@@ -359,6 +359,6 @@ Save as `dashboard.sh` and run before each work session.
 
 - Full tool documentation: `.agentic/lib/tools/` (each script has inline help)
 - Token efficiency: `.agentic/token_efficiency/reading_protocols.md`
-- Agent workflows: `.agentic/lib/workflows/dev_loop.md`
+- Agent workflows: `.claude/skills/implementing-features/SKILL.md`
 - Quick start: `.agentic/START_HERE.md`
 

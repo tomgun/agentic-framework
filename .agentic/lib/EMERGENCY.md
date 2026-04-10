@@ -138,7 +138,7 @@ Or shorter:
 
 **Framework docs**: `.agentic/START_HERE.md`  
 **Full manual ops**: `.agentic/MANUAL_OPERATIONS.md`  
-**Recovery workflow**: `.agentic/lib/workflows/work_in_progress.md`
+**Recovery workflow**: `bash .agentic/lib/tools/wip.sh check`
 
 ---
 

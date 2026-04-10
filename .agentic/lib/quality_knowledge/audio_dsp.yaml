@@ -1,0 +1,129 @@
+stack_id: audio_dsp
+display_name: "Audio DSP (JUCE, VST3, AU)"
+
+matches:
+  frameworks: ["JUCE", "VST3 SDK", "VST3", "iPlug2"]
+  languages: ["C++"]
+  config_files: ["CMakeLists.txt", "*.jucer", "*.projucer"]
+  markers: ["juce_audio_processors", "pluginval", "Steinberg", "processBlock", "AudioProcessor"]
+
+failure_modes:
+  - id: FM-001
+    name: "NaN/Inf in audio output"
+    severity: blocking
+    check: "python3 scripts/test_dsp_validation.py --check-nan-inf"
+  - id: FM-002
+    name: "DC offset exceeds threshold"
+    severity: blocking
+    check: "python3 scripts/test_dsp_validation.py --check-dc-offset --max-dc-offset 0.01"
+  - id: FM-003
+    name: "CPU overload in processBlock"
+    severity: warning
+    check: "python3 scripts/test_realtime_performance.py --max-cpu-percent 50"
+  - id: FM-004
+    name: "Audio glitches (buffer overrun)"
+    severity: warning
+    check: "python3 scripts/test_realtime_performance.py --detect-glitches"
+  - id: FM-005
+    name: "Zipper noise from unsmoothed parameters"
+    severity: warning
+    check: "python3 scripts/test_realtime_performance.py --detect-zipper-noise"
+  - id: FM-006
+    name: "Runaway feedback (exponential gain)"
+    severity: warning
+    check: "python3 scripts/test_realtime_performance.py --detect-runaway-feedback"
+  - id: FM-007
+    name: "Memory allocation on audio thread"
+    severity: blocking
+  - id: FM-008
+    name: "pluginval validation failure"
+    severity: blocking
+    check: "pluginval --validate {plugin_path} --strictness-level 5"
+
+quality_checks:
+  pre_commit:
+    - name: "Build (CMake)"
+      command: "cmake --build build --config Release"
+      required: true
+      condition: "[[ -d build ]]"
+    - name: "Unit tests"
+      command: "ctest --test-dir build --output-on-failure -j4"
+      required: true
+      condition: "[[ -d build ]]"
+    - name: "Pluginval (smoke, strictness 3)"
+      command: "pluginval --validate \"$(find build -name '*.vst3' -type d 2>/dev/null | head -1)\" --strictness-level 3 --validate-in-process --timeout-ms 30000"
+      required: false
+      condition: "command -v pluginval &>/dev/null && find build -name '*.vst3' -type d 2>/dev/null | grep -q ."
+  full:
+    - name: "Pluginval (strict, strictness 8)"
+      command: "pluginval --validate \"$(find build -name '*.vst3' -type d 2>/dev/null | head -1)\" --strictness-level 8 --validate-in-process --timeout-ms 120000"
+      required: true
+      condition: "command -v pluginval &>/dev/null && find build -name '*.vst3' -type d 2>/dev/null | grep -q ."
+    - name: "Offline DSP validation"
+      command: "python3 scripts/test_dsp_validation.py --check-nan-inf --check-dc-offset --max-dc-offset 0.01"
+      required: false
+      condition: "[[ -f scripts/test_dsp_validation.py ]]"
+    - name: "Realtime performance & glitch detection"
+      command: "python3 scripts/test_realtime_performance.py --duration 60 --max-cpu-percent 50 --detect-glitches --detect-nan-inf"
+      required: false
+      condition: "[[ -f scripts/test_realtime_performance.py ]]"
+
+testing_strategy:
+  unit:
+    framework: "GoogleTest or Catch2"
+    command: "ctest --test-dir build --output-on-failure"
+    focus: "DSP algorithms, parameter mapping, state serialization"
+    coverage_target: 70
+  integration:
+    framework: "pluginval"
+    command: "pluginval --validate {plugin_path} --strictness-level 5"
+    focus: "Host compatibility, state save/restore, bus layouts, parameter changes"
+  e2e:
+    framework: "Offline render scripts (Python + numpy/scipy)"
+    command: "python3 scripts/test_dsp_validation.py"
+    focus: "Full signal chain, automation, preset recall, bypass behavior"
+    setup_note: "Requires test_audio/ directory with reference signals"
+
+conventions:
+  - "Never allocate memory in processBlock — pre-allocate all buffers in prepareToPlay"
+  - "Never lock a mutex on the audio thread — use lock-free queues for thread communication"
+  - "Never call system I/O (file, network, console) from processBlock"
+  - "Use parameter smoothing on all user-facing controls to prevent zipper noise"
+  - "Always handle varying buffer sizes — prepareToPlay can be called multiple times"
+  - "Always handle varying sample rates — recalculate filter coefficients in prepareToPlay"
+  - "Check for NaN/Inf at DSP boundaries and clamp/zero output if detected"
+  - "Use JUCE's dsp:: module processors over raw pointer arithmetic where available"
+  - "Save/restore complete plugin state — users expect presets to recall exactly"
+  - "Support mono, stereo, and sidechain bus layouts where applicable"
+
+library_selection:
+  - category: "FFT"
+    prefer: "JUCE FFT or KFR"
+    avoid: "FFTW (GPL license incompatible with most plugin distribution)"
+    reason: "JUCE FFT is integrated; KFR is BSD-licensed and SIMD-optimized"
+  - category: "DSP filters"
+    prefer: "JUCE dsp::IIR, dsp::FIR, or custom from Audio EQ Cookbook"
+    avoid: "Generic math libraries for real-time filters"
+    reason: "Audio filters need sample-accurate coefficient updates"
+  - category: "GUI framework"
+    prefer: "JUCE Graphics (built-in) or custom OpenGL for visualizers"
+    avoid: "Qt, wxWidgets, or web-based UI in plugin context"
+    reason: "DAW hosts manage the window lifecycle; external frameworks conflict"
+  - category: "Resampling"
+    prefer: "libsamplerate (src) or JUCE Interpolators"
+    avoid: "Linear interpolation for audio"
+    reason: "Linear interpolation causes audible aliasing artifacts"
+
+security:
+  - "Validate all parameter values from host — hosts can send out-of-range values"
+  - "Bounds-check all buffer access — buffer sizes vary between calls"
+  - "Sanitize preset/state data loaded from disk — treat as untrusted input"
+  - "Never execute code from loaded presets — state files are data only"
+
+performance:
+  - "Profile processBlock with real-time constraints: must complete within buffer_size/sample_rate seconds"
+  - "Avoid branching in inner DSP loops — use branchless techniques for sample processing"
+  - "Use SIMD intrinsics for critical loops (or JUCE's FloatVectorOperations)"
+  - "Pre-compute expensive operations (sin/cos tables, filter coefficients) outside processBlock"
+  - "Minimize cache misses — process channels contiguously, avoid pointer chasing"
+  - "Target <30% CPU at 44.1kHz/128 samples for comfort margin in production DAW sessions"

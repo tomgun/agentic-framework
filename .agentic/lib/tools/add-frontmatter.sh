@@ -271,41 +271,9 @@ add_frontmatter "$AGENTIC_DIR/workflows/proactive_agent_loop.md" \
 echo -e "  ${YELLOW}⊘${NC} README.md (index file, skipping)"
 echo -e "  ${YELLOW}⊘${NC} USER_WORKFLOWS.md (index file, skipping)"
 
-# ── Guidelines ──────────────────────────────────────────────
+# ── Guidelines (removed in v2 — absorbed into conventions.md + quality_knowledge/) ──
 echo -e "${BLUE}Guidelines:${NC}"
-
-add_frontmatter "$AGENTIC_DIR/agents/shared/guidelines/core-rules.md" \
-    "Constitutional minimum: no fabrication, no auto-commit, use token scripts" \
-    "core rules, constitution, minimum rules" \
-    "170" "always" ""
-
-add_frontmatter "$AGENTIC_DIR/agents/shared/guidelines/anti-hallucination.md" \
-    "Verification rules: check before creating, never fabricate paths or APIs" \
-    "hallucination, fabrication, verify, check first" \
-    "1200" "always" ""
-
-add_frontmatter "$AGENTIC_DIR/agents/shared/guidelines/token-efficiency.md" \
-    "Token optimization: use scripts, delegate, minimize context" \
-    "token, efficiency, cost, optimize, save tokens" \
-    "1000" "always" ""
-
-add_frontmatter "$AGENTIC_DIR/agents/shared/guidelines/multi-agent.md" \
-    "Multi-agent coordination: register, avoid conflicts, handoff" \
-    "multi agent, coordination, parallel, conflict" \
-    "1400" "implementation" ""
-
-add_frontmatter "$AGENTIC_DIR/agents/shared/guidelines/small-batch.md" \
-    "Small batch development: max 5-10 files, break large tasks" \
-    "small batch, too big, break down, max files" \
-    "830" "always" ""
-
-add_frontmatter "$AGENTIC_DIR/agents/shared/guidelines/wip-tracking.md" \
-    "WIP tracking: start, checkpoint, complete, recover" \
-    "wip, work in progress, tracking, checkpoint" \
-    "1280" "implementation" ""
-
-# Skip README (index file)
-echo -e "  ${YELLOW}⊘${NC} README.md (index file, skipping)"
+echo -e "  ${YELLOW}⊘${NC} guidelines/ removed in v2 — now in conventions.md + quality_knowledge/"
 
 # ── Quality ─────────────────────────────────────────────────
 echo -e "${BLUE}Quality:${NC}"

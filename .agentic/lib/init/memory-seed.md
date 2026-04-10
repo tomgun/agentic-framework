@@ -26,6 +26,7 @@ Decision routing: current state → OVERVIEW.md, work log with reasoning → JOU
 - User preferences/corrections/decisions: When the user expresses a preference, corrects your approach, or makes a decision, capture with `ag intel remember "..." --type preference|learning|decision --context "..."`. Recognize these semantically — don't wait for keywords. Project-scoped (project-memory.yaml), NOT Claude's local MEMORY.md. For write-time enforcement: `ag intel learn "..." --reason "user instruction" --scope "*"`.
 - Proposing a choice: Before presenting a recommendation, write: `echo "Use Redis for caching" > .agentic/session/pending-decision.txt`. Framework detects "yes/ok" and advises capture.
 - "intelligence/patterns/quality checks" → Run `ag intel` subcommands (check, learn, remember, patterns, memory, decisions, review-session).
+- "quality check/quality profile/stack quality/quality validation/quality setup" → Run `ag quality setup` (generate profile from detected stack), `ag quality run` (run checks), `ag quality status` (show profile). Stack knowledge in `.agentic/lib/quality_knowledge/`.
 - Before workflow phases: run `ag intel architecture` (planning), `ag intel spec F-XXXX` (specs), `ag intel implement F-XXXX` (coding), `ag intel test F-XXXX` (testing) for phase-aware quality guidance.
 - NEVER write code for multiple features outside of `ag auto` commands.
 - **Wrong rationalizations:** "I can do it directly faster" — NO. "User said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.

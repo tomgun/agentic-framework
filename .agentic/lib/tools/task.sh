@@ -66,7 +66,7 @@ cat > "$FILENAME" <<EOF
 - [ ] Code implemented
 - [ ] Unit tests added/updated
 - [ ] Docs updated (\`STATUS.md\`, relevant spec sections)
-- [ ] Review checklist considered (see \`.agentic/quality/review_checklist.md\`)
+- [ ] Review checklist considered (see \`.agentic/lib/quality_knowledge/review_checklist.knowledge.md\`)
 EOF
 
 echo "Created: $FILENAME"

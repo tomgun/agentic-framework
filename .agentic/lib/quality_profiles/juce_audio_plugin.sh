@@ -100,7 +100,7 @@ else
   echo "   - Compare to expected output with Python/numpy"
   echo "   - Check for NaN/Inf values"
   echo "   - Validate DC offset, RMS levels, etc."
-  echo "   See: .agentic/workflows/continuous_quality_validation.md"
+  echo "   See: .agentic/lib/quality_knowledge/audio_dsp.knowledge.md"
 fi
 echo
 
@@ -134,7 +134,7 @@ else
   echo "   - Detect discontinuities (clicks between buffers)"
   echo "   - Detect zipper noise (parameter smoothing issues)"
   echo "   - Detect runaway feedback (exponentially growing output)"
-  echo "   See: .agentic/workflows/continuous_quality_validation.md"
+  echo "   See: .agentic/lib/quality_knowledge/audio_dsp.knowledge.md"
 fi
 echo
 
@@ -160,5 +160,5 @@ echo "Next steps if scripts missing:"
 echo "  - Create test_audio/ directory with test signals"
 echo "  - Create scripts/test_dsp_validation.py for offline audio validation"
 echo "  - Create scripts/test_realtime_performance.py for processBlock() benchmarking"
-echo "  - See: .agentic/workflows/continuous_quality_validation.md"
+echo "  - See: .agentic/lib/quality_knowledge/audio_dsp.knowledge.md"
 

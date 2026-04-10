@@ -33,6 +33,6 @@ fi
 
 echo "Next actions:"
 echo "- Read the relevant /spec sections"
-echo "- Pick one small task and follow .agentic/workflows/dev_loop.md"
+echo "- Pick one small task and follow ag implement"
 
 

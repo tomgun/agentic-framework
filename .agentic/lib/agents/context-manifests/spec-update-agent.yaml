@@ -8,7 +8,7 @@ description: Update specs after feature completion
 required:
   - spec/contracts/{feature_id}.yaml       # Current contract
   - spec/FEATURES.md[{feature_id}]        # Feature entry to update
-  - .agentic/agents/shared/guidelines/anti-hallucination.md
+  - .agentic/.agentic/lib/quality_knowledge/anti_hallucination.knowledge.md
 
 optional:
   - CHANGELOG.md[unreleased]                # If updating changelog

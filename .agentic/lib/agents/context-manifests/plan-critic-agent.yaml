@@ -8,7 +8,7 @@ description: Find flaws, risks, and blind spots in finalized plans
 required:
   - .agentic/journal/plans/{feature_id}-plan.md  # The plan to critique
   - spec/contracts/{feature_id}.yaml               # Contract assertions to check against
-  - .agentic/agents/shared/guidelines/anti-hallucination.md
+  - .agentic/.agentic/lib/quality_knowledge/anti_hallucination.knowledge.md
 
 optional:
   - CONTEXT_PACK.md[entry_points,modules]         # Architecture context (if budget allows)

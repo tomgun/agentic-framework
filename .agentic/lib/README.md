@@ -99,18 +99,18 @@ This framework supports two development workflows:
 - Implementation follows tests
 - **Token economics**: Smaller increments, less context, clearer progress
 - **Quality**: Forces testability, cleaner code, less rework
-- Workflow: `.agentic/lib/workflows/tdd_mode.md`
+- Workflow: `.claude/skills/writing-tests/SKILL.md`
 - **Enable by**: Set `development_mode: tdd` in `STACK.md` (default in template)
 
 ### Standard Mode (for exploration)
 - Tests are **required** but can come during/after implementation
 - Suitable for prototyping, UI exploration, unclear requirements
-- Workflow: `.agentic/lib/workflows/dev_loop.md`
+- Workflow: `.claude/skills/implementing-features/SKILL.md`
 - **Enable by**: Set `development_mode: standard` in `STACK.md`
 
 **Recommendation**: Start with TDD mode. Switch to standard mode only for exploratory/prototyping work.
 
-See [`.agentic/lib/workflows/tdd_mode.md`](workflows/tdd_mode.md) for complete TDD guide and benefits.
+See [`.claude/skills/writing-tests/SKILL.md`](.claude/skills/writing-tests/SKILL.md) for complete TDD guide and benefits.
 
 ## Quick start (new repo)
 

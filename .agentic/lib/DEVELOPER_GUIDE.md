@@ -366,7 +366,7 @@ git push
 
 ### When to Delegate vs. Do It Yourself
 
-Not sure when to use the agent? See **[`.agentic/lib/workflows/delegation_heuristics.md`](workflows/delegation_heuristics.md)** for practical guidance.
+Not sure when to use the agent? See the quick rules below.
 
 **Quick rules**:
 - ✅ **Delegate**: Repetitive tasks, clear specs, verifiable output
@@ -399,7 +399,6 @@ Not sure when to use the agent? See **[`.agentic/lib/workflows/delegation_heuris
 
 ### How Agents Use This Framework (Proactive Operating Loop)
 
-**Agents follow a proactive operating loop** to make collaboration fluent. See [`.agentic/lib/workflows/proactive_agent_loop.md`](workflows/proactive_agent_loop.md) for full details.
 
 **At Session Start** (silent — no preamble, dashboard is the first text output):
 1. Silently load context (~2-3K tokens)
@@ -571,7 +570,6 @@ bash .agentic/lib/tools/worktree.sh remove F-0006
 4. Each creates PR when done
 5. Merge PRs, cleanup worktrees
 
-See `.agentic/lib/workflows/multi_agent_coordination.md` for full guide.
 
 ### Multi-Session Collision Prevention (F-0195)
 
@@ -676,7 +674,6 @@ bash .agentic/lib/tools/migration.sh create "Add CSV Export feature"
 
 **Note**: Migrations are optional and complementary to FEATURES.md.
 
-See: `.agentic/lib/workflows/spec_migrations.md` for details.
 **Credits**: Migration concept by Arto Jalkanen, hybrid approach by Tomas Günther & Arto Jalkanen
 
 #### Update Priorities
@@ -901,7 +898,7 @@ ag auto task F-XXXX --visual      # Visual review at final verification step
 
 **Requirements**: `pip install anthropic` + `ANTHROPIC_API_KEY` env var. If either is missing, visual review is skipped with a warning. Visual concerns are **advisory only** — they never block.
 
-See: `.agentic/lib/quality/e2e_testing_contract.md` (integration contract), `.agentic/lib/quality/e2e_setup_guide.md` (per-stack setup)
+See: `.agentic/lib/quality_knowledge/testing.knowledge.md` for E2E guidance and stack-specific knowledge files for per-stack setup
 
 #### Three Trust Tiers
 
@@ -1686,7 +1683,6 @@ When enabled, `ag done` checks for `.agentic/journal/evidence/F-XXXX-smoke.*` be
 ```yaml
 # Use worktree.sh tool for parallel agents:
 # bash .agentic/lib/tools/worktree.sh create F-001 "Feature name"
-# See: .agentic/lib/workflows/multi_agent_coordination.md
 ```
 
 #### Retrospectives
@@ -1935,7 +1931,7 @@ bash .agentic/lib/tools/report.sh
 bash .agentic/lib/tools/doctor.sh --full
 
 # Review test strategy
-cat .agentic/lib/quality/test_strategy.md
+cat .agentic/lib/quality_knowledge/testing.knowledge.md
 ```
 
 ### Don't Know What to Work On Next
@@ -1977,7 +1973,6 @@ tail -50 JOURNAL.md
 **Problem:** Codebase outgrew initial structure.
 
 **Fix:**
-1. Read `.agentic/lib/workflows/scaling_guidance.md`
 2. Consider splitting large files (FEATURES.md, NFR.md)
 3. Reorganize into modules
 4. Update CONTEXT_PACK.md with new structure
@@ -2219,7 +2214,7 @@ bash .agentic/lib/tools/retro_check.sh
 
 Tell agent:
 ```
-"Let's run a retrospective. Follow .agentic/lib/workflows/retrospective.md"
+"Let's run a retrospective. Follow `ag retro`"
 ```
 
 ---
@@ -2228,7 +2223,6 @@ Tell agent:
 
 ### Sequential Agent Pipeline
 
-**Full guide:** `.agentic/lib/workflows/sequential_agent_specialization.md`
 
 **Pipeline:**
 ```
@@ -2267,7 +2261,6 @@ You: "Implementation Agent: make tests pass"
 
 ### Multi-Agent Parallel Work
 
-**Full guide:** `.agentic/lib/workflows/multi_agent_coordination.md`
 
 **Use worktree.sh for parallel agents:**
 ```bash
@@ -2404,7 +2397,6 @@ Multi-step `ag` operations (implement, done) write to an intent journal before e
 - strict_version_matching: yes
 ```
 
-**Full guide:** `.agentic/lib/workflows/documentation_verification.md`
 
 ### Mutation Testing
 
@@ -2426,33 +2418,49 @@ bash .agentic/lib/tools/mutation_test.sh src/payment
 - High-value functions
 - After fixing bugs tests didn't catch
 
-**Full guide:** `.agentic/lib/quality/test_strategy.md#mutation-testing`
+**Full guide:** `.agentic/lib/quality_knowledge/testing.knowledge.md#mutation-testing`
 
 ### Continuous Quality Validation
 
-**Stack-specific quality gates:**
+Stack-specific quality checks are auto-generated from knowledge files in `.agentic/lib/quality_knowledge/`.
 
-```yaml
-# STACK.md
-- quality_checks: enabled
-- profile: webapp_fullstack
-- run_command: bash quality_checks.sh --pre-commit
-```
-
-**Pre-commit hook** (the framework uses `core.hooksPath` — install via `ag hooks install`):
+**Setup** (once per project, or after stack changes):
 ```bash
-# Installed automatically by: ag hooks install
-# Runs framework checks + your quality_checks.sh (if it exists)
-ag hooks install
+ag quality setup              # Detect stack from STACK.md, generate profile
+ag quality setup --dry-run    # Preview without writing files
+ag quality setup --force      # Overwrite existing quality_checks.sh
 ```
 
-**Full guide:** `.agentic/lib/workflows/continuous_quality_validation.md`
+**Generated artifacts:**
+- `quality_checks.sh` (project root) — stack-specific checks with `--pre-commit` and `--full` modes
+- `.agentic/local/conventions-stack.md` — stack-specific coding conventions for agents
+- `.agentic/local/extensions/gates/quality-gate.sh` — pre-commit gate (Check 17)
+
+**Running checks:**
+```bash
+ag quality run                # Fast checks (pre-commit mode)
+ag quality run --full         # Comprehensive checks
+ag quality status             # Show detected stack + enforcement setting
+```
+
+**Enforcement** (STACK.md `## Settings`):
+```yaml
+- quality_checks: blocking    # blocking (default) | advisory | off
+```
+- `blocking`: `ag commit` and pre-commit Check 17 fail on quality check failure
+- `advisory`: Warns but doesn't block
+- `off`: Skips quality checks entirely
+
+**Available stack knowledge** (`.agentic/lib/quality_knowledge/`):
+- **Universal** (all projects): security, testing (London/Classical, test doubles), code quality, green coding, library selection, review checklist, anti-hallucination
+- **Stack-specific**: web_fullstack (Next.js/Nuxt), backend_python (Django/FastAPI), backend_node (Express/Fastify), mobile_react_native, audio_dsp (JUCE/VST3), game_2d_web (Phaser), game_unity (Unity C#)
+
+Multi-stack projects (e.g., Next.js + FastAPI) get a composite `quality_checks.sh` with sections for each stack.
 
 ### Scaling Guidance
 
 **When project grows complex:**
 
-1. Read `.agentic/lib/workflows/scaling_guidance.md`
 2. Consider:
    - Splitting FEATURES.md by domain
    - Creating module-specific CONTEXT_PACK files
@@ -2557,7 +2565,7 @@ Evening:  "Let's wrap up and commit" → agent verifies + commits with approval
 **Framework Documentation:**
 - Quick start: `.agentic/START_HERE.md`
 - Manual operations: `.agentic/MANUAL_OPERATIONS.md`
-- All workflows: `.agentic/lib/workflows/`
+- All skills: `.claude/skills/` (workflows are now skills)
 - All tools: `.agentic/lib/tools/` (each has inline help)
 
 **Framework Map:**

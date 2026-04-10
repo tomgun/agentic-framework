@@ -8,7 +8,7 @@ description: Research technology options and best practices
 required:
   - CONTEXT_PACK.md[architecture]           # Understand project structure
   - STACK.md                                # Current tech stack
-  - .agentic/agents/shared/guidelines/anti-hallucination.md
+  - .agentic/.agentic/lib/quality_knowledge/anti_hallucination.knowledge.md
 
 optional:
   - spec/PRD.md                             # Product goals (if Formal)

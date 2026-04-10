@@ -230,7 +230,7 @@ Update `.agentic/pipeline/F-####-pipeline.md`:
 
 ## Reference
 
-- `.agentic/lib/workflows/definition_of_done.md` - Quality gates
+- `.agentic/lib/checklists/feature_complete.md` - Quality gates (also `ag done`)
 - `.agentic/lib/checklists/feature_complete.md` - Completion checklist
 - `.agentic/lib/hooks/pre-commit-check.sh` - Automated checks
 - `.agentic/lib/tools/check-untracked.sh` - Untracked file detection

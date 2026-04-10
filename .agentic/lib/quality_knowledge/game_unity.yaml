@@ -1,0 +1,99 @@
+stack_id: game_unity
+display_name: "Unity Game (C#)"
+
+matches:
+  frameworks: ["Unity"]
+  languages: ["C#"]
+  config_files: ["ProjectSettings/ProjectVersion.txt", "Assets/", "*.unity"]
+  markers: ["MonoBehaviour", "UnityEngine", "SerializeField", "GameObject"]
+
+failure_modes:
+  - id: FM-001
+    name: "GC allocation in Update/FixedUpdate (frame stutter)"
+    severity: blocking
+  - id: FM-002
+    name: "Physics in Update instead of FixedUpdate"
+    severity: blocking
+  - id: FM-003
+    name: "Missing null checks (destroyed object reference)"
+    severity: warning
+  - id: FM-004
+    name: "Shader compile stutter on first use"
+    severity: warning
+  - id: FM-005
+    name: "Large scene load blocking main thread"
+    severity: warning
+  - id: FM-006
+    name: "Build size explosion (uncompressed assets)"
+    severity: warning
+
+quality_checks:
+  pre_commit:
+    - name: "C# compilation (Unity build)"
+      command: "dotnet build *.sln --no-restore -v q 2>/dev/null || echo 'Unity build requires Unity Editor'"
+      required: false
+    - name: "Unit tests (EditMode)"
+      command: "unity-editor -runTests -testPlatform EditMode -batchmode -nographics -logFile - 2>/dev/null || echo 'Requires Unity Editor CLI'"
+      required: false
+  full:
+    - name: "PlayMode tests"
+      command: "unity-editor -runTests -testPlatform PlayMode -batchmode -nographics -logFile -"
+      required: false
+      condition: "command -v unity-editor &>/dev/null || command -v Unity &>/dev/null"
+    - name: "GC allocation check"
+      command: "grep -rn 'new List\\|new Dictionary\\|string +\\|ToString()\\|GetComponent' Assets/Scripts/ 2>/dev/null | grep -v '/Editor/' | head -20 && echo 'Review: potential GC allocations in hot paths'"
+      required: false
+
+testing_strategy:
+  unit:
+    framework: "Unity Test Framework (EditMode tests)"
+    command: "Unity -runTests -testPlatform EditMode -batchmode -nographics"
+    focus: "Game logic, math utilities, state machines, data models"
+    coverage_target: 50
+  integration:
+    framework: "Unity Test Framework (PlayMode tests)"
+    command: "Unity -runTests -testPlatform PlayMode -batchmode -nographics"
+    focus: "Component interactions, scene loading, physics callbacks"
+  e2e:
+    framework: "Unity Automated QA or manual playtesting"
+    command: "Manual playtesting with checklist"
+    focus: "Full gameplay loops, level completion, save/load, performance targets"
+    setup_note: "Automated QA requires Unity Automated QA package"
+
+conventions:
+  - "Physics code in FixedUpdate, input in Update, visuals in LateUpdate"
+  - "Never allocate in Update/FixedUpdate — pre-allocate arrays, use NonAlloc methods"
+  - "Cache GetComponent results in Awake/Start — never call GetComponent in Update"
+  - "Use ScriptableObjects for shared configuration data — not static classes"
+  - "Use object pooling for frequently instantiated objects (bullets, effects, enemies)"
+  - "Use async scene loading (SceneManager.LoadSceneAsync) with progress feedback"
+  - "Use [SerializeField] private fields — avoid public fields for inspector exposure"
+  - "Organize code: one MonoBehaviour per file, matching filename to class name"
+
+library_selection:
+  - category: "Dependency injection"
+    prefer: "VContainer (lightweight) or Zenject (full-featured)"
+    avoid: "Service locator pattern with static classes"
+    reason: "DI enables testability and decoupling; statics create hidden dependencies"
+  - category: "State machine"
+    prefer: "Custom or Unity Animator for simple cases, third-party for complex"
+    avoid: "Nested if/switch chains for game state"
+    reason: "State machines prevent invalid state combinations and are easier to debug"
+  - category: "Networking"
+    prefer: "Netcode for GameObjects (Unity official) or Mirror"
+    avoid: "Raw sockets for multiplayer game state"
+    reason: "Netcode handles prediction, interpolation, and authority patterns"
+
+security:
+  - "Never trust client-side game state in multiplayer — server is authoritative"
+  - "Validate all save data loaded from disk — treat as potentially tampered"
+  - "Obfuscate IL2CPP builds for production — C# decompilation is trivial"
+  - "Use secure transport for all network communication"
+
+performance:
+  - "Profile with Unity Profiler — Deep Profile for allocation tracking"
+  - "Use Burst compiler for math-heavy code (jobs system)"
+  - "Compress textures per platform: ASTC (mobile), BC7 (desktop)"
+  - "Use LOD groups for 3D — reduce draw calls at distance"
+  - "Batch static objects with StaticBatchingUtility"
+  - "Use addressables for asset management — load only what's needed"

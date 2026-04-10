@@ -48,7 +48,29 @@ cmd_commit() {
         echo -e "${GREEN}Untracked check: PASS${NC}"
     fi
 
-    # 3. Run doctor pre-commit checks
+    # 3. Stack-specific quality checks (F-008)
+    local qc_script="${ROOT_DIR}/quality_checks.sh"
+    if [[ -f "$qc_script" ]]; then
+        local qc_mode
+        qc_mode=$(get_setting "quality_checks" "blocking")
+        if [[ "$qc_mode" != "off" ]]; then
+            echo "Running stack-specific quality checks..."
+            if bash "$qc_script" --pre-commit 2>&1; then
+                echo -e "${GREEN}Quality checks: PASS${NC}"
+            else
+                if [[ "$qc_mode" == "blocking" ]]; then
+                    echo -e "${RED}Quality checks FAILED${NC}"
+                    echo "  Fix issues above, or: ag set quality_checks advisory"
+                    exit 1
+                else
+                    echo -e "${YELLOW}Quality checks: WARN (advisory mode)${NC}"
+                fi
+            fi
+            echo ""
+        fi
+    fi
+
+    # 4. Run doctor pre-commit checks
     local pcc
     pcc=$(get_setting "pre_commit_checks" "fast")
     echo ""

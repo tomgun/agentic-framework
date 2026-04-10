@@ -84,8 +84,8 @@ TIP: You can reference real files instead of inline examples:
 
 ## Quality gates (current)
 - Unit tests required: yes
-- Definition of Done: see `.agentic/lib/workflows/definition_of_done.md`
-- Review checklist: see `.agentic/lib/quality/review_checklist.md`
+- Definition of Done: see ``ag done` command`
+- Review checklist: see `.agentic/lib/quality_knowledge/review_checklist.knowledge.md`
 
 ## Documentation
 

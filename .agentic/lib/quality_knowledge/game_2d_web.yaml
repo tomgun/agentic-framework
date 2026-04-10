@@ -1,0 +1,99 @@
+stack_id: game_2d_web
+display_name: "2D Web Game (Phaser, PixiJS)"
+
+matches:
+  frameworks: ["Phaser", "PixiJS", "Pixi", "Phaser 3", "Phaser3"]
+  languages: ["TypeScript", "JavaScript"]
+  config_files: []
+  markers: ["phaser", "pixi.js", "PIXI", "Phaser.Scene", "Phaser.Game"]
+
+failure_modes:
+  - id: FM-001
+    name: "Frame rate dependency (game speed tied to FPS)"
+    severity: blocking
+  - id: FM-002
+    name: "Memory leak (undestroyed scenes, textures)"
+    severity: warning
+  - id: FM-003
+    name: "Asset loading stall (no preload, blocking main thread)"
+    severity: warning
+  - id: FM-004
+    name: "Physics instability (tunneling, jitter)"
+    severity: warning
+  - id: FM-005
+    name: "Large bundle size (>5MB uncompressed JS)"
+    severity: warning
+
+quality_checks:
+  pre_commit:
+    - name: "Lint"
+      command: "npm run lint --if-present"
+      required: true
+    - name: "Unit tests"
+      command: "npm test -- --watchAll=false 2>/dev/null || npx vitest run --reporter=dot"
+      required: true
+    - name: "Build check"
+      command: "npm run build --if-present"
+      required: true
+  full:
+    - name: "Frame rate independence check"
+      command: "! grep -r 'setInterval\\|setTimeout' src/ 2>/dev/null | grep -v node_modules | grep -v '.test.' | grep -q ."
+      required: false
+    - name: "Bundle size check"
+      command: "npm run build 2>/dev/null && du -sh dist/ 2>/dev/null || du -sh build/ 2>/dev/null || true"
+      required: false
+    - name: "Asset preloading check"
+      command: "! grep -r 'new Image()\\|createElement..img' src/ 2>/dev/null | grep -v node_modules | grep -v '.test.' | grep -q ."
+      required: false
+
+testing_strategy:
+  unit:
+    framework: "Vitest or Jest"
+    command: "npx vitest run"
+    focus: "Game logic, physics calculations, scoring, state machines"
+    coverage_target: 60
+  integration:
+    framework: "Vitest with DOM mocking"
+    command: "npx vitest run tests/integration/"
+    focus: "Scene transitions, input handling, collision callbacks"
+  e2e:
+    framework: "Playwright (screenshot-based visual verification)"
+    command: "npx playwright test"
+    focus: "Game starts, renders correctly, responds to input"
+    setup_note: "Use screenshot comparison for visual regression testing"
+
+conventions:
+  - "Always use delta time for movement and animations — never tie logic to frame rate"
+  - "Preload all assets in a dedicated preload scene — never load assets during gameplay"
+  - "Use object pools for frequently created/destroyed objects (bullets, particles, enemies)"
+  - "Separate game logic from rendering — pure functions for physics, scoring, AI"
+  - "Use a state machine for game states (menu, playing, paused, game-over)"
+  - "Clean up event listeners and timers when scenes are destroyed"
+  - "Use sprite sheets/atlases instead of individual images — reduces draw calls"
+
+library_selection:
+  - category: "Physics"
+    prefer: "Matter.js (built into Phaser) or Arcade Physics for simple games"
+    avoid: "Custom physics from scratch for standard platformer/top-down movement"
+    reason: "Matter.js handles collision detection, response, and constraints correctly"
+  - category: "Audio"
+    prefer: "Howler.js or Phaser's built-in audio"
+    avoid: "Raw Web Audio API for simple SFX"
+    reason: "Howler.js handles browser autoplay policies, format fallbacks, and mobile quirks"
+  - category: "Tweening"
+    prefer: "Phaser's built-in tweens or gsap"
+    avoid: "Manual interpolation without easing functions"
+    reason: "Easing functions are essential for game feel; manual lerp often misses edge cases"
+
+security:
+  - "Validate all score/state data server-side if multiplayer or leaderboard"
+  - "Never trust client-side game state for competitive features"
+  - "Sanitize player names and chat input if user-generated content is displayed"
+
+performance:
+  - "Use texture atlases — one draw call per atlas vs one per sprite"
+  - "Object pooling for bullets, particles, enemies — avoid garbage collection spikes"
+  - "Limit physics bodies — disable physics on off-screen objects"
+  - "Use WebGL renderer (Phaser default) — Canvas fallback only when needed"
+  - "Profile with Chrome DevTools Performance tab — watch for long frames"
+  - "Compress assets: WebP for images, OGG/MP3 for audio, sprite packing tools"

@@ -129,7 +129,7 @@ detect_and_run() {
   echo "  - Rust: cargo-mutants (cargo install cargo-mutants)"
   echo "  - Java: PIT (https://pitest.org/quickstart/)"
   echo ""
-  echo "See .agentic/quality/test_strategy.md for setup instructions."
+  echo "See .agentic/lib/quality_knowledge/testing.knowledge.md for setup instructions."
   return 1
 }
 
@@ -148,7 +148,7 @@ if [[ $EXIT_CODE -eq 0 ]]; then
   echo "  2. Add/strengthen tests for high-value survivors"
   echo "  3. Mark equivalent mutants (semantically identical to original)"
   echo ""
-  echo "See .agentic/quality/test_strategy.md for interpretation guidance."
+  echo "See .agentic/lib/quality_knowledge/testing.knowledge.md for interpretation guidance."
 fi
 
 exit $EXIT_CODE

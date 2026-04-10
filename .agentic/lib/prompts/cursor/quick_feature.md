@@ -21,7 +21,7 @@ Please follow this streamlined workflow for Discovery mode:
 
 3. **Implement:**
    - Write minimal code to pass tests
-   - Follow programming standards (`.agentic/lib/workflows/programming_standards.md`)
+   - Follow programming standards (`.agentic/conventions.md`)
    - Keep it simple and maintainable
 
 4. **Verify:**

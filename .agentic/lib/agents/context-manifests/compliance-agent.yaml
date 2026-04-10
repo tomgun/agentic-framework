@@ -15,7 +15,7 @@ required:
 # Files to load if available and budget permits
 optional:
   - .agentic/checklists/session_end.md
-  - .agentic/workflows/definition_of_done.md
+  - .agentic/lib/checklists/feature_complete.md
   - JOURNAL.md                          # Recent entries to verify logging
   - spec/FEATURES.md                    # Verify spec updates
 

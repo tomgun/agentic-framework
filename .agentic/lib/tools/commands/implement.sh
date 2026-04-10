@@ -460,6 +460,13 @@ if c.has_pending_input:
       if [[ -f "$ROOT_DIR/.agentic/conventions.md" ]]; then
         echo "- **Conventions**: .agentic/conventions.md exists — review before coding"
       fi
+      # Stack-specific conventions (F-008)
+      if [[ -f "$ROOT_DIR/.agentic/local/conventions-stack.md" ]]; then
+        echo "- **Stack conventions**: .agentic/local/conventions-stack.md (stack-specific rules)"
+      fi
+      if [[ -f "$ROOT_DIR/quality_checks.sh" ]]; then
+        echo "- **Quality profile**: quality_checks.sh — run with \`--pre-commit\` before commit"
+      fi
       # Quality checklist
       if [[ -f "$ROOT_DIR/.agentic/intel/quality-checklist.yaml" ]]; then
         echo "- **Quality checklist**: implementation-phase items available"

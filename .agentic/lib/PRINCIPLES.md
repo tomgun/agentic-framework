@@ -297,7 +297,7 @@ Some principles are inherently behavioral — they cannot be enforced by scripts
 1. **Framework operations**: Token efficiency (F3) inherently reduces compute energy
 2. **Project output**: Practical guidance for writing efficient code — algorithms, caching, event-driven patterns, resource optimization
 
-**Reference**: See `.agentic/lib/quality/green_coding.md` for comprehensive guidelines covering algorithms, caching, lazy loading, event-driven patterns, resource optimization, and infrastructure choices.
+**Reference**: See `.agentic/lib/quality_knowledge/green_coding.knowledge.md` for comprehensive guidelines covering algorithms, caching, lazy loading, event-driven patterns, resource optimization, and infrastructure choices.
 
 **Anti-pattern**: Polling every second when webhooks would work. Loading entire datasets when pagination would suffice. Unoptimized algorithms causing excessive CPU usage.
 

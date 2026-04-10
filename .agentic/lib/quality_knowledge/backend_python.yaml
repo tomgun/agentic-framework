@@ -1,0 +1,108 @@
+stack_id: backend_python
+display_name: "Python Backend (Django, FastAPI, Flask)"
+
+matches:
+  frameworks: ["Django", "FastAPI", "Flask", "Starlette", "Litestar"]
+  languages: ["Python"]
+  config_files: ["pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile"]
+  markers: ["uvicorn", "gunicorn", "django.conf", "fastapi", "flask"]
+
+failure_modes:
+  - id: FM-001
+    name: "N+1 query (ORM eager/lazy loading)"
+    severity: warning
+  - id: FM-002
+    name: "Unvalidated API input"
+    severity: blocking
+  - id: FM-003
+    name: "Connection pool exhaustion"
+    severity: blocking
+  - id: FM-004
+    name: "Blocking call in async context"
+    severity: warning
+  - id: FM-005
+    name: "Missing database migration"
+    severity: blocking
+
+quality_checks:
+  pre_commit:
+    - name: "Type checking (mypy/pyright)"
+      command: "mypy . --ignore-missing-imports 2>/dev/null || pyright 2>/dev/null || true"
+      required: false
+      condition: "[[ -f mypy.ini || -f pyrightconfig.json || -f pyproject.toml ]]"
+    - name: "Lint (ruff)"
+      command: "ruff check . 2>/dev/null || python -m flake8 ."
+      required: true
+      condition: "command -v ruff &>/dev/null || command -v flake8 &>/dev/null"
+    - name: "Unit tests"
+      command: "python -m pytest tests/ -x -q --tb=short 2>/dev/null || python -m pytest -x -q --tb=short"
+      required: true
+  full:
+    - name: "Full test suite with coverage"
+      command: "python -m pytest --cov=. --cov-report=term-missing -q"
+      required: true
+    - name: "Migration check (Django)"
+      command: "python manage.py makemigrations --check --dry-run"
+      required: false
+      condition: "[[ -f manage.py ]]"
+    - name: "Security audit (bandit)"
+      command: "bandit -r . -ll -q"
+      required: false
+      condition: "command -v bandit &>/dev/null"
+
+testing_strategy:
+  unit:
+    framework: "pytest"
+    command: "python -m pytest tests/unit/ -x -q"
+    focus: "Business logic, validators, serializers, utility functions"
+    coverage_target: 85
+  integration:
+    framework: "pytest + httpx (FastAPI) or Django test client"
+    command: "python -m pytest tests/integration/ -x -q"
+    focus: "API endpoints, database operations, external service integration"
+  e2e:
+    framework: "pytest + httpx or supertest equivalent"
+    command: "python -m pytest tests/e2e/ -x -q"
+    focus: "Full request lifecycle, auth flows, multi-step operations"
+    setup_note: "Requires running database (use docker-compose or testcontainers)"
+
+conventions:
+  - "Use Pydantic models for all API request/response validation (FastAPI) or serializers (Django REST)"
+  - "Database queries go in repository/service layer, not in route handlers/views"
+  - "Use dependency injection for database sessions, auth, and external services"
+  - "Async endpoints must never call sync blocking functions — use run_in_executor if needed"
+  - "Always use database transactions for multi-step operations"
+  - "Use Alembic (FastAPI/Flask) or Django migrations — never raw SQL for schema changes"
+  - "Log structured JSON, not print statements — use Python logging with structlog or similar"
+
+library_selection:
+  - category: "ORM"
+    prefer: "SQLAlchemy 2.0 (FastAPI/Flask) or Django ORM"
+    avoid: "Raw SQL for CRUD, Peewee for production systems"
+    reason: "SQLAlchemy 2.0 has modern async support; Django ORM is battle-tested"
+  - category: "Validation"
+    prefer: "Pydantic v2"
+    avoid: "Marshmallow (slower, less type-safe), manual validation"
+    reason: "Pydantic v2 is 5-50x faster than v1, built-in to FastAPI"
+  - category: "HTTP client"
+    prefer: "httpx (async-compatible)"
+    avoid: "requests in async context (blocks event loop)"
+    reason: "httpx supports both sync and async; requests is sync-only"
+  - category: "Task queue"
+    prefer: "Celery with Redis broker, or arq for async"
+    avoid: "Threading for background work in web handlers"
+    reason: "Task queues handle retries, monitoring, and scaling"
+
+security:
+  - "Never use string formatting for SQL — always parameterized queries"
+  - "Validate file uploads: check content type, limit size, scan for malware"
+  - "Rate-limit authentication endpoints — use slowapi or django-ratelimit"
+  - "Store passwords with bcrypt or argon2 — never MD5/SHA without salt"
+  - "Use CORS middleware with explicit allowed origins — never allow '*' in production"
+
+performance:
+  - "Use select_related/prefetch_related (Django) or joinedload (SQLAlchemy) to prevent N+1"
+  - "Add database indexes for columns used in WHERE, ORDER BY, and JOIN clauses"
+  - "Use connection pooling (SQLAlchemy pool_size, Django CONN_MAX_AGE)"
+  - "Cache expensive queries with Redis — set appropriate TTLs"
+  - "Profile slow endpoints with django-debug-toolbar or py-spy"

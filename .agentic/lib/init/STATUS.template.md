@@ -42,7 +42,7 @@ Purpose: the living "truth" of where the project is today.
 - <!-- bullets -->
 
 ## Retrospectives (optional)
-<!-- Agent-led project health checks. See .agentic/lib/workflows/retrospective.md -->
+<!-- Agent-led project health checks. Run: ag retro -->
 <!-- Uncomment after first retrospective: -->
 <!-- - Last retrospective: YYYY-MM-DD (docs/retrospectives/RETRO-YYYY-MM-DD.md) -->
 <!-- - Features shipped since last: [N] -->

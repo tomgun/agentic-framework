@@ -43,7 +43,7 @@ echo "🎮 Checking for frame rate independence..."
 if grep -r "setInterval\|setTimeout" src/ 2>/dev/null | grep -v "node_modules" | grep -v ".test." > /dev/null; then
   echo "  ⚠️  WARNING: Found setInterval/setTimeout in game code"
   echo "     Use delta time or requestAnimationFrame for frame-independent logic"
-  echo "     See: .agentic/workflows/game_development.md#frame-rate-independence"
+  echo "     See: .agentic/lib/quality_knowledge/game_2d_web.knowledge.md"
 else
   echo "  ✅ No obvious frame rate dependencies"
 fi
@@ -100,7 +100,7 @@ if [[ "$JUICE_PATTERNS" -ge 2 ]]; then
   echo "  ✅ Good 'game feel' patterns found (tweens, particles, sounds)"
 else
   echo "  ℹ️  Consider adding more 'juice' for better game feel"
-  echo "     See: .agentic/workflows/game_development.md#juiciness"
+  echo "     See: .agentic/lib/quality_knowledge/game_2d_web.knowledge.md"
 fi
 
 echo ""

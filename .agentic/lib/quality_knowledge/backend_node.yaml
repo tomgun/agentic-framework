@@ -1,0 +1,98 @@
+stack_id: backend_node
+display_name: "Node.js Backend (Express, Fastify, Hono)"
+
+matches:
+  frameworks: ["Express", "Fastify", "Hono", "Koa", "NestJS", "Nest"]
+  languages: ["TypeScript", "JavaScript"]
+  config_files: []
+  markers: ["express", "fastify", "hono", "@nestjs/core", "app.listen"]
+
+failure_modes:
+  - id: FM-001
+    name: "Event loop blocking (sync operations)"
+    severity: blocking
+  - id: FM-002
+    name: "Memory leak (unclosed streams, event listeners)"
+    severity: warning
+  - id: FM-003
+    name: "Unhandled promise rejection"
+    severity: blocking
+  - id: FM-004
+    name: "Connection pool exhaustion"
+    severity: blocking
+  - id: FM-005
+    name: "Missing input validation"
+    severity: blocking
+
+quality_checks:
+  pre_commit:
+    - name: "TypeScript compilation"
+      command: "npx tsc --noEmit"
+      required: true
+      condition: "[[ -f tsconfig.json ]]"
+    - name: "Lint"
+      command: "npm run lint --if-present"
+      required: true
+    - name: "Unit tests"
+      command: "npm test -- --watchAll=false 2>/dev/null || npx vitest run --reporter=dot 2>/dev/null || npx jest --passWithNoTests"
+      required: true
+  full:
+    - name: "Full test suite"
+      command: "npm test -- --coverage --watchAll=false 2>/dev/null || npx vitest run --coverage"
+      required: true
+    - name: "Security audit"
+      command: "npm audit --production --audit-level=high"
+      required: false
+
+testing_strategy:
+  unit:
+    framework: "Vitest or Jest"
+    command: "npx vitest run"
+    focus: "Business logic, middleware, validators, utility functions"
+    coverage_target: 80
+  integration:
+    framework: "supertest"
+    command: "npx vitest run tests/integration/"
+    focus: "API endpoints, database operations, middleware chains"
+  e2e:
+    framework: "supertest or httpx"
+    command: "npx vitest run tests/e2e/"
+    focus: "Full request lifecycle, auth flows, error handling"
+    setup_note: "Use testcontainers for database dependencies"
+
+conventions:
+  - "Use zod or joi for all API input validation — never trust req.body/req.query directly"
+  - "Handle all promise rejections — use express-async-errors or fastify's built-in async support"
+  - "Never block the event loop — use worker_threads for CPU-intensive tasks"
+  - "Close all resources (DB connections, streams, file handles) with try/finally or using declarations"
+  - "Use structured logging (pino, winston) — never console.log in production"
+  - "Database queries in service/repository layer, not in route handlers"
+  - "Use environment variables for configuration — never hardcode connection strings"
+
+library_selection:
+  - category: "Validation"
+    prefer: "zod (TypeScript-first, composable)"
+    avoid: "Manual validation, express-validator for complex schemas"
+    reason: "zod provides type inference, composability, and clear error messages"
+  - category: "ORM"
+    prefer: "Prisma (type-safe) or Drizzle (SQL-like)"
+    avoid: "Sequelize (complex, type support weak), raw SQL for CRUD"
+    reason: "Prisma generates types from schema; Drizzle is lightweight and SQL-native"
+  - category: "Logger"
+    prefer: "pino (fast, structured JSON)"
+    avoid: "console.log, morgan (request logging only)"
+    reason: "pino is 5x faster than winston, outputs structured JSON for log aggregation"
+
+security:
+  - "Use helmet middleware for security headers"
+  - "Rate-limit all endpoints — use express-rate-limit or fastify-rate-limit"
+  - "Sanitize user input to prevent NoSQL injection (especially with MongoDB)"
+  - "Use parameterized queries — never template strings for SQL"
+  - "Set appropriate CORS origins — never use origin: '*' in production"
+
+performance:
+  - "Use connection pooling for databases (pg pool, Prisma connection limit)"
+  - "Stream large responses instead of buffering in memory"
+  - "Use Redis for caching, session storage, and rate limiting"
+  - "Profile with clinic.js or 0x for event loop delays and memory issues"
+  - "Set appropriate timeouts on HTTP clients and database connections"

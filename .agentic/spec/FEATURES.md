@@ -79,7 +79,7 @@ Enforced development principles: small batches, one feature at a time, spec befo
 **Contract**: [`spec/contracts/F-008.yaml`](contracts/F-008.yaml)
 **Consolidates**: F-008, F-0012, F-0013, F-0014, F-0015, F-0116
 
-Consistent code quality across shell and Python: ShellCheck, error handling patterns, naming conventions, function documentation. Structural tests verify standards.
+Quality knowledge system with 21 files: 7 universal (security/OWASP, testing methodology, code quality, green coding, library selection, review checklist, anti-hallucination) + 7 stack-specific YAML+markdown pairs (web, Python, Node, React Native, audio DSP, 2D web games, Unity). Python generator auto-produces `quality_checks.sh` from detected stack. Enforcement via `ag commit` + pre-commit Check 17. `ag quality setup|run|status` CLI. ShellCheck, error handling patterns, naming conventions in `conventions.md`.
 
 ---
 
@@ -525,3 +525,5 @@ The original 217 features (v0.1.0–v0.72.0) are archived at [`docs/archive/FEAT
 - Tests: `tests/test_capability_catalog.sh` (23 tests)
 
 **Contract**: See `spec/contracts/F-042.yaml`
+
+---

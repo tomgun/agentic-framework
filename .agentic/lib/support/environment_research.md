@@ -199,7 +199,7 @@ This repo uses Agentic Framework (`.agentic/`).
    ```
 
 ## Rules
-- **Tests required** (`.agentic/lib/quality/test_strategy.md`)
+- **Tests required** (`.agentic/lib/quality_knowledge/testing.knowledge.md`)
 - **Docs = part of done** (update docs when code changes)
 - **Use scripts** (token-efficient, 40x cheaper than file edits)
 

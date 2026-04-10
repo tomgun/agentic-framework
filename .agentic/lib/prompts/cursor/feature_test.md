@@ -16,7 +16,7 @@ Please follow Test-Driven Development (TDD):
 2. **Create test structure:**
    - Set up test file(s) following project conventions
    - Organize tests by: happy path, edge cases, error handling
-   - Follow naming conventions in `.agentic/lib/workflows/testing_standards.md`
+   - Follow naming conventions in `.agentic/conventions.md`
 
 3. **Write test cases for:**
    - **Happy path**: Normal, expected usage
@@ -46,7 +46,7 @@ Please follow Test-Driven Development (TDD):
 ---
 
 **Testing Standards:**
-- Follow `.agentic/lib/workflows/testing_standards.md`
+- Follow `.agentic/conventions.md`
 - Use descriptive test names: `test_user_can_login_with_valid_credentials`
 - Test behavior, not implementation
 - Keep tests independent and repeatable

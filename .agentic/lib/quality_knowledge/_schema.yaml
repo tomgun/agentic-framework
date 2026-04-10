@@ -1,0 +1,123 @@
+# Quality Knowledge Schema
+# Each stack knowledge file (.yaml) must follow this structure.
+# Companion .knowledge.md files contain prose-form domain expertise.
+#
+# Generator: .agentic/lib/tools/quality_profile_generator.py
+# Outputs:   quality_checks.sh, .agentic/local/conventions-stack.md,
+#            .agentic/local/extensions/gates/quality-gate.sh
+
+schema_version: "1.0"
+
+fields:
+  stack_id:
+    type: string
+    required: true
+    description: "Unique identifier (matches filename without extension)"
+
+  display_name:
+    type: string
+    required: true
+    description: "Human-readable name shown in ag quality status"
+
+  matches:
+    type: object
+    required: true
+    description: "How discover.py / STACK.md maps to this knowledge file"
+    fields:
+      frameworks:
+        type: list[string]
+        description: "Framework names to match (case-insensitive)"
+      languages:
+        type: list[string]
+        description: "Programming languages"
+      config_files:
+        type: list[string]
+        description: "Config files whose presence signals this stack (glob patterns ok)"
+      markers:
+        type: list[string]
+        description: "String markers in source code or config (e.g., import names)"
+
+  failure_modes:
+    type: list[object]
+    required: false
+    description: "Stack-specific things that break in production"
+    item_fields:
+      id:
+        type: string
+        description: "Unique ID within this file (FM-001, FM-002, ...)"
+      name:
+        type: string
+        description: "Short name for the failure mode"
+      severity:
+        type: enum[blocking, warning]
+        description: "blocking = fails pre-commit, warning = advisory only"
+      check:
+        type: string
+        required: false
+        description: "Shell command to detect this failure (optional — some are advisory)"
+
+  quality_checks:
+    type: object
+    required: true
+    description: "Commands for quality_checks.sh generation"
+    fields:
+      pre_commit:
+        type: list[check]
+        description: "Fast checks (<30s total) for pre-commit and ag commit"
+      full:
+        type: list[check]
+        description: "Comprehensive checks for ag quality run --full and ag verify"
+    check_fields:
+      name:
+        type: string
+        description: "Check display name"
+      command:
+        type: string
+        description: "Shell command to run. {project_root} and {plugin_path} are template vars."
+      required:
+        type: boolean
+        description: "true = failure blocks, false = failure warns (tool may be absent)"
+      condition:
+        type: string
+        required: false
+        description: "Shell condition — check only runs if this evaluates true"
+
+  testing_strategy:
+    type: object
+    required: false
+    description: "Recommended testing approach per level"
+    fields:
+      unit:
+        type: object
+        fields: { framework: string, command: string, focus: string, coverage_target: int }
+      integration:
+        type: object
+        fields: { framework: string, command: string, focus: string }
+      e2e:
+        type: object
+        fields: { framework: string, command: string, focus: string, setup_note: string }
+
+  conventions:
+    type: list[string]
+    required: true
+    description: "Stack-specific coding rules. Compiled into conventions-stack.md."
+
+  library_selection:
+    type: list[object]
+    required: false
+    description: "Decision heuristics for common library choices"
+    item_fields:
+      category: string
+      prefer: string
+      avoid: string
+      reason: string
+
+  security:
+    type: list[string]
+    required: false
+    description: "Stack-specific security concerns beyond generic OWASP"
+
+  performance:
+    type: list[string]
+    required: false
+    description: "Stack-specific performance concerns"

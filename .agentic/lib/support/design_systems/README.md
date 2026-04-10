@@ -60,7 +60,6 @@ These are templates - customize them for your project:
 
 ## See Also
 
-- Visual Design Workflow: `.agentic/lib/workflows/visual_design_workflow.md`
 - Wireframe/mockup guidelines
 - Screenshot annotation process
 

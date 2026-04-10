@@ -14,7 +14,7 @@ tokens: ~500
 - `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria (security-relevant features)
 - `STACK.md` - Tech stack, dependencies
 - `CONTEXT_PACK.md [Entry Points]` - Attack surface (public endpoints, input handlers)
-- `.agentic/lib/quality/programming_standards.md` - Code standards
+- `.agentic/lib/quality_knowledge/code_quality.knowledge.md, security.knowledge.md - Code quality & security
 
 ## Responsibilities
 

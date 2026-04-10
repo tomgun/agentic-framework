@@ -9,7 +9,7 @@ Please:
 
 1. Ask which feature (F-####) if not specified
 2. Read acceptance criteria from `.agentic/spec/acceptance/F-####.md`
-3. Follow TDD workflow from `.agentic/lib/workflows/tdd_mode.md`:
+3. Follow TDD workflow from `.claude/skills/writing-tests/SKILL.md`:
    - Write failing test FIRST
    - Implement minimal code to pass
    - Refactor for clarity
