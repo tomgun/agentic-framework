@@ -14,7 +14,7 @@ tokens: ~500
 - `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria (data requirements)
 - `STACK.md` - Database type, ORM, migration tools
 - `CONTEXT_PACK.md [Modules]` - Existing data models and schema
-- `.agentic/lib/quality/programming_standards.md` - Code standards
+- `.agentic/lib/quality_knowledge/code_quality.knowledge.md, security.knowledge.md - Code quality & security
 
 ## Responsibilities
 

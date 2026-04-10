@@ -8,7 +8,7 @@ description: Create implementation plans and YAML contracts
 required:
   - CONTEXT_PACK.md                         # Project architecture
   - STACK.md                                # Tech stack constraints
-  - .agentic/agents/shared/guidelines/anti-hallucination.md
+  - .agentic/.agentic/lib/quality_knowledge/anti_hallucination.knowledge.md
 
 optional:
   - docs/research/{topic}.md                # Research findings (if available)

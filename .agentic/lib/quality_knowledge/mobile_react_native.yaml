@@ -1,0 +1,102 @@
+stack_id: mobile_react_native
+display_name: "Mobile (React Native, Expo)"
+
+matches:
+  frameworks: ["React Native", "Expo", "react-native"]
+  languages: ["TypeScript", "JavaScript"]
+  config_files: ["app.json", "app.config.js", "app.config.ts", "metro.config.js", "react-native.config.js"]
+  markers: ["react-native", "expo", "react-native-screens", "expo-router"]
+
+failure_modes:
+  - id: FM-001
+    name: "JS thread blocking (long tasks freeze UI)"
+    severity: blocking
+  - id: FM-002
+    name: "Memory leak (unmounted component state update)"
+    severity: warning
+  - id: FM-003
+    name: "Battery drain (excessive background work)"
+    severity: warning
+  - id: FM-004
+    name: "App store rejection (missing permissions, privacy issues)"
+    severity: blocking
+  - id: FM-005
+    name: "UI jank (frame drops below 60fps)"
+    severity: warning
+
+quality_checks:
+  pre_commit:
+    - name: "TypeScript compilation"
+      command: "npx tsc --noEmit"
+      required: true
+      condition: "[[ -f tsconfig.json ]]"
+    - name: "Lint"
+      command: "npm run lint --if-present"
+      required: true
+    - name: "Unit tests"
+      command: "npx jest --passWithNoTests --watchAll=false"
+      required: true
+  full:
+    - name: "Full test suite"
+      command: "npx jest --coverage --watchAll=false"
+      required: true
+    - name: "E2E tests (Detox)"
+      command: "npx detox test --configuration ios.sim.release"
+      required: false
+      condition: "[[ -f .detoxrc.js || -f detox.config.js ]]"
+    - name: "Bundle size analysis"
+      command: "npx react-native-bundle-visualizer 2>/dev/null || true"
+      required: false
+
+testing_strategy:
+  unit:
+    framework: "Jest + React Native Testing Library"
+    command: "npx jest --watchAll=false"
+    focus: "Business logic, hooks, navigation flows, component rendering"
+    coverage_target: 75
+  integration:
+    framework: "React Native Testing Library"
+    command: "npx jest tests/integration/"
+    focus: "Screen flows, navigation, API integration, state management"
+  e2e:
+    framework: "Detox (iOS/Android) or Maestro"
+    command: "npx detox test --configuration ios.sim.release"
+    focus: "Critical user flows, permissions, deep links, push notifications"
+    setup_note: "Requires iOS Simulator or Android Emulator"
+
+conventions:
+  - "Use FlatList/FlashList for lists — never ScrollView with map() for dynamic data"
+  - "Memoize expensive renders with React.memo and useMemo — profile first with Flipper"
+  - "Handle all navigation state transitions — users can back out of any screen"
+  - "Request permissions just-in-time, not at app launch — explain why before asking"
+  - "Support both light and dark mode — use useColorScheme or themed components"
+  - "Handle offline state gracefully — show cached data when network unavailable"
+  - "Use react-native-reanimated for animations — avoid Animated API for complex gestures"
+
+library_selection:
+  - category: "Navigation"
+    prefer: "Expo Router (file-based) or React Navigation 7"
+    avoid: "Manual navigation state management"
+    reason: "Expo Router provides file-based routing with deep link support built-in"
+  - category: "State management"
+    prefer: "Zustand + React Query/TanStack Query"
+    avoid: "Redux (boilerplate), MobX (implicit reactivity)"
+    reason: "Zustand is minimal; React Query handles server state with caching"
+  - category: "Storage"
+    prefer: "expo-secure-store (sensitive), MMKV (fast key-value), expo-file-system"
+    avoid: "AsyncStorage for sensitive data (unencrypted)"
+    reason: "expo-secure-store uses Keychain/Keystore; MMKV is 30x faster than AsyncStorage"
+
+security:
+  - "Store tokens in secure storage (Keychain/Keystore) — never AsyncStorage"
+  - "Certificate pinning for API calls in production builds"
+  - "Validate deep link parameters before navigation — treat as untrusted input"
+  - "Strip sensitive data from Redux/Zustand devtools in production"
+  - "Use App Transport Security (iOS) — no HTTP in production"
+
+performance:
+  - "Use Hermes engine (default in RN 0.70+) for faster startup"
+  - "Optimize images: use WebP, resize before bundling, lazy-load off-screen images"
+  - "Avoid re-renders: profile with React DevTools Profiler or Flipper"
+  - "Use native driver for animations: useNativeDriver: true"
+  - "Minimize bridge calls — batch operations where possible"

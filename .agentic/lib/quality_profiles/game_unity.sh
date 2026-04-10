@@ -82,7 +82,7 @@ FIND_USAGE=$(grep -r "GameObject\.Find\|Find<" Assets/ 2>/dev/null | grep -v "//
 if [[ "$FIND_USAGE" -gt 5 ]]; then
   echo "  ⚠️  WARNING: $FIND_USAGE GameObject.Find() calls detected"
   echo "     This is expensive! Use [SerializeField] or caching instead"
-  echo "     See: .agentic/workflows/game_development.md#performance"
+  echo "     See: .agentic/lib/quality_knowledge/game_unity.knowledge.md"
 else
   echo "  ✅ Limited GameObject.Find usage"
 fi
@@ -116,7 +116,7 @@ if grep -r "Random\.Range\|UnityEngine\.Random" Assets/ 2>/dev/null | wc -l | gr
   if [[ "$SEED_USAGE" -eq 0 ]]; then
     echo "  ℹ️  Random usage found but no seed initialization"
     echo "     For deterministic testing, use Random.InitState(seed)"
-    echo "     See: .agentic/workflows/game_development.md#determinism"
+    echo "     See: .agentic/lib/quality_knowledge/game_unity.knowledge.md"
   else
     echo "  ✅ Deterministic random usage detected"
   fi

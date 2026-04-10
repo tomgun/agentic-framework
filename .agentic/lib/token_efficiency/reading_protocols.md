@@ -317,5 +317,5 @@ Track these metrics informally:
 ## Related resources
 - Context budgeting overview: `.agentic/token_efficiency/context_budgeting.md`
 - Small changes: `.agentic/token_efficiency/change_small.md`
-- Dev loop: `.agentic/lib/workflows/dev_loop.md`
+- Dev loop: `.claude/skills/implementing-features/SKILL.md`
 

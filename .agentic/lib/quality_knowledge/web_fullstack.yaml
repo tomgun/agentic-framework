@@ -1,0 +1,109 @@
+stack_id: web_fullstack
+display_name: "Full-Stack Web (Next.js, Nuxt, Remix, SvelteKit)"
+
+matches:
+  frameworks: ["Next.js", "Nuxt", "Remix", "SvelteKit", "Next", "Nuxt3"]
+  languages: ["TypeScript", "JavaScript"]
+  config_files: ["next.config.js", "next.config.mjs", "next.config.ts", "nuxt.config.ts", "remix.config.js", "svelte.config.js"]
+  markers: ["next/image", "next/link", "useRouter", "getServerSideProps", "getStaticProps"]
+
+failure_modes:
+  - id: FM-001
+    name: "Bundle size regression"
+    severity: warning
+    check: "npx next build 2>&1 | grep -E 'First Load JS|Route'"
+  - id: FM-002
+    name: "Hydration mismatch (SSR/CSR divergence)"
+    severity: blocking
+  - id: FM-003
+    name: "Memory leak in useEffect cleanup"
+    severity: warning
+  - id: FM-004
+    name: "Slow server response (>200ms TTFB)"
+    severity: warning
+  - id: FM-005
+    name: "Accessibility failures (WCAG 2.1 AA)"
+    severity: warning
+
+quality_checks:
+  pre_commit:
+    - name: "TypeScript compilation"
+      command: "npx tsc --noEmit"
+      required: true
+      condition: "[[ -f tsconfig.json ]]"
+    - name: "Lint"
+      command: "npm run lint --if-present"
+      required: true
+    - name: "Unit tests"
+      command: "npx vitest run --reporter=dot 2>/dev/null || npm test -- --watchAll=false"
+      required: true
+  full:
+    - name: "Build"
+      command: "npm run build"
+      required: true
+    - name: "E2E tests (Playwright)"
+      command: "npx playwright test"
+      required: false
+      condition: "[[ -f playwright.config.ts || -f playwright.config.js ]]"
+    - name: "Bundle size check"
+      command: "npm run build 2>&1 | tail -30"
+      required: false
+
+testing_strategy:
+  unit:
+    framework: "Vitest or Jest"
+    command: "npx vitest run"
+    focus: "Business logic, hooks, utilities, API route handlers"
+    coverage_target: 80
+  integration:
+    framework: "Testing Library (@testing-library/react)"
+    command: "npx vitest run --config vitest.integration.config.ts"
+    focus: "Component interactions, form flows, API route integration"
+  e2e:
+    framework: "Playwright"
+    command: "npx playwright test"
+    focus: "Critical user flows — auth, checkout, data creation, navigation"
+    setup_note: "Requires dev server running (playwright auto-starts via webServer config)"
+
+conventions:
+  - "Use server components by default — client components ('use client') only when state/effects are needed"
+  - "Colocate data fetching with the component that consumes it"
+  - "Never use useEffect for data fetching — use server components, React Query, or SWR"
+  - "Environment variables: NEXT_PUBLIC_ prefix for client, bare names for server-only"
+  - "Use next/image for automatic image optimization — never raw <img> for content images"
+  - "Use next/link for internal navigation — never raw <a> for same-site links"
+  - "Handle loading and error states explicitly — use Suspense boundaries and error.tsx"
+  - "Keep page components thin — extract business logic into hooks or utility modules"
+
+library_selection:
+  - category: "State management"
+    prefer: "React Query / TanStack Query for server state, zustand for client state"
+    avoid: "Redux for new projects (boilerplate overhead, most state is server state)"
+    reason: "Server state and client state have fundamentally different update patterns"
+  - category: "CSS"
+    prefer: "Tailwind CSS or CSS Modules"
+    avoid: "Runtime CSS-in-JS (Emotion, styled-components) with SSR streaming"
+    reason: "Runtime CSS-in-JS conflicts with React Server Components and streaming SSR"
+  - category: "Forms"
+    prefer: "React Hook Form + zod"
+    avoid: "Formik (larger bundle, less performant with many fields)"
+    reason: "RHF uses uncontrolled components for better performance; zod provides type-safe validation"
+  - category: "HTTP client"
+    prefer: "Native fetch (server components), React Query (client components)"
+    avoid: "axios (adds bundle size, fetch is built-in and sufficient)"
+    reason: "Next.js extends fetch with caching; axios bypasses this"
+
+security:
+  - "Validate all API route inputs with zod or similar — never trust req.body directly"
+  - "Use middleware for authentication — never check auth in individual route handlers"
+  - "Set Content Security Policy headers via next.config.js"
+  - "Never expose server environment variables to the client bundle"
+  - "Sanitize user-generated content before rendering — use DOMPurify for HTML content"
+  - "Use httpOnly, secure, sameSite cookies for session tokens"
+
+performance:
+  - "Use dynamic imports (next/dynamic) for heavy components below the fold"
+  - "Set appropriate Cache-Control and revalidation intervals for data fetching"
+  - "Use next/image with responsive sizes — avoid loading desktop images on mobile"
+  - "Minimize client-side JavaScript — prefer server components for data display"
+  - "Use React.memo sparingly — profile before optimizing, premature memoization adds complexity"

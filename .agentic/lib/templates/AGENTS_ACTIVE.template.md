@@ -2,7 +2,7 @@
 
 **Purpose**: Coordinate multiple AI agents working simultaneously on different features.
 
-**When to use**: Multi-agent development with Git worktrees (see `.agentic/lib/workflows/multi_agent_coordination.md`)
+**When to use**: Multi-agent development with Git worktrees (see `AGENTS.json + `ag implement` (auto-worktree)`)
 
 ---
 
@@ -106,5 +106,5 @@ Ad-hoc notes for inter-agent communication:
 5. **Update merge queue** when PR is ready
 6. **Notify dependent agents** when your work completes (add to Coordination Notes)
 
-**See full protocol**: `.agentic/lib/workflows/multi_agent_coordination.md`
+**See full protocol**: `AGENTS.json + `ag implement` (auto-worktree)`
 

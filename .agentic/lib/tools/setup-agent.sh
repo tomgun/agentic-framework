@@ -457,7 +457,7 @@ EOF
   echo "  3. Register via wip.sh start (auto-creates AGENTS.json entry)"
   echo "  4. Start with Research Agent"
   echo ""
-  echo "See: .agentic/workflows/multi_agent_coordination.md"
+  echo "See: AGENTS.json for multi-agent coordination"
 }
 
 setup_all() {

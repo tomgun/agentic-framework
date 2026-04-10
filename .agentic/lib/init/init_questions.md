@@ -81,7 +81,6 @@ b) **Balanced** (default) - Best model for planning, mid-tier for implementation
 c) **Economy** - Mid-tier for planning, cheap for everything else.
    - Use for: Prototyping, learning, tight budget
 
-See `.agentic/lib/workflows/agent_mode.md` for details and customization options.
 
 ## Developer experience
 - Lint/format standards (if any)?

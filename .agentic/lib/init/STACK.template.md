@@ -23,6 +23,8 @@ Purpose: a single source of truth for "how we build and run software here".
 # Require criteria before coding. Profile defaults — Discovery: recommended | Formal: blocking
 - wip_before_commit: warning
 # WIP.md required before commit. Profile defaults — Discovery: warning | Formal: blocking
+- quality_checks: blocking
+# Stack-specific quality validation. blocking: fail commit on check failure | advisory: warn only | off: skip
 - pre_commit_checks: fast
 # Pre-commit gate depth. Profile defaults — Discovery: fast | Formal: full
 - pre_commit_hook: fast
@@ -152,7 +154,7 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ## Documentation verification (recommended)
 <!-- Ensures agents use current, version-correct documentation -->
-<!-- See: .agentic/lib/workflows/documentation_verification.md -->
+<!-- Docs gate enforced by ag done Gate 4 -->
 <!-- - doc_verification: context7-mcp  # context7-mcp | web-search | manual | none -->
 <!-- - context7_mcp: enabled          # Requires MCP server config in IDE -->
 <!-- - strict_version_matching: yes -->
@@ -208,16 +210,16 @@ Purpose: a single source of truth for "how we build and run software here".
 <!--   - AI implements feature, then tests verify acceptance criteria -->
 <!--   - Specs evolve during implementation (discoveries are documented) -->
 <!--   - Best for AI-generated code where large chunks work quickly -->
-<!--   - See .agentic/lib/workflows/spec_evolution.md -->
+<!--   - Managed by ag contract commands -->
 <!-- TDD mode (OPTIONAL): Tests written FIRST (red-green-refactor) -->
 <!--   - Better for critical logic, refactoring, or if you prefer tests-first -->
-<!--   - See .agentic/lib/workflows/tdd_mode.md -->
+<!--   - See .claude/skills/writing-tests/ -->
 - development_mode: standard  <!-- DEFAULT: Acceptance-Driven -->
 <!-- - development_mode: tdd  # OPTIONAL: Tests-first approach -->
 
 ## Agent mode (quality vs cost tradeoff)
 <!-- Controls model selection across all agent tasks -->
-<!-- See: .agentic/lib/workflows/agent_mode.md for full documentation -->
+<!-- Options: premium, balanced (default), economy -->
 - agent_mode: balanced  <!-- premium | balanced | economy -->
   <!-- premium: Best quality. opus for planning/implementation/review, sonnet for search -->
   <!-- balanced: Good balance (DEFAULT). opus for planning, sonnet for implementation/review -->
@@ -234,7 +236,7 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ## Plan-Review Loop
 <!-- Iterative planning with critical review before implementation -->
-<!-- See: .agentic/lib/workflows/plan_review_loop.md -->
+<!-- See .claude/skills/planning-features/ -->
 <!-- Note: plan_review_enabled is now in ## Settings (profile-aware) -->
 - plan_review_max_iterations: 3  <!-- Max revisions before escalation (ENFORCED) -->
 - plan_review_auto_for: [planning]  <!-- planning | implement | both -->
@@ -255,8 +257,8 @@ Purpose: a single source of truth for "how we build and run software here".
 
 ## Sequential agent pipeline (optional but RECOMMENDED)
 <!-- Enables specialized agents to work sequentially on features for optimal context efficiency -->
-<!-- See: .agentic/lib/workflows/sequential_agent_specialization.md -->
-<!-- See: .agentic/lib/workflows/automatic_sequential_pipeline.md -->
+<!-- Built into ag implement pipeline -->
+<!-- Built into ag auto commands -->
 - pipeline_enabled: no  <!-- yes | no (default: no) - Start with 'no', enable after reviewing workflow -->
 - pipeline_mode: manual  <!-- manual | auto (default: manual) -->
   <!-- manual: Human explicitly invokes each agent ("Research Agent: investigate X") -->
@@ -271,7 +273,7 @@ Purpose: a single source of truth for "how we build and run software here".
 - pipeline_coordination_file: ..agentic/pipeline  <!-- Directory for pipeline state files -->
 
 ## Git workflow
-<!-- How changes get into main branch. See .agentic/lib/workflows/git_workflow.md -->
+<!-- How changes get into main branch. See .claude/skills/committing-changes/ -->
 <!-- git_workflow setting is in ## Settings (profile-aware: Discovery→direct, Formal→pull_request) -->
 <!-- Override: `ag set git_workflow direct` or `ag set git_workflow pull_request`                  -->
 <!--                                                                           -->
@@ -309,7 +311,7 @@ Purpose: a single source of truth for "how we build and run software here".
 # Bind address (0.0.0.0 for Docker)
 
 ## Multi-agent coordination (optional)
-<!-- Multiple AI agents working simultaneously. See .agentic/lib/workflows/multi_agent_coordination.md -->
+<!-- Multiple AI agents working simultaneously. Uses AGENTS.json for coordination -->
 <!-- - multi_agent_enabled: no  # yes | no -->
 <!-- - multi_agent_orchestrator: cursor-main  # ID of orchestrator agent (optional) -->
 <!-- - multi_agent_workers: -->
@@ -394,7 +396,7 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- - api_style: rest-jsonapi  # API style: rest-jsonapi | graphql | grpc | rpc -->
 
 ## Retrospectives (optional)
-<!-- Agent-led periodic project health checks. See .agentic/lib/workflows/retrospective.md -->
+<!-- Agent-led periodic project health checks. Run: ag retro -->
 <!-- retrospective_enabled is in ## Settings above (profile-aware: Discovery=no, Formal=yes) -->
 <!-- Additional retrospective options (uncomment to customize): -->
 <!-- - retrospective_trigger: both  # time | features | both -->
@@ -403,26 +405,24 @@ Purpose: a single source of truth for "how we build and run software here".
 <!-- - retrospective_depth: full  # full (with research) | quick (no research) -->
 
 ## Research mode (optional)
-<!-- Deep investigation into specific topics. See .agentic/lib/workflows/research_mode.md -->
+<!-- Deep investigation. See .claude/skills/researching-topics/ -->
 <!-- Uncomment to enable proactive research suggestions: -->
 <!-- - research_enabled: yes -->
 <!-- - research_cadence: 90  # days between field update research -->
 <!-- - research_depth: standard  # quick (30min) | standard (60min) | deep (90min) -->
 <!-- - research_budget: 60  # default minutes per research session -->
 
-## Quality validation (recommended)
-<!-- Automated, stack-specific quality gates. See .agentic/lib/workflows/continuous_quality_validation.md -->
-<!-- Agents create this during init based on tech stack -->
-<!-- - quality_checks: enabled -->
-<!-- - profile: juce_audio_plugin  # or webapp_fullstack, ios_app, etc -->
-<!-- Note: pre_commit_hook is now in ## Settings (use `ag set pre_commit_hook fast|full|no`) -->
-<!-- - run_command: bash quality_checks.sh --pre-commit -->
-<!-- - full_suite_command: bash quality_checks.sh --full -->
+## Quality validation
 
-## Quality thresholds (stack-specific, optional)
-<!-- Example for JUCE plugins: -->
-<!-- - max_cpu_percent: 50 -->
-<!-- - allow_nan_inf: no -->
+Stack-specific quality checks are auto-generated by `ag quality setup` from knowledge files
+in `.agentic/lib/quality_knowledge/`. Enforcement controlled by `quality_checks` setting above.
+
+Generated artifacts:
+- `quality_checks.sh` (project root) — stack-specific checks with `--pre-commit` and `--full` modes
+- `.agentic/local/conventions-stack.md` — stack-specific coding conventions
+- `.agentic/local/extensions/gates/quality-gate.sh` — pre-commit gate wrapper (Check 17)
+
+Run `ag quality status` to see current profile. Run `ag quality setup --force` to regenerate.
 <!-- - max_glitches: 0 -->
 <!-- - max_latency_ms: 10 -->
 

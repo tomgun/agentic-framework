@@ -14,7 +14,7 @@ tokens: ~339
 - `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria to test
 - `STACK.md` - Testing framework info
 - Existing test patterns in `tests/`
-- `.agentic/lib/quality/testing_standards.md` - Testing guidelines
+- `.agentic/lib/quality_knowledge/testing.knowledge.md - Testing methodology
 
 ## Responsibilities
 

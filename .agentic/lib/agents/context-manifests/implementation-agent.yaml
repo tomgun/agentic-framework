@@ -10,12 +10,12 @@ required:
   - spec/contracts/{feature_id}.yaml        # Contract assertions for the feature
   - STACK.md[build_commands,test_commands] # How to build and test
   - CONTEXT_PACK.md[entry_points,modules]  # Where code lives
-  - .agentic/agents/shared/guidelines/anti-hallucination.md  # Core rule
-  - .agentic/quality/programming_standards.md  # Code standards (F2: quality by default)
+  - .agentic/.agentic/lib/quality_knowledge/anti_hallucination.knowledge.md  # Core rule
+  - .agentic/lib/quality_knowledge/code_quality.knowledge.md  # Code quality & security standards
 
 # Optional context - loaded if token budget allows
 optional:
-  - .agentic/agents/shared/guidelines/small-batch.md  # Small batch principle
+  - .agentic/.agentic/conventions.md  # Small batch principle
   - src/                                       # Existing code patterns (sampled)
 
 # Excluded - never load (saves tokens)

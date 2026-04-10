@@ -786,7 +786,6 @@ Choose **Proprietary (f)** if:
 - **GPL/AGPL**: Can use MIT, Apache, BSD, GPL, LGPL deps. CANNOT use proprietary!
 - **Proprietary**: Can use MIT, Apache, BSD deps. CANNOT use GPL/AGPL!
 
-**See**: `.agentic/lib/workflows/project_licensing.md` for comprehensive licensing guide.
 
 ### Step 2c: NFR Discovery (quality constraints)
 
@@ -895,7 +894,7 @@ Type a/b/c/d:"
 
 **If (c) Parallel features chosen:**
 1. Pipeline infrastructure already created by scaffold (Formal)
-2. Explain git worktree workflow (see `.agentic/lib/workflows/multi_agent_coordination.md`)
+2. Explain git worktree workflow (see `AGENTS.json for multi-agent coordination`)
 3. Show how to create worktrees:
    ```bash
    git worktree add ../project-F0042 -b feature/F-0042
@@ -919,20 +918,42 @@ Type a/b/c/d:"
 
 ## Step 4: Set up quality validation
 
-1. **Ask user about their tech stack** (from STACK.md)
-2. **Copy appropriate quality profile:**
-   - Web app with E2E: `.agentic/lib/quality_profiles/webapp_with_e2e.sh` (if Playwright/Cypress detected or configured)
-   - Web/mobile: `.agentic/quality_profiles/web_mobile.sh`
-   - Backend: `.agentic/quality_profiles/backend.sh`
-   - Desktop: `.agentic/quality_profiles/desktop.sh`
-   - CLI/server tools: `.agentic/quality_profiles/cli_server.sh`
-   - Audio plugin: `.agentic/quality_profiles/audio_plugin.sh`
-   - Game: `.agentic/quality_profiles/game.sh`
-   - Generic: `.agentic/quality_profiles/generic.sh`
-   - See also: `.agentic/lib/quality/e2e_testing_contract.md` for E2E integration contract
+Quality profiles are auto-generated from stack knowledge files (F-302). If `scaffold.sh`
+detected a brownfield project, `quality_checks.sh` was already generated.
 
-3. **Copy to project root** as `quality_checks.sh` and customize thresholds
-4. **Pre-commit hook** — verify installation, then configure mode:
+1. **If auto-generated** (brownfield project with detected stack):
+   - Review `quality_checks.sh` at project root — customize thresholds if needed
+   - Review `.agentic/local/conventions-stack.md` — stack-specific coding rules
+   - Quality gate already wired into pre-commit via `.agentic/local/extensions/gates/quality-gate.sh`
+
+2. **If not auto-generated** (greenfield or undetected stack):
+   ```bash
+   ag quality setup                    # Detect stack, generate profile
+   ag quality setup --dry-run          # Preview what would be generated
+   ```
+
+3. **Verify quality pipeline:**
+   ```bash
+   bash quality_checks.sh --pre-commit   # Fast checks (pre-commit)
+   bash quality_checks.sh --full         # Comprehensive (ag verify)
+   ag quality status                     # Show profile info
+   ```
+
+4. **Configure enforcement** (STACK.md `## Settings`):
+   - `quality_checks: blocking` — fail commit on check failure (default)
+   - `quality_checks: advisory` — warn only
+   - `quality_checks: off` — skip
+
+5. **Available stack knowledge files** (`.agentic/lib/quality_knowledge/`):
+   - `web_fullstack` — Next.js, Nuxt, Remix, SvelteKit
+   - `backend_python` — Django, FastAPI, Flask
+   - `backend_node` — Express, Fastify, Hono
+   - `mobile_react_native` — React Native, Expo
+   - `audio_dsp` — JUCE, VST3, AU
+   - `game_2d_web` — Phaser, PixiJS
+   - `game_unity` — Unity C#
+
+6. **Pre-commit hook** — verify installation:
    ```bash
    # Verify git hooks are installed (scaffold should have done this)
    actual=$(git config core.hooksPath 2>/dev/null || echo "")

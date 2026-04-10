@@ -181,7 +181,7 @@ cmd_check() {
 
     if [ -z "$last_retro_date" ]; then
         echo "No retrospective recorded yet. Consider running your first!"
-        echo "  See: .agentic/lib/workflows/retrospective.md"
+        echo "  See: ag retro"
         exit 0
     fi
 

@@ -272,7 +272,7 @@ check_retro_due() {
         record_issue "retrospective due"
         if [ "$MODE" != "quiet" ]; then
             echo -e "Retro:      ${YELLOW}DUE — run a project retrospective${NC}"
-            echo -e "            ${DIM}See: .agentic/workflows/retrospective.md${NC}"
+            echo -e "            ${DIM}See: ag retro${NC}"
         fi
     elif [ "$MODE" != "quiet" ] && [ "$MODE" != "increment" ]; then
         echo -e "Retro:      ${GREEN}OK${NC}"

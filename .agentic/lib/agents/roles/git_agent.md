@@ -14,7 +14,7 @@ tokens: ~387
 - `.agentic/pipeline/F-####-pipeline.md` - All completed work
 - All handoff notes from previous agents
 - `STACK.md` - Branch naming, commit conventions
-- `.agentic/lib/workflows/git_workflow.md` - Git practices
+- `.claude/skills/committing-changes/SKILL.md` - Git workflow and commit gates
 
 ## Responsibilities
 

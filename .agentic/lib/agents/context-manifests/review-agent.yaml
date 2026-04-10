@@ -7,12 +7,12 @@ description: Review code quality, security, and standards compliance
 
 required:
   - spec/contracts/{feature_id}.yaml         # Original requirements
-  - .agentic/quality/programming_standards.md # Code standards
-  - .agentic/agents/shared/guidelines/anti-hallucination.md
+  - .agentic/lib/quality_knowledge/code_quality.knowledge.md  # Code quality & security standards
+  - .agentic/.agentic/lib/quality_knowledge/anti_hallucination.knowledge.md
   # Changed files passed dynamically from pipeline
 
 optional:
-  - .agentic/quality/test_strategy.md         # Test quality review
+  - .agentic/lib/quality_knowledge/testing.knowledge.md  # Testing methodology
   - .agentic/checklists/before_commit.md      # Pre-commit checklist
 
 exclude:

@@ -8,7 +8,7 @@ description: Coordinate agents and ensure framework compliance
 required:
   - STATUS.md                               # Current project state
   - CONTEXT_PACK.md[entry_points]           # Project structure overview
-  - .agentic/agents/shared/guidelines/anti-hallucination.md
+  - .agentic/.agentic/lib/quality_knowledge/anti_hallucination.knowledge.md
 
 optional:
   - HUMAN_NEEDED.md                         # Blockers to address

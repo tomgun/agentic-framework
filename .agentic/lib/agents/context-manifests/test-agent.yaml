@@ -8,8 +8,8 @@ description: Write failing tests for contract assertions (TDD red phase)
 required:
   - spec/contracts/{feature_id}.yaml       # What to test
   - STACK.md[test_framework,test_commands]  # How to test
-  - .agentic/quality/test_strategy.md       # Testing guidelines
-  - .agentic/agents/shared/guidelines/anti-hallucination.md
+  - .agentic/lib/quality_knowledge/testing.knowledge.md  # Testing methodology
+  - .agentic/.agentic/lib/quality_knowledge/anti_hallucination.knowledge.md
 
 optional:
   - tests/                                  # Existing test patterns (sampled)

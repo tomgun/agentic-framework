@@ -11,7 +11,7 @@ Please verify and update:
 
 1. **Code Quality:**
    - All tests pass (unit + integration + acceptance)
-   - Code follows `.agentic/lib/workflows/programming_standards.md`
+   - Code follows `.agentic/conventions.md`
    - No linter errors or warnings
    - Code is documented (comments where needed)
 

@@ -56,6 +56,5 @@ Please follow the spec migration workflow:
 ---
 
 **Reference:**
-- See `.agentic/lib/workflows/spec_migrations.md` for full details
 - Migration template: `.agentic/spec/MIGRATION.template.md`
 

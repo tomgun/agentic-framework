@@ -84,7 +84,6 @@ Track HOW we arrived at current specs, not just WHAT the specs are.
 
 ## Usage
 
-See: `.agentic/workflows/spec_migrations.md`
 
 ## Files
 

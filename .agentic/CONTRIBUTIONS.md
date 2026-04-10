@@ -8,6 +8,24 @@
 
 ## Recent Contributions
 
+### QUALITY KNOWLEDGE SYSTEM — Rebuild What v2 Deleted (2026-04-10)
+
+**User insight 1 — "how is quality for building production projects guaranteed? from planning to testing"**: User identified the fundamental question: after v2 deleted ~17K lines of quality/workflow docs, what actually ensures code quality for production projects? Investigation revealed `conventions.md` (83 lines) was the only surviving general-purpose quality guide — the v2 commit messages claimed content was "absorbed into conventions.md and v2 role prompts" but this was largely not true.
+
+**User insight 2 — "we also had some precalculated guidelines for different types of projects... for VST plugins certain script run examples"**: User remembered the stack-specific quality profiles (VST plugin validation with pluginval, DSP testing, performance benchmarks) that were deleted. These contained deep domain knowledge not derivable from code — failure modes, testing strategies, library selection heuristics per technology. User directed rebuilding this as a structured system, not just docs.
+
+**User insight 3 — "i would preset this blocking by default (ask user if this is ok)"**: When asked about enforcement level for quality checks, user chose blocking-by-default with a setting to change it. Rejected the profile-based approach ("we don't have profiles as such, only settings") — enforcement is a setting, not a profile attribute.
+
+**User insight 4 — "do we have code quality instructions? and security (essential for implementation and review!)?"**: User identified that stack-specific knowledge alone isn't enough — universal security (OWASP), testing methodology, and code quality guidelines are essential for every project. This expanded scope from 7 stack-specific files to 7 + 7 universal knowledge files.
+
+**User insight 5 — "and or unit testing - preference over london vs classical"**: User specifically asked for testing methodology guidance including the London/Classical unit testing debate. Chose "context-dependent guidance" — provide a decision framework rather than mandate one school. This became the testing.knowledge.md with a decision matrix for when to use each approach.
+
+**User insight 6 — "that feature number cannot be correct"**: User caught that F-302 was wrongly created as a new feature when the work is actually an enhancement to F-008 (Code Quality Standards). Applied the "no feature inflation" rule — improvements to existing features are deliverables on those features, not new F-XXXX. The agent had violated this rule despite it being in CLAUDE.md.
+
+**User insight 7 — "was there other things worth resurfacing?" (re: broken references)**: User pushed for a comprehensive audit of ALL broken references to deleted files, not just the quality/ ones. This revealed 119 broken refs across 52 files, including 2 functional breakages (add-frontmatter.sh crash, context-for-role.sh silent failure). User directed "ultrathink" analysis of every reference.
+
+**Why these matter**: This session rebuilt the framework's quality assurance knowledge layer that was lost in v2. The hybrid YAML+markdown format with a Python generator creates an auto-enforced pipeline: `ag quality setup` detects the stack, generates checks, and wires them into pre-commit + `ag commit`. The universal knowledge files (security, testing, code quality) fill the gap that `conventions.md` was too thin to cover. The broken reference cleanup fixed 111 dead links that were silently degrading agent behavior (missing core rules, missing anti-hallucination guidance).
+
 ### PLANNED ASSERTIONS INVISIBLE + ENFORCEMENT HIERARCHY GAPS (2026-04-09)
 
 **User insight 1 — "acs not updated" problem identification**: User identified that `status: planned` assertions in YAML contracts were permanently invisible to the workflow. No gate, no sync check, no verify output ever surfaced them. The `planned_assertions` property existed in contracts.py but was never called from any workflow gate. Concrete evidence: F-025 AC-006 through AC-009 stayed `planned` through an entire PR + follow-up session.

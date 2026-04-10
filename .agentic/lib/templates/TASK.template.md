@@ -34,6 +34,6 @@ Purpose: smallest implementable, testable unit of work. Optimize for small diffs
 - [ ] Code implemented
 - [ ] Unit tests added/updated
 - [ ] Docs updated (`.agentic/STATUS.md`, relevant spec sections)
-- [ ] Review checklist considered (see `.agentic/lib/quality/review_checklist.md`)
+- [ ] Review checklist considered (see `.agentic/lib/quality_knowledge/review_checklist.knowledge.md`)
 
 

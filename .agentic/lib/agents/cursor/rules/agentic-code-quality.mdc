@@ -5,7 +5,7 @@ globs: ["src/**/*", "lib/**/*", "*.ts", "*.tsx", "*.js", "*.jsx", "*.py", "*.go"
 
 # Code Quality Standards
 
-Follow `.agentic/quality/programming_standards.md` and `.agentic/quality/test_strategy.md`.
+Follow `.agentic/lib/quality_knowledge/code_quality.knowledge.md` and `.agentic/lib/quality_knowledge/testing.knowledge.md`.
 
 ## Programming Standards
 

@@ -41,5 +41,71 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-0116
 
+  - id: AC-004
+    text: >
+      Quality knowledge base exists at .agentic/lib/quality_knowledge/ with schema,
+      7 stack-specific YAML+markdown pairs (web_fullstack, backend_python, backend_node,
+      mobile_react_native, audio_dsp, game_2d_web, game_unity), and 7 universal knowledge
+      files (security, testing, code_quality, green_coding, library_selection,
+      review_checklist, anti_hallucination).
+    type: structural
+    verify: |
+      test -f .agentic/lib/quality_knowledge/_schema.yaml &&
+      for s in web_fullstack backend_python backend_node mobile_react_native audio_dsp game_2d_web game_unity; do
+        test -f ".agentic/lib/quality_knowledge/${s}.yaml" || exit 1
+        test -f ".agentic/lib/quality_knowledge/${s}.knowledge.md" || exit 1
+      done &&
+      for u in security testing code_quality green_coding library_selection review_checklist anti_hallucination; do
+        test -f ".agentic/lib/quality_knowledge/${u}.knowledge.md" || exit 1
+      done
+
+  - id: AC-005
+    text: >
+      quality_profile_generator.py generates quality_checks.sh, conventions-stack.md,
+      and quality-gate.sh from detected stack. ag quality subcommand (setup|run|status)
+      is registered and functional.
+    type: structural
+    verify: |
+      test -f .agentic/lib/tools/quality_profile_generator.py &&
+      test -f .agentic/lib/tools/generate-quality-profile.sh &&
+      test -f .agentic/lib/tools/commands/quality.sh &&
+      grep -q "quality" .agentic/lib/tools/ag.sh
+
+  - id: AC-006
+    text: >
+      ag commit runs quality_checks.sh when present. Enforcement controlled by
+      quality_checks setting (blocking|advisory|off). Default is blocking.
+    type: behavioral
+    verify: |
+      grep -q "quality_checks" .agentic/lib/tools/commands/commit.sh &&
+      grep -q "quality_checks" .agentic/lib/init/STACK.template.md &&
+      grep -q "quality_checks" .agentic/lib/presets/profiles.conf
+
+  - id: AC-007
+    text: >
+      scaffold.sh calls generator after brownfield discovery. Generated quality-gate.sh
+      wires into pre-commit Check 17 via extensions/gates/.
+    type: structural
+    verify: |
+      grep -q "generate-quality-profile" .agentic/lib/init/scaffold.sh
+
+  - id: AC-008
+    text: >
+      No broken references to deleted quality/, workflows/, or agents/shared/guidelines/
+      files remain in active code (excluding anatomy.yaml, CHANGELOG, journal, and
+      -f guarded references in plan.sh/specs.sh).
+    type: structural
+    verify: |
+      count=$(grep -rn '\.agentic/\(lib/\)\?\(quality\|workflows\)/[a-z_]*\.md\|agents/shared/guidelines/' \
+        .agentic/lib/ --include="*.md" --include="*.yaml" --include="*.sh" --include="*.mdc" --include="*.py" \
+        2>/dev/null | grep -v 'quality_knowledge\|quality_profiles\|anatomy\.yaml\|CHANGELOG\|journal/' | wc -l)
+      test "$count" -le 8
+
 nfr_refs: []
-migrations: []
+migrations:
+  - date: "2026-04-10"
+    trigger: expansion
+    reason: >
+      Expanded F-008 with quality knowledge system: 21 files (7 universal +
+      14 stack-specific), Python generator, ag quality CLI, enforcement wiring.
+      Added AC-004 through AC-008. Fixed 111 broken references to deleted v2 files.

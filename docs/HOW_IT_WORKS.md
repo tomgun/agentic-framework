@@ -150,7 +150,7 @@ graph TB
         M_AC_COV[coverage.py --ac-coverage<br/>per-AC test mapping]
 
         %% Quality
-        M_QUALITY_DOCS[.agentic/quality/<br/>7 standard documents]
+        M_QUALITY_DOCS[.agentic/lib/quality_knowledge/<br/>21 knowledge files + generator]
         M_QUALITY_WIRING[context manifests<br/>YAML role→quality wiring]
     end
 
@@ -821,12 +821,12 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 | **WIP Recovery** (F-016-0053) | `wip.sh start/checkpoint/complete` creates `.agentic/session/WIP.md` lock. Pre-commit blocks if WIP exists. Session start warns of interrupted work. 5-step recovery protocol. | ACTIVE - structural gate |
 | **Multi-Environment Support** (F-0054) | Documented workflow for switching between Claude/Cursor/Copilot when tokens run out. Durable artifacts ensure state survives tool switches. | PASSIVE - documented workflow, no enforcement |
 | **Upgrade System** (F-020, F-0094) | `upgrade.sh` with FEATURE_REGISTRY. Version-aware: only shows features new since user's previous version. `.upgrade_pending` marker. | ACTIVE - structural |
-| **Quality Standards** (F-0015) | 7 quality documents in `.agentic/quality/`. Programming standards, test strategy, review checklist, library selection, green coding, integration testing, design for testability. | ACTIVE - wired via context manifests |
+| **Quality Standards** (F-008) | 21 quality knowledge files in `.agentic/lib/quality_knowledge/`: 7 universal (security, testing, code quality, green coding, library selection, review checklist, anti-hallucination) + 7 stack-specific pairs (YAML + markdown for web, Python, Node, React Native, audio DSP, 2D web games, Unity). `ag quality setup` auto-generates `quality_checks.sh` from detected stack. Enforcement via `ag commit` + pre-commit Check 17. | ACTIVE - structural enforcement |
 | **Spec-Driven Development** (F-002-0006) | Features defined via YAML contracts (`spec/contracts/F-####.yaml`) with machine-verifiable assertions. Each assertion has a `verify` command and linked tests. Shipped contracts are protected — changes require migration entries. `user_input` field enables spec-as-control-interface (user writes change request, agent processes it). `ag contract check` runs all structural assertions. `ag contract promote` promotes planned assertions to shipped after implementation. `ag migrate-specs` converts legacy markdown ACs to YAML contracts. Unshipped assertions in shipped contracts are surfaced by `ag done` (advisory), `ag sync` (Phase 4b drift), and `verify-contracts.sh` (summary). | ACTIVE - structural gate (Formal) |
 
 **Hidden mechanism**: The staleness check in `pre-commit-check.sh` (Check 3) compares JOURNAL.md modification time against last git commit. This forces agents to update project state before every commit, ensuring long-term projects never go stale.
 
-**Hidden mechanism**: When `programming_standards.md` is REQUIRED (not optional) in context manifests, the implementation agent receives quality standards before writing any code — quality by default, not quality by review.
+**Hidden mechanism**: Quality knowledge files are loaded per-role via context manifests — agents receive both universal rules (security, testing methodology, code quality) and stack-specific guidance before writing code. `ag quality setup` generates enforcement artifacts (`quality_checks.sh`, pre-commit gate) that block commits on quality check failure — quality by default, not quality by review.
 
 ---
 
@@ -838,11 +838,11 @@ Precondition checks run in `preconditions.py` — each returns a `CheckResult` w
 |---------|-------------|--------|
 | **Token-Efficient Scripts** (F-019) | `status.sh`, `journal.sh`, `feature.sh`, `blocker.sh` — surgical updates without reading entire files. ~40x more efficient than read-modify-write. | ACTIVE - core mechanism |
 | **State File Flush** (F-0196, F-035) | `ag flush` commits state-only files (STATUS.md, BACKLOG.json, JOURNAL.md, etc.) to main. Hardcoded allowlist + prefix patterns (manifests/) enforce security boundary — code files cannot bypass PR review. Uses `--no-verify` with self-contained validation stricter than the pre-commit hook. `--features` flag allows FEATURES.md status-line-only changes. When `main_branch_mode: protected`, creates an ephemeral `state/flush-*` branch and auto-opens a PR via `gh` instead of pushing directly to main. Falls back to manual PR instructions when `gh` is unavailable. | ACTIVE |
-| **Subagent Context Assembly** (F-0036) | `context-for-role.sh` + 27 YAML manifests. Each agent gets 2-6K tokens of role-specific context instead of loading everything. `ALWAYS_INJECT` array ensures core-rules.md (~300 tokens) always present. Supports section extraction (e.g., `STACK.md[## Build]`). | AVAILABLE but UNDERUTILIZED in practice |
+| **Subagent Context Assembly** (F-0036) | `context-for-role.sh` + 27 YAML manifests. Each agent gets 2-6K tokens of role-specific context instead of loading everything. `ALWAYS_INJECT` array ensures conventions.md always present. Anti-hallucination and quality knowledge loaded per-role via manifests. Supports section extraction (e.g., `STACK.md[## Build]`). | AVAILABLE but UNDERUTILIZED in practice |
 | **Sequential Agent Pipeline** (F-0034) | 8 specialist agents work in sequence: Research → Plan → Test → Implement → Review → Spec Update → Documentation → Git. Each loads only role-relevant context (<50K vs 150-200K for general agent). | DOCUMENTED but RARELY USED in practice |
 | **Orchestrator Agent** (F-025) | Coordinates pipeline, delegates to specialists. Never implements itself. Ensures framework compliance across handoffs. | DOCUMENTED but RARELY INVOKED manually |
 | **Agent Mode Selection** (F-0103) | `agent_mode: premium|balanced|economy` in STACK.md. Controls model selection per task type. Planning always gets best model (bad specs waste more tokens than saved). | IN PROGRESS - config exists, enforcement partial |
-| **Modular Guidelines** (F-0102) | Guidelines split into lazy-loaded modules (anti-hallucination.md, token-efficiency.md, etc.). Agents load only relevant modules per task. ~84% token reduction vs monolithic file. | AVAILABLE but loading is agent-discretionary |
+| **Modular Guidelines** (F-0102) | Guidelines split into `quality_knowledge/` files + `conventions.md`. Universal knowledge (security, testing, code quality) loaded per-role via context manifests. Stack-specific knowledge generated by `ag quality setup`. ~84% token reduction vs monolithic file. | ACTIVE - loaded via manifests |
 | **Instruction File Size Limits** | L-0002 empirical finding: compliance degrades past ~100 lines. All templates slimmed to 38-53 lines. Pre-commit Check 10 warns if instruction files exceed limits. | ACTIVE - structural + empirically validated |
 | **Reading Protocols** | `reading_protocols.md` defines token budgets per task type (3-5K for focused feature, not 50K). | DOCUMENTED - behavioral |
 | **Tier-Based Model Selection** (F-0082) | Model recommendations use tiers (Cheap/Fast, Mid-tier, Powerful) instead of specific names. Future-proof. | ACTIVE - documented in orchestration tables |
@@ -1003,7 +1003,7 @@ These features exist but don't clearly derive from the 13 principles:
 | Feature | Status | Description |
 |---------|--------|-------------|
 | **Multi-Agent Helper Scripts** (F-0108) | planned | `agents_active.sh`, `check_agent_conflicts.sh`, `sync_worktrees.sh`, `git_mode.sh`, `upgrade_profile.sh` — all documented with code sketches but never implemented. |
-| **Game Development Support** | PLANNED commit exists | Comprehensive game dev quality profiles (Unity, Unreal, Godot) — committed as PLANNED but never implemented. |
+| **Game Development Support** | IMPLEMENTED (v0.81.0, F-008) | Quality knowledge for 2D web games (Phaser/PixiJS) and Unity (C#) in `quality_knowledge/`. Generator produces stack-specific `quality_checks.sh`. |
 | **Commercial Media Services** | PLANNED commit exists | Asset workflow, visual design support — committed as PLANNED but never implemented. |
 | **Comprehensive Licensing Support** | PLANNED commit exists | Project licensing automation — committed as PLANNED but never implemented. |
 

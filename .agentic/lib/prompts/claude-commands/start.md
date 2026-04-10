@@ -5,7 +5,6 @@ description: Start new session with context loading
 
 I'm starting a new work session on this project.
 
-Please follow the session start workflow from `.agentic/prompts/claude/session_start.md` or `.agentic/lib/workflows/proactive_agent_loop.md`.
 
 Specifically:
 

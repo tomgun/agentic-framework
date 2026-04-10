@@ -106,6 +106,13 @@ if [[ -n "$_POST_TOOL" ]]; then
           fi
           ;;
       esac
+      # --- Stack conventions nudge (F-302, one-time per session) ---
+      if [[ ! -f ".agentic/session/.stack_conventions_nudged" ]]; then
+        if [[ -f ".agentic/local/conventions-stack.md" ]]; then
+          echo "📋 Stack conventions available: .agentic/local/conventions-stack.md" >&2
+          touch ".agentic/session/.stack_conventions_nudged" 2>/dev/null || true
+        fi
+      fi
       ;;
   esac
 

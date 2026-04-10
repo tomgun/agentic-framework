@@ -188,7 +188,7 @@ print(c.path if c else '')
 
     # Always-inject: constitutional rules for ALL agent roles
     local ALWAYS_INJECT=(
-        ".agentic/agents/shared/guidelines/core-rules.md"
+        ".agentic/conventions.md"
     )
 
     if $dry_run; then

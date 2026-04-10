@@ -132,7 +132,7 @@ See [`.agentic/token_efficiency/reading_protocols.md`](token_efficiency/reading_
 
 **For AI agents** (humans can read too):
 1. [`agents/shared/agent_operating_guidelines.md`](agents/shared/agent_operating_guidelines.md) - Core rules
-2. [`workflows/tdd_mode.md`](workflows/tdd_mode.md) or [`workflows/dev_loop.md`](workflows/dev_loop.md) - Development workflow
+2. [`.claude/skills/writing-tests/SKILL.md`](.claude/skills/writing-tests/SKILL.md) or [`.claude/skills/implementing-features/SKILL.md`](.claude/skills/implementing-features/SKILL.md) - Development workflow
 3. [`token_efficiency/reading_protocols.md`](token_efficiency/reading_protocols.md) - How to read efficiently
 4. **🚨 Working ON the framework itself?** [`FRAMEWORK_DEVELOPMENT.md`](../FRAMEWORK_DEVELOPMENT.md) - Additional guidelines for framework development
 
@@ -181,9 +181,9 @@ Key transitions are gated by artifact preconditions (plan.md, spec.md, tests, do
 - Phase queries: `ag intel architecture|spec|implement|test [F-XXXX]`
 
 **Quality:**
-- Test strategy: [`.agentic/lib/quality/test_strategy.md`](quality/test_strategy.md)
-- Code review: [`.agentic/lib/quality/review_checklist.md`](quality/review_checklist.md)
-- Definition of done: [`.agentic/lib/workflows/definition_of_done.md`](workflows/definition_of_done.md)
+- Test strategy: [`.agentic/lib/quality_knowledge/testing.knowledge.md`](quality_knowledge/testing.knowledge.md)
+- Code review: [`.agentic/lib/quality_knowledge/review_checklist.knowledge.md`](quality_knowledge/review_checklist.knowledge.md)
+- Definition of done: [`.claude/skills/completing-work/SKILL.md + `ag done``](.claude/skills/completing-work/SKILL.md)
 - Spec analysis: `bash .agentic/lib/tools/spec-analyze.sh F-####` (ambiguity, NFR, AC↔test gaps — advisory)
 - AC coverage: `python3 .agentic/lib/tools/coverage.py --ac-coverage F-####` (per-AC test mapping)
 
@@ -209,8 +209,6 @@ Specialized agents work sequentially for optimal context efficiency:
 - **Auto mode**: Agents hand off automatically (you approve at key points)
 
 **Details**:
-- Agent roles & responsibilities: [`workflows/sequential_agent_specialization.md`](workflows/sequential_agent_specialization.md)
-- Automatic coordination: [`workflows/automatic_sequential_pipeline.md`](workflows/automatic_sequential_pipeline.md)
 - Monitor: `bash .agentic/lib/tools/pipeline_status.sh F-####`
 
 ---
@@ -246,7 +244,7 @@ Details: [`.agentic/lib/DEVELOPER_GUIDE.md`](DEVELOPER_GUIDE.md) (Autonomous Mod
 **Why TDD?** Better token economics (smaller increments, clearer progress, less rework) + forces testable code.
 
 Enable: Set `development_mode: tdd` in `STACK.md` (default in template)  
-Details: [`.agentic/lib/workflows/tdd_mode.md`](workflows/tdd_mode.md)
+Details: [`.claude/skills/writing-tests/SKILL.md`](.claude/skills/writing-tests/SKILL.md)
 
 **Standard mode** (for exploration/prototyping):
 1. Pick work from `.agentic/STATUS.md`
@@ -255,7 +253,7 @@ Details: [`.agentic/lib/workflows/tdd_mode.md`](workflows/tdd_mode.md)
 4. Update docs
 
 Enable: Set `development_mode: standard` in `STACK.md`  
-Details: [`.agentic/lib/workflows/dev_loop.md`](workflows/dev_loop.md)
+Details: [`.claude/skills/implementing-features/SKILL.md`](.claude/skills/implementing-features/SKILL.md)
 
 ---
 
@@ -307,12 +305,12 @@ Details: [`.agentic/lib/workflows/dev_loop.md`](workflows/dev_loop.md)
 You shouldn't need to edit these - they're the framework:
 - **agents/**: Agent-specific rules (Cursor, Copilot, Claude)
 - **init/**: Initialization templates and playbook
-- **quality/**: Quality guidelines (testing, review, design)
+- **quality_knowledge/**: Quality knowledge (testing, security, code quality, stack-specific)
 - **spec/**: Specification templates
 - **support/**: Stack profiles, doc templates, CI templates
 - **token_efficiency/**: Token budgeting and context management
 - **tools/**: Automation scripts (brief.sh, report.sh, verify.sh, etc.)
-- **workflows/**: Development workflows (dev loop, debugging, etc.)
+- **Skills**: `.claude/skills/` — JIT workflow guidance (implementing, reviewing, testing, committing)
 
 ### In `.agentic/local/` (your project customizations)
 Survives framework upgrades — `.agentic/` gets replaced, `.agentic/local/` does not:
@@ -336,35 +334,32 @@ Survives framework upgrades — `.agentic/` gets replaced, `.agentic/local/` doe
 **Implement a feature:**
 - Feature list: `.agentic/spec/FEATURES.md`
 - Acceptance criteria: `.agentic/spec/acceptance/F-####.md`
-- Dev workflow: `.agentic/lib/workflows/dev_loop.md`
-- TDD mode (recommended): `.agentic/lib/workflows/tdd_mode.md`
+- Dev workflow: `.claude/skills/implementing-features/SKILL.md`
+- TDD mode (recommended): `.claude/skills/writing-tests/SKILL.md`
 - **Autonomous implementation**: `ag auto task F-####` (hands-off, creates PR)
 - **Autonomous test-fix**: `ag auto verify` (loop until green)
 - **Batch implementation**: `ag auto crunch` (all planned features)
-- Git workflow: `.agentic/lib/workflows/git_workflow.md`
-- Code annotations: `.agentic/lib/workflows/code_annotations.md`
+- Git workflow: `.claude/skills/committing-changes/SKILL.md
 
 **Work with a team / multiple agents:**
-- Multi-agent coordination: `.agentic/lib/workflows/multi_agent_coordination.md`
-- Git worktrees: `.agentic/lib/workflows/multi_agent_coordination.md#git-worktrees`
+- Multi-agent coordination: `AGENTS.json + `ag implement` (auto-worktree)
+- Git worktrees: `AGENTS.json + `ag implement` (auto-worktree)
 - Agent coordination file: `AGENTS.json`
-- PR workflow: `.agentic/lib/workflows/git_workflow.md#pull-request-workflow`
+- PR workflow: `.claude/skills/committing-changes/SKILL.md
 
 **Write tests:**
-- Test strategy: `.agentic/lib/quality/test_strategy.md`
-- Integration testing: `.agentic/lib/quality/integration_testing.md`
-- Design for testability: `.agentic/lib/quality/design_for_testability.md`
-- TDD mode (optional): `.agentic/lib/workflows/tdd_mode.md`
+- Test strategy: `.agentic/lib/quality_knowledge/testing.knowledge.md`
+- Integration testing: `.agentic/lib/quality_knowledge/testing.knowledge.md`
+- Design for testability: `.agentic/conventions.md (Testability section)`
+- TDD mode (optional): `.claude/skills/writing-tests/SKILL.md`
 
 **Understand specifications:**
 - Spec templates: `.agentic/spec/*.template.md`
 - Spec schema (field definitions, valid values): `.agentic/spec/SPEC_SCHEMA.md`
-- Spec validation: `.agentic/lib/workflows/spec_format_validation.md`
 
 **Do research & retrospectives:**
-- Project retrospectives: `.agentic/lib/workflows/retrospective.md`
-- Research mode: `.agentic/lib/workflows/research_mode.md`
-- Documentation verification: `.agentic/lib/workflows/documentation_verification.md`
+- Project retrospectives: ``ag retro``
+- Research mode: `.claude/skills/researching-topics/SKILL.md`
 
 **Make an architectural decision:**
 - ADR template: `.agentic/spec/ADR.template.md`
@@ -376,14 +371,13 @@ Survives framework upgrades — `.agentic/` gets replaced, `.agentic/local/` doe
 - Small changes: `.agentic/token_efficiency/change_small.md`
 
 **Check quality:**
-- Review checklist: `.agentic/lib/quality/review_checklist.md`
-- Definition of done: `.agentic/lib/workflows/definition_of_done.md`
-- Continuous quality validation: `.agentic/lib/workflows/continuous_quality_validation.md`
+- Review checklist: `.agentic/lib/quality_knowledge/review_checklist.knowledge.md`
+- Definition of done: `.claude/skills/completing-work/SKILL.md + `ag done``
+- Continuous quality validation: `ag quality setup` (generate stack-specific checks from STACK.md), `ag quality run` (execute checks), `ag quality status` (show profile). Knowledge in `.agentic/lib/quality_knowledge/`. See DEVELOPER_GUIDE §Continuous Quality Validation.
 - Run verification: `bash .agentic/lib/tools/verify.sh`
 - **Autonomous test-fix loop**: `ag auto verify` (auto-fixes failing tests)
 - **Visual verification**: `ag auto verify --visual` (AI reviews E2E screenshots)
-- E2E testing contract: `.agentic/lib/quality/e2e_testing_contract.md`
-- E2E setup guide: `.agentic/lib/quality/e2e_setup_guide.md`
+- E2E testing contract: `.agentic/lib/quality_knowledge/testing.knowledge.md`
 
 **Get project health:**
 - `bash .agentic/lib/tools/doctor.sh` - Check structure
@@ -405,7 +399,6 @@ Survives framework upgrades — `.agentic/` gets replaced, `.agentic/local/` doe
 | Agent context reset mid-task | Check `.agentic/STATUS.md` "Current session state" |
 | Tests are missing or broken | Run `bash .agentic/lib/tools/doctor.sh --full` |
 | Don't know what to work on next | Check `.agentic/STATUS.md` "Next up" and `.agentic/HUMAN_NEEDED.md` |
-| Project getting complex | See `.agentic/lib/workflows/scaling_guidance.md` |
 
 **More issues & detailed solutions**: [`DEVELOPER_GUIDE.md#troubleshooting`](DEVELOPER_GUIDE.md#troubleshooting)
 
@@ -429,5 +422,5 @@ See [`MANUAL_OPERATIONS.md`](MANUAL_OPERATIONS.md) for token-free operations.
 1. **New project?** Run `bash .agentic/lib/init/scaffold.sh` then agent init
 2. **Existing project?** Read `CONTEXT_PACK.md` → `.agentic/STATUS.md` → `JOURNAL.md`
 3. **Need deep understanding?** See [`FRAMEWORK_MAP.md`](FRAMEWORK_MAP.md)
-4. **Ready to code?** Follow [`.agentic/lib/workflows/dev_loop.md`](workflows/dev_loop.md)
+4. **Ready to code?** Follow [`.claude/skills/implementing-features/SKILL.md`](.claude/skills/implementing-features/SKILL.md)
 

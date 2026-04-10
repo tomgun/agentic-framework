@@ -22,7 +22,7 @@ Please follow this workflow:
 
 3. **Implementation:**
    - Write minimal code to make tests pass (green phase)
-   - Follow programming standards in `.agentic/lib/workflows/programming_standards.md`
+   - Follow programming standards in `.agentic/conventions.md`
    - Add code annotations (`@feature F-[XXXX]`, `@acceptance AC1`)
    - Refactor for clarity and maintainability
 

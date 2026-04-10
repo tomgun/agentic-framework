@@ -152,7 +152,7 @@ If your stack isn't covered:
 
 ## See Also
 
-- Continuous Quality Validation: `.agentic/lib/workflows/continuous_quality_validation.md`
+- Continuous Quality Validation: `ag quality setup`
 - Init Playbook: `.agentic/lib/init/init_playbook.md`
 - Stack Profiles: `.agentic/support/stack_profiles/`
 

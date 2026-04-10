@@ -119,7 +119,7 @@ if [[ -d "assets/" ]] && find assets/ -name "*.mp3" -o -name "*.wav" -o -name "*
   echo "  ✅ Audio files found (good for game feel)"
 else
   echo "  ℹ️  No audio files found - consider adding sound effects"
-  echo "     See: .agentic/workflows/game_development.md#juiciness"
+  echo "     See: .agentic/lib/quality_knowledge/game_2d_web.knowledge.md"
 fi
 
 # Battery Usage Warning

@@ -25,3 +25,10 @@ For quick reviews (PR or working tree), use the Agent tool to spawn a subagent:
 - Give it the diff command (`gh pr diff N` or `git diff`)
 - Ask it to check: correctness, security, performance, style, tests, docs
 - Have it return a structured report (Must Fix / Should Fix / Consider / Verdict)
+
+Quality knowledge references (read for detailed guidance):
+- `.agentic/lib/quality_knowledge/review_checklist.knowledge.md` — structured review checklist
+- `.agentic/lib/quality_knowledge/security.knowledge.md` — OWASP patterns, injection, XSS, auth
+- `.agentic/lib/quality_knowledge/testing.knowledge.md` — test quality, coverage, methodology
+- `.agentic/lib/quality_knowledge/code_quality.knowledge.md` — clarity, error handling, design
+- `.agentic/lib/quality_knowledge/green_coding.knowledge.md` — performance, caching, resources

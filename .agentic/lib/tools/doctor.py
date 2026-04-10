@@ -411,7 +411,18 @@ def validate_quality_setup(root: Path) -> list[str]:
     # Check for quality_checks.sh
     quality_script = root / "quality_checks.sh"
     if not quality_script.exists():
-        suggestions.append("No quality_checks.sh found. Consider creating stack-specific quality checks")
+        # Check if we can auto-generate from knowledge files (F-302)
+        knowledge_dir = root / ".agentic" / "lib" / "quality_knowledge"
+        if knowledge_dir.exists() and list(knowledge_dir.glob("*.yaml")):
+            suggestions.append(
+                "No quality_checks.sh found. "
+                "Stack knowledge files available — run: ag quality setup"
+            )
+        else:
+            suggestions.append(
+                "No quality_checks.sh found. "
+                "Consider creating stack-specific quality checks"
+            )
 
     return suggestions
 

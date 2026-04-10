@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 Format Validation Tool - validates that key files follow expected formats.
-See: .agentic/workflows/format_validation.md
 """
 from __future__ import annotations
 
@@ -241,7 +240,6 @@ def main() -> int:
     if total_issues > 0:
         print(f"Found {total_issues} format issue(s)")
         print()
-        print("See: .agentic/workflows/format_validation.md for format expectations")
         return 1
     else:
         print("✓ All format checks passed")
