@@ -5590,3 +5590,14 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-10 20:14 - v0.82.0 release
+
+**What changed**:
+- VERSION bump to 0.82.0 — F-008 quality knowledge system shipped
+
+**Next steps**:
+- Update stale docs
+
+**Blockers**: None
+
