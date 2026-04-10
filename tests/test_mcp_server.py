@@ -94,7 +94,7 @@ class TestToolCalls:
         assert "error" in resp
         assert resp["error"]["code"] == -32601
 
-    @patch("auto.coord_tools.TOOLS", {"get_unblocked": MagicMock(return_value={"features": []})})
+    @patch.dict("auto.coord_tools.TOOLS", {"get_unblocked": MagicMock(return_value={"features": []})}, clear=True)
     def test_successful_tool_call(self, server):
         msg = {
             "jsonrpc": "2.0", "id": 6,
@@ -111,9 +111,9 @@ class TestToolCalls:
         # No isError on success
         assert "isError" not in resp["result"]
 
-    @patch("auto.coord_tools.TOOLS", {
+    @patch.dict("auto.coord_tools.TOOLS", {
         "claim_feature": MagicMock(return_value={"claimed": False, "error": "already claimed"})
-    })
+    }, clear=True)
     def test_tool_error_uses_isError(self, server):
         msg = {
             "jsonrpc": "2.0", "id": 7,
@@ -128,9 +128,9 @@ class TestToolCalls:
         result_data = json.loads(content[0]["text"])
         assert "error" in result_data
 
-    @patch("auto.coord_tools.TOOLS", {
+    @patch.dict("auto.coord_tools.TOOLS", {
         "claim_feature": MagicMock(side_effect=RuntimeError("disk full"))
-    })
+    }, clear=True)
     def test_tool_exception_uses_isError(self, server):
         msg = {
             "jsonrpc": "2.0", "id": 8,

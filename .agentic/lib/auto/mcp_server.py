@@ -49,7 +49,6 @@ PROTOCOL_VERSION = "2024-11-05"
 PARSE_ERROR = -32700
 INVALID_REQUEST = -32600
 METHOD_NOT_FOUND = -32601
-INVALID_PARAMS = -32602
 INTERNAL_ERROR = -32603
 
 
@@ -86,6 +85,15 @@ def _capture_output(fn, *args, **kwargs):
         result = fn(*args, **kwargs)
     except SystemExit as e:
         result = {"error": f"SystemExit: {e.code}"}
+    except Exception:
+        # Restore streams before re-raising so _log() works and
+        # any diagnostic output captured before the crash is preserved.
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
+        captured = stdout_buf.getvalue() + stderr_buf.getvalue()
+        if captured.strip():
+            _log(f"[captured handler output before exception] {captured.strip()}")
+        raise
     finally:
         sys.stdout = old_stdout
         sys.stderr = old_stderr
