@@ -68,8 +68,22 @@ done
 # --- Detect project type from STACK.md if not overridden ---
 if [[ -z "$PROJECT_TYPE" ]]; then
     if [[ -f "$STACK_FILE" ]]; then
-        PROJECT_TYPE=$(grep -E '^\s*-?\s*Primary platform:' "$STACK_FILE" 2>/dev/null \
-            | sed 's/.*: *//' | sed 's/<!--.*-->//' | tr -d ' ' | tr '[:upper:]' '[:lower:]' || echo "")
+        RAW_PLATFORM=$(grep -E '^\s*-?\s*Primary platform:' "$STACK_FILE" 2>/dev/null \
+            | sed 's/.*: *//' | sed 's/<!--.*-->//' | tr '[:upper:]' '[:lower:]' \
+            | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' || echo "")
+        # Normalize freeform values to known project types
+        case "$RAW_PLATFORM" in
+            *web*|*browser*|*webapp*|*frontend*)  PROJECT_TYPE="web" ;;
+            *mobile*|*ios*|*android*|*react-native*) PROJECT_TYPE="mobile" ;;
+            *desktop*|*electron*|*tauri*)         PROJECT_TYPE="desktop" ;;
+            *cli*|*command*|*terminal*)            PROJECT_TYPE="cli" ;;
+            *api*|*backend*|*service*|*server*)    PROJECT_TYPE="api" ;;
+            *game*|*gaming*)                       PROJECT_TYPE="game" ;;
+            *audio*|*dsp*|*vst*|*plugin*)          PROJECT_TYPE="audio" ;;
+            *library*|*sdk*|*lib*|*package*)       PROJECT_TYPE="library" ;;
+            *pipeline*|*etl*|*data*)               PROJECT_TYPE="data-pipeline" ;;
+            *)  PROJECT_TYPE="" ;;
+        esac
     fi
 fi
 

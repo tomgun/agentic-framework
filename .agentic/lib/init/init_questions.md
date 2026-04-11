@@ -45,6 +45,7 @@ The agent should ask only what’s necessary to produce durable context artifact
 - Where are the seams for testing/mocking?
 
 ## Testing (must be explicit)
+- Development approach: acceptance-driven (default) or TDD (tests-first, red-green-refactor)?
 - Unit test framework choice?
 - Integration/E2E test approach (if any)?
 - How tests are run locally and in CI (commands)?
@@ -59,6 +60,7 @@ The agent should ask only what’s necessary to produce durable context artifact
 How do you want to work with AI agents?
 
 a) **Single agent** (default) - One agent handles research, testing, coding, review
+   - Can add multi-agent later with `bash .agentic/lib/tools/setup-agent.sh pipeline`
 b) **Specialized agents** - Different agents for research, testing, coding, review
    - More context-efficient (each agent reads only what it needs)
    - Better for complex features with clear phases
@@ -66,7 +68,6 @@ b) **Specialized agents** - Different agents for research, testing, coding, revi
 c) **Parallel features** - Multiple agents on different features simultaneously
    - Requires: git worktrees, AGENTS.json coordination
    - Best for: large projects with independent features
-d) **Not sure** - Start with single agent, enable later
 
 If (b) or (c): run `bash .agentic/lib/tools/setup-agent.sh pipeline`
 
