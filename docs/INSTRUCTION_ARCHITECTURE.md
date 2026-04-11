@@ -109,6 +109,8 @@ graph TB
 
 **Skills** in v2 are reduced to trigger-word stubs — they match user intent to the right `ag` command but no longer bundle full playbook content. The role prompts replace skill references + checklists + workflow docs.
 
+**Quality knowledge** (v0.82.0, F-008): `.agentic/lib/quality_knowledge/` provides 21 files of universal and stack-specific quality guidance (security, testing methodology, code quality, green coding, library selection, review checklists, anti-hallucination rules, plus 7 stack-specific YAML+markdown pairs). Loaded per-role via context manifests. `ag quality setup` generates enforcement artifacts (`quality_checks.sh`, pre-commit gate). This complements the three-layer architecture as quality infrastructure — not a playbook (it's always available, not JIT), not state (it's framework-provided, not per-project).
+
 ### Layer 3: Project State (per-feature work items)
 
 | Aspect | v1 | v2 |

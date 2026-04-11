@@ -17,7 +17,7 @@ readonly: true
 - Implementation Agent's handoff notes
 - Changed files (from pipeline)
 - `.agentic/spec/contracts/F-####.yaml` - Original requirements
-- `.agentic/lib/quality/programming_standards.md` - Code standards
+- `.agentic/lib/quality_knowledge/code_quality.knowledge.md, security.knowledge.md - Code quality & security
 - Test results
 
 ## Responsibilities

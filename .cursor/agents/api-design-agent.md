@@ -17,7 +17,7 @@ readonly: false
 - `.agentic/spec/contracts/F-####.yaml` - Acceptance criteria (what the API needs to do)
 - `STACK.md` - Tech stack, existing API patterns
 - `CONTEXT_PACK.md [Entry Points]` - Existing endpoints and routing
-- `.agentic/lib/quality/programming_standards.md` - Code standards
+- `.agentic/lib/quality_knowledge/code_quality.knowledge.md, security.knowledge.md - Code quality & security
 
 ## Responsibilities
 

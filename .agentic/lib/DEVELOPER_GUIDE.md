@@ -2279,6 +2279,18 @@ bash .agentic/lib/tools/worktree.sh list
 bash .agentic/lib/tools/worktree.sh remove F-0006
 ```
 
+### Switching Between AI Tools
+
+When you hit token limits or need a different tool's strengths, switch freely between Claude Code, Cursor, Copilot, or Codex. The framework's durable state files ensure continuity:
+
+- **STATUS.md** — current focus and next steps (the new tool reads this first)
+- **JOURNAL.md** — what was done, why, and what's next
+- **CONTEXT_PACK.md** — architecture overview so the new tool doesn't re-explore
+- **AGENTS.json** — active work tracking (prevents conflicts)
+- **STACK.md** — all project settings, unchanged across tools
+
+No explicit handoff needed. Open the project in the new tool — it reads the same state files and picks up where the previous session left off. Each tool has its own instruction file (CLAUDE.md, .cursorrules, copilot-instructions.md) generated from the same framework templates.
+
 ### Pull Request Workflow
 
 **For teams, use PR mode:**

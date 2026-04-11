@@ -50,6 +50,12 @@ graph TB
         TSTRAT[test-strategy.yaml<br/>per test level]
     end
 
+    subgraph qk [.agentic/lib/quality_knowledge/ - Quality Knowledge]
+        QK_UNIVERSAL[7 universal<br/>security, testing, code quality,<br/>green coding, library selection,<br/>review checklist, anti-hallucination]
+        QK_STACK[7 stack-specific YAML+md<br/>web, Python, Node, RN,<br/>audio DSP, 2D games, Unity]
+        QK_GEN[quality_profile_generator.py<br/>→ quality_checks.sh]
+    end
+
     subgraph extensions [.agentic/local/extensions/]
         EXT_SKILLS[skills/<br/>custom skills]
         EXT_GATES[gates/<br/>custom quality gates]

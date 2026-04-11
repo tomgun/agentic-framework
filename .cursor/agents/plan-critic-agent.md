@@ -4,7 +4,7 @@
 
 **Recommended Model Tier**: Mid-tier (e.g., `sonnet`, `gpt-4o`) — follows `agent_mode` setting
 
-**Context**: Used in dialectical review mechanism. See `.agentic/lib/workflows/dialectical_review.md`
+**Context**: Used in dialectical review mechanism. See `.claude/skills/planning-features/SKILL.md`
 
 ## When to Use
 
