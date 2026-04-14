@@ -1,0 +1,100 @@
+# skills-marketplace.yaml — curated allowlist for `ag skills` (F-008 AC-009)
+#
+# This file is the supply-chain trust boundary for the skills.sh marketplace
+# integration. Only skills listed here can be installed via `ag skills install`.
+# Every entry MUST have a `sha` pin (AC-009 enforces this) so that installs are
+# reproducible and upstream tampering is detectable (sha256 of fetched SKILL.md
+# is compared against the expected content after fetch).
+#
+# Schema:
+#   version: 1                                 # bump on breaking changes
+#   stacks:
+#     <stack-key>:                             # logical stack name (e.g. "react")
+#       signals:                               # any-of match triggers install offer
+#         - <type>:<selector>                  # see "Signal grammar" below
+#       skills:
+#         - id: <owner>/<repo>[#<path>]        # GitHub source; path = subdir of SKILL.md
+#           reason: <one-line rationale>       # shown in confirm prompt
+#           sha: <40-char commit sha>          # MANDATORY — `ag skills update-pins` refreshes
+#
+# Signal grammar (matched by skills_marketplace.py against detected stack):
+#   package.json:<jq-path>    — e.g. package.json:dependencies.react
+#   pyproject.toml            — file presence (any content)
+#   requirements.txt          — file presence
+#   Cargo.toml                — file presence
+#   go.mod                    — file presence
+#   Gemfile                   — file presence
+#   tsconfig.json             — file presence
+#   STACK.md:<regex>          — matches a line in STACK.md against regex (case-insensitive)
+#
+# Maintenance (R11): new community-requested skills go through `ag skills request <url>`,
+# which opens a templated GitHub issue on this repo. Maintainers review + append entry here.
+#
+# Precedence rule (R4): if a built-in F-008 quality file covers the same stack
+# (web_fullstack, backend_python, backend_node, mobile_react_native, audio_dsp,
+# game_2d_web, game_unity), marketplace skills are skipped unless --override-builtin
+# is passed to `ag skills install`. Built-in F-008 always wins on conflict.
+#
+# ⚠️ SEED ENTRIES — the sha values below are placeholders (all-zero). Real sha
+# pins must be set by a framework maintainer via `ag skills update-pins` before
+# any install is attempted against real upstream repos. `ag skills install`
+# refuses fetches when the sha is all-zero (explicit seed marker).
+
+version: 1
+
+stacks:
+  react:
+    signals:
+      - package.json:dependencies.react
+      - package.json:devDependencies.react
+      - STACK.md:react
+    skills:
+      - id: vercel-labs/agent-skills#frontend-design
+        reason: React component quality + design conventions
+        sha: "0000000000000000000000000000000000000000"
+
+  nextjs:
+    signals:
+      - package.json:dependencies.next
+      - STACK.md:next\.js|nextjs
+    skills:
+      - id: vercel-labs/agent-skills#web-design-guidelines
+        reason: Next.js routing, data fetching, and design conventions
+        sha: "0000000000000000000000000000000000000000"
+
+  typescript:
+    signals:
+      - tsconfig.json
+      - package.json:devDependencies.typescript
+    skills:
+      - id: anthropics/skills#typescript-quality
+        reason: Strict TS conventions, generic patterns, type-safe API boundaries
+        sha: "0000000000000000000000000000000000000000"
+
+  python:
+    signals:
+      - pyproject.toml
+      - requirements.txt
+      - STACK.md:python
+    skills:
+      - id: anthropics/skills#python-quality
+        reason: PEP 8, type hints, pytest conventions, virtualenv hygiene
+        sha: "0000000000000000000000000000000000000000"
+
+  node:
+    signals:
+      - package.json:engines.node
+      - STACK.md:node\.js|node
+    skills:
+      - id: anthropics/skills#node-quality
+        reason: Node.js async patterns, error handling, npm security
+        sha: "0000000000000000000000000000000000000000"
+
+  azure:
+    signals:
+      - STACK.md:azure
+      - package.json:dependencies.@azure/.*
+    skills:
+      - id: microsoft/azure-skills#deployment-patterns
+        reason: Azure deployment, ARM/Bicep, identity, cost patterns
+        sha: "0000000000000000000000000000000000000000"
