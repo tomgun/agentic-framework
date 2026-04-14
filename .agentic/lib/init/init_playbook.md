@@ -929,6 +929,28 @@ Type a/b/c:"
 - **`spec/TECH_SPEC.md`**: How we're building it, architecture, data models
 - **`.agentic/spec/FEATURES.md`**: Seed with 2-3 initial features (F-001, F-002, etc.)
 
+## Step 3b: Offer marketplace quality skills
+
+After STACK.md is populated, check whether the skills.sh marketplace has
+stack-matched quality skills the user might want:
+
+```bash
+ag skills suggest       # List matching skills (no install)
+```
+
+If matches are shown:
+- Present the list to the user: skill name, source repo, reason
+- Ask if they'd like to install (all, select, or skip)
+- If yes: `ag skills install --all` (or `--select <id>` for specific ones)
+- If skip: note that `ag skills install` is available later
+
+**Notes:**
+- Marketplace skills come from a curated allowlist (`.agentic/lib/data/skills-marketplace.yaml`)
+- All installs require sha-pinned commits; no arbitrary code fetched
+- If a built-in quality file already covers the stack, marketplace skills are skipped
+  unless the user passes `--override-builtin`
+- Skills land in `.agentic/local/extensions/skills/` and auto-propagate to Claude + Cursor
+
 ## Step 4: Set up quality validation
 
 Quality profiles are auto-generated from stack knowledge files (F-302). If `scaffold.sh`

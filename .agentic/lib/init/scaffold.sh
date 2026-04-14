@@ -17,11 +17,12 @@ fi
 usage() {
   cat <<'EOF'
 Usage:
-  bash .agentic/lib/init/scaffold.sh [--profile discovery|formal|autonomous_formal] [--non-interactive]
+  bash .agentic/lib/init/scaffold.sh [--profile discovery|formal|autonomous_formal] [--non-interactive] [--no-skills]
 
 Options:
   --profile discovery|formal|autonomous_formal  Set the profile (default: discovery)
   --non-interactive           Skip profile prompt, use default or specified profile
+  --no-skills                 Skip marketplace skills suggestion (F-008)
 
 Notes:
   - You can also set: AGENTIC_PROFILE=discovery|formal|autonomous_formal
@@ -31,6 +32,7 @@ EOF
 
 PROFILE="${AGENTIC_PROFILE:-}"
 NON_INTERACTIVE=""
+NO_SKILLS=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --profile)
@@ -39,6 +41,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --non-interactive)
       NON_INTERACTIVE="yes"
+      shift
+      ;;
+    --no-skills)
+      NO_SKILLS="yes"
       shift
       ;;
     -h|--help)
@@ -326,6 +332,56 @@ if [[ "$DISCOVERY_RAN" == "yes" && -f "${ROOT_DIR}/STACK.md" ]]; then
     echo "Setting up stack-specific quality checks..."
     bash "$QUALITY_GEN" --root "$ROOT_DIR" 2>&1 || echo "WARN: Quality profile generation failed (continuing)"
     echo ""
+  fi
+fi
+
+# Suggest marketplace skills if stack was detected (F-008 M-002, PR-B)
+# Runs after quality profile generation so STACK.md + package manifests are populated.
+# Skipped in non-interactive / --no-skills / no-TTY / previous skip preference.
+if [[ "$DISCOVERY_RAN" == "yes" && -z "$NO_SKILLS" && -z "$NON_INTERACTIVE" ]]; then
+  SKILLS_ENGINE="${ROOT_DIR}/.agentic/lib/tools/skills_marketplace.py"
+  SKILLS_PREFS="${ROOT_DIR}/.agentic/local/skills-preferences.json"
+  _SKILLS_SKIPPED_BEFORE=""
+  if [[ -f "$SKILLS_PREFS" ]] && python3 -c "
+import json, sys
+d = json.load(open('$SKILLS_PREFS'))
+sys.exit(0 if d.get('skip_on_init') else 1)
+" 2>/dev/null; then
+    _SKILLS_SKIPPED_BEFORE="yes"
+  fi
+
+  if [[ -f "$SKILLS_ENGINE" && -z "$_SKILLS_SKIPPED_BEFORE" ]] && python3 -c "import yaml" 2>/dev/null; then
+    # Check if there are any matches before prompting
+    SKILLS_OUTPUT=$(CLAUDE_PROJECT_DIR="$ROOT_DIR" ROOT_DIR="$ROOT_DIR" python3 "$SKILLS_ENGINE" suggest 2>&1) || true
+    if echo "$SKILLS_OUTPUT" | grep -q "available"; then
+      echo ""
+      echo "$SKILLS_OUTPUT"
+      echo ""
+      if [[ -t 0 && -t 1 ]]; then
+        printf "Install stack-matched quality skills from skills.sh? [y/N/never] "
+        read -r _skills_resp </dev/tty 2>/dev/null || _skills_resp=""
+        case "$_skills_resp" in
+          y|Y|yes)
+            echo ""
+            CLAUDE_PROJECT_DIR="$ROOT_DIR" ROOT_DIR="$ROOT_DIR" \
+              python3 "$SKILLS_ENGINE" install --all --yes --override-builtin 2>&1 || \
+              echo "WARN: Marketplace skill install failed (continuing)"
+            echo ""
+            ;;
+          never)
+            mkdir -p "$(dirname "$SKILLS_PREFS")"
+            echo '{"skip_on_init": true}' > "$SKILLS_PREFS"
+            echo "OK  : marketplace skills skipped (preference saved; remove $SKILLS_PREFS to re-enable)"
+            ;;
+          *)
+            echo "OK  : skipped. Run 'ag skills install --all' later to install."
+            ;;
+        esac
+      else
+        echo "INFO: non-interactive — skipping marketplace skills prompt."
+        echo "      Run 'ag skills suggest' to see matches, 'ag skills install --all' to install."
+      fi
+    fi
   fi
 fi
 
