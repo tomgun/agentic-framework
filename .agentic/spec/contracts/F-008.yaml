@@ -164,6 +164,20 @@ assertions:
     tests:
       - tests/test_skills_marketplace.sh::t_extension_dir_paths_in_generators
 
+  - id: AC-012
+    text: >
+      scaffold.sh offers marketplace skills after brownfield stack detection.
+      Supports --no-skills flag to opt out. Skips automatically in
+      --non-interactive mode, non-TTY environments, or when
+      .agentic/local/skills-preferences.json has skip_on_init: true.
+      Init playbook (init_playbook.md) includes a Step 3b guiding the
+      agent to run ag skills suggest after STACK.md is populated.
+    type: structural
+    verify: |
+      grep -q 'no-skills\|no_skills\|NO_SKILLS' .agentic/lib/init/scaffold.sh &&
+      grep -q 'skills_marketplace' .agentic/lib/init/scaffold.sh &&
+      grep -q 'ag skills suggest' .agentic/lib/init/init_playbook.md
+
 nfr_refs: []
 migrations:
   - id: M-001
@@ -194,3 +208,6 @@ migrations:
       - "Created .agentic/lib/tools/skills_marketplace.py"
       - "Created .agentic/lib/tools/commands/skills.sh + registered ag skills"
       - "Extended generate-cursor-skills.sh to read .agentic/local/extensions/skills/"
+      - "Added AC-012 (scaffold.sh init integration with --no-skills, TTY/non-interactive handling)"
+      - "Extended scaffold.sh with marketplace skills prompt after quality profile generation"
+      - "Added Step 3b to init_playbook.md for agent-guided skills installation"

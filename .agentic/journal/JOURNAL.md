@@ -5627,3 +5627,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: Real sha pins needed before first real install — current entries are seed placeholders (all-zero shas); ag skills install refuses seed pins explicitly.
 
+
+### Session: 2026-04-14 20:15 - F-008 PR-B: skills.sh marketplace init integration
+
+**Why**: PR-A delivered the CLI engine but no integration touchpoint — users had to know about ag skills to use it. PR-B wires it into the natural init flow.
+
+**Decision**: Dual integration: scaffold.sh (structural, runs regardless of agent) + init_playbook.md (agent-guided, richer UX). --no-skills + skip_on_init preference for CI and repeat inits.
+
+**What changed**:
+- scaffold.sh now offers marketplace skills after brownfield stack detection. Three-way handling: interactive TTY gets Y/N/never prompt, non-interactive/no-TTY gets skip with info log, --no-skills flag for explicit opt-out. 'never' saves preference to skills-preferences.json. init_playbook.md Step 3b guides agent to run ag skills suggest after STACK.md fill. AC-012 added to F-008 contract.
+
+**Next steps**:
+- PR-C: STACK.md PostToolUse change hook + instruction-file sync + LLM tests (backlog pos 14).
+
+**Blockers**: None.
+
