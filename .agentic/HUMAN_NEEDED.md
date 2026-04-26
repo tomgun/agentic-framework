@@ -119,6 +119,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0087: Review PR #242 — R-005 filesystem read-only protection
+- **Type**: review
+- **Added**: 2026-04-26
+- **Context**: https://github.com/tomgun/agentic-framework/pull/242 · sprint 2 / Wave A item 1 of 4 · 14 tests (11 unit + 3 e2e skipped without PyYAML in container) · validate_framework 846/846 · two-wall design (chmod 444 + pre-commit gate); honest limit deliberate chmod u+w
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0079: PR #219: F-041 Phase 2 — Anatomy + Token Ledger
