@@ -18,7 +18,9 @@ But greenfield remains a real choice. If the current install base is small enoug
 
 The v5 plan's "What's preserved (the irreducible 1.6%)" list is necessary but not sufficient for a greenfield start. Greenfield needs the full **user-facing capability inventory** so day-1 AF2 doesn't accidentally drop something users rely on.
 
-### Three co-authoritative sources (baseline + aspiration)
+### Four co-authoritative sources (principles + baseline + built + wishlist)
+
+**PRINCIPLES.md is foundational and authoritative.** Every other source is read in the context of PRINCIPLES.md. AF2 honors all of PRINCIPLES.md's foundations (F1–F3), design principles (D1–D7), and operational rules (R1–R3). The toning observation below is a *delta within PRINCIPLES.md* about specific principles where ambition was softened during implementation — not a critique of the principles themselves.
 
 The capability inventory has **three** co-authoritative sources, each answering a different question. Critically: the first two describe what's been *built or formalized as required*, not what the user actually wanted. **Implementing core features has been hard (the 90% firefighting tax in CAPABILITY_SPEC.md line 9), so the wishlist never made it into formal spec.** The third source captures the gap.
 
@@ -26,16 +28,33 @@ The capability inventory has **three** co-authoritative sources, each answering 
 
 2. **`.agentic/spec/FEATURES.md`** (529 lines, v0.72.0) — the **current built WHAT**. Catalogs 42 shipped/planned/deprecated features across 13 categories with YAML contract refs + consolidation maps. More current than CAPABILITY_SPEC.md because it tracks the live contract state with ACs. Answers: "what does the framework actually do today?"
 
-3. **The wishlist sources** — what the user *wanted* but never made it into formal spec because firefighting consumed the runway. AF2 day-1 must explicitly choose which wishlist items to ship (they're not "nice-to-haves"; they're the half of the product that didn't get built):
+3. **The toning observation within PRINCIPLES.md** — PRINCIPLES.md is the authoritative design contract (point 0); within it, *specific principles* were softened during implementation because full enforcement was too costly. PRINCIPLES.md itself documents these concessions in plain text:
+
+   - **D2 Deterministic Enforcement** — originally "critical behavior enforced by scripts and gates, not documentation and hope." Reality: PRINCIPLES.md itself documents a 4-tier enforcement hierarchy where tier 4 ("Behavioral guidance, ~85% reliability") exists as a recognized fallback. Many rules ended up in tier 4 because tier 1 (~100% structural) was too expensive. Quote: *"Some principles are inherently behavioral — they cannot be enforced by scripts."* This is the toning made explicit. **v5 Tier 0 finally delivers what D2 originally promised** — git-layer enforcement that fires regardless of agent cooperation.
+   - **D4 Small Batch + ATDD** — TDD was originally a discipline. Now PRINCIPLES.md says: *"TDD available as option (set `development_mode: tdd` in STACK.md) for those who prefer tests-first."* And acceptance criteria are "rough OK initially" with "specs evolve during implementation." Significantly softened. **v5 R-001 (TDD enforced via pre-commit) + R-108 (`ag contract → tests scaffold`) restore the original discipline.**
+   - **R2 No Auto-Commits** — originally absolute. Now titled *"R2. No Auto-Commits Without Approval (Conditional)"* — the "(Conditional)" was added to permit autonomous workflows. **v5 Theme A6 + Tier 0 + Tier 2 critic gating restore meaningful guardrails for the conditional.**
+   - **D3 Durable Artifacts** — originally "all state durable across sessions." Reality: AGENTS.json is gitignored ephemeral; sentinel files are gitignored; verification.json is per-session. **v5 R-007 (append-only JSONL events) restores durability for what should be durable; sentinels stay ephemeral by design.**
+   - **D7 Multi-Environment Portability** — originally "framework runs identically in Claude/Cursor/Copilot/Codex." Reality: only Claude has parity-level support. **v5 explicitly walks back D7 to "state portable, enforcement Claude-first" — toning the principle to match observed reality rather than maintaining the fiction.**
+   - **F3 Token & Context Optimization** — originally "agents always invoke token-efficient tools." Reality: F-041 anatomy hook (the largest token-efficiency win) was specced but never wired. **v5 R-101 (Token Ledger visible) + R-103 (Anatomy PreToolUse:Read hook) finally implement what F3 promised.**
+   - **The framework's own self-documented promotion rule** (D2 in PRINCIPLES.md): *"If a behavioral rule has been skipped 3+ times across sessions, promote it to a higher enforcement level. Repeated failures are evidence of misclassification, not insufficient documentation."* — **v5 essentially executes this promotion en masse.** The toning was supposed to be temporary; v5 makes it permanent re-tightening.
+
+   **AF2 day-1 must reverse the toning** — start with the original ambition fully implemented (Tier 0 enforcement for D2, Tier 0 TDD for D4, Tier 2 critic for R2 conditional, JSONL for D3, honest cross-tool stance for D7, Anatomy hook for F3). Don't repeat v0.7x's iteration of "ship strict → soften → ship advisory → forget to re-promote."
+
+4. **The wishlist sources** — what the user *wanted* but never made it into formal spec because firefighting consumed the runway. AF2 day-1 must explicitly choose which wishlist items to ship (they're not "nice-to-haves"; they're the half of the product that didn't get built):
    - **`TODO.md`** — quick-capture inbox (~20 active items + 13 promoted-to-backlog + ~50 closed). Each represents a user wish with context.
    - **`CONTRIBUTIONS.md`** — user design insights captured during PRs. Often contains "we should also..." that didn't become features.
    - **Proposed-but-not-Accepted ADRs** — `ADR-001` (multi-component architecture), `ADR-002` (user involvement modes Tech Lead/Visionary/Fully Autonomous). Both Proposed status; both load-bearing for the autonomy story; both never finalized.
    - **JOURNAL.md future-tense entries** — moments where the user said "we should X" but didn't follow up. Pre-v0.72 grep `(future|later|punt|defer|research|explore|wishlist|moonshot)` returns ~40 items.
    - **v5 plan Theme A–J catalog** (`/workspace/.agentic/journal/plans/2026-04-26-framework-ground-up-redesign-plan.md` — Pillar 4 reclaim section) — **the most consolidated wishlist source**. ~70 items across 9 themes, surfaced by archaeology agents specifically searching for abandoned ambitions. Includes: vision-to-backlog (`ag kickoff`), `ag preview`, feedback-from-running-software, regulatory compliance modules, web deployment, localization, crash reporting, game/itch.io publishing, `ag onboard`, `ag handoff`, marketing copy generation, release notes auto-generation, velocity dashboard, framework verification meta-loop, multi-component architecture, custom feature prefixes, project-specific subagent roles, design-system knowledge files, AI/ML domain knowledge, Token Ledger visibility, Anatomy hook, autonomous framework verification, AC scheduling + parallel execution, post-PR auto-review loop, spec clarification taxonomy, cross-feature semantic checks, etc. **All ~70 items are mapped to v5 R-NNN backlog entries.**
 
-**AF2 day-1 must satisfy all three:** every capability in CAPABILITY_SPEC.md hit; every shipped feature in FEATURES.md has an equivalent (or is explicitly retired); **and the wishlist is treated as a triage menu the user picks from based on which abandoned ambitions actually matter for AF2's positioning.** AF2's biggest opportunity over v0.7x is shipping the wishlist items that v0.7x never got to.
+**AF2 day-1 must satisfy all four:** (1) every capability in CAPABILITY_SPEC.md hit; (2) every shipped feature in FEATURES.md has an equivalent (or is explicitly retired); (3) the toned-down original principles are *re-tightened* per v0.7x's own promotion rule (don't carry the toning forward — that's how v0.7x's complexity grew); (4) the wishlist is triaged — pick the items that materially differentiate AF2.
 
-**FEATURES.md's consolidation map** (217 legacy IDs → 42 consolidated features) shows the historical churn AF2 should avoid repeating. **The wishlist** shows what the team would have built if firefighting hadn't consumed the runway. AF2 has a chance to flip that ratio.
+**The combined gap is bigger than any single source shows:**
+- FEATURES.md's consolidation map (217 → 42) reveals fragmentation churn AF2 should avoid
+- PRINCIPLES.md's toning reveals where v0.7x compromised on its own ambitions because enforcement was too costly — AF2 starts with v5's tier architecture so it doesn't need to compromise
+- The wishlist reveals what didn't get built at all because the firefighting tax consumed the runway
+
+AF2's biggest opportunity over v0.7x is shipping (a) the wishlist that never got built AND (b) the original principle ambitions that got toned down. v5 transform also addresses both — but AF2 starts clean.
 
 **Key insight quoted verbatim** (CAPABILITY_SPEC.md line 9): *"~90% of the effort building this framework was compensating for unreliable agent behavior — not solving the actual development problems. Most of the complexity (behavioral tests, redundant instruction files, reinforcement layers, pre-commit gates) exists because agents kept not doing what they were told."*
 
@@ -370,10 +389,11 @@ The transform plan is reversible: at any phase boundary, the user can pivot to g
 - **v5 refinement:** `/workspace/.agentic/journal/plans/2026-04-26-todo-backlog-refinement.md`
 - **Spike report:** `/workspace/docs/research/2026-04-26-pre-phase-0-spike-results.md`
 - **Sibling research:** `/workspace/docs/research/2026-04-25-swarm-orchestration-and-close-out-hardening.md`
-- **Capability sources (three co-authoritative tiers):**
+- **Capability sources (four co-authoritative tiers, PRINCIPLES.md is foundational):**
+  - **Foundational design contract (HOW):** `/workspace/.agentic/lib/PRINCIPLES.md` (25KB; KISS meta + F1–F3 foundations + D1–D7 design principles + R1–R3 operational rules) — **authoritative; non-negotiable; AF2 honors every principle.** The toning observation below is a delta within PRINCIPLES.md about specific principles where ambition was softened during v0.7x implementation.
   - **Required baseline (WHY):** `/workspace/docs/CAPABILITY_SPEC.md` (118 lines — 15 required capabilities + design constraints)
   - **Built reality (WHAT):** `/workspace/.agentic/spec/FEATURES.md` (529 lines, v0.72.0 — 42 features with YAML contract refs and consolidation maps)
-  - **Wishlist (WHAT WE WANTED):** `.agentic/TODO.md`, `CONTRIBUTIONS.md`, proposed ADRs (001, 002), JOURNAL future-tense entries, and **most importantly** the v5 plan Theme A–J catalog (~70 items mapped to R-NNN backlog) — these are what the user wanted but never got built because firefighting consumed the runway. **AF2's biggest opportunity over v0.7x is shipping the wishlist.**
+  - **Wishlist (WHAT WE WANTED):** `.agentic/TODO.md`, `CONTRIBUTIONS.md`, proposed ADRs (001, 002), JOURNAL future-tense entries, and the v5 plan Theme A–J catalog (~70 items mapped to R-NNN backlog) — items the user wanted but never got built because firefighting consumed the runway.
 - **Supplementary context surveyed:** `/workspace/.agentic/OVERVIEW.md` (16 core capabilities), `/workspace/docs/HOW_IT_WORKS.md` (87KB; includes v2-engine retrospective and principle-by-principle breakdown), `/workspace/FRAMEWORK_QUICK_START.md`, `/workspace/FRAMEWORK_DEVELOPMENT.md`
 - **YAML contract source-of-truth:** `/workspace/.agentic/spec/contracts/F-XXX.yaml` (each FEATURES.md feature has a contract; contracts are the canonical machine-verifiable spec)
 
