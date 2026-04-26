@@ -133,15 +133,47 @@ def _import_settings():
 # ---------------------------------------------------------------------------
 
 
+try:
+    import messages  # type: ignore  # catalog of canonical block reasons (R-012)
+except Exception:  # pragma: no cover — the catalog is bundled with this gate
+    messages = None  # type: ignore
+
+
 @dataclass
 class GateResult:
-    """One AC's outcome. `failed=False` when the check passed or was skipped."""
+    """One AC's outcome. `failed=False` when the check passed or was skipped.
+
+    Failed results carry an optional `reason` link into the `messages.py`
+    catalog (R-012). When set, `print_blocked(verbose=True)` renders the
+    catalog's `verbose_detail` + `plan_ref`.
+    """
 
     ac: str
     failed: bool
     title: str = ""
     detail: str = ""
     next_steps: list[str] = field(default_factory=list)
+    reason: "Optional[messages.BlockReason]" = None  # type: ignore[name-defined]
+
+    @classmethod
+    def from_reason(
+        cls,
+        reason: "messages.BlockReason",  # type: ignore[name-defined]
+        *,
+        failed: bool = True,
+        detail: str = "",
+    ) -> "GateResult":
+        """Build a failed result from a `BlockReason` catalog entry. The
+        catalog supplies `ac`, `title`, and `next_steps`; `detail` carries
+        the runtime-specific output (test tail, file list, etc.)."""
+        return cls(
+            ac=reason.ac,
+            failed=failed,
+            title=reason.title,
+            detail=detail,
+            next_steps=list(reason.next_steps),
+            reason=reason,
+        )
 
 
 @dataclass
@@ -376,17 +408,7 @@ def check_tests(ctx: GateContext) -> GateResult:
         detail_lines.append("--- last output ---")
         detail_lines.append(out.rstrip())
 
-    return GateResult(
-        ac="AC1",
-        failed=True,
-        title="tests failing",
-        detail="\n".join(detail_lines),
-        next_steps=[
-            "Run the test command above directly to reproduce.",
-            "Fix the failing tests.",
-            "If you must commit through the failure: ag commit --skip-gate \"<reason>\"",
-        ],
-    )
+    return GateResult.from_reason(messages.TESTS_FAILING, detail="\n".join(detail_lines))
 
 
 def check_contracts(ctx: GateContext) -> GateResult:
@@ -422,17 +444,7 @@ def check_contracts(ctx: GateContext) -> GateResult:
     if rc == 0:
         return GateResult(ac="AC2", failed=False, title="contracts pass")
 
-    return GateResult(
-        ac="AC2",
-        failed=True,
-        title="contract check failed",
-        detail=out[-1500:],
-        next_steps=[
-            "Run: ag contract check     (verifies all structural assertions)",
-            "Run: ag contract check F-XXX  (focus a single feature)",
-            "Fix assertion failures or update the contract via `ag contract migrate`.",
-        ],
-    )
+    return GateResult.from_reason(messages.CONTRACT_CHECK_FAILED, detail=out[-1500:])
 
 
 def check_plan_approved(ctx: GateContext) -> GateResult:
@@ -446,19 +458,12 @@ def check_plan_approved(ctx: GateContext) -> GateResult:
     if sentinel.exists():
         return GateResult(ac="AC3", failed=False, title="plan-approved sentinel present")
 
-    return GateResult(
-        ac="AC3",
-        failed=True,
-        title="no approved plan for this work",
+    return GateResult.from_reason(
+        messages.PLAN_NOT_APPROVED,
         detail=(
             "STACK.md has plan_review_enabled: yes but `.agentic/session/.plan-approved`\n"
             "is missing. Code commits require an approved plan in this profile."
         ),
-        next_steps=[
-            "Run: ag plan F-XXXX           (drafts a plan)",
-            "Run: ag plan review F-XXXX    (dialectical Critic + Advocate)",
-            "After approval, the framework writes `.agentic/session/.plan-approved`.",
-        ],
     )
 
 
@@ -506,18 +511,12 @@ def check_journal_freshness(ctx: GateContext) -> GateResult:
     if journal_mtime + 5 >= head_ts:
         return GateResult(ac="AC4", failed=False, title="JOURNAL fresh")
 
-    return GateResult(
-        ac="AC4",
-        failed=True,
-        title="JOURNAL.md stale (no entry since last commit)",
+    return GateResult.from_reason(
+        messages.JOURNAL_STALE,
         detail=(
             f"{journal.relative_to(ctx.root)} mtime is older than HEAD's commit time.\n"
             "Formal+ profiles require a journal entry capturing WHY this commit happened."
         ),
-        next_steps=[
-            "Run: bash .agentic/lib/tools/journal.sh \"Topic\" \"Outcomes\" \"Next\" \"Blockers\" --why \"Reason\"",
-            "Then re-stage JOURNAL.md and commit.",
-        ],
     )
 
 
@@ -655,20 +654,21 @@ def check_shipped_contract_migrations(ctx: GateContext) -> GateResult:
     if not offending:
         return GateResult(ac="AC5", failed=False, title="shipped-contract guard pass")
 
-    return GateResult(
-        ac="AC5",
-        failed=True,
-        title="shipped contract changed without migration entry",
+    # Replace the catalog's generic F-XXX with the actual offending feature ID
+    # in the first next-step. The catalog stays generic; the runtime contextualizes.
+    result = GateResult.from_reason(
+        messages.SHIPPED_CONTRACT_NO_MIGRATION,
         detail=(
             "These contracts have lifecycle: shipped + protection: contract.\n"
             "Any change requires a new entry under `migrations:`:\n  - "
             + "\n  - ".join(notes)
         ),
-        next_steps=[
-            f"Run: ag contract migrate {Path(offending[0]).stem} --reason \"<why>\"",
-            "Or revert the contract changes if they were unintentional.",
-        ],
     )
+    feature_id = Path(offending[0]).stem
+    result.next_steps = [
+        step.replace("F-XXX", feature_id) for step in result.next_steps
+    ]
+    return result
 
 
 def check_no_verify_breadcrumb(ctx: GateContext) -> GateResult:
@@ -724,9 +724,15 @@ def _color(s: str, code: str) -> str:
     return f"{code}{s}{_RESET}"
 
 
-def print_blocked(failures: list[GateResult]) -> None:
-    """Structured BLOCKED output (AC8). Each failure gets a title, detail,
-    and concrete next-step commands the agent can run."""
+def print_blocked(failures: list[GateResult], *, verbose: bool = False) -> None:
+    """Structured BLOCKED output (R-001 AC8 + R-012). Each failure gets a
+    title, detail, concrete next-step commands, and — when `verbose=True` —
+    expanded explanations + plan refs from `messages.py`.
+
+    The catalog (`messages.BlockReason`) carries the verbose extras; the
+    runtime detail (test output tail, file list, etc.) carries the failure-
+    specific facts. We render both.
+    """
     sys.stderr.write(_color("\n━━━ pre-commit gate BLOCKED ━━━\n", _RED + _BOLD))
     sys.stderr.write(f"{len(failures)} check(s) failed:\n\n")
     for i, fail in enumerate(failures, 1):
@@ -738,9 +744,19 @@ def print_blocked(failures: list[GateResult]) -> None:
             sys.stderr.write(_color("    suggested next steps:\n", _YELLOW))
             for step in fail.next_steps:
                 sys.stderr.write(f"      • {step}\n")
+        if verbose and fail.reason is not None:
+            if fail.reason.verbose_detail:
+                sys.stderr.write("\n")
+                for line in fail.reason.verbose_detail.splitlines():
+                    sys.stderr.write(f"    {line}\n")
+            if fail.reason.plan_ref:
+                sys.stderr.write(f"\n    Plan ref: {fail.reason.plan_ref}\n")
         sys.stderr.write("\n")
     sys.stderr.write(_color("To bypass with audit (use sparingly):\n", _YELLOW))
-    sys.stderr.write("  ag commit --skip-gate \"<reason>\"\n\n")
+    sys.stderr.write("  ag commit --skip-gate \"<reason>\"\n")
+    if not verbose:
+        sys.stderr.write(_color("Tip: pass --verbose for expanded explanations and plan refs.\n", _YELLOW))
+    sys.stderr.write("\n")
 
 
 def print_passed(results: list[GateResult]) -> None:
@@ -765,11 +781,11 @@ _CHECKS = [
 ]
 
 
-def run_gate(ctx: GateContext) -> int:
+def run_gate(ctx: GateContext, *, verbose: bool = False) -> int:
     results = [check(ctx) for check in _CHECKS]
     failures = [r for r in results if r.failed]
     if failures:
-        print_blocked(failures)
+        print_blocked(failures, verbose=verbose)
         _emit_event(
             type="gate_blocked",
             session_id=ctx.session_id,
@@ -790,6 +806,8 @@ def main(argv: Optional[list[str]] = None) -> int:
                         help="Run as if invoked by CI (currently identical to local mode).")
     parser.add_argument("--print-context", action="store_true",
                         help="Print resolved gate context and exit.")
+    parser.add_argument("--verbose", "-v", action="store_true",
+                        help="Print expanded explanations and plan refs for blocked checks (R-012).")
     args = parser.parse_args(argv)
 
     root = _project_root()
@@ -817,7 +835,7 @@ def main(argv: Optional[list[str]] = None) -> int:
                 f"pre-commit gate skipped (audited): {reason}\n", _YELLOW))
         return 0
 
-    return run_gate(ctx)
+    return run_gate(ctx, verbose=args.verbose)
 
 
 if __name__ == "__main__":

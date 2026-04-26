@@ -3342,6 +3342,24 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### R-012 — Structured Gate Error Messages with Next-Step Catalog (v0.83.0)
+
+**User insight 1 — "Friction belongs at the bypass, not the failure"**: Tomas pushed for the gate to fail *informatively*, not just block. The principle: the agent shouldn't have to read source code to find the next command. Every blocked check carries 1–3 concrete `ag` invocations that resolve it. Bypass remains audited (`--skip-gate "<reason>"`); the helpful UX belongs at the failure path.
+
+**User insight 2 — "The error message *is* the documentation"**: When R-005 introduced the EACCES path on shipped contracts, the refusal hint pointed directly at `ag contract migrate F-XXX --reason "..."` — which is the exact command needed to resolve it. R-012 generalizes that pattern across every gate failure. **Documentation that lives only in design docs is documentation no one reads when they're stuck. Documentation that prints itself at the moment of failure is documentation that converts into action.**
+
+**User insight 3 — "One PR per phase, not one per item"**: When asked why R-005 and R-012 should be separate PRs, Tomas pushed back: sprint 1 was a single merged PR ("Merge sprint 1 — Tier 0 git-layer enforcement + observability spine") covering 4 items. The natural batching is sprint/wave, not individual R-XXX items. **The principle: PR boundaries should match cognitive boundaries (a coherent shipped capability), not bureaucratic boundaries (one ticket = one PR).** Wave A is "Tier 0 hardening cluster" — a single coherent narrative, hence a single PR.
+
+**Why it matters**: Sprint 1 shipped working gates (R-001/R-002), but their UX was minimal — bare BLOCKED messages with whatever next-steps each `check_*` function had inlined. R-012 extracts the message catalog into `messages.py` so:
+- Every block reason is grep-able (one place to refine wording)
+- The 1–3 next-steps invariant is enforced by the dataclass and validated by tests
+- `precommit_gate` and `prepush_gate` share strings instead of drifting
+- A `--verbose` flag layers in expanded explanations + plan refs without bloating the default output
+
+**Design direction**: The catalog is the source of truth; the gates are thin. Adding a new check means adding a new `BlockReason` to `messages.py` and a `from_reason(...)` call in the gate — no inline next-step strings allowed. Tests enforce that every `from_reason(messages.X)` reference resolves, so the catalog stays in sync with the gates.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.73.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

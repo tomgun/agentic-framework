@@ -5732,3 +5732,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-26 20:16 - R-012 shipped: structured gate error messages with central catalog
+
+**Why**: Sprint 1 shipped working gates but with minimal failure UX — bare BLOCKED messages with inlined next-steps that drifted between the two gates. R-012 makes failures self-documenting.
+
+**Decision**: Catalog is the source of truth; gates are thin. Adding a new check means adding a BlockReason + a from_reason() call — no inline next_steps allowed. Tests enforce that every from_reason(messages.X) reference resolves.
+
+**What changed**:
+- Extracted message catalog into .agentic/lib/hooks/messages.py (9 BlockReason constants). precommit_gate + prepush_gate both use GateResult.from_reason(); --verbose flag adds expanded detail + plan refs without bloating default output. 11 catalog tests covering invariants and gate integration.
+
+**Next steps**:
+- Wave A R-004 next (hook integrity SHA-256 baseline)
+
+**Blockers**: None
+

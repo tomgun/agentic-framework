@@ -329,7 +329,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-012 · Pre-commit error messages with concrete next-step suggestions
-**Status:** planned · **Effort:** 1d · **Deps:** R-001
+**Status:** shipped · **Effort:** 1d · **Deps:** R-001
 **Plan ref:** plan §"UX additions for Phase 0"
 **Goal:** Replace bare "BLOCKED" messages with structured guidance ("here's what to do next").
 
