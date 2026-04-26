@@ -18,9 +18,24 @@ But greenfield remains a real choice. If the current install base is small enoug
 
 The v5 plan's "What's preserved (the irreducible 1.6%)" list is necessary but not sufficient for a greenfield start. Greenfield needs the full **user-facing capability inventory** so day-1 AF2 doesn't accidentally drop something users rely on.
 
-### Authoritative source: `docs/CAPABILITY_SPEC.md`
+### Three co-authoritative sources (baseline + aspiration)
 
-The framework's own founding capability spec at `/workspace/docs/CAPABILITY_SPEC.md` (118 lines) is the cleanest user-facing statement of what the framework *actually needs to do* — separate from the implementation complexity. It enumerates **15 required capabilities** that any framework redesign (transform OR greenfield) must deliver. AF2 day-1 must hit all 15.
+The capability inventory has **three** co-authoritative sources, each answering a different question. Critically: the first two describe what's been *built or formalized as required*, not what the user actually wanted. **Implementing core features has been hard (the 90% firefighting tax in CAPABILITY_SPEC.md line 9), so the wishlist never made it into formal spec.** The third source captures the gap.
+
+1. **`docs/CAPABILITY_SPEC.md`** (118 lines) — the **stable required-baseline WHY**. Enumerates 15 required capabilities + design constraints. Answers: "what must any redesign deliver to be acceptable?"
+
+2. **`.agentic/spec/FEATURES.md`** (529 lines, v0.72.0) — the **current built WHAT**. Catalogs 42 shipped/planned/deprecated features across 13 categories with YAML contract refs + consolidation maps. More current than CAPABILITY_SPEC.md because it tracks the live contract state with ACs. Answers: "what does the framework actually do today?"
+
+3. **The wishlist sources** — what the user *wanted* but never made it into formal spec because firefighting consumed the runway. AF2 day-1 must explicitly choose which wishlist items to ship (they're not "nice-to-haves"; they're the half of the product that didn't get built):
+   - **`TODO.md`** — quick-capture inbox (~20 active items + 13 promoted-to-backlog + ~50 closed). Each represents a user wish with context.
+   - **`CONTRIBUTIONS.md`** — user design insights captured during PRs. Often contains "we should also..." that didn't become features.
+   - **Proposed-but-not-Accepted ADRs** — `ADR-001` (multi-component architecture), `ADR-002` (user involvement modes Tech Lead/Visionary/Fully Autonomous). Both Proposed status; both load-bearing for the autonomy story; both never finalized.
+   - **JOURNAL.md future-tense entries** — moments where the user said "we should X" but didn't follow up. Pre-v0.72 grep `(future|later|punt|defer|research|explore|wishlist|moonshot)` returns ~40 items.
+   - **v5 plan Theme A–J catalog** (`/workspace/.agentic/journal/plans/2026-04-26-framework-ground-up-redesign-plan.md` — Pillar 4 reclaim section) — **the most consolidated wishlist source**. ~70 items across 9 themes, surfaced by archaeology agents specifically searching for abandoned ambitions. Includes: vision-to-backlog (`ag kickoff`), `ag preview`, feedback-from-running-software, regulatory compliance modules, web deployment, localization, crash reporting, game/itch.io publishing, `ag onboard`, `ag handoff`, marketing copy generation, release notes auto-generation, velocity dashboard, framework verification meta-loop, multi-component architecture, custom feature prefixes, project-specific subagent roles, design-system knowledge files, AI/ML domain knowledge, Token Ledger visibility, Anatomy hook, autonomous framework verification, AC scheduling + parallel execution, post-PR auto-review loop, spec clarification taxonomy, cross-feature semantic checks, etc. **All ~70 items are mapped to v5 R-NNN backlog entries.**
+
+**AF2 day-1 must satisfy all three:** every capability in CAPABILITY_SPEC.md hit; every shipped feature in FEATURES.md has an equivalent (or is explicitly retired); **and the wishlist is treated as a triage menu the user picks from based on which abandoned ambitions actually matter for AF2's positioning.** AF2's biggest opportunity over v0.7x is shipping the wishlist items that v0.7x never got to.
+
+**FEATURES.md's consolidation map** (217 legacy IDs → 42 consolidated features) shows the historical churn AF2 should avoid repeating. **The wishlist** shows what the team would have built if firefighting hadn't consumed the runway. AF2 has a chance to flip that ratio.
 
 **Key insight quoted verbatim** (CAPABILITY_SPEC.md line 9): *"~90% of the effort building this framework was compensating for unreliable agent behavior — not solving the actual development problems. Most of the complexity (behavioral tests, redundant instruction files, reinforcement layers, pre-commit gates) exists because agents kept not doing what they were told."*
 
@@ -47,6 +62,30 @@ This is the strongest articulation of the v5 thesis. AF2 succeeds if it delivers
 | 15 | **Project Kickoff** | `ag kickoff "vision"` (R-510): vision → epic decomposition → ACs → ordered backlog. Reviewed via Tier 2 critic before commit |
 
 **All 15 covered.** Both v5 transform and AF2 greenfield satisfy CAPABILITY_SPEC.md. The differences are in implementation effort, not in what gets delivered.
+
+### FEATURES.md feature-by-feature × AF2 disposition
+
+Per the FEATURES.md catalog, AF2 dispositions:
+
+**Shipped features that AF2 preserves verbatim (semantic, not literal — implementation may be cleaner):**
+- F-001 Project Initialization & Profiles · F-002 Spec-Driven Development · F-003 Feature Tracking & Lifecycle · F-004 Plan & Design Review (dialectical) · F-005 Feature Hierarchy & Decomposition · F-006 Backlog & Work Queue · F-007 Development Constraints & Principles · F-008 Code Quality Standards (21 quality knowledge files; preserve verbatim) · F-009 Pre-Commit Quality Gates (Tier 0 in v5 maps here) · F-010 Issue & Feedback Tracking · F-011 ADRs · F-012 Documentation Drift & Lifecycle · F-013 Non-Functional Requirements · F-014 Review Checkpoint Framework · F-015 Session Management · F-016 Crash Recovery & Work Tracking · F-017 Multi-Agent Coordination · F-018 Coordination Server (HTTP JSON-RPC; Tier 3 Agent Teams supersedes for orchestration but server stays for cross-tool messaging) · F-019 Token & Resource Efficiency · F-020 Framework Upgrade & Versioning · F-021 Cross-Platform Compatibility · F-022 Framework Architecture & Paths · F-023 Hook-Based Enforcement (Tier 0/1/2/3 in v5 maps here; redesigned but capability preserved) · F-024 Git Workflow & PR Management · F-025 Agent System & Instructions · F-026 Developer Documentation · F-027 Emergency Quick Reference · F-028 User Extensions & Customization (`.agentic/local/` — finally first-class in AF2) · F-029 Autonomous Formal Profile · F-030 Autonomous Execution Engine (Tier 3 supersedes implementation; capability preserved) · F-031 Spec System Overhaul (YAML contracts; AF2 day-1 only format) · F-033 Project-Specific Customization Layer · F-035 Protected Main Branch Support · F-036 Workflow Definition File · F-041 Intelligence Engine (5 phases, 235 tests; preserve all) · F-042 Universal Capability Catalog (profile-as-preset philosophy is core) · F-043 Persona & Platform Dimensions · DEV-002 Testing Infrastructure · DEV-003 Instruction File Integrity · DEV-004 Complexity Tier Experiments
+
+**Planned features that AF2 ships day-1 (no longer "planned"):**
+- F-040 App Store Publishing → AF2 R-540…R-543 + R-549
+
+**Deprecated features that AF2 does NOT resurrect:**
+- F-037 MCP Coordination Server (consolidated into F-018; tool-native MCP is implementation detail)
+- F-038 Multi-Repo Umbrella (consolidated into F-018; multi-repo is enhancement, not separate feature)
+- F-039 Full Autonomous Scheduling (consolidated into F-030; scheduling is part of execution engine)
+
+**Consolidation lesson AF2 must learn:** the 217 → 42 feature consolidation in v0.7x reflected over-fragmentation in early development. AF2 should start with a smaller, well-bounded feature set (target: ≤30 features at v1.0) and resist creating new feature IDs for "improvements/enforcement/hardening of existing features" (per v0.7x's "no feature inflation" rule). Consolidation churn is technical debt; avoid by being disciplined upfront.
+
+**Critical FEATURES.md detail to carry forward:**
+- F-031 description: "Consolidates 217 legacy features into ~33 contracts" — AF2 day-1 starts at the consolidated end-state, not the fragmented start
+- F-041 has 235 tests across 7 test files — AF2 must preserve test coverage at this density for the intelligence engine
+- F-042 explicit: "Profiles are presets for settings, not modes — code branches on settings, not profile names" — design constraint AF2 must obey
+- F-008 description includes the skills.sh marketplace integration (M-002) — AF2 includes this from day-1 (PR-A shipped; PR-B/PR-C carried forward)
+- F-018 description: "HTTP JSON-RPC coordination server (port 4185), bearer token auth" — AF2 keeps for cross-tool/cross-machine signaling; Tier 3 Agent Teams handles in-machine orchestration separately
 
 ### CAPABILITY_SPEC.md design constraints (must preserve)
 
@@ -331,7 +370,12 @@ The transform plan is reversible: at any phase boundary, the user can pivot to g
 - **v5 refinement:** `/workspace/.agentic/journal/plans/2026-04-26-todo-backlog-refinement.md`
 - **Spike report:** `/workspace/docs/research/2026-04-26-pre-phase-0-spike-results.md`
 - **Sibling research:** `/workspace/docs/research/2026-04-25-swarm-orchestration-and-close-out-hardening.md`
-- **Capability sources surveyed:** `/workspace/docs/CAPABILITY_SPEC.md` (authoritative — 15 capabilities + design constraints), `/workspace/.agentic/spec/FEATURES.md` (42 shipped/planned features across 13 categories), `/workspace/.agentic/OVERVIEW.md` (16 core capabilities), `/workspace/docs/HOW_IT_WORKS.md` (87KB; 50+ section outline), `/workspace/FRAMEWORK_QUICK_START.md`, `/workspace/FRAMEWORK_DEVELOPMENT.md`
+- **Capability sources (three co-authoritative tiers):**
+  - **Required baseline (WHY):** `/workspace/docs/CAPABILITY_SPEC.md` (118 lines — 15 required capabilities + design constraints)
+  - **Built reality (WHAT):** `/workspace/.agentic/spec/FEATURES.md` (529 lines, v0.72.0 — 42 features with YAML contract refs and consolidation maps)
+  - **Wishlist (WHAT WE WANTED):** `.agentic/TODO.md`, `CONTRIBUTIONS.md`, proposed ADRs (001, 002), JOURNAL future-tense entries, and **most importantly** the v5 plan Theme A–J catalog (~70 items mapped to R-NNN backlog) — these are what the user wanted but never got built because firefighting consumed the runway. **AF2's biggest opportunity over v0.7x is shipping the wishlist.**
+- **Supplementary context surveyed:** `/workspace/.agentic/OVERVIEW.md` (16 core capabilities), `/workspace/docs/HOW_IT_WORKS.md` (87KB; includes v2-engine retrospective and principle-by-principle breakdown), `/workspace/FRAMEWORK_QUICK_START.md`, `/workspace/FRAMEWORK_DEVELOPMENT.md`
+- **YAML contract source-of-truth:** `/workspace/.agentic/spec/contracts/F-XXX.yaml` (each FEATURES.md feature has a contract; contracts are the canonical machine-verifiable spec)
 
 ---
 
