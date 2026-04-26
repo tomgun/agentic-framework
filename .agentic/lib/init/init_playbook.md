@@ -942,7 +942,7 @@ If matches are shown:
 - Present the list to the user: skill name, source repo, reason
 - Ask if they'd like to install (all, select, or skip)
 - If yes: `ag skills install --all` (or `--select <id>` for specific ones)
-- If skip: note that `ag skills install` is available later
+- If skip: note that `ag skills install --all` is available later (or `ag skills suggest` to re-review)
 
 **Notes:**
 - Marketplace skills come from a curated allowlist (`.agentic/lib/data/skills-marketplace.yaml`)
