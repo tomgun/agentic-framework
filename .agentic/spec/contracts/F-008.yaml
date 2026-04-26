@@ -164,6 +164,36 @@ assertions:
     tests:
       - tests/test_skills_marketplace.sh::t_extension_dir_paths_in_generators
 
+  - id: AC-012
+    text: >
+      scaffold.sh offers marketplace skills after brownfield stack detection.
+      Supports --no-skills flag to opt out. Skips the prompt automatically in
+      non-TTY environments, in CI environments (CI / GITHUB_ACTIONS / GITLAB_CI /
+      BUILDKITE / CIRCLECI / JENKINS_URL set), in --non-interactive mode, and
+      when .agentic/local/skills-preferences.json has skip_on_init: true. The
+      preference is written atomically (tmp + mv) and read with jq when
+      available, falling back to a quote-safe grep otherwise. Match-detection
+      uses sync --dry-run exit code 2, not a brittle output grep. Init playbook
+      (init_playbook.md) Step 3b guides the agent to run ag skills suggest after
+      STACK.md is populated, so agent-driven (non-interactive) inits still get
+      the integration via the playbook path.
+    type: structural
+    verify: |
+      grep -q -- '--no-skills' .agentic/lib/init/scaffold.sh &&
+      grep -q 'NO_SKILLS=""' .agentic/lib/init/scaffold.sh &&
+      grep -q 'skills_marketplace' .agentic/lib/init/scaffold.sh &&
+      grep -q 'GITHUB_ACTIONS' .agentic/lib/init/scaffold.sh &&
+      grep -q 'skip_on_init' .agentic/lib/init/scaffold.sh &&
+      grep -q '"${SKILLS_PREFS}.tmp"' .agentic/lib/init/scaffold.sh &&
+      grep -q 'sync --dry-run' .agentic/lib/init/scaffold.sh &&
+      grep -q 'ag skills suggest' .agentic/lib/init/init_playbook.md
+    tests:
+      - tests/test_scaffold_skills.sh::t_no_skills_flag_skips
+      - tests/test_scaffold_skills.sh::t_skip_on_init_pref_skips
+      - tests/test_scaffold_skills.sh::t_ci_env_skips_prompt
+      - tests/test_scaffold_skills.sh::t_pref_write_atomic
+      - tests/test_scaffold_skills.sh::t_pref_jq_and_grep_fallback
+
 nfr_refs: []
 migrations:
   - id: M-001
@@ -194,3 +224,6 @@ migrations:
       - "Created .agentic/lib/tools/skills_marketplace.py"
       - "Created .agentic/lib/tools/commands/skills.sh + registered ag skills"
       - "Extended generate-cursor-skills.sh to read .agentic/local/extensions/skills/"
+      - "Added AC-012 (scaffold.sh init integration with --no-skills, TTY/non-interactive handling)"
+      - "Extended scaffold.sh with marketplace skills prompt after quality profile generation"
+      - "Added Step 3b to init_playbook.md for agent-guided skills installation"
