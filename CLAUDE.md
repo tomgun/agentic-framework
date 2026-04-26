@@ -30,7 +30,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
 - `ag push [args...]` | `ag push --skip-gate "<reason>"` — sanctioned wrapper (R-002) so the pre-push gate records intent
 - `ag tui` — Textual mission-control dashboard (R-008) live-tailing JSONL streams; needs `pip install textual`
-- `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX`
+- `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX` | `ag contract migrate F-XXXX --reason "..." [--set K=V | --add-assertion "..."]` (sanctioned mutation path for shipped/read-only contracts; R-005)
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 - `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve`
@@ -89,11 +89,12 @@ Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 
 Framework enforcement uses multiple layers. When adding new gates or enforcement, prefer higher layers:
 1. **Tier 0 git-layer gates** (v5; `precommit_gate.py` / `prepush_gate.py`) — fire in a separate process from any agent session. Pre-commit blocks per-commit shape (tests, contracts, plan-approved sentinel, JOURNAL freshness, shipped-contract migrations). Pre-push blocks range shape (full integration tests, coverage threshold, doc drift, range migrations). Sanctioned bypass: `ag commit --skip-gate "<reason>"` / `ag push --skip-gate "<reason>"` — both audited to events.jsonl. *Honest limit:* pre-commit cannot itself observe `git commit --no-verify` (the flag short-circuits hooks); pre-push catches the same range on push regardless.
-2. **Claude hooks** (real-time, during session) — PreToolUse blocks/warns before action, PostToolUse tracks after, Stop.sh validates at session end, UserPromptSubmit nudges per-prompt. In-session enforcement layer.
-3. **Skills** (just-in-time guidance) — loaded at workflow trigger points via `.claude/skills/`
-4. **`ag` commands** (workflow gates) — `ag done`, `ag implement`, `ag commit` validate preconditions
-5. **Pre-commit hooks (legacy bash)** — `pre-commit-check.sh` 16-check defense-in-depth; will be retired in R-301
-6. **Instruction files** (behavioral) — guide agent behavior but no structural enforcement
+2. **Filesystem read-only protection** (R-005; shipped contracts only) — `ag contract promote` chmods `lifecycle: shipped` contracts to `444`, so direct `Edit`/`Write`/`$EDITOR` writes fail with EACCES. The sanctioned mutation path is `ag contract migrate F-XXX --reason "<text>" [--set K=V | --add-assertion "<text>"]`, which records an auditable migration entry, applies the change, and re-locks the file. *Honest limit:* a deliberate `chmod u+w` bypasses this layer; the Tier 0 pre-commit gate's shipped-contract-migration check is the second wall.
+3. **Claude hooks** (real-time, during session) — PreToolUse blocks/warns before action, PostToolUse tracks after, Stop.sh validates at session end, UserPromptSubmit nudges per-prompt. In-session enforcement layer.
+4. **Skills** (just-in-time guidance) — loaded at workflow trigger points via `.claude/skills/`
+5. **`ag` commands** (workflow gates) — `ag done`, `ag implement`, `ag commit` validate preconditions
+6. **Pre-commit hooks (legacy bash)** — `pre-commit-check.sh` 16-check defense-in-depth; will be retired in R-301
+7. **Instruction files** (behavioral) — guide agent behavior but no structural enforcement
 
 ## Design Tracking
 

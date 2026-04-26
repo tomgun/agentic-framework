@@ -3328,6 +3328,20 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
+### R-005 — Filesystem Read-Only Protection for Shipped Contracts (v0.83.0)
+
+**User insight 1 — "Hardening before polish"**: Tomas chose Wave A (R-005 + R-012 + R-004 + R-003) over Wave B (UX widgets) for sprint 2, with the framing that *doing UX widgets before hardening leaves a leaky wall behind a polished facade*. The ordering principle: every honest-limit you document is a wall left to build. Hardening costs less when you do it before you have users counting on the polish.
+
+**User insight 2 — "Two walls, not one"**: The R-005 design pairs filesystem `chmod 444` with the existing pre-commit gate's shipped-contract-migration check. Either layer alone is bypassable: the chmod is undone by `chmod u+w`, the gate is undone by `--no-verify`. Together they form an "agent must be deliberate, twice" invariant — accidental or LLM-pattern-following mutation is blocked by the filesystem, intentional bypass is recorded by the gate's audit trail. **The principle: structural enforcement isn't single-layer; it's belt-and-suspenders where each layer is honest about its own limit.**
+
+**User insight 3 — "Sanctioned path, not lockdown"**: Rather than freezing shipped contracts entirely, R-005 introduces `ag contract migrate F-XXX --reason "<text>"` as the sanctioned mutation path. Tomas framed this as *the only way through is the way that records the audit trail*. The chmod cycle (444 → 644 → mutate → 444) is internal to the command; agents see one ergonomic call instead of a permission puzzle. **The principle: friction belongs at the bypass, not the happy path.**
+
+**Why it matters**: Shipped contracts are the framework's contract-with-itself. Before R-005, an agent could quietly mutate them via `Edit`/`Write` — pre-commit caught the diff, but only at commit time, after the agent had already convinced itself the change was fine. R-005 moves the block to the moment the agent tries to write, with a clear pointer to the migration command. The error message *is* the documentation.
+
+**Design direction**: Every Tier 0 honest-limit in the enforcement hierarchy gets a paired non-git layer. R-004 (hook integrity) closes the hook-tampering limit next; together with R-005 the only deliberate-action bypass remaining is `git commit --no-verify`, which the gate already audits via push-time replay.
+
+---
+
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.73.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)

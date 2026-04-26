@@ -5717,3 +5717,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: Legacy bash gate's complexity warning at 18 staged files (advisory only, instruction-file backport spans 11 files by nature)
 
+
+### Session: 2026-04-26 19:56 - R-005 shipped: filesystem RO protection for shipped contracts
+
+**Why**: Closes one of two known Tier 0 honest-limits — filesystem mutation of shipped contracts. Pre-commit gate (R-001) is the second wall.
+
+**Decision**: Two-wall design: chmod 444 blocks accidental writes; pre-commit gate audits deliberate bypasses (chmod u+w + edit + commit). Sanctioned path is ag contract migrate, not lockdown — friction at the bypass, not the happy path.
+
+**What changed**:
+- ag contract promote chmods to 444; ag contract migrate is the sanctioned mutation path with audit trail; existing mutators refuse on locked contracts with sanctioned-path hints; EACCES on direct Edit/Write blocks accidental tampering
+
+**Next steps**:
+- Wave A R-012 next (structured pre-commit error messages w/ next-step suggestions)
+
+**Blockers**: None
+

@@ -236,7 +236,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-005 · Filesystem read-only protection for shipped contracts
-**Status:** planned · **Effort:** 1d · **Deps:** —
+**Status:** shipped · **Effort:** 1d · **Deps:** —
 **Plan ref:** plan §"Tier 0 — Local primitives"
 **Goal:** Set `chmod 444` on `spec/contracts/*.yaml` files where `lifecycle: shipped` and `protection: contract`. Crude but agent-cannot-bypass-without-deliberate-chmod.
 

@@ -17,7 +17,8 @@ Decision routing: current state → OVERVIEW.md, work log with reasoning → JOU
 - "phase done/mark phase/phase progress/which phase" → STOP. Run `ag phase list F-XXXX` to see phases, `ag phase done F-XXXX <id>` to mark complete.
 - "pending user input/contract input" → STOP. Run `ag contract pending`. Process each pending contract.
 - "contract/assertion/verify contract/check contract" → Run `ag contract check` or `ag contract list`. Contracts are in `spec/contracts/F-XXXX.yaml`.
-- "promote/unshipped/planned assertions" → Run `ag contract promote F-XXXX` to promote planned assertions to shipped.
+- "promote/unshipped/planned assertions" → Run `ag contract promote F-XXXX` to promote planned assertions to shipped. Promote chmods the file to `444` (R-005); after that, direct `Edit`/`Write` returns EACCES.
+- "EACCES on contract / can't edit shipped contract / contract is read-only / chmod 444" → STOP. Shipped contracts are filesystem-locked (R-005). Use `ag contract migrate F-XXXX --reason "<text>" [--trigger TYPE] [--set KEY=VALUE | --add-assertion "<text>" [--type T]]` — the only sanctioned mutation path. It records an auditable migration entry and re-locks the file.
 - "migrate specs/convert acceptance/markdown to yaml" → STOP. Run `ag migrate-specs` (add `--dry-run` to preview, `--archive` to move old files).
 - "churn/batch/all tasks/build everything/implement everything/do all features" → STOP. Run `ag auto crunch`.
 - "delegate/fresh context/context optimization/subagent" → MCP task delegation via `ag mcp start`. Use `list_acs` → `get_delegation_prompt` → Agent tool → `save_progress` → `get_next_action` loop.
