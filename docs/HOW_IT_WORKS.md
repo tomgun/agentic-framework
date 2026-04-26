@@ -6,6 +6,19 @@
 
 ---
 
+## v5 Tier 0 Gates + Mission-Control Dashboard (sprint 1)
+
+The v5 redesign introduces **external enforcement** at the git boundary that fires in a separate process from any agent session. Three pieces compose:
+
+- **R-007 — JSONL event spine** (`.agentic/lib/events.py`). Three append-only streams under `.agentic/journal/`: `events.jsonl`, `delegation.jsonl`, `token-ledger.jsonl`. `fcntl.flock` serializes concurrent writers across worktrees. Validated 4 processes × 1000 events → exactly 4000 valid lines.
+- **R-001 — Tier 0 pre-commit gate** (`.agentic/lib/hooks/precommit_gate.py`). 6 hardcoded checks: tests (subprocess, timeout-safe), `ag contract check`, plan-approved sentinel (when `plan_review_enabled: yes`), JOURNAL freshness (formal+ only), shipped-contract migrations (line-based YAML parse, no PyYAML dep), ag-commit breadcrumb. Sanctioned bypass: **`ag commit --skip-gate "<reason>"`** — emits `gate_skipped` to events.jsonl. **Honest limit:** pre-commit cannot itself observe `git commit --no-verify` because the flag short-circuits hook execution; pre-push (R-002) catches the same range when the commit lands on a remote.
+- **R-002 — Tier 0 pre-push gate** (`.agentic/lib/hooks/prepush_gate.py`). 5 checks: full integration tests, contract coverage threshold (parses `Coverage: N%` from `ag contract coverage`; default 80, settable as `contract_coverage_threshold` in STACK.md), `drift.sh --docs` in formal+, migration check walked across `<remote>..<local>` commit range, ag-push breadcrumb. Reads stdin per `githooks(5)`. Records `push_attempt` event regardless of outcome. Sanctioned bypass: **`ag push --skip-gate "<reason>"`**.
+- **R-008 — `ag tui` mission-control dashboard** (`.agentic/lib/tui/`). Five-panel Textual UI live-tailing all three JSONL streams: header (feature/profile/tokens/elapsed), workers (per-actor live status), events stream (color-coded with cost annotations), drilldown (selected event details), health (green/yellow/red + escalation count + quota alert). Pure-Python core + lazy Textual import — package importable without Textual installed; `ag tui` prints clean install hint when absent. Bindings: `q` quit · `?` help · `a` abort · `d` drilldown · `j`/`k` navigate.
+
+Activation in `core.hooksPath` active path is R-015 (`ag hooks register`). Today, the shims live at `.git/hooks/{pre-commit,pre-push}` and fire when `core.hooksPath` is unset.
+
+---
+
 ## The Big Picture
 
 ```mermaid

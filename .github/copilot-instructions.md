@@ -15,7 +15,9 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag start F-XXXX "Title"` — begin a new feature
 - `ag transition F-XXXX <state>` — advance the workflow (checks artifacts)
 - `ag check F-XXXX` | `ag verify F-XXXX` | `ag ship F-XXXX` | `ag status` | `ag info F-XXXX`
-- `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag push [args...]` | `ag push --skip-gate "<reason>"` — sanctioned wrapper (R-002 pre-push gate records via breadcrumb)
+- `ag tui` — Textual mission-control dashboard live-tailing events.jsonl / delegation.jsonl / token-ledger.jsonl (R-008; needs `pip install textual`)
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`.

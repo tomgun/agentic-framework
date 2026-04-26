@@ -462,32 +462,34 @@ def check_doc_drift(ctx: GateContext) -> GateResult:
 
 def _commits_in_range(root: Path, push_range: PushRange) -> list[str]:
     """Returns the SHAs in `<remote_oid>..<local_oid>` (or all reachable from
-    local_oid for branch creates). Returns [] for deletes."""
+    local_oid for branch creates, modulo other local/remote refs). Returns []
+    for deletes."""
     if push_range.is_delete:
         return []
+
     if push_range.is_create:
-        # All commits reachable from local_oid that aren't on any other ref.
-        # This may overcount in mono-branch repos but is a safe upper bound;
-        # the migration check is idempotent (re-checking a clean commit is a
-        # no-op).
-        args = ["git", "rev-list", push_range.local_oid, "--not", "--all-but-this"]
-        # `--all-but-this` is not a git flag; emulate by listing other refs.
+        # Branch create: walk all commits reachable from local_oid that aren't
+        # already on any other ref. We list other refs (heads + remotes) and
+        # negate them. Falls back to a bounded rev-list if for-each-ref fails.
         try:
             other = subprocess.run(
                 ["git", "for-each-ref", "--format=%(objectname)",
                  "refs/heads/", "refs/remotes/"],
-                cwd=str(root), capture_output=True, text=True, timeout=10, check=False,
+                cwd=str(root), capture_output=True, text=True,
+                timeout=10, check=False,
             )
-            negs = []
-            for line in other.stdout.splitlines():
-                line = line.strip()
-                if line and line != push_range.local_oid:
-                    negs.append("^" + line)
+            negs: list[str] = []
+            if other.returncode == 0:
+                for line in other.stdout.splitlines():
+                    line = line.strip()
+                    if line and line != push_range.local_oid:
+                        negs.append("^" + line)
             args = ["git", "rev-list", push_range.local_oid, *negs]
         except (subprocess.TimeoutExpired, OSError):
             args = ["git", "rev-list", "--max-count=200", push_range.local_oid]
     else:
         args = ["git", "rev-list", push_range.commit_range or push_range.local_oid]
+
     try:
         proc = subprocess.run(args, cwd=str(root), capture_output=True, text=True,
                               timeout=20, check=False)

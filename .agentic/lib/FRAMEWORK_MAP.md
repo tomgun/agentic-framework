@@ -365,6 +365,17 @@ graph LR
     style Done fill:#90EE90
 ```
 
+### Tier 0 git-layer gates (v5)
+
+External enforcement at the git boundary, fired in a separate process from any agent session:
+
+| Gate | When | Hook | Source |
+|------|------|------|--------|
+| Pre-commit | `git commit` | `.git/hooks/pre-commit` | `.agentic/lib/hooks/precommit_gate.py` (R-001) |
+| Pre-push | `git push` | `.git/hooks/pre-push` | `.agentic/lib/hooks/prepush_gate.py` (R-002) |
+
+Sanctioned audited bypass: `ag commit --skip-gate "<reason>"` and `ag push --skip-gate "<reason>"`. Both emit `gate_skipped` to `events.jsonl`. **Honest limit:** pre-commit cannot itself observe `git commit --no-verify`; pre-push catches the same range. Live mission-control: `ag tui` (R-008) tails the JSONL streams.
+
 ---
 
 ## Autonomous modes (v0.43+)

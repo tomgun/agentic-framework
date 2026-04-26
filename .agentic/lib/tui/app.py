@@ -109,9 +109,12 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
 
         def on_mount(self) -> None:  # type: ignore[override]
             tail.start(on_record=lambda rec: state.apply_record(rec))
+            # Full panel refresh — events arrive at human-perceivable cadence.
             self.set_interval(0.5, self._refresh)
-            # Quota refresh runs on a slower cadence per backlog AC6.
-            self.set_interval(30.0, self._refresh)
+            # Quota burn-down ring updates on a slower cadence per AC6 — the
+            # token-ledger doesn't change shape often enough to warrant the
+            # same 0.5s rebuild as the events panel.
+            self.set_interval(30.0, self._refresh_quota_only)
 
         def on_unmount(self) -> None:  # type: ignore[override]
             tail.stop()
@@ -120,6 +123,15 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
             snap = state.snapshot()
             for w in (self._header, self._workers, self._events,
                       self._drilldown, self._health):
+                if w is not None:
+                    w.update_from(snap)
+
+        def _refresh_quota_only(self) -> None:
+            """Quota-specific tick — updates only header + health (where the
+            quota signals appear). R-014 layers the burn-down ring on top
+            of this hook."""
+            snap = state.snapshot()
+            for w in (self._header, self._health):
                 if w is not None:
                     w.update_from(snap)
 

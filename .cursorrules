@@ -16,7 +16,9 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag done F-XXXX` — post-merge: doc gate, VERSION bump, state flush
 - `ag status` — see current work items
 - `ag info F-XXXX` — detailed info with next steps
-- `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag push [args...]` | `ag push --skip-gate "<reason>"` — sanctioned wrapper (R-002 pre-push gate records via breadcrumb)
+- `ag tui` — Textual mission-control dashboard live-tailing events.jsonl / delegation.jsonl / token-ledger.jsonl (R-008; needs `pip install textual`)
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 - `ag persona list` | `ag persona check` | `ag persona coverage` | `ag persona generate` | `ag persona migrate`

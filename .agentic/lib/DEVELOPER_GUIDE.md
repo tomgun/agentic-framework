@@ -63,6 +63,10 @@ When you work with the agent, it uses `ag` commands to enforce quality automatic
 | "What's next?" | `ag backlog` | Shows ordered work queue — position 0 = current work |
 | "Plan this first" | `ag plan` | Creates reviewable plan, saves to journal |
 | "Commit this" | `ag commit` | Runs all quality gates, blocks if issues |
+| "Bypass the gate" | `ag commit --skip-gate "<reason>"` | Audited Tier 0 bypass (R-001); records `gate_skipped` event with reason, then `git commit` |
+| "Push this" | `ag push [args...]` | Sanctioned wrapper that drops a breadcrumb so the pre-push gate (R-002) sees `via ag` |
+| "Bypass pre-push" | `ag push --skip-gate "<reason>"` | Audited Tier 0 bypass; records reason in events.jsonl |
+| "Show me the dashboard" | `ag tui` | Textual mission-control (R-008) live-tailing JSONL streams; needs `pip install textual` |
 | "We're done" | `ag done` | Checks docs, tests, AC completeness, phase completion (blocks if incomplete phases); auto-advances backlog |
 | "Phase progress?" | `ag phase list F-XXXX` | Shows plan phases and completion status; `ag phase done F-XXXX <id>` marks a phase complete |
 | "Flush state" / after `ag done` | `ag flush` | Commits state files (STATUS.md, BACKLOG.json, etc.) to main. When `main_branch_mode: protected`, creates a branch + PR instead of direct push |

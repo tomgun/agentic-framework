@@ -13,7 +13,7 @@ All work is managed by `ag` commands. Never skip steps.
 
 - `ag start F-XXXX "Title"` — begin feature | `ag status` — current work | `ag info F-XXXX` — details
 - `ag transition F-XXXX <state>` | `ag check F-XXXX` | `ag verify F-XXXX` | `ag done F-XXXX`
-- `ag commit` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag commit` | `ag commit --skip-gate "<reason>"` | `ag push` | `ag push --skip-gate "<reason>"` | `ag tui` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag auto task|epic|verify|crunch`
 - `ag intel remember "..." --context "..."` | `ag intel architecture|spec|implement|test [F-XXXX]`
 

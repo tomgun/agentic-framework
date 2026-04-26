@@ -177,13 +177,25 @@ def test_color_hint_push_attempt_blocked_is_red():
 
 
 def test_event_ring_bounded():
+    """Bounded ring evicts oldest first — verify both length AND that the
+    most recently appended record is present (would catch a 'drop everything
+    on overflow' impl)."""
     ds = DashboardState(event_ring_size=5, clock=lambda: 1_000.0)
     for i in range(20):
         ds.apply_record(StreamRecord(
             stream="events", line_no=0,
-            record=_ev(type="tool_call", payload={"i": i}),
+            record=_ev(type="tool_call", payload={"i": i, "tool": f"tool-{i}"}),
         ))
-    assert len(ds.snapshot().events) <= 5
+    snap = ds.snapshot()
+    assert len(snap.events) <= 5
+    # The most recently appended event MUST still be in the ring.
+    assert snap.events, "ring should never be empty after 20 appends"
+    last_summary = snap.events[-1].summary
+    assert "tool-19" in last_summary, f"expected tool-19 to survive eviction, got {last_summary!r}"
+    # The first event (i=0) MUST have been dropped.
+    summaries = [ev.summary for ev in snap.events]
+    assert not any("tool-0 " in s or s.endswith("tool-0") for s in summaries), \
+        f"oldest event should have been evicted, got {summaries}"
 
 
 def test_workers_added_and_aged_out():
@@ -389,7 +401,16 @@ def test_drilldown_lines_render_selected_event_fields():
 
 def test_main_returns_2_with_install_hint_when_textual_missing(tmp_path: Path):
     """`python3 -m tui --journal-dir <tmp>` should exit 2 and print the
-    install hint to stderr — this container has no Textual."""
+    install hint to stderr when Textual is absent. Skipped when Textual is
+    installed — in that case `run_tui()` would actually try to draw a TUI
+    and either succeed (interactive) or fail for unrelated reasons."""
+    try:
+        import textual  # noqa: F401
+        # Textual is installed — this test isn't applicable. The full TUI
+        # rendering path is verified manually per the backlog's verify steps.
+        return
+    except ImportError:
+        pass
     proc = __import__("subprocess").run(
         [sys.executable, "-m", "tui", "--journal-dir", str(tmp_path)],
         cwd=str(_REPO_ROOT),

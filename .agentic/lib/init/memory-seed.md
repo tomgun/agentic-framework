@@ -9,7 +9,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag verify F-XXXX` — run tests and record results
 - `ag done F-XXXX` — post-merge: doc gate, VERSION bump, state flush
 - `ag status` — see current work items
-- `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract` | `ag phase` | `ag persona` | `ag skills`
+- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag push` | `ag push --skip-gate "<reason>"` | `ag tui` (Textual mission control) | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract` | `ag phase` | `ag persona` | `ag skills`
 
 Decision routing: current state → OVERVIEW.md, work log with reasoning → JOURNAL.md (use `--decision` to mark choices), ADR for significant tradeoffs (formal), user preferences → `ag intel remember`.
 
@@ -58,7 +58,7 @@ Docs ship with code, not after merge. Before creating a PR:
 - **Behavioral corrections belong in instruction files**: When a correction applies to this project, update CLAUDE.md or the relevant skill file — don't write a memory as a substitute.
 - **Feature ID patterns are centralized**: `ids.py` (Python) and `ids.sh` (shell) are the single source of truth for feature ID regexes. Import `FEATURE_ID_RE`, `FEATURE_HEADER_RE`, etc. — never inline `F-\d{4,}` or `F-[0-9]{4,}` patterns in code.
 - **Track what you build**: When `feature_tracking=yes`, update FEATURES.md. Otherwise, update OVERVIEW.md (Core Capabilities section). Claude hooks (Stop.sh, UserPromptSubmit) nudge if you write implementation code but forget to update the design doc.
-- **Enforcement hierarchy**: Agent hooks (real-time, where supported: Claude hooks, Cursor hooks) > Skills (just-in-time) > ag commands (gates) > pre-commit (safety net) > instruction files (behavioral). New gates go in agent hooks, not pre-commit.
+- **Enforcement hierarchy** (v5 redesign): Tier 0 git-layer gates (`precommit_gate.py` + `prepush_gate.py` — fire in a process the agent doesn't manage; sanctioned bypass via `ag commit --skip-gate` / `ag push --skip-gate`, audited to events.jsonl) > Agent hooks (real-time, in-session: Claude hooks, Cursor hooks) > Skills (just-in-time) > ag commands (workflow gates) > legacy pre-commit (defense-in-depth, R-301 retires) > instruction files (behavioral). **Honest limit**: pre-commit cannot itself observe `git commit --no-verify` (the flag short-circuits hooks); pre-push catches the same range.
 
 ## What the Framework Enforces Structurally (you can't bypass these)
 - **Spec-first**: PreToolUse denies code edits without spec+AC (formal)

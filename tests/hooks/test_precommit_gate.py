@@ -581,6 +581,66 @@ def test_helper_count_migration_entries_handles_indented_block() -> None:
     assert gate._count_migration_entries(sample) == 2
 
 
+def test_helper_count_migration_entries_empty_array() -> None:
+    """`migrations: []` (zero entries) returns 0 cleanly — guards against
+    a regression where empty arrays mis-count as 1."""
+    assert gate._count_migration_entries("migrations: []\n") == 0
+    assert gate._count_migration_entries("migrations:\n") == 0
+
+
+def test_helper_count_migration_entries_ignores_comments_and_blank_lines() -> None:
+    sample = textwrap.dedent("""\
+        migrations:
+          # a comment that should be skipped
+          - id: a
+            trigger: bug
+
+          - id: b
+            trigger: bug
+        other_key: value
+    """)
+    assert gate._count_migration_entries(sample) == 2
+
+
+def test_helper_count_migration_entries_handles_malformed_extra_indent() -> None:
+    """Entries at deeper indent (e.g., nested under another mapping) are
+    NOT counted as top-level migration entries — guards against false
+    positives from sub-list entries inside a migration's `changes:` field."""
+    sample = textwrap.dedent("""\
+        migrations:
+          - id: a
+            trigger: bug
+            changes:
+              - id: nested-a    # should NOT be counted as a migration
+              - id: nested-b
+          - id: b
+            trigger: bug
+    """)
+    # Two top-level entries, not four
+    assert gate._count_migration_entries(sample) == 2
+
+
+def test_resolve_test_command_preserves_quoted_arguments(tmp_path: Path) -> None:
+    """STACK.md test command with quoted args must reach subprocess intact —
+    regression guard for the trailing-quote rstrip bug found during R-001
+    smoke testing."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "STACK.md").write_text(textwrap.dedent("""\
+        # STACK.md
+        ## Settings
+        - profile: discovery
+        - test_fast: bash -c "echo hi && exit 0"
+        - test: bash -c "exit 0"
+    """))
+    cmd = gate._resolve_test_command(repo)
+    # Closing quote must survive — without it, bash sees an unbalanced quote
+    # and the command fails to parse.
+    assert cmd.count('"') == 2
+    assert cmd.endswith('"')
+    assert "echo hi" in cmd
+
+
 def test_helper_is_shipped_protected_yaml_requires_both_keys() -> None:
     only_shipped = "lifecycle: shipped\n"
     only_protected = "protection: contract\n"

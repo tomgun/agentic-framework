@@ -5702,3 +5702,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: Textual + Rich missing in dev container by design — install hint surfaces cleanly when ag tui invoked here
 
+
+### Session: 2026-04-26 18:10 - Sprint 1 review fixes
+
+**Why**: Code review surfaced bugs + missed conventions; addressing before merge per CLAUDE.md no-merge-with-known-issues policy
+
+**Decision**: VERSION drift left for ag done post-merge — touching VERSION manually mid-sprint violates the 'every merge bumps via ag done' convention
+
+**What changed**:
+- Addressed all reviewer feedback: prepush_gate dead code removed; tui/state monotonic clock + dead branch documented; tui/app double set_interval split into full + quota-only; tests strengthened (ring eviction, malformed YAML, quoted commands, conditional Textual skip); instruction files backport (root + template CLAUDE/cursorrules/copilot/codex + memory-seed + FRAMEWORK_MAP + HOW_IT_WORKS + DEVELOPER_GUIDE); CONTRIBUTIONS.md sprint 1 insights. 103 tests green. validate_framework.sh: 845/846 (pre-existing VERSION drift, not from sprint).
+
+**Next steps**:
+- Commit, push, merge to main per user direction
+
+**Blockers**: Legacy bash gate's complexity warning at 18 staged files (advisory only, instruction-file backport spans 11 files by nature)
+

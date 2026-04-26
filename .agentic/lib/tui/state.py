@@ -223,7 +223,7 @@ class DashboardState:
     def __init__(self, *, feature: str = "—", profile: str = "—",
                  mode: str = "—", event_ring_size: int = 200,
                  worker_idle_seconds: float = 300.0,
-                 clock=time.time) -> None:
+                 clock=time.monotonic) -> None:
         self.feature = feature
         self.profile = profile
         self.mode = mode
@@ -337,6 +337,12 @@ class DashboardState:
 
     @staticmethod
     def _extract_cost(rec_type: str, payload: Mapping[str, Any]) -> Optional[int]:
+        """Extract a token-cost annotation if the writer attached one to the
+        event payload. The events.jsonl writer (events.py) does not currently
+        set tokens_in/tokens_out on event payloads — those land in
+        delegation.jsonl and token-ledger.jsonl. This helper covers the case
+        where a future writer (e.g., R-209 cost-annotated events) attaches
+        them, and returns None for today's writers."""
         if rec_type in ("commit", "merge_attempt", "push_attempt"):
             return None
         for k in ("tokens_in", "tokens_out", "cost_tokens"):
