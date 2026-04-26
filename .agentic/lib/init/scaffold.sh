@@ -337,49 +337,80 @@ fi
 
 # Suggest marketplace skills if stack was detected (F-008 M-002, PR-B)
 # Runs after quality profile generation so STACK.md + package manifests are populated.
-# Skipped in non-interactive / --no-skills / no-TTY / previous skip preference.
-if [[ "$DISCOVERY_RAN" == "yes" && -z "$NO_SKILLS" && -z "$NON_INTERACTIVE" ]]; then
+#
+# Behavior matrix:
+#   --no-skills              => skip entirely
+#   skip_on_init: true       => skip entirely (user-saved preference)
+#   CI detected              => emit info hint, do NOT prompt
+#   non-interactive (no TTY) => emit info hint pointing at `ag skills suggest`,
+#                               do NOT prompt; agent-driven init still gets the
+#                               nudge to run the suggestion via Step 3b in the
+#                               playbook.
+#   interactive TTY          => prompt y/N/never
+if [[ "$DISCOVERY_RAN" == "yes" && -z "$NO_SKILLS" ]]; then
   SKILLS_ENGINE="${ROOT_DIR}/.agentic/lib/tools/skills_marketplace.py"
   SKILLS_PREFS="${ROOT_DIR}/.agentic/local/skills-preferences.json"
+
+  # Detect CI environment (skip prompt even if a TTY is attached)
+  _SKILLS_CI=""
+  if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" || -n "${GITLAB_CI:-}" || -n "${BUILDKITE:-}" || -n "${CIRCLECI:-}" || -n "${JENKINS_URL:-}" ]]; then
+    _SKILLS_CI="yes"
+  fi
+
+  # Read skip-preference safely. Use jq when available (proper parsing); otherwise
+  # fall back to a tolerant grep — quote-safe even with weird paths because we
+  # don't interpolate the path into a shell-built Python literal.
   _SKILLS_SKIPPED_BEFORE=""
-  if [[ -f "$SKILLS_PREFS" ]] && python3 -c "
-import json, sys
-d = json.load(open('$SKILLS_PREFS'))
-sys.exit(0 if d.get('skip_on_init') else 1)
-" 2>/dev/null; then
-    _SKILLS_SKIPPED_BEFORE="yes"
+  if [[ -f "$SKILLS_PREFS" ]]; then
+    if command -v jq >/dev/null 2>&1; then
+      if [[ "$(jq -r '.skip_on_init // false' "$SKILLS_PREFS" 2>/dev/null)" == "true" ]]; then
+        _SKILLS_SKIPPED_BEFORE="yes"
+      fi
+    else
+      if grep -Eq '"skip_on_init"[[:space:]]*:[[:space:]]*true' "$SKILLS_PREFS"; then
+        _SKILLS_SKIPPED_BEFORE="yes"
+      fi
+    fi
   fi
 
   if [[ -f "$SKILLS_ENGINE" && -z "$_SKILLS_SKIPPED_BEFORE" ]] && python3 -c "import yaml" 2>/dev/null; then
-    # Check if there are any matches before prompting
-    SKILLS_OUTPUT=$(CLAUDE_PROJECT_DIR="$ROOT_DIR" ROOT_DIR="$ROOT_DIR" python3 "$SKILLS_ENGINE" suggest 2>&1) || true
-    if echo "$SKILLS_OUTPUT" | grep -q "available"; then
+    # Check if there are any matches before prompting (sync --dry-run returns
+    # exit code 2 when a diff exists — robust signal vs grepping output text).
+    if CLAUDE_PROJECT_DIR="$ROOT_DIR" ROOT_DIR="$ROOT_DIR" python3 "$SKILLS_ENGINE" sync --dry-run >/dev/null 2>&1; \
+       [[ $? -eq 2 ]]; then
+      SKILLS_OUTPUT=$(CLAUDE_PROJECT_DIR="$ROOT_DIR" ROOT_DIR="$ROOT_DIR" python3 "$SKILLS_ENGINE" suggest 2>&1) || true
       echo ""
       echo "$SKILLS_OUTPUT"
       echo ""
-      if [[ -t 0 && -t 1 ]]; then
+      if [[ -t 0 && -t 1 && -z "$_SKILLS_CI" && -z "$NON_INTERACTIVE" ]]; then
         printf "Install stack-matched quality skills from skills.sh? [y/N/never] "
         read -r _skills_resp </dev/tty 2>/dev/null || _skills_resp=""
         case "$_skills_resp" in
           y|Y|yes)
             echo ""
             CLAUDE_PROJECT_DIR="$ROOT_DIR" ROOT_DIR="$ROOT_DIR" \
-              python3 "$SKILLS_ENGINE" install --all --yes --override-builtin 2>&1 || \
+              python3 "$SKILLS_ENGINE" install --all --yes 2>&1 || \
               echo "WARN: Marketplace skill install failed (continuing)"
             echo ""
             ;;
           never)
             mkdir -p "$(dirname "$SKILLS_PREFS")"
-            echo '{"skip_on_init": true}' > "$SKILLS_PREFS"
-            echo "OK  : marketplace skills skipped (preference saved; remove $SKILLS_PREFS to re-enable)"
+            # Atomic write: tmp + mv so a crash mid-write can't leave a
+            # truncated JSON file that subsequent inits would fail to parse.
+            printf '%s\n' '{"skip_on_init": true}' > "${SKILLS_PREFS}.tmp" && \
+              mv "${SKILLS_PREFS}.tmp" "$SKILLS_PREFS"
+            echo "OK  : marketplace skills skipped (preference saved at $SKILLS_PREFS; delete file to re-enable). Use 'ag skills install --all' for one-off install."
             ;;
           *)
-            echo "OK  : skipped. Run 'ag skills install --all' later to install."
+            echo "OK  : skipped. Run 'ag skills install --all' later, or 'ag skills suggest' to review."
             ;;
         esac
       else
-        echo "INFO: non-interactive — skipping marketplace skills prompt."
-        echo "      Run 'ag skills suggest' to see matches, 'ag skills install --all' to install."
+        # Non-interactive / CI / agent-driven init: surface the nudge but don't
+        # prompt. init_playbook.md Step 3b guides agents to invoke ag skills
+        # suggest/install themselves; this hint reinforces that path.
+        echo "INFO: non-interactive context detected; skipping marketplace skills prompt."
+        echo "      Available: 'ag skills suggest' (review matches), 'ag skills install --all' (install)."
       fi
     fi
   fi
